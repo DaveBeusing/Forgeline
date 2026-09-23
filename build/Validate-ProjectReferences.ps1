@@ -42,6 +42,7 @@ function Visit-Project {
         [Parameter(Mandatory = $true)]
         [string]$ProjectPath,
         [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
         [System.Collections.Generic.List[string]]$Stack
     )
 
