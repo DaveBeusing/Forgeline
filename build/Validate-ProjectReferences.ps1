@@ -14,11 +14,12 @@ $nameByPath = @{}
 
 foreach ($project in $projects) {
     [xml]$xml = Get-Content -Path $project.FullName -Raw
+    $referenceNodes = @($xml.SelectNodes("/Project/ItemGroup/ProjectReference"))
     $references = @(
-        $xml.Project.ItemGroup.ProjectReference |
-            Where-Object { $_ -ne $null } |
+        $referenceNodes |
             ForEach-Object {
-                [System.IO.Path]::GetFullPath((Join-Path $project.DirectoryName $_.Include))
+                $include = $_.GetAttribute("Include")
+                [System.IO.Path]::GetFullPath((Join-Path $project.DirectoryName $include))
             }
     )
 
