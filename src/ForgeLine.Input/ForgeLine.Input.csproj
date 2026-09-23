@@ -2,4 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../ForgeLine.Core/ForgeLine.Core.csproj" />
+    <ProjectReference Include="../ForgeLine.Platform.Windows/ForgeLine.Platform.Windows.csproj" />
+  </ItemGroup>
 </Project>

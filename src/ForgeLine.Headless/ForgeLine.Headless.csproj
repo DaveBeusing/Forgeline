@@ -3,4 +3,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../ForgeLine.Assets/ForgeLine.Assets.csproj" />
+    <ProjectReference Include="../ForgeLine.Game/ForgeLine.Game.csproj" />
+  </ItemGroup>
 </Project>
