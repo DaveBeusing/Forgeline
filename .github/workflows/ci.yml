@@ -18,6 +18,7 @@ concurrency:
 env:
   DOTNET_CLI_TELEMETRY_OPTOUT: "1"
   DOTNET_NOLOGO: "1"
+  TESTINGPLATFORM_TELEMETRY_OPTOUT: "1"
 
 jobs:
   build-test:
@@ -43,4 +44,4 @@ jobs:
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test ForgeLine.sln --configuration Release --no-build --logger "console;verbosity=normal"
+        run: dotnet test ForgeLine.sln --configuration Release --no-build
