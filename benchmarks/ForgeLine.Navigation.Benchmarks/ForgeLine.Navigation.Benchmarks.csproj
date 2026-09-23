@@ -4,4 +4,8 @@
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" />
+    <ProjectReference Include="../../src/ForgeLine.Navigation/ForgeLine.Navigation.csproj" />
+  </ItemGroup>
 </Project>
