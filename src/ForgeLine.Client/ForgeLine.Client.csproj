@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../ForgeLine.Platform.Windows/ForgeLine.Platform.Windows.csproj" />
+    <ProjectReference Include="../ForgeLine.Graphics/ForgeLine.Graphics.csproj" />
+    <ProjectReference Include="../ForgeLine.Audio/ForgeLine.Audio.csproj" />
+    <ProjectReference Include="../ForgeLine.Input/ForgeLine.Input.csproj" />
+    <ProjectReference Include="../ForgeLine.Assets/ForgeLine.Assets.csproj" />
+    <ProjectReference Include="../ForgeLine.Game/ForgeLine.Game.csproj" />
+    <ProjectReference Include="../ForgeLine.Presentation/ForgeLine.Presentation.csproj" />
+    <ProjectReference Include="../ForgeLine.UI/ForgeLine.UI.csproj" />
+  </ItemGroup>
+</Project>

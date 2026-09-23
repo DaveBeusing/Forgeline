@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/ForgeLine.Core/ForgeLine.Core.csproj" />
+    <ProjectReference Include="../../src/ForgeLine.Assets/ForgeLine.Assets.csproj" />
+    <ProjectReference Include="../../src/ForgeLine.World/ForgeLine.World.csproj" />
+    <ProjectReference Include="../../src/ForgeLine.Navigation/ForgeLine.Navigation.csproj" />
+  </ItemGroup>
+</Project>

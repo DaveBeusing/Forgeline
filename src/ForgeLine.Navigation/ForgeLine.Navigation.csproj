@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../ForgeLine.Core/ForgeLine.Core.csproj" />
+    <ProjectReference Include="../ForgeLine.Jobs/ForgeLine.Jobs.csproj" />
+    <ProjectReference Include="../ForgeLine.World/ForgeLine.World.csproj" />
+  </ItemGroup>
+</Project>
