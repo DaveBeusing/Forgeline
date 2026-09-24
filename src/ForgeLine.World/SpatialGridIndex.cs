@@ -344,6 +344,38 @@ public sealed class SpatialGridIndex
             ToDuration(_maximumQueryStopwatchTicks));
     }
 
+    public SpatialIndexDebugSnapshot CaptureDebugSnapshot(
+        float planeY = 0.0f)
+    {
+        if (!float.IsFinite(planeY))
+        {
+            throw new ArgumentOutOfRangeException(nameof(planeY));
+        }
+
+        var cells = new SpatialDebugCell[_cells.Count];
+        int index = 0;
+
+        foreach (KeyValuePair<SpatialCellAddress, List<EntityId>> pair in _cells)
+        {
+            cells[index++] = new SpatialDebugCell(
+                pair.Key,
+                SpatialAddressing.GetCellBounds(
+                    pair.Key,
+                    _settings,
+                    planeY - 0.05f,
+                    planeY + 0.05f),
+                pair.Value.Count);
+        }
+
+        Array.Sort(
+            cells,
+            static (left, right) => left.Address.CompareTo(right.Address));
+
+        return new SpatialIndexDebugSnapshot(
+            _entries.Count,
+            cells);
+    }
+
     private void VisitAabbRange(
         SpatialCellRange range,
         AxisAlignedBounds bounds,

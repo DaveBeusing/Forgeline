@@ -53,7 +53,18 @@ internal sealed class ClientApplication
         var snapshotBuffer = new PresentationSnapshotBuffer();
         var simulation = new SimulationCoordinator(
             diagnosticsOptions: new SimulationDiagnosticsOptions { Enabled = true });
+        var spatialIndex = new SpatialGridIndex(
+            new SpatialGridSettings
+            {
+                World = terrainWorld.Settings,
+                CellSizeMeters = SpatialGridSettings.DefaultCellSizeMeters,
+                EnableQueryTiming = true
+            });
+        var spatialSynchronizer = new SpatialIndexSynchronizer(spatialIndex);
+
         simulation.RegisterSystem(new LinearMotionSystem());
+        simulation.RegisterSystem(new SpatialIndexSystem(spatialSynchronizer));
+        simulation.RegisterSystem(new SpatialIndexCleanupSystem(spatialSynchronizer));
         simulation.RegisterTickObserver(new PresentationExtractor(snapshotBuffer));
         PopulateSimulationEntities(simulation, terrainWorld, renderInstanceCount);
         simulation.AdvanceOneTick();
@@ -224,7 +235,8 @@ internal sealed class ClientApplication
                 renderWorld,
                 renderAlpha,
                 camera,
-                selectionController);
+                selectionController,
+                spatialIndex);
 
             terrainRenderer.DebugChunksEnabled = worldDebugEnabled;
 
@@ -336,12 +348,13 @@ internal sealed class ClientApplication
                         : ControllableEntityCategory.Unit;
 
             var entity = simulation.Entities.CreateEntity();
+            Vector3 scale = new(8.0f, 6.0f, 8.0f);
             simulation.Entities.AddComponent(
                 entity,
                 new WorldTransform(
                     new Vector3(x, terrainHeight + 3.0f, z),
                     Quaternion.Identity,
-                    new Vector3(8.0f, 6.0f, 8.0f)));
+                    scale));
 
             Vector3 velocity =
                 category != ControllableEntityCategory.Building &&
@@ -357,6 +370,16 @@ internal sealed class ClientApplication
             simulation.Entities.AddComponent(
                 entity,
                 new ControllableEntity(owner, category));
+            simulation.Entities.AddComponent(
+                entity,
+                new SpatialPresence(
+                    scale * 0.5f,
+                    new SpatialEntryMetadata(
+                        owner.Value,
+                        (ulong)category,
+                        category == ControllableEntityCategory.Building
+                            ? SpatialMobility.Static
+                            : SpatialMobility.Mobile)));
         }
     }
 
@@ -366,7 +389,8 @@ internal sealed class ClientApplication
         RenderWorld renderWorld,
         float alpha,
         RtsCamera camera,
-        RtsSelectionController selectionController)
+        RtsSelectionController selectionController,
+        SpatialGridIndex spatialIndex)
     {
         debugDraw.Clear();
 
@@ -390,8 +414,22 @@ internal sealed class ClientApplication
 
         if (worldDebugEnabled)
         {
-            debugDraw.Circle(camera.Target, 40.0f, rangeColor, segments: 48);
+            SpatialIndexDebugVisualization.DrawRadiusQuery(
+                debugDraw,
+                camera.Target,
+                40.0f,
+                rangeColor);
             debugDraw.Point(camera.Target, 8.0f, pointColor);
+
+            SpatialIndexDebugSnapshot spatialSnapshot =
+                spatialIndex.CaptureDebugSnapshot(camera.Target.Y + 0.1f);
+            SpatialIndexDebugVisualization.DrawOccupiedCells(
+                debugDraw,
+                spatialSnapshot,
+                new Vector4(0.35f, 0.65f, 1.0f, 0.8f),
+                new Vector4(1.0f, 0.35f, 0.15f, 1.0f),
+                maximumCells: 256,
+                maximumLabels: MaximumDebugLabels);
 
             int debugCount = Math.Min(
                 renderWorld.InstanceCount,
