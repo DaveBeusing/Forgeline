@@ -2,7 +2,7 @@
 
 ## Purpose
 
-`ForgeLine.Graphics` owns the first ForgeLine Engine graphics backend for Windows x64. The backend is intentionally narrow and RTS-focused: it establishes stable Direct3D 12 device, swap-chain, frame-resource, synchronization, shader, resource, and diagnostics foundations without introducing terrain, unit rendering, presentation extraction, or gameplay rules.
+`ForgeLine.Graphics` owns the ForgeLine Engine graphics backend for Windows x64. The backend remains intentionally narrow and RTS-focused: it provides Direct3D 12 device, swap-chain, frame-resource, synchronization, shader, geometry-buffer, depth-buffer, indexed-submission, and diagnostics foundations while terrain/world ownership remains outside the graphics layer.
 
 Simulation and headless execution remain independent from graphics.
 
@@ -127,18 +127,15 @@ The client coalesces queued window-size-related events before requesting a graph
 
 `IGraphicsDevice.RenderFrame` owns frame begin/end and accepts an optional `IGraphicsCommandContext` callback.
 
-The first command context exposes frame identity, viewport/scissor control, graphics-pipeline binding, and non-indexed draw submission. Pipelines own their root signature and pipeline state and are tied to the graphics device that created them. Later RTS rendering can extend command recording without moving swap-chain, allocator, or fence ownership into presentation/game code.
+The command context exposes frame identity, viewport/scissor control, graphics-pipeline binding, vertex/index buffer binding, vertex root constants, and indexed or non-indexed draw submission. Pipelines own their root signature and pipeline state and are tied to the graphics device that created them. Terrain uses this boundary without exposing D3D12 objects to presentation/world code.
 
 ## Resource Foundation
 
-`IGraphicsDevice.CreateBuffer` establishes explicit buffer ownership for:
-
-- GPU-local default-heap buffers
-- CPU-visible upload-heap buffers
+`IGraphicsDevice.CreateBuffer` establishes explicit buffer ownership for GPU-local default-heap buffers and CPU-visible upload-heap buffers. `IGraphicsBuffer.SetData` provides bounded initialization of upload buffers. The first terrain renderer creates persistent per-chunk vertex and index buffers once and reuses them across frames.
 
 The returned `IGraphicsBuffer` is caller-owned and disposable. Graphics resources must be released before the graphics device is destroyed. Debug live-object reporting helps surface lifetime violations.
 
-Texture allocation, upload scheduling, descriptor-table management, and higher-level asset residency remain later work.
+Texture allocation, staged GPU-local upload scheduling, descriptor-table management, and higher-level asset residency remain later work.
 
 ## Shader Compilation
 
@@ -155,7 +152,7 @@ The current foundation:
 - returns immutable engine-facing shader bytecode metadata;
 - reports DXC diagnostics through `GraphicsShaderCompilationException`.
 
-The Windows graphics smoke path compiles vertex and pixel shaders, creates a minimal root signature and graphics pipeline state, and submits a three-vertex triangle so CI validates the native DXC and D3D12 pipeline path.
+The Windows graphics smoke path now compiles the terrain vertex/pixel shaders, creates the terrain root signature and pipeline state, creates a depth target, binds indexed chunk geometry, and submits visible terrain so CI validates the native DXC and D3D12 world-rendering path.
 
 ## Diagnostics
 
@@ -181,17 +178,16 @@ The repository validates the foundation through:
 - full solution restore/build
 - project-reference architecture validation
 - focused DXC success/failure tests
-- Windows graphics client smoke execution with root-signature/PSO creation and triangle draw
+- Windows graphics client smoke execution with terrain shader/PSO creation, depth buffering, persistent chunk geometry, frustum culling, and indexed draws
 - the existing headless smoke and 10,000-entity stress validation
 - complete solution tests
 
-The Windows client smoke is a bounded clear/present and minimal triangle-pipeline validation. GPU timing thresholds are intentionally not used as CI gates.
+The Windows client smoke is a bounded terrain-rendering validation. GPU timing thresholds are intentionally not used as CI gates.
 
 ## Deferred Rendering Work
 
 This foundation deliberately does not implement:
 
-- terrain rendering
 - unit/building rendering
 - model loading
 - render extraction from ECS/game state
