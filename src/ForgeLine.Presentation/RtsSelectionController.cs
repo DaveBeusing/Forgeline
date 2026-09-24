@@ -1,5 +1,6 @@
 using System.Numerics;
 using ForgeLine.Core;
+using ForgeLine.Game;
 using ForgeLine.Input;
 using ForgeLine.Platform;
 using ForgeLine.World;
@@ -24,7 +25,7 @@ public sealed class RtsSelectionController
         _filter = filter;
 
         if (!_filter.Owner.IsSpecified ||
-            _filter.Categories == Game.ControllableEntityCategory.None)
+            _filter.Categories == ControllableEntityCategory.None)
         {
             throw new ArgumentOutOfRangeException(nameof(filter));
         }
