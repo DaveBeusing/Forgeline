@@ -44,6 +44,7 @@ public sealed class RtsCameraActionMapper
             pitch,
             state.WheelDelta / 120.0f,
             state.IsMouseButtonDown(Bindings.DragPanButton),
+            state.HasPointerPosition,
             state.PointerPosition,
             state.PointerDelta);
     }

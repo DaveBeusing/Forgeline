@@ -13,6 +13,8 @@ public sealed class InputState
     private Vector2 _pointerDelta;
     private int _wheelDelta;
 
+    public bool HasPointerPosition => _hasPointerPosition;
+
     public Vector2 PointerPosition => _pointerPosition;
 
     public Vector2 PointerDelta => _pointerDelta;

@@ -8,5 +8,6 @@ public readonly record struct RtsCameraInputFrame(
     float Pitch,
     float ZoomSteps,
     bool DragPan,
+    bool HasPointerPosition,
     Vector2 PointerPosition,
     Vector2 PointerDelta);
