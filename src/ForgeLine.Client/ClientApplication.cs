@@ -30,9 +30,18 @@ internal sealed class ClientApplication
         WriteWindowState("started", window);
         WriteGraphicsState("started", graphics);
 
-        if (smokeTest)
+        using IGraphicsPipeline? smokePipeline =
+            smokeTest ? CreateSmokePipeline(graphics) : null;
+
+        Action<IGraphicsCommandContext>? recordCommands = null;
+        if (smokePipeline is not null)
         {
-            ValidateShaderCompiler();
+            IGraphicsPipeline pipeline = smokePipeline;
+            recordCommands = context =>
+            {
+                context.SetPipeline(pipeline);
+                context.Draw(3);
+            };
         }
 
         long startedAt = _platform.Clock.GetTimestamp();
@@ -58,7 +67,7 @@ internal sealed class ClientApplication
                 continue;
             }
 
-            graphics.RenderFrame(GraphicsColor.ForgeLineClear);
+            graphics.RenderFrame(GraphicsColor.ForgeLineClear, recordCommands);
         }
 
         DrainWindowEvents(window, graphics);
@@ -95,9 +104,9 @@ internal sealed class ClientApplication
         }
     }
 
-    private static void ValidateShaderCompiler()
+    private static IGraphicsPipeline CreateSmokePipeline(IGraphicsDevice graphics)
     {
-        const string shaderSource = """
+        const string vertexShaderSource = """
             float4 VSMain(uint vertexId : SV_VertexID) : SV_Position
             {
                 float2 positions[3] =
@@ -111,16 +120,33 @@ internal sealed class ClientApplication
             }
             """;
 
+        const string pixelShaderSource = """
+            float4 PSMain() : SV_Target0
+            {
+                return float4(0.95f, 0.58f, 0.12f, 1.0f);
+            }
+            """;
+
         var compiler = new DxcShaderCompiler();
-        GraphicsShaderBytecode bytecode = compiler.Compile(
-            shaderSource,
+        GraphicsShaderBytecode vertexShader = compiler.Compile(
+            vertexShaderSource,
             GraphicsShaderStage.Vertex,
             "VSMain",
-            "FoundationSmoke.hlsl");
+            "FoundationSmokeVertex.hlsl");
+        GraphicsShaderBytecode pixelShader = compiler.Compile(
+            pixelShaderSource,
+            GraphicsShaderStage.Pixel,
+            "PSMain",
+            "FoundationSmokePixel.hlsl");
+
+        IGraphicsPipeline pipeline = graphics.CreateGraphicsPipeline(
+            new GraphicsPipelineDescription(vertexShader, pixelShader));
 
         Console.WriteLine(
-            $"[graphics:shader] stage={bytecode.Stage} " +
-            $"entry={bytecode.EntryPoint} bytes={bytecode.Data.Length}");
+            $"[graphics:shader] vertexBytes={vertexShader.Data.Length} " +
+            $"pixelBytes={pixelShader.Data.Length} pipeline=ready");
+
+        return pipeline;
     }
 
     private static void WriteWindowState(string state, IWindow window)
