@@ -53,7 +53,7 @@ The repository validates several of these invariants with `build/Validate-Projec
 
 - `ForgeLine.Ecs`: custom data-oriented entity/component storage and queries. The implemented low-level contracts and invariants are documented in `docs/Ecs.md`.
 - `ForgeLine.Jobs`: persistent-worker job scheduling, dependency handles, range execution, fences, failure propagation, and timing instrumentation. The implemented contracts and safe usage rules are documented in `docs/JobSystem.md`.
-- `ForgeLine.World`: chunk-based world ownership and spatial foundations.
+- `ForgeLine.World`: canonical world/region/chunk coordinates, chunk-based terrain ownership, headless heightfield sampling, terrain bounds, deterministic development terrain, and CPU terrain mesh generation.
 - `ForgeLine.Navigation`: hierarchical RTS navigation boundaries.
 - `ForgeLine.Simulation`: command-driven fixed-tick coordination, explicit phase ordering, simulation-owned randomness, and common simulation infrastructure.
 
@@ -129,9 +129,9 @@ Render World
 Renderer
 ```
 
-The renderer consumes extracted presentation state and does not determine simulation outcomes. The current client validation renders only the foundation clear plus a minimal smoke-test triangle; terrain, units, fog of war, and presentation extraction remain later rendering stages.
+The renderer consumes extracted presentation/world data and does not determine simulation outcomes. The current client derives persistent terrain render resources from `ForgeLine.World`, performs presentation-owned chunk frustum culling, and submits indexed depth-tested terrain through `ForgeLine.Graphics`. Units, fog of war, and simulation presentation extraction remain later rendering stages.
 
-See `docs/Graphics.md` for the implemented graphics lifecycle and ownership rules. See `docs/CameraAndInput.md` for the raw-input boundary, RTS action mapping, camera coordinate convention, controls, and screen/world APIs.
+See `docs/Graphics.md` for the implemented graphics lifecycle and ownership rules. See `docs/CameraAndInput.md` for the raw-input boundary, RTS action mapping, camera coordinate convention, controls, and screen/world APIs. See `docs/WorldAndTerrain.md` for the canonical spatial model, heightfield semantics, terrain query boundary, mesh generation, culling, and render ownership.
 
 ## Performance Direction
 
