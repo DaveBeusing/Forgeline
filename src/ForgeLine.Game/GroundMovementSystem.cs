@@ -510,9 +510,9 @@ public sealed class GroundMovementSystem : ISimulationSystem
                 away = Horizontal(position - entry.Bounds.Center);
                 if (away.LengthSquared() <= MinimumDirectionLengthSquared)
                 {
-                    away = DeterministicSeparationAxis(
-                        entity,
-                        obstacle);
+                    away = PerpendicularAvoidanceAxis(
+                        targetDirection,
+                        entity);
                 }
                 else
                 {
@@ -522,6 +522,14 @@ public sealed class GroundMovementSystem : ISimulationSystem
             else
             {
                 away /= distance;
+            }
+
+            if (Vector3.Dot(away, targetDirection) < -0.5f)
+            {
+                Vector3 lateral = PerpendicularAvoidanceAxis(
+                    targetDirection,
+                    entity);
+                away = NormalizeHorizontal(away + lateral * 1.5f);
             }
 
             float strength =
@@ -793,6 +801,23 @@ public sealed class GroundMovementSystem : ISimulationSystem
         return left < right
             ? -Vector3.UnitX
             : Vector3.UnitX;
+    }
+
+    private static Vector3 PerpendicularAvoidanceAxis(
+        Vector3 direction,
+        EntityId entity)
+    {
+        Vector3 lateral = new(
+            direction.Z,
+            0.0f,
+            -direction.X);
+
+        if ((entity.Index & 1U) != 0)
+        {
+            lateral = -lateral;
+        }
+
+        return NormalizeHorizontal(lateral);
     }
 
     private static Vector3 NormalizeHorizontal(Vector3 value)
