@@ -11,10 +11,7 @@ public static class DevelopmentTerrainFactory
         WorldGridSettings resolvedSettings = settings ?? new WorldGridSettings();
         resolvedSettings.Validate();
 
-        if (chunkRadius < 1)
-        {
-            throw new ArgumentOutOfRangeException(nameof(chunkRadius));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(chunkRadius, 1);
 
         int diameter = checked(chunkRadius * 2 + 1);
         var chunks = new List<TerrainChunk>(checked(diameter * diameter));
