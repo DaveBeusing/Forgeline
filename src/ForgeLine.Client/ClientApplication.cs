@@ -1,8 +1,10 @@
 using System.Numerics;
+using ForgeLine.Game;
 using ForgeLine.Graphics;
 using ForgeLine.Input;
 using ForgeLine.Platform;
 using ForgeLine.Presentation;
+using ForgeLine.Simulation;
 using ForgeLine.World;
 
 namespace ForgeLine.Client;
@@ -10,10 +12,13 @@ namespace ForgeLine.Client;
 internal sealed class ClientApplication
 {
     private const float MaximumCameraDeltaSeconds = 0.1f;
+    private const int MaximumDebugInstanceBoxes = 24;
+    private const int MaximumDebugLabels = 4;
 
     private static readonly TimeSpan IdleWait = TimeSpan.FromMilliseconds(16);
-    private static readonly TimeSpan SmokeTestDuration = TimeSpan.FromMilliseconds(250);
+    private static readonly TimeSpan SmokeTestDuration = TimeSpan.FromMilliseconds(350);
     private static readonly TimeSpan DiagnosticInterval = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan MaximumSimulationCatchUp = TimeSpan.FromMilliseconds(250);
 
     private readonly IPlatform _platform;
 
@@ -22,8 +27,10 @@ internal sealed class ClientApplication
         _platform = platform;
     }
 
-    internal int Run(bool smokeTest)
+    internal int Run(bool smokeTest, int renderInstanceCount)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(renderInstanceCount);
+
         var configuration = new WindowConfiguration(
             "FORGELINE",
             1600,
@@ -34,14 +41,24 @@ internal sealed class ClientApplication
         using IWindow window = _platform.CreateWindow(configuration);
         using IGraphicsDevice graphics = GraphicsDeviceFactory.CreateForWindow(window);
 
-        TerrainWorld world =
-            DevelopmentTerrainFactory.CreateRepresentativeWorld();
-        using var terrainRenderer = new TerrainRenderer(graphics, world)
-        {
-            DebugChunksEnabled = true
-        };
+        TerrainWorld terrainWorld = DevelopmentTerrainFactory.CreateRepresentativeWorld();
+        using var terrainRenderer = new TerrainRenderer(graphics, terrainWorld);
+        using var instanceRenderer = new SimpleInstanceRenderer(graphics);
+        using var debugDrawRenderer = new DebugDrawRenderer(graphics);
+        using var overlayRenderer = new DevelopmentOverlayRenderer(graphics);
 
-        float targetHeight = world.TrySampleHeight(
+        var snapshotBuffer = new PresentationSnapshotBuffer();
+        var simulation = new SimulationCoordinator(
+            diagnosticsOptions: new SimulationDiagnosticsOptions { Enabled = true });
+        simulation.RegisterSystem(new LinearMotionSystem());
+        simulation.RegisterTickObserver(new PresentationExtractor(snapshotBuffer));
+        PopulateSimulationEntities(simulation, terrainWorld, renderInstanceCount);
+        simulation.AdvanceOneTick();
+
+        var renderWorld = new RenderWorld();
+        _ = renderWorld.Update(snapshotBuffer);
+
+        float targetHeight = terrainWorld.TrySampleHeight(
             0.0f,
             0.0f,
             out float sampledHeight)
@@ -60,11 +77,28 @@ internal sealed class ClientApplication
                 PanReferenceDistance = 180.0f,
                 MaximumPanSpeedScale = 5.0f
             });
+        var debugDraw = new DebugDraw();
+        var frameTimingTracker = new FrameTimingTracker();
+
+        bool overlayEnabled = true;
+        bool worldDebugEnabled = false;
+        bool overlayToggleHeld = false;
+        bool worldDebugToggleHeld = false;
+        TimeSpan simulationAccumulator = TimeSpan.Zero;
+        FrameTimingMetrics frameTiming = default;
+        SimulationDiagnosticsSnapshot simulationDiagnostics =
+            simulation.Diagnostics.Capture(simulation);
 
         WriteWindowState("started", window);
         WriteGraphicsState("started", graphics);
-        WriteWorldState("started", world);
+        WriteWorldState("started", terrainWorld);
         WriteCameraState("started", camera);
+        WritePresentationState(
+            "started",
+            simulation,
+            renderWorld,
+            terrainRenderer,
+            instanceRenderer);
 
         long startedAt = _platform.Clock.GetTimestamp();
         long previousFrameAt = startedAt;
@@ -83,10 +117,23 @@ internal sealed class ClientApplication
             DrainInputEvents(window, inputState);
 
             long now = _platform.Clock.GetTimestamp();
-            float deltaSeconds = (float)Math.Min(
-                _platform.Clock.GetElapsedTime(previousFrameAt, now).TotalSeconds,
-                MaximumCameraDeltaSeconds);
+            TimeSpan frameElapsed = _platform.Clock.GetElapsedTime(previousFrameAt, now);
             previousFrameAt = now;
+
+            float cameraDeltaSeconds = (float)Math.Min(
+                frameElapsed.TotalSeconds,
+                MaximumCameraDeltaSeconds);
+
+            UpdateToggle(
+                inputState,
+                PlatformKey.F1,
+                ref overlayToggleHeld,
+                ref overlayEnabled);
+            UpdateToggle(
+                inputState,
+                PlatformKey.F2,
+                ref worldDebugToggleHeld,
+                ref worldDebugEnabled);
 
             if (smokeTest &&
                 _platform.Clock.GetElapsedTime(startedAt, now) >= SmokeTestDuration)
@@ -108,19 +155,82 @@ internal sealed class ClientApplication
             RtsCameraInputFrame cameraInput = actionMapper.Map(inputState);
             camera.Update(
                 cameraInput,
-                deltaSeconds,
+                cameraDeltaSeconds,
                 window.ClientSize.Width,
                 window.ClientSize.Height);
 
+            TimeSpan catchUp = frameElapsed <= MaximumSimulationCatchUp
+                ? frameElapsed
+                : MaximumSimulationCatchUp;
+            simulationAccumulator += catchUp;
+
+            while (simulationAccumulator >= simulation.Clock.TickDuration)
+            {
+                simulation.AdvanceOneTick();
+                simulationAccumulator -= simulation.Clock.TickDuration;
+            }
+
+            _ = renderWorld.Update(snapshotBuffer);
+
+            float renderAlpha = RenderInterpolation.CalculateAlpha(
+                simulationAccumulator,
+                simulation.Clock.TickDuration);
+
+            BuildWorldDebugVisualization(
+                debugDraw,
+                worldDebugEnabled,
+                renderWorld,
+                renderAlpha,
+                camera);
+
+            terrainRenderer.DebugChunksEnabled = worldDebugEnabled;
+
+            DevelopmentOverlayMetrics overlayMetrics = CreateOverlayMetrics(
+                frameTiming,
+                simulation,
+                simulationDiagnostics,
+                terrainRenderer,
+                instanceRenderer,
+                debugDrawRenderer,
+                renderWorld);
+
+            long renderStartedAt = _platform.Clock.GetTimestamp();
+
             graphics.RenderFrame(
                 GraphicsColor.ForgeLineClear,
-                context => terrainRenderer.Render(context, camera));
+                context =>
+                {
+                    terrainRenderer.Render(context, camera);
+                    instanceRenderer.Render(context, camera, renderWorld, renderAlpha);
+                    debugDrawRenderer.Render(context, camera, debugDraw);
 
-            if (_platform.Clock.GetElapsedTime(nextDiagnosticAt, now) >=
-                DiagnosticInterval)
+                    if (overlayEnabled)
+                    {
+                        overlayRenderer.Render(
+                            context,
+                            overlayMetrics,
+                            camera,
+                            debugDraw);
+                    }
+                });
+
+            long renderFinishedAt = _platform.Clock.GetTimestamp();
+
+            frameTiming = frameTimingTracker.Record(
+                frameElapsed,
+                _platform.Clock.GetElapsedTime(renderStartedAt, renderFinishedAt));
+
+            if (_platform.Clock.GetElapsedTime(nextDiagnosticAt, now) >= DiagnosticInterval)
             {
+                simulationDiagnostics = simulation.Diagnostics.Capture(simulation);
                 WriteCameraState("frame", camera);
                 WriteTerrainState("frame", terrainRenderer);
+                WritePresentationState(
+                    "frame",
+                    simulation,
+                    renderWorld,
+                    terrainRenderer,
+                    instanceRenderer);
                 nextDiagnosticAt = now;
             }
         }
@@ -129,8 +239,154 @@ internal sealed class ClientApplication
         DrainInputEvents(window, inputState);
         WriteCameraState("stopped", camera);
         WriteTerrainState("stopped", terrainRenderer);
+        WritePresentationState(
+            "stopped",
+            simulation,
+            renderWorld,
+            terrainRenderer,
+            instanceRenderer);
         WriteGraphicsState("stopped", graphics);
         return 0;
+    }
+
+    private static void PopulateSimulationEntities(
+        SimulationCoordinator simulation,
+        TerrainWorld terrainWorld,
+        int entityCount)
+    {
+        int side = checked((int)Math.Ceiling(Math.Sqrt(entityCount)));
+        const float spacing = 12.0f;
+        float halfSpan = (side - 1) * spacing * 0.5f;
+
+        for (int index = 0; index < entityCount; index++)
+        {
+            int xIndex = index % side;
+            int zIndex = index / side;
+            float x = xIndex * spacing - halfSpan;
+            float z = zIndex * spacing - halfSpan;
+            float terrainHeight = terrainWorld.TrySampleHeight(
+                x,
+                z,
+                out float sampledHeight)
+                ? sampledHeight
+                : 0.0f;
+
+            var entity = simulation.Entities.CreateEntity();
+            simulation.Entities.AddComponent(
+                entity,
+                new WorldTransform(
+                    new Vector3(x, terrainHeight + 3.0f, z),
+                    Quaternion.Identity,
+                    new Vector3(8.0f, 6.0f, 8.0f)));
+
+            Vector3 velocity = index % 6 == 0
+                ? new Vector3(2.0f + (index % 5) * 0.35f, 0.0f, 0.0f)
+                : Vector3.Zero;
+
+            simulation.Entities.AddComponent(entity, new LinearVelocity(velocity));
+            simulation.Entities.AddComponent(entity, new VisualIdentity(1));
+        }
+    }
+
+    private static void BuildWorldDebugVisualization(
+        DebugDraw debugDraw,
+        bool enabled,
+        RenderWorld renderWorld,
+        float alpha,
+        RtsCamera camera)
+    {
+        debugDraw.Clear();
+        debugDraw.Enabled = enabled;
+
+        if (!enabled)
+        {
+            return;
+        }
+
+        Vector4 rangeColor = new(0.2f, 0.75f, 1.0f, 1.0f);
+        Vector4 boundsColor = new(1.0f, 0.72f, 0.18f, 1.0f);
+        Vector4 pointColor = new(1.0f, 0.25f, 0.18f, 1.0f);
+
+        debugDraw.Circle(camera.Target, 40.0f, rangeColor, segments: 48);
+        debugDraw.Point(camera.Target, 8.0f, pointColor);
+
+        int debugCount = Math.Min(
+            renderWorld.InstanceCount,
+            MaximumDebugInstanceBoxes);
+
+        for (int index = 0; index < debugCount; index++)
+        {
+            RenderInstance instance = renderWorld.GetInterpolatedInstance(index, alpha);
+            Vector3 extents = Vector3.Max(
+                Vector3.Abs(instance.Transform.Scale) * 0.5f,
+                new Vector3(0.05f));
+
+            debugDraw.Box(
+                new AxisAlignedBounds(
+                    instance.Transform.Position - extents,
+                    instance.Transform.Position + extents),
+                boundsColor);
+
+            if (index < MaximumDebugLabels)
+            {
+                debugDraw.Label(
+                    instance.Transform.Position +
+                    new Vector3(0.0f, extents.Y + 2.0f, 0.0f),
+                    $"E{instance.Entity.Index}",
+                    boundsColor);
+            }
+        }
+    }
+
+    private static DevelopmentOverlayMetrics CreateOverlayMetrics(
+        in FrameTimingMetrics frameTiming,
+        SimulationCoordinator simulation,
+        SimulationDiagnosticsSnapshot simulationDiagnostics,
+        TerrainRenderer terrainRenderer,
+        SimpleInstanceRenderer instanceRenderer,
+        DebugDrawRenderer debugDrawRenderer,
+        RenderWorld renderWorld)
+    {
+        TerrainRenderDiagnostics terrain = terrainRenderer.LastDiagnostics;
+        InstanceRenderDiagnostics instances = instanceRenderer.LastDiagnostics;
+        DebugDrawRenderDiagnostics debug = debugDrawRenderer.LastDiagnostics;
+        double jobExecutionMilliseconds =
+            simulationDiagnostics.Jobs?.TotalExecutionDuration.TotalMilliseconds ?? 0.0;
+
+        return new DevelopmentOverlayMetrics(
+            frameTiming.FramesPerSecond,
+            frameTiming.FrameMilliseconds,
+            frameTiming.CpuRenderMilliseconds,
+            simulation.CurrentTick.Value,
+            simulationDiagnostics.LastTickDuration.TotalMilliseconds,
+            simulation.Entities.EntityCount,
+            terrain.VisibleChunks,
+            terrain.TotalChunks,
+            terrain.DrawCalls + instances.DrawCalls + debug.DrawCalls,
+            instances.VisibleInstances,
+            renderWorld.InstanceCount,
+            jobExecutionMilliseconds,
+            simulationDiagnostics.Runtime.TotalAllocatedBytes,
+            simulationDiagnostics.Runtime.HeapSizeBytes,
+            simulationDiagnostics.Runtime.Gen0Collections,
+            simulationDiagnostics.Runtime.Gen1Collections,
+            simulationDiagnostics.Runtime.Gen2Collections);
+    }
+
+    private static void UpdateToggle(
+        InputState inputState,
+        PlatformKey key,
+        ref bool held,
+        ref bool enabled)
+    {
+        bool down = inputState.IsKeyDown(key);
+
+        if (down && !held)
+        {
+            enabled = !enabled;
+        }
+
+        held = down;
     }
 
     private static void DrainWindowEvents(
@@ -174,9 +430,7 @@ internal sealed class ClientApplication
         }
     }
 
-    private static void WriteWindowState(
-        string state,
-        IWindow window)
+    private static void WriteWindowState(string state, IWindow window)
     {
         Console.WriteLine(
             $"[platform:{state}] handle=0x{window.NativeHandle.Value:X} " +
@@ -202,9 +456,7 @@ internal sealed class ClientApplication
             $"suspended={diagnostics.Surface.IsSuspended}");
     }
 
-    private static void WriteWorldState(
-        string state,
-        TerrainWorld world)
+    private static void WriteWorldState(string state, TerrainWorld world)
     {
         AxisAlignedBounds bounds = world.WorldBounds;
 
@@ -216,9 +468,7 @@ internal sealed class ClientApplication
             $"boundsMax=({bounds.Maximum.X:F0},{bounds.Maximum.Y:F1},{bounds.Maximum.Z:F0})");
     }
 
-    private static void WriteCameraState(
-        string state,
-        RtsCamera camera)
+    private static void WriteCameraState(string state, RtsCamera camera)
     {
         RtsCameraDiagnostics diagnostics = camera.GetDiagnostics();
 
@@ -236,8 +486,7 @@ internal sealed class ClientApplication
         string state,
         TerrainRenderer terrainRenderer)
     {
-        TerrainRenderDiagnostics diagnostics =
-            terrainRenderer.LastDiagnostics;
+        TerrainRenderDiagnostics diagnostics = terrainRenderer.LastDiagnostics;
 
         Console.WriteLine(
             $"[terrain:{state}] totalChunks={diagnostics.TotalChunks} " +
@@ -246,5 +495,25 @@ internal sealed class ClientApplication
             $"triangles={diagnostics.SubmittedTriangles} " +
             $"drawCalls={diagnostics.DrawCalls} " +
             $"staticBuffers={diagnostics.UploadedBufferCount}");
+    }
+
+    private static void WritePresentationState(
+        string state,
+        SimulationCoordinator simulation,
+        RenderWorld renderWorld,
+        TerrainRenderer terrainRenderer,
+        SimpleInstanceRenderer instanceRenderer)
+    {
+        TerrainRenderDiagnostics terrain = terrainRenderer.LastDiagnostics;
+        InstanceRenderDiagnostics instances = instanceRenderer.LastDiagnostics;
+
+        Console.WriteLine(
+            $"[presentation:{state}] tick={simulation.CurrentTick.Value} " +
+            $"entities={simulation.Entities.EntityCount} " +
+            $"snapshotTick={renderWorld.CurrentSnapshot?.Tick.Value ?? 0} " +
+            $"instances={renderWorld.InstanceCount} " +
+            $"visibleInstances={instances.VisibleInstances} " +
+            $"visibleChunks={terrain.VisibleChunks} " +
+            $"drawCalls={terrain.DrawCalls + instances.DrawCalls}");
     }
 }
