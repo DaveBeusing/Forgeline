@@ -58,9 +58,10 @@ The foundation contains BenchmarkDotNet hosts for:
 
 Benchmark code should be introduced together with meaningful measured workloads. Performance-sensitive architectural changes require measurement rather than assumption.
 
-Example benchmark host:
+Example benchmark hosts:
 
 ```powershell
+dotnet run --project benchmarks/ForgeLine.Ecs.Benchmarks/ForgeLine.Ecs.Benchmarks.csproj --configuration Release
 dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simulation.Benchmarks.csproj --configuration Release
 ```
 

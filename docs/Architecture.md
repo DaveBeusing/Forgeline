@@ -51,7 +51,7 @@ The repository validates several of these invariants with `build/Validate-Projec
 
 ### Simulation Foundation
 
-- `ForgeLine.Ecs`: custom data-oriented entity/component storage and queries.
+- `ForgeLine.Ecs`: custom data-oriented entity/component storage and queries. The implemented low-level contracts and invariants are documented in `docs/Ecs.md`.
 - `ForgeLine.Jobs`: persistent-worker job scheduling and synchronization.
 - `ForgeLine.World`: chunk-based world ownership and spatial foundations.
 - `ForgeLine.Navigation`: hierarchical RTS navigation boundaries.
