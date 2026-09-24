@@ -32,7 +32,7 @@ Platform, graphics, audio, input, and asset infrastructure remain isolated from 
 - Rendering must never mutate simulation state directly.
 - `ForgeLine.Headless` must operate without graphics, audio, UI, presentation, client, or Windows-windowing dependencies.
 - Platform-specific APIs remain behind platform boundaries.
-- UI interaction eventually enters simulation through commands rather than direct state mutation.
+- External actions enter simulation through commands rather than direct state mutation.
 - Simulation and presentation remain separate so complete matches can run without a window.
 - Circular project references are prohibited.
 
@@ -55,7 +55,9 @@ The repository validates several of these invariants with `build/Validate-Projec
 - `ForgeLine.Jobs`: persistent-worker job scheduling and synchronization.
 - `ForgeLine.World`: chunk-based world ownership and spatial foundations.
 - `ForgeLine.Navigation`: hierarchical RTS navigation boundaries.
-- `ForgeLine.Simulation`: fixed-tick simulation coordination and common simulation infrastructure.
+- `ForgeLine.Simulation`: command-driven fixed-tick coordination, explicit phase ordering, simulation-owned randomness, and common simulation infrastructure.
+
+The implemented simulation lifecycle and command boundary are documented in `docs/SimulationRuntime.md`.
 
 ### Simulation Domains
 
@@ -65,7 +67,7 @@ The repository validates several of these invariants with `build/Validate-Projec
 - `ForgeLine.Intelligence`: visibility, sensors, and intelligence simulation.
 - `ForgeLine.AI`: strategic, operational, tactical, and unit-behavior orchestration.
 
-These projects establish dependency boundaries only at this stage; their gameplay implementations are intentionally deferred.
+These domain projects establish dependency boundaries only at this stage; their gameplay implementations are intentionally deferred.
 
 ### Game and Presentation
 
@@ -85,18 +87,29 @@ Tool functionality is not part of the repository foundation.
 
 ## Simulation Baseline
 
-The planned simulation architecture is fixed-step, with an initial engineering target of 20 simulation ticks per second. Different systems may later run at lower tick divisors.
+The simulation runtime is fixed-step with a default engineering target of 20 simulation ticks per second, equivalent to 50 ms of logical simulation time per tick.
+
+Each tick traverses an explicit canonical phase sequence. Commands scheduled for a tick are executed at the Input Commands boundary before later phases run. Systems register for a specific phase and execute in stable registration order within that phase.
 
 Simulation code is written in a deterministic-friendly style:
 
 - explicit tick ordering
+- stable command ordering
 - stable iteration where required
 - seeded simulation-owned randomness
 - no wall-clock simulation decisions
 - no rendering-dependent game state
-- controlled parallel reductions
+- controlled parallel reductions when job execution is introduced
 
 Perfect cross-machine bit-level determinism is not a first-prototype requirement.
+
+## Headless Runtime
+
+`ForgeLine.Headless` composes the simulation runtime directly and has no graphics, audio, UI, presentation, client, or Windows-windowing dependency.
+
+Headless execution supports a configurable tick count, deterministic seed, and logical tick-rate override. It intentionally runs faster than real time when work permits; wall-clock timing is used only for host diagnostics and never to mutate simulation state.
+
+CI includes a short headless smoke execution after the Release build.
 
 ## Rendering Boundary
 
@@ -122,5 +135,7 @@ Performance-sensitive decisions are benchmark-driven. The architecture targets a
 - 1,000+ active combat/logistics entities without architectural redesign
 - 10,000+ lightweight simulation entities as an early stress target
 - 60+ FPS rendering on target hardware
+
+The simulation benchmark host includes empty and light fixed-tick workloads to track baseline runtime overhead.
 
 These are engineering targets, not product promises.

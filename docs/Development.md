@@ -27,6 +27,7 @@ From the repository root:
 dotnet restore ForgeLine.sln
 pwsh ./build/Validate-ProjectReferences.ps1
 dotnet build ForgeLine.sln --configuration Release --no-restore
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 64 --seed 12345 --tick-rate 20
 dotnet test ForgeLine.sln --configuration Release --no-build
 ```
 
@@ -34,7 +35,7 @@ The GitHub Actions CI workflow executes the same essential sequence on pull requ
 
 ## Test Projects
 
-The foundation contains test projects for:
+The repository contains test projects for:
 
 - Core
 - ECS
@@ -43,13 +44,13 @@ The foundation contains test projects for:
 - Logistics
 - Game
 
-The initial smoke tests intentionally verify test discovery/execution only. Functional tests belong with the systems they validate and should cover controlled failure behavior as well as successful behavior.
+Functional tests belong with the systems they validate and should cover controlled failure behavior as well as successful behavior.
 
-Simulation tests must remain runnable without starting the interactive client.
+Simulation tests verify fixed tick counts, explicit phase order, command scheduling and stable ordering, deterministic seeded behavior, fast headless-style execution, and allocation behavior. Simulation tests must remain runnable without starting the interactive client.
 
 ## Benchmark Projects
 
-The foundation contains BenchmarkDotNet hosts for:
+The repository contains BenchmarkDotNet hosts for:
 
 - ECS
 - Navigation
@@ -58,12 +59,27 @@ The foundation contains BenchmarkDotNet hosts for:
 
 Benchmark code should be introduced together with meaningful measured workloads. Performance-sensitive architectural changes require measurement rather than assumption.
 
-Example benchmark hosts:
+Examples:
 
 ```powershell
 dotnet run --project benchmarks/ForgeLine.Ecs.Benchmarks/ForgeLine.Ecs.Benchmarks.csproj --configuration Release
 dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simulation.Benchmarks.csproj --configuration Release
 ```
+
+Correctness tests remain separate from benchmark timing. Benchmark timing thresholds are not CI gates unless explicitly introduced later.
+
+## Headless Runtime
+
+The development host supports:
+
+```text
+--ticks <count>
+--seed <value>
+--tick-rate <hz>
+--help
+```
+
+The logical tick rate describes simulation time. Headless execution does not sleep to match real time and may run substantially faster than the configured logical rate.
 
 ## Commit Discipline
 
