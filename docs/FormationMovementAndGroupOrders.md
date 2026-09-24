@@ -45,7 +45,7 @@ The initial templates are:
 - `Wedge`
 - `Compact`
 
-`MoveEntitiesCommand` accepts the requested `FormationTemplate`. The Windows client currently uses the command default (`Compact`) for normal multi-selection move orders. This keeps formation selection available at the command boundary before a dedicated game UI exists.
+`MoveEntitiesCommand` accepts the requested `FormationTemplate`. The Windows development client starts with `Compact` and F3 cycles `Compact → Line → Column → Wedge`; the selected template is passed into subsequent movement commands. This exposes the required minimal formation control before a dedicated RTS command UI exists.
 
 Templates generate local two-dimensional slot offsets around the group anchor. Offsets are projected into world space from the group travel direction:
 
