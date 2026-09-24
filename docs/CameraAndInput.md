@@ -129,6 +129,8 @@ Losing focus invalidates the pointer for edge scrolling until a new pointer even
 
 `ScreenPointToWorldRay` produces a world-space ray suitable for future terrain, selection, and command picking.
 
+`TryScreenPointToWorldOnHorizontalPlane` intersects that ray with a configurable horizontal world plane and provides a direct screen-to-world coordinate helper for placeholder terrain and later ground interactions.
+
 `WorldToScreen` projects a world point into client pixels and reports normalized depth plus current clip visibility.
 
 These helpers do not read simulation state and remain usable with placeholder worlds, presentation snapshots, or future terrain systems.
