@@ -84,6 +84,23 @@ public sealed class RtsCameraTests
     }
 
     [Fact]
+    public void ScreenWorldGroundRoundTripReturnsOriginalTarget()
+    {
+        var camera = new RtsCamera(StableMovementSettings());
+        ScreenProjection projected = camera.WorldToScreen(camera.Target, 1600, 900);
+
+        bool hit = camera.TryScreenPointToWorldOnHorizontalPlane(
+            projected.Position,
+            camera.Target.Y,
+            1600,
+            900,
+            out Vector3 worldPoint);
+
+        Assert.True(hit);
+        Assert.InRange(Vector3.Distance(camera.Target, worldPoint), 0.0f, 0.001f);
+    }
+
+    [Fact]
     public void TargetProjectsToViewportCenter()
     {
         var camera = new RtsCamera(StableMovementSettings());

@@ -176,6 +176,40 @@ public sealed class RtsCamera
         return new CameraRay(Position, direction);
     }
 
+    public bool TryScreenPointToWorldOnHorizontalPlane(
+        Vector2 screenPoint,
+        float worldY,
+        int viewportWidth,
+        int viewportHeight,
+        out Vector3 worldPoint)
+    {
+        if (!float.IsFinite(worldY))
+        {
+            throw new ArgumentOutOfRangeException(nameof(worldY));
+        }
+
+        CameraRay ray = ScreenPointToWorldRay(
+            screenPoint,
+            viewportWidth,
+            viewportHeight);
+
+        if (MathF.Abs(ray.Direction.Y) <= 1e-6f)
+        {
+            worldPoint = default;
+            return false;
+        }
+
+        float distance = (worldY - ray.Origin.Y) / ray.Direction.Y;
+        if (!float.IsFinite(distance) || distance < 0.0f)
+        {
+            worldPoint = default;
+            return false;
+        }
+
+        worldPoint = ray.Origin + ray.Direction * distance;
+        return true;
+    }
+
     public ScreenProjection WorldToScreen(
         Vector3 worldPoint,
         int viewportWidth,
