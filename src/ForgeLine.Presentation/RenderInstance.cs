@@ -8,4 +8,5 @@ public readonly record struct RenderInstance(
     RenderMeshHandle Mesh,
     RenderMaterialHandle Material,
     RenderVisibilityMask Visibility,
-    uint DebugIdentity = 0);
+    uint DebugIdentity = 0,
+    SelectablePresentationMetadata Selectable = default);
