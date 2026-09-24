@@ -27,6 +27,26 @@ public readonly record struct SpatialCellAddress(
             : LocalX.CompareTo(other.LocalX);
     }
 
+    public static bool operator <(
+        SpatialCellAddress left,
+        SpatialCellAddress right) =>
+        left.CompareTo(right) < 0;
+
+    public static bool operator <=(
+        SpatialCellAddress left,
+        SpatialCellAddress right) =>
+        left.CompareTo(right) <= 0;
+
+    public static bool operator >(
+        SpatialCellAddress left,
+        SpatialCellAddress right) =>
+        left.CompareTo(right) > 0;
+
+    public static bool operator >=(
+        SpatialCellAddress left,
+        SpatialCellAddress right) =>
+        left.CompareTo(right) >= 0;
+
     public override string ToString() =>
         $"{Chunk}/[{LocalX},{LocalZ}]";
 }
