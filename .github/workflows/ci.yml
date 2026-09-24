@@ -43,8 +43,19 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
-      - name: Headless smoke test
-        run: dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 64 --seed 12345 --tick-rate 20
+      - name: Headless diagnostics smoke test
+        run: dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 64 --seed 12345 --tick-rate 20 --entities 1000 --diagnostics-output artifacts/headless-smoke.json
+
+      - name: Lightweight entity stress smoke
+        run: dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 16 --seed 67890 --tick-rate 20 --entities 10000 --diagnostics-output artifacts/headless-stress-10000.json
 
       - name: Test
         run: dotnet test ForgeLine.sln --configuration Release --no-build
+
+      - name: Upload engine diagnostic artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine-diagnostics
+          path: artifacts/*.json
+          if-no-files-found: warn

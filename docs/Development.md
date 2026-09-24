@@ -27,11 +27,12 @@ From the repository root:
 dotnet restore ForgeLine.sln
 pwsh ./build/Validate-ProjectReferences.ps1
 dotnet build ForgeLine.sln --configuration Release --no-restore
-dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 64 --seed 12345 --tick-rate 20
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 64 --seed 12345 --tick-rate 20 --entities 1000 --diagnostics-output artifacts/headless-smoke.json
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 16 --seed 67890 --tick-rate 20 --entities 10000 --diagnostics-output artifacts/headless-stress-10000.json
 dotnet test ForgeLine.sln --configuration Release --no-build
 ```
 
-The GitHub Actions CI workflow executes the same essential sequence on pull requests targeting `master` and on pushes to `master`.
+The GitHub Actions CI workflow executes the same essential sequence on pull requests targeting `master` and on pushes to `master`. Headless diagnostic JSON files are uploaded as the `engine-diagnostics` workflow artifact.
 
 ## Test Projects
 
@@ -47,7 +48,19 @@ The repository contains test projects for:
 
 Functional tests belong with the systems they validate and should cover controlled failure behavior as well as successful behavior.
 
-Job tests verify range coverage, dependency ordering, fences, exception propagation, one-worker execution, cancellation-aware shutdown, bounded stress execution, and instrumentation. Simulation tests verify fixed tick counts, explicit phase order, command scheduling and stable ordering, deterministic seeded behavior, job-boundary integration, fast headless-style execution, and allocation behavior. Simulation tests must remain runnable without starting the interactive client.
+Job tests verify range coverage, dependency ordering, fences, exception propagation, one-worker execution, cancellation-aware shutdown, bounded stress execution, and instrumentation. Simulation tests verify fixed tick counts, explicit phase order, command scheduling and stable ordering, deterministic seeded behavior, job-boundary integration, fast headless-style execution, allocation behavior, diagnostics, reusable test scenarios, and bounded entity stress. Simulation tests must remain runnable without starting the interactive client.
+
+## Diagnostics
+
+Engine diagnostics are opt-in and must remain independent of rendering, UI, audio, and platform-specific code.
+
+The headless host can emit structured JSON diagnostics:
+
+```powershell
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --ticks 1000 --seed 1 --entities 1000 --diagnostics-output artifacts/headless.json
+```
+
+See [Diagnostics and Performance](DiagnosticsAndPerformance.md) for available metrics, invariants, report fields, stress scenarios, and regression-investigation guidance.
 
 ## Benchmark Projects
 
@@ -58,7 +71,7 @@ The repository contains BenchmarkDotNet hosts for:
 - Simulation
 - Rendering
 
-Benchmark code should be introduced together with meaningful measured workloads. The simulation benchmark host includes scheduler range benchmarks that compare representative sequential and parallel execution. Performance-sensitive architectural changes require measurement rather than assumption.
+Benchmark code should be introduced together with meaningful measured workloads. The simulation benchmark host covers empty ticks, command processing, representative ECS-backed system ticks, multi-system ticks, and scheduler range work. Performance-sensitive architectural changes require measurement rather than assumption.
 
 Examples:
 
@@ -77,6 +90,8 @@ The development host supports:
 --ticks <count>
 --seed <value>
 --tick-rate <hz>
+--entities <count>
+--diagnostics-output <path>
 --help
 ```
 
@@ -90,4 +105,4 @@ Keep unrelated formatting, refactoring, functional changes, tests, documentation
 
 ## Documentation
 
-Documentation changes with implementation. When project responsibilities, dependency boundaries, build commands, validation requirements, or supported technical baselines change, update the relevant documents in the same work.
+Documentation changes with implementation. When project responsibilities, dependency boundaries, build commands, validation requirements, supported technical baselines, diagnostic conventions, or performance workflows change, update the relevant documents in the same work.
