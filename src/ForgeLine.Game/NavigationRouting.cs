@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Numerics;
 using ForgeLine.Core;
+using ForgeLine.Ecs;
 using ForgeLine.Navigation;
 using ForgeLine.Simulation;
 
