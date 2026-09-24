@@ -21,4 +21,6 @@ public interface IWindow : IDisposable
     void SetMode(WindowMode mode);
 
     bool TryDequeueEvent(out WindowEvent windowEvent);
+
+    bool TryDequeueInputEvent(out PlatformInputEvent inputEvent);
 }
