@@ -339,7 +339,8 @@ internal sealed class ClientApplication
                     "frame",
                     selectionController,
                     lastMovementEnvelope,
-                    lastMovementCommand);
+                    lastMovementCommand,
+                    activeFormation);
                 nextDiagnosticAt = now;
             }
         }
@@ -358,7 +359,8 @@ internal sealed class ClientApplication
             "stopped",
             selectionController,
             lastMovementEnvelope,
-            lastMovementCommand);
+            lastMovementCommand,
+            activeFormation);
         WriteGraphicsState("stopped", graphics);
         return 0;
     }
