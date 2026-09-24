@@ -113,7 +113,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         _frameFenceEvent = new AutoResetEvent(false);
 
         Console.WriteLine(
-            $"[graphics:device] adapter="{_deviceInfo.AdapterName}" " +
+            $"[graphics:device] adapter=\"{_deviceInfo.AdapterName}\" " +
             $"featureLevel={_deviceInfo.FeatureLevel} " +
             $"vramBytes={_deviceInfo.DedicatedVideoMemoryBytes} " +
             $"software={_deviceInfo.IsSoftwareAdapter} " +
@@ -401,7 +401,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         return new GraphicsDeviceException(
             $"{message} HRESULT=0x{resultCode:X8}; " +
             $"deviceRemovedReason=0x{removedReason:X8}; " +
-            $"adapter="{_deviceInfo.AdapterName}".");
+            $"adapter=\"{_deviceInfo.AdapterName}\".");
     }
 
     private static bool TryEnableDebugLayer(bool requested)
