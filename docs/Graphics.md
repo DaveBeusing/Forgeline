@@ -36,6 +36,7 @@ These packages use the MIT license and provide the maintained .NET bindings for 
 - frame fence values and wait event
 - graphics buffer allocations created through the device
 - DXC shader compilation
+- root signatures and graphics pipeline state created through the engine-facing pipeline contract
 
 Graphics does not own or mutate simulation state.
 
@@ -126,7 +127,7 @@ The client coalesces queued window-size-related events before requesting a graph
 
 `IGraphicsDevice.RenderFrame` owns frame begin/end and accepts an optional `IGraphicsCommandContext` callback.
 
-The first command context exposes frame identity plus viewport/scissor control. Later RTS rendering can extend command recording without moving swap-chain, allocator, or fence ownership into presentation/game code.
+The first command context exposes frame identity, viewport/scissor control, graphics-pipeline binding, and non-indexed draw submission. Pipelines own their root signature and pipeline state and are tied to the graphics device that created them. Later RTS rendering can extend command recording without moving swap-chain, allocator, or fence ownership into presentation/game code.
 
 ## Resource Foundation
 
@@ -154,7 +155,7 @@ The current foundation:
 - returns immutable engine-facing shader bytecode metadata;
 - reports DXC diagnostics through `GraphicsShaderCompilationException`.
 
-The Windows graphics smoke path compiles a small vertex shader so CI validates that the native DXC runtime is present and usable.
+The Windows graphics smoke path compiles vertex and pixel shaders, creates a minimal root signature and graphics pipeline state, and submits a three-vertex triangle so CI validates the native DXC and D3D12 pipeline path.
 
 ## Diagnostics
 
@@ -180,11 +181,11 @@ The repository validates the foundation through:
 - full solution restore/build
 - project-reference architecture validation
 - focused DXC success/failure tests
-- Windows graphics client smoke execution
+- Windows graphics client smoke execution with root-signature/PSO creation and triangle draw
 - the existing headless smoke and 10,000-entity stress validation
 - complete solution tests
 
-The Windows client smoke is a bounded clear/present validation. GPU timing thresholds are intentionally not used as CI gates.
+The Windows client smoke is a bounded clear/present and minimal triangle-pipeline validation. GPU timing thresholds are intentionally not used as CI gates.
 
 ## Deferred Rendering Work
 
