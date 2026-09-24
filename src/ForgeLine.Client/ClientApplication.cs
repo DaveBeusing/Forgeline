@@ -163,6 +163,8 @@ internal sealed class ClientApplication
                 PlatformKey.F2,
                 ref worldDebugToggleHeld,
                 ref worldDebugEnabled);
+            groundMovementSystem.DebugCaptureEnabled =
+                worldDebugEnabled;
 
             if (smokeTest &&
                 _platform.Clock.GetElapsedTime(startedAt, now) >= SmokeTestDuration)
