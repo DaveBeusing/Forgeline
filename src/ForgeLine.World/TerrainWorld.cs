@@ -117,8 +117,19 @@ public sealed class TerrainWorld : ITerrainQuery
 
     public bool TryGetChunk(
         ChunkCoordinate coordinate,
-        out TerrainChunk chunk) =>
-        _chunksByCoordinate.TryGetValue(coordinate, out chunk!);
+        out TerrainChunk chunk)
+    {
+        if (_chunksByCoordinate.TryGetValue(
+                coordinate,
+                out TerrainChunk? found))
+        {
+            chunk = found;
+            return true;
+        }
+
+        chunk = null!;
+        return false;
+    }
 
     public bool TrySampleHeight(
         float worldX,
