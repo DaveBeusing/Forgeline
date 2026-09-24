@@ -6,7 +6,7 @@ using ForgeLine.World;
 namespace ForgeLine.Rendering.Benchmarks;
 
 [MemoryDiagnoser]
-public class TerrainBenchmarks
+public class TerrainBenchmarks : IDisposable
 {
     private TerrainChunk _chunk = null!;
     private TerrainRenderer _renderer = null!;
@@ -38,9 +38,12 @@ public class TerrainBenchmarks
     }
 
     [GlobalCleanup]
-    public void Cleanup()
+    public void Cleanup() => Dispose();
+
+    public void Dispose()
     {
-        _renderer.Dispose();
+        _renderer?.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     [Benchmark]
