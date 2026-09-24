@@ -82,10 +82,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
     {
         D3D12GraphicsBuffer d3d12Buffer = ValidateBuffer(buffer);
 
-        if (strideInBytes <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(strideInBytes));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(strideInBytes);
 
         ulong remaining = ValidateBufferOffset(d3d12Buffer, offsetInBytes);
         var view = new VertexBufferView(
@@ -106,8 +103,8 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
 
         Format nativeFormat = format switch
         {
-            GraphicsIndexFormat.UInt16 => Format.R16_UInt,
-            GraphicsIndexFormat.UInt32 => Format.R32_UInt,
+            GraphicsIndexFormat.SixteenBit => Format.R16_UInt,
+            GraphicsIndexFormat.ThirtyTwoBit => Format.R32_UInt,
             _ => throw new ArgumentOutOfRangeException(nameof(format))
         };
 
@@ -180,10 +177,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
                 "Indexed draw calls must contain at least one index.");
         }
 
-        if (startIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(startIndex));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(startIndex);
 
         _commandList.DrawIndexedInstanced(
             checked((uint)indexCount),
@@ -212,10 +206,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         D3D12GraphicsBuffer buffer,
         int offsetInBytes)
     {
-        if (offsetInBytes < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(offsetInBytes));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(offsetInBytes);
 
         ulong offset = (ulong)offsetInBytes;
         if (offset >= buffer.Description.SizeInBytes)
