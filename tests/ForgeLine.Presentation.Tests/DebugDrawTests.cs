@@ -34,6 +34,37 @@ public sealed class DebugDrawTests
     }
 
     [Fact]
+    public void DisabledDebugDrawDoesNotAllocatePerPrimitive()
+    {
+        var debugDraw = new DebugDraw();
+        var bounds = new AxisAlignedBounds(Vector3.Zero, Vector3.One);
+
+        for (int index = 0; index < 16; index++)
+        {
+            debugDraw.Line(Vector3.Zero, Vector3.One, Vector4.One);
+            debugDraw.Box(bounds, Vector4.One);
+            debugDraw.Circle(Vector3.Zero, 2.0f, Vector4.One);
+            debugDraw.Point(Vector3.Zero, 1.0f, Vector4.One);
+        }
+
+        long before = GC.GetAllocatedBytesForCurrentThread();
+
+        for (int index = 0; index < 10_000; index++)
+        {
+            debugDraw.Line(Vector3.Zero, Vector3.One, Vector4.One);
+            debugDraw.Box(bounds, Vector4.One);
+            debugDraw.Circle(Vector3.Zero, 2.0f, Vector4.One);
+            debugDraw.Point(Vector3.Zero, 1.0f, Vector4.One);
+        }
+
+        long allocated =
+            GC.GetAllocatedBytesForCurrentThread() - before;
+
+        Assert.Equal(0L, allocated);
+        Assert.True(debugDraw.Lines.IsEmpty);
+    }
+
+    [Fact]
     public void EnabledDebugDrawBuildsExpectedPrimitiveLines()
     {
         var debugDraw = new DebugDraw

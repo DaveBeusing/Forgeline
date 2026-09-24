@@ -118,6 +118,48 @@ public sealed class PresentationExtractionTests
                 .Transform.Position.X);
     }
 
+    [Fact]
+    public async Task SnapshotHandoffSupportsIndependentProducerAndConsumerRates()
+    {
+        const ulong finalTick = 2_000;
+        var buffer = new PresentationSnapshotBuffer();
+
+        Task producer = Task.Run(
+            () =>
+            {
+                for (ulong tick = 1; tick <= finalTick; tick++)
+                {
+                    buffer.Publish(Snapshot(tick));
+                }
+            },
+            TestContext.Current.CancellationToken);
+
+        ulong observedTick = 0;
+        Task consumer = Task.Run(
+            () =>
+            {
+                while (observedTick < finalTick)
+                {
+                    if (buffer.TryReadLatest(out PresentationSnapshot snapshot))
+                    {
+                        Assert.True(snapshot.Tick.Value >= observedTick);
+                        observedTick = snapshot.Tick.Value;
+                    }
+                    else
+                    {
+                        Thread.Yield();
+                    }
+                }
+            },
+            TestContext.Current.CancellationToken);
+
+        await Task.WhenAll(producer, consumer);
+
+        Assert.Equal(finalTick, observedTick);
+        Assert.True(buffer.TryReadLatest(out PresentationSnapshot latest));
+        Assert.Equal(finalTick, latest.Tick.Value);
+    }
+
     [Theory]
     [InlineData(-1.0, 0.0f)]
     [InlineData(0.025, 0.5f)]
