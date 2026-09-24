@@ -72,7 +72,18 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         _pipeline = d3d12Pipeline;
         _commandList.SetGraphicsRootSignature(d3d12Pipeline.RootSignature);
         _commandList.SetPipelineState(d3d12Pipeline.PipelineState);
-        _commandList.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
+        _commandList.IASetPrimitiveTopology(
+            d3d12Pipeline.Description.PrimitiveTopology switch
+            {
+                GraphicsPrimitiveTopology.TriangleList =>
+                    PrimitiveTopology.TriangleList,
+                GraphicsPrimitiveTopology.LineList =>
+                    PrimitiveTopology.LineList,
+                _ => throw new ArgumentOutOfRangeException(
+                    nameof(pipeline),
+                    d3d12Pipeline.Description.PrimitiveTopology,
+                    "Unsupported graphics primitive topology.")
+            });
     }
 
     public void SetVertexBuffer(

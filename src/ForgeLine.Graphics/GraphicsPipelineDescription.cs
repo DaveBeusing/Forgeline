@@ -1,5 +1,11 @@
 namespace ForgeLine.Graphics;
 
+public enum GraphicsPrimitiveTopology
+{
+    TriangleList,
+    LineList
+}
+
 public sealed record GraphicsPipelineDescription(
     GraphicsShaderBytecode VertexShader,
     GraphicsShaderBytecode PixelShader)
@@ -8,6 +14,9 @@ public sealed record GraphicsPipelineDescription(
         Array.Empty<GraphicsVertexElement>();
 
     public int VertexRootConstantCount { get; init; }
+
+    public GraphicsPrimitiveTopology PrimitiveTopology { get; init; } =
+        GraphicsPrimitiveTopology.TriangleList;
 
     public bool DepthEnabled { get; init; }
 

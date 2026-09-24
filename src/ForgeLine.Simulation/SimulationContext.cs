@@ -23,5 +23,7 @@ public sealed class SimulationContext
 
     public SimulationTick Tick { get; internal set; }
 
+    public TimeSpan TickDuration { get; internal set; }
+
     public SimulationPhase Phase { get; internal set; }
 }

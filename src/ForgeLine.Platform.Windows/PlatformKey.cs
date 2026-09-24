@@ -18,5 +18,7 @@ public enum PlatformKey
     LeftShift,
     RightShift,
     Escape,
-    Space
+    Space,
+    F1,
+    F2
 }
