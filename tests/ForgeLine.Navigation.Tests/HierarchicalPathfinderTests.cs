@@ -96,6 +96,42 @@ public sealed class HierarchicalPathfinderTests
         Assert.Equal(1, pathfinder.HighLevelCacheEntryCount);
     }
 
+
+    [Fact]
+    public void ConcurrentRequestsShareOneHighLevelCacheEntry()
+    {
+        NavigationWorld world = NavigationWorld.Build(
+            CreateFlatWorld(),
+            gridSettings: new NavigationGridSettings
+            {
+                CellSizeMeters = 4.0f
+            },
+            sectorSettings: new NavigationSectorSettings
+            {
+                SectorSizeCells = 4
+            });
+
+        var pathfinder = new HierarchicalPathfinder(world);
+        NavigationCapabilities capabilities =
+            NavigationCapabilities.For(
+                NavigationMovementClass.Tracked);
+        var results = new NavigationSearchResult[16];
+
+        Parallel.For(
+            0,
+            results.Length,
+            index =>
+            {
+                results[index] = pathfinder.FindPath(
+                    new Vector3(4.0f, 0.0f, 4.0f),
+                    new Vector3(60.0f, 0.0f, 60.0f),
+                    capabilities);
+            });
+
+        Assert.All(results, result => Assert.True(result.Succeeded));
+        Assert.Equal(1, pathfinder.HighLevelCacheEntryCount);
+    }
+
     [Fact]
     public void ReturnsExplicitFailureWhenDestinationIsSeparated()
     {

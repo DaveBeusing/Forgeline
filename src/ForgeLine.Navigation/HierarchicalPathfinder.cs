@@ -7,7 +7,7 @@ public sealed class HierarchicalPathfinder
 {
     private readonly ConcurrentDictionary<
         HighLevelRouteCacheKey,
-        HighLevelRouteCacheEntry> _highLevelCache = new();
+        Lazy<HighLevelRouteCacheEntry>> _highLevelCache = new();
     private NavigationWorld _world;
 
     public HierarchicalPathfinder(NavigationWorld world)
@@ -80,26 +80,21 @@ public sealed class HierarchicalPathfinder
             startSector,
             destinationSector);
 
-        bool cacheHit =
-            _highLevelCache.TryGetValue(cacheKey, out _);
+        var candidate =
+            new Lazy<HighLevelRouteCacheEntry>(
+                () => CreateHighLevelRouteEntry(
+                    graph,
+                    cacheKey),
+                LazyThreadSafetyMode.ExecutionAndPublication);
 
-        HighLevelRouteCacheEntry highLevel =
+        Lazy<HighLevelRouteCacheEntry> cached =
             _highLevelCache.GetOrAdd(
                 cacheKey,
-                static (key, state) =>
-                {
-                    bool found =
-                        HighLevelRouteSearch.TryFindRoute(
-                            state.Graph,
-                            key.Start,
-                            key.Destination,
-                            out HighLevelRoute route);
+                candidate);
+        bool cacheHit =
+            !ReferenceEquals(candidate, cached);
 
-                    return new HighLevelRouteCacheEntry(
-                        found,
-                        found ? route : null);
-                },
-                new RouteSearchState(graph));
+        HighLevelRouteCacheEntry highLevel = cached.Value;
 
         if (!highLevel.Found ||
             highLevel.Route is null)
@@ -218,6 +213,22 @@ public sealed class HierarchicalPathfinder
         return total;
     }
 
+    private static HighLevelRouteCacheEntry CreateHighLevelRouteEntry(
+        NavigationSectorGraph graph,
+        HighLevelRouteCacheKey key)
+    {
+        bool found =
+            HighLevelRouteSearch.TryFindRoute(
+                graph,
+                key.Start,
+                key.Destination,
+                out HighLevelRoute route);
+
+        return new HighLevelRouteCacheEntry(
+            found,
+            found ? route : null);
+    }
+
     private static NavigationSearchResult Failure(
         NavigationVersion version,
         NavigationFailureReason reason)
@@ -238,6 +249,4 @@ public sealed class HierarchicalPathfinder
         bool Found,
         HighLevelRoute? Route);
 
-    private readonly record struct RouteSearchState(
-        NavigationSectorGraph Graph);
 }
