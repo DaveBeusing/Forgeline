@@ -85,9 +85,9 @@ public static class SpatialAddressing
     {
         ArgumentNullException.ThrowIfNull(settings);
         settings.Validate();
-        ValidateLocalAddress(address, settings.CellsPerChunk);
 
         int cellsPerChunk = settings.CellsPerChunk;
+        ValidateLocalAddress(address, cellsPerChunk);
 
         return new SpatialCellCoordinate(
             checked(address.Chunk.X * cellsPerChunk + address.LocalX),
@@ -101,14 +101,9 @@ public static class SpatialAddressing
         ArgumentNullException.ThrowIfNull(settings);
         settings.Validate();
 
-        int cellsPerChunk = settings.CellsPerChunk;
-        int chunkX = FloorDivide(coordinate.X, cellsPerChunk);
-        int chunkZ = FloorDivide(coordinate.Z, cellsPerChunk);
-
-        return new SpatialCellAddress(
-            new ChunkCoordinate(chunkX, chunkZ),
-            coordinate.X - chunkX * cellsPerChunk,
-            coordinate.Z - chunkZ * cellsPerChunk);
+        return FromGlobalCellUnchecked(
+            coordinate,
+            settings.CellsPerChunk);
     }
 
     public static SpatialCellRange BoundsToCellRange(
@@ -158,6 +153,19 @@ public static class SpatialAddressing
                 minimumX + settings.CellSizeMeters,
                 maximumY,
                 minimumZ + settings.CellSizeMeters));
+    }
+
+    internal static SpatialCellAddress FromGlobalCellUnchecked(
+        SpatialCellCoordinate coordinate,
+        int cellsPerChunk)
+    {
+        int chunkX = FloorDivide(coordinate.X, cellsPerChunk);
+        int chunkZ = FloorDivide(coordinate.Z, cellsPerChunk);
+
+        return new SpatialCellAddress(
+            new ChunkCoordinate(chunkX, chunkZ),
+            coordinate.X - chunkX * cellsPerChunk,
+            coordinate.Z - chunkZ * cellsPerChunk);
     }
 
     private static int FloorDivide(int value, int divisor)

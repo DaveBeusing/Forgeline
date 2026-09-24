@@ -7,6 +7,7 @@ namespace ForgeLine.World;
 public sealed class SpatialGridIndex
 {
     private readonly SpatialGridSettings _settings;
+    private readonly int _cellsPerChunk;
     private readonly Dictionary<EntityId, EntryState> _entries = new();
     private readonly Dictionary<SpatialCellAddress, List<EntityId>> _cells = new();
 
@@ -18,6 +19,7 @@ public sealed class SpatialGridIndex
     {
         _settings = settings ?? new SpatialGridSettings();
         _settings.Validate();
+        _cellsPerChunk = _settings.CellsPerChunk;
     }
 
     public SpatialGridSettings Settings => _settings;
@@ -204,11 +206,11 @@ public sealed class SpatialGridIndex
                 bounds,
                 _settings);
 
-            VisitRange(
+            VisitAabbRange(
                 range,
+                bounds,
                 buffer,
-                filter,
-                state => SpatialGeometry.Intersects(state.Entry.Bounds, bounds));
+                filter);
 
             ApplyOrdering(buffer, order);
             return buffer.Count;
@@ -254,14 +256,12 @@ public sealed class SpatialGridIndex
                 _settings);
             float radiusSquared = radius * radius;
 
-            VisitRange(
+            VisitRadiusRange(
                 range,
+                center,
+                radiusSquared,
                 buffer,
-                filter,
-                state =>
-                    SpatialGeometry.HorizontalDistanceSquared(
-                        center,
-                        state.Entry.Bounds) <= radiusSquared);
+                filter);
 
             ApplyOrdering(buffer, order);
             return buffer.Count;
@@ -344,22 +344,17 @@ public sealed class SpatialGridIndex
             ToDuration(_maximumQueryStopwatchTicks));
     }
 
-    internal IEnumerable<KeyValuePair<SpatialCellAddress, List<EntityId>>> Cells =>
-        _cells;
-
-    private void VisitRange(
+    private void VisitAabbRange(
         SpatialCellRange range,
+        AxisAlignedBounds bounds,
         SpatialQueryBuffer buffer,
-        SpatialQueryFilter filter,
-        Func<EntryState, bool> predicate)
+        SpatialQueryFilter filter)
     {
         for (int z = range.Minimum.Z; z <= range.Maximum.Z; z++)
         {
             for (int x = range.Minimum.X; x <= range.Maximum.X; x++)
             {
-                SpatialCellAddress address = SpatialAddressing.FromGlobalCell(
-                    new SpatialCellCoordinate(x, z),
-                    _settings);
+                SpatialCellAddress address = AddressFromGlobalCell(x, z);
 
                 if (!_cells.TryGetValue(address, out List<EntityId>? bucket))
                 {
@@ -371,7 +366,43 @@ public sealed class SpatialGridIndex
                     EntityId entity = bucket[index];
                     if (!_entries.TryGetValue(entity, out EntryState? state) ||
                         !filter.Matches(state.Entry) ||
-                        !predicate(state))
+                        !SpatialGeometry.Intersects(state.Entry.Bounds, bounds))
+                    {
+                        continue;
+                    }
+
+                    buffer.Add(entity);
+                }
+            }
+        }
+    }
+
+    private void VisitRadiusRange(
+        SpatialCellRange range,
+        Vector3 center,
+        float radiusSquared,
+        SpatialQueryBuffer buffer,
+        SpatialQueryFilter filter)
+    {
+        for (int z = range.Minimum.Z; z <= range.Maximum.Z; z++)
+        {
+            for (int x = range.Minimum.X; x <= range.Maximum.X; x++)
+            {
+                SpatialCellAddress address = AddressFromGlobalCell(x, z);
+
+                if (!_cells.TryGetValue(address, out List<EntityId>? bucket))
+                {
+                    continue;
+                }
+
+                for (int index = 0; index < bucket.Count; index++)
+                {
+                    EntityId entity = bucket[index];
+                    if (!_entries.TryGetValue(entity, out EntryState? state) ||
+                        !filter.Matches(state.Entry) ||
+                        SpatialGeometry.HorizontalDistanceSquared(
+                            center,
+                            state.Entry.Bounds) > radiusSquared)
                     {
                         continue;
                     }
@@ -390,9 +421,7 @@ public sealed class SpatialGridIndex
         {
             for (int x = range.Minimum.X; x <= range.Maximum.X; x++)
             {
-                SpatialCellAddress address = SpatialAddressing.FromGlobalCell(
-                    new SpatialCellCoordinate(x, z),
-                    _settings);
+                SpatialCellAddress address = AddressFromGlobalCell(x, z);
 
                 if (!_cells.TryGetValue(address, out List<EntityId>? bucket))
                 {
@@ -413,9 +442,7 @@ public sealed class SpatialGridIndex
         {
             for (int x = range.Minimum.X; x <= range.Maximum.X; x++)
             {
-                SpatialCellAddress address = SpatialAddressing.FromGlobalCell(
-                    new SpatialCellCoordinate(x, z),
-                    _settings);
+                SpatialCellAddress address = AddressFromGlobalCell(x, z);
 
                 if (!_cells.TryGetValue(address, out List<EntityId>? bucket))
                 {
@@ -429,6 +456,15 @@ public sealed class SpatialGridIndex
                 }
             }
         }
+    }
+
+    private SpatialCellAddress AddressFromGlobalCell(
+        int x,
+        int z)
+    {
+        return SpatialAddressing.FromGlobalCellUnchecked(
+            new SpatialCellCoordinate(x, z),
+            _cellsPerChunk);
     }
 
     private static void ValidateEntry(in SpatialEntry entry)
