@@ -273,7 +273,14 @@ public sealed class FormationMovementSystem : ISimulationSystem
             };
             context.Entities.SetComponent(group, waitingState);
 
-            if (!hasPending)
+            bool failedForCurrentWorld =
+                previousState.Status == MovementGroupStatus.Failed &&
+                context.Entities.TryGetComponent(
+                    group,
+                    out MovementGroupFailureState failure) &&
+                failure.NavigationVersion == World.Version;
+
+            if (!hasPending && !failedForCurrentWorld)
             {
                 ScheduleSharedRoute(
                     context,
