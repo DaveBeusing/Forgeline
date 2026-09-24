@@ -62,6 +62,7 @@ public sealed class RtsCameraInputTests
 
         Assert.False(state.IsKeyDown(PlatformKey.D));
         Assert.False(state.IsMouseButtonDown(PlatformMouseButton.Middle));
+        Assert.False(state.HasPointerPosition);
         Assert.Equal(Vector2.Zero, state.PointerDelta);
         Assert.Equal(0, state.WheelDelta);
     }
