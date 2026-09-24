@@ -9,11 +9,10 @@ public sealed record GraphicsConfiguration
 
     public int BufferCount { get; init; } = 3;
 
-    public bool EnableDebugLayer { get; init; } =
 #if DEBUG
-        true;
+    public bool EnableDebugLayer { get; init; } = true;
 #else
-        false;
+    public bool EnableDebugLayer { get; init; }
 #endif
 
     public bool AllowSoftwareAdapterFallback { get; init; } = true;
