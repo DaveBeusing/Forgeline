@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.ExceptionServices;
 
@@ -7,6 +8,8 @@ public sealed class JobScheduler : IDisposable
 {
     [ThreadStatic]
     private static JobScheduler? s_currentScheduler;
+
+    private static readonly JobAction s_noOpJob = static _ => { };
 
     private readonly object _gate = new();
     private readonly Queue<JobNode> _ready = new();
@@ -90,22 +93,148 @@ public sealed class JobScheduler : IDisposable
 
     public JobHandle Schedule(JobAction action)
     {
+        return Schedule(action, ReadOnlySpan<JobHandle>.Empty);
+    }
+
+    public JobHandle Schedule(
+        JobAction action,
+        ReadOnlySpan<JobHandle> dependencies)
+    {
         ArgumentNullException.ThrowIfNull(action);
 
         lock (_gate)
         {
             ThrowIfNotAcceptingLocked();
-
-            var completion = new JobCompletion(this, _nextSequence++);
-            var node = JobNode.CreateAction(completion, action);
-
-            _unfinishedNodes.Add(node);
-            _submittedJobs++;
-            _unfinishedJobs++;
-            EnqueueReadyLocked(node);
-
-            return new JobHandle(completion);
+            return CreateJobLocked(
+                action,
+                rangeAction: null,
+                rangeStart: 0,
+                rangeEnd: 0,
+                dependencies);
         }
+    }
+
+    public JobHandle ParallelFor(
+        int startInclusive,
+        int endExclusive,
+        int batchSize,
+        JobRangeAction action)
+    {
+        return ParallelFor(
+            startInclusive,
+            endExclusive,
+            batchSize,
+            action,
+            ReadOnlySpan<JobHandle>.Empty);
+    }
+
+    public JobHandle ParallelFor(
+        int startInclusive,
+        int endExclusive,
+        int batchSize,
+        JobRangeAction action,
+        ReadOnlySpan<JobHandle> dependencies)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+
+        if (endExclusive < startInclusive)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(endExclusive),
+                endExclusive,
+                "Range end must be greater than or equal to range start.");
+        }
+
+        if (batchSize <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(batchSize),
+                batchSize,
+                "Batch size must be greater than zero.");
+        }
+
+        long length = (long)endExclusive - startInclusive;
+
+        if (length == 0)
+        {
+            return CreateFence(dependencies);
+        }
+
+        long batchCountLong = (length + batchSize - 1L) / batchSize;
+
+        if (batchCountLong > int.MaxValue)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(batchSize),
+                batchSize,
+                "The requested range produces too many scheduler batches.");
+        }
+
+        int batchCount = (int)batchCountLong;
+        JobHandle[] handles = ArrayPool<JobHandle>.Shared.Rent(batchCount);
+
+        try
+        {
+            lock (_gate)
+            {
+                ThrowIfNotAcceptingLocked();
+
+                for (int index = 0; index < batchCount; index++)
+                {
+                    long rangeStartLong = (long)startInclusive + ((long)index * batchSize);
+                    int rangeStart = (int)rangeStartLong;
+                    int rangeEnd = (int)Math.Min(rangeStartLong + batchSize, endExclusive);
+
+                    handles[index] = CreateJobLocked(
+                        action: null,
+                        rangeAction: action,
+                        rangeStart,
+                        rangeEnd,
+                        dependencies);
+                }
+
+                if (batchCount == 1)
+                {
+                    return handles[0];
+                }
+
+                return CreateJobLocked(
+                    s_noOpJob,
+                    rangeAction: null,
+                    rangeStart: 0,
+                    rangeEnd: 0,
+                    handles.AsSpan(0, batchCount));
+            }
+        }
+        finally
+        {
+            Array.Clear(handles, 0, batchCount);
+            ArrayPool<JobHandle>.Shared.Return(handles);
+        }
+    }
+
+    public JobHandle CreateFence(ReadOnlySpan<JobHandle> dependencies)
+    {
+        if (dependencies.Length == 0)
+        {
+            return default;
+        }
+
+        lock (_gate)
+        {
+            ThrowIfNotAcceptingLocked();
+            return CreateJobLocked(
+                s_noOpJob,
+                rangeAction: null,
+                rangeStart: 0,
+                rangeEnd: 0,
+                dependencies);
+        }
+    }
+
+    public void WaitAll(ReadOnlySpan<JobHandle> handles)
+    {
+        Wait(CreateFence(handles));
     }
 
     public void Wait(JobHandle handle)
@@ -274,6 +403,76 @@ public sealed class JobScheduler : IDisposable
         _signal.Dispose();
     }
 
+    private JobHandle CreateJobLocked(
+        JobAction? action,
+        JobRangeAction? rangeAction,
+        int rangeStart,
+        int rangeEnd,
+        ReadOnlySpan<JobHandle> dependencies)
+    {
+        var completion = new JobCompletion(this, _nextSequence++);
+        var node = new JobNode(
+            completion,
+            action,
+            rangeAction,
+            rangeStart,
+            rangeEnd);
+
+        _unfinishedNodes.Add(node);
+        _submittedJobs++;
+        _unfinishedJobs++;
+
+        AttachDependenciesLocked(node, dependencies);
+        return new JobHandle(completion);
+    }
+
+    private void AttachDependenciesLocked(
+        JobNode node,
+        ReadOnlySpan<JobHandle> dependencies)
+    {
+        for (int index = 0; index < dependencies.Length; index++)
+        {
+            JobCompletion? dependency = dependencies[index].Completion;
+
+            if (dependency is null)
+            {
+                continue;
+            }
+
+            if (!ReferenceEquals(dependency.Owner, this))
+            {
+                CompleteNodeLocked(
+                    node,
+                    JobCompletionStatus.Faulted,
+                    ExceptionDispatchInfo.Capture(
+                        new ArgumentException(
+                            "All dependency handles must belong to the same scheduler.",
+                            nameof(dependencies))));
+                return;
+            }
+
+            if (dependency.IsCompleted)
+            {
+                MergeDependencyOutcome(node, dependency);
+                continue;
+            }
+
+            node.RemainingDependencies++;
+            dependency.Dependents ??= new List<JobNode>();
+            dependency.Dependents.Add(node);
+        }
+
+        if (node.Completion.IsCompleted)
+        {
+            return;
+        }
+
+        if (node.RemainingDependencies == 0)
+        {
+            ResolveReadyOrFailedDependencyLocked(node);
+        }
+    }
+
     private void WorkerLoop(int workerIndex)
     {
         s_currentScheduler = this;
@@ -325,7 +524,7 @@ public sealed class JobScheduler : IDisposable
 
                 try
                 {
-                    node.Action!(_shutdownCancellation.Token);
+                    node.Execute(_shutdownCancellation.Token);
                 }
                 catch (OperationCanceledException exception)
                     when (_shutdownCancellation.IsCancellationRequested)
@@ -373,6 +572,29 @@ public sealed class JobScheduler : IDisposable
         _signal.Release();
     }
 
+    private void ResolveReadyOrFailedDependencyLocked(JobNode node)
+    {
+        if (node.DependencyFailure is not null)
+        {
+            CompleteNodeLocked(
+                node,
+                JobCompletionStatus.Faulted,
+                node.DependencyFailure);
+            return;
+        }
+
+        if (node.DependencyCanceled)
+        {
+            CompleteNodeLocked(
+                node,
+                JobCompletionStatus.Canceled,
+                failure: null);
+            return;
+        }
+
+        EnqueueReadyLocked(node);
+    }
+
     private void CompleteNodeLocked(
         JobNode node,
         JobCompletionStatus status,
@@ -402,7 +624,45 @@ public sealed class JobScheduler : IDisposable
                 throw new ArgumentOutOfRangeException(nameof(status), status, null);
         }
 
+        List<JobNode>? dependents = node.Completion.Dependents;
+
+        if (dependents is not null)
+        {
+            foreach (JobNode dependent in dependents)
+            {
+                if (dependent.Completion.IsCompleted)
+                {
+                    continue;
+                }
+
+                MergeDependencyOutcome(dependent, node.Completion);
+                dependent.RemainingDependencies--;
+
+                if (dependent.RemainingDependencies == 0)
+                {
+                    ResolveReadyOrFailedDependencyLocked(dependent);
+                }
+            }
+
+            dependents.Clear();
+        }
+
         Monitor.PulseAll(_gate);
+    }
+
+    private static void MergeDependencyOutcome(
+        JobNode dependent,
+        JobCompletion dependency)
+    {
+        if (dependency.Status == JobCompletionStatus.Faulted &&
+            dependent.DependencyFailure is null)
+        {
+            dependent.DependencyFailure = dependency.Failure;
+        }
+        else if (dependency.Status == JobCompletionStatus.Canceled)
+        {
+            dependent.DependencyCanceled = true;
+        }
     }
 
     private void PublishTiming(JobTimingSample sample)
@@ -465,6 +725,8 @@ internal sealed class JobCompletion
 
     public ExceptionDispatchInfo? Failure { get; private set; }
 
+    public List<JobNode>? Dependents { get; set; }
+
     public void Complete(
         JobCompletionStatus status,
         ExceptionDispatchInfo? failure)
@@ -477,10 +739,18 @@ internal sealed class JobCompletion
 
 internal sealed class JobNode
 {
-    private JobNode(JobCompletion completion, JobAction action)
+    public JobNode(
+        JobCompletion completion,
+        JobAction? action,
+        JobRangeAction? rangeAction,
+        int rangeStart,
+        int rangeEnd)
     {
         Completion = completion;
         Action = action;
+        RangeAction = rangeAction;
+        RangeStart = rangeStart;
+        RangeEnd = rangeEnd;
         SubmittedTimestamp = Stopwatch.GetTimestamp();
     }
 
@@ -488,12 +758,30 @@ internal sealed class JobNode
 
     public JobAction? Action { get; }
 
+    public JobRangeAction? RangeAction { get; }
+
+    public int RangeStart { get; }
+
+    public int RangeEnd { get; }
+
     public long SubmittedTimestamp { get; }
+
+    public int RemainingDependencies { get; set; }
+
+    public ExceptionDispatchInfo? DependencyFailure { get; set; }
+
+    public bool DependencyCanceled { get; set; }
 
     public bool IsRunning { get; set; }
 
-    public static JobNode CreateAction(JobCompletion completion, JobAction action)
+    public void Execute(CancellationToken cancellationToken)
     {
-        return new JobNode(completion, action);
+        if (Action is not null)
+        {
+            Action(cancellationToken);
+            return;
+        }
+
+        RangeAction!(RangeStart, RangeEnd, cancellationToken);
     }
 }
