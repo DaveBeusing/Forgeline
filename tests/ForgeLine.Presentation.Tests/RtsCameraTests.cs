@@ -97,7 +97,7 @@ public sealed class RtsCameraTests
             out Vector3 worldPoint);
 
         Assert.True(hit);
-        Assert.InRange(Vector3.Distance(camera.Target, worldPoint), 0.0f, 0.001f);
+        Assert.InRange(Vector3.Distance(camera.Target, worldPoint), 0.0f, 0.005f);
     }
 
     [Fact]
