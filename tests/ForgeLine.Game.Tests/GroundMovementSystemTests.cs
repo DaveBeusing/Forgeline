@@ -322,7 +322,14 @@ public sealed class GroundMovementSystemTests
             sharedTarget,
             acceptedAtTick: new SimulationTick(2));
 
-        simulation.RunTicks(100);
+        bool sawNeighborAdjustment = false;
+
+        for (int tick = 0; tick < 100; tick++)
+        {
+            simulation.AdvanceOneTick();
+            sawNeighborAdjustment |=
+                movementSystem.LastDiagnostics.NeighborAdjustmentCount > 0;
+        }
 
         Vector3 leftPosition =
             simulation.Entities.GetComponent<WorldTransform>(left).Position;
@@ -335,8 +342,7 @@ public sealed class GroundMovementSystemTests
         Assert.True(
             separation >= movement.Radius * 2.0f - 0.05f,
             $"Expected at least {movement.Radius * 2.0f:F2} m separation, got {separation:F3} m.");
-        Assert.True(
-            movementSystem.LastDiagnostics.NeighborAdjustmentCount > 0);
+        Assert.True(sawNeighborAdjustment);
     }
 
     [Fact]
@@ -384,6 +390,7 @@ public sealed class GroundMovementSystemTests
             acceptedAtTick: new SimulationTick(2));
 
         float maximumLateralDeviation = 0.0f;
+        bool sawObstacleAdjustment = false;
 
         for (int tick = 0; tick < 160; tick++)
         {
@@ -393,6 +400,8 @@ public sealed class GroundMovementSystemTests
             maximumLateralDeviation = MathF.Max(
                 maximumLateralDeviation,
                 MathF.Abs(position.Z - 32.0f));
+            sawObstacleAdjustment |=
+                movementSystem.LastDiagnostics.ObstacleAdjustmentCount > 0;
 
             if (!simulation.Entities.HasComponent<MovementOrder>(unit))
             {
@@ -405,8 +414,7 @@ public sealed class GroundMovementSystemTests
 
         Assert.True(maximumLateralDeviation > 1.0f);
         Assert.True(finalTransform.Position.X > 34.0f);
-        Assert.True(
-            movementSystem.LastDiagnostics.ObstacleAdjustmentCount >= 0);
+        Assert.True(sawObstacleAdjustment);
     }
 
     [Fact]
