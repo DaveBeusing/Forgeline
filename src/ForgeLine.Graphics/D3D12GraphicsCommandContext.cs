@@ -1,3 +1,4 @@
+using Vortice.Direct3D;
 using Vortice.Direct3D12;
 using Vortice.Mathematics;
 
@@ -5,14 +6,17 @@ namespace ForgeLine.Graphics;
 
 internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
 {
+    private readonly D3D12GraphicsDevice _owner;
     private readonly ID3D12GraphicsCommandList _commandList;
 
     internal D3D12GraphicsCommandContext(
+        D3D12GraphicsDevice owner,
         ID3D12GraphicsCommandList commandList,
         int width,
         int height,
         int frameIndex)
     {
+        _owner = owner;
         _commandList = commandList;
         Width = width;
         Height = height;
@@ -48,5 +52,47 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
 
         RectI rectangle = RectI.FromLTRB(left, top, right, bottom);
         _commandList.RSSetScissorRect(rectangle);
+    }
+
+    public void SetPipeline(IGraphicsPipeline pipeline)
+    {
+        ArgumentNullException.ThrowIfNull(pipeline);
+
+        if (pipeline is not D3D12GraphicsPipeline d3d12Pipeline ||
+            !ReferenceEquals(d3d12Pipeline.Owner, _owner))
+        {
+            throw new ArgumentException(
+                "The graphics pipeline was not created by this graphics device.",
+                nameof(pipeline));
+        }
+
+        _commandList.SetGraphicsRootSignature(d3d12Pipeline.RootSignature);
+        _commandList.SetPipelineState(d3d12Pipeline.PipelineState);
+        _commandList.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
+    }
+
+    public void Draw(int vertexCount, int startVertex = 0)
+    {
+        if (vertexCount <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(vertexCount),
+                vertexCount,
+                "Draw calls must contain at least one vertex.");
+        }
+
+        if (startVertex < 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(startVertex),
+                startVertex,
+                "The start vertex cannot be negative.");
+        }
+
+        _commandList.DrawInstanced(
+            checked((uint)vertexCount),
+            1,
+            checked((uint)startVertex),
+            0);
     }
 }
