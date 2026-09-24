@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using ForgeLine.Core;
+using ForgeLine.Platform;
 
 namespace ForgeLine.Platform.Windows;
 
