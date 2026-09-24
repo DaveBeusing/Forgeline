@@ -1,4 +1,4 @@
-using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Vortice.Direct3D12;
 
 namespace ForgeLine.Graphics;
@@ -38,7 +38,7 @@ internal sealed class D3D12GraphicsBuffer : IGraphicsBuffer
             throw new ArgumentOutOfRangeException(nameof(offsetInBytes));
         }
 
-        ulong byteCount = checked((ulong)data.Length * (ulong)Unsafe.SizeOf<T>());
+        ulong byteCount = checked((ulong)MemoryMarshal.AsBytes(data).Length);
         ulong end = checked((ulong)offsetInBytes + byteCount);
         if (end > Description.SizeInBytes)
         {
