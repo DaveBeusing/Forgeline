@@ -23,7 +23,6 @@ public sealed class InputState
 
     public void BeginFrame()
     {
-        _hasPointerPosition = false;
         _pointerDelta = Vector2.Zero;
         _wheelDelta = 0;
     }
@@ -88,6 +87,7 @@ public sealed class InputState
     {
         _keysDown.Clear();
         _mouseButtonsDown.Clear();
+        _hasPointerPosition = false;
         _pointerDelta = Vector2.Zero;
         _wheelDelta = 0;
     }
