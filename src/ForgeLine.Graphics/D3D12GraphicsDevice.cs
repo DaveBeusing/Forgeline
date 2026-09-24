@@ -161,13 +161,13 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
 
         try
         {
-            PipelineStateStream pipelineStateStream = new()
+            GraphicsPipelineStateDescription pipelineStateDescription = new()
             {
                 RootSignature = rootSignature,
-                VertexShader = description.VertexShader.Data.Span,
-                PixelShader = description.PixelShader.Data.Span,
+                VertexShader = description.VertexShader.Data,
+                PixelShader = description.PixelShader.Data,
                 SampleMask = uint.MaxValue,
-                PrimitiveTopology = PrimitiveTopologyType.Triangle,
+                PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
                 RasterizerState = RasterizerDescription.CullCounterClockwise,
                 BlendState = BlendDescription.Opaque,
                 DepthStencilState = DepthStencilDescription.None,
@@ -176,7 +176,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             };
 
             ID3D12PipelineState pipelineState =
-                _device.CreatePipelineState(pipelineStateStream);
+                _device.CreateGraphicsPipelineState(pipelineStateDescription);
             pipelineState.Name = "ForgeLine Graphics Pipeline";
 
             return new D3D12GraphicsPipeline(
