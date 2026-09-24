@@ -21,9 +21,9 @@ The project is built on **ForgeLine Engine**, a custom C#/.NET RTS engine design
 - strict simulation/presentation separation
 - multiplayer-aware architecture with networking deferred
 
-Implemented engine foundations currently include the repository architecture, stable entity/component storage, a command-driven fixed-tick simulation runtime, deterministic simulation-owned randomness, a persistent-worker job scheduler, opt-in engine diagnostics, repeatable headless test scenarios, performance baselines, a standalone headless host, the native Windows interactive client host, the Direct3D 12 graphics foundation, the production-oriented RTS camera/input stack, the first chunked heightfield world, and the simulation-to-presentation snapshot pipeline with interpolated generic render instances, debug drawing, and an on-screen development metrics overlay.
+Implemented engine foundations currently include the repository architecture, stable entity/component storage, a command-driven fixed-tick simulation runtime, deterministic simulation-owned randomness, a persistent-worker job scheduler, opt-in engine diagnostics, repeatable headless test scenarios, performance baselines, a standalone headless host, the native Windows interactive client host, the Direct3D 12 graphics foundation, the production-oriented RTS camera/input stack, the first chunked heightfield world, the simulation-to-presentation snapshot pipeline with interpolated generic render instances and debug drawing, plus the first RTS selection and fixed-tick movement-order interaction layer.
 
-Unit/building rendering, selection/gameplay commands, navigation algorithms, logistics simulation, combat, production terrain materials and streaming, editor functionality, asset conversion, and networking remain deferred to their owning implementation stages.
+Navigation algorithms, formation/local-avoidance movement, combat commands, control groups, minimap commands, logistics simulation, combat, production terrain materials and streaming, editor functionality, asset conversion, and networking remain deferred to their owning implementation stages.
 
 ## Repository Layout
 
@@ -77,7 +77,7 @@ Launch the native Windows x64 client host:
 dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release
 ```
 
-The current client creates a DPI-aware native Win32 window, initializes Direct3D 12, runs the fixed-tick simulation, extracts immutable presentation snapshots, interpolates simple moving test entities between ticks, and renders them together with the chunked terrain. F1 toggles the development metrics overlay and F2 toggles world debug visualization.
+The current client creates a DPI-aware native Win32 window, initializes Direct3D 12, runs the fixed-tick simulation, extracts immutable presentation snapshots, interpolates moving test entities, and renders them together with the chunked terrain. Left click selects a visible local unit/logistics entity, Shift + left click toggles selection, left-drag performs box selection, and right click submits a movement order through the fixed-tick command queue. F1 toggles the development metrics overlay and F2 toggles broader world-debug visualization.
 
 Run the bounded client smoke validation used by CI:
 
@@ -85,9 +85,9 @@ Run the bounded client smoke validation used by CI:
 dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release -- --smoke-test
 ```
 
-The smoke mode creates the same native window, initializes Direct3D 12 with hardware-adapter selection and WARP fallback, generates the development world, compiles the terrain shaders, uploads persistent chunk geometry, performs frustum-culling and indexed terrain draws briefly, then requests a clean shutdown.
+The smoke mode creates the same native window, initializes Direct3D 12 with hardware-adapter selection and WARP fallback, generates the development world, runs the fixed-tick simulation/presentation pipeline, renders terrain and test entities briefly, then requests a clean shutdown.
 
-See [Windows Client](docs/WindowsClient.md) for the platform boundary, window lifecycle, supported modes, DPI behavior, and validation procedure. See [Graphics](docs/Graphics.md) for Direct3D 12 ownership, frame synchronization, resize behavior, shader compilation, diagnostics, and resource lifetime. See [RTS Camera and Input](docs/CameraAndInput.md) for controls, coordinate conventions, action mapping, focus-loss behavior, and screen/world APIs. See [World and Terrain](docs/WorldAndTerrain.md) for world units, chunk/region coordinates, heightfield semantics, mesh generation, culling, diagnostics, and headless terrain queries.
+See [Windows Client](docs/WindowsClient.md) for the platform boundary, window lifecycle, supported modes, DPI behavior, and validation procedure. See [Graphics](docs/Graphics.md) for Direct3D 12 ownership, frame synchronization, resize behavior, shader compilation, diagnostics, and resource lifetime. See [RTS Camera and Input](docs/CameraAndInput.md) for controls, coordinate conventions, action mapping, focus-loss behavior, and screen/world APIs. See [Selection and Command Interaction](docs/SelectionAndCommandInteraction.md) for selection ownership, picking/filtering, movement-command flow, and stale-entity handling. See [World and Terrain](docs/WorldAndTerrain.md) for world units, chunk/region coordinates, heightfield semantics, mesh generation, culling, diagnostics, and headless terrain queries.
 
 ## Headless Simulation
 
@@ -130,6 +130,8 @@ Benchmark timing is measurement evidence rather than a hardware-sensitive CI pas
 See [Architecture](docs/Architecture.md) for project responsibilities and dependency rules.
 
 See [Presentation Extraction and Debugging](docs/PresentationExtractionAndDebugging.md) for snapshot ownership, interpolation, debug tooling, overlay metrics, and rendering baselines.
+
+See [Selection and Command Interaction](docs/SelectionAndCommandInteraction.md) for player interaction state, picking, ownership/category filtering, and simulation-safe movement orders.
 
 See [Simulation Runtime](docs/SimulationRuntime.md) for fixed-tick semantics, phase ordering, commands, deterministic randomness, and headless execution.
 

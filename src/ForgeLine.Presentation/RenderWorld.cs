@@ -69,6 +69,38 @@ public sealed class RenderWorld
         };
     }
 
+    public bool TryGetInterpolatedInstance(
+        EntityId entity,
+        float alpha,
+        out RenderInstance instance)
+    {
+        if (_current is null ||
+            !TryFindByEntity(_current, entity, out RenderInstance current))
+        {
+            instance = default;
+            return false;
+        }
+
+        if (_previous is null ||
+            !TryFindByEntity(
+                _previous,
+                entity,
+                out RenderInstance previous))
+        {
+            instance = current;
+            return true;
+        }
+
+        instance = current with
+        {
+            Transform = RenderTransform.Interpolate(
+                previous.Transform,
+                current.Transform,
+                alpha)
+        };
+        return true;
+    }
+
     private static bool TryFindByEntity(
         PresentationSnapshot snapshot,
         EntityId entity,

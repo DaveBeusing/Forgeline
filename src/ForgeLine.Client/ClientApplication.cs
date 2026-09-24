@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Core;
 using ForgeLine.Game;
 using ForgeLine.Graphics;
 using ForgeLine.Input;
@@ -15,6 +16,8 @@ internal sealed class ClientApplication
     private const int MaximumDebugInstanceBoxes = 24;
     private const int MaximumDebugLabels = 4;
 
+    private static readonly PlayerId LocalPlayer = new(1);
+    private static readonly PlayerId OpposingPlayer = new(2);
     private static readonly TimeSpan IdleWait = TimeSpan.FromMilliseconds(16);
     private static readonly TimeSpan SmokeTestDuration = TimeSpan.FromMilliseconds(350);
     private static readonly TimeSpan DiagnosticInterval = TimeSpan.FromSeconds(1);
@@ -77,9 +80,16 @@ internal sealed class ClientApplication
                 PanReferenceDistance = 180.0f,
                 MaximumPanSpeedScale = 5.0f
             });
+        var selectionController = new RtsSelectionController(
+            new SelectionFilter(
+                LocalPlayer,
+                ControllableEntityCategory.Unit |
+                ControllableEntityCategory.Logistics));
         var debugDraw = new DebugDraw();
         var frameTimingTracker = new FrameTimingTracker();
 
+        MoveEntitiesCommand? lastMovementCommand = null;
+        SimulationCommandEnvelope? lastMovementEnvelope = null;
         bool overlayEnabled = true;
         bool worldDebugEnabled = false;
         bool overlayToggleHeld = false;
@@ -99,6 +109,11 @@ internal sealed class ClientApplication
             renderWorld,
             terrainRenderer,
             instanceRenderer);
+        WriteInteractionState(
+            "started",
+            selectionController,
+            lastMovementEnvelope,
+            lastMovementCommand);
 
         long startedAt = _platform.Clock.GetTimestamp();
         long previousFrameAt = startedAt;
@@ -176,12 +191,40 @@ internal sealed class ClientApplication
                 simulationAccumulator,
                 simulation.Clock.TickDuration);
 
+            selectionController.Update(
+                inputState,
+                camera,
+                renderWorld,
+                terrainWorld,
+                window.ClientSize.Width,
+                window.ClientSize.Height,
+                renderAlpha);
+
+            if (selectionController.TryTakeMovementRequest(
+                    out MovementOrderRequest movementRequest))
+            {
+                var targetTick = new SimulationTick(
+                    checked(simulation.CurrentTick.Value + 1));
+                var command = new MoveEntitiesCommand(
+                    LocalPlayer,
+                    movementRequest.Entities,
+                    movementRequest.WorldTarget,
+                    simulation.CurrentTick);
+
+                lastMovementEnvelope = simulation.SubmitCommand(
+                    command,
+                    targetTick,
+                    new SimulationCommandSource(LocalPlayer.Value));
+                lastMovementCommand = command;
+            }
+
             BuildWorldDebugVisualization(
                 debugDraw,
                 worldDebugEnabled,
                 renderWorld,
                 renderAlpha,
-                camera);
+                camera,
+                selectionController);
 
             terrainRenderer.DebugChunksEnabled = worldDebugEnabled;
 
@@ -231,6 +274,11 @@ internal sealed class ClientApplication
                     renderWorld,
                     terrainRenderer,
                     instanceRenderer);
+                WriteInteractionState(
+                    "frame",
+                    selectionController,
+                    lastMovementEnvelope,
+                    lastMovementCommand);
                 nextDiagnosticAt = now;
             }
         }
@@ -245,6 +293,11 @@ internal sealed class ClientApplication
             renderWorld,
             terrainRenderer,
             instanceRenderer);
+        WriteInteractionState(
+            "stopped",
+            selectionController,
+            lastMovementEnvelope,
+            lastMovementCommand);
         WriteGraphicsState("stopped", graphics);
         return 0;
     }
@@ -271,6 +324,17 @@ internal sealed class ClientApplication
                 ? sampledHeight
                 : 0.0f;
 
+            PlayerId owner =
+                index > 0 && index % 7 == 0
+                    ? OpposingPlayer
+                    : LocalPlayer;
+            ControllableEntityCategory category =
+                index > 0 && index % 11 == 0
+                    ? ControllableEntityCategory.Building
+                    : index % 5 == 0
+                        ? ControllableEntityCategory.Logistics
+                        : ControllableEntityCategory.Unit;
+
             var entity = simulation.Entities.CreateEntity();
             simulation.Entities.AddComponent(
                 entity,
@@ -279,26 +343,41 @@ internal sealed class ClientApplication
                     Quaternion.Identity,
                     new Vector3(8.0f, 6.0f, 8.0f)));
 
-            Vector3 velocity = index % 6 == 0
-                ? new Vector3(2.0f + (index % 5) * 0.35f, 0.0f, 0.0f)
-                : Vector3.Zero;
+            Vector3 velocity =
+                category != ControllableEntityCategory.Building &&
+                index % 6 == 0
+                    ? new Vector3(
+                        2.0f + (index % 5) * 0.35f,
+                        0.0f,
+                        0.0f)
+                    : Vector3.Zero;
 
             simulation.Entities.AddComponent(entity, new LinearVelocity(velocity));
             simulation.Entities.AddComponent(entity, new VisualIdentity(1));
+            simulation.Entities.AddComponent(
+                entity,
+                new ControllableEntity(owner, category));
         }
     }
 
     private static void BuildWorldDebugVisualization(
         DebugDraw debugDraw,
-        bool enabled,
+        bool worldDebugEnabled,
         RenderWorld renderWorld,
         float alpha,
-        RtsCamera camera)
+        RtsCamera camera,
+        RtsSelectionController selectionController)
     {
         debugDraw.Clear();
-        debugDraw.Enabled = enabled;
 
-        if (!enabled)
+        bool interactionFeedback =
+            selectionController.Selection.Count > 0 ||
+            selectionController.HoveredEntity.IsValid;
+        debugDraw.Enabled =
+            worldDebugEnabled ||
+            interactionFeedback;
+
+        if (!debugDraw.Enabled)
         {
             return;
         }
@@ -306,35 +385,93 @@ internal sealed class ClientApplication
         Vector4 rangeColor = new(0.2f, 0.75f, 1.0f, 1.0f);
         Vector4 boundsColor = new(1.0f, 0.72f, 0.18f, 1.0f);
         Vector4 pointColor = new(1.0f, 0.25f, 0.18f, 1.0f);
+        Vector4 selectedColor = new(0.25f, 1.0f, 0.35f, 1.0f);
+        Vector4 hoveredColor = new(0.15f, 0.85f, 1.0f, 1.0f);
 
-        debugDraw.Circle(camera.Target, 40.0f, rangeColor, segments: 48);
-        debugDraw.Point(camera.Target, 8.0f, pointColor);
-
-        int debugCount = Math.Min(
-            renderWorld.InstanceCount,
-            MaximumDebugInstanceBoxes);
-
-        for (int index = 0; index < debugCount; index++)
+        if (worldDebugEnabled)
         {
-            RenderInstance instance = renderWorld.GetInterpolatedInstance(index, alpha);
-            Vector3 extents = Vector3.Max(
-                Vector3.Abs(instance.Transform.Scale) * 0.5f,
-                new Vector3(0.05f));
+            debugDraw.Circle(camera.Target, 40.0f, rangeColor, segments: 48);
+            debugDraw.Point(camera.Target, 8.0f, pointColor);
 
-            debugDraw.Box(
-                new AxisAlignedBounds(
-                    instance.Transform.Position - extents,
-                    instance.Transform.Position + extents),
-                boundsColor);
+            int debugCount = Math.Min(
+                renderWorld.InstanceCount,
+                MaximumDebugInstanceBoxes);
 
-            if (index < MaximumDebugLabels)
+            for (int index = 0; index < debugCount; index++)
             {
-                debugDraw.Label(
-                    instance.Transform.Position +
-                    new Vector3(0.0f, extents.Y + 2.0f, 0.0f),
-                    $"E{instance.Entity.Index}",
-                    boundsColor);
+                RenderInstance instance =
+                    renderWorld.GetInterpolatedInstance(index, alpha);
+                DrawInstanceBounds(
+                    debugDraw,
+                    instance,
+                    boundsColor,
+                    index < MaximumDebugLabels
+                        ? $"E{instance.Entity.Index}"
+                        : null);
             }
+        }
+
+        int selectionLabelCount = 0;
+        foreach (var entity in selectionController.Selection.Entities)
+        {
+            if (!renderWorld.TryGetInterpolatedInstance(
+                    entity,
+                    alpha,
+                    out RenderInstance instance))
+            {
+                continue;
+            }
+
+            string? label = selectionLabelCount < MaximumDebugLabels
+                ? $"SELECTED E{entity.Index}"
+                : null;
+            DrawInstanceBounds(
+                debugDraw,
+                instance,
+                selectedColor,
+                label);
+            selectionLabelCount++;
+        }
+
+        EntityId hovered = selectionController.HoveredEntity;
+        if (hovered.IsValid &&
+            !selectionController.Selection.Contains(hovered) &&
+            renderWorld.TryGetInterpolatedInstance(
+                hovered,
+                alpha,
+                out RenderInstance hoveredInstance))
+        {
+            DrawInstanceBounds(
+                debugDraw,
+                hoveredInstance,
+                hoveredColor,
+                $"HOVER E{hovered.Index}");
+        }
+    }
+
+    private static void DrawInstanceBounds(
+        DebugDraw debugDraw,
+        in RenderInstance instance,
+        Vector4 color,
+        string? label)
+    {
+        Vector3 extents = Vector3.Max(
+            Vector3.Abs(instance.Transform.Scale) * 0.5f,
+            new Vector3(0.05f));
+
+        debugDraw.Box(
+            new AxisAlignedBounds(
+                instance.Transform.Position - extents,
+                instance.Transform.Position + extents),
+            color);
+
+        if (label is not null)
+        {
+            debugDraw.Label(
+                instance.Transform.Position +
+                new Vector3(0.0f, extents.Y + 2.0f, 0.0f),
+                label,
+                color);
         }
     }
 
@@ -515,5 +652,28 @@ internal sealed class ClientApplication
             $"visibleInstances={instances.VisibleInstances} " +
             $"visibleChunks={terrain.VisibleChunks} " +
             $"drawCalls={terrain.DrawCalls + instances.DrawCalls}");
+    }
+
+    private static void WriteInteractionState(
+        string state,
+        RtsSelectionController selectionController,
+        SimulationCommandEnvelope? movementEnvelope,
+        MoveEntitiesCommand? movementCommand)
+    {
+        EntityId hovered = selectionController.HoveredEntity;
+        string hoveredText = hovered.IsValid
+            ? hovered.ToString()
+            : "none";
+        string commandText = movementEnvelope.HasValue
+            ? movementEnvelope.Value.Sequence.ToString(
+                System.Globalization.CultureInfo.InvariantCulture)
+            : "none";
+
+        Console.WriteLine(
+            $"[interaction:{state}] selected={selectionController.Selection.Count} " +
+            $"hovered={hoveredText} lastCommand={commandText} " +
+            $"acceptedTargets={movementCommand?.AcceptedTargetCount ?? 0} " +
+            $"rejectedTargets={movementCommand?.RejectedTargetCount ?? 0} " +
+            $"executedTick={movementCommand?.ExecutedAtTick.Value ?? 0}");
     }
 }

@@ -98,10 +98,7 @@ public sealed class DebugDraw
             throw new ArgumentOutOfRangeException(nameof(radius));
         }
 
-        if (segments < 3)
-        {
-            throw new ArgumentOutOfRangeException(nameof(segments));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(segments, 3);
 
         float step = MathF.Tau / segments;
         Vector3 previous =

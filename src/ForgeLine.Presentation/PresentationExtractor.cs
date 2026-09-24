@@ -52,6 +52,16 @@ public sealed class PresentationExtractor : ISimulationTickObserver
             RenderVisibilityMask visibility =
                 (RenderVisibilityMask)(uint)visual.Visibility;
 
+            SelectablePresentationMetadata selectable =
+                context.Entities.TryGetComponent(
+                    entity,
+                    out ControllableEntity controllable) &&
+                controllable.IsControllable
+                    ? new SelectablePresentationMetadata(
+                        controllable.Owner,
+                        controllable.Category)
+                    : SelectablePresentationMetadata.None;
+
             instances[index++] = new RenderInstance(
                 entity,
                 new RenderTransform(
@@ -61,7 +71,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 new RenderMeshHandle(visual.VisualId),
                 RenderMaterialHandle.Default,
                 visibility,
-                entity.Index);
+                entity.Index,
+                selectable);
         }
 
         _buffer.Publish(

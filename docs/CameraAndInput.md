@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The RTS camera/input foundation separates native device events, semantic action mapping, presentation camera behavior, and future simulation commands.
+The RTS camera/input foundation separates native device events, semantic action mapping, presentation camera behavior, and simulation command generation.
 
 The implemented boundary is:
 
@@ -13,12 +13,16 @@ ForgeLine.Platform.Windows raw input events
     ↓
 ForgeLine.Input state + RTS action mapping
     ↓
-ForgeLine.Presentation.RtsCamera
+ForgeLine.Presentation camera / selection interaction
     ↓
-view/projection data and screen/world helpers
+view/projection data + presentation movement requests
+    ↓
+ForgeLine.Client
+    ↓
+simulation commands
 ```
 
-The camera never writes simulation state. Future selection and gameplay commands consume camera rays and mapped actions through separate command-generation paths.
+The camera never writes simulation state. Selection consumes camera rays and extracted render instances; gameplay changes still cross the fixed-tick command boundary.
 
 ## Coordinate Convention
 
@@ -50,12 +54,17 @@ The camera target/focus point lies on arbitrary world coordinates. The Windows c
 | Drag pan | Middle Mouse Button |
 | Zoom | Mouse Wheel |
 | Edge scroll | Enabled by default |
+| Single selection | Left Mouse Button |
+| Add/remove selection | Shift + Left Mouse Button |
+| Box selection | Left-drag |
+| Toggle box selection | Shift + Left-drag |
+| Movement order | Right Mouse Button |
 
-Bindings are represented by `RtsCameraBindings`. The contract is persistence-ready and can later be fed by a settings store without introducing a remapping UI in this foundation.
+Camera bindings are represented by `RtsCameraBindings`. Selection conventions currently use the standard mouse buttons and Shift directly; command-panel remapping remains a later UI/settings concern.
 
 ## Raw Input
 
-`ForgeLine.Platform.Windows` translates the Win32 messages needed by the first RTS interaction layer into `PlatformInputEvent` values.
+`ForgeLine.Platform.Windows` translates the Win32 messages needed by the RTS interaction layer into `PlatformInputEvent` values.
 
 The public platform boundary exposes:
 
@@ -81,7 +90,7 @@ A focus-loss event clears:
 - pointer delta
 - wheel delta
 
-This prevents stuck camera motion when the application loses focus.
+This prevents stuck camera motion and cancels an in-progress selection gesture when the application loses focus.
 
 `RtsCameraActionMapper` converts raw state into an `RtsCameraInputFrame` containing:
 
@@ -91,6 +100,8 @@ This prevents stuck camera motion when the application loses focus.
 - zoom steps
 - drag-pan state
 - pointer position/delta
+
+`RtsSelectionController` independently interprets left/right mouse state plus Shift for selection and movement intent. It owns no simulation state.
 
 ## Camera State
 
@@ -127,13 +138,13 @@ Losing focus invalidates the pointer for edge scrolling until a new pointer even
 - projection
 - combined view-projection
 
-`ScreenPointToWorldRay` produces a world-space ray suitable for future terrain, selection, and command picking.
+`ScreenPointToWorldRay` produces the world-space ray used for entity picking.
 
-`TryScreenPointToWorldOnHorizontalPlane` intersects that ray with a configurable horizontal world plane. The canonical heightfield query API can be used separately when later selection/placement workflows require the actual terrain surface.
+`TryScreenPointToWorldOnHorizontalPlane` intersects that ray with a configurable horizontal world plane. Movement-target resolution then samples the current terrain height at the resolved X/Z position before the request is handed to the client command boundary.
 
-`WorldToScreen` projects a world point into client pixels and reports normalized depth plus current clip visibility.
+`WorldToScreen` projects a world point into client pixels and reports normalized depth plus current clip visibility. Drag-box selection uses this projection and only includes visible entities whose projected centers are inside the screen-space rectangle.
 
-These helpers do not read simulation state and remain usable with the current terrain world, presentation snapshots, and future gameplay read models.
+These helpers do not read live simulation state. Entity picking uses immutable/interpolated `RenderWorld` instances extracted from simulation snapshots.
 
 ## Diagnostics
 
@@ -148,11 +159,13 @@ These helpers do not read simulation state and remain usable with the current te
 
 The Windows client emits camera diagnostics at startup, periodically while running, and at shutdown.
 
+Interaction diagnostics additionally expose selected count, hovered entity, last movement-command sequence, accepted/rejected target counts, and command execution tick.
+
 ## Terrain Validation Scene
 
-The current client renders the representative chunked heightfield world through the RTS camera.
+The current client renders the representative chunked heightfield world through the RTS camera and populates visible test entities with local/foreign ownership plus selectable categories.
 
-Camera navigation directly exercises:
+The scene directly exercises:
 
 - keyboard and drag panning across chunk boundaries
 - edge scrolling
@@ -162,5 +175,8 @@ Camera navigation directly exercises:
 - window aspect changes
 - chunk-level frustum culling
 - world-space depth-tested terrain
+- single/toggle/box selection
+- ownership/category filtering
+- right-click movement-command submission
 
-Terrain remains world/presentation state rather than simulation gameplay state. See [World and Terrain](WorldAndTerrain.md) for the canonical coordinate model and terrain-rendering boundary.
+Terrain remains world/presentation state rather than simulation gameplay state. See [Selection and Command Interaction](SelectionAndCommandInteraction.md) for the interaction/command ownership boundary and [World and Terrain](WorldAndTerrain.md) for the canonical coordinate model and terrain-rendering boundary.
