@@ -8,6 +8,7 @@ public sealed class SimulationCoordinator
     private readonly SimulationContext _context;
     private readonly SimulationCommandSchedule _commands = new();
     private readonly SimulationSystemPipeline _systems = new();
+    private readonly List<ISimulationTickObserver> _tickObservers = new();
     private ulong _commandsProcessed;
     private ulong _systemInvocations;
     private int _peakPendingCommands;
@@ -42,6 +43,8 @@ public sealed class SimulationCoordinator
 
     public int RegisteredSystemCount => _systems.SystemCount;
 
+    public int RegisteredTickObserverCount => _tickObservers.Count;
+
     public SimulationLoopMetrics Metrics =>
         new(
             CurrentTick.Value,
@@ -53,6 +56,19 @@ public sealed class SimulationCoordinator
     public void RegisterSystem(ISimulationSystem system)
     {
         _systems.Register(system);
+    }
+
+    public void RegisterTickObserver(ISimulationTickObserver observer)
+    {
+        ArgumentNullException.ThrowIfNull(observer);
+
+        if (CurrentTick != SimulationTick.Zero)
+        {
+            throw new InvalidOperationException(
+                "Simulation tick observers must be registered before ticking starts.");
+        }
+
+        _tickObservers.Add(observer);
     }
 
     public SimulationCommandEnvelope SubmitCommand(
@@ -98,6 +114,11 @@ public sealed class SimulationCoordinator
                 }
 
                 _systemInvocations += (ulong)_systems.ExecutePhase(phase, _context);
+            }
+
+            for (int index = 0; index < _tickObservers.Count; index++)
+            {
+                _tickObservers[index].OnTickCompleted(_context);
             }
         }
         finally
