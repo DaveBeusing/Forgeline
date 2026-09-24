@@ -4,7 +4,7 @@
 
 `ForgeLine.Client` is the interactive Windows x64 composition root. It owns the native application host and composes the Direct3D 12 graphics foundation, RTS input/camera stack, and the representative terrain presentation without introducing Win32 or D3D12 details into world, simulation, or game rules.
 
-The current client initializes graphics, consumes the platform input stream through `ForgeLine.Input`, updates the presentation-only RTS camera, generates the representative chunked heightfield world, and renders depth-tested terrain with chunk-level frustum culling. Unit/building rendering, RTS UI, audio playback, and simulation composition remain deferred.
+The current client initializes graphics, consumes the platform input stream through `ForgeLine.Input`, updates the presentation-only RTS camera, advances the fixed-tick simulation, extracts immutable presentation snapshots, interpolates simple render instances, and renders them together with depth-tested chunked terrain. Production unit art, selection mechanics, RTS UI, and audio playback remain deferred.
 
 ## Platform Boundary
 
@@ -128,7 +128,7 @@ dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuratio
 
 The executable is a Windows x64 host with the D3D12 graphics foundation, RTS camera/input stack, and representative chunked terrain active. The initial strategic camera view spans multiple chunks; pan, rotation, pitch, zoom, edge scrolling, negative/positive chunk traversal, resize behavior, depth testing, and frustum culling can be validated directly against the visible world.
 
-Default controls are W/A/S/D or Arrow Keys to pan, Q/E to rotate, R/F to change pitch, Middle Mouse drag to pan, and Mouse Wheel to zoom. Edge scrolling is enabled by default. See [RTS Camera and Input](CameraAndInput.md) for the full interaction and coordinate conventions and [World and Terrain](WorldAndTerrain.md) for world/chunk semantics, culling, and terrain diagnostics.
+Default controls are W/A/S/D or Arrow Keys to pan, Q/E to rotate, R/F to change pitch, Middle Mouse drag to pan, and Mouse Wheel to zoom. F1 toggles the development metrics overlay and F2 toggles world debug visualization. Edge scrolling is enabled by default. See [RTS Camera and Input](CameraAndInput.md) for the full interaction and coordinate conventions and [World and Terrain](WorldAndTerrain.md) for world/chunk semantics, culling, and terrain diagnostics.
 
 ## Bounded Smoke Validation
 
@@ -136,6 +136,9 @@ Run:
 
 ```powershell
 dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release -- --smoke-test
+
+# Optional bounded instance stress scene
+dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release -- --smoke-test --render-stress 1000
 ```
 
 Smoke mode:
@@ -152,3 +155,6 @@ Smoke mode:
 CI executes this validation only on Windows runners.
 
 For manual validation, also resize the window, minimize and restore it, move it between displays with different DPI scaling where available, change focus, close it using the system close button, and repeat several debug launches while watching process and USER/GDI handle counts.
+
+
+See [Presentation Extraction and Debugging](PresentationExtractionAndDebugging.md) for the simulation-to-render ownership boundary, interpolation, debug controls, metrics, and render stress workflow.

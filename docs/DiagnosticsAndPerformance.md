@@ -123,6 +123,8 @@ ECS baselines cover:
 - multi-component queries
 - 1,000 and 10,000 entity workloads
 
+Rendering diagnostics additionally expose frame time, CPU render time, terrain visibility/submission counts, generic instance visibility/submission counts, and development overlay allocation/GC state. GPU timestamps remain deferred until the graphics abstraction owns a clean timestamp-query/readback lifecycle.
+
 Simulation baselines cover:
 
 - empty fixed ticks
@@ -138,9 +140,10 @@ Run them with:
 ```powershell
 dotnet run --project benchmarks/ForgeLine.Ecs.Benchmarks/ForgeLine.Ecs.Benchmarks.csproj --configuration Release
 dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simulation.Benchmarks.csproj --configuration Release
+dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release
 ```
 
-BenchmarkDotNet output includes runtime and machine information. Keep benchmark results when comparing architecture or hot-path changes so the environment remains visible.
+The rendering host includes terrain workloads plus 1,000 near-field simple instances and 5,000 total simple instances with far-field culling. BenchmarkDotNet output includes runtime and machine information. Keep benchmark results when comparing architecture or hot-path changes so the environment remains visible.
 
 ## Stress Scenarios
 
@@ -191,3 +194,8 @@ The following remain non-binding engineering targets:
 - 10,000+ lightweight simulation entities as an early stress target.
 
 They are engineering goals, not shipped product guarantees.
+
+
+## Presentation Diagnostics
+
+The Windows client development overlay can be toggled with F1. World debug visualization can be toggled with F2. The presentation path, metric semantics, extraction ownership, and render baselines are documented in [Presentation Extraction and Debugging](PresentationExtractionAndDebugging.md).

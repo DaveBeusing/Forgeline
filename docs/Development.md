@@ -27,7 +27,7 @@ From the repository root:
 dotnet restore ForgeLine.sln
 pwsh ./build/Validate-ProjectReferences.ps1
 dotnet build ForgeLine.sln --configuration Release --no-restore
-dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release --no-build -- --smoke-test
+dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release --no-build -- --smoke-test --render-stress 1000
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 64 --seed 12345 --tick-rate 20 --entities 1000 --diagnostics-output artifacts/headless-smoke.json
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 16 --seed 67890 --tick-rate 20 --entities 10000 --diagnostics-output artifacts/headless-stress-10000.json
 dotnet test ForgeLine.sln --configuration Release --no-build
@@ -57,20 +57,21 @@ See [Diagnostics and Performance](DiagnosticsAndPerformance.md) for available me
 
 ## Benchmark Projects
 
-The repository contains BenchmarkDotNet hosts for ECS, Navigation, Simulation, and Rendering. Benchmark code should be introduced together with meaningful measured workloads. The simulation benchmark host covers fixed-tick and scheduler workloads; the rendering benchmark host covers terrain mesh generation and visible-chunk submission preparation. Performance-sensitive architectural changes require measurement rather than assumption.
+The repository contains BenchmarkDotNet hosts for ECS, Navigation, Simulation, and Rendering. Benchmark code should be introduced together with meaningful measured workloads. The simulation benchmark host covers fixed-tick and scheduler workloads; the rendering benchmark host covers terrain mesh generation, visible-chunk submission preparation, 1,000 near-field instances, and 5,000 total instances with far-field culling. Performance-sensitive architectural changes require measurement rather than assumption.
 
 Examples:
 
 ```powershell
 dotnet run --project benchmarks/ForgeLine.Ecs.Benchmarks/ForgeLine.Ecs.Benchmarks.csproj --configuration Release
 dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simulation.Benchmarks.csproj --configuration Release
+dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release
 ```
 
 Correctness tests remain separate from benchmark timing. Benchmark timing thresholds are not CI gates unless explicitly introduced later.
 
 ## Windows Client Host
 
-The interactive client composes the native Windows host, Direct3D 12 graphics backend, RTS input/camera stack, and the representative chunked terrain world. Simulation/gameplay composition remains intentionally separate.
+The interactive client composes the native Windows host, Direct3D 12 graphics backend, RTS input/camera stack, fixed-tick simulation, immutable presentation extraction, generic interpolated instances, development debug visualization, and the representative chunked terrain world.
 
 Launch it with:
 

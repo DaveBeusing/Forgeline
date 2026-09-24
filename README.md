@@ -21,7 +21,7 @@ The project is built on **ForgeLine Engine**, a custom C#/.NET RTS engine design
 - strict simulation/presentation separation
 - multiplayer-aware architecture with networking deferred
 
-Implemented engine foundations currently include the repository architecture, stable entity/component storage, a command-driven fixed-tick simulation runtime, deterministic simulation-owned randomness, a persistent-worker job scheduler, opt-in engine diagnostics, repeatable headless test scenarios, performance baselines, a standalone headless host, the native Windows interactive client host, the Direct3D 12 graphics foundation, the production-oriented RTS camera/input stack, and the first chunked heightfield world with headless terrain queries, terrain mesh generation, depth-tested terrain rendering, and chunk-level frustum culling.
+Implemented engine foundations currently include the repository architecture, stable entity/component storage, a command-driven fixed-tick simulation runtime, deterministic simulation-owned randomness, a persistent-worker job scheduler, opt-in engine diagnostics, repeatable headless test scenarios, performance baselines, a standalone headless host, the native Windows interactive client host, the Direct3D 12 graphics foundation, the production-oriented RTS camera/input stack, the first chunked heightfield world, and the simulation-to-presentation snapshot pipeline with interpolated generic render instances, debug drawing, and an on-screen development metrics overlay.
 
 Unit/building rendering, selection/gameplay commands, navigation algorithms, logistics simulation, combat, production terrain materials and streaming, editor functionality, asset conversion, and networking remain deferred to their owning implementation stages.
 
@@ -77,7 +77,7 @@ Launch the native Windows x64 client host:
 dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release
 ```
 
-The current client creates a DPI-aware native Win32 window, initializes the Direct3D 12 graphics foundation, consumes mapped RTS camera input, generates a representative chunked heightfield world, and renders depth-tested terrain with chunk-level frustum culling while keeping simulation uncomposed. Close the window normally to exercise orderly terrain, graphics, input, and platform shutdown.
+The current client creates a DPI-aware native Win32 window, initializes Direct3D 12, runs the fixed-tick simulation, extracts immutable presentation snapshots, interpolates simple moving test entities between ticks, and renders them together with the chunked terrain. F1 toggles the development metrics overlay and F2 toggles world debug visualization.
 
 Run the bounded client smoke validation used by CI:
 
@@ -120,6 +120,7 @@ Examples:
 ```powershell
 dotnet run --project benchmarks/ForgeLine.Ecs.Benchmarks/ForgeLine.Ecs.Benchmarks.csproj --configuration Release
 dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simulation.Benchmarks.csproj --configuration Release
+dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release
 ```
 
 Benchmark timing is measurement evidence rather than a hardware-sensitive CI pass/fail gate.
@@ -127,6 +128,8 @@ Benchmark timing is measurement evidence rather than a hardware-sensitive CI pas
 ## Architecture
 
 See [Architecture](docs/Architecture.md) for project responsibilities and dependency rules.
+
+See [Presentation Extraction and Debugging](docs/PresentationExtractionAndDebugging.md) for snapshot ownership, interpolation, debug tooling, overlay metrics, and rendering baselines.
 
 See [Simulation Runtime](docs/SimulationRuntime.md) for fixed-tick semantics, phase ordering, commands, deterministic randomness, and headless execution.
 

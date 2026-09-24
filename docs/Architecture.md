@@ -72,7 +72,7 @@ These domain projects establish dependency boundaries only at this stage; their 
 ### Game and Presentation
 
 - `ForgeLine.Game`: FORGELINE rules and composition of simulation domains.
-- `ForgeLine.Presentation`: conversion of game/read-model state into player-visible presentation state plus presentation-only RTS camera state, projection, and picking math.
+- `ForgeLine.Presentation`: post-tick extraction into immutable snapshots, buffered simulation-to-render handoff, render-world interpolation, generic instance rendering, debug visualization, development metrics, plus presentation-only RTS camera state, projection, and picking math.
 - `ForgeLine.UI`: RTS-specific user-interface boundary.
 - `ForgeLine.Client`: composition root for the interactive Windows application. It owns the platform host lifecycle and will later compose graphics, input, presentation, and game services without moving platform details into simulation.
 - `ForgeLine.Headless`: non-visual composition root for simulation tests, AI matches, balancing, performance work, replay validation, and future server experiments.
@@ -129,9 +129,9 @@ Render World
 Renderer
 ```
 
-The renderer consumes extracted presentation/world data and does not determine simulation outcomes. The current client derives persistent terrain render resources from `ForgeLine.World`, performs presentation-owned chunk frustum culling, and submits indexed depth-tested terrain through `ForgeLine.Graphics`. Units, fog of war, and simulation presentation extraction remain later rendering stages.
+The renderer consumes extracted presentation/world data and does not determine simulation outcomes. `PresentationExtractor` observes the completed post-tick boundary, copies render-relevant ECS data into immutable snapshots, and publishes them through a non-blocking latest-value buffer. `RenderWorld` retains previous/current snapshots for visual transform interpolation. The client renders extracted generic instances alongside persistent terrain resources without querying live simulation state from the renderer.
 
-See `docs/Graphics.md` for the implemented graphics lifecycle and ownership rules. See `docs/CameraAndInput.md` for the raw-input boundary, RTS action mapping, camera coordinate convention, controls, and screen/world APIs. See `docs/WorldAndTerrain.md` for the canonical spatial model, heightfield semantics, terrain query boundary, mesh generation, culling, and render ownership.
+See `docs/PresentationExtractionAndDebugging.md` for extraction timing, snapshot ownership, buffering, interpolation, debug tooling, metrics, and render stress baselines. See `docs/Graphics.md` for the implemented graphics lifecycle and ownership rules. See `docs/CameraAndInput.md` for the raw-input boundary, RTS action mapping, camera coordinate convention, controls, and screen/world APIs. See `docs/WorldAndTerrain.md` for the canonical spatial model, heightfield semantics, terrain query boundary, mesh generation, culling, and render ownership.
 
 ## Performance Direction
 
