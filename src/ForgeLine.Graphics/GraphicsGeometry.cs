@@ -36,6 +36,6 @@ public readonly record struct GraphicsVertexElement(
 
 public enum GraphicsIndexFormat
 {
-    UInt16,
-    UInt32
+    SixteenBit,
+    ThirtyTwoBit
 }
