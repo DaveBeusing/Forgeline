@@ -220,8 +220,12 @@ public sealed class EntityRegistry
 
     private void EnsureAlive(EntityId entity)
     {
-        EngineInvariant.Require(
-            _entities.IsAlive(entity),
+        if (_entities.IsAlive(entity))
+        {
+            return;
+        }
+
+        EngineInvariant.Fail(
             DiagnosticCategory.Ecs,
             "ECS_ENTITY_NOT_ALIVE",
             $"Entity {entity} is not alive.");

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace ForgeLine.Core;
@@ -16,11 +17,12 @@ public static class EngineInvariant
             return;
         }
 
-        Throw(category, code, message);
+        Fail(category, code, message);
     }
 
+    [DoesNotReturn]
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static void Throw(
+    public static void Fail(
         DiagnosticCategory category,
         string code,
         string message)
