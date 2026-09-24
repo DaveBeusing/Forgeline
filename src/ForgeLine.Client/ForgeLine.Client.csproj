@@ -11,6 +11,8 @@
     <ProjectReference Include="../ForgeLine.Audio/ForgeLine.Audio.csproj" />
     <ProjectReference Include="../ForgeLine.Input/ForgeLine.Input.csproj" />
     <ProjectReference Include="../ForgeLine.Assets/ForgeLine.Assets.csproj" />
+    <ProjectReference Include="../ForgeLine.Jobs/ForgeLine.Jobs.csproj" />
+    <ProjectReference Include="../ForgeLine.Navigation/ForgeLine.Navigation.csproj" />
     <ProjectReference Include="../ForgeLine.World/ForgeLine.World.csproj" />
     <ProjectReference Include="../ForgeLine.Game/ForgeLine.Game.csproj" />
     <ProjectReference Include="../ForgeLine.Presentation/ForgeLine.Presentation.csproj" />

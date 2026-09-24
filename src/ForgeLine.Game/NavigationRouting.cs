@@ -110,7 +110,6 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
             ProcessAgent(context, _agents[index]);
         }
 
-        ApplyCompletedResults(context);
         UpdateDiagnostics(context);
     }
 
