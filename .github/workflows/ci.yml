@@ -43,7 +43,7 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
-      - name: Windows client smoke test
+      - name: Windows graphics client smoke test
         if: runner.os == 'Windows'
         run: dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release --no-build -- --smoke-test
 
