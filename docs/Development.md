@@ -37,15 +37,7 @@ The GitHub Actions CI workflow executes the same essential sequence on pull requ
 
 ## Test Projects
 
-The repository contains test projects for:
-
-- Core
-- ECS
-- Jobs
-- Simulation
-- Navigation
-- Logistics
-- Game
+The repository contains focused test projects for Core, ECS, Jobs, World, Simulation, Navigation, Logistics, Game, Platform.Windows, Graphics, Input, and Presentation.
 
 Functional tests belong with the systems they validate and should cover controlled failure behavior as well as successful behavior.
 
@@ -65,14 +57,7 @@ See [Diagnostics and Performance](DiagnosticsAndPerformance.md) for available me
 
 ## Benchmark Projects
 
-The repository contains BenchmarkDotNet hosts for:
-
-- ECS
-- Navigation
-- Simulation
-- Rendering
-
-Benchmark code should be introduced together with meaningful measured workloads. The simulation benchmark host covers empty ticks, command processing, representative ECS-backed system ticks, multi-system ticks, and scheduler range work. Performance-sensitive architectural changes require measurement rather than assumption.
+The repository contains BenchmarkDotNet hosts for ECS, Navigation, Simulation, and Rendering. Benchmark code should be introduced together with meaningful measured workloads. The simulation benchmark host covers fixed-tick and scheduler workloads; the rendering benchmark host covers terrain mesh generation and visible-chunk submission preparation. Performance-sensitive architectural changes require measurement rather than assumption.
 
 Examples:
 
@@ -85,7 +70,7 @@ Correctness tests remain separate from benchmark timing. Benchmark timing thresh
 
 ## Windows Client Host
 
-The interactive client currently validates the platform and application-host boundary only; Direct3D 12 rendering and gameplay presentation are intentionally not initialized yet.
+The interactive client composes the native Windows host, Direct3D 12 graphics backend, RTS input/camera stack, and the representative chunked terrain world. Simulation/gameplay composition remains intentionally separate.
 
 Launch it with:
 
@@ -101,7 +86,7 @@ dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuratio
 
 The client is Windows x64 specific. Native Win32 calls remain confined to `ForgeLine.Platform.Windows`; headless and simulation projects must not reference the client or Windows platform project.
 
-See [Windows Client](WindowsClient.md) for lifecycle and DPI details.
+See [Windows Client](WindowsClient.md) for lifecycle and DPI details, [RTS Camera and Input](CameraAndInput.md) for camera controls and coordinate conventions, and [World and Terrain](WorldAndTerrain.md) for terrain queries, mesh generation, culling, diagnostics, and benchmark coverage.
 
 ## Headless Runtime
 
