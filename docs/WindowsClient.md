@@ -142,7 +142,7 @@ Smoke mode:
 2. creates exactly one primary native window;
 3. initializes the D3D12 device and swap chain, using WARP only when no suitable hardware adapter is available;
 4. compiles a small shader through the DXC path;
-5. clears and presents frames for a short bounded interval;
+5. creates the minimal root-signature/pipeline-state proof and renders a triangle for a short bounded interval;
 6. reports platform and graphics state to standard output;
 7. requests normal window destruction;
 8. waits for graphics work to retire and exits only after orderly graphics/platform cleanup.
