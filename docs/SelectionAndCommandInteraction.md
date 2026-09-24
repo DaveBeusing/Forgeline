@@ -26,9 +26,13 @@ SimulationCoordinator command schedule
 Input Commands tick boundary
     ↓
 MovementOrder component
+    ↓
+GroundMovementSystem
+    ↓
+authoritative WorldTransform
 ```
 
-Navigation, formation movement, local avoidance, attack orders, control groups, minimap commands, and final interaction styling remain deferred.
+Strategic navigation, formation corridors/slots, attack orders, control groups, minimap commands, and final interaction styling remain deferred. Fixed-tick ground locomotion and short-range local steering are implemented.
 
 ## Ownership Boundaries
 
@@ -125,7 +129,7 @@ The command does not change `WorldTransform`.
 
 At execution time it revalidates every target against the live ECS and owner. Accepted entities receive or replace a `MovementOrder` containing the issuer, target, submission tick, and accepted tick.
 
-The later navigation system can consume this component during the existing navigation/order-processing phases without changing the interaction boundary.
+The fixed-tick ground locomotion system consumes this component during the movement phase. Arrival stops the unit and consumes the completed order. Future hierarchical navigation can preserve this interaction boundary by refining the order into local route waypoints or corridors before locomotion.
 
 ## Stale Entity Handling
 
@@ -163,6 +167,10 @@ Focused tests cover:
 - fixed-tick command dispatch;
 - stale-generation rejection;
 - foreign-owner rejection;
-- the invariant that a movement command does not directly change `WorldTransform`.
+- the invariant that a movement command does not directly change `WorldTransform`;
+- authoritative movement-order consumption by fixed-tick locomotion;
+- arrival, terrain following, slope limits, local separation, obstacle steering, and chunk-boundary spatial updates.
+
+See [Ground Movement and Local Steering](GroundMovementAndSteering.md) for locomotion semantics and limitations.
 
 The full solution build, project-reference validation, Windows client smoke test, headless smoke tests, and complete test suite remain the CI gate.
