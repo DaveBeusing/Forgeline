@@ -288,15 +288,8 @@ public sealed class RtsCamera
 
     private static void ValidateViewport(int width, int height)
     {
-        if (width <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(width));
-        }
-
-        if (height <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(height));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(width);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(height);
     }
 
     private static float NormalizeAngle(float radians)
