@@ -1,4 +1,5 @@
 using ForgeLine.Ecs;
+using ForgeLine.Jobs;
 
 namespace ForgeLine.Simulation;
 
@@ -14,12 +15,13 @@ public sealed class SimulationCoordinator
     public SimulationCoordinator(
         int ticksPerSecond = FixedTickClock.DefaultTicksPerSecond,
         ulong seed = 1,
-        int initialEntityCapacity = 256)
+        int initialEntityCapacity = 256,
+        JobScheduler? jobScheduler = null)
     {
         Clock = new FixedTickClock(ticksPerSecond);
         var entities = new EntityRegistry(initialEntityCapacity);
         Random = new SimulationRandom(seed);
-        _context = new SimulationContext(entities, Random);
+        _context = new SimulationContext(entities, Random, jobScheduler);
     }
 
     public FixedTickClock Clock { get; }
@@ -27,6 +29,8 @@ public sealed class SimulationCoordinator
     public SimulationRandom Random { get; }
 
     public EntityRegistry Entities => _context.Entities;
+
+    public SimulationJobs Jobs => _context.Jobs;
 
     public SimulationTick CurrentTick => Clock.CurrentTick;
 

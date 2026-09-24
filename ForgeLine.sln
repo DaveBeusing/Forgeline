@@ -54,6 +54,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForgeLine.Core.Tests", "tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForgeLine.Ecs.Tests", "tests\\ForgeLine.Ecs.Tests\\ForgeLine.Ecs.Tests.csproj", "{00000000-0000-0000-0000-000000000026}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForgeLine.Jobs.Tests", "tests\\ForgeLine.Jobs.Tests\\ForgeLine.Jobs.Tests.csproj", "{00000000-0000-0000-0000-000000000035}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForgeLine.Simulation.Tests", "tests\\ForgeLine.Simulation.Tests\\ForgeLine.Simulation.Tests.csproj", "{00000000-0000-0000-0000-000000000027}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForgeLine.Navigation.Tests", "tests\\ForgeLine.Navigation.Tests\\ForgeLine.Navigation.Tests.csproj", "{00000000-0000-0000-0000-000000000028}"
@@ -180,6 +182,10 @@ Global
 		{00000000-0000-0000-0000-000000000026}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00000000-0000-0000-0000-000000000026}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00000000-0000-0000-0000-000000000026}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00000000-0000-0000-0000-000000000035}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00000000-0000-0000-0000-000000000035}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00000000-0000-0000-0000-000000000035}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00000000-0000-0000-0000-000000000035}.Release|Any CPU.Build.0 = Release|Any CPU
 		{00000000-0000-0000-0000-000000000027}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{00000000-0000-0000-0000-000000000027}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00000000-0000-0000-0000-000000000027}.Release|Any CPU.ActiveCfg = Release|Any CPU

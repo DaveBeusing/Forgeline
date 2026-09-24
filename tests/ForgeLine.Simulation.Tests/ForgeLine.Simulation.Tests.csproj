@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="xunit.v3.mtp-v2" />
+    <ProjectReference Include="../../src/ForgeLine.Jobs/ForgeLine.Jobs.csproj" />
     <ProjectReference Include="../../src/ForgeLine.Simulation/ForgeLine.Simulation.csproj" />
   </ItemGroup>
 </Project>

@@ -1,3 +1,5 @@
+using System.Runtime.ExceptionServices;
+
 namespace ForgeLine.Simulation;
 
 internal sealed class SimulationCommandSchedule
@@ -52,9 +54,44 @@ internal sealed class SimulationCommandSchedule
 
         for (int index = 0; index < commands.Count; index++)
         {
-            commands[index].Command.Execute(context);
+            ExecuteCommand(commands[index].Command, context);
         }
 
         return commands.Count;
+    }
+
+    private static void ExecuteCommand(
+        ISimulationCommand command,
+        SimulationContext context)
+    {
+        ExceptionDispatchInfo? commandFailure = null;
+
+        try
+        {
+            command.Execute(context);
+        }
+        catch (Exception exception)
+        {
+            commandFailure = ExceptionDispatchInfo.Capture(exception);
+        }
+
+        try
+        {
+            context.Jobs.CompleteBoundary();
+        }
+        catch (Exception jobException)
+        {
+            if (commandFailure is not null)
+            {
+                throw new AggregateException(
+                    "The simulation command and one or more scheduled jobs failed.",
+                    commandFailure.SourceException,
+                    jobException);
+            }
+
+            throw;
+        }
+
+        commandFailure?.Throw();
     }
 }

@@ -2,11 +2,11 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <OutputType>Exe</OutputType>
+    <IsTestProject>true</IsTestProject>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" />
+    <PackageReference Include="xunit.v3.mtp-v2" />
     <ProjectReference Include="../../src/ForgeLine.Jobs/ForgeLine.Jobs.csproj" />
-    <ProjectReference Include="../../src/ForgeLine.Simulation/ForgeLine.Simulation.csproj" />
   </ItemGroup>
 </Project>

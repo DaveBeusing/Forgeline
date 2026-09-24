@@ -1,3 +1,5 @@
+using System.Runtime.ExceptionServices;
+
 namespace ForgeLine.Simulation;
 
 public sealed class SimulationSystemPipeline
@@ -44,12 +46,47 @@ public sealed class SimulationSystemPipeline
 
             if (registration.System.Phase == phase)
             {
-                registration.System.Execute(context);
+                ExecuteSystem(registration.System, context);
                 executionCount++;
             }
         }
 
         return executionCount;
+    }
+
+    private static void ExecuteSystem(
+        ISimulationSystem system,
+        SimulationContext context)
+    {
+        ExceptionDispatchInfo? systemFailure = null;
+
+        try
+        {
+            system.Execute(context);
+        }
+        catch (Exception exception)
+        {
+            systemFailure = ExceptionDispatchInfo.Capture(exception);
+        }
+
+        try
+        {
+            context.Jobs.CompleteBoundary();
+        }
+        catch (Exception jobException)
+        {
+            if (systemFailure is not null)
+            {
+                throw new AggregateException(
+                    "The simulation system and one or more scheduled jobs failed.",
+                    systemFailure.SourceException,
+                    jobException);
+            }
+
+            throw;
+        }
+
+        systemFailure?.Throw();
     }
 
     private readonly record struct Registration(

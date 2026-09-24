@@ -39,6 +39,7 @@ The repository contains test projects for:
 
 - Core
 - ECS
+- Jobs
 - Simulation
 - Navigation
 - Logistics
@@ -46,7 +47,7 @@ The repository contains test projects for:
 
 Functional tests belong with the systems they validate and should cover controlled failure behavior as well as successful behavior.
 
-Simulation tests verify fixed tick counts, explicit phase order, command scheduling and stable ordering, deterministic seeded behavior, fast headless-style execution, and allocation behavior. Simulation tests must remain runnable without starting the interactive client.
+Job tests verify range coverage, dependency ordering, fences, exception propagation, one-worker execution, cancellation-aware shutdown, bounded stress execution, and instrumentation. Simulation tests verify fixed tick counts, explicit phase order, command scheduling and stable ordering, deterministic seeded behavior, job-boundary integration, fast headless-style execution, and allocation behavior. Simulation tests must remain runnable without starting the interactive client.
 
 ## Benchmark Projects
 
@@ -57,7 +58,7 @@ The repository contains BenchmarkDotNet hosts for:
 - Simulation
 - Rendering
 
-Benchmark code should be introduced together with meaningful measured workloads. Performance-sensitive architectural changes require measurement rather than assumption.
+Benchmark code should be introduced together with meaningful measured workloads. The simulation benchmark host includes scheduler range benchmarks that compare representative sequential and parallel execution. Performance-sensitive architectural changes require measurement rather than assumption.
 
 Examples:
 
