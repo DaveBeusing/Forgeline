@@ -6,4 +6,4 @@ public readonly record struct TerrainRenderDiagnostics(
     int CulledChunks,
     long SubmittedTriangles,
     int DrawCalls,
-    int UploadedChunkBuffers);
+    int UploadedBufferCount);
