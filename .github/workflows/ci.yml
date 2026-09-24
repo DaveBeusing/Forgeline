@@ -43,6 +43,10 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
+      - name: Windows client smoke test
+        if: runner.os == 'Windows'
+        run: dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release --no-build -- --smoke-test
+
       - name: Headless diagnostics smoke test
         run: dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 64 --seed 12345 --tick-rate 20 --entities 1000 --diagnostics-output artifacts/headless-smoke.json
 

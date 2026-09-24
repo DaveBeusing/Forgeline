@@ -72,6 +72,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForgeLine.Simulation.Benchm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForgeLine.Rendering.Benchmarks", "benchmarks\\ForgeLine.Rendering.Benchmarks\\ForgeLine.Rendering.Benchmarks.csproj", "{00000000-0000-0000-0000-000000000034}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForgeLine.Platform.Windows.Tests", "tests\\ForgeLine.Platform.Windows.Tests\\ForgeLine.Platform.Windows.Tests.csproj", "{00000000-0000-0000-0000-000000000036}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -218,5 +220,9 @@ Global
 		{00000000-0000-0000-0000-000000000034}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00000000-0000-0000-0000-000000000034}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00000000-0000-0000-0000-000000000034}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00000000-0000-0000-0000-000000000036}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00000000-0000-0000-0000-000000000036}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00000000-0000-0000-0000-000000000036}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00000000-0000-0000-0000-000000000036}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
