@@ -50,7 +50,7 @@ public sealed class EntityRegistryTests
         EntityId replacement = registry.CreateEntity();
         registry.AddComponent(replacement, new Position(7, 8));
 
-        Assert.Throws<InvalidOperationException>(
+        Assert.ThrowsAny<InvalidOperationException>(
             () => registry.SetComponent(original, new Position(99, 99)));
 
         Assert.True(registry.TryGetComponent(replacement, out Position position));

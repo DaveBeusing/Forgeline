@@ -21,7 +21,11 @@ public sealed class EntityRegistry
     public int ComponentTypeCount => _componentStores.Count;
 
     public EntityRegistryDiagnostics Diagnostics =>
-        new(EntityCount, Capacity, ComponentTypeCount);
+        new(
+            EntityCount,
+            Capacity,
+            ComponentTypeCount,
+            GetTotalComponentCount());
 
     internal int SlotCount => _entities.SlotCount;
 
@@ -134,6 +138,26 @@ public sealed class EntityRegistry
         return TryGetStore<T>(out ComponentStore<T>? store) ? store.Count : 0;
     }
 
+    public ComponentCount[] GetComponentCounts()
+    {
+        var counts = new ComponentCount[_componentStores.Count];
+        int index = 0;
+
+        foreach (IComponentStore store in _componentStores.Values)
+        {
+            counts[index++] = new ComponentCount(
+                store.ComponentType.FullName ?? store.ComponentType.Name,
+                store.Count);
+        }
+
+        Array.Sort(
+            counts,
+            static (left, right) =>
+                StringComparer.Ordinal.Compare(left.ComponentType, right.ComponentType));
+
+        return counts;
+    }
+
     public EntityQuery<T> Query<T>(QueryIterationOrder order = QueryIterationOrder.Dense)
         where T : struct
     {
@@ -154,6 +178,18 @@ public sealed class EntityRegistry
     internal bool TryGetEntityAtIndex(int index, out EntityId entity)
     {
         return _entities.TryGetAliveEntity(index, out entity);
+    }
+
+    private int GetTotalComponentCount()
+    {
+        int total = 0;
+
+        foreach (IComponentStore store in _componentStores.Values)
+        {
+            total = checked(total + store.Count);
+        }
+
+        return total;
     }
 
     private ComponentStore<T> GetOrCreateStore<T>()
@@ -184,9 +220,14 @@ public sealed class EntityRegistry
 
     private void EnsureAlive(EntityId entity)
     {
-        if (!_entities.IsAlive(entity))
+        if (_entities.IsAlive(entity))
         {
-            throw new InvalidOperationException($"Entity {entity} is not alive.");
+            return;
         }
+
+        EngineInvariant.Fail(
+            DiagnosticCategory.Ecs,
+            "ECS_ENTITY_NOT_ALIVE",
+            $"Entity {entity} is not alive.");
     }
 }

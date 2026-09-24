@@ -44,7 +44,10 @@ public sealed class JobSchedulerTests
 
         scheduler.Wait(second);
 
-        Assert.Equal(new[] { 1, 2 }, order.ToArray());
+        int[] values = order.ToArray();
+        Assert.Equal(2, values.Length);
+        Assert.Equal(1, values[0]);
+        Assert.Equal(2, values[1]);
     }
 
     [Fact]

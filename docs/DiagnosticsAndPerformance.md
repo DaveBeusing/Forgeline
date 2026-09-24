@@ -1,0 +1,193 @@
+# Diagnostics and Performance
+
+ForgeLine Engine treats correctness diagnostics and performance measurement as part of the engine foundation rather than late-stage tooling.
+
+## Diagnostic Model
+
+Core diagnostic terminology is shared through:
+
+- `DiagnosticCategory`
+- `DiagnosticSeverity`
+- `EngineDiagnostic`
+- `EngineInvariant`
+- `EngineInvariantException`
+
+Invariant failures use a stable category and code together with an explicit failure message. Current ECS invalid-entity mutations report `ECS_ENTITY_NOT_ALIVE`.
+
+The invariant mechanism is intended for states that indicate engine correctness failures. It is not a replacement for normal input validation or recoverable gameplay errors.
+
+## Simulation Diagnostics
+
+`SimulationCoordinator` exposes opt-in diagnostics through `SimulationDiagnostics`.
+
+Diagnostics are disabled by default. Disabled diagnostics do not collect tick timing or allocation deltas and retain the allocation-free empty-tick behavior verified by the simulation tests.
+
+When enabled, snapshots expose:
+
+- configured simulation tick rate
+- completed tick count
+- last tick duration
+- average observed tick duration
+- maximum observed tick duration
+- allocated bytes observed during the diagnostic session
+- Gen 0, Gen 1, and Gen 2 collection deltas
+- live entity count
+- entity capacity
+- component type count
+- total component instance count
+- deterministic per-component counts
+- job scheduler counters and aggregate timing when a scheduler is present
+- current managed runtime allocation, heap, memory-load, and collection information
+
+Tick timing is diagnostic observation only. It must never influence simulation decisions.
+
+## Job Metrics
+
+The job scheduler exposes:
+
+- submitted jobs
+- completed jobs
+- faulted jobs
+- canceled jobs
+- pending jobs
+- running jobs
+- worker count
+- peak concurrent running jobs
+- aggregate wait duration
+- aggregate execution duration
+- instrumentation failures
+
+Per-job timing remains available through the scheduler timing observer.
+
+## Headless Diagnostic Reports
+
+The headless host can write an indented JSON report containing runtime metadata, requested scenario parameters, loop counters, and a simulation diagnostic snapshot.
+
+Example:
+
+```powershell
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --ticks 1000 --seed 1 --tick-rate 20 --entities 1000 --diagnostics-output artifacts/headless.json
+```
+
+The report records:
+
+- .NET runtime description
+- operating system description
+- process architecture
+- processor count
+- seed and logical tick rate
+- requested and executed tick counts
+- requested entity count
+- wall-clock elapsed time and throughput
+- simulation loop counters
+- simulation, ECS, job, allocation, and GC metrics
+
+These values make results interpretable across different machines. They are measurements, not product guarantees.
+
+## Headless Test Harness
+
+Simulation tests use a reusable `SimulationTestHarness` that can:
+
+- create a simulation with a known seed
+- optionally create a job scheduler
+- create entities
+- submit commands to explicit target ticks
+- run an exact number of ticks
+- expose resulting ECS and simulation state
+
+This keeps deterministic integration scenarios concise and ensures tests do not initialize graphics, audio, UI, or windowing.
+
+Run focused simulation tests with:
+
+```powershell
+dotnet test tests/ForgeLine.Simulation.Tests/ForgeLine.Simulation.Tests.csproj --configuration Release
+```
+
+Run the complete suite with:
+
+```powershell
+dotnet test ForgeLine.sln --configuration Release
+```
+
+## Benchmarks
+
+BenchmarkDotNet hosts are separate from correctness tests.
+
+ECS baselines cover:
+
+- entity creation
+- entity destruction
+- component add/remove
+- component lookup
+- dense ECS iteration
+- multi-component queries
+- 1,000 and 10,000 entity workloads
+
+Simulation baselines cover:
+
+- empty fixed ticks
+- light system ticks
+- 1,000-entity iteration ticks
+- representative multi-system ticks
+- command scheduling and processing
+- sequential range work
+- parallel scheduler range work
+
+Run them with:
+
+```powershell
+dotnet run --project benchmarks/ForgeLine.Ecs.Benchmarks/ForgeLine.Ecs.Benchmarks.csproj --configuration Release
+dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simulation.Benchmarks.csproj --configuration Release
+```
+
+BenchmarkDotNet output includes runtime and machine information. Keep benchmark results when comparing architecture or hot-path changes so the environment remains visible.
+
+## Stress Scenarios
+
+A bounded headless lightweight-entity scenario is available directly from the host:
+
+```powershell
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --ticks 64 --seed 42 --entities 10000 --diagnostics-output artifacts/stress-10000.json
+```
+
+The simulation test suite also verifies that 10,000 lightweight ECS entities can exist and execute headless ticks without stale-entity or lifecycle failure. A 1,000-entity scenario exercises a representative multi-component load.
+
+Gameplay-domain combat and logistics stress tests must be added only when those systems exist. Placeholder workloads must not be presented as representative gameplay performance.
+
+## Interpreting Results
+
+Use timing values comparatively rather than as universal thresholds.
+
+Investigate regressions by checking:
+
+1. whether the runtime, OS, architecture, and processor count are comparable;
+2. whether entity count and workload parameters are identical;
+3. whether allocation or GC behavior changed;
+4. whether job counts, wait time, or execution time changed;
+5. whether a code change altered the amount of simulated work;
+6. whether the result reproduces across repeated benchmark runs.
+
+Hardware-sensitive timing is intentionally not a hard CI gate.
+
+## CI
+
+CI:
+
+- restores and builds the complete solution;
+- validates project-reference boundaries;
+- runs a 1,000-entity headless diagnostics smoke scenario;
+- runs a bounded 10,000-lightweight-entity stress smoke scenario;
+- runs the complete correctness test suite;
+- uploads the generated JSON diagnostics as the `engine-diagnostics` workflow artifact.
+
+The artifact exists to make failures and performance observations inspectable without turning volatile timing into pass/fail thresholds.
+
+## Current Engineering Targets
+
+The following remain non-binding engineering targets:
+
+- stable 20 Hz simulation;
+- 1,000+ active combat/logistics entities without architectural redesign once those gameplay systems exist;
+- 10,000+ lightweight simulation entities as an early stress target.
+
+They are engineering goals, not shipped product guarantees.

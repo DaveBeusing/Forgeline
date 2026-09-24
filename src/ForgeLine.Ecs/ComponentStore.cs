@@ -20,6 +20,8 @@ internal sealed class ComponentStore<T> : IComponentStore
         _components = new T[capacity];
     }
 
+    public Type ComponentType => typeof(T);
+
     public int Count => _count;
 
     public bool Contains(EntityId entity)
