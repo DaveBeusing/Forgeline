@@ -6,7 +6,7 @@ Ground movement is the authoritative fixed-tick locomotion layer for standard RT
 
 It converts accepted `MovementOrder` state into simulation-owned `WorldTransform` updates while preserving the engine boundaries between commands, simulation, world queries, spatial indexing, presentation, and rendering.
 
-Strategic pathfinding is intentionally separate. This subsystem moves an entity toward the current local target or future route waypoint; it does not compute long-range routes.
+Strategic pathfinding and formation planning are intentionally separate. This subsystem moves an entity toward the current local target or route/formation slot target; it does not compute long-range routes or formation geometry.
 
 ## Simulation Ownership
 
@@ -48,6 +48,8 @@ Rendering never mutates movement state. `PresentationExtractor` continues to cop
 - static-obstacle look-ahead distance
 - maximum traversable terrain slope
 - terrain height offset for the entity origin
+
+`FormationMovementConstraint` may additionally provide a temporary group speed ceiling for a unit participating in formation movement. The base `GroundMovement.MaximumSpeed` remains authoritative and the effective speed is the lower value.
 
 `GroundMovementState` contains the dynamic authoritative state:
 
@@ -125,7 +127,7 @@ This is intentionally lightweight local conflict resolution. It does not replace
 - formation slots
 - traffic scheduling
 
-Those systems can later provide route waypoints or corridors without changing the locomotion contract.
+Shared-route formation movement now provides formation-relative local slot targets through this existing locomotion contract. Local separation may temporarily pull a member away from its slot; subsequent formation updates guide it gradually back without bypassing normal steering.
 
 ## Static Obstacle Steering
 
@@ -246,9 +248,9 @@ The benchmark is measurement evidence, not a CI timing gate.
 
 The current implementation intentionally does not include:
 
-- long-range pathfinding
-- hierarchical route generation
-- formation slots or corridors
+- role-aware combat formation policy
+- convoy-specific lane discipline
+- attack-move or retreat policy
 - combat movement policy
 - road movement modifiers
 - amphibious movement
@@ -256,4 +258,6 @@ The current implementation intentionally does not include:
 - suspension or wheel simulation
 - predictive multi-agent velocity-obstacle solvers
 
-These are separate higher-level systems and must not be folded into base locomotion without a demonstrated gameplay requirement.
+Hierarchical navigation and shared-route formation slots are implemented as separate higher-level systems and intentionally remain outside base locomotion. The remaining items must not be folded into ground movement without a demonstrated gameplay requirement.
+
+See [Formation Movement and Group Orders](FormationMovementAndGroupOrders.md) for shared-route group movement, speed harmonization, slot following, and choke-point fallback.
