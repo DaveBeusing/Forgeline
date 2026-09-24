@@ -56,7 +56,7 @@ The repository validates several of these invariants with `build/Validate-Projec
 - `ForgeLine.Ecs`: custom data-oriented entity/component storage and queries. The implemented low-level contracts and invariants are documented in `docs/Ecs.md`.
 - `ForgeLine.Jobs`: persistent-worker job scheduling, dependency handles, range execution, fences, failure propagation, and timing instrumentation. The implemented contracts and safe usage rules are documented in `docs/JobSystem.md`.
 - `ForgeLine.World`: canonical world/region/chunk coordinates, chunk-based terrain ownership, headless heightfield sampling, terrain bounds, deterministic development terrain, CPU terrain mesh generation, and the derived chunk-aware uniform spatial index used by simulation-facing world queries.
-- `ForgeLine.Navigation`: hierarchical RTS navigation boundaries.
+- `ForgeLine.Navigation`: immutable movement-class traversability data, chunk-aligned sector graphs and portals, versioned high-level route caching, bounded local path refinement, navigation requests/results, and pathfinding diagnostics. See `docs/HierarchicalNavigation.md`.
 - `ForgeLine.Simulation`: command-driven fixed-tick coordination, explicit phase ordering, simulation-owned randomness, and common simulation infrastructure.
 
 The implemented simulation lifecycle and command boundary are documented in `docs/SimulationRuntime.md`.
@@ -93,7 +93,7 @@ The simulation runtime is fixed-step with a default engineering target of 20 sim
 
 Each tick traverses an explicit canonical phase sequence. Commands scheduled for a tick are executed at the Input Commands boundary before later phases run. Systems register for a specific phase and execute in stable registration order within that phase.
 
-The first movement interaction preserves this boundary: the client schedules `MoveEntitiesCommand` for a future tick, and the command writes only validated `MovementOrder` state. It does not update `WorldTransform`; future navigation/movement systems consume orders in their own simulation phases.
+The movement interaction preserves this boundary: the client schedules `MoveEntitiesCommand` for a future tick, and the command writes only validated `MovementOrder` state. `HierarchicalNavigationSystem` consumes long-range orders in `NavigationRequests`, schedules read-only path work through the simulation job boundary when available, and publishes only local waypoint orders. `GroundMovementSystem` remains the sole owner of final locomotion and transform changes in `Movement`.
 
 Simulation code is written in a deterministic-friendly style:
 
@@ -151,3 +151,26 @@ Performance-sensitive decisions are benchmark-driven. The architecture targets a
 The simulation benchmark host includes empty and light fixed-tick workloads, representative sequential-versus-parallel scheduler range workloads, and spatial-query/update workloads over 10,000 indexed entries. Benchmark timing remains observational rather than a CI timing gate.
 
 These are engineering targets, not product promises.
+
+
+## Hierarchical Navigation
+
+Ground navigation follows a strict hierarchy:
+
+```text
+Sector graph
+    ↓
+High-level sector route
+    ↓
+Local traversability grid
+    ↓
+Corridor-bounded local refinement
+    ↓
+Ground movement waypoint
+```
+
+The high-resolution grid is never searched across the complete world as the primary long-range strategy. Sector connectivity is derived from traversable boundary runs, high-level A* selects the regional route, and local A* is constrained to that sector corridor with one-sector expansion only as a bounded fallback.
+
+Navigation data is immutable for a specific `NavigationVersion`. Replacing the derived navigation world is the invalidation boundary: high-level cache entries are cleared and stale asynchronous results are rejected before they can enter simulation state. Path jobs read navigation snapshots only; they never mutate ECS transforms or live world state.
+
+See `docs/HierarchicalNavigation.md` for movement classes, request/result ownership, failures, diagnostics, debug rendering, and benchmark coverage.

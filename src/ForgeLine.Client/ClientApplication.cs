@@ -3,6 +3,8 @@ using ForgeLine.Core;
 using ForgeLine.Game;
 using ForgeLine.Graphics;
 using ForgeLine.Input;
+using ForgeLine.Jobs;
+using ForgeLine.Navigation;
 using ForgeLine.Platform;
 using ForgeLine.Presentation;
 using ForgeLine.Simulation;
@@ -51,7 +53,9 @@ internal sealed class ClientApplication
         using var overlayRenderer = new DevelopmentOverlayRenderer(graphics);
 
         var snapshotBuffer = new PresentationSnapshotBuffer();
+        using var jobScheduler = new JobScheduler();
         var simulation = new SimulationCoordinator(
+            jobScheduler: jobScheduler,
             diagnosticsOptions: new SimulationDiagnosticsOptions { Enabled = true });
         var spatialIndex = new SpatialGridIndex(
             new SpatialGridSettings
@@ -65,11 +69,31 @@ internal sealed class ClientApplication
             terrainWorld,
             spatialIndex);
 
+        PopulateSimulationEntities(
+            simulation,
+            terrainWorld,
+            renderInstanceCount);
+
+        NavigationWorld navigationWorld = NavigationWorld.Build(
+            terrainWorld,
+            CollectStaticNavigationObstacles(simulation),
+            new NavigationGridSettings
+            {
+                CellSizeMeters = NavigationGridSettings.DefaultCellSizeMeters,
+                StaticObstacleClearanceMeters = 0.5f
+            },
+            new NavigationSectorSettings
+            {
+                SectorSizeCells = 8
+            });
+        var navigationSystem = new HierarchicalNavigationSystem(
+            new HierarchicalPathfinder(navigationWorld));
+
+        simulation.RegisterSystem(navigationSystem);
         simulation.RegisterSystem(groundMovementSystem);
         simulation.RegisterSystem(new SpatialIndexSystem(spatialSynchronizer));
         simulation.RegisterSystem(new SpatialIndexCleanupSystem(spatialSynchronizer));
         simulation.RegisterTickObserver(new PresentationExtractor(snapshotBuffer));
-        PopulateSimulationEntities(simulation, terrainWorld, renderInstanceCount);
         simulation.AdvanceOneTick();
 
         var renderWorld = new RenderWorld();
@@ -242,7 +266,9 @@ internal sealed class ClientApplication
                 camera,
                 selectionController,
                 spatialIndex,
-                groundMovementSystem.CaptureDebugSnapshot());
+                groundMovementSystem.CaptureDebugSnapshot(),
+                navigationSystem.World,
+                navigationSystem.LastCompletedPath);
 
             terrainRenderer.DebugChunksEnabled = worldDebugEnabled;
 
@@ -384,6 +410,12 @@ internal sealed class ClientApplication
                 simulation.Entities.AddComponent(
                     entity,
                     GroundMovementState.Stationary());
+                simulation.Entities.AddComponent(
+                    entity,
+                    new NavigationAgent(
+                        logistics
+                            ? NavigationMovementClass.Wheeled
+                            : NavigationMovementClass.Tracked));
             }
 
             simulation.Entities.AddComponent(entity, new VisualIdentity(1));
@@ -403,6 +435,32 @@ internal sealed class ClientApplication
         }
     }
 
+    private static AxisAlignedBounds[] CollectStaticNavigationObstacles(
+        SimulationCoordinator simulation)
+    {
+        var obstacles = new List<AxisAlignedBounds>();
+
+        foreach (EntityId entity in simulation.Entities.Query<
+                     WorldTransform,
+                     SpatialPresence>())
+        {
+            SpatialPresence presence =
+                simulation.Entities.GetComponent<SpatialPresence>(entity);
+
+            if (presence.Metadata.Mobility != SpatialMobility.Static)
+            {
+                continue;
+            }
+
+            WorldTransform transform =
+                simulation.Entities.GetComponent<WorldTransform>(entity);
+            obstacles.Add(
+                presence.CreateEntry(entity, transform).Bounds);
+        }
+
+        return obstacles.ToArray();
+    }
+
     private static void BuildWorldDebugVisualization(
         DebugDraw debugDraw,
         bool worldDebugEnabled,
@@ -411,7 +469,9 @@ internal sealed class ClientApplication
         RtsCamera camera,
         RtsSelectionController selectionController,
         SpatialGridIndex spatialIndex,
-        GroundMovementDebugSnapshot movementSnapshot)
+        GroundMovementDebugSnapshot movementSnapshot,
+        NavigationWorld navigationWorld,
+        NavigationPath? navigationPath)
     {
         debugDraw.Clear();
 
@@ -455,6 +515,13 @@ internal sealed class ClientApplication
                 debugDraw,
                 movementSnapshot,
                 maximumAgents: 64);
+            NavigationDebugVisualization.Draw(
+                debugDraw,
+                navigationWorld,
+                NavigationCapabilities.For(
+                    NavigationMovementClass.Tracked),
+                navigationPath,
+                camera.Target);
 
             int debugCount = Math.Min(
                 renderWorld.InstanceCount,

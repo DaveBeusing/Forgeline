@@ -125,6 +125,8 @@ ECS baselines cover:
 
 Rendering diagnostics additionally expose frame time, CPU render time, terrain visibility/submission counts, generic instance visibility/submission counts, and development overlay allocation/GC state. GPU timestamps remain deferred until the graphics abstraction owns a clean timestamp-query/readback lifecycle.
 
+Navigation baselines cover long-distance path searches over a multi-chunk world, including sector routing, local refinement, cache reuse, expanded-node counts, and route length. Benchmark timing remains observational rather than a CI gate.
+
 Simulation baselines cover:
 
 - empty fixed ticks
@@ -143,6 +145,7 @@ Run them with:
 
 ```powershell
 dotnet run --project benchmarks/ForgeLine.Ecs.Benchmarks/ForgeLine.Ecs.Benchmarks.csproj --configuration Release
+dotnet run --project benchmarks/ForgeLine.Navigation.Benchmarks/ForgeLine.Navigation.Benchmarks.csproj --configuration Release
 dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simulation.Benchmarks.csproj --configuration Release
 dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release
 ```
@@ -220,3 +223,14 @@ See [Spatial Index and World Queries](SpatialIndexAndWorldQueries.md) for query 
 ## Presentation Diagnostics
 
 The Windows client development overlay can be toggled with F1. World debug visualization can be toggled with F2. The presentation path, metric semantics, extraction ownership, and render baselines are documented in [Presentation Extraction and Debugging](PresentationExtractionAndDebugging.md).
+
+
+## Navigation Diagnostics
+
+`HierarchicalNavigationSystem.LastDiagnostics` exposes queued path requests; completed, failed, canceled, and stale-result counts; currently pending requests; active routes; expanded high-level and local nodes for the latest completed route; latest route length; and latest pathfinding latency.
+
+`NavigationPath.Diagnostics` additionally records whether the high-level route cache was hit. These values are diagnostic observations only and never change simulation outcomes.
+
+F2 world debugging can display local traversability, nearby sector boundaries, sector portals, the latest high-level route, and its refined waypoint path. Rendering receives navigation-derived read data only and never mutates navigation or simulation state.
+
+See [Hierarchical Navigation](HierarchicalNavigation.md) for lifecycle and interpretation details.
