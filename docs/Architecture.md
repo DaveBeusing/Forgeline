@@ -55,7 +55,7 @@ The repository validates several of these invariants with `build/Validate-Projec
 
 - `ForgeLine.Ecs`: custom data-oriented entity/component storage and queries. The implemented low-level contracts and invariants are documented in `docs/Ecs.md`.
 - `ForgeLine.Jobs`: persistent-worker job scheduling, dependency handles, range execution, fences, failure propagation, and timing instrumentation. The implemented contracts and safe usage rules are documented in `docs/JobSystem.md`.
-- `ForgeLine.World`: canonical world/region/chunk coordinates, chunk-based terrain ownership, headless heightfield sampling, terrain bounds, deterministic development terrain, and CPU terrain mesh generation.
+- `ForgeLine.World`: canonical world/region/chunk coordinates, chunk-based terrain ownership, headless heightfield sampling, terrain bounds, deterministic development terrain, CPU terrain mesh generation, and the derived chunk-aware uniform spatial index used by simulation-facing world queries.
 - `ForgeLine.Navigation`: hierarchical RTS navigation boundaries.
 - `ForgeLine.Simulation`: command-driven fixed-tick coordination, explicit phase ordering, simulation-owned randomness, and common simulation infrastructure.
 
@@ -137,7 +137,7 @@ The renderer consumes extracted presentation/world data and does not determine s
 
 Selection picking operates against these extracted instances. It filters hidden/off-screen, foreign-owned, and disallowed-category entities before returning the same stable `EntityId` used by simulation. A later movement request crosses back into simulation only through the command queue.
 
-See `docs/PresentationExtractionAndDebugging.md` for extraction timing, snapshot ownership, buffering, interpolation, debug tooling, metrics, and render stress baselines. See `docs/SelectionAndCommandInteraction.md` for interaction ownership, picking/filtering, command flow, and stale-ID handling. See `docs/Graphics.md` for the implemented graphics lifecycle and ownership rules. See `docs/CameraAndInput.md` for the raw-input boundary, RTS action mapping, camera coordinate convention, controls, and screen/world APIs. See `docs/WorldAndTerrain.md` for the canonical spatial model, heightfield semantics, terrain query boundary, mesh generation, culling, and render ownership.
+See `docs/PresentationExtractionAndDebugging.md` for extraction timing, snapshot ownership, buffering, interpolation, debug tooling, metrics, and render stress baselines. See `docs/SelectionAndCommandInteraction.md` for interaction ownership, picking/filtering, command flow, and stale-ID handling. See `docs/Graphics.md` for the implemented graphics lifecycle and ownership rules. See `docs/CameraAndInput.md` for the raw-input boundary, RTS action mapping, camera coordinate convention, controls, and screen/world APIs. See `docs/WorldAndTerrain.md` for the canonical spatial model, heightfield semantics, terrain query boundary, mesh generation, culling, and render ownership. See `docs/SpatialIndexAndWorldQueries.md` for spatial cell mapping, derived-index lifecycle, query semantics, filtering, ordering, diagnostics, and benchmark coverage.
 
 ## Performance Direction
 
@@ -148,6 +148,6 @@ Performance-sensitive decisions are benchmark-driven. The architecture targets a
 - 10,000+ lightweight simulation entities as an early stress target
 - 60+ FPS rendering on target hardware
 
-The simulation benchmark host includes empty and light fixed-tick workloads plus representative sequential-versus-parallel scheduler range workloads. Benchmark timing remains observational rather than a CI timing gate.
+The simulation benchmark host includes empty and light fixed-tick workloads, representative sequential-versus-parallel scheduler range workloads, and spatial-query/update workloads over 10,000 indexed entries. Benchmark timing remains observational rather than a CI timing gate.
 
 These are engineering targets, not product promises.

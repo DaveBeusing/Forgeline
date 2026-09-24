@@ -21,7 +21,7 @@ The project is built on **ForgeLine Engine**, a custom C#/.NET RTS engine design
 - strict simulation/presentation separation
 - multiplayer-aware architecture with networking deferred
 
-Implemented engine foundations currently include the repository architecture, stable entity/component storage, a command-driven fixed-tick simulation runtime, deterministic simulation-owned randomness, a persistent-worker job scheduler, opt-in engine diagnostics, repeatable headless test scenarios, performance baselines, a standalone headless host, the native Windows interactive client host, the Direct3D 12 graphics foundation, the production-oriented RTS camera/input stack, the first chunked heightfield world, the simulation-to-presentation snapshot pipeline with interpolated generic render instances and debug drawing, plus the first RTS selection and fixed-tick movement-order interaction layer.
+Implemented engine foundations currently include the repository architecture, stable entity/component storage, a command-driven fixed-tick simulation runtime, deterministic simulation-owned randomness, a persistent-worker job scheduler, opt-in engine diagnostics, repeatable headless test scenarios, performance baselines, a standalone headless host, the native Windows interactive client host, the Direct3D 12 graphics foundation, the production-oriented RTS camera/input stack, the first chunked heightfield world, a chunk-aware uniform spatial index for world queries, the simulation-to-presentation snapshot pipeline with interpolated generic render instances and debug drawing, plus the first RTS selection and fixed-tick movement-order interaction layer.
 
 Navigation algorithms, formation/local-avoidance movement, combat commands, control groups, minimap commands, logistics simulation, combat, production terrain materials and streaming, editor functionality, asset conversion, and networking remain deferred to their owning implementation stages.
 
@@ -87,7 +87,7 @@ dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuratio
 
 The smoke mode creates the same native window, initializes Direct3D 12 with hardware-adapter selection and WARP fallback, generates the development world, runs the fixed-tick simulation/presentation pipeline, renders terrain and test entities briefly, then requests a clean shutdown.
 
-See [Windows Client](docs/WindowsClient.md) for the platform boundary, window lifecycle, supported modes, DPI behavior, and validation procedure. See [Graphics](docs/Graphics.md) for Direct3D 12 ownership, frame synchronization, resize behavior, shader compilation, diagnostics, and resource lifetime. See [RTS Camera and Input](docs/CameraAndInput.md) for controls, coordinate conventions, action mapping, focus-loss behavior, and screen/world APIs. See [Selection and Command Interaction](docs/SelectionAndCommandInteraction.md) for selection ownership, picking/filtering, movement-command flow, and stale-entity handling. See [World and Terrain](docs/WorldAndTerrain.md) for world units, chunk/region coordinates, heightfield semantics, mesh generation, culling, diagnostics, and headless terrain queries.
+See [Windows Client](docs/WindowsClient.md) for the platform boundary, window lifecycle, supported modes, DPI behavior, and validation procedure. See [Graphics](docs/Graphics.md) for Direct3D 12 ownership, frame synchronization, resize behavior, shader compilation, diagnostics, and resource lifetime. See [RTS Camera and Input](docs/CameraAndInput.md) for controls, coordinate conventions, action mapping, focus-loss behavior, and screen/world APIs. See [Selection and Command Interaction](docs/SelectionAndCommandInteraction.md) for selection ownership, picking/filtering, movement-command flow, and stale-entity handling. See [World and Terrain](docs/WorldAndTerrain.md) for world units, chunk/region coordinates, heightfield semantics, mesh generation, culling, diagnostics, and headless terrain queries. See [Spatial Index and World Queries](docs/SpatialIndexAndWorldQueries.md) for spatial entry ownership, cell mapping, query semantics, movement synchronization, diagnostics, and performance constraints.
 
 ## Headless Simulation
 
@@ -113,7 +113,7 @@ See [Diagnostics and Performance](docs/DiagnosticsAndPerformance.md) for invaria
 
 ## Benchmarks
 
-BenchmarkDotNet hosts cover the implemented ECS, simulation, command-processing, and job-scheduler foundations.
+BenchmarkDotNet hosts cover the implemented ECS, simulation, command-processing, job-scheduler, spatial-query, and rendering foundations.
 
 Examples:
 
