@@ -16,12 +16,14 @@ public sealed class SimulationCoordinator
         int ticksPerSecond = FixedTickClock.DefaultTicksPerSecond,
         ulong seed = 1,
         int initialEntityCapacity = 256,
-        JobScheduler? jobScheduler = null)
+        JobScheduler? jobScheduler = null,
+        SimulationDiagnosticsOptions? diagnosticsOptions = null)
     {
         Clock = new FixedTickClock(ticksPerSecond);
         var entities = new EntityRegistry(initialEntityCapacity);
         Random = new SimulationRandom(seed);
         _context = new SimulationContext(entities, Random, jobScheduler);
+        Diagnostics = new SimulationDiagnostics(diagnosticsOptions);
     }
 
     public FixedTickClock Clock { get; }
@@ -31,6 +33,8 @@ public sealed class SimulationCoordinator
     public EntityRegistry Entities => _context.Entities;
 
     public SimulationJobs Jobs => _context.Jobs;
+
+    public SimulationDiagnostics Diagnostics { get; }
 
     public SimulationTick CurrentTick => Clock.CurrentTick;
 
@@ -75,21 +79,30 @@ public sealed class SimulationCoordinator
     {
         _systems.Seal();
 
-        SimulationTick tick = Clock.Advance();
-        _context.Tick = tick;
+        SimulationDiagnostics.TickMeasurement measurement = Diagnostics.BeginTick();
 
-        ReadOnlySpan<SimulationPhase> phases = SimulationPhaseOrder.All;
-        for (int index = 0; index < phases.Length; index++)
+        try
         {
-            SimulationPhase phase = phases[index];
-            _context.Phase = phase;
+            SimulationTick tick = Clock.Advance();
+            _context.Tick = tick;
 
-            if (phase == SimulationPhase.InputCommands)
+            ReadOnlySpan<SimulationPhase> phases = SimulationPhaseOrder.All;
+            for (int index = 0; index < phases.Length; index++)
             {
-                _commandsProcessed += (ulong)_commands.ExecuteForTick(tick, _context);
-            }
+                SimulationPhase phase = phases[index];
+                _context.Phase = phase;
 
-            _systemInvocations += (ulong)_systems.ExecutePhase(phase, _context);
+                if (phase == SimulationPhase.InputCommands)
+                {
+                    _commandsProcessed += (ulong)_commands.ExecuteForTick(tick, _context);
+                }
+
+                _systemInvocations += (ulong)_systems.ExecutePhase(phase, _context);
+            }
+        }
+        finally
+        {
+            Diagnostics.EndTick(measurement);
         }
     }
 

@@ -67,6 +67,18 @@ public sealed class SimulationJobs
         return RequireScheduler().GetMetrics();
     }
 
+    public bool TryGetMetrics(out JobSchedulerMetrics metrics)
+    {
+        if (_scheduler is null)
+        {
+            metrics = default;
+            return false;
+        }
+
+        metrics = _scheduler.GetMetrics();
+        return true;
+    }
+
     internal void CompleteBoundary()
     {
         if (_pending.Count == 0)
