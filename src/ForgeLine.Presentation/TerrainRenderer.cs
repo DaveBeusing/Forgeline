@@ -1,5 +1,4 @@
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using ForgeLine.Graphics;
 using ForgeLine.World;
 
@@ -39,7 +38,7 @@ public sealed class TerrainRenderer : IDisposable
 
                 ulong vertexBytes = checked(
                     (ulong)mesh.Vertices.Length *
-                    (ulong)Unsafe.SizeOf<TerrainVertex>());
+                    TerrainVertex.SizeInBytes);
                 ulong indexBytes = checked(
                     (ulong)mesh.Indices.Length *
                     sizeof(uint));
