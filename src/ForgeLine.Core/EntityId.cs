@@ -12,6 +12,26 @@ public readonly record struct EntityId(uint Index, uint Generation) : IComparabl
         return indexComparison != 0 ? indexComparison : Generation.CompareTo(other.Generation);
     }
 
+    public static bool operator <(EntityId left, EntityId right)
+    {
+        return left.CompareTo(right) < 0;
+    }
+
+    public static bool operator <=(EntityId left, EntityId right)
+    {
+        return left.CompareTo(right) <= 0;
+    }
+
+    public static bool operator >(EntityId left, EntityId right)
+    {
+        return left.CompareTo(right) > 0;
+    }
+
+    public static bool operator >=(EntityId left, EntityId right)
+    {
+        return left.CompareTo(right) >= 0;
+    }
+
     public override string ToString()
     {
         return IsValid ? $"{Index}:{Generation}" : "Invalid";
