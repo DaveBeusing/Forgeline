@@ -43,5 +43,8 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
+      - name: Headless smoke test
+        run: dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 64 --seed 12345 --tick-rate 20
+
       - name: Test
         run: dotnet test ForgeLine.sln --configuration Release --no-build
