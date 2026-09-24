@@ -137,6 +137,9 @@ internal sealed class ClientApplication
         bool worldDebugEnabled = false;
         bool overlayToggleHeld = false;
         bool worldDebugToggleHeld = false;
+        bool formationToggleHeld = false;
+        FormationTemplate activeFormation =
+            FormationTemplate.Compact;
         TimeSpan simulationAccumulator = TimeSpan.Zero;
         FrameTimingMetrics frameTiming = default;
         SimulationDiagnosticsSnapshot simulationDiagnostics =
@@ -156,7 +159,8 @@ internal sealed class ClientApplication
             "started",
             selectionController,
             lastMovementEnvelope,
-            lastMovementCommand);
+            lastMovementCommand,
+            activeFormation);
 
         long startedAt = _platform.Clock.GetTimestamp();
         long previousFrameAt = startedAt;
@@ -192,6 +196,10 @@ internal sealed class ClientApplication
                 PlatformKey.F2,
                 ref worldDebugToggleHeld,
                 ref worldDebugEnabled);
+            UpdateFormationSelection(
+                inputState,
+                ref formationToggleHeld,
+                ref activeFormation);
             groundMovementSystem.DebugCaptureEnabled =
                 worldDebugEnabled;
             formationMovementSystem.DebugCaptureEnabled =
@@ -256,7 +264,8 @@ internal sealed class ClientApplication
                     LocalPlayer,
                     movementRequest.Entities,
                     movementRequest.WorldTarget,
-                    simulation.CurrentTick);
+                    simulation.CurrentTick,
+                    activeFormation);
 
                 lastMovementEnvelope = simulation.SubmitCommand(
                     command,
@@ -669,6 +678,28 @@ internal sealed class ClientApplication
         held = down;
     }
 
+    private static void UpdateFormationSelection(
+        InputState inputState,
+        ref bool held,
+        ref FormationTemplate activeFormation)
+    {
+        bool down = inputState.IsKeyDown(PlatformKey.F3);
+
+        if (down && !held)
+        {
+            activeFormation = activeFormation switch
+            {
+                FormationTemplate.Compact => FormationTemplate.Line,
+                FormationTemplate.Line => FormationTemplate.Column,
+                FormationTemplate.Column => FormationTemplate.Wedge,
+                FormationTemplate.Wedge => FormationTemplate.Compact,
+                _ => FormationTemplate.Compact
+            };
+        }
+
+        held = down;
+    }
+
     private static void DrainWindowEvents(
         IWindow window,
         IGraphicsDevice graphics)
@@ -801,7 +832,8 @@ internal sealed class ClientApplication
         string state,
         RtsSelectionController selectionController,
         SimulationCommandEnvelope? movementEnvelope,
-        MoveEntitiesCommand? movementCommand)
+        MoveEntitiesCommand? movementCommand,
+        FormationTemplate activeFormation)
     {
         EntityId hovered = selectionController.HoveredEntity;
         string hoveredText = hovered.IsValid
@@ -817,6 +849,7 @@ internal sealed class ClientApplication
             $"hovered={hoveredText} lastCommand={commandText} " +
             $"acceptedTargets={movementCommand?.AcceptedTargetCount ?? 0} " +
             $"rejectedTargets={movementCommand?.RejectedTargetCount ?? 0} " +
-            $"executedTick={movementCommand?.ExecutedAtTick.Value ?? 0}");
+            $"executedTick={movementCommand?.ExecutedAtTick.Value ?? 0} " +
+            $"formation={activeFormation}");
     }
 }
