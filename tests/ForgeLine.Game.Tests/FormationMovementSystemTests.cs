@@ -309,6 +309,69 @@ public sealed class FormationMovementSystemTests
     }
 
     [Fact]
+    public void NavigationVersionChangeRejectsStaleGroupRouteAndLocalTargets()
+    {
+        FormationScenario scenario = CreateScenario(
+            10,
+            FormationTemplate.Compact);
+
+        scenario.Simulation.AdvanceOneTick();
+        scenario.Simulation.AdvanceOneTick();
+        scenario.Simulation.AdvanceOneTick();
+
+        EntityId group =
+            scenario.InitialCommand.CreatedMovementGroup;
+        Assert.True(
+            scenario.Simulation.Entities.HasComponent<
+                MovementGroupRoute>(group));
+
+        TerrainWorld replacementTerrain =
+            CreateFlatWorld(4, 4);
+        NavigationWorld replacementWorld =
+            NavigationWorld.Build(
+                replacementTerrain,
+                gridSettings: new NavigationGridSettings
+                {
+                    CellSizeMeters = 4.0f
+                },
+                sectorSettings: new NavigationSectorSettings
+                {
+                    SectorSizeCells = 4
+                },
+                version: new NavigationVersion(2));
+
+        scenario.FormationSystem.UpdateWorld(replacementWorld);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.False(
+            scenario.Simulation.Entities.HasComponent<
+                MovementGroupRoute>(group));
+        Assert.True(
+            scenario.Simulation.Entities.HasComponent<
+                MovementGroupPendingPath>(group));
+
+        foreach (EntityId unit in scenario.Units)
+        {
+            Assert.False(
+                scenario.Simulation.Entities.HasComponent<
+                    MovementOrder>(unit));
+            Assert.False(
+                scenario.Simulation.Entities.HasComponent<
+                    FormationMovementConstraint>(unit));
+        }
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            scenario.Simulation.Entities.TryGetComponent(
+                group,
+                out MovementGroupRoute replacementRoute));
+        Assert.Equal(
+            new NavigationVersion(2),
+            replacementRoute.Path.Version);
+    }
+
+    [Fact]
     public void MultipleGroupsKeepIndependentSharedRoutes()
     {
         TerrainWorld terrain = CreateFlatWorld(4, 4);
