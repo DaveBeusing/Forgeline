@@ -46,6 +46,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
                 "Scissor bounds must describe a positive area.");
         }
 
-        _commandList.RSSetScissorRect(left, top, right, bottom);
+        RectI rectangle = RectI.FromLTRB(left, top, right, bottom);
+        _commandList.RSSetScissorRect(rectangle);
     }
 }
