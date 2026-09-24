@@ -43,7 +43,7 @@ The repository validates several of these invariants with `build/Validate-Projec
 ### Low-Level Infrastructure
 
 - `ForgeLine.Core`: identifiers, math, collections, memory helpers, diagnostics, timing, and serialization primitives.
-- `ForgeLine.Platform.Windows`: Windows platform integration behind platform boundaries.
+- `ForgeLine.Platform.Windows`: Windows x64 platform integration, native window lifecycle, high-resolution host timing, DPI handling, and Win32 message processing behind platform-facing contracts.
 - `ForgeLine.Graphics`: graphics device, rendering resources, synchronization, and future Direct3D 12 implementation.
 - `ForgeLine.Audio`: audio infrastructure.
 - `ForgeLine.Input`: input infrastructure.
@@ -74,7 +74,7 @@ These domain projects establish dependency boundaries only at this stage; their 
 - `ForgeLine.Game`: FORGELINE rules and composition of simulation domains.
 - `ForgeLine.Presentation`: conversion of game/read-model state into player-visible presentation state.
 - `ForgeLine.UI`: RTS-specific user-interface boundary.
-- `ForgeLine.Client`: composition root for the interactive application.
+- `ForgeLine.Client`: composition root for the interactive Windows application. It owns the platform host lifecycle and will later compose graphics, input, presentation, and game services without moving platform details into simulation.
 - `ForgeLine.Headless`: non-visual composition root for simulation tests, AI matches, balancing, performance work, replay validation, and future server experiments.
 
 ### Tools
@@ -109,7 +109,7 @@ Perfect cross-machine bit-level determinism is not a first-prototype requirement
 
 Headless execution supports a configurable tick count, deterministic seed, and logical tick-rate override. It intentionally runs faster than real time when work permits; wall-clock timing is used only for host diagnostics and never to mutate simulation state.
 
-CI includes a short headless smoke execution after the Release build.
+CI includes short headless smoke executions after the Release build. The Windows runner also performs a bounded native client smoke launch that creates and closes the primary Win32 window.
 
 ## Rendering Boundary
 
