@@ -14,9 +14,8 @@ public sealed record NavigationSectorSettings
 
         if (grid.CellsPerChunk % SectorSizeCells != 0)
         {
-            throw new ArgumentException(
-                "Navigation sector size must divide the chunk-local navigation grid exactly.",
-                nameof(SectorSizeCells));
+            throw new InvalidOperationException(
+                "Navigation sector size must divide the chunk-local navigation grid exactly.");
         }
     }
 }

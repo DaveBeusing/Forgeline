@@ -20,14 +20,15 @@ public sealed record NavigationGridSettings
         if (!float.IsFinite(CellSizeMeters) ||
             CellSizeMeters <= 0.0f)
         {
-            throw new ArgumentOutOfRangeException(nameof(CellSizeMeters));
+            throw new InvalidOperationException(
+                "Navigation cell size must be finite and greater than zero.");
         }
 
         if (!float.IsFinite(StaticObstacleClearanceMeters) ||
             StaticObstacleClearanceMeters < 0.0f)
         {
-            throw new ArgumentOutOfRangeException(
-                nameof(StaticObstacleClearanceMeters));
+            throw new InvalidOperationException(
+                "Static obstacle clearance must be finite and non-negative.");
         }
 
         float cellsPerChunk =
@@ -37,9 +38,8 @@ public sealed record NavigationGridSettings
         if (rounded < 1.0f ||
             MathF.Abs(cellsPerChunk - rounded) > 0.0001f)
         {
-            throw new ArgumentException(
-                "Navigation cell size must divide the world chunk size exactly.",
-                nameof(CellSizeMeters));
+            throw new InvalidOperationException(
+                "Navigation cell size must divide the world chunk size exactly.");
         }
     }
 }

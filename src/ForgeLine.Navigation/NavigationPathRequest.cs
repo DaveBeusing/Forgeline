@@ -13,10 +13,7 @@ public readonly record struct NavigationPathRequest
         NavigationCapabilities capabilities,
         NavigationVersion navigationVersion)
     {
-        if (requestId == 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(requestId));
-        }
+        ArgumentOutOfRangeException.ThrowIfZero(requestId);
 
         if (!requester.IsValid)
         {

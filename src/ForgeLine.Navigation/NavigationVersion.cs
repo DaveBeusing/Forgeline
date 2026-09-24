@@ -19,6 +19,16 @@ public readonly record struct NavigationVersion(ulong Value)
         NavigationVersion left,
         NavigationVersion right) =>
         left.Value > right.Value;
+
+    public static bool operator <=(
+        NavigationVersion left,
+        NavigationVersion right) =>
+        left.Value <= right.Value;
+
+    public static bool operator >=(
+        NavigationVersion left,
+        NavigationVersion right) =>
+        left.Value >= right.Value;
 }
 
 public sealed class NavigationVersionTracker
