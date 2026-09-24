@@ -3,6 +3,7 @@
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="../ForgeLine.World/ForgeLine.World.csproj" />
     <ProjectReference Include="../ForgeLine.Simulation/ForgeLine.Simulation.csproj" />
     <ProjectReference Include="../ForgeLine.Economy/ForgeLine.Economy.csproj" />
     <ProjectReference Include="../ForgeLine.Logistics/ForgeLine.Logistics.csproj" />
