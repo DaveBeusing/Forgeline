@@ -255,6 +255,10 @@ public sealed class FormationMovementSystem : ISimulationSystem
 
         if (!hasRoute)
         {
+            ClearMemberLocalOrdersAndConstraints(
+                context,
+                members);
+
             MovementGroupState waitingState = previousState with
             {
                 Status = MovementGroupStatus.AwaitingRoute,
@@ -750,6 +754,34 @@ public sealed class FormationMovementSystem : ISimulationSystem
 
         _completedGroupCount++;
         _groupsToDestroy.Add(group);
+    }
+
+    private static void ClearMemberLocalOrdersAndConstraints(
+        SimulationContext context,
+        IReadOnlyList<MemberRuntime> members)
+    {
+        for (int index = 0; index < members.Count; index++)
+        {
+            EntityId entity = members[index].Entity;
+
+            if (!context.Entities.IsAlive(entity))
+            {
+                continue;
+            }
+
+            if (context.Entities.HasComponent<FormationMovementConstraint>(entity))
+            {
+                context.Entities.RemoveComponent<FormationMovementConstraint>(entity);
+            }
+
+            if (context.Entities.TryGetComponent(
+                    entity,
+                    out MovementOrder order) &&
+                order.Kind == MovementOrderKind.FormationLocal)
+            {
+                context.Entities.RemoveComponent<MovementOrder>(entity);
+            }
+        }
     }
 
     private void CleanupInvalidMembers(SimulationContext context)
