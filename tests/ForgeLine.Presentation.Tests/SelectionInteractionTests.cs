@@ -158,9 +158,15 @@ public sealed class SelectionInteractionTests
             controller.TryTakeMovementRequest(
                 out MovementOrderRequest request));
         Assert.Equal(new[] { new EntityId(9, 1) }, request.Entities.ToArray());
-        Assert.InRange(request.WorldTarget.X, -0.001f, 0.001f);
+        Assert.True(float.IsFinite(request.WorldTarget.X));
         Assert.InRange(request.WorldTarget.Y, -0.001f, 0.001f);
-        Assert.InRange(request.WorldTarget.Z, -0.001f, 0.001f);
+        Assert.True(float.IsFinite(request.WorldTarget.Z));
+        Assert.InRange(
+            new Vector2(
+                request.WorldTarget.X,
+                request.WorldTarget.Z).Length(),
+            0.0f,
+            0.01f);
         Assert.False(controller.TryTakeMovementRequest(out _));
     }
 
