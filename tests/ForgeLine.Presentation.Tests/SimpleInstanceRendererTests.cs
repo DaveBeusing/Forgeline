@@ -73,7 +73,7 @@ public sealed class SimpleInstanceRendererTests : IDisposable
                 scale),
             new RenderMeshHandle(1),
             RenderMaterialHandle.Default,
-            RenderVisibilityFlags.World,
+            RenderVisibilityMask.World,
             entity.Index);
 
     private sealed class FakeGraphicsDevice : IGraphicsDevice

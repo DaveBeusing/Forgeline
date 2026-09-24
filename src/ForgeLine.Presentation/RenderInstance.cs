@@ -7,5 +7,5 @@ public readonly record struct RenderInstance(
     RenderTransform Transform,
     RenderMeshHandle Mesh,
     RenderMaterialHandle Material,
-    RenderVisibilityFlags Visibility,
+    RenderVisibilityMask Visibility,
     uint DebugIdentity = 0);

@@ -17,7 +17,7 @@ public readonly record struct RenderMaterialHandle(uint Value)
 }
 
 [Flags]
-public enum RenderVisibilityFlags : uint
+public enum RenderVisibilityMask : uint
 {
     None = 0,
     World = 1 << 0,

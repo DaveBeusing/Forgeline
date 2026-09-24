@@ -93,7 +93,7 @@ public class PresentationBenchmarks : IDisposable
                     new Vector3(3.0f)),
                 new RenderMeshHandle(1),
                 RenderMaterialHandle.Default,
-                RenderVisibilityFlags.World,
+                RenderVisibilityMask.World,
                 entity.Index);
         }
 

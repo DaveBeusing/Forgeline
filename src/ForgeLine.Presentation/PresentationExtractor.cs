@@ -49,8 +49,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
             VisualIdentity visual =
                 context.Entities.GetComponent<VisualIdentity>(entity);
 
-            RenderVisibilityFlags visibility =
-                (RenderVisibilityFlags)(uint)visual.Visibility;
+            RenderVisibilityMask visibility =
+                (RenderVisibilityMask)(uint)visual.Visibility;
 
             instances[index++] = new RenderInstance(
                 entity,

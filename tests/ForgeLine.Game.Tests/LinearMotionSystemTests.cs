@@ -38,6 +38,6 @@ public sealed class LinearMotionSystemTests
         var visual = new VisualIdentity(7);
 
         Assert.Equal(7U, visual.VisualId);
-        Assert.Equal(VisualVisibilityFlags.World, visual.Visibility);
+        Assert.Equal(VisualVisibilityMask.World, visual.Visibility);
     }
 }

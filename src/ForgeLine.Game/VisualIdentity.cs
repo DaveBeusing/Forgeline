@@ -1,7 +1,7 @@
 namespace ForgeLine.Game;
 
 [Flags]
-public enum VisualVisibilityFlags : uint
+public enum VisualVisibilityMask : uint
 {
     None = 0,
     World = 1 << 0,
@@ -11,4 +11,4 @@ public enum VisualVisibilityFlags : uint
 
 public readonly record struct VisualIdentity(
     uint VisualId,
-    VisualVisibilityFlags Visibility = VisualVisibilityFlags.Default);
+    VisualVisibilityMask Visibility = VisualVisibilityMask.Default);

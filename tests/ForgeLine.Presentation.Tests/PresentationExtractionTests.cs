@@ -62,7 +62,7 @@ public sealed class PresentationExtractionTests
                         Vector3.One),
                     new RenderMeshHandle(1),
                     RenderMaterialHandle.Default,
-                    RenderVisibilityFlags.World)));
+                    RenderVisibilityMask.World)));
         Assert.True(world.Update(buffer));
 
         buffer.Publish(
@@ -76,7 +76,7 @@ public sealed class PresentationExtractionTests
                         Vector3.One),
                     new RenderMeshHandle(1),
                     RenderMaterialHandle.Default,
-                    RenderVisibilityFlags.World)));
+                    RenderVisibilityMask.World)));
         Assert.True(world.Update(buffer));
 
         RenderInstance interpolated =
@@ -109,7 +109,7 @@ public sealed class PresentationExtractionTests
                         Vector3.One),
                     new RenderMeshHandle(1),
                     RenderMaterialHandle.Default,
-                    RenderVisibilityFlags.World)));
+                    RenderVisibilityMask.World)));
         Assert.True(world.Update(buffer));
 
         Assert.Equal(

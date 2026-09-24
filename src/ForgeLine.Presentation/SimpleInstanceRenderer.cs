@@ -102,7 +102,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             RenderInstance instance =
                 world.GetInterpolatedInstance(index, alpha);
 
-            if ((instance.Visibility & RenderVisibilityFlags.World) == 0 ||
+            if ((instance.Visibility & RenderVisibilityMask.World) == 0 ||
                 !instance.Mesh.IsValid ||
                 !instance.Material.IsValid)
             {
