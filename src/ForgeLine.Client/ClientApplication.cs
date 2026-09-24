@@ -86,9 +86,14 @@ internal sealed class ClientApplication
             {
                 SectorSizeCells = 8
             });
-        var navigationSystem = new HierarchicalNavigationSystem(
-            new HierarchicalPathfinder(navigationWorld));
+        var pathfinder =
+            new HierarchicalPathfinder(navigationWorld);
+        var formationMovementSystem =
+            new FormationMovementSystem(pathfinder);
+        var navigationSystem =
+            new HierarchicalNavigationSystem(pathfinder);
 
+        simulation.RegisterSystem(formationMovementSystem);
         simulation.RegisterSystem(navigationSystem);
         simulation.RegisterSystem(groundMovementSystem);
         simulation.RegisterSystem(new SpatialIndexSystem(spatialSynchronizer));
@@ -189,6 +194,8 @@ internal sealed class ClientApplication
                 ref worldDebugEnabled);
             groundMovementSystem.DebugCaptureEnabled =
                 worldDebugEnabled;
+            formationMovementSystem.DebugCaptureEnabled =
+                worldDebugEnabled;
 
             if (smokeTest &&
                 _platform.Clock.GetElapsedTime(startedAt, now) >= SmokeTestDuration)
@@ -267,6 +274,7 @@ internal sealed class ClientApplication
                 selectionController,
                 spatialIndex,
                 groundMovementSystem.CaptureDebugSnapshot(),
+                formationMovementSystem.CaptureDebugSnapshot(),
                 navigationSystem.World,
                 navigationSystem.LastCompletedPath);
 
@@ -470,6 +478,7 @@ internal sealed class ClientApplication
         RtsSelectionController selectionController,
         SpatialGridIndex spatialIndex,
         GroundMovementDebugSnapshot movementSnapshot,
+        FormationMovementDebugSnapshot formationSnapshot,
         NavigationWorld navigationWorld,
         NavigationPath? navigationPath)
     {
@@ -515,6 +524,10 @@ internal sealed class ClientApplication
                 debugDraw,
                 movementSnapshot,
                 maximumAgents: 64);
+            FormationMovementDebugVisualization.Draw(
+                debugDraw,
+                formationSnapshot,
+                maximumSlots: 128);
             NavigationDebugVisualization.Draw(
                 debugDraw,
                 navigationWorld,
