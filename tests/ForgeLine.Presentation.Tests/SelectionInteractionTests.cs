@@ -86,7 +86,7 @@ public sealed class SelectionInteractionTests
             900,
             1.0f);
 
-        Assert.Equal([new EntityId(1, 1)], picked);
+        Assert.Equal(new[] { new EntityId(1, 1) }, picked);
     }
 
     [Fact]
@@ -157,7 +157,7 @@ public sealed class SelectionInteractionTests
         Assert.True(
             controller.TryTakeMovementRequest(
                 out MovementOrderRequest request));
-        Assert.Equal([new EntityId(9, 1)], request.Entities.ToArray());
+        Assert.Equal(new[] { new EntityId(9, 1) }, request.Entities.ToArray());
         Assert.InRange(request.WorldTarget.X, -0.001f, 0.001f);
         Assert.InRange(request.WorldTarget.Y, -0.001f, 0.001f);
         Assert.InRange(request.WorldTarget.Z, -0.001f, 0.001f);
