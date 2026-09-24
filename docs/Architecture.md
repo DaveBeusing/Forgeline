@@ -44,7 +44,7 @@ The repository validates several of these invariants with `build/Validate-Projec
 
 - `ForgeLine.Core`: identifiers, math, collections, memory helpers, diagnostics, timing, and serialization primitives.
 - `ForgeLine.Platform.Windows`: Windows x64 platform integration, native window lifecycle, high-resolution host timing, DPI handling, and Win32 message processing behind platform-facing contracts.
-- `ForgeLine.Graphics`: graphics device, rendering resources, synchronization, and future Direct3D 12 implementation.
+- `ForgeLine.Graphics`: Direct3D 12 adapter/device ownership, command submission, flip-model swap chain, render-target descriptors, frame synchronization, resize handling, GPU resource foundations, DXC shader compilation, and graphics diagnostics behind engine-facing contracts.
 - `ForgeLine.Audio`: audio infrastructure.
 - `ForgeLine.Input`: input infrastructure.
 - `ForgeLine.Assets`: runtime asset infrastructure.
@@ -113,6 +113,10 @@ CI includes short headless smoke executions after the Release build. The Windows
 
 ## Rendering Boundary
 
+The first graphics backend is Direct3D 12. `ForgeLine.Graphics` owns the D3D12/DXGI objects and exposes a narrow engine-facing device contract. The Windows client passes only the platform-native window target across the platform/graphics boundary.
+
+Graphics frame ownership is independent of simulation. Swap-chain resize, command allocators, command lists, fences, render targets, and shader compilation remain graphics concerns.
+
 Rendering and simulation operate independently:
 
 ```text
@@ -125,7 +129,9 @@ Render World
 Renderer
 ```
 
-The renderer consumes extracted presentation state and does not determine simulation outcomes.
+The renderer consumes extracted presentation state and does not determine simulation outcomes. The current client validation renders only the foundation clear plus a minimal smoke-test triangle; terrain, units, fog of war, and presentation extraction remain later rendering stages.
+
+See `docs/Graphics.md` for the implemented graphics lifecycle and ownership rules.
 
 ## Performance Direction
 

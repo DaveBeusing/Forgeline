@@ -2,9 +2,9 @@
 
 ## Purpose
 
-`ForgeLine.Client` is the interactive Windows x64 composition root. Its current responsibility is to establish a production-quality native application host that later graphics and input work can consume without introducing Win32 details into simulation or game rules.
+`ForgeLine.Client` is the interactive Windows x64 composition root. It owns the native application host and composes the first Direct3D 12 graphics foundation without introducing Win32 or D3D12 details into simulation or game rules.
 
-No Direct3D 12 device, renderer, gameplay input mapping, RTS UI, audio, or simulation composition is created by this stage.
+The current client initializes graphics and runs a clear/present render loop. Gameplay rendering, gameplay input mapping, RTS UI, audio playback, and simulation composition remain deferred.
 
 ## Platform Boundary
 
@@ -39,13 +39,13 @@ Native primary window creation
 Client message loop
 ```
 
-The client creates one primary `FORGELINE` window with a 1600×900 requested client area. Graphics initialization will be added later against the existing native-handle boundary.
+The client creates one primary `FORGELINE` window with a 1600×900 requested client area. Direct3D 12 initialization consumes the existing opaque native-handle boundary immediately after window creation.
 
 ## Message Loop
 
 `WindowsPlatform.PumpEvents()` drains pending Win32 messages without tying platform processing to simulation or rendering.
 
-The current no-renderer client uses bounded waits between pumps so an idle window does not busy-spin. A later renderer can pump messages once per frame while keeping the same platform contracts.
+The graphics client pumps messages once per rendered frame. Present pacing controls the active render loop, while minimized or zero-sized windows use bounded event waits so suspended rendering does not busy-spin.
 
 ## Window Events
 
@@ -84,7 +84,7 @@ Exclusive fullscreen is not implemented.
 
 ## Native Graphics Target
 
-The future Direct3D 12 layer can obtain the native top-level window target through:
+The Direct3D 12 layer obtains the native top-level window target through:
 
 ```text
 IWindow.NativeHandle
@@ -126,7 +126,7 @@ From the repository root:
 dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release
 ```
 
-The executable is currently a Windows x64 host with no renderer, so the native client area intentionally contains no game scene.
+The executable is a Windows x64 host with the D3D12 graphics foundation active. The client area currently shows only the foundation clear color; no game scene is rendered yet.
 
 ## Bounded Smoke Validation
 
@@ -140,10 +140,12 @@ Smoke mode:
 
 1. initializes the Windows platform;
 2. creates exactly one primary native window;
-3. pumps native messages for a short bounded interval;
-4. reports platform/window state to standard output;
-5. requests normal window destruction;
-6. exits only after the native close lifecycle has completed.
+3. initializes the D3D12 device and swap chain, using WARP only when no suitable hardware adapter is available;
+4. compiles a small shader through the DXC path;
+5. creates the minimal root-signature/pipeline-state proof and renders a triangle for a short bounded interval;
+6. reports platform and graphics state to standard output;
+7. requests normal window destruction;
+8. waits for graphics work to retire and exits only after orderly graphics/platform cleanup.
 
 CI executes this validation only on Windows runners.
 

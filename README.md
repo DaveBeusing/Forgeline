@@ -11,7 +11,7 @@ The project is built on **ForgeLine Engine**, a custom C#/.NET RTS engine design
 - C# 14
 - .NET 10 LTS
 - Windows x64 as the initial client platform
-- Direct3D 12 as the planned initial graphics backend
+- Direct3D 12 as the initial graphics backend
 - data-oriented, ECS-first architecture
 - fixed-tick, headless-capable simulation
 - custom job system
@@ -21,9 +21,9 @@ The project is built on **ForgeLine Engine**, a custom C#/.NET RTS engine design
 - strict simulation/presentation separation
 - multiplayer-aware architecture with networking deferred
 
-Implemented engine foundations currently include the repository architecture, stable entity/component storage, a command-driven fixed-tick simulation runtime, deterministic simulation-owned randomness, a persistent-worker job scheduler, opt-in engine diagnostics, repeatable headless test scenarios, performance baselines, a standalone headless host, and the first native Windows interactive client host.
+Implemented engine foundations currently include the repository architecture, stable entity/component storage, a command-driven fixed-tick simulation runtime, deterministic simulation-owned randomness, a persistent-worker job scheduler, opt-in engine diagnostics, repeatable headless test scenarios, performance baselines, a standalone headless host, the native Windows interactive client host, and the first Direct3D 12 graphics device/swap-chain/frame foundation.
 
-Gameplay systems, Direct3D 12 rendering, navigation algorithms, logistics simulation, combat, editor functionality, asset conversion, and networking remain deferred to their owning implementation stages.
+Gameplay rendering beyond the foundation clear/present loop, terrain/unit rendering, navigation algorithms, logistics simulation, combat, editor functionality, asset conversion, and networking remain deferred to their owning implementation stages.
 
 ## Repository Layout
 
@@ -77,7 +77,7 @@ Launch the native Windows x64 client host:
 dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release
 ```
 
-The current client creates a DPI-aware native Win32 window and runs the platform message loop without initializing graphics or simulation. Close the window normally to exercise orderly shutdown.
+The current client creates a DPI-aware native Win32 window, initializes the Direct3D 12 graphics foundation, and continuously clears/presents the swap chain while keeping simulation uncomposed. Close the window normally to exercise orderly graphics and platform shutdown.
 
 Run the bounded client smoke validation used by CI:
 
@@ -85,9 +85,9 @@ Run the bounded client smoke validation used by CI:
 dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release -- --smoke-test
 ```
 
-The smoke mode creates the same native window, pumps messages briefly, then requests a clean shutdown.
+The smoke mode creates the same native window, initializes Direct3D 12 with hardware-adapter selection and WARP fallback, compiles DXC shaders, creates a minimal graphics pipeline, renders a triangle briefly, then requests a clean shutdown.
 
-See [Windows Client](docs/WindowsClient.md) for the platform boundary, window lifecycle, supported modes, DPI behavior, and validation procedure.
+See [Windows Client](docs/WindowsClient.md) for the platform boundary, window lifecycle, supported modes, DPI behavior, and validation procedure. See [Graphics](docs/Graphics.md) for Direct3D 12 ownership, frame synchronization, resize behavior, shader compilation, diagnostics, and resource lifetime.
 
 ## Headless Simulation
 
