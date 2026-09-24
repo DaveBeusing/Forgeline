@@ -144,7 +144,7 @@ public sealed class TerrainRenderer : IDisposable
                 TerrainVertex.SizeInBytes);
             context.SetIndexBuffer(
                 resource.IndexBuffer,
-                GraphicsIndexFormat.UInt32);
+                GraphicsIndexFormat.ThirtyTwoBit);
             context.DrawIndexed(resource.IndexCount);
             drawCalls++;
         }
