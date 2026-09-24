@@ -33,6 +33,8 @@ Platform, graphics, audio, input, and asset infrastructure remain isolated from 
 - `ForgeLine.Headless` must operate without graphics, audio, UI, presentation, client, or Windows-windowing dependencies.
 - Platform-specific APIs remain behind platform boundaries.
 - External actions enter simulation through commands rather than direct state mutation.
+- Selection and hover remain presentation/player-interaction state rather than authoritative simulation ownership.
+- Presentation picking returns stable simulation entity IDs copied through immutable snapshots.
 - Simulation and presentation remain separate so complete matches can run without a window.
 - Circular project references are prohibited.
 
@@ -71,10 +73,10 @@ These domain projects establish dependency boundaries only at this stage; their 
 
 ### Game and Presentation
 
-- `ForgeLine.Game`: FORGELINE rules and composition of simulation domains.
-- `ForgeLine.Presentation`: post-tick extraction into immutable snapshots, buffered simulation-to-render handoff, render-world interpolation, generic instance rendering, debug visualization, development metrics, plus presentation-only RTS camera state, projection, and picking math.
+- `ForgeLine.Game`: FORGELINE rules and composition of simulation domains. The first interaction-facing game contracts include player ownership, controllable entity categories, simulation-owned movement-order state, and the validated movement command.
+- `ForgeLine.Presentation`: post-tick extraction into immutable snapshots, buffered simulation-to-render handoff, render-world interpolation, generic instance rendering, debug visualization, development metrics, RTS camera state/projection, visible-entity picking, and player selection state.
 - `ForgeLine.UI`: RTS-specific user-interface boundary.
-- `ForgeLine.Client`: composition root for the interactive Windows application. It owns the platform host lifecycle and will later compose graphics, input, presentation, and game services without moving platform details into simulation.
+- `ForgeLine.Client`: composition root for the interactive Windows application. It owns platform/graphics lifecycle and translates presentation movement requests into simulation commands without exposing live ECS mutation to input or rendering code.
 - `ForgeLine.Headless`: non-visual composition root for simulation tests, AI matches, balancing, performance work, replay validation, and future server experiments.
 
 ### Tools
@@ -90,6 +92,8 @@ Tool functionality is not part of the repository foundation.
 The simulation runtime is fixed-step with a default engineering target of 20 simulation ticks per second, equivalent to 50 ms of logical simulation time per tick.
 
 Each tick traverses an explicit canonical phase sequence. Commands scheduled for a tick are executed at the Input Commands boundary before later phases run. Systems register for a specific phase and execute in stable registration order within that phase.
+
+The first movement interaction preserves this boundary: the client schedules `MoveEntitiesCommand` for a future tick, and the command writes only validated `MovementOrder` state. It does not update `WorldTransform`; future navigation/movement systems consume orders in their own simulation phases.
 
 Simulation code is written in a deterministic-friendly style:
 
@@ -111,7 +115,7 @@ Headless execution supports a configurable tick count, deterministic seed, and l
 
 CI includes short headless smoke executions after the Release build. The Windows runner also performs a bounded native client smoke launch that creates and closes the primary Win32 window.
 
-## Rendering Boundary
+## Rendering and Interaction Boundary
 
 The first graphics backend is Direct3D 12. `ForgeLine.Graphics` owns the D3D12/DXGI objects and exposes a narrow engine-facing device contract. The Windows client passes only the platform-native window target across the platform/graphics boundary.
 
@@ -126,12 +130,14 @@ Presentation Snapshot
     ↓
 Render World
     ↓
-Renderer
+Renderer / Selection Picking
 ```
 
-The renderer consumes extracted presentation/world data and does not determine simulation outcomes. `PresentationExtractor` observes the completed post-tick boundary, copies render-relevant ECS data into immutable snapshots, and publishes them through a non-blocking latest-value buffer. `RenderWorld` retains previous/current snapshots for visual transform interpolation. The client renders extracted generic instances alongside persistent terrain resources without querying live simulation state from the renderer.
+The renderer consumes extracted presentation/world data and does not determine simulation outcomes. `PresentationExtractor` observes the completed post-tick boundary, copies render-relevant ECS data plus controllable ownership/category metadata into immutable snapshots, and publishes them through a non-blocking latest-value buffer. `RenderWorld` retains previous/current snapshots for visual transform interpolation.
 
-See `docs/PresentationExtractionAndDebugging.md` for extraction timing, snapshot ownership, buffering, interpolation, debug tooling, metrics, and render stress baselines. See `docs/Graphics.md` for the implemented graphics lifecycle and ownership rules. See `docs/CameraAndInput.md` for the raw-input boundary, RTS action mapping, camera coordinate convention, controls, and screen/world APIs. See `docs/WorldAndTerrain.md` for the canonical spatial model, heightfield semantics, terrain query boundary, mesh generation, culling, and render ownership.
+Selection picking operates against these extracted instances. It filters hidden/off-screen, foreign-owned, and disallowed-category entities before returning the same stable `EntityId` used by simulation. A later movement request crosses back into simulation only through the command queue.
+
+See `docs/PresentationExtractionAndDebugging.md` for extraction timing, snapshot ownership, buffering, interpolation, debug tooling, metrics, and render stress baselines. See `docs/SelectionAndCommandInteraction.md` for interaction ownership, picking/filtering, command flow, and stale-ID handling. See `docs/Graphics.md` for the implemented graphics lifecycle and ownership rules. See `docs/CameraAndInput.md` for the raw-input boundary, RTS action mapping, camera coordinate convention, controls, and screen/world APIs. See `docs/WorldAndTerrain.md` for the canonical spatial model, heightfield semantics, terrain query boundary, mesh generation, culling, and render ownership.
 
 ## Performance Direction
 
