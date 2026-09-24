@@ -64,12 +64,14 @@ public sealed class NavigationGrid
         int width,
         int height,
         NavigationGridSettings settings,
+        float chunkSizeMeters,
         NavigationCellSample[] cells)
     {
         Origin = origin;
         Width = width;
         Height = height;
         Settings = settings;
+        ChunkSizeMeters = chunkSizeMeters;
         _cells = cells;
     }
 
@@ -82,6 +84,12 @@ public sealed class NavigationGrid
     public int CellCount => _cells.Length;
 
     public NavigationGridSettings Settings { get; }
+
+    public float ChunkSizeMeters { get; }
+
+    public int CellsPerChunk =>
+        checked((int)MathF.Round(
+            ChunkSizeMeters / Settings.CellSizeMeters));
 
     public bool Contains(NavigationCellCoordinate coordinate) =>
         (uint)coordinate.X < (uint)Width &&
@@ -327,6 +335,7 @@ public static class NavigationGridBuilder
             width,
             height,
             resolvedSettings,
+            terrain.Settings.ChunkSizeMeters,
             cells);
     }
 
