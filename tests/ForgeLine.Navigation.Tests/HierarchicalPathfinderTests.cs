@@ -130,6 +130,7 @@ public sealed class HierarchicalPathfinderTests
 
         Assert.All(results, result => Assert.True(result.Succeeded));
         Assert.Equal(1, pathfinder.HighLevelCacheEntryCount);
+        Assert.Equal(1, world.SectorGraphCacheEntryCount);
     }
 
     [Fact]

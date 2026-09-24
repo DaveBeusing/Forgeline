@@ -7,7 +7,7 @@ public sealed class NavigationWorld
 {
     private readonly ConcurrentDictionary<
         NavigationCapabilities,
-        NavigationSectorGraph> _graphs = new();
+        Lazy<NavigationSectorGraph>> _graphs = new();
 
     public NavigationWorld(
         NavigationGrid grid,
@@ -32,17 +32,23 @@ public sealed class NavigationWorld
 
     public NavigationVersion Version { get; }
 
+    public int SectorGraphCacheEntryCount => _graphs.Count;
+
     public NavigationSectorGraph GetSectorGraph(
         in NavigationCapabilities capabilities)
     {
+        NavigationCapabilities key = capabilities;
+        var candidate =
+            new Lazy<NavigationSectorGraph>(
+                () => NavigationSectorGraphBuilder.Build(
+                    Grid,
+                    key,
+                    SectorSettings),
+                LazyThreadSafetyMode.ExecutionAndPublication);
+
         return _graphs.GetOrAdd(
-            capabilities,
-            static (resolvedCapabilities, state) =>
-                NavigationSectorGraphBuilder.Build(
-                    state.Grid,
-                    resolvedCapabilities,
-                    state.SectorSettings),
-            this);
+            key,
+            candidate).Value;
     }
 
     public static NavigationWorld Build(
