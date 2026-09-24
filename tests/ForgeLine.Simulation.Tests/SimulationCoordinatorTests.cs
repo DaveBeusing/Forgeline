@@ -57,7 +57,10 @@ public sealed class SimulationCoordinatorTests
 
         coordinator.AdvanceOneTick();
 
-        Assert.Equal(new[] { 1, 2, 3 }, executionOrder);
+        Assert.Equal(3, executionOrder.Count);
+        Assert.Equal(1, executionOrder[0]);
+        Assert.Equal(2, executionOrder[1]);
+        Assert.Equal(3, executionOrder[2]);
     }
 
     [Fact]
@@ -77,7 +80,8 @@ public sealed class SimulationCoordinatorTests
 
         coordinator.AdvanceOneTick();
 
-        Assert.Equal(new[] { 42 }, recorder.Values);
+        Assert.Single(recorder.Values);
+        Assert.Equal(42, recorder.Values[0]);
         Assert.Equal(new SimulationTick(4), recorder.ExecutionTicks[0]);
         Assert.Equal(0, coordinator.PendingCommandCount);
     }
@@ -102,7 +106,10 @@ public sealed class SimulationCoordinatorTests
 
         Assert.True(first.Sequence < second.Sequence);
         Assert.True(second.Sequence < third.Sequence);
-        Assert.Equal(new[] { 10, 20, 30 }, recorder.Values);
+        Assert.Equal(3, recorder.Values.Count);
+        Assert.Equal(10, recorder.Values[0]);
+        Assert.Equal(20, recorder.Values[1]);
+        Assert.Equal(30, recorder.Values[2]);
         Assert.Equal(3UL, coordinator.Metrics.CommandsProcessed);
     }
 

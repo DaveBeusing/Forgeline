@@ -89,7 +89,12 @@ public sealed class SimulationCoordinator
         }
     }
 
-    public ulong RunTicks(ulong tickCount, CancellationToken cancellationToken = default)
+    public ulong RunTicks(ulong tickCount)
+    {
+        return RunTicks(tickCount, CancellationToken.None);
+    }
+
+    public ulong RunTicks(ulong tickCount, CancellationToken cancellationToken)
     {
         ulong executed = 0;
 
