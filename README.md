@@ -85,7 +85,7 @@ Run the bounded client smoke validation used by CI:
 dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release -- --smoke-test
 ```
 
-The smoke mode creates the same native window, initializes Direct3D 12 with hardware-adapter selection and WARP fallback, compiles a DXC shader, presents frames briefly, then requests a clean shutdown.
+The smoke mode creates the same native window, initializes Direct3D 12 with hardware-adapter selection and WARP fallback, compiles DXC shaders, creates a minimal graphics pipeline, renders a triangle briefly, then requests a clean shutdown.
 
 See [Windows Client](docs/WindowsClient.md) for the platform boundary, window lifecycle, supported modes, DPI behavior, and validation procedure. See [Graphics](docs/Graphics.md) for Direct3D 12 ownership, frame synchronization, resize behavior, shader compilation, diagnostics, and resource lifetime.
 
