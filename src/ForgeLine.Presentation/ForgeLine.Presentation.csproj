@@ -6,5 +6,6 @@
     <ProjectReference Include="../ForgeLine.Game/ForgeLine.Game.csproj" />
     <ProjectReference Include="../ForgeLine.Graphics/ForgeLine.Graphics.csproj" />
     <ProjectReference Include="../ForgeLine.Audio/ForgeLine.Audio.csproj" />
+    <ProjectReference Include="../ForgeLine.Input/ForgeLine.Input.csproj" />
   </ItemGroup>
 </Project>
