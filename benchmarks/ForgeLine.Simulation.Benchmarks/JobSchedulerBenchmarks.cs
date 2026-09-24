@@ -4,7 +4,7 @@ using ForgeLine.Jobs;
 namespace ForgeLine.Simulation.Benchmarks;
 
 [MemoryDiagnoser]
-public class JobSchedulerBenchmarks
+public class JobSchedulerBenchmarks : IDisposable
 {
     private JobScheduler _scheduler = null!;
     private int[] _sequentialOutput = null!;
@@ -34,7 +34,13 @@ public class JobSchedulerBenchmarks
     [GlobalCleanup]
     public void Cleanup()
     {
-        _scheduler.Dispose();
+        Dispose();
+    }
+
+    public void Dispose()
+    {
+        _scheduler?.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     [Benchmark(Baseline = true)]
