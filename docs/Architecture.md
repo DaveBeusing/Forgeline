@@ -129,7 +129,7 @@ Render World
 Renderer
 ```
 
-The renderer consumes extracted presentation state and does not determine simulation outcomes. The current client validation renders only a stable clear/present frame; terrain, units, fog of war, and presentation extraction remain later rendering stages.
+The renderer consumes extracted presentation state and does not determine simulation outcomes. The current client validation renders only the foundation clear plus a minimal smoke-test triangle; terrain, units, fog of war, and presentation extraction remain later rendering stages.
 
 See `docs/Graphics.md` for the implemented graphics lifecycle and ownership rules.
 
