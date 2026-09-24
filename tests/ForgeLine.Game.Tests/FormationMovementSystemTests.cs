@@ -241,6 +241,142 @@ public sealed class FormationMovementSystemTests
     }
 
     [Fact]
+    public void FormationSpeedUsesSlowestMemberAndRestoresOnIndividualOrder()
+    {
+        FormationScenario scenario = CreateScenario(
+            6,
+            FormationTemplate.Compact);
+
+        EntityId slowUnit = scenario.Units[1];
+        GroundMovement original =
+            scenario.Simulation.Entities.GetComponent<
+                GroundMovement>(slowUnit);
+        scenario.Simulation.Entities.SetComponent(
+            slowUnit,
+            new GroundMovement(
+                maximumSpeed: 7.0f,
+                acceleration: original.Acceleration,
+                deceleration: original.Deceleration,
+                turnRateRadiansPerSecond:
+                    original.TurnRateRadiansPerSecond,
+                radius: original.Radius,
+                stopRadius: original.StopRadius,
+                separationRadius: original.SeparationRadius,
+                obstacleLookAhead: original.ObstacleLookAhead,
+                maximumSlopeDegrees: original.MaximumSlopeDegrees,
+                heightOffset: original.HeightOffset));
+
+        scenario.Simulation.AdvanceOneTick();
+        scenario.Simulation.AdvanceOneTick();
+        scenario.Simulation.AdvanceOneTick();
+
+        foreach (EntityId unit in scenario.Units)
+        {
+            Assert.True(
+                scenario.Simulation.Entities.TryGetComponent(
+                    unit,
+                    out FormationMovementConstraint constraint));
+            Assert.Equal(7.0f, constraint.MaximumSpeed);
+        }
+
+        EntityId detached = scenario.Units[0];
+        var individualOrder = new MoveEntitiesCommand(
+            LocalPlayer,
+            [detached],
+            new Vector3(112.0f, 0.0f, 16.0f),
+            scenario.Simulation.CurrentTick);
+
+        scenario.Simulation.SubmitCommand(
+            individualOrder,
+            scenario.Simulation.CurrentTick.Next(),
+            new SimulationCommandSource(LocalPlayer.Value));
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.False(
+            scenario.Simulation.Entities.HasComponent<
+                FormationMovementConstraint>(detached));
+        Assert.False(
+            scenario.Simulation.Entities.HasComponent<
+                MovementGroupMember>(detached));
+        Assert.True(
+            scenario.Simulation.Entities.TryGetComponent(
+                detached,
+                out MovementOrder strategicOrder));
+        Assert.Equal(
+            MovementOrderKind.Strategic,
+            strategicOrder.Kind);
+    }
+
+    [Fact]
+    public void ConstrainedCorridorCompressesFormationWithoutSplitting()
+    {
+        TerrainWorld terrain = CreateFlatWorld(4, 2);
+        var obstacles = new[]
+        {
+            new AxisAlignedBounds(
+                new Vector3(36.0f, -1.0f, 0.0f),
+                new Vector3(92.0f, 4.0f, 20.0f)),
+            new AxisAlignedBounds(
+                new Vector3(36.0f, -1.0f, 44.0f),
+                new Vector3(92.0f, 4.0f, 64.0f))
+        };
+
+        NavigationWorld navigationWorld = NavigationWorld.Build(
+            terrain,
+            obstacles,
+            new NavigationGridSettings
+            {
+                CellSizeMeters = 4.0f,
+                StaticObstacleClearanceMeters = 0.0f
+            },
+            new NavigationSectorSettings
+            {
+                SectorSizeCells = 4
+            });
+
+        var simulation = new SimulationCoordinator(ticksPerSecond: 20);
+        var pathfinder = new HierarchicalPathfinder(navigationWorld);
+        var formationSystem = new FormationMovementSystem(pathfinder);
+        var navigationSystem = new HierarchicalNavigationSystem(pathfinder);
+        var movementSystem = new GroundMovementSystem(terrain);
+
+        simulation.RegisterSystem(formationSystem);
+        simulation.RegisterSystem(navigationSystem);
+        simulation.RegisterSystem(movementSystem);
+
+        EntityId[] units = CreateUnits(
+            simulation,
+            6,
+            new Vector3(8.0f, 0.5f, 32.0f));
+
+        simulation.SubmitCommand(
+            new MoveEntitiesCommand(
+                LocalPlayer,
+                units,
+                new Vector3(116.0f, 0.0f, 32.0f),
+                SimulationTick.Zero,
+                FormationTemplate.Line),
+            new SimulationTick(1),
+            new SimulationCommandSource(LocalPlayer.Value));
+
+        for (int tick = 0; tick < 220; tick++)
+        {
+            simulation.AdvanceOneTick();
+
+            if (formationSystem.LastDiagnostics.CompressionEventCount > 0)
+            {
+                break;
+            }
+        }
+
+        Assert.True(
+            formationSystem.LastDiagnostics.CompressionEventCount > 0);
+        Assert.Equal(
+            0UL,
+            formationSystem.LastDiagnostics.SplitEventCount);
+    }
+
+    [Fact]
     public void NarrowCorridorTriggersControlledSplitFallback()
     {
         TerrainWorld terrain = CreateFlatWorld(4, 2);
