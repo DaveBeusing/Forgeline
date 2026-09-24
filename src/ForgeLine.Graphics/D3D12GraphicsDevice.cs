@@ -88,7 +88,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         _rtvHeap = _device.CreateDescriptorHeap(
             new DescriptorHeapDescription(
                 DescriptorHeapType.RenderTargetView,
-                configuration.BufferCount));
+                (uint)configuration.BufferCount));
         _rtvDescriptorSize =
             _device.GetDescriptorHandleIncrementSize(DescriptorHeapType.RenderTargetView);
 
