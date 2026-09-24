@@ -21,7 +21,7 @@ public sealed class SimulationCoordinatorTests
     {
         var coordinator = new SimulationCoordinator();
 
-        ulong executed = coordinator.RunTicks(128);
+        ulong executed = coordinator.RunTicks(128, TestContext.Current.CancellationToken);
 
         Assert.Equal(128UL, executed);
         Assert.Equal(new SimulationTick(128), coordinator.CurrentTick);
@@ -73,7 +73,7 @@ public sealed class SimulationCoordinatorTests
             new SimulationTick(4),
             new SimulationCommandSource(7));
 
-        coordinator.RunTicks(3);
+        coordinator.RunTicks(3, TestContext.Current.CancellationToken);
 
         Assert.Empty(recorder.Values);
         Assert.Equal(1, coordinator.PendingCommandCount);
@@ -102,7 +102,7 @@ public sealed class SimulationCoordinatorTests
             new RecordCommand(recorder, 30),
             new SimulationTick(2));
 
-        coordinator.RunTicks(2);
+        coordinator.RunTicks(2, TestContext.Current.CancellationToken);
 
         Assert.True(first.Sequence < second.Sequence);
         Assert.True(second.Sequence < third.Sequence);
@@ -148,8 +148,8 @@ public sealed class SimulationCoordinatorTests
                 new SimulationTick(tick));
         }
 
-        first.RunTicks(32);
-        second.RunTicks(32);
+        first.RunTicks(32, TestContext.Current.CancellationToken);
+        second.RunTicks(32, TestContext.Current.CancellationToken);
 
         Assert.True(first.Entities.TryGetComponent(firstEntity, out Accumulator firstState));
         Assert.True(second.Entities.TryGetComponent(secondEntity, out Accumulator secondState));
@@ -161,10 +161,10 @@ public sealed class SimulationCoordinatorTests
     public void WarmEmptyTickLoopDoesNotAllocate()
     {
         var coordinator = new SimulationCoordinator();
-        coordinator.RunTicks(8);
+        coordinator.RunTicks(8, TestContext.Current.CancellationToken);
 
         long before = GC.GetAllocatedBytesForCurrentThread();
-        coordinator.RunTicks(1_024);
+        coordinator.RunTicks(1_024, TestContext.Current.CancellationToken);
         long allocatedBytes = GC.GetAllocatedBytesForCurrentThread() - before;
 
         Assert.Equal(0L, allocatedBytes);
@@ -176,7 +176,7 @@ public sealed class SimulationCoordinatorTests
         var coordinator = new SimulationCoordinator();
         var stopwatch = Stopwatch.StartNew();
 
-        coordinator.RunTicks(2_000);
+        coordinator.RunTicks(2_000, TestContext.Current.CancellationToken);
 
         stopwatch.Stop();
         TimeSpan logicalDuration = TimeSpan.FromTicks(
