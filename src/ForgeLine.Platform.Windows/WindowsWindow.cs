@@ -537,10 +537,7 @@ internal sealed class WindowsWindow : IWindow
     {
         EnsureOwnerThread();
 
-        if (_disposed)
-        {
-            throw new ObjectDisposedException(nameof(WindowsWindow));
-        }
+        ObjectDisposedException.ThrowIf(_disposed, this);
 
         if (!_isOpen || _handle == 0)
         {

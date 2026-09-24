@@ -129,10 +129,7 @@ public sealed class WindowsPlatform : IPlatform
     {
         EnsureOwnerThread();
 
-        if (_disposed)
-        {
-            throw new ObjectDisposedException(nameof(WindowsPlatform));
-        }
+        ObjectDisposedException.ThrowIf(_disposed, this);
     }
 
     private void EnsureOwnerThread()
