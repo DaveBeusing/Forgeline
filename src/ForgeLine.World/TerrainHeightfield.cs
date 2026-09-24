@@ -98,16 +98,16 @@ public sealed class TerrainHeightfield
         float tx = gridX - x0;
         float tz = gridZ - z0;
 
-        float top = MathF.Lerp(
+        float top = Lerp(
             GetHeight(x0, z0),
             GetHeight(x1, z0),
             tx);
-        float bottom = MathF.Lerp(
+        float bottom = Lerp(
             GetHeight(x0, z1),
             GetHeight(x1, z1),
             tx);
 
-        return MathF.Lerp(top, bottom, tz);
+        return Lerp(top, bottom, tz);
     }
 
     public Vector3 SampleNormal(float localX, float localZ)
@@ -133,6 +133,9 @@ public sealed class TerrainHeightfield
 
         return Vector3.Normalize(new Vector3(-derivativeX, 1.0f, -derivativeZ));
     }
+
+    private static float Lerp(float start, float end, float amount) =>
+        start + (end - start) * amount;
 
     private static void ValidateLocalCoordinate(float value, string parameterName)
     {
