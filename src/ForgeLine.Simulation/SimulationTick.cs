@@ -9,6 +9,26 @@ public readonly record struct SimulationTick(ulong Value) : IComparable<Simulati
         return Value.CompareTo(other.Value);
     }
 
+    public static bool operator <(SimulationTick left, SimulationTick right)
+    {
+        return left.CompareTo(right) < 0;
+    }
+
+    public static bool operator <=(SimulationTick left, SimulationTick right)
+    {
+        return left.CompareTo(right) <= 0;
+    }
+
+    public static bool operator >(SimulationTick left, SimulationTick right)
+    {
+        return left.CompareTo(right) > 0;
+    }
+
+    public static bool operator >=(SimulationTick left, SimulationTick right)
+    {
+        return left.CompareTo(right) >= 0;
+    }
+
     public SimulationTick Next()
     {
         return new SimulationTick(checked(Value + 1));

@@ -5,7 +5,7 @@ namespace ForgeLine.Simulation;
 public sealed class SimulationCoordinator
 {
     private readonly SimulationContext _context;
-    private readonly SimulationCommandQueue _commands = new();
+    private readonly SimulationCommandSchedule _commands = new();
     private readonly SimulationSystemPipeline _systems = new();
     private ulong _commandsProcessed;
     private ulong _systemInvocations;

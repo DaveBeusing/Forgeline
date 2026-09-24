@@ -1,14 +1,14 @@
 namespace ForgeLine.Simulation;
 
-public sealed class SimulationCommandQueue
+internal sealed class SimulationCommandSchedule
 {
     private readonly SortedDictionary<ulong, List<SimulationCommandEnvelope>> _scheduled = new();
     private ulong _nextSequence = 1;
     private int _pendingCount;
 
-    public int PendingCount => _pendingCount;
+    internal int PendingCount => _pendingCount;
 
-    public SimulationCommandEnvelope Enqueue(
+    internal SimulationCommandEnvelope Enqueue(
         SimulationTick targetTick,
         SimulationCommandSource source,
         ISimulationCommand command)
