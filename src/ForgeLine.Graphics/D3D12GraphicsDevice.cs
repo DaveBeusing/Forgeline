@@ -201,7 +201,15 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                 PixelShader = description.PixelShader.Data,
                 InputLayout = new InputLayoutDescription(inputElements),
                 SampleMask = uint.MaxValue,
-                PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
+                PrimitiveTopologyType = description.PrimitiveTopology switch
+                {
+                    GraphicsPrimitiveTopology.TriangleList =>
+                        PrimitiveTopologyType.Triangle,
+                    GraphicsPrimitiveTopology.LineList =>
+                        PrimitiveTopologyType.Line,
+                    _ => throw new ArgumentOutOfRangeException(
+                        nameof(description.PrimitiveTopology))
+                },
                 RasterizerState = RasterizerDescription.CullCounterClockwise,
                 BlendState = BlendDescription.Opaque,
                 DepthStencilState = description.DepthEnabled
