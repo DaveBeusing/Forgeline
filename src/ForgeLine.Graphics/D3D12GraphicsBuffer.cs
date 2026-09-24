@@ -33,10 +33,7 @@ internal sealed class D3D12GraphicsBuffer : IGraphicsBuffer
                 "Only CPU-visible upload buffers can be written directly.");
         }
 
-        if (offsetInBytes < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(offsetInBytes));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(offsetInBytes);
 
         ulong byteCount = checked((ulong)MemoryMarshal.AsBytes(data).Length);
         ulong end = checked((ulong)offsetInBytes + byteCount);
