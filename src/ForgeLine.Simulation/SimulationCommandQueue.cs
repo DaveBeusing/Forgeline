@@ -42,11 +42,12 @@ public sealed class SimulationCommandQueue
 
     internal int ExecuteForTick(SimulationTick tick, SimulationContext context)
     {
-        if (!_scheduled.Remove(tick.Value, out List<SimulationCommandEnvelope>? commands))
+        if (!_scheduled.TryGetValue(tick.Value, out List<SimulationCommandEnvelope>? commands))
         {
             return 0;
         }
 
+        _scheduled.Remove(tick.Value);
         _pendingCount -= commands.Count;
 
         for (int index = 0; index < commands.Count; index++)
