@@ -387,9 +387,15 @@ public sealed class GroundMovementSystem : ISimulationSystem
         in GroundMovement movement,
         ref int adjustmentCount)
     {
-        if (_spatialIndex is null ||
-            _options.SeparationWeight <= 0.0f)
+        if (_spatialIndex is null)
         {
+            _neighborBuffer.Clear();
+            return Vector3.Zero;
+        }
+
+        if (_options.SeparationWeight <= 0.0f)
+        {
+            _neighborBuffer.Clear();
             return Vector3.Zero;
         }
 
@@ -464,6 +470,7 @@ public sealed class GroundMovementSystem : ISimulationSystem
             movement.ObstacleLookAhead <= 0.0f ||
             _options.ObstacleSteeringWeight <= 0.0f)
         {
+            _obstacleBuffer.Clear();
             return Vector3.Zero;
         }
 
