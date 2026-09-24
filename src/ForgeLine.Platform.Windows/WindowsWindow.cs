@@ -16,6 +16,7 @@ internal sealed class WindowsWindow : IWindow
 
     private readonly WindowConfiguration _configuration;
     private readonly Queue<WindowEvent> _events = new(16);
+    private readonly Queue<PlatformInputEvent> _inputEvents = new(64);
     private readonly int _ownerThreadId = Environment.CurrentManagedThreadId;
     private readonly uint _windowedStyle;
 
@@ -191,6 +192,20 @@ internal sealed class WindowsWindow : IWindow
         return true;
     }
 
+    public bool TryDequeueInputEvent(out PlatformInputEvent inputEvent)
+    {
+        EnsureOwnerThread();
+
+        if (_inputEvents.Count == 0)
+        {
+            inputEvent = default;
+            return false;
+        }
+
+        inputEvent = _inputEvents.Dequeue();
+        return true;
+    }
+
     public void Dispose()
     {
         EnsureOwnerThread();
@@ -207,6 +222,7 @@ internal sealed class WindowsWindow : IWindow
         }
 
         _isOpen = false;
+        _inputEvents.Clear();
 
         if (_selfHandle.IsAllocated)
         {
@@ -334,7 +350,75 @@ internal sealed class WindowsWindow : IWindow
 
             case WindowsNative.WmKillFocus:
                 _isFocused = false;
+                _inputEvents.Enqueue(PlatformInputEvent.FocusLost());
                 EnqueueEvent(WindowEventKind.FocusLost);
+                return 0;
+
+            case WindowsNative.WmKeyDown:
+                if (TryMapKey(wParam, out PlatformKey keyDown))
+                {
+                    _inputEvents.Enqueue(
+                        PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, keyDown));
+                    return 0;
+                }
+
+                break;
+
+            case WindowsNative.WmKeyUp:
+                if (TryMapKey(wParam, out PlatformKey keyUp))
+                {
+                    _inputEvents.Enqueue(
+                        PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, keyUp));
+                    return 0;
+                }
+
+                break;
+
+            case WindowsNative.WmMouseMove:
+                (int moveX, int moveY) = DecodePointerPosition(lParam);
+                _inputEvents.Enqueue(PlatformInputEvent.PointerMoved(moveX, moveY));
+                return 0;
+
+            case WindowsNative.WmMouseWheel:
+                EnqueueMouseWheel(wParam, lParam);
+                return 0;
+
+            case WindowsNative.WmLButtonDown:
+                EnqueueMouseButton(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Left, lParam);
+                return 0;
+
+            case WindowsNative.WmLButtonUp:
+                EnqueueMouseButton(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Left, lParam);
+                return 0;
+
+            case WindowsNative.WmRButtonDown:
+                EnqueueMouseButton(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Right, lParam);
+                return 0;
+
+            case WindowsNative.WmRButtonUp:
+                EnqueueMouseButton(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Right, lParam);
+                return 0;
+
+            case WindowsNative.WmMButtonDown:
+                EnqueueMouseButton(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Middle, lParam);
+                return 0;
+
+            case WindowsNative.WmMButtonUp:
+                EnqueueMouseButton(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Middle, lParam);
+                return 0;
+
+            case WindowsNative.WmXButtonDown:
+                EnqueueMouseButton(
+                    PlatformInputEventKind.MouseButtonDown,
+                    DecodeXButton(wParam),
+                    lParam);
+                return 0;
+
+            case WindowsNative.WmXButtonUp:
+                EnqueueMouseButton(
+                    PlatformInputEventKind.MouseButtonUp,
+                    DecodeXButton(wParam),
+                    lParam);
                 return 0;
 
             case WindowsNative.WmDpiChanged:
@@ -346,10 +430,73 @@ internal sealed class WindowsWindow : IWindow
                 _ = WindowsNative.SetWindowLongPtr(windowHandle, WindowsNative.GwlpUserData, 0);
                 _handle = 0;
                 return result;
-
-            default:
-                return WindowsNative.DefWindowProc(windowHandle, message, wParam, lParam);
         }
+
+        return WindowsNative.DefWindowProc(windowHandle, message, wParam, lParam);
+    }
+
+    private void EnqueueMouseButton(
+        PlatformInputEventKind kind,
+        PlatformMouseButton button,
+        nint lParam)
+    {
+        (int x, int y) = DecodePointerPosition(lParam);
+        _inputEvents.Enqueue(PlatformInputEvent.MouseButtonChanged(kind, button, x, y));
+    }
+
+    private void EnqueueMouseWheel(nuint wParam, nint lParam)
+    {
+        (int x, int y) = DecodePointerPosition(lParam);
+        var point = new WindowsNative.NativePoint { X = x, Y = y };
+
+        if (WindowsNative.ScreenToClient(_handle, ref point) != 0)
+        {
+            x = point.X;
+            y = point.Y;
+        }
+
+        int delta = unchecked((short)(((ulong)wParam >> 16) & 0xFFFF));
+        _inputEvents.Enqueue(PlatformInputEvent.MouseWheel(x, y, delta));
+    }
+
+    private static PlatformMouseButton DecodeXButton(nuint wParam)
+    {
+        int button = (int)(((ulong)wParam >> 16) & 0xFFFF);
+        return button == 1 ? PlatformMouseButton.X1 : PlatformMouseButton.X2;
+    }
+
+    private static (int X, int Y) DecodePointerPosition(nint lParam)
+    {
+        long raw = lParam.ToInt64();
+        int x = unchecked((short)(raw & 0xFFFF));
+        int y = unchecked((short)((raw >> 16) & 0xFFFF));
+        return (x, y);
+    }
+
+    private static bool TryMapKey(nuint virtualKey, out PlatformKey key)
+    {
+        key = (int)virtualKey switch
+        {
+            WindowsNative.VkW => PlatformKey.W,
+            WindowsNative.VkA => PlatformKey.A,
+            WindowsNative.VkS => PlatformKey.S,
+            WindowsNative.VkD => PlatformKey.D,
+            WindowsNative.VkQ => PlatformKey.Q,
+            WindowsNative.VkE => PlatformKey.E,
+            WindowsNative.VkR => PlatformKey.R,
+            WindowsNative.VkF => PlatformKey.F,
+            WindowsNative.VkUp => PlatformKey.Up,
+            WindowsNative.VkDown => PlatformKey.Down,
+            WindowsNative.VkLeft => PlatformKey.Left,
+            WindowsNative.VkRight => PlatformKey.Right,
+            WindowsNative.VkLShift => PlatformKey.LeftShift,
+            WindowsNative.VkRShift => PlatformKey.RightShift,
+            WindowsNative.VkEscape => PlatformKey.Escape,
+            WindowsNative.VkSpace => PlatformKey.Space,
+            _ => PlatformKey.Unknown
+        };
+
+        return key != PlatformKey.Unknown;
     }
 
     private void ProcessSizeMessage(nuint wParam, nint lParam)

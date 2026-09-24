@@ -4,7 +4,7 @@
 
 `ForgeLine.Client` is the interactive Windows x64 composition root. It owns the native application host and composes the first Direct3D 12 graphics foundation without introducing Win32 or D3D12 details into simulation or game rules.
 
-The current client initializes graphics and runs a clear/present render loop. Gameplay rendering, gameplay input mapping, RTS UI, audio playback, and simulation composition remain deferred.
+The current client initializes graphics, consumes the platform input stream through `ForgeLine.Input`, updates the presentation-only RTS camera, and renders a lightweight camera-validation grid. Gameplay unit/terrain rendering, RTS UI, audio playback, and simulation composition remain deferred.
 
 ## Platform Boundary
 
@@ -45,13 +45,13 @@ The client creates one primary `FORGELINE` window with a 1600×900 requested cli
 
 `WindowsPlatform.PumpEvents()` drains pending Win32 messages without tying platform processing to simulation or rendering.
 
-The graphics client pumps messages once per rendered frame. Present pacing controls the active render loop, while minimized or zero-sized windows use bounded event waits so suspended rendering does not busy-spin.
+The graphics client pumps messages once per rendered frame. Raw input events are drained after platform messages and mapped into frame-scoped RTS camera actions. Present pacing controls the active render loop, while minimized or zero-sized windows use bounded event waits so suspended rendering does not busy-spin.
 
 ## Window Events
 
 The platform translates relevant native messages into `WindowEvent` snapshots.
 
-Initial event coverage includes:
+Initial window-event coverage includes:
 
 - creation
 - close request and closed state
@@ -61,7 +61,7 @@ Initial event coverage includes:
 - DPI change
 - window-mode change
 
-Each event carries the current client size, DPI, focus state, minimize state, and window mode.
+Each window event carries the current client size, DPI, focus state, minimize state, and window mode. Keyboard, mouse-button, pointer, wheel, and focus-loss input are exposed separately through `IWindow.TryDequeueInputEvent` so higher layers never inspect Win32 messages directly.
 
 ## DPI Behavior
 
@@ -126,7 +126,9 @@ From the repository root:
 dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release
 ```
 
-The executable is a Windows x64 host with the D3D12 graphics foundation active. The client area currently shows only the foundation clear color; no game scene is rendered yet.
+The executable is a Windows x64 host with the D3D12 graphics foundation and RTS camera/input stack active. The client displays a lightweight projected marker grid on the placeholder Y=0 ground plane so pan, rotation, pitch, zoom, edge scrolling, resize behavior, and projection can be validated before terrain/gameplay rendering exists.
+
+Default controls are W/A/S/D or Arrow Keys to pan, Q/E to rotate, R/F to change pitch, Middle Mouse drag to pan, and Mouse Wheel to zoom. Edge scrolling is enabled by default. See [RTS Camera and Input](CameraAndInput.md) for the full interaction and coordinate conventions.
 
 ## Bounded Smoke Validation
 
@@ -142,8 +144,8 @@ Smoke mode:
 2. creates exactly one primary native window;
 3. initializes the D3D12 device and swap chain, using WARP only when no suitable hardware adapter is available;
 4. compiles a small shader through the DXC path;
-5. creates the minimal root-signature/pipeline-state proof and renders a triangle for a short bounded interval;
-6. reports platform and graphics state to standard output;
+5. creates the minimal root-signature/pipeline-state proof and renders the projected camera-validation grid for a short bounded interval;
+6. reports platform, graphics, and camera state to standard output;
 7. requests normal window destruction;
 8. waits for graphics work to retire and exits only after orderly graphics/platform cleanup.
 

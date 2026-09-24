@@ -28,17 +28,46 @@ internal static partial class WindowsNative
 
     internal const int SwShow = 5;
 
+    internal const int VkA = 0x41;
+    internal const int VkD = 0x44;
+    internal const int VkE = 0x45;
+    internal const int VkEscape = 0x1B;
+    internal const int VkF = 0x46;
+    internal const int VkLeft = 0x25;
+    internal const int VkLShift = 0xA0;
+    internal const int VkQ = 0x51;
+    internal const int VkR = 0x52;
+    internal const int VkRight = 0x27;
+    internal const int VkRShift = 0xA1;
+    internal const int VkS = 0x53;
+    internal const int VkSpace = 0x20;
+    internal const int VkUp = 0x26;
+    internal const int VkDown = 0x28;
+    internal const int VkW = 0x57;
+
     internal const uint WaitFailed = 0xFFFFFFFF;
 
     internal const uint WmClose = 0x0010;
     internal const uint WmDestroy = 0x0002;
     internal const uint WmDpiChanged = 0x02E0;
+    internal const uint WmKeyDown = 0x0100;
+    internal const uint WmKeyUp = 0x0101;
     internal const uint WmKillFocus = 0x0008;
+    internal const uint WmLButtonDown = 0x0201;
+    internal const uint WmLButtonUp = 0x0202;
+    internal const uint WmMButtonDown = 0x0207;
+    internal const uint WmMButtonUp = 0x0208;
+    internal const uint WmMouseMove = 0x0200;
+    internal const uint WmMouseWheel = 0x020A;
     internal const uint WmNcCreate = 0x0081;
     internal const uint WmNcDestroy = 0x0082;
     internal const uint WmQuit = 0x0012;
+    internal const uint WmRButtonDown = 0x0204;
+    internal const uint WmRButtonUp = 0x0205;
     internal const uint WmSetFocus = 0x0007;
     internal const uint WmSize = 0x0005;
+    internal const uint WmXButtonDown = 0x020B;
+    internal const uint WmXButtonUp = 0x020C;
 
     internal const uint WsCaption = 0x00C00000;
     internal const uint WsMaximizeBox = 0x00010000;
@@ -205,6 +234,9 @@ internal static partial class WindowsNative
 
     [LibraryImport("user32.dll", EntryPoint = "RegisterClassExW", SetLastError = true)]
     internal static partial ushort RegisterClassEx(ref WindowClassEx windowClass);
+
+    [LibraryImport("user32.dll", EntryPoint = "ScreenToClient", SetLastError = true)]
+    internal static partial int ScreenToClient(nint windowHandle, ref NativePoint point);
 
     [LibraryImport("user32.dll", EntryPoint = "SetProcessDpiAwarenessContext", SetLastError = true)]
     internal static partial int SetProcessDpiAwarenessContext(nint dpiContext);
