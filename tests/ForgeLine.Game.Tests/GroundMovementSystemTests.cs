@@ -211,6 +211,59 @@ public sealed class GroundMovementSystemTests
     }
 
     [Fact]
+    public void NewMovementOrderResetsStuckProgressTracking()
+    {
+        TerrainWorld terrain = CreateRampTerrain(
+            chunkSize: 10.0f,
+            positiveXHeight: 20.0f);
+        var simulation = new SimulationCoordinator(ticksPerSecond: 20);
+        var movementSystem = new GroundMovementSystem(
+            terrain,
+            options: new GroundMovementSystemOptions
+            {
+                StuckTickThreshold = 3,
+                ProgressEpsilonMeters = 0.01f
+            });
+
+        EntityId entity = AddGroundUnit(
+            simulation,
+            new Vector3(1.0f, 2.5f, 5.0f),
+            CreateMovement(
+                maximumSpeed: 8.0f,
+                acceleration: 100.0f,
+                deceleration: 100.0f,
+                turnRateRadiansPerSecond: MathF.Tau,
+                maximumSlopeDegrees: 10.0f));
+
+        AddOrder(
+            simulation,
+            entity,
+            new Vector3(9.0f, 0.0f, 5.0f),
+            acceptedAtTick: new SimulationTick(1));
+        simulation.RegisterSystem(movementSystem);
+        simulation.RunTicks(3);
+
+        Assert.Equal(
+            GroundMovementStatus.Stuck,
+            simulation.Entities
+                .GetComponent<GroundMovementState>(entity)
+                .Status);
+
+        AddOrder(
+            simulation,
+            entity,
+            new Vector3(8.0f, 0.0f, 5.0f),
+            acceptedAtTick: new SimulationTick(4));
+        simulation.AdvanceOneTick();
+
+        GroundMovementState resetState =
+            simulation.Entities.GetComponent<GroundMovementState>(entity);
+
+        Assert.Equal(GroundMovementStatus.Moving, resetState.Status);
+        Assert.Equal(1, resetState.StalledTicks);
+    }
+
+    [Fact]
     public void SpatialOccupancyTracksMovementAcrossChunkBoundary()
     {
         TerrainWorld terrain = CreateFlatTerrain(
