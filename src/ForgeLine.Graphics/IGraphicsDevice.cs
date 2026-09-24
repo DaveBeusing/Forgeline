@@ -4,6 +4,8 @@ public interface IGraphicsDevice : IDisposable
 {
     GraphicsDiagnostics Diagnostics { get; }
 
+    IGraphicsPipeline CreateGraphicsPipeline(GraphicsPipelineDescription description);
+
     IGraphicsBuffer CreateBuffer(GraphicsBufferDescription description);
 
     void RenderFrame(
