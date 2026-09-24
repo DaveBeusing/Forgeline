@@ -21,7 +21,9 @@ The project is built on **ForgeLine Engine**, a custom C#/.NET RTS engine design
 - strict simulation/presentation separation
 - multiplayer-aware architecture with networking deferred
 
-The repository foundation intentionally contains architecture and infrastructure only. Gameplay systems, rendering, navigation algorithms, logistics simulation, combat, editor functionality, asset conversion, and networking are not implemented by the foundation.
+Implemented engine foundations currently include the repository architecture, stable entity/component storage, a command-driven fixed-tick simulation runtime, deterministic simulation-owned randomness, and a standalone headless host.
+
+Gameplay systems, rendering, navigation algorithms, logistics simulation, combat, editor functionality, asset conversion, and networking remain deferred to their owning implementation stages.
 
 ## Repository Layout
 
@@ -67,18 +69,31 @@ dotnet build ForgeLine.sln --configuration Release
 dotnet test ForgeLine.sln --configuration Release
 ```
 
+## Headless Simulation
+
+Run the simulation without graphics, audio, UI, or window creation:
+
+```powershell
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --ticks 1000 --seed 1 --tick-rate 20
+```
+
+The headless host executes logical simulation ticks as quickly as the machine permits. The configured tick rate defines simulation time; it does not force wall-clock pacing.
+
 ## Benchmarks
 
-Benchmark projects are present as compilation-ready BenchmarkDotNet hosts. Concrete engine benchmarks are added with the systems they measure.
+BenchmarkDotNet hosts cover the implemented ECS and simulation foundations.
 
-Example:
+Examples:
 
 ```powershell
 dotnet run --project benchmarks/ForgeLine.Ecs.Benchmarks/ForgeLine.Ecs.Benchmarks.csproj --configuration Release
+dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simulation.Benchmarks.csproj --configuration Release
 ```
 
 ## Architecture
 
 See [Architecture](docs/Architecture.md) for project responsibilities and dependency rules.
+
+See [Simulation Runtime](docs/SimulationRuntime.md) for fixed-tick semantics, phase ordering, commands, deterministic randomness, and headless execution.
 
 See [Development](docs/Development.md) for the canonical development and validation workflow.
