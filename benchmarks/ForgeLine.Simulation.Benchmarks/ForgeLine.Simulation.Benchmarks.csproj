@@ -9,5 +9,6 @@
     <ProjectReference Include="../../src/ForgeLine.Jobs/ForgeLine.Jobs.csproj" />
     <ProjectReference Include="../../src/ForgeLine.World/ForgeLine.World.csproj" />
     <ProjectReference Include="../../src/ForgeLine.Simulation/ForgeLine.Simulation.csproj" />
+    <ProjectReference Include="../../src/ForgeLine.Game/ForgeLine.Game.csproj" />
   </ItemGroup>
 </Project>
