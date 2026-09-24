@@ -71,7 +71,7 @@ public sealed class SimulationSystemPipeline
 
         try
         {
-            context.Jobs.CompleteSystemBoundary();
+            context.Jobs.CompleteBoundary();
         }
         catch (Exception jobException)
         {

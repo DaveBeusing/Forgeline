@@ -77,12 +77,13 @@ Later gameplay systems should prefer stable ECS query ordering wherever gameplay
 
 A `SimulationCoordinator` remains single-threaded unless a `JobScheduler` is supplied during composition.
 
-When a scheduler is present, systems can use `context.Jobs` to schedule bounded work or contiguous `ParallelFor` ranges. Scheduled work is tracked by the simulation context and completed at the current system boundary before the next registered system is invoked.
+When a scheduler is present, systems and commands can use `context.Jobs` to schedule bounded work or contiguous `ParallelFor` ranges. Scheduled command work is completed at the Input Commands boundary before later phases execute, and scheduled system work is completed before the next registered system is invoked.
 
 This preserves the existing guarantees:
 
 - phase order remains explicit;
 - registration order within a phase remains meaningful;
+- commands cannot leave work running into later phases;
 - one system cannot accidentally leave simulation work running into the next system;
 - a worker exception is rethrown on the simulation coordinator thread;
 - a failed dependency prevents dependent work from executing;

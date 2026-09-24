@@ -67,7 +67,7 @@ public sealed class SimulationJobs
         return RequireScheduler().GetMetrics();
     }
 
-    internal void CompleteSystemBoundary()
+    internal void CompleteBoundary()
     {
         if (_pending.Count == 0)
         {

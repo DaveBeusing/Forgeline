@@ -87,6 +87,7 @@ public sealed class SimulationCoordinator
             if (phase == SimulationPhase.InputCommands)
             {
                 _commandsProcessed += (ulong)_commands.ExecuteForTick(tick, _context);
+                _context.Jobs.CompleteBoundary();
             }
 
             _systemInvocations += (ulong)_systems.ExecutePhase(phase, _context);
