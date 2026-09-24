@@ -331,10 +331,12 @@ public sealed class GroundMovementSystem : ISimulationSystem
             ? distanceToTarget
             : state.PreviousDistanceToTarget;
         float progress = previousDistance - newDistance;
+        int previousStalledTicks =
+            newOrder ? 0 : state.StalledTicks;
         int stalledTicks =
             progress >= _options.ProgressEpsilonMeters
                 ? 0
-                : checked(state.StalledTicks + 1);
+                : checked(previousStalledTicks + 1);
 
         GroundMovementStatus status =
             stalledTicks >= _options.StuckTickThreshold
