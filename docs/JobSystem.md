@@ -97,7 +97,7 @@ Timing data is diagnostic only. It must not feed simulation decisions.
 
 `SimulationCoordinator` accepts an optional scheduler.
 
-When present, `SimulationContext.Jobs` can schedule normal or range jobs. The runtime tracks those handles and establishes an automatic fence after the Input Commands batch and at the end of each registered system invocation.
+When present, `SimulationContext.Jobs` can schedule normal or range jobs. The runtime tracks those handles and establishes an automatic fence after each simulation command and at the end of each registered system invocation.
 
 This means a system may parallelize internal work while existing phase and registration ordering remain explicit.
 

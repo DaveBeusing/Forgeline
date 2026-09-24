@@ -37,15 +37,17 @@ public sealed class SimulationJobIntegrationTests
     }
 
     [Fact]
-    public void CommandScheduledJobsCompleteBeforeLaterPhases()
+    public void CommandScheduledJobsCompleteBeforeNextCommand()
     {
         using var scheduler = new JobScheduler(
             new JobSchedulerOptions { WorkerCount = 2 });
         var coordinator = new SimulationCoordinator(jobScheduler: scheduler);
         var state = new int[2];
-        coordinator.RegisterSystem(new CommandResultObserver(state));
         coordinator.SubmitCommand(
             new ParallelCommand(state),
+            new SimulationTick(1));
+        coordinator.SubmitCommand(
+            new ObserveCommand(state),
             new SimulationTick(1));
 
         coordinator.AdvanceOneTick();
@@ -148,16 +150,14 @@ public sealed class SimulationJobIntegrationTests
         }
     }
 
-    private sealed class CommandResultObserver : ISimulationSystem
+    private sealed class ObserveCommand : ISimulationCommand
     {
         private readonly int[] _state;
 
-        public CommandResultObserver(int[] state)
+        public ObserveCommand(int[] state)
         {
             _state = state;
         }
-
-        public SimulationPhase Phase => SimulationPhase.OrderProcessing;
 
         public void Execute(SimulationContext context)
         {
