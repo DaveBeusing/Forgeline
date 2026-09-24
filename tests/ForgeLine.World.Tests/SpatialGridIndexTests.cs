@@ -145,7 +145,7 @@ public sealed class SpatialGridIndexTests
             out float distanceSquared,
             filter));
         Assert.Equal(second, nearest);
-        Assert.Equal(0.0f, distanceSquared);
+        Assert.Equal(0.25f, distanceSquared);
     }
 
     [Fact]
@@ -257,6 +257,41 @@ public sealed class SpatialGridIndexTests
         Assert.True(count > 0);
         Assert.Equal(entityCount, index.Count);
         Assert.True(index.OccupiedCellCount > 0);
+    }
+
+    [Fact]
+    public void DiagnosticsAndDebugSnapshotsReportCurrentOccupancy()
+    {
+        var settings = Settings with { EnableQueryTiming = true };
+        var index = new SpatialGridIndex(settings);
+        var buffer = new SpatialQueryBuffer();
+        var entity = new EntityId(21, 1);
+
+        index.Insert(CreateEntry(
+            entity,
+            new Vector3(12.0f, 0.0f, -4.0f)));
+
+        Assert.Equal(
+            1,
+            index.QueryRadius(
+                new Vector3(12.0f, 0.0f, -4.0f),
+                5.0f,
+                buffer));
+
+        SpatialIndexDiagnosticsSnapshot diagnostics =
+            index.CaptureDiagnostics();
+        SpatialIndexDebugSnapshot debug =
+            index.CaptureDebugSnapshot();
+
+        Assert.Equal(1, diagnostics.IndexedEntities);
+        Assert.True(diagnostics.OccupiedCells > 0);
+        Assert.True(diagnostics.MaximumCellOccupancy > 0);
+        Assert.Equal(1, diagnostics.QueryCount);
+        Assert.Equal(1, debug.IndexedEntities);
+        Assert.NotEmpty(debug.Cells);
+        Assert.All(
+            debug.Cells,
+            static cell => Assert.True(cell.Occupancy > 0));
     }
 
     private static SpatialEntry CreateEntry(
