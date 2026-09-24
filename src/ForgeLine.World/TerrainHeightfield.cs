@@ -11,10 +11,7 @@ public sealed class TerrainHeightfield
         float chunkSizeMeters,
         ReadOnlySpan<float> heights)
     {
-        if (samplesPerSide < 2)
-        {
-            throw new ArgumentOutOfRangeException(nameof(samplesPerSide));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(samplesPerSide, 2);
 
         if (!float.IsFinite(chunkSizeMeters) || chunkSizeMeters <= 0.0f)
         {
