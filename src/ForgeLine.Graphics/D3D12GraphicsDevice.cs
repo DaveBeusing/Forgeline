@@ -208,7 +208,9 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                     GraphicsPrimitiveTopology.LineList =>
                         PrimitiveTopologyType.Line,
                     _ => throw new ArgumentOutOfRangeException(
-                        nameof(description.PrimitiveTopology))
+                        nameof(description),
+                        description.PrimitiveTopology,
+                        "Unsupported graphics primitive topology.")
                 },
                 RasterizerState = RasterizerDescription.CullCounterClockwise,
                 BlendState = BlendDescription.Opaque,

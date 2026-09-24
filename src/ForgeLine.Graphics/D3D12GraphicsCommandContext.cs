@@ -80,7 +80,9 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
                 GraphicsPrimitiveTopology.LineList =>
                     PrimitiveTopology.LineList,
                 _ => throw new ArgumentOutOfRangeException(
-                    nameof(d3d12Pipeline.Description.PrimitiveTopology))
+                    nameof(pipeline),
+                    d3d12Pipeline.Description.PrimitiveTopology,
+                    "Unsupported graphics primitive topology.")
             });
     }
 
