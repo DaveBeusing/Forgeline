@@ -27,12 +27,13 @@ From the repository root:
 dotnet restore ForgeLine.sln
 pwsh ./build/Validate-ProjectReferences.ps1
 dotnet build ForgeLine.sln --configuration Release --no-restore
+dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release --no-build -- --smoke-test
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 64 --seed 12345 --tick-rate 20 --entities 1000 --diagnostics-output artifacts/headless-smoke.json
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 16 --seed 67890 --tick-rate 20 --entities 10000 --diagnostics-output artifacts/headless-stress-10000.json
 dotnet test ForgeLine.sln --configuration Release --no-build
 ```
 
-The GitHub Actions CI workflow executes the same essential sequence on pull requests targeting `master` and on pushes to `master`. Headless diagnostic JSON files are uploaded as the `engine-diagnostics` workflow artifact.
+The GitHub Actions CI workflow executes the same essential sequence on pull requests targeting `master` and on pushes to `master`. Windows client smoke validation is guarded to Windows runners, while headless diagnostic JSON files are uploaded as the `engine-diagnostics` workflow artifact.
 
 ## Test Projects
 
@@ -81,6 +82,26 @@ dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simula
 ```
 
 Correctness tests remain separate from benchmark timing. Benchmark timing thresholds are not CI gates unless explicitly introduced later.
+
+## Windows Client Host
+
+The interactive client currently validates the platform and application-host boundary only; Direct3D 12 rendering and gameplay presentation are intentionally not initialized yet.
+
+Launch it with:
+
+```powershell
+dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release
+```
+
+For bounded validation that exits automatically:
+
+```powershell
+dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release -- --smoke-test
+```
+
+The client is Windows x64 specific. Native Win32 calls remain confined to `ForgeLine.Platform.Windows`; headless and simulation projects must not reference the client or Windows platform project.
+
+See [Windows Client](WindowsClient.md) for lifecycle and DPI details.
 
 ## Headless Runtime
 

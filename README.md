@@ -21,9 +21,9 @@ The project is built on **ForgeLine Engine**, a custom C#/.NET RTS engine design
 - strict simulation/presentation separation
 - multiplayer-aware architecture with networking deferred
 
-Implemented engine foundations currently include the repository architecture, stable entity/component storage, a command-driven fixed-tick simulation runtime, deterministic simulation-owned randomness, a persistent-worker job scheduler, opt-in engine diagnostics, repeatable headless test scenarios, performance baselines, and a standalone headless host.
+Implemented engine foundations currently include the repository architecture, stable entity/component storage, a command-driven fixed-tick simulation runtime, deterministic simulation-owned randomness, a persistent-worker job scheduler, opt-in engine diagnostics, repeatable headless test scenarios, performance baselines, a standalone headless host, and the first native Windows interactive client host.
 
-Gameplay systems, rendering, navigation algorithms, logistics simulation, combat, editor functionality, asset conversion, and networking remain deferred to their owning implementation stages.
+Gameplay systems, Direct3D 12 rendering, navigation algorithms, logistics simulation, combat, editor functionality, asset conversion, and networking remain deferred to their owning implementation stages.
 
 ## Repository Layout
 
@@ -68,6 +68,26 @@ dotnet build ForgeLine.sln --configuration Release
 ```powershell
 dotnet test ForgeLine.sln --configuration Release
 ```
+
+## Windows Client
+
+Launch the native Windows x64 client host:
+
+```powershell
+dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release
+```
+
+The current client creates a DPI-aware native Win32 window and runs the platform message loop without initializing graphics or simulation. Close the window normally to exercise orderly shutdown.
+
+Run the bounded client smoke validation used by CI:
+
+```powershell
+dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release -- --smoke-test
+```
+
+The smoke mode creates the same native window, pumps messages briefly, then requests a clean shutdown.
+
+See [Windows Client](docs/WindowsClient.md) for the platform boundary, window lifecycle, supported modes, DPI behavior, and validation procedure.
 
 ## Headless Simulation
 
