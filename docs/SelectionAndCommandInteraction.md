@@ -101,6 +101,7 @@ Initial interaction conventions are:
 | Box selection | Left-drag |
 | Toggle entities in box | Shift + left-drag |
 | Movement order | Right click with a non-empty selection |
+| Cycle development formation | F3 (Compact → Line → Column → Wedge) |
 
 A drag becomes box selection after a small screen-space threshold so normal clicks are not interpreted as accidental boxes.
 
@@ -126,7 +127,10 @@ The client creates `MoveEntitiesCommand` with:
 - issuer `PlayerId`;
 - copied target entity IDs;
 - world target;
-- submission tick.
+- submission tick;
+- currently selected formation template.
+
+The development client starts with `Compact` and cycles the formation template with F3. This is a minimal command-surface control until the dedicated RTS command UI owns formation selection.
 
 It submits the command through `SimulationCoordinator.SubmitCommand` for the next simulation tick and uses the matching `SimulationCommandSource`.
 
