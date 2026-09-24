@@ -18,6 +18,8 @@ public sealed class GroundMovementSystem : ISimulationSystem
     private readonly SpatialQueryBuffer _obstacleBuffer = new(64);
     private readonly List<EntityId> _completedOrders = new();
     private readonly List<GroundMovementDebugAgent> _debugAgents = new();
+    private GroundMovementDebugSnapshot _lastDebugSnapshot =
+        GroundMovementDebugSnapshot.Empty;
 
     public GroundMovementSystem(
         ITerrainQuery? terrainQuery = null,
@@ -34,13 +36,11 @@ public sealed class GroundMovementSystem : ISimulationSystem
 
     public GroundMovementDiagnosticsSnapshot LastDiagnostics { get; private set; }
 
+    public bool DebugCaptureEnabled { get; set; }
+
     public GroundMovementDebugSnapshot CaptureDebugSnapshot()
     {
-        return _debugAgents.Count == 0
-            ? GroundMovementDebugSnapshot.Empty
-            : new GroundMovementDebugSnapshot(
-                System.Runtime.InteropServices.CollectionsMarshal.AsSpan(
-                    _debugAgents));
+        return _lastDebugSnapshot;
     }
 
     public void Execute(SimulationContext context)
@@ -146,6 +146,13 @@ public sealed class GroundMovementSystem : ISimulationSystem
             terrainBlockedUnits,
             neighborAdjustments,
             obstacleAdjustments);
+
+        _lastDebugSnapshot =
+            DebugCaptureEnabled && _debugAgents.Count > 0
+                ? new GroundMovementDebugSnapshot(
+                    System.Runtime.InteropServices.CollectionsMarshal.AsSpan(
+                        _debugAgents))
+                : GroundMovementDebugSnapshot.Empty;
     }
 
     private void ProcessOrderedMovement(
@@ -732,6 +739,11 @@ public sealed class GroundMovementSystem : ISimulationSystem
         Vector3 target,
         bool hasTarget)
     {
+        if (!DebugCaptureEnabled)
+        {
+            return;
+        }
+
         _debugAgents.Add(
             new GroundMovementDebugAgent(
                 entity,
