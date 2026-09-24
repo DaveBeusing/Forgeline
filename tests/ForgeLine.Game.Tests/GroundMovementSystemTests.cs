@@ -192,7 +192,9 @@ public sealed class GroundMovementSystemTests
 
         simulation.RegisterSystem(movementSystem);
 
-        simulation.RunTicks(3);
+        simulation.RunTicks(
+            3,
+            TestContext.Current.CancellationToken);
 
         WorldTransform transform =
             simulation.Entities.GetComponent<WorldTransform>(entity);
@@ -241,7 +243,9 @@ public sealed class GroundMovementSystemTests
             new Vector3(9.0f, 0.0f, 5.0f),
             acceptedAtTick: new SimulationTick(1));
         simulation.RegisterSystem(movementSystem);
-        simulation.RunTicks(3);
+        simulation.RunTicks(
+            3,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(
             GroundMovementStatus.Stuck,
@@ -530,7 +534,9 @@ public sealed class GroundMovementSystemTests
                 acceptedAtTick: new SimulationTick(2));
         }
 
-        simulation.RunTicks(10);
+        simulation.RunTicks(
+            10,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(
             1_000,
