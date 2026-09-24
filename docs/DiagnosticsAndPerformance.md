@@ -134,6 +134,10 @@ Simulation baselines cover:
 - command scheduling and processing
 - sequential range work
 - parallel scheduler range work
+- spatial radius queries at multiple query sizes
+- spatial AABB queries
+- filtered spatial queries with stable result ordering
+- updates of 10,000 indexed entries
 
 Run them with:
 
@@ -153,7 +157,7 @@ A bounded headless lightweight-entity scenario is available directly from the ho
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --ticks 64 --seed 42 --entities 10000 --diagnostics-output artifacts/stress-10000.json
 ```
 
-The simulation test suite also verifies that 10,000 lightweight ECS entities can exist and execute headless ticks without stale-entity or lifecycle failure. A 1,000-entity scenario exercises a representative multi-component load.
+The simulation test suite also verifies that 10,000 lightweight ECS entities can exist and execute headless ticks without stale-entity or lifecycle failure. Spatial correctness coverage separately indexes and repeatedly moves 10,000 entries, verifies queryability afterward, compares radius results against brute-force reference fixtures, and checks negative-coordinate and chunk-crossing semantics. A 1,000-entity scenario exercises a representative multi-component load.
 
 Gameplay-domain combat and logistics stress tests must be added only when those systems exist. Placeholder workloads must not be presented as representative gameplay performance.
 
@@ -195,6 +199,23 @@ The following remain non-binding engineering targets:
 
 They are engineering goals, not shipped product guarantees.
 
+
+## Spatial Index Diagnostics
+
+`SpatialGridIndex.CaptureDiagnostics()` exposes:
+
+- indexed entity count
+- occupied cell count
+- maximum cell occupancy
+- average cell occupancy
+- query count
+- total, average, and maximum query duration when query timing is enabled
+
+Query timing is optional so timing instrumentation does not become mandatory hot-path overhead. The Windows client enables it for the development scenario.
+
+`CaptureDebugSnapshot()` exposes a presentation-safe copy of occupied cell bounds and occupancy counts. F2 world debugging uses this snapshot to draw occupied cells and query regions without allowing rendering to mutate the simulation index.
+
+See [Spatial Index and World Queries](SpatialIndexAndWorldQueries.md) for query semantics, lifecycle ownership, and performance limits.
 
 ## Presentation Diagnostics
 
