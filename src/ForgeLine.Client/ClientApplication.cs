@@ -61,8 +61,11 @@ internal sealed class ClientApplication
                 EnableQueryTiming = true
             });
         var spatialSynchronizer = new SpatialIndexSynchronizer(spatialIndex);
+        var groundMovementSystem = new GroundMovementSystem(
+            terrainWorld,
+            spatialIndex);
 
-        simulation.RegisterSystem(new LinearMotionSystem());
+        simulation.RegisterSystem(groundMovementSystem);
         simulation.RegisterSystem(new SpatialIndexSystem(spatialSynchronizer));
         simulation.RegisterSystem(new SpatialIndexCleanupSystem(spatialSynchronizer));
         simulation.RegisterTickObserver(new PresentationExtractor(snapshotBuffer));
@@ -160,6 +163,8 @@ internal sealed class ClientApplication
                 PlatformKey.F2,
                 ref worldDebugToggleHeld,
                 ref worldDebugEnabled);
+            groundMovementSystem.DebugCaptureEnabled =
+                worldDebugEnabled;
 
             if (smokeTest &&
                 _platform.Clock.GetElapsedTime(startedAt, now) >= SmokeTestDuration)
@@ -236,7 +241,8 @@ internal sealed class ClientApplication
                 renderAlpha,
                 camera,
                 selectionController,
-                spatialIndex);
+                spatialIndex,
+                groundMovementSystem.CaptureDebugSnapshot());
 
             terrainRenderer.DebugChunksEnabled = worldDebugEnabled;
 
@@ -356,16 +362,30 @@ internal sealed class ClientApplication
                     Quaternion.Identity,
                     scale));
 
-            Vector3 velocity =
-                category != ControllableEntityCategory.Building &&
-                index % 6 == 0
-                    ? new Vector3(
-                        2.0f + (index % 5) * 0.35f,
-                        0.0f,
-                        0.0f)
-                    : Vector3.Zero;
+            if (category != ControllableEntityCategory.Building)
+            {
+                bool logistics =
+                    category == ControllableEntityCategory.Logistics;
 
-            simulation.Entities.AddComponent(entity, new LinearVelocity(velocity));
+                simulation.Entities.AddComponent(
+                    entity,
+                    new GroundMovement(
+                        maximumSpeed: logistics ? 10.0f : 14.0f,
+                        acceleration: logistics ? 6.0f : 9.0f,
+                        deceleration: logistics ? 9.0f : 12.0f,
+                        turnRateRadiansPerSecond:
+                            logistics ? MathF.PI * 0.6f : MathF.PI,
+                        radius: scale.X * 0.5f,
+                        stopRadius: 1.0f,
+                        separationRadius: scale.X + 2.0f,
+                        obstacleLookAhead: logistics ? 14.0f : 10.0f,
+                        maximumSlopeDegrees: logistics ? 28.0f : 35.0f,
+                        heightOffset: scale.Y * 0.5f));
+                simulation.Entities.AddComponent(
+                    entity,
+                    GroundMovementState.Stationary());
+            }
+
             simulation.Entities.AddComponent(entity, new VisualIdentity(1));
             simulation.Entities.AddComponent(
                 entity,
@@ -390,7 +410,8 @@ internal sealed class ClientApplication
         float alpha,
         RtsCamera camera,
         RtsSelectionController selectionController,
-        SpatialGridIndex spatialIndex)
+        SpatialGridIndex spatialIndex,
+        GroundMovementDebugSnapshot movementSnapshot)
     {
         debugDraw.Clear();
 
@@ -430,6 +451,10 @@ internal sealed class ClientApplication
                 new Vector4(1.0f, 0.35f, 0.15f, 1.0f),
                 maximumCells: 256,
                 maximumLabels: MaximumDebugLabels);
+            GroundMovementDebugVisualization.Draw(
+                debugDraw,
+                movementSnapshot,
+                maximumAgents: 64);
 
             int debugCount = Math.Min(
                 renderWorld.InstanceCount,
