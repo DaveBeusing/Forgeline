@@ -10,8 +10,9 @@ public sealed class DebugDrawRenderer : IDisposable
     private const int VertexStride = 28;
     private const int RootConstantCount = 16;
 
+    private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;
-    private readonly IGraphicsBuffer _vertexBuffer;
+    private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers = new(4);
     private readonly DebugVertex[] _vertices =
         new DebugVertex[MaxLines * 2];
     private bool _disposed;
@@ -20,11 +21,8 @@ public sealed class DebugDrawRenderer : IDisposable
     {
         ArgumentNullException.ThrowIfNull(graphics);
 
+        _graphics = graphics;
         _pipeline = CreatePipeline(graphics);
-        _vertexBuffer = graphics.CreateBuffer(
-            new GraphicsBufferDescription(
-                checked((ulong)_vertices.Length * VertexStride),
-                GraphicsBufferMemory.Upload));
     }
 
     public DebugDrawRenderDiagnostics LastDiagnostics { get; private set; }
@@ -59,7 +57,8 @@ public sealed class DebugDrawRenderer : IDisposable
                 new DebugVertex(line.End, line.Color);
         }
 
-        _vertexBuffer.SetData<DebugVertex>(
+        IGraphicsBuffer vertexBuffer = GetFrameVertexBuffer(context.FrameIndex);
+        vertexBuffer.SetData<DebugVertex>(
             _vertices.AsSpan(0, vertexCount));
 
         CameraMatrices matrices =
@@ -71,7 +70,7 @@ public sealed class DebugDrawRenderer : IDisposable
 
         context.SetPipeline(_pipeline);
         context.SetVertexConstants(constants);
-        context.SetVertexBuffer(_vertexBuffer, VertexStride);
+        context.SetVertexBuffer(vertexBuffer, VertexStride);
         context.Draw(vertexCount);
 
         LastDiagnostics = new DebugDrawRenderDiagnostics(
@@ -88,9 +87,29 @@ public sealed class DebugDrawRenderer : IDisposable
             return;
         }
 
-        _vertexBuffer.Dispose();
+        foreach (IGraphicsBuffer vertexBuffer in _vertexBuffers.Values)
+        {
+            vertexBuffer.Dispose();
+        }
+
+        _vertexBuffers.Clear();
         _pipeline.Dispose();
         _disposed = true;
+    }
+
+    private IGraphicsBuffer GetFrameVertexBuffer(int frameIndex)
+    {
+        if (_vertexBuffers.TryGetValue(frameIndex, out IGraphicsBuffer? buffer))
+        {
+            return buffer;
+        }
+
+        buffer = _graphics.CreateBuffer(
+            new GraphicsBufferDescription(
+                checked((ulong)_vertices.Length * VertexStride),
+                GraphicsBufferMemory.Upload));
+        _vertexBuffers.Add(frameIndex, buffer);
+        return buffer;
     }
 
     private static IGraphicsPipeline CreatePipeline(

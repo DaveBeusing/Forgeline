@@ -13,8 +13,9 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
     private const float GlyphAdvance = 12.0f;
     private const float LineAdvance = 16.0f;
 
+    private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;
-    private readonly IGraphicsBuffer _vertexBuffer;
+    private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers = new(4);
     private readonly OverlayVertex[] _vertices =
         new OverlayVertex[MaxVertices];
     private int _vertexCount;
@@ -24,11 +25,8 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
     {
         ArgumentNullException.ThrowIfNull(graphics);
 
+        _graphics = graphics;
         _pipeline = CreatePipeline(graphics);
-        _vertexBuffer = graphics.CreateBuffer(
-            new GraphicsBufferDescription(
-                checked((ulong)_vertices.Length * VertexStride),
-                GraphicsBufferMemory.Upload));
     }
 
     public int LastRenderedVertexCount { get; private set; }
@@ -134,11 +132,12 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             return;
         }
 
-        _vertexBuffer.SetData<OverlayVertex>(
+        IGraphicsBuffer vertexBuffer = GetFrameVertexBuffer(context.FrameIndex);
+        vertexBuffer.SetData<OverlayVertex>(
             _vertices.AsSpan(0, _vertexCount));
 
         context.SetPipeline(_pipeline);
-        context.SetVertexBuffer(_vertexBuffer, VertexStride);
+        context.SetVertexBuffer(vertexBuffer, VertexStride);
         context.Draw(_vertexCount);
 
         LastRenderedVertexCount = _vertexCount;
@@ -151,7 +150,12 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             return;
         }
 
-        _vertexBuffer.Dispose();
+        foreach (IGraphicsBuffer vertexBuffer in _vertexBuffers.Values)
+        {
+            vertexBuffer.Dispose();
+        }
+
+        _vertexBuffers.Clear();
         _pipeline.Dispose();
         _disposed = true;
     }
@@ -261,6 +265,21 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             new OverlayVertex(bottomLeft, color);
         _vertices[_vertexCount++] =
             new OverlayVertex(bottomRight, color);
+    }
+
+    private IGraphicsBuffer GetFrameVertexBuffer(int frameIndex)
+    {
+        if (_vertexBuffers.TryGetValue(frameIndex, out IGraphicsBuffer? buffer))
+        {
+            return buffer;
+        }
+
+        buffer = _graphics.CreateBuffer(
+            new GraphicsBufferDescription(
+                checked((ulong)_vertices.Length * VertexStride),
+                GraphicsBufferMemory.Upload));
+        _vertexBuffers.Add(frameIndex, buffer);
+        return buffer;
     }
 
     private static IGraphicsPipeline CreatePipeline(
