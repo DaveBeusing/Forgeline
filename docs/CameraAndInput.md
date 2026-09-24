@@ -33,7 +33,7 @@ The camera foundation establishes the initial FORGELINE presentation convention:
 - projected depth uses the Direct3D-compatible normalized range **0..1**
 - screen coordinates use a top-left origin with +X right and +Y down
 
-The camera target/focus point lies on arbitrary world coordinates; the client validation scene currently places its placeholder grid on Y=0.
+The camera target/focus point lies on arbitrary world coordinates. The Windows client initializes its target at the sampled development-terrain height near the world origin; panning then remains a presentation transform and can cross chunk boundaries without mutating world state.
 
 ## Default Controls
 
@@ -129,11 +129,11 @@ Losing focus invalidates the pointer for edge scrolling until a new pointer even
 
 `ScreenPointToWorldRay` produces a world-space ray suitable for future terrain, selection, and command picking.
 
-`TryScreenPointToWorldOnHorizontalPlane` intersects that ray with a configurable horizontal world plane and provides a direct screen-to-world coordinate helper for placeholder terrain and later ground interactions.
+`TryScreenPointToWorldOnHorizontalPlane` intersects that ray with a configurable horizontal world plane. The canonical heightfield query API can be used separately when later selection/placement workflows require the actual terrain surface.
 
 `WorldToScreen` projects a world point into client pixels and reports normalized depth plus current clip visibility.
 
-These helpers do not read simulation state and remain usable with placeholder worlds, presentation snapshots, or future terrain systems.
+These helpers do not read simulation state and remain usable with the current terrain world, presentation snapshots, and future gameplay read models.
 
 ## Diagnostics
 
@@ -148,18 +148,19 @@ These helpers do not read simulation state and remain usable with placeholder wo
 
 The Windows client emits camera diagnostics at startup, periodically while running, and at shutdown.
 
-## Validation Scene
+## Terrain Validation Scene
 
-The current client renders a lightweight placeholder ground grid without introducing terrain or gameplay rendering.
+The current client renders the representative chunked heightfield world through the RTS camera.
 
-Grid markers are world-space points on Y=0 projected through the RTS camera. Their screen-space draw positions therefore respond to:
+Camera navigation directly exercises:
 
-- keyboard pan
-- drag pan
-- edge scroll
+- keyboard and drag panning across chunk boundaries
+- edge scrolling
 - yaw rotation
 - pitch
 - zoom
 - window aspect changes
+- chunk-level frustum culling
+- world-space depth-tested terrain
 
-This scene exists only to validate navigation feel and projection correctness. It does not create simulation entities or gameplay state.
+Terrain remains world/presentation state rather than simulation gameplay state. See [World and Terrain](WorldAndTerrain.md) for the canonical coordinate model and terrain-rendering boundary.

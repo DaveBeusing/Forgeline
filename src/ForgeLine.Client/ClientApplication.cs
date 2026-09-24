@@ -3,18 +3,17 @@ using ForgeLine.Graphics;
 using ForgeLine.Input;
 using ForgeLine.Platform;
 using ForgeLine.Presentation;
+using ForgeLine.World;
 
 namespace ForgeLine.Client;
 
 internal sealed class ClientApplication
 {
     private const float MaximumCameraDeltaSeconds = 0.1f;
-    private const float ValidationGridSpacing = 10.0f;
-    private const int ValidationGridRadius = 12;
 
     private static readonly TimeSpan IdleWait = TimeSpan.FromMilliseconds(16);
     private static readonly TimeSpan SmokeTestDuration = TimeSpan.FromMilliseconds(250);
-    private static readonly TimeSpan CameraDiagnosticInterval = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan DiagnosticInterval = TimeSpan.FromSeconds(1);
 
     private readonly IPlatform _platform;
 
@@ -34,19 +33,42 @@ internal sealed class ClientApplication
 
         using IWindow window = _platform.CreateWindow(configuration);
         using IGraphicsDevice graphics = GraphicsDeviceFactory.CreateForWindow(window);
-        using IGraphicsPipeline validationPipeline = CreateValidationPipeline(graphics);
+
+        TerrainWorld world =
+            DevelopmentTerrainFactory.CreateRepresentativeWorld();
+        using var terrainRenderer = new TerrainRenderer(graphics, world)
+        {
+            DebugChunksEnabled = true
+        };
+
+        float targetHeight = world.TrySampleHeight(
+            0.0f,
+            0.0f,
+            out float sampledHeight)
+            ? sampledHeight
+            : 0.0f;
 
         var inputState = new InputState();
         var actionMapper = new RtsCameraActionMapper();
-        var camera = new RtsCamera();
+        var camera = new RtsCamera(
+            new RtsCameraSettings
+            {
+                InitialTarget = new Vector3(0.0f, targetHeight, 0.0f),
+                InitialDistance = 420.0f,
+                MinimumDistance = 20.0f,
+                MaximumDistance = 1_200.0f,
+                PanReferenceDistance = 180.0f,
+                MaximumPanSpeedScale = 5.0f
+            });
 
         WriteWindowState("started", window);
         WriteGraphicsState("started", graphics);
+        WriteWorldState("started", world);
         WriteCameraState("started", camera);
 
         long startedAt = _platform.Clock.GetTimestamp();
         long previousFrameAt = startedAt;
-        long nextCameraDiagnosticAt = startedAt;
+        long nextDiagnosticAt = startedAt;
 
         while (window.IsOpen)
         {
@@ -92,24 +114,28 @@ internal sealed class ClientApplication
 
             graphics.RenderFrame(
                 GraphicsColor.ForgeLineClear,
-                context => DrawValidationScene(context, validationPipeline, camera));
+                context => terrainRenderer.Render(context, camera));
 
-            if (_platform.Clock.GetElapsedTime(nextCameraDiagnosticAt, now) >=
-                CameraDiagnosticInterval)
+            if (_platform.Clock.GetElapsedTime(nextDiagnosticAt, now) >=
+                DiagnosticInterval)
             {
                 WriteCameraState("frame", camera);
-                nextCameraDiagnosticAt = now;
+                WriteTerrainState("frame", terrainRenderer);
+                nextDiagnosticAt = now;
             }
         }
 
         DrainWindowEvents(window, graphics);
         DrainInputEvents(window, inputState);
         WriteCameraState("stopped", camera);
+        WriteTerrainState("stopped", terrainRenderer);
         WriteGraphicsState("stopped", graphics);
         return 0;
     }
 
-    private static void DrainWindowEvents(IWindow window, IGraphicsDevice graphics)
+    private static void DrainWindowEvents(
+        IWindow window,
+        IGraphicsDevice graphics)
     {
         WindowSize? resizeTarget = null;
 
@@ -138,7 +164,9 @@ internal sealed class ClientApplication
         }
     }
 
-    private static void DrainInputEvents(IWindow window, InputState inputState)
+    private static void DrainInputEvents(
+        IWindow window,
+        InputState inputState)
     {
         while (window.TryDequeueInputEvent(out PlatformInputEvent inputEvent))
         {
@@ -146,123 +174,9 @@ internal sealed class ClientApplication
         }
     }
 
-    private static IGraphicsPipeline CreateValidationPipeline(IGraphicsDevice graphics)
-    {
-        const string vertexShaderSource = """
-            float4 VSMain(uint vertexId : SV_VertexID) : SV_Position
-            {
-                float2 positions[3] =
-                {
-                    float2(0.0f, -0.85f),
-                    float2(0.75f, 0.65f),
-                    float2(-0.75f, 0.65f)
-                };
-
-                return float4(positions[vertexId], 0.0f, 1.0f);
-            }
-            """;
-
-        const string pixelShaderSource = """
-            float4 PSMain() : SV_Target0
-            {
-                return float4(0.95f, 0.58f, 0.12f, 1.0f);
-            }
-            """;
-
-        var compiler = new DxcShaderCompiler();
-        GraphicsShaderBytecode vertexShader = compiler.Compile(
-            vertexShaderSource,
-            GraphicsShaderStage.Vertex,
-            "VSMain",
-            "RtsCameraValidationVertex.hlsl");
-        GraphicsShaderBytecode pixelShader = compiler.Compile(
-            pixelShaderSource,
-            GraphicsShaderStage.Pixel,
-            "PSMain",
-            "RtsCameraValidationPixel.hlsl");
-
-        IGraphicsPipeline pipeline = graphics.CreateGraphicsPipeline(
-            new GraphicsPipelineDescription(vertexShader, pixelShader));
-
-        Console.WriteLine(
-            $"[graphics:shader] vertexBytes={vertexShader.Data.Length} " +
-            $"pixelBytes={pixelShader.Data.Length} pipeline=validation-grid");
-
-        return pipeline;
-    }
-
-    private static void DrawValidationScene(
-        IGraphicsCommandContext context,
-        IGraphicsPipeline pipeline,
-        RtsCamera camera)
-    {
-        context.SetPipeline(pipeline);
-
-        float centerX =
-            MathF.Round(camera.Target.X / ValidationGridSpacing) *
-            ValidationGridSpacing;
-        float centerZ =
-            MathF.Round(camera.Target.Z / ValidationGridSpacing) *
-            ValidationGridSpacing;
-
-        float markerSize = Math.Clamp(
-            7.0f * (camera.Settings.PanReferenceDistance / camera.Distance),
-            2.0f,
-            9.0f);
-        float halfMarker = markerSize * 0.5f;
-
-        for (int z = -ValidationGridRadius; z <= ValidationGridRadius; z++)
-        {
-            for (int x = -ValidationGridRadius; x <= ValidationGridRadius; x++)
-            {
-                var world = new Vector3(
-                    centerX + x * ValidationGridSpacing,
-                    0.0f,
-                    centerZ + z * ValidationGridSpacing);
-
-                ScreenProjection projected =
-                    camera.WorldToScreen(world, context.Width, context.Height);
-
-                if (!projected.IsVisible ||
-                    projected.Position.X < halfMarker ||
-                    projected.Position.Y < halfMarker ||
-                    projected.Position.X >= context.Width - halfMarker ||
-                    projected.Position.Y >= context.Height - halfMarker)
-                {
-                    continue;
-                }
-
-                float left = projected.Position.X - halfMarker;
-                float top = projected.Position.Y - halfMarker;
-                int scissorLeft = Math.Max(0, (int)MathF.Floor(left));
-                int scissorTop = Math.Max(0, (int)MathF.Floor(top));
-                int scissorRight = Math.Min(
-                    context.Width,
-                    (int)MathF.Ceiling(left + markerSize));
-                int scissorBottom = Math.Min(
-                    context.Height,
-                    (int)MathF.Ceiling(top + markerSize));
-
-                if (scissorRight <= scissorLeft || scissorBottom <= scissorTop)
-                {
-                    continue;
-                }
-
-                context.SetViewport(left, top, markerSize, markerSize);
-                context.SetScissor(
-                    scissorLeft,
-                    scissorTop,
-                    scissorRight,
-                    scissorBottom);
-                context.Draw(3);
-            }
-        }
-
-        context.SetViewport(0, 0, context.Width, context.Height);
-        context.SetScissor(0, 0, context.Width, context.Height);
-    }
-
-    private static void WriteWindowState(string state, IWindow window)
+    private static void WriteWindowState(
+        string state,
+        IWindow window)
     {
         Console.WriteLine(
             $"[platform:{state}] handle=0x{window.NativeHandle.Value:X} " +
@@ -271,7 +185,9 @@ internal sealed class ClientApplication
             $"minimized={window.IsMinimized} mode={window.Mode}");
     }
 
-    private static void WriteGraphicsState(string state, IGraphicsDevice graphics)
+    private static void WriteGraphicsState(
+        string state,
+        IGraphicsDevice graphics)
     {
         GraphicsDiagnostics diagnostics = graphics.Diagnostics;
 
@@ -286,7 +202,23 @@ internal sealed class ClientApplication
             $"suspended={diagnostics.Surface.IsSuspended}");
     }
 
-    private static void WriteCameraState(string state, RtsCamera camera)
+    private static void WriteWorldState(
+        string state,
+        TerrainWorld world)
+    {
+        AxisAlignedBounds bounds = world.WorldBounds;
+
+        Console.WriteLine(
+            $"[world:{state}] chunks={world.Chunks.Count} " +
+            $"chunkMeters={world.Settings.ChunkSizeMeters:F0} " +
+            $"heightSamples={world.Settings.HeightSamplesPerSide} " +
+            $"boundsMin=({bounds.Minimum.X:F0},{bounds.Minimum.Y:F1},{bounds.Minimum.Z:F0}) " +
+            $"boundsMax=({bounds.Maximum.X:F0},{bounds.Maximum.Y:F1},{bounds.Maximum.Z:F0})");
+    }
+
+    private static void WriteCameraState(
+        string state,
+        RtsCamera camera)
     {
         RtsCameraDiagnostics diagnostics = camera.GetDiagnostics();
 
@@ -298,5 +230,21 @@ internal sealed class ClientApplication
             $"distance={diagnostics.Distance:F1} " +
             $"cursor=({diagnostics.PointerPosition.X:F0},{diagnostics.PointerPosition.Y:F0}) " +
             $"cursorValid={diagnostics.HasPointerPosition}");
+    }
+
+    private static void WriteTerrainState(
+        string state,
+        TerrainRenderer terrainRenderer)
+    {
+        TerrainRenderDiagnostics diagnostics =
+            terrainRenderer.LastDiagnostics;
+
+        Console.WriteLine(
+            $"[terrain:{state}] totalChunks={diagnostics.TotalChunks} " +
+            $"visibleChunks={diagnostics.VisibleChunks} " +
+            $"culledChunks={diagnostics.CulledChunks} " +
+            $"triangles={diagnostics.SubmittedTriangles} " +
+            $"drawCalls={diagnostics.DrawCalls} " +
+            $"staticBuffers={diagnostics.UploadedBufferCount}");
     }
 }

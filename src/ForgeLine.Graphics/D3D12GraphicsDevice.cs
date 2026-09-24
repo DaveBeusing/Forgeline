@@ -10,6 +10,7 @@ namespace ForgeLine.Graphics;
 internal sealed class D3D12GraphicsDevice : IGraphicsDevice
 {
     private const Format BackBufferFormat = Format.R8G8B8A8_UNorm;
+    private const Format DepthBufferFormat = Format.D32_Float;
 
     private readonly GraphicsConfiguration _configuration;
     private readonly IDXGIFactory4 _factory;
@@ -17,6 +18,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     private readonly ID3D12CommandQueue _commandQueue;
     private readonly IDXGISwapChain3 _swapChain;
     private readonly ID3D12DescriptorHeap _rtvHeap;
+    private readonly ID3D12DescriptorHeap _dsvHeap;
     private readonly uint _rtvDescriptorSize;
     private readonly ID3D12CommandAllocator[] _commandAllocators;
     private readonly ID3D12Resource[] _renderTargets;
@@ -26,6 +28,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     private readonly AutoResetEvent _frameFenceEvent;
     private readonly GraphicsDeviceInfo _deviceInfo;
 
+    private ID3D12Resource? _depthTarget;
     private ulong _nextFenceValue = 1;
     private int _frameIndex;
     private int _width;
@@ -86,6 +89,10 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                 (uint)configuration.BufferCount));
         _rtvDescriptorSize =
             _device.GetDescriptorHandleIncrementSize(DescriptorHeapType.RenderTargetView);
+        _dsvHeap = _device.CreateDescriptorHeap(
+            new DescriptorHeapDescription(
+                DescriptorHeapType.DepthStencilView,
+                1));
 
         _renderTargets = new ID3D12Resource[configuration.BufferCount];
         _commandAllocators = new ID3D12CommandAllocator[configuration.BufferCount];
@@ -155,9 +162,35 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             RootSignatureFlags.DenyAmplificationShaderRootAccess |
             RootSignatureFlags.DenyMeshShaderRootAccess;
 
+        RootParameter1[]? rootParameters =
+            description.VertexRootConstantCount > 0
+                ? [
+                    new RootParameter1(
+                        new RootConstants(
+                            0,
+                            0,
+                            checked((uint)description.VertexRootConstantCount)),
+                        ShaderVisibility.Vertex)
+                ]
+                : null;
+
         ID3D12RootSignature rootSignature =
-            _device.CreateRootSignature(new RootSignatureDescription1(rootSignatureFlags));
+            _device.CreateRootSignature(
+                new RootSignatureDescription1(
+                    rootSignatureFlags,
+                    rootParameters));
         rootSignature.Name = "ForgeLine Graphics Root Signature";
+
+        InputElementDescription[] inputElements = description.VertexElements
+            .Select(
+                static element =>
+                    new InputElementDescription(
+                        element.SemanticName,
+                        checked((uint)element.SemanticIndex),
+                        ToNativeFormat(element.Format),
+                        checked((uint)element.OffsetInBytes),
+                        0))
+            .ToArray();
 
         try
         {
@@ -166,12 +199,16 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                 RootSignature = rootSignature,
                 VertexShader = description.VertexShader.Data,
                 PixelShader = description.PixelShader.Data,
+                InputLayout = new InputLayoutDescription(inputElements),
                 SampleMask = uint.MaxValue,
                 PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
                 RasterizerState = RasterizerDescription.CullCounterClockwise,
                 BlendState = BlendDescription.Opaque,
-                DepthStencilState = DepthStencilDescription.None,
+                DepthStencilState = description.DepthEnabled
+                    ? DepthStencilDescription.Default
+                    : DepthStencilDescription.None,
                 RenderTargetFormats = [BackBufferFormat],
+                DepthStencilFormat = DepthBufferFormat,
                 SampleDescription = SampleDescription.Default
             };
 
@@ -224,7 +261,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             ResourceDescription.Buffer(description.SizeInBytes),
             initialState);
 
-        return new D3D12GraphicsBuffer(description, resource);
+        return new D3D12GraphicsBuffer(this, description, resource);
     }
 
     public void RenderFrame(
@@ -255,7 +292,10 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             _frameIndex,
             _rtvDescriptorSize);
 
-        _commandList.OMSetRenderTargets(rtv);
+        CpuDescriptorHandle dsv =
+            _dsvHeap.GetCPUDescriptorHandleForHeapStart();
+
+        _commandList.OMSetRenderTargets(rtv, dsv);
         _commandList.ClearRenderTargetView(
             rtv,
             new Color4(
@@ -263,6 +303,11 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                 clearColor.Green,
                 clearColor.Blue,
                 clearColor.Alpha));
+        _commandList.ClearDepthStencilView(
+            dsv,
+            ClearFlags.Depth,
+            1.0f,
+            0);
 
         var context = new D3D12GraphicsCommandContext(
             this,
@@ -383,6 +428,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         }
 
         _commandList.Dispose();
+        _dsvHeap.Dispose();
         _rtvHeap.Dispose();
         _swapChain.Dispose();
         _frameFence.Dispose();
@@ -419,10 +465,38 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             _device.CreateRenderTargetView(renderTarget, null, rtv);
             rtv += (int)_rtvDescriptorSize;
         }
+
+        ResourceDescription depthDescription = ResourceDescription.Texture2D(
+            DepthBufferFormat,
+            checked((uint)_width),
+            checked((uint)_height),
+            flags: ResourceFlags.AllowDepthStencil);
+        var clearValue = new ClearValue(DepthBufferFormat, 1.0f, 0);
+
+        _depthTarget = _device.CreateCommittedResource(
+            HeapType.Default,
+            depthDescription,
+            ResourceStates.DepthWrite,
+            clearValue);
+        _depthTarget.Name = "ForgeLine Depth Buffer";
+
+        DepthStencilViewDescription depthViewDescription = new()
+        {
+            Format = DepthBufferFormat,
+            ViewDimension = DepthStencilViewDimension.Texture2D
+        };
+
+        _device.CreateDepthStencilView(
+            _depthTarget,
+            depthViewDescription,
+            _dsvHeap.GetCPUDescriptorHandleForHeapStart());
     }
 
     private void ReleaseRenderTargets()
     {
+        _depthTarget?.Dispose();
+        _depthTarget = null;
+
         for (int index = 0; index < _renderTargets.Length; index++)
         {
             _renderTargets[index]?.Dispose();
@@ -441,6 +515,15 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         _frameFence.SetEventOnCompletion(fenceValue, _frameFenceEvent);
         _frameFenceEvent.WaitOne();
     }
+
+    private static Format ToNativeFormat(GraphicsVertexElementFormat format) =>
+        format switch
+        {
+            GraphicsVertexElementFormat.Float2 => Format.R32G32_Float,
+            GraphicsVertexElementFormat.Float3 => Format.R32G32B32_Float,
+            GraphicsVertexElementFormat.Float4 => Format.R32G32B32A32_Float,
+            _ => throw new ArgumentOutOfRangeException(nameof(format))
+        };
 
     private GraphicsDeviceException CreateDeviceFailure(
         string message,
