@@ -101,6 +101,7 @@ public sealed class SimulationCoordinator
         {
             SimulationTick tick = Clock.Advance();
             _context.Tick = tick;
+            _context.TickDuration = Clock.TickDuration;
 
             ReadOnlySpan<SimulationPhase> phases = SimulationPhaseOrder.All;
             for (int index = 0; index < phases.Length; index++)
