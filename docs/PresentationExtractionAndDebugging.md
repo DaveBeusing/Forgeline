@@ -84,16 +84,18 @@ Interpolated transforms are presentation-only. They never feed back into simulat
 
 ## Current Test Entity Path
 
-`ForgeLine.Game` currently provides the minimal simulation-side fixture used to validate the boundary:
+`ForgeLine.Game` provides the simulation-side state used by the current interactive movement path:
 
 - `WorldTransform`;
-- `LinearVelocity`;
-- `VisualIdentity`;
-- `LinearMotionSystem`.
+- `MovementOrder`;
+- `GroundMovement`;
+- `GroundMovementState`;
+- `GroundMovementSystem`;
+- `VisualIdentity`.
 
 `VisualIdentity` contains a stable numeric visual identifier and visibility flags only. It contains no GPU resources, graphics objects, pipelines, shaders, or presentation references.
 
-The Windows client creates a configurable grid of these entities. A subset moves at the fixed simulation rate while the renderer displays smooth interpolated transforms.
+The Windows client creates a configurable grid of controllable ground entities. Accepted movement commands are consumed by authoritative fixed-tick locomotion while the renderer displays smoothly interpolated extracted transforms. `LinearVelocity` and `LinearMotionSystem` remain narrow low-level fixtures for validating fixed-tick transform integration independently of RTS locomotion.
 
 Use:
 
@@ -137,7 +139,7 @@ When disabled, primitive methods return before collecting geometry. Regression c
 The Windows client uses:
 
 - **F1** — toggle the development metrics overlay;
-- **F2** — toggle world debug visualization, including terrain chunk debug state and entity bounds.
+- **F2** — toggle world debug visualization, including terrain chunk debug state, entity bounds, ground-movement velocity vectors, targets, and local steering neighborhoods.
 
 ## Development Overlay
 
@@ -203,3 +205,5 @@ This is a stability/submission smoke workload, not a performance pass/fail thres
 It also rejects graphics/audio/UI/presentation/client/Windows dependencies from `ForgeLine.Headless`.
 
 These checks preserve the invariant that a complete simulation remains runnable without presentation or graphics initialization.
+
+Ground-movement debug capture is opt-in and copies immutable diagnostic values at simulation tick boundaries. Presentation never retains live ECS movement references. See [Ground Movement and Local Steering](GroundMovementAndSteering.md).
