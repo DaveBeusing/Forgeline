@@ -52,7 +52,7 @@ The repository validates several of these invariants with `build/Validate-Projec
 ### Simulation Foundation
 
 - `ForgeLine.Ecs`: custom data-oriented entity/component storage and queries. The implemented low-level contracts and invariants are documented in `docs/Ecs.md`.
-- `ForgeLine.Jobs`: persistent-worker job scheduling and synchronization.
+- `ForgeLine.Jobs`: persistent-worker job scheduling, dependency handles, range execution, fences, failure propagation, and timing instrumentation. The implemented contracts and safe usage rules are documented in `docs/JobSystem.md`.
 - `ForgeLine.World`: chunk-based world ownership and spatial foundations.
 - `ForgeLine.Navigation`: hierarchical RTS navigation boundaries.
 - `ForgeLine.Simulation`: command-driven fixed-tick coordination, explicit phase ordering, simulation-owned randomness, and common simulation infrastructure.
@@ -99,7 +99,7 @@ Simulation code is written in a deterministic-friendly style:
 - seeded simulation-owned randomness
 - no wall-clock simulation decisions
 - no rendering-dependent game state
-- controlled parallel reductions when job execution is introduced
+- controlled parallel reductions across job execution
 
 Perfect cross-machine bit-level determinism is not a first-prototype requirement.
 
@@ -136,6 +136,6 @@ Performance-sensitive decisions are benchmark-driven. The architecture targets a
 - 10,000+ lightweight simulation entities as an early stress target
 - 60+ FPS rendering on target hardware
 
-The simulation benchmark host includes empty and light fixed-tick workloads to track baseline runtime overhead.
+The simulation benchmark host includes empty and light fixed-tick workloads plus representative sequential-versus-parallel scheduler range workloads. Benchmark timing remains observational rather than a CI timing gate.
 
 These are engineering targets, not product promises.

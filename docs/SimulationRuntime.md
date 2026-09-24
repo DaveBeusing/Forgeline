@@ -4,7 +4,7 @@
 
 ForgeLine Simulation provides the deterministic-friendly execution boundary shared by interactive and headless game composition.
 
-The runtime owns logical tick progression, explicit simulation phases, command ingestion, simulation-owned random state, ECS access, and lightweight loop metrics. It has no dependency on rendering, audio, UI, windowing, or wall-clock pacing.
+The runtime owns logical tick progression, explicit simulation phases, command ingestion, simulation-owned random state, ECS access, optional parallel job integration, and lightweight loop metrics. It has no dependency on rendering, audio, UI, windowing, or wall-clock pacing.
 
 ## Fixed-Tick Semantics
 
@@ -67,11 +67,32 @@ UI, input, network, replay, and automation layers must not bypass this boundary 
 
 ## Simulation State and ECS
 
-`SimulationContext` exposes the simulation-owned `EntityRegistry`, current tick, current phase, and deterministic random source to commands and systems.
+`SimulationContext` exposes the simulation-owned `EntityRegistry`, current tick, current phase, deterministic random source, and the opt-in `SimulationJobs` boundary to commands and systems.
 
 The ECS remains responsible for entity/component lifetime and storage. The simulation runtime coordinates when systems and commands are allowed to operate on that state.
 
 Later gameplay systems should prefer stable ECS query ordering wherever gameplay outcomes can depend on iteration order.
+
+## Parallel Simulation Jobs
+
+A `SimulationCoordinator` remains single-threaded unless a `JobScheduler` is supplied during composition.
+
+When a scheduler is present, systems can use `context.Jobs` to schedule bounded work or contiguous `ParallelFor` ranges. Scheduled work is tracked by the simulation context and completed at the current system boundary before the next registered system is invoked.
+
+This preserves the existing guarantees:
+
+- phase order remains explicit;
+- registration order within a phase remains meaningful;
+- one system cannot accidentally leave simulation work running into the next system;
+- a worker exception is rethrown on the simulation coordinator thread;
+- a failed dependency prevents dependent work from executing;
+- systems that do not benefit from parallel execution remain unchanged.
+
+Systems may explicitly wait for a handle when a result is needed before `Execute` returns. Worker jobs must not synchronously wait on unfinished work from the same scheduler because that can deadlock a bounded worker pool.
+
+Parallel work must write to independent ranges or use an explicitly controlled merge/reduction step when output ordering matters. Shared simulation RNG access from parallel jobs is not safe merely because the scheduler is available; randomness that affects outcomes must retain a defined request order or use deliberately partitioned deterministic streams.
+
+The coordinator does not own an injected scheduler. The composition root that creates the scheduler is responsible for its shutdown and disposal.
 
 ## Random Number Ownership
 
@@ -130,4 +151,4 @@ Required practices are:
 - avoid rendering-dependent game-state mutation;
 - keep headless and interactive simulation execution on the same runtime contracts.
 
-Parallel job execution, rollback, replay persistence, savegame persistence, networking, and domain gameplay commands remain outside this runtime foundation and must preserve these contracts when introduced.
+Rollback, replay persistence, savegame persistence, networking, and domain gameplay commands remain outside this runtime foundation and must preserve these contracts when introduced.
