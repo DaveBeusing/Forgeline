@@ -141,6 +141,57 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
 
     private string PresentMode => _configuration.EnableVSync ? "VSync" : "Immediate";
 
+    public IGraphicsPipeline CreateGraphicsPipeline(GraphicsPipelineDescription description)
+    {
+        ThrowIfDisposed();
+        ArgumentNullException.ThrowIfNull(description);
+        description.Validate();
+
+        RootSignatureFlags rootSignatureFlags =
+            RootSignatureFlags.AllowInputAssemblerInputLayout |
+            RootSignatureFlags.DenyHullShaderRootAccess |
+            RootSignatureFlags.DenyDomainShaderRootAccess |
+            RootSignatureFlags.DenyGeometryShaderRootAccess |
+            RootSignatureFlags.DenyAmplificationShaderRootAccess |
+            RootSignatureFlags.DenyMeshShaderRootAccess;
+
+        ID3D12RootSignature rootSignature =
+            _device.CreateRootSignature(new RootSignatureDescription1(rootSignatureFlags));
+        rootSignature.Name = "ForgeLine Graphics Root Signature";
+
+        try
+        {
+            PipelineStateStream pipelineStateStream = new()
+            {
+                RootSignature = rootSignature,
+                VertexShader = description.VertexShader.Data.Span,
+                PixelShader = description.PixelShader.Data.Span,
+                SampleMask = uint.MaxValue,
+                PrimitiveTopology = PrimitiveTopologyType.Triangle,
+                RasterizerState = RasterizerDescription.CullCounterClockwise,
+                BlendState = BlendDescription.Opaque,
+                DepthStencilState = DepthStencilDescription.None,
+                RenderTargetFormats = [BackBufferFormat],
+                SampleDescription = SampleDescription.Default
+            };
+
+            ID3D12PipelineState pipelineState =
+                _device.CreatePipelineState(pipelineStateStream);
+            pipelineState.Name = "ForgeLine Graphics Pipeline";
+
+            return new D3D12GraphicsPipeline(
+                this,
+                description,
+                rootSignature,
+                pipelineState);
+        }
+        catch
+        {
+            rootSignature.Dispose();
+            throw;
+        }
+    }
+
     public IGraphicsBuffer CreateBuffer(GraphicsBufferDescription description)
     {
         ThrowIfDisposed();
@@ -214,6 +265,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                 clearColor.Alpha));
 
         var context = new D3D12GraphicsCommandContext(
+            this,
             _commandList,
             _width,
             _height,
