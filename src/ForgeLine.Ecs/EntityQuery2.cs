@@ -83,7 +83,7 @@ public readonly struct EntityQuery<TFirst, TSecond>
                     ? _first!.GetEntityAt(_position)
                     : _second!.GetEntityAt(_position);
 
-                if (_first.Contains(entity) && _second.Contains(entity))
+                if (_first!.Contains(entity) && _second!.Contains(entity))
                 {
                     _current = entity;
                     return true;

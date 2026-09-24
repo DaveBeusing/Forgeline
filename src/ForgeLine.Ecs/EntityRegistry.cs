@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using ForgeLine.Core;
 
 namespace ForgeLine.Ecs;
@@ -168,7 +169,7 @@ public sealed class EntityRegistry
         return store;
     }
 
-    private bool TryGetStore<T>(out ComponentStore<T>? store)
+    private bool TryGetStore<T>([NotNullWhen(true)] out ComponentStore<T>? store)
         where T : struct
     {
         if (_componentStores.TryGetValue(typeof(T), out IComponentStore? untyped))
