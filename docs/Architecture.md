@@ -46,7 +46,7 @@ The repository validates several of these invariants with `build/Validate-Projec
 - `ForgeLine.Platform.Windows`: Windows x64 platform integration, native window lifecycle, high-resolution host timing, DPI handling, and Win32 message processing behind platform-facing contracts.
 - `ForgeLine.Graphics`: Direct3D 12 adapter/device ownership, command submission, flip-model swap chain, render-target descriptors, frame synchronization, resize handling, GPU resource foundations, DXC shader compilation, and graphics diagnostics behind engine-facing contracts.
 - `ForgeLine.Audio`: audio infrastructure.
-- `ForgeLine.Input`: input infrastructure.
+- `ForgeLine.Input`: raw input state, configurable RTS action mapping, and input-frame contracts above the platform event boundary.
 - `ForgeLine.Assets`: runtime asset infrastructure.
 
 ### Simulation Foundation
@@ -72,7 +72,7 @@ These domain projects establish dependency boundaries only at this stage; their 
 ### Game and Presentation
 
 - `ForgeLine.Game`: FORGELINE rules and composition of simulation domains.
-- `ForgeLine.Presentation`: conversion of game/read-model state into player-visible presentation state.
+- `ForgeLine.Presentation`: conversion of game/read-model state into player-visible presentation state plus presentation-only RTS camera state, projection, and picking math.
 - `ForgeLine.UI`: RTS-specific user-interface boundary.
 - `ForgeLine.Client`: composition root for the interactive Windows application. It owns the platform host lifecycle and will later compose graphics, input, presentation, and game services without moving platform details into simulation.
 - `ForgeLine.Headless`: non-visual composition root for simulation tests, AI matches, balancing, performance work, replay validation, and future server experiments.
@@ -131,7 +131,7 @@ Renderer
 
 The renderer consumes extracted presentation state and does not determine simulation outcomes. The current client validation renders only the foundation clear plus a minimal smoke-test triangle; terrain, units, fog of war, and presentation extraction remain later rendering stages.
 
-See `docs/Graphics.md` for the implemented graphics lifecycle and ownership rules.
+See `docs/Graphics.md` for the implemented graphics lifecycle and ownership rules. See `docs/CameraAndInput.md` for the raw-input boundary, RTS action mapping, camera coordinate convention, controls, and screen/world APIs.
 
 ## Performance Direction
 
