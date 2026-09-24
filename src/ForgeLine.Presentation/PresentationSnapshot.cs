@@ -12,10 +12,9 @@ public sealed class PresentationSnapshot
         int simulationEntityCount,
         ReadOnlySpan<RenderInstance> instances)
     {
-        if (tickDuration < TimeSpan.Zero)
-        {
-            throw new ArgumentOutOfRangeException(nameof(tickDuration));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(
+            tickDuration,
+            TimeSpan.Zero);
 
         ArgumentOutOfRangeException.ThrowIfNegative(simulationEntityCount);
 
