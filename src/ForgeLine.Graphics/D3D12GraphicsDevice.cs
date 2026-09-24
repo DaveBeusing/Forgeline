@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using ForgeLine.Platform;
 using Vortice.Direct3D;
 using Vortice.Direct3D12;
@@ -14,7 +13,6 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
 {
     private const Format BackBufferFormat = Format.R8G8B8A8_UNorm;
 
-    private readonly IWindow _window;
     private readonly GraphicsConfiguration _configuration;
     private readonly IDXGIFactory4 _factory;
     private readonly ID3D12Device _device;
@@ -39,7 +37,6 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
 
     internal D3D12GraphicsDevice(IWindow window, GraphicsConfiguration configuration)
     {
-        _window = window;
         _configuration = configuration;
         configuration.Validate();
 
