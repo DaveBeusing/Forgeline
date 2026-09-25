@@ -2,7 +2,7 @@ using ForgeLine.Core;
 
 namespace ForgeLine.Logistics;
 
-public sealed class LogisticsNetwork
+public sealed partial class LogisticsNetwork
 {
     private readonly Dictionary<LogisticsNodeId, LogisticsNode> _nodes = new();
     private readonly Dictionary<EntityId, LogisticsNodeId> _nodesByEntity = new();
