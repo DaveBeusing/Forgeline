@@ -113,7 +113,7 @@ See [Diagnostics and Performance](docs/DiagnosticsAndPerformance.md) for invaria
 
 ## Benchmarks
 
-BenchmarkDotNet hosts cover the implemented ECS, hierarchical navigation, shared-versus-independent formation routing, simulation, command-processing, job-scheduler, spatial-query, 1,000-unit ground-movement, 100/1,000/10,000-pair resource extraction, 100/1,000/10,000-operation inventory transfer batches, 100/1,000/10,000-consumer power-network allocation, 100/1,000/5,000-facility industrial production, 1,000/10,000-node logistics routing and reachability, 100/500-vehicle physical cargo transport batches, and rendering foundations.
+BenchmarkDotNet hosts cover the implemented ECS, hierarchical navigation, shared-versus-independent formation routing, simulation, command-processing, job-scheduler, spatial-query, 1,000-unit ground-movement, 100/1,000/10,000-pair resource extraction, 100/1,000/10,000-operation inventory transfer batches, 100/1,000/10,000-consumer power-network allocation, 100/1,000/5,000-facility industrial production, 1,000/10,000-node logistics routing and reachability, 100/500-vehicle physical cargo transport batches, 64/256-hub automated distribution scheduling, and rendering foundations.
 
 Examples:
 
@@ -155,5 +155,7 @@ See [Industrial Production](docs/IndustrialProduction.md) for recipe data, proce
 See [Logistics Network and Routing](docs/LogisticsNetworkAndRouting.md) for logistics node/edge semantics, transport modes, capacity metadata, deterministic routing, version invalidation, route caching, economic-building registration, diagnostics, and future transport-mode extension points.
 
 See [Cargo Transport Operations](docs/CargoTransportOperations.md) for Cargo Truck capacity, physical transport lifecycle, load/unload conservation, partial loads, route-to-navigation integration, waiting/reroute behavior, vehicle-loss semantics, diagnostics, and stress coverage.
+
+See [Automated Distribution and Logistics Hubs](docs/AutomatedDistributionAndLogisticsHubs.md) for Logistics Hub capability, min/target/max stock policies, deterministic request scheduling, reservations, source selection, Cargo Truck assignment, priority/fairness, retry handling, diagnostics, and scale validation.
 
 See [Development](docs/Development.md) for the canonical development and validation workflow.

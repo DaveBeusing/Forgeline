@@ -18,7 +18,7 @@ public sealed class BuildingConstructionTests
         BuildingDefinitionCatalog catalog =
             InitialBuildingDefinitions.CreateCatalog();
 
-        Assert.Equal(7, catalog.Count);
+        Assert.Equal(8, catalog.Count);
         Assert.Equal(
             "building.command_core",
             catalog[BuildingIds.CommandCore].Key);
@@ -31,6 +31,12 @@ public sealed class BuildingConstructionTests
         Assert.Equal(
             "building.storage_depot",
             catalog[BuildingIds.StorageDepot].Key);
+        Assert.Equal(
+            "building.logistics_hub",
+            catalog[BuildingIds.LogisticsHub].Key);
+        Assert.True(
+            catalog[BuildingIds.LogisticsHub].Capabilities.HasFlag(
+                BuildingCapability.Distribution));
         Assert.Equal(
             "building.smelter",
             catalog[BuildingIds.Smelter].Key);
@@ -471,6 +477,44 @@ public sealed class BuildingConstructionTests
         Assert.Equal(
             definition.ProductionOutputCapacity,
             test.Inventories.GetTotalCapacity(production.OutputInventory));
+    }
+
+    [Fact]
+    public void LogisticsHubCompletionActivatesDistributionInventory()
+    {
+        TestWorld test = CreateTestWorld();
+        EntityId inventoryEntity =
+            AddFundedInventory(test, includeAllCosts: true);
+        BuildingDefinition definition =
+            test.Definitions[BuildingIds.LogisticsHub];
+
+        SubmitBuild(
+            test,
+            inventoryEntity,
+            BuildingIds.LogisticsHub,
+            new Vector3(64.0f, 0.0f, 64.0f));
+        test.Simulation.AdvanceOneTick();
+
+        EntityId site = SingleSite(test);
+        test.Simulation.RunTicks(
+            definition.ConstructionTicks - 1,
+            TestContext.Current.CancellationToken);
+
+        Assert.True(
+            test.Simulation.Entities.HasComponent<CompletedBuilding>(site));
+        Assert.True(
+            test.Simulation.Entities.TryGetComponent(
+                site,
+                out InventoryStorage storage));
+        Assert.True(
+            test.Simulation.Entities.TryGetComponent(
+                site,
+                out LogisticsHub hub));
+        Assert.Equal(storage.InventoryId, hub.InventoryId);
+        Assert.Equal(new FactionId((uint)Player.Value), hub.Owner);
+        Assert.Equal(
+            definition.StorageCapacity,
+            test.Inventories.GetTotalCapacity(storage.InventoryId));
     }
 
     [Fact]

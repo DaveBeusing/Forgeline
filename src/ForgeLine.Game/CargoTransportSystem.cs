@@ -16,6 +16,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
     private readonly List<EntityId> _transportEntities = new();
     private readonly Dictionary<EntityId, InventoryId> _trackedInventories = new();
     private readonly List<EntityId> _staleTrackedEntities = new();
+    private ICargoTransportReservationObserver? _reservationObserver;
     private long _completedOrderCount;
     private long _rerouteCount;
     private long _routeFailureCount;
@@ -42,6 +43,21 @@ public sealed class CargoTransportSystem : ISimulationSystem
         get;
         private set;
     } = CargoTransportDebugSnapshot.Empty;
+
+    internal void SetReservationObserver(
+        ICargoTransportReservationObserver observer)
+    {
+        ArgumentNullException.ThrowIfNull(observer);
+
+        if (_reservationObserver is not null &&
+            !ReferenceEquals(_reservationObserver, observer))
+        {
+            throw new InvalidOperationException(
+                "Cargo transport reservation observer is already configured.");
+        }
+
+        _reservationObserver = observer;
+    }
 
     internal void TrackTransport(
         EntityId entity,
@@ -446,10 +462,30 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
+        bool hasAutomatedReservation =
+            context.Entities.TryGetComponent(
+                entity,
+                out CargoTransportReservation automatedReservation);
+
+        if (hasAutomatedReservation &&
+            (automatedReservation.SourceInventory != sourceInventory ||
+             automatedReservation.ResourceId != order.ResourceId))
+        {
+            Fail(
+                context.Entities,
+                entity,
+                state,
+                CargoTransportFailureReason.TransferFailed,
+                context.Tick);
+            return;
+        }
+
         double available =
-            _inventories.GetAvailableQuantity(
-                sourceInventory,
-                order.ResourceId);
+            hasAutomatedReservation
+                ? automatedReservation.Quantity
+                : _inventories.GetAvailableQuantity(
+                    sourceInventory,
+                    order.ResourceId);
         double addable =
             _inventories.GetAddableQuantity(
                 transport.CargoInventory,
@@ -521,6 +557,26 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
+        if (hasAutomatedReservation)
+        {
+            InventoryOperationResult release =
+                _inventories.ReleaseReservation(
+                    sourceInventory,
+                    order.ResourceId,
+                    loadQuantity);
+
+            if (!release.Succeeded)
+            {
+                Fail(
+                    context.Entities,
+                    entity,
+                    state,
+                    CargoTransportFailureReason.TransferFailed,
+                    context.Tick);
+                return;
+            }
+        }
+
         InventoryOperationResult transfer =
             _inventories.Transfer(
                 sourceInventory,
@@ -530,6 +586,21 @@ public sealed class CargoTransportSystem : ISimulationSystem
 
         if (!transfer.Succeeded)
         {
+            if (hasAutomatedReservation)
+            {
+                InventoryOperationResult restore =
+                    _inventories.Reserve(
+                        sourceInventory,
+                        order.ResourceId,
+                        loadQuantity);
+
+                EngineInvariant.Require(
+                    restore.Succeeded,
+                    DiagnosticCategory.Simulation,
+                    "CARGO_RESERVATION_RESTORE_FAILED",
+                    $"Unable to restore cargo reservation for source inventory {sourceInventory}.");
+            }
+
             Fail(
                 context.Entities,
                 entity,
@@ -537,6 +608,14 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 CargoTransportFailureReason.TransferFailed,
                 context.Tick);
             return;
+        }
+
+        if (hasAutomatedReservation)
+        {
+            _reservationObserver?.OnCargoReservationConsumed(
+                automatedReservation.RequestId);
+            context.Entities.RemoveComponent<CargoTransportReservation>(
+                entity);
         }
 
         CargoTransportRuntimeState loadedState =
@@ -921,9 +1000,15 @@ public sealed class CargoTransportSystem : ISimulationSystem
                             ? order.RequestedQuantity
                             : QuantityEpsilon;
                     double available =
-                        _inventories.GetAvailableQuantity(
-                            sourceInventory,
-                            order.ResourceId);
+                        context.Entities.TryGetComponent(
+                            entity,
+                            out CargoTransportReservation reservation) &&
+                        reservation.SourceInventory == sourceInventory &&
+                        reservation.ResourceId == order.ResourceId
+                            ? reservation.Quantity
+                            : _inventories.GetAvailableQuantity(
+                                sourceInventory,
+                                order.ResourceId);
 
                     if (available + QuantityEpsilon >=
                         required)

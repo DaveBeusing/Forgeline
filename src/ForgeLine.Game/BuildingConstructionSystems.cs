@@ -527,6 +527,14 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
                     entity,
                     new StorageDepot(inventoryId, owner));
             }
+
+            if (definition.Capabilities.HasFlag(
+                    BuildingCapability.Distribution))
+            {
+                entities.AddComponent(
+                    entity,
+                    new LogisticsHub(inventoryId, owner));
+            }
         }
 
         if (definition.Capabilities.HasFlag(BuildingCapability.Extraction))
