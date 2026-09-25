@@ -20,5 +20,6 @@ public enum PlatformKey
     Escape,
     Space,
     F1,
-    F2
+    F2,
+    F3
 }

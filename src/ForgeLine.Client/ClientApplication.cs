@@ -86,9 +86,14 @@ internal sealed class ClientApplication
             {
                 SectorSizeCells = 8
             });
-        var navigationSystem = new HierarchicalNavigationSystem(
-            new HierarchicalPathfinder(navigationWorld));
+        var pathfinder =
+            new HierarchicalPathfinder(navigationWorld);
+        var formationMovementSystem =
+            new FormationMovementSystem(pathfinder);
+        var navigationSystem =
+            new HierarchicalNavigationSystem(pathfinder);
 
+        simulation.RegisterSystem(formationMovementSystem);
         simulation.RegisterSystem(navigationSystem);
         simulation.RegisterSystem(groundMovementSystem);
         simulation.RegisterSystem(new SpatialIndexSystem(spatialSynchronizer));
@@ -132,6 +137,9 @@ internal sealed class ClientApplication
         bool worldDebugEnabled = false;
         bool overlayToggleHeld = false;
         bool worldDebugToggleHeld = false;
+        bool formationToggleHeld = false;
+        FormationTemplate activeFormation =
+            FormationTemplate.Compact;
         TimeSpan simulationAccumulator = TimeSpan.Zero;
         FrameTimingMetrics frameTiming = default;
         SimulationDiagnosticsSnapshot simulationDiagnostics =
@@ -151,7 +159,8 @@ internal sealed class ClientApplication
             "started",
             selectionController,
             lastMovementEnvelope,
-            lastMovementCommand);
+            lastMovementCommand,
+            activeFormation);
 
         long startedAt = _platform.Clock.GetTimestamp();
         long previousFrameAt = startedAt;
@@ -187,7 +196,13 @@ internal sealed class ClientApplication
                 PlatformKey.F2,
                 ref worldDebugToggleHeld,
                 ref worldDebugEnabled);
+            UpdateFormationSelection(
+                inputState,
+                ref formationToggleHeld,
+                ref activeFormation);
             groundMovementSystem.DebugCaptureEnabled =
+                worldDebugEnabled;
+            formationMovementSystem.DebugCaptureEnabled =
                 worldDebugEnabled;
 
             if (smokeTest &&
@@ -249,7 +264,8 @@ internal sealed class ClientApplication
                     LocalPlayer,
                     movementRequest.Entities,
                     movementRequest.WorldTarget,
-                    simulation.CurrentTick);
+                    simulation.CurrentTick,
+                    activeFormation);
 
                 lastMovementEnvelope = simulation.SubmitCommand(
                     command,
@@ -267,6 +283,7 @@ internal sealed class ClientApplication
                 selectionController,
                 spatialIndex,
                 groundMovementSystem.CaptureDebugSnapshot(),
+                formationMovementSystem.CaptureDebugSnapshot(),
                 navigationSystem.World,
                 navigationSystem.LastCompletedPath);
 
@@ -322,7 +339,8 @@ internal sealed class ClientApplication
                     "frame",
                     selectionController,
                     lastMovementEnvelope,
-                    lastMovementCommand);
+                    lastMovementCommand,
+                    activeFormation);
                 nextDiagnosticAt = now;
             }
         }
@@ -341,7 +359,8 @@ internal sealed class ClientApplication
             "stopped",
             selectionController,
             lastMovementEnvelope,
-            lastMovementCommand);
+            lastMovementCommand,
+            activeFormation);
         WriteGraphicsState("stopped", graphics);
         return 0;
     }
@@ -470,6 +489,7 @@ internal sealed class ClientApplication
         RtsSelectionController selectionController,
         SpatialGridIndex spatialIndex,
         GroundMovementDebugSnapshot movementSnapshot,
+        FormationMovementDebugSnapshot formationSnapshot,
         NavigationWorld navigationWorld,
         NavigationPath? navigationPath)
     {
@@ -515,6 +535,10 @@ internal sealed class ClientApplication
                 debugDraw,
                 movementSnapshot,
                 maximumAgents: 64);
+            FormationMovementDebugVisualization.Draw(
+                debugDraw,
+                formationSnapshot,
+                maximumSlots: 128);
             NavigationDebugVisualization.Draw(
                 debugDraw,
                 navigationWorld,
@@ -656,6 +680,28 @@ internal sealed class ClientApplication
         held = down;
     }
 
+    private static void UpdateFormationSelection(
+        InputState inputState,
+        ref bool held,
+        ref FormationTemplate activeFormation)
+    {
+        bool down = inputState.IsKeyDown(PlatformKey.F3);
+
+        if (down && !held)
+        {
+            activeFormation = activeFormation switch
+            {
+                FormationTemplate.Compact => FormationTemplate.Line,
+                FormationTemplate.Line => FormationTemplate.Column,
+                FormationTemplate.Column => FormationTemplate.Wedge,
+                FormationTemplate.Wedge => FormationTemplate.Compact,
+                _ => FormationTemplate.Compact
+            };
+        }
+
+        held = down;
+    }
+
     private static void DrainWindowEvents(
         IWindow window,
         IGraphicsDevice graphics)
@@ -788,7 +834,8 @@ internal sealed class ClientApplication
         string state,
         RtsSelectionController selectionController,
         SimulationCommandEnvelope? movementEnvelope,
-        MoveEntitiesCommand? movementCommand)
+        MoveEntitiesCommand? movementCommand,
+        FormationTemplate activeFormation)
     {
         EntityId hovered = selectionController.HoveredEntity;
         string hoveredText = hovered.IsValid
@@ -804,6 +851,7 @@ internal sealed class ClientApplication
             $"hovered={hoveredText} lastCommand={commandText} " +
             $"acceptedTargets={movementCommand?.AcceptedTargetCount ?? 0} " +
             $"rejectedTargets={movementCommand?.RejectedTargetCount ?? 0} " +
-            $"executedTick={movementCommand?.ExecutedAtTick.Value ?? 0}");
+            $"executedTick={movementCommand?.ExecutedAtTick.Value ?? 0} " +
+            $"formation={activeFormation}");
     }
 }

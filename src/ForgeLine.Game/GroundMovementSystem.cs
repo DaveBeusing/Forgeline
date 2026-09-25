@@ -248,8 +248,19 @@ public sealed class GroundMovementSystem : ISimulationSystem
             MathF.Max(
                 0.0f,
                 2.0f * movement.Deceleration * remainingDistance));
+        float maximumSpeed = movement.MaximumSpeed;
+
+        if (entities.TryGetComponent(
+                entity,
+                out FormationMovementConstraint formationConstraint))
+        {
+            maximumSpeed = MathF.Min(
+                maximumSpeed,
+                formationConstraint.MaximumSpeed);
+        }
+
         float desiredSpeed = MathF.Min(
-            movement.MaximumSpeed,
+            maximumSpeed,
             brakingSpeed);
 
         float speedChange = desiredSpeed >= currentSpeed

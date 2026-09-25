@@ -73,7 +73,7 @@ These domain projects establish dependency boundaries only at this stage; their 
 
 ### Game and Presentation
 
-- `ForgeLine.Game`: FORGELINE rules and composition of simulation domains. The first interaction-facing game contracts include player ownership, controllable entity categories, simulation-owned movement-order state, and the validated movement command.
+- `ForgeLine.Game`: FORGELINE rules and composition of simulation domains. Interaction-facing game contracts include player ownership, controllable entity categories, simulation-owned movement-order state, movement-group identity/lifecycle, shared-route formation state, formation slot assignment, and the validated movement command.
 - `ForgeLine.Presentation`: post-tick extraction into immutable snapshots, buffered simulation-to-render handoff, render-world interpolation, generic instance rendering, debug visualization, development metrics, RTS camera state/projection, visible-entity picking, and player selection state.
 - `ForgeLine.UI`: RTS-specific user-interface boundary.
 - `ForgeLine.Client`: composition root for the interactive Windows application. It owns platform/graphics lifecycle and translates presentation movement requests into simulation commands without exposing live ECS mutation to input or rendering code.
@@ -93,7 +93,7 @@ The simulation runtime is fixed-step with a default engineering target of 20 sim
 
 Each tick traverses an explicit canonical phase sequence. Commands scheduled for a tick are executed at the Input Commands boundary before later phases run. Systems register for a specific phase and execute in stable registration order within that phase.
 
-The movement interaction preserves this boundary: the client schedules `MoveEntitiesCommand` for a future tick, and the command writes only validated `MovementOrder` state. `HierarchicalNavigationSystem` consumes long-range orders in `NavigationRequests`, schedules read-only path work through the simulation job boundary when available, and publishes only local waypoint orders. `GroundMovementSystem` remains the sole owner of final locomotion and transform changes in `Movement`.
+The movement interaction preserves this boundary: the client schedules `MoveEntitiesCommand` for a future tick. Individual eligible units receive validated strategic `MovementOrder` state. Multi-unit ground selections create a simulation-owned movement group instead. `FormationMovementSystem` consumes those groups first in `NavigationRequests`, schedules one shared hierarchical path, derives stable formation-relative slot targets, and publishes only `FormationLocal` movement orders plus a group speed constraint. `HierarchicalNavigationSystem` continues to route individual strategic orders and explicitly ignores formation-local slot orders. `GroundMovementSystem` remains the sole owner of final locomotion and transform changes in `Movement`.
 
 Simulation code is written in a deterministic-friendly style:
 
@@ -174,3 +174,5 @@ The high-resolution grid is never searched across the complete world as the prim
 Navigation data is immutable for a specific `NavigationVersion`. Replacing the derived navigation world is the invalidation boundary: high-level cache entries are cleared and stale asynchronous results are rejected before they can enter simulation state. Path jobs read navigation snapshots only; they never mutate ECS transforms or live world state.
 
 See `docs/HierarchicalNavigation.md` for movement classes, request/result ownership, failures, diagnostics, debug rendering, and benchmark coverage.
+
+Multi-unit movement groups sit above this hierarchy. A group owns one strategic route/corridor and projects line, column, wedge, or compact formation slots around the active route direction. Stable per-member slot assignment, conservative speed harmonization, blocked-slot projection, lateral compression, and longitudinal cohort fallback remain game simulation concerns; local avoidance and final transform mutation remain in `GroundMovementSystem`. See `docs/FormationMovementAndGroupOrders.md` for the complete lifecycle and scale behavior.

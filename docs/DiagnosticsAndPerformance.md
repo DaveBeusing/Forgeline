@@ -129,6 +129,7 @@ Navigation baselines cover long-distance path searches over a multi-chunk world,
 
 Simulation baselines cover:
 
+- 10, 50, and 100-unit independent strategic routing versus one shared formation route
 - empty fixed ticks
 - light system ticks
 - 1,000-entity iteration ticks
@@ -234,3 +235,16 @@ The Windows client development overlay can be toggled with F1. World debug visua
 F2 world debugging can display local traversability, nearby sector boundaries, sector portals, the latest high-level route, and its refined waypoint path. Rendering receives navigation-derived read data only and never mutates navigation or simulation state.
 
 See [Hierarchical Navigation](HierarchicalNavigation.md) for lifecycle and interpretation details.
+
+
+## Formation Movement Diagnostics
+
+`FormationMovementSystem.LastDiagnostics` exposes active group/member counts, largest group size, compressed groups, shared strategic path requests, completed/failed groups, slot reassignments, compression events, split-cohort events, and blocked-slot projections.
+
+A healthy large-selection move should show one shared path request for the movement group while `HierarchicalNavigationSystem` reports no new per-member strategic requests for formation-local slot orders.
+
+F2 world debugging additionally renders movement-group bounds and centroids, travel direction, active shared waypoint and route, slot targets, assignment lines, compression scale, and split cohort count. The presentation layer consumes copied debug snapshots only.
+
+The Simulation BenchmarkDotNet host includes `FormationRoutingBenchmarks` for 10, 50, and 100 members. It compares independent strategic path searches with one centroid-based shared group route. Timing is observational; the primary invariant is the reduction from N strategic route requests to one group route where members can share navigation.
+
+See [Formation Movement and Group Orders](FormationMovementAndGroupOrders.md) for lifecycle, fallback behavior, and interpretation details.

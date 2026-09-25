@@ -25,14 +25,18 @@ SimulationCoordinator command schedule
     ↓
 Input Commands tick boundary
     ↓
-MovementOrder component
+individual MovementOrder or MovementGroup
+    ↓
+HierarchicalNavigationSystem / FormationMovementSystem
+    ↓
+local MovementOrder
     ↓
 GroundMovementSystem
     ↓
 authoritative WorldTransform
 ```
 
-Strategic navigation, formation corridors/slots, attack orders, control groups, minimap commands, and final interaction styling remain deferred. Fixed-tick ground locomotion and short-range local steering are implemented.
+Strategic hierarchical navigation and shared-route formation movement are implemented. Role-aware combat formations, attack orders, permanent control groups, minimap commands, and final interaction styling remain deferred.
 
 ## Ownership Boundaries
 
@@ -43,6 +47,7 @@ Simulation owns:
 - stable `EntityId` lifetime and generation validation;
 - `ControllableEntity` ownership/category metadata;
 - accepted `MovementOrder` state;
+- movement-group identity, group orders, shared routes, slot assignments, and formation speed constraints;
 - command execution at fixed simulation tick boundaries.
 
 Presentation owns:
@@ -96,6 +101,7 @@ Initial interaction conventions are:
 | Box selection | Left-drag |
 | Toggle entities in box | Shift + left-drag |
 | Movement order | Right click with a non-empty selection |
+| Cycle development formation | F3 (Compact → Line → Column → Wedge) |
 
 A drag becomes box selection after a small screen-space threshold so normal clicks are not interpreted as accidental boxes.
 
@@ -121,15 +127,18 @@ The client creates `MoveEntitiesCommand` with:
 - issuer `PlayerId`;
 - copied target entity IDs;
 - world target;
-- submission tick.
+- submission tick;
+- currently selected formation template.
+
+The development client starts with `Compact` and cycles the formation template with F3. This is a minimal command-surface control until the dedicated RTS command UI owns formation selection.
 
 It submits the command through `SimulationCoordinator.SubmitCommand` for the next simulation tick and uses the matching `SimulationCommandSource`.
 
 The command does not change `WorldTransform`.
 
-At execution time it revalidates every target against the live ECS and owner. Accepted entities receive or replace a `MovementOrder` containing the issuer, target, submission tick, and accepted tick.
+At execution time it revalidates every target against the live ECS and owner. A single formation-capable ground unit receives or replaces a strategic `MovementOrder`. Two or more formation-capable ground units create one movement-group entity and receive `MovementGroupMember` state instead of independent long-range orders. Non-formation-capable accepted targets retain the individual-order path.
 
-The fixed-tick ground locomotion system consumes this component during the movement phase. Arrival stops the unit and consumes the completed order. Future hierarchical navigation can preserve this interaction boundary by refining the order into local route waypoints or corridors before locomotion.
+`FormationMovementSystem` requests one shared hierarchical route for the group, maintains stable formation slots, and emits `MovementOrderKind.FormationLocal` targets. `HierarchicalNavigationSystem` routes individual strategic orders but deliberately bypasses formation-local slot targets so a large selection does not fall back to one global path request per member. `GroundMovementSystem` consumes the current local target during the movement phase and remains the only system that changes `WorldTransform`.
 
 ## Stale Entity Handling
 
@@ -169,8 +178,10 @@ Focused tests cover:
 - foreign-owner rejection;
 - the invariant that a movement command does not directly change `WorldTransform`;
 - authoritative movement-order consumption by fixed-tick locomotion;
+- one shared strategic path request for 10, 50, and 100-unit selections;
+- stable formation slot assignment, entity removal, replacement commands, choke-point fallback, and concurrent groups;
 - arrival, terrain following, slope limits, local separation, obstacle steering, and chunk-boundary spatial updates.
 
-See [Ground Movement and Local Steering](GroundMovementAndSteering.md) for locomotion semantics and limitations.
+See [Formation Movement and Group Orders](FormationMovementAndGroupOrders.md) for multi-unit command semantics and shared-route formation behavior. See [Ground Movement and Local Steering](GroundMovementAndSteering.md) for locomotion semantics and limitations.
 
 The full solution build, project-reference validation, Windows client smoke test, headless smoke tests, and complete test suite remain the CI gate.

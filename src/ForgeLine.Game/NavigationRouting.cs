@@ -161,6 +161,22 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
 
         if (hasMovementOrder)
         {
+            if (movementOrder.Kind == MovementOrderKind.FormationLocal)
+            {
+                CancelPending(context, entity);
+
+                if (hasRoute)
+                {
+                    RemoveRoute(
+                        context,
+                        entity,
+                        removeManagedOrder: false);
+                }
+
+                RemoveFailure(context, entity);
+                return;
+            }
+
             if (hasRoute &&
                 IsManagedWaypoint(movementOrder, route))
             {
