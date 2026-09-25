@@ -190,3 +190,16 @@ The current provider, priority, read-model, and inventory-backed transfer bounda
 ## Artillery Resupply
 
 Artillery uses the existing `AmmunitionState` inventory and is therefore a normal Battlefield Supply recipient. When an active fire mission cannot remove its configured Ammunition cost, the mission enters `NoAmmo` but remains valid. `BattlefieldSupplySystem` may replenish the artillery inventory in the normal Supply phase through a `SupplyProvider` or Supply Truck. The artillery system observes the replenished inventory on a subsequent Combat tick and continues the same mission until its requested round count completes. No artillery-specific ammunition pool or transfer path exists.
+
+
+## Tactical Automatic Resupply
+
+`AutomaticResupplyPolicy` defines Fuel and Ammunition fraction thresholds for units that may autonomously request supply.
+
+`AutomaticResupplyDecisionSystem` never grants resources. It uses the shared `BattlefieldResupplyPlanner` to select an enabled friendly provider deterministically and creates the same real `ResupplyOrder` plus normal `MovementOrder` used by deliberate resupply.
+
+`ResupplyCommand` uses that same planner, keeping manual and tactical provider-selection semantics consistent.
+
+Actual quantities remain transferred only by `BattlefieldSupplySystem`. Tactical combat yields to an active resupply order, and stored AttackMove/Retreat intent can continue after supply completion.
+
+See [Combat Orders, Tactical Behavior, and Readiness](CombatOrdersAndReadiness.md).
