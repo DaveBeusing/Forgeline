@@ -207,4 +207,4 @@ Phase-5 tactical behavior preserves the command/simulation split. Combat command
 
 `CombatReadinessSystem` runs in `SnapshotEvents` and derives unit/group summaries from authoritative Health, inventory quantities, mobility, weapon state, supply state, and surviving members. Readiness is observation, not a substitute source of gameplay truth.
 
-See `docs/CombatOrdersAndReadiness.md`.
+See `docs/CombatOrdersAndReadiness.md`. Directorate faction data, stable unit definitions, cross-catalog content validation, deterministic unit-production queues, and generic unit entity composition live here because they coordinate existing economy, logistics, movement, combat, intelligence, and supply domains without moving ownership out of those domains.

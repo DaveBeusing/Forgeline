@@ -195,6 +195,9 @@ public sealed class ProductionRecipeCatalog
 
     public int Count => _byId.Count;
 
+    public IEnumerable<ProductionRecipeDefinition> Definitions =>
+        _byId.OrderBy(static pair => pair.Key).Select(static pair => pair.Value);
+
     public ProductionRecipeDefinition this[RecipeId id] =>
         _byId.TryGetValue(id, out ProductionRecipeDefinition? definition)
             ? definition

@@ -2,6 +2,7 @@ using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Ecs;
+using ForgeLine.Intelligence;
 using ForgeLine.Simulation;
 using ForgeLine.World;
 
@@ -120,11 +121,10 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
             return;
         }
 
-        if (context.Entities.TryGetComponent(
+        if (!IsSourceInventoryOwnedBy(
+                context.Entities,
                 request.SourceInventory,
-                out StorageDepot sourceDepot) &&
-            sourceDepot.Owner.IsSpecified &&
-            sourceDepot.Owner.Value != request.Issuer.Value)
+                request.Issuer))
         {
             Reject(
                 context,
@@ -199,6 +199,43 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
         _lastCreatedSite = site;
 
         context.Entities.DestroyEntity(requestEntity);
+    }
+
+    private static bool IsSourceInventoryOwnedBy(
+        EntityRegistry entities,
+        EntityId source,
+        PlayerId issuer)
+    {
+        if (entities.TryGetComponent(
+                source,
+                out CompletedBuilding completed))
+        {
+            return completed.Owner == issuer;
+        }
+
+        if (entities.TryGetComponent(
+                source,
+                out StorageDepot storageDepot) &&
+            storageDepot.Owner.IsSpecified)
+        {
+            return storageDepot.Owner.Value == issuer.Value;
+        }
+
+        if (entities.TryGetComponent(
+                source,
+                out SupplyDepot supplyDepot))
+        {
+            return supplyDepot.Owner == issuer;
+        }
+
+        if (entities.TryGetComponent(
+                source,
+                out ControllableEntity controllable))
+        {
+            return controllable.Owner == issuer;
+        }
+
+        return true;
     }
 
     private bool TryResolveSourceInventory(
@@ -589,6 +626,43 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
         {
             entities.AddComponent(entity, new CommandFacility());
         }
+
+        if (definition.Capabilities.HasFlag(BuildingCapability.UnitProduction))
+        {
+            InventoryId inputInventory =
+                _inventories.CreateInventory(
+                    new InventorySpecification(
+                        definition.UnitProductionInputCapacity));
+
+            entities.AddComponent(
+                entity,
+                new InventoryStorage(inputInventory));
+            entities.AddComponent(
+                entity,
+                new UnitProductionFacility(
+                    inputInventory,
+                    definition.UnitProductionCapabilities,
+                    site.Owner,
+                    definition.UnitSpawnOffset,
+                    activatedAtTick));
+        }
+
+        if (definition.Capabilities.HasFlag(BuildingCapability.Radar))
+        {
+            entities.AddComponent(
+                entity,
+                new RadarSensorState(
+                    owner,
+                    definition.RadarDetectionRangeMeters,
+                    definition.RadarIdentificationRangeMeters,
+                    definition.RadarUpdateIntervalTicks));
+        }
+
+        entities.AddComponent(
+            entity,
+            new IntelligenceSignature(
+                owner,
+                0x8000_0000u | site.BuildingId.Value));
 
         if (definition.Capabilities.HasFlag(BuildingCapability.Processing))
         {

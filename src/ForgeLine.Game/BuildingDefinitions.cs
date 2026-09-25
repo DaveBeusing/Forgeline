@@ -41,6 +41,9 @@ public static class BuildingIds
     public static readonly BuildingId LogisticsHub = new(8);
     public static readonly BuildingId AmmunitionPlant = new(9);
     public static readonly BuildingId SupplyDepot = new(10);
+    public static readonly BuildingId Barracks = new(11);
+    public static readonly BuildingId VehicleFactory = new(12);
+    public static readonly BuildingId Radar = new(13);
 }
 
 public enum BuildingOrientation : byte
@@ -62,7 +65,9 @@ public enum BuildingCapability : uint
     Storage = 1 << 4,
     Processing = 1 << 5,
     Distribution = 1 << 6,
-    Supply = 1 << 7
+    Supply = 1 << 7,
+    UnitProduction = 1 << 8,
+    Radar = 1 << 9
 }
 
 public readonly record struct BuildingFootprint
@@ -195,6 +200,18 @@ public sealed record BuildingDefinition
 
     public double ProductionOutputCapacity { get; init; }
 
+    public UnitProductionCapability UnitProductionCapabilities { get; init; }
+
+    public double UnitProductionInputCapacity { get; init; }
+
+    public Vector3 UnitSpawnOffset { get; init; } = new(0.0f, 0.0f, 14.0f);
+
+    public float RadarDetectionRangeMeters { get; init; }
+
+    public float RadarIdentificationRangeMeters { get; init; }
+
+    public int RadarUpdateIntervalTicks { get; init; } = 4;
+
     public void Validate()
     {
         if (!Id.IsSpecified)
@@ -231,10 +248,29 @@ public sealed record BuildingDefinition
             !double.IsFinite(StorageCapacity) || StorageCapacity < 0.0 ||
             !double.IsFinite(ExtractionRatePerSecond) || ExtractionRatePerSecond < 0.0 ||
             !double.IsFinite(ProductionInputCapacity) || ProductionInputCapacity < 0.0 ||
-            !double.IsFinite(ProductionOutputCapacity) || ProductionOutputCapacity < 0.0)
+            !double.IsFinite(ProductionOutputCapacity) || ProductionOutputCapacity < 0.0 ||
+            !double.IsFinite(UnitProductionInputCapacity) || UnitProductionInputCapacity < 0.0)
         {
             throw new InvalidOperationException(
                 $"Building '{Key}' contains invalid capability values.");
+        }
+
+        if (!float.IsFinite(UnitSpawnOffset.X) ||
+            !float.IsFinite(UnitSpawnOffset.Y) ||
+            !float.IsFinite(UnitSpawnOffset.Z))
+        {
+            throw new InvalidOperationException(
+                $"Building '{Key}' has an invalid unit spawn offset.");
+        }
+
+        if (!float.IsFinite(RadarDetectionRangeMeters) ||
+            RadarDetectionRangeMeters < 0.0f ||
+            !float.IsFinite(RadarIdentificationRangeMeters) ||
+            RadarIdentificationRangeMeters < 0.0f ||
+            RadarIdentificationRangeMeters > RadarDetectionRangeMeters)
+        {
+            throw new InvalidOperationException(
+                $"Building '{Key}' contains invalid radar ranges.");
         }
 
         if (Costs.Count == 0)
@@ -300,6 +336,39 @@ public sealed record BuildingDefinition
             throw new InvalidOperationException(
                 $"Building '{Key}' supply capability requires storage and distribution.");
         }
+
+        bool unitProductionEnabled =
+            Capabilities.HasFlag(BuildingCapability.UnitProduction);
+        bool unitProductionConfigured =
+            UnitProductionCapabilities != UnitProductionCapability.None &&
+            (UnitProductionCapabilities & ~UnitProductionCapability.All) == 0 &&
+            UnitProductionInputCapacity > 0.0;
+
+        if (unitProductionEnabled != unitProductionConfigured)
+        {
+            throw new InvalidOperationException(
+                $"Building '{Key}' unit-production capability does not match its production configuration.");
+        }
+
+        if (!unitProductionEnabled &&
+            (UnitProductionCapabilities != UnitProductionCapability.None ||
+             UnitProductionInputCapacity != 0.0))
+        {
+            throw new InvalidOperationException(
+                $"Building '{Key}' defines unit-production values without the capability.");
+        }
+
+        bool radarEnabled =
+            Capabilities.HasFlag(BuildingCapability.Radar);
+        bool radarConfigured =
+            RadarDetectionRangeMeters > 0.0f &&
+            RadarUpdateIntervalTicks > 0;
+
+        if (radarEnabled != radarConfigured)
+        {
+            throw new InvalidOperationException(
+                $"Building '{Key}' radar capability does not match its sensor configuration.");
+        }
     }
 
     private void ValidateCapability(
@@ -351,6 +420,9 @@ public sealed class BuildingDefinitionCatalog
 
     public int Count => _byId.Count;
 
+    public IEnumerable<BuildingDefinition> Definitions =>
+        _byId.OrderBy(static pair => pair.Key).Select(static pair => pair.Value);
+
     public BuildingDefinition this[BuildingId id] =>
         _byId.TryGetValue(id, out BuildingDefinition? definition)
             ? definition
@@ -379,6 +451,7 @@ public static class InitialBuildingDefinitions
                     Id = BuildingIds.CommandCore,
                     Key = "building.command_core",
                     DisplayName = "Command Core",
+                    VisualId = 101,
                     Footprint = new BuildingFootprint(20.0f, 20.0f, 12.0f),
                     ConstructionTicks = 160,
                     Costs =
@@ -389,15 +462,18 @@ public static class InitialBuildingDefinitions
                     ],
                     Capabilities =
                         BuildingCapability.Command |
+                        BuildingCapability.Storage |
                         BuildingCapability.PowerConsumption,
                     PowerDemand = 20.0,
-                    PowerPriority = PowerPriority.Critical
+                    PowerPriority = PowerPriority.Critical,
+                    StorageCapacity = 4_000.0
                 },
                 new BuildingDefinition
                 {
                     Id = BuildingIds.PowerPlant,
                     Key = "building.power_plant",
                     DisplayName = "Power Plant",
+                    VisualId = 102,
                     Footprint = new BuildingFootprint(16.0f, 16.0f, 10.0f),
                     ConstructionTicks = 100,
                     Costs =
@@ -414,6 +490,7 @@ public static class InitialBuildingDefinitions
                     Id = BuildingIds.Extractor,
                     Key = "building.extractor",
                     DisplayName = "Mine / Extractor",
+                    VisualId = 103,
                     Footprint = new BuildingFootprint(12.0f, 12.0f, 8.0f),
                     ConstructionTicks = 80,
                     Costs =
@@ -435,6 +512,7 @@ public static class InitialBuildingDefinitions
                     Id = BuildingIds.StorageDepot,
                     Key = "building.storage_depot",
                     DisplayName = "Storage Depot",
+                    VisualId = 104,
                     Footprint = new BuildingFootprint(14.0f, 14.0f, 8.0f),
                     ConstructionTicks = 70,
                     Costs =
@@ -453,6 +531,7 @@ public static class InitialBuildingDefinitions
                     Id = BuildingIds.LogisticsHub,
                     Key = "building.logistics_hub",
                     DisplayName = "Logistics Hub",
+                    VisualId = 108,
                     Footprint = new BuildingFootprint(18.0f, 18.0f, 9.0f),
                     ConstructionTicks = 100,
                     Costs =
@@ -473,6 +552,7 @@ public static class InitialBuildingDefinitions
                     Id = BuildingIds.SupplyDepot,
                     Key = "building.supply_depot",
                     DisplayName = "Supply Depot",
+                    VisualId = 110,
                     Footprint = new BuildingFootprint(16.0f, 16.0f, 8.0f),
                     ConstructionTicks = 90,
                     Costs =
@@ -494,6 +574,7 @@ public static class InitialBuildingDefinitions
                     Id = BuildingIds.Smelter,
                     Key = "building.smelter",
                     DisplayName = "Smelter",
+                    VisualId = 105,
                     Footprint = new BuildingFootprint(18.0f, 16.0f, 10.0f),
                     ConstructionTicks = 120,
                     Costs =
@@ -515,6 +596,7 @@ public static class InitialBuildingDefinitions
                     Id = BuildingIds.Refinery,
                     Key = "building.refinery",
                     DisplayName = "Refinery",
+                    VisualId = 106,
                     Footprint = new BuildingFootprint(18.0f, 16.0f, 10.0f),
                     ConstructionTicks = 110,
                     Costs =
@@ -535,7 +617,8 @@ public static class InitialBuildingDefinitions
                 {
                     Id = BuildingIds.ElectronicsPlant,
                     Key = "building.electronics_plant",
-                    DisplayName = "Electronics Plant",
+                    DisplayName = "Electronics Fabricator",
+                    VisualId = 107,
                     Footprint = new BuildingFootprint(18.0f, 18.0f, 10.0f),
                     ConstructionTicks = 130,
                     Costs =
@@ -558,6 +641,7 @@ public static class InitialBuildingDefinitions
                     Id = BuildingIds.AmmunitionPlant,
                     Key = "building.ammunition_plant",
                     DisplayName = "Ammunition Plant",
+                    VisualId = 109,
                     Footprint = new BuildingFootprint(18.0f, 18.0f, 10.0f),
                     ConstructionTicks = 130,
                     Costs =
@@ -574,6 +658,74 @@ public static class InitialBuildingDefinitions
                         ProductionCapability.AmmunitionProcessing,
                     ProductionInputCapacity = 1_000.0,
                     ProductionOutputCapacity = 1_000.0
+                },
+                new BuildingDefinition
+                {
+                    Id = BuildingIds.Barracks,
+                    Key = "building.barracks",
+                    DisplayName = "Barracks",
+                    VisualId = 111,
+                    Footprint = new BuildingFootprint(18.0f, 16.0f, 8.0f),
+                    ConstructionTicks = 120,
+                    Costs =
+                    [
+                        new BuildingResourceCost(ResourceIds.Steel, 180.0),
+                        new BuildingResourceCost(ResourceIds.Electronics, 60.0)
+                    ],
+                    Capabilities =
+                        BuildingCapability.UnitProduction |
+                        BuildingCapability.PowerConsumption,
+                    PowerDemand = 20.0,
+                    ProductionInputCapacity = 0.0,
+                    UnitProductionCapabilities =
+                        UnitProductionCapability.Infantry,
+                    UnitProductionInputCapacity = 2_000.0,
+                    UnitSpawnOffset = new Vector3(0.0f, 0.0f, 14.0f)
+                },
+                new BuildingDefinition
+                {
+                    Id = BuildingIds.VehicleFactory,
+                    Key = "building.vehicle_factory",
+                    DisplayName = "Vehicle Factory",
+                    VisualId = 112,
+                    Footprint = new BuildingFootprint(26.0f, 24.0f, 12.0f),
+                    ConstructionTicks = 180,
+                    Costs =
+                    [
+                        new BuildingResourceCost(ResourceIds.Steel, 320.0),
+                        new BuildingResourceCost(ResourceIds.Electronics, 120.0)
+                    ],
+                    Capabilities =
+                        BuildingCapability.UnitProduction |
+                        BuildingCapability.PowerConsumption,
+                    PowerDemand = 40.0,
+                    UnitProductionCapabilities =
+                        UnitProductionCapability.Vehicle |
+                        UnitProductionCapability.Logistics,
+                    UnitProductionInputCapacity = 4_000.0,
+                    UnitSpawnOffset = new Vector3(0.0f, 0.0f, 20.0f)
+                },
+                new BuildingDefinition
+                {
+                    Id = BuildingIds.Radar,
+                    Key = "building.radar",
+                    DisplayName = "Radar",
+                    VisualId = 113,
+                    Footprint = new BuildingFootprint(14.0f, 14.0f, 18.0f),
+                    ConstructionTicks = 110,
+                    Costs =
+                    [
+                        new BuildingResourceCost(ResourceIds.Steel, 120.0),
+                        new BuildingResourceCost(ResourceIds.Electronics, 80.0)
+                    ],
+                    Capabilities =
+                        BuildingCapability.Radar |
+                        BuildingCapability.PowerConsumption,
+                    PowerDemand = 18.0,
+                    PowerPriority = PowerPriority.Critical,
+                    RadarDetectionRangeMeters = 600.0f,
+                    RadarIdentificationRangeMeters = 180.0f,
+                    RadarUpdateIntervalTicks = 4
                 }
             ]);
     }

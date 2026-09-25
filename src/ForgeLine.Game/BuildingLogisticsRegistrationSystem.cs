@@ -155,12 +155,15 @@ public sealed class BuildingLogisticsRegistrationSystem
                 out SupplyDepot supplyDepot);
         bool hasProduction =
             entities.HasComponent<ProductionFacility>(entity);
+        bool hasUnitProduction =
+            entities.HasComponent<UnitProductionFacility>(entity);
 
         if (!hasExtractor &&
             !hasStorageDepot &&
             !hasLogisticsHub &&
             !hasSupplyDepot &&
-            !hasProduction)
+            !hasProduction &&
+            !hasUnitProduction)
         {
             kind = default;
             capabilities = LogisticsNodeCapabilities.None;
@@ -221,6 +224,13 @@ public sealed class BuildingLogisticsRegistrationSystem
         {
             capabilities |=
                 LogisticsNodeCapabilities.CargoSource |
+                LogisticsNodeCapabilities.CargoDestination |
+                LogisticsNodeCapabilities.Processing;
+        }
+
+        if (hasUnitProduction)
+        {
+            capabilities |=
                 LogisticsNodeCapabilities.CargoDestination |
                 LogisticsNodeCapabilities.Processing;
         }

@@ -18,7 +18,7 @@ public sealed class BuildingConstructionTests
         BuildingDefinitionCatalog catalog =
             InitialBuildingDefinitions.CreateCatalog();
 
-        Assert.Equal(10, catalog.Count);
+        Assert.Equal(13, catalog.Count);
         Assert.Equal(
             "building.command_core",
             catalog[BuildingIds.CommandCore].Key);
@@ -55,6 +55,21 @@ public sealed class BuildingConstructionTests
         Assert.True(
             catalog[BuildingIds.SupplyDepot].Capabilities.HasFlag(
                 BuildingCapability.Supply));
+        Assert.Equal(
+            "building.barracks",
+            catalog[BuildingIds.Barracks].Key);
+        Assert.True(
+            catalog[BuildingIds.Barracks].Capabilities.HasFlag(
+                BuildingCapability.UnitProduction));
+        Assert.Equal(
+            "building.vehicle_factory",
+            catalog[BuildingIds.VehicleFactory].Key);
+        Assert.Equal(
+            "building.radar",
+            catalog[BuildingIds.Radar].Key);
+        Assert.True(
+            catalog[BuildingIds.Radar].Capabilities.HasFlag(
+                BuildingCapability.Radar));
 
         Assert.Equal(
             ProductionCapability.SteelProcessing,
@@ -388,6 +403,55 @@ public sealed class BuildingConstructionTests
                 inventoryId,
                 ResourceIds.FerrousOre));
         Assert.Equal(1, test.Construction.Metrics.CompletedBuildings);
+    }
+
+    [Fact]
+    public void CompletedCommandCoreInventoryCanFundOwnedConstruction()
+    {
+        TestWorld test = CreateTestWorld();
+        EntityId source =
+            AddFundedInventory(test, includeAllCosts: true);
+
+        SubmitBuild(
+            test,
+            source,
+            BuildingIds.CommandCore,
+            new Vector3(48.0f, 0.0f, 48.0f));
+        test.Simulation.AdvanceOneTick();
+
+        EntityId commandCore = SingleSite(test);
+        BuildingDefinition commandDefinition =
+            test.Definitions[BuildingIds.CommandCore];
+        test.Simulation.RunTicks(
+            commandDefinition.ConstructionTicks - 1,
+            TestContext.Current.CancellationToken);
+
+        InventoryStorage commandInventory =
+            test.Simulation.Entities.GetComponent<InventoryStorage>(
+                commandCore);
+        BuildingDefinition powerPlant =
+            test.Definitions[BuildingIds.PowerPlant];
+
+        foreach (BuildingResourceCost cost in powerPlant.Costs)
+        {
+            Assert.True(
+                test.Inventories.Add(
+                    commandInventory.InventoryId,
+                    cost.ResourceId,
+                    cost.Quantity).Succeeded);
+        }
+
+        SubmitBuild(
+            test,
+            commandCore,
+            BuildingIds.PowerPlant,
+            new Vector3(96.0f, 0.0f, 48.0f));
+        test.Simulation.AdvanceOneTick();
+
+        Assert.Equal(
+            BuildCommandRejectionReason.None,
+            test.Commands.Metrics.LastRejection);
+        Assert.Equal(1, CountSites(test));
     }
 
     [Fact]
