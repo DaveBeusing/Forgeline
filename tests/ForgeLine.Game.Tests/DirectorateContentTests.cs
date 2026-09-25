@@ -258,7 +258,7 @@ public sealed class DirectorateContentTests
             simulation.CurrentTick.Next());
 
         simulation.RunTicks(
-            checked((int)tank.ProductionTicks + 1),
+            checked((ulong)tank.ProductionTicks + 1UL),
             TestContext.Current.CancellationToken);
 
         Assert.True(command.Accepted);
@@ -296,7 +296,7 @@ public sealed class DirectorateContentTests
         }
 
         Assert.Equal(
-            1UL,
+            1L,
             production.Metrics.CompletedUnits);
     }
 
@@ -389,11 +389,11 @@ public sealed class DirectorateContentTests
                 state: PowerOperationalState.Powered));
 
         simulation.RunTicks(
-            checked((int)rifle.ProductionTicks),
+            checked((ulong)rifle.ProductionTicks),
             TestContext.Current.CancellationToken);
 
         Assert.Equal(
-            1UL,
+            1L,
             production.Metrics.CompletedUnits);
     }
 
