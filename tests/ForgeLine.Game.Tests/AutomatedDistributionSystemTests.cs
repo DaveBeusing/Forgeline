@@ -256,6 +256,65 @@ public sealed class AutomatedDistributionSystemTests
     }
 
     [Fact]
+    public void AgingAllowsOlderLowPriorityDeficitToCompeteWithNewCriticalDemand()
+    {
+        DistributionFixture fixture =
+            CreateFixture(sourceQuantity: 200.0);
+
+        EntityId lowDestination =
+            fixture.CreateStorageNode(
+                new Vector3(52.0f, 0.0f, 20.0f),
+                out _,
+                out LogisticsNodeId lowNode);
+        fixture.Connect(
+            fixture.SourceNode,
+            lowNode);
+        fixture.AddPolicy(
+            lowDestination,
+            minimum: 10.0,
+            target: 40.0,
+            maximum: 80.0,
+            LogisticsStockPriority.Low);
+
+        fixture.Simulation.RunTicks(60);
+
+        fixture.Connect(
+            fixture.SourceNode,
+            fixture.DestinationNode);
+        fixture.AddPolicy(
+            fixture.DestinationEntity,
+            minimum: 10.0,
+            target: 40.0,
+            maximum: 80.0,
+            LogisticsStockPriority.Critical);
+        fixture.CreateTruck(fixture.SourcePosition);
+
+        fixture.Simulation.AdvanceOneTick();
+
+        LogisticsTransportRequestReadModel low =
+            fixture.Distribution.LastDebugSnapshot.Requests
+                .Single(
+                    request =>
+                        request.Destination == lowNode);
+        LogisticsTransportRequestReadModel critical =
+            fixture.Distribution.LastDebugSnapshot.Requests
+                .Single(
+                    request =>
+                        request.Destination ==
+                        fixture.DestinationNode);
+
+        Assert.Equal(
+            LogisticsTransportRequestState.Assigned,
+            low.State);
+        Assert.Equal(
+            LogisticsTransportRequestState.RetryPending,
+            critical.State);
+        Assert.Equal(
+            LogisticsTransportRequestFailureReason.NoTruckAvailable,
+            critical.FailureReason);
+    }
+
+    [Fact]
     public void MissingRouteRetriesWithoutReservingStock()
     {
         DistributionFixture fixture =
