@@ -480,6 +480,44 @@ public sealed class BuildingConstructionTests
     }
 
     [Fact]
+    public void LogisticsHubCompletionActivatesDistributionInventory()
+    {
+        TestWorld test = CreateTestWorld();
+        EntityId inventoryEntity =
+            AddFundedInventory(test, includeAllCosts: true);
+        BuildingDefinition definition =
+            test.Definitions[BuildingIds.LogisticsHub];
+
+        SubmitBuild(
+            test,
+            inventoryEntity,
+            BuildingIds.LogisticsHub,
+            new Vector3(64.0f, 0.0f, 64.0f));
+        test.Simulation.AdvanceOneTick();
+
+        EntityId site = SingleSite(test);
+        test.Simulation.RunTicks(
+            definition.ConstructionTicks - 1,
+            TestContext.Current.CancellationToken);
+
+        Assert.True(
+            test.Simulation.Entities.HasComponent<CompletedBuilding>(site));
+        Assert.True(
+            test.Simulation.Entities.TryGetComponent(
+                site,
+                out InventoryStorage storage));
+        Assert.True(
+            test.Simulation.Entities.TryGetComponent(
+                site,
+                out LogisticsHub hub));
+        Assert.Equal(storage.InventoryId, hub.InventoryId);
+        Assert.Equal(new FactionId((uint)Player.Value), hub.Owner);
+        Assert.Equal(
+            definition.StorageCapacity,
+            test.Inventories.GetTotalCapacity(storage.InventoryId));
+    }
+
+    [Fact]
     public void HeadlessConstructionRunsThroughFixedTicksWithoutPresentation()
     {
         TestWorld test = CreateTestWorld();
