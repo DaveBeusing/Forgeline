@@ -130,6 +130,26 @@ internal sealed class ClientApplication
                 intelligenceStore);
         var combatWeapons =
             new WeaponCatalog();
+        var artilleryWeapons =
+            new ArtilleryWeaponCatalog();
+        artilleryWeapons.Add(
+            new ArtilleryWeaponDefinition(
+                new WeaponId(10_001),
+                minimumRangeMeters: 60.0f,
+                maximumRangeMeters: 600.0f,
+                fireIntervalTicks: 40,
+                acquisitionTicks: 10,
+                ammunitionPerShot: 1.0,
+                new DamagePayload(100.0),
+                areaRadiusMeters: 20.0f,
+                minimumDamageFraction: 0.2,
+                projectileSpeedMetersPerSecond: 120.0f,
+                apexHeightMeters: 120.0f,
+                dispersionRadiusMeters: 4.0f,
+                effectiveness:
+                    new WeaponEffectiveness(
+                        TargetClassMask.All,
+                        penetration: 60.0)));
         var combatArmor =
             new ArmorCatalog();
         var combatRuntime =
@@ -146,11 +166,20 @@ internal sealed class ClientApplication
                 combatRuntime,
                 spatialIndex,
                 intelligenceAvailability);
+        var artilleryFireMissions =
+            new ArtilleryFireMissionSystem(
+                artilleryWeapons,
+                inventories,
+                combatRuntime,
+                intelligenceStore,
+                terrainWorld,
+                spatialIndex);
         var combatDamageResolution =
             new CombatDamageResolutionSystem(
                 combatRuntime,
                 combatWeapons,
-                combatArmor);
+                combatArmor,
+                artilleryWeapons);
         var combatLifecycle =
             new CombatEntityLifecycleSystem(
                 combatRuntime,
@@ -208,6 +237,7 @@ internal sealed class ClientApplication
         simulation.RegisterSystem(resourceExtraction);
         simulation.RegisterSystem(battlefieldIntelligence);
         simulation.RegisterSystem(targetAcquisition);
+        simulation.RegisterSystem(artilleryFireMissions);
         simulation.RegisterSystem(combatExecution);
         simulation.RegisterSystem(combatDamageResolution);
         simulation.RegisterSystem(battlefieldSupply);
@@ -342,6 +372,8 @@ internal sealed class ClientApplication
             battlefieldIntelligence.TimingEnabled =
                 worldDebugEnabled;
             battlefieldIntelligence.DebugCaptureEnabled =
+                worldDebugEnabled;
+            artilleryFireMissions.DebugCaptureEnabled =
                 worldDebugEnabled;
             targetAcquisition.DebugCaptureEnabled =
                 worldDebugEnabled;
@@ -488,6 +520,10 @@ internal sealed class ClientApplication
                 worldDebugEnabled
                     ? combatDebugSnapshots.LastDebugSnapshot
                     : null;
+            ArtilleryDebugSnapshot? artilleryDebugSnapshot =
+                worldDebugEnabled
+                    ? artilleryFireMissions.LastDebugSnapshot
+                    : null;
 
             BuildWorldDebugVisualization(
                 debugDraw,
@@ -510,6 +546,7 @@ internal sealed class ClientApplication
                 logisticsCapacityDebugSnapshot,
                 battlefieldSupplyDebugSnapshot,
                 combatDebugSnapshot,
+                artilleryDebugSnapshot,
                 battlefieldIntelligence.DebugSensors,
                 battlefieldIntelligence.Metrics);
 
@@ -845,6 +882,7 @@ internal sealed class ClientApplication
         LogisticsCapacityDebugSnapshot? logisticsCapacitySnapshot,
         BattlefieldSupplyDebugSnapshot? battlefieldSupplySnapshot,
         CombatDebugSnapshot? combatSnapshot,
+        ArtilleryDebugSnapshot? artillerySnapshot,
         IReadOnlyList<IntelligenceSensorDebugEntry> intelligenceSensors,
         BattlefieldIntelligenceMetrics intelligenceMetrics)
     {
@@ -1002,6 +1040,16 @@ internal sealed class ClientApplication
                     debugDraw,
                     intelligenceMetrics,
                     camera.Target + Vector3.UnitY * 6.0f);
+            }
+
+            if (artillerySnapshot is not null)
+            {
+                ArtilleryDebugVisualization.Draw(
+                    debugDraw,
+                    artillerySnapshot,
+                    camera.Target + Vector3.UnitY * 9.0f,
+                    maximumMissions: 64,
+                    maximumProjectiles: 128);
             }
 
             if (combatSnapshot is not null)

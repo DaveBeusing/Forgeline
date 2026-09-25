@@ -190,3 +190,8 @@ Navigation data is immutable for a specific `NavigationVersion`. Replacing the d
 See `docs/HierarchicalNavigation.md` for movement classes, request/result ownership, failures, diagnostics, debug rendering, and benchmark coverage.
 
 Multi-unit movement groups sit above this hierarchy. A group owns one strategic route/corridor and projects line, column, wedge, or compact formation slots around the active route direction. Stable per-member slot assignment, conservative speed harmonization, blocked-slot projection, lateral compression, and longitudinal cohort fallback remain game simulation concerns; local avoidance and final transform mutation remain in `GroundMovementSystem`. See `docs/FormationMovementAndGroupOrders.md` for the complete lifecycle and scale behavior.
+
+
+## Artillery Authority Boundary
+
+Indirect fire extends the combat/intelligence boundary without reintroducing hidden entity access. `FireMissionCommand` creates a request; `ArtilleryFireMissionSystem` resolves that request after the Sensors phase to either a currently visible coordinate or a stored intelligence contact position. The resulting `FireMissionState` contains a fixed coordinate, not a target entity. Ballistic shell travel, terrain impact, area damage, Ammunition consumption, and Health/destruction remain authoritative fixed-tick simulation. Battlefield Supply may replenish the same Ammunition inventory after Combat, allowing a `NoAmmo` mission to resume on a later tick. See `docs/ArtilleryAndIndirectFire.md`.
