@@ -109,4 +109,31 @@ public sealed record FactionContentDefinition
             .ThenBy(static entry => entry.UnitId)
             .Select(static entry => entry.UnitId)
             .ToArray();
+
+    public IReadOnlyList<UnitId> GetUnitProductionMenu(
+        BuildingDefinition facility,
+        UnitDefinitionCatalog units,
+        ContentAvailabilityTier tier)
+    {
+        ArgumentNullException.ThrowIfNull(facility);
+        ArgumentNullException.ThrowIfNull(units);
+
+        if (!facility.Capabilities.HasFlag(
+                BuildingCapability.UnitProduction))
+        {
+            return [];
+        }
+
+        return Units
+            .Where(entry => entry.Tier <= tier)
+            .Select(entry => units[entry.UnitId])
+            .Where(
+                definition =>
+                    (facility.UnitProductionCapabilities &
+                     definition.RequiredProductionCapability) ==
+                    definition.RequiredProductionCapability)
+            .OrderBy(static definition => definition.Id)
+            .Select(static definition => definition.Id)
+            .ToArray();
+    }
 }
