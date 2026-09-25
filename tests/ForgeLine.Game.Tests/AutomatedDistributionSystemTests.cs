@@ -64,7 +64,55 @@ public sealed class AutomatedDistributionSystemTests
                 fixture.SourceInventory,
                 ResourceIds.FerrousOre));
         Assert.Equal(
-            1,
+            1L,
+            fixture.Distribution.Metrics.CompletedRequestCount);
+    }
+
+    [Fact]
+    public void TargetLargerThanTruckCapacityUsesMultiplePhysicalShipments()
+    {
+        DistributionFixture fixture =
+            CreateFixture(sourceQuantity: 300.0);
+
+        fixture.Connect(
+            fixture.SourceNode,
+            fixture.DestinationNode);
+        fixture.AddPolicy(
+            fixture.DestinationEntity,
+            minimum: 20.0,
+            target: 220.0,
+            maximum: 300.0,
+            LogisticsStockPriority.Normal);
+        EntityId truck =
+            fixture.CreateTruck(fixture.SourcePosition);
+
+        double conservedBefore =
+            fixture.TotalConservedQuantity(truck);
+
+        RunUntil(
+            fixture,
+            () =>
+                fixture.Inventories.GetQuantity(
+                    fixture.DestinationInventory,
+                    ResourceIds.FerrousOre) >= 220.0 &&
+                fixture.Distribution.Metrics.CompletedRequestCount >= 1,
+            maximumTicks: 1_800);
+
+        Assert.Equal(
+            conservedBefore,
+            fixture.TotalConservedQuantity(truck));
+        Assert.Equal(
+            220.0,
+            fixture.Inventories.GetQuantity(
+                fixture.DestinationInventory,
+                ResourceIds.FerrousOre));
+        Assert.Equal(
+            80.0,
+            fixture.Inventories.GetQuantity(
+                fixture.SourceInventory,
+                ResourceIds.FerrousOre));
+        Assert.Equal(
+            1L,
             fixture.Distribution.Metrics.CompletedRequestCount);
     }
 
@@ -184,17 +232,17 @@ public sealed class AutomatedDistributionSystemTests
         fixture.Simulation.AdvanceOneTick();
 
         LogisticsTransportRequestReadModel critical =
-            Assert.Single(
-                fixture.Distribution.LastDebugSnapshot.Requests,
-                request =>
-                    request.Destination ==
-                    fixture.DestinationNode);
+            fixture.Distribution.LastDebugSnapshot.Requests
+                .Single(
+                    request =>
+                        request.Destination ==
+                        fixture.DestinationNode);
         LogisticsTransportRequestReadModel low =
-            Assert.Single(
-                fixture.Distribution.LastDebugSnapshot.Requests,
-                request =>
-                    request.Destination ==
-                    lowNode);
+            fixture.Distribution.LastDebugSnapshot.Requests
+                .Single(
+                    request =>
+                        request.Destination ==
+                        lowNode);
 
         Assert.Equal(
             LogisticsTransportRequestState.Assigned,
