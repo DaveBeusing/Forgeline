@@ -13,6 +13,7 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
     private readonly BuildingPlacementService _placement;
     private readonly InventoryStore _inventories;
     private readonly SpatialGridIndex _spatialIndex;
+    private readonly List<EntityId> _pendingRequests = new();
     private long _acceptedCommands;
     private long _rejectedCommands;
     private BuildCommandRejectionReason _lastRejection;
@@ -49,17 +50,17 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        var pending = new List<EntityId>();
+        _pendingRequests.Clear();
         foreach (EntityId entity in
                  context.Entities.Query<BuildingBuildRequest>(
                      QueryIterationOrder.StableByEntityIndex))
         {
-            pending.Add(entity);
+            _pendingRequests.Add(entity);
         }
 
-        for (int index = 0; index < pending.Count; index++)
+        for (int index = 0; index < _pendingRequests.Count; index++)
         {
-            EntityId requestEntity = pending[index];
+            EntityId requestEntity = _pendingRequests[index];
             if (!context.Entities.IsAlive(requestEntity) ||
                 !context.Entities.TryGetComponent(
                     requestEntity,
@@ -287,6 +288,7 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
     private readonly BuildingDefinitionCatalog _definitions;
     private readonly InventoryStore _inventories;
     private readonly SpatialGridIndex _spatialIndex;
+    private readonly List<EntityId> _sites = new();
     private long _cancelledSites;
     private long _completedBuildings;
 
@@ -311,17 +313,17 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        var sites = new List<EntityId>();
+        _sites.Clear();
         foreach (EntityId entity in
                  context.Entities.Query<ConstructionSite>(
                      QueryIterationOrder.StableByEntityIndex))
         {
-            sites.Add(entity);
+            _sites.Add(entity);
         }
 
-        for (int index = 0; index < sites.Count; index++)
+        for (int index = 0; index < _sites.Count; index++)
         {
-            EntityId entity = sites[index];
+            EntityId entity = _sites[index];
             if (!context.Entities.IsAlive(entity) ||
                 !context.Entities.TryGetComponent(
                     entity,
