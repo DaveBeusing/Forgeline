@@ -199,6 +199,57 @@ public sealed class LogisticsCapacityTrackerTests
     }
 
     [Fact]
+    public void ConfiguredNodeThroughputLimitsOtherwiseAvailableEdge()
+    {
+        var network = new LogisticsNetwork();
+
+        LogisticsNodeId source =
+            network.AddNode(
+                new EntityId(1, 1),
+                Vector3.Zero,
+                LogisticsNodeKind.StorageDepot,
+                Capabilities,
+                throughputCapacityPerSecond: 25.0);
+        LogisticsNodeId destination =
+            network.AddNode(
+                new EntityId(2, 1),
+                new Vector3(10.0f, 0.0f, 0.0f),
+                LogisticsNodeKind.StorageDepot,
+                Capabilities,
+                throughputCapacityPerSecond: 100.0);
+
+        _ = network.AddEdge(
+            source,
+            destination,
+            LogisticsTransportMode.GroundRoad,
+            distanceMeters: 10.0,
+            baseCost: 1.0,
+            capacityPerSecond: 100.0);
+
+        LogisticsRoute route =
+            network.FindRoute(
+                source,
+                destination).Route!;
+        var capacity =
+            new LogisticsCapacityTracker();
+
+        Assert.False(
+            capacity.TryReserveRoute(
+                network,
+                route,
+                quantity: 30.0,
+                new SimulationTick(1),
+                out _,
+                out LogisticsCapacityBottleneck bottleneck));
+
+        Assert.Equal(
+            LogisticsCapacityBottleneckKind.Node,
+            bottleneck.Kind);
+        Assert.Equal(source, bottleneck.NodeId);
+        Assert.Equal(25.0, bottleneck.EffectiveCapacity);
+    }
+
+    [Fact]
     public void LargeReservationSetIsReleasedAcrossRepeatedRouteChanges()
     {
         var network = new LogisticsNetwork();
