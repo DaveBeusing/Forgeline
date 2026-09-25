@@ -14,6 +14,7 @@ public static class SimulationPhaseOrder
         SimulationPhase.DamageResolution,
         SimulationPhase.Supply,
         SimulationPhase.Logistics,
+        SimulationPhase.Infrastructure,
         SimulationPhase.Production,
         SimulationPhase.Economy,
         SimulationPhase.EntityLifecycle,
@@ -36,10 +37,11 @@ public static class SimulationPhaseOrder
             SimulationPhase.DamageResolution => 7,
             SimulationPhase.Supply => 8,
             SimulationPhase.Logistics => 9,
-            SimulationPhase.Production => 10,
-            SimulationPhase.Economy => 11,
-            SimulationPhase.EntityLifecycle => 12,
-            SimulationPhase.SnapshotEvents => 13,
+            SimulationPhase.Infrastructure => 10,
+            SimulationPhase.Production => 11,
+            SimulationPhase.Economy => 12,
+            SimulationPhase.EntityLifecycle => 13,
+            SimulationPhase.SnapshotEvents => 14,
             _ => throw new ArgumentOutOfRangeException(nameof(phase), phase, "Unknown simulation phase."),
         };
     }
