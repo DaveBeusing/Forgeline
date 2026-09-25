@@ -143,7 +143,7 @@ public sealed class CombatExecutionSystemTests
                 new Vector3(0.5f),
                 new SpatialEntryMetadata(
                     RedFaction.Value,
-                    categoryMask: 1,
+                    CategoryMask: 1,
                     SpatialMobility.Mobile)));
 
         scenario.Simulation.RunTicks(3);
