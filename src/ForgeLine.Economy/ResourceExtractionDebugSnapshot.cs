@@ -22,7 +22,8 @@ public readonly record struct ResourceExtractorReadModel(
     double MaximumExtractionRatePerSecond,
     FactionId Owner,
     bool Enabled,
-    ResourceExtractorState State);
+    ResourceExtractorState State,
+    EntityId OutputInventory);
 
 public sealed class ResourceExtractionDebugSnapshot
 {
@@ -94,7 +95,8 @@ public sealed class ResourceExtractionDebugSnapshot
                     extractor.MaximumExtractionRatePerSecond,
                     extractor.Owner,
                     extractor.Enabled,
-                    extractor.State));
+                    extractor.State,
+                    extractor.OutputInventory));
         }
 
         return new ResourceExtractionDebugSnapshot(

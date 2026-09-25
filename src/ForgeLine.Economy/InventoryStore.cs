@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using ForgeLine.Core;
 
 namespace ForgeLine.Economy;
@@ -443,7 +444,7 @@ public sealed class InventoryStore
 
     private bool TryGetState(
         InventoryId inventoryId,
-        out InventoryState? state)
+        [NotNullWhen(true)] out InventoryState? state)
     {
         if (!inventoryId.IsSpecified)
         {

@@ -11,7 +11,10 @@ public enum ResourceExtractorState
     DepositDepleted = 4,
     InvalidDepositReference = 5,
     ResourceMismatch = 6,
-    OwnershipMismatch = 7
+    OwnershipMismatch = 7,
+    OutputUnavailable = 8,
+    OutputBlocked = 9,
+    OutputConstrained = 10
 }
 
 public readonly record struct ResourceExtractor
@@ -22,7 +25,8 @@ public readonly record struct ResourceExtractor
         double maximumExtractionRatePerSecond,
         FactionId owner = default,
         bool enabled = true,
-        ResourceExtractorState state = ResourceExtractorState.Ready)
+        ResourceExtractorState state = ResourceExtractorState.Ready,
+        EntityId outputInventory = default)
     {
         if (!deposit.IsValid)
         {
@@ -50,6 +54,7 @@ public readonly record struct ResourceExtractor
         Owner = owner;
         Enabled = enabled;
         State = enabled ? state : ResourceExtractorState.Disabled;
+        OutputInventory = outputInventory;
     }
 
     public EntityId Deposit { get; }
@@ -64,6 +69,8 @@ public readonly record struct ResourceExtractor
 
     public ResourceExtractorState State { get; }
 
+    public EntityId OutputInventory { get; }
+
     internal ResourceExtractor WithState(ResourceExtractorState state) =>
         new(
             Deposit,
@@ -71,5 +78,6 @@ public readonly record struct ResourceExtractor
             MaximumExtractionRatePerSecond,
             Owner,
             Enabled,
-            state);
+            state,
+            OutputInventory);
 }
