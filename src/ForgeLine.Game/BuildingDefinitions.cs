@@ -100,7 +100,7 @@ public readonly record struct BuildingFootprint
         return new Vector3(width * 0.5f, Height * 0.5f, depth * 0.5f);
     }
 
-    public Quaternion GetRotation(BuildingOrientation orientation)
+    public static Quaternion GetRotation(BuildingOrientation orientation)
     {
         ValidateOrientation(orientation);
 
