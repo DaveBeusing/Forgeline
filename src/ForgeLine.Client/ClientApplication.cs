@@ -347,6 +347,21 @@ internal sealed class ClientApplication
                 lastBuildCommand = command;
             }
 
+            BuildingConstructionDebugSnapshot? constructionDebugSnapshot =
+                worldDebugEnabled ||
+                buildingConstruction.Metrics.ActiveSites > 0
+                    ? BuildingConstructionDebugSnapshot.Capture(
+                        simulation.Entities,
+                        buildingDefinitions)
+                    : null;
+            ResourceExtractionDebugSnapshot? resourceDebugSnapshot =
+                worldDebugEnabled
+                    ? ResourceExtractionDebugSnapshot.Capture(
+                        simulation.Entities,
+                        resourceExtraction.Metrics,
+                        resourceCatalog)
+                    : null;
+
             BuildWorldDebugVisualization(
                 debugDraw,
                 worldDebugEnabled,
@@ -360,13 +375,8 @@ internal sealed class ClientApplication
                 navigationSystem.World,
                 navigationSystem.LastCompletedPath,
                 buildingPlacementController,
-                BuildingConstructionDebugSnapshot.Capture(
-                    simulation.Entities,
-                    buildingDefinitions),
-                ResourceExtractionDebugSnapshot.Capture(
-                    simulation.Entities,
-                    resourceExtraction.Metrics,
-                    resourceCatalog));
+                constructionDebugSnapshot,
+                resourceDebugSnapshot);
 
             terrainRenderer.DebugChunksEnabled = worldDebugEnabled;
 
@@ -658,8 +668,8 @@ internal sealed class ClientApplication
         NavigationWorld navigationWorld,
         NavigationPath? navigationPath,
         RtsBuildingPlacementController buildingPlacementController,
-        BuildingConstructionDebugSnapshot constructionSnapshot,
-        ResourceExtractionDebugSnapshot resourceSnapshot)
+        BuildingConstructionDebugSnapshot? constructionSnapshot,
+        ResourceExtractionDebugSnapshot? resourceSnapshot)
     {
         debugDraw.Clear();
 
@@ -667,7 +677,7 @@ internal sealed class ClientApplication
             selectionController.Selection.Count > 0 ||
             selectionController.HoveredEntity.IsValid ||
             buildingPlacementController.IsActive ||
-            constructionSnapshot.Sites.Count > 0;
+            (constructionSnapshot?.Sites.Count ?? 0) > 0;
         debugDraw.Enabled =
             worldDebugEnabled ||
             interactionFeedback;
@@ -696,13 +706,16 @@ internal sealed class ClientApplication
                 placementInvalidColor);
         }
 
-        BuildingConstructionDebugVisualization.DrawConstructionSites(
-            debugDraw,
-            constructionSnapshot,
-            constructionColor,
-            completedColor,
-            maximumCompleted: worldDebugEnabled ? 64 : 0,
-            maximumLabels: 32);
+        if (constructionSnapshot is not null)
+        {
+            BuildingConstructionDebugVisualization.DrawConstructionSites(
+                debugDraw,
+                constructionSnapshot,
+                constructionColor,
+                completedColor,
+                maximumCompleted: worldDebugEnabled ? 64 : 0,
+                maximumLabels: 32);
+        }
 
         if (worldDebugEnabled)
         {
@@ -737,13 +750,16 @@ internal sealed class ClientApplication
                     NavigationMovementClass.Tracked),
                 navigationPath,
                 camera.Target);
-            ResourceDepositDebugVisualization.DrawDeposits(
-                debugDraw,
-                resourceSnapshot,
-                new Vector4(0.65f, 0.9f, 0.25f, 1.0f),
-                new Vector4(0.35f, 0.35f, 0.35f, 1.0f),
-                maximumDeposits: 64,
-                maximumLabels: 8);
+            if (resourceSnapshot is not null)
+            {
+                ResourceDepositDebugVisualization.DrawDeposits(
+                    debugDraw,
+                    resourceSnapshot,
+                    new Vector4(0.65f, 0.9f, 0.25f, 1.0f),
+                    new Vector4(0.35f, 0.35f, 0.35f, 1.0f),
+                    maximumDeposits: 64,
+                    maximumLabels: 8);
+            }
 
             int debugCount = Math.Min(
                 renderWorld.InstanceCount,
