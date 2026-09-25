@@ -24,7 +24,7 @@ public sealed class CombatExecutionSystemTests
                 shooterAmmunition: 10.0,
                 targetPosition: new Vector3(10.0f, 0.0f, 0.0f));
 
-        scenario.Simulation.RunTicks(5);
+        scenario.Simulation.RunTicks(5, TestContext.Current.CancellationToken);
 
         Assert.Equal(
             7.0,
@@ -60,7 +60,7 @@ public sealed class CombatExecutionSystemTests
                 shooterAmmunition: 10.0,
                 targetPosition: new Vector3(10.0f, 0.0f, 0.0f));
 
-        scenario.Simulation.RunTicks(5);
+        scenario.Simulation.RunTicks(5, TestContext.Current.CancellationToken);
 
         Assert.Equal(3UL, scenario.Runtime.Metrics.TotalShotsFired);
         Assert.Equal(
@@ -146,7 +146,7 @@ public sealed class CombatExecutionSystemTests
                     CategoryMask: 1,
                     SpatialMobility.Mobile)));
 
-        scenario.Simulation.RunTicks(3);
+        scenario.Simulation.RunTicks(3, TestContext.Current.CancellationToken);
 
         Assert.Equal(
             75.0,
@@ -158,7 +158,7 @@ public sealed class CombatExecutionSystemTests
         Assert.Equal(1UL, scenario.Runtime.Metrics.TotalHits);
         Assert.Equal(0, scenario.Runtime.Metrics.ActiveProjectiles);
 
-        scenario.Simulation.RunTicks(5);
+        scenario.Simulation.RunTicks(5, TestContext.Current.CancellationToken);
 
         Assert.Equal(
             75.0,
@@ -187,7 +187,7 @@ public sealed class CombatExecutionSystemTests
             scenario.Simulation.Entities.DestroyEntity(
                 scenario.Shooter));
 
-        scenario.Simulation.RunTicks(2);
+        scenario.Simulation.RunTicks(2, TestContext.Current.CancellationToken);
 
         Assert.Equal(
             80.0,
@@ -274,7 +274,7 @@ public sealed class CombatExecutionSystemTests
                 targetPosition: new Vector3(12.0f, 0.0f, 0.0f),
                 simulationSeed: 12345);
 
-        scenario.Simulation.RunTicks(7);
+        scenario.Simulation.RunTicks(7, TestContext.Current.CancellationToken);
 
         return new CombatOutcome(
             scenario.Runtime.Metrics.TotalShotsFired,
