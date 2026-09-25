@@ -283,3 +283,8 @@ Later intelligence work may add:
 - artillery workflows that consume contact data without resolving hidden entities directly.
 
 Those systems should extend the existing faction store, contact model, sensor scheduling, and target-availability boundary rather than bypass them.
+
+
+## Artillery Contact Consumption
+
+Indirect fire is the first tactical consumer of opaque intelligence contacts. A contact-key mission copies the stored last-known position and last-seen tick into a coordinate fire mission. The artillery state does not retain or reacquire the hidden enemy entity. Direct coordinate missions require current visual visibility. Detected radar contacts may therefore support area fire against their known coordinates without granting direct entity targeting. See [Artillery and Indirect Fire](ArtilleryAndIndirectFire.md).

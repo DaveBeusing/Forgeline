@@ -185,3 +185,8 @@ All tests execute without requiring a graphics client, preserving headless simul
 Maintenance is intentionally not part of the first battlefield supply implementation.
 
 The current provider, priority, read-model, and inventory-backed transfer boundaries are designed so Maintenance can be added later without replacing Fuel/Ammunition logistics or introducing a second supply scheduler.
+
+
+## Artillery Resupply
+
+Artillery uses the existing `AmmunitionState` inventory and is therefore a normal Battlefield Supply recipient. When an active fire mission cannot remove its configured Ammunition cost, the mission enters `NoAmmo` but remains valid. `BattlefieldSupplySystem` may replenish the artillery inventory in the normal Supply phase through a `SupplyProvider` or Supply Truck. The artillery system observes the replenished inventory on a subsequent Combat tick and continues the same mission until its requested round count completes. No artillery-specific ammunition pool or transfer path exists.

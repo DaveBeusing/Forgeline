@@ -279,3 +279,10 @@ F2 world debugging additionally renders movement-group bounds and centroids, tra
 The Simulation BenchmarkDotNet host includes `FormationRoutingBenchmarks` for 10, 50, and 100 members. It compares independent strategic path searches with one centroid-based shared group route. Timing is observational; the primary invariant is the reduction from N strategic route requests to one group route where members can share navigation.
 
 See [Formation Movement and Group Orders](FormationMovementAndGroupOrders.md) for lifecycle, fallback behavior, and interpretation details.
+
+
+## Artillery Diagnostics
+
+`ArtilleryFireMissionSystem.Metrics` reports active missions, `NoAmmo` missions, shells in flight, shots, impacts, affected area-damage targets, Ammunition consumption, and queued area damage for the current tick and cumulatively.
+
+The F2 artillery debug read model exposes mission min/max range, fixed target coordinate, lifecycle state, requested/fired rounds, shell position, complete parabolic trajectory, impact radius, and a compact metrics label. These diagnostics consume simulation-owned state without controlling targeting, dispersion, impact timing, or damage.

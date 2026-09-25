@@ -260,3 +260,8 @@ Those systems should extend the existing weapon, projectile, Health, damage, eve
 
 
 See [Armor and Target Acquisition](ArmorAndTargetAcquisition.md) for the authoritative directional-armor, penetration, target-class, automatic-acquisition, priority, fire-policy, intelligence-availability, and line-of-fire contracts.
+
+
+## Indirect Fire Extension
+
+Artillery uses a separate `ArtilleryWeaponCatalog` and coordinate-based mission lifecycle while reusing `CombatRuntime`, `AmmunitionState`, `CombatDamageResolutionSystem`, Health, armor, combat events, and entity lifecycle. Indirect area damage enters the same pending-damage path as direct fire, and downward impacts resolve against Top armor. See [Artillery and Indirect Fire](ArtilleryAndIndirectFire.md).
