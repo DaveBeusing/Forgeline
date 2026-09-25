@@ -47,6 +47,37 @@ public sealed class BuildingConstructionTests
     }
 
     [Fact]
+    public void PreviewRejectsTerrainThatExceedsBuildingSlopeLimit()
+    {
+        var definitions = InitialBuildingDefinitions.CreateCatalog();
+        var terrain = new SteepTerrainQuery();
+        var spatialIndex = new SpatialGridIndex(
+            new SpatialGridSettings
+            {
+                World = new WorldGridSettings(),
+                CellSizeMeters = 16.0f
+            });
+        var simulation = new SimulationCoordinator();
+        var placement = new BuildingPlacementService(
+            definitions,
+            terrain,
+            spatialIndex);
+
+        BuildingPlacementPreview preview =
+            placement.CreatePreview(
+                simulation.Entities,
+                Player,
+                BuildingIds.PowerPlant,
+                new Vector3(64.0f, 0.0f, 64.0f),
+                BuildingOrientation.North);
+
+        Assert.False(preview.IsValid);
+        Assert.Equal(
+            BuildingPlacementFailureReason.SlopeTooSteep,
+            preview.Failure);
+    }
+
+    [Fact]
     public void PreviewReportsBuildableAreaFailureWithoutChangingSimulation()
     {
         TestWorld test = CreateTestWorld(
@@ -584,6 +615,38 @@ public sealed class BuildingConstructionTests
 
             normal = Vector3.UnitY;
             return contained;
+        }
+    }
+
+    private sealed class SteepTerrainQuery : ITerrainQuery
+    {
+        public AxisAlignedBounds WorldBounds { get; } =
+            new(
+                Vector3.Zero,
+                new Vector3(256.0f, 20.0f, 256.0f));
+
+        public bool TrySampleHeight(
+            float worldX,
+            float worldZ,
+            out float height)
+        {
+            height = 0.0f;
+            return worldX >= 0.0f &&
+                   worldX <= 256.0f &&
+                   worldZ >= 0.0f &&
+                   worldZ <= 256.0f;
+        }
+
+        public bool TrySampleNormal(
+            float worldX,
+            float worldZ,
+            out Vector3 normal)
+        {
+            normal = Vector3.Normalize(new Vector3(1.0f, 1.0f, 0.0f));
+            return worldX >= 0.0f &&
+                   worldX <= 256.0f &&
+                   worldZ >= 0.0f &&
+                   worldZ <= 256.0f;
         }
     }
 
