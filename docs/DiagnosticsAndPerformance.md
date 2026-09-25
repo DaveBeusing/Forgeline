@@ -64,6 +64,14 @@ Directional armor and target acquisition add simulation-owned diagnostics withou
 
 When debug capture is enabled, target rejection positions/reasons and armor facing transforms are copied into the combat debug snapshot for F2 visualization.
 
+## Battlefield Intelligence Metrics
+
+`BattlefieldIntelligenceSystem.Metrics` reports active visual/radar sensors, scans, candidate counts, Detected/Identified contact counts, visible/explored cell counts, cumulative sensing work, and optional measured sensor-update duration.
+
+Sensor timing is enabled only when requested by the development composition. Timing never feeds simulation decisions.
+
+Faction-intelligence snapshots provide presentation-safe Fog-of-War cells and contact read models. Detected-only contacts contain opaque contact keys and last-known positions rather than current hidden entity transforms.
+
 ## Job Metrics
 
 The job scheduler exposes:

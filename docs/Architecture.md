@@ -107,6 +107,8 @@ Combat execution follows the canonical `Combat -> DamageResolution -> EntityLife
 
 Directional armor and target acquisition extend the same authority chain. `TargetAcquisitionSystem` runs in `Sensors` against authoritative transforms and the world spatial index, then `CombatExecutionSystem` performs final target/fire validation before Ammunition use. `CombatDamageResolutionSystem` classifies incoming direction against target facing and resolves logical penetration through data-driven weapon and armor profiles. Intelligence availability and line-of-fire are policy boundaries rather than presentation decisions. See `docs/ArmorAndTargetAcquisition.md`.
 
+Battlefield intelligence owns faction-specific knowledge before target acquisition. `BattlefieldIntelligenceSystem` runs in `Sensors` after movement/spatial synchronization, updates persistent exploration, current visual coverage, and Detected/Identified contacts, then the existing targeting system consumes `IntelligenceTargetAvailabilityPolicy`. Presentation receives a faction-bounded intelligence snapshot and filters hidden enemy render instances; it never determines visibility. See `docs/BattlefieldIntelligence.md`.
+
 Simulation code is written in a deterministic-friendly style:
 
 - explicit tick ordering

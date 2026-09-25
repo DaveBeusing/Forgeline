@@ -207,3 +207,12 @@ It also rejects graphics/audio/UI/presentation/client/Windows dependencies from 
 These checks preserve the invariant that a complete simulation remains runnable without presentation or graphics initialization.
 
 Ground-movement debug capture is opt-in and copies immutable diagnostic values at simulation tick boundaries. Presentation never retains live ECS movement references. See [Ground Movement and Local Steering](GroundMovementAndSteering.md).
+
+
+## Faction Intelligence Extraction
+
+When a presentation composition provides a `FactionIntelligenceStore` and viewing faction, `PresentationExtractor` applies the authoritative battlefield-intelligence result before publishing render instances. Enemy entities carrying `IntelligenceSignature` are included only while currently identified for that faction. Detected-only radar contacts remain separate contact read models.
+
+A bounded `FactionIntelligenceSnapshot` can carry explicit Unexplored, Explored, and Visible cells plus Detected/Identified last-known contacts. F2 debug visualization can render those cells, sensor ranges, contact markers, and sensor timing without mutating simulation visibility.
+
+See `BattlefieldIntelligence.md` for the authoritative sensing and targeting semantics.
