@@ -17,6 +17,7 @@ public sealed class CombatDamageResolutionSystem : ISimulationSystem
     private readonly CombatRuntime _runtime;
     private readonly WeaponCatalog? _weapons;
     private readonly ArmorCatalog? _armor;
+    private readonly ArtilleryWeaponCatalog? _artilleryWeapons;
 
     private ulong _armoredHits;
     private ulong _frontHits;
@@ -28,12 +29,14 @@ public sealed class CombatDamageResolutionSystem : ISimulationSystem
     public CombatDamageResolutionSystem(
         CombatRuntime runtime,
         WeaponCatalog? weapons = null,
-        ArmorCatalog? armor = null)
+        ArmorCatalog? armor = null,
+        ArtilleryWeaponCatalog? artilleryWeapons = null)
     {
         _runtime = runtime ??
             throw new ArgumentNullException(nameof(runtime));
         _weapons = weapons;
         _armor = armor;
+        _artilleryWeapons = artilleryWeapons;
     }
 
     public SimulationPhase Phase =>
@@ -120,10 +123,10 @@ public sealed class CombatDamageResolutionSystem : ISimulationSystem
             return request.Damage;
         }
 
-        if (_weapons is null || _armor is null)
+        if (_armor is null)
         {
             throw new InvalidOperationException(
-                "Armored combatants require weapon and armor catalogs during damage resolution.");
+                "Armored combatants require an armor catalog during damage resolution.");
         }
 
         if (!context.Entities.TryGetComponent(
@@ -134,8 +137,8 @@ public sealed class CombatDamageResolutionSystem : ISimulationSystem
                 $"Armored entity {request.Target} has no authoritative world transform.");
         }
 
-        WeaponDefinition weapon =
-            _weapons.GetRequired(
+        WeaponEffectiveness effectiveness =
+            ResolveEffectiveness(
                 request.Weapon);
         ArmorProfileDefinition armor =
             _armor.GetRequired(
@@ -175,6 +178,30 @@ public sealed class CombatDamageResolutionSystem : ISimulationSystem
 
         return new DamagePayload(
             result.AppliedDamage);
+    }
+
+    private WeaponEffectiveness ResolveEffectiveness(WeaponId weapon)
+    {
+        if (_weapons is not null &&
+            _weapons.TryGet(
+                weapon,
+                out WeaponDefinition? direct) &&
+            direct is not null)
+        {
+            return direct.Effectiveness;
+        }
+
+        if (_artilleryWeapons is not null &&
+            _artilleryWeapons.TryGet(
+                weapon,
+                out ArtilleryWeaponDefinition? artillery) &&
+            artillery is not null)
+        {
+            return artillery.Effectiveness;
+        }
+
+        throw new KeyNotFoundException(
+            $"Unknown weapon definition '{weapon}' during armored damage resolution.");
     }
 
     private static void RecordRetaliation(
