@@ -297,6 +297,153 @@ public sealed class BattlefieldSupplySystemTests
     }
 
     [Fact]
+    public void HeadlessMobileGroupResuppliesAndResumesExistingOrders()
+    {
+        var simulation = new SimulationCoordinator(ticksPerSecond: 20);
+        var inventories = new InventoryStore();
+        var supply = new BattlefieldSupplySystem(inventories);
+
+        simulation.RegisterSystem(new GroundMovementSystem());
+        simulation.RegisterSystem(supply);
+
+        InventoryId providerInventory =
+            inventories.CreateInventory(
+                new InventorySpecification(300.0));
+        Assert.True(
+            inventories.Add(
+                providerInventory,
+                ResourceIds.Fuel,
+                200.0).Succeeded);
+
+        EntityId provider = simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(
+            provider,
+            new WorldTransform(
+                new Vector3(100.0f, 0.0f, 100.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        simulation.Entities.AddComponent(
+            provider,
+            new SupplyProvider(
+                providerInventory,
+                LocalPlayer,
+                resupplyRangeMeters: 12.0f));
+
+        EntityId first =
+            CreateSuppliedUnit(
+                simulation,
+                inventories,
+                Vector3.Zero,
+                fuelCapacity: 20.0,
+                initialFuel: 0.02,
+                ammunitionCapacity: 10.0,
+                initialAmmunition: 10.0,
+                fuelConsumptionPerMeter: 1.0);
+        EntityId second =
+            CreateSuppliedUnit(
+                simulation,
+                inventories,
+                new Vector3(0.0f, 0.0f, 1.0f),
+                fuelCapacity: 20.0,
+                initialFuel: 0.02,
+                ammunitionCapacity: 10.0,
+                initialAmmunition: 10.0,
+                fuelConsumptionPerMeter: 1.0);
+
+        EntityId[] group = [first, second];
+
+        for (int index = 0; index < group.Length; index++)
+        {
+            EntityId unit = group[index];
+            simulation.Entities.AddComponent(
+                unit,
+                GroundMovement.CreateDefault());
+            simulation.Entities.AddComponent(
+                unit,
+                GroundMovementState.Stationary());
+            simulation.Entities.AddComponent(
+                unit,
+                new MovementOrder(
+                    LocalPlayer,
+                    new Vector3(20.0f, 0.0f, index),
+                    SimulationTick.Zero,
+                    new SimulationTick(1)));
+        }
+
+        for (int tick = 0; tick < 40; tick++)
+        {
+            simulation.AdvanceOneTick();
+
+            bool allStopped = true;
+            for (int index = 0; index < group.Length; index++)
+            {
+                GroundMovementState state =
+                    simulation.Entities.GetComponent<GroundMovementState>(
+                        group[index]);
+                allStopped &=
+                    state.Status == GroundMovementStatus.OutOfFuel;
+            }
+
+            if (allStopped)
+            {
+                break;
+            }
+        }
+
+        Vector3 firstStopped =
+            simulation.Entities.GetComponent<WorldTransform>(
+                first).Position;
+        Vector3 secondStopped =
+            simulation.Entities.GetComponent<WorldTransform>(
+                second).Position;
+
+        Assert.Equal(
+            GroundMovementStatus.OutOfFuel,
+            simulation.Entities.GetComponent<GroundMovementState>(
+                first).Status);
+        Assert.Equal(
+            GroundMovementStatus.OutOfFuel,
+            simulation.Entities.GetComponent<GroundMovementState>(
+                second).Status);
+        Assert.True(
+            simulation.Entities.HasComponent<MovementOrder>(first));
+        Assert.True(
+            simulation.Entities.HasComponent<MovementOrder>(second));
+
+        Vector3 providerPosition =
+            (firstStopped + secondStopped) * 0.5f;
+        simulation.Entities.SetComponent(
+            provider,
+            new WorldTransform(
+                providerPosition,
+                Quaternion.Identity,
+                Vector3.One));
+
+        simulation.AdvanceOneTick();
+        simulation.AdvanceOneTick();
+
+        Vector3 firstResumed =
+            simulation.Entities.GetComponent<WorldTransform>(
+                first).Position;
+        Vector3 secondResumed =
+            simulation.Entities.GetComponent<WorldTransform>(
+                second).Position;
+
+        Assert.True(
+            Vector3.Distance(firstResumed, firstStopped) > 0.0f);
+        Assert.True(
+            Vector3.Distance(secondResumed, secondStopped) > 0.0f);
+        Assert.Equal(
+            BattlefieldSupplyStatus.Supplied,
+            simulation.Entities.GetComponent<UnitSupplyState>(
+                first).Status);
+        Assert.Equal(
+            BattlefieldSupplyStatus.Supplied,
+            simulation.Entities.GetComponent<UnitSupplyState>(
+                second).Status);
+    }
+
+    [Fact]
     public void ResupplyCommandUsesExistingMovementOrderPath()
     {
         var simulation = new SimulationCoordinator();
