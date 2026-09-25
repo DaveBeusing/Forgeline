@@ -7,7 +7,9 @@ using ForgeLine.Simulation;
 
 namespace ForgeLine.Game;
 
-public sealed class AutomatedDistributionSystem : ISimulationSystem
+public sealed class AutomatedDistributionSystem
+    : ISimulationSystem,
+      ICargoTransportReservationObserver
 {
     private const double QuantityEpsilon = 0.000000001;
     private const ulong TerminalRetentionTicks = 20;
@@ -50,6 +52,7 @@ public sealed class AutomatedDistributionSystem : ISimulationSystem
         ArgumentOutOfRangeException.ThrowIfZero(fairnessAgingTicks);
 
         _routePolicy = routePolicy ?? LogisticsRouteCostPolicy.Default;
+        _cargoTransportSystem.SetReservationObserver(this);
         _retryDelayTicks = retryDelayTicks;
         _maximumTransportAttempts = maximumTransportAttempts;
         _fairnessAgingTicks = fairnessAgingTicks;
@@ -174,6 +177,23 @@ public sealed class AutomatedDistributionSystem : ISimulationSystem
                     context,
                     request);
             }
+        }
+    }
+
+    void ICargoTransportReservationObserver.OnCargoReservationConsumed(
+        LogisticsTransportRequestId requestId)
+    {
+        for (int index = 0; index < _requests.Count; index++)
+        {
+            RequestState request = _requests[index];
+            if (request.Id != requestId)
+            {
+                continue;
+            }
+
+            request.ReservedQuantity = 0.0;
+            request.ReservedSourceInventory = InventoryId.None;
+            return;
         }
     }
 
