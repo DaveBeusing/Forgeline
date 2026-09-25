@@ -132,7 +132,9 @@ public sealed class AutomatedDistributionSystemTests
             maximum: 100.0,
             LogisticsStockPriority.Normal);
 
-        fixture.Simulation.RunTicks(100);
+        fixture.Simulation.RunTicks(
+            100,
+            TestContext.Current.CancellationToken);
 
         Assert.Single(
             fixture.Distribution.LastDebugSnapshot.Requests);
@@ -276,7 +278,9 @@ public sealed class AutomatedDistributionSystemTests
             maximum: 80.0,
             LogisticsStockPriority.Low);
 
-        fixture.Simulation.RunTicks(60);
+        fixture.Simulation.RunTicks(
+            60,
+            TestContext.Current.CancellationToken);
 
         fixture.Connect(
             fixture.SourceNode,
