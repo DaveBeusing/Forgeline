@@ -228,10 +228,10 @@ public sealed class LogisticsCapacityTracker :
             GetWindowCapacity(edge.CapacityPerSecond);
         double fromCapacity =
             GetWindowCapacity(
-                LogisticsThroughputDefaults.ForNodeKind(from.Kind));
+                from.ThroughputCapacityPerSecond);
         double toCapacity =
             GetWindowCapacity(
-                LogisticsThroughputDefaults.ForNodeKind(to.Kind));
+                to.ThroughputCapacityPerSecond);
 
         double edgeLoad =
             GetLoad(_edgeLoad, edge.Id);
@@ -321,7 +321,7 @@ public sealed class LogisticsCapacityTracker :
             includedNodes.Add(node.Id);
 
             double capacityPerSecond =
-                LogisticsThroughputDefaults.ForNodeKind(node.Kind);
+                node.ThroughputCapacityPerSecond;
             double windowCapacity =
                 GetWindowCapacity(capacityPerSecond);
             double load = GetLoad(_nodeLoad, node.Id);
@@ -548,7 +548,7 @@ public sealed class LogisticsCapacityTracker :
     {
         double capacity =
             GetWindowCapacity(
-                LogisticsThroughputDefaults.ForNodeKind(node.Kind));
+                node.ThroughputCapacityPerSecond);
         double load =
             GetLoad(_nodeLoad, node.Id);
 
