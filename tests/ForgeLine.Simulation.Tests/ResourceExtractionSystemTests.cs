@@ -358,7 +358,7 @@ public sealed class ResourceExtractionSystemTests
         FactionId owner = default)
     {
         uint placementIndex =
-            checked((uint)simulation.Entities.EntityCount + 1U);
+            checked((uint)(simulation.Entities.EntityCount + 1));
         var placement = new ResourceDepositPlacement(
             resourceId,
             CreateBounds(placementIndex),
