@@ -700,6 +700,121 @@ public sealed class TacticalCombatSystemTests
             readiness.InitialMembers);
     }
 
+    [Fact]
+    public void NormalMoveOrderReplacesExistingCombatIntent()
+    {
+        TacticalScenario scenario =
+            CreateScenario(
+                weaponRange: 50.0f);
+
+        EntityId unit =
+            CreateCombatUnit(
+                scenario,
+                BluePlayer,
+                BlueFaction,
+                Vector3.Zero,
+                movable: true);
+
+        scenario.Simulation.Entities.AddComponent(
+            unit,
+            new CombatOrderState(
+                CombatOrderKind.HoldPosition,
+                BluePlayer,
+                EntityId.Invalid,
+                Vector3.Zero,
+                hasDestination: false,
+                Vector3.Zero,
+                pursuitLeashMeters: 0.0f,
+                FormationTemplate.Compact,
+                SimulationTick.Zero,
+                SimulationTick.Zero));
+        scenario.Simulation.Entities.AddComponent(
+            unit,
+            new TacticalMovementConstraint(
+                CanMove: false));
+        scenario.Simulation.Entities.AddComponent(
+            unit,
+            new AutoTargetState(
+                Enabled: false));
+
+        scenario.Simulation.SubmitCommand(
+            new MoveEntitiesCommand(
+                BluePlayer,
+                [unit],
+                new Vector3(80.0f, 0.0f, 0.0f),
+                scenario.Simulation.CurrentTick),
+            scenario.Simulation.CurrentTick.Next());
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.False(
+            scenario.Simulation.Entities.HasComponent<CombatOrderState>(
+                unit));
+        Assert.False(
+            scenario.Simulation.Entities.HasComponent<TacticalMovementConstraint>(
+                unit));
+        Assert.False(
+            scenario.Simulation.Entities.HasComponent<AutoTargetState>(
+                unit));
+        Assert.True(
+            scenario.Simulation.Entities.HasComponent<MovementOrder>(
+                unit));
+    }
+
+    [Fact]
+    public void HoldFirePreventsExplicitAttackPursuit()
+    {
+        TacticalScenario scenario =
+            CreateScenario(
+                weaponRange: 30.0f);
+
+        EntityId attacker =
+            CreateCombatUnit(
+                scenario,
+                BluePlayer,
+                BlueFaction,
+                Vector3.Zero,
+                addVisualSensor: true,
+                visualRange: 150.0f,
+                movable: true);
+        EntityId target =
+            CreateCombatUnit(
+                scenario,
+                RedPlayer,
+                RedFaction,
+                new Vector3(60.0f, 0.0f, 0.0f));
+
+        scenario.Simulation.Entities.SetComponent(
+            attacker,
+            new FirePolicyState(
+                FirePolicy.HoldFire));
+
+        scenario.Simulation.SubmitCommand(
+            new AttackCommand(
+                BluePlayer,
+                [attacker],
+                target,
+                scenario.Simulation.CurrentTick,
+                pursuitLeashMeters: 100.0f),
+            scenario.Simulation.CurrentTick.Next());
+
+        scenario.Simulation.AdvanceOneTick();
+
+        TacticalCombatState state =
+            scenario.Simulation.Entities.GetComponent<TacticalCombatState>(
+                attacker);
+
+        Assert.Equal(
+            CombatOrderStatus.Holding,
+            state.Status);
+        Assert.False(
+            scenario.Simulation.Entities.HasComponent<MovementOrder>(
+                attacker));
+        Assert.False(
+            scenario.Simulation.Entities.GetComponent<WeaponState>(
+                attacker).Target.IsValid);
+    }
+
     private static TacticalScenario CreateScenario(
         float weaponRange,
         bool registerGroundMovement = false,
