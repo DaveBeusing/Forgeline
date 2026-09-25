@@ -305,6 +305,41 @@ public sealed class PowerNetworkSystemTests
         AssertBrownout(simulation, last, 0.75);
     }
 
+    [Fact]
+    public void DebugSnapshotExposesStableNetworkAndConsumerState()
+    {
+        var system = new PowerNetworkSystem();
+        var simulation = new SimulationCoordinator();
+        simulation.RegisterSystem(system);
+
+        PowerNetworkId network = new(70);
+        EntityId generator = AddGenerator(simulation, network, 25.0);
+        EntityId consumer = AddConsumer(
+            simulation,
+            network,
+            10.0,
+            PowerPriority.Critical);
+
+        simulation.AdvanceOneTick();
+
+        PowerNetworkDebugSnapshot snapshot =
+            PowerNetworkDebugSnapshot.Capture(simulation.Entities, system);
+
+        PowerNetworkReadModel networkState = Assert.Single(snapshot.Networks);
+        PowerGeneratorReadModel generatorState = Assert.Single(snapshot.Generators);
+        PowerConsumerReadModel consumerState = Assert.Single(snapshot.Consumers);
+
+        Assert.Equal(network, networkState.NetworkId);
+        Assert.Equal(generator, generatorState.Entity);
+        Assert.Equal(network, generatorState.NetworkId);
+        Assert.Equal(PowerGeneratorState.Generating, generatorState.State);
+        Assert.Equal(consumer, consumerState.Entity);
+        Assert.Equal(network, consumerState.NetworkId);
+        Assert.Equal(PowerOperationalState.Powered, consumerState.State);
+        Assert.Equal(1.0, consumerState.SupplyFraction);
+        Assert.Equal(system.Metrics, snapshot.Metrics);
+    }
+
     private static (PowerNetworkMetrics Metrics, PowerConsumer[] Consumers)
         RunDeterministicFixture()
     {
