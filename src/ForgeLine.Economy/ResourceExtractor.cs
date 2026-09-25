@@ -14,7 +14,9 @@ public enum ResourceExtractorState
     OwnershipMismatch = 7,
     OutputUnavailable = 8,
     OutputBlocked = 9,
-    OutputConstrained = 10
+    OutputConstrained = 10,
+    PowerUnavailable = 11,
+    PowerConstrained = 12
 }
 
 public readonly record struct ResourceExtractor

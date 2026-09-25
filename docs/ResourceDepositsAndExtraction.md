@@ -70,7 +70,9 @@ Extractor state reports:
 - depleted deposit;
 - invalid/stale deposit reference;
 - resource mismatch;
-- ownership mismatch.
+- ownership mismatch;
+- unavailable power;
+- power-constrained throughput.
 
 ## Fixed-tick extraction
 
@@ -122,6 +124,20 @@ Output state is explicit:
 - `OutputConstrained` — only part of the normal tick output fits, so extraction is throttled.
 
 A fully blocked extractor does not reduce its deposit. Partial capacity accepts only the storable quantity and preserves total resource conservation.
+
+## Power integration
+
+An extractor may also carry `PowerConsumer`.
+
+When present, the current Infrastructure-phase power allocation is authoritative for extraction:
+
+- `Powered` runs at normal extraction throughput;
+- `Brownout` multiplies extraction throughput by the consumer's `OperationalScale`;
+- `Offline` pauses extraction without reducing the deposit.
+
+`PowerConstrained` reports brownout-limited extraction and `PowerUnavailable` reports a paused unpowered extractor.
+
+An extractor without `PowerConsumer` preserves the existing behavior, allowing non-powered fixtures and future explicitly power-independent extractors.
 
 ## Diagnostics and read models
 
@@ -184,4 +200,4 @@ It must not depend on:
 - audio;
 - presentation state.
 
-Presentation consumes read models only. Storage, logistics, processing recipes, power consumption, construction costs, Rare Elements, currency, and markets remain separate systems.
+Presentation consumes read models only. Storage, logistics, processing recipes, construction costs, Rare Elements, currency, and markets remain separate systems. Power is integrated only through the shared authoritative `PowerConsumer` contract.
