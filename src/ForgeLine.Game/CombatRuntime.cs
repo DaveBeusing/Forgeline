@@ -29,6 +29,7 @@ internal readonly record struct PendingCombatDamage(
     EntityId Projectile,
     WeaponId Weapon,
     Vector3 Position,
+    Vector3 IncomingDirection,
     DamagePayload Damage);
 
 internal readonly record struct PendingCombatDestruction(
@@ -183,6 +184,7 @@ public sealed class CombatRuntime
         EntityId projectile,
         WeaponId weapon,
         Vector3 position,
+        Vector3 incomingDirection,
         in DamagePayload damage)
     {
         _pendingDamage.Add(
@@ -192,6 +194,7 @@ public sealed class CombatRuntime
                 projectile,
                 weapon,
                 position,
+                incomingDirection,
                 damage));
     }
 
