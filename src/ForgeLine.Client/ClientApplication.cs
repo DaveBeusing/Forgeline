@@ -341,6 +341,8 @@ internal sealed class ClientApplication
                 worldDebugEnabled;
             battlefieldIntelligence.TimingEnabled =
                 worldDebugEnabled;
+            battlefieldIntelligence.DebugCaptureEnabled =
+                worldDebugEnabled;
             targetAcquisition.DebugCaptureEnabled =
                 worldDebugEnabled;
             combatDebugSnapshots.DebugCaptureEnabled =
@@ -507,7 +509,9 @@ internal sealed class ClientApplication
                 distributionDebugSnapshot,
                 logisticsCapacityDebugSnapshot,
                 battlefieldSupplyDebugSnapshot,
-                combatDebugSnapshot);
+                combatDebugSnapshot,
+                battlefieldIntelligence.DebugSensors,
+                battlefieldIntelligence.Metrics);
 
             terrainRenderer.DebugChunksEnabled = worldDebugEnabled;
 
@@ -840,7 +844,9 @@ internal sealed class ClientApplication
         AutomatedDistributionDebugSnapshot? distributionSnapshot,
         LogisticsCapacityDebugSnapshot? logisticsCapacitySnapshot,
         BattlefieldSupplyDebugSnapshot? battlefieldSupplySnapshot,
-        CombatDebugSnapshot? combatSnapshot)
+        CombatDebugSnapshot? combatSnapshot,
+        IReadOnlyList<IntelligenceSensorDebugEntry> intelligenceSensors,
+        BattlefieldIntelligenceMetrics intelligenceMetrics)
     {
         debugDraw.Clear();
 
@@ -988,6 +994,14 @@ internal sealed class ClientApplication
                     intelligenceSnapshot,
                     maximumCells: 512,
                     maximumContacts: 96);
+                IntelligenceDebugVisualization.DrawSensors(
+                    debugDraw,
+                    intelligenceSensors,
+                    maximumSensors: 64);
+                IntelligenceDebugVisualization.DrawMetrics(
+                    debugDraw,
+                    intelligenceMetrics,
+                    camera.Target + Vector3.UnitY * 6.0f);
             }
 
             if (combatSnapshot is not null)
