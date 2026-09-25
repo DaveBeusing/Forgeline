@@ -79,10 +79,9 @@ public readonly record struct MovementGroupMember
             throw new ArgumentOutOfRangeException(nameof(group));
         }
 
-        if (slotIndex < UnassignedSlot)
-        {
-            throw new ArgumentOutOfRangeException(nameof(slotIndex));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(
+            slotIndex,
+            UnassignedSlot);
 
         Group = group;
         SlotIndex = slotIndex;
