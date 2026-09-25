@@ -38,6 +38,9 @@ public sealed class ResourceCatalog
 
     public int Count => _definitions.Count;
 
+    public IEnumerable<ResourceDefinition> Definitions =>
+        _definitions.OrderBy(static pair => pair.Key).Select(static pair => pair.Value);
+
     public ResourceDefinition this[ResourceId id] =>
         _definitions.TryGetValue(id, out ResourceDefinition? definition)
             ? definition
