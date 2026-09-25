@@ -18,19 +18,15 @@ public readonly record struct AutomaticResupplyDecisionMetrics(
 public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
 {
     private readonly InventoryStore _inventories;
-    private readonly BattlefieldResupplyPlanner _planner;
     private readonly List<EntityId> _candidates = new();
     private ulong _totalOrdersIssued;
     private ulong _totalProviderUnavailable;
 
     public AutomaticResupplyDecisionSystem(
-        InventoryStore inventories,
-        BattlefieldResupplyPlanner? planner = null)
+        InventoryStore inventories)
     {
         _inventories = inventories ??
             throw new ArgumentNullException(nameof(inventories));
-        _planner = planner ??
-            new BattlefieldResupplyPlanner();
     }
 
     public SimulationPhase Phase =>
@@ -115,7 +111,7 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
 
             lowSupply++;
 
-            if (_planner.TryIssueNearestProviderOrder(
+            if (BattlefieldResupplyPlanner.TryIssueNearestProviderOrder(
                     context,
                     entity,
                     controllable.Owner,
