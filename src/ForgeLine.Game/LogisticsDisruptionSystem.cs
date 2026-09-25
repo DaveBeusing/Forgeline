@@ -18,6 +18,9 @@ public readonly record struct LogisticsAvailabilityChangeRequest(
     bool Enabled,
     SimulationTick SubmittedAtTick);
 
+public readonly record struct LogisticsNodeAvailabilityOverride(
+    bool Enabled);
+
 public readonly record struct LogisticsDisruptionMetrics(
     long AppliedChangeCount,
     long RejectedChangeCount,
@@ -173,11 +176,12 @@ public sealed class LogisticsDisruptionSystem : ISimulationSystem
                 request.TargetKind switch
                 {
                     LogisticsInfrastructureTargetKind.Node =>
-                        _network.SetNodeEnabled(
+                        ApplyNodeAvailability(
+                            context,
                             request.NodeId,
                             request.Enabled),
                     LogisticsInfrastructureTargetKind.Edge =>
-                        _network.SetEdgeEnabled(
+                        ApplyEdgeAvailability(
                             request.EdgeId,
                             request.Enabled),
                     _ => false
@@ -204,5 +208,62 @@ public sealed class LogisticsDisruptionSystem : ISimulationSystem
 
             context.Entities.DestroyEntity(requestEntity);
         }
+    }
+
+    private bool ApplyNodeAvailability(
+        SimulationContext context,
+        LogisticsNodeId nodeId,
+        bool enabled)
+    {
+        if (!_network.TryGetNode(
+                nodeId,
+                out LogisticsNode node) ||
+            !context.Entities.IsAlive(node.Entity))
+        {
+            return false;
+        }
+
+        var availability =
+            new LogisticsNodeAvailabilityOverride(enabled);
+
+        if (context.Entities.HasComponent<
+                LogisticsNodeAvailabilityOverride>(node.Entity))
+        {
+            context.Entities.SetComponent(
+                node.Entity,
+                availability);
+        }
+        else
+        {
+            context.Entities.AddComponent(
+                node.Entity,
+                availability);
+        }
+
+        if (node.Enabled != enabled)
+        {
+            _network.SetNodeEnabled(nodeId, enabled);
+        }
+
+        return true;
+    }
+
+    private bool ApplyEdgeAvailability(
+        LogisticsEdgeId edgeId,
+        bool enabled)
+    {
+        if (!_network.TryGetEdge(
+                edgeId,
+                out LogisticsEdge edge))
+        {
+            return false;
+        }
+
+        if (edge.Enabled != enabled)
+        {
+            _network.SetEdgeEnabled(edgeId, enabled);
+        }
+
+        return true;
     }
 }
