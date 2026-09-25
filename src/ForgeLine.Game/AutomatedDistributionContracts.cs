@@ -131,6 +131,26 @@ public readonly record struct LogisticsTransportRequestId(ulong Value)
     public int CompareTo(LogisticsTransportRequestId other) =>
         Value.CompareTo(other.Value);
 
+    public static bool operator <(
+        LogisticsTransportRequestId left,
+        LogisticsTransportRequestId right) =>
+        left.CompareTo(right) < 0;
+
+    public static bool operator <=(
+        LogisticsTransportRequestId left,
+        LogisticsTransportRequestId right) =>
+        left.CompareTo(right) <= 0;
+
+    public static bool operator >(
+        LogisticsTransportRequestId left,
+        LogisticsTransportRequestId right) =>
+        left.CompareTo(right) > 0;
+
+    public static bool operator >=(
+        LogisticsTransportRequestId left,
+        LogisticsTransportRequestId right) =>
+        left.CompareTo(right) >= 0;
+
     public override string ToString() =>
         Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
 }
