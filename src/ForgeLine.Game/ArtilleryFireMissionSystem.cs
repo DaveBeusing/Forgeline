@@ -901,7 +901,6 @@ public sealed class ArtilleryFireMissionSystem : ISimulationSystem
         foreach (EntityId entity in
                  context.Entities.Query<
                      FireMissionState,
-                     ArtilleryCapability,
                      WorldTransform>(
                          QueryIterationOrder.StableByEntityIndex))
         {
