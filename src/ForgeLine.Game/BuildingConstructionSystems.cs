@@ -528,12 +528,41 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
                     new StorageDepot(inventoryId, owner));
             }
 
-            if (definition.Capabilities.HasFlag(
-                    BuildingCapability.Distribution))
+            if (site.BuildingId == BuildingIds.LogisticsHub)
             {
                 entities.AddComponent(
                     entity,
                     new LogisticsHub(inventoryId, owner));
+            }
+
+            if (site.BuildingId == BuildingIds.SupplyDepot)
+            {
+                entities.AddComponent(
+                    entity,
+                    new SupplyDepot(
+                        inventoryId,
+                        site.Owner));
+                entities.AddComponent(
+                    entity,
+                    new SupplyProvider(
+                        inventoryId,
+                        site.Owner,
+                        resupplyRangeMeters: 20.0f));
+
+                CreateSupplyStockPolicy(
+                    entities,
+                    entity,
+                    ResourceIds.Fuel,
+                    desiredMinimum: 250.0,
+                    desiredTarget: 600.0,
+                    desiredMaximum: 900.0);
+                CreateSupplyStockPolicy(
+                    entities,
+                    entity,
+                    ResourceIds.Ammunition,
+                    desiredMinimum: 350.0,
+                    desiredTarget: 800.0,
+                    desiredMaximum: 1_200.0);
             }
         }
 
@@ -581,6 +610,26 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
                     definition.ProductionCapabilities,
                     activatedAtTick));
         }
+    }
+
+    private static void CreateSupplyStockPolicy(
+        EntityRegistry entities,
+        EntityId depot,
+        ResourceId resource,
+        double desiredMinimum,
+        double desiredTarget,
+        double desiredMaximum)
+    {
+        EntityId policy = entities.CreateEntity();
+        entities.AddComponent(
+            policy,
+            new LogisticsStockPolicy(
+                depot,
+                resource,
+                desiredMinimum,
+                desiredTarget,
+                desiredMaximum,
+                LogisticsStockPriority.High));
     }
 
     private static FactionId ToFactionId(PlayerId player)

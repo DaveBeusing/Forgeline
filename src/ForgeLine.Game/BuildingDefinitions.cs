@@ -40,6 +40,7 @@ public static class BuildingIds
     public static readonly BuildingId ElectronicsPlant = new(7);
     public static readonly BuildingId LogisticsHub = new(8);
     public static readonly BuildingId AmmunitionPlant = new(9);
+    public static readonly BuildingId SupplyDepot = new(10);
 }
 
 public enum BuildingOrientation : byte
@@ -60,7 +61,8 @@ public enum BuildingCapability : uint
     Extraction = 1 << 3,
     Storage = 1 << 4,
     Processing = 1 << 5,
-    Distribution = 1 << 6
+    Distribution = 1 << 6,
+    Supply = 1 << 7
 }
 
 public readonly record struct BuildingFootprint
@@ -290,6 +292,14 @@ public sealed record BuildingDefinition
             throw new InvalidOperationException(
                 $"Building '{Key}' defines production values without the processing capability.");
         }
+
+        if (Capabilities.HasFlag(BuildingCapability.Supply) &&
+            (!Capabilities.HasFlag(BuildingCapability.Storage) ||
+             !Capabilities.HasFlag(BuildingCapability.Distribution)))
+        {
+            throw new InvalidOperationException(
+                $"Building '{Key}' supply capability requires storage and distribution.");
+        }
     }
 
     private void ValidateCapability(
@@ -457,6 +467,27 @@ public static class InitialBuildingDefinitions
                         BuildingCapability.PowerConsumption,
                     PowerDemand = 10.0,
                     StorageCapacity = 3_000.0
+                },
+                new BuildingDefinition
+                {
+                    Id = BuildingIds.SupplyDepot,
+                    Key = "building.supply_depot",
+                    DisplayName = "Supply Depot",
+                    Footprint = new BuildingFootprint(16.0f, 16.0f, 8.0f),
+                    ConstructionTicks = 90,
+                    Costs =
+                    [
+                        new BuildingResourceCost(ResourceIds.FerrousOre, 150.0),
+                        new BuildingResourceCost(ResourceIds.Silicates, 60.0),
+                        new BuildingResourceCost(ResourceIds.Volatiles, 30.0)
+                    ],
+                    Capabilities =
+                        BuildingCapability.Storage |
+                        BuildingCapability.Distribution |
+                        BuildingCapability.Supply |
+                        BuildingCapability.PowerConsumption,
+                    PowerDemand = 8.0,
+                    StorageCapacity = 2_500.0
                 },
                 new BuildingDefinition
                 {

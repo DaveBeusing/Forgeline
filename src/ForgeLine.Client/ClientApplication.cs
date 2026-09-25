@@ -106,6 +106,9 @@ internal sealed class ClientApplication
                 logisticsNetwork,
                 inventories,
                 cargoTransportSystem);
+        var battlefieldSupply =
+            new BattlefieldSupplySystem(
+                inventories);
         var logisticsRegistration =
             new BuildingLogisticsRegistrationSystem(
                 logisticsNetwork);
@@ -150,6 +153,7 @@ internal sealed class ClientApplication
         simulation.RegisterSystem(production);
         simulation.RegisterSystem(buildingConstruction);
         simulation.RegisterSystem(resourceExtraction);
+        simulation.RegisterSystem(battlefieldSupply);
         simulation.RegisterSystem(automatedDistribution);
         simulation.RegisterSystem(cargoTransportSystem);
         simulation.RegisterSystem(logisticsRegistration);
