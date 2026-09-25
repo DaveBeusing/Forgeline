@@ -127,7 +127,7 @@ The constraint is removed when the unit leaves the group, the group completes, o
 
 ## Choke-Point Handling
 
-The group samples traversable navigation cells laterally around the active shared-route waypoint.
+The group samples traversable navigation cells laterally around both its current centroid and the active shared-route waypoint, using the narrower result. Sampling the current group position prevents simplified long route segments from hiding choke points that lie between sparse waypoints.
 
 If both sides close within the configured scan range and the available corridor is narrower than the desired formation width, the system applies controlled fallback:
 
