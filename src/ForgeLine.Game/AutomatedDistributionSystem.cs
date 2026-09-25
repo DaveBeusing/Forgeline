@@ -845,6 +845,19 @@ public sealed class AutomatedDistributionSystem : ISimulationSystem
 
             reservedCargo += request.ReservedQuantity;
 
+            Vector3 originPosition =
+                _network.TryGetNode(
+                    request.Origin,
+                    out LogisticsNode originNode)
+                    ? originNode.WorldPosition
+                    : Vector3.Zero;
+            Vector3 destinationPosition =
+                _network.TryGetNode(
+                    request.Destination,
+                    out LogisticsNode destinationNode)
+                    ? destinationNode.WorldPosition
+                    : Vector3.Zero;
+
             readModels[index] =
                 new LogisticsTransportRequestReadModel(
                     request.Id,
@@ -855,6 +868,8 @@ public sealed class AutomatedDistributionSystem : ISimulationSystem
                     request.ResourceId,
                     request.Origin,
                     request.Destination,
+                    originPosition,
+                    destinationPosition,
                     request.RequestedQuantity,
                     request.ReservedQuantity,
                     request.AssignedTruck,
