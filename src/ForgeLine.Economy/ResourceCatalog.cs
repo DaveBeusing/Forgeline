@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using ForgeLine.Core;
 
 namespace ForgeLine.Economy;
@@ -44,7 +45,7 @@ public sealed class ResourceCatalog
 
     public bool TryGet(
         ResourceId id,
-        out ResourceDefinition? definition) =>
+        [NotNullWhen(true)] out ResourceDefinition? definition) =>
         _definitions.TryGetValue(id, out definition);
 
     public bool TryResolve(
