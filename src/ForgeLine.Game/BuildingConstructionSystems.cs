@@ -384,7 +384,12 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
 
         ValidateReservations(site.SourceInventory, definition);
         ConsumeReservations(site.SourceInventory, definition);
-        ActivateCapabilities(context.Entities, entity, site, definition);
+        ActivateCapabilities(
+            context.Entities,
+            entity,
+            site,
+            definition,
+            context.Tick);
 
         context.Entities.AddComponent(
             entity,
@@ -466,7 +471,8 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
         EntityRegistry entities,
         EntityId entity,
         in ConstructionSite site,
-        BuildingDefinition definition)
+        BuildingDefinition definition,
+        SimulationTick activatedAtTick)
     {
         FactionId owner = ToFactionId(site.Owner);
 
@@ -549,7 +555,23 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
 
         if (definition.Capabilities.HasFlag(BuildingCapability.Processing))
         {
+            InventoryId inputInventory =
+                _inventories.CreateInventory(
+                    new InventorySpecification(
+                        definition.ProductionInputCapacity));
+            InventoryId outputInventory =
+                _inventories.CreateInventory(
+                    new InventorySpecification(
+                        definition.ProductionOutputCapacity));
+
             entities.AddComponent(entity, new ProcessingFacility());
+            entities.AddComponent(
+                entity,
+                new ProductionFacility(
+                    inputInventory,
+                    outputInventory,
+                    definition.ProductionCapabilities,
+                    activatedAtTick));
         }
     }
 
