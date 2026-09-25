@@ -81,6 +81,8 @@ public sealed class ArtilleryFireMissionSystem : ISimulationSystem
     private readonly SpatialGridIndex? _spatialIndex;
     private readonly SpatialQueryBuffer _impactQueryBuffer = new(256);
     private readonly List<EntityId> _impactCandidates = new();
+    private readonly List<EntityId> _pendingRequestEntities = new();
+    private readonly List<EntityId> _missionEntities = new();
     private readonly List<ArtilleryMissionDebugEntry> _missionDebug = new();
     private readonly List<ArtilleryProjectileDebugEntry> _projectileDebug =
         new();
@@ -146,16 +148,34 @@ public sealed class ArtilleryFireMissionSystem : ISimulationSystem
 
     private void ResolvePendingRequests(SimulationContext context)
     {
+        _pendingRequestEntities.Clear();
+
         foreach (EntityId entity in
                  context.Entities.Query<
                      FireMissionRequest,
                      ArtilleryCapability>(
                          QueryIterationOrder.StableByEntityIndex))
         {
-            FireMissionRequest request =
-                context.Entities.GetComponent<FireMissionRequest>(entity);
-            ArtilleryCapability capability =
-                context.Entities.GetComponent<ArtilleryCapability>(entity);
+            _pendingRequestEntities.Add(entity);
+        }
+
+        for (int index = 0;
+             index < _pendingRequestEntities.Count;
+             index++)
+        {
+            EntityId entity =
+                _pendingRequestEntities[index];
+
+            if (!context.Entities.IsAlive(entity) ||
+                !context.Entities.TryGetComponent(
+                    entity,
+                    out FireMissionRequest request) ||
+                !context.Entities.TryGetComponent(
+                    entity,
+                    out ArtilleryCapability capability))
+            {
+                continue;
+            }
 
             if (!context.Entities.TryGetComponent(
                     entity,
@@ -247,14 +267,33 @@ public sealed class ArtilleryFireMissionSystem : ISimulationSystem
 
     private void ProcessMissions(SimulationContext context)
     {
+        _missionEntities.Clear();
+
         foreach (EntityId entity in
                  context.Entities.Query<
                      FireMissionState,
                      WorldTransform>(
                          QueryIterationOrder.StableByEntityIndex))
         {
-            FireMissionState state =
-                context.Entities.GetComponent<FireMissionState>(entity);
+            _missionEntities.Add(entity);
+        }
+
+        for (int index = 0;
+             index < _missionEntities.Count;
+             index++)
+        {
+            EntityId entity =
+                _missionEntities[index];
+
+            if (!context.Entities.IsAlive(entity) ||
+                !context.Entities.TryGetComponent(
+                    entity,
+                    out FireMissionState state) ||
+                !context.Entities.HasComponent<ArtilleryCapability>(entity) ||
+                !context.Entities.HasComponent<WorldTransform>(entity))
+            {
+                continue;
+            }
 
             if (state.Status is
                 FireMissionStatus.Complete or
