@@ -41,6 +41,21 @@ When enabled, snapshots expose:
 
 Tick timing is diagnostic observation only. It must never influence simulation decisions.
 
+## Combat Runtime Metrics
+
+`CombatRuntime.Metrics` exposes simulation-owned combat counters without introducing presentation authority:
+
+- active physical projectiles
+- shots fired and Ammunition consumed for the current tick
+- projectiles spawned and impacts for the current tick
+- successful damage applications and damage amount for the current tick
+- combat destructions for the current tick
+- cumulative shots, Ammunition consumption, projectiles, impacts, hits, damage, and destructions
+
+`CombatRuntime.Events` contains the current tick's shot, projectile-spawn, impact, damage, and destruction outputs. These events are presentation/diagnostic outputs only; consumers must not feed visual timing back into combat resolution.
+
+`CombatDebugSnapshotSystem` can capture weapon ranges/targets, projectile positions/velocities, Health values, impacts, and the runtime metrics during `SnapshotEvents`. The Windows client F2 world-debug path renders those copies without mutating simulation state.
+
 ## Job Metrics
 
 The job scheduler exposes:
@@ -163,7 +178,7 @@ dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configur
 
 The simulation test suite also verifies that 10,000 lightweight ECS entities can exist and execute headless ticks without stale-entity or lifecycle failure. Spatial correctness coverage separately indexes and repeatedly moves 10,000 entries, verifies queryability afterward, compares radius results against brute-force reference fixtures, and checks negative-coordinate and chunk-crossing semantics. A 1,000-entity scenario exercises a representative multi-component load.
 
-Gameplay-domain combat and logistics stress tests must be added only when those systems exist. Placeholder workloads must not be presented as representative gameplay performance.
+Combat scale measurement is available through the simulation BenchmarkDotNet host with 100/1,000 simultaneously armed direct-fire entities and 100/1,000 moving physical projectiles. Logistics stress coverage remains separate so the measured workload is attributable to the subsystem under test.
 
 ## Interpreting Results
 
