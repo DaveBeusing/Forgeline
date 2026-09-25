@@ -67,6 +67,73 @@ public sealed class BuildingLogisticsRegistrationTests
         Assert.Equal(1, registration.Metrics.RemovedNodeCount);
     }
 
+
+    [Fact]
+    public void LogisticsHubRegistersAsDistributionNodeAndTracksAvailability()
+    {
+        var network = new LogisticsNetwork();
+        var simulation = new SimulationCoordinator();
+        simulation.RegisterSystem(
+            new BuildingLogisticsRegistrationSystem(network));
+
+        EntityId hub = simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(
+            hub,
+            new CompletedBuilding(
+                BuildingIds.LogisticsHub,
+                new PlayerId(1),
+                SimulationTick.Zero));
+        simulation.Entities.AddComponent(
+            hub,
+            new WorldTransform(
+                new Vector3(40.0f, 0.0f, 25.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        simulation.Entities.AddComponent(
+            hub,
+            new InventoryStorage(new InventoryId(4)));
+        simulation.Entities.AddComponent(
+            hub,
+            new LogisticsHub(
+                new InventoryId(4),
+                new FactionId(1)));
+
+        simulation.AdvanceOneTick();
+
+        Assert.True(
+            network.TryGetNodeForEntity(
+                hub,
+                out LogisticsNodeId nodeId));
+        Assert.True(
+            network.TryGetNode(
+                nodeId,
+                out LogisticsNode node));
+        Assert.Equal(
+            LogisticsNodeKind.LogisticsHub,
+            node.Kind);
+        Assert.True(
+            node.Capabilities.HasFlag(
+                LogisticsNodeCapabilities.Distribution));
+        Assert.True(
+            node.Capabilities.HasFlag(
+                LogisticsNodeCapabilities.CargoSource));
+        Assert.True(
+            node.Capabilities.HasFlag(
+                LogisticsNodeCapabilities.CargoDestination));
+        Assert.True(node.Enabled);
+
+        simulation.Entities.SetComponent(
+            hub,
+            new LogisticsHub(
+                new InventoryId(4),
+                new FactionId(1),
+                LogisticsHubState.Disabled));
+        simulation.AdvanceOneTick();
+
+        Assert.True(network.TryGetNode(nodeId, out node));
+        Assert.False(node.Enabled);
+    }
+
     [Fact]
     public void ExtractorAndProcessingFacilityUseDistinctNodeKinds()
     {
