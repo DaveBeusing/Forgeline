@@ -5,6 +5,7 @@ using ForgeLine.Economy;
 using ForgeLine.Game;
 using ForgeLine.Graphics;
 using ForgeLine.Input;
+using ForgeLine.Intelligence;
 using ForgeLine.Jobs;
 using ForgeLine.Logistics;
 using ForgeLine.Navigation;
@@ -113,6 +114,20 @@ internal sealed class ClientApplication
         var battlefieldSupply =
             new BattlefieldSupplySystem(
                 inventories);
+        var intelligenceStore =
+            new FactionIntelligenceStore(
+                new IntelligenceGridSettings
+                {
+                    CellSizeMeters = 32.0f
+                });
+        var battlefieldIntelligence =
+            new BattlefieldIntelligenceSystem(
+                intelligenceStore,
+                spatialIndex);
+        var intelligenceAvailability =
+            new IntelligenceTargetAvailabilityPolicy(
+                simulation.Entities,
+                intelligenceStore);
         var combatWeapons =
             new WeaponCatalog();
         var combatArmor =
@@ -122,13 +137,15 @@ internal sealed class ClientApplication
         var targetAcquisition =
             new TargetAcquisitionSystem(
                 combatWeapons,
-                spatialIndex);
+                spatialIndex,
+                intelligenceAvailability);
         var combatExecution =
             new CombatExecutionSystem(
                 combatWeapons,
                 inventories,
                 combatRuntime,
-                spatialIndex);
+                spatialIndex,
+                intelligenceAvailability);
         var combatDamageResolution =
             new CombatDamageResolutionSystem(
                 combatRuntime,
@@ -189,6 +206,7 @@ internal sealed class ClientApplication
         simulation.RegisterSystem(production);
         simulation.RegisterSystem(buildingConstruction);
         simulation.RegisterSystem(resourceExtraction);
+        simulation.RegisterSystem(battlefieldIntelligence);
         simulation.RegisterSystem(targetAcquisition);
         simulation.RegisterSystem(combatExecution);
         simulation.RegisterSystem(combatDamageResolution);
@@ -199,7 +217,13 @@ internal sealed class ClientApplication
         simulation.RegisterSystem(combatLifecycle);
         simulation.RegisterSystem(new SpatialIndexCleanupSystem(spatialSynchronizer));
         simulation.RegisterSystem(combatDebugSnapshots);
-        simulation.RegisterTickObserver(new PresentationExtractor(snapshotBuffer));
+        simulation.RegisterTickObserver(
+            new PresentationExtractor(
+                snapshotBuffer,
+                intelligenceStore,
+                new FactionId(
+                    checked((uint)LocalPlayer.Value)),
+                terrainWorld.WorldBounds));
         simulation.AdvanceOneTick();
 
         var renderWorld = new RenderWorld();
@@ -314,6 +338,10 @@ internal sealed class ClientApplication
             formationMovementSystem.DebugCaptureEnabled =
                 worldDebugEnabled;
             battlefieldSupply.DebugCaptureEnabled =
+                worldDebugEnabled;
+            battlefieldIntelligence.TimingEnabled =
+                worldDebugEnabled;
+            battlefieldIntelligence.DebugCaptureEnabled =
                 worldDebugEnabled;
             targetAcquisition.DebugCaptureEnabled =
                 worldDebugEnabled;
@@ -481,7 +509,9 @@ internal sealed class ClientApplication
                 distributionDebugSnapshot,
                 logisticsCapacityDebugSnapshot,
                 battlefieldSupplyDebugSnapshot,
-                combatDebugSnapshot);
+                combatDebugSnapshot,
+                battlefieldIntelligence.DebugSensors,
+                battlefieldIntelligence.Metrics);
 
             terrainRenderer.DebugChunksEnabled = worldDebugEnabled;
 
@@ -717,10 +747,44 @@ internal sealed class ClientApplication
                             : NavigationMovementClass.Tracked));
             }
 
+            FactionId faction =
+                new(
+                    checked(
+                        (uint)owner.Value));
+
             simulation.Entities.AddComponent(entity, new VisualIdentity(1));
             simulation.Entities.AddComponent(
                 entity,
+                new IntelligenceSignature(
+                    faction,
+                    identityKey:
+                        checked((uint)index + 1)));
+            simulation.Entities.AddComponent(
+                entity,
                 new ControllableEntity(owner, category));
+
+            if (owner == LocalPlayer &&
+                index % 17 == 0)
+            {
+                simulation.Entities.AddComponent(
+                    entity,
+                    new VisualSensorState(
+                        faction,
+                        rangeMeters: 140.0f,
+                        updateIntervalTicks: 1));
+            }
+
+            if (owner == LocalPlayer &&
+                index % 29 == 0)
+            {
+                simulation.Entities.AddComponent(
+                    entity,
+                    new RadarSensorState(
+                        faction,
+                        detectionRangeMeters: 280.0f,
+                        identificationRangeMeters: 90.0f,
+                        updateIntervalTicks: 4));
+            }
             simulation.Entities.AddComponent(
                 entity,
                 new SpatialPresence(
@@ -780,7 +844,9 @@ internal sealed class ClientApplication
         AutomatedDistributionDebugSnapshot? distributionSnapshot,
         LogisticsCapacityDebugSnapshot? logisticsCapacitySnapshot,
         BattlefieldSupplyDebugSnapshot? battlefieldSupplySnapshot,
-        CombatDebugSnapshot? combatSnapshot)
+        CombatDebugSnapshot? combatSnapshot,
+        IReadOnlyList<IntelligenceSensorDebugEntry> intelligenceSensors,
+        BattlefieldIntelligenceMetrics intelligenceMetrics)
     {
         debugDraw.Clear();
 
@@ -918,6 +984,24 @@ internal sealed class ClientApplication
                     maximumProviders: 64,
                     maximumUnits: 128,
                     maximumLabels: 20);
+            }
+
+            if (renderWorld.CurrentSnapshot?.Intelligence is
+                FactionIntelligenceSnapshot intelligenceSnapshot)
+            {
+                IntelligenceDebugVisualization.Draw(
+                    debugDraw,
+                    intelligenceSnapshot,
+                    maximumCells: 512,
+                    maximumContacts: 96);
+                IntelligenceDebugVisualization.DrawSensors(
+                    debugDraw,
+                    intelligenceSensors,
+                    maximumSensors: 64);
+                IntelligenceDebugVisualization.DrawMetrics(
+                    debugDraw,
+                    intelligenceMetrics,
+                    camera.Target + Vector3.UnitY * 6.0f);
             }
 
             if (combatSnapshot is not null)

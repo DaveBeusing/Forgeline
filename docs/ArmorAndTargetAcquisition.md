@@ -174,7 +174,7 @@ UI commands for changing these policies can be added later without replacing the
 
 `ITargetAvailabilityPolicy` separates combat targeting fundamentals from the future intelligence layer.
 
-The default policy exposes otherwise valid targets. A later fog-of-war/intelligence implementation can reject unknown, stale, detected-only, or otherwise unavailable targets while keeping the same acquisition algorithm and priority rules.
+The default policy exposes otherwise valid targets for compositions without battlefield intelligence. The implemented `IntelligenceTargetAvailabilityPolicy` constrains direct entity targeting to enemies currently `Identified` for the observing faction; unknown, stale, and radar-only `Detected` contacts remain unavailable to exact target acquisition while retaining contact data for later tactical systems.
 
 ## Line-of-Fire Hook
 
@@ -275,3 +275,6 @@ Later systems may add:
 - veterancy.
 
 Those systems must extend these armor, targeting, weapon, Health, and lifecycle contracts rather than replace them with parallel combat state.
+
+
+See [Battlefield Intelligence](BattlefieldIntelligence.md) for the faction visibility store, sensor semantics, Detected/Identified lifecycle, last-known contacts, presentation filtering, and the concrete intelligence target-availability policy.

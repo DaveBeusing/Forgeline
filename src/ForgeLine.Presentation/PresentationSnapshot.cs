@@ -1,3 +1,4 @@
+using ForgeLine.Intelligence;
 using ForgeLine.Simulation;
 
 namespace ForgeLine.Presentation;
@@ -10,7 +11,8 @@ public sealed class PresentationSnapshot
         SimulationTick tick,
         TimeSpan tickDuration,
         int simulationEntityCount,
-        ReadOnlySpan<RenderInstance> instances)
+        ReadOnlySpan<RenderInstance> instances,
+        FactionIntelligenceSnapshot? intelligence = null)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(
             tickDuration,
@@ -21,6 +23,7 @@ public sealed class PresentationSnapshot
         Tick = tick;
         TickDuration = tickDuration;
         SimulationEntityCount = simulationEntityCount;
+        Intelligence = intelligence;
         _instances = instances.ToArray();
     }
 
@@ -29,6 +32,8 @@ public sealed class PresentationSnapshot
     public TimeSpan TickDuration { get; }
 
     public int SimulationEntityCount { get; }
+
+    public FactionIntelligenceSnapshot? Intelligence { get; }
 
     public int InstanceCount => _instances.Length;
 
