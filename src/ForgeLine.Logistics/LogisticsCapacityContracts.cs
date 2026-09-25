@@ -50,6 +50,8 @@ public readonly record struct LogisticsEdgeCapacityReadModel(
     LogisticsEdgeId EdgeId,
     LogisticsNodeId Source,
     LogisticsNodeId Destination,
+    System.Numerics.Vector3 SourcePosition,
+    System.Numerics.Vector3 DestinationPosition,
     bool Enabled,
     double CapacityPerSecond,
     double WindowCapacity,
@@ -60,6 +62,7 @@ public readonly record struct LogisticsEdgeCapacityReadModel(
 public readonly record struct LogisticsNodeCapacityReadModel(
     LogisticsNodeId NodeId,
     LogisticsNodeKind Kind,
+    System.Numerics.Vector3 WorldPosition,
     bool Enabled,
     double CapacityPerSecond,
     double WindowCapacity,
