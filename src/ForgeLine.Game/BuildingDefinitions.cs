@@ -38,6 +38,7 @@ public static class BuildingIds
     public static readonly BuildingId Smelter = new(5);
     public static readonly BuildingId Refinery = new(6);
     public static readonly BuildingId ElectronicsPlant = new(7);
+    public static readonly BuildingId LogisticsHub = new(8);
 }
 
 public enum BuildingOrientation : byte
@@ -57,7 +58,8 @@ public enum BuildingCapability : uint
     PowerConsumption = 1 << 2,
     Extraction = 1 << 3,
     Storage = 1 << 4,
-    Processing = 1 << 5
+    Processing = 1 << 5,
+    Distribution = 1 << 6
 }
 
 public readonly record struct BuildingFootprint
@@ -434,6 +436,26 @@ public static class InitialBuildingDefinitions
                         BuildingCapability.PowerConsumption,
                     PowerDemand = 5.0,
                     StorageCapacity = 5_000.0
+                },
+                new BuildingDefinition
+                {
+                    Id = BuildingIds.LogisticsHub,
+                    Key = "building.logistics_hub",
+                    DisplayName = "Logistics Hub",
+                    Footprint = new BuildingFootprint(18.0f, 18.0f, 9.0f),
+                    ConstructionTicks = 100,
+                    Costs =
+                    [
+                        new BuildingResourceCost(ResourceIds.FerrousOre, 180.0),
+                        new BuildingResourceCost(ResourceIds.Silicates, 80.0),
+                        new BuildingResourceCost(ResourceIds.Volatiles, 20.0)
+                    ],
+                    Capabilities =
+                        BuildingCapability.Storage |
+                        BuildingCapability.Distribution |
+                        BuildingCapability.PowerConsumption,
+                    PowerDemand = 10.0,
+                    StorageCapacity = 3_000.0
                 },
                 new BuildingDefinition
                 {
