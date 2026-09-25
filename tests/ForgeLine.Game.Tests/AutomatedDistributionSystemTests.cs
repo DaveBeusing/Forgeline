@@ -499,6 +499,76 @@ public sealed class AutomatedDistributionSystemTests
                 ResourceIds.FerrousOre));
     }
 
+    [Fact]
+    public void SourceSelectionUsesAvailableCapacityAcrossRoutableSources()
+    {
+        DistributionFixture fixture =
+            CreateFixture(sourceQuantity: 100.0);
+
+        fixture.Connect(
+            fixture.SourceNode,
+            fixture.DestinationNode);
+
+        _ = fixture.CreateStorageNode(
+            new Vector3(4.0f, 0.0f, 28.0f),
+            out InventoryId alternateInventory,
+            out LogisticsNodeId alternateSource);
+
+        Assert.True(
+            fixture.Inventories.Add(
+                alternateInventory,
+                ResourceIds.FerrousOre,
+                100.0).Succeeded);
+
+        fixture.Connect(
+            alternateSource,
+            fixture.DestinationNode);
+
+        LogisticsRoute primaryRoute =
+            fixture.Network.FindRoute(
+                fixture.SourceNode,
+                fixture.DestinationNode).Route!;
+
+        Assert.True(
+            fixture.Distribution.CapacityTracker.TryReserveRoute(
+                fixture.Network,
+                primaryRoute,
+                quantity: 80.0,
+                SimulationTick.Zero,
+                out _,
+                out _));
+
+        fixture.AddPolicy(
+            fixture.DestinationEntity,
+            minimum: 20.0,
+            target: 60.0,
+            maximum: 100.0,
+            LogisticsStockPriority.High);
+        fixture.CreateTruck(
+            new Vector3(4.0f, 0.0f, 28.0f));
+
+        fixture.Simulation.AdvanceOneTick();
+
+        LogisticsTransportRequestReadModel request =
+            Assert.Single(
+                fixture.Distribution.LastDebugSnapshot.Requests);
+
+        Assert.Equal(
+            LogisticsTransportRequestState.Assigned,
+            request.State);
+        Assert.Equal(
+            LogisticsTransportRequestFailureReason.None,
+            request.FailureReason);
+        Assert.Equal(
+            LogisticsBottleneckReason.None,
+            request.BottleneckReason);
+        Assert.Equal(
+            alternateSource,
+            request.Origin);
+        Assert.True(
+            request.CapacityReservationId.IsSpecified);
+    }
+
     private static DistributionFixture CreateFixture(
         double sourceQuantity,
         Vector3? sourcePosition = null,
