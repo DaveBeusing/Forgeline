@@ -18,7 +18,7 @@ public sealed class BuildingConstructionTests
         BuildingDefinitionCatalog catalog =
             InitialBuildingDefinitions.CreateCatalog();
 
-        Assert.Equal(8, catalog.Count);
+        Assert.Equal(10, catalog.Count);
         Assert.Equal(
             "building.command_core",
             catalog[BuildingIds.CommandCore].Key);
@@ -46,6 +46,15 @@ public sealed class BuildingConstructionTests
         Assert.Equal(
             "building.electronics_plant",
             catalog[BuildingIds.ElectronicsPlant].Key);
+        Assert.Equal(
+            "building.ammunition_plant",
+            catalog[BuildingIds.AmmunitionPlant].Key);
+        Assert.Equal(
+            "building.supply_depot",
+            catalog[BuildingIds.SupplyDepot].Key);
+        Assert.True(
+            catalog[BuildingIds.SupplyDepot].Capabilities.HasFlag(
+                BuildingCapability.Supply));
 
         Assert.Equal(
             ProductionCapability.SteelProcessing,
@@ -56,6 +65,9 @@ public sealed class BuildingConstructionTests
         Assert.Equal(
             ProductionCapability.ElectronicsProcessing,
             catalog[BuildingIds.ElectronicsPlant].ProductionCapabilities);
+        Assert.Equal(
+            ProductionCapability.AmmunitionProcessing,
+            catalog[BuildingIds.AmmunitionPlant].ProductionCapabilities);
 
         BuildingFootprint footprint =
             catalog[BuildingIds.Smelter].Footprint;

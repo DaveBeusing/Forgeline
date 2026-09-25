@@ -140,7 +140,7 @@ public sealed class ResupplyCommand : ISimulationCommand
 
         foreach (EntityId candidate in
                  context.Entities.Query<SupplyProvider>(
-                     Ecs.QueryIterationOrder.StableByEntityIndex))
+                     ForgeLine.Ecs.QueryIterationOrder.StableByEntityIndex))
         {
             if (candidate == target ||
                 !context.Entities.TryGetComponent(

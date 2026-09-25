@@ -514,6 +514,11 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
             ProviderCandidate candidate =
                 _providers[index];
 
+            if (candidate.Entity == recipient.Entity)
+            {
+                continue;
+            }
+
             if (candidate.Provider.Owner != recipient.Owner ||
                 _inventories.GetAvailableQuantity(
                     candidate.Provider.InventoryId,

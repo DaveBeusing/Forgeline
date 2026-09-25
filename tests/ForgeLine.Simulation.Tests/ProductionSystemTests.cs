@@ -17,12 +17,13 @@ public sealed class ProductionSystemTests
         ResourceCatalog resources = InitialResourceDefinitions.CreateCatalog();
         ProductionRecipeCatalog recipes = InitialProductionRecipes.CreateCatalog();
 
-        Assert.Equal(6, resources.Count);
+        Assert.Equal(7, resources.Count);
         Assert.False(resources[ResourceIds.Steel].IsExtractable);
         Assert.False(resources[ResourceIds.Fuel].IsExtractable);
         Assert.False(resources[ResourceIds.Electronics].IsExtractable);
+        Assert.False(resources[ResourceIds.Ammunition].IsExtractable);
 
-        Assert.Equal(3, recipes.Count);
+        Assert.Equal(4, recipes.Count);
         Assert.Equal(
             ResourceIds.FerrousOre,
             Assert.Single(recipes[RecipeIds.Steel].Inputs).ResourceId);
@@ -41,6 +42,15 @@ public sealed class ProductionSystemTests
         Assert.Equal(
             ResourceIds.Electronics,
             Assert.Single(recipes[RecipeIds.Electronics].Outputs).ResourceId);
+        Assert.Equal(
+            ResourceIds.Ammunition,
+            Assert.Single(recipes[RecipeIds.Ammunition].Outputs).ResourceId);
+        Assert.Contains(
+            recipes[RecipeIds.Ammunition].Inputs,
+            ingredient => ingredient.ResourceId == ResourceIds.Steel);
+        Assert.Contains(
+            recipes[RecipeIds.Ammunition].Inputs,
+            ingredient => ingredient.ResourceId == ResourceIds.Electronics);
     }
 
     [Fact]
