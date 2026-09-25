@@ -12,8 +12,9 @@ public enum SimulationPhase
     DamageResolution = 7,
     Supply = 8,
     Logistics = 9,
-    Production = 10,
-    Economy = 11,
-    EntityLifecycle = 12,
-    SnapshotEvents = 13,
+    Infrastructure = 10,
+    Production = 11,
+    Economy = 12,
+    EntityLifecycle = 13,
+    SnapshotEvents = 14,
 }
