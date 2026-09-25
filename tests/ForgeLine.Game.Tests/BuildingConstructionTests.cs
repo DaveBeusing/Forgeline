@@ -363,7 +363,9 @@ public sealed class BuildingConstructionTests
 
         BuildingDefinition definition =
             test.Definitions[BuildingIds.Extractor];
-        test.Simulation.RunTicks(definition.ConstructionTicks - 1);
+        test.Simulation.RunTicks(
+            definition.ConstructionTicks - 1,
+            TestContext.Current.CancellationToken);
 
         ResourceExtractor extractor =
             test.Simulation.Entities.GetComponent<ResourceExtractor>(site);
