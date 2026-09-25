@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Logistics;
@@ -289,6 +290,23 @@ public sealed class PrototypeBattlefieldTests
         _ = runtime.AttachCommandCoreObjectives(
             simulation.Entities,
             commandCores);
+
+        foreach (EntityId commandCore in commandCores.Values)
+        {
+            Assert.True(
+                simulation.Entities.HasComponent<Combatant>(
+                    commandCore));
+            Assert.True(
+                simulation.Entities.HasComponent<Targetable>(
+                    commandCore));
+            Assert.Equal(
+                TargetClass.Structure,
+                simulation.Entities.GetComponent<Targetable>(
+                    commandCore).Class);
+            Assert.True(
+                simulation.Entities.HasComponent<HealthState>(
+                    commandCore));
+        }
 
         simulation.RegisterSystem(
             new MatchObjectiveSystem(
