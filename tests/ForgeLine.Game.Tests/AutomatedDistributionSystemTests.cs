@@ -351,6 +351,154 @@ public sealed class AutomatedDistributionSystemTests
                 ResourceIds.FerrousOre));
     }
 
+    [Fact]
+    public void SaturatedRouteCreatesBacklogAndRecoversAfterCapacityWindow()
+    {
+        DistributionFixture fixture =
+            CreateFixture(sourceQuantity: 200.0);
+
+        fixture.Connect(
+            fixture.SourceNode,
+            fixture.DestinationNode);
+        fixture.AddPolicy(
+            fixture.DestinationEntity,
+            minimum: 20.0,
+            target: 60.0,
+            maximum: 100.0,
+            LogisticsStockPriority.Normal);
+        fixture.CreateTruck(fixture.SourcePosition);
+
+        LogisticsRoute route =
+            fixture.Network.FindRoute(
+                fixture.SourceNode,
+                fixture.DestinationNode).Route!;
+
+        Assert.True(
+            fixture.Distribution.CapacityTracker.TryReserveRoute(
+                fixture.Network,
+                route,
+                quantity: 80.0,
+                SimulationTick.Zero,
+                out _,
+                out _));
+
+        fixture.Simulation.AdvanceOneTick();
+
+        LogisticsTransportRequestReadModel blocked =
+            Assert.Single(
+                fixture.Distribution.LastDebugSnapshot.Requests);
+
+        Assert.Equal(
+            LogisticsTransportRequestState.RetryPending,
+            blocked.State);
+        Assert.Equal(
+            LogisticsTransportRequestFailureReason.CapacitySaturated,
+            blocked.FailureReason);
+        Assert.Equal(
+            LogisticsBottleneckReason.SaturatedLinkOrHub,
+            blocked.BottleneckReason);
+        Assert.Equal(
+            1,
+            fixture.Distribution.Metrics.BacklogRequestCount);
+        Assert.Equal(
+            60.0,
+            fixture.Distribution.Metrics.BacklogQuantity);
+        Assert.Equal(
+            1,
+            fixture.Distribution.Metrics.CapacityBlockedRequestCount);
+
+        RunUntil(
+            fixture,
+            () =>
+                fixture.Inventories.GetQuantity(
+                    fixture.DestinationInventory,
+                    ResourceIds.FerrousOre) >= 60.0 &&
+                fixture.Distribution.Metrics.CompletedRequestCount >= 1,
+            maximumTicks: 700);
+
+        Assert.Equal(
+            60.0,
+            fixture.Inventories.GetQuantity(
+                fixture.DestinationInventory,
+                ResourceIds.FerrousOre));
+        Assert.Equal(
+            0,
+            fixture.Distribution.Metrics.BacklogRequestCount);
+    }
+
+    [Fact]
+    public void DisabledCriticalLinkBlocksDeliveryUntilRestored()
+    {
+        DistributionFixture fixture =
+            CreateFixture(sourceQuantity: 100.0);
+
+        fixture.Connect(
+            fixture.SourceNode,
+            fixture.DestinationNode);
+        LogisticsEdgeId criticalEdge =
+            Assert.Single(fixture.Network.GetEdges()).Id;
+
+        Assert.True(
+            fixture.Network.SetEdgeEnabled(
+                criticalEdge,
+                enabled: false));
+
+        fixture.AddPolicy(
+            fixture.DestinationEntity,
+            minimum: 20.0,
+            target: 60.0,
+            maximum: 100.0,
+            LogisticsStockPriority.High);
+        fixture.CreateTruck(fixture.SourcePosition);
+
+        fixture.Simulation.AdvanceOneTick();
+
+        LogisticsTransportRequestReadModel disconnected =
+            Assert.Single(
+                fixture.Distribution.LastDebugSnapshot.Requests);
+
+        Assert.Equal(
+            LogisticsTransportRequestState.RetryPending,
+            disconnected.State);
+        Assert.Equal(
+            LogisticsTransportRequestFailureReason.NoRoute,
+            disconnected.FailureReason);
+        Assert.Equal(
+            LogisticsBottleneckReason.DisconnectedRoute,
+            disconnected.BottleneckReason);
+        Assert.Equal(
+            0.0,
+            fixture.Inventories.GetQuantity(
+                fixture.DestinationInventory,
+                ResourceIds.FerrousOre));
+
+        Assert.True(
+            fixture.Network.SetEdgeEnabled(
+                criticalEdge,
+                enabled: true));
+
+        RunUntil(
+            fixture,
+            () =>
+                fixture.Inventories.GetQuantity(
+                    fixture.DestinationInventory,
+                    ResourceIds.FerrousOre) >= 60.0 &&
+                fixture.Distribution.Metrics.CompletedRequestCount >= 1,
+            maximumTicks: 700);
+
+        Assert.Equal(
+            60.0,
+            fixture.Inventories.GetQuantity(
+                fixture.DestinationInventory,
+                ResourceIds.FerrousOre));
+        Assert.Equal(1, fixture.Network.EdgeCount);
+        Assert.Equal(
+            0.0,
+            fixture.Inventories.GetReservedQuantity(
+                fixture.SourceInventory,
+                ResourceIds.FerrousOre));
+    }
+
     private static DistributionFixture CreateFixture(
         double sourceQuantity,
         Vector3? sourcePosition = null,
