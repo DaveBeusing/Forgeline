@@ -181,28 +181,85 @@ public sealed class DirectorateVerticalSliceSmokeTests
                 simulation.Entities,
                 inventories,
                 cargo);
+        var unitProduction =
+            new UnitProductionSystem(
+                units,
+                inventories,
+                unitFactory);
+        simulation.RegisterSystem(unitProduction);
+
+        EntityId barracks =
+            completedBuildings[BuildingIds.Barracks];
+        EntityId vehicleFactory =
+            completedBuildings[BuildingIds.VehicleFactory];
+
+        FullyPowerFacility(
+            simulation,
+            barracks);
+        FullyPowerFacility(
+            simulation,
+            vehicleFactory);
+
+        FundUnitProductionFacility(
+            simulation,
+            inventories,
+            barracks,
+            units.Definitions.Where(
+                definition =>
+                    definition.RequiredProductionCapability ==
+                    UnitProductionCapability.Infantry));
+        FundUnitProductionFacility(
+            simulation,
+            inventories,
+            vehicleFactory,
+            units.Definitions.Where(
+                definition =>
+                    definition.RequiredProductionCapability !=
+                    UnitProductionCapability.Infantry));
+
+        uint totalProductionTicks = 0;
+        foreach (UnitDefinition definition in units.Definitions)
+        {
+            EntityId facility =
+                definition.RequiredProductionCapability ==
+                UnitProductionCapability.Infantry
+                    ? barracks
+                    : vehicleFactory;
+
+            simulation.SubmitCommand(
+                new QueueUnitProductionCommand(
+                    Player,
+                    facility,
+                    definition.Id,
+                    simulation.CurrentTick),
+                simulation.CurrentTick.Next(),
+                new SimulationCommandSource(Player.Value));
+
+            totalProductionTicks =
+                checked(totalProductionTicks + definition.ProductionTicks);
+        }
+
+        simulation.RunTicks(
+            checked((int)totalProductionTicks + 2),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(
+            7,
+            unitProduction.Metrics.CompletedUnits);
 
         var createdUnits =
             new Dictionary<UnitId, EntityId>();
 
-        int unitIndex = 0;
-        foreach (UnitDefinition definition in units.Definitions)
+        foreach (EntityId entity in
+                 simulation.Entities.Query<UnitIdentity>())
         {
-            EntityId entity =
-                unitFactory.Create(
-                    definition,
-                    new Vector3(
-                        40.0f + unitIndex * 12.0f,
-                        0.0f,
-                        220.0f),
-                    Player);
+            UnitIdentity identity =
+                simulation.Entities.GetComponent<UnitIdentity>(entity);
 
             createdUnits.Add(
-                definition.Id,
+                identity.UnitId,
                 entity);
 
-            Assert.True(
-                simulation.Entities.HasComponent<UnitIdentity>(entity));
             Assert.True(
                 simulation.Entities.HasComponent<GroundMovement>(entity));
             Assert.True(
@@ -213,8 +270,6 @@ public sealed class DirectorateVerticalSliceSmokeTests
                 simulation.Entities.HasComponent<Combatant>(entity));
             Assert.True(
                 simulation.Entities.HasComponent<IntelligenceSignature>(entity));
-
-            unitIndex++;
         }
 
         Assert.Equal(7, createdUnits.Count);
@@ -239,6 +294,153 @@ public sealed class DirectorateVerticalSliceSmokeTests
         Assert.True(
             simulation.Entities.HasComponent<SupplyTruck>(
                 createdUnits[UnitIds.SupplyTruck]));
+
+        VerifyBattlefieldResupply(
+            simulation,
+            inventories,
+            completedBuildings[BuildingIds.SupplyDepot],
+            createdUnits[UnitIds.SupplyTruck],
+            createdUnits[UnitIds.MainBattleTank]);
+    }
+
+    private static void FullyPowerFacility(
+        SimulationCoordinator simulation,
+        EntityId facility)
+    {
+        PowerConsumer consumer =
+            simulation.Entities.GetComponent<PowerConsumer>(facility);
+
+        simulation.Entities.SetComponent(
+            facility,
+            new PowerConsumer(
+                consumer.Demand,
+                consumer.Priority,
+                enabled: true,
+                allocatedPower: consumer.Demand,
+                state: PowerOperationalState.Powered));
+    }
+
+    private static void FundUnitProductionFacility(
+        SimulationCoordinator simulation,
+        InventoryStore inventories,
+        EntityId facility,
+        IEnumerable<UnitDefinition> definitions)
+    {
+        UnitProductionFacility production =
+            simulation.Entities.GetComponent<UnitProductionFacility>(
+                facility);
+
+        foreach (UnitDefinition definition in definitions)
+        {
+            foreach (UnitResourceCost cost in definition.Costs)
+            {
+                Assert.True(
+                    inventories.Add(
+                        production.InputInventory,
+                        cost.ResourceId,
+                        cost.Quantity).Succeeded);
+            }
+        }
+    }
+
+    private static void VerifyBattlefieldResupply(
+        SimulationCoordinator simulation,
+        InventoryStore inventories,
+        EntityId supplyDepotEntity,
+        EntityId supplyTruckEntity,
+        EntityId tankEntity)
+    {
+        SupplyDepot depot =
+            simulation.Entities.GetComponent<SupplyDepot>(
+                supplyDepotEntity);
+        WorldTransform depotTransform =
+            simulation.Entities.GetComponent<WorldTransform>(
+                supplyDepotEntity);
+
+        Assert.True(
+            inventories.Add(
+                depot.InventoryId,
+                ResourceIds.Fuel,
+                300.0).Succeeded);
+        Assert.True(
+            inventories.Add(
+                depot.InventoryId,
+                ResourceIds.Ammunition,
+                300.0).Succeeded);
+
+        simulation.Entities.SetComponent(
+            supplyTruckEntity,
+            simulation.Entities.GetComponent<WorldTransform>(
+                supplyTruckEntity) with
+            {
+                Position = depotTransform.Position
+            });
+
+        var supply =
+            new BattlefieldSupplySystem(inventories);
+        simulation.RegisterSystem(supply);
+        simulation.AdvanceOneTick();
+
+        SupplyTruck supplyTruck =
+            simulation.Entities.GetComponent<SupplyTruck>(
+                supplyTruckEntity);
+
+        Assert.True(
+            inventories.GetQuantity(
+                supplyTruck.InventoryId,
+                ResourceIds.Fuel) > 0.0);
+        Assert.True(
+            inventories.GetQuantity(
+                supplyTruck.InventoryId,
+                ResourceIds.Ammunition) > 0.0);
+
+        UnitFuelState tankFuel =
+            simulation.Entities.GetComponent<UnitFuelState>(
+                tankEntity);
+        AmmunitionState tankAmmunition =
+            simulation.Entities.GetComponent<AmmunitionState>(
+                tankEntity);
+
+        double fuelBefore =
+            inventories.GetQuantity(
+                tankFuel.InventoryId,
+                ResourceIds.Fuel);
+        double ammunitionBefore =
+            inventories.GetQuantity(
+                tankAmmunition.InventoryId,
+                ResourceIds.Ammunition);
+
+        Vector3 resupplyPosition =
+            depotTransform.Position +
+            new Vector3(30.0f, 0.0f, 0.0f);
+
+        simulation.Entities.SetComponent(
+            supplyTruckEntity,
+            simulation.Entities.GetComponent<WorldTransform>(
+                supplyTruckEntity) with
+            {
+                Position = resupplyPosition
+            });
+        simulation.Entities.SetComponent(
+            tankEntity,
+            simulation.Entities.GetComponent<WorldTransform>(
+                tankEntity) with
+            {
+                Position = resupplyPosition
+            });
+
+        simulation.AdvanceOneTick();
+
+        Assert.True(
+            inventories.GetQuantity(
+                tankFuel.InventoryId,
+                ResourceIds.Fuel) >
+            fuelBefore);
+        Assert.True(
+            inventories.GetQuantity(
+                tankAmmunition.InventoryId,
+                ResourceIds.Ammunition) >
+            ammunitionBefore);
     }
 
     private static EntityId CreateFundedConstructionInventory(
