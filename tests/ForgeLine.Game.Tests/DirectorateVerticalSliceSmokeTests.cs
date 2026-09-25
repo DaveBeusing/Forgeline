@@ -240,11 +240,11 @@ public sealed class DirectorateVerticalSliceSmokeTests
         }
 
         simulation.RunTicks(
-            checked((int)totalProductionTicks + 2),
+            checked((ulong)totalProductionTicks + 2UL),
             TestContext.Current.CancellationToken);
 
         Assert.Equal(
-            7UL,
+            7L,
             unitProduction.Metrics.CompletedUnits);
 
         var createdUnits =
