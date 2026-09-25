@@ -10,6 +10,18 @@ public readonly record struct ResourceId(uint Value) : IComparable<ResourceId>
 
     public int CompareTo(ResourceId other) => Value.CompareTo(other.Value);
 
+    public static bool operator <(ResourceId left, ResourceId right) =>
+        left.CompareTo(right) < 0;
+
+    public static bool operator <=(ResourceId left, ResourceId right) =>
+        left.CompareTo(right) <= 0;
+
+    public static bool operator >(ResourceId left, ResourceId right) =>
+        left.CompareTo(right) > 0;
+
+    public static bool operator >=(ResourceId left, ResourceId right) =>
+        left.CompareTo(right) >= 0;
+
     public override string ToString() =>
         Value.ToString(CultureInfo.InvariantCulture);
 }
