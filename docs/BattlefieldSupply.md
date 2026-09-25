@@ -153,7 +153,7 @@ Disabled depots do not provide supply. Missing inventories are treated as unavai
 - Fuel and Ammunition transferred during the current tick;
 - cumulative Fuel and Ammunition transfer quantities.
 
-`BattlefieldSupplyDebugSnapshot` exposes per-unit Fuel/Ammunition fractions, supply state, priority, active resupply provider, provider stock, provider type, range, and world position.
+`BattlefieldSupplyDebugSnapshot` exposes per-unit Fuel/Ammunition fractions, supply state, priority, active resupply provider, provider stock, provider type, range, and world position. Snapshot capture is opt-in through `DebugCaptureEnabled`, so normal simulation ticks keep aggregate metrics without allocating debug read-model arrays.
 
 The development debug visualization renders:
 

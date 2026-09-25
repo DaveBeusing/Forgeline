@@ -272,6 +272,8 @@ internal sealed class ClientApplication
                 worldDebugEnabled;
             formationMovementSystem.DebugCaptureEnabled =
                 worldDebugEnabled;
+            battlefieldSupply.DebugCaptureEnabled =
+                worldDebugEnabled;
 
             if (smokeTest &&
                 _platform.Clock.GetElapsedTime(startedAt, now) >= SmokeTestDuration)

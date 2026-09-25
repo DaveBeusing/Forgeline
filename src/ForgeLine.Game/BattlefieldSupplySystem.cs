@@ -69,6 +69,8 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
     private const double QuantityEpsilon = 0.000000001;
 
     private readonly InventoryStore _inventories;
+    private readonly List<EntityId> _fuelUnits = new();
+    private readonly List<EntityId> _supplyTrucks = new();
     private readonly List<RecipientCandidate> _recipients = new();
     private readonly List<ProviderCandidate> _providers = new();
     private double _totalFuelTransferred;
@@ -83,6 +85,8 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
     public SimulationPhase Phase => SimulationPhase.Supply;
 
     public BattlefieldSupplyMetrics Metrics { get; private set; }
+
+    public bool DebugCaptureEnabled { get; set; }
 
     public BattlefieldSupplyDebugSnapshot LastDebugSnapshot
     {
@@ -123,7 +127,7 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
 
     private void ConsumeMovementFuel(SimulationContext context)
     {
-        var units = new List<EntityId>();
+        _fuelUnits.Clear();
 
         foreach (EntityId entity in
                  context.Entities.Query<UnitFuelState>(
@@ -131,13 +135,13 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
         {
             if (context.Entities.HasComponent<WorldTransform>(entity))
             {
-                units.Add(entity);
+                _fuelUnits.Add(entity);
             }
         }
 
-        for (int index = 0; index < units.Count; index++)
+        for (int index = 0; index < _fuelUnits.Count; index++)
         {
-            EntityId entity = units[index];
+            EntityId entity = _fuelUnits[index];
 
             if (!context.Entities.TryGetComponent(
                     entity,
@@ -194,18 +198,18 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
         ref double fuelTransferred,
         ref double ammunitionTransferred)
     {
-        var trucks = new List<EntityId>();
+        _supplyTrucks.Clear();
 
         foreach (EntityId entity in
                  context.Entities.Query<SupplyTruck>(
                      QueryIterationOrder.StableByEntityIndex))
         {
-            trucks.Add(entity);
+            _supplyTrucks.Add(entity);
         }
 
-        for (int index = 0; index < trucks.Count; index++)
+        for (int index = 0; index < _supplyTrucks.Count; index++)
         {
-            EntityId truckEntity = trucks[index];
+            EntityId truckEntity = _supplyTrucks[index];
 
             if (!context.Entities.TryGetComponent(
                     truckEntity,
@@ -624,8 +628,10 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
         int critical = 0;
         int unsupplied = 0;
 
-        var unitModels =
-            new BattlefieldSupplyUnitReadModel[_recipients.Count];
+        BattlefieldSupplyUnitReadModel[]? unitModels =
+            DebugCaptureEnabled
+                ? new BattlefieldSupplyUnitReadModel[_recipients.Count]
+                : null;
 
         for (int index = 0; index < _recipients.Count; index++)
         {
@@ -727,19 +733,24 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                     ? resupplyOrder.Provider
                     : EntityId.Invalid;
 
-            unitModels[index] =
-                new BattlefieldSupplyUnitReadModel(
-                    recipient.Entity,
-                    status,
-                    recipient.Priority,
-                    fuelFraction,
-                    ammunitionFraction,
-                    recipient.Position,
-                    provider);
+            if (unitModels is not null)
+            {
+                unitModels[index] =
+                    new BattlefieldSupplyUnitReadModel(
+                        recipient.Entity,
+                        status,
+                        recipient.Priority,
+                        fuelFraction,
+                        ammunitionFraction,
+                        recipient.Position,
+                        provider);
+            }
         }
 
-        var providerModels =
-            new BattlefieldSupplyProviderReadModel[_providers.Count];
+        BattlefieldSupplyProviderReadModel[]? providerModels =
+            DebugCaptureEnabled
+                ? new BattlefieldSupplyProviderReadModel[_providers.Count]
+                : null;
         int depotCount = 0;
         int truckCount = 0;
 
@@ -758,19 +769,22 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                 truckCount++;
             }
 
-            providerModels[index] =
-                new BattlefieldSupplyProviderReadModel(
-                    provider.Entity,
-                    provider.IsDepot,
-                    provider.IsTruck,
-                    _inventories.GetQuantity(
-                        provider.Provider.InventoryId,
-                        ResourceIds.Fuel),
-                    _inventories.GetQuantity(
-                        provider.Provider.InventoryId,
-                        ResourceIds.Ammunition),
-                    provider.Provider.ResupplyRangeMeters,
-                    provider.Position);
+            if (providerModels is not null)
+            {
+                providerModels[index] =
+                    new BattlefieldSupplyProviderReadModel(
+                        provider.Entity,
+                        provider.IsDepot,
+                        provider.IsTruck,
+                        _inventories.GetQuantity(
+                            provider.Provider.InventoryId,
+                            ResourceIds.Fuel),
+                        _inventories.GetQuantity(
+                            provider.Provider.InventoryId,
+                            ResourceIds.Ammunition),
+                        provider.Provider.ResupplyRangeMeters,
+                        provider.Position);
+            }
         }
 
         Metrics =
@@ -788,10 +802,12 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                 _totalAmmunitionTransferred);
 
         LastDebugSnapshot =
-            new BattlefieldSupplyDebugSnapshot(
-                Metrics,
-                unitModels,
-                providerModels);
+            DebugCaptureEnabled
+                ? new BattlefieldSupplyDebugSnapshot(
+                    Metrics,
+                    unitModels!,
+                    providerModels!)
+                : BattlefieldSupplyDebugSnapshot.Empty;
     }
 
     private double GetResourceFraction(

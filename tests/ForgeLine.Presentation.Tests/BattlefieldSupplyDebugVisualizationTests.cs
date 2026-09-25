@@ -14,7 +14,11 @@ public sealed class BattlefieldSupplyDebugVisualizationTests
     {
         var inventories = new InventoryStore();
         var simulation = new SimulationCoordinator();
-        var supply = new BattlefieldSupplySystem(inventories);
+        var supply =
+            new BattlefieldSupplySystem(inventories)
+            {
+                DebugCaptureEnabled = true
+            };
         simulation.RegisterSystem(supply);
 
         InventoryId depotInventory =
