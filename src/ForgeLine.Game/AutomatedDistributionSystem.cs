@@ -45,20 +45,9 @@ public sealed class AutomatedDistributionSystem : ISimulationSystem
         _cargoTransportSystem = cargoTransportSystem ??
             throw new ArgumentNullException(nameof(cargoTransportSystem));
 
-        if (retryDelayTicks == 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(retryDelayTicks));
-        }
-
-        if (maximumTransportAttempts == 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(maximumTransportAttempts));
-        }
-
-        if (fairnessAgingTicks == 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(fairnessAgingTicks));
-        }
+        ArgumentOutOfRangeException.ThrowIfZero(retryDelayTicks);
+        ArgumentOutOfRangeException.ThrowIfZero(maximumTransportAttempts);
+        ArgumentOutOfRangeException.ThrowIfZero(fairnessAgingTicks);
 
         _routePolicy = routePolicy ?? LogisticsRouteCostPolicy.Default;
         _retryDelayTicks = retryDelayTicks;
