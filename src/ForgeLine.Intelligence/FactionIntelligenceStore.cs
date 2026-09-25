@@ -1,6 +1,7 @@
 using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Simulation;
+using ForgeLine.World;
 
 namespace ForgeLine.Intelligence;
 
@@ -284,6 +285,7 @@ public sealed class FactionIntelligenceStore
             return new FactionIntelligenceSnapshot(
                 faction,
                 CurrentTick,
+                _settings.CellSizeMeters,
                 [],
                 []);
         }
@@ -309,6 +311,87 @@ public sealed class FactionIntelligenceStore
         return new FactionIntelligenceSnapshot(
             faction,
             CurrentTick,
+            _settings.CellSizeMeters,
+            cells,
+            contacts);
+    }
+
+    public FactionIntelligenceSnapshot Capture(
+        FactionId faction,
+        in AxisAlignedBounds worldBounds)
+    {
+        RequireFaction(faction);
+
+        float cellSize =
+            _settings.CellSizeMeters;
+        int minimumX =
+            checked(
+                (int)MathF.Floor(
+                    worldBounds.Minimum.X /
+                    cellSize));
+        int maximumX =
+            checked(
+                (int)MathF.Floor(
+                    MathF.BitDecrement(
+                        worldBounds.Maximum.X) /
+                    cellSize));
+        int minimumZ =
+            checked(
+                (int)MathF.Floor(
+                    worldBounds.Minimum.Z /
+                    cellSize));
+        int maximumZ =
+            checked(
+                (int)MathF.Floor(
+                    MathF.BitDecrement(
+                        worldBounds.Maximum.Z) /
+                    cellSize));
+
+        int width =
+            checked(maximumX - minimumX + 1);
+        int height =
+            checked(maximumZ - minimumZ + 1);
+        var cells =
+            new VisibilityCellSnapshot[
+                checked(width * height)];
+        int cellIndex = 0;
+
+        for (int z = minimumZ;
+             z <= maximumZ;
+             z++)
+        {
+            for (int x = minimumX;
+                 x <= maximumX;
+                 x++)
+            {
+                var cell =
+                    new VisibilityCellCoordinate(x, z);
+
+                cells[cellIndex++] =
+                    new VisibilityCellSnapshot(
+                        cell,
+                        GetTerrainState(
+                            faction,
+                            cell));
+            }
+        }
+
+        IntelligenceContact[] contacts =
+            _factions.TryGetValue(
+                faction,
+                out FactionState? state)
+                ? state.Contacts.Values
+                    .OrderBy(
+                        static contact =>
+                            contact.ContactKey)
+                    .Select(ToPublicContact)
+                    .ToArray()
+                : [];
+
+        return new FactionIntelligenceSnapshot(
+            faction,
+            CurrentTick,
+            cellSize,
             cells,
             contacts);
     }
