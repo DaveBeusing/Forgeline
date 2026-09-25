@@ -566,6 +566,9 @@ internal static class TacticalCommandUtilities
         ClearCombatGroupMembership(
             context,
             entity);
+        RemoveIfPresent<ResupplyOrder>(
+            context,
+            entity);
 
         if (context.Entities.HasComponent<CombatOrderState>(entity))
         {
