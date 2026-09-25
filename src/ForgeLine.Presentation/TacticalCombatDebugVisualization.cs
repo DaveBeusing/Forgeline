@@ -55,11 +55,11 @@ public static class TacticalCombatDebugVisualization
                     segments: 32);
             }
 
-            if (entry.Target.IsValid)
+            if (entry.HasTargetPosition)
             {
                 debugDraw.Line(
                     entry.Position,
-                    entry.Destination,
+                    entry.TargetPosition,
                     new Vector4(
                         1.0f,
                         0.25f,
