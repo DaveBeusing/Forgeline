@@ -83,7 +83,7 @@ public sealed class BuildingLogisticsRegistrationTests
         simulation.Entities.AddComponent(
             extractor,
             new CompletedBuilding(
-                BuildingIds.Mine,
+                BuildingIds.Extractor,
                 new PlayerId(1),
                 SimulationTick.Zero));
         simulation.Entities.AddComponent(
