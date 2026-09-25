@@ -47,6 +47,22 @@ public sealed class ResourceExtractionSystem : ISimulationSystem
                 continue;
             }
 
+            double powerScale = 1.0;
+            if (entities.TryGetComponent(extractorEntity, out PowerConsumer powerConsumer))
+            {
+                powerScale = powerConsumer.OperationalScale;
+                if (powerScale <= 0.0)
+                {
+                    blockedExtractorCount++;
+                    SetExtractorState(
+                        entities,
+                        extractorEntity,
+                        extractor,
+                        ResourceExtractorState.PowerUnavailable);
+                    continue;
+                }
+            }
+
             if (!entities.IsAlive(extractor.Deposit) ||
                 !entities.TryGetComponent(
                     extractor.Deposit,
@@ -94,7 +110,8 @@ public sealed class ResourceExtractionSystem : ISimulationSystem
                 Math.Min(
                     extractor.MaximumExtractionRatePerSecond,
                     deposit.BaseExtractionRatePerSecond) *
-                deposit.Richness;
+                deposit.Richness *
+                powerScale;
             double requestedQuantity =
                 effectiveRatePerSecond * context.TickDuration.TotalSeconds;
             requestedQuantity =
@@ -173,7 +190,9 @@ public sealed class ResourceExtractionSystem : ISimulationSystem
                     ? ResourceExtractorState.DepositDepleted
                     : outputConstrained
                         ? ResourceExtractorState.OutputConstrained
-                        : ResourceExtractorState.Extracting;
+                        : powerScale < 1.0
+                            ? ResourceExtractorState.PowerConstrained
+                            : ResourceExtractorState.Extracting;
             SetExtractorState(
                 entities,
                 extractorEntity,
