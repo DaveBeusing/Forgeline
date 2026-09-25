@@ -2,6 +2,7 @@ using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Ecs;
+using ForgeLine.Intelligence;
 using ForgeLine.Simulation;
 using ForgeLine.World;
 
@@ -589,6 +590,43 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
         {
             entities.AddComponent(entity, new CommandFacility());
         }
+
+        if (definition.Capabilities.HasFlag(BuildingCapability.UnitProduction))
+        {
+            InventoryId inputInventory =
+                _inventories.CreateInventory(
+                    new InventorySpecification(
+                        definition.UnitProductionInputCapacity));
+
+            entities.AddComponent(
+                entity,
+                new InventoryStorage(inputInventory));
+            entities.AddComponent(
+                entity,
+                new UnitProductionFacility(
+                    inputInventory,
+                    definition.UnitProductionCapabilities,
+                    site.Owner,
+                    definition.UnitSpawnOffset,
+                    activatedAtTick));
+        }
+
+        if (definition.Capabilities.HasFlag(BuildingCapability.Radar))
+        {
+            entities.AddComponent(
+                entity,
+                new RadarSensorState(
+                    owner,
+                    definition.RadarDetectionRangeMeters,
+                    definition.RadarIdentificationRangeMeters,
+                    definition.RadarUpdateIntervalTicks));
+        }
+
+        entities.AddComponent(
+            entity,
+            new IntelligenceSignature(
+                owner,
+                0x8000_0000u | site.BuildingId.Value));
 
         if (definition.Capabilities.HasFlag(BuildingCapability.Processing))
         {
