@@ -325,9 +325,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return defaultConfiguration;
     }
 
-    private OwnedState CaptureOwnedState(
+    private static OwnedState CaptureOwnedState(
         SimulationContext context,
-        in SkirmishOpponentController controller)
+        SkirmishOpponentController controller)
     {
         var owned =
             new OwnedState(
@@ -541,7 +541,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private SkirmishEconomyAssessment AssessEconomy(
         SimulationContext context,
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         OwnedState owned)
     {
         double ferrous = 0.0;
@@ -642,7 +642,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             healthScore);
     }
 
-    private SkirmishForceAssessment AssessForce(
+    private static SkirmishForceAssessment AssessForce(
         SimulationContext context,
         OwnedState owned,
         FactionIntelligenceSnapshot intelligence)
@@ -737,7 +737,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private bool TryRespondToCriticalEconomy(
         SimulationContext context,
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         OwnedState owned,
         in SkirmishEconomyAssessment economy,
         out SkirmishStrategicGoal goal)
@@ -807,7 +807,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private bool TryAdvanceBootstrap(
         SimulationContext context,
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         OwnedState owned,
         in SkirmishEconomyAssessment economy,
         out SkirmishStrategicGoal goal)
@@ -918,7 +918,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private bool TryDefend(
         SimulationContext context,
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         OwnedState owned,
         FactionIntelligenceSnapshot intelligence,
         SkirmishOpponentConfiguration configuration,
@@ -978,9 +978,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return true;
     }
 
-    private bool TryRecoverForce(
+    private static bool TryRecoverForce(
         SimulationContext context,
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         OwnedState owned,
         in SkirmishForceAssessment force,
         SkirmishOpponentConfiguration configuration)
@@ -1023,7 +1023,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private bool TryExpand(
         SimulationContext context,
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         OwnedState owned,
         in SkirmishEconomyAssessment economy,
         in SkirmishForceAssessment force,
@@ -1109,7 +1109,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private bool TryScout(
         SimulationContext context,
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         OwnedState owned,
         FactionIntelligenceSnapshot intelligence,
         ref SkirmishOpponentState state,
@@ -1134,7 +1134,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
-        IReadOnlyList<BattlefieldSiteDefinition> sites =
+        BattlefieldSiteDefinition[] sites =
             GetOpponentFacingSites(
                 controller);
 
@@ -1173,7 +1173,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private bool TryAttack(
         SimulationContext context,
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         OwnedState owned,
         FactionIntelligenceSnapshot intelligence,
         in SkirmishForceAssessment force,
@@ -1255,9 +1255,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return true;
     }
 
-    private void TryIssueArtilleryMission(
+    private static void TryIssueArtilleryMission(
         SimulationContext context,
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         OwnedState owned,
         FactionIntelligenceSnapshot intelligence,
         SkirmishOpponentConfiguration configuration,
@@ -1333,7 +1333,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
     }
 
-    private void EnsureTacticalBehavior(
+    private static void EnsureTacticalBehavior(
         SimulationContext context,
         OwnedState owned,
         SkirmishOpponentConfiguration configuration)
@@ -1367,9 +1367,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
     }
 
-    private void EnsureEconomyPolicies(
+    private static void EnsureEconomyPolicies(
         SimulationContext context,
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         OwnedState owned)
     {
         if (context.Entities.IsAlive(
@@ -1794,7 +1794,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private bool TryIssueBuilding(
         SimulationContext context,
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         OwnedState owned,
         BuildingId buildingId,
         Vector3? requestedPosition)
@@ -1845,7 +1845,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private bool TryIssueExtractor(
         SimulationContext context,
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         OwnedState owned,
         ResourceId resource,
         bool contestedAllowed)
@@ -1877,7 +1877,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private bool TryIssueNearestContestedExtractor(
         SimulationContext context,
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         OwnedState owned,
         Vector3 origin)
     {
@@ -1905,7 +1905,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private bool TrySelectConstructionSource(
         SimulationContext context,
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         OwnedState owned,
         BuildingDefinition definition,
         out EntityId source)
@@ -2000,7 +2000,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private bool TryFindPlacement(
         SimulationContext context,
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         BuildingId buildingId,
         Vector3? requestedPosition,
         out Vector3 placement)
@@ -2240,7 +2240,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     }
 
     private BattlefieldSiteDefinition? SelectExpansionSite(
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         int cursor)
     {
         IReadOnlyList<BattlefieldSiteDefinition> candidates =
@@ -2285,8 +2285,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             candidates.Count];
     }
 
-    private IReadOnlyList<BattlefieldSiteDefinition> GetOpponentFacingSites(
-        in SkirmishOpponentController controller)
+    private BattlefieldSiteDefinition[] GetOpponentFacingSites(
+        SkirmishOpponentController controller)
     {
         float center =
             _battlefield.Metadata.WidthMeters *
@@ -2314,7 +2314,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     }
 
     private bool IsOnHomeSideOrCentral(
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         Vector3 position)
     {
         float center =
@@ -2328,7 +2328,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     }
 
     private Vector3 SelectOffensiveWaypoint(
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         double aggression)
     {
         if (aggression >= 0.70)
@@ -2336,7 +2336,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return controller.EnemyObjectivePosition;
         }
 
-        IReadOnlyList<BattlefieldSiteDefinition> sites =
+        BattlefieldSiteDefinition[] sites =
             GetOpponentFacingSites(
                 controller);
 
@@ -2440,7 +2440,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private static Vector3 ResolveRecoveryPoint(
         SimulationContext context,
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         OwnedState owned)
     {
         if (owned.SupplyDepots.Count == 0)
@@ -2463,7 +2463,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private void CaptureDebug(
         EntityId controllerEntity,
-        in SkirmishOpponentController controller,
+        SkirmishOpponentController controller,
         in SkirmishOpponentState state,
         in SkirmishEconomyAssessment economy,
         in SkirmishForceAssessment force,
