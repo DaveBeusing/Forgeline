@@ -30,6 +30,8 @@ Capacity accounting is simulation-tick based. Wall-clock time does not affect lo
 
 Automated distribution performs capacity admission before it reserves source inventory or assigns a physical Cargo Truck.
 
+Source selection evaluates routable sources together with currently available Cargo Truck capacity and current network capacity. A cheaper source whose route is saturated does not prevent dispatch from another source with usable capacity.
+
 A candidate shipment is admitted only when:
 
 - the route is structurally available;
@@ -186,6 +188,9 @@ Regression coverage includes:
 - edge disable/restore without topology recreation;
 - backlog creation under saturation;
 - disconnected delivery followed by recovery after restoration;
+- factory input starvation followed by production recovery;
+- battlefield supply remaining Unsupplied during disconnection and recovering through the same depot and transport chain after restoration;
+- source selection falling back to a routable source with available capacity;
 - route churn releasing stale capacity reservations;
 - capacity debug visualization.
 
