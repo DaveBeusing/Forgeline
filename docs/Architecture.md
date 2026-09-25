@@ -99,6 +99,8 @@ Cargo transport preserves the same separation. `ForgeLine.Logistics` selects ver
 
 Automated regional distribution is composed above those existing authorities. `AutomatedDistributionSystem` in `ForgeLine.Game` evaluates stock policies, coalesces deficits into transport requests, selects authoritative logistics routes and surplus sources, reserves source inventory, and assigns idle physical Cargo Trucks. It never moves resources remotely: `CargoTransportSystem` remains responsible for physical loading, navigation, unloading, and transport failure state. Presentation receives only distribution read models and debug snapshots. See `docs/AutomatedDistributionAndLogisticsHubs.md`.
 
+Battlefield supply is the downstream operational layer. `BattlefieldSupplySystem` executes in the canonical `Supply` phase, consumes Fuel from authoritative unit movement, loads dedicated Supply Trucks only when physically near an operational Supply Depot, and transfers Fuel/Ammunition only between real inventories within provider range. Supply Depots are normal logistics-network destinations with automated Fuel/Ammunition stock policies; regional replenishment therefore remains owned by the existing distribution and Cargo Truck systems. Unit status and debug data are read models only, while zero-Fuel mobility constraints are consumed by `GroundMovementSystem`. See `docs/BattlefieldSupply.md`.
+
 Simulation code is written in a deterministic-friendly style:
 
 - explicit tick ordering

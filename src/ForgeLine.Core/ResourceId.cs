@@ -39,4 +39,6 @@ public static class ResourceIds
     public static ResourceId Fuel => new(5);
 
     public static ResourceId Electronics => new(6);
+
+    public static ResourceId Ammunition => new(7);
 }

@@ -149,12 +149,17 @@ public sealed class BuildingLogisticsRegistrationSystem
             entities.TryGetComponent(
                 entity,
                 out LogisticsHub logisticsHub);
+        bool hasSupplyDepot =
+            entities.TryGetComponent(
+                entity,
+                out SupplyDepot supplyDepot);
         bool hasProduction =
             entities.HasComponent<ProductionFacility>(entity);
 
         if (!hasExtractor &&
             !hasStorageDepot &&
             !hasLogisticsHub &&
+            !hasSupplyDepot &&
             !hasProduction)
         {
             kind = default;
@@ -199,6 +204,19 @@ public sealed class BuildingLogisticsRegistrationSystem
                 LogisticsHubState.Operational;
         }
 
+        if (hasSupplyDepot)
+        {
+            capabilities |=
+                LogisticsNodeCapabilities.CargoSource |
+                LogisticsNodeCapabilities.CargoDestination |
+                LogisticsNodeCapabilities.Storage |
+                LogisticsNodeCapabilities.Distribution |
+                LogisticsNodeCapabilities.Supply;
+            enabled &=
+                supplyDepot.State ==
+                SupplyDepotState.Operational;
+        }
+
         if (hasProduction)
         {
             capabilities |=
@@ -207,13 +225,15 @@ public sealed class BuildingLogisticsRegistrationSystem
                 LogisticsNodeCapabilities.Processing;
         }
 
-        kind = hasLogisticsHub
-            ? LogisticsNodeKind.LogisticsHub
-            : hasExtractor
-                ? LogisticsNodeKind.ExtractorOutput
-                : hasStorageDepot
-                    ? LogisticsNodeKind.StorageDepot
-                    : LogisticsNodeKind.ProcessingFacility;
+        kind = hasSupplyDepot
+            ? LogisticsNodeKind.SupplyDepot
+            : hasLogisticsHub
+                ? LogisticsNodeKind.LogisticsHub
+                : hasExtractor
+                    ? LogisticsNodeKind.ExtractorOutput
+                    : hasStorageDepot
+                        ? LogisticsNodeKind.StorageDepot
+                        : LogisticsNodeKind.ProcessingFacility;
 
         position = transform.Position;
         return true;

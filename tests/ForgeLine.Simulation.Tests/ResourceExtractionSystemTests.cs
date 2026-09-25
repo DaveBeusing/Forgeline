@@ -13,17 +13,19 @@ public sealed class ResourceExtractionSystemTests
     {
         ResourceCatalog catalog = InitialResourceDefinitions.CreateCatalog();
 
-        Assert.Equal(6, catalog.Count);
+        Assert.Equal(7, catalog.Count);
         Assert.Equal("resource.ferrous_ore", catalog[ResourceIds.FerrousOre].Key);
         Assert.Equal("resource.volatiles", catalog[ResourceIds.Volatiles].Key);
         Assert.Equal("resource.silicates", catalog[ResourceIds.Silicates].Key);
         Assert.Equal("resource.steel", catalog[ResourceIds.Steel].Key);
         Assert.Equal("resource.fuel", catalog[ResourceIds.Fuel].Key);
         Assert.Equal("resource.electronics", catalog[ResourceIds.Electronics].Key);
+        Assert.Equal("resource.ammunition", catalog[ResourceIds.Ammunition].Key);
         Assert.True(catalog[ResourceIds.FerrousOre].IsExtractable);
         Assert.False(catalog[ResourceIds.Steel].IsExtractable);
         Assert.False(catalog[ResourceIds.Fuel].IsExtractable);
         Assert.False(catalog[ResourceIds.Electronics].IsExtractable);
+        Assert.False(catalog[ResourceIds.Ammunition].IsExtractable);
         Assert.True(catalog.TryResolve("resource.ferrous_ore", out ResourceId resolved));
         Assert.Equal(ResourceIds.FerrousOre, resolved);
     }

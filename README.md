@@ -158,4 +158,6 @@ See [Cargo Transport Operations](docs/CargoTransportOperations.md) for Cargo Tru
 
 See [Automated Distribution and Logistics Hubs](docs/AutomatedDistributionAndLogisticsHubs.md) for Logistics Hub capability, min/target/max stock policies, deterministic request scheduling, reservations, source selection, Cargo Truck assignment, priority/fairness, retry handling, diagnostics, and scale validation.
 
+See [Battlefield Supply](docs/BattlefieldSupply.md) for Fuel and Ammunition consumption, Supply Depots, Supply Trucks, priority-aware automatic resupply, operational supply states, the Resupply command, diagnostics, and conservation rules.
+
 See [Development](docs/Development.md) for the canonical development and validation workflow.

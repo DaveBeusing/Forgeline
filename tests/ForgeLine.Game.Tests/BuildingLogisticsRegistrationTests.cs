@@ -134,6 +134,70 @@ public sealed class BuildingLogisticsRegistrationTests
         Assert.False(node.Enabled);
     }
 
+
+    [Fact]
+    public void SupplyDepotRegistersSupplyCapabilityAndTracksAvailability()
+    {
+        var network = new LogisticsNetwork();
+        var simulation = new SimulationCoordinator();
+        simulation.RegisterSystem(
+            new BuildingLogisticsRegistrationSystem(network));
+
+        EntityId depot = simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(
+            depot,
+            new CompletedBuilding(
+                BuildingIds.SupplyDepot,
+                new PlayerId(1),
+                SimulationTick.Zero));
+        simulation.Entities.AddComponent(
+            depot,
+            new WorldTransform(
+                new Vector3(60.0f, 0.0f, 25.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        simulation.Entities.AddComponent(
+            depot,
+            new InventoryStorage(new InventoryId(8)));
+        simulation.Entities.AddComponent(
+            depot,
+            new SupplyDepot(
+                new InventoryId(8),
+                new PlayerId(1)));
+
+        simulation.AdvanceOneTick();
+
+        Assert.True(
+            network.TryGetNodeForEntity(
+                depot,
+                out LogisticsNodeId nodeId));
+        Assert.True(
+            network.TryGetNode(
+                nodeId,
+                out LogisticsNode node));
+        Assert.Equal(
+            LogisticsNodeKind.SupplyDepot,
+            node.Kind);
+        Assert.True(
+            node.Capabilities.HasFlag(
+                LogisticsNodeCapabilities.Supply));
+        Assert.True(
+            node.Capabilities.HasFlag(
+                LogisticsNodeCapabilities.Distribution));
+        Assert.True(node.Enabled);
+
+        simulation.Entities.SetComponent(
+            depot,
+            new SupplyDepot(
+                new InventoryId(8),
+                new PlayerId(1),
+                SupplyDepotState.Disabled));
+        simulation.AdvanceOneTick();
+
+        Assert.True(network.TryGetNode(nodeId, out node));
+        Assert.False(node.Enabled);
+    }
+
     [Fact]
     public void ExtractorAndProcessingFacilityUseDistinctNodeKinds()
     {

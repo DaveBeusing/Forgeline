@@ -106,6 +106,9 @@ internal sealed class ClientApplication
                 logisticsNetwork,
                 inventories,
                 cargoTransportSystem);
+        var battlefieldSupply =
+            new BattlefieldSupplySystem(
+                inventories);
         var logisticsRegistration =
             new BuildingLogisticsRegistrationSystem(
                 logisticsNetwork);
@@ -150,6 +153,7 @@ internal sealed class ClientApplication
         simulation.RegisterSystem(production);
         simulation.RegisterSystem(buildingConstruction);
         simulation.RegisterSystem(resourceExtraction);
+        simulation.RegisterSystem(battlefieldSupply);
         simulation.RegisterSystem(automatedDistribution);
         simulation.RegisterSystem(cargoTransportSystem);
         simulation.RegisterSystem(logisticsRegistration);
@@ -267,6 +271,8 @@ internal sealed class ClientApplication
             groundMovementSystem.DebugCaptureEnabled =
                 worldDebugEnabled;
             formationMovementSystem.DebugCaptureEnabled =
+                worldDebugEnabled;
+            battlefieldSupply.DebugCaptureEnabled =
                 worldDebugEnabled;
 
             if (smokeTest &&
@@ -397,6 +403,10 @@ internal sealed class ClientApplication
                 worldDebugEnabled
                     ? automatedDistribution.LastDebugSnapshot
                     : null;
+            BattlefieldSupplyDebugSnapshot? battlefieldSupplyDebugSnapshot =
+                worldDebugEnabled
+                    ? battlefieldSupply.LastDebugSnapshot
+                    : null;
 
             BuildWorldDebugVisualization(
                 debugDraw,
@@ -415,7 +425,8 @@ internal sealed class ClientApplication
                 resourceDebugSnapshot,
                 logisticsDebugSnapshot,
                 cargoTransportDebugSnapshot,
-                distributionDebugSnapshot);
+                distributionDebugSnapshot,
+                battlefieldSupplyDebugSnapshot);
 
             terrainRenderer.DebugChunksEnabled = worldDebugEnabled;
 
@@ -711,7 +722,8 @@ internal sealed class ClientApplication
         ResourceExtractionDebugSnapshot? resourceSnapshot,
         LogisticsNetworkDebugSnapshot? logisticsSnapshot,
         CargoTransportDebugSnapshot? cargoTransportSnapshot,
-        AutomatedDistributionDebugSnapshot? distributionSnapshot)
+        AutomatedDistributionDebugSnapshot? distributionSnapshot,
+        BattlefieldSupplyDebugSnapshot? battlefieldSupplySnapshot)
     {
         debugDraw.Clear();
 
@@ -829,6 +841,16 @@ internal sealed class ClientApplication
                     distributionSnapshot,
                     maximumRequests: 128,
                     maximumLabels: 12);
+            }
+
+            if (battlefieldSupplySnapshot is not null)
+            {
+                BattlefieldSupplyDebugVisualization.Draw(
+                    debugDraw,
+                    battlefieldSupplySnapshot,
+                    maximumProviders: 64,
+                    maximumUnits: 128,
+                    maximumLabels: 20);
             }
 
             int debugCount = Math.Min(

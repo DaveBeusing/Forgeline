@@ -72,7 +72,8 @@ public struct ProductionFacility
         const uint supportedCapabilities =
             (uint)(ProductionCapability.SteelProcessing |
                    ProductionCapability.FuelProcessing |
-                   ProductionCapability.ElectronicsProcessing);
+                   ProductionCapability.ElectronicsProcessing |
+                   ProductionCapability.AmmunitionProcessing);
 
         if (capabilityValue == 0 ||
             (capabilityValue & supportedCapabilities) != capabilityValue)
