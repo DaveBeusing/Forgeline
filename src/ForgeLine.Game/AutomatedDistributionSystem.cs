@@ -181,7 +181,9 @@ public sealed class AutomatedDistributionSystem : ISimulationSystem
                     request.AssignedTruck))
             {
                 ReleaseReservationIfPresent(request);
-                MarkCompleted(request, context.Tick);
+                CompleteOrContinueRequest(
+                    context,
+                    request);
             }
         }
     }
@@ -467,7 +469,6 @@ public sealed class AutomatedDistributionSystem : ISimulationSystem
         request.AssignedTruck = truckEntity;
         request.ReservedSourceInventory = sourceSelection.Inventory;
         request.ReservedQuantity = quantity;
-        request.RequestedQuantity = quantity;
         request.AttemptCount++;
         request.State = LogisticsTransportRequestState.Assigned;
         request.FailureReason = LogisticsTransportRequestFailureReason.None;
@@ -710,8 +711,9 @@ public sealed class AutomatedDistributionSystem : ISimulationSystem
     {
         request.AssignedTruck = EntityId.Invalid;
         request.Origin = LogisticsNodeId.None;
+        request.TransportFailureCount++;
 
-        if (request.AttemptCount >= _maximumTransportAttempts)
+        if (request.TransportFailureCount >= _maximumTransportAttempts)
         {
             MarkFailed(
                 request,
@@ -721,6 +723,54 @@ public sealed class AutomatedDistributionSystem : ISimulationSystem
         }
 
         DelayRequest(request, reason, tick);
+    }
+
+    private void CompleteOrContinueRequest(
+        SimulationContext context,
+        RequestState request)
+    {
+        request.AssignedTruck = EntityId.Invalid;
+        request.Origin = LogisticsNodeId.None;
+        request.TransportFailureCount = 0;
+
+        if (!context.Entities.TryGetComponent(
+                request.PolicyEntity,
+                out LogisticsStockPolicy policy) ||
+            !policy.Enabled ||
+            !_network.TryGetNode(
+                request.Destination,
+                out LogisticsNode destination) ||
+            !TryResolveDestinationInventory(
+                context.Entities,
+                destination,
+                out InventoryId destinationInventory))
+        {
+            MarkCompleted(request, context.Tick);
+            return;
+        }
+
+        double currentQuantity =
+            _inventories.GetQuantity(
+                destinationInventory,
+                request.ResourceId);
+        double remaining =
+            Math.Max(
+                0.0,
+                policy.DesiredTarget - currentQuantity);
+
+        if (remaining <= QuantityEpsilon)
+        {
+            MarkCompleted(request, context.Tick);
+            return;
+        }
+
+        request.RequestedQuantity = remaining;
+        request.Priority = policy.Priority;
+        request.State = LogisticsTransportRequestState.Pending;
+        request.FailureReason =
+            LogisticsTransportRequestFailureReason.None;
+        request.StateChangedAtTick = context.Tick;
+        request.NextAttemptTick = context.Tick;
     }
 
     private void MarkCompleted(
@@ -1151,6 +1201,8 @@ public sealed class AutomatedDistributionSystem : ISimulationSystem
         public double ReservedQuantity { get; set; }
 
         public uint AttemptCount { get; set; }
+
+        public uint TransportFailureCount { get; set; }
     }
 
     private readonly record struct PolicyState(
