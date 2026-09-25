@@ -5,9 +5,9 @@ using ForgeLine.Simulation;
 
 namespace ForgeLine.Game;
 
-public sealed class BattlefieldResupplyPlanner
+public static class BattlefieldResupplyPlanner
 {
-    public bool TryIssueNearestProviderOrder(
+    public static bool TryIssueNearestProviderOrder(
         SimulationContext context,
         EntityId recipient,
         PlayerId owner,
