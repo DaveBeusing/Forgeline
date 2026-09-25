@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../ForgeLine.Game/ForgeLine.Game.csproj" />
+    <ProjectReference Include="../ForgeLine.Intelligence/ForgeLine.Intelligence.csproj" />
     <ProjectReference Include="../ForgeLine.Economy/ForgeLine.Economy.csproj" />
     <ProjectReference Include="../ForgeLine.World/ForgeLine.World.csproj" />
     <ProjectReference Include="../ForgeLine.Navigation/ForgeLine.Navigation.csproj" />

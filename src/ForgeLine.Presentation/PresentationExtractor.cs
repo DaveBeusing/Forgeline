@@ -1,22 +1,47 @@
 using ForgeLine.Core;
 using ForgeLine.Ecs;
 using ForgeLine.Game;
+using ForgeLine.Intelligence;
 using ForgeLine.Simulation;
+using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
 
 public sealed class PresentationExtractor : ISimulationTickObserver
 {
     private readonly PresentationSnapshotBuffer _buffer;
+    private readonly FactionIntelligenceStore? _intelligence;
+    private readonly FactionId _viewingFaction;
+    private readonly AxisAlignedBounds? _intelligenceWorldBounds;
 
-    public PresentationExtractor(PresentationSnapshotBuffer buffer)
+    public PresentationExtractor(
+        PresentationSnapshotBuffer buffer,
+        FactionIntelligenceStore? intelligence = null,
+        FactionId viewingFaction = default,
+        AxisAlignedBounds? intelligenceWorldBounds = null)
     {
-        _buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
+        _buffer =
+            buffer ??
+            throw new ArgumentNullException(nameof(buffer));
+        _intelligence = intelligence;
+        _viewingFaction = viewingFaction;
+        _intelligenceWorldBounds = intelligenceWorldBounds;
+
+        if (_intelligence is not null &&
+            !_viewingFaction.IsSpecified)
+        {
+            throw new ArgumentException(
+                "Faction-specific intelligence extraction requires a viewing faction.",
+                nameof(viewingFaction));
+        }
     }
 
     public void OnTickCompleted(SimulationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
+
+        FactionIntelligenceSnapshot? intelligenceSnapshot =
+            CaptureIntelligence();
 
         int count =
             context.Entities.GetComponentCount<WorldTransform>();
@@ -29,7 +54,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                     context.Tick,
                     context.TickDuration,
                     context.Entities.EntityCount,
-                    ReadOnlySpan<RenderInstance>.Empty));
+                    ReadOnlySpan<RenderInstance>.Empty,
+                    intelligenceSnapshot));
             return;
         }
 
@@ -44,6 +70,13 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                      VisualIdentity>(
                          QueryIterationOrder.StableByEntityIndex))
         {
+            if (!IsVisibleToViewer(
+                    context.Entities,
+                    entity))
+            {
+                continue;
+            }
+
             WorldTransform transform =
                 context.Entities.GetComponent<WorldTransform>(entity);
             VisualIdentity visual =
@@ -80,6 +113,42 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 context.Tick,
                 context.TickDuration,
                 context.Entities.EntityCount,
-                instances.AsSpan(0, index)));
+                instances.AsSpan(0, index),
+                intelligenceSnapshot));
+    }
+
+    private bool IsVisibleToViewer(
+        EntityRegistry entities,
+        EntityId entity)
+    {
+        if (_intelligence is null ||
+            !_viewingFaction.IsSpecified ||
+            !entities.TryGetComponent(
+                entity,
+                out IntelligenceSignature signature) ||
+            signature.Faction == _viewingFaction)
+        {
+            return true;
+        }
+
+        return _intelligence.IsEntityCurrentlyIdentified(
+            _viewingFaction,
+            entity);
+    }
+
+    private FactionIntelligenceSnapshot? CaptureIntelligence()
+    {
+        if (_intelligence is null ||
+            !_viewingFaction.IsSpecified)
+        {
+            return null;
+        }
+
+        return _intelligenceWorldBounds is AxisAlignedBounds bounds
+            ? _intelligence.Capture(
+                _viewingFaction,
+                bounds)
+            : _intelligence.Capture(
+                _viewingFaction);
     }
 }
