@@ -102,17 +102,26 @@ Invalid entity references, resource mismatches, ownership mismatches, disabled e
 
 ## Output handoff
 
-Storage and logistics are intentionally outside this subsystem.
+An extractor may reference an output entity carrying `InventoryStorage`. When an output inventory is configured, extraction is capacity-aware:
 
-Successful extraction emits a `ResourceExtractionResult` through `IResourceExtractionSink`. The result includes:
+1. validate the output entity and inventory handle;
+2. calculate the quantity the inventory can accept;
+3. clamp extraction to that accepted quantity;
+4. commit the inventory addition;
+5. commit the corresponding deposit reduction;
+6. emit `ResourceExtractionResult` for observation.
 
-- simulation tick;
-- extractor entity;
-- deposit entity;
-- resource ID;
-- extracted quantity.
+This ordering prevents a full, filtered, or stale output inventory from destroying extracted resources.
 
-The default sink discards output. Inventory/storage can later implement the sink contract or adapt it to an event/transfer queue without changing deposit or extraction semantics.
+If no output inventory is configured, the existing `IResourceExtractionSink` remains the handoff boundary for scenarios that intentionally model extraction without storage.
+
+Output state is explicit:
+
+- `OutputUnavailable` — output entity, component, store, or handle is unavailable;
+- `OutputBlocked` — no quantity can currently be accepted;
+- `OutputConstrained` — only part of the normal tick output fits, so extraction is throttled.
+
+A fully blocked extractor does not reduce its deposit. Partial capacity accepts only the storable quantity and preserves total resource conservation.
 
 ## Diagnostics and read models
 
@@ -124,7 +133,8 @@ The default sink discards output. Inventory/storage can later implement the sink
 - active extractor count;
 - quantity extracted on the last tick;
 - last-tick extraction rate;
-- cumulative extracted quantity.
+- cumulative extracted quantity;
+- currently blocked extractor count.
 
 `ResourceExtractionDebugSnapshot.Capture` creates debug/read models in stable entity order.
 
