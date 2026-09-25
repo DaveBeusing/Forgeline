@@ -72,8 +72,12 @@ internal sealed class ClientApplication
         var groundMovementSystem = new GroundMovementSystem(
             terrainWorld,
             spatialIndex);
+        FactionContentDefinition directorateFaction =
+            DirectorateContent.CreateFactionDefinition();
         BuildingDefinitionCatalog buildingDefinitions =
-            InitialBuildingDefinitions.CreateCatalog();
+            DirectorateContent.CreateBuildingCatalog();
+        UnitDefinitionCatalog unitDefinitions =
+            DirectorateContent.CreateUnitCatalog();
         ResourceCatalog resourceCatalog =
             InitialResourceDefinitions.CreateCatalog();
         ProductionRecipeCatalog productionRecipes =
@@ -128,8 +132,8 @@ internal sealed class ClientApplication
             new IntelligenceTargetAvailabilityPolicy(
                 simulation.Entities,
                 intelligenceStore);
-        var combatWeapons =
-            new WeaponCatalog();
+        WeaponCatalog combatWeapons =
+            DirectorateContent.CreateWeaponCatalog();
         combatWeapons.Add(
             new WeaponDefinition(
                 new WeaponId(1_001),
@@ -144,8 +148,8 @@ internal sealed class ClientApplication
                     new WeaponEffectiveness(
                         TargetClassMask.All,
                         penetration: 55.0)));
-        var artilleryWeapons =
-            new ArtilleryWeaponCatalog();
+        ArtilleryWeaponCatalog artilleryWeapons =
+            DirectorateContent.CreateArtilleryWeaponCatalog();
         artilleryWeapons.Add(
             new ArtilleryWeaponDefinition(
                 new WeaponId(10_001),
@@ -164,8 +168,30 @@ internal sealed class ClientApplication
                     new WeaponEffectiveness(
                         TargetClassMask.All,
                         penetration: 60.0)));
-        var combatArmor =
-            new ArmorCatalog();
+        ArmorCatalog combatArmor =
+            DirectorateContent.CreateArmorCatalog();
+
+        GameContentValidator.ValidateDirectorate(
+            directorateFaction,
+            resourceCatalog,
+            buildingDefinitions,
+            unitDefinitions,
+            productionRecipes,
+            combatWeapons,
+            combatArmor,
+            artilleryWeapons);
+
+        var unitFactory =
+            new UnitFactory(
+                simulation.Entities,
+                inventories,
+                cargoTransportSystem);
+        var unitProduction =
+            new UnitProductionSystem(
+                unitDefinitions,
+                inventories,
+                unitFactory);
+
         var combatRuntime =
             new CombatRuntime();
         var targetAcquisition =
@@ -272,6 +298,7 @@ internal sealed class ClientApplication
         simulation.RegisterSystem(new SpatialIndexSystem(spatialSynchronizer));
         simulation.RegisterSystem(powerNetworks);
         simulation.RegisterSystem(production);
+        simulation.RegisterSystem(unitProduction);
         simulation.RegisterSystem(buildingConstruction);
         simulation.RegisterSystem(resourceExtraction);
         simulation.RegisterSystem(battlefieldIntelligence);
