@@ -1139,7 +1139,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             GetOpponentFacingSites(
                 controller);
 
-        if (sites.Count == 0)
+        if (sites.Length == 0)
         {
             return false;
         }
@@ -1147,7 +1147,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         int index =
             Math.Abs(
                 state.ScoutSiteCursor) %
-            sites.Count;
+            sites.Length;
         objective =
             sites[index].Position;
 
@@ -2248,7 +2248,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         SkirmishOpponentController controller,
         int cursor)
     {
-        IReadOnlyList<BattlefieldSiteDefinition> candidates =
+        BattlefieldSiteDefinition[] candidates =
             _battlefield.Sites
                 .Where(
                     site =>
@@ -2345,7 +2345,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             GetOpponentFacingSites(
                 controller);
 
-        return sites.Count > 0
+        return sites.Length > 0
             ? sites[0].Position
             : controller.EnemyObjectivePosition;
     }
