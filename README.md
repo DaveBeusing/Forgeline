@@ -113,7 +113,7 @@ See [Diagnostics and Performance](docs/DiagnosticsAndPerformance.md) for invaria
 
 ## Benchmarks
 
-BenchmarkDotNet hosts cover the implemented ECS, hierarchical navigation, shared-versus-independent formation routing, simulation, command-processing, job-scheduler, spatial-query, 1,000-unit ground-movement, 100/1,000/10,000-pair resource extraction, 100/1,000/10,000-operation inventory transfer batches, 100/1,000/10,000-consumer power-network allocation, 100/1,000/5,000-facility industrial production, 1,000/10,000-node logistics routing and reachability, 100/500-vehicle physical cargo transport batches, 64/256-hub automated distribution scheduling, and rendering foundations.
+BenchmarkDotNet hosts cover the implemented ECS, hierarchical navigation, shared-versus-independent formation routing, simulation, command-processing, job-scheduler, spatial-query, 1,000-unit ground-movement, 100/1,000/10,000-pair resource extraction, 100/1,000/10,000-operation inventory transfer batches, 100/1,000/10,000-consumer power-network allocation, 100/1,000/5,000-facility industrial production, 1,000/10,000-node logistics routing and reachability, 100/500-vehicle physical cargo transport batches, 64/256-hub automated distribution scheduling, 100/1,000-request logistics capacity routing and repeated topology-change workloads, and rendering foundations.
 
 Examples:
 
@@ -159,5 +159,7 @@ See [Cargo Transport Operations](docs/CargoTransportOperations.md) for Cargo Tru
 See [Automated Distribution and Logistics Hubs](docs/AutomatedDistributionAndLogisticsHubs.md) for Logistics Hub capability, min/target/max stock policies, deterministic request scheduling, reservations, source selection, Cargo Truck assignment, priority/fairness, retry handling, diagnostics, and scale validation.
 
 See [Battlefield Supply](docs/BattlefieldSupply.md) for Fuel and Ammunition consumption, Supply Depots, Supply Trucks, priority-aware automatic resupply, operational supply states, the Resupply command, diagnostics, and conservation rules.
+
+See [Logistics Capacity and Disruption](docs/LogisticsCapacityAndDisruption.md) for throughput windows, saturation, backlog, congestion-aware routing, infrastructure disable/restore, bottleneck diagnosis, recovery semantics, debug visualization, and scale validation.
 
 See [Development](docs/Development.md) for the canonical development and validation workflow.
