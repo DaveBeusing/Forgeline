@@ -1690,7 +1690,7 @@ internal sealed class ClientApplication
         }
     }
 
-    private static IReadOnlyDictionary<
+    private static Dictionary<
         string,
         StrategicInfrastructureOperationalState> CaptureCrossingStates(
         SimulationCoordinator simulation,
