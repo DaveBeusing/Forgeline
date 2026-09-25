@@ -16,6 +16,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
     private readonly List<EntityId> _transportEntities = new();
     private readonly Dictionary<EntityId, InventoryId> _trackedInventories = new();
     private readonly List<EntityId> _staleTrackedEntities = new();
+    private ICargoTransportReservationObserver? _reservationObserver;
     private long _completedOrderCount;
     private long _rerouteCount;
     private long _routeFailureCount;
@@ -42,6 +43,21 @@ public sealed class CargoTransportSystem : ISimulationSystem
         get;
         private set;
     } = CargoTransportDebugSnapshot.Empty;
+
+    internal void SetReservationObserver(
+        ICargoTransportReservationObserver observer)
+    {
+        ArgumentNullException.ThrowIfNull(observer);
+
+        if (_reservationObserver is not null &&
+            !ReferenceEquals(_reservationObserver, observer))
+        {
+            throw new InvalidOperationException(
+                "Cargo transport reservation observer is already configured.");
+        }
+
+        _reservationObserver = observer;
+    }
 
     internal void TrackTransport(
         EntityId entity,
@@ -596,6 +612,8 @@ public sealed class CargoTransportSystem : ISimulationSystem
 
         if (hasAutomatedReservation)
         {
+            _reservationObserver?.OnCargoReservationConsumed(
+                automatedReservation.RequestId);
             context.Entities.RemoveComponent<CargoTransportReservation>(
                 entity);
         }
