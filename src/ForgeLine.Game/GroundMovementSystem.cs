@@ -199,6 +199,33 @@ public sealed class GroundMovementSystem : ISimulationSystem
             return;
         }
 
+        if (entities.TryGetComponent(
+                entity,
+                out TacticalMovementConstraint tacticalConstraint) &&
+            !tacticalConstraint.CanMove)
+        {
+            GroundMovementState pausedState = state with
+            {
+                Velocity = Vector3.Zero,
+                Status = GroundMovementStatus.TacticallyPaused,
+                ObservedOrderTick = order.AcceptedAtTick,
+                PreviousDistanceToTarget = distanceToTarget,
+                StalledTicks = 0
+            };
+
+            entities.SetComponent(
+                entity,
+                pausedState);
+            AddDebugAgent(
+                entity,
+                position,
+                pausedState,
+                movement,
+                order.WorldTarget,
+                hasTarget: true);
+            return;
+        }
+
         bool newOrder =
             state.ObservedOrderTick.Value != order.AcceptedAtTick.Value;
 

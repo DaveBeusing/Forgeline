@@ -130,6 +130,20 @@ internal sealed class ClientApplication
                 intelligenceStore);
         var combatWeapons =
             new WeaponCatalog();
+        combatWeapons.Add(
+            new WeaponDefinition(
+                new WeaponId(1_001),
+                rangeMeters: 85.0f,
+                fireIntervalTicks: 8,
+                ammunitionPerShot: 1.0,
+                new DamagePayload(14.0),
+                WeaponDeliveryModel.Hitscan,
+                magazineSize: 4,
+                reloadTicks: 16,
+                effectiveness:
+                    new WeaponEffectiveness(
+                        TargetClassMask.All,
+                        penetration: 55.0)));
         var artilleryWeapons =
             new ArtilleryWeaponCatalog();
         artilleryWeapons.Add(
@@ -190,6 +204,23 @@ internal sealed class ClientApplication
                 combatRuntime,
                 targetAcquisition,
                 combatDamageResolution);
+        var tacticalOrderPreparation =
+            new TacticalOrderPreparationSystem();
+        var tacticalTestOpponent =
+            new TacticalTestOpponentSystem(
+                intelligenceStore);
+        var automaticResupply =
+            new AutomaticResupplyDecisionSystem(
+                inventories);
+        var tacticalCombat =
+            new TacticalCombatSystem(
+                combatWeapons,
+                intelligenceStore);
+        var combatReadiness =
+            new CombatReadinessSystem(
+                inventories,
+                combatWeapons,
+                artilleryWeapons);
         var logisticsRegistration =
             new BuildingLogisticsRegistrationSystem(
                 logisticsNetwork);
@@ -198,6 +229,11 @@ internal sealed class ClientApplication
             simulation,
             terrainWorld,
             renderInstanceCount);
+        DevelopmentTacticalScenario tacticalScenario =
+            CreateDevelopmentTacticalScenario(
+                simulation,
+                inventories,
+                terrainWorld);
         EntityId constructionInventory =
             CreateDevelopmentConstructionInventory(
                 simulation,
@@ -226,6 +262,9 @@ internal sealed class ClientApplication
             new HierarchicalNavigationSystem(pathfinder);
 
         simulation.RegisterSystem(buildingCommands);
+        simulation.RegisterSystem(tacticalOrderPreparation);
+        simulation.RegisterSystem(tacticalTestOpponent);
+        simulation.RegisterSystem(automaticResupply);
         simulation.RegisterSystem(logisticsDisruption);
         simulation.RegisterSystem(formationMovementSystem);
         simulation.RegisterSystem(navigationSystem);
@@ -237,6 +276,7 @@ internal sealed class ClientApplication
         simulation.RegisterSystem(resourceExtraction);
         simulation.RegisterSystem(battlefieldIntelligence);
         simulation.RegisterSystem(targetAcquisition);
+        simulation.RegisterSystem(tacticalCombat);
         simulation.RegisterSystem(artilleryFireMissions);
         simulation.RegisterSystem(combatExecution);
         simulation.RegisterSystem(combatDamageResolution);
@@ -246,6 +286,7 @@ internal sealed class ClientApplication
         simulation.RegisterSystem(logisticsRegistration);
         simulation.RegisterSystem(combatLifecycle);
         simulation.RegisterSystem(new SpatialIndexCleanupSystem(spatialSynchronizer));
+        simulation.RegisterSystem(combatReadiness);
         simulation.RegisterSystem(combatDebugSnapshots);
         simulation.RegisterTickObserver(
             new PresentationExtractor(
@@ -254,6 +295,29 @@ internal sealed class ClientApplication
                 new FactionId(
                     checked((uint)LocalPlayer.Value)),
                 terrainWorld.WorldBounds));
+
+        SimulationTick openingTick =
+            simulation.CurrentTick.Next();
+        simulation.SubmitCommand(
+            new AttackMoveCommand(
+                LocalPlayer,
+                tacticalScenario.BlueAssaultUnits,
+                tacticalScenario.AdvanceDestination,
+                simulation.CurrentTick,
+                FormationTemplate.Line,
+                pursuitLeashMeters: 100.0f),
+            openingTick,
+            new SimulationCommandSource(LocalPlayer.Value));
+        simulation.SubmitCommand(
+            new FireMissionCommand(
+                LocalPlayer,
+                [tacticalScenario.Artillery],
+                tacticalScenario.ArtilleryTarget,
+                requestedRounds: 3,
+                simulation.CurrentTick),
+            openingTick,
+            new SimulationCommandSource(LocalPlayer.Value));
+
         simulation.AdvanceOneTick();
 
         var renderWorld = new RenderWorld();
@@ -376,6 +440,10 @@ internal sealed class ClientApplication
             artilleryFireMissions.DebugCaptureEnabled =
                 worldDebugEnabled;
             targetAcquisition.DebugCaptureEnabled =
+                worldDebugEnabled;
+            tacticalCombat.DebugCaptureEnabled =
+                worldDebugEnabled;
+            combatReadiness.DebugCaptureEnabled =
                 worldDebugEnabled;
             combatDebugSnapshots.DebugCaptureEnabled =
                 worldDebugEnabled;
@@ -524,6 +592,10 @@ internal sealed class ClientApplication
                 worldDebugEnabled
                     ? artilleryFireMissions.LastDebugSnapshot
                     : null;
+            CombatReadinessDebugSnapshot? readinessDebugSnapshot =
+                worldDebugEnabled
+                    ? combatReadiness.LastDebugSnapshot
+                    : null;
 
             BuildWorldDebugVisualization(
                 debugDraw,
@@ -547,6 +619,10 @@ internal sealed class ClientApplication
                 battlefieldSupplyDebugSnapshot,
                 combatDebugSnapshot,
                 artilleryDebugSnapshot,
+                readinessDebugSnapshot,
+                tacticalCombat.DebugEntries,
+                tacticalCombat.Metrics,
+                automaticResupply.Metrics,
                 battlefieldIntelligence.DebugSensors,
                 battlefieldIntelligence.Metrics);
 
@@ -635,6 +711,396 @@ internal sealed class ClientApplication
         WriteGraphicsState("stopped", graphics);
         return 0;
     }
+
+    private static DevelopmentTacticalScenario CreateDevelopmentTacticalScenario(
+        SimulationCoordinator simulation,
+        InventoryStore inventories,
+        TerrainWorld terrainWorld)
+    {
+        FactionId blueFaction =
+            new(
+                checked(
+                    (uint)LocalPlayer.Value));
+        FactionId redFaction =
+            new(
+                checked(
+                    (uint)OpposingPlayer.Value));
+
+        EntityId[] blueUnits =
+            new EntityId[4];
+        EntityId[] redUnits =
+            new EntityId[4];
+
+        for (int index = 0;
+             index < blueUnits.Length;
+             index++)
+        {
+            Vector3 position =
+                SampleTerrainPosition(
+                    terrainWorld,
+                    -115.0f,
+                    -36.0f + index * 24.0f,
+                    heightOffset: 2.0f);
+
+            blueUnits[index] =
+                CreateDevelopmentCombatUnit(
+                    simulation,
+                    inventories,
+                    LocalPlayer,
+                    blueFaction,
+                    position,
+                    tacticalOpponent: false,
+                    visualSensor:
+                        index == 1,
+                    radarSensor:
+                        index == 2);
+        }
+
+        for (int index = 0;
+             index < redUnits.Length;
+             index++)
+        {
+            Vector3 position =
+                SampleTerrainPosition(
+                    terrainWorld,
+                    105.0f,
+                    -36.0f + index * 24.0f,
+                    heightOffset: 2.0f);
+
+            redUnits[index] =
+                CreateDevelopmentCombatUnit(
+                    simulation,
+                    inventories,
+                    OpposingPlayer,
+                    redFaction,
+                    position,
+                    tacticalOpponent: true,
+                    visualSensor:
+                        index == 1,
+                    radarSensor:
+                        index == 2);
+        }
+
+        CreateDevelopmentSupplyProvider(
+            simulation,
+            inventories,
+            LocalPlayer,
+            SampleTerrainPosition(
+                terrainWorld,
+                -145.0f,
+                0.0f,
+                heightOffset: 1.0f));
+        CreateDevelopmentSupplyProvider(
+            simulation,
+            inventories,
+            OpposingPlayer,
+            SampleTerrainPosition(
+                terrainWorld,
+                135.0f,
+                0.0f,
+                heightOffset: 1.0f));
+
+        EntityId artillery =
+            simulation.Entities.CreateEntity();
+        Vector3 artilleryPosition =
+            SampleTerrainPosition(
+                terrainWorld,
+                -180.0f,
+                70.0f,
+                heightOffset: 2.0f);
+
+        simulation.Entities.AddComponent(
+            artillery,
+            new WorldTransform(
+                artilleryPosition,
+                Quaternion.Identity,
+                new Vector3(
+                    7.0f,
+                    4.0f,
+                    7.0f)));
+        simulation.Entities.AddComponent(
+            artillery,
+            new VisualIdentity(1));
+        simulation.Entities.AddComponent(
+            artillery,
+            new ControllableEntity(
+                LocalPlayer,
+                ControllableEntityCategory.Unit));
+        simulation.Entities.AddComponent(
+            artillery,
+            new Combatant(
+                blueFaction));
+        simulation.Entities.AddComponent(
+            artillery,
+            new IntelligenceSignature(
+                blueFaction,
+                identityKey:
+                    checked(
+                        100_000U +
+                        artillery.Index)));
+        simulation.Entities.AddComponent(
+            artillery,
+            new Targetable(
+                TargetClass.LightVehicle));
+        simulation.Entities.AddComponent(
+            artillery,
+            HealthState.Full(140.0));
+        simulation.Entities.AddComponent(
+            artillery,
+            new ArtilleryCapability(
+                new WeaponId(10_001)));
+        simulation.Entities.AddComponent(
+            artillery,
+            new SpatialPresence(
+                new Vector3(
+                    3.5f,
+                    2.0f,
+                    3.5f),
+                new SpatialEntryMetadata(
+                    LocalPlayer.Value,
+                    (ulong)ControllableEntityCategory.Unit,
+                    SpatialMobility.Mobile)));
+        BattlefieldSupplyFactory.AttachUnitSupply(
+            simulation.Entities,
+            inventories,
+            artillery,
+            fuelCapacity: 80.0,
+            ammunitionCapacity: 18.0,
+            fuelConsumptionPerMeter: 0.01,
+            initialFuel: 80.0,
+            initialAmmunition: 18.0);
+
+        Vector3 artilleryTarget =
+            simulation.Entities.GetComponent<WorldTransform>(
+                redUnits[1]).Position;
+
+        return new DevelopmentTacticalScenario(
+            blueUnits,
+            artillery,
+            artilleryTarget,
+            new Vector3(
+                155.0f,
+                artilleryTarget.Y,
+                0.0f));
+    }
+
+    private static EntityId CreateDevelopmentCombatUnit(
+        SimulationCoordinator simulation,
+        InventoryStore inventories,
+        PlayerId owner,
+        FactionId faction,
+        Vector3 position,
+        bool tacticalOpponent,
+        bool visualSensor,
+        bool radarSensor)
+    {
+        EntityId entity =
+            simulation.Entities.CreateEntity();
+
+        var scale =
+            new Vector3(
+                5.0f,
+                4.0f,
+                7.0f);
+
+        simulation.Entities.AddComponent(
+            entity,
+            new WorldTransform(
+                position,
+                Quaternion.Identity,
+                scale));
+        simulation.Entities.AddComponent(
+            entity,
+            new VisualIdentity(1));
+        simulation.Entities.AddComponent(
+            entity,
+            new ControllableEntity(
+                owner,
+                ControllableEntityCategory.Unit));
+        simulation.Entities.AddComponent(
+            entity,
+            new Combatant(
+                faction));
+        simulation.Entities.AddComponent(
+            entity,
+            new IntelligenceSignature(
+                faction,
+                identityKey:
+                    checked(
+                        100_000U +
+                        entity.Index)));
+        simulation.Entities.AddComponent(
+            entity,
+            new Targetable(
+                TargetClass.LightVehicle));
+        simulation.Entities.AddComponent(
+            entity,
+            HealthState.Full(120.0));
+        simulation.Entities.AddComponent(
+            entity,
+            new WeaponState(
+                new WeaponId(1_001),
+                EntityId.Invalid));
+        simulation.Entities.AddComponent(
+            entity,
+            FirePolicyState.FireAtWill);
+        simulation.Entities.AddComponent(
+            entity,
+            new GroundMovement(
+                maximumSpeed: 13.0f,
+                acceleration: 8.0f,
+                deceleration: 11.0f,
+                turnRateRadiansPerSecond:
+                    MathF.PI,
+                radius: 2.5f,
+                stopRadius: 1.0f,
+                separationRadius: 7.0f,
+                obstacleLookAhead: 10.0f,
+                maximumSlopeDegrees: 35.0f,
+                heightOffset: 2.0f));
+        simulation.Entities.AddComponent(
+            entity,
+            GroundMovementState.Stationary());
+        simulation.Entities.AddComponent(
+            entity,
+            new NavigationAgent(
+                NavigationMovementClass.Tracked));
+        simulation.Entities.AddComponent(
+            entity,
+            new SpatialPresence(
+                scale * 0.5f,
+                new SpatialEntryMetadata(
+                    owner.Value,
+                    (ulong)ControllableEntityCategory.Unit,
+                    SpatialMobility.Mobile)));
+
+        BattlefieldSupplyFactory.AttachUnitSupply(
+            simulation.Entities,
+            inventories,
+            entity,
+            fuelCapacity: 100.0,
+            ammunitionCapacity: 40.0,
+            fuelConsumptionPerMeter: 0.015,
+            initialFuel: 100.0,
+            initialAmmunition: 40.0);
+
+        if (!tacticalOpponent)
+        {
+            simulation.Entities.AddComponent(
+                entity,
+                new AutomaticResupplyPolicy(
+                    ammunitionThreshold: 0.25,
+                    fuelThreshold: 0.25));
+        }
+        else
+        {
+            simulation.Entities.AddComponent(
+                entity,
+                new TacticalTestOpponent(
+                    resupplyThreshold: 0.25,
+                    retreatThreshold: 0.2,
+                    engagementLeashMeters: 120.0f));
+        }
+
+        if (visualSensor)
+        {
+            simulation.Entities.AddComponent(
+                entity,
+                new VisualSensorState(
+                    faction,
+                    rangeMeters: 280.0f,
+                    updateIntervalTicks: 1));
+        }
+
+        if (radarSensor)
+        {
+            simulation.Entities.AddComponent(
+                entity,
+                new RadarSensorState(
+                    faction,
+                    detectionRangeMeters: 380.0f,
+                    identificationRangeMeters: 160.0f,
+                    updateIntervalTicks: 2));
+        }
+
+        return entity;
+    }
+
+    private static void CreateDevelopmentSupplyProvider(
+        SimulationCoordinator simulation,
+        InventoryStore inventories,
+        PlayerId owner,
+        Vector3 position)
+    {
+        InventoryId inventory =
+            inventories.CreateInventory(
+                new InventorySpecification(
+                    totalCapacity: 1_000.0,
+                    acceptedResources:
+                    [
+                        ResourceIds.Fuel,
+                        ResourceIds.Ammunition
+                    ]));
+
+        InventoryOperationResult fuel =
+            inventories.Add(
+                inventory,
+                ResourceIds.Fuel,
+                400.0);
+        InventoryOperationResult ammunition =
+            inventories.Add(
+                inventory,
+                ResourceIds.Ammunition,
+                400.0);
+
+        if (!fuel.Succeeded ||
+            !ammunition.Succeeded)
+        {
+            throw new InvalidOperationException(
+                "Unable to seed development battlefield supply provider.");
+        }
+
+        EntityId provider =
+            simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(
+            provider,
+            new WorldTransform(
+                position,
+                Quaternion.Identity,
+                Vector3.One));
+        simulation.Entities.AddComponent(
+            provider,
+            new SupplyProvider(
+                inventory,
+                owner,
+                resupplyRangeMeters: 45.0f));
+    }
+
+    private static Vector3 SampleTerrainPosition(
+        TerrainWorld terrainWorld,
+        float x,
+        float z,
+        float heightOffset)
+    {
+        float height =
+            terrainWorld.TrySampleHeight(
+                x,
+                z,
+                out float sampled)
+                ? sampled
+                : 0.0f;
+
+        return new Vector3(
+            x,
+            height + heightOffset,
+            z);
+    }
+
+    private readonly record struct DevelopmentTacticalScenario(
+        EntityId[] BlueAssaultUnits,
+        EntityId Artillery,
+        Vector3 ArtilleryTarget,
+        Vector3 AdvanceDestination);
 
     private static EntityId CreateDevelopmentConstructionInventory(
         SimulationCoordinator simulation,
@@ -883,6 +1349,10 @@ internal sealed class ClientApplication
         BattlefieldSupplyDebugSnapshot? battlefieldSupplySnapshot,
         CombatDebugSnapshot? combatSnapshot,
         ArtilleryDebugSnapshot? artillerySnapshot,
+        CombatReadinessDebugSnapshot? readinessSnapshot,
+        IReadOnlyList<TacticalCombatDebugEntry> tacticalEntries,
+        TacticalCombatMetrics tacticalMetrics,
+        AutomaticResupplyDecisionMetrics resupplyDecisionMetrics,
         IReadOnlyList<IntelligenceSensorDebugEntry> intelligenceSensors,
         BattlefieldIntelligenceMetrics intelligenceMetrics)
     {
@@ -1050,6 +1520,19 @@ internal sealed class ClientApplication
                     camera.Target + Vector3.UnitY * 9.0f,
                     maximumMissions: 64,
                     maximumProjectiles: 128);
+            }
+
+            if (readinessSnapshot is not null)
+            {
+                TacticalCombatDebugVisualization.Draw(
+                    debugDraw,
+                    tacticalEntries,
+                    tacticalMetrics,
+                    readinessSnapshot,
+                    resupplyDecisionMetrics,
+                    camera.Target + Vector3.UnitY * 13.0f,
+                    maximumUnits: 96,
+                    maximumReadinessLabels: 64);
             }
 
             if (combatSnapshot is not null)

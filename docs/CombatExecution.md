@@ -265,3 +265,12 @@ See [Armor and Target Acquisition](ArmorAndTargetAcquisition.md) for the authori
 ## Indirect Fire Extension
 
 Artillery uses a separate `ArtilleryWeaponCatalog` and coordinate-based mission lifecycle while reusing `CombatRuntime`, `AmmunitionState`, `CombatDamageResolutionSystem`, Health, armor, combat events, and entity lifecycle. Indirect area damage enters the same pending-damage path as direct fire, and downward impacts resolve against Top armor. See [Artillery and Indirect Fire](ArtilleryAndIndirectFire.md).
+
+
+## Tactical Combat Orders
+
+Direct-fire combat can be driven by `Attack`, `AttackMove`, `Stop`, `HoldPosition`, and `Retreat` intent. Tactical behavior does not bypass `TargetAcquisitionSystem`, `FirePolicyState`, current battlefield intelligence, weapon range/class compatibility, authoritative Ammunition consumption, armor, Health, damage, or entity lifecycle.
+
+AttackMove pauses Ground Movement through a tactical constraint while preserving route intent where practical and resumes after the legitimate engagement ends.
+
+See [Combat Orders, Tactical Behavior, and Readiness](CombatOrdersAndReadiness.md).

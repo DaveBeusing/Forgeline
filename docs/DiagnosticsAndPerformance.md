@@ -286,3 +286,16 @@ See [Formation Movement and Group Orders](FormationMovementAndGroupOrders.md) fo
 `ArtilleryFireMissionSystem.Metrics` reports active missions, `NoAmmo` missions, shells in flight, shots, impacts, affected area-damage targets, Ammunition consumption, and queued area damage for the current tick and cumulatively.
 
 The F2 artillery debug read model exposes mission min/max range, fixed target coordinate, lifecycle state, requested/fired rounds, shell position, complete parabolic trajectory, impact radius, and a compact metrics label. These diagnostics consume simulation-owned state without controlling targeting, dispersion, impact timing, or damage.
+
+
+## Tactical Combat and Readiness Metrics
+
+`TacticalCombatSystem.Metrics` reports ordered, engaging, pursuing, holding, retreating, and intelligence-waiting unit counts together with current and cumulative group target assignments.
+
+`AutomaticResupplyDecisionSystem.Metrics` reports evaluated/low-supply units, active real resupply orders, newly issued provider orders, unavailable-provider decisions, and cumulative values.
+
+`CombatReadinessSystem.Metrics` reports unit/group counts, ready/degraded/combat-ineffective unit counts, and average unit/group readiness. Readiness is calculated after authoritative work in `SnapshotEvents` and never substitutes for Health, Fuel, Ammunition, mobility, or weapon state.
+
+The F2 tactical read model exposes current combat order/status, legitimate target position where available, pursuit leash, movement permission, resupply state, and per-unit Health/Fuel/Ammunition/readiness summaries.
+
+The simulation benchmark host includes 100/1,000-unit tactical acquisition and deterministic group target-coordination workloads.
