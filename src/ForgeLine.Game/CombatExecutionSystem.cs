@@ -17,6 +17,8 @@ public sealed class CombatExecutionSystem : ISimulationSystem
     private readonly InventoryStore _inventories;
     private readonly CombatRuntime _runtime;
     private readonly SpatialGridIndex? _spatialIndex;
+    private readonly ITargetAvailabilityPolicy _targetAvailability;
+    private readonly ILineOfFirePolicy _lineOfFire;
     private readonly SpatialQueryBuffer _projectileQueryBuffer = new(128);
     private readonly List<ProjectileSpawnRequest> _projectileSpawns = new();
 
@@ -24,7 +26,9 @@ public sealed class CombatExecutionSystem : ISimulationSystem
         WeaponCatalog weapons,
         InventoryStore inventories,
         CombatRuntime runtime,
-        SpatialGridIndex? spatialIndex = null)
+        SpatialGridIndex? spatialIndex = null,
+        ITargetAvailabilityPolicy? targetAvailability = null,
+        ILineOfFirePolicy? lineOfFire = null)
     {
         _weapons = weapons ??
             throw new ArgumentNullException(nameof(weapons));
@@ -33,6 +37,12 @@ public sealed class CombatExecutionSystem : ISimulationSystem
         _runtime = runtime ??
             throw new ArgumentNullException(nameof(runtime));
         _spatialIndex = spatialIndex;
+        _targetAvailability =
+            targetAvailability ??
+            AlwaysTargetAvailablePolicy.Instance;
+        _lineOfFire =
+            lineOfFire ??
+            UnobstructedLineOfFirePolicy.Instance;
     }
 
     public SimulationPhase Phase => SimulationPhase.Combat;
@@ -117,6 +127,7 @@ public sealed class CombatExecutionSystem : ISimulationSystem
                     projectile,
                     state.Weapon,
                     impactPosition,
+                    Vector3.Normalize(state.Velocity),
                     state.Damage);
                 _runtime.QueueProjectileRemoval(projectile);
                 continue;
@@ -204,6 +215,30 @@ public sealed class CombatExecutionSystem : ISimulationSystem
                 continue;
             }
 
+            if (context.Entities.TryGetComponent(
+                    entity,
+                    out FirePolicyState firePolicy) &&
+                !firePolicy.Permits(target))
+            {
+                continue;
+            }
+
+            if (context.Entities.TryGetComponent(
+                    target,
+                    out Targetable targetable) &&
+                !definition.Effectiveness.CanEngage(
+                    targetable.Class))
+            {
+                continue;
+            }
+
+            if (!_targetAvailability.IsTargetAvailable(
+                    entity,
+                    target))
+            {
+                continue;
+            }
+
             WorldTransform sourceTransform =
                 context.Entities.GetComponent<WorldTransform>(
                     entity);
@@ -218,6 +253,15 @@ public sealed class CombatExecutionSystem : ISimulationSystem
                 definition.RangeMeters;
 
             if (distanceSquared > maximumRangeSquared)
+            {
+                continue;
+            }
+
+            if (!_lineOfFire.HasLineOfFire(
+                    entity,
+                    target,
+                    sourceTransform.Position,
+                    targetTransform.Position))
             {
                 continue;
             }
@@ -255,6 +299,9 @@ public sealed class CombatExecutionSystem : ISimulationSystem
                     EntityId.Invalid,
                     definition.Id,
                     targetTransform.Position,
+                    CreateProjectileDirection(
+                        delta,
+                        sourceTransform.Rotation),
                     definition.Damage);
             }
             else
@@ -461,7 +508,7 @@ public sealed class CombatExecutionSystem : ISimulationSystem
             out impactPosition);
     }
 
-    private static bool TryFindProjectileHitFromEntities(
+    private bool TryFindProjectileHitFromEntities(
         EntityRegistry entities,
         EntityId projectile,
         in ProjectileState state,
@@ -527,7 +574,7 @@ public sealed class CombatExecutionSystem : ISimulationSystem
             out impactPosition);
     }
 
-    private static bool IsEligibleProjectileTarget(
+    private bool IsEligibleProjectileTarget(
         EntityRegistry entities,
         EntityId projectile,
         in ProjectileState state,
@@ -547,7 +594,27 @@ public sealed class CombatExecutionSystem : ISimulationSystem
             return false;
         }
 
-        return combatant.Faction != state.Faction;
+        if (combatant.Faction == state.Faction)
+        {
+            return false;
+        }
+
+        if (entities.TryGetComponent(
+                candidate,
+                out Targetable targetable))
+        {
+            WeaponDefinition weapon =
+                _weapons.GetRequired(
+                    state.Weapon);
+
+            if (!weapon.Effectiveness.CanEngage(
+                    targetable.Class))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static AxisAlignedBounds CreateTargetBounds(

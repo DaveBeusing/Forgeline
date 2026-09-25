@@ -115,8 +115,14 @@ internal sealed class ClientApplication
                 inventories);
         var combatWeapons =
             new WeaponCatalog();
+        var combatArmor =
+            new ArmorCatalog();
         var combatRuntime =
             new CombatRuntime();
+        var targetAcquisition =
+            new TargetAcquisitionSystem(
+                combatWeapons,
+                spatialIndex);
         var combatExecution =
             new CombatExecutionSystem(
                 combatWeapons,
@@ -125,7 +131,9 @@ internal sealed class ClientApplication
                 spatialIndex);
         var combatDamageResolution =
             new CombatDamageResolutionSystem(
-                combatRuntime);
+                combatRuntime,
+                combatWeapons,
+                combatArmor);
         var combatLifecycle =
             new CombatEntityLifecycleSystem(
                 combatRuntime,
@@ -133,7 +141,9 @@ internal sealed class ClientApplication
         var combatDebugSnapshots =
             new CombatDebugSnapshotSystem(
                 combatWeapons,
-                combatRuntime);
+                combatRuntime,
+                targetAcquisition,
+                combatDamageResolution);
         var logisticsRegistration =
             new BuildingLogisticsRegistrationSystem(
                 logisticsNetwork);
@@ -179,6 +189,7 @@ internal sealed class ClientApplication
         simulation.RegisterSystem(production);
         simulation.RegisterSystem(buildingConstruction);
         simulation.RegisterSystem(resourceExtraction);
+        simulation.RegisterSystem(targetAcquisition);
         simulation.RegisterSystem(combatExecution);
         simulation.RegisterSystem(combatDamageResolution);
         simulation.RegisterSystem(battlefieldSupply);
@@ -303,6 +314,8 @@ internal sealed class ClientApplication
             formationMovementSystem.DebugCaptureEnabled =
                 worldDebugEnabled;
             battlefieldSupply.DebugCaptureEnabled =
+                worldDebugEnabled;
+            targetAcquisition.DebugCaptureEnabled =
                 worldDebugEnabled;
             combatDebugSnapshots.DebugCaptureEnabled =
                 worldDebugEnabled;

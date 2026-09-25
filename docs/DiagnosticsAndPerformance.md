@@ -56,6 +56,14 @@ Tick timing is diagnostic observation only. It must never influence simulation d
 
 `CombatDebugSnapshotSystem` can capture weapon ranges/targets, projectile positions/velocities, Health values, impacts, and the runtime metrics during `SnapshotEvents`. The Windows client F2 world-debug path renders those copies without mutating simulation state.
 
+Directional armor and target acquisition add simulation-owned diagnostics without changing that authority boundary.
+
+`TargetAcquisitionSystem.Metrics` reports current-tick and cumulative scans, candidates, acquisitions, reacquisitions, and rejects, plus cumulative friendly, target-class, range, intelligence-availability, line-of-fire, and fire-policy rejection counts.
+
+`CombatDamageResolutionSystem.Metrics` reports armored hits, Front/Side/Rear/Top hit counts, and cumulative mitigated damage.
+
+When debug capture is enabled, target rejection positions/reasons and armor facing transforms are copied into the combat debug snapshot for F2 visualization.
+
 ## Job Metrics
 
 The job scheduler exposes:

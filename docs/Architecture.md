@@ -105,6 +105,8 @@ Logistics capacity and disruption extend the same graph without creating a paral
 
 Combat execution follows the canonical `Combat -> DamageResolution -> EntityLifecycle -> SnapshotEvents` boundaries. `ForgeLine.Combat` owns stable weapon/projectile/health/event contracts and the existing inventory-backed `AmmunitionState`; `ForgeLine.Game` owns tick execution against simulation transforms and world queries. `CombatExecutionSystem` validates cadence, range, faction and Ammunition before resolving hitscan fire or moving physical projectiles. Damage is buffered into `CombatDamageResolutionSystem`, while zero-health entities and spent projectiles are destroyed only by `CombatEntityLifecycleSystem`. `CombatDebugSnapshotSystem` and presentation visualization consume copied outputs only and never determine outcomes. See `docs/CombatExecution.md`.
 
+Directional armor and target acquisition extend the same authority chain. `TargetAcquisitionSystem` runs in `Sensors` against authoritative transforms and the world spatial index, then `CombatExecutionSystem` performs final target/fire validation before Ammunition use. `CombatDamageResolutionSystem` classifies incoming direction against target facing and resolves logical penetration through data-driven weapon and armor profiles. Intelligence availability and line-of-fire are policy boundaries rather than presentation decisions. See `docs/ArmorAndTargetAcquisition.md`.
+
 Simulation code is written in a deterministic-friendly style:
 
 - explicit tick ordering
