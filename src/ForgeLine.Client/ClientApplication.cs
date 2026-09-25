@@ -1,5 +1,6 @@
 using System.Numerics;
 using ForgeLine.Core;
+using ForgeLine.Economy;
 using ForgeLine.Game;
 using ForgeLine.Graphics;
 using ForgeLine.Input;
@@ -68,11 +69,39 @@ internal sealed class ClientApplication
         var groundMovementSystem = new GroundMovementSystem(
             terrainWorld,
             spatialIndex);
+        BuildingDefinitionCatalog buildingDefinitions =
+            InitialBuildingDefinitions.CreateCatalog();
+        ResourceCatalog resourceCatalog =
+            InitialResourceDefinitions.CreateCatalog();
+        var inventories = new InventoryStore();
+        var buildingPlacement = new BuildingPlacementService(
+            buildingDefinitions,
+            terrainWorld,
+            spatialIndex);
+        var buildingCommands = new BuildingCommandProcessingSystem(
+            buildingDefinitions,
+            buildingPlacement,
+            inventories,
+            spatialIndex);
+        var buildingConstruction = new BuildingConstructionSystem(
+            buildingDefinitions,
+            inventories,
+            spatialIndex);
+        var powerNetworks = new PowerNetworkSystem();
+        var resourceExtraction = new ResourceExtractionSystem(
+            inventories: inventories);
 
         PopulateSimulationEntities(
             simulation,
             terrainWorld,
             renderInstanceCount);
+        EntityId constructionInventory =
+            CreateDevelopmentConstructionInventory(
+                simulation,
+                inventories);
+        CreateDevelopmentResourceDeposit(
+            simulation,
+            terrainWorld);
 
         NavigationWorld navigationWorld = NavigationWorld.Build(
             terrainWorld,
@@ -93,10 +122,14 @@ internal sealed class ClientApplication
         var navigationSystem =
             new HierarchicalNavigationSystem(pathfinder);
 
+        simulation.RegisterSystem(buildingCommands);
         simulation.RegisterSystem(formationMovementSystem);
         simulation.RegisterSystem(navigationSystem);
         simulation.RegisterSystem(groundMovementSystem);
         simulation.RegisterSystem(new SpatialIndexSystem(spatialSynchronizer));
+        simulation.RegisterSystem(powerNetworks);
+        simulation.RegisterSystem(buildingConstruction);
+        simulation.RegisterSystem(resourceExtraction);
         simulation.RegisterSystem(new SpatialIndexCleanupSystem(spatialSynchronizer));
         simulation.RegisterTickObserver(new PresentationExtractor(snapshotBuffer));
         simulation.AdvanceOneTick();
@@ -128,11 +161,15 @@ internal sealed class ClientApplication
                 LocalPlayer,
                 ControllableEntityCategory.Unit |
                 ControllableEntityCategory.Logistics));
+        var buildingPlacementController =
+            new RtsBuildingPlacementController(LocalPlayer);
         var debugDraw = new DebugDraw();
         var frameTimingTracker = new FrameTimingTracker();
 
         MoveEntitiesCommand? lastMovementCommand = null;
         SimulationCommandEnvelope? lastMovementEnvelope = null;
+        BuildCommand? lastBuildCommand = null;
+        SimulationCommandEnvelope? lastBuildEnvelope = null;
         bool overlayEnabled = true;
         bool worldDebugEnabled = false;
         bool overlayToggleHeld = false;
@@ -160,7 +197,11 @@ internal sealed class ClientApplication
             selectionController,
             lastMovementEnvelope,
             lastMovementCommand,
-            activeFormation);
+            activeFormation,
+            buildingPlacementController,
+            lastBuildEnvelope,
+            lastBuildCommand,
+            buildingCommands);
 
         long startedAt = _platform.Clock.GetTimestamp();
         long previousFrameAt = startedAt;
@@ -246,33 +287,80 @@ internal sealed class ClientApplication
                 simulationAccumulator,
                 simulation.Clock.TickDuration);
 
-            selectionController.Update(
+            buildingPlacementController.Update(
                 inputState,
                 camera,
-                renderWorld,
                 terrainWorld,
+                simulation.Entities,
+                buildingPlacement,
                 window.ClientSize.Width,
-                window.ClientSize.Height,
-                renderAlpha);
+                window.ClientSize.Height);
 
-            if (selectionController.TryTakeMovementRequest(
-                    out MovementOrderRequest movementRequest))
+            if (!buildingPlacementController.IsActive)
+            {
+                selectionController.Update(
+                    inputState,
+                    camera,
+                    renderWorld,
+                    terrainWorld,
+                    window.ClientSize.Width,
+                    window.ClientSize.Height,
+                    renderAlpha);
+
+                if (selectionController.TryTakeMovementRequest(
+                        out MovementOrderRequest movementRequest))
+                {
+                    var targetTick = new SimulationTick(
+                        checked(simulation.CurrentTick.Value + 1));
+                    var command = new MoveEntitiesCommand(
+                        LocalPlayer,
+                        movementRequest.Entities,
+                        movementRequest.WorldTarget,
+                        simulation.CurrentTick,
+                        activeFormation);
+
+                    lastMovementEnvelope = simulation.SubmitCommand(
+                        command,
+                        targetTick,
+                        new SimulationCommandSource(LocalPlayer.Value));
+                    lastMovementCommand = command;
+                }
+            }
+
+            if (buildingPlacementController.TryTakePlacementRequest(
+                    out BuildingPlacementRequest placementRequest))
             {
                 var targetTick = new SimulationTick(
                     checked(simulation.CurrentTick.Value + 1));
-                var command = new MoveEntitiesCommand(
+                var command = new BuildCommand(
                     LocalPlayer,
-                    movementRequest.Entities,
-                    movementRequest.WorldTarget,
-                    simulation.CurrentTick,
-                    activeFormation);
+                    placementRequest.BuildingId,
+                    placementRequest.Position,
+                    placementRequest.Orientation,
+                    constructionInventory,
+                    simulation.CurrentTick);
 
-                lastMovementEnvelope = simulation.SubmitCommand(
+                lastBuildEnvelope = simulation.SubmitCommand(
                     command,
                     targetTick,
                     new SimulationCommandSource(LocalPlayer.Value));
-                lastMovementCommand = command;
+                lastBuildCommand = command;
             }
+
+            BuildingConstructionDebugSnapshot? constructionDebugSnapshot =
+                worldDebugEnabled ||
+                buildingConstruction.Metrics.ActiveSites > 0
+                    ? BuildingConstructionDebugSnapshot.Capture(
+                        simulation.Entities,
+                        buildingDefinitions)
+                    : null;
+            ResourceExtractionDebugSnapshot? resourceDebugSnapshot =
+                worldDebugEnabled
+                    ? ResourceExtractionDebugSnapshot.Capture(
+                        simulation.Entities,
+                        resourceExtraction.Metrics,
+                        resourceCatalog)
+                    : null;
 
             BuildWorldDebugVisualization(
                 debugDraw,
@@ -285,7 +373,10 @@ internal sealed class ClientApplication
                 groundMovementSystem.CaptureDebugSnapshot(),
                 formationMovementSystem.CaptureDebugSnapshot(),
                 navigationSystem.World,
-                navigationSystem.LastCompletedPath);
+                navigationSystem.LastCompletedPath,
+                buildingPlacementController,
+                constructionDebugSnapshot,
+                resourceDebugSnapshot);
 
             terrainRenderer.DebugChunksEnabled = worldDebugEnabled;
 
@@ -340,7 +431,11 @@ internal sealed class ClientApplication
                     selectionController,
                     lastMovementEnvelope,
                     lastMovementCommand,
-                    activeFormation);
+                    activeFormation,
+                    buildingPlacementController,
+                    lastBuildEnvelope,
+                    lastBuildCommand,
+                    buildingCommands);
                 nextDiagnosticAt = now;
             }
         }
@@ -360,9 +455,89 @@ internal sealed class ClientApplication
             selectionController,
             lastMovementEnvelope,
             lastMovementCommand,
-            activeFormation);
+            activeFormation,
+            buildingPlacementController,
+            lastBuildEnvelope,
+            lastBuildCommand,
+            buildingCommands);
         WriteGraphicsState("stopped", graphics);
         return 0;
+    }
+
+    private static EntityId CreateDevelopmentConstructionInventory(
+        SimulationCoordinator simulation,
+        InventoryStore inventories)
+    {
+        EntityId entity = simulation.Entities.CreateEntity();
+        InventoryId inventoryId =
+            inventories.CreateInventory(
+                new InventorySpecification(100_000.0));
+
+        simulation.Entities.AddComponent(
+            entity,
+            new InventoryStorage(inventoryId));
+        simulation.Entities.AddComponent(
+            entity,
+            new StorageDepot(
+                inventoryId,
+                new FactionId((uint)LocalPlayer.Value)));
+
+        foreach (ResourceId resourceId in new[]
+                 {
+                     ResourceIds.FerrousOre,
+                     ResourceIds.Silicates,
+                     ResourceIds.Volatiles
+                 })
+        {
+            InventoryOperationResult result =
+                inventories.Add(
+                    inventoryId,
+                    resourceId,
+                    20_000.0);
+
+            if (!result.Succeeded)
+            {
+                throw new InvalidOperationException(
+                    $"Unable to seed development construction inventory with resource {resourceId}: {result.Failure}.");
+            }
+        }
+
+        return entity;
+    }
+
+    private static EntityId CreateDevelopmentResourceDeposit(
+        SimulationCoordinator simulation,
+        TerrainWorld terrainWorld)
+    {
+        const float centerX = 900.0f;
+        const float centerZ = 900.0f;
+        const float halfSize = 14.0f;
+
+        float height = terrainWorld.TrySampleHeight(
+            centerX,
+            centerZ,
+            out float sampledHeight)
+            ? sampledHeight
+            : 0.0f;
+
+        EntityId entity = simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(
+            entity,
+            new ResourceDeposit(
+                ResourceIds.FerrousOre,
+                new AxisAlignedBounds(
+                    new Vector3(
+                        centerX - halfSize,
+                        height - 1.0f,
+                        centerZ - halfSize),
+                    new Vector3(
+                        centerX + halfSize,
+                        height + 1.0f,
+                        centerZ + halfSize)),
+                totalQuantity: 50_000.0,
+                baseExtractionRatePerSecond: 10.0));
+
+        return entity;
     }
 
     private static void PopulateSimulationEntities(
@@ -491,13 +666,18 @@ internal sealed class ClientApplication
         GroundMovementDebugSnapshot movementSnapshot,
         FormationMovementDebugSnapshot formationSnapshot,
         NavigationWorld navigationWorld,
-        NavigationPath? navigationPath)
+        NavigationPath? navigationPath,
+        RtsBuildingPlacementController buildingPlacementController,
+        BuildingConstructionDebugSnapshot? constructionSnapshot,
+        ResourceExtractionDebugSnapshot? resourceSnapshot)
     {
         debugDraw.Clear();
 
         bool interactionFeedback =
             selectionController.Selection.Count > 0 ||
-            selectionController.HoveredEntity.IsValid;
+            selectionController.HoveredEntity.IsValid ||
+            buildingPlacementController.IsActive ||
+            (constructionSnapshot?.Sites.Count ?? 0) > 0;
         debugDraw.Enabled =
             worldDebugEnabled ||
             interactionFeedback;
@@ -512,6 +692,30 @@ internal sealed class ClientApplication
         Vector4 pointColor = new(1.0f, 0.25f, 0.18f, 1.0f);
         Vector4 selectedColor = new(0.25f, 1.0f, 0.35f, 1.0f);
         Vector4 hoveredColor = new(0.15f, 0.85f, 1.0f, 1.0f);
+        Vector4 placementValidColor = new(0.15f, 1.0f, 0.35f, 1.0f);
+        Vector4 placementInvalidColor = new(1.0f, 0.2f, 0.15f, 1.0f);
+        Vector4 constructionColor = new(1.0f, 0.75f, 0.2f, 1.0f);
+        Vector4 completedColor = new(0.2f, 0.9f, 0.35f, 1.0f);
+
+        if (buildingPlacementController.Preview is BuildingPlacementPreview placementPreview)
+        {
+            BuildingConstructionDebugVisualization.DrawPreview(
+                debugDraw,
+                placementPreview,
+                placementValidColor,
+                placementInvalidColor);
+        }
+
+        if (constructionSnapshot is not null)
+        {
+            BuildingConstructionDebugVisualization.DrawConstructionSites(
+                debugDraw,
+                constructionSnapshot,
+                constructionColor,
+                completedColor,
+                maximumCompleted: worldDebugEnabled ? 64 : 0,
+                maximumLabels: 32);
+        }
 
         if (worldDebugEnabled)
         {
@@ -546,6 +750,16 @@ internal sealed class ClientApplication
                     NavigationMovementClass.Tracked),
                 navigationPath,
                 camera.Target);
+            if (resourceSnapshot is not null)
+            {
+                ResourceDepositDebugVisualization.DrawDeposits(
+                    debugDraw,
+                    resourceSnapshot,
+                    new Vector4(0.65f, 0.9f, 0.25f, 1.0f),
+                    new Vector4(0.35f, 0.35f, 0.35f, 1.0f),
+                    maximumDeposits: 64,
+                    maximumLabels: 8);
+            }
 
             int debugCount = Math.Min(
                 renderWorld.InstanceCount,
@@ -835,7 +1049,11 @@ internal sealed class ClientApplication
         RtsSelectionController selectionController,
         SimulationCommandEnvelope? movementEnvelope,
         MoveEntitiesCommand? movementCommand,
-        FormationTemplate activeFormation)
+        FormationTemplate activeFormation,
+        RtsBuildingPlacementController buildingPlacementController,
+        SimulationCommandEnvelope? buildEnvelope,
+        BuildCommand? buildCommand,
+        BuildingCommandProcessingSystem buildingCommands)
     {
         EntityId hovered = selectionController.HoveredEntity;
         string hoveredText = hovered.IsValid
@@ -845,6 +1063,11 @@ internal sealed class ClientApplication
             ? movementEnvelope.Value.Sequence.ToString(
                 System.Globalization.CultureInfo.InvariantCulture)
             : "none";
+        string buildCommandText = buildEnvelope.HasValue
+            ? buildEnvelope.Value.Sequence.ToString(
+                System.Globalization.CultureInfo.InvariantCulture)
+            : "none";
+        BuildCommandMetrics buildMetrics = buildingCommands.Metrics;
 
         Console.WriteLine(
             $"[interaction:{state}] selected={selectionController.Selection.Count} " +
@@ -852,6 +1075,11 @@ internal sealed class ClientApplication
             $"acceptedTargets={movementCommand?.AcceptedTargetCount ?? 0} " +
             $"rejectedTargets={movementCommand?.RejectedTargetCount ?? 0} " +
             $"executedTick={movementCommand?.ExecutedAtTick.Value ?? 0} " +
-            $"formation={activeFormation}");
+            $"formation={activeFormation} placementActive={buildingPlacementController.IsActive} " +
+            $"building={buildingPlacementController.ActiveBuilding} " +
+            $"orientation={buildingPlacementController.Orientation} " +
+            $"lastBuildCommand={buildCommandText} buildRequestEntity={buildCommand?.RequestEntity.ToString() ?? "none"} " +
+            $"acceptedBuilds={buildMetrics.AcceptedCommands} rejectedBuilds={buildMetrics.RejectedCommands} " +
+            $"lastBuildRejection={buildMetrics.LastRejection} placementFailure={buildMetrics.LastPlacementFailure}");
     }
 }
