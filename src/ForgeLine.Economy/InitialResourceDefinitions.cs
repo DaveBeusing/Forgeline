@@ -31,6 +31,27 @@ public static class InitialResourceDefinitions
                     DisplayName = "Silicates",
                     DefaultExtractionRatePerSecond = 12.0,
                     DefaultRichness = 1.0
+                },
+                new ResourceDefinition
+                {
+                    Id = ResourceIds.Steel,
+                    Key = "resource.steel",
+                    DisplayName = "Steel",
+                    DefaultExtractionRatePerSecond = 0.0
+                },
+                new ResourceDefinition
+                {
+                    Id = ResourceIds.Fuel,
+                    Key = "resource.fuel",
+                    DisplayName = "Fuel",
+                    DefaultExtractionRatePerSecond = 0.0
+                },
+                new ResourceDefinition
+                {
+                    Id = ResourceIds.Electronics,
+                    Key = "resource.electronics",
+                    DisplayName = "Electronics",
+                    DefaultExtractionRatePerSecond = 0.0
                 }
             ]);
     }

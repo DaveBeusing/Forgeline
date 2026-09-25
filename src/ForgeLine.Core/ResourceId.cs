@@ -33,4 +33,10 @@ public static class ResourceIds
     public static ResourceId Volatiles => new(2);
 
     public static ResourceId Silicates => new(3);
+
+    public static ResourceId Steel => new(4);
+
+    public static ResourceId Fuel => new(5);
+
+    public static ResourceId Electronics => new(6);
 }

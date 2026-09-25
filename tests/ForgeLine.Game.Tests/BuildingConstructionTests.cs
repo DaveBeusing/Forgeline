@@ -18,7 +18,7 @@ public sealed class BuildingConstructionTests
         BuildingDefinitionCatalog catalog =
             InitialBuildingDefinitions.CreateCatalog();
 
-        Assert.Equal(5, catalog.Count);
+        Assert.Equal(7, catalog.Count);
         Assert.Equal(
             "building.command_core",
             catalog[BuildingIds.CommandCore].Key);
@@ -34,6 +34,22 @@ public sealed class BuildingConstructionTests
         Assert.Equal(
             "building.smelter",
             catalog[BuildingIds.Smelter].Key);
+        Assert.Equal(
+            "building.refinery",
+            catalog[BuildingIds.Refinery].Key);
+        Assert.Equal(
+            "building.electronics_plant",
+            catalog[BuildingIds.ElectronicsPlant].Key);
+
+        Assert.Equal(
+            ProductionCapability.SteelProcessing,
+            catalog[BuildingIds.Smelter].ProductionCapabilities);
+        Assert.Equal(
+            ProductionCapability.FuelProcessing,
+            catalog[BuildingIds.Refinery].ProductionCapabilities);
+        Assert.Equal(
+            ProductionCapability.ElectronicsProcessing,
+            catalog[BuildingIds.ElectronicsPlant].ProductionCapabilities);
 
         BuildingFootprint footprint =
             catalog[BuildingIds.Smelter].Footprint;
@@ -407,6 +423,54 @@ public sealed class BuildingConstructionTests
         Assert.True(test.Inventories.Contains(storage.InventoryId));
         Assert.True(
             test.Simulation.Entities.HasComponent<PowerConsumer>(site));
+    }
+
+    [Fact]
+    public void ProcessingBuildingCompletionCreatesBoundProductionInventories()
+    {
+        TestWorld test = CreateTestWorld();
+        EntityId inventoryEntity =
+            AddFundedInventory(test, includeAllCosts: true);
+
+        SubmitBuild(
+            test,
+            inventoryEntity,
+            BuildingIds.Smelter,
+            new Vector3(128.0f, 0.0f, 128.0f));
+
+        test.Simulation.AdvanceOneTick();
+
+        EntityId site = SingleSite(test);
+        BuildingDefinition definition =
+            test.Definitions[BuildingIds.Smelter];
+
+        test.Simulation.RunTicks(
+            definition.ConstructionTicks - 1,
+            TestContext.Current.CancellationToken);
+
+        ProductionFacility production =
+            test.Simulation.Entities.GetComponent<ProductionFacility>(site);
+
+        Assert.True(
+            test.Simulation.Entities.HasComponent<ProcessingFacility>(site));
+        Assert.True(
+            test.Simulation.Entities.HasComponent<PowerConsumer>(site));
+        Assert.Equal(
+            ProductionCapability.SteelProcessing,
+            production.Capabilities);
+        Assert.NotEqual(
+            production.InputInventory,
+            production.OutputInventory);
+        Assert.True(
+            test.Inventories.Contains(production.InputInventory));
+        Assert.True(
+            test.Inventories.Contains(production.OutputInventory));
+        Assert.Equal(
+            definition.ProductionInputCapacity,
+            test.Inventories.GetTotalCapacity(production.InputInventory));
+        Assert.Equal(
+            definition.ProductionOutputCapacity,
+            test.Inventories.GetTotalCapacity(production.OutputInventory));
     }
 
     [Fact]

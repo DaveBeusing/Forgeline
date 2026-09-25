@@ -181,11 +181,13 @@ Power-specific extractor states are:
 
 Inventory-output backpressure remains independent. If both power and output capacity constrain an extractor, power first limits the requested production rate and inventory capacity then limits the storable result.
 
-## Production and construction integration boundary
+## Production and construction integration
 
-Production and construction systems are not yet implemented, but they do not need separate energy logic.
+Construction creates the same authoritative `PowerConsumer` contract for completed processing facilities. `ProductionSystem` then reads that allocated state during `SimulationPhase.Production`, which follows the Infrastructure phase.
 
-An entity can declare its requirement with `PowerConsumer` and read:
+The initial Steel, Fuel, and Electronics recipes require full allocated power. A brownout or offline facility reports `NoPower` and does not advance its active cycle until the authoritative supply fraction meets the recipe requirement.
+
+An entity declares its requirement with `PowerConsumer` and systems read:
 
 - `State`;
 - `AllocatedPower`;
@@ -222,6 +224,7 @@ Regression coverage includes:
 - unassigned membership;
 - repeated deterministic fixtures;
 - extraction pause and scaling;
+- production power blocking and recovery through the production regression suite;
 - 10,000 consumers under shortage.
 
 `PowerNetworkBenchmarks` measures complete allocation ticks at 100, 1,000, and 10,000 consumers.

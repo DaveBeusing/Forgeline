@@ -10,7 +10,9 @@ The initial construction slice supports:
 - Power Plant;
 - Mine / Extractor;
 - Storage Depot;
-- Smelter shell.
+- Smelter;
+- Refinery;
+- Electronics Plant.
 
 Building definitions are data-driven and use stable `BuildingId` values rather than CLR type names.
 
@@ -20,7 +22,7 @@ Building definitions are data-driven and use stable `BuildingId` values rather t
 
 `BuildingFootprint` describes width, depth, and height. The four cardinal `BuildingOrientation` values rotate width and depth deterministically.
 
-The initial definitions are exposed by `InitialBuildingDefinitions.CreateCatalog()`. They provide construction contracts for the first economy structures while leaving production recipes and final art to their owning systems.
+The initial definitions are exposed by `InitialBuildingDefinitions.CreateCatalog()`. They provide construction contracts for the first economy structures, including processing capability and production-inventory metadata, while recipe definitions remain owned by the economy production system and final art remains deferred.
 
 ## Placement preview
 
@@ -153,11 +155,13 @@ Initial capability activation includes:
 - Power Plant: power-network membership and generator;
 - Mine / Extractor: dedicated output inventory, power consumer, and `ResourceExtractor` bound to the resource deposit;
 - Storage Depot: inventory storage, storage-depot contract, and power consumer;
-- Smelter shell: processing marker and power consumer.
+- Smelter: processing marker, Steel Processing production facility, dedicated input/output inventories, and power consumer;
+- Refinery: processing marker, Fuel Processing production facility, dedicated input/output inventories, and power consumer;
+- Electronics Plant: processing marker, Electronics Processing production facility, dedicated input/output inventories, and power consumer.
 
 Power-capable buildings initially join the logical development network with ID `1`. Physical transmission topology remains a later power-system extension.
 
-The Smelter deliberately activates only the processing capability shell. Production recipes remain outside this construction slice.
+Construction activates processing capability and inventory bindings only. Recipe execution remains owned by `ProductionSystem`, preserving the construction/production responsibility boundary.
 
 ## Construction diagnostics
 

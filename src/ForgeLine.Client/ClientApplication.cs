@@ -73,6 +73,8 @@ internal sealed class ClientApplication
             InitialBuildingDefinitions.CreateCatalog();
         ResourceCatalog resourceCatalog =
             InitialResourceDefinitions.CreateCatalog();
+        ProductionRecipeCatalog productionRecipes =
+            InitialProductionRecipes.CreateCatalog();
         var inventories = new InventoryStore();
         var buildingPlacement = new BuildingPlacementService(
             buildingDefinitions,
@@ -88,6 +90,9 @@ internal sealed class ClientApplication
             inventories,
             spatialIndex);
         var powerNetworks = new PowerNetworkSystem();
+        var production = new ProductionSystem(
+            productionRecipes,
+            inventories);
         var resourceExtraction = new ResourceExtractionSystem(
             inventories: inventories);
 
@@ -128,6 +133,7 @@ internal sealed class ClientApplication
         simulation.RegisterSystem(groundMovementSystem);
         simulation.RegisterSystem(new SpatialIndexSystem(spatialSynchronizer));
         simulation.RegisterSystem(powerNetworks);
+        simulation.RegisterSystem(production);
         simulation.RegisterSystem(buildingConstruction);
         simulation.RegisterSystem(resourceExtraction);
         simulation.RegisterSystem(new SpatialIndexCleanupSystem(spatialSynchronizer));

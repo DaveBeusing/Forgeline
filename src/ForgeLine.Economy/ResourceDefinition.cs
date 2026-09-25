@@ -14,6 +14,8 @@ public sealed record ResourceDefinition
 
     public double DefaultRichness { get; init; } = 1.0;
 
+    public bool IsExtractable => DefaultExtractionRatePerSecond > 0.0;
+
     public void Validate()
     {
         if (!Id.IsSpecified)
@@ -25,7 +27,7 @@ public sealed record ResourceDefinition
         ArgumentException.ThrowIfNullOrWhiteSpace(DisplayName);
 
         if (!double.IsFinite(DefaultExtractionRatePerSecond) ||
-            DefaultExtractionRatePerSecond <= 0.0)
+            DefaultExtractionRatePerSecond < 0.0)
         {
             throw new ArgumentOutOfRangeException(nameof(DefaultExtractionRatePerSecond));
         }

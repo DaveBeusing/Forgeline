@@ -36,6 +36,8 @@ public static class BuildingIds
     public static readonly BuildingId Extractor = new(3);
     public static readonly BuildingId StorageDepot = new(4);
     public static readonly BuildingId Smelter = new(5);
+    public static readonly BuildingId Refinery = new(6);
+    public static readonly BuildingId ElectronicsPlant = new(7);
 }
 
 public enum BuildingOrientation : byte
@@ -182,6 +184,12 @@ public sealed record BuildingDefinition
 
     public bool RequiresResourceDeposit { get; init; }
 
+    public ProductionCapability ProductionCapabilities { get; init; }
+
+    public double ProductionInputCapacity { get; init; }
+
+    public double ProductionOutputCapacity { get; init; }
+
     public void Validate()
     {
         if (!Id.IsSpecified)
@@ -216,7 +224,9 @@ public sealed record BuildingDefinition
         if (!double.IsFinite(PowerGeneration) || PowerGeneration < 0.0 ||
             !double.IsFinite(PowerDemand) || PowerDemand < 0.0 ||
             !double.IsFinite(StorageCapacity) || StorageCapacity < 0.0 ||
-            !double.IsFinite(ExtractionRatePerSecond) || ExtractionRatePerSecond < 0.0)
+            !double.IsFinite(ExtractionRatePerSecond) || ExtractionRatePerSecond < 0.0 ||
+            !double.IsFinite(ProductionInputCapacity) || ProductionInputCapacity < 0.0 ||
+            !double.IsFinite(ProductionOutputCapacity) || ProductionOutputCapacity < 0.0)
         {
             throw new InvalidOperationException(
                 $"Building '{Key}' contains invalid capability values.");
@@ -255,6 +265,28 @@ public sealed record BuildingDefinition
             BuildingCapability.Extraction,
             ExtractionRatePerSecond > 0.0 && RequiresResourceDeposit,
             nameof(ExtractionRatePerSecond));
+
+        bool processingEnabled =
+            Capabilities.HasFlag(BuildingCapability.Processing);
+        bool processingConfigured =
+            ProductionCapabilities != ProductionCapability.None &&
+            ProductionInputCapacity > 0.0 &&
+            ProductionOutputCapacity > 0.0;
+
+        if (processingEnabled != processingConfigured)
+        {
+            throw new InvalidOperationException(
+                $"Building '{Key}' processing capability does not match its production configuration.");
+        }
+
+        if (!processingEnabled &&
+            (ProductionCapabilities != ProductionCapability.None ||
+             ProductionInputCapacity != 0.0 ||
+             ProductionOutputCapacity != 0.0))
+        {
+            throw new InvalidOperationException(
+                $"Building '{Key}' defines production values without the processing capability.");
+        }
     }
 
     private void ValidateCapability(
@@ -419,7 +451,53 @@ public static class InitialBuildingDefinitions
                     Capabilities =
                         BuildingCapability.Processing |
                         BuildingCapability.PowerConsumption,
-                    PowerDemand = 30.0
+                    PowerDemand = 30.0,
+                    ProductionCapabilities = ProductionCapability.SteelProcessing,
+                    ProductionInputCapacity = 1_000.0,
+                    ProductionOutputCapacity = 1_000.0
+                },
+                new BuildingDefinition
+                {
+                    Id = BuildingIds.Refinery,
+                    Key = "building.refinery",
+                    DisplayName = "Refinery",
+                    Footprint = new BuildingFootprint(18.0f, 16.0f, 10.0f),
+                    ConstructionTicks = 110,
+                    Costs =
+                    [
+                        new BuildingResourceCost(ResourceIds.FerrousOre, 160.0),
+                        new BuildingResourceCost(ResourceIds.Silicates, 60.0),
+                        new BuildingResourceCost(ResourceIds.Volatiles, 40.0)
+                    ],
+                    Capabilities =
+                        BuildingCapability.Processing |
+                        BuildingCapability.PowerConsumption,
+                    PowerDemand = 25.0,
+                    ProductionCapabilities = ProductionCapability.FuelProcessing,
+                    ProductionInputCapacity = 1_000.0,
+                    ProductionOutputCapacity = 1_000.0
+                },
+                new BuildingDefinition
+                {
+                    Id = BuildingIds.ElectronicsPlant,
+                    Key = "building.electronics_plant",
+                    DisplayName = "Electronics Plant",
+                    Footprint = new BuildingFootprint(18.0f, 18.0f, 10.0f),
+                    ConstructionTicks = 130,
+                    Costs =
+                    [
+                        new BuildingResourceCost(ResourceIds.FerrousOre, 170.0),
+                        new BuildingResourceCost(ResourceIds.Silicates, 100.0),
+                        new BuildingResourceCost(ResourceIds.Volatiles, 20.0)
+                    ],
+                    Capabilities =
+                        BuildingCapability.Processing |
+                        BuildingCapability.PowerConsumption,
+                    PowerDemand = 35.0,
+                    ProductionCapabilities =
+                        ProductionCapability.ElectronicsProcessing,
+                    ProductionInputCapacity = 1_000.0,
+                    ProductionOutputCapacity = 1_000.0
                 }
             ]);
     }
