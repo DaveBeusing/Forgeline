@@ -9,8 +9,11 @@ The initial vertical-slice resource IDs are:
 - `1` — `resource.ferrous_ore` — Ferrous Ore
 - `2` — `resource.volatiles` — Volatiles
 - `3` — `resource.silicates` — Silicates
+- `4` — `resource.steel` — Steel
+- `5` — `resource.fuel` — Fuel
+- `6` — `resource.electronics` — Electronics
 
-Rare Elements remain deferred.
+Only Ferrous Ore, Volatiles, and Silicates are extractable in the initial slice. Steel, Fuel, and Electronics are stable catalog resources produced through industrial recipes. Rare Elements remain deferred.
 
 ## Resource definitions
 
@@ -23,7 +26,7 @@ Each definition exposes:
 - stable resource ID;
 - canonical data key;
 - display name;
-- default extraction rate;
+- default extraction rate, where zero marks a non-extractable processed resource;
 - default richness.
 
 The catalog is the content boundary for later external game-data loading.

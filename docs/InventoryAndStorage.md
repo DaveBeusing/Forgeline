@@ -2,7 +2,7 @@
 
 ## Purpose
 
-FORGELINE inventories are authoritative simulation-owned aggregate resource stores. They provide the shared storage contract used by extraction now and by processing, construction, production, logistics, supply, and transport systems later.
+FORGELINE inventories are authoritative simulation-owned aggregate resource stores. They provide the shared storage contract used by extraction, construction, and industrial production now, with logistics, supply, and transport systems building on the same contract later.
 
 Inventories store numerical resource quantities. They do not model individual crates or presentation objects.
 
