@@ -190,6 +190,23 @@ internal sealed class ClientApplication
                 combatRuntime,
                 targetAcquisition,
                 combatDamageResolution);
+        var tacticalOrderPreparation =
+            new TacticalOrderPreparationSystem();
+        var tacticalTestOpponent =
+            new TacticalTestOpponentSystem(
+                intelligenceStore);
+        var automaticResupply =
+            new AutomaticResupplyDecisionSystem(
+                inventories);
+        var tacticalCombat =
+            new TacticalCombatSystem(
+                combatWeapons,
+                intelligenceStore);
+        var combatReadiness =
+            new CombatReadinessSystem(
+                inventories,
+                combatWeapons,
+                artilleryWeapons);
         var logisticsRegistration =
             new BuildingLogisticsRegistrationSystem(
                 logisticsNetwork);
@@ -226,6 +243,9 @@ internal sealed class ClientApplication
             new HierarchicalNavigationSystem(pathfinder);
 
         simulation.RegisterSystem(buildingCommands);
+        simulation.RegisterSystem(tacticalOrderPreparation);
+        simulation.RegisterSystem(tacticalTestOpponent);
+        simulation.RegisterSystem(automaticResupply);
         simulation.RegisterSystem(logisticsDisruption);
         simulation.RegisterSystem(formationMovementSystem);
         simulation.RegisterSystem(navigationSystem);
@@ -237,6 +257,7 @@ internal sealed class ClientApplication
         simulation.RegisterSystem(resourceExtraction);
         simulation.RegisterSystem(battlefieldIntelligence);
         simulation.RegisterSystem(targetAcquisition);
+        simulation.RegisterSystem(tacticalCombat);
         simulation.RegisterSystem(artilleryFireMissions);
         simulation.RegisterSystem(combatExecution);
         simulation.RegisterSystem(combatDamageResolution);
@@ -246,6 +267,7 @@ internal sealed class ClientApplication
         simulation.RegisterSystem(logisticsRegistration);
         simulation.RegisterSystem(combatLifecycle);
         simulation.RegisterSystem(new SpatialIndexCleanupSystem(spatialSynchronizer));
+        simulation.RegisterSystem(combatReadiness);
         simulation.RegisterSystem(combatDebugSnapshots);
         simulation.RegisterTickObserver(
             new PresentationExtractor(
@@ -376,6 +398,10 @@ internal sealed class ClientApplication
             artilleryFireMissions.DebugCaptureEnabled =
                 worldDebugEnabled;
             targetAcquisition.DebugCaptureEnabled =
+                worldDebugEnabled;
+            tacticalCombat.DebugCaptureEnabled =
+                worldDebugEnabled;
+            combatReadiness.DebugCaptureEnabled =
                 worldDebugEnabled;
             combatDebugSnapshots.DebugCaptureEnabled =
                 worldDebugEnabled;
@@ -524,6 +550,10 @@ internal sealed class ClientApplication
                 worldDebugEnabled
                     ? artilleryFireMissions.LastDebugSnapshot
                     : null;
+            CombatReadinessDebugSnapshot? readinessDebugSnapshot =
+                worldDebugEnabled
+                    ? combatReadiness.LastDebugSnapshot
+                    : null;
 
             BuildWorldDebugVisualization(
                 debugDraw,
@@ -547,6 +577,10 @@ internal sealed class ClientApplication
                 battlefieldSupplyDebugSnapshot,
                 combatDebugSnapshot,
                 artilleryDebugSnapshot,
+                readinessDebugSnapshot,
+                tacticalCombat.DebugEntries,
+                tacticalCombat.Metrics,
+                automaticResupply.Metrics,
                 battlefieldIntelligence.DebugSensors,
                 battlefieldIntelligence.Metrics);
 
@@ -883,6 +917,10 @@ internal sealed class ClientApplication
         BattlefieldSupplyDebugSnapshot? battlefieldSupplySnapshot,
         CombatDebugSnapshot? combatSnapshot,
         ArtilleryDebugSnapshot? artillerySnapshot,
+        CombatReadinessDebugSnapshot? readinessSnapshot,
+        IReadOnlyList<TacticalCombatDebugEntry> tacticalEntries,
+        TacticalCombatMetrics tacticalMetrics,
+        AutomaticResupplyDecisionMetrics resupplyDecisionMetrics,
         IReadOnlyList<IntelligenceSensorDebugEntry> intelligenceSensors,
         BattlefieldIntelligenceMetrics intelligenceMetrics)
     {
@@ -1050,6 +1088,19 @@ internal sealed class ClientApplication
                     camera.Target + Vector3.UnitY * 9.0f,
                     maximumMissions: 64,
                     maximumProjectiles: 128);
+            }
+
+            if (readinessSnapshot is not null)
+            {
+                TacticalCombatDebugVisualization.Draw(
+                    debugDraw,
+                    tacticalEntries,
+                    tacticalMetrics,
+                    readinessSnapshot,
+                    resupplyDecisionMetrics,
+                    camera.Target + Vector3.UnitY * 13.0f,
+                    maximumUnits: 96,
+                    maximumReadinessLabels: 64);
             }
 
             if (combatSnapshot is not null)
