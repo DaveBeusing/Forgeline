@@ -957,7 +957,7 @@ public sealed class AutomatedDistributionSystem : ISimulationSystem
         }
     }
 
-    private static bool TryResolveSourceInventory(
+    private bool TryResolveSourceInventory(
         EntityRegistry entities,
         in LogisticsNode node,
         out InventoryId inventoryId)
@@ -971,7 +971,7 @@ public sealed class AutomatedDistributionSystem : ISimulationSystem
         if (entities.TryGetComponent(
                 node.Entity,
                 out ProductionFacility production) &&
-            production.OutputInventory.IsSpecified)
+            _inventories.Contains(production.OutputInventory))
         {
             inventoryId = production.OutputInventory;
             return true;
@@ -979,7 +979,8 @@ public sealed class AutomatedDistributionSystem : ISimulationSystem
 
         if (entities.TryGetComponent(
                 node.Entity,
-                out InventoryStorage storage))
+                out InventoryStorage storage) &&
+            _inventories.Contains(storage.InventoryId))
         {
             inventoryId = storage.InventoryId;
             return true;
@@ -987,7 +988,8 @@ public sealed class AutomatedDistributionSystem : ISimulationSystem
 
         if (entities.TryGetComponent(
                 node.Entity,
-                out LogisticsHub hub))
+                out LogisticsHub hub) &&
+            _inventories.Contains(hub.InventoryId))
         {
             inventoryId = hub.InventoryId;
             return true;
@@ -999,7 +1001,8 @@ public sealed class AutomatedDistributionSystem : ISimulationSystem
             extractor.OutputInventory.IsValid &&
             entities.TryGetComponent(
                 extractor.OutputInventory,
-                out InventoryStorage outputStorage))
+                out InventoryStorage outputStorage) &&
+            _inventories.Contains(outputStorage.InventoryId))
         {
             inventoryId = outputStorage.InventoryId;
             return true;
