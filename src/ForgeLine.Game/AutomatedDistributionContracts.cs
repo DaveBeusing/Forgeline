@@ -5,6 +5,12 @@ using ForgeLine.Simulation;
 
 namespace ForgeLine.Game;
 
+internal interface ICargoTransportReservationObserver
+{
+    void OnCargoReservationConsumed(
+        LogisticsTransportRequestId requestId);
+}
+
 public enum LogisticsHubState : byte
 {
     Operational = 0,
