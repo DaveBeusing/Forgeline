@@ -64,13 +64,16 @@ public sealed class UnitProductionSystem : ISimulationSystem
             if (!context.Entities.IsAlive(facilityEntity) ||
                 !context.Entities.TryGetComponent(
                     facilityEntity,
-                    out UnitProductionFacility? facility))
+                    out UnitProductionFacility facility))
             {
                 continue;
             }
 
             ProcessFacility(
                 context,
+                facilityEntity,
+                ref facility);
+            context.Entities.SetComponent(
                 facilityEntity,
                 facility);
 
@@ -145,7 +148,7 @@ public sealed class UnitProductionSystem : ISimulationSystem
 
             if (entities.TryGetComponent(
                     request.Facility,
-                    out UnitProductionFacility? facility) &&
+                    out UnitProductionFacility facility) &&
                 facility.ActiveRequest == requestEntity)
             {
                 if (facility.InputsReserved &&
@@ -159,6 +162,9 @@ public sealed class UnitProductionSystem : ISimulationSystem
                 }
 
                 facility.ClearActive();
+                entities.SetComponent(
+                    request.Facility,
+                    facility);
             }
 
             entities.DestroyEntity(requestEntity);
@@ -182,7 +188,7 @@ public sealed class UnitProductionSystem : ISimulationSystem
 
             if (!entities.TryGetComponent(
                     request.Facility,
-                    out UnitProductionFacility? facility) ||
+                    out UnitProductionFacility facility) ||
                 !_units.TryGet(
                     request.UnitId,
                     out UnitDefinition? definition) ||
@@ -198,7 +204,7 @@ public sealed class UnitProductionSystem : ISimulationSystem
     private void ProcessFacility(
         SimulationContext context,
         EntityId facilityEntity,
-        UnitProductionFacility facility)
+        ref UnitProductionFacility facility)
     {
         if (facility.ActiveRequest.IsValid)
         {
@@ -234,7 +240,7 @@ public sealed class UnitProductionSystem : ISimulationSystem
                 ProcessActiveProduction(
                     context,
                     facilityEntity,
-                    facility,
+                    ref facility,
                     facility.ActiveRequest,
                     activeUnit);
                 return;
@@ -258,7 +264,7 @@ public sealed class UnitProductionSystem : ISimulationSystem
         ProcessActiveProduction(
             context,
             facilityEntity,
-            facility,
+            ref facility,
             requestEntity,
             _units[request.UnitId]);
     }
@@ -329,7 +335,7 @@ public sealed class UnitProductionSystem : ISimulationSystem
     private void ProcessActiveProduction(
         SimulationContext context,
         EntityId facilityEntity,
-        UnitProductionFacility facility,
+        ref UnitProductionFacility facility,
         EntityId requestEntity,
         UnitDefinition definition)
     {
@@ -378,7 +384,7 @@ public sealed class UnitProductionSystem : ISimulationSystem
         CommitProduction(
             context,
             facilityEntity,
-            facility,
+            ref facility,
             requestEntity,
             definition);
     }
@@ -386,7 +392,7 @@ public sealed class UnitProductionSystem : ISimulationSystem
     private void CommitProduction(
         SimulationContext context,
         EntityId facilityEntity,
-        UnitProductionFacility facility,
+        ref UnitProductionFacility facility,
         EntityId requestEntity,
         UnitDefinition definition)
     {
