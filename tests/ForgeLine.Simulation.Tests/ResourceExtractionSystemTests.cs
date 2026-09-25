@@ -15,7 +15,7 @@ public sealed class ResourceExtractionSystemTests
 
         Assert.Equal(3, catalog.Count);
         Assert.Equal("resource.ferrous_ore", catalog[ResourceIds.FerrousOre].Key);
-        Assert.Equal("resource.volatiles", catalog[ResourceIds.Volatiless].Key);
+        Assert.Equal("resource.volatiles", catalog[ResourceIds.Volatiles].Key);
         Assert.Equal("resource.silicates", catalog[ResourceIds.Silicates].Key);
         Assert.True(catalog.TryResolve("resource.ferrous_ore", out ResourceId resolved));
         Assert.Equal(ResourceIds.FerrousOre, resolved);
@@ -133,7 +133,7 @@ public sealed class ResourceExtractionSystemTests
             depositEntity,
             ResourceDeposit.Restore(
                 ResourceIds.FerrousOre,
-                CreateBounds(0.0f),
+                CreateBounds(0U),
                 totalQuantity: 100.0,
                 remainingQuantity: 0.0,
                 baseExtractionRatePerSecond: 10.0));
