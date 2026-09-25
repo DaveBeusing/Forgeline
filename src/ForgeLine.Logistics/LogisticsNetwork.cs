@@ -44,7 +44,8 @@ public sealed partial class LogisticsNetwork
         System.Numerics.Vector3 worldPosition,
         LogisticsNodeKind kind,
         LogisticsNodeCapabilities capabilities,
-        bool enabled = true)
+        bool enabled = true,
+        double? throughputCapacityPerSecond = null)
     {
         if (_nodesByEntity.ContainsKey(entity))
         {
@@ -59,7 +60,8 @@ public sealed partial class LogisticsNetwork
             worldPosition,
             kind,
             capabilities,
-            enabled);
+            enabled,
+            throughputCapacityPerSecond);
 
         _nodes.Add(id, node);
         _nodesByEntity.Add(entity, id);
@@ -73,7 +75,8 @@ public sealed partial class LogisticsNetwork
         System.Numerics.Vector3 worldPosition,
         LogisticsNodeKind kind,
         LogisticsNodeCapabilities capabilities,
-        bool enabled = true)
+        bool enabled = true,
+        double? throughputCapacityPerSecond = null)
     {
         if (!_nodes.TryGetValue(id, out LogisticsNode existing))
         {
@@ -86,7 +89,9 @@ public sealed partial class LogisticsNetwork
             worldPosition,
             kind,
             capabilities,
-            enabled);
+            enabled,
+            throughputCapacityPerSecond ??
+            existing.ThroughputCapacityPerSecond);
 
         if (updated == existing)
         {
