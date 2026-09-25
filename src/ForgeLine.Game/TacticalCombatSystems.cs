@@ -334,6 +334,8 @@ public sealed class TacticalCombatSystem : ISimulationSystem
 {
     private readonly WeaponCatalog _weapons;
     private readonly FactionIntelligenceStore _intelligence;
+    private readonly ITargetAvailabilityPolicy _targetAvailability;
+    private readonly ILineOfFirePolicy _lineOfFire;
     private readonly List<EntityId> _ordered = new();
     private readonly Dictionary<EntityId, List<EntityId>> _membersByGroup =
         new();
@@ -347,12 +349,20 @@ public sealed class TacticalCombatSystem : ISimulationSystem
 
     public TacticalCombatSystem(
         WeaponCatalog weapons,
-        FactionIntelligenceStore intelligence)
+        FactionIntelligenceStore intelligence,
+        ITargetAvailabilityPolicy? targetAvailability = null,
+        ILineOfFirePolicy? lineOfFire = null)
     {
         _weapons = weapons ??
             throw new ArgumentNullException(nameof(weapons));
         _intelligence = intelligence ??
             throw new ArgumentNullException(nameof(intelligence));
+        _targetAvailability =
+            targetAvailability ??
+            AlwaysTargetAvailablePolicy.Instance;
+        _lineOfFire =
+            lineOfFire ??
+            UnobstructedLineOfFirePolicy.Instance;
     }
 
     public SimulationPhase Phase =>
@@ -677,8 +687,38 @@ public sealed class TacticalCombatSystem : ISimulationSystem
                 ? configuredPolicy
                 : FirePolicyState.FireAtWill;
 
+        if (!policy.Permits(target))
+        {
+            ClearWeaponTarget(
+                context,
+                entity);
+            ClearChaseMovement(
+                context,
+                entity);
+            SetMovementAllowed(
+                context,
+                entity,
+                allowed: false);
+            SetTacticalState(
+                context,
+                entity,
+                CombatOrderStatus.Holding,
+                EntityId.Invalid,
+                targetTransform.Position,
+                hasTargetPosition: true,
+                movementPaused: true);
+            return;
+        }
+
         if (distanceSquared <= rangeSquared &&
-            policy.Permits(target))
+            _targetAvailability.IsTargetAvailable(
+                entity,
+                target) &&
+            _lineOfFire.HasLineOfFire(
+                entity,
+                target,
+                transform.Position,
+                targetTransform.Position))
         {
             ClearChaseMovement(
                 context,
@@ -1151,10 +1191,18 @@ public sealed class TacticalCombatSystem : ISimulationSystem
             if (!_intelligence.IsEntityCurrentlyIdentified(
                     faction,
                     candidate.Entity) ||
+                !_targetAvailability.IsTargetAvailable(
+                    member,
+                    candidate.Entity) ||
                 !weapon.Effectiveness.CanEngage(
                     candidate.TargetClass) ||
                 !firePolicy.Permits(
-                    candidate.Entity))
+                    candidate.Entity) ||
+                !_lineOfFire.HasLineOfFire(
+                    member,
+                    candidate.Entity,
+                    memberPosition,
+                    candidate.Position))
             {
                 continue;
             }
