@@ -27,6 +27,26 @@ public readonly record struct LogisticsThroughputReservationId(ulong Value)
     public int CompareTo(LogisticsThroughputReservationId other) =>
         Value.CompareTo(other.Value);
 
+    public static bool operator <(
+        LogisticsThroughputReservationId left,
+        LogisticsThroughputReservationId right) =>
+        left.Value < right.Value;
+
+    public static bool operator <=(
+        LogisticsThroughputReservationId left,
+        LogisticsThroughputReservationId right) =>
+        left.Value <= right.Value;
+
+    public static bool operator >(
+        LogisticsThroughputReservationId left,
+        LogisticsThroughputReservationId right) =>
+        left.Value > right.Value;
+
+    public static bool operator >=(
+        LogisticsThroughputReservationId left,
+        LogisticsThroughputReservationId right) =>
+        left.Value >= right.Value;
+
     public override string ToString() =>
         Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
 }
@@ -134,7 +154,7 @@ public interface ILogisticsRouteCostAdjustment
     bool TryEvaluateTraversal(
         in LogisticsEdge edge,
         in LogisticsNode from,
-        in LogisticsNode to,
+        in LogisticsNode destination,
         double requestedQuantity,
         out double additionalCost);
 }
