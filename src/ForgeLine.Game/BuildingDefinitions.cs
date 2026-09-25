@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Economy;
@@ -310,7 +311,9 @@ public sealed class BuildingDefinitionCatalog
             ? definition
             : throw new KeyNotFoundException($"Unknown building ID '{id}'.");
 
-    public bool TryGet(BuildingId id, out BuildingDefinition? definition) =>
+    public bool TryGet(
+        BuildingId id,
+        [NotNullWhen(true)] out BuildingDefinition? definition) =>
         _byId.TryGetValue(id, out definition);
 
     public bool TryResolve(string key, out BuildingId id)
