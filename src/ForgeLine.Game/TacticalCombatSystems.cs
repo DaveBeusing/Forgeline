@@ -95,10 +95,17 @@ public sealed class TacticalOrderPreparationSystem : ISimulationSystem
                         context,
                         entity,
                         enabled: false);
+                    bool attackCanMove =
+                        context.Entities.TryGetComponent(
+                            entity,
+                            out TacticalCombatState attackState) &&
+                        attackState.Status is
+                            CombatOrderStatus.Pursuing or
+                            CombatOrderStatus.Resupplying;
                     SetMovementConstraint(
                         context,
                         entity,
-                        canMove: true);
+                        attackCanMove);
                     SetStateIfMissing(
                         context,
                         entity,
@@ -110,10 +117,17 @@ public sealed class TacticalOrderPreparationSystem : ISimulationSystem
                         context,
                         entity,
                         enabled: true);
+                    bool attackMoveCanMove =
+                        !context.Entities.TryGetComponent(
+                            entity,
+                            out TacticalCombatState attackMoveState) ||
+                        attackMoveState.Status is not
+                            CombatOrderStatus.Engaging and not
+                            CombatOrderStatus.Holding;
                     SetMovementConstraint(
                         context,
                         entity,
-                        canMove: true);
+                        attackMoveCanMove);
                     SetStateIfMissing(
                         context,
                         entity,
