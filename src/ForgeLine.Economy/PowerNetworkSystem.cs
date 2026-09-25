@@ -35,7 +35,8 @@ public sealed class PowerNetworkSystem : ISimulationSystem
             generatorCount++;
             PowerGenerator generator = entities.GetComponent<PowerGenerator>(entity);
 
-            if (!entities.TryGetComponent(entity, out PowerNetworkMembership membership))
+            if (!entities.TryGetComponent(entity, out PowerNetworkMembership membership)
+                || !membership.NetworkId.IsSpecified)
             {
                 unassignedGeneratorCount++;
                 SetGeneratorState(
@@ -80,7 +81,8 @@ public sealed class PowerNetworkSystem : ISimulationSystem
             consumerCount++;
             PowerConsumer consumer = entities.GetComponent<PowerConsumer>(entity);
 
-            if (!entities.TryGetComponent(entity, out PowerNetworkMembership membership))
+            if (!entities.TryGetComponent(entity, out PowerNetworkMembership membership)
+                || !membership.NetworkId.IsSpecified)
             {
                 unassignedConsumerCount++;
                 SetConsumerAllocation(entities, entity, consumer, 0.0);
