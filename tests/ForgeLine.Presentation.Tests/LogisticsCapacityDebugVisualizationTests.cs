@@ -71,7 +71,7 @@ public sealed class LogisticsCapacityDebugVisualizationTests
             maximumLabels: 8);
 
         Assert.True(debugDraw.Lines.Length >= 1);
-        Assert.True(debugDraw.Labels.Length >= 1);
+        Assert.True(debugDraw.Labels.Count >= 1);
         Assert.Contains(
             debugDraw.Labels,
             label =>
