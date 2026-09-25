@@ -91,6 +91,62 @@ public sealed class ProductionSystemTests
     }
 
     [Fact]
+    public void ProductionConservesConfiguredQuantitiesAndDoesNotDuplicateOutput()
+    {
+        ProductionScenario scenario = CreateScenario(
+            ProductionCapability.SteelProcessing);
+        AddInput(
+            scenario,
+            ResourceIds.FerrousOre,
+            quantity: 100.0);
+
+        double before =
+            scenario.Inventories.GetQuantity(
+                scenario.InputInventory,
+                ResourceIds.FerrousOre) +
+            scenario.Inventories.GetQuantity(
+                scenario.OutputInventory,
+                ResourceIds.Steel);
+
+        Queue(
+            scenario,
+            RecipeIds.Steel,
+            ProductionRequestMode.OneShot);
+
+        uint duration =
+            scenario.Recipes[RecipeIds.Steel].DurationTicks;
+        scenario.Simulation.RunTicks(
+            duration,
+            TestContext.Current.CancellationToken);
+
+        double after =
+            scenario.Inventories.GetQuantity(
+                scenario.InputInventory,
+                ResourceIds.FerrousOre) +
+            scenario.Inventories.GetQuantity(
+                scenario.OutputInventory,
+                ResourceIds.Steel);
+
+        Assert.Equal(before, after);
+        Assert.Equal(
+            10.0,
+            scenario.Inventories.GetQuantity(
+                scenario.OutputInventory,
+                ResourceIds.Steel));
+
+        scenario.Simulation.RunTicks(
+            10,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(
+            10.0,
+            scenario.Inventories.GetQuantity(
+                scenario.OutputInventory,
+                ResourceIds.Steel));
+        Assert.Equal(1, scenario.System.Metrics.CompletedCycles);
+    }
+
+    [Fact]
     public void MissingInputReportsNoInputWithoutChangingInventories()
     {
         ProductionScenario scenario = CreateScenario(
