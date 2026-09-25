@@ -208,3 +208,14 @@ Phase-5 tactical behavior preserves the command/simulation split. Combat command
 `CombatReadinessSystem` runs in `SnapshotEvents` and derives unit/group summaries from authoritative Health, inventory quantities, mobility, weapon state, supply state, and surviving members. Readiness is observation, not a substitute source of gameplay truth.
 
 See `docs/CombatOrdersAndReadiness.md`. Directorate faction data, stable unit definitions, cross-catalog content validation, deterministic unit-production queues, and generic unit entity composition live here because they coordinate existing economy, logistics, movement, combat, intelligence, and supply domains without moving ownership out of those domains.
+
+
+## Prototype Battlefield and Strategic Infrastructure Boundary
+
+The canonical `Central Divide` battlefield is game content, not a presentation script. `PrototypeBattlefieldDefinition` owns stable map metadata, starts, finite resource locations, build/expansion sites, road topology, crossings, and Command Core objective positions. `PrototypeBattlefieldTerrainFactory` produces the deterministic chunked `TerrainWorld`, and `PrototypeBattlefieldRuntime` materializes finite deposits and the road corridor through the existing economy and logistics types.
+
+Strategic crossings use the generic `StrategicInfrastructure` / `StrategicInfrastructureState` lifecycle. `StrategicInfrastructureSystem` is simulation-authoritative: disabling a crossing disables its real logistics edge and publishes a new `NavigationWorld` with that crossing blocked. The new navigation version invalidates cached/stale paths through the existing navigation boundary. Restoration remains unavailable while its fixed-tick progress advances and only re-enables logistics and navigation on completion.
+
+`MatchObjectiveSystem` owns match completion state. Command Core objective registration adds the normal combat-target components required by the existing targeting, damage, and entity-lifecycle systems rather than introducing objective-specific damage. Presentation may visualize map landmarks and infrastructure state, but it never decides reachability, restoration, or victory.
+
+See `docs/PrototypeBattlefield.md`.

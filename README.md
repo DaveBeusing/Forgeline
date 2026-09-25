@@ -25,6 +25,8 @@ Implemented engine foundations currently include the repository architecture, st
 
 The first playable faction-content vertical slice is now the **Directorate**: 13 constructible structures and 7 producible units are defined through stable content data, including Barracks/Vehicle Factory unit production, real material and power requirements, physical Fuel/Ammunition initialization, Cargo/Supply Truck integration, Scout/Radar intelligence, direct-fire weapons, directional armor, and Mobile Artillery fire missions. Cross-catalog validation and a bounded headless vertical-slice smoke scenario keep the roster tied to the real engine systems. See [Directorate Vertical Slice](docs/DirectorateVerticalSlice.md).\n\nRole-aware combat formations, convoy specialization, detailed ballistic penetration, advanced artillery deployment, advanced cover tactics, morale/suppression, road-lane discipline, road/rail navigation bonuses, air/naval navigation, advanced dynamic replanning, permanent combat groups, minimap commands, production terrain materials and streaming, editor functionality, asset conversion, and networking remain deferred to their owning implementation stages.
 
+The canonical playable battlefield vertical slice is **Central Divide**, a 3.072 × 3.072 km two-player scenario with finite bootstrap and contested resources, expansion/outpost/FOB areas, a central terrain barrier, the efficient North Bridge and alternate South Ford, real logistics edges, navigation invalidation on crossing disruption, fixed-tick restoration, simulation-owned Command Core objectives, and F2 strategic-map diagnostics. The Windows development client loads this battlefield by default. See [Prototype Battlefield](docs/PrototypeBattlefield.md).
+
 ## Repository Layout
 
 ```text
