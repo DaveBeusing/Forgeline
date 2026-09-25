@@ -1220,7 +1220,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
             tick);
     }
 
-    private void EnsureMovementToNode(
+    private static void EnsureMovementToNode(
         SimulationContext context,
         EntityId entity,
         in CargoTransport transport,
