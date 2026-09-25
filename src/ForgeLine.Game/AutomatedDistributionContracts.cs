@@ -1,5 +1,6 @@
 using ForgeLine.Core;
 using ForgeLine.Economy;
+using ForgeLine.Logistics;
 using ForgeLine.Simulation;
 
 namespace ForgeLine.Game;
