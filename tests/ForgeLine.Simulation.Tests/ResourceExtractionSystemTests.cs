@@ -357,17 +357,18 @@ public sealed class ResourceExtractionSystemTests
         double richness = 1.0,
         FactionId owner = default)
     {
-        EntityId entity = simulation.Entities.CreateEntity();
-        simulation.Entities.AddComponent(
-            entity,
-            new ResourceDeposit(
-                resourceId,
-                CreateBounds(entity.Index),
-                totalQuantity,
-                baseRate,
-                richness,
-                owner));
-        return entity;
+        uint placementIndex =
+            checked((uint)simulation.Entities.EntityCount + 1U);
+        var placement = new ResourceDepositPlacement(
+            resourceId,
+            CreateBounds(placementIndex),
+            totalQuantity,
+            baseRate,
+            richness,
+            owner);
+        return ResourceDepositSpawner.Place(
+            simulation.Entities,
+            placement);
     }
 
     private static EntityId AddExtractor(
