@@ -48,15 +48,12 @@ public sealed class ResupplyCommand : ISimulationCommand
 
         int accepted = 0;
         int rejected = 0;
-        var planner =
-            new BattlefieldResupplyPlanner();
-
         for (int index = 0; index < _targets.Length; index++)
         {
             EntityId entity = _targets[index];
 
             if (!IsEligibleTarget(context, entity) ||
-                !planner.TryIssueNearestProviderOrder(
+                !BattlefieldResupplyPlanner.TryIssueNearestProviderOrder(
                     context,
                     entity,
                     Issuer,
