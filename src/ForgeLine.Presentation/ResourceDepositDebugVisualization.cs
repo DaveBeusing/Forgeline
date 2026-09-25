@@ -38,8 +38,7 @@ public static class ResourceDepositDebugVisualization
             }
 
             string label = FormattableString.Invariant(
-                $"{deposit.ResourceKey} {deposit.RemainingQuantity:F1}/" +
-                $"{deposit.TotalQuantity:F1} r={deposit.Richness:F2}");
+                $"{deposit.ResourceKey} {deposit.RemainingQuantity:F1}/{deposit.TotalQuantity:F1} r={deposit.Richness:F2}");
 
             debugDraw.Label(
                 deposit.Bounds.Center,
