@@ -39,6 +39,7 @@ public static class BuildingIds
     public static readonly BuildingId Refinery = new(6);
     public static readonly BuildingId ElectronicsPlant = new(7);
     public static readonly BuildingId LogisticsHub = new(8);
+    public static readonly BuildingId AmmunitionPlant = new(9);
 }
 
 public enum BuildingOrientation : byte
@@ -518,6 +519,28 @@ public static class InitialBuildingDefinitions
                     PowerDemand = 35.0,
                     ProductionCapabilities =
                         ProductionCapability.ElectronicsProcessing,
+                    ProductionInputCapacity = 1_000.0,
+                    ProductionOutputCapacity = 1_000.0
+                },
+                new BuildingDefinition
+                {
+                    Id = BuildingIds.AmmunitionPlant,
+                    Key = "building.ammunition_plant",
+                    DisplayName = "Ammunition Plant",
+                    Footprint = new BuildingFootprint(18.0f, 18.0f, 10.0f),
+                    ConstructionTicks = 130,
+                    Costs =
+                    [
+                        new BuildingResourceCost(ResourceIds.FerrousOre, 190.0),
+                        new BuildingResourceCost(ResourceIds.Silicates, 80.0),
+                        new BuildingResourceCost(ResourceIds.Volatiles, 30.0)
+                    ],
+                    Capabilities =
+                        BuildingCapability.Processing |
+                        BuildingCapability.PowerConsumption,
+                    PowerDemand = 35.0,
+                    ProductionCapabilities =
+                        ProductionCapability.AmmunitionProcessing,
                     ProductionInputCapacity = 1_000.0,
                     ProductionOutputCapacity = 1_000.0
                 }

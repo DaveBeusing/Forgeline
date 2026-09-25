@@ -34,6 +34,8 @@ public static class RecipeIds
     public static readonly RecipeId Fuel = new(2);
 
     public static readonly RecipeId Electronics = new(3);
+
+    public static readonly RecipeId Ammunition = new(4);
 }
 
 [Flags]
@@ -42,7 +44,8 @@ public enum ProductionCapability : uint
     None = 0,
     SteelProcessing = 1 << 0,
     FuelProcessing = 1 << 1,
-    ElectronicsProcessing = 1 << 2
+    ElectronicsProcessing = 1 << 2,
+    AmmunitionProcessing = 1 << 3
 }
 
 public readonly record struct ProductionIngredient
@@ -109,7 +112,8 @@ public sealed record ProductionRecipeDefinition
         const uint supportedCapabilities =
             (uint)(ProductionCapability.SteelProcessing |
                    ProductionCapability.FuelProcessing |
-                   ProductionCapability.ElectronicsProcessing);
+                   ProductionCapability.ElectronicsProcessing |
+                   ProductionCapability.AmmunitionProcessing);
 
         if (capability == 0 ||
             (capability & supportedCapabilities) != capability ||
@@ -264,6 +268,24 @@ public static class InitialProductionRecipes
                     ],
                     DurationTicks = 50,
                     RequiredCapability = ProductionCapability.ElectronicsProcessing,
+                    MinimumPowerFraction = 1.0
+                },
+                new ProductionRecipeDefinition
+                {
+                    Id = RecipeIds.Ammunition,
+                    Key = "recipe.ammunition",
+                    DisplayName = "Ammunition",
+                    Inputs =
+                    [
+                        new ProductionIngredient(ResourceIds.Steel, 6.0),
+                        new ProductionIngredient(ResourceIds.Electronics, 2.0)
+                    ],
+                    Outputs =
+                    [
+                        new ProductionIngredient(ResourceIds.Ammunition, 10.0)
+                    ],
+                    DurationTicks = 40,
+                    RequiredCapability = ProductionCapability.AmmunitionProcessing,
                     MinimumPowerFraction = 1.0
                 }
             ]);

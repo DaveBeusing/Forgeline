@@ -52,6 +52,13 @@ public static class InitialResourceDefinitions
                     Key = "resource.electronics",
                     DisplayName = "Electronics",
                     DefaultExtractionRatePerSecond = 0.0
+                },
+                new ResourceDefinition
+                {
+                    Id = ResourceIds.Ammunition,
+                    Key = "resource.ammunition",
+                    DisplayName = "Ammunition",
+                    DefaultExtractionRatePerSecond = 0.0
                 }
             ]);
     }
