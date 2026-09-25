@@ -409,76 +409,26 @@ public sealed class AutomatedDistributionSystem
             return;
         }
 
-        SourceSelection sourceSelection =
-            SelectSource(
+        DispatchSelection selection =
+            SelectDispatchCandidate(
                 context.Entities,
                 request,
-                destination);
-
-        if (!sourceSelection.Succeeded)
-        {
-            DelayRequest(
-                request,
-                sourceSelection.HadSurplusWithoutRoute
-                    ? LogisticsTransportRequestFailureReason.NoRoute
-                    : LogisticsTransportRequestFailureReason.NoSourceSurplus,
-                context.Tick);
-            return;
-        }
-
-        if (!TrySelectAvailableTruck(
-                context.Entities,
                 destination,
-                sourceSelection.Node,
-                out EntityId truckEntity,
-                out CargoTransport truck))
+                destinationCapacity);
+
+        if (!selection.Succeeded)
         {
             DelayRequest(
                 request,
-                LogisticsTransportRequestFailureReason.NoTruckAvailable,
-                context.Tick);
-            return;
-        }
-
-        double quantity = Math.Min(
-            request.RequestedQuantity,
-            Math.Min(
-                sourceSelection.SurplusQuantity,
-                Math.Min(
-                    truck.Capacity,
-                    destinationCapacity)));
-
-        if (quantity <= QuantityEpsilon)
-        {
-            DelayRequest(
-                request,
-                LogisticsTransportRequestFailureReason.DestinationFull,
-                context.Tick);
-            return;
-        }
-
-        LogisticsRouteSearchResult capacityRoute =
-            _network.FindCapacityAwareRoute(
-                sourceSelection.Node.Id,
-                request.Destination,
-                _routePolicy,
-                _capacityTracker,
-                quantity);
-
-        if (!capacityRoute.Succeeded ||
-            capacityRoute.Route is null)
-        {
-            DelayRequest(
-                request,
-                LogisticsTransportRequestFailureReason.CapacitySaturated,
+                selection.FailureReason,
                 context.Tick);
             return;
         }
 
         if (!_capacityTracker.TryReserveRoute(
                 _network,
-                capacityRoute.Route,
-                quantity,
+                selection.Route!,
+                selection.Quantity,
                 context.Tick,
                 out LogisticsThroughputReservationId throughputReservation,
                 out _))
@@ -495,9 +445,9 @@ public sealed class AutomatedDistributionSystem
 
         InventoryOperationResult reservationResult =
             _inventories.Reserve(
-                sourceSelection.Inventory,
+                selection.SourceInventory,
                 request.ResourceId,
-                quantity);
+                selection.Quantity);
 
         if (!reservationResult.Succeeded)
         {
@@ -510,34 +460,34 @@ public sealed class AutomatedDistributionSystem
 
         var reservation = new CargoTransportReservation(
             request.Id,
-            sourceSelection.Inventory,
+            selection.SourceInventory,
             request.ResourceId,
-            quantity);
+            selection.Quantity);
 
         context.Entities.AddComponent(
-            truckEntity,
+            selection.TruckEntity,
             reservation);
 
         var order = new CargoTransportOrder(
-            sourceSelection.Node.Id,
+            selection.SourceNode.Id,
             request.Destination,
             request.ResourceId,
-            quantity,
+            selection.Quantity,
             context.Tick,
             CargoPartialLoadPolicy.RequireRequestedQuantity);
 
         if (!_cargoTransportSystem.TryAssignOrder(
                 context.Entities,
-                truckEntity,
+                selection.TruckEntity,
                 order,
                 context.Tick))
         {
             context.Entities.RemoveComponent<CargoTransportReservation>(
-                truckEntity);
+                selection.TruckEntity);
             _ = _inventories.ReleaseReservation(
-                sourceSelection.Inventory,
+                selection.SourceInventory,
                 request.ResourceId,
-                quantity);
+                selection.Quantity);
 
             DelayRequest(
                 request,
@@ -546,24 +496,28 @@ public sealed class AutomatedDistributionSystem
             return;
         }
 
-        request.Origin = sourceSelection.Node.Id;
-        request.AssignedTruck = truckEntity;
-        request.ReservedSourceInventory = sourceSelection.Inventory;
-        request.ReservedQuantity = quantity;
+        request.Origin = selection.SourceNode.Id;
+        request.AssignedTruck = selection.TruckEntity;
+        request.ReservedSourceInventory = selection.SourceInventory;
+        request.ReservedQuantity = selection.Quantity;
         request.AttemptCount++;
         request.State = LogisticsTransportRequestState.Assigned;
         request.FailureReason = LogisticsTransportRequestFailureReason.None;
         request.StateChangedAtTick = context.Tick;
     }
 
-    private SourceSelection SelectSource(
+    private DispatchSelection SelectDispatchCandidate(
         EntityRegistry entities,
         RequestState request,
-        in LogisticsNode destination)
+        in LogisticsNode destination,
+        double destinationCapacity)
     {
         IReadOnlyList<LogisticsNode> nodes = _network.GetNodes();
-        SourceSelection best = default;
-        bool hadSurplusWithoutRoute = false;
+        DispatchSelection best = default;
+        bool hadSurplus = false;
+        bool hadStructuralRoute = false;
+        bool hadAvailableTruck = false;
+        bool hadCapacityBlockedRoute = false;
 
         for (int index = 0; index < nodes.Count; index++)
         {
@@ -598,29 +552,75 @@ public sealed class AutomatedDistributionSystem
                 continue;
             }
 
-            LogisticsRouteSearchResult route =
+            hadSurplus = true;
+
+            LogisticsRouteSearchResult structuralRoute =
                 _network.FindRoute(
                     node.Id,
                     destination.Id,
                     _routePolicy);
 
-            if (!route.Succeeded || route.Route is null)
+            if (!structuralRoute.Succeeded ||
+                structuralRoute.Route is null)
             {
-                hadSurplusWithoutRoute = true;
+                continue;
+            }
+
+            hadStructuralRoute = true;
+
+            if (!TrySelectAvailableTruck(
+                    entities,
+                    destination,
+                    node,
+                    out EntityId truckEntity,
+                    out CargoTransport truck))
+            {
+                continue;
+            }
+
+            hadAvailableTruck = true;
+
+            double quantity = Math.Min(
+                request.RequestedQuantity,
+                Math.Min(
+                    surplus,
+                    Math.Min(
+                        truck.Capacity,
+                        destinationCapacity)));
+
+            if (quantity <= QuantityEpsilon)
+            {
+                continue;
+            }
+
+            LogisticsRouteSearchResult capacityRoute =
+                _network.FindCapacityAwareRoute(
+                    node.Id,
+                    destination.Id,
+                    _routePolicy,
+                    _capacityTracker,
+                    quantity);
+
+            if (!capacityRoute.Succeeded ||
+                capacityRoute.Route is null)
+            {
+                hadCapacityBlockedRoute = true;
                 continue;
             }
 
             if (!best.Succeeded ||
-                route.Route.TotalCost < best.RouteCost ||
-                (route.Route.TotalCost == best.RouteCost &&
-                 node.Id < best.Node.Id))
+                capacityRoute.Route.TotalCost < best.Route!.TotalCost ||
+                (capacityRoute.Route.TotalCost == best.Route.TotalCost &&
+                 node.Id < best.SourceNode.Id))
             {
-                best = new SourceSelection(
-                    node,
-                    sourceInventory,
-                    surplus,
-                    route.Route.TotalCost,
-                    hadSurplusWithoutRoute);
+                best =
+                    new DispatchSelection(
+                        node,
+                        sourceInventory,
+                        truckEntity,
+                        quantity,
+                        capacityRoute.Route,
+                        LogisticsTransportRequestFailureReason.None);
             }
         }
 
@@ -629,7 +629,18 @@ public sealed class AutomatedDistributionSystem
             return best;
         }
 
-        return SourceSelection.Failed(hadSurplusWithoutRoute);
+        LogisticsTransportRequestFailureReason failureReason =
+            !hadSurplus
+                ? LogisticsTransportRequestFailureReason.NoSourceSurplus
+                : !hadStructuralRoute
+                    ? LogisticsTransportRequestFailureReason.NoRoute
+                    : !hadAvailableTruck
+                        ? LogisticsTransportRequestFailureReason.NoTruckAvailable
+                        : hadCapacityBlockedRoute
+                            ? LogisticsTransportRequestFailureReason.CapacitySaturated
+                            : LogisticsTransportRequestFailureReason.AssignmentFailed;
+
+        return DispatchSelection.Failed(failureReason);
     }
 
     private bool TrySelectAvailableTruck(
@@ -1366,23 +1377,29 @@ public sealed class AutomatedDistributionSystem
         EntityId PolicyEntity,
         LogisticsStockPolicy Policy);
 
-    private readonly record struct SourceSelection(
-        LogisticsNode Node,
-        InventoryId Inventory,
-        double SurplusQuantity,
-        double RouteCost,
-        bool HadSurplusWithoutRoute)
+    private readonly record struct DispatchSelection(
+        LogisticsNode SourceNode,
+        InventoryId SourceInventory,
+        EntityId TruckEntity,
+        double Quantity,
+        LogisticsRoute? Route,
+        LogisticsTransportRequestFailureReason FailureReason)
     {
         public bool Succeeded =>
-            Node.Id.IsSpecified && Inventory.IsSpecified;
+            SourceNode.Id.IsSpecified &&
+            SourceInventory.IsSpecified &&
+            TruckEntity.IsValid &&
+            Route is not null &&
+            FailureReason == LogisticsTransportRequestFailureReason.None;
 
-        public static SourceSelection Failed(
-            bool hadSurplusWithoutRoute) =>
+        public static DispatchSelection Failed(
+            LogisticsTransportRequestFailureReason failureReason) =>
             new(
                 default,
                 InventoryId.None,
+                EntityId.Invalid,
                 0.0,
-                double.PositiveInfinity,
-                hadSurplusWithoutRoute);
+                null,
+                failureReason);
     }
 }
