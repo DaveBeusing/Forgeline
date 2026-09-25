@@ -159,7 +159,7 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
             definition.Footprint.Depth);
         var transform = new WorldTransform(
             placement.Bounds.Center,
-            definition.Footprint.GetRotation(request.Orientation),
+            BuildingFootprint.GetRotation(request.Orientation),
             visualScale);
         Vector3 halfExtents =
             (placement.Bounds.Maximum - placement.Bounds.Minimum) * 0.5f;
