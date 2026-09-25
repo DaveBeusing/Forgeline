@@ -11,6 +11,18 @@ public readonly record struct WeaponId(uint Value) : IComparable<WeaponId>
 
     public int CompareTo(WeaponId other) => Value.CompareTo(other.Value);
 
+    public static bool operator <(WeaponId left, WeaponId right) =>
+        left.Value < right.Value;
+
+    public static bool operator <=(WeaponId left, WeaponId right) =>
+        left.Value <= right.Value;
+
+    public static bool operator >(WeaponId left, WeaponId right) =>
+        left.Value > right.Value;
+
+    public static bool operator >=(WeaponId left, WeaponId right) =>
+        left.Value >= right.Value;
+
     public override string ToString() =>
         Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
 }
