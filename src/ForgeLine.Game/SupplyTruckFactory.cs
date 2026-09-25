@@ -51,6 +51,50 @@ public static class SupplyTruckFactory
         CargoTransport transport =
             entities.GetComponent<CargoTransport>(entity);
 
+        const double operationalFuelCapacity = 80.0;
+        InventoryId operationalFuel =
+            inventories.CreateInventory(
+                new InventorySpecification(
+                    operationalFuelCapacity,
+                    [ResourceIds.Fuel],
+                    new Dictionary<ResourceId, double>
+                    {
+                        [ResourceIds.Fuel] = operationalFuelCapacity
+                    }));
+        InventoryOperationResult fuelInitialization =
+            inventories.Add(
+                operationalFuel,
+                ResourceIds.Fuel,
+                operationalFuelCapacity);
+        if (!fuelInitialization.Succeeded)
+        {
+            throw new InvalidOperationException(
+                $"Failed to initialize supply-truck fuel: {fuelInitialization.Failure}.");
+        }
+
+        entities.AddComponent(
+            entity,
+            new UnitFuelState(
+                operationalFuel,
+                operationalFuelCapacity,
+                consumptionPerMeter: 0.08));
+        entities.AddComponent(
+            entity,
+            new UnitSupplyPriority(
+                BattlefieldSupplyPriority.High));
+        entities.AddComponent(
+            entity,
+            new UnitSupplyState(
+                FuelFraction: 1.0,
+                AmmunitionFraction: 1.0,
+                BattlefieldSupplyStatus.Supplied,
+                Simulation.SimulationTick.Zero));
+        entities.AddComponent(
+            entity,
+            new SupplyMovementConstraint(
+                maximumSpeedScale: 1.0f,
+                canMove: true));
+
         entities.AddComponent(
             entity,
             new SupplyTruck(
