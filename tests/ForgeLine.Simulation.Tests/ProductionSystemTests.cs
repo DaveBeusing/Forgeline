@@ -177,6 +177,46 @@ public sealed class ProductionSystemTests
     }
 
     [Fact]
+    public void MissingInputRecoversWhenResourceBecomesAvailable()
+    {
+        ProductionScenario scenario = CreateScenario(
+            ProductionCapability.SteelProcessing);
+
+        Queue(
+            scenario,
+            RecipeIds.Steel,
+            ProductionRequestMode.OneShot);
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.Equal(
+            ProductionStatus.NoInput,
+            scenario.Simulation.Entities
+                .GetComponent<ProductionFacility>(scenario.Facility)
+                .Status);
+
+        AddInput(
+            scenario,
+            ResourceIds.FerrousOre,
+            quantity: 10.0);
+
+        scenario.Simulation.AdvanceOneTick();
+
+        ProductionFacility recovered =
+            scenario.Simulation.Entities.GetComponent<ProductionFacility>(
+                scenario.Facility);
+
+        Assert.Equal(ProductionStatus.Running, recovered.Status);
+        Assert.Equal(ProductionBlockReason.None, recovered.BlockReason);
+        Assert.Equal(1U, recovered.ProgressTicks);
+        Assert.Equal(
+            10.0,
+            scenario.Inventories.GetReservedQuantity(
+                scenario.InputInventory,
+                ResourceIds.FerrousOre));
+    }
+
+    [Fact]
     public void MissingPowerReportsNoPowerBeforeInputReservation()
     {
         ProductionScenario scenario = CreateScenario(
@@ -206,6 +246,65 @@ public sealed class ProductionSystemTests
             scenario.Inventories.GetReservedQuantity(
                 scenario.InputInventory,
                 ResourceIds.FerrousOre));
+    }
+
+    [Fact]
+    public void PowerLossFreezesActiveCycleAndRecoveryResumesIt()
+    {
+        ProductionScenario scenario = CreateScenario(
+            ProductionCapability.SteelProcessing);
+        AddInput(
+            scenario,
+            ResourceIds.FerrousOre,
+            quantity: 20.0);
+
+        Queue(
+            scenario,
+            RecipeIds.Steel,
+            ProductionRequestMode.OneShot);
+
+        scenario.Simulation.AdvanceOneTick();
+
+        ProductionFacility running =
+            scenario.Simulation.Entities.GetComponent<ProductionFacility>(
+                scenario.Facility);
+        Assert.Equal(1U, running.ProgressTicks);
+        Assert.True(running.InputsReserved);
+
+        PowerGenerator generator =
+            scenario.Simulation.Entities.GetComponent<PowerGenerator>(
+                scenario.Generator);
+        scenario.Simulation.Entities.SetComponent(
+            scenario.Generator,
+            generator.WithEnabled(false));
+
+        scenario.Simulation.AdvanceOneTick();
+
+        ProductionFacility blocked =
+            scenario.Simulation.Entities.GetComponent<ProductionFacility>(
+                scenario.Facility);
+
+        Assert.Equal(ProductionStatus.NoPower, blocked.Status);
+        Assert.Equal(ProductionBlockReason.NoPower, blocked.BlockReason);
+        Assert.Equal(1U, blocked.ProgressTicks);
+        Assert.True(blocked.InputsReserved);
+
+        generator =
+            scenario.Simulation.Entities.GetComponent<PowerGenerator>(
+                scenario.Generator);
+        scenario.Simulation.Entities.SetComponent(
+            scenario.Generator,
+            generator.WithEnabled(true));
+
+        scenario.Simulation.AdvanceOneTick();
+
+        ProductionFacility recovered =
+            scenario.Simulation.Entities.GetComponent<ProductionFacility>(
+                scenario.Facility);
+
+        Assert.Equal(ProductionStatus.Running, recovered.Status);
+        Assert.Equal(ProductionBlockReason.None, recovered.BlockReason);
+        Assert.Equal(2U, recovered.ProgressTicks);
     }
 
     [Fact]
@@ -740,9 +839,10 @@ public sealed class ProductionSystemTests
         simulation.RegisterSystem(power);
         simulation.RegisterSystem(production);
 
+        EntityId generator = EntityId.Invalid;
         if (addGenerator)
         {
-            EntityId generator = simulation.Entities.CreateEntity();
+            generator = simulation.Entities.CreateEntity();
             simulation.Entities.AddComponent(
                 generator,
                 new PowerNetworkMembership(ProductionNetwork));
@@ -781,6 +881,7 @@ public sealed class ProductionSystemTests
             recipes,
             production,
             facility,
+            generator,
             inputInventory,
             outputInventory);
     }
@@ -825,6 +926,7 @@ public sealed class ProductionSystemTests
         ProductionRecipeCatalog Recipes,
         ProductionSystem System,
         EntityId Facility,
+        EntityId Generator,
         InventoryId InputInventory,
         InventoryId OutputInventory);
 
