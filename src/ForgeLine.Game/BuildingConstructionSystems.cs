@@ -1,3 +1,4 @@
+using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Ecs;
