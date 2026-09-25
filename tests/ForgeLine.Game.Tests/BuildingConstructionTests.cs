@@ -406,6 +406,55 @@ public sealed class BuildingConstructionTests
     }
 
     [Fact]
+    public void CompletedCommandCoreInventoryCanFundOwnedConstruction()
+    {
+        TestWorld test = CreateTestWorld();
+        EntityId source =
+            AddFundedInventory(test, includeAllCosts: true);
+
+        SubmitBuild(
+            test,
+            source,
+            BuildingIds.CommandCore,
+            new Vector3(48.0f, 0.0f, 48.0f));
+        test.Simulation.AdvanceOneTick();
+
+        EntityId commandCore = SingleSite(test);
+        BuildingDefinition commandDefinition =
+            test.Definitions[BuildingIds.CommandCore];
+        test.Simulation.RunTicks(
+            commandDefinition.ConstructionTicks - 1,
+            TestContext.Current.CancellationToken);
+
+        InventoryStorage commandInventory =
+            test.Simulation.Entities.GetComponent<InventoryStorage>(
+                commandCore);
+        BuildingDefinition powerPlant =
+            test.Definitions[BuildingIds.PowerPlant];
+
+        foreach (BuildingResourceCost cost in powerPlant.Costs)
+        {
+            Assert.True(
+                test.Inventories.Add(
+                    commandInventory.InventoryId,
+                    cost.ResourceId,
+                    cost.Quantity).Succeeded);
+        }
+
+        SubmitBuild(
+            test,
+            commandCore,
+            BuildingIds.PowerPlant,
+            new Vector3(96.0f, 0.0f, 48.0f));
+        test.Simulation.AdvanceOneTick();
+
+        Assert.Equal(
+            BuildCommandRejectionReason.None,
+            test.Commands.Metrics.LastRejection);
+        Assert.Equal(1, CountSites(test));
+    }
+
+    [Fact]
     public void ExtractorCompletionBindsDepositStorageAndPowerContracts()
     {
         TestWorld test = CreateTestWorld();
