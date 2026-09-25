@@ -66,6 +66,26 @@ public sealed class TacticalOrderPreparationSystem : ISimulationSystem
                 continue;
             }
 
+            if (context.Entities.HasComponent<ResupplyOrder>(entity))
+            {
+                ClearWeaponTarget(
+                    context,
+                    entity);
+                SetMovementAllowed(
+                    context,
+                    entity,
+                    allowed: true);
+                SetTacticalState(
+                    context,
+                    entity,
+                    CombatOrderStatus.Resupplying,
+                    EntityId.Invalid,
+                    default,
+                    hasTargetPosition: false,
+                    movementPaused: false);
+                continue;
+            }
+
             switch (order.Kind)
             {
                 case CombatOrderKind.Attack:
@@ -728,6 +748,10 @@ public sealed class TacticalCombatSystem : ISimulationSystem
             context,
             entity,
             allowed: true);
+        EnsureMovementTowardDestination(
+            context,
+            entity,
+            order);
 
         bool arrived =
             HorizontalDistanceSquared(
@@ -796,6 +820,10 @@ public sealed class TacticalCombatSystem : ISimulationSystem
             context,
             entity,
             allowed: true);
+        EnsureMovementTowardDestination(
+            context,
+            entity,
+            order);
 
         bool arrived =
             HorizontalDistanceSquared(
@@ -1312,6 +1340,32 @@ public sealed class TacticalCombatSystem : ISimulationSystem
         context.Entities.HasComponent<GroundMovement>(entity) &&
         context.Entities.HasComponent<GroundMovementState>(entity) &&
         context.Entities.HasComponent<NavigationAgent>(entity);
+
+    private static void EnsureMovementTowardDestination(
+        SimulationContext context,
+        EntityId entity,
+        in CombatOrderState order)
+    {
+        if (!order.HasDestination ||
+            context.Entities.HasComponent<MovementOrder>(entity) ||
+            context.Entities.HasComponent<NavigationPendingPath>(entity) ||
+            context.Entities.HasComponent<NavigationRouteState>(entity) ||
+            context.Entities.HasComponent<MovementGroupMember>(entity))
+        {
+            return;
+        }
+
+        var movement =
+            new MovementOrder(
+                order.Issuer,
+                order.Destination,
+                order.SubmittedAtTick,
+                context.Tick);
+
+        context.Entities.AddComponent(
+            entity,
+            movement);
+    }
 
     private static void IssueChaseMovement(
         SimulationContext context,
