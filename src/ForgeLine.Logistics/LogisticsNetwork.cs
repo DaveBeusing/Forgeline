@@ -262,6 +262,12 @@ public sealed class LogisticsNetwork
         return edges;
     }
 
+    public LogisticsNetworkVersion InvalidateRoutes()
+    {
+        Invalidate();
+        return Version;
+    }
+
     public bool IsReachable(
         LogisticsNodeId source,
         LogisticsNodeId destination) =>
