@@ -20,7 +20,7 @@ Relevant logistics nodes also have an effective throughput budget based on their
 | Logistics hub | 600 units/s |
 | Supply depot | 300 units/s |
 
-These values are initial balancing parameters, not separate inventories.
+These values are initial balancing parameters, not separate inventories. Each logistics node stores its effective throughput as graph metadata, so specific infrastructure definitions can override the role default without changing capacity-accounting code.
 
 The capacity tracker converts throughput into a bounded simulation window. The default is 20 simulation ticks at 20 Hz, or one second. A shipment admitted during that window reserves its quantity against every traversed edge and relevant node until the window expires or the reservation becomes invalid.
 
