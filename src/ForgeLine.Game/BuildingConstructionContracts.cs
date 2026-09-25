@@ -213,15 +213,10 @@ public readonly record struct ConstructionSite
             throw new ArgumentOutOfRangeException(nameof(sourceInventory));
         }
 
-        if (requiredTicks == 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(requiredTicks));
-        }
-
-        if (progressTicks > requiredTicks)
-        {
-            throw new ArgumentOutOfRangeException(nameof(progressTicks));
-        }
+        ArgumentOutOfRangeException.ThrowIfZero(requiredTicks);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(
+            progressTicks,
+            requiredTicks);
 
         BuildingId = buildingId;
         Owner = owner;
