@@ -50,7 +50,11 @@ internal sealed class ClientApplication
         using IWindow window = _platform.CreateWindow(configuration);
         using IGraphicsDevice graphics = GraphicsDeviceFactory.CreateForWindow(window);
 
-        TerrainWorld terrainWorld = DevelopmentTerrainFactory.CreateRepresentativeWorld();
+        PrototypeBattlefieldDefinition prototypeBattlefield =
+            PrototypeBattlefieldDefinition.Create();
+        TerrainWorld terrainWorld =
+            PrototypeBattlefieldTerrainFactory.Create(
+                prototypeBattlefield);
         using var terrainRenderer = new TerrainRenderer(graphics, terrainWorld);
         using var instanceRenderer = new SimpleInstanceRenderer(graphics);
         using var debugDrawRenderer = new DebugDrawRenderer(graphics);
@@ -103,6 +107,12 @@ internal sealed class ClientApplication
         var resourceExtraction = new ResourceExtractionSystem(
             inventories: inventories);
         var logisticsNetwork = new LogisticsNetwork();
+        PrototypeBattlefieldRuntime prototypeRuntime =
+            PrototypeBattlefieldRuntime.Load(
+                simulation.Entities,
+                prototypeBattlefield,
+                terrainWorld,
+                logisticsNetwork);
         var logisticsDisruption =
             new LogisticsDisruptionSystem(
                 logisticsNetwork);
@@ -264,34 +274,54 @@ internal sealed class ClientApplication
             CreateDevelopmentConstructionInventory(
                 simulation,
                 inventories);
-        CreateDevelopmentResourceDeposit(
-            simulation,
-            terrainWorld);
+        AxisAlignedBounds[] developmentObstacles =
+            CollectStaticNavigationObstacles(simulation);
+        var navigationObstacles =
+            new List<AxisAlignedBounds>(
+                prototypeBattlefield.StaticNavigationObstacles.Count +
+                developmentObstacles.Length);
+        navigationObstacles.AddRange(
+            prototypeBattlefield.StaticNavigationObstacles);
+        navigationObstacles.AddRange(
+            developmentObstacles);
 
-        NavigationWorld navigationWorld = NavigationWorld.Build(
-            terrainWorld,
-            CollectStaticNavigationObstacles(simulation),
+        var navigationGridSettings =
             new NavigationGridSettings
             {
-                CellSizeMeters = NavigationGridSettings.DefaultCellSizeMeters,
+                CellSizeMeters = 16.0f,
                 StaticObstacleClearanceMeters = 0.5f
-            },
+            };
+        var navigationSectorSettings =
             new NavigationSectorSettings
             {
                 SectorSizeCells = 8
-            });
+            };
+        NavigationWorld navigationWorld = NavigationWorld.Build(
+            terrainWorld,
+            navigationObstacles,
+            navigationGridSettings,
+            navigationSectorSettings);
         var pathfinder =
             new HierarchicalPathfinder(navigationWorld);
         var formationMovementSystem =
             new FormationMovementSystem(pathfinder);
         var navigationSystem =
             new HierarchicalNavigationSystem(pathfinder);
+        var strategicInfrastructure =
+            new StrategicInfrastructureSystem(
+                logisticsNetwork,
+                terrainWorld,
+                navigationSystem,
+                navigationObstacles,
+                navigationGridSettings,
+                navigationSectorSettings);
 
         simulation.RegisterSystem(buildingCommands);
         simulation.RegisterSystem(tacticalOrderPreparation);
         simulation.RegisterSystem(tacticalTestOpponent);
         simulation.RegisterSystem(automaticResupply);
         simulation.RegisterSystem(logisticsDisruption);
+        simulation.RegisterSystem(strategicInfrastructure);
         simulation.RegisterSystem(formationMovementSystem);
         simulation.RegisterSystem(navigationSystem);
         simulation.RegisterSystem(groundMovementSystem);
@@ -350,9 +380,13 @@ internal sealed class ClientApplication
         var renderWorld = new RenderWorld();
         _ = renderWorld.Update(snapshotBuffer);
 
+        BattlefieldStartPosition localStart =
+            prototypeBattlefield.Starts.Single(
+                start =>
+                    start.Player == LocalPlayer);
         float targetHeight = terrainWorld.TrySampleHeight(
-            0.0f,
-            0.0f,
+            localStart.Position.X,
+            localStart.Position.Z,
             out float sampledHeight)
             ? sampledHeight
             : 0.0f;
@@ -362,7 +396,10 @@ internal sealed class ClientApplication
         var camera = new RtsCamera(
             new RtsCameraSettings
             {
-                InitialTarget = new Vector3(0.0f, targetHeight, 0.0f),
+                InitialTarget = new Vector3(
+                    localStart.Position.X,
+                    targetHeight,
+                    localStart.Position.Z),
                 InitialDistance = 420.0f,
                 MinimumDistance = 20.0f,
                 MaximumDistance = 1_200.0f,
@@ -652,6 +689,16 @@ internal sealed class ClientApplication
                 automaticResupply.Metrics,
                 battlefieldIntelligence.DebugSensors,
                 battlefieldIntelligence.Metrics);
+
+            if (worldDebugEnabled)
+            {
+                PrototypeBattlefieldDebugVisualization.Draw(
+                    debugDraw,
+                    prototypeBattlefield,
+                    CaptureCrossingStates(
+                        simulation,
+                        prototypeRuntime));
+            }
 
             terrainRenderer.DebugChunksEnabled = worldDebugEnabled;
 
@@ -1109,18 +1156,25 @@ internal sealed class ClientApplication
         float z,
         float heightOffset)
     {
+        float worldX =
+            terrainWorld.WorldBounds.Center.X +
+            x;
+        float worldZ =
+            terrainWorld.WorldBounds.Minimum.Z +
+            920.0f +
+            z;
         float height =
             terrainWorld.TrySampleHeight(
-                x,
-                z,
+                worldX,
+                worldZ,
                 out float sampled)
                 ? sampled
                 : 0.0f;
 
         return new Vector3(
-            x,
+            worldX,
             height + heightOffset,
-            z);
+            worldZ);
     }
 
     private readonly record struct DevelopmentTacticalScenario(
@@ -1218,8 +1272,15 @@ internal sealed class ClientApplication
         {
             int xIndex = index % side;
             int zIndex = index / side;
-            float x = xIndex * spacing - halfSpan;
-            float z = zIndex * spacing - halfSpan;
+            float x =
+                terrainWorld.WorldBounds.Minimum.X +
+                620.0f +
+                xIndex * spacing -
+                halfSpan;
+            float z =
+                terrainWorld.WorldBounds.Center.Z +
+                zIndex * spacing -
+                halfSpan;
             float terrainHeight = terrainWorld.TrySampleHeight(
                 x,
                 z,
@@ -1627,6 +1688,31 @@ internal sealed class ClientApplication
                 hoveredColor,
                 $"HOVER E{hovered.Index}");
         }
+    }
+
+    private static IReadOnlyDictionary<
+        string,
+        StrategicInfrastructureOperationalState> CaptureCrossingStates(
+        SimulationCoordinator simulation,
+        PrototypeBattlefieldRuntime runtime)
+    {
+        var states =
+            new Dictionary<
+                string,
+                StrategicInfrastructureOperationalState>(
+                    StringComparer.Ordinal);
+
+        foreach (var pair in runtime.CrossingEntities)
+        {
+            if (simulation.Entities.TryGetComponent(
+                    pair.Value,
+                    out StrategicInfrastructureState state))
+            {
+                states[pair.Key] = state.State;
+            }
+        }
+
+        return states;
     }
 
     private static void DrawInstanceBounds(
