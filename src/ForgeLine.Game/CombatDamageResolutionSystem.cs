@@ -150,7 +150,7 @@ public sealed class CombatDamageResolutionSystem : ISimulationSystem
         ArmorDamageResult result =
             ArmorDamageResolver.Resolve(
                 request.Damage,
-                weapon.Effectiveness,
+                effectiveness,
                 armor,
                 zone);
 
