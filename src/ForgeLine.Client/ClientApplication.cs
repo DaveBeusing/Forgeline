@@ -401,6 +401,10 @@ internal sealed class ClientApplication
                 worldDebugEnabled
                     ? automatedDistribution.LastDebugSnapshot
                     : null;
+            BattlefieldSupplyDebugSnapshot? battlefieldSupplyDebugSnapshot =
+                worldDebugEnabled
+                    ? battlefieldSupply.LastDebugSnapshot
+                    : null;
 
             BuildWorldDebugVisualization(
                 debugDraw,
@@ -419,7 +423,8 @@ internal sealed class ClientApplication
                 resourceDebugSnapshot,
                 logisticsDebugSnapshot,
                 cargoTransportDebugSnapshot,
-                distributionDebugSnapshot);
+                distributionDebugSnapshot,
+                battlefieldSupplyDebugSnapshot);
 
             terrainRenderer.DebugChunksEnabled = worldDebugEnabled;
 
@@ -715,7 +720,8 @@ internal sealed class ClientApplication
         ResourceExtractionDebugSnapshot? resourceSnapshot,
         LogisticsNetworkDebugSnapshot? logisticsSnapshot,
         CargoTransportDebugSnapshot? cargoTransportSnapshot,
-        AutomatedDistributionDebugSnapshot? distributionSnapshot)
+        AutomatedDistributionDebugSnapshot? distributionSnapshot,
+        BattlefieldSupplyDebugSnapshot? battlefieldSupplySnapshot)
     {
         debugDraw.Clear();
 
@@ -833,6 +839,16 @@ internal sealed class ClientApplication
                     distributionSnapshot,
                     maximumRequests: 128,
                     maximumLabels: 12);
+            }
+
+            if (battlefieldSupplySnapshot is not null)
+            {
+                BattlefieldSupplyDebugVisualization.Draw(
+                    debugDraw,
+                    battlefieldSupplySnapshot,
+                    maximumProviders: 64,
+                    maximumUnits: 128,
+                    maximumLabels: 20);
             }
 
             int debugCount = Math.Min(

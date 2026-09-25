@@ -175,7 +175,7 @@ public sealed class BattlefieldSupplySystemTests
     {
         var simulation = new SimulationCoordinator();
         var inventories = new InventoryStore();
-        var network = new Logistics.LogisticsNetwork();
+        var network = new ForgeLine.Logistics.LogisticsNetwork();
         var cargo = new CargoTransportSystem(
             network,
             inventories);
