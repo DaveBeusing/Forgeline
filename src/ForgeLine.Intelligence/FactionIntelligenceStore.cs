@@ -244,6 +244,34 @@ public sealed class FactionIntelligenceStore
             record.State == IntelligenceState.Identified;
     }
 
+    public bool TryResolveCurrentlyIdentifiedEntity(
+        FactionId faction,
+        IntelligenceContactKey key,
+        out EntityId entity)
+    {
+        RequireFaction(faction);
+
+        if (_factions.TryGetValue(
+                faction,
+                out FactionState? state))
+        {
+            foreach ((EntityId candidate, ContactRecord record) in
+                     state.Contacts)
+            {
+                if (record.ContactKey == key &&
+                    record.LastSeenTick == CurrentTick &&
+                    record.State == IntelligenceState.Identified)
+                {
+                    entity = candidate;
+                    return true;
+                }
+            }
+        }
+
+        entity = EntityId.Invalid;
+        return false;
+    }
+
     public bool TryGetContact(
         FactionId faction,
         IntelligenceContactKey key,
