@@ -195,3 +195,16 @@ Multi-unit movement groups sit above this hierarchy. A group owns one strategic 
 ## Artillery Authority Boundary
 
 Indirect fire extends the combat/intelligence boundary without reintroducing hidden entity access. `FireMissionCommand` creates a request; `ArtilleryFireMissionSystem` resolves that request after the Sensors phase to either a currently visible coordinate or a stored intelligence contact position. The resulting `FireMissionState` contains a fixed coordinate, not a target entity. Ballistic shell travel, terrain impact, area damage, Ammunition consumption, and Health/destruction remain authoritative fixed-tick simulation. Battlefield Supply may replenish the same Ammunition inventory after Combat, allowing a `NoAmmo` mission to resume on a later tick. See `docs/ArtilleryAndIndirectFire.md`.
+
+
+## Tactical Combat and Readiness Boundary
+
+Phase-5 tactical behavior preserves the command/simulation split. Combat commands create `CombatOrderState` intent; `TacticalOrderPreparationSystem` maps that intent into targeting and movement policy; existing navigation, formation, and ground movement execute locomotion; battlefield intelligence and target acquisition run before `TacticalCombatSystem` resolves engagement transitions. Direct target transforms are read only after current faction identification is confirmed.
+
+`TacticalMovementConstraint` pauses combat movement independently from `SupplyMovementConstraint`, keeping tactical stop/engage state separate from physical Fuel limitations.
+
+`AutomaticResupplyDecisionSystem` may issue a real `ResupplyOrder` through the shared `BattlefieldResupplyPlanner`, but only `BattlefieldSupplySystem` transfers Fuel or Ammunition.
+
+`CombatReadinessSystem` runs in `SnapshotEvents` and derives unit/group summaries from authoritative Health, inventory quantities, mobility, weapon state, supply state, and surviving members. Readiness is observation, not a substitute source of gameplay truth.
+
+See `docs/CombatOrdersAndReadiness.md`.
