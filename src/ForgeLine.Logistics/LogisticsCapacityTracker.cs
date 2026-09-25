@@ -341,6 +341,7 @@ public sealed class LogisticsCapacityTracker :
                 new LogisticsNodeCapacityReadModel(
                     node.Id,
                     node.Kind,
+                    node.WorldPosition,
                     node.Enabled,
                     capacityPerSecond,
                     windowCapacity,
@@ -399,6 +400,16 @@ public sealed class LogisticsCapacityTracker :
                     edge.Id,
                     edge.Source,
                     edge.Destination,
+                    network.TryGetNode(
+                        edge.Source,
+                        out LogisticsNode sourceNode)
+                        ? sourceNode.WorldPosition
+                        : default,
+                    network.TryGetNode(
+                        edge.Destination,
+                        out LogisticsNode destinationNode)
+                        ? destinationNode.WorldPosition
+                        : default,
                     enabled,
                     edge.CapacityPerSecond,
                     windowCapacity,
