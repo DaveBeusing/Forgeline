@@ -290,10 +290,33 @@ public sealed class BattlefieldSupplySystemTests
                 truckState.InventoryId,
                 ResourceIds.Fuel));
         Assert.Equal(
-            70.0,
+            0.0,
             inventories.GetQuantity(
                 depotInventory,
                 ResourceIds.Ammunition));
+        Assert.Equal(
+            70.0,
+            inventories.GetQuantity(
+                truckState.InventoryId,
+                ResourceIds.Ammunition));
+
+        double conservedFuel =
+            inventories.GetQuantity(
+                depotInventory,
+                ResourceIds.Fuel) +
+            inventories.GetQuantity(
+                truckState.InventoryId,
+                ResourceIds.Fuel) +
+            inventories.GetQuantity(
+                criticalInventory,
+                ResourceIds.Fuel) +
+            inventories.GetQuantity(
+                lowInventory,
+                ResourceIds.Fuel);
+        Assert.Equal(
+            70.0,
+            conservedFuel,
+            precision: 6);
     }
 
     [Fact]
