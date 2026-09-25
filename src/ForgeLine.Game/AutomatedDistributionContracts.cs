@@ -181,7 +181,21 @@ public enum LogisticsTransportRequestFailureReason : byte
     ReservationFailed = 5,
     AssignmentFailed = 6,
     TransportFailed = 7,
-    RetryLimitReached = 8
+    RetryLimitReached = 8,
+    CapacitySaturated = 9,
+    DestinationFull = 10
+}
+
+public enum LogisticsBottleneckReason : byte
+{
+    None = 0,
+    InsufficientSourceStock = 1,
+    InsufficientTruckCapacity = 2,
+    SaturatedLinkOrHub = 3,
+    DisconnectedRoute = 4,
+    DestinationFull = 5,
+    DestinationUnavailable = 6,
+    TransportFailure = 7
 }
 
 public readonly record struct CargoTransportReservation
@@ -249,7 +263,9 @@ public readonly record struct LogisticsTransportRequestReadModel(
     EntityId AssignedTruck,
     uint AttemptCount,
     SimulationTick CreatedAtTick,
-    SimulationTick StateChangedAtTick);
+    SimulationTick StateChangedAtTick,
+    LogisticsBottleneckReason BottleneckReason,
+    LogisticsThroughputReservationId CapacityReservationId);
 
 public readonly record struct AutomatedDistributionMetrics(
     int PolicyCount,
@@ -264,7 +280,10 @@ public readonly record struct AutomatedDistributionMetrics(
     long CompletedRequestCount,
     long FailedRequestCount,
     double AverageDeliveryLatencyTicks,
-    ulong MaximumDeliveryLatencyTicks);
+    ulong MaximumDeliveryLatencyTicks,
+    int BacklogRequestCount,
+    double BacklogQuantity,
+    int CapacityBlockedRequestCount);
 
 public sealed class AutomatedDistributionDebugSnapshot
 {
