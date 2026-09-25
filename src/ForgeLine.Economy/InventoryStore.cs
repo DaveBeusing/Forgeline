@@ -135,6 +135,11 @@ public sealed class InventoryStore
                 InventoryFailureReason.InventoryNotFound);
         }
 
+        if (quantity == 0.0)
+        {
+            return InventoryOperationResult.Success;
+        }
+
         if (!state.Specification.Accepts(resourceId))
         {
             _addFailures++;
@@ -217,6 +222,11 @@ public sealed class InventoryStore
                 InventoryFailureReason.InsufficientAvailableQuantity);
         }
 
+        if (sourceInventoryId == destinationInventoryId || quantity == 0.0)
+        {
+            return InventoryOperationResult.Success;
+        }
+
         if (!destination.Specification.Accepts(resourceId))
         {
             _transferFailures++;
@@ -229,11 +239,6 @@ public sealed class InventoryStore
             _transferFailures++;
             return InventoryOperationResult.Failed(
                 InventoryFailureReason.CapacityExceeded);
-        }
-
-        if (sourceInventoryId == destinationInventoryId || quantity == 0.0)
-        {
-            return InventoryOperationResult.Success;
         }
 
         ApplyRemove(source, resourceId, quantity);
