@@ -168,7 +168,8 @@ public readonly record struct LogisticsNode
         Vector3 worldPosition,
         LogisticsNodeKind kind,
         LogisticsNodeCapabilities capabilities,
-        bool enabled = true)
+        bool enabled = true,
+        double? throughputCapacityPerSecond = null)
     {
         if (!id.IsSpecified)
         {
@@ -204,12 +205,21 @@ public readonly record struct LogisticsNode
             throw new ArgumentOutOfRangeException(nameof(capabilities));
         }
 
+        double effectiveThroughput =
+            throughputCapacityPerSecond ??
+            LogisticsThroughputDefaults.ForNodeKind(kind);
+
+        ValidatePositiveFinite(
+            effectiveThroughput,
+            nameof(throughputCapacityPerSecond));
+
         Id = id;
         Entity = entity;
         WorldPosition = worldPosition;
         Kind = kind;
         Capabilities = capabilities;
         Enabled = enabled;
+        ThroughputCapacityPerSecond = effectiveThroughput;
     }
 
     public LogisticsNodeId Id { get; }
@@ -224,10 +234,22 @@ public readonly record struct LogisticsNode
 
     public bool Enabled { get; }
 
+    public double ThroughputCapacityPerSecond { get; }
+
     private static bool IsFinite(Vector3 value) =>
         float.IsFinite(value.X) &&
         float.IsFinite(value.Y) &&
         float.IsFinite(value.Z);
+
+    private static void ValidatePositiveFinite(
+        double value,
+        string parameterName)
+    {
+        if (!double.IsFinite(value) || value <= 0.0)
+        {
+            throw new ArgumentOutOfRangeException(parameterName);
+        }
+    }
 }
 
 public readonly record struct LogisticsEdge
