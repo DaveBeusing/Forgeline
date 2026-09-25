@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Game;
 using ForgeLine.Intelligence;
 using ForgeLine.World;
 
@@ -99,5 +100,68 @@ public static class IntelligenceDebugVisualization
                     : "RADAR",
                 color);
         }
+    }
+
+    public static void DrawSensors(
+        DebugDraw debugDraw,
+        IReadOnlyList<IntelligenceSensorDebugEntry> sensors,
+        int maximumSensors = 64)
+    {
+        ArgumentNullException.ThrowIfNull(debugDraw);
+        ArgumentNullException.ThrowIfNull(sensors);
+        ArgumentOutOfRangeException.ThrowIfNegative(maximumSensors);
+
+        int count =
+            Math.Min(
+                sensors.Count,
+                maximumSensors);
+
+        for (int index = 0;
+             index < count;
+             index++)
+        {
+            IntelligenceSensorDebugEntry sensor =
+                sensors[index];
+
+            Vector4 color =
+                sensor.IsRadar
+                    ? new Vector4(0.65f, 0.25f, 1.0f, 0.55f)
+                    : new Vector4(0.15f, 0.8f, 1.0f, 0.55f);
+
+            debugDraw.Circle(
+                sensor.Position,
+                sensor.RangeMeters,
+                color,
+                segments: 32);
+
+            if (sensor.IsRadar &&
+                sensor.IdentificationRangeMeters > 0.0f)
+            {
+                debugDraw.Circle(
+                    sensor.Position,
+                    sensor.IdentificationRangeMeters,
+                    new Vector4(1.0f, 0.55f, 0.15f, 0.65f),
+                    segments: 24);
+            }
+        }
+    }
+
+    public static void DrawMetrics(
+        DebugDraw debugDraw,
+        in BattlefieldIntelligenceMetrics metrics,
+        Vector3 position)
+    {
+        ArgumentNullException.ThrowIfNull(debugDraw);
+
+        string text =
+            $"INT scans={metrics.SensorScansThisTick} " +
+            $"contacts={metrics.DetectedContactsThisTick + metrics.IdentifiedContactsThisTick} " +
+            $"visible={metrics.VisibleCellsThisTick} " +
+            $"ms={metrics.SensorUpdateDuration.TotalMilliseconds:F3}";
+
+        debugDraw.Label(
+            position,
+            text,
+            new Vector4(0.75f, 0.9f, 1.0f, 1.0f));
     }
 }
