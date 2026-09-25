@@ -296,7 +296,7 @@ public sealed class DirectorateContentTests
         }
 
         Assert.Equal(
-            1,
+            1UL,
             production.Metrics.CompletedUnits);
     }
 
@@ -393,7 +393,7 @@ public sealed class DirectorateContentTests
             TestContext.Current.CancellationToken);
 
         Assert.Equal(
-            1,
+            1UL,
             production.Metrics.CompletedUnits);
     }
 
