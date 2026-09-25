@@ -4,6 +4,7 @@ using ForgeLine.Economy;
 using ForgeLine.Logistics;
 using ForgeLine.Navigation;
 using ForgeLine.Simulation;
+using ForgeLine.World;
 using Xunit;
 
 namespace ForgeLine.Game.Tests;
