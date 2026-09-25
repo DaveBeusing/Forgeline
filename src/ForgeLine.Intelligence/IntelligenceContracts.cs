@@ -258,11 +258,13 @@ public sealed class FactionIntelligenceSnapshot
     internal FactionIntelligenceSnapshot(
         FactionId faction,
         SimulationTick tick,
+        float cellSizeMeters,
         VisibilityCellSnapshot[] cells,
         IntelligenceContact[] contacts)
     {
         Faction = faction;
         Tick = tick;
+        CellSizeMeters = cellSizeMeters;
         _cells = cells;
         _contacts = contacts;
     }
@@ -270,6 +272,8 @@ public sealed class FactionIntelligenceSnapshot
     public FactionId Faction { get; }
 
     public SimulationTick Tick { get; }
+
+    public float CellSizeMeters { get; }
 
     public IReadOnlyList<VisibilityCellSnapshot> Cells =>
         _cells;
