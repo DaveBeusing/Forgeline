@@ -216,6 +216,8 @@ public readonly record struct LogisticsTransportRequestReadModel(
     ResourceId ResourceId,
     LogisticsNodeId Origin,
     LogisticsNodeId Destination,
+    System.Numerics.Vector3 OriginPosition,
+    System.Numerics.Vector3 DestinationPosition,
     double RequestedQuantity,
     double ReservedQuantity,
     EntityId AssignedTruck,
