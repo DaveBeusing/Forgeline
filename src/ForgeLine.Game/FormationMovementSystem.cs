@@ -815,7 +815,7 @@ public sealed class FormationMovementSystem : ISimulationSystem
         }
     }
 
-    private GroupMetrics CalculateGroupMetrics(
+    private static GroupMetrics CalculateGroupMetrics(
         IReadOnlyList<MemberRuntime> members)
     {
         Vector3 sum = Vector3.Zero;
