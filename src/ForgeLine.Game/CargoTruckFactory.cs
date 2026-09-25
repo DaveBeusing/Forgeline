@@ -14,11 +14,12 @@ public static class CargoTruckFactory
         InventoryStore inventories,
         Vector3 position,
         PlayerId owner,
-        CargoTruckDefinition? definition = null,
-        CargoTransportSystem? transportSystem = null)
+        CargoTransportSystem transportSystem,
+        CargoTruckDefinition? definition = null)
     {
         ArgumentNullException.ThrowIfNull(entities);
         ArgumentNullException.ThrowIfNull(inventories);
+        ArgumentNullException.ThrowIfNull(transportSystem);
 
         if (!IsFinite(position))
         {
@@ -84,7 +85,7 @@ public static class CargoTruckFactory
                     (ulong)ControllableEntityCategory.Logistics,
                     SpatialMobility.Mobile)));
 
-        transportSystem?.TrackTransport(
+        transportSystem.TrackTransport(
             entity,
             cargoInventory);
 
