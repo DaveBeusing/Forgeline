@@ -65,5 +65,11 @@ public readonly record struct ResourceExtractor
     public ResourceExtractorState State { get; }
 
     internal ResourceExtractor WithState(ResourceExtractorState state) =>
-        this with { State = state };
+        new(
+            Deposit,
+            ResourceId,
+            MaximumExtractionRatePerSecond,
+            Owner,
+            Enabled,
+            state);
 }
