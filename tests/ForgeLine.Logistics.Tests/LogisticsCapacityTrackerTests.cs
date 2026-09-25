@@ -198,6 +198,72 @@ public sealed class LogisticsCapacityTrackerTests
         Assert.True(network.IsReachable(source, destination));
     }
 
+    [Fact]
+    public void LargeReservationSetIsReleasedAcrossRepeatedRouteChanges()
+    {
+        var network = new LogisticsNetwork();
+        LogisticsNodeId source = AddNode(network, 1, 0.0f);
+        LogisticsNodeId destination = AddNode(network, 2, 10.0f);
+        LogisticsEdgeId edge = network.AddEdge(
+            source,
+            destination,
+            LogisticsTransportMode.GroundRoad,
+            distanceMeters: 10.0,
+            baseCost: 1.0,
+            capacityPerSecond: 10_000.0);
+
+        var capacity = new LogisticsCapacityTracker();
+        LogisticsRoute route =
+            network.FindRoute(source, destination).Route!;
+
+        for (int index = 0; index < 1_000; index++)
+        {
+            Assert.True(
+                capacity.TryReserveRoute(
+                    network,
+                    route,
+                    quantity: 0.1,
+                    new SimulationTick(1),
+                    out _,
+                    out _));
+        }
+
+        Assert.Equal(1_000, capacity.ActiveReservationCount);
+
+        for (ulong cycle = 0; cycle < 100; cycle++)
+        {
+            Assert.True(
+                network.SetEdgeEnabled(
+                    edge,
+                    enabled: false));
+            capacity.Advance(
+                network,
+                new SimulationTick(checked(2 + cycle * 2)));
+            Assert.Equal(0, capacity.ActiveReservationCount);
+
+            Assert.True(
+                network.SetEdgeEnabled(
+                    edge,
+                    enabled: true));
+
+            LogisticsRoute current =
+                network.FindRoute(
+                    source,
+                    destination).Route!;
+
+            Assert.True(
+                capacity.TryReserveRoute(
+                    network,
+                    current,
+                    quantity: 1.0,
+                    new SimulationTick(checked(3 + cycle * 2)),
+                    out _,
+                    out _));
+        }
+
+        Assert.Equal(1, capacity.ActiveReservationCount);
+    }
+
     private static LogisticsNodeId AddNode(
         LogisticsNetwork network,
         uint entityIndex,
