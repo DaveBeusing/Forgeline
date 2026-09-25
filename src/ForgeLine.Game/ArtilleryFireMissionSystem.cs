@@ -176,7 +176,6 @@ public sealed class ArtilleryFireMissionSystem : ISimulationSystem
                     context,
                     entity,
                     request,
-                    capability,
                     sourceTransform.Position);
                 context.Entities.RemoveComponent<FireMissionRequest>(entity);
                 continue;
@@ -194,7 +193,6 @@ public sealed class ArtilleryFireMissionSystem : ISimulationSystem
                     context,
                     entity,
                     request,
-                    capability,
                     sourceTransform.Position);
                 context.Entities.RemoveComponent<FireMissionRequest>(entity);
                 continue;
@@ -252,7 +250,6 @@ public sealed class ArtilleryFireMissionSystem : ISimulationSystem
         foreach (EntityId entity in
                  context.Entities.Query<
                      FireMissionState,
-                     ArtilleryCapability,
                      WorldTransform>(
                          QueryIterationOrder.StableByEntityIndex))
         {
@@ -812,15 +809,12 @@ public sealed class ArtilleryFireMissionSystem : ISimulationSystem
                 MathF.Sin(angle) * radius);
     }
 
-    private void SetCancelledMission(
+    private static void SetCancelledMission(
         SimulationContext context,
         EntityId entity,
         in FireMissionRequest request,
-        in ArtilleryCapability capability,
         Vector3 fallbackPosition)
     {
-        _ = capability;
-
         SetMission(
             context,
             entity,
