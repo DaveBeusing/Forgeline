@@ -73,11 +73,15 @@ public sealed class TacticalOrderPreparationSystem : ISimulationSystem
                 ClearWeaponTarget(
                     context,
                     entity);
-                SetMovementAllowed(
+                SetAutoTarget(
                     context,
                     entity,
-                    allowed: true);
-                SetTacticalState(
+                    enabled: false);
+                SetMovementConstraint(
+                    context,
+                    entity,
+                    canMove: true);
+                SetState(
                     context,
                     entity,
                     CombatOrderStatus.Resupplying,
@@ -390,6 +394,26 @@ public sealed class TacticalCombatSystem : ISimulationSystem
                     entity,
                     out WorldTransform transform))
             {
+                continue;
+            }
+
+            if (context.Entities.HasComponent<ResupplyOrder>(entity))
+            {
+                ClearWeaponTarget(
+                    context,
+                    entity);
+                SetMovementAllowed(
+                    context,
+                    entity,
+                    allowed: true);
+                SetTacticalState(
+                    context,
+                    entity,
+                    CombatOrderStatus.Resupplying,
+                    EntityId.Invalid,
+                    default,
+                    hasTargetPosition: false,
+                    movementPaused: false);
                 continue;
             }
 
@@ -825,7 +849,7 @@ public sealed class TacticalCombatSystem : ISimulationSystem
             movementPaused: true);
     }
 
-    private void ProcessRetreat(
+    private static void ProcessRetreat(
         SimulationContext context,
         EntityId entity,
         in CombatOrderState order,
