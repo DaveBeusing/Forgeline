@@ -353,6 +353,7 @@ public sealed class FormationMovementSystem : ISimulationSystem
                 metrics.MaximumRadius);
         float corridorWidth =
             EstimateCorridorWidth(
+                metrics.Centroid,
                 activeWaypoint,
                 forward,
                 metrics.RepresentativeCapabilities);
@@ -929,13 +930,31 @@ public sealed class FormationMovementSystem : ISimulationSystem
     }
 
     private float EstimateCorridorWidth(
+        Vector3 centroid,
         Vector3 waypoint,
+        Vector3 forward,
+        in NavigationCapabilities capabilities)
+    {
+        float centroidWidth = EstimateCorridorWidthAtPoint(
+            centroid,
+            forward,
+            capabilities);
+        float waypointWidth = EstimateCorridorWidthAtPoint(
+            waypoint,
+            forward,
+            capabilities);
+
+        return MathF.Min(centroidWidth, waypointWidth);
+    }
+
+    private float EstimateCorridorWidthAtPoint(
+        Vector3 position,
         Vector3 forward,
         in NavigationCapabilities capabilities)
     {
         NavigationGrid grid = World.Grid;
         if (!grid.TryWorldToCell(
-                waypoint,
+                position,
                 out NavigationCellCoordinate center) ||
             !grid.IsTraversable(center, capabilities))
         {
