@@ -129,7 +129,7 @@ public sealed class MoveEntitiesCommand : ISimulationCommand
 
     private EntityId CreateMovementGroup(
         SimulationContext context,
-        IReadOnlyList<EntityId> formationTargets)
+        List<EntityId> formationTargets)
     {
         EntityId group = context.Entities.CreateEntity();
         context.Entities.AddComponent(
