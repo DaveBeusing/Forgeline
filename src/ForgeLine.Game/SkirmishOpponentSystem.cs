@@ -455,9 +455,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             owned.UnitCounts[identity.UnitId] =
                 count + 1;
 
-            if (identity.UnitId is not
-                    var unitId ||
-                unitId == UnitIds.CargoTruck ||
+            UnitId unitId =
+                identity.UnitId;
+
+            if (unitId == UnitIds.CargoTruck ||
                 unitId == UnitIds.SupplyTruck)
             {
                 continue;
