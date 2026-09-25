@@ -249,7 +249,7 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
     private void ScanVisualSensor(
         SimulationContext context,
         EntityId sensorEntity,
-        in VisualSensorState sensor,
+        VisualSensorState sensor,
         Vector3 sensorPosition)
     {
         ForEachCandidate(
@@ -286,7 +286,7 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
     private void ScanRadarSensor(
         SimulationContext context,
         EntityId sensorEntity,
-        in RadarSensorState sensor,
+        RadarSensorState sensor,
         Vector3 sensorPosition)
     {
         float identificationRangeSquared =
@@ -405,6 +405,9 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
         out IntelligenceSignature signature,
         out WorldTransform transform)
     {
+        signature = default;
+        transform = default;
+
         if (candidate == sensorEntity ||
             !entities.IsAlive(candidate) ||
             !entities.TryGetComponent(
