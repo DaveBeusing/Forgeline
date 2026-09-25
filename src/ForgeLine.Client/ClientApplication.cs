@@ -421,7 +421,11 @@ internal sealed class ClientApplication
                     selectionController,
                     lastMovementEnvelope,
                     lastMovementCommand,
-                    activeFormation);
+                    activeFormation,
+                    buildingPlacementController,
+                    lastBuildEnvelope,
+                    lastBuildCommand,
+                    buildingCommands);
                 nextDiagnosticAt = now;
             }
         }
@@ -441,7 +445,11 @@ internal sealed class ClientApplication
             selectionController,
             lastMovementEnvelope,
             lastMovementCommand,
-            activeFormation);
+            activeFormation,
+            buildingPlacementController,
+            lastBuildEnvelope,
+            lastBuildCommand,
+            buildingCommands);
         WriteGraphicsState("stopped", graphics);
         return 0;
     }
