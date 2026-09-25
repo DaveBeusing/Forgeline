@@ -10,6 +10,18 @@ public readonly record struct InventoryId(uint Value) : IComparable<InventoryId>
 
     public int CompareTo(InventoryId other) => Value.CompareTo(other.Value);
 
+    public static bool operator <(InventoryId left, InventoryId right) =>
+        left.CompareTo(right) < 0;
+
+    public static bool operator <=(InventoryId left, InventoryId right) =>
+        left.CompareTo(right) <= 0;
+
+    public static bool operator >(InventoryId left, InventoryId right) =>
+        left.CompareTo(right) > 0;
+
+    public static bool operator >=(InventoryId left, InventoryId right) =>
+        left.CompareTo(right) >= 0;
+
     public override string ToString() => Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
 }
 
