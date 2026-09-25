@@ -145,11 +145,16 @@ public sealed class BuildingLogisticsRegistrationSystem
             entities.TryGetComponent(
                 entity,
                 out StorageDepot storageDepot);
+        bool hasLogisticsHub =
+            entities.TryGetComponent(
+                entity,
+                out LogisticsHub logisticsHub);
         bool hasProduction =
             entities.HasComponent<ProductionFacility>(entity);
 
         if (!hasExtractor &&
             !hasStorageDepot &&
+            !hasLogisticsHub &&
             !hasProduction)
         {
             kind = default;
@@ -182,6 +187,18 @@ public sealed class BuildingLogisticsRegistrationSystem
                 StorageDepotState.Operational;
         }
 
+        if (hasLogisticsHub)
+        {
+            capabilities |=
+                LogisticsNodeCapabilities.CargoSource |
+                LogisticsNodeCapabilities.CargoDestination |
+                LogisticsNodeCapabilities.Storage |
+                LogisticsNodeCapabilities.Distribution;
+            enabled &=
+                logisticsHub.State ==
+                LogisticsHubState.Operational;
+        }
+
         if (hasProduction)
         {
             capabilities |=
@@ -190,11 +207,13 @@ public sealed class BuildingLogisticsRegistrationSystem
                 LogisticsNodeCapabilities.Processing;
         }
 
-        kind = hasExtractor
-            ? LogisticsNodeKind.ExtractorOutput
-            : hasStorageDepot
-                ? LogisticsNodeKind.StorageDepot
-                : LogisticsNodeKind.ProcessingFacility;
+        kind = hasLogisticsHub
+            ? LogisticsNodeKind.LogisticsHub
+            : hasExtractor
+                ? LogisticsNodeKind.ExtractorOutput
+                : hasStorageDepot
+                    ? LogisticsNodeKind.StorageDepot
+                    : LogisticsNodeKind.ProcessingFacility;
 
         position = transform.Position;
         return true;
