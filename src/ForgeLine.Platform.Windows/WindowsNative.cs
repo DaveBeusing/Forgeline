@@ -36,6 +36,12 @@ internal static partial class WindowsNative
     internal const int VkF1 = 0x70;
     internal const int VkF2 = 0x71;
     internal const int VkF3 = 0x72;
+    internal const int VkF4 = 0x73;
+    internal const int VkF5 = 0x74;
+    internal const int VkF6 = 0x75;
+    internal const int VkF7 = 0x76;
+    internal const int VkF8 = 0x77;
+    internal const int VkF9 = 0x78;
     internal const int VkLeft = 0x25;
     internal const int VkLShift = 0xA0;
     internal const int VkQ = 0x51;
