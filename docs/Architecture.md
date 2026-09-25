@@ -73,7 +73,7 @@ Simulation domains remain independently layered and are implemented progressivel
 
 ### Game and Presentation
 
-- `ForgeLine.Game`: FORGELINE rules and composition of simulation domains. Interaction-facing game contracts include player ownership, controllable entity categories, simulation-owned movement-order state, movement-group identity/lifecycle, shared-route formation state, formation slot assignment, and the validated movement command.
+- `ForgeLine.Game`: FORGELINE rules and composition of simulation domains. Interaction-facing game contracts include player ownership, controllable entity categories, simulation-owned movement-order state, movement-group identity/lifecycle, shared-route formation state, formation slot assignment, and the validated movement command. Physical Cargo Truck execution also lives here because it composes economy inventories, logistics routes, hierarchical navigation, and ground movement while leaving each lower-level domain authoritative for its own state.
 - `ForgeLine.Presentation`: post-tick extraction into immutable snapshots, buffered simulation-to-render handoff, render-world interpolation, generic instance rendering, debug visualization, development metrics, RTS camera state/projection, visible-entity picking, and player selection state.
 - `ForgeLine.UI`: RTS-specific user-interface boundary.
 - `ForgeLine.Client`: composition root for the interactive Windows application. It owns platform/graphics lifecycle and translates presentation movement requests into simulation commands without exposing live ECS mutation to input or rendering code.
@@ -94,6 +94,8 @@ The simulation runtime is fixed-step with a default engineering target of 20 sim
 Each tick traverses an explicit canonical phase sequence. Commands scheduled for a tick are executed at the Input Commands boundary before later phases run. Systems register for a specific phase and execute in stable registration order within that phase.
 
 The movement interaction preserves this boundary: the client schedules `MoveEntitiesCommand` for a future tick. Individual eligible units receive validated strategic `MovementOrder` state. Multi-unit ground selections create a simulation-owned movement group instead. `FormationMovementSystem` consumes those groups first in `NavigationRequests`, schedules one shared hierarchical path, derives stable formation-relative slot targets, and publishes only `FormationLocal` movement orders plus a group speed constraint. `HierarchicalNavigationSystem` continues to route individual strategic orders and explicitly ignores formation-local slot orders. `GroundMovementSystem` remains the sole owner of final locomotion and transform changes in `Movement`.
+
+Cargo transport preserves the same separation. `ForgeLine.Logistics` selects versioned strategic routes between logistics nodes, `CargoTransportSystem` in `ForgeLine.Game` advances the load/move/unload lifecycle, `HierarchicalNavigationSystem` resolves physical ground paths to each route node, and `GroundMovementSystem` remains the only owner of vehicle transform mutation. Inventory changes occur only through shared atomic `InventoryStore` operations after physical arrival. See `docs/CargoTransportOperations.md`.
 
 Simulation code is written in a deterministic-friendly style:
 
