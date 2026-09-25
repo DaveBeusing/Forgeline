@@ -244,7 +244,7 @@ public sealed class DirectorateVerticalSliceSmokeTests
             TestContext.Current.CancellationToken);
 
         Assert.Equal(
-            7,
+            7UL,
             unitProduction.Metrics.CompletedUnits);
 
         var createdUnits =
