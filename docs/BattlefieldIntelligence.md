@@ -288,3 +288,14 @@ Those systems should extend the existing faction store, contact model, sensor sc
 ## Artillery Contact Consumption
 
 Indirect fire is the first tactical consumer of opaque intelligence contacts. A contact-key mission copies the stored last-known position and last-seen tick into a coordinate fire mission. The artillery state does not retain or reacquire the hidden enemy entity. Direct coordinate missions require current visual visibility. Detected radar contacts may therefore support area fire against their known coordinates without granting direct entity targeting. See [Artillery and Indirect Fire](ArtilleryAndIndirectFire.md).
+
+
+## Tactical Behavior Consumption
+
+Tactical direct attacks require current `Identified` state before `TacticalCombatSystem` reads an enemy transform. Group target coordination likewise builds candidates only from currently identified enemies.
+
+The development tactical opponent consumes `FactionIntelligenceSnapshot` rather than scanning hostile ECS entities. Current Detected contacts can produce movement toward `LastKnownPosition`; only current Identified contacts may resolve through `TryResolveCurrentlyIdentifiedEntity` to an exact attack entity.
+
+This preserves the same hidden-state boundary used by player targeting.
+
+See [Combat Orders, Tactical Behavior, and Readiness](CombatOrdersAndReadiness.md).
