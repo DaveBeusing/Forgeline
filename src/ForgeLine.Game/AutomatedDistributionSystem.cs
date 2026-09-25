@@ -610,7 +610,7 @@ public sealed class AutomatedDistributionSystem
 
             if (!best.Succeeded ||
                 capacityRoute.Route.TotalCost < best.Route!.TotalCost ||
-                (capacityRoute.Route.TotalCost == best.Route.TotalCost &&
+                (capacityRoute.Route.TotalCost == best.Route!.TotalCost &&
                  node.Id < best.SourceNode.Id))
             {
                 best =
