@@ -228,7 +228,16 @@ public sealed class AutomatedDistributionSystemTests
                 fixture.Distribution.LastDebugSnapshot.Requests);
 
         Assert.Equal(
-            LogisticsTransportRequestRequestState: default);
+            LogisticsTransportRequestState.RetryPending,
+            request.State);
+        Assert.Equal(
+            LogisticsTransportRequestFailureReason.NoRoute,
+            request.FailureReason);
+        Assert.Equal(
+            0.0,
+            fixture.Inventories.GetReservedQuantity(
+                fixture.SourceInventory,
+                ResourceIds.FerrousOre));
     }
 
     private static DistributionFixture CreateFixture(
