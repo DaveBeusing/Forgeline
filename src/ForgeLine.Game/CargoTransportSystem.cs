@@ -982,9 +982,15 @@ public sealed class CargoTransportSystem : ISimulationSystem
                             ? order.RequestedQuantity
                             : QuantityEpsilon;
                     double available =
-                        _inventories.GetAvailableQuantity(
-                            sourceInventory,
-                            order.ResourceId);
+                        context.Entities.TryGetComponent(
+                            entity,
+                            out CargoTransportReservation reservation) &&
+                        reservation.SourceInventory == sourceInventory &&
+                        reservation.ResourceId == order.ResourceId
+                            ? reservation.Quantity
+                            : _inventories.GetAvailableQuantity(
+                                sourceInventory,
+                                order.ResourceId);
 
                     if (available + QuantityEpsilon >=
                         required)
