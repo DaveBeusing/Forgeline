@@ -97,6 +97,8 @@ The movement interaction preserves this boundary: the client schedules `MoveEnti
 
 Cargo transport preserves the same separation. `ForgeLine.Logistics` selects versioned strategic routes between logistics nodes, `CargoTransportSystem` in `ForgeLine.Game` advances the load/move/unload lifecycle, `HierarchicalNavigationSystem` resolves physical ground paths to each route node, and `GroundMovementSystem` remains the only owner of vehicle transform mutation. Inventory changes occur only through shared atomic `InventoryStore` operations after physical arrival. See `docs/CargoTransportOperations.md`.
 
+Automated regional distribution is composed above those existing authorities. `AutomatedDistributionSystem` in `ForgeLine.Game` evaluates stock policies, coalesces deficits into transport requests, selects authoritative logistics routes and surplus sources, reserves source inventory, and assigns idle physical Cargo Trucks. It never moves resources remotely: `CargoTransportSystem` remains responsible for physical loading, navigation, unloading, and transport failure state. Presentation receives only distribution read models and debug snapshots. See `docs/AutomatedDistributionAndLogisticsHubs.md`.
+
 Simulation code is written in a deterministic-friendly style:
 
 - explicit tick ordering
