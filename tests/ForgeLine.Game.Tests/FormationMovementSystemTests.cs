@@ -301,10 +301,13 @@ public sealed class FormationMovementSystemTests
         Assert.True(
             scenario.Simulation.Entities.TryGetComponent(
                 detached,
-                out MovementOrder strategicOrder));
+                out NavigationPendingPath pendingPath));
         Assert.Equal(
             MovementOrderKind.Strategic,
-            strategicOrder.Kind);
+            pendingPath.OriginalOrder.Kind);
+        Assert.Equal(
+            new Vector3(112.0f, 0.0f, 16.0f),
+            pendingPath.OriginalOrder.WorldTarget);
     }
 
     [Fact]
