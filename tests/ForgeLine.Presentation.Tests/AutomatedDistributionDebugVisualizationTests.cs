@@ -109,6 +109,6 @@ public sealed class AutomatedDistributionDebugVisualizationTests
             AutomatedDistributionDebugSnapshot.Empty);
 
         Assert.Empty(debugDraw.Labels);
-        Assert.Empty(debugDraw.Lines);
+        Assert.Equal(0, debugDraw.Lines.Length);
     }
 }
