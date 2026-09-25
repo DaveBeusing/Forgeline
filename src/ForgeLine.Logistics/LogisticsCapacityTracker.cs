@@ -207,7 +207,7 @@ public sealed class LogisticsCapacityTracker :
     public bool TryEvaluateTraversal(
         in LogisticsEdge edge,
         in LogisticsNode from,
-        in LogisticsNode to,
+        in LogisticsNode destination,
         double requestedQuantity,
         out double additionalCost)
     {
@@ -218,7 +218,7 @@ public sealed class LogisticsCapacityTracker :
                 nameof(requestedQuantity));
         }
 
-        if (!edge.Enabled || !from.Enabled || !to.Enabled)
+        if (!edge.Enabled || !from.Enabled || !destination.Enabled)
         {
             additionalCost = double.PositiveInfinity;
             return false;
@@ -231,14 +231,14 @@ public sealed class LogisticsCapacityTracker :
                 from.ThroughputCapacityPerSecond);
         double toCapacity =
             GetWindowCapacity(
-                to.ThroughputCapacityPerSecond);
+                destination.ThroughputCapacityPerSecond);
 
         double edgeLoad =
             GetLoad(_edgeLoad, edge.Id);
         double fromLoad =
             GetLoad(_nodeLoad, from.Id);
         double toLoad =
-            GetLoad(_nodeLoad, to.Id);
+            GetLoad(_nodeLoad, destination.Id);
 
         if (edgeLoad + requestedQuantity >
                 edgeCapacity + QuantityEpsilon ||
@@ -281,11 +281,8 @@ public sealed class LogisticsCapacityTracker :
     {
         ArgumentNullException.ThrowIfNull(network);
 
-        if (backlogRequestCount < 0)
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(backlogRequestCount));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(
+            backlogRequestCount);
 
         if (!double.IsFinite(backlogQuantity) ||
             backlogQuantity < 0.0)
@@ -572,7 +569,7 @@ public sealed class LogisticsCapacityTracker :
         return true;
     }
 
-    private bool ReservationTopologyRemainsValid(
+    private static bool ReservationTopologyRemainsValid(
         LogisticsNetwork network,
         ReservationState reservation)
     {
@@ -610,7 +607,8 @@ public sealed class LogisticsCapacityTracker :
     {
         if (!_reservations.Remove(
                 reservationId,
-                out ReservationState reservation))
+                out ReservationState? reservation) ||
+            reservation is null)
         {
             return false;
         }
