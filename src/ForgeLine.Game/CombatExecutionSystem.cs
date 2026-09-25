@@ -59,7 +59,9 @@ public sealed class CombatExecutionSystem : ISimulationSystem
         CreatePendingProjectiles(context);
 
         _runtime.SetActiveProjectiles(
-            context.Entities.GetComponentCount<ProjectileState>());
+            checked(
+                context.Entities.GetComponentCount<ProjectileState>() +
+                context.Entities.GetComponentCount<IndirectFireProjectileState>()));
     }
 
     private void ProcessProjectiles(SimulationContext context)
