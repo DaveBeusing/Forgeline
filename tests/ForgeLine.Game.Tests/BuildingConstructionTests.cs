@@ -151,6 +151,35 @@ public sealed class BuildingConstructionTests
     }
 
     [Fact]
+    public void SourceInventoryOwnedByAnotherPlayerIsRejected()
+    {
+        TestWorld test = CreateTestWorld();
+        EntityId inventoryEntity =
+            AddFundedInventory(test, includeAllCosts: true);
+        InventoryId inventoryId =
+            GetInventoryId(test, inventoryEntity);
+
+        test.Simulation.Entities.SetComponent(
+            inventoryEntity,
+            new StorageDepot(
+                inventoryId,
+                new FactionId(2)));
+
+        SubmitBuild(
+            test,
+            inventoryEntity,
+            BuildingIds.PowerPlant,
+            new Vector3(64.0f, 0.0f, 64.0f));
+        test.Simulation.AdvanceOneTick();
+
+        Assert.Equal(
+            BuildCommandRejectionReason.SourceInventoryOwnershipMismatch,
+            test.Commands.Metrics.LastRejection);
+        Assert.Equal(0, CountSites(test));
+        AssertAllReservationsZero(test, inventoryEntity);
+    }
+
+    [Fact]
     public void InsufficientResourcesRejectWithoutLeakingReservations()
     {
         TestWorld test = CreateTestWorld();
