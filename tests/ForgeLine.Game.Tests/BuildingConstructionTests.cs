@@ -282,7 +282,9 @@ public sealed class BuildingConstructionTests
         test.Simulation.AdvanceOneTick();
 
         EntityId site = SingleSite(test);
-        test.Simulation.RunTicks(definition.ConstructionTicks - 1);
+        test.Simulation.RunTicks(
+            definition.ConstructionTicks - 1,
+            TestContext.Current.CancellationToken);
 
         Assert.False(
             test.Simulation.Entities.HasComponent<ConstructionSite>(site));
@@ -313,7 +315,9 @@ public sealed class BuildingConstructionTests
                 inventoryId,
                 ResourceIds.FerrousOre);
 
-        test.Simulation.RunTicks(25);
+        test.Simulation.RunTicks(
+            25,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(
             ferrousAfterCompletion,
@@ -387,7 +391,9 @@ public sealed class BuildingConstructionTests
             BuildingIds.StorageDepot,
             new Vector3(64.0f, 0.0f, 64.0f));
 
-        ulong executed = test.Simulation.RunTicks(256);
+        ulong executed = test.Simulation.RunTicks(
+            256,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(256UL, executed);
         Assert.Equal(0, CountSites(test));
