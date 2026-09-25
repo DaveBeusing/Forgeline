@@ -70,9 +70,28 @@ public sealed class DirectorateVerticalSliceSmokeTests
                 inventories,
                 spatialIndex);
         var simulation = new SimulationCoordinator();
+        var logisticsNetwork = new LogisticsNetwork();
+        var cargo =
+            new CargoTransportSystem(
+                logisticsNetwork,
+                inventories);
+        var unitFactory =
+            new UnitFactory(
+                simulation.Entities,
+                inventories,
+                cargo);
+        var unitProduction =
+            new UnitProductionSystem(
+                units,
+                inventories,
+                unitFactory);
+        var battlefieldSupply =
+            new BattlefieldSupplySystem(inventories);
 
         simulation.RegisterSystem(buildingCommands);
         simulation.RegisterSystem(construction);
+        simulation.RegisterSystem(unitProduction);
+        simulation.RegisterSystem(battlefieldSupply);
 
         EntityId source =
             CreateFundedConstructionInventory(
@@ -170,23 +189,6 @@ public sealed class DirectorateVerticalSliceSmokeTests
         Assert.Equal(
             requiredBuildings.Length,
             completedBuildings.Count);
-
-        var logisticsNetwork = new LogisticsNetwork();
-        var cargo =
-            new CargoTransportSystem(
-                logisticsNetwork,
-                inventories);
-        var unitFactory =
-            new UnitFactory(
-                simulation.Entities,
-                inventories,
-                cargo);
-        var unitProduction =
-            new UnitProductionSystem(
-                units,
-                inventories,
-                unitFactory);
-        simulation.RegisterSystem(unitProduction);
 
         EntityId barracks =
             completedBuildings[BuildingIds.Barracks];
@@ -376,9 +378,6 @@ public sealed class DirectorateVerticalSliceSmokeTests
                 Position = depotTransform.Position
             });
 
-        var supply =
-            new BattlefieldSupplySystem(inventories);
-        simulation.RegisterSystem(supply);
         simulation.AdvanceOneTick();
 
         SupplyTruck supplyTruck =
