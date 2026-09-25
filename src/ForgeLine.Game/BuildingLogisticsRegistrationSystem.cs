@@ -157,13 +157,20 @@ public sealed class BuildingLogisticsRegistrationSystem
             entities.HasComponent<ProductionFacility>(entity);
         bool hasUnitProduction =
             entities.HasComponent<UnitProductionFacility>(entity);
+        bool hasCommandStorage =
+            entities.TryGetComponent(
+                entity,
+                out CompletedBuilding completed) &&
+            completed.BuildingId == BuildingIds.CommandCore &&
+            entities.HasComponent<InventoryStorage>(entity);
 
         if (!hasExtractor &&
             !hasStorageDepot &&
             !hasLogisticsHub &&
             !hasSupplyDepot &&
             !hasProduction &&
-            !hasUnitProduction)
+            !hasUnitProduction &&
+            !hasCommandStorage)
         {
             kind = default;
             capabilities = LogisticsNodeCapabilities.None;
@@ -193,6 +200,15 @@ public sealed class BuildingLogisticsRegistrationSystem
             enabled &=
                 storageDepot.State ==
                 StorageDepotState.Operational;
+        }
+
+        if (hasCommandStorage)
+        {
+            capabilities |=
+                LogisticsNodeCapabilities.CargoSource |
+                LogisticsNodeCapabilities.CargoDestination |
+                LogisticsNodeCapabilities.Storage |
+                LogisticsNodeCapabilities.Distribution;
         }
 
         if (hasLogisticsHub)
@@ -248,7 +264,7 @@ public sealed class BuildingLogisticsRegistrationSystem
                 ? LogisticsNodeKind.LogisticsHub
                 : hasExtractor
                     ? LogisticsNodeKind.ExtractorOutput
-                    : hasStorageDepot
+                    : hasStorageDepot || hasCommandStorage
                         ? LogisticsNodeKind.StorageDepot
                         : LogisticsNodeKind.ProcessingFacility;
 
