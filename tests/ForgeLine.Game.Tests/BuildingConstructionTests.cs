@@ -18,7 +18,7 @@ public sealed class BuildingConstructionTests
         BuildingDefinitionCatalog catalog =
             InitialBuildingDefinitions.CreateCatalog();
 
-        Assert.Equal(7, catalog.Count);
+        Assert.Equal(8, catalog.Count);
         Assert.Equal(
             "building.command_core",
             catalog[BuildingIds.CommandCore].Key);
@@ -31,6 +31,12 @@ public sealed class BuildingConstructionTests
         Assert.Equal(
             "building.storage_depot",
             catalog[BuildingIds.StorageDepot].Key);
+        Assert.Equal(
+            "building.logistics_hub",
+            catalog[BuildingIds.LogisticsHub].Key);
+        Assert.True(
+            catalog[BuildingIds.LogisticsHub].Capabilities.HasFlag(
+                BuildingCapability.Distribution));
         Assert.Equal(
             "building.smelter",
             catalog[BuildingIds.Smelter].Key);
