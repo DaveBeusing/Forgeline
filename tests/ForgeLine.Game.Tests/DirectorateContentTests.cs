@@ -81,10 +81,15 @@ public sealed class DirectorateContentTests
                 ContentAvailabilityTier.MechanizedWarfare);
 
         Assert.Equal(
-            [UnitIds.RifleSquad, UnitIds.CombatEngineer],
+            new[] { UnitIds.RifleSquad, UnitIds.CombatEngineer },
             barracks);
         Assert.Equal(
-            [UnitIds.ScoutVehicle, UnitIds.CargoTruck, UnitIds.SupplyTruck],
+            new[]
+            {
+                UnitIds.ScoutVehicle,
+                UnitIds.CargoTruck,
+                UnitIds.SupplyTruck
+            },
             industrialVehicles);
         Assert.Contains(
             UnitIds.MainBattleTank,
