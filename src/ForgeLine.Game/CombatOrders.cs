@@ -211,7 +211,8 @@ public sealed class AttackMoveCommand : ISimulationCommand
                     accepted.ToArray(),
                     Destination,
                     SubmittedAtTick,
-                    Formation);
+                    Formation,
+                    preserveCombatIntent: true);
             movement.Execute(context);
             CreatedMovementGroup =
                 movement.CreatedMovementGroup;
@@ -472,7 +473,8 @@ public sealed class RetreatCommand : ISimulationCommand
                     accepted.ToArray(),
                     Destination,
                     SubmittedAtTick,
-                    Formation);
+                    Formation,
+                    preserveCombatIntent: true);
             movement.Execute(context);
             CreatedMovementGroup =
                 movement.CreatedMovementGroup;
