@@ -37,9 +37,11 @@ public readonly record struct ArtilleryMissionDebugEntry(
 
 public readonly record struct ArtilleryProjectileDebugEntry(
     EntityId Entity,
+    Vector3 LaunchPosition,
     Vector3 Position,
     Vector3 TargetPosition,
     SimulationTick ImpactTick,
+    float ApexHeightMeters,
     float AreaRadiusMeters);
 
 public sealed class ArtilleryDebugSnapshot
@@ -946,9 +948,11 @@ public sealed class ArtilleryFireMissionSystem : ISimulationSystem
             _projectileDebug.Add(
                 new ArtilleryProjectileDebugEntry(
                     entity,
+                    projectile.LaunchPosition,
                     transform.Position,
                     projectile.TargetPosition,
                     projectile.ImpactTick,
+                    projectile.ApexHeightMeters,
                     projectile.AreaRadiusMeters));
         }
 
