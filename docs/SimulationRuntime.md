@@ -36,6 +36,7 @@ Combat
 Damage Resolution
 Supply
 Logistics
+Infrastructure
 Production
 Economy
 Entity Lifecycle
@@ -45,6 +46,8 @@ Snapshot / Events
 Systems implement `ISimulationSystem` and register for exactly one phase.
 
 Phase ordering is explicit and centralized. Registration order is preserved for multiple systems in the same phase. System registration is sealed once ticking starts so update order cannot change invisibly during a running simulation.
+
+`Infrastructure` is the authoritative pre-production boundary for continuous infrastructure state such as logical power allocation. It runs before Production and Economy so consumers observe current-tick capacity before calculating throughput.
 
 Not every phase contains domain logic yet. The phase model exists now so later gameplay systems can enter the correct execution boundary without creating hidden update-order dependencies.
 
