@@ -235,7 +235,7 @@ public sealed class QueueUnitProductionCommand : ISimulationCommand
 
         if (!context.Entities.TryGetComponent(
                 Facility,
-                out UnitProductionFacility? production) ||
+                out UnitProductionFacility production) ||
             production.Owner != Issuer)
         {
             Accepted = false;
@@ -299,7 +299,7 @@ public sealed class CancelUnitProductionRequestCommand : ISimulationCommand
                 out UnitProductionRequest request) ||
             !context.Entities.TryGetComponent(
                 request.Facility,
-                out UnitProductionFacility? facility) ||
+                out UnitProductionFacility facility) ||
             facility.Owner != Issuer)
         {
             Accepted = false;
