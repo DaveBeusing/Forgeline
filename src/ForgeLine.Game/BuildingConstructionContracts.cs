@@ -195,6 +195,7 @@ public readonly record struct ConstructionSite
         SimulationTick startedAtTick,
         uint requiredTicks,
         uint progressTicks,
+        ResourceId extractedResourceId = default,
         EntityId resourceDeposit = default)
     {
         if (!buildingId.IsSpecified)
@@ -228,6 +229,7 @@ public readonly record struct ConstructionSite
         StartedAtTick = startedAtTick;
         RequiredTicks = requiredTicks;
         ProgressTicks = progressTicks;
+        ExtractedResourceId = extractedResourceId;
         ResourceDeposit = resourceDeposit;
     }
 
@@ -242,6 +244,8 @@ public readonly record struct ConstructionSite
     public uint RequiredTicks { get; }
 
     public uint ProgressTicks { get; }
+
+    public ResourceId ExtractedResourceId { get; }
 
     public EntityId ResourceDeposit { get; }
 
@@ -265,6 +269,7 @@ public readonly record struct ConstructionSite
             StartedAtTick,
             RequiredTicks,
             next,
+            ExtractedResourceId,
             ResourceDeposit);
     }
 }
