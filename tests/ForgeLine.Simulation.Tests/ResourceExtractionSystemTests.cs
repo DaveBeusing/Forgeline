@@ -15,7 +15,7 @@ public sealed class ResourceExtractionSystemTests
 
         Assert.Equal(3, catalog.Count);
         Assert.Equal("resource.ferrous_ore", catalog[ResourceIds.FerrousOre].Key);
-        Assert.Equal("resource.volatiles", catalog[ResourceIds.Volatiles].Key);
+        Assert.Equal("resource.volatiles", catalog[ResourceIds.Volatiless].Key);
         Assert.Equal("resource.silicates", catalog[ResourceIds.Silicates].Key);
         Assert.True(catalog.TryResolve("resource.ferrous_ore", out ResourceId resolved));
         Assert.Equal(ResourceIds.FerrousOre, resolved);
@@ -68,14 +68,14 @@ public sealed class ResourceExtractionSystemTests
 
         EntityId depositEntity = AddDeposit(
             simulation,
-            ResourceIds.Volatile,
+            ResourceIds.Volatiles,
             totalQuantity: 100.0,
             baseRate: 8.0,
             richness: 1.5);
         AddExtractor(
             simulation,
             depositEntity,
-            ResourceIds.Volatile,
+            ResourceIds.Volatiles,
             maximumRate: 8.0);
 
         simulation.AdvanceOneTick();
@@ -197,7 +197,7 @@ public sealed class ResourceExtractionSystemTests
         EntityId extractorEntity = AddExtractor(
             simulation,
             depositEntity,
-            ResourceIds.Volatile,
+            ResourceIds.Volatiles,
             maximumRate: 10.0);
 
         simulation.AdvanceOneTick();
@@ -220,14 +220,14 @@ public sealed class ResourceExtractionSystemTests
 
         EntityId depositEntity = AddDeposit(
             simulation,
-            ResourceIds.Volatile,
+            ResourceIds.Volatiles,
             totalQuantity: 100.0,
             baseRate: 8.0,
             owner: new FactionId(7));
         EntityId extractorEntity = AddExtractor(
             simulation,
             depositEntity,
-            ResourceIds.Volatile,
+            ResourceIds.Volatiles,
             maximumRate: 8.0,
             owner: new FactionId(9));
 
@@ -330,7 +330,7 @@ public sealed class ResourceExtractionSystemTests
 
         EntityId depositEntity = AddDeposit(
             simulation,
-            ResourceIds.Volatile,
+            ResourceIds.Volatiles,
             totalQuantity: 250.0,
             baseRate: 8.0,
             richness: 1.25,
@@ -338,7 +338,7 @@ public sealed class ResourceExtractionSystemTests
         AddExtractor(
             simulation,
             depositEntity,
-            ResourceIds.Volatile,
+            ResourceIds.Volatiles,
             maximumRate: 6.0,
             owner: new FactionId(3));
 
