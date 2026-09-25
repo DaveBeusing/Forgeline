@@ -174,6 +174,31 @@ public sealed class GroundMovementSystem : ISimulationSystem
         Vector3 targetDelta = Horizontal(order.WorldTarget - position);
         float distanceToTarget = targetDelta.Length();
 
+        if (entities.TryGetComponent(
+                entity,
+                out SupplyMovementConstraint supplyConstraint) &&
+            !supplyConstraint.CanMove)
+        {
+            GroundMovementState outOfFuelState = state with
+            {
+                Velocity = Vector3.Zero,
+                Status = GroundMovementStatus.OutOfFuel,
+                ObservedOrderTick = order.AcceptedAtTick,
+                PreviousDistanceToTarget = distanceToTarget,
+                StalledTicks = 0
+            };
+
+            entities.SetComponent(entity, outOfFuelState);
+            AddDebugAgent(
+                entity,
+                position,
+                outOfFuelState,
+                movement,
+                order.WorldTarget,
+                hasTarget: true);
+            return;
+        }
+
         bool newOrder =
             state.ObservedOrderTick.Value != order.AcceptedAtTick.Value;
 
@@ -249,6 +274,13 @@ public sealed class GroundMovementSystem : ISimulationSystem
                 0.0f,
                 2.0f * movement.Deceleration * remainingDistance));
         float maximumSpeed = movement.MaximumSpeed;
+
+        if (entities.TryGetComponent(
+                entity,
+                out SupplyMovementConstraint movementSupplyConstraint))
+        {
+            maximumSpeed *= movementSupplyConstraint.MaximumSpeedScale;
+        }
 
         if (entities.TryGetComponent(
                 entity,
