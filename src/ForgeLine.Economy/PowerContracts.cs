@@ -8,6 +8,18 @@ public readonly record struct PowerNetworkId(uint Value) : IComparable<PowerNetw
 
     public int CompareTo(PowerNetworkId other) => Value.CompareTo(other.Value);
 
+    public static bool operator <(PowerNetworkId left, PowerNetworkId right) =>
+        left.CompareTo(right) < 0;
+
+    public static bool operator <=(PowerNetworkId left, PowerNetworkId right) =>
+        left.CompareTo(right) <= 0;
+
+    public static bool operator >(PowerNetworkId left, PowerNetworkId right) =>
+        left.CompareTo(right) > 0;
+
+    public static bool operator >=(PowerNetworkId left, PowerNetworkId right) =>
+        left.CompareTo(right) >= 0;
+
     public override string ToString() =>
         Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
 }
