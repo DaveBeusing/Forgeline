@@ -46,7 +46,8 @@ public sealed class WeaponDefinition
         int reloadTicks = 0,
         float projectileSpeedMetersPerSecond = 0.0f,
         float projectileRadiusMeters = 0.0f,
-        int projectileLifetimeTicks = 0)
+        int projectileLifetimeTicks = 0,
+        WeaponEffectiveness? effectiveness = null)
     {
         if (!id.IsSpecified)
         {
@@ -108,6 +109,7 @@ public sealed class WeaponDefinition
         ProjectileSpeedMetersPerSecond = projectileSpeedMetersPerSecond;
         ProjectileRadiusMeters = projectileRadiusMeters;
         ProjectileLifetimeTicks = projectileLifetimeTicks;
+        Effectiveness = effectiveness ?? WeaponEffectiveness.GeneralPurpose;
     }
 
     public WeaponId Id { get; }
@@ -131,6 +133,8 @@ public sealed class WeaponDefinition
     public float ProjectileRadiusMeters { get; }
 
     public int ProjectileLifetimeTicks { get; }
+
+    public WeaponEffectiveness Effectiveness { get; }
 }
 
 public sealed class WeaponCatalog
