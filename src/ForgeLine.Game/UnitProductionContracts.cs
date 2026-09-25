@@ -24,7 +24,7 @@ public enum UnitProductionBlockReason : byte
     InvalidFacility = 5
 }
 
-public sealed class UnitProductionFacility
+public struct UnitProductionFacility
 {
     public UnitProductionFacility(
         InventoryId inputInventory,
@@ -33,6 +33,8 @@ public sealed class UnitProductionFacility
         Vector3 spawnOffset,
         SimulationTick activatedAtTick)
     {
+        this = default;
+
         if (!inputInventory.IsSpecified)
         {
             throw new ArgumentException(
