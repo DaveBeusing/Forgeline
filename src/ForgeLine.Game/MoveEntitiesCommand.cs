@@ -7,13 +7,15 @@ namespace ForgeLine.Game;
 public sealed class MoveEntitiesCommand : ISimulationCommand
 {
     private readonly EntityId[] _targets;
+    private readonly bool _preserveCombatIntent;
 
     public MoveEntitiesCommand(
         PlayerId issuer,
         ReadOnlySpan<EntityId> targets,
         Vector3 worldTarget,
         SimulationTick submittedAtTick,
-        FormationTemplate formation = FormationTemplate.Compact)
+        FormationTemplate formation = FormationTemplate.Compact,
+        bool preserveCombatIntent = false)
     {
         if (!issuer.IsSpecified)
         {
@@ -43,6 +45,7 @@ public sealed class MoveEntitiesCommand : ISimulationCommand
         WorldTarget = worldTarget;
         SubmittedAtTick = submittedAtTick;
         Formation = formation;
+        _preserveCombatIntent = preserveCombatIntent;
         _targets = targets.ToArray();
     }
 
@@ -89,6 +92,14 @@ public sealed class MoveEntitiesCommand : ISimulationCommand
             }
 
             accepted++;
+
+            if (!_preserveCombatIntent)
+            {
+                ClearCombatIntent(
+                    context,
+                    entity);
+            }
+
             ClearFormationMembership(context, entity);
 
             if (IsFormationCapable(context, entity))
@@ -189,6 +200,27 @@ public sealed class MoveEntitiesCommand : ISimulationCommand
                context.Entities.HasComponent<GroundMovement>(entity) &&
                context.Entities.HasComponent<GroundMovementState>(entity) &&
                context.Entities.HasComponent<NavigationAgent>(entity);
+    }
+
+    private static void ClearCombatIntent(
+        SimulationContext context,
+        EntityId entity)
+    {
+        TacticalCommandUtilities.RemoveIfPresent<CombatOrderState>(
+            context,
+            entity);
+        TacticalCommandUtilities.RemoveIfPresent<TacticalCombatState>(
+            context,
+            entity);
+        TacticalCommandUtilities.RemoveIfPresent<TacticalMovementConstraint>(
+            context,
+            entity);
+        TacticalCommandUtilities.RemoveIfPresent<CombatGroupMember>(
+            context,
+            entity);
+        TacticalCommandUtilities.RemoveIfPresent<AutoTargetState>(
+            context,
+            entity);
     }
 
     private static void ClearFormationMembership(
