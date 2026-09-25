@@ -30,7 +30,8 @@ public sealed class TacticalCombatSystemTests
                 BlueFaction,
                 Vector3.Zero,
                 addVisualSensor: true,
-                visualRange: 150.0f);
+                visualRange: 150.0f,
+                movable: true);
         EntityId target =
             CreateCombatUnit(
                 scenario,
