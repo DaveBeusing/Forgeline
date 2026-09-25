@@ -1,5 +1,7 @@
+using System.Runtime.InteropServices;
 using ForgeLine.Core;
 using ForgeLine.Ecs;
+using ForgeLine.Simulation;
 using ForgeLine.World;
 
 namespace ForgeLine.Game;
@@ -20,7 +22,7 @@ public readonly record struct CompletedBuildingReadModel(
     string BuildingKey,
     PlayerId Owner,
     AxisAlignedBounds Bounds,
-    Simulation.SimulationTick CompletedAtTick);
+    SimulationTick CompletedAtTick);
 
 public sealed class BuildingConstructionDebugSnapshot
 {
