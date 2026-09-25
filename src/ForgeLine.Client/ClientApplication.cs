@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Game;
@@ -112,6 +113,27 @@ internal sealed class ClientApplication
         var battlefieldSupply =
             new BattlefieldSupplySystem(
                 inventories);
+        var combatWeapons =
+            new WeaponCatalog();
+        var combatRuntime =
+            new CombatRuntime();
+        var combatExecution =
+            new CombatExecutionSystem(
+                combatWeapons,
+                inventories,
+                combatRuntime,
+                spatialIndex);
+        var combatDamageResolution =
+            new CombatDamageResolutionSystem(
+                combatRuntime);
+        var combatLifecycle =
+            new CombatEntityLifecycleSystem(
+                combatRuntime,
+                spatialIndex);
+        var combatDebugSnapshots =
+            new CombatDebugSnapshotSystem(
+                combatWeapons,
+                combatRuntime);
         var logisticsRegistration =
             new BuildingLogisticsRegistrationSystem(
                 logisticsNetwork);
@@ -157,11 +179,15 @@ internal sealed class ClientApplication
         simulation.RegisterSystem(production);
         simulation.RegisterSystem(buildingConstruction);
         simulation.RegisterSystem(resourceExtraction);
+        simulation.RegisterSystem(combatExecution);
+        simulation.RegisterSystem(combatDamageResolution);
         simulation.RegisterSystem(battlefieldSupply);
         simulation.RegisterSystem(automatedDistribution);
         simulation.RegisterSystem(cargoTransportSystem);
         simulation.RegisterSystem(logisticsRegistration);
+        simulation.RegisterSystem(combatLifecycle);
         simulation.RegisterSystem(new SpatialIndexCleanupSystem(spatialSynchronizer));
+        simulation.RegisterSystem(combatDebugSnapshots);
         simulation.RegisterTickObserver(new PresentationExtractor(snapshotBuffer));
         simulation.AdvanceOneTick();
 
@@ -277,6 +303,8 @@ internal sealed class ClientApplication
             formationMovementSystem.DebugCaptureEnabled =
                 worldDebugEnabled;
             battlefieldSupply.DebugCaptureEnabled =
+                worldDebugEnabled;
+            combatDebugSnapshots.DebugCaptureEnabled =
                 worldDebugEnabled;
 
             if (smokeTest &&
@@ -415,6 +443,10 @@ internal sealed class ClientApplication
                 worldDebugEnabled
                     ? battlefieldSupply.LastDebugSnapshot
                     : null;
+            CombatDebugSnapshot? combatDebugSnapshot =
+                worldDebugEnabled
+                    ? combatDebugSnapshots.LastDebugSnapshot
+                    : null;
 
             BuildWorldDebugVisualization(
                 debugDraw,
@@ -435,7 +467,8 @@ internal sealed class ClientApplication
                 cargoTransportDebugSnapshot,
                 distributionDebugSnapshot,
                 logisticsCapacityDebugSnapshot,
-                battlefieldSupplyDebugSnapshot);
+                battlefieldSupplyDebugSnapshot,
+                combatDebugSnapshot);
 
             terrainRenderer.DebugChunksEnabled = worldDebugEnabled;
 
@@ -733,7 +766,8 @@ internal sealed class ClientApplication
         CargoTransportDebugSnapshot? cargoTransportSnapshot,
         AutomatedDistributionDebugSnapshot? distributionSnapshot,
         LogisticsCapacityDebugSnapshot? logisticsCapacitySnapshot,
-        BattlefieldSupplyDebugSnapshot? battlefieldSupplySnapshot)
+        BattlefieldSupplyDebugSnapshot? battlefieldSupplySnapshot,
+        CombatDebugSnapshot? combatSnapshot)
     {
         debugDraw.Clear();
 
@@ -871,6 +905,17 @@ internal sealed class ClientApplication
                     maximumProviders: 64,
                     maximumUnits: 128,
                     maximumLabels: 20);
+            }
+
+            if (combatSnapshot is not null)
+            {
+                CombatDebugVisualization.Draw(
+                    debugDraw,
+                    combatSnapshot,
+                    maximumWeapons: 64,
+                    maximumProjectiles: 256,
+                    maximumHealthLabels: 32,
+                    maximumImpacts: 128);
             }
 
             int debugCount = Math.Min(
