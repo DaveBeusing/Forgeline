@@ -64,12 +64,12 @@ The implemented simulation lifecycle and command boundary are documented in `doc
 ### Simulation Domains
 
 - `ForgeLine.Economy`: economy and production simulation.
-- `ForgeLine.Logistics`: graph-based logistics and supply simulation.
+- `ForgeLine.Logistics`: graph-based logistics topology, transport metadata, reachability, deterministic route planning, versioned invalidation/caching, and logistics diagnostics. See `docs/LogisticsNetworkAndRouting.md`.
 - `ForgeLine.Combat`: combat simulation.
 - `ForgeLine.Intelligence`: visibility, sensors, and intelligence simulation.
 - `ForgeLine.AI`: strategic, operational, tactical, and unit-behavior orchestration.
 
-These domain projects establish dependency boundaries only at this stage; their gameplay implementations are intentionally deferred.
+Simulation domains remain independently layered and are implemented progressively. A domain project may therefore contain production simulation while later capabilities in the same domain remain deferred.
 
 ### Game and Presentation
 

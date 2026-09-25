@@ -16,6 +16,7 @@
     <ProjectReference Include="../ForgeLine.World/ForgeLine.World.csproj" />
     <ProjectReference Include="../ForgeLine.Game/ForgeLine.Game.csproj" />
     <ProjectReference Include="../ForgeLine.Economy/ForgeLine.Economy.csproj" />
+    <ProjectReference Include="../ForgeLine.Logistics/ForgeLine.Logistics.csproj" />
     <ProjectReference Include="../ForgeLine.Presentation/ForgeLine.Presentation.csproj" />
     <ProjectReference Include="../ForgeLine.UI/ForgeLine.UI.csproj" />
   </ItemGroup>
