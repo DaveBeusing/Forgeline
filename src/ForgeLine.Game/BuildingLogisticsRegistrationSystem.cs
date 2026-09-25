@@ -225,6 +225,13 @@ public sealed class BuildingLogisticsRegistrationSystem
                 LogisticsNodeCapabilities.Processing;
         }
 
+        if (entities.TryGetComponent(
+                entity,
+                out LogisticsNodeAvailabilityOverride availability))
+        {
+            enabled &= availability.Enabled;
+        }
+
         kind = hasSupplyDepot
             ? LogisticsNodeKind.SupplyDepot
             : hasLogisticsHub

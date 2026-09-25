@@ -101,6 +101,8 @@ Automated regional distribution is composed above those existing authorities. `A
 
 Battlefield supply is the downstream operational layer. `BattlefieldSupplySystem` executes in the canonical `Supply` phase, consumes Fuel from authoritative unit movement, loads dedicated Supply Trucks only when physically near an operational Supply Depot, and transfers Fuel/Ammunition only between real inventories within provider range. Supply Depots are normal logistics-network destinations with automated Fuel/Ammunition stock policies; regional replenishment therefore remains owned by the existing distribution and Cargo Truck systems. Unit status and debug data are read models only, while zero-Fuel mobility constraints are consumed by `GroundMovementSystem`. See `docs/BattlefieldSupply.md`.
 
+Logistics capacity and disruption extend the same graph without creating a parallel transport authority. `LogisticsCapacityTracker` accounts scheduled edge/node load over a simulation-tick window, `LogisticsNetwork.FindCapacityAwareRoute` applies current capacity and lightweight congestion cost during dispatch planning, and `AutomatedDistributionSystem` admits work only when real throughput remains. Dynamic load does not change the structural logistics-network version; node/edge availability changes do, so active Cargo Truck routes continue to invalidate and reroute through the existing physical transport lifecycle. Explicit node disruptions persist as simulation-owned availability overrides that building registration must honor. Presentation consumes capacity and bottleneck snapshots only. See `docs/LogisticsCapacityAndDisruption.md`.
+
 Simulation code is written in a deterministic-friendly style:
 
 - explicit tick ordering
