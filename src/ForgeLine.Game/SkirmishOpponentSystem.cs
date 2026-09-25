@@ -139,18 +139,6 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 owned,
                 intelligence);
 
-        EnsureTacticalBehavior(
-            context,
-            owned,
-            configuration);
-        EnsureEconomyPolicies(
-            context,
-            controller,
-            owned);
-        EnsureProductionPrograms(
-            context,
-            owned);
-
         if (!IsDecisionDue(
                 context.Tick,
                 state.LastDecisionTick,
@@ -166,6 +154,19 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 objective: Vector3.Zero);
             return;
         }
+
+        EnsureTacticalBehavior(
+            context,
+            owned,
+            configuration);
+        EnsureEconomyPolicies(
+            context,
+            controller,
+            owned);
+        EnsureProductionPrograms(
+            context,
+            owned,
+            configuration);
 
         SkirmishStrategicState strategicState;
         SkirmishStrategicGoal goal;
@@ -1562,7 +1563,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private void EnsureProductionPrograms(
         SimulationContext context,
-        OwnedState owned)
+        OwnedState owned,
+        SkirmishOpponentConfiguration configuration)
     {
         for (int index = 0;
              index < owned.ProductionFacilities.Count;
@@ -1626,7 +1628,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         EnsureUnitProduction(
             context,
-            owned);
+            owned,
+            configuration);
     }
 
     private static bool HasProductionRequest(
@@ -1672,7 +1675,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private void EnsureUnitProduction(
         SimulationContext context,
-        OwnedState owned)
+        OwnedState owned,
+        SkirmishOpponentConfiguration configuration)
     {
         for (int index = 0;
              index < owned.UnitProductionFacilities.Count;
@@ -1691,7 +1695,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     ? pending
                     : 0;
 
-            if (queued >= 2)
+            if (queued >=
+                configuration.MaximumQueuedUnitsPerFacility)
             {
                 continue;
             }
