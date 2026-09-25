@@ -13,6 +13,26 @@ public readonly record struct LogisticsNodeId(ulong Value)
     public int CompareTo(LogisticsNodeId other) =>
         Value.CompareTo(other.Value);
 
+    public static bool operator <(
+        LogisticsNodeId left,
+        LogisticsNodeId right) =>
+        left.CompareTo(right) < 0;
+
+    public static bool operator <=(
+        LogisticsNodeId left,
+        LogisticsNodeId right) =>
+        left.CompareTo(right) <= 0;
+
+    public static bool operator >(
+        LogisticsNodeId left,
+        LogisticsNodeId right) =>
+        left.CompareTo(right) > 0;
+
+    public static bool operator >=(
+        LogisticsNodeId left,
+        LogisticsNodeId right) =>
+        left.CompareTo(right) >= 0;
+
     public override string ToString() =>
         Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
 }
@@ -27,6 +47,26 @@ public readonly record struct LogisticsEdgeId(ulong Value)
     public int CompareTo(LogisticsEdgeId other) =>
         Value.CompareTo(other.Value);
 
+    public static bool operator <(
+        LogisticsEdgeId left,
+        LogisticsEdgeId right) =>
+        left.CompareTo(right) < 0;
+
+    public static bool operator <=(
+        LogisticsEdgeId left,
+        LogisticsEdgeId right) =>
+        left.CompareTo(right) <= 0;
+
+    public static bool operator >(
+        LogisticsEdgeId left,
+        LogisticsEdgeId right) =>
+        left.CompareTo(right) > 0;
+
+    public static bool operator >=(
+        LogisticsEdgeId left,
+        LogisticsEdgeId right) =>
+        left.CompareTo(right) >= 0;
+
     public override string ToString() =>
         Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
 }
@@ -40,6 +80,26 @@ public readonly record struct LogisticsNetworkVersion(ulong Value)
 
     public int CompareTo(LogisticsNetworkVersion other) =>
         Value.CompareTo(other.Value);
+
+    public static bool operator <(
+        LogisticsNetworkVersion left,
+        LogisticsNetworkVersion right) =>
+        left.CompareTo(right) < 0;
+
+    public static bool operator <=(
+        LogisticsNetworkVersion left,
+        LogisticsNetworkVersion right) =>
+        left.CompareTo(right) <= 0;
+
+    public static bool operator >(
+        LogisticsNetworkVersion left,
+        LogisticsNetworkVersion right) =>
+        left.CompareTo(right) > 0;
+
+    public static bool operator >=(
+        LogisticsNetworkVersion left,
+        LogisticsNetworkVersion right) =>
+        left.CompareTo(right) >= 0;
 }
 
 public enum LogisticsNodeKind : byte

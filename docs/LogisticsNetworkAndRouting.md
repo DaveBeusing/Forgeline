@@ -4,7 +4,7 @@
 
 FORGELINE logistics routing is an authoritative graph model for strategic cargo connectivity between economic locations. It is deliberately separate from low-level unit navigation: the logistics graph decides which economic nodes and transport links form a valid transport route, while physical transport execution may later use the navigation subsystem to move vehicles between the route's node positions.
 
-The initial implementation provides the shared network foundation for extraction outputs, storage, processing, logistics hubs, supply depots, future cargo transport, congestion, infrastructure disruption, and battlefield supply.
+The network provides the shared routing foundation for extraction outputs, storage, processing, logistics hubs, supply depots, physical cargo transport, future congestion, infrastructure disruption, and battlefield supply.
 
 ## Network Model
 
@@ -101,6 +101,8 @@ Cached routes are keyed by source node, destination node, and the complete cost 
 
 Physical transport systems must treat the route's Version as part of its validity contract. When the network version changes, a previously obtained route must not be assumed to remain valid.
 
+CargoTransportSystem enforces this contract for ground cargo vehicles. It rejects stale routes, returns the vehicle to its last physically confirmed logistics-node anchor when needed, and requests a new route before continuing. See `CargoTransportOperations.md`.
+
 ## Economic Building Registration
 
 BuildingLogisticsRegistrationSystem bridges completed economic structures into the logistics graph while leaving graph ownership in ForgeLine.Logistics.
@@ -164,16 +166,17 @@ The logistics test suite covers:
 - minimum-capacity filtering;
 - disabled nodes.
 
-Game integration tests cover economic-building registration, lifecycle removal, capability mapping, and operational-state propagation.
+Game integration tests cover economic-building registration, lifecycle removal, capability mapping, operational-state propagation, physical Cargo Truck execution, resource conservation, route invalidation/rerouting, destination-capacity waiting, and vehicle-loss behavior.
 
 Presentation tests cover generation of logistics debug geometry without moving simulation ownership into the presentation layer.
 
 ## Current Boundary
 
-This foundation does not implement:
+Physical Cargo Truck execution now consumes this graph through the fixed-tick transport lifecycle documented in `CargoTransportOperations.md`.
 
-- physical cargo trucks;
-- automated dispatch;
+The remaining deferred logistics layers are:
+
+- automated dispatch optimization;
 - battlefield resupply;
 - rail gameplay;
 - pipelines;
@@ -181,4 +184,4 @@ This foundation does not implement:
 - traffic simulation;
 - final logistics UI.
 
-Those systems consume and extend the graph rather than replacing it.
+Those systems consume and extend the graph and physical transport contracts rather than replacing them.

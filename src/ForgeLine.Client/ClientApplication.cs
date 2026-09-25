@@ -97,6 +97,10 @@ internal sealed class ClientApplication
         var resourceExtraction = new ResourceExtractionSystem(
             inventories: inventories);
         var logisticsNetwork = new LogisticsNetwork();
+        var cargoTransportSystem =
+            new CargoTransportSystem(
+                logisticsNetwork,
+                inventories);
         var logisticsRegistration =
             new BuildingLogisticsRegistrationSystem(
                 logisticsNetwork);
@@ -141,6 +145,7 @@ internal sealed class ClientApplication
         simulation.RegisterSystem(production);
         simulation.RegisterSystem(buildingConstruction);
         simulation.RegisterSystem(resourceExtraction);
+        simulation.RegisterSystem(cargoTransportSystem);
         simulation.RegisterSystem(logisticsRegistration);
         simulation.RegisterSystem(new SpatialIndexCleanupSystem(spatialSynchronizer));
         simulation.RegisterTickObserver(new PresentationExtractor(snapshotBuffer));
@@ -378,6 +383,10 @@ internal sealed class ClientApplication
                     ? LogisticsNetworkDebugSnapshot.Capture(
                         logisticsNetwork)
                     : null;
+            CargoTransportDebugSnapshot? cargoTransportDebugSnapshot =
+                worldDebugEnabled
+                    ? cargoTransportSystem.LastDebugSnapshot
+                    : null;
 
             BuildWorldDebugVisualization(
                 debugDraw,
@@ -394,7 +403,8 @@ internal sealed class ClientApplication
                 buildingPlacementController,
                 constructionDebugSnapshot,
                 resourceDebugSnapshot,
-                logisticsDebugSnapshot);
+                logisticsDebugSnapshot,
+                cargoTransportDebugSnapshot);
 
             terrainRenderer.DebugChunksEnabled = worldDebugEnabled;
 
@@ -688,7 +698,8 @@ internal sealed class ClientApplication
         RtsBuildingPlacementController buildingPlacementController,
         BuildingConstructionDebugSnapshot? constructionSnapshot,
         ResourceExtractionDebugSnapshot? resourceSnapshot,
-        LogisticsNetworkDebugSnapshot? logisticsSnapshot)
+        LogisticsNetworkDebugSnapshot? logisticsSnapshot,
+        CargoTransportDebugSnapshot? cargoTransportSnapshot)
     {
         debugDraw.Clear();
 
@@ -788,6 +799,15 @@ internal sealed class ClientApplication
                     maximumNodes: 128,
                     maximumEdges: 256,
                     maximumLabels: 8);
+            }
+
+            if (cargoTransportSnapshot is not null)
+            {
+                CargoTransportDebugVisualization.Draw(
+                    debugDraw,
+                    cargoTransportSnapshot,
+                    maximumTransports: 128,
+                    maximumLabels: 12);
             }
 
             int debugCount = Math.Min(
