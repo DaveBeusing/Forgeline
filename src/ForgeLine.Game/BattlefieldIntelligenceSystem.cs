@@ -8,6 +8,14 @@ using ForgeLine.World;
 
 namespace ForgeLine.Game;
 
+public readonly record struct IntelligenceSensorDebugEntry(
+    EntityId Entity,
+    FactionId Faction,
+    Vector3 Position,
+    float RangeMeters,
+    bool IsRadar,
+    float IdentificationRangeMeters);
+
 public readonly record struct BattlefieldIntelligenceMetrics(
     int VisualSensorsThisTick,
     int RadarSensorsThisTick,
@@ -33,6 +41,8 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
     private readonly HashSet<EntityId> _activeVisualSensors = new();
     private readonly HashSet<FactionId> _activeFactions = new();
     private readonly List<EntityId> _staleVisualSensors = new();
+    private readonly List<IntelligenceSensorDebugEntry> _debugSensors =
+        new();
 
     private int _visualSensorsThisTick;
     private int _radarSensorsThisTick;
@@ -59,6 +69,11 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
     public SimulationPhase Phase => SimulationPhase.Sensors;
 
     public bool TimingEnabled { get; set; }
+
+    public bool DebugCaptureEnabled { get; set; }
+
+    public IReadOnlyList<IntelligenceSensorDebugEntry> DebugSensors =>
+        _debugSensors;
 
     public FactionIntelligenceStore Intelligence =>
         _intelligence;
@@ -139,6 +154,19 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
             _activeFactions.Add(sensor.Faction);
             _activeVisualSensors.Add(sensorEntity);
 
+            if (DebugCaptureEnabled)
+            {
+                _debugSensors.Add(
+                    new IntelligenceSensorDebugEntry(
+                        sensorEntity,
+                        sensor.Faction,
+                        transform.Position,
+                        sensor.RangeMeters,
+                        IsRadar: false,
+                        IdentificationRangeMeters:
+                            sensor.RangeMeters));
+            }
+
             bool due =
                 IsSensorDue(
                     context.Tick,
@@ -185,6 +213,22 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
             _radarSensorsThisTick++;
             _activeFactions.Add(sensor.Faction);
 
+            WorldTransform transform =
+                context.Entities.GetComponent<WorldTransform>(
+                    sensorEntity);
+
+            if (DebugCaptureEnabled)
+            {
+                _debugSensors.Add(
+                    new IntelligenceSensorDebugEntry(
+                        sensorEntity,
+                        sensor.Faction,
+                        transform.Position,
+                        sensor.DetectionRangeMeters,
+                        IsRadar: true,
+                        sensor.IdentificationRangeMeters));
+            }
+
             if (!IsSensorDue(
                     context.Tick,
                     sensorEntity,
@@ -192,10 +236,6 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
             {
                 continue;
             }
-
-            WorldTransform transform =
-                context.Entities.GetComponent<WorldTransform>(
-                    sensorEntity);
 
             RecordScan();
             ScanRadarSensor(
@@ -448,6 +488,7 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
         _sensorUpdateDuration = TimeSpan.Zero;
         _activeVisualSensors.Clear();
         _activeFactions.Clear();
+        _debugSensors.Clear();
     }
 
     private readonly record struct VisualCoverage(
