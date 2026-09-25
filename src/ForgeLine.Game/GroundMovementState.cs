@@ -9,7 +9,8 @@ public enum GroundMovementStatus : byte
     Moving = 1,
     Arrived = 2,
     Stuck = 3,
-    OutOfFuel = 4
+    OutOfFuel = 4,
+    TacticallyPaused = 5
 }
 
 public readonly record struct GroundMovementState(
