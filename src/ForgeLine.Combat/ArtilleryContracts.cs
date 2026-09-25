@@ -221,10 +221,9 @@ public readonly record struct IndirectFireProjectileState
                 nameof(weapon));
         }
 
-        if (impactTick <= launchTick)
-        {
-            throw new ArgumentOutOfRangeException(nameof(impactTick));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(
+            impactTick,
+            launchTick);
 
         if (!IsFinite(launchPosition) ||
             !IsFinite(targetPosition))
