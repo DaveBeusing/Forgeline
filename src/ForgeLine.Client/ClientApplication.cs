@@ -97,6 +97,9 @@ internal sealed class ClientApplication
         var resourceExtraction = new ResourceExtractionSystem(
             inventories: inventories);
         var logisticsNetwork = new LogisticsNetwork();
+        var logisticsDisruption =
+            new LogisticsDisruptionSystem(
+                logisticsNetwork);
         var cargoTransportSystem =
             new CargoTransportSystem(
                 logisticsNetwork,
@@ -145,6 +148,7 @@ internal sealed class ClientApplication
             new HierarchicalNavigationSystem(pathfinder);
 
         simulation.RegisterSystem(buildingCommands);
+        simulation.RegisterSystem(logisticsDisruption);
         simulation.RegisterSystem(formationMovementSystem);
         simulation.RegisterSystem(navigationSystem);
         simulation.RegisterSystem(groundMovementSystem);
@@ -403,6 +407,10 @@ internal sealed class ClientApplication
                 worldDebugEnabled
                     ? automatedDistribution.LastDebugSnapshot
                     : null;
+            LogisticsCapacityDebugSnapshot? logisticsCapacityDebugSnapshot =
+                worldDebugEnabled
+                    ? automatedDistribution.LastCapacityDebugSnapshot
+                    : null;
             BattlefieldSupplyDebugSnapshot? battlefieldSupplyDebugSnapshot =
                 worldDebugEnabled
                     ? battlefieldSupply.LastDebugSnapshot
@@ -426,6 +434,7 @@ internal sealed class ClientApplication
                 logisticsDebugSnapshot,
                 cargoTransportDebugSnapshot,
                 distributionDebugSnapshot,
+                logisticsCapacityDebugSnapshot,
                 battlefieldSupplyDebugSnapshot);
 
             terrainRenderer.DebugChunksEnabled = worldDebugEnabled;
@@ -723,6 +732,7 @@ internal sealed class ClientApplication
         LogisticsNetworkDebugSnapshot? logisticsSnapshot,
         CargoTransportDebugSnapshot? cargoTransportSnapshot,
         AutomatedDistributionDebugSnapshot? distributionSnapshot,
+        LogisticsCapacityDebugSnapshot? logisticsCapacitySnapshot,
         BattlefieldSupplyDebugSnapshot? battlefieldSupplySnapshot)
     {
         debugDraw.Clear();
@@ -840,6 +850,16 @@ internal sealed class ClientApplication
                     debugDraw,
                     distributionSnapshot,
                     maximumRequests: 128,
+                    maximumLabels: 12);
+            }
+
+            if (logisticsCapacitySnapshot is not null)
+            {
+                LogisticsCapacityDebugVisualization.Draw(
+                    debugDraw,
+                    logisticsCapacitySnapshot,
+                    maximumNodes: 128,
+                    maximumEdges: 256,
                     maximumLabels: 12);
             }
 
