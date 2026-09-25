@@ -41,7 +41,7 @@ The first execution layer supports:
 - projectile collision radius
 - projectile lifetime
 
-Directional armor, penetration, crew/module damage, suppression, artillery workflow, repair, and veterancy remain separate refinements.
+Directional armor, logical penetration, target classes, and automatic acquisition extend this layer through the contracts documented in `ArmorAndTargetAcquisition.md`. Realistic ballistic penetration, crew/module damage, suppression, artillery workflow, repair, and veterancy remain separate refinements.
 
 ## Weapon State and Fire Eligibility
 
@@ -254,6 +254,9 @@ Correctness remains separate from timing. Benchmark results are measurement evid
 
 ## Extension Boundary
 
-Later combat work may add directional armor, penetration, target acquisition, aiming, accuracy, guided projectiles, area effects, indirect fire, suppression, artillery workflow, repair, and veterancy.
+Later combat work may add realistic ballistic penetration, aiming, accuracy, guided projectiles, area effects, indirect fire, suppression, artillery workflow, repair, and veterancy.
 
 Those systems should extend the existing weapon, projectile, Health, damage, event, and lifecycle foundations rather than create parallel combat authorities.
+
+
+See [Armor and Target Acquisition](ArmorAndTargetAcquisition.md) for the authoritative directional-armor, penetration, target-class, automatic-acquisition, priority, fire-policy, intelligence-availability, and line-of-fire contracts.
