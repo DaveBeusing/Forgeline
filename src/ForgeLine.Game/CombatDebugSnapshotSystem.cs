@@ -149,12 +149,13 @@ public sealed class CombatDebugSnapshotSystem : ISimulationSystem
             WeaponDefinition definition =
                 _weapons.GetRequired(state.WeaponId);
 
+            WorldTransform targetTransform = default;
             bool hasTarget =
                 state.Target.IsValid &&
                 context.Entities.IsAlive(state.Target) &&
                 context.Entities.TryGetComponent(
                     state.Target,
-                    out WorldTransform targetTransform);
+                    out targetTransform);
 
             _weaponReadModels.Add(
                 new CombatWeaponReadModel(
