@@ -169,8 +169,8 @@ public sealed class CombatDamageResolutionSystem : ISimulationSystem
                 _topHits++;
                 break;
             default:
-                throw new ArgumentOutOfRangeException(
-                    nameof(zone));
+                throw new InvalidOperationException(
+                    $"Unsupported armor zone '{zone}'.");
         }
 
         return new DamagePayload(
