@@ -5,6 +5,7 @@ using ForgeLine.Game;
 using ForgeLine.Graphics;
 using ForgeLine.Input;
 using ForgeLine.Jobs;
+using ForgeLine.Logistics;
 using ForgeLine.Navigation;
 using ForgeLine.Platform;
 using ForgeLine.Presentation;
@@ -95,6 +96,10 @@ internal sealed class ClientApplication
             inventories);
         var resourceExtraction = new ResourceExtractionSystem(
             inventories: inventories);
+        var logisticsNetwork = new LogisticsNetwork();
+        var logisticsRegistration =
+            new BuildingLogisticsRegistrationSystem(
+                logisticsNetwork);
 
         PopulateSimulationEntities(
             simulation,
@@ -136,6 +141,7 @@ internal sealed class ClientApplication
         simulation.RegisterSystem(production);
         simulation.RegisterSystem(buildingConstruction);
         simulation.RegisterSystem(resourceExtraction);
+        simulation.RegisterSystem(logisticsRegistration);
         simulation.RegisterSystem(new SpatialIndexCleanupSystem(spatialSynchronizer));
         simulation.RegisterTickObserver(new PresentationExtractor(snapshotBuffer));
         simulation.AdvanceOneTick();
@@ -367,6 +373,11 @@ internal sealed class ClientApplication
                         resourceExtraction.Metrics,
                         resourceCatalog)
                     : null;
+            LogisticsNetworkDebugSnapshot? logisticsDebugSnapshot =
+                worldDebugEnabled
+                    ? LogisticsNetworkDebugSnapshot.Capture(
+                        logisticsNetwork)
+                    : null;
 
             BuildWorldDebugVisualization(
                 debugDraw,
@@ -382,7 +393,8 @@ internal sealed class ClientApplication
                 navigationSystem.LastCompletedPath,
                 buildingPlacementController,
                 constructionDebugSnapshot,
-                resourceDebugSnapshot);
+                resourceDebugSnapshot,
+                logisticsDebugSnapshot);
 
             terrainRenderer.DebugChunksEnabled = worldDebugEnabled;
 
@@ -675,7 +687,8 @@ internal sealed class ClientApplication
         NavigationPath? navigationPath,
         RtsBuildingPlacementController buildingPlacementController,
         BuildingConstructionDebugSnapshot? constructionSnapshot,
-        ResourceExtractionDebugSnapshot? resourceSnapshot)
+        ResourceExtractionDebugSnapshot? resourceSnapshot,
+        LogisticsNetworkDebugSnapshot? logisticsSnapshot)
     {
         debugDraw.Clear();
 
@@ -764,6 +777,16 @@ internal sealed class ClientApplication
                     new Vector4(0.65f, 0.9f, 0.25f, 1.0f),
                     new Vector4(0.35f, 0.35f, 0.35f, 1.0f),
                     maximumDeposits: 64,
+                    maximumLabels: 8);
+            }
+
+            if (logisticsSnapshot is not null)
+            {
+                LogisticsDebugVisualization.Draw(
+                    debugDraw,
+                    logisticsSnapshot,
+                    maximumNodes: 128,
+                    maximumEdges: 256,
                     maximumLabels: 8);
             }
 
