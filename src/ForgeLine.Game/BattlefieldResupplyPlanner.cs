@@ -28,6 +28,7 @@ public static class BattlefieldResupplyPlanner
         }
 
         WorldTransform providerTransform = default;
+        SupplyProvider selectedProvider = default;
         float bestDistanceSquared =
             float.PositiveInfinity;
 
@@ -70,6 +71,8 @@ public static class BattlefieldResupplyPlanner
                     candidate;
                 providerTransform =
                     transform;
+                selectedProvider =
+                    provider;
                 bestDistanceSquared =
                     distanceSquared;
             }
@@ -104,10 +107,16 @@ public static class BattlefieldResupplyPlanner
                 resupplyOrder);
         }
 
+        Vector3 approachPosition =
+            ResolveProviderApproachPosition(
+                recipientTransform.Position,
+                providerTransform.Position,
+                selectedProvider.ResupplyRangeMeters);
+
         var movementOrder =
             new MovementOrder(
                 owner,
-                providerTransform.Position,
+                approachPosition,
                 submittedAtTick,
                 context.Tick);
 
@@ -126,6 +135,38 @@ public static class BattlefieldResupplyPlanner
         }
 
         return true;
+    }
+
+    private static Vector3 ResolveProviderApproachPosition(
+        Vector3 recipientPosition,
+        Vector3 providerPosition,
+        float resupplyRangeMeters)
+    {
+        Vector3 offset =
+            recipientPosition -
+            providerPosition;
+        offset.Y = 0.0f;
+
+        float distance =
+            offset.Length();
+        float approachRadius =
+            MathF.Max(
+                1.0f,
+                resupplyRangeMeters * 0.75f);
+
+        if (distance <=
+            resupplyRangeMeters)
+        {
+            return recipientPosition;
+        }
+
+        Vector3 direction =
+            distance > 0.0001f
+                ? offset / distance
+                : Vector3.UnitZ;
+
+        return providerPosition +
+            direction * approachRadius;
     }
 
     private static void ClearFormationMovement(
