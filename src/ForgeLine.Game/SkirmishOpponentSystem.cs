@@ -878,7 +878,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
             if (economy.PowerDemand > 0.0 &&
                 economy.PowerGeneration <
-                economy.PowerDemand + 45.0 &&
+                economy.PowerDemand + 20.0 &&
                 GetBuildingCount(
                     owned,
                     BuildingIds.PowerPlant) < 4 &&
@@ -1439,17 +1439,17 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 context,
                 controller.PreferredConstructionSource,
                 ResourceIds.Electronics,
-                100.0,
-                300.0,
+                160.0,
+                360.0,
                 600.0,
                 LogisticsStockPriority.Critical);
             SetStockPolicy(
                 context,
                 controller.PreferredConstructionSource,
                 ResourceIds.Fuel,
-                120.0,
-                320.0,
+                360.0,
                 600.0,
+                900.0,
                 LogisticsStockPriority.High);
         }
 
