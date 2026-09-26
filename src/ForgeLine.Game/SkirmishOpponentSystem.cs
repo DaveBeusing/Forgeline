@@ -1214,11 +1214,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         objective = Vector3.Zero;
 
         if (owned.CombatUnits.Count <
-            configuration.MinimumAttackUnits ||
-            force.AverageReadiness <
-            configuration.OffensiveReadinessThreshold ||
-            force.MinimumSupply <
-            configuration.ResupplyThreshold)
+            configuration.MinimumAttackUnits)
         {
             return false;
         }
@@ -1237,7 +1233,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
                         return
                             readiness.OverallReadiness >=
-                                configuration.RetreatThreshold &&
+                                configuration.OffensiveReadinessThreshold &&
                             Math.Min(
                                 readiness.Fuel,
                                 readiness.Ammunition) >=
