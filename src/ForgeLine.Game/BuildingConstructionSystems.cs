@@ -51,11 +51,15 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
 
     public bool TryGetLastResult(
         PlayerId player,
-        out BuildCommandResult result) =>
-        player.IsSpecified &&
-        _lastResultsByPlayer.TryGetValue(
-            player,
-            out result);
+        out BuildCommandResult result)
+    {
+        result = default;
+
+        return player.IsSpecified &&
+            _lastResultsByPlayer.TryGetValue(
+                player,
+                out result);
+    }
 
     public void Execute(SimulationContext context)
     {
