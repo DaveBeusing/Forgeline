@@ -34,6 +34,21 @@ internal sealed class SkirmishScenarioHarness
     public AutomatedDistributionSystem AutomatedDistribution =>
         _scenario.AutomatedDistribution;
 
+    public PowerNetworkSystem Power => _scenario.Power;
+
+    public ProductionSystem Production => _scenario.Production;
+
+    public UnitProductionSystem UnitProduction => _scenario.UnitProduction;
+
+    public ResourceExtractionSystem Extraction => _scenario.Extraction;
+
+    public BattlefieldSupplySystem BattlefieldSupply =>
+        _scenario.BattlefieldSupply;
+
+    public ArtilleryFireMissionSystem Artillery => _scenario.Artillery;
+
+    public CombatReadinessSystem Readiness => _scenario.Readiness;
+
     public FactionIntelligenceStore Intelligence => _scenario.Intelligence;
 
     public SkirmishOpponentSystem Opponents => _scenario.Opponents;
