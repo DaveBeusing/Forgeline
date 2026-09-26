@@ -602,6 +602,10 @@ public sealed class AutomatedDistributionSystem
                     Math.Min(
                         truck.Capacity,
                         destinationCapacity)));
+            quantity = Math.Min(
+                quantity,
+                GetRouteWindowCapacity(
+                    structuralRoute.Route));
 
             if (quantity <= QuantityEpsilon)
             {
@@ -656,6 +660,55 @@ public sealed class AutomatedDistributionSystem
                             : LogisticsTransportRequestFailureReason.AssignmentFailed;
 
         return DispatchSelection.Failed(failureReason);
+    }
+
+    private double GetRouteWindowCapacity(
+        LogisticsRoute route)
+    {
+        double capacity =
+            double.PositiveInfinity;
+
+        if (!_network.TryGetNode(
+                route.Source,
+                out LogisticsNode source))
+        {
+            return 0.0;
+        }
+
+        capacity = Math.Min(
+            capacity,
+            source.ThroughputCapacityPerSecond *
+            _capacityTracker.WindowSeconds);
+
+        for (int index = 0;
+             index < route.Segments.Count;
+             index++)
+        {
+            LogisticsRouteSegment segment =
+                route.Segments[index];
+
+            capacity = Math.Min(
+                capacity,
+                segment.CapacityPerSecond *
+                _capacityTracker.WindowSeconds);
+
+            if (!_network.TryGetNode(
+                    segment.To,
+                    out LogisticsNode node))
+            {
+                return 0.0;
+            }
+
+            capacity = Math.Min(
+                capacity,
+                node.ThroughputCapacityPerSecond *
+                _capacityTracker.WindowSeconds);
+        }
+
+        return double.IsFinite(capacity) &&
+               capacity > QuantityEpsilon
+            ? capacity
+            : 0.0;
     }
 
     private bool TrySelectAvailableTruck(
