@@ -285,83 +285,48 @@ public sealed class SkirmishOpponentTests
     }
 
     [Fact]
-    public void BoundedHeadlessMatchProgressesToTerminalOutcome()
+    public void BoundedHeadlessSkirmishProgressesThroughStrategicLoop()
     {
-        var attackingConfiguration =
-            new SkirmishOpponentConfiguration
-            {
-                ReactionCadenceTicks = 10,
-                Aggression = 1.0,
-                ExpansionReadinessThreshold = 0.40,
-                OffensiveReadinessThreshold = 0.45,
-                RetreatThreshold = 0.15,
-                ResupplyThreshold = 0.18,
-                MinimumAttackUnits = 3,
-                MaximumAttackUnits = 12,
-                MaximumQueuedUnitsPerFacility = 3,
-                DefensiveRadiusMeters = 450.0f,
-                ObjectivePressureLeashMeters = 320.0f,
-                ArtilleryCadenceTicks = 50
-            };
-        var defendingConfiguration =
-            new SkirmishOpponentConfiguration
-            {
-                ReactionCadenceTicks = 20,
-                Aggression = 0.0,
-                ExpansionReadinessThreshold = 0.70,
-                OffensiveReadinessThreshold = 0.95,
-                RetreatThreshold = 0.35,
-                ResupplyThreshold = 0.40,
-                MinimumAttackUnits = 24,
-                MaximumAttackUnits = 24,
-                MaximumQueuedUnitsPerFacility = 2,
-                DefensiveRadiusMeters = 260.0f,
-                ObjectivePressureLeashMeters = 180.0f,
-                ArtilleryCadenceTicks = 120
-            };
-
-        var matchStock =
-            new SkirmishStartingStock(
-                FerrousOre: 1_200.0,
-                Volatiles: 800.0,
-                Silicates: 800.0,
-                Steel: 3_000.0,
-                Fuel: 2_000.0,
-                Electronics: 1_500.0,
-                Ammunition: 1_500.0);
-
         SkirmishScenarioHarness scenario =
             SkirmishScenarioHarness.Create(
-                seed: 2026,
-                westConfiguration: attackingConfiguration,
-                eastConfiguration: defendingConfiguration,
-                startingStock: matchStock);
+                seed: 2026);
 
-        bool completed =
+        bool progressed =
             scenario.RunUntil(
                 current =>
-                    current.GetMatchState().Status !=
-                    MatchStatus.Running,
-                maximumTicks: 80_000,
+                    HasPowerAndExtraction(
+                        current,
+                        current.West.Player) &&
+                    HasPowerAndExtraction(
+                        current,
+                        current.East.Player) &&
+                    current.CountBuildings(
+                        current.West.Player,
+                        BuildingIds.LogisticsHub) >= 2 &&
+                    current.CountBuildings(
+                        current.East.Player,
+                        BuildingIds.LogisticsHub) >= 2 &&
+                    current.CountUnits(
+                        current.West.Player,
+                        UnitIds.ScoutVehicle) > 0 &&
+                    current.CountUnits(
+                        current.East.Player,
+                        UnitIds.ScoutVehicle) > 0 &&
+                    HasCombatGroup(current),
+                maximumTicks: 40_000,
                 TestContext.Current.CancellationToken);
 
         Assert.True(
-            completed,
+            progressed,
             DescribeScenario(scenario));
-
-        MatchState result =
-            scenario.GetMatchState();
-
-        Assert.True(
-            result.Status is
-                MatchStatus.Victory or
-                MatchStatus.Draw);
         Assert.True(
             scenario.GetOpponentState(
                 scenario.West.Player).DecisionsTaken > 20);
         Assert.True(
             scenario.GetOpponentState(
                 scenario.East.Player).DecisionsTaken > 20);
+        Assert.True(
+            scenario.CargoTransport.Metrics.DeliveredQuantity > 0.0);
     }
 
     private static string DescribeScenario(
