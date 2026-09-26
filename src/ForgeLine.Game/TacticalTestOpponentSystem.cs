@@ -181,26 +181,6 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
                 continue;
             }
 
-            if (context.Entities.TryGetComponent(
-                    entity,
-                    out CombatOrderState existingOrder) &&
-                existingOrder.Kind is
-                    CombatOrderKind.AttackMove or
-                    CombatOrderKind.Retreat)
-            {
-                continue;
-            }
-
-            if (context.Entities.TryGetComponent(
-                    entity,
-                    out CombatOrderState existingOrder) &&
-                existingOrder.Kind is
-                    CombatOrderKind.AttackMove or
-                    CombatOrderKind.Retreat)
-            {
-                continue;
-            }
-
             IssueHoldIntent(
                 context,
                 entity,
