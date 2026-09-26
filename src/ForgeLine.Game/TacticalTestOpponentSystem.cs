@@ -216,6 +216,7 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
 
         bool found = false;
         int bestStateRank = int.MinValue;
+        int bestObjectiveRank = int.MinValue;
         float bestDistanceSquared =
             float.PositiveInfinity;
 
@@ -238,6 +239,23 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
                 contact.State == IntelligenceState.Identified
                     ? 1
                     : 0;
+            int objectiveRank = 0;
+
+            if (contact.State == IntelligenceState.Identified &&
+                _intelligence.TryResolveCurrentlyIdentifiedEntity(
+                    faction,
+                    contact.ContactKey,
+                    out EntityId candidate) &&
+                context.Entities.IsAlive(candidate) &&
+                context.Entities.TryGetComponent(
+                    candidate,
+                    out CompletedBuilding completed) &&
+                completed.BuildingId ==
+                    BuildingIds.CommandCore)
+            {
+                objectiveRank = 1;
+            }
+
             float distanceSquared =
                 HorizontalDistanceSquared(
                     origin,
@@ -246,12 +264,15 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
             if (!found ||
                 stateRank > bestStateRank ||
                 (stateRank == bestStateRank &&
-                 (distanceSquared < bestDistanceSquared ||
-                  (distanceSquared == bestDistanceSquared &&
-                   contact.ContactKey < selected.ContactKey))))
+                 (objectiveRank > bestObjectiveRank ||
+                  (objectiveRank == bestObjectiveRank &&
+                   (distanceSquared < bestDistanceSquared ||
+                    (distanceSquared == bestDistanceSquared &&
+                     contact.ContactKey < selected.ContactKey))))))
             {
                 selected = contact;
                 bestStateRank = stateRank;
+                bestObjectiveRank = objectiveRank;
                 bestDistanceSquared = distanceSquared;
                 found = true;
             }
