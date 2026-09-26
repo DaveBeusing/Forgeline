@@ -39,7 +39,7 @@ public sealed class VerticalSliceReadinessTests
     }
 
     [Fact]
-    public void ValidationAttackerBuildsAttackForceAndEstablishesContact()
+    public void ValidationAttackerEstablishesForwardSupplyAndContact()
     {
         SkirmishScenarioHarness scenario =
             SkirmishScenarioHarness.Create(
@@ -52,6 +52,9 @@ public sealed class VerticalSliceReadinessTests
         bool progressed =
             scenario.RunUntil(
                 current =>
+                    current.CountBuildings(
+                        current.West.Player,
+                        BuildingIds.SupplyDepot) >= 2 &&
                     current.CountUnits(
                         current.West.Player,
                         UnitIds.MainBattleTank) >=
