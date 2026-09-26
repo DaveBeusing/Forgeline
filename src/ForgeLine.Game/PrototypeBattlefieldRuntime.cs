@@ -294,6 +294,10 @@ public sealed class PrototypeBattlefieldRuntime
                     commandCore));
         }
 
+        MatchObjectiveSystem.ActivateMatch(
+            entities,
+            MatchStateEntity);
+
         return objectives;
     }
 
