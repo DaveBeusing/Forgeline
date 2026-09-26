@@ -1344,6 +1344,33 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 configuration.ResupplyThreshold,
                 configuration.RetreatThreshold,
                 configuration.ObjectivePressureLeashMeters);
+        var resupplyPolicy =
+            new AutomaticResupplyPolicy(
+                configuration.ResupplyThreshold,
+                configuration.ResupplyThreshold,
+                enabled: true);
+
+        for (int index = 0;
+             index < owned.Units.Count;
+             index++)
+        {
+            EntityId unit =
+                owned.Units[index];
+
+            if (context.Entities.HasComponent<AutomaticResupplyPolicy>(
+                    unit))
+            {
+                context.Entities.SetComponent(
+                    unit,
+                    resupplyPolicy);
+            }
+            else
+            {
+                context.Entities.AddComponent(
+                    unit,
+                    resupplyPolicy);
+            }
+        }
 
         for (int index = 0;
              index < owned.CombatUnits.Count;
