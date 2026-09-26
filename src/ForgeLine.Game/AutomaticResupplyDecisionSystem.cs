@@ -78,16 +78,6 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
                 continue;
             }
 
-            if (context.Entities.HasComponent<ResupplyOrder>(entity))
-            {
-                activeOrders++;
-                MarkResupplyRequested(
-                    context,
-                    entity,
-                    requested: true);
-                continue;
-            }
-
             bool needsAmmunition =
                 !context.Entities.HasComponent<CargoTransport>(entity) &&
                 NeedsAmmunition(
@@ -103,6 +93,9 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
             if (!needsAmmunition &&
                 !needsFuel)
             {
+                ClearResupplyIntentIfPresent(
+                    context,
+                    entity);
                 MarkResupplyRequested(
                     context,
                     entity,
@@ -125,6 +118,29 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
             {
                 requiredResources |=
                     BattlefieldSupplyResource.Ammunition;
+            }
+
+            if (context.Entities.TryGetComponent(
+                    entity,
+                    out ResupplyOrder activeOrder))
+            {
+                if (CanContinueWithProvider(
+                        context,
+                        controllable.Owner,
+                        activeOrder.Provider,
+                        requiredResources))
+                {
+                    activeOrders++;
+                    MarkResupplyRequested(
+                        context,
+                        entity,
+                        requested: true);
+                    continue;
+                }
+
+                ClearResupplyIntentIfPresent(
+                    context,
+                    entity);
             }
 
             if (BattlefieldResupplyPlanner.TryIssueNearestProviderOrder(
@@ -164,6 +180,67 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
                 unavailable,
                 _totalOrdersIssued,
                 _totalProviderUnavailable);
+    }
+
+    private bool CanContinueWithProvider(
+        SimulationContext context,
+        PlayerId owner,
+        EntityId providerEntity,
+        BattlefieldSupplyResource requiredResources)
+    {
+        if (!providerEntity.IsValid ||
+            !context.Entities.IsAlive(providerEntity) ||
+            !context.Entities.TryGetComponent(
+                providerEntity,
+                out SupplyProvider provider) ||
+            !provider.Enabled ||
+            provider.Owner != owner ||
+            !_inventories.Contains(provider.InventoryId))
+        {
+            return false;
+        }
+
+        if (context.Entities.TryGetComponent(
+                providerEntity,
+                out SupplyDepot depot) &&
+            depot.State != SupplyDepotState.Operational)
+        {
+            return false;
+        }
+
+        const double quantityEpsilon = 0.000000001;
+
+        if (requiredResources.HasFlag(
+                BattlefieldSupplyResource.Fuel) &&
+            _inventories.GetAvailableQuantity(
+                provider.InventoryId,
+                ResourceIds.Fuel) <= quantityEpsilon)
+        {
+            return false;
+        }
+
+        if (requiredResources.HasFlag(
+                BattlefieldSupplyResource.Ammunition) &&
+            _inventories.GetAvailableQuantity(
+                provider.InventoryId,
+                ResourceIds.Ammunition) <= quantityEpsilon)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static void ClearResupplyIntentIfPresent(
+        SimulationContext context,
+        EntityId entity)
+    {
+        TacticalCommandUtilities.RemoveIfPresent<ResupplyOrder>(
+            context,
+            entity);
+        TacticalCommandUtilities.ClearMovementIntent(
+            context,
+            entity);
     }
 
     private bool NeedsAmmunition(
