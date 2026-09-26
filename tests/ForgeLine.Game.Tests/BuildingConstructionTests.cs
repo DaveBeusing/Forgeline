@@ -195,6 +195,20 @@ public sealed class BuildingConstructionTests
         Assert.Equal(
             BuildingPlacementFailureReason.Obstructed,
             test.Commands.Metrics.LastPlacementFailure);
+        Assert.True(
+            test.Commands.TryGetLastResult(
+                Player,
+                out BuildCommandResult result));
+        Assert.False(result.Accepted);
+        Assert.Equal(
+            BuildCommandRejectionReason.PlacementInvalid,
+            result.RejectionReason);
+        Assert.Equal(
+            BuildingPlacementFailureReason.Obstructed,
+            result.PlacementFailure);
+        Assert.Equal(
+            test.Simulation.CurrentTick,
+            result.ResolvedAtTick);
         Assert.Equal(0, CountSites(test));
         AssertAllReservationsZero(test, inventoryEntity);
     }
