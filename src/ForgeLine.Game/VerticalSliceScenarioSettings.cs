@@ -20,6 +20,25 @@ public sealed record VerticalSliceScenarioSettings
 
     public required int NavigationSectorSizeCells { get; init; }
 
+    public void Validate()
+    {
+        WestOpponent.Validate();
+        EastOpponent.Validate();
+
+        if (!float.IsFinite(NavigationCellSizeMeters) ||
+            NavigationCellSizeMeters <= 0.0f)
+        {
+            throw new InvalidOperationException(
+                "Vertical-slice navigation cell size must be finite and greater than zero.");
+        }
+
+        if (NavigationSectorSizeCells < 1)
+        {
+            throw new InvalidOperationException(
+                "Vertical-slice navigation sector size must be at least one cell.");
+        }
+    }
+
     public static VerticalSliceScenarioSettings Create(
         VerticalSliceScenarioProfile profile) =>
         profile switch
