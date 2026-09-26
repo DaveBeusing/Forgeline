@@ -2076,7 +2076,21 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             new(240.0f, -150.0f),
             new(240.0f, 150.0f),
             new(290.0f, -40.0f),
-            new(290.0f, 40.0f)
+            new(290.0f, 40.0f),
+            new(-70.0f, -90.0f),
+            new(-70.0f, 90.0f),
+            new(-130.0f, -150.0f),
+            new(-130.0f, 150.0f),
+            new(-180.0f, -60.0f),
+            new(-180.0f, 60.0f),
+            new(110.0f, -210.0f),
+            new(110.0f, 210.0f),
+            new(210.0f, -210.0f),
+            new(210.0f, 210.0f),
+            new(-110.0f, -210.0f),
+            new(-110.0f, 210.0f),
+            new(-190.0f, -210.0f),
+            new(-190.0f, 210.0f)
         ];
 
         for (int index = 0;
