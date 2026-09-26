@@ -1043,11 +1043,17 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 FormationTemplate.Column);
         command.Execute(context);
 
+        bool attackForceEstablished =
+            force.CombatUnits >=
+            configuration.MinimumAttackUnits;
         bool forceWideRecovery =
-            force.AverageReadiness <
-                configuration.RetreatThreshold ||
-            recoveryUnits.Count ==
-                owned.CombatUnits.Count;
+            attackForceEstablished &&
+            (
+                force.AverageReadiness <
+                    configuration.RetreatThreshold ||
+                recoveryUnits.Count ==
+                    owned.CombatUnits.Count
+            );
 
         return forceWideRecovery;
     }
@@ -1147,6 +1153,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         out Vector3 objective)
     {
         objective = Vector3.Zero;
+
+        if (intelligence.Contacts.Any(
+                static contact =>
+                    contact.IsCurrent))
+        {
+            return false;
+        }
 
         EntityId scout =
             FindIdleUnit(
@@ -1275,8 +1288,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             }
 
             bool isCommandCore =
-                context.Entities.HasComponent<CommandCoreObjective>(
-                    candidate);
+                context.Entities.TryGetComponent(
+                    candidate,
+                    out CompletedBuilding objectiveBuilding) &&
+                objectiveBuilding.BuildingId ==
+                    BuildingIds.CommandCore;
             float distance =
                 HorizontalDistanceSquared(
                     controller.HomePosition,
