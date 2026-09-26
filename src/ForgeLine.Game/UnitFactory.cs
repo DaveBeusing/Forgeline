@@ -259,7 +259,10 @@ public sealed class UnitFactory
         {
             _entities.AddComponent(
                 entity,
-                new AutomaticResupplyPolicy());
+                new AutomaticResupplyPolicy(
+                    ammunitionThreshold: 0.2,
+                    fuelThreshold: 0.2,
+                    enabled: true));
         }
     }
 
