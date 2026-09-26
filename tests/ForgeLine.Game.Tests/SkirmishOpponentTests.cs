@@ -418,38 +418,43 @@ public sealed class SkirmishOpponentTests
                             $" move->{movement} fuel={fuel} resupply={resupply}";
                     }));
 
+        var unitProductionEntries =
+            new List<string>();
+
+        foreach (EntityId entity in
+                 scenario.Simulation.Entities.Query<UnitProductionFacility>())
+        {
+            if (!scenario.Simulation.Entities.TryGetComponent(
+                    entity,
+                    out CompletedBuilding building) ||
+                building.Owner != side.Player)
+            {
+                continue;
+            }
+
+            UnitProductionFacility facility =
+                scenario.Simulation.Entities.GetComponent<UnitProductionFacility>(
+                    entity);
+            PowerOperationalState powerState =
+                scenario.Simulation.Entities.TryGetComponent(
+                    entity,
+                    out PowerConsumer consumer)
+                    ? consumer.State
+                    : PowerOperationalState.Offline;
+
+            unitProductionEntries.Add(
+                $"{entity}:{facility.ActiveUnit}/{facility.Status}/{facility.BlockReason}" +
+                $" power={powerState}" +
+                $" steel={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Steel):F0}" +
+                $" elec={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Electronics):F0}" +
+                $" fuel={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Fuel):F0}" +
+                $" ammo={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Ammunition):F0}");
+        }
+
         string unitProductionStates =
             string.Join(
                 ",",
-                scenario.Simulation.Entities
-                    .Query<UnitProductionFacility>()
-                    .ToArray()
-                    .Where(entity =>
-                        scenario.Simulation.Entities.TryGetComponent(
-                            entity,
-                            out CompletedBuilding building) &&
-                        building.Owner == side.Player)
-                    .OrderBy(static entity => entity)
-                    .Select(entity =>
-                    {
-                        UnitProductionFacility facility =
-                            scenario.Simulation.Entities.GetComponent<UnitProductionFacility>(
-                                entity);
-                        PowerOperationalState powerState =
-                            scenario.Simulation.Entities.TryGetComponent(
-                                entity,
-                                out PowerConsumer consumer)
-                                ? consumer.State
-                                : PowerOperationalState.Offline;
-
-                        return
-                            $"{entity}:{facility.ActiveUnit}/{facility.Status}/{facility.BlockReason}" +
-                            $" power={powerState}" +
-                            $" steel={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Steel):F0}" +
-                            $" elec={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Electronics):F0}" +
-                            $" fuel={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Fuel):F0}" +
-                            $" ammo={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Ammunition):F0}";
-                    }));
+                unitProductionEntries);
 
         return
             $"{side.Player}={state.StrategicState}/{state.ActiveGoal} decisions={state.DecisionsTaken} " +
