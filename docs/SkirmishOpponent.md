@@ -158,9 +158,9 @@ Deterministic scenarios cover:
 - power and raw-resource recovery through normal construction
 - intelligence authorization for direct combat targets
 - same-seed strategic progression
-- bounded full-match execution toward a terminal match state
+- bounded Build–Supply–Conquer progression through bootstrap, expansion, reconnaissance, logistics movement, and combat-group formation
 
-Short deterministic scenarios belong in normal CI. Longer soak runs may use the same harness outside the regular CI duration budget.
+Short deterministic scenarios and bounded strategic progression belong in normal CI. Terminal full-match soak runs use the same harness outside the regular CI duration budget until long-horizon Cargo Truck fuel recovery and unit-production saturation are reliable enough to serve as a deterministic gate.
 
 ## Current Limitations
 
