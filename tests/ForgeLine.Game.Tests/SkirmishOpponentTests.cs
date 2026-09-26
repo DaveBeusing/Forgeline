@@ -423,6 +423,7 @@ public sealed class SkirmishOpponentTests
                 ",",
                 scenario.Simulation.Entities
                     .Query<UnitProductionFacility>()
+                    .ToArray()
                     .Where(entity =>
                         scenario.Simulation.Entities.TryGetComponent(
                             entity,
