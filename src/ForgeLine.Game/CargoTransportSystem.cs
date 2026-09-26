@@ -1418,6 +1418,27 @@ public sealed class CargoTransportSystem : ISimulationSystem
         Vector3 position,
         in GroundMovement movement)
     {
+        float tolerance =
+            movement.ObstacleLookAhead +
+            movement.Radius +
+            0.25f;
+
+        if (entities.IsAlive(node.Entity) &&
+            entities.TryGetComponent(
+                node.Entity,
+                out ResourceExtractor extractor) &&
+            entities.IsAlive(extractor.Deposit) &&
+            entities.TryGetComponent(
+                extractor.Deposit,
+                out ResourceDeposit deposit) &&
+            IsWithinBoundsApproachRange(
+                deposit.Bounds,
+                position,
+                tolerance))
+        {
+            return true;
+        }
+
         if (!entities.IsAlive(node.Entity) ||
             !entities.TryGetComponent(
                 node.Entity,
@@ -1436,6 +1457,17 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 node.Entity,
                 nodeTransform).Bounds;
 
+        return IsWithinBoundsApproachRange(
+            bounds,
+            position,
+            tolerance);
+    }
+
+    private static bool IsWithinBoundsApproachRange(
+        in ForgeLine.World.AxisAlignedBounds bounds,
+        Vector3 position,
+        float tolerance)
+    {
         float deltaX =
             position.X < bounds.Minimum.X
                 ? bounds.Minimum.X - position.X
@@ -1448,10 +1480,6 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 : position.Z > bounds.Maximum.Z
                     ? position.Z - bounds.Maximum.Z
                     : 0.0f;
-        float tolerance =
-            movement.ObstacleLookAhead +
-            movement.Radius +
-            0.25f;
 
         return
             deltaX * deltaX +
