@@ -115,13 +115,16 @@ internal readonly record struct HeadlessOptions(
             }
         }
 
-        ValidateCombination(
-            scenario,
-            profile,
-            tickRate,
-            entityCount,
-            matchCount,
-            requireTerminal);
+        if (!showHelp)
+        {
+            ValidateCombination(
+                scenario,
+                profile,
+                tickRate,
+                entityCount,
+                matchCount,
+                requireTerminal);
+        }
 
         return new HeadlessOptions(
             scenario,
