@@ -2484,7 +2484,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 site =>
                     site.Kind is
                         BattlefieldSiteKind.ForwardOperatingBase or
-                        BattlefieldSiteKind.Expansion)
+                        BattlefieldSiteKind.Expansion or
+                        BattlefieldSiteKind.MiningOutpost)
             .OrderBy(
                 site =>
                     homeWest
