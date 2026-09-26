@@ -292,6 +292,21 @@ public sealed class SkirmishOpponentTests
             scenario.Inventories.GetQuantity(
                 side.StartingInventory,
                 ResourceIds.Electronics);
+        AutomatedDistributionMetrics distribution =
+            scenario.AutomatedDistribution.Metrics;
+        CargoTransportMetrics cargo =
+            scenario.CargoTransport.Metrics;
+        string distributionFailures =
+            string.Join(
+                ",",
+                scenario.AutomatedDistribution.LastDebugSnapshot.Requests
+                    .Where(static request =>
+                        request.FailureReason !=
+                        LogisticsTransportRequestFailureReason.None)
+                    .Select(static request =>
+                        request.FailureReason)
+                    .Distinct()
+                    .Order());
 
         return
             $"{side.Player}={state.StrategicState}/{state.ActiveGoal} decisions={state.DecisionsTaken} " +
@@ -310,6 +325,9 @@ public sealed class SkirmishOpponentTests
             $"coreSteel={coreSteel:F0} coreElectronics={coreElectronics:F0} " +
             $"totalSteel={debug.Economy.Steel:F0} totalElectronics={debug.Economy.Electronics:F0} " +
             $"production={debug.Economy.ProductionFacilities} unitProduction={debug.Economy.UnitProductionFacilities} " +
+            $"distribution=p{distribution.PendingRequestCount}/a{distribution.AssignedRequestCount}/t{distribution.InTransitRequestCount}/r{distribution.RetryPendingRequestCount}/c{distribution.CompletedRequestCount}/f{distribution.FailedRequestCount} " +
+            $"distributionFailures={distributionFailures} " +
+            $"cargo={cargo.TransportCount}/active{cargo.ActiveTransportCount}/wait{cargo.WaitingTransportCount}/failed{cargo.FailedTransportCount}/delivered{cargo.DeliveredQuantity:F0}/routeFail{cargo.RouteFailureCount} " +
             $"scouts={scenario.CountUnits(side.Player, UnitIds.ScoutVehicle)} " +
             $"tanks={scenario.CountUnits(side.Player, UnitIds.MainBattleTank)}";
     }
