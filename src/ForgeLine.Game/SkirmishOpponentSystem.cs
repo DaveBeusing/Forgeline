@@ -24,10 +24,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         BuildingIds.Refinery,
         BuildingIds.ElectronicsPlant,
         BuildingIds.LogisticsHub,
+        BuildingIds.SupplyDepot,
         BuildingIds.Barracks,
         BuildingIds.VehicleFactory,
         BuildingIds.AmmunitionPlant,
-        BuildingIds.SupplyDepot,
         BuildingIds.Radar
     ];
 
