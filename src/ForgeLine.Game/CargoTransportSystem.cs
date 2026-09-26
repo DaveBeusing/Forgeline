@@ -1386,6 +1386,15 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return false;
         }
 
+        if (IsWithinStaticNodeApproachRange(
+                entities,
+                node,
+                transform.Position,
+                movement))
+        {
+            return true;
+        }
+
         if (entities.HasComponent<MovementOrder>(entity) ||
             entities.HasComponent<NavigationPendingPath>(entity) ||
             entities.HasComponent<NavigationRouteState>(entity))
@@ -1400,6 +1409,53 @@ public sealed class CargoTransportSystem : ISimulationSystem
         float tolerance =
             movement.StopRadius + 0.25f;
         return delta.LengthSquared() <=
+            tolerance * tolerance;
+    }
+
+    private static bool IsWithinStaticNodeApproachRange(
+        EntityRegistry entities,
+        in LogisticsNode node,
+        Vector3 position,
+        in GroundMovement movement)
+    {
+        if (!entities.IsAlive(node.Entity) ||
+            !entities.TryGetComponent(
+                node.Entity,
+                out WorldTransform nodeTransform) ||
+            !entities.TryGetComponent(
+                node.Entity,
+                out SpatialPresence presence) ||
+            presence.Metadata.Mobility !=
+            ForgeLine.World.SpatialMobility.Static)
+        {
+            return false;
+        }
+
+        var bounds =
+            presence.CreateEntry(
+                node.Entity,
+                nodeTransform).Bounds;
+
+        float deltaX =
+            position.X < bounds.Minimum.X
+                ? bounds.Minimum.X - position.X
+                : position.X > bounds.Maximum.X
+                    ? position.X - bounds.Maximum.X
+                    : 0.0f;
+        float deltaZ =
+            position.Z < bounds.Minimum.Z
+                ? bounds.Minimum.Z - position.Z
+                : position.Z > bounds.Maximum.Z
+                    ? position.Z - bounds.Maximum.Z
+                    : 0.0f;
+        float tolerance =
+            movement.ObstacleLookAhead +
+            movement.Radius +
+            0.25f;
+
+        return
+            deltaX * deltaX +
+            deltaZ * deltaZ <=
             tolerance * tolerance;
     }
 
