@@ -23,7 +23,7 @@ public readonly record struct SkirmishStartingStock(
             Volatiles: 900.0,
             Silicates: 900.0,
             Steel: 280.0,
-            Fuel: 320.0,
+            Fuel: 900.0,
             Electronics: 160.0,
             Ammunition: 420.0);
 }
