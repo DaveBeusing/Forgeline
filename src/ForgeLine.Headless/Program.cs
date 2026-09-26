@@ -199,6 +199,13 @@ internal static class Program
                 $"westReadiness={report.West.AverageReadiness:F3}; " +
                 $"eastReadiness={report.East.AverageReadiness:F3}.");
 
+            WriteSideSummary(
+                "west",
+                report.West);
+            WriteSideSummary(
+                "east",
+                report.East);
+
             if (options.RequireTerminal &&
                 !scenario.GetMatchState().IsTerminal)
             {
@@ -233,6 +240,21 @@ internal static class Program
         return terminalFailure
             ? 3
             : 0;
+    }
+
+    private static void WriteSideSummary(
+        string label,
+        VerticalSliceSideReport side)
+    {
+        Console.WriteLine(
+            $"{label}: state={side.StrategicState}; goal={side.ActiveGoal}; " +
+            $"units={side.TotalUnits}/combat={side.CombatUnits}; " +
+            $"rifle={side.RifleSquads}; scout={side.Scouts}; tank={side.MainBattleTanks}; " +
+            $"artillery={side.MobileArtillery}; cargo={side.CargoTrucks}; supply={side.SupplyTrucks}; " +
+            $"facilities={side.UnitProductionFacilities}; depots={side.SupplyDepots}; radar={side.Radars}; " +
+            $"steel={side.Steel:F1}; fuel={side.Fuel:F1}; electronics={side.Electronics:F1}; ammo={side.Ammunition:F1}; " +
+            $"minimumSupply={side.MinimumSupply:F3}; resupplyOrders={side.ActiveResupplyOrders}; " +
+            $"production=({side.UnitProductionSummary}).");
     }
 
     private static void PopulateLightweightEntities(
