@@ -991,15 +991,39 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
-        bool retreat =
-            force.AverageReadiness <
-            configuration.RetreatThreshold;
-        bool resupply =
-            force.MinimumSupply <
-            configuration.ResupplyThreshold;
+        var recoveryUnits =
+            new List<EntityId>();
 
-        if (!retreat &&
-            !resupply)
+        for (int index = 0;
+             index < owned.CombatUnits.Count;
+             index++)
+        {
+            EntityId unit =
+                owned.CombatUnits[index];
+
+            if (!context.Entities.TryGetComponent(
+                    unit,
+                    out UnitCombatReadiness readiness))
+            {
+                continue;
+            }
+
+            double supply =
+                Math.Min(
+                    readiness.Fuel,
+                    readiness.Ammunition);
+
+            if (readiness.OverallReadiness <
+                    configuration.RetreatThreshold ||
+                supply <
+                    configuration.ResupplyThreshold)
+            {
+                recoveryUnits.Add(
+                    unit);
+            }
+        }
+
+        if (recoveryUnits.Count == 0)
         {
             return false;
         }
@@ -1013,13 +1037,19 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         var command =
             new RetreatCommand(
                 controller.Player,
-                owned.CombatUnits.ToArray(),
+                recoveryUnits.ToArray(),
                 recovery,
                 context.Tick,
                 FormationTemplate.Column);
         command.Execute(context);
 
-        return true;
+        bool forceWideRecovery =
+            force.AverageReadiness <
+                configuration.RetreatThreshold ||
+            recoveryUnits.Count ==
+                owned.CombatUnits.Count;
+
+        return forceWideRecovery;
     }
 
     private bool TryExpand(
@@ -1195,9 +1225,33 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         EntityId[] attackers =
             owned.CombatUnits
+                .Where(
+                    unit =>
+                    {
+                        if (!context.Entities.TryGetComponent(
+                                unit,
+                                out UnitCombatReadiness readiness))
+                        {
+                            return true;
+                        }
+
+                        return
+                            readiness.OverallReadiness >=
+                                configuration.RetreatThreshold &&
+                            Math.Min(
+                                readiness.Fuel,
+                                readiness.Ammunition) >=
+                                configuration.ResupplyThreshold;
+                    })
                 .Take(
                     configuration.MaximumAttackUnits)
                 .ToArray();
+
+        if (attackers.Length <
+            configuration.MinimumAttackUnits)
+        {
+            return false;
+        }
 
         IntelligenceContact? identified =
             intelligence.Contacts
