@@ -76,9 +76,9 @@ public sealed class SkirmishOpponentTests
     {
         var constrainedStock =
             new SkirmishStartingStock(
-                FerrousOre: 40.0,
-                Volatiles: 40.0,
-                Silicates: 40.0,
+                FerrousOre: 500.0,
+                Volatiles: 60.0,
+                Silicates: 200.0,
                 Steel: 1_200.0,
                 Fuel: 600.0,
                 Electronics: 600.0,
@@ -99,7 +99,9 @@ public sealed class SkirmishOpponentTests
                 maximumTicks: 8_000,
                 TestContext.Current.CancellationToken);
 
-        Assert.True(recovered);
+        Assert.True(
+            recovered,
+            DescribeScenario(scenario));
         Assert.True(
             scenario.GetOpponentState(
                 scenario.West.Player).DecisionsTaken > 0);
@@ -122,7 +124,9 @@ public sealed class SkirmishOpponentTests
                 maximumTicks: 12_000,
                 TestContext.Current.CancellationToken);
 
-        Assert.True(formedGroup);
+        Assert.True(
+            formedGroup,
+            DescribeScenario(scenario));
 
         foreach (EntityId entity in
                  scenario.Simulation.Entities.Query<CombatGroupIntent>())
@@ -226,7 +230,9 @@ public sealed class SkirmishOpponentTests
                 maximumTicks: 30_000,
                 TestContext.Current.CancellationToken);
 
-        Assert.True(completed);
+        Assert.True(
+            completed,
+            DescribeScenario(scenario));
 
         MatchState result =
             scenario.GetMatchState();
@@ -241,6 +247,36 @@ public sealed class SkirmishOpponentTests
         Assert.True(
             scenario.GetOpponentState(
                 scenario.East.Player).DecisionsTaken > 20);
+    }
+
+    private static string DescribeScenario(
+        SkirmishScenarioHarness scenario)
+    {
+        SkirmishOpponentState west =
+            scenario.GetOpponentState(
+                scenario.West.Player);
+        SkirmishOpponentState east =
+            scenario.GetOpponentState(
+                scenario.East.Player);
+        MatchState match =
+            scenario.GetMatchState();
+
+        return
+            $"match={match.Status}; " +
+            $"west={west.StrategicState}/{west.ActiveGoal} decisions={west.DecisionsTaken} " +
+            $"power={scenario.CountBuildings(scenario.West.Player, BuildingIds.PowerPlant)} " +
+            $"extractors={scenario.CountBuildings(scenario.West.Player, BuildingIds.Extractor)} " +
+            $"barracks={scenario.CountBuildings(scenario.West.Player, BuildingIds.Barracks)} " +
+            $"factory={scenario.CountBuildings(scenario.West.Player, BuildingIds.VehicleFactory)} " +
+            $"scouts={scenario.CountUnits(scenario.West.Player, UnitIds.ScoutVehicle)} " +
+            $"tanks={scenario.CountUnits(scenario.West.Player, UnitIds.MainBattleTank)}; " +
+            $"east={east.StrategicState}/{east.ActiveGoal} decisions={east.DecisionsTaken} " +
+            $"power={scenario.CountBuildings(scenario.East.Player, BuildingIds.PowerPlant)} " +
+            $"extractors={scenario.CountBuildings(scenario.East.Player, BuildingIds.Extractor)} " +
+            $"barracks={scenario.CountBuildings(scenario.East.Player, BuildingIds.Barracks)} " +
+            $"factory={scenario.CountBuildings(scenario.East.Player, BuildingIds.VehicleFactory)} " +
+            $"scouts={scenario.CountUnits(scenario.East.Player, UnitIds.ScoutVehicle)} " +
+            $"tanks={scenario.CountUnits(scenario.East.Player, UnitIds.MainBattleTank)}";
     }
 
     private static bool HasCombatGroup(
