@@ -88,7 +88,17 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
                 continue;
             }
 
+            if (context.Entities.HasComponent<CargoTransportOrder>(entity) ||
+                (context.Entities.TryGetComponent(
+                     entity,
+                     out CargoTransportRuntimeState cargoState) &&
+                 cargoState.Lifecycle != CargoTransportLifecycleState.Idle))
+            {
+                continue;
+            }
+
             bool needsAmmunition =
+                !context.Entities.HasComponent<CargoTransport>(entity) &&
                 NeedsAmmunition(
                     context.Entities,
                     entity,
