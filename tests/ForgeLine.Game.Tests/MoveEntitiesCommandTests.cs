@@ -102,6 +102,49 @@ public sealed class MoveEntitiesCommandTests
     }
 
     [Fact]
+    public void MovementOrderRejectsSelectedBuildings()
+    {
+        var simulation = new SimulationCoordinator();
+        EntityId building =
+            simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(
+            building,
+            new WorldTransform(
+                Vector3.Zero,
+                Quaternion.Identity,
+                Vector3.One));
+        simulation.Entities.AddComponent(
+            building,
+            new ControllableEntity(
+                LocalPlayer,
+                ControllableEntityCategory.Building));
+
+        var command =
+            new MoveEntitiesCommand(
+                LocalPlayer,
+                [building],
+                new Vector3(64.0f, 0.0f, 64.0f),
+                SimulationTick.Zero);
+
+        simulation.SubmitCommand(
+            command,
+            new SimulationTick(1),
+            new SimulationCommandSource(
+                LocalPlayer.Value));
+        simulation.AdvanceOneTick();
+
+        Assert.Equal(
+            0,
+            command.AcceptedTargetCount);
+        Assert.Equal(
+            1,
+            command.RejectedTargetCount);
+        Assert.False(
+            simulation.Entities.HasComponent<MovementOrder>(
+                building));
+    }
+
+    [Fact]
     public void MovementCommandNeverChangesTransformDirectly()
     {
         var simulation = new SimulationCoordinator();
