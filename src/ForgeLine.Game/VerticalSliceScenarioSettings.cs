@@ -16,6 +16,10 @@ public sealed record VerticalSliceScenarioSettings
 
     public required SkirmishOpponentConfiguration EastOpponent { get; init; }
 
+    public required float NavigationCellSizeMeters { get; init; }
+
+    public required int NavigationSectorSizeCells { get; init; }
+
     public static VerticalSliceScenarioSettings Create(
         VerticalSliceScenarioProfile profile) =>
         profile switch
@@ -35,7 +39,9 @@ public sealed record VerticalSliceScenarioSettings
             Profile = VerticalSliceScenarioProfile.Gameplay,
             StartingStock = SkirmishStartingStock.Standard,
             WestOpponent = new SkirmishOpponentConfiguration(),
-            EastOpponent = new SkirmishOpponentConfiguration()
+            EastOpponent = new SkirmishOpponentConfiguration(),
+            NavigationCellSizeMeters = 16.0f,
+            NavigationSectorSizeCells = 8
         };
 
     private static VerticalSliceScenarioSettings CreateValidation() =>
@@ -82,6 +88,8 @@ public sealed record VerticalSliceScenarioSettings
                     DefensiveRadiusMeters = 260.0f,
                     ObjectivePressureLeashMeters = 180.0f,
                     ArtilleryCadenceTicks = 120
-                }
+                },
+            NavigationCellSizeMeters = 32.0f,
+            NavigationSectorSizeCells = 4
         };
 }
