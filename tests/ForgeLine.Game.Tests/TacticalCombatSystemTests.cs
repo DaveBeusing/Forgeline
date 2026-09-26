@@ -863,6 +863,69 @@ public sealed class TacticalCombatSystemTests
     }
 
     [Fact]
+    public void TacticalTestOpponentAdvancesTowardIdentifiedTargetOutsideEngagementLeash()
+    {
+        TacticalScenario scenario =
+            CreateScenario(
+                weaponRange: 80.0f,
+                registerReadiness: true,
+                registerTestOpponent: true);
+
+        EntityId opponent =
+            CreateCombatUnit(
+                scenario,
+                RedPlayer,
+                RedFaction,
+                Vector3.Zero,
+                movable: true,
+                attachSupply: true,
+                fuelCapacity: 100.0,
+                initialFuel: 100.0,
+                ammunitionCapacity: 100.0,
+                initialAmmunition: 100.0);
+        scenario.Simulation.Entities.AddComponent(
+            opponent,
+            new TacticalTestOpponent(
+                engagementLeashMeters: 100.0f));
+        scenario.Simulation.Entities.AddComponent(
+            opponent,
+            new VisualSensorState(
+                RedFaction,
+                rangeMeters: 500.0f,
+                updateIntervalTicks: 1));
+
+        EntityId target =
+            CreateCombatUnit(
+                scenario,
+                BluePlayer,
+                BlueFaction,
+                new Vector3(300.0f, 0.0f, 0.0f));
+
+        scenario.Simulation.AdvanceOneTick();
+        scenario.Simulation.AdvanceOneTick();
+
+        CombatOrderState order =
+            scenario.Simulation.Entities.GetComponent<CombatOrderState>(
+                opponent);
+
+        Assert.Equal(
+            CombatOrderKind.AttackMove,
+            order.Kind);
+        Assert.False(
+            order.ExplicitTarget.IsValid);
+        Assert.Equal(
+            new Vector3(300.0f, 0.0f, 0.0f),
+            order.Destination);
+        Assert.True(
+            scenario.Simulation.Entities.HasComponent<MovementOrder>(
+                opponent));
+        Assert.NotEqual(
+            target,
+            scenario.Simulation.Entities.GetComponent<WeaponState>(
+                opponent).Target);
+    }
+
+    [Fact]
     public void GroupReadinessTracksSurvivingStrengthAfterEntityLoss()
     {
         TacticalScenario scenario =
