@@ -15,6 +15,8 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
     private readonly InventoryStore _inventories;
     private readonly SpatialGridIndex _spatialIndex;
     private readonly List<EntityId> _pendingRequests = new();
+    private readonly Dictionary<PlayerId, BuildCommandResult> _lastResultsByPlayer =
+        new();
     private long _acceptedCommands;
     private long _rejectedCommands;
     private BuildCommandRejectionReason _lastRejection;
@@ -46,6 +48,14 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
             _lastRejection,
             _lastPlacementFailure,
             _lastCreatedSite);
+
+    public bool TryGetLastResult(
+        PlayerId player,
+        out BuildCommandResult result) =>
+        player.IsSpecified &&
+        _lastResultsByPlayer.TryGetValue(
+            player,
+            out result);
 
     public void Execute(SimulationContext context)
     {
@@ -86,6 +96,7 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
             Reject(
                 context,
                 requestEntity,
+                request,
                 BuildCommandRejectionReason.UnknownBuilding,
                 BuildingPlacementFailureReason.UnknownBuilding);
             return;
@@ -103,6 +114,7 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
             Reject(
                 context,
                 requestEntity,
+                request,
                 BuildCommandRejectionReason.PlacementInvalid,
                 placement.Failure);
             return;
@@ -116,6 +128,7 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
             Reject(
                 context,
                 requestEntity,
+                request,
                 BuildCommandRejectionReason.InvalidSourceInventory,
                 BuildingPlacementFailureReason.None);
             return;
@@ -129,6 +142,7 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
             Reject(
                 context,
                 requestEntity,
+                request,
                 BuildCommandRejectionReason.SourceInventoryOwnershipMismatch,
                 BuildingPlacementFailureReason.None);
             return;
@@ -139,6 +153,7 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
             Reject(
                 context,
                 requestEntity,
+                request,
                 BuildCommandRejectionReason.InsufficientResources,
                 BuildingPlacementFailureReason.None);
             return;
@@ -197,6 +212,15 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
         _lastRejection = BuildCommandRejectionReason.None;
         _lastPlacementFailure = BuildingPlacementFailureReason.None;
         _lastCreatedSite = site;
+        _lastResultsByPlayer[request.Issuer] =
+            new BuildCommandResult(
+                request.Issuer,
+                request.BuildingId,
+                Accepted: true,
+                BuildCommandRejectionReason.None,
+                BuildingPlacementFailureReason.None,
+                site,
+                context.Tick);
 
         context.Entities.DestroyEntity(requestEntity);
     }
@@ -306,6 +330,7 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
     private void Reject(
         SimulationContext context,
         EntityId requestEntity,
+        in BuildingBuildRequest request,
         BuildCommandRejectionReason rejection,
         BuildingPlacementFailureReason placementFailure)
     {
@@ -313,6 +338,15 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
         _lastRejection = rejection;
         _lastPlacementFailure = placementFailure;
         _lastCreatedSite = EntityId.Invalid;
+        _lastResultsByPlayer[request.Issuer] =
+            new BuildCommandResult(
+                request.Issuer,
+                request.BuildingId,
+                Accepted: false,
+                rejection,
+                placementFailure,
+                EntityId.Invalid,
+                context.Tick);
 
         context.Entities.DestroyEntity(requestEntity);
     }
