@@ -126,6 +126,7 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
             {
                 if (CanContinueWithProvider(
                         context,
+                        entity,
                         controllable.Owner,
                         activeOrder.Provider,
                         requiredResources))
@@ -184,6 +185,7 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
 
     private bool CanContinueWithProvider(
         SimulationContext context,
+        EntityId recipient,
         PlayerId owner,
         EntityId providerEntity,
         BattlefieldSupplyResource requiredResources)
@@ -226,6 +228,38 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
                 ResourceIds.Ammunition) <= quantityEpsilon)
         {
             return false;
+        }
+
+        if (context.Entities.TryGetComponent(
+                recipient,
+                out SupplyMovementConstraint recipientMovement) &&
+            !recipientMovement.CanMove &&
+            context.Entities.TryGetComponent(
+                recipient,
+                out WorldTransform recipientTransform) &&
+            context.Entities.TryGetComponent(
+                providerEntity,
+                out WorldTransform providerTransform))
+        {
+            float deltaX =
+                recipientTransform.Position.X -
+                providerTransform.Position.X;
+            float deltaZ =
+                recipientTransform.Position.Z -
+                providerTransform.Position.Z;
+            float distanceSquared =
+                deltaX * deltaX +
+                deltaZ * deltaZ;
+            float rangeSquared =
+                provider.ResupplyRangeMeters *
+                provider.ResupplyRangeMeters;
+
+            if (distanceSquared > rangeSquared &&
+                !context.Entities.HasComponent<SupplyTruck>(
+                    providerEntity))
+            {
+                return false;
+            }
         }
 
         return true;
