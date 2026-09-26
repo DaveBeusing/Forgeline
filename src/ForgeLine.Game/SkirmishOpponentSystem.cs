@@ -207,6 +207,22 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 SkirmishStrategicGoal.Defend;
             hasObjective = true;
         }
+        else if (TryExpand(
+                     context,
+                     controller,
+                     owned,
+                     economy,
+                     force,
+                     configuration,
+                     ref state,
+                     out objective))
+        {
+            strategicState =
+                SkirmishStrategicState.Expanding;
+            goal =
+                SkirmishStrategicGoal.Expand;
+            hasObjective = true;
+        }
         else if (TryRecoverForce(
                      context,
                      controller,
@@ -223,22 +239,6 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     context,
                     controller,
                     owned);
-            hasObjective = true;
-        }
-        else if (TryExpand(
-                     context,
-                     controller,
-                     owned,
-                     economy,
-                     force,
-                     configuration,
-                     ref state,
-                     out objective))
-        {
-            strategicState =
-                SkirmishStrategicState.Expanding;
-            goal =
-                SkirmishStrategicGoal.Expand;
             hasObjective = true;
         }
         else if (TryScout(
