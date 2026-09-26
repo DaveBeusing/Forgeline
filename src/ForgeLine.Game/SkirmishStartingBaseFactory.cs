@@ -174,6 +174,16 @@ public static class SkirmishStartingBaseFactory
                     new Vector3(0.0f, 0.0f, 20.0f),
                     heightOffset: 2.0f),
                 start.Player);
+        EntityId secondCargoTruck =
+            unitFactory.Create(
+                units[UnitIds.CargoTruck],
+                SampleTerrain(
+                    terrain,
+                    start.Position +
+                    outward * 42.0f +
+                    new Vector3(0.0f, 0.0f, 36.0f),
+                    heightOffset: 2.0f),
+                start.Player);
 
         EntityId controller =
             entities.CreateEntity();
@@ -194,7 +204,7 @@ public static class SkirmishStartingBaseFactory
             commandCore,
             controller,
             inventory,
-            [engineer, cargoTruck]);
+            [engineer, cargoTruck, secondCargoTruck]);
     }
 
     private static void SeedStartingInventory(
