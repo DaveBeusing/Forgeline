@@ -4,7 +4,7 @@
 
 `ForgeLine.Client` is the interactive Windows x64 composition root. It owns the native application host and composes the Direct3D 12 graphics foundation, RTS input/camera stack, and the representative terrain presentation without introducing Win32 or D3D12 details into world, simulation, or game rules.
 
-The current client initializes graphics, consumes the platform input stream through `ForgeLine.Input`, updates the presentation-only RTS camera and selection controller, advances the fixed-tick simulation, extracts immutable presentation snapshots, interpolates simple render instances, and renders them together with depth-tested chunked terrain. RTS selection, movement commands, hierarchical navigation, shared-route formation movement, and the Phase-5 tactical battle composition are active development capabilities. Production unit art, the final RTS combat-command UI, and audio playback remain deferred.
+The current client initializes graphics, consumes the platform input stream through `ForgeLine.Input`, updates the presentation-only RTS camera and selection controller, advances the fixed-tick simulation, extracts immutable presentation snapshots, and renders the authoritative skirmish together with depth-tested chunked terrain. RTS selection, movement commands, hierarchical navigation, shared-route formation movement, and the integrated tactical systems are active development capabilities. Synthetic render instances are opt-in through `--render-stress` and are not part of a normal playable match. Production unit art, the final RTS combat-command UI, and audio playback remain deferred.
 
 ## Platform Boundary
 
@@ -171,14 +171,10 @@ For manual validation, also resize the window, minimize and restore it, move it 
 See [Presentation Extraction and Debugging](PresentationExtractionAndDebugging.md) for the simulation-to-render ownership boundary, interpolation, debug controls, metrics, and render stress workflow.
 
 
-## Tactical Development Battle
+## Clean Playable Match Composition
 
-The normal development client seeds a bounded Blue-vs-Red tactical scenario using the same authoritative systems as headless tests.
+A normal client launch contains the configured Central Divide skirmish only. The earlier standalone Blue-vs-Red tactical fixture and its extra weapons, providers, and units are no longer injected into the playable match.
 
-Blue starts with four supplied direct-fire units under one grouped `AttackMoveCommand`, a supplied artillery unit with a three-round coordinate `FireMissionCommand`, visual/radar sensing, automatic resupply policy, and a friendly physical `SupplyProvider`.
+Combat, sensing, artillery, Fuel/Ammunition, resupply, readiness, opponent behavior, and Command Core victory are exercised by the actual Directorate/skirmish systems. F2 continues to expose their diagnostics without adding presentation-owned gameplay state.
 
-Red starts with four supplied direct-fire units, visual/radar sensing, `TacticalTestOpponent` behavior, and its own friendly provider.
-
-The scenario is development-only. It exists to make movement → sensing → target acquisition → tactical engagement → direct/artillery fire → Fuel/Ammunition → supply/readiness behavior visible in the interactive host without moving combat authority into rendering or input code.
-
-F2 displays tactical orders, targets, leashes, readiness, and resupply state alongside the existing intelligence/combat/artillery debug layers.
+Synthetic generic entities remain available exclusively through `--render-stress <count>` for bounded rendering validation. CI uses that option for graphics stress independently of the headless full-match correctness gate.

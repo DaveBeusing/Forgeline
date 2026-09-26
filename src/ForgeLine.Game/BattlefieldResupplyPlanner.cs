@@ -60,6 +60,12 @@ public static class BattlefieldResupplyPlanner
             return false;
         }
 
+        bool recipientCanMove =
+            !context.Entities.TryGetComponent(
+                recipient,
+                out SupplyMovementConstraint recipientSupplyConstraint) ||
+            recipientSupplyConstraint.CanMove;
+
         WorldTransform providerTransform = default;
         SupplyProvider selectedProvider = default;
         float bestDistanceSquared =
@@ -83,7 +89,12 @@ public static class BattlefieldResupplyPlanner
                       requiredResources))) ||
                 !context.Entities.TryGetComponent(
                     candidate,
-                    out WorldTransform transform))
+                    out WorldTransform transform) ||
+                (!recipientCanMove &&
+                 !CanProviderReachImmobileRecipient(
+                     context,
+                     candidate,
+                     recipient)))
             {
                 continue;
             }
@@ -153,31 +164,42 @@ public static class BattlefieldResupplyPlanner
                 resupplyOrder);
         }
 
-        Vector3 approachPosition =
-            ResolveProviderApproachPosition(
-                recipientTransform.Position,
-                providerTransform.Position,
-                selectedProvider.ResupplyRangeMeters);
+        if (recipientCanMove)
+        {
+            Vector3 approachPosition =
+                ResolveProviderApproachPosition(
+                    recipientTransform.Position,
+                    providerTransform.Position,
+                    selectedProvider.ResupplyRangeMeters);
 
-        var movementOrder =
-            new MovementOrder(
+            SetMovementOrder(
+                context,
+                recipient,
                 owner,
                 approachPosition,
-                submittedAtTick,
-                context.Tick);
-
-        if (context.Entities.HasComponent<MovementOrder>(
-                recipient))
-        {
-            context.Entities.SetComponent(
-                recipient,
-                movementOrder);
+                submittedAtTick);
         }
         else
         {
-            context.Entities.AddComponent(
-                recipient,
-                movementOrder);
+            TacticalCommandUtilities.ClearMovementIntent(
+                context,
+                recipient);
+            ClearFormationMovement(
+                context,
+                providerEntity);
+
+            Vector3 providerApproachPosition =
+                ResolveProviderApproachPosition(
+                    providerTransform.Position,
+                    recipientTransform.Position,
+                    selectedProvider.ResupplyRangeMeters);
+
+            SetMovementOrder(
+                context,
+                providerEntity,
+                owner,
+                providerApproachPosition,
+                submittedAtTick);
         }
 
         return true;
@@ -209,6 +231,79 @@ public static class BattlefieldResupplyPlanner
         }
 
         return true;
+    }
+
+    private static bool CanProviderReachImmobileRecipient(
+        SimulationContext context,
+        EntityId provider,
+        EntityId recipient)
+    {
+        if (!context.Entities.HasComponent<SupplyTruck>(
+                provider) ||
+            !context.Entities.HasComponent<GroundMovement>(
+                provider))
+        {
+            return false;
+        }
+
+        if (context.Entities.TryGetComponent(
+                provider,
+                out SupplyMovementConstraint movementConstraint) &&
+            !movementConstraint.CanMove)
+        {
+            return false;
+        }
+
+        foreach (EntityId candidate in
+                 context.Entities.Query<ResupplyOrder>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            if (candidate == recipient)
+            {
+                continue;
+            }
+
+            ResupplyOrder order =
+                context.Entities.GetComponent<ResupplyOrder>(
+                    candidate);
+
+            if (order.Provider == provider &&
+                context.Entities.IsAlive(candidate))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static void SetMovementOrder(
+        SimulationContext context,
+        EntityId entity,
+        PlayerId owner,
+        Vector3 destination,
+        SimulationTick submittedAtTick)
+    {
+        var movementOrder =
+            new MovementOrder(
+                owner,
+                destination,
+                submittedAtTick,
+                context.Tick);
+
+        if (context.Entities.HasComponent<MovementOrder>(
+                entity))
+        {
+            context.Entities.SetComponent(
+                entity,
+                movementOrder);
+        }
+        else
+        {
+            context.Entities.AddComponent(
+                entity,
+                movementOrder);
+        }
     }
 
     private static Vector3 ResolveProviderApproachPosition(

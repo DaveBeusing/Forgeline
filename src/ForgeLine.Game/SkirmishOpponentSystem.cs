@@ -207,6 +207,22 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 SkirmishStrategicGoal.Defend;
             hasObjective = true;
         }
+        else if (TryExpand(
+                     context,
+                     controller,
+                     owned,
+                     economy,
+                     force,
+                     configuration,
+                     ref state,
+                     out objective))
+        {
+            strategicState =
+                SkirmishStrategicState.Expanding;
+            goal =
+                SkirmishStrategicGoal.Expand;
+            hasObjective = true;
+        }
         else if (TryRecoverForce(
                      context,
                      controller,
@@ -223,22 +239,6 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     context,
                     controller,
                     owned);
-            hasObjective = true;
-        }
-        else if (TryExpand(
-                     context,
-                     controller,
-                     owned,
-                     economy,
-                     force,
-                     configuration,
-                     ref state,
-                     out objective))
-        {
-            strategicState =
-                SkirmishStrategicState.Expanding;
-            goal =
-                SkirmishStrategicGoal.Expand;
             hasObjective = true;
         }
         else if (TryScout(
@@ -943,6 +943,30 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
+        float defensiveRadiusSquared =
+            configuration.DefensiveRadiusMeters *
+            configuration.DefensiveRadiusMeters;
+        EntityId[] defenders =
+            owned.CombatUnits
+                .Where(
+                    unit =>
+                        context.Entities.TryGetComponent(
+                            unit,
+                            out WorldTransform transform) &&
+                        HorizontalDistanceSquared(
+                            controller.HomePosition,
+                            transform.Position) <=
+                        defensiveRadiusSquared)
+                .OrderBy(
+                    static unit =>
+                        unit)
+                .ToArray();
+
+        if (defenders.Length == 0)
+        {
+            return false;
+        }
+
         objective =
             threat.Value.LastKnownPosition;
 
@@ -957,7 +981,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             var command =
                 new AttackCommand(
                     controller.Player,
-                    owned.CombatUnits.ToArray(),
+                    defenders,
                     target,
                     context.Tick,
                     configuration.ObjectivePressureLeashMeters);
@@ -968,7 +992,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             var command =
                 new AttackMoveCommand(
                     controller.Player,
-                    owned.CombatUnits.ToArray(),
+                    defenders,
                     objective,
                     context.Tick,
                     FormationTemplate.Line,
@@ -991,8 +1015,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
-        var recoveryUnits =
+        var retreatUnits =
             new List<EntityId>();
+        int recoveringUnits = 0;
+        int activeResupplyOrders = 0;
 
         for (int index = 0;
              index < owned.CombatUnits.Count;
@@ -1013,41 +1039,63 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     readiness.Fuel,
                     readiness.Ammunition);
 
-            if (readiness.OverallReadiness <
-                    configuration.RetreatThreshold ||
-                supply <
+            if (readiness.OverallReadiness >=
+                    configuration.RetreatThreshold &&
+                supply >=
                     configuration.ResupplyThreshold)
             {
-                recoveryUnits.Add(
+                continue;
+            }
+
+            recoveringUnits++;
+
+            if (context.Entities.HasComponent<ResupplyOrder>(
+                    unit))
+            {
+                activeResupplyOrders++;
+            }
+            else
+            {
+                retreatUnits.Add(
                     unit);
             }
         }
 
-        if (recoveryUnits.Count == 0)
+        if (recoveringUnits == 0)
         {
             return false;
         }
 
-        Vector3 recovery =
-            ResolveRecoveryPoint(
-                context,
-                controller,
-                owned);
+        if (retreatUnits.Count > 0)
+        {
+            Vector3 recovery =
+                ResolveRecoveryPoint(
+                    context,
+                    controller,
+                    owned);
 
-        var command =
-            new RetreatCommand(
-                controller.Player,
-                recoveryUnits.ToArray(),
-                recovery,
-                context.Tick,
-                FormationTemplate.Column);
-        command.Execute(context);
+            var command =
+                new RetreatCommand(
+                    controller.Player,
+                    retreatUnits.ToArray(),
+                    recovery,
+                    context.Tick,
+                    FormationTemplate.Column);
+            command.Execute(context);
+        }
 
+        bool attackForceEstablished =
+            force.CombatUnits >=
+            configuration.MinimumAttackUnits;
         bool forceWideRecovery =
-            force.AverageReadiness <
-                configuration.RetreatThreshold ||
-            recoveryUnits.Count ==
-                owned.CombatUnits.Count;
+            attackForceEstablished &&
+            activeResupplyOrders > 0 &&
+            (
+                force.AverageReadiness <
+                    configuration.RetreatThreshold ||
+                recoveringUnits ==
+                    owned.CombatUnits.Count
+            );
 
         return forceWideRecovery;
     }
@@ -1064,15 +1112,46 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     {
         objective = Vector3.Zero;
 
+        bool economyCanSupportExpansion =
+            economy.HealthScore >=
+                configuration.ExpansionReadinessThreshold ||
+            economy.RawResourceConstrained;
+
         if (!IsBootstrapComplete(owned) ||
-            economy.HealthScore <
-            configuration.ExpansionReadinessThreshold ||
+            !economyCanSupportExpansion ||
             force.TotalUnits < 4 ||
             HasPendingBuilding(
                 owned,
-                BuildingIds.LogisticsHub))
+                BuildingIds.LogisticsHub) ||
+            HasPendingBuilding(
+                owned,
+                BuildingIds.SupplyDepot))
         {
             return false;
+        }
+
+        Vector3? unsupportedRemoteHub =
+            SelectUnsupportedRemoteHub(
+                context,
+                owned,
+                controller.HomePosition,
+                minimumDistanceMeters: 500.0f,
+                supportRadiusMeters: 260.0f);
+
+        if (unsupportedRemoteHub.HasValue)
+        {
+            objective =
+                unsupportedRemoteHub.Value;
+
+            if (TryIssueBuilding(
+                    context,
+                    controller,
+                    owned,
+                    BuildingIds.SupplyDepot,
+                    unsupportedRemoteHub.Value))
+            {
+                return true;
+            }
         }
 
         int remoteHubs =
@@ -1147,6 +1226,29 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         out Vector3 objective)
     {
         objective = Vector3.Zero;
+
+        bool enemyCommandCoreIdentified =
+            intelligence.Contacts.Any(
+                contact =>
+                    contact.IsCurrent &&
+                    contact.State ==
+                        IntelligenceState.Identified &&
+                    _intelligence.TryResolveCurrentlyIdentifiedEntity(
+                        controller.Faction,
+                        contact.ContactKey,
+                        out EntityId identifiedEntity) &&
+                    context.Entities.IsAlive(
+                        identifiedEntity) &&
+                    context.Entities.TryGetComponent(
+                        identifiedEntity,
+                        out CompletedBuilding completed) &&
+                    completed.BuildingId ==
+                        BuildingIds.CommandCore);
+
+        if (enemyCommandCoreIdentified)
+        {
+            return false;
+        }
 
         EntityId scout =
             FindIdleUnit(
@@ -1275,8 +1377,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             }
 
             bool isCommandCore =
-                context.Entities.HasComponent<CommandCoreObjective>(
-                    candidate);
+                context.Entities.TryGetComponent(
+                    candidate,
+                    out CompletedBuilding objectiveBuilding) &&
+                objectiveBuilding.BuildingId ==
+                    BuildingIds.CommandCore;
             float distance =
                 HorizontalDistanceSquared(
                     controller.HomePosition,
@@ -2198,6 +2303,51 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 placement = default;
                 return false;
             }
+
+            Vector2[] localOffsets =
+            [
+                new(60.0f, 0.0f),
+                new(-60.0f, 0.0f),
+                new(0.0f, 60.0f),
+                new(0.0f, -60.0f),
+                new(90.0f, 90.0f),
+                new(90.0f, -90.0f),
+                new(-90.0f, 90.0f),
+                new(-90.0f, -90.0f),
+                new(140.0f, 0.0f),
+                new(-140.0f, 0.0f),
+                new(0.0f, 140.0f),
+                new(0.0f, -140.0f)
+            ];
+
+            for (int index = 0;
+                 index < localOffsets.Length;
+                 index++)
+            {
+                Vector2 offset =
+                    localOffsets[index];
+                Vector3 candidate =
+                    requestedPosition.Value +
+                    new Vector3(
+                        offset.X,
+                        0.0f,
+                        offset.Y);
+
+                BuildingPlacementResult nearby =
+                    _placement.Evaluate(
+                        context.Entities,
+                        controller.Player,
+                        buildingId,
+                        candidate,
+                        BuildingOrientation.North);
+
+                if (nearby.IsValid)
+                {
+                    placement =
+                        nearby.GroundPosition;
+                    return true;
+                }
+            }
         }
 
         float direction =
@@ -2423,6 +2573,54 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return count;
     }
 
+    private static Vector3? SelectUnsupportedRemoteHub(
+        SimulationContext context,
+        OwnedState owned,
+        Vector3 home,
+        float minimumDistanceMeters,
+        float supportRadiusMeters)
+    {
+        float minimumSquared =
+            minimumDistanceMeters *
+            minimumDistanceMeters;
+        float supportSquared =
+            supportRadiusMeters *
+            supportRadiusMeters;
+
+        return owned.Buildings
+            .Where(
+                entity =>
+                    context.Entities.TryGetComponent(
+                        entity,
+                        out CompletedBuilding completed) &&
+                    completed.BuildingId ==
+                        BuildingIds.LogisticsHub &&
+                    context.Entities.TryGetComponent(
+                        entity,
+                        out WorldTransform transform) &&
+                    HorizontalDistanceSquared(
+                        home,
+                        transform.Position) >=
+                        minimumSquared &&
+                    !owned.SupplyDepots.Any(
+                        depot =>
+                            HorizontalDistanceSquared(
+                                transform.Position,
+                                depot.Position) <=
+                            supportSquared))
+            .Select(
+                entity =>
+                    context.Entities.GetComponent<WorldTransform>(
+                        entity).Position)
+            .OrderBy(
+                position =>
+                    HorizontalDistanceSquared(
+                        home,
+                        position))
+            .Cast<Vector3?>()
+            .FirstOrDefault();
+    }
+
     private BattlefieldSiteDefinition? SelectExpansionSite(
         SkirmishOpponentController controller,
         int cursor)
@@ -2488,9 +2686,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         BattlefieldSiteKind.MiningOutpost)
             .OrderBy(
                 site =>
+                    HorizontalDistanceSquared(
+                        controller.HomePosition,
+                        site.Position))
+            .ThenBy(
+                site =>
                     homeWest
-                        ? -site.Position.X
-                        : site.Position.X)
+                        ? site.Position.X
+                        : -site.Position.X)
             .ThenBy(
                 static site =>
                     site.Key,
@@ -2547,6 +2750,28 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private Vector3 SelectDeepOffensiveWaypoint(
         SkirmishOpponentController controller)
     {
+        BattlefieldStartPosition? opposingStart =
+            _battlefield.Starts
+                .Where(
+                    start =>
+                        start.Player !=
+                        controller.Player)
+                .OrderBy(
+                    start =>
+                        HorizontalDistanceSquared(
+                            controller.HomePosition,
+                            start.Position))
+                .ThenBy(
+                    static start =>
+                        start.Player.Value)
+                .Cast<BattlefieldStartPosition?>()
+                .FirstOrDefault();
+
+        if (opposingStart.HasValue)
+        {
+            return opposingStart.Value.Position;
+        }
+
         float center =
             _battlefield.Metadata.WidthMeters *
             0.5f;
@@ -2556,8 +2781,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         float stagingX =
             _battlefield.Metadata.WidthMeters *
             (homeWest
-                ? 0.80f
-                : 0.20f);
+                ? 0.90f
+                : 0.10f);
 
         return new Vector3(
             stagingX,

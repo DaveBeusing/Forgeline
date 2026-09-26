@@ -127,6 +127,107 @@ public sealed class BattlefieldSupplySystemTests
     }
 
     [Fact]
+    public void AutomaticResupplySendsSupplyTruckToImmobilizedUnit()
+    {
+        var simulation =
+            new SimulationCoordinator(
+                ticksPerSecond: 20);
+        var inventories =
+            new InventoryStore();
+        var network =
+            new ForgeLine.Logistics.LogisticsNetwork();
+        var cargo =
+            new CargoTransportSystem(
+                network,
+                inventories);
+
+        simulation.RegisterSystem(
+            new AutomaticResupplyDecisionSystem(
+                inventories));
+        simulation.RegisterSystem(
+            new GroundMovementSystem());
+        simulation.RegisterSystem(
+            new BattlefieldSupplySystem(
+                inventories));
+
+        EntityId truck =
+            SupplyTruckFactory.Create(
+                simulation.Entities,
+                inventories,
+                Vector3.Zero,
+                LocalPlayer,
+                cargo);
+        SupplyTruck truckState =
+            simulation.Entities.GetComponent<SupplyTruck>(
+                truck);
+        Assert.True(
+            inventories.Add(
+                truckState.InventoryId,
+                ResourceIds.Fuel,
+                40.0).Succeeded);
+
+        EntityId unit =
+            CreateSuppliedUnit(
+                simulation,
+                inventories,
+                new Vector3(80.0f, 0.0f, 0.0f),
+                fuelCapacity: 20.0,
+                initialFuel: 0.0,
+                ammunitionCapacity: 10.0,
+                initialAmmunition: 10.0,
+                fuelConsumptionPerMeter: 0.1);
+        simulation.Entities.AddComponent(
+            unit,
+            GroundMovement.CreateDefault());
+        simulation.Entities.AddComponent(
+            unit,
+            GroundMovementState.Stationary());
+        simulation.Entities.AddComponent(
+            unit,
+            new AutomaticResupplyPolicy(
+                ammunitionThreshold: 0.2,
+                fuelThreshold: 0.2));
+
+        simulation.AdvanceOneTick();
+
+        ResupplyOrder order =
+            simulation.Entities.GetComponent<ResupplyOrder>(
+                unit);
+
+        Assert.Equal(
+            truck,
+            order.Provider);
+        Assert.False(
+            simulation.Entities.HasComponent<MovementOrder>(
+                unit));
+        Assert.True(
+            simulation.Entities.HasComponent<MovementOrder>(
+                truck));
+
+        InventoryId unitFuelInventory =
+            simulation.Entities.GetComponent<UnitFuelState>(
+                unit).InventoryId;
+
+        for (int tick = 0;
+             tick < 400 &&
+             inventories.GetQuantity(
+                 unitFuelInventory,
+                 ResourceIds.Fuel) <= 0.0;
+             tick++)
+        {
+            simulation.AdvanceOneTick();
+        }
+
+        Assert.True(
+            inventories.GetQuantity(
+                unitFuelInventory,
+                ResourceIds.Fuel) > 0.0);
+        Assert.True(
+            simulation.Entities.GetComponent<
+                SupplyMovementConstraint>(unit).CanMove);
+    }
+
+    [Fact]
     public void AmmunitionConsumptionUsesUnitInventoryAndFailsClosedWhenEmpty()
     {
         var simulation = new SimulationCoordinator();
