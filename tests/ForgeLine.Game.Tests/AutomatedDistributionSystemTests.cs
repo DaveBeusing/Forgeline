@@ -69,6 +69,49 @@ public sealed class AutomatedDistributionSystemTests
     }
 
     [Fact]
+    public void ShipmentQuantityRespectsRouteThroughputWindow()
+    {
+        DistributionFixture fixture =
+            CreateFixture(sourceQuantity: 100.0);
+
+        fixture.Connect(
+            fixture.SourceNode,
+            fixture.DestinationNode,
+            capacityPerSecond: 40.0);
+        fixture.AddPolicy(
+            fixture.DestinationEntity,
+            minimum: 20.0,
+            target: 80.0,
+            maximum: 100.0,
+            LogisticsStockPriority.Normal);
+        _ = fixture.CreateTruck(
+            fixture.SourcePosition);
+
+        RunUntil(
+            fixture,
+            () =>
+                fixture.Inventories.GetQuantity(
+                    fixture.DestinationInventory,
+                    ResourceIds.FerrousOre) >= 80.0 &&
+                fixture.Distribution.Metrics.CompletedRequestCount >= 1,
+            maximumTicks: 1_200);
+
+        Assert.Equal(
+            80.0,
+            fixture.Inventories.GetQuantity(
+                fixture.DestinationInventory,
+                ResourceIds.FerrousOre));
+        Assert.Equal(
+            20.0,
+            fixture.Inventories.GetQuantity(
+                fixture.SourceInventory,
+                ResourceIds.FerrousOre));
+        Assert.Equal(
+            1L,
+            fixture.Distribution.Metrics.CompletedRequestCount);
+    }
+
+    [Fact]
     public void DoesNotSourceCargoFromAnotherFaction()
     {
         DistributionFixture fixture =
@@ -899,7 +942,8 @@ public sealed class AutomatedDistributionSystemTests
 
         public void Connect(
             LogisticsNodeId source,
-            LogisticsNodeId destination)
+            LogisticsNodeId destination,
+            double capacityPerSecond = 100.0)
         {
             Assert.True(
                 Network.TryGetNode(
@@ -921,7 +965,7 @@ public sealed class AutomatedDistributionSystemTests
                 LogisticsTransportMode.GroundRoad,
                 distanceMeters: distance,
                 baseCost: distance,
-                capacityPerSecond: 100.0);
+                capacityPerSecond: capacityPerSecond);
         }
 
         public EntityId CreateStorageNode(
