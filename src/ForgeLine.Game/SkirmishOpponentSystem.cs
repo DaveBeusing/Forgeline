@@ -1962,7 +1962,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return true;
         }
 
-        if (candidates.Length == 0)
+        if (candidates.Count == 0)
         {
             return false;
         }
@@ -2280,7 +2280,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     .ToArray();
         }
 
-        if (candidates.Count == 0)
+        if (candidates.Length == 0)
         {
             return null;
         }
