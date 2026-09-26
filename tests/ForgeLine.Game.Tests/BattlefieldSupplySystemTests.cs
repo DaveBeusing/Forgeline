@@ -127,6 +127,71 @@ public sealed class BattlefieldSupplySystemTests
     }
 
     [Fact]
+    public void AutomaticResupplyUsesProviderDistanceBeforeFuelThreshold()
+    {
+        var simulation = new SimulationCoordinator();
+        var inventories = new InventoryStore();
+
+        simulation.RegisterSystem(
+            new AutomaticResupplyDecisionSystem(
+                inventories));
+
+        InventoryId providerInventory =
+            inventories.CreateInventory(
+                new InventorySpecification(500.0));
+        Assert.True(
+            inventories.Add(
+                providerInventory,
+                ResourceIds.Fuel,
+                400.0).Succeeded);
+
+        EntityId provider =
+            simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(
+            provider,
+            new WorldTransform(
+                new Vector3(400.0f, 0.0f, 0.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        simulation.Entities.AddComponent(
+            provider,
+            new SupplyProvider(
+                providerInventory,
+                LocalPlayer,
+                resupplyRangeMeters: 20.0f));
+
+        EntityId unit =
+            CreateSuppliedUnit(
+                simulation,
+                inventories,
+                Vector3.Zero,
+                fuelCapacity: 100.0,
+                initialFuel: 50.0,
+                ammunitionCapacity: 10.0,
+                initialAmmunition: 10.0,
+                fuelConsumptionPerMeter: 0.1);
+        simulation.Entities.AddComponent(
+            unit,
+            new AutomaticResupplyPolicy(
+                ammunitionThreshold: 0.2,
+                fuelThreshold: 0.2,
+                enabled: true));
+
+        simulation.AdvanceOneTick();
+
+        Assert.True(
+            simulation.Entities.TryGetComponent(
+                unit,
+                out ResupplyOrder order));
+        Assert.Equal(
+            provider,
+            order.Provider);
+        Assert.True(
+            simulation.Entities.HasComponent<MovementOrder>(
+                unit));
+    }
+
+    [Fact]
     public void AmmunitionConsumptionUsesUnitInventoryAndFailsClosedWhenEmpty()
     {
         var simulation = new SimulationCoordinator();
