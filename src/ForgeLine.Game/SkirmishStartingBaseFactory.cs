@@ -19,12 +19,12 @@ public readonly record struct SkirmishStartingStock(
 {
     public static SkirmishStartingStock Standard =>
         new(
-            FerrousOre: 1_400.0,
+            FerrousOre: 2_200.0,
             Volatiles: 900.0,
             Silicates: 900.0,
-            Steel: 280.0,
+            Steel: 700.0,
             Fuel: 900.0,
-            Electronics: 160.0,
+            Electronics: 320.0,
             Ammunition: 420.0);
 }
 
