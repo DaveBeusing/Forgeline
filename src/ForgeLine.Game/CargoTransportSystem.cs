@@ -1414,10 +1414,12 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return node.WorldPosition;
         }
 
+        const float NavigationCellClearanceMeters = 32.0f;
+
         float clearance =
             movement.ObstacleLookAhead +
             movement.Radius +
-            2.0f;
+            NavigationCellClearanceMeters;
         float minimumX =
             bounds.Minimum.X -
             clearance;
