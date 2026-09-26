@@ -943,6 +943,30 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
+        float defensiveRadiusSquared =
+            configuration.DefensiveRadiusMeters *
+            configuration.DefensiveRadiusMeters;
+        EntityId[] defenders =
+            owned.CombatUnits
+                .Where(
+                    unit =>
+                        context.Entities.TryGetComponent(
+                            unit,
+                            out WorldTransform transform) &&
+                        HorizontalDistanceSquared(
+                            controller.HomePosition,
+                            transform.Position) <=
+                        defensiveRadiusSquared)
+                .OrderBy(
+                    static unit =>
+                        unit)
+                .ToArray();
+
+        if (defenders.Length == 0)
+        {
+            return false;
+        }
+
         objective =
             threat.Value.LastKnownPosition;
 
@@ -957,7 +981,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             var command =
                 new AttackCommand(
                     controller.Player,
-                    owned.CombatUnits.ToArray(),
+                    defenders,
                     target,
                     context.Tick,
                     configuration.ObjectivePressureLeashMeters);
@@ -968,7 +992,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             var command =
                 new AttackMoveCommand(
                     controller.Player,
-                    owned.CombatUnits.ToArray(),
+                    defenders,
                     objective,
                     context.Tick,
                     FormationTemplate.Line,
