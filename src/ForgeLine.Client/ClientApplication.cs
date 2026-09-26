@@ -827,6 +827,8 @@ internal sealed class ClientApplication
                     powerNetworks,
                     production,
                     unitProduction,
+                    buildingCommands,
+                    lastMovementCommand,
                     intelligenceStore,
                     unitDefinitions,
                     buildingDefinitions,
