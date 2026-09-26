@@ -131,6 +131,12 @@ public static class SkirmishStartingBaseFactory
             new CommandFacility());
         entities.AddComponent(
             commandCore,
+            new SupplyProvider(
+                inventory,
+                start.Player,
+                resupplyRangeMeters: 90.0f));
+        entities.AddComponent(
+            commandCore,
             new CompletedBuilding(
                 BuildingIds.CommandCore,
                 start.Player,
