@@ -18,6 +18,41 @@ public enum PlayerAlertState : byte
     CommandCoreDestroyed = 1 << 4
 }
 
+public enum PlayerCommandFeedbackKind : byte
+{
+    None = 0,
+    Movement = 1,
+    Construction = 2
+}
+
+public enum PlayerCommandFeedbackState : byte
+{
+    None = 0,
+    Accepted = 1,
+    Partial = 2,
+    Rejected = 3
+}
+
+public readonly record struct PlayerCommandFeedback(
+    PlayerCommandFeedbackKind Kind,
+    PlayerCommandFeedbackState State,
+    int AcceptedTargets,
+    int RejectedTargets,
+    BuildCommandRejectionReason BuildRejection,
+    BuildingPlacementFailureReason PlacementFailure,
+    SimulationTick ResolvedAtTick)
+{
+    public static PlayerCommandFeedback None =>
+        new(
+            PlayerCommandFeedbackKind.None,
+            PlayerCommandFeedbackState.None,
+            0,
+            0,
+            BuildCommandRejectionReason.None,
+            BuildingPlacementFailureReason.None,
+            SimulationTick.Zero);
+}
+
 public enum PlayerSelectionKind : byte
 {
     None = 0,
@@ -147,6 +182,7 @@ public readonly record struct PlayerExperienceSnapshot(
     PlayerAlertState Alerts,
     int CriticalSupplyUnits,
     int BlockedProductionFacilities,
+    PlayerCommandFeedback Feedback,
     PlayerMatchStatistics Statistics)
 {
     public bool IsMatchComplete =>
@@ -170,6 +206,8 @@ public static class PlayerExperienceSnapshotFactory
         PowerNetworkSystem powerNetworks,
         ProductionSystem production,
         UnitProductionSystem unitProduction,
+        BuildingCommandProcessingSystem buildingCommands,
+        MoveEntitiesCommand? lastMovementCommand,
         FactionIntelligenceStore intelligence,
         UnitDefinitionCatalog units,
         BuildingDefinitionCatalog buildings,
@@ -182,6 +220,7 @@ public static class PlayerExperienceSnapshotFactory
         ArgumentNullException.ThrowIfNull(powerNetworks);
         ArgumentNullException.ThrowIfNull(production);
         ArgumentNullException.ThrowIfNull(unitProduction);
+        ArgumentNullException.ThrowIfNull(buildingCommands);
         ArgumentNullException.ThrowIfNull(intelligence);
         ArgumentNullException.ThrowIfNull(units);
         ArgumentNullException.ThrowIfNull(buildings);
@@ -277,6 +316,12 @@ public static class PlayerExperienceSnapshotFactory
                 intelligence.GetVisibleCellCount(faction),
                 intelligence.GetContactCount(faction));
 
+        PlayerCommandFeedback feedback =
+            CaptureCommandFeedback(
+                player,
+                buildingCommands,
+                lastMovementCommand);
+
         PlayerMatchStatistics statistics =
             CaptureStatistics(
                 entities,
@@ -296,7 +341,72 @@ public static class PlayerExperienceSnapshotFactory
             alerts,
             criticalSupplyUnits,
             blockedProductionFacilities,
+            feedback,
             statistics);
+    }
+
+    private static PlayerCommandFeedback CaptureCommandFeedback(
+        PlayerId player,
+        BuildingCommandProcessingSystem buildingCommands,
+        MoveEntitiesCommand? lastMovementCommand)
+    {
+        bool hasBuildResult =
+            buildingCommands.TryGetLastResult(
+                player,
+                out BuildCommandResult buildResult);
+        bool hasMovementResult =
+            lastMovementCommand is not null &&
+            lastMovementCommand.ExecutedAtTick >
+                SimulationTick.Zero;
+
+        if (!hasBuildResult &&
+            !hasMovementResult)
+        {
+            return PlayerCommandFeedback.None;
+        }
+
+        if (hasBuildResult &&
+            (!hasMovementResult ||
+             buildResult.ResolvedAtTick >=
+                lastMovementCommand!.ExecutedAtTick))
+        {
+            return new PlayerCommandFeedback(
+                PlayerCommandFeedbackKind.Construction,
+                buildResult.Accepted
+                    ? PlayerCommandFeedbackState.Accepted
+                    : PlayerCommandFeedbackState.Rejected,
+                buildResult.Accepted
+                    ? 1
+                    : 0,
+                buildResult.Accepted
+                    ? 0
+                    : 1,
+                buildResult.RejectionReason,
+                buildResult.PlacementFailure,
+                buildResult.ResolvedAtTick);
+        }
+
+        int accepted =
+            lastMovementCommand!.AcceptedTargetCount;
+        int rejected =
+            lastMovementCommand.RejectedTargetCount;
+        PlayerCommandFeedbackState state =
+            accepted > 0 && rejected > 0
+                ? PlayerCommandFeedbackState.Partial
+                : accepted > 0
+                    ? PlayerCommandFeedbackState.Accepted
+                    : rejected > 0
+                        ? PlayerCommandFeedbackState.Rejected
+                        : PlayerCommandFeedbackState.None;
+
+        return new PlayerCommandFeedback(
+            PlayerCommandFeedbackKind.Movement,
+            state,
+            accepted,
+            rejected,
+            BuildCommandRejectionReason.None,
+            BuildingPlacementFailureReason.None,
+            lastMovementCommand.ExecutedAtTick);
     }
 
     private static PlayerResourceSummary CaptureResources(
