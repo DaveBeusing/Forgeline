@@ -263,20 +263,55 @@ public sealed class SkirmishOpponentTests
 
         return
             $"match={match.Status}; " +
-            $"west={west.StrategicState}/{west.ActiveGoal} decisions={west.DecisionsTaken} " +
-            $"power={scenario.CountBuildings(scenario.West.Player, BuildingIds.PowerPlant)} " +
-            $"extractors={scenario.CountBuildings(scenario.West.Player, BuildingIds.Extractor)} " +
-            $"barracks={scenario.CountBuildings(scenario.West.Player, BuildingIds.Barracks)} " +
-            $"factory={scenario.CountBuildings(scenario.West.Player, BuildingIds.VehicleFactory)} " +
-            $"scouts={scenario.CountUnits(scenario.West.Player, UnitIds.ScoutVehicle)} " +
-            $"tanks={scenario.CountUnits(scenario.West.Player, UnitIds.MainBattleTank)}; " +
-            $"east={east.StrategicState}/{east.ActiveGoal} decisions={east.DecisionsTaken} " +
-            $"power={scenario.CountBuildings(scenario.East.Player, BuildingIds.PowerPlant)} " +
-            $"extractors={scenario.CountBuildings(scenario.East.Player, BuildingIds.Extractor)} " +
-            $"barracks={scenario.CountBuildings(scenario.East.Player, BuildingIds.Barracks)} " +
-            $"factory={scenario.CountBuildings(scenario.East.Player, BuildingIds.VehicleFactory)} " +
-            $"scouts={scenario.CountUnits(scenario.East.Player, UnitIds.ScoutVehicle)} " +
-            $"tanks={scenario.CountUnits(scenario.East.Player, UnitIds.MainBattleTank)}";
+            DescribePlayer(
+                scenario,
+                scenario.West,
+                west) +
+            "; " +
+            DescribePlayer(
+                scenario,
+                scenario.East,
+                east);
+    }
+
+    private static string DescribePlayer(
+        SkirmishScenarioHarness scenario,
+        SkirmishStartingBase side,
+        SkirmishOpponentState state)
+    {
+        SkirmishOpponentDebugReadModel debug =
+            scenario.Opponents.DebugSnapshot.Single(
+                entry =>
+                    entry.Player ==
+                    side.Player);
+        double coreSteel =
+            scenario.Inventories.GetQuantity(
+                side.StartingInventory,
+                ResourceIds.Steel);
+        double coreElectronics =
+            scenario.Inventories.GetQuantity(
+                side.StartingInventory,
+                ResourceIds.Electronics);
+
+        return
+            $"{side.Player}={state.StrategicState}/{state.ActiveGoal} decisions={state.DecisionsTaken} " +
+            $"power={scenario.CountBuildings(side.Player, BuildingIds.PowerPlant)} " +
+            $"extractors={scenario.CountBuildings(side.Player, BuildingIds.Extractor)} " +
+            $"storage={scenario.CountBuildings(side.Player, BuildingIds.StorageDepot)} " +
+            $"smelter={scenario.CountBuildings(side.Player, BuildingIds.Smelter)} " +
+            $"refinery={scenario.CountBuildings(side.Player, BuildingIds.Refinery)} " +
+            $"electronics={scenario.CountBuildings(side.Player, BuildingIds.ElectronicsPlant)} " +
+            $"hub={scenario.CountBuildings(side.Player, BuildingIds.LogisticsHub)} " +
+            $"barracks={scenario.CountBuildings(side.Player, BuildingIds.Barracks)} " +
+            $"factory={scenario.CountBuildings(side.Player, BuildingIds.VehicleFactory)} " +
+            $"ammoPlant={scenario.CountBuildings(side.Player, BuildingIds.AmmunitionPlant)} " +
+            $"supply={scenario.CountBuildings(side.Player, BuildingIds.SupplyDepot)} " +
+            $"radar={scenario.CountBuildings(side.Player, BuildingIds.Radar)} " +
+            $"coreSteel={coreSteel:F0} coreElectronics={coreElectronics:F0} " +
+            $"totalSteel={debug.Economy.Steel:F0} totalElectronics={debug.Economy.Electronics:F0} " +
+            $"production={debug.Economy.ProductionFacilities} unitProduction={debug.Economy.UnitProductionFacilities} " +
+            $"scouts={scenario.CountUnits(side.Player, UnitIds.ScoutVehicle)} " +
+            $"tanks={scenario.CountUnits(side.Player, UnitIds.MainBattleTank)}";
     }
 
     private static bool HasCombatGroup(
