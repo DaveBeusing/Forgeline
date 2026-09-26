@@ -500,6 +500,7 @@ internal sealed class ClientApplication
         long startedAt = _platform.Clock.GetTimestamp();
         long previousFrameAt = startedAt;
         long nextDiagnosticAt = startedAt;
+        bool smokeMatchCompleted = false;
 
         while (window.IsOpen)
         {
@@ -598,6 +599,12 @@ internal sealed class ClientApplication
             if (smokeTest &&
                 _platform.Clock.GetElapsedTime(startedAt, now) >= SmokeTestDuration)
             {
+                if (!smokeMatchCompleted)
+                {
+                    throw new InvalidOperationException(
+                        "Client smoke validation did not reach an authoritative match result.");
+                }
+
                 window.RequestClose();
             }
 
@@ -638,6 +645,33 @@ internal sealed class ClientApplication
 
                 simulation.AdvanceOneTick();
                 simulationAccumulator -= simulation.Clock.TickDuration;
+            }
+
+            if (smokeTest &&
+                !smokeMatchCompleted &&
+                simulation.CurrentTick.Value >= 2)
+            {
+                if (simulation.Entities.IsAlive(
+                        eastBase.CommandCore))
+                {
+                    simulation.Entities.DestroyEntity(
+                        eastBase.CommandCore);
+                }
+
+                simulation.AdvanceOneTick();
+                MatchState smokeMatchState =
+                    simulation.Entities.GetComponent<MatchState>(
+                        prototypeRuntime.MatchStateEntity);
+
+                if (smokeMatchState.ForPlayer(LocalPlayer) !=
+                    PlayerMatchStatus.Victory)
+                {
+                    throw new InvalidOperationException(
+                        "Client smoke validation failed to resolve Command Core destruction as a local victory.");
+                }
+
+                smokeMatchCompleted = true;
+                simulationAccumulator = TimeSpan.Zero;
             }
 
             _ = renderWorld.Update(snapshotBuffer);
