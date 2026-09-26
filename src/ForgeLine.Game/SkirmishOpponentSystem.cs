@@ -1962,7 +1962,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return true;
         }
 
-        if (candidates.Count == 0)
+        if (candidates.Length == 0)
         {
             return false;
         }
@@ -2264,7 +2264,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                             site.Position))
                 .ToArray();
 
-        if (candidates.Count == 0)
+        if (candidates.Length == 0)
         {
             candidates =
                 _battlefield.Sites
@@ -2287,7 +2287,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         return candidates[
             Math.Abs(cursor) %
-            candidates.Count];
+            candidates.Length];
     }
 
     private BattlefieldSiteDefinition[] GetOpponentFacingSites(
