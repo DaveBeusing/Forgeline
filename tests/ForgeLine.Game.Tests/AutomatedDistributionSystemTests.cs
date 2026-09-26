@@ -112,6 +112,48 @@ public sealed class AutomatedDistributionSystemTests
     }
 
     [Fact]
+    public void ResupplyingTruckIsNotDispatchedForCargo()
+    {
+        DistributionFixture fixture =
+            CreateFixture(sourceQuantity: 100.0);
+
+        fixture.Connect(
+            fixture.SourceNode,
+            fixture.DestinationNode);
+        fixture.AddPolicy(
+            fixture.DestinationEntity,
+            minimum: 20.0,
+            target: 60.0,
+            maximum: 100.0,
+            LogisticsStockPriority.Normal);
+        EntityId truck =
+            fixture.CreateTruck(fixture.SourcePosition);
+
+        fixture.Simulation.Entities.AddComponent(
+            truck,
+            new ResupplyOrder(
+                fixture.DestinationEntity,
+                SimulationTick.Zero,
+                SimulationTick.Zero));
+
+        fixture.Simulation.AdvanceOneTick();
+
+        LogisticsTransportRequestReadModel request =
+            Assert.Single(
+                fixture.Distribution.LastDebugSnapshot.Requests);
+
+        Assert.Equal(
+            LogisticsTransportRequestState.RetryPending,
+            request.State);
+        Assert.Equal(
+            LogisticsTransportRequestFailureReason.NoTruckAvailable,
+            request.FailureReason);
+        Assert.False(
+            fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(
+                truck));
+    }
+
+    [Fact]
     public void DoesNotSourceCargoFromAnotherFaction()
     {
         DistributionFixture fixture =
