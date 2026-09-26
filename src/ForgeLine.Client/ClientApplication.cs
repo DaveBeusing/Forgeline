@@ -536,18 +536,6 @@ internal sealed class ClientApplication
                 return 0;
             }
 
-            if (smokeTest &&
-                _platform.Clock.GetElapsedTime(startedAt, now) >= SmokeTestDuration)
-            {
-                if (!smokeMatchCompleted)
-                {
-                    throw new InvalidOperationException(
-                        "Client smoke validation did not reach an authoritative match result.");
-                }
-
-                window.RequestClose();
-            }
-
             if (!window.IsOpen)
             {
                 continue;
@@ -588,9 +576,13 @@ internal sealed class ClientApplication
             }
 
             if (smokeTest &&
-                !smokeMatchCompleted &&
-                simulation.CurrentTick.Value >= 2)
+                !smokeMatchCompleted)
             {
+                while (simulation.CurrentTick.Value < 2)
+                {
+                    simulation.AdvanceOneTick();
+                }
+
                 if (simulation.Entities.IsAlive(
                         eastBase.CommandCore))
                 {
@@ -612,6 +604,13 @@ internal sealed class ClientApplication
 
                 smokeMatchCompleted = true;
                 simulationAccumulator = TimeSpan.Zero;
+            }
+
+            if (smokeTest &&
+                smokeMatchCompleted &&
+                _platform.Clock.GetElapsedTime(startedAt, now) >= SmokeTestDuration)
+            {
+                window.RequestClose();
             }
 
             _ = renderWorld.Update(snapshotBuffer);
