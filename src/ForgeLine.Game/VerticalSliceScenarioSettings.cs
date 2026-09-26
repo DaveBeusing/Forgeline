@@ -95,18 +95,18 @@ public sealed record VerticalSliceScenarioSettings
             EastOpponent =
                 new SkirmishOpponentConfiguration
                 {
-                    ReactionCadenceTicks = 20,
-                    Aggression = 0.0,
-                    ExpansionReadinessThreshold = 0.70,
-                    OffensiveReadinessThreshold = 0.95,
-                    RetreatThreshold = 0.35,
-                    ResupplyThreshold = 0.40,
-                    MinimumAttackUnits = 24,
-                    MaximumAttackUnits = 24,
+                    ReactionCadenceTicks = 10,
+                    Aggression = 0.8,
+                    ExpansionReadinessThreshold = 0.42,
+                    OffensiveReadinessThreshold = 0.58,
+                    RetreatThreshold = 0.22,
+                    ResupplyThreshold = 0.22,
+                    MinimumAttackUnits = 3,
+                    MaximumAttackUnits = 8,
                     MaximumQueuedUnitsPerFacility = 2,
-                    DefensiveRadiusMeters = 260.0f,
-                    ObjectivePressureLeashMeters = 180.0f,
-                    ArtilleryCadenceTicks = 120
+                    DefensiveRadiusMeters = 600.0f,
+                    ObjectivePressureLeashMeters = 240.0f,
+                    ArtilleryCadenceTicks = 60
                 },
             NavigationCellSizeMeters = 32.0f,
             NavigationSectorSizeCells = 4
