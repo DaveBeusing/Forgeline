@@ -39,6 +39,36 @@ public sealed class VerticalSliceReadinessTests
     }
 
     [Fact]
+    public void ValidationAttackerBuildsAttackForceAndEstablishesContact()
+    {
+        SkirmishScenarioHarness scenario =
+            SkirmishScenarioHarness.Create(
+                seed: 2026);
+
+        VerticalSliceScenarioSettings settings =
+            VerticalSliceScenarioSettings.Create(
+                VerticalSliceScenarioProfile.Validation);
+
+        bool progressed =
+            scenario.RunUntil(
+                current =>
+                    current.CountUnits(
+                        current.West.Player,
+                        UnitIds.MainBattleTank) >=
+                    settings.WestOpponent.MinimumAttackUnits &&
+                    current.Intelligence.GetContactCount(
+                        current.West.Faction) > 0,
+                maximumTicks: 50_000,
+                TestContext.Current.CancellationToken);
+
+        Assert.True(progressed);
+        Assert.NotEqual(
+            SkirmishStrategicGoal.RecoverSupply,
+            scenario.GetOpponentState(
+                scenario.West.Player).ActiveGoal);
+    }
+
+    [Fact]
     public void FreshVerticalSliceSessionDoesNotRetainTerminalState()
     {
         VerticalSliceScenarioSettings settings =
