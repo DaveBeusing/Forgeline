@@ -210,15 +210,6 @@ internal sealed class ClientApplication
             prototypeBattlefield.Starts.Single(
                 static start =>
                     start.Player == OpposingPlayer);
-        BattlefieldObjectiveDefinition westObjective =
-            prototypeBattlefield.Objectives.Single(
-                static objective =>
-                    objective.Owner == LocalPlayer);
-        BattlefieldObjectiveDefinition eastObjective =
-            prototypeBattlefield.Objectives.Single(
-                static objective =>
-                    objective.Owner == OpposingPlayer);
-
         SkirmishStartingBase westBase =
             SkirmishStartingBaseFactory.Create(
                 simulation.Entities,
