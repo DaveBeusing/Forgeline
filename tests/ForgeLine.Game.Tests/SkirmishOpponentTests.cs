@@ -360,6 +360,10 @@ public sealed class SkirmishOpponentTests
             scenario.Inventories.GetQuantity(
                 side.StartingInventory,
                 ResourceIds.Electronics);
+        double coreFuel =
+            scenario.Inventories.GetQuantity(
+                side.StartingInventory,
+                ResourceIds.Fuel);
         AutomatedDistributionMetrics distribution =
             scenario.AutomatedDistribution.Metrics;
         CargoTransportMetrics cargo =
@@ -380,12 +384,39 @@ public sealed class SkirmishOpponentTests
                 ",",
                 scenario.CargoTransport.LastDebugSnapshot.Transports
                     .OrderBy(static transport => transport.Entity)
-                    .Select(static transport =>
-                        $"{transport.Entity}:{transport.Lifecycle}/{transport.FailureReason}" +
-                        $"@{transport.WorldPosition.X:F0},{transport.WorldPosition.Z:F0}" +
-                        (transport.HasMovementTarget
-                            ? $"->{transport.MovementTarget.X:F0},{transport.MovementTarget.Z:F0}"
-                            : string.Empty)));
+                    .Select(transport =>
+                    {
+                        EntityId entity = transport.Entity;
+                        string fuel = "na";
+                        if (scenario.Simulation.Entities.TryGetComponent(
+                                entity,
+                                out UnitFuelState fuelState))
+                        {
+                            fuel =
+                                $"{scenario.Inventories.GetQuantity(fuelState.InventoryId, ResourceIds.Fuel):F1}/{fuelState.Capacity:F0}";
+                        }
+
+                        string resupply =
+                            scenario.Simulation.Entities.TryGetComponent(
+                                entity,
+                                out ResupplyOrder resupplyOrder)
+                                ? resupplyOrder.Provider.ToString()
+                                : "none";
+                        string movement =
+                            scenario.Simulation.Entities.TryGetComponent(
+                                entity,
+                                out MovementOrder movementOrder)
+                                ? $"{movementOrder.WorldTarget.X:F0},{movementOrder.WorldTarget.Z:F0}"
+                                : "none";
+
+                        return
+                            $"{entity}:{transport.Lifecycle}/{transport.FailureReason}" +
+                            $"@{transport.WorldPosition.X:F0},{transport.WorldPosition.Z:F0}" +
+                            (transport.HasMovementTarget
+                                ? $" cargo->{transport.MovementTarget.X:F0},{transport.MovementTarget.Z:F0}"
+                                : string.Empty) +
+                            $" move->{movement} fuel={fuel} resupply={resupply}";
+                    }));
 
         return
             $"{side.Player}={state.StrategicState}/{state.ActiveGoal} decisions={state.DecisionsTaken} " +
@@ -401,7 +432,7 @@ public sealed class SkirmishOpponentTests
             $"ammoPlant={scenario.CountBuildings(side.Player, BuildingIds.AmmunitionPlant)} " +
             $"supply={scenario.CountBuildings(side.Player, BuildingIds.SupplyDepot)} " +
             $"radar={scenario.CountBuildings(side.Player, BuildingIds.Radar)} " +
-            $"coreSteel={coreSteel:F0} coreElectronics={coreElectronics:F0} " +
+            $"coreSteel={coreSteel:F0} coreElectronics={coreElectronics:F0} coreFuel={coreFuel:F0} " +
             $"totalSteel={debug.Economy.Steel:F0} totalElectronics={debug.Economy.Electronics:F0} " +
             $"production={debug.Economy.ProductionFacilities} unitProduction={debug.Economy.UnitProductionFacilities} " +
             $"distribution=p{distribution.PendingRequestCount}/a{distribution.AssignedRequestCount}/t{distribution.InTransitRequestCount}/r{distribution.RetryPendingRequestCount}/c{distribution.CompletedRequestCount}/f{distribution.FailedRequestCount} " +
