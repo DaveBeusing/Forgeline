@@ -421,9 +421,6 @@ public sealed class VerticalSliceScenario
                 spatialIndex);
         var tacticalPreparation =
             new TacticalOrderPreparationSystem();
-        var tacticalOpponent =
-            new TacticalTestOpponentSystem(
-                intelligence);
         var automaticResupply =
             new AutomaticResupplyDecisionSystem(
                 inventories);
@@ -478,8 +475,6 @@ public sealed class VerticalSliceScenario
 
         simulation.RegisterSystem(
             opponents);
-        simulation.RegisterSystem(
-            tacticalOpponent);
         simulation.RegisterSystem(
             tacticalPreparation);
         simulation.RegisterSystem(
