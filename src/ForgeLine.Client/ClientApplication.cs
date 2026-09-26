@@ -39,7 +39,7 @@ internal sealed class ClientApplication
 
     internal int Run(bool smokeTest, int renderInstanceCount)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(renderInstanceCount);
+        ArgumentOutOfRangeException.ThrowIfNegative(renderInstanceCount);
 
         var configuration = new WindowConfiguration(
             "FORGELINE",
@@ -149,40 +149,8 @@ internal sealed class ClientApplication
                 intelligenceStore);
         WeaponCatalog combatWeapons =
             DirectorateContent.CreateWeaponCatalog();
-        combatWeapons.Add(
-            new WeaponDefinition(
-                new WeaponId(1_001),
-                rangeMeters: 85.0f,
-                fireIntervalTicks: 8,
-                ammunitionPerShot: 1.0,
-                new DamagePayload(14.0),
-                WeaponDeliveryModel.Hitscan,
-                magazineSize: 4,
-                reloadTicks: 16,
-                effectiveness:
-                    new WeaponEffectiveness(
-                        TargetClassMask.All,
-                        penetration: 55.0)));
         ArtilleryWeaponCatalog artilleryWeapons =
             DirectorateContent.CreateArtilleryWeaponCatalog();
-        artilleryWeapons.Add(
-            new ArtilleryWeaponDefinition(
-                new WeaponId(10_001),
-                minimumRangeMeters: 60.0f,
-                maximumRangeMeters: 600.0f,
-                fireIntervalTicks: 40,
-                acquisitionTicks: 10,
-                ammunitionPerShot: 1.0,
-                new DamagePayload(100.0),
-                areaRadiusMeters: 20.0f,
-                minimumDamageFraction: 0.2,
-                projectileSpeedMetersPerSecond: 120.0f,
-                apexHeightMeters: 120.0f,
-                dispersionRadiusMeters: 4.0f,
-                effectiveness:
-                    new WeaponEffectiveness(
-                        TargetClassMask.All,
-                        penetration: 60.0)));
         ArmorCatalog combatArmor =
             DirectorateContent.CreateArmorCatalog();
 
@@ -275,9 +243,6 @@ internal sealed class ClientApplication
                 combatDamageResolution);
         var tacticalOrderPreparation =
             new TacticalOrderPreparationSystem();
-        var tacticalTestOpponent =
-            new TacticalTestOpponentSystem(
-                intelligenceStore);
         var automaticResupply =
             new AutomaticResupplyDecisionSystem(
                 inventories);
@@ -301,15 +266,13 @@ internal sealed class ClientApplication
             new MatchObjectiveSystem(
                 prototypeRuntime.MatchStateEntity);
 
-        PopulateSimulationEntities(
-            simulation,
-            terrainWorld,
-            renderInstanceCount);
-        DevelopmentTacticalScenario tacticalScenario =
-            CreateDevelopmentTacticalScenario(
+        if (renderInstanceCount > 0)
+        {
+            PopulateSimulationEntities(
                 simulation,
-                inventories,
-                terrainWorld);
+                terrainWorld,
+                renderInstanceCount);
+        }
         EntityId constructionInventory =
             westBase.CommandCore;
         AxisAlignedBounds[] developmentObstacles =
@@ -357,7 +320,6 @@ internal sealed class ClientApplication
         simulation.RegisterSystem(buildingCommands);
         simulation.RegisterSystem(skirmishOpponent);
         simulation.RegisterSystem(tacticalOrderPreparation);
-        simulation.RegisterSystem(tacticalTestOpponent);
         simulation.RegisterSystem(automaticResupply);
         simulation.RegisterSystem(logisticsDisruption);
         simulation.RegisterSystem(strategicInfrastructure);
@@ -393,28 +355,6 @@ internal sealed class ClientApplication
                 new FactionId(
                     checked((uint)LocalPlayer.Value)),
                 terrainWorld.WorldBounds));
-
-        SimulationTick openingTick =
-            simulation.CurrentTick.Next();
-        simulation.SubmitCommand(
-            new AttackMoveCommand(
-                LocalPlayer,
-                tacticalScenario.BlueAssaultUnits,
-                tacticalScenario.AdvanceDestination,
-                simulation.CurrentTick,
-                FormationTemplate.Line,
-                pursuitLeashMeters: 100.0f),
-            openingTick,
-            new SimulationCommandSource(LocalPlayer.Value));
-        simulation.SubmitCommand(
-            new FireMissionCommand(
-                LocalPlayer,
-                [tacticalScenario.Artillery],
-                tacticalScenario.ArtilleryTarget,
-                requestedRounds: 3,
-                simulation.CurrentTick),
-            openingTick,
-            new SimulationCommandSource(LocalPlayer.Value));
 
         simulation.AdvanceOneTick();
 
