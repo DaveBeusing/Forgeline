@@ -522,6 +522,122 @@ public sealed class TacticalCombatSystemTests
     }
 
     [Fact]
+    public void AutomaticResupplyReplansWhenAssignedProviderRunsDry()
+    {
+        TacticalScenario scenario =
+            CreateScenario(
+                weaponRange: 50.0f,
+                registerAutomaticResupply: true,
+                registerBattlefieldSupply: true);
+
+        EntityId unit =
+            CreateCombatUnit(
+                scenario,
+                BluePlayer,
+                BlueFaction,
+                Vector3.Zero,
+                movable: true,
+                attachSupply: true,
+                fuelCapacity: 100.0,
+                initialFuel: 10.0,
+                ammunitionCapacity: 100.0,
+                initialAmmunition: 100.0);
+
+        scenario.Simulation.Entities.AddComponent(
+            unit,
+            new AutomaticResupplyPolicy(
+                ammunitionThreshold: 0.2,
+                fuelThreshold: 0.2));
+
+        InventoryId firstInventory =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(
+                    20.0,
+                    [ResourceIds.Fuel]));
+        Assert.True(
+            scenario.Inventories.Add(
+                firstInventory,
+                ResourceIds.Fuel,
+                10.0).Succeeded);
+
+        EntityId firstProvider =
+            scenario.Simulation.Entities.CreateEntity();
+        scenario.Simulation.Entities.AddComponent(
+            firstProvider,
+            new WorldTransform(
+                new Vector3(5.0f, 0.0f, 0.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        scenario.Simulation.Entities.AddComponent(
+            firstProvider,
+            new SupplyProvider(
+                firstInventory,
+                BluePlayer,
+                resupplyRangeMeters: 20.0f));
+
+        InventoryId fallbackInventory =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(
+                    200.0,
+                    [ResourceIds.Fuel]));
+        Assert.True(
+            scenario.Inventories.Add(
+                fallbackInventory,
+                ResourceIds.Fuel,
+                100.0).Succeeded);
+
+        EntityId fallbackProvider =
+            scenario.Simulation.Entities.CreateEntity();
+        scenario.Simulation.Entities.AddComponent(
+            fallbackProvider,
+            new WorldTransform(
+                new Vector3(10.0f, 0.0f, 0.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        scenario.Simulation.Entities.AddComponent(
+            fallbackProvider,
+            new SupplyProvider(
+                fallbackInventory,
+                BluePlayer,
+                resupplyRangeMeters: 20.0f));
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.Equal(
+            firstProvider,
+            scenario.Simulation.Entities.GetComponent<ResupplyOrder>(
+                unit).Provider);
+        Assert.Equal(
+            0.0,
+            scenario.Inventories.GetQuantity(
+                firstInventory,
+                ResourceIds.Fuel),
+            precision: 6);
+
+        scenario.Simulation.AdvanceOneTick();
+
+        UnitFuelState fuel =
+            scenario.Simulation.Entities.GetComponent<UnitFuelState>(
+                unit);
+
+        Assert.Equal(
+            100.0,
+            scenario.Inventories.GetQuantity(
+                fuel.InventoryId,
+                ResourceIds.Fuel),
+            precision: 6);
+        Assert.False(
+            scenario.Simulation.Entities.HasComponent<ResupplyOrder>(
+                unit));
+        Assert.True(
+            scenario.Inventories.GetQuantity(
+                fallbackInventory,
+                ResourceIds.Fuel) < 100.0);
+        Assert.True(
+            scenario.AutomaticResupply!.Metrics.TotalOrdersIssued >= 2);
+    }
+
+    [Fact]
     public void ActiveCargoTransportRefuelsWithoutDroppingDeliveryOrder()
     {
         TacticalScenario scenario =
