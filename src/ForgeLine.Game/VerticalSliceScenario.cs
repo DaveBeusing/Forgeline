@@ -20,6 +20,13 @@ public sealed class VerticalSliceScenario
         LogisticsNetwork logistics,
         CargoTransportSystem cargoTransport,
         AutomatedDistributionSystem automatedDistribution,
+        PowerNetworkSystem power,
+        ProductionSystem production,
+        UnitProductionSystem unitProduction,
+        ResourceExtractionSystem extraction,
+        BattlefieldSupplySystem battlefieldSupply,
+        ArtilleryFireMissionSystem artillery,
+        CombatReadinessSystem readiness,
         FactionIntelligenceStore intelligence,
         SkirmishOpponentSystem opponents,
         UnitFactory unitFactory,
@@ -34,6 +41,13 @@ public sealed class VerticalSliceScenario
         Logistics = logistics;
         CargoTransport = cargoTransport;
         AutomatedDistribution = automatedDistribution;
+        Power = power;
+        Production = production;
+        UnitProduction = unitProduction;
+        Extraction = extraction;
+        BattlefieldSupply = battlefieldSupply;
+        Artillery = artillery;
+        Readiness = readiness;
         Intelligence = intelligence;
         Opponents = opponents;
         UnitFactory = unitFactory;
@@ -56,6 +70,20 @@ public sealed class VerticalSliceScenario
     public CargoTransportSystem CargoTransport { get; }
 
     public AutomatedDistributionSystem AutomatedDistribution { get; }
+
+    public PowerNetworkSystem Power { get; }
+
+    public ProductionSystem Production { get; }
+
+    public UnitProductionSystem UnitProduction { get; }
+
+    public ResourceExtractionSystem Extraction { get; }
+
+    public BattlefieldSupplySystem BattlefieldSupply { get; }
+
+    public ArtilleryFireMissionSystem Artillery { get; }
+
+    public CombatReadinessSystem Readiness { get; }
 
     public FactionIntelligenceStore Intelligence { get; }
 
@@ -494,6 +522,13 @@ public sealed class VerticalSliceScenario
             logistics,
             cargoTransport,
             automatedDistribution,
+            power,
+            production,
+            unitProduction,
+            extraction,
+            battlefieldSupply,
+            artillery,
+            readiness,
             intelligence,
             opponents,
             unitFactory,
