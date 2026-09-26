@@ -145,6 +145,8 @@ public static class SkirmishStartingBaseFactory
 
         UnitDefinitionCatalog units =
             DirectorateContent.CreateUnitCatalog();
+        Vector3 outward =
+            ResolveOutwardDirection(start);
 
         EntityId engineer =
             unitFactory.Create(
@@ -152,7 +154,8 @@ public static class SkirmishStartingBaseFactory
                 SampleTerrain(
                     terrain,
                     start.Position +
-                    new Vector3(30.0f, 0.0f, -20.0f),
+                    outward * 30.0f +
+                    new Vector3(0.0f, 0.0f, -20.0f),
                     heightOffset: 1.5f),
                 start.Player);
         EntityId cargoTruck =
@@ -161,7 +164,8 @@ public static class SkirmishStartingBaseFactory
                 SampleTerrain(
                     terrain,
                     start.Position +
-                    new Vector3(35.0f, 0.0f, 20.0f),
+                    outward * 35.0f +
+                    new Vector3(0.0f, 0.0f, 20.0f),
                     heightOffset: 2.0f),
                 start.Player);
 
@@ -258,6 +262,23 @@ public static class SkirmishStartingBaseFactory
             throw new InvalidOperationException(
                 $"Unable to seed skirmish inventory {inventory} with resource {resource}: {result.Failure}.");
         }
+    }
+
+    private static Vector3 ResolveOutwardDirection(
+        in BattlefieldStartPosition start)
+    {
+        Vector3 direction =
+            start.Position -
+            start.CommandCorePosition;
+        direction.Y = 0.0f;
+
+        if (direction.LengthSquared() <= 0.0001f)
+        {
+            throw new InvalidOperationException(
+                "Skirmish start and Command Core positions must define an outward direction.");
+        }
+
+        return Vector3.Normalize(direction);
     }
 
     private static Vector3 SampleTerrain(
