@@ -27,6 +27,8 @@ The first playable faction-content vertical slice is now the **Directorate**: 13
 
 The canonical playable battlefield vertical slice is **Central Divide**, a 3.072 × 3.072 km two-player scenario with finite bootstrap and contested resources, expansion/outpost/FOB areas, a central terrain barrier, the efficient North Bridge and alternate South Ford, real logistics edges, navigation invalidation on crossing disruption, fixed-tick restoration, simulation-owned Command Core objectives, and F2 strategic-map diagnostics. The Windows development client loads this battlefield by default. See [Prototype Battlefield](docs/PrototypeBattlefield.md).
 
+The first full skirmish opponent now plays the same authoritative vertical-slice loop as the player: real starting stock, construction, power, extraction, processing, logistics stock policies, unit production, reconnaissance, combat groups/formations, Fuel/Ammunition supply, retreat/resupply, artillery, and Command Core pressure. Direct attacks require current identified intelligence; otherwise offensive movement is limited to public strategic map knowledge. The Windows client starts a Player-2 opponent on Central Divide and exposes its strategic state through F2 diagnostics. See [Skirmish Opponent](docs/SkirmishOpponent.md).
+
 ## Repository Layout
 
 ```text
