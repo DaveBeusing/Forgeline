@@ -1204,10 +1204,19 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         objective =
             sites[index].Position;
 
+        EntityId support =
+            FindAvailableScoutSupport(
+                context,
+                owned);
+        EntityId[] scoutingGroup =
+            support.IsValid
+                ? [scout, support]
+                : [scout];
+
         var command =
             new AttackMoveCommand(
                 controller.Player,
-                [scout],
+                scoutingGroup,
                 objective,
                 context.Tick,
                 FormationTemplate.Column,
@@ -2642,6 +2651,44 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
 
         return best;
+    }
+
+    private EntityId FindAvailableScoutSupport(
+        SimulationContext context,
+        OwnedState owned)
+    {
+        foreach (var pair in
+                 owned.UnitByEntity
+                     .Where(
+                         pair =>
+                             pair.Value ==
+                             UnitIds.SupplyTruck)
+                     .OrderBy(
+                         static pair =>
+                             pair.Key))
+        {
+            EntityId entity =
+                pair.Key;
+
+            if (!context.Entities.IsAlive(entity) ||
+                context.Entities.HasComponent<ResupplyOrder>(entity) ||
+                context.Entities.HasComponent<MovementOrder>(entity) ||
+                !context.Entities.TryGetComponent(
+                    entity,
+                    out SupplyProvider provider) ||
+                !_inventories.Contains(
+                    provider.InventoryId) ||
+                _inventories.GetAvailableQuantity(
+                    provider.InventoryId,
+                    ResourceIds.Fuel) <= 0.0)
+            {
+                continue;
+            }
+
+            return entity;
+        }
+
+        return EntityId.Invalid;
     }
 
     private static EntityId FindIdleUnit(
