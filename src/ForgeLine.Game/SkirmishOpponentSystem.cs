@@ -1533,42 +1533,40 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             UnitProductionFacility facility =
                 context.Entities.GetComponent<UnitProductionFacility>(
                     entity);
-            LogisticsStockPriority priority =
-                facility.Supports(UnitProductionCapability.Logistics)
-                    ? LogisticsStockPriority.Critical
-                    : LogisticsStockPriority.High;
+            const LogisticsStockPriority priority =
+                LogisticsStockPriority.Critical;
 
             SetStockPolicy(
                 context,
                 entity,
                 ResourceIds.Steel,
-                120.0,
-                300.0,
-                650.0,
-                priority);
-            SetStockPolicy(
-                context,
-                entity,
-                ResourceIds.Electronics,
-                60.0,
-                160.0,
-                320.0,
-                priority);
-            SetStockPolicy(
-                context,
-                entity,
-                ResourceIds.Fuel,
-                120.0,
+                80.0,
                 240.0,
                 420.0,
                 priority);
             SetStockPolicy(
                 context,
                 entity,
+                ResourceIds.Electronics,
+                30.0,
+                80.0,
+                160.0,
+                priority);
+            SetStockPolicy(
+                context,
+                entity,
+                ResourceIds.Fuel,
+                80.0,
+                160.0,
+                280.0,
+                priority);
+            SetStockPolicy(
+                context,
+                entity,
                 ResourceIds.Ammunition,
+                50.0,
                 120.0,
-                320.0,
-                700.0,
+                240.0,
                 priority);
         }
 
