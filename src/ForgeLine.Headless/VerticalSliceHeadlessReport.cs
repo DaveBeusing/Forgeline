@@ -90,6 +90,11 @@ internal sealed record VerticalSliceMatchReport(
     int PendingDistributionRequests,
     long CompletedDistributionRequests,
     long FailedDistributionRequests,
+    double TotalFuelTransferred,
+    double TotalAmmunitionTransferred,
+    ulong TotalArtilleryShots,
+    ulong TotalArtilleryImpacts,
+    double TotalArtilleryAmmunitionConsumed,
     VerticalSliceSideReport West,
     VerticalSliceSideReport East)
 {
@@ -138,6 +143,11 @@ internal sealed record VerticalSliceMatchReport(
             scenario.AutomatedDistribution.Metrics.PendingRequestCount,
             scenario.AutomatedDistribution.Metrics.CompletedRequestCount,
             scenario.AutomatedDistribution.Metrics.FailedRequestCount,
+            scenario.BattlefieldSupply.Metrics.TotalFuelTransferred,
+            scenario.BattlefieldSupply.Metrics.TotalAmmunitionTransferred,
+            scenario.Artillery.Metrics.TotalShotsFired,
+            scenario.Artillery.Metrics.TotalImpacts,
+            scenario.Artillery.Metrics.TotalAmmunitionConsumed,
             CaptureSide(
                 scenario,
                 scenario.West),
@@ -153,12 +163,26 @@ internal sealed record VerticalSliceMatchReport(
         SkirmishOpponentState opponent =
             scenario.GetOpponentState(
                 side.Player);
+        SkirmishOpponentDebugReadModel debug =
+            scenario.Opponents.DebugSnapshot.Single(
+                entry =>
+                    entry.Player ==
+                    side.Player);
 
         return new VerticalSliceSideReport(
             side.Player.Value,
             opponent.StrategicState.ToString(),
             opponent.ActiveGoal.ToString(),
             opponent.DecisionsTaken,
+            debug.Economy.PowerGeneration,
+            debug.Economy.PowerDemand,
+            debug.Economy.OfflineConsumers,
+            debug.Economy.ProductionFacilities,
+            debug.Economy.UnitProductionFacilities,
+            debug.Force.KnownHostileContacts,
+            debug.Force.CurrentHostileContacts,
+            debug.Force.AverageReadiness,
+            debug.Force.MinimumSupply,
             scenario.CountBuildings(
                 side.Player,
                 BuildingIds.PowerPlant),
@@ -215,6 +239,15 @@ internal sealed record VerticalSliceSideReport(
     string StrategicState,
     string ActiveGoal,
     int DecisionsTaken,
+    double PowerGeneration,
+    double PowerDemand,
+    int OfflineConsumers,
+    int ProductionFacilities,
+    int UnitProductionFacilities,
+    int KnownHostileContacts,
+    int CurrentHostileContacts,
+    double AverageReadiness,
+    double MinimumSupply,
     int PowerPlants,
     int Extractors,
     int Smelters,
