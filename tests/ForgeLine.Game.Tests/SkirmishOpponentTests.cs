@@ -114,7 +114,7 @@ public sealed class SkirmishOpponentTests
     }
 
     [Fact]
-    public void CargoTrucksCanServiceStaticFacilityApproaches()
+    public void CargoTrucksCanServiceExtractorDepositApproaches()
     {
         SkirmishScenarioHarness scenario =
             SkirmishScenarioHarness.Create();
@@ -122,9 +122,9 @@ public sealed class SkirmishOpponentTests
         bool delivered =
             scenario.RunUntil(
                 static current =>
-                    current.CargoTransport.Metrics.DeliveredQuantity >
-                    0.0,
-                maximumTicks: 6_000,
+                    current.CargoTransport.Metrics.DeliveredQuantity >=
+                    700.0,
+                maximumTicks: 12_000,
                 TestContext.Current.CancellationToken);
 
         Assert.True(
@@ -133,6 +133,10 @@ public sealed class SkirmishOpponentTests
         Assert.Equal(
             0L,
             scenario.CargoTransport.Metrics.FailedTransportCount);
+        Assert.True(
+            scenario.CargoTransport.Metrics.CompletedOrderCount >=
+            4L,
+            DescribeScenario(scenario));
     }
 
     [Fact]
