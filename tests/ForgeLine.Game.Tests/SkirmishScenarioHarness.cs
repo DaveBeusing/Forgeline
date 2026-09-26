@@ -209,17 +209,6 @@ internal sealed class SkirmishScenarioHarness
                 static start =>
                     start.Player ==
                     new PlayerId(2));
-        BattlefieldObjectiveDefinition westObjective =
-            battlefield.Objectives.Single(
-                static objective =>
-                    objective.Owner ==
-                    new PlayerId(1));
-        BattlefieldObjectiveDefinition eastObjective =
-            battlefield.Objectives.Single(
-                static objective =>
-                    objective.Owner ==
-                    new PlayerId(2));
-
         SkirmishStartingBase west =
             SkirmishStartingBaseFactory.Create(
                 simulation.Entities,
