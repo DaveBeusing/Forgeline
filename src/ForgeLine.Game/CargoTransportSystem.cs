@@ -1417,7 +1417,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
         float clearance =
             movement.ObstacleLookAhead +
             movement.Radius +
-            0.10f;
+            2.0f;
         float minimumX =
             bounds.Minimum.X -
             clearance;
