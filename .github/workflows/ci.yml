@@ -53,6 +53,9 @@ jobs:
       - name: Lightweight entity stress smoke
         run: dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 16 --seed 67890 --tick-rate 20 --entities 10000 --diagnostics-output artifacts/headless-stress-10000.json
 
+      - name: Vertical slice full-match validation
+        run: dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --require-terminal --diagnostics-output artifacts/vertical-slice-match.json
+
       - name: Test
         run: dotnet test ForgeLine.sln --configuration Release --no-build
 
