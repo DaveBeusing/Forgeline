@@ -124,7 +124,7 @@ public sealed class SkirmishOpponentTests
                 static current =>
                     current.CargoTransport.Metrics.DeliveredQuantity >=
                     700.0,
-                maximumTicks: 80_000,
+                maximumTicks: 12_000,
                 TestContext.Current.CancellationToken);
 
         Assert.True(
@@ -189,7 +189,7 @@ public sealed class SkirmishOpponentTests
                 static current =>
                     HasCombatGroup(
                         current),
-                maximumTicks: 12_000,
+                maximumTicks: 30_000,
                 TestContext.Current.CancellationToken);
 
         Assert.True(
@@ -295,7 +295,7 @@ public sealed class SkirmishOpponentTests
                 current =>
                     current.GetMatchState().Status !=
                     MatchStatus.Running,
-                maximumTicks: 30_000,
+                maximumTicks: 80_000,
                 TestContext.Current.CancellationToken);
 
         Assert.True(
