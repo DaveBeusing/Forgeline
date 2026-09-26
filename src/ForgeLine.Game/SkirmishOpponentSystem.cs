@@ -1368,9 +1368,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 owned.UnitByEntity.TryGetValue(
                     unit,
                     out UnitId unitId) &&
-                unitId is var candidate &&
-                (candidate == UnitIds.CargoTruck ||
-                 candidate == UnitIds.SupplyTruck);
+                (unitId == UnitIds.CargoTruck ||
+                 unitId == UnitIds.SupplyTruck);
             AutomaticResupplyPolicy resupplyPolicy =
                 isLogisticsVehicle
                     ? logisticsResupplyPolicy
