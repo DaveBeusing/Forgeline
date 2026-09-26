@@ -233,6 +233,6 @@ SkirmishOpponentConfiguration changes decision cadence, thresholds, group-size l
 
 The existing combat-command layer remains the group authority. Attack and AttackMove create CombatGroupIntent, while movement-oriented commands also create normal formation/movement groups. CombatReadinessSystem, TacticalTestOpponentSystem, navigation, movement, supply, and combat then operate on those normal entities and components. The skirmish layer must not introduce a parallel tactical simulation.
 
-Headless integration uses SkirmishScenarioHarness to compose the same authoritative systems for two symmetric opponents. Deterministic scenarios verify knowledge boundaries and strategic progression; bounded full-match coverage verifies that the composed loop can reach a normal terminal MatchState.
+Headless integration uses SkirmishScenarioHarness to compose the same authoritative systems for two symmetric opponents. Deterministic scenarios verify knowledge boundaries and bounded Build–Supply–Conquer progression in regular CI. Terminal full-match soak execution uses the same composition outside the regular CI duration budget until long-horizon logistics endurance is reliable enough for a deterministic merge gate.
 
 See docs/SkirmishOpponent.md.
