@@ -2704,6 +2704,28 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private Vector3 SelectDeepOffensiveWaypoint(
         SkirmishOpponentController controller)
     {
+        BattlefieldStartPosition? opposingStart =
+            _battlefield.Starts
+                .Where(
+                    start =>
+                        start.Player !=
+                        controller.Player)
+                .OrderBy(
+                    start =>
+                        HorizontalDistanceSquared(
+                            controller.HomePosition,
+                            start.Position))
+                .ThenBy(
+                    static start =>
+                        start.Player.Value)
+                .Cast<BattlefieldStartPosition?>()
+                .FirstOrDefault();
+
+        if (opposingStart.HasValue)
+        {
+            return opposingStart.Value.Position;
+        }
+
         float center =
             _battlefield.Metadata.WidthMeters *
             0.5f;
@@ -2713,8 +2735,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         float stagingX =
             _battlefield.Metadata.WidthMeters *
             (homeWest
-                ? 0.80f
-                : 0.20f);
+                ? 0.90f
+                : 0.10f);
 
         return new Vector3(
             stagingX,
