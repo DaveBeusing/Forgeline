@@ -1218,6 +1218,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 .Where(
                     unit =>
                     {
+                        if (owned.UnitByEntity.TryGetValue(
+                                unit,
+                                out UnitId unitId) &&
+                            unitId == UnitIds.ScoutVehicle)
+                        {
+                            return false;
+                        }
+
                         if (!context.Entities.TryGetComponent(
                                 unit,
                                 out UnitCombatReadiness readiness))
