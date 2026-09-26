@@ -1551,10 +1551,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 context,
                 entity,
                 ResourceIds.Fuel,
-                70.0,
-                180.0,
-                360.0,
-                LogisticsStockPriority.High);
+                120.0,
+                240.0,
+                420.0,
+                LogisticsStockPriority.Critical);
             SetStockPolicy(
                 context,
                 entity,
@@ -1792,9 +1792,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         UnitId[] priority =
         [
             UnitIds.RifleSquad,
-            UnitIds.ScoutVehicle,
             UnitIds.CargoTruck,
             UnitIds.SupplyTruck,
+            UnitIds.ScoutVehicle,
             UnitIds.MainBattleTank,
             UnitIds.MobileArtillery,
             UnitIds.CombatEngineer
