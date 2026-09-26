@@ -2,6 +2,7 @@ using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Intelligence;
 using ForgeLine.Simulation;
+using ForgeLine.World;
 using Xunit;
 
 namespace ForgeLine.Game.Tests;
@@ -60,6 +61,47 @@ public sealed class SkirmishOpponentTests
             scenario.CountUnits(
                 scenario.East.Player,
                 UnitIds.CargoTruck));
+
+        EntityId westCargo =
+            scenario.West.StartingUnits.Single(
+                entity =>
+                    scenario.Simulation.Entities.GetComponent<UnitIdentity>(
+                        entity).UnitId ==
+                    UnitIds.CargoTruck);
+        EntityId eastCargo =
+            scenario.East.StartingUnits.Single(
+                entity =>
+                    scenario.Simulation.Entities.GetComponent<UnitIdentity>(
+                        entity).UnitId ==
+                    UnitIds.CargoTruck);
+        WorldTransform westCargoTransform =
+            scenario.Simulation.Entities.GetComponent<WorldTransform>(
+                westCargo);
+        WorldTransform eastCargoTransform =
+            scenario.Simulation.Entities.GetComponent<WorldTransform>(
+                eastCargo);
+        WorldTransform westCoreTransform =
+            scenario.Simulation.Entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+        WorldTransform eastCoreTransform =
+            scenario.Simulation.Entities.GetComponent<WorldTransform>(
+                scenario.East.CommandCore);
+
+        float westCargoOffsetX =
+            westCargoTransform.Position.X -
+            westCoreTransform.Position.X;
+        float eastCargoOffsetX =
+            eastCargoTransform.Position.X -
+            eastCoreTransform.Position.X;
+
+        Assert.Equal(
+            -westCargoOffsetX,
+            eastCargoOffsetX,
+            precision: 3);
+        Assert.True(
+            MathF.Abs(westCargoOffsetX) > 20.0f);
+        Assert.True(
+            MathF.Abs(eastCargoOffsetX) > 20.0f);
 
         Assert.Equal(
             SkirmishStrategicState.Bootstrap,
