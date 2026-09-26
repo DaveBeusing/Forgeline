@@ -307,6 +307,17 @@ public sealed class SkirmishOpponentTests
                         request.FailureReason)
                     .Distinct()
                     .Order());
+        string cargoStates =
+            string.Join(
+                ",",
+                scenario.CargoTransport.LastDebugSnapshot.Transports
+                    .OrderBy(static transport => transport.Entity)
+                    .Select(static transport =>
+                        $"{transport.Entity}:{transport.Lifecycle}/{transport.FailureReason}" +
+                        $"@{transport.WorldPosition.X:F0},{transport.WorldPosition.Z:F0}" +
+                        (transport.HasMovementTarget
+                            ? $"->{transport.MovementTarget.X:F0},{transport.MovementTarget.Z:F0}"
+                            : string.Empty)));
 
         return
             $"{side.Player}={state.StrategicState}/{state.ActiveGoal} decisions={state.DecisionsTaken} " +
@@ -328,6 +339,7 @@ public sealed class SkirmishOpponentTests
             $"distribution=p{distribution.PendingRequestCount}/a{distribution.AssignedRequestCount}/t{distribution.InTransitRequestCount}/r{distribution.RetryPendingRequestCount}/c{distribution.CompletedRequestCount}/f{distribution.FailedRequestCount} " +
             $"distributionFailures={distributionFailures} " +
             $"cargo={cargo.TransportCount}/active{cargo.ActiveTransportCount}/wait{cargo.WaitingTransportCount}/failed{cargo.FailedTransportCount}/delivered{cargo.DeliveredQuantity:F0}/routeFail{cargo.RouteFailureCount} " +
+            $"cargoStates={cargoStates} " +
             $"scouts={scenario.CountUnits(side.Player, UnitIds.ScoutVehicle)} " +
             $"tanks={scenario.CountUnits(side.Player, UnitIds.MainBattleTank)}";
     }
