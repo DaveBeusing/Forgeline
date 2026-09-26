@@ -1315,6 +1315,15 @@ public sealed class AutomatedDistributionSystem
 
         if (entities.TryGetComponent(
                 node.Entity,
+                out UnitProductionFacility unitProduction) &&
+            _inventories.Contains(unitProduction.InputInventory))
+        {
+            inventoryId = unitProduction.InputInventory;
+            return true;
+        }
+
+        if (entities.TryGetComponent(
+                node.Entity,
                 out InventoryStorage storage) &&
             _inventories.Contains(storage.InventoryId))
         {
