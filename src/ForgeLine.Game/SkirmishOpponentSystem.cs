@@ -2640,9 +2640,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         BattlefieldSiteKind.MiningOutpost)
             .OrderBy(
                 site =>
+                    HorizontalDistanceSquared(
+                        controller.HomePosition,
+                        site.Position))
+            .ThenBy(
+                site =>
                     homeWest
-                        ? -site.Position.X
-                        : site.Position.X)
+                        ? site.Position.X
+                        : -site.Position.X)
             .ThenBy(
                 static site =>
                     site.Key,
