@@ -1512,7 +1512,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     100.0,
                     260.0,
                     520.0,
-                    LogisticsStockPriority.High);
+                    LogisticsStockPriority.Critical);
                 SetStockPolicy(
                     context,
                     entity,
@@ -1520,7 +1520,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     40.0,
                     120.0,
                     260.0,
-                    LogisticsStockPriority.High);
+                    LogisticsStockPriority.Critical);
             }
         }
 
