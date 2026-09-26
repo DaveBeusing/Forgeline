@@ -253,12 +253,14 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
             if (distanceSquared > rangeSquared)
             {
                 bool recipientCanMove =
-                    !context.Entities.TryGetComponent(recipient, out SupplyMovementConstraint movement) ||
-                    movement.CanMove;
+                    BattlefieldResupplyPlanner.CanReachProvider(
+                        context, _inventories, recipient, distanceSquared, provider.ResupplyRangeMeters);
                 EntityId traveler = recipientCanMove ? recipient : providerEntity;
                 WorldTransform destination = recipientCanMove ? providerTransform : recipientTransform;
 
-                if ((!recipientCanMove && !context.Entities.HasComponent<SupplyTruck>(providerEntity)) ||
+                if ((!recipientCanMove &&
+                     (!context.Entities.HasComponent<SupplyTruck>(providerEntity) ||
+                      context.Entities.HasComponent<ResupplyOrder>(providerEntity))) ||
                     !TacticalCommandUtilities.TryGetMovementIntent(context, traveler, out MovementOrder intent))
                 {
                     return false;

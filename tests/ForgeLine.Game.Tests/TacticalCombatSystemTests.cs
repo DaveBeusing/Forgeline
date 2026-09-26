@@ -810,6 +810,29 @@ public sealed class TacticalCombatSystemTests
     }
 
     [Fact]
+    public void TacticalTestOpponentSelectsTargetItsWeaponCanEngage()
+    {
+        TacticalScenario scenario = CreateScenario(weaponRange: 80.0f, registerTestOpponent: true);
+        scenario.Weapons.Add(new WeaponDefinition(new WeaponId(2), 80.0f, 4, 1.0,
+            new DamagePayload(10.0), WeaponDeliveryModel.Hitscan,
+            effectiveness: new WeaponEffectiveness(TargetClassMask.Infantry, penetration: 20.0)));
+        EntityId opponent = CreateCombatUnit(scenario, RedPlayer, RedFaction, Vector3.Zero,
+            addVisualSensor: true, visualRange: 150.0f, attachSupply: true,
+            fuelCapacity: 100.0, initialFuel: 100.0, ammunitionCapacity: 100.0, initialAmmunition: 100.0);
+        scenario.Simulation.Entities.SetComponent(opponent, new WeaponState(new WeaponId(2), EntityId.Invalid));
+        scenario.Simulation.Entities.AddComponent(opponent, new TacticalTestOpponent());
+        EntityId structure = CreateCombatUnit(scenario, BluePlayer, BlueFaction, new Vector3(20.0f, 0.0f, 0.0f));
+        scenario.Simulation.Entities.SetComponent(structure, new Targetable(TargetClass.Structure));
+        EntityId infantry = CreateCombatUnit(scenario, BluePlayer, BlueFaction, new Vector3(60.0f, 0.0f, 0.0f));
+        scenario.Simulation.Entities.SetComponent(infantry, new Targetable(TargetClass.Infantry));
+
+        scenario.Simulation.RunTicks(3, TestContext.Current.CancellationToken);
+
+        Assert.Equal(infantry, scenario.Simulation.Entities.GetComponent<CombatOrderState>(opponent).ExplicitTarget);
+        Assert.Equal(CombatOrderStatus.Engaging, scenario.Simulation.Entities.GetComponent<TacticalCombatState>(opponent).Status);
+    }
+
+    [Fact]
     public void TacticalTestOpponentUsesDetectedCoordinateThenIdentifiedTarget()
     {
         TacticalScenario scenario =
@@ -1174,7 +1197,8 @@ public sealed class TacticalCombatSystemTests
         TacticalTestOpponentSystem? opponent =
             registerTestOpponent
                 ? new TacticalTestOpponentSystem(
-                    intelligence)
+                    intelligence,
+                    weapons)
                 : null;
         AutomaticResupplyDecisionSystem? autoResupply =
             registerAutomaticResupply ||

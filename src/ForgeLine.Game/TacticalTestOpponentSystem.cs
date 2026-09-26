@@ -21,6 +21,7 @@ public readonly record struct TacticalTestOpponentMetrics(
 public sealed class TacticalTestOpponentSystem : ISimulationSystem
 {
     private readonly FactionIntelligenceStore _intelligence;
+    private readonly WeaponCatalog _weapons;
     private readonly List<EntityId> _units = new();
 
     private ulong _totalAttackDecisions;
@@ -29,10 +30,13 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
     private ulong _totalRetreatDecisions;
 
     public TacticalTestOpponentSystem(
-        FactionIntelligenceStore intelligence)
+        FactionIntelligenceStore intelligence,
+        WeaponCatalog weapons)
     {
         _intelligence = intelligence ??
             throw new ArgumentNullException(nameof(intelligence));
+        _weapons = weapons ??
+            throw new ArgumentNullException(nameof(weapons));
     }
 
     public SimulationPhase Phase =>
@@ -136,6 +140,7 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
 
             if (TryFindBestContact(
                     context,
+                    entity,
                     faction,
                     transform.Position,
                     out IntelligenceContact contact,
@@ -212,6 +217,7 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
 
     private bool TryFindBestContact(
         SimulationContext context,
+        EntityId source,
         FactionId faction,
         Vector3 origin,
         out IntelligenceContact selected,
@@ -249,6 +255,16 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
                     ? 1
                     : 0;
             int objectiveRank = 0;
+
+            if (contact.State == IntelligenceState.Identified &&
+                _intelligence.TryResolveCurrentlyIdentifiedEntity(
+                    faction, contact.ContactKey, out EntityId identified) &&
+                context.Entities.TryGetComponent(identified, out Targetable targetable) &&
+                context.Entities.TryGetComponent(source, out WeaponState weapon) &&
+                !_weapons.GetRequired(weapon.WeaponId).Effectiveness.CanEngage(targetable.Class))
+            {
+                continue;
+            }
 
             if (contact.State == IntelligenceState.Identified &&
                 _intelligence.TryResolveCurrentlyIdentifiedEntity(

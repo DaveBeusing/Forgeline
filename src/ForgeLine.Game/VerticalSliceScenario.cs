@@ -396,7 +396,8 @@ public sealed class VerticalSliceScenario
             new TacticalOrderPreparationSystem();
         var tacticalOpponent =
             new TacticalTestOpponentSystem(
-                intelligence);
+                intelligence,
+                weapons);
         var automaticResupply =
             new AutomaticResupplyDecisionSystem(
                 inventories);

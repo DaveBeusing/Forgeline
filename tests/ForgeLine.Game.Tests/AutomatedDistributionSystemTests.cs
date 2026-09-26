@@ -474,6 +474,36 @@ public sealed class AutomatedDistributionSystemTests
         Assert.InRange(fixture.Inventories.GetQuantity(fixture.DestinationInventory, ResourceIds.FerrousOre), 1.0, 599.0);
     }
 
+    [Theory]
+    [InlineData(true, 3.0, true)]
+    [InlineData(true, 0.5, false)]
+    [InlineData(false, 3.0, false)]
+    public void RefineryInputCanUseFuelReserveButStillRequiresEnoughForTheTrip(
+        bool refinery, double fuelQuantity, bool shouldDispatch)
+    {
+        DistributionFixture fixture = CreateFixture(sourceQuantity: 0.0);
+        Assert.True(fixture.Inventories.Add(fixture.SourceInventory, ResourceIds.Volatiles, 80.0).Succeeded);
+        fixture.Connect(fixture.SourceNode, fixture.DestinationNode);
+        if (refinery)
+        {
+            InventoryId output = fixture.Inventories.CreateInventory(new InventorySpecification(200.0));
+            fixture.Simulation.Entities.AddComponent(fixture.DestinationEntity,
+                new ProductionFacility(fixture.DestinationInventory, output, ProductionCapability.FuelProcessing, SimulationTick.Zero));
+        }
+
+        EntityId policy = fixture.Simulation.Entities.CreateEntity();
+        fixture.Simulation.Entities.AddComponent(policy,
+            new LogisticsStockPolicy(fixture.DestinationEntity, ResourceIds.Volatiles, 20.0, 40.0, 80.0, LogisticsStockPriority.Critical));
+        EntityId truck = fixture.CreateTruck(fixture.SourcePosition);
+        InventoryId fuel = fixture.Inventories.CreateInventory(new InventorySpecification(20.0));
+        Assert.True(fixture.Inventories.Add(fuel, ResourceIds.Fuel, fuelQuantity).Succeeded);
+        fixture.Simulation.Entities.AddComponent(truck, new UnitFuelState(fuel, 20.0, 0.02));
+
+        fixture.Simulation.AdvanceOneTick();
+
+        Assert.Equal(shouldDispatch, fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(truck));
+    }
+
     [Fact]
     public void MissingRouteRetriesWithoutReservingStock()
     {

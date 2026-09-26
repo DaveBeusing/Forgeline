@@ -60,11 +60,7 @@ public static class BattlefieldResupplyPlanner
             return false;
         }
 
-        bool recipientCanMove =
-            !context.Entities.TryGetComponent(
-                recipient,
-                out SupplyMovementConstraint recipientSupplyConstraint) ||
-            recipientSupplyConstraint.CanMove;
+        bool recipientCanReachProvider = false;
 
         WorldTransform providerTransform = default;
         SupplyProvider selectedProvider = default;
@@ -89,12 +85,7 @@ public static class BattlefieldResupplyPlanner
                       requiredResources))) ||
                 !context.Entities.TryGetComponent(
                     candidate,
-                    out WorldTransform transform) ||
-                (!recipientCanMove &&
-                 !CanProviderReachImmobileRecipient(
-                     context,
-                     candidate,
-                     recipient)))
+                    out WorldTransform transform))
             {
                 continue;
             }
@@ -112,6 +103,14 @@ public static class BattlefieldResupplyPlanner
                     recipientTransform.Position,
                     transform.Position);
 
+            bool canReachProvider = CanReachProvider(
+                context, inventories, recipient, distanceSquared, provider.ResupplyRangeMeters);
+            if (!canReachProvider &&
+                !CanProviderReachImmobileRecipient(context, candidate, recipient))
+            {
+                continue;
+            }
+
             if (!providerEntity.IsValid ||
                 distanceSquared < bestDistanceSquared ||
                 (distanceSquared == bestDistanceSquared &&
@@ -125,6 +124,7 @@ public static class BattlefieldResupplyPlanner
                     provider;
                 bestDistanceSquared =
                     distanceSquared;
+                recipientCanReachProvider = canReachProvider;
             }
         }
 
@@ -164,7 +164,7 @@ public static class BattlefieldResupplyPlanner
                 resupplyOrder);
         }
 
-        if (recipientCanMove)
+        if (recipientCanReachProvider)
         {
             Vector3 approachPosition =
                 ResolveProviderApproachPosition(
@@ -205,6 +205,36 @@ public static class BattlefieldResupplyPlanner
         return true;
     }
 
+    internal static bool CanReachProvider(
+        SimulationContext context,
+        InventoryStore? inventories,
+        EntityId recipient,
+        float distanceSquared,
+        float range)
+    {
+        if (distanceSquared <= range * range)
+        {
+            return true;
+        }
+
+        if (context.Entities.TryGetComponent(recipient, out SupplyMovementConstraint movement) &&
+            !movement.CanMove)
+        {
+            return false;
+        }
+
+        if (inventories is null ||
+            !context.Entities.TryGetComponent(recipient, out UnitFuelState fuel) ||
+            fuel.ConsumptionPerMeter <= 0.0)
+        {
+            return true;
+        }
+
+        double requiredFuel = (MathF.Sqrt(distanceSquared) - range * 0.75f) * fuel.ConsumptionPerMeter;
+        return inventories.Contains(fuel.InventoryId) &&
+            inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel) >= requiredFuel;
+    }
+
     private static bool HasRequiredStock(
         InventoryStore inventories,
         InventoryId inventory,
@@ -240,6 +270,7 @@ public static class BattlefieldResupplyPlanner
     {
         if (!context.Entities.HasComponent<SupplyTruck>(
                 provider) ||
+            context.Entities.HasComponent<ResupplyOrder>(provider) ||
             !context.Entities.HasComponent<GroundMovement>(
                 provider))
         {
