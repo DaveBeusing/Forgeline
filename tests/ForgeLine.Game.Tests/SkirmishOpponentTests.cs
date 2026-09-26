@@ -116,10 +116,9 @@ public sealed class SkirmishOpponentTests
 
         bool formedGroup =
             scenario.RunUntil(
-                current =>
-                    current.Simulation.Entities
-                        .Query<CombatGroupIntent>()
-                        .Any(),
+                static current =>
+                    HasCombatGroup(
+                        current),
                 maximumTicks: 12_000,
                 TestContext.Current.CancellationToken);
 
@@ -242,6 +241,18 @@ public sealed class SkirmishOpponentTests
         Assert.True(
             scenario.GetOpponentState(
                 scenario.East.Player).DecisionsTaken > 20);
+    }
+
+    private static bool HasCombatGroup(
+        SkirmishScenarioHarness scenario)
+    {
+        foreach (EntityId _ in
+                 scenario.Simulation.Entities.Query<CombatGroupIntent>())
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private static bool HasPowerAndExtraction(
