@@ -707,13 +707,25 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                     state);
             }
 
+            if (context.Entities.TryGetComponent(
+                    recipient.Entity,
+                    out ResupplyOrder activeOrder) &&
+                IsResupplyOrderSatisfied(
+                    activeOrder,
+                    recipient.HasFuel,
+                    fuelFraction,
+                    recipient.HasAmmunition,
+                    ammunitionFraction))
+            {
+                CompleteResupplyOrderIfPresent(
+                    context,
+                    recipient.Entity);
+            }
+
             switch (status)
             {
                 case BattlefieldSupplyStatus.Supplied:
                     supplied++;
-                    CompleteResupplyOrderIfPresent(
-                        context,
-                        recipient.Entity);
                     break;
                 case BattlefieldSupplyStatus.LowSupply:
                     low++;
@@ -827,6 +839,30 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                 resource) / capacity,
             0.0,
             1.0);
+    }
+
+    private static bool IsResupplyOrderSatisfied(
+        in ResupplyOrder order,
+        bool hasFuel,
+        double fuelFraction,
+        bool hasAmmunition,
+        double ammunitionFraction)
+    {
+        BattlefieldSupplyResource requested =
+            order.RequestedResources == BattlefieldSupplyResource.None
+                ? BattlefieldSupplyResource.All
+                : order.RequestedResources;
+
+        bool fuelSatisfied =
+            !requested.HasFlag(BattlefieldSupplyResource.Fuel) ||
+            !hasFuel ||
+            fuelFraction >= 1.0 - QuantityEpsilon;
+        bool ammunitionSatisfied =
+            !requested.HasFlag(BattlefieldSupplyResource.Ammunition) ||
+            !hasAmmunition ||
+            ammunitionFraction >= 1.0 - QuantityEpsilon;
+
+        return fuelSatisfied && ammunitionSatisfied;
     }
 
     private static void CompleteResupplyOrderIfPresent(
