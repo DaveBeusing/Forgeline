@@ -311,18 +311,18 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             }
         }
 
-        if (snapshot.Alerts != PlayerAlertFlags.None)
+        if (snapshot.Alerts != PlayerAlertState.None)
         {
             builder.Append("ALERT ");
 
             if (snapshot.Alerts.HasFlag(
-                    PlayerAlertFlags.LowPower))
+                    PlayerAlertState.LowPower))
             {
                 builder.Append("LOW POWER ");
             }
 
             if (snapshot.Alerts.HasFlag(
-                    PlayerAlertFlags.ProductionBlocked))
+                    PlayerAlertState.ProductionBlocked))
             {
                 builder.Append("PRODUCTION BLOCKED ");
                 builder.Append(
@@ -331,7 +331,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             }
 
             if (snapshot.Alerts.HasFlag(
-                    PlayerAlertFlags.SupplyCritical))
+                    PlayerAlertState.SupplyCritical))
             {
                 builder.Append("SUPPLY CRITICAL ");
                 builder.Append(snapshot.CriticalSupplyUnits);
@@ -339,13 +339,13 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             }
 
             if (snapshot.Alerts.HasFlag(
-                    PlayerAlertFlags.CommandCoreDamaged))
+                    PlayerAlertState.CommandCoreDamaged))
             {
                 builder.Append("COMMAND CORE DAMAGED ");
             }
 
             if (snapshot.Alerts.HasFlag(
-                    PlayerAlertFlags.CommandCoreDestroyed))
+                    PlayerAlertState.CommandCoreDestroyed))
             {
                 builder.Append("COMMAND CORE DESTROYED ");
             }
