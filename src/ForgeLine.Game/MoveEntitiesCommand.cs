@@ -86,7 +86,9 @@ public sealed class MoveEntitiesCommand : ISimulationCommand
                     entity,
                     out ControllableEntity controllable) ||
                 !controllable.IsControllable ||
-                controllable.Owner != Issuer)
+                controllable.Owner != Issuer ||
+                controllable.Category ==
+                    ControllableEntityCategory.Building)
             {
                 rejected++;
                 continue;
@@ -103,7 +105,7 @@ public sealed class MoveEntitiesCommand : ISimulationCommand
 
             ClearFormationMembership(context, entity);
 
-            if (IsFormationCapable(context, entity))
+            if (IsMovementCapable(context, entity))
             {
                 if (formationTargetSet.Add(entity))
                 {
@@ -193,7 +195,7 @@ public sealed class MoveEntitiesCommand : ISimulationCommand
         }
     }
 
-    private static bool IsFormationCapable(
+    private static bool IsMovementCapable(
         SimulationContext context,
         EntityId entity)
     {

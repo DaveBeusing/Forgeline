@@ -7,9 +7,22 @@ namespace ForgeLine.Game;
 
 public enum MatchStatus : byte
 {
-    Running = 1,
-    Victory = 2,
-    Draw = 3
+    Loading = 1,
+    Active = 2,
+    Running = Active,
+    Victory = 3,
+    Draw = 4,
+    Ended = 5
+}
+
+public enum PlayerMatchStatus : byte
+{
+    Loading = 1,
+    Active = 2,
+    Victory = 3,
+    Defeat = 4,
+    Draw = 5,
+    Ended = 6
 }
 
 public readonly record struct MatchState(
@@ -17,11 +30,52 @@ public readonly record struct MatchState(
     PlayerId Winner,
     SimulationTick CompletedAtTick)
 {
-    public static MatchState Running =>
+    public static MatchState Loading =>
         new(
-            MatchStatus.Running,
+            MatchStatus.Loading,
             PlayerId.None,
             SimulationTick.Zero);
+
+    public static MatchState Active =>
+        new(
+            MatchStatus.Active,
+            PlayerId.None,
+            SimulationTick.Zero);
+
+    public static MatchState Running => Active;
+
+    public bool IsTerminal =>
+        Status is
+            MatchStatus.Victory or
+            MatchStatus.Draw or
+            MatchStatus.Ended;
+
+    public PlayerMatchStatus ForPlayer(PlayerId player)
+    {
+        if (!player.IsSpecified)
+        {
+            throw new ArgumentOutOfRangeException(nameof(player));
+        }
+
+        return Status switch
+        {
+            MatchStatus.Loading =>
+                PlayerMatchStatus.Loading,
+            MatchStatus.Active =>
+                PlayerMatchStatus.Active,
+            MatchStatus.Victory when Winner == player =>
+                PlayerMatchStatus.Victory,
+            MatchStatus.Victory =>
+                PlayerMatchStatus.Defeat,
+            MatchStatus.Draw =>
+                PlayerMatchStatus.Draw,
+            MatchStatus.Ended =>
+                PlayerMatchStatus.Ended,
+            _ =>
+                throw new InvalidOperationException(
+                    $"Unsupported match status '{Status}'.")
+        };
+    }
 }
 
 public readonly record struct CommandCoreObjective
@@ -55,6 +109,65 @@ public readonly record struct CommandCoreObjective
     public EntityId CommandCore { get; }
 }
 
+public sealed class EndMatchCommand : ISimulationCommand
+{
+    public EndMatchCommand(
+        PlayerId issuer,
+        EntityId matchStateEntity,
+        SimulationTick submittedAtTick)
+    {
+        if (!issuer.IsSpecified)
+        {
+            throw new ArgumentOutOfRangeException(nameof(issuer));
+        }
+
+        if (!matchStateEntity.IsValid)
+        {
+            throw new ArgumentOutOfRangeException(nameof(matchStateEntity));
+        }
+
+        Issuer = issuer;
+        MatchStateEntity = matchStateEntity;
+        SubmittedAtTick = submittedAtTick;
+    }
+
+    public PlayerId Issuer { get; }
+
+    public EntityId MatchStateEntity { get; }
+
+    public SimulationTick SubmittedAtTick { get; }
+
+    public bool Accepted { get; private set; }
+
+    public SimulationTick ExecutedAtTick { get; private set; }
+
+    public void Execute(SimulationContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        ExecutedAtTick = context.Tick;
+
+        if (!context.Entities.TryGetComponent(
+                MatchStateEntity,
+                out MatchState state) ||
+            state.Status is not
+                MatchStatus.Victory and not
+                MatchStatus.Draw)
+        {
+            Accepted = false;
+            return;
+        }
+
+        context.Entities.SetComponent(
+            MatchStateEntity,
+            state with
+            {
+                Status = MatchStatus.Ended
+            });
+        Accepted = true;
+    }
+}
+
 public sealed class MatchObjectiveSystem : ISimulationSystem
 {
     private readonly EntityId _matchStateEntity;
@@ -81,7 +194,7 @@ public sealed class MatchObjectiveSystem : ISimulationSystem
             !context.Entities.TryGetComponent(
                 _matchStateEntity,
                 out MatchState state) ||
-            state.Status != MatchStatus.Running)
+            state.Status != MatchStatus.Active)
         {
             return;
         }
@@ -157,8 +270,28 @@ public sealed class MatchObjectiveSystem : ISimulationSystem
             entities.CreateEntity();
         entities.AddComponent(
             entity,
-            MatchState.Running);
+            MatchState.Loading);
         return entity;
+    }
+
+    public static void ActivateMatch(
+        EntityRegistry entities,
+        EntityId matchStateEntity)
+    {
+        ArgumentNullException.ThrowIfNull(entities);
+
+        if (!entities.TryGetComponent(
+                matchStateEntity,
+                out MatchState state) ||
+            state.Status != MatchStatus.Loading)
+        {
+            throw new InvalidOperationException(
+                "Only a loading match can transition to active.");
+        }
+
+        entities.SetComponent(
+            matchStateEntity,
+            MatchState.Active);
     }
 
     public static EntityId AttachCommandCoreObjective(

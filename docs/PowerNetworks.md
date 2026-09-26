@@ -30,6 +30,8 @@ This separation is intentional. The initial system uses explicitly assigned logi
 
 Consumers and generators can continue to depend on the same power contract when that topology becomes physical.
 
+For the current skirmish slice, player-owned bases and completed buildings are assigned to a logical network derived from their owning `PlayerId`. Player 1 and Player 2 therefore cannot share generation, demand, brownout allocation, or HUD power state merely because both are on the same battlefield. This ownership mapping is a prototype topology rule; it does not replace the future physical-grid model.
+
 An enabled generator or consumer without network membership is treated as unassigned and operationally offline. Diagnostics report unassigned counts explicitly.
 
 ## Generators

@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using ForgeLine.Game;
 using ForgeLine.Graphics;
 
 namespace ForgeLine.Presentation;
@@ -35,13 +36,17 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         IGraphicsCommandContext context,
         in DevelopmentOverlayMetrics metrics,
         RtsCamera? camera = null,
-        DebugDraw? debugDraw = null)
+        DebugDraw? debugDraw = null,
+        PlayerExperienceSnapshot? playerExperience = null,
+        bool showDevelopmentMetrics = true)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(context);
 
         _vertexCount = 0;
 
+        if (showDevelopmentMetrics)
+        {
         Span<char> buffer = stackalloc char[1_024];
         var builder = new OverlayTextBuilder(buffer);
 
@@ -98,6 +103,16 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             new Vector4(0.98f, 0.78f, 0.18f, 1.0f),
             context.Width,
             context.Height);
+        }
+
+        if (playerExperience.HasValue)
+        {
+            EmitPlayerExperience(
+                playerExperience.Value,
+                showDevelopmentMetrics ? 112.0f : 12.0f,
+                context.Width,
+                context.Height);
+        }
 
         if (camera is not null &&
             debugDraw is not null &&
@@ -141,6 +156,313 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         context.Draw(_vertexCount);
 
         LastRenderedVertexCount = _vertexCount;
+    }
+
+    private void EmitPlayerExperience(
+        in PlayerExperienceSnapshot snapshot,
+        float originY,
+        int width,
+        int height)
+    {
+        Span<char> buffer = stackalloc char[2_048];
+        var builder = new OverlayTextBuilder(buffer);
+
+        builder.Append("MATCH ");
+        builder.Append(
+            snapshot.MatchStatus switch
+            {
+                PlayerMatchStatus.Loading => "LOADING",
+                PlayerMatchStatus.Active => "ACTIVE",
+                PlayerMatchStatus.Victory => "VICTORY",
+                PlayerMatchStatus.Defeat => "DEFEAT",
+                PlayerMatchStatus.Draw => "DRAW",
+                PlayerMatchStatus.Ended => "ENDED",
+                _ => "UNKNOWN"
+            });
+
+        int totalSeconds =
+            (int)Math.Clamp(
+                snapshot.Statistics.DurationSeconds,
+                0.0,
+                int.MaxValue);
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+
+        builder.Append("  TIME ");
+        builder.Append(minutes);
+        builder.Append(":");
+        if (seconds < 10)
+        {
+            builder.Append("0");
+        }
+
+        builder.Append(seconds);
+        builder.NewLine();
+
+        builder.Append("STEEL ");
+        builder.Append(snapshot.Resources.Steel, "F0");
+        builder.Append("  FUEL ");
+        builder.Append(snapshot.Resources.Fuel, "F0");
+        builder.Append("  ELECTRONICS ");
+        builder.Append(snapshot.Resources.Electronics, "F0");
+        builder.Append("  AMMO ");
+        builder.Append(snapshot.Resources.Ammunition, "F0");
+        builder.NewLine();
+
+        builder.Append("RAW FE ");
+        builder.Append(snapshot.Resources.FerrousOre, "F0");
+        builder.Append("  VOL ");
+        builder.Append(snapshot.Resources.Volatiles, "F0");
+        builder.Append("  SIL ");
+        builder.Append(snapshot.Resources.Silicates, "F0");
+        builder.NewLine();
+
+        builder.Append("POWER ");
+        builder.Append(snapshot.Power.Generation, "F0");
+        builder.Append("/");
+        builder.Append(snapshot.Power.Demand, "F0");
+        builder.Append("  ");
+        builder.Append(
+            snapshot.Power.IsConstrained
+                ? "CONSTRAINED"
+                : "STABLE");
+        builder.NewLine();
+
+        builder.Append("INTEL EXP ");
+        builder.Append(snapshot.Intelligence.ExploredCells);
+        builder.Append(" VIS ");
+        builder.Append(snapshot.Intelligence.VisibleCells);
+        builder.Append(" CONTACTS ");
+        builder.Append(snapshot.Intelligence.KnownContacts);
+        builder.NewLine();
+
+        if (snapshot.Selection.Count > 0)
+        {
+            builder.Append("SELECTED ");
+            builder.Append(snapshot.Selection.Count);
+            builder.Append(" ");
+            builder.Append(snapshot.Selection.DisplayName);
+            builder.NewLine();
+
+            if (snapshot.Selection.HasHealth)
+            {
+                builder.Append("HP ");
+                builder.Append(
+                    snapshot.Selection.HealthFraction * 100.0,
+                    "F0");
+                builder.Append("% ");
+            }
+
+            if (snapshot.Selection.HasSupply)
+            {
+                builder.Append("FUEL ");
+                builder.Append(
+                    snapshot.Selection.FuelFraction * 100.0,
+                    "F0");
+                builder.Append("% AMMO ");
+                builder.Append(
+                    snapshot.Selection.AmmunitionFraction * 100.0,
+                    "F0");
+                builder.Append("% ");
+            }
+
+            if (snapshot.Selection.HasReadiness)
+            {
+                builder.Append("READY ");
+                builder.Append(
+                    snapshot.Selection.Readiness * 100.0,
+                    "F0");
+                builder.Append("% ");
+            }
+
+            if (snapshot.Selection.HasPower)
+            {
+                builder.Append("POWER ");
+                builder.Append(
+                    snapshot.Selection.PowerState.ToString());
+            }
+
+            builder.NewLine();
+
+            if (snapshot.Selection.Work.Kind != PlayerWorkKind.None)
+            {
+                builder.Append(
+                    snapshot.Selection.Work.Kind.ToString());
+                builder.Append(" ");
+                builder.Append(
+                    snapshot.Selection.Work.Activity);
+                builder.Append(" ");
+                builder.Append(
+                    snapshot.Selection.Work.Progress * 100.0,
+                    "F0");
+                builder.Append("% ");
+                builder.Append(
+                    snapshot.Selection.Work.State.ToString());
+
+                if (!string.IsNullOrWhiteSpace(
+                        snapshot.Selection.Work.BlockReason))
+                {
+                    builder.Append(" ");
+                    builder.Append(
+                        snapshot.Selection.Work.BlockReason);
+                }
+
+                builder.NewLine();
+            }
+        }
+
+        if (snapshot.Feedback.Kind != PlayerCommandFeedbackKind.None &&
+            snapshot.Tick.Value >= snapshot.Feedback.ResolvedAtTick.Value &&
+            snapshot.Tick.Value - snapshot.Feedback.ResolvedAtTick.Value <= 80)
+        {
+            builder.Append("COMMAND ");
+
+            if (snapshot.Feedback.Kind ==
+                PlayerCommandFeedbackKind.Movement)
+            {
+                builder.Append("MOVE ");
+                builder.Append(
+                    snapshot.Feedback.AcceptedTargets);
+                builder.Append(" ACCEPTED");
+
+                if (snapshot.Feedback.RejectedTargets > 0)
+                {
+                    builder.Append(" ");
+                    builder.Append(
+                        snapshot.Feedback.RejectedTargets);
+                    builder.Append(" REJECTED");
+                }
+            }
+            else
+            {
+                builder.Append("BUILD ");
+
+                if (snapshot.Feedback.State ==
+                    PlayerCommandFeedbackState.Accepted)
+                {
+                    builder.Append("ACCEPTED");
+                }
+                else
+                {
+                    builder.Append("BLOCKED ");
+                    builder.Append(
+                        snapshot.Feedback.BuildRejection.ToString());
+
+                    if (snapshot.Feedback.PlacementFailure !=
+                        BuildingPlacementFailureReason.None)
+                    {
+                        builder.Append(" ");
+                        builder.Append(
+                            snapshot.Feedback.PlacementFailure.ToString());
+                    }
+                }
+            }
+
+            builder.NewLine();
+        }
+
+        if (snapshot.Alerts != PlayerAlertState.None)
+        {
+            builder.Append("ALERT ");
+
+            if (snapshot.Alerts.HasFlag(
+                    PlayerAlertState.LowPower))
+            {
+                builder.Append("LOW POWER ");
+            }
+
+            if (snapshot.Alerts.HasFlag(
+                    PlayerAlertState.ProductionBlocked))
+            {
+                builder.Append("PRODUCTION BLOCKED ");
+                builder.Append(
+                    snapshot.BlockedProductionFacilities);
+                builder.Append(" ");
+            }
+
+            if (snapshot.Alerts.HasFlag(
+                    PlayerAlertState.SupplyCritical))
+            {
+                builder.Append("SUPPLY CRITICAL ");
+                builder.Append(snapshot.CriticalSupplyUnits);
+                builder.Append(" ");
+            }
+
+            if (snapshot.Alerts.HasFlag(
+                    PlayerAlertState.CommandCoreDamaged))
+            {
+                builder.Append("COMMAND CORE DAMAGED ");
+            }
+
+            if (snapshot.Alerts.HasFlag(
+                    PlayerAlertState.CommandCoreDestroyed))
+            {
+                builder.Append("COMMAND CORE DESTROYED ");
+            }
+
+            builder.NewLine();
+        }
+
+        EmitText(
+            builder.Written,
+            12.0f,
+            originY,
+            new Vector4(0.92f, 0.96f, 1.0f, 1.0f),
+            width,
+            height);
+
+        if (!snapshot.IsMatchComplete)
+        {
+            return;
+        }
+
+        string result =
+            snapshot.MatchStatus switch
+            {
+                PlayerMatchStatus.Victory => "VICTORY",
+                PlayerMatchStatus.Defeat => "DEFEAT",
+                PlayerMatchStatus.Draw => "DRAW",
+                _ => "MATCH ENDED"
+            };
+
+        EmitText(
+            result.AsSpan(),
+            MathF.Max(12.0f, width * 0.5f - 48.0f),
+            MathF.Max(12.0f, height * 0.32f),
+            new Vector4(0.98f, 0.78f, 0.18f, 1.0f),
+            width,
+            height);
+        EmitText(
+            "R RESTART  ESC RETURN".AsSpan(),
+            MathF.Max(12.0f, width * 0.5f - 126.0f),
+            MathF.Max(30.0f, height * 0.32f + 28.0f),
+            new Vector4(0.92f, 0.96f, 1.0f, 1.0f),
+            width,
+            height);
+
+        Span<char> statisticsBuffer =
+            stackalloc char[256];
+        var statistics =
+            new OverlayTextBuilder(
+                statisticsBuffer);
+        statistics.Append("UNITS PRODUCED ");
+        statistics.Append(
+            snapshot.Statistics.UnitsProduced);
+        statistics.Append("  BUILDINGS ");
+        statistics.Append(
+            snapshot.Statistics.BuildingsConstructed);
+        statistics.Append("  OUTPUT ");
+        statistics.Append(
+            snapshot.Statistics.ProcessedOutput,
+            "F0");
+
+        EmitText(
+            statistics.Written,
+            MathF.Max(12.0f, width * 0.5f - 156.0f),
+            MathF.Max(48.0f, height * 0.32f + 52.0f),
+            new Vector4(0.92f, 0.96f, 1.0f, 1.0f),
+            width,
+            height);
     }
 
     public void Dispose()

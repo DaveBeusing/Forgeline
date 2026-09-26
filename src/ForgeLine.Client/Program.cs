@@ -17,8 +17,23 @@ internal static class Program
         try
         {
             using var platform = new WindowsPlatform();
-            var application = new ClientApplication(platform);
-            return application.Run(smokeTest, renderInstanceCount);
+
+            while (true)
+            {
+                var application =
+                    new ClientApplication(platform);
+                int result =
+                    application.Run(
+                        smokeTest,
+                        renderInstanceCount);
+
+                if (smokeTest ||
+                    result !=
+                    ClientApplication.RestartRequestedExitCode)
+                {
+                    return result;
+                }
+            }
         }
         catch (Exception exception)
         {

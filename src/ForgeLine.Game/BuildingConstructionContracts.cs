@@ -22,6 +22,15 @@ public readonly record struct BuildCommandMetrics(
     BuildingPlacementFailureReason LastPlacementFailure,
     EntityId LastCreatedSite);
 
+public readonly record struct BuildCommandResult(
+    PlayerId Issuer,
+    BuildingId BuildingId,
+    bool Accepted,
+    BuildCommandRejectionReason RejectionReason,
+    BuildingPlacementFailureReason PlacementFailure,
+    EntityId CreatedSite,
+    SimulationTick ResolvedAtTick);
+
 public readonly record struct BuildingConstructionMetrics(
     int ActiveSites,
     long CancelledSites,
