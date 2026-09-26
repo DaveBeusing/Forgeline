@@ -68,6 +68,21 @@ public sealed class VerticalSliceScenario
     public SkirmishStartingBase East { get; }
 
     public static VerticalSliceScenario Create(
+        VerticalSliceScenarioSettings settings,
+        ulong seed = 17,
+        bool enableDiagnostics = false)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+
+        return Create(
+            seed,
+            settings.WestOpponent,
+            settings.EastOpponent,
+            settings.StartingStock,
+            enableDiagnostics);
+    }
+
+    public static VerticalSliceScenario Create(
         ulong seed = 17,
         SkirmishOpponentConfiguration? westConfiguration = null,
         SkirmishOpponentConfiguration? eastConfiguration = null,
