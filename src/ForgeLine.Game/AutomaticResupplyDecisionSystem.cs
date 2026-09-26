@@ -88,14 +88,6 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
                 continue;
             }
 
-            // Cargo transport owns locomotion while a delivery is active.
-            // Automatic resupply may take over only between transport orders,
-            // otherwise both systems continuously replace the same movement intent.
-            if (context.Entities.HasComponent<CargoTransportOrder>(entity))
-            {
-                continue;
-            }
-
             bool needsAmmunition =
                 NeedsAmmunition(
                     context.Entities,
