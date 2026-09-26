@@ -1,5 +1,6 @@
 using ForgeLine.Core;
 using ForgeLine.Ecs;
+using ForgeLine.Economy;
 using ForgeLine.Game;
 using ForgeLine.Logistics;
 using ForgeLine.Simulation;
@@ -198,6 +199,30 @@ public sealed class MatchFlowTests
         Assert.Equal(
             SimulationTick.Zero,
             state.CompletedAtTick);
+    }
+
+    [Fact]
+    public void StartingBasesUsePlayerScopedPowerNetworks()
+    {
+        SkirmishScenarioHarness harness =
+            SkirmishScenarioHarness.Create();
+
+        PowerNetworkMembership west =
+            harness.Simulation.Entities.GetComponent<PowerNetworkMembership>(
+                harness.West.CommandCore);
+        PowerNetworkMembership east =
+            harness.Simulation.Entities.GetComponent<PowerNetworkMembership>(
+                harness.East.CommandCore);
+
+        Assert.Equal(
+            new PowerNetworkId(1),
+            west.NetworkId);
+        Assert.Equal(
+            new PowerNetworkId(2),
+            east.NetworkId);
+        Assert.NotEqual(
+            west.NetworkId,
+            east.NetworkId);
     }
 
     [Fact]
