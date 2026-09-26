@@ -1,5 +1,6 @@
 using System.Numerics;
 using ForgeLine.Core;
+using ForgeLine.Economy;
 using ForgeLine.Ecs;
 using ForgeLine.Simulation;
 
@@ -9,12 +10,22 @@ public static class BattlefieldResupplyPlanner
 {
     public static bool TryIssueNearestProviderOrder(
         SimulationContext context,
+        InventoryStore inventories,
         EntityId recipient,
         PlayerId owner,
         SimulationTick submittedAtTick,
+        BattlefieldSupplyResource requiredResources,
         out EntityId providerEntity)
     {
         ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(inventories);
+
+        if (requiredResources == BattlefieldSupplyResource.None ||
+            (requiredResources & ~BattlefieldSupplyResource.All) != 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(requiredResources));
+        }
 
         providerEntity = EntityId.Invalid;
 
@@ -42,6 +53,11 @@ public static class BattlefieldResupplyPlanner
                     out SupplyProvider provider) ||
                 !provider.Enabled ||
                 provider.Owner != owner ||
+                !inventories.Contains(provider.InventoryId) ||
+                !HasRequiredStock(
+                    inventories,
+                    provider.InventoryId,
+                    requiredResources) ||
                 !context.Entities.TryGetComponent(
                     candidate,
                     out WorldTransform transform))
@@ -132,6 +148,34 @@ public static class BattlefieldResupplyPlanner
             context.Entities.AddComponent(
                 recipient,
                 movementOrder);
+        }
+
+        return true;
+    }
+
+    private static bool HasRequiredStock(
+        InventoryStore inventories,
+        InventoryId inventory,
+        BattlefieldSupplyResource requiredResources)
+    {
+        const double QuantityEpsilon = 0.000000001;
+
+        if (requiredResources.HasFlag(
+                BattlefieldSupplyResource.Fuel) &&
+            inventories.GetAvailableQuantity(
+                inventory,
+                ResourceIds.Fuel) <= QuantityEpsilon)
+        {
+            return false;
+        }
+
+        if (requiredResources.HasFlag(
+                BattlefieldSupplyResource.Ammunition) &&
+            inventories.GetAvailableQuantity(
+                inventory,
+                ResourceIds.Ammunition) <= QuantityEpsilon)
+        {
+            return false;
         }
 
         return true;
