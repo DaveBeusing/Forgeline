@@ -293,6 +293,11 @@ public readonly record struct CombatGroupReadiness(
 
 public readonly record struct TacticalTestOpponent
 {
+    public TacticalTestOpponent()
+        : this(0.2, 0.15, 160.0f)
+    {
+    }
+
     public TacticalTestOpponent(
         double resupplyThreshold = 0.2,
         double retreatThreshold = 0.15,

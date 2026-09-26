@@ -6,6 +6,37 @@ namespace ForgeLine.Navigation.Tests;
 
 public sealed class HierarchicalPathfinderTests
 {
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void CanProjectAnEndpointOutsideABuildingButInsideItsBlockedCell(bool blockedStart)
+    {
+        NavigationWorld world = NavigationWorld.Build(
+            CreateFlatWorld(),
+            [new AxisAlignedBounds(new Vector3(28.0f, -1.0f, 24.0f), new Vector3(29.0f, 2.0f, 25.0f))],
+            new NavigationGridSettings { CellSizeMeters = 4.0f },
+            new NavigationSectorSettings { SectorSizeCells = 4 });
+        var pathfinder = new HierarchicalPathfinder(world);
+        NavigationCapabilities capabilities = NavigationCapabilities.For(NavigationMovementClass.Wheeled);
+        Vector3 blocked = new(30.0f, 0.0f, 26.0f);
+        Vector3 open = new(4.0f, 0.0f, 4.0f);
+        Vector3 start = blockedStart ? blocked : open;
+        Vector3 destination = blockedStart ? open : blocked;
+
+        Assert.False(pathfinder.FindPath(start, destination, capabilities).Succeeded);
+        NavigationSearchResult projected = pathfinder.FindPath(
+            start, destination, capabilities, projectBlockedEndpoints: true);
+
+        Assert.True(projected.Succeeded);
+        Assert.NotNull(projected.Path);
+        Assert.Equal(destination, projected.Path.RequestedDestination);
+        foreach (Vector3 waypoint in projected.Path.Waypoints)
+        {
+            Assert.True(world.Grid.TryWorldToCell(waypoint, out NavigationCellCoordinate cell));
+            Assert.True(world.Grid.IsTraversable(cell, capabilities));
+        }
+    }
+
     [Fact]
     public void RefinesMultiSectorRouteThroughChokePoint()
     {

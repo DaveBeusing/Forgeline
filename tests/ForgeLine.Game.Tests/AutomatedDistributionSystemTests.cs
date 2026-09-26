@@ -455,6 +455,26 @@ public sealed class AutomatedDistributionSystemTests
     }
 
     [Fact]
+    public void DeliveredBulkLoadYieldsToNewCriticalDemand()
+    {
+        DistributionFixture fixture = CreateFixture(sourceQuantity: 1_000.0);
+        fixture.Connect(fixture.SourceNode, fixture.DestinationNode);
+        fixture.AddPolicy(fixture.DestinationEntity, 20.0, 600.0, 800.0, LogisticsStockPriority.Low);
+        fixture.Simulation.RunTicks(60, TestContext.Current.CancellationToken);
+        EntityId truck = fixture.CreateTruck(fixture.SourcePosition);
+        fixture.Simulation.AdvanceOneTick();
+        EntityId critical = fixture.CreateStorageNode(new Vector3(52.0f, 0.0f, 20.0f), out _, out LogisticsNodeId criticalNode);
+        fixture.Connect(fixture.SourceNode, criticalNode);
+        fixture.AddPolicy(critical, 10.0, 40.0, 80.0, LogisticsStockPriority.Critical);
+        RunUntil(fixture, () => fixture.Cargo.Metrics.CompletedOrderCount == 1, maximumTicks: 600);
+        fixture.Simulation.AdvanceOneTick();
+
+        Assert.Equal(criticalNode,
+            fixture.Simulation.Entities.GetComponent<CargoTransportOrder>(truck).Destination);
+        Assert.InRange(fixture.Inventories.GetQuantity(fixture.DestinationInventory, ResourceIds.FerrousOre), 1.0, 599.0);
+    }
+
+    [Fact]
     public void MissingRouteRetriesWithoutReservingStock()
     {
         DistributionFixture fixture =

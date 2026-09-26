@@ -6,6 +6,7 @@ using ForgeLine.Intelligence;
 using ForgeLine.Logistics;
 using ForgeLine.Navigation;
 using ForgeLine.Simulation;
+using ForgeLine.World;
 using Xunit;
 
 namespace ForgeLine.Game.Tests;
@@ -16,6 +17,28 @@ public sealed class TacticalCombatSystemTests
     private static readonly PlayerId RedPlayer = new(2);
     private static readonly FactionId BlueFaction = new(1);
     private static readonly FactionId RedFaction = new(2);
+
+    [Fact]
+    public void AttackPursuitCompletesNavigationAndReachesWeaponRange()
+    {
+        TacticalScenario scenario = CreateScenario(weaponRange: 10.0f, registerGroundMovement: true);
+        var terrain = new TerrainWorld(
+            new WorldGridSettings { ChunkSizeMeters = 64.0f, HeightSamplesPerSide = 17 },
+            [new TerrainChunk(new ChunkCoordinate(0, 0), new TerrainHeightfield(17, 64.0f, new float[17 * 17]))]);
+        var navigation = new HierarchicalNavigationSystem(new HierarchicalPathfinder(NavigationWorld.Build(terrain)));
+        scenario.Simulation.RegisterSystem(navigation);
+        EntityId attacker = CreateCombatUnit(scenario, BluePlayer, BlueFaction,
+            new Vector3(4.0f, 0.0f, 4.0f), addVisualSensor: true, visualRange: 100.0f, movable: true);
+        EntityId target = CreateCombatUnit(scenario, RedPlayer, RedFaction, new Vector3(56.0f, 0.0f, 4.0f));
+        scenario.Simulation.SubmitCommand(new AttackCommand(BluePlayer, [attacker], target, SimulationTick.Zero), SimulationTick.Zero.Next());
+
+        scenario.Simulation.RunTicks(400, TestContext.Current.CancellationToken);
+
+        Assert.Equal(CombatOrderStatus.Engaging,
+            scenario.Simulation.Entities.GetComponent<TacticalCombatState>(attacker).Status);
+        Assert.True(navigation.LastDiagnostics.CompletedPathCount > 0);
+        Assert.InRange(navigation.LastDiagnostics.QueuedPathCount, 1UL, 3UL);
+    }
 
     [Fact]
     public void AttackUsesCurrentIntelligenceAndPursuesWithinLeash()

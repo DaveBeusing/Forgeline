@@ -232,10 +232,6 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
 
         if (context.Entities.TryGetComponent(
                 recipient,
-                out SupplyMovementConstraint recipientMovement) &&
-            !recipientMovement.CanMove &&
-            context.Entities.TryGetComponent(
-                recipient,
                 out WorldTransform recipientTransform) &&
             context.Entities.TryGetComponent(
                 providerEntity,
@@ -254,11 +250,23 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
                 provider.ResupplyRangeMeters *
                 provider.ResupplyRangeMeters;
 
-            if (distanceSquared > rangeSquared &&
-                !context.Entities.HasComponent<SupplyTruck>(
-                    providerEntity))
+            if (distanceSquared > rangeSquared)
             {
-                return false;
+                bool recipientCanMove =
+                    !context.Entities.TryGetComponent(recipient, out SupplyMovementConstraint movement) ||
+                    movement.CanMove;
+                EntityId traveler = recipientCanMove ? recipient : providerEntity;
+                WorldTransform destination = recipientCanMove ? providerTransform : recipientTransform;
+
+                if ((!recipientCanMove && !context.Entities.HasComponent<SupplyTruck>(providerEntity)) ||
+                    !TacticalCommandUtilities.TryGetMovementIntent(context, traveler, out MovementOrder intent))
+                {
+                    return false;
+                }
+
+                float targetDeltaX = intent.WorldTarget.X - destination.Position.X;
+                float targetDeltaZ = intent.WorldTarget.Z - destination.Position.Z;
+                return targetDeltaX * targetDeltaX + targetDeltaZ * targetDeltaZ <= rangeSquared;
             }
         }
 

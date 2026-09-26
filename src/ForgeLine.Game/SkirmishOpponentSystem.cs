@@ -167,6 +167,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             context,
             owned,
             configuration);
+        EnsureSupplyTrucksLoaded(context, owned);
 
         SkirmishStrategicState strategicState;
         SkirmishStrategicGoal goal;
@@ -978,6 +979,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 out EntityId target) &&
             context.Entities.IsAlive(target))
         {
+            if (HaveCombatOrder(context, defenders, CombatOrderKind.Attack, objective, target))
+            {
+                return true;
+            }
+
             var command =
                 new AttackCommand(
                     controller.Player,
@@ -989,6 +995,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
         else
         {
+            if (HaveCombatOrder(context, defenders, CombatOrderKind.AttackMove, objective))
+            {
+                return true;
+            }
+
             var command =
                 new AttackMoveCommand(
                     controller.Player,
@@ -1408,6 +1419,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             objective =
                 identified.Value.LastKnownPosition;
 
+            if (HaveCombatOrder(context, attackers, CombatOrderKind.Attack, objective, identifiedTarget))
+            {
+                return true;
+            }
+
             var attack =
                 new AttackCommand(
                     controller.Player,
@@ -1424,6 +1440,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 controller,
                 configuration.Aggression);
 
+        if (HaveCombatOrder(context, attackers, CombatOrderKind.AttackMove, objective))
+        {
+            return true;
+        }
+
         var advance =
             new AttackMoveCommand(
                 controller.Player,
@@ -1433,6 +1454,28 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 FormationTemplate.Line,
                 configuration.ObjectivePressureLeashMeters);
         advance.Execute(context);
+
+        return true;
+    }
+
+    private static bool HaveCombatOrder(
+        SimulationContext context,
+        EntityId[] units,
+        CombatOrderKind kind,
+        Vector3 destination,
+        EntityId target = default)
+    {
+        foreach (EntityId unit in units)
+        {
+            if (!context.Entities.TryGetComponent(unit, out CombatOrderState order) ||
+                order.Kind != kind ||
+                (kind == CombatOrderKind.Attack
+                    ? order.ExplicitTarget != target
+                    : !order.HasDestination || HorizontalDistanceSquared(order.Destination, destination) > 1.0f))
+            {
+                return false;
+            }
+        }
 
         return true;
     }
@@ -1609,7 +1652,78 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
     }
 
-    private static void EnsureEconomyPolicies(
+    private void EnsureSupplyTrucksLoaded(
+        SimulationContext context,
+        OwnedState owned)
+    {
+        foreach (EntityId entity in owned.Units)
+        {
+            if (!context.Entities.TryGetComponent(entity, out SupplyTruck truck) ||
+                context.Entities.HasComponent<MovementOrder>(entity) ||
+                context.Entities.HasComponent<ResupplyOrder>(entity) ||
+                !context.Entities.TryGetComponent(entity, out WorldTransform transform))
+            {
+                continue;
+            }
+
+            bool needsFuel = _inventories.GetQuantity(truck.InventoryId, ResourceIds.Fuel) < truck.FuelTarget * 0.25;
+            bool needsAmmunition = _inventories.GetQuantity(truck.InventoryId, ResourceIds.Ammunition) < truck.AmmunitionTarget * 0.25;
+            if (!needsFuel && !needsAmmunition)
+            {
+                continue;
+            }
+
+            bool servingRecipient = false;
+            foreach (EntityId recipient in context.Entities.Query<ResupplyOrder>())
+            {
+                if (context.Entities.GetComponent<ResupplyOrder>(recipient).Provider == entity)
+                {
+                    servingRecipient = true;
+                    break;
+                }
+            }
+
+            if (servingRecipient)
+            {
+                continue;
+            }
+
+            Vector3 destination = default;
+            float bestDistance = float.PositiveInfinity;
+            foreach (var candidate in owned.SupplyDepots)
+            {
+                if (!context.Entities.TryGetComponent(candidate.Entity, out SupplyDepot depot) ||
+                    depot.State != SupplyDepotState.Operational ||
+                    (needsFuel && _inventories.GetAvailableQuantity(depot.InventoryId, ResourceIds.Fuel) <= 0.0) ||
+                    (needsAmmunition && _inventories.GetAvailableQuantity(depot.InventoryId, ResourceIds.Ammunition) <= 0.0))
+                {
+                    continue;
+                }
+
+                float distance = HorizontalDistanceSquared(transform.Position, candidate.Position);
+                if (distance < bestDistance)
+                {
+                    destination = candidate.Position;
+                    bestDistance = distance;
+                }
+            }
+
+            if (!float.IsFinite(bestDistance) || bestDistance <= truck.LoadRangeMeters * truck.LoadRangeMeters)
+            {
+                continue;
+            }
+
+            // Load from a face of the depot, within the truck's loading range.
+            Vector3 offset = transform.Position - destination;
+            float approach = truck.LoadRangeMeters - 1.0f;
+            destination += MathF.Abs(offset.X) >= MathF.Abs(offset.Z)
+                ? new Vector3(MathF.CopySign(approach, offset.X), 0.0f, 0.0f)
+                : new Vector3(0.0f, 0.0f, MathF.CopySign(approach, offset.Z));
+            new MoveEntitiesCommand(truck.Owner, [entity], destination, context.Tick).Execute(context);
+        }
+    }
+
+    private void EnsureEconomyPolicies(
         SimulationContext context,
         SkirmishOpponentController controller,
         OwnedState owned)
@@ -1750,33 +1864,37 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             const LogisticsStockPriority priority =
                 LogisticsStockPriority.Critical;
 
-            SetStockPolicy(
+            SetUnitProductionStockPolicy(
                 context,
                 entity,
+                facility,
                 ResourceIds.Steel,
                 80.0,
                 240.0,
                 420.0,
                 priority);
-            SetStockPolicy(
+            SetUnitProductionStockPolicy(
                 context,
                 entity,
+                facility,
                 ResourceIds.Electronics,
                 30.0,
                 80.0,
                 160.0,
                 priority);
-            SetStockPolicy(
+            SetUnitProductionStockPolicy(
                 context,
                 entity,
+                facility,
                 ResourceIds.Fuel,
                 80.0,
                 160.0,
                 280.0,
                 priority);
-            SetStockPolicy(
+            SetUnitProductionStockPolicy(
                 context,
                 entity,
+                facility,
                 ResourceIds.Ammunition,
                 50.0,
                 120.0,
@@ -1808,6 +1926,41 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 1_200.0,
                 LogisticsStockPriority.High);
         }
+    }
+
+    private void SetUnitProductionStockPolicy(
+        SimulationContext context,
+        EntityId entity,
+        in UnitProductionFacility facility,
+        ResourceId resource,
+        double minimum,
+        double target,
+        double maximum,
+        LogisticsStockPriority priority)
+    {
+        // A fixed refill threshold can leave stock above the minimum but below
+        // the next unit's cost, permanently blocking an otherwise supplied factory.
+        if (_units.TryGet(facility.ActiveUnit, out UnitDefinition? unit))
+        {
+            foreach (UnitResourceCost cost in unit.Costs)
+            {
+                if (cost.ResourceId == resource)
+                {
+                    minimum = Math.Max(minimum, cost.Quantity);
+                }
+            }
+        }
+
+        target = Math.Max(target, minimum);
+        maximum = Math.Max(maximum, target);
+        SetStockPolicy(
+            context,
+            entity,
+            resource,
+            minimum,
+            target,
+            maximum,
+            priority);
     }
 
     private static void SetStockPolicy(

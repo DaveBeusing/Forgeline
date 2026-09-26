@@ -199,6 +199,8 @@ public sealed class StrategicInfrastructureSystem
     private readonly NavigationVersionTracker _navigationVersions = new();
     private readonly List<EntityId> _requests = new();
     private readonly List<EntityId> _infrastructure = new();
+    private List<AxisAlignedBounds> _liveObstacles = new();
+    private List<AxisAlignedBounds> _observedObstacles = new();
     private bool _initialized;
     private long _disableCount;
     private long _restoreStartedCount;
@@ -243,6 +245,9 @@ public sealed class StrategicInfrastructureSystem
 
         topologyChanged |=
             AdvanceRestoration(context);
+
+        topologyChanged |=
+            RefreshStaticObstacles(context.Entities);
 
         if (!_initialized ||
             topologyChanged)
@@ -396,6 +401,31 @@ public sealed class StrategicInfrastructureSystem
         return changed;
     }
 
+    private bool RefreshStaticObstacles(EntityRegistry entities)
+    {
+        _observedObstacles.Clear();
+        foreach (EntityId entity in entities.Query<WorldTransform, SpatialPresence>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            SpatialPresence presence = entities.GetComponent<SpatialPresence>(entity);
+            if (presence.Metadata.Mobility != SpatialMobility.Static)
+            {
+                continue;
+            }
+
+            WorldTransform transform = entities.GetComponent<WorldTransform>(entity);
+            _observedObstacles.Add(presence.CreateEntry(entity, transform).Bounds);
+        }
+
+        if (_liveObstacles.SequenceEqual(_observedObstacles))
+        {
+            return false;
+        }
+
+        (_liveObstacles, _observedObstacles) = (_observedObstacles, _liveObstacles);
+        return true;
+    }
+
     private void SynchronizeAuthoritativeTopology(
         SimulationContext context)
     {
@@ -406,6 +436,7 @@ public sealed class StrategicInfrastructureSystem
                     StrategicInfrastructure>());
         blockers.AddRange(
             _persistentObstacles);
+        blockers.AddRange(_liveObstacles);
 
         foreach (EntityId entity in
                  context.Entities.Query<

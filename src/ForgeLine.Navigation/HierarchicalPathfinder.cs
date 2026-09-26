@@ -30,10 +30,13 @@ public sealed class HierarchicalPathfinder
     public NavigationSearchResult FindPath(
         Vector3 start,
         Vector3 destination,
-        in NavigationCapabilities capabilities)
+        in NavigationCapabilities capabilities,
+        bool projectBlockedEndpoints = false)
     {
         NavigationWorld world = World;
         NavigationGrid grid = world.Grid;
+        Vector3 requestedDestination = destination;
+        bool projectedStart = false;
 
         if (!grid.TryWorldToCell(
                 start,
@@ -55,16 +58,24 @@ public sealed class HierarchicalPathfinder
 
         if (!grid.IsTraversable(startCell, capabilities))
         {
-            return Failure(
-                world.Version,
-                NavigationFailureReason.StartBlocked);
+            if (!projectBlockedEndpoints ||
+                !TryProjectEndpoint(grid, start, capabilities, out startCell))
+            {
+                return Failure(world.Version, NavigationFailureReason.StartBlocked);
+            }
+
+            projectedStart = true;
         }
 
         if (!grid.IsTraversable(destinationCell, capabilities))
         {
-            return Failure(
-                world.Version,
-                NavigationFailureReason.DestinationBlocked);
+            if (!projectBlockedEndpoints ||
+                !TryProjectEndpoint(grid, destination, capabilities, out destinationCell))
+            {
+                return Failure(world.Version, NavigationFailureReason.DestinationBlocked);
+            }
+
+            destination = grid.GetCellCenter(destinationCell);
         }
 
         NavigationSectorGraph graph =
@@ -144,6 +155,10 @@ public sealed class HierarchicalPathfinder
                 grid,
                 local.Cells,
                 destination);
+        if (projectedStart)
+        {
+            waypoints = [grid.GetCellCenter(startCell), .. waypoints];
+        }
         float length =
             CalculateRouteLength(start, waypoints);
 
@@ -157,7 +172,7 @@ public sealed class HierarchicalPathfinder
         var path = new NavigationPath(
             world.Version,
             capabilities.MovementClass,
-            destination,
+            requestedDestination,
             highLevel.Route.Sectors.ToArray(),
             highLevel.Route.Portals.ToArray(),
             local.Cells,
@@ -168,6 +183,42 @@ public sealed class HierarchicalPathfinder
             world.Version,
             NavigationFailureReason.None,
             path);
+    }
+
+    private static bool TryProjectEndpoint(
+        NavigationGrid grid,
+        Vector3 position,
+        in NavigationCapabilities capabilities,
+        out NavigationCellCoordinate projected)
+    {
+        projected = default;
+        if (!grid.TryWorldToCell(position, out NavigationCellCoordinate origin))
+        {
+            return false;
+        }
+
+        float bestDistance = float.PositiveInfinity;
+        for (int z = origin.Z - 2; z <= origin.Z + 2; z++)
+        {
+            for (int x = origin.X - 2; x <= origin.X + 2; x++)
+            {
+                var candidate = new NavigationCellCoordinate(x, z);
+                if (!grid.IsTraversable(candidate, capabilities))
+                {
+                    continue;
+                }
+
+                Vector3 delta = grid.GetCellCenter(candidate) - position;
+                float distance = delta.X * delta.X + delta.Z * delta.Z;
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    projected = candidate;
+                }
+            }
+        }
+
+        return float.IsFinite(bestDistance);
     }
 
     private static Vector3[] CreateWaypoints(

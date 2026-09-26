@@ -357,7 +357,7 @@ public sealed class AutomatedDistributionSystem
                 }
 
                 int ageComparison =
-                    left.CreatedAtTick.CompareTo(right.CreatedAtTick);
+                    left.WaitingSinceTick.CompareTo(right.WaitingSinceTick);
 
                 return ageComparison != 0
                     ? ageComparison
@@ -899,8 +899,8 @@ public sealed class AutomatedDistributionSystem
         SimulationTick tick)
     {
         int basePriority = (int)request.Priority;
-        ulong age = tick.Value >= request.CreatedAtTick.Value
-            ? tick.Value - request.CreatedAtTick.Value
+        ulong age = tick.Value >= request.WaitingSinceTick.Value
+            ? tick.Value - request.WaitingSinceTick.Value
             : 0;
         ulong agingSteps = age / _fairnessAgingTicks;
         int boundedAging = (int)Math.Min(
@@ -956,6 +956,20 @@ public sealed class AutomatedDistributionSystem
         request.Origin = LogisticsNodeId.None;
         request.TransportFailureCount = 0;
 
+        // A truck became available. Reconsider waiting deficits before handing
+        // it straight back to this bulk request between their retry intervals.
+        foreach (RequestState waiting in _requests)
+        {
+            if (waiting.State == LogisticsTransportRequestState.RetryPending &&
+                waiting.FailureReason == LogisticsTransportRequestFailureReason.NoTruckAvailable)
+            {
+                waiting.State = LogisticsTransportRequestState.Pending;
+                waiting.FailureReason = LogisticsTransportRequestFailureReason.None;
+                waiting.StateChangedAtTick = context.Tick;
+                waiting.NextAttemptTick = context.Tick;
+            }
+        }
+
         if (!context.Entities.TryGetComponent(
                 request.PolicyEntity,
                 out LogisticsStockPolicy policy) ||
@@ -989,6 +1003,9 @@ public sealed class AutomatedDistributionSystem
 
         request.RequestedQuantity = remaining;
         request.Priority = policy.Priority;
+        // A delivered load has received its fair turn. Remaining bulk demand
+        // must age again instead of monopolizing trucks ahead of new deficits.
+        request.WaitingSinceTick = context.Tick;
         request.State = LogisticsTransportRequestState.Pending;
         request.FailureReason =
             LogisticsTransportRequestFailureReason.None;
@@ -1460,6 +1477,7 @@ public sealed class AutomatedDistributionSystem
             RequestedQuantity = requestedQuantity;
             Priority = priority;
             CreatedAtTick = createdAtTick;
+            WaitingSinceTick = createdAtTick;
             StateChangedAtTick = createdAtTick;
             NextAttemptTick = createdAtTick;
         }
@@ -1479,6 +1497,8 @@ public sealed class AutomatedDistributionSystem
         public LogisticsStockPriority Priority { get; set; }
 
         public SimulationTick CreatedAtTick { get; }
+
+        public SimulationTick WaitingSinceTick { get; set; }
 
         public SimulationTick StateChangedAtTick { get; set; }
 

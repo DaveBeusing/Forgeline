@@ -600,7 +600,8 @@ public sealed class FormationMovementSystem : ISimulationSystem
             search = _pathfinder.FindPath(
                 request.Start,
                 request.Destination,
-                request.Capabilities);
+                request.Capabilities,
+                projectBlockedEndpoints: true);
         }
 
         return new NavigationPathResult(

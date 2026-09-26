@@ -11,6 +11,46 @@ public sealed class BattlefieldSupplySystemTests
 {
     private static readonly PlayerId LocalPlayer = new(1);
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ActiveResupplyRecoversWhenProviderMovesOrRecipientRunsOutOfFuel(bool immobilizeRecipient)
+    {
+        var simulation = new SimulationCoordinator();
+        var inventories = new InventoryStore();
+        var cargo = new CargoTransportSystem(new ForgeLine.Logistics.LogisticsNetwork(), inventories);
+        simulation.RegisterSystem(new AutomaticResupplyDecisionSystem(inventories));
+        simulation.RegisterSystem(new GroundMovementSystem());
+        simulation.RegisterSystem(new BattlefieldSupplySystem(inventories));
+        EntityId truck = SupplyTruckFactory.Create(simulation.Entities, inventories, Vector3.Zero, LocalPlayer, cargo);
+        SupplyTruck supply = simulation.Entities.GetComponent<SupplyTruck>(truck);
+        Assert.True(inventories.Add(supply.InventoryId, ResourceIds.Fuel, 40.0).Succeeded);
+        EntityId unit = CreateSuppliedUnit(simulation, inventories, new Vector3(80.0f, 0.0f, 0.0f),
+            fuelCapacity: 20.0, initialFuel: 2.0, ammunitionCapacity: 10.0, initialAmmunition: 10.0,
+            fuelConsumptionPerMeter: 0.01);
+        simulation.Entities.AddComponent(unit, GroundMovement.CreateDefault());
+        simulation.Entities.AddComponent(unit, GroundMovementState.Stationary());
+        simulation.Entities.AddComponent(unit, new AutomaticResupplyPolicy(0.2, 0.2));
+        simulation.AdvanceOneTick();
+        Assert.Equal(truck, simulation.Entities.GetComponent<ResupplyOrder>(unit).Provider);
+        InventoryId fuel = simulation.Entities.GetComponent<UnitFuelState>(unit).InventoryId;
+
+        if (immobilizeRecipient)
+        {
+            Assert.True(inventories.Remove(fuel, ResourceIds.Fuel, inventories.GetQuantity(fuel, ResourceIds.Fuel)).Succeeded);
+        }
+        else
+        {
+            simulation.Entities.SetComponent(truck,
+                new WorldTransform(new Vector3(160.0f, 0.0f, 80.0f), Quaternion.Identity, Vector3.One));
+        }
+
+        simulation.RunTicks(600, TestContext.Current.CancellationToken);
+
+        Assert.True(inventories.GetQuantity(fuel, ResourceIds.Fuel) > 10.0);
+        Assert.True(inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel) < 40.0);
+    }
+
     [Fact]
     public void MovementDistanceConsumesPhysicalFuel()
     {

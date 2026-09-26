@@ -318,7 +318,9 @@ public sealed class SkirmishOpponentTests
                     current.CountUnits(
                         current.East.Player,
                         UnitIds.ScoutVehicle) > 0 &&
-                    HasCombatGroup(current),
+                    HasCombatGroup(current) &&
+                    (current.Intelligence.GetContactCount(current.West.Faction) > 0 ||
+                     current.Intelligence.GetContactCount(current.East.Faction) > 0),
                 maximumTicks: 40_000,
                 TestContext.Current.CancellationToken);
 

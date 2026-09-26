@@ -1463,6 +1463,14 @@ public sealed class TacticalCombatSystem : ISimulationSystem
         in CombatOrderState order,
         Vector3 targetPosition)
     {
+        // Keep the pending search and its waypoints until the target moves.
+        // Replacing the order every tick prevents navigation from advancing.
+        if (TacticalCommandUtilities.TryGetMovementIntent(context, entity, out MovementOrder current) &&
+            HorizontalDistanceSquared(current.WorldTarget, targetPosition) <= 16.0f)
+        {
+            return;
+        }
+
         var movement =
             new MovementOrder(
                 order.Issuer,

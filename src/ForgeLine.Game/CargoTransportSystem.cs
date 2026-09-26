@@ -3,6 +3,7 @@ using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Ecs;
 using ForgeLine.Logistics;
+using ForgeLine.Navigation;
 using ForgeLine.Simulation;
 
 namespace ForgeLine.Game;
@@ -14,6 +15,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
 
     private readonly LogisticsNetwork _network;
     private readonly InventoryStore _inventories;
+    private readonly HierarchicalNavigationSystem? _navigation;
     private readonly List<EntityId> _transportEntities = new();
     private readonly Dictionary<EntityId, InventoryId> _trackedInventories = new();
     private readonly List<EntityId> _staleTrackedEntities = new();
@@ -26,12 +28,14 @@ public sealed class CargoTransportSystem : ISimulationSystem
 
     public CargoTransportSystem(
         LogisticsNetwork network,
-        InventoryStore inventories)
+        InventoryStore inventories,
+        HierarchicalNavigationSystem? navigation = null)
     {
         _network = network ??
             throw new ArgumentNullException(nameof(network));
         _inventories = inventories ??
             throw new ArgumentNullException(nameof(inventories));
+        _navigation = navigation;
     }
 
     public SimulationPhase Phase =>
@@ -1314,7 +1318,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
             tick);
     }
 
-    private static void EnsureMovementToNode(
+    private void EnsureMovementToNode(
         SimulationContext context,
         EntityId entity,
         in CargoTransport transport,
@@ -1336,6 +1340,12 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 node,
                 transportTransform.Position,
                 groundMovement);
+
+        if (_navigation is not null &&
+            context.Entities.TryGetComponent(entity, out NavigationAgent agent))
+        {
+            movementPosition = ResolveNavigableApproach(movementPosition, agent.Capabilities);
+        }
 
         if (context.Entities.TryGetComponent(
                 entity,
@@ -1398,6 +1408,43 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 entity,
                 movementTarget);
         }
+    }
+
+    private Vector3 ResolveNavigableApproach(
+        Vector3 requested,
+        in NavigationCapabilities capabilities)
+    {
+        NavigationGrid grid = _navigation!.World.Grid;
+        if (!grid.TryWorldToCell(requested, out NavigationCellCoordinate cell) ||
+            grid.IsTraversable(cell, capabilities))
+        {
+            return requested;
+        }
+
+        Vector3 nearest = requested;
+        float bestDistance = float.PositiveInfinity;
+        for (int z = cell.Z - 2; z <= cell.Z + 2; z++)
+        {
+            for (int x = cell.X - 2; x <= cell.X + 2; x++)
+            {
+                var candidate = new NavigationCellCoordinate(x, z);
+                if (!grid.IsTraversable(candidate, capabilities))
+                {
+                    continue;
+                }
+
+                Vector3 position = grid.GetCellCenter(candidate);
+                Vector3 delta = position - requested;
+                float distance = delta.X * delta.X + delta.Z * delta.Z;
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    nearest = position;
+                }
+            }
+        }
+
+        return nearest;
     }
 
     private static Vector3 ResolveNodeApproachPosition(
@@ -1547,8 +1594,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
             entities.HasComponent<NavigationPendingPath>(entity) ||
             entities.HasComponent<NavigationRouteState>(entity);
 
-        if (!navigationActive &&
-            entities.TryGetComponent(
+        if (entities.TryGetComponent(
                 entity,
                 out CargoTransportMovementTarget approachTarget) &&
             approachTarget.NodeId == node.Id)
@@ -1561,6 +1607,13 @@ public sealed class CargoTransportSystem : ISimulationSystem
             float approachTolerance =
                 movement.StopRadius +
                 1.5f;
+
+            if (TryGetStaticNodeBounds(entities, node, out _))
+            {
+                // Another truck may occupy the exact loading point. Allow the
+                // recipient to stop alongside it without waiting for overlap.
+                approachTolerance += movement.Radius * 2.0f;
+            }
 
             if (approachDelta.LengthSquared() <=
                 approachTolerance *

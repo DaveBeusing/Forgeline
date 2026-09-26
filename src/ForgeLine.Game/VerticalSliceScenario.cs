@@ -241,10 +241,34 @@ public sealed class VerticalSliceScenario
         var logisticsDisruption =
             new LogisticsDisruptionSystem(
                 logistics);
+        var gridSettings =
+            new NavigationGridSettings
+            {
+                CellSizeMeters = navigationCellSizeMeters,
+                StaticObstacleClearanceMeters = 0.5f
+            };
+        var sectorSettings =
+            new NavigationSectorSettings
+            {
+                SectorSizeCells = navigationSectorSizeCells
+            };
+        NavigationWorld navigationWorld =
+            NavigationWorld.Build(
+                terrain,
+                battlefield.StaticNavigationObstacles,
+                gridSettings,
+                sectorSettings);
+        var pathfinder =
+            new HierarchicalPathfinder(
+                navigationWorld);
+        var navigation =
+            new HierarchicalNavigationSystem(
+                pathfinder);
         var cargoTransport =
             new CargoTransportSystem(
                 logistics,
-                inventories);
+                inventories,
+                navigation);
         var automatedDistribution =
             new AutomatedDistributionSystem(
                 logistics,
@@ -320,57 +344,6 @@ public sealed class VerticalSliceScenario
                     east.CommandCore
             });
 
-        var navigationObstacles =
-            new List<AxisAlignedBounds>(
-                battlefield.StaticNavigationObstacles);
-
-        foreach (EntityId entity in
-                 simulation.Entities.Query<
-                     WorldTransform,
-                     SpatialPresence>())
-        {
-            SpatialPresence presence =
-                simulation.Entities.GetComponent<SpatialPresence>(
-                    entity);
-
-            if (presence.Metadata.Mobility !=
-                SpatialMobility.Static)
-            {
-                continue;
-            }
-
-            WorldTransform transform =
-                simulation.Entities.GetComponent<WorldTransform>(
-                    entity);
-            navigationObstacles.Add(
-                presence.CreateEntry(
-                    entity,
-                    transform).Bounds);
-        }
-
-        var gridSettings =
-            new NavigationGridSettings
-            {
-                CellSizeMeters = navigationCellSizeMeters,
-                StaticObstacleClearanceMeters = 0.5f
-            };
-        var sectorSettings =
-            new NavigationSectorSettings
-            {
-                SectorSizeCells = navigationSectorSizeCells
-            };
-        NavigationWorld navigationWorld =
-            NavigationWorld.Build(
-                terrain,
-                navigationObstacles,
-                gridSettings,
-                sectorSettings);
-        var pathfinder =
-            new HierarchicalPathfinder(
-                navigationWorld);
-        var navigation =
-            new HierarchicalNavigationSystem(
-                pathfinder);
         var formationMovement =
             new FormationMovementSystem(
                 pathfinder);
@@ -383,7 +356,7 @@ public sealed class VerticalSliceScenario
                 logistics,
                 terrain,
                 navigation,
-                navigationObstacles,
+                battlefield.StaticNavigationObstacles,
                 gridSettings,
                 sectorSettings);
 
