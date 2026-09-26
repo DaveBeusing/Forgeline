@@ -174,15 +174,31 @@ internal sealed record VerticalSliceMatchReport(
             opponent.StrategicState.ToString(),
             opponent.ActiveGoal.ToString(),
             opponent.DecisionsTaken,
+            debug.Economy.FerrousOre,
+            debug.Economy.Volatiles,
+            debug.Economy.Silicates,
+            debug.Economy.Steel,
+            debug.Economy.Fuel,
+            debug.Economy.Electronics,
+            debug.Economy.Ammunition,
+            debug.Economy.HealthScore,
             debug.Economy.PowerGeneration,
             debug.Economy.PowerDemand,
             debug.Economy.OfflineConsumers,
             debug.Economy.ProductionFacilities,
             debug.Economy.UnitProductionFacilities,
+            debug.Force.TotalUnits,
+            debug.Force.CombatUnits,
             debug.Force.KnownHostileContacts,
             debug.Force.CurrentHostileContacts,
             debug.Force.AverageReadiness,
             debug.Force.MinimumSupply,
+            CountActiveResupplyOrders(
+                scenario,
+                side.Player),
+            BuildUnitProductionSummary(
+                scenario,
+                side.Player),
             scenario.CountBuildings(
                 side.Player,
                 BuildingIds.PowerPlant),
@@ -218,6 +234,12 @@ internal sealed record VerticalSliceMatchReport(
                 BuildingIds.Radar),
             scenario.CountUnits(
                 side.Player,
+                UnitIds.RifleSquad),
+            scenario.CountUnits(
+                side.Player,
+                UnitIds.CombatEngineer),
+            scenario.CountUnits(
+                side.Player,
                 UnitIds.ScoutVehicle),
             scenario.CountUnits(
                 side.Player,
@@ -232,6 +254,58 @@ internal sealed record VerticalSliceMatchReport(
                 side.Player,
                 UnitIds.SupplyTruck));
     }
+
+    private static int CountActiveResupplyOrders(
+        VerticalSliceScenario scenario,
+        PlayerId player)
+    {
+        int count = 0;
+
+        foreach (var entity in
+                 scenario.Simulation.Entities.Query<ResupplyOrder>())
+        {
+            if (scenario.Simulation.Entities.TryGetComponent(
+                    entity,
+                    out ControllableEntity controllable) &&
+                controllable.Owner == player)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private static string BuildUnitProductionSummary(
+        VerticalSliceScenario scenario,
+        PlayerId player)
+    {
+        var entries =
+            new List<string>();
+
+        for (int index = 0;
+             index < scenario.UnitProduction.Facilities.Count;
+             index++)
+        {
+            UnitProductionFacilityReadModel facility =
+                scenario.UnitProduction.Facilities[index];
+
+            if (!scenario.Simulation.Entities.TryGetComponent(
+                    facility.Entity,
+                    out CompletedBuilding building) ||
+                building.Owner != player)
+            {
+                continue;
+            }
+
+            entries.Add(
+                $"{facility.Entity}:{facility.ActiveUnit}/{facility.Status}/{facility.BlockReason}/completed={facility.CompletedUnits}");
+        }
+
+        return string.Join(
+            ";",
+            entries);
+    }
 }
 
 internal sealed record VerticalSliceSideReport(
@@ -239,15 +313,27 @@ internal sealed record VerticalSliceSideReport(
     string StrategicState,
     string ActiveGoal,
     int DecisionsTaken,
+    double FerrousOre,
+    double Volatiles,
+    double Silicates,
+    double Steel,
+    double Fuel,
+    double Electronics,
+    double Ammunition,
+    double EconomyHealth,
     double PowerGeneration,
     double PowerDemand,
     int OfflineConsumers,
     int ProductionFacilities,
     int UnitProductionFacilities,
+    int TotalUnits,
+    int CombatUnits,
     int KnownHostileContacts,
     int CurrentHostileContacts,
     double AverageReadiness,
     double MinimumSupply,
+    int ActiveResupplyOrders,
+    string UnitProductionSummary,
     int PowerPlants,
     int Extractors,
     int Smelters,
@@ -259,6 +345,8 @@ internal sealed record VerticalSliceSideReport(
     int AmmunitionPlants,
     int SupplyDepots,
     int Radars,
+    int RifleSquads,
+    int CombatEngineers,
     int Scouts,
     int MainBattleTanks,
     int MobileArtillery,
