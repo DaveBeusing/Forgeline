@@ -219,3 +219,20 @@ Strategic crossings use the generic `StrategicInfrastructure` / `StrategicInfras
 `MatchObjectiveSystem` owns match completion state. Command Core objective registration adds the normal combat-target components required by the existing targeting, damage, and entity-lifecycle systems rather than introducing objective-specific damage. Presentation may visualize map landmarks and infrastructure state, but it never decides reachability, restoration, or victory.
 
 See `docs/PrototypeBattlefield.md`.
+
+
+## Skirmish Opponent Authority Boundary
+
+The vertical-slice skirmish opponent is a strategic orchestration layer in ForgeLine.Game. It observes faction-owned state, public static battlefield content, and the faction's Battlefield Intelligence snapshot, then expresses intent through the same simulation commands and automation policies available to player-controlled forces.
+
+It does not own economy quantities, construction completion, logistics transfers, transforms, visibility, combat damage, or match outcomes. Those remain authoritative in their existing domain systems. Building and unit plans consume real inventories; stock targets flow through automated distribution and physical Cargo Trucks; movement flows through combat/movement groups, hierarchical navigation, formations, and ground locomotion; Fuel and Ammunition remain inventory-backed; and damage/objective completion continue through normal combat and MatchObjectiveSystem execution.
+
+Direct entity targeting has an explicit intelligence boundary. A strategic decision may create Attack intent only after the faction can resolve a currently Identified contact to that entity. Detected contacts remain coordinate-level knowledge for legitimate movement or artillery workflows. When no current hostile intelligence is available, offensive movement may use only allowed static map knowledge such as public expansion/FOB locations and the battlefield center; exact hidden enemy objective coordinates are not a fallback target.
+
+SkirmishOpponentConfiguration changes decision cadence, thresholds, group-size limits, and engagement policy only. It must never modify income, costs, production speed, sensing, unit statistics, weapon performance, Fuel, Ammunition, or logistics capacity.
+
+The existing combat-command layer remains the group authority. Attack and AttackMove create CombatGroupIntent, while movement-oriented commands also create normal formation/movement groups. CombatReadinessSystem, TacticalTestOpponentSystem, navigation, movement, supply, and combat then operate on those normal entities and components. The skirmish layer must not introduce a parallel tactical simulation.
+
+Headless integration uses SkirmishScenarioHarness to compose the same authoritative systems for two symmetric opponents. Deterministic scenarios verify knowledge boundaries and strategic progression; bounded full-match coverage verifies that the composed loop can reach a normal terminal MatchState.
+
+See docs/SkirmishOpponent.md.
