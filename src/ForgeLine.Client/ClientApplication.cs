@@ -202,6 +202,67 @@ internal sealed class ClientApplication
                 inventories,
                 unitFactory);
 
+        BattlefieldStartPosition westStart =
+            prototypeBattlefield.Starts.Single(
+                static start =>
+                    start.Player == LocalPlayer);
+        BattlefieldStartPosition eastStart =
+            prototypeBattlefield.Starts.Single(
+                static start =>
+                    start.Player == OpposingPlayer);
+        BattlefieldObjectiveDefinition westObjective =
+            prototypeBattlefield.Objectives.Single(
+                static objective =>
+                    objective.Owner == LocalPlayer);
+        BattlefieldObjectiveDefinition eastObjective =
+            prototypeBattlefield.Objectives.Single(
+                static objective =>
+                    objective.Owner == OpposingPlayer);
+
+        SkirmishStartingBase westBase =
+            SkirmishStartingBaseFactory.Create(
+                simulation.Entities,
+                inventories,
+                unitFactory,
+                terrainWorld,
+                westStart,
+                eastObjective.CommandCorePosition);
+        SkirmishStartingBase eastBase =
+            SkirmishStartingBaseFactory.Create(
+                simulation.Entities,
+                inventories,
+                unitFactory,
+                terrainWorld,
+                eastStart,
+                westObjective.CommandCorePosition);
+
+        simulation.Entities.DestroyEntity(
+            westBase.Controller);
+
+        _ = prototypeRuntime.AttachCommandCoreObjectives(
+            simulation.Entities,
+            new Dictionary<PlayerId, EntityId>
+            {
+                [westBase.Player] =
+                    westBase.CommandCore,
+                [eastBase.Player] =
+                    eastBase.CommandCore
+            });
+
+        var skirmishOpponent =
+            new SkirmishOpponentSystem(
+                buildingDefinitions,
+                unitDefinitions,
+                inventories,
+                buildingPlacement,
+                intelligenceStore,
+                prototypeBattlefield,
+                new Dictionary<PlayerId, SkirmishOpponentConfiguration>
+                {
+                    [eastBase.Player] =
+                        new SkirmishOpponentConfiguration()
+                });
+
         var combatRuntime =
             new CombatRuntime();
         var targetAcquisition =
@@ -260,6 +321,13 @@ internal sealed class ClientApplication
         var logisticsRegistration =
             new BuildingLogisticsRegistrationSystem(
                 logisticsNetwork);
+        var prototypeRoadAccess =
+            new PrototypeRoadAccessSystem(
+                logisticsNetwork,
+                prototypeRuntime.RoadNodes);
+        var matchObjectives =
+            new MatchObjectiveSystem(
+                prototypeRuntime.MatchStateEntity);
 
         PopulateSimulationEntities(
             simulation,
@@ -271,9 +339,7 @@ internal sealed class ClientApplication
                 inventories,
                 terrainWorld);
         EntityId constructionInventory =
-            CreateDevelopmentConstructionInventory(
-                simulation,
-                inventories);
+            westBase.CommandCore;
         AxisAlignedBounds[] developmentObstacles =
             CollectStaticNavigationObstacles(simulation);
         var navigationObstacles =
@@ -317,6 +383,7 @@ internal sealed class ClientApplication
                 navigationSectorSettings);
 
         simulation.RegisterSystem(buildingCommands);
+        simulation.RegisterSystem(skirmishOpponent);
         simulation.RegisterSystem(tacticalOrderPreparation);
         simulation.RegisterSystem(tacticalTestOpponent);
         simulation.RegisterSystem(automaticResupply);
@@ -341,9 +408,11 @@ internal sealed class ClientApplication
         simulation.RegisterSystem(automatedDistribution);
         simulation.RegisterSystem(cargoTransportSystem);
         simulation.RegisterSystem(logisticsRegistration);
+        simulation.RegisterSystem(prototypeRoadAccess);
         simulation.RegisterSystem(combatLifecycle);
         simulation.RegisterSystem(new SpatialIndexCleanupSystem(spatialSynchronizer));
         simulation.RegisterSystem(combatReadiness);
+        simulation.RegisterSystem(matchObjectives);
         simulation.RegisterSystem(combatDebugSnapshots);
         simulation.RegisterTickObserver(
             new PresentationExtractor(
@@ -510,6 +579,8 @@ internal sealed class ClientApplication
             combatReadiness.DebugCaptureEnabled =
                 worldDebugEnabled;
             combatDebugSnapshots.DebugCaptureEnabled =
+                worldDebugEnabled;
+            skirmishOpponent.DebugCaptureEnabled =
                 worldDebugEnabled;
 
             if (smokeTest &&
@@ -698,6 +769,10 @@ internal sealed class ClientApplication
                     CaptureCrossingStates(
                         simulation,
                         prototypeRuntime));
+                SkirmishOpponentDebugVisualization.Draw(
+                    debugDraw,
+                    skirmishOpponent.DebugSnapshot,
+                    MaximumDebugLabels);
             }
 
             terrainRenderer.DebugChunksEnabled = worldDebugEnabled;
