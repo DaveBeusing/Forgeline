@@ -52,28 +52,29 @@ public sealed class SkirmishOpponentTests
                 scenario.East.Player,
                 UnitIds.CombatEngineer));
         Assert.Equal(
-            1,
+            2,
             scenario.CountUnits(
                 scenario.West.Player,
                 UnitIds.CargoTruck));
         Assert.Equal(
-            1,
+            2,
             scenario.CountUnits(
                 scenario.East.Player,
                 UnitIds.CargoTruck));
 
         EntityId westCargo =
-            scenario.West.StartingUnits.Single(
-                entity =>
-                    scenario.Simulation.Entities.GetComponent<UnitIdentity>(
-                        entity).UnitId ==
-                    UnitIds.CargoTruck);
+            scenario.West.StartingUnits[1];
         EntityId eastCargo =
-            scenario.East.StartingUnits.Single(
-                entity =>
-                    scenario.Simulation.Entities.GetComponent<UnitIdentity>(
-                        entity).UnitId ==
-                    UnitIds.CargoTruck);
+            scenario.East.StartingUnits[1];
+
+        Assert.Equal(
+            UnitIds.CargoTruck,
+            scenario.Simulation.Entities.GetComponent<UnitIdentity>(
+                westCargo).UnitId);
+        Assert.Equal(
+            UnitIds.CargoTruck,
+            scenario.Simulation.Entities.GetComponent<UnitIdentity>(
+                eastCargo).UnitId);
         WorldTransform westCargoTransform =
             scenario.Simulation.Entities.GetComponent<WorldTransform>(
                 westCargo);
