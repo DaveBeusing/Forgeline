@@ -126,11 +126,18 @@ public static class BattlefieldResupplyPlanner
             context,
             recipient);
 
+        BattlefieldSupplyResource requestedResources =
+            requiredResources == BattlefieldSupplyResource.None
+                ? BattlefieldSupplyResource.All
+                : requiredResources;
         var resupplyOrder =
             new ResupplyOrder(
                 providerEntity,
                 submittedAtTick,
-                context.Tick);
+                context.Tick)
+            {
+                RequestedResources = requestedResources
+            };
 
         if (context.Entities.HasComponent<ResupplyOrder>(
                 recipient))
