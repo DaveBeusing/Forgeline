@@ -3,6 +3,7 @@ using ForgeLine.Ecs;
 using ForgeLine.Game;
 using ForgeLine.Logistics;
 using ForgeLine.Simulation;
+using Xunit;
 
 namespace ForgeLine.Game.Tests;
 
