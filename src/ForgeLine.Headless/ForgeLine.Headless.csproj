@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="../ForgeLine.Game/ForgeLine.Game.csproj" />
     <ProjectReference Include="../ForgeLine.Simulation/ForgeLine.Simulation.csproj" />
   </ItemGroup>
 </Project>
