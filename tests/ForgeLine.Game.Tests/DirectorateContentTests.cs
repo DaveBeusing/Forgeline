@@ -149,6 +149,11 @@ public sealed class DirectorateContentTests
             simulation.Entities.HasComponent<AmmunitionState>(tank));
         Assert.True(
             simulation.Entities.HasComponent<AutomaticResupplyPolicy>(tank));
+        AutomaticResupplyPolicy tankResupply =
+            simulation.Entities.GetComponent<AutomaticResupplyPolicy>(tank);
+        Assert.True(tankResupply.Enabled);
+        Assert.Equal(0.2, tankResupply.FuelThreshold);
+        Assert.Equal(0.2, tankResupply.AmmunitionThreshold);
 
         Assert.True(
             simulation.Entities.HasComponent<ArtilleryCapability>(artillery));
