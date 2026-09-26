@@ -1018,6 +1018,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         var retreatUnits =
             new List<EntityId>();
         int recoveringUnits = 0;
+        int activeResupplyOrders = 0;
 
         for (int index = 0;
              index < owned.CombatUnits.Count;
@@ -1048,8 +1049,12 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
             recoveringUnits++;
 
-            if (!context.Entities.HasComponent<ResupplyOrder>(
+            if (context.Entities.HasComponent<ResupplyOrder>(
                     unit))
+            {
+                activeResupplyOrders++;
+            }
+            else
             {
                 retreatUnits.Add(
                     unit);
@@ -1084,6 +1089,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             configuration.MinimumAttackUnits;
         bool forceWideRecovery =
             attackForceEstablished &&
+            activeResupplyOrders > 0 &&
             (
                 force.AverageReadiness <
                     configuration.RetreatThreshold ||
