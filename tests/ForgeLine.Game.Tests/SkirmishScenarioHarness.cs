@@ -69,15 +69,24 @@ internal sealed class SkirmishScenarioHarness
             VerticalSliceScenarioSettings.Create(
                 VerticalSliceScenarioProfile.Validation);
 
+        VerticalSliceScenarioSettings configured =
+            validation with
+            {
+                WestOpponent =
+                    westConfiguration ??
+                    validation.WestOpponent,
+                EastOpponent =
+                    eastConfiguration ??
+                    validation.EastOpponent,
+                StartingStock =
+                    startingStock ??
+                    validation.StartingStock
+            };
+
         return new SkirmishScenarioHarness(
             VerticalSliceScenario.Create(
-                seed,
-                westConfiguration ??
-                    validation.WestOpponent,
-                eastConfiguration ??
-                    validation.EastOpponent,
-                startingStock ??
-                    validation.StartingStock));
+                configured,
+                seed));
     }
 
     public MatchState GetMatchState() =>
