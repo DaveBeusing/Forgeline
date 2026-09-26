@@ -1410,7 +1410,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 220.0,
                 650.0,
                 1_100.0,
-                LogisticsStockPriority.Critical);
+                LogisticsStockPriority.High);
             SetStockPolicy(
                 context,
                 controller.PreferredConstructionSource,
@@ -1418,7 +1418,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 140.0,
                 450.0,
                 800.0,
-                LogisticsStockPriority.Critical);
+                LogisticsStockPriority.High);
             SetStockPolicy(
                 context,
                 controller.PreferredConstructionSource,
@@ -1426,7 +1426,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 140.0,
                 450.0,
                 800.0,
-                LogisticsStockPriority.Critical);
+                LogisticsStockPriority.High);
             SetStockPolicy(
                 context,
                 controller.PreferredConstructionSource,
@@ -1434,7 +1434,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 220.0,
                 700.0,
                 1_200.0,
-                LogisticsStockPriority.Critical);
+                LogisticsStockPriority.High);
             SetStockPolicy(
                 context,
                 controller.PreferredConstructionSource,
@@ -1442,7 +1442,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 160.0,
                 360.0,
                 600.0,
-                LogisticsStockPriority.Critical);
+                LogisticsStockPriority.High);
             SetStockPolicy(
                 context,
                 controller.PreferredConstructionSource,
@@ -1450,7 +1450,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 360.0,
                 600.0,
                 900.0,
-                LogisticsStockPriority.Critical);
+                LogisticsStockPriority.High);
         }
 
         for (int index = 0;
@@ -1512,7 +1512,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     100.0,
                     260.0,
                     520.0,
-                    LogisticsStockPriority.Critical);
+                    LogisticsStockPriority.High);
                 SetStockPolicy(
                     context,
                     entity,
@@ -1520,7 +1520,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     40.0,
                     120.0,
                     260.0,
-                    LogisticsStockPriority.Critical);
+                    LogisticsStockPriority.High);
             }
         }
 
@@ -1530,6 +1530,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         {
             EntityId entity =
                 owned.UnitProductionFacilities[index];
+            UnitProductionFacility facility =
+                context.Entities.GetComponent<UnitProductionFacility>(
+                    entity);
+            LogisticsStockPriority priority =
+                facility.Supports(UnitProductionCapability.Logistics)
+                    ? LogisticsStockPriority.Critical
+                    : LogisticsStockPriority.High;
 
             SetStockPolicy(
                 context,
@@ -1538,7 +1545,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 120.0,
                 300.0,
                 650.0,
-                LogisticsStockPriority.Critical);
+                priority);
             SetStockPolicy(
                 context,
                 entity,
@@ -1546,7 +1553,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 60.0,
                 160.0,
                 320.0,
-                LogisticsStockPriority.Critical);
+                priority);
             SetStockPolicy(
                 context,
                 entity,
@@ -1554,7 +1561,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 120.0,
                 240.0,
                 420.0,
-                LogisticsStockPriority.Critical);
+                priority);
             SetStockPolicy(
                 context,
                 entity,
@@ -1562,7 +1569,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 120.0,
                 320.0,
                 700.0,
-                LogisticsStockPriority.Critical);
+                priority);
         }
 
         for (int index = 0;
@@ -1579,7 +1586,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 250.0,
                 600.0,
                 900.0,
-                LogisticsStockPriority.Critical);
+                LogisticsStockPriority.High);
             SetStockPolicy(
                 context,
                 entity,
@@ -1587,7 +1594,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 350.0,
                 800.0,
                 1_200.0,
-                LogisticsStockPriority.Critical);
+                LogisticsStockPriority.High);
         }
     }
 
