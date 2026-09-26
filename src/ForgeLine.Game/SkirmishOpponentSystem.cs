@@ -1159,12 +1159,6 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
-        if (intelligence.Contacts.Any(
-                static contact => contact.IsCurrent))
-        {
-            return false;
-        }
-
         BattlefieldSiteDefinition[] sites =
             GetOpponentFacingSites(
                 controller);
@@ -2610,9 +2604,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             if (context.Entities.TryGetComponent(
                     entity,
                     out CombatOrderState order) &&
-                order.Kind is
-                    CombatOrderKind.AttackMove or
-                    CombatOrderKind.Retreat)
+                order.Kind == CombatOrderKind.Retreat)
+            {
+                continue;
+            }
+
+            if (order.Kind == CombatOrderKind.AttackMove &&
+                context.Entities.HasComponent<MovementOrder>(
+                    entity))
             {
                 continue;
             }
