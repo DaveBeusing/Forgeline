@@ -19,7 +19,7 @@ The opponent does not own alternate economy, movement, combat, or supply state.
 - Fuel and Ammunition are real inventory-backed constraints; recovery uses normal battlefield supply.
 - Direct entity attacks are allowed only when the faction currently identifies the target through battlefield intelligence.
 - Detected contacts may supply a legitimate last-known coordinate but not hidden entity state.
-- Without current hostile intelligence, strategic movement targets only static public battlefield knowledge such as expansion/FOB sites and the map center. Exact hostile Command Core coordinates are not used as hidden offensive knowledge.
+- Without current hostile intelligence, strategic movement targets only static public battlefield knowledge such as expansion/FOB sites, the map center, and symmetric far-side staging lines derived from map dimensions. Exact hostile Command Core coordinates are not used as hidden offensive knowledge.
 - No resource multiplier, free construction, free production, teleportation, hidden target transform, infinite ammunition, infinite fuel, or supply bypass is provided.
 
 Static map geometry, public strategic sites, the faction's own start area, and the shared ruleset are allowed knowledge. Enemy state must enter decision-making through the faction intelligence snapshot.
