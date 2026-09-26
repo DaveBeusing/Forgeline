@@ -287,9 +287,44 @@ public sealed class SkirmishOpponentTests
     [Fact]
     public void BoundedHeadlessMatchProgressesToTerminalOutcome()
     {
+        var attackingConfiguration =
+            new SkirmishOpponentConfiguration
+            {
+                ReactionCadenceTicks = 10,
+                Aggression = 1.0,
+                ExpansionReadinessThreshold = 0.40,
+                OffensiveReadinessThreshold = 0.45,
+                RetreatThreshold = 0.15,
+                ResupplyThreshold = 0.18,
+                MinimumAttackUnits = 3,
+                MaximumAttackUnits = 12,
+                MaximumQueuedUnitsPerFacility = 3,
+                DefensiveRadiusMeters = 450.0f,
+                ObjectivePressureLeashMeters = 320.0f,
+                ArtilleryCadenceTicks = 50
+            };
+        var defendingConfiguration =
+            new SkirmishOpponentConfiguration
+            {
+                ReactionCadenceTicks = 20,
+                Aggression = 0.0,
+                ExpansionReadinessThreshold = 0.70,
+                OffensiveReadinessThreshold = 0.95,
+                RetreatThreshold = 0.35,
+                ResupplyThreshold = 0.40,
+                MinimumAttackUnits = 24,
+                MaximumAttackUnits = 24,
+                MaximumQueuedUnitsPerFacility = 2,
+                DefensiveRadiusMeters = 260.0f,
+                ObjectivePressureLeashMeters = 180.0f,
+                ArtilleryCadenceTicks = 120
+            };
+
         SkirmishScenarioHarness scenario =
             SkirmishScenarioHarness.Create(
-                seed: 2026);
+                seed: 2026,
+                westConfiguration: attackingConfiguration,
+                eastConfiguration: defendingConfiguration);
 
         bool completed =
             scenario.RunUntil(
