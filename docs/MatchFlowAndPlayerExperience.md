@@ -91,6 +91,16 @@ When the selected entity is working, the HUD reports:
 
 Block reasons originate from the existing production systems, including `NoInput`, `NoPower`, `OutputFull`, and `Paused`.
 
+## Contextual command feedback
+
+The HUD briefly presents the most recent local command result after simulation has resolved it.
+
+Movement feedback uses the executed `MoveEntitiesCommand` result and reports accepted and rejected target counts. Buildings are selectable for inspection but are rejected as movement targets; mixed selections therefore produce partial feedback instead of receiving invalid movement state.
+
+Construction feedback comes from a player-scoped `BuildCommandResult` published by `BuildingCommandProcessingSystem`. Rejections expose the existing authoritative `BuildCommandRejectionReason` and, where relevant, the concrete `BuildingPlacementFailureReason` rather than inventing a separate UI explanation.
+
+Feedback is transient presentation of authoritative results. It does not become gameplay state or alter command acceptance.
+
 ## Alerts
 
 The current HUD derives focused alerts from authoritative state:
