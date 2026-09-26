@@ -991,8 +991,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
-        var recoveryUnits =
+        var retreatUnits =
             new List<EntityId>();
+        int recoveringUnits = 0;
 
         for (int index = 0;
              index < owned.CombatUnits.Count;
@@ -1013,35 +1014,46 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     readiness.Fuel,
                     readiness.Ammunition);
 
-            if (readiness.OverallReadiness <
-                    configuration.RetreatThreshold ||
-                supply <
+            if (readiness.OverallReadiness >=
+                    configuration.RetreatThreshold &&
+                supply >=
                     configuration.ResupplyThreshold)
             {
-                recoveryUnits.Add(
+                continue;
+            }
+
+            recoveringUnits++;
+
+            if (!context.Entities.HasComponent<ResupplyOrder>(
+                    unit))
+            {
+                retreatUnits.Add(
                     unit);
             }
         }
 
-        if (recoveryUnits.Count == 0)
+        if (recoveringUnits == 0)
         {
             return false;
         }
 
-        Vector3 recovery =
-            ResolveRecoveryPoint(
-                context,
-                controller,
-                owned);
+        if (retreatUnits.Count > 0)
+        {
+            Vector3 recovery =
+                ResolveRecoveryPoint(
+                    context,
+                    controller,
+                    owned);
 
-        var command =
-            new RetreatCommand(
-                controller.Player,
-                recoveryUnits.ToArray(),
-                recovery,
-                context.Tick,
-                FormationTemplate.Column);
-        command.Execute(context);
+            var command =
+                new RetreatCommand(
+                    controller.Player,
+                    retreatUnits.ToArray(),
+                    recovery,
+                    context.Tick,
+                    FormationTemplate.Column);
+            command.Execute(context);
+        }
 
         bool attackForceEstablished =
             force.CombatUnits >=
@@ -1051,7 +1063,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             (
                 force.AverageReadiness <
                     configuration.RetreatThreshold ||
-                recoveryUnits.Count ==
+                recoveringUnits ==
                     owned.CombatUnits.Count
             );
 
