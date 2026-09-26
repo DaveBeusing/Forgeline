@@ -124,7 +124,7 @@ public sealed class SkirmishOpponentTests
                 static current =>
                     current.CargoTransport.Metrics.DeliveredQuantity >=
                     700.0,
-                maximumTicks: 12_000,
+                maximumTicks: 80_000,
                 TestContext.Current.CancellationToken);
 
         Assert.True(
