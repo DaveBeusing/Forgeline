@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using ForgeLine.Core;
 using ForgeLine.Game;
 using ForgeLine.Simulation;
 
