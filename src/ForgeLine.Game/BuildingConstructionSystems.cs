@@ -683,6 +683,17 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
                     outputInventory,
                     definition.ProductionCapabilities,
                     activatedAtTick));
+
+            if (definition.ProductionCapabilities.HasFlag(
+                    ProductionCapability.FuelProcessing))
+            {
+                entities.AddComponent(
+                    entity,
+                    new SupplyProvider(
+                        outputInventory,
+                        site.Owner,
+                        resupplyRangeMeters: 90.0f));
+            }
         }
     }
 
