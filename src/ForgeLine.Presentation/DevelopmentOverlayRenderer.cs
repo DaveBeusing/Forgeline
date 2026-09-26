@@ -311,6 +311,56 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             }
         }
 
+        if (snapshot.Feedback.Kind != PlayerCommandFeedbackKind.None &&
+            snapshot.Tick.Value >= snapshot.Feedback.ResolvedAtTick.Value &&
+            snapshot.Tick.Value - snapshot.Feedback.ResolvedAtTick.Value <= 80)
+        {
+            builder.Append("COMMAND ");
+
+            if (snapshot.Feedback.Kind ==
+                PlayerCommandFeedbackKind.Movement)
+            {
+                builder.Append("MOVE ");
+                builder.Append(
+                    snapshot.Feedback.AcceptedTargets);
+                builder.Append(" ACCEPTED");
+
+                if (snapshot.Feedback.RejectedTargets > 0)
+                {
+                    builder.Append(" ");
+                    builder.Append(
+                        snapshot.Feedback.RejectedTargets);
+                    builder.Append(" REJECTED");
+                }
+            }
+            else
+            {
+                builder.Append("BUILD ");
+
+                if (snapshot.Feedback.State ==
+                    PlayerCommandFeedbackState.Accepted)
+                {
+                    builder.Append("ACCEPTED");
+                }
+                else
+                {
+                    builder.Append("BLOCKED ");
+                    builder.Append(
+                        snapshot.Feedback.BuildRejection.ToString());
+
+                    if (snapshot.Feedback.PlacementFailure !=
+                        BuildingPlacementFailureReason.None)
+                    {
+                        builder.Append(" ");
+                        builder.Append(
+                            snapshot.Feedback.PlacementFailure.ToString());
+                    }
+                }
+            }
+
+            builder.NewLine();
+        }
+
         if (snapshot.Alerts != PlayerAlertState.None)
         {
             builder.Append("ALERT ");
