@@ -10,6 +10,7 @@ namespace ForgeLine.Game;
 public sealed class CargoTransportSystem : ISimulationSystem
 {
     private const double QuantityEpsilon = 0.000000001;
+    private const float LogicalTransitNodeApproachRadiusMeters = 72.0f;
 
     private readonly LogisticsNetwork _network;
     private readonly InventoryStore _inventories;
@@ -1390,7 +1391,11 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 entities,
                 node,
                 transform.Position,
-                movement))
+                movement) ||
+            IsWithinLogicalTransitNodeApproachRange(
+                entities,
+                node,
+                transform.Position))
         {
             return true;
         }
@@ -1410,6 +1415,33 @@ public sealed class CargoTransportSystem : ISimulationSystem
             movement.StopRadius + 0.25f;
         return delta.LengthSquared() <=
             tolerance * tolerance;
+    }
+
+    private static bool IsWithinLogicalTransitNodeApproachRange(
+        EntityRegistry entities,
+        in LogisticsNode node,
+        Vector3 position)
+    {
+        if (!entities.IsAlive(node.Entity) ||
+            entities.HasComponent<CompletedBuilding>(node.Entity) ||
+            entities.HasComponent<ResourceExtractor>(node.Entity) ||
+            entities.HasComponent<InventoryStorage>(node.Entity) ||
+            entities.HasComponent<ProductionFacility>(node.Entity) ||
+            entities.HasComponent<UnitProductionFacility>(node.Entity) ||
+            entities.HasComponent<LogisticsHub>(node.Entity) ||
+            entities.HasComponent<SupplyDepot>(node.Entity))
+        {
+            return false;
+        }
+
+        Vector3 delta =
+            node.WorldPosition -
+            position;
+        delta.Y = 0.0f;
+
+        return delta.LengthSquared() <=
+            LogicalTransitNodeApproachRadiusMeters *
+            LogicalTransitNodeApproachRadiusMeters;
     }
 
     private static bool IsWithinStaticNodeApproachRange(
