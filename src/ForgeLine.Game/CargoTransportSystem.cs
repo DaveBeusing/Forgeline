@@ -227,6 +227,14 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
+        // Battlefield resupply temporarily owns locomotion. Keep the cargo
+        // order and runtime state intact so the same delivery resumes once
+        // the resupply order is completed.
+        if (context.Entities.HasComponent<ResupplyOrder>(entity))
+        {
+            return;
+        }
+
         switch (state.Lifecycle)
         {
             case CargoTransportLifecycleState.Idle:
