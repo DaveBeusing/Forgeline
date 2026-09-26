@@ -186,6 +186,18 @@ internal static class Program
                 $"avgTick={report.AverageTickMilliseconds:F3}ms; " +
                 $"maxTick={report.MaximumTickMilliseconds:F3}ms; " +
                 $"allocated={report.AllocatedBytes} bytes.");
+            Console.WriteLine(
+                $"Integrated metrics: cargoDelivered={report.DeliveredCargoQuantity:F1}; " +
+                $"cargoCompleted={report.CompletedCargoOrders}; cargoFailed={report.FailedCargoOrders}; " +
+                $"routeFailures={report.RouteFailures}; " +
+                $"supplyFuel={report.TotalFuelTransferred:F1}; " +
+                $"supplyAmmo={report.TotalAmmunitionTransferred:F1}; " +
+                $"artilleryShots={report.TotalArtilleryShots}; " +
+                $"artilleryImpacts={report.TotalArtilleryImpacts}; " +
+                $"westContacts={report.West.KnownHostileContacts}; " +
+                $"eastContacts={report.East.KnownHostileContacts}; " +
+                $"westReadiness={report.West.AverageReadiness:F3}; " +
+                $"eastReadiness={report.East.AverageReadiness:F3}.");
 
             if (options.RequireTerminal &&
                 !scenario.GetMatchState().IsTerminal)
