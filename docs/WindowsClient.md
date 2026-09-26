@@ -158,9 +158,10 @@ Smoke mode:
 3. initializes the D3D12 device and swap chain, using WARP only when no suitable hardware adapter is available;
 4. generates the deterministic development terrain and persistent per-chunk geometry;
 5. compiles terrain shaders through DXC, creates the terrain pipeline and depth target, frustum-culls chunks, and submits indexed terrain draws for a short bounded interval;
-6. reports platform, graphics, world, camera, and terrain submission state to standard output;
-7. requests normal window destruction;
-8. waits for graphics work to retire and exits only after orderly graphics/platform cleanup.
+6. advances the configured skirmish, removes the opposing Command Core through authoritative entity state, advances simulation until the objective system resolves a local victory, and renders the terminal player HUD;
+7. reports platform, graphics, world, camera, terrain submission, and completed match state through the normal validation path;
+8. requests normal window destruction;
+9. waits for graphics work to retire and exits only after orderly graphics/platform cleanup.
 
 CI executes this validation only on Windows runners.
 
