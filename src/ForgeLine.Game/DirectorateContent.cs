@@ -489,7 +489,7 @@ public static class DirectorateContent
             InitialFuelFraction = 1.0,
             InitialAmmunitionFraction = 0.0,
             CargoCapacity = 220.0,
-            AutomaticResupply = false,
+            AutomaticResupply = true,
             TargetPriority = 30
         };
 
