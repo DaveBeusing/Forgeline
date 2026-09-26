@@ -1227,9 +1227,25 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     {
         objective = Vector3.Zero;
 
-        if (intelligence.Contacts.Any(
-                static contact =>
-                    contact.IsCurrent))
+        bool enemyCommandCoreIdentified =
+            intelligence.Contacts.Any(
+                contact =>
+                    contact.IsCurrent &&
+                    contact.State ==
+                        IntelligenceState.Identified &&
+                    _intelligence.TryResolveCurrentlyIdentifiedEntity(
+                        controller.Faction,
+                        contact.ContactKey,
+                        out EntityId identifiedEntity) &&
+                    context.Entities.IsAlive(
+                        identifiedEntity) &&
+                    context.Entities.TryGetComponent(
+                        identifiedEntity,
+                        out CompletedBuilding completed) &&
+                    completed.BuildingId ==
+                        BuildingIds.CommandCore);
+
+        if (enemyCommandCoreIdentified)
         {
             return false;
         }
