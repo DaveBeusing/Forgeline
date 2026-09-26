@@ -1,3 +1,4 @@
+using System.Numerics;
 using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
@@ -86,8 +87,9 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
                     policy.AmmunitionThreshold);
             bool needsFuel =
                 NeedsFuel(
-                    context.Entities,
+                    context,
                     entity,
+                    controllable.Owner,
                     policy.FuelThreshold);
 
             if (!needsAmmunition &&
@@ -279,11 +281,12 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
     }
 
     private bool NeedsFuel(
-        EntityRegistry entities,
+        SimulationContext context,
         EntityId entity,
+        PlayerId owner,
         double threshold)
     {
-        if (!entities.TryGetComponent(
+        if (!context.Entities.TryGetComponent(
                 entity,
                 out UnitFuelState fuel))
         {
@@ -296,15 +299,116 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
             return true;
         }
 
-        double fraction =
-            fuel.Capacity <= 0.0
-                ? 0.0
-                : _inventories.GetQuantity(
-                    fuel.InventoryId,
-                    ResourceIds.Fuel) /
-                  fuel.Capacity;
+        double currentFuel =
+            _inventories.GetQuantity(
+                fuel.InventoryId,
+                ResourceIds.Fuel);
+        double thresholdFuel =
+            fuel.Capacity *
+            threshold;
 
-        return fraction <= threshold;
+        if (currentFuel <= thresholdFuel)
+        {
+            return true;
+        }
+
+        if (fuel.ConsumptionPerMeter <= 0.0 ||
+            !context.Entities.TryGetComponent(
+                entity,
+                out WorldTransform transform))
+        {
+            return false;
+        }
+
+        double nearestReturnFuel =
+            FindNearestProviderReturnFuel(
+                context,
+                owner,
+                transform.Position,
+                fuel.ConsumptionPerMeter);
+
+        return double.IsFinite(nearestReturnFuel) &&
+            currentFuel <=
+                nearestReturnFuel +
+                thresholdFuel;
+    }
+
+    private double FindNearestProviderReturnFuel(
+        SimulationContext context,
+        PlayerId owner,
+        Vector3 recipientPosition,
+        double consumptionPerMeter)
+    {
+        const double quantityEpsilon = 0.000000001;
+        double nearestFuel =
+            double.PositiveInfinity;
+
+        foreach (EntityId providerEntity in
+                 context.Entities.Query<SupplyProvider>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            SupplyProvider provider =
+                context.Entities.GetComponent<SupplyProvider>(
+                    providerEntity);
+
+            if (!provider.Enabled ||
+                provider.Owner != owner ||
+                !_inventories.Contains(
+                    provider.InventoryId) ||
+                _inventories.GetAvailableQuantity(
+                    provider.InventoryId,
+                    ResourceIds.Fuel) <= quantityEpsilon ||
+                !context.Entities.TryGetComponent(
+                    providerEntity,
+                    out WorldTransform providerTransform))
+            {
+                continue;
+            }
+
+            if (context.Entities.TryGetComponent(
+                    providerEntity,
+                    out SupplyDepot depot) &&
+                depot.State != SupplyDepotState.Operational)
+            {
+                continue;
+            }
+
+            double distance =
+                HorizontalDistance(
+                    recipientPosition,
+                    providerTransform.Position);
+            double approachDistance =
+                Math.Max(
+                    0.0,
+                    distance -
+                    provider.ResupplyRangeMeters *
+                    0.75);
+            double returnFuel =
+                approachDistance *
+                consumptionPerMeter;
+
+            if (returnFuel < nearestFuel)
+            {
+                nearestFuel =
+                    returnFuel;
+            }
+        }
+
+        return nearestFuel;
+    }
+
+    private static double HorizontalDistance(
+        Vector3 left,
+        Vector3 right)
+    {
+        double x =
+            left.X - right.X;
+        double z =
+            left.Z - right.Z;
+
+        return Math.Sqrt(
+            x * x +
+            z * z);
     }
 
     private static void MarkResupplyRequested(
