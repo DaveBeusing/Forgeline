@@ -320,11 +320,22 @@ public sealed class SkirmishOpponentTests
                 ArtilleryCadenceTicks = 120
             };
 
+        var matchStock =
+            new SkirmishStartingStock(
+                FerrousOre: 1_200.0,
+                Volatiles: 800.0,
+                Silicates: 800.0,
+                Steel: 3_000.0,
+                Fuel: 2_000.0,
+                Electronics: 1_500.0,
+                Ammunition: 1_500.0);
+
         SkirmishScenarioHarness scenario =
             SkirmishScenarioHarness.Create(
                 seed: 2026,
                 westConfiguration: attackingConfiguration,
-                eastConfiguration: defendingConfiguration);
+                eastConfiguration: defendingConfiguration,
+                startingStock: matchStock);
 
         bool completed =
             scenario.RunUntil(
