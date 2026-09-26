@@ -38,8 +38,6 @@ public readonly record struct SkirmishStartingBase(
 
 public static class SkirmishStartingBaseFactory
 {
-    private static readonly PowerNetworkId DefaultPowerNetwork = new(1);
-
     public static SkirmishStartingBase Create(
         EntityRegistry entities,
         InventoryStore inventories,
@@ -120,7 +118,8 @@ public static class SkirmishStartingBaseFactory
         entities.AddComponent(
             commandCore,
             new PowerNetworkMembership(
-                DefaultPowerNetwork));
+                new PowerNetworkId(
+                    checked((uint)start.Player.Value))));
         entities.AddComponent(
             commandCore,
             new PowerConsumer(
