@@ -1249,30 +1249,54 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
-        IntelligenceContact? identified =
-            intelligence.Contacts
-                .Where(
-                    static contact =>
-                        contact.IsCurrent &&
-                        contact.State ==
-                        IntelligenceState.Identified)
-                .OrderBy(
-                    contact =>
-                        HorizontalDistanceSquared(
-                            controller.HomePosition,
-                            contact.LastKnownPosition))
-                .ThenBy(
-                    static contact =>
-                        contact.ContactKey)
-                .Cast<IntelligenceContact?>()
-                .FirstOrDefault();
+        IntelligenceContact? identified = null;
+        EntityId identifiedTarget = EntityId.Invalid;
+        bool identifiedIsCommandCore = false;
+        float identifiedDistance = float.PositiveInfinity;
+
+        for (int index = 0;
+             index < intelligence.Contacts.Count;
+             index++)
+        {
+            IntelligenceContact contact =
+                intelligence.Contacts[index];
+
+            if (!contact.IsCurrent ||
+                contact.State != IntelligenceState.Identified ||
+                !_intelligence.TryResolveCurrentlyIdentifiedEntity(
+                    controller.Faction,
+                    contact.ContactKey,
+                    out EntityId candidate) ||
+                !context.Entities.IsAlive(candidate))
+            {
+                continue;
+            }
+
+            bool isCommandCore =
+                context.Entities.HasComponent<CommandCoreObjective>(
+                    candidate);
+            float distance =
+                HorizontalDistanceSquared(
+                    controller.HomePosition,
+                    contact.LastKnownPosition);
+
+            if (!identified.HasValue ||
+                (isCommandCore && !identifiedIsCommandCore) ||
+                (isCommandCore == identifiedIsCommandCore &&
+                 (distance < identifiedDistance ||
+                  (distance == identifiedDistance &&
+                   contact.ContactKey <
+                   identified.Value.ContactKey))))
+            {
+                identified = contact;
+                identifiedTarget = candidate;
+                identifiedIsCommandCore = isCommandCore;
+                identifiedDistance = distance;
+            }
+        }
 
         if (identified.HasValue &&
-            _intelligence.TryResolveCurrentlyIdentifiedEntity(
-                controller.Faction,
-                identified.Value.ContactKey,
-                out EntityId target) &&
-            context.Entities.IsAlive(target))
+            identifiedTarget.IsValid)
         {
             objective =
                 identified.Value.LastKnownPosition;
@@ -1281,7 +1305,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 new AttackCommand(
                     controller.Player,
                     attackers,
-                    target,
+                    identifiedTarget,
                     context.Tick,
                     configuration.ObjectivePressureLeashMeters);
             attack.Execute(context);
@@ -1446,6 +1470,21 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         {
             EntityId unit =
                 owned.CombatUnits[index];
+
+            if (owned.UnitByEntity.TryGetValue(
+                    unit,
+                    out UnitId unitId) &&
+                unitId == UnitIds.ScoutVehicle)
+            {
+                if (context.Entities.HasComponent<TacticalTestOpponent>(
+                        unit))
+                {
+                    context.Entities.RemoveComponent<TacticalTestOpponent>(
+                        unit);
+                }
+
+                continue;
+            }
 
             if (context.Entities.HasComponent<TacticalTestOpponent>(
                     unit))
