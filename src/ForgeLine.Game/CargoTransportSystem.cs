@@ -1320,10 +1320,30 @@ public sealed class CargoTransportSystem : ISimulationSystem
         in CargoTransport transport,
         in LogisticsNode node)
     {
+        if (!context.Entities.TryGetComponent(
+                entity,
+                out WorldTransform transportTransform) ||
+            !context.Entities.TryGetComponent(
+                entity,
+                out GroundMovement groundMovement))
+        {
+            return;
+        }
+
+        Vector3 movementPosition =
+            ResolveNodeApproachPosition(
+                context.Entities,
+                node,
+                transportTransform.Position,
+                groundMovement);
+
         if (context.Entities.TryGetComponent(
                 entity,
                 out CargoTransportMovementTarget target) &&
-            target.NodeId == node.Id)
+            target.NodeId == node.Id &&
+            Vector3.DistanceSquared(
+                target.WorldPosition,
+                movementPosition) <= 1.0f)
         {
             bool navigationActive =
                 context.Entities.HasComponent<
@@ -1341,7 +1361,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
 
         var movementOrder = new MovementOrder(
             transport.Owner,
-            node.WorldPosition,
+            movementPosition,
             context.Tick,
             context.Tick);
 
@@ -1362,7 +1382,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
         var movementTarget =
             new CargoTransportMovementTarget(
                 node.Id,
-                node.WorldPosition,
+                movementPosition,
                 context.Tick);
 
         if (context.Entities.HasComponent<
@@ -1378,6 +1398,118 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 entity,
                 movementTarget);
         }
+    }
+
+    private static Vector3 ResolveNodeApproachPosition(
+        EntityRegistry entities,
+        in LogisticsNode node,
+        Vector3 origin,
+        in GroundMovement movement)
+    {
+        if (!TryGetStaticNodeBounds(
+                entities,
+                node,
+                out ForgeLine.World.AxisAlignedBounds bounds))
+        {
+            return node.WorldPosition;
+        }
+
+        float clearance =
+            movement.ObstacleLookAhead +
+            movement.Radius +
+            1.0f;
+        float minimumX =
+            bounds.Minimum.X -
+            clearance;
+        float maximumX =
+            bounds.Maximum.X +
+            clearance;
+        float minimumZ =
+            bounds.Minimum.Z -
+            clearance;
+        float maximumZ =
+            bounds.Maximum.Z +
+            clearance;
+        Vector3 center =
+            (bounds.Minimum +
+             bounds.Maximum) *
+            0.5f;
+        float deltaX =
+            origin.X -
+            center.X;
+        float deltaZ =
+            origin.Z -
+            center.Z;
+
+        if (MathF.Abs(deltaX) >=
+            MathF.Abs(deltaZ))
+        {
+            return new Vector3(
+                deltaX >= 0.0f
+                    ? maximumX
+                    : minimumX,
+                node.WorldPosition.Y,
+                Math.Clamp(
+                    origin.Z,
+                    minimumZ,
+                    maximumZ));
+        }
+
+        return new Vector3(
+            Math.Clamp(
+                origin.X,
+                minimumX,
+                maximumX),
+            node.WorldPosition.Y,
+            deltaZ >= 0.0f
+                ? maximumZ
+                : minimumZ);
+    }
+
+    private static bool TryGetStaticNodeBounds(
+        EntityRegistry entities,
+        in LogisticsNode node,
+        out ForgeLine.World.AxisAlignedBounds bounds)
+    {
+        if (!entities.IsAlive(
+                node.Entity))
+        {
+            bounds = default;
+            return false;
+        }
+
+        if (entities.TryGetComponent(
+                node.Entity,
+                out ResourceExtractor extractor) &&
+            entities.IsAlive(
+                extractor.Deposit) &&
+            entities.TryGetComponent(
+                extractor.Deposit,
+                out ResourceDeposit deposit))
+        {
+            bounds =
+                deposit.Bounds;
+            return true;
+        }
+
+        if (!entities.TryGetComponent(
+                node.Entity,
+                out WorldTransform transform) ||
+            !entities.TryGetComponent(
+                node.Entity,
+                out SpatialPresence presence) ||
+            presence.Metadata.Mobility !=
+                ForgeLine.World.SpatialMobility.Static)
+        {
+            bounds = default;
+            return false;
+        }
+
+        bounds =
+            presence.CreateEntry(
+                node.Entity,
+                transform).Bounds;
+        return true;
     }
 
     private static bool IsSettledAtNode(
