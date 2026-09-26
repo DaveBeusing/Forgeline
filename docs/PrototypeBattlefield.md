@@ -67,7 +67,7 @@ Each side has one stable Command Core objective definition.
 
 `MatchObjectiveSystem` owns match completion state in simulation. When a Command Core is attached as an objective, it is also made a normal combat structure target if those combat components are not already present. A surviving opposing Command Core therefore wins only after the real target's entity has been removed through authoritative gameplay state.
 
-The current match state supports `Running`, `Victory`, and `Draw`.
+The match state is created as `Loading`, becomes `Active` only after Command Core objectives are attached, and resolves to `Victory` or `Draw`. Player-facing read models derive `Victory` versus `Defeat` from the authoritative winner. A completed match can transition to `Ended` through a simulation command.
 
 ## Debug Visualization
 
