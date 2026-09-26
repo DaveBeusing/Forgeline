@@ -227,7 +227,6 @@ internal sealed class SkirmishScenarioHarness
                 unitFactory,
                 terrain,
                 westStart,
-                eastObjective.CommandCorePosition,
                 startingStock);
         SkirmishStartingBase east =
             SkirmishStartingBaseFactory.Create(
@@ -236,7 +235,6 @@ internal sealed class SkirmishScenarioHarness
                 unitFactory,
                 terrain,
                 eastStart,
-                westObjective.CommandCorePosition,
                 startingStock);
 
         _ = battlefieldRuntime.AttachCommandCoreObjectives(

@@ -46,7 +46,6 @@ public static class SkirmishStartingBaseFactory
         UnitFactory unitFactory,
         TerrainWorld terrain,
         BattlefieldStartPosition start,
-        Vector3 enemyObjectivePosition,
         SkirmishStartingStock? startingStock = null)
     {
         ArgumentNullException.ThrowIfNull(entities);
@@ -174,8 +173,7 @@ public static class SkirmishStartingBaseFactory
                 start.Player,
                 faction,
                 commandCore,
-                commandCorePosition,
-                enemyObjectivePosition));
+                commandCorePosition));
         entities.AddComponent(
             controller,
             SkirmishOpponentState.Initial);

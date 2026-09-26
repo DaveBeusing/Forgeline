@@ -225,16 +225,14 @@ internal sealed class ClientApplication
                 inventories,
                 unitFactory,
                 terrainWorld,
-                westStart,
-                eastObjective.CommandCorePosition);
+                westStart);
         SkirmishStartingBase eastBase =
             SkirmishStartingBaseFactory.Create(
                 simulation.Entities,
                 inventories,
                 unitFactory,
                 terrainWorld,
-                eastStart,
-                westObjective.CommandCorePosition);
+                eastStart);
 
         simulation.Entities.DestroyEntity(
             westBase.Controller);

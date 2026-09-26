@@ -128,8 +128,7 @@ public readonly record struct SkirmishOpponentController
         PlayerId player,
         FactionId faction,
         EntityId preferredConstructionSource,
-        Vector3 homePosition,
-        Vector3 enemyObjectivePosition)
+        Vector3 homePosition)
     {
         if (!player.IsSpecified)
         {
@@ -147,8 +146,7 @@ public readonly record struct SkirmishOpponentController
                 nameof(preferredConstructionSource));
         }
 
-        if (!IsFinite(homePosition) ||
-            !IsFinite(enemyObjectivePosition))
+        if (!IsFinite(homePosition))
         {
             throw new ArgumentOutOfRangeException(
                 nameof(homePosition));
@@ -159,8 +157,6 @@ public readonly record struct SkirmishOpponentController
         PreferredConstructionSource =
             preferredConstructionSource;
         HomePosition = homePosition;
-        EnemyObjectivePosition =
-            enemyObjectivePosition;
     }
 
     public PlayerId Player { get; }
@@ -171,7 +167,6 @@ public readonly record struct SkirmishOpponentController
 
     public Vector3 HomePosition { get; }
 
-    public Vector3 EnemyObjectivePosition { get; }
 
     private static bool IsFinite(Vector3 value) =>
         float.IsFinite(value.X) &&
