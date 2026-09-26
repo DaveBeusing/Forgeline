@@ -8,7 +8,7 @@ using ForgeLine.Simulation;
 namespace ForgeLine.Game;
 
 [Flags]
-public enum PlayerAlertFlags : byte
+public enum PlayerAlertState : byte
 {
     None = 0,
     LowPower = 1 << 0,
@@ -144,7 +144,7 @@ public readonly record struct PlayerExperienceSnapshot(
     PlayerPowerSummary Power,
     PlayerIntelligenceSummary Intelligence,
     PlayerSelectionSummary Selection,
-    PlayerAlertFlags Alerts,
+    PlayerAlertState Alerts,
     int CriticalSupplyUnits,
     int BlockedProductionFacilities,
     PlayerMatchStatistics Statistics)
@@ -239,34 +239,34 @@ public static class PlayerExperienceSnapshotFactory
                 entities,
                 player);
 
-        PlayerAlertFlags alerts =
-            PlayerAlertFlags.None;
+        PlayerAlertState alerts =
+            PlayerAlertState.None;
 
         if (power.IsConstrained)
         {
-            alerts |= PlayerAlertFlags.LowPower;
+            alerts |= PlayerAlertState.LowPower;
         }
 
         if (blockedProductionFacilities > 0)
         {
-            alerts |= PlayerAlertFlags.ProductionBlocked;
+            alerts |= PlayerAlertState.ProductionBlocked;
         }
 
         if (criticalSupplyUnits > 0)
         {
-            alerts |= PlayerAlertFlags.SupplyCritical;
+            alerts |= PlayerAlertState.SupplyCritical;
         }
 
         if (!entities.IsAlive(commandCore))
         {
-            alerts |= PlayerAlertFlags.CommandCoreDestroyed;
+            alerts |= PlayerAlertState.CommandCoreDestroyed;
         }
         else if (entities.TryGetComponent(
                      commandCore,
                      out HealthState commandCoreHealth) &&
                  commandCoreHealth.Fraction < 0.75)
         {
-            alerts |= PlayerAlertFlags.CommandCoreDamaged;
+            alerts |= PlayerAlertState.CommandCoreDamaged;
         }
 
         FactionId faction =
