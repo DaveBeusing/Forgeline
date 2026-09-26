@@ -87,9 +87,8 @@ public sealed class MoveEntitiesCommand : ISimulationCommand
                     out ControllableEntity controllable) ||
                 !controllable.IsControllable ||
                 controllable.Owner != Issuer ||
-                !IsMovementCapable(
-                    context,
-                    entity))
+                controllable.Category ==
+                    ControllableEntityCategory.Building)
             {
                 rejected++;
                 continue;
