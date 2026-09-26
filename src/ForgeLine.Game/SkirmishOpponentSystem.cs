@@ -1082,9 +1082,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     {
         objective = Vector3.Zero;
 
+        bool economyCanSupportExpansion =
+            economy.HealthScore >=
+                configuration.ExpansionReadinessThreshold ||
+            economy.RawResourceConstrained;
+
         if (!IsBootstrapComplete(owned) ||
-            economy.HealthScore <
-            configuration.ExpansionReadinessThreshold ||
+            !economyCanSupportExpansion ||
             force.TotalUnits < 4 ||
             HasPendingBuilding(
                 owned,
