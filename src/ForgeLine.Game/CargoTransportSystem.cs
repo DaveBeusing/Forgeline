@@ -1540,9 +1540,35 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return true;
         }
 
-        if (entities.HasComponent<MovementOrder>(entity) ||
+        bool navigationActive =
+            entities.HasComponent<MovementOrder>(entity) ||
             entities.HasComponent<NavigationPendingPath>(entity) ||
-            entities.HasComponent<NavigationRouteState>(entity))
+            entities.HasComponent<NavigationRouteState>(entity);
+
+        if (!navigationActive &&
+            entities.TryGetComponent(
+                entity,
+                out CargoTransportMovementTarget approachTarget) &&
+            approachTarget.NodeId == node.Id)
+        {
+            Vector3 approachDelta =
+                approachTarget.WorldPosition -
+                transform.Position;
+            approachDelta.Y = 0.0f;
+
+            float approachTolerance =
+                movement.StopRadius +
+                1.5f;
+
+            if (approachDelta.LengthSquared() <=
+                approachTolerance *
+                approachTolerance)
+            {
+                return true;
+            }
+        }
+
+        if (navigationActive)
         {
             return false;
         }
