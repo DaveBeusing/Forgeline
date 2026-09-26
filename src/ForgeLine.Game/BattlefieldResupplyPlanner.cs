@@ -10,7 +10,22 @@ public static class BattlefieldResupplyPlanner
 {
     public static bool TryIssueNearestProviderOrder(
         SimulationContext context,
-        InventoryStore inventories,
+        EntityId recipient,
+        PlayerId owner,
+        SimulationTick submittedAtTick,
+        out EntityId providerEntity) =>
+        TryIssueNearestProviderOrder(
+            context,
+            inventories: null,
+            recipient,
+            owner,
+            submittedAtTick,
+            BattlefieldSupplyResource.None,
+            out providerEntity);
+
+    public static bool TryIssueNearestProviderOrder(
+        SimulationContext context,
+        InventoryStore? inventories,
         EntityId recipient,
         PlayerId owner,
         SimulationTick submittedAtTick,
@@ -18,10 +33,17 @@ public static class BattlefieldResupplyPlanner
         out EntityId providerEntity)
     {
         ArgumentNullException.ThrowIfNull(context);
-        ArgumentNullException.ThrowIfNull(inventories);
 
-        if (requiredResources == BattlefieldSupplyResource.None ||
-            (requiredResources & ~BattlefieldSupplyResource.All) != 0)
+        if (inventories is null)
+        {
+            if (requiredResources != BattlefieldSupplyResource.None)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(requiredResources));
+            }
+        }
+        else if (requiredResources == BattlefieldSupplyResource.None ||
+                 (requiredResources & ~BattlefieldSupplyResource.All) != 0)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(requiredResources));
@@ -53,11 +75,12 @@ public static class BattlefieldResupplyPlanner
                     out SupplyProvider provider) ||
                 !provider.Enabled ||
                 provider.Owner != owner ||
-                !inventories.Contains(provider.InventoryId) ||
-                !HasRequiredStock(
-                    inventories,
-                    provider.InventoryId,
-                    requiredResources) ||
+                (inventories is not null &&
+                 (!inventories.Contains(provider.InventoryId) ||
+                  !HasRequiredStock(
+                      inventories,
+                      provider.InventoryId,
+                      requiredResources))) ||
                 !context.Entities.TryGetComponent(
                     candidate,
                     out WorldTransform transform))
