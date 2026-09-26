@@ -101,6 +101,7 @@ public sealed class VerticalSliceScenario
         bool enableDiagnostics = false)
     {
         ArgumentNullException.ThrowIfNull(settings);
+        settings.Validate();
 
         return CreateCore(
             seed,
