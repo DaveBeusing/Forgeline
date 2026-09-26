@@ -50,19 +50,19 @@ internal sealed class SkirmishScenarioHarness
         SkirmishOpponentConfiguration? eastConfiguration = null,
         SkirmishStartingStock? startingStock = null)
     {
-        SkirmishOpponentConfiguration validationWest =
-            westConfiguration ??
-            CreateTestConfiguration();
-        SkirmishOpponentConfiguration validationEast =
-            eastConfiguration ??
-            CreateTestConfiguration();
+        VerticalSliceScenarioSettings validation =
+            VerticalSliceScenarioSettings.Create(
+                VerticalSliceScenarioProfile.Validation);
 
         return new SkirmishScenarioHarness(
             VerticalSliceScenario.Create(
                 seed,
-                validationWest,
-                validationEast,
-                startingStock));
+                westConfiguration ??
+                    validation.WestOpponent,
+                eastConfiguration ??
+                    validation.EastOpponent,
+                startingStock ??
+                    validation.StartingStock));
     }
 
     public MatchState GetMatchState() =>
@@ -99,20 +99,4 @@ internal sealed class SkirmishScenarioHarness
             cancellationToken);
     }
 
-    private static SkirmishOpponentConfiguration CreateTestConfiguration() =>
-        new()
-        {
-            ReactionCadenceTicks = 10,
-            Aggression = 0.8,
-            ExpansionReadinessThreshold = 0.42,
-            OffensiveReadinessThreshold = 0.58,
-            RetreatThreshold = 0.22,
-            ResupplyThreshold = 0.22,
-            MinimumAttackUnits = 3,
-            MaximumAttackUnits = 8,
-            MaximumQueuedUnitsPerFacility = 2,
-            DefensiveRadiusMeters = 600.0f,
-            ObjectivePressureLeashMeters = 240.0f,
-            ArtilleryCadenceTicks = 60
-        };
 }
