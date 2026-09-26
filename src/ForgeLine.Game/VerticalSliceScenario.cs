@@ -102,11 +102,13 @@ public sealed class VerticalSliceScenario
     {
         ArgumentNullException.ThrowIfNull(settings);
 
-        return Create(
+        return CreateCore(
             seed,
             settings.WestOpponent,
             settings.EastOpponent,
             settings.StartingStock,
+            settings.NavigationCellSizeMeters,
+            settings.NavigationSectorSizeCells,
             enableDiagnostics);
     }
 
@@ -116,6 +118,32 @@ public sealed class VerticalSliceScenario
         SkirmishOpponentConfiguration? eastConfiguration = null,
         SkirmishStartingStock? startingStock = null,
         bool enableDiagnostics = false)
+    {
+        VerticalSliceScenarioSettings gameplay =
+            VerticalSliceScenarioSettings.Create(
+                VerticalSliceScenarioProfile.Gameplay);
+
+        return CreateCore(
+            seed,
+            westConfiguration ??
+                gameplay.WestOpponent,
+            eastConfiguration ??
+                gameplay.EastOpponent,
+            startingStock ??
+                gameplay.StartingStock,
+            gameplay.NavigationCellSizeMeters,
+            gameplay.NavigationSectorSizeCells,
+            enableDiagnostics);
+    }
+
+    private static VerticalSliceScenario CreateCore(
+        ulong seed,
+        SkirmishOpponentConfiguration westConfiguration,
+        SkirmishOpponentConfiguration eastConfiguration,
+        SkirmishStartingStock startingStock,
+        float navigationCellSizeMeters,
+        int navigationSectorSizeCells,
+        bool enableDiagnostics)
     {
         PrototypeBattlefieldDefinition battlefield =
             PrototypeBattlefieldDefinition.Create();
@@ -322,13 +350,13 @@ public sealed class VerticalSliceScenario
         var gridSettings =
             new NavigationGridSettings
             {
-                CellSizeMeters = 32.0f,
+                CellSizeMeters = navigationCellSizeMeters,
                 StaticObstacleClearanceMeters = 0.5f
             };
         var sectorSettings =
             new NavigationSectorSettings
             {
-                SectorSizeCells = 4
+                SectorSizeCells = navigationSectorSizeCells
             };
         NavigationWorld navigationWorld =
             NavigationWorld.Build(
@@ -419,11 +447,9 @@ public sealed class VerticalSliceScenario
             new Dictionary<PlayerId, SkirmishOpponentConfiguration>
             {
                 [west.Player] =
-                    westConfiguration ??
-                    new SkirmishOpponentConfiguration(),
+                    westConfiguration,
                 [east.Player] =
-                    eastConfiguration ??
-                    new SkirmishOpponentConfiguration()
+                    eastConfiguration
             };
         var opponents =
             new SkirmishOpponentSystem(
