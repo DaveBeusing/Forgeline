@@ -89,6 +89,7 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
             }
 
             bool needsAmmunition =
+                !context.Entities.HasComponent<CargoTransport>(entity) &&
                 NeedsAmmunition(
                     context.Entities,
                     entity,
@@ -111,11 +112,28 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
 
             lowSupply++;
 
+            BattlefieldSupplyResource requiredResources =
+                BattlefieldSupplyResource.None;
+
+            if (needsFuel)
+            {
+                requiredResources |=
+                    BattlefieldSupplyResource.Fuel;
+            }
+
+            if (needsAmmunition)
+            {
+                requiredResources |=
+                    BattlefieldSupplyResource.Ammunition;
+            }
+
             if (BattlefieldResupplyPlanner.TryIssueNearestProviderOrder(
                     context,
+                    _inventories,
                     entity,
                     controllable.Owner,
                     context.Tick,
+                    requiredResources,
                     out _))
             {
                 issued++;

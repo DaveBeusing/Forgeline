@@ -535,8 +535,18 @@ public sealed class BattlefieldSupplySystemTests
                 unit,
                 out MovementOrder movementOrder));
         Assert.Equal(
-            depotPosition,
-            movementOrder.WorldTarget);
+            15.0f,
+            Vector3.Distance(
+                movementOrder.WorldTarget,
+                depotPosition),
+            precision: 3);
+        Assert.True(
+            Vector3.Distance(
+                movementOrder.WorldTarget,
+                Vector3.Zero) <
+            Vector3.Distance(
+                depotPosition,
+                Vector3.Zero));
     }
 
     private static EntityId CreateSuppliedUnit(

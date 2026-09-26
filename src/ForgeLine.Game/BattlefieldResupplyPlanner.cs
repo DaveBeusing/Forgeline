@@ -1,5 +1,6 @@
 using System.Numerics;
 using ForgeLine.Core;
+using ForgeLine.Economy;
 using ForgeLine.Ecs;
 using ForgeLine.Simulation;
 
@@ -12,9 +13,41 @@ public static class BattlefieldResupplyPlanner
         EntityId recipient,
         PlayerId owner,
         SimulationTick submittedAtTick,
+        out EntityId providerEntity) =>
+        TryIssueNearestProviderOrder(
+            context,
+            inventories: null,
+            recipient,
+            owner,
+            submittedAtTick,
+            BattlefieldSupplyResource.None,
+            out providerEntity);
+
+    public static bool TryIssueNearestProviderOrder(
+        SimulationContext context,
+        InventoryStore? inventories,
+        EntityId recipient,
+        PlayerId owner,
+        SimulationTick submittedAtTick,
+        BattlefieldSupplyResource requiredResources,
         out EntityId providerEntity)
     {
         ArgumentNullException.ThrowIfNull(context);
+
+        if (inventories is null)
+        {
+            if (requiredResources != BattlefieldSupplyResource.None)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(requiredResources));
+            }
+        }
+        else if (requiredResources == BattlefieldSupplyResource.None ||
+                 (requiredResources & ~BattlefieldSupplyResource.All) != 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(requiredResources));
+        }
 
         providerEntity = EntityId.Invalid;
 
@@ -28,6 +61,7 @@ public static class BattlefieldResupplyPlanner
         }
 
         WorldTransform providerTransform = default;
+        SupplyProvider selectedProvider = default;
         float bestDistanceSquared =
             float.PositiveInfinity;
 
@@ -41,6 +75,12 @@ public static class BattlefieldResupplyPlanner
                     out SupplyProvider provider) ||
                 !provider.Enabled ||
                 provider.Owner != owner ||
+                (inventories is not null &&
+                 (!inventories.Contains(provider.InventoryId) ||
+                  !HasRequiredStock(
+                      inventories,
+                      provider.InventoryId,
+                      requiredResources))) ||
                 !context.Entities.TryGetComponent(
                     candidate,
                     out WorldTransform transform))
@@ -70,6 +110,8 @@ public static class BattlefieldResupplyPlanner
                     candidate;
                 providerTransform =
                     transform;
+                selectedProvider =
+                    provider;
                 bestDistanceSquared =
                     distanceSquared;
             }
@@ -84,11 +126,18 @@ public static class BattlefieldResupplyPlanner
             context,
             recipient);
 
+        BattlefieldSupplyResource requestedResources =
+            requiredResources == BattlefieldSupplyResource.None
+                ? BattlefieldSupplyResource.All
+                : requiredResources;
         var resupplyOrder =
             new ResupplyOrder(
                 providerEntity,
                 submittedAtTick,
-                context.Tick);
+                context.Tick)
+            {
+                RequestedResources = requestedResources
+            };
 
         if (context.Entities.HasComponent<ResupplyOrder>(
                 recipient))
@@ -104,10 +153,16 @@ public static class BattlefieldResupplyPlanner
                 resupplyOrder);
         }
 
+        Vector3 approachPosition =
+            ResolveProviderApproachPosition(
+                recipientTransform.Position,
+                providerTransform.Position,
+                selectedProvider.ResupplyRangeMeters);
+
         var movementOrder =
             new MovementOrder(
                 owner,
-                providerTransform.Position,
+                approachPosition,
                 submittedAtTick,
                 context.Tick);
 
@@ -126,6 +181,66 @@ public static class BattlefieldResupplyPlanner
         }
 
         return true;
+    }
+
+    private static bool HasRequiredStock(
+        InventoryStore inventories,
+        InventoryId inventory,
+        BattlefieldSupplyResource requiredResources)
+    {
+        const double QuantityEpsilon = 0.000000001;
+
+        if (requiredResources.HasFlag(
+                BattlefieldSupplyResource.Fuel) &&
+            inventories.GetAvailableQuantity(
+                inventory,
+                ResourceIds.Fuel) <= QuantityEpsilon)
+        {
+            return false;
+        }
+
+        if (requiredResources.HasFlag(
+                BattlefieldSupplyResource.Ammunition) &&
+            inventories.GetAvailableQuantity(
+                inventory,
+                ResourceIds.Ammunition) <= QuantityEpsilon)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static Vector3 ResolveProviderApproachPosition(
+        Vector3 recipientPosition,
+        Vector3 providerPosition,
+        float resupplyRangeMeters)
+    {
+        Vector3 offset =
+            recipientPosition -
+            providerPosition;
+        offset.Y = 0.0f;
+
+        float distance =
+            offset.Length();
+        float approachRadius =
+            MathF.Max(
+                1.0f,
+                resupplyRangeMeters * 0.75f);
+
+        if (distance <=
+            resupplyRangeMeters)
+        {
+            return recipientPosition;
+        }
+
+        Vector3 direction =
+            distance > 0.0001f
+                ? offset / distance
+                : Vector3.UnitZ;
+
+        return providerPosition +
+            direction * approachRadius;
     }
 
     private static void ClearFormationMovement(

@@ -514,6 +514,11 @@ public sealed class AutomatedDistributionSystem
     {
         IReadOnlyList<LogisticsNode> nodes = _network.GetNodes();
         DispatchSelection best = default;
+        bool destinationHasOwner =
+            TryResolveOwner(
+                entities,
+                destination.Entity,
+                out PlayerId destinationOwner);
         bool hadSurplus = false;
         bool hadStructuralRoute = false;
         bool hadAvailableTruck = false;
@@ -531,6 +536,16 @@ public sealed class AutomatedDistributionSystem
                     entities,
                     node,
                     out InventoryId sourceInventory))
+            {
+                continue;
+            }
+
+            if (destinationHasOwner &&
+                (!TryResolveOwner(
+                     entities,
+                     node.Entity,
+                     out PlayerId sourceOwner) ||
+                 sourceOwner != destinationOwner))
             {
                 continue;
             }
@@ -572,6 +587,7 @@ public sealed class AutomatedDistributionSystem
                     entities,
                     destination,
                     node,
+                    structuralRoute.Route,
                     out EntityId truckEntity,
                     out CargoTransport truck))
             {
@@ -587,6 +603,10 @@ public sealed class AutomatedDistributionSystem
                     Math.Min(
                         truck.Capacity,
                         destinationCapacity)));
+            quantity = Math.Min(
+                quantity,
+                GetRouteWindowCapacity(
+                    structuralRoute.Route));
 
             if (quantity <= QuantityEpsilon)
             {
@@ -643,10 +663,60 @@ public sealed class AutomatedDistributionSystem
         return DispatchSelection.Failed(failureReason);
     }
 
+    private double GetRouteWindowCapacity(
+        LogisticsRoute route)
+    {
+        double capacity =
+            double.PositiveInfinity;
+
+        if (!_network.TryGetNode(
+                route.Source,
+                out LogisticsNode source))
+        {
+            return 0.0;
+        }
+
+        capacity = Math.Min(
+            capacity,
+            source.ThroughputCapacityPerSecond *
+            _capacityTracker.WindowSeconds);
+
+        for (int index = 0;
+             index < route.Segments.Count;
+             index++)
+        {
+            LogisticsRouteSegment segment =
+                route.Segments[index];
+
+            capacity = Math.Min(
+                capacity,
+                segment.CapacityPerSecond *
+                _capacityTracker.WindowSeconds);
+
+            if (!_network.TryGetNode(
+                    segment.To,
+                    out LogisticsNode node))
+            {
+                return 0.0;
+            }
+
+            capacity = Math.Min(
+                capacity,
+                node.ThroughputCapacityPerSecond *
+                _capacityTracker.WindowSeconds);
+        }
+
+        return double.IsFinite(capacity) &&
+               capacity > QuantityEpsilon
+            ? capacity
+            : 0.0;
+    }
+
     private bool TrySelectAvailableTruck(
         EntityRegistry entities,
         in LogisticsNode destination,
         in LogisticsNode source,
+        LogisticsRoute route,
         out EntityId selectedEntity,
         out CargoTransport selectedTransport)
     {
@@ -681,6 +751,7 @@ public sealed class AutomatedDistributionSystem
 
             if (entities.HasComponent<CargoTransportOrder>(entity) ||
                 entities.HasComponent<CargoTransportReservation>(entity) ||
+                entities.HasComponent<ResupplyOrder>(entity) ||
                 !entities.TryGetComponent(
                     entity,
                     out CargoTransportRuntimeState state) ||
@@ -693,14 +764,26 @@ public sealed class AutomatedDistributionSystem
             }
 
             double distanceSquared = 0.0;
+            Vector3 truckPosition = source.WorldPosition;
             if (entities.TryGetComponent(
                     entity,
                     out WorldTransform transform))
             {
+                truckPosition = transform.Position;
                 distanceSquared =
                     Vector3.DistanceSquared(
-                        transform.Position,
+                        truckPosition,
                         source.WorldPosition);
+            }
+
+            if (!HasSufficientFuelForTransport(
+                    entities,
+                    entity,
+                    truckPosition,
+                    source,
+                    route))
+            {
+                continue;
             }
 
             if (!selectedEntity.IsValid ||
@@ -713,6 +796,46 @@ public sealed class AutomatedDistributionSystem
         }
 
         return selectedEntity.IsValid;
+    }
+
+    private bool HasSufficientFuelForTransport(
+        EntityRegistry entities,
+        EntityId entity,
+        Vector3 truckPosition,
+        in LogisticsNode source,
+        LogisticsRoute route)
+    {
+        if (!entities.TryGetComponent(
+                entity,
+                out UnitFuelState fuel) ||
+            fuel.ConsumptionPerMeter <= QuantityEpsilon)
+        {
+            return true;
+        }
+
+        if (!_inventories.Contains(fuel.InventoryId))
+        {
+            return false;
+        }
+
+        double deadheadDistance =
+            Vector3.Distance(
+                truckPosition,
+                source.WorldPosition);
+        double requiredFuel =
+            checked(
+                (deadheadDistance +
+                 route.TotalDistanceMeters) *
+                fuel.ConsumptionPerMeter);
+        double reserveFuel =
+            fuel.Capacity * 0.2;
+        double availableFuel =
+            _inventories.GetQuantity(
+                fuel.InventoryId,
+                ResourceIds.Fuel);
+
+        return availableFuel + QuantityEpsilon >=
+            requiredFuel + reserveFuel;
     }
 
     private double GetRetainedSourceTarget(
@@ -1241,6 +1364,15 @@ public sealed class AutomatedDistributionSystem
             _inventories.Contains(production.InputInventory))
         {
             inventoryId = production.InputInventory;
+            return true;
+        }
+
+        if (entities.TryGetComponent(
+                node.Entity,
+                out UnitProductionFacility unitProduction) &&
+            _inventories.Contains(unitProduction.InputInventory))
+        {
+            inventoryId = unitProduction.InputInventory;
             return true;
         }
 

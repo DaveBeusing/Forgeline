@@ -69,6 +69,142 @@ public sealed class AutomatedDistributionSystemTests
     }
 
     [Fact]
+    public void ShipmentQuantityRespectsRouteThroughputWindow()
+    {
+        DistributionFixture fixture =
+            CreateFixture(sourceQuantity: 100.0);
+
+        fixture.Connect(
+            fixture.SourceNode,
+            fixture.DestinationNode,
+            capacityPerSecond: 40.0);
+        fixture.AddPolicy(
+            fixture.DestinationEntity,
+            minimum: 20.0,
+            target: 80.0,
+            maximum: 100.0,
+            LogisticsStockPriority.Normal);
+        _ = fixture.CreateTruck(
+            fixture.SourcePosition);
+
+        RunUntil(
+            fixture,
+            () =>
+                fixture.Inventories.GetQuantity(
+                    fixture.DestinationInventory,
+                    ResourceIds.FerrousOre) >= 80.0 &&
+                fixture.Distribution.Metrics.CompletedRequestCount >= 1,
+            maximumTicks: 1_200);
+
+        Assert.Equal(
+            80.0,
+            fixture.Inventories.GetQuantity(
+                fixture.DestinationInventory,
+                ResourceIds.FerrousOre));
+        Assert.Equal(
+            20.0,
+            fixture.Inventories.GetQuantity(
+                fixture.SourceInventory,
+                ResourceIds.FerrousOre));
+        Assert.Equal(
+            1L,
+            fixture.Distribution.Metrics.CompletedRequestCount);
+    }
+
+    [Fact]
+    public void ResupplyingTruckIsNotDispatchedForCargo()
+    {
+        DistributionFixture fixture =
+            CreateFixture(sourceQuantity: 100.0);
+
+        fixture.Connect(
+            fixture.SourceNode,
+            fixture.DestinationNode);
+        fixture.AddPolicy(
+            fixture.DestinationEntity,
+            minimum: 20.0,
+            target: 60.0,
+            maximum: 100.0,
+            LogisticsStockPriority.Normal);
+        EntityId truck =
+            fixture.CreateTruck(fixture.SourcePosition);
+
+        fixture.Simulation.Entities.AddComponent(
+            truck,
+            new ResupplyOrder(
+                fixture.DestinationEntity,
+                SimulationTick.Zero,
+                SimulationTick.Zero));
+
+        fixture.Simulation.AdvanceOneTick();
+
+        LogisticsTransportRequestReadModel request =
+            Assert.Single(
+                fixture.Distribution.LastDebugSnapshot.Requests);
+
+        Assert.Equal(
+            LogisticsTransportRequestState.RetryPending,
+            request.State);
+        Assert.Equal(
+            LogisticsTransportRequestFailureReason.NoTruckAvailable,
+            request.FailureReason);
+        Assert.False(
+            fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(
+                truck));
+    }
+
+    [Fact]
+    public void DoesNotSourceCargoFromAnotherFaction()
+    {
+        DistributionFixture fixture =
+            CreateFixture(sourceQuantity: 0.0);
+
+        EntityId foreignSource =
+            fixture.CreateStorageNode(
+                new Vector3(28.0f, 0.0f, 4.0f),
+                new FactionId(2),
+                out InventoryId foreignInventory,
+                out LogisticsNodeId foreignNode);
+        _ = foreignSource;
+
+        Assert.True(
+            fixture.Inventories.Add(
+                foreignInventory,
+                ResourceIds.FerrousOre,
+                100.0).Succeeded);
+
+        fixture.Connect(
+            foreignNode,
+            fixture.DestinationNode);
+        fixture.AddPolicy(
+            fixture.DestinationEntity,
+            minimum: 20.0,
+            target: 60.0,
+            maximum: 100.0,
+            LogisticsStockPriority.Normal);
+        _ = fixture.CreateTruck(
+            fixture.SourcePosition);
+
+        fixture.Simulation.RunTicks(
+            200,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(
+            0.0,
+            fixture.Inventories.GetQuantity(
+                fixture.DestinationInventory,
+                ResourceIds.FerrousOre));
+        Assert.Equal(
+            100.0,
+            fixture.Inventories.GetQuantity(
+                foreignInventory,
+                ResourceIds.FerrousOre));
+        Assert.Equal(
+            0L,
+            fixture.Distribution.Metrics.CompletedRequestCount);
+    }
+
+    [Fact]
     public void TargetLargerThanTruckCapacityUsesMultiplePhysicalShipments()
     {
         DistributionFixture fixture =
@@ -687,7 +823,8 @@ public sealed class AutomatedDistributionSystemTests
         InventoryStore inventories,
         Vector3 position,
         double capacity,
-        out InventoryId inventoryId)
+        out InventoryId inventoryId,
+        FactionId owner = default)
     {
         inventoryId =
             inventories.CreateInventory(
@@ -708,7 +845,9 @@ public sealed class AutomatedDistributionSystemTests
             entity,
             new StorageDepot(
                 inventoryId,
-                LocalFaction));
+                owner.IsSpecified
+                    ? owner
+                    : LocalFaction));
         return entity;
     }
 
@@ -845,7 +984,8 @@ public sealed class AutomatedDistributionSystemTests
 
         public void Connect(
             LogisticsNodeId source,
-            LogisticsNodeId destination)
+            LogisticsNodeId destination,
+            double capacityPerSecond = 100.0)
         {
             Assert.True(
                 Network.TryGetNode(
@@ -867,11 +1007,22 @@ public sealed class AutomatedDistributionSystemTests
                 LogisticsTransportMode.GroundRoad,
                 distanceMeters: distance,
                 baseCost: distance,
-                capacityPerSecond: 100.0);
+                capacityPerSecond: capacityPerSecond);
         }
 
         public EntityId CreateStorageNode(
             Vector3 position,
+            out InventoryId inventoryId,
+            out LogisticsNodeId nodeId) =>
+            CreateStorageNode(
+                position,
+                LocalFaction,
+                out inventoryId,
+                out nodeId);
+
+        public EntityId CreateStorageNode(
+            Vector3 position,
+            FactionId owner,
             out InventoryId inventoryId,
             out LogisticsNodeId nodeId)
         {
@@ -881,7 +1032,8 @@ public sealed class AutomatedDistributionSystemTests
                     Inventories,
                     position,
                     1_000.0,
-                    out inventoryId);
+                    out inventoryId,
+                    owner);
 
             nodeId =
                 Network.AddNode(

@@ -298,4 +298,8 @@ public readonly record struct SupplyTruck
 public readonly record struct ResupplyOrder(
     EntityId Provider,
     SimulationTick SubmittedAtTick,
-    SimulationTick AcceptedAtTick);
+    SimulationTick AcceptedAtTick)
+{
+    public BattlefieldSupplyResource RequestedResources { get; init; } =
+        BattlefieldSupplyResource.All;
+}

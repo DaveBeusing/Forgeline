@@ -10,6 +10,7 @@ namespace ForgeLine.Game;
 public sealed class CargoTransportSystem : ISimulationSystem
 {
     private const double QuantityEpsilon = 0.000000001;
+    private const float LogicalTransitNodeApproachRadiusMeters = 72.0f;
 
     private readonly LogisticsNetwork _network;
     private readonly InventoryStore _inventories;
@@ -223,6 +224,14 @@ public sealed class CargoTransportSystem : ISimulationSystem
                     state);
             }
 
+            return;
+        }
+
+        // Battlefield resupply temporarily owns locomotion. Keep the cargo
+        // order and runtime state intact so the same delivery resumes once
+        // the resupply order is completed.
+        if (context.Entities.HasComponent<ResupplyOrder>(entity))
+        {
             return;
         }
 
@@ -1311,10 +1320,30 @@ public sealed class CargoTransportSystem : ISimulationSystem
         in CargoTransport transport,
         in LogisticsNode node)
     {
+        if (!context.Entities.TryGetComponent(
+                entity,
+                out WorldTransform transportTransform) ||
+            !context.Entities.TryGetComponent(
+                entity,
+                out GroundMovement groundMovement))
+        {
+            return;
+        }
+
+        Vector3 movementPosition =
+            ResolveNodeApproachPosition(
+                context.Entities,
+                node,
+                transportTransform.Position,
+                groundMovement);
+
         if (context.Entities.TryGetComponent(
                 entity,
                 out CargoTransportMovementTarget target) &&
-            target.NodeId == node.Id)
+            target.NodeId == node.Id &&
+            Vector3.DistanceSquared(
+                target.WorldPosition,
+                movementPosition) <= 1.0f)
         {
             bool navigationActive =
                 context.Entities.HasComponent<
@@ -1332,7 +1361,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
 
         var movementOrder = new MovementOrder(
             transport.Owner,
-            node.WorldPosition,
+            movementPosition,
             context.Tick,
             context.Tick);
 
@@ -1353,7 +1382,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
         var movementTarget =
             new CargoTransportMovementTarget(
                 node.Id,
-                node.WorldPosition,
+                movementPosition,
                 context.Tick);
 
         if (context.Entities.HasComponent<
@@ -1371,6 +1400,120 @@ public sealed class CargoTransportSystem : ISimulationSystem
         }
     }
 
+    private static Vector3 ResolveNodeApproachPosition(
+        EntityRegistry entities,
+        in LogisticsNode node,
+        Vector3 origin,
+        in GroundMovement movement)
+    {
+        if (!TryGetStaticNodeBounds(
+                entities,
+                node,
+                out ForgeLine.World.AxisAlignedBounds bounds))
+        {
+            return node.WorldPosition;
+        }
+
+        const float NavigationCellClearanceMeters = 32.0f;
+
+        float clearance =
+            movement.ObstacleLookAhead +
+            movement.Radius +
+            NavigationCellClearanceMeters;
+        float minimumX =
+            bounds.Minimum.X -
+            clearance;
+        float maximumX =
+            bounds.Maximum.X +
+            clearance;
+        float minimumZ =
+            bounds.Minimum.Z -
+            clearance;
+        float maximumZ =
+            bounds.Maximum.Z +
+            clearance;
+        Vector3 center =
+            (bounds.Minimum +
+             bounds.Maximum) *
+            0.5f;
+        float deltaX =
+            origin.X -
+            center.X;
+        float deltaZ =
+            origin.Z -
+            center.Z;
+
+        if (MathF.Abs(deltaX) >=
+            MathF.Abs(deltaZ))
+        {
+            return new Vector3(
+                deltaX >= 0.0f
+                    ? maximumX
+                    : minimumX,
+                node.WorldPosition.Y,
+                Math.Clamp(
+                    origin.Z,
+                    minimumZ,
+                    maximumZ));
+        }
+
+        return new Vector3(
+            Math.Clamp(
+                origin.X,
+                minimumX,
+                maximumX),
+            node.WorldPosition.Y,
+            deltaZ >= 0.0f
+                ? maximumZ
+                : minimumZ);
+    }
+
+    private static bool TryGetStaticNodeBounds(
+        EntityRegistry entities,
+        in LogisticsNode node,
+        out ForgeLine.World.AxisAlignedBounds bounds)
+    {
+        if (!entities.IsAlive(
+                node.Entity))
+        {
+            bounds = default;
+            return false;
+        }
+
+        if (entities.TryGetComponent(
+                node.Entity,
+                out ResourceExtractor extractor) &&
+            entities.IsAlive(
+                extractor.Deposit) &&
+            entities.TryGetComponent(
+                extractor.Deposit,
+                out ResourceDeposit deposit))
+        {
+            bounds =
+                deposit.Bounds;
+            return true;
+        }
+
+        if (!entities.TryGetComponent(
+                node.Entity,
+                out WorldTransform transform) ||
+            !entities.TryGetComponent(
+                node.Entity,
+                out SpatialPresence presence) ||
+            presence.Metadata.Mobility !=
+                ForgeLine.World.SpatialMobility.Static)
+        {
+            bounds = default;
+            return false;
+        }
+
+        bounds =
+            presence.CreateEntry(
+                node.Entity,
+                transform).Bounds;
+        return true;
+    }
+
     private static bool IsSettledAtNode(
         EntityRegistry entities,
         EntityId entity,
@@ -1386,9 +1529,48 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return false;
         }
 
-        if (entities.HasComponent<MovementOrder>(entity) ||
+        if (IsWithinStaticNodeApproachRange(
+                entities,
+                node,
+                transform.Position,
+                movement) ||
+            IsWithinLogicalTransitNodeApproachRange(
+                entities,
+                node,
+                transform.Position))
+        {
+            return true;
+        }
+
+        bool navigationActive =
+            entities.HasComponent<MovementOrder>(entity) ||
             entities.HasComponent<NavigationPendingPath>(entity) ||
-            entities.HasComponent<NavigationRouteState>(entity))
+            entities.HasComponent<NavigationRouteState>(entity);
+
+        if (!navigationActive &&
+            entities.TryGetComponent(
+                entity,
+                out CargoTransportMovementTarget approachTarget) &&
+            approachTarget.NodeId == node.Id)
+        {
+            Vector3 approachDelta =
+                approachTarget.WorldPosition -
+                transform.Position;
+            approachDelta.Y = 0.0f;
+
+            float approachTolerance =
+                movement.StopRadius +
+                1.5f;
+
+            if (approachDelta.LengthSquared() <=
+                approachTolerance *
+                approachTolerance)
+            {
+                return true;
+            }
+        }
+
+        if (navigationActive)
         {
             return false;
         }
@@ -1400,6 +1582,108 @@ public sealed class CargoTransportSystem : ISimulationSystem
         float tolerance =
             movement.StopRadius + 0.25f;
         return delta.LengthSquared() <=
+            tolerance * tolerance;
+    }
+
+    private static bool IsWithinLogicalTransitNodeApproachRange(
+        EntityRegistry entities,
+        in LogisticsNode node,
+        Vector3 position)
+    {
+        if (!entities.IsAlive(node.Entity) ||
+            entities.HasComponent<CompletedBuilding>(node.Entity) ||
+            entities.HasComponent<ResourceExtractor>(node.Entity) ||
+            entities.HasComponent<InventoryStorage>(node.Entity) ||
+            entities.HasComponent<ProductionFacility>(node.Entity) ||
+            entities.HasComponent<UnitProductionFacility>(node.Entity) ||
+            entities.HasComponent<LogisticsHub>(node.Entity) ||
+            entities.HasComponent<SupplyDepot>(node.Entity))
+        {
+            return false;
+        }
+
+        Vector3 delta =
+            node.WorldPosition -
+            position;
+        delta.Y = 0.0f;
+
+        return delta.LengthSquared() <=
+            LogicalTransitNodeApproachRadiusMeters *
+            LogicalTransitNodeApproachRadiusMeters;
+    }
+
+    private static bool IsWithinStaticNodeApproachRange(
+        EntityRegistry entities,
+        in LogisticsNode node,
+        Vector3 position,
+        in GroundMovement movement)
+    {
+        float tolerance =
+            movement.ObstacleLookAhead +
+            movement.Radius +
+            0.25f;
+
+        if (entities.IsAlive(node.Entity) &&
+            entities.TryGetComponent(
+                node.Entity,
+                out ResourceExtractor extractor) &&
+            entities.IsAlive(extractor.Deposit) &&
+            entities.TryGetComponent(
+                extractor.Deposit,
+                out ResourceDeposit deposit) &&
+            IsWithinBoundsApproachRange(
+                deposit.Bounds,
+                position,
+                tolerance))
+        {
+            return true;
+        }
+
+        if (!entities.IsAlive(node.Entity) ||
+            !entities.TryGetComponent(
+                node.Entity,
+                out WorldTransform nodeTransform) ||
+            !entities.TryGetComponent(
+                node.Entity,
+                out SpatialPresence presence) ||
+            presence.Metadata.Mobility !=
+            ForgeLine.World.SpatialMobility.Static)
+        {
+            return false;
+        }
+
+        var bounds =
+            presence.CreateEntry(
+                node.Entity,
+                nodeTransform).Bounds;
+
+        return IsWithinBoundsApproachRange(
+            bounds,
+            position,
+            tolerance);
+    }
+
+    private static bool IsWithinBoundsApproachRange(
+        in ForgeLine.World.AxisAlignedBounds bounds,
+        Vector3 position,
+        float tolerance)
+    {
+        float deltaX =
+            position.X < bounds.Minimum.X
+                ? bounds.Minimum.X - position.X
+                : position.X > bounds.Maximum.X
+                    ? position.X - bounds.Maximum.X
+                    : 0.0f;
+        float deltaZ =
+            position.Z < bounds.Minimum.Z
+                ? bounds.Minimum.Z - position.Z
+                : position.Z > bounds.Maximum.Z
+                    ? position.Z - bounds.Maximum.Z
+                    : 0.0f;
+
+        return
+            deltaX * deltaX +
+            deltaZ * deltaZ <=
             tolerance * tolerance;
     }
 
