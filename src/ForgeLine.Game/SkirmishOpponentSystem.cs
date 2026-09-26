@@ -2336,18 +2336,27 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         SkirmishOpponentController controller,
         double aggression)
     {
-        if (aggression >= 0.70)
-        {
-            return controller.EnemyObjectivePosition;
-        }
-
         BattlefieldSiteDefinition[] sites =
             GetOpponentFacingSites(
                 controller);
 
-        return sites.Length > 0
-            ? sites[0].Position
-            : controller.EnemyObjectivePosition;
+        if (sites.Length > 0)
+        {
+            int index =
+                aggression >= 0.70 ||
+                sites.Length == 1
+                    ? 0
+                    : Math.Min(
+                        1,
+                        sites.Length - 1);
+
+            return sites[index].Position;
+        }
+
+        return new Vector3(
+            _battlefield.Metadata.WidthMeters * 0.5f,
+            controller.HomePosition.Y,
+            _battlefield.Metadata.HeightMeters * 0.5f);
     }
 
     private static IntelligenceContact? FindClosestCurrentContact(
