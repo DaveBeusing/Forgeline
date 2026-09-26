@@ -2515,6 +2515,12 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         SkirmishOpponentController controller,
         double aggression)
     {
+        if (aggression >= 0.70)
+        {
+            return SelectDeepOffensiveWaypoint(
+                controller);
+        }
+
         BattlefieldSiteDefinition[] sites =
             GetOpponentFacingSites(
                 controller);
@@ -2522,7 +2528,6 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         if (sites.Length > 0)
         {
             int index =
-                aggression >= 0.70 ||
                 sites.Length == 1
                     ? 0
                     : Math.Min(
@@ -2534,6 +2539,27 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         return new Vector3(
             _battlefield.Metadata.WidthMeters * 0.5f,
+            controller.HomePosition.Y,
+            _battlefield.Metadata.HeightMeters * 0.5f);
+    }
+
+    private Vector3 SelectDeepOffensiveWaypoint(
+        SkirmishOpponentController controller)
+    {
+        float center =
+            _battlefield.Metadata.WidthMeters *
+            0.5f;
+        bool homeWest =
+            controller.HomePosition.X <
+            center;
+        float stagingX =
+            _battlefield.Metadata.WidthMeters *
+            (homeWest
+                ? 0.80f
+                : 0.20f);
+
+        return new Vector3(
+            stagingX,
             controller.HomePosition.Y,
             _battlefield.Metadata.HeightMeters * 0.5f);
     }
