@@ -1092,9 +1092,36 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             force.TotalUnits < 4 ||
             HasPendingBuilding(
                 owned,
-                BuildingIds.LogisticsHub))
+                BuildingIds.LogisticsHub) ||
+            HasPendingBuilding(
+                owned,
+                BuildingIds.SupplyDepot))
         {
             return false;
+        }
+
+        Vector3? unsupportedRemoteHub =
+            SelectUnsupportedRemoteHub(
+                context,
+                owned,
+                controller.HomePosition,
+                minimumDistanceMeters: 500.0f,
+                supportRadiusMeters: 260.0f);
+
+        if (unsupportedRemoteHub.HasValue)
+        {
+            objective =
+                unsupportedRemoteHub.Value;
+
+            if (TryIssueBuilding(
+                    context,
+                    controller,
+                    owned,
+                    BuildingIds.SupplyDepot,
+                    unsupportedRemoteHub.Value))
+            {
+                return true;
+            }
         }
 
         int remoteHubs =
@@ -2230,6 +2257,51 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 placement = default;
                 return false;
             }
+
+            Vector2[] localOffsets =
+            [
+                new(60.0f, 0.0f),
+                new(-60.0f, 0.0f),
+                new(0.0f, 60.0f),
+                new(0.0f, -60.0f),
+                new(90.0f, 90.0f),
+                new(90.0f, -90.0f),
+                new(-90.0f, 90.0f),
+                new(-90.0f, -90.0f),
+                new(140.0f, 0.0f),
+                new(-140.0f, 0.0f),
+                new(0.0f, 140.0f),
+                new(0.0f, -140.0f)
+            ];
+
+            for (int index = 0;
+                 index < localOffsets.Length;
+                 index++)
+            {
+                Vector2 offset =
+                    localOffsets[index];
+                Vector3 candidate =
+                    requestedPosition.Value +
+                    new Vector3(
+                        offset.X,
+                        0.0f,
+                        offset.Y);
+
+                BuildingPlacementResult nearby =
+                    _placement.Evaluate(
+                        context.Entities,
+                        controller.Player,
+                        buildingId,
+                        candidate,
+                        BuildingOrientation.North);
+
+                if (nearby.IsValid)
+                {
+                    placement =
+                        nearby.GroundPosition;
+                    return true;
+                }
+            }
         }
 
         float direction =
@@ -2453,6 +2525,54 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
 
         return count;
+    }
+
+    private static Vector3? SelectUnsupportedRemoteHub(
+        SimulationContext context,
+        OwnedState owned,
+        Vector3 home,
+        float minimumDistanceMeters,
+        float supportRadiusMeters)
+    {
+        float minimumSquared =
+            minimumDistanceMeters *
+            minimumDistanceMeters;
+        float supportSquared =
+            supportRadiusMeters *
+            supportRadiusMeters;
+
+        return owned.Buildings
+            .Where(
+                entity =>
+                    context.Entities.TryGetComponent(
+                        entity,
+                        out CompletedBuilding completed) &&
+                    completed.BuildingId ==
+                        BuildingIds.LogisticsHub &&
+                    context.Entities.TryGetComponent(
+                        entity,
+                        out WorldTransform transform) &&
+                    HorizontalDistanceSquared(
+                        home,
+                        transform.Position) >=
+                        minimumSquared &&
+                    !owned.SupplyDepots.Any(
+                        depot =>
+                            HorizontalDistanceSquared(
+                                transform.Position,
+                                depot.Position) <=
+                            supportSquared))
+            .Select(
+                entity =>
+                    context.Entities.GetComponent<WorldTransform>(
+                        entity).Position)
+            .OrderBy(
+                position =>
+                    HorizontalDistanceSquared(
+                        home,
+                        position))
+            .Cast<Vector3?>()
+            .FirstOrDefault();
     }
 
     private BattlefieldSiteDefinition? SelectExpansionSite(
