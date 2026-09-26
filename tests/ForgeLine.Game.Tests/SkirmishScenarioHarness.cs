@@ -20,6 +20,8 @@ internal sealed class SkirmishScenarioHarness
         PrototypeBattlefieldRuntime battlefieldRuntime,
         InventoryStore inventories,
         LogisticsNetwork logistics,
+        CargoTransportSystem cargoTransport,
+        AutomatedDistributionSystem automatedDistribution,
         FactionIntelligenceStore intelligence,
         SkirmishOpponentSystem opponents,
         UnitFactory unitFactory,
@@ -32,6 +34,8 @@ internal sealed class SkirmishScenarioHarness
         BattlefieldRuntime = battlefieldRuntime;
         Inventories = inventories;
         Logistics = logistics;
+        CargoTransport = cargoTransport;
+        AutomatedDistribution = automatedDistribution;
         Intelligence = intelligence;
         Opponents = opponents;
         UnitFactory = unitFactory;
@@ -50,6 +54,10 @@ internal sealed class SkirmishScenarioHarness
     public InventoryStore Inventories { get; }
 
     public LogisticsNetwork Logistics { get; }
+
+    public CargoTransportSystem CargoTransport { get; }
+
+    public AutomatedDistributionSystem AutomatedDistribution { get; }
 
     public FactionIntelligenceStore Intelligence { get; }
 
@@ -465,6 +473,8 @@ internal sealed class SkirmishScenarioHarness
             battlefieldRuntime,
             inventories,
             logistics,
+            cargoTransport,
+            automatedDistribution,
             intelligence,
             opponents,
             unitFactory,
