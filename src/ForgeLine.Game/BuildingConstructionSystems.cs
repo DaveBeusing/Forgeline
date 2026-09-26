@@ -320,8 +320,6 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
 
 public sealed class BuildingConstructionSystem : ISimulationSystem
 {
-    private static readonly PowerNetworkId DefaultPowerNetwork = new(1);
-
     private readonly BuildingDefinitionCatalog _definitions;
     private readonly InventoryStore _inventories;
     private readonly SpatialGridIndex _spatialIndex;
@@ -521,7 +519,8 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
         {
             entities.AddComponent(
                 entity,
-                new PowerNetworkMembership(DefaultPowerNetwork));
+                new PowerNetworkMembership(
+                    ToPowerNetworkId(site.Owner)));
         }
 
         if (definition.Capabilities.HasFlag(BuildingCapability.PowerGeneration))
@@ -715,6 +714,17 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
                 desiredTarget,
                 desiredMaximum,
                 LogisticsStockPriority.High));
+    }
+
+    private static PowerNetworkId ToPowerNetworkId(PlayerId player)
+    {
+        EngineInvariant.Require(
+            player.Value <= uint.MaxValue,
+            DiagnosticCategory.Simulation,
+            "BUILDING_OWNER_POWER_NETWORK_RANGE",
+            $"Player {player} cannot be represented as a power network ID.");
+
+        return new PowerNetworkId((uint)player.Value);
     }
 
     private static FactionId ToFactionId(PlayerId player)
