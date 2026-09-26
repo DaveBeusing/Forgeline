@@ -235,6 +235,12 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
         SimulationContext context,
         EntityId entity)
     {
+        if (!context.Entities.HasComponent<ResupplyOrder>(
+                entity))
+        {
+            return;
+        }
+
         TacticalCommandUtilities.RemoveIfPresent<ResupplyOrder>(
             context,
             entity);
