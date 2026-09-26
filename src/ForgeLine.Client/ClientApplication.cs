@@ -21,6 +21,7 @@ internal sealed class ClientApplication
     private const float MaximumCameraDeltaSeconds = 0.1f;
     private const int MaximumDebugInstanceBoxes = 24;
     private const int MaximumDebugLabels = 4;
+    internal const int RestartRequestedExitCode = 10;
 
     private static readonly PlayerId LocalPlayer = new(1);
     private static readonly PlayerId OpposingPlayer = new(2);
@@ -52,6 +53,9 @@ internal sealed class ClientApplication
 
         PrototypeBattlefieldDefinition prototypeBattlefield =
             PrototypeBattlefieldDefinition.Create();
+        MatchConfiguration matchConfiguration =
+            MatchConfiguration.CreateVerticalSlice(
+                prototypeBattlefield);
         TerrainWorld terrainWorld =
             PrototypeBattlefieldTerrainFactory.Create(
                 prototypeBattlefield);
@@ -63,6 +67,7 @@ internal sealed class ClientApplication
         var snapshotBuffer = new PresentationSnapshotBuffer();
         using var jobScheduler = new JobScheduler();
         var simulation = new SimulationCoordinator(
+            seed: matchConfiguration.Seed,
             jobScheduler: jobScheduler,
             diagnosticsOptions: new SimulationDiagnosticsOptions { Enabled = true });
         var spatialIndex = new SpatialGridIndex(
@@ -202,41 +207,19 @@ internal sealed class ClientApplication
                 inventories,
                 unitFactory);
 
-        BattlefieldStartPosition westStart =
-            prototypeBattlefield.Starts.Single(
-                static start =>
-                    start.Player == LocalPlayer);
-        BattlefieldStartPosition eastStart =
-            prototypeBattlefield.Starts.Single(
-                static start =>
-                    start.Player == OpposingPlayer);
+        SkirmishMatchInitialization matchInitialization =
+            SkirmishMatchInitializer.Initialize(
+                simulation.Entities,
+                inventories,
+                unitFactory,
+                terrainWorld,
+                prototypeBattlefield,
+                prototypeRuntime,
+                matchConfiguration);
         SkirmishStartingBase westBase =
-            SkirmishStartingBaseFactory.Create(
-                simulation.Entities,
-                inventories,
-                unitFactory,
-                terrainWorld,
-                westStart);
+            matchInitialization.GetBase(LocalPlayer);
         SkirmishStartingBase eastBase =
-            SkirmishStartingBaseFactory.Create(
-                simulation.Entities,
-                inventories,
-                unitFactory,
-                terrainWorld,
-                eastStart);
-
-        simulation.Entities.DestroyEntity(
-            westBase.Controller);
-
-        _ = prototypeRuntime.AttachCommandCoreObjectives(
-            simulation.Entities,
-            new Dictionary<PlayerId, EntityId>
-            {
-                [westBase.Player] =
-                    westBase.CommandCore,
-                [eastBase.Player] =
-                    eastBase.CommandCore
-            });
+            matchInitialization.GetBase(OpposingPlayer);
 
         var skirmishOpponent =
             new SkirmishOpponentSystem(
@@ -468,6 +451,7 @@ internal sealed class ClientApplication
             new SelectionFilter(
                 LocalPlayer,
                 ControllableEntityCategory.Unit |
+                ControllableEntityCategory.Building |
                 ControllableEntityCategory.Logistics));
         var buildingPlacementController =
             new RtsBuildingPlacementController(LocalPlayer);
@@ -483,6 +467,8 @@ internal sealed class ClientApplication
         bool overlayToggleHeld = false;
         bool worldDebugToggleHeld = false;
         bool formationToggleHeld = false;
+        bool restartHeld = false;
+        bool returnHeld = false;
         FormationTemplate activeFormation =
             FormationTemplate.Compact;
         TimeSpan simulationAccumulator = TimeSpan.Zero;
@@ -572,6 +558,43 @@ internal sealed class ClientApplication
             skirmishOpponent.DebugCaptureEnabled =
                 worldDebugEnabled;
 
+            bool restartPressed =
+                ConsumeKeyPress(
+                    inputState,
+                    PlatformKey.R,
+                    ref restartHeld);
+            bool returnPressed =
+                ConsumeKeyPress(
+                    inputState,
+                    PlatformKey.Escape,
+                    ref returnHeld);
+            MatchState inputMatchState =
+                simulation.Entities.GetComponent<MatchState>(
+                    prototypeRuntime.MatchStateEntity);
+
+            if (inputMatchState.IsTerminal &&
+                restartPressed)
+            {
+                return RestartRequestedExitCode;
+            }
+
+            if (inputMatchState.IsTerminal &&
+                returnPressed)
+            {
+                var endMatch =
+                    new EndMatchCommand(
+                        LocalPlayer,
+                        prototypeRuntime.MatchStateEntity,
+                        simulation.CurrentTick);
+                simulation.SubmitCommand(
+                    endMatch,
+                    simulation.CurrentTick.Next(),
+                    new SimulationCommandSource(
+                        LocalPlayer.Value));
+                simulation.AdvanceOneTick();
+                return 0;
+            }
+
             if (smokeTest &&
                 _platform.Clock.GetElapsedTime(startedAt, now) >= SmokeTestDuration)
             {
@@ -603,6 +626,16 @@ internal sealed class ClientApplication
 
             while (simulationAccumulator >= simulation.Clock.TickDuration)
             {
+                MatchState matchState =
+                    simulation.Entities.GetComponent<MatchState>(
+                        prototypeRuntime.MatchStateEntity);
+
+                if (matchState.IsTerminal)
+                {
+                    simulationAccumulator = TimeSpan.Zero;
+                    break;
+                }
+
                 simulation.AdvanceOneTick();
                 simulationAccumulator -= simulation.Clock.TickDuration;
             }
@@ -612,7 +645,14 @@ internal sealed class ClientApplication
             float renderAlpha = RenderInterpolation.CalculateAlpha(
                 simulationAccumulator,
                 simulation.Clock.TickDuration);
+            MatchState currentMatchState =
+                simulation.Entities.GetComponent<MatchState>(
+                    prototypeRuntime.MatchStateEntity);
+            bool gameplayActive =
+                currentMatchState.Status == MatchStatus.Active;
 
+            if (gameplayActive)
+            {
             buildingPlacementController.Update(
                 inputState,
                 camera,
@@ -671,6 +711,7 @@ internal sealed class ClientApplication
                     targetTick,
                     new SimulationCommandSource(LocalPlayer.Value));
                 lastBuildCommand = command;
+            }
             }
 
             BuildingConstructionDebugSnapshot? constructionDebugSnapshot =
@@ -774,6 +815,23 @@ internal sealed class ClientApplication
                 instanceRenderer,
                 debugDrawRenderer,
                 renderWorld);
+            PlayerExperienceSnapshot playerExperience =
+                PlayerExperienceSnapshotFactory.Capture(
+                    simulation.Entities,
+                    LocalPlayer,
+                    westBase.CommandCore,
+                    westBase.StartingInventory,
+                    prototypeRuntime.MatchStateEntity,
+                    selectionController.Selection.Entities,
+                    inventories,
+                    powerNetworks,
+                    production,
+                    unitProduction,
+                    intelligenceStore,
+                    unitDefinitions,
+                    buildingDefinitions,
+                    simulation.CurrentTick,
+                    simulation.Clock.TicksPerSecond);
 
             long renderStartedAt = _platform.Clock.GetTimestamp();
 
@@ -785,14 +843,14 @@ internal sealed class ClientApplication
                     instanceRenderer.Render(context, camera, renderWorld, renderAlpha);
                     debugDrawRenderer.Render(context, camera, debugDraw);
 
-                    if (overlayEnabled)
-                    {
-                        overlayRenderer.Render(
-                            context,
-                            overlayMetrics,
-                            camera,
-                            debugDraw);
-                    }
+                    overlayRenderer.Render(
+                        context,
+                        overlayMetrics,
+                        camera,
+                        debugDraw,
+                        playerExperience,
+                        showDevelopmentMetrics:
+                            overlayEnabled);
                 });
 
             long renderFinishedAt = _platform.Clock.GetTimestamp();
@@ -1838,6 +1896,20 @@ internal sealed class ClientApplication
             simulationDiagnostics.Runtime.Gen0Collections,
             simulationDiagnostics.Runtime.Gen1Collections,
             simulationDiagnostics.Runtime.Gen2Collections);
+    }
+
+    private static bool ConsumeKeyPress(
+        InputState inputState,
+        PlatformKey key,
+        ref bool held)
+    {
+        bool down =
+            inputState.IsKeyDown(key);
+        bool pressed =
+            down &&
+            !held;
+        held = down;
+        return pressed;
     }
 
     private static void UpdateToggle(
