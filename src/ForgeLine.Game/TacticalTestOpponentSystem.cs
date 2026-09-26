@@ -141,7 +141,16 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
                     out IntelligenceContact contact,
                     out EntityId identifiedTarget))
             {
-                if (identifiedTarget.IsValid)
+                float contactDistanceSquared =
+                    HorizontalDistanceSquared(
+                        transform.Position,
+                        contact.LastKnownPosition);
+                float leashSquared =
+                    behavior.EngagementLeashMeters *
+                    behavior.EngagementLeashMeters;
+
+                if (identifiedTarget.IsValid &&
+                    contactDistanceSquared <= leashSquared)
                 {
                     IssueAttackIntent(
                         context,
