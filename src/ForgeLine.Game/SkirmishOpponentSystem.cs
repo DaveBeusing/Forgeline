@@ -1344,10 +1344,18 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 configuration.ResupplyThreshold,
                 configuration.RetreatThreshold,
                 configuration.ObjectivePressureLeashMeters);
-        var resupplyPolicy =
+        var combatResupplyPolicy =
             new AutomaticResupplyPolicy(
                 configuration.ResupplyThreshold,
                 configuration.ResupplyThreshold,
+                enabled: true);
+        var logisticsResupplyPolicy =
+            new AutomaticResupplyPolicy(
+                configuration.ResupplyThreshold,
+                fuelThreshold:
+                    Math.Max(
+                        configuration.ResupplyThreshold,
+                        0.8),
                 enabled: true);
 
         for (int index = 0;
@@ -1356,6 +1364,17 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         {
             EntityId unit =
                 owned.Units[index];
+            bool isLogisticsVehicle =
+                owned.UnitByEntity.TryGetValue(
+                    unit,
+                    out UnitId unitId) &&
+                unitId is var candidate &&
+                (candidate == UnitIds.CargoTruck ||
+                 candidate == UnitIds.SupplyTruck);
+            AutomaticResupplyPolicy resupplyPolicy =
+                isLogisticsVehicle
+                    ? logisticsResupplyPolicy
+                    : combatResupplyPolicy;
 
             if (context.Entities.HasComponent<AutomaticResupplyPolicy>(
                     unit))
