@@ -1416,6 +1416,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 300.0,
                 600.0,
                 LogisticsStockPriority.Critical);
+            SetStockPolicy(
+                context,
+                controller.PreferredConstructionSource,
+                ResourceIds.Fuel,
+                120.0,
+                320.0,
+                600.0,
+                LogisticsStockPriority.High);
         }
 
         for (int index = 0;
