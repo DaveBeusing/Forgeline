@@ -514,6 +514,11 @@ public sealed class AutomatedDistributionSystem
     {
         IReadOnlyList<LogisticsNode> nodes = _network.GetNodes();
         DispatchSelection best = default;
+        bool destinationHasOwner =
+            TryResolveOwner(
+                entities,
+                destination.Entity,
+                out PlayerId destinationOwner);
         bool hadSurplus = false;
         bool hadStructuralRoute = false;
         bool hadAvailableTruck = false;
@@ -531,6 +536,16 @@ public sealed class AutomatedDistributionSystem
                     entities,
                     node,
                     out InventoryId sourceInventory))
+            {
+                continue;
+            }
+
+            if (destinationHasOwner &&
+                (!TryResolveOwner(
+                     entities,
+                     node.Entity,
+                     out PlayerId sourceOwner) ||
+                 sourceOwner != destinationOwner))
             {
                 continue;
             }
