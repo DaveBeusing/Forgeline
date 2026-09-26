@@ -418,6 +418,38 @@ public sealed class SkirmishOpponentTests
                             $" move->{movement} fuel={fuel} resupply={resupply}";
                     }));
 
+        string unitProductionStates =
+            string.Join(
+                ",",
+                scenario.Simulation.Entities
+                    .Query<UnitProductionFacility>()
+                    .Where(entity =>
+                        scenario.Simulation.Entities.TryGetComponent(
+                            entity,
+                            out CompletedBuilding building) &&
+                        building.Owner == side.Player)
+                    .OrderBy(static entity => entity)
+                    .Select(entity =>
+                    {
+                        UnitProductionFacility facility =
+                            scenario.Simulation.Entities.GetComponent<UnitProductionFacility>(
+                                entity);
+                        PowerOperationalState powerState =
+                            scenario.Simulation.Entities.TryGetComponent(
+                                entity,
+                                out PowerConsumer consumer)
+                                ? consumer.State
+                                : PowerOperationalState.Offline;
+
+                        return
+                            $"{entity}:{facility.ActiveUnit}/{facility.Status}/{facility.BlockReason}" +
+                            $" power={powerState}" +
+                            $" steel={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Steel):F0}" +
+                            $" elec={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Electronics):F0}" +
+                            $" fuel={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Fuel):F0}" +
+                            $" ammo={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Ammunition):F0}";
+                    }));
+
         return
             $"{side.Player}={state.StrategicState}/{state.ActiveGoal} decisions={state.DecisionsTaken} " +
             $"power={scenario.CountBuildings(side.Player, BuildingIds.PowerPlant)} " +
@@ -439,6 +471,7 @@ public sealed class SkirmishOpponentTests
             $"distributionFailures={distributionFailures} " +
             $"cargo={cargo.TransportCount}/active{cargo.ActiveTransportCount}/wait{cargo.WaitingTransportCount}/failed{cargo.FailedTransportCount}/delivered{cargo.DeliveredQuantity:F0}/routeFail{cargo.RouteFailureCount} " +
             $"cargoStates={cargoStates} " +
+            $"unitProductionStates={unitProductionStates} " +
             $"scouts={scenario.CountUnits(side.Player, UnitIds.ScoutVehicle)} " +
             $"tanks={scenario.CountUnits(side.Player, UnitIds.MainBattleTank)}";
     }
