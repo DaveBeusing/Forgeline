@@ -3,6 +3,7 @@ using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Intelligence;
+using ForgeLine.Logistics;
 using ForgeLine.Navigation;
 using ForgeLine.Simulation;
 using Xunit;
@@ -518,6 +519,115 @@ public sealed class TacticalCombatSystemTests
             scenario.AutomaticResupply!.Metrics.TotalOrdersIssued > 0);
         Assert.True(
             scenario.BattlefieldSupply!.Metrics.TotalAmmunitionTransferred > 0.0);
+    }
+
+    [Fact]
+    public void ActiveCargoTransportRefuelsWithoutDroppingDeliveryOrder()
+    {
+        TacticalScenario scenario =
+            CreateScenario(
+                weaponRange: 50.0f,
+                registerAutomaticResupply: true,
+                registerBattlefieldSupply: true);
+
+        EntityId truck =
+            CreateCombatUnit(
+                scenario,
+                BluePlayer,
+                BlueFaction,
+                Vector3.Zero,
+                movable: true,
+                attachSupply: true,
+                fuelCapacity: 100.0,
+                initialFuel: 20.0,
+                ammunitionCapacity: 100.0,
+                initialAmmunition: 0.0);
+
+        InventoryId cargoInventory =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(100.0));
+        scenario.Simulation.Entities.AddComponent(
+            truck,
+            new CargoTransport(
+                cargoInventory,
+                capacity: 100.0,
+                BluePlayer));
+        scenario.Simulation.Entities.AddComponent(
+            truck,
+            new CargoTransportOrder(
+                new LogisticsNodeId(1),
+                new LogisticsNodeId(2),
+                ResourceIds.FerrousOre,
+                requestedQuantity: 20.0,
+                scenario.Simulation.CurrentTick));
+        scenario.Simulation.Entities.AddComponent(
+            truck,
+            new CargoTransportRuntimeState(
+                CargoTransportLifecycleState.ToOrigin,
+                CargoTransportWaitReason.None,
+                CargoTransportFailureReason.None,
+                LogisticsNodeId.None,
+                LogisticsNetworkVersion.Initial,
+                LoadedQuantity: 0.0,
+                DeliveredQuantity: 0.0,
+                StateChangedAtTick:
+                    scenario.Simulation.CurrentTick));
+        scenario.Simulation.Entities.AddComponent(
+            truck,
+            new AutomaticResupplyPolicy(
+                ammunitionThreshold: 0.2,
+                fuelThreshold: 0.8));
+
+        InventoryId providerInventory =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(
+                    200.0,
+                    [ResourceIds.Fuel]));
+        Assert.True(
+            scenario.Inventories.Add(
+                providerInventory,
+                ResourceIds.Fuel,
+                100.0).Succeeded);
+
+        EntityId provider =
+            scenario.Simulation.Entities.CreateEntity();
+        scenario.Simulation.Entities.AddComponent(
+            provider,
+            new WorldTransform(
+                new Vector3(5.0f, 0.0f, 0.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        scenario.Simulation.Entities.AddComponent(
+            provider,
+            new SupplyProvider(
+                providerInventory,
+                BluePlayer,
+                resupplyRangeMeters: 20.0f));
+
+        scenario.Simulation.AdvanceOneTick();
+
+        UnitFuelState fuel =
+            scenario.Simulation.Entities.GetComponent<UnitFuelState>(
+                truck);
+
+        Assert.Equal(
+            100.0,
+            scenario.Inventories.GetQuantity(
+                fuel.InventoryId,
+                ResourceIds.Fuel),
+            precision: 6);
+        Assert.True(
+            scenario.AutomaticResupply!.Metrics.TotalOrdersIssued > 0);
+        Assert.True(
+            scenario.Simulation.Entities.HasComponent<CargoTransportOrder>(
+                truck));
+        Assert.Equal(
+            CargoTransportLifecycleState.ToOrigin,
+            scenario.Simulation.Entities.GetComponent<
+                CargoTransportRuntimeState>(truck).Lifecycle);
+        Assert.False(
+            scenario.Simulation.Entities.HasComponent<ResupplyOrder>(
+                truck));
     }
 
     [Fact]
