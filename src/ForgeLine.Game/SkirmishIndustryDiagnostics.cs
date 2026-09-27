@@ -100,7 +100,7 @@ internal static class SkirmishIndustryDiagnostics
             Math.Max(0, extractorCount - extractors.Count), industry, extractors);
     }
 
-    private static IReadOnlyList<SkirmishStockDiagnostic> CaptureStock(
+    private static List<SkirmishStockDiagnostic> CaptureStock(
         InventoryStore inventories, InventoryId inventory)
     {
         var stocks = new List<SkirmishStockDiagnostic>();
