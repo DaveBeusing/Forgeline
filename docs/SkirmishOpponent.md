@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The vertical-slice skirmish opponent is a deterministic-friendly strategic controller for the Directorate on the Central Divide battlefield. Its purpose is to exercise the complete Build–Supply–Conquer loop through the same authoritative simulation rules and command paths available to a player.
+The vertical-slice skirmish opponent is a deterministic-friendly strategic controller for the Directorate on the Central Divide battlefield. Its purpose is to exercise the complete Build-Supply-Conquer loop through the same authoritative simulation rules and command paths available to a player.
 
 It is intentionally pragmatic rather than optimal. The controller prioritizes coherent full-match behavior, integration coverage, and recoverability over perfect build orders or tactical prediction.
 
@@ -19,10 +19,10 @@ The opponent does not own alternate economy, movement, combat, or supply state.
 - Fuel and Ammunition are real inventory-backed constraints; recovery uses normal battlefield supply.
 - Direct entity attacks are allowed only when the faction currently identifies the target through battlefield intelligence.
 - Detected contacts may supply a legitimate last-known coordinate but not hidden entity state.
-- Without current hostile intelligence, strategic movement targets only static public battlefield knowledge such as expansion/FOB sites, the map center, and symmetric far-side staging lines derived from map dimensions. Exact hostile Command Core coordinates are not used as hidden offensive knowledge.
+- Without current hostile identification, strategic movement uses public static battlefield sites and map-defined start positions. A map start is not permission to inspect a hidden live Command Core entity or its transform.
 - No resource multiplier, free construction, free production, teleportation, hidden target transform, infinite ammunition, infinite fuel, or supply bypass is provided.
 
-Static map geometry, public strategic sites, the faction's own start area, and the shared ruleset are allowed knowledge. Enemy state must enter decision-making through the faction intelligence snapshot.
+Static map geometry, public strategic sites and starts, and the shared ruleset are allowed knowledge. Enemy runtime state must enter decision-making through the faction intelligence snapshot.
 
 ## Strategic State
 
@@ -38,7 +38,7 @@ Each controller stores simulation-owned strategic state:
 
 The active strategic goal records the current intent, including power establishment, resource security, industrial bootstrap, production capability, expansion, scouting, defense, offensive preparation, attack pressure, and economy/supply recovery.
 
-Strategic evaluation runs at a configurable low-frequency cadence rather than every tick. All timing uses simulation ticks.
+Strategic decisions run at a configurable low-frequency cadence. All timing uses simulation ticks. The controller's current decision order is critical economy recovery, bootstrap construction, local defense, expansion, force recovery, scouting, and offense. A successful earlier branch prevents a later branch from issuing a strategic objective in that decision. Economy stock and production policies and supply-truck loading are maintained before this branch selection.
 
 ## Opening and Economy
 
@@ -54,130 +54,96 @@ The opening plan establishes the minimum industrial chain with real construction
 
 Economy evaluation observes real inventory quantities, power generation/demand, offline consumers, active construction, and production capability. A power shortage raises power construction priority. Raw-resource shortages prioritize missing extractors before discretionary expansion.
 
-Production facilities receive desired-stock programs through the existing production system. Logistics stock targets are applied through the existing stock-policy command so physical distribution remains responsible for moving material.
+Production facilities receive desired-stock programs through the existing production system. Logistics stock targets are applied through the existing stock-policy command so physical distribution remains responsible for moving material. Unit-production refill minima account for the active unit's material costs; stock above a generic minimum is not necessarily sufficient to start that unit.
+
+Faction-wide inventory totals are an assessment, not a substitute for the consuming facility's inputs. Diagnosing NoInput requires comparing each recipe or unit cost with available stock in that facility. A full extractor output and nonempty deposit alongside an empty refinery input indicate a material-flow problem, not proof of deposit exhaustion. Power state is independently authoritative: recorded input shortages do not supersede an active NoPower block reason.
 
 ## Expansion
 
-Expansion is considered only after the opening economy is viable and the configured readiness threshold is met.
+Expansion is considered after bootstrap when the configured economy readiness threshold is met or the economy is raw-resource constrained, provided the force and pending-construction checks permit it.
 
-The controller evaluates known static expansion sites on its home side or near the center, requests normal Logistics Hub construction, and can add a nearby contested-resource extractor when construction and placement rules allow it. Placement is validated by the same building-placement service used for player construction.
+The controller evaluates known static expansion sites, requests normal Logistics Hub construction, and can add a nearby contested-resource extractor when construction and placement rules allow it. Unsupported remote hubs are candidates for a nearby Supply Depot. Placement is validated by the same building-placement service used for player construction.
 
 Economic buildings are connected to the canonical prototype road corridor through the shared road-access and logistics-registration systems. No remote resource transfer is introduced by the opponent.
 
 ## Production and Force Composition
 
-Unit production uses the existing Directorate unit catalog and normal unit-production queues. The current vertical-slice composition can request:
+Unit production uses the existing Directorate unit catalog and normal unit-production queues. The current vertical-slice composition can request infantry, Combat Engineers, Scout Vehicles, Main Battle Tanks, Mobile Artillery, Cargo Trucks, and Supply Trucks.
 
-- infantry
-- Scout Vehicles
-- Main Battle Tanks
-- Mobile Artillery
-- Cargo Trucks
-- Supply Trucks
-
-Desired counts are intentionally simple. Configuration limits queue depth so the controller cannot monopolize a production facility with an unbounded plan.
+Desired counts are intentionally simple. Configuration limits queue depth so the controller cannot monopolize a production facility with an unbounded plan. A completed facility or a large army does not establish that its next unit has locally available production inputs or that enough units are currently eligible to attack.
 
 ## Reconnaissance and Intelligence
 
-Idle Scout Vehicles are assigned AttackMove reconnaissance tasks toward public expansion and forward-operating sites while the faction lacks current hostile contacts.
+Idle Scout Vehicles receive AttackMove reconnaissance tasks toward public expansion and forward-operating sites until the enemy Command Core is currently identified. Scouts are excluded from the strategic attack candidate set.
 
-Strategic threat and opportunity evaluation consumes FactionIntelligenceSnapshot only. Identified contacts may resolve to an entity for a direct Attack command. Detected contacts remain coordinate-level information. Artillery missions use current detected or identified contact keys and are validated again by the authoritative artillery system.
+Strategic threat and opportunity evaluation consumes FactionIntelligenceSnapshot. Identified contacts may resolve to an entity for a direct Attack command. Detected contacts remain coordinate-level information. Artillery missions use current detected or identified contact keys and are validated again by the authoritative artillery system.
 
 ## Combat Groups and Formations
 
 The strategic layer selects eligible owned combat units and issues normal combat commands. Those commands create the existing simulation-owned combat groups and, for movement-oriented orders, normal movement/formation groups.
 
-The opponent therefore reuses:
-
-- combat-group intent and readiness
-- Line/Column/Compact formation semantics
-- shared-route formation movement
-- tactical target coordination
-- pursuit leashes
-- authoritative navigation and locomotion
-
-The strategic controller does not maintain a parallel combat-group implementation.
+The opponent reuses combat-group intent and readiness, Line/Column/Compact formation semantics, shared-route formation movement, tactical target coordination, pursuit leashes, and authoritative navigation and locomotion. It does not maintain a parallel combat-group implementation. Matching existing attack orders are retained rather than being recreated unconditionally at every decision.
 
 ## Defense, Offense, Resupply, and Retreat
 
-Defense is triggered by current hostile intelligence inside the configured defensive radius. Identified threats receive direct Attack intent; other legitimate contacts receive coordinate-based AttackMove intent.
+Defense responds to current hostile intelligence inside the configured defensive radius and selects local defenders. Identified threats receive direct Attack intent; other legitimate contacts receive coordinate-based AttackMove intent.
 
-An offensive requires:
+Offensive admission is per candidate, not a comparison against the entire army's average:
 
-- the configured minimum number of combat units
-- average readiness at or above the offensive threshold
-- minimum force supply at or above the resupply threshold
+- Scout Vehicles are excluded.
+- Candidates with readiness data must meet the configured offensive readiness threshold.
+- Their minimum Fuel/Ammunition fraction must meet the configured resupply threshold.
+- The remaining candidate set, bounded by MaximumAttackUnits, must contain at least MinimumAttackUnits.
 
-When direct hostile identification exists, the opponent may attack that identified entity. Otherwise it advances toward public strategic map positions rather than hidden enemy state.
+The current implementation allows a candidate without a readiness component through the readiness filter; diagnostics explicitly records HasReadiness so absence cannot be mistaken for a measured full-readiness value. Normal runtime readiness is derived in SnapshotEvents.
 
-Low force readiness or low supply triggers a normal Retreat command toward a valid recovery point. Automatic resupply policy remains attached to combat units, and only the battlefield-supply system may transfer Fuel or Ammunition.
+When direct hostile identification exists, the opponent may attack that identified entity, prioritizing an identified Command Core. Otherwise it advances toward public static strategic positions rather than reading hidden live enemy state.
 
-Mobile Artillery may receive fire missions only from current detected or identified contacts and respects a configurable firing-decision cadence.
+Individual low-readiness or low-supply units receive normal retreat/recovery behavior. Existing real ResupplyOrders are not replaced with a new strategic retreat. Force-wide Resupplying is narrower than the presence of any degraded unit: it requires an established attack force, an active resupply order, and the configured aggregate/all-units recovery condition. Consequently, PrepareOffensive with no active resupply order must not be interpreted as proof of either adequate supply or a particular supply-system defect.
+
+Automatic resupply policy remains attached to units. Only BattlefieldSupplySystem transfers Fuel or Ammunition. A recipient unable to afford the trip to a provider can instead receive a Supply Truck rescue, subject to separate propulsion/cargo checks and actual route-budget validation. Rescue cancellation releases only the movement owned by that assignment. See [Battlefield Supply](BattlefieldSupply.md).
+
+Mobile Artillery receives fire missions only from current detected or identified contacts and respects a configurable firing-decision cadence.
 
 ## Configuration
 
 SkirmishOpponentConfiguration exposes behavior tuning without direct simulation advantages:
 
-- reaction cadence
-- aggression
-- expansion readiness threshold
-- offensive readiness threshold
-- retreat threshold
-- resupply threshold
-- minimum and maximum attack-group size
-- maximum queued units per production facility
-- defensive radius
-- objective-pressure pursuit leash
-- artillery decision cadence
+- reaction cadence and aggression;
+- expansion, offensive readiness, retreat, and resupply thresholds;
+- minimum and maximum attack-group size;
+- maximum queued units per production facility;
+- defensive radius and objective-pressure pursuit leash;
+- artillery decision cadence.
 
 Configuration changes decision frequency and thresholds only. It does not modify resource income, construction cost, production speed, unit statistics, sensing, weapon performance, Fuel, Ammunition, or supply rules.
 
 ## Diagnostics
 
-SkirmishOpponentDebugReadModel exposes observation-only development data:
+SkirmishOpponentDebugReadModel exposes observation-only development data: strategic state, active goal, economy health, power generation/demand, force composition, average readiness, current/known hostile contacts, selected public objective, and decision tick/count.
 
-- strategic state
-- active goal
-- economy health
-- power generation/demand
-- force composition
-- average readiness
-- current/known hostile contacts
-- selected public objective
-- decision tick/count
+The F2 world-debug view draws opponent home/objective markers and compact status labels. Visualization is presentation-only and never feeds decisions back into simulation.
 
-The F2 world-debug view can draw opponent home/objective markers and compact status labels. The visualization is presentation-only and never feeds decisions back into simulation.
+Headless runs with a diagnostics output additionally attach SkirmishProgressionDiagnostics at the end of AiDecisions. Its snapshots record the selected strategic branch, eligible attacker count and exclusions, unit readiness and current order state, consuming-facility material shortages, provider cargo versus propulsion Fuel, industrial processing/extraction state, and bounded transport inventories, reservations, and movement intent.
+
+The observer retains 128 history entries: the first 32 and a rolling 96-entry tail. First loss of the minimum eligible attacker count is retained separately as a before/after pair for each player, along with the latest decision. Each detailed category has a fixed bound and omission counts. Transition history is sampled at decision boundaries, not emitted every simulation tick. See [Diagnostics and Performance](DiagnosticsAndPerformance.md) for phase timing, sidecar names, retention, and interpretation.
+
+A first eligibility loss identifies the immediate admission mechanism, not necessarily the underlying bug. Follow the resource's extraction, processing, transport, provider assignment, and physical transfer path before changing behavior. Cumulative successful cargo deliveries do not prove that currently assigned trucks are making progress.
 
 ## Headless Validation
 
-`VerticalSliceScenario` is the reusable game composition for the Central Divide simulation stack without graphics. `SkirmishScenarioHarness` is a thin test wrapper over that runtime rather than a duplicate composition.
+VerticalSliceScenario is the reusable game composition for the Central Divide simulation stack without graphics. SkirmishScenarioHarness is a thin test wrapper rather than a duplicate composition.
 
-Deterministic scenarios cover:
+Deterministic scenarios cover symmetric authoritative starts, power and raw-resource recovery through normal construction, intelligence authorization for direct combat targets, same-seed strategic progression, and bounded Build-Supply-Conquer progression through bootstrap, expansion, reconnaissance, logistics movement, and combat-group formation.
 
-- symmetric authoritative starts
-- power and raw-resource recovery through normal construction
-- intelligence authorization for direct combat targets
-- same-seed strategic progression
-- bounded Build–Supply–Conquer progression through bootstrap, expansion, reconnaissance, logistics movement, and combat-group formation
+Focused deterministic scenarios and bounded strategic progression belong in the normal test suite. CI additionally runs one natural terminal match with the explicit validation profile and fails if Command Core victory does not resolve within 80,000 ticks. Forced-objective lifecycle tests verify objective handling only; they are not evidence of a naturally completed match.
 
-Focused deterministic scenarios and bounded strategic progression belong in the normal test suite. CI additionally runs one terminal match with the explicit accelerated `validation` profile and fails if Command Core victory does not resolve within the bounded tick budget. Repeated multi-match soak uses the same runtime through `build/Run-VerticalSliceSoak.ps1` or the manually dispatched soak workflow and remains separate from hardware-sensitive PR timing gates.
+Repeated multi-match soak uses the same runtime through build/Run-VerticalSliceSoak.ps1 or the manually dispatched soak workflow and remains separate from hardware-sensitive PR timing gates. Inspect every requested match, retain failing outcomes, and record the seed sequence. A successful seed or a passing unit suite alone does not establish general gameplay balance or universal termination.
 
-The normal `gameplay` profile keeps the product-facing starting stock, default strategic-controller settings, and interactive navigation resolution. The `validation` profile intentionally uses accelerated resources, asymmetric attacker/defender pacing, and a coarser navigation grid to produce repeatable bounded coverage. Those validation values are not gameplay balance values.
+The normal gameplay profile keeps the product-facing starting stock, default strategic-controller settings, and interactive navigation resolution. The validation profile intentionally uses accelerated resources, asymmetric attacker/defender pacing, and a coarser navigation grid for bounded coverage. Those values are not gameplay balance values. Failed progression must not be hidden by reducing attack thresholds, removing resource costs, forcing a match result, or weakening the terminal gate.
 
 ## Current Limitations
 
-The first opponent deliberately does not include:
-
-- build-order search or economic optimization
-- opponent modeling or personality
-- diplomacy
-- doctrine variants
-- learned behavior
-- dynamic difficulty
-- deception planning
-- advanced multi-front force allocation
-- persistent named task forces across strategic replans
-- predictive artillery against stale contacts
-- campaign scripting
+The first opponent deliberately does not include build-order search or economic optimization, opponent modeling, personalities, diplomacy, doctrine variants, learned behavior, dynamic difficulty, deception planning, advanced multi-front force allocation, persistent named task forces across strategic replans, predictive artillery against stale contacts, or campaign scripting.
 
 These are future strategy-layer capabilities and must preserve the same knowledge and authority boundaries if added.
