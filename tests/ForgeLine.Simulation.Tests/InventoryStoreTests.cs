@@ -8,6 +8,41 @@ namespace ForgeLine.Simulation.Tests;
 public sealed class InventoryStoreTests
 {
     [Fact]
+    public void FractionalWithdrawalsDoNotPreventReservingAndConsumingTheRemainder()
+    {
+        var store = new InventoryStore();
+        InventoryId inventory = store.CreateInventory(new InventorySpecification(200.0));
+        Assert.True(store.Add(inventory, ResourceIds.Fuel, 120.0 + 28.33).Succeeded);
+        Assert.True(store.Remove(inventory, ResourceIds.Fuel, 28.33).Succeeded);
+        Assert.True(store.Reserve(inventory, ResourceIds.Fuel, 120.0).Succeeded);
+        Assert.True(store.ConsumeReserved(inventory, ResourceIds.Fuel, 120.0).Succeeded);
+        Assert.Equal(0.0, store.GetTotalQuantity(inventory));
+        Assert.False(store.Reserve(inventory, ResourceIds.Fuel, 0.01).Succeeded);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void FractionalReservationReleaseDoesNotStrandRemainingStock(bool consume)
+    {
+        var store = new InventoryStore();
+        InventoryId inventory = store.CreateInventory(new InventorySpecification(200.0));
+        Assert.True(store.Add(inventory, ResourceIds.Fuel, 200.0).Succeeded);
+        Assert.True(store.Reserve(inventory, ResourceIds.Fuel, 120.0).Succeeded);
+        Assert.True(store.Reserve(inventory, ResourceIds.Fuel, 28.33).Succeeded);
+        Assert.True(store.ReleaseReservation(inventory, ResourceIds.Fuel, 28.33).Succeeded);
+
+        InventoryOperationResult result = consume
+            ? store.ConsumeReserved(inventory, ResourceIds.Fuel, 120.0)
+            : store.ReleaseReservation(inventory, ResourceIds.Fuel, 120.0);
+
+        Assert.True(result.Succeeded);
+        Assert.Equal(0.0, store.GetReservedQuantity(inventory, ResourceIds.Fuel));
+        Assert.Equal(consume ? 80.0 : 200.0, store.GetAvailableQuantity(inventory, ResourceIds.Fuel));
+        Assert.False(store.ReleaseReservation(inventory, ResourceIds.Fuel, 0.01).Succeeded);
+    }
+
+    [Fact]
     public void ExactCapacityRejectsFurtherAdds()
     {
         var store = new InventoryStore();

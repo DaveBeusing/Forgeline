@@ -173,8 +173,11 @@ public sealed class AutomatedDistributionSystem
 
                 double cargoQuantity = GetTruckCargoQuantity(
                     context.Entities,
-                    request.AssignedTruck,
-                    request.ResourceId);
+                    request.AssignedTruck);
+                if (hasReservation)
+                {
+                    context.Entities.RemoveComponent<CargoTransportReservation>(request.AssignedTruck);
+                }
 
                 if (cargoQuantity > QuantityEpsilon)
                 {
@@ -185,6 +188,13 @@ public sealed class AutomatedDistributionSystem
                 }
                 else
                 {
+                    // The failed order otherwise keeps an empty truck occupied
+                    // forever, even though its delivery request is retried.
+                    if (context.Entities.HasComponent<CargoTransportOrder>(request.AssignedTruck))
+                    {
+                        context.Entities.RemoveComponent<CargoTransportOrder>(request.AssignedTruck);
+                    }
+
                     RetryOrFail(
                         request,
                         LogisticsTransportRequestFailureReason.TransportFailed,
@@ -1133,8 +1143,7 @@ public sealed class AutomatedDistributionSystem
 
     private double GetTruckCargoQuantity(
         EntityRegistry entities,
-        EntityId truckEntity,
-        ResourceId resourceId)
+        EntityId truckEntity)
     {
         if (!entities.TryGetComponent(
                 truckEntity,
@@ -1144,9 +1153,7 @@ public sealed class AutomatedDistributionSystem
             return 0.0;
         }
 
-        return _inventories.GetQuantity(
-            transport.CargoInventory,
-            resourceId);
+        return _inventories.GetTotalQuantity(transport.CargoInventory);
     }
 
     private void UpdateMetricsAndDebugSnapshot(SimulationContext context)

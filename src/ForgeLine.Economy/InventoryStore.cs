@@ -5,6 +5,7 @@ namespace ForgeLine.Economy;
 
 public sealed class InventoryStore
 {
+    private const double ReservationTolerance = 1e-9;
     private readonly Dictionary<InventoryId, InventoryState> _inventories = new();
     private uint _nextInventoryId;
     private long _addAttempts;
@@ -262,7 +263,7 @@ public sealed class InventoryStore
                 InventoryFailureReason.InventoryNotFound);
         }
 
-        if (GetAvailableQuantity(state, resourceId) < quantity)
+        if (GetAvailableQuantity(state, resourceId) + ReservationTolerance < quantity)
         {
             _reservationFailures++;
             return InventoryOperationResult.Failed(
@@ -291,7 +292,7 @@ public sealed class InventoryStore
         }
 
         double reserved = GetValue(state.Reservations, resourceId);
-        if (reserved < quantity)
+        if (reserved + ReservationTolerance < quantity)
         {
             _reservationFailures++;
             return InventoryOperationResult.Failed(
@@ -320,7 +321,7 @@ public sealed class InventoryStore
 
         double reserved = GetValue(state.Reservations, resourceId);
         double stored = GetValue(state.Quantities, resourceId);
-        if (reserved < quantity || stored < quantity)
+        if (reserved + ReservationTolerance < quantity || stored + ReservationTolerance < quantity)
         {
             _reservationFailures++;
             return InventoryOperationResult.Failed(
