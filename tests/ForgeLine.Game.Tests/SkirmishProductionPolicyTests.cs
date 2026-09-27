@@ -90,7 +90,7 @@ public sealed class SkirmishProductionPolicyTests
             VerticalSliceScenario.Create(
                 VerticalSliceScenarioSettings.Create(
                     VerticalSliceScenarioProfile.Validation));
-        EntityRegistry entities =
+        var entities =
             scenario.Simulation.Entities;
 
         EntityId lostCargo =

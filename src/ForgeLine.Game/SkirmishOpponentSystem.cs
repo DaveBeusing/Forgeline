@@ -2205,8 +2205,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             {
                 candidateQueued = true;
 
-                if (request.Priority >
-                    ProductionPriority.High)
+                if (request.Priority.CompareTo(
+                        ProductionPriority.High) > 0)
                 {
                     context.Entities.SetComponent(
                         requestEntity,
@@ -2223,17 +2223,17 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
             if (requestEntity ==
                     activeRequest ||
-                request.Priority <=
-                    ProductionPriority.High)
+                request.Priority.CompareTo(
+                    ProductionPriority.High) <= 0)
             {
                 continue;
             }
 
             if (!replaceablePending.IsValid ||
-                request.SubmittedAtTick >
-                    replaceableRequest.SubmittedAtTick ||
-                (request.SubmittedAtTick ==
-                    replaceableRequest.SubmittedAtTick &&
+                request.SubmittedAtTick.CompareTo(
+                    replaceableRequest.SubmittedAtTick) > 0 ||
+                (request.SubmittedAtTick.CompareTo(
+                     replaceableRequest.SubmittedAtTick) == 0 &&
                  requestEntity >
                     replaceablePending))
             {
@@ -2253,8 +2253,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             context.Entities.TryGetComponent(
                 activeRequest,
                 out UnitProductionRequest active) &&
-            active.Priority >
-                ProductionPriority.High &&
+            active.Priority.CompareTo(
+                ProductionPriority.High) > 0 &&
             !context.Entities.HasComponent<
                 UnitProductionCancellationRequest>(
                     activeRequest);
