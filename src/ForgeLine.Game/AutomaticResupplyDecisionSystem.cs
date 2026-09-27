@@ -90,7 +90,9 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
                 NeedsFuel(
                     context.Entities,
                     entity,
-                    policy.FuelThreshold);
+                    policy.FuelThreshold) &&
+                !CargoDeliveryFuelPolicy.ShouldDeferRefueling(
+                    context.Entities, _inventories, entity);
 
             if (!needsAmmunition &&
                 !needsFuel)
