@@ -224,6 +224,7 @@ internal static class Program
                 SkirmishProgressionReport.Write(
                     options.DiagnosticsOutput, options.Profile, matchIndex + 1,
                     matchSeed, executedTicks, scenario.GetMatchState(), progression);
+                WriteDistributionSummary(scenario);
             }
 
             if (options.RequireTerminal &&
@@ -260,6 +261,28 @@ internal static class Program
         return terminalFailure
             ? 3
             : 0;
+    }
+
+    private static void WriteDistributionSummary(VerticalSliceScenario scenario)
+    {
+        const int maximumRequests = 128;
+        IReadOnlyList<LogisticsTransportRequestReadModel> requests =
+            scenario.AutomatedDistribution.LastDebugSnapshot.Requests;
+        Console.WriteLine($"Distribution: requests={requests.Count}; omitted={Math.Max(0, requests.Count - maximumRequests)}.");
+        foreach (LogisticsTransportRequestReadModel request in requests.Take(maximumRequests))
+        {
+            bool hasPolicy = scenario.Simulation.Entities.TryGetComponent(
+                request.PolicyEntity, out LogisticsStockPolicy policy);
+            bool hasBuilding = hasPolicy && scenario.Simulation.Entities.HasComponent<CompletedBuilding>(policy.TargetEntity);
+            CompletedBuilding building = hasBuilding
+                ? scenario.Simulation.Entities.GetComponent<CompletedBuilding>(policy.TargetEntity) : default;
+            Console.WriteLine(
+                $"Distribution request: id={request.RequestId}; player={building.Owner}; target={policy.TargetEntity}; " +
+                $"building={building.BuildingId}; resource={request.ResourceId}; state={request.State}; reason={request.FailureReason}; " +
+                $"quantity={request.RequestedQuantity:F3}; reserved={request.ReservedQuantity:F3}; attempts={request.AttemptCount}; " +
+                $"created={request.CreatedAtTick.Value}; changed={request.StateChangedAtTick.Value}; truck={request.AssignedTruck}; " +
+                $"minimum={policy.DesiredMinimum:F1}; targetStock={policy.DesiredTarget:F1}.");
+        }
     }
 
     private static void WriteSideSummary(
