@@ -93,33 +93,59 @@ public sealed class SkirmishProductionPolicyTests
                     VerticalSliceScenarioProfile.Validation));
         var entities =
             scenario.Simulation.Entities;
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
         UnitDefinition cargoDefinition =
-            DirectorateContent.CreateUnitCatalog()[
-                UnitIds.CargoTruck];
+            units[UnitIds.CargoTruck];
+        UnitDefinition supplyDefinition =
+            units[UnitIds.SupplyTruck];
 
         var westCargo =
             new List<EntityId>();
+        bool hasSupplyTruck =
+            false;
         foreach (EntityId entity in
                  entities.Query<ControllableEntity, UnitIdentity>(
                      QueryIterationOrder.StableByEntityIndex))
         {
-            if (entities.GetComponent<ControllableEntity>(entity).Owner ==
-                    scenario.West.Player &&
-                entities.GetComponent<UnitIdentity>(entity).UnitId ==
-                    UnitIds.CargoTruck)
+            if (entities.GetComponent<ControllableEntity>(entity).Owner !=
+                scenario.West.Player)
+            {
+                continue;
+            }
+
+            UnitId unitId =
+                entities.GetComponent<UnitIdentity>(entity).UnitId;
+            if (unitId ==
+                UnitIds.CargoTruck)
             {
                 westCargo.Add(entity);
             }
+            else if (unitId ==
+                     UnitIds.SupplyTruck)
+            {
+                hasSupplyTruck = true;
+            }
         }
 
+        Vector3 stagingPosition =
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore).Position;
         while (westCargo.Count < 2)
         {
             westCargo.Add(
                 scenario.UnitFactory.Create(
                     cargoDefinition,
-                    entities.GetComponent<WorldTransform>(
-                        scenario.West.CommandCore).Position,
+                    stagingPosition,
                     scenario.West.Player));
+        }
+
+        if (!hasSupplyTruck)
+        {
+            scenario.UnitFactory.Create(
+                supplyDefinition,
+                stagingPosition,
+                scenario.West.Player);
         }
 
         InventoryId input =
