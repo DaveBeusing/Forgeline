@@ -154,6 +154,19 @@ internal static class Program
                     settings,
                     matchSeed,
                     enableDiagnostics: true);
+            SkirmishProgressionDiagnostics? progression = null;
+            if (options.DiagnosticsOutput is not null)
+            {
+                progression = new SkirmishProgressionDiagnostics(
+                    scenario.Inventories,
+                    DirectorateContent.CreateUnitCatalog(),
+                    new Dictionary<PlayerId, SkirmishOpponentConfiguration>
+                    {
+                        [scenario.West.Player] = settings.WestOpponent,
+                        [scenario.East.Player] = settings.EastOpponent
+                    });
+                scenario.Simulation.RegisterSystem(progression);
+            }
 
             var matchStopwatch =
                 Stopwatch.StartNew();
@@ -205,6 +218,13 @@ internal static class Program
             WriteSideSummary(
                 "east",
                 report.East);
+
+            if (progression is not null && options.DiagnosticsOutput is not null)
+            {
+                SkirmishProgressionReport.Write(
+                    options.DiagnosticsOutput, options.Profile, matchIndex + 1,
+                    matchSeed, executedTicks, scenario.GetMatchState(), progression);
+            }
 
             if (options.RequireTerminal &&
                 !scenario.GetMatchState().IsTerminal)
