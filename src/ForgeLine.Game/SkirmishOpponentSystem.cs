@@ -144,6 +144,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 state.LastDecisionTick,
                 configuration.ReactionCadenceTicks))
         {
+            EnsureCriticalLogisticsRecovery(
+                context,
+                owned,
+                configuration);
             CaptureDebug(
                 controllerEntity,
                 controller,
@@ -2094,6 +2098,34 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 output,
                 desiredStock);
         command.Execute(context);
+    }
+
+    private static void EnsureCriticalLogisticsRecovery(
+        SimulationContext context,
+        OwnedState owned,
+        SkirmishOpponentConfiguration configuration)
+    {
+        for (int index = 0;
+             index < owned.UnitProductionFacilities.Count;
+             index++)
+        {
+            EntityId facilityEntity =
+                owned.UnitProductionFacilities[index];
+
+            if (!context.Entities.TryGetComponent(
+                    facilityEntity,
+                    out UnitProductionFacility facility))
+            {
+                continue;
+            }
+
+            EnsureCriticalLogisticsProduction(
+                context,
+                owned,
+                facilityEntity,
+                facility,
+                configuration);
+        }
     }
 
     private void EnsureUnitProduction(
