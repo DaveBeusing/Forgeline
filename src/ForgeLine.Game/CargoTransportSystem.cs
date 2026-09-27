@@ -1386,6 +1386,26 @@ public sealed class CargoTransportSystem : ISimulationSystem
             context.Tick,
             context.Tick);
 
+        if (_navigation is not null &&
+            context.Entities.HasComponent<NavigationAgent>(entity))
+        {
+            if (CargoDeliveryFuelPolicy.ShouldDeferMovement(
+                    context.Entities,
+                    _inventories,
+                    entity,
+                    movementOrder,
+                    _navigation.World.Version))
+            {
+                return;
+            }
+
+            CargoDeliveryFuelPolicy.PrepareMovementBudget(
+                context.Entities,
+                _inventories,
+                entity,
+                movementOrder);
+        }
+
         if (context.Entities.HasComponent<
                 MovementOrder>(entity))
         {
@@ -2006,6 +2026,10 @@ public sealed class CargoTransportSystem : ISimulationSystem
             entities.RemoveComponent<
                 NavigationFailureState>(entity);
         }
+
+        CargoDeliveryFuelPolicy.ClearTravelState(
+            entities,
+            entity);
     }
 
     private static void RemoveRouteState(

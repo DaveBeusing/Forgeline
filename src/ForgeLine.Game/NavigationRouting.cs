@@ -389,6 +389,12 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
                 continue;
             }
 
+            if (!CargoDeliveryFuelPolicy.ValidateCompletedRoute(
+                    context, entity, pending.OriginalOrder, result.Search.Path))
+            {
+                continue;
+            }
+
             var route = new NavigationRouteState(
                 pending.OriginalOrder,
                 result.Search.Path,
