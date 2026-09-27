@@ -106,7 +106,9 @@ public static class BattlefieldResupplyPlanner
             bool canReachProvider = CanReachProvider(
                 context, inventories, recipient, distanceSquared, provider.ResupplyRangeMeters);
             if (!canReachProvider &&
-                !CanProviderReachImmobileRecipient(context, candidate, recipient))
+                !CanProviderReachImmobileRecipient(
+                    context, inventories, candidate, recipient,
+                    distanceSquared, provider.ResupplyRangeMeters))
             {
                 continue;
             }
@@ -230,9 +232,11 @@ public static class BattlefieldResupplyPlanner
             return true;
         }
 
+        // This is only a direct-distance rejection bound. Navigation must still
+        // establish a traversable route; passing it does not certify a detour.
         double requiredFuel = (MathF.Sqrt(distanceSquared) - range * 0.75f) * fuel.ConsumptionPerMeter;
         return inventories.Contains(fuel.InventoryId) &&
-            inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel) >= requiredFuel;
+            inventories.GetAvailableQuantity(fuel.InventoryId, ResourceIds.Fuel) >= requiredFuel;
     }
 
     private static bool HasRequiredStock(
@@ -263,10 +267,13 @@ public static class BattlefieldResupplyPlanner
         return true;
     }
 
-    private static bool CanProviderReachImmobileRecipient(
+    internal static bool CanProviderReachImmobileRecipient(
         SimulationContext context,
+        InventoryStore? inventories,
         EntityId provider,
-        EntityId recipient)
+        EntityId recipient,
+        float distanceSquared,
+        float range)
     {
         if (!context.Entities.HasComponent<SupplyTruck>(
                 provider) ||
@@ -277,10 +284,9 @@ public static class BattlefieldResupplyPlanner
             return false;
         }
 
-        if (context.Entities.TryGetComponent(
-                provider,
-                out SupplyMovementConstraint movementConstraint) &&
-            !movementConstraint.CanMove)
+        // Propulsion uses UnitFuelState, never the SupplyTruck cargo inventory.
+        if (!CanReachProvider(
+                context, inventories, provider, distanceSquared, range))
         {
             return false;
         }
