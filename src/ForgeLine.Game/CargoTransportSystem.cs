@@ -1334,6 +1334,17 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
+        // An approach is a fixed destination for this node visit, not a point
+        // that follows the truck as it steers. Recomputing it during an active
+        // route repeatedly replaces navigation with a path from the new start.
+        if (context.Entities.TryGetComponent(entity, out CargoTransportMovementTarget activeTarget) &&
+            activeTarget.NodeId == node.Id &&
+            TacticalCommandUtilities.TryGetMovementIntent(context, entity, out MovementOrder activeOrder) &&
+            Vector3.DistanceSquared(activeOrder.WorldTarget, activeTarget.WorldPosition) <= 1.0f)
+        {
+            return;
+        }
+
         Vector3 movementPosition =
             ResolveNodeApproachPosition(
                 context.Entities,
