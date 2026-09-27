@@ -78,11 +78,10 @@ public sealed class SupplyRescueFeasibilityTests
         var fixture = new Fixture();
         EntityId truck = fixture.Truck(Vector3.Zero, 0.0, 40.0);
         EntityId recipient = fixture.Recipient(new Vector3(8.0f, 0.0f, 0.0f));
+        fixture.Simulation.RegisterSystem(new BattlefieldSupplySystem(fixture.Inventories));
         PlanCommand plan = fixture.Plan(recipient);
         Assert.True(plan.Accepted);
         Assert.Equal(truck, plan.Provider);
-        fixture.Simulation.RegisterSystem(new BattlefieldSupplySystem(fixture.Inventories));
-        fixture.Simulation.AdvanceOneTick();
 
         UnitFuelState fuel = fixture.Simulation.Entities.GetComponent<UnitFuelState>(recipient);
         Assert.Equal(20.0, fixture.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel));
