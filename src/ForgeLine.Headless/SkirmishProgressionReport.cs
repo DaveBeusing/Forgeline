@@ -56,6 +56,13 @@ internal sealed record SkirmishProgressionReport(
             Console.WriteLine("First eligibility loss after: " + JsonSerializer.Serialize(loss.After));
         }
 
+        foreach (SkirmishDecisionDiagnostic entry in report.History.TakeLast(12))
+        {
+            Console.WriteLine(
+                $"Transport history: tick={entry.Tick}; player={entry.Player}; " +
+                JsonSerializer.Serialize(entry.Economy.Transports));
+        }
+
         foreach (SkirmishDecisionDiagnostic entry in report.Latest)
         {
             Console.WriteLine("Latest decision detail: " + JsonSerializer.Serialize(entry));

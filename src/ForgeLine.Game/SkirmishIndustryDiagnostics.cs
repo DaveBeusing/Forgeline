@@ -26,7 +26,10 @@ public sealed record SkirmishTransportDiagnostic(
     string MovementStatus, string MovementTarget, string NavigationFailure,
     string ResupplyProvider, CargoTransportOrder? Order,
     CargoTransportRuntimeState State, CargoTransportReservation? Reservation,
-    IReadOnlyList<SkirmishStockDiagnostic> Cargo);
+    IReadOnlyList<SkirmishStockDiagnostic> Cargo)
+{
+    public SkirmishTransportMotionDiagnostic? Motion { get; init; }
+}
 
 public sealed record SkirmishEconomyDiagnostic(
     double Generation, double Demand, int OfflineConsumers,
@@ -150,7 +153,10 @@ internal static class SkirmishIndustryDiagnostics
                 context.Entities.TryGetComponent(entity, out CargoTransportRuntimeState state)
                     ? state : CargoTransportRuntimeState.Idle,
                 context.Entities.TryGetComponent(entity, out CargoTransportReservation reservation) ? reservation : null,
-                CaptureStock(inventories, transport.CargoInventory)));
+                CaptureStock(inventories, transport.CargoInventory))
+            {
+                Motion = SkirmishTransportMotionDiagnostic.Capture(context, entity)
+            });
         }
 
         return new SkirmishEconomyDiagnostic(
