@@ -144,6 +144,8 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
                 route.OriginalOrder.WorldTarget,
                 route.OriginalOrder.SubmittedAtTick,
                 context.Tick);
+            SupplyRescueTravel.RedirectOwnedOrder(
+                context, entity, route.OriginalOrder, replacement);
 
             ScheduleRequest(
                 context,
@@ -357,6 +359,8 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
                 result.Search.Path is null)
             {
                 _failedPathCount++;
+                SupplyRescueTravel.RecordNavigationFailure(
+                    context, entity, pending.OriginalOrder, result.Search.FailureReason);
                 SetFailure(
                     context,
                     entity,
@@ -376,6 +380,14 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
                 diagnostics.ExpandedLocalNodes;
             _lastRouteLengthMeters =
                 diagnostics.RouteLengthMeters;
+
+            // A completed geometric search is not proof of affordable travel.
+            // Reuse its exact path before exposing any movement waypoint.
+            if (!SupplyRescueTravel.ValidateCompletedRoute(
+                    context, entity, pending.OriginalOrder, result.Search.Path))
+            {
+                continue;
+            }
 
             var route = new NavigationRouteState(
                 pending.OriginalOrder,
@@ -421,14 +433,15 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
             {
                 // Coarse cells can overlap a building while the requested point
                 // is physically clear. Finish from the grid edge using collision-aware movement.
-                context.Entities.AddComponent(
-                    entity,
-                    new MovementOrder(
-                        route.OriginalOrder.Issuer,
-                        route.OriginalOrder.WorldTarget,
-                        route.OriginalOrder.SubmittedAtTick,
-                        context.Tick,
-                        MovementOrderKind.LocalApproach));
+                var approach = new MovementOrder(
+                    route.OriginalOrder.Issuer,
+                    route.OriginalOrder.WorldTarget,
+                    route.OriginalOrder.SubmittedAtTick,
+                    context.Tick,
+                    MovementOrderKind.LocalApproach);
+                context.Entities.AddComponent(entity, approach);
+                SupplyRescueTravel.RedirectOwnedOrder(
+                    context, entity, route.OriginalOrder, approach);
             }
 
             return;

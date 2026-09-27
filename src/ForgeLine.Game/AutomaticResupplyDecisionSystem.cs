@@ -19,6 +19,7 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
 {
     private readonly InventoryStore _inventories;
     private readonly List<EntityId> _candidates = new();
+    private readonly List<EntityId> _rescueProviders = new();
     private ulong _totalOrdersIssued;
     private ulong _totalProviderUnavailable;
 
@@ -42,6 +43,7 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
     {
         ArgumentNullException.ThrowIfNull(context);
 
+        RefreshRescueAssignments(context);
         _candidates.Clear();
 
         foreach (EntityId entity in
@@ -183,6 +185,36 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
                 _totalProviderUnavailable);
     }
 
+    private void RefreshRescueAssignments(SimulationContext context)
+    {
+        _rescueProviders.Clear();
+        foreach (EntityId provider in context.Entities.Query<SupplyRescueAssignment>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            _rescueProviders.Add(provider);
+        }
+
+        foreach (EntityId provider in _rescueProviders)
+        {
+            if (!context.Entities.TryGetComponent(provider, out SupplyRescueAssignment assignment))
+            {
+                continue;
+            }
+
+            if (!context.Entities.IsAlive(assignment.Recipient) ||
+                !context.Entities.TryGetComponent(assignment.Recipient, out ResupplyOrder order) ||
+                order.Provider != provider)
+            {
+                SupplyRescueTravel.Release(context, provider, assignment.Recipient);
+                continue;
+            }
+
+            // Both deliberate and automatic rescue orders use real current stock.
+            // The provider need not itself have an automatic resupply policy.
+            SupplyRescueTravel.RefreshBudget(context, _inventories, provider);
+        }
+    }
+
     private bool CanContinueWithProvider(
         SimulationContext context,
         EntityId recipient,
@@ -258,10 +290,16 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
                 EntityId traveler = recipientCanMove ? recipient : providerEntity;
                 WorldTransform destination = recipientCanMove ? providerTransform : recipientTransform;
 
-                if ((!recipientCanMove &&
-                     (!context.Entities.HasComponent<SupplyTruck>(providerEntity) ||
-                      context.Entities.HasComponent<ResupplyOrder>(providerEntity))) ||
-                    !TacticalCommandUtilities.TryGetMovementIntent(context, traveler, out MovementOrder intent))
+                if (!recipientCanMove &&
+                    (!BattlefieldResupplyPlanner.CanProviderReachImmobileRecipient(
+                         context, _inventories, providerEntity, recipient,
+                         distanceSquared, provider.ResupplyRangeMeters) ||
+                     !SupplyRescueTravel.ValidateRemainingRoute(context, providerEntity, recipient)))
+                {
+                    return false;
+                }
+
+                if (!TacticalCommandUtilities.TryGetMovementIntent(context, traveler, out MovementOrder intent))
                 {
                     return false;
                 }
@@ -279,12 +317,12 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
         SimulationContext context,
         EntityId entity)
     {
-        if (!context.Entities.HasComponent<ResupplyOrder>(
-                entity))
+        if (!context.Entities.TryGetComponent(entity, out ResupplyOrder order))
         {
             return;
         }
 
+        SupplyRescueTravel.Release(context, order.Provider, entity);
         TacticalCommandUtilities.RemoveIfPresent<ResupplyOrder>(
             context,
             entity);

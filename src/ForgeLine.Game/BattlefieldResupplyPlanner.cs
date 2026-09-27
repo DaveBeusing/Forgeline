@@ -196,12 +196,14 @@ public static class BattlefieldResupplyPlanner
                     recipientTransform.Position,
                     selectedProvider.ResupplyRangeMeters);
 
-            SetMovementOrder(
+            MovementOrder movement = SetMovementOrder(
                 context,
                 providerEntity,
                 owner,
                 providerApproachPosition,
                 submittedAtTick);
+            SupplyRescueTravel.Assign(
+                context, inventories, providerEntity, recipient, movement);
         }
 
         return true;
@@ -279,7 +281,9 @@ public static class BattlefieldResupplyPlanner
                 provider) ||
             context.Entities.HasComponent<ResupplyOrder>(provider) ||
             !context.Entities.HasComponent<GroundMovement>(
-                provider))
+                provider) ||
+            SupplyRescueTravel.IsDeferred(context, inventories, provider, recipient) ||
+            SupplyRescueTravel.HasUnrelatedMovement(context, provider, recipient))
         {
             return false;
         }
@@ -314,7 +318,7 @@ public static class BattlefieldResupplyPlanner
         return true;
     }
 
-    private static void SetMovementOrder(
+    private static MovementOrder SetMovementOrder(
         SimulationContext context,
         EntityId entity,
         PlayerId owner,
@@ -328,8 +332,7 @@ public static class BattlefieldResupplyPlanner
                 submittedAtTick,
                 context.Tick);
 
-        if (context.Entities.HasComponent<MovementOrder>(
-                entity))
+        if (context.Entities.HasComponent<MovementOrder>(entity))
         {
             context.Entities.SetComponent(
                 entity,
@@ -341,6 +344,8 @@ public static class BattlefieldResupplyPlanner
                 entity,
                 movementOrder);
         }
+
+        return movementOrder;
     }
 
     private static Vector3 ResolveProviderApproachPosition(
