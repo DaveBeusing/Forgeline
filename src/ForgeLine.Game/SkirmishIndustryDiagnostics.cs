@@ -37,6 +37,8 @@ public sealed record SkirmishEconomyDiagnostic(
     public int OmittedTransportDetails { get; init; }
 
     public IReadOnlyList<SkirmishTransportDiagnostic> Transports { get; init; } = [];
+
+    public SkirmishSupplyDiagnosticSnapshot Supply { get; init; } = SkirmishSupplyDiagnosticSnapshot.Empty;
 }
 
 internal static class SkirmishIndustryDiagnostics
@@ -156,7 +158,8 @@ internal static class SkirmishIndustryDiagnostics
             Math.Max(0, extractorCount - extractors.Count), industry, extractors)
         {
             OmittedTransportDetails = Math.Max(0, transportCount - transports.Count),
-            Transports = transports
+            Transports = transports,
+            Supply = SkirmishSupplyDiagnostics.Capture(context, owner)
         };
     }
 
