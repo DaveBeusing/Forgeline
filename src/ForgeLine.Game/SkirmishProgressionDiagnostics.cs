@@ -32,7 +32,8 @@ public sealed record SkirmishDecisionDiagnostic(
     int ActiveResupplyOrders, int OmittedUnitDetails, int OmittedFacilityDetails, int OmittedProviderDetails,
     IReadOnlyList<SkirmishUnitDecisionDiagnostic> Units,
     IReadOnlyList<SkirmishProductionDiagnostic> Production,
-    IReadOnlyList<SkirmishProviderDiagnostic> Providers);
+    IReadOnlyList<SkirmishProviderDiagnostic> Providers,
+    SkirmishEconomyDiagnostic Economy);
 
 public sealed record SkirmishEligibilityLossDiagnostic(
     SkirmishDecisionDiagnostic Before, SkirmishDecisionDiagnostic After);
@@ -301,7 +302,8 @@ public sealed class SkirmishProgressionDiagnostics : ISimulationSystem
             combat, eligible, Math.Min(eligible, configuration.MaximumAttackUnits), configuration.MinimumAttackUnits,
             scouts, readinessExcluded, fuelExcluded, ammunitionExcluded, activeResupply,
             Math.Max(0, combat - units.Count), Math.Max(0, facilityCount - production.Count),
-            Math.Max(0, providerCount - providers.Count), units, production, providers);
+            Math.Max(0, providerCount - providers.Count), units, production, providers,
+            SkirmishIndustryDiagnostics.Capture(context, _inventories, owner));
     }
 
     private double Stock(InventoryId inventory, ResourceId resource, bool available) =>
@@ -322,5 +324,9 @@ public sealed class SkirmishProgressionDiagnostics : ISimulationSystem
             string.Join(",", facility.Inputs.Where(static input => input.Missing > 0.0).Select(static input => input.Resource)))) +
         "/" + string.Join(";", entry.Providers.Select(static provider =>
             $"{provider.Entity}:{provider.Enabled}:{provider.DepotState}:{provider.CargoFuel > 0.0}:" +
-            $"{provider.CargoAmmunition > 0.0}:{provider.MovementFuel > 0.0}:{provider.Recipients.Count}"));
+            $"{provider.CargoAmmunition > 0.0}:{provider.MovementFuel > 0.0}:{provider.Recipients.Count}")) +
+        "/" + string.Join(";", entry.Economy.Industry.Select(static facility =>
+            $"{facility.Entity}:{facility.Status}:{facility.BlockReason}:{facility.PowerState}")) +
+        "/" + string.Join(";", entry.Economy.Extractors.Select(static extractor =>
+            $"{extractor.Entity}:{extractor.State}:{extractor.RemainingQuantity > 0.0}"));
 }
