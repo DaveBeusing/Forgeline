@@ -2155,7 +2155,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
     }
 
-    private bool EnsureCriticalLogisticsProduction(
+    private static bool EnsureCriticalLogisticsProduction(
         SimulationContext context,
         OwnedState owned,
         EntityId facilityEntity,
@@ -2244,6 +2244,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             }
         }
 
+        UnitProductionRequest active =
+            default;
         bool activeBlocksRecovery =
             activeRequest.IsValid &&
             facility.ActiveUnit !=
@@ -2252,7 +2254,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 UnitProductionStatus.NoInput &&
             context.Entities.TryGetComponent(
                 activeRequest,
-                out UnitProductionRequest active) &&
+                out active) &&
             active.Priority.CompareTo(
                 ProductionPriority.High) > 0 &&
             !context.Entities.HasComponent<
