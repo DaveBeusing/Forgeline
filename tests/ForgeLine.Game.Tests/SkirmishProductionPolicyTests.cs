@@ -139,6 +139,16 @@ public sealed class SkirmishProductionPolicyTests
                 scenario.West.Player,
                 Vector3.Zero,
                 SimulationTick.Zero));
+        entities.AddComponent(
+            factory,
+            entities.GetComponent<PowerNetworkMembership>(
+                scenario.West.CommandCore));
+        entities.AddComponent(
+            factory,
+            new PowerConsumer(
+                1.0,
+                PowerPriority.Industrial,
+                enabled: true));
 
         var firstTank =
             new QueueUnitProductionCommand(
