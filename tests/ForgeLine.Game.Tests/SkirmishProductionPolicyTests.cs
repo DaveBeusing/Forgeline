@@ -1,6 +1,7 @@
 using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Economy;
+using ForgeLine.Ecs;
 using ForgeLine.Game;
 using ForgeLine.Simulation;
 using Xunit;
