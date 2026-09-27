@@ -115,6 +115,16 @@ The report records:
 
 These values make results interpretable across different machines. They are measurements, not product guarantees.
 
+For integrated readiness work, the headless host can execute the complete Central Divide vertical slice:
+
+```powershell
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --require-terminal --diagnostics-output artifacts/vertical-slice-match.json
+```
+
+The vertical-slice report adds match outcome/pacing, entity and pending-command state, tick timing, observed allocation/GC activity, Cargo Transport completion/failure/route counters, Automated Distribution state, Battlefield Supply transfer totals, Artillery shot/impact totals, and per-side economy/power/industry/intelligence/readiness/force summaries.
+
+`gameplay` and `validation` are intentionally different profiles. Gameplay uses normal starting stock, default opponent settings, and the interactive client's navigation resolution. Validation uses explicit accelerated resources/opponent pacing and coarser navigation for bounded deterministic coverage. Validation values must not silently become gameplay defaults.
+
 ## Headless Test Harness
 
 Simulation tests use a reusable `SimulationTestHarness` that can:
@@ -186,7 +196,7 @@ The rendering host includes terrain workloads plus 1,000 near-field simple insta
 
 ## Stress Scenarios
 
-A bounded headless lightweight-entity scenario is available directly from the host:
+Bounded lightweight-entity and integrated vertical-slice scenarios are available directly from the host:
 
 ```powershell
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --ticks 64 --seed 42 --entities 10000 --diagnostics-output artifacts/stress-10000.json
@@ -195,6 +205,8 @@ dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configur
 The simulation test suite also verifies that 10,000 lightweight ECS entities can exist and execute headless ticks without stale-entity or lifecycle failure. Spatial correctness coverage separately indexes and repeatedly moves 10,000 entries, verifies queryability afterward, compares radius results against brute-force reference fixtures, and checks negative-coordinate and chunk-crossing semantics. A 1,000-entity scenario exercises a representative multi-component load.
 
 Combat scale measurement is available through the simulation BenchmarkDotNet host with 100/1,000 simultaneously armed direct-fire entities and 100/1,000 moving physical projectiles. Logistics stress coverage remains separate so the measured workload is attributable to the subsystem under test.
+
+Repeated full-match endurance runs use `build/Run-VerticalSliceSoak.ps1` or the manually dispatched `Vertical Slice Soak` workflow. These runs create a fresh simulation for every match and retain environment/context in the structured report. They are deliberately not hard PR timing gates.
 
 ## Interpreting Results
 
@@ -219,8 +231,9 @@ CI:
 - validates project-reference boundaries;
 - runs a 1,000-entity headless diagnostics smoke scenario;
 - runs a bounded 10,000-lightweight-entity stress smoke scenario;
+- runs one accelerated terminal Central Divide match through the real headless game stack;
 - runs the complete correctness test suite;
-- uploads the generated JSON diagnostics as the `engine-diagnostics` workflow artifact.
+- uploads the generated JSON diagnostics, including the vertical-slice report, as the `engine-diagnostics` workflow artifact.
 
 The artifact exists to make failures and performance observations inspectable without turning volatile timing into pass/fail thresholds.
 

@@ -150,7 +150,7 @@ The F2 world-debug view can draw opponent home/objective markers and compact sta
 
 ## Headless Validation
 
-SkirmishScenarioHarness composes the normal Central Divide simulation stack without graphics. Both sides receive symmetric starting resources and units and are controlled by the same skirmish-opponent implementation.
+`VerticalSliceScenario` is the reusable game composition for the Central Divide simulation stack without graphics. `SkirmishScenarioHarness` is a thin test wrapper over that runtime rather than a duplicate composition.
 
 Deterministic scenarios cover:
 
@@ -160,7 +160,9 @@ Deterministic scenarios cover:
 - same-seed strategic progression
 - bounded Build–Supply–Conquer progression through bootstrap, expansion, reconnaissance, logistics movement, and combat-group formation
 
-Short deterministic scenarios and bounded strategic progression belong in normal CI. Terminal full-match soak runs use the same harness outside the regular CI duration budget until long-horizon Cargo Truck fuel recovery and unit-production saturation are reliable enough to serve as a deterministic gate.
+Focused deterministic scenarios and bounded strategic progression belong in the normal test suite. CI additionally runs one terminal match with the explicit accelerated `validation` profile and fails if Command Core victory does not resolve within the bounded tick budget. Repeated multi-match soak uses the same runtime through `build/Run-VerticalSliceSoak.ps1` or the manually dispatched soak workflow and remains separate from hardware-sensitive PR timing gates.
+
+The normal `gameplay` profile keeps the product-facing starting stock, default strategic-controller settings, and interactive navigation resolution. The `validation` profile intentionally uses accelerated resources, asymmetric attacker/defender pacing, and a coarser navigation grid to produce repeatable bounded coverage. Those validation values are not gameplay balance values.
 
 ## Current Limitations
 

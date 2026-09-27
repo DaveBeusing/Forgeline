@@ -4,7 +4,7 @@ namespace ForgeLine.Client;
 
 internal static class Program
 {
-    private const int DefaultRenderInstanceCount = 128;
+    private const int DefaultRenderInstanceCount = 0;
 
     [STAThread]
     public static int Main(string[] args)

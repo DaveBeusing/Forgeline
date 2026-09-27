@@ -6,7 +6,8 @@ namespace ForgeLine.Game;
 public enum MovementOrderKind : byte
 {
     Strategic = 0,
-    FormationLocal = 1
+    FormationLocal = 1,
+    LocalApproach = 2
 }
 
 public readonly record struct MovementOrder(

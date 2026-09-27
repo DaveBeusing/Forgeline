@@ -6,6 +6,7 @@ using ForgeLine.Intelligence;
 using ForgeLine.Logistics;
 using ForgeLine.Navigation;
 using ForgeLine.Simulation;
+using ForgeLine.World;
 using Xunit;
 
 namespace ForgeLine.Game.Tests;
@@ -16,6 +17,28 @@ public sealed class TacticalCombatSystemTests
     private static readonly PlayerId RedPlayer = new(2);
     private static readonly FactionId BlueFaction = new(1);
     private static readonly FactionId RedFaction = new(2);
+
+    [Fact]
+    public void AttackPursuitCompletesNavigationAndReachesWeaponRange()
+    {
+        TacticalScenario scenario = CreateScenario(weaponRange: 10.0f, registerGroundMovement: true);
+        var terrain = new TerrainWorld(
+            new WorldGridSettings { ChunkSizeMeters = 64.0f, HeightSamplesPerSide = 17 },
+            [new TerrainChunk(new ChunkCoordinate(0, 0), new TerrainHeightfield(17, 64.0f, new float[17 * 17]))]);
+        var navigation = new HierarchicalNavigationSystem(new HierarchicalPathfinder(NavigationWorld.Build(terrain)));
+        scenario.Simulation.RegisterSystem(navigation);
+        EntityId attacker = CreateCombatUnit(scenario, BluePlayer, BlueFaction,
+            new Vector3(4.0f, 0.0f, 4.0f), addVisualSensor: true, visualRange: 100.0f, movable: true);
+        EntityId target = CreateCombatUnit(scenario, RedPlayer, RedFaction, new Vector3(56.0f, 0.0f, 4.0f));
+        scenario.Simulation.SubmitCommand(new AttackCommand(BluePlayer, [attacker], target, SimulationTick.Zero), SimulationTick.Zero.Next());
+
+        scenario.Simulation.RunTicks(400, TestContext.Current.CancellationToken);
+
+        Assert.Equal(CombatOrderStatus.Engaging,
+            scenario.Simulation.Entities.GetComponent<TacticalCombatState>(attacker).Status);
+        Assert.True(navigation.LastDiagnostics.CompletedPathCount > 0);
+        Assert.InRange(navigation.LastDiagnostics.QueuedPathCount, 1UL, 3UL);
+    }
 
     [Fact]
     public void AttackUsesCurrentIntelligenceAndPursuesWithinLeash()
@@ -522,6 +545,122 @@ public sealed class TacticalCombatSystemTests
     }
 
     [Fact]
+    public void AutomaticResupplyReplansWhenAssignedProviderRunsDry()
+    {
+        TacticalScenario scenario =
+            CreateScenario(
+                weaponRange: 50.0f,
+                registerAutomaticResupply: true,
+                registerBattlefieldSupply: true);
+
+        EntityId unit =
+            CreateCombatUnit(
+                scenario,
+                BluePlayer,
+                BlueFaction,
+                Vector3.Zero,
+                movable: true,
+                attachSupply: true,
+                fuelCapacity: 100.0,
+                initialFuel: 10.0,
+                ammunitionCapacity: 100.0,
+                initialAmmunition: 100.0);
+
+        scenario.Simulation.Entities.AddComponent(
+            unit,
+            new AutomaticResupplyPolicy(
+                ammunitionThreshold: 0.2,
+                fuelThreshold: 0.2));
+
+        InventoryId firstInventory =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(
+                    20.0,
+                    [ResourceIds.Fuel]));
+        Assert.True(
+            scenario.Inventories.Add(
+                firstInventory,
+                ResourceIds.Fuel,
+                10.0).Succeeded);
+
+        EntityId firstProvider =
+            scenario.Simulation.Entities.CreateEntity();
+        scenario.Simulation.Entities.AddComponent(
+            firstProvider,
+            new WorldTransform(
+                new Vector3(5.0f, 0.0f, 0.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        scenario.Simulation.Entities.AddComponent(
+            firstProvider,
+            new SupplyProvider(
+                firstInventory,
+                BluePlayer,
+                resupplyRangeMeters: 20.0f));
+
+        InventoryId fallbackInventory =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(
+                    200.0,
+                    [ResourceIds.Fuel]));
+        Assert.True(
+            scenario.Inventories.Add(
+                fallbackInventory,
+                ResourceIds.Fuel,
+                100.0).Succeeded);
+
+        EntityId fallbackProvider =
+            scenario.Simulation.Entities.CreateEntity();
+        scenario.Simulation.Entities.AddComponent(
+            fallbackProvider,
+            new WorldTransform(
+                new Vector3(10.0f, 0.0f, 0.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        scenario.Simulation.Entities.AddComponent(
+            fallbackProvider,
+            new SupplyProvider(
+                fallbackInventory,
+                BluePlayer,
+                resupplyRangeMeters: 20.0f));
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.Equal(
+            firstProvider,
+            scenario.Simulation.Entities.GetComponent<ResupplyOrder>(
+                unit).Provider);
+        Assert.Equal(
+            0.0,
+            scenario.Inventories.GetQuantity(
+                firstInventory,
+                ResourceIds.Fuel),
+            precision: 6);
+
+        scenario.Simulation.AdvanceOneTick();
+
+        UnitFuelState fuel =
+            scenario.Simulation.Entities.GetComponent<UnitFuelState>(
+                unit);
+
+        Assert.Equal(
+            100.0,
+            scenario.Inventories.GetQuantity(
+                fuel.InventoryId,
+                ResourceIds.Fuel),
+            precision: 6);
+        Assert.False(
+            scenario.Simulation.Entities.HasComponent<ResupplyOrder>(
+                unit));
+        Assert.True(
+            scenario.Inventories.GetQuantity(
+                fallbackInventory,
+                ResourceIds.Fuel) < 100.0);
+        Assert.True(
+            scenario.AutomaticResupply!.Metrics.TotalOrdersIssued >= 2);
+    }
+
+    [Fact]
     public void ActiveCargoTransportRefuelsWithoutDroppingDeliveryOrder()
     {
         TacticalScenario scenario =
@@ -671,6 +810,29 @@ public sealed class TacticalCombatSystemTests
     }
 
     [Fact]
+    public void TacticalTestOpponentSelectsTargetItsWeaponCanEngage()
+    {
+        TacticalScenario scenario = CreateScenario(weaponRange: 80.0f, registerTestOpponent: true);
+        scenario.Weapons.Add(new WeaponDefinition(new WeaponId(2), 80.0f, 4, 1.0,
+            new DamagePayload(10.0), WeaponDeliveryModel.Hitscan,
+            effectiveness: new WeaponEffectiveness(TargetClassMask.Infantry, penetration: 20.0)));
+        EntityId opponent = CreateCombatUnit(scenario, RedPlayer, RedFaction, Vector3.Zero,
+            addVisualSensor: true, visualRange: 150.0f, attachSupply: true,
+            fuelCapacity: 100.0, initialFuel: 100.0, ammunitionCapacity: 100.0, initialAmmunition: 100.0);
+        scenario.Simulation.Entities.SetComponent(opponent, new WeaponState(new WeaponId(2), EntityId.Invalid));
+        scenario.Simulation.Entities.AddComponent(opponent, new TacticalTestOpponent());
+        EntityId structure = CreateCombatUnit(scenario, BluePlayer, BlueFaction, new Vector3(20.0f, 0.0f, 0.0f));
+        scenario.Simulation.Entities.SetComponent(structure, new Targetable(TargetClass.Structure));
+        EntityId infantry = CreateCombatUnit(scenario, BluePlayer, BlueFaction, new Vector3(60.0f, 0.0f, 0.0f));
+        scenario.Simulation.Entities.SetComponent(infantry, new Targetable(TargetClass.Infantry));
+
+        scenario.Simulation.RunTicks(3, TestContext.Current.CancellationToken);
+
+        Assert.Equal(infantry, scenario.Simulation.Entities.GetComponent<CombatOrderState>(opponent).ExplicitTarget);
+        Assert.Equal(CombatOrderStatus.Engaging, scenario.Simulation.Entities.GetComponent<TacticalCombatState>(opponent).Status);
+    }
+
+    [Fact]
     public void TacticalTestOpponentUsesDetectedCoordinateThenIdentifiedTarget()
     {
         TacticalScenario scenario =
@@ -744,6 +906,69 @@ public sealed class TacticalCombatSystemTests
         Assert.Equal(
             target,
             identifiedOrder.ExplicitTarget);
+    }
+
+    [Fact]
+    public void TacticalTestOpponentAdvancesTowardIdentifiedTargetOutsideEngagementLeash()
+    {
+        TacticalScenario scenario =
+            CreateScenario(
+                weaponRange: 80.0f,
+                registerReadiness: true,
+                registerTestOpponent: true);
+
+        EntityId opponent =
+            CreateCombatUnit(
+                scenario,
+                RedPlayer,
+                RedFaction,
+                Vector3.Zero,
+                movable: true,
+                attachSupply: true,
+                fuelCapacity: 100.0,
+                initialFuel: 100.0,
+                ammunitionCapacity: 100.0,
+                initialAmmunition: 100.0);
+        scenario.Simulation.Entities.AddComponent(
+            opponent,
+            new TacticalTestOpponent(
+                engagementLeashMeters: 100.0f));
+        scenario.Simulation.Entities.AddComponent(
+            opponent,
+            new VisualSensorState(
+                RedFaction,
+                rangeMeters: 500.0f,
+                updateIntervalTicks: 1));
+
+        EntityId target =
+            CreateCombatUnit(
+                scenario,
+                BluePlayer,
+                BlueFaction,
+                new Vector3(300.0f, 0.0f, 0.0f));
+
+        scenario.Simulation.AdvanceOneTick();
+        scenario.Simulation.AdvanceOneTick();
+
+        CombatOrderState order =
+            scenario.Simulation.Entities.GetComponent<CombatOrderState>(
+                opponent);
+
+        Assert.Equal(
+            CombatOrderKind.AttackMove,
+            order.Kind);
+        Assert.False(
+            order.ExplicitTarget.IsValid);
+        Assert.Equal(
+            new Vector3(300.0f, 0.0f, 0.0f),
+            order.Destination);
+        Assert.True(
+            scenario.Simulation.Entities.HasComponent<MovementOrder>(
+                opponent));
+        Assert.NotEqual(
+            target,
+            scenario.Simulation.Entities.GetComponent<WeaponState>(
+                opponent).Target);
     }
 
     [Fact]
@@ -972,7 +1197,8 @@ public sealed class TacticalCombatSystemTests
         TacticalTestOpponentSystem? opponent =
             registerTestOpponent
                 ? new TacticalTestOpponentSystem(
-                    intelligence)
+                    intelligence,
+                    weapons)
                 : null;
         AutomaticResupplyDecisionSystem? autoResupply =
             registerAutomaticResupply ||

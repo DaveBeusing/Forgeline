@@ -14,6 +14,50 @@ public sealed class CargoTransportSystemTests
     private static readonly PlayerId LocalPlayer = new(1);
 
     [Fact]
+    public void LoadsNearStaticApproachWhileAnActiveMovementOrderRemains()
+    {
+        TransportFixture fixture = CreateFixture(
+            sourceQuantity: 80.0,
+            sourcePosition: new Vector3(64.0f, 0.0f, 16.0f),
+            destinationPosition: new Vector3(100.0f, 0.0f, 16.0f),
+            worldChunkCountX: 4);
+        fixture.ConnectDirect();
+        Assert.True(fixture.Network.TryGetNode(fixture.SourceNode, out LogisticsNode source));
+        fixture.Simulation.Entities.AddComponent(
+            source.Entity,
+            new SpatialPresence(
+                new Vector3(4.0f),
+                new SpatialEntryMetadata(1, 0, SpatialMobility.Static)));
+        EntityId truck = fixture.CreateTruckAtSource();
+        GroundMovement movement = fixture.Simulation.Entities.GetComponent<GroundMovement>(truck);
+        Vector3 approach = fixture.SourcePosition - new Vector3(
+            4.0f + movement.ObstacleLookAhead + movement.Radius + 32.0f, 0.0f, 0.0f);
+        WorldTransform transform = fixture.Simulation.Entities.GetComponent<WorldTransform>(truck);
+        fixture.Simulation.Entities.SetComponent(
+            truck,
+            transform with { Position = approach - new Vector3(movement.Radius * 2.0f, 0.0f, 0.0f) });
+        Assert.True(fixture.TransportSystem.TryAssignOrder(
+            fixture.Simulation.Entities,
+            truck,
+            new CargoTransportOrder(fixture.SourceNode, fixture.DestinationNode,
+                ResourceIds.FerrousOre, 50.0, SimulationTick.Zero),
+            SimulationTick.Zero));
+        fixture.Simulation.Entities.AddComponent(
+            truck,
+            new CargoTransportMovementTarget(fixture.SourceNode, approach, SimulationTick.Zero));
+        fixture.Simulation.Entities.AddComponent(
+            truck,
+            new MovementOrder(LocalPlayer, approach, SimulationTick.Zero, SimulationTick.Zero.Next()));
+
+        fixture.Simulation.AdvanceOneTick();
+
+        Assert.Equal(CargoTransportLifecycleState.Loading,
+            fixture.Simulation.Entities.GetComponent<CargoTransportRuntimeState>(truck).Lifecycle);
+        Assert.False(fixture.Simulation.Entities.HasComponent<NavigationPendingPath>(truck));
+        Assert.Equal(80.0, fixture.TotalConservedQuantity(truck));
+    }
+
+    [Fact]
     public void FullTransportCycleMovesCargoPhysicallyAndConservesResources()
     {
         TransportFixture fixture = CreateFixture(

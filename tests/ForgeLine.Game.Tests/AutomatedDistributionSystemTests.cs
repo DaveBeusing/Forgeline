@@ -14,6 +14,39 @@ public sealed class AutomatedDistributionSystemTests
     private static readonly PlayerId LocalPlayer = new(1);
     private static readonly FactionId LocalFaction = new(1);
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void FailedTruckCanBeReassignedOnlyWhenItsCargoIsEmpty(bool hasCargo)
+    {
+        DistributionFixture fixture = CreateFixture(sourceQuantity: 100.0);
+        fixture.Connect(fixture.SourceNode, fixture.DestinationNode);
+        fixture.AddPolicy(fixture.DestinationEntity, 20.0, 60.0, 100.0, LogisticsStockPriority.Normal);
+        EntityId truck = fixture.CreateTruck(fixture.SourcePosition);
+        CargoTransport transport = fixture.Simulation.Entities.GetComponent<CargoTransport>(truck);
+        fixture.Simulation.AdvanceOneTick();
+        Assert.True(fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(truck));
+        Assert.True(fixture.Simulation.Entities.HasComponent<CargoTransportReservation>(truck));
+        if (hasCargo)
+        {
+            Assert.True(fixture.Inventories.Add(transport.CargoInventory, ResourceIds.FerrousOre, 10.0).Succeeded);
+        }
+        fixture.Simulation.Entities.SetComponent(truck, CargoTransportRuntimeState.Idle with
+        {
+            Lifecycle = CargoTransportLifecycleState.Failed,
+            FailureReason = CargoTransportFailureReason.TransferFailed
+        });
+        double total = fixture.TotalConservedQuantity(truck);
+
+        fixture.Simulation.RunTicks(600, TestContext.Current.CancellationToken);
+
+        Assert.Equal(hasCargo ? 0.0 : 60.0,
+            fixture.Inventories.GetQuantity(fixture.DestinationInventory, ResourceIds.FerrousOre));
+        Assert.Equal(total, fixture.TotalConservedQuantity(truck));
+        Assert.Equal(hasCargo ? 10.0 : 0.0,
+            fixture.Inventories.GetQuantity(transport.CargoInventory, ResourceIds.FerrousOre));
+    }
+
     [Fact]
     public void ReplenishesDestinationToConfiguredTargetThroughPhysicalTruck()
     {
@@ -452,6 +485,56 @@ public sealed class AutomatedDistributionSystemTests
         Assert.Equal(
             LogisticsTransportRequestFailureReason.NoTruckAvailable,
             critical.FailureReason);
+    }
+
+    [Fact]
+    public void DeliveredBulkLoadYieldsToNewCriticalDemand()
+    {
+        DistributionFixture fixture = CreateFixture(sourceQuantity: 1_000.0);
+        fixture.Connect(fixture.SourceNode, fixture.DestinationNode);
+        fixture.AddPolicy(fixture.DestinationEntity, 20.0, 600.0, 800.0, LogisticsStockPriority.Low);
+        fixture.Simulation.RunTicks(60, TestContext.Current.CancellationToken);
+        EntityId truck = fixture.CreateTruck(fixture.SourcePosition);
+        fixture.Simulation.AdvanceOneTick();
+        EntityId critical = fixture.CreateStorageNode(new Vector3(52.0f, 0.0f, 20.0f), out _, out LogisticsNodeId criticalNode);
+        fixture.Connect(fixture.SourceNode, criticalNode);
+        fixture.AddPolicy(critical, 10.0, 40.0, 80.0, LogisticsStockPriority.Critical);
+        RunUntil(fixture, () => fixture.Cargo.Metrics.CompletedOrderCount == 1, maximumTicks: 600);
+        fixture.Simulation.AdvanceOneTick();
+
+        Assert.Equal(criticalNode,
+            fixture.Simulation.Entities.GetComponent<CargoTransportOrder>(truck).Destination);
+        Assert.InRange(fixture.Inventories.GetQuantity(fixture.DestinationInventory, ResourceIds.FerrousOre), 1.0, 599.0);
+    }
+
+    [Theory]
+    [InlineData(true, 3.0, true)]
+    [InlineData(true, 0.5, false)]
+    [InlineData(false, 3.0, false)]
+    public void RefineryInputCanUseFuelReserveButStillRequiresEnoughForTheTrip(
+        bool refinery, double fuelQuantity, bool shouldDispatch)
+    {
+        DistributionFixture fixture = CreateFixture(sourceQuantity: 0.0);
+        Assert.True(fixture.Inventories.Add(fixture.SourceInventory, ResourceIds.Volatiles, 80.0).Succeeded);
+        fixture.Connect(fixture.SourceNode, fixture.DestinationNode);
+        if (refinery)
+        {
+            InventoryId output = fixture.Inventories.CreateInventory(new InventorySpecification(200.0));
+            fixture.Simulation.Entities.AddComponent(fixture.DestinationEntity,
+                new ProductionFacility(fixture.DestinationInventory, output, ProductionCapability.FuelProcessing, SimulationTick.Zero));
+        }
+
+        EntityId policy = fixture.Simulation.Entities.CreateEntity();
+        fixture.Simulation.Entities.AddComponent(policy,
+            new LogisticsStockPolicy(fixture.DestinationEntity, ResourceIds.Volatiles, 20.0, 40.0, 80.0, LogisticsStockPriority.Critical));
+        EntityId truck = fixture.CreateTruck(fixture.SourcePosition);
+        InventoryId fuel = fixture.Inventories.CreateInventory(new InventorySpecification(20.0));
+        Assert.True(fixture.Inventories.Add(fuel, ResourceIds.Fuel, fuelQuantity).Succeeded);
+        fixture.Simulation.Entities.AddComponent(truck, new UnitFuelState(fuel, 20.0, 0.02));
+
+        fixture.Simulation.AdvanceOneTick();
+
+        Assert.Equal(shouldDispatch, fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(truck));
     }
 
     [Fact]

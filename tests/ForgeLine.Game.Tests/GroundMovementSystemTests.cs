@@ -403,6 +403,30 @@ public sealed class GroundMovementSystemTests
     }
 
     [Fact]
+    public void MovingUnitPassesStationaryUnitInsteadOfStoppingBehindIt()
+    {
+        TerrainWorld terrain = CreateFlatTerrain(64.0f);
+        var index = new SpatialGridIndex(CreateSpatialSettings(terrain.Settings, cellSizeMeters: 4.0f));
+        var synchronizer = new SpatialIndexSynchronizer(index);
+        var simulation = new SimulationCoordinator();
+        GroundMovement movement = CreateMovement(maximumSpeed: 8.0f, acceleration: 20.0f,
+            deceleration: 20.0f, turnRateRadiansPerSecond: MathF.Tau, radius: 2.0f,
+            stopRadius: 0.25f, separationRadius: 6.0f);
+        EntityId moving = AddGroundUnit(simulation, new Vector3(32.0f, 0.5f, 12.0f), movement);
+        EntityId parked = AddGroundUnit(simulation, new Vector3(32.0f, 0.5f, 24.0f), movement);
+        simulation.RegisterSystem(new GroundMovementSystem(terrain, index));
+        simulation.RegisterSystem(new SpatialIndexSystem(synchronizer));
+        simulation.RegisterSystem(new SpatialIndexCleanupSystem(synchronizer));
+        simulation.AdvanceOneTick();
+        AddOrder(simulation, moving, new Vector3(32.0f, 0.0f, 48.0f), new SimulationTick(2));
+
+        simulation.RunTicks(300, TestContext.Current.CancellationToken);
+
+        Assert.InRange(simulation.Entities.GetComponent<WorldTransform>(moving).Position.Z, 47.5f, 48.5f);
+        Assert.Equal(new Vector3(32.0f, 0.5f, 24.0f), simulation.Entities.GetComponent<WorldTransform>(parked).Position);
+    }
+
+    [Fact]
     public void StaticObstacleSteeringProducesShortRangeDetour()
     {
         TerrainWorld terrain = CreateFlatTerrain(64.0f);

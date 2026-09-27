@@ -1,6 +1,7 @@
 using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Jobs;
+using ForgeLine.Logistics;
 using ForgeLine.Navigation;
 using ForgeLine.Simulation;
 using ForgeLine.World;
@@ -155,6 +156,90 @@ public sealed class HierarchicalNavigationSystemTests
         Assert.Equal(
             newer.WorldTarget,
             route.OriginalOrder.WorldTarget);
+    }
+
+    [Fact]
+    public void NewStaticObstacleReplansActiveRouteAndRemovalReopensCells()
+    {
+        TerrainWorld terrain = CreateFlatWorld();
+        var simulation = new SimulationCoordinator();
+        var pathfinder = new HierarchicalPathfinder(CreateNavigationWorld(terrain));
+        var navigation = new HierarchicalNavigationSystem(pathfinder);
+        var infrastructure = new StrategicInfrastructureSystem(
+            new LogisticsNetwork(),
+            terrain,
+            navigation,
+            [],
+            new NavigationGridSettings { CellSizeMeters = 4.0f },
+            new NavigationSectorSettings { SectorSizeCells = 4 });
+        simulation.RegisterSystem(infrastructure);
+        simulation.RegisterSystem(navigation);
+        EntityId unit = AddUnit(simulation, new Vector3(4.0f, 0.5f, 4.0f));
+        simulation.Entities.AddComponent(
+            unit,
+            new MovementOrder(
+                LocalPlayer,
+                new Vector3(60.0f, 0.0f, 4.0f),
+                SimulationTick.Zero,
+                SimulationTick.Zero.Next()));
+        simulation.RunTicks(2, TestContext.Current.CancellationToken);
+        NavigationRouteState original =
+            simulation.Entities.GetComponent<NavigationRouteState>(unit);
+
+        EntityId building = simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(
+            building,
+            new WorldTransform(
+                new Vector3(28.0f, 0.0f, 4.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        simulation.Entities.AddComponent(
+            building,
+            new SpatialPresence(
+                new Vector3(4.0f, 4.0f, 4.0f),
+                new SpatialEntryMetadata(1, 0, SpatialMobility.Static)));
+        simulation.RunTicks(2, TestContext.Current.CancellationToken);
+
+        NavigationRouteState detour =
+            simulation.Entities.GetComponent<NavigationRouteState>(unit);
+        Assert.NotEqual(original.Path.Version, detour.Path.Version);
+        Assert.Equal(navigation.World.Version, detour.Path.Version);
+        Assert.True(detour.Path.Diagnostics.RouteLengthMeters > original.Path.Diagnostics.RouteLengthMeters);
+        var blockedCell = new NavigationCellCoordinate(7, 1);
+        NavigationCapabilities capabilities = NavigationCapabilities.For(NavigationMovementClass.Tracked);
+        Assert.False(navigation.World.Grid.IsTraversable(blockedCell, capabilities));
+
+        simulation.AdvanceOneTick();
+        Assert.Equal(detour.Path.Version, navigation.World.Version);
+        Assert.True(simulation.Entities.DestroyEntity(building));
+        simulation.AdvanceOneTick();
+        Assert.NotEqual(detour.Path.Version, navigation.World.Version);
+        Assert.True(navigation.World.Grid.IsTraversable(blockedCell, capabilities));
+    }
+
+    [Fact]
+    public void ProjectedDestinationFinishesWithLocalApproachToRequestedPoint()
+    {
+        TerrainWorld terrain = CreateFlatWorld();
+        NavigationWorld world = NavigationWorld.Build(
+            terrain,
+            [new AxisAlignedBounds(new Vector3(28.0f, -1.0f, 12.0f), new Vector3(29.0f, 2.0f, 13.0f))],
+            new NavigationGridSettings { CellSizeMeters = 4.0f },
+            new NavigationSectorSettings { SectorSizeCells = 4 });
+        var simulation = new SimulationCoordinator();
+        simulation.RegisterSystem(new HierarchicalNavigationSystem(new HierarchicalPathfinder(world)));
+        simulation.RegisterSystem(new GroundMovementSystem(terrain));
+        EntityId unit = AddUnit(simulation, new Vector3(4.0f, 0.5f, 14.0f));
+        Vector3 destination = new(30.0f, 0.5f, 14.0f);
+        simulation.Entities.AddComponent(unit,
+            new MovementOrder(LocalPlayer, destination, SimulationTick.Zero, SimulationTick.Zero.Next()));
+
+        simulation.RunTicks(400, TestContext.Current.CancellationToken);
+
+        Assert.False(simulation.Entities.HasComponent<MovementOrder>(unit));
+        Assert.False(simulation.Entities.HasComponent<NavigationRouteState>(unit));
+        Assert.InRange(Vector3.Distance(destination,
+            simulation.Entities.GetComponent<WorldTransform>(unit).Position), 0.0f, 1.0f);
     }
 
     private static EntityId AddUnit(

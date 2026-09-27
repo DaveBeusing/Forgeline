@@ -264,6 +264,7 @@ public sealed class GroundMovementSystem : ISimulationSystem
         steering += CalculateSeparationSteering(
             entity,
             position,
+            targetDirection,
             movement,
             ref neighborAdjustments);
 
@@ -456,6 +457,7 @@ public sealed class GroundMovementSystem : ISimulationSystem
     private Vector3 CalculateSeparationSteering(
         EntityId entity,
         Vector3 position,
+        Vector3 targetDirection,
         in GroundMovement movement,
         ref int adjustmentCount)
     {
@@ -525,6 +527,13 @@ public sealed class GroundMovementSystem : ISimulationSystem
 
             steering +=
                 away * (strength * _options.SeparationWeight);
+            if (Vector3.Dot(away, targetDirection) < -0.5f)
+            {
+                // Repulsion alone cancels forward movement behind a stopped
+                // vehicle. Pick a stable side so traffic can pass around it.
+                steering += PerpendicularAvoidanceAxis(targetDirection, entity) *
+                    (strength * _options.SeparationWeight);
+            }
             adjustmentCount++;
         }
 

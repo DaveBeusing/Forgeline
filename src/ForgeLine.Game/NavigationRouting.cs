@@ -161,7 +161,7 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
 
         if (hasMovementOrder)
         {
-            if (movementOrder.Kind == MovementOrderKind.FormationLocal)
+            if (movementOrder.Kind is MovementOrderKind.FormationLocal or MovementOrderKind.LocalApproach)
             {
                 CancelPending(context, entity);
 
@@ -300,7 +300,8 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
             search = _pathfinder.FindPath(
                 request.Start,
                 request.Destination,
-                request.Capabilities);
+                request.Capabilities,
+                projectBlockedEndpoints: true);
         }
 
         TimeSpan latency = Stopwatch.GetElapsedTime(started);
@@ -413,6 +414,21 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
             {
                 context.Entities.RemoveComponent<
                     NavigationRouteState>(entity);
+            }
+
+            if (route.Path.Waypoints.Count > 0 &&
+                Vector3.DistanceSquared(route.Path.Waypoints[^1], route.OriginalOrder.WorldTarget) > 0.0001f)
+            {
+                // Coarse cells can overlap a building while the requested point
+                // is physically clear. Finish from the grid edge using collision-aware movement.
+                context.Entities.AddComponent(
+                    entity,
+                    new MovementOrder(
+                        route.OriginalOrder.Issuer,
+                        route.OriginalOrder.WorldTarget,
+                        route.OriginalOrder.SubmittedAtTick,
+                        context.Tick,
+                        MovementOrderKind.LocalApproach));
             }
 
             return;

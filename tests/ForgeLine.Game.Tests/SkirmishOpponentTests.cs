@@ -306,13 +306,21 @@ public sealed class SkirmishOpponentTests
                     current.CountBuildings(
                         current.East.Player,
                         BuildingIds.LogisticsHub) >= 2 &&
+                    HasIntegratedIndustry(
+                        current,
+                        current.West.Player) &&
+                    HasIntegratedIndustry(
+                        current,
+                        current.East.Player) &&
                     current.CountUnits(
                         current.West.Player,
                         UnitIds.ScoutVehicle) > 0 &&
                     current.CountUnits(
                         current.East.Player,
                         UnitIds.ScoutVehicle) > 0 &&
-                    HasCombatGroup(current),
+                    HasCombatGroup(current) &&
+                    (current.Intelligence.GetContactCount(current.West.Faction) > 0 ||
+                     current.Intelligence.GetContactCount(current.East.Faction) > 0),
                 maximumTicks: 40_000,
                 TestContext.Current.CancellationToken);
 
@@ -327,7 +335,40 @@ public sealed class SkirmishOpponentTests
                 scenario.East.Player).DecisionsTaken > 20);
         Assert.True(
             scenario.CargoTransport.Metrics.DeliveredQuantity > 0.0);
+        Assert.True(
+            scenario.BattlefieldSupply.Metrics.TotalFuelTransferred > 0.0 ||
+            scenario.BattlefieldSupply.Metrics.TotalAmmunitionTransferred > 0.0);
+        Assert.True(
+            scenario.Intelligence.GetContactCount(
+                scenario.West.Faction) > 0 ||
+            scenario.Intelligence.GetContactCount(
+                scenario.East.Faction) > 0);
     }
+
+    private static bool HasIntegratedIndustry(
+        SkirmishScenarioHarness scenario,
+        PlayerId player) =>
+        scenario.CountBuildings(
+            player,
+            BuildingIds.Smelter) > 0 &&
+        scenario.CountBuildings(
+            player,
+            BuildingIds.Refinery) > 0 &&
+        scenario.CountBuildings(
+            player,
+            BuildingIds.ElectronicsPlant) > 0 &&
+        scenario.CountBuildings(
+            player,
+            BuildingIds.VehicleFactory) > 0 &&
+        scenario.CountBuildings(
+            player,
+            BuildingIds.AmmunitionPlant) > 0 &&
+        scenario.CountBuildings(
+            player,
+            BuildingIds.SupplyDepot) > 0 &&
+        scenario.CountBuildings(
+            player,
+            BuildingIds.Radar) > 0;
 
     private static string DescribeScenario(
         SkirmishScenarioHarness scenario)

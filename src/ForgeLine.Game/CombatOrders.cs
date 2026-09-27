@@ -487,6 +487,26 @@ public sealed class RetreatCommand : ISimulationCommand
 
 internal static class TacticalCommandUtilities
 {
+    public static bool TryGetMovementIntent(
+        SimulationContext context,
+        EntityId entity,
+        out MovementOrder order)
+    {
+        if (context.Entities.TryGetComponent(entity, out NavigationPendingPath pending))
+        {
+            order = pending.OriginalOrder;
+            return true;
+        }
+
+        if (context.Entities.TryGetComponent(entity, out NavigationRouteState route))
+        {
+            order = route.OriginalOrder;
+            return true;
+        }
+
+        return context.Entities.TryGetComponent(entity, out order);
+    }
+
     public static void ValidateIssuerAndUnits(
         PlayerId issuer,
         ReadOnlySpan<EntityId> units)

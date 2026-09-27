@@ -83,12 +83,12 @@ Launch the native Windows x64 client host:
 dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release
 ```
 
-The current client creates a DPI-aware native Win32 window, initializes Direct3D 12, runs the fixed-tick simulation, extracts immutable presentation snapshots, interpolates moving test entities, and renders them together with the chunked terrain. Left click selects a visible local unit, logistics entity, or building, Shift + left click toggles selection, left-drag performs box selection, and right click submits a movement order through the fixed-tick command queue. A single eligible ground unit uses hierarchical navigation directly; multi-unit selections create one shared strategic route and formation-relative local targets before authoritative locomotion moves each member. F1 toggles the development metrics overlay, F2 toggles broader world-debug visualization, and F3 cycles the development formation selection through Compact, Line, Column, and Wedge. F4–F8 select Command Core, Power Plant, Mine / Extractor, Storage Depot, and Smelter placement respectively; F9 rotates the selected footprint clockwise, left click submits a valid placement as a simulation command, and Escape exits placement mode. World debugging includes movement targets, velocity vectors, local steering neighborhoods, navigation cells, sectors, portals, formation centroids, slots, assignments, shared routes, combat orders/targets/pursuit leashes, readiness and resupply decisions, resource-deposit bounds, construction footprints, construction progress, and logistics nodes, links, availability state, and route geometry. The development client also starts a supplied Blue-vs-Red tactical battle exercising grouped AttackMove, sensing/targeting, an artillery fire mission, the tactical test opponent, real Fuel/Ammunition, and battlefield resupply.
+The current client creates a DPI-aware native Win32 window, initializes Direct3D 12, runs the fixed-tick simulation, extracts immutable presentation snapshots, and renders the authoritative Central Divide skirmish together with the chunked terrain. Synthetic render-load entities are disabled during normal play and are created only when `--render-stress` is requested. Left click selects a visible local unit, logistics entity, or building, Shift + left click toggles selection, left-drag performs box selection, and right click submits a movement order through the fixed-tick command queue. A single eligible ground unit uses hierarchical navigation directly; multi-unit selections create one shared strategic route and formation-relative local targets before authoritative locomotion moves each member. F1 toggles the development metrics overlay, F2 toggles broader world-debug visualization, and F3 cycles the development formation selection through Compact, Line, Column, and Wedge. F4–F8 select Command Core, Power Plant, Mine / Extractor, Storage Depot, and Smelter placement respectively; F9 rotates the selected footprint clockwise, left click submits a valid placement as a simulation command, and Escape exits placement mode. World debugging includes movement targets, velocity vectors, local steering neighborhoods, navigation cells, sectors, portals, formation centroids, slots, assignments, shared routes, combat orders/targets/pursuit leashes, readiness and resupply decisions, resource-deposit bounds, construction footprints, construction progress, and logistics nodes, links, availability state, and route geometry.
 
 Run the bounded client smoke validation used by CI:
 
 ```powershell
-dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release -- --smoke-test
+dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release -- --smoke-test --render-stress 1000
 ```
 
 The smoke mode creates the same native window, initializes Direct3D 12 with hardware-adapter selection and WARP fallback, generates the development world, runs the fixed-tick simulation/presentation pipeline, renders terrain and test entities briefly, then requests a clean shutdown.
@@ -109,6 +109,18 @@ Create a repeatable lightweight-entity stress scenario and write structured diag
 
 ```powershell
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --ticks 64 --seed 42 --entities 10000 --diagnostics-output artifacts/stress-10000.json
+```
+
+Run the canonical vertical-slice stack headlessly. The `gameplay` profile uses product-facing starting stock, opponent settings, and 16 m / 8-cell navigation sectors; the `validation` profile is explicitly accelerated and uses 32 m / 4-cell sectors for bounded deterministic validation without changing gameplay defaults:
+
+```powershell
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --require-terminal --diagnostics-output artifacts/vertical-slice-match.json
+```
+
+Run repeated fresh-match soak validation outside the normal PR duration budget:
+
+```powershell
+pwsh ./build/Run-VerticalSliceSoak.ps1 -Profile validation -Matches 5 -TicksPerMatch 80000 -Seed 2026
 ```
 
 ## Diagnostics

@@ -173,8 +173,11 @@ public sealed class AutomatedDistributionSystem
 
                 double cargoQuantity = GetTruckCargoQuantity(
                     context.Entities,
-                    request.AssignedTruck,
-                    request.ResourceId);
+                    request.AssignedTruck);
+                if (hasReservation)
+                {
+                    context.Entities.RemoveComponent<CargoTransportReservation>(request.AssignedTruck);
+                }
 
                 if (cargoQuantity > QuantityEpsilon)
                 {
@@ -185,6 +188,13 @@ public sealed class AutomatedDistributionSystem
                 }
                 else
                 {
+                    // The failed order otherwise keeps an empty truck occupied
+                    // forever, even though its delivery request is retried.
+                    if (context.Entities.HasComponent<CargoTransportOrder>(request.AssignedTruck))
+                    {
+                        context.Entities.RemoveComponent<CargoTransportOrder>(request.AssignedTruck);
+                    }
+
                     RetryOrFail(
                         request,
                         LogisticsTransportRequestFailureReason.TransportFailed,
@@ -357,7 +367,7 @@ public sealed class AutomatedDistributionSystem
                 }
 
                 int ageComparison =
-                    left.CreatedAtTick.CompareTo(right.CreatedAtTick);
+                    left.WaitingSinceTick.CompareTo(right.WaitingSinceTick);
 
                 return ageComparison != 0
                     ? ageComparison
@@ -588,6 +598,7 @@ public sealed class AutomatedDistributionSystem
                     destination,
                     node,
                     structuralRoute.Route,
+                    request.ResourceId,
                     out EntityId truckEntity,
                     out CargoTransport truck))
             {
@@ -717,6 +728,7 @@ public sealed class AutomatedDistributionSystem
         in LogisticsNode destination,
         in LogisticsNode source,
         LogisticsRoute route,
+        ResourceId resource,
         out EntityId selectedEntity,
         out CargoTransport selectedTransport)
     {
@@ -781,7 +793,10 @@ public sealed class AutomatedDistributionSystem
                     entity,
                     truckPosition,
                     source,
-                    route))
+                    route,
+                    resource == ResourceIds.Volatiles &&
+                    entities.TryGetComponent(destination.Entity, out ProductionFacility facility) &&
+                    facility.Supports(ProductionCapability.FuelProcessing)))
             {
                 continue;
             }
@@ -803,7 +818,8 @@ public sealed class AutomatedDistributionSystem
         EntityId entity,
         Vector3 truckPosition,
         in LogisticsNode source,
-        LogisticsRoute route)
+        LogisticsRoute route,
+        bool replenishesFuelProduction)
     {
         if (!entities.TryGetComponent(
                 entity,
@@ -828,7 +844,10 @@ public sealed class AutomatedDistributionSystem
                  route.TotalDistanceMeters) *
                 fuel.ConsumptionPerMeter);
         double reserveFuel =
-            fuel.Capacity * 0.2;
+            // Refineries refill operational tanks once their input arrives.
+            // Keep a small margin, but do not strand the fuel supply chain
+            // behind the normal reserve while every provider is running dry.
+            fuel.Capacity * (replenishesFuelProduction ? 0.05 : 0.2);
         double availableFuel =
             _inventories.GetQuantity(
                 fuel.InventoryId,
@@ -899,8 +918,8 @@ public sealed class AutomatedDistributionSystem
         SimulationTick tick)
     {
         int basePriority = (int)request.Priority;
-        ulong age = tick.Value >= request.CreatedAtTick.Value
-            ? tick.Value - request.CreatedAtTick.Value
+        ulong age = tick.Value >= request.WaitingSinceTick.Value
+            ? tick.Value - request.WaitingSinceTick.Value
             : 0;
         ulong agingSteps = age / _fairnessAgingTicks;
         int boundedAging = (int)Math.Min(
@@ -956,6 +975,20 @@ public sealed class AutomatedDistributionSystem
         request.Origin = LogisticsNodeId.None;
         request.TransportFailureCount = 0;
 
+        // A truck became available. Reconsider waiting deficits before handing
+        // it straight back to this bulk request between their retry intervals.
+        foreach (RequestState waiting in _requests)
+        {
+            if (waiting.State == LogisticsTransportRequestState.RetryPending &&
+                waiting.FailureReason == LogisticsTransportRequestFailureReason.NoTruckAvailable)
+            {
+                waiting.State = LogisticsTransportRequestState.Pending;
+                waiting.FailureReason = LogisticsTransportRequestFailureReason.None;
+                waiting.StateChangedAtTick = context.Tick;
+                waiting.NextAttemptTick = context.Tick;
+            }
+        }
+
         if (!context.Entities.TryGetComponent(
                 request.PolicyEntity,
                 out LogisticsStockPolicy policy) ||
@@ -989,6 +1022,9 @@ public sealed class AutomatedDistributionSystem
 
         request.RequestedQuantity = remaining;
         request.Priority = policy.Priority;
+        // A delivered load has received its fair turn. Remaining bulk demand
+        // must age again instead of monopolizing trucks ahead of new deficits.
+        request.WaitingSinceTick = context.Tick;
         request.State = LogisticsTransportRequestState.Pending;
         request.FailureReason =
             LogisticsTransportRequestFailureReason.None;
@@ -1107,8 +1143,7 @@ public sealed class AutomatedDistributionSystem
 
     private double GetTruckCargoQuantity(
         EntityRegistry entities,
-        EntityId truckEntity,
-        ResourceId resourceId)
+        EntityId truckEntity)
     {
         if (!entities.TryGetComponent(
                 truckEntity,
@@ -1118,9 +1153,7 @@ public sealed class AutomatedDistributionSystem
             return 0.0;
         }
 
-        return _inventories.GetQuantity(
-            transport.CargoInventory,
-            resourceId);
+        return _inventories.GetTotalQuantity(transport.CargoInventory);
     }
 
     private void UpdateMetricsAndDebugSnapshot(SimulationContext context)
@@ -1460,6 +1493,7 @@ public sealed class AutomatedDistributionSystem
             RequestedQuantity = requestedQuantity;
             Priority = priority;
             CreatedAtTick = createdAtTick;
+            WaitingSinceTick = createdAtTick;
             StateChangedAtTick = createdAtTick;
             NextAttemptTick = createdAtTick;
         }
@@ -1479,6 +1513,8 @@ public sealed class AutomatedDistributionSystem
         public LogisticsStockPriority Priority { get; set; }
 
         public SimulationTick CreatedAtTick { get; }
+
+        public SimulationTick WaitingSinceTick { get; set; }
 
         public SimulationTick StateChangedAtTick { get; set; }
 

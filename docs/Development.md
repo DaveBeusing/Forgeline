@@ -30,6 +30,7 @@ dotnet build ForgeLine.sln --configuration Release --no-restore
 dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release --no-build -- --smoke-test --render-stress 1000
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 64 --seed 12345 --tick-rate 20 --entities 1000 --diagnostics-output artifacts/headless-smoke.json
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 16 --seed 67890 --tick-rate 20 --entities 10000 --diagnostics-output artifacts/headless-stress-10000.json
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --require-terminal --diagnostics-output artifacts/vertical-slice-match.json
 dotnet test ForgeLine.sln --configuration Release --no-build
 ```
 
@@ -39,7 +40,7 @@ The GitHub Actions CI workflow executes the same essential sequence on pull requ
 
 The repository contains focused test projects for Core, ECS, Jobs, World, Simulation, Navigation, Logistics, Game, Platform.Windows, Graphics, Input, and Presentation.
 
-Functional tests belong with the systems they validate and should cover controlled failure behavior as well as successful behavior. Directorate content validation and the bounded vertical-slice smoke scenario run in `ForgeLine.Game.Tests` and must remain fully headless. Prototype battlefield validation, disruption/rerouting/restoration, finite-resource loading, and Command Core objective tests also run in `ForgeLine.Game.Tests` without a presentation dependency. Skirmish-opponent validation uses the same headless game stack for symmetric starts, shortage recovery, intelligence-constrained direct targeting, same-seed strategic progression, and bounded Build–Supply–Conquer progression. Terminal full-match soak execution remains outside the regular CI duration budget while long-horizon logistics endurance is stabilized.
+Functional tests belong with the systems they validate and should cover controlled failure behavior as well as successful behavior. Directorate content validation and bounded vertical-slice scenarios run in `ForgeLine.Game.Tests` and remain fully headless. Prototype battlefield validation, disruption/rerouting/restoration, finite-resource loading, and Command Core objective tests also run in `ForgeLine.Game.Tests` without a presentation dependency. Skirmish-opponent validation reuses `VerticalSliceScenario` for shortage recovery, intelligence-constrained direct targeting, same-seed strategic progression, integrated Build–Supply–Conquer coverage, and fresh-session cleanup. CI additionally executes one bounded terminal match through the real headless host. Repeated multi-match soak remains an on-demand workflow rather than a per-PR timing gate.
 
 Job tests verify range coverage, dependency ordering, fences, exception propagation, one-worker execution, cancellation-aware shutdown, bounded stress execution, and instrumentation. Simulation tests verify fixed tick counts, explicit phase order, command scheduling and stable ordering, deterministic seeded behavior, job-boundary integration, fast headless-style execution, allocation behavior, diagnostics, reusable test scenarios, and bounded entity stress. Simulation tests must remain runnable without starting the interactive client. Navigation tests cover movement-class traversability, obstacle blocking, sector decomposition, portals, high-level routing, choke points, bounded local refinement, cache reuse, explicit route failure, and large-map hierarchy scaling. Logistics tests cover connected and disconnected graphs, disabled infrastructure, alternate routes, deterministic equal-cost ties, node removal, versioned cache invalidation, transport-mode filtering, and minimum-capacity filtering. Game tests additionally cover job-scheduled navigation handoff, stale-result rejection, fixed-tick ground locomotion, arrival, acceleration and turn limits, terrain/slope handling, spatial chunk crossing, local separation, static obstacle steering, stuck detection, one shared strategic route for 10/50/100-unit selections, stable formation slots, unit removal, replacement orders, choke-point fallback, concurrent groups, a 1,000-unit movement stress scenario, economic-building logistics registration, physical cargo transport, load/unload conservation, route invalidation/rerouting, destination-capacity recovery, vehicle-loss semantics, bounded multi-transport stress, throughput-window enforcement, congestion-aware alternate routing, persistent node/edge disruption and restoration, saturation backlog/recovery, route-churn reservation cleanup, hitscan cadence and reload timing, authoritative Ammunition depletion, range rejection, physical projectile travel/collision, exactly-once impact, stale source/target handling, zero-health lifecycle destruction, repeatable headless combat outcomes, Front/Side/Rear/Top armor classification, penetration mitigation, target-class filtering, deterministic target priority, reacquisition, fire-policy behavior, and target-availability/line-of-fire hooks, persistent exploration, visual-visibility loss, radar-only contacts, Detected/Identified transitions, faction isolation, hidden-target exclusion, last-known moving contacts, faction-safe presentation filtering, hidden artillery-coordinate rejection, radar-contact fire missions, indirect min/max range, projectile travel, exactly-once area damage, Ammunition exhaustion, Battlefield-Supply-driven mission recovery, Attack/pursuit-leash behavior, AttackMove engagement/resume, Hold/Stop semantics, group target spreading, real automatic resupply, Retreat, derived unit/group readiness, entity-loss strength degradation, and intelligence-constrained tactical test-opponent behavior.
 
@@ -72,7 +73,7 @@ Correctness tests remain separate from benchmark timing. Benchmark timing thresh
 
 ## Windows Client Host
 
-The interactive client composes the native Windows host, Direct3D 12 graphics backend, RTS input/camera stack, fixed-tick simulation, immutable presentation extraction, generic interpolated instances, development debug visualization, and the canonical Central Divide prototype battlefield. The local side receives the normal west starting base while Player 2 runs the skirmish opponent through the same construction, logistics, movement, intelligence, supply, combat, and objective systems. F2 includes the battlefield's starts, resources, strategic sites, logistics corridor, crossings, infrastructure state, Command Core objectives, and skirmish strategic state alongside the existing system diagnostics.
+The interactive client composes the native Windows host, Direct3D 12 graphics backend, RTS input/camera stack, fixed-tick simulation, immutable presentation extraction, development debug visualization, and the canonical Central Divide prototype battlefield. Normal launches contain only the skirmish world; synthetic instance load is opt-in through `--render-stress` and is used by the rendering smoke path. The local side receives the normal west starting base while Player 2 runs the skirmish opponent through the same construction, logistics, movement, intelligence, supply, combat, and objective systems. F2 includes the battlefield's starts, resources, strategic sites, logistics corridor, crossings, infrastructure state, Command Core objectives, and skirmish strategic state alongside the existing system diagnostics.
 
 Launch it with:
 
@@ -92,18 +93,30 @@ See [Windows Client](WindowsClient.md) for lifecycle and DPI details, [RTS Camer
 
 ## Headless Runtime
 
-The development host supports:
+The development host supports lightweight engine stress and complete vertical-slice execution:
 
 ```text
+--scenario <lightweight|vertical-slice>
+--profile <gameplay|validation>
 --ticks <count>
 --seed <value>
 --tick-rate <hz>
 --entities <count>
+--matches <count>
+--require-terminal
 --diagnostics-output <path>
 --help
 ```
 
-The logical tick rate describes simulation time. Headless execution does not sleep to match real time and may run substantially faster than the configured logical rate.
+The logical tick rate describes simulation time. Headless execution does not sleep to match real time and may run substantially faster than the configured logical rate. The vertical-slice runtime remains fixed at the canonical 20 Hz simulation rate. `gameplay` preserves the product-facing balance and navigation configuration; `validation` deliberately accelerates the scenario for deterministic CI/soak coverage and must not be treated as product balance.
+
+Run repeated fresh sessions with:
+
+```powershell
+pwsh ./build/Run-VerticalSliceSoak.ps1 -Profile validation -Matches 5 -TicksPerMatch 80000 -Seed 2026
+```
+
+The `Vertical Slice Soak` GitHub Actions workflow exposes the same runner through manual dispatch and uploads the JSON report.
 
 ## Commit Discipline
 
@@ -120,4 +133,4 @@ Documentation changes with implementation. When project responsibilities, depend
 
 The skirmish opponent is a game-composition layer, not an alternate simulation authority. New behavior must preserve the command boundary, faction-scoped intelligence, real resource costs, physical Fuel/Ammunition, and normal logistics/movement/combat execution. Difficulty/configuration changes may adjust decision cadence and thresholds but must not alter simulation advantages.
 
-Use `SkirmishScenarioHarness` for deterministic headless integration coverage. Keep bounded correctness scenarios in the normal test suite; longer soak runs may reuse the harness outside the regular CI duration budget. See [Skirmish Opponent](SkirmishOpponent.md) for behavior, allowed knowledge, configuration, diagnostics, and current limitations.
+Use `VerticalSliceScenario` as the canonical reusable game composition and `SkirmishScenarioHarness` as its test-facing wrapper. Keep focused deterministic scenarios in the normal test suite; CI also executes one accelerated terminal validation match, while repeated multi-match soak remains on demand. See [Skirmish Opponent](SkirmishOpponent.md) for behavior, allowed knowledge, configuration, diagnostics, and current limitations.
