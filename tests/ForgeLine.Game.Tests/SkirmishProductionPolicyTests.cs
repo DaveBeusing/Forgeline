@@ -94,13 +94,22 @@ public sealed class SkirmishProductionPolicyTests
             scenario.Simulation.Entities;
 
         EntityId lostCargo =
-            entities.Query<ControllableEntity, UnitIdentity>()
-                .First(
-                    entity =>
-                        entities.GetComponent<ControllableEntity>(entity).Owner ==
-                            scenario.West.Player &&
-                        entities.GetComponent<UnitIdentity>(entity).UnitId ==
-                            UnitIds.CargoTruck);
+            EntityId.Invalid;
+        foreach (EntityId entity in
+                 entities.Query<ControllableEntity, UnitIdentity>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            if (entities.GetComponent<ControllableEntity>(entity).Owner ==
+                    scenario.West.Player &&
+                entities.GetComponent<UnitIdentity>(entity).UnitId ==
+                    UnitIds.CargoTruck)
+            {
+                lostCargo = entity;
+                break;
+            }
+        }
+
+        Assert.True(lostCargo.IsValid);
         Assert.True(
             entities.DestroyEntity(
                 lostCargo));
@@ -163,17 +172,21 @@ public sealed class SkirmishProductionPolicyTests
             UnitProductionStatus.NoInput,
             state.Status);
 
-        UnitProductionRequest[] live =
-            entities.Query<UnitProductionRequest>()
-                .Select(
-                    entity =>
-                        entities.GetComponent<UnitProductionRequest>(
-                            entity))
-                .Where(
-                    request =>
-                        request.Facility ==
-                        factory)
-                .ToArray();
+        var live =
+            new List<UnitProductionRequest>();
+        foreach (EntityId requestEntity in
+                 entities.Query<UnitProductionRequest>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            UnitProductionRequest request =
+                entities.GetComponent<UnitProductionRequest>(
+                    requestEntity);
+            if (request.Facility ==
+                factory)
+            {
+                live.Add(request);
+            }
+        }
 
         Assert.Contains(
             live,
@@ -183,9 +196,9 @@ public sealed class SkirmishProductionPolicyTests
                 request.Priority ==
                     ProductionPriority.High);
         Assert.Single(
-            live.Where(
-                request =>
-                    request.UnitId ==
-                    UnitIds.MainBattleTank));
+            live,
+            request =>
+                request.UnitId ==
+                    UnitIds.MainBattleTank);
     }
 }
