@@ -2162,6 +2162,18 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         in UnitProductionFacility facility,
         SkirmishOpponentConfiguration configuration)
     {
+        // Only canonical power-connected production facilities may take over
+        // the queue for critical fleet recovery. An unregistered/offline
+        // synthetic facility cannot restore logistics and must not perturb
+        // unrelated production policy decisions.
+        if (!context.Entities.HasComponent<PowerNetworkMembership>(
+                facilityEntity) ||
+            !context.Entities.HasComponent<PowerConsumer>(
+                facilityEntity))
+        {
+            return false;
+        }
+
         UnitId candidate =
             SelectCriticalLogisticsProductionGoal(
                 owned,
