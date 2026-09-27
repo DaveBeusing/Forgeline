@@ -93,9 +93,12 @@ public sealed class SkirmishProductionPolicyTests
                     VerticalSliceScenarioProfile.Validation));
         var entities =
             scenario.Simulation.Entities;
+        UnitDefinition cargoDefinition =
+            DirectorateContent.CreateUnitCatalog()[
+                UnitIds.CargoTruck];
 
-        EntityId lostCargo =
-            EntityId.Invalid;
+        var westCargo =
+            new List<EntityId>();
         foreach (EntityId entity in
                  entities.Query<ControllableEntity, UnitIdentity>(
                      QueryIterationOrder.StableByEntityIndex))
@@ -105,15 +108,19 @@ public sealed class SkirmishProductionPolicyTests
                 entities.GetComponent<UnitIdentity>(entity).UnitId ==
                     UnitIds.CargoTruck)
             {
-                lostCargo = entity;
-                break;
+                westCargo.Add(entity);
             }
         }
 
-        Assert.True(lostCargo.IsValid);
-        Assert.True(
-            entities.DestroyEntity(
-                lostCargo));
+        while (westCargo.Count < 2)
+        {
+            westCargo.Add(
+                scenario.UnitFactory.Create(
+                    cargoDefinition,
+                    entities.GetComponent<WorldTransform>(
+                        scenario.West.CommandCore).Position,
+                    scenario.West.Player));
+        }
 
         InventoryId input =
             scenario.Inventories.CreateInventory(
@@ -139,10 +146,16 @@ public sealed class SkirmishProductionPolicyTests
                 scenario.West.Player,
                 Vector3.Zero,
                 SimulationTick.Zero));
+        var isolatedNetwork =
+            new PowerNetworkId(10_000);
         entities.AddComponent(
             factory,
-            entities.GetComponent<PowerNetworkMembership>(
-                scenario.West.CommandCore));
+            new PowerNetworkMembership(
+                isolatedNetwork));
+        entities.AddComponent(
+            factory,
+            new PowerGenerator(
+                10.0));
         entities.AddComponent(
             factory,
             new PowerConsumer(
@@ -173,15 +186,38 @@ public sealed class SkirmishProductionPolicyTests
             3,
             TestContext.Current.CancellationToken);
 
-        UnitProductionFacility state =
+        UnitProductionFacility blocked =
+            entities.GetComponent<UnitProductionFacility>(
+                factory);
+        Assert.Equal(
+            UnitIds.MainBattleTank,
+            blocked.ActiveUnit);
+        Assert.Equal(
+            UnitProductionStatus.NoInput,
+            blocked.Status);
+
+        for (int index = 1;
+             index < westCargo.Count;
+             index++)
+        {
+            Assert.True(
+                entities.DestroyEntity(
+                    westCargo[index]));
+        }
+
+        scenario.Simulation.RunTicks(
+            2,
+            TestContext.Current.CancellationToken);
+
+        UnitProductionFacility recovered =
             entities.GetComponent<UnitProductionFacility>(
                 factory);
         Assert.Equal(
             UnitIds.CargoTruck,
-            state.ActiveUnit);
+            recovered.ActiveUnit);
         Assert.Equal(
             UnitProductionStatus.NoInput,
-            state.Status);
+            recovered.Status);
 
         var live =
             new List<UnitProductionRequest>();
