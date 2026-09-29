@@ -674,6 +674,29 @@ public sealed class PlayerConstructionProductionFlowTests
                 .GetComponent<InventoryStorage>(
                     supplyDepot);
 
+        RemoveStockPolicies(
+            scenario,
+            gateway,
+            smelter,
+            vehicleFactory);
+
+        SubmitStockPolicy(
+            scenario,
+            gateway,
+            supplyDepot,
+            ResourceIds.Fuel,
+            minimum: 50.0,
+            target: 100.0,
+            maximum: 150.0);
+        SubmitStockPolicy(
+            scenario,
+            gateway,
+            supplyDepot,
+            ResourceIds.Ammunition,
+            minimum: 40.0,
+            target: 80.0,
+            maximum: 120.0);
+
         RunUntil(
             scenario,
             () =>
@@ -922,6 +945,45 @@ public sealed class PlayerConstructionProductionFlowTests
         Assert.Equal(
             PlayerCommandFeedbackState.Accepted,
             result.State);
+    }
+
+    private static void RemoveStockPolicies(
+        VerticalSliceScenario scenario,
+        PlayerCommandGateway gateway,
+        params EntityId[] targets)
+    {
+        var policies =
+            new List<EntityId>();
+
+        foreach (EntityId policyEntity in
+                 scenario.Simulation.Entities.Query<LogisticsStockPolicy>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            LogisticsStockPolicy policy =
+                scenario.Simulation.Entities
+                    .GetComponent<LogisticsStockPolicy>(
+                        policyEntity);
+
+            if (targets.Contains(
+                    policy.TargetEntity))
+            {
+                policies.Add(
+                    policyEntity);
+            }
+        }
+
+        foreach (EntityId policyEntity in policies)
+        {
+            PlayerCommandResultReadModel result =
+                DispatchAction(
+                    scenario,
+                    gateway,
+                    PlayerActionRequest.RemoveStockPolicy(
+                        policyEntity));
+            Assert.Equal(
+                PlayerCommandFeedbackState.Accepted,
+                result.State);
+        }
     }
 
     private static void SubmitStockPolicy(
