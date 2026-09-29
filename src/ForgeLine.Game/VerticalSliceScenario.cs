@@ -666,6 +666,8 @@ public sealed class VerticalSliceScenario : IDisposable
                 buildingDefinitions,
                 unitDefinitions,
                 recipes,
+                weapons,
+                artilleryWeapons,
                 spatialIndex,
                 buildingPlacement,
                 buildingCommands,
