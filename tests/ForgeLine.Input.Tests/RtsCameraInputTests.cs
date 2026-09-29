@@ -65,6 +65,11 @@ public sealed class RtsCameraInputTests
         Assert.False(state.HasPointerPosition);
         Assert.Equal(Vector2.Zero, state.PointerDelta);
         Assert.Equal(0, state.WheelDelta);
+        Assert.True(state.FocusLostThisFrame);
+
+        state.BeginFrame();
+
+        Assert.False(state.FocusLostThisFrame);
     }
 
     [Fact]
