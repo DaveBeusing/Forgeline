@@ -479,6 +479,30 @@ public sealed class PlayerCommandBoundaryTests
         Assert.Equal(
             PlayerLogisticsActionFailureReason.InvalidThresholds,
             invalidResult.ActionFailure);
+
+        PlayerCommandSubmissionReceipt nonFinite =
+            gateway.SubmitLogisticsStockPolicy(
+                scenario.West.Player,
+                scenario.West.CommandCore,
+                ResourceIds.Electronics,
+                double.NaN,
+                20.0,
+                40.0,
+                LogisticsStockPriority.Normal,
+                enabled: true,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(nonFinite.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel nonFiniteResult));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Rejected,
+            nonFiniteResult.State);
+        Assert.Equal(
+            PlayerLogisticsActionFailureReason.InvalidThresholds,
+            nonFiniteResult.ActionFailure);
     }
 
     [Fact]
