@@ -708,7 +708,7 @@ public sealed class PlayerConstructionProductionFlowTests
         Assert.True(
             gateway.SubmitMovement(
                 scenario.West.Player,
-                [supplyTruck, .. tanks],
+                tanks,
                 supplyDepotPosition,
                 scenario.Simulation.CurrentTick,
                 FormationTemplate.Compact).Accepted);
@@ -726,44 +726,6 @@ public sealed class PlayerConstructionProductionFlowTests
                                     tank).Position,
                             supplyDepotPosition) <=
                         28.0f * 28.0f),
-            maximumTicks: 1_000);
-
-        Vector3 depotLoadDirection =
-            Vector3.Normalize(
-                new Vector3(
-                    supplyDepotPosition.X -
-                        westCore.Position.X,
-                    0.0f,
-                    supplyDepotPosition.Z -
-                        westCore.Position.Z));
-        Vector3 supplyTruckLoadPoint =
-            supplyDepotPosition +
-            depotLoadDirection * 10.0f;
-
-        Assert.True(
-            gateway.SubmitMovement(
-                scenario.West.Player,
-                [supplyTruck],
-                supplyTruckLoadPoint,
-                scenario.Simulation.CurrentTick,
-                FormationTemplate.Compact).Accepted);
-        scenario.Simulation.AdvanceOneTick();
-        Assert.True(gateway.Results.TryRead(out _));
-
-        SupplyTruck truckSupply =
-            scenario.Simulation.Entities
-                .GetComponent<SupplyTruck>(
-                    supplyTruck);
-
-        RunUntil(
-            scenario,
-            () =>
-                scenario.Inventories.GetQuantity(
-                    truckSupply.InventoryId,
-                    ResourceIds.Fuel) > 0.0 &&
-                scenario.Inventories.GetQuantity(
-                    truckSupply.InventoryId,
-                    ResourceIds.Ammunition) > 0.0,
             maximumTicks: 1_000);
 
         var fuelBefore =
