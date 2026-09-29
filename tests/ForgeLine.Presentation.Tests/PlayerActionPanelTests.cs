@@ -152,6 +152,11 @@ public sealed class PlayerActionPanelTests
             1600,
             900);
         Release(input, PlatformKey.P);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
 
         Press(input, PlatformKey.M);
         controller.Update(
@@ -160,6 +165,11 @@ public sealed class PlayerActionPanelTests
             1600,
             900);
         Release(input, PlatformKey.M);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
         Press(input, PlatformKey.M);
         controller.Update(
             input,
@@ -167,6 +177,11 @@ public sealed class PlayerActionPanelTests
             1600,
             900);
         Release(input, PlatformKey.M);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
 
         Assert.Equal(
             ProductionRequestMode.DesiredStock,
@@ -179,6 +194,11 @@ public sealed class PlayerActionPanelTests
             1600,
             900);
         Release(input, PlatformKey.T);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
 
         Assert.Equal(
             ProductionPriority.High,
@@ -191,6 +211,11 @@ public sealed class PlayerActionPanelTests
             1600,
             900);
         Release(input, PlatformKey.Enter);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
 
         Assert.True(
             controller.TryTakeRequest(
@@ -224,6 +249,11 @@ public sealed class PlayerActionPanelTests
             1600,
             900);
         Release(input, PlatformKey.Tab);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
 
         Assert.Equal(
             1,
@@ -236,6 +266,11 @@ public sealed class PlayerActionPanelTests
             1600,
             900);
         Release(input, PlatformKey.Enter);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
 
         Assert.True(
             controller.TryTakeRequest(
@@ -255,6 +290,11 @@ public sealed class PlayerActionPanelTests
             1600,
             900);
         Release(input, PlatformKey.C);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
 
         Assert.True(
             controller.TryTakeRequest(
