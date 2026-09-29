@@ -982,31 +982,6 @@ internal sealed class ClientApplication
         }
     }
 
-    private static Dictionary<
-        string,
-        StrategicInfrastructureOperationalState> CaptureCrossingStates(
-        SimulationCoordinator simulation,
-        PrototypeBattlefieldRuntime runtime)
-    {
-        var states =
-            new Dictionary<
-                string,
-                StrategicInfrastructureOperationalState>(
-                    StringComparer.Ordinal);
-
-        foreach (var pair in runtime.CrossingEntities)
-        {
-            if (simulation.Entities.TryGetComponent(
-                    pair.Value,
-                    out StrategicInfrastructureState state))
-            {
-                states[pair.Key] = state.State;
-            }
-        }
-
-        return states;
-    }
-
     private static void DrawInstanceBounds(
         DebugDraw debugDraw,
         in RenderInstance instance,
@@ -1035,37 +1010,60 @@ internal sealed class ClientApplication
 
     private static DevelopmentOverlayMetrics CreateOverlayMetrics(
         in FrameTimingMetrics frameTiming,
-        SimulationCoordinator simulation,
-        SimulationDiagnosticsSnapshot simulationDiagnostics,
+        PresentationSnapshot? snapshot,
         TerrainRenderer terrainRenderer,
         SimpleInstanceRenderer instanceRenderer,
         DebugDrawRenderer debugDrawRenderer,
         RenderWorld renderWorld)
     {
-        TerrainRenderDiagnostics terrain = terrainRenderer.LastDiagnostics;
-        InstanceRenderDiagnostics instances = instanceRenderer.LastDiagnostics;
-        DebugDrawRenderDiagnostics debug = debugDrawRenderer.LastDiagnostics;
+        TerrainRenderDiagnostics terrain =
+            terrainRenderer.LastDiagnostics;
+        InstanceRenderDiagnostics instances =
+            instanceRenderer.LastDiagnostics;
+        DebugDrawRenderDiagnostics debug =
+            debugDrawRenderer.LastDiagnostics;
+        SimulationDiagnosticsSnapshot? simulationDiagnostics =
+            snapshot?.SimulationDiagnostics;
+
         double jobExecutionMilliseconds =
-            simulationDiagnostics.Jobs?.TotalExecutionDuration.TotalMilliseconds ?? 0.0;
+            simulationDiagnostics?.Jobs?
+                .TotalExecutionDuration
+                .TotalMilliseconds ??
+            0.0;
 
         return new DevelopmentOverlayMetrics(
             frameTiming.FramesPerSecond,
             frameTiming.FrameMilliseconds,
             frameTiming.CpuRenderMilliseconds,
-            simulation.CurrentTick.Value,
-            simulationDiagnostics.LastTickDuration.TotalMilliseconds,
-            simulation.Entities.EntityCount,
+            snapshot?.Tick.Value ?? 0,
+            simulationDiagnostics?
+                .LastTickDuration
+                .TotalMilliseconds ??
+            0.0,
+            snapshot?.SimulationEntityCount ?? 0,
             terrain.VisibleChunks,
             terrain.TotalChunks,
-            terrain.DrawCalls + instances.DrawCalls + debug.DrawCalls,
+            terrain.DrawCalls +
+            instances.DrawCalls +
+            debug.DrawCalls,
             instances.VisibleInstances,
             renderWorld.InstanceCount,
             jobExecutionMilliseconds,
-            simulationDiagnostics.Runtime.TotalAllocatedBytes,
-            simulationDiagnostics.Runtime.HeapSizeBytes,
-            simulationDiagnostics.Runtime.Gen0Collections,
-            simulationDiagnostics.Runtime.Gen1Collections,
-            simulationDiagnostics.Runtime.Gen2Collections);
+            simulationDiagnostics?
+                .Runtime.TotalAllocatedBytes ??
+            0,
+            simulationDiagnostics?
+                .Runtime.HeapSizeBytes ??
+            0,
+            simulationDiagnostics?
+                .Runtime.Gen0Collections ??
+            0,
+            simulationDiagnostics?
+                .Runtime.Gen1Collections ??
+            0,
+            simulationDiagnostics?
+                .Runtime.Gen2Collections ??
+            0);
     }
 
     private static bool ConsumeKeyPress(
@@ -1230,18 +1228,21 @@ internal sealed class ClientApplication
 
     private static void WritePresentationState(
         string state,
-        SimulationCoordinator simulation,
         RenderWorld renderWorld,
         TerrainRenderer terrainRenderer,
         SimpleInstanceRenderer instanceRenderer)
     {
-        TerrainRenderDiagnostics terrain = terrainRenderer.LastDiagnostics;
-        InstanceRenderDiagnostics instances = instanceRenderer.LastDiagnostics;
+        TerrainRenderDiagnostics terrain =
+            terrainRenderer.LastDiagnostics;
+        InstanceRenderDiagnostics instances =
+            instanceRenderer.LastDiagnostics;
+        PresentationSnapshot? snapshot =
+            renderWorld.CurrentSnapshot;
 
         Console.WriteLine(
-            $"[presentation:{state}] tick={simulation.CurrentTick.Value} " +
-            $"entities={simulation.Entities.EntityCount} " +
-            $"snapshotTick={renderWorld.CurrentSnapshot?.Tick.Value ?? 0} " +
+            $"[presentation:{state}] session={snapshot?.SessionId.Value ?? 0} " +
+            $"tick={snapshot?.Tick.Value ?? 0} " +
+            $"entities={snapshot?.SimulationEntityCount ?? 0} " +
             $"instances={renderWorld.InstanceCount} " +
             $"visibleInstances={instances.VisibleInstances} " +
             $"visibleChunks={terrain.VisibleChunks} " +
@@ -1251,39 +1252,59 @@ internal sealed class ClientApplication
     private static void WriteInteractionState(
         string state,
         RtsSelectionController selectionController,
-        SimulationCommandEnvelope? movementEnvelope,
-        MoveEntitiesCommand? movementCommand,
+        PlayerCommandSubmissionReceipt? commandReceipt,
+        PlayerCommandResultReadModel? commandResult,
         FormationTemplate activeFormation,
-        RtsBuildingPlacementController buildingPlacementController,
-        SimulationCommandEnvelope? buildEnvelope,
-        BuildCommand? buildCommand,
-        BuildingCommandProcessingSystem buildingCommands)
+        RtsBuildingPlacementController buildingPlacementController)
     {
-        EntityId hovered = selectionController.HoveredEntity;
-        string hoveredText = hovered.IsValid
-            ? hovered.ToString()
-            : "none";
-        string commandText = movementEnvelope.HasValue
-            ? movementEnvelope.Value.Sequence.ToString(
-                System.Globalization.CultureInfo.InvariantCulture)
-            : "none";
-        string buildCommandText = buildEnvelope.HasValue
-            ? buildEnvelope.Value.Sequence.ToString(
-                System.Globalization.CultureInfo.InvariantCulture)
-            : "none";
-        BuildCommandMetrics buildMetrics = buildingCommands.Metrics;
+        EntityId hovered =
+            selectionController.HoveredEntity;
+        string hoveredText =
+            hovered.IsValid
+                ? hovered.ToString()
+                : "none";
+
+        string commandSequence =
+            commandReceipt?.Sequence.ToString(
+                System.Globalization.CultureInfo.InvariantCulture) ??
+            "none";
+
+        string correlation =
+            commandReceipt?.CorrelationId.Value.ToString(
+                System.Globalization.CultureInfo.InvariantCulture) ??
+            commandResult?.CorrelationId.Value.ToString(
+                System.Globalization.CultureInfo.InvariantCulture) ??
+            "none";
 
         Console.WriteLine(
             $"[interaction:{state}] selected={selectionController.Selection.Count} " +
-            $"hovered={hoveredText} lastCommand={commandText} " +
-            $"acceptedTargets={movementCommand?.AcceptedTargetCount ?? 0} " +
-            $"rejectedTargets={movementCommand?.RejectedTargetCount ?? 0} " +
-            $"executedTick={movementCommand?.ExecutedAtTick.Value ?? 0} " +
-            $"formation={activeFormation} placementActive={buildingPlacementController.IsActive} " +
+            $"hovered={hoveredText} commandSequence={commandSequence} " +
+            $"correlation={correlation} " +
+            $"commandAccepted={commandReceipt?.Accepted ?? false} " +
+            $"submissionFailure={commandReceipt?.Failure ?? PlayerCommandSubmissionFailure.None} " +
+            $"result={commandResult?.State ?? PlayerCommandFeedbackState.None} " +
+            $"acceptedTargets={commandResult?.AcceptedTargets ?? 0} " +
+            $"rejectedTargets={commandResult?.RejectedTargets ?? 0} " +
+            $"resolvedTick={commandResult?.ResolvedAtTick.Value ?? 0} " +
+            $"buildRejection={commandResult?.BuildRejection ?? BuildCommandRejectionReason.None} " +
+            $"placementFailure={commandResult?.PlacementFailure ?? BuildingPlacementFailureReason.None} " +
+            $"formation={activeFormation} " +
+            $"placementActive={buildingPlacementController.IsActive} " +
             $"building={buildingPlacementController.ActiveBuilding} " +
             $"orientation={buildingPlacementController.Orientation} " +
-            $"lastBuildCommand={buildCommandText} buildRequestEntity={buildCommand?.RequestEntity.ToString() ?? "none"} " +
-            $"acceptedBuilds={buildMetrics.AcceptedCommands} rejectedBuilds={buildMetrics.RejectedCommands} " +
-            $"lastBuildRejection={buildMetrics.LastRejection} placementFailure={buildMetrics.LastPlacementFailure}");
+            $"previewFreshness={buildingPlacementController.PreviewFreshness}");
     }
+
+    private static void DrainCommandResults(
+        PlayerCommandGateway commandGateway,
+        ref PlayerCommandResultReadModel? lastCommandResult)
+    {
+        while (commandGateway.Results.TryRead(
+                   out PlayerCommandResultReadModel result))
+        {
+            lastCommandResult =
+                result;
+        }
+    }
+
 }
