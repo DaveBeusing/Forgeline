@@ -529,7 +529,14 @@ internal sealed class ClientApplication
                         debugDraw,
                         playerExperience,
                         showDevelopmentMetrics:
-                            overlayEnabled);
+                            overlayEnabled,
+                        playerActions:
+                            currentSnapshot?.PlayerActions,
+                        actionPanel:
+                            actionPanel.CreateView(
+                                window.ClientSize.Width,
+                                window.ClientSize.Height,
+                                currentSnapshot?.PlayerActions));
                 });
 
             long renderFinishedAt = _platform.Clock.GetTimestamp();
