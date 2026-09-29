@@ -451,6 +451,7 @@ public sealed class PlayerTacticalActionCommand : ISimulationCommand
                 !_weapons.TryGet(
                     weaponState.WeaponId,
                     out WeaponDefinition? weapon) ||
+                weapon is null ||
                 !weapon.Effectiveness.CanEngage(
                     targetable.Class))
             {
@@ -588,7 +589,8 @@ public sealed class PlayerTacticalActionCommand : ISimulationCommand
                     out WorldTransform transform) ||
                 !_artilleryWeapons.TryGet(
                     capability.WeaponId,
-                    out ArtilleryWeaponDefinition? definition))
+                    out ArtilleryWeaponDefinition? definition) ||
+                definition is null)
             {
                 continue;
             }
