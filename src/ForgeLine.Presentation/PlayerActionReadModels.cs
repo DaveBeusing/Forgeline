@@ -285,7 +285,8 @@ internal static class PlayerActionSnapshotFactory
 
         PlayerConstructionActionReadModel[] construction =
             CaptureConstructionActions(
-                scenario);
+                scenario,
+                extraction.Side.StartingInventory);
 
         EntityId selectedFacility =
             ResolveSingleOwnedSelection(
@@ -328,7 +329,8 @@ internal static class PlayerActionSnapshotFactory
 
     private static PlayerConstructionActionReadModel[]
         CaptureConstructionActions(
-            VerticalSliceScenario scenario)
+            VerticalSliceScenario scenario,
+            InventoryId constructionInventory)
     {
         var actions =
             new List<PlayerConstructionActionReadModel>();
@@ -342,10 +344,7 @@ internal static class PlayerActionSnapshotFactory
                         cost =>
                             CreateAmount(
                                 scenario,
-                                scenario.West.Player ==
-                                scenario.West.Player
-                                    ? scenario.West.StartingInventory
-                                    : scenario.West.StartingInventory,
+                                constructionInventory,
                                 cost.ResourceId,
                                 cost.Quantity))
                     .ToArray();
