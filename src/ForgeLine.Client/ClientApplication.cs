@@ -156,13 +156,26 @@ internal sealed class ClientApplication
         EntityId constructionInventory =
             westBase.CommandCore;
 
+        var presentationInteraction =
+            new PresentationInteractionState();
+        var commandGateway =
+            new PlayerCommandGateway(
+                simulation,
+                scenario.Services.BuildingCommands,
+                scenario.BattlefieldRuntime.MatchStateEntity);
+        var presentationExtraction =
+            new PresentationExtractionContext(
+                scenario,
+                LocalPlayer,
+                presentationInteraction,
+                commandGateway);
+
+        simulation.RegisterTickObserver(
+            commandGateway);
         simulation.RegisterTickObserver(
             new PresentationExtractor(
                 snapshotBuffer,
-                intelligenceStore,
-                new FactionId(
-                    checked((uint)LocalPlayer.Value)),
-                terrainWorld.WorldBounds));
+                presentationExtraction));
 
         simulation.AdvanceOneTick();
 
@@ -206,10 +219,8 @@ internal sealed class ClientApplication
         var debugDraw = new DebugDraw();
         var frameTimingTracker = new FrameTimingTracker();
 
-        MoveEntitiesCommand? lastMovementCommand = null;
-        SimulationCommandEnvelope? lastMovementEnvelope = null;
-        BuildCommand? lastBuildCommand = null;
-        SimulationCommandEnvelope? lastBuildEnvelope = null;
+        PlayerCommandSubmissionReceipt? lastCommandReceipt = null;
+        PlayerCommandResultReadModel? lastCommandResult = null;
         bool overlayEnabled = true;
         bool worldDebugEnabled = false;
         bool overlayToggleHeld = false;
@@ -221,8 +232,6 @@ internal sealed class ClientApplication
             FormationTemplate.Compact;
         TimeSpan simulationAccumulator = TimeSpan.Zero;
         FrameTimingMetrics frameTiming = default;
-        SimulationDiagnosticsSnapshot simulationDiagnostics =
-            simulation.Diagnostics.Capture(simulation);
 
         WriteWindowState("started", window);
         WriteGraphicsState("started", graphics);
