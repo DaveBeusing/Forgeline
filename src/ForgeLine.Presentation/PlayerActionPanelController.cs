@@ -13,7 +13,16 @@ public enum PlayerActionPanelMode : byte
     Closed = 0,
     Construction = 1,
     Production = 2,
-    UnitProduction = 3
+    UnitProduction = 3,
+    Logistics = 4,
+    Supply = 5
+}
+
+public enum PlayerStockThresholdField : byte
+{
+    Minimum = 0,
+    Target = 1,
+    Maximum = 2
 }
 
 public enum PlayerActionRequestKind : byte
@@ -24,7 +33,11 @@ public enum PlayerActionRequestKind : byte
     SetProductionPaused = 3,
     CancelProduction = 4,
     QueueUnitProduction = 5,
-    CancelUnitProduction = 6
+    CancelUnitProduction = 6,
+    SetStockPolicy = 7,
+    RemoveStockPolicy = 8,
+    SetAutomaticResupplyPolicy = 9,
+    RequestResupply = 10
 }
 
 public readonly record struct PlayerActionRequest(
@@ -38,7 +51,15 @@ public readonly record struct PlayerActionRequest(
     ProductionPriority Priority,
     ProductionRequestMode ProductionMode,
     ResourceId DesiredStockResourceId,
-    double DesiredStockQuantity)
+    double DesiredStockQuantity,
+    ResourceId StockResourceId = default,
+    double StockMinimum = 0.0,
+    double StockTarget = 0.0,
+    double StockMaximum = 0.0,
+    LogisticsStockPriority StockPriority = LogisticsStockPriority.Normal,
+    bool Enabled = true,
+    double AutomaticFuelThreshold = 0.0,
+    double AutomaticAmmunitionThreshold = 0.0)
 {
     public static PlayerActionRequest BeginBuildingPlacement(
         BuildingId buildingId) =>
@@ -137,6 +158,89 @@ public readonly record struct PlayerActionRequest(
             ProductionRequestMode.OneShot,
             ResourceId.None,
             0.0);
+
+    public static PlayerActionRequest SetStockPolicy(
+        EntityId target,
+        ResourceId resourceId,
+        double minimum,
+        double desiredTarget,
+        double maximum,
+        LogisticsStockPriority priority,
+        bool enabled) =>
+        new(
+            PlayerActionRequestKind.SetStockPolicy,
+            BuildingId.None,
+            target,
+            RecipeId.None,
+            UnitId.None,
+            EntityId.Invalid,
+            false,
+            ProductionPriority.Normal,
+            ProductionRequestMode.OneShot,
+            ResourceId.None,
+            0.0,
+            resourceId,
+            minimum,
+            desiredTarget,
+            maximum,
+            priority,
+            enabled);
+
+    public static PlayerActionRequest RemoveStockPolicy(
+        EntityId policyEntity) =>
+        new(
+            PlayerActionRequestKind.RemoveStockPolicy,
+            BuildingId.None,
+            EntityId.Invalid,
+            RecipeId.None,
+            UnitId.None,
+            policyEntity,
+            false,
+            ProductionPriority.Normal,
+            ProductionRequestMode.OneShot,
+            ResourceId.None,
+            0.0);
+
+    public static PlayerActionRequest SetAutomaticResupplyPolicy(
+        EntityId target,
+        double fuelThreshold,
+        double ammunitionThreshold,
+        bool enabled) =>
+        new(
+            PlayerActionRequestKind.SetAutomaticResupplyPolicy,
+            BuildingId.None,
+            target,
+            RecipeId.None,
+            UnitId.None,
+            EntityId.Invalid,
+            false,
+            ProductionPriority.Normal,
+            ProductionRequestMode.OneShot,
+            ResourceId.None,
+            0.0,
+            ResourceId.None,
+            0.0,
+            0.0,
+            0.0,
+            LogisticsStockPriority.Normal,
+            enabled,
+            fuelThreshold,
+            ammunitionThreshold);
+
+    public static PlayerActionRequest RequestResupply(
+        EntityId target) =>
+        new(
+            PlayerActionRequestKind.RequestResupply,
+            BuildingId.None,
+            target,
+            RecipeId.None,
+            UnitId.None,
+            EntityId.Invalid,
+            false,
+            ProductionPriority.Normal,
+            ProductionRequestMode.OneShot,
+            ResourceId.None,
+            0.0);
 }
 
 public readonly record struct PlayerActionPanelView(
@@ -145,6 +249,14 @@ public readonly record struct PlayerActionPanelView(
     ProductionPriority Priority,
     ProductionRequestMode ProductionMode,
     double DesiredStockQuantity,
+    LogisticsStockPriority LogisticsPriority,
+    PlayerStockThresholdField StockThresholdField,
+    double StockMinimum,
+    double StockTarget,
+    double StockMaximum,
+    bool AutomaticResupplyEnabled,
+    double AutomaticFuelThreshold,
+    double AutomaticAmmunitionThreshold,
     bool PointerCaptured,
     float OriginX,
     float OriginY)
@@ -166,6 +278,14 @@ public sealed class PlayerActionPanelController
     private PlayerActionRequest? _pendingRequest;
     private SimulationSessionId _sessionId;
     private double _desiredStockQuantity;
+    private ResourceId _stockResourceId;
+    private double _stockMinimum;
+    private double _stockTarget;
+    private double _stockMaximum;
+    private EntityId _supplyEntity;
+    private double _automaticFuelThreshold;
+    private double _automaticAmmunitionThreshold;
+    private bool _automaticResupplyEnabled;
 
     public PlayerActionPanelMode Mode { get; private set; }
 
@@ -176,6 +296,12 @@ public sealed class PlayerActionPanelController
 
     public ProductionRequestMode ProductionMode { get; private set; } =
         ProductionRequestMode.OneShot;
+
+    public LogisticsStockPriority LogisticsPriority { get; private set; } =
+        LogisticsStockPriority.Normal;
+
+    public PlayerStockThresholdField StockThresholdField { get; private set; } =
+        PlayerStockThresholdField.Target;
 
     public bool PointerCaptured { get; private set; }
 
@@ -217,6 +343,18 @@ public sealed class PlayerActionPanelController
                 PlayerActionPanelMode.UnitProduction);
         }
 
+        if (Pressed(input, PlatformKey.L))
+        {
+            ToggleMode(
+                PlayerActionPanelMode.Logistics);
+        }
+
+        if (Pressed(input, PlatformKey.Y))
+        {
+            ToggleMode(
+                PlayerActionPanelMode.Supply);
+        }
+
         if (Mode != PlayerActionPanelMode.Closed &&
             Pressed(input, PlatformKey.Escape))
         {
@@ -249,6 +387,7 @@ public sealed class PlayerActionPanelController
                     (SelectedIndex + 1) %
                     rowCount;
                 _desiredStockQuantity = 0.0;
+                _stockResourceId = ResourceId.None;
             }
             else
             {
@@ -272,6 +411,22 @@ public sealed class PlayerActionPanelController
                         ProductionPriority.Normal
                 };
         }
+        else if (Mode == PlayerActionPanelMode.Logistics &&
+                 Pressed(input, PlatformKey.T))
+        {
+            LogisticsPriority =
+                LogisticsPriority switch
+                {
+                    LogisticsStockPriority.Normal =>
+                        LogisticsStockPriority.High,
+                    LogisticsStockPriority.High =>
+                        LogisticsStockPriority.Critical,
+                    LogisticsStockPriority.Critical =>
+                        LogisticsStockPriority.Low,
+                    _ =>
+                        LogisticsStockPriority.Normal
+                };
+        }
         else
         {
             _ = Pressed(input, PlatformKey.T);
@@ -292,12 +447,41 @@ public sealed class PlayerActionPanelController
                 };
             _desiredStockQuantity = 0.0;
         }
+        else if (Mode == PlayerActionPanelMode.Logistics &&
+                 Pressed(input, PlatformKey.M))
+        {
+            StockThresholdField =
+                StockThresholdField switch
+                {
+                    PlayerStockThresholdField.Minimum =>
+                        PlayerStockThresholdField.Target,
+                    PlayerStockThresholdField.Target =>
+                        PlayerStockThresholdField.Maximum,
+                    _ =>
+                        PlayerStockThresholdField.Minimum
+                };
+        }
+        else if (Mode == PlayerActionPanelMode.Supply &&
+                 Pressed(input, PlatformKey.M))
+        {
+            _automaticResupplyEnabled =
+                !_automaticResupplyEnabled;
+            QueueAutomaticResupplyPolicy(actions);
+        }
         else
         {
             _ = Pressed(input, PlatformKey.M);
         }
 
+        SynchronizeStockEditor(actions);
+        SynchronizeSupplyEditor(actions);
         UpdateDesiredStockTarget(
+            input,
+            actions);
+        UpdateStockThresholds(
+            input,
+            actions);
+        UpdateSupplyThresholds(
             input,
             actions);
 
@@ -372,6 +556,14 @@ public sealed class PlayerActionPanelController
             Priority,
             ProductionMode,
             ResolveDesiredStockQuantity(actions),
+            LogisticsPriority,
+            StockThresholdField,
+            _stockMinimum,
+            _stockTarget,
+            _stockMaximum,
+            _automaticResupplyEnabled,
+            _automaticFuelThreshold,
+            _automaticAmmunitionThreshold,
             PointerCaptured,
             MathF.Max(
                 12.0f,
@@ -448,6 +640,16 @@ public sealed class PlayerActionPanelController
             case PlayerActionPanelMode.UnitProduction:
                 ActivateUnitProduction(
                     actions.UnitProduction);
+                break;
+
+            case PlayerActionPanelMode.Logistics:
+                ActivateLogistics(
+                    actions.Logistics);
+                break;
+
+            case PlayerActionPanelMode.Supply:
+                ActivateSupply(
+                    actions.Supply);
                 break;
         }
     }
@@ -538,6 +740,71 @@ public sealed class PlayerActionPanelController
                 Priority);
     }
 
+    private void ActivateLogistics(
+        PlayerLogisticsActionReadModel? logistics)
+    {
+        if (logistics is null ||
+            SelectedIndex < 0 ||
+            SelectedIndex >= logistics.Policies.Count)
+        {
+            return;
+        }
+
+        PlayerStockPolicyActionReadModel policy =
+            logistics.Policies[SelectedIndex];
+
+        _pendingRequest =
+            PlayerActionRequest.SetStockPolicy(
+                logistics.Entity,
+                policy.ResourceId,
+                _stockMinimum,
+                _stockTarget,
+                _stockMaximum,
+                LogisticsPriority,
+                policy.Enabled);
+    }
+
+    private void ActivateSupply(
+        PlayerSupplyActionReadModel? supply)
+    {
+        if (!supply.HasValue)
+        {
+            return;
+        }
+
+        if (SelectedIndex >= 2)
+        {
+            _pendingRequest =
+                PlayerActionRequest.RequestResupply(
+                    supply.Value.Entity);
+            return;
+        }
+
+        QueueAutomaticResupplyPolicy(
+            supply);
+    }
+
+    private void QueueAutomaticResupplyPolicy(
+        PlayerActionSnapshot? actions) =>
+        QueueAutomaticResupplyPolicy(
+            actions?.Supply);
+
+    private void QueueAutomaticResupplyPolicy(
+        PlayerSupplyActionReadModel? supply)
+    {
+        if (!supply.HasValue)
+        {
+            return;
+        }
+
+        _pendingRequest =
+            PlayerActionRequest.SetAutomaticResupplyPolicy(
+                supply.Value.Entity,
+                _automaticFuelThreshold,
+                _automaticAmmunitionThreshold,
+                _automaticResupplyEnabled);
+    }
+
     private void CancelSelected(
         PlayerActionSnapshot? actions)
     {
@@ -586,6 +853,195 @@ public sealed class PlayerActionPanelController
                         unitProduction.Requests[
                             requestIndex].RequestEntity);
             }
+        }
+
+        if (Mode ==
+                PlayerActionPanelMode.Logistics &&
+            actions.Logistics is
+                PlayerLogisticsActionReadModel logistics &&
+            SelectedIndex >= 0 &&
+            SelectedIndex < logistics.Policies.Count)
+        {
+            PlayerStockPolicyActionReadModel policy =
+                logistics.Policies[SelectedIndex];
+
+            if (policy.HasPolicy)
+            {
+                _pendingRequest =
+                    PlayerActionRequest.RemoveStockPolicy(
+                        policy.PolicyEntity);
+            }
+        }
+    }
+
+    private void SynchronizeStockEditor(
+        PlayerActionSnapshot? actions)
+    {
+        if (Mode != PlayerActionPanelMode.Logistics ||
+            actions?.Logistics is not
+                PlayerLogisticsActionReadModel logistics ||
+            SelectedIndex < 0 ||
+            SelectedIndex >= logistics.Policies.Count)
+        {
+            _stockResourceId = ResourceId.None;
+            return;
+        }
+
+        PlayerStockPolicyActionReadModel policy =
+            logistics.Policies[SelectedIndex];
+
+        if (_stockResourceId == policy.ResourceId)
+        {
+            return;
+        }
+
+        _stockResourceId = policy.ResourceId;
+        _stockMinimum = policy.DesiredMinimum;
+        _stockTarget = policy.DesiredTarget;
+        _stockMaximum = policy.DesiredMaximum;
+        LogisticsPriority = policy.Priority;
+    }
+
+    private void SynchronizeSupplyEditor(
+        PlayerActionSnapshot? actions)
+    {
+        if (Mode != PlayerActionPanelMode.Supply ||
+            !actions?.Supply.HasValue == true)
+        {
+            _supplyEntity = EntityId.Invalid;
+            return;
+        }
+
+        PlayerSupplyActionReadModel supply =
+            actions!.Supply!.Value;
+
+        if (_supplyEntity == supply.Entity)
+        {
+            return;
+        }
+
+        _supplyEntity = supply.Entity;
+        _automaticFuelThreshold =
+            supply.AutomaticFuelThreshold;
+        _automaticAmmunitionThreshold =
+            supply.AutomaticAmmunitionThreshold;
+        _automaticResupplyEnabled =
+            supply.AutomaticEnabled;
+    }
+
+    private void UpdateStockThresholds(
+        InputState input,
+        PlayerActionSnapshot? actions)
+    {
+        if (Mode != PlayerActionPanelMode.Logistics ||
+            actions?.Logistics is null ||
+            SelectedIndex < 0 ||
+            SelectedIndex >= actions.Logistics.Policies.Count)
+        {
+            _ = Pressed(input, PlatformKey.Left);
+            _ = Pressed(input, PlatformKey.Right);
+            return;
+        }
+
+        double step =
+            Math.Max(
+                1.0,
+                Math.Ceiling(_stockTarget * 0.1));
+
+        double delta = 0.0;
+        if (Pressed(input, PlatformKey.Left))
+        {
+            delta = -step;
+        }
+
+        if (Pressed(input, PlatformKey.Right))
+        {
+            delta = step;
+        }
+
+        if (delta == 0.0)
+        {
+            return;
+        }
+
+        switch (StockThresholdField)
+        {
+            case PlayerStockThresholdField.Minimum:
+                _stockMinimum =
+                    Math.Clamp(
+                        _stockMinimum + delta,
+                        0.0,
+                        _stockTarget);
+                break;
+
+            case PlayerStockThresholdField.Target:
+                _stockTarget =
+                    Math.Max(
+                        1.0,
+                        _stockTarget + delta);
+                _stockMinimum =
+                    Math.Min(
+                        _stockMinimum,
+                        _stockTarget);
+                _stockMaximum =
+                    Math.Max(
+                        _stockMaximum,
+                        _stockTarget);
+                break;
+
+            case PlayerStockThresholdField.Maximum:
+                _stockMaximum =
+                    Math.Max(
+                        _stockTarget,
+                        _stockMaximum + delta);
+                break;
+        }
+    }
+
+    private void UpdateSupplyThresholds(
+        InputState input,
+        PlayerActionSnapshot? actions)
+    {
+        if (Mode != PlayerActionPanelMode.Supply ||
+            !actions?.Supply.HasValue == true ||
+            SelectedIndex > 1)
+        {
+            _ = Pressed(input, PlatformKey.Left);
+            _ = Pressed(input, PlatformKey.Right);
+            return;
+        }
+
+        double delta = 0.0;
+        if (Pressed(input, PlatformKey.Left))
+        {
+            delta = -0.05;
+        }
+
+        if (Pressed(input, PlatformKey.Right))
+        {
+            delta = 0.05;
+        }
+
+        if (delta == 0.0)
+        {
+            return;
+        }
+
+        if (SelectedIndex == 0)
+        {
+            _automaticFuelThreshold =
+                Math.Clamp(
+                    _automaticFuelThreshold + delta,
+                    0.0,
+                    1.0);
+        }
+        else
+        {
+            _automaticAmmunitionThreshold =
+                Math.Clamp(
+                    _automaticAmmunitionThreshold + delta,
+                    0.0,
+                    1.0);
         }
     }
 
@@ -698,6 +1154,13 @@ public sealed class PlayerActionPanelController
                     ? units.Units.Count +
                       units.Requests.Count
                     : 0,
+            PlayerActionPanelMode.Logistics =>
+                actions?.Logistics?.Policies.Count ??
+                0,
+            PlayerActionPanelMode.Supply =>
+                actions?.Supply is null
+                    ? 0
+                    : 3,
             _ =>
                 0
         };
@@ -775,6 +1238,12 @@ public sealed class PlayerActionPanelController
             ProductionPriority.Normal;
         ProductionMode =
             ProductionRequestMode.OneShot;
+        LogisticsPriority =
+            LogisticsStockPriority.Normal;
+        StockThresholdField =
+            PlayerStockThresholdField.Target;
+        _stockResourceId = ResourceId.None;
+        _supplyEntity = EntityId.Invalid;
         PointerCaptured = false;
         _pendingRequest = null;
         _desiredStockQuantity = 0.0;
