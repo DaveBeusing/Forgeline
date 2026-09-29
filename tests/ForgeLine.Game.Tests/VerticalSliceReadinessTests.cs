@@ -64,7 +64,12 @@ public sealed class VerticalSliceReadinessTests
                 maximumTicks: 50_000,
                 TestContext.Current.CancellationToken);
 
-        Assert.True(progressed);
+        Assert.True(
+            progressed,
+            $"Readiness stalled: depots={scenario.CountBuildings(scenario.West.Player, BuildingIds.SupplyDepot)}; " +
+            $"tanks={scenario.CountUnits(scenario.West.Player, UnitIds.MainBattleTank)}; " +
+            $"contacts={scenario.Intelligence.GetContactCount(scenario.West.Faction)}; " +
+            $"goal={scenario.GetOpponentState(scenario.West.Player).ActiveGoal}.");
         Assert.NotEqual(
             SkirmishStrategicGoal.RecoverSupply,
             scenario.GetOpponentState(
