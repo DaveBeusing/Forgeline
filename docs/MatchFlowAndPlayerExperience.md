@@ -196,3 +196,13 @@ The existing reusable player action palette now includes logistics and battlefie
 `L` exposes stock-policy and Cargo status for one selected owned logistics-capable entity. `Y` exposes automatic and explicit resupply controls for one selected owned supply-capable unit. The same panel focus and pointer-capture rules used by construction/production prevent clicks and keyboard actions from leaking into world selection, movement, or placement.
 
 All displayed policy, cargo, provider, and supply information is copied at the completed-tick presentation boundary. Actions are submitted through the bounded `PlayerCommandGateway`; pending submission remains distinct from accepted/rejected feedback. Session changes clear transient panel state, and stale or foreign selections do not retain player authority.
+
+## Player Tactical Combat Surface
+
+The shared player action surface now spans Build, Process, Units, Logistics, Supply, and Combat. The Combat view reports the selected count, combat-eligible/rejected counts, current common or mixed tactical order state, identified attack-target count, critical/resupplying supply counts, and artillery ammunition/range/mission state. Target-mode instructions are shown separately from owned selection.
+
+Tactical results use the same pending/result boundary as economy and supply actions. Accepted, partial, and rejected outcomes include accepted/rejected entity counts and tactical failure causes. Session changes and terminal match state clear transient targeting state instead of retaining authority across restart or result screens.
+
+The vertical-slice Command Core contract is implemented as documented: starting Command Cores are normal Structure combat targets with authoritative `HealthState`, `Combatant`, `Targetable`, `TargetPriority`, and `CombatHitbox` components. Damage flows through the normal combat runtime and lifecycle; when health reaches zero the entity is destroyed normally and `MatchObjectiveSystem` resolves victory/defeat from objective survival. No presentation action and no match-objective shortcut deletes a Command Core.
+
+The bounded player-commanded acceptance path uses human slots, finite starting stock, normal construction, industrial processing, Cargo Truck distribution, unit production, physical battlefield resupply, faction intelligence, direct tactical commands, ammunition consumption, combat damage, and natural Command Core destruction. It is distinct from the graphics smoke, which still intentionally forces objective deletion only to validate graphics-host lifecycle behavior.
