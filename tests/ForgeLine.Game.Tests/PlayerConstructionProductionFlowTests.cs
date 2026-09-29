@@ -728,11 +728,23 @@ public sealed class PlayerConstructionProductionFlowTests
                         28.0f * 28.0f),
             maximumTicks: 1_000);
 
+        Vector3 depotLoadDirection =
+            Vector3.Normalize(
+                new Vector3(
+                    supplyDepotPosition.X -
+                        westCore.Position.X,
+                    0.0f,
+                    supplyDepotPosition.Z -
+                        westCore.Position.Z));
+        Vector3 supplyTruckLoadPoint =
+            supplyDepotPosition +
+            depotLoadDirection * 10.0f;
+
         Assert.True(
             gateway.SubmitMovement(
                 scenario.West.Player,
                 [supplyTruck],
-                supplyDepotPosition,
+                supplyTruckLoadPoint,
                 scenario.Simulation.CurrentTick,
                 FormationTemplate.Compact).Accepted);
         scenario.Simulation.AdvanceOneTick();
