@@ -395,6 +395,9 @@ public sealed class PlayerActionPanelController
             }
         }
 
+        SynchronizeStockEditor(actions);
+        SynchronizeSupplyEditor(actions);
+
         if ((Mode is
                  PlayerActionPanelMode.Production or
                  PlayerActionPanelMode.UnitProduction) &&
@@ -473,8 +476,6 @@ public sealed class PlayerActionPanelController
             _ = Pressed(input, PlatformKey.M);
         }
 
-        SynchronizeStockEditor(actions);
-        SynchronizeSupplyEditor(actions);
         UpdateDesiredStockTarget(
             input,
             actions);
@@ -531,7 +532,8 @@ public sealed class PlayerActionPanelController
         bool cancel =
             (Mode is
                  PlayerActionPanelMode.Production or
-                 PlayerActionPanelMode.UnitProduction) &&
+                 PlayerActionPanelMode.UnitProduction or
+                 PlayerActionPanelMode.Logistics) &&
             Pressed(input, PlatformKey.C);
 
         if (cancel)
@@ -607,6 +609,8 @@ public sealed class PlayerActionPanelController
                 : requested;
         SelectedIndex = 0;
         _desiredStockQuantity = 0.0;
+        _stockResourceId = ResourceId.None;
+        _supplyEntity = EntityId.Invalid;
     }
 
     private void ActivateSelected(
