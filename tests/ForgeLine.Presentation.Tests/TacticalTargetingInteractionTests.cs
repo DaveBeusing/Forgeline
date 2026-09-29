@@ -274,6 +274,62 @@ public sealed class TacticalTargetingInteractionTests
     }
 
     [Fact]
+    public void TerminalMatchCancelsActiveTargeting()
+    {
+        var selected =
+            new EntityId(104, 1);
+        var targeting =
+            new RtsTacticalTargetingController();
+        var input =
+            new InputState();
+        PresentationSnapshot active =
+            CreateSnapshot(
+                selected,
+                Tactical(selected));
+
+        targeting.Begin(
+            PlayerActionRequest.BeginAttackTargeting(
+                [selected]),
+            active.SessionId);
+
+        PlayerExperienceSnapshot terminalExperience =
+            new(
+                LocalPlayer,
+                new SimulationTick(5),
+                PlayerMatchStatus.Victory,
+                LocalPlayer,
+                default,
+                default,
+                default,
+                default,
+                PlayerAlertState.None,
+                0,
+                0,
+                PlayerCommandFeedback.None,
+                default);
+        PresentationSnapshot terminal =
+            CreateSnapshot(
+                selected,
+                Tactical(selected),
+                experience:
+                    terminalExperience);
+
+        targeting.Update(
+            input,
+            CreateCamera(),
+            new FlatTerrain(),
+            terminal,
+            1600,
+            900,
+            FormationTemplate.Compact);
+
+        Assert.False(targeting.IsActive);
+        Assert.False(targeting.PointerCaptured);
+        Assert.False(
+            targeting.TryTakeRequest(out _));
+    }
+
+    [Fact]
     public void SharedRequestDispatcherSubmitsResolvedTacticalAction()
     {
         using VerticalSliceScenario scenario =
@@ -364,7 +420,8 @@ public sealed class TacticalTargetingInteractionTests
         EntityId selected,
         PlayerTacticalActionReadModel tactical,
         FactionIntelligenceSnapshot? intelligence = null,
-        SimulationSessionId session = default)
+        SimulationSessionId session = default,
+        PlayerExperienceSnapshot? experience = null)
     {
         SimulationSessionId resolvedSession =
             session.IsSpecified
@@ -401,6 +458,8 @@ public sealed class TacticalTargetingInteractionTests
             ],
             intelligence:
                 intelligence,
+            playerExperience:
+                experience,
             sessionId:
                 resolvedSession,
             playerActions:
