@@ -180,7 +180,6 @@ public sealed class RtsTacticalTargetingController
         _entities = [];
         _leftWasDown = false;
         _escapeWasDown = false;
-        _hadPointerPosition = false;
         _pointerCaptured = false;
     }
 
@@ -470,7 +469,6 @@ public sealed class RtsTacticalTargetingController
         _entities = [];
         _leftWasDown = false;
         _escapeWasDown = false;
-        _hadPointerPosition = false;
     }
 
     private void SynchronizeSession(
