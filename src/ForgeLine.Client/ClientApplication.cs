@@ -642,100 +642,23 @@ internal sealed class ClientApplication
         SimulationTick observedTick,
         ref PlayerCommandSubmissionReceipt? lastCommandReceipt)
     {
+        if (PlayerActionRequestDispatcher.TryDispatch(
+                request,
+                LocalPlayer,
+                commandGateway,
+                observedTick,
+                out PlayerCommandSubmissionReceipt receipt))
+        {
+            lastCommandReceipt = receipt;
+            return;
+        }
+
         switch (request.Kind)
         {
             case PlayerActionRequestKind.BeginBuildingPlacement:
+                tacticalTargetingController.Cancel();
                 buildingPlacementController.SelectBuilding(
                     request.BuildingId);
-                break;
-
-            case PlayerActionRequestKind.QueueProduction:
-                lastCommandReceipt =
-                    commandGateway.SubmitProduction(
-                        LocalPlayer,
-                        request.Facility,
-                        request.RecipeId,
-                        observedTick,
-                        request.Priority,
-                        request.ProductionMode,
-                        request.DesiredStockResourceId,
-                        request.DesiredStockQuantity);
-                break;
-
-            case PlayerActionRequestKind.SetProductionPaused:
-                lastCommandReceipt =
-                    commandGateway.SubmitProductionPaused(
-                        LocalPlayer,
-                        request.RequestEntity,
-                        request.Paused,
-                        observedTick);
-                break;
-
-            case PlayerActionRequestKind.CancelProduction:
-                lastCommandReceipt =
-                    commandGateway.SubmitProductionCancel(
-                        LocalPlayer,
-                        request.RequestEntity,
-                        observedTick);
-                break;
-
-            case PlayerActionRequestKind.QueueUnitProduction:
-                lastCommandReceipt =
-                    commandGateway.SubmitUnitProduction(
-                        LocalPlayer,
-                        request.Facility,
-                        request.UnitId,
-                        observedTick,
-                        request.Priority);
-                break;
-
-            case PlayerActionRequestKind.CancelUnitProduction:
-                lastCommandReceipt =
-                    commandGateway.SubmitUnitProductionCancel(
-                        LocalPlayer,
-                        request.RequestEntity,
-                        observedTick);
-                break;
-
-            case PlayerActionRequestKind.SetStockPolicy:
-                lastCommandReceipt =
-                    commandGateway.SubmitLogisticsStockPolicy(
-                        LocalPlayer,
-                        request.Facility,
-                        request.StockResourceId,
-                        request.StockMinimum,
-                        request.StockTarget,
-                        request.StockMaximum,
-                        request.StockPriority,
-                        request.Enabled,
-                        observedTick);
-                break;
-
-            case PlayerActionRequestKind.RemoveStockPolicy:
-                lastCommandReceipt =
-                    commandGateway.SubmitRemoveLogisticsStockPolicy(
-                        LocalPlayer,
-                        request.RequestEntity,
-                        observedTick);
-                break;
-
-            case PlayerActionRequestKind.SetAutomaticResupplyPolicy:
-                lastCommandReceipt =
-                    commandGateway.SubmitAutomaticResupplyPolicy(
-                        LocalPlayer,
-                        request.Facility,
-                        request.AutomaticAmmunitionThreshold,
-                        request.AutomaticFuelThreshold,
-                        request.Enabled,
-                        observedTick);
-                break;
-
-            case PlayerActionRequestKind.RequestResupply:
-                lastCommandReceipt =
-                    commandGateway.SubmitResupply(
-                        LocalPlayer,
-                        request.Facility,
-                        observedTick);
                 break;
 
             case PlayerActionRequestKind.BeginAttackTargeting:
@@ -751,79 +674,6 @@ internal sealed class ClientApplication
                 tacticalTargetingController.Begin(
                     request,
                     commandGateway.SessionId);
-                break;
-
-            case PlayerActionRequestKind.SubmitStopCombat:
-                lastCommandReceipt =
-                    commandGateway.SubmitStopCombat(
-                        LocalPlayer,
-                        request.TacticalEntities ?? [],
-                        observedTick);
-                break;
-
-            case PlayerActionRequestKind.SubmitHoldPosition:
-                lastCommandReceipt =
-                    commandGateway.SubmitHoldPosition(
-                        LocalPlayer,
-                        request.TacticalEntities ?? [],
-                        observedTick);
-                break;
-
-            case PlayerActionRequestKind.CancelFireMission:
-                lastCommandReceipt =
-                    commandGateway.SubmitCancelFireMission(
-                        LocalPlayer,
-                        request.TacticalEntities ?? [],
-                        observedTick);
-                break;
-
-            case PlayerActionRequestKind.SubmitAttack:
-                lastCommandReceipt =
-                    commandGateway.SubmitAttack(
-                        LocalPlayer,
-                        request.TacticalEntities ?? [],
-                        request.TacticalTarget,
-                        observedTick);
-                break;
-
-            case PlayerActionRequestKind.SubmitAttackMove:
-                lastCommandReceipt =
-                    commandGateway.SubmitAttackMove(
-                        LocalPlayer,
-                        request.TacticalEntities ?? [],
-                        request.TacticalWorldTarget,
-                        observedTick,
-                        request.TacticalFormation);
-                break;
-
-            case PlayerActionRequestKind.SubmitRetreat:
-                lastCommandReceipt =
-                    commandGateway.SubmitRetreat(
-                        LocalPlayer,
-                        request.TacticalEntities ?? [],
-                        request.TacticalWorldTarget,
-                        observedTick,
-                        request.TacticalFormation);
-                break;
-
-            case PlayerActionRequestKind.SubmitFireMissionCoordinate:
-                lastCommandReceipt =
-                    commandGateway.SubmitFireMission(
-                        LocalPlayer,
-                        request.TacticalEntities ?? [],
-                        request.TacticalWorldTarget,
-                        request.TacticalRounds,
-                        observedTick);
-                break;
-
-            case PlayerActionRequestKind.SubmitFireMissionContact:
-                lastCommandReceipt =
-                    commandGateway.SubmitFireMission(
-                        LocalPlayer,
-                        request.TacticalEntities ?? [],
-                        request.TacticalContactKey,
-                        request.TacticalRounds,
-                        observedTick);
                 break;
         }
     }
