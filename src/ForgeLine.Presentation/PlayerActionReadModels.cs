@@ -245,6 +245,7 @@ public sealed class PlayerActionSnapshot
         SimulationSessionId sessionId,
         SimulationTick tick,
         IReadOnlyList<PlayerConstructionActionReadModel> construction,
+        int pendingCommandCount,
         PlayerProductionFacilityActionReadModel? production,
         PlayerUnitProductionFacilityActionReadModel? unitProduction)
     {
@@ -254,6 +255,9 @@ public sealed class PlayerActionSnapshot
             Array.AsReadOnly(
                 construction?.ToArray() ??
                 throw new ArgumentNullException(nameof(construction)));
+        ArgumentOutOfRangeException.ThrowIfNegative(
+            pendingCommandCount);
+        PendingCommandCount = pendingCommandCount;
         Production = production;
         UnitProduction = unitProduction;
     }
@@ -264,6 +268,8 @@ public sealed class PlayerActionSnapshot
 
     public IReadOnlyList<PlayerConstructionActionReadModel> Construction =>
         _construction;
+
+    public int PendingCommandCount { get; }
 
     public PlayerProductionFacilityActionReadModel? Production { get; }
 
@@ -323,6 +329,7 @@ internal static class PlayerActionSnapshotFactory
             scenario.Simulation.SessionId,
             context.Tick,
             construction,
+            extraction.Commands.PendingCount,
             production,
             unitProduction);
     }
