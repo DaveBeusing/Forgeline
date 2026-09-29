@@ -409,21 +409,27 @@ public sealed class PlayerCommandBoundaryTests
             PlayerCommandFeedbackState.Accepted,
             ownedResult.State);
 
-        LogisticsStockPolicy policy =
-            Assert.Single(
+        var matchingPolicies =
+            new List<LogisticsStockPolicy>();
+        foreach (EntityId entity in
+                 scenario.Simulation.Entities.Query<LogisticsStockPolicy>())
+        {
+            LogisticsStockPolicy candidate =
                 scenario.Simulation.Entities
-                    .Query<LogisticsStockPolicy>()
-                    .Select(
-                        entity =>
-                            scenario.Simulation.Entities
-                                .GetComponent<LogisticsStockPolicy>(
-                                    entity))
-                    .Where(
-                        value =>
-                            value.TargetEntity ==
-                                scenario.West.CommandCore &&
-                            value.ResourceId ==
-                                ResourceIds.Fuel));
+                    .GetComponent<LogisticsStockPolicy>(
+                        entity);
+
+            if (candidate.TargetEntity ==
+                    scenario.West.CommandCore &&
+                candidate.ResourceId ==
+                    ResourceIds.Fuel)
+            {
+                matchingPolicies.Add(candidate);
+            }
+        }
+
+        LogisticsStockPolicy policy =
+            Assert.Single(matchingPolicies);
         Assert.Equal(100.0, policy.DesiredTarget);
 
         PlayerCommandSubmissionReceipt foreign =
