@@ -1000,7 +1000,7 @@ public sealed class PlayerCommandBoundaryTests
                     scenario.West.CommandCore);
         Vector3 artilleryPosition =
             westCore.Position +
-            new Vector3(40.0f, 0.0f, 0.0f);
+            new Vector3(120.0f, 0.0f, 0.0f);
 
         Assert.True(
             scenario.Terrain.TrySampleHeight(
