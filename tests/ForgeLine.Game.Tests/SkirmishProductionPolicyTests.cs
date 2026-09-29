@@ -85,6 +85,100 @@ public sealed class SkirmishProductionPolicyTests
     }
 
     [Fact]
+    public void ExpandedSupplyNetworkQueuesAdditionalCargoRecovery()
+    {
+        VerticalSliceScenario scenario =
+            VerticalSliceScenario.Create(
+                VerticalSliceScenarioSettings.Create(
+                    VerticalSliceScenarioProfile.Validation));
+        EntityRegistry entities =
+            scenario.Simulation.Entities;
+        WorldTransform coreTransform =
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+
+        for (int index = 0; index < 3; index++)
+        {
+            InventoryId depotInventory =
+                scenario.Inventories.CreateInventory(
+                    new InventorySpecification(2_500.0));
+            EntityId depot =
+                entities.CreateEntity();
+            entities.AddComponent(
+                depot,
+                coreTransform);
+            entities.AddComponent(
+                depot,
+                new CompletedBuilding(
+                    BuildingIds.SupplyDepot,
+                    scenario.West.Player,
+                    SimulationTick.Zero));
+            entities.AddComponent(
+                depot,
+                new SupplyDepot(
+                    depotInventory,
+                    scenario.West.Player));
+        }
+
+        InventoryId input =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(4_000.0));
+        EntityId factory =
+            entities.CreateEntity();
+        entities.AddComponent(
+            factory,
+            coreTransform);
+        entities.AddComponent(
+            factory,
+            new CompletedBuilding(
+                BuildingIds.VehicleFactory,
+                scenario.West.Player,
+                SimulationTick.Zero));
+        entities.AddComponent(
+            factory,
+            new UnitProductionFacility(
+                input,
+                UnitProductionCapability.Vehicle |
+                UnitProductionCapability.Logistics,
+                scenario.West.Player,
+                Vector3.Zero,
+                SimulationTick.Zero));
+        var isolatedNetwork =
+            new PowerNetworkId(10_001);
+        entities.AddComponent(
+            factory,
+            new PowerNetworkMembership(
+                isolatedNetwork));
+        entities.AddComponent(
+            factory,
+            new PowerGenerator(
+                10.0));
+        entities.AddComponent(
+            factory,
+            new PowerConsumer(
+                1.0,
+                PowerPriority.Industrial,
+                enabled: true));
+
+        scenario.Simulation.RunTicks(
+            2,
+            TestContext.Current.CancellationToken);
+
+        Assert.Contains(
+            entities.Query<UnitProductionRequest>(
+                QueryIterationOrder.StableByEntityIndex),
+            requestEntity =>
+            {
+                UnitProductionRequest request =
+                    entities.GetComponent<UnitProductionRequest>(
+                        requestEntity);
+                return request.Facility == factory &&
+                    request.UnitId == UnitIds.CargoTruck &&
+                    request.Priority == ProductionPriority.High;
+            });
+    }
+
+    [Fact]
     public void MissingCargoTruckPreemptsBlockedCombatProduction()
     {
         VerticalSliceScenario scenario =
