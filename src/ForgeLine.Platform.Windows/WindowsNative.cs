@@ -37,10 +37,12 @@ internal static partial class WindowsNative
     internal const int VkEscape = 0x1B;
     internal const int VkTab = 0x09;
     internal const int VkF = 0x46;
+    internal const int VkL = 0x4C;
     internal const int VkM = 0x4D;
     internal const int VkP = 0x50;
     internal const int VkT = 0x54;
     internal const int VkU = 0x55;
+    internal const int VkY = 0x59;
     internal const int VkF1 = 0x70;
     internal const int VkF2 = 0x71;
     internal const int VkF3 = 0x72;
