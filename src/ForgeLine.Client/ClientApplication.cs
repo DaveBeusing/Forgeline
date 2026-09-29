@@ -76,6 +76,8 @@ internal sealed class ClientApplication
             scenario.Services.FormationMovement;
         HierarchicalNavigationSystem navigationSystem =
             scenario.Services.Navigation;
+        ResourceCatalog resourceCatalog =
+            scenario.Services.Resources;
         BuildingDefinitionCatalog buildingDefinitions =
             scenario.Services.BuildingDefinitions;
         UnitDefinitionCatalog unitDefinitions =
@@ -86,6 +88,10 @@ internal sealed class ClientApplication
             scenario.Services.BuildingPlacement;
         BuildingCommandProcessingSystem buildingCommands =
             scenario.Services.BuildingCommands;
+        BuildingConstructionSystem buildingConstruction =
+            scenario.Services.BuildingConstruction;
+        UnitProductionSystem unitProduction =
+            scenario.Services.UnitProduction;
         PowerNetworkSystem powerNetworks =
             scenario.Power;
         ProductionSystem production =
