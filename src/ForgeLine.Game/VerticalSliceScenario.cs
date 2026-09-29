@@ -2,6 +2,7 @@ using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Intelligence;
+using ForgeLine.Jobs;
 using ForgeLine.Logistics;
 using ForgeLine.Navigation;
 using ForgeLine.Simulation;
@@ -9,9 +10,17 @@ using ForgeLine.World;
 
 namespace ForgeLine.Game;
 
-public sealed class VerticalSliceScenario
+public sealed class VerticalSliceScenario : IDisposable
 {
+    private readonly JobScheduler? _ownedScheduler;
+    private bool _disposed;
+
     private VerticalSliceScenario(
+        VerticalSliceRuntimeSettings runtimeSettings,
+        MatchConfiguration matchConfiguration,
+        JobScheduler? scheduler,
+        bool ownsScheduler,
+        VerticalSliceRuntimeServices services,
         SimulationCoordinator simulation,
         PrototypeBattlefieldDefinition battlefield,
         TerrainWorld terrain,
@@ -33,6 +42,14 @@ public sealed class VerticalSliceScenario
         SkirmishStartingBase west,
         SkirmishStartingBase east)
     {
+        RuntimeSettings = runtimeSettings;
+        MatchConfiguration = matchConfiguration;
+        Scheduler = scheduler;
+        _ownedScheduler =
+            ownsScheduler
+                ? scheduler
+                : null;
+        Services = services;
         Simulation = simulation;
         Battlefield = battlefield;
         Terrain = terrain;
@@ -54,6 +71,16 @@ public sealed class VerticalSliceScenario
         West = west;
         East = east;
     }
+
+    public VerticalSliceRuntimeSettings RuntimeSettings { get; }
+
+    public MatchConfiguration MatchConfiguration { get; }
+
+    public JobScheduler? Scheduler { get; }
+
+    public bool OwnsScheduler => _ownedScheduler is not null;
+
+    public VerticalSliceRuntimeServices Services { get; }
 
     public SimulationCoordinator Simulation { get; }
 
@@ -101,16 +128,18 @@ public sealed class VerticalSliceScenario
         bool enableDiagnostics = false)
     {
         ArgumentNullException.ThrowIfNull(settings);
-        settings.Validate();
 
-        return CreateCore(
-            seed,
-            settings.WestOpponent,
-            settings.EastOpponent,
-            settings.StartingStock,
-            settings.NavigationCellSizeMeters,
-            settings.NavigationSectorSizeCells,
-            enableDiagnostics);
+        VerticalSliceRuntimeSettings runtime =
+            VerticalSliceRuntimeSettings.CreateHeadless(
+                settings.Profile,
+                seed,
+                enableDiagnostics,
+                enableDebugCapture: enableDiagnostics) with
+            {
+                Scenario = settings
+            };
+
+        return Create(runtime);
     }
 
     public static VerticalSliceScenario Create(
@@ -124,43 +153,107 @@ public sealed class VerticalSliceScenario
             VerticalSliceScenarioSettings.Create(
                 VerticalSliceScenarioProfile.Gameplay);
 
-        return CreateCore(
-            seed,
-            westConfiguration ??
-                gameplay.WestOpponent,
-            eastConfiguration ??
-                gameplay.EastOpponent,
-            startingStock ??
-                gameplay.StartingStock,
-            gameplay.NavigationCellSizeMeters,
-            gameplay.NavigationSectorSizeCells,
-            enableDiagnostics);
+        VerticalSliceScenarioSettings configured =
+            gameplay with
+            {
+                WestOpponent =
+                    westConfiguration ??
+                    gameplay.WestOpponent,
+                EastOpponent =
+                    eastConfiguration ??
+                    gameplay.EastOpponent,
+                StartingStock =
+                    startingStock ??
+                    gameplay.StartingStock
+            };
+
+        return Create(
+            VerticalSliceRuntimeSettings.CreateHeadless(
+                configured.Profile,
+                seed,
+                enableDiagnostics,
+                enableDebugCapture: enableDiagnostics) with
+            {
+                Scenario = configured
+            });
+    }
+
+    public static VerticalSliceScenario Create(
+        VerticalSliceRuntimeSettings runtimeSettings,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(runtimeSettings);
+        runtimeSettings.Validate();
+        cancellationToken.ThrowIfCancellationRequested();
+
+        JobScheduler? scheduler =
+            runtimeSettings.SchedulerOwnership switch
+            {
+                VerticalSliceSchedulerOwnership.None =>
+                    null,
+                VerticalSliceSchedulerOwnership.Host =>
+                    runtimeSettings.Scheduler,
+                VerticalSliceSchedulerOwnership.Runtime =>
+                    new JobScheduler(),
+                _ =>
+                    throw new InvalidOperationException(
+                        "Vertical-slice scheduler ownership is invalid.")
+            };
+        bool ownsScheduler =
+            runtimeSettings.SchedulerOwnership ==
+            VerticalSliceSchedulerOwnership.Runtime;
+
+        try
+        {
+            return CreateCore(
+                runtimeSettings,
+                scheduler,
+                ownsScheduler,
+                cancellationToken);
+        }
+        catch
+        {
+            if (ownsScheduler)
+            {
+                scheduler?.Dispose();
+            }
+
+            throw;
+        }
     }
 
     private static VerticalSliceScenario CreateCore(
-        ulong seed,
-        SkirmishOpponentConfiguration westConfiguration,
-        SkirmishOpponentConfiguration eastConfiguration,
-        SkirmishStartingStock startingStock,
-        float navigationCellSizeMeters,
-        int navigationSectorSizeCells,
-        bool enableDiagnostics)
+        VerticalSliceRuntimeSettings runtimeSettings,
+        JobScheduler? scheduler,
+        bool ownsScheduler,
+        CancellationToken cancellationToken)
     {
+        VerticalSliceScenarioSettings settings =
+            runtimeSettings.Scenario;
+
         PrototypeBattlefieldDefinition battlefield =
             PrototypeBattlefieldDefinition.Create();
+        MatchConfiguration matchConfiguration =
+            runtimeSettings.CreateMatchConfiguration(
+                battlefield);
         TerrainWorld terrain =
             PrototypeBattlefieldTerrainFactory.Create(
                 battlefield);
 
+        cancellationToken.ThrowIfCancellationRequested();
+
         var simulation =
             new SimulationCoordinator(
                 ticksPerSecond: 20,
-                seed: seed,
-                initialEntityCapacity: 8_192,
+                seed: runtimeSettings.Seed,
+                initialEntityCapacity:
+                    runtimeSettings.InitialEntityCapacity,
+                jobScheduler: scheduler,
                 diagnosticsOptions:
                     new SimulationDiagnosticsOptions
                     {
-                        Enabled = enableDiagnostics
+                        Enabled =
+                            runtimeSettings.EnableDiagnostics
                     });
 
         var spatialIndex =
@@ -169,7 +262,9 @@ public sealed class VerticalSliceScenario
                 {
                     World = terrain.Settings,
                     CellSizeMeters =
-                        SpatialGridSettings.DefaultCellSizeMeters
+                        SpatialGridSettings.DefaultCellSizeMeters,
+                    EnableQueryTiming =
+                        runtimeSettings.EnableSpatialQueryTiming
                 });
         var spatialSynchronizer =
             new SpatialIndexSynchronizer(
@@ -238,19 +333,22 @@ public sealed class VerticalSliceScenario
                 battlefield,
                 terrain,
                 logistics);
+
         var logisticsDisruption =
             new LogisticsDisruptionSystem(
                 logistics);
         var gridSettings =
             new NavigationGridSettings
             {
-                CellSizeMeters = navigationCellSizeMeters,
+                CellSizeMeters =
+                    settings.NavigationCellSizeMeters,
                 StaticObstacleClearanceMeters = 0.5f
             };
         var sectorSettings =
             new NavigationSectorSettings
             {
-                SectorSizeCells = navigationSectorSizeCells
+                SectorSizeCells =
+                    settings.NavigationSectorSizeCells
             };
         NavigationWorld navigationWorld =
             NavigationWorld.Build(
@@ -274,12 +372,19 @@ public sealed class VerticalSliceScenario
                 logistics,
                 inventories,
                 cargoTransport,
-                retryDelayTicks: 10,
-                maximumTransportAttempts: 8,
-                fairnessAgingTicks: 100);
+                retryDelayTicks:
+                    settings.DistributionRetryDelayTicks,
+                maximumTransportAttempts:
+                    settings.DistributionMaximumTransportAttempts,
+                fairnessAgingTicks:
+                    settings.DistributionFairnessAgingTicks);
         var battlefieldSupply =
             new BattlefieldSupplySystem(
-                inventories);
+                inventories)
+            {
+                DebugCaptureEnabled =
+                    runtimeSettings.EnableDebugCapture
+            };
 
         var intelligence =
             new FactionIntelligenceStore(
@@ -290,7 +395,13 @@ public sealed class VerticalSliceScenario
         var battlefieldIntelligence =
             new BattlefieldIntelligenceSystem(
                 intelligence,
-                spatialIndex);
+                spatialIndex)
+            {
+                TimingEnabled =
+                    runtimeSettings.EnableDebugCapture,
+                DebugCaptureEnabled =
+                    runtimeSettings.EnableDebugCapture
+            };
         var intelligenceAvailability =
             new IntelligenceTargetAvailabilityPolicy(
                 simulation.Entities,
@@ -307,56 +418,65 @@ public sealed class VerticalSliceScenario
                 inventories,
                 unitFactory);
 
-        BattlefieldStartPosition westStart =
-            battlefield.Starts.Single(
-                static start =>
-                    start.Player ==
-                    new PlayerId(1));
-        BattlefieldStartPosition eastStart =
-            battlefield.Starts.Single(
-                static start =>
-                    start.Player ==
-                    new PlayerId(2));
+        SkirmishMatchInitialization initialization =
+            SkirmishMatchInitializer.Initialize(
+                simulation.Entities,
+                inventories,
+                unitFactory,
+                terrain,
+                battlefield,
+                battlefieldRuntime,
+                matchConfiguration,
+                settings.StartingStock);
         SkirmishStartingBase west =
-            SkirmishStartingBaseFactory.Create(
-                simulation.Entities,
-                inventories,
-                unitFactory,
-                terrain,
-                westStart,
-                startingStock);
+            initialization.GetBase(
+                new PlayerId(1));
         SkirmishStartingBase east =
-            SkirmishStartingBaseFactory.Create(
-                simulation.Entities,
-                inventories,
-                unitFactory,
-                terrain,
-                eastStart,
-                startingStock);
+            initialization.GetBase(
+                new PlayerId(2));
 
-        _ = battlefieldRuntime.AttachCommandCoreObjectives(
-            simulation.Entities,
-            new Dictionary<PlayerId, EntityId>
-            {
-                [west.Player] =
-                    west.CommandCore,
-                [east.Player] =
-                    east.CommandCore
-            });
+        AxisAlignedBounds[] entityObstacles =
+            CollectStaticNavigationObstacles(
+                simulation);
+        var navigationObstacles =
+            new List<AxisAlignedBounds>(
+                battlefield.StaticNavigationObstacles.Count +
+                entityObstacles.Length);
+        navigationObstacles.AddRange(
+            battlefield.StaticNavigationObstacles);
+        navigationObstacles.AddRange(
+            entityObstacles);
+
+        navigation.UpdateWorld(
+            NavigationWorld.Build(
+                terrain,
+                navigationObstacles,
+                gridSettings,
+                sectorSettings));
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         var formationMovement =
             new FormationMovementSystem(
-                pathfinder);
+                pathfinder)
+            {
+                DebugCaptureEnabled =
+                    runtimeSettings.EnableDebugCapture
+            };
         var groundMovement =
             new GroundMovementSystem(
                 terrain,
-                spatialIndex);
+                spatialIndex)
+            {
+                DebugCaptureEnabled =
+                    runtimeSettings.EnableDebugCapture
+            };
         var strategicInfrastructure =
             new StrategicInfrastructureSystem(
                 logistics,
                 terrain,
                 navigation,
-                battlefield.StaticNavigationObstacles,
+                navigationObstacles,
                 gridSettings,
                 sectorSettings);
 
@@ -366,7 +486,11 @@ public sealed class VerticalSliceScenario
             new TargetAcquisitionSystem(
                 weapons,
                 spatialIndex,
-                intelligenceAvailability);
+                intelligenceAvailability)
+            {
+                DebugCaptureEnabled =
+                    runtimeSettings.EnableDebugCapture
+            };
         var combatExecution =
             new CombatExecutionSystem(
                 weapons,
@@ -381,7 +505,11 @@ public sealed class VerticalSliceScenario
                 combatRuntime,
                 intelligence,
                 terrain,
-                spatialIndex);
+                spatialIndex)
+            {
+                DebugCaptureEnabled =
+                    runtimeSettings.EnableDebugCapture
+            };
         var damage =
             new CombatDamageResolutionSystem(
                 combatRuntime,
@@ -392,6 +520,16 @@ public sealed class VerticalSliceScenario
             new CombatEntityLifecycleSystem(
                 combatRuntime,
                 spatialIndex);
+        var combatDebugSnapshots =
+            new CombatDebugSnapshotSystem(
+                weapons,
+                combatRuntime,
+                targetAcquisition,
+                damage)
+            {
+                DebugCaptureEnabled =
+                    runtimeSettings.EnableDebugCapture
+            };
         var tacticalPreparation =
             new TacticalOrderPreparationSystem();
         var tacticalOpponent =
@@ -404,12 +542,20 @@ public sealed class VerticalSliceScenario
         var tacticalCombat =
             new TacticalCombatSystem(
                 weapons,
-                intelligence);
+                intelligence)
+            {
+                DebugCaptureEnabled =
+                    runtimeSettings.EnableDebugCapture
+            };
         var readiness =
             new CombatReadinessSystem(
                 inventories,
                 weapons,
-                artilleryWeapons);
+                artilleryWeapons)
+            {
+                DebugCaptureEnabled =
+                    runtimeSettings.EnableDebugCapture
+            };
         var logisticsRegistration =
             new BuildingLogisticsRegistrationSystem(
                 logistics);
@@ -419,13 +565,29 @@ public sealed class VerticalSliceScenario
                 battlefieldRuntime.RoadNodes);
 
         var configurations =
-            new Dictionary<PlayerId, SkirmishOpponentConfiguration>
+            new Dictionary<
+                PlayerId,
+                SkirmishOpponentConfiguration>();
+
+        for (int index = 0;
+             index < matchConfiguration.Participants.Count;
+             index++)
+        {
+            MatchParticipantConfiguration participant =
+                matchConfiguration.Participants[index];
+
+            if (!participant.IsComputerControlled)
             {
-                [west.Player] =
-                    westConfiguration,
-                [east.Player] =
-                    eastConfiguration
-            };
+                continue;
+            }
+
+            configurations.Add(
+                participant.Player,
+                participant.Player == west.Player
+                    ? settings.WestOpponent
+                    : settings.EastOpponent);
+        }
+
         var opponents =
             new SkirmishOpponentSystem(
                 buildingDefinitions,
@@ -436,85 +598,91 @@ public sealed class VerticalSliceScenario
                 battlefield,
                 configurations)
             {
-                DebugCaptureEnabled = true
+                DebugCaptureEnabled =
+                    runtimeSettings.EnableDebugCapture
             };
 
         var matchObjectives =
             new MatchObjectiveSystem(
                 battlefieldRuntime.MatchStateEntity);
 
-        simulation.RegisterSystem(
-            buildingCommands);
-        simulation.RegisterSystem(
-            logisticsDisruption);
-        simulation.RegisterSystem(
-            strategicInfrastructure);
-
-        simulation.RegisterSystem(
-            opponents);
-        simulation.RegisterSystem(
-            tacticalOpponent);
-        simulation.RegisterSystem(
-            tacticalPreparation);
-        simulation.RegisterSystem(
-            automaticResupply);
-
-        simulation.RegisterSystem(
-            formationMovement);
-        simulation.RegisterSystem(
-            navigation);
-        simulation.RegisterSystem(
-            groundMovement);
-        simulation.RegisterSystem(
+        ISimulationSystem[] systems =
+        [
+            buildingCommands,
+            logisticsDisruption,
+            strategicInfrastructure,
+            opponents,
+            tacticalOpponent,
+            tacticalPreparation,
+            automaticResupply,
+            formationMovement,
+            navigation,
+            groundMovement,
             new SpatialIndexSystem(
-                spatialSynchronizer));
-
-        simulation.RegisterSystem(
-            battlefieldIntelligence);
-        simulation.RegisterSystem(
-            targetAcquisition);
-        simulation.RegisterSystem(
-            tacticalCombat);
-        simulation.RegisterSystem(
-            artillery);
-        simulation.RegisterSystem(
-            combatExecution);
-        simulation.RegisterSystem(
-            damage);
-
-        simulation.RegisterSystem(
-            battlefieldSupply);
-        simulation.RegisterSystem(
-            automatedDistribution);
-        simulation.RegisterSystem(
-            cargoTransport);
-        simulation.RegisterSystem(
-            power);
-        simulation.RegisterSystem(
-            production);
-        simulation.RegisterSystem(
-            unitProduction);
-        simulation.RegisterSystem(
-            buildingConstruction);
-        simulation.RegisterSystem(
-            extraction);
-
-        simulation.RegisterSystem(
-            logisticsRegistration);
-        simulation.RegisterSystem(
-            roadAccess);
-        simulation.RegisterSystem(
-            lifecycle);
-        simulation.RegisterSystem(
+                spatialSynchronizer),
+            battlefieldIntelligence,
+            targetAcquisition,
+            tacticalCombat,
+            artillery,
+            combatExecution,
+            damage,
+            battlefieldSupply,
+            automatedDistribution,
+            cargoTransport,
+            power,
+            production,
+            unitProduction,
+            buildingConstruction,
+            extraction,
+            logisticsRegistration,
+            roadAccess,
+            lifecycle,
             new SpatialIndexCleanupSystem(
-                spatialSynchronizer));
+                spatialSynchronizer),
+            readiness,
+            matchObjectives,
+            combatDebugSnapshots
+        ];
 
-        simulation.RegisterSystem(
-            readiness);
-        simulation.RegisterSystem(
-            matchObjectives);
+        var registeredSystemTypes =
+            new Type[systems.Length];
+
+        for (int index = 0;
+             index < systems.Length;
+             index++)
+        {
+            ISimulationSystem system =
+                systems[index];
+            simulation.RegisterSystem(system);
+            registeredSystemTypes[index] =
+                system.GetType();
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var services =
+            new VerticalSliceRuntimeServices(
+                buildingDefinitions,
+                unitDefinitions,
+                spatialIndex,
+                buildingPlacement,
+                buildingCommands,
+                groundMovement,
+                formationMovement,
+                navigation,
+                battlefieldIntelligence,
+                targetAcquisition,
+                tacticalCombat,
+                automaticResupply,
+                combatDebugSnapshots,
+                registeredSystemTypes);
 
         return new VerticalSliceScenario(
+            runtimeSettings,
+            matchConfiguration,
+            scheduler,
+            ownsScheduler,
+            services,
             simulation,
             battlefield,
             terrain,
@@ -535,6 +703,41 @@ public sealed class VerticalSliceScenario
             unitFactory,
             west,
             east);
+    }
+
+    private static AxisAlignedBounds[] CollectStaticNavigationObstacles(
+        SimulationCoordinator simulation)
+    {
+        var obstacles =
+            new List<AxisAlignedBounds>();
+
+        foreach (EntityId entity in
+                 simulation.Entities.Query<
+                     WorldTransform,
+                     SpatialPresence>())
+        {
+            SpatialPresence presence =
+                simulation.Entities.GetComponent<
+                    SpatialPresence>(
+                        entity);
+
+            if (presence.Metadata.Mobility !=
+                SpatialMobility.Static)
+            {
+                continue;
+            }
+
+            WorldTransform transform =
+                simulation.Entities.GetComponent<
+                    WorldTransform>(
+                        entity);
+            obstacles.Add(
+                presence.CreateEntry(
+                    entity,
+                    transform).Bounds);
+        }
+
+        return obstacles.ToArray();
     }
 
     public MatchState GetMatchState() =>
@@ -612,6 +815,17 @@ public sealed class VerticalSliceScenario
         }
 
         return count;
+    }
+
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        _ownedScheduler?.Dispose();
     }
 
     public bool RunUntil(
