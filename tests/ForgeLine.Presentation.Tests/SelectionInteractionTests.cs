@@ -229,6 +229,68 @@ public sealed class SelectionInteractionTests
         Assert.Equal(0, controller.Selection.Count);
     }
 
+    [Fact]
+    public void CapturedPanelPointerDoesNotLeakIntoWorldSelection()
+    {
+        var camera = CreateCamera();
+        var entity = new EntityId(21, 1);
+        var world = CreateWorld(
+            Instance(
+                entity,
+                Vector3.Zero,
+                LocalPlayer,
+                ControllableEntityCategory.Unit));
+        var terrain = new FlatTerrain();
+        var input = new InputState();
+        var controller = new RtsSelectionController(
+            new SelectionFilter(
+                LocalPlayer,
+                ControllableEntityCategory.Unit));
+
+        input.Apply(
+            PlatformInputEvent.PointerMoved(
+                800,
+                450));
+        input.Apply(
+            PlatformInputEvent.MouseButtonChanged(
+                PlatformInputEventKind.MouseButtonDown,
+                PlatformMouseButton.Left,
+                800,
+                450));
+        controller.Update(
+            input,
+            camera,
+            world,
+            terrain,
+            1600,
+            900,
+            1.0f,
+            pointerCaptured: true);
+
+        input.Apply(
+            PlatformInputEvent.MouseButtonChanged(
+                PlatformInputEventKind.MouseButtonUp,
+                PlatformMouseButton.Left,
+                800,
+                450));
+        controller.Update(
+            input,
+            camera,
+            world,
+            terrain,
+            1600,
+            900,
+            1.0f,
+            pointerCaptured: true);
+
+        Assert.Equal(
+            0,
+            controller.Selection.Count);
+        Assert.Equal(
+            EntityId.Invalid,
+            controller.HoveredEntity);
+    }
+
     private static RtsCamera CreateCamera() =>
         new(
             new RtsCameraSettings
