@@ -49,10 +49,12 @@ public sealed class VerticalSliceRuntimeCompositionTests
 
         using VerticalSliceScenario computerScenario =
             VerticalSliceScenario.Create(
-                computerRuntime);
+                computerRuntime,
+                TestContext.Current.CancellationToken);
         using VerticalSliceScenario playerScenario =
             VerticalSliceScenario.Create(
-                playerRuntime);
+                playerRuntime,
+                TestContext.Current.CancellationToken);
 
         Assert.Equal(
             computerScenario.Services.RegisteredSystemTypes,
@@ -101,7 +103,9 @@ public sealed class VerticalSliceRuntimeCompositionTests
             };
 
         using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(runtime);
+            VerticalSliceScenario.Create(
+                runtime,
+                TestContext.Current.CancellationToken);
 
         NavigationGrid grid =
             scenario.Services.Navigation.World.Grid;
@@ -282,7 +286,8 @@ public sealed class VerticalSliceRuntimeCompositionTests
                 seed: 77);
         VerticalSliceScenario scenario =
             VerticalSliceScenario.Create(
-                runtime);
+                runtime,
+                TestContext.Current.CancellationToken);
 
         Assert.False(
             scenario.OwnsScheduler);
@@ -310,7 +315,8 @@ public sealed class VerticalSliceRuntimeCompositionTests
                     eastComputerControlled: true));
         VerticalSliceScenario scenario =
             VerticalSliceScenario.Create(
-                runtime);
+                runtime,
+                TestContext.Current.CancellationToken);
         JobScheduler scheduler =
             Assert.IsType<JobScheduler>(
                 scenario.Scheduler);
