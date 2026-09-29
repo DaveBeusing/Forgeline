@@ -298,8 +298,7 @@ internal sealed class ClientApplication
                     inputState,
                     inputSnapshot,
                     window.ClientSize.Width,
-                    window.ClientSize.Height,
-                    actionPanel.PointerCaptured);
+                    window.ClientSize.Height);
 
                 if (actionPanel.HasKeyboardFocus &&
                     buildingPlacementController.IsActive)
@@ -417,7 +416,8 @@ internal sealed class ClientApplication
                     currentSnapshot,
                     presentationInteraction,
                     window.ClientSize.Width,
-                    window.ClientSize.Height);
+                    window.ClientSize.Height,
+                    actionPanel.PointerCaptured);
 
                 if (!buildingPlacementController.IsActive)
                 {
