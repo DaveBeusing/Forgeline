@@ -733,27 +733,9 @@ internal sealed class ClientApplication
         float alpha,
         RtsCamera camera,
         RtsSelectionController selectionController,
-        SpatialGridIndex spatialIndex,
-        GroundMovementDebugSnapshot movementSnapshot,
-        FormationMovementDebugSnapshot formationSnapshot,
-        NavigationWorld navigationWorld,
-        NavigationPath? navigationPath,
         RtsBuildingPlacementController buildingPlacementController,
         BuildingConstructionDebugSnapshot? constructionSnapshot,
-        ResourceExtractionDebugSnapshot? resourceSnapshot,
-        LogisticsNetworkDebugSnapshot? logisticsSnapshot,
-        CargoTransportDebugSnapshot? cargoTransportSnapshot,
-        AutomatedDistributionDebugSnapshot? distributionSnapshot,
-        LogisticsCapacityDebugSnapshot? logisticsCapacitySnapshot,
-        BattlefieldSupplyDebugSnapshot? battlefieldSupplySnapshot,
-        CombatDebugSnapshot? combatSnapshot,
-        ArtilleryDebugSnapshot? artillerySnapshot,
-        CombatReadinessDebugSnapshot? readinessSnapshot,
-        IReadOnlyList<TacticalCombatDebugEntry> tacticalEntries,
-        TacticalCombatMetrics tacticalMetrics,
-        AutomaticResupplyDecisionMetrics resupplyDecisionMetrics,
-        IReadOnlyList<IntelligenceSensorDebugEntry> intelligenceSensors,
-        BattlefieldIntelligenceMetrics intelligenceMetrics)
+        PresentationDebugSnapshot? debugSnapshot)
     {
         debugDraw.Clear();
 
@@ -801,7 +783,8 @@ internal sealed class ClientApplication
                 maximumLabels: 32);
         }
 
-        if (worldDebugEnabled)
+        if (worldDebugEnabled &&
+            debugSnapshot is not null)
         {
             SpatialIndexDebugVisualization.DrawRadiusQuery(
                 debugDraw,
@@ -810,84 +793,82 @@ internal sealed class ClientApplication
                 rangeColor);
             debugDraw.Point(camera.Target, 8.0f, pointColor);
 
-            SpatialIndexDebugSnapshot spatialSnapshot =
-                spatialIndex.CaptureDebugSnapshot(camera.Target.Y + 0.1f);
             SpatialIndexDebugVisualization.DrawOccupiedCells(
                 debugDraw,
-                spatialSnapshot,
+                debugSnapshot.Spatial,
                 new Vector4(0.35f, 0.65f, 1.0f, 0.8f),
                 new Vector4(1.0f, 0.35f, 0.15f, 1.0f),
                 maximumCells: 256,
                 maximumLabels: MaximumDebugLabels);
             GroundMovementDebugVisualization.Draw(
                 debugDraw,
-                movementSnapshot,
+                debugSnapshot.Movement,
                 maximumAgents: 64);
             FormationMovementDebugVisualization.Draw(
                 debugDraw,
-                formationSnapshot,
+                debugSnapshot.Formation,
                 maximumSlots: 128);
             NavigationDebugVisualization.Draw(
                 debugDraw,
-                navigationWorld,
+                debugSnapshot.NavigationWorld,
                 NavigationCapabilities.For(
                     NavigationMovementClass.Tracked),
-                navigationPath,
+                debugSnapshot.NavigationPath,
                 camera.Target);
-            if (resourceSnapshot is not null)
+            if (debugSnapshot.Resources is not null)
             {
                 ResourceDepositDebugVisualization.DrawDeposits(
                     debugDraw,
-                    resourceSnapshot,
+                    debugSnapshot.Resources,
                     new Vector4(0.65f, 0.9f, 0.25f, 1.0f),
                     new Vector4(0.35f, 0.35f, 0.35f, 1.0f),
                     maximumDeposits: 64,
                     maximumLabels: 8);
             }
 
-            if (logisticsSnapshot is not null)
+            if (debugSnapshot.Logistics is not null)
             {
                 LogisticsDebugVisualization.Draw(
                     debugDraw,
-                    logisticsSnapshot,
+                    debugSnapshot.Logistics,
                     maximumNodes: 128,
                     maximumEdges: 256,
                     maximumLabels: 8);
             }
 
-            if (cargoTransportSnapshot is not null)
+            if (debugSnapshot.CargoTransport is not null)
             {
                 CargoTransportDebugVisualization.Draw(
                     debugDraw,
-                    cargoTransportSnapshot,
+                    debugSnapshot.CargoTransport,
                     maximumTransports: 128,
                     maximumLabels: 12);
             }
 
-            if (distributionSnapshot is not null)
+            if (debugSnapshot.Distribution is not null)
             {
                 AutomatedDistributionDebugVisualization.Draw(
                     debugDraw,
-                    distributionSnapshot,
+                    debugSnapshot.Distribution,
                     maximumRequests: 128,
                     maximumLabels: 12);
             }
 
-            if (logisticsCapacitySnapshot is not null)
+            if (debugSnapshot.LogisticsCapacity is not null)
             {
                 LogisticsCapacityDebugVisualization.Draw(
                     debugDraw,
-                    logisticsCapacitySnapshot,
+                    debugSnapshot.LogisticsCapacity,
                     maximumNodes: 128,
                     maximumEdges: 256,
                     maximumLabels: 12);
             }
 
-            if (battlefieldSupplySnapshot is not null)
+            if (debugSnapshot.BattlefieldSupply is not null)
             {
                 BattlefieldSupplyDebugVisualization.Draw(
                     debugDraw,
-                    battlefieldSupplySnapshot,
+                    debugSnapshot.BattlefieldSupply,
                     maximumProviders: 64,
                     maximumUnits: 128,
                     maximumLabels: 20);
@@ -903,42 +884,42 @@ internal sealed class ClientApplication
                     maximumContacts: 96);
                 IntelligenceDebugVisualization.DrawSensors(
                     debugDraw,
-                    intelligenceSensors,
+                    debugSnapshot.IntelligenceSensors,
                     maximumSensors: 64);
                 IntelligenceDebugVisualization.DrawMetrics(
                     debugDraw,
-                    intelligenceMetrics,
+                    debugSnapshot.IntelligenceMetrics,
                     camera.Target + Vector3.UnitY * 6.0f);
             }
 
-            if (artillerySnapshot is not null)
+            if (debugSnapshot.Artillery is not null)
             {
                 ArtilleryDebugVisualization.Draw(
                     debugDraw,
-                    artillerySnapshot,
+                    debugSnapshot.Artillery,
                     camera.Target + Vector3.UnitY * 9.0f,
                     maximumMissions: 64,
                     maximumProjectiles: 128);
             }
 
-            if (readinessSnapshot is not null)
+            if (debugSnapshot.Readiness is not null)
             {
                 TacticalCombatDebugVisualization.Draw(
                     debugDraw,
-                    tacticalEntries,
-                    tacticalMetrics,
-                    readinessSnapshot,
-                    resupplyDecisionMetrics,
+                    debugSnapshot.TacticalEntries,
+                    debugSnapshot.TacticalMetrics,
+                    debugSnapshot.Readiness,
+                    debugSnapshot.ResupplyDecisionMetrics,
                     camera.Target + Vector3.UnitY * 13.0f,
                     maximumUnits: 96,
                     maximumReadinessLabels: 64);
             }
 
-            if (combatSnapshot is not null)
+            if (debugSnapshot.Combat is not null)
             {
                 CombatDebugVisualization.Draw(
                     debugDraw,
-                    combatSnapshot,
+                    debugSnapshot.Combat,
                     maximumWeapons: 64,
                     maximumProjectiles: 256,
                     maximumHealthLabels: 32,
