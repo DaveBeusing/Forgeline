@@ -113,6 +113,103 @@ public sealed class SimulationPresentationReadModelTests
     }
 
     [Fact]
+    public void CurrentPlacementPreviewProducesPlacementRequest()
+    {
+        var interaction = new PresentationInteractionState();
+        var controller = new RtsBuildingPlacementController(LocalPlayer);
+        var input = new InputState();
+        RtsCamera camera = CreateCamera();
+        var terrain = new FlatTerrain();
+
+        input.Apply(PlatformInputEvent.KeyChanged(
+            PlatformInputEventKind.KeyDown,
+            PlatformKey.F5));
+        input.Apply(PlatformInputEvent.PointerMoved(800, 450));
+
+        controller.Update(
+            input,
+            camera,
+            terrain,
+            snapshot: null,
+            interaction,
+            1600,
+            900);
+
+        PresentationSnapshot current = SnapshotWithPreview(
+            requestId: 1,
+            tick: 4,
+            ValidPreview());
+
+        controller.Update(
+            input,
+            camera,
+            terrain,
+            current,
+            interaction,
+            1600,
+            900);
+
+        Assert.Equal(
+            PlacementPreviewFreshness.Current,
+            controller.PreviewFreshness);
+
+        input.Apply(PlatformInputEvent.MouseButtonChanged(
+            PlatformInputEventKind.MouseButtonDown,
+            PlatformMouseButton.Left,
+            800,
+            450));
+        controller.Update(
+            input,
+            camera,
+            terrain,
+            current,
+            interaction,
+            1600,
+            900);
+
+        Assert.True(
+            controller.TryTakePlacementRequest(
+                out BuildingPlacementRequest request));
+        Assert.Equal(1UL, request.PreviewRequestId);
+        Assert.Equal(new SimulationTick(4), request.PreviewTick);
+        Assert.Equal(BuildingIds.PowerPlant, request.BuildingId);
+    }
+
+    [Fact]
+    public void DisabledDebugCapturePublishesNoHeavyDebugEnvelope()
+    {
+        using VerticalSliceScenario scenario = CreateScenario(4202);
+        var buffer = new PresentationSnapshotBuffer();
+        var interaction = new PresentationInteractionState();
+        var gateway = new PlayerCommandGateway(
+            scenario.Simulation,
+            scenario.Services.BuildingCommands,
+            scenario.BattlefieldRuntime.MatchStateEntity);
+
+        interaction.SetDebugState(
+            enabled: false,
+            planeHeight: 0.0f);
+        scenario.Simulation.RegisterTickObserver(gateway);
+        scenario.Simulation.RegisterTickObserver(
+            new PresentationExtractor(
+                buffer,
+                new PresentationExtractionContext(
+                    scenario,
+                    LocalPlayer,
+                    interaction,
+                    gateway)));
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(buffer.TryReadLatest(out PresentationSnapshot snapshot));
+        Assert.Null(snapshot.Debug);
+        Assert.False(
+            scenario.Services.GroundMovement.DebugCaptureEnabled);
+        Assert.False(
+            scenario.Services.BattlefieldIntelligence.DebugCaptureEnabled);
+    }
+
+    [Fact]
     public void NewSessionResetsInterpolationAndSelection()
     {
         var buffer = new PresentationSnapshotBuffer();
