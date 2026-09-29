@@ -2,9 +2,11 @@
 
 ## Source of Truth
 
-The current GitHub repository is the technical source of truth.
+The current GitHub repository is the technical source of truth for implemented code, configuration, tests, and current build behavior.
 
-The integration branch is `master`. Feature and fix work should begin from the current `master`, reuse relevant existing work where appropriate, use short-lived technical branches, and integrate through pull requests.
+The integration branch is `master`. Feature, fix, and technical work should begin from the current `master`, reuse relevant existing work where appropriate, use short-lived branches, and integrate through pull requests.
+
+Project-specific governance, source precedence, protection requirements, and unresolved Product Owner decisions are recorded in [Project Context and Repository Governance](ProjectContext.md). Placeholder or template approval metadata is not treated as project approval evidence.
 
 ## SDK
 
@@ -30,11 +32,19 @@ dotnet build ForgeLine.sln --configuration Release --no-restore
 dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release --no-build -- --smoke-test --render-stress 1000
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 64 --seed 12345 --tick-rate 20 --entities 1000 --diagnostics-output artifacts/headless-smoke.json
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 16 --seed 67890 --tick-rate 20 --entities 10000 --diagnostics-output artifacts/headless-stress-10000.json
+dotnet test --solution ForgeLine.sln --configuration Release --no-build
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --require-terminal --diagnostics-output artifacts/vertical-slice-match.json
-dotnet test ForgeLine.sln --configuration Release --no-build
 ```
 
-The GitHub Actions CI workflow executes the same essential sequence on pull requests targeting `master` and on pushes to `master`. Windows client smoke validation is guarded to Windows runners, while headless diagnostic JSON files are uploaded as the `engine-diagnostics` workflow artifact.
+The GitHub Actions CI workflow executes this sequence on pull requests targeting `master` and on pushes to `master`. Windows client smoke validation is guarded to Windows runners, while headless diagnostic JSON files are uploaded as the `engine-diagnostics` workflow artifact.
+
+## Pull Requests and Required Check
+
+`master` is the integration branch. Integration is intended to occur through pull requests from short-lived technical branches.
+
+The CI workflow emits the required check context `build-test` from GitHub Actions. That check represents the complete job, including the natural vertical-slice terminal validation; a successful build or unit-test subset is not equivalent to the full required check.
+
+Repository settings must require that check before merge once `master` protection is applied. Documentation does not itself enforce branch protection, so the effective GitHub settings must be verified by readback. See [Project Context and Repository Governance](ProjectContext.md).
 
 ## Test Projects
 
