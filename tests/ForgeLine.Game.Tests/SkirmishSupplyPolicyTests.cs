@@ -44,21 +44,71 @@ public sealed class SkirmishSupplyPolicyTests
         VerticalSliceScenario scenario = VerticalSliceScenario.Create(
             VerticalSliceScenarioSettings.Create(VerticalSliceScenarioProfile.Validation));
         EntityRegistry entities = scenario.Simulation.Entities;
+        WorldTransform transform =
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+
+        InventoryId refineryInput =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(1_000.0));
+        InventoryId refineryOutput =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(1_000.0));
+        EntityId refinery = entities.CreateEntity();
+        entities.AddComponent(refinery, transform);
+        entities.AddComponent(
+            refinery,
+            new CompletedBuilding(
+                BuildingIds.Refinery,
+                scenario.West.Player,
+                SimulationTick.Zero));
+        entities.AddComponent(
+            refinery,
+            new ProductionFacility(
+                refineryInput,
+                refineryOutput,
+                ProductionCapability.FuelProcessing,
+                SimulationTick.Zero));
+
+        InventoryId depotInventory =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(2_500.0));
+        EntityId supplyDepot = entities.CreateEntity();
+        entities.AddComponent(supplyDepot, transform);
+        entities.AddComponent(
+            supplyDepot,
+            new CompletedBuilding(
+                BuildingIds.SupplyDepot,
+                scenario.West.Player,
+                SimulationTick.Zero));
+        entities.AddComponent(
+            supplyDepot,
+            new SupplyDepot(
+                depotInventory,
+                scenario.West.Player));
+
+        InventoryId factoryInput =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(4_000.0));
+        EntityId vehicleFactory = entities.CreateEntity();
+        entities.AddComponent(vehicleFactory, transform);
+        entities.AddComponent(
+            vehicleFactory,
+            new CompletedBuilding(
+                BuildingIds.VehicleFactory,
+                scenario.West.Player,
+                SimulationTick.Zero));
+        entities.AddComponent(
+            vehicleFactory,
+            new UnitProductionFacility(
+                factoryInput,
+                UnitProductionCapability.Vehicle |
+                UnitProductionCapability.Logistics,
+                scenario.West.Player,
+                Vector3.Zero,
+                SimulationTick.Zero));
 
         scenario.Simulation.AdvanceOneTick();
-
-        EntityId refinery = FindOwnedBuilding(
-            entities,
-            scenario.West.Player,
-            BuildingIds.Refinery);
-        EntityId supplyDepot = FindOwnedBuilding(
-            entities,
-            scenario.West.Player,
-            BuildingIds.SupplyDepot);
-        EntityId vehicleFactory = FindOwnedBuilding(
-            entities,
-            scenario.West.Player,
-            BuildingIds.VehicleFactory);
 
         Assert.Equal(
             LogisticsStockPriority.Critical,
@@ -84,26 +134,6 @@ public sealed class SkirmishSupplyPolicyTests
                 entities,
                 vehicleFactory,
                 ResourceIds.Fuel).Priority);
-    }
-
-    private static EntityId FindOwnedBuilding(
-        EntityRegistry entities,
-        PlayerId owner,
-        BuildingId buildingId)
-    {
-        foreach (EntityId entity in entities.Query<CompletedBuilding>())
-        {
-            CompletedBuilding building =
-                entities.GetComponent<CompletedBuilding>(entity);
-
-            if (building.Owner == owner &&
-                building.BuildingId == buildingId)
-            {
-                return entity;
-            }
-        }
-
-        return EntityId.Invalid;
     }
 
     private static LogisticsStockPolicy FindStockPolicy(
