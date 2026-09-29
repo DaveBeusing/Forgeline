@@ -309,7 +309,7 @@ internal static class PlayerActionSnapshotFactory
                     context.Entities,
                     scenario,
                     selectedFacility,
-                    in productionFacility)
+                    productionFacility)
                 : null;
 
         PlayerUnitProductionFacilityActionReadModel? unitProduction =
@@ -322,7 +322,7 @@ internal static class PlayerActionSnapshotFactory
                     context.Entities,
                     scenario,
                     selectedFacility,
-                    in unitFacility)
+                    unitFacility)
                 : null;
 
         return new PlayerActionSnapshot(
@@ -372,7 +372,7 @@ internal static class PlayerActionSnapshotFactory
             EntityRegistry entities,
             VerticalSliceScenario scenario,
             EntityId entity,
-            in ProductionFacility facility)
+            ProductionFacility facility)
     {
         var recipes =
             new List<PlayerProductionRecipeActionReadModel>();
@@ -479,7 +479,7 @@ internal static class PlayerActionSnapshotFactory
             EntityRegistry entities,
             VerticalSliceScenario scenario,
             EntityId entity,
-            in UnitProductionFacility facility)
+            UnitProductionFacility facility)
     {
         var units =
             new List<PlayerUnitProductionActionReadModel>();
