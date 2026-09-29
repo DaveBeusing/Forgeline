@@ -160,20 +160,46 @@ Graphics frame ownership is independent of simulation. Swap-chain resize, comman
 Rendering and simulation operate independently:
 
 ```text
-Simulation
+Simulation-owned completed tick
     ↓
-Presentation Snapshot
+PresentationExtractor
     ↓
-Render World
+PresentationSnapshot(session, tick)
     ↓
-Renderer / Selection Picking
+RenderWorld / HUD / Selection / Debug
+
+Player input
+    ↓
+PlayerCommandGateway(correlation, source, target tick, sequence)
+    ↓
+Simulation command queue
+    ↓
+Bounded copied command-result buffer
+    ↓
+HUD / interaction feedback
 ```
 
-The renderer consumes extracted presentation/world data and does not determine simulation outcomes. `PresentationExtractor` observes the completed post-tick boundary, copies render-relevant ECS data plus controllable ownership/category metadata into immutable snapshots, and publishes them through a non-blocking latest-value buffer. `RenderWorld` retains previous/current snapshots for visual transform interpolation.
+The renderer consumes extracted presentation/world data and does not determine simulation outcomes. `PresentationExtractor` observes the completed post-tick boundary and publishes one coherent envelope containing copied render instances, faction-filtered intelligence, local HUD/selection inspection, placement preview results, construction state, copied diagnostics, and optional copied debug state. `RenderWorld` retains previous/current snapshots for visual transform interpolation only within one `SimulationSessionId`.
 
-Selection picking operates against these extracted instances. It filters hidden/off-screen, foreign-owned, and disallowed-category entities before returning the same stable `EntityId` used by simulation. A later movement request crosses back into simulation only through the command queue.
+Selection picking operates against extracted instances. It filters hidden/off-screen, foreign-owned, and disallowed-category entities before returning the same full-generation `EntityId` used by simulation. Player commands cross back through `PlayerCommandGateway`, which records correlation/source/tick/sequence metadata and publishes resolved outcomes as copied bounded results instead of exposing mutable command objects to rendering.
+
+Placement preview is advisory and asynchronous. Presentation publishes the latest request facts; completed-tick extraction evaluates those facts through the existing game-side placement service and publishes a request-ID/tick-tagged result. The actual `BuildCommand` still revalidates authoritative placement, source ownership, and resources during command processing.
 
 See `docs/PresentationExtractionAndDebugging.md` for extraction timing, snapshot ownership, buffering, interpolation, debug tooling, metrics, and render stress baselines. See `docs/SelectionAndCommandInteraction.md` for interaction ownership, picking/filtering, command flow, and stale-ID handling. See `docs/Graphics.md` for the implemented graphics lifecycle and ownership rules. See `docs/CameraAndInput.md` for the raw-input boundary, RTS action mapping, camera coordinate convention, controls, and screen/world APIs. See `docs/WorldAndTerrain.md` for the canonical spatial model, heightfield semantics, terrain query boundary, mesh generation, culling, and render ownership. See `docs/SpatialIndexAndWorldQueries.md` for spatial cell mapping, derived-index lifecycle, query semantics, filtering, ordering, diagnostics, and benchmark coverage.
+
+### Presentation Lifetime Decision
+
+**Context.** Player-facing rendering previously combined an immutable render-instance snapshot with live ECS, inventory, placement-service, command-object, match-state, and debug-system reads. The client is serial today, so this was not a reproduced concurrent race, but moving simulation execution independently would make those mixed lifetimes unsafe.
+
+**Decision.** Dynamic player-facing state is copied at the simulation-owned completed-tick boundary into a `PresentationSnapshot` identified by `SimulationSessionId` and tick. Stateful visual/HUD data uses the latest-value snapshot handoff. Essential command outcomes use a separate bounded consumptive result buffer so snapshot replacement cannot lose them. Presentation-to-simulation placement intent uses copied request facts and explicit request freshness; authoritative build validation remains simulation-owned.
+
+**Alternatives considered.** Keeping direct reads was rejected because it preserves hidden mutable lifetime coupling. Locking the entire ECS around rendering was rejected because it couples render cadence to simulation and would undermine independent execution. Copying the entire world every render frame was rejected as unnecessary and unbounded. A generic event bus was rejected because the current needs are explicit state snapshots plus a bounded result channel.
+
+**Trade-offs.** Player-facing state can be one completed tick behind input/render time, and toggling heavy debug capture can require a tick before every system reflects the new request. Snapshot replacement may skip intermediate state by design. Essential command results cannot be skipped; under sustained consumer backpressure the command boundary rejects new submissions explicitly instead of allocating without bound.
+
+**Ownership and migration.** Immutable catalogs, terrain queries, camera/input state, renderer diagnostics, and host tick control remain safely outside the dynamic snapshot. Runtime ECS/inventory/system reads required to build player-facing models occur only inside completed-tick extraction. Client-only smoke/render-stress setup may mutate simulation as explicit host test/setup behavior and is not a presentation read path.
+
+**Re-evaluate when.** Revisit the boundary when independent simulation execution is introduced, when networking/replay requires a different command transport, when snapshot copy cost is measured as material, or when a new player control needs data not represented by the bounded contracts. New controls extend these contracts rather than restoring live dynamic reads.
 
 ## Performance Direction
 

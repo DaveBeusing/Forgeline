@@ -17,6 +17,8 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
     private readonly List<EntityId> _pendingRequests = new();
     private readonly Dictionary<PlayerId, BuildCommandResult> _lastResultsByPlayer =
         new();
+    private readonly Dictionary<PlayerCommandCorrelationId, BuildCommandResult>
+        _resultsByCorrelation = new();
     private long _acceptedCommands;
     private long _rejectedCommands;
     private BuildCommandRejectionReason _lastRejection;
@@ -59,6 +61,27 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
             _lastResultsByPlayer.TryGetValue(
                 player,
                 out result);
+    }
+
+    public bool TryTakeResult(
+        PlayerCommandCorrelationId correlationId,
+        out BuildCommandResult result)
+    {
+        if (!correlationId.IsSpecified)
+        {
+            result = default;
+            return false;
+        }
+
+        if (!_resultsByCorrelation.Remove(
+                correlationId,
+                out result))
+        {
+            result = default;
+            return false;
+        }
+
+        return true;
     }
 
     public void Execute(SimulationContext context)
@@ -216,7 +239,7 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
         _lastRejection = BuildCommandRejectionReason.None;
         _lastPlacementFailure = BuildingPlacementFailureReason.None;
         _lastCreatedSite = site;
-        _lastResultsByPlayer[request.Issuer] =
+        var result =
             new BuildCommandResult(
                 request.Issuer,
                 request.BuildingId,
@@ -224,7 +247,14 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
                 BuildCommandRejectionReason.None,
                 BuildingPlacementFailureReason.None,
                 site,
-                context.Tick);
+                context.Tick)
+            {
+                CorrelationId =
+                    request.CorrelationId
+            };
+        _lastResultsByPlayer[request.Issuer] =
+            result;
+        StoreCorrelatedResult(result);
 
         context.Entities.DestroyEntity(requestEntity);
     }
@@ -331,6 +361,18 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
         return true;
     }
 
+    private void StoreCorrelatedResult(
+        in BuildCommandResult result)
+    {
+        if (!result.CorrelationId.IsSpecified)
+        {
+            return;
+        }
+
+        _resultsByCorrelation[result.CorrelationId] =
+            result;
+    }
+
     private void Reject(
         SimulationContext context,
         EntityId requestEntity,
@@ -342,7 +384,7 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
         _lastRejection = rejection;
         _lastPlacementFailure = placementFailure;
         _lastCreatedSite = EntityId.Invalid;
-        _lastResultsByPlayer[request.Issuer] =
+        var result =
             new BuildCommandResult(
                 request.Issuer,
                 request.BuildingId,
@@ -350,7 +392,14 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
                 rejection,
                 placementFailure,
                 EntityId.Invalid,
-                context.Tick);
+                context.Tick)
+            {
+                CorrelationId =
+                    request.CorrelationId
+            };
+        _lastResultsByPlayer[request.Issuer] =
+            result;
+        StoreCorrelatedResult(result);
 
         context.Entities.DestroyEntity(requestEntity);
     }

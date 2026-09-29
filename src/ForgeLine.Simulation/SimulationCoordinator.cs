@@ -20,12 +20,15 @@ public sealed class SimulationCoordinator
         JobScheduler? jobScheduler = null,
         SimulationDiagnosticsOptions? diagnosticsOptions = null)
     {
+        SessionId = SimulationSessionId.Allocate();
         Clock = new FixedTickClock(ticksPerSecond);
         var entities = new EntityRegistry(initialEntityCapacity);
         Random = new SimulationRandom(seed);
         _context = new SimulationContext(entities, Random, jobScheduler);
         Diagnostics = new SimulationDiagnostics(diagnosticsOptions);
     }
+
+    public SimulationSessionId SessionId { get; }
 
     public FixedTickClock Clock { get; }
 

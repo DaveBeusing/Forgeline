@@ -3,6 +3,7 @@ using ForgeLine.Core;
 using ForgeLine.Game;
 using ForgeLine.Input;
 using ForgeLine.Platform;
+using ForgeLine.Simulation;
 using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
@@ -19,6 +20,7 @@ public sealed class RtsSelectionController
     private Vector2 _selectionStart;
     private Vector2 _selectionCurrent;
     private MovementOrderRequest? _pendingMovementRequest;
+    private SimulationSessionId _sessionId;
 
     public RtsSelectionController(SelectionFilter filter)
     {
@@ -57,6 +59,8 @@ public sealed class RtsSelectionController
         ArgumentNullException.ThrowIfNull(camera);
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(terrain);
+
+        SynchronizeSession(world);
 
         bool leftDown =
             input.IsMouseButtonDown(PlatformMouseButton.Left);
@@ -144,6 +148,26 @@ public sealed class RtsSelectionController
         request = _pendingMovementRequest;
         _pendingMovementRequest = null;
         return true;
+    }
+
+    private void SynchronizeSession(
+        RenderWorld world)
+    {
+        SimulationSessionId sessionId =
+            world.CurrentSnapshot?.SessionId ??
+            SimulationSessionId.None;
+
+        if (!sessionId.IsSpecified ||
+            sessionId == _sessionId)
+        {
+            return;
+        }
+
+        _sessionId = sessionId;
+        Selection.Clear();
+        HoveredEntity = EntityId.Invalid;
+        _pendingMovementRequest = null;
+        _selectionGestureActive = false;
     }
 
     private void CompleteSelection(

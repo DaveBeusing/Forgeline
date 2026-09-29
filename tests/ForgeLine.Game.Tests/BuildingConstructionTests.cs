@@ -182,11 +182,14 @@ public sealed class BuildingConstructionTests
         test.SpatialIndex.Insert(
             blockerPresence.CreateEntry(blocker, blockerTransform));
 
+        var correlation =
+            new PlayerCommandCorrelationId(77);
         SubmitBuild(
             test,
             inventoryEntity,
             BuildingIds.PowerPlant,
-            position);
+            position,
+            correlation);
         test.Simulation.AdvanceOneTick();
 
         Assert.Equal(
@@ -209,6 +212,20 @@ public sealed class BuildingConstructionTests
         Assert.Equal(
             test.Simulation.CurrentTick,
             result.ResolvedAtTick);
+        Assert.Equal(
+            correlation,
+            result.CorrelationId);
+        Assert.True(
+            test.Commands.TryTakeResult(
+                correlation,
+                out BuildCommandResult correlated));
+        Assert.Equal(
+            result,
+            correlated);
+        Assert.False(
+            test.Commands.TryTakeResult(
+                correlation,
+                out _));
         Assert.Equal(0, CountSites(test));
         AssertAllReservationsZero(test, inventoryEntity);
     }
@@ -720,7 +737,8 @@ public sealed class BuildingConstructionTests
         TestWorld test,
         EntityId inventoryEntity,
         BuildingId buildingId,
-        Vector3 position)
+        Vector3 position,
+        PlayerCommandCorrelationId correlationId = default)
     {
         var command = new BuildCommand(
             Player,
@@ -728,7 +746,8 @@ public sealed class BuildingConstructionTests
             position,
             BuildingOrientation.North,
             inventoryEntity,
-            test.Simulation.CurrentTick);
+            test.Simulation.CurrentTick,
+            correlationId);
 
         test.Simulation.SubmitCommand(
             command,
