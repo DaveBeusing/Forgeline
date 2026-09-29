@@ -66,7 +66,8 @@ public sealed class RtsBuildingPlacementController
         PresentationSnapshot? snapshot,
         PresentationInteractionState interaction,
         int viewportWidth,
-        int viewportHeight)
+        int viewportHeight,
+        bool pointerCaptured = false)
     {
         ArgumentNullException.ThrowIfNull(input);
         ArgumentNullException.ThrowIfNull(camera);
@@ -123,6 +124,12 @@ public sealed class RtsBuildingPlacementController
             input.IsMouseButtonDown(
                 PlatformMouseButton.Left);
 
+        if (pointerCaptured)
+        {
+            _leftWasDown = leftDown;
+            return;
+        }
+
         if (!IsActive ||
             !input.HasPointerPosition ||
             !TryResolveWorldTarget(
@@ -167,6 +174,24 @@ public sealed class RtsBuildingPlacementController
         }
 
         _leftWasDown = leftDown;
+    }
+
+    public void SelectBuilding(
+        BuildingId buildingId)
+    {
+        if (!buildingId.IsSpecified)
+        {
+            throw new ArgumentOutOfRangeException(nameof(buildingId));
+        }
+
+        ActiveBuilding = buildingId;
+        Preview = null;
+        PreviewFreshness =
+            PlacementPreviewFreshness.Unavailable;
+        _pendingRequest = null;
+        _hasPreviewRequest = false;
+        _previewRequestId = 0;
+        _requestedBuilding = BuildingId.None;
     }
 
     public bool TryTakePlacementRequest(
