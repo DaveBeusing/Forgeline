@@ -1,5 +1,6 @@
 using System.Numerics;
 using ForgeLine.Core;
+using ForgeLine.Economy;
 using ForgeLine.Game;
 using ForgeLine.Simulation;
 using Xunit;
@@ -273,6 +274,110 @@ public sealed class PlayerCommandBoundaryTests
         Assert.Equal(
             MatchStatus.Ended,
             scenario.GetMatchState().Status);
+    }
+
+    [Fact]
+    public void ProductionSubmissionRejectsFacilityOwnedByAnotherPlayer()
+    {
+        using VerticalSliceScenario scenario =
+            CreateHumanScenario(seed: 4107);
+        PlayerCommandGateway gateway =
+            CreateGateway(scenario);
+        InventoryId input =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(1_000.0));
+        InventoryId output =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(1_000.0));
+        EntityId facility =
+            scenario.Simulation.Entities.CreateEntity();
+
+        scenario.Simulation.Entities.AddComponent(
+            facility,
+            new ControllableEntity(
+                new PlayerId(2),
+                ControllableEntityCategory.Building));
+        scenario.Simulation.Entities.AddComponent(
+            facility,
+            new ProductionFacility(
+                input,
+                output,
+                ProductionCapability.SteelProcessing,
+                scenario.Simulation.CurrentTick));
+
+        PlayerCommandSubmissionReceipt receipt =
+            gateway.SubmitProduction(
+                scenario.West.Player,
+                facility,
+                RecipeIds.Steel,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(receipt.Accepted);
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel result));
+        Assert.Equal(
+            PlayerCommandKind.Production,
+            result.Kind);
+        Assert.Equal(
+            PlayerCommandFeedbackState.Rejected,
+            result.State);
+        Assert.Equal(0, result.AcceptedTargets);
+        Assert.Equal(1, result.RejectedTargets);
+    }
+
+    [Fact]
+    public void UnitProductionSubmissionUsesOwnedFacilityAndPublishesAcceptedResult()
+    {
+        using VerticalSliceScenario scenario =
+            CreateHumanScenario(seed: 4108);
+        PlayerCommandGateway gateway =
+            CreateGateway(scenario);
+        InventoryId input =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(4_000.0));
+        EntityId facility =
+            scenario.Simulation.Entities.CreateEntity();
+
+        scenario.Simulation.Entities.AddComponent(
+            facility,
+            new ControllableEntity(
+                scenario.West.Player,
+                ControllableEntityCategory.Building));
+        scenario.Simulation.Entities.AddComponent(
+            facility,
+            new UnitProductionFacility(
+                input,
+                UnitProductionCapability.Infantry,
+                scenario.West.Player,
+                Vector3.Zero,
+                scenario.Simulation.CurrentTick));
+
+        PlayerCommandSubmissionReceipt receipt =
+            gateway.SubmitUnitProduction(
+                scenario.West.Player,
+                facility,
+                UnitIds.RifleSquad,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(receipt.Accepted);
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel result));
+        Assert.Equal(
+            PlayerCommandKind.UnitProduction,
+            result.Kind);
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            result.State);
+        Assert.Equal(1, result.AcceptedTargets);
+        Assert.Equal(0, result.RejectedTargets);
     }
 
     private static VerticalSliceScenario CreateHumanScenario(
