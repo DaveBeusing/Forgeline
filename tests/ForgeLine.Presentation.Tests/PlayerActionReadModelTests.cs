@@ -226,6 +226,81 @@ public sealed class PlayerActionReadModelTests
         Assert.False(tank.HasInputs);
     }
 
+    [Fact]
+    public void LogisticsAndSupplyActionsExposeOwnedAuthoritativeState()
+    {
+        using VerticalSliceScenario scenario =
+            CreateScenario(4304);
+        var buffer =
+            RegisterExtraction(
+                scenario,
+                out PresentationInteractionState interaction,
+                out _);
+
+        EntityId policyEntity =
+            scenario.Simulation.Entities.CreateEntity();
+        scenario.Simulation.Entities.AddComponent(
+            policyEntity,
+            new LogisticsStockPolicy(
+                scenario.West.CommandCore,
+                ResourceIds.Fuel,
+                50.0,
+                100.0,
+                150.0,
+                LogisticsStockPriority.High));
+
+        interaction.SetSelection(
+            [scenario.West.CommandCore]);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            buffer.TryReadLatest(
+                out PresentationSnapshot snapshot));
+        PlayerLogisticsActionReadModel logistics =
+            Assert.IsType<PlayerLogisticsActionReadModel>(
+                snapshot.PlayerActions?.Logistics);
+        PlayerStockPolicyActionReadModel fuel =
+            Assert.Single(
+                logistics.Policies,
+                policy =>
+                    policy.ResourceId ==
+                    ResourceIds.Fuel);
+
+        Assert.True(fuel.HasPolicy);
+        Assert.Equal(policyEntity, fuel.PolicyEntity);
+        Assert.Equal(100.0, fuel.DesiredTarget);
+        Assert.True(fuel.CurrentQuantity > 0.0);
+
+        EntityId cargoTruck =
+            scenario.West.StartingUnits[1];
+        interaction.SetSelection([cargoTruck]);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(
+            buffer.TryReadLatest(out snapshot));
+        Assert.NotNull(
+            snapshot.PlayerActions?.Logistics?.Cargo);
+
+        EntityId engineer =
+            scenario.West.StartingUnits[0];
+        interaction.SetSelection([engineer]);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(
+            buffer.TryReadLatest(out snapshot));
+
+        PlayerSupplyActionReadModel supply =
+            Assert.IsType<PlayerSupplyActionReadModel>(
+                snapshot.PlayerActions?.Supply);
+        Assert.Equal(engineer, supply.Entity);
+        Assert.InRange(
+            supply.FuelFraction,
+            0.0,
+            1.0);
+        Assert.InRange(
+            supply.AmmunitionFraction,
+            0.0,
+            1.0);
+    }
+
     private static PresentationSnapshotBuffer RegisterExtraction(
         VerticalSliceScenario scenario,
         out PresentationInteractionState interaction,
