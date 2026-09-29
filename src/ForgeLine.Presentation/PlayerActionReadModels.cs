@@ -4,6 +4,7 @@ using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Ecs;
 using ForgeLine.Game;
+using ForgeLine.Intelligence;
 using ForgeLine.Simulation;
 
 namespace ForgeLine.Presentation;
@@ -326,6 +327,113 @@ public readonly record struct PlayerSupplyActionReadModel(
     double ProviderAmmunition,
     ResupplyProviderRejection ProviderRejections);
 
+public readonly record struct PlayerTacticalTargetReadModel(
+    EntityId Entity,
+    IntelligenceContactKey ContactKey,
+    System.Numerics.Vector3 LastKnownPosition,
+    IntelligenceState State,
+    SimulationTick LastSeenTick,
+    int CompatibleUnitCount);
+
+public readonly record struct PlayerArtilleryActionReadModel(
+    EntityId Entity,
+    double AmmunitionQuantity,
+    double AmmunitionCapacity,
+    float MinimumRangeMeters,
+    float MaximumRangeMeters,
+    FireMissionStatus MissionStatus,
+    int RoundsFired,
+    int RequestedRounds)
+{
+    public bool HasActiveMission =>
+        MissionStatus is not
+            FireMissionStatus.Complete and not
+            FireMissionStatus.Cancelled;
+}
+
+public sealed class PlayerTacticalActionReadModel
+{
+    private readonly IReadOnlyList<EntityId> _selectedEntities;
+    private readonly IReadOnlyList<PlayerTacticalTargetReadModel> _targets;
+    private readonly IReadOnlyList<PlayerArtilleryActionReadModel> _artillery;
+
+    public PlayerTacticalActionReadModel(
+        IReadOnlyList<EntityId> selectedEntities,
+        int requestedSelectionCount,
+        int combatEligibleCount,
+        int rejectedSelectionCount,
+        int criticalSupplyCount,
+        int resupplyingCount,
+        bool hasCommonOrder,
+        bool mixedOrderState,
+        CombatOrderKind currentOrder,
+        CombatOrderStatus currentStatus,
+        IReadOnlyList<PlayerTacticalTargetReadModel> targets,
+        IReadOnlyList<PlayerArtilleryActionReadModel> artillery)
+    {
+        _selectedEntities =
+            Array.AsReadOnly(
+                selectedEntities?.ToArray() ??
+                throw new ArgumentNullException(nameof(selectedEntities)));
+        _targets =
+            Array.AsReadOnly(
+                targets?.ToArray() ??
+                throw new ArgumentNullException(nameof(targets)));
+        _artillery =
+            Array.AsReadOnly(
+                artillery?.ToArray() ??
+                throw new ArgumentNullException(nameof(artillery)));
+
+        ArgumentOutOfRangeException.ThrowIfNegative(
+            requestedSelectionCount);
+        ArgumentOutOfRangeException.ThrowIfNegative(
+            combatEligibleCount);
+        ArgumentOutOfRangeException.ThrowIfNegative(
+            rejectedSelectionCount);
+        ArgumentOutOfRangeException.ThrowIfNegative(
+            criticalSupplyCount);
+        ArgumentOutOfRangeException.ThrowIfNegative(
+            resupplyingCount);
+
+        RequestedSelectionCount = requestedSelectionCount;
+        CombatEligibleCount = combatEligibleCount;
+        RejectedSelectionCount = rejectedSelectionCount;
+        CriticalSupplyCount = criticalSupplyCount;
+        ResupplyingCount = resupplyingCount;
+        HasCommonOrder = hasCommonOrder;
+        MixedOrderState = mixedOrderState;
+        CurrentOrder = currentOrder;
+        CurrentStatus = currentStatus;
+    }
+
+    public IReadOnlyList<EntityId> SelectedEntities =>
+        _selectedEntities;
+
+    public int RequestedSelectionCount { get; }
+
+    public int CombatEligibleCount { get; }
+
+    public int RejectedSelectionCount { get; }
+
+    public int CriticalSupplyCount { get; }
+
+    public int ResupplyingCount { get; }
+
+    public bool HasCommonOrder { get; }
+
+    public bool MixedOrderState { get; }
+
+    public CombatOrderKind CurrentOrder { get; }
+
+    public CombatOrderStatus CurrentStatus { get; }
+
+    public IReadOnlyList<PlayerTacticalTargetReadModel> Targets =>
+        _targets;
+
+    public IReadOnlyList<PlayerArtilleryActionReadModel> Artillery =>
+        _artillery;
+}
+
 public sealed class PlayerActionSnapshot
 {
     private readonly IReadOnlyList<PlayerConstructionActionReadModel> _construction;
@@ -338,7 +446,8 @@ public sealed class PlayerActionSnapshot
         PlayerProductionFacilityActionReadModel? production,
         PlayerUnitProductionFacilityActionReadModel? unitProduction,
         PlayerLogisticsActionReadModel? logistics = null,
-        PlayerSupplyActionReadModel? supply = null)
+        PlayerSupplyActionReadModel? supply = null,
+        PlayerTacticalActionReadModel? tactical = null)
     {
         SessionId = sessionId;
         Tick = tick;
@@ -353,6 +462,7 @@ public sealed class PlayerActionSnapshot
         UnitProduction = unitProduction;
         Logistics = logistics;
         Supply = supply;
+        Tactical = tactical;
     }
 
     public SimulationSessionId SessionId { get; }
@@ -371,6 +481,8 @@ public sealed class PlayerActionSnapshot
     public PlayerLogisticsActionReadModel? Logistics { get; }
 
     public PlayerSupplyActionReadModel? Supply { get; }
+
+    public PlayerTacticalActionReadModel? Tactical { get; }
 }
 
 internal static class PlayerActionSnapshotFactory
@@ -438,6 +550,13 @@ internal static class PlayerActionSnapshotFactory
                     selectedFacility)
                 : null;
 
+        PlayerTacticalActionReadModel? tactical =
+            CaptureTactical(
+                context.Entities,
+                scenario,
+                extraction.Player,
+                interaction.SelectedEntities);
+
         return new PlayerActionSnapshot(
             scenario.Simulation.SessionId,
             context.Tick,
@@ -446,7 +565,8 @@ internal static class PlayerActionSnapshotFactory
             production,
             unitProduction,
             logistics,
-            supply);
+            supply,
+            tactical);
     }
 
     private static PlayerConstructionActionReadModel[]
@@ -683,6 +803,259 @@ internal static class PlayerActionSnapshotFactory
             progress,
             units,
             requests);
+    }
+
+    private static PlayerTacticalActionReadModel? CaptureTactical(
+        EntityRegistry entities,
+        VerticalSliceScenario scenario,
+        PlayerId player,
+        IReadOnlyList<EntityId> selectedEntities)
+    {
+        if (selectedEntities.Count == 0 ||
+            player.Value == 0 ||
+            player.Value > uint.MaxValue)
+        {
+            return null;
+        }
+
+        var owned =
+            new List<EntityId>(selectedEntities.Count);
+        var combatEligible =
+            new List<EntityId>(selectedEntities.Count);
+        var artillery =
+            new List<PlayerArtilleryActionReadModel>();
+        int criticalSupply = 0;
+        int resupplying = 0;
+
+        bool hasOrder = false;
+        bool mixedOrder = false;
+        CombatOrderKind commonOrder = default;
+        CombatOrderStatus commonStatus = default;
+
+        for (int index = 0;
+             index < selectedEntities.Count;
+             index++)
+        {
+            EntityId entity =
+                selectedEntities[index];
+
+            if (!entities.IsAlive(entity) ||
+                !entities.TryGetComponent(
+                    entity,
+                    out ControllableEntity controllable) ||
+                !controllable.IsControllable ||
+                controllable.Owner != player)
+            {
+                continue;
+            }
+
+            owned.Add(entity);
+
+            bool isCombatEligible =
+                entities.HasComponent<WorldTransform>(entity) &&
+                entities.HasComponent<Combatant>(entity);
+
+            if (isCombatEligible)
+            {
+                combatEligible.Add(entity);
+
+                if (entities.TryGetComponent(
+                        entity,
+                        out UnitSupplyState supply) &&
+                    supply.Status is
+                        BattlefieldSupplyStatus.Critical or
+                        BattlefieldSupplyStatus.Unsupplied)
+                {
+                    criticalSupply++;
+                }
+
+                CombatOrderKind orderKind = default;
+                CombatOrderStatus status = default;
+                bool entityHasOrder =
+                    entities.TryGetComponent(
+                        entity,
+                        out CombatOrderState order);
+                bool entityHasStatus =
+                    entities.TryGetComponent(
+                        entity,
+                        out TacticalCombatState tactical);
+
+                if (entityHasOrder)
+                {
+                    orderKind = order.Kind;
+                }
+
+                if (entityHasStatus)
+                {
+                    status = tactical.Status;
+
+                    if (status ==
+                        CombatOrderStatus.Resupplying)
+                    {
+                        resupplying++;
+                    }
+                }
+
+                if (!hasOrder)
+                {
+                    hasOrder = entityHasOrder;
+                    commonOrder = orderKind;
+                    commonStatus = status;
+                }
+                else if (!entityHasOrder ||
+                         orderKind != commonOrder ||
+                         status != commonStatus)
+                {
+                    mixedOrder = true;
+                }
+            }
+
+            if (entities.TryGetComponent(
+                    entity,
+                    out ArtilleryCapability capability) &&
+                scenario.Services.ArtilleryWeapons.TryGet(
+                    capability.WeaponId,
+                    out ArtilleryWeaponDefinition? definition))
+            {
+                double ammunitionQuantity = 0.0;
+                double ammunitionCapacity = 0.0;
+
+                if (entities.TryGetComponent(
+                        entity,
+                        out AmmunitionState ammunition))
+                {
+                    ammunitionCapacity =
+                        ammunition.Capacity;
+
+                    if (scenario.Inventories.Contains(
+                            ammunition.InventoryId))
+                    {
+                        ammunitionQuantity =
+                            scenario.Inventories.GetQuantity(
+                                ammunition.InventoryId,
+                                ResourceIds.Ammunition);
+                    }
+                }
+
+                FireMissionState mission =
+                    entities.TryGetComponent(
+                        entity,
+                        out FireMissionState currentMission)
+                        ? currentMission
+                        : new FireMissionState(
+                            System.Numerics.Vector3.Zero,
+                            IntelligenceContactKey.None,
+                            0,
+                            0,
+                            FireMissionStatus.Complete,
+                            SimulationTick.Zero,
+                            SimulationTick.Zero,
+                            SimulationTick.Zero,
+                            SimulationTick.Zero);
+
+                artillery.Add(
+                    new PlayerArtilleryActionReadModel(
+                        entity,
+                        ammunitionQuantity,
+                        ammunitionCapacity,
+                        definition.MinimumRangeMeters,
+                        definition.MaximumRangeMeters,
+                        mission.Status,
+                        mission.RoundsFired,
+                        mission.RequestedRounds));
+            }
+        }
+
+        if (owned.Count == 0)
+        {
+            return null;
+        }
+
+        FactionId faction =
+            new((uint)player.Value);
+        FactionIntelligenceSnapshot intelligence =
+            scenario.Intelligence.Capture(
+                faction);
+        var targets =
+            new List<PlayerTacticalTargetReadModel>();
+
+        for (int index = 0;
+             index < intelligence.Contacts.Count;
+             index++)
+        {
+            IntelligenceContact contact =
+                intelligence.Contacts[index];
+
+            if (!contact.IsCurrent ||
+                !contact.IsIdentified ||
+                !scenario.Intelligence.TryResolveCurrentlyIdentifiedEntity(
+                    faction,
+                    contact.ContactKey,
+                    out EntityId target) ||
+                !entities.IsAlive(target) ||
+                !entities.TryGetComponent(
+                    target,
+                    out Combatant targetCombatant) ||
+                targetCombatant.Faction == faction ||
+                !entities.TryGetComponent(
+                    target,
+                    out Targetable targetable) ||
+                !entities.TryGetComponent(
+                    target,
+                    out HealthState health) ||
+                health.IsDepleted)
+            {
+                continue;
+            }
+
+            int compatible = 0;
+
+            for (int unitIndex = 0;
+                 unitIndex < combatEligible.Count;
+                 unitIndex++)
+            {
+                EntityId unit =
+                    combatEligible[unitIndex];
+
+                if (!entities.TryGetComponent(
+                        unit,
+                        out WeaponState weaponState) ||
+                    !scenario.Services.Weapons.TryGet(
+                        weaponState.WeaponId,
+                        out WeaponDefinition? weapon) ||
+                    !weapon.Effectiveness.CanEngage(
+                        targetable.Class))
+                {
+                    continue;
+                }
+
+                compatible++;
+            }
+
+            targets.Add(
+                new PlayerTacticalTargetReadModel(
+                    target,
+                    contact.ContactKey,
+                    contact.LastKnownPosition,
+                    contact.State,
+                    contact.LastSeenTick,
+                    compatible));
+        }
+
+        return new PlayerTacticalActionReadModel(
+            owned,
+            selectedEntities.Count,
+            combatEligible.Count,
+            selectedEntities.Count -
+                combatEligible.Count,
+            criticalSupply,
+            resupplying,
+            hasOrder && !mixedOrder,
+            mixedOrder,
+            commonOrder,
+            commonStatus,
+            targets,
+            artillery);
     }
 
     private static PlayerLogisticsActionReadModel? CaptureLogistics(
