@@ -1095,7 +1095,20 @@ public sealed class PlayerCommandBoundaryTests
             PlayerCommandFeedbackState.Accepted,
             accepted.State);
 
-        scenario.Simulation.AdvanceOneTick();
+        ArtilleryWeaponDefinition artilleryWeapon =
+            scenario.Services.ArtilleryWeapons.GetRequired(
+                DirectorateContent.WeaponIds.MobileArtillery);
+
+        for (int tick = 0;
+             tick <= artilleryWeapon.AcquisitionTicks + 2 &&
+             scenario.Simulation.Entities
+                 .GetComponent<FireMissionState>(
+                     artillery).Status !=
+                 FireMissionStatus.NoAmmo;
+             tick++)
+        {
+            scenario.Simulation.AdvanceOneTick();
+        }
 
         Assert.Equal(
             FireMissionStatus.NoAmmo,
@@ -1125,7 +1138,7 @@ public sealed class PlayerCommandBoundaryTests
             Vector3 position =
                 coreTransform.Position +
                 new Vector3(
-                    -180.0f,
+                    -140.0f,
                     0.0f,
                     -20.0f + index * 40.0f);
 
