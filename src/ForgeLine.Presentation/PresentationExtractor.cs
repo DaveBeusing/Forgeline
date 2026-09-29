@@ -116,7 +116,9 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 playerExperience,
                 placementPreview,
                 debug,
-                construction));
+                construction,
+                _extraction?.Scenario.Simulation.Diagnostics.Capture(
+                    _extraction.Scenario.Simulation)));
     }
 
     private RenderInstance[] CaptureRenderInstances(
