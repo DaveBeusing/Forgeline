@@ -273,6 +273,77 @@ public sealed class TacticalTargetingInteractionTests
             targeting.TryTakeRequest(out _));
     }
 
+    [Fact]
+    public void SharedRequestDispatcherSubmitsResolvedTacticalAction()
+    {
+        using VerticalSliceScenario scenario =
+            CreateScenario(4401);
+        var gateway =
+            new PlayerCommandGateway(
+                scenario.Simulation,
+                scenario.Services.BuildingCommands,
+                scenario.BattlefieldRuntime.MatchStateEntity,
+                intelligence:
+                    scenario.Intelligence,
+                weapons:
+                    scenario.Services.Weapons,
+                artilleryWeapons:
+                    scenario.Services.ArtilleryWeapons);
+        scenario.Simulation.RegisterTickObserver(
+            gateway);
+
+        EntityId attacker =
+            scenario.West.StartingUnits[0];
+        EntityId target =
+            scenario.East.StartingUnits[0];
+        FactionId faction =
+            new((uint)scenario.West.Player.Value);
+        IntelligenceSignature signature =
+            scenario.Simulation.Entities
+                .GetComponent<IntelligenceSignature>(
+                    target);
+        WorldTransform transform =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    target);
+
+        scenario.Intelligence.BeginTick(
+            scenario.Simulation.CurrentTick);
+        scenario.Intelligence.Observe(
+            faction,
+            target,
+            signature,
+            transform.Position,
+            IntelligenceState.Identified,
+            scenario.Simulation.CurrentTick);
+
+        PlayerActionRequest request =
+            PlayerActionRequest.Attack(
+                [attacker],
+                target);
+
+        Assert.True(
+            PlayerActionRequestDispatcher.TryDispatch(
+                request,
+                scenario.West.Player,
+                gateway,
+                scenario.Simulation.CurrentTick,
+                out PlayerCommandSubmissionReceipt receipt));
+        Assert.True(receipt.Accepted);
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel result));
+        Assert.Equal(
+            PlayerCommandKind.Tactical,
+            result.Kind);
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            result.State);
+    }
+
     private static PlayerTacticalActionReadModel Tactical(
         EntityId selected) =>
         new(
@@ -334,6 +405,25 @@ public sealed class TacticalTargetingInteractionTests
                 resolvedSession,
             playerActions:
                 actions);
+    }
+
+    private static VerticalSliceScenario CreateScenario(
+        ulong seed)
+    {
+        VerticalSliceRuntimeSettings runtime =
+            VerticalSliceRuntimeSettings.CreateHeadless(
+                VerticalSliceScenarioProfile.Gameplay,
+                seed) with
+            {
+                Participants =
+                    VerticalSliceRuntimeSettings.CreateDefaultParticipants(
+                        westComputerControlled: false,
+                        eastComputerControlled: false)
+            };
+
+        return VerticalSliceScenario.Create(
+            runtime,
+            TestContext.Current.CancellationToken);
     }
 
     private static RtsCamera CreateCamera() =>
