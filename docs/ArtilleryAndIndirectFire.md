@@ -390,3 +390,13 @@ The first implementation deliberately leaves these outside the subsystem:
 - final artillery UI.
 
 Future systems must keep the same intelligence-safe coordinate boundary and existing Ammunition/supply authority.
+
+## Human Player Fire Missions
+
+The shared combat palette exposes Fire Mission and Cancel Fire Mission for an owned selection. Target mode accepts either an intelligence contact or a terrain coordinate.
+
+Contact targeting carries only the opaque `IntelligenceContactKey` from the copied faction-intelligence snapshot. The authoritative artillery system resolves that key to the contact's stored `LastKnownPosition`; it never resolves a newly hidden entity to its current transform for UI convenience. Detected radar-only contacts are therefore valid indirect-fire information without becoming directly selectable Attack targets.
+
+Coordinate targeting is provisional in presentation. `PlayerTacticalActionCommand` and `ArtilleryFireMissionSystem` require the corresponding faction-intelligence terrain cell to be currently visible. The player adapter also filters owned artillery and current minimum/maximum range before creating the existing mission command. The artillery system remains authoritative for acquisition, cadence, ammunition consumption, `NoAmmo`, projectile flight, terrain impact, area damage, and cancellation.
+
+The development action surface uses three rounds as the current fixed human fire-mission request. A configurable round count is deferred; no additional artillery mechanic or ammunition shortcut is introduced here.
