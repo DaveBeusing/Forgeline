@@ -2368,16 +2368,33 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return UnitId.None;
         }
 
-        if (GetUnitCount(
+        int cargoTarget = Math.Clamp(
+            owned.SupplyDepots.Count,
+            2,
+            4);
+        int cargoCount =
+            GetUnitCount(
                 owned,
-                UnitIds.CargoTruck) < 2)
+                UnitIds.CargoTruck);
+        owned.PendingUnitCounts.TryGetValue(
+            UnitIds.CargoTruck,
+            out int pendingCargo);
+
+        if (cargoCount + pendingCargo <
+            cargoTarget)
         {
             return UnitIds.CargoTruck;
         }
 
-        if (GetUnitCount(
+        int supplyCount =
+            GetUnitCount(
                 owned,
-                UnitIds.SupplyTruck) < 1)
+                UnitIds.SupplyTruck);
+        owned.PendingUnitCounts.TryGetValue(
+            UnitIds.SupplyTruck,
+            out int pendingSupply);
+
+        if (supplyCount + pendingSupply < 1)
         {
             return UnitIds.SupplyTruck;
         }
