@@ -256,9 +256,9 @@ public sealed class PlayerActionPanelController
             }
         }
 
-        if (Mode is
-                PlayerActionPanelMode.Production or
-                PlayerActionPanelMode.UnitProduction &&
+        if ((Mode is
+                 PlayerActionPanelMode.Production or
+                 PlayerActionPanelMode.UnitProduction) &&
             Pressed(input, PlatformKey.T))
         {
             Priority =
@@ -331,6 +331,8 @@ public sealed class PlayerActionPanelController
         {
             SelectedIndex = pointerRow;
             _desiredStockQuantity = 0.0;
+            ActivateSelected(actions);
+            PointerCaptured = true;
         }
 
         bool activate =
@@ -343,9 +345,9 @@ public sealed class PlayerActionPanelController
         }
 
         bool cancel =
-            Mode is
-                PlayerActionPanelMode.Production or
-                PlayerActionPanelMode.UnitProduction &&
+            (Mode is
+                 PlayerActionPanelMode.Production or
+                 PlayerActionPanelMode.UnitProduction) &&
             Pressed(input, PlatformKey.C);
 
         if (cancel)
