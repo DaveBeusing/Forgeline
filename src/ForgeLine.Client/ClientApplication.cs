@@ -558,25 +558,20 @@ internal sealed class ClientApplication
 
             if (_platform.Clock.GetElapsedTime(nextDiagnosticAt, now) >= DiagnosticInterval)
             {
-                simulationDiagnostics = simulation.Diagnostics.Capture(simulation);
                 WriteCameraState("frame", camera);
                 WriteTerrainState("frame", terrainRenderer);
                 WritePresentationState(
                     "frame",
-                    simulation,
                     renderWorld,
                     terrainRenderer,
                     instanceRenderer);
                 WriteInteractionState(
                     "frame",
                     selectionController,
-                    lastMovementEnvelope,
-                    lastMovementCommand,
+                    lastCommandReceipt,
+                    lastCommandResult,
                     activeFormation,
-                    buildingPlacementController,
-                    lastBuildEnvelope,
-                    lastBuildCommand,
-                    buildingCommands);
+                    buildingPlacementController);
                 nextDiagnosticAt = now;
             }
         }
@@ -587,20 +582,16 @@ internal sealed class ClientApplication
         WriteTerrainState("stopped", terrainRenderer);
         WritePresentationState(
             "stopped",
-            simulation,
             renderWorld,
             terrainRenderer,
             instanceRenderer);
         WriteInteractionState(
             "stopped",
             selectionController,
-            lastMovementEnvelope,
-            lastMovementCommand,
+            lastCommandReceipt,
+            lastCommandResult,
             activeFormation,
-            buildingPlacementController,
-            lastBuildEnvelope,
-            lastBuildCommand,
-            buildingCommands);
+            buildingPlacementController);
         WriteGraphicsState("stopped", graphics);
         return 0;
     }
