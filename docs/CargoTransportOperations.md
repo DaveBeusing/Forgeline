@@ -268,3 +268,9 @@ The current implementation deliberately does not include:
 - final Cargo Truck art or animation.
 
 Those features may schedule, specialize, or present the existing transport lifecycle. They must not bypass the physical cargo and conservation semantics defined here.
+
+## Player-Facing Cargo Status
+
+Selecting an owned Cargo Truck and opening the logistics view exposes copied cargo quantity/capacity plus the authoritative `CargoTransportRuntimeState`: Idle, ToOrigin, Loading, ToDestination, Unloading, Waiting, or Failed. Wait and failure reasons are shown when available.
+
+The player does not directly teleport cargo or edit a route from this surface. Stock policy is the normal distribution control. Cargo inventory changes remain restricted to the existing physical loading and unloading boundaries, with reservations, route capacity, vehicle Fuel feasibility, rerouting, destruction, and destination capacity enforced by the simulation.
