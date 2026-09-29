@@ -653,7 +653,7 @@ public sealed class PlayerActionPanelTests
             PlayerActionRequestKind.BeginAttackTargeting,
             attack.Kind);
         Assert.Equal(
-            [unit],
+            new[] { unit },
             attack.TacticalEntities);
         Assert.Equal(
             PlayerActionPanelMode.Closed,
@@ -710,7 +710,7 @@ public sealed class PlayerActionPanelTests
             PlayerActionRequestKind.SubmitHoldPosition,
             hold.Kind);
         Assert.Equal(
-            [unit],
+            new[] { unit },
             hold.TacticalEntities);
     }
 
