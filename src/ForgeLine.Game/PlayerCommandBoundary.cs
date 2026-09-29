@@ -1272,6 +1272,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 null,
                 null,
                 null,
+                null,
                 null);
 
         public static PendingCommand ForBuild(
@@ -1281,6 +1282,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 correlation,
                 PlayerCommandKind.Construction,
                 envelope,
+                null,
                 null,
                 null,
                 null,
@@ -1301,6 +1303,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 null,
                 null,
                 null,
+                null,
                 null);
 
         public static PendingCommand ForProduction(
@@ -1311,6 +1314,23 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 correlation,
                 PlayerCommandKind.Production,
                 envelope,
+                null,
+                null,
+                command,
+                null,
+                null,
+                null,
+                null);
+
+        public static PendingCommand ForUnitProduction(
+            PlayerCommandCorrelationId correlation,
+            in SimulationCommandEnvelope envelope,
+            PlayerUnitProductionActionCommand command) =>
+            new(
+                correlation,
+                PlayerCommandKind.UnitProduction,
+                envelope,
+                null,
                 null,
                 null,
                 command,
@@ -1369,21 +1389,5 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 command,
                 null);
         }
-
-        public static PendingCommand ForUnitProduction(
-            PlayerCommandCorrelationId correlation,
-            in SimulationCommandEnvelope envelope,
-            PlayerUnitProductionActionCommand command) =>
-            new(
-                correlation,
-                PlayerCommandKind.UnitProduction,
-                envelope,
-                null,
-                null,
-                null,
-                command,
-                null,
-                null,
-                null);
     }
 }
