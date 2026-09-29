@@ -843,11 +843,13 @@ public sealed class AutomatedDistributionSystem
                 (deadheadDistance +
                  route.TotalDistanceMeters) *
                 fuel.ConsumptionPerMeter);
+        // Refineries refill operational tanks once their input arrives.
+        // Keep a small margin, but do not strand the fuel supply chain
+        // behind the normal reserve while every provider is running dry.
         double reserveFuel =
-            // Refineries refill operational tanks once their input arrives.
-            // Keep a small margin, but do not strand the fuel supply chain
-            // behind the normal reserve while every provider is running dry.
-            fuel.Capacity * (replenishesFuelProduction ? 0.05 : 0.2);
+            CargoDeliveryFuelPolicy.ResolveReserveFuel(
+                fuel,
+                replenishesFuelProduction);
         double availableFuel =
             _inventories.GetQuantity(
                 fuel.InventoryId,

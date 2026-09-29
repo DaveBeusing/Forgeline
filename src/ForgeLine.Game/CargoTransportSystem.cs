@@ -1403,7 +1403,10 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 context.Entities,
                 _inventories,
                 entity,
-                movementOrder);
+                movementOrder,
+                IsFuelProductionRecoveryOrder(
+                    context.Entities,
+                    entity));
         }
 
         if (context.Entities.HasComponent<
@@ -1439,6 +1442,28 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 entity,
                 movementTarget);
         }
+    }
+
+    private bool IsFuelProductionRecoveryOrder(
+        EntityRegistry entities,
+        EntityId entity)
+    {
+        if (!entities.TryGetComponent(
+                entity,
+                out CargoTransportOrder order) ||
+            order.ResourceId != ResourceIds.Volatiles ||
+            !_network.TryGetNode(
+                order.Destination,
+                out LogisticsNode destination) ||
+            !entities.TryGetComponent(
+                destination.Entity,
+                out ProductionFacility production))
+        {
+            return false;
+        }
+
+        return production.Supports(
+            ProductionCapability.FuelProcessing);
     }
 
     private Vector3 ResolveNavigableApproach(

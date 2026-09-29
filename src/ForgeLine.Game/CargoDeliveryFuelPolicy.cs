@@ -11,6 +11,7 @@ public readonly record struct CargoDeliveryFuelBudget(
     MovementOrder Movement,
     double AvailableFuel,
     double FuelPerMeter,
+    double ReserveFuel,
     SimulationTick CapturedAtTick);
 
 public readonly record struct CargoDeliveryFuelDeferral(
@@ -31,6 +32,7 @@ internal static class CargoDeliveryFuelPolicy
 {
     private const double QuantityEpsilon = 0.000000001;
     private const double ReserveFraction = 0.20;
+    private const double FuelProductionRecoveryReserveFraction = 0.05;
 
     public static bool RequiresRefueling(
         EntityRegistry entities,
@@ -160,7 +162,8 @@ internal static class CargoDeliveryFuelPolicy
         EntityRegistry entities,
         InventoryStore inventories,
         EntityId entity,
-        MovementOrder movement)
+        MovementOrder movement,
+        bool replenishesFuelProduction)
     {
         if (!IsCargoTravel(entities, entity) ||
             !entities.TryGetComponent(entity, out UnitFuelState fuel) ||
@@ -177,6 +180,9 @@ internal static class CargoDeliveryFuelPolicy
                 fuel.InventoryId,
                 ResourceIds.Fuel),
             fuel.ConsumptionPerMeter,
+            ResolveReserveFuel(
+                fuel,
+                replenishesFuelProduction),
             SimulationTick.Zero);
 
         if (entities.HasComponent<CargoDeliveryFuelBudget>(entity))
@@ -226,7 +232,8 @@ internal static class CargoDeliveryFuelPolicy
                 firstWaypoint: 0,
                 movement.WorldTarget);
         double required =
-            distance * budget.FuelPerMeter;
+            distance * budget.FuelPerMeter +
+            budget.ReserveFuel;
 
         if (double.IsFinite(required) &&
             budget.AvailableFuel + QuantityEpsilon >= required)
@@ -294,6 +301,14 @@ internal static class CargoDeliveryFuelPolicy
         RemoveBudget(entities, entity);
         RemoveDeferral(entities, entity);
     }
+
+    public static double ResolveReserveFuel(
+        in UnitFuelState fuel,
+        bool replenishesFuelProduction) =>
+        fuel.Capacity *
+        (replenishesFuelProduction
+            ? FuelProductionRecoveryReserveFraction
+            : ReserveFraction);
 
     private static bool IsCargoTravel(
         EntityRegistry entities,

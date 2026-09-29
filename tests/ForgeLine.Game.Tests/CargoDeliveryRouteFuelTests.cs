@@ -138,7 +138,7 @@ public sealed class CargoDeliveryRouteFuelTests
             inventories.Add(
                 fuelInventory,
                 ResourceIds.Fuel,
-                5.0).Succeeded);
+                8.0).Succeeded);
         simulation.Entities.AddComponent(
             truck,
             new UnitFuelState(
@@ -174,6 +174,9 @@ public sealed class CargoDeliveryRouteFuelTests
 
         Assert.True(deferral.RequiredFuel > deferral.AvailableFuel);
         Assert.True(
+            deferral.RequiredFuel - 4.0 <
+            deferral.AvailableFuel);
+        Assert.True(
             Vector3.Distance(Start, Destination) * 0.08 <
             deferral.AvailableFuel);
         Assert.Equal(
@@ -195,14 +198,14 @@ public sealed class CargoDeliveryRouteFuelTests
                 ResourceIds.Steel),
             precision: 6);
         Assert.Equal(
-            5.0,
+            8.0,
             inventories.GetQuantity(
                 fuelInventory,
                 ResourceIds.Fuel),
             precision: 6);
 
-        // The exact route deficit must request Fuel even though 25% tank
-        // remains and the ordinary automatic threshold is only 10%.
+        // The exact leg is affordable, but consuming it would violate the
+        // 20% operating reserve. Refueling must win before travel starts.
         Assert.True(
             automatic.Metrics.ProviderUnavailableThisTick > 0);
 
