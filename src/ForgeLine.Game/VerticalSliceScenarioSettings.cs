@@ -20,6 +20,12 @@ public sealed record VerticalSliceScenarioSettings
 
     public required int NavigationSectorSizeCells { get; init; }
 
+    public required ulong DistributionRetryDelayTicks { get; init; }
+
+    public required uint DistributionMaximumTransportAttempts { get; init; }
+
+    public required ulong DistributionFairnessAgingTicks { get; init; }
+
     public void Validate()
     {
         WestOpponent.Validate();
@@ -36,6 +42,24 @@ public sealed record VerticalSliceScenarioSettings
         {
             throw new InvalidOperationException(
                 "Vertical-slice navigation sector size must be at least one cell.");
+        }
+
+        if (DistributionRetryDelayTicks == 0)
+        {
+            throw new InvalidOperationException(
+                "Vertical-slice distribution retry delay must be greater than zero.");
+        }
+
+        if (DistributionMaximumTransportAttempts == 0)
+        {
+            throw new InvalidOperationException(
+                "Vertical-slice distribution attempt count must be greater than zero.");
+        }
+
+        if (DistributionFairnessAgingTicks == 0)
+        {
+            throw new InvalidOperationException(
+                "Vertical-slice distribution fairness aging must be greater than zero.");
         }
     }
 
@@ -60,7 +84,10 @@ public sealed record VerticalSliceScenarioSettings
             WestOpponent = new SkirmishOpponentConfiguration(),
             EastOpponent = new SkirmishOpponentConfiguration(),
             NavigationCellSizeMeters = 16.0f,
-            NavigationSectorSizeCells = 8
+            NavigationSectorSizeCells = 8,
+            DistributionRetryDelayTicks = 20,
+            DistributionMaximumTransportAttempts = 4,
+            DistributionFairnessAgingTicks = 200
         };
 
     private static VerticalSliceScenarioSettings CreateValidation() =>
@@ -109,6 +136,9 @@ public sealed record VerticalSliceScenarioSettings
                     ArtilleryCadenceTicks = 60
                 },
             NavigationCellSizeMeters = 32.0f,
-            NavigationSectorSizeCells = 4
+            NavigationSectorSizeCells = 4,
+            DistributionRetryDelayTicks = 10,
+            DistributionMaximumTransportAttempts = 8,
+            DistributionFairnessAgingTicks = 100
         };
 }

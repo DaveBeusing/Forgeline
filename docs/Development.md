@@ -83,7 +83,11 @@ Correctness tests remain separate from benchmark timing. Benchmark timing thresh
 
 ## Windows Client Host
 
-The interactive client composes the native Windows host, Direct3D 12 graphics backend, RTS input/camera stack, fixed-tick simulation, immutable presentation extraction, development debug visualization, and the canonical Central Divide prototype battlefield. Normal launches contain only the skirmish world; synthetic instance load is opt-in through `--render-stress` and is used by the rendering smoke path. The local side receives the normal west starting base while Player 2 runs the skirmish opponent through the same construction, logistics, movement, intelligence, supply, combat, and objective systems. F2 includes the battlefield's starts, resources, strategic sites, logistics corridor, crossings, infrastructure state, Command Core objectives, and skirmish strategic state alongside the existing system diagnostics.
+The interactive client owns the native Windows host, Direct3D 12 graphics backend, RTS input/camera stack, immutable presentation extraction, frame pacing, and development visualization. Canonical gameplay construction is delegated to `VerticalSliceScenario` using the `Gameplay` profile. Player 1 is explicitly human-controlled and Player 2 computer-controlled; the local slot therefore does not receive a strategic opponent controller.
+
+The client supplies a host-owned `JobScheduler` to the shared runtime. Scenario disposal does not dispose that scheduler; the client host owns its single disposal. Match restart creates a fresh shared scenario so ECS state, inventories, navigation state, routes, controllers, and orders do not leak between sessions.
+
+Normal launches contain only the skirmish world. Synthetic instance load is opt-in through `--render-stress` and is added after authoritative gameplay/navigation construction, so rendering stress entities do not alter the gameplay navigation topology. F2 includes the battlefield's starts, resources, strategic sites, logistics corridor, crossings, infrastructure state, Command Core objectives, and skirmish strategic state alongside the existing system diagnostics.
 
 Launch it with:
 
@@ -118,7 +122,11 @@ The development host supports lightweight engine stress and complete vertical-sl
 --help
 ```
 
-The logical tick rate describes simulation time. Headless execution does not sleep to match real time and may run substantially faster than the configured logical rate. The vertical-slice runtime remains fixed at the canonical 20 Hz simulation rate. `gameplay` preserves the product-facing balance and navigation configuration; `validation` deliberately accelerates the scenario for deterministic CI/soak coverage and must not be treated as product balance.
+The logical tick rate describes simulation time. Headless execution does not sleep to match real time and may run substantially faster than the configured logical rate. The vertical-slice runtime remains fixed at the canonical 20 Hz simulation rate and uses the same `VerticalSliceScenario` construction path as the Windows client.
+
+`gameplay` preserves product-facing starting stock, opponent behavior, 16 m navigation cells with 8-cell sectors, and the normal distribution retry/attempt/fairness policy (20 ticks / 4 attempts / 200 aging ticks). `validation` deliberately retains accelerated starting stock and opponent behavior, 32 m navigation cells with 4-cell sectors, and its faster distribution policy (10 / 8 / 100) for deterministic CI/soak coverage. Validation tuning must not be treated as product balance.
+
+Headless participant assignments are explicit runtime settings rather than hidden host behavior. Tests may choose human or computer slots independently of the profile when validating composition parity. Headless match creation forwards cancellation and disposes each scenario after the fresh-session run; the shared runtime introduces no wall-clock pacing.
 
 Run repeated fresh sessions with:
 

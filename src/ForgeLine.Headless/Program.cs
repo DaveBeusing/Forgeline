@@ -149,11 +149,20 @@ internal static class Program
                 checked(
                     options.Seed +
                     (ulong)matchIndex);
-            VerticalSliceScenario scenario =
-                VerticalSliceScenario.Create(
-                    settings,
+            VerticalSliceRuntimeSettings runtimeSettings =
+                VerticalSliceRuntimeSettings.CreateHeadless(
+                    settings.Profile,
                     matchSeed,
-                    enableDiagnostics: true);
+                    enableDiagnostics: true,
+                    enableDebugCapture:
+                        options.DiagnosticsOutput is not null) with
+                {
+                    Scenario = settings
+                };
+            using VerticalSliceScenario scenario =
+                VerticalSliceScenario.Create(
+                    runtimeSettings,
+                    cancellationToken);
             SkirmishProgressionDiagnostics? progression = null;
             if (options.DiagnosticsOutput is not null)
             {

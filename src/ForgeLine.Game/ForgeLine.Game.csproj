@@ -6,6 +6,7 @@
     <ProjectReference Include="../ForgeLine.World/ForgeLine.World.csproj" />
     <ProjectReference Include="../ForgeLine.Navigation/ForgeLine.Navigation.csproj" />
     <ProjectReference Include="../ForgeLine.Simulation/ForgeLine.Simulation.csproj" />
+    <ProjectReference Include="../ForgeLine.Jobs/ForgeLine.Jobs.csproj" />
     <ProjectReference Include="../ForgeLine.Economy/ForgeLine.Economy.csproj" />
     <ProjectReference Include="../ForgeLine.Logistics/ForgeLine.Logistics.csproj" />
     <ProjectReference Include="../ForgeLine.Combat/ForgeLine.Combat.csproj" />

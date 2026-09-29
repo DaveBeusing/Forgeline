@@ -51,220 +51,99 @@ internal sealed class ClientApplication
         using IWindow window = _platform.CreateWindow(configuration);
         using IGraphicsDevice graphics = GraphicsDeviceFactory.CreateForWindow(window);
 
+        var snapshotBuffer =
+            new PresentationSnapshotBuffer();
+        using var jobScheduler =
+            new JobScheduler();
+        VerticalSliceRuntimeSettings runtimeSettings =
+            VerticalSliceRuntimeSettings.CreateClient(
+                jobScheduler);
+        using VerticalSliceScenario scenario =
+            VerticalSliceScenario.Create(
+                runtimeSettings);
+
+        SimulationCoordinator simulation =
+            scenario.Simulation;
         PrototypeBattlefieldDefinition prototypeBattlefield =
-            PrototypeBattlefieldDefinition.Create();
-        MatchConfiguration matchConfiguration =
-            MatchConfiguration.CreateVerticalSlice(
-                prototypeBattlefield);
+            scenario.Battlefield;
         TerrainWorld terrainWorld =
-            PrototypeBattlefieldTerrainFactory.Create(
-                prototypeBattlefield);
-        using var terrainRenderer = new TerrainRenderer(graphics, terrainWorld);
-        using var instanceRenderer = new SimpleInstanceRenderer(graphics);
-        using var debugDrawRenderer = new DebugDrawRenderer(graphics);
-        using var overlayRenderer = new DevelopmentOverlayRenderer(graphics);
-
-        var snapshotBuffer = new PresentationSnapshotBuffer();
-        using var jobScheduler = new JobScheduler();
-        var simulation = new SimulationCoordinator(
-            seed: matchConfiguration.Seed,
-            jobScheduler: jobScheduler,
-            diagnosticsOptions: new SimulationDiagnosticsOptions { Enabled = true });
-        var spatialIndex = new SpatialGridIndex(
-            new SpatialGridSettings
-            {
-                World = terrainWorld.Settings,
-                CellSizeMeters = SpatialGridSettings.DefaultCellSizeMeters,
-                EnableQueryTiming = true
-            });
-        var spatialSynchronizer = new SpatialIndexSynchronizer(spatialIndex);
-        var groundMovementSystem = new GroundMovementSystem(
-            terrainWorld,
-            spatialIndex);
-        FactionContentDefinition directorateFaction =
-            DirectorateContent.CreateFactionDefinition();
-        BuildingDefinitionCatalog buildingDefinitions =
-            DirectorateContent.CreateBuildingCatalog();
-        UnitDefinitionCatalog unitDefinitions =
-            DirectorateContent.CreateUnitCatalog();
+            scenario.Terrain;
+        SpatialGridIndex spatialIndex =
+            scenario.Services.SpatialIndex;
+        GroundMovementSystem groundMovementSystem =
+            scenario.Services.GroundMovement;
+        FormationMovementSystem formationMovementSystem =
+            scenario.Services.FormationMovement;
+        HierarchicalNavigationSystem navigationSystem =
+            scenario.Services.Navigation;
         ResourceCatalog resourceCatalog =
-            InitialResourceDefinitions.CreateCatalog();
-        ProductionRecipeCatalog productionRecipes =
-            InitialProductionRecipes.CreateCatalog();
-        var inventories = new InventoryStore();
-        var buildingPlacement = new BuildingPlacementService(
-            buildingDefinitions,
-            terrainWorld,
-            spatialIndex);
-        var buildingCommands = new BuildingCommandProcessingSystem(
-            buildingDefinitions,
-            buildingPlacement,
-            inventories,
-            spatialIndex);
-        var buildingConstruction = new BuildingConstructionSystem(
-            buildingDefinitions,
-            inventories,
-            spatialIndex);
-        var powerNetworks = new PowerNetworkSystem();
-        var production = new ProductionSystem(
-            productionRecipes,
-            inventories);
-        var resourceExtraction = new ResourceExtractionSystem(
-            inventories: inventories);
-        var logisticsNetwork = new LogisticsNetwork();
+            scenario.Services.Resources;
+        BuildingDefinitionCatalog buildingDefinitions =
+            scenario.Services.BuildingDefinitions;
+        UnitDefinitionCatalog unitDefinitions =
+            scenario.Services.UnitDefinitions;
+        InventoryStore inventories =
+            scenario.Inventories;
+        BuildingPlacementService buildingPlacement =
+            scenario.Services.BuildingPlacement;
+        BuildingCommandProcessingSystem buildingCommands =
+            scenario.Services.BuildingCommands;
+        BuildingConstructionSystem buildingConstruction =
+            scenario.Services.BuildingConstruction;
+        UnitProductionSystem unitProduction =
+            scenario.Services.UnitProduction;
+        PowerNetworkSystem powerNetworks =
+            scenario.Power;
+        ProductionSystem production =
+            scenario.Production;
+        ResourceExtractionSystem resourceExtraction =
+            scenario.Extraction;
+        LogisticsNetwork logisticsNetwork =
+            scenario.Logistics;
         PrototypeBattlefieldRuntime prototypeRuntime =
-            PrototypeBattlefieldRuntime.Load(
-                simulation.Entities,
-                prototypeBattlefield,
-                terrainWorld,
-                logisticsNetwork);
-        var logisticsDisruption =
-            new LogisticsDisruptionSystem(
-                logisticsNetwork);
-        var cargoTransportSystem =
-            new CargoTransportSystem(
-                logisticsNetwork,
-                inventories);
-        var automatedDistribution =
-            new AutomatedDistributionSystem(
-                logisticsNetwork,
-                inventories,
-                cargoTransportSystem);
-        var battlefieldSupply =
-            new BattlefieldSupplySystem(
-                inventories);
-        var intelligenceStore =
-            new FactionIntelligenceStore(
-                new IntelligenceGridSettings
-                {
-                    CellSizeMeters = 32.0f
-                });
-        var battlefieldIntelligence =
-            new BattlefieldIntelligenceSystem(
-                intelligenceStore,
-                spatialIndex);
-        var intelligenceAvailability =
-            new IntelligenceTargetAvailabilityPolicy(
-                simulation.Entities,
-                intelligenceStore);
-        WeaponCatalog combatWeapons =
-            DirectorateContent.CreateWeaponCatalog();
-        ArtilleryWeaponCatalog artilleryWeapons =
-            DirectorateContent.CreateArtilleryWeaponCatalog();
-        ArmorCatalog combatArmor =
-            DirectorateContent.CreateArmorCatalog();
-
-        GameContentValidator.ValidateDirectorate(
-            directorateFaction,
-            resourceCatalog,
-            buildingDefinitions,
-            unitDefinitions,
-            productionRecipes,
-            combatWeapons,
-            combatArmor,
-            artilleryWeapons);
-
-        var unitFactory =
-            new UnitFactory(
-                simulation.Entities,
-                inventories,
-                cargoTransportSystem);
-        var unitProduction =
-            new UnitProductionSystem(
-                unitDefinitions,
-                inventories,
-                unitFactory);
-
-        SkirmishMatchInitialization matchInitialization =
-            SkirmishMatchInitializer.Initialize(
-                simulation.Entities,
-                inventories,
-                unitFactory,
-                terrainWorld,
-                prototypeBattlefield,
-                prototypeRuntime,
-                matchConfiguration);
+            scenario.BattlefieldRuntime;
+        CargoTransportSystem cargoTransportSystem =
+            scenario.CargoTransport;
+        AutomatedDistributionSystem automatedDistribution =
+            scenario.AutomatedDistribution;
+        BattlefieldSupplySystem battlefieldSupply =
+            scenario.BattlefieldSupply;
+        FactionIntelligenceStore intelligenceStore =
+            scenario.Intelligence;
+        BattlefieldIntelligenceSystem battlefieldIntelligence =
+            scenario.Services.BattlefieldIntelligence;
+        SkirmishOpponentSystem skirmishOpponent =
+            scenario.Opponents;
+        TargetAcquisitionSystem targetAcquisition =
+            scenario.Services.TargetAcquisition;
+        ArtilleryFireMissionSystem artilleryFireMissions =
+            scenario.Artillery;
+        AutomaticResupplyDecisionSystem automaticResupply =
+            scenario.Services.AutomaticResupply;
+        TacticalCombatSystem tacticalCombat =
+            scenario.Services.TacticalCombat;
+        CombatReadinessSystem combatReadiness =
+            scenario.Readiness;
+        CombatDebugSnapshotSystem combatDebugSnapshots =
+            scenario.Services.CombatDebugSnapshots;
         SkirmishStartingBase westBase =
-            matchInitialization.GetBase(LocalPlayer);
+            scenario.West;
         SkirmishStartingBase eastBase =
-            matchInitialization.GetBase(OpposingPlayer);
+            scenario.East;
 
-        var skirmishOpponent =
-            new SkirmishOpponentSystem(
-                buildingDefinitions,
-                unitDefinitions,
-                inventories,
-                buildingPlacement,
-                intelligenceStore,
-                prototypeBattlefield,
-                new Dictionary<PlayerId, SkirmishOpponentConfiguration>
-                {
-                    [eastBase.Player] =
-                        new SkirmishOpponentConfiguration()
-                });
-
-        var combatRuntime =
-            new CombatRuntime();
-        var targetAcquisition =
-            new TargetAcquisitionSystem(
-                combatWeapons,
-                spatialIndex,
-                intelligenceAvailability);
-        var combatExecution =
-            new CombatExecutionSystem(
-                combatWeapons,
-                inventories,
-                combatRuntime,
-                spatialIndex,
-                intelligenceAvailability);
-        var artilleryFireMissions =
-            new ArtilleryFireMissionSystem(
-                artilleryWeapons,
-                inventories,
-                combatRuntime,
-                intelligenceStore,
-                terrainWorld,
-                spatialIndex);
-        var combatDamageResolution =
-            new CombatDamageResolutionSystem(
-                combatRuntime,
-                combatWeapons,
-                combatArmor,
-                artilleryWeapons);
-        var combatLifecycle =
-            new CombatEntityLifecycleSystem(
-                combatRuntime,
-                spatialIndex);
-        var combatDebugSnapshots =
-            new CombatDebugSnapshotSystem(
-                combatWeapons,
-                combatRuntime,
-                targetAcquisition,
-                combatDamageResolution);
-        var tacticalOrderPreparation =
-            new TacticalOrderPreparationSystem();
-        var automaticResupply =
-            new AutomaticResupplyDecisionSystem(
-                inventories);
-        var tacticalCombat =
-            new TacticalCombatSystem(
-                combatWeapons,
-                intelligenceStore);
-        var combatReadiness =
-            new CombatReadinessSystem(
-                inventories,
-                combatWeapons,
-                artilleryWeapons);
-        var logisticsRegistration =
-            new BuildingLogisticsRegistrationSystem(
-                logisticsNetwork);
-        var prototypeRoadAccess =
-            new PrototypeRoadAccessSystem(
-                logisticsNetwork,
-                prototypeRuntime.RoadNodes);
-        var matchObjectives =
-            new MatchObjectiveSystem(
-                prototypeRuntime.MatchStateEntity);
+        using var terrainRenderer =
+            new TerrainRenderer(
+                graphics,
+                terrainWorld);
+        using var instanceRenderer =
+            new SimpleInstanceRenderer(
+                graphics);
+        using var debugDrawRenderer =
+            new DebugDrawRenderer(
+                graphics);
+        using var overlayRenderer =
+            new DevelopmentOverlayRenderer(
+                graphics);
 
         if (renderInstanceCount > 0)
         {
@@ -273,81 +152,10 @@ internal sealed class ClientApplication
                 terrainWorld,
                 renderInstanceCount);
         }
+
         EntityId constructionInventory =
             westBase.CommandCore;
-        AxisAlignedBounds[] developmentObstacles =
-            CollectStaticNavigationObstacles(simulation);
-        var navigationObstacles =
-            new List<AxisAlignedBounds>(
-                prototypeBattlefield.StaticNavigationObstacles.Count +
-                developmentObstacles.Length);
-        navigationObstacles.AddRange(
-            prototypeBattlefield.StaticNavigationObstacles);
-        navigationObstacles.AddRange(
-            developmentObstacles);
 
-        var navigationGridSettings =
-            new NavigationGridSettings
-            {
-                CellSizeMeters = 16.0f,
-                StaticObstacleClearanceMeters = 0.5f
-            };
-        var navigationSectorSettings =
-            new NavigationSectorSettings
-            {
-                SectorSizeCells = 8
-            };
-        NavigationWorld navigationWorld = NavigationWorld.Build(
-            terrainWorld,
-            navigationObstacles,
-            navigationGridSettings,
-            navigationSectorSettings);
-        var pathfinder =
-            new HierarchicalPathfinder(navigationWorld);
-        var formationMovementSystem =
-            new FormationMovementSystem(pathfinder);
-        var navigationSystem =
-            new HierarchicalNavigationSystem(pathfinder);
-        var strategicInfrastructure =
-            new StrategicInfrastructureSystem(
-                logisticsNetwork,
-                terrainWorld,
-                navigationSystem,
-                navigationObstacles,
-                navigationGridSettings,
-                navigationSectorSettings);
-
-        simulation.RegisterSystem(buildingCommands);
-        simulation.RegisterSystem(skirmishOpponent);
-        simulation.RegisterSystem(tacticalOrderPreparation);
-        simulation.RegisterSystem(automaticResupply);
-        simulation.RegisterSystem(logisticsDisruption);
-        simulation.RegisterSystem(strategicInfrastructure);
-        simulation.RegisterSystem(formationMovementSystem);
-        simulation.RegisterSystem(navigationSystem);
-        simulation.RegisterSystem(groundMovementSystem);
-        simulation.RegisterSystem(new SpatialIndexSystem(spatialSynchronizer));
-        simulation.RegisterSystem(powerNetworks);
-        simulation.RegisterSystem(production);
-        simulation.RegisterSystem(unitProduction);
-        simulation.RegisterSystem(buildingConstruction);
-        simulation.RegisterSystem(resourceExtraction);
-        simulation.RegisterSystem(battlefieldIntelligence);
-        simulation.RegisterSystem(targetAcquisition);
-        simulation.RegisterSystem(tacticalCombat);
-        simulation.RegisterSystem(artilleryFireMissions);
-        simulation.RegisterSystem(combatExecution);
-        simulation.RegisterSystem(combatDamageResolution);
-        simulation.RegisterSystem(battlefieldSupply);
-        simulation.RegisterSystem(automatedDistribution);
-        simulation.RegisterSystem(cargoTransportSystem);
-        simulation.RegisterSystem(logisticsRegistration);
-        simulation.RegisterSystem(prototypeRoadAccess);
-        simulation.RegisterSystem(combatLifecycle);
-        simulation.RegisterSystem(new SpatialIndexCleanupSystem(spatialSynchronizer));
-        simulation.RegisterSystem(combatReadiness);
-        simulation.RegisterSystem(matchObjectives);
-        simulation.RegisterSystem(combatDebugSnapshots);
         simulation.RegisterTickObserver(
             new PresentationExtractor(
                 snapshotBuffer,
@@ -1011,32 +819,6 @@ internal sealed class ClientApplication
                             ? SpatialMobility.Static
                             : SpatialMobility.Mobile)));
         }
-    }
-
-    private static AxisAlignedBounds[] CollectStaticNavigationObstacles(
-        SimulationCoordinator simulation)
-    {
-        var obstacles = new List<AxisAlignedBounds>();
-
-        foreach (EntityId entity in simulation.Entities.Query<
-                     WorldTransform,
-                     SpatialPresence>())
-        {
-            SpatialPresence presence =
-                simulation.Entities.GetComponent<SpatialPresence>(entity);
-
-            if (presence.Metadata.Mobility != SpatialMobility.Static)
-            {
-                continue;
-            }
-
-            WorldTransform transform =
-                simulation.Entities.GetComponent<WorldTransform>(entity);
-            obstacles.Add(
-                presence.CreateEntry(entity, transform).Bounds);
-        }
-
-        return obstacles.ToArray();
     }
 
     private static void BuildWorldDebugVisualization(

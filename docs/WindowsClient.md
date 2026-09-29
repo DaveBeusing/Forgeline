@@ -2,9 +2,11 @@
 
 ## Purpose
 
-`ForgeLine.Client` is the interactive Windows x64 composition root. It owns the native application host and composes the Direct3D 12 graphics foundation, RTS input/camera stack, and the representative terrain presentation without introducing Win32 or D3D12 details into world, simulation, or game rules.
+`ForgeLine.Client` is the interactive Windows x64 host. It owns the native application lifecycle, Direct3D 12 graphics foundation, RTS input/camera stack, presentation extraction, rendering, and real-time frame pacing without introducing Win32 or D3D12 details into world, simulation, or game rules.
 
-The current client initializes graphics, consumes the platform input stream through `ForgeLine.Input`, updates the presentation-only RTS camera and selection controller, advances the fixed-tick simulation, extracts immutable presentation snapshots, and renders the authoritative skirmish together with depth-tested chunked terrain. RTS selection, movement commands, hierarchical navigation, shared-route formation movement, and the integrated tactical systems are active development capabilities. Synthetic render instances are opt-in through `--render-stress` and are not part of a normal playable match. Production unit art, the final RTS combat-command UI, and audio playback remain deferred.
+Authoritative vertical-slice gameplay construction is owned by `VerticalSliceScenario` in `ForgeLine.Game`. The client creates that shared runtime with the `Gameplay` profile, Player 1 explicitly human-controlled, Player 2 computer-controlled, and a host-owned `JobScheduler`. It then adds only presentation/platform concerns around the shared simulation.
+
+The client consumes the platform input stream through `ForgeLine.Input`, updates the presentation-only RTS camera and selection controller, advances the fixed-tick simulation, extracts immutable presentation snapshots, and renders the authoritative skirmish together with depth-tested chunked terrain. RTS selection, movement commands, hierarchical navigation, shared-route formation movement, and the integrated tactical systems are active development capabilities. Synthetic render instances are opt-in through `--render-stress`, are created after gameplay runtime construction, and therefore do not participate in the authoritative starting navigation obstacle set. Production unit art, the final RTS combat-command UI, and audio playback remain deferred.
 
 ## Platform Boundary
 
@@ -26,20 +28,20 @@ The current startup sequence is:
 ```text
 ForgeLine.Client
     ↓
-WindowsPlatform
+WindowsPlatform / primary window
     ↓
-Per-monitor-v2 DPI awareness
+Direct3D 12 device
     ↓
-WindowsWindow
+VerticalSliceScenario (shared Gameplay runtime)
     ↓
-Win32 class registration
+Presentation extraction + RTS input/camera
     ↓
-Native primary window creation
-    ↓
-Client message loop
+Client message/render loop
 ```
 
-The client creates one primary `FORGELINE` window with a 1600×900 requested client area. Direct3D 12 initialization consumes the existing opaque native-handle boundary immediately after window creation.
+The client creates one primary `FORGELINE` window with a 1600×900 requested client area. Direct3D 12 initialization consumes the existing opaque native-handle boundary immediately after window creation. The gameplay runtime then constructs the canonical battlefield, participants, simulation systems, navigation, cargo transport, logistics, intelligence, combat, and match objectives without referencing Windows or presentation types.
+
+The client-provided scheduler remains client-owned. Disposing the shared scenario does not dispose it; the client host disposes it once after the scenario. A restart leaves the current loop through the existing restart result and creates a fresh runtime on the next application session, so old authoritative routes, inventories, controllers, snapshots, or orders are not reused.
 
 ## Message Loop
 
