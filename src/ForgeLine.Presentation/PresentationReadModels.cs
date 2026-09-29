@@ -46,11 +46,15 @@ public sealed class PresentationInteractionState
     private float _debugPlaneHeight;
     private ulong _nextPlacementRequestId = 1;
 
-    public void SetSelection(ReadOnlySpan<EntityId> entities)
+    public void SetSelection(
+        IReadOnlyCollection<EntityId> entities)
     {
+        ArgumentNullException.ThrowIfNull(entities);
+
         lock (_gate)
         {
-            _selectedEntities = entities.ToArray();
+            _selectedEntities =
+                entities.ToArray();
         }
     }
 
