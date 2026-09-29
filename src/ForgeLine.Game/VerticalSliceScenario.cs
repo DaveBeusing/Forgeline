@@ -134,7 +134,7 @@ public sealed class VerticalSliceScenario : IDisposable
                 settings.Profile,
                 seed,
                 enableDiagnostics,
-                enableDebugCapture: enableDiagnostics) with
+                enableDebugCapture: true) with
             {
                 Scenario = settings
             };
