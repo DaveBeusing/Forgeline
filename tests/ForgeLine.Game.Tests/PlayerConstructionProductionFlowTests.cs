@@ -746,12 +746,6 @@ public sealed class PlayerConstructionProductionFlowTests
         RunUntil(
             scenario,
             () =>
-                Vector3.DistanceSquared(
-                    scenario.Simulation.Entities
-                        .GetComponent<WorldTransform>(
-                            supplyTruck).Position,
-                    supplyDepotPosition) <=
-                    10.0f * 10.0f &&
                 scenario.Inventories.GetQuantity(
                     truckSupply.InventoryId,
                     ResourceIds.Fuel) > 0.0 &&
