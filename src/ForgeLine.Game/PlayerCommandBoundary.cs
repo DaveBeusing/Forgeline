@@ -1009,6 +1009,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 null,
                 null,
                 null,
+                null,
                 null);
 
         public static PendingCommand ForEndMatch(
