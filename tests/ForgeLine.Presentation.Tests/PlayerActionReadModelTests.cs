@@ -299,6 +299,22 @@ public sealed class PlayerActionReadModelTests
             supply.AmmunitionFraction,
             0.0,
             1.0);
+
+        interaction.SetSelection(
+            [scenario.West.CommandCore, engineer]);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(
+            buffer.TryReadLatest(out snapshot));
+        Assert.Null(snapshot.PlayerActions?.Logistics);
+        Assert.Null(snapshot.PlayerActions?.Supply);
+
+        interaction.SetSelection(
+            [scenario.East.CommandCore]);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(
+            buffer.TryReadLatest(out snapshot));
+        Assert.Null(snapshot.PlayerActions?.Logistics);
+        Assert.Null(snapshot.PlayerActions?.Supply);
     }
 
     private static PresentationSnapshotBuffer RegisterExtraction(
