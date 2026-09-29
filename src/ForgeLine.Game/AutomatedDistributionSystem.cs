@@ -922,16 +922,8 @@ public sealed class AutomatedDistributionSystem
             ? tick.Value - request.WaitingSinceTick.Value
             : 0;
         ulong agingSteps = age / _fairnessAgingTicks;
-
-        // Critical is an explicit recovery class. Fairness aging may advance
-        // ordinary demand as far as High, but must not make it indistinguishable
-        // from refinery, field-supply, or other recovery-critical demand.
-        int priorityFloor = (int)LogisticsStockPriority.High;
-        int maximumAging = Math.Max(
-            0,
-            basePriority - priorityFloor);
         int boundedAging = (int)Math.Min(
-            (ulong)maximumAging,
+            (ulong)basePriority,
             agingSteps);
 
         return basePriority - boundedAging;
