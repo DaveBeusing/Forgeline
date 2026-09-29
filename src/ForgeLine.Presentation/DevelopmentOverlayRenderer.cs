@@ -347,14 +347,22 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             }
             else
             {
-                builder.Append("BUILD ");
+                builder.Append(
+                    snapshot.Feedback.Kind switch
+                    {
+                        PlayerCommandFeedbackKind.Construction => "BUILD ",
+                        PlayerCommandFeedbackKind.Production => "PROCESS ",
+                        PlayerCommandFeedbackKind.UnitProduction => "UNITS ",
+                        _ => "ACTION "
+                    });
 
                 if (snapshot.Feedback.State ==
                     PlayerCommandFeedbackState.Accepted)
                 {
                     builder.Append("ACCEPTED");
                 }
-                else
+                else if (snapshot.Feedback.Kind ==
+                         PlayerCommandFeedbackKind.Construction)
                 {
                     builder.Append("BLOCKED ");
                     builder.Append(
@@ -367,6 +375,10 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                         builder.Append(
                             snapshot.Feedback.PlacementFailure.ToString());
                     }
+                }
+                else
+                {
+                    builder.Append("REJECTED");
                 }
             }
 
@@ -514,7 +526,9 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         builder.Append("TAB SELECT  ENTER ACT  C CANCEL");
         builder.NewLine();
 
-        builder.Append("PRIORITY ");
+        builder.Append("PENDING ");
+        builder.Append(actions.PendingCommandCount);
+        builder.Append("  PRIORITY ");
         builder.Append(panel.Priority.ToString());
         if (panel.Mode == PlayerActionPanelMode.Production)
         {
