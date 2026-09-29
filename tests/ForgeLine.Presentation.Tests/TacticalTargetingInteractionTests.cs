@@ -92,7 +92,7 @@ public sealed class TacticalTargetingInteractionTests
             request.Kind);
         Assert.Equal(target, request.TacticalTarget);
         Assert.Equal(
-            [selected],
+            new[] { selected },
             request.TacticalEntities);
 
         var buffer =
