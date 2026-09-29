@@ -26,7 +26,9 @@ The initial definitions are exposed by `InitialBuildingDefinitions.CreateCatalog
 
 ## Placement preview
 
-`BuildingPlacementService.CreatePreview` creates a non-authoritative read model for presentation.
+`BuildingPlacementService.CreatePreview` remains simulation/game-side validation and creates a non-authoritative detached read model. The presentation controller no longer receives `EntityRegistry` or `BuildingPlacementService`.
+
+Instead, `RtsBuildingPlacementController` publishes a bounded latest placement-preview request through `PresentationInteractionState`. The request contains a monotonically increasing request ID, issuer, building, requested position, and orientation. At the simulation-owned completed-tick boundary, `PresentationExtractor` evaluates the latest request against current authoritative terrain/occupancy facts and publishes `BuildingPlacementPreviewReadModel` with the matching request ID and completed tick.
 
 The preview reports:
 
@@ -52,7 +54,13 @@ The Windows development client exposes:
 - `Escape` — leave building-placement mode;
 - `F2` — toggle world diagnostics, including resource-deposit bounds.
 
-The placement ghost is green when currently valid and red when invalid. Invalid previews include the rejection reason.
+The placement ghost is green when the matching preview is currently valid and red when it is currently invalid. Preview freshness is explicit:
+
+- `Current` — the published request ID matches the controller's latest request;
+- `Stale` — a previous or out-of-order preview arrived after a newer request was issued;
+- `Unavailable` — no result exists yet for the current placement intent.
+
+A click can produce a build request only from a `Current` valid preview. Stale/unavailable previews remain advisory display state and cannot authorize a command. Invalid previews expose the rejection reason but not the identity of an obstructing entity, so placement feedback does not become an enemy-information side channel.
 
 ## Authoritative placement validation
 
@@ -70,7 +78,7 @@ Validation includes:
 8. source inventory validity and ownership;
 9. construction-resource availability.
 
-The client preview is therefore guidance only. A location that becomes blocked after preview is rejected when the command reaches simulation.
+The client preview is therefore guidance only. The eventual `BuildCommand` carries the chosen position/orientation and is re-evaluated from current simulation state during `OrderProcessing`. A location that becomes blocked, loses a required deposit, or otherwise becomes invalid after preview is rejected authoritatively even if the preview was previously green.
 
 Accepted construction sites are inserted into the spatial index immediately during command processing. Multiple build commands targeting the same footprint in the same tick therefore resolve deterministically: the first accepted site occupies the area and later conflicting requests are rejected.
 
@@ -83,7 +91,8 @@ Accepted construction sites are inserted into the spatial index immediately duri
 - world position;
 - cardinal orientation;
 - construction source inventory entity;
-- submission tick metadata.
+- submission tick metadata;
+- an optional player-command correlation ID used only to route the copied result back across the presentation boundary.
 
 The command itself does not directly construct a building. During `InputCommands` it creates a simulation-owned build request. `BuildingCommandProcessingSystem` validates and resolves that request during `OrderProcessing`.
 
@@ -165,7 +174,7 @@ Construction activates processing capability and inventory bindings only. Recipe
 
 ## Construction diagnostics
 
-`BuildingCommandProcessingSystem.Metrics` exposes accepted and rejected command counts, the last command rejection reason, the last placement failure, and the last created site.
+`BuildingCommandProcessingSystem.Metrics` continues to expose simulation diagnostics. Presentation does not poll those mutable metrics for command feedback. Correlated player submissions instead receive a copied `BuildCommandResult` through the bounded player-command result boundary.
 
 `BuildingConstructionSystem.Metrics` exposes active sites, cancelled sites, and completed buildings.
 
@@ -192,7 +201,9 @@ Regression coverage validates:
 
 - stable initial building definitions and rotated footprints;
 - buildable-area rejection without preview side effects;
-- preview-valid placement becoming invalid before command execution;
+- preview-valid placement becoming invalid before command execution, including correlated authoritative rejection delivery;
+- stale placement-preview responses never authorizing a build request;
+- current matching placement-preview responses producing the expected request/tick metadata;
 - insufficient-resource rejection with reservation rollback;
 - same-tick concurrent footprint conflicts;
 - cancellation refund and occupancy cleanup;
