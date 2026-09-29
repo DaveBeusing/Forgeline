@@ -121,9 +121,31 @@ Simulation code is written in a deterministic-friendly style:
 
 Perfect cross-machine bit-level determinism is not a first-prototype requirement.
 
+## Shared Vertical-Slice Runtime Composition
+
+`VerticalSliceScenario` is the authoritative construction path for the canonical vertical-slice gameplay runtime. The Windows client, headless vertical-slice execution, and scenario-level tests delegate world, entity, inventory, logistics, intelligence, navigation, combat, supply, production, objective, and opponent-system construction to this game-layer composition instead of recreating parallel stacks.
+
+`VerticalSliceRuntimeSettings` makes host choices explicit:
+
+- scenario profile and deterministic seed;
+- participant/start assignments and computer-control flags;
+- diagnostics and spatial-query timing;
+- initial entity capacity;
+- optional job-scheduler provision and ownership.
+
+Participant control is independent from balance profile. Human participants keep their normal simulation entities but do not receive a strategic opponent controller; computer-controlled participants receive the configured opponent policy. Equivalent gameplay-profile configurations therefore share the same gameplay systems and settings even when their participant-control assignments differ.
+
+The `Gameplay` profile retains product-facing navigation and distribution behavior. The `Validation` profile retains its accelerated starting stock, opponent cadence/readiness settings, coarser navigation, and distribution retry/fairness policy. Validation tuning is never promoted into normal gameplay implicitly.
+
+Navigation is constructed once inside the shared runtime. Starting static gameplay entities are incorporated into the initial navigation obstacle set, then the same `HierarchicalNavigationSystem` instance is supplied to `CargoTransportSystem` and `StrategicInfrastructureSystem`. Cargo approach projection and later infrastructure topology invalidation consequently observe the same navigation world.
+
+Scheduler ownership is explicit. A host-provided `JobScheduler` remains host-owned and is not disposed by `VerticalSliceScenario`; a runtime-owned scheduler is disposed with the scenario and also cleaned up if scenario creation fails. Headless execution may deliberately run without a scheduler. Disposing a scenario never owns or tears down an externally supplied scheduler.
+
+A restart constructs a new `VerticalSliceScenario`. Authoritative ECS state, inventories, routes, controller state, navigation requests, orders, and match state are therefore recreated rather than retained from the prior match.
+
 ## Headless Runtime
 
-`ForgeLine.Headless` composes the simulation runtime directly and has no graphics, audio, UI, presentation, client, or Windows-windowing dependency.
+`ForgeLine.Headless` delegates vertical-slice gameplay construction to `VerticalSliceScenario` and adds only headless execution, cancellation, diagnostics/reporting, and command-line configuration. It has no graphics, audio, UI, presentation, client, or Windows-windowing dependency.
 
 Headless execution supports a configurable tick count, deterministic seed, and logical tick-rate override. It intentionally runs faster than real time when work permits; wall-clock timing is used only for host diagnostics and never to mutate simulation state.
 
