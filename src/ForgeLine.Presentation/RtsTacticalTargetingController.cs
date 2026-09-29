@@ -38,7 +38,6 @@ public sealed class RtsTacticalTargetingController
     private SimulationSessionId _sessionId;
     private bool _leftWasDown;
     private bool _escapeWasDown;
-    private bool _hadPointerPosition;
     private bool _pointerCaptured;
 
     public TacticalTargetingMode Mode { get; private set; }
@@ -82,7 +81,6 @@ public sealed class RtsTacticalTargetingController
         _pendingRequest = null;
         _leftWasDown = false;
         _escapeWasDown = false;
-        _hadPointerPosition = false;
     }
 
     public void Update(
@@ -116,8 +114,7 @@ public sealed class RtsTacticalTargetingController
                 PlatformKey.Escape);
 
         if (IsActive &&
-            _hadPointerPosition &&
-            !input.HasPointerPosition)
+            input.FocusLostThisFrame)
         {
             Cancel();
         }
@@ -147,8 +144,6 @@ public sealed class RtsTacticalTargetingController
 
         _leftWasDown = leftDown;
         _escapeWasDown = escapeDown;
-        _hadPointerPosition =
-            input.HasPointerPosition;
     }
 
     public bool TryTakeRequest(
