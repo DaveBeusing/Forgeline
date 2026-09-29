@@ -1,3 +1,4 @@
+using ForgeLine.Game;
 using ForgeLine.Intelligence;
 using ForgeLine.Simulation;
 
@@ -16,7 +17,8 @@ public sealed class PresentationSnapshot
         SimulationSessionId sessionId = default,
         PlayerExperienceSnapshot? playerExperience = null,
         BuildingPlacementPreviewReadModel? placementPreview = null,
-        PresentationDebugSnapshot? debug = null)
+        PresentationDebugSnapshot? debug = null,
+        BuildingConstructionDebugSnapshot? construction = null)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(
             tickDuration,
@@ -32,6 +34,7 @@ public sealed class PresentationSnapshot
         PlayerExperience = playerExperience;
         PlacementPreview = placementPreview;
         Debug = debug;
+        Construction = construction;
         _instances = instances.ToArray();
     }
 
@@ -50,6 +53,8 @@ public sealed class PresentationSnapshot
     public BuildingPlacementPreviewReadModel? PlacementPreview { get; }
 
     public PresentationDebugSnapshot? Debug { get; }
+
+    public BuildingConstructionDebugSnapshot? Construction { get; }
 
     public int InstanceCount => _instances.Length;
 
