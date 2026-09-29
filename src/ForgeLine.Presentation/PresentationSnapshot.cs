@@ -12,7 +12,11 @@ public sealed class PresentationSnapshot
         TimeSpan tickDuration,
         int simulationEntityCount,
         ReadOnlySpan<RenderInstance> instances,
-        FactionIntelligenceSnapshot? intelligence = null)
+        FactionIntelligenceSnapshot? intelligence = null,
+        SimulationSessionId sessionId = default,
+        PlayerExperienceSnapshot? playerExperience = null,
+        BuildingPlacementPreviewReadModel? placementPreview = null,
+        PresentationDebugSnapshot? debug = null)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(
             tickDuration,
@@ -20,12 +24,18 @@ public sealed class PresentationSnapshot
 
         ArgumentOutOfRangeException.ThrowIfNegative(simulationEntityCount);
 
+        SessionId = sessionId;
         Tick = tick;
         TickDuration = tickDuration;
         SimulationEntityCount = simulationEntityCount;
         Intelligence = intelligence;
+        PlayerExperience = playerExperience;
+        PlacementPreview = placementPreview;
+        Debug = debug;
         _instances = instances.ToArray();
     }
+
+    public SimulationSessionId SessionId { get; }
 
     public SimulationTick Tick { get; }
 
@@ -34,6 +44,12 @@ public sealed class PresentationSnapshot
     public int SimulationEntityCount { get; }
 
     public FactionIntelligenceSnapshot? Intelligence { get; }
+
+    public PlayerExperienceSnapshot? PlayerExperience { get; }
+
+    public BuildingPlacementPreviewReadModel? PlacementPreview { get; }
+
+    public PresentationDebugSnapshot? Debug { get; }
 
     public int InstanceCount => _instances.Length;
 
