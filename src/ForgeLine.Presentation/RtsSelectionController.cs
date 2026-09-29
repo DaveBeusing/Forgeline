@@ -53,7 +53,8 @@ public sealed class RtsSelectionController
         ITerrainQuery terrain,
         int viewportWidth,
         int viewportHeight,
-        float interpolationAlpha)
+        float interpolationAlpha,
+        bool pointerCaptured = false)
     {
         ArgumentNullException.ThrowIfNull(input);
         ArgumentNullException.ThrowIfNull(camera);
@@ -66,6 +67,15 @@ public sealed class RtsSelectionController
             input.IsMouseButtonDown(PlatformMouseButton.Left);
         bool rightDown =
             input.IsMouseButtonDown(PlatformMouseButton.Right);
+
+        if (pointerCaptured)
+        {
+            HoveredEntity = EntityId.Invalid;
+            _selectionGestureActive = false;
+            _leftWasDown = leftDown;
+            _rightWasDown = rightDown;
+            return;
+        }
 
         if (!input.HasPointerPosition)
         {
