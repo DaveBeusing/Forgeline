@@ -491,6 +491,19 @@ public sealed class PlayerConstructionProductionFlowTests
             (BuildingIds.VehicleFactory,
              vehicleFactoryPosition));
 
+        Vector3 supplyDepotPosition =
+            FindOpenPlacement(
+                scenario,
+                BuildingIds.SupplyDepot);
+        BuildPlayerBuilding(
+            scenario,
+            gateway,
+            BuildingIds.SupplyDepot,
+            supplyDepotPosition);
+        built.Add(
+            (BuildingIds.SupplyDepot,
+             supplyDepotPosition));
+
         uint longestConstruction =
             built
                 .Select(
@@ -511,6 +524,43 @@ public sealed class PlayerConstructionProductionFlowTests
             FindCompletedBuilding(
                 scenario,
                 BuildingIds.VehicleFactory);
+        EntityId supplyDepot =
+            FindCompletedBuilding(
+                scenario,
+                BuildingIds.SupplyDepot);
+        InventoryStorage supplyStorage =
+            scenario.Simulation.Entities
+                .GetComponent<InventoryStorage>(
+                    supplyDepot);
+
+        SubmitStockPolicy(
+            scenario,
+            gateway,
+            supplyDepot,
+            ResourceIds.Fuel,
+            minimum: 50.0,
+            target: 100.0,
+            maximum: 150.0);
+        SubmitStockPolicy(
+            scenario,
+            gateway,
+            supplyDepot,
+            ResourceIds.Ammunition,
+            minimum: 40.0,
+            target: 80.0,
+            maximum: 120.0);
+
+        RunUntil(
+            scenario,
+            () =>
+                scenario.Inventories.GetQuantity(
+                    supplyStorage.InventoryId,
+                    ResourceIds.Fuel) >= 100.0 &&
+                scenario.Inventories.GetQuantity(
+                    supplyStorage.InventoryId,
+                    ResourceIds.Ammunition) >= 80.0,
+            maximumTicks: 4_000);
+
         ProductionFacility steelFacility =
             scenario.Simulation.Entities
                 .GetComponent<ProductionFacility>(
@@ -649,64 +699,11 @@ public sealed class PlayerConstructionProductionFlowTests
 
         Assert.Equal(2, tanks.Length);
 
-        Vector3 supplyDepotPosition =
-            FindOpenPlacement(
-                scenario,
-                BuildingIds.SupplyDepot);
-        BuildPlayerBuilding(
-            scenario,
-            gateway,
-            BuildingIds.SupplyDepot,
-            supplyDepotPosition);
-
-        scenario.Simulation.RunTicks(
-            scenario.Services.BuildingDefinitions[
-                BuildingIds.SupplyDepot].ConstructionTicks +
-            6,
-            TestContext.Current.CancellationToken);
-
-        EntityId supplyDepot =
-            FindCompletedBuilding(
-                scenario,
-                BuildingIds.SupplyDepot);
-        InventoryStorage supplyStorage =
-            scenario.Simulation.Entities
-                .GetComponent<InventoryStorage>(
-                    supplyDepot);
-
         RemoveStockPolicies(
             scenario,
             gateway,
             smelter,
             vehicleFactory);
-
-        SubmitStockPolicy(
-            scenario,
-            gateway,
-            supplyDepot,
-            ResourceIds.Fuel,
-            minimum: 50.0,
-            target: 100.0,
-            maximum: 150.0);
-        SubmitStockPolicy(
-            scenario,
-            gateway,
-            supplyDepot,
-            ResourceIds.Ammunition,
-            minimum: 40.0,
-            target: 80.0,
-            maximum: 120.0);
-
-        RunUntil(
-            scenario,
-            () =>
-                scenario.Inventories.GetQuantity(
-                    supplyStorage.InventoryId,
-                    ResourceIds.Fuel) >= 100.0 &&
-                scenario.Inventories.GetQuantity(
-                    supplyStorage.InventoryId,
-                    ResourceIds.Ammunition) >= 80.0,
-            maximumTicks: 8_000);
 
         Assert.True(
             gateway.SubmitMovement(
