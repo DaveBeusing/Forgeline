@@ -1334,6 +1334,17 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return;
         }
 
+        // An approach is a fixed destination for this node visit, not a point
+        // that follows the truck as it steers. Recomputing it during an active
+        // route repeatedly replaces navigation with a path from the new start.
+        if (context.Entities.TryGetComponent(entity, out CargoTransportMovementTarget activeTarget) &&
+            activeTarget.NodeId == node.Id &&
+            TacticalCommandUtilities.TryGetMovementIntent(context, entity, out MovementOrder activeOrder) &&
+            Vector3.DistanceSquared(activeOrder.WorldTarget, activeTarget.WorldPosition) <= 1.0f)
+        {
+            return;
+        }
+
         Vector3 movementPosition =
             ResolveNodeApproachPosition(
                 context.Entities,
@@ -1375,6 +1386,29 @@ public sealed class CargoTransportSystem : ISimulationSystem
             context.Tick,
             context.Tick);
 
+        if (_navigation is not null &&
+            context.Entities.HasComponent<NavigationAgent>(entity))
+        {
+            if (CargoDeliveryFuelPolicy.ShouldDeferMovement(
+                    context.Entities,
+                    _inventories,
+                    entity,
+                    movementOrder,
+                    _navigation.World.Version))
+            {
+                return;
+            }
+
+            CargoDeliveryFuelPolicy.PrepareMovementBudget(
+                context.Entities,
+                _inventories,
+                entity,
+                movementOrder,
+                IsFuelProductionRecoveryOrder(
+                    context.Entities,
+                    entity));
+        }
+
         if (context.Entities.HasComponent<
                 MovementOrder>(entity))
         {
@@ -1408,6 +1442,28 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 entity,
                 movementTarget);
         }
+    }
+
+    private bool IsFuelProductionRecoveryOrder(
+        EntityRegistry entities,
+        EntityId entity)
+    {
+        if (!entities.TryGetComponent(
+                entity,
+                out CargoTransportOrder order) ||
+            order.ResourceId != ResourceIds.Volatiles ||
+            !_network.TryGetNode(
+                order.Destination,
+                out LogisticsNode destination) ||
+            !entities.TryGetComponent(
+                destination.Entity,
+                out ProductionFacility production))
+        {
+            return false;
+        }
+
+        return production.Supports(
+            ProductionCapability.FuelProcessing);
     }
 
     private Vector3 ResolveNavigableApproach(
@@ -1995,6 +2051,10 @@ public sealed class CargoTransportSystem : ISimulationSystem
             entities.RemoveComponent<
                 NavigationFailureState>(entity);
         }
+
+        CargoDeliveryFuelPolicy.ClearTravelState(
+            entities,
+            entity);
     }
 
     private static void RemoveRouteState(

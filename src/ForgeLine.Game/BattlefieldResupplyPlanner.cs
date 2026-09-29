@@ -61,7 +61,9 @@ public static class BattlefieldResupplyPlanner
         }
 
         bool recipientCanReachProvider = false;
-
+        int friendlyProviders = 0;
+        int rejectedProviders = 0;
+        ResupplyProviderRejection rejections = ResupplyProviderRejection.None;
         WorldTransform providerTransform = default;
         SupplyProvider selectedProvider = default;
         float bestDistanceSquared =
@@ -71,33 +73,23 @@ public static class BattlefieldResupplyPlanner
                  context.Entities.Query<SupplyProvider>(
                      QueryIterationOrder.StableByEntityIndex))
         {
-            if (candidate == recipient ||
-                !context.Entities.TryGetComponent(
-                    candidate,
-                    out SupplyProvider provider) ||
-                !provider.Enabled ||
-                provider.Owner != owner ||
-                (inventories is not null &&
-                 (!inventories.Contains(provider.InventoryId) ||
-                  !HasRequiredStock(
-                      inventories,
-                      provider.InventoryId,
-                      requiredResources))) ||
-                !context.Entities.TryGetComponent(
-                    candidate,
-                    out WorldTransform transform))
+            SupplyProvider provider = context.Entities.GetComponent<SupplyProvider>(candidate);
+            if (provider.Owner != owner)
             {
                 continue;
             }
 
-            if (context.Entities.TryGetComponent(
-                    candidate,
-                    out SupplyDepot depot) &&
-                depot.State != SupplyDepotState.Operational)
+            friendlyProviders++;
+            ResupplyProviderRejection rejection = EvaluateProvider(
+                context, inventories, candidate, recipient, provider, requiredResources);
+            if (rejection != ResupplyProviderRejection.None)
             {
+                rejections |= rejection;
+                rejectedProviders++;
                 continue;
             }
 
+            WorldTransform transform = context.Entities.GetComponent<WorldTransform>(candidate);
             float distanceSquared =
                 HorizontalDistanceSquared(
                     recipientTransform.Position,
@@ -105,10 +97,17 @@ public static class BattlefieldResupplyPlanner
 
             bool canReachProvider = CanReachProvider(
                 context, inventories, recipient, distanceSquared, provider.ResupplyRangeMeters);
-            if (!canReachProvider &&
-                !CanProviderReachImmobileRecipient(context, candidate, recipient))
+            if (!canReachProvider)
             {
-                continue;
+                rejection = EvaluateRescueTravel(
+                    context, inventories, candidate, recipient,
+                    distanceSquared, provider.ResupplyRangeMeters);
+                if (rejection != ResupplyProviderRejection.None)
+                {
+                    rejections |= ResupplyProviderRejection.RecipientTravelUnavailable | rejection;
+                    rejectedProviders++;
+                    continue;
+                }
             }
 
             if (!providerEntity.IsValid ||
@@ -126,6 +125,19 @@ public static class BattlefieldResupplyPlanner
                     distanceSquared;
                 recipientCanReachProvider = canReachProvider;
             }
+        }
+
+        var result = new ResupplyPlanningResult(
+            context.Tick, friendlyProviders, rejectedProviders,
+            friendlyProviders == 0 ? ResupplyProviderRejection.NoFriendlyProvider : rejections,
+            providerEntity);
+        if (context.Entities.HasComponent<ResupplyPlanningResult>(recipient))
+        {
+            context.Entities.SetComponent(recipient, result);
+        }
+        else
+        {
+            context.Entities.AddComponent(recipient, result);
         }
 
         if (!providerEntity.IsValid)
@@ -194,12 +206,14 @@ public static class BattlefieldResupplyPlanner
                     recipientTransform.Position,
                     selectedProvider.ResupplyRangeMeters);
 
-            SetMovementOrder(
+            MovementOrder movement = SetMovementOrder(
                 context,
                 providerEntity,
                 owner,
                 providerApproachPosition,
                 submittedAtTick);
+            SupplyRescueTravel.Assign(
+                context, inventories, providerEntity, recipient, movement);
         }
 
         return true;
@@ -230,85 +244,133 @@ public static class BattlefieldResupplyPlanner
             return true;
         }
 
+        // This is only a direct-distance rejection bound. Navigation must still
+        // establish a traversable route; passing it does not certify a detour.
         double requiredFuel = (MathF.Sqrt(distanceSquared) - range * 0.75f) * fuel.ConsumptionPerMeter;
         return inventories.Contains(fuel.InventoryId) &&
-            inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel) >= requiredFuel;
+            inventories.GetAvailableQuantity(fuel.InventoryId, ResourceIds.Fuel) >= requiredFuel;
     }
 
-    private static bool HasRequiredStock(
-        InventoryStore inventories,
-        InventoryId inventory,
+    private static ResupplyProviderRejection EvaluateProvider(
+        SimulationContext context,
+        InventoryStore? inventories,
+        EntityId candidate,
+        EntityId recipient,
+        in SupplyProvider provider,
         BattlefieldSupplyResource requiredResources)
     {
+        if (candidate == recipient)
+        {
+            return ResupplyProviderRejection.SelfSupply;
+        }
+
+        if (!provider.Enabled)
+        {
+            return ResupplyProviderRejection.Disabled;
+        }
+
+        if (!context.Entities.HasComponent<WorldTransform>(candidate))
+        {
+            return ResupplyProviderRejection.MissingPosition;
+        }
+
+        if (context.Entities.TryGetComponent(candidate, out SupplyDepot depot) &&
+            depot.State != SupplyDepotState.Operational)
+        {
+            return ResupplyProviderRejection.DepotNotOperational;
+        }
+
+        if (inventories is null)
+        {
+            return ResupplyProviderRejection.None;
+        }
+
+        if (!inventories.Contains(provider.InventoryId))
+        {
+            return ResupplyProviderRejection.MissingInventory;
+        }
+
         const double QuantityEpsilon = 0.000000001;
-
-        if (requiredResources.HasFlag(
-                BattlefieldSupplyResource.Fuel) &&
-            inventories.GetAvailableQuantity(
-                inventory,
-                ResourceIds.Fuel) <= QuantityEpsilon)
+        ResupplyProviderRejection rejection = ResupplyProviderRejection.None;
+        if (requiredResources.HasFlag(BattlefieldSupplyResource.Fuel) &&
+            inventories.GetAvailableQuantity(provider.InventoryId, ResourceIds.Fuel) <= QuantityEpsilon)
         {
-            return false;
+            rejection |= ResupplyProviderRejection.FuelStockUnavailable;
         }
 
-        if (requiredResources.HasFlag(
-                BattlefieldSupplyResource.Ammunition) &&
-            inventories.GetAvailableQuantity(
-                inventory,
-                ResourceIds.Ammunition) <= QuantityEpsilon)
+        if (requiredResources.HasFlag(BattlefieldSupplyResource.Ammunition) &&
+            inventories.GetAvailableQuantity(provider.InventoryId, ResourceIds.Ammunition) <= QuantityEpsilon)
         {
-            return false;
+            rejection |= ResupplyProviderRejection.AmmunitionStockUnavailable;
         }
 
-        return true;
+        return rejection;
     }
 
-    private static bool CanProviderReachImmobileRecipient(
+    internal static bool CanProviderReachImmobileRecipient(
         SimulationContext context,
+        InventoryStore? inventories,
         EntityId provider,
-        EntityId recipient)
+        EntityId recipient,
+        float distanceSquared,
+        float range) =>
+        EvaluateRescueTravel(context, inventories, provider, recipient, distanceSquared, range) ==
+        ResupplyProviderRejection.None;
+
+    private static ResupplyProviderRejection EvaluateRescueTravel(
+        SimulationContext context,
+        InventoryStore? inventories,
+        EntityId provider,
+        EntityId recipient,
+        float distanceSquared,
+        float range)
     {
-        if (!context.Entities.HasComponent<SupplyTruck>(
-                provider) ||
-            context.Entities.HasComponent<ResupplyOrder>(provider) ||
-            !context.Entities.HasComponent<GroundMovement>(
-                provider))
+        if (!context.Entities.HasComponent<SupplyTruck>(provider) ||
+            !context.Entities.HasComponent<GroundMovement>(provider))
         {
-            return false;
+            return ResupplyProviderRejection.ProviderNotMobile;
         }
 
-        if (context.Entities.TryGetComponent(
-                provider,
-                out SupplyMovementConstraint movementConstraint) &&
-            !movementConstraint.CanMove)
+        if (context.Entities.HasComponent<ResupplyOrder>(provider))
         {
-            return false;
+            return ResupplyProviderRejection.ProviderRefueling;
+        }
+
+        if (SupplyRescueTravel.IsDeferred(context, inventories, provider, recipient))
+        {
+            return ResupplyProviderRejection.RouteRetryDeferred;
+        }
+
+        if (SupplyRescueTravel.HasUnrelatedMovement(context, provider, recipient))
+        {
+            return ResupplyProviderRejection.ProviderBusy;
+        }
+
+        // Propulsion uses UnitFuelState, never the SupplyTruck cargo inventory.
+        if (!CanReachProvider(context, inventories, provider, distanceSquared, range))
+        {
+            return ResupplyProviderRejection.ProviderFuelUnavailable;
         }
 
         foreach (EntityId candidate in
-                 context.Entities.Query<ResupplyOrder>(
-                     QueryIterationOrder.StableByEntityIndex))
+                 context.Entities.Query<ResupplyOrder>(QueryIterationOrder.StableByEntityIndex))
         {
             if (candidate == recipient)
             {
                 continue;
             }
 
-            ResupplyOrder order =
-                context.Entities.GetComponent<ResupplyOrder>(
-                    candidate);
-
-            if (order.Provider == provider &&
-                context.Entities.IsAlive(candidate))
+            ResupplyOrder order = context.Entities.GetComponent<ResupplyOrder>(candidate);
+            if (order.Provider == provider && context.Entities.IsAlive(candidate))
             {
-                return false;
+                return ResupplyProviderRejection.ProviderBusy;
             }
         }
 
-        return true;
+        return ResupplyProviderRejection.None;
     }
 
-    private static void SetMovementOrder(
+    private static MovementOrder SetMovementOrder(
         SimulationContext context,
         EntityId entity,
         PlayerId owner,
@@ -322,8 +384,7 @@ public static class BattlefieldResupplyPlanner
                 submittedAtTick,
                 context.Tick);
 
-        if (context.Entities.HasComponent<MovementOrder>(
-                entity))
+        if (context.Entities.HasComponent<MovementOrder>(entity))
         {
             context.Entities.SetComponent(
                 entity,
@@ -335,6 +396,8 @@ public static class BattlefieldResupplyPlanner
                 entity,
                 movementOrder);
         }
+
+        return movementOrder;
     }
 
     private static Vector3 ResolveProviderApproachPosition(

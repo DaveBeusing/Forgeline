@@ -843,11 +843,13 @@ public sealed class AutomatedDistributionSystem
                 (deadheadDistance +
                  route.TotalDistanceMeters) *
                 fuel.ConsumptionPerMeter);
+        // Refineries refill operational tanks once their input arrives.
+        // Keep a small margin, but do not strand the fuel supply chain
+        // behind the normal reserve while every provider is running dry.
         double reserveFuel =
-            // Refineries refill operational tanks once their input arrives.
-            // Keep a small margin, but do not strand the fuel supply chain
-            // behind the normal reserve while every provider is running dry.
-            fuel.Capacity * (replenishesFuelProduction ? 0.05 : 0.2);
+            CargoDeliveryFuelPolicy.ResolveReserveFuel(
+                fuel,
+                replenishesFuelProduction);
         double availableFuel =
             _inventories.GetQuantity(
                 fuel.InventoryId,
@@ -922,8 +924,16 @@ public sealed class AutomatedDistributionSystem
             ? tick.Value - request.WaitingSinceTick.Value
             : 0;
         ulong agingSteps = age / _fairnessAgingTicks;
+
+        // Critical is reserved for recovery demand that must not be displaced
+        // by ordinary backlog aging. Fairness can promote noncritical work as
+        // far as High while preserving the explicit Critical recovery class.
+        int priorityFloor = (int)LogisticsStockPriority.High;
+        int maximumAging = Math.Max(
+            0,
+            basePriority - priorityFloor);
         int boundedAging = (int)Math.Min(
-            (ulong)basePriority,
+            (ulong)maximumAging,
             agingSteps);
 
         return basePriority - boundedAging;

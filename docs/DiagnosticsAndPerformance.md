@@ -85,7 +85,7 @@ The job scheduler exposes:
 - worker count
 - peak concurrent running jobs
 - aggregate wait duration
-- aggregate execution duration
+- aggregate execution time
 - instrumentation failures
 
 Per-job timing remains available through the scheduler timing observer.
@@ -125,6 +125,43 @@ The vertical-slice report adds match outcome/pacing, entity and pending-command 
 
 `gameplay` and `validation` are intentionally different profiles. Gameplay uses normal starting stock, default opponent settings, and the interactive client's navigation resolution. Validation uses explicit accelerated resources/opponent pacing and coarser navigation for bounded deterministic coverage. Validation values must not silently become gameplay defaults.
 
+### Bounded Skirmish Progression Reports
+
+A vertical-slice run with `--diagnostics-output` additionally registers the read-only `SkirmishProgressionDiagnostics` observer. It writes a per-match sidecar by replacing the main file extension with `progression-N.json`; for example:
+
+```text
+artifacts/vertical-slice-match.json
+artifacts/vertical-slice-match.progression-1.json
+```
+
+The sidecar contains profile, match index, seed, executed ticks, terminal status, observed decision count, dropped history count, retained history, first eligibility-loss pairs, and the latest decision for each side. No progression observer is attached when the headless run omits a diagnostics output path.
+
+Observation occurs at the end of `AiDecisions`, after strategic and automatic resupply decisions, but before the current tick's movement, supply, and production. The selected branch and commands are current to that decision; readiness and industrial results normally reflect the previously completed tick. An end-of-decision snapshot is not the exact pre-command state.
+
+Observations include eligible attacker counts and individual exclusions, unit readiness and orders, consuming-facility required/available/reserved/missing inputs, provider cargo versus propulsion Fuel, industrial production and power state, extractor outputs and remaining deposits, and transport cargo, reservations, delivery state, positions, movement intent, and navigation failure. Exclusion categories overlap and must not be summed as unique excluded units. `HasReadiness=false` distinguishes missing readiness from a measured full-readiness value. Missing inputs do not replace the facility's active block reason, such as NoPower.
+
+History is bounded to 128 entries: the opening 32 and a rolling 96-entry tail. A changed strategic/eligibility/production/provider/industry signature or a 1,000-tick sampling interval adds an entry at a real decision boundary. The first transition from sufficient eligible attackers to fewer than the configured minimum is retained separately for each player, even when ordinary entries expire. The latest decision is independently retained. The post-run console includes at most 12 retained transport-history snapshots; it does not emit transport details every tick.
+
+Detail caps per observation are 128 combat candidates, 32 unit-production facilities, 64 providers, 32 industrial facilities, 32 extractors, and 32 transports. Provider recipient lists are capped at 128. Transport motion includes the current local waypoint, pending destination, route progress and up to four upcoming waypoints, velocity, stalled-tick count, and observed order tick. Omission counts distinguish bounded output from a complete listing. Diagnostic snapshots do not issue commands or change resource quantities, movement, eligibility, or match results.
+
+`ResupplyPlanningResult` retains one compact result per recipient for the latest planner attempt. It records the attempt tick, friendly and rejected provider counts, selected provider, and a bitmask of rejection reasons. These distinguish no friendly provider, self-supply, disabled provider/depot, missing inventory or position, unavailable Fuel/Ammunition cargo, unavailable recipient travel, nonmobile/refueling/busy providers, insufficient provider propulsion Fuel, and route retry deferral. Foreign provider counts and positions are not disclosed. A successful selection can still include rejection reasons for other candidates; the selected provider is authoritative for that attempt. An old attempt result is not a current availability guarantee.
+
+`SupplyRescueAssignment` identifies provider movement ownership. `SupplyRescueRejection` records the last route admission rejection per provider, including the affected recipient, required/available Fuel and tick. The bounded supply snapshot retains at most 128 planner results and 64 route rejections, with omission counts. `RouteFuelInsufficient`, `RemainingRouteFuelInsufficient`, `FuelBudgetUnavailable`, and navigation failure are distinct from cargo shortages. A geometric path success is not proof of affordable travel or completed physical supply. See [Battlefield Supply](BattlefieldSupply.md).
+
+### Investigating a Nonterminal Match
+
+Start with the first recorded loss of minimum offensive eligibility. Trace extraction, processing, actual consuming inventories, stock reservations, current transport progress, provider assignment, and physical supply rather than inferring a root cause from the final army size. A threshold crossing can be correct behavior; failure to recover requires separate evidence.
+
+A zero final resupply-order count does not establish healthy supply. A faction's total Fuel does not establish that provider cargo or factory inputs contain deliverable Fuel. `OutputBlocked` with a nonempty deposit is not deposit exhaustion. Successful cumulative cargo deliveries do not establish that currently assigned trucks are moving, and Cargo Transport route counters do not describe every battlefield navigation request. Compare repeated positions, waypoint/accepted ticks, and delivery-state ticks to distinguish travel, navigation churn, and physical obstruction.
+
+For a stable logistics-node visit, the Cargo Transport approach target remains fixed while its matching movement intent is active. Steering around an obstacle must not continuously relocate the requested loading point and restart its route. An interrupted visit can select a fresh approach from the new location; network invalidation and normal navigation remain responsible for replacing invalid routes. `CargoTransportApproachTests` checks target stability and resumption without moving inventory remotely.
+
+Historical [CI run 36309353158](https://github.com/DaveBeusing/Forgeline/actions/runs/36309353158), head `cc7b48acf90305b8e7e0a86c19832a28c8cbbdfd`, built cleanly and passed 411 tests on 2026-09-27 but remained Active after 80,000 validation ticks for seed 2026. East first lost minimum attacker eligibility at decision 15161 and West at 16681 through configured Fuel thresholds. At decision 79991, both sides had generation 400 against demand 357 and no offline consumers, but empty refinery inputs and OutputBlocked extractors with substantial remaining deposits. These observations rule out persistent final power shortage and deposit exhaustion for that run; they do not prove one universal failure mechanism.
+
+That run measured 3.382 ms average tick, 223.188 ms maximum tick, and 34,976,826,808 allocated bytes. These single-run measurements are neither timing guarantees nor valid comparisons against a different workload or diagnostic configuration. Final-head CI and subsequent scenario reports remain the evidence for later changes.
+
+Natural terminal acceptance is separate from forced-objective lifecycle tests. Preserve `--require-terminal` and the 80,000-tick bound, repeat the same successful seeded configuration, and inspect every requested fresh-session soak result, including failures. Do not weaken resource costs, eligibility thresholds, or the match gate to hide a failure.
+
 ## Headless Test Harness
 
 Simulation tests use a reusable `SimulationTestHarness` that can:
@@ -138,16 +175,10 @@ Simulation tests use a reusable `SimulationTestHarness` that can:
 
 This keeps deterministic integration scenarios concise and ensures tests do not initialize graphics, audio, UI, or windowing.
 
-Run focused simulation tests with:
+Use the test runner selected by `global.json`. The canonical full-suite command for the current Microsoft.Testing.Platform configuration is:
 
 ```powershell
-dotnet test tests/ForgeLine.Simulation.Tests/ForgeLine.Simulation.Tests.csproj --configuration Release
-```
-
-Run the complete suite with:
-
-```powershell
-dotnet test ForgeLine.sln --configuration Release
+dotnet test --solution ForgeLine.sln --configuration Release
 ```
 
 ## Benchmarks
@@ -166,7 +197,7 @@ ECS baselines cover:
 
 Rendering diagnostics additionally expose frame time, CPU render time, terrain visibility/submission counts, generic instance visibility/submission counts, and development overlay allocation/GC state. GPU timestamps remain deferred until the graphics abstraction owns a clean timestamp-query/readback lifecycle.
 
-Navigation baselines cover long-distance path searches over a multi-chunk world, including sector routing, local refinement, cache reuse, expanded-node counts, and route length. Benchmark timing remains observational rather than a CI gate.
+Navigation baselines cover long-distance path searches over a multi-chunk map, including sector routing, local refinement, cache reuse, expanded-node counts, and route length. Benchmark timing remains observational rather than a CI gate.
 
 Simulation baselines cover:
 
@@ -233,7 +264,7 @@ CI:
 - runs a bounded 10,000-lightweight-entity stress smoke scenario;
 - runs one accelerated terminal Central Divide match through the real headless game stack;
 - runs the complete correctness test suite;
-- uploads the generated JSON diagnostics, including the vertical-slice report, as the `engine-diagnostics` workflow artifact.
+- uploads the generated JSON diagnostics, including the vertical-slice report and its progression sidecar, as the `engine-diagnostics` workflow artifact.
 
 The artifact exists to make failures and performance observations inspectable without turning volatile timing into pass/fail thresholds.
 
@@ -246,7 +277,6 @@ The following remain non-binding engineering targets:
 - 10,000+ lightweight simulation entities as an early stress target.
 
 They are engineering goals, not shipped product guarantees.
-
 
 ## Spatial Index Diagnostics
 
@@ -269,7 +299,6 @@ See [Spatial Index and World Queries](SpatialIndexAndWorldQueries.md) for query 
 
 The Windows client development overlay can be toggled with F1. World debug visualization can be toggled with F2. The presentation path, metric semantics, extraction ownership, and render baselines are documented in [Presentation Extraction and Debugging](PresentationExtractionAndDebugging.md).
 
-
 ## Navigation Diagnostics
 
 `HierarchicalNavigationSystem.LastDiagnostics` exposes queued path requests; completed, failed, canceled, and stale-result counts; currently pending requests; active routes; expanded high-level and local nodes for the latest completed route; latest route length; and latest pathfinding latency.
@@ -279,7 +308,6 @@ The Windows client development overlay can be toggled with F1. World debug visua
 F2 world debugging can display local traversability, nearby sector boundaries, sector portals, the latest high-level route, and its refined waypoint path. Rendering receives navigation-derived read data only and never mutates navigation or simulation state.
 
 See [Hierarchical Navigation](HierarchicalNavigation.md) for lifecycle and interpretation details.
-
 
 ## Formation Movement Diagnostics
 
@@ -293,13 +321,11 @@ The Simulation BenchmarkDotNet host includes `FormationRoutingBenchmarks` for 10
 
 See [Formation Movement and Group Orders](FormationMovementAndGroupOrders.md) for lifecycle, fallback behavior, and interpretation details.
 
-
 ## Artillery Diagnostics
 
 `ArtilleryFireMissionSystem.Metrics` reports active missions, `NoAmmo` missions, shells in flight, shots, impacts, affected area-damage targets, Ammunition consumption, and queued area damage for the current tick and cumulatively.
 
 The F2 artillery debug read model exposes mission min/max range, fixed target coordinate, lifecycle state, requested/fired rounds, shell position, complete parabolic trajectory, impact radius, and a compact metrics label. These diagnostics consume simulation-owned state without controlling targeting, dispersion, impact timing, or damage.
-
 
 ## Tactical Combat and Readiness Metrics
 

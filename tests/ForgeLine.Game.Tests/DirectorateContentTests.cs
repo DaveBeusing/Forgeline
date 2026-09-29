@@ -100,6 +100,20 @@ public sealed class DirectorateContentTests
     }
 
     [Fact]
+    public void LogisticsTransportsKeepCriticalFuelPriority()
+    {
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
+
+        Assert.Equal(
+            BattlefieldSupplyPriority.Critical,
+            units[UnitIds.CargoTruck].SupplyPriority);
+        Assert.Equal(
+            BattlefieldSupplyPriority.Critical,
+            units[UnitIds.SupplyTruck].SupplyPriority);
+    }
+
+    [Fact]
     public void GenericUnitFactoryComposesDirectorateUnitsFromExistingSystems()
     {
         var simulation = new SimulationCoordinator();

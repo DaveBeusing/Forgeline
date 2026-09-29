@@ -54,7 +54,7 @@ A zero-Fuel unit remains selectable and retains its movement order. After Fuel i
 
 `ForgeLine.Combat.AmmunitionConsumption.TryConsume` is the combat-facing V1 hook.
 
-The operation consumes `ResourceIds.Ammunition` from the unit's physical inventory and fails closed when insufficient Ammunition is available. Full weapon firing remains a later combat concern, but future weapons must use this same state rather than introducing a parallel ammunition pool.
+The operation consumes `ResourceIds.Ammunition` from the unit's physical inventory and fails closed when insufficient Ammunition is available. Weapons use this same inventory-backed state rather than introducing a parallel ammunition pool.
 
 ## Supply Status
 
@@ -96,7 +96,7 @@ The vehicle has two distinct inventory responsibilities:
 
 Supply Trucks are explicitly excluded from the regional automated-distribution truck pool. They load their battlefield cargo only from an operational friendly Supply Depot within loading range.
 
-This separation prevents carried Fuel from being confused with the truck's own propulsion Fuel.
+This separation prevents carried Fuel from being confused with the truck's own propulsion Fuel. Available propulsion Fuel excludes quantities already reserved in the inventory. A stocked cargo compartment cannot fund a trip whose propulsion inventory is empty, missing, or insufficient.
 
 ## Automatic Resupply
 
@@ -121,16 +121,23 @@ This is intentionally automatic. The player manages provider positioning, depot 
 
 `ResupplyCommand` gives selected friendly units a normal simulation command for deliberate resupply.
 
-The command:
+The command validates ownership and supply eligibility, uses `BattlefieldResupplyPlanner` to select a provider, and stores a real `ResupplyOrder`. A mobile recipient approaches the provider. When the recipient cannot afford that trip or is immobilized, an eligible Supply Truck may instead approach the recipient.
 
-1. validates ownership and supply eligibility;
-2. selects the nearest operational friendly provider;
-3. stores a `ResupplyOrder`;
-4. issues a normal `MovementOrder` toward the provider.
+Navigation and `GroundMovementSystem` remain authoritative for movement. The command never teleports resources or changes transforms. Already-in-range supply does not require either party to fund a journey.
 
-Navigation and `GroundMovementSystem` remain authoritative for movement. The command never teleports resources or changes transforms.
+When the requested supply is satisfied, the resupply-specific movement/navigation state is cleared. Rescue movement owned by the provider is released at the next automatic-decision boundary when its recipient order no longer exists.
 
-When the unit returns to `Supplied`, the resupply-specific movement/navigation state is cleared.
+## Rescue Feasibility and Order Ownership
+
+Rescue admission has two stages. The planner first rejects trips whose direct horizontal approach already exceeds available propulsion Fuel. This is a rejection bound, not a claim that a route around obstacles is affordable. Providers refueling themselves, serving another assigned recipient, or executing unrelated movement are not redirected into a new rescue.
+
+`SupplyRescueAssignment` identifies the recipient and the exact provider movement order owned by that rescue. `AutomaticResupplyDecisionSystem` refreshes the provider's available propulsion Fuel and consumption rate before navigation. This also services deliberate rescue assignments whose provider does not itself have an automatic policy.
+
+`HierarchicalNavigationSystem` reuses its completed hierarchical path to check the full horizontal waypoint distance and final local approach before issuing the first waypoint. There is no second global pathfinder. A missing current budget defers the rescue rather than certifying unknown travel. During automatic recovery, the remaining path is rechecked against current Fuel. Topology-driven replacement paths pass through the same admission check. Local steering can change actual travel cost, so passing admission is not an unconditional guarantee of arrival.
+
+`SupplyRescueRejection` records the last affected recipient, reason, positions, required and available Fuel, and simulation tick. Route rejection suppresses immediate reselection of the same stationary provider/recipient pair for 20 ticks; changed positions or enough newly available Fuel permit an earlier retry. The record is bounded to one per provider. Another eligible provider may be selected through the normal deterministic planner.
+
+Cancellation, recipient loss, replacement, and completion release only movement that still belongs to the rescue. A newer unrelated movement order must survive, including when it overlaps an older pending or active route. Rescue planning creates no inventory reservations and changes no resource quantities. It therefore has no separate stock reservation to leak or refund.
 
 ## Conservation and Failure Semantics
 
@@ -142,43 +149,29 @@ For every transfer:
 
 except for explicit consumption such as movement Fuel or weapon Ammunition.
 
-Disabled depots do not provide supply. Missing inventories are treated as unavailable. Insufficient provider stock leaves the recipient partially supplied rather than fabricating the missing quantity.
+Disabled depots do not provide supply. Missing inventories are treated as unavailable. Insufficient provider stock leaves the recipient partially supplied rather than fabricating the missing quantity. Route failures and rescue-budget rejection do not consume cargo or propulsion Fuel by themselves.
 
 ## Diagnostics
 
 `BattlefieldSupplyMetrics` exposes:
 
 - supplied/low/critical/unsupplied unit counts;
-- provider/depot/truck counts;
 - Fuel and Ammunition transferred during the current tick;
 - cumulative Fuel and Ammunition transfer quantities.
 
 `BattlefieldSupplyDebugSnapshot` exposes per-unit Fuel/Ammunition fractions, supply state, priority, active resupply provider, provider stock, provider type, range, and world position. Snapshot capture is opt-in through `DebugCaptureEnabled`, so normal simulation ticks keep aggregate metrics without allocating debug read-model arrays.
 
-The development debug visualization renders:
+The development debug visualization renders provider ranges, stock labels, Low/Critical/Unsupplied unit markers, and active resupply links. Presentation only renders read models. It never owns or mutates supply simulation state.
 
-- provider resupply ranges;
-- provider Fuel/Ammunition stock labels;
-- Low/Critical/Unsupplied unit markers;
-- active resupply links.
-
-Presentation only renders read models. It never owns or mutates supply simulation state.
+The headless progression observer distinguishes a truck's carried Fuel from its propulsion Fuel, records factory-local input deficits and industrial production/extraction state, and retains the first loss of minimum offensive eligibility. Inspect `SupplyRescueRejection` for route admission failures rather than interpreting a completed geometric path or a successful Cargo Transport counter as proof of battlefield rescue completion.
 
 ## Validation
 
-Regression coverage includes:
+Regression coverage includes movement Fuel consumption, zero-Fuel immobilization and post-refuel resumption, Ammunition consumption and insufficient-ammo failure, Supply Truck loading, provider depletion and recipient priority, Supply Depot logistics registration, Resupply commands, resource conservation, and debug read models.
 
-- movement Fuel consumption;
-- zero-Fuel immobilization and post-refuel resumption;
-- Ammunition consumption and insufficient-ammo failure;
-- Supply Truck loading;
-- provider depletion and recipient priority;
-- Supply Depot logistics registration;
-- Resupply command generation;
-- resource conservation through inventory-backed transfers;
-- debug read-model visualization.
+`SupplyRescueFeasibilityTests` covers unaffordable propulsion, a feasible alternative, reserved propulsion stock, missing propulsion inventories, cargo/propulsion separation, already-in-range transfer, and competing recipients. `SupplyRescueRoutingTests` covers an unaffordable real detour, alternative-provider selection, topology-driven replanning, cancellation and recipient/provider loss, changed propulsion stock, and preservation of a newer movement order. Route-admission tests intentionally omit ground movement to prove that rejection happens before any travel or consumption.
 
-All tests execute without requiring a graphics client, preserving headless simulation validation.
+All tests execute without requiring a graphics client. Passing focused supply tests is not evidence that a complete skirmish naturally reaches victory; the independent terminal-match gate remains required.
 
 ## Future Extension
 
@@ -186,11 +179,9 @@ Maintenance is intentionally not part of the first battlefield supply implementa
 
 The current provider, priority, read-model, and inventory-backed transfer boundaries are designed so Maintenance can be added later without replacing Fuel/Ammunition logistics or introducing a second supply scheduler.
 
-
 ## Artillery Resupply
 
 Artillery uses the existing `AmmunitionState` inventory and is therefore a normal Battlefield Supply recipient. When an active fire mission cannot remove its configured Ammunition cost, the mission enters `NoAmmo` but remains valid. `BattlefieldSupplySystem` may replenish the artillery inventory in the normal Supply phase through a `SupplyProvider` or Supply Truck. The artillery system observes the replenished inventory on a subsequent Combat tick and continues the same mission until its requested round count completes. No artillery-specific ammunition pool or transfer path exists.
-
 
 ## Tactical Automatic Resupply
 
@@ -198,8 +189,6 @@ Artillery uses the existing `AmmunitionState` inventory and is therefore a norma
 
 `AutomaticResupplyDecisionSystem` never grants resources. It uses the shared `BattlefieldResupplyPlanner` to select an enabled friendly provider deterministically and creates the same real `ResupplyOrder` plus normal `MovementOrder` used by deliberate resupply.
 
-`ResupplyCommand` uses that same planner, keeping manual and tactical provider-selection semantics consistent.
-
-Actual quantities remain transferred only by `BattlefieldSupplySystem`. Tactical combat yields to an active resupply order, and stored AttackMove/Retreat intent can continue after supply completion.
+`ResupplyCommand` uses that same planner, keeping manual and tactical provider-selection semantics consistent. Actual quantities remain transferred only by `BattlefieldSupplySystem`. Tactical combat yields to an active resupply order, and stored AttackMove/Retreat intent can continue after supply completion.
 
 See [Combat Orders, Tactical Behavior, and Readiness](CombatOrdersAndReadiness.md).

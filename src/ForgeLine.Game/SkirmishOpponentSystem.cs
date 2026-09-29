@@ -144,6 +144,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 state.LastDecisionTick,
                 configuration.ReactionCadenceTicks))
         {
+            EnsureCriticalLogisticsRecovery(
+                context,
+                owned,
+                configuration);
             CaptureDebug(
                 controllerEntity,
                 controller,
@@ -1814,7 +1818,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     80.0,
                     220.0,
                     450.0,
-                    LogisticsStockPriority.High);
+                    LogisticsStockPriority.Critical);
             }
 
             if (facility.Supports(
@@ -1890,7 +1894,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 80.0,
                 160.0,
                 280.0,
-                priority);
+                LogisticsStockPriority.High);
             SetUnitProductionStockPolicy(
                 context,
                 entity,
@@ -1916,7 +1920,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 250.0,
                 600.0,
                 900.0,
-                LogisticsStockPriority.High);
+                LogisticsStockPriority.Critical);
             SetStockPolicy(
                 context,
                 entity,
@@ -2096,6 +2100,34 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         command.Execute(context);
     }
 
+    private static void EnsureCriticalLogisticsRecovery(
+        SimulationContext context,
+        OwnedState owned,
+        SkirmishOpponentConfiguration configuration)
+    {
+        for (int index = 0;
+             index < owned.UnitProductionFacilities.Count;
+             index++)
+        {
+            EntityId facilityEntity =
+                owned.UnitProductionFacilities[index];
+
+            if (!context.Entities.TryGetComponent(
+                    facilityEntity,
+                    out UnitProductionFacility facility))
+            {
+                continue;
+            }
+
+            EnsureCriticalLogisticsProduction(
+                context,
+                owned,
+                facilityEntity,
+                facility,
+                configuration);
+        }
+    }
+
     private void EnsureUnitProduction(
         SimulationContext context,
         OwnedState owned,
@@ -2110,6 +2142,16 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             UnitProductionFacility facility =
                 context.Entities.GetComponent<UnitProductionFacility>(
                     facilityEntity);
+
+            if (EnsureCriticalLogisticsProduction(
+                    context,
+                    owned,
+                    facilityEntity,
+                    facility,
+                    configuration))
+            {
+                continue;
+            }
 
             int queued =
                 owned.PendingRequestsPerFacility.TryGetValue(
@@ -2134,27 +2176,308 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
-            var command =
-                new QueueUnitProductionCommand(
-                    facility.Owner,
-                    facilityEntity,
-                    candidate,
-                    context.Tick,
-                    ProductionPriority.Normal);
-            command.Execute(context);
+            QueueUnitProduction(
+                context,
+                owned,
+                facilityEntity,
+                facility.Owner,
+                candidate,
+                ProductionPriority.Normal,
+                queued);
+        }
+    }
 
-            if (command.Accepted)
+    private static bool EnsureCriticalLogisticsProduction(
+        SimulationContext context,
+        OwnedState owned,
+        EntityId facilityEntity,
+        in UnitProductionFacility facility,
+        SkirmishOpponentConfiguration configuration)
+    {
+        // Only canonical power-connected production facilities may take over
+        // the queue for critical fleet recovery. An unregistered/offline
+        // synthetic facility cannot restore logistics and must not perturb
+        // unrelated production policy decisions.
+        if (!context.Entities.HasComponent<PowerNetworkMembership>(
+                facilityEntity) ||
+            !context.Entities.HasComponent<PowerConsumer>(
+                facilityEntity))
+        {
+            return false;
+        }
+
+        UnitId candidate =
+            SelectCriticalLogisticsProductionGoal(
+                owned,
+                facility);
+
+        if (!candidate.IsSpecified)
+        {
+            return false;
+        }
+
+        EntityId activeRequest =
+            facility.ActiveRequest;
+        bool candidateQueued = false;
+        int liveRequests = 0;
+        EntityId replaceablePending =
+            EntityId.Invalid;
+        UnitProductionRequest replaceableRequest =
+            default;
+
+        foreach (EntityId requestEntity in
+                 context.Entities.Query<UnitProductionRequest>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            UnitProductionRequest request =
+                context.Entities.GetComponent<UnitProductionRequest>(
+                    requestEntity);
+
+            if (request.Facility !=
+                    facilityEntity ||
+                context.Entities.HasComponent<
+                    UnitProductionCancellationRequest>(
+                        requestEntity))
             {
-                owned.PendingUnitCounts.TryGetValue(
-                    candidate,
-                    out int candidatePending);
-                owned.PendingUnitCounts[candidate] =
-                    candidatePending + 1;
-                owned.PendingRequestsPerFacility[
-                    facilityEntity] =
-                    queued + 1;
+                continue;
+            }
+
+            liveRequests++;
+
+            if (request.UnitId ==
+                candidate)
+            {
+                candidateQueued = true;
+
+                if (request.Priority.CompareTo(
+                        ProductionPriority.High) > 0)
+                {
+                    context.Entities.SetComponent(
+                        requestEntity,
+                        new UnitProductionRequest(
+                            request.Facility,
+                            request.UnitId,
+                            ProductionPriority.High,
+                            request.SubmittedAtTick,
+                            request.Paused));
+                }
+
+                continue;
+            }
+
+            if (requestEntity ==
+                    activeRequest ||
+                request.Priority.CompareTo(
+                    ProductionPriority.High) <= 0)
+            {
+                continue;
+            }
+
+            if (!replaceablePending.IsValid ||
+                request.SubmittedAtTick.CompareTo(
+                    replaceableRequest.SubmittedAtTick) > 0 ||
+                (request.SubmittedAtTick.CompareTo(
+                     replaceableRequest.SubmittedAtTick) == 0 &&
+                 requestEntity >
+                    replaceablePending))
+            {
+                replaceablePending =
+                    requestEntity;
+                replaceableRequest =
+                    request;
             }
         }
+
+        UnitProductionRequest active =
+            default;
+        bool activeBlocksRecovery =
+            activeRequest.IsValid &&
+            facility.ActiveUnit !=
+                candidate &&
+            facility.Status ==
+                UnitProductionStatus.NoInput &&
+            context.Entities.TryGetComponent(
+                activeRequest,
+                out active) &&
+            active.Priority.CompareTo(
+                ProductionPriority.High) > 0 &&
+            !context.Entities.HasComponent<
+                UnitProductionCancellationRequest>(
+                    activeRequest);
+
+        if (activeBlocksRecovery &&
+            CancelUnitProduction(
+                context,
+                owned,
+                facilityEntity,
+                facility.Owner,
+                activeRequest,
+                active))
+        {
+            liveRequests =
+                Math.Max(
+                    0,
+                    liveRequests - 1);
+        }
+
+        if (!candidateQueued &&
+            liveRequests >=
+                configuration.MaximumQueuedUnitsPerFacility &&
+            replaceablePending.IsValid &&
+            CancelUnitProduction(
+                context,
+                owned,
+                facilityEntity,
+                facility.Owner,
+                replaceablePending,
+                replaceableRequest))
+        {
+            liveRequests =
+                Math.Max(
+                    0,
+                    liveRequests - 1);
+        }
+
+        if (!candidateQueued &&
+            liveRequests <
+                configuration.MaximumQueuedUnitsPerFacility)
+        {
+            QueueUnitProduction(
+                context,
+                owned,
+                facilityEntity,
+                facility.Owner,
+                candidate,
+                ProductionPriority.High,
+                liveRequests);
+        }
+
+        // A missing core logistics vehicle owns this facility's next available
+        // production slot. Normal combat expansion resumes after the target is
+        // restored; no resources are granted or consumed by this decision.
+        return true;
+    }
+
+    private static UnitId SelectCriticalLogisticsProductionGoal(
+        OwnedState owned,
+        in UnitProductionFacility facility)
+    {
+        if (!facility.Supports(
+                UnitProductionCapability.Logistics))
+        {
+            return UnitId.None;
+        }
+
+        int cargoTarget = Math.Clamp(
+            owned.SupplyDepots.Count,
+            2,
+            4);
+        int cargoCount =
+            GetUnitCount(
+                owned,
+                UnitIds.CargoTruck);
+        owned.PendingUnitCounts.TryGetValue(
+            UnitIds.CargoTruck,
+            out int pendingCargo);
+
+        if (cargoCount + pendingCargo <
+            cargoTarget)
+        {
+            return UnitIds.CargoTruck;
+        }
+
+        int supplyCount =
+            GetUnitCount(
+                owned,
+                UnitIds.SupplyTruck);
+        owned.PendingUnitCounts.TryGetValue(
+            UnitIds.SupplyTruck,
+            out int pendingSupply);
+
+        if (supplyCount + pendingSupply < 1)
+        {
+            return UnitIds.SupplyTruck;
+        }
+
+        return UnitId.None;
+    }
+
+    private static bool CancelUnitProduction(
+        SimulationContext context,
+        OwnedState owned,
+        EntityId facilityEntity,
+        PlayerId owner,
+        EntityId requestEntity,
+        in UnitProductionRequest request)
+    {
+        var command =
+            new CancelUnitProductionRequestCommand(
+                owner,
+                requestEntity,
+                context.Tick);
+        command.Execute(context);
+
+        if (!command.Accepted)
+        {
+            return false;
+        }
+
+        if (owned.PendingUnitCounts.TryGetValue(
+                request.UnitId,
+                out int unitCount))
+        {
+            owned.PendingUnitCounts[
+                request.UnitId] =
+                Math.Max(
+                    0,
+                    unitCount - 1);
+        }
+
+        if (owned.PendingRequestsPerFacility.TryGetValue(
+                facilityEntity,
+                out int facilityCount))
+        {
+            owned.PendingRequestsPerFacility[
+                facilityEntity] =
+                Math.Max(
+                    0,
+                    facilityCount - 1);
+        }
+
+        return true;
+    }
+
+    private static void QueueUnitProduction(
+        SimulationContext context,
+        OwnedState owned,
+        EntityId facilityEntity,
+        PlayerId owner,
+        UnitId candidate,
+        ProductionPriority priority,
+        int queued)
+    {
+        var command =
+            new QueueUnitProductionCommand(
+                owner,
+                facilityEntity,
+                candidate,
+                context.Tick,
+                priority);
+        command.Execute(context);
+
+        if (!command.Accepted)
+        {
+            return;
+        }
+
+        owned.PendingUnitCounts.TryGetValue(
+            candidate,
+            out int candidatePending);
+        owned.PendingUnitCounts[candidate] =
+            candidatePending + 1;
+        owned.PendingRequestsPerFacility[
+            facilityEntity] =
+            queued + 1;
     }
 
     private UnitId SelectUnitProductionGoal(
