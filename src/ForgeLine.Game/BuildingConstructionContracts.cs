@@ -29,7 +29,10 @@ public readonly record struct BuildCommandResult(
     BuildCommandRejectionReason RejectionReason,
     BuildingPlacementFailureReason PlacementFailure,
     EntityId CreatedSite,
-    SimulationTick ResolvedAtTick);
+    SimulationTick ResolvedAtTick)
+{
+    public PlayerCommandCorrelationId CorrelationId { get; init; }
+}
 
 public readonly record struct BuildingConstructionMetrics(
     int ActiveSites,
@@ -44,7 +47,8 @@ public sealed class BuildCommand : ISimulationCommand
         Vector3 position,
         BuildingOrientation orientation,
         EntityId sourceInventory,
-        SimulationTick submittedAtTick)
+        SimulationTick submittedAtTick,
+        PlayerCommandCorrelationId correlationId = default)
     {
         if (!issuer.IsSpecified)
         {
@@ -79,6 +83,7 @@ public sealed class BuildCommand : ISimulationCommand
         Orientation = orientation;
         SourceInventory = sourceInventory;
         SubmittedAtTick = submittedAtTick;
+        CorrelationId = correlationId;
     }
 
     public PlayerId Issuer { get; }
@@ -92,6 +97,8 @@ public sealed class BuildCommand : ISimulationCommand
     public EntityId SourceInventory { get; }
 
     public SimulationTick SubmittedAtTick { get; }
+
+    public PlayerCommandCorrelationId CorrelationId { get; }
 
     public EntityId RequestEntity { get; private set; }
 
@@ -111,7 +118,8 @@ public sealed class BuildCommand : ISimulationCommand
                 Orientation,
                 SourceInventory,
                 SubmittedAtTick,
-                context.Tick));
+                context.Tick,
+                CorrelationId));
 
         RequestEntity = request;
         ExecutedAtTick = context.Tick;
@@ -188,7 +196,8 @@ internal readonly record struct BuildingBuildRequest(
     BuildingOrientation Orientation,
     EntityId SourceInventory,
     SimulationTick SubmittedAtTick,
-    SimulationTick ExecutedAtTick);
+    SimulationTick ExecutedAtTick,
+    PlayerCommandCorrelationId CorrelationId);
 
 public readonly record struct ConstructionCancellationRequest(
     PlayerId Issuer,
