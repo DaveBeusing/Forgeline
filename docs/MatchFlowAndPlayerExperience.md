@@ -44,9 +44,9 @@ The terminal overlay exposes:
 - `R` — restart;
 - `Escape` — return/exit the current client session.
 
-Restart returns control to the host and creates a completely new `ClientApplication` match session. The new session rebuilds the simulation coordinator, entity registry, inventories, logistics network, intelligence store, systems, presentation state, and match-state entity rather than attempting to reset mutable systems in place.
+Restart returns control to the host and creates a completely new `ClientApplication` match session. The new session rebuilds the simulation coordinator, entity registry, inventories, logistics network, intelligence store, systems, presentation state, and match-state entity rather than attempting to reset mutable systems in place. Each coordinator receives a new `SimulationSessionId`; `RenderWorld` drops previous-session interpolation state and selection/hover/pending presentation interaction is invalidated before the new session is consumed.
 
-Return submits `EndMatchCommand` through the simulation command queue before leaving the completed session.
+Return submits `EndMatchCommand` through `PlayerCommandGateway` and the normal simulation command queue before leaving the completed session; presentation does not poll the mutable command object.
 
 ## Command Core objective
 
@@ -60,7 +60,7 @@ Surrender is not implemented in this slice because the existing client has no ge
 
 ## Player HUD read model
 
-`PlayerExperienceSnapshotFactory` is the boundary between authoritative gameplay state and the minimum player-facing HUD.
+`PlayerExperienceSnapshotFactory` remains the simulation/game-side copier for the minimum player-facing HUD, but the Windows render loop no longer invokes it against live ECS/inventory/system state. `PresentationExtractor` captures the local `PlayerExperienceSnapshot` once at the completed-tick boundary and publishes it inside the same `PresentationSnapshot` as render instances, intelligence, placement feedback, and match state.
 
 The snapshot contains:
 
@@ -75,13 +75,13 @@ The snapshot contains:
 - alert flags;
 - basic development-readable match statistics.
 
-The HUD never creates or advances gameplay state.
+The HUD never creates or advances gameplay state. Every published player-experience model carries the same completed tick as its enclosing presentation snapshot, and the enclosing snapshot carries the simulation-session ID. Rendering therefore cannot silently combine one session's match result with another session's resources or selection inspection.
 
 ## Selection and production presentation
 
 The normal RTS selection filter includes local units, logistics entities, and buildings.
 
-The selected entity summary resolves names through the existing unit/building catalogs. It reads existing authoritative components and production read models instead of storing a second UI-owned copy.
+The selected entity summary resolves names through the existing immutable unit/building catalogs. During completed-tick extraction it copies the selected entities' currently authorized local-player details from authoritative components and production read models. Rendering only consumes that copied summary; it does not re-query the selected entity from ECS. Full `EntityId` generation remains part of the copied selection identity, and selection is cleared when the session ID changes.
 
 When the selected entity is working, the HUD reports:
 
@@ -95,9 +95,13 @@ Block reasons originate from the existing production systems, including `NoInput
 
 The HUD briefly presents the most recent local command result after simulation has resolved it.
 
-Movement feedback uses the executed `MoveEntitiesCommand` result and reports accepted and rejected target counts. Buildings are selectable for inspection but are rejected as movement targets; mixed selections therefore produce partial feedback instead of receiving invalid movement state.
+Player submissions go through `PlayerCommandGateway`. Every accepted submission receives a session-scoped correlation ID and records command source, player-observed tick, scheduled target tick, and simulation sequence. The gateway retains mutable command objects internally only while resolving them.
 
-Construction feedback comes from a player-scoped `BuildCommandResult` published by `BuildingCommandProcessingSystem`. Rejections expose the existing authoritative `BuildCommandRejectionReason` and, where relevant, the concrete `BuildingPlacementFailureReason` rather than inventing a separate UI explanation.
+Resolved outcomes are copied into `PlayerCommandResultReadModel` and delivered through a bounded consumptive `PlayerCommandResultBuffer`. This queue is intentionally separate from the latest presentation snapshot: replacing a visual/HUD snapshot cannot erase an unconsumed accepted/rejected command result. The gateway bounds pending plus published results; once full, new submissions fail explicitly with `BoundaryFull`.
+
+Movement results report accepted and rejected target counts. Buildings remain selectable for inspection but are rejected as movement targets; mixed selections therefore produce partial feedback instead of receiving invalid movement state.
+
+Construction feedback is correlated with the `BuildCommandResult` produced by `BuildingCommandProcessingSystem`. Rejections expose the existing authoritative `BuildCommandRejectionReason` and, where relevant, the concrete `BuildingPlacementFailureReason`. The build path still revalidates placement and resources when the command executes.
 
 Feedback is transient presentation of authoritative results. It does not become gameplay state or alter command acceptance.
 
@@ -153,7 +157,10 @@ Headless lifecycle coverage verifies:
 - deterministic simultaneous destruction as a draw;
 - completed-match transition to `Ended`;
 - fresh restart state without retained terminal state;
-- canonical vertical-slice configuration.
+- canonical vertical-slice configuration;
+- bounded correlated command-result ordering and overflow behavior;
+- completed-tick/session coherence for player-facing snapshots;
+- old-session interpolation and selection invalidation.
 
 The repository CI remains responsible for the full Release build, Windows client smoke run, headless diagnostics/stress runs, and the complete test suite.
 
