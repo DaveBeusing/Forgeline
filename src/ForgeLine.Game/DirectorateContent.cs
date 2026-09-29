@@ -490,6 +490,7 @@ public static class DirectorateContent
             InitialAmmunitionFraction = 0.0,
             CargoCapacity = 220.0,
             AutomaticResupply = true,
+            SupplyPriority = BattlefieldSupplyPriority.Critical,
             TargetPriority = 30
         };
 
