@@ -27,9 +27,19 @@ public sealed class RenderWorld
             return false;
         }
 
-        if (_current is not null && latest.Tick < _current.Tick)
+        if (_current is not null &&
+            latest.SessionId == _current.SessionId &&
+            latest.Tick < _current.Tick)
         {
             return false;
+        }
+
+        if (_current is not null &&
+            latest.SessionId != _current.SessionId)
+        {
+            _previous = null;
+            _current = latest;
+            return true;
         }
 
         _previous = _current;
