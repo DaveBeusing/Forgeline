@@ -1065,6 +1065,24 @@ public sealed class PlayerCommandBoundaryTests
             IntelligenceState.Detected,
             scenario.Simulation.CurrentTick);
 
+        PlayerCommandSubmissionReceipt disableAutomaticResupply =
+            gateway.SubmitAutomaticResupplyPolicy(
+                scenario.West.Player,
+                artillery,
+                ammunitionThreshold: 0.2,
+                fuelThreshold: 0.2,
+                enabled: false,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(disableAutomaticResupply.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel policyResult));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            policyResult.State);
+
         AmmunitionState ammunition =
             scenario.Simulation.Entities
                 .GetComponent<AmmunitionState>(
