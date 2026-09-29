@@ -1,5 +1,6 @@
 using ForgeLine.Core;
 using ForgeLine.Ecs;
+using ForgeLine.Economy;
 using ForgeLine.Game;
 using ForgeLine.Intelligence;
 using ForgeLine.Logistics;
@@ -376,7 +377,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 _viewingFaction);
     }
 
-    private static IReadOnlyDictionary<
+    private static Dictionary<
         string,
         StrategicInfrastructureOperationalState> CaptureCrossingStates(
         EntityRegistry entities,
