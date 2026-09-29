@@ -39,6 +39,7 @@ public sealed class RtsTacticalTargetingController
     private bool _leftWasDown;
     private bool _escapeWasDown;
     private bool _hadPointerPosition;
+    private bool _pointerCaptured;
 
     public TacticalTargetingMode Mode { get; private set; }
 
@@ -46,7 +47,7 @@ public sealed class RtsTacticalTargetingController
         Mode != TacticalTargetingMode.None;
 
     public bool PointerCaptured =>
-        IsActive;
+        _pointerCaptured;
 
     public void Begin(
         in PlayerActionRequest request,
@@ -103,6 +104,9 @@ public sealed class RtsTacticalTargetingController
         SynchronizeSession(
             snapshot?.SessionId ??
             SimulationSessionId.None);
+
+        _pointerCaptured =
+            IsActive;
 
         bool leftDown =
             input.IsMouseButtonDown(
@@ -181,6 +185,7 @@ public sealed class RtsTacticalTargetingController
         _leftWasDown = false;
         _escapeWasDown = false;
         _hadPointerPosition = false;
+        _pointerCaptured = false;
     }
 
     private void TryResolveTarget(
