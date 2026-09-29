@@ -412,127 +412,83 @@ internal sealed class ClientApplication
                 window.RequestClose();
             }
 
-            _ = renderWorld.Update(snapshotBuffer);
+            _ = renderWorld.Update(
+                snapshotBuffer);
 
-            float renderAlpha = RenderInterpolation.CalculateAlpha(
-                simulationAccumulator,
-                simulation.Clock.TickDuration);
-            MatchState currentMatchState =
-                simulation.Entities.GetComponent<MatchState>(
-                    prototypeRuntime.MatchStateEntity);
+            PresentationSnapshot? currentSnapshot =
+                renderWorld.CurrentSnapshot;
+            float renderAlpha =
+                RenderInterpolation.CalculateAlpha(
+                    simulationAccumulator,
+                    simulation.Clock.TickDuration);
+            PlayerExperienceSnapshot? currentExperience =
+                currentSnapshot?.PlayerExperience;
             bool gameplayActive =
-                currentMatchState.Status == MatchStatus.Active;
+                currentExperience?.MatchStatus ==
+                PlayerMatchStatus.Active;
 
             if (gameplayActive)
             {
-            buildingPlacementController.Update(
-                inputState,
-                camera,
-                terrainWorld,
-                simulation.Entities,
-                buildingPlacement,
-                window.ClientSize.Width,
-                window.ClientSize.Height);
-
-            if (!buildingPlacementController.IsActive)
-            {
-                selectionController.Update(
+                buildingPlacementController.Update(
                     inputState,
                     camera,
-                    renderWorld,
                     terrainWorld,
+                    currentSnapshot,
+                    presentationInteraction,
                     window.ClientSize.Width,
-                    window.ClientSize.Height,
-                    renderAlpha);
+                    window.ClientSize.Height);
 
-                if (selectionController.TryTakeMovementRequest(
-                        out MovementOrderRequest movementRequest))
+                if (!buildingPlacementController.IsActive)
                 {
-                    var targetTick = new SimulationTick(
-                        checked(simulation.CurrentTick.Value + 1));
-                    var command = new MoveEntitiesCommand(
-                        LocalPlayer,
-                        movementRequest.Entities,
-                        movementRequest.WorldTarget,
-                        simulation.CurrentTick,
-                        activeFormation);
+                    selectionController.Update(
+                        inputState,
+                        camera,
+                        renderWorld,
+                        terrainWorld,
+                        window.ClientSize.Width,
+                        window.ClientSize.Height,
+                        renderAlpha);
 
-                    lastMovementEnvelope = simulation.SubmitCommand(
-                        command,
-                        targetTick,
-                        new SimulationCommandSource(LocalPlayer.Value));
-                    lastMovementCommand = command;
+                    if (selectionController.TryTakeMovementRequest(
+                            out MovementOrderRequest movementRequest))
+                    {
+                        lastCommandReceipt =
+                            commandGateway.SubmitMovement(
+                                LocalPlayer,
+                                movementRequest.Entities,
+                                movementRequest.WorldTarget,
+                                currentSnapshot?.Tick ??
+                                    SimulationTick.Zero,
+                                activeFormation);
+                    }
+                }
+
+                presentationInteraction.SetSelection(
+                    selectionController.Selection.Entities);
+
+                if (buildingPlacementController.TryTakePlacementRequest(
+                        out BuildingPlacementRequest placementRequest))
+                {
+                    lastCommandReceipt =
+                        commandGateway.SubmitBuild(
+                            LocalPlayer,
+                            placementRequest.BuildingId,
+                            placementRequest.Position,
+                            placementRequest.Orientation,
+                            constructionInventory,
+                            currentSnapshot?.Tick ??
+                                SimulationTick.Zero);
                 }
             }
-
-            if (buildingPlacementController.TryTakePlacementRequest(
-                    out BuildingPlacementRequest placementRequest))
+            else
             {
-                var targetTick = new SimulationTick(
-                    checked(simulation.CurrentTick.Value + 1));
-                var command = new BuildCommand(
-                    LocalPlayer,
-                    placementRequest.BuildingId,
-                    placementRequest.Position,
-                    placementRequest.Orientation,
-                    constructionInventory,
-                    simulation.CurrentTick);
-
-                lastBuildEnvelope = simulation.SubmitCommand(
-                    command,
-                    targetTick,
-                    new SimulationCommandSource(LocalPlayer.Value));
-                lastBuildCommand = command;
-            }
+                presentationInteraction.SetSelection(
+                    selectionController.Selection.Entities);
             }
 
-            BuildingConstructionDebugSnapshot? constructionDebugSnapshot =
-                worldDebugEnabled ||
-                buildingConstruction.Metrics.ActiveSites > 0
-                    ? BuildingConstructionDebugSnapshot.Capture(
-                        simulation.Entities,
-                        buildingDefinitions)
-                    : null;
-            ResourceExtractionDebugSnapshot? resourceDebugSnapshot =
-                worldDebugEnabled
-                    ? ResourceExtractionDebugSnapshot.Capture(
-                        simulation.Entities,
-                        resourceExtraction.Metrics,
-                        resourceCatalog)
-                    : null;
-            LogisticsNetworkDebugSnapshot? logisticsDebugSnapshot =
-                worldDebugEnabled
-                    ? LogisticsNetworkDebugSnapshot.Capture(
-                        logisticsNetwork)
-                    : null;
-            CargoTransportDebugSnapshot? cargoTransportDebugSnapshot =
-                worldDebugEnabled
-                    ? cargoTransportSystem.LastDebugSnapshot
-                    : null;
-            AutomatedDistributionDebugSnapshot? distributionDebugSnapshot =
-                worldDebugEnabled
-                    ? automatedDistribution.LastDebugSnapshot
-                    : null;
-            LogisticsCapacityDebugSnapshot? logisticsCapacityDebugSnapshot =
-                worldDebugEnabled
-                    ? automatedDistribution.LastCapacityDebugSnapshot
-                    : null;
-            BattlefieldSupplyDebugSnapshot? battlefieldSupplyDebugSnapshot =
-                worldDebugEnabled
-                    ? battlefieldSupply.LastDebugSnapshot
-                    : null;
-            CombatDebugSnapshot? combatDebugSnapshot =
-                worldDebugEnabled
-                    ? combatDebugSnapshots.LastDebugSnapshot
-                    : null;
-            ArtilleryDebugSnapshot? artilleryDebugSnapshot =
-                worldDebugEnabled
-                    ? artilleryFireMissions.LastDebugSnapshot
-                    : null;
-            CombatReadinessDebugSnapshot? readinessDebugSnapshot =
-                worldDebugEnabled
-                    ? combatReadiness.LastDebugSnapshot
-                    : null;
+            DrainCommandResults(
+                commandGateway,
+                ref lastCommandResult);
 
             BuildWorldDebugVisualization(
                 debugDraw,
@@ -541,71 +497,38 @@ internal sealed class ClientApplication
                 renderAlpha,
                 camera,
                 selectionController,
-                spatialIndex,
-                groundMovementSystem.CaptureDebugSnapshot(),
-                formationMovementSystem.CaptureDebugSnapshot(),
-                navigationSystem.World,
-                navigationSystem.LastCompletedPath,
                 buildingPlacementController,
-                constructionDebugSnapshot,
-                resourceDebugSnapshot,
-                logisticsDebugSnapshot,
-                cargoTransportDebugSnapshot,
-                distributionDebugSnapshot,
-                logisticsCapacityDebugSnapshot,
-                battlefieldSupplyDebugSnapshot,
-                combatDebugSnapshot,
-                artilleryDebugSnapshot,
-                readinessDebugSnapshot,
-                tacticalCombat.DebugEntries,
-                tacticalCombat.Metrics,
-                automaticResupply.Metrics,
-                battlefieldIntelligence.DebugSensors,
-                battlefieldIntelligence.Metrics);
+                currentSnapshot?.Construction,
+                currentSnapshot?.Debug);
 
-            if (worldDebugEnabled)
+            if (worldDebugEnabled &&
+                currentSnapshot?.Debug is
+                    PresentationDebugSnapshot debugSnapshot)
             {
                 PrototypeBattlefieldDebugVisualization.Draw(
                     debugDraw,
                     prototypeBattlefield,
-                    CaptureCrossingStates(
-                        simulation,
-                        prototypeRuntime));
+                    debugSnapshot.CrossingStates);
                 SkirmishOpponentDebugVisualization.Draw(
                     debugDraw,
-                    skirmishOpponent.DebugSnapshot,
+                    debugSnapshot.Opponents,
                     MaximumDebugLabels);
             }
 
-            terrainRenderer.DebugChunksEnabled = worldDebugEnabled;
+            terrainRenderer.DebugChunksEnabled =
+                worldDebugEnabled;
 
-            DevelopmentOverlayMetrics overlayMetrics = CreateOverlayMetrics(
-                frameTiming,
-                simulation,
-                simulationDiagnostics,
-                terrainRenderer,
-                instanceRenderer,
-                debugDrawRenderer,
-                renderWorld);
+            DevelopmentOverlayMetrics overlayMetrics =
+                CreateOverlayMetrics(
+                    frameTiming,
+                    currentSnapshot,
+                    terrainRenderer,
+                    instanceRenderer,
+                    debugDrawRenderer,
+                    renderWorld);
             PlayerExperienceSnapshot playerExperience =
-                PlayerExperienceSnapshotFactory.Capture(
-                    simulation.Entities,
-                    LocalPlayer,
-                    westBase.CommandCore,
-                    westBase.StartingInventory,
-                    prototypeRuntime.MatchStateEntity,
-                    selectionController.Selection.Entities,
-                    inventories,
-                    powerNetworks,
-                    production,
-                    unitProduction,
-                    buildingCommands,
-                    lastMovementCommand,
-                    intelligenceStore,
-                    unitDefinitions,
-                    buildingDefinitions,
-                    simulation.CurrentTick,
-                    simulation.Clock.TicksPerSecond);
+                currentExperience ??
+                default;
 
             long renderStartedAt = _platform.Clock.GetTimestamp();
 
