@@ -2,6 +2,7 @@ using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Game;
 using ForgeLine.Input;
+using ForgeLine.Intelligence;
 using ForgeLine.Platform;
 using ForgeLine.Simulation;
 using ForgeLine.World;
@@ -51,6 +52,165 @@ public sealed class SimulationPresentationReadModelTests
                 scenario.West.CommandCore));
 
         Assert.Equal(captured, snapshot.PlayerExperience.Value);
+    }
+
+    [Fact]
+    public void HiddenEnemyStateIsExcludedFromPresentationAndSelection()
+    {
+        using VerticalSliceScenario scenario = CreateScenario(4203);
+        var buffer = new PresentationSnapshotBuffer();
+        var interaction = new PresentationInteractionState();
+        var gateway = new PlayerCommandGateway(
+            scenario.Simulation,
+            scenario.Services.BuildingCommands,
+            scenario.BattlefieldRuntime.MatchStateEntity);
+
+        EntityId hiddenEnemy =
+            scenario.Simulation.Entities.CreateEntity();
+        Vector3 hiddenPosition =
+            scenario.Terrain.WorldBounds.Maximum -
+            new Vector3(32.0f, 0.0f, 32.0f);
+
+        scenario.Simulation.Entities.AddComponent(
+            hiddenEnemy,
+            new WorldTransform(
+                hiddenPosition,
+                Quaternion.Identity,
+                Vector3.One));
+        scenario.Simulation.Entities.AddComponent(
+            hiddenEnemy,
+            new VisualIdentity(9_001));
+        scenario.Simulation.Entities.AddComponent(
+            hiddenEnemy,
+            new ControllableEntity(
+                new PlayerId(2),
+                ControllableEntityCategory.Unit));
+        scenario.Simulation.Entities.AddComponent(
+            hiddenEnemy,
+            new IntelligenceSignature(
+                new FactionId(2),
+                identityKey: 9_001));
+
+        interaction.SetSelection([hiddenEnemy]);
+        scenario.Simulation.RegisterTickObserver(gateway);
+        scenario.Simulation.RegisterTickObserver(
+            new PresentationExtractor(
+                buffer,
+                new PresentationExtractionContext(
+                    scenario,
+                    LocalPlayer,
+                    interaction,
+                    gateway)));
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            buffer.TryReadLatest(
+                out PresentationSnapshot snapshot));
+        Assert.DoesNotContain(
+            snapshot.Instances.ToArray(),
+            instance =>
+                instance.Entity == hiddenEnemy);
+        Assert.True(
+            snapshot.PlayerExperience.HasValue);
+        Assert.Equal(
+            0,
+            snapshot.PlayerExperience.Value.Selection.Count);
+        Assert.Equal(
+            EntityId.Invalid,
+            snapshot.PlayerExperience.Value.Selection.PrimaryEntity);
+    }
+
+    [Fact]
+    public void ReusedEntityIndexDoesNotReviveStaleSelection()
+    {
+        using VerticalSliceScenario scenario = CreateScenario(4204);
+        var buffer = new PresentationSnapshotBuffer();
+        var interaction = new PresentationInteractionState();
+        var gateway = new PlayerCommandGateway(
+            scenario.Simulation,
+            scenario.Services.BuildingCommands,
+            scenario.BattlefieldRuntime.MatchStateEntity);
+
+        EntityId stale =
+            scenario.Simulation.Entities.CreateEntity();
+        scenario.Simulation.Entities.AddComponent(
+            stale,
+            new WorldTransform(
+                Vector3.Zero,
+                Quaternion.Identity,
+                Vector3.One));
+        scenario.Simulation.Entities.AddComponent(
+            stale,
+            new VisualIdentity(9_002));
+        scenario.Simulation.Entities.AddComponent(
+            stale,
+            new ControllableEntity(
+                LocalPlayer,
+                ControllableEntityCategory.Unit));
+
+        interaction.SetSelection([stale]);
+
+        Assert.True(
+            scenario.Simulation.Entities.DestroyEntity(
+                stale));
+
+        EntityId replacement =
+            scenario.Simulation.Entities.CreateEntity();
+
+        Assert.Equal(
+            stale.Index,
+            replacement.Index);
+        Assert.NotEqual(
+            stale.Generation,
+            replacement.Generation);
+
+        scenario.Simulation.Entities.AddComponent(
+            replacement,
+            new WorldTransform(
+                new Vector3(64.0f, 0.0f, 64.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        scenario.Simulation.Entities.AddComponent(
+            replacement,
+            new VisualIdentity(9_003));
+        scenario.Simulation.Entities.AddComponent(
+            replacement,
+            new ControllableEntity(
+                LocalPlayer,
+                ControllableEntityCategory.Unit));
+
+        scenario.Simulation.RegisterTickObserver(gateway);
+        scenario.Simulation.RegisterTickObserver(
+            new PresentationExtractor(
+                buffer,
+                new PresentationExtractionContext(
+                    scenario,
+                    LocalPlayer,
+                    interaction,
+                    gateway)));
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            buffer.TryReadLatest(
+                out PresentationSnapshot snapshot));
+        Assert.True(
+            snapshot.PlayerExperience.HasValue);
+        Assert.Equal(
+            0,
+            snapshot.PlayerExperience.Value.Selection.Count);
+        Assert.Equal(
+            EntityId.Invalid,
+            snapshot.PlayerExperience.Value.Selection.PrimaryEntity);
+        Assert.DoesNotContain(
+            snapshot.Instances.ToArray(),
+            instance =>
+                instance.Entity == stale);
+        Assert.Contains(
+            snapshot.Instances.ToArray(),
+            instance =>
+                instance.Entity == replacement);
     }
 
     [Fact]
