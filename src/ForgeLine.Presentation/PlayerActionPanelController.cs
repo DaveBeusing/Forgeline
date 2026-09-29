@@ -3,6 +3,7 @@ using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Game;
 using ForgeLine.Input;
+using ForgeLine.Intelligence;
 using ForgeLine.Platform;
 using ForgeLine.Simulation;
 
@@ -15,7 +16,8 @@ public enum PlayerActionPanelMode : byte
     Production = 2,
     UnitProduction = 3,
     Logistics = 4,
-    Supply = 5
+    Supply = 5,
+    Tactical = 6
 }
 
 public enum PlayerStockThresholdField : byte
@@ -37,7 +39,19 @@ public enum PlayerActionRequestKind : byte
     SetStockPolicy = 7,
     RemoveStockPolicy = 8,
     SetAutomaticResupplyPolicy = 9,
-    RequestResupply = 10
+    RequestResupply = 10,
+    BeginAttackTargeting = 11,
+    BeginAttackMoveTargeting = 12,
+    SubmitStopCombat = 13,
+    SubmitHoldPosition = 14,
+    BeginRetreatTargeting = 15,
+    BeginFireMissionTargeting = 16,
+    CancelFireMission = 17,
+    SubmitAttack = 18,
+    SubmitAttackMove = 19,
+    SubmitRetreat = 20,
+    SubmitFireMissionCoordinate = 21,
+    SubmitFireMissionContact = 22
 }
 
 public readonly record struct PlayerActionRequest(
@@ -59,7 +73,13 @@ public readonly record struct PlayerActionRequest(
     LogisticsStockPriority StockPriority = LogisticsStockPriority.Normal,
     bool Enabled = true,
     double AutomaticFuelThreshold = 0.0,
-    double AutomaticAmmunitionThreshold = 0.0)
+    double AutomaticAmmunitionThreshold = 0.0,
+    EntityId[]? TacticalEntities = null,
+    EntityId TacticalTarget = default,
+    Vector3 TacticalWorldTarget = default,
+    IntelligenceContactKey TacticalContactKey = default,
+    int TacticalRounds = 0,
+    FormationTemplate TacticalFormation = FormationTemplate.Compact)
 {
     public static PlayerActionRequest BeginBuildingPlacement(
         BuildingId buildingId) =>
@@ -241,6 +261,125 @@ public readonly record struct PlayerActionRequest(
             ProductionRequestMode.OneShot,
             ResourceId.None,
             0.0);
+
+    public static PlayerActionRequest BeginAttackTargeting(
+        IReadOnlyList<EntityId> entities) =>
+        CreateTactical(
+            PlayerActionRequestKind.BeginAttackTargeting,
+            entities);
+
+    public static PlayerActionRequest BeginAttackMoveTargeting(
+        IReadOnlyList<EntityId> entities) =>
+        CreateTactical(
+            PlayerActionRequestKind.BeginAttackMoveTargeting,
+            entities);
+
+    public static PlayerActionRequest StopCombat(
+        IReadOnlyList<EntityId> entities) =>
+        CreateTactical(
+            PlayerActionRequestKind.SubmitStopCombat,
+            entities);
+
+    public static PlayerActionRequest HoldPosition(
+        IReadOnlyList<EntityId> entities) =>
+        CreateTactical(
+            PlayerActionRequestKind.SubmitHoldPosition,
+            entities);
+
+    public static PlayerActionRequest BeginRetreatTargeting(
+        IReadOnlyList<EntityId> entities) =>
+        CreateTactical(
+            PlayerActionRequestKind.BeginRetreatTargeting,
+            entities);
+
+    public static PlayerActionRequest BeginFireMissionTargeting(
+        IReadOnlyList<EntityId> entities) =>
+        CreateTactical(
+            PlayerActionRequestKind.BeginFireMissionTargeting,
+            entities);
+
+    public static PlayerActionRequest CancelFireMission(
+        IReadOnlyList<EntityId> entities) =>
+        CreateTactical(
+            PlayerActionRequestKind.CancelFireMission,
+            entities);
+
+    public static PlayerActionRequest Attack(
+        IReadOnlyList<EntityId> entities,
+        EntityId target) =>
+        CreateTactical(
+            PlayerActionRequestKind.SubmitAttack,
+            entities,
+            tacticalTarget: target);
+
+    public static PlayerActionRequest AttackMove(
+        IReadOnlyList<EntityId> entities,
+        Vector3 destination,
+        FormationTemplate formation) =>
+        CreateTactical(
+            PlayerActionRequestKind.SubmitAttackMove,
+            entities,
+            tacticalWorldTarget: destination,
+            tacticalFormation: formation);
+
+    public static PlayerActionRequest Retreat(
+        IReadOnlyList<EntityId> entities,
+        Vector3 destination,
+        FormationTemplate formation) =>
+        CreateTactical(
+            PlayerActionRequestKind.SubmitRetreat,
+            entities,
+            tacticalWorldTarget: destination,
+            tacticalFormation: formation);
+
+    public static PlayerActionRequest FireMission(
+        IReadOnlyList<EntityId> entities,
+        Vector3 coordinate,
+        int requestedRounds) =>
+        CreateTactical(
+            PlayerActionRequestKind.SubmitFireMissionCoordinate,
+            entities,
+            tacticalWorldTarget: coordinate,
+            tacticalRounds: requestedRounds);
+
+    public static PlayerActionRequest FireMission(
+        IReadOnlyList<EntityId> entities,
+        IntelligenceContactKey contactKey,
+        int requestedRounds) =>
+        CreateTactical(
+            PlayerActionRequestKind.SubmitFireMissionContact,
+            entities,
+            tacticalContactKey: contactKey,
+            tacticalRounds: requestedRounds);
+
+    private static PlayerActionRequest CreateTactical(
+        PlayerActionRequestKind kind,
+        IReadOnlyList<EntityId> entities,
+        EntityId tacticalTarget = default,
+        Vector3 tacticalWorldTarget = default,
+        IntelligenceContactKey tacticalContactKey = default,
+        int tacticalRounds = 0,
+        FormationTemplate tacticalFormation = FormationTemplate.Compact) =>
+        new(
+            kind,
+            BuildingId.None,
+            EntityId.Invalid,
+            RecipeId.None,
+            UnitId.None,
+            EntityId.Invalid,
+            false,
+            ProductionPriority.Normal,
+            ProductionRequestMode.OneShot,
+            ResourceId.None,
+            0.0,
+            TacticalEntities:
+                entities?.ToArray() ??
+                throw new ArgumentNullException(nameof(entities)),
+            TacticalTarget: tacticalTarget,
+            TacticalWorldTarget: tacticalWorldTarget,
+            TacticalContactKey: tacticalContactKey,
+            TacticalRounds: tacticalRounds,
+            TacticalFormation: tacticalFormation);
 }
 
 public readonly record struct PlayerActionPanelView(
@@ -353,6 +492,12 @@ public sealed class PlayerActionPanelController
         {
             ToggleMode(
                 PlayerActionPanelMode.Supply);
+        }
+
+        if (Pressed(input, PlatformKey.K))
+        {
+            ToggleMode(
+                PlayerActionPanelMode.Tactical);
         }
 
         if (Mode != PlayerActionPanelMode.Closed &&
@@ -671,6 +816,11 @@ public sealed class PlayerActionPanelController
                 ActivateSupply(
                     actions.Supply);
                 break;
+
+            case PlayerActionPanelMode.Tactical:
+                ActivateTactical(
+                    actions.Tactical);
+                break;
         }
     }
 
@@ -823,6 +973,54 @@ public sealed class PlayerActionPanelController
                 _automaticFuelThreshold,
                 _automaticAmmunitionThreshold,
                 _automaticResupplyEnabled);
+    }
+
+    private void ActivateTactical(
+        PlayerTacticalActionReadModel? tactical)
+    {
+        if (tactical is null ||
+            SelectedIndex < 0 ||
+            SelectedIndex >= 7)
+        {
+            return;
+        }
+
+        PlayerActionRequest request =
+            SelectedIndex switch
+            {
+                0 =>
+                    PlayerActionRequest.BeginAttackTargeting(
+                        tactical.SelectedEntities),
+                1 =>
+                    PlayerActionRequest.BeginAttackMoveTargeting(
+                        tactical.SelectedEntities),
+                2 =>
+                    PlayerActionRequest.StopCombat(
+                        tactical.SelectedEntities),
+                3 =>
+                    PlayerActionRequest.HoldPosition(
+                        tactical.SelectedEntities),
+                4 =>
+                    PlayerActionRequest.BeginRetreatTargeting(
+                        tactical.SelectedEntities),
+                5 =>
+                    PlayerActionRequest.BeginFireMissionTargeting(
+                        tactical.SelectedEntities),
+                6 =>
+                    PlayerActionRequest.CancelFireMission(
+                        tactical.SelectedEntities),
+                _ =>
+                    default
+            };
+
+        if (request.Kind ==
+            PlayerActionRequestKind.None)
+        {
+            return;
+        }
+
+        _pendingRequest = request;
+        Close();
     }
 
     private void CancelSelected(
@@ -1177,6 +1375,10 @@ public sealed class PlayerActionPanelController
                 actions?.Supply is null
                     ? 0
                     : 3,
+            PlayerActionPanelMode.Tactical =>
+                actions?.Tactical is null
+                    ? 0
+                    : 7,
             _ =>
                 0
         };
