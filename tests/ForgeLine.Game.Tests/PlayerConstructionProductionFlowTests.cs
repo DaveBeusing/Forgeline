@@ -416,6 +416,596 @@ public sealed class PlayerConstructionProductionFlowTests
                 .TotalAmmunitionTransferred > 0.0);
     }
 
+    [Fact]
+    public void PlayerCommandsBuildSupplyAndConquerThroughNaturalCombat()
+    {
+        using VerticalSliceScenario scenario =
+            CreateScenario(4119);
+        var gateway =
+            new PlayerCommandGateway(
+                scenario.Simulation,
+                scenario.Services.BuildingCommands,
+                scenario.BattlefieldRuntime.MatchStateEntity,
+                intelligence:
+                    scenario.Intelligence,
+                weapons:
+                    scenario.Services.Weapons,
+                artilleryWeapons:
+                    scenario.Services.ArtilleryWeapons);
+        scenario.Simulation.RegisterTickObserver(gateway);
+
+        Assert.Equal(
+            0,
+            scenario.Simulation.Entities
+                .GetComponentCount<SkirmishOpponentController>());
+
+        WorldTransform westCore =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    scenario.West.CommandCore);
+        WorldTransform eastCore =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    scenario.East.CommandCore);
+        Vector3 towardWest =
+            Vector3.Normalize(
+                new Vector3(
+                    westCore.Position.X -
+                        eastCore.Position.X,
+                    0.0f,
+                    westCore.Position.Z -
+                        eastCore.Position.Z));
+        Vector3 forwardIndustryCenter =
+            eastCore.Position +
+            towardWest * 420.0f;
+
+        var built =
+            new List<(BuildingId Id, Vector3 Position)>();
+
+        foreach (BuildingId buildingId in
+                 new[]
+                 {
+                     BuildingIds.PowerPlant,
+                     BuildingIds.PowerPlant,
+                     BuildingIds.Smelter
+                 })
+        {
+            Vector3 position =
+                FindOpenPlacement(
+                    scenario,
+                    buildingId);
+            BuildPlayerBuilding(
+                scenario,
+                gateway,
+                buildingId,
+                position);
+            built.Add((buildingId, position));
+        }
+
+        Vector3 vehicleFactoryPosition =
+            FindOpenPlacementNear(
+                scenario,
+                BuildingIds.VehicleFactory,
+                forwardIndustryCenter);
+        BuildPlayerBuilding(
+            scenario,
+            gateway,
+            BuildingIds.VehicleFactory,
+            vehicleFactoryPosition);
+        built.Add(
+            (BuildingIds.VehicleFactory,
+             vehicleFactoryPosition));
+
+        uint longestConstruction =
+            built
+                .Select(
+                    item =>
+                        scenario.Services.BuildingDefinitions[
+                            item.Id].ConstructionTicks)
+                .Max();
+
+        scenario.Simulation.RunTicks(
+            longestConstruction + 6,
+            TestContext.Current.CancellationToken);
+
+        EntityId smelter =
+            FindCompletedBuilding(
+                scenario,
+                BuildingIds.Smelter);
+        EntityId vehicleFactory =
+            FindCompletedBuilding(
+                scenario,
+                BuildingIds.VehicleFactory);
+        ProductionFacility steelFacility =
+            scenario.Simulation.Entities
+                .GetComponent<ProductionFacility>(
+                    smelter);
+        UnitProductionFacility vehicleProduction =
+            scenario.Simulation.Entities
+                .GetComponent<UnitProductionFacility>(
+                    vehicleFactory);
+
+        SubmitStockPolicy(
+            scenario,
+            gateway,
+            smelter,
+            ResourceIds.FerrousOre,
+            minimum: 120.0,
+            target: 200.0,
+            maximum: 240.0);
+
+        RunUntil(
+            scenario,
+            () =>
+                scenario.Inventories.GetQuantity(
+                    steelFacility.InputInventory,
+                    ResourceIds.FerrousOre) >=
+                200.0,
+            maximumTicks: 5_000);
+
+        PlayerCommandSubmissionReceipt steelReceipt =
+            gateway.SubmitProduction(
+                scenario.West.Player,
+                smelter,
+                RecipeIds.Steel,
+                scenario.Simulation.CurrentTick,
+                priority:
+                    ProductionPriority.High,
+                mode:
+                    ProductionRequestMode.DesiredStock,
+                desiredStockResourceId:
+                    ResourceIds.Steel,
+                desiredStockQuantity:
+                    200.0);
+
+        Assert.True(steelReceipt.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel steelResult));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            steelResult.State);
+
+        RunUntil(
+            scenario,
+            () =>
+                scenario.Inventories.GetQuantity(
+                    steelFacility.OutputInventory,
+                    ResourceIds.Steel) >=
+                200.0,
+            maximumTicks: 2_000);
+
+        foreach ((ResourceId Resource, double Target) stock in
+                 new[]
+                 {
+                     (ResourceIds.Steel, 570.0),
+                     (ResourceIds.Electronics, 180.0),
+                     (ResourceIds.Fuel, 410.0),
+                     (ResourceIds.Ammunition, 90.0)
+                 })
+        {
+            SubmitStockPolicy(
+                scenario,
+                gateway,
+                vehicleFactory,
+                stock.Resource,
+                minimum:
+                    stock.Target * 0.5,
+                target:
+                    stock.Target,
+                maximum:
+                    stock.Target + 80.0);
+        }
+
+        RunUntil(
+            scenario,
+            () =>
+                scenario.Inventories.GetQuantity(
+                    vehicleProduction.InputInventory,
+                    ResourceIds.Steel) >= 555.0 &&
+                scenario.Inventories.GetQuantity(
+                    vehicleProduction.InputInventory,
+                    ResourceIds.Electronics) >= 172.0 &&
+                scenario.Inventories.GetQuantity(
+                    vehicleProduction.InputInventory,
+                    ResourceIds.Fuel) >= 396.0 &&
+                scenario.Inventories.GetQuantity(
+                    vehicleProduction.InputInventory,
+                    ResourceIds.Ammunition) >= 80.0,
+            maximumTicks: 8_000);
+
+        QueueUnit(
+            scenario,
+            gateway,
+            vehicleFactory,
+            UnitIds.MainBattleTank);
+        QueueUnit(
+            scenario,
+            gateway,
+            vehicleFactory,
+            UnitIds.MainBattleTank);
+        QueueUnit(
+            scenario,
+            gateway,
+            vehicleFactory,
+            UnitIds.ScoutVehicle);
+        QueueUnit(
+            scenario,
+            gateway,
+            vehicleFactory,
+            UnitIds.SupplyTruck);
+
+        scenario.Simulation.RunTicks(
+            scenario.Services.UnitDefinitions[
+                UnitIds.MainBattleTank].ProductionTicks * 2 +
+            scenario.Services.UnitDefinitions[
+                UnitIds.ScoutVehicle].ProductionTicks +
+            scenario.Services.UnitDefinitions[
+                UnitIds.SupplyTruck].ProductionTicks +
+            12,
+            TestContext.Current.CancellationToken);
+
+        EntityId[] tanks =
+            FindOwnedUnits(
+                scenario,
+                UnitIds.MainBattleTank);
+        EntityId scout =
+            Assert.Single(
+                FindOwnedUnits(
+                    scenario,
+                    UnitIds.ScoutVehicle));
+        EntityId supplyTruck =
+            Assert.Single(
+                FindOwnedUnits(
+                    scenario,
+                    UnitIds.SupplyTruck));
+
+        Assert.Equal(2, tanks.Length);
+
+        Vector3 supplyDepotPosition =
+            FindOpenPlacementNear(
+                scenario,
+                BuildingIds.SupplyDepot,
+                vehicleFactoryPosition +
+                    towardWest * 45.0f);
+        BuildPlayerBuilding(
+            scenario,
+            gateway,
+            BuildingIds.SupplyDepot,
+            supplyDepotPosition);
+
+        scenario.Simulation.RunTicks(
+            scenario.Services.BuildingDefinitions[
+                BuildingIds.SupplyDepot].ConstructionTicks +
+            6,
+            TestContext.Current.CancellationToken);
+
+        EntityId supplyDepot =
+            FindCompletedBuilding(
+                scenario,
+                BuildingIds.SupplyDepot);
+        InventoryStorage supplyStorage =
+            scenario.Simulation.Entities
+                .GetComponent<InventoryStorage>(
+                    supplyDepot);
+
+        RunUntil(
+            scenario,
+            () =>
+                scenario.Inventories.GetQuantity(
+                    supplyStorage.InventoryId,
+                    ResourceIds.Fuel) >= 100.0 &&
+                scenario.Inventories.GetQuantity(
+                    supplyStorage.InventoryId,
+                    ResourceIds.Ammunition) >= 80.0,
+            maximumTicks: 8_000);
+
+        Assert.True(
+            gateway.SubmitMovement(
+                scenario.West.Player,
+                [supplyTruck, .. tanks],
+                supplyDepotPosition,
+                scenario.Simulation.CurrentTick,
+                FormationTemplate.Compact).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out _));
+
+        RunUntil(
+            scenario,
+            () =>
+                tanks.All(
+                    tank =>
+                        Vector3.DistanceSquared(
+                            scenario.Simulation.Entities
+                                .GetComponent<WorldTransform>(
+                                    tank).Position,
+                            supplyDepotPosition) <=
+                        28.0f * 28.0f),
+            maximumTicks: 1_000);
+
+        var fuelBefore =
+            new Dictionary<EntityId, double>();
+
+        foreach (EntityId tank in tanks)
+        {
+            UnitFuelState fuel =
+                scenario.Simulation.Entities
+                    .GetComponent<UnitFuelState>(
+                        tank);
+            fuelBefore[tank] =
+                scenario.Inventories.GetQuantity(
+                    fuel.InventoryId,
+                    ResourceIds.Fuel);
+
+            Assert.True(
+                gateway.SubmitResupply(
+                    scenario.West.Player,
+                    tank,
+                    scenario.Simulation.CurrentTick).Accepted);
+            scenario.Simulation.AdvanceOneTick();
+            Assert.True(gateway.Results.TryRead(out _));
+        }
+
+        RunUntil(
+            scenario,
+            () =>
+                tanks.All(
+                    tank =>
+                    {
+                        UnitFuelState fuel =
+                            scenario.Simulation.Entities
+                                .GetComponent<UnitFuelState>(
+                                    tank);
+                        return scenario.Inventories.GetQuantity(
+                                   fuel.InventoryId,
+                                   ResourceIds.Fuel) >
+                               fuelBefore[tank];
+                    }),
+            maximumTicks: 600);
+
+        Vector3 reconnaissancePoint =
+            eastCore.Position +
+            towardWest * 180.0f;
+        Assert.True(
+            gateway.SubmitAttackMove(
+                scenario.West.Player,
+                [scout],
+                reconnaissancePoint,
+                scenario.Simulation.CurrentTick,
+                FormationTemplate.Compact).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out _));
+
+        FactionId westFaction =
+            new((uint)scenario.West.Player.Value);
+
+        RunUntil(
+            scenario,
+            () =>
+                scenario.Intelligence
+                    .IsEntityCurrentlyIdentified(
+                        westFaction,
+                        scenario.East.CommandCore),
+            maximumTicks: 1_200);
+
+        double ammunitionBeforeCombat =
+            tanks.Sum(
+                tank =>
+                {
+                    AmmunitionState ammunition =
+                        scenario.Simulation.Entities
+                            .GetComponent<AmmunitionState>(
+                                tank);
+                    return scenario.Inventories.GetQuantity(
+                        ammunition.InventoryId,
+                        ResourceIds.Ammunition);
+                });
+
+        PlayerCommandSubmissionReceipt attackReceipt =
+            gateway.SubmitAttack(
+                scenario.West.Player,
+                tanks,
+                scenario.East.CommandCore,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(attackReceipt.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel attackResult));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            attackResult.State);
+
+        RunUntil(
+            scenario,
+            () =>
+                scenario.GetMatchState().IsTerminal,
+            maximumTicks: 2_000);
+
+        MatchState match =
+            scenario.GetMatchState();
+
+        Assert.Equal(
+            MatchStatus.Victory,
+            match.Status);
+        Assert.Equal(
+            scenario.West.Player,
+            match.Winner);
+        Assert.False(
+            scenario.Simulation.Entities.IsAlive(
+                scenario.East.CommandCore));
+
+        double ammunitionAfterCombat =
+            tanks
+                .Where(
+                    tank =>
+                        scenario.Simulation.Entities.IsAlive(
+                            tank))
+                .Sum(
+                    tank =>
+                    {
+                        AmmunitionState ammunition =
+                            scenario.Simulation.Entities
+                                .GetComponent<AmmunitionState>(
+                                    tank);
+                        return scenario.Inventories.GetQuantity(
+                            ammunition.InventoryId,
+                            ResourceIds.Ammunition);
+                    });
+
+        Assert.True(
+            ammunitionAfterCombat <
+            ammunitionBeforeCombat);
+        Assert.True(
+            scenario.AutomatedDistribution.Metrics
+                .CompletedRequestCount > 0);
+        Assert.True(
+            scenario.BattlefieldSupply.Metrics
+                .TotalFuelTransferred > 0.0);
+    }
+
+    private static void BuildPlayerBuilding(
+        VerticalSliceScenario scenario,
+        PlayerCommandGateway gateway,
+        BuildingId buildingId,
+        Vector3 position)
+    {
+        PlayerCommandSubmissionReceipt receipt =
+            gateway.SubmitBuild(
+                scenario.West.Player,
+                buildingId,
+                position,
+                BuildingOrientation.North,
+                scenario.West.CommandCore,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(receipt.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel result));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            result.State);
+    }
+
+    private static void SubmitStockPolicy(
+        VerticalSliceScenario scenario,
+        PlayerCommandGateway gateway,
+        EntityId targetEntity,
+        ResourceId resource,
+        double minimum,
+        double target,
+        double maximum)
+    {
+        PlayerCommandSubmissionReceipt receipt =
+            gateway.SubmitLogisticsStockPolicy(
+                scenario.West.Player,
+                targetEntity,
+                resource,
+                minimum,
+                target,
+                maximum,
+                LogisticsStockPriority.Critical,
+                enabled: true,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(receipt.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel result));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            result.State);
+    }
+
+    private static EntityId[] FindOwnedUnits(
+        VerticalSliceScenario scenario,
+        UnitId unitId)
+    {
+        var result =
+            new List<EntityId>();
+
+        foreach (EntityId entity in
+                 scenario.Simulation.Entities.Query<
+                     UnitIdentity,
+                     ControllableEntity>(
+                         QueryIterationOrder.StableByEntityIndex))
+        {
+            UnitIdentity identity =
+                scenario.Simulation.Entities
+                    .GetComponent<UnitIdentity>(
+                        entity);
+            ControllableEntity controllable =
+                scenario.Simulation.Entities
+                    .GetComponent<ControllableEntity>(
+                        entity);
+
+            if (identity.UnitId == unitId &&
+                controllable.Owner ==
+                    scenario.West.Player)
+            {
+                result.Add(entity);
+            }
+        }
+
+        return result.ToArray();
+    }
+
+    private static Vector3 FindOpenPlacementNear(
+        VerticalSliceScenario scenario,
+        BuildingId buildingId,
+        Vector3 center)
+    {
+        for (int radius = 0;
+             radius <= 10;
+             radius++)
+        {
+            for (int z = -radius;
+                 z <= radius;
+                 z++)
+            {
+                for (int x = -radius;
+                     x <= radius;
+                     x++)
+                {
+                    if (radius > 0 &&
+                        Math.Abs(x) != radius &&
+                        Math.Abs(z) != radius)
+                    {
+                        continue;
+                    }
+
+                    Vector3 candidate =
+                        center +
+                        new Vector3(
+                            x * 32.0f,
+                            0.0f,
+                            z * 32.0f);
+                    BuildingPlacementPreview preview =
+                        scenario.Services.BuildingPlacement
+                            .CreatePreview(
+                                scenario.Simulation.Entities,
+                                scenario.West.Player,
+                                buildingId,
+                                candidate,
+                                BuildingOrientation.North);
+
+                    if (preview.IsValid)
+                    {
+                        return preview.GroundPosition;
+                    }
+                }
+            }
+        }
+
+        throw new InvalidOperationException(
+            $"No valid placement was found near {center} for building '{buildingId}'.");
+    }
+
     private static void QueueUnit(
         VerticalSliceScenario scenario,
         PlayerCommandGateway gateway,
