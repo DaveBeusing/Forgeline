@@ -157,8 +157,8 @@ public sealed class PlayerActionPanelController
 {
     private const float PanelWidth = 608.0f;
     private const float PanelTop = 96.0f;
-    private const float RowStartOffset = 76.0f;
-    private const float RowHeight = 20.0f;
+    private const float RowStartOffset = 64.0f;
+    private const float RowHeight = 16.0f;
     private const float PanelBottomPadding = 28.0f;
 
     private readonly Dictionary<PlatformKey, bool> _heldKeys = new();
