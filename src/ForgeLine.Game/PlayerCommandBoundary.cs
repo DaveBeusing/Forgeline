@@ -18,7 +18,9 @@ public enum PlayerCommandKind : byte
     Construction = 2,
     EndMatch = 3,
     Production = 4,
-    UnitProduction = 5
+    UnitProduction = 5,
+    Logistics = 6,
+    Supply = 7
 }
 
 public enum PlayerCommandSubmissionFailure : byte
@@ -47,7 +49,9 @@ public readonly record struct PlayerCommandResultReadModel(
     int RejectedTargets,
     BuildCommandRejectionReason BuildRejection,
     BuildingPlacementFailureReason PlacementFailure,
-    SimulationTick ResolvedAtTick);
+    SimulationTick ResolvedAtTick,
+    PlayerLogisticsActionFailureReason ActionFailure =
+        PlayerLogisticsActionFailureReason.None);
 
 public sealed class PlayerCommandResultBuffer
 {
@@ -488,6 +492,115 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             envelope);
     }
 
+    public PlayerCommandSubmissionReceipt SubmitLogisticsStockPolicy(
+        PlayerId issuer,
+        EntityId target,
+        ResourceId resourceId,
+        double desiredMinimum,
+        double desiredTarget,
+        double desiredMaximum,
+        LogisticsStockPriority priority,
+        bool enabled,
+        SimulationTick observedTick) =>
+        SubmitLogisticsAction(
+            PlayerCommandKind.Logistics,
+            issuer,
+            observedTick,
+            PlayerLogisticsActionCommand.SetStockPolicy(
+                issuer,
+                target,
+                resourceId,
+                desiredMinimum,
+                desiredTarget,
+                desiredMaximum,
+                priority,
+                enabled,
+                observedTick));
+
+    public PlayerCommandSubmissionReceipt SubmitRemoveLogisticsStockPolicy(
+        PlayerId issuer,
+        EntityId policyEntity,
+        SimulationTick observedTick) =>
+        SubmitLogisticsAction(
+            PlayerCommandKind.Logistics,
+            issuer,
+            observedTick,
+            PlayerLogisticsActionCommand.RemoveStockPolicy(
+                issuer,
+                policyEntity,
+                observedTick));
+
+    public PlayerCommandSubmissionReceipt SubmitAutomaticResupplyPolicy(
+        PlayerId issuer,
+        EntityId target,
+        double ammunitionThreshold,
+        double fuelThreshold,
+        bool enabled,
+        SimulationTick observedTick) =>
+        SubmitLogisticsAction(
+            PlayerCommandKind.Supply,
+            issuer,
+            observedTick,
+            PlayerLogisticsActionCommand.SetAutomaticResupplyPolicy(
+                issuer,
+                target,
+                ammunitionThreshold,
+                fuelThreshold,
+                enabled,
+                observedTick));
+
+    public PlayerCommandSubmissionReceipt SubmitResupply(
+        PlayerId issuer,
+        EntityId target,
+        SimulationTick observedTick) =>
+        SubmitLogisticsAction(
+            PlayerCommandKind.Supply,
+            issuer,
+            observedTick,
+            PlayerLogisticsActionCommand.RequestResupply(
+                issuer,
+                target,
+                observedTick));
+
+    private PlayerCommandSubmissionReceipt SubmitLogisticsAction(
+        PlayerCommandKind kind,
+        PlayerId issuer,
+        SimulationTick observedTick,
+        PlayerLogisticsActionCommand command)
+    {
+        if (!TryBeginSubmission(
+                kind,
+                issuer,
+                observedTick,
+                out PlayerCommandCorrelationId correlation,
+                out SimulationTick targetTick,
+                out SimulationCommandSource source,
+                out PlayerCommandSubmissionReceipt rejected))
+        {
+            return rejected;
+        }
+
+        SimulationCommandEnvelope envelope =
+            _simulation.SubmitCommand(
+                command,
+                targetTick,
+                source);
+
+        _pending.Add(
+            PendingCommand.ForLogistics(
+                correlation,
+                kind,
+                envelope,
+                command));
+
+        return AcceptedReceipt(
+            correlation,
+            kind,
+            source,
+            observedTick,
+            envelope);
+    }
+
     public PlayerCommandSubmissionReceipt SubmitEndMatch(
         PlayerId issuer,
         SimulationTick observedTick)
@@ -673,6 +786,24 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     command.ExecutedAtTick);
             }
 
+            case PlayerCommandKind.Logistics:
+            case PlayerCommandKind.Supply:
+            {
+                PlayerLogisticsActionCommand command =
+                    pending.LogisticsCommand!;
+
+                if (command.ExecutedAtTick == SimulationTick.Zero)
+                {
+                    return null;
+                }
+
+                return CreateActionResult(
+                    pending,
+                    command.Accepted,
+                    command.ExecutedAtTick,
+                    command.FailureReason);
+            }
+
             case PlayerCommandKind.EndMatch:
             {
                 EndMatchCommand command =
@@ -710,7 +841,9 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
     private PlayerCommandResultReadModel CreateActionResult(
         in PendingCommand pending,
         bool accepted,
-        SimulationTick executedAtTick) =>
+        SimulationTick executedAtTick,
+        PlayerLogisticsActionFailureReason actionFailure =
+            PlayerLogisticsActionFailureReason.None) =>
         new(
             SessionId,
             pending.CorrelationId,
@@ -722,7 +855,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             accepted ? 0 : 1,
             BuildCommandRejectionReason.None,
             BuildingPlacementFailureReason.None,
-            executedAtTick);
+            executedAtTick,
+            actionFailure);
 
     private bool TryBeginSubmission(
         PlayerCommandKind kind,
@@ -823,6 +957,10 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     PlayerCommandFeedbackKind.Production,
                 PlayerCommandKind.UnitProduction =>
                     PlayerCommandFeedbackKind.UnitProduction,
+                PlayerCommandKind.Logistics =>
+                    PlayerCommandFeedbackKind.Logistics,
+                PlayerCommandKind.Supply =>
+                    PlayerCommandFeedbackKind.Supply,
                 _ =>
                     PlayerCommandFeedbackKind.None
             },
@@ -831,7 +969,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             result.RejectedTargets,
             result.BuildRejection,
             result.PlacementFailure,
-            result.ResolvedAtTick);
+            result.ResolvedAtTick,
+            result.ActionFailure);
 
     private readonly record struct PendingCommand(
         PlayerCommandCorrelationId CorrelationId,
@@ -841,6 +980,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         EndMatchCommand? EndMatchCommand,
         PlayerProductionActionCommand? ProductionCommand,
         PlayerUnitProductionActionCommand? UnitProductionCommand,
+        PlayerLogisticsActionCommand? LogisticsCommand,
         PlayerCommandResultReadModel? Result)
     {
         public static PendingCommand ForMovement(
@@ -855,6 +995,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 null,
                 null,
                 null,
+                null,
                 null);
 
         public static PendingCommand ForBuild(
@@ -864,6 +1005,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 correlation,
                 PlayerCommandKind.Construction,
                 envelope,
+                null,
                 null,
                 null,
                 null,
@@ -882,6 +1024,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 command,
                 null,
                 null,
+                null,
                 null);
 
         public static PendingCommand ForProduction(
@@ -896,7 +1039,33 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 null,
                 command,
                 null,
+                null,
                 null);
+
+        public static PendingCommand ForLogistics(
+            PlayerCommandCorrelationId correlation,
+            PlayerCommandKind kind,
+            in SimulationCommandEnvelope envelope,
+            PlayerLogisticsActionCommand command)
+        {
+            if (kind is not
+                    (PlayerCommandKind.Logistics or
+                     PlayerCommandKind.Supply))
+            {
+                throw new ArgumentOutOfRangeException(nameof(kind));
+            }
+
+            return new PendingCommand(
+                correlation,
+                kind,
+                envelope,
+                null,
+                null,
+                null,
+                null,
+                command,
+                null);
+        }
 
         public static PendingCommand ForUnitProduction(
             PlayerCommandCorrelationId correlation,
@@ -910,6 +1079,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 null,
                 null,
                 command,
+                null,
                 null);
     }
 }

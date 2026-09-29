@@ -188,3 +188,11 @@ The palette is session-scoped and consumes immutable completed-tick `PlayerActio
 `B`, `P`, and `U` select construction, processing, and unit-production modes. While a mode owns keyboard focus, RTS camera keys are suppressed. Pointer clicks inside the panel are captured before world selection, movement, or placement. Mixed selections, foreign ownership, destroyed/stale facilities, terminal matches, and a fresh session remove incompatible transient actions instead of retaining stale authority.
 
 Command submission is not success feedback. `PlayerActionSnapshot.PendingCommandCount` identifies unresolved player submissions; completed results are published separately as accepted/rejected `PlayerCommandFeedback`. Production progress and block reasons remain authoritative copied state from the selected facility.
+
+## Player Logistics and Supply Surface
+
+The existing reusable player action palette now includes logistics and battlefield supply without changing construction or production ownership.
+
+`L` exposes stock-policy and Cargo status for one selected owned logistics-capable entity. `Y` exposes automatic and explicit resupply controls for one selected owned supply-capable unit. The same panel focus and pointer-capture rules used by construction/production prevent clicks and keyboard actions from leaking into world selection, movement, or placement.
+
+All displayed policy, cargo, provider, and supply information is copied at the completed-tick presentation boundary. Actions are submitted through the bounded `PlayerCommandGateway`; pending submission remains distinct from accepted/rejected feedback. Session changes clear transient panel state, and stale or foreign selections do not retain player authority.

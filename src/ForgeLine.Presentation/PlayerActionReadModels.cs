@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Ecs;
@@ -237,6 +238,94 @@ public sealed class PlayerUnitProductionFacilityActionReadModel
         _requests;
 }
 
+public enum PlayerDistributionActionState : byte
+{
+    None = 0,
+    Pending = 1,
+    Assigned = 2,
+    Loading = 3,
+    Traveling = 4,
+    Unloading = 5,
+    Waiting = 6,
+    Failed = 7
+}
+
+public readonly record struct PlayerStockPolicyActionReadModel(
+    EntityId PolicyEntity,
+    ResourceId ResourceId,
+    string DisplayName,
+    double CurrentQuantity,
+    double DesiredMinimum,
+    double DesiredTarget,
+    double DesiredMaximum,
+    LogisticsStockPriority Priority,
+    bool Enabled,
+    PlayerDistributionActionState DistributionState,
+    LogisticsTransportRequestFailureReason FailureReason,
+    LogisticsBottleneckReason BottleneckReason,
+    EntityId AssignedTruck)
+{
+    public bool HasPolicy => PolicyEntity.IsValid;
+}
+
+public readonly record struct PlayerCargoStatusReadModel(
+    EntityId Entity,
+    CargoTransportLifecycleState Lifecycle,
+    CargoTransportWaitReason WaitReason,
+    CargoTransportFailureReason FailureReason,
+    double CargoQuantity,
+    double Capacity);
+
+public sealed class PlayerLogisticsActionReadModel
+{
+    private readonly IReadOnlyList<PlayerStockPolicyActionReadModel> _policies;
+
+    public PlayerLogisticsActionReadModel(
+        EntityId entity,
+        IReadOnlyList<PlayerStockPolicyActionReadModel> policies,
+        PlayerCargoStatusReadModel? cargo)
+    {
+        Entity = entity;
+        _policies =
+            Array.AsReadOnly(
+                policies?.ToArray() ??
+                throw new ArgumentNullException(nameof(policies)));
+        Cargo = cargo;
+    }
+
+    public EntityId Entity { get; }
+
+    public IReadOnlyList<PlayerStockPolicyActionReadModel> Policies =>
+        _policies;
+
+    public PlayerCargoStatusReadModel? Cargo { get; }
+}
+
+public enum PlayerSupplyProviderState : byte
+{
+    None = 0,
+    Available = 1,
+    Assigned = 2,
+    Traveling = 3,
+    Transferring = 4,
+    Empty = 5,
+    Blocked = 6
+}
+
+public readonly record struct PlayerSupplyActionReadModel(
+    EntityId Entity,
+    BattlefieldSupplyStatus Status,
+    double FuelFraction,
+    double AmmunitionFraction,
+    bool AutomaticEnabled,
+    double AutomaticFuelThreshold,
+    double AutomaticAmmunitionThreshold,
+    EntityId Provider,
+    PlayerSupplyProviderState ProviderState,
+    double ProviderFuel,
+    double ProviderAmmunition,
+    ResupplyProviderRejection ProviderRejections);
+
 public sealed class PlayerActionSnapshot
 {
     private readonly IReadOnlyList<PlayerConstructionActionReadModel> _construction;
@@ -247,7 +336,9 @@ public sealed class PlayerActionSnapshot
         IReadOnlyList<PlayerConstructionActionReadModel> construction,
         int pendingCommandCount,
         PlayerProductionFacilityActionReadModel? production,
-        PlayerUnitProductionFacilityActionReadModel? unitProduction)
+        PlayerUnitProductionFacilityActionReadModel? unitProduction,
+        PlayerLogisticsActionReadModel? logistics = null,
+        PlayerSupplyActionReadModel? supply = null)
     {
         SessionId = sessionId;
         Tick = tick;
@@ -260,6 +351,8 @@ public sealed class PlayerActionSnapshot
         PendingCommandCount = pendingCommandCount;
         Production = production;
         UnitProduction = unitProduction;
+        Logistics = logistics;
+        Supply = supply;
     }
 
     public SimulationSessionId SessionId { get; }
@@ -274,6 +367,10 @@ public sealed class PlayerActionSnapshot
     public PlayerProductionFacilityActionReadModel? Production { get; }
 
     public PlayerUnitProductionFacilityActionReadModel? UnitProduction { get; }
+
+    public PlayerLogisticsActionReadModel? Logistics { get; }
+
+    public PlayerSupplyActionReadModel? Supply { get; }
 }
 
 internal static class PlayerActionSnapshotFactory
@@ -325,13 +422,31 @@ internal static class PlayerActionSnapshotFactory
                     unitFacility)
                 : null;
 
+        PlayerLogisticsActionReadModel? logistics =
+            selectedFacility.IsValid
+                ? CaptureLogistics(
+                    context.Entities,
+                    scenario,
+                    selectedFacility)
+                : null;
+
+        PlayerSupplyActionReadModel? supply =
+            selectedFacility.IsValid
+                ? CaptureSupply(
+                    context.Entities,
+                    scenario,
+                    selectedFacility)
+                : null;
+
         return new PlayerActionSnapshot(
             scenario.Simulation.SessionId,
             context.Tick,
             construction,
             extraction.Commands.PendingCount,
             production,
-            unitProduction);
+            unitProduction,
+            logistics,
+            supply);
     }
 
     private static PlayerConstructionActionReadModel[]
@@ -568,6 +683,453 @@ internal static class PlayerActionSnapshotFactory
             progress,
             units,
             requests);
+    }
+
+    private static PlayerLogisticsActionReadModel? CaptureLogistics(
+        EntityRegistry entities,
+        VerticalSliceScenario scenario,
+        EntityId entity)
+    {
+        bool hasInventory =
+            TryResolveDistributionInventory(
+                entities,
+                entity,
+                out InventoryId inventory);
+
+        PlayerCargoStatusReadModel? cargo = null;
+        if (entities.TryGetComponent(
+                entity,
+                out CargoTransport transport))
+        {
+            CargoTransportRuntimeState state =
+                entities.TryGetComponent(
+                    entity,
+                    out CargoTransportRuntimeState current)
+                    ? current
+                    : CargoTransportRuntimeState.Idle;
+            double quantity =
+                scenario.Inventories.Contains(
+                    transport.CargoInventory)
+                    ? scenario.Inventories.GetTotalQuantity(
+                        transport.CargoInventory)
+                    : 0.0;
+            cargo =
+                new PlayerCargoStatusReadModel(
+                    entity,
+                    state.Lifecycle,
+                    state.WaitReason,
+                    state.FailureReason,
+                    quantity,
+                    transport.Capacity);
+        }
+
+        if (!hasInventory)
+        {
+            return cargo.HasValue
+                ? new PlayerLogisticsActionReadModel(
+                    entity,
+                    [],
+                    cargo)
+                : null;
+        }
+
+        var policies =
+            new List<PlayerStockPolicyActionReadModel>();
+
+        foreach (ResourceDefinition resource in
+                 scenario.Services.Resources.Definitions)
+        {
+            EntityId policyEntity =
+                EntityId.Invalid;
+            LogisticsStockPolicy policy =
+                default;
+            bool hasPolicy = false;
+
+            foreach (EntityId candidate in
+                     entities.Query<LogisticsStockPolicy>(
+                         QueryIterationOrder.StableByEntityIndex))
+            {
+                LogisticsStockPolicy current =
+                    entities.GetComponent<LogisticsStockPolicy>(
+                        candidate);
+
+                if (current.TargetEntity == entity &&
+                    current.ResourceId == resource.Id)
+                {
+                    policyEntity = candidate;
+                    policy = current;
+                    hasPolicy = true;
+                    break;
+                }
+            }
+
+            double currentQuantity =
+                scenario.Inventories.Contains(inventory)
+                    ? scenario.Inventories.GetQuantity(
+                        inventory,
+                        resource.Id)
+                    : 0.0;
+            double target =
+                hasPolicy
+                    ? policy.DesiredTarget
+                    : Math.Max(
+                        10.0,
+                        Math.Ceiling(currentQuantity));
+            double minimum =
+                hasPolicy
+                    ? policy.DesiredMinimum
+                    : Math.Min(
+                        target,
+                        target * 0.5);
+            double maximum =
+                hasPolicy
+                    ? policy.DesiredMaximum
+                    : Math.Max(
+                        target,
+                        target * 2.0);
+
+            ResolveDistributionStatus(
+                scenario,
+                entities,
+                policyEntity,
+                out PlayerDistributionActionState distributionState,
+                out LogisticsTransportRequestFailureReason failure,
+                out LogisticsBottleneckReason bottleneck,
+                out EntityId assignedTruck);
+
+            policies.Add(
+                new PlayerStockPolicyActionReadModel(
+                    policyEntity,
+                    resource.Id,
+                    resource.DisplayName,
+                    currentQuantity,
+                    minimum,
+                    target,
+                    maximum,
+                    hasPolicy
+                        ? policy.Priority
+                        : LogisticsStockPriority.Normal,
+                    !hasPolicy || policy.Enabled,
+                    distributionState,
+                    failure,
+                    bottleneck,
+                    assignedTruck));
+        }
+
+        return new PlayerLogisticsActionReadModel(
+            entity,
+            policies,
+            cargo);
+    }
+
+    private static PlayerSupplyActionReadModel? CaptureSupply(
+        EntityRegistry entities,
+        VerticalSliceScenario scenario,
+        EntityId entity)
+    {
+        bool recipient =
+            entities.HasComponent<UnitFuelState>(entity) ||
+            entities.HasComponent<AmmunitionState>(entity);
+        bool provider =
+            entities.HasComponent<SupplyProvider>(entity) ||
+            entities.HasComponent<SupplyTruck>(entity);
+
+        if (!recipient && !provider)
+        {
+            return null;
+        }
+
+        UnitSupplyState supplyState =
+            entities.TryGetComponent(
+                entity,
+                out UnitSupplyState currentSupply)
+                ? currentSupply
+                : new UnitSupplyState(
+                    1.0,
+                    1.0,
+                    BattlefieldSupplyStatus.Supplied,
+                    scenario.Simulation.CurrentTick);
+
+        AutomaticResupplyPolicy automatic =
+            entities.TryGetComponent(
+                entity,
+                out AutomaticResupplyPolicy currentAutomatic)
+                ? currentAutomatic
+                : new AutomaticResupplyPolicy();
+
+        EntityId selectedProvider =
+            EntityId.Invalid;
+        if (entities.TryGetComponent(
+                entity,
+                out ResupplyOrder order))
+        {
+            selectedProvider =
+                order.Provider;
+        }
+        else if (entities.TryGetComponent(
+                     entity,
+                     out ResupplyPlanningResult planning) &&
+                 planning.SelectedProvider.IsValid)
+        {
+            selectedProvider =
+                planning.SelectedProvider;
+        }
+
+        ResupplyProviderRejection rejections =
+            entities.TryGetComponent(
+                entity,
+                out ResupplyPlanningResult result)
+                ? result.Rejections
+                : ResupplyProviderRejection.None;
+
+        ResolveProviderState(
+            entities,
+            scenario,
+            entity,
+            selectedProvider,
+            out PlayerSupplyProviderState providerState,
+            out double providerFuel,
+            out double providerAmmunition);
+
+        return new PlayerSupplyActionReadModel(
+            entity,
+            supplyState.Status,
+            supplyState.FuelFraction,
+            supplyState.AmmunitionFraction,
+            automatic.Enabled,
+            automatic.FuelThreshold,
+            automatic.AmmunitionThreshold,
+            selectedProvider,
+            providerState,
+            providerFuel,
+            providerAmmunition,
+            rejections);
+    }
+
+    private static bool TryResolveDistributionInventory(
+        EntityRegistry entities,
+        EntityId entity,
+        out InventoryId inventory)
+    {
+        if (entities.TryGetComponent(
+                entity,
+                out ProductionFacility production))
+        {
+            inventory = production.InputInventory;
+            return inventory.IsSpecified;
+        }
+
+        if (entities.TryGetComponent(
+                entity,
+                out UnitProductionFacility unitProduction))
+        {
+            inventory = unitProduction.InputInventory;
+            return inventory.IsSpecified;
+        }
+
+        if (entities.TryGetComponent(
+                entity,
+                out InventoryStorage storage))
+        {
+            inventory = storage.InventoryId;
+            return inventory.IsSpecified;
+        }
+
+        if (entities.TryGetComponent(
+                entity,
+                out LogisticsHub hub))
+        {
+            inventory = hub.InventoryId;
+            return inventory.IsSpecified;
+        }
+
+        if (entities.TryGetComponent(
+                entity,
+                out SupplyDepot depot))
+        {
+            inventory = depot.InventoryId;
+            return inventory.IsSpecified;
+        }
+
+        inventory = InventoryId.None;
+        return false;
+    }
+
+    private static void ResolveDistributionStatus(
+        VerticalSliceScenario scenario,
+        EntityRegistry entities,
+        EntityId policyEntity,
+        out PlayerDistributionActionState state,
+        out LogisticsTransportRequestFailureReason failure,
+        out LogisticsBottleneckReason bottleneck,
+        out EntityId assignedTruck)
+    {
+        state = PlayerDistributionActionState.None;
+        failure = LogisticsTransportRequestFailureReason.None;
+        bottleneck = LogisticsBottleneckReason.None;
+        assignedTruck = EntityId.Invalid;
+
+        if (!policyEntity.IsValid)
+        {
+            return;
+        }
+
+        LogisticsTransportRequestReadModel? best = null;
+        foreach (LogisticsTransportRequestReadModel request in
+                 scenario.AutomatedDistribution.LastDebugSnapshot.Requests)
+        {
+            if (request.PolicyEntity != policyEntity ||
+                (best.HasValue &&
+                 request.RequestId <= best.Value.RequestId))
+            {
+                continue;
+            }
+
+            best = request;
+        }
+
+        if (!best.HasValue)
+        {
+            return;
+        }
+
+        LogisticsTransportRequestReadModel selected =
+            best.Value;
+        failure = selected.FailureReason;
+        bottleneck = selected.BottleneckReason;
+        assignedTruck = selected.AssignedTruck;
+
+        if (selected.AssignedTruck.IsValid &&
+            entities.TryGetComponent(
+                selected.AssignedTruck,
+                out CargoTransportRuntimeState transport))
+        {
+            state =
+                transport.Lifecycle switch
+                {
+                    CargoTransportLifecycleState.Loading =>
+                        PlayerDistributionActionState.Loading,
+                    CargoTransportLifecycleState.ToOrigin or
+                    CargoTransportLifecycleState.ToDestination =>
+                        PlayerDistributionActionState.Traveling,
+                    CargoTransportLifecycleState.Unloading =>
+                        PlayerDistributionActionState.Unloading,
+                    CargoTransportLifecycleState.Waiting =>
+                        PlayerDistributionActionState.Waiting,
+                    CargoTransportLifecycleState.Failed =>
+                        PlayerDistributionActionState.Failed,
+                    _ =>
+                        PlayerDistributionActionState.Assigned
+                };
+            return;
+        }
+
+        state =
+            selected.State switch
+            {
+                LogisticsTransportRequestState.Pending =>
+                    PlayerDistributionActionState.Pending,
+                LogisticsTransportRequestState.Assigned or
+                LogisticsTransportRequestState.InTransit =>
+                    PlayerDistributionActionState.Assigned,
+                LogisticsTransportRequestState.RetryPending =>
+                    PlayerDistributionActionState.Waiting,
+                LogisticsTransportRequestState.Failed =>
+                    PlayerDistributionActionState.Failed,
+                _ =>
+                    PlayerDistributionActionState.None
+            };
+    }
+
+    private static void ResolveProviderState(
+        EntityRegistry entities,
+        VerticalSliceScenario scenario,
+        EntityId recipient,
+        EntityId provider,
+        out PlayerSupplyProviderState state,
+        out double fuel,
+        out double ammunition)
+    {
+        state = PlayerSupplyProviderState.None;
+        fuel = 0.0;
+        ammunition = 0.0;
+
+        if (!provider.IsValid ||
+            !entities.IsAlive(provider))
+        {
+            if (provider.IsValid)
+            {
+                state = PlayerSupplyProviderState.Blocked;
+            }
+
+            return;
+        }
+
+        InventoryId inventory =
+            InventoryId.None;
+        float range = 0.0f;
+
+        if (entities.TryGetComponent(
+                provider,
+                out SupplyProvider staticProvider))
+        {
+            inventory = staticProvider.InventoryId;
+            range = staticProvider.ResupplyRangeMeters;
+        }
+        else if (entities.TryGetComponent(
+                     provider,
+                     out SupplyTruck truck))
+        {
+            inventory = truck.InventoryId;
+            range = truck.ResupplyRangeMeters;
+        }
+
+        if (scenario.Inventories.Contains(inventory))
+        {
+            fuel =
+                scenario.Inventories.GetQuantity(
+                    inventory,
+                    ResourceIds.Fuel);
+            ammunition =
+                scenario.Inventories.GetQuantity(
+                    inventory,
+                    ResourceIds.Ammunition);
+        }
+
+        if (fuel <= 0.0 &&
+            ammunition <= 0.0)
+        {
+            state = PlayerSupplyProviderState.Empty;
+            return;
+        }
+
+        if (entities.TryGetComponent(
+                recipient,
+                out WorldTransform recipientTransform) &&
+            entities.TryGetComponent(
+                provider,
+                out WorldTransform providerTransform) &&
+            range > 0.0f)
+        {
+            float distanceSquared =
+                System.Numerics.Vector3.DistanceSquared(
+                    recipientTransform.Position,
+                    providerTransform.Position);
+
+            if (distanceSquared <=
+                range * range)
+            {
+                state =
+                    PlayerSupplyProviderState.Transferring;
+                return;
+            }
+
+            state =
+                PlayerSupplyProviderState.Traveling;
+            return;
+        }
+
+        state = PlayerSupplyProviderState.Assigned;
     }
 
     private static EntityId ResolveSingleOwnedSelection(

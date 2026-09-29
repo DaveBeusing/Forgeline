@@ -375,6 +375,221 @@ public sealed class PlayerActionPanelTests
             request.BuildingId);
     }
 
+    [Fact]
+    public void LogisticsPaletteEditsThresholdsAndCreatesPolicyRequest()
+    {
+        EntityId target =
+            new(70, 1);
+        EntityId policyEntity =
+            new(71, 1);
+        var logistics =
+            new PlayerLogisticsActionReadModel(
+                target,
+                [
+                    new PlayerStockPolicyActionReadModel(
+                        policyEntity,
+                        ResourceIds.Fuel,
+                        "Fuel",
+                        25.0,
+                        20.0,
+                        40.0,
+                        80.0,
+                        LogisticsStockPriority.Normal,
+                        true,
+                        PlayerDistributionActionState.Waiting,
+                        LogisticsTransportRequestFailureReason.NoTruckAvailable,
+                        LogisticsBottleneckReason.None,
+                        EntityId.Invalid)
+                ],
+                null);
+        PresentationSnapshot snapshot =
+            CreateSnapshot(
+                logistics: logistics);
+        var input = new InputState();
+        var controller =
+            new PlayerActionPanelController();
+
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+        Press(input, PlatformKey.L);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+        Release(input, PlatformKey.L);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        Press(input, PlatformKey.Right);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+        Release(input, PlatformKey.Right);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        Assert.True(
+            controller.CreateView(
+                    1600,
+                    900,
+                    snapshot.PlayerActions)
+                .StockTarget >
+            40.0);
+
+        Press(input, PlatformKey.Enter);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        Assert.True(
+            controller.TryTakeRequest(
+                out PlayerActionRequest request));
+        Assert.Equal(
+            PlayerActionRequestKind.SetStockPolicy,
+            request.Kind);
+        Assert.Equal(target, request.Facility);
+        Assert.Equal(ResourceIds.Fuel, request.StockResourceId);
+        Assert.True(
+            request.StockMinimum <= request.StockTarget);
+        Assert.True(
+            request.StockTarget <= request.StockMaximum);
+
+        Release(input, PlatformKey.Enter);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+        Press(input, PlatformKey.C);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        Assert.True(
+            controller.TryTakeRequest(
+                out PlayerActionRequest remove));
+        Assert.Equal(
+            PlayerActionRequestKind.RemoveStockPolicy,
+            remove.Kind);
+        Assert.Equal(policyEntity, remove.RequestEntity);
+    }
+
+    [Fact]
+    public void SupplyPaletteAdjustsPolicyAndRequestsExplicitResupply()
+    {
+        EntityId unit =
+            new(80, 1);
+        var supply =
+            new PlayerSupplyActionReadModel(
+                unit,
+                BattlefieldSupplyStatus.LowSupply,
+                0.2,
+                0.3,
+                true,
+                0.2,
+                0.2,
+                new EntityId(81, 1),
+                PlayerSupplyProviderState.Traveling,
+                100.0,
+                50.0,
+                ResupplyProviderRejection.None);
+        PresentationSnapshot snapshot =
+            CreateSnapshot(
+                supply: supply);
+        var input = new InputState();
+        var controller =
+            new PlayerActionPanelController();
+
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+        Press(input, PlatformKey.Y);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+        Release(input, PlatformKey.Y);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        Press(input, PlatformKey.Right);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+        Release(input, PlatformKey.Right);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        Press(input, PlatformKey.Enter);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+        Assert.True(
+            controller.TryTakeRequest(
+                out PlayerActionRequest policyRequest));
+        Assert.Equal(
+            PlayerActionRequestKind.SetAutomaticResupplyPolicy,
+            policyRequest.Kind);
+        Assert.True(
+            policyRequest.AutomaticFuelThreshold >
+            0.2);
+
+        Release(input, PlatformKey.Enter);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+        Press(input, PlatformKey.Tab);
+        controller.Update(input, snapshot, 1600, 900);
+        Release(input, PlatformKey.Tab);
+        controller.Update(input, snapshot, 1600, 900);
+        Press(input, PlatformKey.Tab);
+        controller.Update(input, snapshot, 1600, 900);
+        Release(input, PlatformKey.Tab);
+        controller.Update(input, snapshot, 1600, 900);
+
+        Press(input, PlatformKey.Enter);
+        controller.Update(input, snapshot, 1600, 900);
+
+        Assert.True(
+            controller.TryTakeRequest(
+                out PlayerActionRequest resupplyRequest));
+        Assert.Equal(
+            PlayerActionRequestKind.RequestResupply,
+            resupplyRequest.Kind);
+        Assert.Equal(unit, resupplyRequest.Facility);
+    }
+
     private static PlayerConstructionActionReadModel Construction(
         BuildingId buildingId,
         string name) =>
@@ -393,7 +608,9 @@ public sealed class PlayerActionPanelTests
     private static PresentationSnapshot CreateSnapshot(
         IReadOnlyList<PlayerConstructionActionReadModel>? construction = null,
         PlayerProductionFacilityActionReadModel? production = null,
-        PlayerUnitProductionFacilityActionReadModel? unitProduction = null)
+        PlayerUnitProductionFacilityActionReadModel? unitProduction = null,
+        PlayerLogisticsActionReadModel? logistics = null,
+        PlayerSupplyActionReadModel? supply = null)
     {
         var session =
             new SimulationSessionId(101);
@@ -404,7 +621,9 @@ public sealed class PlayerActionPanelTests
                 construction ?? [],
                 0,
                 production,
-                unitProduction);
+                unitProduction,
+                logistics,
+                supply);
 
         return new PresentationSnapshot(
             new SimulationTick(4),

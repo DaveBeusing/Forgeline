@@ -353,6 +353,8 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                         PlayerCommandFeedbackKind.Construction => "BUILD ",
                         PlayerCommandFeedbackKind.Production => "PROCESS ",
                         PlayerCommandFeedbackKind.UnitProduction => "UNITS ",
+                        PlayerCommandFeedbackKind.Logistics => "LOGISTICS ",
+                        PlayerCommandFeedbackKind.Supply => "SUPPLY ",
                         _ => "ACTION "
                     });
 
@@ -379,6 +381,13 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                 else
                 {
                     builder.Append("REJECTED");
+                    if (snapshot.Feedback.ActionFailure !=
+                        PlayerLogisticsActionFailureReason.None)
+                    {
+                        builder.Append(" ");
+                        builder.Append(
+                            snapshot.Feedback.ActionFailure.ToString());
+                    }
                 }
             }
 
@@ -498,7 +507,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         if (!panel.IsOpen)
         {
             EmitText(
-                "B BUILD  P PROCESS  U UNITS".AsSpan(),
+                "B BUILD  P PROCESS  U UNITS  L LOGISTICS  Y SUPPLY".AsSpan(),
                 panel.OriginX,
                 panel.OriginY,
                 new Vector4(0.78f, 0.86f, 0.95f, 1.0f),
@@ -519,6 +528,8 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                 PlayerActionPanelMode.Construction => "BUILD",
                 PlayerActionPanelMode.Production => "PROCESS",
                 PlayerActionPanelMode.UnitProduction => "UNITS",
+                PlayerActionPanelMode.Logistics => "LOGISTICS",
+                PlayerActionPanelMode.Supply => "SUPPLY",
                 _ => "CLOSED"
             });
         builder.NewLine();
@@ -528,8 +539,18 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
 
         builder.Append("PENDING ");
         builder.Append(actions.PendingCommandCount);
-        builder.Append("  PRIORITY ");
-        builder.Append(panel.Priority.ToString());
+        if (panel.Mode == PlayerActionPanelMode.Logistics)
+        {
+            builder.Append("  PRIORITY ");
+            builder.Append(panel.LogisticsPriority.ToString());
+            builder.Append("  EDIT ");
+            builder.Append(panel.StockThresholdField.ToString());
+        }
+        else
+        {
+            builder.Append("  PRIORITY ");
+            builder.Append(panel.Priority.ToString());
+        }
         if (panel.Mode == PlayerActionPanelMode.Production)
         {
             builder.Append("  MODE ");
@@ -568,6 +589,20 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                     ref builder,
                     actions.UnitProduction,
                     panel.SelectedIndex);
+                break;
+
+            case PlayerActionPanelMode.Logistics:
+                EmitLogisticsActions(
+                    ref builder,
+                    actions.Logistics,
+                    panel);
+                break;
+
+            case PlayerActionPanelMode.Supply:
+                EmitSupplyActions(
+                    ref builder,
+                    actions.Supply,
+                    panel);
                 break;
         }
 
@@ -819,6 +854,177 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                 selected.Costs);
             builder.NewLine();
         }
+    }
+
+    private static void EmitLogisticsActions(
+        ref OverlayTextBuilder builder,
+        PlayerLogisticsActionReadModel? logistics,
+        in PlayerActionPanelView panel)
+    {
+        if (logistics is null)
+        {
+            builder.Append("SELECT ONE OWNED LOGISTICS-CAPABLE ENTITY");
+            builder.NewLine();
+            return;
+        }
+
+        if (logistics.Cargo is PlayerCargoStatusReadModel cargo)
+        {
+            builder.Append("CARGO ");
+            builder.Append(cargo.CargoQuantity, "F0");
+            builder.Append("/");
+            builder.Append(cargo.Capacity, "F0");
+            builder.Append(" ");
+            builder.Append(cargo.Lifecycle.ToString());
+            if (cargo.WaitReason != CargoTransportWaitReason.None)
+            {
+                builder.Append(" ");
+                builder.Append(cargo.WaitReason.ToString());
+            }
+
+            builder.NewLine();
+        }
+
+        if (logistics.Policies.Count == 0)
+        {
+            builder.Append("NO STOCK-POLICY TARGET INVENTORY");
+            builder.NewLine();
+            return;
+        }
+
+        builder.Append("MIN ");
+        builder.Append(panel.StockMinimum, "F0");
+        builder.Append(" TARGET ");
+        builder.Append(panel.StockTarget, "F0");
+        builder.Append(" MAX ");
+        builder.Append(panel.StockMaximum, "F0");
+        builder.Append("  M FIELD  LEFT/RIGHT ADJUST");
+        builder.NewLine();
+
+        for (int index = 0;
+             index < logistics.Policies.Count;
+             index++)
+        {
+            PlayerStockPolicyActionReadModel policy =
+                logistics.Policies[index];
+
+            builder.Append(
+                index == panel.SelectedIndex
+                    ? "X "
+                    : "  ");
+            builder.Append(policy.DisplayName);
+            builder.Append(" STOCK ");
+            builder.Append(policy.CurrentQuantity, "F0");
+
+            if (policy.HasPolicy)
+            {
+                builder.Append(" POLICY ");
+                builder.Append(policy.DesiredMinimum, "F0");
+                builder.Append("/");
+                builder.Append(policy.DesiredTarget, "F0");
+                builder.Append("/");
+                builder.Append(policy.DesiredMaximum, "F0");
+            }
+            else
+            {
+                builder.Append(" NO POLICY");
+            }
+
+            if (policy.DistributionState !=
+                PlayerDistributionActionState.None)
+            {
+                builder.Append(" ");
+                builder.Append(policy.DistributionState.ToString());
+            }
+
+            if (policy.FailureReason !=
+                LogisticsTransportRequestFailureReason.None)
+            {
+                builder.Append(" ");
+                builder.Append(policy.FailureReason.ToString());
+            }
+            else if (policy.BottleneckReason !=
+                     LogisticsBottleneckReason.None)
+            {
+                builder.Append(" ");
+                builder.Append(policy.BottleneckReason.ToString());
+            }
+
+            builder.NewLine();
+        }
+    }
+
+    private static void EmitSupplyActions(
+        ref OverlayTextBuilder builder,
+        PlayerSupplyActionReadModel? supply,
+        in PlayerActionPanelView panel)
+    {
+        if (!supply.HasValue)
+        {
+            builder.Append("SELECT ONE OWNED SUPPLY UNIT OR PROVIDER");
+            builder.NewLine();
+            return;
+        }
+
+        PlayerSupplyActionReadModel value =
+            supply.Value;
+
+        builder.Append("STATUS ");
+        builder.Append(value.Status.ToString());
+        builder.Append(" FUEL ");
+        builder.Append(value.FuelFraction * 100.0, "F0");
+        builder.Append("% AMMO ");
+        builder.Append(value.AmmunitionFraction * 100.0, "F0");
+        builder.Append("%");
+        builder.NewLine();
+
+        builder.Append("AUTO ");
+        builder.Append(
+            panel.AutomaticResupplyEnabled
+                ? "ON"
+                : "OFF");
+        builder.Append(" PROVIDER ");
+        builder.Append(value.ProviderState.ToString());
+        if (value.ProviderRejections !=
+            ResupplyProviderRejection.None)
+        {
+            builder.Append(" ");
+            builder.Append(
+                value.ProviderRejections.ToString());
+        }
+
+        builder.NewLine();
+
+        builder.Append(
+            panel.SelectedIndex == 0
+                ? "X "
+                : "  ");
+        builder.Append("FUEL THRESHOLD ");
+        builder.Append(
+            panel.AutomaticFuelThreshold * 100.0,
+            "F0");
+        builder.Append("%");
+        builder.NewLine();
+
+        builder.Append(
+            panel.SelectedIndex == 1
+                ? "X "
+                : "  ");
+        builder.Append("AMMO THRESHOLD ");
+        builder.Append(
+            panel.AutomaticAmmunitionThreshold * 100.0,
+            "F0");
+        builder.Append("%");
+        builder.NewLine();
+
+        builder.Append(
+            panel.SelectedIndex == 2
+                ? "X "
+                : "  ");
+        builder.Append("REQUEST RESUPPLY");
+        builder.NewLine();
+        builder.Append("M TOGGLE AUTO  LEFT/RIGHT ADJUST");
+        builder.NewLine();
     }
 
     private static void AppendAmounts(

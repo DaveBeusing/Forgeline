@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Ecs;
@@ -195,6 +196,226 @@ public sealed class PlayerConstructionProductionFlowTests
             1);
     }
 
+    [Fact]
+    public void PlayerPoliciesPhysicallyDeliverForwardSupplyAndRecoverUnit()
+    {
+        using VerticalSliceScenario scenario =
+            CreateScenario(4113);
+        var gateway =
+            new PlayerCommandGateway(
+                scenario.Simulation,
+                scenario.Services.BuildingCommands,
+                scenario.BattlefieldRuntime.MatchStateEntity);
+        scenario.Simulation.RegisterTickObserver(gateway);
+
+        foreach (BuildingId buildingId in
+                 new[]
+                 {
+                     BuildingIds.PowerPlant,
+                     BuildingIds.SupplyDepot
+                 })
+        {
+            PlayerCommandSubmissionReceipt receipt =
+                gateway.SubmitBuild(
+                    scenario.West.Player,
+                    buildingId,
+                    FindOpenPlacement(
+                        scenario,
+                        buildingId),
+                    BuildingOrientation.North,
+                    scenario.West.CommandCore,
+                    scenario.Simulation.CurrentTick);
+
+            Assert.True(receipt.Accepted);
+            scenario.Simulation.AdvanceOneTick();
+            Assert.True(
+                gateway.Results.TryRead(
+                    out PlayerCommandResultReadModel result));
+            Assert.Equal(
+                PlayerCommandFeedbackState.Accepted,
+                result.State);
+        }
+
+        uint constructionTicks =
+            Math.Max(
+                scenario.Services.BuildingDefinitions[
+                    BuildingIds.PowerPlant].ConstructionTicks,
+                scenario.Services.BuildingDefinitions[
+                    BuildingIds.SupplyDepot].ConstructionTicks);
+
+        scenario.Simulation.RunTicks(
+            constructionTicks + 4,
+            TestContext.Current.CancellationToken);
+
+        EntityId supplyDepot =
+            FindCompletedBuilding(
+                scenario,
+                BuildingIds.SupplyDepot);
+        InventoryStorage depotStorage =
+            scenario.Simulation.Entities
+                .GetComponent<InventoryStorage>(
+                    supplyDepot);
+
+        double sourceFuelBefore =
+            scenario.Inventories.GetQuantity(
+                scenario.West.StartingInventory,
+                ResourceIds.Fuel);
+        double sourceAmmoBefore =
+            scenario.Inventories.GetQuantity(
+                scenario.West.StartingInventory,
+                ResourceIds.Ammunition);
+
+        foreach ((ResourceId Resource, double Minimum, double Target, double Maximum)
+                 policy in
+                 new[]
+                 {
+                     (ResourceIds.Fuel, 20.0, 60.0, 100.0),
+                     (ResourceIds.Ammunition, 20.0, 60.0, 100.0)
+                 })
+        {
+            PlayerCommandSubmissionReceipt receipt =
+                gateway.SubmitLogisticsStockPolicy(
+                    scenario.West.Player,
+                    supplyDepot,
+                    policy.Resource,
+                    policy.Minimum,
+                    policy.Target,
+                    policy.Maximum,
+                    LogisticsStockPriority.Critical,
+                    enabled: true,
+                    scenario.Simulation.CurrentTick);
+
+            Assert.True(receipt.Accepted);
+            scenario.Simulation.AdvanceOneTick();
+            Assert.True(
+                gateway.Results.TryRead(
+                    out PlayerCommandResultReadModel result));
+            Assert.Equal(
+                PlayerCommandFeedbackState.Accepted,
+                result.State);
+        }
+
+        RunUntil(
+            scenario,
+            () =>
+                scenario.Inventories.GetQuantity(
+                    depotStorage.InventoryId,
+                    ResourceIds.Fuel) >= 60.0 &&
+                scenario.Inventories.GetQuantity(
+                    depotStorage.InventoryId,
+                    ResourceIds.Ammunition) >= 60.0,
+            maximumTicks: 4_000);
+
+        Assert.True(
+            scenario.AutomatedDistribution.Metrics
+                .CompletedRequestCount > 0);
+        Assert.True(
+            scenario.Inventories.GetQuantity(
+                scenario.West.StartingInventory,
+                ResourceIds.Fuel) <
+            sourceFuelBefore);
+        Assert.True(
+            scenario.Inventories.GetQuantity(
+                scenario.West.StartingInventory,
+                ResourceIds.Ammunition) <
+            sourceAmmoBefore);
+
+        SupplyProvider coreProvider =
+            scenario.Simulation.Entities
+                .GetComponent<SupplyProvider>(
+                    scenario.West.CommandCore);
+        scenario.Simulation.Entities.SetComponent(
+            scenario.West.CommandCore,
+            new SupplyProvider(
+                coreProvider.InventoryId,
+                coreProvider.Owner,
+                coreProvider.ResupplyRangeMeters,
+                enabled: false));
+
+        EntityId recipient =
+            scenario.West.StartingUnits[0];
+        UnitFuelState fuelState =
+            scenario.Simulation.Entities
+                .GetComponent<UnitFuelState>(
+                    recipient);
+        AmmunitionState ammunitionState =
+            scenario.Simulation.Entities
+                .GetComponent<AmmunitionState>(
+                    recipient);
+
+        double initialFuel =
+            scenario.Inventories.GetQuantity(
+                fuelState.InventoryId,
+                ResourceIds.Fuel);
+        double retainedFuel =
+            Math.Max(
+                5.0,
+                initialFuel * 0.35);
+        Assert.True(
+            scenario.Inventories.Remove(
+                fuelState.InventoryId,
+                ResourceIds.Fuel,
+                initialFuel - retainedFuel).Succeeded);
+
+        double initialAmmo =
+            scenario.Inventories.GetQuantity(
+                ammunitionState.InventoryId,
+                ResourceIds.Ammunition);
+        Assert.True(
+            scenario.Inventories.Remove(
+                ammunitionState.InventoryId,
+                ResourceIds.Ammunition,
+                initialAmmo).Succeeded);
+
+        PlayerCommandSubmissionReceipt resupply =
+            gateway.SubmitResupply(
+                scenario.West.Player,
+                recipient,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(resupply.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel resupplyResult));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            resupplyResult.State);
+
+        Assert.True(
+            scenario.Simulation.Entities.TryGetComponent(
+                recipient,
+                out ResupplyOrder order));
+        Assert.Equal(
+            supplyDepot,
+            order.Provider);
+
+        double fuelBeforeRecovery =
+            scenario.Inventories.GetQuantity(
+                fuelState.InventoryId,
+                ResourceIds.Fuel);
+
+        RunUntil(
+            scenario,
+            () =>
+                scenario.Inventories.GetQuantity(
+                    fuelState.InventoryId,
+                    ResourceIds.Fuel) >
+                    fuelBeforeRecovery &&
+                scenario.Inventories.GetQuantity(
+                    ammunitionState.InventoryId,
+                    ResourceIds.Ammunition) >
+                    0.0,
+            maximumTicks: 3_000);
+
+        Assert.True(
+            scenario.BattlefieldSupply.Metrics
+                .TotalFuelTransferred > 0.0);
+        Assert.True(
+            scenario.BattlefieldSupply.Metrics
+                .TotalAmmunitionTransferred > 0.0);
+    }
+
     private static void QueueUnit(
         VerticalSliceScenario scenario,
         PlayerCommandGateway gateway,
@@ -370,6 +591,22 @@ public sealed class PlayerConstructionProductionFlowTests
         }
 
         return count;
+    }
+
+    private static void RunUntil(
+        VerticalSliceScenario scenario,
+        Func<bool> condition,
+        int maximumTicks)
+    {
+        for (int tick = 0;
+             tick < maximumTicks &&
+             !condition();
+             tick++)
+        {
+            scenario.Simulation.AdvanceOneTick();
+        }
+
+        Assert.True(condition());
     }
 
     private static VerticalSliceScenario CreateScenario(

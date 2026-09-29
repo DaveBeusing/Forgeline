@@ -192,3 +192,17 @@ Artillery uses the existing `AmmunitionState` inventory and is therefore a norma
 `ResupplyCommand` uses that same planner, keeping manual and tactical provider-selection semantics consistent. Actual quantities remain transferred only by `BattlefieldSupplySystem`. Tactical combat yields to an active resupply order, and stored AttackMove/Retreat intent can continue after supply completion.
 
 See [Combat Orders, Tactical Behavior, and Readiness](CombatOrdersAndReadiness.md).
+
+## Human Player Supply Controls
+
+The shared action surface exposes battlefield supply for one selected owned supply-capable unit.
+
+- `Y` opens the supply view.
+- `Tab` selects automatic Fuel threshold, automatic Ammunition threshold, or explicit Resupply.
+- Left / Right changes the selected automatic threshold in bounded steps.
+- `M` toggles automatic resupply and submits the policy through the player command boundary.
+- `Enter` applies the edited automatic policy on a threshold row or submits the existing explicit `ResupplyCommand` on the Resupply row.
+
+The read model reports current supply state, Fuel/Ammunition fractions, selected provider, provider stock, provider state, and `ResupplyProviderRejection` flags. Provider states are descriptive only: Assigned/Traveling does not promise successful transfer. Empty or destroyed providers, route retry, provider Fuel infeasibility, busy providers, and unavailable stock remain normal authoritative outcomes.
+
+Actual Fuel and Ammunition move only in `BattlefieldSupplySystem` at legitimate transfer range. Automatic and explicit requests use the same `BattlefieldResupplyPlanner`; the player surface does not create a second rescue or transfer implementation.

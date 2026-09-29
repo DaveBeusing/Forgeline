@@ -380,6 +380,172 @@ public sealed class PlayerCommandBoundaryTests
         Assert.Equal(0, result.RejectedTargets);
     }
 
+    [Fact]
+    public void LogisticsStockPolicySubmissionEnforcesOwnershipAndThresholds()
+    {
+        using VerticalSliceScenario scenario =
+            CreateHumanScenario(seed: 4111);
+        PlayerCommandGateway gateway =
+            CreateGateway(scenario);
+
+        PlayerCommandSubmissionReceipt owned =
+            gateway.SubmitLogisticsStockPolicy(
+                scenario.West.Player,
+                scenario.West.CommandCore,
+                ResourceIds.Fuel,
+                50.0,
+                100.0,
+                150.0,
+                LogisticsStockPriority.High,
+                enabled: true,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(owned.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel ownedResult));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            ownedResult.State);
+
+        var matchingPolicies =
+            new List<LogisticsStockPolicy>();
+        foreach (EntityId entity in
+                 scenario.Simulation.Entities.Query<LogisticsStockPolicy>())
+        {
+            LogisticsStockPolicy candidate =
+                scenario.Simulation.Entities
+                    .GetComponent<LogisticsStockPolicy>(
+                        entity);
+
+            if (candidate.TargetEntity ==
+                    scenario.West.CommandCore &&
+                candidate.ResourceId ==
+                    ResourceIds.Fuel)
+            {
+                matchingPolicies.Add(candidate);
+            }
+        }
+
+        LogisticsStockPolicy policy =
+            Assert.Single(matchingPolicies);
+        Assert.Equal(100.0, policy.DesiredTarget);
+
+        PlayerCommandSubmissionReceipt foreign =
+            gateway.SubmitLogisticsStockPolicy(
+                scenario.West.Player,
+                scenario.East.CommandCore,
+                ResourceIds.Fuel,
+                10.0,
+                20.0,
+                30.0,
+                LogisticsStockPriority.Normal,
+                enabled: true,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(foreign.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel foreignResult));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Rejected,
+            foreignResult.State);
+        Assert.Equal(
+            PlayerLogisticsActionFailureReason.ForeignOwnership,
+            foreignResult.ActionFailure);
+
+        PlayerCommandSubmissionReceipt invalid =
+            gateway.SubmitLogisticsStockPolicy(
+                scenario.West.Player,
+                scenario.West.CommandCore,
+                ResourceIds.Ammunition,
+                30.0,
+                20.0,
+                40.0,
+                LogisticsStockPriority.Normal,
+                enabled: true,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(invalid.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel invalidResult));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Rejected,
+            invalidResult.State);
+        Assert.Equal(
+            PlayerLogisticsActionFailureReason.InvalidThresholds,
+            invalidResult.ActionFailure);
+
+        PlayerCommandSubmissionReceipt nonFinite =
+            gateway.SubmitLogisticsStockPolicy(
+                scenario.West.Player,
+                scenario.West.CommandCore,
+                ResourceIds.Electronics,
+                double.NaN,
+                20.0,
+                40.0,
+                LogisticsStockPriority.Normal,
+                enabled: true,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(nonFinite.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel nonFiniteResult));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Rejected,
+            nonFiniteResult.State);
+        Assert.Equal(
+            PlayerLogisticsActionFailureReason.InvalidThresholds,
+            nonFiniteResult.ActionFailure);
+    }
+
+    [Fact]
+    public void AutomaticResupplyPolicySubmissionUpdatesOwnedUnit()
+    {
+        using VerticalSliceScenario scenario =
+            CreateHumanScenario(seed: 4112);
+        PlayerCommandGateway gateway =
+            CreateGateway(scenario);
+        EntityId unit =
+            scenario.West.StartingUnits[0];
+
+        PlayerCommandSubmissionReceipt receipt =
+            gateway.SubmitAutomaticResupplyPolicy(
+                scenario.West.Player,
+                unit,
+                ammunitionThreshold: 0.35,
+                fuelThreshold: 0.4,
+                enabled: false,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(receipt.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel result));
+        Assert.Equal(
+            PlayerCommandKind.Supply,
+            result.Kind);
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            result.State);
+
+        AutomaticResupplyPolicy policy =
+            scenario.Simulation.Entities
+                .GetComponent<AutomaticResupplyPolicy>(
+                    unit);
+        Assert.Equal(0.35, policy.AmmunitionThreshold);
+        Assert.Equal(0.4, policy.FuelThreshold);
+        Assert.False(policy.Enabled);
+    }
+
     private static VerticalSliceScenario CreateHumanScenario(
         ulong seed)
     {
