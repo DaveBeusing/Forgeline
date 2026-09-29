@@ -38,10 +38,17 @@ Simulation owns the observer hook but has no dependency on `ForgeLine.Presentati
 
 A snapshot contains:
 
+- a unique simulation-session identifier;
 - completed simulation tick;
 - configured simulation tick duration;
 - simulation entity count at extraction time;
-- ordered render instances.
+- ordered render instances;
+- faction-filtered intelligence;
+- the local player-experience/HUD read model;
+- the latest placement-preview result, identified by request ID and completed tick;
+- lightweight construction presentation state;
+- copied simulation diagnostics;
+- copied world-debug state only while debug capture is enabled.
 
 A `RenderInstance` contains:
 
@@ -65,6 +72,28 @@ Publishing uses `Interlocked.Exchange`; readers use `Volatile.Read`. The rendere
 If rendering is slower than simulation, intermediate snapshots may be skipped. This is intentional: the renderer needs the newest complete presentation state, not every historical frame.
 
 If rendering is faster than simulation, `RenderWorld` retains the previous and current complete snapshots for interpolation.
+
+The latest-value buffer is deliberately **not** used for essential command-result delivery. Accepted/rejected player-command results are published through a separate bounded consumptive `PlayerCommandResultBuffer`. Snapshot replacement can therefore skip intermediate visual/HUD states without silently discarding an unconsumed command result. The command gateway caps total pending plus published results; when the boundary is full, new submissions fail explicitly with `BoundaryFull` rather than growing an unbounded history or overwriting old results.
+
+## Session and Command Boundaries
+
+Every `SimulationCoordinator` allocates a `SimulationSessionId`. All extracted player-facing state and every copied player-command result carry that session identity. A restarted match creates a fresh coordinator and therefore a fresh session ID.
+
+`RenderWorld` never interpolates across different sessions. When it observes a new session, the previous interpolation snapshot is discarded. Selection controllers likewise clear selection, hover state, pending movement requests, and in-progress selection gestures when the session changes. Old entity indices or generations therefore cannot revive a prior-session selection.
+
+Player actions enter simulation through `PlayerCommandGateway`. Each accepted submission records:
+
+- session ID;
+- correlation ID;
+- command kind;
+- command source;
+- player-observed completed tick;
+- scheduled target tick;
+- simulation command sequence.
+
+The gateway retains command objects only on the simulation/host side while they execute. Presentation receives copied `PlayerCommandResultReadModel` values containing the correlation, outcome, rejection details, and resolved tick. Construction commands carry the same correlation through `BuildingCommandProcessingSystem` so authoritative revalidation results are matched to the original player request without polling the mutable command object.
+
+The current client still advances simulation serially on its host loop. This change does not introduce a simulation worker thread or claim that `SimulationCoordinator.SubmitCommand` is generally safe for arbitrary concurrent callers. The snapshot buffer, presentation-interaction state, and result buffer have explicit handoff synchronization so they are suitable boundary primitives for a later independent-execution change.
 
 ## Interpolation
 
@@ -140,6 +169,14 @@ The Windows client uses:
 
 - **F1** — toggle the development metrics overlay;
 - **F2** — toggle world debug visualization, including terrain chunk debug state, entity bounds, ground-movement velocity vectors, targets, and local steering neighborhoods.
+
+## Simulation-Owned Debug Extraction
+
+F2 remains a presentation request, but the client no longer polls mutable gameplay-system debug state during rendering. `PresentationInteractionState` publishes whether debug data is requested and the current presentation-plane height. At the completed-tick observer boundary, `PresentationExtractor` enables the existing opt-in diagnostic capture and copies the resulting movement, formation, navigation, spatial, construction, extraction, logistics, supply, combat, artillery, readiness, intelligence, opponent, and strategic-infrastructure read models into the same session/tick envelope.
+
+Disabled debug capture publishes `Debug = null` and avoids constructing that heavyweight aggregate. Construction state remains available independently when active because the normal placement/construction feedback needs it even with F2 off.
+
+Because the debug request is consumed at a completed-tick boundary, changing F2 can take one simulation tick before all underlying opt-in systems reflect the new capture state. Debug data is observational and never feeds simulation decisions.
 
 ## Development Overlay
 
