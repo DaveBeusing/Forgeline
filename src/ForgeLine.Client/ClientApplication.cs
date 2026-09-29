@@ -104,7 +104,13 @@ internal sealed class ClientApplication
             new PlayerCommandGateway(
                 simulation,
                 scenario.Services.BuildingCommands,
-                scenario.BattlefieldRuntime.MatchStateEntity);
+                scenario.BattlefieldRuntime.MatchStateEntity,
+                intelligence:
+                    scenario.Intelligence,
+                weapons:
+                    scenario.Services.Weapons,
+                artilleryWeapons:
+                    scenario.Services.ArtilleryWeapons);
         var presentationExtraction =
             new PresentationExtractionContext(
                 scenario,
@@ -160,6 +166,8 @@ internal sealed class ClientApplication
             new RtsBuildingPlacementController(LocalPlayer);
         var actionPanel =
             new PlayerActionPanelController();
+        var tacticalTargetingController =
+            new RtsTacticalTargetingController();
         var debugDraw = new DebugDraw();
         var frameTimingTracker = new FrameTimingTracker();
 
@@ -291,6 +299,7 @@ internal sealed class ClientApplication
             if (inputMatchTerminal)
             {
                 actionPanel.Close();
+                tacticalTargetingController.Cancel();
             }
             else
             {
@@ -300,11 +309,15 @@ internal sealed class ClientApplication
                     window.ClientSize.Width,
                     window.ClientSize.Height);
 
-                if (actionPanel.HasKeyboardFocus &&
-                    buildingPlacementController.IsActive)
+                if (actionPanel.HasKeyboardFocus)
                 {
-                    buildingPlacementController.Cancel(
-                        presentationInteraction);
+                    tacticalTargetingController.Cancel();
+
+                    if (buildingPlacementController.IsActive)
+                    {
+                        buildingPlacementController.Cancel(
+                            presentationInteraction);
+                    }
                 }
 
                 if (actionPanel.TryTakeRequest(
@@ -314,6 +327,8 @@ internal sealed class ClientApplication
                         actionRequest,
                         commandGateway,
                         buildingPlacementController,
+                        tacticalTargetingController,
+                        presentationInteraction,
                         inputSnapshot?.Tick ??
                             SimulationTick.Zero,
                         ref lastCommandReceipt);
@@ -409,7 +424,33 @@ internal sealed class ClientApplication
 
             if (gameplayActive)
             {
-                buildingPlacementController.Update(
+                tacticalTargetingController.Update(
+                    inputState,
+                    camera,
+                    terrainWorld,
+                    currentSnapshot,
+                    window.ClientSize.Width,
+                    window.ClientSize.Height,
+                    activeFormation,
+                    actionPanel.PointerCaptured);
+
+                if (tacticalTargetingController.TryTakeRequest(
+                        out PlayerActionRequest tacticalRequest))
+                {
+                    DispatchPlayerActionRequest(
+                        tacticalRequest,
+                        commandGateway,
+                        buildingPlacementController,
+                        tacticalTargetingController,
+                        presentationInteraction,
+                        currentSnapshot?.Tick ??
+                            SimulationTick.Zero,
+                        ref lastCommandReceipt);
+                }
+
+                if (!tacticalTargetingController.IsActive)
+                {
+                    buildingPlacementController.Update(
                     inputState,
                     camera,
                     terrainWorld,
@@ -418,6 +459,7 @@ internal sealed class ClientApplication
                     window.ClientSize.Width,
                     window.ClientSize.Height,
                     actionPanel.PointerCaptured);
+                }
 
                 if (!buildingPlacementController.IsActive)
                 {
@@ -429,7 +471,8 @@ internal sealed class ClientApplication
                         window.ClientSize.Width,
                         window.ClientSize.Height,
                         renderAlpha,
-                        actionPanel.PointerCaptured);
+                        actionPanel.PointerCaptured ||
+                        tacticalTargetingController.PointerCaptured);
 
                     if (selectionController.TryTakeMovementRequest(
                             out MovementOrderRequest movementRequest))
@@ -536,7 +579,12 @@ internal sealed class ClientApplication
                             actionPanel.CreateView(
                                 window.ClientSize.Width,
                                 window.ClientSize.Height,
-                                currentSnapshot?.PlayerActions));
+                                currentSnapshot?.PlayerActions),
+                        tacticalTargeting:
+                            tacticalTargetingController.CreateView(
+                                currentSnapshot),
+                        activeFormation:
+                            activeFormation);
                 });
 
             long renderFinishedAt = _platform.Clock.GetTimestamp();
@@ -589,6 +637,8 @@ internal sealed class ClientApplication
         in PlayerActionRequest request,
         PlayerCommandGateway commandGateway,
         RtsBuildingPlacementController buildingPlacementController,
+        RtsTacticalTargetingController tacticalTargetingController,
+        PresentationInteractionState presentationInteraction,
         SimulationTick observedTick,
         ref PlayerCommandSubmissionReceipt? lastCommandReceipt)
     {
@@ -685,6 +735,94 @@ internal sealed class ClientApplication
                     commandGateway.SubmitResupply(
                         LocalPlayer,
                         request.Facility,
+                        observedTick);
+                break;
+
+            case PlayerActionRequestKind.BeginAttackTargeting:
+            case PlayerActionRequestKind.BeginAttackMoveTargeting:
+            case PlayerActionRequestKind.BeginRetreatTargeting:
+            case PlayerActionRequestKind.BeginFireMissionTargeting:
+                if (buildingPlacementController.IsActive)
+                {
+                    buildingPlacementController.Cancel(
+                        presentationInteraction);
+                }
+
+                tacticalTargetingController.Begin(
+                    request,
+                    commandGateway.SessionId);
+                break;
+
+            case PlayerActionRequestKind.SubmitStopCombat:
+                lastCommandReceipt =
+                    commandGateway.SubmitStopCombat(
+                        LocalPlayer,
+                        request.TacticalEntities ?? [],
+                        observedTick);
+                break;
+
+            case PlayerActionRequestKind.SubmitHoldPosition:
+                lastCommandReceipt =
+                    commandGateway.SubmitHoldPosition(
+                        LocalPlayer,
+                        request.TacticalEntities ?? [],
+                        observedTick);
+                break;
+
+            case PlayerActionRequestKind.CancelFireMission:
+                lastCommandReceipt =
+                    commandGateway.SubmitCancelFireMission(
+                        LocalPlayer,
+                        request.TacticalEntities ?? [],
+                        observedTick);
+                break;
+
+            case PlayerActionRequestKind.SubmitAttack:
+                lastCommandReceipt =
+                    commandGateway.SubmitAttack(
+                        LocalPlayer,
+                        request.TacticalEntities ?? [],
+                        request.TacticalTarget,
+                        observedTick);
+                break;
+
+            case PlayerActionRequestKind.SubmitAttackMove:
+                lastCommandReceipt =
+                    commandGateway.SubmitAttackMove(
+                        LocalPlayer,
+                        request.TacticalEntities ?? [],
+                        request.TacticalWorldTarget,
+                        observedTick,
+                        request.TacticalFormation);
+                break;
+
+            case PlayerActionRequestKind.SubmitRetreat:
+                lastCommandReceipt =
+                    commandGateway.SubmitRetreat(
+                        LocalPlayer,
+                        request.TacticalEntities ?? [],
+                        request.TacticalWorldTarget,
+                        observedTick,
+                        request.TacticalFormation);
+                break;
+
+            case PlayerActionRequestKind.SubmitFireMissionCoordinate:
+                lastCommandReceipt =
+                    commandGateway.SubmitFireMission(
+                        LocalPlayer,
+                        request.TacticalEntities ?? [],
+                        request.TacticalWorldTarget,
+                        request.TacticalRounds,
+                        observedTick);
+                break;
+
+            case PlayerActionRequestKind.SubmitFireMissionContact:
+                lastCommandReceipt =
+                    commandGateway.SubmitFireMission(
+                        LocalPlayer,
+                        request.TacticalEntities ?? [],
+                        request.TacticalContactKey,
+                        request.TacticalRounds,
                         observedTick);
                 break;
         }
