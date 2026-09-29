@@ -13,6 +13,8 @@ public sealed class VerticalSliceRuntimeServices
         BuildingDefinitionCatalog buildingDefinitions,
         UnitDefinitionCatalog unitDefinitions,
         ProductionRecipeCatalog productionRecipes,
+        WeaponCatalog weapons,
+        ArtilleryWeaponCatalog artilleryWeapons,
         SpatialGridIndex spatialIndex,
         BuildingPlacementService buildingPlacement,
         BuildingCommandProcessingSystem buildingCommands,
@@ -32,6 +34,8 @@ public sealed class VerticalSliceRuntimeServices
         BuildingDefinitions = buildingDefinitions;
         UnitDefinitions = unitDefinitions;
         ProductionRecipes = productionRecipes;
+        Weapons = weapons;
+        ArtilleryWeapons = artilleryWeapons;
         SpatialIndex = spatialIndex;
         BuildingPlacement = buildingPlacement;
         BuildingCommands = buildingCommands;
@@ -55,6 +59,10 @@ public sealed class VerticalSliceRuntimeServices
     public UnitDefinitionCatalog UnitDefinitions { get; }
 
     public ProductionRecipeCatalog ProductionRecipes { get; }
+
+    public WeaponCatalog Weapons { get; }
+
+    public ArtilleryWeaponCatalog ArtilleryWeapons { get; }
 
     public SpatialGridIndex SpatialIndex { get; }
 
