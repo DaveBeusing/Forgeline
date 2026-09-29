@@ -879,6 +879,232 @@ public sealed class PlayerCommandBoundaryTests
     }
 
     [Fact]
+    public void TacticalAttackRejectsDetectedDeadAndIncompatibleTargets()
+    {
+        using VerticalSliceScenario scenario =
+            CreateHumanScenario(seed: 4120);
+        PlayerCommandGateway gateway =
+            CreateGateway(scenario);
+        EntityId attacker =
+            scenario.West.StartingUnits[0];
+        EntityId target =
+            scenario.East.StartingUnits[0];
+        FactionId faction =
+            new((uint)scenario.West.Player.Value);
+        IntelligenceSignature targetSignature =
+            scenario.Simulation.Entities
+                .GetComponent<IntelligenceSignature>(
+                    target);
+        WorldTransform targetTransform =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    target);
+
+        scenario.Intelligence.BeginTick(
+            scenario.Simulation.CurrentTick);
+        scenario.Intelligence.Observe(
+            faction,
+            target,
+            targetSignature,
+            targetTransform.Position,
+            IntelligenceState.Detected,
+            scenario.Simulation.CurrentTick);
+
+        Assert.True(
+            gateway.SubmitAttack(
+                scenario.West.Player,
+                [attacker],
+                target,
+                scenario.Simulation.CurrentTick).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel detected));
+        Assert.Equal(
+            PlayerTacticalActionFailureReason.TargetNotIdentified,
+            detected.TacticalFailure);
+
+        IntelligenceSignature coreSignature =
+            scenario.Simulation.Entities
+                .GetComponent<IntelligenceSignature>(
+                    scenario.East.CommandCore);
+        WorldTransform coreTransform =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    scenario.East.CommandCore);
+        scenario.Intelligence.BeginTick(
+            scenario.Simulation.CurrentTick);
+        scenario.Intelligence.Observe(
+            faction,
+            scenario.East.CommandCore,
+            coreSignature,
+            coreTransform.Position,
+            IntelligenceState.Identified,
+            scenario.Simulation.CurrentTick);
+
+        Assert.True(
+            gateway.SubmitAttack(
+                scenario.West.Player,
+                [attacker],
+                scenario.East.CommandCore,
+                scenario.Simulation.CurrentTick).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel incompatible));
+        Assert.Equal(
+            PlayerTacticalActionFailureReason.UnsupportedTargetClass,
+            incompatible.TacticalFailure);
+
+        scenario.Intelligence.BeginTick(
+            scenario.Simulation.CurrentTick);
+        scenario.Intelligence.Observe(
+            faction,
+            target,
+            targetSignature,
+            targetTransform.Position,
+            IntelligenceState.Identified,
+            scenario.Simulation.CurrentTick);
+        Assert.True(
+            scenario.Simulation.Entities.DestroyEntity(
+                target));
+
+        Assert.True(
+            gateway.SubmitAttack(
+                scenario.West.Player,
+                [attacker],
+                target,
+                scenario.Simulation.CurrentTick).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel dead));
+        Assert.Equal(
+            PlayerTacticalActionFailureReason.TargetUnavailable,
+            dead.TacticalFailure);
+    }
+
+    [Fact]
+    public void PlayerArtilleryReportsRangeAndUsesNormalNoAmmoState()
+    {
+        using VerticalSliceScenario scenario =
+            CreateHumanScenario(seed: 4121);
+        PlayerCommandGateway gateway =
+            CreateGateway(scenario);
+        WorldTransform westCore =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    scenario.West.CommandCore);
+        Vector3 artilleryPosition =
+            westCore.Position +
+            new Vector3(40.0f, 0.0f, 0.0f);
+
+        Assert.True(
+            scenario.Terrain.TrySampleHeight(
+                artilleryPosition.X,
+                artilleryPosition.Z,
+                out float height));
+        artilleryPosition.Y = height + 1.4f;
+
+        EntityId artillery =
+            scenario.UnitFactory.Create(
+                scenario.Services.UnitDefinitions[
+                    UnitIds.MobileArtillery],
+                artilleryPosition,
+                scenario.West.Player);
+        EntityId contactEntity =
+            scenario.East.StartingUnits[0];
+        IntelligenceSignature signature =
+            scenario.Simulation.Entities
+                .GetComponent<IntelligenceSignature>(
+                    contactEntity);
+        FactionId faction =
+            new((uint)scenario.West.Player.Value);
+        IntelligenceContactKey key =
+            IntelligenceContactKey.FromEntity(
+                contactEntity);
+
+        scenario.Intelligence.BeginTick(
+            scenario.Simulation.CurrentTick);
+        scenario.Intelligence.Observe(
+            faction,
+            contactEntity,
+            signature,
+            artilleryPosition +
+                new Vector3(900.0f, 0.0f, 0.0f),
+            IntelligenceState.Detected,
+            scenario.Simulation.CurrentTick);
+
+        Assert.True(
+            gateway.SubmitFireMission(
+                scenario.West.Player,
+                [artillery],
+                key,
+                requestedRounds: 1,
+                scenario.Simulation.CurrentTick).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel outOfRange));
+        Assert.Equal(
+            PlayerTacticalActionFailureReason.ArtilleryOutOfRange,
+            outOfRange.TacticalFailure);
+
+        scenario.Intelligence.BeginTick(
+            scenario.Simulation.CurrentTick);
+        scenario.Intelligence.Observe(
+            faction,
+            contactEntity,
+            signature,
+            artilleryPosition +
+                new Vector3(180.0f, 0.0f, 0.0f),
+            IntelligenceState.Detected,
+            scenario.Simulation.CurrentTick);
+
+        AmmunitionState ammunition =
+            scenario.Simulation.Entities
+                .GetComponent<AmmunitionState>(
+                    artillery);
+        double quantity =
+            scenario.Inventories.GetQuantity(
+                ammunition.InventoryId,
+                ResourceIds.Ammunition);
+        Assert.True(
+            scenario.Inventories.Remove(
+                ammunition.InventoryId,
+                ResourceIds.Ammunition,
+                quantity).Succeeded);
+
+        Assert.True(
+            gateway.SubmitFireMission(
+                scenario.West.Player,
+                [artillery],
+                key,
+                requestedRounds: 1,
+                scenario.Simulation.CurrentTick).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel accepted));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            accepted.State);
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.Equal(
+            FireMissionStatus.NoAmmo,
+            scenario.Simulation.Entities
+                .GetComponent<FireMissionState>(
+                    artillery).Status);
+    }
+
+    [Fact]
     public void PlayerAttackNaturallyDestroysCommandCoreAndResolvesVictory()
     {
         using VerticalSliceScenario scenario =
