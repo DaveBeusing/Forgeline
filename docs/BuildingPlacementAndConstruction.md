@@ -12,7 +12,13 @@ The initial construction slice supports:
 - Storage Depot;
 - Smelter;
 - Refinery;
-- Electronics Plant.
+- Electronics Plant;
+- Logistics Hub;
+- Ammunition Plant;
+- Supply Depot;
+- Barracks;
+- Vehicle Factory;
+- Radar.
 
 Building definitions are data-driven and use stable `BuildingId` values rather than CLR type names.
 
@@ -42,7 +48,14 @@ The preview reports:
 
 Preview evaluation queries terrain and current world occupancy but never changes simulation state.
 
-The Windows development client exposes:
+The Windows development client exposes the complete current building catalog through the shared player action palette:
+
+- `B` — open/close the construction palette;
+- `Tab` — move through catalog entries;
+- `Enter` or left click on a palette row — begin placement for the selected building;
+- the palette displays copied construction costs and current Command Core inventory availability.
+
+The legacy direct development bindings remain available for fast testing:
 
 - `F4` — Command Core;
 - `F5` — Power Plant;
@@ -236,3 +249,10 @@ This slice intentionally does not implement:
 - complete production recipes.
 
 Those systems can build on `BuildingDefinition`, authoritative footprint occupancy, `ConstructionSite`, and `CompletedBuilding` without replacing the construction lifecycle.
+
+
+## Player action boundary
+
+Catalog selection does not authorize construction. The palette reads immutable `PlayerActionSnapshot` data published at the completed-tick boundary and only selects a `BuildingId` for the existing placement controller. Placement still requires a current valid preview, and the eventual `BuildCommand` is revalidated authoritatively.
+
+Pointer input inside the action palette is captured before placement and world-selection processing. Switching to a production action mode cancels an active placement intent so panel input cannot become an unintended world click. Session changes invalidate the panel's transient mode and selection state.

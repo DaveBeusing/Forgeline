@@ -479,12 +479,18 @@ internal sealed class WindowsWindow : IWindow
         {
             WindowsNative.VkW => PlatformKey.W,
             WindowsNative.VkA => PlatformKey.A,
+            WindowsNative.VkB => PlatformKey.B,
+            WindowsNative.VkC => PlatformKey.C,
             WindowsNative.VkS => PlatformKey.S,
             WindowsNative.VkD => PlatformKey.D,
             WindowsNative.VkQ => PlatformKey.Q,
             WindowsNative.VkE => PlatformKey.E,
             WindowsNative.VkR => PlatformKey.R,
             WindowsNative.VkF => PlatformKey.F,
+            WindowsNative.VkM => PlatformKey.M,
+            WindowsNative.VkP => PlatformKey.P,
+            WindowsNative.VkT => PlatformKey.T,
+            WindowsNative.VkU => PlatformKey.U,
             WindowsNative.VkF1 => PlatformKey.F1,
             WindowsNative.VkF2 => PlatformKey.F2,
             WindowsNative.VkF3 => PlatformKey.F3,
@@ -501,6 +507,8 @@ internal sealed class WindowsWindow : IWindow
             WindowsNative.VkLShift => PlatformKey.LeftShift,
             WindowsNative.VkRShift => PlatformKey.RightShift,
             WindowsNative.VkEscape => PlatformKey.Escape,
+            WindowsNative.VkEnter => PlatformKey.Enter,
+            WindowsNative.VkTab => PlatformKey.Tab,
             WindowsNative.VkSpace => PlatformKey.Space,
             _ => PlatformKey.Unknown
         };

@@ -38,7 +38,9 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         RtsCamera? camera = null,
         DebugDraw? debugDraw = null,
         PlayerExperienceSnapshot? playerExperience = null,
-        bool showDevelopmentMetrics = true)
+        bool showDevelopmentMetrics = true,
+        PlayerActionSnapshot? playerActions = null,
+        PlayerActionPanelView? actionPanel = null)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(context);
@@ -110,6 +112,16 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             EmitPlayerExperience(
                 playerExperience.Value,
                 showDevelopmentMetrics ? 112.0f : 12.0f,
+                context.Width,
+                context.Height);
+        }
+
+        if (playerActions is not null &&
+            actionPanel is PlayerActionPanelView panelView)
+        {
+            EmitPlayerActions(
+                playerActions,
+                panelView,
                 context.Width,
                 context.Height);
         }
@@ -335,14 +347,22 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             }
             else
             {
-                builder.Append("BUILD ");
+                builder.Append(
+                    snapshot.Feedback.Kind switch
+                    {
+                        PlayerCommandFeedbackKind.Construction => "BUILD ",
+                        PlayerCommandFeedbackKind.Production => "PROCESS ",
+                        PlayerCommandFeedbackKind.UnitProduction => "UNITS ",
+                        _ => "ACTION "
+                    });
 
                 if (snapshot.Feedback.State ==
                     PlayerCommandFeedbackState.Accepted)
                 {
                     builder.Append("ACCEPTED");
                 }
-                else
+                else if (snapshot.Feedback.Kind ==
+                         PlayerCommandFeedbackKind.Construction)
                 {
                     builder.Append("BLOCKED ");
                     builder.Append(
@@ -355,6 +375,10 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                         builder.Append(
                             snapshot.Feedback.PlacementFailure.ToString());
                     }
+                }
+                else
+                {
+                    builder.Append("REJECTED");
                 }
             }
 
@@ -463,6 +487,365 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             new Vector4(0.92f, 0.96f, 1.0f, 1.0f),
             width,
             height);
+    }
+
+    private void EmitPlayerActions(
+        PlayerActionSnapshot actions,
+        in PlayerActionPanelView panel,
+        int width,
+        int height)
+    {
+        if (!panel.IsOpen)
+        {
+            EmitText(
+                "B BUILD  P PROCESS  U UNITS".AsSpan(),
+                panel.OriginX,
+                panel.OriginY,
+                new Vector4(0.78f, 0.86f, 0.95f, 1.0f),
+                width,
+                height);
+            return;
+        }
+
+        Span<char> buffer =
+            stackalloc char[8_192];
+        var builder =
+            new OverlayTextBuilder(buffer);
+
+        builder.Append("ACTIONS ");
+        builder.Append(
+            panel.Mode switch
+            {
+                PlayerActionPanelMode.Construction => "BUILD",
+                PlayerActionPanelMode.Production => "PROCESS",
+                PlayerActionPanelMode.UnitProduction => "UNITS",
+                _ => "CLOSED"
+            });
+        builder.NewLine();
+
+        builder.Append("TAB SELECT  ENTER ACT  C CANCEL");
+        builder.NewLine();
+
+        builder.Append("PENDING ");
+        builder.Append(actions.PendingCommandCount);
+        builder.Append("  PRIORITY ");
+        builder.Append(panel.Priority.ToString());
+        if (panel.Mode == PlayerActionPanelMode.Production)
+        {
+            builder.Append("  MODE ");
+            builder.Append(panel.ProductionMode.ToString());
+
+            if (panel.ProductionMode ==
+                ForgeLine.Economy.ProductionRequestMode.DesiredStock)
+            {
+                builder.Append("  TARGET ");
+                builder.Append(
+                    panel.DesiredStockQuantity,
+                    "F0");
+            }
+        }
+
+        builder.NewLine();
+
+        switch (panel.Mode)
+        {
+            case PlayerActionPanelMode.Construction:
+                EmitConstructionActions(
+                    ref builder,
+                    actions,
+                    panel.SelectedIndex);
+                break;
+
+            case PlayerActionPanelMode.Production:
+                EmitProductionActions(
+                    ref builder,
+                    actions.Production,
+                    panel.SelectedIndex);
+                break;
+
+            case PlayerActionPanelMode.UnitProduction:
+                EmitUnitProductionActions(
+                    ref builder,
+                    actions.UnitProduction,
+                    panel.SelectedIndex);
+                break;
+        }
+
+        EmitText(
+            builder.Written,
+            panel.OriginX,
+            panel.OriginY,
+            new Vector4(0.92f, 0.96f, 1.0f, 1.0f),
+            width,
+            height);
+    }
+
+    private static void EmitConstructionActions(
+        ref OverlayTextBuilder builder,
+        PlayerActionSnapshot actions,
+        int selectedIndex)
+    {
+        if (actions.Construction.Count == 0)
+        {
+            builder.Append("NO CONSTRUCTIBLE CONTENT");
+            builder.NewLine();
+            return;
+        }
+
+        if (selectedIndex >= 0 &&
+            selectedIndex <
+                actions.Construction.Count)
+        {
+            PlayerConstructionActionReadModel selected =
+                actions.Construction[selectedIndex];
+            builder.Append("COST ");
+            AppendAmounts(
+                ref builder,
+                selected.Costs);
+            if (selected.RequiresResourceDeposit)
+            {
+                builder.Append("  DEPOSIT REQUIRED");
+            }
+
+            builder.NewLine();
+        }
+        else
+        {
+            builder.NewLine();
+        }
+
+        for (int index = 0;
+             index < actions.Construction.Count;
+             index++)
+        {
+            PlayerConstructionActionReadModel action =
+                actions.Construction[index];
+            builder.Append(
+                index == selectedIndex
+                    ? "X "
+                    : "  ");
+            builder.Append(action.DisplayName);
+            builder.Append(
+                action.HasRequiredResources
+                    ? "  READY"
+                    : "  MATERIALS");
+            builder.NewLine();
+        }
+    }
+
+    private static void EmitProductionActions(
+        ref OverlayTextBuilder builder,
+        PlayerProductionFacilityActionReadModel? facility,
+        int selectedIndex)
+    {
+        if (facility is null)
+        {
+            builder.Append("SELECT ONE OWNED PROCESSING FACILITY");
+            builder.NewLine();
+            return;
+        }
+
+        builder.Append("STATUS ");
+        builder.Append(facility.Status.ToString());
+        builder.Append(" ");
+        builder.Append(
+            facility.Progress * 100.0,
+            "F0");
+        builder.Append("%");
+
+        if (facility.BlockReason !=
+            ForgeLine.Economy.ProductionBlockReason.None)
+        {
+            builder.Append(" ");
+            builder.Append(
+                facility.BlockReason.ToString());
+        }
+
+        builder.NewLine();
+
+        int recipeCount =
+            facility.Recipes.Count;
+
+        for (int index = 0;
+             index < recipeCount;
+             index++)
+        {
+            PlayerProductionRecipeActionReadModel recipe =
+                facility.Recipes[index];
+            builder.Append(
+                index == selectedIndex
+                    ? "X "
+                    : "  ");
+            builder.Append(recipe.DisplayName);
+            builder.Append(
+                recipe.HasInputs
+                    ? "  INPUT OK"
+                    : "  INPUT MISSING");
+            builder.NewLine();
+        }
+
+        for (int index = 0;
+             index < facility.Requests.Count;
+             index++)
+        {
+            int row =
+                recipeCount +
+                index;
+            PlayerProductionRequestReadModel request =
+                facility.Requests[index];
+
+            builder.Append(
+                row == selectedIndex
+                    ? "X "
+                    : "  ");
+            builder.Append("QUEUE ");
+            builder.Append(request.DisplayName);
+            builder.Append(" ");
+            builder.Append(request.Priority.ToString());
+            builder.Append(" ");
+            builder.Append(request.Mode.ToString());
+
+            if (request.Paused)
+            {
+                builder.Append(" PAUSED");
+            }
+            else if (request.IsActive)
+            {
+                builder.Append(" ACTIVE");
+            }
+
+            builder.NewLine();
+        }
+
+        if (selectedIndex >= 0 &&
+            selectedIndex < recipeCount)
+        {
+            PlayerProductionRecipeActionReadModel selected =
+                facility.Recipes[selectedIndex];
+            builder.Append("INPUT ");
+            AppendAmounts(
+                ref builder,
+                selected.Inputs);
+            builder.NewLine();
+        }
+    }
+
+    private static void EmitUnitProductionActions(
+        ref OverlayTextBuilder builder,
+        PlayerUnitProductionFacilityActionReadModel? facility,
+        int selectedIndex)
+    {
+        if (facility is null)
+        {
+            builder.Append("SELECT ONE OWNED BARRACKS OR FACTORY");
+            builder.NewLine();
+            return;
+        }
+
+        builder.Append("STATUS ");
+        builder.Append(facility.Status.ToString());
+        builder.Append(" ");
+        builder.Append(
+            facility.Progress * 100.0,
+            "F0");
+        builder.Append("%");
+
+        if (facility.BlockReason !=
+            UnitProductionBlockReason.None)
+        {
+            builder.Append(" ");
+            builder.Append(
+                facility.BlockReason.ToString());
+        }
+
+        builder.NewLine();
+
+        int unitCount =
+            facility.Units.Count;
+
+        for (int index = 0;
+             index < unitCount;
+             index++)
+        {
+            PlayerUnitProductionActionReadModel unit =
+                facility.Units[index];
+            builder.Append(
+                index == selectedIndex
+                    ? "X "
+                    : "  ");
+            builder.Append(unit.DisplayName);
+            builder.Append(
+                unit.HasInputs
+                    ? "  INPUT OK"
+                    : "  INPUT MISSING");
+            builder.NewLine();
+        }
+
+        for (int index = 0;
+             index < facility.Requests.Count;
+             index++)
+        {
+            int row =
+                unitCount +
+                index;
+            PlayerUnitProductionRequestReadModel request =
+                facility.Requests[index];
+
+            builder.Append(
+                row == selectedIndex
+                    ? "X "
+                    : "  ");
+            builder.Append("QUEUE ");
+            builder.Append(request.DisplayName);
+            builder.Append(" ");
+            builder.Append(request.Priority.ToString());
+
+            if (request.IsActive)
+            {
+                builder.Append(" ACTIVE");
+            }
+
+            builder.NewLine();
+        }
+
+        if (selectedIndex >= 0 &&
+            selectedIndex < unitCount)
+        {
+            PlayerUnitProductionActionReadModel selected =
+                facility.Units[selectedIndex];
+            builder.Append("COST ");
+            AppendAmounts(
+                ref builder,
+                selected.Costs);
+            builder.NewLine();
+        }
+    }
+
+    private static void AppendAmounts(
+        ref OverlayTextBuilder builder,
+        IReadOnlyList<PlayerActionResourceAmount> amounts)
+    {
+        for (int index = 0;
+             index < amounts.Count;
+             index++)
+        {
+            if (index > 0)
+            {
+                builder.Append("  ");
+            }
+
+            PlayerActionResourceAmount amount =
+                amounts[index];
+            builder.Append(amount.DisplayName);
+            builder.Append(" ");
+            builder.Append(
+                amount.AvailableQuantity,
+                "F0");
+            builder.Append("/");
+            builder.Append(
+                amount.RequiredQuantity,
+                "F0");
+        }
     }
 
     public void Dispose()

@@ -177,3 +177,14 @@ Current limitations include:
 - transient event history/notification queues are not yet persistent;
 - no surrender action is exposed yet;
 - final visual hierarchy, iconography, accessibility treatment, localization, and audio feedback are deferred.
+
+
+## Player Action Surface
+
+The interactive match uses a reusable action palette for player-authored construction and production while keeping simulation ownership unchanged.
+
+The palette is session-scoped and consumes immutable completed-tick `PlayerActionSnapshot` data. Construction entries come from the current building catalog and Command Core inventory. Processing and unit-production entries exist only for a single selected owned compatible facility and use that facility's local input inventory.
+
+`B`, `P`, and `U` select construction, processing, and unit-production modes. While a mode owns keyboard focus, RTS camera keys are suppressed. Pointer clicks inside the panel are captured before world selection, movement, or placement. Mixed selections, foreign ownership, destroyed/stale facilities, terminal matches, and a fresh session remove incompatible transient actions instead of retaining stale authority.
+
+Command submission is not success feedback. `PlayerActionSnapshot.PendingCommandCount` identifies unresolved player submissions; completed results are published separately as accepted/rejected `PlayerCommandFeedback`. Production progress and block reasons remain authoritative copied state from the selected facility.

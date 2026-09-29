@@ -1,5 +1,6 @@
 using System.Numerics;
 using ForgeLine.Core;
+using ForgeLine.Economy;
 using ForgeLine.Simulation;
 
 namespace ForgeLine.Game;
@@ -15,7 +16,9 @@ public enum PlayerCommandKind : byte
 {
     Movement = 1,
     Construction = 2,
-    EndMatch = 3
+    EndMatch = 3,
+    Production = 4,
+    UnitProduction = 5
 }
 
 public enum PlayerCommandSubmissionFailure : byte
@@ -151,6 +154,9 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
     public PlayerCommandFeedback LatestFeedback { get; private set; } =
         PlayerCommandFeedback.None;
 
+    public int PendingCount =>
+        _pending.Count;
+
     public int OutstandingCount =>
         _pending.Count + _results.Count;
 
@@ -245,6 +251,238 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         return AcceptedReceipt(
             correlation,
             PlayerCommandKind.Construction,
+            source,
+            observedTick,
+            envelope);
+    }
+
+
+    public PlayerCommandSubmissionReceipt SubmitProduction(
+        PlayerId issuer,
+        EntityId facility,
+        RecipeId recipeId,
+        SimulationTick observedTick,
+        ProductionPriority priority = ProductionPriority.Normal,
+        ProductionRequestMode mode = ProductionRequestMode.OneShot,
+        ResourceId desiredStockResourceId = default,
+        double desiredStockQuantity = 0.0)
+    {
+        if (!TryBeginSubmission(
+                PlayerCommandKind.Production,
+                issuer,
+                observedTick,
+                out PlayerCommandCorrelationId correlation,
+                out SimulationTick targetTick,
+                out SimulationCommandSource source,
+                out PlayerCommandSubmissionReceipt rejected))
+        {
+            return rejected;
+        }
+
+        PlayerProductionActionCommand command =
+            PlayerProductionActionCommand.Queue(
+                issuer,
+                facility,
+                recipeId,
+                observedTick,
+                priority,
+                mode,
+                desiredStockResourceId,
+                desiredStockQuantity);
+
+        SimulationCommandEnvelope envelope =
+            _simulation.SubmitCommand(
+                command,
+                targetTick,
+                source);
+
+        _pending.Add(
+            PendingCommand.ForProduction(
+                correlation,
+                envelope,
+                command));
+
+        return AcceptedReceipt(
+            correlation,
+            PlayerCommandKind.Production,
+            source,
+            observedTick,
+            envelope);
+    }
+
+    public PlayerCommandSubmissionReceipt SubmitProductionPaused(
+        PlayerId issuer,
+        EntityId requestEntity,
+        bool paused,
+        SimulationTick observedTick)
+    {
+        if (!TryBeginSubmission(
+                PlayerCommandKind.Production,
+                issuer,
+                observedTick,
+                out PlayerCommandCorrelationId correlation,
+                out SimulationTick targetTick,
+                out SimulationCommandSource source,
+                out PlayerCommandSubmissionReceipt rejected))
+        {
+            return rejected;
+        }
+
+        PlayerProductionActionCommand command =
+            PlayerProductionActionCommand.SetPaused(
+                issuer,
+                requestEntity,
+                paused,
+                observedTick);
+
+        SimulationCommandEnvelope envelope =
+            _simulation.SubmitCommand(
+                command,
+                targetTick,
+                source);
+
+        _pending.Add(
+            PendingCommand.ForProduction(
+                correlation,
+                envelope,
+                command));
+
+        return AcceptedReceipt(
+            correlation,
+            PlayerCommandKind.Production,
+            source,
+            observedTick,
+            envelope);
+    }
+
+    public PlayerCommandSubmissionReceipt SubmitProductionCancel(
+        PlayerId issuer,
+        EntityId requestEntity,
+        SimulationTick observedTick)
+    {
+        if (!TryBeginSubmission(
+                PlayerCommandKind.Production,
+                issuer,
+                observedTick,
+                out PlayerCommandCorrelationId correlation,
+                out SimulationTick targetTick,
+                out SimulationCommandSource source,
+                out PlayerCommandSubmissionReceipt rejected))
+        {
+            return rejected;
+        }
+
+        PlayerProductionActionCommand command =
+            PlayerProductionActionCommand.Cancel(
+                issuer,
+                requestEntity,
+                observedTick);
+
+        SimulationCommandEnvelope envelope =
+            _simulation.SubmitCommand(
+                command,
+                targetTick,
+                source);
+
+        _pending.Add(
+            PendingCommand.ForProduction(
+                correlation,
+                envelope,
+                command));
+
+        return AcceptedReceipt(
+            correlation,
+            PlayerCommandKind.Production,
+            source,
+            observedTick,
+            envelope);
+    }
+
+    public PlayerCommandSubmissionReceipt SubmitUnitProduction(
+        PlayerId issuer,
+        EntityId facility,
+        UnitId unitId,
+        SimulationTick observedTick,
+        ProductionPriority priority = ProductionPriority.Normal)
+    {
+        if (!TryBeginSubmission(
+                PlayerCommandKind.UnitProduction,
+                issuer,
+                observedTick,
+                out PlayerCommandCorrelationId correlation,
+                out SimulationTick targetTick,
+                out SimulationCommandSource source,
+                out PlayerCommandSubmissionReceipt rejected))
+        {
+            return rejected;
+        }
+
+        PlayerUnitProductionActionCommand command =
+            PlayerUnitProductionActionCommand.Queue(
+                issuer,
+                facility,
+                unitId,
+                observedTick,
+                priority);
+
+        SimulationCommandEnvelope envelope =
+            _simulation.SubmitCommand(
+                command,
+                targetTick,
+                source);
+
+        _pending.Add(
+            PendingCommand.ForUnitProduction(
+                correlation,
+                envelope,
+                command));
+
+        return AcceptedReceipt(
+            correlation,
+            PlayerCommandKind.UnitProduction,
+            source,
+            observedTick,
+            envelope);
+    }
+
+    public PlayerCommandSubmissionReceipt SubmitUnitProductionCancel(
+        PlayerId issuer,
+        EntityId requestEntity,
+        SimulationTick observedTick)
+    {
+        if (!TryBeginSubmission(
+                PlayerCommandKind.UnitProduction,
+                issuer,
+                observedTick,
+                out PlayerCommandCorrelationId correlation,
+                out SimulationTick targetTick,
+                out SimulationCommandSource source,
+                out PlayerCommandSubmissionReceipt rejected))
+        {
+            return rejected;
+        }
+
+        PlayerUnitProductionActionCommand command =
+            PlayerUnitProductionActionCommand.Cancel(
+                issuer,
+                requestEntity,
+                observedTick);
+
+        SimulationCommandEnvelope envelope =
+            _simulation.SubmitCommand(
+                command,
+                targetTick,
+                source);
+
+        _pending.Add(
+            PendingCommand.ForUnitProduction(
+                correlation,
+                envelope,
+                command));
+
+        return AcceptedReceipt(
+            correlation,
+            PlayerCommandKind.UnitProduction,
             source,
             observedTick,
             envelope);
@@ -403,6 +641,38 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     buildResult.ResolvedAtTick);
             }
 
+            case PlayerCommandKind.Production:
+            {
+                PlayerProductionActionCommand command =
+                    pending.ProductionCommand!;
+
+                if (command.ExecutedAtTick == SimulationTick.Zero)
+                {
+                    return null;
+                }
+
+                return CreateActionResult(
+                    pending,
+                    command.Accepted,
+                    command.ExecutedAtTick);
+            }
+
+            case PlayerCommandKind.UnitProduction:
+            {
+                PlayerUnitProductionActionCommand command =
+                    pending.UnitProductionCommand!;
+
+                if (command.ExecutedAtTick == SimulationTick.Zero)
+                {
+                    return null;
+                }
+
+                return CreateActionResult(
+                    pending,
+                    command.Accepted,
+                    command.ExecutedAtTick);
+            }
+
             case PlayerCommandKind.EndMatch:
             {
                 EndMatchCommand command =
@@ -436,6 +706,23 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     $"Unsupported player command kind '{pending.Kind}'.");
         }
     }
+
+    private PlayerCommandResultReadModel CreateActionResult(
+        in PendingCommand pending,
+        bool accepted,
+        SimulationTick executedAtTick) =>
+        new(
+            SessionId,
+            pending.CorrelationId,
+            pending.Kind,
+            accepted
+                ? PlayerCommandFeedbackState.Accepted
+                : PlayerCommandFeedbackState.Rejected,
+            accepted ? 1 : 0,
+            accepted ? 0 : 1,
+            BuildCommandRejectionReason.None,
+            BuildingPlacementFailureReason.None,
+            executedAtTick);
 
     private bool TryBeginSubmission(
         PlayerCommandKind kind,
@@ -532,6 +819,10 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     PlayerCommandFeedbackKind.Movement,
                 PlayerCommandKind.Construction =>
                     PlayerCommandFeedbackKind.Construction,
+                PlayerCommandKind.Production =>
+                    PlayerCommandFeedbackKind.Production,
+                PlayerCommandKind.UnitProduction =>
+                    PlayerCommandFeedbackKind.UnitProduction,
                 _ =>
                     PlayerCommandFeedbackKind.None
             },
@@ -548,6 +839,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         SimulationCommandEnvelope Envelope,
         MoveEntitiesCommand? MovementCommand,
         EndMatchCommand? EndMatchCommand,
+        PlayerProductionActionCommand? ProductionCommand,
+        PlayerUnitProductionActionCommand? UnitProductionCommand,
         PlayerCommandResultReadModel? Result)
     {
         public static PendingCommand ForMovement(
@@ -560,6 +853,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 envelope,
                 command,
                 null,
+                null,
+                null,
                 null);
 
         public static PendingCommand ForBuild(
@@ -569,6 +864,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 correlation,
                 PlayerCommandKind.Construction,
                 envelope,
+                null,
+                null,
                 null,
                 null,
                 null);
@@ -581,6 +878,36 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 correlation,
                 PlayerCommandKind.EndMatch,
                 envelope,
+                null,
+                command,
+                null,
+                null,
+                null);
+
+        public static PendingCommand ForProduction(
+            PlayerCommandCorrelationId correlation,
+            in SimulationCommandEnvelope envelope,
+            PlayerProductionActionCommand command) =>
+            new(
+                correlation,
+                PlayerCommandKind.Production,
+                envelope,
+                null,
+                null,
+                command,
+                null,
+                null);
+
+        public static PendingCommand ForUnitProduction(
+            PlayerCommandCorrelationId correlation,
+            in SimulationCommandEnvelope envelope,
+            PlayerUnitProductionActionCommand command) =>
+            new(
+                correlation,
+                PlayerCommandKind.UnitProduction,
+                envelope,
+                null,
+                null,
                 null,
                 command,
                 null);

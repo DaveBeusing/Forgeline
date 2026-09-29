@@ -130,3 +130,16 @@ The slice intentionally excludes:
 - a Repair Station or repair subsystem expansion.
 
 Repair behavior should only be added when a reusable generic repair foundation exists.
+
+
+## Human Construction and Production Access
+
+The Windows client exposes the current Directorate content through one shared action surface rather than one hotkey per catalog entry.
+
+- `B`: all current constructible Directorate buildings from the live building catalog.
+- `P`: supported industrial recipes for one selected owned processing facility.
+- `U`: supported units for one selected owned Barracks or Vehicle Factory.
+- `Tab` selects an action or queued request; `Enter` activates the selected action; `C` cancels a selected production request.
+- `T` changes production priority; `M` changes industrial request mode.
+
+Availability and costs are copied from the same building, recipe, unit, and inventory contracts used by simulation. A human slot does not receive a hidden strategic controller: construction and production originate as explicit player commands and remain subject to authoritative ownership, material, power, placement, output-capacity, and fixed-tick rules.

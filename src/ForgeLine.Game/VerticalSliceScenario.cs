@@ -665,6 +665,7 @@ public sealed class VerticalSliceScenario : IDisposable
                 resources,
                 buildingDefinitions,
                 unitDefinitions,
+                recipes,
                 spatialIndex,
                 buildingPlacement,
                 buildingCommands,
