@@ -1,7 +1,11 @@
+using System.Numerics;
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Game;
+using ForgeLine.Intelligence;
 using ForgeLine.Simulation;
+using ForgeLine.World;
 using Xunit;
 
 namespace ForgeLine.Presentation.Tests;
@@ -317,6 +321,106 @@ public sealed class PlayerActionReadModelTests
         Assert.Null(snapshot.PlayerActions?.Supply);
     }
 
+    [Fact]
+    public void TacticalActionsExposeOwnedStateAndCurrentIdentifiedTargets()
+    {
+        using VerticalSliceScenario scenario =
+            CreateScenario(4305);
+        var buffer =
+            RegisterExtraction(
+                scenario,
+                out PresentationInteractionState interaction,
+                out _);
+        EntityId engineer =
+            scenario.West.StartingUnits[0];
+        EntityId enemy =
+            scenario.East.StartingUnits[0];
+        WorldTransform engineerTransform =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    engineer);
+
+        scenario.Simulation.Entities.SetComponent(
+            enemy,
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    enemy) with
+            {
+                Position =
+                    engineerTransform.Position +
+                    new Vector3(20.0f, 0.0f, 0.0f)
+            });
+
+        interaction.SetSelection([engineer]);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            buffer.TryReadLatest(
+                out PresentationSnapshot snapshot));
+        PlayerTacticalActionReadModel tactical =
+            Assert.IsType<PlayerTacticalActionReadModel>(
+                snapshot.PlayerActions?.Tactical);
+
+        Assert.Equal(1, tactical.RequestedSelectionCount);
+        Assert.Equal(1, tactical.CombatEligibleCount);
+        PlayerTacticalTargetReadModel target =
+            Assert.Single(
+                tactical.Targets,
+                candidate =>
+                    candidate.Entity ==
+                    enemy);
+        Assert.Equal(
+            IntelligenceState.Identified,
+            target.State);
+        Assert.True(
+            target.CompatibleUnitCount > 0);
+        Assert.Equal(
+            IntelligenceContactKey.FromEntity(
+                enemy),
+            target.ContactKey);
+
+        EntityId artillery =
+            scenario.UnitFactory.Create(
+                scenario.Services.UnitDefinitions[
+                    UnitIds.MobileArtillery],
+                engineerTransform.Position +
+                    new Vector3(10.0f, 0.0f, 0.0f),
+                scenario.West.Player);
+        interaction.SetSelection([artillery]);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            buffer.TryReadLatest(out snapshot));
+        tactical =
+            Assert.IsType<PlayerTacticalActionReadModel>(
+                snapshot.PlayerActions?.Tactical);
+        PlayerArtilleryActionReadModel artilleryState =
+            Assert.Single(tactical.Artillery);
+
+        Assert.Equal(artillery, artilleryState.Entity);
+        Assert.True(artilleryState.AmmunitionCapacity > 0.0);
+        Assert.InRange(
+            artilleryState.AmmunitionQuantity,
+            0.0,
+            artilleryState.AmmunitionCapacity);
+        Assert.Equal(90.0f, artilleryState.MinimumRangeMeters);
+        Assert.Equal(700.0f, artilleryState.MaximumRangeMeters);
+
+        interaction.SetSelection(
+            [engineer, scenario.East.StartingUnits[1]]);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            buffer.TryReadLatest(out snapshot));
+        tactical =
+            Assert.IsType<PlayerTacticalActionReadModel>(
+                snapshot.PlayerActions?.Tactical);
+        Assert.Equal(
+            2,
+            tactical.RequestedSelectionCount);
+        Assert.Single(tactical.SelectedEntities);
+    }
+
     private static PresentationSnapshotBuffer RegisterExtraction(
         VerticalSliceScenario scenario,
         out PresentationInteractionState interaction,
@@ -330,7 +434,13 @@ public sealed class PlayerActionReadModelTests
             new PlayerCommandGateway(
                 scenario.Simulation,
                 scenario.Services.BuildingCommands,
-                scenario.BattlefieldRuntime.MatchStateEntity);
+                scenario.BattlefieldRuntime.MatchStateEntity,
+                intelligence:
+                    scenario.Intelligence,
+                weapons:
+                    scenario.Services.Weapons,
+                artilleryWeapons:
+                    scenario.Services.ArtilleryWeapons);
 
         scenario.Simulation.RegisterTickObserver(
             gateway);
