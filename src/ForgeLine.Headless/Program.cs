@@ -161,7 +161,8 @@ internal static class Program
                 };
             using VerticalSliceScenario scenario =
                 VerticalSliceScenario.Create(
-                    runtimeSettings);
+                    runtimeSettings,
+                    cancellationToken);
             SkirmishProgressionDiagnostics? progression = null;
             if (options.DiagnosticsOutput is not null)
             {
