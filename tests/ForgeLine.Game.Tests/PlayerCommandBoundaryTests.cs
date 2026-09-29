@@ -181,6 +181,100 @@ public sealed class PlayerCommandBoundaryTests
             second.Simulation.SessionId);
     }
 
+    [Fact]
+    public void PendingResultRemainsBoundToOriginalSessionAcrossRestart()
+    {
+        using VerticalSliceScenario first =
+            CreateHumanScenario(seed: 4105);
+        var firstGateway =
+            CreateGateway(first);
+        EntityId firstUnit =
+            first.West.StartingUnits[0];
+
+        PlayerCommandSubmissionReceipt receipt =
+            SubmitMovement(
+                firstGateway,
+                first,
+                firstUnit,
+                72.0f);
+
+        first.Simulation.AdvanceOneTick();
+
+        Assert.True(receipt.Accepted);
+        Assert.Equal(
+            1,
+            firstGateway.Results.Count);
+
+        using VerticalSliceScenario restarted =
+            CreateHumanScenario(seed: 4105);
+        var restartedGateway =
+            CreateGateway(restarted);
+
+        Assert.NotEqual(
+            firstGateway.SessionId,
+            restartedGateway.SessionId);
+        Assert.Equal(
+            0,
+            restartedGateway.OutstandingCount);
+        Assert.False(
+            restartedGateway.Results.TryRead(out _));
+
+        Assert.True(
+            firstGateway.Results.TryRead(
+                out PlayerCommandResultReadModel oldResult));
+        Assert.Equal(
+            firstGateway.SessionId,
+            oldResult.SessionId);
+        Assert.Equal(
+            receipt.CorrelationId,
+            oldResult.CorrelationId);
+    }
+
+    [Fact]
+    public void TerminalEndMatchResultIsDeliveredThroughBoundary()
+    {
+        using VerticalSliceScenario scenario =
+            CreateHumanScenario(seed: 4106);
+        var gateway =
+            CreateGateway(scenario);
+
+        Assert.True(
+            scenario.Simulation.Entities.DestroyEntity(
+                scenario.East.CommandCore));
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            scenario.GetMatchState().IsTerminal);
+
+        PlayerCommandSubmissionReceipt receipt =
+            gateway.SubmitEndMatch(
+                scenario.West.Player,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(receipt.Accepted);
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel result));
+        Assert.Equal(
+            receipt.CorrelationId,
+            result.CorrelationId);
+        Assert.Equal(
+            PlayerCommandKind.EndMatch,
+            result.Kind);
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            result.State);
+        Assert.Equal(
+            scenario.Simulation.SessionId,
+            result.SessionId);
+        Assert.Equal(
+            MatchStatus.Ended,
+            scenario.GetMatchState().Status);
+    }
+
     private static VerticalSliceScenario CreateHumanScenario(
         ulong seed)
     {
