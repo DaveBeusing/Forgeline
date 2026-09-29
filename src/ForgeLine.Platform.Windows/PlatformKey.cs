@@ -16,6 +16,7 @@ public enum PlatformKey
     E,
     R,
     F,
+    K,
     T,
     U,
     Y,
