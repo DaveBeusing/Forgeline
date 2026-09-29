@@ -157,9 +157,15 @@ LogisticsNetwork determines the strategic transport path between economic nodes.
 
 HierarchicalNavigationSystem converts each selected node target into traversable ground navigation.
 
+The canonical vertical-slice runtime injects that same `HierarchicalNavigationSystem` instance into `CargoTransportSystem`. When a logistics-node visit point falls inside an initially blocked navigation cell, cargo movement resolves a nearby traversable approach before issuing the physical movement order. Loading or unloading still occurs only after the vehicle physically reaches the node visit range; approach projection never transfers resources remotely.
+
+The shared runtime builds the starting navigation world from battlefield obstacles plus static gameplay entities created during match initialization. `StrategicInfrastructureSystem` receives the same obstacle set and updates the same navigation system when topology changes, so cargo approach checks, normal hierarchical paths, stale-result rejection, and crossing invalidation share one navigation version boundary.
+
 GroundMovementSystem remains the only system that mutates ground-vehicle transforms.
 
-CargoTransportSystem never writes a vehicle position directly.
+CargoTransportSystem never writes a vehicle position directly. Resource conservation remains enforced through the existing aggregate inventory transfers.
+
+Regression coverage includes a shared `Gameplay` runtime case where a starting Command Core occupies the requested cargo cell: the truck receives a traversable approach, completes the physical delivery, and preserves total Steel quantity.
 
 ## Route Versioning and Rerouting
 
