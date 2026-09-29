@@ -303,30 +303,33 @@ internal sealed class ClientApplication
                     inputState,
                     PlatformKey.Escape,
                     ref returnHeld);
-            MatchState inputMatchState =
-                simulation.Entities.GetComponent<MatchState>(
-                    prototypeRuntime.MatchStateEntity);
+            PresentationSnapshot? inputSnapshot =
+                renderWorld.CurrentSnapshot;
+            PlayerExperienceSnapshot? inputExperience =
+                inputSnapshot?.PlayerExperience;
+            bool inputMatchTerminal =
+                inputExperience?.IsMatchComplete ==
+                true;
 
-            if (inputMatchState.IsTerminal &&
+            if (inputMatchTerminal &&
                 restartPressed)
             {
                 return RestartRequestedExitCode;
             }
 
-            if (inputMatchState.IsTerminal &&
+            if (inputMatchTerminal &&
                 returnPressed)
             {
-                var endMatch =
-                    new EndMatchCommand(
+                lastCommandReceipt =
+                    commandGateway.SubmitEndMatch(
                         LocalPlayer,
-                        prototypeRuntime.MatchStateEntity,
-                        simulation.CurrentTick);
-                simulation.SubmitCommand(
-                    endMatch,
-                    simulation.CurrentTick.Next(),
-                    new SimulationCommandSource(
-                        LocalPlayer.Value));
+                        inputSnapshot!.Tick);
                 simulation.AdvanceOneTick();
+                _ = renderWorld.Update(
+                    snapshotBuffer);
+                DrainCommandResults(
+                    commandGateway,
+                    ref lastCommandResult);
                 return 0;
             }
 
@@ -355,18 +358,20 @@ internal sealed class ClientApplication
 
             while (simulationAccumulator >= simulation.Clock.TickDuration)
             {
-                MatchState matchState =
-                    simulation.Entities.GetComponent<MatchState>(
-                        prototypeRuntime.MatchStateEntity);
-
-                if (matchState.IsTerminal)
+                if (renderWorld.CurrentSnapshot?.PlayerExperience
+                        ?.IsMatchComplete ==
+                    true)
                 {
-                    simulationAccumulator = TimeSpan.Zero;
+                    simulationAccumulator =
+                        TimeSpan.Zero;
                     break;
                 }
 
                 simulation.AdvanceOneTick();
-                simulationAccumulator -= simulation.Clock.TickDuration;
+                _ = renderWorld.Update(
+                    snapshotBuffer);
+                simulationAccumulator -=
+                    simulation.Clock.TickDuration;
             }
 
             if (smokeTest &&
@@ -385,11 +390,11 @@ internal sealed class ClientApplication
                 }
 
                 simulation.AdvanceOneTick();
-                MatchState smokeMatchState =
-                    simulation.Entities.GetComponent<MatchState>(
-                        prototypeRuntime.MatchStateEntity);
+                _ = renderWorld.Update(
+                    snapshotBuffer);
 
-                if (smokeMatchState.ForPlayer(LocalPlayer) !=
+                if (renderWorld.CurrentSnapshot?.PlayerExperience
+                        ?.MatchStatus !=
                     PlayerMatchStatus.Victory)
                 {
                     throw new InvalidOperationException(
