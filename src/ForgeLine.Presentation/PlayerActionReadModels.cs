@@ -918,7 +918,8 @@ internal static class PlayerActionSnapshotFactory
                     out ArtilleryCapability capability) &&
                 scenario.Services.ArtilleryWeapons.TryGet(
                     capability.WeaponId,
-                    out ArtilleryWeaponDefinition? definition))
+                    out ArtilleryWeaponDefinition? definition) &&
+                definition is not null)
             {
                 double ammunitionQuantity = 0.0;
                 double ammunitionCapacity = 0.0;
@@ -1026,6 +1027,7 @@ internal static class PlayerActionSnapshotFactory
                     !scenario.Services.Weapons.TryGet(
                         weaponState.WeaponId,
                         out WeaponDefinition? weapon) ||
+                    weapon is null ||
                     !weapon.Effectiveness.CanEngage(
                         targetable.Class))
                 {
