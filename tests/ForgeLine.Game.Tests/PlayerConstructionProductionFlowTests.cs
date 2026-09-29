@@ -543,26 +543,17 @@ public sealed class PlayerConstructionProductionFlowTests
                 200.0,
             maximumTicks: 5_000);
 
-        PlayerCommandSubmissionReceipt steelReceipt =
-            gateway.SubmitProduction(
-                scenario.West.Player,
-                smelter,
-                RecipeIds.Steel,
-                scenario.Simulation.CurrentTick,
-                priority:
+        PlayerCommandResultReadModel steelResult =
+            DispatchAction(
+                scenario,
+                gateway,
+                PlayerActionRequest.QueueProduction(
+                    smelter,
+                    RecipeIds.Steel,
                     ProductionPriority.High,
-                mode:
                     ProductionRequestMode.DesiredStock,
-                desiredStockResourceId:
                     ResourceIds.Steel,
-                desiredStockQuantity:
-                    200.0);
-
-        Assert.True(steelReceipt.Accepted);
-        scenario.Simulation.AdvanceOneTick();
-        Assert.True(
-            gateway.Results.TryRead(
-                out PlayerCommandResultReadModel steelResult));
+                    200.0));
         Assert.Equal(
             PlayerCommandFeedbackState.Accepted,
             steelResult.State);
@@ -738,13 +729,15 @@ public sealed class PlayerConstructionProductionFlowTests
                     fuel.InventoryId,
                     ResourceIds.Fuel);
 
-            Assert.True(
-                gateway.SubmitResupply(
-                    scenario.West.Player,
-                    tank,
-                    scenario.Simulation.CurrentTick).Accepted);
-            scenario.Simulation.AdvanceOneTick();
-            Assert.True(gateway.Results.TryRead(out _));
+            PlayerCommandResultReadModel resupplyResult =
+                DispatchAction(
+                    scenario,
+                    gateway,
+                    PlayerActionRequest.RequestResupply(
+                        tank));
+            Assert.Equal(
+                PlayerCommandFeedbackState.Accepted,
+                resupplyResult.State);
         }
 
         RunUntil(
@@ -767,15 +760,17 @@ public sealed class PlayerConstructionProductionFlowTests
         Vector3 reconnaissancePoint =
             eastCore.Position +
             towardWest * 180.0f;
-        Assert.True(
-            gateway.SubmitAttackMove(
-                scenario.West.Player,
-                [scout],
-                reconnaissancePoint,
-                scenario.Simulation.CurrentTick,
-                FormationTemplate.Compact).Accepted);
-        scenario.Simulation.AdvanceOneTick();
-        Assert.True(gateway.Results.TryRead(out _));
+        PlayerCommandResultReadModel reconnaissanceResult =
+            DispatchAction(
+                scenario,
+                gateway,
+                PlayerActionRequest.AttackMove(
+                    [scout],
+                    reconnaissancePoint,
+                    FormationTemplate.Compact));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            reconnaissanceResult.State);
 
         FactionId westFaction =
             new((uint)scenario.West.Player.Value);
@@ -802,18 +797,13 @@ public sealed class PlayerConstructionProductionFlowTests
                         ResourceIds.Ammunition);
                 });
 
-        PlayerCommandSubmissionReceipt attackReceipt =
-            gateway.SubmitAttack(
-                scenario.West.Player,
-                tanks,
-                scenario.East.CommandCore,
-                scenario.Simulation.CurrentTick);
-
-        Assert.True(attackReceipt.Accepted);
-        scenario.Simulation.AdvanceOneTick();
-        Assert.True(
-            gateway.Results.TryRead(
-                out PlayerCommandResultReadModel attackResult));
+        PlayerCommandResultReadModel attackResult =
+            DispatchAction(
+                scenario,
+                gateway,
+                PlayerActionRequest.Attack(
+                    tanks,
+                    scenario.East.CommandCore));
         Assert.Equal(
             PlayerCommandFeedbackState.Accepted,
             attackResult.State);
@@ -866,6 +856,29 @@ public sealed class PlayerConstructionProductionFlowTests
                 .TotalFuelTransferred > 0.0);
     }
 
+    private static PlayerCommandResultReadModel DispatchAction(
+        VerticalSliceScenario scenario,
+        PlayerCommandGateway gateway,
+        in PlayerActionRequest request)
+    {
+        Assert.True(
+            PlayerActionRequestDispatcher.TryDispatch(
+                request,
+                scenario.West.Player,
+                gateway,
+                scenario.Simulation.CurrentTick,
+                out PlayerCommandSubmissionReceipt receipt));
+        Assert.True(receipt.Accepted);
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel result));
+
+        return result;
+    }
+
     private static void BuildPlayerBuilding(
         VerticalSliceScenario scenario,
         PlayerCommandGateway gateway,
@@ -900,23 +913,18 @@ public sealed class PlayerConstructionProductionFlowTests
         double target,
         double maximum)
     {
-        PlayerCommandSubmissionReceipt receipt =
-            gateway.SubmitLogisticsStockPolicy(
-                scenario.West.Player,
-                targetEntity,
-                resource,
-                minimum,
-                target,
-                maximum,
-                LogisticsStockPriority.Critical,
-                enabled: true,
-                scenario.Simulation.CurrentTick);
-
-        Assert.True(receipt.Accepted);
-        scenario.Simulation.AdvanceOneTick();
-        Assert.True(
-            gateway.Results.TryRead(
-                out PlayerCommandResultReadModel result));
+        PlayerCommandResultReadModel result =
+            DispatchAction(
+                scenario,
+                gateway,
+                PlayerActionRequest.SetStockPolicy(
+                    targetEntity,
+                    resource,
+                    minimum,
+                    target,
+                    maximum,
+                    LogisticsStockPriority.Critical,
+                    enabled: true));
         Assert.Equal(
             PlayerCommandFeedbackState.Accepted,
             result.State);
@@ -1012,19 +1020,14 @@ public sealed class PlayerConstructionProductionFlowTests
         EntityId facility,
         UnitId unitId)
     {
-        PlayerCommandSubmissionReceipt receipt =
-            gateway.SubmitUnitProduction(
-                scenario.West.Player,
-                facility,
-                unitId,
-                scenario.Simulation.CurrentTick);
-
-        Assert.True(receipt.Accepted);
-        scenario.Simulation.AdvanceOneTick();
-
-        Assert.True(
-            gateway.Results.TryRead(
-                out PlayerCommandResultReadModel result));
+        PlayerCommandResultReadModel result =
+            DispatchAction(
+                scenario,
+                gateway,
+                PlayerActionRequest.QueueUnitProduction(
+                    facility,
+                    unitId,
+                    ProductionPriority.Normal));
         Assert.Equal(
             PlayerCommandFeedbackState.Accepted,
             result.State);
