@@ -1,6 +1,8 @@
 using System.Numerics;
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
+using ForgeLine.Intelligence;
 using ForgeLine.Simulation;
 
 namespace ForgeLine.Game;
@@ -20,7 +22,9 @@ public enum PlayerCommandKind : byte
     Production = 4,
     UnitProduction = 5,
     Logistics = 6,
-    Supply = 7
+    Supply = 7,
+    Tactical = 8,
+    Artillery = 9
 }
 
 public enum PlayerCommandSubmissionFailure : byte
@@ -51,7 +55,9 @@ public readonly record struct PlayerCommandResultReadModel(
     BuildingPlacementFailureReason PlacementFailure,
     SimulationTick ResolvedAtTick,
     PlayerLogisticsActionFailureReason ActionFailure =
-        PlayerLogisticsActionFailureReason.None);
+        PlayerLogisticsActionFailureReason.None,
+    PlayerTacticalActionFailureReason TacticalFailure =
+        PlayerTacticalActionFailureReason.None);
 
 public sealed class PlayerCommandResultBuffer
 {
@@ -118,13 +124,19 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
     private readonly PlayerCommandResultBuffer _results;
     private readonly List<PendingCommand> _pending = new();
     private readonly int _maximumOutstanding;
+    private readonly FactionIntelligenceStore? _intelligence;
+    private readonly WeaponCatalog? _weapons;
+    private readonly ArtilleryWeaponCatalog? _artilleryWeapons;
     private ulong _nextCorrelationId = 1;
 
     public PlayerCommandGateway(
         SimulationCoordinator simulation,
         BuildingCommandProcessingSystem buildingCommands,
         EntityId matchStateEntity,
-        int maximumOutstanding = 128)
+        int maximumOutstanding = 128,
+        FactionIntelligenceStore? intelligence = null,
+        WeaponCatalog? weapons = null,
+        ArtilleryWeaponCatalog? artilleryWeapons = null)
     {
         _simulation =
             simulation ??
@@ -144,6 +156,9 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
 
         _matchStateEntity = matchStateEntity;
         _maximumOutstanding = maximumOutstanding;
+        _intelligence = intelligence;
+        _weapons = weapons;
+        _artilleryWeapons = artilleryWeapons;
         _results =
             new PlayerCommandResultBuffer(
                 maximumOutstanding);
@@ -601,6 +616,234 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             envelope);
     }
 
+    public PlayerCommandSubmissionReceipt SubmitAttack(
+        PlayerId issuer,
+        ReadOnlySpan<EntityId> units,
+        EntityId target,
+        SimulationTick observedTick)
+    {
+        RequireTacticalServices();
+
+        return SubmitTacticalAction(
+            PlayerCommandKind.Tactical,
+            issuer,
+            observedTick,
+            PlayerTacticalActionCommand.Attack(
+                issuer,
+                units,
+                target,
+                observedTick,
+                _intelligence!,
+                _weapons!,
+                _artilleryWeapons!));
+    }
+
+    public PlayerCommandSubmissionReceipt SubmitAttackMove(
+        PlayerId issuer,
+        ReadOnlySpan<EntityId> units,
+        Vector3 destination,
+        SimulationTick observedTick,
+        FormationTemplate formation)
+    {
+        RequireTacticalServices();
+
+        return SubmitTacticalAction(
+            PlayerCommandKind.Tactical,
+            issuer,
+            observedTick,
+            PlayerTacticalActionCommand.AttackMove(
+                issuer,
+                units,
+                destination,
+                observedTick,
+                formation,
+                _intelligence!,
+                _weapons!,
+                _artilleryWeapons!));
+    }
+
+    public PlayerCommandSubmissionReceipt SubmitStopCombat(
+        PlayerId issuer,
+        ReadOnlySpan<EntityId> units,
+        SimulationTick observedTick)
+    {
+        RequireTacticalServices();
+
+        return SubmitTacticalAction(
+            PlayerCommandKind.Tactical,
+            issuer,
+            observedTick,
+            PlayerTacticalActionCommand.Stop(
+                issuer,
+                units,
+                observedTick,
+                _intelligence!,
+                _weapons!,
+                _artilleryWeapons!));
+    }
+
+    public PlayerCommandSubmissionReceipt SubmitHoldPosition(
+        PlayerId issuer,
+        ReadOnlySpan<EntityId> units,
+        SimulationTick observedTick)
+    {
+        RequireTacticalServices();
+
+        return SubmitTacticalAction(
+            PlayerCommandKind.Tactical,
+            issuer,
+            observedTick,
+            PlayerTacticalActionCommand.HoldPosition(
+                issuer,
+                units,
+                observedTick,
+                _intelligence!,
+                _weapons!,
+                _artilleryWeapons!));
+    }
+
+    public PlayerCommandSubmissionReceipt SubmitRetreat(
+        PlayerId issuer,
+        ReadOnlySpan<EntityId> units,
+        Vector3 destination,
+        SimulationTick observedTick,
+        FormationTemplate formation)
+    {
+        RequireTacticalServices();
+
+        return SubmitTacticalAction(
+            PlayerCommandKind.Tactical,
+            issuer,
+            observedTick,
+            PlayerTacticalActionCommand.Retreat(
+                issuer,
+                units,
+                destination,
+                observedTick,
+                formation,
+                _intelligence!,
+                _weapons!,
+                _artilleryWeapons!));
+    }
+
+    public PlayerCommandSubmissionReceipt SubmitFireMission(
+        PlayerId issuer,
+        ReadOnlySpan<EntityId> artillery,
+        Vector3 coordinate,
+        int requestedRounds,
+        SimulationTick observedTick)
+    {
+        RequireTacticalServices();
+
+        return SubmitTacticalAction(
+            PlayerCommandKind.Artillery,
+            issuer,
+            observedTick,
+            PlayerTacticalActionCommand.FireMissionCoordinate(
+                issuer,
+                artillery,
+                coordinate,
+                requestedRounds,
+                observedTick,
+                _intelligence!,
+                _weapons!,
+                _artilleryWeapons!));
+    }
+
+    public PlayerCommandSubmissionReceipt SubmitFireMission(
+        PlayerId issuer,
+        ReadOnlySpan<EntityId> artillery,
+        IntelligenceContactKey contactKey,
+        int requestedRounds,
+        SimulationTick observedTick)
+    {
+        RequireTacticalServices();
+
+        return SubmitTacticalAction(
+            PlayerCommandKind.Artillery,
+            issuer,
+            observedTick,
+            PlayerTacticalActionCommand.FireMissionContact(
+                issuer,
+                artillery,
+                contactKey,
+                requestedRounds,
+                observedTick,
+                _intelligence!,
+                _weapons!,
+                _artilleryWeapons!));
+    }
+
+    public PlayerCommandSubmissionReceipt SubmitCancelFireMission(
+        PlayerId issuer,
+        ReadOnlySpan<EntityId> artillery,
+        SimulationTick observedTick)
+    {
+        RequireTacticalServices();
+
+        return SubmitTacticalAction(
+            PlayerCommandKind.Artillery,
+            issuer,
+            observedTick,
+            PlayerTacticalActionCommand.CancelFireMission(
+                issuer,
+                artillery,
+                observedTick,
+                _intelligence!,
+                _weapons!,
+                _artilleryWeapons!));
+    }
+
+    private PlayerCommandSubmissionReceipt SubmitTacticalAction(
+        PlayerCommandKind kind,
+        PlayerId issuer,
+        SimulationTick observedTick,
+        PlayerTacticalActionCommand command)
+    {
+        if (!TryBeginSubmission(
+                kind,
+                issuer,
+                observedTick,
+                out PlayerCommandCorrelationId correlation,
+                out SimulationTick targetTick,
+                out SimulationCommandSource source,
+                out PlayerCommandSubmissionReceipt rejected))
+        {
+            return rejected;
+        }
+
+        SimulationCommandEnvelope envelope =
+            _simulation.SubmitCommand(
+                command,
+                targetTick,
+                source);
+
+        _pending.Add(
+            PendingCommand.ForTactical(
+                correlation,
+                kind,
+                envelope,
+                command));
+
+        return AcceptedReceipt(
+            correlation,
+            kind,
+            source,
+            observedTick,
+            envelope);
+    }
+
+    private void RequireTacticalServices()
+    {
+        if (_intelligence is null ||
+            _weapons is null ||
+            _artilleryWeapons is null)
+        {
+            throw new InvalidOperationException(
+                "Player tactical commands require intelligence and combat catalogs.");
+        }
+    }
+
     public PlayerCommandSubmissionReceipt SubmitEndMatch(
         PlayerId issuer,
         SimulationTick observedTick)
@@ -804,6 +1047,33 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     command.FailureReason);
             }
 
+            case PlayerCommandKind.Tactical:
+            case PlayerCommandKind.Artillery:
+            {
+                PlayerTacticalActionCommand command =
+                    pending.TacticalCommand!;
+
+                if (command.ExecutedAtTick == SimulationTick.Zero)
+                {
+                    return null;
+                }
+
+                return new PlayerCommandResultReadModel(
+                    SessionId,
+                    pending.CorrelationId,
+                    pending.Kind,
+                    ResolveState(
+                        command.AcceptedTargetCount,
+                        command.RejectedTargetCount),
+                    command.AcceptedTargetCount,
+                    command.RejectedTargetCount,
+                    BuildCommandRejectionReason.None,
+                    BuildingPlacementFailureReason.None,
+                    command.ExecutedAtTick,
+                    PlayerLogisticsActionFailureReason.None,
+                    command.FailureReason);
+            }
+
             case PlayerCommandKind.EndMatch:
             {
                 EndMatchCommand command =
@@ -961,6 +1231,10 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     PlayerCommandFeedbackKind.Logistics,
                 PlayerCommandKind.Supply =>
                     PlayerCommandFeedbackKind.Supply,
+                PlayerCommandKind.Tactical =>
+                    PlayerCommandFeedbackKind.Tactical,
+                PlayerCommandKind.Artillery =>
+                    PlayerCommandFeedbackKind.Artillery,
                 _ =>
                     PlayerCommandFeedbackKind.None
             },
@@ -970,7 +1244,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             result.BuildRejection,
             result.PlacementFailure,
             result.ResolvedAtTick,
-            result.ActionFailure);
+            result.ActionFailure,
+            result.TacticalFailure);
 
     private readonly record struct PendingCommand(
         PlayerCommandCorrelationId CorrelationId,
@@ -981,6 +1256,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         PlayerProductionActionCommand? ProductionCommand,
         PlayerUnitProductionActionCommand? UnitProductionCommand,
         PlayerLogisticsActionCommand? LogisticsCommand,
+        PlayerTacticalActionCommand? TacticalCommand,
         PlayerCommandResultReadModel? Result)
     {
         public static PendingCommand ForMovement(
@@ -1064,6 +1340,33 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 null,
                 null,
                 command,
+                null,
+                null);
+        }
+
+        public static PendingCommand ForTactical(
+            PlayerCommandCorrelationId correlation,
+            PlayerCommandKind kind,
+            in SimulationCommandEnvelope envelope,
+            PlayerTacticalActionCommand command)
+        {
+            if (kind is not
+                    (PlayerCommandKind.Tactical or
+                     PlayerCommandKind.Artillery))
+            {
+                throw new ArgumentOutOfRangeException(nameof(kind));
+            }
+
+            return new PendingCommand(
+                correlation,
+                kind,
+                envelope,
+                null,
+                null,
+                null,
+                null,
+                null,
+                command,
                 null);
         }
 
@@ -1079,6 +1382,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 null,
                 null,
                 command,
+                null,
                 null,
                 null);
     }
