@@ -176,6 +176,19 @@ public sealed class RtsBuildingPlacementController
         _leftWasDown = leftDown;
     }
 
+    public void Cancel(
+        PresentationInteractionState interaction)
+    {
+        ArgumentNullException.ThrowIfNull(interaction);
+
+        ActiveBuilding = BuildingId.None;
+        Preview = null;
+        PreviewFreshness =
+            PlacementPreviewFreshness.Unavailable;
+        _pendingRequest = null;
+        ResetPreviewRequest(interaction);
+    }
+
     public void SelectBuilding(
         BuildingId buildingId)
     {
