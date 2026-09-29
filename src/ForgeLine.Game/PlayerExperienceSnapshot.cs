@@ -214,13 +214,54 @@ public static class PlayerExperienceSnapshotFactory
         SimulationTick tick,
         int ticksPerSecond)
     {
+        ArgumentNullException.ThrowIfNull(buildingCommands);
+
+        return Capture(
+            entities,
+            player,
+            commandCore,
+            coreInventory,
+            matchStateEntity,
+            selectedEntities,
+            inventories,
+            powerNetworks,
+            production,
+            unitProduction,
+            CaptureCommandFeedback(
+                player,
+                buildingCommands,
+                lastMovementCommand),
+            intelligence,
+            units,
+            buildings,
+            tick,
+            ticksPerSecond);
+    }
+
+    public static PlayerExperienceSnapshot Capture(
+        EntityRegistry entities,
+        PlayerId player,
+        EntityId commandCore,
+        InventoryId coreInventory,
+        EntityId matchStateEntity,
+        IReadOnlyCollection<EntityId> selectedEntities,
+        InventoryStore inventories,
+        PowerNetworkSystem powerNetworks,
+        ProductionSystem production,
+        UnitProductionSystem unitProduction,
+        PlayerCommandFeedback commandFeedback,
+        FactionIntelligenceStore intelligence,
+        UnitDefinitionCatalog units,
+        BuildingDefinitionCatalog buildings,
+        SimulationTick tick,
+        int ticksPerSecond)
+    {
         ArgumentNullException.ThrowIfNull(entities);
         ArgumentNullException.ThrowIfNull(selectedEntities);
         ArgumentNullException.ThrowIfNull(inventories);
         ArgumentNullException.ThrowIfNull(powerNetworks);
         ArgumentNullException.ThrowIfNull(production);
         ArgumentNullException.ThrowIfNull(unitProduction);
-        ArgumentNullException.ThrowIfNull(buildingCommands);
         ArgumentNullException.ThrowIfNull(intelligence);
         ArgumentNullException.ThrowIfNull(units);
         ArgumentNullException.ThrowIfNull(buildings);
@@ -317,10 +358,7 @@ public static class PlayerExperienceSnapshotFactory
                 intelligence.GetContactCount(faction));
 
         PlayerCommandFeedback feedback =
-            CaptureCommandFeedback(
-                player,
-                buildingCommands,
-                lastMovementCommand);
+            commandFeedback;
 
         PlayerMatchStatistics statistics =
             CaptureStatistics(
