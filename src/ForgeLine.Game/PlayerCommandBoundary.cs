@@ -850,6 +850,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 envelope,
                 command,
                 null,
+                null,
+                null,
                 null);
 
         public static PendingCommand ForBuild(
@@ -877,6 +879,34 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 command,
                 null,
                 null,
+                null);
+
+        public static PendingCommand ForProduction(
+            PlayerCommandCorrelationId correlation,
+            in SimulationCommandEnvelope envelope,
+            PlayerProductionActionCommand command) =>
+            new(
+                correlation,
+                PlayerCommandKind.Production,
+                envelope,
+                null,
+                null,
+                command,
+                null,
+                null);
+
+        public static PendingCommand ForUnitProduction(
+            PlayerCommandCorrelationId correlation,
+            in SimulationCommandEnvelope envelope,
+            PlayerUnitProductionActionCommand command) =>
+            new(
+                correlation,
+                PlayerCommandKind.UnitProduction,
+                envelope,
+                null,
+                null,
+                null,
+                command,
                 null);
     }
 }
