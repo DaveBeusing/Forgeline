@@ -105,3 +105,19 @@ The simulation benchmark host includes automated-distribution scheduling scenari
 ## Extension Boundary
 
 Battlefield supply can use this shared request/dispatch foundation for resources such as Fuel and Ammunition. Battlefield-specific demand generation may add policy logic, but it should not introduce a second truck scheduler or bypass shared reservation and physical transport.
+
+## Human Player Stock Policies
+
+The shared player action surface exposes automated-distribution policy for one selected owned logistics-capable entity.
+
+- `L` opens the logistics view.
+- `Tab` selects a resource.
+- `M` cycles the edited Minimum / Target / Maximum threshold.
+- Left / Right changes the selected threshold while preserving `0 <= minimum <= target <= maximum`.
+- `T` cycles logistics priority.
+- `Enter` submits the current stock policy through `PlayerCommandGateway`.
+- `C` removes an existing policy.
+
+The panel reads current stock, existing policy values, request state, assigned Cargo Truck, failure reason, and bottleneck reason from immutable completed-tick read models. Submission is not delivery: `AutomatedDistributionSystem` still creates requests, reserves real source stock and route capacity, assigns eligible Cargo Trucks, and relies on `CargoTransportSystem` for physical loading, movement, and unloading.
+
+Player commands validate target ownership before delegating to the existing stock-policy commands. Invalid thresholds, foreign targets, stale policy entities, unavailable source stock, missing routes, saturated capacity, unavailable trucks, and full destinations remain authoritative failures rather than UI-side exceptions or resource grants.
