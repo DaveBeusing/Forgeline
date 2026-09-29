@@ -104,6 +104,12 @@ public sealed class RtsTacticalTargetingController
             snapshot?.SessionId ??
             SimulationSessionId.None);
 
+        if (snapshot?.PlayerExperience?.IsMatchComplete ==
+            true)
+        {
+            Cancel();
+        }
+
         _pointerCaptured =
             IsActive;
 
