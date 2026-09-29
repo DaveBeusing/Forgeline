@@ -827,6 +827,7 @@ internal static class PlayerActionSnapshotFactory
         int criticalSupply = 0;
         int resupplying = 0;
 
+        bool observedCombatState = false;
         bool hasOrder = false;
         bool mixedOrder = false;
         CombatOrderKind commonOrder = default;
@@ -896,14 +897,16 @@ internal static class PlayerActionSnapshotFactory
                     }
                 }
 
-                if (!hasOrder)
+                if (!observedCombatState)
                 {
+                    observedCombatState = true;
                     hasOrder = entityHasOrder;
                     commonOrder = orderKind;
                     commonStatus = status;
                 }
-                else if (!entityHasOrder ||
-                         orderKind != commonOrder ||
+                else if (entityHasOrder != hasOrder ||
+                         (entityHasOrder &&
+                          orderKind != commonOrder) ||
                          status != commonStatus)
                 {
                     mixedOrder = true;
