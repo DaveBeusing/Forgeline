@@ -33,7 +33,8 @@ public readonly record struct BuildingPlacementPreviewReadModel(
 internal readonly record struct PresentationInteractionRequestSnapshot(
     IReadOnlyList<EntityId> SelectedEntities,
     BuildingPlacementPreviewRequest? PlacementRequest,
-    bool DebugEnabled);
+    bool DebugEnabled,
+    float DebugPlaneHeight);
 
 public sealed class PresentationInteractionState
 {
@@ -41,6 +42,7 @@ public sealed class PresentationInteractionState
     private EntityId[] _selectedEntities = [];
     private BuildingPlacementPreviewRequest? _placementRequest;
     private bool _debugEnabled;
+    private float _debugPlaneHeight;
     private ulong _nextPlacementRequestId = 1;
 
     public void SetSelection(ReadOnlySpan<EntityId> entities)
@@ -109,11 +111,19 @@ public sealed class PresentationInteractionState
         }
     }
 
-    public void SetDebugEnabled(bool enabled)
+    public void SetDebugState(
+        bool enabled,
+        float planeHeight)
     {
+        if (!float.IsFinite(planeHeight))
+        {
+            throw new ArgumentOutOfRangeException(nameof(planeHeight));
+        }
+
         lock (_gate)
         {
             _debugEnabled = enabled;
+            _debugPlaneHeight = planeHeight;
         }
     }
 
@@ -125,7 +135,8 @@ public sealed class PresentationInteractionState
                 Array.AsReadOnly(
                     _selectedEntities.ToArray()),
                 _placementRequest,
-                _debugEnabled);
+                _debugEnabled,
+                _debugPlaneHeight);
         }
     }
 }
