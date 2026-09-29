@@ -12,6 +12,7 @@ public sealed class VerticalSliceRuntimeServices
         ResourceCatalog resources,
         BuildingDefinitionCatalog buildingDefinitions,
         UnitDefinitionCatalog unitDefinitions,
+        ProductionRecipeCatalog productionRecipes,
         SpatialGridIndex spatialIndex,
         BuildingPlacementService buildingPlacement,
         BuildingCommandProcessingSystem buildingCommands,
@@ -30,6 +31,7 @@ public sealed class VerticalSliceRuntimeServices
         Resources = resources;
         BuildingDefinitions = buildingDefinitions;
         UnitDefinitions = unitDefinitions;
+        ProductionRecipes = productionRecipes;
         SpatialIndex = spatialIndex;
         BuildingPlacement = buildingPlacement;
         BuildingCommands = buildingCommands;
@@ -51,6 +53,8 @@ public sealed class VerticalSliceRuntimeServices
     public BuildingDefinitionCatalog BuildingDefinitions { get; }
 
     public UnitDefinitionCatalog UnitDefinitions { get; }
+
+    public ProductionRecipeCatalog ProductionRecipes { get; }
 
     public SpatialGridIndex SpatialIndex { get; }
 
