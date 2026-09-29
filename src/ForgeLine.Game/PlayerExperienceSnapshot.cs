@@ -26,7 +26,9 @@ public enum PlayerCommandFeedbackKind : byte
     Production = 3,
     UnitProduction = 4,
     Logistics = 5,
-    Supply = 6
+    Supply = 6,
+    Tactical = 7,
+    Artillery = 8
 }
 
 public enum PlayerCommandFeedbackState : byte
@@ -46,7 +48,9 @@ public readonly record struct PlayerCommandFeedback(
     BuildingPlacementFailureReason PlacementFailure,
     SimulationTick ResolvedAtTick,
     PlayerLogisticsActionFailureReason ActionFailure =
-        PlayerLogisticsActionFailureReason.None)
+        PlayerLogisticsActionFailureReason.None,
+    PlayerTacticalActionFailureReason TacticalFailure =
+        PlayerTacticalActionFailureReason.None)
 {
     public static PlayerCommandFeedback None =>
         new(
