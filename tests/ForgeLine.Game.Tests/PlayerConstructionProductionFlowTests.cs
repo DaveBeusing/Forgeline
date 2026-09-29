@@ -666,19 +666,12 @@ public sealed class PlayerConstructionProductionFlowTests
             gateway,
             vehicleFactory,
             UnitIds.ScoutVehicle);
-        QueueUnit(
-            scenario,
-            gateway,
-            vehicleFactory,
-            UnitIds.SupplyTruck);
 
         scenario.Simulation.RunTicks(
             scenario.Services.UnitDefinitions[
                 UnitIds.MainBattleTank].ProductionTicks * 2 +
             scenario.Services.UnitDefinitions[
                 UnitIds.ScoutVehicle].ProductionTicks +
-            scenario.Services.UnitDefinitions[
-                UnitIds.SupplyTruck].ProductionTicks +
             12,
             TestContext.Current.CancellationToken);
 
@@ -691,25 +684,26 @@ public sealed class PlayerConstructionProductionFlowTests
                 FindOwnedUnits(
                     scenario,
                     UnitIds.ScoutVehicle));
-        EntityId supplyTruck =
-            Assert.Single(
-                FindOwnedUnits(
-                    scenario,
-                    UnitIds.SupplyTruck));
 
         Assert.Equal(2, tanks.Length);
 
-        RemoveStockPolicies(
-            scenario,
-            gateway,
-            smelter,
-            vehicleFactory);
+        Vector3 supplyStagingDirection =
+            Vector3.Normalize(
+                new Vector3(
+                    supplyDepotPosition.X -
+                        westCore.Position.X,
+                    0.0f,
+                    supplyDepotPosition.Z -
+                        westCore.Position.Z));
+        Vector3 supplyStagingPoint =
+            supplyDepotPosition +
+            supplyStagingDirection * 34.0f;
 
         Assert.True(
             gateway.SubmitMovement(
                 scenario.West.Player,
                 tanks,
-                supplyDepotPosition,
+                supplyStagingPoint,
                 scenario.Simulation.CurrentTick,
                 FormationTemplate.Compact).Accepted);
         scenario.Simulation.AdvanceOneTick();
@@ -724,8 +718,8 @@ public sealed class PlayerConstructionProductionFlowTests
                             scenario.Simulation.Entities
                                 .GetComponent<WorldTransform>(
                                     tank).Position,
-                            supplyDepotPosition) <=
-                        28.0f * 28.0f),
+                            supplyStagingPoint) <=
+                        6.0f * 6.0f),
             maximumTicks: 1_000);
 
         var fuelBefore =
@@ -769,6 +763,29 @@ public sealed class PlayerConstructionProductionFlowTests
                                fuelBefore[tank];
                     }),
             maximumTicks: 600);
+
+        QueueUnit(
+            scenario,
+            gateway,
+            vehicleFactory,
+            UnitIds.SupplyTruck);
+        scenario.Simulation.RunTicks(
+            scenario.Services.UnitDefinitions[
+                UnitIds.SupplyTruck].ProductionTicks +
+            8,
+            TestContext.Current.CancellationToken);
+
+        EntityId supplyTruck =
+            Assert.Single(
+                FindOwnedUnits(
+                    scenario,
+                    UnitIds.SupplyTruck));
+
+        RemoveStockPolicies(
+            scenario,
+            gateway,
+            smelter,
+            vehicleFactory);
 
         Vector3 reconnaissancePoint =
             eastCore.Position +
