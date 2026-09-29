@@ -68,64 +68,6 @@ internal sealed class ClientApplication
             scenario.Battlefield;
         TerrainWorld terrainWorld =
             scenario.Terrain;
-        SpatialGridIndex spatialIndex =
-            scenario.Services.SpatialIndex;
-        GroundMovementSystem groundMovementSystem =
-            scenario.Services.GroundMovement;
-        FormationMovementSystem formationMovementSystem =
-            scenario.Services.FormationMovement;
-        HierarchicalNavigationSystem navigationSystem =
-            scenario.Services.Navigation;
-        ResourceCatalog resourceCatalog =
-            scenario.Services.Resources;
-        BuildingDefinitionCatalog buildingDefinitions =
-            scenario.Services.BuildingDefinitions;
-        UnitDefinitionCatalog unitDefinitions =
-            scenario.Services.UnitDefinitions;
-        InventoryStore inventories =
-            scenario.Inventories;
-        BuildingPlacementService buildingPlacement =
-            scenario.Services.BuildingPlacement;
-        BuildingCommandProcessingSystem buildingCommands =
-            scenario.Services.BuildingCommands;
-        BuildingConstructionSystem buildingConstruction =
-            scenario.Services.BuildingConstruction;
-        UnitProductionSystem unitProduction =
-            scenario.Services.UnitProduction;
-        PowerNetworkSystem powerNetworks =
-            scenario.Power;
-        ProductionSystem production =
-            scenario.Production;
-        ResourceExtractionSystem resourceExtraction =
-            scenario.Extraction;
-        LogisticsNetwork logisticsNetwork =
-            scenario.Logistics;
-        PrototypeBattlefieldRuntime prototypeRuntime =
-            scenario.BattlefieldRuntime;
-        CargoTransportSystem cargoTransportSystem =
-            scenario.CargoTransport;
-        AutomatedDistributionSystem automatedDistribution =
-            scenario.AutomatedDistribution;
-        BattlefieldSupplySystem battlefieldSupply =
-            scenario.BattlefieldSupply;
-        FactionIntelligenceStore intelligenceStore =
-            scenario.Intelligence;
-        BattlefieldIntelligenceSystem battlefieldIntelligence =
-            scenario.Services.BattlefieldIntelligence;
-        SkirmishOpponentSystem skirmishOpponent =
-            scenario.Opponents;
-        TargetAcquisitionSystem targetAcquisition =
-            scenario.Services.TargetAcquisition;
-        ArtilleryFireMissionSystem artilleryFireMissions =
-            scenario.Artillery;
-        AutomaticResupplyDecisionSystem automaticResupply =
-            scenario.Services.AutomaticResupply;
-        TacticalCombatSystem tacticalCombat =
-            scenario.Services.TacticalCombat;
-        CombatReadinessSystem combatReadiness =
-            scenario.Readiness;
-        CombatDebugSnapshotSystem combatDebugSnapshots =
-            scenario.Services.CombatDebugSnapshots;
         SkirmishStartingBase westBase =
             scenario.West;
         SkirmishStartingBase eastBase =
