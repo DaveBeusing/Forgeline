@@ -189,3 +189,20 @@ Regression coverage includes normal production, missing input, missing power, bl
 `ProductionBenchmarks` exercises 100, 1,000, and 5,000 simultaneously active processing facilities using the real fixed-tick production and power systems.
 
 Benchmark timing remains observational and is not a hard CI threshold.
+
+
+## Human Player Controls
+
+Industrial production is exposed through the same reusable player action palette used by construction and unit production.
+
+- `P` opens or closes the processing view for one selected owned processing facility.
+- `Tab` selects a supported recipe or queued request.
+- `Enter` queues the selected recipe. On a queued processing request, `Enter` toggles pause/resume.
+- `C` cancels the selected queued processing request.
+- `T` cycles High, Normal, and Low request priority.
+- `M` cycles OneShot, Repeat, and DesiredStock request modes.
+- In DesiredStock mode, Left/Right adjusts the target by the selected recipe's output batch size.
+
+The palette displays facility-local input quantities, output-derived desired-stock targets, fixed-tick progress, queue entries, authoritative status/block reasons, pending command count, and accepted/rejected feedback. Global player resource totals are never used as permission to spend from a processing facility.
+
+Every operation crosses `PlayerCommandGateway`. The player-facing adapter validates ownership before delegating to the existing production commands. The presentation layer never creates production output, reserves inventory, advances progress, or mutates `ProductionFacility` state.
