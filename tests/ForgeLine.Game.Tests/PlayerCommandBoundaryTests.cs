@@ -878,6 +878,104 @@ public sealed class PlayerCommandBoundaryTests
             mission.TargetPosition.X);
     }
 
+    [Fact]
+    public void PlayerAttackNaturallyDestroysCommandCoreAndResolvesVictory()
+    {
+        using VerticalSliceScenario scenario =
+            CreateHumanScenario(seed: 4118);
+        PlayerCommandGateway gateway =
+            CreateGateway(scenario);
+        WorldTransform coreTransform =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    scenario.East.CommandCore);
+        var attackers =
+            new List<EntityId>();
+
+        for (int index = 0;
+             index < 2;
+             index++)
+        {
+            Vector3 position =
+                coreTransform.Position +
+                new Vector3(
+                    -180.0f,
+                    0.0f,
+                    -20.0f + index * 40.0f);
+
+            Assert.True(
+                scenario.Terrain.TrySampleHeight(
+                    position.X,
+                    position.Z,
+                    out float height));
+            position.Y = height + 1.5f;
+
+            attackers.Add(
+                scenario.UnitFactory.Create(
+                    scenario.Services.UnitDefinitions[
+                        UnitIds.MainBattleTank],
+                    position,
+                    scenario.West.Player));
+        }
+
+        FactionId westFaction =
+            new((uint)scenario.West.Player.Value);
+        IntelligenceSignature coreSignature =
+            scenario.Simulation.Entities
+                .GetComponent<IntelligenceSignature>(
+                    scenario.East.CommandCore);
+
+        scenario.Intelligence.BeginTick(
+            scenario.Simulation.CurrentTick);
+        scenario.Intelligence.Observe(
+            westFaction,
+            scenario.East.CommandCore,
+            coreSignature,
+            coreTransform.Position,
+            IntelligenceState.Identified,
+            scenario.Simulation.CurrentTick);
+
+        Assert.True(
+            gateway.SubmitAttack(
+                scenario.West.Player,
+                attackers.ToArray(),
+                scenario.East.CommandCore,
+                scenario.Simulation.CurrentTick).Accepted);
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel result));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            result.State);
+
+        for (int tick = 0;
+             tick < 1_500 &&
+             !scenario.GetMatchState().IsTerminal;
+             tick++)
+        {
+            scenario.Simulation.AdvanceOneTick();
+        }
+
+        MatchState match =
+            scenario.GetMatchState();
+
+        Assert.Equal(
+            MatchStatus.Victory,
+            match.Status);
+        Assert.Equal(
+            scenario.West.Player,
+            match.Winner);
+        Assert.False(
+            scenario.Simulation.Entities.IsAlive(
+                scenario.East.CommandCore));
+        Assert.True(
+            scenario.Services.TacticalCombat.Metrics
+                .EngagingUnits >= 0);
+    }
+
     private static VerticalSliceScenario CreateHumanScenario(
         ulong seed)
     {
