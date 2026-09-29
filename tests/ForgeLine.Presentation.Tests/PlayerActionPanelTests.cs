@@ -467,6 +467,27 @@ public sealed class PlayerActionPanelTests
             request.StockMinimum <= request.StockTarget);
         Assert.True(
             request.StockTarget <= request.StockMaximum);
+
+        Release(input, PlatformKey.Enter);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+        Press(input, PlatformKey.C);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        Assert.True(
+            controller.TryTakeRequest(
+                out PlayerActionRequest remove));
+        Assert.Equal(
+            PlayerActionRequestKind.RemoveStockPolicy,
+            remove.Kind);
+        Assert.Equal(policyEntity, remove.RequestEntity);
     }
 
     [Fact]
