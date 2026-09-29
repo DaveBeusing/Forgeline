@@ -476,15 +476,31 @@ public sealed class PlayerActionPanelController
             _ = Pressed(input, PlatformKey.M);
         }
 
-        UpdateDesiredStockTarget(
-            input,
-            actions);
-        UpdateStockThresholds(
-            input,
-            actions);
-        UpdateSupplyThresholds(
-            input,
-            actions);
+        switch (Mode)
+        {
+            case PlayerActionPanelMode.Production:
+                UpdateDesiredStockTarget(
+                    input,
+                    actions);
+                break;
+
+            case PlayerActionPanelMode.Logistics:
+                UpdateStockThresholds(
+                    input,
+                    actions);
+                break;
+
+            case PlayerActionPanelMode.Supply:
+                UpdateSupplyThresholds(
+                    input,
+                    actions);
+                break;
+
+            default:
+                _ = Pressed(input, PlatformKey.Left);
+                _ = Pressed(input, PlatformKey.Right);
+                break;
+        }
 
         PlayerActionPanelView view =
             CreateView(
@@ -937,8 +953,7 @@ public sealed class PlayerActionPanelController
         InputState input,
         PlayerActionSnapshot? actions)
     {
-        if (Mode != PlayerActionPanelMode.Logistics ||
-            actions?.Logistics is null ||
+        if (actions?.Logistics is null ||
             SelectedIndex < 0 ||
             SelectedIndex >= actions.Logistics.Policies.Count)
         {
@@ -1006,8 +1021,7 @@ public sealed class PlayerActionPanelController
         InputState input,
         PlayerActionSnapshot? actions)
     {
-        if (Mode != PlayerActionPanelMode.Supply ||
-            !actions?.Supply.HasValue == true ||
+        if (!actions?.Supply.HasValue == true ||
             SelectedIndex > 1)
         {
             _ = Pressed(input, PlatformKey.Left);
@@ -1053,9 +1067,7 @@ public sealed class PlayerActionPanelController
         InputState input,
         PlayerActionSnapshot? actions)
     {
-        if (Mode !=
-                PlayerActionPanelMode.Production ||
-            ProductionMode !=
+        if (ProductionMode !=
                 ProductionRequestMode.DesiredStock ||
             actions?.Production is not
                 PlayerProductionFacilityActionReadModel facility ||
