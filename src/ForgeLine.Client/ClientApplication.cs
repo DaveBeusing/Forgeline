@@ -158,6 +158,8 @@ internal sealed class ClientApplication
                 ControllableEntityCategory.Logistics));
         var buildingPlacementController =
             new RtsBuildingPlacementController(LocalPlayer);
+        var actionPanel =
+            new PlayerActionPanelController();
         var debugDraw = new DebugDraw();
         var frameTimingTracker = new FrameTimingTracker();
 
@@ -286,12 +288,49 @@ internal sealed class ClientApplication
                 continue;
             }
 
-            RtsCameraInputFrame cameraInput = actionMapper.Map(inputState);
-            camera.Update(
-                cameraInput,
-                cameraDeltaSeconds,
-                window.ClientSize.Width,
-                window.ClientSize.Height);
+            if (inputMatchTerminal)
+            {
+                actionPanel.Close();
+            }
+            else
+            {
+                actionPanel.Update(
+                    inputState,
+                    inputSnapshot,
+                    window.ClientSize.Width,
+                    window.ClientSize.Height,
+                    actionPanel.PointerCaptured);
+
+                if (actionPanel.HasKeyboardFocus &&
+                    buildingPlacementController.IsActive)
+                {
+                    buildingPlacementController.Cancel(
+                        presentationInteraction);
+                }
+
+                if (actionPanel.TryTakeRequest(
+                        out PlayerActionRequest actionRequest))
+                {
+                    DispatchPlayerActionRequest(
+                        actionRequest,
+                        commandGateway,
+                        buildingPlacementController,
+                        inputSnapshot?.Tick ??
+                            SimulationTick.Zero,
+                        ref lastCommandReceipt);
+                }
+            }
+
+            if (!actionPanel.HasKeyboardFocus)
+            {
+                RtsCameraInputFrame cameraInput =
+                    actionMapper.Map(inputState);
+                camera.Update(
+                    cameraInput,
+                    cameraDeltaSeconds,
+                    window.ClientSize.Width,
+                    window.ClientSize.Height);
+            }
 
             TimeSpan catchUp = frameElapsed <= MaximumSimulationCatchUp
                 ? frameElapsed
@@ -389,7 +428,8 @@ internal sealed class ClientApplication
                         terrainWorld,
                         window.ClientSize.Width,
                         window.ClientSize.Height,
-                        renderAlpha);
+                        renderAlpha,
+                        actionPanel.PointerCaptured);
 
                     if (selectionController.TryTakeMovementRequest(
                             out MovementOrderRequest movementRequest))
@@ -536,6 +576,70 @@ internal sealed class ClientApplication
             buildingPlacementController);
         WriteGraphicsState("stopped", graphics);
         return 0;
+    }
+
+    private static void DispatchPlayerActionRequest(
+        in PlayerActionRequest request,
+        PlayerCommandGateway commandGateway,
+        RtsBuildingPlacementController buildingPlacementController,
+        SimulationTick observedTick,
+        ref PlayerCommandSubmissionReceipt? lastCommandReceipt)
+    {
+        switch (request.Kind)
+        {
+            case PlayerActionRequestKind.BeginBuildingPlacement:
+                buildingPlacementController.SelectBuilding(
+                    request.BuildingId);
+                break;
+
+            case PlayerActionRequestKind.QueueProduction:
+                lastCommandReceipt =
+                    commandGateway.SubmitProduction(
+                        LocalPlayer,
+                        request.Facility,
+                        request.RecipeId,
+                        observedTick,
+                        request.Priority,
+                        request.ProductionMode,
+                        request.DesiredStockResourceId,
+                        request.DesiredStockQuantity);
+                break;
+
+            case PlayerActionRequestKind.SetProductionPaused:
+                lastCommandReceipt =
+                    commandGateway.SubmitProductionPaused(
+                        LocalPlayer,
+                        request.RequestEntity,
+                        request.Paused,
+                        observedTick);
+                break;
+
+            case PlayerActionRequestKind.CancelProduction:
+                lastCommandReceipt =
+                    commandGateway.SubmitProductionCancel(
+                        LocalPlayer,
+                        request.RequestEntity,
+                        observedTick);
+                break;
+
+            case PlayerActionRequestKind.QueueUnitProduction:
+                lastCommandReceipt =
+                    commandGateway.SubmitUnitProduction(
+                        LocalPlayer,
+                        request.Facility,
+                        request.UnitId,
+                        observedTick,
+                        request.Priority);
+                break;
+
+            case PlayerActionRequestKind.CancelUnitProduction:
+                lastCommandReceipt =
+                    commandGateway.SubmitUnitProductionCancel(
+                        LocalPlayer,
+                        request.RequestEntity,
+                        observedTick);
+                break;
+        }
     }
 
     private static void PopulateSimulationEntities(
