@@ -22,7 +22,9 @@ public enum PlayerCommandFeedbackKind : byte
 {
     None = 0,
     Movement = 1,
-    Construction = 2
+    Construction = 2,
+    Production = 3,
+    UnitProduction = 4
 }
 
 public enum PlayerCommandFeedbackState : byte
