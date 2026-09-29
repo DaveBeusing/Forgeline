@@ -646,6 +646,47 @@ internal sealed class ClientApplication
                         request.RequestEntity,
                         observedTick);
                 break;
+
+            case PlayerActionRequestKind.SetStockPolicy:
+                lastCommandReceipt =
+                    commandGateway.SubmitLogisticsStockPolicy(
+                        LocalPlayer,
+                        request.Facility,
+                        request.StockResourceId,
+                        request.StockMinimum,
+                        request.StockTarget,
+                        request.StockMaximum,
+                        request.StockPriority,
+                        request.Enabled,
+                        observedTick);
+                break;
+
+            case PlayerActionRequestKind.RemoveStockPolicy:
+                lastCommandReceipt =
+                    commandGateway.SubmitRemoveLogisticsStockPolicy(
+                        LocalPlayer,
+                        request.RequestEntity,
+                        observedTick);
+                break;
+
+            case PlayerActionRequestKind.SetAutomaticResupplyPolicy:
+                lastCommandReceipt =
+                    commandGateway.SubmitAutomaticResupplyPolicy(
+                        LocalPlayer,
+                        request.Facility,
+                        request.AutomaticAmmunitionThreshold,
+                        request.AutomaticFuelThreshold,
+                        request.Enabled,
+                        observedTick);
+                break;
+
+            case PlayerActionRequestKind.RequestResupply:
+                lastCommandReceipt =
+                    commandGateway.SubmitResupply(
+                        LocalPlayer,
+                        request.Facility,
+                        observedTick);
+                break;
         }
     }
 
