@@ -455,10 +455,6 @@ public sealed class PlayerConstructionProductionFlowTests
                     0.0f,
                     westCore.Position.Z -
                         eastCore.Position.Z));
-        Vector3 forwardIndustryCenter =
-            eastCore.Position +
-            towardWest * 420.0f;
-
         var built =
             new List<(BuildingId Id, Vector3 Position)>();
 
@@ -483,10 +479,9 @@ public sealed class PlayerConstructionProductionFlowTests
         }
 
         Vector3 vehicleFactoryPosition =
-            FindOpenPlacementNear(
+            FindOpenPlacement(
                 scenario,
-                BuildingIds.VehicleFactory,
-                forwardIndustryCenter);
+                BuildingIds.VehicleFactory);
         BuildPlayerBuilding(
             scenario,
             gateway,
@@ -655,11 +650,9 @@ public sealed class PlayerConstructionProductionFlowTests
         Assert.Equal(2, tanks.Length);
 
         Vector3 supplyDepotPosition =
-            FindOpenPlacementNear(
+            FindOpenPlacement(
                 scenario,
-                BuildingIds.SupplyDepot,
-                vehicleFactoryPosition +
-                    towardWest * 45.0f);
+                BuildingIds.SupplyDepot);
         BuildPlayerBuilding(
             scenario,
             gateway,
@@ -796,6 +789,33 @@ public sealed class PlayerConstructionProductionFlowTests
                         ammunition.InventoryId,
                         ResourceIds.Ammunition);
                 });
+
+        Vector3 assaultStagingPoint =
+            eastCore.Position +
+            towardWest * 135.0f;
+
+        Assert.True(
+            gateway.SubmitMovement(
+                scenario.West.Player,
+                [supplyTruck, .. tanks],
+                assaultStagingPoint,
+                scenario.Simulation.CurrentTick,
+                FormationTemplate.Line).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out _));
+
+        RunUntil(
+            scenario,
+            () =>
+                tanks.All(
+                    tank =>
+                        Vector3.DistanceSquared(
+                            scenario.Simulation.Entities
+                                .GetComponent<WorldTransform>(
+                                    tank).Position,
+                            assaultStagingPoint) <=
+                        42.0f * 42.0f),
+            maximumTicks: 3_000);
 
         PlayerCommandResultReadModel attackResult =
             DispatchAction(
