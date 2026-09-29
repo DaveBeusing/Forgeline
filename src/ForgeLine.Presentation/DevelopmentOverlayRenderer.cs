@@ -652,18 +652,6 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         int recipeCount =
             facility.Recipes.Count;
 
-        if (selectedIndex >= 0 &&
-            selectedIndex < recipeCount)
-        {
-            PlayerProductionRecipeActionReadModel selected =
-                facility.Recipes[selectedIndex];
-            builder.Append("INPUT ");
-            AppendAmounts(
-                ref builder,
-                selected.Inputs);
-            builder.NewLine();
-        }
-
         for (int index = 0;
              index < recipeCount;
              index++)
@@ -714,6 +702,18 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
 
             builder.NewLine();
         }
+
+        if (selectedIndex >= 0 &&
+            selectedIndex < recipeCount)
+        {
+            PlayerProductionRecipeActionReadModel selected =
+                facility.Recipes[selectedIndex];
+            builder.Append("INPUT ");
+            AppendAmounts(
+                ref builder,
+                selected.Inputs);
+            builder.NewLine();
+        }
     }
 
     private static void EmitUnitProductionActions(
@@ -748,18 +748,6 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
 
         int unitCount =
             facility.Units.Count;
-
-        if (selectedIndex >= 0 &&
-            selectedIndex < unitCount)
-        {
-            PlayerUnitProductionActionReadModel selected =
-                facility.Units[selectedIndex];
-            builder.Append("COST ");
-            AppendAmounts(
-                ref builder,
-                selected.Costs);
-            builder.NewLine();
-        }
 
         for (int index = 0;
              index < unitCount;
@@ -803,6 +791,18 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                 builder.Append(" ACTIVE");
             }
 
+            builder.NewLine();
+        }
+
+        if (selectedIndex >= 0 &&
+            selectedIndex < unitCount)
+        {
+            PlayerUnitProductionActionReadModel selected =
+                facility.Units[selectedIndex];
+            builder.Append("COST ");
+            AppendAmounts(
+                ref builder,
+                selected.Costs);
             builder.NewLine();
         }
     }
