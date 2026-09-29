@@ -239,20 +239,16 @@ internal sealed class ClientApplication
         WriteCameraState("started", camera);
         WritePresentationState(
             "started",
-            simulation,
             renderWorld,
             terrainRenderer,
             instanceRenderer);
         WriteInteractionState(
             "started",
             selectionController,
-            lastMovementEnvelope,
-            lastMovementCommand,
+            lastCommandReceipt,
+            lastCommandResult,
             activeFormation,
-            buildingPlacementController,
-            lastBuildEnvelope,
-            lastBuildCommand,
-            buildingCommands);
+            buildingPlacementController);
 
         long startedAt = _platform.Clock.GetTimestamp();
         long previousFrameAt = startedAt;
@@ -293,28 +289,9 @@ internal sealed class ClientApplication
                 inputState,
                 ref formationToggleHeld,
                 ref activeFormation);
-            groundMovementSystem.DebugCaptureEnabled =
-                worldDebugEnabled;
-            formationMovementSystem.DebugCaptureEnabled =
-                worldDebugEnabled;
-            battlefieldSupply.DebugCaptureEnabled =
-                worldDebugEnabled;
-            battlefieldIntelligence.TimingEnabled =
-                worldDebugEnabled;
-            battlefieldIntelligence.DebugCaptureEnabled =
-                worldDebugEnabled;
-            artilleryFireMissions.DebugCaptureEnabled =
-                worldDebugEnabled;
-            targetAcquisition.DebugCaptureEnabled =
-                worldDebugEnabled;
-            tacticalCombat.DebugCaptureEnabled =
-                worldDebugEnabled;
-            combatReadiness.DebugCaptureEnabled =
-                worldDebugEnabled;
-            combatDebugSnapshots.DebugCaptureEnabled =
-                worldDebugEnabled;
-            skirmishOpponent.DebugCaptureEnabled =
-                worldDebugEnabled;
+            presentationInteraction.SetDebugState(
+                worldDebugEnabled,
+                camera.Target.Y);
 
             bool restartPressed =
                 ConsumeKeyPress(
