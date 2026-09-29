@@ -662,11 +662,14 @@ public sealed class VerticalSliceScenario : IDisposable
 
         var services =
             new VerticalSliceRuntimeServices(
+                resources,
                 buildingDefinitions,
                 unitDefinitions,
                 spatialIndex,
                 buildingPlacement,
                 buildingCommands,
+                buildingConstruction,
+                unitProduction,
                 groundMovement,
                 formationMovement,
                 navigation,
