@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Numerics;
 using ForgeLine.Combat;
 using ForgeLine.Core;
+using ForgeLine.Economy;
 using ForgeLine.Game;
 using ForgeLine.Intelligence;
 using ForgeLine.Logistics;
