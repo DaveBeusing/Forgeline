@@ -82,6 +82,14 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                     context,
                     interaction);
 
+        PlayerActionSnapshot? playerActions =
+            _extraction is null
+                ? null
+                : PlayerActionSnapshotFactory.Capture(
+                    context,
+                    _extraction,
+                    interaction);
+
         BuildingPlacementPreviewReadModel? placementPreview =
             _extraction is null
                 ? null
@@ -119,7 +127,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 debug,
                 construction,
                 _extraction?.Scenario.Simulation.Diagnostics.Capture(
-                    _extraction.Scenario.Simulation)));
+                    _extraction.Scenario.Simulation),
+                playerActions));
     }
 
     private RenderInstance[] CaptureRenderInstances(
