@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Ecs;
