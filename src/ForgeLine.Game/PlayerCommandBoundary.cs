@@ -154,6 +154,9 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
     public PlayerCommandFeedback LatestFeedback { get; private set; } =
         PlayerCommandFeedback.None;
 
+    public int PendingCount =>
+        _pending.Count;
+
     public int OutstandingCount =>
         _pending.Count + _results.Count;
 
