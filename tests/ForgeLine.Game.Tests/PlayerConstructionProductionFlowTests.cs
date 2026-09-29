@@ -728,6 +728,38 @@ public sealed class PlayerConstructionProductionFlowTests
                         28.0f * 28.0f),
             maximumTicks: 1_000);
 
+        Assert.True(
+            gateway.SubmitMovement(
+                scenario.West.Player,
+                [supplyTruck],
+                supplyDepotPosition,
+                scenario.Simulation.CurrentTick,
+                FormationTemplate.Compact).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out _));
+
+        SupplyTruck truckSupply =
+            scenario.Simulation.Entities
+                .GetComponent<SupplyTruck>(
+                    supplyTruck);
+
+        RunUntil(
+            scenario,
+            () =>
+                Vector3.DistanceSquared(
+                    scenario.Simulation.Entities
+                        .GetComponent<WorldTransform>(
+                            supplyTruck).Position,
+                    supplyDepotPosition) <=
+                    10.0f * 10.0f &&
+                scenario.Inventories.GetQuantity(
+                    truckSupply.InventoryId,
+                    ResourceIds.Fuel) > 0.0 &&
+                scenario.Inventories.GetQuantity(
+                    truckSupply.InventoryId,
+                    ResourceIds.Ammunition) > 0.0,
+            maximumTicks: 1_000);
+
         var fuelBefore =
             new Dictionary<EntityId, double>();
 
