@@ -9,11 +9,14 @@ namespace ForgeLine.Game;
 public sealed class VerticalSliceRuntimeServices
 {
     internal VerticalSliceRuntimeServices(
+        ResourceCatalog resources,
         BuildingDefinitionCatalog buildingDefinitions,
         UnitDefinitionCatalog unitDefinitions,
         SpatialGridIndex spatialIndex,
         BuildingPlacementService buildingPlacement,
         BuildingCommandProcessingSystem buildingCommands,
+        BuildingConstructionSystem buildingConstruction,
+        UnitProductionSystem unitProduction,
         GroundMovementSystem groundMovement,
         FormationMovementSystem formationMovement,
         HierarchicalNavigationSystem navigation,
@@ -24,11 +27,14 @@ public sealed class VerticalSliceRuntimeServices
         CombatDebugSnapshotSystem combatDebugSnapshots,
         IReadOnlyList<Type> registeredSystemTypes)
     {
+        Resources = resources;
         BuildingDefinitions = buildingDefinitions;
         UnitDefinitions = unitDefinitions;
         SpatialIndex = spatialIndex;
         BuildingPlacement = buildingPlacement;
         BuildingCommands = buildingCommands;
+        BuildingConstruction = buildingConstruction;
+        UnitProduction = unitProduction;
         GroundMovement = groundMovement;
         FormationMovement = formationMovement;
         Navigation = navigation;
@@ -40,6 +46,8 @@ public sealed class VerticalSliceRuntimeServices
         RegisteredSystemTypes = registeredSystemTypes;
     }
 
+    public ResourceCatalog Resources { get; }
+
     public BuildingDefinitionCatalog BuildingDefinitions { get; }
 
     public UnitDefinitionCatalog UnitDefinitions { get; }
@@ -49,6 +57,10 @@ public sealed class VerticalSliceRuntimeServices
     public BuildingPlacementService BuildingPlacement { get; }
 
     public BuildingCommandProcessingSystem BuildingCommands { get; }
+
+    public BuildingConstructionSystem BuildingConstruction { get; }
+
+    public UnitProductionSystem UnitProduction { get; }
 
     public GroundMovementSystem GroundMovement { get; }
 
