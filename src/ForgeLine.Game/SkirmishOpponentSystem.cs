@@ -1818,7 +1818,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     80.0,
                     220.0,
                     450.0,
-                    LogisticsStockPriority.High);
+                    LogisticsStockPriority.Critical);
             }
 
             if (facility.Supports(
@@ -1894,7 +1894,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 80.0,
                 160.0,
                 280.0,
-                priority);
+                LogisticsStockPriority.High);
             SetUnitProductionStockPolicy(
                 context,
                 entity,
@@ -1920,7 +1920,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 250.0,
                 600.0,
                 900.0,
-                LogisticsStockPriority.High);
+                LogisticsStockPriority.Critical);
             SetStockPolicy(
                 context,
                 entity,
