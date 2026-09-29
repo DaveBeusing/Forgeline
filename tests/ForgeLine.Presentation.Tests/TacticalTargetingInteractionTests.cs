@@ -274,6 +274,70 @@ public sealed class TacticalTargetingInteractionTests
     }
 
     [Fact]
+    public void RapidTargetingModeChangesReplacePendingIntent()
+    {
+        var selected =
+            new EntityId(105, 1);
+        PresentationSnapshot snapshot =
+            CreateSnapshot(
+                selected,
+                Tactical(selected));
+        var targeting =
+            new RtsTacticalTargetingController();
+        var input =
+            new InputState();
+
+        targeting.Begin(
+            PlayerActionRequest.BeginAttackTargeting(
+                [selected]),
+            snapshot.SessionId);
+        targeting.Begin(
+            PlayerActionRequest.BeginRetreatTargeting(
+                [selected]),
+            snapshot.SessionId);
+
+        Assert.Equal(
+            TacticalTargetingMode.Retreat,
+            targeting.Mode);
+        Assert.False(
+            targeting.TryTakeRequest(out _));
+
+        input.Apply(
+            PlatformInputEvent.PointerMoved(
+                800,
+                450));
+        input.Apply(
+            PlatformInputEvent.MouseButtonChanged(
+                PlatformInputEventKind.MouseButtonDown,
+                PlatformMouseButton.Left,
+                800,
+                450));
+
+        targeting.Update(
+            input,
+            CreateCamera(),
+            new FlatTerrain(),
+            snapshot,
+            1600,
+            900,
+            FormationTemplate.Wedge);
+
+        Assert.True(
+            targeting.TryTakeRequest(
+                out PlayerActionRequest request));
+        Assert.Equal(
+            PlayerActionRequestKind.SubmitRetreat,
+            request.Kind);
+        Assert.Equal(
+            FormationTemplate.Wedge,
+            request.TacticalFormation);
+        Assert.Equal(
+            new[] { selected },
+            request.TacticalEntities);
+        Assert.False(targeting.IsActive);
+    }
+
+    [Fact]
     public void TerminalMatchCancelsActiveTargeting()
     {
         var selected =
