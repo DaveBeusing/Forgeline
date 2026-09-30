@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
+using ForgeLine.Assets;
 using ForgeLine.Graphics;
 using ForgeLine.World;
 
@@ -13,13 +14,22 @@ public sealed class SimpleInstanceRenderer : IDisposable
     private readonly IGraphicsPipeline _pipeline;
     private readonly IGraphicsBuffer _vertexBuffer;
     private readonly IGraphicsBuffer _indexBuffer;
+    private readonly RuntimeWorldAssetResources? _runtimeAssets;
     private bool _disposed;
 
-    public SimpleInstanceRenderer(IGraphicsDevice graphics)
+    public SimpleInstanceRenderer(
+        IGraphicsDevice graphics,
+        RuntimeAssetCatalog? runtimeAssets = null)
     {
         ArgumentNullException.ThrowIfNull(graphics);
 
         _pipeline = CreatePipeline(graphics);
+        _runtimeAssets =
+            runtimeAssets is null
+                ? null
+                : new RuntimeWorldAssetResources(
+                    graphics,
+                    runtimeAssets);
 
         SimpleVertex[] vertices =
         [
@@ -86,10 +96,6 @@ public sealed class SimpleInstanceRenderer : IDisposable
             ViewFrustum.FromViewProjection(matrices.ViewProjection);
 
         context.SetPipeline(_pipeline);
-        context.SetVertexBuffer(_vertexBuffer, VertexStride);
-        context.SetIndexBuffer(
-            _indexBuffer,
-            GraphicsIndexFormat.SixteenBit);
 
         Span<float> constants = stackalloc float[RootConstantCount];
         WriteMatrix(matrices.ViewProjection, constants[..16]);
@@ -125,15 +131,20 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
             visible++;
 
+            WorldAssetLod lod =
+                WorldAssetLod.High;
+
             if (instance.WorldFeature.IsSpecified)
             {
                 float distance =
                     Vector3.Distance(
                         camera.Position,
                         instance.Transform.Position);
-                if (WorldPresentationCatalog.SelectLod(
+                lod =
+                    WorldPresentationCatalog.SelectLod(
                         instance.WorldFeature,
-                        distance) == WorldAssetLod.Reduced)
+                        distance);
+                if (lod == WorldAssetLod.Reduced)
                 {
                     reducedLod++;
                 }
@@ -147,12 +158,39 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 highLod++;
             }
 
+            int indexCount = 36;
+            if (_runtimeAssets is not null &&
+                _runtimeAssets.TryGetMesh(
+                    instance.WorldFeature,
+                    lod,
+                    out RuntimeMeshBuffers runtimeMesh) &&
+                runtimeMesh.IsValid)
+            {
+                context.SetVertexBuffer(
+                    runtimeMesh.VertexBuffer,
+                    runtimeMesh.VertexStride);
+                context.SetIndexBuffer(
+                    runtimeMesh.IndexBuffer,
+                    GraphicsIndexFormat.ThirtyTwoBit);
+                indexCount =
+                    runtimeMesh.IndexCount;
+            }
+            else
+            {
+                context.SetVertexBuffer(
+                    _vertexBuffer,
+                    VertexStride);
+                context.SetIndexBuffer(
+                    _indexBuffer,
+                    GraphicsIndexFormat.SixteenBit);
+            }
+
             Matrix4x4 worldMatrix = instance.Transform.ToMatrix();
             WriteMatrix(worldMatrix, constants.Slice(16, 16));
             WriteColor(instance, constants.Slice(32, 4));
 
             context.SetVertexConstants(constants);
-            context.DrawIndexed(36);
+            context.DrawIndexed(indexCount);
             draws++;
         }
 
@@ -172,6 +210,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             return;
         }
 
+        _runtimeAssets?.Dispose();
         _indexBuffer.Dispose();
         _vertexBuffer.Dispose();
         _pipeline.Dispose();
@@ -282,8 +321,13 @@ public sealed class SimpleInstanceRenderer : IDisposable
         if (instance.WorldFeature.IsSpecified)
         {
             Vector4 tint =
-                WorldPresentationCatalog.ResolveTint(
-                    instance.WorldFeature);
+                _runtimeAssets is not null &&
+                _runtimeAssets.TryGetMaterialTint(
+                    instance.WorldFeature,
+                    out Vector4 runtimeTint)
+                    ? runtimeTint
+                    : WorldPresentationCatalog.ResolveTint(
+                        instance.WorldFeature);
             destination[0] = tint.X;
             destination[1] = tint.Y;
             destination[2] = tint.Z;

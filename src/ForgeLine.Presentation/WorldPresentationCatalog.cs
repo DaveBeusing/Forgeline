@@ -86,29 +86,33 @@ public static class WorldPresentationCatalog
     }
 
     public static Vector4 ResolveTint(
-        in WorldFeaturePresentationMetadata feature)
-    {
-        WorldPresentationDefinition definition =
-            Get(feature.Visual);
+        in WorldFeaturePresentationMetadata feature) =>
+        ApplyStateTint(
+            feature,
+            Get(feature.Visual).Tint);
 
+    public static Vector4 ApplyStateTint(
+        in WorldFeaturePresentationMetadata feature,
+        Vector4 baseTint)
+    {
         if (feature.Kind != WorldPresentationKind.ResourceDeposit)
         {
-            return definition.Tint;
+            return baseTint;
         }
 
         return feature.ResourceState switch
         {
             ResourceDepositPresentationState.Untouched =>
-                definition.Tint,
+                baseTint,
             ResourceDepositPresentationState.Active =>
                 Vector4.Min(
                     Vector4.One,
-                    definition.Tint *
+                    baseTint *
                     new Vector4(1.18f, 1.18f, 1.18f, 1.0f)),
             ResourceDepositPresentationState.Depleted =>
                 new Vector4(0.30f, 0.31f, 0.32f, 1.0f),
             _ =>
-                definition.Tint
+                baseTint
         };
     }
 
