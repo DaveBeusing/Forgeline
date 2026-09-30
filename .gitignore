@@ -7,3 +7,4 @@ obj/
 TestResults/
 BenchmarkDotNet.Artifacts/
 artifacts/
+assets/runtime/\n
