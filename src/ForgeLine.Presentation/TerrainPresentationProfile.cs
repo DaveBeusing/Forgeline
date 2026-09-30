@@ -1,4 +1,6 @@
 using System.Numerics;
+using System.Text.Json;
+using ForgeLine.Assets;
 
 namespace ForgeLine.Presentation;
 
@@ -157,18 +159,32 @@ public sealed class TerrainPresentationProfile
             1.0f);
     }
 
-    public static TerrainPresentationProfile CreateCentralDivide() =>
-        new(
-            [
-                new(TerrainMaterialSlot.GrassGround, "material.world.terrain.grass_ground", new Vector3(0.20f, 0.30f, 0.15f), 0.90f, 0.0f),
-                new(TerrainMaterialSlot.Dirt, "material.world.terrain.dirt", new Vector3(0.34f, 0.27f, 0.18f), 0.92f, 0.0f),
-                new(TerrainMaterialSlot.Mud, "material.world.terrain.mud", new Vector3(0.20f, 0.18f, 0.13f), 0.98f, 0.0f),
-                new(TerrainMaterialSlot.Rock, "material.world.terrain.rock", new Vector3(0.38f, 0.39f, 0.37f), 0.82f, 0.0f),
-                new(TerrainMaterialSlot.Gravel, "material.world.terrain.gravel", new Vector3(0.42f, 0.40f, 0.35f), 0.88f, 0.0f),
-                new(TerrainMaterialSlot.IndustrialGround, "material.world.terrain.industrial_ground", new Vector3(0.30f, 0.31f, 0.29f), 0.78f, 0.05f),
-                new(TerrainMaterialSlot.Concrete, "material.world.terrain.concrete", new Vector3(0.48f, 0.49f, 0.47f), 0.84f, 0.0f),
-                new(TerrainMaterialSlot.Scorched, "material.world.terrain.scorched", new Vector3(0.15f, 0.13f, 0.11f), 0.96f, 0.0f)
-            ],
+    public static TerrainPresentationProfile CreateCentralDivide(
+        RuntimeAssetCatalog? runtimeAssets = null)
+    {
+        TerrainMaterialDefinition[] defaults =
+        [
+            new(TerrainMaterialSlot.GrassGround, "material.world.terrain.grass_ground", new Vector3(0.20f, 0.30f, 0.15f), 0.90f, 0.0f),
+            new(TerrainMaterialSlot.Dirt, "material.world.terrain.dirt", new Vector3(0.34f, 0.27f, 0.18f), 0.92f, 0.0f),
+            new(TerrainMaterialSlot.Mud, "material.world.terrain.mud", new Vector3(0.20f, 0.18f, 0.13f), 0.98f, 0.0f),
+            new(TerrainMaterialSlot.Rock, "material.world.terrain.rock", new Vector3(0.38f, 0.39f, 0.37f), 0.82f, 0.0f),
+            new(TerrainMaterialSlot.Gravel, "material.world.terrain.gravel", new Vector3(0.42f, 0.40f, 0.35f), 0.88f, 0.0f),
+            new(TerrainMaterialSlot.IndustrialGround, "material.world.terrain.industrial_ground", new Vector3(0.30f, 0.31f, 0.29f), 0.78f, 0.05f),
+            new(TerrainMaterialSlot.Concrete, "material.world.terrain.concrete", new Vector3(0.48f, 0.49f, 0.47f), 0.84f, 0.0f),
+            new(TerrainMaterialSlot.Scorched, "material.world.terrain.scorched", new Vector3(0.15f, 0.13f, 0.11f), 0.96f, 0.0f)
+        ];
+
+        TerrainMaterialDefinition[] materials =
+            defaults
+                .Select(
+                    material =>
+                        ResolveRuntimeMaterial(
+                            runtimeAssets,
+                            material))
+                .ToArray();
+
+        return new TerrainPresentationProfile(
+            materials,
             [
                 new(TerrainMaterialSlot.Gravel, new Vector2(1_536.0f, 1_536.0f), new Vector2(1_120.0f, 32.0f), 24.0f),
                 new(TerrainMaterialSlot.Concrete, new Vector2(1_536.0f, 920.0f), new Vector2(78.0f, 58.0f), 12.0f),
@@ -176,6 +192,138 @@ public sealed class TerrainPresentationProfile
                 new(TerrainMaterialSlot.IndustrialGround, new Vector2(2_420.0f, 2_560.0f), new Vector2(150.0f, 120.0f), 28.0f),
                 new(TerrainMaterialSlot.Scorched, new Vector2(1_610.0f, 1_690.0f), new Vector2(90.0f, 80.0f), 35.0f)
             ]);
+    }
+
+    private static TerrainMaterialDefinition ResolveRuntimeMaterial(
+        RuntimeAssetCatalog? runtimeAssets,
+        TerrainMaterialDefinition fallback)
+    {
+        if (runtimeAssets is null)
+        {
+            return fallback;
+        }
+
+        AssetId id =
+            AssetId.Parse(
+                fallback.AssetId);
+
+        if (!runtimeAssets.TryGet(
+                id,
+                out RuntimeAssetRecord? record) ||
+            record is null ||
+            record.Type != RuntimeAssetType.Material)
+        {
+            return fallback;
+        }
+
+        try
+        {
+            RuntimeAssetContent content =
+                runtimeAssets.Read(
+                    id);
+            using JsonDocument document =
+                JsonDocument.Parse(
+                    content.Payload);
+            JsonElement root =
+                document.RootElement;
+
+            if (!TryReadBaseColor(
+                    root,
+                    out Vector3 baseColor) ||
+                !TryReadUnitFactor(
+                    root,
+                    "roughnessFactor",
+                    out float roughness) ||
+                !TryReadUnitFactor(
+                    root,
+                    "metallicFactor",
+                    out float metallic))
+            {
+                return fallback;
+            }
+
+            return fallback with
+            {
+                BaseColor = baseColor,
+                Roughness = roughness,
+                Metallic = metallic
+            };
+        }
+        catch (IOException)
+        {
+            return fallback;
+        }
+        catch (InvalidDataException)
+        {
+            return fallback;
+        }
+        catch (JsonException)
+        {
+            return fallback;
+        }
+    }
+
+    private static bool TryReadBaseColor(
+        JsonElement root,
+        out Vector3 baseColor)
+    {
+        baseColor = default;
+
+        if (!root.TryGetProperty(
+                "baseColorFactor",
+                out JsonElement factor) ||
+            factor.ValueKind != JsonValueKind.Array ||
+            factor.GetArrayLength() != 4)
+        {
+            return false;
+        }
+
+        JsonElement.ArrayEnumerator values =
+            factor.EnumerateArray();
+        Span<float> channels =
+            stackalloc float[4];
+        int index = 0;
+
+        foreach (JsonElement value in values)
+        {
+            if (!value.TryGetSingle(
+                    out float channel) ||
+                !float.IsFinite(channel) ||
+                channel < 0.0f ||
+                channel > 1.0f)
+            {
+                return false;
+            }
+
+            channels[index++] =
+                channel;
+        }
+
+        baseColor =
+            new Vector3(
+                channels[0],
+                channels[1],
+                channels[2]);
+        return true;
+    }
+
+    private static bool TryReadUnitFactor(
+        JsonElement root,
+        string propertyName,
+        out float value)
+    {
+        value = default;
+
+        return root.TryGetProperty(
+                propertyName,
+                out JsonElement element) &&
+            element.TryGetSingle(
+                out value) &&
+            float.IsFinite(
+                value) &&
+            value >= 0.0f &&
+            value <= 1.0f;
+    }
 
     private static float CalculateRegionWeight(
         Vector2 point,
