@@ -284,3 +284,17 @@ The existing combat-command layer remains the group authority. Attack and Attack
 Headless integration uses SkirmishScenarioHarness to compose the same authoritative systems for two symmetric opponents. Deterministic scenarios verify knowledge boundaries and bounded Build–Supply–Conquer progression in regular CI. Terminal full-match soak execution uses the same composition outside the regular CI duration budget until long-horizon logistics endurance is reliable enough for a deterministic merge gate.
 
 See docs/SkirmishOpponent.md.
+
+
+## Interactive Execution Ownership
+
+The Windows interactive host now has explicit platform, simulation, and render owners instead of a serial all-in-one loop.
+
+- The platform owner creates the Windows platform/window, pumps native events, drains input, and reads mutable window state.
+- The simulation owner is the only long-lived owner allowed to advance `SimulationCoordinator`, invoke `PlayerCommandGateway`, or mutate authoritative game state after startup handoff.
+- The render owner creates, uses, resizes, idles, and disposes D3D12 objects and presentation renderer resources.
+- The existing persistent `JobScheduler` remains below simulation as bounded worker execution and does not own window or graphics APIs.
+- Immutable `PresentationSnapshot` instances flow simulation → latest-value buffer → independent platform/render consumers. Essential command results use the separate bounded result queue.
+- Platform-authored gameplay requests cross a bounded host queue and are converted to normal future-tick simulation commands only on the simulation owner.
+
+Minimize/pause, terminal freeze/acknowledgement, restart, shutdown, and owner failure are explicit lifecycle transitions. See [Client Execution Ownership](adr/ClientExecutionOwnership.md).

@@ -93,7 +93,7 @@ Player actions enter simulation through `PlayerCommandGateway`. Each accepted su
 
 The gateway retains command objects only on the simulation/host side while they execute. Presentation receives copied `PlayerCommandResultReadModel` values containing the correlation, outcome, rejection details, and resolved tick. Construction commands carry the same correlation through `BuildingCommandProcessingSystem` so authoritative revalidation results are matched to the original player request without polling the mutable command object.
 
-The current client still advances simulation serially on its host loop. This change does not introduce a simulation worker thread or claim that `SimulationCoordinator.SubmitCommand` is generally safe for arbitrary concurrent callers. The snapshot buffer, presentation-interaction state, and result buffer have explicit handoff synchronization so they are suitable boundary primitives for a later independent-execution change.
+The client now advances simulation on one dedicated simulation owner and renders on one dedicated graphics owner. `SimulationCoordinator.SubmitCommand` is still not treated as generally safe for arbitrary concurrent callers: platform-authored requests first cross a bounded host queue, and only the simulation owner invokes `PlayerCommandGateway`/`SubmitCommand`. The snapshot buffer, presentation-interaction state, and result buffer remain the synchronized handoff primitives between owners.
 
 ## Interpolation
 
@@ -253,3 +253,14 @@ When a presentation composition provides a `FactionIntelligenceStore` and viewin
 A bounded `FactionIntelligenceSnapshot` can carry explicit Unexplored, Explored, and Visible cells plus Detected/Identified last-known contacts. F2 debug visualization can render those cells, sensor ranges, contact markers, and sensor timing without mutating simulation visibility.
 
 See `BattlefieldIntelligence.md` for the authoritative sensing and targeting semantics.
+
+
+## Independent consumers
+
+The platform/input owner and render owner each maintain their own `RenderWorld` over the same immutable latest-value snapshot buffer. They never share mutable interpolation state.
+
+Rendering calculates interpolation from elapsed host time since the newest completed snapshot it observed. If simulation is late, rendering may repeat/interpolate the existing complete snapshot; it never asks simulation to execute a tick.
+
+Platform-side picking intentionally operates against the latest complete presentation state rather than live ECS. Camera state sent to rendering uses copied `RtsCameraState`. World-debug lines/labels and action/tactical panel views are copied per render request so their mutable controller/build state remains owned by the platform thread.
+
+Render-frame requests are latest-value work and may supersede older visual requests. Essential gameplay command results remain in `PlayerCommandResultBuffer` and are not lost by visual replacement.

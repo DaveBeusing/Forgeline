@@ -3,6 +3,14 @@ using ForgeLine.Input;
 
 namespace ForgeLine.Presentation;
 
+public readonly record struct RtsCameraState(
+    Vector3 Target,
+    float YawRadians,
+    float PitchRadians,
+    float Distance,
+    bool HasPointerPosition,
+    Vector2 PointerPosition);
+
 public sealed class RtsCamera
 {
     private const float RadiansToDegrees = 180.0f / MathF.PI;
@@ -234,6 +242,41 @@ public sealed class RtsCamera
             ndc.Z >= 0.0f && ndc.Z <= 1.0f;
 
         return new ScreenProjection(screen, ndc.Z, visible);
+    }
+
+    public RtsCameraState CaptureState() =>
+        new(
+            Target,
+            YawRadians,
+            PitchRadians,
+            Distance,
+            _hasPointerPosition,
+            _pointerPosition);
+
+    public void ApplyState(in RtsCameraState state)
+    {
+        if (!float.IsFinite(state.Target.X) ||
+            !float.IsFinite(state.Target.Y) ||
+            !float.IsFinite(state.Target.Z) ||
+            !float.IsFinite(state.YawRadians) ||
+            !float.IsFinite(state.PitchRadians) ||
+            !float.IsFinite(state.Distance))
+        {
+            throw new ArgumentOutOfRangeException(nameof(state));
+        }
+
+        Target = state.Target;
+        YawRadians = NormalizeAngle(state.YawRadians);
+        PitchRadians = Math.Clamp(
+            state.PitchRadians,
+            _settings.MinimumPitchRadians,
+            _settings.MaximumPitchRadians);
+        Distance = Math.Clamp(
+            state.Distance,
+            _settings.MinimumDistance,
+            _settings.MaximumDistance);
+        _hasPointerPosition = state.HasPointerPosition;
+        _pointerPosition = state.PointerPosition;
     }
 
     public RtsCameraDiagnostics GetDiagnostics() =>

@@ -6,7 +6,7 @@
 
 Authoritative vertical-slice gameplay construction is owned by `VerticalSliceScenario` in `ForgeLine.Game`. The client creates that shared runtime with the `Gameplay` profile, Player 1 explicitly human-controlled, Player 2 computer-controlled, and a host-owned `JobScheduler`. It then adds only presentation/platform concerns around the shared simulation.
 
-The client consumes the platform input stream through `ForgeLine.Input`, updates the presentation-only RTS camera and selection controller, advances the fixed-tick simulation, extracts immutable presentation snapshots, and renders the authoritative skirmish together with depth-tested chunked terrain. RTS selection, movement commands, hierarchical navigation, shared-route formation movement, and the integrated tactical systems are active development capabilities. Synthetic render instances are opt-in through `--render-stress`, are created after gameplay runtime construction, and therefore do not participate in the authoritative starting navigation obstacle set. Production unit art, the final RTS combat-command UI, and audio playback remain deferred.
+The client consumes the platform input stream through `ForgeLine.Input` and updates the presentation-only RTS camera and interaction controllers on the platform owner. A dedicated simulation owner advances the fixed-tick runtime and publishes immutable snapshots; a dedicated render owner consumes the latest complete snapshot and renders the authoritative skirmish together with depth-tested chunked terrain. RTS selection, movement commands, hierarchical navigation, shared-route formation movement, and the integrated tactical systems are active development capabilities. Synthetic render instances are opt-in through `--render-stress`, are created after gameplay runtime construction, and therefore do not participate in the authoritative starting navigation obstacle set. Production unit art, the final RTS combat-command UI, and audio playback remain deferred.
 
 ## Platform Boundary
 
@@ -180,3 +180,22 @@ A normal client launch contains the configured Central Divide skirmish only. The
 Combat, sensing, artillery, Fuel/Ammunition, resupply, readiness, opponent behavior, and Command Core victory are exercised by the actual Directorate/skirmish systems. F2 continues to expose their diagnostics without adding presentation-owned gameplay state.
 
 Synthetic generic entities remain available exclusively through `--render-stress <count>` for bounded rendering validation. CI uses that option for graphics stress independently of the headless full-match correctness gate.
+
+
+## Execution owners
+
+The active client session uses three explicit owners:
+
+- **Platform:** the creating thread of `WindowsPlatform` and `IWindow`; Win32 pumping, input/window-event draining, mutable window state, camera/input controllers.
+- **Simulation:** the dedicated `ForgeLine Simulation` thread; all fixed-tick advancement, command-gateway invocation, authoritative ECS/game mutation after startup, pause/terminal control.
+- **Rendering:** the dedicated `ForgeLine Render` thread; graphics device/swap chain, renderer resources, resize, draw submission, present, GPU idle and disposal.
+
+The platform copies HWND/initial dimensions into `GraphicsWindowTarget` before starting the graphics owner. The render owner never calls `IWindow` or Win32 APIs. Window size/minimize changes cross as copied frame state.
+
+Gameplay submissions use a bounded client→simulation queue. When full, admission fails instead of blocking the Win32 pump or allocating unbounded history. The simulation owner assigns the normal gateway correlation/target tick/command sequence. Completed command results continue through the separate bounded result queue.
+
+Minimize explicitly requests simulation pause and independently suspends zero-sized rendering. Restore requests resume. This replaces the earlier accidental behavior where a minimized render-loop branch simply skipped simulation advancement.
+
+A terminal completed-tick snapshot freezes normal simulation ticks while event pumping and terminal rendering continue. Escape applies a non-ticking simulation-owned `EndMatchCommand` control transition. Restart shuts down the old render/simulation owners and constructs a fresh session.
+
+See [Client Execution Ownership](adr/ClientExecutionOwnership.md).

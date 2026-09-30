@@ -128,6 +128,61 @@ public sealed class RtsCameraTests
     }
 
     [Fact]
+    public void CameraStateTransferPreservesViewWithoutSharingMutableCamera()
+    {
+        var settings =
+            StableMovementSettings();
+        var source =
+            new RtsCamera(settings);
+        var copy =
+            new RtsCamera(settings);
+
+        source.Update(
+            Frame(
+                pan: new Vector2(0.4f, 0.8f),
+                rotation: 0.5f,
+                pitch: -0.25f,
+                zoomSteps: -2.0f,
+                hasPointerPosition: true,
+                pointerPosition: new Vector2(320.0f, 240.0f)),
+            0.5f,
+            1600,
+            900);
+
+        RtsCameraState state =
+            source.CaptureState();
+        copy.ApplyState(
+            state);
+
+        Assert.Equal(
+            source.Target,
+            copy.Target);
+        Assert.Equal(
+            source.YawRadians,
+            copy.YawRadians);
+        Assert.Equal(
+            source.PitchRadians,
+            copy.PitchRadians);
+        Assert.Equal(
+            source.Distance,
+            copy.Distance);
+        Assert.Equal(
+            source.GetMatrices(1600, 900),
+            copy.GetMatrices(1600, 900));
+
+        source.Update(
+            Frame(
+                pan: new Vector2(1.0f, 0.0f)),
+            0.25f,
+            1600,
+            900);
+
+        Assert.NotEqual(
+            source.Target,
+            copy.Target);
+    }
+
+    [Fact]
     public void EdgeScrollMovesCameraWhenPointerEntersConfiguredZone()
     {
         var settings = StableMovementSettings() with

@@ -157,3 +157,30 @@ Required practices are:
 - keep headless and interactive simulation execution on the same runtime contracts.
 
 Rollback, replay persistence, savegame persistence, networking, and domain gameplay commands remain outside this runtime foundation and must preserve these contracts when introduced.
+
+
+## Interactive Execution Owner
+
+Headless execution remains unpaced and calls the coordinator directly. The Windows client instead assigns one dedicated simulation owner thread to the shared runtime.
+
+The client execution owner is responsible for wall-clock pacing only. The coordinator still owns logical ticks, phase ordering, simulation RNG, command ordering, and job-completion boundaries. Wall-clock delay cannot change gameplay decisions.
+
+Platform-authored requests first enter a bounded host queue. Only the simulation owner drains that queue and calls `PlayerCommandGateway`, which then schedules accepted gameplay commands for the normal future tick through `SimulationCoordinator.SubmitCommand`. `SubmitCommand` is therefore not redefined as an arbitrary multi-thread-safe mutation surface.
+
+The interactive catch-up policy executes at most five complete ticks per scheduling pass. Excess wall-clock debt is discarded by resetting the next pacing deadline; logical ticks and already accepted commands are never skipped or partially executed.
+
+Pause/resume is applied between complete ticks. Terminal match snapshots freeze further normal tick advancement while the platform and renderer continue operating.
+
+### Control transitions without gameplay advancement
+
+`SimulationCoordinator.ExecuteControlCommand` exists for host lifecycle controls that must remain simulation-owned but must not execute another normal gameplay tick. It:
+
+- requires an initialized simulation;
+- executes the command at the current completed tick in the Input Commands context;
+- does not advance `FixedTickClock`;
+- does not execute the normal system phase pipeline;
+- republishes tick observers so copied presentation state reflects the control transition.
+
+The Windows client uses this path only for terminal match acknowledgement. Normal gameplay actions continue to require future-tick scheduling.
+
+See [Client Execution Ownership](adr/ClientExecutionOwnership.md) for the full ownership and disposal model.

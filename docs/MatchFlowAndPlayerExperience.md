@@ -46,7 +46,7 @@ The terminal overlay exposes:
 
 Restart returns control to the host and creates a completely new `ClientApplication` match session. The new session rebuilds the simulation coordinator, entity registry, inventories, logistics network, intelligence store, systems, presentation state, and match-state entity rather than attempting to reset mutable systems in place. Each coordinator receives a new `SimulationSessionId`; `RenderWorld` drops previous-session interpolation state and selection/hover/pending presentation interaction is invalidated before the new session is consumed.
 
-Return submits `EndMatchCommand` through `PlayerCommandGateway` and the normal simulation command queue before leaving the completed session; presentation does not poll the mutable command object.
+Return sends an explicit terminal acknowledgement to the simulation owner. The owner applies `EndMatchCommand` through the coordinator's non-ticking control transition at the already completed terminal tick. This republishes the copied terminal/Ended presentation state without advancing the logical clock or running another normal gameplay phase pipeline.
 
 ## Command Core objective
 
@@ -208,3 +208,14 @@ The vertical-slice Command Core contract is implemented as documented: starting 
 The bounded player-commanded acceptance path uses the shared gameplay composition with seed `4119` and both participant slots configured as human, so no `SkirmishOpponentController` drives either side. Starting from finite stock, it constructs power generation, a Smelter, Vehicle Factory, and Supply Depot; establishes stock policies through the same `PlayerActionRequestDispatcher` used by the client; processes Steel; produces two Main Battle Tanks, one Scout Vehicle, and one Supply Truck; physically replenishes the combat group; performs legal reconnaissance until the opposing Command Core is currently identified; moves the supplied assault group into a legitimate staging position; and submits the final Attack through the shared request adapter. Fuel and Ammunition are consumed normally, damage is resolved by the combat pipeline, the opposing Command Core is destroyed by combat lifecycle processing, and `MatchObjectiveSystem` resolves the local player as winner.
 
 This bounded evidence validates the cross-feature Build-Supply-Conquer path, command authority, physical supply, intelligence gating, damage, and natural terminal resolution. It does not claim to be a long free-form human playthrough, exhaustive battlefield-balance proof, or a substitute for the canonical 80,000-tick terminal CI gate. It is also distinct from the Windows graphics smoke, which intentionally destroys a Command Core only to validate native-host/render/session lifecycle behavior rather than natural combat progression.
+
+
+## Independent client lifecycle
+
+The Windows client no longer advances authoritative gameplay from the render/event loop.
+
+A completed Victory/Defeat/Draw snapshot causes the simulation owner to freeze normal ticks immediately after that completed tick. Platform input and rendering remain live so the result screen can be interacted with and redrawn.
+
+Minimize pause is an explicit simulation control transition between complete ticks. It is not inferred from whether the renderer happens to submit a frame.
+
+Restart stops and joins the render/simulation owners before the shared runtime and job scheduler are disposed, then creates a fresh runtime/session. Requests carry the expected `SimulationSessionId`; old-session or terminal gameplay work is rejected before it can reach the authoritative command scheduler.
