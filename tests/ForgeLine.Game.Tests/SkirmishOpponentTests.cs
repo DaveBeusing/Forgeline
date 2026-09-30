@@ -414,18 +414,28 @@ public sealed class SkirmishOpponentTests
             before.ScratchStatesReleased);
 
         EntityId removedController =
-            scenario.Simulation.Entities
-                .Query<
-                    SkirmishOpponentController,
-                    SkirmishOpponentState>(
-                        QueryIterationOrder.StableByEntityIndex)
-                .First(
-                    entity =>
-                        scenario.Simulation.Entities
-                            .GetComponent<SkirmishOpponentController>(
-                                entity).Player ==
-                        scenario.East.Player);
+            EntityId.Invalid;
 
+        foreach (EntityId entity in
+                 scenario.Simulation.Entities.Query<
+                     SkirmishOpponentController,
+                     SkirmishOpponentState>(
+                         QueryIterationOrder.StableByEntityIndex))
+        {
+            SkirmishOpponentController controller =
+                scenario.Simulation.Entities
+                    .GetComponent<SkirmishOpponentController>(
+                        entity);
+
+            if (controller.Player ==
+                scenario.East.Player)
+            {
+                removedController = entity;
+                break;
+            }
+        }
+
+        Assert.True(removedController.IsValid);
         Assert.True(
             scenario.Simulation.Entities.DestroyEntity(
                 removedController));
