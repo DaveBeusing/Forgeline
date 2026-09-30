@@ -19,7 +19,7 @@ internal static class GltfImporter
         if (!root.TryGetProperty("asset", out var asset) ||
             !asset.TryGetProperty("version", out var version) ||
             version.GetString() is not { } versionString ||
-            !versionString.StartsWith("2", StringComparison.Ordinal))
+            !versionString.StartsWith('2'))
         {
             throw new InvalidDataException("Only glTF 2.x assets are supported.");
         }
@@ -352,7 +352,7 @@ internal static class GltfImporter
 
     private static float[] ReadFloatAccessor(
         JsonElement root,
-        IReadOnlyList<byte[]> buffers,
+        byte[][] buffers,
         int accessorIndex,
         string expectedType)
     {
@@ -421,7 +421,7 @@ internal static class GltfImporter
 
     private static uint[] ReadIndexAccessor(
         JsonElement root,
-        IReadOnlyList<byte[]> buffers,
+        byte[][] buffers,
         int accessorIndex)
     {
         var accessor = GetArrayElement(root, "accessors", accessorIndex);
