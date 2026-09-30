@@ -43,6 +43,7 @@ internal sealed class ClientSimulationHost : IDisposable
     private readonly ConcurrentQueue<ClientSubmissionCompletion> _completions = new();
     private readonly AutoResetEvent _signal = new(false);
     private readonly ManualResetEventSlim _started = new(false);
+    private readonly ManualResetEventSlim _faulted = new(false);
     private readonly Thread _thread;
     private readonly int _capacity;
 
@@ -327,6 +328,15 @@ internal sealed class ClientSimulationHost : IDisposable
     internal bool IsExecutionThreadAlive =>
         _thread.IsAlive;
 
+    internal bool WaitForFault(
+        TimeSpan timeout)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(
+            timeout,
+            TimeSpan.Zero);
+        return _faulted.Wait(timeout);
+    }
+
     public bool TrySubmit(
         SimulationSessionId expectedSession,
         Func<PlayerCommandGateway, PlayerCommandSubmissionReceipt> submission)
@@ -405,6 +415,7 @@ internal sealed class ClientSimulationHost : IDisposable
             _thread.Join();
         }
 
+        _faulted.Dispose();
         _started.Dispose();
         _signal.Dispose();
         _disposed = true;
@@ -508,7 +519,9 @@ internal sealed class ClientSimulationHost : IDisposable
                 ExceptionDispatchInfo.Capture(
                     exception),
                 null);
+            _faulted.Set();
             _started.Set();
+            NotifyProgress();
         }
         finally
         {
