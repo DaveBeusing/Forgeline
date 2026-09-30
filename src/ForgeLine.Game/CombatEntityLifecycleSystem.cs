@@ -1,5 +1,6 @@
 using ForgeLine.Combat;
 using ForgeLine.Core;
+using ForgeLine.Intelligence;
 using ForgeLine.Simulation;
 using ForgeLine.World;
 
@@ -48,6 +49,9 @@ public sealed class CombatEntityLifecycleSystem : ISimulationSystem
             {
                 _runtime.RecordDestruction(
                     destruction);
+                CreateUnitWreckPresentation(
+                    context,
+                    destruction.Entity);
             }
 
             _spatialIndex?.Remove(
@@ -59,5 +63,47 @@ public sealed class CombatEntityLifecycleSystem : ISimulationSystem
         _runtime.ClearPendingDestructions();
         _runtime.SetActiveProjectiles(
             context.Entities.GetComponentCount<ProjectileState>());
+    private static void CreateUnitWreckPresentation(
+        SimulationContext context,
+        EntityId destroyedEntity)
+    {
+        if (!context.Entities.TryGetComponent(
+                destroyedEntity,
+                out UnitIdentity unit) ||
+            !context.Entities.TryGetComponent(
+                destroyedEntity,
+                out WorldTransform transform) ||
+            !context.Entities.TryGetComponent(
+                destroyedEntity,
+                out VisualIdentity visual))
+        {
+            return;
+        }
+
+        EntityId wreck =
+            context.Entities.CreateEntity();
+
+        context.Entities.AddComponent(
+            wreck,
+            transform);
+        context.Entities.AddComponent(
+            wreck,
+            visual);
+        context.Entities.AddComponent(
+            wreck,
+            new UnitWreckPresentationIdentity(
+                unit.UnitId,
+                unit.ContentFaction));
+
+        if (context.Entities.TryGetComponent(
+                destroyedEntity,
+                out IntelligenceSignature signature))
+        {
+            context.Entities.AddComponent(
+                wreck,
+                signature);
+        }
+    }
+
     }
 }
