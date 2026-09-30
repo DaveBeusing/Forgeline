@@ -41,6 +41,21 @@ public sealed class PrototypeBattlefieldTests
             definition.Resources,
             resource =>
                 resource.Contested);
+        Assert.Contains(
+            definition.Resources,
+            resource =>
+                resource.ResourceId ==
+                ResourceIds.RareElements);
+        Assert.Contains(
+            definition.WorldObjects,
+            worldObject =>
+                worldObject.Kind ==
+                WorldPresentationKind.Decal);
+        Assert.Contains(
+            definition.WorldObjects,
+            worldObject =>
+                worldObject.Kind ==
+                WorldPresentationKind.Vegetation);
         Assert.Equal(
             definition.Metadata.WidthMeters,
             terrain.WorldBounds.Maximum.X -
@@ -380,7 +395,20 @@ public sealed class PrototypeBattlefieldTests
             Assert.True(
                 double.IsFinite(
                     deposit.RemainingQuantity));
+            Assert.True(
+                simulation.Entities.HasComponent<WorldTransform>(
+                    depositEntity));
+            Assert.True(
+                simulation.Entities.HasComponent<VisualIdentity>(
+                    depositEntity));
+            Assert.True(
+                simulation.Entities.HasComponent<WorldPresentationIdentity>(
+                    depositEntity));
         }
+
+        Assert.Equal(
+            definition.WorldObjects.Count,
+            runtime.WorldPresentationEntities.Count);
     }
 
     private static NavigationGridSettings CreateGridSettings() =>
