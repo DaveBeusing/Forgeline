@@ -233,6 +233,17 @@ public readonly record struct SkirmishForceAssessment(
     int KnownHostileContacts,
     int CurrentHostileContacts);
 
+public readonly record struct SkirmishOpponentWorkMetrics(
+    long Executions,
+    long OwnedStateCaptures,
+    long IntelligenceCaptures,
+    long EconomyAssessments,
+    long ForceAssessments,
+    long DecisionEvaluations,
+    long NonDecisionEvaluations,
+    long ScratchStatesCreated,
+    long ScratchStatesReleased);
+
 public readonly record struct SkirmishOpponentDebugReadModel(
     EntityId Controller,
     PlayerId Player,
