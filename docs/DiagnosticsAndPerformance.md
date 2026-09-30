@@ -357,3 +357,12 @@ dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simula
 The workload matrix covers one versus two strategic controllers, diagnostics disabled versus enabled, and an early versus later vertical-slice state. Setup advances to a decision-aligned age outside the measured operation; the measured method executes eight non-decision ticks. BenchmarkDotNet `MemoryDiagnoser` reports managed allocation for the benchmark process, while the opponent work counters show which strategic assessments were actually performed. Worker-thread allocation is not represented by `GC.GetAllocatedBytesForCurrentThread`-style accounting; use BenchmarkDotNet/process diagnostics when whole-process attribution is required.
 
 For before/after comparisons, retain the BenchmarkDotNet environment header, runtime version, OS, architecture, processor count, scenario age, controller count, diagnostics state, and seed. Compare normalized allocation distributions for identical parameters. Do not treat a reduced managed-allocation result as proof that every maximum-tick outlier, retained-heap issue, or GC pause has been resolved.
+
+
+## Visual Asset Qualification
+
+The integrated visual qualification path combines runtime asset validation, the real Windows Direct3D 12 Vertical Slice smoke, and representative tactical/strategic rendering benchmarks.
+
+CI publishes `artifacts/asset-qualification.json` and `artifacts/visual-qualification.json`. The latter records frame/CPU-render timing, terrain submission, draw calls, instance counts, LOD distribution, VFX population, and adapter information from a completed render frame. GPU milliseconds remain unavailable until the graphics abstraction implements validated D3D12 timestamp queries.
+
+See [Asset Performance and Visual Qualification](AssetPerformanceQualification.md) for commands, budgets, interpretation, regression policy, and outlier handling.
