@@ -153,6 +153,8 @@ internal sealed class ClientApplication
             new PlayerActionPanelController();
         var tacticalTargetingController =
             new RtsTacticalTargetingController();
+        var informationLayer =
+            new RtsInformationLayerController();
         var debugDraw = new DebugDraw();
 
         using var simulationHost =
@@ -185,6 +187,8 @@ internal sealed class ClientApplication
         bool overlayToggleHeld = false;
         bool worldDebugToggleHeld = false;
         bool formationToggleHeld = false;
+        bool strategicOverlayToggleHeld = false;
+        bool minimapToggleHeld = false;
         bool restartHeld = false;
         bool returnHeld = false;
         FormationTemplate activeFormation =
@@ -253,9 +257,28 @@ internal sealed class ClientApplication
                 inputState,
                 ref formationToggleHeld,
                 ref activeFormation);
+
+            if (ConsumeKeyPress(
+                    inputState,
+                    PlatformKey.F10,
+                    ref strategicOverlayToggleHeld))
+            {
+                informationLayer.CycleOverlay();
+            }
+
+            if (ConsumeKeyPress(
+                    inputState,
+                    PlatformKey.F11,
+                    ref minimapToggleHeld))
+            {
+                informationLayer.ToggleMinimap();
+            }
+
             presentationInteraction.SetDebugState(
                 worldDebugEnabled,
                 camera.Target.Y);
+            presentationInteraction.SetStrategicOverlay(
+                informationLayer.OverlayMode);
 
             bool restartPressed =
                 ConsumeKeyPress(
@@ -545,6 +568,10 @@ internal sealed class ClientApplication
                 commandGateway,
                 ref lastCommandResult);
 
+            TacticalTargetingView tacticalTargetingView =
+                tacticalTargetingController.CreateView(
+                    currentSnapshot);
+
             BuildWorldDebugVisualization(
                 debugDraw,
                 worldDebugEnabled,
@@ -553,6 +580,8 @@ internal sealed class ClientApplication
                 camera,
                 selectionController,
                 buildingPlacementController,
+                tacticalTargetingView,
+                informationLayer.OverlayMode,
                 currentSnapshot?.Construction,
                 currentSnapshot?.Debug);
 
@@ -570,6 +599,43 @@ internal sealed class ClientApplication
                     MaximumDebugLabels);
             }
 
+            PlayerActionPanelView actionPanelView =
+                actionPanel.CreateView(
+                    window.ClientSize.Width,
+                    window.ClientSize.Height,
+                    currentSnapshot?.PlayerActions);
+            bool placementValid =
+                buildingPlacementController.PreviewFreshness ==
+                    PlacementPreviewFreshness.Current &&
+                buildingPlacementController.Preview?.IsValid ==
+                    true;
+            RtsCursorKind cursor =
+                RtsCursorResolver.Resolve(
+                    new RtsCursorContext(
+                        inputState.HasPointerPosition,
+                        selectionController.IsDragSelecting,
+                        inputState.IsMouseButtonDown(
+                            PlatformMouseButton.Middle),
+                        buildingPlacementController.IsActive,
+                        placementValid,
+                        tacticalTargetingView.Mode,
+                        tacticalTargetingView.PointerTargetValid,
+                        selectionController.HoveredEntity.IsValid,
+                        selectionController.Selection.Count > 0,
+                        actionPanel.Mode ==
+                            PlayerActionPanelMode.Supply));
+            var informationView =
+                new RtsInformationLayerView(
+                    informationLayer.MinimapEnabled,
+                    informationLayer.OverlayMode,
+                    cursor,
+                    inputState.HasPointerPosition,
+                    inputState.PointerPosition,
+                    selectionController.IsDragSelecting,
+                    selectionController.DragStart,
+                    selectionController.DragCurrent,
+                    selectionController.Selection.Entities.ToArray());
+
             _ = renderHost.Publish(
                 new ClientRenderFrame(
                     camera.CaptureState(),
@@ -577,15 +643,13 @@ internal sealed class ClientApplication
                     window.ClientSize.Height,
                     overlayEnabled,
                     worldDebugEnabled,
-                    actionPanel.CreateView(
-                        window.ClientSize.Width,
-                        window.ClientSize.Height,
-                        currentSnapshot?.PlayerActions),
-                    tacticalTargetingController.CreateView(
-                        currentSnapshot),
+                    actionPanelView,
+                    tacticalTargetingView,
                     activeFormation,
                     debugDraw.Lines.ToArray(),
-                    debugDraw.Labels.ToArray()));
+                    debugDraw.Labels.ToArray(),
+                    window.Dpi,
+                    informationView));
 
             if (_platform.Clock.GetElapsedTime(nextDiagnosticAt, now) >= DiagnosticInterval)
             {
@@ -855,6 +919,8 @@ internal sealed class ClientApplication
         RtsCamera camera,
         RtsSelectionController selectionController,
         RtsBuildingPlacementController buildingPlacementController,
+        TacticalTargetingView tacticalTargeting,
+        StrategicOverlayMode strategicOverlayMode,
         BuildingConstructionDebugSnapshot? constructionSnapshot,
         PresentationDebugSnapshot? debugSnapshot)
     {
@@ -865,9 +931,12 @@ internal sealed class ClientApplication
             selectionController.InspectedEntity.IsValid ||
             selectionController.HoveredEntity.IsValid ||
             buildingPlacementController.IsActive ||
+            tacticalTargeting.HasPointerTarget ||
             (constructionSnapshot?.Sites.Count ?? 0) > 0;
         debugDraw.Enabled =
             worldDebugEnabled ||
+            strategicOverlayMode !=
+                StrategicOverlayMode.None ||
             interactionFeedback;
 
         if (!debugDraw.Enabled)
@@ -903,6 +972,36 @@ internal sealed class ClientApplication
                 completedColor,
                 maximumCompleted: worldDebugEnabled ? 64 : 0,
                 maximumLabels: 32);
+        }
+
+        if (strategicOverlayMode !=
+                StrategicOverlayMode.None &&
+            debugSnapshot is not null)
+        {
+            RtsStrategicOverlayVisualization.Draw(
+                debugDraw,
+                strategicOverlayMode,
+                debugSnapshot,
+                renderWorld.CurrentSnapshot?.Intelligence,
+                camera.Target);
+        }
+
+        if (tacticalTargeting.HasPointerTarget)
+        {
+            RtsWorldMarkerVisualization.DrawTarget(
+                debugDraw,
+                tacticalTargeting.PointerWorldTarget,
+                tacticalTargeting.PointerTargetValid,
+                new Vector4(
+                    1.0f,
+                    0.72f,
+                    0.18f,
+                    1.0f),
+                new Vector4(
+                    1.0f,
+                    0.18f,
+                    0.12f,
+                    1.0f));
         }
 
         if (worldDebugEnabled &&
@@ -1066,8 +1165,8 @@ internal sealed class ClientApplication
             }
         }
 
-        int selectionLabelCount = 0;
-        foreach (var entity in selectionController.Selection.Entities)
+        foreach (var entity in
+                 selectionController.Selection.Entities)
         {
             if (!renderWorld.TryGetInterpolatedInstance(
                     entity,
@@ -1077,46 +1176,42 @@ internal sealed class ClientApplication
                 continue;
             }
 
-            string? label = selectionLabelCount < MaximumDebugLabels
-                ? $"SELECTED E{entity.Index}"
-                : null;
-            DrawInstanceBounds(
+            RtsWorldMarkerVisualization.DrawSelected(
                 debugDraw,
                 instance,
-                selectedColor,
-                label);
-            selectionLabelCount++;
+                selectedColor);
         }
 
         EntityId inspected =
             selectionController.InspectedEntity;
         if (inspected.IsValid &&
-            !selectionController.Selection.Contains(inspected) &&
+            !selectionController.Selection.Contains(
+                inspected) &&
             renderWorld.TryGetInterpolatedInstance(
                 inspected,
                 alpha,
                 out RenderInstance inspectedInstance))
         {
-            DrawInstanceBounds(
+            RtsWorldMarkerVisualization.DrawHover(
                 debugDraw,
                 inspectedInstance,
-                selectedColor,
-                $"INSPECTED E{inspected.Index}");
+                selectedColor);
         }
 
-        EntityId hovered = selectionController.HoveredEntity;
+        EntityId hovered =
+            selectionController.HoveredEntity;
         if (hovered.IsValid &&
-            !selectionController.Selection.Contains(hovered) &&
+            !selectionController.Selection.Contains(
+                hovered) &&
             renderWorld.TryGetInterpolatedInstance(
                 hovered,
                 alpha,
                 out RenderInstance hoveredInstance))
         {
-            DrawInstanceBounds(
+            RtsWorldMarkerVisualization.DrawHover(
                 debugDraw,
                 hoveredInstance,
-                hoveredColor,
-                $"HOVER E{hovered.Index}");
+                hoveredColor);
         }
     }
 

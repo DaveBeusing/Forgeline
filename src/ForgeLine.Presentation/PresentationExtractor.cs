@@ -73,11 +73,16 @@ public sealed class PresentationExtractor : ISimulationTickObserver
             _extraction?.Interaction.Capture() ??
             default;
 
+        bool diagnosticsRequested =
+            interaction.DebugEnabled ||
+            interaction.StrategicOverlay !=
+                StrategicOverlayMode.None;
+
         if (_extraction is not null)
         {
             ApplyDebugCaptureState(
                 _extraction.Scenario,
-                interaction.DebugEnabled);
+                diagnosticsRequested);
         }
 
         _vfxPool.BeginTick(
@@ -125,7 +130,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
 
         PresentationDebugSnapshot? debug =
             _extraction is not null &&
-            interaction.DebugEnabled
+            diagnosticsRequested
                 ? CaptureDebug(
                     context,
                     interaction,

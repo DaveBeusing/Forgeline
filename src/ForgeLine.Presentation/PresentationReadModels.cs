@@ -35,7 +35,8 @@ internal readonly record struct PresentationInteractionRequestSnapshot(
     IReadOnlyList<EntityId> SelectedEntities,
     BuildingPlacementPreviewRequest? PlacementRequest,
     bool DebugEnabled,
-    float DebugPlaneHeight);
+    float DebugPlaneHeight,
+    StrategicOverlayMode StrategicOverlay);
 
 public sealed class PresentationInteractionState
 {
@@ -44,6 +45,7 @@ public sealed class PresentationInteractionState
     private BuildingPlacementPreviewRequest? _placementRequest;
     private bool _debugEnabled;
     private float _debugPlaneHeight;
+    private StrategicOverlayMode _strategicOverlay;
     private ulong _nextPlacementRequestId = 1;
 
     public void SetSelection(
@@ -132,6 +134,20 @@ public sealed class PresentationInteractionState
         }
     }
 
+    public void SetStrategicOverlay(
+        StrategicOverlayMode mode)
+    {
+        if (!Enum.IsDefined(mode))
+        {
+            throw new ArgumentOutOfRangeException(nameof(mode));
+        }
+
+        lock (_gate)
+        {
+            _strategicOverlay = mode;
+        }
+    }
+
     internal PresentationInteractionRequestSnapshot Capture()
     {
         lock (_gate)
@@ -141,7 +157,8 @@ public sealed class PresentationInteractionState
                     _selectedEntities.ToArray()),
                 _placementRequest,
                 _debugEnabled,
-                _debugPlaneHeight);
+                _debugPlaneHeight,
+                _strategicOverlay);
         }
     }
 }

@@ -503,6 +503,8 @@ internal sealed class WindowsWindow : IWindow
             WindowsNative.VkF7 => PlatformKey.F7,
             WindowsNative.VkF8 => PlatformKey.F8,
             WindowsNative.VkF9 => PlatformKey.F9,
+            WindowsNative.VkF10 => PlatformKey.F10,
+            WindowsNative.VkF11 => PlatformKey.F11,
             WindowsNative.VkUp => PlatformKey.Up,
             WindowsNative.VkDown => PlatformKey.Down,
             WindowsNative.VkLeft => PlatformKey.Left,

@@ -1,0 +1,5 @@
+{
+  "id": "ui.icon.status.power",
+  "type": "material",
+  "source": "command.material.json"
+}

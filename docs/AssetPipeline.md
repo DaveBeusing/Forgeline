@@ -250,6 +250,20 @@ It uses ordinary compiled mesh/material assets because the current runtime contr
 
 Stable IDs use `vfx.combat.*`, `vfx.destruction.*`, `vfx.logistics.*`, and `material.vfx.*`. Runtime code never reads the glTF or material authoring files directly.
 
+## RTS UI semantic asset set
+
+The initial RTS information-layer source set lives below:
+
+```text
+assets/source/ui/
+```
+
+Semantic UI IDs use the `ui.icon.*` namespace and compile through the existing material asset path. The current renderer draws compact procedural glyph geometry while compiled material records provide stable runtime identity and tint data. This avoids introducing a parallel atlas/vector format before the asset runtime owns one.
+
+The set covers resources, unit/building roles, commands, cursors, supply states, minimap/strategic symbols, and status indicators. Runtime UI code resolves IDs through `RtsUiIconCatalog`; features do not own duplicate file-path copies. Future texture/vector icon payloads may replace the visual representation while preserving these stable IDs.
+
+See [RTS Information Layer](RTSInformationLayer.md) for mapping and presentation ownership.
+
 ## Compiler Usage
 
 From the repository root:

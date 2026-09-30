@@ -19,6 +19,14 @@ public static class BuildingConstructionDebugVisualization
 
         debugDraw.Box(preview.Bounds, color);
 
+        if (!preview.IsValid)
+        {
+            RtsWorldMarkerVisualization.DrawInvalidFootprint(
+                debugDraw,
+                preview.Bounds,
+                invalidColor);
+        }
+
         string state = preview.IsValid
             ? "VALID"
             : preview.Failure.ToString();

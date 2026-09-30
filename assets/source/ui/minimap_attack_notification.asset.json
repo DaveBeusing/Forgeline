@@ -1,0 +1,5 @@
+{
+  "id": "ui.icon.minimap.attack_notification",
+  "type": "material",
+  "source": "warning.material.json"
+}

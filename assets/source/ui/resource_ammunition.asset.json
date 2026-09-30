@@ -1,0 +1,5 @@
+{
+  "id": "ui.icon.resource.ammunition",
+  "type": "material",
+  "source": "command.material.json"
+}

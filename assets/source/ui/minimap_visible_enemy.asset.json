@@ -1,0 +1,5 @@
+{
+  "id": "ui.icon.minimap.visible_enemy",
+  "type": "material",
+  "source": "warning.material.json"
+}

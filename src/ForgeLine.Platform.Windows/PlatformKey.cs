@@ -38,5 +38,7 @@ public enum PlatformKey
     F6,
     F7,
     F8,
-    F9
+    F9,
+    F10,
+    F11
 }

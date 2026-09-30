@@ -27,6 +27,12 @@ public readonly record struct TacticalTargetingView(
 {
     public bool IsActive =>
         Mode != TacticalTargetingMode.None;
+
+    public bool HasPointerTarget { get; init; }
+
+    public bool PointerTargetValid { get; init; }
+
+    public Vector3 PointerWorldTarget { get; init; }
 }
 
 public sealed class RtsTacticalTargetingController
@@ -40,6 +46,9 @@ public sealed class RtsTacticalTargetingController
     private bool _leftWasDown;
     private bool _escapeWasDown;
     private bool _pointerCaptured;
+    private bool _hasPointerTarget;
+    private bool _pointerTargetValid;
+    private Vector3 _pointerWorldTarget;
 
     public TacticalTargetingMode Mode { get; private set; }
 
@@ -113,6 +122,23 @@ public sealed class RtsTacticalTargetingController
         _pointerCaptured =
             IsActive;
 
+        if (IsActive &&
+            !pointerBlocked &&
+            input.HasPointerPosition)
+        {
+            UpdatePreview(
+                camera,
+                terrain,
+                snapshot,
+                input.PointerPosition,
+                viewportWidth,
+                viewportHeight);
+        }
+        else
+        {
+            ResetPreview();
+        }
+
         bool leftDown =
             input.IsMouseButtonDown(
                 PlatformMouseButton.Left);
@@ -177,7 +203,15 @@ public sealed class RtsTacticalTargetingController
                 0,
             snapshot?.Intelligence?.Contacts.Count ??
                 0,
-            DefaultFireMissionRounds);
+            DefaultFireMissionRounds)
+        {
+            HasPointerTarget =
+                _hasPointerTarget,
+            PointerTargetValid =
+                _pointerTargetValid,
+            PointerWorldTarget =
+                _pointerWorldTarget
+        };
 
     public void Cancel()
     {
@@ -187,6 +221,59 @@ public sealed class RtsTacticalTargetingController
         _leftWasDown = false;
         _escapeWasDown = false;
         _pointerCaptured = false;
+        ResetPreview();
+    }
+
+    private void UpdatePreview(
+        RtsCamera camera,
+        ITerrainQuery terrain,
+        PresentationSnapshot? snapshot,
+        Vector2 pointer,
+        int viewportWidth,
+        int viewportHeight)
+    {
+        _hasPointerTarget =
+            TryResolveTerrainTarget(
+                camera,
+                terrain,
+                pointer,
+                viewportWidth,
+                viewportHeight,
+                out _pointerWorldTarget);
+
+        _pointerTargetValid =
+            Mode switch
+            {
+                TacticalTargetingMode.Attack =>
+                    TryPickAttackTarget(
+                        camera,
+                        snapshot,
+                        pointer,
+                        viewportWidth,
+                        viewportHeight,
+                        out _),
+                TacticalTargetingMode.AttackMove or
+                TacticalTargetingMode.Retreat =>
+                    _hasPointerTarget,
+                TacticalTargetingMode.FireMission =>
+                    TryPickContact(
+                        camera,
+                        snapshot?.Intelligence,
+                        pointer,
+                        viewportWidth,
+                        viewportHeight,
+                        out _) ||
+                    _hasPointerTarget,
+                _ =>
+                    false
+            };
+    }
+
+    private void ResetPreview()
+    {
+        _hasPointerTarget = false;
+        _pointerTargetValid = false;
+        _pointerWorldTarget = default;
     }
 
     private void TryResolveTarget(
@@ -475,6 +562,7 @@ public sealed class RtsTacticalTargetingController
         _entities = [];
         _leftWasDown = false;
         _escapeWasDown = false;
+        ResetPreview();
     }
 
     private void SynchronizeSession(
