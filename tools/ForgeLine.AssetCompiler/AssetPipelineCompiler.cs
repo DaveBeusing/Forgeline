@@ -10,7 +10,7 @@ public sealed class AssetPipelineCompiler
 
     private static readonly JsonSerializerOptions JsonOptions = RuntimeAssetCatalog.CreateJsonOptions();
 
-    public AssetCompilationResult Compile(
+    public static AssetCompilationResult Compile(
         string sourceRoot,
         string runtimeRoot,
         bool clean = false)
@@ -370,7 +370,7 @@ public sealed class AssetPipelineCompiler
         }
     }
 
-    private static IReadOnlyList<AssetId> CollectDependencies(
+    private static AssetId[] CollectDependencies(
         SourceAssetDefinition definition,
         AssetId ownerId,
         string sourcePath,
@@ -556,7 +556,7 @@ public sealed class AssetPipelineCompiler
         }
     }
 
-    private static IReadOnlyList<AssetNode> TopologicallyOrder(
+    private static List<AssetNode> TopologicallyOrder(
         IReadOnlyDictionary<AssetId, AssetNode> nodes,
         List<AssetCompilerDiagnostic> diagnostics)
     {
