@@ -63,6 +63,8 @@ public sealed class CombatEntityLifecycleSystem : ISimulationSystem
         _runtime.ClearPendingDestructions();
         _runtime.SetActiveProjectiles(
             context.Entities.GetComponentCount<ProjectileState>());
+    }
+
     private static void CreateUnitWreckPresentation(
         SimulationContext context,
         EntityId destroyedEntity)
@@ -103,7 +105,5 @@ public sealed class CombatEntityLifecycleSystem : ISimulationSystem
                 wreck,
                 signature);
         }
-    }
-
     }
 }
