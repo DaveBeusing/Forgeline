@@ -380,7 +380,7 @@ internal static class GltfImporter
         var viewIndex = accessor.GetProperty("bufferView").GetInt32();
         var view = GetArrayElement(root, "bufferViews", viewIndex);
         var bufferIndex = view.GetProperty("buffer").GetInt32();
-        if ((uint)bufferIndex >= buffers.Count)
+        if ((uint)bufferIndex >= buffers.Length)
         {
             throw new InvalidDataException($"glTF buffer view {viewIndex} references missing buffer {bufferIndex}.");
         }
@@ -454,7 +454,7 @@ internal static class GltfImporter
         var viewIndex = accessor.GetProperty("bufferView").GetInt32();
         var view = GetArrayElement(root, "bufferViews", viewIndex);
         var bufferIndex = view.GetProperty("buffer").GetInt32();
-        if ((uint)bufferIndex >= buffers.Count)
+        if ((uint)bufferIndex >= buffers.Length)
         {
             throw new InvalidDataException($"glTF buffer view {viewIndex} references missing buffer {bufferIndex}.");
         }
