@@ -41,4 +41,6 @@ public static class ResourceIds
     public static ResourceId Electronics => new(6);
 
     public static ResourceId Ammunition => new(7);
+
+    public static ResourceId RareElements => new(8);
 }

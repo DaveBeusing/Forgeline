@@ -28,6 +28,14 @@ public readonly record struct BattlefieldResourceDepositDefinition(
     double ExtractionRatePerSecond,
     bool Contested);
 
+public readonly record struct BattlefieldWorldObjectDefinition(
+    string Key,
+    WorldVisualId Visual,
+    WorldPresentationKind Kind,
+    Vector3 Position,
+    Vector3 Scale,
+    float RotationDegrees);
+
 public enum BattlefieldSiteKind : byte
 {
     Expansion = 1,
@@ -81,6 +89,7 @@ public sealed class PrototypeBattlefieldDefinition
         BattlefieldMapMetadata metadata,
         BattlefieldStartPosition[] starts,
         BattlefieldResourceDepositDefinition[] resources,
+        BattlefieldWorldObjectDefinition[] worldObjects,
         BattlefieldSiteDefinition[] sites,
         BattlefieldRoadNodeDefinition[] roadNodes,
         BattlefieldRoadEdgeDefinition[] roadEdges,
@@ -91,6 +100,7 @@ public sealed class PrototypeBattlefieldDefinition
         Metadata = metadata;
         Starts = starts;
         Resources = resources;
+        WorldObjects = worldObjects;
         Sites = sites;
         RoadNodes = roadNodes;
         RoadEdges = roadEdges;
@@ -104,6 +114,8 @@ public sealed class PrototypeBattlefieldDefinition
     public IReadOnlyList<BattlefieldStartPosition> Starts { get; }
 
     public IReadOnlyList<BattlefieldResourceDepositDefinition> Resources { get; }
+
+    public IReadOnlyList<BattlefieldWorldObjectDefinition> WorldObjects { get; }
 
     public IReadOnlyList<BattlefieldSiteDefinition> Sites { get; }
 
@@ -129,6 +141,7 @@ public sealed class PrototypeBattlefieldDefinition
                 RecommendedPlayers: 2),
             CreateStarts(),
             CreateResources(),
+            CreateWorldObjects(),
             CreateSites(),
             CreateRoadNodes(),
             CreateRoadEdges(),
@@ -228,7 +241,42 @@ public sealed class PrototypeBattlefieldDefinition
         Deposit("south.contested.volatiles", ResourceIds.Volatiles, 1_330, 2_360, 8_000, 7.0, true),
 
         Deposit("west.outpost.silicates", ResourceIds.Silicates, 700, 520, 9_000, 7.0, true),
-        Deposit("east.outpost.silicates", ResourceIds.Silicates, 2_372, 2_560, 9_000, 7.0, true)
+        Deposit("east.outpost.silicates", ResourceIds.Silicates, 2_372, 2_560, 9_000, 7.0, true),
+        Deposit("center.rare_elements", ResourceIds.RareElements, 1_536, 1_310, 4_500, 3.5, true),
+        Deposit("south.rare_elements", ResourceIds.RareElements, 1_535, 2_690, 5_200, 3.5, true)
+    ];
+
+    private static BattlefieldWorldObjectDefinition[] CreateWorldObjects() =>
+    [
+        WorldObject("prop.rock.west", WorldVisualId.PropRock, WorldPresentationKind.Prop, 830, 1_250, 18, 9, 15, 22),
+        WorldObject("prop.barrier.west", WorldVisualId.PropBarrier, WorldPresentationKind.Prop, 1_060, 1_520, 22, 3, 5, 90),
+        WorldObject("prop.concrete.north", WorldVisualId.PropConcreteBlock, WorldPresentationKind.Prop, 1_330, 895, 9, 4, 4, 0),
+        WorldObject("prop.crate.west", WorldVisualId.PropCrate, WorldPresentationKind.Prop, 650, 560, 5, 5, 5, 15),
+        WorldObject("prop.drum.west", WorldVisualId.PropDrum, WorldPresentationKind.Prop, 675, 548, 3, 5, 3, 0),
+        WorldObject("prop.pallet.east", WorldVisualId.PropPallet, WorldPresentationKind.Prop, 2_410, 2_520, 7, 1, 5, 10),
+        WorldObject("prop.pipe.east", WorldVisualId.PropPipeSection, WorldPresentationKind.Prop, 2_380, 2_535, 12, 4, 4, 80),
+        WorldObject("prop.utility.east", WorldVisualId.PropUtilityBox, WorldPresentationKind.Prop, 2_445, 2_535, 5, 7, 4, 0),
+        WorldObject("prop.fence.north", WorldVisualId.PropFence, WorldPresentationKind.Prop, 1_255, 950, 24, 4, 1, 0),
+        WorldObject("prop.light.south", WorldVisualId.PropIndustrialLightSignage, WorldPresentationKind.Prop, 1_815, 2_165, 3, 14, 3, 0),
+        WorldObject("prop.rubble.center", WorldVisualId.PropRubble, WorldPresentationKind.Prop, 1_610, 1_690, 18, 5, 14, 35),
+
+        WorldObject("vegetation.conifer.01", WorldVisualId.VegetationConifer, WorldPresentationKind.Vegetation, 920, 680, 8, 24, 8, 5),
+        WorldObject("vegetation.conifer.02", WorldVisualId.VegetationConifer, WorldPresentationKind.Vegetation, 960, 705, 7, 21, 7, 42),
+        WorldObject("vegetation.conifer.03", WorldVisualId.VegetationConifer, WorldPresentationKind.Vegetation, 2_130, 2_385, 9, 26, 9, 19),
+        WorldObject("vegetation.scrub.01", WorldVisualId.VegetationScrub, WorldPresentationKind.Vegetation, 1_170, 1_245, 10, 5, 9, 0),
+        WorldObject("vegetation.scrub.02", WorldVisualId.VegetationScrub, WorldPresentationKind.Vegetation, 1_905, 1_785, 9, 4, 8, 0),
+        WorldObject("vegetation.scrub.03", WorldVisualId.VegetationScrub, WorldPresentationKind.Vegetation, 780, 2_180, 11, 5, 10, 0),
+        WorldObject("vegetation.grass.01", WorldVisualId.VegetationGrassClump, WorldPresentationKind.Vegetation, 1_085, 735, 12, 2, 12, 0),
+        WorldObject("vegetation.grass.02", WorldVisualId.VegetationGrassClump, WorldPresentationKind.Vegetation, 1_980, 2_315, 14, 2, 14, 0),
+
+        WorldObject("decal.tire.west", WorldVisualId.DecalTireTracks, WorldPresentationKind.Decal, 790, 1_535, 42, 0.08f, 8, 0),
+        WorldObject("decal.tracked.north", WorldVisualId.DecalTrackedVehicleMarks, WorldPresentationKind.Decal, 1_345, 945, 36, 0.08f, 10, 8),
+        WorldObject("decal.roadwear.center", WorldVisualId.DecalRoadWear, WorldPresentationKind.Decal, 1_536, 920, 72, 0.08f, 14, 90),
+        WorldObject("decal.oil.west", WorldVisualId.DecalOilStain, WorldPresentationKind.Decal, 665, 535, 12, 0.08f, 10, 0),
+        WorldObject("decal.blast.center", WorldVisualId.DecalBlastMark, WorldPresentationKind.Decal, 1_640, 1_630, 16, 0.08f, 16, 0),
+        WorldObject("decal.shell.south", WorldVisualId.DecalShellImpact, WorldPresentationKind.Decal, 1_420, 2_310, 8, 0.08f, 8, 0),
+        WorldObject("decal.scorch.east", WorldVisualId.DecalScorchMark, WorldPresentationKind.Decal, 2_365, 2_545, 14, 0.08f, 12, 0),
+        WorldObject("decal.crack.north", WorldVisualId.DecalConcreteCrack, WorldPresentationKind.Decal, 1_535, 918, 18, 0.08f, 10, 90)
     ];
 
     private static BattlefieldSiteDefinition[] CreateSites() =>
@@ -320,6 +368,24 @@ public sealed class PrototypeBattlefieldDefinition
             quantity,
             rate,
             contested);
+
+    private static BattlefieldWorldObjectDefinition WorldObject(
+        string key,
+        WorldVisualId visual,
+        WorldPresentationKind kind,
+        float x,
+        float z,
+        float scaleX,
+        float scaleY,
+        float scaleZ,
+        float rotationDegrees) =>
+        new(
+            key,
+            visual,
+            kind,
+            new Vector3(x, 0.0f, z),
+            new Vector3(scaleX, scaleY, scaleZ),
+            rotationDegrees);
 
     private static BattlefieldSiteDefinition Site(
         string key,

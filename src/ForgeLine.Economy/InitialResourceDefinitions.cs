@@ -34,6 +34,14 @@ public static class InitialResourceDefinitions
                 },
                 new ResourceDefinition
                 {
+                    Id = ResourceIds.RareElements,
+                    Key = "resource.rare_elements",
+                    DisplayName = "Rare Elements",
+                    DefaultExtractionRatePerSecond = 4.0,
+                    DefaultRichness = 1.0
+                },
+                new ResourceDefinition
+                {
                     Id = ResourceIds.Steel,
                     Key = "resource.steel",
                     DisplayName = "Steel",
