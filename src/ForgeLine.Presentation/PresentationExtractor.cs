@@ -983,11 +983,23 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 transform.Position,
                 context.Tick);
             SpawnAt(
+                VfxEffectKind.DestructionDebris,
+                transform.Position,
+                context.Tick);
+            SpawnAt(
                 VfxEffectKind.DestructionSmokePlume,
                 transform.Position,
                 context.Tick);
             SpawnAt(
                 VfxEffectKind.DestructionPersistentFire,
+                transform.Position,
+                context.Tick);
+            SpawnAt(
+                VfxEffectKind.DestructionSparkEmission,
+                transform.Position,
+                context.Tick);
+            SpawnAt(
+                VfxEffectKind.DestructionDustCloud,
                 transform.Position,
                 context.Tick);
         }
@@ -1020,6 +1032,10 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 transform.Position,
                 context.Tick);
             SpawnAt(
+                VfxEffectKind.DestructionDebris,
+                transform.Position,
+                context.Tick);
+            SpawnAt(
                 VfxEffectKind.DestructionDustCloud,
                 transform.Position,
                 context.Tick);
@@ -1029,6 +1045,10 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 context.Tick);
             SpawnAt(
                 VfxEffectKind.DestructionPersistentFire,
+                transform.Position,
+                context.Tick);
+            SpawnAt(
+                VfxEffectKind.DestructionSparkEmission,
                 transform.Position,
                 context.Tick);
         }

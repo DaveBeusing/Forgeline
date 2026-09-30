@@ -364,6 +364,21 @@ public sealed class VfxPresentationTests
         Assert.Contains(
             VfxEffectKind.ExplosionBuilding,
             firstEffects);
+        Assert.Contains(
+            VfxEffectKind.DestructionDebris,
+            firstEffects);
+        Assert.Contains(
+            VfxEffectKind.DestructionSmokePlume,
+            firstEffects);
+        Assert.Contains(
+            VfxEffectKind.DestructionPersistentFire,
+            firstEffects);
+        Assert.Contains(
+            VfxEffectKind.DestructionSparkEmission,
+            firstEffects);
+        Assert.Contains(
+            VfxEffectKind.DestructionDustCloud,
+            firstEffects);
 
         ulong spawnedAfterFirst =
             first.VfxMetrics.TotalSpawned;
