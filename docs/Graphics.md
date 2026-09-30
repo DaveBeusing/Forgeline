@@ -199,3 +199,18 @@ This foundation deliberately does not implement:
 - post-processing
 - editor rendering
 - Vulkan
+
+
+## Render-thread ownership
+
+The interactive client gives all D3D12 lifetime and submission to one dedicated render owner. Device creation, swap-chain creation, pipelines, buffers, renderer objects, `RenderFrame`, resize, `WaitForIdle`, and disposal all execute on that owner.
+
+`GraphicsDeviceFactory.CreateForWindowTarget` accepts a copied `GraphicsWindowTarget` containing the opaque native handle, initial client dimensions, and suspended state. This lets graphics create its swap chain without reading mutable `IWindow` properties from the render thread.
+
+Subsequent resize/minimize/restore state crosses from the platform owner as copied dimensions. A zero-sized target suspends rendering; restoration to a positive size performs the existing idle/recreate path on the render owner.
+
+The renderer consumes immutable presentation snapshots and copied camera/debug/UI frame state. No graphics object, mutable window object, ECS registry, inventory, or simulation system crosses into the render owner.
+
+A slow render frame can delay later GPU submissions, but it cannot execute or block authoritative simulation ticks. A slow simulation tick leaves the renderer free to reuse the newest completed snapshot.
+
+See [Client Execution Ownership](adr/ClientExecutionOwnership.md).
