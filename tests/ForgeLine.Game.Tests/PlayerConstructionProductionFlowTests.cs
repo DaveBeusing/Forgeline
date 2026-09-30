@@ -778,20 +778,33 @@ public sealed class PlayerConstructionProductionFlowTests
         Vector3 reconnaissancePoint =
             eastCore.Position +
             towardWest * 180.0f;
-        PlayerCommandResultReadModel reconnaissanceResult =
-            DispatchAction(
-                scenario,
-                gateway,
-                PlayerActionRequest.AttackMove(
-                    [scout],
-                    reconnaissancePoint,
-                    FormationTemplate.Compact));
-        Assert.Equal(
-            PlayerCommandFeedbackState.Accepted,
-            reconnaissanceResult.State);
+        Assert.True(
+            gateway.SubmitMovement(
+                scenario.West.Player,
+                [scout, supplyTruck],
+                reconnaissancePoint,
+                scenario.Simulation.CurrentTick,
+                FormationTemplate.Compact).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out _));
 
         FactionId westFaction =
             new((uint)scenario.West.Player.Value);
+        WorldTransform scoutBeforeRecon =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    scout);
+        float reconnaissanceDistance =
+            Vector3.Distance(
+                scoutBeforeRecon.Position,
+                reconnaissancePoint);
+        int reconnaissanceTickBudget =
+            checked(
+                (int)MathF.Ceiling(
+                    reconnaissanceDistance /
+                    10.0f *
+                    scenario.Simulation.TicksPerSecond) +
+                800);
 
         RunUntil(
             scenario,
@@ -800,7 +813,7 @@ public sealed class PlayerConstructionProductionFlowTests
                     .IsEntityCurrentlyIdentified(
                         westFaction,
                         scenario.East.CommandCore),
-            maximumTicks: 1_200);
+            maximumTicks: reconnaissanceTickBudget);
 
         double ammunitionBeforeCombat =
             tanks.Sum(
