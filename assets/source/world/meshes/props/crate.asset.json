@@ -1,0 +1,15 @@
+{
+  "id": "mesh.world.prop.crate",
+  "type": "mesh",
+  "source": "../sources/world_box.gltf",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "mesh.world.prop.crate_lod1",
+      "maxDistance": 200
+    }
+  ]
+}

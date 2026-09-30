@@ -1,0 +1,15 @@
+{
+  "id": "mesh.world.resource.rare_elements",
+  "type": "mesh",
+  "source": "../sources/world_box.gltf",
+  "materialReferences": [
+    "material.world.resource.rare_elements"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "mesh.world.resource.rare_elements_lod1",
+      "maxDistance": 260
+    }
+  ]
+}

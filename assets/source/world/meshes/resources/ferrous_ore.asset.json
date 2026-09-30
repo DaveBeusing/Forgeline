@@ -1,0 +1,15 @@
+{
+  "id": "mesh.world.resource.ferrous_ore",
+  "type": "mesh",
+  "source": "../sources/world_box.gltf",
+  "materialReferences": [
+    "material.world.resource.ferrous_ore"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "mesh.world.resource.ferrous_ore_lod1",
+      "maxDistance": 260
+    }
+  ]
+}

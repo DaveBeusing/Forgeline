@@ -1,0 +1,5 @@
+{
+  "id": "material.world.resource.ferrous_ore",
+  "type": "material",
+  "source": "ferrous_ore.material.json"
+}

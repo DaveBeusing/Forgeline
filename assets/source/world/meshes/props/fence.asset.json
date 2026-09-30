@@ -1,0 +1,15 @@
+{
+  "id": "mesh.world.prop.fence",
+  "type": "mesh",
+  "source": "../sources/world_box.gltf",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "mesh.world.prop.fence_lod1",
+      "maxDistance": 300
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "mesh.world.prop.utility_box",
+  "type": "mesh",
+  "source": "../sources/world_box.gltf",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "mesh.world.prop.utility_box_lod1",
+      "maxDistance": 220
+    }
+  ]
+}

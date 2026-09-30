@@ -1,0 +1,5 @@
+{
+  "id": "material.world.decal.shell_impact",
+  "type": "material",
+  "source": "shell_impact.material.json"
+}

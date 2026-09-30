@@ -1,0 +1,5 @@
+{
+  "id": "material.world.decal.road_wear",
+  "type": "material",
+  "source": "road_wear.material.json"
+}
