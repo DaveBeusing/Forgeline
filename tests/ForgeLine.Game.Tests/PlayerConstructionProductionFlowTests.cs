@@ -735,7 +735,7 @@ public sealed class PlayerConstructionProductionFlowTests
         Vector3 supplyTruckLoadPoint =
             supplyDepotPosition +
             supplyStagingDirection *
-                (supplyTruckState.LoadRangeMeters * 0.5f);
+                (supplyTruckState.LoadRangeMeters - 1.0f);
 
         Assert.True(
             gateway.SubmitMovement(
