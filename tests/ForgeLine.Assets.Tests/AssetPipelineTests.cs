@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using ForgeLine.AssetCompiler;
 using ForgeLine.Assets;
+using Xunit;
 
 namespace ForgeLine.Assets.Tests;
 
