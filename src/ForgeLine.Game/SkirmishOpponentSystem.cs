@@ -37,10 +37,27 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private readonly BuildingPlacementService _placement;
     private readonly FactionIntelligenceStore _intelligence;
     private readonly PrototypeBattlefieldDefinition _battlefield;
+    private static readonly SkirmishOpponentConfiguration DefaultConfiguration =
+        CreateDefaultConfiguration();
+
+    private const int MaximumRetainedScratchCapacity = 4_096;
+
     private readonly IReadOnlyDictionary<PlayerId, SkirmishOpponentConfiguration>
         _configurations;
     private readonly List<EntityId> _controllers = new();
+    private readonly List<EntityId> _staleControllerScratch = new();
+    private readonly Dictionary<EntityId, OwnedState> _ownedScratch = new();
     private readonly List<SkirmishOpponentDebugReadModel> _debug = new();
+
+    private long _executions;
+    private long _ownedStateCaptures;
+    private long _intelligenceCaptures;
+    private long _economyAssessments;
+    private long _forceAssessments;
+    private long _decisionEvaluations;
+    private long _nonDecisionEvaluations;
+    private long _scratchStatesCreated;
+    private long _scratchStatesReleased;
 
     public SkirmishOpponentSystem(
         BuildingDefinitionCatalog buildings,
@@ -82,10 +99,23 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     public IReadOnlyList<SkirmishOpponentDebugReadModel> DebugSnapshot =>
         _debug;
 
+    public SkirmishOpponentWorkMetrics WorkMetrics =>
+        new(
+            _executions,
+            _ownedStateCaptures,
+            _intelligenceCaptures,
+            _economyAssessments,
+            _forceAssessments,
+            _decisionEvaluations,
+            _nonDecisionEvaluations,
+            _scratchStatesCreated,
+            _scratchStatesReleased);
+
     public void Execute(SimulationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
+        _executions++;
         _controllers.Clear();
         _debug.Clear();
 
@@ -97,6 +127,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         {
             _controllers.Add(controller);
         }
+
+        ReleaseStaleControllerScratch();
 
         for (int index = 0;
              index < _controllers.Count;
@@ -120,44 +152,72 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 controllerEntity);
         SkirmishOpponentConfiguration configuration =
             ResolveConfiguration(controller.Player);
+        bool decisionDue =
+            IsDecisionDue(
+                context.Tick,
+                state.LastDecisionTick,
+                configuration.ReactionCadenceTicks);
 
         OwnedState owned =
             CaptureOwnedState(
                 context,
+                controllerEntity,
                 controller);
-        FactionIntelligenceSnapshot intelligence =
-            _intelligence.Capture(
-                controller.Faction);
-        SkirmishEconomyAssessment economy =
-            AssessEconomy(
-                context,
-                controller,
-                owned);
-        SkirmishForceAssessment force =
-            AssessForce(
-                context,
-                owned,
-                intelligence);
 
-        if (!IsDecisionDue(
-                context.Tick,
-                state.LastDecisionTick,
-                configuration.ReactionCadenceTicks))
+        if (!decisionDue)
         {
+            _nonDecisionEvaluations++;
+
             EnsureCriticalLogisticsRecovery(
                 context,
                 owned,
                 configuration);
+
+            if (!DebugCaptureEnabled)
+            {
+                return;
+            }
+
+            FactionIntelligenceSnapshot debugIntelligence =
+                CaptureIntelligence(
+                    controller.Faction);
+            SkirmishEconomyAssessment debugEconomy =
+                AssessEconomyMeasured(
+                    context,
+                    controller,
+                    owned);
+            SkirmishForceAssessment debugForce =
+                AssessForceMeasured(
+                    context,
+                    owned,
+                    debugIntelligence);
+
             CaptureDebug(
                 controllerEntity,
                 controller,
                 state,
-                economy,
-                force,
+                debugEconomy,
+                debugForce,
                 hasObjective: false,
                 objective: Vector3.Zero);
             return;
         }
+
+        _decisionEvaluations++;
+
+        FactionIntelligenceSnapshot intelligence =
+            CaptureIntelligence(
+                controller.Faction);
+        SkirmishEconomyAssessment economy =
+            AssessEconomyMeasured(
+                context,
+                controller,
+                owned);
+        SkirmishForceAssessment force =
+            AssessForceMeasured(
+                context,
+                owned,
+                intelligence);
 
         EnsureTacticalBehavior(
             context,
@@ -325,20 +385,74 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return configuration;
         }
 
-        var defaultConfiguration =
-            new SkirmishOpponentConfiguration();
-        defaultConfiguration.Validate();
-        return defaultConfiguration;
+        return DefaultConfiguration;
     }
 
-    private static OwnedState CaptureOwnedState(
+    private static SkirmishOpponentConfiguration CreateDefaultConfiguration()
+    {
+        var configuration =
+            new SkirmishOpponentConfiguration();
+        configuration.Validate();
+        return configuration;
+    }
+
+    private FactionIntelligenceSnapshot CaptureIntelligence(
+        FactionId faction)
+    {
+        _intelligenceCaptures++;
+        return _intelligence.Capture(faction);
+    }
+
+    private SkirmishEconomyAssessment AssessEconomyMeasured(
         SimulationContext context,
+        SkirmishOpponentController controller,
+        OwnedState owned)
+    {
+        _economyAssessments++;
+        return AssessEconomy(
+            context,
+            controller,
+            owned);
+    }
+
+    private SkirmishForceAssessment AssessForceMeasured(
+        SimulationContext context,
+        OwnedState owned,
+        FactionIntelligenceSnapshot intelligence)
+    {
+        _forceAssessments++;
+        return AssessForce(
+            context,
+            owned,
+            intelligence);
+    }
+
+    private OwnedState CaptureOwnedState(
+        SimulationContext context,
+        EntityId controllerEntity,
         SkirmishOpponentController controller)
     {
-        var owned =
-            new OwnedState(
+        _ownedStateCaptures++;
+
+        if (!_ownedScratch.TryGetValue(
+                controllerEntity,
+                out OwnedState? owned))
+        {
+            owned =
+                new OwnedState(
+                    controller.Player,
+                    controller.Faction);
+            _ownedScratch.Add(
+                controllerEntity,
+                owned);
+            _scratchStatesCreated++;
+        }
+        else
+        {
+            owned.Reset(
                 controller.Player,
                 controller.Faction);
+        }
 
         foreach (EntityId entity in
                  context.Entities.Query<CompletedBuilding>(
@@ -511,6 +625,48 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
 
         return owned;
+    }
+
+    private void ReleaseStaleControllerScratch()
+    {
+        if (_ownedScratch.Count == 0)
+        {
+            return;
+        }
+
+        _staleControllerScratch.Clear();
+
+        foreach (EntityId controller in _ownedScratch.Keys)
+        {
+            bool active = false;
+
+            for (int index = 0;
+                 index < _controllers.Count;
+                 index++)
+            {
+                if (_controllers[index] == controller)
+                {
+                    active = true;
+                    break;
+                }
+            }
+
+            if (!active)
+            {
+                _staleControllerScratch.Add(controller);
+            }
+        }
+
+        for (int index = 0;
+             index < _staleControllerScratch.Count;
+             index++)
+        {
+            if (_ownedScratch.Remove(
+                    _staleControllerScratch[index]))
+            {
+                _scratchStatesReleased++;
+            }
+        }
     }
 
     private static void AddBuildingInventories(
@@ -3456,9 +3612,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             Faction = faction;
         }
 
-        public PlayerId Player { get; }
+        public PlayerId Player { get; private set; }
 
-        public FactionId Faction { get; }
+        public FactionId Faction { get; private set; }
 
         public List<EntityId> Buildings { get; } = new();
 
@@ -3495,5 +3651,71 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         public double PowerDemand { get; set; }
 
         public int OfflineConsumers { get; set; }
+
+        public void Reset(
+            PlayerId player,
+            FactionId faction)
+        {
+            Player = player;
+            Faction = faction;
+
+            Clear(Buildings);
+            Clear(BuildingCounts);
+            Clear(PendingBuildings);
+            Clear(ConstructionSites);
+            Clear(InventoryIds);
+            Clear(ProductionFacilities);
+            Clear(UnitProductionFacilities);
+            Clear(SupplyDepots);
+            Clear(Units);
+            Clear(CombatUnits);
+            Clear(UnitByEntity);
+            Clear(UnitCounts);
+            Clear(PendingUnitCounts);
+            Clear(PendingRequestsPerFacility);
+
+            PowerGeneration = 0.0;
+            PowerDemand = 0.0;
+            OfflineConsumers = 0;
+        }
+
+        private static void Clear<T>(List<T> values)
+        {
+            values.Clear();
+
+            if (values.Capacity >
+                MaximumRetainedScratchCapacity)
+            {
+                values.Capacity =
+                    MaximumRetainedScratchCapacity;
+            }
+        }
+
+        private static void Clear<TKey, TValue>(
+            Dictionary<TKey, TValue> values)
+            where TKey : notnull
+        {
+            values.Clear();
+
+            if (values.EnsureCapacity(0) >
+                MaximumRetainedScratchCapacity)
+            {
+                values.TrimExcess(
+                    MaximumRetainedScratchCapacity);
+            }
+        }
+
+        private static void Clear<T>(
+            HashSet<T> values)
+        {
+            values.Clear();
+
+            if (values.EnsureCapacity(0) >
+                MaximumRetainedScratchCapacity)
+            {
+                values.TrimExcess(
+                    MaximumRetainedScratchCapacity);
+            }
+        }
     }
 }
