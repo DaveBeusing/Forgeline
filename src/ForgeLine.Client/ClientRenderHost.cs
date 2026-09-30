@@ -190,7 +190,8 @@ internal sealed class ClientRenderHost : IDisposable
             using var terrainRenderer =
                 new TerrainRenderer(
                     graphics,
-                    terrain);
+                    terrain,
+                    runtimeAssets: _runtimeAssets);
             using var instanceRenderer =
                 new SimpleInstanceRenderer(
                     graphics,
