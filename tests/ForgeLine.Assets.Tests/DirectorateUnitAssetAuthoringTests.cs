@@ -65,6 +65,11 @@ public sealed class DirectorateUnitAssetAuthoringTests
                 RuntimeAssetCatalog.Load(
                     runtimeRoot);
 
+            Assert.True(
+                catalog.Contains(
+                    AssetId.Parse(
+                        "unit.directorate.main_battle_tank.turret")));
+
             foreach (UnitAssetExpectation unit in Units)
             {
                 string primaryId =
