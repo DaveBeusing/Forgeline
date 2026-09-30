@@ -1,5 +1,6 @@
 using ForgeLine.Core;
 using ForgeLine.Economy;
+using ForgeLine.Ecs;
 using ForgeLine.Intelligence;
 using ForgeLine.Simulation;
 using ForgeLine.World;
@@ -285,6 +286,174 @@ public sealed class SkirmishOpponentTests
     }
 
     [Fact]
+    public void NonDecisionTicksSkipDecisionOnlyAssessmentWithoutDebugCapture()
+    {
+        using VerticalSliceScenario scenario =
+            CreateMeasuredScenario(
+                enableOpponentDebugCapture: false);
+
+        scenario.Simulation.RunTicks(
+            3,
+            TestContext.Current.CancellationToken);
+
+        SkirmishOpponentWorkMetrics before =
+            scenario.Opponents.WorkMetrics;
+
+        scenario.Simulation.RunTicks(
+            5,
+            TestContext.Current.CancellationToken);
+
+        SkirmishOpponentWorkMetrics after =
+            scenario.Opponents.WorkMetrics;
+
+        Assert.Equal(
+            0,
+            after.DecisionEvaluations -
+            before.DecisionEvaluations);
+        Assert.Equal(
+            10,
+            after.NonDecisionEvaluations -
+            before.NonDecisionEvaluations);
+        Assert.Equal(
+            10,
+            after.OwnedStateCaptures -
+            before.OwnedStateCaptures);
+        Assert.Equal(
+            0,
+            after.IntelligenceCaptures -
+            before.IntelligenceCaptures);
+        Assert.Equal(
+            0,
+            after.EconomyAssessments -
+            before.EconomyAssessments);
+        Assert.Equal(
+            0,
+            after.ForceAssessments -
+            before.ForceAssessments);
+        Assert.Equal(
+            before.ScratchStatesCreated,
+            after.ScratchStatesCreated);
+    }
+
+    [Fact]
+    public void DebugCaptureKeepsNonDecisionAssessmentsFresh()
+    {
+        using VerticalSliceScenario scenario =
+            CreateMeasuredScenario(
+                enableOpponentDebugCapture: true);
+
+        scenario.Simulation.RunTicks(
+            3,
+            TestContext.Current.CancellationToken);
+
+        SkirmishOpponentWorkMetrics before =
+            scenario.Opponents.WorkMetrics;
+
+        scenario.Simulation.RunTicks(
+            5,
+            TestContext.Current.CancellationToken);
+
+        SkirmishOpponentWorkMetrics after =
+            scenario.Opponents.WorkMetrics;
+
+        Assert.Equal(
+            10,
+            after.NonDecisionEvaluations -
+            before.NonDecisionEvaluations);
+        Assert.Equal(
+            10,
+            after.IntelligenceCaptures -
+            before.IntelligenceCaptures);
+        Assert.Equal(
+            10,
+            after.EconomyAssessments -
+            before.EconomyAssessments);
+        Assert.Equal(
+            10,
+            after.ForceAssessments -
+            before.ForceAssessments);
+        Assert.Equal(
+            2,
+            scenario.Opponents.DebugSnapshot.Count);
+    }
+
+    [Fact]
+    public void NonDecisionAssessmentSuppressionReducesCurrentThreadAllocations()
+    {
+        long assessmentEnabled =
+            MeasureNonDecisionAllocations(
+                enableOpponentDebugCapture: true);
+        long assessmentSuppressed =
+            MeasureNonDecisionAllocations(
+                enableOpponentDebugCapture: false);
+
+        Assert.True(
+            assessmentSuppressed <
+            assessmentEnabled,
+            $"Expected cadence suppression to reduce current-thread allocation; enabled={assessmentEnabled}; suppressed={assessmentSuppressed}.");
+    }
+
+    [Fact]
+    public void OpponentScratchStateFollowsControllerLifetime()
+    {
+        using VerticalSliceScenario scenario =
+            CreateMeasuredScenario(
+                enableOpponentDebugCapture: false);
+
+        scenario.Simulation.RunTicks(
+            3,
+            TestContext.Current.CancellationToken);
+
+        SkirmishOpponentWorkMetrics before =
+            scenario.Opponents.WorkMetrics;
+        Assert.Equal(
+            2,
+            before.ScratchStatesCreated);
+        Assert.Equal(
+            0,
+            before.ScratchStatesReleased);
+
+        EntityId removedController =
+            EntityId.Invalid;
+
+        foreach (EntityId entity in
+                 scenario.Simulation.Entities.Query<
+                     SkirmishOpponentController,
+                     SkirmishOpponentState>(
+                         QueryIterationOrder.StableByEntityIndex))
+        {
+            SkirmishOpponentController controller =
+                scenario.Simulation.Entities
+                    .GetComponent<SkirmishOpponentController>(
+                        entity);
+
+            if (controller.Player ==
+                scenario.East.Player)
+            {
+                removedController = entity;
+                break;
+            }
+        }
+
+        Assert.True(removedController.IsValid);
+        Assert.True(
+            scenario.Simulation.Entities.DestroyEntity(
+                removedController));
+
+        scenario.Simulation.AdvanceOneTick();
+
+        SkirmishOpponentWorkMetrics after =
+            scenario.Opponents.WorkMetrics;
+        Assert.Equal(
+            before.ScratchStatesCreated,
+            after.ScratchStatesCreated);
+        Assert.Equal(
+            1,
+            after.ScratchStatesReleased -
+            before.ScratchStatesReleased);
+    }
+
+    [Fact]
     public void BoundedHeadlessSkirmishProgressesThroughStrategicLoop()
     {
         SkirmishScenarioHarness scenario =
@@ -343,6 +512,51 @@ public sealed class SkirmishOpponentTests
                 scenario.West.Faction) > 0 ||
             scenario.Intelligence.GetContactCount(
                 scenario.East.Faction) > 0);
+    }
+
+    private static long MeasureNonDecisionAllocations(
+        bool enableOpponentDebugCapture)
+    {
+        using VerticalSliceScenario scenario =
+            CreateMeasuredScenario(
+                enableOpponentDebugCapture);
+
+        scenario.Simulation.RunTicks(
+            3,
+            TestContext.Current.CancellationToken);
+
+        long before =
+            GC.GetAllocatedBytesForCurrentThread();
+
+        scenario.Simulation.RunTicks(
+            5,
+            TestContext.Current.CancellationToken);
+
+        return
+            GC.GetAllocatedBytesForCurrentThread() -
+            before;
+    }
+
+    private static VerticalSliceScenario CreateMeasuredScenario(
+        bool enableOpponentDebugCapture)
+    {
+        VerticalSliceScenarioSettings settings =
+            VerticalSliceScenarioSettings.Create(
+                VerticalSliceScenarioProfile.Validation);
+        VerticalSliceRuntimeSettings runtime =
+            VerticalSliceRuntimeSettings.CreateHeadless(
+                settings.Profile,
+                seed: 7331,
+                enableDiagnostics: false,
+                enableDebugCapture: false) with
+            {
+                Scenario = settings
+            };
+        VerticalSliceScenario scenario =
+            VerticalSliceScenario.Create(runtime);
+        scenario.Opponents.DebugCaptureEnabled =
+            enableOpponentDebugCapture;
+        return scenario;
     }
 
     private static bool HasIntegratedIndustry(
