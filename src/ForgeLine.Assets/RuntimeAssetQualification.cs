@@ -414,7 +414,8 @@ public static class RuntimeAssetQualification
 
         if (!catalog.TryGet(
                 referencedId,
-                out RuntimeAssetRecord? referenced))
+                out RuntimeAssetRecord? referenced) ||
+            referenced is null)
         {
             issues.Add(
                 new RuntimeAssetQualificationIssue(
