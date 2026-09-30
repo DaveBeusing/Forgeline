@@ -40,6 +40,8 @@ The active strategic goal records the current intent, including power establishm
 
 Strategic decisions run at a configurable low-frequency cadence. All timing uses simulation ticks. The controller's current decision order is critical economy recovery, bootstrap construction, local defense, expansion, force recovery, scouting, and offense. A successful earlier branch prevents a later branch from issuing a strategic objective in that decision. Economy stock and production policies and supply-truck loading are maintained before this branch selection.
 
+Owned-state capture remains active on every opponent tick because critical logistics recovery can legitimately need current production-facility, supply-depot, unit, and pending-request state between strategic decisions. The collections backing that capture are reusable per-controller scratch storage: contents are cleared before refill, stable entity iteration remains authoritative, excessive retained capacity is trimmed, and the scratch state is released when its controller disappears. Intelligence capture plus economy and force assessment are decision-cadence work when development debug capture is disabled. When debug capture is enabled they continue on non-decision ticks so the published debug snapshot remains current rather than silently stale.
+
 ## Opening and Economy
 
 The opening plan establishes the minimum industrial chain with real construction costs:
