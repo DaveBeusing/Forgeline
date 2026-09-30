@@ -1,3 +1,4 @@
+using System.Numerics;
 using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Ecs;
@@ -274,7 +275,65 @@ public sealed class PresentationExtractor : ISimulationTickObserver
 
         return new UnitFeaturePresentationMetadata(
             unit.UnitId,
-            state);
+            state,
+            ResolveAimYaw(
+                entities,
+                entity));
+    }
+
+    private static float ResolveAimYaw(
+        EntityRegistry entities,
+        EntityId entity)
+    {
+        if (!entities.TryGetComponent(
+                entity,
+                out WeaponState weapon) ||
+            !weapon.Target.IsValid ||
+            !entities.IsAlive(
+                weapon.Target) ||
+            !entities.TryGetComponent(
+                entity,
+                out WorldTransform source) ||
+            !entities.TryGetComponent(
+                weapon.Target,
+                out WorldTransform target))
+        {
+            return 0.0f;
+        }
+
+        Vector3 direction =
+            target.Position -
+            source.Position;
+        direction.Y =
+            0.0f;
+
+        if (direction.LengthSquared() <=
+            0.0001f)
+        {
+            return 0.0f;
+        }
+
+        Vector3 forward =
+            Vector3.Transform(
+                Vector3.UnitZ,
+                source.Rotation);
+        float bodyYaw =
+            MathF.Atan2(
+                forward.X,
+                forward.Z);
+        float targetYaw =
+            MathF.Atan2(
+                direction.X,
+                direction.Z);
+        float delta =
+            targetYaw -
+            bodyYaw;
+
+        return MathF.Atan2(
+            MathF.Sin(
+                delta),
+            MathF.Cos(
+                delta));
     }
 
     private static ResourceDepositPresentationState ResolveResourcePresentationState(
