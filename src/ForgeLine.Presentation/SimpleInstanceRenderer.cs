@@ -270,7 +270,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             {
                 var turretKey =
                     new InstanceBatchKey(
-                        UsesRuntimeMesh: true,
+                        true,
                         turretMeshId);
 
                 if (!batchLookup.TryGetValue(
@@ -279,7 +279,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 {
                     turretBatch =
                         new InstanceBatch(
-                            usesRuntimeMesh: true,
+                            true,
                             turretMesh);
                     batchLookup.Add(
                         turretKey,
