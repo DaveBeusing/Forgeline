@@ -777,7 +777,7 @@ public sealed class PlayerConstructionProductionFlowTests
 
         Vector3 reconnaissancePoint =
             eastCore.Position +
-            towardWest * 180.0f;
+            towardWest * 260.0f;
         Assert.True(
             gateway.SubmitMovement(
                 scenario.West.Player,
