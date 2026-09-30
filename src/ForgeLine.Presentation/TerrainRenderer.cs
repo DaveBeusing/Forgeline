@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Assets;
 using ForgeLine.Graphics;
 using ForgeLine.World;
 
@@ -17,7 +18,8 @@ public sealed class TerrainRenderer : IDisposable
         IGraphicsDevice graphics,
         TerrainWorld world,
         TerrainMeshSettings? meshSettings = null,
-        TerrainPresentationProfile? presentationProfile = null)
+        TerrainPresentationProfile? presentationProfile = null,
+        RuntimeAssetCatalog? runtimeAssets = null)
     {
         ArgumentNullException.ThrowIfNull(graphics);
         ArgumentNullException.ThrowIfNull(world);
@@ -26,7 +28,8 @@ public sealed class TerrainRenderer : IDisposable
             meshSettings ?? new TerrainMeshSettings();
         TerrainPresentationProfile resolvedProfile =
             presentationProfile ??
-            TerrainPresentationProfile.CreateCentralDivide();
+            TerrainPresentationProfile.CreateCentralDivide(
+                runtimeAssets);
         resolvedMeshSettings.Validate();
 
         _pipeline = CreateTerrainPipeline(graphics);
