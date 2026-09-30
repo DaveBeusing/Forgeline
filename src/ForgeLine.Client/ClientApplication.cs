@@ -1124,64 +1124,6 @@ internal sealed class ClientApplication
         }
     }
 
-    private static DevelopmentOverlayMetrics CreateOverlayMetrics(
-        in FrameTimingMetrics frameTiming,
-        PresentationSnapshot? snapshot,
-        TerrainRenderer terrainRenderer,
-        SimpleInstanceRenderer instanceRenderer,
-        DebugDrawRenderer debugDrawRenderer,
-        RenderWorld renderWorld)
-    {
-        TerrainRenderDiagnostics terrain =
-            terrainRenderer.LastDiagnostics;
-        InstanceRenderDiagnostics instances =
-            instanceRenderer.LastDiagnostics;
-        DebugDrawRenderDiagnostics debug =
-            debugDrawRenderer.LastDiagnostics;
-        SimulationDiagnosticsSnapshot? simulationDiagnostics =
-            snapshot?.SimulationDiagnostics;
-
-        double jobExecutionMilliseconds =
-            simulationDiagnostics?.Jobs?
-                .TotalExecutionDuration
-                .TotalMilliseconds ??
-            0.0;
-
-        return new DevelopmentOverlayMetrics(
-            frameTiming.FramesPerSecond,
-            frameTiming.FrameMilliseconds,
-            frameTiming.CpuRenderMilliseconds,
-            snapshot?.Tick.Value ?? 0,
-            simulationDiagnostics?
-                .LastTickDuration
-                .TotalMilliseconds ??
-            0.0,
-            snapshot?.SimulationEntityCount ?? 0,
-            terrain.VisibleChunks,
-            terrain.TotalChunks,
-            terrain.DrawCalls +
-            instances.DrawCalls +
-            debug.DrawCalls,
-            instances.VisibleInstances,
-            renderWorld.InstanceCount,
-            jobExecutionMilliseconds,
-            simulationDiagnostics?
-                .Runtime.TotalAllocatedBytes ??
-            0,
-            simulationDiagnostics?
-                .Runtime.HeapSizeBytes ??
-            0,
-            simulationDiagnostics?
-                .Runtime.Gen0Collections ??
-            0,
-            simulationDiagnostics?
-                .Runtime.Gen1Collections ??
-            0,
-            simulationDiagnostics?
-                .Runtime.Gen2Collections ??
-            0);
-    }
-
     private static bool ConsumeKeyPress(
         InputState inputState,
         PlatformKey key,
@@ -1267,23 +1209,6 @@ internal sealed class ClientApplication
             $"minimized={window.IsMinimized} mode={window.Mode}");
     }
 
-    private static void WriteGraphicsState(
-        string state,
-        IGraphicsDevice graphics)
-    {
-        GraphicsDiagnostics diagnostics = graphics.Diagnostics;
-
-        Console.WriteLine(
-            $"[graphics:{state}] adapter=\"{diagnostics.Device.AdapterName}\" " +
-            $"featureLevel={diagnostics.Device.FeatureLevel} " +
-            $"software={diagnostics.Device.IsSoftwareAdapter} " +
-            $"size={diagnostics.Surface.Width}x{diagnostics.Surface.Height} " +
-            $"buffers={diagnostics.Surface.BufferCount} " +
-            $"frameIndex={diagnostics.Surface.FrameIndex} " +
-            $"present={diagnostics.Surface.PresentMode} " +
-            $"suspended={diagnostics.Surface.IsSuspended}");
-    }
-
     private static void WriteWorldState(string state, TerrainWorld world)
     {
         AxisAlignedBounds bounds = world.WorldBounds;
@@ -1308,44 +1233,6 @@ internal sealed class ClientApplication
             $"distance={diagnostics.Distance:F1} " +
             $"cursor=({diagnostics.PointerPosition.X:F0},{diagnostics.PointerPosition.Y:F0}) " +
             $"cursorValid={diagnostics.HasPointerPosition}");
-    }
-
-    private static void WriteTerrainState(
-        string state,
-        TerrainRenderer terrainRenderer)
-    {
-        TerrainRenderDiagnostics diagnostics = terrainRenderer.LastDiagnostics;
-
-        Console.WriteLine(
-            $"[terrain:{state}] totalChunks={diagnostics.TotalChunks} " +
-            $"visibleChunks={diagnostics.VisibleChunks} " +
-            $"culledChunks={diagnostics.CulledChunks} " +
-            $"triangles={diagnostics.SubmittedTriangles} " +
-            $"drawCalls={diagnostics.DrawCalls} " +
-            $"staticBuffers={diagnostics.UploadedBufferCount}");
-    }
-
-    private static void WritePresentationState(
-        string state,
-        RenderWorld renderWorld,
-        TerrainRenderer terrainRenderer,
-        SimpleInstanceRenderer instanceRenderer)
-    {
-        TerrainRenderDiagnostics terrain =
-            terrainRenderer.LastDiagnostics;
-        InstanceRenderDiagnostics instances =
-            instanceRenderer.LastDiagnostics;
-        PresentationSnapshot? snapshot =
-            renderWorld.CurrentSnapshot;
-
-        Console.WriteLine(
-            $"[presentation:{state}] session={snapshot?.SessionId.Value ?? 0} " +
-            $"tick={snapshot?.Tick.Value ?? 0} " +
-            $"entities={snapshot?.SimulationEntityCount ?? 0} " +
-            $"instances={renderWorld.InstanceCount} " +
-            $"visibleInstances={instances.VisibleInstances} " +
-            $"visibleChunks={terrain.VisibleChunks} " +
-            $"drawCalls={terrain.DrawCalls + instances.DrawCalls}");
     }
 
     private static void WriteInteractionState(
