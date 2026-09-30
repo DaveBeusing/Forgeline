@@ -314,7 +314,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
         destination[15] = matrix.M44;
     }
 
-    private static void WriteColor(
+    private void WriteColor(
         in RenderInstance instance,
         Span<float> destination)
     {
