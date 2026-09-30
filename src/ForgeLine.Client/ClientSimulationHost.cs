@@ -210,6 +210,89 @@ internal sealed class ClientSimulationHost : IDisposable
         }
     }
 
+    internal bool WaitForTerminalState(
+        bool terminal,
+        TimeSpan timeout)
+    {
+        if (timeout < TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(nameof(timeout));
+        }
+
+        long deadline =
+            Stopwatch.GetTimestamp() +
+            ToStopwatchTicks(timeout);
+
+        lock (_progressGate)
+        {
+            while (IsTerminalFrozen != terminal)
+            {
+                ThrowIfFaulted();
+
+                long remainingTicks =
+                    deadline -
+                    Stopwatch.GetTimestamp();
+
+                if (remainingTicks <= 0)
+                {
+                    return false;
+                }
+
+                Monitor.Wait(
+                    _progressGate,
+                    StopwatchElapsed(
+                        0,
+                        remainingTicks));
+            }
+
+            return true;
+        }
+    }
+
+    internal bool WaitForSubmissionCompletion(
+        TimeSpan timeout,
+        out ClientSubmissionCompletion completion)
+    {
+        if (timeout < TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(nameof(timeout));
+        }
+
+        long deadline =
+            Stopwatch.GetTimestamp() +
+            ToStopwatchTicks(timeout);
+
+        lock (_progressGate)
+        {
+            while (!TryReadSubmissionCompletion(
+                       out completion))
+            {
+                ThrowIfFaulted();
+
+                long remainingTicks =
+                    deadline -
+                    Stopwatch.GetTimestamp();
+
+                if (remainingTicks <= 0)
+                {
+                    completion = default;
+                    return false;
+                }
+
+                Monitor.Wait(
+                    _progressGate,
+                    StopwatchElapsed(
+                        0,
+                        remainingTicks));
+            }
+
+            return true;
+        }
+    }
+
+    internal bool IsExecutionThreadAlive =>
+        _thread.IsAlive;
+
     public bool TrySubmit(
         SimulationSessionId expectedSession,
         Func<PlayerCommandGateway, PlayerCommandSubmissionReceipt> submission)
@@ -513,6 +596,7 @@ internal sealed class ClientSimulationHost : IDisposable
 
         _simulation.ExecuteControlCommand(
             command);
+        NotifyProgress();
 
         if (!command.Accepted)
         {
@@ -527,6 +611,7 @@ internal sealed class ClientSimulationHost : IDisposable
         while (_simulation.CurrentTick.Value < 2)
         {
             _simulation.AdvanceOneTick();
+            NotifyProgress();
         }
 
         if (_simulation.Entities.IsAlive(
@@ -537,6 +622,7 @@ internal sealed class ClientSimulationHost : IDisposable
         }
 
         _simulation.AdvanceOneTick();
+        NotifyProgress();
         UpdateTerminalState();
     }
 
@@ -555,9 +641,17 @@ internal sealed class ClientSimulationHost : IDisposable
                 .IsMatchComplete ==
             true;
 
-        Volatile.Write(
-            ref _terminalFrozen,
-            terminal ? 1 : 0);
+        int value =
+            terminal ? 1 : 0;
+        int previous =
+            Interlocked.Exchange(
+                ref _terminalFrozen,
+                value);
+
+        if (previous != value)
+        {
+            NotifyProgress();
+        }
     }
 
     private bool TryQueue(
@@ -605,6 +699,8 @@ internal sealed class ClientSimulationHost : IDisposable
                     failure,
                     receipt));
         }
+
+        NotifyProgress();
     }
 
     private void RejectRemainingSubmissions(
