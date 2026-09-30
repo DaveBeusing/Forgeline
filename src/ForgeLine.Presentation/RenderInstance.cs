@@ -13,4 +13,5 @@ public readonly record struct RenderInstance(
     WorldFeaturePresentationMetadata WorldFeature = default,
     UnitFeaturePresentationMetadata UnitFeature = default,
     BuildingFeaturePresentationMetadata BuildingFeature = default,
-    InfrastructureFeaturePresentationMetadata InfrastructureFeature = default);
+    InfrastructureFeaturePresentationMetadata InfrastructureFeature = default,
+    VfxFeaturePresentationMetadata VfxFeature = default);

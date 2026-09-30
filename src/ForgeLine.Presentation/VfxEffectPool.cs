@@ -31,6 +31,9 @@ public sealed class VfxEffectPool
     public int ActiveCount =>
         _activeCount;
 
+    public ReadOnlySpan<VfxPooledEffect> Slots =>
+        _slots;
+
     public VfxPresentationMetrics Metrics =>
         new(
             _activeCount,

@@ -20,7 +20,8 @@ public sealed class PresentationSnapshot
         PresentationDebugSnapshot? debug = null,
         BuildingConstructionDebugSnapshot? construction = null,
         SimulationDiagnosticsSnapshot? simulationDiagnostics = null,
-        PlayerActionSnapshot? playerActions = null)
+        PlayerActionSnapshot? playerActions = null,
+        VfxPresentationMetrics vfxMetrics = default)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(
             tickDuration,
@@ -39,6 +40,7 @@ public sealed class PresentationSnapshot
         Construction = construction;
         SimulationDiagnostics = simulationDiagnostics;
         PlayerActions = playerActions;
+        VfxMetrics = vfxMetrics;
         _instances = instances.ToArray();
     }
 
@@ -63,6 +65,8 @@ public sealed class PresentationSnapshot
     public SimulationDiagnosticsSnapshot? SimulationDiagnostics { get; }
 
     public PlayerActionSnapshot? PlayerActions { get; }
+
+    public VfxPresentationMetrics VfxMetrics { get; }
 
     public int InstanceCount => _instances.Length;
 
