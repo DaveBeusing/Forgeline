@@ -135,10 +135,9 @@ internal sealed class ClientSimulationHost : IDisposable
         SimulationTick target,
         TimeSpan timeout)
     {
-        if (timeout < TimeSpan.Zero)
-        {
-            throw new ArgumentOutOfRangeException(nameof(timeout));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(
+            timeout,
+            TimeSpan.Zero);
 
         long deadline =
             Stopwatch.GetTimestamp() +
@@ -175,10 +174,9 @@ internal sealed class ClientSimulationHost : IDisposable
         bool paused,
         TimeSpan timeout)
     {
-        if (timeout < TimeSpan.Zero)
-        {
-            throw new ArgumentOutOfRangeException(nameof(timeout));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(
+            timeout,
+            TimeSpan.Zero);
 
         long deadline =
             Stopwatch.GetTimestamp() +
@@ -214,10 +212,9 @@ internal sealed class ClientSimulationHost : IDisposable
         bool terminal,
         TimeSpan timeout)
     {
-        if (timeout < TimeSpan.Zero)
-        {
-            throw new ArgumentOutOfRangeException(nameof(timeout));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(
+            timeout,
+            TimeSpan.Zero);
 
         long deadline =
             Stopwatch.GetTimestamp() +
@@ -253,10 +250,9 @@ internal sealed class ClientSimulationHost : IDisposable
         PlayerMatchStatus status,
         TimeSpan timeout)
     {
-        if (timeout < TimeSpan.Zero)
-        {
-            throw new ArgumentOutOfRangeException(nameof(timeout));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(
+            timeout,
+            TimeSpan.Zero);
 
         long deadline =
             Stopwatch.GetTimestamp() +
@@ -292,10 +288,9 @@ internal sealed class ClientSimulationHost : IDisposable
         TimeSpan timeout,
         out ClientSubmissionCompletion completion)
     {
-        if (timeout < TimeSpan.Zero)
-        {
-            throw new ArgumentOutOfRangeException(nameof(timeout));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(
+            timeout,
+            TimeSpan.Zero);
 
         long deadline =
             Stopwatch.GetTimestamp() +
