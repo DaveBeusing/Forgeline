@@ -1,3 +1,4 @@
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Ecs;
 using ForgeLine.Economy;
@@ -195,6 +196,11 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                         worldPresentation.Inspectable)
                     : WorldFeaturePresentationMetadata.None;
 
+            UnitFeaturePresentationMetadata unitFeature =
+                ResolveUnitPresentationState(
+                    context.Entities,
+                    entity);
+
             instances[index++] =
                 new RenderInstance(
                     entity,
@@ -208,7 +214,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                     visibility,
                     entity.Index,
                     selectable,
-                    worldFeature);
+                    worldFeature,
+                    unitFeature);
         }
 
         if (index == instances.Length)
@@ -219,6 +226,55 @@ public sealed class PresentationExtractor : ISimulationTickObserver
         return instances.AsSpan(
             0,
             index).ToArray();
+    }
+
+    private static UnitFeaturePresentationMetadata ResolveUnitPresentationState(
+        EntityRegistry entities,
+        EntityId entity)
+    {
+        if (entities.TryGetComponent(
+                entity,
+                out UnitWreckPresentationIdentity wreck))
+        {
+            return new UnitFeaturePresentationMetadata(
+                wreck.UnitId,
+                UnitPresentationDamageState.Wreck);
+        }
+
+        if (!entities.TryGetComponent(
+                entity,
+                out UnitIdentity unit) ||
+            !UnitPresentationCatalog.TryGet(
+                unit.UnitId,
+                out _))
+        {
+            return UnitFeaturePresentationMetadata.None;
+        }
+
+        UnitPresentationDamageState state =
+            UnitPresentationDamageState.Intact;
+
+        if (entities.TryGetComponent(
+                entity,
+                out HealthState health))
+        {
+            state =
+                health.Fraction switch
+                {
+                    <= 0.0 =>
+                        UnitPresentationDamageState.Wreck,
+                    <= 0.33 =>
+                        UnitPresentationDamageState.Critical,
+                    <= 0.67 =>
+                        UnitPresentationDamageState.Damaged,
+                    _ =>
+                        UnitPresentationDamageState.Intact
+                };
+        }
+
+        return new UnitFeaturePresentationMetadata(
+            unit.UnitId,
+            state);
     }
 
     private static ResourceDepositPresentationState ResolveResourcePresentationState(
