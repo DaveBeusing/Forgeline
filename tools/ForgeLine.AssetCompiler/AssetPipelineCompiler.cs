@@ -97,9 +97,11 @@ public sealed class AssetPipelineCompiler
                     normalizedRuntimeRoot,
                     runtimePath.Replace('/', Path.DirectorySeparatorChar));
 
+                var sourceRelativePath = ToRelativePath(normalizedSourceRoot, node.SourcePath);
                 if (previousById.TryGetValue(node.Id.Value, out var previous) &&
                     string.Equals(previous.BuildHash, buildHash, StringComparison.Ordinal) &&
                     string.Equals(previous.RuntimePath, runtimePath, StringComparison.Ordinal) &&
+                    string.Equals(previous.SourcePath, sourceRelativePath, StringComparison.Ordinal) &&
                     File.Exists(runtimeFullPath))
                 {
                     recordsById[node.Id] = previous;
@@ -187,6 +189,17 @@ public sealed class AssetPipelineCompiler
                     AssetCompilerDiagnosticSeverity.Error,
                     "Asset definition is empty.",
                     SourcePath: ToRelativePath(sourceRoot, definitionPath)));
+                continue;
+            }
+
+            if (string.IsNullOrWhiteSpace(definition.Source))
+            {
+                diagnostics.Add(new AssetCompilerDiagnostic(
+                    "ASSET025",
+                    AssetCompilerDiagnosticSeverity.Error,
+                    "Asset definition must provide a non-empty source path.",
+                    definition.Id,
+                    ToRelativePath(sourceRoot, definitionPath)));
                 continue;
             }
 
