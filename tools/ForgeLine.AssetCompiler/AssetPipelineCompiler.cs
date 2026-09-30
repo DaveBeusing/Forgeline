@@ -108,7 +108,13 @@ public sealed class AssetPipelineCompiler
                 }
 
                 var imported = Import(node, normalizedSourceRoot);
-                var record = CreateRuntimeRecord(node, sourceHash, buildHash, runtimePath, imported.Bounds);
+                var record = CreateRuntimeRecord(
+                    node,
+                    normalizedSourceRoot,
+                    sourceHash,
+                    buildHash,
+                    runtimePath,
+                    imported.Bounds);
                 var metadata = JsonSerializer.SerializeToUtf8Bytes(record, JsonOptions);
                 WriteAtomically(runtimeFullPath, node.Definition.Type, metadata, imported.Payload);
 
@@ -607,15 +613,23 @@ public sealed class AssetPipelineCompiler
 
     private static RuntimeAssetRecord CreateRuntimeRecord(
         AssetNode node,
+        string sourceRoot,
         string sourceHash,
         string buildHash,
         string runtimePath,
-        AssetBounds? bounds) =>
-        new()
+        AssetBounds? bounds)
+    {
+        var textureReferences = node.Definition.TextureReferences.AsEnumerable();
+        if (node.Definition.Type == RuntimeAssetType.Material)
+        {
+            textureReferences = textureReferences.Concat(MaterialImporter.ReadDependencies(node.SourcePath));
+        }
+
+        return new RuntimeAssetRecord
         {
             Id = node.Id.Value,
             Type = node.Definition.Type,
-            SourcePath = node.Definition.Source.Replace('\\', '/'),
+            SourcePath = ToRelativePath(sourceRoot, node.SourcePath),
             RuntimePath = runtimePath,
             SourceHash = sourceHash,
             BuildHash = buildHash,
@@ -623,9 +637,11 @@ public sealed class AssetPipelineCompiler
             CompilerVersion = CompilerVersion,
             Dependencies = node.Dependencies.Select(static id => id.Value).ToArray(),
             MaterialReferences = node.Definition.MaterialReferences
+                .Distinct(StringComparer.Ordinal)
                 .Order(StringComparer.Ordinal)
                 .ToArray(),
-            TextureReferences = node.Definition.TextureReferences
+            TextureReferences = textureReferences
+                .Distinct(StringComparer.Ordinal)
                 .Order(StringComparer.Ordinal)
                 .ToArray(),
             Lods = node.Definition.Lods
@@ -638,6 +654,7 @@ public sealed class AssetPipelineCompiler
                 .ToArray(),
             Bounds = bounds,
         };
+    }
 
     private static RuntimeAssetManifest? LoadPreviousManifest(
         string runtimeRoot,
