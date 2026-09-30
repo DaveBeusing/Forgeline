@@ -249,6 +249,45 @@ internal sealed class ClientSimulationHost : IDisposable
         }
     }
 
+    internal bool WaitForPlayerMatchStatus(
+        PlayerMatchStatus status,
+        TimeSpan timeout)
+    {
+        if (timeout < TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(nameof(timeout));
+        }
+
+        long deadline =
+            Stopwatch.GetTimestamp() +
+            ToStopwatchTicks(timeout);
+
+        lock (_progressGate)
+        {
+            while (!HasPlayerMatchStatus(status))
+            {
+                ThrowIfFaulted();
+
+                long remainingTicks =
+                    deadline -
+                    Stopwatch.GetTimestamp();
+
+                if (remainingTicks <= 0)
+                {
+                    return false;
+                }
+
+                Monitor.Wait(
+                    _progressGate,
+                    StopwatchElapsed(
+                        0,
+                        remainingTicks));
+            }
+
+            return true;
+        }
+    }
+
     internal bool WaitForSubmissionCompletion(
         TimeSpan timeout,
         out ClientSubmissionCompletion completion)
@@ -730,6 +769,15 @@ internal sealed class ClientSimulationHost : IDisposable
             }
         }
     }
+
+    private bool HasPlayerMatchStatus(
+        PlayerMatchStatus status) =>
+        _snapshots.TryReadLatest(
+            out PresentationSnapshot snapshot) &&
+        snapshot.SessionId ==
+            SessionId &&
+        snapshot.PlayerExperience?.MatchStatus ==
+            status;
 
     private void NotifyProgress()
     {
