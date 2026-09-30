@@ -1,0 +1,8 @@
+{
+  "id": "unit.directorate.main_battle_tank.turret",
+  "type": "mesh",
+  "source": "../sources/main_battle_tank_turret.gltf",
+  "materialReferences": [
+    "material.directorate.unit.main_battle_tank"
+  ]
+}
