@@ -3,7 +3,7 @@ using ForgeLine.Assets;
 
 namespace ForgeLine.AssetCompiler;
 
-public sealed class AssetPipelineCompiler
+public static class AssetPipelineCompiler
 {
     public const string CompilerVersion = "1.0.0";
     public const int RuntimeVersion = 1;
