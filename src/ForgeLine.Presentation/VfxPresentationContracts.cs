@@ -150,6 +150,20 @@ public static class VfxPresentationCatalog
             kind,
             out definition);
 
+    public static bool ShouldRender(
+        VfxEffectKind kind,
+        float distanceMeters)
+    {
+        if (!float.IsFinite(distanceMeters) ||
+            distanceMeters < 0.0f)
+        {
+            return false;
+        }
+
+        return distanceMeters <=
+            Get(kind).MaximumDistanceMeters;
+    }
+
     public static VfxEffectKind ResolveMuzzle(
         WeaponId weapon) =>
         weapon switch
@@ -240,6 +254,25 @@ public static class VfxPresentationCatalog
                 VfxEffectKind.ExplosionSmall,
             _ =>
                 null
+        };
+
+    public static VfxEffectKind ResolveCombatEvent(
+        in CombatEvent combatEvent,
+        TargetClass? targetClass = null) =>
+        combatEvent.Type switch
+        {
+            CombatEventType.ShotFired =>
+                ResolveMuzzle(
+                    combatEvent.Weapon),
+            CombatEventType.ProjectileSpawned =>
+                ResolveProjectile(
+                    combatEvent.Weapon),
+            CombatEventType.Impact =>
+                ResolveImpact(
+                    combatEvent.Weapon,
+                    targetClass),
+            _ =>
+                VfxEffectKind.None
         };
 
     private static Dictionary<

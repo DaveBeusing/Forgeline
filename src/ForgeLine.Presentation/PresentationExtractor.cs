@@ -806,8 +806,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
         in CombatEvent combatEvent)
     {
         VfxEffectKind muzzle =
-            VfxPresentationCatalog.ResolveMuzzle(
-                combatEvent.Weapon);
+            VfxPresentationCatalog.ResolveCombatEvent(
+                combatEvent);
         WorldTransform sourceTransform =
             entities.TryGetComponent(
                 combatEvent.Source,
@@ -905,8 +905,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 : null;
 
         VfxEffectKind impact =
-            VfxPresentationCatalog.ResolveImpact(
-                combatEvent.Weapon,
+            VfxPresentationCatalog.ResolveCombatEvent(
+                combatEvent,
                 targetClass);
 
         SpawnAt(

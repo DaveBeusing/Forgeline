@@ -241,8 +241,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     VfxPresentationCatalog.Get(
                         instance.VfxFeature.Kind);
 
-                if (distance >
-                    definition.MaximumDistanceMeters)
+                if (!VfxPresentationCatalog.ShouldRender(
+                        instance.VfxFeature.Kind,
+                        distance))
                 {
                     visible--;
                     continue;
