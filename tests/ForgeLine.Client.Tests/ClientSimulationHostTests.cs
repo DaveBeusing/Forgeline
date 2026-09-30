@@ -342,6 +342,143 @@ public sealed class ClientSimulationHostTests
     }
 
     [Fact]
+    public void SimulationOwnerFailurePropagatesToHost()
+    {
+        using ClientHostFixture fixture =
+            ClientHostFixture.Create(
+                additionalSystem:
+                    new FaultingSystem(
+                        new SimulationTick(2)));
+
+        Assert.True(
+            fixture.Host.WaitForFault(
+                TestTimeout));
+        Assert.Throws<InvalidOperationException>(
+            fixture.Host.ThrowIfFaulted);
+    }
+
+    [Fact]
+    public void RenderOwnerFailurePropagatesToHost()
+    {
+        using var host =
+            new ClientRenderHost(
+                static _ =>
+                    throw new InvalidOperationException(
+                        "controlled render failure"));
+
+        Assert.True(
+            host.Publish(
+                CreateRenderFrame(
+                    viewportWidth: 800)));
+        Assert.True(
+            host.WaitForFault(
+                TestTimeout));
+        Assert.Throws<InvalidOperationException>(
+            host.ThrowIfFaulted);
+    }
+
+    [Fact]
+    public void ShutdownWaitsForSlowSimulationTickToComplete()
+    {
+        using var slowSystem =
+            new ControlledSlowSystem(
+                blockAtTick: new SimulationTick(2));
+        using ClientHostFixture fixture =
+            ClientHostFixture.Create(
+                additionalSystem: slowSystem);
+        using var disposeStarted =
+            new ManualResetEventSlim(false);
+        using var disposeFinished =
+            new ManualResetEventSlim(false);
+
+        Assert.True(
+            slowSystem.Entered.Wait(
+                TestTimeout));
+
+        var disposer =
+            new Thread(
+                () =>
+                {
+                    disposeStarted.Set();
+                    fixture.Host.Dispose();
+                    disposeFinished.Set();
+                });
+
+        disposer.Start();
+
+        Assert.True(
+            disposeStarted.Wait(
+                TestTimeout));
+        Assert.False(
+            disposeFinished.IsSet);
+
+        slowSystem.Release();
+
+        Assert.True(
+            disposeFinished.Wait(
+                TestTimeout));
+        disposer.Join();
+
+        Assert.False(
+            fixture.Host.IsExecutionThreadAlive);
+    }
+
+    [Fact]
+    public void ShutdownWaitsForSlowRenderFrameToComplete()
+    {
+        using var entered =
+            new ManualResetEventSlim(false);
+        using var release =
+            new ManualResetEventSlim(false);
+        using var disposeStarted =
+            new ManualResetEventSlim(false);
+        using var disposeFinished =
+            new ManualResetEventSlim(false);
+        using var host =
+            new ClientRenderHost(
+                _ =>
+                {
+                    entered.Set();
+                    release.Wait();
+                });
+
+        Assert.True(
+            host.Publish(
+                CreateRenderFrame(
+                    viewportWidth: 800)));
+        Assert.True(
+            entered.Wait(
+                TestTimeout));
+
+        var disposer =
+            new Thread(
+                () =>
+                {
+                    disposeStarted.Set();
+                    host.Dispose();
+                    disposeFinished.Set();
+                });
+
+        disposer.Start();
+
+        Assert.True(
+            disposeStarted.Wait(
+                TestTimeout));
+        Assert.False(
+            disposeFinished.IsSet);
+
+        release.Set();
+
+        Assert.True(
+            disposeFinished.Wait(
+                TestTimeout));
+        disposer.Join();
+
+        Assert.False(
+            host.IsExecutionThreadAlive);
+    }
+
+    [Fact]
     public void DisposeJoinsSimulationOwner()
     {
         ClientHostFixture fixture =
@@ -467,6 +604,33 @@ public sealed class ClientSimulationHostTests
             Host.Dispose();
             Scenario.Dispose();
             _disposed = true;
+        }
+    }
+
+    private sealed class FaultingSystem :
+        ISimulationSystem
+    {
+        private readonly SimulationTick _faultAtTick;
+
+        public FaultingSystem(
+            SimulationTick faultAtTick)
+        {
+            _faultAtTick =
+                faultAtTick;
+        }
+
+        public SimulationPhase Phase =>
+            SimulationPhase.AiDecisions;
+
+        public void Execute(
+            SimulationContext context)
+        {
+            if (context.Tick ==
+                _faultAtTick)
+            {
+                throw new InvalidOperationException(
+                    "controlled simulation failure");
+            }
         }
     }
 
