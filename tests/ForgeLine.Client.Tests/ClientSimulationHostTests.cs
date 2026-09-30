@@ -22,27 +22,32 @@ public sealed class ClientSimulationHostTests
             ClientHostFixture.Create(
                 additionalSystem: slowSystem);
 
-        Assert.True(
-            slowSystem.Entered.Wait(
-                TestTimeout));
-
-        Assert.Equal(
-            new SimulationTick(1),
-            fixture.Host.CurrentTick);
-
-        int callingThreadProgress = 0;
-        for (int index = 0;
-             index < 10_000;
-             index++)
+        try
         {
-            callingThreadProgress++;
+            Assert.True(
+                slowSystem.Entered.Wait(
+                    TestTimeout));
+
+            Assert.Equal(
+                new SimulationTick(1),
+                fixture.Host.CurrentTick);
+
+            int callingThreadProgress = 0;
+            for (int index = 0;
+                 index < 10_000;
+                 index++)
+            {
+                callingThreadProgress++;
+            }
+
+            Assert.Equal(
+                10_000,
+                callingThreadProgress);
         }
-
-        Assert.Equal(
-            10_000,
-            callingThreadProgress);
-
-        slowSystem.Release();
+        finally
+        {
+            slowSystem.Release();
+        }
 
         Assert.True(
             fixture.Host.WaitForTickAtLeast(
@@ -338,7 +343,7 @@ public sealed class ClientSimulationHostTests
                     scenario.Simulation,
                     scenario.Services.BuildingCommands,
                     scenario.BattlefieldRuntime.MatchStateEntity,
-                    maximumOutstanding: 32,
+                    32,
                     scenario.Intelligence,
                     scenario.Services.Weapons,
                     scenario.Services.ArtilleryWeapons);
@@ -412,8 +417,7 @@ public sealed class ClientSimulationHostTests
             }
 
             Entered.Set();
-            _release.Wait(
-                TestContext.Current.CancellationToken);
+            _release.Wait();
         }
 
         public void Release() =>
