@@ -9,4 +9,5 @@ public readonly record struct RenderInstance(
     RenderMaterialHandle Material,
     RenderVisibilityMask Visibility,
     uint DebugIdentity = 0,
-    SelectablePresentationMetadata Selectable = default);
+    SelectablePresentationMetadata Selectable = default,
+    WorldFeaturePresentationMetadata WorldFeature = default);

@@ -96,6 +96,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
         int visible = 0;
         int draws = 0;
+        int highLod = 0;
+        int reducedLod = 0;
 
         for (int index = 0; index < world.InstanceCount; index++)
         {
@@ -123,9 +125,31 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
             visible++;
 
+            if (instance.WorldFeature.IsSpecified)
+            {
+                float distance =
+                    Vector3.Distance(
+                        camera.Position,
+                        instance.Transform.Position);
+                if (WorldPresentationCatalog.SelectLod(
+                        instance.WorldFeature,
+                        distance) == WorldAssetLod.Reduced)
+                {
+                    reducedLod++;
+                }
+                else
+                {
+                    highLod++;
+                }
+            }
+            else
+            {
+                highLod++;
+            }
+
             Matrix4x4 worldMatrix = instance.Transform.ToMatrix();
             WriteMatrix(worldMatrix, constants.Slice(16, 16));
-            WriteColor(instance.DebugIdentity, constants.Slice(32, 4));
+            WriteColor(instance, constants.Slice(32, 4));
 
             context.SetVertexConstants(constants);
             context.DrawIndexed(36);
@@ -136,7 +160,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
             world.InstanceCount,
             visible,
             world.InstanceCount - visible,
-            draws);
+            draws,
+            highLod,
+            reducedLod);
     }
 
     public void Dispose()
@@ -250,10 +276,24 @@ public sealed class SimpleInstanceRenderer : IDisposable
     }
 
     private static void WriteColor(
-        uint identity,
+        in RenderInstance instance,
         Span<float> destination)
     {
-        uint hash = identity * 2_654_435_761U;
+        if (instance.WorldFeature.IsSpecified)
+        {
+            Vector4 tint =
+                WorldPresentationCatalog.ResolveTint(
+                    instance.WorldFeature);
+            destination[0] = tint.X;
+            destination[1] = tint.Y;
+            destination[2] = tint.Z;
+            destination[3] = tint.W;
+            return;
+        }
+
+        uint hash =
+            instance.DebugIdentity *
+            2_654_435_761U;
         destination[0] = 0.35f + ((hash & 0xFFU) / 255.0f) * 0.45f;
         destination[1] = 0.45f + (((hash >> 8) & 0xFFU) / 255.0f) * 0.35f;
         destination[2] = 0.15f + (((hash >> 16) & 0xFFU) / 255.0f) * 0.35f;
