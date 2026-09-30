@@ -338,3 +338,22 @@ The F2 artillery debug read model exposes mission min/max range, fixed target co
 The F2 tactical read model exposes current combat order/status, legitimate target position where available, pursuit leash, movement permission, resupply state, and per-unit Health/Fuel/Ammunition/readiness summaries.
 
 The simulation benchmark host includes 100/1,000-unit tactical acquisition and deterministic group target-coordination workloads.
+
+
+## Skirmish Strategic Assessment Allocation Measurement
+
+Strategic-opponent allocation work is measured separately from aggregate full-match allocation. The historical cumulative allocation reported by a headless run describes the complete instrumented process and must not be attributed to one system without narrower evidence.
+
+`SkirmishOpponentSystem.WorkMetrics` exposes cumulative operation counts for owned-state captures, intelligence captures, economy assessments, force assessments, decision evaluations, non-decision evaluations, and per-controller scratch lifetime. These counters are semantic diagnostics rather than timing gates. With opponent debug capture disabled, non-decision ticks still refresh owned state for critical logistics recovery but do not capture faction intelligence or recompute economy/force assessment. With debug capture enabled, those assessments remain current on non-decision ticks so the debug snapshot is not presented as fresh while containing stale values.
+
+Owned-state collection storage is reused per live controller. Every capture clears logical contents before refill, collection iteration retains the existing stable entity ordering, unusually large retained collection capacity is trimmed to the bounded scratch limit, and controller removal releases the corresponding scratch state. A fresh vertical-slice runtime owns a fresh opponent system, so scratch state does not cross match/session lifetime.
+
+The allocation benchmark is part of the existing simulation BenchmarkDotNet host:
+
+```powershell
+dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simulation.Benchmarks.csproj --configuration Release -- --filter *SkirmishOpponentBenchmarks*
+```
+
+The workload matrix covers one versus two strategic controllers, diagnostics disabled versus enabled, and an early versus later vertical-slice state. Setup advances to a decision-aligned age outside the measured operation; the measured method executes eight non-decision ticks. BenchmarkDotNet `MemoryDiagnoser` reports managed allocation for the benchmark process, while the opponent work counters show which strategic assessments were actually performed. Worker-thread allocation is not represented by `GC.GetAllocatedBytesForCurrentThread`-style accounting; use BenchmarkDotNet/process diagnostics when whole-process attribution is required.
+
+For before/after comparisons, retain the BenchmarkDotNet environment header, runtime version, OS, architecture, processor count, scenario age, controller count, diagnostics state, and seed. Compare normalized allocation distributions for identical parameters. Do not treat a reduced managed-allocation result as proof that every maximum-tick outlier, retained-heap issue, or GC pause has been resolved.
