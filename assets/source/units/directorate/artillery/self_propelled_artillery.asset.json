@@ -1,0 +1,42 @@
+{
+  "id": "unit.directorate.self_propelled_artillery",
+  "type": "mesh",
+  "source": "../sources/self_propelled_artillery_lod0.gltf",
+  "materialReferences": [
+    "material.directorate.unit.self_propelled_artillery"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "unit.directorate.self_propelled_artillery.lod1",
+      "maxDistance": 140
+    },
+    {
+      "level": 2,
+      "assetId": "unit.directorate.self_propelled_artillery.lod2",
+      "maxDistance": 380
+    }
+  ],
+  "collisionRequired": true,
+  "collisionReference": "unit.directorate.self_propelled_artillery.collision",
+  "sockets": [
+    {
+      "name": "gun_pivot",
+      "x": 0,
+      "y": 0.24,
+      "z": -0.04
+    },
+    {
+      "name": "weapon_muzzle",
+      "x": 0,
+      "y": 0.24,
+      "z": 0.68
+    },
+    {
+      "name": "recoil_anchor",
+      "x": 0,
+      "y": 0.24,
+      "z": 0.04
+    }
+  ]
+}

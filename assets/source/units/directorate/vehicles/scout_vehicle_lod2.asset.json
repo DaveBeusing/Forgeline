@@ -1,0 +1,8 @@
+{
+  "id": "unit.directorate.scout_vehicle.lod2",
+  "type": "mesh",
+  "source": "../sources/scout_vehicle_lod2.gltf",
+  "materialReferences": [
+    "material.directorate.unit.scout_vehicle"
+  ]
+}

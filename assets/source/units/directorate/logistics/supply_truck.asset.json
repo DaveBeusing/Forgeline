@@ -1,0 +1,36 @@
+{
+  "id": "unit.directorate.supply_truck",
+  "type": "mesh",
+  "source": "../sources/supply_truck_lod0.gltf",
+  "materialReferences": [
+    "material.directorate.unit.supply_truck"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "unit.directorate.supply_truck.lod1",
+      "maxDistance": 130
+    },
+    {
+      "level": 2,
+      "assetId": "unit.directorate.supply_truck.lod2",
+      "maxDistance": 360
+    }
+  ],
+  "collisionRequired": true,
+  "collisionReference": "unit.directorate.supply_truck.collision",
+  "sockets": [
+    {
+      "name": "cargo_load",
+      "x": 0,
+      "y": 0.12,
+      "z": -0.38
+    },
+    {
+      "name": "supply_transfer",
+      "x": 0.34,
+      "y": 0.04,
+      "z": -0.18
+    }
+  ]
+}

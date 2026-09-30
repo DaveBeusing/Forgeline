@@ -1,3 +1,5 @@
+using System.Numerics;
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Ecs;
 using ForgeLine.Economy;
@@ -195,6 +197,11 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                         worldPresentation.Inspectable)
                     : WorldFeaturePresentationMetadata.None;
 
+            UnitFeaturePresentationMetadata unitFeature =
+                ResolveUnitPresentationState(
+                    context.Entities,
+                    entity);
+
             instances[index++] =
                 new RenderInstance(
                     entity,
@@ -208,7 +215,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                     visibility,
                     entity.Index,
                     selectable,
-                    worldFeature);
+                    worldFeature,
+                    unitFeature);
         }
 
         if (index == instances.Length)
@@ -219,6 +227,113 @@ public sealed class PresentationExtractor : ISimulationTickObserver
         return instances.AsSpan(
             0,
             index).ToArray();
+    }
+
+    private static UnitFeaturePresentationMetadata ResolveUnitPresentationState(
+        EntityRegistry entities,
+        EntityId entity)
+    {
+        if (entities.TryGetComponent(
+                entity,
+                out UnitWreckPresentationIdentity wreck))
+        {
+            return new UnitFeaturePresentationMetadata(
+                wreck.UnitId,
+                UnitPresentationDamageState.Wreck);
+        }
+
+        if (!entities.TryGetComponent(
+                entity,
+                out UnitIdentity unit) ||
+            !UnitPresentationCatalog.TryGet(
+                unit.UnitId,
+                out _))
+        {
+            return UnitFeaturePresentationMetadata.None;
+        }
+
+        UnitPresentationDamageState state =
+            UnitPresentationDamageState.Intact;
+
+        if (entities.TryGetComponent(
+                entity,
+                out HealthState health))
+        {
+            state =
+                health.Fraction switch
+                {
+                    <= 0.0 =>
+                        UnitPresentationDamageState.Wreck,
+                    <= 0.33 =>
+                        UnitPresentationDamageState.Critical,
+                    <= 0.67 =>
+                        UnitPresentationDamageState.Damaged,
+                    _ =>
+                        UnitPresentationDamageState.Intact
+                };
+        }
+
+        return new UnitFeaturePresentationMetadata(
+            unit.UnitId,
+            state,
+            ResolveAimYaw(
+                entities,
+                entity));
+    }
+
+    private static float ResolveAimYaw(
+        EntityRegistry entities,
+        EntityId entity)
+    {
+        if (!entities.TryGetComponent(
+                entity,
+                out WeaponState weapon) ||
+            !weapon.Target.IsValid ||
+            !entities.IsAlive(
+                weapon.Target) ||
+            !entities.TryGetComponent(
+                entity,
+                out WorldTransform source) ||
+            !entities.TryGetComponent(
+                weapon.Target,
+                out WorldTransform target))
+        {
+            return 0.0f;
+        }
+
+        Vector3 direction =
+            target.Position -
+            source.Position;
+        direction.Y =
+            0.0f;
+
+        if (direction.LengthSquared() <=
+            0.0001f)
+        {
+            return 0.0f;
+        }
+
+        Vector3 forward =
+            Vector3.Transform(
+                Vector3.UnitZ,
+                source.Rotation);
+        float bodyYaw =
+            MathF.Atan2(
+                forward.X,
+                forward.Z);
+        float targetYaw =
+            MathF.Atan2(
+                direction.X,
+                direction.Z);
+        float delta =
+            targetYaw -
+            bodyYaw;
+
+        return MathF.Atan2(
+            MathF.Sin(
+                delta),
+            MathF.Cos(
+                delta));
     }
 
     private static ResourceDepositPresentationState ResolveResourcePresentationState(

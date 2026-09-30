@@ -1,0 +1,5 @@
+{
+  "id": "material.directorate.unit.main_battle_tank",
+  "type": "material",
+  "source": "main_battle_tank.material.json"
+}

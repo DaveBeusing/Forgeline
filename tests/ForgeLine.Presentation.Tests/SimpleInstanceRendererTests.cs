@@ -1,5 +1,6 @@
 using System.Numerics;
 using ForgeLine.Core;
+using ForgeLine.Game;
 using ForgeLine.Graphics;
 using ForgeLine.Simulation;
 using Xunit;
@@ -117,6 +118,88 @@ public sealed class SimpleInstanceRendererTests : IDisposable
             context.IndexedDrawCalls);
         Assert.Equal(
             2,
+            context.LastInstanceCount);
+    }
+
+    [Fact]
+    public void RepeatedDirectorateUnitsRemainSingleBatchAtRepresentativeCount()
+    {
+        const int Count = 256;
+
+        var camera =
+            new RtsCamera();
+        var instances =
+            new RenderInstance[Count];
+
+        for (int index = 0; index < Count; index++)
+        {
+            int x =
+                index % 16;
+            int z =
+                index / 16;
+            Vector3 position =
+                camera.Target +
+                new Vector3(
+                    (x - 7.5f) * 2.0f,
+                    0.0f,
+                    (z - 7.5f) * 2.0f);
+
+            instances[index] =
+                Instance(
+                    new EntityId(
+                        checked((uint)index + 1U),
+                        1),
+                    position,
+                    new Vector3(
+                        4.0f,
+                        3.0f,
+                        7.2f)) with
+                {
+                    UnitFeature =
+                        new UnitFeaturePresentationMetadata(
+                            UnitIds.MainBattleTank,
+                            UnitPresentationDamageState.Intact)
+                };
+        }
+
+        var buffer =
+            new PresentationSnapshotBuffer();
+        buffer.Publish(
+            new PresentationSnapshot(
+                new SimulationTick(1),
+                TimeSpan.FromMilliseconds(50),
+                instances.Length,
+                instances));
+
+        var world =
+            new RenderWorld();
+        Assert.True(
+            world.Update(
+                buffer));
+
+        using var renderer =
+            new SimpleInstanceRenderer(
+                _graphics);
+        var context =
+            new FakeGraphicsCommandContext();
+
+        renderer.Render(
+            context,
+            camera,
+            world,
+            1.0f);
+
+        Assert.Equal(
+            Count,
+            renderer.LastDiagnostics.VisibleInstances);
+        Assert.Equal(
+            1,
+            renderer.LastDiagnostics.DrawCalls);
+        Assert.Equal(
+            1,
+            context.IndexedDrawCalls);
+        Assert.Equal(
+            Count,
             context.LastInstanceCount);
     }
 

@@ -113,9 +113,13 @@ The normal test suite includes a bounded headless vertical-slice smoke scenario 
 
 ## Presentation Status
 
-The slice uses distinguishable placeholder presentation IDs for every required structure and unit. These IDs are stable content metadata, not final production assets.
+The six core Directorate Vertical Slice unit families now resolve through the production source-to-runtime asset pipeline with stable mesh/material IDs, LOD0–LOD2, collision references, gameplay-facing sockets, damage/wreck presentation, and strategic-symbol bindings. Main Battle Tank LOD0 separates hull and turret so presentation can rotate the turret toward the current authoritative weapon target without changing simulation ownership; strategic LODs remain combined meshes. The existing Combat Engineer deliberately reuses the Rifle Squad presentation family until a dedicated infantry-art package exists.
 
-Final models, materials, animations, effects, audio, portraits, and polished RTS build/production UI remain outside this slice. Placeholder presentation must not affect simulation outcomes.
+Unit presentation remains strictly downstream from authoritative gameplay state. Health determines visual damage state, destruction leaves only a non-commandable presentation wreck proxy, and render LOD never changes movement, hitbox, supply, combat, or intelligence behavior.
+
+See [Directorate Unit Assets](DirectorateUnitAssets.md) for the binding unit-asset IDs, source layout, LOD distances, socket names, damage treatment, strategic references, and current animation boundary.
+
+Final high-detail textures, skeletal animation, articulated vehicle motion, VFX, audio, portraits, and polished RTS production UI remain later content work.
 
 ## Current Boundaries
 

@@ -1,0 +1,8 @@
+{
+  "id": "unit.directorate.supply_truck.lod1",
+  "type": "mesh",
+  "source": "../sources/supply_truck_lod1.gltf",
+  "materialReferences": [
+    "material.directorate.unit.supply_truck"
+  ]
+}

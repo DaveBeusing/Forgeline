@@ -1,0 +1,5 @@
+{
+  "id": "material.directorate.unit.scout_vehicle",
+  "type": "material",
+  "source": "scout_vehicle.material.json"
+}

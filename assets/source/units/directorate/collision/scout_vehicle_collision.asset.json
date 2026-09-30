@@ -1,0 +1,5 @@
+{
+  "id": "unit.directorate.scout_vehicle.collision",
+  "type": "mesh",
+  "source": "../sources/collision_box.gltf"
+}

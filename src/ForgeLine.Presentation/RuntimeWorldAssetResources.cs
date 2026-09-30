@@ -44,8 +44,6 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
         out RuntimeMeshBuffers mesh,
         out AssetId assetId)
     {
-        ThrowIfDisposed();
-
         if (!feature.IsSpecified)
         {
             mesh = default;
@@ -56,19 +54,42 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
         WorldPresentationDefinition definition =
             WorldPresentationCatalog.Get(
                 feature.Visual);
-        string assetIdValue =
+
+        return TryGetMesh(
             lod == WorldAssetLod.Reduced
                 ? definition.ReducedLodAssetId
-                : definition.MeshAssetId;
+                : definition.MeshAssetId,
+            out mesh,
+            out assetId);
+    }
+
+    public bool TryGetMesh(
+        string assetId,
+        out RuntimeMeshBuffers mesh) =>
+        TryGetMesh(
+            assetId,
+            out mesh,
+            out _);
+
+    public bool TryGetMesh(
+        string assetId,
+        out RuntimeMeshBuffers mesh,
+        out AssetId resolvedAssetId)
+    {
+        ThrowIfDisposed();
+        ArgumentException.ThrowIfNullOrWhiteSpace(
+            assetId);
+
         AssetId id =
             AssetId.Parse(
-                assetIdValue);
+                assetId);
 
         if (_meshes.TryGetValue(
                 id,
                 out mesh))
         {
-            assetId = id;
+            resolvedAssetId =
+                id;
             return true;
         }
 
@@ -79,7 +100,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
             record.Type != RuntimeAssetType.Mesh)
         {
             mesh = default;
-            assetId = default;
+            resolvedAssetId = default;
             return false;
         }
 
@@ -92,7 +113,8 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
         _meshes.Add(
             id,
             mesh);
-        assetId = id;
+        resolvedAssetId =
+            id;
         return true;
     }
 
@@ -100,8 +122,6 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
         in WorldFeaturePresentationMetadata feature,
         out Vector4 tint)
     {
-        ThrowIfDisposed();
-
         if (!feature.IsSpecified)
         {
             tint = default;
@@ -111,38 +131,60 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
         WorldPresentationDefinition definition =
             WorldPresentationCatalog.Get(
                 feature.Visual);
-        AssetId id =
-            AssetId.Parse(
-                definition.MaterialAssetId);
 
-        if (!_materialTints.TryGetValue(
-                id,
+        if (!TryGetMaterialTint(
+                definition.MaterialAssetId,
                 out Vector4 baseTint))
         {
-            if (!_catalog.TryGet(
-                    id,
-                    out RuntimeAssetRecord? record) ||
-                record is null ||
-                record.Type != RuntimeAssetType.Material)
-            {
-                tint = default;
-                return false;
-            }
-
-            RuntimeAssetContent content =
-                _catalog.Read(id);
-            baseTint =
-                ReadMaterialTint(
-                    content.Payload);
-            _materialTints.Add(
-                id,
-                baseTint);
+            tint = default;
+            return false;
         }
 
         tint =
             WorldPresentationCatalog.ApplyStateTint(
                 feature,
                 baseTint);
+        return true;
+    }
+
+    public bool TryGetMaterialTint(
+        string assetId,
+        out Vector4 tint)
+    {
+        ThrowIfDisposed();
+        ArgumentException.ThrowIfNullOrWhiteSpace(
+            assetId);
+
+        AssetId id =
+            AssetId.Parse(
+                assetId);
+
+        if (_materialTints.TryGetValue(
+                id,
+                out tint))
+        {
+            return true;
+        }
+
+        if (!_catalog.TryGet(
+                id,
+                out RuntimeAssetRecord? record) ||
+            record is null ||
+            record.Type != RuntimeAssetType.Material)
+        {
+            tint = default;
+            return false;
+        }
+
+        RuntimeAssetContent content =
+            _catalog.Read(
+                id);
+        tint =
+            ReadMaterialTint(
+                content.Payload);
+        _materialTints.Add(
+            id,
+            tint);
         return true;
     }
 

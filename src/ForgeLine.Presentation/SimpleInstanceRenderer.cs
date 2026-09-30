@@ -146,21 +146,74 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
             visible++;
 
-            WorldAssetLod lod =
-                WorldAssetLod.High;
+            RuntimeMeshBuffers runtimeMesh =
+                default;
+            AssetId runtimeMeshId =
+                default;
+            bool usesRuntimeMesh =
+                false;
+            float distance =
+                Vector3.Distance(
+                    camera.Position,
+                    instance.Transform.Position);
+            UnitAssetLod unitLod =
+                UnitAssetLod.Lod0;
+            UnitPresentationDefinition unitDefinition =
+                default;
+            bool hasUnitDefinition =
+                false;
 
-            if (instance.WorldFeature.IsSpecified)
+            if (instance.UnitFeature.IsSpecified)
             {
-                float distance =
-                    Vector3.Distance(
-                        camera.Position,
-                        instance.Transform.Position);
-                lod =
+                unitLod =
+                    UnitPresentationCatalog.SelectLod(
+                        instance.UnitFeature,
+                        distance);
+                unitDefinition =
+                    UnitPresentationCatalog.Get(
+                        instance.UnitFeature.Unit);
+                hasUnitDefinition =
+                    true;
+                string meshAssetId =
+                    instance.UnitFeature.IsWreck
+                        ? unitDefinition.Lod2AssetId
+                        : unitDefinition.GetMeshAssetId(
+                            unitLod);
+
+                usesRuntimeMesh =
+                    _runtimeAssets is not null &&
+                    _runtimeAssets.TryGetMesh(
+                        meshAssetId,
+                        out runtimeMesh,
+                        out runtimeMeshId) &&
+                    runtimeMesh.IsValid;
+
+                if (unitLod == UnitAssetLod.Lod0)
+                {
+                    highLod++;
+                }
+                else
+                {
+                    reducedLod++;
+                }
+            }
+            else if (instance.WorldFeature.IsSpecified)
+            {
+                WorldAssetLod worldLod =
                     WorldPresentationCatalog.SelectLod(
                         instance.WorldFeature,
                         distance);
 
-                if (lod == WorldAssetLod.Reduced)
+                usesRuntimeMesh =
+                    _runtimeAssets is not null &&
+                    _runtimeAssets.TryGetMesh(
+                        instance.WorldFeature,
+                        worldLod,
+                        out runtimeMesh,
+                        out runtimeMeshId) &&
+                    runtimeMesh.IsValid;
+
+                if (worldLod == WorldAssetLod.Reduced)
                 {
                     reducedLod++;
                 }
@@ -174,18 +227,11 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 highLod++;
             }
 
-            RuntimeMeshBuffers runtimeMesh =
-                default;
-            AssetId runtimeMeshId =
-                default;
-            bool usesRuntimeMesh =
-                _runtimeAssets is not null &&
-                _runtimeAssets.TryGetMesh(
-                    instance.WorldFeature,
-                    lod,
-                    out runtimeMesh,
-                    out runtimeMeshId) &&
-                runtimeMesh.IsValid;
+            Vector4 color =
+                ResolveColor(
+                    instance);
+            Matrix4x4 worldMatrix =
+                instance.Transform.ToMatrix();
             var key =
                 new InstanceBatchKey(
                     usesRuntimeMesh,
@@ -208,9 +254,48 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
             batch.Instances.Add(
                 new InstanceRenderData(
-                    instance.Transform.ToMatrix(),
-                    ResolveColor(
-                        instance)));
+                    worldMatrix,
+                    color));
+
+            if (hasUnitDefinition &&
+                unitLod == UnitAssetLod.Lod0 &&
+                !instance.UnitFeature.IsWreck &&
+                unitDefinition.HasArticulatedTurret &&
+                _runtimeAssets is not null &&
+                _runtimeAssets.TryGetMesh(
+                    unitDefinition.TurretMeshAssetId!,
+                    out RuntimeMeshBuffers turretMesh,
+                    out AssetId turretMeshId) &&
+                turretMesh.IsValid)
+            {
+                var turretKey =
+                    new InstanceBatchKey(
+                        true,
+                        turretMeshId);
+
+                if (!batchLookup.TryGetValue(
+                        turretKey,
+                        out InstanceBatch? turretBatch))
+                {
+                    turretBatch =
+                        new InstanceBatch(
+                            true,
+                            turretMesh);
+                    batchLookup.Add(
+                        turretKey,
+                        turretBatch);
+                    batches.Add(
+                        turretBatch);
+                }
+
+                turretBatch.Instances.Add(
+                    new InstanceRenderData(
+                        CreateArticulatedTransform(
+                            worldMatrix,
+                            unitDefinition.TurretPivot,
+                            instance.UnitFeature.AimYawRadians),
+                        color));
+            }
         }
 
         if (visible == 0)
@@ -226,12 +311,25 @@ public sealed class SimpleInstanceRenderer : IDisposable
             return;
         }
 
+        int submittedInstances =
+            0;
+
+        for (int batchIndex = 0;
+             batchIndex < batches.Count;
+             batchIndex++)
+        {
+            submittedInstances =
+                checked(
+                    submittedInstances +
+                    batches[batchIndex].Instances.Count);
+        }
+
         IGraphicsBuffer instanceBuffer =
             GetFrameInstanceBuffer(
                 context.FrameIndex,
-                visible);
+                submittedInstances);
         var instanceData =
-            new InstanceRenderData[visible];
+            new InstanceRenderData[submittedInstances];
         int writeOffset = 0;
 
         for (int batchIndex = 0;
@@ -530,6 +628,27 @@ public sealed class SimpleInstanceRenderer : IDisposable
             });
     }
 
+    private static Matrix4x4 CreateArticulatedTransform(
+        Matrix4x4 world,
+        Vector3 pivot,
+        float yawRadians)
+    {
+        float yaw =
+            float.IsFinite(
+                yawRadians)
+                ? yawRadians
+                : 0.0f;
+
+        return
+            Matrix4x4.CreateTranslation(
+                -pivot) *
+            Matrix4x4.CreateRotationY(
+                yaw) *
+            Matrix4x4.CreateTranslation(
+                pivot) *
+            world;
+    }
+
     private static void WriteMatrix(
         Matrix4x4 matrix,
         Span<float> destination)
@@ -555,6 +674,24 @@ public sealed class SimpleInstanceRenderer : IDisposable
     private Vector4 ResolveColor(
         in RenderInstance instance)
     {
+        if (instance.UnitFeature.IsSpecified)
+        {
+            UnitPresentationDefinition definition =
+                UnitPresentationCatalog.Get(
+                    instance.UnitFeature.Unit);
+            Vector4 baseTint =
+                _runtimeAssets is not null &&
+                _runtimeAssets.TryGetMaterialTint(
+                    definition.MaterialAssetId,
+                    out Vector4 runtimeTint)
+                    ? runtimeTint
+                    : definition.FallbackTint;
+
+            return UnitPresentationCatalog.ApplyDamageTint(
+                instance.UnitFeature,
+                baseTint);
+        }
+
         if (instance.WorldFeature.IsSpecified)
         {
             return
