@@ -11,4 +11,6 @@ public readonly record struct RenderInstance(
     uint DebugIdentity = 0,
     SelectablePresentationMetadata Selectable = default,
     WorldFeaturePresentationMetadata WorldFeature = default,
-    UnitFeaturePresentationMetadata UnitFeature = default);
+    UnitFeaturePresentationMetadata UnitFeature = default,
+    BuildingFeaturePresentationMetadata BuildingFeature = default,
+    InfrastructureFeaturePresentationMetadata InfrastructureFeature = default);

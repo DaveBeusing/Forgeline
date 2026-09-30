@@ -201,6 +201,14 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 ResolveUnitPresentationState(
                     context.Entities,
                     entity);
+            BuildingFeaturePresentationMetadata buildingFeature =
+                ResolveBuildingPresentationState(
+                    context.Entities,
+                    entity);
+            InfrastructureFeaturePresentationMetadata infrastructureFeature =
+                ResolveInfrastructurePresentationState(
+                    context.Entities,
+                    entity);
 
             instances[index++] =
                 new RenderInstance(
@@ -216,7 +224,9 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                     entity.Index,
                     selectable,
                     worldFeature,
-                    unitFeature);
+                    unitFeature,
+                    buildingFeature,
+                    infrastructureFeature);
         }
 
         if (index == instances.Length)
@@ -334,6 +344,177 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 delta),
             MathF.Cos(
                 delta));
+    }
+
+    private static BuildingFeaturePresentationMetadata ResolveBuildingPresentationState(
+        EntityRegistry entities,
+        EntityId entity)
+    {
+        if (entities.TryGetComponent(
+                entity,
+                out BuildingWreckPresentationIdentity wreck) &&
+            BuildingPresentationCatalog.TryGet(
+                wreck.BuildingId,
+                out _))
+        {
+            return new BuildingFeaturePresentationMetadata(
+                wreck.BuildingId,
+                BuildingPresentationState.Destroyed);
+        }
+
+        if (entities.TryGetComponent(
+                entity,
+                out ConstructionSite site) &&
+            BuildingPresentationCatalog.TryGet(
+                site.BuildingId,
+                out _))
+        {
+            BuildingPresentationState constructionState =
+                site.Progress switch
+                {
+                    < 0.34f =>
+                        BuildingPresentationState.ConstructionFoundation,
+                    < 0.67f =>
+                        BuildingPresentationState.ConstructionFrame,
+                    _ =>
+                        BuildingPresentationState.ConstructionShell
+                };
+
+            return new BuildingFeaturePresentationMetadata(
+                site.BuildingId,
+                constructionState,
+                site.Progress);
+        }
+
+        if (!entities.TryGetComponent(
+                entity,
+                out CompletedBuilding building) ||
+            !BuildingPresentationCatalog.TryGet(
+                building.BuildingId,
+                out _))
+        {
+            return BuildingFeaturePresentationMetadata.None;
+        }
+
+        BuildingPresentationState state =
+            BuildingPresentationState.Operational;
+
+        if (entities.TryGetComponent(
+                entity,
+                out HealthState health))
+        {
+            state =
+                health.Fraction switch
+                {
+                    <= 0.0 =>
+                        BuildingPresentationState.Destroyed,
+                    <= 0.33 =>
+                        BuildingPresentationState.Critical,
+                    <= 0.67 =>
+                        BuildingPresentationState.Damaged,
+                    _ =>
+                        BuildingPresentationState.Operational
+                };
+
+            if (state is
+                BuildingPresentationState.Destroyed or
+                BuildingPresentationState.Critical or
+                BuildingPresentationState.Damaged)
+            {
+                return new BuildingFeaturePresentationMetadata(
+                    building.BuildingId,
+                    state);
+            }
+        }
+
+        if (entities.TryGetComponent(
+                entity,
+                out PowerConsumer consumer) &&
+            (!consumer.Enabled ||
+             consumer.State !=
+             PowerOperationalState.Powered))
+        {
+            state =
+                BuildingPresentationState.Unpowered;
+        }
+        else if (entities.TryGetComponent(
+                     entity,
+                     out PowerGenerator generator) &&
+                 (!generator.Enabled ||
+                  generator.State ==
+                  PowerGeneratorState.Offline))
+        {
+            state =
+                BuildingPresentationState.Unpowered;
+        }
+        else if (entities.TryGetComponent(
+                     entity,
+                     out ResourceExtractor extractor) &&
+                 extractor.State !=
+                 ResourceExtractorState.Extracting)
+        {
+            state =
+                BuildingPresentationState.Idle;
+        }
+        else if (entities.TryGetComponent(
+                     entity,
+                     out ProductionFacility production) &&
+                 production.Status !=
+                 ProductionStatus.Running)
+        {
+            state =
+                BuildingPresentationState.Idle;
+        }
+        else if (entities.TryGetComponent(
+                     entity,
+                     out UnitProductionFacility unitProduction) &&
+                 unitProduction.Status !=
+                 UnitProductionStatus.Running)
+        {
+            state =
+                BuildingPresentationState.Idle;
+        }
+
+        return new BuildingFeaturePresentationMetadata(
+            building.BuildingId,
+            state);
+    }
+
+    private static InfrastructureFeaturePresentationMetadata ResolveInfrastructurePresentationState(
+        EntityRegistry entities,
+        EntityId entity)
+    {
+        if (!entities.TryGetComponent(
+                entity,
+                out InfrastructurePresentationIdentity presentation))
+        {
+            return InfrastructureFeaturePresentationMetadata.None;
+        }
+
+        InfrastructurePresentationState state =
+            InfrastructurePresentationState.Operational;
+
+        if (entities.TryGetComponent(
+                entity,
+                out StrategicInfrastructureState infrastructure))
+        {
+            state =
+                infrastructure.State switch
+                {
+                    StrategicInfrastructureOperationalState.Operational =>
+                        InfrastructurePresentationState.Operational,
+                    StrategicInfrastructureOperationalState.Restoring =>
+                        InfrastructurePresentationState.Restoring,
+                    StrategicInfrastructureOperationalState.Disabled =>
+                        InfrastructurePresentationState.Disabled,
+                    _ =>
+                        InfrastructurePresentationState.Operational
+                };
+        }
+
+        return new InfrastructureFeaturePresentationMetadata(
+            presentation.Kind,
+            state);
     }
 
     private static ResourceDepositPresentationState ResolveResourcePresentationState(
