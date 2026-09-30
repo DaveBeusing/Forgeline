@@ -61,6 +61,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
         if (!_catalog.TryGet(
                 id,
                 out RuntimeAssetRecord? record) ||
+            record is null ||
             record.Type != RuntimeAssetType.Mesh)
         {
             mesh = default;
@@ -104,6 +105,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
             if (!_catalog.TryGet(
                     id,
                     out RuntimeAssetRecord? record) ||
+                record is null ||
                 record.Type != RuntimeAssetType.Material)
             {
                 tint = default;
