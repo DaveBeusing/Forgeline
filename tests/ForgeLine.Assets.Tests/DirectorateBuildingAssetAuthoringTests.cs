@@ -4,39 +4,30 @@ using Xunit;
 
 namespace ForgeLine.Assets.Tests;
 
-public sealed class DirectorateUnitAssetAuthoringTests
+public sealed class DirectorateBuildingAssetAuthoringTests
 {
-    private static readonly UnitAssetExpectation[] Units =
+    private static readonly string[] BuildingFamilies =
     [
-        new(
-            "rifle_squad",
-            ["weapon_muzzle"]),
-        new(
-            "scout_vehicle",
-            ["weapon_muzzle", "sensor_origin"]),
-        new(
-            "main_battle_tank",
-            ["turret_pivot", "gun_pivot", "weapon_muzzle", "recoil_anchor"]),
-        new(
-            "self_propelled_artillery",
-            ["gun_pivot", "weapon_muzzle", "recoil_anchor"]),
-        new(
-            "cargo_truck",
-            ["cargo_load"]),
-        new(
-            "supply_truck",
-            ["cargo_load", "supply_transfer"])
+        "command_core",
+        "extractor",
+        "smelter",
+        "electronics_plant",
+        "fuel_refinery",
+        "vehicle_factory",
+        "storage_depot",
+        "supply_depot",
+        "power_plant"
     ];
 
     [Fact]
-    public void DirectorateVerticalSliceUnitFamiliesCompileWithLodsCollisionSocketsAndSymbols()
+    public void DirectorateBuildingsAndInfrastructureCompileWithStableRuntimeContracts()
     {
         string repositoryRoot =
             FindRepositoryRoot();
         string runtimeRoot =
             Path.Combine(
                 Path.GetTempPath(),
-                "forgeline-directorate-units-" +
+                "forgeline-directorate-buildings-" +
                 Guid.NewGuid().ToString("N"));
 
         try
@@ -65,15 +56,11 @@ public sealed class DirectorateUnitAssetAuthoringTests
                 RuntimeAssetCatalog.Load(
                     runtimeRoot);
 
-            Assert.True(
-                catalog.Contains(
-                    AssetId.Parse(
-                        "unit.directorate.main_battle_tank.turret")));
-
-            foreach (UnitAssetExpectation unit in Units)
+            foreach (string family in
+                     BuildingFamilies)
             {
                 string primaryId =
-                    $"unit.directorate.{unit.Name}";
+                    $"building.directorate.{family}";
                 RuntimeAssetRecord primary =
                     catalog.Get(
                         AssetId.Parse(
@@ -83,7 +70,7 @@ public sealed class DirectorateUnitAssetAuthoringTests
                     RuntimeAssetType.Mesh,
                     primary.Type);
                 Assert.Equal(
-                    $"{primaryId}.collision",
+                    "building.directorate.module.collision_box",
                     primary.CollisionReference);
                 Assert.Contains(
                     primary.Lods,
@@ -97,17 +84,6 @@ public sealed class DirectorateUnitAssetAuthoringTests
                         lod.Level == 2 &&
                         lod.AssetId ==
                         $"{primaryId}.lod2");
-
-                foreach (string requiredSocket in
-                         unit.RequiredSockets)
-                {
-                    Assert.Contains(
-                        primary.Sockets,
-                        socket =>
-                            socket.Name ==
-                            requiredSocket);
-                }
-
                 Assert.True(
                     catalog.Contains(
                         AssetId.Parse(
@@ -116,18 +92,56 @@ public sealed class DirectorateUnitAssetAuthoringTests
                     catalog.Contains(
                         AssetId.Parse(
                             $"{primaryId}.lod2")));
+            }
+
+            string[] sharedIds =
+            [
+                "building.directorate.module.foundation",
+                "building.directorate.module.structural_frame",
+                "building.directorate.module.partial_shell",
+                "building.directorate.module.state_idle",
+                "building.directorate.module.state_unpowered",
+                "building.directorate.module.state_damaged",
+                "building.directorate.module.state_critical",
+                "building.directorate.module.destroyed",
+                "building.directorate.module.collision_box",
+                "material.directorate.building.structural",
+                "material.directorate.building.unpowered",
+                "material.directorate.building.damaged",
+                "material.directorate.building.critical",
+                "material.directorate.building.destroyed",
+                "material.directorate.symbol.building.command",
+                "material.directorate.symbol.building.extraction",
+                "material.directorate.symbol.building.processing",
+                "material.directorate.symbol.building.factory",
+                "material.directorate.symbol.building.storage",
+                "material.directorate.symbol.building.supply",
+                "material.directorate.symbol.building.power",
+                "infrastructure.directorate.road.straight",
+                "infrastructure.directorate.road.curve_short",
+                "infrastructure.directorate.road.curve_long",
+                "infrastructure.directorate.road.junction_t",
+                "infrastructure.directorate.road.junction_cross",
+                "infrastructure.directorate.road.yard_transition",
+                "infrastructure.directorate.road.shoulder",
+                "infrastructure.directorate.road.damaged",
+                "infrastructure.directorate.road.destroyed",
+                "infrastructure.directorate.bridge.road.intact",
+                "infrastructure.directorate.bridge.road.damaged",
+                "infrastructure.directorate.bridge.road.destroyed",
+                "material.directorate.infrastructure.road",
+                "material.directorate.infrastructure.bridge",
+                "material.directorate.symbol.infrastructure.road",
+                "material.directorate.symbol.infrastructure.bridge"
+            ];
+
+            foreach (string id in sharedIds)
+            {
                 Assert.True(
                     catalog.Contains(
                         AssetId.Parse(
-                            $"{primaryId}.collision")));
-                Assert.True(
-                    catalog.Contains(
-                        AssetId.Parse(
-                            $"material.directorate.unit.{unit.Name}")));
-                Assert.True(
-                    catalog.Contains(
-                        AssetId.Parse(
-                            $"material.directorate.symbol.{unit.Name}")));
+                            id)),
+                    $"Compiled catalog is missing '{id}'.");
             }
         }
         finally
@@ -164,8 +178,4 @@ public sealed class DirectorateUnitAssetAuthoringTests
         throw new InvalidOperationException(
             "Could not locate the repository root from the test host.");
     }
-
-    private sealed record UnitAssetExpectation(
-        string Name,
-        string[] RequiredSockets);
 }
