@@ -1,0 +1,22 @@
+{
+  "id": "building.directorate.storage_depot",
+  "type": "mesh",
+  "source": "sources/storage_depot_lod0.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "building.directorate.storage_depot.lod1",
+      "maxDistance": 220
+    },
+    {
+      "level": 2,
+      "assetId": "building.directorate.storage_depot.lod2",
+      "maxDistance": 620
+    }
+  ],
+  "collisionRequired": true,
+  "collisionReference": "building.directorate.module.collision_box"
+}

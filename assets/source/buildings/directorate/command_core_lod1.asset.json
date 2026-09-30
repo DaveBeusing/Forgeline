@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.command_core.lod1",
+  "type": "mesh",
+  "source": "sources/command_core_lod1.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

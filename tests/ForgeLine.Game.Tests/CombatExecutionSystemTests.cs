@@ -311,6 +311,100 @@ public sealed class CombatExecutionSystemTests
     }
 
     [Fact]
+    public void DestroyedBuildingLeavesPresentationOnlyWreckIdentity()
+    {
+        CombatScenario scenario =
+            CreateScenario(
+                CreateHitscanWeapon(
+                    damage: 100.0),
+                shooterAmmunition: 1.0,
+                targetPosition:
+                    new Vector3(
+                        5.0f,
+                        0.0f,
+                        0.0f),
+                targetHealth: 50.0);
+
+        WorldTransform transform =
+            scenario.Simulation.Entities.GetComponent<WorldTransform>(
+                scenario.Target);
+
+        scenario.Simulation.Entities.AddComponent(
+            scenario.Target,
+            new CompletedBuilding(
+                BuildingIds.CommandCore,
+                new PlayerId(
+                    2),
+                SimulationTick.Zero));
+        scenario.Simulation.Entities.AddComponent(
+            scenario.Target,
+            new VisualIdentity(
+                101));
+        scenario.Simulation.Entities.AddComponent(
+            scenario.Target,
+            new IntelligenceSignature(
+                RedFaction,
+                0x8000_0000u |
+                BuildingIds.CommandCore.Value));
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.False(
+            scenario.Simulation.Entities.IsAlive(
+                scenario.Target));
+
+        EntityId wreck =
+            EntityId.Invalid;
+        int wreckCount =
+            0;
+
+        foreach (EntityId candidate in
+                 scenario.Simulation.Entities.Query<BuildingWreckPresentationIdentity>())
+        {
+            wreck =
+                candidate;
+            wreckCount++;
+        }
+
+        Assert.Equal(
+            1,
+            wreckCount);
+        Assert.True(
+            wreck.IsValid);
+
+        BuildingWreckPresentationIdentity identity =
+            scenario.Simulation.Entities.GetComponent<BuildingWreckPresentationIdentity>(
+                wreck);
+
+        Assert.Equal(
+            BuildingIds.CommandCore,
+            identity.BuildingId);
+        Assert.Equal(
+            new PlayerId(
+                2),
+            identity.Owner);
+        Assert.Equal(
+            transform,
+            scenario.Simulation.Entities.GetComponent<WorldTransform>(
+                wreck));
+        Assert.True(
+            scenario.Simulation.Entities.HasComponent<VisualIdentity>(
+                wreck));
+        Assert.True(
+            scenario.Simulation.Entities.HasComponent<IntelligenceSignature>(
+                wreck));
+        Assert.False(
+            scenario.Simulation.Entities.HasComponent<ControllableEntity>(
+                wreck));
+        Assert.False(
+            scenario.Simulation.Entities.HasComponent<Combatant>(
+                wreck));
+        Assert.False(
+            scenario.Simulation.Entities.HasComponent<CompletedBuilding>(
+                wreck));
+    }
+
+    [Fact]
     public void StaleTargetIsClearedWithoutFiring()
     {
         CombatScenario scenario =

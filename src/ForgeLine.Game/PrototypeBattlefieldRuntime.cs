@@ -174,6 +174,9 @@ public sealed class PrototypeBattlefieldRuntime
         var roadNodes =
             new Dictionary<string, LogisticsNodeId>(
                 StringComparer.Ordinal);
+        var roadNodePositions =
+            new Dictionary<string, Vector3>(
+                StringComparer.Ordinal);
 
         for (int index = 0;
              index < definition.RoadNodes.Count;
@@ -211,6 +214,9 @@ public sealed class PrototypeBattlefieldRuntime
             roadNodes.Add(
                 roadNode.Key,
                 node);
+            roadNodePositions.Add(
+                roadNode.Key,
+                position);
         }
 
         var roadEdges =
@@ -230,19 +236,11 @@ public sealed class PrototypeBattlefieldRuntime
                 roadNodes[roadEdge.DestinationNodeKey];
 
             Vector3 sourcePosition =
-                definition.RoadNodes.First(
-                    node =>
-                        string.Equals(
-                            node.Key,
-                            roadEdge.SourceNodeKey,
-                            StringComparison.Ordinal)).Position;
+                roadNodePositions[
+                    roadEdge.SourceNodeKey];
             Vector3 destinationPosition =
-                definition.RoadNodes.First(
-                    node =>
-                        string.Equals(
-                            node.Key,
-                            roadEdge.DestinationNodeKey,
-                            StringComparison.Ordinal)).Position;
+                roadNodePositions[
+                    roadEdge.DestinationNodeKey];
 
             double distance =
                 HorizontalDistance(
@@ -260,6 +258,18 @@ public sealed class PrototypeBattlefieldRuntime
                     roadEdge.CapacityPerSecond,
                     bidirectional: true,
                     enabled: true));
+
+            if (!IsCrossingEdge(
+                    definition,
+                    roadEdge.Key))
+            {
+                CreateRoadPresentationEntity(
+                    entities,
+                    roadEdge,
+                    sourcePosition,
+                    destinationPosition,
+                    checked((uint)(6_000 + index)));
+            }
         }
 
         var crossingEntities =
@@ -305,6 +315,12 @@ public sealed class PrototypeBattlefieldRuntime
                 crossing.InitiallyOperational
                     ? StrategicInfrastructureState.Operational
                     : StrategicInfrastructureState.Disabled);
+            entities.AddComponent(
+                entity,
+                new InfrastructurePresentationIdentity(
+                    ResolveCrossingPresentationKind(
+                        crossing),
+                    crossing.Key));
 
             if (!crossing.InitiallyOperational)
             {
@@ -373,6 +389,87 @@ public sealed class PrototypeBattlefieldRuntime
 
         return objectives;
     }
+
+    private static bool IsCrossingEdge(
+        PrototypeBattlefieldDefinition definition,
+        string roadEdgeKey)
+    {
+        for (int index = 0;
+             index < definition.Crossings.Count;
+             index++)
+        {
+            if (string.Equals(
+                    definition.Crossings[index].LogisticsEdgeKey,
+                    roadEdgeKey,
+                    StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static void CreateRoadPresentationEntity(
+        EntityRegistry entities,
+        in BattlefieldRoadEdgeDefinition roadEdge,
+        Vector3 sourcePosition,
+        Vector3 destinationPosition,
+        uint visualId)
+    {
+        Vector3 delta =
+            destinationPosition -
+            sourcePosition;
+        float length =
+            MathF.Sqrt(
+                (delta.X * delta.X) +
+                (delta.Z * delta.Z));
+
+        if (length <= 0.001f)
+        {
+            return;
+        }
+
+        float yaw =
+            MathF.Atan2(
+                delta.X,
+                delta.Z);
+        Vector3 midpoint =
+            (sourcePosition +
+             destinationPosition) *
+            0.5f;
+
+        EntityId entity =
+            entities.CreateEntity();
+        entities.AddComponent(
+            entity,
+            new WorldTransform(
+                midpoint,
+                Quaternion.CreateFromAxisAngle(
+                    Vector3.UnitY,
+                    yaw),
+                new Vector3(
+                    12.0f,
+                    0.35f,
+                    length)));
+        entities.AddComponent(
+            entity,
+            new VisualIdentity(
+                visualId));
+        entities.AddComponent(
+            entity,
+            new InfrastructurePresentationIdentity(
+                InfrastructurePresentationKind.RoadSegment,
+                roadEdge.Key));
+    }
+
+    private static InfrastructurePresentationKind ResolveCrossingPresentationKind(
+        in BattlefieldCrossingDefinition crossing) =>
+        crossing.LogisticsEdgeKey.Contains(
+            "bridge",
+            StringComparison.OrdinalIgnoreCase)
+            ? InfrastructurePresentationKind.RoadBridge
+            : InfrastructurePresentationKind.Ford;
 
     private static Vector3 SampleTerrainPosition(
         TerrainWorld terrain,

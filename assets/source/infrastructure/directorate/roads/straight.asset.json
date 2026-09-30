@@ -1,0 +1,8 @@
+{
+  "id": "infrastructure.directorate.road.straight",
+  "type": "mesh",
+  "source": "../sources/road_straight.gltf",
+  "materialReferences": [
+    "material.directorate.infrastructure.road"
+  ]
+}

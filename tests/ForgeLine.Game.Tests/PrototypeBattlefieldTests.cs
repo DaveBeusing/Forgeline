@@ -409,6 +409,43 @@ public sealed class PrototypeBattlefieldTests
         Assert.Equal(
             definition.WorldObjects.Count,
             runtime.WorldPresentationEntities.Count);
+
+        int roadPresentationCount =
+            0;
+        foreach (EntityId entity in
+                 simulation.Entities.Query<InfrastructurePresentationIdentity>())
+        {
+            InfrastructurePresentationIdentity presentation =
+                simulation.Entities.GetComponent<InfrastructurePresentationIdentity>(
+                    entity);
+
+            if (presentation.Kind ==
+                InfrastructurePresentationKind.RoadSegment)
+            {
+                roadPresentationCount++;
+            }
+        }
+
+        Assert.Equal(
+            definition.RoadEdges.Count -
+            definition.Crossings.Count,
+            roadPresentationCount);
+
+        InfrastructurePresentationIdentity northBridge =
+            simulation.Entities.GetComponent<InfrastructurePresentationIdentity>(
+                runtime.CrossingEntities[
+                    "crossing.north_bridge"]);
+        InfrastructurePresentationIdentity southFord =
+            simulation.Entities.GetComponent<InfrastructurePresentationIdentity>(
+                runtime.CrossingEntities[
+                    "crossing.south_ford"]);
+
+        Assert.Equal(
+            InfrastructurePresentationKind.RoadBridge,
+            northBridge.Kind);
+        Assert.Equal(
+            InfrastructurePresentationKind.Ford,
+            southFord.Kind);
     }
 
     private static NavigationGridSettings CreateGridSettings() =>

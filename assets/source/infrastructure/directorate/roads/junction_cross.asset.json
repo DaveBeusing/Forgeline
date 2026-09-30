@@ -1,0 +1,8 @@
+{
+  "id": "infrastructure.directorate.road.junction_cross",
+  "type": "mesh",
+  "source": "../sources/road_junction_cross.gltf",
+  "materialReferences": [
+    "material.directorate.infrastructure.road"
+  ]
+}

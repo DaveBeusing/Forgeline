@@ -12,6 +12,14 @@ The stable faction identity is:
 
 Unit keys use the `directorate.unit.*` namespace. Existing building keys remain stable for compatibility while faction availability explicitly binds them to the Directorate slice.
 
+## Production presentation
+
+The core Vertical Slice presentation now covers both the six core unit families and the nine required industrial building families. Buildings resolve through stable `building.directorate.*` runtime IDs, shared construction/state modules, LOD0–LOD2, strategic-symbol bindings, and existing indexed instancing.
+
+The presentation layer derives construction, power, production-idle, damage, critical, and destroyed state from existing simulation components. It does not create faction-specific simulation shortcuts. Central Divide also uses the Directorate road kit and a state-driven North Bridge visual family over its existing authoritative GroundRoad and strategic-infrastructure systems.
+
+See [Directorate Building and Infrastructure Assets](DirectorateBuildingAssets.md).
+
 ## Progression
 
 The vertical slice uses three bounded availability tiers.

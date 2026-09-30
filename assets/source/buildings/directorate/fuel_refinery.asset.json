@@ -1,0 +1,22 @@
+{
+  "id": "building.directorate.fuel_refinery",
+  "type": "mesh",
+  "source": "sources/fuel_refinery_lod0.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "building.directorate.fuel_refinery.lod1",
+      "maxDistance": 220
+    },
+    {
+      "level": 2,
+      "assetId": "building.directorate.fuel_refinery.lod2",
+      "maxDistance": 620
+    }
+  ],
+  "collisionRequired": true,
+  "collisionReference": "building.directorate.module.collision_box"
+}

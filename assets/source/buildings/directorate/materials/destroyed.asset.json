@@ -1,0 +1,5 @@
+{
+  "id": "material.directorate.building.destroyed",
+  "type": "material",
+  "source": "destroyed.material.json"
+}

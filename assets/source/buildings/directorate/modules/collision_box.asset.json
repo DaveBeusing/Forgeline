@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.module.collision_box",
+  "type": "mesh",
+  "source": "../sources/module_collision_box.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

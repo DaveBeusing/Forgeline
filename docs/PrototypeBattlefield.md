@@ -103,6 +103,10 @@ All visuals remain diagnostic overlays; navigation and logistics behavior comes 
 
 The presentation tests separately validate the battlefield debug overlay.
 
-## Placeholder Art
+## Runtime world and infrastructure presentation
 
-The prototype intentionally uses generic visual IDs and debug geometry for strategic infrastructure and objectives. Final terrain materials, bridge meshes, environmental art, destruction animation, and production map-editor authoring remain outside this vertical slice. The gameplay topology and authoritative state are not placeholders.
+The prototype now combines its authoritative map data with compiled presentation assets. Non-crossing `GroundRoad` edges produce presentation-only road entities using the Directorate road material family. The functional North Bridge resolves intact, restoring/damaged, and disabled/destroyed runtime meshes directly from `StrategicInfrastructureState`; the South Ford remains a road-surface presentation.
+
+These visual entities do not participate in logistics routing, capacity, navigation blocking, restoration progress, or crossing availability. Those facts continue to come exclusively from the existing logistics and strategic-infrastructure systems.
+
+Final high-detail environment art, richer bridge repair/destruction effects, and production map-editor authoring remain future work. The gameplay topology and authoritative state are not placeholders.

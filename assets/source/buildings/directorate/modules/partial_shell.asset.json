@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.module.partial_shell",
+  "type": "mesh",
+  "source": "../sources/module_partial_shell.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

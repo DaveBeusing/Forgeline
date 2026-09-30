@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.module.state_critical",
+  "type": "mesh",
+  "source": "../sources/module_state_critical.gltf",
+  "materialReferences": [
+    "material.directorate.building.critical"
+  ]
+}

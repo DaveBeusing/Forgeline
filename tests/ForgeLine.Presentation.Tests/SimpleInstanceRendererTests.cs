@@ -203,6 +203,90 @@ public sealed class SimpleInstanceRendererTests : IDisposable
             context.LastInstanceCount);
     }
 
+    [Fact]
+    public void RepeatedDirectorateBuildingsUseSharedInstancingPath()
+    {
+        const int Count = 256;
+
+        var camera =
+            new RtsCamera();
+        var instances =
+            new RenderInstance[Count];
+
+        for (int index = 0;
+             index < Count;
+             index++)
+        {
+            int x =
+                index % 16;
+            int z =
+                index / 16;
+
+            instances[index] =
+                Instance(
+                    new EntityId(
+                        checked((uint)index + 1U),
+                        1),
+                    camera.Target +
+                    new Vector3(
+                        (x - 7.5f) * 3.0f,
+                        0.0f,
+                        (z - 7.5f) * 3.0f),
+                    new Vector3(
+                        20.0f,
+                        12.0f,
+                        20.0f)) with
+                {
+                    BuildingFeature =
+                        new BuildingFeaturePresentationMetadata(
+                            BuildingIds.CommandCore,
+                            BuildingPresentationState.Operational)
+                };
+        }
+
+        var buffer =
+            new PresentationSnapshotBuffer();
+        buffer.Publish(
+            new PresentationSnapshot(
+                new SimulationTick(
+                    1),
+                TimeSpan.FromMilliseconds(
+                    50),
+                Count,
+                instances));
+
+        var world =
+            new RenderWorld();
+        Assert.True(
+            world.Update(
+                buffer));
+
+        using var renderer =
+            new SimpleInstanceRenderer(
+                _graphics);
+        var context =
+            new FakeGraphicsCommandContext();
+
+        renderer.Render(
+            context,
+            camera,
+            world,
+            1.0f);
+
+        Assert.Equal(
+            Count,
+            renderer.LastDiagnostics.VisibleInstances);
+        Assert.Equal(
+            1,
+            renderer.LastDiagnostics.DrawCalls);
+        Assert.Equal(
+            1,
+            context.IndexedDrawCalls);
+        Assert.Equal(
+            Count,
+            context.LastInstanceCount);
+    }
+
     private static RenderInstance Instance(
         EntityId entity,
         Vector3 position,

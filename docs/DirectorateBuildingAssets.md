@@ -1,0 +1,205 @@
+# Directorate Building and Infrastructure Assets
+
+## Purpose
+
+The Directorate building and infrastructure presentation set connects the existing authoritative construction, economy, power, production, logistics, combat-damage, and strategic-infrastructure state to compiled runtime visuals. Presentation never owns or duplicates those gameplay states.
+
+The first visual baseline intentionally uses compact modular geometry. Stable asset IDs, source/runtime separation, state contracts, LOD behavior, and reuse are the production contracts; higher-detail art can replace the authored geometry without changing gameplay IDs.
+
+## Included building families
+
+| Gameplay building | Stable presentation asset | Primary visual function |
+| --- | --- | --- |
+| Command Core | `building.directorate.command_core` | dominant command anchor |
+| Mine / Extractor | `building.directorate.extractor` | extraction head, machinery, material handling |
+| Smelter | `building.directorate.smelter` | furnace/exhaust/process mass |
+| Electronics Fabricator | `building.directorate.electronics_plant` | enclosed controlled industrial processing |
+| Refinery | `building.directorate.fuel_refinery` | tanks, pipes, pressure/process structures |
+| Vehicle Factory | `building.directorate.vehicle_factory` | wide production hall and vehicle-scale access |
+| Storage Depot | `building.directorate.storage_depot` | warehouses and repeated storage modules |
+| Supply Depot | `building.directorate.supply_depot` | storage plus readable distribution/service modules |
+| Power Plant | `building.directorate.power_plant` | generation hall and distribution/exhaust structures |
+
+The existing gameplay `BuildingId` values and building-definition keys remain authoritative. The presentation catalog maps those IDs to stable Directorate runtime assets rather than creating a second gameplay roster.
+
+## Source layout
+
+Editable sources live below:
+
+```text
+assets/source/buildings/directorate/
+  materials/
+  modules/
+  sources/
+  symbols/
+
+assets/source/infrastructure/directorate/
+  bridges/
+  materials/
+  roads/
+  sources/
+  symbols/
+```
+
+Generated runtime content remains below `assets/runtime/` and is never edited as source.
+
+## Shared modular building kit
+
+The first kit establishes reusable structural and state geometry:
+
+```text
+building.directorate.module.foundation
+building.directorate.module.structural_frame
+building.directorate.module.partial_shell
+building.directorate.module.state_idle
+building.directorate.module.state_unpowered
+building.directorate.module.state_damaged
+building.directorate.module.state_critical
+building.directorate.module.destroyed
+building.directorate.module.collision_box
+```
+
+The construction and state modules are intentionally shared by all nine families. This keeps the initial art vocabulary consistent and makes repeated geometry eligible for the existing indexed-instancing path.
+
+## Construction presentation
+
+`PresentationExtractor` reads the authoritative `ConstructionSite.Progress` value and publishes one of three visual stages:
+
+- below 34%: foundation;
+- 34% to below 67%: structural frame;
+- 67% to completion: partial shell.
+
+Completion removes `ConstructionSite` and the completed building switches to its family-specific runtime mesh. No presentation state advances construction and no render asset changes footprint occupancy.
+
+## Operational state presentation
+
+For completed supported buildings, state is derived from existing ECS components in priority order.
+
+| Presentation state | Existing authoritative source |
+| --- | --- |
+| Damaged / Critical | `HealthState` |
+| Unpowered | `PowerConsumer` or `PowerGenerator` |
+| Idle | `ResourceExtractor`, `ProductionFacility`, or `UnitProductionFacility` |
+| Operational | completed building with no higher-priority condition |
+| Destroyed | presentation-only wreck identity created at authoritative combat destruction |
+
+Brownout and offline power consumers use the unpowered treatment in this baseline because both represent insufficient power for normal operation.
+
+Critical states do not rely on tint alone. Idle, unpowered, damaged, and critical buildings add a shared state-geometry layer. Destroyed buildings use a dedicated collapsed module. Runtime material factors reinforce those shapes but are not the sole signal.
+
+The current asset runtime has no general skeletal/mechanical animation or effect asset contract. Machinery animation, sparks, smoke, fire, richer emissive behavior, and destruction VFX therefore remain later presentation layers rather than invented simulation state.
+
+## Destruction boundary
+
+Combat destruction remains authoritative. When a completed supported building is destroyed, the gameplay entity is removed through the existing lifecycle system. A presentation-only wreck entity preserves:
+
+- world transform;
+- visual identity;
+- stable building identity;
+- intelligence signature when available.
+
+The wreck has no command, combat, production, power, storage, or navigation authority.
+
+## LOD and collision
+
+Each primary family exposes LOD0, LOD1, and LOD2 references. The current presentation thresholds are 220 m and 620 m.
+
+All nine primary assets reference the shared simplified collision asset:
+
+```text
+building.directorate.module.collision_box
+```
+
+That asset is a tooling/runtime visual contract only. Gameplay placement, occupancy, navigation, combat hitboxes, and construction validation continue to use existing simulation-owned footprint/spatial contracts and never change with render LOD.
+
+## Strategic symbols
+
+Building classes expose stable strategic/minimap symbol references:
+
+```text
+material.directorate.symbol.building.command
+material.directorate.symbol.building.extraction
+material.directorate.symbol.building.processing
+material.directorate.symbol.building.factory
+material.directorate.symbol.building.storage
+material.directorate.symbol.building.supply
+material.directorate.symbol.building.power
+```
+
+These are shared presentation bindings for future minimap/strategic consumers. They do not claim that a dedicated minimap renderer exists yet.
+
+## Road kit
+
+The initial Directorate road kit contains:
+
+- straight;
+- short curve;
+- long curve;
+- T junction;
+- four-way junction;
+- industrial-yard transition;
+- shoulder;
+- damaged segment;
+- destroyed segment.
+
+Central Divide already owns a real `GroundRoad` logistics graph. `PrototypeBattlefieldRuntime` now creates presentation-only road entities for non-crossing road edges from those authoritative node positions. The visual entity never participates in routing, capacity, collision, or navigation.
+
+The current map uses straight runtime presentation along each graph edge. The additional kit shapes establish stable source/runtime contracts for later map/editor authoring without adding new gameplay roads.
+
+## North Bridge and South Ford
+
+Central Divide already has functional strategic crossing gameplay, so bridge presentation is part of this baseline.
+
+The North Bridge uses:
+
+```text
+infrastructure.directorate.bridge.road.intact
+infrastructure.directorate.bridge.road.damaged
+infrastructure.directorate.bridge.road.destroyed
+```
+
+Its visual state is driven directly by the existing `StrategicInfrastructureState`:
+
+- `Operational` -> intact;
+- `Restoring` -> damaged/repairable;
+- `Disabled` -> destroyed.
+
+The South Ford remains a road-surface presentation family rather than a bridge mesh, while its existing strategic-infrastructure state remains authoritative.
+
+Disabling or restoring either crossing still changes the real logistics edge and navigation blocker through `StrategicInfrastructureSystem`; presentation only reflects the result.
+
+## Renderer and performance
+
+Building and infrastructure meshes load through `RuntimeAssetCatalog` and `RuntimeWorldAssetResources`.
+
+`SimpleInstanceRenderer`:
+
+1. resolves building or infrastructure presentation metadata;
+2. selects the stable runtime mesh;
+3. applies building LOD selection where applicable;
+4. resolves compiled material tint;
+5. submits optional building state geometry;
+6. batches identical runtime mesh IDs through the existing per-frame indexed-instancing stream.
+
+Repeated buildings therefore share the same batching architecture as units and world props.
+
+## Validation
+
+Automated coverage verifies:
+
+- all nine building families compile;
+- LOD and shared collision references resolve;
+- shared construction/state modules resolve;
+- building and infrastructure strategic symbols resolve;
+- complete road and bridge source families resolve;
+- construction progress maps to foundation/frame/shell presentation;
+- power, damage, critical, and wreck state extraction;
+- critical state geometry is present in addition to material treatment;
+- Central Divide creates road presentation from the real road graph;
+- North Bridge and South Ford receive the correct infrastructure presentation identity;
+- repeated Directorate buildings retain the shared indexed-instancing path;
+- the normal Windows D3D12 smoke consumes the compiled runtime manifest.
+
+## Current boundary
+
+This baseline integrates the required Vertical Slice functions without expanding gameplay mechanics. Roads are not player-constructible, rail content remains outside the current slice, and no new economic or power mechanic is introduced. Higher-detail production art, mechanical building animation, emissive texture animation, particles, audio, repair visuals, and editor-specific road placement can extend the stable contracts later.

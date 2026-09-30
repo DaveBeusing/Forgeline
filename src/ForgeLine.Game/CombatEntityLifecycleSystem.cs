@@ -52,6 +52,9 @@ public sealed class CombatEntityLifecycleSystem : ISimulationSystem
                 CreateUnitWreckPresentation(
                     context,
                     destruction.Entity);
+                CreateBuildingWreckPresentation(
+                    context,
+                    destruction.Entity);
             }
 
             _spatialIndex?.Remove(
@@ -106,4 +109,47 @@ public sealed class CombatEntityLifecycleSystem : ISimulationSystem
                 signature);
         }
     }
+
+    private static void CreateBuildingWreckPresentation(
+        SimulationContext context,
+        EntityId destroyedEntity)
+    {
+        if (!context.Entities.TryGetComponent(
+                destroyedEntity,
+                out CompletedBuilding building) ||
+            !context.Entities.TryGetComponent(
+                destroyedEntity,
+                out WorldTransform transform) ||
+            !context.Entities.TryGetComponent(
+                destroyedEntity,
+                out VisualIdentity visual))
+        {
+            return;
+        }
+
+        EntityId wreck =
+            context.Entities.CreateEntity();
+
+        context.Entities.AddComponent(
+            wreck,
+            transform);
+        context.Entities.AddComponent(
+            wreck,
+            visual);
+        context.Entities.AddComponent(
+            wreck,
+            new BuildingWreckPresentationIdentity(
+                building.BuildingId,
+                building.Owner));
+
+        if (context.Entities.TryGetComponent(
+                destroyedEntity,
+                out IntelligenceSignature signature))
+        {
+            context.Entities.AddComponent(
+                wreck,
+                signature);
+        }
+    }
+
 }

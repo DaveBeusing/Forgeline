@@ -1,0 +1,22 @@
+{
+  "id": "building.directorate.electronics_plant",
+  "type": "mesh",
+  "source": "sources/electronics_plant_lod0.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "building.directorate.electronics_plant.lod1",
+      "maxDistance": 220
+    },
+    {
+      "level": 2,
+      "assetId": "building.directorate.electronics_plant.lod2",
+      "maxDistance": 620
+    }
+  ],
+  "collisionRequired": true,
+  "collisionReference": "building.directorate.module.collision_box"
+}
