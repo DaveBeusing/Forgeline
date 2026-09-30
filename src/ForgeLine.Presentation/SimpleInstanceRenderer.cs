@@ -162,6 +162,10 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 default;
             bool hasUnitDefinition =
                 false;
+            BuildingAssetLod buildingLod =
+                BuildingAssetLod.Lod0;
+            bool hasBuildingDefinition =
+                false;
 
             if (instance.UnitFeature.IsSpecified)
             {
@@ -196,6 +200,56 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 {
                     reducedLod++;
                 }
+            }
+            else if (instance.BuildingFeature.IsSpecified)
+            {
+                buildingLod =
+                    BuildingPresentationCatalog.SelectLod(
+                        instance.BuildingFeature,
+                        distance);
+                hasBuildingDefinition =
+                    BuildingPresentationCatalog.TryGet(
+                        instance.BuildingFeature.Building,
+                        out _);
+
+                string meshAssetId =
+                    BuildingPresentationCatalog.ResolveMeshAssetId(
+                        instance.BuildingFeature,
+                        buildingLod);
+
+                usesRuntimeMesh =
+                    _runtimeAssets is not null &&
+                    _runtimeAssets.TryGetMesh(
+                        meshAssetId,
+                        out runtimeMesh,
+                        out runtimeMeshId) &&
+                    runtimeMesh.IsValid;
+
+                if (buildingLod ==
+                    BuildingAssetLod.Lod0)
+                {
+                    highLod++;
+                }
+                else
+                {
+                    reducedLod++;
+                }
+            }
+            else if (instance.InfrastructureFeature.IsSpecified)
+            {
+                string meshAssetId =
+                    InfrastructurePresentationCatalog.ResolveMeshAssetId(
+                        instance.InfrastructureFeature);
+
+                usesRuntimeMesh =
+                    _runtimeAssets is not null &&
+                    _runtimeAssets.TryGetMesh(
+                        meshAssetId,
+                        out runtimeMesh,
+                        out runtimeMeshId) &&
+                    runtimeMesh.IsValid;
+
+                highLod++;
             }
             else if (instance.WorldFeature.IsSpecified)
             {
@@ -232,6 +286,15 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     instance);
             Matrix4x4 worldMatrix =
                 instance.Transform.ToMatrix();
+
+            if (instance.InfrastructureFeature.IsSpecified)
+            {
+                worldMatrix =
+                    InfrastructurePresentationCatalog.AdjustWorldTransform(
+                        instance.InfrastructureFeature,
+                        worldMatrix);
+            }
+
             var key =
                 new InstanceBatchKey(
                     usesRuntimeMesh,
@@ -294,6 +357,46 @@ public sealed class SimpleInstanceRenderer : IDisposable
                             worldMatrix,
                             unitDefinition.TurretPivot,
                             instance.UnitFeature.AimYawRadians),
+                        color));
+            }
+
+            string? buildingStateAssetId =
+                hasBuildingDefinition
+                    ? BuildingPresentationCatalog.ResolveStateAttachmentAssetId(
+                        instance.BuildingFeature)
+                    : null;
+
+            if (buildingStateAssetId is not null &&
+                _runtimeAssets is not null &&
+                _runtimeAssets.TryGetMesh(
+                    buildingStateAssetId,
+                    out RuntimeMeshBuffers stateMesh,
+                    out AssetId stateMeshId) &&
+                stateMesh.IsValid)
+            {
+                var stateKey =
+                    new InstanceBatchKey(
+                        true,
+                        stateMeshId);
+
+                if (!batchLookup.TryGetValue(
+                        stateKey,
+                        out InstanceBatch? stateBatch))
+                {
+                    stateBatch =
+                        new InstanceBatch(
+                            true,
+                            stateMesh);
+                    batchLookup.Add(
+                        stateKey,
+                        stateBatch);
+                    batches.Add(
+                        stateBatch);
+                }
+
+                stateBatch.Instances.Add(
+                    new InstanceRenderData(
+                        worldMatrix,
                         color));
             }
         }
@@ -690,6 +793,38 @@ public sealed class SimpleInstanceRenderer : IDisposable
             return UnitPresentationCatalog.ApplyDamageTint(
                 instance.UnitFeature,
                 baseTint);
+        }
+
+        if (instance.BuildingFeature.IsSpecified)
+        {
+            string materialAssetId =
+                BuildingPresentationCatalog.ResolveMaterialAssetId(
+                    instance.BuildingFeature);
+
+            return
+                _runtimeAssets is not null &&
+                _runtimeAssets.TryGetMaterialTint(
+                    materialAssetId,
+                    out Vector4 runtimeTint)
+                    ? runtimeTint
+                    : BuildingPresentationCatalog.ResolveFallbackTint(
+                        instance.BuildingFeature);
+        }
+
+        if (instance.InfrastructureFeature.IsSpecified)
+        {
+            string materialAssetId =
+                InfrastructurePresentationCatalog.ResolveMaterialAssetId(
+                    instance.InfrastructureFeature);
+
+            return
+                _runtimeAssets is not null &&
+                _runtimeAssets.TryGetMaterialTint(
+                    materialAssetId,
+                    out Vector4 runtimeTint)
+                    ? runtimeTint
+                    : InfrastructurePresentationCatalog.ResolveFallbackTint(
+                        instance.InfrastructureFeature);
         }
 
         if (instance.WorldFeature.IsSpecified)
