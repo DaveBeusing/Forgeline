@@ -1235,33 +1235,16 @@ internal sealed class ClientApplication
     }
 
     private static void DrainWindowEvents(
-        IWindow window,
-        IGraphicsDevice graphics)
+        IWindow window)
     {
-        WindowSize? resizeTarget = null;
-
-        while (window.TryDequeueEvent(out WindowEvent windowEvent))
+        while (window.TryDequeueEvent(
+                   out WindowEvent windowEvent))
         {
             Console.WriteLine(
                 $"[platform:event] kind={windowEvent.Kind} " +
                 $"size={windowEvent.ClientSize.Width}x{windowEvent.ClientSize.Height} " +
                 $"dpi={windowEvent.Dpi} focused={windowEvent.IsFocused} " +
                 $"minimized={windowEvent.IsMinimized} mode={windowEvent.Mode}");
-
-            if (windowEvent.Kind is
-                WindowEventKind.Resized or
-                WindowEventKind.Minimized or
-                WindowEventKind.Restored or
-                WindowEventKind.DpiChanged or
-                WindowEventKind.ModeChanged)
-            {
-                resizeTarget = windowEvent.ClientSize;
-            }
-        }
-
-        if (resizeTarget is WindowSize size)
-        {
-            graphics.Resize(size.Width, size.Height);
         }
     }
 
