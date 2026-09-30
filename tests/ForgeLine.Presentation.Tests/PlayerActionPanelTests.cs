@@ -590,6 +590,130 @@ public sealed class PlayerActionPanelTests
         Assert.Equal(unit, resupplyRequest.Facility);
     }
 
+    [Fact]
+    public void TacticalPaletteMapsTargetedAndImmediateActions()
+    {
+        EntityId unit =
+            new(90, 1);
+        var tactical =
+            new PlayerTacticalActionReadModel(
+                [unit],
+                requestedSelectionCount: 1,
+                combatEligibleCount: 1,
+                rejectedSelectionCount: 0,
+                criticalSupplyCount: 0,
+                resupplyingCount: 0,
+                hasCommonOrder: false,
+                mixedOrderState: false,
+                currentOrder: default,
+                currentStatus: default,
+                targets: [],
+                artillery: []);
+        PresentationSnapshot snapshot =
+            CreateSnapshot(
+                tactical: tactical);
+        var input = new InputState();
+        var controller =
+            new PlayerActionPanelController();
+
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        Press(input, PlatformKey.K);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+        Release(input, PlatformKey.K);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        Assert.Equal(
+            PlayerActionPanelMode.Tactical,
+            controller.Mode);
+
+        Press(input, PlatformKey.Enter);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        Assert.True(
+            controller.TryTakeRequest(
+                out PlayerActionRequest attack));
+        Assert.Equal(
+            PlayerActionRequestKind.BeginAttackTargeting,
+            attack.Kind);
+        Assert.Equal(
+            new[] { unit },
+            attack.TacticalEntities);
+        Assert.Equal(
+            PlayerActionPanelMode.Closed,
+            controller.Mode);
+
+        Release(input, PlatformKey.Enter);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+        Press(input, PlatformKey.K);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+        Release(input, PlatformKey.K);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        for (int index = 0;
+             index < 3;
+             index++)
+        {
+            Press(input, PlatformKey.Tab);
+            controller.Update(
+                input,
+                snapshot,
+                1600,
+                900);
+            Release(input, PlatformKey.Tab);
+            controller.Update(
+                input,
+                snapshot,
+                1600,
+                900);
+        }
+
+        Press(input, PlatformKey.Enter);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        Assert.True(
+            controller.TryTakeRequest(
+                out PlayerActionRequest hold));
+        Assert.Equal(
+            PlayerActionRequestKind.SubmitHoldPosition,
+            hold.Kind);
+        Assert.Equal(
+            new[] { unit },
+            hold.TacticalEntities);
+    }
+
     private static PlayerConstructionActionReadModel Construction(
         BuildingId buildingId,
         string name) =>
@@ -610,7 +734,8 @@ public sealed class PlayerActionPanelTests
         PlayerProductionFacilityActionReadModel? production = null,
         PlayerUnitProductionFacilityActionReadModel? unitProduction = null,
         PlayerLogisticsActionReadModel? logistics = null,
-        PlayerSupplyActionReadModel? supply = null)
+        PlayerSupplyActionReadModel? supply = null,
+        PlayerTacticalActionReadModel? tactical = null)
     {
         var session =
             new SimulationSessionId(101);
@@ -623,7 +748,8 @@ public sealed class PlayerActionPanelTests
                 production,
                 unitProduction,
                 logistics,
-                supply);
+                supply,
+                tactical);
 
         return new PresentationSnapshot(
             new SimulationTick(4),

@@ -1,8 +1,11 @@
 using System.Numerics;
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Game;
+using ForgeLine.Intelligence;
 using ForgeLine.Simulation;
+using ForgeLine.World;
 using Xunit;
 
 namespace ForgeLine.Game.Tests;
@@ -546,6 +549,690 @@ public sealed class PlayerCommandBoundaryTests
         Assert.False(policy.Enabled);
     }
 
+    [Fact]
+    public void TacticalAttackRequiresCurrentIdentifiedEnemy()
+    {
+        using VerticalSliceScenario scenario =
+            CreateHumanScenario(seed: 4114);
+        PlayerCommandGateway gateway =
+            CreateGateway(scenario);
+        EntityId attacker =
+            scenario.West.StartingUnits[0];
+        EntityId target =
+            scenario.East.StartingUnits[0];
+        FactionId westFaction =
+            new((uint)scenario.West.Player.Value);
+
+        IntelligenceSignature signature =
+            scenario.Simulation.Entities
+                .GetComponent<IntelligenceSignature>(
+                    target);
+        WorldTransform targetTransform =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    target);
+
+        scenario.Intelligence.BeginTick(
+            scenario.Simulation.CurrentTick);
+        scenario.Intelligence.Observe(
+            westFaction,
+            target,
+            signature,
+            targetTransform.Position,
+            IntelligenceState.Identified,
+            scenario.Simulation.CurrentTick);
+
+        PlayerCommandSubmissionReceipt receipt =
+            gateway.SubmitAttack(
+                scenario.West.Player,
+                [attacker],
+                target,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(receipt.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel accepted));
+        Assert.Equal(
+            PlayerCommandKind.Tactical,
+            accepted.Kind);
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            accepted.State);
+        Assert.Equal(
+            CombatOrderKind.Attack,
+            scenario.Simulation.Entities
+                .GetComponent<CombatOrderState>(
+                    attacker).Kind);
+
+        PlayerCommandSubmissionReceipt stale =
+            gateway.SubmitAttack(
+                scenario.West.Player,
+                [attacker],
+                target,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(stale.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel rejected));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Rejected,
+            rejected.State);
+        Assert.Equal(
+            PlayerTacticalActionFailureReason.TargetNotIdentified,
+            rejected.TacticalFailure);
+    }
+
+    [Fact]
+    public void TacticalAttackPublishesPartialResultForMixedSelection()
+    {
+        using VerticalSliceScenario scenario =
+            CreateHumanScenario(seed: 4115);
+        PlayerCommandGateway gateway =
+            CreateGateway(scenario);
+        EntityId attacker =
+            scenario.West.StartingUnits[0];
+        EntityId cargo =
+            scenario.West.StartingUnits[1];
+        EntityId foreign =
+            scenario.East.StartingUnits[1];
+        EntityId target =
+            scenario.East.StartingUnits[0];
+        FactionId westFaction =
+            new((uint)scenario.West.Player.Value);
+
+        IntelligenceSignature signature =
+            scenario.Simulation.Entities
+                .GetComponent<IntelligenceSignature>(
+                    target);
+        WorldTransform transform =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    target);
+        scenario.Intelligence.BeginTick(
+            scenario.Simulation.CurrentTick);
+        scenario.Intelligence.Observe(
+            westFaction,
+            target,
+            signature,
+            transform.Position,
+            IntelligenceState.Identified,
+            scenario.Simulation.CurrentTick);
+
+        PlayerCommandSubmissionReceipt receipt =
+            gateway.SubmitAttack(
+                scenario.West.Player,
+                [attacker, cargo, foreign],
+                target,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(receipt.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel result));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Partial,
+            result.State);
+        Assert.Equal(1, result.AcceptedTargets);
+        Assert.Equal(2, result.RejectedTargets);
+    }
+
+    [Fact]
+    public void TacticalMovementCommandsPreserveDistinctOrderSemantics()
+    {
+        using VerticalSliceScenario scenario =
+            CreateHumanScenario(seed: 4116);
+        PlayerCommandGateway gateway =
+            CreateGateway(scenario);
+        EntityId unit =
+            scenario.West.StartingUnits[0];
+        WorldTransform transform =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    unit);
+        Vector3 first =
+            transform.Position +
+            new Vector3(20.0f, 0.0f, 0.0f);
+        Vector3 second =
+            transform.Position +
+            new Vector3(0.0f, 0.0f, 20.0f);
+
+        Assert.True(
+            gateway.SubmitAttackMove(
+                scenario.West.Player,
+                [unit],
+                first,
+                scenario.Simulation.CurrentTick,
+                FormationTemplate.Line).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out _));
+
+        CombatOrderState order =
+            scenario.Simulation.Entities
+                .GetComponent<CombatOrderState>(
+                    unit);
+        Assert.Equal(
+            CombatOrderKind.AttackMove,
+            order.Kind);
+        Assert.Equal(
+            FormationTemplate.Line,
+            order.Formation);
+
+        Assert.True(
+            gateway.SubmitHoldPosition(
+                scenario.West.Player,
+                [unit],
+                scenario.Simulation.CurrentTick).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out _));
+        Assert.Equal(
+            CombatOrderKind.HoldPosition,
+            scenario.Simulation.Entities
+                .GetComponent<CombatOrderState>(
+                    unit).Kind);
+
+        Assert.True(
+            gateway.SubmitStopCombat(
+                scenario.West.Player,
+                [unit],
+                scenario.Simulation.CurrentTick).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out _));
+        Assert.Equal(
+            CombatOrderKind.Stop,
+            scenario.Simulation.Entities
+                .GetComponent<CombatOrderState>(
+                    unit).Kind);
+
+        Assert.True(
+            gateway.SubmitRetreat(
+                scenario.West.Player,
+                [unit],
+                second,
+                scenario.Simulation.CurrentTick,
+                FormationTemplate.Column).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out _));
+
+        order =
+            scenario.Simulation.Entities
+                .GetComponent<CombatOrderState>(
+                    unit);
+        Assert.Equal(
+            CombatOrderKind.Retreat,
+            order.Kind);
+        Assert.Equal(
+            FormationTemplate.Column,
+            order.Formation);
+    }
+
+    [Fact]
+    public void PlayerFireMissionUsesStoredContactCoordinate()
+    {
+        using VerticalSliceScenario scenario =
+            CreateHumanScenario(seed: 4117);
+        PlayerCommandGateway gateway =
+            CreateGateway(scenario);
+        EntityId target =
+            scenario.East.StartingUnits[0];
+        WorldTransform targetTransform =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    target);
+        Vector3 storedPosition =
+            targetTransform.Position;
+        Vector3 artilleryPosition =
+            storedPosition +
+            new Vector3(-180.0f, 0.0f, 0.0f);
+
+        Assert.True(
+            scenario.Terrain.TrySampleHeight(
+                artilleryPosition.X,
+                artilleryPosition.Z,
+                out float artilleryHeight));
+        artilleryPosition.Y =
+            artilleryHeight;
+
+        EntityId artillery =
+            scenario.UnitFactory.Create(
+                scenario.Services.UnitDefinitions[
+                    UnitIds.MobileArtillery],
+                artilleryPosition,
+                scenario.West.Player);
+        FactionId westFaction =
+            new((uint)scenario.West.Player.Value);
+        IntelligenceSignature signature =
+            scenario.Simulation.Entities
+                .GetComponent<IntelligenceSignature>(
+                    target);
+
+        scenario.Intelligence.BeginTick(
+            scenario.Simulation.CurrentTick);
+        scenario.Intelligence.Observe(
+            westFaction,
+            target,
+            signature,
+            storedPosition,
+            IntelligenceState.Detected,
+            scenario.Simulation.CurrentTick);
+
+        scenario.Simulation.Entities.SetComponent(
+            target,
+            targetTransform with
+            {
+                Position =
+                    storedPosition +
+                    new Vector3(60.0f, 0.0f, 0.0f)
+            });
+
+        IntelligenceContactKey key =
+            IntelligenceContactKey.FromEntity(
+                target);
+        PlayerCommandSubmissionReceipt receipt =
+            gateway.SubmitFireMission(
+                scenario.West.Player,
+                [artillery],
+                key,
+                requestedRounds: 1,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(receipt.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel result));
+        Assert.Equal(
+            PlayerCommandKind.Artillery,
+            result.Kind);
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            result.State);
+
+        FireMissionState mission =
+            scenario.Simulation.Entities
+                .GetComponent<FireMissionState>(
+                    artillery);
+        Assert.Equal(
+            key,
+            mission.ContactKey);
+        Assert.Equal(
+            storedPosition.X,
+            mission.TargetPosition.X,
+            precision: 3);
+        Assert.Equal(
+            storedPosition.Z,
+            mission.TargetPosition.Z,
+            precision: 3);
+        Assert.NotEqual(
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    target).Position.X,
+            mission.TargetPosition.X);
+    }
+
+    [Fact]
+    public void TacticalAttackRejectsDetectedDeadAndIncompatibleTargets()
+    {
+        using VerticalSliceScenario scenario =
+            CreateHumanScenario(seed: 4120);
+        PlayerCommandGateway gateway =
+            CreateGateway(scenario);
+        EntityId attacker =
+            scenario.West.StartingUnits[0];
+        EntityId target =
+            scenario.East.StartingUnits[0];
+        FactionId faction =
+            new((uint)scenario.West.Player.Value);
+        IntelligenceSignature targetSignature =
+            scenario.Simulation.Entities
+                .GetComponent<IntelligenceSignature>(
+                    target);
+        WorldTransform targetTransform =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    target);
+
+        scenario.Intelligence.BeginTick(
+            scenario.Simulation.CurrentTick);
+        scenario.Intelligence.Observe(
+            faction,
+            target,
+            targetSignature,
+            targetTransform.Position,
+            IntelligenceState.Detected,
+            scenario.Simulation.CurrentTick);
+
+        Assert.True(
+            gateway.SubmitAttack(
+                scenario.West.Player,
+                [attacker],
+                target,
+                scenario.Simulation.CurrentTick).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel detected));
+        Assert.Equal(
+            PlayerTacticalActionFailureReason.TargetNotIdentified,
+            detected.TacticalFailure);
+
+        IntelligenceSignature coreSignature =
+            scenario.Simulation.Entities
+                .GetComponent<IntelligenceSignature>(
+                    scenario.East.CommandCore);
+        WorldTransform coreTransform =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    scenario.East.CommandCore);
+        scenario.Intelligence.BeginTick(
+            scenario.Simulation.CurrentTick);
+        scenario.Intelligence.Observe(
+            faction,
+            scenario.East.CommandCore,
+            coreSignature,
+            coreTransform.Position,
+            IntelligenceState.Identified,
+            scenario.Simulation.CurrentTick);
+
+        Assert.True(
+            gateway.SubmitAttack(
+                scenario.West.Player,
+                [attacker],
+                scenario.East.CommandCore,
+                scenario.Simulation.CurrentTick).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel incompatible));
+        Assert.Equal(
+            PlayerTacticalActionFailureReason.UnsupportedTargetClass,
+            incompatible.TacticalFailure);
+
+        scenario.Intelligence.BeginTick(
+            scenario.Simulation.CurrentTick);
+        scenario.Intelligence.Observe(
+            faction,
+            target,
+            targetSignature,
+            targetTransform.Position,
+            IntelligenceState.Identified,
+            scenario.Simulation.CurrentTick);
+        Assert.True(
+            scenario.Simulation.Entities.DestroyEntity(
+                target));
+
+        Assert.True(
+            gateway.SubmitAttack(
+                scenario.West.Player,
+                [attacker],
+                target,
+                scenario.Simulation.CurrentTick).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel dead));
+        Assert.Equal(
+            PlayerTacticalActionFailureReason.TargetUnavailable,
+            dead.TacticalFailure);
+    }
+
+    [Fact]
+    public void PlayerArtilleryReportsRangeAndUsesNormalNoAmmoState()
+    {
+        using VerticalSliceScenario scenario =
+            CreateHumanScenario(seed: 4121);
+        PlayerCommandGateway gateway =
+            CreateGateway(scenario);
+        WorldTransform westCore =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    scenario.West.CommandCore);
+        Vector3 artilleryPosition =
+            westCore.Position +
+            new Vector3(120.0f, 0.0f, 0.0f);
+
+        Assert.True(
+            scenario.Terrain.TrySampleHeight(
+                artilleryPosition.X,
+                artilleryPosition.Z,
+                out float height));
+        artilleryPosition.Y = height + 1.4f;
+
+        EntityId artillery =
+            scenario.UnitFactory.Create(
+                scenario.Services.UnitDefinitions[
+                    UnitIds.MobileArtillery],
+                artilleryPosition,
+                scenario.West.Player);
+        EntityId contactEntity =
+            scenario.East.StartingUnits[0];
+        IntelligenceSignature signature =
+            scenario.Simulation.Entities
+                .GetComponent<IntelligenceSignature>(
+                    contactEntity);
+        FactionId faction =
+            new((uint)scenario.West.Player.Value);
+        IntelligenceContactKey key =
+            IntelligenceContactKey.FromEntity(
+                contactEntity);
+
+        scenario.Intelligence.BeginTick(
+            scenario.Simulation.CurrentTick);
+        scenario.Intelligence.Observe(
+            faction,
+            contactEntity,
+            signature,
+            artilleryPosition +
+                new Vector3(900.0f, 0.0f, 0.0f),
+            IntelligenceState.Detected,
+            scenario.Simulation.CurrentTick);
+
+        Assert.True(
+            gateway.SubmitFireMission(
+                scenario.West.Player,
+                [artillery],
+                key,
+                requestedRounds: 1,
+                scenario.Simulation.CurrentTick).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel outOfRange));
+        Assert.Equal(
+            PlayerTacticalActionFailureReason.ArtilleryOutOfRange,
+            outOfRange.TacticalFailure);
+
+        scenario.Intelligence.BeginTick(
+            scenario.Simulation.CurrentTick);
+        scenario.Intelligence.Observe(
+            faction,
+            contactEntity,
+            signature,
+            artilleryPosition +
+                new Vector3(180.0f, 0.0f, 0.0f),
+            IntelligenceState.Detected,
+            scenario.Simulation.CurrentTick);
+
+        PlayerCommandSubmissionReceipt disableAutomaticResupply =
+            gateway.SubmitAutomaticResupplyPolicy(
+                scenario.West.Player,
+                artillery,
+                ammunitionThreshold: 0.2,
+                fuelThreshold: 0.2,
+                enabled: false,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(disableAutomaticResupply.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel policyResult));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            policyResult.State);
+
+        AmmunitionState ammunition =
+            scenario.Simulation.Entities
+                .GetComponent<AmmunitionState>(
+                    artillery);
+        double quantity =
+            scenario.Inventories.GetQuantity(
+                ammunition.InventoryId,
+                ResourceIds.Ammunition);
+        Assert.True(
+            scenario.Inventories.Remove(
+                ammunition.InventoryId,
+                ResourceIds.Ammunition,
+                quantity).Succeeded);
+
+        Assert.True(
+            gateway.SubmitFireMission(
+                scenario.West.Player,
+                [artillery],
+                key,
+                requestedRounds: 1,
+                scenario.Simulation.CurrentTick).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel accepted));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            accepted.State);
+
+        ArtilleryWeaponDefinition artilleryWeapon =
+            scenario.Services.ArtilleryWeapons.GetRequired(
+                DirectorateContent.WeaponIds.MobileArtillery);
+
+        for (int tick = 0;
+             tick <= artilleryWeapon.AcquisitionTicks + 2 &&
+             scenario.Simulation.Entities
+                 .GetComponent<FireMissionState>(
+                     artillery).Status !=
+                 FireMissionStatus.NoAmmo;
+             tick++)
+        {
+            scenario.Simulation.AdvanceOneTick();
+        }
+
+        Assert.Equal(
+            FireMissionStatus.NoAmmo,
+            scenario.Simulation.Entities
+                .GetComponent<FireMissionState>(
+                    artillery).Status);
+    }
+
+    [Fact]
+    public void PlayerAttackNaturallyDestroysCommandCoreAndResolvesVictory()
+    {
+        using VerticalSliceScenario scenario =
+            CreateHumanScenario(seed: 4118);
+        PlayerCommandGateway gateway =
+            CreateGateway(scenario);
+        WorldTransform coreTransform =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    scenario.East.CommandCore);
+        var attackers =
+            new List<EntityId>();
+
+        for (int index = 0;
+             index < 2;
+             index++)
+        {
+            Vector3 position =
+                coreTransform.Position +
+                new Vector3(
+                    -140.0f,
+                    0.0f,
+                    -20.0f + index * 40.0f);
+
+            Assert.True(
+                scenario.Terrain.TrySampleHeight(
+                    position.X,
+                    position.Z,
+                    out float height));
+            position.Y = height + 1.5f;
+
+            attackers.Add(
+                scenario.UnitFactory.Create(
+                    scenario.Services.UnitDefinitions[
+                        UnitIds.MainBattleTank],
+                    position,
+                    scenario.West.Player));
+        }
+
+        FactionId westFaction =
+            new((uint)scenario.West.Player.Value);
+        IntelligenceSignature coreSignature =
+            scenario.Simulation.Entities
+                .GetComponent<IntelligenceSignature>(
+                    scenario.East.CommandCore);
+
+        scenario.Intelligence.BeginTick(
+            scenario.Simulation.CurrentTick);
+        scenario.Intelligence.Observe(
+            westFaction,
+            scenario.East.CommandCore,
+            coreSignature,
+            coreTransform.Position,
+            IntelligenceState.Identified,
+            scenario.Simulation.CurrentTick);
+
+        Assert.True(
+            gateway.SubmitAttack(
+                scenario.West.Player,
+                attackers.ToArray(),
+                scenario.East.CommandCore,
+                scenario.Simulation.CurrentTick).Accepted);
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel result));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            result.State);
+
+        for (int tick = 0;
+             tick < 1_500 &&
+             !scenario.GetMatchState().IsTerminal;
+             tick++)
+        {
+            scenario.Simulation.AdvanceOneTick();
+        }
+
+        MatchState match =
+            scenario.GetMatchState();
+
+        Assert.Equal(
+            MatchStatus.Victory,
+            match.Status);
+        Assert.Equal(
+            scenario.West.Player,
+            match.Winner);
+        Assert.False(
+            scenario.Simulation.Entities.IsAlive(
+                scenario.East.CommandCore));
+        Assert.True(
+            scenario.Services.TacticalCombat.Metrics
+                .EngagingUnits >= 0);
+    }
+
     private static VerticalSliceScenario CreateHumanScenario(
         ulong seed)
     {
@@ -574,7 +1261,13 @@ public sealed class PlayerCommandBoundaryTests
                 scenario.Simulation,
                 scenario.Services.BuildingCommands,
                 scenario.BattlefieldRuntime.MatchStateEntity,
-                maximumOutstanding);
+                maximumOutstanding,
+                intelligence:
+                    scenario.Intelligence,
+                weapons:
+                    scenario.Services.Weapons,
+                artilleryWeapons:
+                    scenario.Services.ArtilleryWeapons);
         scenario.Simulation.RegisterTickObserver(
             gateway);
         return gateway;

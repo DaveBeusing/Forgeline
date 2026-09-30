@@ -235,3 +235,13 @@ Benchmark timing remains measurement evidence rather than a hardware-sensitive C
 ## Deferred Work
 
 The first tactical layer deliberately leaves strategic/campaign AI, morale/suppression, veterancy, repair/recovery, advanced cover tactics, faction-specific doctrine, multiplayer, and final combat-command UI polish to later work.
+
+## Human Player Tactical Controls
+
+The human player uses the same authoritative tactical commands as the simulation systems: Attack, AttackMove, Stop, Hold Position, and Retreat. `K` opens the combat section of the shared action palette. `Tab` selects an action and `Enter` activates it. Attack, AttackMove, Retreat, and Fire Mission enter an explicit target mode; Stop, Hold Position, and fire-mission cancellation submit immediately. `F3` continues to cycle Compact, Line, Column, and Wedge and the selected formation is preserved for AttackMove and Retreat.
+
+`PlayerActionRequestDispatcher` and `PlayerActionRequest` live in the cross-platform game layer and are shared by the Windows client, interaction tests, and the bounded headless player-acceptance flow. They submit resolved player actions through `PlayerCommandGateway`; simulation commands remain the only tactical state authority. The gateway reports accepted, partial, and rejected target counts plus a causal tactical failure such as missing current identification, incompatible target class, unavailable artillery target, or range failure.
+
+Direct Attack requires a current identified hostile target. The command adapter revalidates liveness, faction, health, targetability, current identification, ownership of the selected units, and weapon effectiveness before creating the existing `AttackCommand`. A copied target row is therefore not authority to attack later after intelligence becomes stale.
+
+Stop and Hold remain distinct existing commands. Stop clears tactical intent through the existing stop semantics; Hold creates a stationary combat order that can engage in range without pursuing. Retreat continues to use real movement and can still interact with the existing supply/resupply systems rather than teleporting or restoring resources.

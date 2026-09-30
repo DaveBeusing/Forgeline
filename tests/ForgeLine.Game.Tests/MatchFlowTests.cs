@@ -1,3 +1,4 @@
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Ecs;
 using ForgeLine.Economy;
@@ -223,6 +224,37 @@ public sealed class MatchFlowTests
         Assert.NotEqual(
             west.NetworkId,
             east.NetworkId);
+    }
+
+    [Fact]
+    public void SkirmishCommandCoresAreNormalAuthoritativeCombatTargets()
+    {
+        SkirmishScenarioHarness harness =
+            SkirmishScenarioHarness.Create();
+        EntityId core =
+            harness.West.CommandCore;
+
+        Assert.True(
+            harness.Simulation.Entities
+                .HasComponent<Combatant>(
+                    core));
+        Assert.Equal(
+            TargetClass.Structure,
+            harness.Simulation.Entities
+                .GetComponent<Targetable>(
+                    core).Class);
+        HealthState health =
+            harness.Simulation.Entities
+                .GetComponent<HealthState>(
+                    core);
+
+        Assert.False(health.IsDepleted);
+        Assert.True(
+            health.Current > 0.0);
+        Assert.True(
+            harness.Simulation.Entities
+                .HasComponent<CombatHitbox>(
+                    core));
     }
 
     [Fact]

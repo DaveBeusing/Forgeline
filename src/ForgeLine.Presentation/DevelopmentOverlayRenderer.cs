@@ -40,7 +40,9 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         PlayerExperienceSnapshot? playerExperience = null,
         bool showDevelopmentMetrics = true,
         PlayerActionSnapshot? playerActions = null,
-        PlayerActionPanelView? actionPanel = null)
+        PlayerActionPanelView? actionPanel = null,
+        TacticalTargetingView? tacticalTargeting = null,
+        FormationTemplate activeFormation = FormationTemplate.Compact)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(context);
@@ -122,6 +124,17 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             EmitPlayerActions(
                 playerActions,
                 panelView,
+                activeFormation,
+                context.Width,
+                context.Height);
+        }
+
+        if (tacticalTargeting is
+                TacticalTargetingView targeting &&
+            targeting.IsActive)
+        {
+            EmitTacticalTargeting(
+                targeting,
                 context.Width,
                 context.Height);
         }
@@ -355,6 +368,8 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                         PlayerCommandFeedbackKind.UnitProduction => "UNITS ",
                         PlayerCommandFeedbackKind.Logistics => "LOGISTICS ",
                         PlayerCommandFeedbackKind.Supply => "SUPPLY ",
+                        PlayerCommandFeedbackKind.Tactical => "TACTICAL ",
+                        PlayerCommandFeedbackKind.Artillery => "ARTILLERY ",
                         _ => "ACTION "
                     });
 
@@ -387,6 +402,13 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                         builder.Append(" ");
                         builder.Append(
                             snapshot.Feedback.ActionFailure.ToString());
+                    }
+                    else if (snapshot.Feedback.TacticalFailure !=
+                             PlayerTacticalActionFailureReason.None)
+                    {
+                        builder.Append(" ");
+                        builder.Append(
+                            snapshot.Feedback.TacticalFailure.ToString());
                     }
                 }
             }
@@ -501,13 +523,14 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
     private void EmitPlayerActions(
         PlayerActionSnapshot actions,
         in PlayerActionPanelView panel,
+        FormationTemplate activeFormation,
         int width,
         int height)
     {
         if (!panel.IsOpen)
         {
             EmitText(
-                "B BUILD  P PROCESS  U UNITS  L LOGISTICS  Y SUPPLY".AsSpan(),
+                "B BUILD  P PROCESS  U UNITS  L LOGISTICS  Y SUPPLY  K COMBAT".AsSpan(),
                 panel.OriginX,
                 panel.OriginY,
                 new Vector4(0.78f, 0.86f, 0.95f, 1.0f),
@@ -530,6 +553,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                 PlayerActionPanelMode.UnitProduction => "UNITS",
                 PlayerActionPanelMode.Logistics => "LOGISTICS",
                 PlayerActionPanelMode.Supply => "SUPPLY",
+                PlayerActionPanelMode.Tactical => "COMBAT",
                 _ => "CLOSED"
             });
         builder.NewLine();
@@ -545,6 +569,12 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             builder.Append(panel.LogisticsPriority.ToString());
             builder.Append("  EDIT ");
             builder.Append(panel.StockThresholdField.ToString());
+        }
+        else if (panel.Mode == PlayerActionPanelMode.Tactical)
+        {
+            builder.Append("  FORMATION ");
+            builder.Append(activeFormation.ToString());
+            builder.Append("  F3 CYCLE");
         }
         else
         {
@@ -603,6 +633,13 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                     ref builder,
                     actions.Supply,
                     panel);
+                break;
+
+            case PlayerActionPanelMode.Tactical:
+                EmitTacticalActions(
+                    ref builder,
+                    actions.Tactical,
+                    panel.SelectedIndex);
                 break;
         }
 
@@ -1025,6 +1062,157 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         builder.NewLine();
         builder.Append("M TOGGLE AUTO  LEFT/RIGHT ADJUST");
         builder.NewLine();
+    }
+
+    private static void EmitTacticalActions(
+        ref OverlayTextBuilder builder,
+        PlayerTacticalActionReadModel? tactical,
+        int selectedIndex)
+    {
+        if (tactical is null)
+        {
+            builder.Append("SELECT OWNED UNITS");
+            builder.NewLine();
+            return;
+        }
+
+        builder.Append("SELECTED ");
+        builder.Append(tactical.RequestedSelectionCount);
+        builder.Append("  COMBAT ");
+        builder.Append(tactical.CombatEligibleCount);
+        builder.Append("  REJECTED ");
+        builder.Append(tactical.RejectedSelectionCount);
+        builder.NewLine();
+
+        builder.Append("INTEL TARGETS ");
+        builder.Append(tactical.Targets.Count);
+        builder.Append("  ARTILLERY ");
+        builder.Append(tactical.Artillery.Count);
+        builder.Append("  SUPPLY CRIT ");
+        builder.Append(tactical.CriticalSupplyCount);
+        builder.Append("  RESUPPLY ");
+        builder.Append(tactical.ResupplyingCount);
+        builder.NewLine();
+
+        builder.Append("ORDER ");
+        if (tactical.MixedOrderState)
+        {
+            builder.Append("MIXED");
+        }
+        else if (tactical.HasCommonOrder)
+        {
+            builder.Append(tactical.CurrentOrder.ToString());
+            builder.Append(" ");
+            builder.Append(tactical.CurrentStatus.ToString());
+        }
+        else
+        {
+            builder.Append("NONE");
+        }
+
+        builder.NewLine();
+
+        string[] rows =
+        [
+            "ATTACK TARGET",
+            "ATTACK MOVE",
+            "STOP",
+            "HOLD POSITION",
+            "RETREAT",
+            "FIRE MISSION",
+            "CANCEL FIRE MISSION"
+        ];
+
+        for (int index = 0;
+             index < rows.Length;
+             index++)
+        {
+            builder.Append(
+                index == selectedIndex
+                    ? "X "
+                    : "  ");
+            builder.Append(rows[index]);
+            builder.NewLine();
+        }
+
+        if (tactical.Artillery.Count > 0)
+        {
+            PlayerArtilleryActionReadModel artillery =
+                tactical.Artillery[0];
+            builder.Append("ARTY AMMO ");
+            builder.Append(artillery.AmmunitionQuantity, "F0");
+            builder.Append("/");
+            builder.Append(artillery.AmmunitionCapacity, "F0");
+            builder.Append(" RANGE ");
+            builder.Append(artillery.MinimumRangeMeters, "F0");
+            builder.Append("-");
+            builder.Append(artillery.MaximumRangeMeters, "F0");
+            builder.Append(" ");
+            builder.Append(artillery.MissionStatus.ToString());
+            builder.NewLine();
+        }
+    }
+
+    private void EmitTacticalTargeting(
+        in TacticalTargetingView targeting,
+        int width,
+        int height)
+    {
+        Span<char> buffer =
+            stackalloc char[512];
+        var builder =
+            new OverlayTextBuilder(buffer);
+
+        builder.Append("TARGET MODE ");
+        builder.Append(
+            targeting.Mode switch
+            {
+                TacticalTargetingMode.Attack => "ATTACK",
+                TacticalTargetingMode.AttackMove => "ATTACK MOVE",
+                TacticalTargetingMode.Retreat => "RETREAT",
+                TacticalTargetingMode.FireMission => "FIRE MISSION",
+                _ => "NONE"
+            });
+        builder.NewLine();
+
+        builder.Append(
+            targeting.Mode switch
+            {
+                TacticalTargetingMode.Attack =>
+                    "CLICK CURRENT IDENTIFIED ENEMY",
+                TacticalTargetingMode.FireMission =>
+                    "CLICK KNOWN CONTACT OR VISIBLE GROUND",
+                _ =>
+                    "CLICK GROUND DESTINATION"
+            });
+        builder.NewLine();
+        builder.Append("ESC CANCEL  SELECTED ");
+        builder.Append(targeting.SelectedEntityCount);
+
+        if (targeting.Mode == TacticalTargetingMode.Attack)
+        {
+            builder.Append("  TARGETS ");
+            builder.Append(targeting.AvailableAttackTargets);
+        }
+        else if (targeting.Mode == TacticalTargetingMode.FireMission)
+        {
+            builder.Append("  CONTACTS ");
+            builder.Append(targeting.KnownContacts);
+            builder.Append("  ROUNDS ");
+            builder.Append(targeting.RequestedRounds);
+        }
+
+        EmitText(
+            builder.Written,
+            MathF.Max(
+                12.0f,
+                width * 0.5f - 210.0f),
+            MathF.Max(
+                12.0f,
+                height - 76.0f),
+            new Vector4(0.98f, 0.78f, 0.18f, 1.0f),
+            width,
+            height);
     }
 
     private static void AppendAmounts(

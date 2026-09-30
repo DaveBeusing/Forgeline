@@ -12,6 +12,10 @@ public sealed class InputState
     private Vector2 _pointerPosition;
     private Vector2 _pointerDelta;
     private int _wheelDelta;
+    private bool _focusLostThisFrame;
+
+    public bool FocusLostThisFrame =>
+        _focusLostThisFrame;
 
     public bool HasPointerPosition => _hasPointerPosition;
 
@@ -25,6 +29,7 @@ public sealed class InputState
     {
         _pointerDelta = Vector2.Zero;
         _wheelDelta = 0;
+        _focusLostThisFrame = false;
     }
 
     public void Apply(PlatformInputEvent inputEvent)
@@ -68,6 +73,7 @@ public sealed class InputState
 
             case PlatformInputEventKind.FocusLost:
                 Reset();
+                _focusLostThisFrame = true;
                 break;
 
             default:
@@ -90,6 +96,7 @@ public sealed class InputState
         _hasPointerPosition = false;
         _pointerDelta = Vector2.Zero;
         _wheelDelta = 0;
+        _focusLostThisFrame = false;
     }
 
     private void UpdatePointerPosition(int x, int y, bool accumulateDelta)

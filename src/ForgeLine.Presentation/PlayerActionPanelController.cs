@@ -3,6 +3,7 @@ using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Game;
 using ForgeLine.Input;
+using ForgeLine.Intelligence;
 using ForgeLine.Platform;
 using ForgeLine.Simulation;
 
@@ -15,7 +16,8 @@ public enum PlayerActionPanelMode : byte
     Production = 2,
     UnitProduction = 3,
     Logistics = 4,
-    Supply = 5
+    Supply = 5,
+    Tactical = 6
 }
 
 public enum PlayerStockThresholdField : byte
@@ -23,224 +25,6 @@ public enum PlayerStockThresholdField : byte
     Minimum = 0,
     Target = 1,
     Maximum = 2
-}
-
-public enum PlayerActionRequestKind : byte
-{
-    None = 0,
-    BeginBuildingPlacement = 1,
-    QueueProduction = 2,
-    SetProductionPaused = 3,
-    CancelProduction = 4,
-    QueueUnitProduction = 5,
-    CancelUnitProduction = 6,
-    SetStockPolicy = 7,
-    RemoveStockPolicy = 8,
-    SetAutomaticResupplyPolicy = 9,
-    RequestResupply = 10
-}
-
-public readonly record struct PlayerActionRequest(
-    PlayerActionRequestKind Kind,
-    BuildingId BuildingId,
-    EntityId Facility,
-    RecipeId RecipeId,
-    UnitId UnitId,
-    EntityId RequestEntity,
-    bool Paused,
-    ProductionPriority Priority,
-    ProductionRequestMode ProductionMode,
-    ResourceId DesiredStockResourceId,
-    double DesiredStockQuantity,
-    ResourceId StockResourceId = default,
-    double StockMinimum = 0.0,
-    double StockTarget = 0.0,
-    double StockMaximum = 0.0,
-    LogisticsStockPriority StockPriority = LogisticsStockPriority.Normal,
-    bool Enabled = true,
-    double AutomaticFuelThreshold = 0.0,
-    double AutomaticAmmunitionThreshold = 0.0)
-{
-    public static PlayerActionRequest BeginBuildingPlacement(
-        BuildingId buildingId) =>
-        new(
-            PlayerActionRequestKind.BeginBuildingPlacement,
-            buildingId,
-            EntityId.Invalid,
-            RecipeId.None,
-            UnitId.None,
-            EntityId.Invalid,
-            false,
-            ProductionPriority.Normal,
-            ProductionRequestMode.OneShot,
-            ResourceId.None,
-            0.0);
-
-    public static PlayerActionRequest QueueProduction(
-        EntityId facility,
-        RecipeId recipeId,
-        ProductionPriority priority,
-        ProductionRequestMode mode,
-        ResourceId desiredStockResourceId,
-        double desiredStockQuantity) =>
-        new(
-            PlayerActionRequestKind.QueueProduction,
-            BuildingId.None,
-            facility,
-            recipeId,
-            UnitId.None,
-            EntityId.Invalid,
-            false,
-            priority,
-            mode,
-            desiredStockResourceId,
-            desiredStockQuantity);
-
-    public static PlayerActionRequest SetProductionPaused(
-        EntityId requestEntity,
-        bool paused) =>
-        new(
-            PlayerActionRequestKind.SetProductionPaused,
-            BuildingId.None,
-            EntityId.Invalid,
-            RecipeId.None,
-            UnitId.None,
-            requestEntity,
-            paused,
-            ProductionPriority.Normal,
-            ProductionRequestMode.OneShot,
-            ResourceId.None,
-            0.0);
-
-    public static PlayerActionRequest CancelProduction(
-        EntityId requestEntity) =>
-        new(
-            PlayerActionRequestKind.CancelProduction,
-            BuildingId.None,
-            EntityId.Invalid,
-            RecipeId.None,
-            UnitId.None,
-            requestEntity,
-            false,
-            ProductionPriority.Normal,
-            ProductionRequestMode.OneShot,
-            ResourceId.None,
-            0.0);
-
-    public static PlayerActionRequest QueueUnitProduction(
-        EntityId facility,
-        UnitId unitId,
-        ProductionPriority priority) =>
-        new(
-            PlayerActionRequestKind.QueueUnitProduction,
-            BuildingId.None,
-            facility,
-            RecipeId.None,
-            unitId,
-            EntityId.Invalid,
-            false,
-            priority,
-            ProductionRequestMode.OneShot,
-            ResourceId.None,
-            0.0);
-
-    public static PlayerActionRequest CancelUnitProduction(
-        EntityId requestEntity) =>
-        new(
-            PlayerActionRequestKind.CancelUnitProduction,
-            BuildingId.None,
-            EntityId.Invalid,
-            RecipeId.None,
-            UnitId.None,
-            requestEntity,
-            false,
-            ProductionPriority.Normal,
-            ProductionRequestMode.OneShot,
-            ResourceId.None,
-            0.0);
-
-    public static PlayerActionRequest SetStockPolicy(
-        EntityId target,
-        ResourceId resourceId,
-        double minimum,
-        double desiredTarget,
-        double maximum,
-        LogisticsStockPriority priority,
-        bool enabled) =>
-        new(
-            PlayerActionRequestKind.SetStockPolicy,
-            BuildingId.None,
-            target,
-            RecipeId.None,
-            UnitId.None,
-            EntityId.Invalid,
-            false,
-            ProductionPriority.Normal,
-            ProductionRequestMode.OneShot,
-            ResourceId.None,
-            0.0,
-            resourceId,
-            minimum,
-            desiredTarget,
-            maximum,
-            priority,
-            enabled);
-
-    public static PlayerActionRequest RemoveStockPolicy(
-        EntityId policyEntity) =>
-        new(
-            PlayerActionRequestKind.RemoveStockPolicy,
-            BuildingId.None,
-            EntityId.Invalid,
-            RecipeId.None,
-            UnitId.None,
-            policyEntity,
-            false,
-            ProductionPriority.Normal,
-            ProductionRequestMode.OneShot,
-            ResourceId.None,
-            0.0);
-
-    public static PlayerActionRequest SetAutomaticResupplyPolicy(
-        EntityId target,
-        double fuelThreshold,
-        double ammunitionThreshold,
-        bool enabled) =>
-        new(
-            PlayerActionRequestKind.SetAutomaticResupplyPolicy,
-            BuildingId.None,
-            target,
-            RecipeId.None,
-            UnitId.None,
-            EntityId.Invalid,
-            false,
-            ProductionPriority.Normal,
-            ProductionRequestMode.OneShot,
-            ResourceId.None,
-            0.0,
-            ResourceId.None,
-            0.0,
-            0.0,
-            0.0,
-            LogisticsStockPriority.Normal,
-            enabled,
-            fuelThreshold,
-            ammunitionThreshold);
-
-    public static PlayerActionRequest RequestResupply(
-        EntityId target) =>
-        new(
-            PlayerActionRequestKind.RequestResupply,
-            BuildingId.None,
-            target,
-            RecipeId.None,
-            UnitId.None,
-            EntityId.Invalid,
-            false,
-            ProductionPriority.Normal,
-            ProductionRequestMode.OneShot,
-            ResourceId.None,
-            0.0);
 }
 
 public readonly record struct PlayerActionPanelView(
@@ -353,6 +137,12 @@ public sealed class PlayerActionPanelController
         {
             ToggleMode(
                 PlayerActionPanelMode.Supply);
+        }
+
+        if (Pressed(input, PlatformKey.K))
+        {
+            ToggleMode(
+                PlayerActionPanelMode.Tactical);
         }
 
         if (Mode != PlayerActionPanelMode.Closed &&
@@ -671,6 +461,11 @@ public sealed class PlayerActionPanelController
                 ActivateSupply(
                     actions.Supply);
                 break;
+
+            case PlayerActionPanelMode.Tactical:
+                ActivateTactical(
+                    actions.Tactical);
+                break;
         }
     }
 
@@ -823,6 +618,54 @@ public sealed class PlayerActionPanelController
                 _automaticFuelThreshold,
                 _automaticAmmunitionThreshold,
                 _automaticResupplyEnabled);
+    }
+
+    private void ActivateTactical(
+        PlayerTacticalActionReadModel? tactical)
+    {
+        if (tactical is null ||
+            SelectedIndex < 0 ||
+            SelectedIndex >= 7)
+        {
+            return;
+        }
+
+        PlayerActionRequest request =
+            SelectedIndex switch
+            {
+                0 =>
+                    PlayerActionRequest.BeginAttackTargeting(
+                        tactical.SelectedEntities),
+                1 =>
+                    PlayerActionRequest.BeginAttackMoveTargeting(
+                        tactical.SelectedEntities),
+                2 =>
+                    PlayerActionRequest.StopCombat(
+                        tactical.SelectedEntities),
+                3 =>
+                    PlayerActionRequest.HoldPosition(
+                        tactical.SelectedEntities),
+                4 =>
+                    PlayerActionRequest.BeginRetreatTargeting(
+                        tactical.SelectedEntities),
+                5 =>
+                    PlayerActionRequest.BeginFireMissionTargeting(
+                        tactical.SelectedEntities),
+                6 =>
+                    PlayerActionRequest.CancelFireMission(
+                        tactical.SelectedEntities),
+                _ =>
+                    default
+            };
+
+        if (request.Kind ==
+            PlayerActionRequestKind.None)
+        {
+            return;
+        }
+
+        _pendingRequest = request;
+        Close();
     }
 
     private void CancelSelected(
@@ -1177,6 +1020,10 @@ public sealed class PlayerActionPanelController
                 actions?.Supply is null
                     ? 0
                     : 3,
+            PlayerActionPanelMode.Tactical =>
+                actions?.Tactical is null
+                    ? 0
+                    : 7,
             _ =>
                 0
         };
