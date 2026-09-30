@@ -21,9 +21,9 @@ Central Divide defines eight stable terrain material slots:
 | Concrete | `material.world.terrain.concrete` |
 | Scorched / battle-damaged | `material.world.terrain.scorched` |
 
-`TerrainPresentationProfile` resolves the base slope/elevation treatment and explicit Central Divide blend regions for roads, industrial areas, the North Bridge concrete apron, and a scorched combat area. The profile is converted into terrain vertex presentation data when chunk GPU buffers are created, so simulation/world terrain remains material-agnostic.
+`TerrainPresentationProfile` resolves the base slope/elevation treatment and explicit Central Divide blend regions for roads, industrial areas, the North Bridge concrete apron, and a scorched combat area. When a compiled `RuntimeAssetCatalog` is available, the profile reads base-color, roughness, and metallic factors from the material `.flasset` payloads before terrain chunk GPU buffers are created. Simulation/world terrain therefore remains material-agnostic and runtime never opens authoring files.
 
-A deterministic Dirt material is used as the missing-slot fallback. This keeps incomplete development profiles renderable without silently loading source files.
+The authored profile values remain deterministic development fallbacks. A deterministic Dirt definition is also used for a missing slot, so incomplete runtime catalogs remain renderable without silently loading source files.
 
 ## Decals
 
@@ -46,7 +46,7 @@ The first repeat-friendly prop catalog contains rock, barrier, concrete block, c
 
 Vegetation currently contains conifer, scrub, and grass-clump families. Central Divide places representative instances in the canonical map definition.
 
-Repeated world objects share compiled mesh resources through `RuntimeWorldAssetResources`. Runtime vertex/index buffers are cached by stable asset ID instead of being rebuilt per entity. The current generic renderer still submits one draw per visible entity; true GPU instance-buffer batching remains a benchmark-driven renderer optimization rather than an authoring requirement.
+Repeated world objects share compiled mesh resources through `RuntimeWorldAssetResources`. Runtime vertex/index buffers are cached by stable asset ID instead of being rebuilt per entity. Visible instances are grouped by the resolved runtime mesh and selected LOD, while transform and tint are uploaded through a per-swap-chain-frame instance stream. Each group is submitted with one indexed instanced draw, so repeated props, vegetation, deposits, and shared decal geometry no longer require one draw call per entity.
 
 ## LOD
 
@@ -127,6 +127,8 @@ The repository validates this baseline through:
 - resource state extraction tests;
 - resource inspection tests that verify deposits do not enter command selection;
 - LOD and strategic-symbol lookup tests;
+- compiled terrain-material resolution with deterministic missing-material fallback;
+- repeated-instance batching that verifies multiple visible instances share one instanced draw;
 - canonical map/runtime tests for Rare Elements and spawned world-presentation entities;
 - the existing Windows graphics smoke and 1,000-instance render-stress path, now run after runtime asset compilation.
 
