@@ -2,6 +2,7 @@ using System.Numerics;
 using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
+using ForgeLine.Intelligence;
 using ForgeLine.Simulation;
 using ForgeLine.World;
 using Xunit;
@@ -220,6 +221,78 @@ public sealed class CombatExecutionSystemTests
                 combatEvent.Type ==
                 CombatEventType.EntityDestroyed &&
                 combatEvent.Target == scenario.Target);
+    }
+
+    [Fact]
+    public void DestroyedUnitLeavesPresentationOnlyWreckIdentity()
+    {
+        CombatScenario scenario =
+            CreateScenario(
+                CreateHitscanWeapon(
+                    damage: 100.0),
+                shooterAmmunition: 1.0,
+                targetPosition:
+                    new Vector3(
+                        5.0f,
+                        0.0f,
+                        0.0f),
+                targetHealth: 50.0);
+
+        WorldTransform transform =
+            scenario.Simulation.Entities.GetComponent<WorldTransform>(
+                scenario.Target);
+
+        scenario.Simulation.Entities.AddComponent(
+            scenario.Target,
+            new UnitIdentity(
+                UnitIds.MainBattleTank,
+                DirectorateContent.FactionId));
+        scenario.Simulation.Entities.AddComponent(
+            scenario.Target,
+            new VisualIdentity(
+                204));
+        scenario.Simulation.Entities.AddComponent(
+            scenario.Target,
+            new IntelligenceSignature(
+                RedFaction,
+                UnitIds.MainBattleTank.Value));
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.False(
+            scenario.Simulation.Entities.IsAlive(
+                scenario.Target));
+
+        EntityId wreck =
+            Assert.Single(
+                scenario.Simulation.Entities.Query<UnitWreckPresentationIdentity>());
+
+        UnitWreckPresentationIdentity identity =
+            scenario.Simulation.Entities.GetComponent<UnitWreckPresentationIdentity>(
+                wreck);
+
+        Assert.Equal(
+            UnitIds.MainBattleTank,
+            identity.UnitId);
+        Assert.Equal(
+            DirectorateContent.FactionId,
+            identity.ContentFaction);
+        Assert.Equal(
+            transform,
+            scenario.Simulation.Entities.GetComponent<WorldTransform>(
+                wreck));
+        Assert.True(
+            scenario.Simulation.Entities.HasComponent<VisualIdentity>(
+                wreck));
+        Assert.True(
+            scenario.Simulation.Entities.HasComponent<IntelligenceSignature>(
+                wreck));
+        Assert.False(
+            scenario.Simulation.Entities.HasComponent<ControllableEntity>(
+                wreck));
+        Assert.False(
+            scenario.Simulation.Entities.HasComponent<Combatant>(
+                wreck));
     }
 
     [Fact]
