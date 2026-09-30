@@ -142,8 +142,7 @@ public static class RuntimeAssetQualification
             catch (Exception exception) when (
                 exception is IOException or
                 UnauthorizedAccessException or
-                InvalidDataException or
-                EndOfStreamException)
+                InvalidDataException)
             {
                 issues.Add(
                     new RuntimeAssetQualificationIssue(
