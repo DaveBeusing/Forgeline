@@ -31,30 +31,44 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
     public bool TryGetMesh(
         in WorldFeaturePresentationMetadata feature,
         WorldAssetLod lod,
-        out RuntimeMeshBuffers mesh)
+        out RuntimeMeshBuffers mesh) =>
+        TryGetMesh(
+            feature,
+            lod,
+            out mesh,
+            out _);
+
+    public bool TryGetMesh(
+        in WorldFeaturePresentationMetadata feature,
+        WorldAssetLod lod,
+        out RuntimeMeshBuffers mesh,
+        out AssetId assetId)
     {
         ThrowIfDisposed();
 
         if (!feature.IsSpecified)
         {
             mesh = default;
+            assetId = default;
             return false;
         }
 
         WorldPresentationDefinition definition =
             WorldPresentationCatalog.Get(
                 feature.Visual);
-        string assetId =
+        string assetIdValue =
             lod == WorldAssetLod.Reduced
                 ? definition.ReducedLodAssetId
                 : definition.MeshAssetId;
         AssetId id =
-            AssetId.Parse(assetId);
+            AssetId.Parse(
+                assetIdValue);
 
         if (_meshes.TryGetValue(
                 id,
                 out mesh))
         {
+            assetId = id;
             return true;
         }
 
@@ -65,17 +79,20 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
             record.Type != RuntimeAssetType.Mesh)
         {
             mesh = default;
+            assetId = default;
             return false;
         }
 
         RuntimeAssetContent content =
-            _catalog.Read(id);
+            _catalog.Read(
+                id);
         mesh =
             CreateMeshBuffers(
                 content.Payload);
         _meshes.Add(
             id,
             mesh);
+        assetId = id;
         return true;
     }
 
