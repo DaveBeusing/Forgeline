@@ -192,3 +192,9 @@ The Windows client smoke path exercises actual terrain shader compilation, pipel
 - visible terrain chunk render-submission preparation and command dispatch through a no-op graphics backend
 
 Benchmark timing is measurement evidence and is not a hardware-sensitive CI pass/fail threshold.
+
+## Vertical Slice presentation baseline
+
+Central Divide now has a presentation layer above the simulation-owned chunked heightfield. Eight stable terrain material slots, map-specific blend regions, reusable world objects, decals, and vegetation are defined without adding material state to `TerrainWorld` or `TerrainChunk`.
+
+Terrain colors are resolved by `TerrainPresentationProfile` while chunk GPU buffers are created. World props and vegetation remain ordinary presentation entities using compiled runtime assets and shared cached mesh buffers. See [World Asset Presentation](WorldAssetPresentation.md) for the stable IDs, LOD policy, map authoring examples, and current renderer boundary.
