@@ -27,10 +27,16 @@ public readonly record struct UnitPresentationDefinition(
     string CollisionAssetId,
     string StrategicSymbolAssetId,
     Vector4 FallbackTint,
+    string? TurretMeshAssetId,
+    Vector3 TurretPivot,
     float Lod1DistanceMeters,
     float Lod2DistanceMeters,
     IReadOnlyList<string> RequiredSockets)
 {
+    public bool HasArticulatedTurret =>
+        !string.IsNullOrWhiteSpace(
+            TurretMeshAssetId);
+
     public string GetMeshAssetId(UnitAssetLod lod) =>
         lod switch
         {
@@ -43,7 +49,8 @@ public readonly record struct UnitPresentationDefinition(
 
 public readonly record struct UnitFeaturePresentationMetadata(
     UnitId Unit,
-    UnitPresentationDamageState DamageState)
+    UnitPresentationDamageState DamageState,
+    float AimYawRadians = 0.0f)
 {
     public static UnitFeaturePresentationMetadata None => default;
 
@@ -160,6 +167,17 @@ public static class UnitPresentationCatalog
             140.0f,
             380.0f,
             ["turret_pivot", "gun_pivot", "weapon_muzzle", "recoil_anchor"]);
+        result[UnitIds.MainBattleTank] =
+            result[UnitIds.MainBattleTank] with
+            {
+                TurretMeshAssetId =
+                    "unit.directorate.main_battle_tank.turret",
+                TurretPivot =
+                    new Vector3(
+                        0.0f,
+                        0.10f,
+                        0.02f)
+            };
         Add(
             UnitIds.MobileArtillery,
             "self_propelled_artillery",
@@ -203,6 +221,8 @@ public static class UnitPresentationCatalog
                     $"unit.directorate.{name}.collision",
                     $"material.directorate.symbol.{name}",
                     tint,
+                    null,
+                    Vector3.Zero,
                     lod1Distance,
                     lod2Distance,
                     requiredSockets));
