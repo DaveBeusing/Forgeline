@@ -1,0 +1,5 @@
+{
+  "id": "ui.icon.minimap.friendly_unit",
+  "type": "material",
+  "source": "friendly.material.json"
+}
