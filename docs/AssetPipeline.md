@@ -276,3 +276,12 @@ The first authored world set lives below `assets/source/world/`. It includes the
 These files are normal compiler inputs. CI compiles the source tree into ignored `assets/runtime/` output before the Windows graphics smoke test. The client consumes only the runtime manifest and `.flasset` payloads; it does not read glTF or material-source JSON at runtime.
 
 See [World Asset Presentation](WorldAssetPresentation.md) for how stable world asset IDs map to Central Divide presentation data.
+
+
+## Committed Directorate Vertical Slice unit assets
+
+The first production-oriented gameplay-unit set lives below `assets/source/units/directorate/`. Six unit families provide stable LOD0/LOD1/LOD2 meshes, separate collision assets, runtime materials, strategic-symbol materials, and required gameplay-facing sockets. The existing Combat Engineer reuses the Rifle Squad visual family rather than creating a duplicate asset lineage.
+
+The runtime animation asset type is still intentionally absent, so unit source metadata does not claim unsupported animation references. Articulation and VFX integration points are established through named sockets instead.
+
+See [Directorate Unit Assets](DirectorateUnitAssets.md) for the complete unit presentation contract.
