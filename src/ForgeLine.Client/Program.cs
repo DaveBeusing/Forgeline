@@ -9,7 +9,11 @@ internal static class Program
     [STAThread]
     public static int Main(string[] args)
     {
-        if (!TryParseArguments(args, out bool smokeTest, out int renderInstanceCount))
+        if (!TryParseArguments(
+                args,
+                out bool smokeTest,
+                out int renderInstanceCount,
+                out string? visualQualificationOutput))
         {
             return 2;
         }
@@ -25,7 +29,8 @@ internal static class Program
                 int result =
                     application.Run(
                         smokeTest,
-                        renderInstanceCount);
+                        renderInstanceCount,
+                        visualQualificationOutput);
 
                 if (smokeTest ||
                     result !=
@@ -46,10 +51,12 @@ internal static class Program
     private static bool TryParseArguments(
         string[] args,
         out bool smokeTest,
-        out int renderInstanceCount)
+        out int renderInstanceCount,
+        out string? visualQualificationOutput)
     {
         smokeTest = false;
         renderInstanceCount = DefaultRenderInstanceCount;
+        visualQualificationOutput = null;
 
         for (int index = 0; index < args.Length; index++)
         {
@@ -75,6 +82,26 @@ internal static class Program
                 continue;
             }
 
+            if (string.Equals(
+                    argument,
+                    "--visual-qualification-output",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                if (index + 1 >= args.Length ||
+                    args[index + 1].StartsWith(
+                        "--",
+                        StringComparison.Ordinal))
+                {
+                    Console.Error.WriteLine(
+                        "--visual-qualification-output requires a file path.");
+                    return false;
+                }
+
+                visualQualificationOutput =
+                    args[++index];
+                continue;
+            }
+
             if (string.Equals(argument, "--help", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(argument, "-h", StringComparison.OrdinalIgnoreCase))
             {
@@ -93,6 +120,7 @@ internal static class Program
     private static void WriteUsage(TextWriter writer)
     {
         writer.WriteLine(
-            "ForgeLine.Client [--smoke-test] [--render-stress <instances>]");
+            "ForgeLine.Client [--smoke-test] [--render-stress <instances>] " +
+            "[--visual-qualification-output <report.json>]");
     }
 }
