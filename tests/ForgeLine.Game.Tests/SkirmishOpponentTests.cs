@@ -377,6 +377,22 @@ public sealed class SkirmishOpponentTests
     }
 
     [Fact]
+    public void NonDecisionAssessmentSuppressionReducesCurrentThreadAllocations()
+    {
+        long assessmentEnabled =
+            MeasureNonDecisionAllocations(
+                enableOpponentDebugCapture: true);
+        long assessmentSuppressed =
+            MeasureNonDecisionAllocations(
+                enableOpponentDebugCapture: false);
+
+        Assert.True(
+            assessmentSuppressed <
+            assessmentEnabled,
+            $"Expected cadence suppression to reduce current-thread allocation; enabled={assessmentEnabled}; suppressed={assessmentSuppressed}.");
+    }
+
+    [Fact]
     public void OpponentScratchStateFollowsControllerLifetime()
     {
         using VerticalSliceScenario scenario =
@@ -485,6 +501,29 @@ public sealed class SkirmishOpponentTests
                 scenario.West.Faction) > 0 ||
             scenario.Intelligence.GetContactCount(
                 scenario.East.Faction) > 0);
+    }
+
+    private static long MeasureNonDecisionAllocations(
+        bool enableOpponentDebugCapture)
+    {
+        using VerticalSliceScenario scenario =
+            CreateMeasuredScenario(
+                enableOpponentDebugCapture);
+
+        scenario.Simulation.RunTicks(
+            3,
+            TestContext.Current.CancellationToken);
+
+        long before =
+            GC.GetAllocatedBytesForCurrentThread();
+
+        scenario.Simulation.RunTicks(
+            5,
+            TestContext.Current.CancellationToken);
+
+        return
+            GC.GetAllocatedBytesForCurrentThread() -
+            before;
     }
 
     private static VerticalSliceScenario CreateMeasuredScenario(
