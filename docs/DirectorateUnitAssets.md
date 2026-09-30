@@ -79,15 +79,16 @@ The Asset Compiler stores these sockets in the runtime manifest. The weapon/VFX 
 
 The current runtime asset contract does not yet contain an animation asset type and the compiler intentionally rejects animation references. This package therefore does not invent unsupported animation metadata.
 
-The Directorate assets establish articulation anchors needed for later supported motion:
+The Main Battle Tank already uses the articulation contract for its LOD0 turret. LOD0 is authored as a hull mesh plus `unit.directorate.main_battle_tank.turret`. `PresentationExtractor` derives relative horizontal aim yaw from the authoritative `WeaponState` target and unit transforms, and the renderer rotates the turret mesh around `turret_pivot`. LOD1 and LOD2 remain combined silhouette meshes to avoid strategic-distance attachment overhead.
 
-- turret rotation around `turret_pivot`;
-- gun elevation around `gun_pivot`;
-- weapon recoil from `recoil_anchor`;
-- projectile/VFX origin at `weapon_muzzle`;
-- sensor motion around `sensor_origin`.
+The remaining anchors establish supported integration points without pretending that the engine owns systems it does not yet have:
 
-Infantry remains a static authored silhouette until the engine owns a real animation/skeleton runtime contract. Gameplay simulation remains unaffected.
+- gun elevation may later rotate around `gun_pivot`;
+- weapon recoil may later use `recoil_anchor`;
+- projectile/VFX origin resolves at `weapon_muzzle`;
+- sensor motion may later use `sensor_origin`.
+
+Gun elevation and recoil are not simulated presentation states in this package because the current gameplay/runtime contracts do not publish those values. Infantry remains a static authored silhouette until the engine owns a real animation/skeleton runtime contract. Gameplay simulation remains unaffected.
 
 ## Materials and damage states
 
@@ -131,9 +132,10 @@ Normal unit selection continues to use the existing `ControllableEntity` metadat
 3. resolves the stable runtime mesh from `RuntimeAssetCatalog`;
 4. resolves the compiled material tint;
 5. applies authoritative damage-state presentation;
-6. batches identical runtime meshes through the existing indexed-instancing path.
+6. adds the articulated MBT LOD0 turret batch when applicable;
+7. batches identical runtime meshes through the existing indexed-instancing path.
 
-Combat Engineer instances reuse the Rifle Squad asset IDs and therefore naturally share the same runtime mesh buffers and draw batches.
+The MBT turret uses the same per-frame instance stream as other repeated geometry, so a field of tanks batches hulls together and turrets together rather than introducing one draw per tank. Combat Engineer instances reuse the Rifle Squad asset IDs and therefore naturally share the same runtime mesh buffers and draw batches.
 
 ## Validation
 
@@ -143,6 +145,7 @@ Automated coverage verifies:
 - LOD1 and LOD2 references resolve;
 - collision references resolve and stay independent of render LOD;
 - required sockets are present;
+- the dedicated MBT turret runtime asset resolves;
 - material and strategic-symbol IDs resolve;
 - unit damage and wreck states are extracted into render snapshots;
 - destroyed units leave presentation-only wreck identities;
