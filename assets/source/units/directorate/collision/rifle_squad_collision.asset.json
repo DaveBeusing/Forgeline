@@ -1,0 +1,5 @@
+{
+  "id": "unit.directorate.rifle_squad.collision",
+  "type": "mesh",
+  "source": "../sources/collision_box.gltf"
+}

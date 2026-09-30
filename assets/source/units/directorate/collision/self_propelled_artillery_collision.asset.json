@@ -1,0 +1,5 @@
+{
+  "id": "unit.directorate.self_propelled_artillery.collision",
+  "type": "mesh",
+  "source": "../sources/collision_box.gltf"
+}

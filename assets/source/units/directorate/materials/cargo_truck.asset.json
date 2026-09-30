@@ -1,0 +1,5 @@
+{
+  "id": "material.directorate.unit.cargo_truck",
+  "type": "material",
+  "source": "cargo_truck.material.json"
+}

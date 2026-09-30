@@ -1,0 +1,30 @@
+{
+  "id": "unit.directorate.cargo_truck",
+  "type": "mesh",
+  "source": "../sources/cargo_truck_lod0.gltf",
+  "materialReferences": [
+    "material.directorate.unit.cargo_truck"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "unit.directorate.cargo_truck.lod1",
+      "maxDistance": 130
+    },
+    {
+      "level": 2,
+      "assetId": "unit.directorate.cargo_truck.lod2",
+      "maxDistance": 360
+    }
+  ],
+  "collisionRequired": true,
+  "collisionReference": "unit.directorate.cargo_truck.collision",
+  "sockets": [
+    {
+      "name": "cargo_load",
+      "x": 0,
+      "y": 0.12,
+      "z": -0.38
+    }
+  ]
+}

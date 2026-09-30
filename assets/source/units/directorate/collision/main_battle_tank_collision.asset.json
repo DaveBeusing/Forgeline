@@ -1,0 +1,5 @@
+{
+  "id": "unit.directorate.main_battle_tank.collision",
+  "type": "mesh",
+  "source": "../sources/collision_box.gltf"
+}

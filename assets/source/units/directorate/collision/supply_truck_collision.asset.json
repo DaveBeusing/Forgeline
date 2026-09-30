@@ -1,0 +1,5 @@
+{
+  "id": "unit.directorate.supply_truck.collision",
+  "type": "mesh",
+  "source": "../sources/collision_box.gltf"
+}

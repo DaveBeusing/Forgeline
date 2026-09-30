@@ -1,0 +1,30 @@
+{
+  "id": "unit.directorate.rifle_squad",
+  "type": "mesh",
+  "source": "../sources/rifle_squad_lod0.gltf",
+  "materialReferences": [
+    "material.directorate.unit.rifle_squad"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "unit.directorate.rifle_squad.lod1",
+      "maxDistance": 80
+    },
+    {
+      "level": 2,
+      "assetId": "unit.directorate.rifle_squad.lod2",
+      "maxDistance": 220
+    }
+  ],
+  "collisionRequired": true,
+  "collisionReference": "unit.directorate.rifle_squad.collision",
+  "sockets": [
+    {
+      "name": "weapon_muzzle",
+      "x": 0.05,
+      "y": 0.05,
+      "z": 0.42
+    }
+  ]
+}

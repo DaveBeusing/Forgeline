@@ -1,0 +1,36 @@
+{
+  "id": "unit.directorate.scout_vehicle",
+  "type": "mesh",
+  "source": "../sources/scout_vehicle_lod0.gltf",
+  "materialReferences": [
+    "material.directorate.unit.scout_vehicle"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "unit.directorate.scout_vehicle.lod1",
+      "maxDistance": 120
+    },
+    {
+      "level": 2,
+      "assetId": "unit.directorate.scout_vehicle.lod2",
+      "maxDistance": 340
+    }
+  ],
+  "collisionRequired": true,
+  "collisionReference": "unit.directorate.scout_vehicle.collision",
+  "sockets": [
+    {
+      "name": "weapon_muzzle",
+      "x": 0,
+      "y": 0.2,
+      "z": 0.47
+    },
+    {
+      "name": "sensor_origin",
+      "x": 0,
+      "y": 0.48,
+      "z": 0.02
+    }
+  ]
+}
