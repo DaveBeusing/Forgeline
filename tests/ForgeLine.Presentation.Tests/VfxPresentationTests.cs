@@ -379,6 +379,66 @@ public sealed class VfxPresentationTests
     }
 
     [Fact]
+    public void SustainedRepresentativeEffectLoadStaysBoundedAndReusesPoolSlots()
+    {
+        const int Capacity = 512;
+        const int EffectsPerTick = 128;
+        const int Ticks = 200;
+
+        var pool =
+            new VfxEffectPool(
+                Capacity);
+        var transform =
+            new RenderTransform(
+                Vector3.Zero,
+                Quaternion.Identity,
+                Vector3.One);
+
+        for (ulong tick = 1;
+             tick <= Ticks;
+             tick++)
+        {
+            var simulationTick =
+                new SimulationTick(
+                    tick);
+            pool.BeginTick(
+                simulationTick);
+
+            for (int effect = 0;
+                 effect < EffectsPerTick;
+                 effect++)
+            {
+                Assert.True(
+                    pool.TrySpawn(
+                        VfxEffectKind.MuzzleMachineGun,
+                        transform,
+                        simulationTick));
+            }
+
+            Assert.InRange(
+                pool.ActiveCount,
+                1,
+                Capacity);
+        }
+
+        VfxPresentationMetrics metrics =
+            pool.Metrics;
+
+        Assert.Equal(
+            Capacity,
+            metrics.PoolCapacity);
+        Assert.True(
+            metrics.TotalSpawned >=
+            (ulong)(EffectsPerTick * Ticks));
+        Assert.True(
+            metrics.TotalReused >
+            0UL);
+        Assert.Equal(
+            0UL,
+            metrics.TotalDropped);
+    }
+
+    [Fact]
     public void CatalogContainsAllRequiredProductionFamilies()
     {
         Assert.Equal(

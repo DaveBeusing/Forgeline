@@ -1463,28 +1463,40 @@ public sealed class PresentationExtractor : ISimulationTickObserver
         EntityRegistry entities,
         in CombatEvent combatEvent)
     {
-        if (combatEvent.Source.IsValid &&
-            entities.IsAlive(
-                combatEvent.Source) &&
-            IsVisibleToViewer(
-                entities,
-                combatEvent.Source))
+        bool positionVisible =
+            IsPositionVisible(
+                combatEvent.Position);
+
+        if (combatEvent.Type is
+            CombatEventType.ShotFired or
+            CombatEventType.ProjectileSpawned)
         {
-            return true;
+            return
+                positionVisible ||
+                (combatEvent.Source.IsValid &&
+                 entities.IsAlive(
+                     combatEvent.Source) &&
+                 IsVisibleToViewer(
+                     entities,
+                     combatEvent.Source));
         }
 
-        if (combatEvent.Target.IsValid &&
-            entities.IsAlive(
-                combatEvent.Target) &&
-            IsVisibleToViewer(
-                entities,
-                combatEvent.Target))
+        if (combatEvent.Type is
+            CombatEventType.Impact or
+            CombatEventType.DamageApplied or
+            CombatEventType.EntityDestroyed)
         {
-            return true;
+            return
+                positionVisible ||
+                (combatEvent.Target.IsValid &&
+                 entities.IsAlive(
+                     combatEvent.Target) &&
+                 IsVisibleToViewer(
+                     entities,
+                     combatEvent.Target));
         }
 
-        return IsPositionVisible(
-            combatEvent.Position);
+        return positionVisible;
     }
 
     private bool IsPositionVisible(
