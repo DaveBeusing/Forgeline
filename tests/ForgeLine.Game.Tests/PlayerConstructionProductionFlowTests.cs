@@ -703,10 +703,6 @@ public sealed class PlayerConstructionProductionFlowTests
                 policyResult.State);
         }
 
-        SupplyProvider supplyProvider =
-            scenario.Simulation.Entities
-                .GetComponent<SupplyProvider>(
-                    supplyDepot);
         Vector3 supplyStagingDirection =
             Vector3.Normalize(
                 new Vector3(
@@ -715,75 +711,6 @@ public sealed class PlayerConstructionProductionFlowTests
                     0.0f,
                     supplyDepotPosition.Z -
                         westCore.Position.Z));
-        Vector3 supplyStagingPoint =
-            supplyDepotPosition +
-            supplyStagingDirection *
-                (supplyProvider.ResupplyRangeMeters + 50.0f);
-
-        Assert.True(
-            gateway.SubmitMovement(
-                scenario.West.Player,
-                tanks,
-                supplyStagingPoint,
-                scenario.Simulation.CurrentTick,
-                FormationTemplate.Compact).Accepted);
-        scenario.Simulation.AdvanceOneTick();
-        Assert.True(gateway.Results.TryRead(out _));
-
-        RunUntil(
-            scenario,
-            () =>
-                tanks.All(
-                    tank =>
-                        Vector3.DistanceSquared(
-                            scenario.Simulation.Entities
-                                .GetComponent<WorldTransform>(
-                                    tank).Position,
-                            supplyStagingPoint) <=
-                        6.0f * 6.0f),
-            maximumTicks: 1_000);
-
-        var fuelBefore =
-            new Dictionary<EntityId, double>();
-
-        foreach (EntityId tank in tanks)
-        {
-            UnitFuelState fuel =
-                scenario.Simulation.Entities
-                    .GetComponent<UnitFuelState>(
-                        tank);
-            fuelBefore[tank] =
-                scenario.Inventories.GetQuantity(
-                    fuel.InventoryId,
-                    ResourceIds.Fuel);
-
-            PlayerCommandResultReadModel resupplyResult =
-                DispatchAction(
-                    scenario,
-                    gateway,
-                    PlayerActionRequest.RequestResupply(
-                        tank));
-            Assert.Equal(
-                PlayerCommandFeedbackState.Accepted,
-                resupplyResult.State);
-        }
-
-        RunUntil(
-            scenario,
-            () =>
-                tanks.All(
-                    tank =>
-                    {
-                        UnitFuelState fuel =
-                            scenario.Simulation.Entities
-                                .GetComponent<UnitFuelState>(
-                                    tank);
-                        return scenario.Inventories.GetQuantity(
-                                   fuel.InventoryId,
-                                   ResourceIds.Fuel) >
-                               fuelBefore[tank];
-                    }),
-            maximumTicks: 600);
 
         QueueUnit(
             scenario,
@@ -801,6 +728,46 @@ public sealed class PlayerConstructionProductionFlowTests
                 FindOwnedUnits(
                     scenario,
                     UnitIds.SupplyTruck));
+        SupplyTruck supplyTruckState =
+            scenario.Simulation.Entities
+                .GetComponent<SupplyTruck>(
+                    supplyTruck);
+        Vector3 supplyTruckLoadPoint =
+            supplyDepotPosition +
+            supplyStagingDirection *
+                (supplyTruckState.LoadRangeMeters * 0.5f);
+
+        Assert.True(
+            gateway.SubmitMovement(
+                scenario.West.Player,
+                [supplyTruck],
+                supplyTruckLoadPoint,
+                scenario.Simulation.CurrentTick,
+                FormationTemplate.Compact).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out _));
+
+        RunUntil(
+            scenario,
+            () =>
+                Vector3.DistanceSquared(
+                    scenario.Simulation.Entities
+                        .GetComponent<WorldTransform>(
+                            supplyTruck).Position,
+                    supplyTruckLoadPoint) <=
+                4.0f * 4.0f,
+            maximumTicks: 1_200);
+
+        RunUntil(
+            scenario,
+            () =>
+                scenario.Inventories.GetQuantity(
+                    supplyTruckState.InventoryId,
+                    ResourceIds.Fuel) > 0.0 &&
+                scenario.Inventories.GetQuantity(
+                    supplyTruckState.InventoryId,
+                    ResourceIds.Ammunition) > 0.0,
+            maximumTicks: 1_200);
 
         RemoveStockPolicies(
             scenario,
@@ -855,7 +822,7 @@ public sealed class PlayerConstructionProductionFlowTests
         Assert.True(
             gateway.SubmitMovement(
                 scenario.West.Player,
-                [supplyTruck, .. tanks],
+                tanks,
                 assaultStagingPoint,
                 scenario.Simulation.CurrentTick,
                 FormationTemplate.Line).Accepted);
@@ -874,6 +841,75 @@ public sealed class PlayerConstructionProductionFlowTests
                             assaultStagingPoint) <=
                         42.0f * 42.0f),
             maximumTicks: 3_000);
+
+        Vector3 supplyTruckStagingPoint =
+            assaultStagingPoint +
+            towardWest *
+                (supplyTruckState.ResupplyRangeMeters + 60.0f);
+        Assert.True(
+            gateway.SubmitMovement(
+                scenario.West.Player,
+                [supplyTruck],
+                supplyTruckStagingPoint,
+                scenario.Simulation.CurrentTick,
+                FormationTemplate.Compact).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out _));
+
+        RunUntil(
+            scenario,
+            () =>
+                Vector3.DistanceSquared(
+                    scenario.Simulation.Entities
+                        .GetComponent<WorldTransform>(
+                            supplyTruck).Position,
+                    supplyTruckStagingPoint) <=
+                6.0f * 6.0f,
+            maximumTicks: 3_000);
+
+        var fuelBeforeResupply =
+            new Dictionary<EntityId, double>();
+
+        foreach (EntityId tank in tanks)
+        {
+            UnitFuelState fuel =
+                scenario.Simulation.Entities
+                    .GetComponent<UnitFuelState>(
+                        tank);
+            double currentFuel =
+                scenario.Inventories.GetQuantity(
+                    fuel.InventoryId,
+                    ResourceIds.Fuel);
+            Assert.True(currentFuel < fuel.Capacity);
+            fuelBeforeResupply[tank] = currentFuel;
+
+            PlayerCommandResultReadModel resupplyResult =
+                DispatchAction(
+                    scenario,
+                    gateway,
+                    PlayerActionRequest.RequestResupply(
+                        tank));
+            Assert.Equal(
+                PlayerCommandFeedbackState.Accepted,
+                resupplyResult.State);
+        }
+
+        RunUntil(
+            scenario,
+            () =>
+                tanks.All(
+                    tank =>
+                    {
+                        UnitFuelState fuel =
+                            scenario.Simulation.Entities
+                                .GetComponent<UnitFuelState>(
+                                    tank);
+                        return scenario.Inventories.GetQuantity(
+                                   fuel.InventoryId,
+                                   ResourceIds.Fuel) >
+                               fuelBeforeResupply[tank];
+                    }),
+            maximumTicks: 2_000);
 
         PlayerCommandResultReadModel attackResult =
             DispatchAction(
