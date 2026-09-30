@@ -37,7 +37,7 @@ public sealed class WorldAssetAuthoringTests
                     result.Diagnostics.Select(
                         static diagnostic =>
                             $"{diagnostic.Code}: {diagnostic.Message}")));
-            Assert.Equal(164, result.CompiledCount);
+            Assert.Equal(210, result.CompiledCount);
 
             RuntimeAssetCatalog catalog =
                 RuntimeAssetCatalog.Load(

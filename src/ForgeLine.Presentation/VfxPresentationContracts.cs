@@ -125,7 +125,7 @@ public readonly record struct VfxPresentationMetrics(
 
 public static class VfxPresentationCatalog
 {
-    private static readonly IReadOnlyDictionary<
+    private static readonly Dictionary<
         VfxEffectKind,
         VfxPresentationDefinition> Definitions =
         CreateDefinitions();
