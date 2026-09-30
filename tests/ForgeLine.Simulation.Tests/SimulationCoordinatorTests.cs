@@ -158,6 +158,48 @@ public sealed class SimulationCoordinatorTests
     }
 
     [Fact]
+    public void ControlCommandDoesNotAdvanceSimulationOrRunGameplaySystems()
+    {
+        var recorder =
+            new CommandRecorder();
+        var systemExecutions =
+            new List<int>();
+        var coordinator =
+            new SimulationCoordinator();
+
+        coordinator.RegisterSystem(
+            new OrderedSystem(
+                1,
+                systemExecutions));
+        coordinator.AdvanceOneTick();
+
+        SimulationTick before =
+            coordinator.CurrentTick;
+        int systemsBefore =
+            systemExecutions.Count;
+
+        coordinator.ExecuteControlCommand(
+            new RecordCommand(
+                recorder,
+                77));
+
+        Assert.Equal(
+            before,
+            coordinator.CurrentTick);
+        Assert.Equal(
+            systemsBefore,
+            systemExecutions.Count);
+        Assert.Single(
+            recorder.Values);
+        Assert.Equal(
+            77,
+            recorder.Values[0]);
+        Assert.Equal(
+            before,
+            recorder.ExecutionTicks[0]);
+    }
+
+    [Fact]
     public void WarmEmptyTickLoopDoesNotAllocate()
     {
         var coordinator = new SimulationCoordinator();
