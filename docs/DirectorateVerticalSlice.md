@@ -113,7 +113,7 @@ The normal test suite includes a bounded headless vertical-slice smoke scenario 
 
 ## Presentation Status
 
-The six core Directorate Vertical Slice unit families now resolve through the production source-to-runtime asset pipeline with stable mesh/material IDs, LOD0–LOD2, collision references, gameplay-facing sockets, damage/wreck presentation, and strategic-symbol bindings. The existing Combat Engineer deliberately reuses the Rifle Squad presentation family until a dedicated infantry-art package exists.
+The six core Directorate Vertical Slice unit families now resolve through the production source-to-runtime asset pipeline with stable mesh/material IDs, LOD0–LOD2, collision references, gameplay-facing sockets, damage/wreck presentation, and strategic-symbol bindings. Main Battle Tank LOD0 separates hull and turret so presentation can rotate the turret toward the current authoritative weapon target without changing simulation ownership; strategic LODs remain combined meshes. The existing Combat Engineer deliberately reuses the Rifle Squad presentation family until a dedicated infantry-art package exists.
 
 Unit presentation remains strictly downstream from authoritative gameplay state. Health determines visual damage state, destruction leaves only a non-commandable presentation wreck proxy, and render LOD never changes movement, hitbox, supply, combat, or intelligence behavior.
 
