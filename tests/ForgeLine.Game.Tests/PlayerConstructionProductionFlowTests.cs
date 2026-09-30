@@ -703,6 +703,10 @@ public sealed class PlayerConstructionProductionFlowTests
                 policyResult.State);
         }
 
+        SupplyProvider supplyProvider =
+            scenario.Simulation.Entities
+                .GetComponent<SupplyProvider>(
+                    supplyDepot);
         Vector3 supplyStagingDirection =
             Vector3.Normalize(
                 new Vector3(
@@ -713,7 +717,8 @@ public sealed class PlayerConstructionProductionFlowTests
                         westCore.Position.Z));
         Vector3 supplyStagingPoint =
             supplyDepotPosition +
-            supplyStagingDirection * 34.0f;
+            supplyStagingDirection *
+                (supplyProvider.ResupplyRangeMeters + 50.0f);
 
         Assert.True(
             gateway.SubmitMovement(
