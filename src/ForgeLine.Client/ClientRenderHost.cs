@@ -9,6 +9,27 @@ using ForgeLine.World;
 
 namespace ForgeLine.Client;
 
+internal readonly record struct ClientVisualQualificationSnapshot(
+    string AdapterName,
+    ulong DedicatedVideoMemoryBytes,
+    double FramesPerSecond,
+    double FrameMilliseconds,
+    double CpuRenderMilliseconds,
+    double? GpuMilliseconds,
+    int VisibleTerrainChunks,
+    int TotalTerrainChunks,
+    long SubmittedTerrainTriangles,
+    int TerrainDrawCalls,
+    int InstanceDrawCalls,
+    int TotalMeasuredDrawCalls,
+    int VisibleInstances,
+    int TotalInstances,
+    int HighLodInstances,
+    int ReducedLodInstances,
+    int ActiveVfxEffects,
+    int VfxPoolCapacity,
+    ulong DroppedVfxEffects);
+
 internal readonly record struct ClientRenderFrame(
     RtsCameraState Camera,
     int ViewportWidth,
@@ -43,6 +64,7 @@ internal sealed class ClientRenderHost : IDisposable
     private readonly Thread _thread;
 
     private ClientRenderFrame? _latestFrame;
+    private ClientVisualQualificationSnapshot? _latestQualification;
     private ExceptionDispatchInfo? _failure;
     private int _stopping;
     private bool _disposed;
@@ -90,6 +112,17 @@ internal sealed class ClientRenderHost : IDisposable
 
     internal bool IsExecutionThreadAlive =>
         _thread.IsAlive;
+
+    internal ClientVisualQualificationSnapshot? LatestQualification
+    {
+        get
+        {
+            lock (_frameGate)
+            {
+                return _latestQualification;
+            }
+        }
+    }
 
     internal bool WaitForFault(
         TimeSpan timeout)
@@ -388,18 +421,29 @@ internal sealed class ClientRenderHost : IDisposable
                             renderStartedAt,
                             renderFinishedAt));
 
+                GraphicsDiagnostics diagnostics =
+                    graphics.Diagnostics;
+                PublishQualification(
+                    diagnostics,
+                    frameTiming,
+                    terrainRenderer.LastDiagnostics,
+                    instanceRenderer.LastDiagnostics,
+                    debugDrawRenderer.LastDiagnostics,
+                    snapshot.VfxMetrics,
+                    renderWorld.InstanceCount);
+
                 if (StopwatchElapsed(
                         nextDiagnosticAt,
                         renderFinishedAt) >=
                     DiagnosticInterval)
                 {
-                    GraphicsDiagnostics diagnostics =
-                        graphics.Diagnostics;
                     Console.WriteLine(
                         $"[render:frame] thread={Environment.CurrentManagedThreadId} " +
                         $"tick={snapshot.Tick.Value} fps={frameTiming.FramesPerSecond:F1} " +
                         $"size={diagnostics.Surface.Width}x{diagnostics.Surface.Height} " +
                         $"instances={instanceRenderer.LastDiagnostics.VisibleInstances}/{renderWorld.InstanceCount} " +
+                        $"lod={instanceRenderer.LastDiagnostics.HighLodInstances}/{instanceRenderer.LastDiagnostics.ReducedLodInstances} " +
+                        $"draws={terrainRenderer.LastDiagnostics.DrawCalls + instanceRenderer.LastDiagnostics.DrawCalls + debugDrawRenderer.LastDiagnostics.DrawCalls} " +
                         $"vfx={snapshot.VfxMetrics.ActiveTransientEffects}/{snapshot.VfxMetrics.PoolCapacity} " +
                         $"vfxDropped={snapshot.VfxMetrics.TotalDropped}");
                     nextDiagnosticAt =
@@ -451,6 +495,46 @@ internal sealed class ClientRenderHost : IDisposable
         lock (_frameGate)
         {
             return _latestFrame;
+        }
+    }
+
+    private void PublishQualification(
+        GraphicsDiagnostics graphics,
+        in FrameTimingMetrics frameTiming,
+        in TerrainRenderDiagnostics terrain,
+        in InstanceRenderDiagnostics instances,
+        in DebugDrawRenderDiagnostics debug,
+        in VfxPresentationMetrics vfx,
+        int totalInstances)
+    {
+        var snapshot =
+            new ClientVisualQualificationSnapshot(
+                graphics.Device.AdapterName,
+                graphics.Device.DedicatedVideoMemoryBytes,
+                frameTiming.FramesPerSecond,
+                frameTiming.FrameMilliseconds,
+                frameTiming.CpuRenderMilliseconds,
+                GpuMilliseconds: null,
+                terrain.VisibleChunks,
+                terrain.TotalChunks,
+                terrain.SubmittedTriangles,
+                terrain.DrawCalls,
+                instances.DrawCalls,
+                terrain.DrawCalls +
+                instances.DrawCalls +
+                debug.DrawCalls,
+                instances.VisibleInstances,
+                totalInstances,
+                instances.HighLodInstances,
+                instances.ReducedLodInstances,
+                vfx.ActiveTransientEffects,
+                vfx.PoolCapacity,
+                vfx.TotalDropped);
+
+        lock (_frameGate)
+        {
+            _latestQualification =
+                snapshot;
         }
     }
 
