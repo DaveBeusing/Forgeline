@@ -17,7 +17,8 @@ public sealed class ClientSimulationHostTests
     {
         using var slowSystem =
             new ControlledSlowSystem(
-                blockAtTick: new SimulationTick(2));
+                blockAtTick: new SimulationTick(2),
+                TestContext.Current.CancellationToken);
         using ClientHostFixture fixture =
             ClientHostFixture.Create(
                 additionalSystem: slowSystem);
@@ -26,7 +27,8 @@ public sealed class ClientSimulationHostTests
         {
             Assert.True(
                 slowSystem.Entered.Wait(
-                    TestTimeout));
+                    TestTimeout,
+                    TestContext.Current.CancellationToken));
 
             Assert.Equal(
                 new SimulationTick(1),
@@ -278,12 +280,15 @@ public sealed class ClientSimulationHostTests
             new ManualResetEventSlim(false);
         using var release =
             new ManualResetEventSlim(false);
+        CancellationToken cancellationToken =
+            TestContext.Current.CancellationToken;
         using var host =
             new ClientRenderHost(
                 _ =>
                 {
                     entered.Set();
-                    release.Wait();
+                    release.Wait(
+                        cancellationToken);
                 });
 
         ClientRenderFrame first =
@@ -300,7 +305,8 @@ public sealed class ClientSimulationHostTests
         {
             Assert.True(
                 entered.Wait(
-                    TestTimeout));
+                    TestTimeout,
+                    TestContext.Current.CancellationToken));
 
             Assert.True(
                 host.Publish(second));
@@ -382,7 +388,8 @@ public sealed class ClientSimulationHostTests
     {
         using var slowSystem =
             new ControlledSlowSystem(
-                blockAtTick: new SimulationTick(2));
+                blockAtTick: new SimulationTick(2),
+                TestContext.Current.CancellationToken);
         using ClientHostFixture fixture =
             ClientHostFixture.Create(
                 additionalSystem: slowSystem);
@@ -393,7 +400,8 @@ public sealed class ClientSimulationHostTests
 
         Assert.True(
             slowSystem.Entered.Wait(
-                TestTimeout));
+                TestTimeout,
+                TestContext.Current.CancellationToken));
 
         var disposer =
             new Thread(
@@ -408,7 +416,8 @@ public sealed class ClientSimulationHostTests
 
         Assert.True(
             disposeStarted.Wait(
-                TestTimeout));
+                TestTimeout,
+                TestContext.Current.CancellationToken));
         Assert.False(
             disposeFinished.IsSet);
 
@@ -416,7 +425,8 @@ public sealed class ClientSimulationHostTests
 
         Assert.True(
             disposeFinished.Wait(
-                TestTimeout));
+                TestTimeout,
+                TestContext.Current.CancellationToken));
         disposer.Join();
 
         Assert.False(
@@ -434,12 +444,15 @@ public sealed class ClientSimulationHostTests
             new ManualResetEventSlim(false);
         using var disposeFinished =
             new ManualResetEventSlim(false);
+        CancellationToken cancellationToken =
+            TestContext.Current.CancellationToken;
         using var host =
             new ClientRenderHost(
                 _ =>
                 {
                     entered.Set();
-                    release.Wait();
+                    release.Wait(
+                        cancellationToken);
                 });
 
         Assert.True(
@@ -448,7 +461,8 @@ public sealed class ClientSimulationHostTests
                     viewportWidth: 800)));
         Assert.True(
             entered.Wait(
-                TestTimeout));
+                TestTimeout,
+                TestContext.Current.CancellationToken));
 
         var disposer =
             new Thread(
@@ -463,7 +477,8 @@ public sealed class ClientSimulationHostTests
 
         Assert.True(
             disposeStarted.Wait(
-                TestTimeout));
+                TestTimeout,
+                TestContext.Current.CancellationToken));
         Assert.False(
             disposeFinished.IsSet);
 
@@ -471,7 +486,8 @@ public sealed class ClientSimulationHostTests
 
         Assert.True(
             disposeFinished.Wait(
-                TestTimeout));
+                TestTimeout,
+                TestContext.Current.CancellationToken));
         disposer.Join();
 
         Assert.False(
@@ -641,12 +657,16 @@ public sealed class ClientSimulationHostTests
         private readonly SimulationTick _blockAtTick;
         private readonly ManualResetEventSlim _release =
             new(false);
+        private readonly CancellationToken _cancellationToken;
 
         public ControlledSlowSystem(
-            SimulationTick blockAtTick)
+            SimulationTick blockAtTick,
+            CancellationToken cancellationToken)
         {
             _blockAtTick =
                 blockAtTick;
+            _cancellationToken =
+                cancellationToken;
         }
 
         public ManualResetEventSlim Entered { get; } =
@@ -665,7 +685,8 @@ public sealed class ClientSimulationHostTests
             }
 
             Entered.Set();
-            _release.Wait();
+            _release.Wait(
+                _cancellationToken);
         }
 
         public void Release() =>
