@@ -142,8 +142,7 @@ public class PresentationBenchmarks : IDisposable
                     entity.Index);
 
             instance =
-                index %
-                10 switch
+                (index % 10) switch
                 {
                     0 or 1 or 2 =>
                         instance with
