@@ -374,13 +374,12 @@ internal sealed class ClientApplication
                 {
                     DispatchPlayerActionRequest(
                         actionRequest,
-                        commandGateway,
+                        simulationHost,
                         buildingPlacementController,
                         tacticalTargetingController,
                         presentationInteraction,
                         inputSnapshot?.Tick ??
-                            SimulationTick.Zero,
-                        ref lastCommandReceipt);
+                            SimulationTick.Zero);
                 }
             }
 
@@ -410,6 +409,29 @@ internal sealed class ClientApplication
             const float renderAlpha = 1.0f;
             PlayerExperienceSnapshot? currentExperience =
                 currentSnapshot?.PlayerExperience;
+
+            if (smokeTest &&
+                !smokeCompletionRequested)
+            {
+                if (!simulationHost.TryRunSmokeCompletion(
+                        eastBase.CommandCore))
+                {
+                    throw new InvalidOperationException(
+                        "Simulation control boundary is full while scheduling smoke completion.");
+                }
+
+                smokeCompletionRequested = true;
+            }
+
+            if (smokeTest &&
+                smokeCompletionRequested &&
+                !smokeMatchCompleted &&
+                currentExperience?.MatchStatus ==
+                    PlayerMatchStatus.Victory)
+            {
+                smokeMatchCompleted = true;
+            }
+
             bool gameplayActive =
                 currentExperience?.MatchStatus ==
                 PlayerMatchStatus.Active;
@@ -431,13 +453,12 @@ internal sealed class ClientApplication
                 {
                     DispatchPlayerActionRequest(
                         tacticalRequest,
-                        commandGateway,
+                        simulationHost,
                         buildingPlacementController,
                         tacticalTargetingController,
                         presentationInteraction,
                         currentSnapshot?.Tick ??
-                            SimulationTick.Zero,
-                        ref lastCommandReceipt);
+                            SimulationTick.Zero);
                 }
 
                 if (!tacticalTargetingController.IsActive)
@@ -469,14 +490,21 @@ internal sealed class ClientApplication
                     if (selectionController.TryTakeMovementRequest(
                             out MovementOrderRequest movementRequest))
                     {
-                        lastCommandReceipt =
-                            commandGateway.SubmitMovement(
-                                LocalPlayer,
-                                movementRequest.Entities,
-                                movementRequest.WorldTarget,
-                                currentSnapshot?.Tick ??
-                                    SimulationTick.Zero,
-                                activeFormation);
+                        EntityId[] movementEntities =
+                            movementRequest.Entities.ToArray();
+                        SimulationTick observedTick =
+                            currentSnapshot?.Tick ??
+                            SimulationTick.Zero;
+
+                        RequireSubmission(
+                            simulationHost,
+                            gateway =>
+                                gateway.SubmitMovement(
+                                    LocalPlayer,
+                                    movementEntities,
+                                    movementRequest.WorldTarget,
+                                    observedTick,
+                                    activeFormation));
                     }
                 }
 
@@ -486,15 +514,20 @@ internal sealed class ClientApplication
                 if (buildingPlacementController.TryTakePlacementRequest(
                         out BuildingPlacementRequest placementRequest))
                 {
-                    lastCommandReceipt =
-                        commandGateway.SubmitBuild(
-                            LocalPlayer,
-                            placementRequest.BuildingId,
-                            placementRequest.Position,
-                            placementRequest.Orientation,
-                            constructionInventory,
-                            currentSnapshot?.Tick ??
-                                SimulationTick.Zero);
+                    SimulationTick observedTick =
+                        currentSnapshot?.Tick ??
+                        SimulationTick.Zero;
+
+                    RequireSubmission(
+                        simulationHost,
+                        gateway =>
+                            gateway.SubmitBuild(
+                                LocalPlayer,
+                                placementRequest.BuildingId,
+                                placementRequest.Position,
+                                placementRequest.Orientation,
+                                constructionInventory,
+                                observedTick));
                 }
             }
             else
@@ -585,31 +618,19 @@ internal sealed class ClientApplication
 
     private static void DispatchPlayerActionRequest(
         in PlayerActionRequest request,
-        PlayerCommandGateway commandGateway,
+        ClientSimulationHost simulationHost,
         RtsBuildingPlacementController buildingPlacementController,
         RtsTacticalTargetingController tacticalTargetingController,
         PresentationInteractionState presentationInteraction,
-        SimulationTick observedTick,
-        ref PlayerCommandSubmissionReceipt? lastCommandReceipt)
+        SimulationTick observedTick)
     {
-        if (PlayerActionRequestDispatcher.TryDispatch(
-                request,
-                LocalPlayer,
-                commandGateway,
-                observedTick,
-                out PlayerCommandSubmissionReceipt receipt))
-        {
-            lastCommandReceipt = receipt;
-            return;
-        }
-
         switch (request.Kind)
         {
             case PlayerActionRequestKind.BeginBuildingPlacement:
                 tacticalTargetingController.Cancel();
                 buildingPlacementController.SelectBuilding(
                     request.BuildingId);
-                break;
+                return;
 
             case PlayerActionRequestKind.BeginAttackTargeting:
             case PlayerActionRequestKind.BeginAttackMoveTargeting:
@@ -623,8 +644,71 @@ internal sealed class ClientApplication
 
                 tacticalTargetingController.Begin(
                     request,
-                    commandGateway.SessionId);
-                break;
+                    simulationHost.SessionId);
+                return;
+        }
+
+        PlayerActionRequest transported =
+            request with
+            {
+                TacticalEntities =
+                    request.TacticalEntities?.ToArray()
+            };
+
+        RequireSubmission(
+            simulationHost,
+            gateway =>
+            {
+                if (!PlayerActionRequestDispatcher.TryDispatch(
+                        transported,
+                        LocalPlayer,
+                        gateway,
+                        observedTick,
+                        out PlayerCommandSubmissionReceipt receipt))
+                {
+                    throw new InvalidOperationException(
+                        $"Unsupported simulation player action '{transported.Kind}'.");
+                }
+
+                return receipt;
+            });
+    }
+
+    private static void RequireSubmission(
+        ClientSimulationHost simulationHost,
+        Func<PlayerCommandGateway, PlayerCommandSubmissionReceipt> submission)
+    {
+        if (!simulationHost.TrySubmit(
+                simulationHost.SessionId,
+                submission))
+        {
+            throw new InvalidOperationException(
+                "Simulation command boundary is full or stopping.");
+        }
+    }
+
+    private static void DrainSubmissionCompletions(
+        ClientSimulationHost simulationHost,
+        ref PlayerCommandSubmissionReceipt? lastCommandReceipt)
+    {
+        while (simulationHost.TryReadSubmissionCompletion(
+                   out ClientSubmissionCompletion completion))
+        {
+            if (completion.Receipt is
+                PlayerCommandSubmissionReceipt receipt)
+            {
+                lastCommandReceipt =
+                    receipt;
+                continue;
+            }
+
+            if (completion.Failure !=
+                ClientSubmissionFailure.None)
+            {
+                Console.Error.WriteLine(
+                    $"[simulation:submission-rejected] sequence={completion.HostSequence} " +
+                    $"reason={completion.Failure}");
+            }
         }
     }
 
