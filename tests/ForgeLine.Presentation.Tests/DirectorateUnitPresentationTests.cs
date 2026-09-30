@@ -50,6 +50,21 @@ public sealed class DirectorateUnitPresentationTests
                 definition.RequiredSockets);
         }
 
+        UnitPresentationDefinition tank =
+            UnitPresentationCatalog.Get(
+                UnitIds.MainBattleTank);
+        Assert.True(
+            tank.HasArticulatedTurret);
+        Assert.Equal(
+            "unit.directorate.main_battle_tank.turret",
+            tank.TurretMeshAssetId);
+        Assert.Equal(
+            new Vector3(
+                0.0f,
+                0.10f,
+                0.02f),
+            tank.TurretPivot);
+
         UnitPresentationDefinition rifle =
             UnitPresentationCatalog.Get(
                 UnitIds.RifleSquad);
@@ -131,6 +146,24 @@ public sealed class DirectorateUnitPresentationTests
                 140.0,
                 560.0));
 
+        EntityId target =
+            simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(
+            target,
+            new WorldTransform(
+                new Vector3(
+                    20.0f,
+                    0.0f,
+                    0.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        simulation.Entities.AddComponent(
+            damaged,
+            new WeaponState(
+                new WeaponId(
+                    1),
+                target));
+
         EntityId wreck =
             simulation.Entities.CreateEntity();
         simulation.Entities.AddComponent(
@@ -182,6 +215,10 @@ public sealed class DirectorateUnitPresentationTests
         Assert.Equal(
             UnitIds.MainBattleTank,
             damagedInstance.UnitFeature.Unit);
+        Assert.InRange(
+            damagedInstance.UnitFeature.AimYawRadians,
+            (MathF.PI * 0.5f) - 0.001f,
+            (MathF.PI * 0.5f) + 0.001f);
         Assert.Equal(
             UnitPresentationDamageState.Wreck,
             wreckInstance.UnitFeature.DamageState);
