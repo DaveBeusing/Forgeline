@@ -32,6 +32,8 @@ internal sealed class ClientSimulationHost : IDisposable
     private const int DefaultBoundaryCapacity = 256;
     private const int MaximumCatchUpTicks = 5;
 
+    private readonly object _boundaryGate = new();
+    private readonly object _progressGate = new();
     private readonly VerticalSliceScenario _scenario;
     private readonly SimulationCoordinator _simulation;
     private readonly PlayerCommandGateway _commands;
@@ -47,6 +49,7 @@ internal sealed class ClientSimulationHost : IDisposable
     private ExceptionDispatchInfo? _failure;
     private long _nextHostSequence;
     private int _queuedCount;
+    private int _inFlightSubmissions;
     private int _completionCount;
     private int _paused;
     private int _terminalFrozen;
@@ -111,9 +114,101 @@ internal sealed class ClientSimulationHost : IDisposable
     public bool IsTerminalFrozen =>
         Volatile.Read(ref _terminalFrozen) != 0;
 
-    public int OutstandingHostMessages =>
-        Volatile.Read(ref _queuedCount) +
-        Volatile.Read(ref _completionCount);
+    public int OutstandingHostMessages
+    {
+        get
+        {
+            lock (_boundaryGate)
+            {
+                return
+                    _queuedCount +
+                    _inFlightSubmissions +
+                    _completionCount;
+            }
+        }
+    }
+
+    internal SimulationTick CurrentTick =>
+        _simulation.CurrentTick;
+
+    internal bool WaitForTickAtLeast(
+        SimulationTick target,
+        TimeSpan timeout)
+    {
+        if (timeout < TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(nameof(timeout));
+        }
+
+        long deadline =
+            Stopwatch.GetTimestamp() +
+            ToStopwatchTicks(timeout);
+
+        lock (_progressGate)
+        {
+            while (_simulation.CurrentTick <
+                   target)
+            {
+                ThrowIfFaulted();
+
+                long remainingTicks =
+                    deadline -
+                    Stopwatch.GetTimestamp();
+
+                if (remainingTicks <= 0)
+                {
+                    return false;
+                }
+
+                Monitor.Wait(
+                    _progressGate,
+                    StopwatchElapsed(
+                        0,
+                        remainingTicks));
+            }
+
+            return true;
+        }
+    }
+
+    internal bool WaitForPauseState(
+        bool paused,
+        TimeSpan timeout)
+    {
+        if (timeout < TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(nameof(timeout));
+        }
+
+        long deadline =
+            Stopwatch.GetTimestamp() +
+            ToStopwatchTicks(timeout);
+
+        lock (_progressGate)
+        {
+            while (IsPaused != paused)
+            {
+                ThrowIfFaulted();
+
+                long remainingTicks =
+                    deadline -
+                    Stopwatch.GetTimestamp();
+
+                if (remainingTicks <= 0)
+                {
+                    return false;
+                }
+
+                Monitor.Wait(
+                    _progressGate,
+                    StopwatchElapsed(
+                        0,
+                        remainingTicks));
+            }
+
+            return true;
+        }
+    }
 
     public bool TrySubmit(
         SimulationSessionId expectedSession,
@@ -125,19 +220,17 @@ internal sealed class ClientSimulationHost : IDisposable
             AllocateHostSequence();
 
         return TryQueue(
-            HostMessage.Submission(
+            HostMessage.CreateSubmission(
                 sequence,
                 expectedSession,
-                submission),
-            reservesCompletion: true);
+                submission));
     }
 
     public bool TrySetPaused(bool paused) =>
         TryQueue(
             paused
                 ? HostMessage.Pause()
-                : HostMessage.Resume(),
-            reservesCompletion: false);
+                : HostMessage.Resume());
 
     public bool TryAcknowledgeTerminal(
         SimulationSessionId expectedSession,
@@ -147,15 +240,13 @@ internal sealed class ClientSimulationHost : IDisposable
             HostMessage.AcknowledgeTerminal(
                 expectedSession,
                 issuer,
-                observedTick),
-            reservesCompletion: false);
+                observedTick));
 
     public bool TryRunSmokeCompletion(
         EntityId opposingCommandCore) =>
         TryQueue(
             HostMessage.SmokeCompletion(
-                opposingCommandCore),
-            reservesCompletion: false);
+                opposingCommandCore));
 
     public bool TryReadSubmissionCompletion(
         out ClientSubmissionCompletion completion)
@@ -166,8 +257,11 @@ internal sealed class ClientSimulationHost : IDisposable
             return false;
         }
 
-        Interlocked.Decrement(
-            ref _completionCount);
+        lock (_boundaryGate)
+        {
+            _completionCount--;
+        }
+
         return true;
     }
 
@@ -204,6 +298,7 @@ internal sealed class ClientSimulationHost : IDisposable
         try
         {
             _simulation.AdvanceOneTick();
+            NotifyProgress();
             UpdateTerminalState();
 
             long nextTickAt =
@@ -212,6 +307,7 @@ internal sealed class ClientSimulationHost : IDisposable
                     _simulation.Clock.TickDuration);
 
             _started.Set();
+            NotifyProgress();
 
             while (Volatile.Read(ref _stopping) == 0)
             {
@@ -266,6 +362,7 @@ internal sealed class ClientSimulationHost : IDisposable
                     }
 
                     _simulation.AdvanceOneTick();
+                    NotifyProgress();
                     UpdateTerminalState();
 
                     catchUpTicks++;
@@ -308,8 +405,16 @@ internal sealed class ClientSimulationHost : IDisposable
         while (_messages.TryDequeue(
                    out HostMessage message))
         {
-            Interlocked.Decrement(
-                ref _queuedCount);
+            lock (_boundaryGate)
+            {
+                _queuedCount--;
+
+                if (message.Kind ==
+                    HostMessageKind.Submission)
+                {
+                    _inFlightSubmissions++;
+                }
+            }
 
             switch (message.Kind)
             {
@@ -322,12 +427,14 @@ internal sealed class ClientSimulationHost : IDisposable
                     Volatile.Write(
                         ref _paused,
                         1);
+                    NotifyProgress();
                     break;
 
                 case HostMessageKind.Resume:
                     Volatile.Write(
                         ref _paused,
                         0);
+                    NotifyProgress();
                     break;
 
                 case HostMessageKind.AcknowledgeTerminal:
@@ -454,8 +561,7 @@ internal sealed class ClientSimulationHost : IDisposable
     }
 
     private bool TryQueue(
-        in HostMessage message,
-        bool reservesCompletion)
+        in HostMessage message)
     {
         ThrowIfDisposed();
         ThrowIfFaulted();
@@ -465,40 +571,21 @@ internal sealed class ClientSimulationHost : IDisposable
             return false;
         }
 
-        int reservation =
-            reservesCompletion
-                ? 1
-                : 0;
-
-        while (true)
+        lock (_boundaryGate)
         {
-            int queued =
-                Volatile.Read(
-                    ref _queuedCount);
-            int completions =
-                Volatile.Read(
-                    ref _completionCount);
-
-            if (queued +
-                completions +
-                reservation >=
+            if (_queuedCount +
+                _inFlightSubmissions +
+                _completionCount >=
                 _capacity)
             {
                 return false;
             }
 
-            if (Interlocked.CompareExchange(
-                    ref _queuedCount,
-                    queued + 1,
-                    queued) ==
-                queued)
-            {
-                break;
-            }
+            _messages.Enqueue(
+                message);
+            _queuedCount++;
         }
 
-        _messages.Enqueue(
-            message);
         _signal.Set();
         return true;
     }
@@ -508,13 +595,16 @@ internal sealed class ClientSimulationHost : IDisposable
         ClientSubmissionFailure failure,
         PlayerCommandSubmissionReceipt? receipt)
     {
-        Interlocked.Increment(
-            ref _completionCount);
-        _completions.Enqueue(
-            new ClientSubmissionCompletion(
-                sequence,
-                failure,
-                receipt));
+        lock (_boundaryGate)
+        {
+            _inFlightSubmissions--;
+            _completionCount++;
+            _completions.Enqueue(
+                new ClientSubmissionCompletion(
+                    sequence,
+                    failure,
+                    receipt));
+        }
     }
 
     private void RejectRemainingSubmissions(
@@ -523,8 +613,16 @@ internal sealed class ClientSimulationHost : IDisposable
         while (_messages.TryDequeue(
                    out HostMessage message))
         {
-            Interlocked.Decrement(
-                ref _queuedCount);
+            lock (_boundaryGate)
+            {
+                _queuedCount--;
+
+                if (message.Kind ==
+                    HostMessageKind.Submission)
+                {
+                    _inFlightSubmissions++;
+                }
+            }
 
             if (message.Kind ==
                 HostMessageKind.Submission)
@@ -534,6 +632,15 @@ internal sealed class ClientSimulationHost : IDisposable
                     failure,
                     receipt: null);
             }
+        }
+    }
+
+    private void NotifyProgress()
+    {
+        lock (_progressGate)
+        {
+            Monitor.PulseAll(
+                _progressGate);
         }
     }
 
@@ -591,7 +698,7 @@ internal sealed class ClientSimulationHost : IDisposable
         SimulationTick ObservedTick,
         EntityId SmokeCommandCore)
     {
-        public static HostMessage Submission(
+        public static HostMessage CreateSubmission(
             ulong sequence,
             SimulationSessionId expectedSession,
             Func<PlayerCommandGateway, PlayerCommandSubmissionReceipt> submission) =>
