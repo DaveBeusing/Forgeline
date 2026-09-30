@@ -319,6 +319,119 @@ public sealed class RtsInformationLayerTests
     }
 
     [Fact]
+    public void SupplyStatesResolveToDistinctSemanticIcons()
+    {
+        RtsUiIcon[] icons =
+        [
+            RtsUiIconCatalog.ResolveSupply(
+                BattlefieldSupplyStatus.Supplied),
+            RtsUiIconCatalog.ResolveSupply(
+                BattlefieldSupplyStatus.LowSupply),
+            RtsUiIconCatalog.ResolveSupply(
+                BattlefieldSupplyStatus.Critical),
+            RtsUiIconCatalog.ResolveSupply(
+                BattlefieldSupplyStatus.Unsupplied)
+        ];
+
+        Assert.Equal(
+            4,
+            icons.Distinct().Count());
+    }
+
+    [Fact]
+    public void WorldMarkersUseDistinctGeometryForSelectionHoverAndInvalidTargets()
+    {
+        var draw =
+            new DebugDraw
+            {
+                Enabled = true
+            };
+        RenderInstance unit =
+            Unit(
+                new EntityId(
+                    11,
+                    1),
+                Vector3.Zero,
+                LocalPlayer,
+                UnitIds.MainBattleTank);
+        RenderInstance building =
+            Building(
+                new EntityId(
+                    12,
+                    1),
+                new Vector3(
+                    20.0f,
+                    0.0f,
+                    20.0f),
+                LocalPlayer,
+                BuildingIds.CommandCore);
+        Vector4 selectedColor =
+            new(
+                0.1f,
+                0.8f,
+                1.0f,
+                1.0f);
+        Vector4 invalidColor =
+            new(
+                1.0f,
+                0.2f,
+                0.1f,
+                1.0f);
+
+        RtsWorldMarkerVisualization.DrawSelected(
+            draw,
+            unit,
+            selectedColor);
+        int unitSelectionLines =
+            draw.Lines.Length;
+
+        draw.Clear();
+        RtsWorldMarkerVisualization.DrawSelected(
+            draw,
+            building,
+            selectedColor);
+        int buildingSelectionLines =
+            draw.Lines.Length;
+
+        draw.Clear();
+        RtsWorldMarkerVisualization.DrawHover(
+            draw,
+            unit,
+            selectedColor);
+        int hoverLines =
+            draw.Lines.Length;
+
+        draw.Clear();
+        RtsWorldMarkerVisualization.DrawTarget(
+            draw,
+            Vector3.Zero,
+            valid: false,
+            selectedColor,
+            invalidColor);
+        DebugLine[] invalidTargetLines =
+            draw.Lines.ToArray();
+
+        Assert.True(
+            unitSelectionLines >
+            buildingSelectionLines);
+        Assert.Equal(
+            4,
+            buildingSelectionLines);
+        Assert.Equal(
+            4,
+            hoverLines);
+        Assert.Equal(
+            2,
+            invalidTargetLines.Length);
+        Assert.All(
+            invalidTargetLines,
+            line =>
+                Assert.Equal(
+                    invalidColor,
+                    line.Color));
+    }
+
+    [Fact]
     public void OverlayControllerCyclesOnlyPresentationModes()
     {
         var controller =
