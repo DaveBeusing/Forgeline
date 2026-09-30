@@ -188,7 +188,20 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                         checked((uint)element.SemanticIndex),
                         ToNativeFormat(element.Format),
                         checked((uint)element.OffsetInBytes),
-                        0))
+                        checked((uint)element.InputSlot),
+                        element.InputRate switch
+                        {
+                            GraphicsVertexInputRate.PerVertex =>
+                                InputClassification.PerVertexData,
+                            GraphicsVertexInputRate.PerInstance =>
+                                InputClassification.PerInstanceData,
+                            _ =>
+                                throw new ArgumentOutOfRangeException(
+                                    nameof(element),
+                                    element.InputRate,
+                                    "Unsupported graphics vertex input rate.")
+                        },
+                        checked((uint)element.InstanceStepRate)))
             .ToArray();
 
         try
