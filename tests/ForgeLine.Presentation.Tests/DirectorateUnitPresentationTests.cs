@@ -29,10 +29,9 @@ public sealed class DirectorateUnitPresentationTests
                 UnitPresentationCatalog.Get(
                     unit);
 
-            Assert.True(
-                definition.MeshAssetId.StartsWith(
-                    "unit.directorate.",
-                    StringComparison.Ordinal));
+            Assert.StartsWith(
+                "unit.directorate.",
+                definition.MeshAssetId);
             Assert.Equal(
                 definition.MeshAssetId + ".lod1",
                 definition.Lod1AssetId);
@@ -42,10 +41,9 @@ public sealed class DirectorateUnitPresentationTests
             Assert.Equal(
                 definition.MeshAssetId + ".collision",
                 definition.CollisionAssetId);
-            Assert.True(
-                definition.StrategicSymbolAssetId.StartsWith(
-                    "material.directorate.symbol.",
-                    StringComparison.Ordinal));
+            Assert.StartsWith(
+                "material.directorate.symbol.",
+                definition.StrategicSymbolAssetId);
             Assert.NotEmpty(
                 definition.RequiredSockets);
         }
