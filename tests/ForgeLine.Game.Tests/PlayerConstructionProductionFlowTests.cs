@@ -803,7 +803,7 @@ public sealed class PlayerConstructionProductionFlowTests
                 (int)MathF.Ceiling(
                     reconnaissanceDistance /
                     10.0f *
-                    scenario.Simulation.TicksPerSecond) +
+                    20.0f) +
                 800);
 
         RunUntil(
