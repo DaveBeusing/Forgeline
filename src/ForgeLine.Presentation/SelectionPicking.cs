@@ -65,6 +65,74 @@ public static class SelectionPicking
         return entity.IsValid;
     }
 
+    public static bool TryPickInspectable(
+        RtsCamera camera,
+        RenderWorld world,
+        Vector2 screenPoint,
+        int viewportWidth,
+        int viewportHeight,
+        float interpolationAlpha,
+        out EntityId entity)
+    {
+        ArgumentNullException.ThrowIfNull(camera);
+        ArgumentNullException.ThrowIfNull(world);
+
+        CameraRay ray = camera.ScreenPointToWorldRay(
+            screenPoint,
+            viewportWidth,
+            viewportHeight);
+
+        float nearestDistance = float.PositiveInfinity;
+        EntityId nearest = EntityId.Invalid;
+
+        for (int index = 0; index < world.InstanceCount; index++)
+        {
+            RenderInstance instance =
+                world.GetInterpolatedInstance(
+                    index,
+                    interpolationAlpha);
+
+            if ((instance.Visibility & RenderVisibilityMask.World) == 0 ||
+                !instance.Mesh.IsValid ||
+                !instance.Material.IsValid ||
+                !instance.WorldFeature.IsInspectable)
+            {
+                continue;
+            }
+
+            ScreenProjection projection =
+                camera.WorldToScreen(
+                    instance.Transform.Position,
+                    viewportWidth,
+                    viewportHeight);
+            if (!projection.IsVisible)
+            {
+                continue;
+            }
+
+            Vector3 extents =
+                Vector3.Max(
+                    Vector3.Abs(instance.Transform.Scale) * 0.5f,
+                    new Vector3(0.05f));
+
+            if (!TryIntersectBounds(
+                    ray,
+                    instance.Transform.Position - extents,
+                    instance.Transform.Position + extents,
+                    out float distance) ||
+                distance >= nearestDistance)
+            {
+                continue;
+            }
+
+            nearestDistance = distance;
+            nearest = instance.Entity;
+        }
+
+        entity = nearest;
+        return entity.IsValid;
+    }
+
     public static EntityId[] PickBox(
         RtsCamera camera,
         RenderWorld world,

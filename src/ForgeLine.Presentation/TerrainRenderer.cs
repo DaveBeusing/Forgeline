@@ -16,13 +16,17 @@ public sealed class TerrainRenderer : IDisposable
     public TerrainRenderer(
         IGraphicsDevice graphics,
         TerrainWorld world,
-        TerrainMeshSettings? meshSettings = null)
+        TerrainMeshSettings? meshSettings = null,
+        TerrainPresentationProfile? presentationProfile = null)
     {
         ArgumentNullException.ThrowIfNull(graphics);
         ArgumentNullException.ThrowIfNull(world);
 
         TerrainMeshSettings resolvedMeshSettings =
             meshSettings ?? new TerrainMeshSettings();
+        TerrainPresentationProfile resolvedProfile =
+            presentationProfile ??
+            TerrainPresentationProfile.CreateCentralDivide();
         resolvedMeshSettings.Validate();
 
         _pipeline = CreateTerrainPipeline(graphics);
@@ -36,9 +40,14 @@ public sealed class TerrainRenderer : IDisposable
                 TerrainMeshData mesh =
                     TerrainMeshGenerator.Generate(chunk, resolvedMeshSettings);
 
+                TerrainRenderVertex[] renderVertices =
+                    CreateRenderVertices(
+                        mesh.Vertices,
+                        resolvedProfile);
+
                 ulong vertexBytes = checked(
-                    (ulong)mesh.Vertices.Length *
-                    TerrainVertex.SizeInBytes);
+                    (ulong)renderVertices.Length *
+                    TerrainRenderVertex.SizeInBytes);
                 ulong indexBytes = checked(
                     (ulong)mesh.Indices.Length *
                     sizeof(uint));
@@ -54,7 +63,7 @@ public sealed class TerrainRenderer : IDisposable
 
                 try
                 {
-                    vertexBuffer.SetData<TerrainVertex>(mesh.Vertices);
+                    vertexBuffer.SetData<TerrainRenderVertex>(renderVertices);
                     indexBuffer.SetData<uint>(mesh.Indices);
 
                     resources.Add(
@@ -141,7 +150,7 @@ public sealed class TerrainRenderer : IDisposable
             context.SetVertexConstants(constants);
             context.SetVertexBuffer(
                 resource.VertexBuffer,
-                TerrainVertex.SizeInBytes);
+                TerrainRenderVertex.SizeInBytes);
             context.SetIndexBuffer(
                 resource.IndexBuffer,
                 GraphicsIndexFormat.ThirtyTwoBit);
@@ -191,6 +200,7 @@ public sealed class TerrainRenderer : IDisposable
                 float3 Position : POSITION;
                 float3 Normal : NORMAL;
                 float2 LocalUv : TEXCOORD0;
+                float4 BaseColor : COLOR0;
             };
 
             struct VertexOutput
@@ -201,6 +211,7 @@ public sealed class TerrainRenderer : IDisposable
                 float2 LocalUv : TEXCOORD2;
                 float2 ChunkCoordinate : TEXCOORD3;
                 float DebugChunks : TEXCOORD4;
+                float4 BaseColor : COLOR0;
             };
 
             VertexOutput VSMain(VertexInput input)
@@ -211,6 +222,7 @@ public sealed class TerrainRenderer : IDisposable
                 output.WorldPosition = input.Position;
                 output.Normal = input.Normal;
                 output.LocalUv = input.LocalUv;
+                output.BaseColor = input.BaseColor;
                 output.ChunkCoordinate = ChunkCoordinate;
                 output.DebugChunks = DebugChunks;
                 return output;
@@ -226,19 +238,13 @@ public sealed class TerrainRenderer : IDisposable
                 float2 LocalUv : TEXCOORD2;
                 float2 ChunkCoordinate : TEXCOORD3;
                 float DebugChunks : TEXCOORD4;
+                float4 BaseColor : COLOR0;
             };
 
             float4 PSMain(PixelInput input) : SV_Target0
             {
                 float3 normal = normalize(input.Normal);
-                float slope = saturate(1.0f - normal.y);
-                float elevation = saturate((input.WorldPosition.y + 30.0f) / 70.0f);
-
-                float3 low = float3(0.16f, 0.28f, 0.13f);
-                float3 high = float3(0.38f, 0.34f, 0.22f);
-                float3 rock = float3(0.34f, 0.35f, 0.33f);
-                float3 color = lerp(low, high, elevation);
-                color = lerp(color, rock, saturate(slope * 1.8f));
+                float3 color = input.BaseColor.rgb;
 
                 float light =
                     0.45f +
@@ -302,11 +308,49 @@ public sealed class TerrainRenderer : IDisposable
                         "TEXCOORD",
                         0,
                         GraphicsVertexElementFormat.Float2,
-                        24)
+                        24),
+                    new GraphicsVertexElement(
+                        "COLOR",
+                        0,
+                        GraphicsVertexElementFormat.Float4,
+                        32)
                 ],
                 VertexRootConstantCount = TerrainRootConstantCount,
                 DepthEnabled = true
             });
+    }
+
+    private static TerrainRenderVertex[] CreateRenderVertices(
+        IReadOnlyList<TerrainVertex> vertices,
+        TerrainPresentationProfile profile)
+    {
+        var result =
+            new TerrainRenderVertex[vertices.Count];
+
+        for (int index = 0; index < result.Length; index++)
+        {
+            TerrainVertex vertex =
+                vertices[index];
+            result[index] =
+                new TerrainRenderVertex(
+                    vertex.Position,
+                    vertex.Normal,
+                    vertex.LocalUv,
+                    profile.SampleBaseColor(
+                        vertex.Position,
+                        vertex.Normal));
+        }
+
+        return result;
+    }
+
+    private readonly record struct TerrainRenderVertex(
+        Vector3 Position,
+        Vector3 Normal,
+        Vector2 LocalUv,
+        Vector4 BaseColor)
+    {
+        public const int SizeInBytes = 48;
     }
 
     private static void WriteMatrix(

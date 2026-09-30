@@ -857,6 +857,7 @@ internal sealed class ClientApplication
 
         bool interactionFeedback =
             selectionController.Selection.Count > 0 ||
+            selectionController.InspectedEntity.IsValid ||
             selectionController.HoveredEntity.IsValid ||
             buildingPlacementController.IsActive ||
             (constructionSnapshot?.Sites.Count ?? 0) > 0;
@@ -1080,6 +1081,22 @@ internal sealed class ClientApplication
                 selectedColor,
                 label);
             selectionLabelCount++;
+        }
+
+        EntityId inspected =
+            selectionController.InspectedEntity;
+        if (inspected.IsValid &&
+            !selectionController.Selection.Contains(inspected) &&
+            renderWorld.TryGetInterpolatedInstance(
+                inspected,
+                alpha,
+                out RenderInstance inspectedInstance))
+        {
+            DrawInstanceBounds(
+                debugDraw,
+                inspectedInstance,
+                selectedColor,
+                $"INSPECTED E{inspected.Index}");
         }
 
         EntityId hovered = selectionController.HoveredEntity;
