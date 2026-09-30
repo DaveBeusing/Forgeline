@@ -264,8 +264,23 @@ public sealed class CombatExecutionSystemTests
                 scenario.Target));
 
         EntityId wreck =
-            Assert.Single(
-                scenario.Simulation.Entities.Query<UnitWreckPresentationIdentity>());
+            EntityId.Invalid;
+        int wreckCount =
+            0;
+
+        foreach (EntityId candidate in
+                 scenario.Simulation.Entities.Query<UnitWreckPresentationIdentity>())
+        {
+            wreck =
+                candidate;
+            wreckCount++;
+        }
+
+        Assert.Equal(
+            1,
+            wreckCount);
+        Assert.True(
+            wreck.IsValid);
 
         UnitWreckPresentationIdentity identity =
             scenario.Simulation.Entities.GetComponent<UnitWreckPresentationIdentity>(
