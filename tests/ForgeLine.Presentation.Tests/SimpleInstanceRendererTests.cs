@@ -181,7 +181,8 @@ public sealed class SimpleInstanceRendererTests : IDisposable
         public void SetVertexBuffer(
             IGraphicsBuffer buffer,
             int strideInBytes,
-            int offsetInBytes = 0)
+            int offsetInBytes = 0,
+            int inputSlot = 0)
         {
         }
 
@@ -207,6 +208,16 @@ public sealed class SimpleInstanceRendererTests : IDisposable
             int indexCount,
             int startIndex = 0,
             int baseVertex = 0)
+        {
+            IndexedDrawCalls++;
+        }
+
+        public void DrawIndexedInstanced(
+            int indexCount,
+            int instanceCount,
+            int startIndex = 0,
+            int baseVertex = 0,
+            int startInstance = 0)
         {
             IndexedDrawCalls++;
         }
