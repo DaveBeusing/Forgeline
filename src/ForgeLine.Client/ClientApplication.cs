@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Text.Json;
 using ForgeLine.Assets;
 using ForgeLine.Combat;
 using ForgeLine.Core;
@@ -37,7 +38,10 @@ internal sealed class ClientApplication
         _platform = platform;
     }
 
-    internal int Run(bool smokeTest, int renderInstanceCount)
+    internal int Run(
+        bool smokeTest,
+        int renderInstanceCount,
+        string? visualQualificationOutput = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(renderInstanceCount);
 
@@ -682,7 +686,74 @@ internal sealed class ClientApplication
             buildingPlacementController);
         renderHost.ThrowIfFaulted();
         simulationHost.ThrowIfFaulted();
+
+        if (!string.IsNullOrWhiteSpace(
+                visualQualificationOutput))
+        {
+            WriteVisualQualificationReport(
+                visualQualificationOutput,
+                renderInstanceCount,
+                renderHost.LatestQualification);
+        }
+
         return 0;
+    }
+
+    private static void WriteVisualQualificationReport(
+        string outputPath,
+        int renderStressInstances,
+        ClientVisualQualificationSnapshot? qualification)
+    {
+        ClientVisualQualificationSnapshot metrics =
+            qualification ??
+            throw new InvalidOperationException(
+                "No completed render frame was available for visual qualification.");
+
+        string fullPath =
+            Path.GetFullPath(
+                outputPath);
+        string? directory =
+            Path.GetDirectoryName(
+                fullPath);
+
+        if (!string.IsNullOrWhiteSpace(
+                directory))
+        {
+            Directory.CreateDirectory(
+                directory);
+        }
+
+        var report =
+            new
+            {
+                scene =
+                    "vertical-slice-client",
+                renderStressInstances,
+                metrics
+            };
+
+        File.WriteAllText(
+            fullPath,
+            JsonSerializer.Serialize(
+                report,
+                new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy =
+                        JsonNamingPolicy.CamelCase,
+                    WriteIndented =
+                        true
+                }));
+
+        Console.WriteLine(
+            $"[render:qualification] output=\"{fullPath}\" " +
+            $"fps={metrics.FramesPerSecond:F1} " +
+            $"frameMs={metrics.FrameMilliseconds:F3} " +
+            $"cpuRenderMs={metrics.CpuRenderMilliseconds:F3} " +
+            $"gpuMs={(metrics.GpuMilliseconds?.ToString("F3", System.Globalization.CultureInfo.InvariantCulture) ?? "unavailable")} " +
+            $"draws={metrics.TotalMeasuredDrawCalls} " +
+            $"instances={metrics.VisibleInstances}/{metrics.TotalInstances} " +
+            $"lod={metrics.HighLodInstances}/{metrics.ReducedLodInstances} " +
+            $"vfx={metrics.ActiveVfxEffects}/{metrics.VfxPoolCapacity}");
     }
 
     private static void DispatchPlayerActionRequest(
