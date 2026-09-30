@@ -29,6 +29,8 @@ public sealed record SourceAssetDefinition
 
     public required string Source { get; init; }
 
+    public float Scale { get; init; } = 1f;
+
     public IReadOnlyList<string> Dependencies { get; init; } = [];
 
     public IReadOnlyList<string> MaterialReferences { get; init; } = [];
