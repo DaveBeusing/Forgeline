@@ -89,11 +89,13 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
     public void SetVertexBuffer(
         IGraphicsBuffer buffer,
         int strideInBytes,
-        int offsetInBytes = 0)
+        int offsetInBytes = 0,
+        int inputSlot = 0)
     {
         D3D12GraphicsBuffer d3d12Buffer = ValidateBuffer(buffer);
 
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(strideInBytes);
+        ArgumentOutOfRangeException.ThrowIfNegative(inputSlot);
 
         ulong remaining = ValidateBufferOffset(d3d12Buffer, offsetInBytes);
         var view = new VertexBufferView(
@@ -101,7 +103,9 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
             checked((uint)remaining),
             checked((uint)strideInBytes));
 
-        _commandList.IASetVertexBuffers(0, view);
+        _commandList.IASetVertexBuffers(
+            checked((uint)inputSlot),
+            view);
     }
 
     public void SetIndexBuffer(
@@ -178,7 +182,19 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
     public void DrawIndexed(
         int indexCount,
         int startIndex = 0,
-        int baseVertex = 0)
+        int baseVertex = 0) =>
+        DrawIndexedInstanced(
+            indexCount,
+            1,
+            startIndex,
+            baseVertex);
+
+    public void DrawIndexedInstanced(
+        int indexCount,
+        int instanceCount,
+        int startIndex = 0,
+        int baseVertex = 0,
+        int startInstance = 0)
     {
         if (indexCount <= 0)
         {
@@ -188,14 +204,23 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
                 "Indexed draw calls must contain at least one index.");
         }
 
+        if (instanceCount <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(instanceCount),
+                instanceCount,
+                "Instanced draw calls must contain at least one instance.");
+        }
+
         ArgumentOutOfRangeException.ThrowIfNegative(startIndex);
+        ArgumentOutOfRangeException.ThrowIfNegative(startInstance);
 
         _commandList.DrawIndexedInstanced(
             checked((uint)indexCount),
-            1,
+            checked((uint)instanceCount),
             checked((uint)startIndex),
             baseVertex,
-            0);
+            checked((uint)startInstance));
     }
 
     private D3D12GraphicsBuffer ValidateBuffer(IGraphicsBuffer buffer)
