@@ -321,11 +321,11 @@ public sealed class TerrainRenderer : IDisposable
     }
 
     private static TerrainRenderVertex[] CreateRenderVertices(
-        IReadOnlyList<TerrainVertex> vertices,
+        TerrainVertex[] vertices,
         TerrainPresentationProfile profile)
     {
         var result =
-            new TerrainRenderVertex[vertices.Count];
+            new TerrainRenderVertex[vertices.Length];
 
         for (int index = 0; index < result.Length; index++)
         {

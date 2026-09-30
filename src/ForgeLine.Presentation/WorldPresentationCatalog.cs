@@ -47,7 +47,7 @@ public readonly record struct WorldFeaturePresentationMetadata(
 
 public static class WorldPresentationCatalog
 {
-    private static readonly IReadOnlyDictionary<WorldVisualId, WorldPresentationDefinition> Definitions =
+    private static readonly Dictionary<WorldVisualId, WorldPresentationDefinition> Definitions =
         CreateDefinitions();
 
     public static WorldPresentationDefinition Get(
@@ -116,7 +116,7 @@ public static class WorldPresentationCatalog
         };
     }
 
-    private static IReadOnlyDictionary<WorldVisualId, WorldPresentationDefinition> CreateDefinitions()
+    private static Dictionary<WorldVisualId, WorldPresentationDefinition> CreateDefinitions()
     {
         var result =
             new Dictionary<WorldVisualId, WorldPresentationDefinition>();

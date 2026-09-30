@@ -29,7 +29,7 @@ public readonly record struct TerrainBlendRegion(
 
 public sealed class TerrainPresentationProfile
 {
-    private readonly IReadOnlyDictionary<TerrainMaterialSlot, TerrainMaterialDefinition> _materials;
+    private readonly Dictionary<TerrainMaterialSlot, TerrainMaterialDefinition> _materials;
     private readonly TerrainBlendRegion[] _regions;
 
     public TerrainPresentationProfile(
