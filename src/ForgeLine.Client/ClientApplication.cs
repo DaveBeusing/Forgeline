@@ -28,7 +28,6 @@ internal sealed class ClientApplication
     private static readonly TimeSpan IdleWait = TimeSpan.FromMilliseconds(16);
     private static readonly TimeSpan SmokeTestDuration = TimeSpan.FromMilliseconds(350);
     private static readonly TimeSpan DiagnosticInterval = TimeSpan.FromSeconds(1);
-    private static readonly TimeSpan MaximumSimulationCatchUp = TimeSpan.FromMilliseconds(250);
 
     private readonly IPlatform _platform;
 
@@ -49,7 +48,6 @@ internal sealed class ClientApplication
             WindowMode.Windowed);
 
         using IWindow window = _platform.CreateWindow(configuration);
-        using IGraphicsDevice graphics = GraphicsDeviceFactory.CreateForWindow(window);
 
         var snapshotBuffer =
             new PresentationSnapshotBuffer();
@@ -72,20 +70,6 @@ internal sealed class ClientApplication
             scenario.West;
         SkirmishStartingBase eastBase =
             scenario.East;
-
-        using var terrainRenderer =
-            new TerrainRenderer(
-                graphics,
-                terrainWorld);
-        using var instanceRenderer =
-            new SimpleInstanceRenderer(
-                graphics);
-        using var debugDrawRenderer =
-            new DebugDrawRenderer(
-                graphics);
-        using var overlayRenderer =
-            new DevelopmentOverlayRenderer(
-                graphics);
 
         if (renderInstanceCount > 0)
         {
@@ -125,10 +109,7 @@ internal sealed class ClientApplication
                 snapshotBuffer,
                 presentationExtraction));
 
-        simulation.AdvanceOneTick();
-
         var renderWorld = new RenderWorld();
-        _ = renderWorld.Update(snapshotBuffer);
 
         BattlefieldStartPosition localStart =
             prototypeBattlefield.Starts.Single(
@@ -169,7 +150,28 @@ internal sealed class ClientApplication
         var tacticalTargetingController =
             new RtsTacticalTargetingController();
         var debugDraw = new DebugDraw();
-        var frameTimingTracker = new FrameTimingTracker();
+
+        using var simulationHost =
+            new ClientSimulationHost(
+                scenario,
+                commandGateway,
+                snapshotBuffer);
+        _ = renderWorld.Update(
+            snapshotBuffer);
+
+        var graphicsTarget =
+            new GraphicsWindowTarget(
+                window.NativeHandle.Value,
+                window.ClientSize.Width,
+                window.ClientSize.Height,
+                window.IsMinimized ||
+                window.ClientSize.IsEmpty);
+        using var renderHost =
+            new ClientRenderHost(
+                graphicsTarget,
+                terrainWorld,
+                snapshotBuffer,
+                camera.Settings);
 
         PlayerCommandSubmissionReceipt? lastCommandReceipt = null;
         PlayerCommandResultReadModel? lastCommandResult = null;
@@ -182,18 +184,16 @@ internal sealed class ClientApplication
         bool returnHeld = false;
         FormationTemplate activeFormation =
             FormationTemplate.Compact;
-        TimeSpan simulationAccumulator = TimeSpan.Zero;
-        FrameTimingMetrics frameTiming = default;
+        bool simulationPausedForWindow = false;
+        bool terminalAcknowledgementRequested = false;
+        bool smokeCompletionRequested = false;
 
         WriteWindowState("started", window);
-        WriteGraphicsState("started", graphics);
         WriteWorldState("started", terrainWorld);
         WriteCameraState("started", camera);
-        WritePresentationState(
-            "started",
-            renderWorld,
-            terrainRenderer,
-            instanceRenderer);
+        Console.WriteLine(
+            $"[execution:owners] platform={Environment.CurrentManagedThreadId} " +
+            $"session={simulationHost.SessionId.Value} simulation=dedicated render=dedicated");
         WriteInteractionState(
             "started",
             selectionController,
@@ -216,8 +216,15 @@ internal sealed class ClientApplication
                 break;
             }
 
-            DrainWindowEvents(window, graphics);
+            DrainWindowEvents(window);
             DrainInputEvents(window, inputState);
+            simulationHost.ThrowIfFaulted();
+            renderHost.ThrowIfFaulted();
+            _ = renderWorld.Update(
+                snapshotBuffer);
+            DrainSubmissionCompletions(
+                simulationHost,
+                ref lastCommandReceipt);
 
             long now = _platform.Clock.GetTimestamp();
             TimeSpan frameElapsed = _platform.Clock.GetElapsedTime(previousFrameAt, now);
@@ -263,6 +270,13 @@ internal sealed class ClientApplication
                 inputExperience?.IsMatchComplete ==
                 true;
 
+            if (inputExperience?.MatchStatus ==
+                    PlayerMatchStatus.Ended &&
+                terminalAcknowledgementRequested)
+            {
+                return 0;
+            }
+
             if (inputMatchTerminal &&
                 restartPressed)
             {
@@ -270,19 +284,19 @@ internal sealed class ClientApplication
             }
 
             if (inputMatchTerminal &&
-                returnPressed)
+                returnPressed &&
+                !terminalAcknowledgementRequested)
             {
-                lastCommandReceipt =
-                    commandGateway.SubmitEndMatch(
+                if (!simulationHost.TryAcknowledgeTerminal(
+                        simulationHost.SessionId,
                         LocalPlayer,
-                        inputSnapshot!.Tick);
-                simulation.AdvanceOneTick();
-                _ = renderWorld.Update(
-                    snapshotBuffer);
-                DrainCommandResults(
-                    commandGateway,
-                    ref lastCommandResult);
-                return 0;
+                        inputSnapshot!.Tick))
+                {
+                    throw new InvalidOperationException(
+                        "Simulation control boundary is full while acknowledging the terminal match.");
+                }
+
+                terminalAcknowledgementRequested = true;
             }
 
             if (!window.IsOpen)
@@ -290,8 +304,43 @@ internal sealed class ClientApplication
                 continue;
             }
 
-            if (window.IsMinimized || window.ClientSize.IsEmpty)
+            bool shouldPauseForWindow =
+                window.IsMinimized ||
+                window.ClientSize.IsEmpty;
+
+            if (shouldPauseForWindow !=
+                simulationPausedForWindow)
             {
+                if (!simulationHost.TrySetPaused(
+                        shouldPauseForWindow))
+                {
+                    throw new InvalidOperationException(
+                        "Simulation control boundary is full while changing the window pause state.");
+                }
+
+                simulationPausedForWindow =
+                    shouldPauseForWindow;
+            }
+
+            if (shouldPauseForWindow)
+            {
+                debugDraw.Clear();
+                _ = renderHost.Publish(
+                    new ClientRenderFrame(
+                        camera.CaptureState(),
+                        window.ClientSize.Width,
+                        window.ClientSize.Height,
+                        overlayEnabled,
+                        worldDebugEnabled,
+                        actionPanel.CreateView(
+                            window.ClientSize.Width,
+                            window.ClientSize.Height,
+                            inputSnapshot?.PlayerActions),
+                        tacticalTargetingController.CreateView(
+                            inputSnapshot),
+                        activeFormation,
+                        [],
+                        []));
                 _platform.WaitForEvents(IdleWait);
                 continue;
             }
@@ -346,60 +395,6 @@ internal sealed class ClientApplication
                     window.ClientSize.Height);
             }
 
-            TimeSpan catchUp = frameElapsed <= MaximumSimulationCatchUp
-                ? frameElapsed
-                : MaximumSimulationCatchUp;
-            simulationAccumulator += catchUp;
-
-            while (simulationAccumulator >= simulation.Clock.TickDuration)
-            {
-                if (renderWorld.CurrentSnapshot?.PlayerExperience
-                        ?.IsMatchComplete ==
-                    true)
-                {
-                    simulationAccumulator =
-                        TimeSpan.Zero;
-                    break;
-                }
-
-                simulation.AdvanceOneTick();
-                _ = renderWorld.Update(
-                    snapshotBuffer);
-                simulationAccumulator -=
-                    simulation.Clock.TickDuration;
-            }
-
-            if (smokeTest &&
-                !smokeMatchCompleted)
-            {
-                while (simulation.CurrentTick.Value < 2)
-                {
-                    simulation.AdvanceOneTick();
-                }
-
-                if (simulation.Entities.IsAlive(
-                        eastBase.CommandCore))
-                {
-                    simulation.Entities.DestroyEntity(
-                        eastBase.CommandCore);
-                }
-
-                simulation.AdvanceOneTick();
-                _ = renderWorld.Update(
-                    snapshotBuffer);
-
-                if (renderWorld.CurrentSnapshot?.PlayerExperience
-                        ?.MatchStatus !=
-                    PlayerMatchStatus.Victory)
-                {
-                    throw new InvalidOperationException(
-                        "Client smoke validation failed to resolve Command Core destruction as a local victory.");
-                }
-
-                smokeMatchCompleted = true;
-                simulationAccumulator = TimeSpan.Zero;
-            }
-
             if (smokeTest &&
                 smokeMatchCompleted &&
                 _platform.Clock.GetElapsedTime(startedAt, now) >= SmokeTestDuration)
@@ -412,10 +407,7 @@ internal sealed class ClientApplication
 
             PresentationSnapshot? currentSnapshot =
                 renderWorld.CurrentSnapshot;
-            float renderAlpha =
-                RenderInterpolation.CalculateAlpha(
-                    simulationAccumulator,
-                    simulation.Clock.TickDuration);
+            const float renderAlpha = 1.0f;
             PlayerExperienceSnapshot? currentExperience =
                 currentSnapshot?.PlayerExperience;
             bool gameplayActive =
@@ -540,68 +532,31 @@ internal sealed class ClientApplication
                     MaximumDebugLabels);
             }
 
-            terrainRenderer.DebugChunksEnabled =
-                worldDebugEnabled;
-
-            DevelopmentOverlayMetrics overlayMetrics =
-                CreateOverlayMetrics(
-                    frameTiming,
-                    currentSnapshot,
-                    terrainRenderer,
-                    instanceRenderer,
-                    debugDrawRenderer,
-                    renderWorld);
-            PlayerExperienceSnapshot playerExperience =
-                currentExperience ??
-                default;
-
-            long renderStartedAt = _platform.Clock.GetTimestamp();
-
-            graphics.RenderFrame(
-                GraphicsColor.ForgeLineClear,
-                context =>
-                {
-                    terrainRenderer.Render(context, camera);
-                    instanceRenderer.Render(context, camera, renderWorld, renderAlpha);
-                    debugDrawRenderer.Render(context, camera, debugDraw);
-
-                    overlayRenderer.Render(
-                        context,
-                        overlayMetrics,
-                        camera,
-                        debugDraw,
-                        playerExperience,
-                        showDevelopmentMetrics:
-                            overlayEnabled,
-                        playerActions:
-                            currentSnapshot?.PlayerActions,
-                        actionPanel:
-                            actionPanel.CreateView(
-                                window.ClientSize.Width,
-                                window.ClientSize.Height,
-                                currentSnapshot?.PlayerActions),
-                        tacticalTargeting:
-                            tacticalTargetingController.CreateView(
-                                currentSnapshot),
-                        activeFormation:
-                            activeFormation);
-                });
-
-            long renderFinishedAt = _platform.Clock.GetTimestamp();
-
-            frameTiming = frameTimingTracker.Record(
-                frameElapsed,
-                _platform.Clock.GetElapsedTime(renderStartedAt, renderFinishedAt));
+            _ = renderHost.Publish(
+                new ClientRenderFrame(
+                    camera.CaptureState(),
+                    window.ClientSize.Width,
+                    window.ClientSize.Height,
+                    overlayEnabled,
+                    worldDebugEnabled,
+                    actionPanel.CreateView(
+                        window.ClientSize.Width,
+                        window.ClientSize.Height,
+                        currentSnapshot?.PlayerActions),
+                    tacticalTargetingController.CreateView(
+                        currentSnapshot),
+                    activeFormation,
+                    debugDraw.Lines.ToArray(),
+                    debugDraw.Labels.ToArray()));
 
             if (_platform.Clock.GetElapsedTime(nextDiagnosticAt, now) >= DiagnosticInterval)
             {
                 WriteCameraState("frame", camera);
-                WriteTerrainState("frame", terrainRenderer);
-                WritePresentationState(
-                    "frame",
-                    renderWorld,
-                    terrainRenderer,
-                    instanceRenderer);
+                Console.WriteLine(
+                    $"[presentation:frame] session={currentSnapshot?.SessionId.Value ?? 0} " +
+                    $"tick={currentSnapshot?.Tick.Value ?? 0} " +
+                    $"entities={currentSnapshot?.SimulationEntityCount ?? 0} " +
+                    $"instances={renderWorld.InstanceCount}");
                 WriteInteractionState(
                     "frame",
                     selectionController,
@@ -613,15 +568,9 @@ internal sealed class ClientApplication
             }
         }
 
-        DrainWindowEvents(window, graphics);
+        DrainWindowEvents(window);
         DrainInputEvents(window, inputState);
         WriteCameraState("stopped", camera);
-        WriteTerrainState("stopped", terrainRenderer);
-        WritePresentationState(
-            "stopped",
-            renderWorld,
-            terrainRenderer,
-            instanceRenderer);
         WriteInteractionState(
             "stopped",
             selectionController,
@@ -629,7 +578,8 @@ internal sealed class ClientApplication
             lastCommandResult,
             activeFormation,
             buildingPlacementController);
-        WriteGraphicsState("stopped", graphics);
+        renderHost.ThrowIfFaulted();
+        simulationHost.ThrowIfFaulted();
         return 0;
     }
 
