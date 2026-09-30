@@ -687,6 +687,22 @@ public sealed class PlayerConstructionProductionFlowTests
 
         Assert.Equal(2, tanks.Length);
 
+        foreach (EntityId tank in tanks)
+        {
+            PlayerCommandResultReadModel policyResult =
+                DispatchAction(
+                    scenario,
+                    gateway,
+                    PlayerActionRequest.SetAutomaticResupplyPolicy(
+                        tank,
+                        fuelThreshold: 0.0,
+                        ammunitionThreshold: 0.0,
+                        enabled: false));
+            Assert.Equal(
+                PlayerCommandFeedbackState.Accepted,
+                policyResult.State);
+        }
+
         Vector3 supplyStagingDirection =
             Vector3.Normalize(
                 new Vector3(
