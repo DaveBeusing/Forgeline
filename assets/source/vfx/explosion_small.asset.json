@@ -1,0 +1,8 @@
+{
+  "id": "vfx.combat.explosion.small",
+  "type": "mesh",
+  "source": "sources/explosion_small.gltf",
+  "materialReferences": [
+    "material.vfx.explosion"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "id": "vfx.combat.muzzle.machine_gun",
+  "type": "mesh",
+  "source": "sources/muzzle_machine_gun.gltf",
+  "materialReferences": [
+    "material.vfx.muzzle"
+  ]
+}

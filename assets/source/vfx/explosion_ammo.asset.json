@@ -1,0 +1,8 @@
+{
+  "id": "vfx.combat.explosion.ammunition_secondary",
+  "type": "mesh",
+  "source": "sources/explosion_ammo.gltf",
+  "materialReferences": [
+    "material.vfx.explosion"
+  ]
+}

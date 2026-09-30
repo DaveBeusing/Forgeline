@@ -1,0 +1,51 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine VFX baseline"
+  },
+  "buffers": [
+    {
+      "byteLength": 960,
+      "uri": "data:application/octet-stream;base64,mpk5v2Zm5r6amTm/mpk5P2Zm5r6amTm/mpk5P2Zm5j6amTm/mpk5v2Zm5j6amTm/mpk5v2Zm5r6amTk/mpk5P2Zm5r6amTk/mpk5P2Zm5j6amTk/mpk5v2Zm5j6amTk/mpkZPs3MTD3NzEy+MzNzP83MTD3NzEy+MzNzP2ZmJj/NzEy+mpkZPmZmJj/NzEy+mpkZPs3MTD2amRk/MzNzP83MTD2amRk/MzNzP2ZmJj+amRk/mpkZPmZmJj+amRk/mplZvwrXozyuRyG/mpkZvgrXozyuRyG/mpkZvnE9Cj+uRyG/mplZv3E9Cj+uRyG/mplZvwrXozwpXI89mpkZvgrXozwpXI89mpkZvnE9Cj8pXI89mplZv3E9Cj8pXI89exQuvs3MzD57FC6+exQuPs3MzD57FC6+exQuPjMzsz97FC6+exQuvjMzsz97FC6+exQuvs3MzD57FC4+exQuPs3MzD57FC4+exQuPjMzsz97FC4+exQuvjMzsz97FC4+AAAAAAIAAAABAAAAAAAAAAMAAAACAAAABAAAAAUAAAAGAAAABAAAAAYAAAAHAAAAAAAAAAEAAAAFAAAAAAAAAAUAAAAEAAAAAwAAAAcAAAAGAAAAAwAAAAYAAAACAAAAAQAAAAIAAAAGAAAAAQAAAAYAAAAFAAAAAAAAAAQAAAAHAAAAAAAAAAcAAAADAAAACAAAAAoAAAAJAAAACAAAAAsAAAAKAAAADAAAAA0AAAAOAAAADAAAAA4AAAAPAAAACAAAAAkAAAANAAAACAAAAA0AAAAMAAAACwAAAA8AAAAOAAAACwAAAA4AAAAKAAAACQAAAAoAAAAOAAAACQAAAA4AAAANAAAACAAAAAwAAAAPAAAACAAAAA8AAAALAAAAEAAAABIAAAARAAAAEAAAABMAAAASAAAAFAAAABUAAAAWAAAAFAAAABYAAAAXAAAAEAAAABEAAAAVAAAAEAAAABUAAAAUAAAAEwAAABcAAAAWAAAAEwAAABYAAAASAAAAEQAAABIAAAAWAAAAEQAAABYAAAAVAAAAEAAAABQAAAAXAAAAEAAAABcAAAATAAAAGAAAABoAAAAZAAAAGAAAABsAAAAaAAAAHAAAAB0AAAAeAAAAHAAAAB4AAAAfAAAAGAAAABkAAAAdAAAAGAAAAB0AAAAcAAAAGwAAAB8AAAAeAAAAGwAAAB4AAAAaAAAAGQAAABoAAAAeAAAAGQAAAB4AAAAdAAAAGAAAABwAAAAfAAAAGAAAAB8AAAAbAAAA"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 384
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 384,
+      "byteLength": 576
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 32,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5125,
+      "count": 144,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1,
+          "mode": 4
+        }
+      ]
+    }
+  ]
+}

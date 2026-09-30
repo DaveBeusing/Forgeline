@@ -1,0 +1,8 @@
+{
+  "id": "vfx.combat.explosion.vehicle",
+  "type": "mesh",
+  "source": "sources/explosion_vehicle.gltf",
+  "materialReferences": [
+    "material.vfx.explosion"
+  ]
+}

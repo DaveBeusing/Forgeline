@@ -1,0 +1,8 @@
+{
+  "id": "vfx.logistics.refuel",
+  "type": "mesh",
+  "source": "sources/logistics_refuel.gltf",
+  "materialReferences": [
+    "material.vfx.logistics"
+  ]
+}

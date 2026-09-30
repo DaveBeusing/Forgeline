@@ -1,0 +1,5 @@
+{
+  "id": "material.vfx.spark",
+  "type": "material",
+  "source": "spark.material.json"
+}

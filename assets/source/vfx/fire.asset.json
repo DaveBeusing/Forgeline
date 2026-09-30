@@ -1,0 +1,8 @@
+{
+  "id": "vfx.combat.persistent.fire",
+  "type": "mesh",
+  "source": "sources/fire.gltf",
+  "materialReferences": [
+    "material.vfx.fire"
+  ]
+}

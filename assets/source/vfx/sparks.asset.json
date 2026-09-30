@@ -1,0 +1,8 @@
+{
+  "id": "vfx.combat.persistent.sparks",
+  "type": "mesh",
+  "source": "sources/sparks.gltf",
+  "materialReferences": [
+    "material.vfx.spark"
+  ]
+}

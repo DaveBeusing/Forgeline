@@ -1,0 +1,51 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine VFX baseline"
+  },
+  "buffers": [
+    {
+      "byteLength": 480,
+      "uri": "data:application/octet-stream;base64,ocEGPiQHq76PwnW9XP2GPnaLeb6PwnW9ocEGviQHqz6PwnW9XP2GvnaLeT6PwnW9ocEGPiQHq76PwnU9XP2GPnaLeb6PwnU9ocEGviQHqz6PwnU9XP2GvnaLeT6PwnU9Ctejvcg9d748p1++CtejPcg9d748p1++CtejPQ28mz5Dyu09CtejvQ28mz5Dyu09CtejvQ28m75Dyu29CtejPQ28m75Dyu29CtejPcg9dz48p18+Ctejvcg9dz48p18+AAAAAAIAAAABAAAAAAAAAAMAAAACAAAABAAAAAUAAAAGAAAABAAAAAYAAAAHAAAAAAAAAAEAAAAFAAAAAAAAAAUAAAAEAAAAAwAAAAcAAAAGAAAAAwAAAAYAAAACAAAAAQAAAAIAAAAGAAAAAQAAAAYAAAAFAAAAAAAAAAQAAAAHAAAAAAAAAAcAAAADAAAACAAAAAoAAAAJAAAACAAAAAsAAAAKAAAADAAAAA0AAAAOAAAADAAAAA4AAAAPAAAACAAAAAkAAAANAAAACAAAAA0AAAAMAAAACwAAAA8AAAAOAAAACwAAAA4AAAAKAAAACQAAAAoAAAAOAAAACQAAAA4AAAANAAAACAAAAAwAAAAPAAAACAAAAA8AAAALAAAA"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 192
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 192,
+      "byteLength": 288
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 16,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5125,
+      "count": 72,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1,
+          "mode": 4
+        }
+      ]
+    }
+  ]
+}

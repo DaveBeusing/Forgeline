@@ -1,0 +1,51 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine VFX baseline"
+  },
+  "buffers": [
+    {
+      "byteLength": 720,
+      "uri": "data:application/octet-stream;base64,6qmpPlZG4b6PwvW84SjBPgB8zb6PwvW86qmpvlZG4T6PwvW84SjBvgB8zT6PwvW86qmpPlZG4b6PwvU84SjBPgB8zb6PwvU86qmpvlZG4T6PwvU84SjBvgB8zT6PwvU8AihcvlV1qb7mjI2+1DwmvrEvuL7mjI2+cY1rPrWMtz7AuGY+Q6I1PhBHxj7AuGY+cY1rvrWMt77AuGa+Q6I1vhBHxr7AuGa+AihcPlV1qT7mjI0+1DwmPrEvuD7mjI0+n7f0PQ06ub7Wh2U+uQk0Pt/csb6CVFY+09z7vUjepj7XVIu+Upw3vhqBnz4tu4O+09z7PUjepr7XVIs+Upw3PhqBn74tu4M+n7f0vQ06uT7Wh2W+uQk0vt/csT6CVFa+AAAAAAIAAAABAAAAAAAAAAMAAAACAAAABAAAAAUAAAAGAAAABAAAAAYAAAAHAAAAAAAAAAEAAAAFAAAAAAAAAAUAAAAEAAAAAwAAAAcAAAAGAAAAAwAAAAYAAAACAAAAAQAAAAIAAAAGAAAAAQAAAAYAAAAFAAAAAAAAAAQAAAAHAAAAAAAAAAcAAAADAAAACAAAAAoAAAAJAAAACAAAAAsAAAAKAAAADAAAAA0AAAAOAAAADAAAAA4AAAAPAAAACAAAAAkAAAANAAAACAAAAA0AAAAMAAAACwAAAA8AAAAOAAAACwAAAA4AAAAKAAAACQAAAAoAAAAOAAAACQAAAA4AAAANAAAACAAAAAwAAAAPAAAACAAAAA8AAAALAAAAEAAAABIAAAARAAAAEAAAABMAAAASAAAAFAAAABUAAAAWAAAAFAAAABYAAAAXAAAAEAAAABEAAAAVAAAAEAAAABUAAAAUAAAAEwAAABcAAAAWAAAAEwAAABYAAAASAAAAEQAAABIAAAAWAAAAEQAAABYAAAAVAAAAEAAAABQAAAAXAAAAEAAAABcAAAATAAAA"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 288
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 288,
+      "byteLength": 432
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5125,
+      "count": 108,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1,
+          "mode": 4
+        }
+      ]
+    }
+  ]
+}

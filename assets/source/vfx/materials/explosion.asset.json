@@ -1,0 +1,5 @@
+{
+  "id": "material.vfx.explosion",
+  "type": "material",
+  "source": "explosion.material.json"
+}

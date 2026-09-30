@@ -1,0 +1,8 @@
+{
+  "id": "vfx.destruction.spark_emission",
+  "type": "mesh",
+  "source": "sources/destruction_spark_emission.gltf",
+  "materialReferences": [
+    "material.vfx.spark"
+  ]
+}

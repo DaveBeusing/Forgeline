@@ -1,0 +1,8 @@
+{
+  "id": "vfx.destruction.vehicle_burst",
+  "type": "mesh",
+  "source": "sources/destruction_vehicle.gltf",
+  "materialReferences": [
+    "material.vfx.explosion"
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "id": "material.vfx.dust",
+  "type": "material",
+  "source": "dust.material.json"
+}
