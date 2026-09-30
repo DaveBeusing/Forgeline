@@ -3,6 +3,7 @@ using System.Runtime.ExceptionServices;
 using ForgeLine.Game;
 using ForgeLine.Graphics;
 using ForgeLine.Presentation;
+using ForgeLine.Simulation;
 using ForgeLine.World;
 
 namespace ForgeLine.Client;
