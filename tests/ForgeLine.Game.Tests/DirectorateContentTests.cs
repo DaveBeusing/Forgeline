@@ -201,6 +201,75 @@ public sealed class DirectorateContentTests
     }
 
     [Fact]
+    public void VerticalSliceUnitGameplayFootprintsRemainSaneAndIndependentFromRenderLod()
+    {
+        var simulation =
+            new SimulationCoordinator();
+        var inventories =
+            new InventoryStore();
+        var cargo =
+            new CargoTransportSystem(
+                new LogisticsNetwork(),
+                inventories);
+        var factory =
+            new UnitFactory(
+                simulation.Entities,
+                inventories,
+                cargo);
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
+        UnitId[] ids =
+        [
+            UnitIds.RifleSquad,
+            UnitIds.ScoutVehicle,
+            UnitIds.MainBattleTank,
+            UnitIds.MobileArtillery,
+            UnitIds.CargoTruck,
+            UnitIds.SupplyTruck
+        ];
+
+        for (int index = 0;
+             index < ids.Length;
+             index++)
+        {
+            UnitDefinition definition =
+                units[ids[index]];
+            EntityId entity =
+                factory.Create(
+                    definition,
+                    new Vector3(
+                        index * 20.0f,
+                        0.0f,
+                        0.0f),
+                    DirectoratePlayer);
+
+            CombatHitbox hitbox =
+                simulation.Entities.GetComponent<CombatHitbox>(
+                    entity);
+            GroundMovement movement =
+                simulation.Entities.GetComponent<GroundMovement>(
+                    entity);
+            WorldTransform transform =
+                simulation.Entities.GetComponent<WorldTransform>(
+                    entity);
+
+            Assert.Equal(
+                definition.VisualScale,
+                transform.Scale);
+            Assert.Equal(
+                definition.VisualScale * 0.5f,
+                hitbox.HalfExtents);
+            Assert.True(
+                movement.Radius > 0.0f);
+            Assert.True(
+                movement.Radius <=
+                MathF.Max(
+                    hitbox.HalfExtents.X,
+                    hitbox.HalfExtents.Z));
+        }
+    }
+
+    [Fact]
     public void UnitProductionConsumesPhysicalInputsAndSpawnsConfiguredUnit()
     {
         var simulation = new SimulationCoordinator();
