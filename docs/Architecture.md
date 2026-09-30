@@ -298,3 +298,9 @@ The Windows interactive host now has explicit platform, simulation, and render o
 - Platform-authored gameplay requests cross a bounded host queue and are converted to normal future-tick simulation commands only on the simulation owner.
 
 Minimize/pause, terminal freeze/acknowledgement, restart, shutdown, and owner failure are explicit lifecycle transitions. See [Client Execution Ownership](adr/ClientExecutionOwnership.md).
+
+## World presentation asset boundary
+
+`ForgeLine.Game` owns stable world-presentation identities and canonical Central Divide placement data without reading asset files. `ForgeLine.Presentation` maps those identities to stable runtime asset IDs, derives resource presentation state, selects LODs, and caches compiled mesh buffers. `ForgeLine.Client` loads the generated `RuntimeAssetCatalog` and passes it to the render host.
+
+This preserves the intended direction: source assets -> Asset Compiler -> runtime assets -> Presentation/Graphics. Simulation never loads source or runtime rendering assets.

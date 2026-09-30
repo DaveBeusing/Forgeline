@@ -1,0 +1,8 @@
+{
+  "id": "mesh.world.prop.industrial_light_signage_lod1",
+  "type": "mesh",
+  "source": "../sources/world_box.gltf",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ]
+}

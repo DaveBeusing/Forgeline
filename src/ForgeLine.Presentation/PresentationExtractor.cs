@@ -181,6 +181,20 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                         controllable.Category)
                     : SelectablePresentationMetadata.None;
 
+            WorldFeaturePresentationMetadata worldFeature =
+                context.Entities.TryGetComponent(
+                    entity,
+                    out WorldPresentationIdentity worldPresentation)
+                    ? new WorldFeaturePresentationMetadata(
+                        worldPresentation.Visual,
+                        worldPresentation.Kind,
+                        ResolveResourcePresentationState(
+                            context.Entities,
+                            entity,
+                            worldPresentation.Kind),
+                        worldPresentation.Inspectable)
+                    : WorldFeaturePresentationMetadata.None;
+
             instances[index++] =
                 new RenderInstance(
                     entity,
@@ -193,7 +207,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                     RenderMaterialHandle.Default,
                     visibility,
                     entity.Index,
-                    selectable);
+                    selectable,
+                    worldFeature);
         }
 
         if (index == instances.Length)
@@ -204,6 +219,43 @@ public sealed class PresentationExtractor : ISimulationTickObserver
         return instances.AsSpan(
             0,
             index).ToArray();
+    }
+
+    private static ResourceDepositPresentationState ResolveResourcePresentationState(
+        EntityRegistry entities,
+        EntityId entity,
+        WorldPresentationKind kind)
+    {
+        if (kind != WorldPresentationKind.ResourceDeposit ||
+            !entities.TryGetComponent(
+                entity,
+                out ResourceDeposit deposit))
+        {
+            return ResourceDepositPresentationState.None;
+        }
+
+        if (deposit.IsDepleted)
+        {
+            return ResourceDepositPresentationState.Depleted;
+        }
+
+        foreach (EntityId extractorEntity in entities.Query<ResourceExtractor>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            ResourceExtractor extractor =
+                entities.GetComponent<ResourceExtractor>(
+                    extractorEntity);
+
+            if (extractor.Deposit == entity &&
+                extractor.State == ResourceExtractorState.Extracting)
+            {
+                return ResourceDepositPresentationState.Active;
+            }
+        }
+
+        return deposit.RemainingFraction >= 0.999_999
+            ? ResourceDepositPresentationState.Untouched
+            : ResourceDepositPresentationState.Active;
     }
 
     private PlayerExperienceSnapshot CapturePlayerExperience(

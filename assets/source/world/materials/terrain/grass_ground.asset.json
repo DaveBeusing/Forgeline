@@ -1,0 +1,5 @@
+{
+  "id": "material.world.terrain.grass_ground",
+  "type": "material",
+  "source": "grass_ground.material.json"
+}

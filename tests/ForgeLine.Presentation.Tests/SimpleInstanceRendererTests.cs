@@ -61,6 +61,65 @@ public sealed class SimpleInstanceRendererTests : IDisposable
         Assert.Equal(1, context.IndexedDrawCalls);
     }
 
+    [Fact]
+    public void RepeatedVisibleInstancesShareOneInstancedDraw()
+    {
+        var camera =
+            new RtsCamera();
+        RenderInstance[] instances =
+        [
+            Instance(
+                new EntityId(1, 1),
+                camera.Target,
+                new Vector3(4.0f)),
+            Instance(
+                new EntityId(2, 1),
+                camera.Target +
+                new Vector3(8.0f, 0.0f, 0.0f),
+                new Vector3(4.0f))
+        ];
+
+        var buffer =
+            new PresentationSnapshotBuffer();
+        buffer.Publish(
+            new PresentationSnapshot(
+                new SimulationTick(1),
+                TimeSpan.FromMilliseconds(50),
+                instances.Length,
+                instances));
+
+        var world =
+            new RenderWorld();
+        Assert.True(
+            world.Update(
+                buffer));
+
+        using var renderer =
+            new SimpleInstanceRenderer(
+                _graphics);
+        var context =
+            new FakeGraphicsCommandContext();
+
+        renderer.Render(
+            context,
+            camera,
+            world,
+            1.0f);
+
+        Assert.Equal(
+            2,
+            renderer.LastDiagnostics.VisibleInstances);
+        Assert.Equal(
+            1,
+            renderer.LastDiagnostics.DrawCalls);
+        Assert.Equal(
+            1,
+            context.IndexedDrawCalls);
+        Assert.Equal(
+            2,
+            context.LastInstanceCount);
+    }
+
     private static RenderInstance Instance(
         EntityId entity,
         Vector3 position,
@@ -158,6 +217,8 @@ public sealed class SimpleInstanceRendererTests : IDisposable
 
         public int IndexedDrawCalls { get; private set; }
 
+        public int LastInstanceCount { get; private set; }
+
         public void SetViewport(
             float x,
             float y,
@@ -181,7 +242,8 @@ public sealed class SimpleInstanceRendererTests : IDisposable
         public void SetVertexBuffer(
             IGraphicsBuffer buffer,
             int strideInBytes,
-            int offsetInBytes = 0)
+            int offsetInBytes = 0,
+            int inputSlot = 0)
         {
         }
 
@@ -209,6 +271,18 @@ public sealed class SimpleInstanceRendererTests : IDisposable
             int baseVertex = 0)
         {
             IndexedDrawCalls++;
+        }
+
+        public void DrawIndexedInstanced(
+            int indexCount,
+            int instanceCount,
+            int startIndex = 0,
+            int baseVertex = 0,
+            int startInstance = 0)
+        {
+            IndexedDrawCalls++;
+            LastInstanceCount =
+                instanceCount;
         }
     }
 }

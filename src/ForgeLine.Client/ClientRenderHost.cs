@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.ExceptionServices;
+using ForgeLine.Assets;
 using ForgeLine.Game;
 using ForgeLine.Graphics;
 using ForgeLine.Presentation;
@@ -32,6 +33,7 @@ internal sealed class ClientRenderHost : IDisposable
     private readonly TerrainWorld? _terrain;
     private readonly PresentationSnapshotBuffer? _snapshots;
     private readonly RtsCameraSettings? _cameraSettings;
+    private readonly RuntimeAssetCatalog? _runtimeAssets;
     private readonly Action<ClientRenderFrame>? _testRenderAction;
     private readonly AutoResetEvent _signal = new(false);
     private readonly ManualResetEventSlim _started = new(false);
@@ -47,7 +49,8 @@ internal sealed class ClientRenderHost : IDisposable
         in GraphicsWindowTarget initialTarget,
         TerrainWorld terrain,
         PresentationSnapshotBuffer snapshots,
-        RtsCameraSettings cameraSettings)
+        RtsCameraSettings cameraSettings,
+        RuntimeAssetCatalog? runtimeAssets = null)
     {
         initialTarget.Validate();
         _initialTarget = initialTarget;
@@ -60,6 +63,8 @@ internal sealed class ClientRenderHost : IDisposable
         _cameraSettings =
             cameraSettings ??
             throw new ArgumentNullException(nameof(cameraSettings));
+        _runtimeAssets =
+            runtimeAssets;
 
         _thread =
             CreateThread();
@@ -185,10 +190,12 @@ internal sealed class ClientRenderHost : IDisposable
             using var terrainRenderer =
                 new TerrainRenderer(
                     graphics,
-                    terrain);
+                    terrain,
+                    runtimeAssets: _runtimeAssets);
             using var instanceRenderer =
                 new SimpleInstanceRenderer(
-                    graphics);
+                    graphics,
+                    _runtimeAssets);
             using var debugDrawRenderer =
                 new DebugDrawRenderer(
                     graphics);

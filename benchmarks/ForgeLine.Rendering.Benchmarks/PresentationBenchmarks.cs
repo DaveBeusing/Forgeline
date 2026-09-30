@@ -213,7 +213,8 @@ public class PresentationBenchmarks : IDisposable
         public void SetVertexBuffer(
             IGraphicsBuffer buffer,
             int strideInBytes,
-            int offsetInBytes = 0)
+            int offsetInBytes = 0,
+            int inputSlot = 0)
         {
         }
 
@@ -239,6 +240,15 @@ public class PresentationBenchmarks : IDisposable
             int indexCount,
             int startIndex = 0,
             int baseVertex = 0)
+        {
+        }
+
+        public void DrawIndexedInstanced(
+            int indexCount,
+            int instanceCount,
+            int startIndex = 0,
+            int baseVertex = 0,
+            int startInstance = 0)
         {
         }
     }

@@ -1,0 +1,5 @@
+{
+  "id": "material.world.terrain.dirt",
+  "type": "material",
+  "source": "dirt.material.json"
+}

@@ -37,6 +37,8 @@ public sealed class RtsSelectionController
 
     public EntityId HoveredEntity { get; private set; } = EntityId.Invalid;
 
+    public EntityId InspectedEntity { get; private set; } = EntityId.Invalid;
+
     public bool IsDragSelecting =>
         _selectionGestureActive &&
         Vector2.DistanceSquared(_selectionStart, _selectionCurrent) >=
@@ -88,17 +90,32 @@ public sealed class RtsSelectionController
 
         Vector2 pointer = input.PointerPosition;
 
-        HoveredEntity = SelectionPicking.TryPick(
-            camera,
-            world,
-            _filter,
-            pointer,
-            viewportWidth,
-            viewportHeight,
-            interpolationAlpha,
-            out EntityId hovered)
-            ? hovered
-            : EntityId.Invalid;
+        if (SelectionPicking.TryPick(
+                camera,
+                world,
+                _filter,
+                pointer,
+                viewportWidth,
+                viewportHeight,
+                interpolationAlpha,
+                out EntityId hovered))
+        {
+            HoveredEntity = hovered;
+        }
+        else
+        {
+            HoveredEntity =
+                SelectionPicking.TryPickInspectable(
+                    camera,
+                    world,
+                    pointer,
+                    viewportWidth,
+                    viewportHeight,
+                    interpolationAlpha,
+                    out EntityId inspectable)
+                    ? inspectable
+                    : EntityId.Invalid;
+        }
 
         if (leftDown && !_leftWasDown)
         {
@@ -176,6 +193,7 @@ public sealed class RtsSelectionController
         _sessionId = sessionId;
         Selection.Clear();
         HoveredEntity = EntityId.Invalid;
+        InspectedEntity = EntityId.Invalid;
         _pendingMovementRequest = null;
         _selectionGestureActive = false;
     }
@@ -213,26 +231,52 @@ public sealed class RtsSelectionController
                 Selection.Replace(entities);
             }
 
+            if (entities.Length > 0)
+            {
+                InspectedEntity = EntityId.Invalid;
+            }
+
             return;
         }
 
-        if (HoveredEntity.IsValid)
+        if (HoveredEntity.IsValid &&
+            world.TryGetInterpolatedInstance(
+                HoveredEntity,
+                interpolationAlpha,
+                out RenderInstance hoveredInstance))
         {
-            if (toggle)
+            if (_filter.Allows(
+                    hoveredInstance.Selectable))
             {
-                Selection.Toggle(HoveredEntity);
-            }
-            else
-            {
-                Selection.SetSingle(HoveredEntity);
+                if (toggle)
+                {
+                    Selection.Toggle(HoveredEntity);
+                }
+                else
+                {
+                    Selection.SetSingle(HoveredEntity);
+                }
+
+                InspectedEntity = EntityId.Invalid;
+                return;
             }
 
-            return;
+            if (hoveredInstance.WorldFeature.IsInspectable)
+            {
+                InspectedEntity = HoveredEntity;
+                if (!toggle)
+                {
+                    Selection.Clear();
+                }
+
+                return;
+            }
         }
 
         if (!toggle)
         {
             Selection.Clear();
+            InspectedEntity = EntityId.Invalid;
         }
     }
 

@@ -1,0 +1,15 @@
+{
+  "id": "mesh.world.vegetation.conifer",
+  "type": "mesh",
+  "source": "../sources/world_billboard.gltf",
+  "materialReferences": [
+    "material.world.vegetation"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "mesh.world.vegetation.conifer_lod1",
+      "maxDistance": 190
+    }
+  ]
+}

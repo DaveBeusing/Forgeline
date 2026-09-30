@@ -1,0 +1,5 @@
+{
+  "id": "material.world.vegetation",
+  "type": "material",
+  "source": "vegetation.material.json"
+}

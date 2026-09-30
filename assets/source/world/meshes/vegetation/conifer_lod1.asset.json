@@ -1,0 +1,8 @@
+{
+  "id": "mesh.world.vegetation.conifer_lod1",
+  "type": "mesh",
+  "source": "../sources/world_billboard.gltf",
+  "materialReferences": [
+    "material.world.vegetation"
+  ]
+}

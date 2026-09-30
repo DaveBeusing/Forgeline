@@ -1,0 +1,15 @@
+{
+  "id": "mesh.world.resource.silicates",
+  "type": "mesh",
+  "source": "../sources/world_box.gltf",
+  "materialReferences": [
+    "material.world.resource.silicates"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "mesh.world.resource.silicates_lod1",
+      "maxDistance": 260
+    }
+  ]
+}

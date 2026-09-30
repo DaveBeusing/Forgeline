@@ -268,3 +268,11 @@ Tests cover successful compilation, invalid input, duplicate IDs, missing depend
 This baseline intentionally does not add final Directorate art, animation retargeting, audio conversion, a generic editor framework, automatic content generation, GPU texture compression, mip generation, or final shipping-package optimization.
 
 Those capabilities should extend this pipeline rather than create parallel asset formats.
+
+## Committed Vertical Slice world assets
+
+The first authored world set lives below `assets/source/world/`. It includes the eight terrain material slots, eight decal materials, reusable props, vegetation, four resource-deposit families, reduced LOD meshes, and strategic resource-symbol materials.
+
+These files are normal compiler inputs. CI compiles the source tree into ignored `assets/runtime/` output before the Windows graphics smoke test. The client consumes only the runtime manifest and `.flasset` payloads; it does not read glTF or material-source JSON at runtime.
+
+See [World Asset Presentation](WorldAssetPresentation.md) for how stable world asset IDs map to Central Divide presentation data.

@@ -1,0 +1,5 @@
+{
+  "id": "material.world.decal.tracked_vehicle_marks",
+  "type": "material",
+  "source": "tracked_vehicle_marks.material.json"
+}

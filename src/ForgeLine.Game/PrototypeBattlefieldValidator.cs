@@ -29,6 +29,9 @@ public static class PrototypeBattlefieldValidator
         ValidateResources(
             definition,
             errors);
+        ValidateWorldObjects(
+            definition,
+            errors);
         ValidateSites(
             definition,
             errors);
@@ -203,6 +206,44 @@ public static class PrototypeBattlefieldValidator
         {
             errors.Add(
                 "At least one richer contested resource deposit is required.");
+        }
+    }
+
+    private static void ValidateWorldObjects(
+        PrototypeBattlefieldDefinition definition,
+        List<string> errors)
+    {
+        ValidateUniqueKeys(
+            definition.WorldObjects.Select(
+                static worldObject => worldObject.Key),
+            "world object",
+            errors);
+
+        for (int index = 0; index < definition.WorldObjects.Count; index++)
+        {
+            BattlefieldWorldObjectDefinition worldObject =
+                definition.WorldObjects[index];
+
+            ValidatePoint(
+                definition,
+                worldObject.Position,
+                $"World object {worldObject.Key}",
+                errors);
+
+            if (worldObject.Visual == WorldVisualId.None ||
+                !Enum.IsDefined(worldObject.Visual) ||
+                !Enum.IsDefined(worldObject.Kind) ||
+                !float.IsFinite(worldObject.Scale.X) ||
+                !float.IsFinite(worldObject.Scale.Y) ||
+                !float.IsFinite(worldObject.Scale.Z) ||
+                worldObject.Scale.X <= 0.0f ||
+                worldObject.Scale.Y <= 0.0f ||
+                worldObject.Scale.Z <= 0.0f ||
+                !float.IsFinite(worldObject.RotationDegrees))
+            {
+                errors.Add(
+                    $"World object '{worldObject.Key}' has invalid presentation data.");
+            }
         }
     }
 

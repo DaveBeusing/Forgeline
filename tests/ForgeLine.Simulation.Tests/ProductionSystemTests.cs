@@ -17,7 +17,8 @@ public sealed class ProductionSystemTests
         ResourceCatalog resources = InitialResourceDefinitions.CreateCatalog();
         ProductionRecipeCatalog recipes = InitialProductionRecipes.CreateCatalog();
 
-        Assert.Equal(7, resources.Count);
+        Assert.Equal(8, resources.Count);
+        Assert.True(resources[ResourceIds.RareElements].IsExtractable);
         Assert.False(resources[ResourceIds.Steel].IsExtractable);
         Assert.False(resources[ResourceIds.Fuel].IsExtractable);
         Assert.False(resources[ResourceIds.Electronics].IsExtractable);

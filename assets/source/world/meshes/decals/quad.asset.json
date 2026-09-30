@@ -1,0 +1,5 @@
+{
+  "id": "mesh.world.decal.quad",
+  "type": "mesh",
+  "source": "../sources/world_quad.gltf"
+}

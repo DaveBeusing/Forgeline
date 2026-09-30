@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Assets;
 using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
@@ -166,12 +167,16 @@ internal sealed class ClientApplication
                 window.ClientSize.Height,
                 window.IsMinimized ||
                 window.ClientSize.IsEmpty);
+        RuntimeAssetCatalog? runtimeAssets =
+            TryLoadRuntimeAssets();
+
         using var renderHost =
             new ClientRenderHost(
                 graphicsTarget,
                 terrainWorld,
                 snapshotBuffer,
-                camera.Settings);
+                camera.Settings,
+                runtimeAssets);
 
         PlayerCommandSubmissionReceipt? lastCommandReceipt = null;
         PlayerCommandResultReadModel? lastCommandResult = null;
@@ -857,6 +862,7 @@ internal sealed class ClientApplication
 
         bool interactionFeedback =
             selectionController.Selection.Count > 0 ||
+            selectionController.InspectedEntity.IsValid ||
             selectionController.HoveredEntity.IsValid ||
             buildingPlacementController.IsActive ||
             (constructionSnapshot?.Sites.Count ?? 0) > 0;
@@ -1082,6 +1088,22 @@ internal sealed class ClientApplication
             selectionLabelCount++;
         }
 
+        EntityId inspected =
+            selectionController.InspectedEntity;
+        if (inspected.IsValid &&
+            !selectionController.Selection.Contains(inspected) &&
+            renderWorld.TryGetInterpolatedInstance(
+                inspected,
+                alpha,
+                out RenderInstance inspectedInstance))
+        {
+            DrawInstanceBounds(
+                debugDraw,
+                inspectedInstance,
+                selectedColor,
+                $"INSPECTED E{inspected.Index}");
+        }
+
         EntityId hovered = selectionController.HoveredEntity;
         if (hovered.IsValid &&
             !selectionController.Selection.Contains(hovered) &&
@@ -1198,6 +1220,33 @@ internal sealed class ClientApplication
         {
             inputState.Apply(inputEvent);
         }
+    }
+
+    private static RuntimeAssetCatalog? TryLoadRuntimeAssets()
+    {
+        string runtimeRoot =
+            Path.GetFullPath(
+                Path.Combine(
+                    "assets",
+                    "runtime"));
+        string manifestPath =
+            Path.Combine(
+                runtimeRoot,
+                RuntimeAssetCatalog.ManifestFileName);
+
+        if (!File.Exists(manifestPath))
+        {
+            Console.WriteLine(
+                $"[assets:runtime] manifest=missing root=\"{runtimeRoot}\" fallback=development");
+            return null;
+        }
+
+        RuntimeAssetCatalog catalog =
+            RuntimeAssetCatalog.Load(
+                runtimeRoot);
+        Console.WriteLine(
+            $"[assets:runtime] manifest=loaded assets={catalog.AssetIds.Count} root=\"{runtimeRoot}\"");
+        return catalog;
     }
 
     private static void WriteWindowState(string state, IWindow window)

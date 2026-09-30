@@ -204,3 +204,11 @@ It must not depend on:
 - presentation state.
 
 Presentation consumes read models only. Storage, logistics, processing recipes, construction costs, Rare Elements, currency, and markets remain separate systems. Power is integrated only through the shared authoritative `PowerConsumer` contract.
+
+## Vertical Slice resource presentation
+
+The raw-resource presentation catalog now includes Ferrous Ore, Silicates, Volatiles, and Rare Elements. Rare Elements use stable `ResourceIds.RareElements` and are placed as contested deposits on Central Divide.
+
+Resource simulation remains unchanged: finite quantity, extraction rate, richness, ownership, and depletion are authoritative in `ForgeLine.Economy`. Presentation derives `Untouched`, `Active`, and `Depleted` states into the render snapshot. Deposits are inspectable for hover/selection feedback but never enter the commandable player selection set.
+
+Each resource family also exposes stable high/reduced mesh IDs, a material ID, and a strategic-symbol material ID for minimap/strategic consumers. See [World Asset Presentation](WorldAssetPresentation.md).

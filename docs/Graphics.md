@@ -127,11 +127,11 @@ The client coalesces queued window-size-related events before requesting a graph
 
 `IGraphicsDevice.RenderFrame` owns frame begin/end and accepts an optional `IGraphicsCommandContext` callback.
 
-The command context exposes frame identity, viewport/scissor control, graphics-pipeline binding, vertex/index buffer binding, vertex root constants, and indexed or non-indexed draw submission. Pipelines own their root signature and pipeline state and are tied to the graphics device that created them. Terrain uses this boundary without exposing D3D12 objects to presentation/world code.
+The command context exposes frame identity, viewport/scissor control, graphics-pipeline binding, multi-slot vertex/index buffer binding, vertex root constants, and indexed, indexed-instanced, or non-indexed draw submission. Vertex declarations distinguish per-vertex and per-instance input rates while keeping the D3D12 classification inside `ForgeLine.Graphics`. Pipelines own their root signature and pipeline state and are tied to the graphics device that created them. Terrain and world presentation use this boundary without exposing D3D12 objects to world or simulation code.
 
 ## Resource Foundation
 
-`IGraphicsDevice.CreateBuffer` establishes explicit buffer ownership for GPU-local default-heap buffers and CPU-visible upload-heap buffers. `IGraphicsBuffer.SetData` provides bounded initialization of upload buffers. The first terrain renderer creates persistent per-chunk vertex and index buffers once and reuses them across frames.
+`IGraphicsDevice.CreateBuffer` establishes explicit buffer ownership for GPU-local default-heap buffers and CPU-visible upload-heap buffers. `IGraphicsBuffer.SetData` provides bounded initialization of upload buffers. The terrain renderer creates persistent per-chunk vertex and index buffers once and reuses them across frames. Repeated world presentation uses one upload instance stream per swap-chain frame index so transform/tint data can be refreshed only after that frame resource has been synchronized for reuse.
 
 The returned `IGraphicsBuffer` is caller-owned and disposable. Graphics resources must be released before the graphics device is destroyed. Debug live-object reporting helps surface lifetime violations.
 

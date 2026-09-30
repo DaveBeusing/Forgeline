@@ -106,16 +106,18 @@ The graphics layer owns native D3D12 resources and command submission. The world
 
 ## Material and Shader
 
-The first terrain material is intentionally minimal.
+The Vertical Slice terrain presentation defines eight stable material slots for grass/ground, dirt, mud, rock, gravel, industrial ground, concrete, and scorched ground.
 
-The shader uses:
+When the Windows client has a compiled runtime asset catalog, `TerrainPresentationProfile` resolves each available slot from its material `.flasset` payload. Base-color, roughness, and metallic factors therefore originate from the source-to-runtime asset pipeline. Missing or invalid runtime material entries use deterministic authored fallback values; source material files are never opened at runtime.
 
-- elevation
-- terrain normal/slope
-- a fixed directional light
-- simple low/high/rock color blending
+The current terrain shader uses the resolved base colors together with:
 
-It does not implement production texture splatting, material layers, vegetation, water, roads, or final art assets.
+- elevation;
+- terrain normal/slope;
+- explicit Central Divide blend regions;
+- a fixed directional light.
+
+Production texture splatting and texture sampling remain later renderer work. The runtime material contract and stable IDs are already in place, so adding texture-layer sampling does not require terrain simulation data to acquire renderer state.
 
 ## Frustum Culling
 
@@ -192,3 +194,9 @@ The Windows client smoke path exercises actual terrain shader compilation, pipel
 - visible terrain chunk render-submission preparation and command dispatch through a no-op graphics backend
 
 Benchmark timing is measurement evidence and is not a hardware-sensitive CI pass/fail threshold.
+
+## Vertical Slice presentation baseline
+
+Central Divide now has a presentation layer above the simulation-owned chunked heightfield. Eight stable terrain material slots, map-specific blend regions, reusable world objects, decals, and vegetation are defined without adding material state to `TerrainWorld` or `TerrainChunk`.
+
+Terrain material factors are resolved by `TerrainPresentationProfile` from compiled runtime materials when available and converted into terrain vertex presentation data while chunk GPU buffers are created. World props and vegetation remain ordinary presentation entities using compiled runtime assets, shared cached mesh buffers, distance-selected LODs, and batched indexed instanced draws. See [World Asset Presentation](WorldAssetPresentation.md) for the stable IDs, LOD policy, map authoring examples, and current renderer boundary.

@@ -7,11 +7,20 @@ public enum GraphicsVertexElementFormat
     Float4
 }
 
+public enum GraphicsVertexInputRate
+{
+    PerVertex,
+    PerInstance
+}
+
 public readonly record struct GraphicsVertexElement(
     string SemanticName,
     int SemanticIndex,
     GraphicsVertexElementFormat Format,
-    int OffsetInBytes)
+    int OffsetInBytes,
+    int InputSlot = 0,
+    GraphicsVertexInputRate InputRate = GraphicsVertexInputRate.PerVertex,
+    int InstanceStepRate = 0)
 {
     internal void Validate()
     {
@@ -30,6 +39,32 @@ public readonly record struct GraphicsVertexElement(
         if (OffsetInBytes < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(OffsetInBytes));
+        }
+
+        if (InputSlot < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(InputSlot));
+        }
+
+        if (InstanceStepRate < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(InstanceStepRate));
+        }
+
+        if (InputRate == GraphicsVertexInputRate.PerVertex &&
+            InstanceStepRate != 0)
+        {
+            throw new ArgumentException(
+                "Per-vertex elements must use an instance step rate of zero.",
+                nameof(InstanceStepRate));
+        }
+
+        if (InputRate == GraphicsVertexInputRate.PerInstance &&
+            InstanceStepRate <= 0)
+        {
+            throw new ArgumentException(
+                "Per-instance elements must use a positive instance step rate.",
+                nameof(InstanceStepRate));
         }
     }
 }
