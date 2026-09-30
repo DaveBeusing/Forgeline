@@ -156,20 +156,28 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 Vector3.Distance(
                     camera.Position,
                     instance.Transform.Position);
+            UnitAssetLod unitLod =
+                UnitAssetLod.Lod0;
+            UnitPresentationDefinition unitDefinition =
+                default;
+            bool hasUnitDefinition =
+                false;
 
             if (instance.UnitFeature.IsSpecified)
             {
-                UnitAssetLod unitLod =
+                unitLod =
                     UnitPresentationCatalog.SelectLod(
                         instance.UnitFeature,
                         distance);
-                UnitPresentationDefinition definition =
+                unitDefinition =
                     UnitPresentationCatalog.Get(
                         instance.UnitFeature.Unit);
+                hasUnitDefinition =
+                    true;
                 string meshAssetId =
                     instance.UnitFeature.IsWreck
-                        ? definition.Lod2AssetId
-                        : definition.GetMeshAssetId(
+                        ? unitDefinition.Lod2AssetId
+                        : unitDefinition.GetMeshAssetId(
                             unitLod);
 
                 usesRuntimeMesh =
@@ -218,6 +226,12 @@ public sealed class SimpleInstanceRenderer : IDisposable
             {
                 highLod++;
             }
+
+            Vector4 color =
+                ResolveColor(
+                    instance);
+            Matrix4x4 worldMatrix =
+                instance.Transform.ToMatrix();
             var key =
                 new InstanceBatchKey(
                     usesRuntimeMesh,
@@ -240,9 +254,48 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
             batch.Instances.Add(
                 new InstanceRenderData(
-                    instance.Transform.ToMatrix(),
-                    ResolveColor(
-                        instance)));
+                    worldMatrix,
+                    color));
+
+            if (hasUnitDefinition &&
+                unitLod == UnitAssetLod.Lod0 &&
+                !instance.UnitFeature.IsWreck &&
+                unitDefinition.HasArticulatedTurret &&
+                _runtimeAssets is not null &&
+                _runtimeAssets.TryGetMesh(
+                    unitDefinition.TurretMeshAssetId!,
+                    out RuntimeMeshBuffers turretMesh,
+                    out AssetId turretMeshId) &&
+                turretMesh.IsValid)
+            {
+                var turretKey =
+                    new InstanceBatchKey(
+                        UsesRuntimeMesh: true,
+                        turretMeshId);
+
+                if (!batchLookup.TryGetValue(
+                        turretKey,
+                        out InstanceBatch? turretBatch))
+                {
+                    turretBatch =
+                        new InstanceBatch(
+                            usesRuntimeMesh: true,
+                            turretMesh);
+                    batchLookup.Add(
+                        turretKey,
+                        turretBatch);
+                    batches.Add(
+                        turretBatch);
+                }
+
+                turretBatch.Instances.Add(
+                    new InstanceRenderData(
+                        CreateArticulatedTransform(
+                            worldMatrix,
+                            unitDefinition.TurretPivot,
+                            instance.UnitFeature.AimYawRadians),
+                        color));
+            }
         }
 
         if (visible == 0)
@@ -258,12 +311,25 @@ public sealed class SimpleInstanceRenderer : IDisposable
             return;
         }
 
+        int submittedInstances =
+            0;
+
+        for (int batchIndex = 0;
+             batchIndex < batches.Count;
+             batchIndex++)
+        {
+            submittedInstances =
+                checked(
+                    submittedInstances +
+                    batches[batchIndex].Instances.Count);
+        }
+
         IGraphicsBuffer instanceBuffer =
             GetFrameInstanceBuffer(
                 context.FrameIndex,
-                visible);
+                submittedInstances);
         var instanceData =
-            new InstanceRenderData[visible];
+            new InstanceRenderData[submittedInstances];
         int writeOffset = 0;
 
         for (int batchIndex = 0;
@@ -560,6 +626,27 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 DepthEnabled =
                     true
             });
+    }
+
+    private static Matrix4x4 CreateArticulatedTransform(
+        Matrix4x4 world,
+        Vector3 pivot,
+        float yawRadians)
+    {
+        float yaw =
+            float.IsFinite(
+                yawRadians)
+                ? yawRadians
+                : 0.0f;
+
+        return
+            Matrix4x4.CreateTranslation(
+                -pivot) *
+            Matrix4x4.CreateRotationY(
+                yaw) *
+            Matrix4x4.CreateTranslation(
+                pivot) *
+            world;
     }
 
     private static void WriteMatrix(
