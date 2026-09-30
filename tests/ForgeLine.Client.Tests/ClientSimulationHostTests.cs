@@ -272,6 +272,76 @@ public sealed class ClientSimulationHostTests
     }
 
     [Fact]
+    public void SlowRenderOwnerDoesNotBlockFramePublisher()
+    {
+        using var entered =
+            new ManualResetEventSlim(false);
+        using var release =
+            new ManualResetEventSlim(false);
+        using var host =
+            new ClientRenderHost(
+                _ =>
+                {
+                    entered.Set();
+                    release.Wait();
+                });
+
+        ClientRenderFrame first =
+            CreateRenderFrame(
+                viewportWidth: 800);
+        ClientRenderFrame second =
+            CreateRenderFrame(
+                viewportWidth: 1_024);
+
+        Assert.True(
+            host.Publish(first));
+
+        try
+        {
+            Assert.True(
+                entered.Wait(
+                    TestTimeout));
+
+            Assert.True(
+                host.Publish(second));
+
+            int publisherProgress = 0;
+            for (int index = 0;
+                 index < 10_000;
+                 index++)
+            {
+                publisherProgress++;
+            }
+
+            Assert.Equal(
+                10_000,
+                publisherProgress);
+        }
+        finally
+        {
+            release.Set();
+        }
+    }
+
+    [Fact]
+    public void DisposeJoinsRenderOwner()
+    {
+        var host =
+            new ClientRenderHost(
+                static _ =>
+                {
+                });
+
+        Assert.True(
+            host.IsExecutionThreadAlive);
+
+        host.Dispose();
+
+        Assert.False(
+            host.IsExecutionThreadAlive);
+    }
+
+    [Fact]
     public void DisposeJoinsSimulationOwner()
     {
         ClientHostFixture fixture =
@@ -285,6 +355,20 @@ public sealed class ClientSimulationHostTests
         Assert.False(
             fixture.Host.IsExecutionThreadAlive);
     }
+
+    private static ClientRenderFrame CreateRenderFrame(
+        int viewportWidth) =>
+        new(
+            new RtsCamera().CaptureState(),
+            viewportWidth,
+            720,
+            OverlayEnabled: false,
+            WorldDebugEnabled: false,
+            default,
+            default,
+            FormationTemplate.Compact,
+            [],
+            []);
 
     private sealed class ClientHostFixture : IDisposable
     {
