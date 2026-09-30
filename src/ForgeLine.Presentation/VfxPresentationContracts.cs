@@ -1,5 +1,6 @@
 using System.Numerics;
 using ForgeLine.Assets;
+using ForgeLine.Combat;
 using ForgeLine.Game;
 using ForgeLine.Simulation;
 
@@ -660,7 +661,7 @@ public static class VfxPresentationCatalog
                 mesh,
                 material,
                 scale,
-                1,
+                4,
                 maxDistance,
                 tint,
                 fineDetail);

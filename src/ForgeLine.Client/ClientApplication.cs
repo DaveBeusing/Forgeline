@@ -96,6 +96,8 @@ internal sealed class ClientApplication
                     scenario.Services.Weapons,
                 artilleryWeapons:
                     scenario.Services.ArtilleryWeapons);
+        RuntimeAssetCatalog? runtimeAssets =
+            TryLoadRuntimeAssets();
         var presentationExtraction =
             new PresentationExtractionContext(
                 scenario,
@@ -108,7 +110,8 @@ internal sealed class ClientApplication
         simulation.RegisterTickObserver(
             new PresentationExtractor(
                 snapshotBuffer,
-                presentationExtraction));
+                presentationExtraction,
+                runtimeAssets));
 
         var renderWorld = new RenderWorld();
 
@@ -167,9 +170,6 @@ internal sealed class ClientApplication
                 window.ClientSize.Height,
                 window.IsMinimized ||
                 window.ClientSize.IsEmpty);
-        RuntimeAssetCatalog? runtimeAssets =
-            TryLoadRuntimeAssets();
-
         using var renderHost =
             new ClientRenderHost(
                 graphicsTarget,

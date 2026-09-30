@@ -61,6 +61,12 @@ public sealed class RenderWorld
         }
 
         RenderInstance currentInstance = current.GetInstance(index);
+
+        if (currentInstance.VfxFeature.IsSpecified)
+        {
+            return currentInstance;
+        }
+
         if (_previous is null ||
             !TryFindByEntity(
                 _previous,

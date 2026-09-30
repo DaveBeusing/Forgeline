@@ -235,6 +235,29 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     reducedLod++;
                 }
             }
+            else if (instance.VfxFeature.IsSpecified)
+            {
+                VfxPresentationDefinition definition =
+                    VfxPresentationCatalog.Get(
+                        instance.VfxFeature.Kind);
+
+                if (distance >
+                    definition.MaximumDistanceMeters)
+                {
+                    visible--;
+                    continue;
+                }
+
+                usesRuntimeMesh =
+                    _runtimeAssets is not null &&
+                    _runtimeAssets.TryGetMesh(
+                        definition.MeshAssetId,
+                        out runtimeMesh,
+                        out runtimeMeshId) &&
+                    runtimeMesh.IsValid;
+
+                highLod++;
+            }
             else if (instance.InfrastructureFeature.IsSpecified)
             {
                 string meshAssetId =
@@ -793,6 +816,21 @@ public sealed class SimpleInstanceRenderer : IDisposable
             return UnitPresentationCatalog.ApplyDamageTint(
                 instance.UnitFeature,
                 baseTint);
+        }
+
+        if (instance.VfxFeature.IsSpecified)
+        {
+            VfxPresentationDefinition definition =
+                VfxPresentationCatalog.Get(
+                    instance.VfxFeature.Kind);
+
+            return
+                _runtimeAssets is not null &&
+                _runtimeAssets.TryGetMaterialTint(
+                    definition.MaterialAssetId,
+                    out Vector4 runtimeTint)
+                    ? runtimeTint
+                    : definition.FallbackTint;
         }
 
         if (instance.BuildingFeature.IsSpecified)
