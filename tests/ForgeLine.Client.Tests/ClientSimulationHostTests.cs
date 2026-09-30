@@ -31,8 +31,14 @@ public sealed class ClientSimulationHostTests
                     TestContext.Current.CancellationToken));
 
             Assert.Equal(
-                new SimulationTick(1),
+                new SimulationTick(2),
                 fixture.Host.CurrentTick);
+            Assert.True(
+                fixture.Snapshots.TryReadLatest(
+                    out PresentationSnapshot completedSnapshot));
+            Assert.Equal(
+                new SimulationTick(1),
+                completedSnapshot.Tick);
 
             int callingThreadProgress = 0;
             for (int index = 0;
@@ -529,13 +535,17 @@ public sealed class ClientSimulationHostTests
 
         private ClientHostFixture(
             VerticalSliceScenario scenario,
+            PresentationSnapshotBuffer snapshots,
             ClientSimulationHost host)
         {
             Scenario = scenario;
+            Snapshots = snapshots;
             Host = host;
         }
 
         public VerticalSliceScenario Scenario { get; }
+
+        public PresentationSnapshotBuffer Snapshots { get; }
 
         public ClientSimulationHost Host { get; }
 
@@ -607,6 +617,7 @@ public sealed class ClientSimulationHostTests
 
             return new ClientHostFixture(
                 scenario,
+                snapshots,
                 host);
         }
 
