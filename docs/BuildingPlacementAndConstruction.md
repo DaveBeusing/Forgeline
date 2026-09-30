@@ -28,7 +28,7 @@ Building definitions are data-driven and use stable `BuildingId` values rather t
 
 `BuildingFootprint` describes width, depth, and height. The four cardinal `BuildingOrientation` values rotate width and depth deterministically.
 
-The initial definitions are exposed by `InitialBuildingDefinitions.CreateCatalog()`. They provide construction contracts for the first economy structures, including processing capability and production-inventory metadata, while recipe definitions remain owned by the economy production system and final art remains deferred.
+The initial definitions are exposed by `InitialBuildingDefinitions.CreateCatalog()`. They provide construction contracts for the first economy structures, including processing capability and production-inventory metadata, while recipe definitions remain owned by the economy production system. The nine core Vertical Slice industrial families now have stable Directorate presentation assets; gameplay footprints remain independent from render geometry and LOD.
 
 ## Placement preview
 
@@ -152,7 +152,7 @@ An accepted site is a normal simulation entity containing:
 - optional extractor resource ID;
 - optional resource-deposit binding.
 
-Construction progress is simulation-owned and can run fully headless.
+Construction progress is simulation-owned and can run fully headless. Presentation reads that completed-tick state and maps it to shared foundation, structural-frame, and partial-shell runtime meshes; it never advances construction itself.
 
 ## Cancellation
 
@@ -245,7 +245,8 @@ This slice intentionally does not implement:
 - repair or rebuild;
 - blueprint copy/paste;
 - terrain deformation;
-- final building art;
+- final high-detail building art replacement;
+- mechanical building animation and richer VFX;
 - complete production recipes.
 
 Those systems can build on `BuildingDefinition`, authoritative footprint occupancy, `ConstructionSite`, and `CompletedBuilding` without replacing the construction lifecycle.
@@ -256,3 +257,10 @@ Those systems can build on `BuildingDefinition`, authoritative footprint occupan
 Catalog selection does not authorize construction. The palette reads immutable `PlayerActionSnapshot` data published at the completed-tick boundary and only selects a `BuildingId` for the existing placement controller. Placement still requires a current valid preview, and the eventual `BuildCommand` is revalidated authoritatively.
 
 Pointer input inside the action palette is captured before placement and world-selection processing. Switching to a production action mode cancels an active placement intent so panel input cannot become an unintended world click. Session changes invalidate the panel's transient mode and selection state.
+
+
+## Production presentation boundary
+
+The Directorate building baseline is documented in [Directorate Building and Infrastructure Assets](DirectorateBuildingAssets.md). It maps the existing construction, power, production, damage, and destruction state into immutable render metadata after each completed tick.
+
+Presentation changes do not modify `BuildingFootprint`, `SpatialPresence`, placement validity, power allocation, construction progress, production state, or combat damage. LOD and shared collision asset references are renderer/tooling contracts only.

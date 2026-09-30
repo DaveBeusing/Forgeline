@@ -220,6 +220,24 @@ var content = catalog.Read(AssetId.Parse("unit.directorate.main_battle_tank"));
 
 The catalog validates stable IDs, duplicate manifest entries, runtime path confinement, container headers, and expected asset types.
 
+## Directorate building and infrastructure source sets
+
+The first building and infrastructure production baseline uses the same compiler contract as units and world assets.
+
+Editable building sources live under:
+
+```text
+assets/source/buildings/directorate/
+```
+
+Editable road and bridge sources live under:
+
+```text
+assets/source/infrastructure/directorate/
+```
+
+The nine primary building assets expose LOD1/LOD2 references and share `building.directorate.module.collision_box` as a simplified visual/tooling collision contract. Shared construction and state modules reduce duplicate geometry while preserving stable IDs. Directorate road and bridge meshes compile through the same runtime manifest and are consumed by presentation only; authoritative building footprints, logistics edges, and navigation blockers remain game/simulation data.
+
 ## Compiler Usage
 
 From the repository root:
