@@ -16,25 +16,34 @@ internal static class Program
         string runtimeRoot = Path.Combine("assets", "runtime");
         var clean = false;
 
-        for (var index = 0; index < args.Length; index++)
+        try
         {
-            var argument = args[index];
-            switch (argument)
+            for (var index = 0; index < args.Length; index++)
             {
-                case "--source":
-                    sourceRoot = ReadValue(args, ref index, argument);
-                    break;
-                case "--runtime":
-                    runtimeRoot = ReadValue(args, ref index, argument);
-                    break;
-                case "--clean":
-                    clean = true;
-                    break;
-                default:
-                    Console.Error.WriteLine($"Unknown argument '{argument}'.");
-                    PrintUsage();
-                    return 2;
+                var argument = args[index];
+                switch (argument)
+                {
+                    case "--source":
+                        sourceRoot = ReadValue(args, ref index, argument);
+                        break;
+                    case "--runtime":
+                        runtimeRoot = ReadValue(args, ref index, argument);
+                        break;
+                    case "--clean":
+                        clean = true;
+                        break;
+                    default:
+                        Console.Error.WriteLine($"Unknown argument '{argument}'.");
+                        PrintUsage();
+                        return 2;
+                }
             }
+        }
+        catch (ArgumentException exception)
+        {
+            Console.Error.WriteLine(exception.Message);
+            PrintUsage();
+            return 2;
         }
 
         var compiler = new AssetPipelineCompiler();
