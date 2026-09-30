@@ -49,7 +49,7 @@ The repository validates several of these invariants with `build/Validate-Projec
 - `ForgeLine.Graphics`: Direct3D 12 adapter/device ownership, command submission, flip-model swap chain, render-target descriptors, frame synchronization, resize handling, GPU resource foundations, DXC shader compilation, and graphics diagnostics behind engine-facing contracts.
 - `ForgeLine.Audio`: audio infrastructure.
 - `ForgeLine.Input`: raw input state, configurable RTS action mapping, and input-frame contracts above the platform event boundary.
-- `ForgeLine.Assets`: runtime asset infrastructure.
+- `ForgeLine.Assets`: stable runtime asset identifiers, manifest contracts, validated runtime-path lookup, and versioned `.flasset` loading. Source import and compilation remain outside runtime code; see `docs/AssetPipeline.md`.
 
 ### Simulation Foundation
 
@@ -82,10 +82,10 @@ Simulation domains remain independently layered and are implemented progressivel
 ### Tools
 
 - `ForgeLine.Editor`: FORGELINE-specific editor host.
-- `ForgeLine.AssetCompiler`: source-to-runtime asset compiler host.
+- `ForgeLine.AssetCompiler`: production source-to-runtime asset compiler for static glTF/GLB meshes, PNG/TGA textures, material definitions, stable IDs, dependency validation, incremental rebuilds, and runtime manifest generation. See `docs/AssetPipeline.md`.
 - `ForgeLine.MapCompiler`: map compilation host.
 
-Tool functionality is not part of the repository foundation.
+The Editor and Map Compiler remain foundation hosts. The Asset Compiler is an implemented tooling boundary and must not leak source-format parsing into runtime or simulation projects.
 
 ## Simulation Baseline
 
