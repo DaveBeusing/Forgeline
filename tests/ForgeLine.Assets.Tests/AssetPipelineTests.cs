@@ -288,7 +288,7 @@ public sealed class AssetPipelineTests
         public string RuntimeRoot { get; }
 
         public AssetCompilationResult Compile(bool clean = false) =>
-            new AssetPipelineCompiler().Compile(SourceRoot, RuntimeRoot, clean);
+            AssetPipelineCompiler.Compile(SourceRoot, RuntimeRoot, clean);
 
         public void WriteAsset(string relativePath, string json) =>
             WriteText(relativePath, json);
