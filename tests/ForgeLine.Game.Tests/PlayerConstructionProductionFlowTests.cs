@@ -703,15 +703,6 @@ public sealed class PlayerConstructionProductionFlowTests
                 policyResult.State);
         }
 
-        Vector3 supplyStagingDirection =
-            Vector3.Normalize(
-                new Vector3(
-                    supplyDepotPosition.X -
-                        westCore.Position.X,
-                    0.0f,
-                    supplyDepotPosition.Z -
-                        westCore.Position.Z));
-
         QueueUnit(
             scenario,
             gateway,
@@ -732,6 +723,18 @@ public sealed class PlayerConstructionProductionFlowTests
             scenario.Simulation.Entities
                 .GetComponent<SupplyTruck>(
                     supplyTruck);
+        Vector3 supplyTruckPosition =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    supplyTruck).Position;
+        Vector3 supplyStagingDirection =
+            Vector3.Normalize(
+                new Vector3(
+                    supplyTruckPosition.X -
+                        supplyDepotPosition.X,
+                    0.0f,
+                    supplyTruckPosition.Z -
+                        supplyDepotPosition.Z));
         Vector3 supplyTruckLoadPoint =
             supplyDepotPosition +
             supplyStagingDirection *
