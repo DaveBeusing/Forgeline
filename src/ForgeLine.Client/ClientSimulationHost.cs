@@ -146,8 +146,8 @@ internal sealed class ClientSimulationHost : IDisposable
 
         lock (_progressGate)
         {
-            while (_simulation.CurrentTick <
-                   target)
+            while (!HasCompletedTick(
+                       target))
             {
                 ThrowIfFaulted();
 
@@ -777,6 +777,15 @@ internal sealed class ClientSimulationHost : IDisposable
             }
         }
     }
+
+    private bool HasCompletedTick(
+        SimulationTick target) =>
+        _snapshots.TryReadLatest(
+            out PresentationSnapshot snapshot) &&
+        snapshot.SessionId ==
+            SessionId &&
+        snapshot.Tick >=
+            target;
 
     private bool HasPlayerMatchStatus(
         PlayerMatchStatus status) =>
