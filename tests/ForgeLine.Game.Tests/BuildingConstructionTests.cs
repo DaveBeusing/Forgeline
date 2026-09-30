@@ -96,6 +96,59 @@ public sealed class BuildingConstructionTests
     }
 
     [Fact]
+    public void RequiredDirectorateBuildingFootprintsRemainFiniteAndPositive()
+    {
+        BuildingDefinitionCatalog catalog =
+            InitialBuildingDefinitions.CreateCatalog();
+        BuildingId[] required =
+        [
+            BuildingIds.CommandCore,
+            BuildingIds.Extractor,
+            BuildingIds.Smelter,
+            BuildingIds.ElectronicsPlant,
+            BuildingIds.Refinery,
+            BuildingIds.VehicleFactory,
+            BuildingIds.StorageDepot,
+            BuildingIds.SupplyDepot,
+            BuildingIds.PowerPlant
+        ];
+
+        foreach (BuildingId buildingId in
+                 required)
+        {
+            BuildingDefinition definition =
+                catalog[buildingId];
+
+            foreach (BuildingOrientation orientation in
+                     Enum.GetValues<BuildingOrientation>())
+            {
+                Vector3 halfExtents =
+                    definition.Footprint.GetHalfExtents(
+                        orientation);
+
+                Assert.True(
+                    float.IsFinite(
+                        halfExtents.X));
+                Assert.True(
+                    float.IsFinite(
+                        halfExtents.Y));
+                Assert.True(
+                    float.IsFinite(
+                        halfExtents.Z));
+                Assert.True(
+                    halfExtents.X >
+                    0.0f);
+                Assert.True(
+                    halfExtents.Y >
+                    0.0f);
+                Assert.True(
+                    halfExtents.Z >
+                    0.0f);
+            }
+        }
+    }
+
+    [Fact]
     public void PreviewRejectsTerrainThatExceedsBuildingSlopeLimit()
     {
         var definitions = InitialBuildingDefinitions.CreateCatalog();
