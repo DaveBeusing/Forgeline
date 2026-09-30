@@ -46,8 +46,7 @@ internal static class Program
             return 2;
         }
 
-        var compiler = new AssetPipelineCompiler();
-        var result = compiler.Compile(sourceRoot, runtimeRoot, clean);
+        var result = AssetPipelineCompiler.Compile(sourceRoot, runtimeRoot, clean);
 
         foreach (var diagnostic in result.Diagnostics)
         {
