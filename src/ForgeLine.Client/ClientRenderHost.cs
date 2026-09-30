@@ -28,10 +28,11 @@ internal sealed class ClientRenderHost : IDisposable
         TimeSpan.FromSeconds(1);
 
     private readonly object _frameGate = new();
-    private readonly GraphicsWindowTarget _initialTarget;
-    private readonly TerrainWorld _terrain;
-    private readonly PresentationSnapshotBuffer _snapshots;
-    private readonly RtsCameraSettings _cameraSettings;
+    private readonly GraphicsWindowTarget? _initialTarget;
+    private readonly TerrainWorld? _terrain;
+    private readonly PresentationSnapshotBuffer? _snapshots;
+    private readonly RtsCameraSettings? _cameraSettings;
+    private readonly Action<ClientRenderFrame>? _testRenderAction;
     private readonly AutoResetEvent _signal = new(false);
     private readonly ManualResetEventSlim _started = new(false);
     private readonly Thread _thread;
@@ -60,15 +61,34 @@ internal sealed class ClientRenderHost : IDisposable
             throw new ArgumentNullException(nameof(cameraSettings));
 
         _thread =
-            new Thread(RenderLoop)
-            {
-                IsBackground = true,
-                Name = "ForgeLine Render"
-            };
+            CreateThread();
         _thread.Start();
         _started.Wait();
         ThrowIfFaulted();
     }
+
+    internal ClientRenderHost(
+        Action<ClientRenderFrame> renderAction)
+    {
+        _testRenderAction =
+            renderAction ??
+            throw new ArgumentNullException(nameof(renderAction));
+        _thread =
+            CreateThread();
+        _thread.Start();
+        _started.Wait();
+        ThrowIfFaulted();
+    }
+
+    internal bool IsExecutionThreadAlive =>
+        _thread.IsAlive;
+
+    private Thread CreateThread() =>
+        new(RenderLoop)
+        {
+            IsBackground = true,
+            Name = "ForgeLine Render"
+        };
 
     public bool Publish(in ClientRenderFrame frame)
     {
@@ -124,13 +144,37 @@ internal sealed class ClientRenderHost : IDisposable
     {
         try
         {
+            if (_testRenderAction is not null)
+            {
+                RunTestRenderLoop(
+                    _testRenderAction);
+                return;
+            }
+
+            GraphicsWindowTarget initialTarget =
+                _initialTarget ??
+                throw new InvalidOperationException(
+                    "Render target was not configured.");
+            TerrainWorld terrain =
+                _terrain ??
+                throw new InvalidOperationException(
+                    "Render terrain was not configured.");
+            PresentationSnapshotBuffer snapshots =
+                _snapshots ??
+                throw new InvalidOperationException(
+                    "Render snapshot buffer was not configured.");
+            RtsCameraSettings cameraSettings =
+                _cameraSettings ??
+                throw new InvalidOperationException(
+                    "Render camera settings were not configured.");
+
             using IGraphicsDevice graphics =
                 GraphicsDeviceFactory.CreateForWindowTarget(
-                    _initialTarget);
+                    initialTarget);
             using var terrainRenderer =
                 new TerrainRenderer(
                     graphics,
-                    _terrain);
+                    terrain);
             using var instanceRenderer =
                 new SimpleInstanceRenderer(
                     graphics);
@@ -145,7 +189,7 @@ internal sealed class ClientRenderHost : IDisposable
                 new RenderWorld();
             var renderCamera =
                 new RtsCamera(
-                    _cameraSettings);
+                    cameraSettings);
             var debugDraw =
                 new DebugDraw();
             var frameTimingTracker =
@@ -160,9 +204,9 @@ internal sealed class ClientRenderHost : IDisposable
             FrameTimingMetrics frameTiming =
                 default;
             int width =
-                _initialTarget.Width;
+                initialTarget.Width;
             int height =
-                _initialTarget.Height;
+                initialTarget.Height;
 
             _started.Set();
 
@@ -208,7 +252,7 @@ internal sealed class ClientRenderHost : IDisposable
                     current.Camera);
 
                 if (renderWorld.Update(
-                        _snapshots))
+                        snapshots))
                 {
                     snapshotObservedAt =
                         Stopwatch.GetTimestamp();
@@ -332,6 +376,31 @@ internal sealed class ClientRenderHost : IDisposable
                     exception),
                 null);
             _started.Set();
+        }
+    }
+
+    private void RunTestRenderLoop(
+        Action<ClientRenderFrame> renderAction)
+    {
+        _started.Set();
+
+        while (Volatile.Read(ref _stopping) == 0)
+        {
+            _signal.WaitOne(IdleWait);
+
+            if (Volatile.Read(ref _stopping) != 0)
+            {
+                break;
+            }
+
+            ClientRenderFrame? frame =
+                TakeLatestFrame();
+
+            if (frame.HasValue)
+            {
+                renderAction(
+                    frame.Value);
+            }
         }
     }
 
