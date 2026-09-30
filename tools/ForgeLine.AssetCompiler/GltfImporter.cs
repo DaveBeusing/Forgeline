@@ -485,7 +485,7 @@ internal static class GltfImporter
                 5121 => buffer[itemOffset],
                 5123 => BinaryPrimitives.ReadUInt16LittleEndian(buffer.AsSpan(itemOffset, 2)),
                 5125 => BinaryPrimitives.ReadUInt32LittleEndian(buffer.AsSpan(itemOffset, 4)),
-                _ => throw new UnreachableException(),
+                _ => throw new InvalidOperationException("Unsupported index component type reached after validation."),
             };
         }
 

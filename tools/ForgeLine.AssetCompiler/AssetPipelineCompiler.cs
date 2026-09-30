@@ -489,7 +489,11 @@ public sealed class AssetPipelineCompiler
                 {
                     materialTextures = MaterialImporter.ReadDependencies(node.SourcePath);
                 }
-                catch
+                catch (Exception exception) when (
+                    exception is IOException or
+                    JsonException or
+                    InvalidDataException or
+                    ArgumentException)
                 {
                     continue;
                 }

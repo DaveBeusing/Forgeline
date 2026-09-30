@@ -199,10 +199,11 @@ public sealed class AssetPipelineTests
         var record = catalog.Get(AssetId.Parse("unit.test.triangle"));
 
         Assert.True(result.Success);
-        Assert.NotNull(record.Bounds);
-        Assert.Equal(0f, record.Bounds.Value.MinX);
-        Assert.Equal(1f, record.Bounds.Value.MaxX);
-        Assert.Equal(1f, record.Bounds.Value.MaxY);
+        var bounds = record.Bounds
+            ?? throw new InvalidOperationException("Compiled mesh did not publish bounds.");
+        Assert.Equal(0f, bounds.MinX);
+        Assert.Equal(1f, bounds.MaxX);
+        Assert.Equal(1f, bounds.MaxY);
 
         var runtime = catalog.Read(AssetId.Parse("unit.test.triangle"));
         using var stream = new MemoryStream(runtime.Payload);
