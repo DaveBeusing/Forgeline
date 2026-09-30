@@ -1,4 +1,3 @@
-using ForgeLine.Platform;
 using Vortice.Direct3D;
 using Vortice.Direct3D12;
 using Vortice.Direct3D12.Debug;
@@ -36,7 +35,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     private bool _isSuspended;
     private bool _disposed;
 
-    internal D3D12GraphicsDevice(IWindow window, GraphicsConfiguration configuration)
+    internal D3D12GraphicsDevice(in GraphicsWindowTarget target, GraphicsConfiguration configuration)
     {
         _configuration = configuration;
         configuration.Validate();
@@ -52,9 +51,9 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         _commandQueue = _device.CreateCommandQueue(CommandListType.Direct);
         _commandQueue.Name = "ForgeLine Graphics Queue";
 
-        _width = Math.Max(window.ClientSize.Width, 1);
-        _height = Math.Max(window.ClientSize.Height, 1);
-        _isSuspended = window.IsMinimized || window.ClientSize.IsEmpty;
+        _width = Math.Max(target.Width, 1);
+        _height = Math.Max(target.Height, 1);
+        _isSuspended = target.Suspended || target.Width <= 0 || target.Height <= 0;
 
         SwapChainDescription1 swapChainDescription = new()
         {
@@ -71,11 +70,11 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
 
         using (IDXGISwapChain1 swapChain = _factory.CreateSwapChainForHwnd(
                    _commandQueue,
-                   window.NativeHandle.Value,
+                   target.NativeHandle,
                    swapChainDescription))
         {
             _factory.MakeWindowAssociation(
-                window.NativeHandle.Value,
+                target.NativeHandle,
                 WindowAssociationFlags.IgnoreAltEnter);
 
             _swapChain = swapChain.QueryInterface<IDXGISwapChain3>();
