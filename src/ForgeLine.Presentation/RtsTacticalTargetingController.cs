@@ -562,6 +562,7 @@ public sealed class RtsTacticalTargetingController
         _entities = [];
         _leftWasDown = false;
         _escapeWasDown = false;
+        ResetPreview();
     }
 
     private void SynchronizeSession(

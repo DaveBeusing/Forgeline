@@ -19,7 +19,9 @@ internal readonly record struct ClientRenderFrame(
     TacticalTargetingView TacticalTargeting,
     FormationTemplate ActiveFormation,
     DebugLine[] DebugLines,
-    DebugLabel[] DebugLabels);
+    DebugLabel[] DebugLabels,
+    uint Dpi = 96,
+    RtsInformationLayerView InformationLayer = default);
 
 internal sealed class ClientRenderHost : IDisposable
 {
@@ -116,7 +118,15 @@ internal sealed class ClientRenderHost : IDisposable
                 DebugLines =
                     frame.DebugLines.ToArray(),
                 DebugLabels =
-                    frame.DebugLabels.ToArray()
+                    frame.DebugLabels.ToArray(),
+                InformationLayer =
+                    frame.InformationLayer with
+                    {
+                        SelectedEntities =
+                            frame.InformationLayer.SelectedEntities?
+                                .ToArray() ??
+                            []
+                    }
             };
 
         lock (_frameGate)
@@ -202,6 +212,10 @@ internal sealed class ClientRenderHost : IDisposable
             using var overlayRenderer =
                 new DevelopmentOverlayRenderer(
                     graphics);
+            using var informationRenderer =
+                new RtsInformationOverlayRenderer(
+                    graphics,
+                    _runtimeAssets);
 
             var renderWorld =
                 new RenderWorld();
@@ -349,6 +363,13 @@ internal sealed class ClientRenderHost : IDisposable
                                 current.TacticalTargeting,
                             activeFormation:
                                 current.ActiveFormation);
+                        informationRenderer.Render(
+                            context,
+                            renderCamera,
+                            snapshot,
+                            terrain.WorldBounds,
+                            current.InformationLayer,
+                            current.Dpi);
                     });
 
                 long renderFinishedAt =
