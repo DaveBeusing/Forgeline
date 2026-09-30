@@ -1,0 +1,8 @@
+{
+  "id": "infrastructure.directorate.bridge.road.intact",
+  "type": "mesh",
+  "source": "../sources/bridge_intact.gltf",
+  "materialReferences": [
+    "material.directorate.infrastructure.bridge"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.module.state_unpowered",
+  "type": "mesh",
+  "source": "../sources/module_state_unpowered.gltf",
+  "materialReferences": [
+    "material.directorate.building.unpowered"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.module.structural_frame",
+  "type": "mesh",
+  "source": "../sources/module_structural_frame.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

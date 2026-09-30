@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.module.state_idle",
+  "type": "mesh",
+  "source": "../sources/module_state_idle.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

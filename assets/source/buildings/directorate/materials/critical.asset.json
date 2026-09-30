@@ -1,0 +1,5 @@
+{
+  "id": "material.directorate.building.critical",
+  "type": "material",
+  "source": "critical.material.json"
+}

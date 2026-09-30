@@ -1,0 +1,8 @@
+{
+  "id": "infrastructure.directorate.road.curve_short",
+  "type": "mesh",
+  "source": "../sources/road_curve_short.gltf",
+  "materialReferences": [
+    "material.directorate.infrastructure.road"
+  ]
+}

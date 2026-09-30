@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.module.destroyed",
+  "type": "mesh",
+  "source": "../sources/module_destroyed.gltf",
+  "materialReferences": [
+    "material.directorate.building.destroyed"
+  ]
+}

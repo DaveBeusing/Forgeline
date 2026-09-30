@@ -1,0 +1,51 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine Directorate modular building kit"
+  },
+  "buffers": [
+    {
+      "byteLength": 960,
+      "uri": "data:application/octet-stream;base64,Crz8vgqN/b737KY9biCyvRSq174BEY69qIjhvZHXZr4OXRK9DEsEv79Omb5yz+s9ZWC9vnjZCL+Nnco+SJwWPfnP674evHo+Ty9fPK6Rh76ulo4+dDrJvqV0rb4s1ts+ZQaSPXwb9b7uYdu+CKQAPxCkDr+4V26+gX8KP96qzr6fFoO+KuLgPTt+pr6xTOe+kON5vbzuyr4y7dS9BYq9Pl8b874V67s99kDRPh5+pL4JQIw9C1i4vPWieL4fTAK+9RisvoU6/b5meZi92amsPlkypb78CyK+LXKZPpP0K77IzhG+oVC/vnYCrr77/W+9LXKZvlYXA7+KxDo+oVC/PoAmrr6D6sk99RisPuHcPb7rZOo92amsvp32tr6/AUs+Gap0vt+h1b7+iuO+yfxYPW2cw75+BwG/FJDIPK7wPb5PCQe/pOuIvpH7Yb6fju++Dek8vvu/v76wLBy+fQDcPYm6rb6uNFm+HaahPecsEr7wO3G+PBZavso3Nr7yMzS+AAAAAAIAAAABAAAAAAAAAAMAAAACAAAABAAAAAUAAAAGAAAABAAAAAYAAAAHAAAAAAAAAAEAAAAFAAAAAAAAAAUAAAAEAAAAAwAAAAcAAAAGAAAAAwAAAAYAAAACAAAAAQAAAAIAAAAGAAAAAQAAAAYAAAAFAAAAAAAAAAQAAAAHAAAAAAAAAAcAAAADAAAACAAAAAoAAAAJAAAACAAAAAsAAAAKAAAADAAAAA0AAAAOAAAADAAAAA4AAAAPAAAACAAAAAkAAAANAAAACAAAAA0AAAAMAAAACwAAAA8AAAAOAAAACwAAAA4AAAAKAAAACQAAAAoAAAAOAAAACQAAAA4AAAANAAAACAAAAAwAAAAPAAAACAAAAA8AAAALAAAAEAAAABIAAAARAAAAEAAAABMAAAASAAAAFAAAABUAAAAWAAAAFAAAABYAAAAXAAAAEAAAABEAAAAVAAAAEAAAABUAAAAUAAAAEwAAABcAAAAWAAAAEwAAABYAAAASAAAAEQAAABIAAAAWAAAAEQAAABYAAAAVAAAAEAAAABQAAAAXAAAAEAAAABcAAAATAAAAGAAAABoAAAAZAAAAGAAAABsAAAAaAAAAHAAAAB0AAAAeAAAAHAAAAB4AAAAfAAAAGAAAABkAAAAdAAAAGAAAAB0AAAAcAAAAGwAAAB8AAAAeAAAAGwAAAB4AAAAaAAAAGQAAABoAAAAeAAAAGQAAAB4AAAAdAAAAGAAAABwAAAAfAAAAGAAAAB8AAAAbAAAA"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 384
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 384,
+      "byteLength": 576
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 32,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5125,
+      "count": 144,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1,
+          "mode": 4
+        }
+      ]
+    }
+  ]
+}

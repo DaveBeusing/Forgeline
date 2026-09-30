@@ -1,0 +1,8 @@
+{
+  "id": "infrastructure.directorate.road.shoulder",
+  "type": "mesh",
+  "source": "../sources/road_shoulder.gltf",
+  "materialReferences": [
+    "material.directorate.infrastructure.road"
+  ]
+}

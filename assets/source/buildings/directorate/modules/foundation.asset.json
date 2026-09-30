@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.module.foundation",
+  "type": "mesh",
+  "source": "../sources/module_foundation.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}
