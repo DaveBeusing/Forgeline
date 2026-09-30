@@ -668,6 +668,7 @@ public sealed class VerticalSliceScenario : IDisposable
                 recipes,
                 weapons,
                 artilleryWeapons,
+                combatRuntime,
                 spatialIndex,
                 buildingPlacement,
                 buildingCommands,
