@@ -1,4 +1,7 @@
 using System.Numerics;
+using System.Text;
+using System.Text.Json;
+using ForgeLine.Assets;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Game;
@@ -60,6 +63,114 @@ public sealed class WorldPresentationTests
         Assert.Equal(
             "material.world.terrain.dirt",
             fallback.AssetId);
+    }
+
+    [Fact]
+    public void RuntimeTerrainMaterialOverridesFallbackWhenAvailable()
+    {
+        string runtimeRoot =
+            Path.Combine(
+                Path.GetTempPath(),
+                "forgeline-terrain-runtime-" +
+                Guid.NewGuid().ToString("N"));
+        string runtimePath =
+            "materials/world/terrain/grass_ground.flasset";
+
+        try
+        {
+            byte[] payload =
+                Encoding.UTF8.GetBytes(
+                    """
+                    {
+                      "baseColorFactor": [0.61, 0.27, 0.13, 1.0],
+                      "metallicFactor": 0.25,
+                      "roughnessFactor": 0.55
+                    }
+                    """);
+
+            RuntimeAssetFile.Write(
+                Path.Combine(
+                    runtimeRoot,
+                    runtimePath.Replace(
+                        '/',
+                        Path.DirectorySeparatorChar)),
+                RuntimeAssetType.Material,
+                ReadOnlySpan<byte>.Empty,
+                payload);
+
+            var manifest =
+                new RuntimeAssetManifest
+                {
+                    CompilerVersion = "test",
+                    Assets =
+                    [
+                        new RuntimeAssetRecord
+                        {
+                            Id = "material.world.terrain.grass_ground",
+                            Type = RuntimeAssetType.Material,
+                            SourcePath = "world/materials/terrain/grass_ground.material.json",
+                            RuntimePath = runtimePath,
+                            SourceHash = "source",
+                            BuildHash = "build",
+                            RuntimeVersion = 1,
+                            CompilerVersion = "test"
+                        }
+                    ]
+                };
+
+            Directory.CreateDirectory(
+                runtimeRoot);
+            File.WriteAllText(
+                Path.Combine(
+                    runtimeRoot,
+                    RuntimeAssetCatalog.ManifestFileName),
+                JsonSerializer.Serialize(
+                    manifest,
+                    RuntimeAssetCatalog.CreateJsonOptions()));
+
+            RuntimeAssetCatalog catalog =
+                RuntimeAssetCatalog.Load(
+                    runtimeRoot);
+            TerrainPresentationProfile profile =
+                TerrainPresentationProfile.CreateCentralDivide(
+                    catalog);
+
+            TerrainMaterialDefinition grass =
+                profile.GetMaterial(
+                    TerrainMaterialSlot.GrassGround);
+            Assert.Equal(
+                new Vector3(
+                    0.61f,
+                    0.27f,
+                    0.13f),
+                grass.BaseColor);
+            Assert.Equal(
+                0.55f,
+                grass.Roughness);
+            Assert.Equal(
+                0.25f,
+                grass.Metallic);
+
+            TerrainMaterialDefinition dirt =
+                profile.GetMaterial(
+                    TerrainMaterialSlot.Dirt);
+            Assert.Equal(
+                new Vector3(
+                    0.34f,
+                    0.27f,
+                    0.18f),
+                dirt.BaseColor);
+        }
+        finally
+        {
+            if (Directory.Exists(
+                    runtimeRoot))
+            {
+                Directory.Delete(
+                    runtimeRoot,
+                    recursive: true);
+            }
+        }
     }
 
     [Fact]
