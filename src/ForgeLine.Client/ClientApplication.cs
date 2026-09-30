@@ -30,6 +30,14 @@ internal sealed class ClientApplication
     private static readonly TimeSpan IdleWait = TimeSpan.FromMilliseconds(16);
     private static readonly TimeSpan SmokeTestDuration = TimeSpan.FromMilliseconds(350);
     private static readonly TimeSpan DiagnosticInterval = TimeSpan.FromSeconds(1);
+    private static readonly JsonSerializerOptions VisualQualificationJsonOptions =
+        new()
+        {
+            PropertyNamingPolicy =
+                JsonNamingPolicy.CamelCase,
+            WriteIndented =
+                true
+        };
 
     private readonly IPlatform _platform;
 
@@ -736,13 +744,7 @@ internal sealed class ClientApplication
             fullPath,
             JsonSerializer.Serialize(
                 report,
-                new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy =
-                        JsonNamingPolicy.CamelCase,
-                    WriteIndented =
-                        true
-                }));
+                VisualQualificationJsonOptions));
 
         Console.WriteLine(
             $"[render:qualification] output=\"{fullPath}\" " +
