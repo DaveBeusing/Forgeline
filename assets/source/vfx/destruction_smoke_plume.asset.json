@@ -1,0 +1,8 @@
+{
+  "id": "vfx.destruction.smoke_plume",
+  "type": "mesh",
+  "source": "sources/destruction_smoke_plume.gltf",
+  "materialReferences": [
+    "material.vfx.smoke"
+  ]
+}

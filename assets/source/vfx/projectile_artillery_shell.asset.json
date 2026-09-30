@@ -1,0 +1,8 @@
+{
+  "id": "vfx.combat.projectile.artillery_shell",
+  "type": "mesh",
+  "source": "sources/projectile_artillery_shell.gltf",
+  "materialReferences": [
+    "material.vfx.projectile"
+  ]
+}

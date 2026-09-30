@@ -1,0 +1,5 @@
+{
+  "id": "material.vfx.smoke",
+  "type": "material",
+  "source": "smoke.material.json"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "vfx.combat.impact.concrete",
+  "type": "mesh",
+  "source": "sources/impact_concrete.gltf",
+  "materialReferences": [
+    "material.vfx.impact.dirt"
+  ]
+}

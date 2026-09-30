@@ -1,0 +1,8 @@
+{
+  "id": "vfx.combat.muzzle.tank_cannon",
+  "type": "mesh",
+  "source": "sources/muzzle_tank_cannon.gltf",
+  "materialReferences": [
+    "material.vfx.muzzle"
+  ]
+}

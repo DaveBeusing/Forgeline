@@ -1,0 +1,8 @@
+{
+  "id": "vfx.destruction.debris",
+  "type": "mesh",
+  "source": "sources/destruction_debris.gltf",
+  "materialReferences": [
+    "material.vfx.impact.dirt"
+  ]
+}

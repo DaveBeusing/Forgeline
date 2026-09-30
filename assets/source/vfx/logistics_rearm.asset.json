@@ -1,0 +1,8 @@
+{
+  "id": "vfx.logistics.rearm",
+  "type": "mesh",
+  "source": "sources/logistics_rearm.gltf",
+  "materialReferences": [
+    "material.vfx.logistics"
+  ]
+}

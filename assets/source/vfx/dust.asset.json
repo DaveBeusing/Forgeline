@@ -1,0 +1,8 @@
+{
+  "id": "vfx.combat.persistent.dust",
+  "type": "mesh",
+  "source": "sources/dust.gltf",
+  "materialReferences": [
+    "material.vfx.dust"
+  ]
+}

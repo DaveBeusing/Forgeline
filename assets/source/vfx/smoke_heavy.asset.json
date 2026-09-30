@@ -1,0 +1,8 @@
+{
+  "id": "vfx.combat.persistent.heavy_smoke",
+  "type": "mesh",
+  "source": "sources/smoke_heavy.gltf",
+  "materialReferences": [
+    "material.vfx.smoke"
+  ]
+}

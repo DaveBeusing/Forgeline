@@ -1,0 +1,8 @@
+{
+  "id": "vfx.logistics.resource_transfer",
+  "type": "mesh",
+  "source": "sources/logistics_resource_transfer.gltf",
+  "materialReferences": [
+    "material.vfx.logistics"
+  ]
+}

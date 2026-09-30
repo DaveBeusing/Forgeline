@@ -61,6 +61,12 @@ public sealed class RenderWorld
         }
 
         RenderInstance currentInstance = current.GetInstance(index);
+
+        if (currentInstance.VfxFeature.IsSpecified)
+        {
+            return currentInstance;
+        }
+
         if (_previous is null ||
             !TryFindByEntity(
                 _previous,
@@ -91,7 +97,8 @@ public sealed class RenderWorld
             return false;
         }
 
-        if (_previous is null ||
+        if (current.VfxFeature.IsSpecified ||
+            _previous is null ||
             !TryFindByEntity(
                 _previous,
                 entity,

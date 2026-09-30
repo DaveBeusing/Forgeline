@@ -1,0 +1,8 @@
+{
+  "id": "vfx.combat.persistent.light_smoke",
+  "type": "mesh",
+  "source": "sources/smoke_light.gltf",
+  "materialReferences": [
+    "material.vfx.smoke"
+  ]
+}

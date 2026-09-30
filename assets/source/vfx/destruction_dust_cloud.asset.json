@@ -1,0 +1,8 @@
+{
+  "id": "vfx.destruction.dust_cloud",
+  "type": "mesh",
+  "source": "sources/destruction_dust_cloud.gltf",
+  "materialReferences": [
+    "material.vfx.dust"
+  ]
+}

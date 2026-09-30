@@ -1,0 +1,8 @@
+{
+  "id": "vfx.combat.projectile.generic_explosive",
+  "type": "mesh",
+  "source": "sources/projectile_explosive.gltf",
+  "materialReferences": [
+    "material.vfx.projectile"
+  ]
+}

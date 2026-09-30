@@ -1,0 +1,8 @@
+{
+  "id": "vfx.combat.impact.metal",
+  "type": "mesh",
+  "source": "sources/impact_metal.gltf",
+  "materialReferences": [
+    "material.vfx.impact.metal"
+  ]
+}

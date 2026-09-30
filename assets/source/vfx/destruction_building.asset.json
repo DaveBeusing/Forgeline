@@ -1,0 +1,8 @@
+{
+  "id": "vfx.destruction.building_burst",
+  "type": "mesh",
+  "source": "sources/destruction_building.gltf",
+  "materialReferences": [
+    "material.vfx.explosion"
+  ]
+}

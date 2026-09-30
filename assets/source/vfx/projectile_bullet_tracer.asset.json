@@ -1,0 +1,8 @@
+{
+  "id": "vfx.combat.projectile.bullet_tracer",
+  "type": "mesh",
+  "source": "sources/projectile_bullet_tracer.gltf",
+  "materialReferences": [
+    "material.vfx.projectile"
+  ]
+}

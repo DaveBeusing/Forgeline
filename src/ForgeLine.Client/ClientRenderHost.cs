@@ -378,7 +378,9 @@ internal sealed class ClientRenderHost : IDisposable
                         $"[render:frame] thread={Environment.CurrentManagedThreadId} " +
                         $"tick={snapshot.Tick.Value} fps={frameTiming.FramesPerSecond:F1} " +
                         $"size={diagnostics.Surface.Width}x{diagnostics.Surface.Height} " +
-                        $"instances={instanceRenderer.LastDiagnostics.VisibleInstances}/{renderWorld.InstanceCount}");
+                        $"instances={instanceRenderer.LastDiagnostics.VisibleInstances}/{renderWorld.InstanceCount} " +
+                        $"vfx={snapshot.VfxMetrics.ActiveTransientEffects}/{snapshot.VfxMetrics.PoolCapacity} " +
+                        $"vfxDropped={snapshot.VfxMetrics.TotalDropped}");
                     nextDiagnosticAt =
                         renderFinishedAt;
                 }
