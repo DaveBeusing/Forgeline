@@ -35,6 +35,7 @@ internal sealed class ClientRenderHost : IDisposable
     private readonly Action<ClientRenderFrame>? _testRenderAction;
     private readonly AutoResetEvent _signal = new(false);
     private readonly ManualResetEventSlim _started = new(false);
+    private readonly ManualResetEventSlim _faulted = new(false);
     private readonly Thread _thread;
 
     private ClientRenderFrame? _latestFrame;
@@ -82,6 +83,15 @@ internal sealed class ClientRenderHost : IDisposable
 
     internal bool IsExecutionThreadAlive =>
         _thread.IsAlive;
+
+    internal bool WaitForFault(
+        TimeSpan timeout)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(
+            timeout,
+            TimeSpan.Zero);
+        return _faulted.Wait(timeout);
+    }
 
     private Thread CreateThread() =>
         new(RenderLoop)
@@ -135,6 +145,7 @@ internal sealed class ClientRenderHost : IDisposable
             _thread.Join();
         }
 
+        _faulted.Dispose();
         _started.Dispose();
         _signal.Dispose();
         _disposed = true;
@@ -375,6 +386,7 @@ internal sealed class ClientRenderHost : IDisposable
                 ExceptionDispatchInfo.Capture(
                     exception),
                 null);
+            _faulted.Set();
             _started.Set();
         }
     }
