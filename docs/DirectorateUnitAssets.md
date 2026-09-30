@@ -156,3 +156,12 @@ Automated coverage verifies:
 ## Current boundary
 
 This is the first production-oriented Directorate unit visual baseline, not final high-detail art. Final texture sets, skeletal animation, track/wheel animation, articulated turret/gun transforms, VFX, portraits, audio, and higher-fidelity destruction can replace or extend the stable contracts established here without changing gameplay IDs or creating a parallel runtime asset path.
+
+
+## VFX integration
+
+Directorate weapon and damage visuals use the shared presentation VFX contracts documented in [Combat, Destruction, and Logistics VFX](CombatAndLogisticsVfx.md).
+
+The compiled unit sockets are now active presentation anchors: `weapon_muzzle` supplies muzzle origin, while logistics-family sockets can anchor cargo/supply effects. Missing socket/runtime data falls back to the unit transform without changing weapon or supply simulation.
+
+Damage-state smoke/fire/sparks and destruction bursts are derived from authoritative health/wreck state. They do not replace the existing unit material/geometry damage treatment or create additional combat authority.

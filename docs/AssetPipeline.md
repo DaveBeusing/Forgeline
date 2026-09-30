@@ -238,6 +238,18 @@ assets/source/infrastructure/directorate/
 
 The nine primary building assets expose LOD1/LOD2 references and share `building.directorate.module.collision_box` as a simplified visual/tooling collision contract. Shared construction and state modules reduce duplicate geometry while preserving stable IDs. Directorate road and bridge meshes compile through the same runtime manifest and are consumed by presentation only; authoritative building footprints, logistics edges, and navigation blockers remain game/simulation data.
 
+## Combat, destruction, and logistics VFX source set
+
+The first VFX baseline is authored below:
+
+```text
+assets/source/vfx/
+```
+
+It uses ordinary compiled mesh/material assets because the current runtime contract intentionally exposes only Mesh, Texture, and Material asset types. Effect lifetime, distance reduction, event mapping, pooling, and socket behavior are presentation contracts rather than source-asset metadata.
+
+Stable IDs use `vfx.combat.*`, `vfx.destruction.*`, `vfx.logistics.*`, and `material.vfx.*`. Runtime code never reads the glTF or material authoring files directly.
+
 ## Compiler Usage
 
 From the repository root:

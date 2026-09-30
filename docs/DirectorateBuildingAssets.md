@@ -203,3 +203,12 @@ Automated coverage verifies:
 ## Current boundary
 
 This baseline integrates the required Vertical Slice functions without expanding gameplay mechanics. Roads are not player-constructible, rail content remains outside the current slice, and no new economic or power mechanic is introduced. Higher-detail production art, mechanical building animation, emissive texture animation, particles, audio, repair visuals, and editor-specific road placement can extend the stable contracts later.
+
+
+## VFX integration
+
+Building damage and destruction presentation is extended by the shared VFX layer documented in [Combat, Destruction, and Logistics VFX](CombatAndLogisticsVfx.md).
+
+Damaged buildings receive light smoke, Critical buildings receive heavier smoke/fire/sparks, and destroyed building wrecks receive one-shot building-scale destruction layers plus persistent wreck smoke/fire. These effects consume the existing `HealthState` and presentation-only wreck identity and never alter building footprint, occupancy, combat, production, power, or logistics authority.
+
+Supply/cargo effects are likewise driven only when existing transport/supply state reports real loading, unloading, refuel, or rearm activity.
