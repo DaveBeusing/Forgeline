@@ -94,6 +94,33 @@ public sealed class SimulationCoordinator
         return envelope;
     }
 
+    public void ExecuteControlCommand(
+        ISimulationCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        if (CurrentTick == SimulationTick.Zero)
+        {
+            throw new InvalidOperationException(
+                "Control commands require an initialized simulation tick.");
+        }
+
+        _systems.Seal();
+        _context.Tick = CurrentTick;
+        _context.TickDuration = Clock.TickDuration;
+        _context.Phase = SimulationPhase.InputCommands;
+
+        command.Execute(_context);
+
+        for (int index = 0;
+             index < _tickObservers.Count;
+             index++)
+        {
+            _tickObservers[index].OnTickCompleted(
+                _context);
+        }
+    }
+
     public void AdvanceOneTick()
     {
         _systems.Seal();
