@@ -3,6 +3,7 @@ using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Simulation;
+using ForgeLine.World;
 using Xunit;
 
 namespace ForgeLine.Game.Tests;
@@ -419,6 +420,17 @@ public sealed class BattlefieldSupplySystemTests
                 Vector3.One));
         simulation.Entities.AddComponent(
             commandCore,
+            new SpatialPresence(
+                new Vector3(
+                    10.0f,
+                    6.0f,
+                    10.0f),
+                new SpatialEntryMetadata(
+                    LocalPlayer.Value,
+                    0,
+                    SpatialMobility.Static)));
+        simulation.Entities.AddComponent(
+            commandCore,
             new CommandFacility());
         simulation.Entities.AddComponent(
             commandCore,
@@ -455,15 +467,18 @@ public sealed class BattlefieldSupplySystemTests
             SupplyTruckFactory.Create(
                 simulation.Entities,
                 inventories,
-                new Vector3(5.0f, 0.0f, 0.0f),
+                new Vector3(0.0f, 0.0f, 13.5f),
                 LocalPlayer,
                 cargo);
-
-        simulation.AdvanceOneTick();
-
         SupplyTruck truckState =
             simulation.Entities.GetComponent<SupplyTruck>(
                 truck);
+
+        Assert.True(
+            13.5f >
+            truckState.LoadRangeMeters);
+
+        simulation.AdvanceOneTick();
 
         Assert.Equal(
             truckState.FuelTarget,
