@@ -1678,7 +1678,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         EntityId[] attackers,
         SkirmishOpponentConfiguration configuration)
     {
-        if (attackers.Count == 0)
+        if (attackers.Length == 0)
         {
             return;
         }
@@ -1686,7 +1686,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         Vector3 centroid = Vector3.Zero;
         int positionedAttackers = 0;
 
-        for (int index = 0; index < attackers.Count; index++)
+        for (int index = 0; index < attackers.Length; index++)
         {
             if (!context.Entities.TryGetComponent(
                     attackers[index],
@@ -1712,7 +1712,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 0.50,
                 configuration.ResupplyThreshold + 0.10);
 
-        for (int index = 0; index < attackers.Count; index++)
+        for (int index = 0; index < attackers.Length; index++)
         {
             if (!context.Entities.TryGetComponent(
                     attackers[index],
