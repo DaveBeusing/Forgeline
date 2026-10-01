@@ -28,7 +28,8 @@ public enum PlayerCommandFeedbackKind : byte
     Logistics = 5,
     Supply = 6,
     Tactical = 7,
-    Artillery = 8
+    Artillery = 8,
+    Surrender = 9
 }
 
 public enum PlayerCommandFeedbackState : byte

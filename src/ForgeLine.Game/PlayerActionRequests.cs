@@ -29,7 +29,8 @@ public enum PlayerActionRequestKind : byte
     SubmitAttackMove = 19,
     SubmitRetreat = 20,
     SubmitFireMissionCoordinate = 21,
-    SubmitFireMissionContact = 22
+    SubmitFireMissionContact = 22,
+    Surrender = 23
 }
 
 public readonly record struct PlayerActionRequest(
@@ -329,6 +330,20 @@ public readonly record struct PlayerActionRequest(
             entities,
             tacticalContactKey: contactKey,
             tacticalRounds: requestedRounds);
+
+    public static PlayerActionRequest Surrender() =>
+        new(
+            PlayerActionRequestKind.Surrender,
+            BuildingId.None,
+            EntityId.Invalid,
+            RecipeId.None,
+            UnitId.None,
+            EntityId.Invalid,
+            false,
+            ProductionPriority.Normal,
+            ProductionRequestMode.OneShot,
+            ResourceId.None,
+            0.0);
 
     private static PlayerActionRequest CreateTactical(
         PlayerActionRequestKind kind,

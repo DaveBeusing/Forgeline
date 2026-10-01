@@ -24,7 +24,8 @@ public enum PlayerCommandKind : byte
     Logistics = 6,
     Supply = 7,
     Tactical = 8,
-    Artillery = 9
+    Artillery = 9,
+    Surrender = 10
 }
 
 public enum PlayerCommandSubmissionFailure : byte
@@ -886,6 +887,48 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             envelope);
     }
 
+    public PlayerCommandSubmissionReceipt SubmitSurrender(
+        PlayerId issuer,
+        SimulationTick observedTick)
+    {
+        if (!TryBeginSubmission(
+                PlayerCommandKind.Surrender,
+                issuer,
+                observedTick,
+                out PlayerCommandCorrelationId correlation,
+                out SimulationTick targetTick,
+                out SimulationCommandSource source,
+                out PlayerCommandSubmissionReceipt rejected))
+        {
+            return rejected;
+        }
+
+        var command =
+            new SurrenderCommand(
+                issuer,
+                _matchStateEntity,
+                observedTick);
+
+        SimulationCommandEnvelope envelope =
+            _simulation.SubmitCommand(
+                command,
+                targetTick,
+                source);
+
+        _pending.Add(
+            PendingCommand.ForSurrender(
+                correlation,
+                envelope,
+                command));
+
+        return AcceptedReceipt(
+            correlation,
+            PlayerCommandKind.Surrender,
+            source,
+            observedTick,
+            envelope);
+    }
+
     public void OnTickCompleted(SimulationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
@@ -1102,6 +1145,34 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     command.ExecutedAtTick);
             }
 
+            case PlayerCommandKind.Surrender:
+            {
+                SurrenderCommand command =
+                    pending.SurrenderCommand!;
+
+                if (command.ExecutedAtTick == SimulationTick.Zero)
+                {
+                    return null;
+                }
+
+                return new PlayerCommandResultReadModel(
+                    SessionId,
+                    pending.CorrelationId,
+                    pending.Kind,
+                    command.Accepted
+                        ? PlayerCommandFeedbackState.Accepted
+                        : PlayerCommandFeedbackState.Rejected,
+                    command.Accepted
+                        ? 1
+                        : 0,
+                    command.Accepted
+                        ? 0
+                        : 1,
+                    BuildCommandRejectionReason.None,
+                    BuildingPlacementFailureReason.None,
+                    command.ExecutedAtTick);
+            }
+
             default:
                 throw new InvalidOperationException(
                     $"Unsupported player command kind '{pending.Kind}'.");
@@ -1235,6 +1306,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     PlayerCommandFeedbackKind.Tactical,
                 PlayerCommandKind.Artillery =>
                     PlayerCommandFeedbackKind.Artillery,
+                PlayerCommandKind.Surrender =>
+                    PlayerCommandFeedbackKind.Surrender,
                 _ =>
                     PlayerCommandFeedbackKind.None
             },
@@ -1257,7 +1330,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         PlayerUnitProductionActionCommand? UnitProductionCommand,
         PlayerLogisticsActionCommand? LogisticsCommand,
         PlayerTacticalActionCommand? TacticalCommand,
-        PlayerCommandResultReadModel? Result)
+        PlayerCommandResultReadModel? Result,
+        SurrenderCommand? SurrenderCommand = null)
     {
         public static PendingCommand ForMovement(
             PlayerCommandCorrelationId correlation,
@@ -1305,6 +1379,23 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 null,
                 null,
                 null);
+
+        public static PendingCommand ForSurrender(
+            PlayerCommandCorrelationId correlation,
+            in SimulationCommandEnvelope envelope,
+            SurrenderCommand command) =>
+            new(
+                correlation,
+                PlayerCommandKind.Surrender,
+                envelope,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                command);
 
         public static PendingCommand ForProduction(
             PlayerCommandCorrelationId correlation,
