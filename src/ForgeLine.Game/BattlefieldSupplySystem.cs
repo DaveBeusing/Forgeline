@@ -222,38 +222,38 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                 continue;
             }
 
-            if (!TryFindLoadingDepot(
+            if (!TryFindLoadingInventory(
                     context,
                     truck,
                     truckTransform.Position,
-                    out SupplyDepot depot))
+                    out InventoryId loadingInventory))
             {
                 continue;
             }
 
             fuelTransferred +=
                 TransferTowardTarget(
-                    depot.InventoryId,
+                    loadingInventory,
                     truck.InventoryId,
                     ResourceIds.Fuel,
                     truck.FuelTarget);
 
             ammunitionTransferred +=
                 TransferTowardTarget(
-                    depot.InventoryId,
+                    loadingInventory,
                     truck.InventoryId,
                     ResourceIds.Ammunition,
                     truck.AmmunitionTarget);
         }
     }
 
-    private bool TryFindLoadingDepot(
+    private bool TryFindLoadingInventory(
         SimulationContext context,
         in SupplyTruck truck,
         Vector3 truckPosition,
-        out SupplyDepot selectedDepot)
+        out InventoryId selectedInventory)
     {
-        selectedDepot = default;
+        selectedInventory = default;
         EntityId selectedEntity = EntityId.Invalid;
         float bestDistanceSquared = float.PositiveInfinity;
         float maximumDistanceSquared =
@@ -276,14 +276,55 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                 continue;
             }
 
+            ConsiderLoadingSource(
+                entity,
+                depot.InventoryId,
+                transform.Position);
+        }
+
+        foreach (EntityId entity in
+                 context.Entities.Query<SupplyProvider>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            if (!context.Entities.HasComponent<CommandFacility>(entity))
+            {
+                continue;
+            }
+
+            SupplyProvider provider =
+                context.Entities.GetComponent<SupplyProvider>(entity);
+
+            if (!provider.Enabled ||
+                provider.Owner != truck.Owner ||
+                !_inventories.Contains(provider.InventoryId) ||
+                !context.Entities.TryGetComponent(
+                    entity,
+                    out WorldTransform transform))
+            {
+                continue;
+            }
+
+            ConsiderLoadingSource(
+                entity,
+                provider.InventoryId,
+                transform.Position);
+        }
+
+        return selectedEntity.IsValid;
+
+        void ConsiderLoadingSource(
+            EntityId entity,
+            InventoryId inventory,
+            Vector3 position)
+        {
             float distanceSquared =
                 HorizontalDistanceSquared(
                     truckPosition,
-                    transform.Position);
+                    position);
 
             if (distanceSquared > maximumDistanceSquared)
             {
-                continue;
+                return;
             }
 
             if (!selectedEntity.IsValid ||
@@ -292,12 +333,10 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                  entity < selectedEntity))
             {
                 selectedEntity = entity;
-                selectedDepot = depot;
+                selectedInventory = inventory;
                 bestDistanceSquared = distanceSquared;
             }
         }
-
-        return selectedEntity.IsValid;
     }
 
     private double TransferTowardTarget(
