@@ -2473,7 +2473,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         UnitId candidate =
             SelectCriticalLogisticsProductionGoal(
                 owned,
-                facility);
+                facility,
+                configuration);
 
         if (!candidate.IsSpecified)
         {
@@ -2624,7 +2625,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private static UnitId SelectCriticalLogisticsProductionGoal(
         OwnedState owned,
-        in UnitProductionFacility facility)
+        in UnitProductionFacility facility,
+        SkirmishOpponentConfiguration configuration)
     {
         if (!facility.Supports(
                 UnitProductionCapability.Logistics))
@@ -2632,10 +2634,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return UnitId.None;
         }
 
-        int cargoTarget = Math.Clamp(
-            owned.SupplyDepots.Count,
-            2,
-            4);
+        int cargoTarget =
+            Math.Max(
+                configuration.MinimumCargoTrucks,
+                Math.Clamp(
+                    owned.SupplyDepots.Count,
+                    2,
+                    4));
         int cargoCount =
             GetUnitCount(
                 owned,
@@ -2650,7 +2655,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return UnitIds.CargoTruck;
         }
 
-        const int supplyTarget = 1;
+        int supplyTarget =
+            configuration.MinimumSupplyTrucks;
         int supplyCount =
             GetUnitCount(
                 owned,
