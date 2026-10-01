@@ -2029,14 +2029,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             }
 
             if (!float.IsFinite(bestDistance) &&
-                context.Entities.IsAlive(controller.CommandCore) &&
+                context.Entities.IsAlive(controller.PreferredConstructionSource) &&
                 context.Entities.TryGetComponent(
-                    controller.CommandCore,
+                    controller.PreferredConstructionSource,
                     out SupplyProvider commandCoreProvider) &&
                 commandCoreProvider.Enabled &&
                 commandCoreProvider.Owner == truck.Owner &&
                 context.Entities.TryGetComponent(
-                    controller.CommandCore,
+                    controller.PreferredConstructionSource,
                     out WorldTransform commandCoreTransform) &&
                 ((needsFuel &&
                   _inventories.GetAvailableQuantity(
