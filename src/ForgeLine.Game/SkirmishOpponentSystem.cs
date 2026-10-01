@@ -1530,7 +1530,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         EnsureAttackSupplySupport(
             context,
             owned,
-            attackers);
+            attackers,
+            configuration);
 
         IntelligenceContact? identified = null;
         EntityId identifiedTarget = EntityId.Invalid;
@@ -1674,7 +1675,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private void EnsureAttackSupplySupport(
         SimulationContext context,
         OwnedState owned,
-        IReadOnlyList<EntityId> attackers)
+        IReadOnlyList<EntityId> attackers,
+        SkirmishOpponentConfiguration configuration)
     {
         if (attackers.Count == 0)
         {
@@ -1703,6 +1705,31 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
 
         centroid /= positionedAttackers;
+
+        bool releaseForRecovery = false;
+        double releaseThreshold =
+            Math.Min(
+                0.50,
+                configuration.ResupplyThreshold + 0.10);
+
+        for (int index = 0; index < attackers.Count; index++)
+        {
+            if (!context.Entities.TryGetComponent(
+                    attackers[index],
+                    out UnitCombatReadiness readiness))
+            {
+                continue;
+            }
+
+            if (Math.Min(
+                    readiness.Fuel,
+                    readiness.Ammunition) <=
+                releaseThreshold)
+            {
+                releaseForRecovery = true;
+                break;
+            }
+        }
 
         EntityId selected = EntityId.Invalid;
         SupplyTruck selectedTruck = default;
@@ -1778,9 +1805,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
 
         const float holdRadiusMeters = 12.0f;
-        const float retargetDistanceMeters = 72.0f;
+        const float retargetDistanceMeters = 24.0f;
 
-        if (selectedDistanceSquared <=
+        if (releaseForRecovery ||
+            selectedDistanceSquared <=
             holdRadiusMeters * holdRadiusMeters)
         {
             TacticalCommandUtilities.ClearMovementIntent(
