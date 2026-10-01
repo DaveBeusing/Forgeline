@@ -1527,6 +1527,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
+        EnsureAttackSupplySupport(
+            context,
+            owned,
+            attackers);
+
         IntelligenceContact? identified = null;
         EntityId identifiedTarget = EntityId.Invalid;
         bool identifiedIsCommandCore = false;
@@ -1664,6 +1669,146 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         advance.Execute(context);
 
         return true;
+    }
+
+    private void EnsureAttackSupplySupport(
+        SimulationContext context,
+        OwnedState owned,
+        IReadOnlyList<EntityId> attackers)
+    {
+        if (attackers.Count == 0)
+        {
+            return;
+        }
+
+        Vector3 centroid = Vector3.Zero;
+        int positionedAttackers = 0;
+
+        for (int index = 0; index < attackers.Count; index++)
+        {
+            if (!context.Entities.TryGetComponent(
+                    attackers[index],
+                    out WorldTransform transform))
+            {
+                continue;
+            }
+
+            centroid += transform.Position;
+            positionedAttackers++;
+        }
+
+        if (positionedAttackers == 0)
+        {
+            return;
+        }
+
+        centroid /= positionedAttackers;
+
+        EntityId selected = EntityId.Invalid;
+        SupplyTruck selectedTruck = default;
+        float selectedDistanceSquared = float.PositiveInfinity;
+
+        for (int index = 0; index < owned.Units.Count; index++)
+        {
+            EntityId candidate = owned.Units[index];
+
+            if (!context.Entities.TryGetComponent(
+                    candidate,
+                    out SupplyTruck truck) ||
+                !context.Entities.TryGetComponent(
+                    candidate,
+                    out WorldTransform transform) ||
+                context.Entities.HasComponent<ResupplyOrder>(
+                    candidate) ||
+                context.Entities.HasComponent<SupplyRescueAssignment>(
+                    candidate))
+            {
+                continue;
+            }
+
+            double availableFuel =
+                _inventories.GetAvailableQuantity(
+                    truck.InventoryId,
+                    ResourceIds.Fuel);
+
+            if (availableFuel <
+                truck.FuelTarget * 0.50)
+            {
+                continue;
+            }
+
+            bool servingRecipient = false;
+
+            foreach (EntityId recipient in
+                     context.Entities.Query<ResupplyOrder>(
+                         QueryIterationOrder.StableByEntityIndex))
+            {
+                if (context.Entities.GetComponent<ResupplyOrder>(
+                        recipient).Provider == candidate)
+                {
+                    servingRecipient = true;
+                    break;
+                }
+            }
+
+            if (servingRecipient)
+            {
+                continue;
+            }
+
+            float distanceSquared =
+                HorizontalDistanceSquared(
+                    transform.Position,
+                    centroid);
+
+            if (!selected.IsValid ||
+                distanceSquared < selectedDistanceSquared ||
+                (distanceSquared == selectedDistanceSquared &&
+                 candidate < selected))
+            {
+                selected = candidate;
+                selectedTruck = truck;
+                selectedDistanceSquared = distanceSquared;
+            }
+        }
+
+        if (!selected.IsValid)
+        {
+            return;
+        }
+
+        const float holdRadiusMeters = 12.0f;
+        const float retargetDistanceMeters = 72.0f;
+
+        if (selectedDistanceSquared <=
+            holdRadiusMeters * holdRadiusMeters)
+        {
+            TacticalCommandUtilities.ClearMovementIntent(
+                context,
+                selected);
+            return;
+        }
+
+        if (TacticalCommandUtilities.TryGetMovementIntent(
+                context,
+                selected,
+                out MovementOrder movement) &&
+            HorizontalDistanceSquared(
+                movement.WorldTarget,
+                centroid) <=
+            retargetDistanceMeters *
+            retargetDistanceMeters)
+        {
+            return;
+        }
+
+        var command =
+            new MoveEntitiesCommand(
+                selectedTruck.Owner,
+                [selected],
+                centroid,
+                context.Tick);
+        command.Execute(context);
     }
 
     private static Vector3 ResolveObjectiveApproachPoint(
