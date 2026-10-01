@@ -55,12 +55,11 @@ public sealed class VerticalSliceReadinessTests
                     current.CountBuildings(
                         current.West.Player,
                         BuildingIds.SupplyDepot) >= 1 &&
-                    current.CountUnits(
-                        current.West.Player,
-                        UnitIds.MainBattleTank) >=
-                    settings.WestOpponent.MinimumAttackUnits &&
                     current.Intelligence.GetContactCount(
-                        current.West.Faction) > 0,
+                        current.West.Faction) > 0 &&
+                    current.GetOpponentState(
+                        current.West.Player).ActiveGoal ==
+                    SkirmishStrategicGoal.AttackObjective,
                 maximumTicks: 50_000,
                 TestContext.Current.CancellationToken);
 
