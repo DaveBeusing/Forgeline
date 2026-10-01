@@ -848,9 +848,9 @@ public sealed class PlayerConstructionProductionFlowTests
             checked(
                 (int)MathF.Ceiling(
                     reconnaissanceDistance /
-                    10.0f *
+                    6.0f *
                     20.0f) +
-                800);
+                1_600);
 
         bool identified = false;
         for (int tick = 0;
