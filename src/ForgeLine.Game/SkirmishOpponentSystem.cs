@@ -3767,23 +3767,34 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
-            if (context.Entities.TryGetComponent(
+            bool hasMovementIntent =
+                TacticalCommandUtilities.TryGetMovementIntent(
+                    context,
                     entity,
-                    out CombatOrderState order) &&
-                order.Kind == CombatOrderKind.Retreat)
+                    out _);
+            bool hasResupplyOrder =
+                context.Entities.HasComponent<ResupplyOrder>(
+                    entity);
+            bool hasCombatOrder =
+                context.Entities.TryGetComponent(
+                    entity,
+                    out CombatOrderState order);
+
+            if (hasCombatOrder &&
+                order.Kind == CombatOrderKind.Retreat &&
+                (hasMovementIntent || hasResupplyOrder))
             {
                 continue;
             }
 
-            if (order.Kind == CombatOrderKind.AttackMove &&
-                context.Entities.HasComponent<MovementOrder>(
-                    entity))
+            if (hasCombatOrder &&
+                order.Kind == CombatOrderKind.AttackMove &&
+                hasMovementIntent)
             {
                 continue;
             }
 
-            if (context.Entities.HasComponent<ResupplyOrder>(
-                    entity))
+            if (hasResupplyOrder)
             {
                 continue;
             }
