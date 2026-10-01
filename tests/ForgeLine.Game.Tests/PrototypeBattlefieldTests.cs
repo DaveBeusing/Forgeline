@@ -306,6 +306,20 @@ public sealed class PrototypeBattlefieldTests
             simulation.Entities,
             commandCores);
 
+        MatchState ready =
+            simulation.Entities.GetComponent<MatchState>(
+                runtime.MatchStateEntity);
+        Assert.Equal(
+            MatchLifecyclePhase.Ready,
+            ready.Lifecycle);
+        Assert.Equal(
+            MatchStatus.Loading,
+            ready.Status);
+
+        MatchObjectiveSystem.ActivateMatch(
+            simulation.Entities,
+            runtime.MatchStateEntity);
+
         foreach (EntityId commandCore in commandCores.Values)
         {
             Assert.True(
