@@ -329,3 +329,10 @@ The first production-oriented gameplay-unit set lives below `assets/source/units
 The runtime animation asset type is still intentionally absent, so unit source metadata does not claim unsupported animation references. Articulation and VFX integration points are established through named sockets instead.
 
 See [Directorate Unit Assets](DirectorateUnitAssets.md) for the complete unit presentation contract.
+
+
+## Runtime Qualification
+
+Every successful compiler invocation now performs a second runtime qualification pass. The pass opens every generated payload, validates runtime references and LOD chains, records generated asset footprint by type, and reports the largest runtime assets.
+
+CI writes the structured result to `artifacts/asset-qualification.json`. See [Asset Performance and Visual Qualification](AssetPerformanceQualification.md) for the complete acceptance and measurement procedure.

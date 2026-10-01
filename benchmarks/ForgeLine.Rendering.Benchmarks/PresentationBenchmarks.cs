@@ -2,6 +2,7 @@ using System.Numerics;
 using BenchmarkDotNet.Attributes;
 using ForgeLine.Core;
 using ForgeLine.Graphics;
+using ForgeLine.Game;
 using ForgeLine.Presentation;
 using ForgeLine.Simulation;
 
@@ -12,9 +13,11 @@ public class PresentationBenchmarks : IDisposable
 {
     private SimpleInstanceRenderer _renderer = null!;
     private RtsCamera _camera = null!;
+    private RtsCamera _strategicCamera = null!;
     private NullGraphicsCommandContext _context = null!;
     private RenderWorld _visibleWorld = null!;
     private RenderWorld _culledWorld = null!;
+    private RenderWorld _representativeWorld = null!;
 
     [GlobalSetup]
     public void Setup()
@@ -24,12 +27,19 @@ public class PresentationBenchmarks : IDisposable
         _camera = new RtsCamera(
             new RtsCameraSettings
             {
-                InitialDistance = 600.0f,
+                InitialDistance = 120.0f,
+                MaximumDistance = 1_200.0f
+            });
+        _strategicCamera = new RtsCamera(
+            new RtsCameraSettings
+            {
+                InitialDistance = 900.0f,
                 MaximumDistance = 1_200.0f
             });
         _context = new NullGraphicsCommandContext();
         _visibleWorld = CreateWorld(1_000, includeFarField: false);
         _culledWorld = CreateWorld(5_000, includeFarField: true);
+        _representativeWorld = CreateRepresentativeWorld(1_200);
     }
 
     [GlobalCleanup]
@@ -53,6 +63,179 @@ public class PresentationBenchmarks : IDisposable
     {
         _renderer.Render(_context, _camera, _culledWorld, 1.0f);
         return _renderer.LastDiagnostics;
+    }
+
+    [Benchmark]
+    public InstanceRenderDiagnostics SubmitRepresentativeVerticalSliceTacticalView()
+    {
+        _renderer.Render(
+            _context,
+            _camera,
+            _representativeWorld,
+            1.0f);
+        return _renderer.LastDiagnostics;
+    }
+
+    [Benchmark]
+    public InstanceRenderDiagnostics SubmitRepresentativeVerticalSliceStrategicView()
+    {
+        _renderer.Render(
+            _context,
+            _strategicCamera,
+            _representativeWorld,
+            1.0f);
+        return _renderer.LastDiagnostics;
+    }
+
+    private static RenderWorld CreateRepresentativeWorld(
+        int count)
+    {
+        var instances =
+            new RenderInstance[count];
+        int side =
+            checked(
+                (int)Math.Ceiling(
+                    Math.Sqrt(
+                        count)));
+        const float spacing =
+            7.0f;
+        float halfSpan =
+            (side - 1) *
+            spacing *
+            0.5f;
+
+        for (int index = 0;
+             index < count;
+             index++)
+        {
+            int xIndex =
+                index %
+                side;
+            int zIndex =
+                index /
+                side;
+            Vector3 position =
+                new(
+                    xIndex * spacing -
+                    halfSpan,
+                    0.0f,
+                    zIndex * spacing -
+                    halfSpan);
+            var entity =
+                new EntityId(
+                    checked(
+                        (uint)index +
+                        1U),
+                    1);
+            RenderInstance instance =
+                new(
+                    entity,
+                    new RenderTransform(
+                        position,
+                        Quaternion.Identity,
+                        new Vector3(
+                            4.0f)),
+                    new RenderMeshHandle(
+                        1),
+                    RenderMaterialHandle.Default,
+                    RenderVisibilityMask.World,
+                    entity.Index);
+
+            instance =
+                (index % 10) switch
+                {
+                    0 or 1 or 2 =>
+                        instance with
+                        {
+                            UnitFeature =
+                                new UnitFeaturePresentationMetadata(
+                                    UnitIds.MainBattleTank,
+                                    UnitPresentationDamageState.Intact)
+                        },
+                    3 =>
+                        instance with
+                        {
+                            UnitFeature =
+                                new UnitFeaturePresentationMetadata(
+                                    UnitIds.ScoutVehicle,
+                                    UnitPresentationDamageState.Intact)
+                        },
+                    4 =>
+                        instance with
+                        {
+                            BuildingFeature =
+                                new BuildingFeaturePresentationMetadata(
+                                    BuildingIds.CommandCore,
+                                    BuildingPresentationState.Operational)
+                        },
+                    5 =>
+                        instance with
+                        {
+                            BuildingFeature =
+                                new BuildingFeaturePresentationMetadata(
+                                    BuildingIds.VehicleFactory,
+                                    BuildingPresentationState.Operational)
+                        },
+                    6 =>
+                        instance with
+                        {
+                            WorldFeature =
+                                new WorldFeaturePresentationMetadata(
+                                    WorldVisualId.ResourceFerrousOre,
+                                    WorldPresentationKind.ResourceDeposit,
+                                    ResourceDepositPresentationState.Active,
+                                    Inspectable: true)
+                        },
+                    7 =>
+                        instance with
+                        {
+                            WorldFeature =
+                                new WorldFeaturePresentationMetadata(
+                                    WorldVisualId.VegetationConifer,
+                                    WorldPresentationKind.Vegetation,
+                                    ResourceDepositPresentationState.None,
+                                    Inspectable: false)
+                        },
+                    8 =>
+                        instance with
+                        {
+                            VfxFeature =
+                                new VfxFeaturePresentationMetadata(
+                                    VfxEffectKind.ExplosionMedium)
+                        },
+                    _ =>
+                        instance with
+                        {
+                            WorldFeature =
+                                new WorldFeaturePresentationMetadata(
+                                    WorldVisualId.PropBarrier,
+                                    WorldPresentationKind.Prop,
+                                    ResourceDepositPresentationState.None,
+                                    Inspectable: false)
+                        }
+                };
+
+            instances[index] =
+                instance;
+        }
+
+        var buffer =
+            new PresentationSnapshotBuffer();
+        buffer.Publish(
+            new PresentationSnapshot(
+                new SimulationTick(
+                    1),
+                TimeSpan.FromMilliseconds(
+                    50),
+                count,
+                instances));
+
+        var world =
+            new RenderWorld();
+        _ =
+            world.Update(
+                buffer);
+        return world;
     }
 
     private static RenderWorld CreateWorld(

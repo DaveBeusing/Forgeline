@@ -1,3 +1,6 @@
+using System.Text.Json;
+using ForgeLine.Assets;
+
 namespace ForgeLine.AssetCompiler;
 
 internal static class Program
@@ -14,6 +17,7 @@ internal static class Program
 
         string sourceRoot = Path.Combine("assets", "source");
         string runtimeRoot = Path.Combine("assets", "runtime");
+        string? qualificationOutput = null;
         var clean = false;
 
         try
@@ -28,6 +32,9 @@ internal static class Program
                         break;
                     case "--runtime":
                         runtimeRoot = ReadValue(args, ref index, argument);
+                        break;
+                    case "--qualification-output":
+                        qualificationOutput = ReadValue(args, ref index, argument);
                         break;
                     case "--clean":
                         clean = true;
@@ -60,7 +67,87 @@ internal static class Program
             $"Asset compilation {(result.Success ? "succeeded" : "failed")}: " +
             $"{result.CompiledCount} compiled, {result.SkippedCount} unchanged.");
 
-        return result.Success ? 0 : 1;
+        if (!result.Success)
+        {
+            return 1;
+        }
+
+        RuntimeAssetQualificationReport qualification =
+            RuntimeAssetQualification.Run(
+                runtimeRoot);
+
+        foreach (RuntimeAssetQualificationIssue issue in
+                 qualification.Issues)
+        {
+            string runtimePath =
+                issue.RuntimePath is null
+                    ? string.Empty
+                    : $" [{issue.RuntimePath}]";
+            string asset =
+                issue.AssetId is null
+                    ? string.Empty
+                    : $" ({issue.AssetId})";
+
+            Console.WriteLine(
+                $"{issue.Severity.ToString().ToUpperInvariant()} {issue.Code}{asset}{runtimePath}: {issue.Message}");
+        }
+
+        Console.WriteLine(
+            $"Runtime asset qualification {(qualification.Success ? "succeeded" : "failed")}: " +
+            $"assets={qualification.AssetCount} " +
+            $"meshes={qualification.MeshCount} " +
+            $"textures={qualification.TextureCount} " +
+            $"materials={qualification.MaterialCount} " +
+            $"bytes={qualification.TotalRuntimeBytes} " +
+            $"catalogLoadMs={qualification.CatalogLoadDuration.TotalMilliseconds:F3} " +
+            $"assetReadMs={qualification.AssetReadDuration.TotalMilliseconds:F3}.");
+
+        foreach (RuntimeAssetFootprintEntry entry in
+                 qualification.LargestAssets)
+        {
+            Console.WriteLine(
+                $"[asset:footprint] id={entry.AssetId} type={entry.Type} bytes={entry.RuntimeBytes}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(
+                qualificationOutput))
+        {
+            WriteQualificationReport(
+                qualificationOutput,
+                qualification);
+        }
+
+        return qualification.Success
+            ? 0
+            : 1;
+    }
+
+    private static void WriteQualificationReport(
+        string outputPath,
+        RuntimeAssetQualificationReport qualification)
+    {
+        string fullPath =
+            Path.GetFullPath(
+                outputPath);
+        string? directory =
+            Path.GetDirectoryName(
+                fullPath);
+
+        if (!string.IsNullOrWhiteSpace(
+                directory))
+        {
+            Directory.CreateDirectory(
+                directory);
+        }
+
+        File.WriteAllText(
+            fullPath,
+            JsonSerializer.Serialize(
+                qualification,
+                RuntimeAssetCatalog.CreateJsonOptions()));
+
+        Console.WriteLine(
+            $"Runtime asset qualification report written to '{fullPath}'.");
     }
 
     private static string ReadValue(string[] args, ref int index, string argument)
@@ -77,6 +164,7 @@ internal static class Program
     private static void PrintUsage()
     {
         Console.WriteLine(
-            "ForgeLine.AssetCompiler [--source <assets/source>] [--runtime <assets/runtime>] [--clean]");
+            "ForgeLine.AssetCompiler [--source <assets/source>] [--runtime <assets/runtime>] " +
+            "[--clean] [--qualification-output <report.json>]");
     }
 }
