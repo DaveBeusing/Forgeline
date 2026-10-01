@@ -1527,11 +1527,40 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
-        EnsureAttackSupplySupport(
-            context,
-            owned,
-            attackers,
-            configuration);
+        bool supplySupportReady =
+            EnsureAttackSupplySupport(
+                context,
+                owned,
+                attackers,
+                configuration);
+
+        if (!supplySupportReady)
+        {
+            bool alreadyHolding =
+                attackers.All(
+                    unit =>
+                        context.Entities.TryGetComponent(
+                            unit,
+                            out CombatOrderState order) &&
+                        order.Kind ==
+                            CombatOrderKind.HoldPosition);
+
+            if (!alreadyHolding)
+            {
+                var hold =
+                    new HoldPositionCommand(
+                        controller.Player,
+                        attackers,
+                        context.Tick);
+                hold.Execute(context);
+            }
+
+            objective =
+                ResolveAttackForceCentroid(
+                    context,
+                    attackers);
+            return true;
+        }
 
         IntelligenceContact? identified = null;
         EntityId identifiedTarget = EntityId.Invalid;
@@ -1672,7 +1701,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return true;
     }
 
-    private void EnsureAttackSupplySupport(
+    private bool EnsureAttackSupplySupport(
         SimulationContext context,
         OwnedState owned,
         EntityId[] attackers,
@@ -1680,7 +1709,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     {
         if (attackers.Length == 0)
         {
-            return;
+            return true;
         }
 
         Vector3 centroid = Vector3.Zero;
@@ -1701,7 +1730,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         if (positionedAttackers == 0)
         {
-            return;
+            return true;
         }
 
         centroid /= positionedAttackers;
@@ -1801,42 +1830,77 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         if (!selected.IsValid)
         {
-            return;
+            return true;
         }
 
         const float holdRadiusMeters = 12.0f;
+        const float supportCohesionRadiusMeters = 64.0f;
         const float retargetDistanceMeters = 24.0f;
 
-        if (releaseForRecovery ||
-            selectedDistanceSquared <=
+        if (releaseForRecovery)
+        {
+            TacticalCommandUtilities.ClearMovementIntent(
+                context,
+                selected);
+            return false;
+        }
+
+        if (selectedDistanceSquared <=
             holdRadiusMeters * holdRadiusMeters)
         {
             TacticalCommandUtilities.ClearMovementIntent(
                 context,
                 selected);
-            return;
+            return true;
         }
 
-        if (TacticalCommandUtilities.TryGetMovementIntent(
+        if (!TacticalCommandUtilities.TryGetMovementIntent(
                 context,
                 selected,
-                out MovementOrder movement) &&
+                out MovementOrder movement) ||
             HorizontalDistanceSquared(
                 movement.WorldTarget,
-                centroid) <=
+                centroid) >
             retargetDistanceMeters *
             retargetDistanceMeters)
         {
-            return;
+            var command =
+                new MoveEntitiesCommand(
+                    selectedTruck.Owner,
+                    [selected],
+                    centroid,
+                    context.Tick);
+            command.Execute(context);
         }
 
-        var command =
-            new MoveEntitiesCommand(
-                selectedTruck.Owner,
-                [selected],
-                centroid,
-                context.Tick);
-        command.Execute(context);
+        return selectedDistanceSquared <=
+            supportCohesionRadiusMeters *
+            supportCohesionRadiusMeters;
+    }
+
+    private static Vector3 ResolveAttackForceCentroid(
+        SimulationContext context,
+        EntityId[] attackers)
+    {
+        Vector3 centroid = Vector3.Zero;
+        int count = 0;
+
+        for (int index = 0; index < attackers.Length; index++)
+        {
+            if (!context.Entities.TryGetComponent(
+                    attackers[index],
+                    out WorldTransform transform))
+            {
+                continue;
+            }
+
+            centroid += transform.Position;
+            count++;
+        }
+
+        return count == 0
+            ? Vector3.Zero
+            : centroid / count;
     }
 
     private static Vector3 ResolveObjectiveApproachPoint(
