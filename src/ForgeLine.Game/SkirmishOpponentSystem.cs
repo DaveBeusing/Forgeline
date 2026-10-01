@@ -2282,6 +2282,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
+            EntityId loadingSource =
+                EntityId.Invalid;
             Vector3 destination = default;
             float bestDistance = float.PositiveInfinity;
             foreach (var candidate in owned.SupplyDepots)
@@ -2309,11 +2311,20 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     continue;
                 }
 
-                float distance = HorizontalDistanceSquared(transform.Position, candidate.Position);
+                float distance =
+                    HorizontalDistanceToSupplyLoadingSourceSquared(
+                        context,
+                        candidate.Entity,
+                        candidate.Position,
+                        transform.Position);
                 if (distance < bestDistance)
                 {
-                    destination = candidate.Position;
-                    bestDistance = distance;
+                    loadingSource =
+                        candidate.Entity;
+                    destination =
+                        candidate.Position;
+                    bestDistance =
+                        distance;
                 }
             }
 
@@ -2336,12 +2347,16 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                       commandCoreProvider.InventoryId,
                       ResourceIds.Ammunition) > 0.0)))
             {
+                loadingSource =
+                    controller.PreferredConstructionSource;
                 destination =
                     commandCoreTransform.Position;
                 bestDistance =
-                    HorizontalDistanceSquared(
-                        transform.Position,
-                        destination);
+                    HorizontalDistanceToSupplyLoadingSourceSquared(
+                        context,
+                        loadingSource,
+                        destination,
+                        transform.Position);
             }
 
             if (!float.IsFinite(bestDistance))
@@ -2368,13 +2383,18 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
-            // Load from a face of the depot, within the truck's loading range.
-            Vector3 offset = transform.Position - destination;
-            float approach = truck.LoadRangeMeters - 1.0f;
-            destination += MathF.Abs(offset.X) >= MathF.Abs(offset.Z)
-                ? new Vector3(MathF.CopySign(approach, offset.X), 0.0f, 0.0f)
-                : new Vector3(0.0f, 0.0f, MathF.CopySign(approach, offset.Z));
-            new MoveEntitiesCommand(truck.Owner, [entity], destination, context.Tick).Execute(context);
+            destination =
+                ResolveSupplyLoadingApproach(
+                    context,
+                    loadingSource,
+                    destination,
+                    transform.Position,
+                    truck.LoadRangeMeters);
+            new MoveEntitiesCommand(
+                truck.Owner,
+                [entity],
+                destination,
+                context.Tick).Execute(context);
         }
     }
 
@@ -2412,9 +2432,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
-            if (HorizontalDistanceSquared(
-                    movement.WorldTarget,
-                    depotPosition) <=
+            if (HorizontalDistanceToSupplyLoadingSourceSquared(
+                    context,
+                    depotEntity,
+                    depotPosition,
+                    movement.WorldTarget) <=
                 loadRangeSquared)
             {
                 return true;
@@ -2426,15 +2448,95 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             context.Entities.TryGetComponent(
                 controller.PreferredConstructionSource,
                 out WorldTransform commandCoreTransform) &&
-            HorizontalDistanceSquared(
-                movement.WorldTarget,
-                commandCoreTransform.Position) <=
+            HorizontalDistanceToSupplyLoadingSourceSquared(
+                context,
+                controller.PreferredConstructionSource,
+                commandCoreTransform.Position,
+                movement.WorldTarget) <=
             loadRangeSquared)
         {
             return true;
         }
 
         return false;
+    }
+
+    private static Vector3 ResolveSupplyLoadingApproach(
+        SimulationContext context,
+        EntityId source,
+        Vector3 sourcePosition,
+        Vector3 truckPosition,
+        float loadRangeMeters)
+    {
+        Vector3 offset =
+            truckPosition -
+            sourcePosition;
+        float halfExtentX = 0.0f;
+        float halfExtentZ = 0.0f;
+
+        if (context.Entities.TryGetComponent(
+                source,
+                out SpatialPresence presence))
+        {
+            halfExtentX =
+                presence.HalfExtents.X;
+            halfExtentZ =
+                presence.HalfExtents.Z;
+        }
+
+        float approach =
+            MathF.Max(
+                0.0f,
+                loadRangeMeters - 1.0f);
+
+        return MathF.Abs(offset.X) >=
+               MathF.Abs(offset.Z)
+            ? sourcePosition +
+              new Vector3(
+                  MathF.CopySign(
+                      halfExtentX + approach,
+                      offset.X),
+                  0.0f,
+                  0.0f)
+            : sourcePosition +
+              new Vector3(
+                  0.0f,
+                  0.0f,
+                  MathF.CopySign(
+                      halfExtentZ + approach,
+                      offset.Z));
+    }
+
+    private static float HorizontalDistanceToSupplyLoadingSourceSquared(
+        SimulationContext context,
+        EntityId source,
+        Vector3 sourcePosition,
+        Vector3 loadingPosition)
+    {
+        float x =
+            MathF.Abs(
+                loadingPosition.X -
+                sourcePosition.X);
+        float z =
+            MathF.Abs(
+                loadingPosition.Z -
+                sourcePosition.Z);
+
+        if (context.Entities.TryGetComponent(
+                source,
+                out SpatialPresence presence))
+        {
+            x =
+                MathF.Max(
+                    0.0f,
+                    x - presence.HalfExtents.X);
+            z =
+                MathF.Max(
+                    0.0f,
+                    z - presence.HalfExtents.Z);
+        }
+
+        return x * x + z * z;
     }
 
     private void EnsureEconomyPolicies(
