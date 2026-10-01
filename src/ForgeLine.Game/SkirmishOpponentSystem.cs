@@ -2604,6 +2604,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return UnitIds.CargoTruck;
         }
 
+        int supplyTarget =
+            Math.Clamp(
+                owned.SupplyDepots.Count,
+                2,
+                3);
         int supplyCount =
             GetUnitCount(
                 owned,
@@ -2612,7 +2617,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             UnitIds.SupplyTruck,
             out int pendingSupply);
 
-        if (supplyCount + pendingSupply < 1)
+        if (supplyCount + pendingSupply <
+            supplyTarget)
         {
             return UnitIds.SupplyTruck;
         }
