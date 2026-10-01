@@ -1553,6 +1553,12 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     out CompletedBuilding objectiveBuilding) &&
                 objectiveBuilding.BuildingId ==
                     BuildingIds.CommandCore;
+
+            if (!isCommandCore)
+            {
+                continue;
+            }
+
             float distance =
                 HorizontalDistanceSquared(
                     controller.HomePosition,
