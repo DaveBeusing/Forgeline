@@ -1950,9 +1950,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     out _);
             bool loadingMovement =
                 hasMovement &&
-                HasSupplyDepotLoadingMovement(
+                HasSupplyLoadingMovement(
                     context,
                     entity,
+                    controller,
                     owned,
                     truck);
             bool needsFuel =
@@ -2089,9 +2090,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
     }
 
-    private static bool HasSupplyDepotLoadingMovement(
+    private static bool HasSupplyLoadingMovement(
         SimulationContext context,
         EntityId entity,
+        SkirmishOpponentController controller,
         OwnedState owned,
         in SupplyTruck truck)
     {
@@ -2129,6 +2131,19 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             {
                 return true;
             }
+        }
+
+        if (context.Entities.IsAlive(
+                controller.PreferredConstructionSource) &&
+            context.Entities.TryGetComponent(
+                controller.PreferredConstructionSource,
+                out WorldTransform commandCoreTransform) &&
+            HorizontalDistanceSquared(
+                movement.WorldTarget,
+                commandCoreTransform.Position) <=
+            loadRangeSquared)
+        {
+            return true;
         }
 
         return false;
