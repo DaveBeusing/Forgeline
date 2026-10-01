@@ -772,11 +772,15 @@ public sealed class PlayerConstructionProductionFlowTests
                     ResourceIds.Ammunition) > 0.0,
             maximumTicks: 1_200);
 
+        Vector3 scoutRefuelPoint =
+            supplyTruckLoadPoint +
+            supplyStagingDirection * 8.0f;
+
         Assert.True(
             gateway.SubmitMovement(
                 scenario.West.Player,
                 [scout],
-                supplyTruckLoadPoint,
+                scoutRefuelPoint,
                 scenario.Simulation.CurrentTick,
                 FormationTemplate.Compact).Accepted);
         scenario.Simulation.AdvanceOneTick();
@@ -789,7 +793,7 @@ public sealed class PlayerConstructionProductionFlowTests
                     scenario.Simulation.Entities
                         .GetComponent<WorldTransform>(
                             scout).Position,
-                    supplyTruckLoadPoint) <=
+                    scoutRefuelPoint) <=
                 4.0f * 4.0f,
             maximumTicks: 1_200);
 
