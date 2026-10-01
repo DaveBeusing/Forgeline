@@ -376,6 +376,94 @@ public sealed class BattlefieldSupplySystemTests
     }
 
     [Fact]
+    public void SupplyTruckCanReloadFromFriendlyCommandCore()
+    {
+        var simulation =
+            new SimulationCoordinator();
+        var inventories =
+            new InventoryStore();
+        var network =
+            new ForgeLine.Logistics.LogisticsNetwork();
+        var cargo =
+            new CargoTransportSystem(
+                network,
+                inventories);
+        var supply =
+            new BattlefieldSupplySystem(
+                inventories);
+        simulation.RegisterSystem(
+            supply);
+
+        InventoryId commandInventory =
+            inventories.CreateInventory(
+                new InventorySpecification(
+                    500.0));
+        Assert.True(
+            inventories.Add(
+                commandInventory,
+                ResourceIds.Fuel,
+                140.0).Succeeded);
+        Assert.True(
+            inventories.Add(
+                commandInventory,
+                ResourceIds.Ammunition,
+                130.0).Succeeded);
+
+        EntityId commandCore =
+            simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(
+            commandCore,
+            new WorldTransform(
+                Vector3.Zero,
+                Quaternion.Identity,
+                Vector3.One));
+        simulation.Entities.AddComponent(
+            commandCore,
+            new CommandFacility());
+        simulation.Entities.AddComponent(
+            commandCore,
+            new SupplyProvider(
+                commandInventory,
+                LocalPlayer,
+                resupplyRangeMeters: 20.0f));
+
+        EntityId truck =
+            SupplyTruckFactory.Create(
+                simulation.Entities,
+                inventories,
+                new Vector3(5.0f, 0.0f, 0.0f),
+                LocalPlayer,
+                cargo);
+
+        simulation.AdvanceOneTick();
+
+        SupplyTruck truckState =
+            simulation.Entities.GetComponent<SupplyTruck>(
+                truck);
+
+        Assert.Equal(
+            truckState.FuelTarget,
+            inventories.GetQuantity(
+                truckState.InventoryId,
+                ResourceIds.Fuel));
+        Assert.Equal(
+            truckState.AmmunitionTarget,
+            inventories.GetQuantity(
+                truckState.InventoryId,
+                ResourceIds.Ammunition));
+        Assert.Equal(
+            30.0,
+            inventories.GetQuantity(
+                commandInventory,
+                ResourceIds.Fuel));
+        Assert.Equal(
+            10.0,
+            inventories.GetQuantity(
+                commandInventory,
+                ResourceIds.Ammunition));
+    }
+
+    [Fact]
     public void SupplyTruckLoadsFromDepotAndHonorsRecipientPriority()
     {
         var simulation = new SimulationCoordinator();
