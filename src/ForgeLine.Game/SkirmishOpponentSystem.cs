@@ -1535,8 +1535,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             EnsureAttackSupplySupport(
                 context,
                 owned,
-                attackers,
-                configuration);
+                attackers);
 
         if (!supplySupportReady)
         {
@@ -1754,8 +1753,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private bool EnsureAttackSupplySupport(
         SimulationContext context,
         OwnedState owned,
-        EntityId[] attackers,
-        SkirmishOpponentConfiguration configuration)
+        EntityId[] attackers)
     {
         if (attackers.Length == 0)
         {
