@@ -1455,29 +1455,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 .Cast<BattlefieldObjectiveDefinition?>()
                 .FirstOrDefault();
 
-        int objectiveCount =
-            sites.Length +
-            (enemyObjective.HasValue ? 1 : 0);
-
-        if (objectiveCount == 0)
-        {
-            return false;
-        }
-
-        int index =
-            Math.Abs(
-                state.ScoutSiteCursor) %
-            objectiveCount;
-
-        if (index < sites.Length)
-        {
-            objective =
-                sites[index].Position;
-        }
-        else
+        if (enemyObjective.HasValue)
         {
             Vector3 enemyPosition =
-                enemyObjective!.Value.CommandCorePosition;
+                enemyObjective.Value.CommandCorePosition;
             Vector3 towardHome =
                 controller.HomePosition -
                 enemyPosition;
@@ -1494,6 +1475,20 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             objective =
                 enemyPosition +
                 towardHome * 260.0f;
+        }
+        else
+        {
+            if (sites.Length == 0)
+            {
+                return false;
+            }
+
+            int index =
+                Math.Abs(
+                    state.ScoutSiteCursor) %
+                sites.Length;
+            objective =
+                sites[index].Position;
         }
 
         var command =
