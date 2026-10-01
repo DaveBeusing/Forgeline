@@ -76,6 +76,7 @@ internal sealed record VerticalSliceMatchReport(
     string MatchStatus,
     ulong Winner,
     ulong CompletedAtTick,
+    MatchLifecycleReport Lifecycle,
     int EntityCount,
     int PendingCommands,
     double AverageTickMilliseconds,
@@ -130,6 +131,8 @@ internal sealed record VerticalSliceMatchReport(
             match.Status.ToString(),
             match.Winner.Value,
             match.CompletedAtTick.Value,
+            MatchLifecycleReport.Capture(
+                match),
             scenario.Simulation.Entities.EntityCount,
             scenario.Simulation.PendingCommandCount,
             diagnostics.AverageTickDuration.TotalMilliseconds,
@@ -308,6 +311,39 @@ internal sealed record VerticalSliceMatchReport(
         return string.Join(
             ";",
             entries);
+    }
+}
+
+internal sealed record MatchLifecycleReport(
+    string Phase,
+    string Outcome,
+    string TerminationReason,
+    ulong Winner,
+    ulong DefeatedPlayer,
+    ulong StartedAtTick,
+    ulong CompletedAtTick,
+    ulong FinalizedAtTick,
+    ulong LastTransitionAtTick,
+    uint TransitionCount)
+{
+    public static MatchLifecycleReport Capture(
+        in MatchState state)
+    {
+        MatchLifecycleDiagnosticsSnapshot diagnostics =
+            MatchLifecycleDiagnosticsSnapshot.Capture(
+                state);
+
+        return new MatchLifecycleReport(
+            diagnostics.Lifecycle.ToString(),
+            diagnostics.Outcome.ToString(),
+            diagnostics.TerminationReason.ToString(),
+            diagnostics.Winner.Value,
+            diagnostics.DefeatedPlayer.Value,
+            diagnostics.StartedAtTick.Value,
+            diagnostics.CompletedAtTick.Value,
+            diagnostics.FinalizedAtTick.Value,
+            diagnostics.LastTransitionAtTick.Value,
+            diagnostics.TransitionCount);
     }
 }
 

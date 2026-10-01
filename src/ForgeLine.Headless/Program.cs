@@ -183,10 +183,18 @@ internal static class Program
 
             while (executedTicks < options.TickCount &&
                    !cancellationToken.IsCancellationRequested &&
-                   !scenario.GetMatchState().IsTerminal)
+                   !scenario.GetMatchState().HasResult)
             {
                 scenario.Simulation.AdvanceOneTick();
                 executedTicks++;
+            }
+
+            if (!cancellationToken.IsCancellationRequested &&
+                scenario.GetMatchState().HasResult &&
+                !scenario.GetMatchState().IsCompleted)
+            {
+                FinalizeHeadlessMatch(
+                    scenario);
             }
 
             matchStopwatch.Stop();
@@ -202,8 +210,9 @@ internal static class Program
 
             Console.WriteLine(
                 $"Vertical slice match {report.MatchIndex}/{options.MatchCount}: " +
-                $"status={report.MatchStatus}; winner={report.Winner}; " +
-                $"ticks={report.ExecutedTicks}; logical={report.LogicalSeconds:F1}s; " +
+                $"status={report.MatchStatus}; lifecycle={report.Lifecycle.Phase}; " +
+                $"outcome={report.Lifecycle.Outcome}; reason={report.Lifecycle.TerminationReason}; " +
+                $"winner={report.Winner}; ticks={report.ExecutedTicks}; logical={report.LogicalSeconds:F1}s; " +
                 $"elapsed={report.ElapsedMilliseconds:F1}ms; " +
                 $"avgTick={report.AverageTickMilliseconds:F3}ms; " +
                 $"maxTick={report.MaximumTickMilliseconds:F3}ms; " +
@@ -237,11 +246,11 @@ internal static class Program
             }
 
             if (options.RequireTerminal &&
-                !scenario.GetMatchState().IsTerminal)
+                !scenario.GetMatchState().IsCompleted)
             {
                 terminalFailure = true;
                 Console.Error.WriteLine(
-                    $"Vertical slice match {report.MatchIndex} did not reach a terminal state within {options.TickCount} ticks.");
+                    $"Vertical slice match {report.MatchIndex} did not complete its lifecycle within {options.TickCount} ticks.");
                 break;
             }
         }
@@ -270,6 +279,27 @@ internal static class Program
         return terminalFailure
             ? 3
             : 0;
+    }
+
+    private static void FinalizeHeadlessMatch(
+        VerticalSliceScenario scenario)
+    {
+        MatchParticipantConfiguration participant =
+            scenario.MatchConfiguration.Participants[0];
+        var command =
+            new EndMatchCommand(
+                participant.Player,
+                scenario.BattlefieldRuntime.MatchStateEntity,
+                scenario.Simulation.CurrentTick);
+
+        scenario.Simulation.ExecuteControlCommand(
+            command);
+
+        if (!command.Accepted)
+        {
+            throw new InvalidOperationException(
+                "Headless match result could not transition to the completed lifecycle state.");
+        }
     }
 
     private static void WriteDistributionSummary(VerticalSliceScenario scenario)

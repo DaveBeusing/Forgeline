@@ -554,17 +554,13 @@ internal sealed class ClientSimulationHost : IDisposable
                     break;
 
                 case HostMessageKind.Pause:
-                    Volatile.Write(
-                        ref _paused,
-                        1);
-                    NotifyProgress();
+                    ProcessPauseChange(
+                        paused: true);
                     break;
 
                 case HostMessageKind.Resume:
-                    Volatile.Write(
-                        ref _paused,
-                        0);
-                    NotifyProgress();
+                    ProcessPauseChange(
+                        paused: false);
                     break;
 
                 case HostMessageKind.AcknowledgeTerminal:
@@ -623,6 +619,31 @@ internal sealed class ClientSimulationHost : IDisposable
             message.Sequence,
             ClientSubmissionFailure.None,
             receipt);
+    }
+
+    private void ProcessPauseChange(bool paused)
+    {
+        if (IsTerminalFrozen)
+        {
+            return;
+        }
+
+        var command =
+            new SetMatchPausedCommand(
+                _matchStateEntity,
+                paused);
+        _simulation.ExecuteControlCommand(
+            command);
+
+        if (!command.Accepted)
+        {
+            return;
+        }
+
+        Volatile.Write(
+            ref _paused,
+            paused ? 1 : 0);
+        NotifyProgress();
     }
 
     private void ProcessTerminalAcknowledgement(
