@@ -188,10 +188,20 @@ public sealed class SkirmishProductionPolicyTests
     [Fact]
     public void MissingCargoTruckPreemptsBlockedCombatProduction()
     {
+        VerticalSliceScenarioSettings validation =
+            VerticalSliceScenarioSettings.Create(
+                VerticalSliceScenarioProfile.Validation);
         VerticalSliceScenario scenario =
             VerticalSliceScenario.Create(
-                VerticalSliceScenarioSettings.Create(
-                    VerticalSliceScenarioProfile.Validation));
+                validation with
+                {
+                    WestOpponent =
+                        validation.WestOpponent with
+                        {
+                            MinimumCargoTrucks = 2,
+                            MinimumSupplyTrucks = 1
+                        }
+                });
         var entities =
             scenario.Simulation.Entities;
         UnitDefinitionCatalog units =
