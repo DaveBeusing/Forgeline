@@ -538,9 +538,9 @@ public sealed class PlayerConstructionProductionFlowTests
             gateway,
             supplyDepot,
             ResourceIds.Fuel,
-            minimum: 50.0,
-            target: 100.0,
-            maximum: 150.0);
+            minimum: 120.0,
+            target: 180.0,
+            maximum: 220.0);
         SubmitStockPolicy(
             scenario,
             gateway,
@@ -555,7 +555,7 @@ public sealed class PlayerConstructionProductionFlowTests
             () =>
                 scenario.Inventories.GetQuantity(
                     supplyStorage.InventoryId,
-                    ResourceIds.Fuel) >= 100.0 &&
+                    ResourceIds.Fuel) >= 180.0 &&
                 scenario.Inventories.GetQuantity(
                     supplyStorage.InventoryId,
                     ResourceIds.Ammunition) >= 80.0,
