@@ -1240,6 +1240,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
+        ReleaseSupplyEscortMovementForRecovery(
+            context,
+            owned);
+
         if (retreatUnits.Count > 0)
         {
             Vector3 recovery =
@@ -1701,6 +1705,52 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return true;
     }
 
+    private static void ReleaseSupplyEscortMovementForRecovery(
+        SimulationContext context,
+        OwnedState owned)
+    {
+        for (int index = 0; index < owned.Units.Count; index++)
+        {
+            EntityId candidate = owned.Units[index];
+
+            if (!context.Entities.TryGetComponent(
+                    candidate,
+                    out SupplyTruck _) ||
+                context.Entities.HasComponent<ResupplyOrder>(
+                    candidate) ||
+                context.Entities.HasComponent<SupplyRescueAssignment>(
+                    candidate) ||
+                !TacticalCommandUtilities.TryGetMovementIntent(
+                    context,
+                    candidate,
+                    out _))
+            {
+                continue;
+            }
+
+            bool servingRecipient = false;
+
+            foreach (EntityId recipient in
+                     context.Entities.Query<ResupplyOrder>(
+                         QueryIterationOrder.StableByEntityIndex))
+            {
+                if (context.Entities.GetComponent<ResupplyOrder>(
+                        recipient).Provider == candidate)
+                {
+                    servingRecipient = true;
+                    break;
+                }
+            }
+
+            if (!servingRecipient)
+            {
+                TacticalCommandUtilities.ClearMovementIntent(
+                    context,
+                    candidate);
+            }
+        }
+    }
+
     private bool EnsureAttackSupplySupport(
         SimulationContext context,
         OwnedState owned,
@@ -1734,31 +1784,6 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
 
         centroid /= positionedAttackers;
-
-        bool releaseForRecovery = false;
-        double releaseThreshold =
-            Math.Min(
-                0.50,
-                configuration.ResupplyThreshold + 0.10);
-
-        for (int index = 0; index < attackers.Length; index++)
-        {
-            if (!context.Entities.TryGetComponent(
-                    attackers[index],
-                    out UnitCombatReadiness readiness))
-            {
-                continue;
-            }
-
-            if (Math.Min(
-                    readiness.Fuel,
-                    readiness.Ammunition) <=
-                releaseThreshold)
-            {
-                releaseForRecovery = true;
-                break;
-            }
-        }
 
         EntityId selected = EntityId.Invalid;
         SupplyTruck selectedTruck = default;
@@ -1836,14 +1861,6 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         const float holdRadiusMeters = 12.0f;
         const float supportCohesionRadiusMeters = 64.0f;
         const float retargetDistanceMeters = 24.0f;
-
-        if (releaseForRecovery)
-        {
-            TacticalCommandUtilities.ClearMovementIntent(
-                context,
-                selected);
-            return false;
-        }
 
         if (selectedDistanceSquared <=
             holdRadiusMeters * holdRadiusMeters)
