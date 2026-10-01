@@ -169,7 +169,7 @@ Platform-authored requests first enter a bounded host queue. Only the simulation
 
 The interactive catch-up policy executes at most five complete ticks per scheduling pass. Excess wall-clock debt is discarded by resetting the next pacing deadline; logical ticks and already accepted commands are never skipped or partially executed.
 
-Pause/resume is applied between complete ticks. Terminal match snapshots freeze further normal tick advancement while the platform and renderer continue operating.
+Pause/resume is applied between complete ticks through a simulation-owned lifecycle control command. The authoritative match state moves between `Running` and `Paused` without advancing the logical clock. Terminal match snapshots freeze further normal tick advancement while the platform and renderer continue operating.
 
 ### Control transitions without gameplay advancement
 
@@ -181,6 +181,6 @@ Pause/resume is applied between complete ticks. Terminal match snapshots freeze 
 - does not execute the normal system phase pipeline;
 - republishes tick observers so copied presentation state reflects the control transition.
 
-The Windows client uses this path only for terminal match acknowledgement. Normal gameplay actions continue to require future-tick scheduling.
+The Windows client uses this path for pause/resume lifecycle transitions and terminal match acknowledgement. Headless full-match execution also uses it to move an authoritative `Ending` result to `Completed` after normal gameplay ticking has stopped. Normal gameplay actions, including surrender, continue to require future-tick scheduling through the command queue.
 
 See [Client Execution Ownership](adr/ClientExecutionOwnership.md) for the full ownership and disposal model.
