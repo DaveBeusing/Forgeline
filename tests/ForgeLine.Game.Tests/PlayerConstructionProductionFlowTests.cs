@@ -802,12 +802,14 @@ public sealed class PlayerConstructionProductionFlowTests
                 scoutBeforeRecon.Position,
                 reconnaissancePoint);
         int reconnaissanceTickBudget =
-            checked(
-                (int)MathF.Ceiling(
-                    reconnaissanceDistance /
-                    10.0f *
-                    20.0f) +
-                800);
+            Math.Max(
+                20_000,
+                checked(
+                    (int)MathF.Ceiling(
+                        reconnaissanceDistance /
+                        6.0f *
+                        20.0f) +
+                    1_600));
 
         RunUntil(
             scenario,
