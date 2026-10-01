@@ -115,6 +115,8 @@ public sealed record VerticalSliceScenarioSettings
                     MinimumAttackUnits = 3,
                     MaximumAttackUnits = 12,
                     MaximumQueuedUnitsPerFacility = 3,
+                    MinimumCargoTrucks = 4,
+                    MinimumSupplyTrucks = 3,
                     DefensiveRadiusMeters = 450.0f,
                     ObjectivePressureLeashMeters = 120.0f,
                     ArtilleryCadenceTicks = 50
@@ -131,6 +133,8 @@ public sealed record VerticalSliceScenarioSettings
                     MinimumAttackUnits = 3,
                     MaximumAttackUnits = 8,
                     MaximumQueuedUnitsPerFacility = 2,
+                    MinimumCargoTrucks = 4,
+                    MinimumSupplyTrucks = 3,
                     DefensiveRadiusMeters = 600.0f,
                     ObjectivePressureLeashMeters = 240.0f,
                     ArtilleryCadenceTicks = 60
