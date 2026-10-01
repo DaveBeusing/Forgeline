@@ -82,6 +82,61 @@ public sealed class ResupplyPlanningDiagnosticsTests
     }
 
     [Fact]
+    public void InRangeMobileProviderPreservesFormationMembership()
+    {
+        var fixture = new Fixture();
+        EntityId provider =
+            fixture.Truck(
+                new Vector3(105.0f, 0.0f, 0.0f),
+                80.0,
+                40.0,
+                Owner);
+        EntityId recipient =
+            fixture.Recipient();
+        EntityId group =
+            fixture.Simulation.Entities.CreateEntity();
+
+        fixture.Simulation.Entities.AddComponent(
+            recipient,
+            new MovementGroupMember(group));
+        fixture.Simulation.Entities.AddComponent(
+            recipient,
+            new FormationMovementConstraint(8.0f));
+
+        var context =
+            new SimulationContext(
+                fixture.Simulation.Entities,
+                fixture.Simulation.CurrentTick,
+                fixture.Simulation.TickDuration);
+
+        Assert.True(
+            BattlefieldResupplyPlanner.TryIssueNearestProviderOrder(
+                context,
+                fixture.Inventories,
+                recipient,
+                Owner,
+                fixture.Simulation.CurrentTick,
+                BattlefieldSupplyResource.Fuel,
+                out EntityId selectedProvider));
+
+        Assert.Equal(
+            provider,
+            selectedProvider);
+        Assert.True(
+            fixture.Simulation.Entities.HasComponent<MovementGroupMember>(
+                recipient));
+        Assert.True(
+            fixture.Simulation.Entities.HasComponent<FormationMovementConstraint>(
+                recipient));
+        Assert.True(
+            fixture.Simulation.Entities.HasComponent<ResupplyOrder>(
+                recipient));
+        Assert.False(
+            fixture.Simulation.Entities.HasComponent<MovementOrder>(
+                recipient));
+    }
+
+    [Fact]
     public void UnreachableStaticProviderReportsRecipientTravelFailure()
     {
         var fixture = new Fixture();
