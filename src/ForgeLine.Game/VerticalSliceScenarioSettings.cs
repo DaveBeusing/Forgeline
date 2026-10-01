@@ -116,7 +116,7 @@ public sealed record VerticalSliceScenarioSettings
                     MaximumAttackUnits = 12,
                     MaximumQueuedUnitsPerFacility = 3,
                     DefensiveRadiusMeters = 450.0f,
-                    ObjectivePressureLeashMeters = 320.0f,
+                    ObjectivePressureLeashMeters = 120.0f,
                     ArtilleryCadenceTicks = 50
                 },
             EastOpponent =
