@@ -103,25 +103,14 @@ public sealed class ResupplyPlanningDiagnosticsTests
             recipient,
             new FormationMovementConstraint(8.0f));
 
-        var context =
-            new SimulationContext(
-                fixture.Simulation.Entities,
-                fixture.Simulation.CurrentTick,
-                fixture.Simulation.TickDuration);
+        fixture.Simulation.AdvanceOneTick();
 
-        Assert.True(
-            BattlefieldResupplyPlanner.TryIssueNearestProviderOrder(
-                context,
-                fixture.Inventories,
-                recipient,
-                Owner,
-                fixture.Simulation.CurrentTick,
-                BattlefieldSupplyResource.Fuel,
-                out EntityId selectedProvider));
+        ResupplyPlanningResult result =
+            fixture.Result(recipient);
 
         Assert.Equal(
             provider,
-            selectedProvider);
+            result.SelectedProvider);
         Assert.True(
             fixture.Simulation.Entities.HasComponent<MovementGroupMember>(
                 recipient));
