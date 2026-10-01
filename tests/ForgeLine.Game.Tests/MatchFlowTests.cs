@@ -34,6 +34,21 @@ public sealed class MatchFlowTests
                 fixture.Runtime.MatchStateEntity);
 
         Assert.Equal(
+            MatchLifecyclePhase.Ready,
+            active.Lifecycle);
+        Assert.Equal(
+            MatchStatus.Loading,
+            active.Status);
+
+        fixture.StartMatch();
+
+        active = fixture.Simulation.Entities.GetComponent<MatchState>(
+            fixture.Runtime.MatchStateEntity);
+
+        Assert.Equal(
+            MatchLifecyclePhase.Running,
+            active.Lifecycle);
+        Assert.Equal(
             MatchStatus.Active,
             active.Status);
         Assert.Equal(
@@ -47,6 +62,7 @@ public sealed class MatchFlowTests
         using MatchFixture fixture = MatchFixture.Create();
 
         fixture.AttachObjectives();
+        fixture.StartMatch();
         fixture.RegisterObjectiveSystem();
         fixture.Simulation.AdvanceOneTick();
 
@@ -83,6 +99,7 @@ public sealed class MatchFlowTests
         using MatchFixture fixture = MatchFixture.Create();
 
         fixture.AttachObjectives();
+        fixture.StartMatch();
         fixture.RegisterObjectiveSystem();
 
         Assert.True(
@@ -118,6 +135,7 @@ public sealed class MatchFlowTests
         using MatchFixture fixture = MatchFixture.Create();
 
         fixture.AttachObjectives();
+        fixture.StartMatch();
         fixture.RegisterObjectiveSystem();
 
         var rejected =
@@ -363,6 +381,13 @@ public sealed class MatchFlowTests
             _ = Runtime.AttachCommandCoreObjectives(
                 Simulation.Entities,
                 CommandCores);
+        }
+
+        public void StartMatch()
+        {
+            MatchObjectiveSystem.ActivateMatch(
+                Simulation.Entities,
+                Runtime.MatchStateEntity);
         }
 
         public void RegisterObjectiveSystem()
