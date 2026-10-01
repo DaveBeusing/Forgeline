@@ -231,7 +231,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             context,
             owned,
             configuration);
-        EnsureSupplyTrucksLoaded(context, owned);
+        EnsureSupplyTrucksLoaded(
+            context,
+            controller,
+            owned);
 
         SkirmishStrategicState strategicState;
         SkirmishStrategicGoal goal;
@@ -1928,6 +1931,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private void EnsureSupplyTrucksLoaded(
         SimulationContext context,
+        SkirmishOpponentController controller,
         OwnedState owned)
     {
         foreach (EntityId entity in owned.Units)
@@ -2007,6 +2011,33 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     destination = candidate.Position;
                     bestDistance = distance;
                 }
+            }
+
+            if (!float.IsFinite(bestDistance) &&
+                context.Entities.IsAlive(controller.CommandCore) &&
+                context.Entities.TryGetComponent(
+                    controller.CommandCore,
+                    out SupplyProvider commandCoreProvider) &&
+                commandCoreProvider.Enabled &&
+                commandCoreProvider.Owner == truck.Owner &&
+                context.Entities.TryGetComponent(
+                    controller.CommandCore,
+                    out WorldTransform commandCoreTransform) &&
+                (!needsFuel ||
+                 _inventories.GetAvailableQuantity(
+                     commandCoreProvider.InventoryId,
+                     ResourceIds.Fuel) > 0.0) &&
+                (!needsAmmunition ||
+                 _inventories.GetAvailableQuantity(
+                     commandCoreProvider.InventoryId,
+                     ResourceIds.Ammunition) > 0.0))
+            {
+                destination =
+                    commandCoreTransform.Position;
+                bestDistance =
+                    HorizontalDistanceSquared(
+                        transform.Position,
+                        destination);
             }
 
             if (!float.IsFinite(bestDistance))
