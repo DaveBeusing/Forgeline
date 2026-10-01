@@ -896,9 +896,9 @@ public sealed class PlayerConstructionProductionFlowTests
             scoutAlive &&
             scenario.Simulation.Entities.TryGetComponent(
                 scout,
-                out UnitFuelState scoutFuel)
+                out UnitFuelState observedScoutFuel)
                 ? scenario.Inventories.GetQuantity(
-                    scoutFuel.InventoryId,
+                    observedScoutFuel.InventoryId,
                     ResourceIds.Fuel)
                 : -1.0;
 
