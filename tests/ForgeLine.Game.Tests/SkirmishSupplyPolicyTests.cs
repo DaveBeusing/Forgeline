@@ -36,6 +36,15 @@ public sealed class SkirmishSupplyPolicyTests
         Assert.Equal(supply.AmmunitionTarget, scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Ammunition), precision: 6);
         Assert.Equal(600.0 - supply.FuelTarget, scenario.Inventories.GetQuantity(inventory, ResourceIds.Fuel), precision: 6);
         Assert.Equal(800.0 - supply.AmmunitionTarget, scenario.Inventories.GetQuantity(inventory, ResourceIds.Ammunition), precision: 6);
+        Assert.False(
+            entities.HasComponent<MovementOrder>(
+                truck));
+        Assert.False(
+            entities.HasComponent<NavigationPendingPath>(
+                truck));
+        Assert.False(
+            entities.HasComponent<NavigationRouteState>(
+                truck));
     }
 
     [Fact]
