@@ -1586,11 +1586,17 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     objective,
                     configuration.ObjectivePressureLeashMeters))
             {
+                Vector3 approachObjective =
+                    ResolveObjectiveApproachPoint(
+                        controller.HomePosition,
+                        objective,
+                        configuration.ObjectivePressureLeashMeters);
+
                 if (HaveCombatOrder(
                         context,
                         attackers,
                         CombatOrderKind.AttackMove,
-                        objective))
+                        approachObjective))
                 {
                     return true;
                 }
@@ -1599,7 +1605,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     new AttackMoveCommand(
                         controller.Player,
                         attackers,
-                        objective,
+                        approachObjective,
                         context.Tick,
                         FormationTemplate.Line,
                         configuration.ObjectivePressureLeashMeters);
@@ -1649,6 +1655,46 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         advance.Execute(context);
 
         return true;
+    }
+
+    private static Vector3 ResolveObjectiveApproachPoint(
+        Vector3 home,
+        Vector3 objective,
+        float pressureRadiusMeters)
+    {
+        Vector3 direction =
+            objective - home;
+        direction.Y = 0.0f;
+
+        float distanceSquared =
+            direction.LengthSquared();
+        if (distanceSquared <= 0.001f)
+        {
+            return objective;
+        }
+
+        float standOffMeters =
+            MathF.Min(
+                80.0f,
+                MathF.Max(
+                    24.0f,
+                    pressureRadiusMeters * 0.6f));
+        float distance =
+            MathF.Sqrt(distanceSquared);
+
+        if (distance <= standOffMeters)
+        {
+            return objective;
+        }
+
+        direction /= distance;
+
+        return new Vector3(
+            objective.X -
+                direction.X * standOffMeters,
+            objective.Y,
+            objective.Z -
+                direction.Z * standOffMeters);
     }
 
     private static bool IsAttackForceInsideObjectivePressure(
@@ -2604,11 +2650,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return UnitIds.CargoTruck;
         }
 
-        int supplyTarget =
-            Math.Clamp(
-                owned.SupplyDepots.Count,
-                2,
-                3);
+        const int supplyTarget = 1;
         int supplyCount =
             GetUnitCount(
                 owned,
