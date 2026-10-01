@@ -265,6 +265,46 @@ public sealed class MatchLifecycleTests
     }
 
     [Fact]
+    public void InvalidMatchConfigurationRejectsDuplicatePlayersAndStarts()
+    {
+        Assert.Throws<ArgumentException>(
+            () =>
+                new MatchConfiguration(
+                    "prototype",
+                    seed: 1,
+                    [
+                        new MatchParticipantConfiguration(
+                            WestPlayer,
+                            new FactionId(1),
+                            startIndex: 0,
+                            isComputerControlled: false),
+                        new MatchParticipantConfiguration(
+                            WestPlayer,
+                            new FactionId(2),
+                            startIndex: 1,
+                            isComputerControlled: true)
+                    ]));
+
+        Assert.Throws<ArgumentException>(
+            () =>
+                new MatchConfiguration(
+                    "prototype",
+                    seed: 1,
+                    [
+                        new MatchParticipantConfiguration(
+                            WestPlayer,
+                            new FactionId(1),
+                            startIndex: 0,
+                            isComputerControlled: false),
+                        new MatchParticipantConfiguration(
+                            EastPlayer,
+                            new FactionId(2),
+                            startIndex: 0,
+                            isComputerControlled: true)
+                    ]));
+    }
+
+    [Fact]
     public void LifecycleDiagnosticsCaptureReasonWinnerAndTransitionHistory()
     {
         using VerticalSliceScenario scenario =
