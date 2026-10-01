@@ -37,7 +37,7 @@ The canonical playable battlefield vertical slice is **Central Divide**, a 3.072
 
 The first full skirmish opponent now plays the same authoritative vertical-slice loop as the player: real starting stock, construction, power, extraction, processing, logistics stock policies, unit production, reconnaissance, combat groups/formations, Fuel/Ammunition supply, retreat/resupply, artillery, and Command Core pressure. Direct attacks require current identified intelligence; otherwise offensive movement is limited to public strategic map knowledge. The Windows client starts a Player-2 opponent on Central Divide and exposes its strategic state through F2 diagnostics. See [Skirmish Opponent](docs/SkirmishOpponent.md).
 
-The Windows client now runs a complete vertical-slice skirmish lifecycle from configured start assignment through authoritative Command Core victory/defeat. A persistent player HUD shows core resources, local power state, intelligence counts, owned selection details, Health/Fuel/Ammunition/readiness, production or construction progress, block reasons, and causal alerts. Terminal matches stop advancing gameplay; press `R` to create a fresh match session or `Escape` to end the completed session. F1 now toggles development metrics while leaving the player HUD visible. See [Match Flow and Player Experience](docs/MatchFlowAndPlayerExperience.md).
+The Windows client now runs the complete vertical-slice skirmish lifecycle through explicit `Initializing -> Ready -> Running <-> Paused -> Ending -> Completed` states. Command Core destruction and surrender resolve authoritative outcomes with terminal reasons; the player HUD receives copied lifecycle/result state rather than owning match authority. Terminal matches stop advancing gameplay; press `R` to create a fresh match session or `Escape` to finalize and end the completed session. F1 now toggles development metrics while leaving the player HUD visible. See [Match Flow and Player Experience](docs/MatchFlowAndPlayerExperience.md).
 
 ## Repository Layout
 
@@ -111,7 +111,7 @@ Run the simulation without graphics, audio, UI, or window creation:
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --ticks 1000 --seed 1 --tick-rate 20
 ```
 
-The headless host executes logical simulation ticks as quickly as the machine permits. The configured tick rate defines simulation time; it does not force wall-clock pacing.
+The headless host executes logical simulation ticks as quickly as the machine permits. The configured tick rate defines simulation time; it does not force wall-clock pacing. Vertical-slice runs stop normal ticking when an authoritative match result is reached, finalize that result through the shared match lifecycle, and include lifecycle phase, outcome, terminal reason, winner/defeated participant, transition ticks, and transition count in structured diagnostics.
 
 Create a repeatable lightweight-entity stress scenario and write structured diagnostics:
 
