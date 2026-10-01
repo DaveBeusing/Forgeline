@@ -1675,7 +1675,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private void EnsureAttackSupplySupport(
         SimulationContext context,
         OwnedState owned,
-        IReadOnlyList<EntityId> attackers,
+        EntityId[] attackers,
         SkirmishOpponentConfiguration configuration)
     {
         if (attackers.Count == 0)
