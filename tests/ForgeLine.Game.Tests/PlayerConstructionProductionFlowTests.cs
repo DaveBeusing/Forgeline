@@ -852,20 +852,68 @@ public sealed class PlayerConstructionProductionFlowTests
                     20.0f) +
                 800);
 
-        RunUntil(
-            scenario,
-            () =>
-                scenario.Intelligence
-                    .IsEntityCurrentlyIdentified(
-                        westFaction,
-                        scenario.East.CommandCore),
-            maximumTicks: reconnaissanceTickBudget);
+        bool identified = false;
+        for (int tick = 0;
+             tick < reconnaissanceTickBudget &&
+             !(identified =
+                 scenario.Intelligence
+                     .IsEntityCurrentlyIdentified(
+                         westFaction,
+                         scenario.East.CommandCore));
+             tick++)
+        {
+            scenario.Simulation.AdvanceOneTick();
+        }
+
+        bool scoutAlive =
+            scenario.Simulation.Entities.IsAlive(
+                scout);
+        bool truckAlive =
+            scenario.Simulation.Entities.IsAlive(
+                supplyTruck);
+        Vector3 scoutPosition =
+            scoutAlive &&
+            scenario.Simulation.Entities.TryGetComponent(
+                scout,
+                out WorldTransform scoutTransform)
+                ? scoutTransform.Position
+                : new Vector3(float.NaN);
+        Vector3 truckPosition =
+            truckAlive &&
+            scenario.Simulation.Entities.TryGetComponent(
+                supplyTruck,
+                out WorldTransform truckTransform)
+                ? truckTransform.Position
+                : new Vector3(float.NaN);
+        string scoutMovementStatus =
+            scoutAlive &&
+            scenario.Simulation.Entities.TryGetComponent(
+                scout,
+                out GroundMovementState scoutMovement)
+                ? scoutMovement.Status.ToString()
+                : "Unavailable";
+        double scoutFuelQuantity =
+            scoutAlive &&
+            scenario.Simulation.Entities.TryGetComponent(
+                scout,
+                out UnitFuelState scoutFuel)
+                ? scenario.Inventories.GetQuantity(
+                    scoutFuel.InventoryId,
+                    ResourceIds.Fuel)
+                : -1.0;
 
         Assert.True(
-            scenario.Intelligence
-                .IsEntityCurrentlyIdentified(
-                    westFaction,
-                    scenario.East.CommandCore));
+            identified,
+            $"Reconnaissance failed: scoutAlive={scoutAlive}; truckAlive={truckAlive}; " +
+            $"scout=({scoutPosition.X:F1},{scoutPosition.Z:F1}); " +
+            $"truck=({truckPosition.X:F1},{truckPosition.Z:F1}); " +
+            $"core=({eastCore.Position.X:F1},{eastCore.Position.Z:F1}); " +
+            $"distance={Vector3.Distance(scoutPosition, eastCore.Position):F1}; " +
+            $"movement={scoutMovementStatus}; fuel={scoutFuelQuantity:F2}; " +
+            $"grouped={scenario.Simulation.Entities.HasComponent<MovementGroupMember>(scout)}; " +
+            $"resupplying={scenario.Simulation.Entities.HasComponent<ResupplyOrder>(scout)}; " +
+            $"contacts={scenario.Intelligence.GetContactCount(westFaction)}; " +
+            $"match={scenario.GetMatchState().Status}; ticks={reconnaissanceTickBudget}.");
         Assert.True(
             scenario.Simulation.Entities.IsAlive(
                 scenario.East.CommandCore));
