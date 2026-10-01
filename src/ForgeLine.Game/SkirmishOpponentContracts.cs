@@ -52,6 +52,10 @@ public sealed record SkirmishOpponentConfiguration
 
     public int MaximumQueuedUnitsPerFacility { get; init; } = 2;
 
+    public int MinimumCargoTrucks { get; init; } = 2;
+
+    public int MinimumSupplyTrucks { get; init; } = 1;
+
     public float DefensiveRadiusMeters { get; init; } = 520.0f;
 
     public float ObjectivePressureLeashMeters { get; init; } = 220.0f;
@@ -89,6 +93,12 @@ public sealed record SkirmishOpponentConfiguration
             MinimumAttackUnits);
         ArgumentOutOfRangeException.ThrowIfLessThan(
             MaximumQueuedUnitsPerFacility,
+            1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(
+            MinimumCargoTrucks,
+            1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(
+            MinimumSupplyTrucks,
             1);
         ArgumentOutOfRangeException.ThrowIfZero(
             ArtilleryCadenceTicks);
