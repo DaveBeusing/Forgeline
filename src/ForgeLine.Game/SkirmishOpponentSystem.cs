@@ -1927,17 +1927,44 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         foreach (EntityId entity in owned.Units)
         {
             if (!context.Entities.TryGetComponent(entity, out SupplyTruck truck) ||
-                context.Entities.HasComponent<MovementOrder>(entity) ||
                 context.Entities.HasComponent<ResupplyOrder>(entity) ||
                 !context.Entities.TryGetComponent(entity, out WorldTransform transform))
             {
                 continue;
             }
 
-            bool needsFuel = _inventories.GetQuantity(truck.InventoryId, ResourceIds.Fuel) < truck.FuelTarget * 0.25;
-            bool needsAmmunition = _inventories.GetQuantity(truck.InventoryId, ResourceIds.Ammunition) < truck.AmmunitionTarget * 0.25;
+            bool hasMovement =
+                TacticalCommandUtilities.TryGetMovementIntent(
+                    context,
+                    entity,
+                    out _);
+            bool loadingMovement =
+                hasMovement &&
+                HasSupplyDepotLoadingMovement(
+                    context,
+                    entity,
+                    owned,
+                    truck);
+            bool needsFuel =
+                _inventories.GetQuantity(
+                    truck.InventoryId,
+                    ResourceIds.Fuel) <
+                truck.FuelTarget * 0.25;
+            bool needsAmmunition =
+                _inventories.GetQuantity(
+                    truck.InventoryId,
+                    ResourceIds.Ammunition) <
+                truck.AmmunitionTarget * 0.25;
+
             if (!needsFuel && !needsAmmunition)
             {
+                if (loadingMovement)
+                {
+                    TacticalCommandUtilities.ClearMovementIntent(
+                        context,
+                        entity);
+                }
+
                 continue;
             }
 
@@ -1976,7 +2003,26 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 }
             }
 
-            if (!float.IsFinite(bestDistance) || bestDistance <= truck.LoadRangeMeters * truck.LoadRangeMeters)
+            if (!float.IsFinite(bestDistance))
+            {
+                continue;
+            }
+
+            if (bestDistance <=
+                truck.LoadRangeMeters *
+                truck.LoadRangeMeters)
+            {
+                if (loadingMovement)
+                {
+                    TacticalCommandUtilities.ClearMovementIntent(
+                        context,
+                        entity);
+                }
+
+                continue;
+            }
+
+            if (hasMovement)
             {
                 continue;
             }
@@ -1989,6 +2035,51 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 : new Vector3(0.0f, 0.0f, MathF.CopySign(approach, offset.Z));
             new MoveEntitiesCommand(truck.Owner, [entity], destination, context.Tick).Execute(context);
         }
+    }
+
+    private static bool HasSupplyDepotLoadingMovement(
+        SimulationContext context,
+        EntityId entity,
+        OwnedState owned,
+        in SupplyTruck truck)
+    {
+        if (!TacticalCommandUtilities.TryGetMovementIntent(
+                context,
+                entity,
+                out MovementOrder movement))
+        {
+            return false;
+        }
+
+        float loadRangeSquared =
+            truck.LoadRangeMeters *
+            truck.LoadRangeMeters;
+
+        for (int index = 0;
+             index < owned.SupplyDepots.Count;
+             index++)
+        {
+            (EntityId depotEntity, Vector3 depotPosition) =
+                owned.SupplyDepots[index];
+
+            if (!context.Entities.TryGetComponent(
+                    depotEntity,
+                    out SupplyDepot depot) ||
+                depot.State != SupplyDepotState.Operational)
+            {
+                continue;
+            }
+
+            if (HorizontalDistanceSquared(
+                    movement.WorldTarget,
+                    depotPosition) <=
+                loadRangeSquared)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void EnsureEconomyPolicies(
