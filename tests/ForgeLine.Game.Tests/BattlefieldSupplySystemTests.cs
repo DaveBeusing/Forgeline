@@ -476,12 +476,12 @@ public sealed class BattlefieldSupplySystemTests
                 truckState.InventoryId,
                 ResourceIds.Ammunition));
         Assert.Equal(
-            30.0,
+            70.0,
             inventories.GetQuantity(
                 commandInventory,
                 ResourceIds.Fuel));
         Assert.Equal(
-            10.0,
+            60.0,
             inventories.GetQuantity(
                 commandInventory,
                 ResourceIds.Ammunition));
