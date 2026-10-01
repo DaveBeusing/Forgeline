@@ -823,7 +823,7 @@ public sealed class PlayerConstructionProductionFlowTests
 
         Vector3 reconnaissancePoint =
             eastCore.Position +
-            towardWest * 180.0f;
+            towardWest * 260.0f;
         Assert.True(
             gateway.SubmitMovement(
                 scenario.West.Player,
@@ -845,52 +845,21 @@ public sealed class PlayerConstructionProductionFlowTests
                 scoutBeforeRecon.Position,
                 reconnaissancePoint);
         int reconnaissanceTickBudget =
-            Math.Max(
-                20_000,
-                checked(
-                    (int)MathF.Ceiling(
-                        reconnaissanceDistance /
-                        6.0f *
-                        20.0f) +
-                    1_600));
+            checked(
+                (int)MathF.Ceiling(
+                    reconnaissanceDistance /
+                    10.0f *
+                    20.0f) +
+                800);
 
-        bool identified = false;
-        for (int tick = 0;
-             tick < reconnaissanceTickBudget &&
-             !(identified =
-                 scenario.Intelligence
-                     .IsEntityCurrentlyIdentified(
-                         westFaction,
-                         scenario.East.CommandCore));
-             tick++)
-        {
-            scenario.Simulation.AdvanceOneTick();
-        }
-
-        WorldTransform scoutAfterRecon =
-            scenario.Simulation.Entities
-                .GetComponent<WorldTransform>(
-                    scout);
-        GroundMovementState scoutMovement =
-            scenario.Simulation.Entities
-                .GetComponent<GroundMovementState>(
-                    scout);
-        UnitFuelState scoutFuel =
-            scenario.Simulation.Entities
-                .GetComponent<UnitFuelState>(
-                    scout);
-        double scoutFuelQuantity =
-            scenario.Inventories.GetQuantity(
-                scoutFuel.InventoryId,
-                ResourceIds.Fuel);
-
-        Assert.True(
-            identified,
-            $"Reconnaissance failed: scout=({scoutAfterRecon.Position.X:F1},{scoutAfterRecon.Position.Z:F1}); " +
-            $"target=({reconnaissancePoint.X:F1},{reconnaissancePoint.Z:F1}); " +
-            $"distanceToCore={Vector3.Distance(scoutAfterRecon.Position, eastCore.Position):F1}; " +
-            $"movement={scoutMovement.Status}; fuel={scoutFuelQuantity:F2}; " +
-            $"contacts={scenario.Intelligence.GetContactCount(westFaction)}; ticks={reconnaissanceTickBudget}.");
+        RunUntil(
+            scenario,
+            () =>
+                scenario.Intelligence
+                    .IsEntityCurrentlyIdentified(
+                        westFaction,
+                        scenario.East.CommandCore),
+            maximumTicks: reconnaissanceTickBudget);
 
         Assert.True(
             scenario.Intelligence
