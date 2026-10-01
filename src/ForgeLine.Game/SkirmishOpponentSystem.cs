@@ -1442,8 +1442,24 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         BattlefieldSiteDefinition[] sites =
             GetOpponentFacingSites(
                 controller);
+        BattlefieldObjectiveDefinition? enemyObjective =
+            _battlefield.Objectives
+                .Where(
+                    candidate =>
+                        candidate.Owner != controller.Player)
+                .OrderBy(
+                    candidate =>
+                        HorizontalDistanceSquared(
+                            controller.HomePosition,
+                            candidate.CommandCorePosition))
+                .Cast<BattlefieldObjectiveDefinition?>()
+                .FirstOrDefault();
 
-        if (sites.Length == 0)
+        int objectiveCount =
+            sites.Length +
+            (enemyObjective.HasValue ? 1 : 0);
+
+        if (objectiveCount == 0)
         {
             return false;
         }
@@ -1451,9 +1467,34 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         int index =
             Math.Abs(
                 state.ScoutSiteCursor) %
-            sites.Length;
-        objective =
-            sites[index].Position;
+            objectiveCount;
+
+        if (index < sites.Length)
+        {
+            objective =
+                sites[index].Position;
+        }
+        else
+        {
+            Vector3 enemyPosition =
+                enemyObjective!.Value.CommandCorePosition;
+            Vector3 towardHome =
+                controller.HomePosition -
+                enemyPosition;
+            towardHome.Y = 0.0f;
+
+            if (towardHome.LengthSquared() >
+                0.0001f)
+            {
+                towardHome =
+                    Vector3.Normalize(
+                        towardHome);
+            }
+
+            objective =
+                enemyPosition +
+                towardHome * 260.0f;
+        }
 
         var command =
             new AttackMoveCommand(
