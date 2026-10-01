@@ -1579,7 +1579,40 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             objective =
                 identified.Value.LastKnownPosition;
 
-            if (HaveCombatOrder(context, attackers, CombatOrderKind.Attack, objective, identifiedTarget))
+            if (identifiedIsCommandCore &&
+                !IsAttackForceInsideObjectivePressure(
+                    context,
+                    attackers,
+                    objective,
+                    configuration.ObjectivePressureLeashMeters))
+            {
+                if (HaveCombatOrder(
+                        context,
+                        attackers,
+                        CombatOrderKind.AttackMove,
+                        objective))
+                {
+                    return true;
+                }
+
+                var approach =
+                    new AttackMoveCommand(
+                        controller.Player,
+                        attackers,
+                        objective,
+                        context.Tick,
+                        FormationTemplate.Line,
+                        configuration.ObjectivePressureLeashMeters);
+                approach.Execute(context);
+                return true;
+            }
+
+            if (HaveCombatOrder(
+                    context,
+                    attackers,
+                    CombatOrderKind.Attack,
+                    objective,
+                    identifiedTarget))
             {
                 return true;
             }
@@ -1614,6 +1647,35 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 FormationTemplate.Line,
                 configuration.ObjectivePressureLeashMeters);
         advance.Execute(context);
+
+        return true;
+    }
+
+    private static bool IsAttackForceInsideObjectivePressure(
+        SimulationContext context,
+        EntityId[] attackers,
+        Vector3 objective,
+        float pressureRadiusMeters)
+    {
+        float pressureSquared =
+            pressureRadiusMeters *
+            pressureRadiusMeters;
+
+        for (int index = 0;
+             index < attackers.Length;
+             index++)
+        {
+            if (!context.Entities.TryGetComponent(
+                    attackers[index],
+                    out WorldTransform transform) ||
+                HorizontalDistanceSquared(
+                    transform.Position,
+                    objective) >
+                pressureSquared)
+            {
+                return false;
+            }
+        }
 
         return true;
     }
