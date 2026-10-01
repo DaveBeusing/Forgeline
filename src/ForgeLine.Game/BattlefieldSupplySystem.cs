@@ -352,9 +352,11 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
             }
 
             float distanceSquared =
-                HorizontalDistanceSquared(
-                    truckPosition,
-                    position);
+                HorizontalDistanceToLoadingSourceSquared(
+                    context,
+                    entity,
+                    position,
+                    truckPosition);
 
             if (distanceSquared > maximumDistanceSquared)
             {
@@ -984,6 +986,38 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
     {
         float x = left.X - right.X;
         float z = left.Z - right.Z;
+        return x * x + z * z;
+    }
+
+    private static float HorizontalDistanceToLoadingSourceSquared(
+        SimulationContext context,
+        EntityId source,
+        Vector3 sourcePosition,
+        Vector3 loadingPosition)
+    {
+        float x =
+            MathF.Abs(
+                loadingPosition.X -
+                sourcePosition.X);
+        float z =
+            MathF.Abs(
+                loadingPosition.Z -
+                sourcePosition.Z);
+
+        if (context.Entities.TryGetComponent(
+                source,
+                out SpatialPresence presence))
+        {
+            x =
+                MathF.Max(
+                    0.0f,
+                    x - presence.HalfExtents.X);
+            z =
+                MathF.Max(
+                    0.0f,
+                    z - presence.HalfExtents.Z);
+        }
+
         return x * x + z * z;
     }
 
