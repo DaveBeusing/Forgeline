@@ -258,6 +258,16 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
         float bestDistanceSquared = float.PositiveInfinity;
         float maximumDistanceSquared =
             truck.LoadRangeMeters * truck.LoadRangeMeters;
+        bool needsFuel =
+            _inventories.GetQuantity(
+                truck.InventoryId,
+                ResourceIds.Fuel) <
+            truck.FuelTarget;
+        bool needsAmmunition =
+            _inventories.GetQuantity(
+                truck.InventoryId,
+                ResourceIds.Ammunition) <
+            truck.AmmunitionTarget;
 
         foreach (EntityId entity in
                  context.Entities.Query<SupplyDepot>(
@@ -317,6 +327,23 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
             InventoryId inventory,
             Vector3 position)
         {
+            bool hasNeededFuel =
+                needsFuel &&
+                _inventories.GetAvailableQuantity(
+                    inventory,
+                    ResourceIds.Fuel) > 0.0;
+            bool hasNeededAmmunition =
+                needsAmmunition &&
+                _inventories.GetAvailableQuantity(
+                    inventory,
+                    ResourceIds.Ammunition) > 0.0;
+
+            if (!hasNeededFuel &&
+                !hasNeededAmmunition)
+            {
+                return;
+            }
+
             float distanceSquared =
                 HorizontalDistanceSquared(
                     truckPosition,
