@@ -772,6 +772,45 @@ public sealed class PlayerConstructionProductionFlowTests
                     ResourceIds.Ammunition) > 0.0,
             maximumTicks: 1_200);
 
+        Assert.True(
+            gateway.SubmitMovement(
+                scenario.West.Player,
+                [scout],
+                supplyTruckLoadPoint,
+                scenario.Simulation.CurrentTick,
+                FormationTemplate.Compact).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out _));
+
+        RunUntil(
+            scenario,
+            () =>
+                Vector3.DistanceSquared(
+                    scenario.Simulation.Entities
+                        .GetComponent<WorldTransform>(
+                            scout).Position,
+                    supplyTruckLoadPoint) <=
+                4.0f * 4.0f,
+            maximumTicks: 1_200);
+
+        UnitFuelState scoutFuel =
+            scenario.Simulation.Entities
+                .GetComponent<UnitFuelState>(
+                    scout);
+
+        RunUntil(
+            scenario,
+            () =>
+                scenario.Inventories.GetQuantity(
+                    scoutFuel.InventoryId,
+                    ResourceIds.Fuel) >=
+                scoutFuel.Capacity - 0.001 &&
+                scenario.Inventories.GetQuantity(
+                    supplyTruckState.InventoryId,
+                    ResourceIds.Fuel) >=
+                supplyTruckState.FuelTarget - 0.001,
+            maximumTicks: 1_200);
+
         RemoveStockPolicies(
             scenario,
             gateway,
