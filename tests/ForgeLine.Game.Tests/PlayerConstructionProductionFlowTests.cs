@@ -830,7 +830,7 @@ public sealed class PlayerConstructionProductionFlowTests
                 [scout, supplyTruck],
                 reconnaissancePoint,
                 scenario.Simulation.CurrentTick,
-                FormationTemplate.Compact).Accepted);
+                FormationTemplate.Column).Accepted);
         scenario.Simulation.AdvanceOneTick();
         Assert.True(gateway.Results.TryRead(out _));
 
