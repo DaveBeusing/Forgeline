@@ -254,6 +254,7 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
         out InventoryId selectedInventory)
     {
         selectedInventory = default;
+        InventoryId candidateInventory = default;
         EntityId selectedEntity = EntityId.Invalid;
         float bestDistanceSquared = float.PositiveInfinity;
         float maximumDistanceSquared =
@@ -320,7 +321,13 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                 transform.Position);
         }
 
-        return selectedEntity.IsValid;
+        if (selectedEntity.IsValid)
+        {
+            selectedInventory = candidateInventory;
+            return true;
+        }
+
+        return false;
 
         void ConsiderLoadingSource(
             EntityId entity,
@@ -360,7 +367,7 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                  entity < selectedEntity))
             {
                 selectedEntity = entity;
-                selectedInventory = inventory;
+                candidateInventory = inventory;
                 bestDistanceSquared = distanceSquared;
             }
         }
