@@ -97,10 +97,10 @@ public sealed record VerticalSliceScenarioSettings
             StartingStock =
                 new SkirmishStartingStock(
                     FerrousOre: 1_200.0,
-                    Volatiles: 800.0,
+                    Volatiles: 2_400.0,
                     Silicates: 800.0,
                     Steel: 3_000.0,
-                    Fuel: 2_000.0,
+                    Fuel: 6_000.0,
                     Electronics: 1_500.0,
                     Ammunition: 1_500.0),
             WestOpponent =
@@ -123,7 +123,7 @@ public sealed record VerticalSliceScenarioSettings
                 new SkirmishOpponentConfiguration
                 {
                     ReactionCadenceTicks = 10,
-                    Aggression = 0.8,
+                    Aggression = 0.55,
                     ExpansionReadinessThreshold = 0.42,
                     OffensiveReadinessThreshold = 0.58,
                     RetreatThreshold = 0.22,
