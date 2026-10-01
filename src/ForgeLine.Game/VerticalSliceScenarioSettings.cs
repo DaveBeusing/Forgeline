@@ -97,10 +97,10 @@ public sealed record VerticalSliceScenarioSettings
             StartingStock =
                 new SkirmishStartingStock(
                     FerrousOre: 1_200.0,
-                    Volatiles: 2_400.0,
+                    Volatiles: 6_000.0,
                     Silicates: 800.0,
                     Steel: 3_000.0,
-                    Fuel: 6_000.0,
+                    Fuel: 18_000.0,
                     Electronics: 1_500.0,
                     Ammunition: 1_500.0),
             WestOpponent =
