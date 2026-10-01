@@ -1998,9 +1998,24 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             foreach (var candidate in owned.SupplyDepots)
             {
                 if (!context.Entities.TryGetComponent(candidate.Entity, out SupplyDepot depot) ||
-                    depot.State != SupplyDepotState.Operational ||
-                    (needsFuel && _inventories.GetAvailableQuantity(depot.InventoryId, ResourceIds.Fuel) <= 0.0) ||
-                    (needsAmmunition && _inventories.GetAvailableQuantity(depot.InventoryId, ResourceIds.Ammunition) <= 0.0))
+                    depot.State != SupplyDepotState.Operational)
+                {
+                    continue;
+                }
+
+                bool depotHasNeededFuel =
+                    needsFuel &&
+                    _inventories.GetAvailableQuantity(
+                        depot.InventoryId,
+                        ResourceIds.Fuel) > 0.0;
+                bool depotHasNeededAmmunition =
+                    needsAmmunition &&
+                    _inventories.GetAvailableQuantity(
+                        depot.InventoryId,
+                        ResourceIds.Ammunition) > 0.0;
+
+                if (!depotHasNeededFuel &&
+                    !depotHasNeededAmmunition)
                 {
                     continue;
                 }
@@ -2023,14 +2038,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 context.Entities.TryGetComponent(
                     controller.CommandCore,
                     out WorldTransform commandCoreTransform) &&
-                (!needsFuel ||
-                 _inventories.GetAvailableQuantity(
-                     commandCoreProvider.InventoryId,
-                     ResourceIds.Fuel) > 0.0) &&
-                (!needsAmmunition ||
-                 _inventories.GetAvailableQuantity(
-                     commandCoreProvider.InventoryId,
-                     ResourceIds.Ammunition) > 0.0))
+                ((needsFuel &&
+                  _inventories.GetAvailableQuantity(
+                      commandCoreProvider.InventoryId,
+                      ResourceIds.Fuel) > 0.0) ||
+                 (needsAmmunition &&
+                  _inventories.GetAvailableQuantity(
+                      commandCoreProvider.InventoryId,
+                      ResourceIds.Ammunition) > 0.0)))
             {
                 destination =
                     commandCoreTransform.Position;
