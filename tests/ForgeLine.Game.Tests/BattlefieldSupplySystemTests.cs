@@ -427,6 +427,30 @@ public sealed class BattlefieldSupplySystemTests
                 LocalPlayer,
                 resupplyRangeMeters: 20.0f));
 
+        InventoryId emptyDepotInventory =
+            inventories.CreateInventory(
+                new InventorySpecification(
+                    500.0));
+        EntityId emptyDepot =
+            simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(
+            emptyDepot,
+            new WorldTransform(
+                new Vector3(4.0f, 0.0f, 0.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        simulation.Entities.AddComponent(
+            emptyDepot,
+            new SupplyDepot(
+                emptyDepotInventory,
+                LocalPlayer));
+        simulation.Entities.AddComponent(
+            emptyDepot,
+            new SupplyProvider(
+                emptyDepotInventory,
+                LocalPlayer,
+                resupplyRangeMeters: 20.0f));
+
         EntityId truck =
             SupplyTruckFactory.Create(
                 simulation.Entities,
