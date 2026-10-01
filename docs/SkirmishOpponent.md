@@ -76,7 +76,7 @@ Desired counts are intentionally simple. Configuration limits queue depth so the
 
 ## Reconnaissance and Intelligence
 
-Idle Scout Vehicles receive AttackMove reconnaissance tasks toward public expansion and forward-operating sites until the enemy Command Core is currently identified. Scouts are excluded from the strategic attack candidate set.
+Idle Scout Vehicles receive AttackMove reconnaissance tasks toward public expansion, forward-operating, and mining sites. If those public map locations still do not produce a current enemy Command Core identification, the scouting cycle includes a stand-off approach point toward the public opposing Command Core objective. The scout still has to enter real sensor range and identification is produced only by the battlefield intelligence system. Scouts are excluded from the strategic attack candidate set.
 
 Strategic threat and opportunity evaluation consumes FactionIntelligenceSnapshot. Identified contacts may resolve to an entity for a direct Attack command. Detected contacts remain coordinate-level information. Artillery missions use current detected or identified contact keys and are validated again by the authoritative artillery system.
 
