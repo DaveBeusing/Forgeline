@@ -373,6 +373,8 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
         Vector3 anchor,
         float leash)
     {
+        _ = anchor;
+
         if (context.Entities.TryGetComponent(
                 entity,
                 out CombatOrderState existing) &&
@@ -382,23 +384,14 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
             return;
         }
 
-        TacticalCommandUtilities.ClearMovementIntent(
-            context,
-            entity);
-        TacticalCommandUtilities.SetOrder(
-            context,
-            entity,
-            new CombatOrderState(
-                CombatOrderKind.Attack,
+        var command =
+            new AttackCommand(
                 owner,
+                [entity],
                 target,
-                Vector3.Zero,
-                hasDestination: false,
-                anchor,
-                leash,
-                FormationTemplate.Compact,
                 context.Tick,
-                context.Tick));
+                leash);
+        command.Execute(context);
     }
 
     private static void IssueAttackMoveIntent(
@@ -409,6 +402,8 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
         Vector3 anchor,
         float leash)
     {
+        _ = anchor;
+
         if (context.Entities.TryGetComponent(
                 entity,
                 out CombatOrderState existing) &&
@@ -420,26 +415,15 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
             return;
         }
 
-        TacticalCommandUtilities.SetOrder(
-            context,
-            entity,
-            new CombatOrderState(
-                CombatOrderKind.AttackMove,
+        var command =
+            new AttackMoveCommand(
                 owner,
-                EntityId.Invalid,
+                [entity],
                 destination,
-                hasDestination: true,
-                anchor,
-                leash,
-                FormationTemplate.Compact,
                 context.Tick,
-                context.Tick));
-
-        SetMovementOrder(
-            context,
-            entity,
-            owner,
-            destination);
+                FormationTemplate.Compact,
+                leash);
+        command.Execute(context);
     }
 
     private static void IssueRetreatIntent(
@@ -456,27 +440,14 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
             return;
         }
 
-        TacticalCommandUtilities.SetOrder(
-            context,
-            entity,
-            new CombatOrderState(
-                CombatOrderKind.Retreat,
+        var command =
+            new RetreatCommand(
                 owner,
-                EntityId.Invalid,
+                [entity],
                 destination,
-                hasDestination: true,
-                context.Entities.GetComponent<WorldTransform>(
-                    entity).Position,
-                pursuitLeashMeters: 0.0f,
-                FormationTemplate.Column,
                 context.Tick,
-                context.Tick));
-
-        SetMovementOrder(
-            context,
-            entity,
-            owner,
-            destination);
+                FormationTemplate.Column);
+        command.Execute(context);
     }
 
     private static void IssueHoldIntent(
@@ -485,6 +456,8 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
         PlayerId owner,
         Vector3 position)
     {
+        _ = position;
+
         if (context.Entities.TryGetComponent(
                 entity,
                 out CombatOrderState existing) &&
@@ -493,51 +466,14 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
             return;
         }
 
-        TacticalCommandUtilities.ClearMovementIntent(
-            context,
-            entity);
-        TacticalCommandUtilities.SetOrder(
-            context,
-            entity,
-            new CombatOrderState(
-                CombatOrderKind.HoldPosition,
+        var command =
+            new HoldPositionCommand(
                 owner,
-                EntityId.Invalid,
-                position,
-                hasDestination: false,
-                position,
-                pursuitLeashMeters: 0.0f,
-                FormationTemplate.Compact,
-                context.Tick,
-                context.Tick));
-    }
-
-    private static void SetMovementOrder(
-        SimulationContext context,
-        EntityId entity,
-        PlayerId owner,
-        Vector3 destination)
-    {
-        var movement =
-            new MovementOrder(
-                owner,
-                destination,
-                context.Tick,
+                [entity],
                 context.Tick);
-
-        if (context.Entities.HasComponent<MovementOrder>(entity))
-        {
-            context.Entities.SetComponent(
-                entity,
-                movement);
-        }
-        else
-        {
-            context.Entities.AddComponent(
-                entity,
-                movement);
-        }
+        command.Execute(context);
     }
+
 
     private static bool TryGetFaction(
         SimulationContext context,
