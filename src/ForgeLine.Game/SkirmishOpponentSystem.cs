@@ -3376,9 +3376,20 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     owned,
                     facility,
                     configuration);
+            bool matureReconnaissanceRecovery =
+                plannedUnit ==
+                    UnitIds.ScoutVehicle &&
+                GetUnitCount(
+                    owned,
+                    UnitIds.ScoutVehicle) == 0 &&
+                GetUnitCount(
+                    owned,
+                    UnitIds.MainBattleTank) >=
+                    configuration.MinimumObjectivePressureUnits;
             LogisticsStockPriority productionPriority =
                 plannedUnit ==
-                    UnitIds.MainBattleTank
+                    UnitIds.MainBattleTank ||
+                matureReconnaissanceRecovery
                     ? LogisticsStockPriority.Critical
                     : LogisticsStockPriority.High;
 
@@ -3424,7 +3435,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
             LogisticsStockPriority fuelPriority =
                 plannedUnit ==
-                    UnitIds.MainBattleTank
+                    UnitIds.MainBattleTank ||
+                matureReconnaissanceRecovery
                     ? LogisticsStockPriority.Critical
                     : LogisticsStockPriority.High;
 
