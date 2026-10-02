@@ -10,7 +10,8 @@ public enum PlayerLogisticsActionOperation : byte
     SetStockPolicy = 1,
     RemoveStockPolicy = 2,
     SetAutomaticResupplyPolicy = 3,
-    RequestResupply = 4
+    RequestResupply = 4,
+    SetSupplyPriority = 5
 }
 
 public enum PlayerLogisticsActionFailureReason : byte
@@ -39,6 +40,7 @@ public sealed class PlayerLogisticsActionCommand : ISimulationCommand
         bool enabled,
         double ammunitionThreshold,
         double fuelThreshold,
+        BattlefieldSupplyPriority supplyPriority,
         SimulationTick submittedAtTick)
     {
         if (!issuer.IsSpecified)
@@ -61,8 +63,14 @@ public sealed class PlayerLogisticsActionCommand : ISimulationCommand
         DesiredMaximum = desiredMaximum;
         Priority = priority;
         Enabled = enabled;
+        if (!Enum.IsDefined(supplyPriority))
+        {
+            throw new ArgumentOutOfRangeException(nameof(supplyPriority));
+        }
+
         AmmunitionThreshold = ammunitionThreshold;
         FuelThreshold = fuelThreshold;
+        SupplyPriority = supplyPriority;
         SubmittedAtTick = submittedAtTick;
     }
 
@@ -89,6 +97,8 @@ public sealed class PlayerLogisticsActionCommand : ISimulationCommand
     public double AmmunitionThreshold { get; }
 
     public double FuelThreshold { get; }
+
+    public BattlefieldSupplyPriority SupplyPriority { get; }
 
     public SimulationTick SubmittedAtTick { get; }
 
@@ -140,6 +150,7 @@ public sealed class PlayerLogisticsActionCommand : ISimulationCommand
             false,
             0.0,
             0.0,
+            BattlefieldSupplyPriority.Normal,
             submittedAtTick);
 
     public static PlayerLogisticsActionCommand SetAutomaticResupplyPolicy(
@@ -162,6 +173,7 @@ public sealed class PlayerLogisticsActionCommand : ISimulationCommand
             enabled,
             ammunitionThreshold,
             fuelThreshold,
+            BattlefieldSupplyPriority.Normal,
             submittedAtTick);
 
     public static PlayerLogisticsActionCommand RequestResupply(
@@ -181,6 +193,28 @@ public sealed class PlayerLogisticsActionCommand : ISimulationCommand
             true,
             0.0,
             0.0,
+            BattlefieldSupplyPriority.Normal,
+            submittedAtTick);
+
+    public static PlayerLogisticsActionCommand SetSupplyPriority(
+        PlayerId issuer,
+        EntityId target,
+        BattlefieldSupplyPriority priority,
+        SimulationTick submittedAtTick) =>
+        new(
+            PlayerLogisticsActionOperation.SetSupplyPriority,
+            issuer,
+            target,
+            EntityId.Invalid,
+            ResourceId.None,
+            0.0,
+            0.0,
+            0.0,
+            LogisticsStockPriority.Normal,
+            true,
+            0.0,
+            0.0,
+            priority,
             submittedAtTick);
 
     public void Execute(SimulationContext context)
@@ -207,6 +241,10 @@ public sealed class PlayerLogisticsActionCommand : ISimulationCommand
 
             case PlayerLogisticsActionOperation.RequestResupply:
                 ExecuteRequestResupply(context);
+                break;
+
+            case PlayerLogisticsActionOperation.SetSupplyPriority:
+                ExecuteSetSupplyPriority(context);
                 break;
 
             default:
@@ -331,6 +369,42 @@ public sealed class PlayerLogisticsActionCommand : ISimulationCommand
             context.Entities.AddComponent(
                 Target,
                 policy);
+        }
+
+        Accepted = true;
+    }
+
+    private void ExecuteSetSupplyPriority(
+        SimulationContext context)
+    {
+        if (!ValidateOwnedTarget(context, Target))
+        {
+            return;
+        }
+
+        if (!context.Entities.HasComponent<UnitFuelState>(Target) &&
+            !context.Entities.HasComponent<AmmunitionState>(Target))
+        {
+            FailureReason =
+                PlayerLogisticsActionFailureReason.UnsupportedTarget;
+            return;
+        }
+
+        var priority =
+            new UnitSupplyPriority(
+                SupplyPriority);
+
+        if (context.Entities.HasComponent<UnitSupplyPriority>(Target))
+        {
+            context.Entities.SetComponent(
+                Target,
+                priority);
+        }
+        else
+        {
+            context.Entities.AddComponent(
+                Target,
+                priority);
         }
 
         Accepted = true;
