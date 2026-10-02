@@ -319,13 +319,26 @@ public sealed class SkirmishOpponentTests
         WorldTransform coreTransform =
             scenario.Simulation.Entities.GetComponent<WorldTransform>(
                 scenario.West.CommandCore);
-        scenario.Simulation.Entities.AddComponent(
-            unit,
+        var recovery =
             new RetreatRecoveryState(
                 scenario.West.CommandCore,
                 RetreatRecoveryReason.RepairAndSupply,
                 coreTransform.Position,
-                scenario.Simulation.CurrentTick));
+                scenario.Simulation.CurrentTick);
+
+        if (scenario.Simulation.Entities.HasComponent<RetreatRecoveryState>(
+                unit))
+        {
+            scenario.Simulation.Entities.SetComponent(
+                unit,
+                recovery);
+        }
+        else
+        {
+            scenario.Simulation.Entities.AddComponent(
+                unit,
+                recovery);
+        }
 
         scenario.Simulation.AdvanceOneTick();
 
