@@ -597,7 +597,7 @@ public sealed class PlayerTacticalActionCommand : ISimulationCommand
         }
 
         if (!RetreatRecoveryPlanner.TryResolve(
-                context,
+                context.Entities,
                 Issuer,
                 owned,
                 out EntityId provider,
