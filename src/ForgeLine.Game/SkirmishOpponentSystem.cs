@@ -1243,6 +1243,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         ReleaseSupplyEscortMovementForRecovery(
             context,
+            controller,
             owned);
 
         if (retreatUnits.Count > 0)
@@ -1743,6 +1744,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private static void ReleaseSupplyEscortMovementForRecovery(
         SimulationContext context,
+        SkirmishOpponentController controller,
         OwnedState owned)
     {
         for (int index = 0; index < owned.Units.Count; index++)
@@ -1751,7 +1753,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
             if (!context.Entities.TryGetComponent(
                     candidate,
-                    out SupplyTruck _) ||
+                    out SupplyTruck truck) ||
                 context.Entities.HasComponent<ResupplyOrder>(
                     candidate) ||
                 context.Entities.HasComponent<SupplyRescueAssignment>(
@@ -1760,6 +1762,16 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     context,
                     candidate,
                     out _))
+            {
+                continue;
+            }
+
+            if (HasSupplyLoadingMovement(
+                    context,
+                    candidate,
+                    controller,
+                    owned,
+                    truck))
             {
                 continue;
             }
