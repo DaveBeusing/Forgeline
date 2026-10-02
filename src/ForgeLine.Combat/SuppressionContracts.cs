@@ -81,7 +81,12 @@ public readonly record struct SuppressionProfile
                 : SuppressionLevel.Normal;
 
     public static SuppressionProfile InfantryDefault =>
-        new();
+        new(
+            suppressedThreshold: 0.35,
+            pinnedThreshold: 0.75,
+            decayPerSecond: 0.12,
+            impactScale: 3.0,
+            suppressedSpeedScale: 0.55f);
 }
 
 public readonly record struct SuppressionState(
