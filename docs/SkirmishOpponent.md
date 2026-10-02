@@ -38,6 +38,8 @@ The layer boundary is diagnostic and organizational. Economy, construction, prod
 
 Operational offensive movement is intentionally stable across decision cadences. Units already following the current Attack or AttackMove objective keep their existing combat/movement group; only newly eligible or previously diverted units receive reinforcement commands. Unit behavior may replace that objective to engage a currently identified target inside its configured engagement leash, but a distant detected/identified contact cannot replace an active Strategic/Operational AttackMove or Retreat objective. This prevents readiness/resupply churn from repeatedly rebuilding long-range formation routes while preserving legitimate local tactical reactions.
 
+Forward logistics preserves the same responsibility boundary. A loaded Supply Truck actively following the reconnaissance Scout is reserved for that reconnaissance movement while the Scout keeps its AttackMove objective. Offensive admission must therefore find another field-ready Supply Truck, and offensive support selection cannot retarget the reconnaissance escort. The reservation is derived from existing movement and supply state rather than a second logistics authority.
+
 ## Strategic State
 
 Each controller stores simulation-owned strategic state:
