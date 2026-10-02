@@ -297,6 +297,10 @@ public sealed class PlayerActionReadModelTests
 
         EntityId engineer =
             scenario.West.StartingUnits[0];
+        scenario.Simulation.Entities.SetComponent(
+            engineer,
+            new UnitSupplyPriority(
+                BattlefieldSupplyPriority.Critical));
         interaction.SetSelection([engineer]);
         scenario.Simulation.AdvanceOneTick();
         Assert.True(
@@ -306,6 +310,9 @@ public sealed class PlayerActionReadModelTests
             Assert.IsType<PlayerSupplyActionReadModel>(
                 snapshot.PlayerActions?.Supply);
         Assert.Equal(engineer, supply.Entity);
+        Assert.Equal(
+            BattlefieldSupplyPriority.Critical,
+            supply.Priority);
         Assert.InRange(
             supply.FuelFraction,
             0.0,
