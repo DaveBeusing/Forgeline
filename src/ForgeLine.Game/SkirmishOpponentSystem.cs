@@ -3772,6 +3772,16 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
+            if (EnsureReconnaissanceRecoveryProduction(
+                    context,
+                    owned,
+                    facilityEntity,
+                    facility,
+                    configuration))
+            {
+                continue;
+            }
+
             int queued =
                 owned.PendingRequestsPerFacility.TryGetValue(
                     facilityEntity,
@@ -3975,6 +3985,171 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         // A missing core logistics vehicle owns this facility's next available
         // production slot. Normal combat expansion resumes after the target is
         // restored; no resources are granted or consumed by this decision.
+        return true;
+    }
+
+    private static bool EnsureReconnaissanceRecoveryProduction(
+        SimulationContext context,
+        OwnedState owned,
+        EntityId facilityEntity,
+        in UnitProductionFacility facility,
+        SkirmishOpponentConfiguration configuration)
+    {
+        if (!facility.Supports(
+                UnitProductionCapability.Vehicle))
+        {
+            return false;
+        }
+
+        int scoutCount =
+            GetUnitCount(
+                owned,
+                UnitIds.ScoutVehicle);
+        int pendingScouts =
+            GetPendingUnitCount(
+                owned,
+                UnitIds.ScoutVehicle);
+
+        if (scoutCount + pendingScouts >= 1)
+        {
+            return false;
+        }
+
+        EntityId activeRequest =
+            facility.ActiveRequest;
+        bool scoutQueued = false;
+        int liveRequests = 0;
+        EntityId replaceablePending =
+            EntityId.Invalid;
+        UnitProductionRequest replaceableRequest =
+            default;
+
+        foreach (EntityId requestEntity in
+                 context.Entities.Query<UnitProductionRequest>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            UnitProductionRequest request =
+                context.Entities.GetComponent<UnitProductionRequest>(
+                    requestEntity);
+
+            if (request.Facility !=
+                    facilityEntity ||
+                context.Entities.HasComponent<
+                    UnitProductionCancellationRequest>(
+                        requestEntity))
+            {
+                continue;
+            }
+
+            liveRequests++;
+
+            if (request.UnitId ==
+                UnitIds.ScoutVehicle)
+            {
+                scoutQueued = true;
+
+                if (request.Priority.CompareTo(
+                        ProductionPriority.High) > 0)
+                {
+                    var priorityCommand =
+                        PlayerUnitProductionActionCommand.SetPriority(
+                            facility.Owner,
+                            requestEntity,
+                            ProductionPriority.High,
+                            context.Tick);
+                    priorityCommand.Execute(context);
+                }
+
+                continue;
+            }
+
+            if (requestEntity ==
+                    activeRequest ||
+                request.Priority.CompareTo(
+                    ProductionPriority.High) <= 0)
+            {
+                continue;
+            }
+
+            if (!replaceablePending.IsValid ||
+                request.SubmittedAtTick.CompareTo(
+                    replaceableRequest.SubmittedAtTick) > 0 ||
+                (request.SubmittedAtTick.CompareTo(
+                     replaceableRequest.SubmittedAtTick) == 0 &&
+                 requestEntity >
+                    replaceablePending))
+            {
+                replaceablePending =
+                    requestEntity;
+                replaceableRequest =
+                    request;
+            }
+        }
+
+        UnitProductionRequest active =
+            default;
+        bool activeBlocksScout =
+            activeRequest.IsValid &&
+            facility.ActiveUnit !=
+                UnitIds.ScoutVehicle &&
+            facility.Status ==
+                UnitProductionStatus.NoInput &&
+            context.Entities.TryGetComponent(
+                activeRequest,
+                out active) &&
+            active.Priority.CompareTo(
+                ProductionPriority.High) > 0 &&
+            !context.Entities.HasComponent<
+                UnitProductionCancellationRequest>(
+                    activeRequest);
+
+        if (activeBlocksScout &&
+            CancelUnitProduction(
+                context,
+                owned,
+                facilityEntity,
+                facility.Owner,
+                activeRequest,
+                active))
+        {
+            liveRequests =
+                Math.Max(
+                    0,
+                    liveRequests - 1);
+        }
+
+        if (!scoutQueued &&
+            liveRequests >=
+                configuration.MaximumQueuedUnitsPerFacility &&
+            replaceablePending.IsValid &&
+            CancelUnitProduction(
+                context,
+                owned,
+                facilityEntity,
+                facility.Owner,
+                replaceablePending,
+                replaceableRequest))
+        {
+            liveRequests =
+                Math.Max(
+                    0,
+                    liveRequests - 1);
+        }
+
+        if (!scoutQueued &&
+            liveRequests <
+                configuration.MaximumQueuedUnitsPerFacility)
+        {
+            QueueUnitProduction(
+                context,
+                owned,
+                facilityEntity,
+                facility.Owner,
+                UnitIds.ScoutVehicle,
+                ProductionPriority.High,
+                liveRequests);
+        }
+
         return true;
     }
 
