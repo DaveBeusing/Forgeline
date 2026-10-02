@@ -1653,14 +1653,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         objective,
                         identifiedTarget))
                 {
-                    var attack =
+                    var pressureAttack =
                         new AttackCommand(
                             controller.Player,
                             pressureUnits,
                             identifiedTarget,
                             context.Tick,
                             configuration.ObjectivePressureLeashMeters);
-                    attack.Execute(context);
+                    pressureAttack.Execute(context);
                 }
 
                 if (approachUnits.Length > 0)
