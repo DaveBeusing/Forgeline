@@ -53,6 +53,8 @@ public sealed record SkirmishOpponentConfiguration
 
     public int MaximumAttackUnits { get; init; } = 12;
 
+    public int MinimumObjectivePressureUnits { get; init; } = 1;
+
     public int MaximumQueuedUnitsPerFacility { get; init; } = 2;
 
     public int MinimumCargoTrucks { get; init; } = 2;
@@ -104,6 +106,17 @@ public sealed record SkirmishOpponentConfiguration
         ArgumentOutOfRangeException.ThrowIfLessThan(
             MaximumAttackUnits,
             MinimumAttackUnits);
+        ArgumentOutOfRangeException.ThrowIfLessThan(
+            MinimumObjectivePressureUnits,
+            1);
+
+        if (MinimumObjectivePressureUnits >
+            MaximumAttackUnits)
+        {
+            throw new InvalidOperationException(
+                "Objective-pressure unit minimum cannot exceed the maximum attack force.");
+        }
+
         ArgumentOutOfRangeException.ThrowIfLessThan(
             MaximumQueuedUnitsPerFacility,
             1);
