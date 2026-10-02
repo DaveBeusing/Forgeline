@@ -3010,6 +3010,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             {
                 QueueDesiredStock(
                     context,
+                    owned.Player,
                     entity,
                     RecipeIds.Steel,
                     ResourceIds.Steel,
@@ -3020,6 +3021,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             {
                 QueueDesiredStock(
                     context,
+                    owned.Player,
                     entity,
                     RecipeIds.Fuel,
                     ResourceIds.Fuel,
@@ -3030,6 +3032,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             {
                 QueueDesiredStock(
                     context,
+                    owned.Player,
                     entity,
                     RecipeIds.Electronics,
                     ResourceIds.Electronics,
@@ -3040,6 +3043,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             {
                 QueueDesiredStock(
                     context,
+                    owned.Player,
                     entity,
                     RecipeIds.Ammunition,
                     ResourceIds.Ammunition,
@@ -3077,13 +3081,15 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private static void QueueDesiredStock(
         SimulationContext context,
+        PlayerId owner,
         EntityId facility,
         RecipeId recipe,
         ResourceId output,
         double desiredStock)
     {
         var command =
-            new QueueProductionCommand(
+            PlayerProductionActionCommand.Queue(
+                owner,
                 facility,
                 recipe,
                 context.Tick,
@@ -3248,7 +3254,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         ProductionPriority.High) > 0)
                 {
                     var priorityCommand =
-                        new SetUnitProductionRequestPriorityCommand(
+                        PlayerUnitProductionActionCommand.SetPriority(
                             facility.Owner,
                             requestEntity,
                             ProductionPriority.High,
@@ -3412,7 +3418,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         in UnitProductionRequest request)
     {
         var command =
-            new CancelUnitProductionRequestCommand(
+            PlayerUnitProductionActionCommand.Cancel(
                 owner,
                 requestEntity,
                 context.Tick);
@@ -3458,7 +3464,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         int queued)
     {
         var command =
-            new QueueUnitProductionCommand(
+            PlayerUnitProductionActionCommand.Queue(
                 owner,
                 facilityEntity,
                 candidate,
