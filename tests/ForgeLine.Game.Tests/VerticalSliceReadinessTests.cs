@@ -7,6 +7,28 @@ namespace ForgeLine.Game.Tests;
 public sealed class VerticalSliceReadinessTests
 {
     [Fact]
+    public void HeadlessRuntimeUsesTwoComputerControlledParticipants()
+    {
+        VerticalSliceRuntimeSettings runtime =
+            VerticalSliceRuntimeSettings.CreateHeadless(
+                VerticalSliceScenarioProfile.Validation,
+                seed: 2026);
+
+        Assert.Equal(2, runtime.Participants.Count);
+        Assert.All(
+            runtime.Participants,
+            static participant =>
+                Assert.True(
+                    participant.IsComputerControlled));
+        Assert.NotEqual(
+            runtime.Participants[0].Player,
+            runtime.Participants[1].Player);
+        Assert.NotEqual(
+            runtime.Participants[0].StartIndex,
+            runtime.Participants[1].StartIndex);
+    }
+
+    [Fact]
     public void ValidationProfileDoesNotReplaceGameplayDefaults()
     {
         VerticalSliceScenarioSettings gameplay =
