@@ -454,6 +454,49 @@ public sealed class SkirmishOpponentTests
     }
 
     [Fact]
+    public void EastOffensiveObjectiveAdvancesIntoOpponentHalf()
+    {
+        SkirmishScenarioHarness scenario =
+            SkirmishScenarioHarness.Create(
+                seed: 2026);
+        scenario.Opponents.DebugCaptureEnabled =
+            true;
+
+        bool reachedAttack =
+            scenario.RunUntil(
+                current =>
+                    current.GetOpponentState(
+                        current.East.Player).ActiveGoal ==
+                    SkirmishStrategicGoal.AttackObjective &&
+                    current.Opponents.DebugSnapshot.Any(
+                        snapshot =>
+                            snapshot.Player ==
+                                current.East.Player &&
+                            snapshot.HasChosenObjective),
+                maximumTicks: 40_000,
+                TestContext.Current.CancellationToken);
+
+        Assert.True(
+            reachedAttack,
+            DescribeScenario(scenario));
+
+        SkirmishOpponentDebugReadModel decision =
+            Assert.Single(
+                scenario.Opponents.DebugSnapshot.Where(
+                    snapshot =>
+                        snapshot.Player ==
+                        scenario.East.Player));
+
+        float center =
+            scenario.Battlefield.Metadata.WidthMeters *
+            0.5f;
+
+        Assert.True(
+            decision.ChosenObjective.X <= center,
+            $"East offensive objective remained on its own half: objective={decision.ChosenObjective}; center={center:F1}.");
+    }
+
+    [Fact]
     public void BoundedHeadlessSkirmishProgressesThroughStrategicLoop()
     {
         SkirmishScenarioHarness scenario =
