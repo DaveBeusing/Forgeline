@@ -313,6 +313,26 @@ public enum SkirmishRetreatReason : byte
     RepairAndSupply = 6
 }
 
+public enum SkirmishOffensiveAdmissionReason : byte
+{
+    Ready = 0,
+    InsufficientCombatUnits = 1,
+    InsufficientReadyUnits = 2,
+    InsufficientObjectivePressure = 3,
+    MissingForwardSupply = 4
+}
+
+public readonly record struct SkirmishOffensiveAdmissionReadModel(
+    SkirmishOffensiveAdmissionReason Reason,
+    int CombatUnitCount,
+    int EligibleAttackerCount,
+    int ObjectivePressureUnitCount,
+    bool ForwardSupplyReady)
+{
+    public bool IsReady =>
+        Reason == SkirmishOffensiveAdmissionReason.Ready;
+}
+
 public readonly record struct SkirmishGroupObjectiveReadModel(
     EntityId Group,
     CombatOrderKind Order,
@@ -345,4 +365,6 @@ public readonly record struct SkirmishOpponentDebugReadModel(
     SkirmishSupplyRequirement SupplyRequirement =
         SkirmishSupplyRequirement.None,
     SkirmishRetreatReason RetreatReason =
-        SkirmishRetreatReason.None);
+        SkirmishRetreatReason.None,
+    SkirmishOffensiveAdmissionReadModel OffensiveAdmission =
+        default);
