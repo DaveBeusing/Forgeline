@@ -237,6 +237,72 @@ public sealed class SkirmishSupplyPolicyTests
     }
 
     [Fact]
+    public void ReconnaissanceAdvanceSharesRouteWithPhysicalSupplyEscort()
+    {
+        using VerticalSliceScenario scenario =
+            VerticalSliceScenario.Create(
+                VerticalSliceScenarioSettings.Create(
+                    VerticalSliceScenarioProfile.Validation));
+        EntityRegistry entities =
+            scenario.Simulation.Entities;
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
+        WorldTransform core =
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+
+        EntityId scout =
+            scenario.UnitFactory.Create(
+                units[UnitIds.ScoutVehicle],
+                core.Position +
+                    new Vector3(30.0f, 0.0f, 0.0f),
+                scenario.West.Player);
+        EntityId supply =
+            scenario.UnitFactory.Create(
+                units[UnitIds.SupplyTruck],
+                core.Position +
+                    new Vector3(35.0f, 0.0f, 0.0f),
+                scenario.West.Player);
+        SupplyTruck supplyState =
+            entities.GetComponent<SupplyTruck>(
+                supply);
+
+        Assert.True(
+            scenario.Inventories.Add(
+                supplyState.InventoryId,
+                ResourceIds.Fuel,
+                supplyState.FuelTarget).Succeeded);
+        Assert.True(
+            scenario.Inventories.Add(
+                supplyState.InventoryId,
+                ResourceIds.Ammunition,
+                supplyState.AmmunitionTarget).Succeeded);
+
+        scenario.Simulation.RunTicks(
+            20,
+            TestContext.Current.CancellationToken);
+
+        Assert.True(
+            entities.TryGetComponent(
+                scout,
+                out CombatOrderState scoutOrder) &&
+            scoutOrder.Kind ==
+                CombatOrderKind.AttackMove);
+
+        MovementGroupMember scoutGroup =
+            entities.GetComponent<MovementGroupMember>(
+                scout);
+        MovementGroupMember supplyGroup =
+            entities.GetComponent<MovementGroupMember>(
+                supply);
+
+        Assert.Equal(
+            scoutGroup.Group,
+            supplyGroup.Group);
+        Assert.True(scoutGroup.Group.IsValid);
+    }
+
+    [Fact]
     public void PartiallyLoadedSupplyTruckReturnsForOffensiveReserve()
     {
         using VerticalSliceScenario scenario =
