@@ -1575,6 +1575,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         EntityId reconReserve =
             ResolveReconReserveScout(
                 owned);
+        bool reconnaissanceEstablished =
+            intelligence.Contacts.Any(
+                static contact =>
+                    contact.IsCurrent);
+        EntityId protectedReconScout =
+            reconnaissanceEstablished
+                ? EntityId.Invalid
+                : reconReserve;
 
         EntityId[] attackers =
             owned.CombatUnits
@@ -1631,7 +1639,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             !HasOperationalAttackSupplySupport(
                 context,
                 owned,
-                reconReserve))
+                protectedReconScout))
         {
             return false;
         }
@@ -1640,7 +1648,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             context,
             owned,
             attackers,
-            reconReserve);
+            protectedReconScout);
 
         IntelligenceContact? identified = null;
         EntityId identifiedTarget = EntityId.Invalid;
