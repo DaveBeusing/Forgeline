@@ -23,8 +23,17 @@ public sealed class SkirmishProductionPolicyTests
                 VerticalSliceScenarioSettings.Create(
                     VerticalSliceScenarioProfile.Validation));
         var resource = new ResourceId(checked((uint)resourceValue));
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
         UnitDefinition tank =
-            DirectorateContent.CreateUnitCatalog()[UnitIds.MainBattleTank];
+            units[UnitIds.MainBattleTank];
+        WorldTransform coreTransform =
+            scenario.Simulation.Entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+        scenario.UnitFactory.Create(
+            units[UnitIds.ScoutVehicle],
+            coreTransform.Position,
+            scenario.West.Player);
         InventoryId input = scenario.Inventories.CreateInventory(
             new InventorySpecification(4_000.0));
 
@@ -785,6 +794,31 @@ public sealed class SkirmishProductionPolicyTests
         {
             scenario.UnitFactory.Create(
                 supplyDefinition,
+                stagingPosition,
+                scenario.West.Player);
+        }
+
+        bool hasScout = false;
+        foreach (EntityId entity in
+                 entities.Query<ControllableEntity, UnitIdentity>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            if (entities.GetComponent<ControllableEntity>(
+                    entity).Owner ==
+                    scenario.West.Player &&
+                entities.GetComponent<UnitIdentity>(
+                    entity).UnitId ==
+                    UnitIds.ScoutVehicle)
+            {
+                hasScout = true;
+                break;
+            }
+        }
+
+        if (!hasScout)
+        {
+            scenario.UnitFactory.Create(
+                units[UnitIds.ScoutVehicle],
                 stagingPosition,
                 scenario.West.Player);
         }
