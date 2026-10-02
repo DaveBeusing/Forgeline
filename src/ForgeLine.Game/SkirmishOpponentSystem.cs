@@ -1571,7 +1571,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 .ToArray();
 
         if (attackers.Length <
-            configuration.MinimumAttackUnits)
+            configuration.MinimumAttackUnits ||
+            !HasOperationalAttackSupplySupport(
+                context,
+                owned))
         {
             return false;
         }
@@ -1812,6 +1815,69 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     candidate);
             }
         }
+    }
+
+    private bool HasOperationalAttackSupplySupport(
+        SimulationContext context,
+        OwnedState owned)
+    {
+        for (int index = 0;
+             index < owned.Units.Count;
+             index++)
+        {
+            EntityId candidate =
+                owned.Units[index];
+
+            if (!context.Entities.TryGetComponent(
+                    candidate,
+                    out SupplyTruck truck) ||
+                context.Entities.HasComponent<ResupplyOrder>(
+                    candidate) ||
+                context.Entities.HasComponent<SupplyRescueAssignment>(
+                    candidate))
+            {
+                continue;
+            }
+
+            double cargoFuel =
+                _inventories.GetAvailableQuantity(
+                    truck.InventoryId,
+                    ResourceIds.Fuel);
+            double cargoAmmunition =
+                _inventories.GetAvailableQuantity(
+                    truck.InventoryId,
+                    ResourceIds.Ammunition);
+
+            if (cargoFuel <
+                    truck.FuelTarget * 0.50 ||
+                cargoAmmunition <
+                    truck.AmmunitionTarget * 0.25)
+            {
+                continue;
+            }
+
+            if (context.Entities.TryGetComponent(
+                    candidate,
+                    out UnitFuelState movementFuel) &&
+                _inventories.Contains(
+                    movementFuel.InventoryId))
+            {
+                double propulsionFuel =
+                    _inventories.GetQuantity(
+                        movementFuel.InventoryId,
+                        ResourceIds.Fuel);
+
+                if (propulsionFuel <
+                    movementFuel.Capacity * 0.35)
+                {
+                    continue;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     private void MaintainAttackSupplySupport(
