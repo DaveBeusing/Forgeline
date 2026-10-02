@@ -5124,6 +5124,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 ResolveRetreatReason(
                     context,
                     owned,
+                    configuration),
+                ResolveOffensiveAdmission(
+                    context,
+                    owned,
+                    force,
                     configuration)));
     }
 
@@ -5286,6 +5291,104 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
 
         return requirement;
+    }
+
+    private SkirmishOffensiveAdmissionReadModel
+        ResolveOffensiveAdmission(
+            SimulationContext context,
+            OwnedState owned,
+            in SkirmishForceAssessment force,
+            SkirmishOpponentConfiguration configuration)
+    {
+        if (owned.CombatUnits.Count <
+            configuration.MinimumAttackUnits)
+        {
+            return new SkirmishOffensiveAdmissionReadModel(
+                SkirmishOffensiveAdmissionReason.InsufficientCombatUnits,
+                owned.CombatUnits.Count,
+                0,
+                0,
+                ForwardSupplyReady: false);
+        }
+
+        EntityId reconReserve =
+            ResolveReconReserveScout(
+                owned);
+        EntityId protectedReconScout =
+            force.CurrentHostileContacts > 0
+                ? EntityId.Invalid
+                : reconReserve;
+
+        int eligibleAttackers = 0;
+        int objectivePressureUnits = 0;
+
+        for (int index = 0;
+             index < owned.CombatUnits.Count;
+             index++)
+        {
+            EntityId unit =
+                owned.CombatUnits[index];
+
+            if (unit == reconReserve)
+            {
+                continue;
+            }
+
+            bool eligible = true;
+
+            if (context.Entities.TryGetComponent(
+                    unit,
+                    out UnitCombatReadiness readiness))
+            {
+                eligible =
+                    readiness.OverallReadiness >=
+                        configuration.OffensiveReadinessThreshold &&
+                    readiness.Fuel >=
+                        configuration.OffensiveFuelThreshold &&
+                    readiness.Ammunition >=
+                        configuration.ResupplyThreshold;
+            }
+
+            if (!eligible)
+            {
+                continue;
+            }
+
+            eligibleAttackers++;
+
+            if (owned.UnitByEntity.TryGetValue(
+                    unit,
+                    out UnitId unitId) &&
+                unitId ==
+                    UnitIds.MainBattleTank)
+            {
+                objectivePressureUnits++;
+            }
+        }
+
+        bool supplyReady =
+            HasOperationalAttackSupplySupport(
+                context,
+                owned,
+                protectedReconScout);
+
+        SkirmishOffensiveAdmissionReason reason =
+            eligibleAttackers <
+                configuration.MinimumAttackUnits
+                ? SkirmishOffensiveAdmissionReason.InsufficientReadyUnits
+                : objectivePressureUnits <
+                    configuration.MinimumObjectivePressureUnits
+                    ? SkirmishOffensiveAdmissionReason.InsufficientObjectivePressure
+                    : !supplyReady
+                        ? SkirmishOffensiveAdmissionReason.MissingForwardSupply
+                        : SkirmishOffensiveAdmissionReason.Ready;
+
+        return new SkirmishOffensiveAdmissionReadModel(
+            reason,
+            owned.CombatUnits.Count,
+            eligibleAttackers,
+            objectivePressureUnits,
+            supplyReady);
     }
 
     private static SkirmishRetreatReason ResolveRetreatReason(
