@@ -2985,6 +2985,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             UnitProductionFacility facility =
                 context.Entities.GetComponent<UnitProductionFacility>(
                     entity);
+            UnitId plannedUnit =
+                ResolveUnitProductionPlanningUnit(
+                    owned,
+                    facility,
+                    configuration);
             const LogisticsStockPriority priority =
                 LogisticsStockPriority.Critical;
 
@@ -2992,6 +2997,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 context,
                 entity,
                 facility,
+                plannedUnit,
                 ResourceIds.Steel,
                 80.0,
                 240.0,
@@ -3001,6 +3007,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 context,
                 entity,
                 facility,
+                plannedUnit,
                 ResourceIds.Electronics,
                 30.0,
                 80.0,
@@ -3030,6 +3037,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 context,
                 entity,
                 facility,
+                plannedUnit,
                 ResourceIds.Fuel,
                 cargoFleetRecovery
                     ? 240.0
@@ -3045,6 +3053,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 context,
                 entity,
                 facility,
+                plannedUnit,
                 ResourceIds.Ammunition,
                 50.0,
                 120.0,
@@ -3084,6 +3093,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         SimulationContext context,
         EntityId entity,
         in UnitProductionFacility facility,
+        UnitId plannedUnit,
         ResourceId resource,
         double minimum,
         double target,
@@ -3092,16 +3102,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     {
         // A fixed refill threshold can leave stock above the minimum but below
         // the next unit's cost, permanently blocking an otherwise supplied factory.
-        if (_units.TryGet(facility.ActiveUnit, out UnitDefinition? unit))
-        {
-            foreach (UnitResourceCost cost in unit.Costs)
-            {
-                if (cost.ResourceId == resource)
-                {
-                    minimum = Math.Max(minimum, cost.Quantity);
-                }
-            }
-        }
+        ApplyUnitCostMinimum(
+            facility.ActiveUnit,
+            resource,
+            ref minimum);
+        ApplyUnitCostMinimum(
+            plannedUnit,
+            resource,
+            ref minimum);
 
         target = Math.Max(target, minimum);
         maximum = Math.Max(maximum, target);
@@ -3114,6 +3122,64 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             target,
             maximum,
             priority);
+    }
+
+    private UnitId ResolveUnitProductionPlanningUnit(
+        OwnedState owned,
+        in UnitProductionFacility facility,
+        SkirmishOpponentConfiguration configuration)
+    {
+        if (facility.ActiveUnit.IsSpecified)
+        {
+            return facility.ActiveUnit;
+        }
+
+        UnitId critical =
+            SelectCriticalLogisticsProductionGoal(
+                owned,
+                facility,
+                configuration);
+
+        if (critical.IsSpecified)
+        {
+            return critical;
+        }
+
+        return SelectUnitProductionGoal(
+            owned,
+            facility,
+            configuration);
+    }
+
+    private void ApplyUnitCostMinimum(
+        UnitId unitId,
+        ResourceId resource,
+        ref double minimum)
+    {
+        if (!_units.TryGet(
+                unitId,
+                out UnitDefinition? unit))
+        {
+            return;
+        }
+
+        for (int index = 0;
+             index < unit.Costs.Count;
+             index++)
+        {
+            UnitResourceCost cost =
+                unit.Costs[index];
+
+            if (cost.ResourceId ==
+                resource)
+            {
+                minimum =
+                    Math.Max(
+                        minimum,
+                        cost.Quantity);
+                return;
+            }
+        }
     }
 
     private static void SetStockPolicy(
