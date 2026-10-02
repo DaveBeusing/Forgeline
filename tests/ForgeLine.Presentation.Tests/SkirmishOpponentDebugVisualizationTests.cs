@@ -58,7 +58,7 @@ public sealed class SkirmishOpponentDebugVisualizationTests
                 GroupObjective:
                     new SkirmishGroupObjectiveReadModel(
                         new ForgeLine.Core.EntityId(3, 1),
-                        ForgeLine.Combat.CombatOrderKind.AttackMove,
+                        CombatOrderKind.AttackMove,
                         new Vector3(480.0f, 0.0f, 1_520.0f),
                         HasDestination: true,
                         ForgeLine.Core.EntityId.Invalid,
