@@ -145,28 +145,34 @@ public sealed class SkirmishProgressionDiagnostics : ISimulationSystem
         int activeResupply = 0;
 
         EntityId reconReserve =
-            context.Entities
-                .Query<ControllableEntity, UnitIdentity>(
-                    QueryIterationOrder.StableByEntityIndex)
-                .Where(
-                    entity =>
-                        context.Entities
-                            .GetComponent<ControllableEntity>(
-                                entity)
-                            .Owner == owner &&
-                        context.Entities
-                            .GetComponent<UnitIdentity>(
-                                entity)
-                            .UnitId ==
-                            UnitIds.ScoutVehicle &&
-                        context.Entities.HasComponent<Combatant>(
-                            entity) &&
-                        context.Entities.HasComponent<HealthState>(
-                            entity))
-                .OrderBy(
-                    static entity =>
-                        entity)
-                .FirstOrDefault();
+            EntityId.Invalid;
+
+        foreach (EntityId candidate in
+                 context.Entities.Query<
+                     ControllableEntity,
+                     UnitIdentity>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            if (context.Entities
+                    .GetComponent<ControllableEntity>(
+                        candidate)
+                    .Owner != owner ||
+                context.Entities
+                    .GetComponent<UnitIdentity>(
+                        candidate)
+                    .UnitId !=
+                    UnitIds.ScoutVehicle ||
+                !context.Entities.HasComponent<Combatant>(
+                    candidate) ||
+                !context.Entities.HasComponent<HealthState>(
+                    candidate))
+            {
+                continue;
+            }
+
+            reconReserve = candidate;
+            break;
+        }
 
         foreach (EntityId entity in context.Entities.Query<ControllableEntity, UnitIdentity>(
                      QueryIterationOrder.StableByEntityIndex))
