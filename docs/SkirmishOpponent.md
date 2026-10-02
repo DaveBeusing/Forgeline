@@ -32,7 +32,7 @@ The full-match opponent preserves four responsibilities without creating paralle
 - **Strategic** chooses the current long-horizon goal: stabilize economy, establish infrastructure, expand, scout, defend, recover, prepare an offensive, or pressure the match objective.
 - **Operational** translates that goal into a public-map objective and force-level task such as an expansion site, defensive response, recovery location, reconnaissance route, or offensive pressure point.
 - **Tactical** uses normal combat groups, formations, Attack/AttackMove/Retreat, artillery, and supply-support commands against only legitimate intelligence.
-- **Unit behavior** remains the bounded per-unit tactical behavior already owned by the fixed-tick combat systems.
+- **Unit behavior** remains bounded per-unit tactical decision logic, but Attack, AttackMove, Retreat, and Hold requests are emitted through the same ownership-validated tactical simulation commands as higher-level control rather than writing combat intent directly.
 
 The layer boundary is diagnostic and organizational. Economy, construction, production, logistics, movement, intelligence, combat, supply, and match lifecycle remain owned by their existing simulation systems.
 
