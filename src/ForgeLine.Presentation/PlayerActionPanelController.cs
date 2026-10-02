@@ -34,7 +34,6 @@ public readonly record struct PlayerActionPanelView(
     ProductionRequestMode ProductionMode,
     double DesiredStockQuantity,
     LogisticsStockPriority LogisticsPriority,
-    BattlefieldSupplyPriority SupplyPriority,
     PlayerStockThresholdField StockThresholdField,
     double StockMinimum,
     double StockTarget,
@@ -44,7 +43,9 @@ public readonly record struct PlayerActionPanelView(
     double AutomaticAmmunitionThreshold,
     bool PointerCaptured,
     float OriginX,
-    float OriginY)
+    float OriginY,
+    BattlefieldSupplyPriority SupplyPriority =
+        BattlefieldSupplyPriority.Normal)
 {
     public bool IsOpen =>
         Mode != PlayerActionPanelMode.Closed;
@@ -388,7 +389,6 @@ public sealed class PlayerActionPanelController
             ProductionMode,
             ResolveDesiredStockQuantity(actions),
             LogisticsPriority,
-            _supplyPriority,
             StockThresholdField,
             _stockMinimum,
             _stockTarget,
@@ -404,7 +404,8 @@ public sealed class PlayerActionPanelController
                 PanelTop,
                 MathF.Max(
                     12.0f,
-                    viewportHeight * 0.12f)));
+                    viewportHeight * 0.12f)),
+            _supplyPriority);
 
     public bool TryTakeRequest(
         out PlayerActionRequest request)
