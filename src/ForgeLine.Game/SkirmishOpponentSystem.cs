@@ -1569,39 +1569,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
-        bool supplySupportReady =
-            EnsureAttackSupplySupport(
-                context,
-                owned,
-                attackers);
-
-        if (!supplySupportReady)
-        {
-            bool alreadyHolding =
-                attackers.All(
-                    unit =>
-                        context.Entities.TryGetComponent(
-                            unit,
-                            out CombatOrderState order) &&
-                        order.Kind ==
-                            CombatOrderKind.HoldPosition);
-
-            if (!alreadyHolding)
-            {
-                var hold =
-                    new HoldPositionCommand(
-                        controller.Player,
-                        attackers,
-                        context.Tick);
-                hold.Execute(context);
-            }
-
-            objective =
-                ResolveAttackForceCentroid(
-                    context,
-                    attackers);
-            return true;
-        }
+        MaintainAttackSupplySupport(
+            context,
+            owned,
+            attackers);
 
         IntelligenceContact? identified = null;
         EntityId identifiedTarget = EntityId.Invalid;
@@ -1813,14 +1784,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
     }
 
-    private bool EnsureAttackSupplySupport(
+    private void MaintainAttackSupplySupport(
         SimulationContext context,
         OwnedState owned,
         EntityId[] attackers)
     {
         if (attackers.Length == 0)
         {
-            return true;
+            return;
         }
 
         Vector3 centroid = Vector3.Zero;
@@ -1841,7 +1812,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         if (positionedAttackers == 0)
         {
-            return true;
+            return;
         }
 
         centroid /= positionedAttackers;
@@ -1916,7 +1887,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         if (!selected.IsValid)
         {
-            return true;
+            return;
         }
 
         const float holdRadiusMeters = 12.0f;
@@ -1929,7 +1900,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             TacticalCommandUtilities.ClearMovementIntent(
                 context,
                 selected);
-            return true;
+            return;
         }
 
         if (!TacticalCommandUtilities.TryGetMovementIntent(
@@ -1951,9 +1922,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             command.Execute(context);
         }
 
-        return selectedDistanceSquared <=
-            supportCohesionRadiusMeters *
-            supportCohesionRadiusMeters;
+        _ = supportCohesionRadiusMeters;
     }
 
     private static Vector3 ResolveAttackForceCentroid(
