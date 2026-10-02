@@ -232,6 +232,7 @@ The battle uses the same fixed-tick systems as headless tests. Rendering/input d
 Automated tests cover:
 
 - explicit Attack with current intelligence;
+- continued pursuit when terrain blocks direct fire inside nominal weapon range;
 - pursuit inside and rejection outside the leash;
 - AttackMove engagement pause and resume after visibility loss;
 - Hold Position without pursuit;
