@@ -219,6 +219,8 @@ public readonly record struct SkirmishOpponentState(
     int ScoutSiteCursor,
     int DecisionsTaken)
 {
+    public bool DeepOffensiveCommitted { get; init; }
+
     public static SkirmishOpponentState Initial =>
         new(
             SkirmishStrategicState.Bootstrap,
