@@ -180,6 +180,109 @@ public readonly record struct UnitProductionRequest
 
 public readonly record struct UnitProductionCancellationRequest;
 
+public readonly record struct UnitProductionRallyPoint
+{
+    public UnitProductionRallyPoint(
+        Vector3 worldPosition,
+        SimulationTick updatedAtTick)
+    {
+        if (!float.IsFinite(worldPosition.X) ||
+            !float.IsFinite(worldPosition.Y) ||
+            !float.IsFinite(worldPosition.Z))
+        {
+            throw new ArgumentOutOfRangeException(nameof(worldPosition));
+        }
+
+        WorldPosition = worldPosition;
+        UpdatedAtTick = updatedAtTick;
+    }
+
+    public Vector3 WorldPosition { get; }
+
+    public SimulationTick UpdatedAtTick { get; }
+}
+
+public sealed class SetUnitProductionRallyPointCommand : ISimulationCommand
+{
+    public SetUnitProductionRallyPointCommand(
+        PlayerId issuer,
+        EntityId facility,
+        Vector3 worldPosition,
+        SimulationTick submittedAtTick)
+    {
+        if (!issuer.IsSpecified)
+        {
+            throw new ArgumentOutOfRangeException(nameof(issuer));
+        }
+
+        if (!facility.IsValid)
+        {
+            throw new ArgumentOutOfRangeException(nameof(facility));
+        }
+
+        if (!float.IsFinite(worldPosition.X) ||
+            !float.IsFinite(worldPosition.Y) ||
+            !float.IsFinite(worldPosition.Z))
+        {
+            throw new ArgumentOutOfRangeException(nameof(worldPosition));
+        }
+
+        Issuer = issuer;
+        Facility = facility;
+        WorldPosition = worldPosition;
+        SubmittedAtTick = submittedAtTick;
+    }
+
+    public PlayerId Issuer { get; }
+
+    public EntityId Facility { get; }
+
+    public Vector3 WorldPosition { get; }
+
+    public SimulationTick SubmittedAtTick { get; }
+
+    public bool Accepted { get; private set; }
+
+    public SimulationTick ExecutedAtTick { get; private set; }
+
+    public void Execute(SimulationContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        ExecutedAtTick = context.Tick;
+
+        if (!context.Entities.TryGetComponent(
+                Facility,
+                out UnitProductionFacility facility) ||
+            facility.Owner != Issuer)
+        {
+            Accepted = false;
+            return;
+        }
+
+        var rallyPoint =
+            new UnitProductionRallyPoint(
+                WorldPosition,
+                context.Tick);
+
+        if (context.Entities.HasComponent<UnitProductionRallyPoint>(
+                Facility))
+        {
+            context.Entities.SetComponent(
+                Facility,
+                rallyPoint);
+        }
+        else
+        {
+            context.Entities.AddComponent(
+                Facility,
+                rallyPoint);
+        }
+
+        Accepted = true;
+    }
+}
+
 public sealed class QueueUnitProductionCommand : ISimulationCommand
 {
     public QueueUnitProductionCommand(
@@ -334,4 +437,7 @@ public readonly record struct UnitProductionFacilityReadModel(
     UnitProductionBlockReason BlockReason,
     double Progress,
     PowerOperationalState PowerState,
-    ulong CompletedUnits);
+    ulong CompletedUnits)
+{
+    public Vector3? RallyPoint { get; init; }
+}
