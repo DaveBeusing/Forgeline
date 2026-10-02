@@ -29,6 +29,7 @@ public sealed class RepairRecoverySystem : ISimulationSystem
 {
     private readonly InventoryStore _inventories;
     private readonly List<EntityId> _providers = new();
+    private readonly List<EntityId> _damagedCandidates = new();
     private readonly List<RepairRecoveryDebugEntry> _debugEntries = new();
     private double _totalHealthRestored;
     private double _totalResourceConsumed;
@@ -64,12 +65,24 @@ public sealed class RepairRecoverySystem : ISimulationSystem
         double resourceConsumed = 0.0;
 
         _debugEntries.Clear();
+        _damagedCandidates.Clear();
 
         foreach (EntityId entity in
                  context.Entities.Query<HealthState>(
                      QueryIterationOrder.StableByEntityIndex))
         {
-            if (!context.Entities.TryGetComponent(
+            _damagedCandidates.Add(entity);
+        }
+
+        for (int candidateIndex = 0;
+             candidateIndex < _damagedCandidates.Count;
+             candidateIndex++)
+        {
+            EntityId entity =
+                _damagedCandidates[candidateIndex];
+
+            if (!context.Entities.IsAlive(entity) ||
+                !context.Entities.TryGetComponent(
                     entity,
                     out WorldTransform transform) ||
                 !context.Entities.TryGetComponent(
