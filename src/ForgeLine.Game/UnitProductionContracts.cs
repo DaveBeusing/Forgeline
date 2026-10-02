@@ -360,6 +360,77 @@ public sealed class QueueUnitProductionCommand : ISimulationCommand
     }
 }
 
+public sealed class SetUnitProductionRequestPriorityCommand : ISimulationCommand
+{
+    public SetUnitProductionRequestPriorityCommand(
+        PlayerId issuer,
+        EntityId requestEntity,
+        ProductionPriority priority,
+        SimulationTick submittedAtTick)
+    {
+        if (!issuer.IsSpecified)
+        {
+            throw new ArgumentOutOfRangeException(nameof(issuer));
+        }
+
+        if (!requestEntity.IsValid)
+        {
+            throw new ArgumentOutOfRangeException(nameof(requestEntity));
+        }
+
+        if (!Enum.IsDefined(priority))
+        {
+            throw new ArgumentOutOfRangeException(nameof(priority));
+        }
+
+        Issuer = issuer;
+        RequestEntity = requestEntity;
+        Priority = priority;
+        SubmittedAtTick = submittedAtTick;
+    }
+
+    public PlayerId Issuer { get; }
+
+    public EntityId RequestEntity { get; }
+
+    public ProductionPriority Priority { get; }
+
+    public SimulationTick SubmittedAtTick { get; }
+
+    public bool Accepted { get; private set; }
+
+    public SimulationTick ExecutedAtTick { get; private set; }
+
+    public void Execute(SimulationContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ExecutedAtTick = context.Tick;
+
+        if (!context.Entities.TryGetComponent(
+                RequestEntity,
+                out UnitProductionRequest request) ||
+            !context.Entities.TryGetComponent(
+                request.Facility,
+                out UnitProductionFacility facility) ||
+            facility.Owner != Issuer)
+        {
+            Accepted = false;
+            return;
+        }
+
+        context.Entities.SetComponent(
+            RequestEntity,
+            new UnitProductionRequest(
+                request.Facility,
+                request.UnitId,
+                Priority,
+                request.SubmittedAtTick,
+                request.Paused));
+
+        Accepted = true;
+    }
+}
+
 public sealed class CancelUnitProductionRequestCommand : ISimulationCommand
 {
     public CancelUnitProductionRequestCommand(
