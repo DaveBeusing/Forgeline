@@ -66,15 +66,19 @@ public sealed class RepairRecoverySystem : ISimulationSystem
         _debugEntries.Clear();
 
         foreach (EntityId entity in
-                 context.Entities.Query<
-                     HealthState,
-                     WorldTransform,
-                     ControllableEntity>(
+                 context.Entities.Query<HealthState>(
                      QueryIterationOrder.StableByEntityIndex))
         {
-            ControllableEntity controllable =
-                context.Entities.GetComponent<ControllableEntity>(
-                    entity);
+            if (!context.Entities.TryGetComponent(
+                    entity,
+                    out WorldTransform transform) ||
+                !context.Entities.TryGetComponent(
+                    entity,
+                    out ControllableEntity controllable))
+            {
+                continue;
+            }
+
             HealthState health =
                 context.Entities.GetComponent<HealthState>(
                     entity);
@@ -88,10 +92,6 @@ public sealed class RepairRecoverySystem : ISimulationSystem
             }
 
             damaged++;
-
-            WorldTransform transform =
-                context.Entities.GetComponent<WorldTransform>(
-                    entity);
 
             if (!TryResolveProvider(
                     context,
