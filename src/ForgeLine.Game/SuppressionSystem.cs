@@ -21,6 +21,7 @@ public readonly record struct SuppressionDebugEntry(
 
 public sealed class SuppressionSystem : ISimulationSystem
 {
+    private readonly List<EntityId> _units = new();
     private readonly List<SuppressionDebugEntry> _debugEntries = new();
     private ulong _totalRecoveries;
 
@@ -43,6 +44,7 @@ public sealed class SuppressionSystem : ISimulationSystem
         int pinned = 0;
 
         _debugEntries.Clear();
+        _units.Clear();
 
         foreach (EntityId entity in
                  context.Entities.Query<
@@ -50,6 +52,15 @@ public sealed class SuppressionSystem : ISimulationSystem
                      SuppressionProfile>(
                      QueryIterationOrder.StableByEntityIndex))
         {
+            _units.Add(entity);
+        }
+
+        for (int unitIndex = 0;
+             unitIndex < _units.Count;
+             unitIndex++)
+        {
+            EntityId entity =
+                _units[unitIndex];
             SuppressionState previous =
                 context.Entities.GetComponent<SuppressionState>(
                     entity);
