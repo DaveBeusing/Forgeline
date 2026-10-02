@@ -133,7 +133,7 @@ It verifies:
 
 - both starts can reach all strategic sites with Tracked movement;
 - both starts can reach all strategic sites with Wheeled movement;
-- both starts can reach every contested resource with Tracked movement;
+- both starts can reach every resource deposit with Tracked movement;
 - opposing starts are mutually connected;
 - an east-west Tracked route still exists with either crossing individually unavailable;
 - the road graph still has an east-west route with either crossing edge individually unavailable.
@@ -237,3 +237,5 @@ The strategic map does not change the fundamental ownership model:
 - tools compile and qualify data but do not become gameplay authority.
 
 Headless execution remains fully supported.
+
+`ForgeLine.Editor` remains a bootstrap host in this stage. Interactive map-editor authoring is not introduced by this change; the compiled artifact and qualification contract are the stable boundary that a later editor can target.
