@@ -133,12 +133,12 @@ It verifies:
 
 - both starts can reach all strategic sites with Tracked movement;
 - both starts can reach all strategic sites with Wheeled movement;
-- both starts can reach every resource deposit with Tracked movement;
+- both starts can reach a bounded traversable approach for every resource deposit with Tracked movement;
 - opposing starts are mutually connected;
 - an east-west Tracked route still exists with either crossing individually unavailable;
 - the road graph still has an east-west route with either crossing edge individually unavailable.
 
-Endpoints may project to a neighboring traversable cell through the standard pathfinder endpoint-projection option. The route itself must still be produced by normal hierarchical navigation.
+Strategic-site endpoints may use the standard pathfinder endpoint-projection option. Resource qualification resolves a bounded tracked approach around the deposit because transport and construction interact with a deposit from its perimeter rather than requiring a vehicle to occupy the deposit center. The approach search is capped by the deposit footprint plus 128 meters; absence of a traversable approach fails qualification. The route itself must still be produced by normal hierarchical navigation.
 
 ## Operational Geography Qualification
 
