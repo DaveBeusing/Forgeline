@@ -482,10 +482,10 @@ public sealed class SkirmishOpponentTests
 
         SkirmishOpponentDebugReadModel decision =
             Assert.Single(
-                scenario.Opponents.DebugSnapshot.Where(
-                    snapshot =>
-                        snapshot.Player ==
-                        scenario.East.Player));
+                scenario.Opponents.DebugSnapshot,
+                snapshot =>
+                    snapshot.Player ==
+                    scenario.East.Player);
 
         float center =
             scenario.Battlefield.Metadata.WidthMeters *
