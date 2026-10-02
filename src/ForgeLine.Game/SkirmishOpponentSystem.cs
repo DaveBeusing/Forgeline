@@ -341,6 +341,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                      intelligence,
                      force,
                      configuration,
+                     ref state,
                      out objective))
         {
             strategicState =
@@ -1572,6 +1573,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         FactionIntelligenceSnapshot intelligence,
         in SkirmishForceAssessment force,
         SkirmishOpponentConfiguration configuration,
+        ref SkirmishOpponentState state,
         out Vector3 objective)
     {
         objective = Vector3.Zero;
@@ -1805,20 +1807,30 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return true;
         }
 
-        objective =
+        Vector3 stagingObjective =
             SelectOffensiveWaypoint(
                 controller,
                 configuration.Aggression);
 
-        if (HasAttackForceReachedWaypoint(
-                context,
-                attackers,
-                objective))
+        if (!state.DeepOffensiveCommitted &&
+            (configuration.Aggression >= 0.70 ||
+             HasAttackForceReachedWaypoint(
+                 context,
+                 attackers,
+                 stagingObjective)))
         {
-            objective =
-                SelectDeepOffensiveWaypoint(
-                    controller);
+            state =
+                state with
+                {
+                    DeepOffensiveCommitted = true
+                };
         }
+
+        objective =
+            state.DeepOffensiveCommitted
+                ? SelectDeepOffensiveWaypoint(
+                    controller)
+                : stagingObjective;
 
         EntityId[] advanceReinforcements =
             SelectUnitsNeedingCombatOrder(
