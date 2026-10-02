@@ -1577,6 +1577,16 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                             readiness.Ammunition >=
                                 configuration.ResupplyThreshold;
                     })
+                .OrderByDescending(
+                    unit =>
+                        owned.UnitByEntity.TryGetValue(
+                            unit,
+                            out UnitId unitId) &&
+                        unitId ==
+                            UnitIds.MainBattleTank)
+                .ThenBy(
+                    static unit =>
+                        unit)
                 .Take(
                     configuration.MaximumAttackUnits)
                 .ToArray();
