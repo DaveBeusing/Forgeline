@@ -185,7 +185,7 @@ Infantry units carry `SuppressionProfile` and `SuppressionState`. Applied combat
 - Pinned infantry cannot move or fire.
 - Suppression decays on fixed simulation ticks and naturally returns through Suppressed to Normal when no further impacts arrive.
 
-`RepairRecoverySystem` runs in the Supply phase after damage resolution. Owned damaged units inside an owned `RepairProvider` radius consume physical Steel from that provider's authoritative inventory and restore bounded Health. Command Cores and completed Supply Depots are the first recovery providers. Supply Depots maintain a Steel stock policy through the existing automated distribution system; repair therefore depends on the same production/logistics economy rather than free regeneration.
+`RepairRecoverySystem` runs in the Supply phase after damage resolution. Owned damaged units inside an owned `RepairProvider` radius consume physical Steel from that provider's authoritative inventory and restore bounded Health. Command Cores and completed Supply Depots are the first recovery providers. Repair never creates material implicitly: a provider can restore Health only from Steel that physically exists in its inventory, so recovery remains coupled to the existing production/logistics economy without adding automatic high-priority transport demand.
 
 Destroyed units are never repaired, and missing repair material produces an explicit `NoMaterial` recovery state.
 
