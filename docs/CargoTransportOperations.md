@@ -257,17 +257,17 @@ Benchmark timing remains measurement evidence rather than a hardware-dependent c
 
 ## Current Boundary
 
+Automated regional distribution already schedules this physical transport lifecycle, and battlefield supply already depends on the Fuel/Ammunition stock physically delivered to forward Supply Depots. The transport system therefore remains the shared cargo execution boundary rather than a future placeholder.
+
 The current implementation deliberately does not include:
 
-- automated dispatch optimization;
-- battlefield resupply;
 - rail transport execution;
 - convoy specialization;
 - escorts;
 - detailed road traffic or lane congestion;
 - final Cargo Truck art or animation.
 
-Those features may schedule, specialize, or present the existing transport lifecycle. They must not bypass the physical cargo and conservation semantics defined here.
+Future transport modes and specialization may schedule, specialize, or present the existing lifecycle. They must not bypass the physical cargo and conservation semantics defined here.
 
 ## Player-Facing Cargo Status
 
