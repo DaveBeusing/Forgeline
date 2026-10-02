@@ -42,6 +42,22 @@ public sealed class SkirmishSupplyPolicyTests
                     0,
                     SpatialMobility.Static)));
 
+        EntityId recoveryUnit = scenario.UnitFactory.Create(
+            DirectorateContent.CreateUnitCatalog()[UnitIds.RifleSquad],
+            new Vector3(500.0f, 0.0f, 1800.0f), scenario.West.Player);
+        UnitFuelState recoveryFuel =
+            entities.GetComponent<UnitFuelState>(
+                recoveryUnit);
+        double recoveryFuelQuantity =
+            scenario.Inventories.GetQuantity(
+                recoveryFuel.InventoryId,
+                ResourceIds.Fuel);
+        Assert.True(
+            scenario.Inventories.Remove(
+                recoveryFuel.InventoryId,
+                ResourceIds.Fuel,
+                recoveryFuelQuantity).Succeeded);
+
         EntityId truck = scenario.UnitFactory.Create(
             DirectorateContent.CreateUnitCatalog()[UnitIds.SupplyTruck],
             new Vector3(360.0f, 0.0f, 1800.0f), scenario.West.Player);
