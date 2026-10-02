@@ -222,6 +222,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         EnsureTacticalBehavior(
             context,
+            controller,
             owned,
             configuration);
         EnsureEconomyPolicies(
@@ -2162,6 +2163,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private static void EnsureTacticalBehavior(
         SimulationContext context,
+        SkirmishOpponentController controller,
         OwnedState owned,
         SkirmishOpponentConfiguration configuration)
     {
@@ -2201,19 +2203,15 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     ? logisticsResupplyPolicy
                     : combatResupplyPolicy;
 
-            if (context.Entities.HasComponent<AutomaticResupplyPolicy>(
-                    unit))
-            {
-                context.Entities.SetComponent(
+            var policyCommand =
+                PlayerLogisticsActionCommand.SetAutomaticResupplyPolicy(
+                    controller.Player,
                     unit,
-                    resupplyPolicy);
-            }
-            else
-            {
-                context.Entities.AddComponent(
-                    unit,
-                    resupplyPolicy);
-            }
+                    resupplyPolicy.AmmunitionThreshold,
+                    resupplyPolicy.FuelThreshold,
+                    resupplyPolicy.Enabled,
+                    context.Tick);
+            policyCommand.Execute(context);
         }
 
         for (int index = 0;
@@ -3226,14 +3224,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 if (request.Priority.CompareTo(
                         ProductionPriority.High) > 0)
                 {
-                    context.Entities.SetComponent(
-                        requestEntity,
-                        new UnitProductionRequest(
-                            request.Facility,
-                            request.UnitId,
+                    var priorityCommand =
+                        new SetUnitProductionRequestPriorityCommand(
+                            facility.Owner,
+                            requestEntity,
                             ProductionPriority.High,
-                            request.SubmittedAtTick,
-                            request.Paused));
+                            context.Tick);
+                    priorityCommand.Execute(context);
                 }
 
                 continue;
