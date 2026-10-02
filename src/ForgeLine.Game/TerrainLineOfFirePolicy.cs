@@ -81,15 +81,13 @@ public sealed class TerrainLineOfFirePolicy : ILineOfFirePolicy
                 (float)sample /
                 sampleCount;
             float x =
-                MathF.Lerp(
-                    sourcePosition.X,
-                    targetPosition.X,
-                    t);
+                sourcePosition.X +
+                (targetPosition.X - sourcePosition.X) *
+                t;
             float z =
-                MathF.Lerp(
-                    sourcePosition.Z,
-                    targetPosition.Z,
-                    t);
+                sourcePosition.Z +
+                (targetPosition.Z - sourcePosition.Z) *
+                t;
 
             if (!_terrain.TrySampleHeight(
                     x,
@@ -100,10 +98,9 @@ public sealed class TerrainLineOfFirePolicy : ILineOfFirePolicy
             }
 
             float rayHeight =
-                MathF.Lerp(
-                    sourcePosition.Y,
-                    targetPosition.Y,
-                    t);
+                sourcePosition.Y +
+                (targetPosition.Y - sourcePosition.Y) *
+                t;
 
             if (terrainHeight +
                     _clearanceMeters >=
