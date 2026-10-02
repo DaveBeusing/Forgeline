@@ -689,12 +689,12 @@ public sealed class PlayerCommandBoundaryTests
         Assert.Equal(
             PlayerLogisticsActionFailureReason.ForeignOwnership,
             foreignResult.ActionFailure);
-        Assert.NotEqual(
-            BattlefieldSupplyPriority.High,
-            scenario.Simulation.Entities
-                .GetComponent<UnitSupplyPriority>(
-                    foreignUnit)
-                .Priority);
+        Assert.False(
+            scenario.Simulation.Entities.TryGetComponent(
+                foreignUnit,
+                out UnitSupplyPriority foreignPriority) &&
+            foreignPriority.Priority ==
+                BattlefieldSupplyPriority.High);
     }
 
     [Fact]
