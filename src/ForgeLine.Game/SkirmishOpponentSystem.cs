@@ -3018,9 +3018,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 cargoFleetRecovery
                     ? 480.0
                     : 280.0,
-                cargoFleetRecovery
-                    ? LogisticsStockPriority.Critical
-                    : LogisticsStockPriority.High);
+                LogisticsStockPriority.High);
             SetUnitProductionStockPolicy(
                 context,
                 entity,
