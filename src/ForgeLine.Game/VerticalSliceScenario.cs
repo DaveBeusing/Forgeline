@@ -527,24 +527,25 @@ public sealed class VerticalSliceScenario : IDisposable
             new CombatEntityLifecycleSystem(
                 combatRuntime,
                 spatialIndex);
-        var combatDebugSnapshots =
-            new CombatDebugSnapshotSystem(
-                weapons,
-                combatRuntime,
-                targetAcquisition,
-                damage)
-            {
-                DebugCaptureEnabled =
-                    runtimeSettings.EnableDebugCapture
-            };
-        var tacticalPreparation =
-            new TacticalOrderPreparationSystem();
         var suppression =
             new SuppressionSystem
             {
                 DebugCaptureEnabled =
                     runtimeSettings.EnableDebugCapture
             };
+        var combatDebugSnapshots =
+            new CombatDebugSnapshotSystem(
+                weapons,
+                combatRuntime,
+                targetAcquisition,
+                damage,
+                suppression)
+            {
+                DebugCaptureEnabled =
+                    runtimeSettings.EnableDebugCapture
+            };
+        var tacticalPreparation =
+            new TacticalOrderPreparationSystem();
         var tacticalOpponent =
             new TacticalTestOpponentSystem(
                 intelligence,
