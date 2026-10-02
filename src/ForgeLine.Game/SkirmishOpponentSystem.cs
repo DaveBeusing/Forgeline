@@ -231,7 +231,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         EnsureEconomyPolicies(
             context,
             controller,
-            owned);
+            owned,
+            configuration);
         EnsureProductionPrograms(
             context,
             owned,
@@ -2815,7 +2816,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private void EnsureEconomyPolicies(
         SimulationContext context,
         SkirmishOpponentController controller,
-        OwnedState owned)
+        OwnedState owned,
+        SkirmishOpponentConfiguration configuration)
     {
         if (context.Entities.IsAlive(
                 controller.PreferredConstructionSource))
@@ -2982,15 +2984,43 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 80.0,
                 160.0,
                 priority);
+            int cargoTarget =
+                Math.Max(
+                    configuration.MinimumCargoTrucks,
+                    Math.Clamp(
+                        owned.SupplyDepots.Count,
+                        2,
+                        4));
+            int cargoCount =
+                GetUnitCount(
+                    owned,
+                    UnitIds.CargoTruck);
+            owned.PendingUnitCounts.TryGetValue(
+                UnitIds.CargoTruck,
+                out int pendingCargo);
+            bool cargoFleetRecovery =
+                facility.Supports(
+                    UnitProductionCapability.Logistics) &&
+                cargoCount + pendingCargo <
+                    cargoTarget;
+
             SetUnitProductionStockPolicy(
                 context,
                 entity,
                 facility,
                 ResourceIds.Fuel,
-                80.0,
-                160.0,
-                280.0,
-                LogisticsStockPriority.High);
+                cargoFleetRecovery
+                    ? 240.0
+                    : 80.0,
+                cargoFleetRecovery
+                    ? 360.0
+                    : 160.0,
+                cargoFleetRecovery
+                    ? 480.0
+                    : 280.0,
+                cargoFleetRecovery
+                    ? LogisticsStockPriority.Critical
+                    : LogisticsStockPriority.High);
             SetUnitProductionStockPolicy(
                 context,
                 entity,
