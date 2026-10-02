@@ -162,21 +162,29 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
 
                     attacks++;
                     _totalAttackDecisions++;
+                    continue;
                 }
-                else
-                {
-                    IssueAttackMoveIntent(
-                        context,
+
+                if (context.Entities.TryGetComponent(
                         entity,
-                        controllable.Owner,
-                        contact.LastKnownPosition,
-                        transform.Position,
-                        behavior.EngagementLeashMeters);
-
-                    advances++;
-                    _totalAdvanceDecisions++;
+                        out CombatOrderState strategicContactOrder) &&
+                    strategicContactOrder.Kind is
+                        CombatOrderKind.AttackMove or
+                        CombatOrderKind.Retreat)
+                {
+                    continue;
                 }
 
+                IssueAttackMoveIntent(
+                    context,
+                    entity,
+                    controllable.Owner,
+                    contact.LastKnownPosition,
+                    transform.Position,
+                    behavior.EngagementLeashMeters);
+
+                advances++;
+                _totalAdvanceDecisions++;
                 continue;
             }
 
