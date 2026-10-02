@@ -553,6 +553,13 @@ public sealed class VerticalSliceScenario : IDisposable
         var automaticResupply =
             new AutomaticResupplyDecisionSystem(
                 inventories);
+        var repairRecovery =
+            new RepairRecoverySystem(
+                inventories)
+            {
+                DebugCaptureEnabled =
+                    runtimeSettings.EnableDebugCapture
+            };
         var tacticalCombat =
             new TacticalCombatSystem(
                 weapons,
@@ -644,6 +651,7 @@ public sealed class VerticalSliceScenario : IDisposable
             combatExecution,
             damage,
             battlefieldSupply,
+            repairRecovery,
             automatedDistribution,
             cargoTransport,
             power,
@@ -703,6 +711,7 @@ public sealed class VerticalSliceScenario : IDisposable
                 tacticalCombat,
                 suppression,
                 automaticResupply,
+                repairRecovery,
                 combatDebugSnapshots,
                 registeredSystemTypes);
 
