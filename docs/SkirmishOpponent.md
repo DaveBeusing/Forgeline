@@ -99,7 +99,7 @@ Offensive admission is per candidate, not a comparison against the entire army's
 
 The current implementation allows a candidate without a readiness component through the readiness filter; diagnostics explicitly records HasReadiness so absence cannot be mistaken for a measured full-readiness value. Normal runtime readiness is derived in SnapshotEvents.
 
-When direct hostile identification exists, the opponent may attack that identified entity, prioritizing an identified Command Core. Otherwise it advances toward public static strategic positions rather than reading hidden live enemy state.
+When direct hostile identification exists, the opponent may attack that identified entity, prioritizing an identified Command Core. Otherwise it advances only toward public strategic sites on the opponent-facing half of the map rather than reading hidden live enemy state. Reaching that forward waypoint escalates the same offensive intent toward the public opposing start position; this brings the force into normal reconnaissance range so the battlefield-intelligence system can identify the Command Core and hand control to the direct Attack path.
 
 Individual low-readiness or low-supply units receive normal retreat/recovery behavior. Existing real ResupplyOrders are not replaced with a new strategic retreat. Force-wide Resupplying is narrower than the presence of any degraded unit: it requires an established attack force, an active resupply order, and the configured aggregate/all-units recovery condition. Consequently, PrepareOffensive with no active resupply order must not be interpreted as proof of either adequate supply or a particular supply-system defect.
 
