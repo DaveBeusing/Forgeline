@@ -7,6 +7,12 @@ namespace ForgeLine.MapCompiler;
 
 internal static class Program
 {
+    private static readonly JsonSerializerOptions QualificationSerializerOptions =
+        new()
+        {
+            WriteIndented = true
+        };
+
     public static int Main(string[] args)
     {
         try
@@ -113,10 +119,7 @@ internal static class Program
             path,
             JsonSerializer.Serialize(
                 report,
-                new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                }));
+                QualificationSerializerOptions));
     }
 
     private sealed record CompilerOptions(
