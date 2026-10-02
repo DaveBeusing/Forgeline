@@ -47,6 +47,8 @@ public sealed record SkirmishOpponentConfiguration
 
     public double ResupplyThreshold { get; init; } = 0.30;
 
+    public double OffensiveFuelThreshold { get; init; } = 0.55;
+
     public int MinimumAttackUnits { get; init; } = 5;
 
     public int MaximumAttackUnits { get; init; } = 12;
@@ -79,6 +81,16 @@ public sealed record SkirmishOpponentConfiguration
         ValidateFraction(
             ResupplyThreshold,
             nameof(ResupplyThreshold));
+        ValidateFraction(
+            OffensiveFuelThreshold,
+            nameof(OffensiveFuelThreshold));
+
+        if (OffensiveFuelThreshold <
+            ResupplyThreshold)
+        {
+            throw new InvalidOperationException(
+                "Offensive fuel threshold must not be below the general resupply threshold.");
+        }
 
         if (RetreatThreshold >= OffensiveReadinessThreshold)
         {
