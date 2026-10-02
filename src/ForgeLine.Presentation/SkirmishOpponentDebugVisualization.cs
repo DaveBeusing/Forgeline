@@ -91,7 +91,7 @@ public static class SkirmishOpponentDebugVisualization
                 $"Econ {opponent.Economy.HealthScore:P0} Power {opponent.Economy.PowerGeneration:F0}/{opponent.Economy.PowerDemand:F0} Units {opponent.Force.TotalUnits} Ready {opponent.Force.AverageReadiness:P0} Contacts {opponent.Force.CurrentHostileContacts}",
                 statusColor);
 
-            if (labels + 2 < maximumLabels)
+            if (labels + 4 <= maximumLabels)
             {
                 string group =
                     opponent.GroupObjective.IsSpecified
