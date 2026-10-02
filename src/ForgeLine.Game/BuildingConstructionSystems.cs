@@ -684,13 +684,6 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
                 CreateSupplyStockPolicy(
                     entities,
                     entity,
-                    ResourceIds.Steel,
-                    desiredMinimum: 80.0,
-                    desiredTarget: 200.0,
-                    desiredMaximum: 350.0);
-                CreateSupplyStockPolicy(
-                    entities,
-                    entity,
                     ResourceIds.Fuel,
                     desiredMinimum: 250.0,
                     desiredTarget: 600.0,
