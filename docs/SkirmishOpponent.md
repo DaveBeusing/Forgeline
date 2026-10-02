@@ -24,6 +24,17 @@ The opponent does not own alternate economy, movement, combat, or supply state.
 
 Static map geometry, public strategic sites and starts, and the shared ruleset are allowed knowledge. Enemy runtime state must enter decision-making through the faction intelligence snapshot.
 
+## Decision Layers
+
+The full-match opponent preserves four responsibilities without creating parallel gameplay authority:
+
+- **Strategic** chooses the current long-horizon goal: stabilize economy, establish infrastructure, expand, scout, defend, recover, prepare an offensive, or pressure the match objective.
+- **Operational** translates that goal into a public-map objective and force-level task such as an expansion site, defensive response, recovery location, reconnaissance route, or offensive pressure point.
+- **Tactical** uses normal combat groups, formations, Attack/AttackMove/Retreat, artillery, and supply-support commands against only legitimate intelligence.
+- **Unit behavior** remains the bounded per-unit tactical behavior already owned by the fixed-tick combat systems.
+
+The layer boundary is diagnostic and organizational. Economy, construction, production, logistics, movement, intelligence, combat, supply, and match lifecycle remain owned by their existing simulation systems.
+
 ## Strategic State
 
 Each controller stores simulation-owned strategic state:
