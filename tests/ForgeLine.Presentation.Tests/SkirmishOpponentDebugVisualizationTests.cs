@@ -52,7 +52,23 @@ public sealed class SkirmishOpponentDebugVisualizationTests
                 new Vector3(470.0f, 0.0f, 1_536.0f),
                 HasChosenObjective: true,
                 new SimulationTick(200),
-                DecisionsTaken: 10);
+                DecisionsTaken: 10,
+                OperationalObjective:
+                    SkirmishOperationalObjective.PressureObjective,
+                GroupObjective:
+                    new SkirmishGroupObjectiveReadModel(
+                        new ForgeLine.Core.EntityId(3, 1),
+                        ForgeLine.Combat.CombatOrderKind.AttackMove,
+                        new Vector3(480.0f, 0.0f, 1_520.0f),
+                        HasDestination: true,
+                        ForgeLine.Core.EntityId.Invalid,
+                        FormationTemplate.Column,
+                        InitialMemberCount: 6,
+                        SurvivingMemberCount: 5),
+                SupplyRequirement:
+                    SkirmishSupplyRequirement.Fuel,
+                RetreatReason:
+                    SkirmishRetreatReason.LowFuel);
 
         SkirmishOpponentDebugVisualization.Draw(
             debugDraw,
@@ -61,13 +77,25 @@ public sealed class SkirmishOpponentDebugVisualizationTests
         Assert.True(
             debugDraw.Lines.Length > 10);
         Assert.Equal(
-            2,
+            4,
             debugDraw.Labels.Count);
         Assert.Contains(
             debugDraw.Labels,
             label =>
                 label.Text.Contains(
                     "Attacking / AttackObjective",
+                    StringComparison.Ordinal));
+        Assert.Contains(
+            debugDraw.Labels,
+            label =>
+                label.Text.Contains(
+                    "Operational PressureObjective",
+                    StringComparison.Ordinal));
+        Assert.Contains(
+            debugDraw.Labels,
+            label =>
+                label.Text.Contains(
+                    "Supply Fuel Retreat LowFuel",
                     StringComparison.Ordinal));
     }
 }
