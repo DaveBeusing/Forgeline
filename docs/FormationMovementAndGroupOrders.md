@@ -206,6 +206,8 @@ Game tests cover:
 - narrow-corridor split fallback;
 - concurrent movement of multiple groups.
 
+Recovery-aware Retreat uses this same group path. `RetreatToRecovery` resolves one support destination for the accepted selection and submits a normal Column formation move, so large retreats retain one shared strategic route rather than creating a recovery-specific pathfinder or independent long-range searches per member.
+
 The Simulation benchmark host contains `FormationRoutingBenchmarks`, comparing 10/50/100 independent strategic path searches with one shared formation route. Benchmark timing remains observational and is not a hardware-sensitive CI gate.
 
 ## Current Boundaries
@@ -214,8 +216,6 @@ The current system deliberately does not include:
 
 - role-aware combat slot placement;
 - permanent named combat groups;
-- attack-move;
-- retreat behavior;
 - convoy-specific road-lane discipline;
 - artillery deployment templates;
 - multi-army traffic scheduling.
