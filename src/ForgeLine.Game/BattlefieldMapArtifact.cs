@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using ForgeLine.World;
@@ -101,16 +102,16 @@ public sealed record BattlefieldMapArtifact(
         Validate();
 
         if (Metadata != definition.Metadata ||
-            Starts.Length != definition.Starts.Count ||
-            Resources.Length != definition.Resources.Count ||
-            WorldObjects.Length != definition.WorldObjects.Count ||
-            Sites.Length != definition.Sites.Count ||
-            RoadNodes.Length != definition.RoadNodes.Count ||
-            RoadEdges.Length != definition.RoadEdges.Count ||
-            Crossings.Length != definition.Crossings.Count ||
-            Objectives.Length != definition.Objectives.Count ||
-            StaticNavigationObstacles.Length !=
-                definition.StaticNavigationObstacles.Count)
+            !Starts.SequenceEqual(definition.Starts) ||
+            !Resources.SequenceEqual(definition.Resources) ||
+            !WorldObjects.SequenceEqual(definition.WorldObjects) ||
+            !Sites.SequenceEqual(definition.Sites) ||
+            !RoadNodes.SequenceEqual(definition.RoadNodes) ||
+            !RoadEdges.SequenceEqual(definition.RoadEdges) ||
+            !Crossings.SequenceEqual(definition.Crossings) ||
+            !Objectives.SequenceEqual(definition.Objectives) ||
+            !StaticNavigationObstacles.SequenceEqual(
+                definition.StaticNavigationObstacles))
         {
             throw new InvalidOperationException(
                 "Compiled battlefield map artifact does not match the canonical definition.");
@@ -128,8 +129,85 @@ public sealed record BattlefieldMapArtifact(
                 WriteIndented = true
             };
         options.Converters.Add(
+            new AxisAlignedBoundsConverter());
+        options.Converters.Add(
             new JsonStringEnumConverter());
 
         return options;
+    }
+
+    private sealed class AxisAlignedBoundsConverter
+        : JsonConverter<AxisAlignedBounds>
+    {
+        public override AxisAlignedBounds Read(
+            ref Utf8JsonReader reader,
+            Type typeToConvert,
+            JsonSerializerOptions options)
+        {
+            using JsonDocument document =
+                JsonDocument.ParseValue(
+                    ref reader);
+            JsonElement root =
+                document.RootElement;
+
+            Vector3 minimum =
+                ReadVector(
+                    root.GetProperty(
+                        "minimum"));
+            Vector3 maximum =
+                ReadVector(
+                    root.GetProperty(
+                        "maximum"));
+
+            return new AxisAlignedBounds(
+                minimum,
+                maximum);
+        }
+
+        public override void Write(
+            Utf8JsonWriter writer,
+            AxisAlignedBounds value,
+            JsonSerializerOptions options)
+        {
+            writer.WriteStartObject();
+
+            writer.WritePropertyName(
+                "minimum");
+            WriteVector(
+                writer,
+                value.Minimum);
+
+            writer.WritePropertyName(
+                "maximum");
+            WriteVector(
+                writer,
+                value.Maximum);
+
+            writer.WriteEndObject();
+        }
+
+        private static Vector3 ReadVector(
+            JsonElement element) =>
+            new(
+                element.GetProperty("x").GetSingle(),
+                element.GetProperty("y").GetSingle(),
+                element.GetProperty("z").GetSingle());
+
+        private static void WriteVector(
+            Utf8JsonWriter writer,
+            Vector3 value)
+        {
+            writer.WriteStartObject();
+            writer.WriteNumber(
+                "x",
+                value.X);
+            writer.WriteNumber(
+                "y",
+                value.Y);
+            writer.WriteNumber(
+                "z",
+                value.Z);
+            writer.WriteEndObject();
+        }
     }
 }
