@@ -671,7 +671,23 @@ public sealed class BuildingConstructionSystem : ISimulationSystem
                         inventoryId,
                         site.Owner,
                         resupplyRangeMeters: 20.0f));
+                entities.AddComponent(
+                    entity,
+                    new RepairProvider(
+                        inventoryId,
+                        site.Owner,
+                        repairRangeMeters: 25.0f,
+                        healthPerTick: 5.0,
+                        ResourceIds.Steel,
+                        resourcePerHealth: 0.2));
 
+                CreateSupplyStockPolicy(
+                    entities,
+                    entity,
+                    ResourceIds.Steel,
+                    desiredMinimum: 80.0,
+                    desiredTarget: 200.0,
+                    desiredMaximum: 350.0);
                 CreateSupplyStockPolicy(
                     entities,
                     entity,
