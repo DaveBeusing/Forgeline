@@ -374,7 +374,12 @@ public sealed class PlayerTacticalActionReadModel
         CombatOrderKind currentOrder,
         CombatOrderStatus currentStatus,
         IReadOnlyList<PlayerTacticalTargetReadModel> targets,
-        IReadOnlyList<PlayerArtilleryActionReadModel> artillery)
+        IReadOnlyList<PlayerArtilleryActionReadModel> artillery,
+        int suppressedCount = 0,
+        int pinnedCount = 0,
+        int repairingCount = 0,
+        RetreatRecoveryReason retreatReason = RetreatRecoveryReason.None,
+        EntityId retreatProvider = default)
     {
         _selectedEntities =
             Array.AsReadOnly(
@@ -399,12 +404,23 @@ public sealed class PlayerTacticalActionReadModel
             criticalSupplyCount);
         ArgumentOutOfRangeException.ThrowIfNegative(
             resupplyingCount);
+        ArgumentOutOfRangeException.ThrowIfNegative(
+            suppressedCount);
+        ArgumentOutOfRangeException.ThrowIfNegative(
+            pinnedCount);
+        ArgumentOutOfRangeException.ThrowIfNegative(
+            repairingCount);
 
         RequestedSelectionCount = requestedSelectionCount;
         CombatEligibleCount = combatEligibleCount;
         RejectedSelectionCount = rejectedSelectionCount;
         CriticalSupplyCount = criticalSupplyCount;
         ResupplyingCount = resupplyingCount;
+        SuppressedCount = suppressedCount;
+        PinnedCount = pinnedCount;
+        RepairingCount = repairingCount;
+        RetreatReason = retreatReason;
+        RetreatProvider = retreatProvider;
         HasCommonOrder = hasCommonOrder;
         MixedOrderState = mixedOrderState;
         CurrentOrder = currentOrder;
@@ -423,6 +439,16 @@ public sealed class PlayerTacticalActionReadModel
     public int CriticalSupplyCount { get; }
 
     public int ResupplyingCount { get; }
+
+    public int SuppressedCount { get; }
+
+    public int PinnedCount { get; }
+
+    public int RepairingCount { get; }
+
+    public RetreatRecoveryReason RetreatReason { get; }
+
+    public EntityId RetreatProvider { get; }
 
     public bool HasCommonOrder { get; }
 
@@ -839,6 +865,15 @@ internal static class PlayerActionSnapshotFactory
             new List<PlayerArtilleryActionReadModel>();
         int criticalSupply = 0;
         int resupplying = 0;
+        int suppressed = 0;
+        int pinned = 0;
+        int repairing = 0;
+        bool observedRetreatRecovery = false;
+        bool mixedRetreatRecovery = false;
+        RetreatRecoveryReason retreatReason =
+            RetreatRecoveryReason.None;
+        EntityId retreatProvider =
+            EntityId.Invalid;
 
         bool observedCombatState = false;
         bool hasOrder = false;
@@ -881,6 +916,52 @@ internal static class PlayerActionSnapshotFactory
                         BattlefieldSupplyStatus.Unsupplied)
                 {
                     criticalSupply++;
+                }
+
+                if (entities.TryGetComponent(
+                        entity,
+                        out SuppressionState suppression))
+                {
+                    if (suppression.Level ==
+                        SuppressionLevel.Suppressed)
+                    {
+                        suppressed++;
+                    }
+                    else if (suppression.Level ==
+                             SuppressionLevel.Pinned)
+                    {
+                        pinned++;
+                    }
+                }
+
+                if (entities.TryGetComponent(
+                        entity,
+                        out RepairRecoveryState recovery) &&
+                    recovery.Status ==
+                        RepairRecoveryStatus.Repairing)
+                {
+                    repairing++;
+                }
+
+                if (entities.TryGetComponent(
+                        entity,
+                        out RetreatRecoveryState retreatRecovery))
+                {
+                    if (!observedRetreatRecovery)
+                    {
+                        observedRetreatRecovery = true;
+                        retreatReason =
+                            retreatRecovery.Reason;
+                        retreatProvider =
+                            retreatRecovery.Provider;
+                    }
+                    else if (retreatReason !=
+                                 retreatRecovery.Reason ||
+                             retreatProvider !=
+                                 retreatRecovery.Provider)
+                    {
+                        mixedRetreatRecovery = true;
+                    }
                 }
 
                 CombatOrderKind orderKind = default;
@@ -1073,7 +1154,18 @@ internal static class PlayerActionSnapshotFactory
             commonOrder,
             commonStatus,
             targets,
-            artillery);
+            artillery,
+            suppressed,
+            pinned,
+            repairing,
+            observedRetreatRecovery &&
+            !mixedRetreatRecovery
+                ? retreatReason
+                : RetreatRecoveryReason.None,
+            observedRetreatRecovery &&
+            !mixedRetreatRecovery
+                ? retreatProvider
+                : EntityId.Invalid);
     }
 
     private static PlayerLogisticsActionReadModel? CaptureLogistics(
