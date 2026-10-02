@@ -1548,15 +1548,16 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
+        EntityId reconReserve =
+            ResolveReconReserveScout(
+                owned);
+
         EntityId[] attackers =
             owned.CombatUnits
                 .Where(
                     unit =>
                     {
-                        if (owned.UnitByEntity.TryGetValue(
-                                unit,
-                                out UnitId unitId) &&
-                            unitId == UnitIds.ScoutVehicle)
+                        if (unit == reconReserve)
                         {
                             return false;
                         }
@@ -4477,6 +4478,23 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         return best;
     }
+
+    private static EntityId ResolveReconReserveScout(
+        OwnedState owned) =>
+        owned.UnitByEntity
+            .Where(
+                pair =>
+                    pair.Value ==
+                        UnitIds.ScoutVehicle &&
+                    owned.CombatUnits.Contains(
+                        pair.Key))
+            .Select(
+                static pair =>
+                    pair.Key)
+            .OrderBy(
+                static entity =>
+                    entity)
+            .FirstOrDefault();
 
     private static EntityId FindIdleUnit(
         SimulationContext context,
