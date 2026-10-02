@@ -121,13 +121,28 @@ public static class BattlefieldOperationalGeographyValidator
             {
                 BattlefieldResourceDepositDefinition resource =
                     definition.Resources[resourceIndex];
+                NavigationCapabilities tracked =
+                    NavigationCapabilities.For(
+                        NavigationMovementClass.Tracked);
+
+                if (!TryResolveResourceApproach(
+                        baselineWorld.Grid,
+                        resource,
+                        tracked,
+                        out Vector3 approach))
+                {
+                    reachabilityChecks++;
+                    errors.Add(
+                        $"Resource '{resource.Key}' has no traversable tracked approach.");
+                    continue;
+                }
 
                 CheckRoute(
                     baselinePathfinder,
                     start.Position,
-                    resource.Center,
+                    approach,
                     NavigationMovementClass.Tracked,
-                    $"start {start.Player} to resource '{resource.Key}'",
+                    $"start {start.Player} to resource '{resource.Key}' approach",
                     errors,
                     ref reachabilityChecks,
                     ref shortestRoute,
@@ -289,6 +304,89 @@ public static class BattlefieldOperationalGeographyValidator
             MathF.Max(
                 longestRoute,
                 length);
+    }
+
+    private static bool TryResolveResourceApproach(
+        NavigationGrid grid,
+        in BattlefieldResourceDepositDefinition resource,
+        in NavigationCapabilities capabilities,
+        out Vector3 approach)
+    {
+        approach = default;
+
+        if (!grid.TryWorldToCell(
+                resource.Center,
+                out NavigationCellCoordinate origin))
+        {
+            return false;
+        }
+
+        float maximumApproachDistance =
+            MathF.Max(
+                resource.HalfExtents.X,
+                resource.HalfExtents.Z) +
+            128.0f;
+        int cellRadius =
+            checked(
+                (int)MathF.Ceiling(
+                    maximumApproachDistance /
+                    grid.Settings.CellSizeMeters));
+        float maximumDistanceSquared =
+            maximumApproachDistance *
+            maximumApproachDistance;
+        float bestDistanceSquared =
+            float.PositiveInfinity;
+
+        for (int z = origin.Z - cellRadius;
+             z <= origin.Z + cellRadius;
+             z++)
+        {
+            for (int x = origin.X - cellRadius;
+                 x <= origin.X + cellRadius;
+                 x++)
+            {
+                var candidate =
+                    new NavigationCellCoordinate(
+                        x,
+                        z);
+
+                if (!grid.IsTraversable(
+                        candidate,
+                        capabilities))
+                {
+                    continue;
+                }
+
+                Vector3 center =
+                    grid.GetCellCenter(
+                        candidate);
+                float deltaX =
+                    center.X -
+                    resource.Center.X;
+                float deltaZ =
+                    center.Z -
+                    resource.Center.Z;
+                float distanceSquared =
+                    deltaX * deltaX +
+                    deltaZ * deltaZ;
+
+                if (distanceSquared >
+                        maximumDistanceSquared ||
+                    distanceSquared >=
+                        bestDistanceSquared)
+                {
+                    continue;
+                }
+
+                bestDistanceSquared =
+                    distanceSquared;
+                approach =
+                    center;
+            }
+        }
+
+        return float.IsFinite(
+            bestDistanceSquared);
     }
 
     private static void ValidateExpansionPressure(
