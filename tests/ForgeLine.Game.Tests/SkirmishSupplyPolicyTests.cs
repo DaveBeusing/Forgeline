@@ -194,6 +194,12 @@ public sealed class SkirmishSupplyPolicyTests
                 core.Position +
                     new Vector3(30.0f, 0.0f, 0.0f),
                 scenario.West.Player);
+        EntityId combat =
+            scenario.UnitFactory.Create(
+                units[UnitIds.RifleSquad],
+                core.Position +
+                    new Vector3(40.0f, 0.0f, 0.0f),
+                scenario.West.Player);
 
         scenario.Simulation.RunTicks(
             25,
@@ -205,6 +211,9 @@ public sealed class SkirmishSupplyPolicyTests
         AutomaticResupplyPolicy supplyPolicy =
             entities.GetComponent<AutomaticResupplyPolicy>(
                 supply);
+        AutomaticResupplyPolicy combatPolicy =
+            entities.GetComponent<AutomaticResupplyPolicy>(
+                combat);
 
         Assert.Equal(
             0.55,
@@ -217,6 +226,14 @@ public sealed class SkirmishSupplyPolicyTests
         Assert.True(
             supplyPolicy.FuelThreshold <
             cargoPolicy.FuelThreshold);
+        Assert.Equal(
+            scenario.Settings.WestOpponent.OffensiveFuelThreshold,
+            combatPolicy.FuelThreshold,
+            precision: 6);
+        Assert.Equal(
+            scenario.Settings.WestOpponent.ResupplyThreshold,
+            combatPolicy.AmmunitionThreshold,
+            precision: 6);
     }
 
     [Fact]
