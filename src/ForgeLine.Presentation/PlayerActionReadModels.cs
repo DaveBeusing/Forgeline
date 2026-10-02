@@ -329,7 +329,8 @@ public readonly record struct PlayerSupplyActionReadModel(
     PlayerSupplyProviderState ProviderState,
     double ProviderFuel,
     double ProviderAmmunition,
-    ResupplyProviderRejection ProviderRejections);
+    ResupplyProviderRejection ProviderRejections,
+    BattlefieldSupplyPriority Priority = BattlefieldSupplyPriority.Normal);
 
 public readonly record struct PlayerTacticalTargetReadModel(
     EntityId Entity,
@@ -1281,6 +1282,13 @@ internal static class PlayerActionSnapshotFactory
             out double providerFuel,
             out double providerAmmunition);
 
+        BattlefieldSupplyPriority priority =
+            entities.TryGetComponent(
+                entity,
+                out UnitSupplyPriority configuredPriority)
+                ? configuredPriority.Priority
+                : BattlefieldSupplyPriority.Normal;
+
         return new PlayerSupplyActionReadModel(
             entity,
             supplyState.Status,
@@ -1293,7 +1301,8 @@ internal static class PlayerActionSnapshotFactory
             providerState,
             providerFuel,
             providerAmmunition,
-            rejections);
+            rejections,
+            priority);
     }
 
     private static bool TryResolveDistributionInventory(
