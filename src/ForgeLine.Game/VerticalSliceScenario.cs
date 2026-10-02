@@ -539,6 +539,12 @@ public sealed class VerticalSliceScenario : IDisposable
             };
         var tacticalPreparation =
             new TacticalOrderPreparationSystem();
+        var suppression =
+            new SuppressionSystem
+            {
+                DebugCaptureEnabled =
+                    runtimeSettings.EnableDebugCapture
+            };
         var tacticalOpponent =
             new TacticalTestOpponentSystem(
                 intelligence,
@@ -623,6 +629,7 @@ public sealed class VerticalSliceScenario : IDisposable
             opponents,
             tacticalOpponent,
             tacticalPreparation,
+            suppression,
             automaticResupply,
             formationMovement,
             navigation,
@@ -693,6 +700,7 @@ public sealed class VerticalSliceScenario : IDisposable
                 battlefieldIntelligence,
                 targetAcquisition,
                 tacticalCombat,
+                suppression,
                 automaticResupply,
                 combatDebugSnapshots,
                 registeredSystemTypes);
