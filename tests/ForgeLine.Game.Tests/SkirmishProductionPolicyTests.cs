@@ -207,6 +207,39 @@ public sealed class SkirmishProductionPolicyTests
         }
 
         Assert.True(queuedObjectivePressureUnit);
+
+        LogisticsStockPolicy? fuelPolicy = null;
+
+        foreach (EntityId policyEntity in
+                 entities.Query<LogisticsStockPolicy>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            LogisticsStockPolicy policy =
+                entities.GetComponent<LogisticsStockPolicy>(
+                    policyEntity);
+
+            if (policy.TargetEntity == factory &&
+                policy.ResourceId ==
+                    ResourceIds.Fuel)
+            {
+                fuelPolicy = policy;
+                break;
+            }
+        }
+
+        Assert.True(fuelPolicy.HasValue);
+        Assert.Equal(
+            LogisticsStockPriority.Critical,
+            fuelPolicy.Value.Priority);
+        Assert.True(
+            fuelPolicy.Value.DesiredMinimum >=
+            units[UnitIds.MainBattleTank]
+                .Costs
+                .Single(
+                    cost =>
+                        cost.ResourceId ==
+                        ResourceIds.Fuel)
+                .Quantity);
     }
 
     [Fact]
