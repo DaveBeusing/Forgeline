@@ -2670,6 +2670,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 fuelThreshold:
                     configuration.OffensiveFuelThreshold,
                 enabled: true);
+        var reconnaissanceResupplyPolicy =
+            new AutomaticResupplyPolicy(
+                ammunitionThreshold:
+                    configuration.ResupplyThreshold,
+                fuelThreshold:
+                    configuration.ResupplyThreshold,
+                enabled: true);
         var cargoResupplyPolicy =
             new AutomaticResupplyPolicy(
                 configuration.ResupplyThreshold,
@@ -2704,7 +2711,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     : hasIdentity &&
                       unitId == UnitIds.CargoTruck
                         ? cargoResupplyPolicy
-                        : combatResupplyPolicy;
+                        : hasIdentity &&
+                          unitId == UnitIds.ScoutVehicle
+                            ? reconnaissanceResupplyPolicy
+                            : combatResupplyPolicy;
 
             var policyCommand =
                 PlayerLogisticsActionCommand.SetAutomaticResupplyPolicy(
