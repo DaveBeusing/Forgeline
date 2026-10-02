@@ -4030,7 +4030,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         in UnitProductionFacility facility,
         SkirmishOpponentConfiguration configuration)
     {
-        if (!facility.Supports(
+        if (!context.Entities.HasComponent<PowerNetworkMembership>(
+                facilityEntity) ||
+            !context.Entities.HasComponent<PowerConsumer>(
+                facilityEntity) ||
+            !facility.Supports(
                 UnitProductionCapability.Vehicle))
         {
             return false;
