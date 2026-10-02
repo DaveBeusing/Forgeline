@@ -237,6 +237,62 @@ public sealed class SkirmishSupplyPolicyTests
     }
 
     [Fact]
+    public void PartiallyLoadedSupplyTruckReturnsForOffensiveReserve()
+    {
+        using VerticalSliceScenario scenario =
+            VerticalSliceScenario.Create(
+                VerticalSliceScenarioSettings.Create(
+                    VerticalSliceScenarioProfile.Validation));
+        EntityRegistry entities =
+            scenario.Simulation.Entities;
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
+        WorldTransform core =
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+
+        EntityId truck =
+            scenario.UnitFactory.Create(
+                units[UnitIds.SupplyTruck],
+                core.Position +
+                    new Vector3(120.0f, 0.0f, 0.0f),
+                scenario.West.Player);
+        SupplyTruck supply =
+            entities.GetComponent<SupplyTruck>(
+                truck);
+
+        Assert.True(
+            scenario.Inventories.Add(
+                supply.InventoryId,
+                ResourceIds.Fuel,
+                supply.FuelTarget * 0.40).Succeeded);
+        Assert.True(
+            scenario.Inventories.Add(
+                supply.InventoryId,
+                ResourceIds.Ammunition,
+                supply.AmmunitionTarget * 0.30).Succeeded);
+
+        double initialFuel =
+            scenario.Inventories.GetQuantity(
+                supply.InventoryId,
+                ResourceIds.Fuel);
+
+        scenario.Simulation.RunTicks(
+            40,
+            TestContext.Current.CancellationToken);
+
+        double currentFuel =
+            scenario.Inventories.GetQuantity(
+                supply.InventoryId,
+                ResourceIds.Fuel);
+
+        Assert.True(
+            currentFuel > initialFuel ||
+            entities.HasComponent<MovementOrder>(truck),
+            "A Supply Truck below the offensive Fuel reserve neither returned to a loading source nor loaded additional Fuel.");
+    }
+
+    [Fact]
     public void FuelRecoveryPoliciesPrioritizeFieldSupplyOverVehicleProduction()
     {
         VerticalSliceScenario scenario = VerticalSliceScenario.Create(
@@ -323,6 +379,21 @@ public sealed class SkirmishSupplyPolicyTests
                 SimulationTick.Zero));
 
         scenario.Simulation.AdvanceOneTick();
+
+        LogisticsStockPolicy coreSteel =
+            FindStockPolicy(
+                entities,
+                scenario.West.CommandCore,
+                ResourceIds.Steel);
+
+        Assert.Equal(
+            220.0,
+            coreSteel.DesiredMinimum,
+            precision: 6);
+        Assert.Equal(
+            500.0,
+            coreSteel.DesiredTarget,
+            precision: 6);
 
         Assert.Equal(
             LogisticsStockPriority.Critical,
