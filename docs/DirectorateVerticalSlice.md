@@ -12,6 +12,14 @@ The stable faction identity is:
 
 Unit keys use the `directorate.unit.*` namespace. Existing building keys remain stable for compatibility while faction availability explicitly binds them to the Directorate slice.
 
+## Canonical battlefield
+
+The Directorate Vertical Slice runs on Central Divide, the canonical 3,072 m × 3,072 m operational map.
+
+Central Divide provides explicit start/base build areas, strategic expansion and forward-position build zones, bounded mining zones, finite local resources, richer contested reserves, two east-west crossings, road/logistics topology, and elevation-driven terrain. Construction outside defined strategic zones is rejected by the normal authoritative placement flow.
+
+The map is qualified headlessly for critical reachability, alternate navigation and road routing after single-crossing loss, expansion pressure, and elevation. See [Strategic Map and Operational Geography](StrategicMapAndOperationalGeography.md).
+
 ## Production presentation
 
 The core Vertical Slice presentation now covers both the six core unit families and the nine required industrial building families. Buildings resolve through stable `building.directorate.*` runtime IDs, shared construction/state modules, LOD0–LOD2, strategic-symbol bindings, and existing indexed instancing.

@@ -195,6 +195,14 @@ The Windows client smoke path exercises actual terrain shader compilation, pipel
 
 Benchmark timing is measurement evidence and is not a hardware-sensitive CI pass/fail threshold.
 
+## Canonical Vertical Slice operational geography
+
+Central Divide is the canonical 3,072 m × 3,072 m Vertical Slice battlefield. Its terrain, Central Divide ridge, north/south crossings, expansion sites, resource locations, and static navigation obstacles are simulation-owned gameplay geography rather than presentation-only scenery.
+
+Construction in the Vertical Slice now uses explicit map build zones instead of treating all world bounds as buildable. The owning start area, shared strategic sites, and bounded resource mining areas are buildable; unassigned terrain remains non-buildable while normal slope, collision, terrain, and resource-deposit validation still applies.
+
+The canonical definition can be captured as a versioned `BattlefieldMapArtifact`. `ForgeLine.MapCompiler` compiles and reloads that artifact and runs headless operational-geography qualification before CI accepts the map. See [Strategic Map and Operational Geography](StrategicMapAndOperationalGeography.md).
+
 ## Vertical Slice presentation baseline
 
 Central Divide now has a presentation layer above the simulation-owned chunked heightfield. Eight stable terrain material slots, map-specific blend regions, reusable world objects, decals, and vegetation are defined without adding material state to `TerrainWorld` or `TerrainChunk`.

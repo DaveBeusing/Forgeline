@@ -69,6 +69,11 @@ public sealed class VerticalSliceReadinessTests
             $"tanks={scenario.CountUnits(scenario.West.Player, UnitIds.MainBattleTank)}; " +
             $"contacts={scenario.Intelligence.GetContactCount(scenario.West.Faction)}; " +
             $"goal={scenario.GetOpponentState(scenario.West.Player).ActiveGoal}.");
+        Assert.True(
+            scenario.GetOpponentState(
+                scenario.West.Player).ExpansionSiteCursor > 0,
+            "Validation opponent never established a canonical-map expansion.");
+
         Assert.NotEqual(
             SkirmishStrategicGoal.RecoverSupply,
             scenario.GetOpponentState(

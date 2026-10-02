@@ -140,6 +140,23 @@ Game integration records route failures in `NavigationFailureState` instead of i
 
 F2 development visualization can show local traversable and blocked cells, nearby sector boundaries, sector portals, the latest high-level portal route, and the latest refined waypoint route.
 
+## Central Divide operational qualification
+
+The canonical Central Divide map is qualified through the same `NavigationWorld` and `HierarchicalPathfinder` used by gameplay.
+
+Map qualification checks:
+
+- both starts to every strategic site for Tracked movement;
+- both starts to every strategic site for Wheeled movement;
+- both starts to every contested resource for Tracked movement;
+- direct opposing-start connectivity;
+- an opposing-start route after disabling North Bridge;
+- an opposing-start route after disabling South Ford.
+
+Each single-crossing-loss case rebuilds navigation from the map's authoritative obstacle contract. No unrestricted full-map fallback or map-specific movement shortcut is permitted.
+
+`CentralDividePathfindingBenchmarks` measures cross-map, expansion, and bridge-loss alternate-route workloads against the complete canonical terrain.
+
 ## Validation
 
 Correctness fixtures cover open fields, movement-class slope constraints, static obstacles, blocked boundaries, choke points, multi-sector routes, explicit unreachable destinations, high-level cache reuse, job-scheduled simulation handoff, stale-result rejection, and large-map hierarchy scaling.

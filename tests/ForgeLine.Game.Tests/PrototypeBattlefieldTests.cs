@@ -67,6 +67,123 @@ public sealed class PrototypeBattlefieldTests
     }
 
     [Fact]
+    public void CanonicalMapArtifactRoundTripsStrategicDefinition()
+    {
+        PrototypeBattlefieldDefinition definition =
+            PrototypeBattlefieldDefinition.Create();
+
+        BattlefieldMapArtifact artifact =
+            BattlefieldMapArtifact.Capture(
+                definition);
+        byte[] payload =
+            artifact.Serialize();
+        BattlefieldMapArtifact loaded =
+            BattlefieldMapArtifact.Deserialize(
+                payload);
+
+        loaded.ValidateMatches(
+            definition);
+
+        Assert.Equal(
+            BattlefieldMapArtifact.CurrentFormatVersion,
+            loaded.FormatVersion);
+        Assert.Equal(
+            definition.Metadata,
+            loaded.Metadata);
+        Assert.Equal(
+            definition.Resources.Count,
+            loaded.Resources.Length);
+        Assert.Equal(
+            definition.Crossings.Count,
+            loaded.Crossings.Length);
+        Assert.Equal(
+            payload,
+            loaded.Serialize());
+    }
+
+    [Fact]
+    public void CanonicalMapOperationalGeographyQualifiesHeadlessly()
+    {
+        PrototypeBattlefieldDefinition definition =
+            PrototypeBattlefieldDefinition.Create();
+        TerrainWorld terrain =
+            PrototypeBattlefieldTerrainFactory.Create(
+                definition);
+
+        BattlefieldOperationalGeographyReport report =
+            BattlefieldOperationalGeographyValidator.Validate(
+                definition,
+                terrain,
+                new NavigationGridSettings
+                {
+                    CellSizeMeters = 32.0f,
+                    StaticObstacleClearanceMeters = 0.5f
+                },
+                new NavigationSectorSettings
+                {
+                    SectorSizeCells = 4
+                });
+
+        Assert.Equal(
+            definition.Metadata.Key,
+            report.MapKey);
+        Assert.True(
+            report.ReachabilityChecks > 0);
+        Assert.Equal(
+            definition.Crossings.Count,
+            report.AlternateNavigationChecks);
+        Assert.Equal(
+            definition.Crossings.Count,
+            report.AlternateRoadChecks);
+        Assert.True(
+            report.TerrainElevationRangeMeters >= 20.0f);
+        Assert.True(
+            report.LongestRouteMeters >
+            report.ShortestRouteMeters);
+        Assert.Equal(
+            definition.Resources.Count(
+                resource => resource.Contested),
+            report.ContestedResourceCount);
+    }
+
+    [Fact]
+    public void CanonicalMapUsesExplicitStrategicBuildZones()
+    {
+        PrototypeBattlefieldDefinition definition =
+            PrototypeBattlefieldDefinition.Create();
+        var query =
+            new BattlefieldBuildableAreaQuery(
+                definition);
+        BattlefieldStartPosition west =
+            definition.Starts[0];
+        BattlefieldResourceDepositDefinition contested =
+            Assert.Single(
+                definition.Resources,
+                resource =>
+                    resource.Key ==
+                    "center.contested.silicates");
+
+        Assert.True(
+            query.IsBuildable(
+                west.Player,
+                SmallFootprint(
+                    west.CommandCorePosition)));
+        Assert.True(
+            query.IsBuildable(
+                west.Player,
+                SmallFootprint(
+                    contested.Center)));
+        Assert.False(
+            query.IsBuildable(
+                west.Player,
+                SmallFootprint(
+                    new Vector3(
+                        definition.Metadata.WidthMeters * 0.5f,
+                        0.0f,
+                        320.0f))));
+    }
+
+    [Fact]
     public void CrossingDisruptionReroutesNavigationAndLogisticsAndRestorationRecovers()
     {
         PrototypeBattlefieldDefinition definition =
@@ -461,6 +578,18 @@ public sealed class PrototypeBattlefieldTests
             InfrastructurePresentationKind.Ford,
             southFord.Kind);
     }
+
+    private static AxisAlignedBounds SmallFootprint(
+        Vector3 position) =>
+        new(
+            new Vector3(
+                position.X - 2.0f,
+                -64.0f,
+                position.Z - 2.0f),
+            new Vector3(
+                position.X + 2.0f,
+                128.0f,
+                position.Z + 2.0f));
 
     private static NavigationGridSettings CreateGridSettings() =>
         new()

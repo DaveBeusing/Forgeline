@@ -4,7 +4,7 @@
 
 `Central Divide` is the canonical FORGELINE vertical-slice battlefield. It is a 3,072 × 3,072 meter two-player map designed to force the production, logistics, intelligence, terrain, disruption, and combined-arms systems to interact in one scenario.
 
-The map is authored as typed game-content data through `PrototypeBattlefieldDefinition`. The current map compiler remains a future asset-pipeline host; the prototype does not depend on an editor-only or map-script-only runtime path.
+The map is authored as typed game-content data through `PrototypeBattlefieldDefinition`. `ForgeLine.MapCompiler` now captures that definition into the versioned `BattlefieldMapArtifact`, reloads the compiled payload, and runs operational-geography qualification. Gameplay does not depend on editor-only state; the typed definition remains the current runtime source while the artifact establishes the compiler handoff for later editor-authored maps.
 
 ## Strategic Layout
 
@@ -59,7 +59,7 @@ This mechanism is intentionally not specific to Central Divide and can be reused
 
 Every deposit is a normal finite `ResourceDeposit`. Starting deposits are smaller and non-contested. Expansion deposits are larger and placed away from the protected start areas.
 
-The content validator verifies that both starts have nearby access to Ferrous Ore, Volatiles, and Silicates and that contested resource pressure exists.
+The content validator verifies that both starts have nearby access to Ferrous Ore, Volatiles, and Silicates and that contested resource pressure exists. Construction is additionally restricted to explicit start, strategic-site, and resource-mining build zones; arbitrary open terrain is not globally buildable.
 
 ## Command Core Objectives
 
@@ -89,6 +89,8 @@ All visuals remain diagnostic overlays; navigation and logistics behavior comes 
 
 `PrototypeBattlefieldValidator` fails loading for invalid dimensions, duplicate or missing stable keys, invalid road references, insufficient crossing data, missing bootstrap resources, invalid strategic sites, or objective/start mismatches.
 
+`BattlefieldOperationalGeographyValidator` additionally qualifies every strategic-site route and a bounded traversable approach for every resource deposit from the spawns, explicit buildability, expansion pressure, elevation range, and both navigation and road alternatives after either crossing is individually unavailable. CI runs this qualification through `ForgeLine.MapCompiler` and retains the compiled map/report as diagnostics.
+
 `PrototypeBattlefieldTests` run headlessly and validate:
 
 - canonical dimensions and strategic content
@@ -100,6 +102,9 @@ All visuals remain diagnostic overlays; navigation and logistics behavior comes 
 - fixed-tick restoration recovering the original route
 - simulation-owned Command Core victory state
 - Command Core combat-target integration
+- compiled map capture/load roundtrip
+- explicit buildable versus non-buildable geography
+- complete strategic reachability and alternate-route qualification
 
 The presentation tests separately validate the battlefield debug overlay.
 

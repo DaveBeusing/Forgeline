@@ -7,5 +7,6 @@
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" />
     <ProjectReference Include="../../src/ForgeLine.Navigation/ForgeLine.Navigation.csproj" />
+    <ProjectReference Include="../../src/ForgeLine.Game/ForgeLine.Game.csproj" />
   </ItemGroup>
 </Project>
