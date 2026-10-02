@@ -28,7 +28,8 @@ public enum PlayerCommandFeedbackKind : byte
     Logistics = 5,
     Supply = 6,
     Tactical = 7,
-    Artillery = 8
+    Artillery = 8,
+    Surrender = 9
 }
 
 public enum PlayerCommandFeedbackState : byte
@@ -193,7 +194,13 @@ public readonly record struct PlayerExperienceSnapshot(
     int CriticalSupplyUnits,
     int BlockedProductionFacilities,
     PlayerCommandFeedback Feedback,
-    PlayerMatchStatistics Statistics)
+    PlayerMatchStatistics Statistics,
+    MatchLifecyclePhase Lifecycle = MatchLifecyclePhase.Initializing,
+    MatchOutcome Outcome = MatchOutcome.None,
+    MatchTerminationReason TerminationReason = MatchTerminationReason.None,
+    PlayerId DefeatedPlayer = default,
+    SimulationTick MatchCompletedAtTick = default,
+    SimulationTick MatchFinalizedAtTick = default)
 {
     public bool IsMatchComplete =>
         MatchStatus is
@@ -201,6 +208,9 @@ public readonly record struct PlayerExperienceSnapshot(
             PlayerMatchStatus.Defeat or
             PlayerMatchStatus.Draw or
             PlayerMatchStatus.Ended;
+
+    public bool IsMatchFinalized =>
+        Lifecycle == MatchLifecyclePhase.Completed;
 }
 
 public static class PlayerExperienceSnapshotFactory
@@ -390,7 +400,13 @@ public static class PlayerExperienceSnapshotFactory
             criticalSupplyUnits,
             blockedProductionFacilities,
             feedback,
-            statistics);
+            statistics,
+            matchState.Lifecycle,
+            matchState.Outcome,
+            matchState.TerminationReason,
+            matchState.DefeatedPlayer,
+            matchState.CompletedAtTick,
+            matchState.FinalizedAtTick);
     }
 
     private static PlayerCommandFeedback CaptureCommandFeedback(

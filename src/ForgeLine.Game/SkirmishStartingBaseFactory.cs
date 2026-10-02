@@ -77,15 +77,30 @@ public static class SkirmishStartingBaseFactory
                 start.CommandCorePosition,
                 heightOffset: 6.0f);
 
+        SkirmishStartingStock stock =
+            startingStock ??
+            SkirmishStartingStock.Standard;
+        double startingQuantity =
+            stock.FerrousOre +
+            stock.Volatiles +
+            stock.Silicates +
+            stock.Steel +
+            stock.Fuel +
+            stock.Electronics +
+            stock.Ammunition;
+        double inventoryCapacity =
+            Math.Max(
+                12_000.0,
+                startingQuantity + 2_000.0);
+
         InventoryId inventory =
             inventories.CreateInventory(
                 new InventorySpecification(
-                    totalCapacity: 12_000.0));
+                    totalCapacity: inventoryCapacity));
         SeedStartingInventory(
             inventories,
             inventory,
-            startingStock ??
-            SkirmishStartingStock.Standard);
+            stock);
 
         EntityId commandCore =
             entities.CreateEntity();

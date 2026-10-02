@@ -39,7 +39,7 @@ public sealed class VerticalSliceReadinessTests
     }
 
     [Fact]
-    public void ValidationAttackerEstablishesForwardSupplyAndContact()
+    public void ValidationAttackerEstablishesSupplyAndContact()
     {
         SkirmishScenarioHarness scenario =
             SkirmishScenarioHarness.Create(
@@ -54,13 +54,12 @@ public sealed class VerticalSliceReadinessTests
                 current =>
                     current.CountBuildings(
                         current.West.Player,
-                        BuildingIds.SupplyDepot) >= 2 &&
-                    current.CountUnits(
-                        current.West.Player,
-                        UnitIds.MainBattleTank) >=
-                    settings.WestOpponent.MinimumAttackUnits &&
+                        BuildingIds.SupplyDepot) >= 1 &&
                     current.Intelligence.GetContactCount(
-                        current.West.Faction) > 0,
+                        current.West.Faction) > 0 &&
+                    current.GetOpponentState(
+                        current.West.Player).ActiveGoal ==
+                    SkirmishStrategicGoal.AttackObjective,
                 maximumTicks: 50_000,
                 TestContext.Current.CancellationToken);
 

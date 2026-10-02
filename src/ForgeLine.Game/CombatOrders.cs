@@ -592,6 +592,9 @@ internal static class TacticalCommandUtilities
         RemoveIfPresent<ResupplyOrder>(
             context,
             entity);
+        RemoveIfPresent<TacticalCombatState>(
+            context,
+            entity);
 
         if (context.Entities.HasComponent<CombatOrderState>(entity))
         {

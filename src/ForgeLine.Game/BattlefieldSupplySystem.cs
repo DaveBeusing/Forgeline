@@ -222,42 +222,53 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                 continue;
             }
 
-            if (!TryFindLoadingDepot(
+            if (!TryFindLoadingInventory(
                     context,
                     truck,
                     truckTransform.Position,
-                    out SupplyDepot depot))
+                    out InventoryId loadingInventory))
             {
                 continue;
             }
 
             fuelTransferred +=
                 TransferTowardTarget(
-                    depot.InventoryId,
+                    loadingInventory,
                     truck.InventoryId,
                     ResourceIds.Fuel,
                     truck.FuelTarget);
 
             ammunitionTransferred +=
                 TransferTowardTarget(
-                    depot.InventoryId,
+                    loadingInventory,
                     truck.InventoryId,
                     ResourceIds.Ammunition,
                     truck.AmmunitionTarget);
         }
     }
 
-    private bool TryFindLoadingDepot(
+    private bool TryFindLoadingInventory(
         SimulationContext context,
         in SupplyTruck truck,
         Vector3 truckPosition,
-        out SupplyDepot selectedDepot)
+        out InventoryId selectedInventory)
     {
-        selectedDepot = default;
+        selectedInventory = default;
+        InventoryId candidateInventory = default;
         EntityId selectedEntity = EntityId.Invalid;
         float bestDistanceSquared = float.PositiveInfinity;
         float maximumDistanceSquared =
             truck.LoadRangeMeters * truck.LoadRangeMeters;
+        bool needsFuel =
+            _inventories.GetQuantity(
+                truck.InventoryId,
+                ResourceIds.Fuel) <
+            truck.FuelTarget;
+        bool needsAmmunition =
+            _inventories.GetQuantity(
+                truck.InventoryId,
+                ResourceIds.Ammunition) <
+            truck.AmmunitionTarget;
 
         foreach (EntityId entity in
                  context.Entities.Query<SupplyDepot>(
@@ -276,14 +287,80 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                 continue;
             }
 
+            ConsiderLoadingSource(
+                entity,
+                depot.InventoryId,
+                transform.Position);
+        }
+
+        foreach (EntityId entity in
+                 context.Entities.Query<SupplyProvider>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            if (!context.Entities.HasComponent<CommandFacility>(entity))
+            {
+                continue;
+            }
+
+            SupplyProvider provider =
+                context.Entities.GetComponent<SupplyProvider>(entity);
+
+            if (!provider.Enabled ||
+                provider.Owner != truck.Owner ||
+                !_inventories.Contains(provider.InventoryId) ||
+                !context.Entities.TryGetComponent(
+                    entity,
+                    out WorldTransform transform))
+            {
+                continue;
+            }
+
+            ConsiderLoadingSource(
+                entity,
+                provider.InventoryId,
+                transform.Position);
+        }
+
+        if (selectedEntity.IsValid)
+        {
+            selectedInventory = candidateInventory;
+            return true;
+        }
+
+        return false;
+
+        void ConsiderLoadingSource(
+            EntityId entity,
+            InventoryId inventory,
+            Vector3 position)
+        {
+            bool hasNeededFuel =
+                needsFuel &&
+                _inventories.GetAvailableQuantity(
+                    inventory,
+                    ResourceIds.Fuel) > 0.0;
+            bool hasNeededAmmunition =
+                needsAmmunition &&
+                _inventories.GetAvailableQuantity(
+                    inventory,
+                    ResourceIds.Ammunition) > 0.0;
+
+            if (!hasNeededFuel &&
+                !hasNeededAmmunition)
+            {
+                return;
+            }
+
             float distanceSquared =
-                HorizontalDistanceSquared(
-                    truckPosition,
-                    transform.Position);
+                HorizontalDistanceToLoadingSourceSquared(
+                    context,
+                    entity,
+                    position,
+                    truckPosition);
 
             if (distanceSquared > maximumDistanceSquared)
             {
-                continue;
+                return;
             }
 
             if (!selectedEntity.IsValid ||
@@ -292,12 +369,10 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
                  entity < selectedEntity))
             {
                 selectedEntity = entity;
-                selectedDepot = depot;
+                candidateInventory = inventory;
                 bestDistanceSquared = distanceSquared;
             }
         }
-
-        return selectedEntity.IsValid;
     }
 
     private double TransferTowardTarget(
@@ -911,6 +986,38 @@ public sealed class BattlefieldSupplySystem : ISimulationSystem
     {
         float x = left.X - right.X;
         float z = left.Z - right.Z;
+        return x * x + z * z;
+    }
+
+    private static float HorizontalDistanceToLoadingSourceSquared(
+        SimulationContext context,
+        EntityId source,
+        Vector3 sourcePosition,
+        Vector3 loadingPosition)
+    {
+        float x =
+            MathF.Abs(
+                loadingPosition.X -
+                sourcePosition.X);
+        float z =
+            MathF.Abs(
+                loadingPosition.Z -
+                sourcePosition.Z);
+
+        if (context.Entities.TryGetComponent(
+                source,
+                out SpatialPresence presence))
+        {
+            x =
+                MathF.Max(
+                    0.0f,
+                    x - presence.HalfExtents.X);
+            z =
+                MathF.Max(
+                    0.0f,
+                    z - presence.HalfExtents.Z);
+        }
+
         return x * x + z * z;
     }
 

@@ -76,6 +76,9 @@ public sealed class ClientSimulationHostTests
             fixture.Host.WaitForPauseState(
                 paused: true,
                 TestTimeout));
+        Assert.Equal(
+            MatchLifecyclePhase.Paused,
+            fixture.Scenario.GetMatchState().Lifecycle);
 
         SimulationTick pausedAt =
             fixture.Host.CurrentTick;
@@ -87,6 +90,9 @@ public sealed class ClientSimulationHostTests
             fixture.Host.WaitForPauseState(
                 paused: false,
                 TestTimeout));
+        Assert.Equal(
+            MatchLifecyclePhase.Running,
+            fixture.Scenario.GetMatchState().Lifecycle);
         Assert.True(
             fixture.Host.WaitForTickAtLeast(
                 new SimulationTick(
@@ -277,6 +283,19 @@ public sealed class ClientSimulationHostTests
         Assert.Equal(
             terminalTick,
             fixture.Host.CurrentTick);
+
+        MatchState finalized =
+            fixture.Scenario.GetMatchState();
+
+        Assert.Equal(
+            MatchLifecyclePhase.Completed,
+            finalized.Lifecycle);
+        Assert.Equal(
+            MatchOutcome.Victory,
+            finalized.Outcome);
+        Assert.Equal(
+            MatchTerminationReason.CommandCoreDestroyed,
+            finalized.TerminationReason);
     }
 
     [Fact]

@@ -5,6 +5,7 @@ using ForgeLine.Economy;
 using ForgeLine.Ecs;
 using ForgeLine.Intelligence;
 using ForgeLine.Simulation;
+using ForgeLine.World;
 
 namespace ForgeLine.Game;
 
@@ -231,7 +232,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             context,
             owned,
             configuration);
-        EnsureSupplyTrucksLoaded(context, owned);
+        EnsureSupplyTrucksLoaded(
+            context,
+            controller,
+            owned);
 
         SkirmishStrategicState strategicState;
         SkirmishStrategicGoal goal;
@@ -1237,6 +1241,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
+        ReleaseSupplyEscortMovementForRecovery(
+            context,
+            controller,
+            owned);
+
         if (retreatUnits.Count > 0)
         {
             Vector3 recovery =
@@ -1435,18 +1444,54 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         BattlefieldSiteDefinition[] sites =
             GetOpponentFacingSites(
                 controller);
+        BattlefieldObjectiveDefinition? enemyObjective =
+            _battlefield.Objectives
+                .Where(
+                    candidate =>
+                        candidate.Owner != controller.Player)
+                .OrderBy(
+                    candidate =>
+                        HorizontalDistanceSquared(
+                            controller.HomePosition,
+                            candidate.CommandCorePosition))
+                .Cast<BattlefieldObjectiveDefinition?>()
+                .FirstOrDefault();
 
-        if (sites.Length == 0)
+        if (enemyObjective.HasValue)
         {
-            return false;
-        }
+            Vector3 enemyPosition =
+                enemyObjective.Value.CommandCorePosition;
+            Vector3 towardHome =
+                controller.HomePosition -
+                enemyPosition;
+            towardHome.Y = 0.0f;
 
-        int index =
-            Math.Abs(
-                state.ScoutSiteCursor) %
-            sites.Length;
-        objective =
-            sites[index].Position;
+            if (towardHome.LengthSquared() >
+                0.0001f)
+            {
+                towardHome =
+                    Vector3.Normalize(
+                        towardHome);
+            }
+
+            objective =
+                enemyPosition +
+                towardHome * 260.0f;
+        }
+        else
+        {
+            if (sites.Length == 0)
+            {
+                return false;
+            }
+
+            int index =
+                Math.Abs(
+                    state.ScoutSiteCursor) %
+                sites.Length;
+            objective =
+                sites[index].Position;
+        }
 
         var command =
             new AttackMoveCommand(
@@ -1524,6 +1569,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
+        MaintainAttackSupplySupport(
+            context,
+            owned,
+            attackers);
+
         IntelligenceContact? identified = null;
         EntityId identifiedTarget = EntityId.Invalid;
         bool identifiedIsCommandCore = false;
@@ -1553,6 +1603,12 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     out CompletedBuilding objectiveBuilding) &&
                 objectiveBuilding.BuildingId ==
                     BuildingIds.CommandCore;
+
+            if (!isCommandCore)
+            {
+                continue;
+            }
+
             float distance =
                 HorizontalDistanceSquared(
                     controller.HomePosition,
@@ -1579,7 +1635,69 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             objective =
                 identified.Value.LastKnownPosition;
 
-            if (HaveCombatOrder(context, attackers, CombatOrderKind.Attack, objective, identifiedTarget))
+            if (identifiedIsCommandCore)
+            {
+                PartitionAttackForceByObjectivePressure(
+                    context,
+                    attackers,
+                    objective,
+                    configuration.ObjectivePressureLeashMeters,
+                    out EntityId[] pressureUnits,
+                    out EntityId[] approachUnits);
+
+                if (pressureUnits.Length > 0 &&
+                    !HaveCombatOrder(
+                        context,
+                        pressureUnits,
+                        CombatOrderKind.Attack,
+                        objective,
+                        identifiedTarget))
+                {
+                    var attack =
+                        new AttackCommand(
+                            controller.Player,
+                            pressureUnits,
+                            identifiedTarget,
+                            context.Tick,
+                            configuration.ObjectivePressureLeashMeters);
+                    attack.Execute(context);
+                }
+
+                if (approachUnits.Length > 0)
+                {
+                    Vector3 approachObjective =
+                        ResolveObjectiveApproachPoint(
+                            controller.HomePosition,
+                            objective,
+                            configuration.ObjectivePressureLeashMeters);
+
+                    if (!HaveCombatOrder(
+                            context,
+                            approachUnits,
+                            CombatOrderKind.AttackMove,
+                            approachObjective))
+                    {
+                        var approach =
+                            new AttackMoveCommand(
+                                controller.Player,
+                                approachUnits,
+                                approachObjective,
+                                context.Tick,
+                                FormationTemplate.Column,
+                                configuration.ObjectivePressureLeashMeters);
+                        approach.Execute(context);
+                    }
+                }
+
+                return true;
+            }
+
+            if (HaveCombatOrder(
+                    context,
+                    attackers,
+                    CombatOrderKind.Attack,
+                    objective,
+                    identifiedTarget))
             {
                 return true;
             }
@@ -1600,7 +1718,21 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 controller,
                 configuration.Aggression);
 
-        if (HaveCombatOrder(context, attackers, CombatOrderKind.AttackMove, objective))
+        if (HasAttackForceReachedWaypoint(
+                context,
+                attackers,
+                objective))
+        {
+            objective =
+                SelectDeepOffensiveWaypoint(
+                    controller);
+        }
+
+        if (HaveCombatOrder(
+                context,
+                attackers,
+                CombatOrderKind.AttackMove,
+                objective))
         {
             return true;
         }
@@ -1611,11 +1743,321 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 attackers,
                 objective,
                 context.Tick,
-                FormationTemplate.Line,
+                FormationTemplate.Column,
                 configuration.ObjectivePressureLeashMeters);
         advance.Execute(context);
 
         return true;
+    }
+
+    private static void ReleaseSupplyEscortMovementForRecovery(
+        SimulationContext context,
+        SkirmishOpponentController controller,
+        OwnedState owned)
+    {
+        for (int index = 0; index < owned.Units.Count; index++)
+        {
+            EntityId candidate = owned.Units[index];
+
+            if (!context.Entities.TryGetComponent(
+                    candidate,
+                    out SupplyTruck truck) ||
+                context.Entities.HasComponent<ResupplyOrder>(
+                    candidate) ||
+                context.Entities.HasComponent<SupplyRescueAssignment>(
+                    candidate) ||
+                !TacticalCommandUtilities.TryGetMovementIntent(
+                    context,
+                    candidate,
+                    out _))
+            {
+                continue;
+            }
+
+            if (HasSupplyLoadingMovement(
+                    context,
+                    candidate,
+                    controller,
+                    owned,
+                    truck))
+            {
+                continue;
+            }
+
+            bool servingRecipient = false;
+
+            foreach (EntityId recipient in
+                     context.Entities.Query<ResupplyOrder>(
+                         QueryIterationOrder.StableByEntityIndex))
+            {
+                if (context.Entities.GetComponent<ResupplyOrder>(
+                        recipient).Provider == candidate)
+                {
+                    servingRecipient = true;
+                    break;
+                }
+            }
+
+            if (!servingRecipient)
+            {
+                TacticalCommandUtilities.ClearMovementIntent(
+                    context,
+                    candidate);
+            }
+        }
+    }
+
+    private void MaintainAttackSupplySupport(
+        SimulationContext context,
+        OwnedState owned,
+        EntityId[] attackers)
+    {
+        if (attackers.Length == 0)
+        {
+            return;
+        }
+
+        Vector3 centroid = Vector3.Zero;
+        int positionedAttackers = 0;
+
+        for (int index = 0; index < attackers.Length; index++)
+        {
+            if (!context.Entities.TryGetComponent(
+                    attackers[index],
+                    out WorldTransform transform))
+            {
+                continue;
+            }
+
+            centroid += transform.Position;
+            positionedAttackers++;
+        }
+
+        if (positionedAttackers == 0)
+        {
+            return;
+        }
+
+        centroid /= positionedAttackers;
+
+        EntityId selected = EntityId.Invalid;
+        SupplyTruck selectedTruck = default;
+        float selectedDistanceSquared = float.PositiveInfinity;
+
+        for (int index = 0; index < owned.Units.Count; index++)
+        {
+            EntityId candidate = owned.Units[index];
+
+            if (!context.Entities.TryGetComponent(
+                    candidate,
+                    out SupplyTruck truck) ||
+                !context.Entities.TryGetComponent(
+                    candidate,
+                    out WorldTransform transform) ||
+                context.Entities.HasComponent<ResupplyOrder>(
+                    candidate) ||
+                context.Entities.HasComponent<SupplyRescueAssignment>(
+                    candidate))
+            {
+                continue;
+            }
+
+            double availableFuel =
+                _inventories.GetAvailableQuantity(
+                    truck.InventoryId,
+                    ResourceIds.Fuel);
+
+            if (availableFuel <
+                truck.FuelTarget * 0.50)
+            {
+                continue;
+            }
+
+            bool servingRecipient = false;
+
+            foreach (EntityId recipient in
+                     context.Entities.Query<ResupplyOrder>(
+                         QueryIterationOrder.StableByEntityIndex))
+            {
+                if (context.Entities.GetComponent<ResupplyOrder>(
+                        recipient).Provider == candidate)
+                {
+                    servingRecipient = true;
+                    break;
+                }
+            }
+
+            if (servingRecipient)
+            {
+                continue;
+            }
+
+            float distanceSquared =
+                HorizontalDistanceSquared(
+                    transform.Position,
+                    centroid);
+
+            if (!selected.IsValid ||
+                distanceSquared < selectedDistanceSquared ||
+                (distanceSquared == selectedDistanceSquared &&
+                 candidate < selected))
+            {
+                selected = candidate;
+                selectedTruck = truck;
+                selectedDistanceSquared = distanceSquared;
+            }
+        }
+
+        if (!selected.IsValid)
+        {
+            return;
+        }
+
+        const float holdRadiusMeters = 12.0f;
+        const float retargetDistanceMeters = 24.0f;
+
+        if (selectedDistanceSquared <=
+            holdRadiusMeters * holdRadiusMeters)
+        {
+            TacticalCommandUtilities.ClearMovementIntent(
+                context,
+                selected);
+            return;
+        }
+
+        if (!TacticalCommandUtilities.TryGetMovementIntent(
+                context,
+                selected,
+                out MovementOrder movement) ||
+            HorizontalDistanceSquared(
+                movement.WorldTarget,
+                centroid) >
+            retargetDistanceMeters *
+            retargetDistanceMeters)
+        {
+            var command =
+                new MoveEntitiesCommand(
+                    selectedTruck.Owner,
+                    [selected],
+                    centroid,
+                    context.Tick);
+            command.Execute(context);
+        }
+
+    }
+
+    private static Vector3 ResolveAttackForceCentroid(
+        SimulationContext context,
+        EntityId[] attackers)
+    {
+        Vector3 centroid = Vector3.Zero;
+        int count = 0;
+
+        for (int index = 0; index < attackers.Length; index++)
+        {
+            if (!context.Entities.TryGetComponent(
+                    attackers[index],
+                    out WorldTransform transform))
+            {
+                continue;
+            }
+
+            centroid += transform.Position;
+            count++;
+        }
+
+        return count == 0
+            ? Vector3.Zero
+            : centroid / count;
+    }
+
+    private static Vector3 ResolveObjectiveApproachPoint(
+        Vector3 home,
+        Vector3 objective,
+        float pressureRadiusMeters)
+    {
+        Vector3 direction =
+            objective - home;
+        direction.Y = 0.0f;
+
+        float distanceSquared =
+            direction.LengthSquared();
+        if (distanceSquared <= 0.001f)
+        {
+            return objective;
+        }
+
+        float standOffMeters =
+            MathF.Min(
+                80.0f,
+                MathF.Max(
+                    24.0f,
+                    pressureRadiusMeters * 0.6f));
+        float distance =
+            MathF.Sqrt(distanceSquared);
+
+        if (distance <= standOffMeters)
+        {
+            return objective;
+        }
+
+        direction /= distance;
+
+        return new Vector3(
+            objective.X -
+                direction.X * standOffMeters,
+            objective.Y,
+            objective.Z -
+                direction.Z * standOffMeters);
+    }
+
+    private static void PartitionAttackForceByObjectivePressure(
+        SimulationContext context,
+        EntityId[] attackers,
+        Vector3 objective,
+        float pressureRadiusMeters,
+        out EntityId[] pressureUnits,
+        out EntityId[] approachUnits)
+    {
+        float pressureSquared =
+            pressureRadiusMeters *
+            pressureRadiusMeters;
+        var inside =
+            new List<EntityId>(
+                attackers.Length);
+        var outside =
+            new List<EntityId>(
+                attackers.Length);
+
+        for (int index = 0;
+             index < attackers.Length;
+             index++)
+        {
+            EntityId attacker =
+                attackers[index];
+
+            if (context.Entities.TryGetComponent(
+                    attacker,
+                    out WorldTransform transform) &&
+                HorizontalDistanceSquared(
+                    transform.Position,
+                    objective) <=
+                pressureSquared)
+            {
+                inside.Add(
+                    attacker);
+            }
+            else
+            {
+                outside.Add(
+                    attacker);
+            }
+        }
+
+        pressureUnits =
+            inside.ToArray();
+        approachUnits =
+            outside.ToArray();
     }
 
     private static bool HaveCombatOrder(
@@ -1814,22 +2256,51 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private void EnsureSupplyTrucksLoaded(
         SimulationContext context,
+        SkirmishOpponentController controller,
         OwnedState owned)
     {
         foreach (EntityId entity in owned.Units)
         {
             if (!context.Entities.TryGetComponent(entity, out SupplyTruck truck) ||
-                context.Entities.HasComponent<MovementOrder>(entity) ||
                 context.Entities.HasComponent<ResupplyOrder>(entity) ||
                 !context.Entities.TryGetComponent(entity, out WorldTransform transform))
             {
                 continue;
             }
 
-            bool needsFuel = _inventories.GetQuantity(truck.InventoryId, ResourceIds.Fuel) < truck.FuelTarget * 0.25;
-            bool needsAmmunition = _inventories.GetQuantity(truck.InventoryId, ResourceIds.Ammunition) < truck.AmmunitionTarget * 0.25;
+            bool hasMovement =
+                TacticalCommandUtilities.TryGetMovementIntent(
+                    context,
+                    entity,
+                    out _);
+            bool loadingMovement =
+                hasMovement &&
+                HasSupplyLoadingMovement(
+                    context,
+                    entity,
+                    controller,
+                    owned,
+                    truck);
+            bool needsFuel =
+                _inventories.GetQuantity(
+                    truck.InventoryId,
+                    ResourceIds.Fuel) <
+                truck.FuelTarget * 0.25;
+            bool needsAmmunition =
+                _inventories.GetQuantity(
+                    truck.InventoryId,
+                    ResourceIds.Ammunition) <
+                truck.AmmunitionTarget * 0.25;
+
             if (!needsFuel && !needsAmmunition)
             {
+                if (loadingMovement)
+                {
+                    TacticalCommandUtilities.ClearMovementIntent(
+                        context,
+                        entity);
+                }
+
                 continue;
             }
 
@@ -1848,39 +2319,385 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
+            EntityId loadingSource =
+                EntityId.Invalid;
             Vector3 destination = default;
             float bestDistance = float.PositiveInfinity;
             foreach (var candidate in owned.SupplyDepots)
             {
                 if (!context.Entities.TryGetComponent(candidate.Entity, out SupplyDepot depot) ||
-                    depot.State != SupplyDepotState.Operational ||
-                    (needsFuel && _inventories.GetAvailableQuantity(depot.InventoryId, ResourceIds.Fuel) <= 0.0) ||
-                    (needsAmmunition && _inventories.GetAvailableQuantity(depot.InventoryId, ResourceIds.Ammunition) <= 0.0))
+                    depot.State != SupplyDepotState.Operational)
                 {
                     continue;
                 }
 
-                float distance = HorizontalDistanceSquared(transform.Position, candidate.Position);
+                bool depotHasNeededFuel =
+                    needsFuel &&
+                    _inventories.GetAvailableQuantity(
+                        depot.InventoryId,
+                        ResourceIds.Fuel) > 0.0;
+                bool depotHasNeededAmmunition =
+                    needsAmmunition &&
+                    _inventories.GetAvailableQuantity(
+                        depot.InventoryId,
+                        ResourceIds.Ammunition) > 0.0;
+
+                if (!depotHasNeededFuel &&
+                    !depotHasNeededAmmunition)
+                {
+                    continue;
+                }
+
+                float distance =
+                    HorizontalDistanceToSupplyLoadingSourceSquared(
+                        context,
+                        candidate.Entity,
+                        candidate.Position,
+                        transform.Position);
                 if (distance < bestDistance)
                 {
-                    destination = candidate.Position;
-                    bestDistance = distance;
+                    loadingSource =
+                        candidate.Entity;
+                    destination =
+                        candidate.Position;
+                    bestDistance =
+                        distance;
                 }
             }
 
-            if (!float.IsFinite(bestDistance) || bestDistance <= truck.LoadRangeMeters * truck.LoadRangeMeters)
+            if (!float.IsFinite(bestDistance) &&
+                context.Entities.IsAlive(controller.PreferredConstructionSource) &&
+                context.Entities.TryGetComponent(
+                    controller.PreferredConstructionSource,
+                    out SupplyProvider commandCoreProvider) &&
+                commandCoreProvider.Enabled &&
+                commandCoreProvider.Owner == truck.Owner &&
+                context.Entities.TryGetComponent(
+                    controller.PreferredConstructionSource,
+                    out WorldTransform commandCoreTransform) &&
+                ((needsFuel &&
+                  _inventories.GetAvailableQuantity(
+                      commandCoreProvider.InventoryId,
+                      ResourceIds.Fuel) > 0.0) ||
+                 (needsAmmunition &&
+                  _inventories.GetAvailableQuantity(
+                      commandCoreProvider.InventoryId,
+                      ResourceIds.Ammunition) > 0.0)))
+            {
+                loadingSource =
+                    controller.PreferredConstructionSource;
+                destination =
+                    commandCoreTransform.Position;
+                bestDistance =
+                    HorizontalDistanceToSupplyLoadingSourceSquared(
+                        context,
+                        loadingSource,
+                        destination,
+                        transform.Position);
+            }
+
+            if (!float.IsFinite(bestDistance))
             {
                 continue;
             }
 
-            // Load from a face of the depot, within the truck's loading range.
-            Vector3 offset = transform.Position - destination;
-            float approach = truck.LoadRangeMeters - 1.0f;
-            destination += MathF.Abs(offset.X) >= MathF.Abs(offset.Z)
-                ? new Vector3(MathF.CopySign(approach, offset.X), 0.0f, 0.0f)
-                : new Vector3(0.0f, 0.0f, MathF.CopySign(approach, offset.Z));
-            new MoveEntitiesCommand(truck.Owner, [entity], destination, context.Tick).Execute(context);
+            if (bestDistance <=
+                truck.LoadRangeMeters *
+                truck.LoadRangeMeters)
+            {
+                if (loadingMovement)
+                {
+                    TacticalCommandUtilities.ClearMovementIntent(
+                        context,
+                        entity);
+                }
+
+                continue;
+            }
+
+            if (hasMovement)
+            {
+                continue;
+            }
+
+            destination =
+                ResolveSupplyLoadingApproach(
+                    context,
+                    loadingSource,
+                    entity,
+                    destination,
+                    transform.Position,
+                    truck.LoadRangeMeters);
+            new MoveEntitiesCommand(
+                truck.Owner,
+                [entity],
+                destination,
+                context.Tick).Execute(context);
         }
+    }
+
+    private static bool HasSupplyLoadingMovement(
+        SimulationContext context,
+        EntityId entity,
+        SkirmishOpponentController controller,
+        OwnedState owned,
+        in SupplyTruck truck)
+    {
+        if (!TacticalCommandUtilities.TryGetMovementIntent(
+                context,
+                entity,
+                out MovementOrder movement))
+        {
+            return false;
+        }
+
+        float loadRangeSquared =
+            truck.LoadRangeMeters *
+            truck.LoadRangeMeters;
+
+        for (int index = 0;
+             index < owned.SupplyDepots.Count;
+             index++)
+        {
+            (EntityId depotEntity, Vector3 depotPosition) =
+                owned.SupplyDepots[index];
+
+            if (!context.Entities.TryGetComponent(
+                    depotEntity,
+                    out SupplyDepot depot) ||
+                depot.State != SupplyDepotState.Operational)
+            {
+                continue;
+            }
+
+            if (HorizontalDistanceToSupplyLoadingSourceSquared(
+                    context,
+                    depotEntity,
+                    depotPosition,
+                    movement.WorldTarget) <=
+                loadRangeSquared)
+            {
+                return true;
+            }
+        }
+
+        if (context.Entities.IsAlive(
+                controller.PreferredConstructionSource) &&
+            context.Entities.TryGetComponent(
+                controller.PreferredConstructionSource,
+                out WorldTransform commandCoreTransform) &&
+            HorizontalDistanceToSupplyLoadingSourceSquared(
+                context,
+                controller.PreferredConstructionSource,
+                commandCoreTransform.Position,
+                movement.WorldTarget) <=
+            loadRangeSquared)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static Vector3 ResolveSupplyLoadingApproach(
+        SimulationContext context,
+        EntityId source,
+        EntityId truckEntity,
+        Vector3 sourcePosition,
+        Vector3 truckPosition,
+        float loadRangeMeters)
+    {
+        float halfExtentX = 0.0f;
+        float halfExtentZ = 0.0f;
+
+        if (context.Entities.TryGetComponent(
+                source,
+                out SpatialPresence sourcePresence))
+        {
+            halfExtentX =
+                sourcePresence.HalfExtents.X;
+            halfExtentZ =
+                sourcePresence.HalfExtents.Z;
+        }
+
+        float truckHalfExtentX = 2.0f;
+        float truckHalfExtentZ = 2.0f;
+
+        if (context.Entities.TryGetComponent(
+                truckEntity,
+                out SpatialPresence truckPresence))
+        {
+            truckHalfExtentX =
+                truckPresence.HalfExtents.X;
+            truckHalfExtentZ =
+                truckPresence.HalfExtents.Z;
+        }
+
+        float approach =
+            MathF.Max(
+                0.0f,
+                loadRangeMeters - 1.0f);
+
+        Span<Vector3> candidates =
+        [
+            sourcePosition +
+            new Vector3(
+                halfExtentX + approach,
+                0.0f,
+                0.0f),
+            sourcePosition +
+            new Vector3(
+                -(halfExtentX + approach),
+                0.0f,
+                0.0f),
+            sourcePosition +
+            new Vector3(
+                0.0f,
+                0.0f,
+                halfExtentZ + approach),
+            sourcePosition +
+            new Vector3(
+                0.0f,
+                0.0f,
+                -(halfExtentZ + approach))
+        ];
+
+        Vector3 selected =
+            candidates[0];
+        float selectedDistanceSquared =
+            float.PositiveInfinity;
+        bool foundClearCandidate = false;
+
+        for (int index = 0;
+             index < candidates.Length;
+             index++)
+        {
+            Vector3 candidate =
+                candidates[index];
+            bool clear =
+                IsSupplyLoadingApproachClear(
+                    context,
+                    source,
+                    candidate,
+                    truckHalfExtentX,
+                    truckHalfExtentZ);
+
+            if (foundClearCandidate &&
+                !clear)
+            {
+                continue;
+            }
+
+            float distanceSquared =
+                HorizontalDistanceSquared(
+                    truckPosition,
+                    candidate);
+
+            if ((!foundClearCandidate && clear) ||
+                clear == foundClearCandidate &&
+                distanceSquared <
+                selectedDistanceSquared)
+            {
+                selected =
+                    candidate;
+                selectedDistanceSquared =
+                    distanceSquared;
+                foundClearCandidate =
+                    clear;
+            }
+        }
+
+        return selected;
+    }
+
+    private static bool IsSupplyLoadingApproachClear(
+        SimulationContext context,
+        EntityId loadingSource,
+        Vector3 candidate,
+        float truckHalfExtentX,
+        float truckHalfExtentZ)
+    {
+        const float clearanceMeters = 1.0f;
+
+        foreach (EntityId entity in
+                 context.Entities.Query<
+                     SpatialPresence,
+                     WorldTransform>(
+                         QueryIterationOrder.StableByEntityIndex))
+        {
+            if (entity == loadingSource)
+            {
+                continue;
+            }
+
+            SpatialPresence presence =
+                context.Entities.GetComponent<SpatialPresence>(
+                    entity);
+
+            if (presence.Metadata.Mobility !=
+                SpatialMobility.Static)
+            {
+                continue;
+            }
+
+            WorldTransform transform =
+                context.Entities.GetComponent<WorldTransform>(
+                    entity);
+            float allowedX =
+                presence.HalfExtents.X +
+                truckHalfExtentX +
+                clearanceMeters;
+            float allowedZ =
+                presence.HalfExtents.Z +
+                truckHalfExtentZ +
+                clearanceMeters;
+
+            if (MathF.Abs(
+                    candidate.X -
+                    transform.Position.X) <
+                allowedX &&
+                MathF.Abs(
+                    candidate.Z -
+                    transform.Position.Z) <
+                allowedZ)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static float HorizontalDistanceToSupplyLoadingSourceSquared(
+        SimulationContext context,
+        EntityId source,
+        Vector3 sourcePosition,
+        Vector3 loadingPosition)
+    {
+        float x =
+            MathF.Abs(
+                loadingPosition.X -
+                sourcePosition.X);
+        float z =
+            MathF.Abs(
+                loadingPosition.Z -
+                sourcePosition.Z);
+
+        if (context.Entities.TryGetComponent(
+                source,
+                out SpatialPresence presence))
+        {
+            x =
+                MathF.Max(
+                    0.0f,
+                    x - presence.HalfExtents.X);
+            z =
+                MathF.Max(
+                    0.0f,
+                    z - presence.HalfExtents.Z);
+        }
+
+        return x * x + z * z;
     }
 
     private void EnsureEconomyPolicies(
@@ -2365,7 +3182,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         UnitId candidate =
             SelectCriticalLogisticsProductionGoal(
                 owned,
-                facility);
+                facility,
+                configuration);
 
         if (!candidate.IsSpecified)
         {
@@ -2516,7 +3334,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private static UnitId SelectCriticalLogisticsProductionGoal(
         OwnedState owned,
-        in UnitProductionFacility facility)
+        in UnitProductionFacility facility,
+        SkirmishOpponentConfiguration configuration)
     {
         if (!facility.Supports(
                 UnitProductionCapability.Logistics))
@@ -2524,10 +3343,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return UnitId.None;
         }
 
-        int cargoTarget = Math.Clamp(
-            owned.SupplyDepots.Count,
-            2,
-            4);
+        int cargoTarget =
+            Math.Max(
+                configuration.MinimumCargoTrucks,
+                Math.Clamp(
+                    owned.SupplyDepots.Count,
+                    2,
+                    4));
         int cargoCount =
             GetUnitCount(
                 owned,
@@ -2542,6 +3364,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return UnitIds.CargoTruck;
         }
 
+        int supplyTarget =
+            configuration.MinimumSupplyTrucks;
         int supplyCount =
             GetUnitCount(
                 owned,
@@ -2550,7 +3374,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             UnitIds.SupplyTruck,
             out int pendingSupply);
 
-        if (supplyCount + pendingSupply < 1)
+        if (supplyCount + pendingSupply <
+            supplyTarget)
         {
             return UnitIds.SupplyTruck;
         }
@@ -3312,10 +4137,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return _battlefield.Sites
             .Where(
                 site =>
-                    site.Kind is
+                    (site.Kind is
                         BattlefieldSiteKind.ForwardOperatingBase or
                         BattlefieldSiteKind.Expansion or
-                        BattlefieldSiteKind.MiningOutpost)
+                        BattlefieldSiteKind.MiningOutpost) &&
+                    (homeWest
+                        ? site.Position.X >= center
+                        : site.Position.X <= center))
             .OrderBy(
                 site =>
                     HorizontalDistanceSquared(
@@ -3345,6 +4173,25 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                center
             ? position.X <= center
             : position.X >= center;
+    }
+
+    private static bool HasAttackForceReachedWaypoint(
+        SimulationContext context,
+        EntityId[] attackers,
+        Vector3 waypoint)
+    {
+        const float reachedRadiusMeters = 180.0f;
+
+        Vector3 centroid =
+            ResolveAttackForceCentroid(
+                context,
+                attackers);
+
+        return HorizontalDistanceSquared(
+                   centroid,
+                   waypoint) <=
+               reachedRadiusMeters *
+               reachedRadiusMeters;
     }
 
     private Vector3 SelectOffensiveWaypoint(
@@ -3493,23 +4340,34 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
-            if (context.Entities.TryGetComponent(
+            bool hasMovementIntent =
+                TacticalCommandUtilities.TryGetMovementIntent(
+                    context,
                     entity,
-                    out CombatOrderState order) &&
-                order.Kind == CombatOrderKind.Retreat)
+                    out _);
+            bool hasResupplyOrder =
+                context.Entities.HasComponent<ResupplyOrder>(
+                    entity);
+            bool hasCombatOrder =
+                context.Entities.TryGetComponent(
+                    entity,
+                    out CombatOrderState order);
+
+            if (hasCombatOrder &&
+                order.Kind == CombatOrderKind.Retreat &&
+                (hasMovementIntent || hasResupplyOrder))
             {
                 continue;
             }
 
-            if (order.Kind == CombatOrderKind.AttackMove &&
-                context.Entities.HasComponent<MovementOrder>(
-                    entity))
+            if (hasCombatOrder &&
+                order.Kind == CombatOrderKind.AttackMove &&
+                hasMovementIntent)
             {
                 continue;
             }
 
-            if (context.Entities.HasComponent<ResupplyOrder>(
-                    entity))
+            if (hasResupplyOrder)
             {
                 continue;
             }

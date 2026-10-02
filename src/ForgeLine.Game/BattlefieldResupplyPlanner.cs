@@ -145,9 +145,17 @@ public static class BattlefieldResupplyPlanner
             return false;
         }
 
-        ClearFormationMovement(
-            context,
-            recipient);
+        bool alreadyInProviderRange =
+            bestDistanceSquared <=
+            selectedProvider.ResupplyRangeMeters *
+            selectedProvider.ResupplyRangeMeters;
+
+        if (!alreadyInProviderRange)
+        {
+            ClearFormationMovement(
+                context,
+                recipient);
+        }
 
         BattlefieldSupplyResource requestedResources =
             requiredResources == BattlefieldSupplyResource.None
@@ -174,6 +182,11 @@ public static class BattlefieldResupplyPlanner
             context.Entities.AddComponent(
                 recipient,
                 resupplyOrder);
+        }
+
+        if (alreadyInProviderRange)
+        {
+            return true;
         }
 
         if (recipientCanReachProvider)

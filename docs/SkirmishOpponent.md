@@ -76,7 +76,7 @@ Desired counts are intentionally simple. Configuration limits queue depth so the
 
 ## Reconnaissance and Intelligence
 
-Idle Scout Vehicles receive AttackMove reconnaissance tasks toward public expansion and forward-operating sites until the enemy Command Core is currently identified. Scouts are excluded from the strategic attack candidate set.
+Idle Scout Vehicles prioritize an AttackMove reconnaissance route to a stand-off approach point toward the public opposing Command Core objective. The scout still has to cross the battlefield, enter real sensor range, and obtain identification through the battlefield intelligence system; no contact is synthesized from map knowledge. Public expansion, forward-operating, and mining sites remain the fallback scouting route when no opposing objective is configured. Scouts are excluded from the strategic attack candidate set.
 
 Strategic threat and opportunity evaluation consumes FactionIntelligenceSnapshot. Identified contacts may resolve to an entity for a direct Attack command. Detected contacts remain coordinate-level information. Artillery missions use current detected or identified contact keys and are validated again by the authoritative artillery system.
 
@@ -99,11 +99,11 @@ Offensive admission is per candidate, not a comparison against the entire army's
 
 The current implementation allows a candidate without a readiness component through the readiness filter; diagnostics explicitly records HasReadiness so absence cannot be mistaken for a measured full-readiness value. Normal runtime readiness is derived in SnapshotEvents.
 
-When direct hostile identification exists, the opponent may attack that identified entity, prioritizing an identified Command Core. Otherwise it advances toward public static strategic positions rather than reading hidden live enemy state.
+When direct hostile identification exists, the opponent may attack that identified entity, prioritizing an identified Command Core. Otherwise it advances only toward public strategic sites on the opponent-facing half of the map rather than reading hidden live enemy state. Reaching that forward waypoint escalates the same offensive intent toward the public opposing start position; this brings the force into normal reconnaissance range so the battlefield-intelligence system can identify the Command Core and hand control to the direct Attack path.
 
 Individual low-readiness or low-supply units receive normal retreat/recovery behavior. Existing real ResupplyOrders are not replaced with a new strategic retreat. Force-wide Resupplying is narrower than the presence of any degraded unit: it requires an established attack force, an active resupply order, and the configured aggregate/all-units recovery condition. Consequently, PrepareOffensive with no active resupply order must not be interpreted as proof of either adequate supply or a particular supply-system defect.
 
-Automatic resupply policy remains attached to units. Only BattlefieldSupplySystem transfers Fuel or Ammunition. A recipient unable to afford the trip to a provider can instead receive a Supply Truck rescue, subject to separate propulsion/cargo checks and actual route-budget validation. Rescue cancellation releases only the movement owned by that assignment. See [Battlefield Supply](BattlefieldSupply.md).
+Automatic resupply policy remains attached to units. Only BattlefieldSupplySystem transfers Fuel or Ammunition. A recipient unable to afford the trip to a provider can instead receive a Supply Truck rescue, subject to separate propulsion/cargo checks and actual route-budget validation. Rescue cancellation releases only the movement owned by that assignment. An available loaded Supply Truck may also follow the current offensive centroid as mobile support, but escort distance is not an additional offensive-admission gate: units that already satisfy the configured readiness and supply thresholds continue their attack while the truck catches up. See [Battlefield Supply](BattlefieldSupply.md).
 
 Mobile Artillery receives fire missions only from current detected or identified contacts and respects a configurable firing-decision cadence.
 

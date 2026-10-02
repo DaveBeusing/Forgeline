@@ -660,6 +660,10 @@ public sealed class VerticalSliceScenario : IDisposable
 
         cancellationToken.ThrowIfCancellationRequested();
 
+        MatchObjectiveSystem.ActivateMatch(
+            simulation.Entities,
+            battlefieldRuntime.MatchStateEntity);
+
         var services =
             new VerticalSliceRuntimeServices(
                 resources,

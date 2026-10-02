@@ -178,6 +178,13 @@ public static class PlayerActionRequestDispatcher
                         observedTick);
                 return true;
 
+            case PlayerActionRequestKind.Surrender:
+                receipt =
+                    gateway.SubmitSurrender(
+                        player,
+                        observedTick);
+                return true;
+
             default:
                 receipt = default;
                 return false;

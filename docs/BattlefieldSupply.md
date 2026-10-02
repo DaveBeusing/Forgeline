@@ -9,7 +9,7 @@ The system keeps the player-facing model readable while preserving authoritative
 - Fuel is consumed by movement.
 - Ammunition is consumed through the combat-facing ammunition hook.
 - Supply Depots receive stock through the existing regional logistics network.
-- Supply Trucks load only when physically near an operational Supply Depot.
+- Supply Trucks normally load when physically near an operational Supply Depot; a friendly Command Core is a deterministic fallback loading source when needed battlefield stock is unavailable from depots.
 - Units receive resources only from an eligible provider within its resupply range.
 - No battlefield resource is granted through a global pool or remote shortcut.
 
@@ -94,7 +94,9 @@ The vehicle has two distinct inventory responsibilities:
 - a dedicated operational Fuel inventory used for its own movement;
 - a cargo inventory that carries Fuel and Ammunition for recipients.
 
-Supply Trucks are explicitly excluded from the regional automated-distribution truck pool. They load their battlefield cargo only from an operational friendly Supply Depot within loading range.
+Supply Trucks are explicitly excluded from the regional automated-distribution truck pool. Their normal battlefield loading source is an operational friendly Supply Depot within loading range. A friendly Command Core may also act as a fallback loading source when it is physically within the same loading range and holds Fuel or Ammunition the truck currently needs. This recovery path transfers real inventory stock; it does not create resources or bypass movement.
+
+The fallback prevents battlefield recovery from deadlocking when regional depot stock is temporarily exhausted while real reserve stock still exists at the base. Supply Depots remain the preferred forward logistics layer, and Supply Trucks still have to travel to a valid loading source before their cargo can be replenished.
 
 This separation prevents carried Fuel from being confused with the truck's own propulsion Fuel. Available propulsion Fuel excludes quantities already reserved in the inventory. A stocked cargo compartment cannot fund a trip whose propulsion inventory is empty, missing, or insufficient.
 
@@ -167,7 +169,7 @@ The headless progression observer distinguishes a truck's carried Fuel from its 
 
 ## Validation
 
-Regression coverage includes movement Fuel consumption, zero-Fuel immobilization and post-refuel resumption, Ammunition consumption and insufficient-ammo failure, Supply Truck loading, provider depletion and recipient priority, Supply Depot logistics registration, Resupply commands, resource conservation, and debug read models.
+Regression coverage includes movement Fuel consumption, zero-Fuel immobilization and post-refuel resumption, Ammunition consumption and insufficient-ammo failure, Supply Truck loading from depots and Command Core fallback stock, provider depletion and recipient priority, Supply Depot logistics registration, Resupply commands, resource conservation, and debug read models.
 
 `SupplyRescueFeasibilityTests` covers unaffordable propulsion, a feasible alternative, reserved propulsion stock, missing propulsion inventories, cargo/propulsion separation, already-in-range transfer, and competing recipients. `SupplyRescueRoutingTests` covers an unaffordable real detour, alternative-provider selection, topology-driven replanning, cancellation and recipient/provider loss, changed propulsion stock, and preservation of a newer movement order. Route-admission tests intentionally omit ground movement to prove that rejection happens before any travel or consumption.
 

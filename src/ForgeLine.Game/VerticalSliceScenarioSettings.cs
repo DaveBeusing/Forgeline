@@ -97,10 +97,10 @@ public sealed record VerticalSliceScenarioSettings
             StartingStock =
                 new SkirmishStartingStock(
                     FerrousOre: 1_200.0,
-                    Volatiles: 800.0,
+                    Volatiles: 6_000.0,
                     Silicates: 800.0,
                     Steel: 3_000.0,
-                    Fuel: 2_000.0,
+                    Fuel: 18_000.0,
                     Electronics: 1_500.0,
                     Ammunition: 1_500.0),
             WestOpponent =
@@ -115,15 +115,17 @@ public sealed record VerticalSliceScenarioSettings
                     MinimumAttackUnits = 3,
                     MaximumAttackUnits = 12,
                     MaximumQueuedUnitsPerFacility = 3,
+                    MinimumCargoTrucks = 4,
+                    MinimumSupplyTrucks = 3,
                     DefensiveRadiusMeters = 450.0f,
-                    ObjectivePressureLeashMeters = 320.0f,
+                    ObjectivePressureLeashMeters = 120.0f,
                     ArtilleryCadenceTicks = 50
                 },
             EastOpponent =
                 new SkirmishOpponentConfiguration
                 {
                     ReactionCadenceTicks = 10,
-                    Aggression = 0.8,
+                    Aggression = 0.55,
                     ExpansionReadinessThreshold = 0.42,
                     OffensiveReadinessThreshold = 0.58,
                     RetreatThreshold = 0.22,
@@ -131,6 +133,8 @@ public sealed record VerticalSliceScenarioSettings
                     MinimumAttackUnits = 3,
                     MaximumAttackUnits = 8,
                     MaximumQueuedUnitsPerFacility = 2,
+                    MinimumCargoTrucks = 4,
+                    MinimumSupplyTrucks = 3,
                     DefensiveRadiusMeters = 600.0f,
                     ObjectivePressureLeashMeters = 240.0f,
                     ArtilleryCadenceTicks = 60

@@ -21,19 +21,19 @@ The current prototype battlefield binds starts and objective ownership to Player
 
 ## Authoritative lifecycle
 
-The match-state entity is created in `Loading`.
+The match-state entity has an explicit simulation-owned lifecycle:
 
-After both Command Core objectives are attached, setup transitions the state to `Active`. Only `Active` matches are evaluated by `MatchObjectiveSystem`.
+`Initializing -> Ready -> Running <-> Paused -> Ending -> Completed`
 
-Authoritative terminal states are:
+`Initializing` exists while the world and starting state are being created. Attaching all Command Core objectives moves the match to `Ready`; the shared vertical-slice composition enters `Running` only after the simulation system pipeline is fully registered. Client pause/resume uses simulation control commands to move between `Running` and `Paused` without advancing the logical clock.
 
-- `Victory` — exactly one Command Core remains and `Winner` identifies its owner;
-- `Draw` — all Command Cores are lost in the same objective-evaluation tick;
-- `Ended` — a completed match has been explicitly acknowledged through `EndMatchCommand`.
+A match result is distinct from lifecycle phase. `MatchOutcome` records `Victory` or `Draw`, while `MatchTerminationReason` records why the result occurred. Current authoritative reasons are Command Core destruction, surrender, simultaneous Command Core destruction, and all-participant elimination.
 
-`MatchState.ForPlayer` converts the global state into the local player-facing result. A global `Victory` is therefore rendered as either `Victory` or `Defeat` without storing contradictory winner/loser states in simulation.
+`MatchObjectiveSystem` evaluates only `Running` matches. It resolves Command Core destruction and surrendered participants from simulation state. Result resolution moves the lifecycle to `Ending`; `EndMatchCommand` is the only normal transition from `Ending` to `Completed`. The result, winner, defeated participant, result tick, finalization tick, last transition tick, and transition count remain available for diagnostics after completion.
 
-Command Core resolution uses stable ECS iteration and the simulation tick, so simultaneous destruction is deterministic and headless-testable.
+The compatibility-facing `MatchStatus` still exposes `Loading`, `Active`, `Victory`, `Draw`, and `Ended`, and `MatchState.ForPlayer` still maps a global victory to local `Victory` or `Defeat`. Presentation therefore does not own or reconstruct match authority.
+
+Command Core resolution uses stable ECS iteration and the simulation tick, so simultaneous destruction is deterministic and headless-testable. Invalid lifecycle transitions fail explicitly instead of silently mutating state.
 
 ## End-of-match behavior
 
@@ -56,7 +56,7 @@ Command Cores attached to the objective system are normal combat targets with au
 
 If the local Command Core is destroyed while the opponent survives, the same global result identifies the opponent as winner and the player read model reports `Defeat`.
 
-Surrender is not implemented in this slice because the existing client has no general match command/menu surface yet. It remains an optional extension rather than a parallel one-off UI path.
+Surrender is an authoritative simulation command. `PlayerActionRequest.Surrender` dispatches through the same bounded `PlayerCommandGateway` as other player-authored actions, schedules `SurrenderCommand` for a future simulation tick, and publishes the accepted/rejected result through the normal command-result buffer. The objective system then resolves the surrendered participant exactly like other terminal objective changes. A dedicated final frontend/menu affordance can call this existing action without introducing a second match-authority path.
 
 ## Player HUD read model
 
@@ -148,19 +148,23 @@ Historical unit-loss and delivered-supply totals remain deferred until those sys
 
 ## Validation
 
-Headless lifecycle coverage verifies:
+Lifecycle validation verifies:
 
-- loading before objective setup;
-- activation after objective attachment;
-- Command Core victory;
-- player-relative defeat;
+- explicit `Initializing -> Ready -> Running` bootstrap;
+- controlled `Running <-> Paused` transitions;
+- invalid-transition rejection;
+- Command Core victory and player-relative defeat;
 - deterministic simultaneous destruction as a draw;
-- completed-match transition to `Ended`;
-- fresh restart state without retained terminal state;
+- surrender through the request, command gateway, simulation command, result buffer, and objective evaluator;
+- result-reason diagnostics and terminal read-model propagation;
+- `Ending -> Completed` finalization without an extra gameplay tick;
+- fresh restart sessions with no retained terminal/world state;
 - canonical vertical-slice configuration;
 - bounded correlated command-result ordering and overflow behavior;
 - completed-tick/session coherence for player-facing snapshots;
 - old-session interpolation and selection invalidation.
+
+The headless full-match CI path runs the shared vertical-slice composition until an authoritative result exists, finalizes that result through `EndMatchCommand`, requires the lifecycle to reach `Completed`, and emits the complete lifecycle/outcome/reason transition data in its JSON report.
 
 The repository CI remains responsible for the full Release build, Windows client smoke run, headless diagnostics/stress runs, and the complete test suite.
 
@@ -175,7 +179,7 @@ Current limitations include:
 - there is no final menu shell or frontend;
 - there is no dedicated minimap render surface yet;
 - transient event history/notification queues are not yet persistent;
-- no surrender action is exposed yet;
+- the surrender command path exists, but a dedicated final frontend/menu affordance is still deferred;
 - final visual hierarchy, iconography, accessibility treatment, localization, and audio feedback are deferred.
 
 
@@ -216,6 +220,6 @@ The Windows client no longer advances authoritative gameplay from the render/eve
 
 A completed Victory/Defeat/Draw snapshot causes the simulation owner to freeze normal ticks immediately after that completed tick. Platform input and rendering remain live so the result screen can be interacted with and redrawn.
 
-Minimize pause is an explicit simulation control transition between complete ticks. It is not inferred from whether the renderer happens to submit a frame.
+Minimize pause is an explicit `SetMatchPausedCommand` control transition between complete ticks. The authoritative match lifecycle changes to `Paused` and back to `Running` without executing a gameplay tick; pause is not inferred from whether the renderer happens to submit a frame.
 
 Restart stops and joins the render/simulation owners before the shared runtime and job scheduler are disposed, then creates a fresh runtime/session. Requests carry the expected `SimulationSessionId`; old-session or terminal gameplay work is rejected before it can reach the authoritative command scheduler.

@@ -11,7 +11,7 @@ namespace ForgeLine.Game.Tests;
 public sealed class SkirmishSupplyPolicyTests
 {
     [Fact]
-    public void EmptySupplyTruckDrivesToDepotAndLoadsPhysicalStock()
+    public void EmptySupplyTruckAvoidsBlockedLoadingFaceAndLoadsPhysicalStock()
     {
         VerticalSliceScenario scenario = VerticalSliceScenario.Create(
             VerticalSliceScenarioSettings.Create(VerticalSliceScenarioProfile.Validation));
@@ -25,6 +25,23 @@ public sealed class SkirmishSupplyPolicyTests
         entities.AddComponent(depot, new SupplyDepot(inventory, scenario.West.Player));
         entities.AddComponent(depot, new SpatialPresence(new Vector3(8.0f, 4.0f, 8.0f),
             new SpatialEntryMetadata(scenario.West.Player.Value, 0, SpatialMobility.Static)));
+
+        EntityId blockedFace = entities.CreateEntity();
+        entities.AddComponent(
+            blockedFace,
+            new WorldTransform(
+                new Vector3(401.0f, 0.0f, 1800.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        entities.AddComponent(
+            blockedFace,
+            new SpatialPresence(
+                new Vector3(6.0f, 4.0f, 6.0f),
+                new SpatialEntryMetadata(
+                    scenario.West.Player.Value,
+                    0,
+                    SpatialMobility.Static)));
+
         EntityId truck = scenario.UnitFactory.Create(
             DirectorateContent.CreateUnitCatalog()[UnitIds.SupplyTruck],
             new Vector3(360.0f, 0.0f, 1800.0f), scenario.West.Player);
@@ -36,6 +53,118 @@ public sealed class SkirmishSupplyPolicyTests
         Assert.Equal(supply.AmmunitionTarget, scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Ammunition), precision: 6);
         Assert.Equal(600.0 - supply.FuelTarget, scenario.Inventories.GetQuantity(inventory, ResourceIds.Fuel), precision: 6);
         Assert.Equal(800.0 - supply.AmmunitionTarget, scenario.Inventories.GetQuantity(inventory, ResourceIds.Ammunition), precision: 6);
+        Assert.False(
+            entities.HasComponent<MovementOrder>(
+                truck));
+        Assert.False(
+            entities.HasComponent<NavigationPendingPath>(
+                truck));
+        Assert.False(
+            entities.HasComponent<NavigationRouteState>(
+                truck));
+    }
+
+    [Fact]
+    public void CombatRecoveryDoesNotCancelSupplyTruckLoadingMovement()
+    {
+        VerticalSliceScenario scenario = VerticalSliceScenario.Create(
+            VerticalSliceScenarioSettings.Create(VerticalSliceScenarioProfile.Validation));
+        EntityRegistry entities = scenario.Simulation.Entities;
+
+        InventoryId depotInventory =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(2_500.0));
+        Assert.True(
+            scenario.Inventories.Add(
+                depotInventory,
+                ResourceIds.Fuel,
+                600.0).Succeeded);
+        Assert.True(
+            scenario.Inventories.Add(
+                depotInventory,
+                ResourceIds.Ammunition,
+                800.0).Succeeded);
+
+        EntityId depot = entities.CreateEntity();
+        entities.AddComponent(
+            depot,
+            new WorldTransform(
+                new Vector3(420.0f, 0.0f, 1800.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        entities.AddComponent(
+            depot,
+            new CompletedBuilding(
+                BuildingIds.SupplyDepot,
+                scenario.West.Player,
+                SimulationTick.Zero));
+        entities.AddComponent(
+            depot,
+            new SupplyDepot(
+                depotInventory,
+                scenario.West.Player));
+        entities.AddComponent(
+            depot,
+            new SpatialPresence(
+                new Vector3(8.0f, 4.0f, 8.0f),
+                new SpatialEntryMetadata(
+                    scenario.West.Player.Value,
+                    0,
+                    SpatialMobility.Static)));
+
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
+        EntityId recoveryUnit =
+            scenario.UnitFactory.Create(
+                units[UnitIds.RifleSquad],
+                new Vector3(500.0f, 0.0f, 1800.0f),
+                scenario.West.Player);
+        UnitFuelState recoveryFuel =
+            entities.GetComponent<UnitFuelState>(
+                recoveryUnit);
+        double initialRecoveryFuel =
+            scenario.Inventories.GetQuantity(
+                recoveryFuel.InventoryId,
+                ResourceIds.Fuel);
+        Assert.True(
+            scenario.Inventories.Remove(
+                recoveryFuel.InventoryId,
+                ResourceIds.Fuel,
+                initialRecoveryFuel).Succeeded);
+
+        EntityId truck =
+            scenario.UnitFactory.Create(
+                units[UnitIds.SupplyTruck],
+                new Vector3(360.0f, 0.0f, 1800.0f),
+                scenario.West.Player);
+        SupplyTruck supply =
+            entities.GetComponent<SupplyTruck>(
+                truck);
+
+        scenario.Simulation.RunTicks(
+            600,
+            TestContext.Current.CancellationToken);
+
+        double truckFuel =
+            scenario.Inventories.GetQuantity(
+                supply.InventoryId,
+                ResourceIds.Fuel);
+        double recoveredFuel =
+            scenario.Inventories.GetQuantity(
+                recoveryFuel.InventoryId,
+                ResourceIds.Fuel);
+        double remainingDepotFuel =
+            scenario.Inventories.GetQuantity(
+                depotInventory,
+                ResourceIds.Fuel);
+
+        Assert.True(
+            remainingDepotFuel < 600.0,
+            "The Supply Truck never reached a loading source while combat recovery was active.");
+        Assert.True(
+            truckFuel > 0.0 ||
+            recoveredFuel > 0.0,
+            "Loaded Fuel was neither retained by the Supply Truck nor delivered to the recovering combat unit.");
     }
 
     [Fact]

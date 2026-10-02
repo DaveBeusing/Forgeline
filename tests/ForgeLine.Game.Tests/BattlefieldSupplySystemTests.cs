@@ -3,6 +3,7 @@ using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Simulation;
+using ForgeLine.World;
 using Xunit;
 
 namespace ForgeLine.Game.Tests;
@@ -372,6 +373,132 @@ public sealed class BattlefieldSupplySystemTests
             2.0,
             inventories.GetQuantity(
                 ammunition.InventoryId,
+                ResourceIds.Ammunition));
+    }
+
+    [Fact]
+    public void SupplyTruckCanReloadFromFriendlyCommandCore()
+    {
+        var simulation =
+            new SimulationCoordinator();
+        var inventories =
+            new InventoryStore();
+        var network =
+            new ForgeLine.Logistics.LogisticsNetwork();
+        var cargo =
+            new CargoTransportSystem(
+                network,
+                inventories);
+        var supply =
+            new BattlefieldSupplySystem(
+                inventories);
+        simulation.RegisterSystem(
+            supply);
+
+        InventoryId commandInventory =
+            inventories.CreateInventory(
+                new InventorySpecification(
+                    500.0));
+        Assert.True(
+            inventories.Add(
+                commandInventory,
+                ResourceIds.Fuel,
+                140.0).Succeeded);
+        Assert.True(
+            inventories.Add(
+                commandInventory,
+                ResourceIds.Ammunition,
+                130.0).Succeeded);
+
+        EntityId commandCore =
+            simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(
+            commandCore,
+            new WorldTransform(
+                Vector3.Zero,
+                Quaternion.Identity,
+                Vector3.One));
+        simulation.Entities.AddComponent(
+            commandCore,
+            new SpatialPresence(
+                new Vector3(
+                    10.0f,
+                    6.0f,
+                    10.0f),
+                new SpatialEntryMetadata(
+                    LocalPlayer.Value,
+                    0,
+                    SpatialMobility.Static)));
+        simulation.Entities.AddComponent(
+            commandCore,
+            new CommandFacility());
+        simulation.Entities.AddComponent(
+            commandCore,
+            new SupplyProvider(
+                commandInventory,
+                LocalPlayer,
+                resupplyRangeMeters: 20.0f));
+
+        InventoryId emptyDepotInventory =
+            inventories.CreateInventory(
+                new InventorySpecification(
+                    500.0));
+        EntityId emptyDepot =
+            simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(
+            emptyDepot,
+            new WorldTransform(
+                new Vector3(4.0f, 0.0f, 0.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        simulation.Entities.AddComponent(
+            emptyDepot,
+            new SupplyDepot(
+                emptyDepotInventory,
+                LocalPlayer));
+        simulation.Entities.AddComponent(
+            emptyDepot,
+            new SupplyProvider(
+                emptyDepotInventory,
+                LocalPlayer,
+                resupplyRangeMeters: 20.0f));
+
+        EntityId truck =
+            SupplyTruckFactory.Create(
+                simulation.Entities,
+                inventories,
+                new Vector3(0.0f, 0.0f, 13.5f),
+                LocalPlayer,
+                cargo);
+        SupplyTruck truckState =
+            simulation.Entities.GetComponent<SupplyTruck>(
+                truck);
+
+        Assert.True(
+            13.5f >
+            truckState.LoadRangeMeters);
+
+        simulation.AdvanceOneTick();
+
+        Assert.Equal(
+            truckState.FuelTarget,
+            inventories.GetQuantity(
+                truckState.InventoryId,
+                ResourceIds.Fuel));
+        Assert.Equal(
+            truckState.AmmunitionTarget,
+            inventories.GetQuantity(
+                truckState.InventoryId,
+                ResourceIds.Ammunition));
+        Assert.Equal(
+            70.0,
+            inventories.GetQuantity(
+                commandInventory,
+                ResourceIds.Fuel));
+        Assert.Equal(
+            60.0,
+            inventories.GetQuantity(
+                commandInventory,
                 ResourceIds.Ammunition));
     }
 

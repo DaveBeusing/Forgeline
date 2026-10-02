@@ -383,7 +383,7 @@ public sealed class PrototypeBattlefieldRuntime
                     commandCore));
         }
 
-        MatchObjectiveSystem.ActivateMatch(
+        MatchObjectiveSystem.MarkMatchReady(
             entities,
             MatchStateEntity);
 
