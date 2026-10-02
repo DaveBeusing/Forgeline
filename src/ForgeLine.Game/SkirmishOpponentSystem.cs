@@ -194,11 +194,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     debugIntelligence);
 
             CaptureDebug(
+                context,
                 controllerEntity,
                 controller,
                 state,
                 debugEconomy,
                 debugForce,
+                owned,
+                configuration,
                 hasObjective: false,
                 objective: Vector3.Zero);
             return;
@@ -371,11 +374,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             state);
 
         CaptureDebug(
+            context,
             controllerEntity,
             controller,
             state,
             economy,
             force,
+            owned,
+            configuration,
             hasObjective,
             objective);
     }
@@ -4399,11 +4405,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     }
 
     private void CaptureDebug(
+        SimulationContext context,
         EntityId controllerEntity,
         SkirmishOpponentController controller,
         in SkirmishOpponentState state,
         in SkirmishEconomyAssessment economy,
         in SkirmishForceAssessment force,
+        OwnedState owned,
+        SkirmishOpponentConfiguration configuration,
         bool hasObjective,
         Vector3 objective)
     {
@@ -4424,7 +4433,274 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 objective,
                 hasObjective,
                 state.LastDecisionTick,
-                state.DecisionsTaken));
+                state.DecisionsTaken,
+                ResolveOperationalObjective(
+                    state.ActiveGoal),
+                ResolveGroupObjective(
+                    context,
+                    controller.Player),
+                ResolveSupplyRequirement(
+                    context,
+                    owned,
+                    configuration),
+                ResolveRetreatReason(
+                    context,
+                    owned,
+                    configuration)));
+    }
+
+    private static SkirmishOperationalObjective
+        ResolveOperationalObjective(
+            SkirmishStrategicGoal goal) =>
+        goal switch
+        {
+            SkirmishStrategicGoal.EstablishPower or
+            SkirmishStrategicGoal.SecureResources or
+            SkirmishStrategicGoal.RecoverEconomy =>
+                SkirmishOperationalObjective.StabilizeEconomy,
+
+            SkirmishStrategicGoal.EstablishStorage or
+            SkirmishStrategicGoal.EstablishIndustry or
+            SkirmishStrategicGoal.EstablishProduction =>
+                SkirmishOperationalObjective.EstablishInfrastructure,
+
+            SkirmishStrategicGoal.Expand =>
+                SkirmishOperationalObjective.Expand,
+
+            SkirmishStrategicGoal.Defend =>
+                SkirmishOperationalObjective.Defend,
+
+            SkirmishStrategicGoal.RecoverSupply =>
+                SkirmishOperationalObjective.RecoverForce,
+
+            SkirmishStrategicGoal.Scout =>
+                SkirmishOperationalObjective.Reconnoiter,
+
+            SkirmishStrategicGoal.PrepareOffensive =>
+                SkirmishOperationalObjective.PrepareOffensive,
+
+            SkirmishStrategicGoal.AttackObjective =>
+                SkirmishOperationalObjective.PressureObjective,
+
+            _ =>
+                SkirmishOperationalObjective.None
+        };
+
+    private static SkirmishGroupObjectiveReadModel
+        ResolveGroupObjective(
+            SimulationContext context,
+            PlayerId player)
+    {
+        EntityId selectedGroup =
+            EntityId.Invalid;
+        CombatGroupIntent selectedIntent =
+            default;
+
+        foreach (EntityId group in
+                 context.Entities.Query<CombatGroupIntent>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            CombatGroupIntent intent =
+                context.Entities.GetComponent<CombatGroupIntent>(
+                    group);
+
+            if (intent.Issuer != player)
+            {
+                continue;
+            }
+
+            if (!selectedGroup.IsValid ||
+                intent.AcceptedAtTick.CompareTo(
+                    selectedIntent.AcceptedAtTick) > 0 ||
+                (intent.AcceptedAtTick.CompareTo(
+                     selectedIntent.AcceptedAtTick) == 0 &&
+                 group < selectedGroup))
+            {
+                selectedGroup = group;
+                selectedIntent = intent;
+            }
+        }
+
+        if (!selectedGroup.IsValid)
+        {
+            return default;
+        }
+
+        int survivingMembers = 0;
+
+        foreach (EntityId entity in
+                 context.Entities.Query<CombatGroupMember>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            CombatGroupMember member =
+                context.Entities.GetComponent<CombatGroupMember>(
+                    entity);
+
+            if (member.Group ==
+                selectedGroup)
+            {
+                survivingMembers++;
+            }
+        }
+
+        return new SkirmishGroupObjectiveReadModel(
+            selectedGroup,
+            selectedIntent.Kind,
+            selectedIntent.Destination,
+            selectedIntent.HasDestination,
+            selectedIntent.ExplicitTarget,
+            selectedIntent.Formation,
+            selectedIntent.InitialMemberCount,
+            survivingMembers);
+    }
+
+    private static SkirmishSupplyRequirement
+        ResolveSupplyRequirement(
+            SimulationContext context,
+            OwnedState owned,
+            SkirmishOpponentConfiguration configuration)
+    {
+        SkirmishSupplyRequirement requirement =
+            SkirmishSupplyRequirement.None;
+
+        for (int index = 0;
+             index < owned.CombatUnits.Count;
+             index++)
+        {
+            EntityId unit =
+                owned.CombatUnits[index];
+
+            if (context.Entities.TryGetComponent(
+                    unit,
+                    out UnitCombatReadiness readiness))
+            {
+                if (readiness.Fuel <
+                    configuration.ResupplyThreshold)
+                {
+                    requirement |=
+                        SkirmishSupplyRequirement.Fuel;
+                }
+
+                if (readiness.Ammunition <
+                    configuration.ResupplyThreshold)
+                {
+                    requirement |=
+                        SkirmishSupplyRequirement.Ammunition;
+                }
+
+                if (readiness.Health <
+                    configuration.RetreatThreshold)
+                {
+                    requirement |=
+                        SkirmishSupplyRequirement.Repair;
+                }
+            }
+
+            if (context.Entities.TryGetComponent(
+                    unit,
+                    out RepairRecoveryState recovery) &&
+                recovery.Status !=
+                    RepairRecoveryStatus.FullyRecovered)
+            {
+                requirement |=
+                    SkirmishSupplyRequirement.Repair;
+            }
+        }
+
+        return requirement;
+    }
+
+    private static SkirmishRetreatReason ResolveRetreatReason(
+        SimulationContext context,
+        OwnedState owned,
+        SkirmishOpponentConfiguration configuration)
+    {
+        bool lowReadiness = false;
+        bool lowFuel = false;
+        bool lowAmmunition = false;
+        bool repair = false;
+
+        for (int index = 0;
+             index < owned.CombatUnits.Count;
+             index++)
+        {
+            EntityId unit =
+                owned.CombatUnits[index];
+
+            if (context.Entities.TryGetComponent(
+                    unit,
+                    out RetreatRecoveryState recovery))
+            {
+                switch (recovery.Reason)
+                {
+                    case RetreatRecoveryReason.RepairAndSupply:
+                        repair = true;
+                        lowFuel = true;
+                        lowAmmunition = true;
+                        break;
+
+                    case RetreatRecoveryReason.Repair:
+                        repair = true;
+                        break;
+
+                    case RetreatRecoveryReason.Supply:
+                        lowFuel = true;
+                        lowAmmunition = true;
+                        break;
+                }
+            }
+
+            if (!context.Entities.TryGetComponent(
+                    unit,
+                    out UnitCombatReadiness readiness))
+            {
+                continue;
+            }
+
+            lowReadiness |=
+                readiness.OverallReadiness <
+                configuration.RetreatThreshold;
+            lowFuel |=
+                readiness.Fuel <
+                configuration.ResupplyThreshold;
+            lowAmmunition |=
+                readiness.Ammunition <
+                configuration.ResupplyThreshold;
+            repair |=
+                readiness.Health <
+                configuration.RetreatThreshold;
+        }
+
+        if (repair &&
+            (lowFuel || lowAmmunition))
+        {
+            return SkirmishRetreatReason.RepairAndSupply;
+        }
+
+        if (repair)
+        {
+            return SkirmishRetreatReason.RepairRequired;
+        }
+
+        if (lowFuel &&
+            lowAmmunition)
+        {
+            return SkirmishRetreatReason.LowFuelAndAmmunition;
+        }
+
+        if (lowFuel)
+        {
+            return SkirmishRetreatReason.LowFuel;
+        }
+
+        if (lowAmmunition)
+        {
+            return SkirmishRetreatReason.LowAmmunition;
+        }
+
+        return lowReadiness
+            ? SkirmishRetreatReason.LowReadiness
+            : SkirmishRetreatReason.None;
     }
 
     private static int GetBuildingCount(
