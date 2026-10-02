@@ -193,6 +193,11 @@ public sealed class SkirmishSupplyPolicyTests
                 SimulationTick.Zero));
         entities.AddComponent(
             refinery,
+            new ControllableEntity(
+                scenario.West.Player,
+                ControllableEntityCategory.Building));
+        entities.AddComponent(
+            refinery,
             new ProductionFacility(
                 refineryInput,
                 refineryOutput,
@@ -212,6 +217,12 @@ public sealed class SkirmishSupplyPolicyTests
                 SimulationTick.Zero));
         entities.AddComponent(
             supplyDepot,
+            new ControllableEntity(
+                scenario.West.Player,
+                ControllableEntityCategory.Building |
+                    ControllableEntityCategory.Logistics));
+        entities.AddComponent(
+            supplyDepot,
             new SupplyDepot(
                 depotInventory,
                 scenario.West.Player));
@@ -227,6 +238,11 @@ public sealed class SkirmishSupplyPolicyTests
                 BuildingIds.VehicleFactory,
                 scenario.West.Player,
                 SimulationTick.Zero));
+        entities.AddComponent(
+            vehicleFactory,
+            new ControllableEntity(
+                scenario.West.Player,
+                ControllableEntityCategory.Building));
         entities.AddComponent(
             vehicleFactory,
             new UnitProductionFacility(
