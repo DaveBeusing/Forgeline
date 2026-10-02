@@ -89,11 +89,6 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
                 continue;
             }
 
-            EnsureAutomaticResupplyPolicy(
-                context,
-                entity,
-                behavior.ResupplyThreshold);
-
             if (context.Entities.HasComponent<ResupplyOrder>(entity))
             {
                 resupplies++;
@@ -541,32 +536,6 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
             context.Entities.AddComponent(
                 entity,
                 movement);
-        }
-    }
-
-    private static void EnsureAutomaticResupplyPolicy(
-        SimulationContext context,
-        EntityId entity,
-        double threshold)
-    {
-        var policy =
-            new AutomaticResupplyPolicy(
-                threshold,
-                threshold,
-                enabled: true);
-
-        if (context.Entities.HasComponent<
-                AutomaticResupplyPolicy>(entity))
-        {
-            context.Entities.SetComponent(
-                entity,
-                policy);
-        }
-        else
-        {
-            context.Entities.AddComponent(
-                entity,
-                policy);
         }
     }
 
