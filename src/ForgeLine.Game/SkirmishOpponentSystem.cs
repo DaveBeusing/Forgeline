@@ -173,6 +173,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 context,
                 owned,
                 configuration);
+            EnsureReconnaissanceRecovery(
+                context,
+                owned,
+                configuration);
 
             if (!DebugCaptureEnabled)
             {
@@ -3717,6 +3721,37 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 output,
                 desiredStock);
         command.Execute(context);
+    }
+
+    private static void EnsureReconnaissanceRecovery(
+        SimulationContext context,
+        OwnedState owned,
+        SkirmishOpponentConfiguration configuration)
+    {
+        for (int index = 0;
+             index < owned.UnitProductionFacilities.Count;
+             index++)
+        {
+            EntityId facilityEntity =
+                owned.UnitProductionFacilities[index];
+
+            if (!context.Entities.TryGetComponent(
+                    facilityEntity,
+                    out UnitProductionFacility facility))
+            {
+                continue;
+            }
+
+            if (EnsureReconnaissanceRecoveryProduction(
+                    context,
+                    owned,
+                    facilityEntity,
+                    facility,
+                    configuration))
+            {
+                return;
+            }
+        }
     }
 
     private static void EnsureCriticalLogisticsRecovery(
