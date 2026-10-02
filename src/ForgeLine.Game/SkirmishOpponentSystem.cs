@@ -2978,7 +2978,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 maximum,
                 priority,
                 enabled: true,
-                context.Tick);
+                submittedAtTick: context.Tick);
         command.Execute(context);
     }
 
