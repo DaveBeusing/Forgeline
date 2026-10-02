@@ -227,11 +227,11 @@ public sealed class SkirmishSupplyPolicyTests
             supplyPolicy.FuelThreshold <
             cargoPolicy.FuelThreshold);
         Assert.Equal(
-            scenario.Settings.WestOpponent.OffensiveFuelThreshold,
+            scenario.RuntimeSettings.Scenario.WestOpponent.OffensiveFuelThreshold,
             combatPolicy.FuelThreshold,
             precision: 6);
         Assert.Equal(
-            scenario.Settings.WestOpponent.ResupplyThreshold,
+            scenario.RuntimeSettings.Scenario.WestOpponent.ResupplyThreshold,
             combatPolicy.AmmunitionThreshold,
             precision: 6);
     }
