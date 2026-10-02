@@ -1692,7 +1692,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         attackers,
                         approachObjective,
                         context.Tick,
-                        FormationTemplate.Line,
+                        FormationTemplate.Column,
                         configuration.ObjectivePressureLeashMeters);
                 approach.Execute(context);
                 return true;
@@ -1735,7 +1735,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 attackers,
                 objective,
                 context.Tick,
-                FormationTemplate.Line,
+                FormationTemplate.Column,
                 configuration.ObjectivePressureLeashMeters);
         advance.Execute(context);
 
