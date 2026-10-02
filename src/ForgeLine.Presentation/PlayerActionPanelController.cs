@@ -664,7 +664,7 @@ public sealed class PlayerActionPanelController
     {
         if (tactical is null ||
             SelectedIndex < 0 ||
-            SelectedIndex >= 7)
+            SelectedIndex >= 8)
         {
             return;
         }
@@ -693,6 +693,10 @@ public sealed class PlayerActionPanelController
                 6 =>
                     PlayerActionRequest.CancelFireMission(
                         tactical.SelectedEntities),
+                7 =>
+                    PlayerActionRequest.RetreatToRecovery(
+                        tactical.SelectedEntities,
+                        FormationTemplate.Column),
                 _ =>
                     default
             };
@@ -1064,7 +1068,7 @@ public sealed class PlayerActionPanelController
             PlayerActionPanelMode.Tactical =>
                 actions?.Tactical is null
                     ? 0
-                    : 7,
+                    : 8,
             _ =>
                 0
         };
