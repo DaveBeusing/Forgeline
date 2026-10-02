@@ -594,6 +594,32 @@ public sealed class SkirmishProductionPolicyTests
                     scenario.West.Player));
         }
 
+        int tankCount = 0;
+        foreach (EntityId entity in
+                 entities.Query<ControllableEntity, UnitIdentity>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            if (entities.GetComponent<ControllableEntity>(
+                    entity).Owner ==
+                    scenario.West.Player &&
+                entities.GetComponent<UnitIdentity>(
+                    entity).UnitId ==
+                    UnitIds.MainBattleTank)
+            {
+                tankCount++;
+            }
+        }
+
+        while (tankCount <
+               validation.WestOpponent.MinimumObjectivePressureUnits)
+        {
+            scenario.UnitFactory.Create(
+                units[UnitIds.MainBattleTank],
+                stagingPosition,
+                scenario.West.Player);
+            tankCount++;
+        }
+
         InventoryId input =
             scenario.Inventories.CreateInventory(
                 new InventorySpecification(4_000.0));
@@ -722,6 +748,15 @@ public sealed class SkirmishProductionPolicyTests
             request =>
                 request.UnitId ==
                     UnitIds.MainBattleTank);
+
+        LogisticsStockPolicy steelPolicy =
+            FindStockPolicy(
+                entities,
+                factory,
+                ResourceIds.Steel);
+        Assert.Equal(
+            LogisticsStockPriority.Critical,
+            steelPolicy.Priority);
     }
 
     [Fact]
