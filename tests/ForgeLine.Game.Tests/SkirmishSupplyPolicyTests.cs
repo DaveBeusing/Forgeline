@@ -11,7 +11,7 @@ namespace ForgeLine.Game.Tests;
 public sealed class SkirmishSupplyPolicyTests
 {
     [Fact]
-    public void EmptySupplyTruckDrivesToDepotAndLoadsPhysicalStock()
+    public void EmptySupplyTruckAvoidsBlockedLoadingFaceAndLoadsPhysicalStock()
     {
         VerticalSliceScenario scenario = VerticalSliceScenario.Create(
             VerticalSliceScenarioSettings.Create(VerticalSliceScenarioProfile.Validation));
@@ -25,6 +25,23 @@ public sealed class SkirmishSupplyPolicyTests
         entities.AddComponent(depot, new SupplyDepot(inventory, scenario.West.Player));
         entities.AddComponent(depot, new SpatialPresence(new Vector3(8.0f, 4.0f, 8.0f),
             new SpatialEntryMetadata(scenario.West.Player.Value, 0, SpatialMobility.Static)));
+
+        EntityId blockedFace = entities.CreateEntity();
+        entities.AddComponent(
+            blockedFace,
+            new WorldTransform(
+                new Vector3(401.0f, 0.0f, 1800.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        entities.AddComponent(
+            blockedFace,
+            new SpatialPresence(
+                new Vector3(6.0f, 4.0f, 6.0f),
+                new SpatialEntryMetadata(
+                    scenario.West.Player.Value,
+                    0,
+                    SpatialMobility.Static)));
+
         EntityId truck = scenario.UnitFactory.Create(
             DirectorateContent.CreateUnitCatalog()[UnitIds.SupplyTruck],
             new Vector3(360.0f, 0.0f, 1800.0f), scenario.West.Player);
