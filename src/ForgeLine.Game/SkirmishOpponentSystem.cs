@@ -1222,6 +1222,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
+            bool reconnaissanceUnit =
+                owned.UnitByEntity.TryGetValue(
+                    unit,
+                    out UnitId unitId) &&
+                unitId == UnitIds.ScoutVehicle;
             bool offensiveOrder =
                 context.Entities.TryGetComponent(
                     unit,
@@ -1233,8 +1238,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 force.CombatUnits >=
                     configuration.MinimumAttackUnits;
             double fuelThreshold =
-                offensiveOrder ||
-                offensiveForceEstablished
+                !reconnaissanceUnit &&
+                (offensiveOrder ||
+                 offensiveForceEstablished)
                     ? configuration.OffensiveFuelThreshold
                     : configuration.ResupplyThreshold;
 
