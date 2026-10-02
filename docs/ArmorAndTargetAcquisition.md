@@ -180,7 +180,7 @@ The default policy exposes otherwise valid targets for compositions without batt
 
 `ILineOfFirePolicy` separates target selection from terrain and obstruction evaluation.
 
-The canonical Vertical Slice composes `TerrainLineOfFirePolicy` into automatic acquisition, tactical engagement, and final direct-fire execution. The policy samples the authoritative terrain heightfield between source and target and rejects a direct shot when intervening terrain rises into the firing line. The final execution check repeats the same rule before Ammunition is consumed, so a target acquired on an earlier tick cannot fire through newly blocking terrain.
+The canonical Vertical Slice composes `TerrainLineOfFirePolicy` into automatic acquisition, tactical engagement, and final direct-fire execution. The policy samples the authoritative terrain heightfield between source and target and rejects a direct shot when intervening terrain rises into the firing line. The final execution check repeats the same rule before Ammunition is consumed, so a target acquired on an earlier tick cannot fire through newly blocking terrain. An explicit Attack that is already inside nominal weapon range but still lacks line of fire continues normal pursuit within its leash until it reaches a legal firing position instead of freezing at range.
 
 Headless or focused compositions may still use the unobstructed default when terrain is intentionally absent.
 
