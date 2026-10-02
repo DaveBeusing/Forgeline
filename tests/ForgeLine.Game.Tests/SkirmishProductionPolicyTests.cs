@@ -637,6 +637,11 @@ public sealed class SkirmishProductionPolicyTests
                 SimulationTick.Zero));
         entities.AddComponent(
             factory,
+            new ControllableEntity(
+                scenario.West.Player,
+                ControllableEntityCategory.Building));
+        entities.AddComponent(
+            factory,
             new UnitProductionFacility(
                 input,
                 UnitProductionCapability.Vehicle |
