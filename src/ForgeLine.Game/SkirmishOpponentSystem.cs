@@ -1216,14 +1216,23 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
-            double supply =
-                Math.Min(
-                    readiness.Fuel,
-                    readiness.Ammunition);
+            bool offensiveOrder =
+                context.Entities.TryGetComponent(
+                    unit,
+                    out CombatOrderState order) &&
+                order.Kind is
+                    CombatOrderKind.Attack or
+                    CombatOrderKind.AttackMove;
+            double fuelThreshold =
+                offensiveOrder
+                    ? configuration.OffensiveFuelThreshold
+                    : configuration.ResupplyThreshold;
 
             if (readiness.OverallReadiness >=
                     configuration.RetreatThreshold &&
-                supply >=
+                readiness.Fuel >=
+                    fuelThreshold &&
+                readiness.Ammunition >=
                     configuration.ResupplyThreshold)
             {
                 continue;
@@ -2263,8 +2272,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 configuration.ObjectivePressureLeashMeters);
         var combatResupplyPolicy =
             new AutomaticResupplyPolicy(
-                configuration.ResupplyThreshold,
-                configuration.ResupplyThreshold,
+                ammunitionThreshold:
+                    configuration.ResupplyThreshold,
+                fuelThreshold:
+                    configuration.OffensiveFuelThreshold,
                 enabled: true);
         var cargoResupplyPolicy =
             new AutomaticResupplyPolicy(
