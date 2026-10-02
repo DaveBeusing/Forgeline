@@ -167,6 +167,15 @@ public static class PlayerActionRequestDispatcher
                         request.TacticalFormation);
                 return true;
 
+            case PlayerActionRequestKind.SubmitRetreatToRecovery:
+                receipt =
+                    gateway.SubmitRetreatToRecovery(
+                        player,
+                        request.TacticalEntities ?? [],
+                        observedTick,
+                        request.TacticalFormation);
+                return true;
+
             case PlayerActionRequestKind.SubmitFireMissionCoordinate:
                 receipt =
                     gateway.SubmitFireMission(
