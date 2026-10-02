@@ -1126,7 +1126,8 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             "HOLD POSITION",
             "RETREAT",
             "FIRE MISSION",
-            "CANCEL FIRE MISSION"
+            "CANCEL FIRE MISSION",
+            "RETREAT TO RECOVERY"
         ];
 
         for (int index = 0;
