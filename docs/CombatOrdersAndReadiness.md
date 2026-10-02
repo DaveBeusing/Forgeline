@@ -97,6 +97,10 @@ When a legitimate target is acquired, `TacticalMovementConstraint` pauses Ground
 
 No teleport, speed bonus, Fuel exemption, or hidden route knowledge is granted.
 
+`RetreatToRecovery` adds a command-owned recovery choice without adding a second movement implementation. The planner evaluates owned repair and supply providers in stable order, chooses the nearest provider that satisfies the selected force's support needs, resolves an approach point inside the provider radius, and submits the normal Retreat path in Column formation from the player action surface.
+
+`RetreatRecoveryState` records the selected provider, whether it offers Repair, Supply, or both, the resolved destination, and the issue tick for diagnostics/read models. A replacement tactical order clears stale recovery intent.
+
 If resupply temporarily takes precedence, the stored Retreat destination can resume afterward.
 
 ## Fire Policy
