@@ -131,6 +131,7 @@ public sealed class PlayerLogisticsActionCommand : ISimulationCommand
             enabled,
             0.0,
             0.0,
+            BattlefieldSupplyPriority.Normal,
             submittedAtTick);
 
     public static PlayerLogisticsActionCommand RemoveStockPolicy(
