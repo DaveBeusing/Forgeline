@@ -2714,6 +2714,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         {
             SetStockPolicy(
                 context,
+                controller.Player,
                 controller.PreferredConstructionSource,
                 ResourceIds.FerrousOre,
                 220.0,
@@ -2722,6 +2723,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 LogisticsStockPriority.High);
             SetStockPolicy(
                 context,
+                controller.Player,
                 controller.PreferredConstructionSource,
                 ResourceIds.Volatiles,
                 140.0,
@@ -2730,6 +2732,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 LogisticsStockPriority.High);
             SetStockPolicy(
                 context,
+                controller.Player,
                 controller.PreferredConstructionSource,
                 ResourceIds.Silicates,
                 140.0,
@@ -2738,6 +2741,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 LogisticsStockPriority.High);
             SetStockPolicy(
                 context,
+                controller.Player,
                 controller.PreferredConstructionSource,
                 ResourceIds.Steel,
                 220.0,
@@ -2746,6 +2750,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 LogisticsStockPriority.High);
             SetStockPolicy(
                 context,
+                controller.Player,
                 controller.PreferredConstructionSource,
                 ResourceIds.Electronics,
                 160.0,
@@ -2754,6 +2759,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 LogisticsStockPriority.High);
             SetStockPolicy(
                 context,
+                controller.Player,
                 controller.PreferredConstructionSource,
                 ResourceIds.Fuel,
                 360.0,
@@ -2777,6 +2783,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             {
                 SetStockPolicy(
                     context,
+                    controller.Player,
                     entity,
                     ResourceIds.FerrousOre,
                     80.0,
@@ -2790,6 +2797,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             {
                 SetStockPolicy(
                     context,
+                    controller.Player,
                     entity,
                     ResourceIds.Volatiles,
                     80.0,
@@ -2803,6 +2811,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             {
                 SetStockPolicy(
                     context,
+                    controller.Player,
                     entity,
                     ResourceIds.Silicates,
                     80.0,
@@ -2816,6 +2825,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             {
                 SetStockPolicy(
                     context,
+                    controller.Player,
                     entity,
                     ResourceIds.Steel,
                     100.0,
@@ -2824,6 +2834,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     LogisticsStockPriority.Critical);
                 SetStockPolicy(
                     context,
+                    controller.Player,
                     entity,
                     ResourceIds.Electronics,
                     40.0,
@@ -2892,6 +2903,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
             SetStockPolicy(
                 context,
+                controller.Player,
                 entity,
                 ResourceIds.Fuel,
                 250.0,
@@ -2900,6 +2912,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 LogisticsStockPriority.Critical);
             SetStockPolicy(
                 context,
+                controller.Player,
                 entity,
                 ResourceIds.Ammunition,
                 350.0,
@@ -2936,6 +2949,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         maximum = Math.Max(maximum, target);
         SetStockPolicy(
             context,
+            facility.Owner,
             entity,
             resource,
             minimum,
@@ -2946,6 +2960,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private static void SetStockPolicy(
         SimulationContext context,
+        PlayerId issuer,
         EntityId entity,
         ResourceId resource,
         double minimum,
@@ -2954,14 +2969,16 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         LogisticsStockPriority priority)
     {
         var command =
-            new SetLogisticsStockPolicyCommand(
+            PlayerLogisticsActionCommand.SetStockPolicy(
+                issuer,
                 entity,
                 resource,
                 minimum,
                 target,
                 maximum,
-                context.Tick,
-                priority);
+                priority,
+                enabled: true,
+                context.Tick);
         command.Execute(context);
     }
 
