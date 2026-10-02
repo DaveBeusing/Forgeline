@@ -944,7 +944,12 @@ public sealed class SkirmishOpponentTests
             $"cargoStates={cargoStates} " +
             $"unitProductionStates={unitProductionStates} " +
             $"scouts={scenario.CountUnits(side.Player, UnitIds.ScoutVehicle)} " +
-            $"tanks={scenario.CountUnits(side.Player, UnitIds.MainBattleTank)}";
+            $"tanks={scenario.CountUnits(side.Player, UnitIds.MainBattleTank)} " +
+            $"force={debug.Force.CombatUnits}/ready{debug.Force.AverageReadiness:F2}/supply{debug.Force.MinimumSupply:F2}/currentContacts{debug.Force.CurrentHostileContacts} " +
+            $"admission={debug.OffensiveAdmission.Reason}" +
+            $"/eligible{debug.OffensiveAdmission.EligibleAttackerCount}" +
+            $"/pressure{debug.OffensiveAdmission.ObjectivePressureUnitCount}" +
+            $"/supply{debug.OffensiveAdmission.ForwardSupplyReady}";
     }
 
     private static bool HasCombatGroup(
