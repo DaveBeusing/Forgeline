@@ -122,17 +122,12 @@ public static class BattlefieldOperationalGeographyValidator
                 BattlefieldResourceDepositDefinition resource =
                     definition.Resources[resourceIndex];
 
-                if (!resource.Contested)
-                {
-                    continue;
-                }
-
                 CheckRoute(
                     baselinePathfinder,
                     start.Position,
                     resource.Center,
                     NavigationMovementClass.Tracked,
-                    $"start {start.Player} to contested resource '{resource.Key}'",
+                    $"start {start.Player} to resource '{resource.Key}'",
                     errors,
                     ref reachabilityChecks,
                     ref shortestRoute,
