@@ -243,7 +243,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             owned);
         EnsureReconSupplySupport(
             context,
-            owned);
+            controller,
+            owned,
+            intelligence);
 
         SkirmishStrategicState strategicState;
         SkirmishStrategicGoal goal;
@@ -1884,7 +1886,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private void EnsureReconSupplySupport(
         SimulationContext context,
-        OwnedState owned)
+        SkirmishOpponentController controller,
+        OwnedState owned,
+        FactionIntelligenceSnapshot intelligence)
     {
         EntityId scout =
             ResolveReconReserveScout(
@@ -1900,6 +1904,42 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 context,
                 scout,
                 out _))
+        {
+            return;
+        }
+
+        bool reconnaissanceEstablished =
+            intelligence.Contacts.Any(
+                static contact =>
+                    contact.IsCurrent);
+
+        if (reconnaissanceEstablished &&
+            TryResolveSharedReconEscort(
+                context,
+                owned,
+                scout,
+                out EntityId escort))
+        {
+            var continueScout =
+                new MoveEntitiesCommand(
+                    controller.Player,
+                    [scout],
+                    order.Destination,
+                    context.Tick,
+                    order.Formation,
+                    preserveCombatIntent: true);
+            continueScout.Execute(context);
+
+            new StopMovementCommand(
+                controller.Player,
+                [escort],
+                context.Tick)
+                .Execute(context);
+
+            return;
+        }
+
+        if (reconnaissanceEstablished)
         {
             return;
         }
@@ -1926,6 +1966,46 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             context,
             owned,
             [scout]);
+    }
+
+    private static bool TryResolveSharedReconEscort(
+        SimulationContext context,
+        OwnedState owned,
+        EntityId scout,
+        out EntityId escort)
+    {
+        escort = EntityId.Invalid;
+
+        if (!context.Entities.TryGetComponent(
+                scout,
+                out MovementGroupMember scoutMember))
+        {
+            return false;
+        }
+
+        for (int index = 0;
+             index < owned.Units.Count;
+             index++)
+        {
+            EntityId candidate =
+                owned.Units[index];
+
+            if (!context.Entities.HasComponent<SupplyTruck>(
+                    candidate) ||
+                !context.Entities.TryGetComponent(
+                    candidate,
+                    out MovementGroupMember candidateMember) ||
+                candidateMember.Group !=
+                    scoutMember.Group)
+            {
+                continue;
+            }
+
+            escort = candidate;
+            return true;
+        }
+
+        return false;
     }
 
     private bool TrySelectReconSupplyEscort(
