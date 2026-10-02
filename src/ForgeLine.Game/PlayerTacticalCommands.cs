@@ -15,7 +15,8 @@ public enum PlayerTacticalActionOperation : byte
     Retreat = 5,
     FireMissionCoordinate = 6,
     FireMissionContact = 7,
-    CancelFireMission = 8
+    CancelFireMission = 8,
+    RetreatToRecovery = 9
 }
 
 public enum PlayerTacticalActionFailureReason : byte
@@ -29,7 +30,8 @@ public enum PlayerTacticalActionFailureReason : byte
     UnsupportedTargetClass = 6,
     NoEligibleArtillery = 7,
     ArtilleryTargetUnavailable = 8,
-    ArtilleryOutOfRange = 9
+    ArtilleryOutOfRange = 9,
+    NoRecoveryProvider = 10
 }
 
 public sealed class PlayerTacticalActionCommand : ISimulationCommand
@@ -264,6 +266,28 @@ public sealed class PlayerTacticalActionCommand : ISimulationCommand
             weapons,
             artilleryWeapons);
 
+    public static PlayerTacticalActionCommand RetreatToRecovery(
+        PlayerId issuer,
+        ReadOnlySpan<EntityId> units,
+        SimulationTick submittedAtTick,
+        FormationTemplate formation,
+        FactionIntelligenceStore intelligence,
+        WeaponCatalog weapons,
+        ArtilleryWeaponCatalog artilleryWeapons) =>
+        new(
+            PlayerTacticalActionOperation.RetreatToRecovery,
+            issuer,
+            units,
+            EntityId.Invalid,
+            Vector3.Zero,
+            IntelligenceContactKey.None,
+            formation,
+            0,
+            submittedAtTick,
+            intelligence,
+            weapons,
+            artilleryWeapons);
+
     public static PlayerTacticalActionCommand FireMissionCoordinate(
         PlayerId issuer,
         ReadOnlySpan<EntityId> artillery,
@@ -361,6 +385,10 @@ public sealed class PlayerTacticalActionCommand : ISimulationCommand
 
             case PlayerTacticalActionOperation.Retreat:
                 ExecuteRetreat(context);
+                break;
+
+            case PlayerTacticalActionOperation.RetreatToRecovery:
+                ExecuteRetreatToRecovery(context);
                 break;
 
             case PlayerTacticalActionOperation.FireMissionCoordinate:
@@ -549,6 +577,81 @@ public sealed class PlayerTacticalActionCommand : ISimulationCommand
         CopyCombatResult(
             command.AcceptedTargetCount,
             command.RejectedTargetCount);
+    }
+
+    private void ExecuteRetreatToRecovery(
+        SimulationContext context)
+    {
+        List<EntityId> owned =
+            TacticalCommandUtilities.FilterOwnedCombatUnits(
+                context,
+                Issuer,
+                _units,
+                out _);
+
+        if (owned.Count == 0)
+        {
+            RejectAll(
+                PlayerTacticalActionFailureReason.NoEligibleUnits);
+            return;
+        }
+
+        if (!RetreatRecoveryPlanner.TryResolve(
+                context,
+                Issuer,
+                owned,
+                out EntityId provider,
+                out Vector3 destination,
+                out RetreatRecoveryReason reason))
+        {
+            RejectAll(
+                PlayerTacticalActionFailureReason.NoRecoveryProvider);
+            return;
+        }
+
+        var command =
+            new RetreatCommand(
+                Issuer,
+                owned.ToArray(),
+                destination,
+                SubmittedAtTick,
+                Formation);
+        command.Execute(context);
+
+        AcceptedTargetCount =
+            command.AcceptedTargetCount;
+        RejectedTargetCount =
+            _units.Length -
+            AcceptedTargetCount;
+
+        for (int index = 0;
+             index < owned.Count;
+             index++)
+        {
+            EntityId entity =
+                owned[index];
+
+            var recovery =
+                new RetreatRecoveryState(
+                    provider,
+                    reason,
+                    destination,
+                    context.Tick);
+
+            if (context.Entities.HasComponent<RetreatRecoveryState>(
+                    entity))
+            {
+                context.Entities.SetComponent(
+                    entity,
+                    recovery);
+            }
+            else
+            {
+                context.Entities.AddComponent(
+                    entity,
+                    recovery);
+            }
+        }
     }
 
     private void ExecuteFireMission(
