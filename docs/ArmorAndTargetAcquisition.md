@@ -176,13 +176,15 @@ UI commands for changing these policies can be added later without replacing the
 
 The default policy exposes otherwise valid targets for compositions without battlefield intelligence. The implemented `IntelligenceTargetAvailabilityPolicy` constrains direct entity targeting to enemies currently `Identified` for the observing faction; unknown, stale, and radar-only `Detected` contacts remain unavailable to exact target acquisition while retaining contact data for later tactical systems.
 
-## Line-of-Fire Hook
+## Terrain-Aware Line of Fire
 
-`ILineOfFirePolicy` separates target selection from future terrain, cover, obstruction, and weapon-specific line-of-fire rules.
+`ILineOfFirePolicy` separates target selection from terrain and obstruction evaluation.
 
-The default policy is unobstructed. Future terrain-aware implementations can reject blocked fire during both acquisition and final combat execution.
+The canonical Vertical Slice composes `TerrainLineOfFirePolicy` into automatic acquisition, tactical engagement, and final direct-fire execution. The policy samples the authoritative terrain heightfield between source and target and rejects a direct shot when intervening terrain rises into the firing line. The final execution check repeats the same rule before Ammunition is consumed, so a target acquired on an earlier tick cannot fire through newly blocking terrain.
 
-The V1 hook does not attempt realistic projectile penetration through terrain or structures.
+Headless or focused compositions may still use the unobstructed default when terrain is intentionally absent.
+
+The V1 rule is deliberately gameplay-oriented. It does not simulate material penetration, destructible cover, vegetation occlusion, or detailed ballistic collision against structures.
 
 ## Projectile Target Validity
 
