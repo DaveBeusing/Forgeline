@@ -508,6 +508,51 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             envelope);
     }
 
+    public PlayerCommandSubmissionReceipt SubmitUnitProductionRallyPoint(
+        PlayerId issuer,
+        EntityId facility,
+        Vector3 rallyPoint,
+        SimulationTick observedTick)
+    {
+        if (!TryBeginSubmission(
+                PlayerCommandKind.UnitProduction,
+                issuer,
+                observedTick,
+                out PlayerCommandCorrelationId correlation,
+                out SimulationTick targetTick,
+                out SimulationCommandSource source,
+                out PlayerCommandSubmissionReceipt rejected))
+        {
+            return rejected;
+        }
+
+        PlayerUnitProductionActionCommand command =
+            PlayerUnitProductionActionCommand.SetRallyPoint(
+                issuer,
+                facility,
+                rallyPoint,
+                observedTick);
+
+        SimulationCommandEnvelope envelope =
+            _simulation.SubmitCommand(
+                command,
+                targetTick,
+                source);
+
+        _pending.Add(
+            PendingCommand.ForUnitProduction(
+                correlation,
+                envelope,
+                command));
+
+        return AcceptedReceipt(
+            correlation,
+            PlayerCommandKind.UnitProduction,
+            source,
+            observedTick,
+            envelope);
+    }
+
     public PlayerCommandSubmissionReceipt SubmitLogisticsStockPolicy(
         PlayerId issuer,
         EntityId target,
