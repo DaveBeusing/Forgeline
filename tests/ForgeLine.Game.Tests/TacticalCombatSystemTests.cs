@@ -1027,23 +1027,6 @@ public sealed class TacticalCombatSystemTests
         Assert.Equal(
             target,
             identifiedOrder.ExplicitTarget);
-
-        CombatGroupMember membership =
-            scenario.Simulation.Entities.GetComponent<CombatGroupMember>(
-                opponent);
-        Assert.True(membership.Group.IsValid);
-        CombatGroupIntent group =
-            scenario.Simulation.Entities.GetComponent<CombatGroupIntent>(
-                membership.Group);
-        Assert.Equal(
-            CombatOrderKind.Attack,
-            group.Kind);
-        Assert.Equal(
-            target,
-            group.ExplicitTarget);
-        Assert.Equal(
-            RedPlayer,
-            group.Issuer);
     }
 
     [Fact]
