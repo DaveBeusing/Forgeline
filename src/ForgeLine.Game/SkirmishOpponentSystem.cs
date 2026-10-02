@@ -3033,6 +3033,12 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 cargoCount + pendingCargo <
                     cargoTarget;
 
+            LogisticsStockPriority fuelPriority =
+                plannedUnit ==
+                    UnitIds.MainBattleTank
+                    ? LogisticsStockPriority.Critical
+                    : LogisticsStockPriority.High;
+
             SetUnitProductionStockPolicy(
                 context,
                 entity,
@@ -3048,7 +3054,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 cargoFleetRecovery
                     ? 480.0
                     : 280.0,
-                LogisticsStockPriority.High);
+                fuelPriority);
             SetUnitProductionStockPolicy(
                 context,
                 entity,
