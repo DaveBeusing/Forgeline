@@ -131,6 +131,24 @@ public sealed class RepairRecoverySystemTests
             inventories.CreateInventory(
                 new InventorySpecification(100.0));
 
+        InventoryId supplyOnlyInventory =
+            inventories.CreateInventory(
+                new InventorySpecification(100.0));
+        EntityId supplyOnly =
+            simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(
+            supplyOnly,
+            new WorldTransform(
+                new Vector3(30.0f, 0.0f, 0.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        simulation.Entities.AddComponent(
+            supplyOnly,
+            new SupplyProvider(
+                supplyOnlyInventory,
+                Owner,
+                resupplyRangeMeters: 30.0f));
+
         EntityId near =
             CreateProvider(
                 simulation,
