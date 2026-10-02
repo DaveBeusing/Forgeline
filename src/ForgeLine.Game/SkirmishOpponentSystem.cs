@@ -2416,7 +2416,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 _inventories.GetQuantity(
                     truck.InventoryId,
                     ResourceIds.Fuel) <
-                truck.FuelTarget * 0.25;
+                truck.FuelTarget * 0.50;
             bool needsAmmunition =
                 _inventories.GetQuantity(
                     truck.InventoryId,
@@ -2877,8 +2877,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 controller.PreferredConstructionSource,
                 ResourceIds.Steel,
                 220.0,
-                700.0,
-                1_200.0,
+                500.0,
+                1_000.0,
                 LogisticsStockPriority.High);
             SetStockPolicy(
                 context,
