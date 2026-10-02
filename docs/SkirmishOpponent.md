@@ -106,16 +106,19 @@ Offensive admission is per candidate, not a comparison against the entire army's
 
 - Scout Vehicles are excluded.
 - Candidates with readiness data must meet the configured offensive readiness threshold.
-- Their minimum Fuel/Ammunition fraction must meet the configured resupply threshold.
+- Fuel must meet the higher configured offensive reserve threshold; Ammunition must meet the general resupply threshold.
+- At least one owned Supply Truck must be field-ready: not self-resupplying or rescue-assigned, carrying at least half of its Fuel cargo target and one quarter of its Ammunition target, with at least 35% propulsion Fuel when propulsion state is present.
 - The remaining candidate set, bounded by MaximumAttackUnits, must contain at least MinimumAttackUnits.
 
-The current implementation allows a candidate without a readiness component through the readiness filter; diagnostics explicitly records HasReadiness so absence cannot be mistaken for a measured full-readiness value. Normal runtime readiness is derived in SnapshotEvents.
+The stronger Fuel reserve exists because a fraction that is sufficient to trigger normal resupply is not necessarily enough to commit a heavy vehicle across Central Divide and still retain recovery options. The current implementation allows a candidate without a readiness component through the readiness filter; diagnostics explicitly records HasReadiness so absence cannot be mistaken for a measured full-readiness value. Normal runtime readiness is derived in SnapshotEvents.
 
 When direct hostile identification exists, the opponent may attack that identified entity, prioritizing an identified Command Core. Otherwise it advances only toward public strategic sites on the opponent-facing half of the map rather than reading hidden live enemy state. Reaching that forward waypoint escalates the same offensive intent toward the public opposing start position; this brings the force into normal reconnaissance range so the battlefield-intelligence system can identify the Command Core and hand control to the direct Attack path.
 
 Individual low-readiness or low-supply units receive normal retreat/recovery behavior. Existing real ResupplyOrders are not replaced with a new strategic retreat. Force-wide Resupplying is narrower than the presence of any degraded unit: it requires an established attack force, an active resupply order, and the configured aggregate/all-units recovery condition. Consequently, PrepareOffensive with no active resupply order must not be interpreted as proof of either adequate supply or a particular supply-system defect.
 
-Automatic resupply policy remains attached to units. Only BattlefieldSupplySystem transfers Fuel or Ammunition. A recipient unable to afford the trip to a provider can instead receive a Supply Truck rescue, subject to separate propulsion/cargo checks and actual route-budget validation. Rescue cancellation releases only the movement owned by that assignment. An available loaded Supply Truck may also follow the current offensive centroid as mobile support, but escort distance is not an additional offensive-admission gate: units that already satisfy the configured readiness and supply thresholds continue their attack while the truck catches up. See [Battlefield Supply](BattlefieldSupply.md).
+Automatic resupply policy remains attached to units. Only BattlefieldSupplySystem transfers Fuel or Ammunition. A recipient unable to afford the trip to a provider can instead receive a Supply Truck rescue, subject to separate propulsion/cargo checks and actual route-budget validation. Cargo Trucks use a conservative 55% self-refuel threshold because regional delivery is their primary task; Supply Trucks use a lower 35% propulsion threshold so a field-support provider does not repeatedly make itself unavailable while a supported force still has a viable rescue need. Rescue cancellation and supply-loading movement stops now use the ownership-validated StopMovementCommand rather than direct movement-state mutation.
+
+An available loaded Supply Truck follows the current offensive centroid as mobile support. Offense does not begin without such a field-ready provider, so strategic preparation cannot knowingly launch a force into a deep objective with no physical Fuel/Ammunition support path. See [Battlefield Supply](BattlefieldSupply.md).
 
 Mobile Artillery receives fire missions only from current detected or identified contacts and respects a configurable firing-decision cadence.
 
@@ -124,7 +127,7 @@ Mobile Artillery receives fire missions only from current detected or identified
 SkirmishOpponentConfiguration exposes behavior tuning without direct simulation advantages:
 
 - reaction cadence and aggression;
-- expansion, offensive readiness, retreat, and resupply thresholds;
+- expansion, offensive readiness, offensive Fuel reserve, retreat, and resupply thresholds;
 - minimum and maximum attack-group size;
 - maximum queued units per production facility;
 - defensive radius and objective-pressure pursuit leash;
