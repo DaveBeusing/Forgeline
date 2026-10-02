@@ -39,6 +39,12 @@ public static class RetreatRecoveryPlanner
             return false;
         }
 
+        ResolveNeeds(
+            entities,
+            units,
+            out bool needsRepair,
+            out bool needsSupply);
+
         float bestDistanceSquared =
             float.PositiveInfinity;
         float bestRange = 0.0f;
@@ -62,6 +68,18 @@ public static class RetreatRecoveryPlanner
                     out float supplyRange);
 
             if (!hasRepair &&
+                !hasSupply)
+            {
+                continue;
+            }
+
+            if (needsRepair &&
+                !hasRepair)
+            {
+                continue;
+            }
+
+            if (needsSupply &&
                 !hasSupply)
             {
                 continue;
@@ -133,6 +151,47 @@ public static class RetreatRecoveryPlanner
                 bestRange);
         reason = bestReason;
         return true;
+    }
+
+    private static void ResolveNeeds(
+        EntityRegistry entities,
+        IReadOnlyList<EntityId> units,
+        out bool needsRepair,
+        out bool needsSupply)
+    {
+        needsRepair = false;
+        needsSupply = false;
+
+        for (int index = 0;
+             index < units.Count;
+             index++)
+        {
+            EntityId unit =
+                units[index];
+
+            if (entities.TryGetComponent(
+                    unit,
+                    out HealthState health) &&
+                !health.IsDepleted &&
+                health.Current < health.Maximum)
+            {
+                needsRepair = true;
+            }
+
+            if (entities.TryGetComponent(
+                    unit,
+                    out UnitSupplyState supply) &&
+                supply.Status != BattlefieldSupplyStatus.Supplied)
+            {
+                needsSupply = true;
+            }
+
+            if (needsRepair &&
+                needsSupply)
+            {
+                return;
+            }
+        }
     }
 
     private static Vector3 ResolveCentroid(
