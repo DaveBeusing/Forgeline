@@ -1645,18 +1645,20 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     out EntityId[] pressureUnits,
                     out EntityId[] approachUnits);
 
-                if (pressureUnits.Length > 0 &&
-                    !HaveCombatOrder(
+                EntityId[] pressureOrders =
+                    SelectUnitsWithoutCombatOrder(
                         context,
                         pressureUnits,
                         CombatOrderKind.Attack,
                         objective,
-                        identifiedTarget))
+                        identifiedTarget);
+
+                if (pressureOrders.Length > 0)
                 {
                     var pressureAttack =
                         new AttackCommand(
                             controller.Player,
-                            pressureUnits,
+                            pressureOrders,
                             identifiedTarget,
                             context.Tick,
                             configuration.ObjectivePressureLeashMeters);
@@ -1670,17 +1672,19 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                             controller.HomePosition,
                             objective,
                             configuration.ObjectivePressureLeashMeters);
-
-                    if (!HaveCombatOrder(
+                    EntityId[] approachOrders =
+                        SelectUnitsWithoutCombatOrder(
                             context,
                             approachUnits,
                             CombatOrderKind.AttackMove,
-                            approachObjective))
+                            approachObjective);
+
+                    if (approachOrders.Length > 0)
                     {
                         var approach =
                             new AttackMoveCommand(
                                 controller.Player,
-                                approachUnits,
+                                approachOrders,
                                 approachObjective,
                                 context.Tick,
                                 FormationTemplate.Column,
@@ -2060,6 +2064,61 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             outside.ToArray();
     }
 
+    private static EntityId[] SelectUnitsWithoutCombatOrder(
+        SimulationContext context,
+        EntityId[] units,
+        CombatOrderKind kind,
+        Vector3 destination,
+        EntityId target = default)
+    {
+        if (units.Length == 0)
+        {
+            return [];
+        }
+
+        var selected =
+            new List<EntityId>(
+                units.Length);
+
+        for (int index = 0; index < units.Length; index++)
+        {
+            EntityId unit =
+                units[index];
+
+            if (!HasCombatOrder(
+                    context,
+                    unit,
+                    kind,
+                    destination,
+                    target))
+            {
+                selected.Add(unit);
+            }
+        }
+
+        return selected.ToArray();
+    }
+
+    private static bool HasCombatOrder(
+        SimulationContext context,
+        EntityId unit,
+        CombatOrderKind kind,
+        Vector3 destination,
+        EntityId target = default)
+    {
+        return context.Entities.TryGetComponent(
+                   unit,
+                   out CombatOrderState order) &&
+               order.Kind == kind &&
+               (kind == CombatOrderKind.Attack
+                   ? order.ExplicitTarget == target
+                   : order.HasDestination &&
+                     HorizontalDistanceSquared(
+                         order.Destination,
+                         destination) <=
+                     1.0f);
+    }
+
     private static bool HaveCombatOrder(
         SimulationContext context,
         EntityId[] units,
@@ -2069,11 +2128,12 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     {
         foreach (EntityId unit in units)
         {
-            if (!context.Entities.TryGetComponent(unit, out CombatOrderState order) ||
-                order.Kind != kind ||
-                (kind == CombatOrderKind.Attack
-                    ? order.ExplicitTarget != target
-                    : !order.HasDestination || HorizontalDistanceSquared(order.Destination, destination) > 1.0f))
+            if (!HasCombatOrder(
+                    context,
+                    unit,
+                    kind,
+                    destination,
+                    target))
             {
                 return false;
             }
