@@ -1229,8 +1229,12 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 order.Kind is
                     CombatOrderKind.Attack or
                     CombatOrderKind.AttackMove;
+            bool offensiveForceEstablished =
+                force.CombatUnits >=
+                    configuration.MinimumAttackUnits;
             double fuelThreshold =
-                offensiveOrder
+                offensiveOrder ||
+                offensiveForceEstablished
                     ? configuration.OffensiveFuelThreshold
                     : configuration.ResupplyThreshold;
 
