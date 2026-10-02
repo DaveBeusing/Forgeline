@@ -168,6 +168,58 @@ public sealed class SkirmishSupplyPolicyTests
     }
 
     [Fact]
+    public void FieldSupplyTruckPreservesFrontlineAvailabilityBeforeSelfRefuel()
+    {
+        using VerticalSliceScenario scenario =
+            VerticalSliceScenario.Create(
+                VerticalSliceScenarioSettings.Create(
+                    VerticalSliceScenarioProfile.Validation));
+        EntityRegistry entities =
+            scenario.Simulation.Entities;
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
+        WorldTransform core =
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+
+        EntityId cargo =
+            scenario.UnitFactory.Create(
+                units[UnitIds.CargoTruck],
+                core.Position +
+                    new Vector3(20.0f, 0.0f, 0.0f),
+                scenario.West.Player);
+        EntityId supply =
+            scenario.UnitFactory.Create(
+                units[UnitIds.SupplyTruck],
+                core.Position +
+                    new Vector3(30.0f, 0.0f, 0.0f),
+                scenario.West.Player);
+
+        scenario.Simulation.RunTicks(
+            25,
+            TestContext.Current.CancellationToken);
+
+        AutomaticResupplyPolicy cargoPolicy =
+            entities.GetComponent<AutomaticResupplyPolicy>(
+                cargo);
+        AutomaticResupplyPolicy supplyPolicy =
+            entities.GetComponent<AutomaticResupplyPolicy>(
+                supply);
+
+        Assert.Equal(
+            0.55,
+            cargoPolicy.FuelThreshold,
+            precision: 6);
+        Assert.Equal(
+            0.35,
+            supplyPolicy.FuelThreshold,
+            precision: 6);
+        Assert.True(
+            supplyPolicy.FuelThreshold <
+            cargoPolicy.FuelThreshold);
+    }
+
+    [Fact]
     public void FuelRecoveryPoliciesPrioritizeFieldSupplyOverVehicleProduction()
     {
         VerticalSliceScenario scenario = VerticalSliceScenario.Create(
