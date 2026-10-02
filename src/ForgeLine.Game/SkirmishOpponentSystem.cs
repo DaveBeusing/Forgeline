@@ -1561,9 +1561,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         return
                             readiness.OverallReadiness >=
                                 configuration.OffensiveReadinessThreshold &&
-                            Math.Min(
-                                readiness.Fuel,
-                                readiness.Ammunition) >=
+                            readiness.Fuel >=
+                                configuration.OffensiveFuelThreshold &&
+                            readiness.Ammunition >=
                                 configuration.ResupplyThreshold;
                     })
                 .Take(
@@ -1880,6 +1880,19 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
+            if (context.Entities.TryGetComponent(
+                    candidate,
+                    out UnitFuelState movementFuel) &&
+                _inventories.Contains(
+                    movementFuel.InventoryId) &&
+                _inventories.GetQuantity(
+                    movementFuel.InventoryId,
+                    ResourceIds.Fuel) <
+                movementFuel.Capacity * 0.35)
+            {
+                continue;
+            }
+
             bool servingRecipient = false;
 
             foreach (EntityId recipient in
@@ -2183,13 +2196,21 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 configuration.ResupplyThreshold,
                 configuration.ResupplyThreshold,
                 enabled: true);
-        var logisticsResupplyPolicy =
+        var cargoResupplyPolicy =
             new AutomaticResupplyPolicy(
                 configuration.ResupplyThreshold,
                 fuelThreshold:
                     Math.Max(
                         configuration.ResupplyThreshold,
-                        0.8),
+                        0.55),
+                enabled: true);
+        var supplyTruckResupplyPolicy =
+            new AutomaticResupplyPolicy(
+                configuration.ResupplyThreshold,
+                fuelThreshold:
+                    Math.Max(
+                        configuration.ResupplyThreshold,
+                        0.35),
                 enabled: true);
 
         for (int index = 0;
@@ -2198,16 +2219,18 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         {
             EntityId unit =
                 owned.Units[index];
-            bool isLogisticsVehicle =
+            bool hasIdentity =
                 owned.UnitByEntity.TryGetValue(
                     unit,
-                    out UnitId unitId) &&
-                (unitId == UnitIds.CargoTruck ||
-                 unitId == UnitIds.SupplyTruck);
+                    out UnitId unitId);
             AutomaticResupplyPolicy resupplyPolicy =
-                isLogisticsVehicle
-                    ? logisticsResupplyPolicy
-                    : combatResupplyPolicy;
+                hasIdentity &&
+                unitId == UnitIds.SupplyTruck
+                    ? supplyTruckResupplyPolicy
+                    : hasIdentity &&
+                      unitId == UnitIds.CargoTruck
+                        ? cargoResupplyPolicy
+                        : combatResupplyPolicy;
 
             var policyCommand =
                 PlayerLogisticsActionCommand.SetAutomaticResupplyPolicy(
