@@ -534,6 +534,31 @@ public sealed class PlayerActionPanelTests
             1600,
             900);
 
+        Press(input, PlatformKey.T);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        Assert.True(
+            controller.TryTakeRequest(
+                out PlayerActionRequest priorityRequest));
+        Assert.Equal(
+            PlayerActionRequestKind.SetSupplyPriority,
+            priorityRequest.Kind);
+        Assert.Equal(unit, priorityRequest.Facility);
+        Assert.Equal(
+            BattlefieldSupplyPriority.High,
+            priorityRequest.SupplyPriority);
+
+        Release(input, PlatformKey.T);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
         Press(input, PlatformKey.Right);
         controller.Update(
             input,

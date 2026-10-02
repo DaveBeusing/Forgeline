@@ -102,9 +102,11 @@ Regression coverage includes automatic replenishment to target, resource conserv
 
 The simulation benchmark host includes automated-distribution scheduling scenarios with tens to hundreds of hubs and requests. Benchmark timing is observational rather than a CI pass/fail threshold.
 
-## Extension Boundary
+## Battlefield Supply Integration Boundary
 
-Battlefield supply can use this shared request/dispatch foundation for resources such as Fuel and Ammunition. Battlefield-specific demand generation may add policy logic, but it should not introduce a second truck scheduler or bypass shared reservation and physical transport.
+Battlefield Fuel and Ammunition already use this shared request/dispatch foundation for regional replenishment. Supply Depot stock policies create normal automated-distribution demand, real Cargo Trucks move that stock through the logistics graph, and battlefield providers transfer only physically available inventory at valid supply range.
+
+Battlefield-specific demand and recipient logic must not introduce a second regional truck scheduler or bypass shared reservation, route capacity, physical transport, and inventory conservation.
 
 ## Human Player Stock Policies
 

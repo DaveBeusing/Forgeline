@@ -163,6 +163,16 @@ The development world-debug view renders capacity state over the logistics netwo
 
 Automated distribution continues to render request flow and request state, while Cargo Transport continues to render physical transport state.
 
+The operational diagnostics are intentionally layered instead of copied into one mutable model:
+
+- route and topology state: `LogisticsNetworkDebugSnapshot`;
+- physical cargo route/wait/failure state: `CargoTransportDebugSnapshot`;
+- throughput, utilization, capacity denial, and backlog: `LogisticsCapacityDebugSnapshot`;
+- blocked flow, bottleneck reason, and unserved deficit: `AutomatedDistributionDebugSnapshot` and `AutomatedDistributionMetrics`;
+- battlefield provider, stock, priority, recipient state, and transfer state: `BattlefieldSupplyDebugSnapshot` plus the immutable player supply read model.
+
+Together these surfaces expose route, provider, throughput, blocked flow, capacity, and deficit without giving presentation code simulation authority.
+
 ## Headless and Deterministic-Friendly Behavior
 
 Capacity and disruption use simulation ticks, stable logistics identifiers, stable request ordering, and the existing fixed-tick command/system pipeline.

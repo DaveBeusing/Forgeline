@@ -570,6 +570,12 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             builder.Append("  EDIT ");
             builder.Append(panel.StockThresholdField.ToString());
         }
+        else if (panel.Mode == PlayerActionPanelMode.Supply)
+        {
+            builder.Append("  PRIORITY ");
+            builder.Append(panel.SupplyPriority.ToString());
+            builder.Append("  T CYCLE");
+        }
         else if (panel.Mode == PlayerActionPanelMode.Tactical)
         {
             builder.Append("  FORMATION ");
@@ -1060,7 +1066,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                 : "  ");
         builder.Append("REQUEST RESUPPLY");
         builder.NewLine();
-        builder.Append("M TOGGLE AUTO  LEFT/RIGHT ADJUST");
+        builder.Append("T CYCLE PRIORITY  M TOGGLE AUTO  LEFT/RIGHT ADJUST");
         builder.NewLine();
     }
 

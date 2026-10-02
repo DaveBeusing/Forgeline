@@ -105,6 +105,15 @@ public static class PlayerActionRequestDispatcher
                         observedTick);
                 return true;
 
+            case PlayerActionRequestKind.SetSupplyPriority:
+                receipt =
+                    gateway.SubmitSupplyPriority(
+                        player,
+                        request.Facility,
+                        request.SupplyPriority,
+                        observedTick);
+                return true;
+
             case PlayerActionRequestKind.SubmitStopCombat:
                 receipt =
                     gateway.SubmitStopCombat(

@@ -202,9 +202,10 @@ The shared action surface exposes battlefield supply for one selected owned supp
 - `Y` opens the supply view.
 - `Tab` selects automatic Fuel threshold, automatic Ammunition threshold, or explicit Resupply.
 - Left / Right changes the selected automatic threshold in bounded steps.
+- `T` cycles the unit's battlefield supply priority through Normal, High, Critical, and Low and submits the change through the player command boundary.
 - `M` toggles automatic resupply and submits the policy through the player command boundary.
 - `Enter` applies the edited automatic policy on a threshold row or submits the existing explicit `ResupplyCommand` on the Resupply row.
 
-The read model reports current supply state, Fuel/Ammunition fractions, selected provider, provider stock, provider state, and `ResupplyProviderRejection` flags. Provider states are descriptive only: Assigned/Traveling does not promise successful transfer. Empty or destroyed providers, route retry, provider Fuel infeasibility, busy providers, and unavailable stock remain normal authoritative outcomes.
+The configured battlefield supply priority is authoritative simulation state and directly participates in the deterministic recipient ordering used by `BattlefieldSupplySystem`. The read model reports current supply state, priority, Fuel/Ammunition fractions, selected provider, provider stock, provider state, and `ResupplyProviderRejection` flags. Provider states are descriptive only: Assigned/Traveling does not promise successful transfer. Empty or destroyed providers, route retry, provider Fuel infeasibility, busy providers, and unavailable stock remain normal authoritative outcomes.
 
 Actual Fuel and Ammunition move only in `BattlefieldSupplySystem` at legitimate transfer range. Automatic and explicit requests use the same `BattlefieldResupplyPlanner`; the player surface does not create a second rescue or transfer implementation.

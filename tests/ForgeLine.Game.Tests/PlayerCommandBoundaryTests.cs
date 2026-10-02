@@ -633,6 +633,71 @@ public sealed class PlayerCommandBoundaryTests
     }
 
     [Fact]
+    public void SupplyPrioritySubmissionEnforcesOwnership()
+    {
+        using VerticalSliceScenario scenario =
+            CreateHumanScenario(seed: 4113);
+        PlayerCommandGateway gateway =
+            CreateGateway(scenario);
+        EntityId ownedUnit =
+            scenario.West.StartingUnits[0];
+        EntityId foreignUnit =
+            scenario.East.StartingUnits[0];
+
+        PlayerCommandSubmissionReceipt owned =
+            gateway.SubmitSupplyPriority(
+                scenario.West.Player,
+                ownedUnit,
+                BattlefieldSupplyPriority.Critical,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(owned.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel ownedResult));
+        Assert.Equal(
+            PlayerCommandKind.Supply,
+            ownedResult.Kind);
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            ownedResult.State);
+        Assert.Equal(
+            BattlefieldSupplyPriority.Critical,
+            scenario.Simulation.Entities
+                .GetComponent<UnitSupplyPriority>(
+                    ownedUnit)
+                .Priority);
+
+        PlayerCommandSubmissionReceipt foreign =
+            gateway.SubmitSupplyPriority(
+                scenario.West.Player,
+                foreignUnit,
+                BattlefieldSupplyPriority.High,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(foreign.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel foreignResult));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Rejected,
+            foreignResult.State);
+        Assert.Equal(
+            PlayerLogisticsActionFailureReason.ForeignOwnership,
+            foreignResult.ActionFailure);
+        Assert.False(
+            scenario.Simulation.Entities.TryGetComponent(
+                foreignUnit,
+                out UnitSupplyPriority foreignPriority) &&
+            foreignPriority.Priority ==
+                BattlefieldSupplyPriority.High);
+    }
+
+    [Fact]
     public void TacticalAttackRequiresCurrentIdentifiedEnemy()
     {
         using VerticalSliceScenario scenario =

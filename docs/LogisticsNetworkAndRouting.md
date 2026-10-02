@@ -172,16 +172,14 @@ Presentation tests cover generation of logistics debug geometry without moving s
 
 ## Current Boundary
 
-Physical Cargo Truck execution now consumes this graph through the fixed-tick transport lifecycle documented in `CargoTransportOperations.md`.
+Physical Cargo Truck execution consumes this graph through the fixed-tick transport lifecycle documented in `CargoTransportOperations.md`. `AutomatedDistributionSystem` already schedules physical Cargo Trucks from player and computer-controlled opponent stock policies, while battlefield Fuel and Ammunition replenishment uses Supply Depots and Supply Trucks without bypassing graph-owned regional transport.
 
 The remaining deferred logistics layers are:
 
-- automated dispatch optimization;
-- battlefield resupply;
-- rail gameplay;
-- pipelines;
+- rail transport execution;
+- pipeline gameplay;
 - cargo drones;
-- traffic simulation;
-- final logistics UI.
+- detailed traffic/lane simulation;
+- production-polished logistics UI.
 
-Those systems consume and extend the graph and physical transport contracts rather than replacing them.
+Future logistics modes must consume and extend the same graph, capacity, inventory, and physical transport contracts rather than replacing them.

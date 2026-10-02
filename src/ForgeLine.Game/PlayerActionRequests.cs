@@ -30,7 +30,8 @@ public enum PlayerActionRequestKind : byte
     SubmitRetreat = 20,
     SubmitFireMissionCoordinate = 21,
     SubmitFireMissionContact = 22,
-    Surrender = 23
+    Surrender = 23,
+    SetSupplyPriority = 24
 }
 
 public readonly record struct PlayerActionRequest(
@@ -58,7 +59,8 @@ public readonly record struct PlayerActionRequest(
     Vector3 TacticalWorldTarget = default,
     IntelligenceContactKey TacticalContactKey = default,
     int TacticalRounds = 0,
-    FormationTemplate TacticalFormation = FormationTemplate.Compact)
+    FormationTemplate TacticalFormation = FormationTemplate.Compact,
+    BattlefieldSupplyPriority SupplyPriority = BattlefieldSupplyPriority.Normal)
 {
     public static PlayerActionRequest BeginBuildingPlacement(
         BuildingId buildingId) =>
@@ -240,6 +242,23 @@ public readonly record struct PlayerActionRequest(
             ProductionRequestMode.OneShot,
             ResourceId.None,
             0.0);
+
+    public static PlayerActionRequest SetSupplyPriority(
+        EntityId target,
+        BattlefieldSupplyPriority priority) =>
+        new(
+            PlayerActionRequestKind.SetSupplyPriority,
+            BuildingId.None,
+            target,
+            RecipeId.None,
+            UnitId.None,
+            EntityId.Invalid,
+            false,
+            ProductionPriority.Normal,
+            ProductionRequestMode.OneShot,
+            ResourceId.None,
+            0.0,
+            SupplyPriority: priority);
 
     public static PlayerActionRequest BeginAttackTargeting(
         IReadOnlyList<EntityId> entities) =>
