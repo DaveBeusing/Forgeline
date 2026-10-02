@@ -2387,6 +2387,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 ResolveSupplyLoadingApproach(
                     context,
                     loadingSource,
+                    entity,
                     destination,
                     transform.Position,
                     truck.LoadRangeMeters);
@@ -2464,24 +2465,35 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private static Vector3 ResolveSupplyLoadingApproach(
         SimulationContext context,
         EntityId source,
+        EntityId truckEntity,
         Vector3 sourcePosition,
         Vector3 truckPosition,
         float loadRangeMeters)
     {
-        Vector3 offset =
-            truckPosition -
-            sourcePosition;
         float halfExtentX = 0.0f;
         float halfExtentZ = 0.0f;
 
         if (context.Entities.TryGetComponent(
                 source,
-                out SpatialPresence presence))
+                out SpatialPresence sourcePresence))
         {
             halfExtentX =
-                presence.HalfExtents.X;
+                sourcePresence.HalfExtents.X;
             halfExtentZ =
-                presence.HalfExtents.Z;
+                sourcePresence.HalfExtents.Z;
+        }
+
+        float truckHalfExtentX = 2.0f;
+        float truckHalfExtentZ = 2.0f;
+
+        if (context.Entities.TryGetComponent(
+                truckEntity,
+                out SpatialPresence truckPresence))
+        {
+            truckHalfExtentX =
+                truckPresence.HalfExtents.X;
+            truckHalfExtentZ =
+                truckPresence.HalfExtents.Z;
         }
 
         float approach =
@@ -2489,22 +2501,134 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 0.0f,
                 loadRangeMeters - 1.0f);
 
-        return MathF.Abs(offset.X) >=
-               MathF.Abs(offset.Z)
-            ? sourcePosition +
-              new Vector3(
-                  MathF.CopySign(
-                      halfExtentX + approach,
-                      offset.X),
-                  0.0f,
-                  0.0f)
-            : sourcePosition +
-              new Vector3(
-                  0.0f,
-                  0.0f,
-                  MathF.CopySign(
-                      halfExtentZ + approach,
-                      offset.Z));
+        Span<Vector3> candidates =
+        [
+            sourcePosition +
+            new Vector3(
+                halfExtentX + approach,
+                0.0f,
+                0.0f),
+            sourcePosition +
+            new Vector3(
+                -(halfExtentX + approach),
+                0.0f,
+                0.0f),
+            sourcePosition +
+            new Vector3(
+                0.0f,
+                0.0f,
+                halfExtentZ + approach),
+            sourcePosition +
+            new Vector3(
+                0.0f,
+                0.0f,
+                -(halfExtentZ + approach))
+        ];
+
+        Vector3 selected =
+            candidates[0];
+        float selectedDistanceSquared =
+            float.PositiveInfinity;
+        bool foundClearCandidate = false;
+
+        for (int index = 0;
+             index < candidates.Length;
+             index++)
+        {
+            Vector3 candidate =
+                candidates[index];
+            bool clear =
+                IsSupplyLoadingApproachClear(
+                    context,
+                    source,
+                    candidate,
+                    truckHalfExtentX,
+                    truckHalfExtentZ);
+
+            if (foundClearCandidate &&
+                !clear)
+            {
+                continue;
+            }
+
+            float distanceSquared =
+                HorizontalDistanceSquared(
+                    truckPosition,
+                    candidate);
+
+            if ((!foundClearCandidate && clear) ||
+                clear == foundClearCandidate &&
+                distanceSquared <
+                selectedDistanceSquared)
+            {
+                selected =
+                    candidate;
+                selectedDistanceSquared =
+                    distanceSquared;
+                foundClearCandidate =
+                    clear;
+            }
+        }
+
+        return selected;
+    }
+
+    private static bool IsSupplyLoadingApproachClear(
+        SimulationContext context,
+        EntityId loadingSource,
+        Vector3 candidate,
+        float truckHalfExtentX,
+        float truckHalfExtentZ)
+    {
+        const float clearanceMeters = 1.0f;
+
+        foreach (EntityId entity in
+                 context.Entities.Query<
+                     SpatialPresence,
+                     WorldTransform>(
+                         QueryIterationOrder.StableByEntityIndex))
+        {
+            if (entity == loadingSource)
+            {
+                continue;
+            }
+
+            SpatialPresence presence =
+                context.Entities.GetComponent<SpatialPresence>(
+                    entity);
+
+            if (presence.Metadata.Mobility !=
+                SpatialMobility.Static)
+            {
+                continue;
+            }
+
+            WorldTransform transform =
+                context.Entities.GetComponent<WorldTransform>(
+                    entity);
+            float allowedX =
+                presence.HalfExtents.X +
+                truckHalfExtentX +
+                clearanceMeters;
+            float allowedZ =
+                presence.HalfExtents.Z +
+                truckHalfExtentZ +
+                clearanceMeters;
+
+            if (MathF.Abs(
+                    candidate.X -
+                    transform.Position.X) <
+                allowedX &&
+                MathF.Abs(
+                    candidate.Z -
+                    transform.Position.Z) <
+                allowedZ)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static float HorizontalDistanceToSupplyLoadingSourceSquared(
