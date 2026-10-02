@@ -59,6 +59,16 @@ public static class SkirmishOpponentDebugVisualization
                     objectiveColor);
             }
 
+            if (opponent.GroupObjective.IsSpecified &&
+                opponent.GroupObjective.HasDestination)
+            {
+                debugDraw.Point(
+                    opponent.GroupObjective.Destination +
+                    Vector3.UnitY * 5.0f,
+                    8.0f,
+                    warningColor);
+            }
+
             if (labels >= maximumLabels)
             {
                 continue;
@@ -80,7 +90,30 @@ public static class SkirmishOpponentDebugVisualization
                 Vector3.UnitY * 14.0f,
                 $"Econ {opponent.Economy.HealthScore:P0} Power {opponent.Economy.PowerGeneration:F0}/{opponent.Economy.PowerDemand:F0} Units {opponent.Force.TotalUnits} Ready {opponent.Force.AverageReadiness:P0} Contacts {opponent.Force.CurrentHostileContacts}",
                 statusColor);
-            labels += 2;
+
+            if (labels + 2 < maximumLabels)
+            {
+                string group =
+                    opponent.GroupObjective.IsSpecified
+                        ? $"{opponent.GroupObjective.Order}/{opponent.GroupObjective.SurvivingMemberCount}"
+                        : "None";
+
+                debugDraw.Label(
+                    opponent.HomePosition +
+                    Vector3.UnitY * 18.0f,
+                    $"Operational {opponent.OperationalObjective} Group {group}",
+                    statusColor);
+                debugDraw.Label(
+                    opponent.HomePosition +
+                    Vector3.UnitY * 22.0f,
+                    $"Supply {opponent.SupplyRequirement} Retreat {opponent.RetreatReason}",
+                    statusColor);
+                labels += 4;
+            }
+            else
+            {
+                labels += 2;
+            }
         }
     }
 }
