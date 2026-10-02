@@ -384,6 +384,89 @@ public sealed class PlayerCommandBoundaryTests
     }
 
     [Fact]
+    public void UnitProductionRallyPointSubmissionEnforcesFacilityOwnership()
+    {
+        using VerticalSliceScenario scenario =
+            CreateHumanScenario(seed: 4109);
+        PlayerCommandGateway gateway =
+            CreateGateway(scenario);
+        InventoryId input =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(1_000.0));
+        EntityId ownedFacility =
+            scenario.Simulation.Entities.CreateEntity();
+        EntityId foreignFacility =
+            scenario.Simulation.Entities.CreateEntity();
+
+        scenario.Simulation.Entities.AddComponent(
+            ownedFacility,
+            new UnitProductionFacility(
+                input,
+                UnitProductionCapability.Vehicle,
+                scenario.West.Player,
+                Vector3.Zero,
+                scenario.Simulation.CurrentTick));
+        scenario.Simulation.Entities.AddComponent(
+            foreignFacility,
+            new UnitProductionFacility(
+                input,
+                UnitProductionCapability.Vehicle,
+                scenario.East.Player,
+                Vector3.Zero,
+                scenario.Simulation.CurrentTick));
+
+        Vector3 rallyPoint =
+            new(240.0f, 0.0f, 180.0f);
+
+        PlayerCommandSubmissionReceipt owned =
+            gateway.SubmitUnitProductionRallyPoint(
+                scenario.West.Player,
+                ownedFacility,
+                rallyPoint,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(owned.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel ownedResult));
+        Assert.Equal(
+            PlayerCommandKind.UnitProduction,
+            ownedResult.Kind);
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            ownedResult.State);
+        Assert.Equal(
+            rallyPoint,
+            scenario.Simulation.Entities
+                .GetComponent<UnitProductionRallyPoint>(
+                    ownedFacility)
+                .WorldPosition);
+
+        PlayerCommandSubmissionReceipt foreign =
+            gateway.SubmitUnitProductionRallyPoint(
+                scenario.West.Player,
+                foreignFacility,
+                rallyPoint,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(foreign.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel foreignResult));
+        Assert.Equal(
+            PlayerCommandFeedbackState.Rejected,
+            foreignResult.State);
+        Assert.False(
+            scenario.Simulation.Entities
+                .HasComponent<UnitProductionRallyPoint>(
+                    foreignFacility));
+    }
+
+    [Fact]
     public void LogisticsStockPolicySubmissionEnforcesOwnershipAndThresholds()
     {
         using VerticalSliceScenario scenario =
