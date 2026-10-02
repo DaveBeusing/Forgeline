@@ -13,6 +13,26 @@ namespace ForgeLine.Game.Tests;
 public sealed class SkirmishOpponentTests
 {
     [Fact]
+    public void OffensiveFuelReserveCannotUndercutGeneralResupplyThreshold()
+    {
+        var configuration =
+            new SkirmishOpponentConfiguration
+            {
+                ResupplyThreshold = 0.40,
+                OffensiveFuelThreshold = 0.30
+            };
+
+        InvalidOperationException error =
+            Assert.Throws<InvalidOperationException>(
+                configuration.Validate);
+
+        Assert.Contains(
+            "Offensive fuel threshold",
+            error.Message,
+            StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void StartingBasesAreSymmetricAndUseNormalAuthoritativeState()
     {
         SkirmishScenarioHarness scenario =
