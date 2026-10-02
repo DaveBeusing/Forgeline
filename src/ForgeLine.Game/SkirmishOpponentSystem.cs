@@ -241,6 +241,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             context,
             controller,
             owned);
+        EnsureReconSupplySupport(
+            context,
+            owned);
 
         SkirmishStrategicState strategicState;
         SkirmishStrategicGoal goal;
@@ -1854,6 +1857,34 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     .Execute(context);
             }
         }
+    }
+
+    private void EnsureReconSupplySupport(
+        SimulationContext context,
+        OwnedState owned)
+    {
+        EntityId scout =
+            ResolveReconReserveScout(
+                owned);
+
+        if (!scout.IsValid ||
+            !context.Entities.TryGetComponent(
+                scout,
+                out CombatOrderState order) ||
+            order.Kind !=
+                CombatOrderKind.AttackMove ||
+            !TacticalCommandUtilities.TryGetMovementIntent(
+                context,
+                scout,
+                out _))
+        {
+            return;
+        }
+
+        MaintainForwardSupplySupport(
+            context,
+            owned,
+            [scout]);
     }
 
     private bool HasOperationalAttackSupplySupport(
