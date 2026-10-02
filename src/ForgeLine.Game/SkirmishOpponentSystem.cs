@@ -1520,6 +1520,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 pursuitLeashMeters: 90.0f);
         command.Execute(context);
 
+        MaintainForwardSupplySupport(
+            context,
+            owned,
+            [scout]);
+
         state =
             state with
             {
@@ -1611,7 +1616,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
-        MaintainAttackSupplySupport(
+        MaintainForwardSupplySupport(
             context,
             owned,
             attackers);
@@ -1914,7 +1919,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return false;
     }
 
-    private void MaintainAttackSupplySupport(
+    private void MaintainForwardSupplySupport(
         SimulationContext context,
         OwnedState owned,
         EntityId[] attackers)
