@@ -34,6 +34,7 @@ public readonly record struct PlayerActionPanelView(
     ProductionRequestMode ProductionMode,
     double DesiredStockQuantity,
     LogisticsStockPriority LogisticsPriority,
+    BattlefieldSupplyPriority SupplyPriority,
     PlayerStockThresholdField StockThresholdField,
     double StockMinimum,
     double StockTarget,
@@ -70,6 +71,8 @@ public sealed class PlayerActionPanelController
     private double _automaticFuelThreshold;
     private double _automaticAmmunitionThreshold;
     private bool _automaticResupplyEnabled;
+    private BattlefieldSupplyPriority _supplyPriority =
+        BattlefieldSupplyPriority.Normal;
 
     public PlayerActionPanelMode Mode { get; private set; }
 
@@ -83,6 +86,9 @@ public sealed class PlayerActionPanelController
 
     public LogisticsStockPriority LogisticsPriority { get; private set; } =
         LogisticsStockPriority.Normal;
+
+    public BattlefieldSupplyPriority SupplyPriority =>
+        _supplyPriority;
 
     public PlayerStockThresholdField StockThresholdField { get; private set; } =
         PlayerStockThresholdField.Target;
@@ -219,6 +225,23 @@ public sealed class PlayerActionPanelController
                     _ =>
                         LogisticsStockPriority.Normal
                 };
+        }
+        else if (Mode == PlayerActionPanelMode.Supply &&
+                 Pressed(input, PlatformKey.T))
+        {
+            _supplyPriority =
+                _supplyPriority switch
+                {
+                    BattlefieldSupplyPriority.Normal =>
+                        BattlefieldSupplyPriority.High,
+                    BattlefieldSupplyPriority.High =>
+                        BattlefieldSupplyPriority.Critical,
+                    BattlefieldSupplyPriority.Critical =>
+                        BattlefieldSupplyPriority.Low,
+                    _ =>
+                        BattlefieldSupplyPriority.Normal
+                };
+            QueueSupplyPriority(actions);
         }
         else
         {
@@ -365,6 +388,7 @@ public sealed class PlayerActionPanelController
             ProductionMode,
             ResolveDesiredStockQuantity(actions),
             LogisticsPriority,
+            _supplyPriority,
             StockThresholdField,
             _stockMinimum,
             _stockTarget,
@@ -599,6 +623,20 @@ public sealed class PlayerActionPanelController
             supply);
     }
 
+    private void QueueSupplyPriority(
+        PlayerActionSnapshot? actions)
+    {
+        if (!actions?.Supply.HasValue == true)
+        {
+            return;
+        }
+
+        _pendingRequest =
+            PlayerActionRequest.SetSupplyPriority(
+                actions!.Supply!.Value.Entity,
+                _supplyPriority);
+    }
+
     private void QueueAutomaticResupplyPolicy(
         PlayerActionSnapshot? actions) =>
         QueueAutomaticResupplyPolicy(
@@ -790,6 +828,8 @@ public sealed class PlayerActionPanelController
             supply.AutomaticAmmunitionThreshold;
         _automaticResupplyEnabled =
             supply.AutomaticEnabled;
+        _supplyPriority =
+            supply.Priority;
     }
 
     private void UpdateStockThresholds(
@@ -1103,6 +1143,8 @@ public sealed class PlayerActionPanelController
             ProductionRequestMode.OneShot;
         LogisticsPriority =
             LogisticsStockPriority.Normal;
+        _supplyPriority =
+            BattlefieldSupplyPriority.Normal;
         StockThresholdField =
             PlayerStockThresholdField.Target;
         _stockResourceId = ResourceId.None;
