@@ -5,6 +5,7 @@ using ForgeLine.Economy;
 using ForgeLine.Ecs;
 using ForgeLine.Intelligence;
 using ForgeLine.Simulation;
+using ForgeLine.World;
 
 namespace ForgeLine.Game;
 
