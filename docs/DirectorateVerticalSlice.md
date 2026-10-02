@@ -99,9 +99,20 @@ A unit-production facility:
 5. advances fixed-tick production;
 6. consumes the reserved inputs;
 7. creates the configured unit through `UnitFactory`;
-8. initializes the unit with its real movement, combat, armor, intelligence, and supply components.
+8. initializes the unit with its real movement, combat, armor, intelligence, and supply components;
+9. if the facility has a rally point, issues the produced unit a normal simulation-owned movement order toward that point.
 
 Cargo Truck and Supply Truck continue to use the existing physical transport and battlefield-supply systems. Unit factories are registered as logistics cargo destinations rather than receiving resources through a special transfer path.
+
+### Unit-production rally points
+
+Barracks and Vehicle Factory rally points are authoritative gameplay state on the production facility.
+
+- Rally-point changes enter the simulation through an ownership-validated unit-production command.
+- The configured world position is copied into unit-production read models for presentation.
+- Completing a unit does not teleport it to the rally point. The unit spawns at the facility's normal spawn offset and receives a standard `MovementOrder`.
+- Navigation, terrain traversal, movement speed, Fuel consumption, blocking, and later tactical orders remain owned by their existing systems.
+- Facilities without a configured rally point preserve the existing spawn-and-idle behavior.
 
 ## Validation
 
@@ -117,7 +128,7 @@ Cargo Truck and Supply Truck continue to use the existing physical transport and
 - initial Fuel or Ammunition quantities that exceed the physical amounts consumed by production;
 - faction or stable-namespace mismatches.
 
-The normal test suite includes a bounded headless vertical-slice smoke scenario that constructs every required structure through the authoritative construction lifecycle and composes every required unit without graphics, audio, or UI.
+The normal test suite includes a bounded headless vertical-slice smoke scenario that constructs every required structure through the authoritative construction lifecycle and composes every required unit without graphics, audio, or UI. Focused regression coverage also verifies rally-point ownership, player read-model publication, and spawn-to-movement-order routing.
 
 ## Presentation Status
 
