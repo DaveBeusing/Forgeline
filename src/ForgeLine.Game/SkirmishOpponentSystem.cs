@@ -1724,7 +1724,21 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 controller,
                 configuration.Aggression);
 
-        if (HaveCombatOrder(context, attackers, CombatOrderKind.AttackMove, objective))
+        if (HasAttackForceReachedWaypoint(
+                context,
+                attackers,
+                objective))
+        {
+            objective =
+                SelectDeepOffensiveWaypoint(
+                    controller);
+        }
+
+        if (HaveCombatOrder(
+                context,
+                attackers,
+                CombatOrderKind.AttackMove,
+                objective))
         {
             return true;
         }
@@ -4116,7 +4130,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     site.Kind is
                         BattlefieldSiteKind.ForwardOperatingBase or
                         BattlefieldSiteKind.Expansion or
-                        BattlefieldSiteKind.MiningOutpost)
+                        BattlefieldSiteKind.MiningOutpost &&
+                    (homeWest
+                        ? site.Position.X >= center
+                        : site.Position.X <= center))
             .OrderBy(
                 site =>
                     HorizontalDistanceSquared(
@@ -4146,6 +4163,25 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                center
             ? position.X <= center
             : position.X >= center;
+    }
+
+    private static bool HasAttackForceReachedWaypoint(
+        SimulationContext context,
+        EntityId[] attackers,
+        Vector3 waypoint)
+    {
+        const float reachedRadiusMeters = 180.0f;
+
+        Vector3 centroid =
+            ResolveAttackForceCentroid(
+                context,
+                attackers);
+
+        return HorizontalDistanceSquared(
+                   centroid,
+                   waypoint) <=
+               reachedRadiusMeters *
+               reachedRadiusMeters;
     }
 
     private Vector3 SelectOffensiveWaypoint(
