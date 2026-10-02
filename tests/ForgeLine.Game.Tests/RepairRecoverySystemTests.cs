@@ -68,6 +68,25 @@ public sealed class RepairRecoverySystemTests
             state.Status);
         Assert.Equal(5.0, state.HealthRestoredThisTick, precision: 6);
         Assert.Equal(1.0, state.ResourceConsumedThisTick, precision: 6);
+
+        simulation.RunTicks(
+            10,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(
+            100.0,
+            simulation.Entities.GetComponent<HealthState>(
+                unit).Current,
+            precision: 6);
+        Assert.Equal(
+            0.0,
+            inventories.GetQuantity(
+                providerInventory,
+                ResourceIds.Steel),
+            precision: 6);
+        Assert.False(
+            simulation.Entities.HasComponent<RepairRecoveryState>(
+                unit));
     }
 
     [Fact]
