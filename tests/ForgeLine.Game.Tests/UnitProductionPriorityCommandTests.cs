@@ -62,7 +62,7 @@ public sealed class UnitProductionPriorityCommandTests
             PlayerUnitProductionActionCommand.SetPriority(
                 foreign,
                 request,
-                ProductionPriority.Critical,
+                ProductionPriority.Normal,
                 SimulationTick.Zero);
         simulation.SubmitCommand(
             rejected,
