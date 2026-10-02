@@ -1635,37 +1635,60 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             objective =
                 identified.Value.LastKnownPosition;
 
-            if (identifiedIsCommandCore &&
-                !IsAttackForceInsideObjectivePressure(
+            if (identifiedIsCommandCore)
+            {
+                PartitionAttackForceByObjectivePressure(
                     context,
                     attackers,
                     objective,
-                    configuration.ObjectivePressureLeashMeters))
-            {
-                Vector3 approachObjective =
-                    ResolveObjectiveApproachPoint(
-                        controller.HomePosition,
-                        objective,
-                        configuration.ObjectivePressureLeashMeters);
+                    configuration.ObjectivePressureLeashMeters,
+                    out EntityId[] pressureUnits,
+                    out EntityId[] approachUnits);
 
-                if (HaveCombatOrder(
+                if (pressureUnits.Length > 0 &&
+                    !HaveCombatOrder(
                         context,
-                        attackers,
-                        CombatOrderKind.AttackMove,
-                        approachObjective))
+                        pressureUnits,
+                        CombatOrderKind.Attack,
+                        objective,
+                        identifiedTarget))
                 {
-                    return true;
+                    var attack =
+                        new AttackCommand(
+                            controller.Player,
+                            pressureUnits,
+                            identifiedTarget,
+                            context.Tick,
+                            configuration.ObjectivePressureLeashMeters);
+                    attack.Execute(context);
                 }
 
-                var approach =
-                    new AttackMoveCommand(
-                        controller.Player,
-                        attackers,
-                        approachObjective,
-                        context.Tick,
-                        FormationTemplate.Column,
-                        configuration.ObjectivePressureLeashMeters);
-                approach.Execute(context);
+                if (approachUnits.Length > 0)
+                {
+                    Vector3 approachObjective =
+                        ResolveObjectiveApproachPoint(
+                            controller.HomePosition,
+                            objective,
+                            configuration.ObjectivePressureLeashMeters);
+
+                    if (!HaveCombatOrder(
+                            context,
+                            approachUnits,
+                            CombatOrderKind.AttackMove,
+                            approachObjective))
+                    {
+                        var approach =
+                            new AttackMoveCommand(
+                                controller.Player,
+                                approachUnits,
+                                approachObjective,
+                                context.Tick,
+                                FormationTemplate.Column,
+                                configuration.ObjectivePressureLeashMeters);
+                        approach.Execute(context);
+                    }
+                }
+
                 return true;
             }
 
@@ -1988,33 +2011,53 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 direction.Z * standOffMeters);
     }
 
-    private static bool IsAttackForceInsideObjectivePressure(
+    private static void PartitionAttackForceByObjectivePressure(
         SimulationContext context,
         EntityId[] attackers,
         Vector3 objective,
-        float pressureRadiusMeters)
+        float pressureRadiusMeters,
+        out EntityId[] pressureUnits,
+        out EntityId[] approachUnits)
     {
         float pressureSquared =
             pressureRadiusMeters *
             pressureRadiusMeters;
+        var inside =
+            new List<EntityId>(
+                attackers.Length);
+        var outside =
+            new List<EntityId>(
+                attackers.Length);
 
         for (int index = 0;
              index < attackers.Length;
              index++)
         {
-            if (!context.Entities.TryGetComponent(
-                    attackers[index],
-                    out WorldTransform transform) ||
+            EntityId attacker =
+                attackers[index];
+
+            if (context.Entities.TryGetComponent(
+                    attacker,
+                    out WorldTransform transform) &&
                 HorizontalDistanceSquared(
                     transform.Position,
-                    objective) >
+                    objective) <=
                 pressureSquared)
             {
-                return false;
+                inside.Add(
+                    attacker);
+            }
+            else
+            {
+                outside.Add(
+                    attacker);
             }
         }
 
-        return true;
+        pressureUnits =
+            inside.ToArray();
+        approachUnits =
+            outside.ToArray();
     }
 
     private static bool HaveCombatOrder(
