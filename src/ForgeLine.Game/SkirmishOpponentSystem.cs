@@ -1614,7 +1614,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 configuration.MinimumObjectivePressureUnits ||
             !HasOperationalAttackSupplySupport(
                 context,
-                owned))
+                owned,
+                reconReserve))
         {
             return false;
         }
@@ -1622,7 +1623,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         MaintainForwardSupplySupport(
             context,
             owned,
-            attackers);
+            attackers,
+            reconReserve);
 
         IntelligenceContact? identified = null;
         EntityId identifiedTarget = EntityId.Invalid;
@@ -1896,7 +1898,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private bool HasOperationalAttackSupplySupport(
         SimulationContext context,
-        OwnedState owned)
+        OwnedState owned,
+        EntityId protectedReconScout)
     {
         for (int index = 0;
              index < owned.Units.Count;
@@ -1911,7 +1914,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 context.Entities.HasComponent<ResupplyOrder>(
                     candidate) ||
                 context.Entities.HasComponent<SupplyRescueAssignment>(
-                    candidate))
+                    candidate) ||
+                IsProtectingReconScout(
+                    context,
+                    candidate,
+                    protectedReconScout))
             {
                 continue;
             }
@@ -1960,7 +1967,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private void MaintainForwardSupplySupport(
         SimulationContext context,
         OwnedState owned,
-        EntityId[] attackers)
+        EntityId[] attackers,
+        EntityId protectedReconScout = default)
     {
         if (attackers.Length == 0)
         {
@@ -2007,7 +2015,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 context.Entities.HasComponent<ResupplyOrder>(
                     candidate) ||
                 context.Entities.HasComponent<SupplyRescueAssignment>(
-                    candidate))
+                    candidate) ||
+                IsProtectingReconScout(
+                    context,
+                    candidate,
+                    protectedReconScout))
             {
                 continue;
             }
@@ -2109,6 +2121,36 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             command.Execute(context);
         }
 
+    }
+
+    private static bool IsProtectingReconScout(
+        SimulationContext context,
+        EntityId supplyTruck,
+        EntityId scout)
+    {
+        if (!scout.IsValid ||
+            !context.Entities.TryGetComponent(
+                scout,
+                out CombatOrderState scoutOrder) ||
+            scoutOrder.Kind != CombatOrderKind.AttackMove ||
+            !context.Entities.TryGetComponent(
+                scout,
+                out WorldTransform scoutTransform) ||
+            !TacticalCommandUtilities.TryGetMovementIntent(
+                context,
+                supplyTruck,
+                out MovementOrder escortMovement))
+        {
+            return false;
+        }
+
+        const float escortTargetToleranceMeters = 32.0f;
+
+        return HorizontalDistanceSquared(
+                   escortMovement.WorldTarget,
+                   scoutTransform.Position) <=
+               escortTargetToleranceMeters *
+               escortTargetToleranceMeters;
     }
 
     private static Vector3 ResolveAttackForceCentroid(
