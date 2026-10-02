@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Simulation;
@@ -254,6 +255,53 @@ public readonly record struct SkirmishOpponentWorkMetrics(
     long ScratchStatesCreated,
     long ScratchStatesReleased);
 
+public enum SkirmishOperationalObjective : byte
+{
+    None = 0,
+    StabilizeEconomy = 1,
+    EstablishInfrastructure = 2,
+    Expand = 3,
+    Defend = 4,
+    RecoverForce = 5,
+    Reconnoiter = 6,
+    PrepareOffensive = 7,
+    PressureObjective = 8
+}
+
+[Flags]
+public enum SkirmishSupplyRequirement : byte
+{
+    None = 0,
+    Fuel = 1 << 0,
+    Ammunition = 1 << 1,
+    Repair = 1 << 2
+}
+
+public enum SkirmishRetreatReason : byte
+{
+    None = 0,
+    LowReadiness = 1,
+    LowFuel = 2,
+    LowAmmunition = 3,
+    LowFuelAndAmmunition = 4,
+    RepairRequired = 5,
+    RepairAndSupply = 6
+}
+
+public readonly record struct SkirmishGroupObjectiveReadModel(
+    EntityId Group,
+    CombatOrderKind Order,
+    Vector3 Destination,
+    bool HasDestination,
+    EntityId ExplicitTarget,
+    FormationTemplate Formation,
+    int InitialMemberCount,
+    int SurvivingMemberCount)
+{
+    public bool IsSpecified =>
+        Group.IsValid;
+}
+
 public readonly record struct SkirmishOpponentDebugReadModel(
     EntityId Controller,
     PlayerId Player,
@@ -265,4 +313,11 @@ public readonly record struct SkirmishOpponentDebugReadModel(
     Vector3 ChosenObjective,
     bool HasChosenObjective,
     SimulationTick LastDecisionTick,
-    int DecisionsTaken);
+    int DecisionsTaken,
+    SkirmishOperationalObjective OperationalObjective =
+        SkirmishOperationalObjective.None,
+    SkirmishGroupObjectiveReadModel GroupObjective = default,
+    SkirmishSupplyRequirement SupplyRequirement =
+        SkirmishSupplyRequirement.None,
+    SkirmishRetreatReason RetreatReason =
+        SkirmishRetreatReason.None);
