@@ -433,10 +433,24 @@ public sealed class UnitProductionSystem : ISimulationSystem
         Vector3 spawnPosition =
             facilityTransform.Position + worldOffset;
 
-        _unitFactory.Create(
-            definition,
-            spawnPosition,
-            facility.Owner);
+        EntityId producedUnit =
+            _unitFactory.Create(
+                definition,
+                spawnPosition,
+                facility.Owner);
+
+        if (context.Entities.TryGetComponent(
+                facilityEntity,
+                out UnitProductionRallyPoint rallyPoint))
+        {
+            context.Entities.AddComponent(
+                producedUnit,
+                new MovementOrder(
+                    facility.Owner,
+                    rallyPoint.WorldPosition,
+                    context.Tick,
+                    context.Tick));
+        }
 
         facility.CompletedUnits++;
         facility.LastCompletedTick = context.Tick;
@@ -604,6 +618,13 @@ public sealed class UnitProductionSystem : ISimulationSystem
                 ? consumer.State
                 : PowerOperationalState.Offline;
 
+        Vector3? rallyPoint =
+            context.Entities.TryGetComponent(
+                facilityEntity,
+                out UnitProductionRallyPoint configuredRallyPoint)
+                ? configuredRallyPoint.WorldPosition
+                : null;
+
         return new UnitProductionFacilityReadModel(
             facilityEntity,
             facility.InputInventory,
@@ -612,6 +633,9 @@ public sealed class UnitProductionSystem : ISimulationSystem
             facility.BlockReason,
             progress,
             powerState,
-            facility.CompletedUnits);
+            facility.CompletedUnits)
+        {
+            RallyPoint = rallyPoint
+        };
     }
 }
