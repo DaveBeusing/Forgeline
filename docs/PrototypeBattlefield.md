@@ -89,7 +89,7 @@ All visuals remain diagnostic overlays; navigation and logistics behavior comes 
 
 `PrototypeBattlefieldValidator` fails loading for invalid dimensions, duplicate or missing stable keys, invalid road references, insufficient crossing data, missing bootstrap resources, invalid strategic sites, or objective/start mismatches.
 
-`BattlefieldOperationalGeographyValidator` additionally qualifies every resource and strategic-site route from the spawns, explicit buildability, expansion pressure, elevation range, and both navigation and road alternatives after either crossing is individually unavailable. CI runs this qualification through `ForgeLine.MapCompiler` and retains the compiled map/report as diagnostics.
+`BattlefieldOperationalGeographyValidator` additionally qualifies every strategic-site route and a bounded traversable approach for every resource deposit from the spawns, explicit buildability, expansion pressure, elevation range, and both navigation and road alternatives after either crossing is individually unavailable. CI runs this qualification through `ForgeLine.MapCompiler` and retains the compiled map/report as diagnostics.
 
 `PrototypeBattlefieldTests` run headlessly and validate:
 
