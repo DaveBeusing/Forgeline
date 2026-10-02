@@ -1513,6 +1513,15 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 sites[index].Position;
         }
 
+        if (!TrySelectReconSupplyEscort(
+                context,
+                owned,
+                scout,
+                out EntityId escort))
+        {
+            return false;
+        }
+
         var command =
             new AttackMoveCommand(
                 controller.Player,
@@ -1523,10 +1532,15 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 pursuitLeashMeters: 90.0f);
         command.Execute(context);
 
-        MaintainForwardSupplySupport(
-            context,
-            owned,
-            [scout]);
+        var escortedMovement =
+            new MoveEntitiesCommand(
+                controller.Player,
+                [scout, escort],
+                objective,
+                context.Tick,
+                FormationTemplate.Column,
+                preserveCombatIntent: true);
+        escortedMovement.Execute(context);
 
         state =
             state with
@@ -1890,10 +1904,135 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return;
         }
 
+        for (int index = 0;
+             index < owned.Units.Count;
+             index++)
+        {
+            EntityId candidate =
+                owned.Units[index];
+
+            if (context.Entities.HasComponent<SupplyTruck>(
+                    candidate) &&
+                IsProtectingReconScout(
+                    context,
+                    candidate,
+                    scout))
+            {
+                return;
+            }
+        }
+
         MaintainForwardSupplySupport(
             context,
             owned,
             [scout]);
+    }
+
+    private bool TrySelectReconSupplyEscort(
+        SimulationContext context,
+        OwnedState owned,
+        EntityId scout,
+        out EntityId escort)
+    {
+        escort = EntityId.Invalid;
+
+        if (!context.Entities.TryGetComponent(
+                scout,
+                out WorldTransform scoutTransform))
+        {
+            return false;
+        }
+
+        float bestDistanceSquared =
+            float.PositiveInfinity;
+
+        for (int index = 0;
+             index < owned.Units.Count;
+             index++)
+        {
+            EntityId candidate =
+                owned.Units[index];
+
+            if (!context.Entities.TryGetComponent(
+                    candidate,
+                    out SupplyTruck truck) ||
+                !context.Entities.TryGetComponent(
+                    candidate,
+                    out WorldTransform transform) ||
+                context.Entities.HasComponent<ResupplyOrder>(
+                    candidate) ||
+                context.Entities.HasComponent<SupplyRescueAssignment>(
+                    candidate))
+            {
+                continue;
+            }
+
+            double availableFuel =
+                _inventories.GetAvailableQuantity(
+                    truck.InventoryId,
+                    ResourceIds.Fuel);
+            double availableAmmunition =
+                _inventories.GetAvailableQuantity(
+                    truck.InventoryId,
+                    ResourceIds.Ammunition);
+
+            if (availableFuel <
+                    truck.FuelTarget * 0.50 ||
+                availableAmmunition <
+                    truck.AmmunitionTarget * 0.25)
+            {
+                continue;
+            }
+
+            if (context.Entities.TryGetComponent(
+                    candidate,
+                    out UnitFuelState propulsion) &&
+                _inventories.Contains(
+                    propulsion.InventoryId) &&
+                _inventories.GetQuantity(
+                    propulsion.InventoryId,
+                    ResourceIds.Fuel) <
+                propulsion.Capacity * 0.35)
+            {
+                continue;
+            }
+
+            bool servingRecipient = false;
+
+            foreach (EntityId recipient in
+                     context.Entities.Query<ResupplyOrder>(
+                         QueryIterationOrder.StableByEntityIndex))
+            {
+                if (context.Entities.GetComponent<ResupplyOrder>(
+                        recipient).Provider ==
+                    candidate)
+                {
+                    servingRecipient = true;
+                    break;
+                }
+            }
+
+            if (servingRecipient)
+            {
+                continue;
+            }
+
+            float distanceSquared =
+                HorizontalDistanceSquared(
+                    transform.Position,
+                    scoutTransform.Position);
+
+            if (!escort.IsValid ||
+                distanceSquared < bestDistanceSquared ||
+                (distanceSquared == bestDistanceSquared &&
+                 candidate < escort))
+            {
+                escort = candidate;
+                bestDistanceSquared = distanceSquared;
+            }
+        }
+
+        return escort.IsValid;
     }
 
     private bool HasOperationalAttackSupplySupport(
@@ -2132,8 +2271,23 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             !context.Entities.TryGetComponent(
                 scout,
                 out CombatOrderState scoutOrder) ||
-            scoutOrder.Kind != CombatOrderKind.AttackMove ||
-            !context.Entities.TryGetComponent(
+            scoutOrder.Kind != CombatOrderKind.AttackMove)
+        {
+            return false;
+        }
+
+        if (context.Entities.TryGetComponent(
+                scout,
+                out MovementGroupMember scoutMember) &&
+            context.Entities.TryGetComponent(
+                supplyTruck,
+                out MovementGroupMember escortMember) &&
+            scoutMember.Group == escortMember.Group)
+        {
+            return true;
+        }
+
+        if (!context.Entities.TryGetComponent(
                 scout,
                 out WorldTransform scoutTransform) ||
             !TacticalCommandUtilities.TryGetMovementIntent(
