@@ -1891,7 +1891,6 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
 
         const float holdRadiusMeters = 12.0f;
-        const float supportCohesionRadiusMeters = 64.0f;
         const float retargetDistanceMeters = 24.0f;
 
         if (selectedDistanceSquared <=
@@ -1922,7 +1921,6 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             command.Execute(context);
         }
 
-        _ = supportCohesionRadiusMeters;
     }
 
     private static Vector3 ResolveAttackForceCentroid(
