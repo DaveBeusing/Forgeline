@@ -98,9 +98,16 @@ public sealed class RepairRecoverySystem : ISimulationSystem
 
             if (!controllable.Category.HasFlag(
                     ControllableEntityCategory.Unit) ||
-                health.IsDepleted ||
-                health.Current >= health.Maximum)
+                health.IsDepleted)
             {
+                continue;
+            }
+
+            if (health.Current >= health.Maximum)
+            {
+                ClearRecoveryState(
+                    context,
+                    entity);
                 continue;
             }
 
