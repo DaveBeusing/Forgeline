@@ -1,3 +1,4 @@
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Ecs;
@@ -236,6 +237,126 @@ public sealed class SkirmishOpponentTests
 
             Assert.True(authorized);
         }
+    }
+
+    [Fact]
+    public void DebugSnapshotProjectsLayeredGroupSupplyAndRetreatState()
+    {
+        var configuration =
+            new SkirmishOpponentConfiguration
+            {
+                ReactionCadenceTicks = 1_000
+            };
+        SkirmishScenarioHarness scenario =
+            SkirmishScenarioHarness.Create(
+                westConfiguration: configuration,
+                eastConfiguration: configuration);
+        scenario.Opponents.DebugCaptureEnabled =
+            true;
+
+        EntityId unit =
+            scenario.West.StartingUnits[0];
+        EntityId group =
+            scenario.Simulation.Entities.CreateEntity();
+        Vector3 destination =
+            new(1_250.0f, 0.0f, 1_100.0f);
+
+        scenario.Simulation.Entities.AddComponent(
+            group,
+            new CombatGroupIntent(
+                CombatOrderKind.AttackMove,
+                scenario.West.Player,
+                destination,
+                hasDestination: true,
+                EntityId.Invalid,
+                FormationTemplate.Column,
+                initialMemberCount: 1,
+                pursuitLeashMeters: 160.0f,
+                scenario.Simulation.CurrentTick));
+
+        if (scenario.Simulation.Entities.HasComponent<CombatGroupMember>(
+                unit))
+        {
+            scenario.Simulation.Entities.SetComponent(
+                unit,
+                new CombatGroupMember(group));
+        }
+        else
+        {
+            scenario.Simulation.Entities.AddComponent(
+                unit,
+                new CombatGroupMember(group));
+        }
+
+        var readiness =
+            new UnitCombatReadiness(
+                Strength: 1.0,
+                Health: 0.20,
+                Fuel: 0.10,
+                Ammunition: 0.10,
+                Mobility: 1.0,
+                WeaponAvailability: 1.0,
+                SupplyCondition: 0.10,
+                CombatCapability: 0.20,
+                OverallReadiness: 0.20,
+                scenario.Simulation.CurrentTick);
+
+        if (scenario.Simulation.Entities.HasComponent<UnitCombatReadiness>(
+                unit))
+        {
+            scenario.Simulation.Entities.SetComponent(
+                unit,
+                readiness);
+        }
+        else
+        {
+            scenario.Simulation.Entities.AddComponent(
+                unit,
+                readiness);
+        }
+
+        WorldTransform coreTransform =
+            scenario.Simulation.Entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+        scenario.Simulation.Entities.AddComponent(
+            unit,
+            new RetreatRecoveryState(
+                scenario.West.CommandCore,
+                RetreatRecoveryReason.RepairAndSupply,
+                coreTransform.Position,
+                scenario.Simulation.CurrentTick));
+
+        scenario.Simulation.AdvanceOneTick();
+
+        SkirmishOpponentDebugReadModel debug =
+            Assert.Single(
+                scenario.Opponents.DebugSnapshot,
+                entry =>
+                    entry.Player ==
+                    scenario.West.Player);
+
+        Assert.Equal(
+            SkirmishOperationalObjective.StabilizeEconomy,
+            debug.OperationalObjective);
+        Assert.True(debug.GroupObjective.IsSpecified);
+        Assert.Equal(group, debug.GroupObjective.Group);
+        Assert.Equal(
+            CombatOrderKind.AttackMove,
+            debug.GroupObjective.Order);
+        Assert.Equal(destination, debug.GroupObjective.Destination);
+        Assert.Equal(1, debug.GroupObjective.SurvivingMemberCount);
+        Assert.True(
+            debug.SupplyRequirement.HasFlag(
+                SkirmishSupplyRequirement.Fuel));
+        Assert.True(
+            debug.SupplyRequirement.HasFlag(
+                SkirmishSupplyRequirement.Ammunition));
+        Assert.True(
+            debug.SupplyRequirement.HasFlag(
+                SkirmishSupplyRequirement.Repair));
+        Assert.Equal(
+            SkirmishRetreatReason.RepairAndSupply,
+            debug.RetreatReason);
     }
 
     [Fact]
