@@ -199,7 +199,7 @@ Destroyed units are never repaired, and missing repair material produces an expl
 
 `CombatReadinessSystem.Metrics` reports ready/degraded/combat-ineffective counts and average unit/group readiness.
 
-F2 can display current order/status, target/destination, pursuit leash, movement permission, resupply state, and Health/Fuel/Ammunition/readiness values. Presentation never calculates or changes tactical state.
+F2 can display current order/status, target/destination, pursuit leash, movement permission, resupply state, and Health/Fuel/Ammunition/readiness values. Combat diagnostics additionally expose suppression state, while the tactical player read model exposes Suppressed/Pinned counts, active repair count, and recovery-aware Retreat provider/reason. Presentation never calculates or changes tactical state.
 
 ## Tactical Test Opponent
 
@@ -241,24 +241,28 @@ Automated tests cover:
 - automatic resupply through a real provider and real `BattlefieldSupplySystem` transfer;
 - Retreat movement intent;
 - Detected-coordinate versus Identified-entity behavior for the test opponent;
-- group Strength after entity destruction.
+- group Strength after entity destruction;
+- Normal → Suppressed → Pinned transitions, movement/fire consequences, and fixed-tick recovery;
+- Steel-backed repair and explicit no-material behavior;
+- recovery-aware Retreat provider selection and player command routing;
+- reconnaissance identification enabling an artillery strike beyond the artillery unit's own visual range.
 
 ## Performance Coverage
 
-The simulation BenchmarkDotNet host includes 100- and 1,000-unit tactical acquisition/coordination workloads exercising preparation, spatial target acquisition, current intelligence validation, Fire Policy/weapon compatibility, group candidate construction, and deterministic target spreading.
+The simulation BenchmarkDotNet host includes 100- and 1,000-unit tactical acquisition/coordination workloads exercising preparation, spatial target acquisition, current intelligence validation, Fire Policy/weapon compatibility, group candidate construction, and deterministic target spreading. Combined-arms coverage also includes 100/1,000-check terrain line-of-fire workloads and 100/1,000-unit suppression updates.
 
 Benchmark timing remains measurement evidence rather than a hardware-sensitive CI gate.
 
 ## Deferred Work
 
-The first tactical layer deliberately leaves strategic/campaign AI, morale/suppression, veterancy, repair/recovery, advanced cover tactics, faction-specific doctrine, multiplayer, and final combat-command UI polish to later work.
+The first tactical layer deliberately leaves strategic/campaign opponent planning, morale beyond the current suppression model, veterancy, advanced semantic cover tactics, dedicated maintenance resources, mobile repair specialization, faction-specific doctrine, multiplayer, and final combat-command UI polish to later work.
 
 ## Human Player Tactical Controls
 
-The human player uses the same authoritative tactical commands as the simulation systems: Attack, AttackMove, Stop, Hold Position, and Retreat. `K` opens the combat section of the shared action palette. `Tab` selects an action and `Enter` activates it. Attack, AttackMove, Retreat, and Fire Mission enter an explicit target mode; Stop, Hold Position, and fire-mission cancellation submit immediately. `F3` continues to cycle Compact, Line, Column, and Wedge and the selected formation is preserved for AttackMove and Retreat.
+The human player uses the same authoritative tactical commands as the simulation systems: Attack, AttackMove, Stop, Hold Position, Retreat, and Retreat to Recovery. `K` opens the combat section of the shared action palette. `Tab` selects an action and `Enter` activates it. Attack, AttackMove, Retreat, and Fire Mission enter an explicit target mode; Stop, Hold Position, Retreat to Recovery, and fire-mission cancellation submit immediately. `F3` continues to cycle Compact, Line, Column, and Wedge and the selected formation is preserved for AttackMove and Retreat.
 
 `PlayerActionRequestDispatcher` and `PlayerActionRequest` live in the cross-platform game layer and are shared by the Windows client, interaction tests, and the bounded headless player-acceptance flow. They submit resolved player actions through `PlayerCommandGateway`; simulation commands remain the only tactical state authority. The gateway reports accepted, partial, and rejected target counts plus a causal tactical failure such as missing current identification, incompatible target class, unavailable artillery target, or range failure.
 
 Direct Attack requires a current identified hostile target. The command adapter revalidates liveness, faction, health, targetability, current identification, ownership of the selected units, and weapon effectiveness before creating the existing `AttackCommand`. A copied target row is therefore not authority to attack later after intelligence becomes stale.
 
-Stop and Hold remain distinct existing commands. Stop clears tactical intent through the existing stop semantics; Hold creates a stationary combat order that can engage in range without pursuing. Retreat continues to use real movement and can still interact with the existing supply/resupply systems rather than teleporting or restoring resources.
+Stop and Hold remain distinct existing commands. Stop clears tactical intent through the existing stop semantics; Hold creates a stationary combat order that can engage in range without pursuing. Retreat continues to use real movement and can still interact with the existing supply/resupply systems rather than teleporting or restoring resources. Retreat to Recovery resolves an owned support destination from current damage/supply needs and then submits the same existing Retreat/formation/navigation path.
