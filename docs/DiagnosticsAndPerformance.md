@@ -118,7 +118,7 @@ These values make results interpretable across different machines. They are meas
 For integrated readiness work, the headless host can execute the complete Central Divide vertical slice:
 
 ```powershell
-dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --require-terminal --diagnostics-output artifacts/vertical-slice-match.json
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --require-terminal --diagnostics-output artifacts/opponent-full-match.json
 ```
 
 The vertical-slice report adds match outcome/pacing, entity and pending-command state, tick timing, observed allocation/GC activity, Cargo Transport completion/failure/route counters, Automated Distribution state, Battlefield Supply transfer totals, Artillery shot/impact totals, and per-side economy/power/industry/intelligence/readiness/force summaries.
@@ -130,8 +130,8 @@ The vertical-slice report adds match outcome/pacing, entity and pending-command 
 A vertical-slice run with `--diagnostics-output` additionally registers the read-only `SkirmishProgressionDiagnostics` observer. It writes a per-match sidecar by replacing the main file extension with `progression-N.json`; for example:
 
 ```text
-artifacts/vertical-slice-match.json
-artifacts/vertical-slice-match.progression-1.json
+artifacts/opponent-full-match.json
+artifacts/opponent-full-match.progression-1.json
 ```
 
 The sidecar contains profile, match index, seed, executed ticks, terminal status, observed decision count, dropped history count, retained history, first eligibility-loss pairs, and the latest decision for each side. No progression observer is attached when the headless run omits a diagnostics output path.
