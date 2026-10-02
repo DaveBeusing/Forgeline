@@ -623,6 +623,21 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 target,
                 observedTick));
 
+    public PlayerCommandSubmissionReceipt SubmitSupplyPriority(
+        PlayerId issuer,
+        EntityId target,
+        BattlefieldSupplyPriority priority,
+        SimulationTick observedTick) =>
+        SubmitLogisticsAction(
+            PlayerCommandKind.Supply,
+            issuer,
+            observedTick,
+            PlayerLogisticsActionCommand.SetSupplyPriority(
+                issuer,
+                target,
+                priority,
+                observedTick));
+
     private PlayerCommandSubmissionReceipt SubmitLogisticsAction(
         PlayerCommandKind kind,
         PlayerId issuer,
