@@ -1810,9 +1810,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
             if (!servingRecipient)
             {
-                TacticalCommandUtilities.ClearMovementIntent(
-                    context,
-                    candidate);
+                new StopMovementCommand(
+                    controller.Player,
+                    [candidate],
+                    context.Tick)
+                    .Execute(context);
             }
         }
     }
@@ -2005,9 +2007,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         if (selectedDistanceSquared <=
             holdRadiusMeters * holdRadiusMeters)
         {
-            TacticalCommandUtilities.ClearMovementIntent(
-                context,
-                selected);
+            new StopMovementCommand(
+                selectedTruck.Owner,
+                [selected],
+                context.Tick)
+                .Execute(context);
             return;
         }
 
@@ -2389,9 +2393,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             {
                 if (loadingMovement)
                 {
-                    TacticalCommandUtilities.ClearMovementIntent(
-                        context,
-                        entity);
+                    new StopMovementCommand(
+                        truck.Owner,
+                        [entity],
+                        context.Tick)
+                        .Execute(context);
                 }
 
                 continue;
@@ -2500,9 +2506,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             {
                 if (loadingMovement)
                 {
-                    TacticalCommandUtilities.ClearMovementIntent(
-                        context,
-                        entity);
+                    new StopMovementCommand(
+                        truck.Owner,
+                        [entity],
+                        context.Tick)
+                        .Execute(context);
                 }
 
                 continue;
