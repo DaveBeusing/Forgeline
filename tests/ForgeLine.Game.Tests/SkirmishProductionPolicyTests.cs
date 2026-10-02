@@ -680,7 +680,7 @@ public sealed class SkirmishProductionPolicyTests
         }
 
         scenario.Simulation.RunTicks(
-            2,
+            validation.WestOpponent.ReactionCadenceTicks + 2,
             TestContext.Current.CancellationToken);
 
         UnitProductionFacility recovered =
