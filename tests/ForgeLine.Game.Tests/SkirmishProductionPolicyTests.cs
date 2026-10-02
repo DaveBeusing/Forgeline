@@ -373,6 +373,30 @@ public sealed class SkirmishProductionPolicyTests
                 .Quantity);
     }
 
+    private static LogisticsStockPolicy FindStockPolicy(
+        EntityRegistry entities,
+        EntityId target,
+        ResourceId resource)
+    {
+        foreach (EntityId entity in
+                 entities.Query<LogisticsStockPolicy>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            LogisticsStockPolicy policy =
+                entities.GetComponent<LogisticsStockPolicy>(
+                    entity);
+
+            if (policy.TargetEntity == target &&
+                policy.ResourceId == resource)
+            {
+                return policy;
+            }
+        }
+
+        throw new Xunit.Sdk.XunitException(
+            $"No stock policy found for target {target} and resource {resource}.");
+    }
+
     [Fact]
     public void ExpandedSupplyNetworkQueuesAdditionalCargoRecovery()
     {
