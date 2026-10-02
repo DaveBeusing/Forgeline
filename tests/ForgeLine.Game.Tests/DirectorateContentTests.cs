@@ -389,6 +389,142 @@ public sealed class DirectorateContentTests
     }
 
     [Fact]
+    public void UnitProductionRallyPointRoutesProducedUnitThroughMovementOrder()
+    {
+        var simulation = new SimulationCoordinator();
+        var inventories = new InventoryStore();
+        var network = new LogisticsNetwork();
+        var cargo =
+            new CargoTransportSystem(
+                network,
+                inventories);
+        var factory =
+            new UnitFactory(
+                simulation.Entities,
+                inventories,
+                cargo);
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
+        var production =
+            new UnitProductionSystem(
+                units,
+                inventories,
+                factory);
+
+        simulation.RegisterSystem(production);
+
+        UnitDefinition scout =
+            units[UnitIds.ScoutVehicle];
+        InventoryId input =
+            inventories.CreateInventory(
+                new InventorySpecification(2_000.0));
+
+        foreach (UnitResourceCost cost in scout.Costs)
+        {
+            Assert.True(
+                inventories.Add(
+                    input,
+                    cost.ResourceId,
+                    cost.Quantity).Succeeded);
+        }
+
+        EntityId facility =
+            simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(
+            facility,
+            new WorldTransform(
+                new Vector3(50.0f, 0.0f, 50.0f),
+                Quaternion.Identity,
+                new Vector3(20.0f, 10.0f, 20.0f)));
+        simulation.Entities.AddComponent(
+            facility,
+            new PowerConsumer(
+                demand: 40.0,
+                allocatedPower: 40.0,
+                state: PowerOperationalState.Powered));
+        simulation.Entities.AddComponent(
+            facility,
+            new UnitProductionFacility(
+                input,
+                UnitProductionCapability.Vehicle |
+                UnitProductionCapability.Logistics,
+                DirectoratePlayer,
+                new Vector3(0.0f, 0.0f, 18.0f),
+                SimulationTick.Zero));
+
+        var rallyPoint =
+            new Vector3(180.0f, 0.0f, 125.0f);
+        var rallyCommand =
+            new SetUnitProductionRallyPointCommand(
+                DirectoratePlayer,
+                facility,
+                rallyPoint,
+                simulation.CurrentTick);
+
+        simulation.SubmitCommand(
+            rallyCommand,
+            simulation.CurrentTick.Next(),
+            new SimulationCommandSource(
+                DirectoratePlayer.Value));
+        simulation.AdvanceOneTick();
+
+        Assert.True(rallyCommand.Accepted);
+
+        var queueCommand =
+            new QueueUnitProductionCommand(
+                DirectoratePlayer,
+                facility,
+                scout.Id,
+                simulation.CurrentTick);
+        simulation.SubmitCommand(
+            queueCommand,
+            simulation.CurrentTick.Next(),
+            new SimulationCommandSource(
+                DirectoratePlayer.Value));
+
+        simulation.RunTicks(
+            checked((ulong)scout.ProductionTicks + 1UL),
+            TestContext.Current.CancellationToken);
+
+        EntityId produced = EntityId.Invalid;
+        foreach (EntityId entity in
+                 simulation.Entities.Query<UnitIdentity>())
+        {
+            UnitIdentity identity =
+                simulation.Entities.GetComponent<UnitIdentity>(
+                    entity);
+
+            if (identity.UnitId == scout.Id)
+            {
+                produced = entity;
+                break;
+            }
+        }
+
+        Assert.True(produced.IsValid);
+
+        MovementOrder movement =
+            simulation.Entities.GetComponent<MovementOrder>(
+                produced);
+        Assert.Equal(
+            DirectoratePlayer,
+            movement.Issuer);
+        Assert.Equal(
+            rallyPoint,
+            movement.WorldTarget);
+
+        UnitProductionFacilityReadModel facilityState =
+            Assert.Single(
+                production.Facilities,
+                state =>
+                    state.Entity ==
+                    facility);
+        Assert.Equal(
+            rallyPoint,
+            facilityState.RallyPoint);
+    }
+
+    [Fact]
     public void UnitProductionStopsWithoutPowerAndResumesWhenPowerReturns()
     {
         var simulation = new SimulationCoordinator();
