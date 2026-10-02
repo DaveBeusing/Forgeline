@@ -698,6 +698,59 @@ public sealed class PlayerCommandBoundaryTests
     }
 
     [Fact]
+    public void RetreatToRecoveryUsesOwnedCombinedSupportProvider()
+    {
+        using VerticalSliceScenario scenario =
+            CreateHumanScenario(seed: 4117);
+        PlayerCommandGateway gateway =
+            CreateGateway(scenario);
+        EntityId unit =
+            scenario.West.StartingUnits[0];
+
+        PlayerCommandSubmissionReceipt receipt =
+            gateway.SubmitRetreatToRecovery(
+                scenario.West.Player,
+                [unit],
+                scenario.Simulation.CurrentTick,
+                FormationTemplate.Column);
+
+        Assert.True(receipt.Accepted);
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel result));
+        Assert.Equal(
+            PlayerCommandKind.Tactical,
+            result.Kind);
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            result.State);
+
+        RetreatRecoveryState recovery =
+            scenario.Simulation.Entities
+                .GetComponent<RetreatRecoveryState>(
+                    unit);
+        Assert.Equal(
+            scenario.West.CommandCore,
+            recovery.Provider);
+        Assert.Equal(
+            RetreatRecoveryReason.RepairAndSupply,
+            recovery.Reason);
+
+        CombatOrderState order =
+            scenario.Simulation.Entities
+                .GetComponent<CombatOrderState>(
+                    unit);
+        Assert.Equal(
+            CombatOrderKind.Retreat,
+            order.Kind);
+        Assert.Equal(
+            recovery.Destination,
+            order.Destination);
+    }
+
+    [Fact]
     public void TacticalAttackRequiresCurrentIdentifiedEnemy()
     {
         using VerticalSliceScenario scenario =
