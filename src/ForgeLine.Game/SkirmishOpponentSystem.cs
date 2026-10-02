@@ -1581,8 +1581,19 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     configuration.MaximumAttackUnits)
                 .ToArray();
 
+        int objectivePressureUnits =
+            attackers.Count(
+                unit =>
+                    owned.UnitByEntity.TryGetValue(
+                        unit,
+                        out UnitId unitId) &&
+                    unitId ==
+                        UnitIds.MainBattleTank);
+
         if (attackers.Length <
-            configuration.MinimumAttackUnits ||
+                configuration.MinimumAttackUnits ||
+            objectivePressureUnits <
+                configuration.MinimumObjectivePressureUnits ||
             !HasOperationalAttackSupplySupport(
                 context,
                 owned))
@@ -3306,7 +3317,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             UnitId candidate =
                 SelectUnitProductionGoal(
                     owned,
-                    facility);
+                    facility,
+                    configuration);
 
             if (!candidate.IsSpecified)
             {
@@ -3626,8 +3638,46 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private UnitId SelectUnitProductionGoal(
         OwnedState owned,
-        in UnitProductionFacility facility)
+        in UnitProductionFacility facility,
+        SkirmishOpponentConfiguration configuration)
     {
+        if (facility.Supports(
+                UnitProductionCapability.Vehicle))
+        {
+            if (GetUnitCount(
+                    owned,
+                    UnitIds.ScoutVehicle) +
+                GetPendingUnitCount(
+                    owned,
+                    UnitIds.ScoutVehicle) <
+                1)
+            {
+                return UnitIds.ScoutVehicle;
+            }
+
+            if (GetUnitCount(
+                    owned,
+                    UnitIds.MainBattleTank) +
+                GetPendingUnitCount(
+                    owned,
+                    UnitIds.MainBattleTank) <
+                configuration.MinimumObjectivePressureUnits)
+            {
+                return UnitIds.MainBattleTank;
+            }
+
+            if (GetUnitCount(
+                    owned,
+                    UnitIds.MobileArtillery) +
+                GetPendingUnitCount(
+                    owned,
+                    UnitIds.MobileArtillery) <
+                1)
+            {
+                return UnitIds.MobileArtillery;
+            }
+        }
+
         UnitId[] priority =
         [
             UnitIds.RifleSquad,
@@ -4893,6 +4943,15 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         OwnedState owned,
         UnitId unit) =>
         owned.UnitCounts.TryGetValue(
+            unit,
+            out int count)
+            ? count
+            : 0;
+
+    private static int GetPendingUnitCount(
+        OwnedState owned,
+        UnitId unit) =>
+        owned.PendingUnitCounts.TryGetValue(
             unit,
             out int count)
             ? count
