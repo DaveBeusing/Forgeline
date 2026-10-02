@@ -303,7 +303,9 @@ public sealed class VerticalSliceScenario : IDisposable
             new BuildingPlacementService(
                 buildingDefinitions,
                 terrain,
-                spatialIndex);
+                spatialIndex,
+                new BattlefieldBuildableAreaQuery(
+                    battlefield));
         var buildingCommands =
             new BuildingCommandProcessingSystem(
                 buildingDefinitions,
