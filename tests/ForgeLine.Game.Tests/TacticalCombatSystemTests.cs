@@ -116,6 +116,60 @@ public sealed class TacticalCombatSystemTests
     }
 
     [Fact]
+    public void AttackPursuesWhenTerrainBlocksFireInsideWeaponRange()
+    {
+        TacticalScenario scenario =
+            CreateScenario(
+                weaponRange: 80.0f,
+                lineOfFire:
+                    BlockedLineOfFirePolicy.Instance);
+
+        EntityId attacker =
+            CreateCombatUnit(
+                scenario,
+                BluePlayer,
+                BlueFaction,
+                Vector3.Zero,
+                addVisualSensor: true,
+                visualRange: 150.0f,
+                movable: true);
+        EntityId target =
+            CreateCombatUnit(
+                scenario,
+                RedPlayer,
+                RedFaction,
+                new Vector3(40.0f, 0.0f, 0.0f));
+
+        scenario.Simulation.SubmitCommand(
+            new AttackCommand(
+                BluePlayer,
+                [attacker],
+                target,
+                scenario.Simulation.CurrentTick,
+                pursuitLeashMeters: 100.0f),
+            scenario.Simulation.CurrentTick.Next());
+
+        scenario.Simulation.AdvanceOneTick();
+
+        TacticalCombatState state =
+            scenario.Simulation.Entities.GetComponent<TacticalCombatState>(
+                attacker);
+
+        Assert.Equal(
+            CombatOrderStatus.Pursuing,
+            state.Status);
+        Assert.True(
+            scenario.Simulation.Entities.GetComponent<TacticalMovementConstraint>(
+                attacker).CanMove);
+        Assert.True(
+            scenario.Simulation.Entities.HasComponent<MovementOrder>(
+                attacker));
+        Assert.False(
+            scenario.Simulation.Entities.GetComponent<WeaponState>(
+                attacker).Target.IsValid);
+    }
+
+    [Fact]
     public void AttackDoesNotChaseBeyondPursuitLeash()
     {
         TacticalScenario scenario =
@@ -1223,7 +1277,8 @@ public sealed class TacticalCombatSystemTests
         bool registerReadiness = false,
         bool registerAutomaticResupply = false,
         bool registerBattlefieldSupply = false,
-        bool registerTestOpponent = false)
+        bool registerTestOpponent = false,
+        ILineOfFirePolicy? lineOfFire = null)
     {
         var simulation =
             new SimulationCoordinator(
@@ -1258,7 +1313,8 @@ public sealed class TacticalCombatSystemTests
         var targetAcquisition =
             new TargetAcquisitionSystem(
                 weapons,
-                targetAvailability: availability);
+                targetAvailability: availability,
+                lineOfFire: lineOfFire);
         var tacticalPreparation =
             new TacticalOrderPreparationSystem();
         TacticalTestOpponentSystem? opponent =
@@ -1276,7 +1332,9 @@ public sealed class TacticalCombatSystemTests
         var tactical =
             new TacticalCombatSystem(
                 weapons,
-                intelligence);
+                intelligence,
+                availability,
+                lineOfFire);
         CombatReadinessSystem? readiness =
             registerReadiness ||
             registerTestOpponent
@@ -1437,6 +1495,29 @@ public sealed class TacticalCombatSystemTests
         }
 
         return entity;
+    }
+
+    private sealed class BlockedLineOfFirePolicy : ILineOfFirePolicy
+    {
+        public static BlockedLineOfFirePolicy Instance { get; } =
+            new();
+
+        private BlockedLineOfFirePolicy()
+        {
+        }
+
+        public bool HasLineOfFire(
+            EntityId source,
+            EntityId target,
+            Vector3 sourcePosition,
+            Vector3 targetPosition)
+        {
+            _ = source;
+            _ = target;
+            _ = sourcePosition;
+            _ = targetPosition;
+            return false;
+        }
     }
 
     private readonly record struct TacticalScenario(
