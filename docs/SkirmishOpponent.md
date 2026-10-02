@@ -84,7 +84,9 @@ Economic buildings are connected to the canonical prototype road corridor throug
 
 Unit production uses the existing Directorate unit catalog and normal unit-production queues. The current vertical-slice composition can request infantry, Combat Engineers, Scout Vehicles, Main Battle Tanks, Mobile Artillery, Cargo Trucks, and Supply Trucks.
 
-Desired counts are intentionally simple. Configuration limits queue depth so the controller cannot monopolize a production facility with an unbounded plan. A completed facility or a large army does not establish that its next unit has locally available production inputs or that enough units are currently eligible to attack.
+Desired counts are intentionally simple. Configuration limits queue depth so the controller cannot monopolize a production facility with an unbounded plan. Critical logistics recovery owns the next vehicle-production slot only until the configured minimum Cargo Truck and Supply Truck fleet is restored. Once that floor is satisfied, the vehicle plan first establishes one reconnaissance Scout, then the configured minimum objective-pressure Main Battle Tanks, then one Mobile Artillery unit before optional roster growth. This prevents transport recovery from starving the only structure-capable assault path without granting resources or bypassing normal production.
+
+A completed facility or a large army does not establish that its next unit has locally available production inputs or that enough units are currently eligible to attack.
 
 ## Reconnaissance and Intelligence
 
@@ -109,6 +111,7 @@ Offensive admission is per candidate, not a comparison against the entire army's
 - Fuel must meet the higher configured offensive reserve threshold; Ammunition must meet the general resupply threshold.
 - At least one owned Supply Truck must be field-ready: not self-resupplying or rescue-assigned, carrying at least half of its Fuel cargo target and one quarter of its Ammunition target, with at least 35% propulsion Fuel when propulsion state is present.
 - The remaining candidate set, bounded by MaximumAttackUnits, must contain at least MinimumAttackUnits.
+- The eligible attack set must also contain at least MinimumObjectivePressureUnits Main Battle Tanks, ensuring the committed force can actually damage the Command Core instead of relying on infantry/Scout weapons that cannot engage structures.
 
 The stronger Fuel reserve exists because a fraction that is sufficient to trigger normal resupply is not necessarily enough to commit a heavy vehicle across Central Divide and still retain recovery options. Combat-unit automatic resupply uses the same offensive Fuel reserve, and an active Attack/AttackMove unit below that reserve is treated as a recovery candidate rather than being allowed to burn down to the general emergency threshold. The current implementation allows a candidate without a readiness component through the readiness filter; diagnostics explicitly records HasReadiness so absence cannot be mistaken for a measured full-readiness value. Normal runtime readiness is derived in SnapshotEvents.
 
@@ -128,7 +131,7 @@ SkirmishOpponentConfiguration exposes behavior tuning without direct simulation 
 
 - reaction cadence and aggression;
 - expansion, offensive readiness, offensive Fuel reserve, retreat, and resupply thresholds;
-- minimum and maximum attack-group size;
+- minimum and maximum attack-group size plus the minimum structure-pressure component;
 - maximum queued units per production facility;
 - defensive radius and objective-pressure pursuit leash;
 - artillery decision cadence.
