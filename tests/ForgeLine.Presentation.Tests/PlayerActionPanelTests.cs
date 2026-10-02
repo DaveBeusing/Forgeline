@@ -616,6 +616,90 @@ public sealed class PlayerActionPanelTests
     }
 
     [Fact]
+    public void TacticalPaletteSubmitsRecoveryAwareRetreat()
+    {
+        EntityId unit =
+            new(89, 1);
+        var tactical =
+            new PlayerTacticalActionReadModel(
+                [unit],
+                requestedSelectionCount: 1,
+                combatEligibleCount: 1,
+                rejectedSelectionCount: 0,
+                criticalSupplyCount: 1,
+                resupplyingCount: 0,
+                hasCommonOrder: false,
+                mixedOrderState: false,
+                currentOrder: default,
+                currentStatus: default,
+                targets: [],
+                artillery: []);
+        PresentationSnapshot snapshot =
+            CreateSnapshot(
+                tactical: tactical);
+        var input =
+            new InputState();
+        var controller =
+            new PlayerActionPanelController();
+
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+        Press(input, PlatformKey.K);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+        Release(input, PlatformKey.K);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        for (int index = 0;
+             index < 7;
+             index++)
+        {
+            Press(input, PlatformKey.Tab);
+            controller.Update(
+                input,
+                snapshot,
+                1600,
+                900);
+            Release(input, PlatformKey.Tab);
+            controller.Update(
+                input,
+                snapshot,
+                1600,
+                900);
+        }
+
+        Press(input, PlatformKey.Enter);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        Assert.True(
+            controller.TryTakeRequest(
+                out PlayerActionRequest request));
+        Assert.Equal(
+            PlayerActionRequestKind.SubmitRetreatToRecovery,
+            request.Kind);
+        Assert.Equal(
+            new[] { unit },
+            request.TacticalEntities);
+        Assert.Equal(
+            FormationTemplate.Column,
+            request.TacticalFormation);
+    }
+
+    [Fact]
     public void TacticalPaletteMapsTargetedAndImmediateActions()
     {
         EntityId unit =
