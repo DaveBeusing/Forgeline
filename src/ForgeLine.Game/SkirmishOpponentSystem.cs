@@ -4127,10 +4127,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return _battlefield.Sites
             .Where(
                 site =>
-                    site.Kind is
+                    (site.Kind is
                         BattlefieldSiteKind.ForwardOperatingBase or
                         BattlefieldSiteKind.Expansion or
-                        BattlefieldSiteKind.MiningOutpost &&
+                        BattlefieldSiteKind.MiningOutpost) &&
                     (homeWest
                         ? site.Position.X >= center
                         : site.Position.X <= center))
