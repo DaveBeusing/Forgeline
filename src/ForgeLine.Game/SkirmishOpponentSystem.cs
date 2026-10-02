@@ -4369,7 +4369,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 [UnitIds.RifleSquad] = 6,
                 [UnitIds.CombatEngineer] = 1,
                 [UnitIds.ScoutVehicle] = 2,
-                [UnitIds.CargoTruck] = 2,
+                [UnitIds.CargoTruck] =
+                    Math.Clamp(
+                        owned.SupplyDepots.Count + 1,
+                        2,
+                        4),
                 [UnitIds.SupplyTruck] = 1,
                 [UnitIds.MainBattleTank] = 4,
                 [UnitIds.MobileArtillery] = 2
