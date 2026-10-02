@@ -226,6 +226,33 @@ public sealed class GroundMovementSystem : ISimulationSystem
             return;
         }
 
+        if (entities.TryGetComponent(
+                entity,
+                out SuppressionMovementConstraint suppressionConstraint) &&
+            !suppressionConstraint.CanMove)
+        {
+            GroundMovementState pinnedState = state with
+            {
+                Velocity = Vector3.Zero,
+                Status = GroundMovementStatus.TacticallyPaused,
+                ObservedOrderTick = order.AcceptedAtTick,
+                PreviousDistanceToTarget = distanceToTarget,
+                StalledTicks = 0
+            };
+
+            entities.SetComponent(
+                entity,
+                pinnedState);
+            AddDebugAgent(
+                entity,
+                position,
+                pinnedState,
+                movement,
+                order.WorldTarget,
+                hasTarget: true);
+            return;
+        }
+
         bool newOrder =
             state.ObservedOrderTick.Value != order.AcceptedAtTick.Value;
 
@@ -308,6 +335,14 @@ public sealed class GroundMovementSystem : ISimulationSystem
                 out SupplyMovementConstraint movementSupplyConstraint))
         {
             maximumSpeed *= movementSupplyConstraint.MaximumSpeedScale;
+        }
+
+        if (entities.TryGetComponent(
+                entity,
+                out SuppressionMovementConstraint movementSuppressionConstraint))
+        {
+            maximumSpeed *=
+                movementSuppressionConstraint.MaximumSpeedScale;
         }
 
         if (entities.TryGetComponent(
