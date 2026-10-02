@@ -40,7 +40,7 @@ public sealed class UnitProductionPriorityCommandTests
                 SimulationTick.Zero));
 
         var owned =
-            new SetUnitProductionRequestPriorityCommand(
+            PlayerUnitProductionActionCommand.SetPriority(
                 owner,
                 request,
                 ProductionPriority.High,
@@ -59,7 +59,7 @@ public sealed class UnitProductionPriorityCommandTests
                 .Priority);
 
         var rejected =
-            new SetUnitProductionRequestPriorityCommand(
+            PlayerUnitProductionActionCommand.SetPriority(
                 foreign,
                 request,
                 ProductionPriority.Critical,
