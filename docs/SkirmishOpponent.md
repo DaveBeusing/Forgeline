@@ -134,9 +134,11 @@ Configuration changes decision frequency and thresholds only. It does not modify
 
 ## Diagnostics
 
-SkirmishOpponentDebugReadModel exposes observation-only development data: strategic state, active goal, economy health, power generation/demand, force composition, average readiness, current/known hostile contacts, selected public objective, and decision tick/count.
+SkirmishOpponentDebugReadModel exposes observation-only development data: strategic state, active goal, economy health, power generation/demand, force composition, average readiness, current/known hostile contacts, selected public strategic objective, operational objective, active combat-group objective, force supply requirement, retreat reason, and decision tick/count.
 
-The F2 world-debug view draws opponent home/objective markers and compact status labels. Visualization is presentation-only and never feeds decisions back into simulation.
+The group projection is copied from the authoritative CombatGroupIntent and surviving CombatGroupMember state. Supply and retreat diagnostics are derived from real unit readiness, resupply, and repair/recovery state rather than from a second planning model.
+
+The F2 world-debug view draws opponent home/objective markers, active group destination, and compact strategic/operational/supply/retreat labels. Visualization is presentation-only and never feeds decisions back into simulation.
 
 Headless runs with a diagnostics output additionally attach SkirmishProgressionDiagnostics at the end of AiDecisions. Its snapshots record the selected strategic branch, eligible attacker count and exclusions, unit readiness and current order state, consuming-facility material shortages, provider cargo versus propulsion Fuel, industrial processing/extraction state, and bounded transport inventories, reservations, and movement intent.
 
