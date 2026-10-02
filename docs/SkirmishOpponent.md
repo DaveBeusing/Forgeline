@@ -104,7 +104,7 @@ Defense responds to current hostile intelligence inside the configured defensive
 
 Offensive admission is per candidate, not a comparison against the entire army's average:
 
-- Scout Vehicles are excluded.
+- One owned Scout Vehicle is retained as the reconnaissance reserve; additional armed Scout Vehicles may reinforce the offensive group.
 - Candidates with readiness data must meet the configured offensive readiness threshold.
 - Fuel must meet the higher configured offensive reserve threshold; Ammunition must meet the general resupply threshold.
 - At least one owned Supply Truck must be field-ready: not self-resupplying or rescue-assigned, carrying at least half of its Fuel cargo target and one quarter of its Ammunition target, with at least 35% propulsion Fuel when propulsion state is present.
