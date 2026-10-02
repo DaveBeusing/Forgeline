@@ -43,6 +43,9 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
+      - name: Compile and qualify canonical map
+        run: dotnet run --project tools/ForgeLine.MapCompiler/ForgeLine.MapCompiler.csproj --configuration Release --no-build -- --output artifacts/maps/central-divide.flmap.json --qualification-output artifacts/map-qualification.json
+
       - name: Compile and qualify runtime assets
         run: dotnet run --project tools/ForgeLine.AssetCompiler/ForgeLine.AssetCompiler.csproj --configuration Release --no-build -- --source assets/source --runtime assets/runtime --clean --qualification-output artifacts/asset-qualification.json
 
@@ -67,5 +70,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: engine-diagnostics
-          path: artifacts/*.json
+          path: |
+            artifacts/*.json
+            artifacts/maps/*.json
           if-no-files-found: warn
