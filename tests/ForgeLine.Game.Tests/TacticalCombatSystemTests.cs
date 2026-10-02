@@ -1093,6 +1093,76 @@ public sealed class TacticalCombatSystemTests
     }
 
     [Fact]
+    public void TacticalTestOpponentPreservesStrategicAdvanceForDistantContact()
+    {
+        TacticalScenario scenario =
+            CreateScenario(
+                weaponRange: 80.0f,
+                registerReadiness: true,
+                registerTestOpponent: true);
+
+        EntityId opponent =
+            CreateCombatUnit(
+                scenario,
+                RedPlayer,
+                RedFaction,
+                Vector3.Zero,
+                movable: true,
+                attachSupply: true,
+                fuelCapacity: 100.0,
+                initialFuel: 100.0,
+                ammunitionCapacity: 100.0,
+                initialAmmunition: 100.0);
+        scenario.Simulation.Entities.AddComponent(
+            opponent,
+            new TacticalTestOpponent(
+                engagementLeashMeters: 100.0f));
+        scenario.Simulation.Entities.AddComponent(
+            opponent,
+            new VisualSensorState(
+                RedFaction,
+                rangeMeters: 500.0f,
+                updateIntervalTicks: 1));
+
+        _ =
+            CreateCombatUnit(
+                scenario,
+                BluePlayer,
+                BlueFaction,
+                new Vector3(300.0f, 0.0f, 0.0f));
+
+        Vector3 strategicDestination =
+            new(600.0f, 0.0f, 0.0f);
+
+        scenario.Simulation.SubmitCommand(
+            new AttackMoveCommand(
+                RedPlayer,
+                [opponent],
+                strategicDestination,
+                scenario.Simulation.CurrentTick,
+                FormationTemplate.Column,
+                pursuitLeashMeters: 100.0f),
+            scenario.Simulation.CurrentTick.Next());
+
+        scenario.Simulation.RunTicks(
+            3,
+            TestContext.Current.CancellationToken);
+
+        CombatOrderState order =
+            scenario.Simulation.Entities.GetComponent<CombatOrderState>(
+                opponent);
+
+        Assert.Equal(
+            CombatOrderKind.AttackMove,
+            order.Kind);
+        Assert.Equal(
+            strategicDestination,
+            order.Destination);
+        Assert.False(
+            order.ExplicitTarget.IsValid);
+    }
+
+    [Fact]
     public void GroupReadinessTracksSurvivingStrengthAfterEntityLoss()
     {
         TacticalScenario scenario =
