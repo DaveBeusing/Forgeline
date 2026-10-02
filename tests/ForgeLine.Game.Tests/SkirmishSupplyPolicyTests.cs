@@ -342,12 +342,23 @@ public sealed class SkirmishSupplyPolicyTests
                 entities,
                 supplyDepot,
                 ResourceIds.Ammunition).Priority);
-        Assert.Equal(
-            LogisticsStockPriority.High,
+        LogisticsStockPolicy factoryFuel =
             FindStockPolicy(
                 entities,
                 vehicleFactory,
-                ResourceIds.Fuel).Priority);
+                ResourceIds.Fuel);
+
+        Assert.Equal(
+            LogisticsStockPriority.High,
+            factoryFuel.Priority);
+        Assert.Equal(
+            240.0,
+            factoryFuel.DesiredMinimum,
+            precision: 6);
+        Assert.Equal(
+            360.0,
+            factoryFuel.DesiredTarget,
+            precision: 6);
     }
 
     private static LogisticsStockPolicy FindStockPolicy(
