@@ -152,7 +152,9 @@ VerticalSliceScenario is the reusable game composition for the Central Divide si
 
 Deterministic scenarios cover symmetric authoritative starts, power and raw-resource recovery through normal construction, intelligence authorization for direct combat targets, same-seed strategic progression, and bounded Build-Supply-Conquer progression through bootstrap, expansion, reconnaissance, logistics movement, and combat-group formation.
 
-Focused deterministic scenarios and bounded strategic progression belong in the normal test suite. CI additionally runs one natural terminal match with the explicit validation profile and fails if Command Core victory does not resolve within 80,000 ticks. Forced-objective lifecycle tests verify objective handling only; they are not evidence of a naturally completed match.
+Focused deterministic scenarios and bounded strategic progression belong in the normal test suite. CI additionally runs the explicit **Two-opponent full-match validation**: one fresh validation-profile match, two computer-controlled participants, seed 2026, an 80,000-tick ceiling, and `--require-terminal`. The gate fails unless normal Command Core gameplay produces a match result and the ordinary lifecycle reaches Completed. Its diagnostics are written to `artifacts/opponent-full-match.json`.
+
+Forced-objective lifecycle tests verify objective handling only; they are not evidence of a naturally completed match.
 
 Repeated multi-match soak uses the same runtime through build/Run-VerticalSliceSoak.ps1 or the manually dispatched soak workflow and remains separate from hardware-sensitive PR timing gates. Inspect every requested match, retain failing outcomes, and record the seed sequence. A successful seed or a passing unit suite alone does not establish general gameplay balance or universal termination.
 
