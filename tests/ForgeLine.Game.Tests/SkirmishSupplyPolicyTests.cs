@@ -352,11 +352,11 @@ public sealed class SkirmishSupplyPolicyTests
             LogisticsStockPriority.High,
             factoryFuel.Priority);
         Assert.Equal(
-            240.0,
+            120.0,
             factoryFuel.DesiredMinimum,
             precision: 6);
         Assert.Equal(
-            360.0,
+            160.0,
             factoryFuel.DesiredTarget,
             precision: 6);
     }
