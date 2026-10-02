@@ -202,7 +202,8 @@ public sealed class PlayerUnitProductionFacilityActionReadModel
         UnitProductionBlockReason blockReason,
         double progress,
         IReadOnlyList<PlayerUnitProductionActionReadModel> units,
-        IReadOnlyList<PlayerUnitProductionRequestReadModel> requests)
+        IReadOnlyList<PlayerUnitProductionRequestReadModel> requests,
+        System.Numerics.Vector3? rallyPoint = null)
     {
         Entity = entity;
         ActiveRequest = activeRequest;
@@ -210,6 +211,7 @@ public sealed class PlayerUnitProductionFacilityActionReadModel
         Status = status;
         BlockReason = blockReason;
         Progress = progress;
+        RallyPoint = rallyPoint;
         _units =
             Array.AsReadOnly(
                 units?.ToArray() ??
@@ -231,6 +233,8 @@ public sealed class PlayerUnitProductionFacilityActionReadModel
     public UnitProductionBlockReason BlockReason { get; }
 
     public double Progress { get; }
+
+    public System.Numerics.Vector3? RallyPoint { get; }
 
     public IReadOnlyList<PlayerUnitProductionActionReadModel> Units =>
         _units;
@@ -794,6 +798,13 @@ internal static class PlayerActionSnapshotFactory
                     1.0);
         }
 
+        System.Numerics.Vector3? rallyPoint =
+            entities.TryGetComponent(
+                entity,
+                out UnitProductionRallyPoint configuredRallyPoint)
+                ? configuredRallyPoint.WorldPosition
+                : null;
+
         return new PlayerUnitProductionFacilityActionReadModel(
             entity,
             facility.ActiveRequest,
@@ -802,7 +813,8 @@ internal static class PlayerActionSnapshotFactory
             facility.BlockReason,
             progress,
             units,
-            requests);
+            requests,
+            rallyPoint);
     }
 
     private static PlayerTacticalActionReadModel? CaptureTactical(

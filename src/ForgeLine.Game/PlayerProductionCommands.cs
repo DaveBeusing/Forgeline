@@ -1,3 +1,4 @@
+using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Simulation;
@@ -252,7 +253,8 @@ public sealed class PlayerProductionActionCommand : ISimulationCommand
 public enum PlayerUnitProductionOperation : byte
 {
     Queue = 1,
-    Cancel = 2
+    Cancel = 2,
+    SetRallyPoint = 3
 }
 
 public sealed class PlayerUnitProductionActionCommand : ISimulationCommand
@@ -264,6 +266,7 @@ public sealed class PlayerUnitProductionActionCommand : ISimulationCommand
         UnitId unitId,
         EntityId requestEntity,
         ProductionPriority priority,
+        Vector3 rallyPoint,
         SimulationTick submittedAtTick)
     {
         if (!issuer.IsSpecified)
@@ -282,6 +285,7 @@ public sealed class PlayerUnitProductionActionCommand : ISimulationCommand
         UnitId = unitId;
         RequestEntity = requestEntity;
         Priority = priority;
+        RallyPoint = rallyPoint;
         SubmittedAtTick = submittedAtTick;
     }
 
@@ -296,6 +300,8 @@ public sealed class PlayerUnitProductionActionCommand : ISimulationCommand
     public EntityId RequestEntity { get; }
 
     public ProductionPriority Priority { get; }
+
+    public Vector3 RallyPoint { get; }
 
     public SimulationTick SubmittedAtTick { get; }
 
@@ -318,6 +324,7 @@ public sealed class PlayerUnitProductionActionCommand : ISimulationCommand
             unitId,
             EntityId.Invalid,
             priority,
+            Vector3.Zero,
             submittedAtTick);
 
     public static PlayerUnitProductionActionCommand Cancel(
@@ -331,6 +338,22 @@ public sealed class PlayerUnitProductionActionCommand : ISimulationCommand
             UnitId.None,
             requestEntity,
             ProductionPriority.Normal,
+            Vector3.Zero,
+            submittedAtTick);
+
+    public static PlayerUnitProductionActionCommand SetRallyPoint(
+        PlayerId issuer,
+        EntityId facility,
+        Vector3 rallyPoint,
+        SimulationTick submittedAtTick) =>
+        new(
+            PlayerUnitProductionOperation.SetRallyPoint,
+            issuer,
+            facility,
+            UnitId.None,
+            EntityId.Invalid,
+            ProductionPriority.Normal,
+            rallyPoint,
             submittedAtTick);
 
     public void Execute(SimulationContext context)
@@ -364,6 +387,19 @@ public sealed class PlayerUnitProductionActionCommand : ISimulationCommand
                     new CancelUnitProductionRequestCommand(
                         Issuer,
                         RequestEntity,
+                        SubmittedAtTick);
+                command.Execute(context);
+                Accepted = command.Accepted;
+                break;
+            }
+
+            case PlayerUnitProductionOperation.SetRallyPoint:
+            {
+                var command =
+                    new SetUnitProductionRallyPointCommand(
+                        Issuer,
+                        Facility,
+                        RallyPoint,
                         SubmittedAtTick);
                 command.Execute(context);
                 Accepted = command.Accepted;

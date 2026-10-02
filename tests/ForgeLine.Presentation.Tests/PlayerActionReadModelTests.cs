@@ -191,6 +191,14 @@ public sealed class PlayerActionReadModelTests
                 System.Numerics.Vector3.Zero,
                 scenario.Simulation.CurrentTick));
 
+        Vector3 rallyPoint =
+            new(320.0f, 0.0f, 220.0f);
+        scenario.Simulation.Entities.AddComponent(
+            facility,
+            new UnitProductionRallyPoint(
+                rallyPoint,
+                scenario.Simulation.CurrentTick));
+
         var buffer =
             RegisterExtraction(
                 scenario,
@@ -210,6 +218,9 @@ public sealed class PlayerActionReadModelTests
         Assert.Equal(
             scenario.Services.UnitDefinitions.Count,
             units.Units.Count);
+        Assert.Equal(
+            rallyPoint,
+            units.RallyPoint);
 
         PlayerUnitProductionActionReadModel tank =
             Assert.Single(
