@@ -45,9 +45,10 @@ public sealed class UnitProductionPriorityCommandTests
                 request,
                 ProductionPriority.High,
                 SimulationTick.Zero);
-        owned.Execute(
-            new SimulationContextAccessor(
-                simulation).Context);
+        simulation.SubmitCommand(
+            owned,
+            simulation.CurrentTick.Next());
+        simulation.AdvanceOneTick();
 
         Assert.True(owned.Accepted);
         Assert.Equal(
@@ -63,9 +64,10 @@ public sealed class UnitProductionPriorityCommandTests
                 request,
                 ProductionPriority.Critical,
                 SimulationTick.Zero);
-        rejected.Execute(
-            new SimulationContextAccessor(
-                simulation).Context);
+        simulation.SubmitCommand(
+            rejected,
+            simulation.CurrentTick.Next());
+        simulation.AdvanceOneTick();
 
         Assert.False(rejected.Accepted);
         Assert.Equal(
@@ -74,26 +76,5 @@ public sealed class UnitProductionPriorityCommandTests
                 .GetComponent<UnitProductionRequest>(
                     request)
                 .Priority);
-    }
-
-    private sealed class SimulationContextAccessor : ISimulationSystem
-    {
-        public SimulationContextAccessor(
-            SimulationCoordinator simulation)
-        {
-            simulation.RegisterSystem(this);
-            simulation.AdvanceOneTick();
-        }
-
-        public SimulationPhase Phase =>
-            SimulationPhase.AiDecisions;
-
-        public SimulationContext Context { get; private set; } = null!;
-
-        public void Execute(
-            SimulationContext context)
-        {
-            Context = context;
-        }
     }
 }
