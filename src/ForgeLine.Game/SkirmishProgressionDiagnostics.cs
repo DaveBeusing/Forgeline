@@ -144,6 +144,30 @@ public sealed class SkirmishProgressionDiagnostics : ISimulationSystem
         int ammunitionExcluded = 0;
         int activeResupply = 0;
 
+        EntityId reconReserve =
+            context.Entities
+                .Query<ControllableEntity, UnitIdentity>(
+                    QueryIterationOrder.StableByEntityIndex)
+                .Where(
+                    entity =>
+                        context.Entities
+                            .GetComponent<ControllableEntity>(
+                                entity)
+                            .Owner == owner &&
+                        context.Entities
+                            .GetComponent<UnitIdentity>(
+                                entity)
+                            .UnitId ==
+                            UnitIds.ScoutVehicle &&
+                        context.Entities.HasComponent<Combatant>(
+                            entity) &&
+                        context.Entities.HasComponent<HealthState>(
+                            entity))
+                .OrderBy(
+                    static entity =>
+                        entity)
+                .FirstOrDefault();
+
         foreach (EntityId entity in context.Entities.Query<ControllableEntity, UnitIdentity>(
                      QueryIterationOrder.StableByEntityIndex))
         {
@@ -168,15 +192,20 @@ public sealed class SkirmishProgressionDiagnostics : ISimulationSystem
 
             combat++;
             bool hasReadiness = context.Entities.TryGetComponent(entity, out UnitCombatReadiness readiness);
-            bool scout = unit == UnitIds.ScoutVehicle;
+            bool scoutReserved =
+                entity == reconReserve;
             bool lowReadiness = hasReadiness && readiness.OverallReadiness < configuration.OffensiveReadinessThreshold;
-            bool lowFuel = hasReadiness && readiness.Fuel < configuration.ResupplyThreshold;
+            bool lowFuel = hasReadiness && readiness.Fuel < configuration.OffensiveFuelThreshold;
             bool lowAmmunition = hasReadiness && readiness.Ammunition < configuration.ResupplyThreshold;
-            bool canAttack = !scout && !lowReadiness && !lowFuel && !lowAmmunition;
-            scouts += scout ? 1 : 0;
-            readinessExcluded += !scout && lowReadiness ? 1 : 0;
-            fuelExcluded += !scout && lowFuel ? 1 : 0;
-            ammunitionExcluded += !scout && lowAmmunition ? 1 : 0;
+            bool canAttack =
+                !scoutReserved &&
+                !lowReadiness &&
+                !lowFuel &&
+                !lowAmmunition;
+            scouts += scoutReserved ? 1 : 0;
+            readinessExcluded += !scoutReserved && lowReadiness ? 1 : 0;
+            fuelExcluded += !scoutReserved && lowFuel ? 1 : 0;
+            ammunitionExcluded += !scoutReserved && lowAmmunition ? 1 : 0;
             eligible += canAttack ? 1 : 0;
 
             if (units.Count == MaximumUnitDetails)
@@ -185,7 +214,7 @@ public sealed class SkirmishProgressionDiagnostics : ISimulationSystem
             }
 
             var exclusions = new List<string>();
-            if (scout)
+            if (scoutReserved)
             {
                 exclusions.Add("Scout");
             }
