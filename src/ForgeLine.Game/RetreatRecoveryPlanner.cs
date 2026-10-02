@@ -1,7 +1,6 @@
 using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Ecs;
-using ForgeLine.Simulation;
 using ForgeLine.World;
 
 namespace ForgeLine.Game;
@@ -9,14 +8,14 @@ namespace ForgeLine.Game;
 public static class RetreatRecoveryPlanner
 {
     public static bool TryResolve(
-        SimulationContext context,
+        EntityRegistry entities,
         PlayerId owner,
         IReadOnlyList<EntityId> units,
         out EntityId provider,
         out Vector3 destination,
         out RetreatRecoveryReason reason)
     {
-        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(entities);
         ArgumentNullException.ThrowIfNull(units);
 
         provider = EntityId.Invalid;
@@ -31,7 +30,7 @@ public static class RetreatRecoveryPlanner
 
         Vector3 centroid =
             ResolveCentroid(
-                context.Entities,
+                entities,
                 units,
                 out int positioned);
 
@@ -47,17 +46,17 @@ public static class RetreatRecoveryPlanner
             RetreatRecoveryReason.NoProvider;
 
         foreach (EntityId candidate in
-                 context.Entities.Query<WorldTransform>(
+                 entities.Query<WorldTransform>(
                      QueryIterationOrder.StableByEntityIndex))
         {
             bool hasRepair =
-                context.Entities.TryGetComponent(
+                entities.TryGetComponent(
                     candidate,
                     out RepairProvider repair) &&
                 repair.Owner == owner;
             bool hasSupply =
                 TryResolveSupplyRange(
-                    context.Entities,
+                    entities,
                     candidate,
                     owner,
                     out float supplyRange);
@@ -69,7 +68,7 @@ public static class RetreatRecoveryPlanner
             }
 
             WorldTransform transform =
-                context.Entities.GetComponent<WorldTransform>(
+                entities.GetComponent<WorldTransform>(
                     candidate);
             float distanceSquared =
                 HorizontalDistanceSquared(
@@ -125,7 +124,7 @@ public static class RetreatRecoveryPlanner
         }
 
         WorldTransform providerTransform =
-            context.Entities.GetComponent<WorldTransform>(
+            entities.GetComponent<WorldTransform>(
                 provider);
         destination =
             ResolveApproachPoint(
