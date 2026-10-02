@@ -145,6 +145,61 @@ public sealed class MoveEntitiesCommandTests
     }
 
     [Fact]
+    public void StopMovementCommandClearsOnlyOwnedMovementIntent()
+    {
+        var simulation =
+            new SimulationCoordinator();
+
+        EntityId owned =
+            CreateControllableEntity(
+                simulation,
+                LocalPlayer,
+                Vector3.Zero);
+        EntityId foreign =
+            CreateControllableEntity(
+                simulation,
+                ForeignPlayer,
+                Vector3.One);
+
+        simulation.Entities.AddComponent(
+            owned,
+            new MovementOrder(
+                LocalPlayer,
+                new Vector3(20.0f, 0.0f, 0.0f),
+                SimulationTick.Zero,
+                SimulationTick.Zero));
+        simulation.Entities.AddComponent(
+            foreign,
+            new MovementOrder(
+                ForeignPlayer,
+                new Vector3(20.0f, 0.0f, 0.0f),
+                SimulationTick.Zero,
+                SimulationTick.Zero));
+
+        var command =
+            new StopMovementCommand(
+                LocalPlayer,
+                [owned, foreign],
+                SimulationTick.Zero);
+
+        simulation.SubmitCommand(
+            command,
+            new SimulationTick(1),
+            new SimulationCommandSource(
+                LocalPlayer.Value));
+        simulation.AdvanceOneTick();
+
+        Assert.Equal(1, command.AcceptedTargetCount);
+        Assert.Equal(1, command.RejectedTargetCount);
+        Assert.False(
+            simulation.Entities.HasComponent<MovementOrder>(
+                owned));
+        Assert.True(
+            simulation.Entities.HasComponent<MovementOrder>(
+                foreign));
+    }
+
+    [Fact]
     public void MovementCommandNeverChangesTransformDirectly()
     {
         var simulation = new SimulationCoordinator();
