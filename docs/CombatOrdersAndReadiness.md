@@ -176,6 +176,19 @@ Strength is the surviving-member fraction relative to the group's original accep
 
 Destroyed entities therefore reduce group Strength naturally through the existing entity lifecycle rather than a parallel casualty counter.
 
+## Suppression and Recovery
+
+Infantry units carry `SuppressionProfile` and `SuppressionState`. Applied combat damage raises suppression from the actual damage fraction rather than from a separate hit pool.
+
+- Normal infantry has no suppression movement constraint.
+- Suppressed infantry remains mobile at reduced maximum speed.
+- Pinned infantry cannot move or fire.
+- Suppression decays on fixed simulation ticks and naturally returns through Suppressed to Normal when no further impacts arrive.
+
+`RepairRecoverySystem` runs in the Supply phase after damage resolution. Owned damaged units inside an owned `RepairProvider` radius consume physical Steel from that provider's authoritative inventory and restore bounded Health. Command Cores and completed Supply Depots are the first recovery providers. Supply Depots maintain a Steel stock policy through the existing automated distribution system; repair therefore depends on the same production/logistics economy rather than free regeneration.
+
+Destroyed units are never repaired, and missing repair material produces an explicit `NoMaterial` recovery state.
+
 ## Read Models and Diagnostics
 
 `UnitCombatReadinessReadModel`, `CombatGroupReadinessReadModel`, and `CombatReadinessDebugSnapshot` provide presentation-safe copies.
