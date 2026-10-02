@@ -97,6 +97,10 @@ When a legitimate target is acquired, `TacticalMovementConstraint` pauses Ground
 
 No teleport, speed bonus, Fuel exemption, or hidden route knowledge is granted.
 
+`RetreatToRecovery` adds a command-owned recovery choice without adding a second movement implementation. The planner evaluates owned repair and supply providers in stable order, chooses the nearest provider that satisfies the selected force's support needs, resolves an approach point inside the provider radius, and submits the normal Retreat path in Column formation from the player action surface.
+
+`RetreatRecoveryState` records the selected provider, whether it offers Repair, Supply, or both, the resolved destination, and the issue tick for diagnostics/read models. A replacement tactical order clears stale recovery intent.
+
 If resupply temporarily takes precedence, the stored Retreat destination can resume afterward.
 
 ## Fire Policy
@@ -172,6 +176,19 @@ Strength is the surviving-member fraction relative to the group's original accep
 
 Destroyed entities therefore reduce group Strength naturally through the existing entity lifecycle rather than a parallel casualty counter.
 
+## Suppression and Recovery
+
+Infantry units carry `SuppressionProfile` and `SuppressionState`. Applied combat damage raises suppression from the actual damage fraction rather than from a separate hit pool.
+
+- Normal infantry has no suppression movement constraint.
+- Suppressed infantry remains mobile at reduced maximum speed.
+- Pinned infantry cannot move or fire.
+- Suppression decays on fixed simulation ticks and naturally returns through Suppressed to Normal when no further impacts arrive.
+
+`RepairRecoverySystem` runs in the Supply phase after damage resolution. Owned damaged units inside an owned `RepairProvider` radius consume physical Steel from that provider's authoritative inventory and restore bounded Health. Command Cores and completed Supply Depots are the first recovery providers. Repair never creates material implicitly: a provider can restore Health only from Steel that physically exists in its inventory, so recovery remains coupled to the existing production/logistics economy without adding automatic high-priority transport demand.
+
+Destroyed units are never repaired, and missing repair material produces an explicit `NoMaterial` recovery state.
+
 ## Read Models and Diagnostics
 
 `UnitCombatReadinessReadModel`, `CombatGroupReadinessReadModel`, and `CombatReadinessDebugSnapshot` provide presentation-safe copies.
@@ -182,7 +199,7 @@ Destroyed entities therefore reduce group Strength naturally through the existin
 
 `CombatReadinessSystem.Metrics` reports ready/degraded/combat-ineffective counts and average unit/group readiness.
 
-F2 can display current order/status, target/destination, pursuit leash, movement permission, resupply state, and Health/Fuel/Ammunition/readiness values. Presentation never calculates or changes tactical state.
+F2 can display current order/status, target/destination, pursuit leash, movement permission, resupply state, and Health/Fuel/Ammunition/readiness values. Combat diagnostics additionally expose suppression state, while the tactical player read model exposes Suppressed/Pinned counts, active repair count, and recovery-aware Retreat provider/reason. Presentation never calculates or changes tactical state.
 
 ## Tactical Test Opponent
 
@@ -215,6 +232,7 @@ The battle uses the same fixed-tick systems as headless tests. Rendering/input d
 Automated tests cover:
 
 - explicit Attack with current intelligence;
+- continued pursuit when terrain blocks direct fire inside nominal weapon range;
 - pursuit inside and rejection outside the leash;
 - AttackMove engagement pause and resume after visibility loss;
 - Hold Position without pursuit;
@@ -224,24 +242,28 @@ Automated tests cover:
 - automatic resupply through a real provider and real `BattlefieldSupplySystem` transfer;
 - Retreat movement intent;
 - Detected-coordinate versus Identified-entity behavior for the test opponent;
-- group Strength after entity destruction.
+- group Strength after entity destruction;
+- Normal → Suppressed → Pinned transitions, movement/fire consequences, and fixed-tick recovery;
+- Steel-backed repair and explicit no-material behavior;
+- recovery-aware Retreat provider selection and player command routing;
+- reconnaissance identification enabling an artillery strike beyond the artillery unit's own visual range.
 
 ## Performance Coverage
 
-The simulation BenchmarkDotNet host includes 100- and 1,000-unit tactical acquisition/coordination workloads exercising preparation, spatial target acquisition, current intelligence validation, Fire Policy/weapon compatibility, group candidate construction, and deterministic target spreading.
+The simulation BenchmarkDotNet host includes 100- and 1,000-unit tactical acquisition/coordination workloads exercising preparation, spatial target acquisition, current intelligence validation, Fire Policy/weapon compatibility, group candidate construction, and deterministic target spreading. Combined-arms coverage also includes 100/1,000-check terrain line-of-fire workloads and 100/1,000-unit suppression updates.
 
 Benchmark timing remains measurement evidence rather than a hardware-sensitive CI gate.
 
 ## Deferred Work
 
-The first tactical layer deliberately leaves strategic/campaign AI, morale/suppression, veterancy, repair/recovery, advanced cover tactics, faction-specific doctrine, multiplayer, and final combat-command UI polish to later work.
+The first tactical layer deliberately leaves strategic/campaign opponent planning, morale beyond the current suppression model, veterancy, advanced semantic cover tactics, dedicated maintenance resources, mobile repair specialization, faction-specific doctrine, multiplayer, and final combat-command UI polish to later work.
 
 ## Human Player Tactical Controls
 
-The human player uses the same authoritative tactical commands as the simulation systems: Attack, AttackMove, Stop, Hold Position, and Retreat. `K` opens the combat section of the shared action palette. `Tab` selects an action and `Enter` activates it. Attack, AttackMove, Retreat, and Fire Mission enter an explicit target mode; Stop, Hold Position, and fire-mission cancellation submit immediately. `F3` continues to cycle Compact, Line, Column, and Wedge and the selected formation is preserved for AttackMove and Retreat.
+The human player uses the same authoritative tactical commands as the simulation systems: Attack, AttackMove, Stop, Hold Position, Retreat, and Retreat to Recovery. `K` opens the combat section of the shared action palette. `Tab` selects an action and `Enter` activates it. Attack, AttackMove, Retreat, and Fire Mission enter an explicit target mode; Stop, Hold Position, Retreat to Recovery, and fire-mission cancellation submit immediately. `F3` continues to cycle Compact, Line, Column, and Wedge and the selected formation is preserved for AttackMove and Retreat.
 
 `PlayerActionRequestDispatcher` and `PlayerActionRequest` live in the cross-platform game layer and are shared by the Windows client, interaction tests, and the bounded headless player-acceptance flow. They submit resolved player actions through `PlayerCommandGateway`; simulation commands remain the only tactical state authority. The gateway reports accepted, partial, and rejected target counts plus a causal tactical failure such as missing current identification, incompatible target class, unavailable artillery target, or range failure.
 
 Direct Attack requires a current identified hostile target. The command adapter revalidates liveness, faction, health, targetability, current identification, ownership of the selected units, and weapon effectiveness before creating the existing `AttackCommand`. A copied target row is therefore not authority to attack later after intelligence becomes stale.
 
-Stop and Hold remain distinct existing commands. Stop clears tactical intent through the existing stop semantics; Hold creates a stationary combat order that can engage in range without pursuing. Retreat continues to use real movement and can still interact with the existing supply/resupply systems rather than teleporting or restoring resources.
+Stop and Hold remain distinct existing commands. Stop clears tactical intent through the existing stop semantics; Hold creates a stationary combat order that can engage in range without pursuing. Retreat continues to use real movement and can still interact with the existing supply/resupply systems rather than teleporting or restoring resources. Retreat to Recovery resolves an owned support destination from current damage/supply needs and then submits the same existing Retreat/formation/navigation path.

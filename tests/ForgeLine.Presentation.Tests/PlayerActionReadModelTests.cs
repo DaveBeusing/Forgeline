@@ -301,6 +301,50 @@ public sealed class PlayerActionReadModelTests
             engineer,
             new UnitSupplyPriority(
                 BattlefieldSupplyPriority.Critical));
+
+        WorldTransform commandCoreTransform =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    scenario.West.CommandCore);
+        WorldTransform engineerTransform =
+            scenario.Simulation.Entities
+                .GetComponent<WorldTransform>(
+                    engineer);
+        scenario.Simulation.Entities.SetComponent(
+            engineer,
+            engineerTransform with
+            {
+                Position =
+                    commandCoreTransform.Position +
+                    new Vector3(5.0f, 0.0f, 0.0f)
+            });
+
+        HealthState engineerHealth =
+            scenario.Simulation.Entities
+                .GetComponent<HealthState>(
+                    engineer);
+        scenario.Simulation.Entities.SetComponent(
+            engineer,
+            new HealthState(
+                Math.Max(
+                    1.0,
+                    engineerHealth.Maximum - 20.0),
+                engineerHealth.Maximum));
+        scenario.Simulation.Entities.SetComponent(
+            engineer,
+            new SuppressionState(
+                0.5,
+                SuppressionLevel.Suppressed,
+                scenario.Simulation.CurrentTick,
+                scenario.Simulation.CurrentTick));
+        scenario.Simulation.Entities.AddComponent(
+            engineer,
+            new RetreatRecoveryState(
+                scenario.West.CommandCore,
+                RetreatRecoveryReason.RepairAndSupply,
+                commandCoreTransform.Position,
+                scenario.Simulation.CurrentTick));
+
         interaction.SetSelection([engineer]);
         scenario.Simulation.AdvanceOneTick();
         Assert.True(
@@ -321,6 +365,19 @@ public sealed class PlayerActionReadModelTests
             supply.AmmunitionFraction,
             0.0,
             1.0);
+
+        PlayerTacticalActionReadModel tactical =
+            Assert.IsType<PlayerTacticalActionReadModel>(
+                snapshot.PlayerActions?.Tactical);
+        Assert.Equal(1, tactical.SuppressedCount);
+        Assert.Equal(0, tactical.PinnedCount);
+        Assert.Equal(1, tactical.RepairingCount);
+        Assert.Equal(
+            RetreatRecoveryReason.RepairAndSupply,
+            tactical.RetreatReason);
+        Assert.Equal(
+            scenario.West.CommandCore,
+            tactical.RetreatProvider);
 
         interaction.SetSelection(
             [scenario.West.CommandCore, engineer]);

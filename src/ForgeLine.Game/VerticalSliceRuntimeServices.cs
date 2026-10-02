@@ -27,7 +27,9 @@ public sealed class VerticalSliceRuntimeServices
         BattlefieldIntelligenceSystem battlefieldIntelligence,
         TargetAcquisitionSystem targetAcquisition,
         TacticalCombatSystem tacticalCombat,
+        SuppressionSystem suppression,
         AutomaticResupplyDecisionSystem automaticResupply,
+        RepairRecoverySystem repairRecovery,
         CombatDebugSnapshotSystem combatDebugSnapshots,
         IReadOnlyList<Type> registeredSystemTypes)
     {
@@ -51,7 +53,13 @@ public sealed class VerticalSliceRuntimeServices
         BattlefieldIntelligence = battlefieldIntelligence;
         TargetAcquisition = targetAcquisition;
         TacticalCombat = tacticalCombat;
+        Suppression =
+            suppression ??
+            throw new ArgumentNullException(nameof(suppression));
         AutomaticResupply = automaticResupply;
+        RepairRecovery =
+            repairRecovery ??
+            throw new ArgumentNullException(nameof(repairRecovery));
         CombatDebugSnapshots = combatDebugSnapshots;
         RegisteredSystemTypes = registeredSystemTypes;
     }
@@ -92,7 +100,11 @@ public sealed class VerticalSliceRuntimeServices
 
     public TacticalCombatSystem TacticalCombat { get; }
 
+    public SuppressionSystem Suppression { get; }
+
     public AutomaticResupplyDecisionSystem AutomaticResupply { get; }
+
+    public RepairRecoverySystem RepairRecovery { get; }
 
     public CombatDebugSnapshotSystem CombatDebugSnapshots { get; }
 

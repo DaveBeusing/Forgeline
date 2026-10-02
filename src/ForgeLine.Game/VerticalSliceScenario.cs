@@ -484,11 +484,15 @@ public sealed class VerticalSliceScenario : IDisposable
 
         var combatRuntime =
             new CombatRuntime();
+        var terrainLineOfFire =
+            new TerrainLineOfFirePolicy(
+                terrain);
         var targetAcquisition =
             new TargetAcquisitionSystem(
                 weapons,
                 spatialIndex,
-                intelligenceAvailability)
+                intelligenceAvailability,
+                terrainLineOfFire)
             {
                 DebugCaptureEnabled =
                     runtimeSettings.EnableDebugCapture
@@ -499,7 +503,8 @@ public sealed class VerticalSliceScenario : IDisposable
                 inventories,
                 combatRuntime,
                 spatialIndex,
-                intelligenceAvailability);
+                intelligenceAvailability,
+                terrainLineOfFire);
         var artillery =
             new ArtilleryFireMissionSystem(
                 artilleryWeapons,
@@ -522,12 +527,19 @@ public sealed class VerticalSliceScenario : IDisposable
             new CombatEntityLifecycleSystem(
                 combatRuntime,
                 spatialIndex);
+        var suppression =
+            new SuppressionSystem
+            {
+                DebugCaptureEnabled =
+                    runtimeSettings.EnableDebugCapture
+            };
         var combatDebugSnapshots =
             new CombatDebugSnapshotSystem(
                 weapons,
                 combatRuntime,
                 targetAcquisition,
-                damage)
+                damage,
+                suppression)
             {
                 DebugCaptureEnabled =
                     runtimeSettings.EnableDebugCapture
@@ -541,10 +553,19 @@ public sealed class VerticalSliceScenario : IDisposable
         var automaticResupply =
             new AutomaticResupplyDecisionSystem(
                 inventories);
+        var repairRecovery =
+            new RepairRecoverySystem(
+                inventories)
+            {
+                DebugCaptureEnabled =
+                    runtimeSettings.EnableDebugCapture
+            };
         var tacticalCombat =
             new TacticalCombatSystem(
                 weapons,
-                intelligence)
+                intelligence,
+                intelligenceAvailability,
+                terrainLineOfFire)
             {
                 DebugCaptureEnabled =
                     runtimeSettings.EnableDebugCapture
@@ -616,6 +637,7 @@ public sealed class VerticalSliceScenario : IDisposable
             opponents,
             tacticalOpponent,
             tacticalPreparation,
+            suppression,
             automaticResupply,
             formationMovement,
             navigation,
@@ -629,6 +651,7 @@ public sealed class VerticalSliceScenario : IDisposable
             combatExecution,
             damage,
             battlefieldSupply,
+            repairRecovery,
             automatedDistribution,
             cargoTransport,
             power,
@@ -686,7 +709,9 @@ public sealed class VerticalSliceScenario : IDisposable
                 battlefieldIntelligence,
                 targetAcquisition,
                 tacticalCombat,
+                suppression,
                 automaticResupply,
+                repairRecovery,
                 combatDebugSnapshots,
                 registeredSystemTypes);
 

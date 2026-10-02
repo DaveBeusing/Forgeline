@@ -710,15 +710,20 @@ public sealed class TacticalCombatSystem : ISimulationSystem
             return;
         }
 
-        if (distanceSquared <= rangeSquared &&
+        bool targetAvailable =
             _targetAvailability.IsTargetAvailable(
                 entity,
-                target) &&
+                target);
+        bool hasLineOfFire =
+            targetAvailable &&
             _lineOfFire.HasLineOfFire(
                 entity,
                 target,
                 transform.Position,
-                targetTransform.Position))
+                targetTransform.Position);
+
+        if (distanceSquared <= rangeSquared &&
+            hasLineOfFire)
         {
             ClearChaseMovement(
                 context,
@@ -746,7 +751,7 @@ public sealed class TacticalCombatSystem : ISimulationSystem
             context,
             entity);
 
-        if (distanceSquared > rangeSquared &&
+        if (targetAvailable &&
             CanNavigate(context, entity))
         {
             SetMovementAllowed(

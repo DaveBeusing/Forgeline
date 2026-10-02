@@ -44,6 +44,12 @@ public readonly record struct CombatTargetRejectionReadModel(
     Vector3 Position,
     TargetRejectionReason Reason);
 
+public readonly record struct CombatSuppressionReadModel(
+    EntityId Entity,
+    Vector3 Position,
+    double Value,
+    SuppressionLevel Level);
+
 public sealed class CombatDebugSnapshot
 {
     private readonly CombatWeaponReadModel[] _weapons;
@@ -52,6 +58,7 @@ public sealed class CombatDebugSnapshot
     private readonly CombatImpactReadModel[] _impacts;
     private readonly CombatArmorReadModel[] _armor;
     private readonly CombatTargetRejectionReadModel[] _targetRejections;
+    private readonly CombatSuppressionReadModel[] _suppression;
 
     internal CombatDebugSnapshot(
         CombatRuntimeMetrics metrics,
@@ -62,7 +69,8 @@ public sealed class CombatDebugSnapshot
         CombatHealthReadModel[] health,
         CombatImpactReadModel[] impacts,
         CombatArmorReadModel[] armor,
-        CombatTargetRejectionReadModel[] targetRejections)
+        CombatTargetRejectionReadModel[] targetRejections,
+        CombatSuppressionReadModel[] suppression)
     {
         Metrics = metrics;
         TargetingMetrics = targetingMetrics;
@@ -73,10 +81,11 @@ public sealed class CombatDebugSnapshot
         _impacts = impacts;
         _armor = armor;
         _targetRejections = targetRejections;
+        _suppression = suppression;
     }
 
     public static CombatDebugSnapshot Empty { get; } =
-        new(default, default, default, [], [], [], [], [], []);
+        new(default, default, default, [], [], [], [], [], [], []);
 
     public CombatRuntimeMetrics Metrics { get; }
 
@@ -101,6 +110,9 @@ public sealed class CombatDebugSnapshot
 
     public IReadOnlyList<CombatTargetRejectionReadModel> TargetRejections =>
         _targetRejections;
+
+    public IReadOnlyList<CombatSuppressionReadModel> Suppression =>
+        _suppression;
 }
 
 public sealed class CombatDebugSnapshotSystem : ISimulationSystem
@@ -109,6 +121,7 @@ public sealed class CombatDebugSnapshotSystem : ISimulationSystem
     private readonly CombatRuntime _runtime;
     private readonly TargetAcquisitionSystem? _targeting;
     private readonly CombatDamageResolutionSystem? _damageResolution;
+    private readonly SuppressionSystem? _suppressionSystem;
     private readonly List<CombatWeaponReadModel> _weaponReadModels = new();
     private readonly List<CombatProjectileReadModel> _projectileReadModels =
         new();
@@ -117,12 +130,15 @@ public sealed class CombatDebugSnapshotSystem : ISimulationSystem
     private readonly List<CombatArmorReadModel> _armorReadModels = new();
     private readonly List<CombatTargetRejectionReadModel> _rejectionReadModels =
         new();
+    private readonly List<CombatSuppressionReadModel> _suppressionReadModels =
+        new();
 
     public CombatDebugSnapshotSystem(
         WeaponCatalog weapons,
         CombatRuntime runtime,
         TargetAcquisitionSystem? targeting = null,
-        CombatDamageResolutionSystem? damageResolution = null)
+        CombatDamageResolutionSystem? damageResolution = null,
+        SuppressionSystem? suppressionSystem = null)
     {
         _weapons = weapons ??
             throw new ArgumentNullException(nameof(weapons));
@@ -130,6 +146,7 @@ public sealed class CombatDebugSnapshotSystem : ISimulationSystem
             throw new ArgumentNullException(nameof(runtime));
         _targeting = targeting;
         _damageResolution = damageResolution;
+        _suppressionSystem = suppressionSystem;
     }
 
     public SimulationPhase Phase =>
@@ -161,6 +178,7 @@ public sealed class CombatDebugSnapshotSystem : ISimulationSystem
         _impactReadModels.Clear();
         _armorReadModels.Clear();
         _rejectionReadModels.Clear();
+        _suppressionReadModels.Clear();
 
         CaptureWeapons(context);
         CaptureProjectiles(context);
@@ -168,6 +186,7 @@ public sealed class CombatDebugSnapshotSystem : ISimulationSystem
         CaptureImpacts();
         CaptureArmor(context);
         CaptureTargetRejections();
+        CaptureSuppression();
 
         LastDebugSnapshot =
             new CombatDebugSnapshot(
@@ -179,7 +198,8 @@ public sealed class CombatDebugSnapshotSystem : ISimulationSystem
                 _healthReadModels.ToArray(),
                 _impactReadModels.ToArray(),
                 _armorReadModels.ToArray(),
-                _rejectionReadModels.ToArray());
+                _rejectionReadModels.ToArray(),
+                _suppressionReadModels.ToArray());
     }
 
     private void CaptureWeapons(
@@ -335,6 +355,32 @@ public sealed class CombatDebugSnapshotSystem : ISimulationSystem
                     rejection.Candidate,
                     rejection.CandidatePosition,
                     rejection.Reason));
+        }
+    }
+
+    private void CaptureSuppression()
+    {
+        if (_suppressionSystem is null)
+        {
+            return;
+        }
+
+        IReadOnlyList<SuppressionDebugEntry> entries =
+            _suppressionSystem.DebugEntries;
+
+        for (int index = 0;
+             index < entries.Count;
+             index++)
+        {
+            SuppressionDebugEntry entry =
+                entries[index];
+
+            _suppressionReadModels.Add(
+                new CombatSuppressionReadModel(
+                    entry.Entity,
+                    entry.Position,
+                    entry.Value,
+                    entry.Level));
         }
     }
 }

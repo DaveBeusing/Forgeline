@@ -95,6 +95,11 @@ public sealed class CombatDamageResolutionSystem : ISimulationSystem
             context.Entities.SetComponent(
                 request.Target,
                 updated);
+            ApplySuppression(
+                context,
+                request.Target,
+                health,
+                appliedDamage);
             RecordRetaliation(
                 context,
                 request);
@@ -202,6 +207,52 @@ public sealed class CombatDamageResolutionSystem : ISimulationSystem
 
         throw new KeyNotFoundException(
             $"Unknown weapon definition '{weapon}' during armored damage resolution.");
+    }
+
+    private static void ApplySuppression(
+        SimulationContext context,
+        EntityId target,
+        in HealthState healthBeforeDamage,
+        double appliedDamage)
+    {
+        if (!context.Entities.TryGetComponent(
+                target,
+                out Targetable targetable) ||
+            targetable.Class != TargetClass.Infantry ||
+            !context.Entities.TryGetComponent(
+                target,
+                out SuppressionProfile profile))
+        {
+            return;
+        }
+
+        SuppressionState current =
+            context.Entities.TryGetComponent(
+                target,
+                out SuppressionState existing)
+                ? existing
+                : SuppressionState.Clear;
+        SuppressionState updated =
+            SuppressionRules.ApplyImpact(
+                current,
+                profile,
+                healthBeforeDamage,
+                appliedDamage,
+                context.Tick);
+
+        if (context.Entities.HasComponent<SuppressionState>(
+                target))
+        {
+            context.Entities.SetComponent(
+                target,
+                updated);
+        }
+        else
+        {
+            context.Entities.AddComponent(
+                target,
+                updated);
+        }
     }
 
     private static void RecordRetaliation(

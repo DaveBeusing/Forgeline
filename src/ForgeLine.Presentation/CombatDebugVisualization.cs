@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Combat;
 using ForgeLine.Game;
 
 namespace ForgeLine.Presentation;
@@ -13,7 +14,8 @@ public static class CombatDebugVisualization
         int maximumHealthLabels = 64,
         int maximumImpacts = 128,
         int maximumArmorFacings = 64,
-        int maximumTargetRejections = 32)
+        int maximumTargetRejections = 32,
+        int maximumSuppressionLabels = 64)
     {
         ArgumentNullException.ThrowIfNull(debugDraw);
         ArgumentNullException.ThrowIfNull(snapshot);
@@ -23,12 +25,14 @@ public static class CombatDebugVisualization
         ArgumentOutOfRangeException.ThrowIfNegative(maximumImpacts);
         ArgumentOutOfRangeException.ThrowIfNegative(maximumArmorFacings);
         ArgumentOutOfRangeException.ThrowIfNegative(maximumTargetRejections);
+        ArgumentOutOfRangeException.ThrowIfNegative(maximumSuppressionLabels);
 
         DrawWeapons(debugDraw, snapshot, maximumWeapons);
         DrawProjectiles(debugDraw, snapshot, maximumProjectiles);
         DrawImpacts(debugDraw, snapshot, maximumImpacts);
         DrawArmorFacing(debugDraw, snapshot, maximumArmorFacings);
         DrawTargetRejections(debugDraw, snapshot, maximumTargetRejections);
+        DrawSuppression(debugDraw, snapshot, maximumSuppressionLabels);
         DrawHealth(debugDraw, snapshot, maximumHealthLabels);
     }
 
@@ -224,6 +228,37 @@ public static class CombatDebugVisualization
                 rejection.Position + Vector3.UnitY * 1.5f,
                 rejection.Reason.ToString(),
                 new Vector4(0.9f, 0.3f, 1.0f, 1.0f));
+        }
+    }
+
+    private static void DrawSuppression(
+        DebugDraw debugDraw,
+        CombatDebugSnapshot snapshot,
+        int maximumLabels)
+    {
+        int labels = 0;
+
+        for (int index = 0;
+             index < snapshot.Suppression.Count &&
+             labels < maximumLabels;
+             index++)
+        {
+            CombatSuppressionReadModel suppression =
+                snapshot.Suppression[index];
+
+            if (suppression.Level == SuppressionLevel.Normal)
+            {
+                continue;
+            }
+
+            debugDraw.Label(
+                suppression.Position +
+                    Vector3.UnitY * 3.0f,
+                $"{suppression.Level} {suppression.Value * 100.0:F0}%",
+                suppression.Level == SuppressionLevel.Pinned
+                    ? new Vector4(1.0f, 0.2f, 0.1f, 1.0f)
+                    : new Vector4(1.0f, 0.75f, 0.2f, 1.0f));
+            labels++;
         }
     }
 

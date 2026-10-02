@@ -187,6 +187,14 @@ public sealed class CombatExecutionSystem : ISimulationSystem
                 continue;
             }
 
+            if (context.Entities.TryGetComponent(
+                    entity,
+                    out SuppressionState suppression) &&
+                suppression.Level == SuppressionLevel.Pinned)
+            {
+                continue;
+            }
+
             EntityId target = state.Target;
             if (!context.Entities.IsAlive(target))
             {

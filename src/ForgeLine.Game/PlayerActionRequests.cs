@@ -31,7 +31,8 @@ public enum PlayerActionRequestKind : byte
     SubmitFireMissionCoordinate = 21,
     SubmitFireMissionContact = 22,
     Surrender = 23,
-    SetSupplyPriority = 24
+    SetSupplyPriority = 24,
+    SubmitRetreatToRecovery = 25
 }
 
 public readonly record struct PlayerActionRequest(
@@ -328,6 +329,14 @@ public readonly record struct PlayerActionRequest(
             PlayerActionRequestKind.SubmitRetreat,
             entities,
             tacticalWorldTarget: destination,
+            tacticalFormation: formation);
+
+    public static PlayerActionRequest RetreatToRecovery(
+        IReadOnlyList<EntityId> entities,
+        FormationTemplate formation) =>
+        CreateTactical(
+            PlayerActionRequestKind.SubmitRetreatToRecovery,
+            entities,
             tacticalFormation: formation);
 
     public static PlayerActionRequest FireMission(

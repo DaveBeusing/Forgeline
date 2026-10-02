@@ -155,6 +155,15 @@ public static class SkirmishStartingBaseFactory
                 resupplyRangeMeters: 90.0f));
         entities.AddComponent(
             commandCore,
+            new RepairProvider(
+                inventory,
+                start.Player,
+                repairRangeMeters: 30.0f,
+                healthPerTick: 4.0,
+                ResourceIds.Steel,
+                resourcePerHealth: 0.2));
+        entities.AddComponent(
+            commandCore,
             new CompletedBuilding(
                 BuildingIds.CommandCore,
                 start.Player,

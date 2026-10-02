@@ -182,6 +182,17 @@ public sealed class UnitFactory
             entity,
             new CombatHitbox(
                 definition.VisualScale * 0.5f));
+
+        if (definition.TargetClass == TargetClass.Infantry)
+        {
+            _entities.AddComponent(
+                entity,
+                SuppressionProfile.InfantryDefault);
+            _entities.AddComponent(
+                entity,
+                SuppressionState.Clear);
+        }
+
         _entities.AddComponent(
             entity,
             new IntelligenceSignature(

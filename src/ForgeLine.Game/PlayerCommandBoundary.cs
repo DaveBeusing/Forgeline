@@ -787,6 +787,28 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 _artilleryWeapons!));
     }
 
+    public PlayerCommandSubmissionReceipt SubmitRetreatToRecovery(
+        PlayerId issuer,
+        ReadOnlySpan<EntityId> units,
+        SimulationTick observedTick,
+        FormationTemplate formation)
+    {
+        RequireTacticalServices();
+
+        return SubmitTacticalAction(
+            PlayerCommandKind.Tactical,
+            issuer,
+            observedTick,
+            PlayerTacticalActionCommand.RetreatToRecovery(
+                issuer,
+                units,
+                observedTick,
+                formation,
+                _intelligence!,
+                _weapons!,
+                _artilleryWeapons!));
+    }
+
     public PlayerCommandSubmissionReceipt SubmitFireMission(
         PlayerId issuer,
         ReadOnlySpan<EntityId> artillery,

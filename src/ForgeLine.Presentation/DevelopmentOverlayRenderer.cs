@@ -1098,7 +1098,23 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         builder.Append(tactical.CriticalSupplyCount);
         builder.Append("  RESUPPLY ");
         builder.Append(tactical.ResupplyingCount);
+        builder.Append("  SUPP ");
+        builder.Append(tactical.SuppressedCount);
+        builder.Append("  PINNED ");
+        builder.Append(tactical.PinnedCount);
+        builder.Append("  REPAIR ");
+        builder.Append(tactical.RepairingCount);
         builder.NewLine();
+
+        if (tactical.RetreatReason !=
+            RetreatRecoveryReason.None)
+        {
+            builder.Append("RETREAT ");
+            builder.Append(tactical.RetreatReason.ToString());
+            builder.Append("  PROVIDER ");
+            builder.Append(tactical.RetreatProvider.ToString());
+            builder.NewLine();
+        }
 
         builder.Append("ORDER ");
         if (tactical.MixedOrderState)
@@ -1126,7 +1142,8 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             "HOLD POSITION",
             "RETREAT",
             "FIRE MISSION",
-            "CANCEL FIRE MISSION"
+            "CANCEL FIRE MISSION",
+            "RETREAT TO RECOVERY"
         ];
 
         for (int index = 0;
