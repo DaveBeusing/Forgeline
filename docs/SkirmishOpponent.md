@@ -11,7 +11,8 @@ It is intentionally pragmatic rather than optimal. The controller prioritizes co
 The opponent does not own alternate economy, movement, combat, or supply state.
 
 - Construction is requested through the normal building command path and consumes real inventory resources.
-- Production uses normal production and unit-production requests.
+- Production uses normal production and unit-production requests; priority changes use an ownership-validated unit-production command.
+- Automatic resupply configuration uses the same ownership-validated player logistics command as the interactive player path.
 - Power consumers and generators use the shared power-network simulation.
 - Regional resource movement uses stock policies, logistics routing, Cargo Trucks, and physical inventories.
 - Units move through normal navigation, formation, and ground-movement systems.
