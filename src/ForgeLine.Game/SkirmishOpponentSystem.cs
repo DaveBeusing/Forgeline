@@ -1913,34 +1913,53 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 static contact =>
                     contact.IsCurrent);
 
-        if (reconnaissanceEstablished &&
-            TryResolveSharedReconEscort(
-                context,
-                owned,
-                scout,
-                out EntityId escort))
-        {
-            var continueScout =
-                new MoveEntitiesCommand(
-                    controller.Player,
-                    [scout],
-                    order.Destination,
-                    context.Tick,
-                    order.Formation,
-                    preserveCombatIntent: true);
-            continueScout.Execute(context);
-
-            new StopMovementCommand(
-                controller.Player,
-                [escort],
-                context.Tick)
-                .Execute(context);
-
-            return;
-        }
-
         if (reconnaissanceEstablished)
         {
+            var escorts =
+                new List<EntityId>();
+
+            for (int index = 0;
+                 index < owned.Units.Count;
+                 index++)
+            {
+                EntityId candidate =
+                    owned.Units[index];
+
+                if (context.Entities.HasComponent<SupplyTruck>(
+                        candidate) &&
+                    IsProtectingReconScout(
+                        context,
+                        candidate,
+                        scout))
+                {
+                    escorts.Add(candidate);
+                }
+            }
+
+            if (escorts.Count > 0)
+            {
+                var continueScout =
+                    new MoveEntitiesCommand(
+                        controller.Player,
+                        [scout],
+                        order.Destination,
+                        context.Tick,
+                        order.Formation,
+                        preserveCombatIntent: true);
+                continueScout.Execute(context);
+
+                for (int index = 0;
+                     index < escorts.Count;
+                     index++)
+                {
+                    new StopMovementCommand(
+                        controller.Player,
+                        [escorts[index]],
+                        context.Tick)
+                        .Execute(context);
+                }
+            }
+
             return;
         }
 
@@ -1966,46 +1985,6 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             context,
             owned,
             [scout]);
-    }
-
-    private static bool TryResolveSharedReconEscort(
-        SimulationContext context,
-        OwnedState owned,
-        EntityId scout,
-        out EntityId escort)
-    {
-        escort = EntityId.Invalid;
-
-        if (!context.Entities.TryGetComponent(
-                scout,
-                out MovementGroupMember scoutMember))
-        {
-            return false;
-        }
-
-        for (int index = 0;
-             index < owned.Units.Count;
-             index++)
-        {
-            EntityId candidate =
-                owned.Units[index];
-
-            if (!context.Entities.HasComponent<SupplyTruck>(
-                    candidate) ||
-                !context.Entities.TryGetComponent(
-                    candidate,
-                    out MovementGroupMember candidateMember) ||
-                candidateMember.Group !=
-                    scoutMember.Group)
-            {
-                continue;
-            }
-
-            escort = candidate;
-            return true;
-        }
-
-        return false;
     }
 
     private bool TrySelectReconSupplyEscort(
