@@ -166,16 +166,9 @@ public sealed class RepairRecoverySystemTests
                 new Vector3(20.0f, 0.0f, 0.0f),
                 currentHealth: 80.0);
 
-        var context =
-            new SimulationContext(
-                simulation.Entities,
-                simulation.CurrentTick,
-                simulation.TickDuration,
-                simulation.Random);
-
         Assert.True(
             RetreatRecoveryPlanner.TryResolve(
-                context,
+                simulation.Entities,
                 Owner,
                 [first, second],
                 out EntityId provider,
