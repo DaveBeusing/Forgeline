@@ -90,6 +90,118 @@ public sealed class SkirmishProductionPolicyTests
     }
 
     [Fact]
+    public void ObjectivePressureUnitsPrecedeOptionalVehicleGrowth()
+    {
+        VerticalSliceScenarioSettings validation =
+            VerticalSliceScenarioSettings.Create(
+                VerticalSliceScenarioProfile.Validation);
+        using VerticalSliceScenario scenario =
+            VerticalSliceScenario.Create(
+                validation);
+        EntityRegistry entities =
+            scenario.Simulation.Entities;
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
+        WorldTransform coreTransform =
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+
+        int supplyTrucks = 0;
+        foreach (EntityId entity in
+                 entities.Query<ControllableEntity, UnitIdentity>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            if (entities.GetComponent<ControllableEntity>(
+                    entity).Owner ==
+                    scenario.West.Player &&
+                entities.GetComponent<UnitIdentity>(
+                    entity).UnitId ==
+                    UnitIds.SupplyTruck)
+            {
+                supplyTrucks++;
+            }
+        }
+
+        while (supplyTrucks <
+               validation.WestOpponent.MinimumSupplyTrucks)
+        {
+            scenario.UnitFactory.Create(
+                units[UnitIds.SupplyTruck],
+                coreTransform.Position,
+                scenario.West.Player);
+            supplyTrucks++;
+        }
+
+        scenario.UnitFactory.Create(
+            units[UnitIds.ScoutVehicle],
+            coreTransform.Position,
+            scenario.West.Player);
+
+        InventoryId input =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(
+                    4_000.0));
+        EntityId factory =
+            entities.CreateEntity();
+        entities.AddComponent(
+            factory,
+            coreTransform);
+        entities.AddComponent(
+            factory,
+            new CompletedBuilding(
+                BuildingIds.VehicleFactory,
+                scenario.West.Player,
+                SimulationTick.Zero));
+        entities.AddComponent(
+            factory,
+            new ControllableEntity(
+                scenario.West.Player,
+                ControllableEntityCategory.Building));
+        entities.AddComponent(
+            factory,
+            new UnitProductionFacility(
+                input,
+                UnitProductionCapability.Vehicle |
+                UnitProductionCapability.Logistics,
+                scenario.West.Player,
+                Vector3.Zero,
+                SimulationTick.Zero));
+        var network =
+            new PowerNetworkId(10_002);
+        entities.AddComponent(
+            factory,
+            new PowerNetworkMembership(
+                network));
+        entities.AddComponent(
+            factory,
+            new PowerGenerator(
+                10.0));
+        entities.AddComponent(
+            factory,
+            new PowerConsumer(
+                1.0,
+                PowerPriority.Industrial,
+                enabled: true));
+
+        scenario.Simulation.RunTicks(
+            2,
+            TestContext.Current.CancellationToken);
+
+        Assert.Contains(
+            entities.Query<UnitProductionRequest>(
+                QueryIterationOrder.StableByEntityIndex),
+            requestEntity =>
+            {
+                UnitProductionRequest request =
+                    entities.GetComponent<UnitProductionRequest>(
+                        requestEntity);
+                return request.Facility == factory &&
+                       request.UnitId ==
+                           UnitIds.MainBattleTank;
+            });
+    }
+
+    [Fact]
     public void ExpandedSupplyNetworkQueuesAdditionalCargoRecovery()
     {
         VerticalSliceScenario scenario =
