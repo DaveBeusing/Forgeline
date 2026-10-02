@@ -2990,8 +2990,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     owned,
                     facility,
                     configuration);
-            const LogisticsStockPriority priority =
-                LogisticsStockPriority.Critical;
+            LogisticsStockPriority productionPriority =
+                plannedUnit ==
+                    UnitIds.MainBattleTank
+                    ? LogisticsStockPriority.Critical
+                    : LogisticsStockPriority.High;
 
             SetUnitProductionStockPolicy(
                 context,
@@ -3002,7 +3005,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 80.0,
                 240.0,
                 420.0,
-                priority);
+                productionPriority);
             SetUnitProductionStockPolicy(
                 context,
                 entity,
@@ -3012,7 +3015,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 30.0,
                 80.0,
                 160.0,
-                priority);
+                productionPriority);
             int cargoTarget =
                 Math.Max(
                     configuration.MinimumCargoTrucks,
@@ -3064,7 +3067,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 50.0,
                 120.0,
                 240.0,
-                priority);
+                productionPriority);
         }
 
         for (int index = 0;
