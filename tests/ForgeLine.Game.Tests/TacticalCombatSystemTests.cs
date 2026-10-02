@@ -282,6 +282,73 @@ public sealed class TacticalCombatSystemTests
     }
 
     [Fact]
+    public void ReplacingHoldWithAttackMoveResetsTacticalStateAndResumesMovement()
+    {
+        TacticalScenario scenario =
+            CreateScenario(
+                weaponRange: 40.0f,
+                registerGroundMovement: true);
+
+        EntityId unit =
+            CreateCombatUnit(
+                scenario,
+                BluePlayer,
+                BlueFaction,
+                Vector3.Zero,
+                movable: true);
+
+        scenario.Simulation.SubmitCommand(
+            new HoldPositionCommand(
+                BluePlayer,
+                [unit],
+                scenario.Simulation.CurrentTick),
+            scenario.Simulation.CurrentTick.Next());
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.Equal(
+            CombatOrderStatus.Holding,
+            scenario.Simulation.Entities.GetComponent<TacticalCombatState>(
+                unit).Status);
+        Assert.False(
+            scenario.Simulation.Entities.GetComponent<TacticalMovementConstraint>(
+                unit).CanMove);
+
+        Vector3 before =
+            scenario.Simulation.Entities.GetComponent<WorldTransform>(
+                unit).Position;
+
+        scenario.Simulation.SubmitCommand(
+            new AttackMoveCommand(
+                BluePlayer,
+                [unit],
+                new Vector3(120.0f, 0.0f, 0.0f),
+                scenario.Simulation.CurrentTick),
+            scenario.Simulation.CurrentTick.Next());
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.Equal(
+            CombatOrderKind.AttackMove,
+            scenario.Simulation.Entities.GetComponent<CombatOrderState>(
+                unit).Kind);
+        Assert.Equal(
+            CombatOrderStatus.Advancing,
+            scenario.Simulation.Entities.GetComponent<TacticalCombatState>(
+                unit).Status);
+        Assert.True(
+            scenario.Simulation.Entities.GetComponent<TacticalMovementConstraint>(
+                unit).CanMove);
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Vector3 after =
+            scenario.Simulation.Entities.GetComponent<WorldTransform>(
+                unit).Position;
+
+        Assert.True(
+            after.X > before.X);
+    }
+
+    [Fact]
     public void StopCancelsMovementAndTargeting()
     {
         TacticalScenario scenario =
