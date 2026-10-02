@@ -172,7 +172,7 @@ Presentation tests cover generation of logistics debug geometry without moving s
 
 ## Current Boundary
 
-Physical Cargo Truck execution consumes this graph through the fixed-tick transport lifecycle documented in `CargoTransportOperations.md`. `AutomatedDistributionSystem` already schedules physical Cargo Trucks from player/AI stock policies, while battlefield Fuel and Ammunition replenishment uses Supply Depots and Supply Trucks without bypassing graph-owned regional transport.
+Physical Cargo Truck execution consumes this graph through the fixed-tick transport lifecycle documented in `CargoTransportOperations.md`. `AutomatedDistributionSystem` already schedules physical Cargo Trucks from player and computer-controlled opponent stock policies, while battlefield Fuel and Ammunition replenishment uses Supply Depots and Supply Trucks without bypassing graph-owned regional transport.
 
 The remaining deferred logistics layers are:
 
