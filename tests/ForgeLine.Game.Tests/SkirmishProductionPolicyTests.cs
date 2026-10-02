@@ -90,6 +90,137 @@ public sealed class SkirmishProductionPolicyTests
     }
 
     [Fact]
+    public void ObjectivePressureFactoryOutranksRoutineUnitMaterialDemand()
+    {
+        using VerticalSliceScenario scenario =
+            VerticalSliceScenario.Create(
+                VerticalSliceScenarioSettings.Create(
+                    VerticalSliceScenarioProfile.Validation));
+        EntityRegistry entities =
+            scenario.Simulation.Entities;
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
+        WorldTransform coreTransform =
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+
+        InventoryId barracksInput =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(4_000.0));
+        EntityId barracks =
+            entities.CreateEntity();
+        entities.AddComponent(barracks, coreTransform);
+        entities.AddComponent(
+            barracks,
+            new CompletedBuilding(
+                BuildingIds.Barracks,
+                scenario.West.Player,
+                SimulationTick.Zero));
+        entities.AddComponent(
+            barracks,
+            new ControllableEntity(
+                scenario.West.Player,
+                ControllableEntityCategory.Building));
+        entities.AddComponent(
+            barracks,
+            new UnitProductionFacility(
+                barracksInput,
+                UnitProductionCapability.Infantry,
+                scenario.West.Player,
+                Vector3.Zero,
+                SimulationTick.Zero));
+
+        int supplyTrucks = 0;
+        foreach (EntityId entity in
+                 entities.Query<ControllableEntity, UnitIdentity>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            if (entities.GetComponent<ControllableEntity>(
+                    entity).Owner ==
+                    scenario.West.Player &&
+                entities.GetComponent<UnitIdentity>(
+                    entity).UnitId ==
+                    UnitIds.SupplyTruck)
+            {
+                supplyTrucks++;
+            }
+        }
+
+        while (supplyTrucks <
+               scenario.RuntimeSettings.Scenario.WestOpponent.MinimumSupplyTrucks)
+        {
+            scenario.UnitFactory.Create(
+                units[UnitIds.SupplyTruck],
+                coreTransform.Position,
+                scenario.West.Player);
+            supplyTrucks++;
+        }
+
+        scenario.UnitFactory.Create(
+            units[UnitIds.ScoutVehicle],
+            coreTransform.Position,
+            scenario.West.Player);
+
+        InventoryId vehicleInput =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(4_000.0));
+        EntityId vehicleFactory =
+            entities.CreateEntity();
+        entities.AddComponent(vehicleFactory, coreTransform);
+        entities.AddComponent(
+            vehicleFactory,
+            new CompletedBuilding(
+                BuildingIds.VehicleFactory,
+                scenario.West.Player,
+                SimulationTick.Zero));
+        entities.AddComponent(
+            vehicleFactory,
+            new ControllableEntity(
+                scenario.West.Player,
+                ControllableEntityCategory.Building));
+        entities.AddComponent(
+            vehicleFactory,
+            new UnitProductionFacility(
+                vehicleInput,
+                UnitProductionCapability.Vehicle |
+                UnitProductionCapability.Logistics,
+                scenario.West.Player,
+                Vector3.Zero,
+                SimulationTick.Zero));
+
+        scenario.Simulation.RunTicks(
+            2,
+            TestContext.Current.CancellationToken);
+
+        LogisticsStockPolicy barracksSteel =
+            FindStockPolicy(
+                entities,
+                barracks,
+                ResourceIds.Steel);
+        LogisticsStockPolicy vehicleSteel =
+            FindStockPolicy(
+                entities,
+                vehicleFactory,
+                ResourceIds.Steel);
+
+        Assert.Equal(
+            LogisticsStockPriority.High,
+            barracksSteel.Priority);
+        Assert.Equal(
+            LogisticsStockPriority.Critical,
+            vehicleSteel.Priority);
+        Assert.True(
+            vehicleSteel.DesiredMinimum >=
+            units[UnitIds.MainBattleTank]
+                .Costs
+                .Single(
+                    cost =>
+                        cost.ResourceId ==
+                        ResourceIds.Steel)
+                .Quantity);
+    }
+
+    [Fact]
     public void ObjectivePressureUnitsPrecedeOptionalVehicleGrowth()
     {
         VerticalSliceScenarioSettings validation =
