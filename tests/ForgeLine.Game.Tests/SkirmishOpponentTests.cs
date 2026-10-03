@@ -228,6 +228,111 @@ public sealed class SkirmishOpponentTests
                 scenario.East.Player).DecisionsTaken > 0);
     }
 
+
+    [Fact]
+    public void PowerRecoveryCanAddCapacityWhenFourPlantsStillCannotMeetDemand()
+    {
+        using VerticalSliceScenario scenario =
+            VerticalSliceScenario.Create(
+                VerticalSliceScenarioSettings.Create(
+                    VerticalSliceScenarioProfile.Validation));
+        EntityRegistry entities =
+            scenario.Simulation.Entities;
+        WorldTransform core =
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+
+        int powerPlants = 0;
+
+        foreach (EntityId entity in
+                 entities.Query<CompletedBuilding>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            CompletedBuilding building =
+                entities.GetComponent<CompletedBuilding>(
+                    entity);
+
+            if (building.Owner ==
+                    scenario.West.Player &&
+                building.BuildingId ==
+                    BuildingIds.PowerPlant)
+            {
+                powerPlants++;
+            }
+        }
+
+        while (powerPlants < 4)
+        {
+            EntityId plant =
+                entities.CreateEntity();
+            entities.AddComponent(
+                plant,
+                new WorldTransform(
+                    core.Position +
+                        new Vector3(
+                            80.0f + 24.0f * powerPlants,
+                            0.0f,
+                            80.0f),
+                    Quaternion.Identity,
+                    Vector3.One));
+            entities.AddComponent(
+                plant,
+                new CompletedBuilding(
+                    BuildingIds.PowerPlant,
+                    scenario.West.Player,
+                    SimulationTick.Zero));
+            entities.AddComponent(
+                plant,
+                new PowerGenerator(
+                    100.0));
+            powerPlants++;
+        }
+
+        EntityId overloadedConsumer =
+            entities.CreateEntity();
+        entities.AddComponent(
+            overloadedConsumer,
+            new CompletedBuilding(
+                BuildingIds.StorageDepot,
+                scenario.West.Player,
+                SimulationTick.Zero));
+        entities.AddComponent(
+            overloadedConsumer,
+            new PowerConsumer(
+                450.0,
+                PowerPriority.Industrial,
+                enabled: true));
+
+        scenario.Simulation.RunTicks(
+            2,
+            TestContext.Current.CancellationToken);
+
+        bool queuedAdditionalPower =
+            false;
+
+        foreach (EntityId site in
+                 entities.Query<ConstructionSite>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            ConstructionSite construction =
+                entities.GetComponent<ConstructionSite>(
+                    site);
+
+            if (construction.Owner ==
+                    scenario.West.Player &&
+                construction.BuildingId ==
+                    BuildingIds.PowerPlant)
+            {
+                queuedAdditionalPower =
+                    true;
+                break;
+            }
+        }
+
+        Assert.True(
+            queuedAdditionalPower);
+    }
+
     [Fact]
     public void DirectCombatTargetsRequireCurrentIdentifiedIntelligence()
     {
