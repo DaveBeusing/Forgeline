@@ -4244,6 +4244,39 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return UnitIds.SupplyTruck;
         }
 
+        int matureSupplyTarget =
+            configuration.ResolveMatureSupplyTruckTarget(
+                owned.SupplyDepots.Count);
+        bool coreAssaultEstablished =
+            GetUnitCount(
+                owned,
+                UnitIds.ScoutVehicle) +
+            GetPendingUnitCount(
+                owned,
+                UnitIds.ScoutVehicle) >=
+                1 &&
+            GetUnitCount(
+                owned,
+                UnitIds.MainBattleTank) +
+            GetPendingUnitCount(
+                owned,
+                UnitIds.MainBattleTank) >=
+                configuration.MinimumObjectivePressureUnits &&
+            GetUnitCount(
+                owned,
+                UnitIds.MobileArtillery) +
+            GetPendingUnitCount(
+                owned,
+                UnitIds.MobileArtillery) >=
+                1;
+
+        if (coreAssaultEstablished &&
+            supplyCount + pendingSupply <
+                matureSupplyTarget)
+        {
+            return UnitIds.SupplyTruck;
+        }
+
         return UnitId.None;
     }
 
