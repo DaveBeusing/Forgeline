@@ -18,10 +18,10 @@ public sealed class ClientUserSettingsTests
 
         Assert.Equal(
             1_600,
-            window.ClientWidth);
+            window.Width);
         Assert.Equal(
             900,
-            window.ClientHeight);
+            window.Height);
         Assert.Equal(
             WindowMode.Windowed,
             window.Mode);
