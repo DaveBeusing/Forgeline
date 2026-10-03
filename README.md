@@ -39,6 +39,8 @@ The full skirmish opponent plays the same authoritative vertical-slice loop as t
 
 The Windows client now runs the complete vertical-slice skirmish lifecycle through explicit `Initializing -> Ready -> Running <-> Paused -> Ending -> Completed` states. Command Core destruction and surrender resolve authoritative outcomes with terminal reasons; the player HUD receives copied lifecycle/result state rather than owning match authority. Terminal matches stop advancing gameplay; press `R` to create a fresh match session or `Escape` to finalize and end the completed session. F1 now toggles development metrics while leaving the player HUD visible. See [Match Flow and Player Experience](docs/MatchFlowAndPlayerExperience.md).
 
+The pre-alpha client shell now adds an explicit Central Divide / Directorate / computer-opponent match setup screen, validated persistent user settings, camera rebinding through the existing camera-binding contract, Space pause, F12 controls/onboarding, scalable overlay text, best-effort local failure reports, and a reproducible Windows x64 packaging path with packaged fresh-install CI smoke validation. See [Pre-Alpha UX and Operations](docs/PreAlphaUxAndOperations.md) and the [Pre-Alpha Verification Checklist](docs/PreAlphaVerificationChecklist.md).
+
 ## Repository Layout
 
 ```text
