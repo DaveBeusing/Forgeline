@@ -184,6 +184,18 @@ public sealed class GameplayTelemetryCollector
         new(StringComparer.Ordinal);
     private readonly Dictionary<MilestoneKey, GameplayMilestone> _milestones =
         new();
+    private readonly Dictionary<EntityId, string> _extractorOwnerScratch =
+        new();
+    private readonly Dictionary<string, StorageObservation> _storageScratch =
+        new(StringComparer.Ordinal);
+    private readonly HashSet<EntityId> _activeCargoScratch =
+        new();
+    private readonly List<EntityId> _staleCargoScratch =
+        new();
+    private readonly Dictionary<EntityId, UnitObservation> _unitScratch =
+        new();
+    private readonly string _westOwner;
+    private readonly string _eastOwner;
 
     private ulong _observedTicks;
     private ulong _supplyShortageTicks;
@@ -196,6 +208,10 @@ public sealed class GameplayTelemetryCollector
         _scenario =
             scenario ??
             throw new ArgumentNullException(nameof(scenario));
+        _westOwner =
+            $"player:{_scenario.West.Player.Value}";
+        _eastOwner =
+            $"player:{_scenario.East.Player.Value}";
 
         CaptureInitialDeposits();
         CaptureInitialUnits();
@@ -353,8 +369,7 @@ public sealed class GameplayTelemetryCollector
 
     private void ObserveExtraction()
     {
-        var owners =
-            new Dictionary<EntityId, string>();
+        _extractorOwnerScratch.Clear();
 
         foreach (EntityId entity in
                  _scenario.Simulation.Entities.Query<ResourceExtractor>(
@@ -364,7 +379,7 @@ public sealed class GameplayTelemetryCollector
                 _scenario.Simulation.Entities.GetComponent<ResourceExtractor>(
                     entity);
 
-            owners.TryAdd(
+            _extractorOwnerScratch.TryAdd(
                 extractor.Deposit,
                 OwnerForFaction(extractor.Owner));
         }
@@ -401,7 +416,7 @@ public sealed class GameplayTelemetryCollector
                     ResourceDimension(
                         deposit.ResourceId);
                 string owner =
-                    owners.TryGetValue(
+                    _extractorOwnerScratch.TryGetValue(
                         entity,
                         out string? value)
                         ? value
@@ -573,9 +588,7 @@ public sealed class GameplayTelemetryCollector
 
     private void ObserveStorage()
     {
-        var byOwner =
-            new Dictionary<string, StorageObservation>(
-                StringComparer.Ordinal);
+        _storageScratch.Clear();
 
         foreach (EntityId entity in
                  _scenario.Simulation.Entities.Query<CompletedBuilding>(
@@ -587,75 +600,67 @@ public sealed class GameplayTelemetryCollector
             string owner =
                 OwnerForPlayer(
                     building.Owner);
-            var inventories =
-                new HashSet<InventoryId>();
+
+            InventoryId first =
+                InventoryId.None;
+            InventoryId second =
+                InventoryId.None;
+            InventoryId third =
+                InventoryId.None;
 
             if (_scenario.Simulation.Entities.TryGetComponent(
                     entity,
                     out InventoryStorage storage))
             {
-                inventories.Add(
-                    storage.InventoryId);
+                first =
+                    storage.InventoryId;
+                AccumulateStorage(
+                    owner,
+                    first);
             }
 
             if (_scenario.Simulation.Entities.TryGetComponent(
                     entity,
                     out ProductionFacility production))
             {
-                inventories.Add(
-                    production.InputInventory);
-                inventories.Add(
-                    production.OutputInventory);
+                if (production.InputInventory != first)
+                {
+                    second =
+                        production.InputInventory;
+                    AccumulateStorage(
+                        owner,
+                        second);
+                }
+
+                if (production.OutputInventory != first &&
+                    production.OutputInventory != second)
+                {
+                    third =
+                        production.OutputInventory;
+                    AccumulateStorage(
+                        owner,
+                        third);
+                }
             }
 
             if (_scenario.Simulation.Entities.TryGetComponent(
                     entity,
-                    out UnitProductionFacility unitProduction))
+                    out UnitProductionFacility unitProduction) &&
+                unitProduction.InputInventory != first &&
+                unitProduction.InputInventory != second &&
+                unitProduction.InputInventory != third)
             {
-                inventories.Add(
+                AccumulateStorage(
+                    owner,
                     unitProduction.InputInventory);
-            }
-
-            foreach (InventoryId inventory in inventories)
-            {
-                if (!_scenario.Inventories.Contains(
-                        inventory))
-                {
-                    continue;
-                }
-
-                double capacity =
-                    _scenario.Inventories.GetTotalCapacity(
-                        inventory);
-                double quantity =
-                    _scenario.Inventories.GetTotalQuantity(
-                        inventory);
-
-                if (!byOwner.TryGetValue(
-                        owner,
-                        out StorageObservation current))
-                {
-                    current =
-                        default;
-                }
-
-                byOwner[owner] =
-                    current with
-                    {
-                        Capacity =
-                            current.Capacity +
-                            capacity,
-                        Quantity =
-                            current.Quantity +
-                            quantity
-                    };
             }
         }
 
         double matchCapacity = 0.0;
         double matchQuantity = 0.0;
 
-        foreach ((string owner, StorageObservation storage) in byOwner)
+        foreach ((string owner, StorageObservation storage) in
+                 _storageScratch)
         {
             ObserveStorageUtilization(
                 owner,
@@ -671,6 +676,39 @@ public sealed class GameplayTelemetryCollector
             new StorageObservation(
                 matchCapacity,
                 matchQuantity));
+    }
+
+    private void AccumulateStorage(
+        string owner,
+        InventoryId inventory)
+    {
+        if (!inventory.IsSpecified ||
+            !_scenario.Inventories.Contains(
+                inventory))
+        {
+            return;
+        }
+
+        double capacity =
+            _scenario.Inventories.GetTotalCapacity(
+                inventory);
+        double quantity =
+            _scenario.Inventories.GetTotalQuantity(
+                inventory);
+
+        _storageScratch.TryGetValue(
+            owner,
+            out StorageObservation current);
+        _storageScratch[owner] =
+            current with
+            {
+                Capacity =
+                    current.Capacity +
+                    capacity,
+                Quantity =
+                    current.Quantity +
+                    quantity
+            };
     }
 
     private void ObserveStorageUtilization(
@@ -711,8 +749,8 @@ public sealed class GameplayTelemetryCollector
     {
         ulong currentTick =
             _scenario.Simulation.CurrentTick.Value;
-        var active =
-            new HashSet<EntityId>();
+        _activeCargoScratch.Clear();
+        _staleCargoScratch.Clear();
 
         foreach (EntityId entity in
                  _scenario.Simulation.Entities.Query<CargoTransport>(
@@ -722,7 +760,8 @@ public sealed class GameplayTelemetryCollector
                     entity,
                     out CargoTransportOrder order))
             {
-                active.Add(entity);
+                _activeCargoScratch.Add(
+                    entity);
 
                 if (!_cargoOrders.TryGetValue(
                         entity,
@@ -761,27 +800,31 @@ public sealed class GameplayTelemetryCollector
                     duration);
         }
 
-        EntityId[] stale =
-            _cargoOrders.Keys
-                .Where(
-                    entity =>
-                        !active.Contains(entity) &&
-                        !_scenario.Simulation.Entities.IsAlive(entity))
-                .ToArray();
+        foreach (EntityId entity in
+                 _cargoOrders.Keys)
+        {
+            if (!_activeCargoScratch.Contains(
+                    entity) &&
+                !_scenario.Simulation.Entities.IsAlive(
+                    entity))
+            {
+                _staleCargoScratch.Add(
+                    entity);
+            }
+        }
 
         for (int index = 0;
-             index < stale.Length;
+             index < _staleCargoScratch.Count;
              index++)
         {
             _cargoOrders.Remove(
-                stale[index]);
+                _staleCargoScratch[index]);
         }
     }
 
     private void ObserveUnits()
     {
-        var current =
-            new Dictionary<EntityId, UnitObservation>();
+        _unitScratch.Clear();
 
         foreach (EntityId entity in
                  _scenario.Simulation.Entities.Query<
@@ -800,7 +843,7 @@ public sealed class GameplayTelemetryCollector
                     controllable.Owner,
                     identity.UnitId);
 
-            current.Add(
+            _unitScratch.Add(
                 entity,
                 observation);
 
@@ -829,7 +872,8 @@ public sealed class GameplayTelemetryCollector
 
         foreach ((EntityId entity, UnitObservation previous) in _units)
         {
-            if (current.ContainsKey(entity))
+            if (_unitScratch.ContainsKey(
+                    entity))
             {
                 continue;
             }
@@ -845,7 +889,8 @@ public sealed class GameplayTelemetryCollector
 
         _units.Clear();
 
-        foreach ((EntityId entity, UnitObservation observation) in current)
+        foreach ((EntityId entity, UnitObservation observation) in
+                 _unitScratch)
         {
             _units.Add(
                 entity,
@@ -1487,27 +1532,56 @@ public sealed class GameplayTelemetryCollector
         if (network.Value ==
             _scenario.West.Player.Value)
         {
-            return OwnerForPlayer(
-                _scenario.West.Player);
+            return _westOwner;
         }
 
         if (network.Value ==
             _scenario.East.Player.Value)
         {
-            return OwnerForPlayer(
-                _scenario.East.Player);
+            return _eastOwner;
         }
 
         return $"network:{network.Value}";
     }
 
-    private static string OwnerForPlayer(PlayerId player) =>
-        $"player:{player.Value}";
+    private string OwnerForPlayer(PlayerId player)
+    {
+        if (player ==
+            _scenario.West.Player)
+        {
+            return _westOwner;
+        }
 
-    private static string OwnerForFaction(FactionId faction) =>
-        faction.IsSpecified
-            ? $"player:{faction.Value}"
-            : MatchOwner;
+        if (player ==
+            _scenario.East.Player)
+        {
+            return _eastOwner;
+        }
+
+        return $"player:{player.Value}";
+    }
+
+    private string OwnerForFaction(FactionId faction)
+    {
+        if (!faction.IsSpecified)
+        {
+            return MatchOwner;
+        }
+
+        if (faction.Value ==
+            _scenario.West.Player.Value)
+        {
+            return _westOwner;
+        }
+
+        if (faction.Value ==
+            _scenario.East.Player.Value)
+        {
+            return _eastOwner;
+        }
+
+        return $"player:{faction.Value}";
+    }
 
     private double LogicalSeconds() =>
         _observedTicks /
@@ -1517,11 +1591,10 @@ public sealed class GameplayTelemetryCollector
         ticks /
         (double)_scenario.Simulation.Clock.TicksPerSecond;
 
-    private static void Add<TKey>(
-        IDictionary<TKey, double> values,
-        TKey key,
+    private static void Add(
+        Dictionary<MetricDimensionKey, double> values,
+        MetricDimensionKey key,
         double value)
-        where TKey : notnull
     {
         values.TryGetValue(
             key,
@@ -1531,10 +1604,35 @@ public sealed class GameplayTelemetryCollector
             value;
     }
 
-    private static void Increment<TKey>(
-        IDictionary<TKey, long> values,
-        TKey key)
-        where TKey : notnull
+    private static void Add(
+        Dictionary<string, double> values,
+        string key,
+        double value)
+    {
+        values.TryGetValue(
+            key,
+            out double existing);
+        values[key] =
+            existing +
+            value;
+    }
+
+    private static void Increment(
+        Dictionary<MetricDimensionKey, long> values,
+        MetricDimensionKey key)
+    {
+        values.TryGetValue(
+            key,
+            out long existing);
+        values[key] =
+            checked(
+                existing +
+                1);
+    }
+
+    private static void Increment(
+        Dictionary<string, long> values,
+        string key)
     {
         values.TryGetValue(
             key,
