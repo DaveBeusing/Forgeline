@@ -293,6 +293,34 @@ public static class BattlefieldResupplyPlanner
             return ResupplyProviderRejection.DepotNotOperational;
         }
 
+        if (context.Entities.HasComponent<SupplyTruck>(candidate))
+        {
+            if (context.Entities.HasComponent<ResupplyOrder>(candidate))
+            {
+                return ResupplyProviderRejection.ProviderRefueling;
+            }
+
+            foreach (EntityId otherRecipient in
+                     context.Entities.Query<ResupplyOrder>(
+                         QueryIterationOrder.StableByEntityIndex))
+            {
+                if (otherRecipient == recipient ||
+                    !context.Entities.IsAlive(otherRecipient))
+                {
+                    continue;
+                }
+
+                ResupplyOrder activeOrder =
+                    context.Entities.GetComponent<ResupplyOrder>(
+                        otherRecipient);
+
+                if (activeOrder.Provider == candidate)
+                {
+                    return ResupplyProviderRejection.ProviderBusy;
+                }
+            }
+        }
+
         if (inventories is null)
         {
             return ResupplyProviderRejection.None;
