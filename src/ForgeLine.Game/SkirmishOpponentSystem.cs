@@ -4365,6 +4365,27 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             {
                 return UnitIds.MobileArtillery;
             }
+
+            if (facility.Supports(
+                    UnitProductionCapability.Logistics))
+            {
+                int matureSupplyTarget =
+                    configuration.ResolveMatureSupplyTruckTarget(
+                        owned.SupplyDepots.Count);
+                int matureSupplyCount =
+                    GetUnitCount(
+                        owned,
+                        UnitIds.SupplyTruck) +
+                    GetPendingUnitCount(
+                        owned,
+                        UnitIds.SupplyTruck);
+
+                if (matureSupplyCount <
+                    matureSupplyTarget)
+                {
+                    return UnitIds.SupplyTruck;
+                }
+            }
         }
 
         UnitId[] priority =
