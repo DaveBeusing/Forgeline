@@ -771,19 +771,25 @@ public sealed class SkirmishSupplyPolicyTests
                 combatCentroid);
 
         bool stagedSupport =
-            supplyTrucks.Any(
-                truck =>
-                    entities.TryGetComponent(
-                        truck,
-                        out MovementOrder order) &&
-                    Vector3.DistanceSquared(
-                        order.WorldTarget,
-                        combatCentroid) <
-                    homeDistance * 0.25f);
+            entities.Query<SupplyTruck, ControllableEntity>()
+                .Where(
+                    truck =>
+                        entities.GetComponent<ControllableEntity>(
+                            truck).Owner ==
+                        scenario.West.Player)
+                .Any(
+                    truck =>
+                        entities.TryGetComponent(
+                            truck,
+                            out MovementOrder order) &&
+                        Vector3.DistanceSquared(
+                            order.WorldTarget,
+                            combatCentroid) <
+                        homeDistance * 0.25f);
 
         Assert.True(
             stagedSupport,
-            "A loaded mobile Supply Truck was not staged toward the recovering offensive combat group.");
+            "No available owned mobile Supply Truck was staged toward the recovering offensive combat group.");
     }
 
     private static LogisticsStockPolicy FindStockPolicy(
