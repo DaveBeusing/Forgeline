@@ -136,6 +136,83 @@ public sealed class RepairRecoverySystemTests
     }
 
     [Fact]
+    public void RetreatPlannerPrefersForwardSupplyProviderForLowSupplyForce()
+    {
+        var simulation =
+            new SimulationCoordinator();
+        var inventories =
+            new InventoryStore();
+
+        InventoryId homeInventory =
+            inventories.CreateInventory(
+                new InventorySpecification(100.0));
+        InventoryId forwardInventory =
+            inventories.CreateInventory(
+                new InventorySpecification(100.0));
+
+        EntityId home =
+            simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(
+            home,
+            new WorldTransform(
+                new Vector3(100.0f, 0.0f, 0.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        simulation.Entities.AddComponent(
+            home,
+            new SupplyProvider(
+                homeInventory,
+                Owner,
+                resupplyRangeMeters: 30.0f));
+
+        EntityId forward =
+            simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(
+            forward,
+            new WorldTransform(
+                new Vector3(900.0f, 0.0f, 0.0f),
+                Quaternion.Identity,
+                Vector3.One));
+        simulation.Entities.AddComponent(
+            forward,
+            new SupplyProvider(
+                forwardInventory,
+                Owner,
+                resupplyRangeMeters: 30.0f));
+
+        EntityId first =
+            CreateSuppliedCombatUnit(
+                simulation,
+                new Vector3(820.0f, 0.0f, 0.0f),
+                BattlefieldSupplyStatus.Critical);
+        EntityId second =
+            CreateSuppliedCombatUnit(
+                simulation,
+                new Vector3(860.0f, 0.0f, 0.0f),
+                BattlefieldSupplyStatus.LowSupply);
+
+        Assert.True(
+            RetreatRecoveryPlanner.TryResolve(
+                simulation.Entities,
+                Owner,
+                [first, second],
+                out EntityId provider,
+                out Vector3 destination,
+                out RetreatRecoveryReason reason));
+
+        Assert.Equal(forward, provider);
+        Assert.Equal(
+            RetreatRecoveryReason.Supply,
+            reason);
+        Assert.True(
+            Vector3.Distance(
+                destination,
+                new Vector3(900.0f, 0.0f, 0.0f)) <
+            30.0f);
+        Assert.NotEqual(home, provider);
+    }
+
+    [Fact]
     public void RetreatPlannerPrefersNearestCombinedRepairAndSupplyProvider()
     {
         var simulation =
@@ -245,6 +322,43 @@ public sealed class RepairRecoverySystemTests
                 healthPerTick: 5.0,
                 ResourceIds.Steel,
                 resourcePerHealth: 0.2));
+        return entity;
+    }
+
+    private static EntityId CreateSuppliedCombatUnit(
+        SimulationCoordinator simulation,
+        Vector3 position,
+        BattlefieldSupplyStatus status)
+    {
+        EntityId entity =
+            simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(
+            entity,
+            new WorldTransform(
+                position,
+                Quaternion.Identity,
+                Vector3.One));
+        simulation.Entities.AddComponent(
+            entity,
+            new ControllableEntity(
+                Owner,
+                ControllableEntityCategory.Unit));
+        simulation.Entities.AddComponent(
+            entity,
+            new Combatant(
+                new FactionId(1)));
+        simulation.Entities.AddComponent(
+            entity,
+            HealthState.Full(100.0));
+        simulation.Entities.AddComponent(
+            entity,
+            new UnitSupplyState(
+                status == BattlefieldSupplyStatus.Supplied
+                    ? 1.0
+                    : 0.25,
+                1.0,
+                status,
+                SimulationTick.Zero));
         return entity;
     }
 
