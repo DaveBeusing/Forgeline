@@ -407,12 +407,19 @@ public sealed class GameplayTelemetryCollector
                         ? value
                         : MatchOwner;
 
-                Add(
-                    _resourceIncome,
-                    new MetricDimensionKey(
+                if (!string.Equals(
                         owner,
-                        resource),
-                    extracted);
+                        MatchOwner,
+                        StringComparison.Ordinal))
+                {
+                    Add(
+                        _resourceIncome,
+                        new MetricDimensionKey(
+                            owner,
+                            resource),
+                        extracted);
+                }
+
                 Add(
                     _resourceIncome,
                     new MetricDimensionKey(
@@ -440,10 +447,17 @@ public sealed class GameplayTelemetryCollector
             string owner =
                 ResolveBuildingOwner(entity);
 
-            Add(
-                _processingFacilityTicks,
-                owner,
-                1.0);
+            if (!string.Equals(
+                    owner,
+                    MatchOwner,
+                    StringComparison.Ordinal))
+            {
+                Add(
+                    _processingFacilityTicks,
+                    owner,
+                    1.0);
+            }
+
             Add(
                 _processingFacilityTicks,
                 MatchOwner,
@@ -452,10 +466,17 @@ public sealed class GameplayTelemetryCollector
             if (facility.Status ==
                 ProductionStatus.Running)
             {
-                Add(
-                    _processingRunningTicks,
-                    owner,
-                    1.0);
+                if (!string.Equals(
+                        owner,
+                        MatchOwner,
+                        StringComparison.Ordinal))
+                {
+                    Add(
+                        _processingRunningTicks,
+                        owner,
+                        1.0);
+                }
+
                 Add(
                     _processingRunningTicks,
                     MatchOwner,
@@ -474,10 +495,17 @@ public sealed class GameplayTelemetryCollector
 
                 if (delta > 0.0)
                 {
-                    Add(
-                        _processingOutput,
-                        owner,
-                        delta);
+                    if (!string.Equals(
+                            owner,
+                            MatchOwner,
+                            StringComparison.Ordinal))
+                    {
+                        Add(
+                            _processingOutput,
+                            owner,
+                            delta);
+                    }
+
                     Add(
                         _processingOutput,
                         MatchOwner,
