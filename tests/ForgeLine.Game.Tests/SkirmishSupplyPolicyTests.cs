@@ -362,6 +362,17 @@ public sealed class SkirmishSupplyPolicyTests
             scenario.Inventories.GetQuantity(
                 supply.InventoryId,
                 ResourceIds.Fuel);
+        Vector3 staleForwardTarget =
+            core.Position +
+            new Vector3(500.0f, 0.0f, 0.0f);
+
+        entities.AddComponent(
+            truck,
+            new MovementOrder(
+                scenario.West.Player,
+                staleForwardTarget,
+                scenario.Simulation.CurrentTick,
+                scenario.Simulation.CurrentTick));
 
         scenario.Simulation.RunTicks(
             40,
@@ -372,10 +383,25 @@ public sealed class SkirmishSupplyPolicyTests
                 supply.InventoryId,
                 ResourceIds.Fuel);
 
+        bool loadedFuel =
+            currentFuel > initialFuel;
+        bool retaskedToLoadingSource =
+            entities.TryGetComponent(
+                truck,
+                out MovementOrder loadingOrder) &&
+            loadingOrder.WorldTarget !=
+                staleForwardTarget &&
+            Vector3.DistanceSquared(
+                loadingOrder.WorldTarget,
+                core.Position) <
+            Vector3.DistanceSquared(
+                staleForwardTarget,
+                core.Position);
+
         Assert.True(
-            currentFuel > initialFuel ||
-            entities.HasComponent<MovementOrder>(truck),
-            "A Supply Truck below the offensive Fuel reserve neither returned to a loading source nor loaded additional Fuel.");
+            loadedFuel ||
+            retaskedToLoadingSource,
+            "A Supply Truck below the offensive Fuel reserve retained unrelated forward movement instead of returning to a loading source.");
     }
 
     [Fact]
