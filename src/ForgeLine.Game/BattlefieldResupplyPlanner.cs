@@ -66,6 +66,12 @@ public static class BattlefieldResupplyPlanner
         ResupplyProviderRejection rejections = ResupplyProviderRejection.None;
         WorldTransform providerTransform = default;
         SupplyProvider selectedProvider = default;
+        bool preferMobileProvider =
+            ShouldPreferMobileProvider(
+                context,
+                recipient);
+        int bestProviderRank =
+            int.MaxValue;
         float bestDistanceSquared =
             float.PositiveInfinity;
 
@@ -110,10 +116,19 @@ public static class BattlefieldResupplyPlanner
                 }
             }
 
+            int providerRank =
+                preferMobileProvider &&
+                !context.Entities.HasComponent<SupplyTruck>(
+                    candidate)
+                    ? 1
+                    : 0;
+
             if (!providerEntity.IsValid ||
-                distanceSquared < bestDistanceSquared ||
-                (distanceSquared == bestDistanceSquared &&
-                 candidate < providerEntity))
+                providerRank < bestProviderRank ||
+                (providerRank == bestProviderRank &&
+                 (distanceSquared < bestDistanceSquared ||
+                  (distanceSquared == bestDistanceSquared &&
+                   candidate < providerEntity))))
             {
                 providerEntity =
                     candidate;
@@ -121,6 +136,8 @@ public static class BattlefieldResupplyPlanner
                     transform;
                 selectedProvider =
                     provider;
+                bestProviderRank =
+                    providerRank;
                 bestDistanceSquared =
                     distanceSquared;
                 recipientCanReachProvider = canReachProvider;
@@ -230,6 +247,24 @@ public static class BattlefieldResupplyPlanner
         }
 
         return true;
+    }
+
+    private static bool ShouldPreferMobileProvider(
+        SimulationContext context,
+        EntityId recipient)
+    {
+        if (!context.Entities.HasComponent<Combatant>(
+                recipient) ||
+            !context.Entities.TryGetComponent(
+                recipient,
+                out UnitSupplyPriority priority))
+        {
+            return false;
+        }
+
+        return priority.Priority is
+            BattlefieldSupplyPriority.Critical or
+            BattlefieldSupplyPriority.High;
     }
 
     internal static bool CanReachProvider(
