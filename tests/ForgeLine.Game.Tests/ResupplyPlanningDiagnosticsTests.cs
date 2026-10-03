@@ -62,6 +62,82 @@ public sealed class ResupplyPlanningDiagnosticsTests
     }
 
     [Fact]
+    public void BusyMobileProviderDoesNotAttractAdditionalReachableRecipient()
+    {
+        var fixture =
+            new Fixture();
+        EntityId nearest =
+            fixture.Truck(
+                new Vector3(
+                    60.0f,
+                    0.0f,
+                    0.0f),
+                movementFuel: 80.0,
+                cargoFuel: 40.0,
+                Owner);
+        EntityId alternate =
+            fixture.Truck(
+                new Vector3(
+                    40.0f,
+                    0.0f,
+                    0.0f),
+                movementFuel: 80.0,
+                cargoFuel: 40.0,
+                Owner);
+        EntityId first =
+            fixture.MobileRecipient(
+                new Vector3(
+                    100.0f,
+                    0.0f,
+                    0.0f));
+        EntityId second =
+            fixture.MobileRecipient(
+                new Vector3(
+                    100.0f,
+                    0.0f,
+                    1.0f));
+
+        Assert.True(
+            BattlefieldResupplyPlanner.TryIssueNearestProviderOrder(
+                fixture.Simulation.Context,
+                fixture.Inventories,
+                first,
+                Owner,
+                SimulationTick.Zero,
+                BattlefieldSupplyResource.Fuel,
+                out EntityId firstProvider));
+        Assert.Equal(
+            nearest,
+            firstProvider);
+
+        Assert.True(
+            BattlefieldResupplyPlanner.TryIssueNearestProviderOrder(
+                fixture.Simulation.Context,
+                fixture.Inventories,
+                second,
+                Owner,
+                SimulationTick.Zero,
+                BattlefieldSupplyResource.Fuel,
+                out EntityId secondProvider));
+        Assert.Equal(
+            alternate,
+            secondProvider);
+
+        ResupplyPlanningResult result =
+            fixture.Result(
+                second);
+        Assert.Equal(
+            2,
+            result.FriendlyProviders);
+        Assert.Equal(
+            1,
+            result.RejectedProviders);
+        Assert.True(
+            result.Rejections.HasFlag(
+                ResupplyProviderRejection.ProviderBusy));
+    }
+
+    [Fact]
     public void NewAttemptReplacesStaleFailureAfterPhysicalStockBecomesAvailable()
     {
         var fixture = new Fixture();
@@ -161,6 +237,48 @@ public sealed class ResupplyPlanningDiagnosticsTests
             Assert.True(Inventories.Remove(fuel.InventoryId, ResourceIds.Fuel, fuel.Capacity - movementFuel).Succeeded);
             SupplyTruck truck = Simulation.Entities.GetComponent<SupplyTruck>(entity);
             Assert.True(Inventories.Add(truck.InventoryId, ResourceIds.Fuel, cargoFuel).Succeeded);
+            return entity;
+        }
+
+        public EntityId MobileRecipient(
+            Vector3 position)
+        {
+            EntityId entity =
+                Simulation.Entities.CreateEntity();
+            InventoryId inventory =
+                Inventories.CreateInventory(
+                    new InventorySpecification(
+                        20.0));
+
+            Assert.True(
+                Inventories.Add(
+                    inventory,
+                    ResourceIds.Fuel,
+                    6.0).Succeeded);
+
+            Simulation.Entities.AddComponent(
+                entity,
+                new WorldTransform(
+                    position,
+                    Quaternion.Identity,
+                    Vector3.One));
+            Simulation.Entities.AddComponent(
+                entity,
+                new ControllableEntity(
+                    Owner,
+                    ControllableEntityCategory.Unit));
+            Simulation.Entities.AddComponent(
+                entity,
+                new UnitFuelState(
+                    inventory,
+                    20.0,
+                    0.1));
+            Simulation.Entities.AddComponent(
+                entity,
+                new SupplyMovementConstraint(
+                    1.0f,
+                    canMove: true));
+
             return entity;
         }
 
