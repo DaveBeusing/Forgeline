@@ -1,3 +1,5 @@
+using System.Numerics;
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Ecs;
@@ -10,6 +12,52 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class SkirmishOpponentTests
 {
+    [Fact]
+    public void OffensiveFuelReserveCannotUndercutGeneralResupplyThreshold()
+    {
+        var configuration =
+            new SkirmishOpponentConfiguration
+            {
+                ResupplyThreshold = 0.40,
+                OffensiveFuelThreshold = 0.30
+            };
+
+        InvalidOperationException error =
+            Assert.Throws<InvalidOperationException>(
+                configuration.Validate);
+
+        Assert.Contains(
+            "Offensive fuel threshold",
+            error.Message,
+            StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData(1, 1, 1)]
+    [InlineData(1, 2, 2)]
+    [InlineData(1, 3, 3)]
+    [InlineData(1, 5, 3)]
+    [InlineData(2, 1, 2)]
+    [InlineData(2, 3, 3)]
+    [InlineData(4, 3, 4)]
+    public void MatureSupplyTargetScalesWithDepotNetwork(
+        int minimumSupplyTrucks,
+        int supplyDepotCount,
+        int expected)
+    {
+        var configuration =
+            new SkirmishOpponentConfiguration
+            {
+                MinimumSupplyTrucks =
+                    minimumSupplyTrucks
+            };
+
+        Assert.Equal(
+            expected,
+            configuration.ResolveMatureSupplyTruckTarget(
+                supplyDepotCount));
+    }
+
     [Fact]
     public void StartingBasesAreSymmetricAndUseNormalAuthoritativeState()
     {
@@ -180,6 +228,111 @@ public sealed class SkirmishOpponentTests
                 scenario.East.Player).DecisionsTaken > 0);
     }
 
+
+    [Fact]
+    public void PowerRecoveryCanAddCapacityWhenFourPlantsStillCannotMeetDemand()
+    {
+        using VerticalSliceScenario scenario =
+            VerticalSliceScenario.Create(
+                VerticalSliceScenarioSettings.Create(
+                    VerticalSliceScenarioProfile.Validation));
+        EntityRegistry entities =
+            scenario.Simulation.Entities;
+        WorldTransform core =
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+
+        int powerPlants = 0;
+
+        foreach (EntityId entity in
+                 entities.Query<CompletedBuilding>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            CompletedBuilding building =
+                entities.GetComponent<CompletedBuilding>(
+                    entity);
+
+            if (building.Owner ==
+                    scenario.West.Player &&
+                building.BuildingId ==
+                    BuildingIds.PowerPlant)
+            {
+                powerPlants++;
+            }
+        }
+
+        while (powerPlants < 4)
+        {
+            EntityId plant =
+                entities.CreateEntity();
+            entities.AddComponent(
+                plant,
+                new WorldTransform(
+                    core.Position +
+                        new Vector3(
+                            80.0f + 24.0f * powerPlants,
+                            0.0f,
+                            80.0f),
+                    Quaternion.Identity,
+                    Vector3.One));
+            entities.AddComponent(
+                plant,
+                new CompletedBuilding(
+                    BuildingIds.PowerPlant,
+                    scenario.West.Player,
+                    SimulationTick.Zero));
+            entities.AddComponent(
+                plant,
+                new PowerGenerator(
+                    100.0));
+            powerPlants++;
+        }
+
+        EntityId overloadedConsumer =
+            entities.CreateEntity();
+        entities.AddComponent(
+            overloadedConsumer,
+            new CompletedBuilding(
+                BuildingIds.StorageDepot,
+                scenario.West.Player,
+                SimulationTick.Zero));
+        entities.AddComponent(
+            overloadedConsumer,
+            new PowerConsumer(
+                450.0,
+                PowerPriority.Industrial,
+                enabled: true));
+
+        scenario.Simulation.RunTicks(
+            2,
+            TestContext.Current.CancellationToken);
+
+        bool queuedAdditionalPower =
+            false;
+
+        foreach (EntityId site in
+                 entities.Query<ConstructionSite>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            ConstructionSite construction =
+                entities.GetComponent<ConstructionSite>(
+                    site);
+
+            if (construction.Owner ==
+                    scenario.West.Player &&
+                construction.BuildingId ==
+                    BuildingIds.PowerPlant)
+            {
+                queuedAdditionalPower =
+                    true;
+                break;
+            }
+        }
+
+        Assert.True(
+            queuedAdditionalPower);
+    }
+
     [Fact]
     public void DirectCombatTargetsRequireCurrentIdentifiedIntelligence()
     {
@@ -236,6 +389,139 @@ public sealed class SkirmishOpponentTests
 
             Assert.True(authorized);
         }
+    }
+
+    [Fact]
+    public void DebugSnapshotProjectsLayeredGroupSupplyAndRetreatState()
+    {
+        var configuration =
+            new SkirmishOpponentConfiguration
+            {
+                ReactionCadenceTicks = 1_000
+            };
+        SkirmishScenarioHarness scenario =
+            SkirmishScenarioHarness.Create(
+                westConfiguration: configuration,
+                eastConfiguration: configuration);
+        scenario.Opponents.DebugCaptureEnabled =
+            true;
+
+        EntityId unit =
+            scenario.West.StartingUnits[0];
+        EntityId group =
+            scenario.Simulation.Entities.CreateEntity();
+        Vector3 destination =
+            new(1_250.0f, 0.0f, 1_100.0f);
+
+        scenario.Simulation.Entities.AddComponent(
+            group,
+            new CombatGroupIntent(
+                CombatOrderKind.AttackMove,
+                scenario.West.Player,
+                destination,
+                hasDestination: true,
+                EntityId.Invalid,
+                FormationTemplate.Column,
+                initialMemberCount: 1,
+                pursuitLeashMeters: 160.0f,
+                scenario.Simulation.CurrentTick));
+
+        if (scenario.Simulation.Entities.HasComponent<CombatGroupMember>(
+                unit))
+        {
+            scenario.Simulation.Entities.SetComponent(
+                unit,
+                new CombatGroupMember(group));
+        }
+        else
+        {
+            scenario.Simulation.Entities.AddComponent(
+                unit,
+                new CombatGroupMember(group));
+        }
+
+        var readiness =
+            new UnitCombatReadiness(
+                Strength: 1.0,
+                Health: 0.20,
+                Fuel: 0.10,
+                Ammunition: 0.10,
+                Mobility: 1.0,
+                WeaponAvailability: 1.0,
+                SupplyCondition: 0.10,
+                CombatCapability: 0.20,
+                OverallReadiness: 0.20,
+                scenario.Simulation.CurrentTick);
+
+        if (scenario.Simulation.Entities.HasComponent<UnitCombatReadiness>(
+                unit))
+        {
+            scenario.Simulation.Entities.SetComponent(
+                unit,
+                readiness);
+        }
+        else
+        {
+            scenario.Simulation.Entities.AddComponent(
+                unit,
+                readiness);
+        }
+
+        WorldTransform coreTransform =
+            scenario.Simulation.Entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+        var recovery =
+            new RetreatRecoveryState(
+                scenario.West.CommandCore,
+                RetreatRecoveryReason.RepairAndSupply,
+                coreTransform.Position,
+                scenario.Simulation.CurrentTick);
+
+        if (scenario.Simulation.Entities.HasComponent<RetreatRecoveryState>(
+                unit))
+        {
+            scenario.Simulation.Entities.SetComponent(
+                unit,
+                recovery);
+        }
+        else
+        {
+            scenario.Simulation.Entities.AddComponent(
+                unit,
+                recovery);
+        }
+
+        scenario.Simulation.AdvanceOneTick();
+
+        SkirmishOpponentDebugReadModel debug =
+            Assert.Single(
+                scenario.Opponents.DebugSnapshot,
+                entry =>
+                    entry.Player ==
+                    scenario.West.Player);
+
+        Assert.Equal(
+            SkirmishOperationalObjective.StabilizeEconomy,
+            debug.OperationalObjective);
+        Assert.True(debug.GroupObjective.IsSpecified);
+        Assert.Equal(group, debug.GroupObjective.Group);
+        Assert.Equal(
+            CombatOrderKind.AttackMove,
+            debug.GroupObjective.Order);
+        Assert.Equal(destination, debug.GroupObjective.Destination);
+        Assert.Equal(1, debug.GroupObjective.SurvivingMemberCount);
+        Assert.True(
+            debug.SupplyRequirement.HasFlag(
+                SkirmishSupplyRequirement.Fuel));
+        Assert.True(
+            debug.SupplyRequirement.HasFlag(
+                SkirmishSupplyRequirement.Ammunition));
+        Assert.True(
+            debug.SupplyRequirement.HasFlag(
+                SkirmishSupplyRequirement.Repair));
+        Assert.Equal(
+            SkirmishRetreatReason.RepairAndSupply,
+            debug.RetreatReason);
     }
 
     [Fact]
@@ -789,7 +1075,12 @@ public sealed class SkirmishOpponentTests
             $"cargoStates={cargoStates} " +
             $"unitProductionStates={unitProductionStates} " +
             $"scouts={scenario.CountUnits(side.Player, UnitIds.ScoutVehicle)} " +
-            $"tanks={scenario.CountUnits(side.Player, UnitIds.MainBattleTank)}";
+            $"tanks={scenario.CountUnits(side.Player, UnitIds.MainBattleTank)} " +
+            $"force={debug.Force.CombatUnits}/ready{debug.Force.AverageReadiness:F2}/supply{debug.Force.MinimumSupply:F2}/currentContacts{debug.Force.CurrentHostileContacts} " +
+            $"admission={debug.OffensiveAdmission.Reason}" +
+            $"/eligible{debug.OffensiveAdmission.EligibleAttackerCount}" +
+            $"/pressure{debug.OffensiveAdmission.ObjectivePressureUnitCount}" +
+            $"/supply{debug.OffensiveAdmission.ForwardSupplyReady}";
     }
 
     private static bool HasCombatGroup(

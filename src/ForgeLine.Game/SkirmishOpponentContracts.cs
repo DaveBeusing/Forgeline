@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Simulation;
@@ -46,15 +47,32 @@ public sealed record SkirmishOpponentConfiguration
 
     public double ResupplyThreshold { get; init; } = 0.30;
 
+    public double OffensiveFuelThreshold { get; init; } = 0.55;
+
     public int MinimumAttackUnits { get; init; } = 5;
 
     public int MaximumAttackUnits { get; init; } = 12;
+
+    public int MinimumObjectivePressureUnits { get; init; } = 1;
 
     public int MaximumQueuedUnitsPerFacility { get; init; } = 2;
 
     public int MinimumCargoTrucks { get; init; } = 2;
 
     public int MinimumSupplyTrucks { get; init; } = 1;
+
+    public int ResolveMatureSupplyTruckTarget(
+        int supplyDepotCount)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(
+            supplyDepotCount);
+
+        return Math.Max(
+            MinimumSupplyTrucks,
+            Math.Min(
+                supplyDepotCount,
+                3));
+    }
 
     public float DefensiveRadiusMeters { get; init; } = 520.0f;
 
@@ -78,6 +96,16 @@ public sealed record SkirmishOpponentConfiguration
         ValidateFraction(
             ResupplyThreshold,
             nameof(ResupplyThreshold));
+        ValidateFraction(
+            OffensiveFuelThreshold,
+            nameof(OffensiveFuelThreshold));
+
+        if (OffensiveFuelThreshold <
+            ResupplyThreshold)
+        {
+            throw new InvalidOperationException(
+                "Offensive fuel threshold must not be below the general resupply threshold.");
+        }
 
         if (RetreatThreshold >= OffensiveReadinessThreshold)
         {
@@ -91,6 +119,17 @@ public sealed record SkirmishOpponentConfiguration
         ArgumentOutOfRangeException.ThrowIfLessThan(
             MaximumAttackUnits,
             MinimumAttackUnits);
+        ArgumentOutOfRangeException.ThrowIfLessThan(
+            MinimumObjectivePressureUnits,
+            1);
+
+        if (MinimumObjectivePressureUnits >
+            MaximumAttackUnits)
+        {
+            throw new InvalidOperationException(
+                "Objective-pressure unit minimum cannot exceed the maximum attack force.");
+        }
+
         ArgumentOutOfRangeException.ThrowIfLessThan(
             MaximumQueuedUnitsPerFacility,
             1);
@@ -193,6 +232,8 @@ public readonly record struct SkirmishOpponentState(
     int ScoutSiteCursor,
     int DecisionsTaken)
 {
+    public bool DeepOffensiveCommitted { get; init; }
+
     public static SkirmishOpponentState Initial =>
         new(
             SkirmishStrategicState.Bootstrap,
@@ -254,6 +295,73 @@ public readonly record struct SkirmishOpponentWorkMetrics(
     long ScratchStatesCreated,
     long ScratchStatesReleased);
 
+public enum SkirmishOperationalObjective : byte
+{
+    None = 0,
+    StabilizeEconomy = 1,
+    EstablishInfrastructure = 2,
+    Expand = 3,
+    Defend = 4,
+    RecoverForce = 5,
+    Reconnoiter = 6,
+    PrepareOffensive = 7,
+    PressureObjective = 8
+}
+
+[Flags]
+public enum SkirmishSupplyRequirement : byte
+{
+    None = 0,
+    Fuel = 1 << 0,
+    Ammunition = 1 << 1,
+    Repair = 1 << 2
+}
+
+public enum SkirmishRetreatReason : byte
+{
+    None = 0,
+    LowReadiness = 1,
+    LowFuel = 2,
+    LowAmmunition = 3,
+    LowFuelAndAmmunition = 4,
+    RepairRequired = 5,
+    RepairAndSupply = 6
+}
+
+public enum SkirmishOffensiveAdmissionReason : byte
+{
+    Ready = 0,
+    InsufficientCombatUnits = 1,
+    InsufficientReadyUnits = 2,
+    InsufficientObjectivePressure = 3,
+    MissingForwardSupply = 4
+}
+
+public readonly record struct SkirmishOffensiveAdmissionReadModel(
+    SkirmishOffensiveAdmissionReason Reason,
+    int CombatUnitCount,
+    int EligibleAttackerCount,
+    int ObjectivePressureUnitCount,
+    bool ForwardSupplyReady)
+{
+    public bool IsReady =>
+        Reason == SkirmishOffensiveAdmissionReason.Ready;
+}
+
+public readonly record struct SkirmishGroupObjectiveReadModel(
+    EntityId Group,
+    CombatOrderKind Order,
+    Vector3 Destination,
+    bool HasDestination,
+    EntityId ExplicitTarget,
+    FormationTemplate Formation,
+    int InitialMemberCount,
+    int SurvivingMemberCount)
+{
+    public bool IsSpecified =>
+        Group.IsValid;
+}
+
 public readonly record struct SkirmishOpponentDebugReadModel(
     EntityId Controller,
     PlayerId Player,
@@ -265,4 +373,13 @@ public readonly record struct SkirmishOpponentDebugReadModel(
     Vector3 ChosenObjective,
     bool HasChosenObjective,
     SimulationTick LastDecisionTick,
-    int DecisionsTaken);
+    int DecisionsTaken,
+    SkirmishOperationalObjective OperationalObjective =
+        SkirmishOperationalObjective.None,
+    SkirmishGroupObjectiveReadModel GroupObjective = default,
+    SkirmishSupplyRequirement SupplyRequirement =
+        SkirmishSupplyRequirement.None,
+    SkirmishRetreatReason RetreatReason =
+        SkirmishRetreatReason.None,
+    SkirmishOffensiveAdmissionReadModel OffensiveAdmission =
+        default);

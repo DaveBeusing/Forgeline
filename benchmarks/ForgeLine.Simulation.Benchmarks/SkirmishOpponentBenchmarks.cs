@@ -7,6 +7,7 @@ namespace ForgeLine.Simulation.Benchmarks;
 public class SkirmishOpponentBenchmarks
 {
     private VerticalSliceScenario? _scenario;
+    private uint _reactionCadenceTicks;
 
     [Params(false, true)]
     public bool TwoControllers { get; set; }
@@ -23,6 +24,8 @@ public class SkirmishOpponentBenchmarks
         VerticalSliceScenarioSettings settings =
             VerticalSliceScenarioSettings.Create(
                 VerticalSliceScenarioProfile.Validation);
+        _reactionCadenceTicks =
+            settings.WestOpponent.ReactionCadenceTicks;
         VerticalSliceRuntimeSettings runtime =
             VerticalSliceRuntimeSettings.CreateHeadless(
                 settings.Profile,
@@ -52,6 +55,19 @@ public class SkirmishOpponentBenchmarks
                 "Benchmark scenario is not initialized.");
 
         scenario.Simulation.RunTicks(8);
+        return scenario.Opponents.WorkMetrics;
+    }
+
+    [Benchmark]
+    public SkirmishOpponentWorkMetrics DecisionCadenceWindow()
+    {
+        VerticalSliceScenario scenario =
+            _scenario ??
+            throw new InvalidOperationException(
+                "Benchmark scenario is not initialized.");
+
+        scenario.Simulation.RunTicks(
+            _reactionCadenceTicks);
         return scenario.Opponents.WorkMetrics;
     }
 

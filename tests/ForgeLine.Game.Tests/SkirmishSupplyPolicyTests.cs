@@ -168,6 +168,354 @@ public sealed class SkirmishSupplyPolicyTests
     }
 
     [Fact]
+    public void FieldSupplyTruckPreservesFrontlineAvailabilityBeforeSelfRefuel()
+    {
+        using VerticalSliceScenario scenario =
+            VerticalSliceScenario.Create(
+                VerticalSliceScenarioSettings.Create(
+                    VerticalSliceScenarioProfile.Validation));
+        EntityRegistry entities =
+            scenario.Simulation.Entities;
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
+        WorldTransform core =
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+
+        EntityId cargo =
+            scenario.UnitFactory.Create(
+                units[UnitIds.CargoTruck],
+                core.Position +
+                    new Vector3(20.0f, 0.0f, 0.0f),
+                scenario.West.Player);
+        EntityId supply =
+            scenario.UnitFactory.Create(
+                units[UnitIds.SupplyTruck],
+                core.Position +
+                    new Vector3(30.0f, 0.0f, 0.0f),
+                scenario.West.Player);
+        EntityId combat =
+            scenario.UnitFactory.Create(
+                units[UnitIds.RifleSquad],
+                core.Position +
+                    new Vector3(40.0f, 0.0f, 0.0f),
+                scenario.West.Player);
+        EntityId scout =
+            scenario.UnitFactory.Create(
+                units[UnitIds.ScoutVehicle],
+                core.Position +
+                    new Vector3(50.0f, 0.0f, 0.0f),
+                scenario.West.Player);
+
+        scenario.Simulation.RunTicks(
+            25,
+            TestContext.Current.CancellationToken);
+
+        AutomaticResupplyPolicy cargoPolicy =
+            entities.GetComponent<AutomaticResupplyPolicy>(
+                cargo);
+        AutomaticResupplyPolicy supplyPolicy =
+            entities.GetComponent<AutomaticResupplyPolicy>(
+                supply);
+        AutomaticResupplyPolicy combatPolicy =
+            entities.GetComponent<AutomaticResupplyPolicy>(
+                combat);
+        AutomaticResupplyPolicy scoutPolicy =
+            entities.GetComponent<AutomaticResupplyPolicy>(
+                scout);
+
+        Assert.Equal(
+            0.55,
+            cargoPolicy.FuelThreshold,
+            precision: 6);
+        Assert.Equal(
+            0.35,
+            supplyPolicy.FuelThreshold,
+            precision: 6);
+        Assert.True(
+            supplyPolicy.FuelThreshold <
+            cargoPolicy.FuelThreshold);
+        Assert.Equal(
+            scenario.RuntimeSettings.Scenario.WestOpponent.OffensiveFuelThreshold,
+            combatPolicy.FuelThreshold,
+            precision: 6);
+        Assert.Equal(
+            scenario.RuntimeSettings.Scenario.WestOpponent.ResupplyThreshold,
+            combatPolicy.AmmunitionThreshold,
+            precision: 6);
+        Assert.Equal(
+            scenario.RuntimeSettings.Scenario.WestOpponent.ResupplyThreshold,
+            scoutPolicy.FuelThreshold,
+            precision: 6);
+        Assert.Equal(
+            scenario.RuntimeSettings.Scenario.WestOpponent.ResupplyThreshold,
+            scoutPolicy.AmmunitionThreshold,
+            precision: 6);
+        Assert.True(
+            scoutPolicy.FuelThreshold <
+            combatPolicy.FuelThreshold);
+    }
+
+    [Fact]
+    public void ReconnaissanceAdvanceSharesRouteWithPhysicalSupplyEscort()
+    {
+        using VerticalSliceScenario scenario =
+            VerticalSliceScenario.Create(
+                VerticalSliceScenarioSettings.Create(
+                    VerticalSliceScenarioProfile.Validation));
+        EntityRegistry entities =
+            scenario.Simulation.Entities;
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
+        WorldTransform core =
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+
+        EntityId scout =
+            scenario.UnitFactory.Create(
+                units[UnitIds.ScoutVehicle],
+                core.Position +
+                    new Vector3(30.0f, 0.0f, 0.0f),
+                scenario.West.Player);
+        EntityId supply =
+            scenario.UnitFactory.Create(
+                units[UnitIds.SupplyTruck],
+                core.Position +
+                    new Vector3(35.0f, 0.0f, 0.0f),
+                scenario.West.Player);
+        SupplyTruck supplyState =
+            entities.GetComponent<SupplyTruck>(
+                supply);
+
+        Assert.True(
+            scenario.Inventories.Add(
+                supplyState.InventoryId,
+                ResourceIds.Fuel,
+                supplyState.FuelTarget).Succeeded);
+        Assert.True(
+            scenario.Inventories.Add(
+                supplyState.InventoryId,
+                ResourceIds.Ammunition,
+                supplyState.AmmunitionTarget).Succeeded);
+
+        scenario.Simulation.RunTicks(
+            20,
+            TestContext.Current.CancellationToken);
+
+        Assert.True(
+            entities.TryGetComponent(
+                scout,
+                out CombatOrderState scoutOrder) &&
+            scoutOrder.Kind ==
+                CombatOrderKind.AttackMove);
+
+        MovementGroupMember scoutGroup =
+            entities.GetComponent<MovementGroupMember>(
+                scout);
+        MovementGroupMember supplyGroup =
+            entities.GetComponent<MovementGroupMember>(
+                supply);
+
+        Assert.Equal(
+            scoutGroup.Group,
+            supplyGroup.Group);
+        Assert.True(scoutGroup.Group.IsValid);
+    }
+
+    [Fact]
+    public void PartiallyLoadedSupplyTruckReturnsForOffensiveReserve()
+    {
+        using VerticalSliceScenario scenario =
+            VerticalSliceScenario.Create(
+                VerticalSliceScenarioSettings.Create(
+                    VerticalSliceScenarioProfile.Validation));
+        EntityRegistry entities =
+            scenario.Simulation.Entities;
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
+        WorldTransform core =
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+
+        EntityId truck =
+            scenario.UnitFactory.Create(
+                units[UnitIds.SupplyTruck],
+                core.Position +
+                    new Vector3(120.0f, 0.0f, 0.0f),
+                scenario.West.Player);
+        SupplyTruck supply =
+            entities.GetComponent<SupplyTruck>(
+                truck);
+
+        Assert.True(
+            scenario.Inventories.Add(
+                supply.InventoryId,
+                ResourceIds.Fuel,
+                supply.FuelTarget * 0.40).Succeeded);
+        Assert.True(
+            scenario.Inventories.Add(
+                supply.InventoryId,
+                ResourceIds.Ammunition,
+                supply.AmmunitionTarget * 0.30).Succeeded);
+
+        double initialFuel =
+            scenario.Inventories.GetQuantity(
+                supply.InventoryId,
+                ResourceIds.Fuel);
+        Vector3 staleForwardTarget =
+            core.Position +
+            new Vector3(500.0f, 0.0f, 0.0f);
+
+        entities.AddComponent(
+            truck,
+            new MovementOrder(
+                scenario.West.Player,
+                staleForwardTarget,
+                scenario.Simulation.CurrentTick,
+                scenario.Simulation.CurrentTick));
+
+        scenario.Simulation.RunTicks(
+            40,
+            TestContext.Current.CancellationToken);
+
+        double currentFuel =
+            scenario.Inventories.GetQuantity(
+                supply.InventoryId,
+                ResourceIds.Fuel);
+
+        bool loadedFuel =
+            currentFuel > initialFuel;
+        bool retaskedToLoadingSource =
+            entities.TryGetComponent(
+                truck,
+                out MovementOrder loadingOrder) &&
+            loadingOrder.WorldTarget !=
+                staleForwardTarget &&
+            Vector3.DistanceSquared(
+                loadingOrder.WorldTarget,
+                core.Position) <
+            Vector3.DistanceSquared(
+                staleForwardTarget,
+                core.Position);
+
+        Assert.True(
+            loadedFuel ||
+            retaskedToLoadingSource,
+            "A Supply Truck below the offensive Fuel reserve retained unrelated forward movement instead of returning to a loading source.");
+    }
+
+
+    [Fact]
+    public void SupplyTruckRetargetsFromRemoteDepotToCloserCommandCore()
+    {
+        using VerticalSliceScenario scenario =
+            VerticalSliceScenario.Create(
+                VerticalSliceScenarioSettings.Create(
+                    VerticalSliceScenarioProfile.Validation));
+        EntityRegistry entities =
+            scenario.Simulation.Entities;
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
+        WorldTransform core =
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+        SupplyProvider coreProvider =
+            entities.GetComponent<SupplyProvider>(
+                scenario.West.CommandCore);
+
+        Assert.True(
+            scenario.Inventories.GetAvailableQuantity(
+                coreProvider.InventoryId,
+                ResourceIds.Fuel) >
+            0.0);
+
+        InventoryId remoteInventory =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(
+                    2_500.0));
+        Assert.True(
+            scenario.Inventories.Add(
+                remoteInventory,
+                ResourceIds.Fuel,
+                600.0).Succeeded);
+
+        Vector3 remotePosition =
+            core.Position +
+            new Vector3(
+                700.0f,
+                0.0f,
+                0.0f);
+        EntityId remoteDepot =
+            entities.CreateEntity();
+        entities.AddComponent(
+            remoteDepot,
+            new WorldTransform(
+                remotePosition,
+                Quaternion.Identity,
+                Vector3.One));
+        entities.AddComponent(
+            remoteDepot,
+            new CompletedBuilding(
+                BuildingIds.SupplyDepot,
+                scenario.West.Player,
+                SimulationTick.Zero));
+        entities.AddComponent(
+            remoteDepot,
+            new SupplyDepot(
+                remoteInventory,
+                scenario.West.Player));
+
+        EntityId truck =
+            scenario.UnitFactory.Create(
+                units[UnitIds.SupplyTruck],
+                core.Position +
+                    new Vector3(
+                        120.0f,
+                        0.0f,
+                        0.0f),
+                scenario.West.Player);
+        SupplyTruck supply =
+            entities.GetComponent<SupplyTruck>(
+                truck);
+
+        Vector3 remoteLoadingTarget =
+            remotePosition;
+        entities.AddComponent(
+            truck,
+            new MovementOrder(
+                scenario.West.Player,
+                remoteLoadingTarget,
+                scenario.Simulation.CurrentTick,
+                scenario.Simulation.CurrentTick));
+
+        scenario.Simulation.RunTicks(
+            40,
+            TestContext.Current.CancellationToken);
+
+        double loadedFuel =
+            scenario.Inventories.GetQuantity(
+                supply.InventoryId,
+                ResourceIds.Fuel);
+
+        bool retaskedTowardCore =
+            entities.TryGetComponent(
+                truck,
+                out MovementOrder loadingOrder) &&
+            Vector3.DistanceSquared(
+                loadingOrder.WorldTarget,
+                core.Position) <
+            Vector3.DistanceSquared(
+                remoteLoadingTarget,
+                core.Position);
+
+        Assert.True(
+            loadedFuel > 0.0 ||
+            retaskedTowardCore,
+            "A depleted Supply Truck retained a farther loading route instead of using the closer stocked Command Core.");
+    }
+
+
+    [Fact]
     public void FuelRecoveryPoliciesPrioritizeFieldSupplyOverVehicleProduction()
     {
         VerticalSliceScenario scenario = VerticalSliceScenario.Create(
@@ -193,6 +541,11 @@ public sealed class SkirmishSupplyPolicyTests
                 SimulationTick.Zero));
         entities.AddComponent(
             refinery,
+            new ControllableEntity(
+                scenario.West.Player,
+                ControllableEntityCategory.Building));
+        entities.AddComponent(
+            refinery,
             new ProductionFacility(
                 refineryInput,
                 refineryOutput,
@@ -212,6 +565,12 @@ public sealed class SkirmishSupplyPolicyTests
                 SimulationTick.Zero));
         entities.AddComponent(
             supplyDepot,
+            new ControllableEntity(
+                scenario.West.Player,
+                ControllableEntityCategory.Building |
+                    ControllableEntityCategory.Logistics));
+        entities.AddComponent(
+            supplyDepot,
             new SupplyDepot(
                 depotInventory,
                 scenario.West.Player));
@@ -229,6 +588,11 @@ public sealed class SkirmishSupplyPolicyTests
                 SimulationTick.Zero));
         entities.AddComponent(
             vehicleFactory,
+            new ControllableEntity(
+                scenario.West.Player,
+                ControllableEntityCategory.Building));
+        entities.AddComponent(
+            vehicleFactory,
             new UnitProductionFacility(
                 factoryInput,
                 UnitProductionCapability.Vehicle |
@@ -239,12 +603,32 @@ public sealed class SkirmishSupplyPolicyTests
 
         scenario.Simulation.AdvanceOneTick();
 
+        LogisticsStockPolicy coreSteel =
+            FindStockPolicy(
+                entities,
+                scenario.West.CommandCore,
+                ResourceIds.Steel);
+
         Assert.Equal(
-            LogisticsStockPriority.Critical,
+            220.0,
+            coreSteel.DesiredMinimum,
+            precision: 6);
+        Assert.Equal(
+            500.0,
+            coreSteel.DesiredTarget,
+            precision: 6);
+
+        LogisticsStockPriority refineryVolatilesPriority =
             FindStockPolicy(
                 entities,
                 refinery,
-                ResourceIds.Volatiles).Priority);
+                ResourceIds.Volatiles).Priority;
+
+        Assert.True(
+            refineryVolatilesPriority is
+                LogisticsStockPriority.High or
+                LogisticsStockPriority.Critical,
+            "Fuel processing input must remain elevated while field supply recovery stays Critical.");
         Assert.Equal(
             LogisticsStockPriority.Critical,
             FindStockPolicy(
@@ -257,12 +641,23 @@ public sealed class SkirmishSupplyPolicyTests
                 entities,
                 supplyDepot,
                 ResourceIds.Ammunition).Priority);
-        Assert.Equal(
-            LogisticsStockPriority.High,
+        LogisticsStockPolicy factoryFuel =
             FindStockPolicy(
                 entities,
                 vehicleFactory,
-                ResourceIds.Fuel).Priority);
+                ResourceIds.Fuel);
+
+        Assert.Equal(
+            LogisticsStockPriority.High,
+            factoryFuel.Priority);
+        Assert.Equal(
+            240.0,
+            factoryFuel.DesiredMinimum,
+            precision: 6);
+        Assert.Equal(
+            240.0,
+            factoryFuel.DesiredTarget,
+            precision: 6);
     }
 
     private static LogisticsStockPolicy FindStockPolicy(

@@ -254,7 +254,8 @@ public enum PlayerUnitProductionOperation : byte
 {
     Queue = 1,
     Cancel = 2,
-    SetRallyPoint = 3
+    SetRallyPoint = 3,
+    SetPriority = 4
 }
 
 public sealed class PlayerUnitProductionActionCommand : ISimulationCommand
@@ -356,6 +357,21 @@ public sealed class PlayerUnitProductionActionCommand : ISimulationCommand
             rallyPoint,
             submittedAtTick);
 
+    public static PlayerUnitProductionActionCommand SetPriority(
+        PlayerId issuer,
+        EntityId requestEntity,
+        ProductionPriority priority,
+        SimulationTick submittedAtTick) =>
+        new(
+            PlayerUnitProductionOperation.SetPriority,
+            issuer,
+            EntityId.Invalid,
+            UnitId.None,
+            requestEntity,
+            priority,
+            Vector3.Zero,
+            submittedAtTick);
+
     public void Execute(SimulationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
@@ -400,6 +416,19 @@ public sealed class PlayerUnitProductionActionCommand : ISimulationCommand
                         Issuer,
                         Facility,
                         RallyPoint,
+                        SubmittedAtTick);
+                command.Execute(context);
+                Accepted = command.Accepted;
+                break;
+            }
+
+            case PlayerUnitProductionOperation.SetPriority:
+            {
+                var command =
+                    new SetUnitProductionRequestPriorityCommand(
+                        Issuer,
+                        RequestEntity,
+                        Priority,
                         SubmittedAtTick);
                 command.Execute(context);
                 Accepted = command.Accepted;
