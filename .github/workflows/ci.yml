@@ -72,8 +72,42 @@ jobs:
       - name: Test
         run: dotnet test --solution ForgeLine.sln --configuration Release --no-build
 
+      - name: Publish reproducible pre-alpha package
+        shell: pwsh
+        run: ./build/Publish-PreAlpha.ps1 -Configuration Release -VerifyReproducible
+
+      - name: Packaged client fresh-install smoke
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $settingsRoot = Join-Path $env:LOCALAPPDATA "FORGELINE"
+          if (Test-Path $settingsRoot) {
+            Remove-Item $settingsRoot -Recurse -Force
+          }
+
+          Push-Location artifacts/prealpha/win-x64/publish
+          try {
+            ./ForgeLine.Client.exe --smoke-test --render-stress 1000
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+          finally {
+            Pop-Location
+          }
+
+          if (-not (Test-Path (Join-Path $settingsRoot "settings.json"))) {
+            throw "Fresh-install smoke did not create validated user settings."
+          }
+
       - name: Two-opponent full-match validation
         run: dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --matches 1 --require-terminal --diagnostics-output artifacts/opponent-full-match.json --telemetry-output artifacts/opponent-balance-telemetry.json
+
+      - name: Upload pre-alpha package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-alpha-package
+          path: artifacts/prealpha/FORGELINE-prealpha-win-x64.zip
+          if-no-files-found: warn
 
       - name: Upload engine diagnostic artifacts
         if: always()
