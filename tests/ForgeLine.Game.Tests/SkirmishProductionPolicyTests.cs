@@ -1276,4 +1276,189 @@ public sealed class SkirmishProductionPolicyTests
                 request.UnitId ==
                     UnitIds.MainBattleTank);
     }
+
+    [Fact]
+    public void RoutineVehicleProductionPreservesCargoReplacementReserve()
+    {
+        VerticalSliceScenarioSettings validation =
+            VerticalSliceScenarioSettings.Create(
+                VerticalSliceScenarioProfile.Validation);
+        VerticalSliceScenario scenario =
+            VerticalSliceScenario.Create(
+                validation);
+        EntityRegistry entities =
+            scenario.Simulation.Entities;
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
+        Vector3 stagingPosition =
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore).Position;
+
+        var counts =
+            new Dictionary<UnitId, int>();
+        foreach (EntityId entity in
+                 entities.Query<ControllableEntity, UnitIdentity>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            if (entities.GetComponent<ControllableEntity>(
+                    entity).Owner !=
+                scenario.West.Player)
+            {
+                continue;
+            }
+
+            UnitId unitId =
+                entities.GetComponent<UnitIdentity>(
+                    entity).UnitId;
+            counts.TryGetValue(
+                unitId,
+                out int count);
+            counts[unitId] =
+                count + 1;
+        }
+
+        void EnsureCount(
+            UnitId unitId,
+            int target)
+        {
+            counts.TryGetValue(
+                unitId,
+                out int current);
+
+            while (current < target)
+            {
+                scenario.UnitFactory.Create(
+                    units[unitId],
+                    stagingPosition,
+                    scenario.West.Player);
+                current++;
+            }
+
+            counts[unitId] =
+                current;
+        }
+
+        EnsureCount(
+            UnitIds.CargoTruck,
+            4);
+        EnsureCount(
+            UnitIds.SupplyTruck,
+            3);
+        EnsureCount(
+            UnitIds.ScoutVehicle,
+            1);
+        EnsureCount(
+            UnitIds.MainBattleTank,
+            4);
+        EnsureCount(
+            UnitIds.MobileArtillery,
+            2);
+
+        InventoryId input =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(
+                    4_000.0));
+        EntityId factory =
+            entities.CreateEntity();
+        entities.AddComponent(
+            factory,
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore));
+        entities.AddComponent(
+            factory,
+            new CompletedBuilding(
+                BuildingIds.VehicleFactory,
+                scenario.West.Player,
+                SimulationTick.Zero));
+        entities.AddComponent(
+            factory,
+            new ControllableEntity(
+                scenario.West.Player,
+                ControllableEntityCategory.Building));
+        entities.AddComponent(
+            factory,
+            new UnitProductionFacility(
+                input,
+                UnitProductionCapability.Vehicle |
+                UnitProductionCapability.Logistics,
+                scenario.West.Player,
+                Vector3.Zero,
+                SimulationTick.Zero));
+
+        var isolatedNetwork =
+            new PowerNetworkId(10_004);
+        entities.AddComponent(
+            factory,
+            new PowerNetworkMembership(
+                isolatedNetwork));
+        entities.AddComponent(
+            factory,
+            new PowerGenerator(
+                10.0));
+        entities.AddComponent(
+            factory,
+            new PowerConsumer(
+                1.0,
+                PowerPriority.Industrial,
+                enabled: true));
+
+        UnitDefinition scout =
+            units[UnitIds.ScoutVehicle];
+        UnitDefinition cargo =
+            units[UnitIds.CargoTruck];
+
+        foreach (UnitResourceCost cost in
+                 scout.Costs)
+        {
+            Assert.True(
+                scenario.Inventories.Add(
+                    input,
+                    cost.ResourceId,
+                    cost.Quantity).Succeeded);
+        }
+
+        scenario.Simulation.RunTicks(
+            2,
+            TestContext.Current.CancellationToken);
+
+        Assert.DoesNotContain(
+            entities.Query<UnitProductionRequest>(
+                QueryIterationOrder.StableByEntityIndex),
+            requestEntity =>
+                entities.GetComponent<UnitProductionRequest>(
+                    requestEntity).Facility ==
+                factory);
+
+        foreach (UnitResourceCost cost in
+                 cargo.Costs)
+        {
+            Assert.True(
+                scenario.Inventories.Add(
+                    input,
+                    cost.ResourceId,
+                    cost.Quantity).Succeeded);
+        }
+
+        scenario.Simulation.RunTicks(
+            2,
+            TestContext.Current.CancellationToken);
+
+        Assert.Contains(
+            entities.Query<UnitProductionRequest>(
+                QueryIterationOrder.StableByEntityIndex),
+            requestEntity =>
+            {
+                UnitProductionRequest request =
+                    entities.GetComponent<UnitProductionRequest>(
+                        requestEntity);
+
+                return request.Facility ==
+                        factory &&
+                    request.UnitId ==
+                        UnitIds.ScoutVehicle &&
+                    request.Priority ==
+                        ProductionPriority.Normal;
+            });
+    }
+
 }
