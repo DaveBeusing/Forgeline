@@ -137,6 +137,25 @@ The telemetry report records each match seed, stable gameplay metric series, pro
 
 See [Gameplay Telemetry and Match Analysis](GameplayTelemetry.md) for the schema, ownership rules, metric catalog, aggregation, and baseline-comparison semantics.
 
+### Save and Replay Recovery Validation
+
+Persistence validation is a separate correctness path from engine timing diagnostics and gameplay telemetry. It reconstructs a fresh authoritative runtime and compares saved/replayed RNG and state rather than accepting a partially restored object graph.
+
+A bounded run can emit both recovery documents:
+
+```powershell
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario vertical-slice --profile validation --ticks 256 --seed 4242 --save-output artifacts/recovery.save.json --replay-output artifacts/recovery.replay.json
+```
+
+The same headless executable validates each document independently:
+
+```powershell
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --load-input artifacts/recovery.save.json
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --replay-input artifacts/recovery.replay.json
+```
+
+CI executes this bounded round trip in addition to the normal build/tests and natural terminal-match gate. A persistence failure reports a stable reason such as corruption, version incompatibility, incomplete command history, RNG divergence, or authoritative-state divergence. See [Save, Load, Replay, and Recovery](SaveLoadReplayAndRecovery.md).
+
 `gameplay` and `validation` are intentionally different profiles. Gameplay uses normal starting stock, default opponent settings, and the interactive client's navigation resolution. Validation uses explicit accelerated resources/opponent pacing and coarser navigation for bounded deterministic coverage. Validation values must not silently become gameplay defaults.
 
 ### Bounded Skirmish Progression Reports
