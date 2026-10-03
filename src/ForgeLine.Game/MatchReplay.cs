@@ -162,7 +162,7 @@ public sealed class MatchReplayRecorder : IDisposable
                     out RecordedSimulationCommand? command))
             {
                 _commands.Add(
-                    command with
+                    command! with
                     {
                         RecordingOrder =
                             _nextRecordingOrder++,
@@ -201,7 +201,7 @@ public sealed class MatchReplayRecorder : IDisposable
                     out RecordedSimulationCommand? recorded))
             {
                 _commands.Add(
-                    recorded with
+                    recorded! with
                     {
                         RecordingOrder =
                             _nextRecordingOrder++,
@@ -226,7 +226,7 @@ public sealed class MatchReplayRecorder : IDisposable
 public static class ReplayCommandCodec
 {
     public static bool TryEncode(
-        in SimulationCommandEnvelope envelope,
+        SimulationCommandEnvelope envelope,
         out RecordedSimulationCommand? recorded)
     {
         RecordedSimulationCommand Base(
