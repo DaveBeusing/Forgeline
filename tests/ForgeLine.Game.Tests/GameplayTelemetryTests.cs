@@ -121,8 +121,17 @@ public sealed class GameplayTelemetryTests
             first.Milestones.ToArray(),
             second.Milestones.ToArray());
         Assert.Equal(
-            first.Debug,
-            second.Debug);
+            first.Debug.Supply,
+            second.Debug.Supply);
+        Assert.Equal(
+            first.Debug.Production,
+            second.Debug.Production);
+        Assert.Equal(
+            first.Debug.Fronts.ToArray(),
+            second.Debug.Fronts.ToArray());
+        Assert.Equal(
+            first.Debug.Objectives.ToArray(),
+            second.Debug.Objectives.ToArray());
     }
 
     [Fact]
