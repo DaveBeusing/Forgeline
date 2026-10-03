@@ -2900,8 +2900,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 }
             }
 
-            if (!float.IsFinite(bestDistance) &&
-                context.Entities.IsAlive(controller.PreferredConstructionSource) &&
+            if (context.Entities.IsAlive(
+                    controller.PreferredConstructionSource) &&
                 context.Entities.TryGetComponent(
                     controller.PreferredConstructionSource,
                     out SupplyProvider commandCoreProvider) &&
@@ -2919,16 +2919,28 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                       commandCoreProvider.InventoryId,
                       ResourceIds.Ammunition) > 0.0)))
             {
-                loadingSource =
-                    controller.PreferredConstructionSource;
-                destination =
-                    commandCoreTransform.Position;
-                bestDistance =
+                float commandCoreDistance =
                     HorizontalDistanceToSupplyLoadingSourceSquared(
                         context,
-                        loadingSource,
-                        destination,
+                        controller.PreferredConstructionSource,
+                        commandCoreTransform.Position,
                         transform.Position);
+
+                if (!loadingSource.IsValid ||
+                    commandCoreDistance <
+                        bestDistance ||
+                    (commandCoreDistance ==
+                        bestDistance &&
+                     controller.PreferredConstructionSource <
+                        loadingSource))
+                {
+                    loadingSource =
+                        controller.PreferredConstructionSource;
+                    destination =
+                        commandCoreTransform.Position;
+                    bestDistance =
+                        commandCoreDistance;
+                }
             }
 
             if (!float.IsFinite(bestDistance))
@@ -2952,8 +2964,21 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
-            if (hasMovement &&
-                loadingMovement)
+            bool movingToSelectedLoadingSource =
+                hasMovement &&
+                TacticalCommandUtilities.TryGetMovementIntent(
+                    context,
+                    entity,
+                    out MovementOrder loadingIntent) &&
+                HorizontalDistanceToSupplyLoadingSourceSquared(
+                    context,
+                    loadingSource,
+                    destination,
+                    loadingIntent.WorldTarget) <=
+                truck.LoadRangeMeters *
+                truck.LoadRangeMeters;
+
+            if (movingToSelectedLoadingSource)
             {
                 continue;
             }
