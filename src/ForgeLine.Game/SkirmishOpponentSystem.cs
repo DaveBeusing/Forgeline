@@ -3584,6 +3584,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             plannedUnit,
             resource,
             ref minimum);
+        ApplyLogisticsReplacementReserve(
+            facility,
+            plannedUnit,
+            resource,
+            ref minimum);
 
         target = Math.Max(target, minimum);
         maximum = Math.Max(maximum, target);
@@ -3654,6 +3659,130 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 return;
             }
         }
+    }
+
+    private void ApplyLogisticsReplacementReserve(
+        in UnitProductionFacility facility,
+        UnitId plannedUnit,
+        ResourceId resource,
+        ref double minimum)
+    {
+        if (!facility.Supports(
+                UnitProductionCapability.Logistics) ||
+            facility.ActiveUnit ==
+                UnitIds.CargoTruck ||
+            plannedUnit ==
+                UnitIds.CargoTruck ||
+            !_units.TryGet(
+                UnitIds.CargoTruck,
+                out UnitDefinition? cargoTruck))
+        {
+            return;
+        }
+
+        for (int index = 0;
+             index < cargoTruck.Costs.Count;
+             index++)
+        {
+            UnitResourceCost cost =
+                cargoTruck.Costs[index];
+
+            if (cost.ResourceId ==
+                resource)
+            {
+                minimum += cost.Quantity;
+                return;
+            }
+        }
+    }
+
+    private bool HasLogisticsReplacementReserve(
+        in UnitProductionFacility facility,
+        UnitId candidate)
+    {
+        if (!facility.Supports(
+                UnitProductionCapability.Logistics) ||
+            candidate ==
+                UnitIds.CargoTruck ||
+            !_units.TryGet(
+                candidate,
+                out UnitDefinition? candidateDefinition) ||
+            !_units.TryGet(
+                UnitIds.CargoTruck,
+                out UnitDefinition? cargoTruck))
+        {
+            return true;
+        }
+
+        for (int index = 0;
+             index < candidateDefinition.Costs.Count;
+             index++)
+        {
+            UnitResourceCost candidateCost =
+                candidateDefinition.Costs[index];
+            double required =
+                candidateCost.Quantity;
+
+            for (int cargoIndex = 0;
+                 cargoIndex < cargoTruck.Costs.Count;
+                 cargoIndex++)
+            {
+                UnitResourceCost cargoCost =
+                    cargoTruck.Costs[cargoIndex];
+
+                if (cargoCost.ResourceId ==
+                    candidateCost.ResourceId)
+                {
+                    required +=
+                        cargoCost.Quantity;
+                    break;
+                }
+            }
+
+            if (_inventories.GetAvailableQuantity(
+                    facility.InputInventory,
+                    candidateCost.ResourceId) +
+                1e-9 <
+                required)
+            {
+                return false;
+            }
+        }
+
+        for (int cargoIndex = 0;
+             cargoIndex < cargoTruck.Costs.Count;
+             cargoIndex++)
+        {
+            UnitResourceCost cargoCost =
+                cargoTruck.Costs[cargoIndex];
+            bool candidateUsesResource =
+                false;
+
+            for (int index = 0;
+                 index < candidateDefinition.Costs.Count;
+                 index++)
+            {
+                if (candidateDefinition.Costs[index].ResourceId ==
+                    cargoCost.ResourceId)
+                {
+                    candidateUsesResource =
+                        true;
+                    break;
+                }
+            }
+
+            if (!candidateUsesResource &&
+                _inventories.GetAvailableQuantity(
+                    facility.InputInventory,
+                    cargoCost.ResourceId) +
+                1e-9 <
+                cargoCost.Quantity)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static void SetStockPolicy(
@@ -3881,6 +4010,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     configuration);
 
             if (!candidate.IsSpecified)
+            {
+                continue;
+            }
+
+            if (!HasLogisticsReplacementReserve(
+                    facility,
+                    candidate))
             {
                 continue;
             }
