@@ -1022,21 +1022,32 @@ public sealed class SkirmishProductionPolicyTests
             UnitProductionStatus.NoInput,
             recovered.Status);
 
-        Assert.Contains(
-            entities.Query<UnitProductionRequest>(
-                QueryIterationOrder.StableByEntityIndex),
-            requestEntity =>
+        bool queuedMatureSupplyRecovery =
+            false;
+
+        foreach (EntityId requestEntity in
+                 entities.Query<UnitProductionRequest>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            UnitProductionRequest request =
+                entities.GetComponent<UnitProductionRequest>(
+                    requestEntity);
+
+            if (request.Facility ==
+                    factory &&
+                request.UnitId ==
+                    UnitIds.SupplyTruck &&
+                request.Priority ==
+                    ProductionPriority.High)
             {
-                UnitProductionRequest request =
-                    entities.GetComponent<UnitProductionRequest>(
-                        requestEntity);
-                return request.Facility ==
-                        factory &&
-                    request.UnitId ==
-                        UnitIds.SupplyTruck &&
-                    request.Priority ==
-                        ProductionPriority.High;
-            });
+                queuedMatureSupplyRecovery =
+                    true;
+                break;
+            }
+        }
+
+        Assert.True(
+            queuedMatureSupplyRecovery);
     }
 
 
