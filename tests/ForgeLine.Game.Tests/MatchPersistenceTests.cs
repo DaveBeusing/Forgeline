@@ -23,7 +23,9 @@ public sealed class MatchPersistenceTests
                         .GetComponentCount<ProductionRequest>() > 0 ||
                     scenario.Simulation.Entities
                         .GetComponentCount<CargoTransportOrder>() > 0,
-                maximumTicks: 5_000);
+                maximumTicks: 5_000,
+                cancellationToken:
+                    TestContext.Current.CancellationToken);
 
         Assert.True(
             reachedActiveState);
@@ -65,9 +67,11 @@ public sealed class MatchPersistenceTests
                 actual).Compatible);
 
         original.Simulation.RunTicks(
-            250);
+            250,
+            TestContext.Current.CancellationToken);
         restored.Simulation.RunTicks(
-            250);
+            250,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(
             VerticalSliceAuthoritativeSnapshot
@@ -113,7 +117,8 @@ public sealed class MatchPersistenceTests
             submitted.Sequence);
 
         original.Simulation.RunTicks(
-            100);
+            100,
+            TestContext.Current.CancellationToken);
 
         MatchSaveData save =
             MatchPersistenceService.CaptureSave(
@@ -134,9 +139,11 @@ public sealed class MatchPersistenceTests
             restored.Simulation.PendingCommandCount);
 
         original.Simulation.RunTicks(
-            150);
+            150,
+            TestContext.Current.CancellationToken);
         restored.Simulation.RunTicks(
-            150);
+            150,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(
             VerticalSliceAuthoritativeSnapshot
@@ -173,7 +180,8 @@ public sealed class MatchPersistenceTests
                 original.West.Player.Value));
 
         original.Simulation.RunTicks(
-            600);
+            600,
+            TestContext.Current.CancellationToken);
 
         MatchReplayData replay =
             MatchPersistenceService.CaptureReplay(
@@ -216,7 +224,8 @@ public sealed class MatchPersistenceTests
                 seed: 123);
 
         scenario.Simulation.RunTicks(
-            40);
+            40,
+            TestContext.Current.CancellationToken);
 
         string document =
             MatchPersistenceSerializer.SerializeSave(
@@ -281,7 +290,8 @@ public sealed class MatchPersistenceTests
                 seed: 125);
 
         scenario.Simulation.RunTicks(
-            160);
+            160,
+            TestContext.Current.CancellationToken);
 
         MatchSaveData save =
             MatchPersistenceService.CaptureSave(
@@ -314,7 +324,8 @@ public sealed class MatchPersistenceTests
                 seed: 126);
 
         scenario.Simulation.RunTicks(
-            180);
+            180,
+            TestContext.Current.CancellationToken);
 
         MatchReplayData replay =
             MatchPersistenceService.CaptureReplay(
@@ -347,7 +358,8 @@ public sealed class MatchPersistenceTests
                 westComputerControlled: false);
 
         scenario.Simulation.RunTicks(
-            20);
+            20,
+            TestContext.Current.CancellationToken);
 
         scenario.Simulation.ExecuteControlCommand(
             new SetMatchPausedCommand(
@@ -419,7 +431,8 @@ public sealed class MatchPersistenceTests
                  cycle++)
             {
                 current.Simulation.RunTicks(
-                    300);
+            300,
+            TestContext.Current.CancellationToken);
 
                 InventoryStoreSnapshot before =
                     current.Inventories.CaptureSnapshot();
@@ -501,7 +514,8 @@ public sealed class MatchPersistenceTests
             };
 
         return VerticalSliceScenario.Create(
-            runtime);
+            runtime,
+            TestContext.Current.CancellationToken);
     }
     private sealed class UnsupportedRecoveryCommand : ISimulationCommand
     {
