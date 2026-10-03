@@ -97,31 +97,41 @@ public sealed class ResupplyPlanningDiagnosticsTests
                     0.0f,
                     1.0f));
 
-        Assert.True(
-            BattlefieldResupplyPlanner.TryIssueNearestProviderOrder(
-                fixture.Simulation.Context,
-                fixture.Inventories,
-                first,
+        var firstCommand =
+            new ResupplyCommand(
                 Owner,
-                SimulationTick.Zero,
-                BattlefieldSupplyResource.Fuel,
-                out EntityId firstProvider));
+                [first],
+                SimulationTick.Zero);
+        fixture.Simulation.SubmitCommand(
+            firstCommand,
+            new SimulationTick(1),
+            new SimulationCommandSource(
+                Owner.Value));
+        fixture.Simulation.AdvanceOneTick();
+
         Assert.Equal(
             nearest,
-            firstProvider);
+            fixture.Simulation.Entities
+                .GetComponent<ResupplyOrder>(
+                    first).Provider);
 
-        Assert.True(
-            BattlefieldResupplyPlanner.TryIssueNearestProviderOrder(
-                fixture.Simulation.Context,
-                fixture.Inventories,
-                second,
+        var secondCommand =
+            new ResupplyCommand(
                 Owner,
-                SimulationTick.Zero,
-                BattlefieldSupplyResource.Fuel,
-                out EntityId secondProvider));
+                [second],
+                fixture.Simulation.CurrentTick);
+        fixture.Simulation.SubmitCommand(
+            secondCommand,
+            new SimulationTick(2),
+            new SimulationCommandSource(
+                Owner.Value));
+        fixture.Simulation.AdvanceOneTick();
+
         Assert.Equal(
             alternate,
-            secondProvider);
+            fixture.Simulation.Entities
+                .GetComponent<ResupplyOrder>(
+                    second).Provider);
 
         ResupplyPlanningResult result =
             fixture.Result(
@@ -273,6 +283,12 @@ public sealed class ResupplyPlanningDiagnosticsTests
                     inventory,
                     20.0,
                     0.1));
+            Simulation.Entities.AddComponent(
+                entity,
+                GroundMovement.CreateDefault());
+            Simulation.Entities.AddComponent(
+                entity,
+                GroundMovementState.Stationary());
             Simulation.Entities.AddComponent(
                 entity,
                 new SupplyMovementConstraint(
