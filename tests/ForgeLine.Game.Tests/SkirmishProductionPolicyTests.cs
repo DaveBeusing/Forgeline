@@ -784,7 +784,8 @@ public sealed class SkirmishProductionPolicyTests
 
         int depotCount = 0;
         int cargoCount = 0;
-        int supplyCount = 0;
+        var supplyTrucks =
+            new List<EntityId>();
         int scoutCount = 0;
         int tankCount = 0;
         int artilleryCount = 0;
@@ -859,7 +860,7 @@ public sealed class SkirmishProductionPolicyTests
             }
             else if (unitId == UnitIds.SupplyTruck)
             {
-                supplyCount++;
+                supplyTrucks.Add(entity);
             }
             else if (unitId == UnitIds.ScoutVehicle)
             {
@@ -894,14 +895,14 @@ public sealed class SkirmishProductionPolicyTests
         int matureSupplyTarget =
             validation.WestOpponent.ResolveMatureSupplyTruckTarget(
                 depotCount);
-        while (supplyCount <
-               matureSupplyTarget - 1)
+        while (supplyTrucks.Count <
+               matureSupplyTarget)
         {
-            scenario.UnitFactory.Create(
-                units[UnitIds.SupplyTruck],
-                stagingPosition,
-                scenario.West.Player);
-            supplyCount++;
+            supplyTrucks.Add(
+                scenario.UnitFactory.Create(
+                    units[UnitIds.SupplyTruck],
+                    stagingPosition,
+                    scenario.West.Player));
         }
 
         while (scoutCount < 1)
@@ -1002,6 +1003,10 @@ public sealed class SkirmishProductionPolicyTests
         Assert.Equal(
             UnitProductionStatus.NoInput,
             blocked.Status);
+
+        Assert.True(
+            entities.DestroyEntity(
+                supplyTrucks[^1]));
 
         scenario.Simulation.RunTicks(
             2,
