@@ -42,6 +42,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         CreateDefaultConfiguration();
 
     private const int MaximumRetainedScratchCapacity = 4_096;
+    private const double OffensiveFuelContinuationMargin = 0.15;
 
     private readonly IReadOnlyDictionary<PlayerId, SkirmishOpponentConfiguration>
         _configurations;
@@ -1228,22 +1229,16 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     unit,
                     out UnitId unitId) &&
                 unitId == UnitIds.ScoutVehicle;
-            bool offensiveOrder =
-                context.Entities.TryGetComponent(
-                    unit,
-                    out CombatOrderState order) &&
-                order.Kind is
-                    CombatOrderKind.Attack or
-                    CombatOrderKind.AttackMove;
             bool offensiveForceEstablished =
                 force.CombatUnits >=
                     configuration.MinimumAttackUnits;
             double fuelThreshold =
-                !reconnaissanceUnit &&
-                (offensiveOrder ||
-                 offensiveForceEstablished)
-                    ? configuration.OffensiveFuelThreshold
-                    : configuration.ResupplyThreshold;
+                ResolveForceRecoveryFuelThreshold(
+                    context,
+                    unit,
+                    reconnaissanceUnit,
+                    offensiveForceEstablished,
+                    configuration);
 
             if (readiness.OverallReadiness >=
                     configuration.RetreatThreshold &&
@@ -1617,7 +1612,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                             readiness.OverallReadiness >=
                                 configuration.OffensiveReadinessThreshold &&
                             readiness.Fuel >=
-                                configuration.OffensiveFuelThreshold &&
+                                ResolveAttackFuelThreshold(
+                                    context,
+                                    unit,
+                                    configuration) &&
                             readiness.Ammunition >=
                                 configuration.ResupplyThreshold;
                     })
@@ -5571,7 +5569,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     readiness.OverallReadiness >=
                         configuration.OffensiveReadinessThreshold &&
                     readiness.Fuel >=
-                        configuration.OffensiveFuelThreshold &&
+                        ResolveAttackFuelThreshold(
+                            context,
+                            unit,
+                            configuration) &&
                     readiness.Ammunition >=
                         configuration.ResupplyThreshold;
             }
@@ -5616,6 +5617,60 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             eligibleAttackers,
             objectivePressureUnits,
             supplyReady);
+    }
+
+    private static double ResolveAttackFuelThreshold(
+        SimulationContext context,
+        EntityId unit,
+        SkirmishOpponentConfiguration configuration)
+    {
+        bool continuingOffensiveOrder =
+            context.Entities.TryGetComponent(
+                unit,
+                out CombatOrderState order) &&
+            order.Kind is
+                CombatOrderKind.Attack or
+                CombatOrderKind.AttackMove;
+
+        if (!continuingOffensiveOrder)
+        {
+            return configuration.OffensiveFuelThreshold;
+        }
+
+        return Math.Max(
+            configuration.ResupplyThreshold,
+            configuration.OffensiveFuelThreshold -
+                OffensiveFuelContinuationMargin);
+    }
+
+    private static double ResolveForceRecoveryFuelThreshold(
+        SimulationContext context,
+        EntityId unit,
+        bool reconnaissanceUnit,
+        bool offensiveForceEstablished,
+        SkirmishOpponentConfiguration configuration)
+    {
+        if (reconnaissanceUnit)
+        {
+            return configuration.ResupplyThreshold;
+        }
+
+        if (context.Entities.TryGetComponent(
+                unit,
+                out CombatOrderState order) &&
+            order.Kind is
+                CombatOrderKind.Attack or
+                CombatOrderKind.AttackMove)
+        {
+            return ResolveAttackFuelThreshold(
+                context,
+                unit,
+                configuration);
+        }
+
+        return offensiveForceEstablished
+            ? configuration.OffensiveFuelThreshold
+            : configuration.ResupplyThreshold;
     }
 
     private static SkirmishRetreatReason ResolveRetreatReason(
