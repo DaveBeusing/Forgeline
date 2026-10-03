@@ -764,6 +764,277 @@ public sealed class SkirmishProductionPolicyTests
             steelPolicy.Priority);
     }
 
+
+    [Fact]
+    public void MatureSupplyRecoveryPreemptsBlockedOptionalVehicleProduction()
+    {
+        VerticalSliceScenarioSettings validation =
+            VerticalSliceScenarioSettings.Create(
+                VerticalSliceScenarioProfile.Validation);
+        using VerticalSliceScenario scenario =
+            VerticalSliceScenario.Create(
+                validation);
+        EntityRegistry entities =
+            scenario.Simulation.Entities;
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
+        Vector3 stagingPosition =
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore).Position;
+
+        int depotCount = 0;
+        int cargoCount = 0;
+        int supplyCount = 0;
+        int scoutCount = 0;
+        int tankCount = 0;
+        int artilleryCount = 0;
+
+        foreach (EntityId entity in
+                 entities.Query<CompletedBuilding>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            CompletedBuilding building =
+                entities.GetComponent<CompletedBuilding>(
+                    entity);
+
+            if (building.Owner ==
+                    scenario.West.Player &&
+                building.BuildingId ==
+                    BuildingIds.SupplyDepot)
+            {
+                depotCount++;
+            }
+        }
+
+        while (depotCount < 3)
+        {
+            InventoryId depotInventory =
+                scenario.Inventories.CreateInventory(
+                    new InventorySpecification(
+                        2_500.0));
+            EntityId depot =
+                entities.CreateEntity();
+            entities.AddComponent(
+                depot,
+                new WorldTransform(
+                    stagingPosition +
+                        new Vector3(
+                            40.0f * depotCount,
+                            0.0f,
+                            80.0f),
+                    Quaternion.Identity,
+                    Vector3.One));
+            entities.AddComponent(
+                depot,
+                new CompletedBuilding(
+                    BuildingIds.SupplyDepot,
+                    scenario.West.Player,
+                    SimulationTick.Zero));
+            entities.AddComponent(
+                depot,
+                new SupplyDepot(
+                    depotInventory,
+                    scenario.West.Player));
+            depotCount++;
+        }
+
+        foreach (EntityId entity in
+                 entities.Query<ControllableEntity, UnitIdentity>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            if (entities.GetComponent<ControllableEntity>(
+                    entity).Owner !=
+                scenario.West.Player)
+            {
+                continue;
+            }
+
+            UnitId unitId =
+                entities.GetComponent<UnitIdentity>(
+                    entity).UnitId;
+
+            if (unitId == UnitIds.CargoTruck)
+            {
+                cargoCount++;
+            }
+            else if (unitId == UnitIds.SupplyTruck)
+            {
+                supplyCount++;
+            }
+            else if (unitId == UnitIds.ScoutVehicle)
+            {
+                scoutCount++;
+            }
+            else if (unitId == UnitIds.MainBattleTank)
+            {
+                tankCount++;
+            }
+            else if (unitId == UnitIds.MobileArtillery)
+            {
+                artilleryCount++;
+            }
+        }
+
+        int cargoTarget =
+            Math.Max(
+                validation.WestOpponent.MinimumCargoTrucks,
+                Math.Clamp(
+                    depotCount,
+                    2,
+                    4));
+        while (cargoCount < cargoTarget)
+        {
+            scenario.UnitFactory.Create(
+                units[UnitIds.CargoTruck],
+                stagingPosition,
+                scenario.West.Player);
+            cargoCount++;
+        }
+
+        int matureSupplyTarget =
+            validation.WestOpponent.ResolveMatureSupplyTruckTarget(
+                depotCount);
+        while (supplyCount <
+               matureSupplyTarget - 1)
+        {
+            scenario.UnitFactory.Create(
+                units[UnitIds.SupplyTruck],
+                stagingPosition,
+                scenario.West.Player);
+            supplyCount++;
+        }
+
+        while (scoutCount < 1)
+        {
+            scenario.UnitFactory.Create(
+                units[UnitIds.ScoutVehicle],
+                stagingPosition,
+                scenario.West.Player);
+            scoutCount++;
+        }
+
+        while (tankCount <
+               validation.WestOpponent.MinimumObjectivePressureUnits)
+        {
+            scenario.UnitFactory.Create(
+                units[UnitIds.MainBattleTank],
+                stagingPosition,
+                scenario.West.Player);
+            tankCount++;
+        }
+
+        while (artilleryCount < 1)
+        {
+            scenario.UnitFactory.Create(
+                units[UnitIds.MobileArtillery],
+                stagingPosition,
+                scenario.West.Player);
+            artilleryCount++;
+        }
+
+        InventoryId input =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(
+                    4_000.0));
+        EntityId factory =
+            entities.CreateEntity();
+        entities.AddComponent(
+            factory,
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore));
+        entities.AddComponent(
+            factory,
+            new CompletedBuilding(
+                BuildingIds.VehicleFactory,
+                scenario.West.Player,
+                SimulationTick.Zero));
+        entities.AddComponent(
+            factory,
+            new ControllableEntity(
+                scenario.West.Player,
+                ControllableEntityCategory.Building));
+        entities.AddComponent(
+            factory,
+            new UnitProductionFacility(
+                input,
+                UnitProductionCapability.Vehicle |
+                UnitProductionCapability.Logistics,
+                scenario.West.Player,
+                Vector3.Zero,
+                SimulationTick.Zero));
+        var isolatedNetwork =
+            new PowerNetworkId(10_003);
+        entities.AddComponent(
+            factory,
+            new PowerNetworkMembership(
+                isolatedNetwork));
+        entities.AddComponent(
+            factory,
+            new PowerGenerator(
+                10.0));
+        entities.AddComponent(
+            factory,
+            new PowerConsumer(
+                1.0,
+                PowerPriority.Industrial,
+                enabled: true));
+
+        var optionalArtillery =
+            new QueueUnitProductionCommand(
+                scenario.West.Player,
+                factory,
+                UnitIds.MobileArtillery,
+                SimulationTick.Zero);
+        scenario.Simulation.SubmitCommand(
+            optionalArtillery,
+            SimulationTick.Zero.Next());
+
+        scenario.Simulation.RunTicks(
+            3,
+            TestContext.Current.CancellationToken);
+
+        UnitProductionFacility blocked =
+            entities.GetComponent<UnitProductionFacility>(
+                factory);
+        Assert.Equal(
+            UnitIds.MobileArtillery,
+            blocked.ActiveUnit);
+        Assert.Equal(
+            UnitProductionStatus.NoInput,
+            blocked.Status);
+
+        scenario.Simulation.RunTicks(
+            2,
+            TestContext.Current.CancellationToken);
+
+        UnitProductionFacility recovered =
+            entities.GetComponent<UnitProductionFacility>(
+                factory);
+        Assert.Equal(
+            UnitIds.SupplyTruck,
+            recovered.ActiveUnit);
+        Assert.Equal(
+            UnitProductionStatus.NoInput,
+            recovered.Status);
+
+        Assert.Contains(
+            entities.Query<UnitProductionRequest>(
+                QueryIterationOrder.StableByEntityIndex),
+            requestEntity =>
+            {
+                UnitProductionRequest request =
+                    entities.GetComponent<UnitProductionRequest>(
+                        requestEntity);
+                return request.Facility ==
+                        factory &&
+                    request.UnitId ==
+                        UnitIds.SupplyTruck &&
+                    request.Priority ==
+                        ProductionPriority.High;
+            });
+    }
+
+
     [Fact]
     public void MissingCargoTruckPreemptsBlockedCombatProduction()
     {
