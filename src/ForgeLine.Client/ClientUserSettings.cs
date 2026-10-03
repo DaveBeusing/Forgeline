@@ -125,10 +125,10 @@ internal sealed record ClientUserSettings
                 "Camera bindings cannot use the Unknown key.");
         }
 
-        if (bindings.DragPanButton == PlatformMouseButton.Unknown)
+        if (bindings.DragPanButton == PlatformMouseButton.None)
         {
             throw new InvalidDataException(
-                "DragPanButton cannot use the Unknown mouse button.");
+                "DragPanButton cannot use the None mouse button.");
         }
 
         PlatformKey[] primaryKeys =
