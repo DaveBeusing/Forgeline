@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Ecs;
@@ -29,7 +30,10 @@ public sealed record VerticalSliceAuthoritativeSnapshot(
     private static readonly JsonSerializerOptions s_jsonOptions =
         new()
         {
-            IncludeFields = true
+            IncludeFields = true,
+            NumberHandling =
+                JsonNumberHandling
+                    .AllowNamedFloatingPointLiterals
         };
 
     public static VerticalSliceAuthoritativeSnapshot Capture(
