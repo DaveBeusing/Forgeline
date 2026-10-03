@@ -195,7 +195,8 @@ internal static class Program
                     {
                         [scenario.West.Player] = settings.WestOpponent,
                         [scenario.East.Player] = settings.EastOpponent
-                    });
+                    },
+                    scenario.Intelligence);
                 scenario.Simulation.RegisterSystem(progression);
             }
 

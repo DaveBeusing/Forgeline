@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Ecs;
@@ -66,6 +67,12 @@ public static class BattlefieldResupplyPlanner
         ResupplyProviderRejection rejections = ResupplyProviderRejection.None;
         WorldTransform providerTransform = default;
         SupplyProvider selectedProvider = default;
+        bool preferMobileProvider =
+            ShouldPreferMobileProvider(
+                context,
+                recipient);
+        int bestProviderRank =
+            int.MaxValue;
         float bestDistanceSquared =
             float.PositiveInfinity;
 
@@ -110,10 +117,19 @@ public static class BattlefieldResupplyPlanner
                 }
             }
 
+            int providerRank =
+                preferMobileProvider &&
+                !context.Entities.HasComponent<SupplyTruck>(
+                    candidate)
+                    ? 1
+                    : 0;
+
             if (!providerEntity.IsValid ||
-                distanceSquared < bestDistanceSquared ||
-                (distanceSquared == bestDistanceSquared &&
-                 candidate < providerEntity))
+                providerRank < bestProviderRank ||
+                (providerRank == bestProviderRank &&
+                 (distanceSquared < bestDistanceSquared ||
+                  (distanceSquared == bestDistanceSquared &&
+                   candidate < providerEntity))))
             {
                 providerEntity =
                     candidate;
@@ -121,6 +137,8 @@ public static class BattlefieldResupplyPlanner
                     transform;
                 selectedProvider =
                     provider;
+                bestProviderRank =
+                    providerRank;
                 bestDistanceSquared =
                     distanceSquared;
                 recipientCanReachProvider = canReachProvider;
@@ -149,12 +167,30 @@ public static class BattlefieldResupplyPlanner
             bestDistanceSquared <=
             selectedProvider.ResupplyRangeMeters *
             selectedProvider.ResupplyRangeMeters;
+        bool prioritizedMobileDelivery =
+            preferMobileProvider &&
+            !alreadyInProviderRange &&
+            context.Entities.HasComponent<SupplyTruck>(
+                providerEntity) &&
+            CanPrioritizedMobileProviderTravel(
+                context,
+                inventories,
+                providerEntity,
+                recipient,
+                bestDistanceSquared,
+                selectedProvider.ResupplyRangeMeters);
 
         if (!alreadyInProviderRange)
         {
             ClearFormationMovement(
                 context,
                 recipient);
+        }
+
+        if (prioritizedMobileDelivery)
+        {
+            recipientCanReachProvider =
+                false;
         }
 
         BattlefieldSupplyResource requestedResources =
@@ -232,6 +268,24 @@ public static class BattlefieldResupplyPlanner
         return true;
     }
 
+    private static bool ShouldPreferMobileProvider(
+        SimulationContext context,
+        EntityId recipient)
+    {
+        if (!context.Entities.HasComponent<Combatant>(
+                recipient) ||
+            !context.Entities.TryGetComponent(
+                recipient,
+                out UnitSupplyPriority priority))
+        {
+            return false;
+        }
+
+        return priority.Priority is
+            BattlefieldSupplyPriority.Critical or
+            BattlefieldSupplyPriority.High;
+    }
+
     internal static bool CanReachProvider(
         SimulationContext context,
         InventoryStore? inventories,
@@ -293,6 +347,34 @@ public static class BattlefieldResupplyPlanner
             return ResupplyProviderRejection.DepotNotOperational;
         }
 
+        if (context.Entities.HasComponent<SupplyTruck>(candidate))
+        {
+            if (context.Entities.HasComponent<ResupplyOrder>(candidate))
+            {
+                return ResupplyProviderRejection.ProviderRefueling;
+            }
+
+            foreach (EntityId otherRecipient in
+                     context.Entities.Query<ResupplyOrder>(
+                         QueryIterationOrder.StableByEntityIndex))
+            {
+                if (otherRecipient == recipient ||
+                    !context.Entities.IsAlive(otherRecipient))
+                {
+                    continue;
+                }
+
+                ResupplyOrder activeOrder =
+                    context.Entities.GetComponent<ResupplyOrder>(
+                        otherRecipient);
+
+                if (activeOrder.Provider == candidate)
+                {
+                    return ResupplyProviderRejection.ProviderBusy;
+                }
+            }
+        }
+
         if (inventories is null)
         {
             return ResupplyProviderRejection.None;
@@ -318,6 +400,57 @@ public static class BattlefieldResupplyPlanner
         }
 
         return rejection;
+    }
+
+    private static bool CanPrioritizedMobileProviderTravel(
+        SimulationContext context,
+        InventoryStore? inventories,
+        EntityId provider,
+        EntityId recipient,
+        float distanceSquared,
+        float range)
+    {
+        if (!context.Entities.HasComponent<SupplyTruck>(
+                provider) ||
+            !context.Entities.HasComponent<GroundMovement>(
+                provider) ||
+            context.Entities.HasComponent<ResupplyOrder>(
+                provider) ||
+            SupplyRescueTravel.IsDeferred(
+                context,
+                inventories,
+                provider,
+                recipient) ||
+            !CanReachProvider(
+                context,
+                inventories,
+                provider,
+                distanceSquared,
+                range))
+        {
+            return false;
+        }
+
+        foreach (EntityId candidate in
+                 context.Entities.Query<ResupplyOrder>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            if (candidate == recipient ||
+                !context.Entities.IsAlive(
+                    candidate))
+            {
+                continue;
+            }
+
+            if (context.Entities.GetComponent<ResupplyOrder>(
+                    candidate).Provider ==
+                provider)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     internal static bool CanProviderReachImmobileRecipient(
