@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ForgeLine.Game;
 
@@ -17,7 +18,10 @@ public static class MatchPersistenceSerializer
         new()
         {
             IncludeFields = true,
-            WriteIndented = true
+            WriteIndented = true,
+            NumberHandling =
+                JsonNumberHandling
+                    .AllowNamedFloatingPointLiterals
         };
 
     public static string SerializeSave(
