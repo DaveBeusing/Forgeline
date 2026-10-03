@@ -404,6 +404,117 @@ public sealed class SkirmishSupplyPolicyTests
             "A Supply Truck below the offensive Fuel reserve retained unrelated forward movement instead of returning to a loading source.");
     }
 
+
+    [Fact]
+    public void SupplyTruckRetargetsFromRemoteDepotToCloserCommandCore()
+    {
+        using VerticalSliceScenario scenario =
+            VerticalSliceScenario.Create(
+                VerticalSliceScenarioSettings.Create(
+                    VerticalSliceScenarioProfile.Validation));
+        EntityRegistry entities =
+            scenario.Simulation.Entities;
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
+        WorldTransform core =
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+        SupplyProvider coreProvider =
+            entities.GetComponent<SupplyProvider>(
+                scenario.West.CommandCore);
+
+        Assert.True(
+            scenario.Inventories.GetAvailableQuantity(
+                coreProvider.InventoryId,
+                ResourceIds.Fuel) >
+            0.0);
+
+        InventoryId remoteInventory =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(
+                    2_500.0));
+        Assert.True(
+            scenario.Inventories.Add(
+                remoteInventory,
+                ResourceIds.Fuel,
+                600.0).Succeeded);
+
+        Vector3 remotePosition =
+            core.Position +
+            new Vector3(
+                700.0f,
+                0.0f,
+                0.0f);
+        EntityId remoteDepot =
+            entities.CreateEntity();
+        entities.AddComponent(
+            remoteDepot,
+            new WorldTransform(
+                remotePosition,
+                Quaternion.Identity,
+                Vector3.One));
+        entities.AddComponent(
+            remoteDepot,
+            new CompletedBuilding(
+                BuildingIds.SupplyDepot,
+                scenario.West.Player,
+                SimulationTick.Zero));
+        entities.AddComponent(
+            remoteDepot,
+            new SupplyDepot(
+                remoteInventory,
+                scenario.West.Player));
+
+        EntityId truck =
+            scenario.UnitFactory.Create(
+                units[UnitIds.SupplyTruck],
+                core.Position +
+                    new Vector3(
+                        120.0f,
+                        0.0f,
+                        0.0f),
+                scenario.West.Player);
+        SupplyTruck supply =
+            entities.GetComponent<SupplyTruck>(
+                truck);
+
+        Vector3 remoteLoadingTarget =
+            remotePosition;
+        entities.AddComponent(
+            truck,
+            new MovementOrder(
+                scenario.West.Player,
+                remoteLoadingTarget,
+                scenario.Simulation.CurrentTick,
+                scenario.Simulation.CurrentTick));
+
+        scenario.Simulation.RunTicks(
+            40,
+            TestContext.Current.CancellationToken);
+
+        double loadedFuel =
+            scenario.Inventories.GetQuantity(
+                supply.InventoryId,
+                ResourceIds.Fuel);
+
+        bool retaskedTowardCore =
+            entities.TryGetComponent(
+                truck,
+                out MovementOrder loadingOrder) &&
+            Vector3.DistanceSquared(
+                loadingOrder.WorldTarget,
+                core.Position) <
+            Vector3.DistanceSquared(
+                remoteLoadingTarget,
+                core.Position);
+
+        Assert.True(
+            loadedFuel > 0.0 ||
+            retaskedTowardCore,
+            "A depleted Supply Truck retained a farther loading route instead of using the closer stocked Command Core.");
+    }
+
+
     [Fact]
     public void FuelRecoveryPoliciesPrioritizeFieldSupplyOverVehicleProduction()
     {
