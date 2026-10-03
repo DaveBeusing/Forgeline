@@ -70,8 +70,8 @@ public sealed record SkirmishOpponentConfiguration
         return Math.Max(
             MinimumSupplyTrucks,
             Math.Min(
-                supplyDepotCount,
-                3));
+                checked(supplyDepotCount + 1),
+                4));
     }
 
     public float DefensiveRadiusMeters { get; init; } = 520.0f;
