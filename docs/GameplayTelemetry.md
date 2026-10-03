@@ -18,7 +18,7 @@ Gameplay telemetry is separate from engine and renderer performance diagnostics.
 - --diagnostics-output remains the engine/runtime diagnostics path.
 - --telemetry-output is the gameplay/balance evidence path.
 
-The simulation remains independent from the headless report format. No telemetry type participates in gameplay authority or command processing.
+The simulation remains independent from the headless report format. No telemetry type participates in gameplay authority or command processing. Hot-path collection reuses scratch storage where practical, and enabling gameplay telemetry does not enable the heavier existing debug-capture paths.
 
 ## Reproducibility
 
@@ -105,6 +105,8 @@ Cargo travel starts at the authoritative order submission tick and completes whe
 | match.winner | Winning player ID, or 0 when no winner exists | player_id |
 
 Unit dimensions use stable unit keys such as unit.directorate.main_battle_tank.
+
+In addition to numeric match metrics, every snapshot contains a structured match-result block with public match status, lifecycle phase, outcome, termination reason, winner, defeated participant, start/completion/finalization ticks, and lifecycle transition count.
 
 ## Progression Milestones
 
