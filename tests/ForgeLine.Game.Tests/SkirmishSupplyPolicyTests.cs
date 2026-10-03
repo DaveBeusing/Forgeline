@@ -660,6 +660,132 @@ public sealed class SkirmishSupplyPolicyTests
             precision: 6);
     }
 
+    [Fact]
+    public void OffensiveRecoveryStagesLoadedMobileSupplyTowardCombatGroup()
+    {
+        using VerticalSliceScenario scenario =
+            VerticalSliceScenario.Create(
+                VerticalSliceScenarioSettings.Create(
+                    VerticalSliceScenarioProfile.Validation));
+        EntityRegistry entities =
+            scenario.Simulation.Entities;
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
+        WorldTransform core =
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+
+        scenario.Simulation.RunTicks(
+            20,
+            TestContext.Current.CancellationToken);
+
+        Vector3 combatAnchor =
+            core.Position +
+            new Vector3(320.0f, 0.0f, 0.0f);
+        var combatUnits =
+            new[]
+            {
+                scenario.UnitFactory.Create(
+                    units[UnitIds.MainBattleTank],
+                    combatAnchor,
+                    scenario.West.Player),
+                scenario.UnitFactory.Create(
+                    units[UnitIds.MainBattleTank],
+                    combatAnchor +
+                        new Vector3(8.0f, 0.0f, 0.0f),
+                    scenario.West.Player),
+                scenario.UnitFactory.Create(
+                    units[UnitIds.RifleSquad],
+                    combatAnchor +
+                        new Vector3(16.0f, 0.0f, 0.0f),
+                    scenario.West.Player)
+            };
+
+        foreach (EntityId unit in combatUnits)
+        {
+            UnitFuelState fuel =
+                entities.GetComponent<UnitFuelState>(
+                    unit);
+            double current =
+                scenario.Inventories.GetQuantity(
+                    fuel.InventoryId,
+                    ResourceIds.Fuel);
+            double retained =
+                fuel.Capacity * 0.40;
+
+            if (current > retained)
+            {
+                Assert.True(
+                    scenario.Inventories.Remove(
+                        fuel.InventoryId,
+                        ResourceIds.Fuel,
+                        current - retained).Succeeded);
+            }
+        }
+
+        var supplyTrucks =
+            new EntityId[2];
+
+        for (int index = 0;
+             index < supplyTrucks.Length;
+             index++)
+        {
+            EntityId truck =
+                scenario.UnitFactory.Create(
+                    units[UnitIds.SupplyTruck],
+                    core.Position +
+                        new Vector3(
+                            40.0f + index * 8.0f,
+                            0.0f,
+                            0.0f),
+                    scenario.West.Player);
+            SupplyTruck supply =
+                entities.GetComponent<SupplyTruck>(
+                    truck);
+
+            Assert.True(
+                scenario.Inventories.Add(
+                    supply.InventoryId,
+                    ResourceIds.Fuel,
+                    supply.FuelTarget).Succeeded);
+            Assert.True(
+                scenario.Inventories.Add(
+                    supply.InventoryId,
+                    ResourceIds.Ammunition,
+                    supply.AmmunitionTarget).Succeeded);
+
+            supplyTrucks[index] =
+                truck;
+        }
+
+        scenario.Simulation.RunTicks(
+            30,
+            TestContext.Current.CancellationToken);
+
+        Vector3 combatCentroid =
+            combatAnchor +
+            new Vector3(8.0f, 0.0f, 0.0f);
+        float homeDistance =
+            Vector3.DistanceSquared(
+                core.Position,
+                combatCentroid);
+
+        bool stagedSupport =
+            supplyTrucks.Any(
+                truck =>
+                    entities.TryGetComponent(
+                        truck,
+                        out MovementOrder order) &&
+                    Vector3.DistanceSquared(
+                        order.WorldTarget,
+                        combatCentroid) <
+                    homeDistance * 0.25f);
+
+        Assert.True(
+            stagedSupport,
+            "A loaded mobile Supply Truck was not staged toward the recovering offensive combat group.");
+    }
+
     private static LogisticsStockPolicy FindStockPolicy(
         EntityRegistry entities,
         EntityId target,
