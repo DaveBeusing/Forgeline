@@ -1421,13 +1421,24 @@ public sealed class SkirmishProductionPolicyTests
             2,
             TestContext.Current.CancellationToken);
 
-        Assert.DoesNotContain(
-            entities.Query<UnitProductionRequest>(
-                QueryIterationOrder.StableByEntityIndex),
-            requestEntity =>
-                entities.GetComponent<UnitProductionRequest>(
+        bool requestQueuedWithoutReserve =
+            false;
+        foreach (EntityId requestEntity in
+                 entities.Query<UnitProductionRequest>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            if (entities.GetComponent<UnitProductionRequest>(
                     requestEntity).Facility ==
-                factory);
+                factory)
+            {
+                requestQueuedWithoutReserve =
+                    true;
+                break;
+            }
+        }
+
+        Assert.False(
+            requestQueuedWithoutReserve);
 
         foreach (UnitResourceCost cost in
                  cargo.Costs)
@@ -1443,22 +1454,31 @@ public sealed class SkirmishProductionPolicyTests
             2,
             TestContext.Current.CancellationToken);
 
-        Assert.Contains(
-            entities.Query<UnitProductionRequest>(
-                QueryIterationOrder.StableByEntityIndex),
-            requestEntity =>
-            {
-                UnitProductionRequest request =
-                    entities.GetComponent<UnitProductionRequest>(
-                        requestEntity);
+        bool scoutQueuedWithReserve =
+            false;
+        foreach (EntityId requestEntity in
+                 entities.Query<UnitProductionRequest>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            UnitProductionRequest request =
+                entities.GetComponent<UnitProductionRequest>(
+                    requestEntity);
 
-                return request.Facility ==
-                        factory &&
-                    request.UnitId ==
-                        UnitIds.ScoutVehicle &&
-                    request.Priority ==
-                        ProductionPriority.Normal;
-            });
+            if (request.Facility ==
+                    factory &&
+                request.UnitId ==
+                    UnitIds.ScoutVehicle &&
+                request.Priority ==
+                    ProductionPriority.Normal)
+            {
+                scoutQueuedWithReserve =
+                    true;
+                break;
+            }
+        }
+
+        Assert.True(
+            scoutQueuedWithReserve);
     }
 
 }
