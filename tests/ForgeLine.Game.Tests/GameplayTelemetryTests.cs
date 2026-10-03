@@ -230,6 +230,78 @@ public sealed class GameplayTelemetryTests
     }
 
     [Fact]
+    public void FreshMatchBatchUsesIndependentSeedsAndAggregatesSamples()
+    {
+        var matches =
+            new List<GameplayTelemetryMatch>();
+
+        const ulong startingSeed = 700;
+
+        for (int matchIndex = 0;
+             matchIndex < 2;
+             matchIndex++)
+        {
+            ulong seed =
+                startingSeed +
+                (ulong)matchIndex;
+
+            using VerticalSliceScenario scenario =
+                VerticalSliceScenario.Create(
+                    VerticalSliceScenarioSettings.Create(
+                        VerticalSliceScenarioProfile.Validation),
+                    seed);
+            var telemetry =
+                new GameplayTelemetryCollector(
+                    scenario);
+
+            RunTicks(
+                scenario,
+                telemetry,
+                120);
+
+            matches.Add(
+                new GameplayTelemetryMatch(
+                    matchIndex + 1,
+                    seed,
+                    telemetry.Capture()));
+        }
+
+        Assert.Equal(
+            startingSeed,
+            matches[0].Seed);
+        Assert.Equal(
+            startingSeed + 1,
+            matches[1].Seed);
+        Assert.Equal(
+            120UL,
+            matches[0].Telemetry.ObservedTicks);
+        Assert.Equal(
+            120UL,
+            matches[1].Telemetry.ObservedTicks);
+
+        GameplayTelemetryAnalysisResult analysis =
+            GameplayTelemetryAnalysis.Aggregate(
+                matches);
+
+        GameplayMetricAggregate duration =
+            Assert.Single(
+                analysis.Metrics,
+                static metric =>
+                    metric.Name ==
+                        GameplayMetricNames.MatchDurationTicks &&
+                    metric.Owner ==
+                        "match");
+
+        Assert.Equal(
+            2,
+            duration.SampleCount);
+        Assert.Equal(
+            120.0,
+            duration.Mean,
+            precision: 6);
+    }
+
+    [Fact]
     public void LongRunGameplayMetricsRemainFiniteAndNonNegative()
     {
         GameplayTelemetrySnapshot snapshot =
