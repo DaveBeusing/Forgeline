@@ -135,7 +135,7 @@ public sealed class MatchReplayRecorder : IDisposable
         _commands
             .OrderBy(
                 static command =>
-                    command.Sequence)
+                    command.RecordingOrder)
             .ToArray();
 
     public void Dispose()
