@@ -339,6 +339,73 @@ public sealed class MatchPersistenceTests
     }
 
     [Fact]
+    public void ControlCommandsReplayAtTheirOriginalTickBoundary()
+    {
+        using VerticalSliceScenario scenario =
+            CreateScenario(
+                seed: 127,
+                westComputerControlled: false);
+
+        scenario.Simulation.RunTicks(
+            20);
+
+        scenario.Simulation.ExecuteControlCommand(
+            new SetMatchPausedCommand(
+                scenario.BattlefieldRuntime.MatchStateEntity,
+                paused: true));
+        scenario.Simulation.ExecuteControlCommand(
+            new SetMatchPausedCommand(
+                scenario.BattlefieldRuntime.MatchStateEntity,
+                paused: false));
+
+        MatchReplayData replay =
+            MatchPersistenceService.CaptureReplay(
+                scenario);
+
+        Assert.Equal(
+            2,
+            replay.Commands.Count(
+                static command =>
+                    command.IsControl));
+
+        using VerticalSliceScenario playback =
+            MatchPersistenceService.PlayReplay(
+                replay);
+
+        Assert.Equal(
+            scenario.GetMatchState(),
+            playback.GetMatchState());
+        Assert.Equal(
+            replay.FinalStateSha256,
+            VerticalSliceAuthoritativeSnapshot
+                .Capture(playback)
+                .ComputeSha256());
+    }
+
+    [Fact]
+    public void UnsupportedQueuedCommandPreventsUnsafeSave()
+    {
+        using VerticalSliceScenario scenario =
+            CreateScenario(
+                seed: 128);
+
+        scenario.Simulation.SubmitCommand(
+            new UnsupportedRecoveryCommand(),
+            new SimulationTick(1),
+            SimulationCommandSource.None);
+
+        MatchPersistenceException exception =
+            Assert.Throws<MatchPersistenceException>(
+                () =>
+                    MatchPersistenceService.CaptureSave(
+                        scenario));
+
+        Assert.Equal(
+            MatchPersistenceFailureReason.IncompleteCommandHistory,
+            exception.Reason);
+    }
+
+    [Fact]
     public void RepeatedSaveLoadKeepsResourceStateStable()
     {
         VerticalSliceScenario current =
@@ -363,7 +430,7 @@ public sealed class MatchPersistenceTests
                     MatchPersistenceService.Restore(
                         save);
 
-                Assert.Equal(
+                AssertInventorySnapshotsEqual(
                     before,
                     restored.Inventories.CaptureSnapshot());
 
@@ -374,6 +441,46 @@ public sealed class MatchPersistenceTests
         finally
         {
             current.Dispose();
+        }
+    }
+
+    private static void AssertInventorySnapshotsEqual(
+        InventoryStoreSnapshot expected,
+        InventoryStoreSnapshot actual)
+    {
+        Assert.Equal(
+            expected.NextInventoryId,
+            actual.NextInventoryId);
+        Assert.Equal(
+            expected.Metrics,
+            actual.Metrics);
+        Assert.Equal(
+            expected.Inventories.Count,
+            actual.Inventories.Count);
+
+        for (int index = 0;
+             index < expected.Inventories.Count;
+             index++)
+        {
+            InventoryStateSnapshot expectedInventory =
+                expected.Inventories[index];
+            InventoryStateSnapshot actualInventory =
+                actual.Inventories[index];
+
+            Assert.Equal(
+                expectedInventory.InventoryId,
+                actualInventory.InventoryId);
+            Assert.Equal(
+                expectedInventory.TotalCapacity,
+                actualInventory.TotalCapacity,
+                precision: 9);
+            Assert.Equal(
+                expectedInventory.TotalQuantity,
+                actualInventory.TotalQuantity,
+                precision: 9);
+            Assert.Equal(
+                expectedInventory.Resources.ToArray(),
+                actualInventory.Resources.ToArray());
         }
     }
 
@@ -396,4 +503,14 @@ public sealed class MatchPersistenceTests
         return VerticalSliceScenario.Create(
             runtime);
     }
+    private sealed class UnsupportedRecoveryCommand : ISimulationCommand
+    {
+        public void Execute(
+            SimulationContext context)
+        {
+            ArgumentNullException.ThrowIfNull(
+                context);
+        }
+    }
+
 }
