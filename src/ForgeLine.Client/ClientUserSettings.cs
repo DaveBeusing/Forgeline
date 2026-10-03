@@ -197,7 +197,7 @@ internal sealed class ClientSettingsStore
                 "settings.json");
     }
 
-    internal string Path => _path;
+    internal string SettingsPath => _path;
 
     internal ClientSettingsLoadResult Load()
     {
