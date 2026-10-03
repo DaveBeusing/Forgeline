@@ -1276,6 +1276,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
+        ReleaseSupplyEscortMovementForRecovery(
+            context,
+            controller,
+            owned);
+
         bool attackForceEstablished =
             force.CombatUnits >=
             configuration.MinimumAttackUnits;
@@ -1301,11 +1306,6 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 supportGroup,
                 reconReserve);
         }
-
-        ReleaseSupplyEscortMovementForRecovery(
-            context,
-            controller,
-            owned);
 
         if (retreatUnits.Count > 0)
         {
