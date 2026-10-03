@@ -2946,11 +2946,6 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
-            if (hasMovement)
-            {
-                continue;
-            }
-
             destination =
                 ResolveSupplyLoadingApproach(
                     context,
@@ -2959,6 +2954,17 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     destination,
                     transform.Position,
                     truck.LoadRangeMeters);
+
+            if (hasMovement &&
+                !loadingMovement)
+            {
+                new StopMovementCommand(
+                    truck.Owner,
+                    [entity],
+                    context.Tick)
+                    .Execute(context);
+            }
+
             new MoveEntitiesCommand(
                 truck.Owner,
                 [entity],
