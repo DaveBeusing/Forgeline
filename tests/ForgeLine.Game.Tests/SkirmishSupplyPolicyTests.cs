@@ -770,22 +770,31 @@ public sealed class SkirmishSupplyPolicyTests
                 core.Position,
                 combatCentroid);
 
-        bool stagedSupport =
-            entities.Query<SupplyTruck, ControllableEntity>()
-                .Where(
-                    truck =>
-                        entities.GetComponent<ControllableEntity>(
-                            truck).Owner ==
-                        scenario.West.Player)
-                .Any(
-                    truck =>
-                        entities.TryGetComponent(
-                            truck,
-                            out MovementOrder order) &&
-                        Vector3.DistanceSquared(
-                            order.WorldTarget,
-                            combatCentroid) <
-                        homeDistance * 0.25f);
+        bool stagedSupport = false;
+
+        foreach (EntityId truck in
+                 entities.Query<SupplyTruck, ControllableEntity>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            if (entities.GetComponent<ControllableEntity>(
+                    truck).Owner !=
+                scenario.West.Player ||
+                !entities.TryGetComponent(
+                    truck,
+                    out MovementOrder order))
+            {
+                continue;
+            }
+
+            if (Vector3.DistanceSquared(
+                    order.WorldTarget,
+                    combatCentroid) <
+                homeDistance * 0.25f)
+            {
+                stagedSupport = true;
+                break;
+            }
+        }
 
         Assert.True(
             stagedSupport,
