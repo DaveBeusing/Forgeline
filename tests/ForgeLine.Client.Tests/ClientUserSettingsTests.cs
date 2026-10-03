@@ -81,7 +81,7 @@ public sealed class ClientUserSettingsTests
                 created.RecoveredInvalidSettings);
             Assert.True(
                 File.Exists(
-                    store.Path));
+                    store.SettingsPath));
 
             var custom =
                 created.Settings with
@@ -142,9 +142,9 @@ public sealed class ClientUserSettingsTests
                     root);
             Directory.CreateDirectory(
                 Path.GetDirectoryName(
-                    store.Path)!);
+                    store.SettingsPath)!);
             File.WriteAllText(
-                store.Path,
+                store.SettingsPath,
                 "{ invalid json");
 
             ClientSettingsLoadResult loaded =
@@ -157,11 +157,11 @@ public sealed class ClientUserSettingsTests
             loaded.Settings.Validate();
             Assert.True(
                 File.Exists(
-                    store.Path));
+                    store.SettingsPath));
 
             string directory =
                 Path.GetDirectoryName(
-                    store.Path)!;
+                    store.SettingsPath)!;
             Assert.Single(
                 Directory.GetFiles(
                     directory,
