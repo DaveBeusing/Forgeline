@@ -3696,6 +3696,27 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
     }
 
+    private static bool RequiresCargoReplacementReserve(
+        OwnedState owned,
+        SkirmishOpponentConfiguration configuration)
+    {
+        int cargoTarget =
+            Math.Max(
+                configuration.MinimumCargoTrucks,
+                Math.Clamp(
+                    owned.SupplyDepots.Count,
+                    2,
+                    4));
+
+        return GetUnitCount(
+                   owned,
+                   UnitIds.CargoTruck) +
+               GetPendingUnitCount(
+                   owned,
+                   UnitIds.CargoTruck) <
+               cargoTarget;
+    }
+
     private bool HasLogisticsReplacementReserve(
         in UnitProductionFacility facility,
         UnitId candidate)
@@ -4014,7 +4035,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
-            if (!HasLogisticsReplacementReserve(
+            if (RequiresCargoReplacementReserve(
+                    owned,
+                    configuration) &&
+                !HasLogisticsReplacementReserve(
                     facility,
                     candidate))
             {
