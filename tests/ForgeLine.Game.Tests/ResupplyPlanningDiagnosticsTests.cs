@@ -187,6 +187,17 @@ public sealed class ResupplyPlanningDiagnosticsTests
             fixture.Simulation.Entities
                 .GetComponent<ResupplyOrder>(
                     recipient).Provider);
+        Assert.False(
+            fixture.Simulation.Entities.HasComponent<MovementOrder>(
+                recipient));
+        Assert.True(
+            fixture.Simulation.Entities.HasComponent<MovementOrder>(
+                mobile));
+        Assert.Equal(
+            recipient,
+            fixture.Simulation.Entities
+                .GetComponent<SupplyRescueAssignment>(
+                    mobile).Recipient);
     }
 
     [Fact]
@@ -373,6 +384,15 @@ public sealed class ResupplyPlanningDiagnosticsTests
             EntityId entity =
                 MobileRecipient(
                     position);
+            UnitFuelState fuel =
+                Simulation.Entities.GetComponent<UnitFuelState>(
+                    entity);
+
+            Assert.True(
+                Inventories.Add(
+                    fuel.InventoryId,
+                    ResourceIds.Fuel,
+                    4.0).Succeeded);
 
             Simulation.Entities.AddComponent(
                 entity,
