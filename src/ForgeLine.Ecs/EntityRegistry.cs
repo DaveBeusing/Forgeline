@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using ForgeLine.Core;
 
 namespace ForgeLine.Ecs;
@@ -180,7 +181,10 @@ public sealed class EntityRegistry
         var options =
             new JsonSerializerOptions
             {
-                IncludeFields = true
+                IncludeFields = true,
+                NumberHandling =
+                    JsonNumberHandling
+                        .AllowNamedFloatingPointLiterals
             };
         IComponentStore[] stores =
             _componentStores.Values.ToArray();
