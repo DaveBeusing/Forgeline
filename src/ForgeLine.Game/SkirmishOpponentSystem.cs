@@ -5310,7 +5310,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         SimulationContext context,
         SkirmishOpponentController controller,
         OwnedState owned,
-        IReadOnlyList<EntityId> recoveringUnits)
+        List<EntityId> recoveringUnits)
     {
         if (RetreatRecoveryPlanner.TryResolve(
                 context.Entities,
