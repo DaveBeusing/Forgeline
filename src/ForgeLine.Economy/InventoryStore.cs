@@ -29,6 +29,32 @@ public sealed class InventoryStore
             _reservationAttempts,
             _reservationFailures);
 
+    public InventoryStoreSnapshot CaptureSnapshot()
+    {
+        var inventories =
+            new List<InventoryStateSnapshot>(
+                _inventories.Count);
+
+        foreach ((InventoryId inventoryId, InventoryState state) in
+                 _inventories.OrderBy(
+                     static pair =>
+                         pair.Key))
+        {
+            inventories.Add(
+                new InventoryStateSnapshot(
+                    inventoryId,
+                    state.Specification.TotalCapacity,
+                    state.TotalQuantity,
+                    GetResourceQuantities(
+                        inventoryId)));
+        }
+
+        return new InventoryStoreSnapshot(
+            _nextInventoryId,
+            Metrics,
+            inventories);
+    }
+
     public InventoryId CreateInventory(InventorySpecification specification)
     {
         ArgumentNullException.ThrowIfNull(specification);

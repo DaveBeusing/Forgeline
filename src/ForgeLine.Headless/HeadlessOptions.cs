@@ -21,6 +21,10 @@ internal readonly record struct HeadlessOptions(
     string? DiagnosticsOutput,
     string? TelemetryOutput,
     string? TelemetryBaseline,
+    string? SaveOutput,
+    string? ReplayOutput,
+    string? LoadInput,
+    string? ReplayInput,
     bool ShowHelp)
 {
     public static HeadlessOptions Parse(string[] args)
@@ -41,6 +45,10 @@ internal readonly record struct HeadlessOptions(
         string? diagnosticsOutput = null;
         string? telemetryOutput = null;
         string? telemetryBaseline = null;
+        string? saveOutput = null;
+        string? replayOutput = null;
+        string? loadInput = null;
+        string? replayInput = null;
         bool showHelp = false;
 
         for (int index = 0; index < args.Length; index++)
@@ -123,6 +131,46 @@ internal readonly record struct HeadlessOptions(
                             argument);
                     break;
 
+                case "--save-output":
+                    saveOutput =
+                        GetValue(
+                            args,
+                            ref index,
+                            argument);
+                    scenario =
+                        HeadlessScenarioKind.VerticalSlice;
+                    break;
+
+                case "--replay-output":
+                    replayOutput =
+                        GetValue(
+                            args,
+                            ref index,
+                            argument);
+                    scenario =
+                        HeadlessScenarioKind.VerticalSlice;
+                    break;
+
+                case "--load-input":
+                    loadInput =
+                        GetValue(
+                            args,
+                            ref index,
+                            argument);
+                    scenario =
+                        HeadlessScenarioKind.VerticalSlice;
+                    break;
+
+                case "--replay-input":
+                    replayInput =
+                        GetValue(
+                            args,
+                            ref index,
+                            argument);
+                    scenario =
+                        HeadlessScenarioKind.VerticalSlice;
+                    break;
+
                 case "--help":
                 case "-h":
                     showHelp = true;
@@ -144,8 +192,13 @@ internal readonly record struct HeadlessOptions(
                 entityCount,
                 matchCount,
                 requireTerminal,
+                diagnosticsOutput,
                 telemetryOutput,
-                telemetryBaseline);
+                telemetryBaseline,
+                saveOutput,
+                replayOutput,
+                loadInput,
+                replayInput);
         }
 
         return new HeadlessOptions(
@@ -160,6 +213,10 @@ internal readonly record struct HeadlessOptions(
             diagnosticsOutput,
             telemetryOutput,
             telemetryBaseline,
+            saveOutput,
+            replayOutput,
+            loadInput,
+            replayInput,
             showHelp);
     }
 
@@ -170,8 +227,13 @@ internal readonly record struct HeadlessOptions(
         int entityCount,
         int matchCount,
         bool requireTerminal,
+        string? diagnosticsOutput,
         string? telemetryOutput,
-        string? telemetryBaseline)
+        string? telemetryBaseline,
+        string? saveOutput,
+        string? replayOutput,
+        string? loadInput,
+        string? replayInput)
     {
         if (scenario == HeadlessScenarioKind.VerticalSlice)
         {
@@ -198,14 +260,51 @@ internal readonly record struct HeadlessOptions(
                     nameof(telemetryBaseline));
             }
 
+            if (loadInput is not null &&
+                replayInput is not null)
+            {
+                throw new ArgumentException(
+                    "--load-input and --replay-input are mutually exclusive.");
+            }
+
+            bool hasRecoveryInput =
+                loadInput is not null ||
+                replayInput is not null;
+            bool hasPersistenceOutput =
+                saveOutput is not null ||
+                replayOutput is not null;
+
+            if ((hasRecoveryInput ||
+                 hasPersistenceOutput) &&
+                matchCount != 1)
+            {
+                throw new ArgumentException(
+                    "Save/replay input and output currently require --matches 1.",
+                    nameof(matchCount));
+            }
+
+            if (hasRecoveryInput &&
+                (hasPersistenceOutput ||
+                 diagnosticsOutput is not null ||
+                 telemetryOutput is not null ||
+                 telemetryBaseline is not null))
+            {
+                throw new ArgumentException(
+                    "Recovery input validation cannot be combined with output generation or diagnostics/telemetry options.");
+            }
+
             return;
         }
 
         if (telemetryOutput is not null ||
-            telemetryBaseline is not null)
+            telemetryBaseline is not null ||
+            saveOutput is not null ||
+            replayOutput is not null ||
+            loadInput is not null ||
+            replayInput is not null)
         {
             throw new ArgumentException(
-                "--telemetry-output and --telemetry-baseline are only valid for the vertical-slice scenario.");
+                "Telemetry and save/replay options are only valid for the vertical-slice scenario.");
         }
 
         if (profile != VerticalSliceScenarioProfile.Gameplay)

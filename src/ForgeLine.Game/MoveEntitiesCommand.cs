@@ -58,6 +58,8 @@ public sealed class MoveEntitiesCommand : ISimulationCommand
 
     public FormationTemplate Formation { get; }
 
+    public bool PreserveCombatIntent => _preserveCombatIntent;
+
     public ReadOnlySpan<EntityId> Targets => _targets;
 
     public int AcceptedTargetCount { get; private set; }

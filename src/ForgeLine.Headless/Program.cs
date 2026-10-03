@@ -30,6 +30,18 @@ internal static class Program
             return 0;
         }
 
+        if (options.LoadInput is not null)
+        {
+            return ValidateSaveRecovery(
+                options.LoadInput);
+        }
+
+        if (options.ReplayInput is not null)
+        {
+            return ValidateReplayPlayback(
+                options.ReplayInput);
+        }
+
         using var shutdown =
             new CancellationTokenSource();
         ConsoleCancelEventHandler cancelHandler =
@@ -158,7 +170,9 @@ internal static class Program
                     matchSeed,
                     enableDiagnostics: true,
                     enableDebugCapture:
-                        options.DiagnosticsOutput is not null) with
+                        options.DiagnosticsOutput is not null ||
+                        options.SaveOutput is not null ||
+                        options.ReplayOutput is not null) with
                 {
                     Scenario = settings
                 };
@@ -267,6 +281,30 @@ internal static class Program
                 WriteDistributionSummary(scenario);
             }
 
+            if (options.SaveOutput is not null)
+            {
+                MatchSaveData save =
+                    MatchPersistenceService.CaptureSave(
+                        scenario);
+                MatchPersistenceSerializer.WriteSave(
+                    options.SaveOutput,
+                    save);
+                Console.WriteLine(
+                    $"Match save: {Path.GetFullPath(options.SaveOutput)}");
+            }
+
+            if (options.ReplayOutput is not null)
+            {
+                MatchReplayData replay =
+                    MatchPersistenceService.CaptureReplay(
+                        scenario);
+                MatchPersistenceSerializer.WriteReplay(
+                    options.ReplayOutput,
+                    replay);
+                Console.WriteLine(
+                    $"Match replay: {Path.GetFullPath(options.ReplayOutput)}");
+            }
+
             if (options.RequireTerminal &&
                 !scenario.GetMatchState().IsCompleted)
             {
@@ -319,6 +357,72 @@ internal static class Program
         return terminalFailure
             ? 3
             : 0;
+    }
+
+    private static int ValidateSaveRecovery(
+        string path)
+    {
+        try
+        {
+            MatchSaveData save =
+                MatchPersistenceSerializer.ReadSave(
+                    path);
+            using VerticalSliceScenario restored =
+                MatchPersistenceService.Restore(
+                    save);
+            VerticalSliceAuthoritativeSnapshot state =
+                VerticalSliceAuthoritativeSnapshot.Capture(
+                    restored);
+
+            Console.WriteLine(
+                $"Save recovery validated: tick={state.Tick}; rng={state.RandomState}; state={state.ComputeSha256()}.");
+            return 0;
+        }
+        catch (MatchPersistenceException exception)
+        {
+            Console.Error.WriteLine(
+                $"Save recovery failed ({exception.Reason}): {exception.Message}");
+            return 4;
+        }
+        catch (IOException exception)
+        {
+            Console.Error.WriteLine(
+                $"Save recovery failed: {exception.Message}");
+            return 4;
+        }
+    }
+
+    private static int ValidateReplayPlayback(
+        string path)
+    {
+        try
+        {
+            MatchReplayData replay =
+                MatchPersistenceSerializer.ReadReplay(
+                    path);
+            using VerticalSliceScenario playback =
+                MatchPersistenceService.PlayReplay(
+                    replay);
+            VerticalSliceAuthoritativeSnapshot state =
+                VerticalSliceAuthoritativeSnapshot.Capture(
+                    playback);
+
+            Console.WriteLine(
+                $"Replay validated: tick={state.Tick}; rng={state.RandomState}; state={state.ComputeSha256()}.");
+            return 0;
+        }
+        catch (MatchPersistenceException exception)
+        {
+            Console.Error.WriteLine(
+                $"Replay validation failed ({exception.Reason}): {exception.Message}");
+            return 4;
+        }
+        catch (IOException exception)
+        {
+            Console.Error.WriteLine(
+                $"Replay validation failed: {exception.Message}");
+            return 4;
+        }
     }
 
     private static void FinalizeHeadlessMatch(
@@ -455,6 +559,10 @@ internal static class Program
         writer.WriteLine("  --diagnostics-output <path>  Write a structured JSON diagnostics report.");
         writer.WriteLine("  --telemetry-output <path>    Write observational gameplay telemetry and batch aggregates.");
         writer.WriteLine("  --telemetry-baseline <path>  Compare telemetry aggregates with a prior telemetry report.");
+        writer.WriteLine("  --save-output <path>         Write a versioned match save after one vertical-slice match.");
+        writer.WriteLine("  --replay-output <path>       Write a deterministic command replay after one vertical-slice match.");
+        writer.WriteLine("  --load-input <path>          Validate and reconstruct a saved match, then exit.");
+        writer.WriteLine("  --replay-input <path>        Play and validate a replay, then exit.");
         writer.WriteLine("  --help, -h                   Show this help.");
     }
 

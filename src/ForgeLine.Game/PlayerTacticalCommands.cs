@@ -136,6 +136,8 @@ public sealed class PlayerTacticalActionCommand : ISimulationCommand
 
     public PlayerId Issuer { get; }
 
+    public ReadOnlySpan<EntityId> Units => _units;
+
     public EntityId Target { get; }
 
     public Vector3 WorldTarget { get; }
