@@ -52,6 +52,20 @@ Gameplay telemetry is observational infrastructure, not a simulation authority.
 
 See [Gameplay Telemetry and Match Analysis](GameplayTelemetry.md) for the schema and measurement semantics.
 
+## Persistence and Replay Boundary
+
+Match persistence is owned by the game/simulation boundary and remains independent from graphics, UI, audio, windowing, and presentation state.
+
+- Every Vertical Slice runtime records supported queued and control commands from tick zero.
+- Saves retain the deterministic runtime configuration and command history together with a versioned authoritative checkpoint.
+- The checkpoint covers fixed-tick/RNG state, match lifecycle, stable ECS entity/component state, inventories, logistics state, cargo/distribution state, and faction intelligence.
+- Loading is transactional: a fresh runtime reconstructs the checkpoint and must match the saved RNG and authoritative-state checksum before it is returned.
+- Replay playback uses the same command/tick boundary and verifies its final authoritative state.
+- Corrupt, incompatible, incomplete, or divergent recovery data fails without partially mutating a live scenario.
+- Persistence format compatibility is explicit and versioned; networking and unlimited backward compatibility remain separate concerns.
+
+See [Save, Load, Replay, and Recovery](SaveLoadReplayAndRecovery.md) for the format and recovery semantics.
+
 ## Project Responsibilities
 
 ### Low-Level Infrastructure
