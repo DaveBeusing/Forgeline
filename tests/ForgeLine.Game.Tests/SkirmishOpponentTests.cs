@@ -32,6 +32,32 @@ public sealed class SkirmishOpponentTests
             StringComparison.Ordinal);
     }
 
+    [Theory]
+    [InlineData(1, 1, 1)]
+    [InlineData(1, 2, 2)]
+    [InlineData(1, 3, 3)]
+    [InlineData(1, 5, 3)]
+    [InlineData(2, 1, 2)]
+    [InlineData(2, 3, 3)]
+    [InlineData(4, 3, 4)]
+    public void MatureSupplyTargetScalesWithDepotNetwork(
+        int minimumSupplyTrucks,
+        int supplyDepotCount,
+        int expected)
+    {
+        var configuration =
+            new SkirmishOpponentConfiguration
+            {
+                MinimumSupplyTrucks =
+                    minimumSupplyTrucks
+            };
+
+        Assert.Equal(
+            expected,
+            configuration.ResolveMatureSupplyTruckTarget(
+                supplyDepotCount));
+    }
+
     [Fact]
     public void StartingBasesAreSymmetricAndUseNormalAuthoritativeState()
     {
