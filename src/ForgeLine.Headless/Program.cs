@@ -136,6 +136,9 @@ internal static class Program
         var reports =
             new List<VerticalSliceMatchReport>(
                 options.MatchCount);
+        var telemetryMatches =
+            new List<GameplayTelemetryMatch>(
+                options.MatchCount);
         var overallStopwatch =
             Stopwatch.StartNew();
         bool terminalFailure = false;
@@ -155,7 +158,8 @@ internal static class Program
                     matchSeed,
                     enableDiagnostics: true,
                     enableDebugCapture:
-                        options.DiagnosticsOutput is not null) with
+                        options.DiagnosticsOutput is not null ||
+                        options.TelemetryOutput is not null) with
                 {
                     Scenario = settings
                 };
@@ -163,6 +167,11 @@ internal static class Program
                 VerticalSliceScenario.Create(
                     runtimeSettings,
                     cancellationToken);
+            GameplayTelemetryCollector? telemetry =
+                options.TelemetryOutput is not null
+                    ? new GameplayTelemetryCollector(
+                        scenario)
+                    : null;
             SkirmishProgressionDiagnostics? progression = null;
             if (options.DiagnosticsOutput is not null)
             {
@@ -187,6 +196,7 @@ internal static class Program
             {
                 scenario.Simulation.AdvanceOneTick();
                 executedTicks++;
+                telemetry?.Observe();
             }
 
             if (!cancellationToken.IsCancellationRequested &&
@@ -207,6 +217,19 @@ internal static class Program
                     matchStopwatch.Elapsed,
                     scenario);
             reports.Add(report);
+
+            if (telemetry is not null)
+            {
+                GameplayTelemetrySnapshot snapshot =
+                    telemetry.Capture();
+                telemetryMatches.Add(
+                    new GameplayTelemetryMatch(
+                        matchIndex + 1,
+                        matchSeed,
+                        snapshot));
+                WriteTelemetrySummary(
+                    snapshot);
+            }
 
             Console.WriteLine(
                 $"Vertical slice match {report.MatchIndex}/{options.MatchCount}: " +
@@ -269,6 +292,24 @@ internal static class Program
                 options.DiagnosticsOutput);
             Console.WriteLine(
                 $"Diagnostics report: {Path.GetFullPath(options.DiagnosticsOutput)}");
+        }
+
+        if (options.TelemetryOutput is not null)
+        {
+            GameplayTelemetryBatchReport telemetryReport =
+                GameplayTelemetryBatchReport.Create(
+                    options,
+                    telemetryMatches);
+            telemetryReport.Write(
+                options.TelemetryOutput);
+            Console.WriteLine(
+                $"Gameplay telemetry report: {Path.GetFullPath(options.TelemetryOutput)}");
+
+            if (telemetryReport.Comparison.Count > 0)
+            {
+                Console.WriteLine(
+                    $"Gameplay telemetry comparison: {telemetryReport.Comparison.Count} comparable metric series.");
+            }
         }
 
         if (cancellationToken.IsCancellationRequested)
@@ -339,6 +380,50 @@ internal static class Program
             $"production=({side.UnitProductionSummary}).");
     }
 
+    private static void WriteTelemetrySummary(
+        GameplayTelemetrySnapshot snapshot)
+    {
+        GameplayMetric? duration =
+            snapshot.Metrics.FirstOrDefault(
+                static metric =>
+                    metric.Name ==
+                    GameplayMetricNames.MatchDurationSeconds &&
+                    metric.Owner ==
+                    "match");
+        GameplayMetric? damage =
+            snapshot.Metrics.FirstOrDefault(
+                static metric =>
+                    metric.Name ==
+                    GameplayMetricNames.CombatDamageApplied &&
+                    metric.Owner ==
+                    "match");
+        GameplayMetric? cargo =
+            snapshot.Metrics.FirstOrDefault(
+                static metric =>
+                    metric.Name ==
+                    GameplayMetricNames.CargoDeliveredQuantity &&
+                    metric.Owner ==
+                    "match");
+
+        Console.WriteLine(
+            $"Gameplay telemetry: ticks={snapshot.ObservedTicks}; " +
+            $"duration={duration?.Value ?? 0.0:F1}s; " +
+            $"damage={damage?.Value ?? 0.0:F1}; " +
+            $"cargoDelivered={cargo?.Value ?? 0.0:F1}; " +
+            $"milestones={snapshot.Milestones.Count}.");
+
+        for (int index = 0;
+             index < snapshot.Debug.Objectives.Count;
+             index++)
+        {
+            GameplayObjectiveDebugSummary objective =
+                snapshot.Debug.Objectives[index];
+            Console.WriteLine(
+                $"Objective summary: player={objective.Player}; " +
+                $"state={objective.StrategicState}; goal={objective.ActiveGoal}.");
+        }
+    }
+
     private static void PopulateLightweightEntities(
         SimulationCoordinator simulation,
         int entityCount)
@@ -369,6 +454,8 @@ internal static class Program
         writer.WriteLine("  --matches <count>            Fresh vertical-slice matches to execute (default: 1).");
         writer.WriteLine("  --require-terminal           Fail if a vertical-slice match does not end within the tick budget.");
         writer.WriteLine("  --diagnostics-output <path>  Write a structured JSON diagnostics report.");
+        writer.WriteLine("  --telemetry-output <path>    Write observational gameplay telemetry and batch aggregates.");
+        writer.WriteLine("  --telemetry-baseline <path>  Compare telemetry aggregates with a prior telemetry report.");
         writer.WriteLine("  --help, -h                   Show this help.");
     }
 
