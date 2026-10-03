@@ -133,6 +133,21 @@ dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configur
 
 See [Gameplay Telemetry and Match Analysis](docs/GameplayTelemetry.md) for metric semantics, ownership, aggregation, comparison, and validation.
 
+Create a versioned authoritative checkpoint and deterministic replay from one Vertical Slice run:
+
+```powershell
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 5000 --seed 2026 --save-output artifacts/match.save.json --replay-output artifacts/match.replay.json
+```
+
+Validate recovery without exposing a partially restored match:
+
+```powershell
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --load-input artifacts/match.save.json
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --replay-input artifacts/match.replay.json
+```
+
+See [Save, Load, Replay, and Recovery](docs/SaveLoadReplayAndRecovery.md) for versioning, authoritative-state coverage, command recording, transactional reconstruction, failure handling, and determinism boundaries.
+
 Run repeated fresh-match soak validation outside the normal PR duration budget:
 
 ```powershell
@@ -175,6 +190,8 @@ See [Hierarchical Navigation](docs/HierarchicalNavigation.md) for long-range gro
 See [Formation Movement and Group Orders](docs/FormationMovementAndGroupOrders.md) for multi-unit shared routing, formation slots, cohesion, fallback behavior, diagnostics, and scale validation.
 
 See [Simulation Runtime](docs/SimulationRuntime.md) for fixed-tick semantics, phase ordering, commands, deterministic randomness, and headless execution.
+
+See [Save, Load, Replay, and Recovery](docs/SaveLoadReplayAndRecovery.md) for match persistence, replay recording/playback, authoritative checkpoint validation, and controlled recovery behavior.
 
 See [Resource Deposits and Extraction](docs/ResourceDepositsAndExtraction.md) for the authoritative raw-resource simulation contract.
 
