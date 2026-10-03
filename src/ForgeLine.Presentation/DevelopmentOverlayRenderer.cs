@@ -20,6 +20,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
     private readonly OverlayVertex[] _vertices =
         new OverlayVertex[MaxVertices];
     private int _vertexCount;
+    private float _uiScale = 1.0f;
     private bool _disposed;
 
     public DevelopmentOverlayRenderer(IGraphicsDevice graphics)
@@ -42,12 +43,18 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         PlayerActionSnapshot? playerActions = null,
         PlayerActionPanelView? actionPanel = null,
         TacticalTargetingView? tacticalTargeting = null,
-        FormationTemplate activeFormation = FormationTemplate.Compact)
+        FormationTemplate activeFormation = FormationTemplate.Compact,
+        PreAlphaUxView preAlphaUx = default,
+        float uiScale = 1.0f)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(context);
 
         _vertexCount = 0;
+        _uiScale =
+            float.IsFinite(uiScale)
+                ? Math.Clamp(uiScale, 0.75f, 2.0f)
+                : 1.0f;
 
         if (showDevelopmentMetrics)
         {
@@ -138,6 +145,11 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                 context.Width,
                 context.Height);
         }
+
+        EmitPreAlphaUx(
+            preAlphaUx,
+            context.Width,
+            context.Height);
 
         if (camera is not null &&
             debugDraw is not null &&
@@ -1265,6 +1277,201 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         }
     }
 
+    private void EmitPreAlphaUx(
+        in PreAlphaUxView view,
+        int width,
+        int height)
+    {
+        if (view.Mode == PreAlphaUxMode.None &&
+            !view.ShowOnboarding)
+        {
+            return;
+        }
+
+        Span<char> buffer =
+            stackalloc char[4_096];
+        var builder =
+            new OverlayTextBuilder(buffer);
+
+        if (view.Mode == PreAlphaUxMode.MatchSetup)
+        {
+            builder.Append("FORGELINE PRE-ALPHA");
+            builder.NewLine();
+            builder.Append("MATCH SETUP");
+            builder.NewLine();
+            builder.NewLine();
+            builder.Append("MAP ");
+            builder.Append(view.MapName);
+            builder.NewLine();
+            builder.Append("PLAYER ");
+            builder.Append(view.PlayerFaction);
+            builder.NewLine();
+            builder.Append("OPPONENT ");
+            builder.Append(view.OpponentDescription);
+            builder.NewLine();
+            builder.NewLine();
+            builder.Append("ENTER START MATCH");
+            builder.NewLine();
+            builder.Append("ESC EXIT");
+            builder.NewLine();
+            builder.Append("F12 CONTROLS AND ONBOARDING");
+            builder.NewLine();
+            builder.NewLine();
+            builder.Append("SETTINGS ");
+            builder.Append(view.SettingsPath);
+
+            EmitReadableText(
+                builder.Written,
+                32.0f,
+                160.0f,
+                new Vector4(
+                    0.98f,
+                    0.86f,
+                    0.32f,
+                    1.0f),
+                width,
+                height);
+            return;
+        }
+
+        if (view.Mode == PreAlphaUxMode.Paused)
+        {
+            builder.Append("PAUSED");
+            builder.NewLine();
+            builder.Append("SPACE RESUME");
+            builder.NewLine();
+            builder.Append("F12 CONTROLS");
+
+            EmitReadableText(
+                builder.Written,
+                32.0f,
+                160.0f,
+                new Vector4(
+                    0.98f,
+                    0.86f,
+                    0.32f,
+                    1.0f),
+                width,
+                height);
+            return;
+        }
+
+        if (view.Mode == PreAlphaUxMode.Help)
+        {
+            builder.Append("CONTROLS");
+            builder.NewLine();
+            builder.Append("CAMERA ");
+            builder.Append(view.PanForwardBinding);
+            builder.Append("/");
+            builder.Append(view.PanLeftBinding);
+            builder.Append("/");
+            builder.Append(view.PanBackwardBinding);
+            builder.Append("/");
+            builder.Append(view.PanRightBinding);
+            builder.Append(" PAN  ");
+            builder.Append(view.RotateLeftBinding);
+            builder.Append("/");
+            builder.Append(view.RotateRightBinding);
+            builder.Append(" ROTATE  ");
+            builder.Append(view.PitchUpBinding);
+            builder.Append("/");
+            builder.Append(view.PitchDownBinding);
+            builder.Append(" PITCH");
+            builder.NewLine();
+            builder.Append("MOUSE WHEEL ZOOM  ");
+            builder.Append(view.DragPanBinding);
+            builder.Append(" DRAG PAN");
+            builder.NewLine();
+            builder.Append("LEFT CLICK SELECT  SHIFT LEFT CLICK MULTI SELECT");
+            builder.NewLine();
+            builder.Append("RIGHT CLICK MOVE  B BUILD  P PROCESS  U UNITS");
+            builder.NewLine();
+            builder.Append("L LOGISTICS  Y SUPPLY  K COMBAT");
+            builder.NewLine();
+            builder.Append("F10 OVERLAYS  F11 MINIMAP  SPACE PAUSE");
+            builder.NewLine();
+            builder.NewLine();
+            builder.Append("QUICK START");
+            builder.NewLine();
+            builder.Append("1 MOVE CAMERA AND SELECT YOUR UNITS");
+            builder.NewLine();
+            builder.Append("2 RIGHT CLICK TO MOVE AND SCOUT");
+            builder.NewLine();
+            builder.Append("3 BUILD POWER AND INDUSTRY WITH B");
+            builder.NewLine();
+            builder.Append("4 PROCESS MATERIALS WITH P AND PRODUCE UNITS WITH U");
+            builder.NewLine();
+            builder.Append("5 USE L AND Y TO KEEP THE FRONT SUPPLIED");
+            builder.NewLine();
+            builder.Append("6 USE K FOR ATTACK ATTACK-MOVE RETREAT AND ARTILLERY");
+            builder.NewLine();
+            builder.Append("7 DESTROY THE ENEMY COMMAND CORE TO WIN");
+            builder.NewLine();
+            builder.NewLine();
+            builder.Append("F12 CLOSE HELP");
+
+            EmitReadableText(
+                builder.Written,
+                24.0f,
+                140.0f,
+                new Vector4(
+                    0.93f,
+                    0.95f,
+                    0.98f,
+                    1.0f),
+                width,
+                height);
+            return;
+        }
+
+        if (view.ShowOnboarding)
+        {
+            builder.Append("F12 HELP  SPACE PAUSE  GOAL DESTROY ENEMY COMMAND CORE");
+
+            EmitReadableText(
+                builder.Written,
+                12.0f,
+                MathF.Max(
+                    12.0f,
+                    height - 28.0f * _uiScale),
+                new Vector4(
+                    0.93f,
+                    0.95f,
+                    0.98f,
+                    1.0f),
+                width,
+                height);
+        }
+    }
+
+    private void EmitReadableText(
+        ReadOnlySpan<char> text,
+        float originX,
+        float originY,
+        Vector4 color,
+        int width,
+        int height)
+    {
+        EmitText(
+            text,
+            originX + 2.0f,
+            originY + 2.0f,
+            new Vector4(
+                0.02f,
+                0.02f,
+                0.02f,
+                0.95f),
+            width,
+            height);
+        EmitText(
+            text,
+            originX,
+            originY,
+            color,
+            width,
+            height);
+    }
+
     public void Dispose()
     {
         if (_disposed)
@@ -1300,7 +1507,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             if (character == '\n')
             {
                 x = originX;
-                y += LineAdvance;
+                y += LineAdvance * _uiScale;
                 continue;
             }
 
@@ -1311,7 +1518,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                 color,
                 width,
                 height);
-            x += GlyphAdvance;
+            x += GlyphAdvance * _uiScale;
         }
     }
 
@@ -1339,8 +1546,8 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                 }
 
                 EmitPixel(
-                    x + column * GlyphPixelSize,
-                    y + row * GlyphPixelSize,
+                    x + column * GlyphPixelSize * _uiScale,
+                    y + row * GlyphPixelSize * _uiScale,
                     color,
                     width,
                     height);
@@ -1364,11 +1571,11 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
 
         float left = (x / width) * 2.0f - 1.0f;
         float right =
-            ((x + GlyphPixelSize) / width) * 2.0f - 1.0f;
+            ((x + GlyphPixelSize * _uiScale) / width) * 2.0f - 1.0f;
         float top = 1.0f - (y / height) * 2.0f;
         float bottom =
             1.0f -
-            ((y + GlyphPixelSize) / height) * 2.0f;
+            ((y + GlyphPixelSize * _uiScale) / height) * 2.0f;
 
         Vector2 topLeft = new(left, top);
         Vector2 topRight = new(right, top);
