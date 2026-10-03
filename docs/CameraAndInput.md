@@ -62,6 +62,10 @@ The camera target/focus point lies on arbitrary world coordinates. The Windows c
 
 Camera bindings are represented by `RtsCameraBindings`. Selection conventions currently use the standard mouse buttons and Shift directly; command-panel remapping remains a later UI/settings concern.
 
+The pre-alpha client persists the existing `RtsCameraBindings` contract in `%LOCALAPPDATA%\\FORGELINE\\settings.json`. Camera pan, rotation, pitch, and drag-pan bindings can therefore be changed without adding a second input model. Settings validation rejects unknown/no-button values and duplicate primary camera actions. Selection, command-panel, and gameplay-action rebinding remains deferred until those surfaces have equivalent conflict handling and discoverability.
+
+`F12` opens the controls/onboarding surface and `Space` toggles explicit player pause; both are client-shell controls rather than simulation gameplay actions.
+
 ## Raw Input
 
 `ForgeLine.Platform.Windows` translates the Win32 messages needed by the RTS interaction layer into `PlatformInputEvent` values.
