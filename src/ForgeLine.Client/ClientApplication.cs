@@ -416,8 +416,9 @@ internal sealed class ClientApplication
                 userPaused ||
                 helpVisible;
             bool shouldPauseSimulation =
-                shouldPauseForWindow ||
-                shellBlocksGameplay;
+                !inputMatchTerminal &&
+                (shouldPauseForWindow ||
+                 shellBlocksGameplay);
 
             if (shouldPauseSimulation !=
                 simulationPaused)
