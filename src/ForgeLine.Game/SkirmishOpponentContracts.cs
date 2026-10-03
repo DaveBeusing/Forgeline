@@ -61,6 +61,19 @@ public sealed record SkirmishOpponentConfiguration
 
     public int MinimumSupplyTrucks { get; init; } = 1;
 
+    public int ResolveMatureSupplyTruckTarget(
+        int supplyDepotCount)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(
+            supplyDepotCount);
+
+        return Math.Max(
+            MinimumSupplyTrucks,
+            Math.Min(
+                supplyDepotCount,
+                3));
+    }
+
     public float DefensiveRadiusMeters { get; init; } = 520.0f;
 
     public float ObjectivePressureLeashMeters { get; init; } = 220.0f;
