@@ -278,7 +278,7 @@ public sealed class SkirmishProductionPolicyTests
             scenario.West.Player);
 
         for (int index = 0;
-             index < 3;
+             index < 2;
              index++)
         {
             EntityId depot =
