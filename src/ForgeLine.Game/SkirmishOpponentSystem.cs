@@ -1280,7 +1280,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 ResolveRecoveryPoint(
                     context,
                     controller,
-                    owned);
+                    owned,
+                    retreatUnits);
 
             var command =
                 new RetreatCommand(
@@ -5298,18 +5299,68 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private static Vector3 ResolveRecoveryPoint(
         SimulationContext context,
         SkirmishOpponentController controller,
-        OwnedState owned)
+        OwnedState owned) =>
+        ResolveRecoveryPoint(
+            context,
+            controller,
+            owned,
+            owned.CombatUnits);
+
+    private static Vector3 ResolveRecoveryPoint(
+        SimulationContext context,
+        SkirmishOpponentController controller,
+        OwnedState owned,
+        IReadOnlyList<EntityId> recoveringUnits)
     {
+        if (RetreatRecoveryPlanner.TryResolve(
+                context.Entities,
+                controller.Player,
+                recoveringUnits,
+                out _,
+                out Vector3 destination,
+                out _))
+        {
+            return destination;
+        }
+
         if (owned.SupplyDepots.Count == 0)
         {
             return controller.HomePosition;
+        }
+
+        Vector3 centroid = Vector3.Zero;
+        int positioned = 0;
+
+        for (int index = 0;
+             index < recoveringUnits.Count;
+             index++)
+        {
+            if (!context.Entities.TryGetComponent(
+                    recoveringUnits[index],
+                    out WorldTransform transform))
+            {
+                continue;
+            }
+
+            centroid += transform.Position;
+            positioned++;
+        }
+
+        if (positioned == 0)
+        {
+            centroid =
+                controller.HomePosition;
+        }
+        else
+        {
+            centroid /= positioned;
         }
 
         return owned.SupplyDepots
             .OrderBy(
                 depot =>
                     HorizontalDistanceSquared(
-                        controller.HomePosition,
+                        centroid,
                         depot.Position))
             .ThenBy(
                 static depot =>
