@@ -18,7 +18,7 @@ public readonly record struct AutomaticResupplyDecisionMetrics(
 public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
 {
     private readonly InventoryStore _inventories;
-    private readonly List<EntityId> _candidates = new();
+    private readonly List<ResupplyCandidate> _candidates = new();
     private readonly List<EntityId> _rescueProviders = new();
     private ulong _totalOrdersIssued;
     private ulong _totalProviderUnavailable;
@@ -52,8 +52,31 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
                      ControllableEntity>(
                          QueryIterationOrder.StableByEntityIndex))
         {
-            _candidates.Add(entity);
+            BattlefieldSupplyPriority priority =
+                context.Entities.TryGetComponent(
+                    entity,
+                    out UnitSupplyPriority configuredPriority)
+                    ? configuredPriority.Priority
+                    : BattlefieldSupplyPriority.Normal;
+
+            _candidates.Add(
+                new ResupplyCandidate(
+                    entity,
+                    priority));
         }
+
+        _candidates.Sort(
+            static (left, right) =>
+            {
+                int priority =
+                    left.Priority.CompareTo(
+                        right.Priority);
+
+                return priority != 0
+                    ? priority
+                    : left.Entity.CompareTo(
+                        right.Entity);
+            });
 
         int lowSupply = 0;
         int activeOrders = 0;
@@ -65,7 +88,7 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
              index++)
         {
             EntityId entity =
-                _candidates[index];
+                _candidates[index].Entity;
 
             if (!context.Entities.IsAlive(entity) ||
                 !context.Entities.TryGetComponent(
@@ -394,6 +417,10 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
 
         return fraction <= threshold;
     }
+
+    private readonly record struct ResupplyCandidate(
+        EntityId Entity,
+        BattlefieldSupplyPriority Priority);
 
     private static void MarkResupplyRequested(
         SimulationContext context,
