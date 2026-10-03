@@ -68,6 +68,7 @@ public sealed class VerticalSliceScenario : IDisposable
         Intelligence = intelligence;
         Opponents = opponents;
         UnitFactory = unitFactory;
+        Replay = new MatchReplayRecorder(simulation);
         West = west;
         East = east;
     }
@@ -117,6 +118,8 @@ public sealed class VerticalSliceScenario : IDisposable
     public SkirmishOpponentSystem Opponents { get; }
 
     public UnitFactory UnitFactory { get; }
+
+    public MatchReplayRecorder Replay { get; }
 
     public SkirmishStartingBase West { get; }
 
@@ -863,6 +866,7 @@ public sealed class VerticalSliceScenario : IDisposable
         }
 
         _disposed = true;
+        Replay.Dispose();
         _ownedScheduler?.Dispose();
     }
 
