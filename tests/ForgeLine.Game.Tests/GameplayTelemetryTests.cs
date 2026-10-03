@@ -112,6 +112,9 @@ public sealed class GameplayTelemetryTests
             first.ObservedTicks,
             second.ObservedTicks);
         Assert.Equal(
+            first.MatchResult,
+            second.MatchResult);
+        Assert.Equal(
             first.Metrics.ToArray(),
             second.Metrics.ToArray());
         Assert.Equal(
@@ -143,6 +146,9 @@ public sealed class GameplayTelemetryTests
         Assert.Equal(
             snapshot.ObservedTicks,
             restored.ObservedTicks);
+        Assert.Equal(
+            snapshot.MatchResult,
+            restored.MatchResult);
         Assert.Equal(
             snapshot.Metrics.ToArray(),
             restored.Metrics.ToArray());
@@ -369,6 +375,17 @@ public sealed class GameplayTelemetryTests
             GameplayTelemetryCollector.CurrentSchemaVersion,
             (ulong)durationTicks,
             20,
+            new GameplayMatchResult(
+                "Active",
+                "Running",
+                "None",
+                "None",
+                0,
+                0,
+                0,
+                0,
+                0,
+                1),
             [
                 new GameplayMetric(
                     GameplayMetricNames.ResourceIncomeQuantity,
