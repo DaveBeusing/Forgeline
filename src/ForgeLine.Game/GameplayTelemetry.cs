@@ -982,7 +982,7 @@ public sealed class GameplayTelemetryCollector
     }
 
     private void AddResourceIncomeMetrics(
-        ICollection<GameplayMetric> metrics)
+        List<GameplayMetric> metrics)
     {
         foreach ((MetricDimensionKey key, double quantity) in
                  _resourceIncome)
@@ -998,7 +998,7 @@ public sealed class GameplayTelemetryCollector
     }
 
     private void AddProcessingMetrics(
-        ICollection<GameplayMetric> metrics)
+        List<GameplayMetric> metrics)
     {
         var owners =
             new HashSet<string>(
@@ -1057,7 +1057,7 @@ public sealed class GameplayTelemetryCollector
     }
 
     private void AddPowerMetrics(
-        ICollection<GameplayMetric> metrics)
+        List<GameplayMetric> metrics)
     {
         var owners =
             new HashSet<string>(
@@ -1110,7 +1110,7 @@ public sealed class GameplayTelemetryCollector
     }
 
     private void AddStorageMetrics(
-        ICollection<GameplayMetric> metrics)
+        List<GameplayMetric> metrics)
     {
         var owners =
             new HashSet<string>(
@@ -1152,7 +1152,7 @@ public sealed class GameplayTelemetryCollector
     }
 
     private void AddLogisticsMetrics(
-        ICollection<GameplayMetric> metrics)
+        List<GameplayMetric> metrics)
     {
         CargoTransportMetrics cargo =
             _scenario.CargoTransport.Metrics;
@@ -1245,7 +1245,7 @@ public sealed class GameplayTelemetryCollector
     }
 
     private void AddUnitMetrics(
-        ICollection<GameplayMetric> metrics)
+        List<GameplayMetric> metrics)
     {
         foreach ((MetricDimensionKey key, long count) in
                  _producedUnits)
@@ -1273,7 +1273,7 @@ public sealed class GameplayTelemetryCollector
     }
 
     private void AddCombatMetrics(
-        ICollection<GameplayMetric> metrics)
+        List<GameplayMetric> metrics)
     {
         CombatRuntimeMetrics combat =
             _scenario.Services.CombatRuntime.Metrics;
@@ -1295,7 +1295,7 @@ public sealed class GameplayTelemetryCollector
     }
 
     private void AddExpansionMetrics(
-        ICollection<GameplayMetric> metrics)
+        List<GameplayMetric> metrics)
     {
         foreach ((string owner, long count) in
                  _expandedBuildings)
@@ -1311,7 +1311,7 @@ public sealed class GameplayTelemetryCollector
     }
 
     private void AddMatchMetrics(
-        ICollection<GameplayMetric> metrics)
+        List<GameplayMetric> metrics)
     {
         MatchState match =
             _scenario.GetMatchState();
@@ -1408,11 +1408,8 @@ public sealed class GameplayTelemetryCollector
         int count = 0;
 
         foreach (EntityId entity in
-                 _scenario.Simulation.Entities.Query<
-                     ControllableEntity,
-                     UnitIdentity,
-                     WorldTransform>(
-                         QueryIterationOrder.StableByEntityIndex))
+                 _scenario.Simulation.Entities.Query<ControllableEntity>(
+                     QueryIterationOrder.StableByEntityIndex))
         {
             ControllableEntity controllable =
                 _scenario.Simulation.Entities.GetComponent<ControllableEntity>(
@@ -1420,14 +1417,13 @@ public sealed class GameplayTelemetryCollector
 
             if (controllable.Owner != player ||
                 !_scenario.Simulation.Entities.HasComponent<Combatant>(
-                    entity))
+                    entity) ||
+                !_scenario.Simulation.Entities.TryGetComponent(
+                    entity,
+                    out WorldTransform transform))
             {
                 continue;
             }
-
-            WorldTransform transform =
-                _scenario.Simulation.Entities.GetComponent<WorldTransform>(
-                    entity);
             sum +=
                 transform.Position;
             count++;
@@ -1549,10 +1545,9 @@ public sealed class GameplayTelemetryCollector
                 1);
     }
 
-    private static void Increment<TKey>(
-        IDictionary<TKey, ulong> values,
-        TKey key)
-        where TKey : notnull
+    private static void Increment(
+        Dictionary<string, ulong> values,
+        string key)
     {
         values.TryGetValue(
             key,
@@ -1564,7 +1559,7 @@ public sealed class GameplayTelemetryCollector
     }
 
     private static double Get(
-        IReadOnlyDictionary<string, double> values,
+        Dictionary<string, double> values,
         string key) =>
         values.TryGetValue(
             key,
@@ -1573,7 +1568,7 @@ public sealed class GameplayTelemetryCollector
             : 0.0;
 
     private static ulong Get(
-        IReadOnlyDictionary<string, ulong> values,
+        Dictionary<string, ulong> values,
         string key) =>
         values.TryGetValue(
             key,
