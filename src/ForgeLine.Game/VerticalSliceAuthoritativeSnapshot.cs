@@ -41,8 +41,8 @@ public sealed record VerticalSliceAuthoritativeSnapshot(
             new List<AuthoritativeDomainSnapshot>
             {
                 CaptureDomain(
-                    "simulation.metrics",
-                    scenario.Simulation.Metrics),
+                    "simulation.pending_commands",
+                    scenario.Simulation.PendingCommandCount),
                 CaptureDomain(
                     "logistics.version",
                     scenario.Logistics.Version),
