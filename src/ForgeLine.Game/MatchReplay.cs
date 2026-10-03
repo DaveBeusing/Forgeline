@@ -16,7 +16,8 @@ public enum ReplayCommandKind : byte
     Logistics = 5,
     Tactical = 6,
     EndMatch = 7,
-    Surrender = 8
+    Surrender = 8,
+    SetMatchPaused = 9
 }
 
 public sealed record RecordedSimulationCommand
@@ -28,6 +29,10 @@ public sealed record RecordedSimulationCommand
     public required ulong Sequence { get; init; }
 
     public required ulong Source { get; init; }
+
+    public ulong RecordingOrder { get; init; }
+
+    public bool IsControl { get; init; }
 
     public PlayerId Issuer { get; init; }
 
@@ -92,6 +97,7 @@ public sealed class MatchReplayRecorder : IDisposable
     private readonly List<RecordedSimulationCommand> _commands = new();
     private readonly HashSet<string> _unsupported =
         new(StringComparer.Ordinal);
+    private ulong _nextRecordingOrder = 1;
     private bool _disposed;
 
     public MatchReplayRecorder(
@@ -110,6 +116,8 @@ public sealed class MatchReplayRecorder : IDisposable
 
         _simulation.CommandSubmitted +=
             OnCommandSubmitted;
+        _simulation.ControlCommandExecuting +=
+            OnControlCommandExecuting;
     }
 
     public bool IsComplete =>
@@ -140,6 +148,8 @@ public sealed class MatchReplayRecorder : IDisposable
         _disposed = true;
         _simulation.CommandSubmitted -=
             OnCommandSubmitted;
+        _simulation.ControlCommandExecuting -=
+            OnControlCommandExecuting;
     }
 
     private void OnCommandSubmitted(
@@ -151,7 +161,13 @@ public sealed class MatchReplayRecorder : IDisposable
                     envelope,
                     out RecordedSimulationCommand? command))
             {
-                _commands.Add(command);
+                _commands.Add(
+                    command with
+                    {
+                        RecordingOrder =
+                            _nextRecordingOrder++,
+                        IsControl = false
+                    });
                 return;
             }
 
@@ -164,6 +180,45 @@ public sealed class MatchReplayRecorder : IDisposable
             _unsupported.Add(
                 envelope.CommandType.FullName ??
                 envelope.CommandType.Name);
+        }
+    }
+
+    private void OnControlCommandExecuting(
+        ISimulationCommand command,
+        SimulationTick tick)
+    {
+        try
+        {
+            var envelope =
+                new SimulationCommandEnvelope(
+                    tick,
+                    Sequence: 0,
+                    SimulationCommandSource.None,
+                    command);
+
+            if (ReplayCommandCodec.TryEncode(
+                    envelope,
+                    out RecordedSimulationCommand? recorded))
+            {
+                _commands.Add(
+                    recorded with
+                    {
+                        RecordingOrder =
+                            _nextRecordingOrder++,
+                        IsControl = true
+                    });
+                return;
+            }
+
+            _unsupported.Add(
+                command.GetType().FullName ??
+                command.GetType().Name);
+        }
+        catch
+        {
+            _unsupported.Add(
+                command.GetType().FullName ??
+                command.GetType().Name);
         }
     }
 }
@@ -381,6 +436,18 @@ public static class ReplayCommandCodec
                     };
                 return true;
 
+            case SetMatchPausedCommand command:
+                recorded =
+                    Base(
+                        ReplayCommandKind.SetMatchPaused) with
+                    {
+                        TargetEntity =
+                            command.MatchStateEntity,
+                        Enabled =
+                            command.Paused
+                    };
+                return true;
+
             default:
                 recorded = null;
                 return false;
@@ -452,6 +519,11 @@ public static class ReplayCommandCodec
                     command.Issuer,
                     command.TargetEntity,
                     submittedAtTick),
+
+            ReplayCommandKind.SetMatchPaused =>
+                new SetMatchPausedCommand(
+                    command.TargetEntity,
+                    command.Enabled),
 
             _ =>
                 throw new InvalidDataException(
