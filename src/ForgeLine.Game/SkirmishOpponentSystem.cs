@@ -4563,6 +4563,29 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         in UnitProductionFacility facility,
         SkirmishOpponentConfiguration configuration)
     {
+        bool coreAssaultEstablished =
+            GetUnitCount(
+                owned,
+                UnitIds.ScoutVehicle) +
+            GetPendingUnitCount(
+                owned,
+                UnitIds.ScoutVehicle) >=
+                1 &&
+            GetUnitCount(
+                owned,
+                UnitIds.MainBattleTank) +
+            GetPendingUnitCount(
+                owned,
+                UnitIds.MainBattleTank) >=
+                configuration.MinimumObjectivePressureUnits &&
+            GetUnitCount(
+                owned,
+                UnitIds.MobileArtillery) +
+            GetPendingUnitCount(
+                owned,
+                UnitIds.MobileArtillery) >=
+                1;
+
         if (facility.Supports(
                 UnitProductionCapability.Vehicle))
         {
@@ -4599,7 +4622,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 return UnitIds.MobileArtillery;
             }
 
-            if (facility.Supports(
+            if (coreAssaultEstablished &&
+                facility.Supports(
                     UnitProductionCapability.Logistics))
             {
                 int matureSupplyTarget =
@@ -4644,8 +4668,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         2,
                         4),
                 [UnitIds.SupplyTruck] =
-                    configuration.ResolveMatureSupplyTruckTarget(
-                        owned.SupplyDepots.Count),
+                    coreAssaultEstablished
+                        ? configuration.ResolveMatureSupplyTruckTarget(
+                            owned.SupplyDepots.Count)
+                        : configuration.MinimumSupplyTrucks,
                 [UnitIds.MainBattleTank] = 4,
                 [UnitIds.MobileArtillery] = 2
             };
