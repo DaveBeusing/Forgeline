@@ -423,8 +423,7 @@ public sealed class SkirmishProgressionDiagnostics : ISimulationSystem
             foreach (EntityId entity in
                      context.Entities.Query<
                          ControllableEntity,
-                         UnitIdentity,
-                         WorldTransform>(
+                         UnitIdentity>(
                          QueryIterationOrder.StableByEntityIndex))
             {
                 if (context.Entities.GetComponent<ControllableEntity>(
@@ -432,7 +431,10 @@ public sealed class SkirmishProgressionDiagnostics : ISimulationSystem
                     !context.Entities.HasComponent<Combatant>(
                         entity) ||
                     !context.Entities.HasComponent<HealthState>(
-                        entity))
+                        entity) ||
+                    !context.Entities.TryGetComponent(
+                        entity,
+                        out WorldTransform transform))
                 {
                     continue;
                 }
@@ -448,9 +450,6 @@ public sealed class SkirmishProgressionDiagnostics : ISimulationSystem
                     continue;
                 }
 
-                WorldTransform transform =
-                    context.Entities.GetComponent<WorldTransform>(
-                        entity);
                 float deltaX =
                     transform.Position.X -
                     coreTransform.Position.X;
