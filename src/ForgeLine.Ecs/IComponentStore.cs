@@ -9,4 +9,8 @@ internal interface IComponentStore
     int Count { get; }
 
     bool Remove(EntityId entity);
+
+    EntityId GetEntityAt(int denseIndex);
+
+    object GetBoxedComponentAt(int denseIndex);
 }
