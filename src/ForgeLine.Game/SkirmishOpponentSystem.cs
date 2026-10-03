@@ -165,7 +165,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             CaptureOwnedState(
                 context,
                 controllerEntity,
-                controller);
+                controller,
+                state.DeepOffensiveCommitted);
 
         if (!decisionDue)
         {
@@ -453,7 +454,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private OwnedState CaptureOwnedState(
         SimulationContext context,
         EntityId controllerEntity,
-        SkirmishOpponentController controller)
+        SkirmishOpponentController controller,
+        bool deepOffensiveCommitted)
     {
         _ownedStateCaptures++;
 
@@ -476,6 +478,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 controller.Player,
                 controller.Faction);
         }
+
+        owned.DeepOffensiveCommitted =
+            deepOffensiveCommitted;
 
         foreach (EntityId entity in
                  context.Entities.Query<CompletedBuilding>(
@@ -4444,9 +4449,17 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return UnitIds.SupplyTruck;
         }
 
+        int establishedSupplyTarget =
+            Math.Max(
+                configuration.MinimumSupplyTrucks,
+                Math.Min(
+                    owned.SupplyDepots.Count,
+                    3));
         int matureSupplyTarget =
-            configuration.ResolveMatureSupplyTruckTarget(
-                owned.SupplyDepots.Count);
+            owned.DeepOffensiveCommitted
+                ? configuration.ResolveMatureSupplyTruckTarget(
+                    owned.SupplyDepots.Count)
+                : establishedSupplyTarget;
         bool coreAssaultEstablished =
             GetUnitCount(
                 owned,
@@ -4563,28 +4576,17 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         in UnitProductionFacility facility,
         SkirmishOpponentConfiguration configuration)
     {
-        bool coreAssaultEstablished =
-            GetUnitCount(
-                owned,
-                UnitIds.ScoutVehicle) +
-            GetPendingUnitCount(
-                owned,
-                UnitIds.ScoutVehicle) >=
-                1 &&
-            GetUnitCount(
-                owned,
-                UnitIds.MainBattleTank) +
-            GetPendingUnitCount(
-                owned,
-                UnitIds.MainBattleTank) >=
-                configuration.MinimumObjectivePressureUnits &&
-            GetUnitCount(
-                owned,
-                UnitIds.MobileArtillery) +
-            GetPendingUnitCount(
-                owned,
-                UnitIds.MobileArtillery) >=
-                1;
+        int establishedSupplyTarget =
+            Math.Max(
+                configuration.MinimumSupplyTrucks,
+                Math.Min(
+                    owned.SupplyDepots.Count,
+                    3));
+        int matureSupplyTarget =
+            owned.DeepOffensiveCommitted
+                ? configuration.ResolveMatureSupplyTruckTarget(
+                    owned.SupplyDepots.Count)
+                : establishedSupplyTarget;
 
         if (facility.Supports(
                 UnitProductionCapability.Vehicle))
@@ -4622,13 +4624,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 return UnitIds.MobileArtillery;
             }
 
-            if (coreAssaultEstablished &&
-                facility.Supports(
+            if (facility.Supports(
                     UnitProductionCapability.Logistics))
             {
-                int matureSupplyTarget =
-                    configuration.ResolveMatureSupplyTruckTarget(
-                        owned.SupplyDepots.Count);
                 int matureSupplyCount =
                     GetUnitCount(
                         owned,
@@ -4668,14 +4666,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         2,
                         4),
                 [UnitIds.SupplyTruck] =
-                    coreAssaultEstablished
-                        ? configuration.ResolveMatureSupplyTruckTarget(
-                            owned.SupplyDepots.Count)
-                        : Math.Max(
-                            configuration.MinimumSupplyTrucks,
-                            Math.Min(
-                                owned.SupplyDepots.Count,
-                                3)),
+                    matureSupplyTarget,
                 [UnitIds.MainBattleTank] = 4,
                 [UnitIds.MobileArtillery] = 2
             };
@@ -6228,6 +6219,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         public int OfflineConsumers { get; set; }
 
+        public bool DeepOffensiveCommitted { get; set; }
+
         public void Reset(
             PlayerId player,
             FactionId faction)
@@ -6253,6 +6246,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             PowerGeneration = 0.0;
             PowerDemand = 0.0;
             OfflineConsumers = 0;
+            DeepOffensiveCommitted = false;
         }
 
         private static void Clear<T>(List<T> values)
