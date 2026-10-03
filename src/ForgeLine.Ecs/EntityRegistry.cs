@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using ForgeLine.Core;
 
 namespace ForgeLine.Ecs;
@@ -156,6 +157,98 @@ public sealed class EntityRegistry
                 StringComparer.Ordinal.Compare(left.ComponentType, right.ComponentType));
 
         return counts;
+    }
+
+    public EntityRegistrySnapshot CaptureSnapshot()
+    {
+        var aliveEntities =
+            new List<EntityId>(
+                _entities.Count);
+
+        for (int index = 0;
+             index < _entities.SlotCount;
+             index++)
+        {
+            if (_entities.TryGetAliveEntity(
+                    index,
+                    out EntityId entity))
+            {
+                aliveEntities.Add(entity);
+            }
+        }
+
+        var options =
+            new JsonSerializerOptions
+            {
+                IncludeFields = true
+            };
+        IComponentStore[] stores =
+            _componentStores.Values.ToArray();
+
+        Array.Sort(
+            stores,
+            static (left, right) =>
+                StringComparer.Ordinal.Compare(
+                    left.ComponentType.FullName ??
+                    left.ComponentType.Name,
+                    right.ComponentType.FullName ??
+                    right.ComponentType.Name));
+
+        var snapshots =
+            new List<ComponentStoreSnapshot>(
+                stores.Length);
+
+        for (int storeIndex = 0;
+             storeIndex < stores.Length;
+             storeIndex++)
+        {
+            IComponentStore store =
+                stores[storeIndex];
+            var components =
+                new ComponentStateSnapshot[
+                    store.Count];
+
+            for (int componentIndex = 0;
+                 componentIndex < store.Count;
+                 componentIndex++)
+            {
+                EntityId entity =
+                    store.GetEntityAt(
+                        componentIndex);
+                object component =
+                    store.GetBoxedComponentAt(
+                        componentIndex);
+                string json =
+                    JsonSerializer.Serialize(
+                        component,
+                        store.ComponentType,
+                        options);
+
+                components[componentIndex] =
+                    new ComponentStateSnapshot(
+                        entity,
+                        json);
+            }
+
+            Array.Sort(
+                components,
+                static (left, right) =>
+                    left.Entity.CompareTo(
+                        right.Entity));
+
+            snapshots.Add(
+                new ComponentStoreSnapshot(
+                    store.ComponentType.FullName ??
+                    store.ComponentType.Name,
+                    components));
+        }
+
+        return new EntityRegistrySnapshot(
+            EntityCount,
+            Capacity,
+            _structuralVersion,
+            aliveEntities,
+            snapshots);
     }
 
     public EntityQuery<T> Query<T>(QueryIterationOrder order = QueryIterationOrder.Dense)
