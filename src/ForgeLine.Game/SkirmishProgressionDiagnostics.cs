@@ -2,6 +2,7 @@ using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Ecs;
+using ForgeLine.Intelligence;
 using ForgeLine.Simulation;
 
 namespace ForgeLine.Game;
@@ -25,6 +26,14 @@ public sealed record SkirmishProviderDiagnostic(
     double CargoFuel, double CargoAmmunition, double MovementFuel, double FuelPerMeter,
     string MovementTarget, IReadOnlyList<string> Recipients);
 
+public sealed record SkirmishObjectiveDiagnostic(
+    string EnemyCommandCore,
+    double EnemyCommandCoreHealth,
+    double EnemyCommandCoreMaximumHealth,
+    bool EnemyCommandCoreDetected,
+    bool EnemyCommandCoreIdentified,
+    double ClosestCombatUnitDistanceMeters);
+
 public sealed record SkirmishDecisionDiagnostic(
     ulong Tick, ulong Player, string StrategicState, string Goal,
     int CombatCandidates, int EligibleAttackers, int AttackGroupCapacity, int MinimumAttackers,
@@ -33,7 +42,10 @@ public sealed record SkirmishDecisionDiagnostic(
     IReadOnlyList<SkirmishUnitDecisionDiagnostic> Units,
     IReadOnlyList<SkirmishProductionDiagnostic> Production,
     IReadOnlyList<SkirmishProviderDiagnostic> Providers,
-    SkirmishEconomyDiagnostic Economy);
+    SkirmishEconomyDiagnostic Economy)
+{
+    public SkirmishObjectiveDiagnostic? Objective { get; init; }
+}
 
 public sealed record SkirmishEligibilityLossDiagnostic(
     SkirmishDecisionDiagnostic Before, SkirmishDecisionDiagnostic After);
@@ -56,6 +68,7 @@ public sealed class SkirmishProgressionDiagnostics : ISimulationSystem
     private readonly InventoryStore _inventories;
     private readonly UnitDefinitionCatalog _units;
     private readonly IReadOnlyDictionary<PlayerId, SkirmishOpponentConfiguration> _configurations;
+    private readonly FactionIntelligenceStore? _intelligence;
     private readonly List<SkirmishDecisionDiagnostic> _history = new(MaximumHistoryEntries);
     private readonly List<SkirmishEligibilityLossDiagnostic> _firstLosses = new();
     private readonly Dictionary<PlayerId, SkirmishDecisionDiagnostic> _latest = new();
@@ -64,11 +77,13 @@ public sealed class SkirmishProgressionDiagnostics : ISimulationSystem
     public SkirmishProgressionDiagnostics(
         InventoryStore inventories,
         UnitDefinitionCatalog units,
-        IReadOnlyDictionary<PlayerId, SkirmishOpponentConfiguration> configurations)
+        IReadOnlyDictionary<PlayerId, SkirmishOpponentConfiguration> configurations,
+        FactionIntelligenceStore? intelligence = null)
     {
         _inventories = inventories ?? throw new ArgumentNullException(nameof(inventories));
         _units = units ?? throw new ArgumentNullException(nameof(units));
         _configurations = configurations ?? throw new ArgumentNullException(nameof(configurations));
+        _intelligence = intelligence;
     }
 
     public SimulationPhase Phase => SimulationPhase.AiDecisions;
@@ -338,7 +353,129 @@ public sealed class SkirmishProgressionDiagnostics : ISimulationSystem
             scouts, readinessExcluded, fuelExcluded, ammunitionExcluded, activeResupply,
             Math.Max(0, combat - units.Count), Math.Max(0, facilityCount - production.Count),
             Math.Max(0, providerCount - providers.Count), units, production, providers,
-            SkirmishIndustryDiagnostics.Capture(context, _inventories, owner));
+            SkirmishIndustryDiagnostics.Capture(context, _inventories, owner))
+        {
+            Objective =
+                CaptureObjective(
+                    context,
+                    owner)
+        };
+    }
+
+    private SkirmishObjectiveDiagnostic? CaptureObjective(
+        SimulationContext context,
+        PlayerId owner)
+    {
+        EntityId enemyCore =
+            EntityId.Invalid;
+
+        foreach (EntityId objectiveEntity in
+                 context.Entities.Query<CommandCoreObjective>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            CommandCoreObjective objective =
+                context.Entities.GetComponent<CommandCoreObjective>(
+                    objectiveEntity);
+
+            if (objective.Owner != owner)
+            {
+                enemyCore =
+                    objective.CommandCore;
+                break;
+            }
+        }
+
+        if (!enemyCore.IsValid ||
+            !context.Entities.IsAlive(
+                enemyCore) ||
+            !context.Entities.TryGetComponent(
+                enemyCore,
+                out HealthState health))
+        {
+            return null;
+        }
+
+        FactionId observingFaction =
+            owner.Value <= uint.MaxValue
+                ? new FactionId(
+                    checked((uint)owner.Value))
+                : FactionId.None;
+        bool detected =
+            _intelligence is not null &&
+            observingFaction.IsSpecified &&
+            _intelligence.IsEntityCurrentlyDetected(
+                observingFaction,
+                enemyCore);
+        bool identified =
+            _intelligence is not null &&
+            observingFaction.IsSpecified &&
+            _intelligence.IsEntityCurrentlyIdentified(
+                observingFaction,
+                enemyCore);
+
+        double closestDistance =
+            double.PositiveInfinity;
+
+        if (context.Entities.TryGetComponent(
+                enemyCore,
+                out WorldTransform coreTransform))
+        {
+            foreach (EntityId entity in
+                     context.Entities.Query<
+                         ControllableEntity,
+                         UnitIdentity,
+                         WorldTransform>(
+                         QueryIterationOrder.StableByEntityIndex))
+            {
+                if (context.Entities.GetComponent<ControllableEntity>(
+                        entity).Owner != owner ||
+                    !context.Entities.HasComponent<Combatant>(
+                        entity) ||
+                    !context.Entities.HasComponent<HealthState>(
+                        entity))
+                {
+                    continue;
+                }
+
+                UnitId unitId =
+                    context.Entities.GetComponent<UnitIdentity>(
+                        entity).UnitId;
+
+                if (unitId is var value &&
+                    (value == UnitIds.CargoTruck ||
+                     value == UnitIds.SupplyTruck))
+                {
+                    continue;
+                }
+
+                WorldTransform transform =
+                    context.Entities.GetComponent<WorldTransform>(
+                        entity);
+                float deltaX =
+                    transform.Position.X -
+                    coreTransform.Position.X;
+                float deltaZ =
+                    transform.Position.Z -
+                    coreTransform.Position.Z;
+                double distance =
+                    Math.Sqrt(
+                        deltaX * deltaX +
+                        deltaZ * deltaZ);
+
+                closestDistance =
+                    Math.Min(
+                        closestDistance,
+                        distance);
+            }
+        }
+
+        return new SkirmishObjectiveDiagnostic(
+            enemyCore.ToString(),
+            health.Current,
+            health.Maximum,
+            detected,
+            identified,
+            closestDistance);
     }
 
     private double Stock(InventoryId inventory, ResourceId resource, bool available) =>
