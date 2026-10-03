@@ -402,6 +402,218 @@ public sealed class SkirmishProductionPolicyTests
                 .Quantity);
     }
 
+    [Fact]
+    public void HealthyCargoFleetDoesNotBlockArtilleryProductionReserve()
+    {
+        VerticalSliceScenarioSettings validation =
+            VerticalSliceScenarioSettings.Create(
+                VerticalSliceScenarioProfile.Validation);
+        using VerticalSliceScenario scenario =
+            VerticalSliceScenario.Create(
+                validation);
+        EntityRegistry entities =
+            scenario.Simulation.Entities;
+        UnitDefinitionCatalog units =
+            DirectorateContent.CreateUnitCatalog();
+        WorldTransform coreTransform =
+            entities.GetComponent<WorldTransform>(
+                scenario.West.CommandCore);
+
+        int depotCount = 0;
+        int cargoCount = 0;
+        int supplyCount = 0;
+        int scoutCount = 0;
+        int tankCount = 0;
+
+        foreach (EntityId entity in
+                 entities.Query<CompletedBuilding>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            CompletedBuilding building =
+                entities.GetComponent<CompletedBuilding>(
+                    entity);
+
+            if (building.Owner ==
+                    scenario.West.Player &&
+                building.BuildingId ==
+                    BuildingIds.SupplyDepot)
+            {
+                depotCount++;
+            }
+        }
+
+        foreach (EntityId entity in
+                 entities.Query<ControllableEntity, UnitIdentity>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            if (entities.GetComponent<ControllableEntity>(
+                    entity).Owner !=
+                scenario.West.Player)
+            {
+                continue;
+            }
+
+            UnitId unitId =
+                entities.GetComponent<UnitIdentity>(
+                    entity).UnitId;
+
+            if (unitId == UnitIds.CargoTruck)
+            {
+                cargoCount++;
+            }
+            else if (unitId == UnitIds.SupplyTruck)
+            {
+                supplyCount++;
+            }
+            else if (unitId == UnitIds.ScoutVehicle)
+            {
+                scoutCount++;
+            }
+            else if (unitId == UnitIds.MainBattleTank)
+            {
+                tankCount++;
+            }
+        }
+
+        int cargoTarget =
+            Math.Max(
+                validation.WestOpponent.MinimumCargoTrucks,
+                Math.Clamp(
+                    depotCount,
+                    2,
+                    4));
+
+        while (cargoCount < cargoTarget)
+        {
+            scenario.UnitFactory.Create(
+                units[UnitIds.CargoTruck],
+                coreTransform.Position,
+                scenario.West.Player);
+            cargoCount++;
+        }
+
+        while (supplyCount <
+               validation.WestOpponent.MinimumSupplyTrucks)
+        {
+            scenario.UnitFactory.Create(
+                units[UnitIds.SupplyTruck],
+                coreTransform.Position,
+                scenario.West.Player);
+            supplyCount++;
+        }
+
+        while (scoutCount < 1)
+        {
+            scenario.UnitFactory.Create(
+                units[UnitIds.ScoutVehicle],
+                coreTransform.Position,
+                scenario.West.Player);
+            scoutCount++;
+        }
+
+        while (tankCount <
+               validation.WestOpponent.MinimumObjectivePressureUnits)
+        {
+            scenario.UnitFactory.Create(
+                units[UnitIds.MainBattleTank],
+                coreTransform.Position,
+                scenario.West.Player);
+            tankCount++;
+        }
+
+        InventoryId input =
+            scenario.Inventories.CreateInventory(
+                new InventorySpecification(
+                    4_000.0));
+        EntityId factory =
+            entities.CreateEntity();
+        entities.AddComponent(
+            factory,
+            coreTransform);
+        entities.AddComponent(
+            factory,
+            new CompletedBuilding(
+                BuildingIds.VehicleFactory,
+                scenario.West.Player,
+                SimulationTick.Zero));
+        entities.AddComponent(
+            factory,
+            new ControllableEntity(
+                scenario.West.Player,
+                ControllableEntityCategory.Building));
+        entities.AddComponent(
+            factory,
+            new UnitProductionFacility(
+                input,
+                UnitProductionCapability.Vehicle |
+                UnitProductionCapability.Logistics,
+                scenario.West.Player,
+                Vector3.Zero,
+                SimulationTick.Zero));
+
+        var network =
+            new PowerNetworkId(10_004);
+        entities.AddComponent(
+            factory,
+            new PowerNetworkMembership(
+                network));
+        entities.AddComponent(
+            factory,
+            new PowerGenerator(
+                10.0));
+        entities.AddComponent(
+            factory,
+            new PowerConsumer(
+                1.0,
+                PowerPriority.Industrial,
+                enabled: true));
+
+        foreach (UnitResourceCost cost in
+                 units[UnitIds.MobileArtillery].Costs)
+        {
+            Assert.True(
+                scenario.Inventories.Add(
+                    input,
+                    cost.ResourceId,
+                    cost.Quantity).Succeeded);
+        }
+
+        scenario.Simulation.RunTicks(
+            2,
+            TestContext.Current.CancellationToken);
+
+        bool artilleryQueued = false;
+
+        foreach (EntityId requestEntity in
+                 entities.Query<UnitProductionRequest>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            UnitProductionRequest request =
+                entities.GetComponent<UnitProductionRequest>(
+                    requestEntity);
+
+            if (request.Facility ==
+                    factory &&
+                request.UnitId ==
+                    UnitIds.MobileArtillery)
+            {
+                artilleryQueued = true;
+                break;
+            }
+        }
+
+        UnitProductionFacility state =
+            entities.GetComponent<UnitProductionFacility>(
+                factory);
+
+        Assert.True(
+            artilleryQueued ||
+            state.ActiveUnit ==
+                UnitIds.MobileArtillery,
+            "A healthy Cargo Truck fleet must not reserve an additional replacement vehicle's materials before required artillery can enter production.");
+    }
+
+
     private static LogisticsStockPolicy FindStockPolicy(
         EntityRegistry entities,
         EntityId target,
