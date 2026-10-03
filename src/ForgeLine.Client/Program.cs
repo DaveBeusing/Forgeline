@@ -20,12 +20,32 @@ internal static class Program
 
         try
         {
+            var settingsStore =
+                new ClientSettingsStore();
+            ClientSettingsLoadResult settingsLoad =
+                settingsStore.Load();
+
+            Console.WriteLine(
+                $"[settings:loaded] path=\"{settingsLoad.Path}\" " +
+                $"createdDefaults={settingsLoad.CreatedDefaults} " +
+                $"recoveredInvalid={settingsLoad.RecoveredInvalidSettings}");
+
+            if (!string.IsNullOrWhiteSpace(
+                    settingsLoad.RecoveryMessage))
+            {
+                Console.WriteLine(
+                    $"[settings:recovery] {settingsLoad.RecoveryMessage}");
+            }
+
             using var platform = new WindowsPlatform();
 
             while (true)
             {
                 var application =
-                    new ClientApplication(platform);
+                    new ClientApplication(
+                        platform,
+                        settingsLoad.Settings,
+                        settingsLoad.Path);
                 int result =
                     application.Run(
                         smokeTest,
@@ -42,8 +62,19 @@ internal static class Program
         }
         catch (Exception exception)
         {
+            string? report =
+                ClientDiagnostics.WriteCrashReport(
+                    exception);
+
             Console.Error.WriteLine(
                 $"[platform:error] type={exception.GetType().Name} message={exception.Message}");
+
+            if (!string.IsNullOrWhiteSpace(report))
+            {
+                Console.Error.WriteLine(
+                    $"[diagnostics:failure-report] path=\"{report}\"");
+            }
+
             return 1;
         }
     }

@@ -42,7 +42,9 @@ internal readonly record struct ClientRenderFrame(
     DebugLine[] DebugLines,
     DebugLabel[] DebugLabels,
     uint Dpi = 96,
-    RtsInformationLayerView InformationLayer = default);
+    RtsInformationLayerView InformationLayer = default,
+    float UiScale = 1.0f,
+    PreAlphaUxView PreAlphaUx = default);
 
 internal sealed class ClientRenderHost : IDisposable
 {
@@ -395,7 +397,11 @@ internal sealed class ClientRenderHost : IDisposable
                             tacticalTargeting:
                                 current.TacticalTargeting,
                             activeFormation:
-                                current.ActiveFormation);
+                                current.ActiveFormation,
+                            preAlphaUx:
+                                current.PreAlphaUx,
+                            uiScale:
+                                current.UiScale);
                         informationRenderer.Render(
                             context,
                             renderCamera,

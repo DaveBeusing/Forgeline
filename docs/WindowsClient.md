@@ -120,6 +120,16 @@ Platform disposal
 
 Window and platform operations are thread-affine and must remain on the thread that created them.
 
+## Pre-Alpha Shell
+
+A normal interactive launch opens an explicit match-setup state before gameplay. The current vertical slice exposes Central Divide, Directorate, and the Directorate computer opponent as the available configuration. Enter starts the match, Escape exits from setup, Space toggles player pause during gameplay, and F12 opens the controls/onboarding view.
+
+Setup, explicit player pause, help, and minimized/zero-size window state all use the existing simulation-owner pause control transition. They are combined as pause reasons so restoring the window cannot resume a match that remains explicitly paused or has help open.
+
+Client settings are loaded from the current user's Local Application Data FORGELINE/settings.json path before window and camera creation. Missing settings create validated defaults; malformed or invalid settings are quarantined and recovered. The current settings contract includes window size/mode, UI scale, onboarding visibility, edge scroll, camera pan speed, camera keys, and drag-pan binding.
+
+See [Pre-Alpha UX and Operations](PreAlphaUxAndOperations.md) and [Pre-Alpha Verification Checklist](PreAlphaVerificationChecklist.md).
+
 ## Launch
 
 From the repository root:

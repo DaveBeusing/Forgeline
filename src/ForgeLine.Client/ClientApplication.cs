@@ -40,10 +40,25 @@ internal sealed class ClientApplication
         };
 
     private readonly IPlatform _platform;
+    private readonly ClientUserSettings _settings;
+    private readonly string _settingsPath;
 
-    internal ClientApplication(IPlatform platform)
+    internal ClientApplication(
+        IPlatform platform,
+        ClientUserSettings? settings = null,
+        string? settingsPath = null)
     {
-        _platform = platform;
+        _platform =
+            platform ??
+            throw new ArgumentNullException(nameof(platform));
+        _settings =
+            settings ??
+            new ClientUserSettings();
+        _settings.Validate();
+        _settingsPath =
+            string.IsNullOrWhiteSpace(settingsPath)
+                ? "default settings"
+                : settingsPath;
     }
 
     internal int Run(
@@ -53,12 +68,8 @@ internal sealed class ClientApplication
     {
         ArgumentOutOfRangeException.ThrowIfNegative(renderInstanceCount);
 
-        var configuration = new WindowConfiguration(
-            "FORGELINE",
-            1600,
-            900,
-            resizable: true,
-            WindowMode.Windowed);
+        WindowConfiguration configuration =
+            _settings.CreateWindowConfiguration();
 
         using IWindow window = _platform.CreateWindow(configuration);
 
@@ -139,20 +150,14 @@ internal sealed class ClientApplication
             : 0.0f;
 
         var inputState = new InputState();
-        var actionMapper = new RtsCameraActionMapper();
+        var actionMapper = new RtsCameraActionMapper(
+            _settings.CameraBindings);
         var camera = new RtsCamera(
-            new RtsCameraSettings
-            {
-                InitialTarget = new Vector3(
+            _settings.CreateCameraSettings(
+                new Vector3(
                     localStart.Position.X,
                     targetHeight,
-                    localStart.Position.Z),
-                InitialDistance = 420.0f,
-                MinimumDistance = 20.0f,
-                MaximumDistance = 1_200.0f,
-                PanReferenceDistance = 180.0f,
-                MaximumPanSpeedScale = 5.0f
-            });
+                    localStart.Position.Z)));
         var selectionController = new RtsSelectionController(
             new SelectionFilter(
                 LocalPlayer,
@@ -203,9 +208,15 @@ internal sealed class ClientApplication
         bool minimapToggleHeld = false;
         bool restartHeld = false;
         bool returnHeld = false;
+        bool setupStartHeld = false;
+        bool pauseHeld = false;
+        bool helpHeld = false;
+        bool matchSetupActive = !smokeTest;
+        bool userPaused = false;
+        bool helpVisible = false;
         FormationTemplate activeFormation =
             FormationTemplate.Compact;
-        bool simulationPausedForWindow = false;
+        bool simulationPaused = false;
         bool terminalAcknowledgementRequested = false;
         bool smokeCompletionRequested = false;
 
@@ -286,6 +297,28 @@ internal sealed class ClientApplication
                 informationLayer.ToggleMinimap();
             }
 
+            if (ConsumeKeyPress(
+                    inputState,
+                    PlatformKey.F12,
+                    ref helpHeld))
+            {
+                helpVisible =
+                    !helpVisible;
+            }
+
+            bool setupStartPressed =
+                matchSetupActive &&
+                ConsumeKeyPress(
+                    inputState,
+                    PlatformKey.Enter,
+                    ref setupStartHeld);
+            bool pausePressed =
+                !matchSetupActive &&
+                ConsumeKeyPress(
+                    inputState,
+                    PlatformKey.Space,
+                    ref pauseHeld);
+
             presentationInteraction.SetDebugState(
                 worldDebugEnabled,
                 camera.Target.Y);
@@ -309,6 +342,37 @@ internal sealed class ClientApplication
             bool inputMatchTerminal =
                 inputExperience?.IsMatchComplete ==
                 true;
+
+            if (matchSetupActive &&
+                returnPressed)
+            {
+                return 0;
+            }
+
+            if (matchSetupActive &&
+                setupStartPressed)
+            {
+                matchSetupActive =
+                    false;
+                helpVisible =
+                    false;
+            }
+
+            if (!inputMatchTerminal &&
+                !matchSetupActive &&
+                pausePressed)
+            {
+                userPaused =
+                    !userPaused;
+            }
+
+            PreAlphaUxView preAlphaUx =
+                CreatePreAlphaUxView(
+                    matchSetupActive,
+                    userPaused,
+                    helpVisible,
+                    _settings.ShowOnboarding &&
+                    !smokeTest);
 
             if (inputExperience?.MatchStatus ==
                     PlayerMatchStatus.Ended &&
@@ -347,24 +411,36 @@ internal sealed class ClientApplication
             bool shouldPauseForWindow =
                 window.IsMinimized ||
                 window.ClientSize.IsEmpty;
+            bool shellBlocksGameplay =
+                matchSetupActive ||
+                userPaused ||
+                helpVisible;
+            bool shouldPauseSimulation =
+                !inputMatchTerminal &&
+                (shouldPauseForWindow ||
+                 shellBlocksGameplay);
 
-            if (shouldPauseForWindow !=
-                simulationPausedForWindow)
+            if (shouldPauseSimulation !=
+                simulationPaused)
             {
                 if (!simulationHost.TrySetPaused(
-                        shouldPauseForWindow))
+                        shouldPauseSimulation))
                 {
                     throw new InvalidOperationException(
-                        "Simulation control boundary is full while changing the window pause state.");
+                        "Simulation control boundary is full while changing the pause state.");
                 }
 
-                simulationPausedForWindow =
-                    shouldPauseForWindow;
+                simulationPaused =
+                    shouldPauseSimulation;
             }
 
-            if (shouldPauseForWindow)
+            if (shouldPauseForWindow ||
+                shellBlocksGameplay)
             {
+                actionPanel.Close();
+                tacticalTargetingController.Cancel();
                 debugDraw.Clear();
+
                 _ = renderHost.Publish(
                     new ClientRenderFrame(
                         camera.CaptureState(),
@@ -380,8 +456,18 @@ internal sealed class ClientApplication
                             inputSnapshot),
                         activeFormation,
                         [],
-                        []));
-                _platform.WaitForEvents(IdleWait);
+                        [],
+                        window.Dpi,
+                        default,
+                        _settings.UiScale,
+                        preAlphaUx));
+
+                if (shouldPauseForWindow)
+                {
+                    _platform.WaitForEvents(
+                        IdleWait);
+                }
+
                 continue;
             }
 
@@ -661,7 +747,9 @@ internal sealed class ClientApplication
                     debugDraw.Lines.ToArray(),
                     debugDraw.Labels.ToArray(),
                     window.Dpi,
-                    informationView));
+                    informationView,
+                    _settings.UiScale,
+                    preAlphaUx));
 
             if (_platform.Clock.GetElapsedTime(nextDiagnosticAt, now) >= DiagnosticInterval)
             {
@@ -1312,6 +1400,41 @@ internal sealed class ClientApplication
                 label,
                 color);
         }
+    }
+
+    private PreAlphaUxView CreatePreAlphaUxView(
+        bool matchSetupActive,
+        bool userPaused,
+        bool helpVisible,
+        bool showOnboarding)
+    {
+        PreAlphaUxMode mode =
+            helpVisible
+                ? PreAlphaUxMode.Help
+                : matchSetupActive
+                    ? PreAlphaUxMode.MatchSetup
+                    : userPaused
+                        ? PreAlphaUxMode.Paused
+                        : PreAlphaUxMode.None;
+        RtsCameraBindings bindings =
+            _settings.CameraBindings;
+
+        return new PreAlphaUxView(
+            mode,
+            showOnboarding,
+            "Central Divide",
+            "Directorate",
+            "Directorate AI",
+            bindings.PanForward.ToString(),
+            bindings.PanBackward.ToString(),
+            bindings.PanLeft.ToString(),
+            bindings.PanRight.ToString(),
+            bindings.RotateLeft.ToString(),
+            bindings.RotateRight.ToString(),
+            bindings.PitchUp.ToString(),
+            bindings.PitchDown.ToString(),
+            bindings.DragPanButton.ToString(),
+            _settingsPath);
     }
 
     private static bool ConsumeKeyPress(
