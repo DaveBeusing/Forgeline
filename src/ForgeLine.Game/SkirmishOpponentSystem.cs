@@ -4389,7 +4389,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         owned.SupplyDepots.Count + 1,
                         2,
                         4),
-                [UnitIds.SupplyTruck] = 1,
+                [UnitIds.SupplyTruck] =
+                    configuration.ResolveMatureSupplyTruckTarget(
+                        owned.SupplyDepots.Count),
                 [UnitIds.MainBattleTank] = 4,
                 [UnitIds.MobileArtillery] = 2
             };
