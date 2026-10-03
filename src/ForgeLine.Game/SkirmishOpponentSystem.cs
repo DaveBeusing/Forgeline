@@ -1199,7 +1199,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return true;
     }
 
-    private bool TryRecoverForce(
+    private static bool TryRecoverForce(
         SimulationContext context,
         SkirmishOpponentController controller,
         OwnedState owned,
@@ -1281,32 +1281,6 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             controller,
             owned);
 
-        bool attackForceEstablished =
-            force.CombatUnits >=
-            configuration.MinimumAttackUnits;
-
-        if (attackForceEstablished)
-        {
-            EntityId reconReserve =
-                ResolveReconReserveScout(
-                    owned);
-            EntityId[] supportGroup =
-                owned.CombatUnits
-                    .Where(
-                        unit =>
-                            unit != reconReserve)
-                    .OrderBy(
-                        static unit =>
-                            unit)
-                    .ToArray();
-
-            MaintainForwardSupplySupport(
-                context,
-                owned,
-                supportGroup,
-                reconReserve);
-        }
-
         if (retreatUnits.Count > 0)
         {
             Vector3 recovery =
@@ -1327,6 +1301,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             command.Execute(context);
         }
 
+        bool attackForceEstablished =
+            force.CombatUnits >=
+            configuration.MinimumAttackUnits;
         bool forceWideRecovery =
             attackForceEstablished &&
             activeResupplyOrders > 0 &&
