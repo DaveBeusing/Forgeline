@@ -313,6 +313,26 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
 
             if (distanceSquared > rangeSquared)
             {
+                if (context.Entities.TryGetComponent(
+                        providerEntity,
+                        out SupplyRescueAssignment assignment) &&
+                    assignment.Recipient ==
+                        recipient)
+                {
+                    return BattlefieldResupplyPlanner
+                               .CanProviderReachImmobileRecipient(
+                                   context,
+                                   _inventories,
+                                   providerEntity,
+                                   recipient,
+                                   distanceSquared,
+                                   provider.ResupplyRangeMeters) &&
+                           SupplyRescueTravel.ValidateRemainingRoute(
+                               context,
+                               providerEntity,
+                               recipient);
+                }
+
                 bool recipientCanMove =
                     BattlefieldResupplyPlanner.CanReachProvider(
                         context, _inventories, recipient, distanceSquared, provider.ResupplyRangeMeters);
