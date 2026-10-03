@@ -170,7 +170,9 @@ internal static class Program
                     matchSeed,
                     enableDiagnostics: true,
                     enableDebugCapture:
-                        options.DiagnosticsOutput is not null) with
+                        options.DiagnosticsOutput is not null ||
+                        options.SaveOutput is not null ||
+                        options.ReplayOutput is not null) with
                 {
                     Scenario = settings
                 };
