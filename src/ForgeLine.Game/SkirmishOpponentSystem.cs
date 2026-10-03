@@ -4671,7 +4671,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     coreAssaultEstablished
                         ? configuration.ResolveMatureSupplyTruckTarget(
                             owned.SupplyDepots.Count)
-                        : configuration.MinimumSupplyTrucks,
+                        : Math.Max(
+                            configuration.MinimumSupplyTrucks,
+                            Math.Min(
+                                owned.SupplyDepots.Count,
+                                3)),
                 [UnitIds.MainBattleTank] = 4,
                 [UnitIds.MobileArtillery] = 2
             };
