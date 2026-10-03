@@ -132,10 +132,23 @@ public sealed record GameplayTelemetryDebugSummary(
     IReadOnlyList<GameplayFrontDebugSummary> Fronts,
     IReadOnlyList<GameplayObjectiveDebugSummary> Objectives);
 
+public sealed record GameplayMatchResult(
+    string Status,
+    string Lifecycle,
+    string Outcome,
+    string TerminationReason,
+    ulong Winner,
+    ulong DefeatedPlayer,
+    ulong StartedAtTick,
+    ulong CompletedAtTick,
+    ulong FinalizedAtTick,
+    uint TransitionCount);
+
 public sealed record GameplayTelemetrySnapshot(
     int SchemaVersion,
     ulong ObservedTicks,
     int TickRate,
+    GameplayMatchResult MatchResult,
     IReadOnlyList<GameplayMetric> Metrics,
     IReadOnlyList<GameplayMilestone> Milestones,
     GameplayTelemetryDebugSummary Debug);
@@ -296,6 +309,7 @@ public sealed class GameplayTelemetryCollector
             CurrentSchemaVersion,
             _observedTicks,
             _scenario.Simulation.Clock.TicksPerSecond,
+            CaptureMatchResult(),
             metrics,
             milestones,
             CaptureDebugSummary());
@@ -1396,6 +1410,24 @@ public sealed class GameplayTelemetryCollector
                 string.Empty,
                 match.Winner.Value,
                 "player_id"));
+    }
+
+    private GameplayMatchResult CaptureMatchResult()
+    {
+        MatchState match =
+            _scenario.GetMatchState();
+
+        return new GameplayMatchResult(
+            match.Status.ToString(),
+            match.Lifecycle.ToString(),
+            match.Outcome.ToString(),
+            match.TerminationReason.ToString(),
+            match.Winner.Value,
+            match.DefeatedPlayer.Value,
+            match.StartedAtTick.Value,
+            match.CompletedAtTick.Value,
+            match.FinalizedAtTick.Value,
+            match.TransitionCount);
     }
 
     private GameplayTelemetryDebugSummary CaptureDebugSummary()
