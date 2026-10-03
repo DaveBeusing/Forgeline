@@ -42,6 +42,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         CreateDefaultConfiguration();
 
     private const int MaximumRetainedScratchCapacity = 4_096;
+    private const int MaximumRecoveryPowerPlants = 6;
     private const double OffensiveFuelContinuationMargin = 0.15;
 
     private readonly IReadOnlyDictionary<PlayerId, SkirmishOpponentConfiguration>
@@ -931,7 +932,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         {
             if (GetBuildingCount(
                     owned,
-                    BuildingIds.PowerPlant) < 4 &&
+                    BuildingIds.PowerPlant) <
+                    MaximumRecoveryPowerPlants &&
                 TryIssueBuilding(
                     context,
                     controller,
@@ -1064,7 +1066,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 economy.PowerDemand + 20.0 &&
                 GetBuildingCount(
                     owned,
-                    BuildingIds.PowerPlant) < 4 &&
+                    BuildingIds.PowerPlant) <
+                    MaximumRecoveryPowerPlants &&
                 !HasPendingBuilding(
                     owned,
                     BuildingIds.PowerPlant))
