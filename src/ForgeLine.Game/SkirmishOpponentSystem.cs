@@ -308,7 +308,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                      controller,
                      owned,
                      force,
-                     configuration))
+                     configuration,
+                     state.DeepOffensiveCommitted))
         {
             strategicState =
                 SkirmishStrategicState.Resupplying;
@@ -318,7 +319,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 ResolveRecoveryPoint(
                     context,
                     controller,
-                    owned);
+                    owned,
+                    owned.CombatUnits,
+                    state.DeepOffensiveCommitted);
             hasObjective = true;
         }
         else if (TryScout(
@@ -1198,7 +1201,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         SkirmishOpponentController controller,
         OwnedState owned,
         in SkirmishForceAssessment force,
-        SkirmishOpponentConfiguration configuration)
+        SkirmishOpponentConfiguration configuration,
+        bool deepOffensiveCommitted)
     {
         if (owned.CombatUnits.Count == 0)
         {
@@ -1281,7 +1285,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     context,
                     controller,
                     owned,
-                    retreatUnits);
+                    retreatUnits,
+                    deepOffensiveCommitted);
 
             var command =
                 new RetreatCommand(
@@ -5299,20 +5304,12 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private static Vector3 ResolveRecoveryPoint(
         SimulationContext context,
         SkirmishOpponentController controller,
-        OwnedState owned) =>
-        ResolveRecoveryPoint(
-            context,
-            controller,
-            owned,
-            owned.CombatUnits);
-
-    private static Vector3 ResolveRecoveryPoint(
-        SimulationContext context,
-        SkirmishOpponentController controller,
         OwnedState owned,
-        List<EntityId> recoveringUnits)
+        List<EntityId> recoveringUnits,
+        bool preferForwardSupport)
     {
-        if (RetreatRecoveryPlanner.TryResolve(
+        if (preferForwardSupport &&
+            RetreatRecoveryPlanner.TryResolve(
                 context.Entities,
                 controller.Player,
                 recoveringUnits,
@@ -5326,6 +5323,21 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         if (owned.SupplyDepots.Count == 0)
         {
             return controller.HomePosition;
+        }
+
+        if (!preferForwardSupport)
+        {
+            return owned.SupplyDepots
+                .OrderBy(
+                    depot =>
+                        HorizontalDistanceSquared(
+                            controller.HomePosition,
+                            depot.Position))
+                .ThenBy(
+                    static depot =>
+                        depot.Entity)
+                .First()
+                .Position;
         }
 
         Vector3 centroid = Vector3.Zero;
@@ -5348,13 +5360,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         if (positioned == 0)
         {
-            centroid =
-                controller.HomePosition;
+            return controller.HomePosition;
         }
-        else
-        {
-            centroid /= positioned;
-        }
+
+        centroid /= positioned;
 
         return owned.SupplyDepots
             .OrderBy(
