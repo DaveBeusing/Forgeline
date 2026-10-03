@@ -148,6 +148,88 @@ public sealed class ResupplyPlanningDiagnosticsTests
     }
 
     [Fact]
+    public void HighPriorityCombatRecipientPrefersMobileProviderOverCloserStaticProvider()
+    {
+        var fixture =
+            new Fixture();
+        EntityId mobile =
+            fixture.Truck(
+                new Vector3(
+                    20.0f,
+                    0.0f,
+                    0.0f),
+                movementFuel: 80.0,
+                cargoFuel: 40.0,
+                Owner);
+        fixture.StaticProvider(
+            new Vector3(
+                80.0f,
+                0.0f,
+                0.0f),
+            cargoFuel: 40.0);
+        EntityId recipient =
+            fixture.CombatRecipient(
+                new Vector3(
+                    100.0f,
+                    0.0f,
+                    0.0f),
+                BattlefieldSupplyPriority.High);
+
+        fixture.Simulation.AdvanceOneTick();
+
+        Assert.Equal(
+            mobile,
+            fixture.Result(
+                recipient).SelectedProvider);
+        Assert.Equal(
+            mobile,
+            fixture.Simulation.Entities
+                .GetComponent<ResupplyOrder>(
+                    recipient).Provider);
+    }
+
+    [Fact]
+    public void NormalPriorityCombatRecipientKeepsNearestProviderSelection()
+    {
+        var fixture =
+            new Fixture();
+        fixture.Truck(
+            new Vector3(
+                20.0f,
+                0.0f,
+                0.0f),
+            movementFuel: 80.0,
+            cargoFuel: 40.0,
+            Owner);
+        EntityId nearest =
+            fixture.StaticProvider(
+                new Vector3(
+                    80.0f,
+                    0.0f,
+                    0.0f),
+                cargoFuel: 40.0);
+        EntityId recipient =
+            fixture.CombatRecipient(
+                new Vector3(
+                    100.0f,
+                    0.0f,
+                    0.0f),
+                BattlefieldSupplyPriority.Normal);
+
+        fixture.Simulation.AdvanceOneTick();
+
+        Assert.Equal(
+            nearest,
+            fixture.Result(
+                recipient).SelectedProvider);
+        Assert.Equal(
+            nearest,
+            fixture.Simulation.Entities
+                .GetComponent<ResupplyOrder>(
+                    recipient).Provider);
+    }
+
+    [Fact]
     public void NewAttemptReplacesStaleFailureAfterPhysicalStockBecomesAvailable()
     {
         var fixture = new Fixture();
@@ -247,6 +329,70 @@ public sealed class ResupplyPlanningDiagnosticsTests
             Assert.True(Inventories.Remove(fuel.InventoryId, ResourceIds.Fuel, fuel.Capacity - movementFuel).Succeeded);
             SupplyTruck truck = Simulation.Entities.GetComponent<SupplyTruck>(entity);
             Assert.True(Inventories.Add(truck.InventoryId, ResourceIds.Fuel, cargoFuel).Succeeded);
+            return entity;
+        }
+
+        public EntityId StaticProvider(
+            Vector3 position,
+            double cargoFuel)
+        {
+            InventoryId inventory =
+                Inventories.CreateInventory(
+                    new InventorySpecification(
+                        100.0));
+
+            Assert.True(
+                Inventories.Add(
+                    inventory,
+                    ResourceIds.Fuel,
+                    cargoFuel).Succeeded);
+
+            EntityId entity =
+                Simulation.Entities.CreateEntity();
+            Simulation.Entities.AddComponent(
+                entity,
+                new WorldTransform(
+                    position,
+                    Quaternion.Identity,
+                    Vector3.One));
+            Simulation.Entities.AddComponent(
+                entity,
+                new SupplyProvider(
+                    inventory,
+                    Owner,
+                    resupplyRangeMeters: 12.0f));
+
+            return entity;
+        }
+
+        public EntityId CombatRecipient(
+            Vector3 position,
+            BattlefieldSupplyPriority priority)
+        {
+            EntityId entity =
+                MobileRecipient(
+                    position);
+
+            Simulation.Entities.AddComponent(
+                entity,
+                new Combatant(
+                    new FactionId(
+                        checked((uint)Owner.Value))));
+            Simulation.Entities.AddComponent(
+                entity,
+                HealthState.Full(
+                    100.0));
+            Simulation.Entities.AddComponent(
+                entity,
+                new UnitSupplyPriority(
+                    priority));
+            Simulation.Entities.AddComponent(
+                entity,
+                new AutomaticResupplyPolicy(
+                    ammunitionThreshold: 0.2,
+                    fuelThreshold: 0.55,
+                    enabled: true));
+
             return entity;
         }
 
