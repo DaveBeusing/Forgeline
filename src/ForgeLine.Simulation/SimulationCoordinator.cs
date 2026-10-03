@@ -30,6 +30,8 @@ public sealed class SimulationCoordinator
 
     public SimulationSessionId SessionId { get; }
 
+    public event Action<SimulationCommandEnvelope>? CommandSubmitted;
+
     public FixedTickClock Clock { get; }
 
     public SimulationRandom Random { get; }
@@ -91,6 +93,7 @@ public sealed class SimulationCoordinator
 
         SimulationCommandEnvelope envelope = _commands.Enqueue(targetTick, source, command);
         _peakPendingCommands = Math.Max(_peakPendingCommands, _commands.PendingCount);
+        CommandSubmitted?.Invoke(envelope);
         return envelope;
     }
 
