@@ -142,7 +142,7 @@ public static class GameplayTelemetryAnalysis
         return comparisons;
     }
 
-    private static IReadOnlyList<GameplayMetricAggregate> AggregateMetrics(
+    private static List<GameplayMetricAggregate> AggregateMetrics(
         IReadOnlyList<GameplayTelemetryMatch> matches)
     {
         var groups =
@@ -284,7 +284,7 @@ public static class GameplayTelemetryAnalysis
         return result;
     }
 
-    private static IReadOnlyList<GameplayMilestoneAggregate>
+    private static List<GameplayMilestoneAggregate>
         AggregateMilestones(
             IReadOnlyList<GameplayTelemetryMatch> matches)
     {
