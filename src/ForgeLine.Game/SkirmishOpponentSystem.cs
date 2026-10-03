@@ -3282,6 +3282,16 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         OwnedState owned,
         SkirmishOpponentConfiguration configuration)
     {
+        bool powerRecoveryRequired =
+            owned.PowerDemand > 0.0 &&
+            (owned.PowerGeneration <
+                 owned.PowerDemand ||
+             owned.OfflineConsumers > 0);
+        LogisticsStockPriority constructionRawPriority =
+            powerRecoveryRequired
+                ? LogisticsStockPriority.Critical
+                : LogisticsStockPriority.High;
+
         if (context.Entities.IsAlive(
                 controller.PreferredConstructionSource))
         {
@@ -3293,7 +3303,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 220.0,
                 650.0,
                 1_100.0,
-                LogisticsStockPriority.High);
+                constructionRawPriority);
             SetStockPolicy(
                 context,
                 controller.Player,
@@ -3302,7 +3312,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 140.0,
                 450.0,
                 800.0,
-                LogisticsStockPriority.High);
+                constructionRawPriority);
             SetStockPolicy(
                 context,
                 controller.Player,
@@ -3311,7 +3321,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 140.0,
                 450.0,
                 800.0,
-                LogisticsStockPriority.High);
+                constructionRawPriority);
             SetStockPolicy(
                 context,
                 controller.Player,
@@ -3376,7 +3386,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     80.0,
                     220.0,
                     450.0,
-                    LogisticsStockPriority.Critical);
+                    powerRecoveryRequired
+                        ? LogisticsStockPriority.High
+                        : LogisticsStockPriority.Critical);
             }
 
             if (facility.Supports(
