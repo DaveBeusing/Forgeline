@@ -106,7 +106,22 @@ internal sealed class ComponentStore<T> : IComponentStore
 
     public EntityId GetEntityAt(int denseIndex)
     {
+        if ((uint)denseIndex >= (uint)_count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(denseIndex));
+        }
+
         return _entities[denseIndex];
+    }
+
+    public object GetBoxedComponentAt(int denseIndex)
+    {
+        if ((uint)denseIndex >= (uint)_count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(denseIndex));
+        }
+
+        return _components[denseIndex];
     }
 
     private bool TryGetDenseIndex(EntityId entity, out int denseIndex)
