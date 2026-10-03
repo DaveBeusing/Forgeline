@@ -123,6 +123,20 @@ dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configur
 
 The vertical-slice report adds match outcome/pacing, entity and pending-command state, tick timing, observed allocation/GC activity, Cargo Transport completion/failure/route counters, Automated Distribution state, Battlefield Supply transfer totals, Artillery shot/impact totals, and per-side economy/power/industry/intelligence/readiness/force summaries.
 
+### Gameplay Telemetry Is a Separate Evidence Stream
+
+Engine/runtime diagnostics answer questions about execution behavior, failure investigation, allocations, timing, and subsystem state. Gameplay telemetry answers balance and pacing questions across reproducible matches. The two outputs intentionally remain separate.
+
+A vertical-slice batch can emit both:
+
+```powershell
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --matches 5 --require-terminal --diagnostics-output artifacts/vertical-slice-soak.json --telemetry-output artifacts/vertical-slice-soak.telemetry.json
+```
+
+The telemetry report records each match seed, stable gameplay metric series, progression milestones, compact supply/production/front/objective summaries, aggregate distributions, and optional comparison against a prior compatible report. It does not contain renderer timing and does not participate in authoritative gameplay.
+
+See [Gameplay Telemetry and Match Analysis](GameplayTelemetry.md) for the schema, ownership rules, metric catalog, aggregation, and baseline-comparison semantics.
+
 `gameplay` and `validation` are intentionally different profiles. Gameplay uses normal starting stock, default opponent settings, and the interactive client's navigation resolution. Validation uses explicit accelerated resources/opponent pacing and coarser navigation for bounded deterministic coverage. Validation values must not silently become gameplay defaults.
 
 ### Bounded Skirmish Progression Reports
@@ -237,7 +251,7 @@ The simulation test suite also verifies that 10,000 lightweight ECS entities can
 
 Combat scale measurement is available through the simulation BenchmarkDotNet host with 100/1,000 simultaneously armed direct-fire entities and 100/1,000 moving physical projectiles. Logistics stress coverage remains separate so the measured workload is attributable to the subsystem under test.
 
-Repeated full-match endurance runs use `build/Run-VerticalSliceSoak.ps1` or the manually dispatched `Vertical Slice Soak` workflow. These runs create a fresh simulation for every match and retain environment/context in the structured report. They are deliberately not hard PR timing gates.
+Repeated full-match endurance runs use `build/Run-VerticalSliceSoak.ps1` or the manually dispatched `Vertical Slice Soak` workflow. These runs create a fresh simulation for every match and emit separate engine-diagnostics and gameplay-telemetry reports. They are deliberately not hard PR timing gates.
 
 ## Interpreting Results
 
@@ -264,7 +278,7 @@ CI:
 - runs a bounded 10,000-lightweight-entity stress smoke scenario;
 - runs one accelerated terminal Central Divide match through the real headless game stack;
 - runs the complete correctness test suite;
-- uploads the generated JSON diagnostics, including the vertical-slice report and its progression sidecar, as the `engine-diagnostics` workflow artifact.
+- uploads generated JSON evidence, including engine diagnostics, the vertical-slice progression sidecar, and the gameplay telemetry report, as the `engine-diagnostics` workflow artifact.
 
 The artifact exists to make failures and performance observations inspectable without turning volatile timing into pass/fail thresholds.
 
