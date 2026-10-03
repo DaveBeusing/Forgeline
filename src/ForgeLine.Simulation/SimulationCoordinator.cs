@@ -32,6 +32,8 @@ public sealed class SimulationCoordinator
 
     public event Action<SimulationCommandEnvelope>? CommandSubmitted;
 
+    public event Action<ISimulationCommand, SimulationTick>? ControlCommandExecuting;
+
     public FixedTickClock Clock { get; }
 
     public SimulationRandom Random { get; }
@@ -113,6 +115,9 @@ public sealed class SimulationCoordinator
         _context.TickDuration = Clock.TickDuration;
         _context.Phase = SimulationPhase.InputCommands;
 
+        ControlCommandExecuting?.Invoke(
+            command,
+            CurrentTick);
         command.Execute(_context);
 
         for (int index = 0;
