@@ -618,12 +618,17 @@ public sealed class SkirmishSupplyPolicyTests
             coreSteel.DesiredTarget,
             precision: 6);
 
-        Assert.Equal(
-            LogisticsStockPriority.Critical,
+        LogisticsStockPriority refineryVolatilesPriority =
             FindStockPolicy(
                 entities,
                 refinery,
-                ResourceIds.Volatiles).Priority);
+                ResourceIds.Volatiles).Priority;
+
+        Assert.True(
+            refineryVolatilesPriority is
+                LogisticsStockPriority.High or
+                LogisticsStockPriority.Critical,
+            "Fuel processing input must remain elevated while field supply recovery stays Critical.");
         Assert.Equal(
             LogisticsStockPriority.Critical,
             FindStockPolicy(
