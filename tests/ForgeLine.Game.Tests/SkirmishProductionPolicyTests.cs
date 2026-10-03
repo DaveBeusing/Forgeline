@@ -1234,6 +1234,16 @@ public sealed class SkirmishProductionPolicyTests
                 PowerPriority.Industrial,
                 enabled: true));
 
+        SkirmishOpponentState opponentState =
+            entities.GetComponent<SkirmishOpponentState>(
+                scenario.West.Controller);
+        entities.SetComponent(
+            scenario.West.Controller,
+            opponentState with
+            {
+                DeepOffensiveCommitted = true
+            });
+
         var optionalArtillery =
             new QueueUnitProductionCommand(
                 scenario.West.Player,
