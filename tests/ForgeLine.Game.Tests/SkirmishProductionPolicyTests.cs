@@ -277,28 +277,6 @@ public sealed class SkirmishProductionPolicyTests
             coreTransform.Position,
             scenario.West.Player);
 
-        for (int index = 0;
-             index < 2;
-             index++)
-        {
-            EntityId depot =
-                entities.CreateEntity();
-            entities.AddComponent(
-                depot,
-                coreTransform);
-            entities.AddComponent(
-                depot,
-                new CompletedBuilding(
-                    BuildingIds.SupplyDepot,
-                    scenario.West.Player,
-                    SimulationTick.Zero));
-            entities.AddComponent(
-                depot,
-                new ControllableEntity(
-                    scenario.West.Player,
-                    ControllableEntityCategory.Building));
-        }
-
         InventoryId input =
             scenario.Inventories.CreateInventory(
                 new InventorySpecification(
@@ -1233,16 +1211,6 @@ public sealed class SkirmishProductionPolicyTests
                 1.0,
                 PowerPriority.Industrial,
                 enabled: true));
-
-        SkirmishOpponentState opponentState =
-            entities.GetComponent<SkirmishOpponentState>(
-                scenario.West.Controller);
-        entities.SetComponent(
-            scenario.West.Controller,
-            opponentState with
-            {
-                DeepOffensiveCommitted = true
-            });
 
         var optionalArtillery =
             new QueueUnitProductionCommand(
