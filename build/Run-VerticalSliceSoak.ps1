@@ -12,7 +12,9 @@ param(
     [ValidateRange(0, [long]::MaxValue)]
     [long]$Seed = 2026,
 
-    [string]$Output = "artifacts/vertical-slice-soak.json"
+    [string]$Output = "artifacts/vertical-slice-soak.json",
+
+    [string]$TelemetryOutput = "artifacts/vertical-slice-soak.telemetry.json"
 )
 
 Set-StrictMode -Version Latest
@@ -32,7 +34,8 @@ try {
         "--ticks", $TicksPerMatch.ToString([System.Globalization.CultureInfo]::InvariantCulture),
         "--seed", $Seed.ToString([System.Globalization.CultureInfo]::InvariantCulture),
         "--matches", $Matches.ToString([System.Globalization.CultureInfo]::InvariantCulture),
-        "--diagnostics-output", $Output
+        "--diagnostics-output", $Output,
+        "--telemetry-output", $TelemetryOutput
     )
 
     if ($Profile -eq "validation") {
@@ -45,7 +48,8 @@ try {
         throw "Vertical-slice soak run failed with exit code $LASTEXITCODE."
     }
 
-    Write-Host "Vertical-slice soak completed. Report: $Output"
+    Write-Host "Vertical-slice soak completed. Diagnostics: $Output"
+    Write-Host "Vertical-slice soak telemetry: $TelemetryOutput"
 }
 finally {
     Pop-Location

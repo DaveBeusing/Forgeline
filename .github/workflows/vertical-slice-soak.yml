@@ -67,11 +67,14 @@ jobs:
           -TicksPerMatch ${{ inputs.ticks_per_match }}
           -Seed ${{ inputs.seed }}
           -Output "artifacts/vertical-slice-soak.json"
+          -TelemetryOutput "artifacts/vertical-slice-soak.telemetry.json"
 
       - name: Upload soak report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: vertical-slice-soak
-          path: artifacts/vertical-slice-soak.json
+          path: |
+            artifacts/vertical-slice-soak.json
+            artifacts/vertical-slice-soak.telemetry.json
           if-no-files-found: warn

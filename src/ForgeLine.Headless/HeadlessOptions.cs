@@ -19,6 +19,8 @@ internal readonly record struct HeadlessOptions(
     int MatchCount,
     bool RequireTerminal,
     string? DiagnosticsOutput,
+    string? TelemetryOutput,
+    string? TelemetryBaseline,
     bool ShowHelp)
 {
     public static HeadlessOptions Parse(string[] args)
@@ -37,6 +39,8 @@ internal readonly record struct HeadlessOptions(
         int matchCount = 1;
         bool requireTerminal = false;
         string? diagnosticsOutput = null;
+        string? telemetryOutput = null;
+        string? telemetryBaseline = null;
         bool showHelp = false;
 
         for (int index = 0; index < args.Length; index++)
@@ -103,6 +107,22 @@ internal readonly record struct HeadlessOptions(
                             argument);
                     break;
 
+                case "--telemetry-output":
+                    telemetryOutput =
+                        GetValue(
+                            args,
+                            ref index,
+                            argument);
+                    break;
+
+                case "--telemetry-baseline":
+                    telemetryBaseline =
+                        GetValue(
+                            args,
+                            ref index,
+                            argument);
+                    break;
+
                 case "--help":
                 case "-h":
                     showHelp = true;
@@ -123,7 +143,9 @@ internal readonly record struct HeadlessOptions(
                 tickRate,
                 entityCount,
                 matchCount,
-                requireTerminal);
+                requireTerminal,
+                telemetryOutput,
+                telemetryBaseline);
         }
 
         return new HeadlessOptions(
@@ -136,6 +158,8 @@ internal readonly record struct HeadlessOptions(
             matchCount,
             requireTerminal,
             diagnosticsOutput,
+            telemetryOutput,
+            telemetryBaseline,
             showHelp);
     }
 
@@ -145,7 +169,9 @@ internal readonly record struct HeadlessOptions(
         int tickRate,
         int entityCount,
         int matchCount,
-        bool requireTerminal)
+        bool requireTerminal,
+        string? telemetryOutput,
+        string? telemetryBaseline)
     {
         if (scenario == HeadlessScenarioKind.VerticalSlice)
         {
@@ -164,7 +190,22 @@ internal readonly record struct HeadlessOptions(
                     nameof(entityCount));
             }
 
+            if (telemetryBaseline is not null &&
+                telemetryOutput is null)
+            {
+                throw new ArgumentException(
+                    "--telemetry-baseline requires --telemetry-output.",
+                    nameof(telemetryBaseline));
+            }
+
             return;
+        }
+
+        if (telemetryOutput is not null ||
+            telemetryBaseline is not null)
+        {
+            throw new ArgumentException(
+                "--telemetry-output and --telemetry-baseline are only valid for the vertical-slice scenario.");
         }
 
         if (profile != VerticalSliceScenarioProfile.Gameplay)

@@ -125,6 +125,14 @@ Run the canonical vertical-slice stack headlessly. The `gameplay` profile uses p
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --require-terminal --diagnostics-output artifacts/opponent-full-match.json
 ```
 
+Collect a separate structured gameplay/balance report, including stable metrics, progression milestones, per-match seeds, multi-match aggregation, and optional baseline comparison:
+
+```powershell
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --matches 5 --require-terminal --telemetry-output artifacts/balance-telemetry.json
+```
+
+See [Gameplay Telemetry and Match Analysis](docs/GameplayTelemetry.md) for metric semantics, ownership, aggregation, comparison, and validation.
+
 Run repeated fresh-match soak validation outside the normal PR duration budget:
 
 ```powershell
@@ -135,7 +143,7 @@ pwsh ./build/Run-VerticalSliceSoak.ps1 -Profile validation -Matches 5 -TicksPerM
 
 Opt-in diagnostics expose tick timing, entity/component counts, job metrics, managed allocation and GC observations, and runtime environment metadata without coupling simulation to presentation or platform code.
 
-See [Diagnostics and Performance](docs/DiagnosticsAndPerformance.md) for invariant conventions, metric interpretation, headless reports, stress scenarios, and regression investigation.
+See [Diagnostics and Performance](docs/DiagnosticsAndPerformance.md) for invariant conventions, engine/runtime metric interpretation, headless diagnostics, stress scenarios, and regression investigation. Gameplay/balance evidence is intentionally exported separately; see [Gameplay Telemetry and Match Analysis](docs/GameplayTelemetry.md).
 
 ## Benchmarks
 

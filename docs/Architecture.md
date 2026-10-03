@@ -40,6 +40,18 @@ Platform, graphics, audio, input, and asset infrastructure remain isolated from 
 
 The repository validates several of these invariants with `build/Validate-ProjectReferences.ps1`, which also checks the complete project graph for cycles.
 
+## Observability and Analysis Boundary
+
+Gameplay telemetry is observational infrastructure, not a simulation authority.
+
+- ForgeLine.Game owns stable gameplay metric contracts and read-only collection from authoritative subsystem metrics and ECS state.
+- ForgeLine.Headless owns batch execution, structured report serialization, aggregation, and revision comparison.
+- Collection occurs after completed fixed ticks and never submits commands or mutates simulation state.
+- Gameplay/balance telemetry is kept separate from simulation-loop, allocation, GC, rendering, and hardware-sensitive performance diagnostics.
+- Deterministic seeds and fresh runtime composition make multi-match evidence reproducible for a fixed repository revision and scenario profile.
+
+See [Gameplay Telemetry and Match Analysis](GameplayTelemetry.md) for the schema and measurement semantics.
+
 ## Project Responsibilities
 
 ### Low-Level Infrastructure
