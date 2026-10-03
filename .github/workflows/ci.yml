@@ -59,6 +59,16 @@ jobs:
       - name: Lightweight entity stress smoke
         run: dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 16 --seed 67890 --tick-rate 20 --entities 10000 --diagnostics-output artifacts/headless-stress-10000.json
 
+      - name: Save and replay recovery smoke
+        shell: pwsh
+        run: |
+          dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario vertical-slice --profile validation --ticks 256 --seed 4242 --save-output artifacts/recovery-smoke.save.json --replay-output artifacts/recovery-smoke.replay.json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --load-input artifacts/recovery-smoke.save.json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --replay-input artifacts/recovery-smoke.replay.json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Test
         run: dotnet test --solution ForgeLine.sln --configuration Release --no-build
 
