@@ -53,24 +53,6 @@ public sealed record VerticalSliceAuthoritativeSnapshot(
                     "logistics.edges",
                     scenario.Logistics.GetEdges()),
                 CaptureDomain(
-                    "logistics.metrics",
-                    scenario.Logistics.Metrics),
-                CaptureDomain(
-                    "cargo.metrics",
-                    scenario.CargoTransport.Metrics),
-                CaptureDomain(
-                    "cargo.debug",
-                    scenario.CargoTransport.LastDebugSnapshot),
-                CaptureDomain(
-                    "distribution.metrics",
-                    scenario.AutomatedDistribution.Metrics),
-                CaptureDomain(
-                    "distribution.debug",
-                    scenario.AutomatedDistribution.LastDebugSnapshot),
-                CaptureDomain(
-                    "distribution.capacity",
-                    scenario.AutomatedDistribution.LastCapacityDebugSnapshot),
-                CaptureDomain(
                     "intelligence.player_1",
                     scenario.Intelligence.Capture(
                         new FactionId(1))),
