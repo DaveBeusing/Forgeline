@@ -85,8 +85,10 @@ public static class MatchPersistenceService
                 CreateAndSchedule(
                     replay.Configuration,
                     replay.Commands);
-            scenario.Simulation.RunTicks(
-                replay.FinalTick);
+            RunToTickWithControls(
+                scenario,
+                replay.FinalTick,
+                replay.Commands);
 
             if (scenario.Simulation.Random.State !=
                 replay.FinalRandomState)
@@ -254,8 +256,10 @@ public static class MatchPersistenceService
                 CreateAndSchedule(
                     configuration,
                     commands);
-            scenario.Simulation.RunTicks(
-                targetTick);
+            RunToTickWithControls(
+                scenario,
+                targetTick,
+                commands);
 
             if (scenario.Simulation.Random.State !=
                 expectedRandomState)
@@ -328,8 +332,11 @@ public static class MatchPersistenceService
 
         try
         {
-            RecordedSimulationCommand[] ordered =
+            RecordedSimulationCommand[] scheduled =
                 commands
+                    .Where(
+                        static command =>
+                            !command.IsControl)
                     .OrderBy(
                         static command =>
                             command.Sequence)
@@ -338,11 +345,11 @@ public static class MatchPersistenceService
             ulong expectedSequence = 1;
 
             for (int index = 0;
-                 index < ordered.Length;
+                 index < scheduled.Length;
                  index++)
             {
                 RecordedSimulationCommand entry =
-                    ordered[index];
+                    scheduled[index];
 
                 if (entry.Sequence !=
                         expectedSequence ||
@@ -350,7 +357,7 @@ public static class MatchPersistenceService
                 {
                     throw Failure(
                         MatchPersistenceFailureReason.CorruptDocument,
-                        $"Replay command sequence is invalid at entry {index}.");
+                        $"Replay command sequence is invalid at scheduled entry {index}.");
                 }
 
                 ISimulationCommand command =
@@ -387,6 +394,111 @@ public static class MatchPersistenceService
         }
     }
 
+    private static void RunToTickWithControls(
+        VerticalSliceScenario scenario,
+        ulong targetTick,
+        IReadOnlyList<RecordedSimulationCommand> commands)
+    {
+        RecordedSimulationCommand[] controls =
+            commands
+                .Where(
+                    static command =>
+                        command.IsControl)
+                .OrderBy(
+                    static command =>
+                        command.RecordingOrder)
+                .ToArray();
+        int controlIndex = 0;
+
+        while (scenario.Simulation.CurrentTick.Value <
+               targetTick)
+        {
+            scenario.Simulation.AdvanceOneTick();
+            ulong currentTick =
+                scenario.Simulation.CurrentTick.Value;
+
+            while (controlIndex <
+                       controls.Length &&
+                   controls[controlIndex].TargetTick ==
+                       currentTick)
+            {
+                ISimulationCommand control =
+                    ReplayCommandCodec.Decode(
+                        controls[controlIndex],
+                        scenario);
+                scenario.Simulation.ExecuteControlCommand(
+                    control);
+                controlIndex++;
+            }
+        }
+
+        if (controlIndex !=
+            controls.Length)
+        {
+            throw Failure(
+                MatchPersistenceFailureReason.CorruptDocument,
+                "Replay contains a control command outside the captured tick range.");
+        }
+    }
+
+    private static void ValidateCommandHistory(
+        IReadOnlyList<RecordedSimulationCommand> commands,
+        ulong targetTick)
+    {
+        RecordedSimulationCommand[] recorded =
+            commands
+                .OrderBy(
+                    static command =>
+                        command.RecordingOrder)
+                .ToArray();
+        ulong expectedRecordingOrder = 1;
+        ulong expectedScheduledSequence = 1;
+
+        for (int index = 0;
+             index < recorded.Length;
+             index++)
+        {
+            RecordedSimulationCommand command =
+                recorded[index];
+
+            if (command.RecordingOrder !=
+                expectedRecordingOrder)
+            {
+                throw Failure(
+                    MatchPersistenceFailureReason.CorruptDocument,
+                    $"Replay recording order is invalid at entry {index}.");
+            }
+
+            expectedRecordingOrder++;
+
+            if (command.IsControl)
+            {
+                if (command.Sequence != 0 ||
+                    command.TargetTick == 0 ||
+                    command.TargetTick >
+                        targetTick)
+                {
+                    throw Failure(
+                        MatchPersistenceFailureReason.CorruptDocument,
+                        $"Control command at entry {index} has invalid tick or sequence metadata.");
+                }
+
+                continue;
+            }
+
+            if (command.Sequence !=
+                    expectedScheduledSequence ||
+                command.TargetTick == 0)
+            {
+                throw Failure(
+                    MatchPersistenceFailureReason.CorruptDocument,
+                    $"Scheduled command at entry {index} has invalid sequence metadata.");
+            }
+
+            expectedScheduledSequence++;
+        }
+    }
+
     private static void ValidateSave(
         MatchSaveData save)
     {
@@ -400,6 +512,10 @@ public static class MatchPersistenceService
             save.Commands);
         ArgumentNullException.ThrowIfNull(
             save.State);
+
+        ValidateCommandHistory(
+            save.Commands,
+            save.SavedTick);
 
         if (save.State.SchemaVersion !=
             VerticalSliceAuthoritativeSnapshot.CurrentSchemaVersion)
@@ -444,6 +560,10 @@ public static class MatchPersistenceService
             replay.Configuration);
         ArgumentNullException.ThrowIfNull(
             replay.Commands);
+
+        ValidateCommandHistory(
+            replay.Commands,
+            replay.FinalTick);
 
         if (string.IsNullOrWhiteSpace(
                 replay.FinalStateSha256))
