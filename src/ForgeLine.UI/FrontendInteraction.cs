@@ -103,18 +103,21 @@ public sealed class SettingsInteractionModel
 
 public static class FrontendHitTesting
 {
+    private static (float X, float Y) Local(float pointerX, float pointerY, FrontendLayout layout) =>
+        ((pointerX - layout.OffsetX) / layout.Scale, (pointerY - layout.OffsetY) / layout.Scale);
     private const float DetailStartY = 390f;
     private const float DetailRowHeight = 58f;
-    public static int? DetailRow(float pointerX, float pointerY, float scale, int rowCount)
+    public static int? DetailRow(float pointerX, float pointerY, FrontendLayout layout, int rowCount)
     {
+        (float x, float y) = Local(pointerX, pointerY, layout);
         if (rowCount <= 0 ||
-            pointerX < 92f * scale ||
-            pointerX > 1072f * scale)
+            x < 92f ||
+            x > 1072f)
         {
             return null;
         }
 
-        float localY = pointerY / scale - DetailStartY;
+        float localY = y - DetailStartY;
         if (localY < 0)
         {
             return null;
@@ -124,15 +127,15 @@ public static class FrontendHitTesting
         return row < rowCount ? row : null;
     }
 
-    public static int? DetailAdjust(float pointerX, float pointerY, float scale, int rowCount)
+    public static int? DetailAdjust(float pointerX, float pointerY, FrontendLayout layout, int rowCount)
     {
-        int? row = DetailRow(pointerX, pointerY, scale, rowCount);
+        int? row = DetailRow(pointerX, pointerY, layout, rowCount);
         if (row is null)
         {
             return null;
         }
 
-        float x = pointerX / scale;
+        (float x, _) = Local(pointerX, pointerY, layout);
         if (x >= 830f && x <= 902f)
         {
             return -1;
@@ -146,45 +149,55 @@ public static class FrontendHitTesting
         return null;
     }
 
-    public static bool PrimaryAction(float pointerX, float pointerY, float scale) =>
-        pointerX >= 782f * scale &&
-        pointerX <= 1072f * scale &&
-        pointerY >= 838f * scale &&
-        pointerY <= 896f * scale;
+    public static bool PrimaryAction(float pointerX, float pointerY, FrontendLayout layout)
+    {
+        (float x, float y) = Local(pointerX, pointerY, layout);
+        return x >= 782f &&
+            x <= 1072f &&
+            y >= 838f &&
+            y <= 896f;
+    }
 
-    public static bool SecondaryAction(float pointerX, float pointerY, float scale) =>
-        pointerX >= 92f * scale &&
-        pointerX <= 312f * scale &&
-        pointerY >= 838f * scale &&
-        pointerY <= 896f * scale;
+    public static bool SecondaryAction(float pointerX, float pointerY, FrontendLayout layout)
+    {
+        (float x, float y) = Local(pointerX, pointerY, layout);
+        return x >= 92f &&
+            x <= 312f &&
+            y >= 838f &&
+            y <= 896f;
+    }
 
-    public static bool Footer(float pointerX, float pointerY, float scale) =>
-        pointerX >= 82f * scale &&
-        pointerX <= 1072f * scale &&
-        pointerY >= 900f * scale &&
-        pointerY <= 970f * scale;
+    public static bool Footer(float pointerX, float pointerY, FrontendLayout layout)
+    {
+        (float x, float y) = Local(pointerX, pointerY, layout);
+        return x >= 82f &&
+            x <= 1072f &&
+            y >= 900f &&
+            y <= 970f;
+    }
 
     public static string? MainMenu(
         float pointerX,
         float pointerY,
-        float scale,
+        FrontendLayout layout,
         IReadOnlyList<MainMenuItem> items)
     {
         ArgumentNullException.ThrowIfNull(items);
-        float y = 338f * scale;
+        (float x, float pointerLocalY) = Local(pointerX, pointerY, layout);
+        float y = 338f;
 
         foreach (MainMenuItem item in items)
         {
             if (item.IsEnabled &&
-                pointerX >= 82f * scale &&
-                pointerX <= 642f * scale &&
-                pointerY >= y &&
-                pointerY <= y + 52f * scale)
+                x >= 82f &&
+                x <= 642f &&
+                pointerLocalY >= y &&
+                pointerLocalY <= y + 52f)
             {
                 return item.Id;
             }
 
-            y += 72f * scale;
+            y += 72f;
         }
 
         return null;
