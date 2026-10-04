@@ -33,4 +33,112 @@ internal static class FrontendPresentationAdapter
 
         return FrontendSurfaceView.MainMenu(entries);
     }
+
+    internal static FrontendSurfaceView NewGame(
+        NewGameModel model) =>
+        FrontendSurfaceView.Detail(
+            "NEW GAME",
+            [
+                new FrontendDetailLineView(
+                    "BATTLEFIELD",
+                    model.Configuration.MapName),
+                new FrontendDetailLineView(
+                    "FACTION",
+                    model.Configuration.FactionName),
+                new FrontendDetailLineView(
+                    "SEED",
+                    model.Configuration.Seed.ToString(
+                        System.Globalization.CultureInfo.InvariantCulture))
+            ],
+            "ENTER  START MATCH     ESC  BACK");
+
+    internal static FrontendSurfaceView LoadGame(
+        LoadGameModel model)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+
+        if (!model.HasSaves)
+        {
+            return FrontendSurfaceView.Detail(
+                "LOAD GAME",
+                [
+                    new FrontendDetailLineView(
+                        "STATUS",
+                        "NO SAVED MATCHES")
+                ],
+                "ESC  BACK");
+        }
+
+        FrontendDetailLineView[] lines =
+            model.Entries
+                .Select(
+                    entry =>
+                        new FrontendDetailLineView(
+                            entry.DisplayName,
+                            entry.CanLoad
+                                ? $"TICK {entry.SavedTick}"
+                                : entry.State.ToString().ToUpperInvariant(),
+                            !entry.CanLoad))
+                .ToArray();
+
+        return FrontendSurfaceView.Detail(
+            "LOAD GAME",
+            lines,
+            "ESC  BACK");
+    }
+
+    internal static FrontendSurfaceView Settings(
+        SettingsModel model)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+        FrontendSettingsSnapshot settings =
+            model.Settings;
+
+        return FrontendSurfaceView.Detail(
+            "SETTINGS",
+            [
+                new FrontendDetailLineView(
+                    "DISPLAY",
+                    $"{settings.WindowWidth} X {settings.WindowHeight}"),
+                new FrontendDetailLineView(
+                    "BORDERLESS",
+                    settings.BorderlessFullscreen ? "ON" : "OFF"),
+                new FrontendDetailLineView(
+                    "UI SCALE",
+                    settings.UiScale.ToString(
+                        "0.00",
+                        System.Globalization.CultureInfo.InvariantCulture)),
+                new FrontendDetailLineView(
+                    "EDGE SCROLL",
+                    settings.EdgeScrollEnabled ? "ON" : "OFF"),
+                new FrontendDetailLineView(
+                    "CAMERA SPEED",
+                    settings.CameraPanSpeedMultiplier.ToString(
+                        "0.00",
+                        System.Globalization.CultureInfo.InvariantCulture)),
+                new FrontendDetailLineView(
+                    "ONBOARDING",
+                    settings.ShowOnboarding ? "ON" : "OFF")
+            ],
+            "ESC  BACK");
+    }
+
+    internal static FrontendSurfaceView Credits()
+    {
+        FrontendDetailLineView[] lines =
+            CreditsModel.Sections
+                .SelectMany(
+                    section =>
+                        section.Lines.Select(
+                            line =>
+                                new FrontendDetailLineView(
+                                    section.Heading,
+                                    line)))
+                .ToArray();
+
+        return FrontendSurfaceView.Detail(
+            "CREDITS",
+            lines,
+            "ESC  BACK");
+    }
 }
