@@ -12,6 +12,7 @@ public sealed class VerticalSliceValidationProfileTests
                 VerticalSliceScenarioProfile.Validation);
 
         Assert.Equal(0.40, settings.WestOpponent.OffensiveFuelThreshold, 2);
+        Assert.Equal(1, settings.WestOpponent.MinimumObjectivePressureUnits);
         Assert.Equal(0.46, settings.EastOpponent.OffensiveFuelThreshold, 2);
 
         Assert.True(
