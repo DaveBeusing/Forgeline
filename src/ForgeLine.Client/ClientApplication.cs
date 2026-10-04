@@ -842,15 +842,17 @@ internal sealed class ClientApplication
             WriteVisualQualificationReport(
                 visualQualificationOutput,
                 renderInstanceCount,
+                window,
                 renderHost.LatestQualification);
         }
 
         return 0;
     }
 
-    private static void WriteVisualQualificationReport(
+    private void WriteVisualQualificationReport(
         string outputPath,
         int renderStressInstances,
+        IWindow window,
         ClientVisualQualificationSnapshot? qualification)
     {
         ClientVisualQualificationSnapshot metrics =
@@ -878,6 +880,31 @@ internal sealed class ClientApplication
                 scene =
                     "vertical-slice-client",
                 renderStressInstances,
+                settings =
+                    new
+                    {
+                        path =
+                            _settingsPath,
+                        requestedMode =
+                            _settings.BorderlessFullscreen
+                                ? WindowMode.BorderlessFullscreen.ToString()
+                                : WindowMode.Windowed.ToString(),
+                        _settings.WindowWidth,
+                        _settings.WindowHeight
+                    },
+                window =
+                    new
+                    {
+                        mode =
+                            window.Mode.ToString(),
+                        clientWidth =
+                            window.ClientSize.Width,
+                        clientHeight =
+                            window.ClientSize.Height,
+                        window.IsMinimized,
+                        window.IsOpen,
+                        window.Dpi
+                    },
                 metrics
             };
 
@@ -896,7 +923,13 @@ internal sealed class ClientApplication
             $"draws={metrics.TotalMeasuredDrawCalls} " +
             $"instances={metrics.VisibleInstances}/{metrics.TotalInstances} " +
             $"lod={metrics.HighLodInstances}/{metrics.ReducedLodInstances} " +
-            $"vfx={metrics.ActiveVfxEffects}/{metrics.VfxPoolCapacity}");
+            $"vfx={metrics.ActiveVfxEffects}/{metrics.VfxPoolCapacity} " +
+            $"windowMode={window.Mode} " +
+            $"surface={metrics.Surface.Width}x{metrics.Surface.Height} " +
+            $"submitted={metrics.Surface.SubmittedFrameCount} " +
+            $"presented={metrics.Surface.PresentedFrameCount} " +
+            $"pendingResize={metrics.Surface.ResizePending} " +
+            $"occluded={metrics.Surface.IsOccluded}");
     }
 
     private static void DispatchPlayerActionRequest(
