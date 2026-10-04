@@ -136,7 +136,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             $"software={_deviceInfo.IsSoftwareAdapter} " +
             $"debugLayer={_deviceInfo.DebugLayerEnabled}");
         Console.WriteLine(
-            $"[graphics:surface] size={_width}x{_height} " +
+            $"[graphics:surface] size={_surfaceLifecycle.Width}x{_surfaceLifecycle.Height} " +
             $"buffers={configuration.BufferCount} present={PresentMode}");
     }
 
