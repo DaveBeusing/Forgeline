@@ -460,11 +460,14 @@ internal sealed class ClientApplication
                 informationLayer.ToggleMinimap();
             }
 
-            if (!pauseMenuActive &&
+            bool helpPressed =
                 ConsumeKeyPress(
                     inputState,
                     PlatformKey.F12,
-                    ref helpHeld))
+                    ref helpHeld);
+
+            if (!pauseMenuActive &&
+                helpPressed)
             {
                 helpVisible =
                     !helpVisible;
@@ -695,7 +698,8 @@ internal sealed class ClientApplication
             {
                 if (!simulationHost.WaitForPauseState(
                         paused: true,
-                        PauseTransitionTimeout))
+                        timeout:
+                            PauseTransitionTimeout))
                 {
                     pauseMenuFeedback =
                         "SAVE FAILED - PAUSE TIMEOUT";
