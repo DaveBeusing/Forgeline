@@ -88,11 +88,14 @@ internal static class FrontendPresentationAdapter
     }
 
     internal static FrontendSurfaceView Settings(
-        SettingsModel model)
+        SettingsModel model,
+        SettingsInteractionModel? interaction = null)
     {
         ArgumentNullException.ThrowIfNull(model);
         FrontendSettingsSnapshot settings =
             model.Settings;
+
+        FrontendSettingsField? focused = interaction?.FocusedField;
 
         return FrontendSurfaceView.Detail(
             "SETTINGS",
@@ -101,26 +104,26 @@ internal static class FrontendPresentationAdapter
                     "DISPLAY",
                     $"{settings.WindowWidth} X {settings.WindowHeight}"),
                 new FrontendDetailLineView(
-                    "BORDERLESS",
+                    focused == FrontendSettingsField.BorderlessFullscreen ? "> BORDERLESS" : "BORDERLESS",
                     settings.BorderlessFullscreen ? "ON" : "OFF"),
                 new FrontendDetailLineView(
-                    "UI SCALE",
+                    focused == FrontendSettingsField.UiScale ? "> UI SCALE" : "UI SCALE",
                     settings.UiScale.ToString(
                         "0.00",
                         System.Globalization.CultureInfo.InvariantCulture)),
                 new FrontendDetailLineView(
-                    "EDGE SCROLL",
+                    focused == FrontendSettingsField.EdgeScroll ? "> EDGE SCROLL" : "EDGE SCROLL",
                     settings.EdgeScrollEnabled ? "ON" : "OFF"),
                 new FrontendDetailLineView(
-                    "CAMERA SPEED",
+                    focused == FrontendSettingsField.CameraSpeed ? "> CAMERA SPEED" : "CAMERA SPEED",
                     settings.CameraPanSpeedMultiplier.ToString(
                         "0.00",
                         System.Globalization.CultureInfo.InvariantCulture)),
                 new FrontendDetailLineView(
-                    "ONBOARDING",
+                    focused == FrontendSettingsField.Onboarding ? "> ONBOARDING" : "ONBOARDING",
                     settings.ShowOnboarding ? "ON" : "OFF")
             ],
-            "ESC  BACK");
+            "UP/DOWN  SELECT     LEFT/RIGHT  CHANGE     ENTER  APPLY     ESC  BACK");
     }
 
     internal static FrontendSurfaceView Credits()

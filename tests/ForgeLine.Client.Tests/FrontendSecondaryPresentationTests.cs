@@ -74,7 +74,7 @@ public sealed class FrontendSecondaryPresentationTests
                     true,
                     true,
                     1.0f,
-                    ForgeLine.Input.RtsCameraBindings.Default));
+                    new ForgeLine.Input.RtsCameraBindings()));
 
         FrontendSurfaceView view =
             FrontendPresentationAdapter.Settings(model);
