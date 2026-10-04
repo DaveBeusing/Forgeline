@@ -1812,8 +1812,9 @@ internal sealed class ClientApplication
                     if (action == GameFrontendAction.LoadGame &&
                         loadGame.CanContinue)
                     {
-                        if (loadGame.TryGetLoadTarget(
-                                loadGame.ContinueTarget!.Id,
+                        if (loadGame.ContinueTarget is LoadGameEntry continueTarget &&
+                            loadGame.TryGetLoadTarget(
+                                continueTarget.Id,
                                 out LoadGameEntry targetSave))
                         {
                             return FrontendSessionSelectionResult.Start(
