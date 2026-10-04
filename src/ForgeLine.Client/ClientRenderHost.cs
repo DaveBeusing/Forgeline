@@ -45,7 +45,8 @@ internal readonly record struct ClientRenderFrame(
     RtsInformationLayerView InformationLayer = default,
     float UiScale = 1.0f,
     PreAlphaUxView PreAlphaUx = default,
-    FrontendSurfaceView? Frontend = null);
+    FrontendSurfaceView? Frontend = null,
+    bool SurfaceSuspended = false);
 
 internal sealed class ClientRenderHost : IDisposable
 {
@@ -278,6 +279,10 @@ internal sealed class ClientRenderHost : IDisposable
                 initialTarget.Width;
             int height =
                 initialTarget.Height;
+            bool surfaceSuspended =
+                initialTarget.Suspended ||
+                width <= 0 ||
+                height <= 0;
 
             _started.Set();
 
@@ -301,7 +306,28 @@ internal sealed class ClientRenderHost : IDisposable
                 ClientRenderFrame current =
                     frame.Value;
 
-                if (current.ViewportWidth != width ||
+                if (current.SurfaceSuspended)
+                {
+                    if (!surfaceSuspended)
+                    {
+                        graphics.Resize(
+                            0,
+                            0);
+                        surfaceSuspended =
+                            true;
+                    }
+
+                    continue;
+                }
+
+                if (current.ViewportWidth <= 0 ||
+                    current.ViewportHeight <= 0)
+                {
+                    continue;
+                }
+
+                if (surfaceSuspended ||
+                    current.ViewportWidth != width ||
                     current.ViewportHeight != height)
                 {
                     graphics.Resize(
@@ -311,12 +337,8 @@ internal sealed class ClientRenderHost : IDisposable
                         current.ViewportWidth;
                     height =
                         current.ViewportHeight;
-                }
-
-                if (width <= 0 ||
-                    height <= 0)
-                {
-                    continue;
+                    surfaceSuspended =
+                        false;
                 }
 
                 renderCamera.ApplyState(

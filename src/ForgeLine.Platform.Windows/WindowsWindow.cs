@@ -17,20 +17,20 @@ internal sealed class WindowsWindow : IWindow
     private readonly WindowConfiguration _configuration;
     private readonly Queue<WindowEvent> _events = new(16);
     private readonly Queue<PlatformInputEvent> _inputEvents = new(64);
+    private readonly WindowLifecycleState _lifecycle = new();
     private readonly int _ownerThreadId = Environment.CurrentManagedThreadId;
     private readonly uint _windowedStyle;
 
     private GCHandle _selfHandle;
+    private WindowsNative.NativeRect _currentMonitorBounds;
     private WindowsNative.NativeRect _windowedRect;
+    private nint _currentMonitor;
     private nint _handle;
-    private WindowSize _clientSize;
     private uint _dpi = 96;
     private bool _disposed;
     private bool _hasWindowedRect;
     private bool _isFocused;
-    private bool _isMinimized;
     private bool _isOpen;
-    private WindowMode _mode = WindowMode.Windowed;
 
     internal WindowsWindow(WindowConfiguration configuration)
     {
@@ -90,7 +90,9 @@ internal sealed class WindowsWindow : IWindow
 
             uint windowDpi = WindowsNative.GetDpiForWindow(_handle);
             _dpi = windowDpi == 0 ? initialDpi : windowDpi;
-            RefreshClientSizeOrThrow();
+            _lifecycle.InitializeClientSize(
+                ReadClientSizeOrThrow());
+            RefreshCurrentMonitor();
 
             _ = WindowsNative.ShowWindow(_handle, WindowsNative.SwShow);
             _ = WindowsNative.UpdateWindow(_handle);
@@ -121,17 +123,17 @@ internal sealed class WindowsWindow : IWindow
 
     public NativeWindowHandle NativeHandle => new(_handle);
 
-    public WindowSize ClientSize => _clientSize;
+    public WindowSize ClientSize => _lifecycle.ValidClientSize;
 
     public uint Dpi => _dpi;
 
     public bool IsFocused => _isFocused;
 
-    public bool IsMinimized => _isMinimized;
+    public bool IsMinimized => _lifecycle.IsMinimized;
 
     public bool IsOpen => _isOpen;
 
-    public WindowMode Mode => _mode;
+    public WindowMode Mode => _lifecycle.CurrentMode;
 
     public void RequestClose()
     {
@@ -154,28 +156,56 @@ internal sealed class WindowsWindow : IWindow
     {
         ThrowIfUnavailable();
 
-        if (_mode == mode)
+        WindowMode previousMode =
+            _lifecycle.CurrentMode;
+
+        if (!_lifecycle.BeginModeTransition(mode))
         {
             return;
         }
 
-        switch (mode)
+        ulong previousResizeGeneration =
+            _lifecycle.ResizeGeneration;
+
+        try
         {
-            case WindowMode.Windowed:
-                RestoreWindowedMode();
-                break;
+            switch (mode)
+            {
+                case WindowMode.Windowed:
+                    RestoreWindowedMode();
+                    break;
 
-            case WindowMode.BorderlessFullscreen:
-                EnterBorderlessFullscreen();
-                break;
+                case WindowMode.BorderlessFullscreen:
+                    EnterBorderlessFullscreen();
+                    break;
 
-            default:
-                throw new ArgumentOutOfRangeException(nameof(mode), mode, "Unsupported window mode.");
+                default:
+                    throw new ArgumentOutOfRangeException(
+                        nameof(mode),
+                        mode,
+                        "Unsupported window mode.");
+            }
+
+            WindowSize finalClientSize =
+                ReadClientSizeOrThrow();
+            _lifecycle.CompleteModeTransition(
+                finalClientSize);
+            RefreshCurrentMonitor();
+
+            EnqueueEvent(
+                WindowEventKind.Resized);
+            EnqueueEvent(
+                WindowEventKind.ModeChanged);
+
+            WriteModeTransitionDiagnostic(
+                previousMode,
+                previousResizeGeneration);
         }
-
-        _mode = mode;
-        RefreshClientSizeOrThrow();
-        EnqueueEvent(WindowEventKind.ModeChanged);
+        catch
+        {
+            _lifecycle.AbortModeTransition();
+            throw;
+        }
     }
 
     public bool TryDequeueEvent(out WindowEvent windowEvent)
@@ -524,29 +554,48 @@ internal sealed class WindowsWindow : IWindow
 
     private void ProcessSizeMessage(nuint wParam, nint lParam)
     {
-        int width = unchecked((ushort)(lParam.ToInt64() & 0xFFFF));
-        int height = unchecked((ushort)((lParam.ToInt64() >> 16) & 0xFFFF));
-        _clientSize = new WindowSize(width, height);
+        int width =
+            unchecked(
+                (ushort)(
+                    lParam.ToInt64() &
+                    0xFFFF));
+        int height =
+            unchecked(
+                (ushort)(
+                    (lParam.ToInt64() >> 16) &
+                    0xFFFF));
 
-        bool wasMinimized = _isMinimized;
-        _isMinimized = wParam == WindowsNative.SizeMinimized;
+        WindowSizeMessageTransition transition =
+            _lifecycle.ApplySizeMessage(
+                width,
+                height,
+                wParam ==
+                    WindowsNative.SizeMinimized);
 
-        if (_isMinimized)
+        if (transition.BecameMinimized)
         {
-            if (!wasMinimized)
-            {
-                EnqueueEvent(WindowEventKind.Minimized);
-            }
+            EnqueueEvent(
+                WindowEventKind.Minimized);
+        }
 
+        if (!transition.ValidClientSizeObserved)
+        {
             return;
         }
 
-        if (wasMinimized)
+        if (transition.Restored)
         {
-            EnqueueEvent(WindowEventKind.Restored);
+            EnqueueEvent(
+                WindowEventKind.Restored);
         }
 
-        EnqueueEvent(WindowEventKind.Resized);
+        if (!_lifecycle.TransitionInProgress &&
+            (transition.ClientSizeChanged ||
+             transition.Restored))
+        {
+            EnqueueEvent(
+                WindowEventKind.Resized);
+        }
     }
 
     private void ProcessDpiChanged(nuint wParam, nint lParam)
@@ -571,35 +620,28 @@ internal sealed class WindowsWindow : IWindow
         }
 
         TryRefreshClientSize();
+        RefreshCurrentMonitor();
         EnqueueEvent(WindowEventKind.DpiChanged);
     }
 
     private void EnterBorderlessFullscreen()
     {
-        if (WindowsNative.GetWindowRect(_handle, out _windowedRect) == 0)
+        if (WindowsNative.GetWindowRect(
+                _handle,
+                out _windowedRect) == 0)
         {
-            throw CreateLastErrorException("Unable to capture the windowed placement.");
+            throw CreateLastErrorException(
+                "Unable to capture the windowed placement.");
         }
 
         _hasWindowedRect = true;
 
-        nint monitor = WindowsNative.MonitorFromWindow(_handle, WindowsNative.MonitorDefaultToNearest);
-        if (monitor == 0)
-        {
-            throw CreateLastErrorException("Unable to resolve the target monitor.");
-        }
+        WindowsNative.MonitorInfo monitorInfo =
+            GetCurrentMonitorInfo();
 
-        var monitorInfo = new WindowsNative.MonitorInfo
-        {
-            Size = (uint)Marshal.SizeOf<WindowsNative.MonitorInfo>()
-        };
-
-        if (WindowsNative.GetMonitorInfo(monitor, ref monitorInfo) == 0)
-        {
-            throw CreateLastErrorException("Unable to read the target monitor bounds.");
-        }
-
-        SetWindowStyle(WindowsNative.WsPopup);
+        SetWindowStyle(
+            WindowsNative.WsPopup |
+            WindowsNative.WsVisible);
 
         if (WindowsNative.SetWindowPos(
                 _handle,
@@ -608,32 +650,43 @@ internal sealed class WindowsWindow : IWindow
                 monitorInfo.Monitor.Top,
                 monitorInfo.Monitor.Width,
                 monitorInfo.Monitor.Height,
-                WindowsNative.SwpFrameChanged | WindowsNative.SwpNoActivate | WindowsNative.SwpNoZOrder) == 0)
+                WindowsNative.SwpFrameChanged |
+                WindowsNative.SwpNoActivate |
+                WindowsNative.SwpNoZOrder |
+                WindowsNative.SwpShowWindow) == 0)
         {
-            throw CreateLastErrorException("Unable to enter borderless fullscreen mode.");
+            throw CreateLastErrorException(
+                "Unable to enter borderless fullscreen mode.");
         }
     }
 
     private void RestoreWindowedMode()
     {
-        SetWindowStyle(_windowedStyle);
+        SetWindowStyle(
+            _windowedStyle |
+            WindowsNative.WsVisible);
 
-        if (!_hasWindowedRect)
-        {
-            return;
-        }
+        WindowsNative.NativeRect restoreRect =
+            ResolveWindowedRestoreRect();
 
         if (WindowsNative.SetWindowPos(
                 _handle,
                 0,
-                _windowedRect.Left,
-                _windowedRect.Top,
-                _windowedRect.Width,
-                _windowedRect.Height,
-                WindowsNative.SwpFrameChanged | WindowsNative.SwpNoActivate | WindowsNative.SwpNoZOrder) == 0)
+                restoreRect.Left,
+                restoreRect.Top,
+                restoreRect.Width,
+                restoreRect.Height,
+                WindowsNative.SwpFrameChanged |
+                WindowsNative.SwpNoActivate |
+                WindowsNative.SwpNoZOrder |
+                WindowsNative.SwpShowWindow) == 0)
         {
-            throw CreateLastErrorException("Unable to restore windowed mode.");
+            throw CreateLastErrorException(
+                "Unable to restore windowed mode.");
         }
+
+        _windowedRect = restoreRect;
+        _hasWindowedRect = true;
     }
 
     private void SetWindowStyle(uint style)
@@ -654,33 +707,214 @@ internal sealed class WindowsWindow : IWindow
         }
     }
 
-    private void RefreshClientSizeOrThrow()
+    private WindowSize ReadClientSizeOrThrow()
     {
-        if (WindowsNative.GetClientRect(_handle, out var rect) == 0)
+        if (WindowsNative.GetClientRect(
+                _handle,
+                out WindowsNative.NativeRect rect) == 0)
         {
-            throw CreateLastErrorException("Unable to query the Windows client area.");
+            throw CreateLastErrorException(
+                "Unable to query the Windows client area.");
         }
 
-        _clientSize = new WindowSize(rect.Width, rect.Height);
+        var clientSize =
+            new WindowSize(
+                rect.Width,
+                rect.Height);
+
+        if (clientSize.IsEmpty)
+        {
+            throw new InvalidOperationException(
+                "The Windows client area resolved to an invalid zero-sized surface.");
+        }
+
+        return clientSize;
     }
 
     private void TryRefreshClientSize()
     {
-        if (_handle != 0 && WindowsNative.GetClientRect(_handle, out var rect) != 0)
+        if (_handle == 0 ||
+            WindowsNative.GetClientRect(
+                _handle,
+                out WindowsNative.NativeRect rect) == 0 ||
+            rect.Width <= 0 ||
+            rect.Height <= 0)
         {
-            _clientSize = new WindowSize(rect.Width, rect.Height);
+            return;
         }
+
+        _lifecycle.SetValidClientSize(
+            new WindowSize(
+                rect.Width,
+                rect.Height));
+    }
+
+    private WindowsNative.NativeRect ResolveWindowedRestoreRect()
+    {
+        WindowsNative.NativeRect candidate =
+            _hasWindowedRect
+                ? _windowedRect
+                : CreateFallbackWindowedRect();
+
+        nint monitor =
+            WindowsNative.MonitorFromRect(
+                ref candidate,
+                WindowsNative.MonitorDefaultToNull);
+
+        if (monitor == 0)
+        {
+            monitor =
+                WindowsNative.MonitorFromWindow(
+                    _handle,
+                    WindowsNative.MonitorDefaultToNearest);
+        }
+
+        if (monitor == 0)
+        {
+            throw CreateLastErrorException(
+                "Unable to resolve a monitor for the restored window.");
+        }
+
+        WindowsNative.MonitorInfo monitorInfo =
+            ReadMonitorInfo(
+                monitor);
+        WindowsNative.NativeRect fallback =
+            CreateFallbackWindowedRect();
+
+        WindowBounds normalized =
+            WindowPlacement.ConstrainToWorkArea(
+                ToBounds(candidate),
+                ToBounds(monitorInfo.Work),
+                fallback.Width,
+                fallback.Height);
+
+        return ToNativeRect(
+            normalized);
+    }
+
+    private WindowsNative.NativeRect CreateFallbackWindowedRect()
+    {
+        var rect =
+            new WindowsNative.NativeRect
+            {
+                Left = 0,
+                Top = 0,
+                Right = _configuration.Width,
+                Bottom = _configuration.Height
+            };
+
+        if (WindowsNative.AdjustWindowRectExForDpi(
+                ref rect,
+                _windowedStyle,
+                0,
+                0,
+                _dpi) == 0)
+        {
+            throw CreateLastErrorException(
+                "Unable to calculate fallback windowed bounds.");
+        }
+
+        return rect;
+    }
+
+    private WindowsNative.MonitorInfo GetCurrentMonitorInfo()
+    {
+        nint monitor =
+            WindowsNative.MonitorFromWindow(
+                _handle,
+                WindowsNative.MonitorDefaultToNearest);
+
+        if (monitor == 0)
+        {
+            throw CreateLastErrorException(
+                "Unable to resolve the target monitor.");
+        }
+
+        WindowsNative.MonitorInfo monitorInfo =
+            ReadMonitorInfo(
+                monitor);
+        _currentMonitor = monitor;
+        _currentMonitorBounds =
+            monitorInfo.Monitor;
+        return monitorInfo;
+    }
+
+    private void RefreshCurrentMonitor()
+    {
+        _ = GetCurrentMonitorInfo();
+    }
+
+    private static WindowsNative.MonitorInfo ReadMonitorInfo(
+        nint monitor)
+    {
+        var monitorInfo =
+            new WindowsNative.MonitorInfo
+            {
+                Size =
+                    (uint)Marshal.SizeOf<
+                        WindowsNative.MonitorInfo>()
+            };
+
+        if (WindowsNative.GetMonitorInfo(
+                monitor,
+                ref monitorInfo) == 0)
+        {
+            throw CreateLastErrorException(
+                "Unable to read the target monitor bounds.");
+        }
+
+        return monitorInfo;
+    }
+
+    private static WindowBounds ToBounds(
+        in WindowsNative.NativeRect rect) =>
+        new(
+            rect.Left,
+            rect.Top,
+            rect.Width,
+            rect.Height);
+
+    private static WindowsNative.NativeRect ToNativeRect(
+        in WindowBounds bounds) =>
+        new()
+        {
+            Left = bounds.Left,
+            Top = bounds.Top,
+            Right =
+                bounds.Left +
+                bounds.Width,
+            Bottom =
+                bounds.Top +
+                bounds.Height
+        };
+
+    private void WriteModeTransitionDiagnostic(
+        WindowMode previousMode,
+        ulong previousResizeGeneration)
+    {
+        Console.WriteLine(
+            $"[platform:window-mode] previous={previousMode} " +
+            $"requested={_lifecycle.RequestedMode} " +
+            $"result={_lifecycle.CurrentMode} " +
+            $"monitor=0x{_currentMonitor:X} " +
+            $"monitorBounds={_currentMonitorBounds.Left},{_currentMonitorBounds.Top}," +
+            $"{_currentMonitorBounds.Width}x{_currentMonitorBounds.Height} " +
+            $"client={_lifecycle.ValidClientSize.Width}x{_lifecycle.ValidClientSize.Height} " +
+            $"minimized={_lifecycle.IsMinimized} " +
+            $"resizeGeneration={previousResizeGeneration}->{_lifecycle.ResizeGeneration} " +
+            "resizeNotification=emitted");
     }
 
     private void EnqueueEvent(WindowEventKind kind)
     {
-        _events.Enqueue(new WindowEvent(
-            kind,
-            _clientSize,
-            _dpi,
-            _isFocused,
-            _isMinimized,
-            _mode));
+        _events.Enqueue(
+            new WindowEvent(
+                kind,
+                _lifecycle.ValidClientSize,
+                _dpi,
+                _isFocused,
+                _lifecycle.IsMinimized,
+                _lifecycle.CurrentMode));
     }
 
     private static uint GetWindowStyle(bool resizable)

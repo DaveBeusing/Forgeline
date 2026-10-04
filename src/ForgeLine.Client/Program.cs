@@ -22,25 +22,26 @@ internal static class Program
         {
             var settingsStore =
                 new ClientSettingsStore();
-            ClientSettingsLoadResult settingsLoad =
-                settingsStore.Load();
-
-            Console.WriteLine(
-                $"[settings:loaded] path=\"{settingsLoad.Path}\" " +
-                $"createdDefaults={settingsLoad.CreatedDefaults} " +
-                $"recoveredInvalid={settingsLoad.RecoveredInvalidSettings}");
-
-            if (!string.IsNullOrWhiteSpace(
-                    settingsLoad.RecoveryMessage))
-            {
-                Console.WriteLine(
-                    $"[settings:recovery] {settingsLoad.RecoveryMessage}");
-            }
-
-            using var platform = new WindowsPlatform();
+            using var platform =
+                new WindowsPlatform();
 
             while (true)
             {
+                ClientSettingsLoadResult settingsLoad =
+                    settingsStore.Load();
+
+                Console.WriteLine(
+                    $"[settings:loaded] path=\"{settingsLoad.Path}\" " +
+                    $"createdDefaults={settingsLoad.CreatedDefaults} " +
+                    $"recoveredInvalid={settingsLoad.RecoveredInvalidSettings}");
+
+                if (!string.IsNullOrWhiteSpace(
+                        settingsLoad.RecoveryMessage))
+                {
+                    Console.WriteLine(
+                        $"[settings:recovery] {settingsLoad.RecoveryMessage}");
+                }
+
                 var application =
                     new ClientApplication(
                         platform,

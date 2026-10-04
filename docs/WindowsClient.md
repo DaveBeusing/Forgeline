@@ -53,7 +53,7 @@ The client-provided scheduler remains client-owned. Disposing the shared scenari
 
 `WindowsPlatform.PumpEvents()` drains pending Win32 messages without tying platform processing to simulation or rendering.
 
-The graphics client pumps messages once per rendered frame. Raw input events are drained after platform messages and mapped into frame-scoped RTS camera actions. Present pacing controls the active render loop, while minimized or zero-sized windows use bounded event waits so suspended rendering does not busy-spin.
+The graphics client pumps messages once per rendered frame. Raw input events are drained after platform messages and mapped into frame-scoped RTS camera actions. Present pacing controls the active render loop. Minimize state is propagated separately from the last valid non-zero client dimensions so suspended rendering does not depend on a transient `0x0` resize becoming authoritative.
 
 ## Window Events
 
@@ -69,7 +69,7 @@ Initial window-event coverage includes:
 - DPI change
 - window-mode change
 
-Each window event carries the current client size, DPI, focus state, minimize state, and window mode. Keyboard, mouse-button, pointer, wheel, and focus-loss input are exposed separately through `IWindow.TryDequeueInputEvent` so higher layers never inspect Win32 messages directly.
+Each window event carries the last valid non-zero client size, DPI, focus state, minimize state, and window mode. A minimized or otherwise transient zero-sized `WM_SIZE` does not replace the valid client dimensions. During a window-mode transition, intermediate native resize messages are folded into the transition and the platform emits the final valid resize state after the native placement has completed. Keyboard, mouse-button, pointer, wheel, and focus-loss input are exposed separately through `IWindow.TryDequeueInputEvent` so higher layers never inspect Win32 messages directly.
 
 ## DPI Behavior
 
@@ -86,7 +86,11 @@ The initial supported modes are:
 - `Windowed`
 - `BorderlessFullscreen`
 
-Borderless fullscreen captures the previous windowed bounds, removes the overlapped window frame, expands to the nearest monitor bounds, and restores the saved windowed placement when returning to `Windowed`.
+Borderless fullscreen uses a normal visible `WS_POPUP` desktop window. The platform captures the previous windowed bounds, resolves the monitor associated with the current window, applies the monitor bounds with a frame refresh, and keeps DXGI exclusive fullscreen disabled.
+
+Returning to `Windowed` restores the normal overlapped/resizable style and the saved windowed bounds. Restored bounds are validated against the currently available monitor work area; an off-screen or invalid placement is constrained or safely centered on an available display.
+
+Persisted Borderless startup and runtime mode changes use the same platform transition path. When the Settings screen requests a client restart for a display-mode change, the restart reloads the persisted settings before creating the next native window.
 
 Exclusive fullscreen is not implemented.
 
@@ -136,7 +140,7 @@ After a session begins, Space toggles player pause during gameplay and F12 opens
 
 Setup, explicit player pause, help, and minimized/zero-size window state all use the existing simulation-owner pause control transition. They are combined as pause reasons so restoring the window cannot resume a match that remains explicitly paused or has help open.
 
-Client settings are loaded from the current user's Local Application Data FORGELINE/settings.json path before window and camera creation. Missing settings create validated defaults; malformed or invalid settings are quarantined and recovered. The current settings contract includes window size/mode, UI scale, onboarding visibility, edge scroll, camera pan speed, camera keys, and drag-pan binding.
+Client settings are loaded from the current user's Local Application Data FORGELINE/settings.json path before every native-window application session. Missing settings create validated defaults; malformed or invalid settings are quarantined and recovered. A display-setting restart reloads the just-persisted window size and mode before recreating the window. The current settings contract includes window size/mode, UI scale, onboarding visibility, edge scroll, camera pan speed, camera keys, and drag-pan binding.
 
 See [Pre-Alpha UX and Operations](PreAlphaUxAndOperations.md) and [Pre-Alpha Verification Checklist](PreAlphaVerificationChecklist.md).
 

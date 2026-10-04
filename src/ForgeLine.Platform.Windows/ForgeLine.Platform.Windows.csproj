@@ -6,4 +6,7 @@
   <ItemGroup>
     <ProjectReference Include="../ForgeLine.Core/ForgeLine.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="ForgeLine.Platform.Windows.Tests" />
+  </ItemGroup>
 </Project>

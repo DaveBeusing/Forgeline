@@ -800,7 +800,9 @@ internal sealed class ClientApplication
                     window.Dpi,
                     informationView,
                     _settings.UiScale,
-                    preAlphaUx));
+                    preAlphaUx,
+                    SurfaceSuspended:
+                        window.IsMinimized));
 
             if (_platform.Clock.GetElapsedTime(nextDiagnosticAt, now) >= DiagnosticInterval)
             {
