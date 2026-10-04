@@ -15,7 +15,7 @@ public sealed class FrontendInteractionTests
         string? hit =
             FrontendHitTesting.MainMenu(
                 120,
-                430,
+                502,
                 1.0f,
                 menu.Items);
 
