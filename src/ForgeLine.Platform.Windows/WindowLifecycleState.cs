@@ -31,13 +31,16 @@ internal sealed class WindowLifecycleState
     internal void InitializeClientSize(
         in WindowSize clientSize)
     {
+        RequireValidClientSize(
+            clientSize);
+
         if (HasValidClientSize)
         {
-            throw new InvalidOperationException(
-                "The initial client size has already been established.");
+            _ = SetValidClientSize(
+                clientSize);
+            return;
         }
 
-        RequireValidClientSize(clientSize);
         _validClientSize = clientSize;
         HasValidClientSize = true;
     }
