@@ -109,7 +109,9 @@ Synchronization waits only when a frame allocator/back buffer is about to be reu
 
 ## Resize and Minimize
 
-Zero-sized surfaces are treated as suspended rendering. No back buffers are recreated while minimized.
+The platform-to-graphics contract separates suspension from valid client dimensions. The platform retains the last valid non-zero client size while minimized, and the client forwards an explicit suspended surface state to the render owner.
+
+Entering suspension calls the graphics resize boundary with a zero-sized request only to mark rendering suspended; no swap-chain back buffers are recreated. On restore or a completed window-mode transition, the render owner submits the final positive client dimensions. A positive resize is processed even when the dimensions match the pre-minimize size so the graphics device can leave its suspended state.
 
 When a positive client size is restored or changed:
 
@@ -121,7 +123,7 @@ When a positive client size is restored or changed:
 6. reset per-frame fence bookkeeping;
 7. resume rendering.
 
-The client coalesces queued window-size-related events before requesting a graphics resize.
+Intermediate Win32 resize messages produced by a platform window-mode transition are not treated as independent graphics surface states; the final valid platform state drives graphics resize/recovery.
 
 ## Command Submission Boundary
 
