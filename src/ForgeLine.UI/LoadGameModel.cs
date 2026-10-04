@@ -21,6 +21,7 @@ public readonly record struct LoadGameEntry(
 
 public sealed class LoadGameModel
 {
+    private int _focusedIndex;
     private readonly LoadGameEntry[] _entries;
 
     public LoadGameModel(IEnumerable<LoadGameEntry> entries)
