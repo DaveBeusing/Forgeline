@@ -115,7 +115,7 @@ public sealed record VerticalSliceScenarioSettings
                     OffensiveFuelThreshold = 0.40,
                     MinimumAttackUnits = 3,
                     MaximumAttackUnits = 12,
-                    MinimumObjectivePressureUnits = 2,
+                    MinimumObjectivePressureUnits = 1,
                     MaximumQueuedUnitsPerFacility = 3,
                     MinimumCargoTrucks = 2,
                     MinimumSupplyTrucks = 2,
