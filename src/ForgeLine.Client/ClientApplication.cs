@@ -100,10 +100,6 @@ internal sealed class ClientApplication
         {
             frontendLoading.BeginPhase(
                 FrontendLoadingPhase.LoadingSettings,
-                "Settings validated",
-                totalSteps: 3);
-            frontendLoading.ReportProgress(
-                1,
                 "Settings validated");
             bootRenderer.Publish(
                 FrontendPresentationAdapter.Loading(
@@ -114,22 +110,30 @@ internal sealed class ClientApplication
                 VerticalSliceRuntimeSettings.CreateClient(
                     jobScheduler,
                     seed: newGame.Configuration.Seed);
-            runtimeAssets =
-                TryLoadRuntimeAssets();
-            frontendLoading.ReportProgress(
-                2,
-                "Runtime assets loaded");
+
+            frontendLoading.BeginPhase(
+                FrontendLoadingPhase.LoadingAssets,
+                "Loading runtime assets");
             bootRenderer.Publish(
                 FrontendPresentationAdapter.Loading(
                     frontendLoading.State));
             PumpBootFrame(window, bootRenderer);
+            runtimeAssets =
+                TryLoadRuntimeAssets();
 
+            frontendLoading.BeginPhase(
+                FrontendLoadingPhase.PreparingFrontend,
+                "Preparing battlefield");
+            bootRenderer.Publish(
+                FrontendPresentationAdapter.Loading(
+                    frontendLoading.State));
+            PumpBootFrame(window, bootRenderer);
             scenario =
                 VerticalSliceScenario.Create(
                     runtimeSettings);
-            frontendLoading.ReportProgress(
-                3,
-                "Battlefield ready");
+
+            frontendLoading.Complete(
+                "Command interface ready");
             bootRenderer.Publish(
                 FrontendPresentationAdapter.Loading(
                     frontendLoading.State));
@@ -266,7 +270,6 @@ internal sealed class ClientApplication
         bool pauseHeld = false;
         bool helpHeld = false;
         bool matchSetupActive = !smokeTest;
-        frontendLoading.Complete();
         frontendShell.Dispatch(GameFrontendAction.LoadingCompleted);
         var mainMenu = new MainMenuModel(hasValidContinueTarget: false);
         bool userPaused = false;
