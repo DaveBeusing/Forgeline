@@ -12,11 +12,11 @@ internal enum ClientSessionRequestKind : byte
 
 internal readonly record struct ClientSessionRequest(
     ClientSessionRequestKind Kind,
-    int Seed,
+    ulong Seed,
     LoadGameEntry? Save)
 {
     internal static ClientSessionRequest NewGame(
-        int seed) =>
+        ulong seed) =>
         new(
             ClientSessionRequestKind.NewGame,
             seed,
@@ -34,7 +34,7 @@ internal static class ClientSessionFactory
 {
     internal static VerticalSliceScenario Create(
         ClientSessionRequest request,
-        IJobScheduler jobScheduler) =>
+        JobScheduler jobScheduler) =>
         request.Kind switch
         {
             ClientSessionRequestKind.NewGame =>

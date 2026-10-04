@@ -16,7 +16,7 @@ public sealed class ClientSessionFactoryTests
         Assert.Equal(
             ClientSessionRequestKind.NewGame,
             request.Kind);
-        Assert.Equal(731, request.Seed);
+        Assert.Equal(731UL, request.Seed);
         Assert.Null(request.Save);
     }
 

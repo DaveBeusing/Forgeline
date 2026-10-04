@@ -1791,12 +1791,63 @@ internal sealed class ClientApplication
                     shell.Dispatch(action);
                 }
             }
-            else if (shell.Screen == GameFrontendScreen.NewGame &&
-                     enter)
+            else if (shell.Screen == GameFrontendScreen.NewGame)
             {
-                return FrontendSessionSelectionResult.Start(
-                    ClientSessionRequest.NewGame(
-                        newGame.Configuration.Seed));
+                if (ConsumeKeyPress(
+                        input,
+                        PlatformKey.Left,
+                        ref leftHeld))
+                {
+                    newGame.SetSeed(
+                        newGame.Configuration.Seed == 0
+                            ? 0
+                            : newGame.Configuration.Seed - 1);
+                }
+
+                if (ConsumeKeyPress(
+                        input,
+                        PlatformKey.Right,
+                        ref rightHeld))
+                {
+                    newGame.SetSeed(
+                        newGame.Configuration.Seed == ulong.MaxValue
+                            ? ulong.MaxValue
+                            : newGame.Configuration.Seed + 1);
+                }
+
+                if (enter)
+                {
+                    return FrontendSessionSelectionResult.Start(
+                        ClientSessionRequest.NewGame(
+                            newGame.Configuration.Seed));
+                }
+            }
+            else if (shell.Screen == GameFrontendScreen.LoadGame)
+            {
+                if (ConsumeKeyPress(
+                        input,
+                        PlatformKey.Up,
+                        ref upHeld))
+                {
+                    loadGame.MovePrevious();
+                }
+
+                if (ConsumeKeyPress(
+                        input,
+                        PlatformKey.Down,
+                        ref downHeld))
+                {
+                    loadGame.MoveNext();
+                }
+
+                if (enter &&
+                    loadGame.TryGetFocusedLoadTarget(
+                        out LoadGameEntry selectedSave))
+                {
+                    return FrontendSessionSelectionResult.Start(
+                        ClientSessionRequest.Load(
+                            selectedSave));
+                }
             }
             else if (shell.Screen == GameFrontendScreen.Settings)
             {
