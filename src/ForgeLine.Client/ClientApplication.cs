@@ -119,15 +119,33 @@ internal sealed class ClientApplication
             PumpBootFrame(window, bootRenderer);
         }
 
-        ClientSessionRequest sessionRequest =
-            smokeTest
-                ? ClientSessionRequest.NewGame(
-                    newGame.Configuration.Seed)
-                : RunFrontendSessionSelection(
+        ClientSessionRequest sessionRequest;
+        if (smokeTest)
+        {
+            sessionRequest =
+                ClientSessionRequest.NewGame(
+                    newGame.Configuration.Seed);
+        }
+        else
+        {
+            FrontendSessionSelectionResult selection =
+                RunFrontendSessionSelection(
                     window,
                     frontendShell,
-                    newGame,
-                    runtimeAssets);
+                    newGame);
+
+            if (selection.RestartRequested)
+            {
+                return RestartRequestedExitCode;
+            }
+
+            if (selection.Session is not ClientSessionRequest selected)
+            {
+                return 0;
+            }
+
+            sessionRequest = selected;
+        }
 
         frontendLoading.BeginPhase(
             FrontendLoadingPhase.PreparingFrontend,
@@ -1806,11 +1824,10 @@ internal sealed class ClientApplication
             $"previewFreshness={buildingPlacementController.PreviewFreshness}");
     }
 
-    private ClientSessionRequest RunFrontendSessionSelection(
+    private FrontendSessionSelectionResult RunFrontendSessionSelection(
         IWindow window,
         GameFrontendShell shell,
-        NewGameModel newGame,
-        RuntimeAssetCatalog? runtimeAssets)
+        NewGameModel newGame)
     {
         shell.Dispatch(
             GameFrontendAction.LoadingCompleted);
@@ -1918,8 +1935,9 @@ internal sealed class ClientApplication
                                 loadGame.ContinueTarget!.Id,
                                 out LoadGameEntry targetSave))
                         {
-                            return ClientSessionRequest.Load(
-                                targetSave);
+                            return FrontendSessionSelectionResult.Start(
+                                ClientSessionRequest.Load(
+                                    targetSave));
                         }
                     }
 
@@ -1929,8 +1947,9 @@ internal sealed class ClientApplication
             else if (shell.Screen == GameFrontendScreen.NewGame &&
                      enter)
             {
-                return ClientSessionRequest.NewGame(
-                    newGame.Configuration.Seed);
+                return FrontendSessionSelectionResult.Start(
+                    ClientSessionRequest.NewGame(
+                        newGame.Configuration.Seed));
             }
             else if (shell.Screen == GameFrontendScreen.Settings)
             {
@@ -1993,7 +2012,7 @@ internal sealed class ClientApplication
                         applied.BorderlessFullscreen !=
                             _settings.BorderlessFullscreen)
                     {
-                        throw new ClientRestartRequestedException();
+                        return FrontendSessionSelectionResult.Restart();
                     }
                 }
             }
@@ -2018,8 +2037,22 @@ internal sealed class ClientApplication
                 IdleWait);
         }
 
-        throw new OperationCanceledException(
-            "Frontend session selection was closed.");
+        return FrontendSessionSelectionResult.Exit();
+    }
+
+    private readonly record struct FrontendSessionSelectionResult(
+        ClientSessionRequest? Session,
+        bool RestartRequested)
+    {
+        internal static FrontendSessionSelectionResult Start(
+            ClientSessionRequest session) =>
+            new(session, false);
+
+        internal static FrontendSessionSelectionResult Restart() =>
+            new(null, true);
+
+        internal static FrontendSessionSelectionResult Exit() =>
+            new(null, false);
     }
 
     private static FrontendSurfaceView CreateFrontendSurface(
