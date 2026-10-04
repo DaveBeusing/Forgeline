@@ -21,7 +21,7 @@ public sealed class NewGameModel
 
     public NewGameConfiguration Configuration { get; private set; }
 
-    public bool CanStart => true;
+    public static bool CanStart => true;
 
     public void SetSeed(ulong seed)
     {
@@ -31,9 +31,9 @@ public sealed class NewGameModel
         };
     }
 
-    public GameFrontendAction Start() =>
+    public static GameFrontendAction Start() =>
         GameFrontendAction.StartMatch;
 
-    public GameFrontendAction Back() =>
+    public static GameFrontendAction Back() =>
         GameFrontendAction.Back;
 }
