@@ -111,19 +111,27 @@ Synchronization waits only when a frame allocator/back buffer is about to be reu
 
 The platform-to-graphics contract separates suspension from valid client dimensions. The platform retains the last valid non-zero client size while minimized, and the client forwards an explicit suspended surface state to the render owner.
 
-Entering suspension calls the graphics resize boundary with a zero-sized request only to mark rendering suspended; no swap-chain back buffers are recreated. On restore or a completed window-mode transition, the render owner submits the final positive client dimensions. A positive resize is processed even when the dimensions match the pre-minimize size so the graphics device can leave its suspended state.
+`IGraphicsDevice.Resize` records graphics-owned surface intent instead of calling DXGI immediately. Zero or negative dimensions mark the surface suspended and never call `ResizeBuffers`. Positive resize requests are collapsed to the most recent requested size and are applied by the graphics device at the beginning of `RenderFrame`, before any command allocator, back buffer, or render-target state is reused.
 
-When a positive client size is restored or changed:
+On restore or a completed window-mode transition, the render owner submits the final positive client dimensions. A positive resize is processed even when the dimensions match the pre-minimize size so a suspended device has an explicit path back to an active renderable surface.
 
-1. wait for outstanding graphics work;
-2. release references to the old swap-chain back buffers;
-3. call `ResizeBuffers`;
-4. reacquire every back buffer;
-5. recreate RTVs;
-6. reset per-frame fence bookkeeping;
-7. resume rendering.
+When a pending positive resize is applied:
+
+1. wait for all outstanding graphics work using the existing frame fence;
+2. release the depth target and every old swap-chain back-buffer reference;
+3. call `ResizeBuffers` with the final non-zero dimensions;
+4. reacquire every swap-chain back buffer;
+5. recreate RTVs and the resolution-dependent depth target;
+6. refresh the current DXGI back-buffer index and validate it against the configured buffer count;
+7. clear per-frame fence bookkeeping;
+8. publish the new surface dimensions and applied resize generation;
+9. resume normal rendering with viewport/scissor derived from the new dimensions.
 
 Intermediate Win32 resize messages produced by a platform window-mode transition are not treated as independent graphics surface states; the final valid platform state drives graphics resize/recovery.
+
+Surface diagnostics expose suspension, occlusion, pending-resize state, requested resize generation, and the last successfully applied generation. Resize requests, synchronization/application, successful recreation, Present failures, and recovery transitions emit structured console diagnostics. A resize or Present failure is escalated with the HRESULT and device-removal reason instead of leaving the client in a silent blank state.
+
+The swap chain uses flip-discard presentation. Defensive occlusion handling still treats an occlusion status as recoverable: rendering pauses while occluded and the graphics layer probes presentation readiness before resuming, without making occlusion a sticky terminal state.
 
 ## Command Submission Boundary
 

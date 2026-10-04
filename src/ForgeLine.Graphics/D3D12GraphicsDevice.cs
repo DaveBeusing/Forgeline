@@ -10,6 +10,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
 {
     private const Format BackBufferFormat = Format.R8G8B8A8_UNorm;
     private const Format DepthBufferFormat = Format.D32_Float;
+    private const int DxgiStatusOccluded = 0x087A0001;
 
     private readonly GraphicsConfiguration _configuration;
     private readonly IDXGIFactory4 _factory;
@@ -26,13 +27,11 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     private readonly ID3D12Fence _frameFence;
     private readonly AutoResetEvent _frameFenceEvent;
     private readonly GraphicsDeviceInfo _deviceInfo;
+    private readonly GraphicsSurfaceLifecycleState _surfaceLifecycle;
 
     private ID3D12Resource? _depthTarget;
     private ulong _nextFenceValue = 1;
     private int _frameIndex;
-    private int _width;
-    private int _height;
-    private bool _isSuspended;
     private bool _disposed;
 
     internal D3D12GraphicsDevice(in GraphicsWindowTarget target, GraphicsConfiguration configuration)
@@ -51,14 +50,26 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         _commandQueue = _device.CreateCommandQueue(CommandListType.Direct);
         _commandQueue.Name = "ForgeLine Graphics Queue";
 
-        _width = Math.Max(target.Width, 1);
-        _height = Math.Max(target.Height, 1);
-        _isSuspended = target.Suspended || target.Width <= 0 || target.Height <= 0;
+        int initialWidth =
+            Math.Max(
+                target.Width,
+                1);
+        int initialHeight =
+            Math.Max(
+                target.Height,
+                1);
+        _surfaceLifecycle =
+            new GraphicsSurfaceLifecycleState(
+                initialWidth,
+                initialHeight,
+                target.Suspended ||
+                target.Width <= 0 ||
+                target.Height <= 0);
 
         SwapChainDescription1 swapChainDescription = new()
         {
-            Width = (uint)_width,
-            Height = (uint)_height,
+            Width = (uint)initialWidth,
+            Height = (uint)initialHeight,
             Format = BackBufferFormat,
             Stereo = false,
             SampleDescription = new SampleDescription(1, 0),
@@ -97,7 +108,9 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         _commandAllocators = new ID3D12CommandAllocator[configuration.BufferCount];
         _frameFenceValues = new ulong[configuration.BufferCount];
 
-        CreateRenderTargets();
+        CreateRenderTargets(
+            initialWidth,
+            initialHeight);
 
         for (int index = 0; index < configuration.BufferCount; index++)
         {
@@ -123,7 +136,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             $"software={_deviceInfo.IsSoftwareAdapter} " +
             $"debugLayer={_deviceInfo.DebugLayerEnabled}");
         Console.WriteLine(
-            $"[graphics:surface] size={_width}x{_height} " +
+            $"[graphics:surface] size={_surfaceLifecycle.Width}x{_surfaceLifecycle.Height} " +
             $"buffers={configuration.BufferCount} present={PresentMode}");
     }
 
@@ -136,12 +149,16 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             return new GraphicsDiagnostics(
                 _deviceInfo,
                 new GraphicsSurfaceInfo(
-                    _width,
-                    _height,
+                    _surfaceLifecycle.Width,
+                    _surfaceLifecycle.Height,
                     _configuration.BufferCount,
                     _frameIndex,
-                    _isSuspended,
-                    PresentMode));
+                    _surfaceLifecycle.IsSuspended,
+                    PresentMode,
+                    _surfaceLifecycle.IsOccluded,
+                    _surfaceLifecycle.HasPendingResize,
+                    _surfaceLifecycle.ResizeGeneration,
+                    _surfaceLifecycle.AppliedResizeGeneration));
         }
     }
 
@@ -292,7 +309,15 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     {
         ThrowIfDisposed();
 
-        if (_isSuspended)
+        ApplyPendingResize();
+
+        if (_surfaceLifecycle.IsSuspended)
+        {
+            return;
+        }
+
+        if (_surfaceLifecycle.IsOccluded &&
+            !TryRecoverOcclusion())
         {
             return;
         }
@@ -331,15 +356,27 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             1.0f,
             0);
 
+        int width =
+            _surfaceLifecycle.Width;
+        int height =
+            _surfaceLifecycle.Height;
         var context = new D3D12GraphicsCommandContext(
             this,
             _commandList,
-            _width,
-            _height,
+            width,
+            height,
             _frameIndex);
 
-        context.SetViewport(0, 0, _width, _height);
-        context.SetScissor(0, 0, _width, _height);
+        context.SetViewport(
+            0,
+            0,
+            width,
+            height);
+        context.SetScissor(
+            0,
+            0,
+            width,
+            height);
         recordCommands?.Invoke(context);
 
         _commandList.ResourceBarrierTransition(
@@ -356,56 +393,55 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
 
         if (presentResult.Failure)
         {
+            Console.Error.WriteLine(
+                $"[graphics:present-failed] frameIndex={_frameIndex} " +
+                $"size={width}x{height} hresult=0x{presentResult.Code:X8}");
             throw CreateDeviceFailure(
                 "Direct3D 12 failed to present the current frame.",
                 presentResult.Code);
         }
 
-        ulong fenceValue = _nextFenceValue++;
-        _commandQueue.Signal(_frameFence, fenceValue);
-        _frameFenceValues[_frameIndex] = fenceValue;
-        _frameIndex = checked((int)_swapChain.CurrentBackBufferIndex);
+        if (presentResult.Code ==
+            DxgiStatusOccluded)
+        {
+            if (_surfaceLifecycle.MarkOccluded())
+            {
+                Console.WriteLine(
+                    $"[graphics:present-occluded] frameIndex={_frameIndex} " +
+                    $"size={width}x{height}");
+            }
+        }
+        else
+        {
+            _ = _surfaceLifecycle.MarkPresentable();
+        }
+
+        SignalSubmittedFrame();
     }
 
     public void Resize(int width, int height)
     {
         ThrowIfDisposed();
 
-        if (width <= 0 || height <= 0)
-        {
-            _isSuspended = true;
-            return;
-        }
-
-        if (!_isSuspended && width == _width && height == _height)
+        if (!_surfaceLifecycle.RequestResize(
+                width,
+                height))
         {
             return;
         }
 
-        WaitForIdle();
-        ReleaseRenderTargets();
-
-        var resizeResult = _swapChain.ResizeBuffers(
-            (uint)_configuration.BufferCount,
-            (uint)width,
-            (uint)height,
-            BackBufferFormat);
-
-        if (resizeResult.Failure)
+        if (width <= 0 ||
+            height <= 0)
         {
-            throw CreateDeviceFailure(
-                $"Direct3D 12 failed to resize the swap chain to {width}x{height}.",
-                resizeResult.Code);
+            Console.WriteLine(
+                $"[graphics:resize-request] requested={width}x{height} " +
+                "action=suspend");
+            return;
         }
 
-        _width = width;
-        _height = height;
-        _frameIndex = checked((int)_swapChain.CurrentBackBufferIndex);
-        Array.Clear(_frameFenceValues);
-        CreateRenderTargets();
-        _isSuspended = false;
-
-        Console.WriteLine($"[graphics:resize] size={_width}x{_height}");
+        Console.WriteLine(
+            $"[graphics:resize-request] requested={width}x{height} " +
+            $"generation={_surfaceLifecycle.ResizeGeneration} action=queued");
     }
 
     public void WaitForIdle()
@@ -473,7 +509,9 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         _disposed = true;
     }
 
-    private void CreateRenderTargets()
+    private void CreateRenderTargets(
+        int width,
+        int height)
     {
         CpuDescriptorHandle rtv =
             _rtvHeap.GetCPUDescriptorHandleForHeapStart();
@@ -490,8 +528,8 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
 
         ResourceDescription depthDescription = ResourceDescription.Texture2D(
             DepthBufferFormat,
-            checked((uint)_width),
-            checked((uint)_height),
+            checked((uint)width),
+            checked((uint)height),
             flags: ResourceFlags.AllowDepthStencil);
         var clearValue = new ClearValue(DepthBufferFormat, 1.0f, 0);
 
@@ -524,6 +562,121 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             _renderTargets[index]?.Dispose();
             _renderTargets[index] = null!;
         }
+    }
+
+    private void ApplyPendingResize()
+    {
+        if (!_surfaceLifecycle.TryGetPendingResize(
+                out GraphicsResizeRequest request))
+        {
+            return;
+        }
+
+        Console.WriteLine(
+            $"[graphics:resize-apply] requested={request.Width}x{request.Height} " +
+            $"generation={request.Generation} phase=synchronize");
+
+        WaitForIdle();
+        Console.WriteLine(
+            $"[graphics:resize-synchronized] generation={request.Generation} " +
+            $"completedFence={_frameFence.CompletedValue}");
+        ReleaseRenderTargets();
+
+        var resizeResult =
+            _swapChain.ResizeBuffers(
+                (uint)_configuration.BufferCount,
+                (uint)request.Width,
+                (uint)request.Height,
+                BackBufferFormat);
+
+        if (resizeResult.Failure)
+        {
+            Console.Error.WriteLine(
+                $"[graphics:resize-failed] requested={request.Width}x{request.Height} " +
+                $"generation={request.Generation} hresult=0x{resizeResult.Code:X8}");
+            throw CreateDeviceFailure(
+                $"Direct3D 12 failed to resize the swap chain to {request.Width}x{request.Height}.",
+                resizeResult.Code);
+        }
+
+        int frameIndex =
+            GetCurrentBackBufferIndex();
+        CreateRenderTargets(
+            request.Width,
+            request.Height);
+        Array.Clear(
+            _frameFenceValues);
+        _frameIndex = frameIndex;
+        _surfaceLifecycle.CompleteResize(
+            request);
+
+        Console.WriteLine(
+            $"[graphics:resize-applied] size={request.Width}x{request.Height} " +
+            $"generation={request.Generation} frameIndex={_frameIndex} " +
+            $"buffers={_configuration.BufferCount}");
+    }
+
+    private bool TryRecoverOcclusion()
+    {
+        var testResult =
+            _swapChain.Present(
+                0,
+                PresentFlags.Test);
+
+        if (testResult.Code ==
+            DxgiStatusOccluded)
+        {
+            return false;
+        }
+
+        if (testResult.Failure)
+        {
+            Console.Error.WriteLine(
+                $"[graphics:present-recovery-failed] frameIndex={_frameIndex} " +
+                $"hresult=0x{testResult.Code:X8}");
+            throw CreateDeviceFailure(
+                "Direct3D 12 failed while probing presentation recovery.",
+                testResult.Code);
+        }
+
+        if (_surfaceLifecycle.MarkPresentable())
+        {
+            Console.WriteLine(
+                $"[graphics:present-recovered] frameIndex={_frameIndex} " +
+                $"size={_surfaceLifecycle.Width}x{_surfaceLifecycle.Height}");
+        }
+
+        return true;
+    }
+
+    private void SignalSubmittedFrame()
+    {
+        ulong fenceValue =
+            _nextFenceValue++;
+        _commandQueue.Signal(
+            _frameFence,
+            fenceValue);
+        _frameFenceValues[_frameIndex] =
+            fenceValue;
+        _frameIndex =
+            GetCurrentBackBufferIndex();
+    }
+
+    private int GetCurrentBackBufferIndex()
+    {
+        int frameIndex =
+            checked(
+                (int)_swapChain.CurrentBackBufferIndex);
+
+        if ((uint)frameIndex >=
+            (uint)_configuration.BufferCount)
+        {
+            throw new GraphicsDeviceException(
+                $"DXGI returned invalid back-buffer index {frameIndex} " +
+                $"for {_configuration.BufferCount} buffers.");
+        }
+
+        return frameIndex;
     }
 
     private void WaitForFrame(int frameIndex)
