@@ -13,7 +13,8 @@ internal static class Program
                 args,
                 out bool smokeTest,
                 out int renderInstanceCount,
-                out string? visualQualificationOutput))
+                out string? visualQualificationOutput,
+                out string? settingsRoot))
         {
             return 2;
         }
@@ -21,7 +22,8 @@ internal static class Program
         try
         {
             var settingsStore =
-                new ClientSettingsStore();
+                new ClientSettingsStore(
+                    settingsRoot);
             using var platform =
                 new WindowsPlatform();
 
@@ -80,15 +82,17 @@ internal static class Program
         }
     }
 
-    private static bool TryParseArguments(
+    internal static bool TryParseArguments(
         string[] args,
         out bool smokeTest,
         out int renderInstanceCount,
-        out string? visualQualificationOutput)
+        out string? visualQualificationOutput,
+        out string? settingsRoot)
     {
         smokeTest = false;
         renderInstanceCount = DefaultRenderInstanceCount;
         visualQualificationOutput = null;
+        settingsRoot = null;
 
         for (int index = 0; index < args.Length; index++)
         {
@@ -134,6 +138,26 @@ internal static class Program
                 continue;
             }
 
+            if (string.Equals(
+                    argument,
+                    "--settings-root",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                if (index + 1 >= args.Length ||
+                    args[index + 1].StartsWith(
+                        "--",
+                        StringComparison.Ordinal))
+                {
+                    Console.Error.WriteLine(
+                        "--settings-root requires a directory path.");
+                    return false;
+                }
+
+                settingsRoot =
+                    args[++index];
+                continue;
+            }
+
             if (string.Equals(argument, "--help", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(argument, "-h", StringComparison.OrdinalIgnoreCase))
             {
@@ -153,6 +177,7 @@ internal static class Program
     {
         writer.WriteLine(
             "ForgeLine.Client [--smoke-test] [--render-stress <instances>] " +
-            "[--visual-qualification-output <report.json>]");
+            "[--visual-qualification-output <report.json>] " +
+            "[--settings-root <directory>]");
     }
 }
