@@ -74,7 +74,9 @@ internal static class FrontendPresentationAdapter
                 .Select(
                     entry =>
                         new FrontendDetailLineView(
-                            entry.DisplayName,
+                            ReferenceEquals(entry, model.FocusedEntry)
+                                ? $"> {entry.DisplayName}"
+                                : entry.DisplayName,
                             entry.CanLoad
                                 ? $"TICK {entry.SavedTick}"
                                 : entry.State.ToString().ToUpperInvariant(),
@@ -84,7 +86,7 @@ internal static class FrontendPresentationAdapter
         return FrontendSurfaceView.Detail(
             "LOAD GAME",
             lines,
-            "ESC  BACK");
+            "UP/DOWN  SELECT SAVE     ENTER  LOAD     ESC  BACK");
     }
 
     internal static FrontendSurfaceView Settings(
