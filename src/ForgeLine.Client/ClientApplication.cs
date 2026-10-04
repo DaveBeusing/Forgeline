@@ -84,15 +84,10 @@ internal sealed class ClientApplication
                 window.IsMinimized ||
                 window.ClientSize.IsEmpty);
 
-        var snapshotBuffer =
-            new PresentationSnapshotBuffer();
         var newGame =
             new NewGameModel();
         using var jobScheduler =
             new JobScheduler();
-
-        VerticalSliceRuntimeSettings runtimeSettings;
-        VerticalSliceScenario scenario;
         RuntimeAssetCatalog? runtimeAssets;
 
         using (var bootRenderer =
@@ -106,11 +101,6 @@ internal sealed class ClientApplication
                     frontendLoading.State));
             PumpBootFrame(window, bootRenderer);
 
-            runtimeSettings =
-                VerticalSliceRuntimeSettings.CreateClient(
-                    jobScheduler,
-                    seed: newGame.Configuration.Seed);
-
             frontendLoading.BeginPhase(
                 FrontendLoadingPhase.LoadingAssets,
                 "Loading runtime assets");
@@ -121,17 +111,6 @@ internal sealed class ClientApplication
             runtimeAssets =
                 TryLoadRuntimeAssets();
 
-            frontendLoading.BeginPhase(
-                FrontendLoadingPhase.PreparingFrontend,
-                "Preparing battlefield");
-            bootRenderer.Publish(
-                FrontendPresentationAdapter.Loading(
-                    frontendLoading.State));
-            PumpBootFrame(window, bootRenderer);
-            scenario =
-                VerticalSliceScenario.Create(
-                    runtimeSettings);
-
             frontendLoading.Complete(
                 "Command interface ready");
             bootRenderer.Publish(
@@ -140,8 +119,48 @@ internal sealed class ClientApplication
             PumpBootFrame(window, bootRenderer);
         }
 
-        using (scenario)
+        ClientSessionRequest sessionRequest;
+        if (smokeTest)
         {
+            sessionRequest =
+                ClientSessionRequest.NewGame(
+                    newGame.Configuration.Seed);
+        }
+        else
+        {
+            FrontendSessionSelectionResult selection =
+                RunFrontendSessionSelection(
+                    window,
+                    frontendShell,
+                    newGame);
+
+            if (selection.RestartRequested)
+            {
+                return RestartRequestedExitCode;
+            }
+
+            if (selection.Session is not ClientSessionRequest selected)
+            {
+                return 0;
+            }
+
+            sessionRequest = selected;
+        }
+
+        frontendLoading.BeginPhase(
+            FrontendLoadingPhase.PreparingFrontend,
+            sessionRequest.Kind ==
+                ClientSessionRequestKind.LoadGame
+                ? "Restoring saved battlefield"
+                : "Preparing battlefield");
+
+        using VerticalSliceScenario scenario =
+            ClientSessionFactory.Create(
+                sessionRequest,
+                jobScheduler);
+        var snapshotBuffer =
+            new PresentationSnapshotBuffer();
+
         SimulationCoordinator simulation =
             scenario.Simulation;
         PrototypeBattlefieldDefinition prototypeBattlefield =
@@ -264,33 +283,8 @@ internal sealed class ClientApplication
         bool minimapToggleHeld = false;
         bool restartHeld = false;
         bool returnHeld = false;
-        bool setupStartHeld = false;
-        bool frontendUpHeld = false;
-        bool frontendDownHeld = false;
-        bool frontendLeftHeld = false;
-        bool frontendRightHeld = false;
         bool pauseHeld = false;
         bool helpHeld = false;
-        bool matchSetupActive = !smokeTest;
-        frontendShell.Dispatch(GameFrontendAction.LoadingCompleted);
-        var newGameScreen = new NewGameModel();
-        var loadGameScreen = new LoadGameModel([]);
-        var settingsInteraction =
-            new SettingsInteractionModel();
-        var settingsScreen =
-            new SettingsModel(
-                new FrontendSettingsSnapshot(
-                    _settings.WindowWidth,
-                    _settings.WindowHeight,
-                    _settings.BorderlessFullscreen,
-                    _settings.UiScale,
-                    _settings.ShowOnboarding,
-                    _settings.EdgeScrollEnabled,
-                    _settings.CameraPanSpeedMultiplier,
-                    _settings.CameraBindings));
-        var mainMenu =
-            new MainMenuModel(
-                loadGameScreen.CanContinue);
         bool userPaused = false;
         bool helpVisible = false;
         FormationTemplate activeFormation =
@@ -385,74 +379,7 @@ internal sealed class ClientApplication
                     !helpVisible;
             }
 
-            bool setupStartPressed =
-                matchSetupActive &&
-                ConsumeKeyPress(
-                    inputState,
-                    PlatformKey.Enter,
-                    ref setupStartHeld);
-
-            if (matchSetupActive &&
-                frontendShell.Screen == GameFrontendScreen.MainMenu)
-            {
-                if (ConsumeKeyPress(
-                        inputState,
-                        PlatformKey.Up,
-                        ref frontendUpHeld))
-                {
-                    mainMenu.MovePrevious();
-                }
-
-                if (ConsumeKeyPress(
-                        inputState,
-                        PlatformKey.Down,
-                        ref frontendDownHeld))
-                {
-                    mainMenu.MoveNext();
-                }
-            }
-
-            if (matchSetupActive &&
-                frontendShell.Screen == GameFrontendScreen.Settings)
-            {
-                if (ConsumeKeyPress(
-                        inputState,
-                        PlatformKey.Up,
-                        ref frontendUpHeld))
-                {
-                    settingsInteraction.MovePrevious();
-                }
-
-                if (ConsumeKeyPress(
-                        inputState,
-                        PlatformKey.Down,
-                        ref frontendDownHeld))
-                {
-                    settingsInteraction.MoveNext();
-                }
-
-                if (ConsumeKeyPress(
-                        inputState,
-                        PlatformKey.Left,
-                        ref frontendLeftHeld))
-                {
-                    settingsInteraction.Adjust(
-                        settingsScreen,
-                        -1);
-                }
-
-                if (ConsumeKeyPress(
-                        inputState,
-                        PlatformKey.Right,
-                        ref frontendRightHeld))
-                {
-                    settingsInteraction.Adjust(
-                        settingsScreen,
-                        1);
-                }
-            }
             bool pausePressed =
-                !matchSetupActive &&
                 ConsumeKeyPress(
                     inputState,
                     PlatformKey.Space,
@@ -482,78 +409,7 @@ internal sealed class ClientApplication
                 inputExperience?.IsMatchComplete ==
                 true;
 
-            if (matchSetupActive &&
-                returnPressed)
-            {
-                return 0;
-            }
-
-            if (matchSetupActive &&
-                setupStartPressed &&
-                frontendShell.Screen == GameFrontendScreen.MainMenu)
-            {
-                GameFrontendAction action =
-                    mainMenu.ActivateFocused();
-                frontendShell.Dispatch(action);
-
-                if (action == GameFrontendAction.Exit)
-                {
-                    return 0;
-                }
-            }
-
-            if (matchSetupActive &&
-                returnPressed &&
-                frontendShell.Screen != GameFrontendScreen.MainMenu)
-            {
-                frontendShell.Dispatch(
-                    GameFrontendAction.Back);
-            }
-
-            if (matchSetupActive &&
-                setupStartPressed &&
-                frontendShell.Screen == GameFrontendScreen.NewGame)
-            {
-                frontendShell.Dispatch(
-                    NewGameModel.Start());
-                matchSetupActive = false;
-                helpVisible = false;
-            }
-
-            if (matchSetupActive &&
-                setupStartPressed &&
-                frontendShell.Screen == GameFrontendScreen.Settings)
-            {
-                string settingsDirectory =
-                    Path.GetDirectoryName(_settingsPath) ??
-                    throw new InvalidOperationException(
-                        "Settings path must have a directory.");
-                string settingsRoot =
-                    Directory.GetParent(settingsDirectory)?.FullName ??
-                    settingsDirectory;
-                var settingsStore =
-                    new ClientSettingsStore(
-                        settingsRoot);
-                var settingsAdapter =
-                    new ClientSettingsFrontendAdapter(
-                        settingsStore);
-                ClientUserSettings applied =
-                    settingsAdapter.Apply(
-                        settingsScreen);
-                frontendShell.Dispatch(
-                    SettingsModel.Back());
-
-                if (applied.WindowWidth != _settings.WindowWidth ||
-                    applied.WindowHeight != _settings.WindowHeight ||
-                    applied.BorderlessFullscreen !=
-                        _settings.BorderlessFullscreen)
-                {
-                    return RestartRequestedExitCode;
-                }
-            }
-
             if (!inputMatchTerminal &&
-                !matchSetupActive &&
                 pausePressed)
             {
                 userPaused =
@@ -562,7 +418,7 @@ internal sealed class ClientApplication
 
             PreAlphaUxView preAlphaUx =
                 CreatePreAlphaUxView(
-                    matchSetupActive,
+                    false,
                     userPaused,
                     helpVisible,
                     _settings.ShowOnboarding &&
@@ -606,7 +462,6 @@ internal sealed class ClientApplication
                 window.IsMinimized ||
                 window.ClientSize.IsEmpty;
             bool shellBlocksGameplay =
-                matchSetupActive ||
                 userPaused ||
                 helpVisible;
             bool shouldPauseSimulation =
@@ -655,15 +510,7 @@ internal sealed class ClientApplication
                         default,
                         _settings.UiScale,
                         preAlphaUx,
-                        matchSetupActive
-                            ? CreateFrontendSurface(
-                                frontendShell.Screen,
-                                mainMenu,
-                                newGameScreen,
-                                loadGameScreen,
-                                settingsScreen,
-                                settingsInteraction)
-                            : null));
+                        null));
 
                 if (shouldPauseForWindow)
                 {
@@ -993,8 +840,6 @@ internal sealed class ClientApplication
                 visualQualificationOutput,
                 renderInstanceCount,
                 renderHost.LatestQualification);
-        }
-
         }
 
         return 0;
@@ -1824,6 +1669,237 @@ internal sealed class ClientApplication
             $"building={buildingPlacementController.ActiveBuilding} " +
             $"orientation={buildingPlacementController.Orientation} " +
             $"previewFreshness={buildingPlacementController.PreviewFreshness}");
+    }
+
+    private FrontendSessionSelectionResult RunFrontendSessionSelection(
+        IWindow window,
+        GameFrontendShell shell,
+        NewGameModel newGame)
+    {
+        shell.Dispatch(
+            GameFrontendAction.LoadingCompleted);
+
+        string saveDirectory =
+            Path.Combine(
+                Environment.GetFolderPath(
+                    Environment.SpecialFolder.LocalApplicationData),
+                "FORGELINE",
+                "Saves");
+        var loadGame =
+            new LoadGameModel(
+                ClientSaveCatalog.Discover(
+                    saveDirectory));
+        var settingsInteraction =
+            new SettingsInteractionModel();
+        var settings =
+            new SettingsModel(
+                new FrontendSettingsSnapshot(
+                    _settings.WindowWidth,
+                    _settings.WindowHeight,
+                    _settings.BorderlessFullscreen,
+                    _settings.UiScale,
+                    _settings.ShowOnboarding,
+                    _settings.EdgeScrollEnabled,
+                    _settings.CameraPanSpeedMultiplier,
+                    _settings.CameraBindings));
+        var mainMenu =
+            new MainMenuModel(
+                loadGame.CanContinue);
+        var input = new InputState();
+        bool enterHeld = false;
+        bool escapeHeld = false;
+        bool upHeld = false;
+        bool downHeld = false;
+        bool leftHeld = false;
+        bool rightHeld = false;
+
+        var target =
+            new GraphicsWindowTarget(
+                window.NativeHandle.Value,
+                window.ClientSize.Width,
+                window.ClientSize.Height,
+                window.IsMinimized ||
+                window.ClientSize.IsEmpty);
+        using var renderer =
+            new ClientFrontendRenderHost(target);
+
+        while (window.IsOpen)
+        {
+            input.BeginFrame();
+            if (!_platform.PumpEvents())
+            {
+                throw new OperationCanceledException(
+                    "Frontend session selection was closed.");
+            }
+
+            DrainWindowEvents(window);
+            DrainInputEvents(window, input);
+
+            bool enter =
+                ConsumeKeyPress(
+                    input,
+                    PlatformKey.Enter,
+                    ref enterHeld);
+            bool escape =
+                ConsumeKeyPress(
+                    input,
+                    PlatformKey.Escape,
+                    ref escapeHeld);
+
+            if (shell.Screen == GameFrontendScreen.MainMenu)
+            {
+                if (ConsumeKeyPress(
+                        input,
+                        PlatformKey.Up,
+                        ref upHeld))
+                {
+                    mainMenu.MovePrevious();
+                }
+
+                if (ConsumeKeyPress(
+                        input,
+                        PlatformKey.Down,
+                        ref downHeld))
+                {
+                    mainMenu.MoveNext();
+                }
+
+                if (enter)
+                {
+                    GameFrontendAction action =
+                        mainMenu.ActivateFocused();
+
+                    if (action == GameFrontendAction.Exit)
+                    {
+                        window.RequestClose();
+                        continue;
+                    }
+
+                    if (action == GameFrontendAction.LoadGame &&
+                        loadGame.CanContinue)
+                    {
+                        if (loadGame.TryGetLoadTarget(
+                                loadGame.ContinueTarget!.Id,
+                                out LoadGameEntry targetSave))
+                        {
+                            return FrontendSessionSelectionResult.Start(
+                                ClientSessionRequest.Load(
+                                    targetSave));
+                        }
+                    }
+
+                    shell.Dispatch(action);
+                }
+            }
+            else if (shell.Screen == GameFrontendScreen.NewGame &&
+                     enter)
+            {
+                return FrontendSessionSelectionResult.Start(
+                    ClientSessionRequest.NewGame(
+                        newGame.Configuration.Seed));
+            }
+            else if (shell.Screen == GameFrontendScreen.Settings)
+            {
+                if (ConsumeKeyPress(
+                        input,
+                        PlatformKey.Up,
+                        ref upHeld))
+                {
+                    settingsInteraction.MovePrevious();
+                }
+
+                if (ConsumeKeyPress(
+                        input,
+                        PlatformKey.Down,
+                        ref downHeld))
+                {
+                    settingsInteraction.MoveNext();
+                }
+
+                if (ConsumeKeyPress(
+                        input,
+                        PlatformKey.Left,
+                        ref leftHeld))
+                {
+                    settingsInteraction.Adjust(
+                        settings,
+                        -1);
+                }
+
+                if (ConsumeKeyPress(
+                        input,
+                        PlatformKey.Right,
+                        ref rightHeld))
+                {
+                    settingsInteraction.Adjust(
+                        settings,
+                        1);
+                }
+
+                if (enter)
+                {
+                    string settingsDirectory =
+                        Path.GetDirectoryName(_settingsPath) ??
+                        throw new InvalidOperationException(
+                            "Settings path must have a directory.");
+                    string settingsRoot =
+                        Directory.GetParent(settingsDirectory)?.FullName ??
+                        settingsDirectory;
+                    var adapter =
+                        new ClientSettingsFrontendAdapter(
+                            new ClientSettingsStore(
+                                settingsRoot));
+                    ClientUserSettings applied =
+                        adapter.Apply(settings);
+                    shell.Dispatch(
+                        SettingsModel.Back());
+
+                    if (applied.WindowWidth != _settings.WindowWidth ||
+                        applied.WindowHeight != _settings.WindowHeight ||
+                        applied.BorderlessFullscreen !=
+                            _settings.BorderlessFullscreen)
+                    {
+                        return FrontendSessionSelectionResult.Restart();
+                    }
+                }
+            }
+
+            if (escape &&
+                shell.Screen != GameFrontendScreen.MainMenu)
+            {
+                shell.Dispatch(
+                    GameFrontendAction.Back);
+            }
+
+            renderer.Publish(
+                CreateFrontendSurface(
+                    shell.Screen,
+                    mainMenu,
+                    newGame,
+                    loadGame,
+                    settings,
+                    settingsInteraction));
+            renderer.ThrowIfFaulted();
+            _platform.WaitForEvents(
+                IdleWait);
+        }
+
+        return FrontendSessionSelectionResult.Exit();
+    }
+
+    private readonly record struct FrontendSessionSelectionResult(
+        ClientSessionRequest? Session,
+        bool RestartRequested)
+    {
+        internal static FrontendSessionSelectionResult Start(
+            ClientSessionRequest session) =>
+            new(session, false);
+
+        internal static FrontendSessionSelectionResult Restart() =>
+            new(null, true);
+
+        internal static FrontendSessionSelectionResult Exit() =>
+            new(null, false);
     }
 
     private static FrontendSurfaceView CreateFrontendSurface(
