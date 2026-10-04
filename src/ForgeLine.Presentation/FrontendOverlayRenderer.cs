@@ -61,8 +61,21 @@ public sealed class FrontendOverlayRenderer : IDisposable
         float transition = Math.Clamp(view.Transition, 0f, 1f);
         float contentOffset = (1f - transition) * 18f * scale;
 
+        SurfaceRect backdrop =
+            view.Kind == FrontendSurfaceKind.PauseMenu
+                ? new SurfaceRect(
+                    64f,
+                    54f,
+                    1040f,
+                    972f)
+                : new SurfaceRect(
+                    0f,
+                    0f,
+                    1920f,
+                    1080f);
+
         EmitPanel(
-            new SurfaceRect(0, 0, 1920f, 1080f).Scale(scale),
+            backdrop.Scale(scale),
             new Vector4(0.035f, 0.045f, 0.045f, 0.98f),
             context.Width,
             context.Height);
