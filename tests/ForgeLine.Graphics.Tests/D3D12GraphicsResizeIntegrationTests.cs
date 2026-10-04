@@ -38,8 +38,18 @@ public sealed class D3D12GraphicsResizeIntegrationTests
         graphics.Resize(
             window.ClientSize.Width,
             window.ClientSize.Height);
+
+        int renderedWidth = 0;
+        int renderedHeight = 0;
         graphics.RenderFrame(
-            GraphicsColor.ForgeLineClear);
+            GraphicsColor.ForgeLineClear,
+            context =>
+            {
+                renderedWidth =
+                    context.Width;
+                renderedHeight =
+                    context.Height;
+            });
 
         GraphicsSurfaceInfo borderless =
             graphics.Diagnostics.Surface;
@@ -58,6 +68,12 @@ public sealed class D3D12GraphicsResizeIntegrationTests
             borderless.FrameIndex,
             0,
             borderless.BufferCount - 1);
+        Assert.Equal(
+            borderless.Width,
+            renderedWidth);
+        Assert.Equal(
+            borderless.Height,
+            renderedHeight);
 
         graphics.Resize(
             0,
