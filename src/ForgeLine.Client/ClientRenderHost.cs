@@ -28,7 +28,8 @@ internal readonly record struct ClientVisualQualificationSnapshot(
     int ReducedLodInstances,
     int ActiveVfxEffects,
     int VfxPoolCapacity,
-    ulong DroppedVfxEffects);
+    ulong DroppedVfxEffects,
+    GraphicsSurfaceInfo Surface = default);
 
 internal readonly record struct ClientRenderFrame(
     RtsCameraState Camera,
@@ -568,7 +569,8 @@ internal sealed class ClientRenderHost : IDisposable
                 instances.ReducedLodInstances,
                 vfx.ActiveTransientEffects,
                 vfx.PoolCapacity,
-                vfx.TotalDropped);
+                vfx.TotalDropped,
+                graphics.Surface);
 
         lock (_frameGate)
         {
