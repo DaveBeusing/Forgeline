@@ -16,6 +16,8 @@ public sealed class FrontendOverlayRenderer : IDisposable
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers = new(4);
     private readonly OverlayVertex[] _vertices = new OverlayVertex[MaxVertices];
     private int _vertexCount;
+    private float _offsetX;
+    private float _offsetY;
     private bool _disposed;
 
     public FrontendOverlayRenderer(IGraphicsDevice graphics)
@@ -36,13 +38,25 @@ public sealed class FrontendOverlayRenderer : IDisposable
         ArgumentNullException.ThrowIfNull(context);
 
         _vertexCount = 0;
+        _offsetX = 0f;
+        _offsetY = 0f;
         float viewportScale = MathF.Min(
             context.Width / 1920f,
             context.Height / 1080f);
-        float scale = Math.Clamp(
+        float scale = Math.Min(
             viewportScale * userScale,
-            0.75f,
             2.0f);
+        float offsetX =
+            MathF.Max(
+                0f,
+                (context.Width - 1920f * scale) * 0.5f);
+        float offsetY =
+            MathF.Max(
+                0f,
+                (context.Height - 1080f * scale) * 0.5f);
+
+        _offsetX = offsetX;
+        _offsetY = offsetY;
 
         float transition = Math.Clamp(view.Transition, 0f, 1f);
         float contentOffset = (1f - transition) * 18f * scale;
@@ -197,10 +211,14 @@ public sealed class FrontendOverlayRenderer : IDisposable
 
     private void EmitPanel(SurfaceRect rect, Vector4 color, int width, int height)
     {
-        float left = rect.X / width * 2 - 1;
-        float right = (rect.X + rect.Width) / width * 2 - 1;
-        float top = 1 - rect.Y / height * 2;
-        float bottom = 1 - (rect.Y + rect.Height) / height * 2;
+        float x = MathF.Round(rect.X + _offsetX);
+        float y = MathF.Round(rect.Y + _offsetY);
+        float rectWidth = MathF.Max(1f, MathF.Round(rect.Width));
+        float rectHeight = MathF.Max(1f, MathF.Round(rect.Height));
+        float left = x / width * 2 - 1;
+        float right = (x + rectWidth) / width * 2 - 1;
+        float top = 1 - y / height * 2;
+        float bottom = 1 - (y + rectHeight) / height * 2;
         EmitTriangle(left, top, right, top, right, bottom, color);
         EmitTriangle(left, top, right, bottom, left, bottom, color);
     }
