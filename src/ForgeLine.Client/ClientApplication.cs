@@ -1855,6 +1855,68 @@ internal sealed class ClientApplication
         }
     }
 
+    private static string ResolveSaveDirectory() =>
+        Path.Combine(
+            Environment.GetFolderPath(
+                Environment.SpecialFolder.LocalApplicationData),
+            "FORGELINE",
+            "Saves");
+
+    private static bool TrySaveCurrentMatch(
+        VerticalSliceScenario scenario,
+        string saveDirectory,
+        out string feedback)
+    {
+        ArgumentNullException.ThrowIfNull(
+            scenario);
+        ArgumentException.ThrowIfNullOrWhiteSpace(
+            saveDirectory);
+
+        try
+        {
+            Directory.CreateDirectory(
+                saveDirectory);
+
+            MatchSaveData save =
+                MatchPersistenceService.CaptureSave(
+                    scenario);
+            string timestamp =
+                DateTimeOffset.UtcNow.ToString(
+                    "yyyyMMdd-HHmmss-fff",
+                    System.Globalization.CultureInfo.InvariantCulture);
+            string tick =
+                save.SavedTick.ToString(
+                    "D8",
+                    System.Globalization.CultureInfo.InvariantCulture);
+            string path =
+                Path.Combine(
+                    saveDirectory,
+                    $"manual-{timestamp}-tick-{tick}.save.json");
+
+            MatchPersistenceSerializer.WriteSave(
+                path,
+                save);
+
+            feedback =
+                "GAME SAVED";
+            Console.WriteLine(
+                $"[save:written] tick={save.SavedTick} path=\"{path}\"");
+            return true;
+        }
+        catch (Exception exception)
+            when (exception is
+                      MatchPersistenceException or
+                      IOException or
+                      UnauthorizedAccessException)
+        {
+            feedback =
+                "SAVE FAILED";
+            Console.Error.WriteLine(
+                $"[save:error] type={exception.GetType().Name} message={exception.Message}");
+            return false;
+        }
+    }
+
     private static RuntimeAssetCatalog? TryLoadRuntimeAssets()
     {
         string runtimeRoot =
@@ -1972,11 +2034,7 @@ internal sealed class ClientApplication
             GameFrontendAction.LoadingCompleted);
 
         string saveDirectory =
-            Path.Combine(
-                Environment.GetFolderPath(
-                    Environment.SpecialFolder.LocalApplicationData),
-                "FORGELINE",
-                "Saves");
+            ResolveSaveDirectory();
         var loadGame =
             new LoadGameModel(
                 ClientSaveCatalog.Discover(
