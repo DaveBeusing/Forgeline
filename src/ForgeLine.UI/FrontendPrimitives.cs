@@ -13,20 +13,9 @@ public static class FrontendDesign
 
     public static float ResolveScale(float viewportWidth, float viewportHeight, float userScale = 1f)
     {
-        if (viewportWidth <= 0f)
-        {
-            throw new ArgumentOutOfRangeException(nameof(viewportWidth));
-        }
-
-        if (viewportHeight <= 0f)
-        {
-            throw new ArgumentOutOfRangeException(nameof(viewportHeight));
-        }
-
-        if (userScale <= 0f)
-        {
-            throw new ArgumentOutOfRangeException(nameof(userScale));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(viewportWidth, 0f);
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(viewportHeight, 0f);
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(userScale, 0f);
 
         var viewportScale = MathF.Min(viewportWidth / ReferenceWidth, viewportHeight / ReferenceHeight);
         return Math.Clamp(viewportScale * userScale, MinimumScale, MaximumScale);
@@ -37,10 +26,7 @@ public readonly record struct FrontendRect(float X, float Y, float Width, float 
 {
     public FrontendRect Scale(float scale)
     {
-        if (scale <= 0f)
-        {
-            throw new ArgumentOutOfRangeException(nameof(scale));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(scale, 0f);
 
         return new FrontendRect(X * scale, Y * scale, Width * scale, Height * scale);
     }
