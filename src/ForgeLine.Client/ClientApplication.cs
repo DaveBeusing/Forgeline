@@ -283,14 +283,8 @@ internal sealed class ClientApplication
         bool minimapToggleHeld = false;
         bool restartHeld = false;
         bool returnHeld = false;
-        bool setupStartHeld = false;
-        bool frontendUpHeld = false;
-        bool frontendDownHeld = false;
-        bool frontendLeftHeld = false;
-        bool frontendRightHeld = false;
         bool pauseHeld = false;
         bool helpHeld = false;
-        bool matchSetupActive = false;
         bool userPaused = false;
         bool helpVisible = false;
         FormationTemplate activeFormation =
@@ -385,74 +379,7 @@ internal sealed class ClientApplication
                     !helpVisible;
             }
 
-            bool setupStartPressed =
-                matchSetupActive &&
-                ConsumeKeyPress(
-                    inputState,
-                    PlatformKey.Enter,
-                    ref setupStartHeld);
-
-            if (matchSetupActive &&
-                frontendShell.Screen == GameFrontendScreen.MainMenu)
-            {
-                if (ConsumeKeyPress(
-                        inputState,
-                        PlatformKey.Up,
-                        ref frontendUpHeld))
-                {
-                    mainMenu.MovePrevious();
-                }
-
-                if (ConsumeKeyPress(
-                        inputState,
-                        PlatformKey.Down,
-                        ref frontendDownHeld))
-                {
-                    mainMenu.MoveNext();
-                }
-            }
-
-            if (matchSetupActive &&
-                frontendShell.Screen == GameFrontendScreen.Settings)
-            {
-                if (ConsumeKeyPress(
-                        inputState,
-                        PlatformKey.Up,
-                        ref frontendUpHeld))
-                {
-                    settingsInteraction.MovePrevious();
-                }
-
-                if (ConsumeKeyPress(
-                        inputState,
-                        PlatformKey.Down,
-                        ref frontendDownHeld))
-                {
-                    settingsInteraction.MoveNext();
-                }
-
-                if (ConsumeKeyPress(
-                        inputState,
-                        PlatformKey.Left,
-                        ref frontendLeftHeld))
-                {
-                    settingsInteraction.Adjust(
-                        settingsScreen,
-                        -1);
-                }
-
-                if (ConsumeKeyPress(
-                        inputState,
-                        PlatformKey.Right,
-                        ref frontendRightHeld))
-                {
-                    settingsInteraction.Adjust(
-                        settingsScreen,
-                        1);
-                }
-            }
             bool pausePressed =
-                !matchSetupActive &&
                 ConsumeKeyPress(
                     inputState,
                     PlatformKey.Space,
@@ -482,78 +409,7 @@ internal sealed class ClientApplication
                 inputExperience?.IsMatchComplete ==
                 true;
 
-            if (matchSetupActive &&
-                returnPressed)
-            {
-                return 0;
-            }
-
-            if (matchSetupActive &&
-                setupStartPressed &&
-                frontendShell.Screen == GameFrontendScreen.MainMenu)
-            {
-                GameFrontendAction action =
-                    mainMenu.ActivateFocused();
-                frontendShell.Dispatch(action);
-
-                if (action == GameFrontendAction.Exit)
-                {
-                    return 0;
-                }
-            }
-
-            if (matchSetupActive &&
-                returnPressed &&
-                frontendShell.Screen != GameFrontendScreen.MainMenu)
-            {
-                frontendShell.Dispatch(
-                    GameFrontendAction.Back);
-            }
-
-            if (matchSetupActive &&
-                setupStartPressed &&
-                frontendShell.Screen == GameFrontendScreen.NewGame)
-            {
-                frontendShell.Dispatch(
-                    NewGameModel.Start());
-                matchSetupActive = false;
-                helpVisible = false;
-            }
-
-            if (matchSetupActive &&
-                setupStartPressed &&
-                frontendShell.Screen == GameFrontendScreen.Settings)
-            {
-                string settingsDirectory =
-                    Path.GetDirectoryName(_settingsPath) ??
-                    throw new InvalidOperationException(
-                        "Settings path must have a directory.");
-                string settingsRoot =
-                    Directory.GetParent(settingsDirectory)?.FullName ??
-                    settingsDirectory;
-                var settingsStore =
-                    new ClientSettingsStore(
-                        settingsRoot);
-                var settingsAdapter =
-                    new ClientSettingsFrontendAdapter(
-                        settingsStore);
-                ClientUserSettings applied =
-                    settingsAdapter.Apply(
-                        settingsScreen);
-                frontendShell.Dispatch(
-                    SettingsModel.Back());
-
-                if (applied.WindowWidth != _settings.WindowWidth ||
-                    applied.WindowHeight != _settings.WindowHeight ||
-                    applied.BorderlessFullscreen !=
-                        _settings.BorderlessFullscreen)
-                {
-                    return RestartRequestedExitCode;
-                }
-            }
-
             if (!inputMatchTerminal &&
-                !matchSetupActive &&
                 pausePressed)
             {
                 userPaused =
@@ -562,7 +418,7 @@ internal sealed class ClientApplication
 
             PreAlphaUxView preAlphaUx =
                 CreatePreAlphaUxView(
-                    matchSetupActive,
+                    false,
                     userPaused,
                     helpVisible,
                     _settings.ShowOnboarding &&
@@ -606,7 +462,6 @@ internal sealed class ClientApplication
                 window.IsMinimized ||
                 window.ClientSize.IsEmpty;
             bool shellBlocksGameplay =
-                matchSetupActive ||
                 userPaused ||
                 helpVisible;
             bool shouldPauseSimulation =
@@ -655,15 +510,7 @@ internal sealed class ClientApplication
                         default,
                         _settings.UiScale,
                         preAlphaUx,
-                        matchSetupActive
-                            ? CreateFrontendSurface(
-                                frontendShell.Screen,
-                                mainMenu,
-                                newGameScreen,
-                                loadGameScreen,
-                                settingsScreen,
-                                settingsInteraction)
-                            : null));
+                        null));
 
                 if (shouldPauseForWindow)
                 {
