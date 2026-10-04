@@ -44,6 +44,51 @@ public sealed class LoadGameModel
     public bool CanContinue =>
         ContinueTarget.HasValue;
 
+    public LoadGameEntry? FocusedEntry =>
+        _entries.Length == 0
+            ? null
+            : _entries[_focusedIndex];
+
+    public LoadGameEntry? MoveNext()
+    {
+        if (_entries.Length == 0)
+        {
+            return null;
+        }
+
+        _focusedIndex =
+            (_focusedIndex + 1) %
+            _entries.Length;
+        return FocusedEntry;
+    }
+
+    public LoadGameEntry? MovePrevious()
+    {
+        if (_entries.Length == 0)
+        {
+            return null;
+        }
+
+        _focusedIndex =
+            (_focusedIndex - 1 + _entries.Length) %
+            _entries.Length;
+        return FocusedEntry;
+    }
+
+    public bool TryGetFocusedLoadTarget(
+        out LoadGameEntry entry)
+    {
+        if (FocusedEntry is LoadGameEntry focused &&
+            focused.CanLoad)
+        {
+            entry = focused;
+            return true;
+        }
+
+        entry = default;
+        return false;
+    }
+
     public bool TryGetLoadTarget(
         string id,
         out LoadGameEntry entry)
