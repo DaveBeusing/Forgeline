@@ -52,6 +52,6 @@ public sealed class ClientSessionFactoryTests
 
         Assert.Equal(
             731,
-            scenario.Settings.RandomSeed);
+            scenario.RuntimeSettings.RandomSeed);
     }
 }
