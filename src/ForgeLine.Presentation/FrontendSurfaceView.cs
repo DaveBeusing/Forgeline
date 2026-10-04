@@ -19,7 +19,9 @@ public readonly record struct FrontendDetailLineView(
     bool IsWarning = false,
     bool IsFocused = false,
     bool CanDecrease = false,
-    bool CanIncrease = false);
+    bool CanIncrease = false,
+    bool IsHovered = false,
+    bool IsPressed = false);
 
 public readonly record struct FrontendSurfaceView(
     FrontendSurfaceKind Kind,
@@ -31,7 +33,13 @@ public readonly record struct FrontendSurfaceView(
     IReadOnlyList<FrontendDetailLineView> DetailLines,
     string Footer,
     string PrimaryAction = "",
-    string SecondaryAction = "BACK")
+    string SecondaryAction = "BACK",
+    string Feedback = "",
+    float Transition = 1f,
+    bool PrimaryHovered = false,
+    bool PrimaryPressed = false,
+    bool SecondaryHovered = false,
+    bool SecondaryPressed = false)
 {
     public static FrontendSurfaceView Loading(
         string status,
@@ -59,10 +67,29 @@ public readonly record struct FrontendSurfaceView(
             [],
             "ENTER  SELECT     UP/DOWN  NAVIGATE");
 
+    public FrontendSurfaceView WithInteraction(
+        string feedback,
+        float transition,
+        bool primaryHovered,
+        bool primaryPressed,
+        bool secondaryHovered,
+        bool secondaryPressed) =>
+        this with
+        {
+            Feedback = feedback,
+            Transition = transition,
+            PrimaryHovered = primaryHovered,
+            PrimaryPressed = primaryPressed,
+            SecondaryHovered = secondaryHovered,
+            SecondaryPressed = secondaryPressed
+        };
+
     public static FrontendSurfaceView Detail(
         string title,
         IReadOnlyList<FrontendDetailLineView> lines,
-        string footer) =>
+        string footer,
+        string primaryAction = "",
+        string secondaryAction = "BACK") =>
         new(
             FrontendSurfaceKind.Detail,
             title,
@@ -71,5 +98,7 @@ public readonly record struct FrontendSurfaceView(
             0f,
             [],
             lines,
-            footer);
+            footer,
+            primaryAction,
+            secondaryAction);
 }

@@ -44,6 +44,9 @@ public sealed class FrontendOverlayRenderer : IDisposable
             0.75f,
             2.0f);
 
+        float transition = Math.Clamp(view.Transition, 0f, 1f);
+        float contentOffset = (1f - transition) * 18f * scale;
+
         EmitPanel(
             new SurfaceRect(0, 0, 1920f, 1080f).Scale(scale),
             new Vector4(0.035f, 0.045f, 0.045f, 0.98f),
@@ -79,19 +82,29 @@ public sealed class FrontendOverlayRenderer : IDisposable
                 EmitText(item.Label, 104 * scale, y, textColor, context.Width, context.Height, scale);
                 y += 72 * scale;
             }
+            if (!string.IsNullOrEmpty(view.Feedback))
+            {
+                EmitText(view.Feedback, 94 * scale, 790 * scale, new Vector4(0.82f, 0.42f, 0.20f, 1), context.Width, context.Height, scale);
+            }
+
             EmitText(view.Footer, 94 * scale, 930 * scale, new Vector4(0.40f, 0.44f, 0.40f, 1), context.Width, context.Height, scale);
         }
         else if (view.Kind == FrontendSurfaceKind.Detail)
         {
-            EmitText(view.Title, 94 * scale, 286 * scale, new Vector4(0.95f, 0.72f, 0.22f, 1), context.Width, context.Height, scale);
+            EmitText(view.Title, 94 * scale + contentOffset, 286 * scale, new Vector4(0.95f, 0.72f, 0.22f, 1), context.Width, context.Height, scale);
             EmitPanel(new SurfaceRect(92 * scale, 330 * scale, 980 * scale, 2 * scale), new Vector4(0.28f, 0.32f, 0.29f, 1), context.Width, context.Height);
 
             float y = 390 * scale;
             foreach (FrontendDetailLineView line in view.DetailLines)
             {
-                if (line.IsFocused)
+                if (line.IsFocused || line.IsHovered)
                 {
-                    EmitPanel(new SurfaceRect(92 * scale, (y - 13 * scale), 980 * scale, 48 * scale), new Vector4(0.10f, 0.12f, 0.11f, 0.96f), context.Width, context.Height);
+                    Vector4 rowPanel = line.IsPressed
+                        ? new Vector4(0.20f, 0.17f, 0.10f, 0.98f)
+                        : line.IsHovered
+                            ? new Vector4(0.14f, 0.16f, 0.14f, 0.97f)
+                            : new Vector4(0.10f, 0.12f, 0.11f, 0.96f);
+                    EmitPanel(new SurfaceRect(92 * scale, (y - 13 * scale), 980 * scale, 48 * scale), rowPanel, context.Width, context.Height);
                     EmitPanel(new SurfaceRect(92 * scale, (y - 13 * scale), 4 * scale, 48 * scale), new Vector4(0.86f, 0.61f, 0.16f, 1), context.Width, context.Height);
                 }
 
@@ -118,12 +131,12 @@ public sealed class FrontendOverlayRenderer : IDisposable
 
             if (!string.IsNullOrEmpty(view.PrimaryAction))
             {
-                EmitActionButton(view.PrimaryAction, 782 * scale, 838 * scale, 290 * scale, 58 * scale, true, context.Width, context.Height, scale);
+                EmitActionButton(view.PrimaryAction, 782 * scale, 838 * scale, 290 * scale, 58 * scale, true, view.PrimaryHovered, view.PrimaryPressed, context.Width, context.Height, scale);
             }
 
             if (!string.IsNullOrEmpty(view.SecondaryAction))
             {
-                EmitActionButton(view.SecondaryAction, 92 * scale, 838 * scale, 220 * scale, 58 * scale, false, context.Width, context.Height, scale);
+                EmitActionButton(view.SecondaryAction, 92 * scale, 838 * scale, 220 * scale, 58 * scale, false, view.SecondaryHovered, view.SecondaryPressed, context.Width, context.Height, scale);
             }
 
             EmitText(view.Footer, 94 * scale, 930 * scale, new Vector4(0.40f, 0.44f, 0.40f, 1), context.Width, context.Height, scale);
@@ -159,11 +172,15 @@ public sealed class FrontendOverlayRenderer : IDisposable
         EmitText(label, x + 27 * scale, y + 10 * scale, new Vector4(0.82f, 0.84f, 0.78f, 1), viewportWidth, viewportHeight, scale);
     }
 
-    private void EmitActionButton(string label, float x, float y, float width, float height, bool primary, int viewportWidth, int viewportHeight, float scale)
+    private void EmitActionButton(string label, float x, float y, float width, float height, bool primary, bool hovered, bool pressed, int viewportWidth, int viewportHeight, float scale)
     {
-        Vector4 panel = primary
-            ? new Vector4(0.24f, 0.20f, 0.10f, 1)
-            : new Vector4(0.12f, 0.14f, 0.13f, 1);
+        Vector4 panel = pressed
+            ? new Vector4(0.30f, 0.24f, 0.10f, 1)
+            : hovered
+                ? new Vector4(0.20f, 0.19f, 0.13f, 1)
+                : primary
+                    ? new Vector4(0.24f, 0.20f, 0.10f, 1)
+                    : new Vector4(0.12f, 0.14f, 0.13f, 1);
         Vector4 accent = primary
             ? new Vector4(0.86f, 0.61f, 0.16f, 1)
             : new Vector4(0.34f, 0.38f, 0.34f, 1);

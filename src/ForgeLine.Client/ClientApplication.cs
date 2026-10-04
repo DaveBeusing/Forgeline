@@ -1713,6 +1713,9 @@ internal sealed class ClientApplication
         bool leftHeld = false;
         bool rightHeld = false;
         bool primaryPointerHeld = false;
+        string frontendFeedback = string.Empty;
+        GameFrontendScreen transitionScreen = shell.Screen;
+        long transitionStarted = Stopwatch.GetTimestamp();
 
         var target =
             new GraphicsWindowTarget(
@@ -1754,6 +1757,19 @@ internal sealed class ClientApplication
                 !primaryPointerHeld;
             primaryPointerHeld =
                 primaryPointerDown;
+            if (shell.Screen != transitionScreen)
+            {
+                transitionScreen = shell.Screen;
+                transitionStarted = Stopwatch.GetTimestamp();
+                frontendFeedback = string.Empty;
+            }
+
+            float transition =
+                Math.Clamp(
+                    (float)Stopwatch.GetElapsedTime(
+                        transitionStarted).TotalMilliseconds / 140f,
+                    0f,
+                    1f);
             float frontendScale =
                 FrontendDesign.ResolveScale(
                     window.ClientSize.Width,
@@ -1916,13 +1932,18 @@ internal sealed class ClientApplication
                         input.PointerPosition.Y,
                         frontendScale);
 
-                if ((enter || loadActionClicked) &&
-                    loadGame.TryGetFocusedLoadTarget(
-                        out LoadGameEntry selectedSave))
+                if (enter || loadActionClicked)
                 {
-                    return FrontendSessionSelectionResult.Start(
-                        ClientSessionRequest.Load(
-                            selectedSave));
+                    if (loadGame.TryGetFocusedLoadTarget(
+                            out LoadGameEntry selectedSave))
+                    {
+                        return FrontendSessionSelectionResult.Start(
+                            ClientSessionRequest.Load(
+                                selectedSave));
+                    }
+
+                    frontendFeedback =
+                        "SELECT A VALID SAVE TO LOAD";
                 }
             }
             else if (shell.Screen == GameFrontendScreen.Settings)
@@ -2039,14 +2060,51 @@ internal sealed class ClientApplication
                     GameFrontendAction.Back);
             }
 
-            renderer.Publish(
+            FrontendSurfaceView surface =
                 CreateFrontendSurface(
                     shell.Screen,
                     mainMenu,
                     newGame,
                     loadGame,
                     settings,
-                    settingsInteraction));
+                    settingsInteraction);
+            if (input.HasPointerPosition &&
+                shell.Screen != GameFrontendScreen.MainMenu)
+            {
+                bool primaryHovered =
+                    FrontendHitTesting.PrimaryAction(
+                        input.PointerPosition.X,
+                        input.PointerPosition.Y,
+                        frontendScale) &&
+                    !string.IsNullOrEmpty(surface.PrimaryAction);
+                bool secondaryHovered =
+                    FrontendHitTesting.SecondaryAction(
+                        input.PointerPosition.X,
+                        input.PointerPosition.Y,
+                        frontendScale) &&
+                    !string.IsNullOrEmpty(surface.SecondaryAction);
+                surface =
+                    surface.WithInteraction(
+                        frontendFeedback,
+                        transition,
+                        primaryHovered,
+                        primaryHovered && primaryPointerDown,
+                        secondaryHovered,
+                        secondaryHovered && primaryPointerDown);
+            }
+            else
+            {
+                surface =
+                    surface.WithInteraction(
+                        frontendFeedback,
+                        transition,
+                        false,
+                        false,
+                        false,
+                        false);
+            }
+
+            renderer.Publish(surface);
             renderer.ThrowIfFaulted();
             _platform.WaitForEvents(
                 IdleWait);
