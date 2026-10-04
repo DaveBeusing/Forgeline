@@ -178,6 +178,103 @@ public sealed class ClientUserSettingsTests
     }
 
     [Fact]
+    public void MissingPersistedDisplayValuesUseValidatedDefaults()
+    {
+        string root =
+            CreateTemporaryRoot();
+
+        try
+        {
+            var store =
+                new ClientSettingsStore(
+                    root);
+            Directory.CreateDirectory(
+                Path.GetDirectoryName(
+                    store.SettingsPath)!);
+            File.WriteAllText(
+                store.SettingsPath,
+                """
+                {
+                  "schemaVersion": 1
+                }
+                """);
+
+            ClientSettingsLoadResult loaded =
+                store.Load();
+            WindowConfiguration window =
+                loaded.Settings.CreateWindowConfiguration();
+
+            Assert.False(
+                loaded.RecoveredInvalidSettings);
+            Assert.Equal(
+                1_600,
+                window.Width);
+            Assert.Equal(
+                900,
+                window.Height);
+            Assert.Equal(
+                WindowMode.Windowed,
+                window.Mode);
+        }
+        finally
+        {
+            Directory.Delete(
+                root,
+                recursive: true);
+        }
+    }
+
+    [Fact]
+    public void InvalidPersistedDisplayDimensionsRecoverToSafeDefaults()
+    {
+        string root =
+            CreateTemporaryRoot();
+
+        try
+        {
+            var store =
+                new ClientSettingsStore(
+                    root);
+            Directory.CreateDirectory(
+                Path.GetDirectoryName(
+                    store.SettingsPath)!);
+            File.WriteAllText(
+                store.SettingsPath,
+                """
+                {
+                  "schemaVersion": 1,
+                  "windowWidth": 640,
+                  "windowHeight": 480,
+                  "borderlessFullscreen": true
+                }
+                """);
+
+            ClientSettingsLoadResult loaded =
+                store.Load();
+            WindowConfiguration window =
+                loaded.Settings.CreateWindowConfiguration();
+
+            Assert.True(
+                loaded.RecoveredInvalidSettings);
+            Assert.Equal(
+                1_600,
+                window.Width);
+            Assert.Equal(
+                900,
+                window.Height);
+            Assert.Equal(
+                WindowMode.Windowed,
+                window.Mode);
+        }
+        finally
+        {
+            Directory.Delete(
+                root,
+                recursive: true);
+        }
+    }
+
+    [Fact]
     public void InvalidSettingsAreQuarantinedAndRecovered()
     {
         string root =
