@@ -10,7 +10,6 @@ public sealed class FrontendOverlayRenderer : IDisposable
     private const int VertexStride = 24;
     private const float GlyphPixelSize = 3.0f;
     private const float GlyphAdvance = 18.0f;
-    private const float LineAdvance = 24.0f;
 
     private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;
