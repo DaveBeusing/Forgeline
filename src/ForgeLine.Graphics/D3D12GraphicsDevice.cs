@@ -160,9 +160,13 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                     _surfaceLifecycle.IsOccluded,
                     _surfaceLifecycle.HasPendingResize,
                     _surfaceLifecycle.ResizeGeneration,
-                    _surfaceLifecycle.AppliedResizeGeneration,
-                    _submittedFrameCount,
-                    _presentedFrameCount));
+                    _surfaceLifecycle.AppliedResizeGeneration)
+                {
+                    SubmittedFrameCount =
+                        _submittedFrameCount,
+                    PresentedFrameCount =
+                        _presentedFrameCount
+                });
         }
     }
 
