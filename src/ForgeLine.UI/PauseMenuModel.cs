@@ -36,6 +36,9 @@ public sealed class PauseMenuModel
             PauseMenuCommand.ReturnToMenu)
     ];
 
+    private readonly PauseMenuItem[] _items =
+        s_items;
+
     private readonly FrontendFocusModel _focus =
         new(
             s_items
@@ -43,13 +46,13 @@ public sealed class PauseMenuModel
                 .Select(static item => item.Id));
 
     public IReadOnlyList<PauseMenuItem> Items =>
-        s_items;
+        _items;
 
     public string FocusedId =>
         _focus.FocusedId;
 
     public PauseMenuItem FocusedItem =>
-        s_items.First(
+        _items.First(
             item =>
                 string.Equals(
                     item.Id,
@@ -69,7 +72,7 @@ public sealed class PauseMenuModel
     }
 
     public bool TryFocus(string id) =>
-        s_items.Any(
+        _items.Any(
             item =>
                 item.IsEnabled &&
                 string.Equals(
