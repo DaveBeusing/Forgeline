@@ -12,4 +12,7 @@
     <ProjectReference Include="../ForgeLine.Core/ForgeLine.Core.csproj" />
     <ProjectReference Include="../ForgeLine.Platform.Windows/ForgeLine.Platform.Windows.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="ForgeLine.Graphics.Tests" />
+  </ItemGroup>
 </Project>
