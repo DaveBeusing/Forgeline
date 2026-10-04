@@ -13,7 +13,7 @@ public sealed class NewGameModelTests
         Assert.Equal("Central Divide", model.Configuration.MapName);
         Assert.Equal("Directorate", model.Configuration.FactionName);
         Assert.Equal(17UL, model.Configuration.Seed);
-        Assert.True(model.CanStart);
+        Assert.True(NewGameModel.CanStart);
     }
 
     [Fact]
@@ -33,8 +33,8 @@ public sealed class NewGameModelTests
     {
         var model = new NewGameModel();
 
-        Assert.Equal(GameFrontendAction.StartMatch, model.Start());
-        Assert.Equal(GameFrontendAction.Back, model.Back());
+        Assert.Equal(GameFrontendAction.StartMatch, NewGameModel.Start());
+        Assert.Equal(GameFrontendAction.Back, NewGameModel.Back());
     }
 
     [Fact]
