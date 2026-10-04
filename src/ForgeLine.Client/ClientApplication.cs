@@ -20,6 +20,13 @@ using ForgeLine.World;
 
 namespace ForgeLine.Client;
 
+internal readonly record struct ClientWindowQualificationSnapshot(
+    WindowMode Mode,
+    int ClientWidth,
+    int ClientHeight,
+    bool IsMinimized,
+    uint Dpi);
+
 internal sealed class ClientApplication
 {
     private const float MaximumCameraDeltaSeconds = 0.1f;
@@ -74,6 +81,9 @@ internal sealed class ClientApplication
             _settings.CreateWindowConfiguration();
 
         using IWindow window = _platform.CreateWindow(configuration);
+        ClientWindowQualificationSnapshot qualificationWindow =
+            CaptureWindowQualification(
+                window);
 
         var frontendShell = new GameFrontendShell();
         var frontendLoading = new FrontendLoadingController();
@@ -324,6 +334,15 @@ internal sealed class ClientApplication
 
             DrainWindowEvents(window);
             DrainInputEvents(window, inputState);
+
+            if (window.IsOpen &&
+                !window.ClientSize.IsEmpty)
+            {
+                qualificationWindow =
+                    CaptureWindowQualification(
+                        window);
+            }
+
             simulationHost.ThrowIfFaulted();
             renderHost.ThrowIfFaulted();
             _ = renderWorld.Update(
@@ -842,7 +861,7 @@ internal sealed class ClientApplication
             WriteVisualQualificationReport(
                 visualQualificationOutput,
                 renderInstanceCount,
-                window,
+                qualificationWindow,
                 renderHost.LatestQualification);
         }
 
@@ -852,7 +871,7 @@ internal sealed class ClientApplication
     private void WriteVisualQualificationReport(
         string outputPath,
         int renderStressInstances,
-        IWindow window,
+        in ClientWindowQualificationSnapshot window,
         ClientVisualQualificationSnapshot? qualification)
     {
         ClientVisualQualificationSnapshot metrics =
@@ -897,12 +916,9 @@ internal sealed class ClientApplication
                     {
                         mode =
                             window.Mode.ToString(),
-                        clientWidth =
-                            window.ClientSize.Width,
-                        clientHeight =
-                            window.ClientSize.Height,
+                        window.ClientWidth,
+                        window.ClientHeight,
                         window.IsMinimized,
-                        window.IsOpen,
                         window.Dpi
                     },
                 metrics
@@ -930,6 +946,20 @@ internal sealed class ClientApplication
             $"presented={metrics.Surface.PresentedFrameCount} " +
             $"pendingResize={metrics.Surface.ResizePending} " +
             $"occluded={metrics.Surface.IsOccluded}");
+    }
+
+    private static ClientWindowQualificationSnapshot CaptureWindowQualification(
+        IWindow window)
+    {
+        ArgumentNullException.ThrowIfNull(
+            window);
+
+        return new ClientWindowQualificationSnapshot(
+            window.Mode,
+            window.ClientSize.Width,
+            window.ClientSize.Height,
+            window.IsMinimized,
+            window.Dpi);
     }
 
     private static void DispatchPlayerActionRequest(
