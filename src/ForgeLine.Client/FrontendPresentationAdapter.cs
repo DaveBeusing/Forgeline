@@ -29,6 +29,7 @@ internal static class FrontendPresentationAdapter
                                 item.Id,
                                 menu.FocusedId,
                                 StringComparison.Ordinal)))
+                .Take(FrontendDesign.MaximumVisibleDetailRows)
                 .ToArray();
 
         return FrontendSurfaceView.MainMenu(entries);
@@ -80,8 +81,8 @@ internal static class FrontendPresentationAdapter
                         new FrontendDetailLineView(
                             model.FocusedEntry is LoadGameEntry focused &&
                             string.Equals(entry.Id, focused.Id, StringComparison.Ordinal)
-                                ? $"> {entry.DisplayName}"
-                                : entry.DisplayName,
+                                ? FrontendDesign.FitText(entry.DisplayName)
+                                : FrontendDesign.FitText(entry.DisplayName),
                             entry.CanLoad
                                 ? $"TICK {entry.SavedTick}"
                                 : entry.State.ToString().ToUpperInvariant(),
