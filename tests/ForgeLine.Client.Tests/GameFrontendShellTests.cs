@@ -1,4 +1,5 @@
 using ForgeLine.UI;
+using Xunit;
 
 namespace ForgeLine.Client.Tests;
 
