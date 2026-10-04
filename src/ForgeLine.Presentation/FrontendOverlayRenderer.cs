@@ -89,12 +89,41 @@ public sealed class FrontendOverlayRenderer : IDisposable
             float y = 390 * scale;
             foreach (FrontendDetailLineView line in view.DetailLines)
             {
+                if (line.IsFocused)
+                {
+                    EmitPanel(new SurfaceRect(92 * scale, (y - 13 * scale), 980 * scale, 48 * scale), new Vector4(0.10f, 0.12f, 0.11f, 0.96f), context.Width, context.Height);
+                    EmitPanel(new SurfaceRect(92 * scale, (y - 13 * scale), 4 * scale, 48 * scale), new Vector4(0.86f, 0.61f, 0.16f, 1), context.Width, context.Height);
+                }
+
                 Vector4 valueColor = line.IsWarning
                     ? new Vector4(0.82f, 0.42f, 0.20f, 1)
-                    : new Vector4(0.78f, 0.80f, 0.74f, 1);
-                EmitText(line.Label, 104 * scale, y, new Vector4(0.45f, 0.50f, 0.45f, 1), context.Width, context.Height, scale);
+                    : line.IsFocused
+                        ? new Vector4(0.95f, 0.72f, 0.22f, 1)
+                        : new Vector4(0.78f, 0.80f, 0.74f, 1);
+                EmitText(line.Label, 112 * scale, y, new Vector4(0.45f, 0.50f, 0.45f, 1), context.Width, context.Height, scale);
                 EmitText(line.Value, 460 * scale, y, valueColor, context.Width, context.Height, scale);
+
+                if (line.CanDecrease)
+                {
+                    EmitControlButton("-", 830 * scale, (y - 13 * scale), 72 * scale, 42 * scale, context.Width, context.Height, scale);
+                }
+
+                if (line.CanIncrease)
+                {
+                    EmitControlButton("+", 916 * scale, (y - 13 * scale), 72 * scale, 42 * scale, context.Width, context.Height, scale);
+                }
+
                 y += 58 * scale;
+            }
+
+            if (!string.IsNullOrEmpty(view.PrimaryAction))
+            {
+                EmitActionButton(view.PrimaryAction, 782 * scale, 838 * scale, 290 * scale, 58 * scale, true, context.Width, context.Height, scale);
+            }
+
+            if (!string.IsNullOrEmpty(view.SecondaryAction))
+            {
+                EmitActionButton(view.SecondaryAction, 92 * scale, 838 * scale, 220 * scale, 58 * scale, false, context.Width, context.Height, scale);
             }
 
             EmitText(view.Footer, 94 * scale, 930 * scale, new Vector4(0.40f, 0.44f, 0.40f, 1), context.Width, context.Height, scale);
@@ -121,6 +150,26 @@ public sealed class FrontendOverlayRenderer : IDisposable
         _vertexBuffers.Clear();
         _pipeline.Dispose();
         _disposed = true;
+    }
+
+    private void EmitControlButton(string label, float x, float y, float width, float height, int viewportWidth, int viewportHeight, float scale)
+    {
+        EmitPanel(new SurfaceRect(x, y, width, height), new Vector4(0.15f, 0.17f, 0.16f, 1), viewportWidth, viewportHeight);
+        EmitPanel(new SurfaceRect(x, y, width, 2 * scale), new Vector4(0.36f, 0.40f, 0.36f, 1), viewportWidth, viewportHeight);
+        EmitText(label, x + 27 * scale, y + 10 * scale, new Vector4(0.82f, 0.84f, 0.78f, 1), viewportWidth, viewportHeight, scale);
+    }
+
+    private void EmitActionButton(string label, float x, float y, float width, float height, bool primary, int viewportWidth, int viewportHeight, float scale)
+    {
+        Vector4 panel = primary
+            ? new Vector4(0.24f, 0.20f, 0.10f, 1)
+            : new Vector4(0.12f, 0.14f, 0.13f, 1);
+        Vector4 accent = primary
+            ? new Vector4(0.86f, 0.61f, 0.16f, 1)
+            : new Vector4(0.34f, 0.38f, 0.34f, 1);
+        EmitPanel(new SurfaceRect(x, y, width, height), panel, viewportWidth, viewportHeight);
+        EmitPanel(new SurfaceRect(x, y, 5 * scale, height), accent, viewportWidth, viewportHeight);
+        EmitText(label, x + 24 * scale, y + 18 * scale, new Vector4(0.90f, 0.88f, 0.76f, 1), viewportWidth, viewportHeight, scale);
     }
 
     private void EmitProgress(float x, float y, float width, float height, float progress, int viewportWidth, int viewportHeight)
@@ -183,7 +232,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
         '3' => [30,1,1,14,1,1,30], '4' => [2,6,10,18,31,2,2], '5' => [31,16,16,30,1,1,30],
         '6' => [14,16,16,30,17,17,14], '7' => [31,1,2,4,8,8,8], '8' => [14,17,17,14,17,17,14],
         '9' => [14,17,17,15,1,1,14], '.' => [0,0,0,0,0,12,12], ':' => [0,12,12,0,12,12,0],
-        '/' => [1,2,4,8,16,0,0], '-' => [0,0,0,31,0,0,0], _ => [0,0,0,0,0,0,0]
+        '/' => [1,2,4,8,16,0,0], '-' => [0,0,0,31,0,0,0], '+' => [0,4,4,31,4,4,0], _ => [0,0,0,0,0,0,0]
     };
 
     private static IGraphicsPipeline CreatePipeline(IGraphicsDevice graphics)
