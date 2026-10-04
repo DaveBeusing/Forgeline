@@ -1338,7 +1338,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         {
             builder.Append("PAUSED");
             builder.NewLine();
-            builder.Append("SPACE RESUME");
+            builder.Append("ESC OR SPACE RESUME");
             builder.NewLine();
             builder.Append("F12 CONTROLS");
 
@@ -1388,7 +1388,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             builder.NewLine();
             builder.Append("L LOGISTICS  Y SUPPLY  K COMBAT");
             builder.NewLine();
-            builder.Append("F10 OVERLAYS  F11 MINIMAP  SPACE PAUSE");
+            builder.Append("F10 OVERLAYS  F11 MINIMAP  ESC PAUSE MENU");
             builder.NewLine();
             builder.NewLine();
             builder.Append("QUICK START");
@@ -1426,7 +1426,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
 
         if (view.ShowOnboarding)
         {
-            builder.Append("F12 HELP  SPACE PAUSE  GOAL DESTROY ENEMY COMMAND CORE");
+            builder.Append("F12 HELP  ESC PAUSE MENU  GOAL DESTROY ENEMY COMMAND CORE");
 
             EmitReadableText(
                 builder.Written,

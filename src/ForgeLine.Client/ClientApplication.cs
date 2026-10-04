@@ -39,6 +39,7 @@ internal sealed class ClientApplication
     private static readonly TimeSpan IdleWait = TimeSpan.FromMilliseconds(16);
     private static readonly TimeSpan SmokeTestDuration = TimeSpan.FromMilliseconds(350);
     private static readonly TimeSpan DiagnosticInterval = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan PauseTransitionTimeout = TimeSpan.FromSeconds(2);
     private static readonly JsonSerializerOptions VisualQualificationJsonOptions =
         new()
         {
@@ -158,17 +159,46 @@ internal sealed class ClientApplication
             sessionRequest = selected;
         }
 
+        var sessionTransitionTarget =
+            new GraphicsWindowTarget(
+                window.NativeHandle.Value,
+                window.ClientSize.Width,
+                window.ClientSize.Height,
+                window.IsMinimized ||
+                window.ClientSize.IsEmpty);
+        using var sessionTransitionRenderer =
+            new ClientFrontendRenderHost(
+                sessionTransitionTarget);
+
         frontendLoading.BeginPhase(
             FrontendLoadingPhase.PreparingFrontend,
             sessionRequest.Kind ==
                 ClientSessionRequestKind.LoadGame
-                ? "Restoring saved battlefield"
-                : "Preparing battlefield");
+                ? "RESTORING SAVED BATTLEFIELD"
+                : "CREATING BATTLEFIELD SIMULATION",
+            totalSteps: 4);
+        sessionTransitionRenderer.Publish(
+            FrontendPresentationAdapter.Loading(
+                frontendLoading.State));
+        PumpBootFrame(
+            window,
+            sessionTransitionRenderer);
 
         using VerticalSliceScenario scenario =
             ClientSessionFactory.Create(
                 sessionRequest,
                 jobScheduler);
+
+        frontendLoading.ReportProgress(
+            1,
+            "PREPARING PRESENTATION STATE");
+        sessionTransitionRenderer.Publish(
+            FrontendPresentationAdapter.Loading(
+                frontendLoading.State));
+        PumpBootFrame(
+            window,
+            sessionTransitionRenderer);
+
         var snapshotBuffer =
             new PresentationSnapshotBuffer();
 
@@ -222,6 +252,16 @@ internal sealed class ClientApplication
                 presentationExtraction,
                 runtimeAssets));
 
+        frontendLoading.ReportProgress(
+            2,
+            "INITIALIZING PLAYER CONTROLS");
+        sessionTransitionRenderer.Publish(
+            FrontendPresentationAdapter.Loading(
+                frontendLoading.State));
+        PumpBootFrame(
+            window,
+            sessionTransitionRenderer);
+
         var renderWorld = new RenderWorld();
 
         BattlefieldStartPosition localStart =
@@ -260,6 +300,16 @@ internal sealed class ClientApplication
             new RtsInformationLayerController();
         var debugDraw = new DebugDraw();
 
+        frontendLoading.ReportProgress(
+            3,
+            "STARTING SIMULATION");
+        sessionTransitionRenderer.Publish(
+            FrontendPresentationAdapter.Loading(
+                frontendLoading.State));
+        PumpBootFrame(
+            window,
+            sessionTransitionRenderer);
+
         using var simulationHost =
             new ClientSimulationHost(
                 scenario,
@@ -267,6 +317,17 @@ internal sealed class ClientApplication
                 snapshotBuffer);
         _ = renderWorld.Update(
             snapshotBuffer);
+
+        frontendLoading.ReportProgress(
+            4,
+            "ENTERING BATTLEFIELD");
+        sessionTransitionRenderer.Publish(
+            FrontendPresentationAdapter.Loading(
+                frontendLoading.State));
+        PumpBootFrame(
+            window,
+            sessionTransitionRenderer);
+        sessionTransitionRenderer.Dispose();
 
         var graphicsTarget =
             new GraphicsWindowTarget(
@@ -292,12 +353,21 @@ internal sealed class ClientApplication
         bool formationToggleHeld = false;
         bool strategicOverlayToggleHeld = false;
         bool minimapToggleHeld = false;
+        var pauseMenu =
+            new PauseMenuModel();
+        string saveDirectory =
+            ResolveSaveDirectory();
         bool restartHeld = false;
         bool returnHeld = false;
         bool pauseHeld = false;
         bool helpHeld = false;
-        bool userPaused = false;
+        bool pauseMenuUpHeld = false;
+        bool pauseMenuDownHeld = false;
+        bool pauseMenuEnterHeld = false;
+        bool pauseMenuPrimaryPointerHeld = false;
+        bool pauseMenuActive = false;
         bool helpVisible = false;
+        string pauseMenuFeedback = string.Empty;
         FormationTemplate activeFormation =
             FormationTemplate.Compact;
         bool simulationPaused = false;
@@ -390,10 +460,14 @@ internal sealed class ClientApplication
                 informationLayer.ToggleMinimap();
             }
 
-            if (ConsumeKeyPress(
+            bool helpPressed =
+                ConsumeKeyPress(
                     inputState,
                     PlatformKey.F12,
-                    ref helpHeld))
+                    ref helpHeld);
+
+            if (!pauseMenuActive &&
+                helpPressed)
             {
                 helpVisible =
                     !helpVisible;
@@ -429,17 +503,126 @@ internal sealed class ClientApplication
                 inputExperience?.IsMatchComplete ==
                 true;
 
+            PauseMenuCommand? pauseMenuCommand =
+                null;
+
             if (!inputMatchTerminal &&
-                pausePressed)
+                (pausePressed ||
+                 returnPressed))
             {
-                userPaused =
-                    !userPaused;
+                pauseMenuActive =
+                    !pauseMenuActive;
+                pauseMenuFeedback =
+                    string.Empty;
+                helpVisible =
+                    false;
+            }
+
+            if (pauseMenuActive &&
+                !inputMatchTerminal)
+            {
+                FrontendLayout pauseLayout =
+                    FrontendDesign.ResolveLayout(
+                        window.ClientSize.Width,
+                        window.ClientSize.Height,
+                        _settings.UiScale);
+
+                if (inputState.HasPointerPosition)
+                {
+                    string? hoveredId =
+                        FrontendHitTesting.PauseMenu(
+                            inputState.PointerPosition.X,
+                            inputState.PointerPosition.Y,
+                            pauseLayout,
+                            pauseMenu.Items);
+
+                    if (hoveredId is not null)
+                    {
+                        pauseMenu.TryFocus(
+                            hoveredId);
+                    }
+                }
+
+                if (ConsumeKeyPress(
+                        inputState,
+                        PlatformKey.Up,
+                        ref pauseMenuUpHeld))
+                {
+                    pauseMenu.MovePrevious();
+                }
+
+                if (ConsumeKeyPress(
+                        inputState,
+                        PlatformKey.Down,
+                        ref pauseMenuDownHeld))
+                {
+                    pauseMenu.MoveNext();
+                }
+
+                bool pointerDown =
+                    inputState.IsMouseButtonDown(
+                        PlatformMouseButton.Left);
+                bool pointerPressed =
+                    pointerDown &&
+                    !pauseMenuPrimaryPointerHeld;
+                pauseMenuPrimaryPointerHeld =
+                    pointerDown;
+
+                bool activate =
+                    ConsumeKeyPress(
+                        inputState,
+                        PlatformKey.Enter,
+                        ref pauseMenuEnterHeld);
+
+                if (pointerPressed &&
+                    inputState.HasPointerPosition &&
+                    FrontendHitTesting.PauseMenu(
+                        inputState.PointerPosition.X,
+                        inputState.PointerPosition.Y,
+                        pauseLayout,
+                        pauseMenu.Items) is string clickedId)
+                {
+                    pauseMenu.TryFocus(
+                        clickedId);
+                    activate =
+                        true;
+                }
+
+                if (activate)
+                {
+                    pauseMenuCommand =
+                        pauseMenu.ActivateFocused();
+
+                    if (pauseMenuCommand ==
+                        PauseMenuCommand.Resume)
+                    {
+                        pauseMenuActive =
+                            false;
+                        pauseMenuFeedback =
+                            string.Empty;
+                    }
+                }
+            }
+            else
+            {
+                pauseMenuUpHeld =
+                    inputState.IsKeyDown(
+                        PlatformKey.Up);
+                pauseMenuDownHeld =
+                    inputState.IsKeyDown(
+                        PlatformKey.Down);
+                pauseMenuEnterHeld =
+                    inputState.IsKeyDown(
+                        PlatformKey.Enter);
+                pauseMenuPrimaryPointerHeld =
+                    inputState.IsMouseButtonDown(
+                        PlatformMouseButton.Left);
             }
 
             PreAlphaUxView preAlphaUx =
                 CreatePreAlphaUxView(
                     false,
-                    userPaused,
+                    false,
                     helpVisible,
                     _settings.ShowOnboarding &&
                     !smokeTest);
@@ -482,7 +665,7 @@ internal sealed class ClientApplication
                 window.IsMinimized ||
                 window.ClientSize.IsEmpty;
             bool shellBlocksGameplay =
-                userPaused ||
+                pauseMenuActive ||
                 helpVisible;
             bool shouldPauseSimulation =
                 !inputMatchTerminal &&
@@ -503,12 +686,59 @@ internal sealed class ClientApplication
                     shouldPauseSimulation;
             }
 
+            if (pauseMenuCommand ==
+                PauseMenuCommand.ReturnToMenu)
+            {
+                return RestartRequestedExitCode;
+            }
+
+            if (pauseMenuCommand is
+                    PauseMenuCommand.SaveGame or
+                    PauseMenuCommand.SaveAndReturnToMenu)
+            {
+                if (!simulationHost.WaitForPauseState(
+                        paused: true,
+                        timeout:
+                            PauseTransitionTimeout))
+                {
+                    pauseMenuFeedback =
+                        "SAVE FAILED - PAUSE TIMEOUT";
+                }
+                else if (TrySaveCurrentMatch(
+                             scenario,
+                             saveDirectory,
+                             out pauseMenuFeedback) &&
+                         pauseMenuCommand ==
+                             PauseMenuCommand.SaveAndReturnToMenu)
+                {
+                    return RestartRequestedExitCode;
+                }
+            }
+
             if (shouldPauseForWindow ||
                 shellBlocksGameplay)
             {
                 actionPanel.Close();
                 tacticalTargetingController.Cancel();
                 debugDraw.Clear();
+
+                FrontendSurfaceView? frontendSurface =
+                    null;
+
+                if (pauseMenuActive)
+                {
+                    FrontendSurfaceView pauseSurface =
+                        FrontendPresentationAdapter.PauseMenu(
+                            pauseMenu);
+                    frontendSurface =
+                        pauseSurface.WithInteraction(
+                            pauseMenuFeedback,
+                            1f,
+                            false,
+                            false,
+                            false,
+                            false);
+                }
 
                 _ = renderHost.Publish(
                     new ClientRenderFrame(
@@ -530,7 +760,7 @@ internal sealed class ClientApplication
                         default,
                         _settings.UiScale,
                         preAlphaUx,
-                        null));
+                        frontendSurface));
 
                 if (shouldPauseForWindow)
                 {
@@ -1629,6 +1859,68 @@ internal sealed class ClientApplication
         }
     }
 
+    private static string ResolveSaveDirectory() =>
+        Path.Combine(
+            Environment.GetFolderPath(
+                Environment.SpecialFolder.LocalApplicationData),
+            "FORGELINE",
+            "Saves");
+
+    private static bool TrySaveCurrentMatch(
+        VerticalSliceScenario scenario,
+        string saveDirectory,
+        out string feedback)
+    {
+        ArgumentNullException.ThrowIfNull(
+            scenario);
+        ArgumentException.ThrowIfNullOrWhiteSpace(
+            saveDirectory);
+
+        try
+        {
+            Directory.CreateDirectory(
+                saveDirectory);
+
+            MatchSaveData save =
+                MatchPersistenceService.CaptureSave(
+                    scenario);
+            string timestamp =
+                DateTimeOffset.UtcNow.ToString(
+                    "yyyyMMdd-HHmmss-fff",
+                    System.Globalization.CultureInfo.InvariantCulture);
+            string tick =
+                save.SavedTick.ToString(
+                    "D8",
+                    System.Globalization.CultureInfo.InvariantCulture);
+            string path =
+                Path.Combine(
+                    saveDirectory,
+                    $"manual-{timestamp}-tick-{tick}.save.json");
+
+            MatchPersistenceSerializer.WriteSave(
+                path,
+                save);
+
+            feedback =
+                "GAME SAVED";
+            Console.WriteLine(
+                $"[save:written] tick={save.SavedTick} path=\"{path}\"");
+            return true;
+        }
+        catch (Exception exception)
+            when (exception is
+                      MatchPersistenceException or
+                      IOException or
+                      UnauthorizedAccessException)
+        {
+            feedback =
+                "SAVE FAILED";
+            Console.Error.WriteLine(
+                $"[save:error] type={exception.GetType().Name} message={exception.Message}");
+            return false;
+        }
+    }
+
     private static RuntimeAssetCatalog? TryLoadRuntimeAssets()
     {
         string runtimeRoot =
@@ -1746,11 +2038,7 @@ internal sealed class ClientApplication
             GameFrontendAction.LoadingCompleted);
 
         string saveDirectory =
-            Path.Combine(
-                Environment.GetFolderPath(
-                    Environment.SpecialFolder.LocalApplicationData),
-                "FORGELINE",
-                "Saves");
+            ResolveSaveDirectory();
         var loadGame =
             new LoadGameModel(
                 ClientSaveCatalog.Discover(

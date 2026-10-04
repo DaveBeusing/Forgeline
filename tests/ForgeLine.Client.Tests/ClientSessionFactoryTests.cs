@@ -54,4 +54,76 @@ public sealed class ClientSessionFactoryTests
             731UL,
             scenario.RuntimeSettings.Seed);
     }
+
+    [Fact]
+    public void RestoredPausedSaveResumesBeforeGameplayStarts()
+    {
+        string directory =
+            Path.Combine(
+                Path.GetTempPath(),
+                "ForgeLine.Client.Tests",
+                Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(
+            directory);
+
+        try
+        {
+            string path =
+                Path.Combine(
+                    directory,
+                    "paused.save.json");
+
+            using (VerticalSliceScenario source =
+                   VerticalSliceScenario.Create(
+                       seed: 731))
+            {
+                var pause =
+                    new SetMatchPausedCommand(
+                        source.BattlefieldRuntime.MatchStateEntity,
+                        paused: true);
+                source.Simulation.ExecuteControlCommand(
+                    pause);
+
+                Assert.True(
+                    pause.Accepted);
+                Assert.Equal(
+                    MatchLifecyclePhase.Paused,
+                    source.GetMatchState().Lifecycle);
+
+                MatchPersistenceSerializer.WriteSave(
+                    path,
+                    MatchPersistenceService.CaptureSave(
+                        source));
+            }
+
+            var entry =
+                new LoadGameEntry(
+                    "paused",
+                    "PAUSED",
+                    path,
+                    0,
+                    LoadGameEntryState.Available);
+            using var scheduler =
+                new JobScheduler();
+            using VerticalSliceScenario restored =
+                ClientSessionFactory.Create(
+                    ClientSessionRequest.Load(
+                        entry),
+                    scheduler);
+
+            Assert.Equal(
+                MatchLifecyclePhase.Running,
+                restored.GetMatchState().Lifecycle);
+        }
+        finally
+        {
+            if (Directory.Exists(
+                    directory))
+            {
+                Directory.Delete(
+                    directory,
+                    recursive: true);
+            }
+        }
+    }
 }

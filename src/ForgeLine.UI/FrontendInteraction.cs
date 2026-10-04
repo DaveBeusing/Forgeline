@@ -189,10 +189,10 @@ public static class FrontendHitTesting
         foreach (MainMenuItem item in items)
         {
             if (item.IsEnabled &&
-                x >= 82f &&
-                x <= 642f &&
-                pointerLocalY >= y &&
-                pointerLocalY <= y + 52f)
+                IsMenuRowHit(
+                    x,
+                    pointerLocalY,
+                    y))
             {
                 return item.Id;
             }
@@ -202,4 +202,44 @@ public static class FrontendHitTesting
 
         return null;
     }
+
+    public static string? PauseMenu(
+        float pointerX,
+        float pointerY,
+        FrontendLayout layout,
+        IReadOnlyList<PauseMenuItem> items)
+    {
+        ArgumentNullException.ThrowIfNull(items);
+        (float x, float pointerLocalY) =
+            Local(
+                pointerX,
+                pointerY,
+                layout);
+        float y = 338f;
+
+        foreach (PauseMenuItem item in items)
+        {
+            if (item.IsEnabled &&
+                IsMenuRowHit(
+                    x,
+                    pointerLocalY,
+                    y))
+            {
+                return item.Id;
+            }
+
+            y += 72f;
+        }
+
+        return null;
+    }
+
+    private static bool IsMenuRowHit(
+        float x,
+        float y,
+        float rowY) =>
+        x >= 82f &&
+        x <= 642f &&
+        y >= rowY &&
+        y <= rowY + 52f;
 }

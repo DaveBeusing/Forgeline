@@ -47,6 +47,37 @@ public sealed class FrontendOverlayRendererTests : IDisposable
         }
     }
 
+    [Fact]
+    public void BitmapFontRendersPercentageSymbol()
+    {
+        using var renderer =
+            new FrontendOverlayRenderer(_graphics);
+        var context =
+            new FakeGraphicsCommandContext();
+
+        renderer.Render(
+            context,
+            FrontendSurfaceView.Detail(
+                " ",
+                [],
+                string.Empty,
+                secondaryAction: string.Empty));
+        int blankVertexCount =
+            renderer.LastRenderedVertexCount;
+
+        renderer.Render(
+            context,
+            FrontendSurfaceView.Detail(
+                "%",
+                [],
+                string.Empty,
+                secondaryAction: string.Empty));
+
+        Assert.True(
+            renderer.LastRenderedVertexCount >
+            blankVertexCount);
+    }
+
     private sealed class FakeGraphicsDevice : IGraphicsDevice
     {
         public GraphicsDiagnostics Diagnostics =>

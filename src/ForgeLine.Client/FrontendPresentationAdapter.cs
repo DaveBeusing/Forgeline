@@ -34,6 +34,28 @@ internal static class FrontendPresentationAdapter
         return FrontendSurfaceView.MainMenu(entries);
     }
 
+    internal static FrontendSurfaceView PauseMenu(
+        PauseMenuModel menu)
+    {
+        ArgumentNullException.ThrowIfNull(menu);
+
+        FrontendMenuEntryView[] entries =
+            menu.Items
+                .Select(
+                    item =>
+                        new FrontendMenuEntryView(
+                            item.Id,
+                            item.Label,
+                            item.IsEnabled,
+                            string.Equals(
+                                item.Id,
+                                menu.FocusedId,
+                                StringComparison.Ordinal)))
+                .ToArray();
+
+        return FrontendSurfaceView.PauseMenu(entries);
+    }
+
     internal static FrontendSurfaceView NewGame(
         NewGameModel model) =>
         FrontendSurfaceView.Detail(

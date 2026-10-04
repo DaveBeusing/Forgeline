@@ -4,7 +4,8 @@ public enum FrontendSurfaceKind : byte
 {
     Loading = 1,
     MainMenu = 2,
-    Detail = 3
+    Detail = 3,
+    PauseMenu = 4
 }
 
 public readonly record struct FrontendMenuEntryView(
@@ -66,6 +67,18 @@ public readonly record struct FrontendSurfaceView(
             entries,
             [],
             "ENTER  SELECT     UP/DOWN  NAVIGATE");
+
+    public static FrontendSurfaceView PauseMenu(
+        IReadOnlyList<FrontendMenuEntryView> entries) =>
+        new(
+            FrontendSurfaceKind.PauseMenu,
+            "PAUSED",
+            string.Empty,
+            false,
+            0f,
+            entries,
+            [],
+            "ENTER  SELECT     UP/DOWN  NAVIGATE     ESC  RESUME");
 
     public FrontendSurfaceView WithInteraction(
         string feedback,

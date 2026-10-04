@@ -14,6 +14,7 @@ internal sealed class ClientFrontendRenderHost : IDisposable
     private FrontendSurfaceView? _latest;
     private ExceptionDispatchInfo? _failure;
     private int _stopping;
+    private bool _disposed;
 
     internal ClientFrontendRenderHost(
         in GraphicsWindowTarget target)
@@ -47,6 +48,11 @@ internal sealed class ClientFrontendRenderHost : IDisposable
 
     public void Dispose()
     {
+        if (_disposed)
+        {
+            return;
+        }
+
         Interlocked.Exchange(ref _stopping, 1);
         _signal.Set();
         if (Thread.CurrentThread != _thread)
@@ -56,6 +62,7 @@ internal sealed class ClientFrontendRenderHost : IDisposable
 
         _signal.Dispose();
         _started.Dispose();
+        _disposed = true;
     }
 
     private void RenderLoop()
