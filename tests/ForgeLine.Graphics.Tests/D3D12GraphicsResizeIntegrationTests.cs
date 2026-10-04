@@ -33,6 +33,14 @@ public sealed class D3D12GraphicsResizeIntegrationTests
         graphics.RenderFrame(
             GraphicsColor.ForgeLineClear);
 
+        GraphicsSurfaceInfo initial =
+            graphics.Diagnostics.Surface;
+
+        Assert.True(
+            initial.SubmittedFrameCount > 0);
+        Assert.True(
+            initial.PresentedFrameCount > 0);
+
         window.SetMode(
             WindowMode.BorderlessFullscreen);
         graphics.Resize(
@@ -74,6 +82,14 @@ public sealed class D3D12GraphicsResizeIntegrationTests
         Assert.Equal(
             borderless.Height,
             renderedHeight);
+        Assert.True(
+            borderless.SubmittedFrameCount >
+            initial.SubmittedFrameCount);
+        Assert.True(
+            borderless.PresentedFrameCount >
+            initial.PresentedFrameCount);
+        Assert.False(
+            borderless.IsOccluded);
 
         graphics.Resize(
             0,
@@ -88,6 +104,12 @@ public sealed class D3D12GraphicsResizeIntegrationTests
             suspended.IsSuspended);
         Assert.False(
             suspended.ResizePending);
+        Assert.Equal(
+            borderless.SubmittedFrameCount,
+            suspended.SubmittedFrameCount);
+        Assert.Equal(
+            borderless.PresentedFrameCount,
+            suspended.PresentedFrameCount);
 
         graphics.Resize(
             window.ClientSize.Width,
@@ -118,6 +140,14 @@ public sealed class D3D12GraphicsResizeIntegrationTests
             restored.FrameIndex,
             0,
             restored.BufferCount - 1);
+        Assert.True(
+            restored.SubmittedFrameCount >
+            suspended.SubmittedFrameCount);
+        Assert.True(
+            restored.PresentedFrameCount >
+            suspended.PresentedFrameCount);
+        Assert.False(
+            restored.IsOccluded);
 
         window.SetMode(
             WindowMode.Windowed);
@@ -140,5 +170,63 @@ public sealed class D3D12GraphicsResizeIntegrationTests
         Assert.Equal(
             window.ClientSize.Height,
             windowed.Height);
+        Assert.True(
+            windowed.SubmittedFrameCount >
+            restored.SubmittedFrameCount);
+        Assert.True(
+            windowed.PresentedFrameCount >
+            restored.PresentedFrameCount);
+
+        ulong previousPresentedFrames =
+            windowed.PresentedFrameCount;
+
+        for (int transition = 0;
+             transition < 4;
+             transition++)
+        {
+            WindowMode requestedMode =
+                transition % 2 == 0
+                    ? WindowMode.BorderlessFullscreen
+                    : WindowMode.Windowed;
+
+            window.SetMode(
+                requestedMode);
+            graphics.Resize(
+                window.ClientSize.Width,
+                window.ClientSize.Height);
+            graphics.RenderFrame(
+                GraphicsColor.ForgeLineClear);
+
+            GraphicsSurfaceInfo current =
+                graphics.Diagnostics.Surface;
+
+            Assert.Equal(
+                requestedMode,
+                window.Mode);
+            Assert.False(
+                window.ClientSize.IsEmpty);
+            Assert.False(
+                current.IsSuspended);
+            Assert.False(
+                current.ResizePending);
+            Assert.False(
+                current.IsOccluded);
+            Assert.Equal(
+                window.ClientSize.Width,
+                current.Width);
+            Assert.Equal(
+                window.ClientSize.Height,
+                current.Height);
+            Assert.InRange(
+                current.FrameIndex,
+                0,
+                current.BufferCount - 1);
+            Assert.True(
+                current.PresentedFrameCount >
+                previousPresentedFrames);
+
+            previousPresentedFrames =
+                current.PresentedFrameCount;
+        }
     }
 }

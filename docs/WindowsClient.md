@@ -94,6 +94,38 @@ Persisted Borderless startup and runtime mode changes use the same platform tran
 
 Exclusive fullscreen is not implemented.
 
+## Window Mode Qualification
+
+The Windows qualification path reuses the normal client smoke infrastructure rather than maintaining a separate test host. Run:
+
+```powershell
+./build/Invoke-WindowModeQualification.ps1 -Configuration Release -RenderStressInstances 1000
+```
+
+The script uses an isolated settings root. It first launches from missing settings and verifies validated Windowed defaults. It then edits the settings file created by the real client, persists `borderlessFullscreen = true`, launches the client again, and verifies startup directly into `BorderlessFullscreen`.
+
+Each smoke report records the requested persisted mode, the last valid visible window mode/client size before orderly smoke shutdown, and the render owner's final graphics surface snapshot. Qualification requires a non-zero visible client size, matching graphics dimensions, no suspended/occluded/pending-resize state, a valid back-buffer index, completed resize generations, at least one submitted frame, and at least one successful Present.
+
+Automated Windows coverage includes:
+
+- default Windowed startup from missing settings;
+- persisted Borderless startup through the normal settings loader;
+- Windowed -> Borderless -> Windowed and repeated mode switching through native Win32/D3D12 integration tests;
+- transient zero-size/suspension -> valid-size recovery;
+- missing or invalid persisted display dimensions;
+- off-screen/restored Windowed placement;
+- graphics pending-resize and occlusion state-machine recovery;
+- continued command submission and successful Present activity after recovery.
+
+Manual desktop qualification remains required for behavior that depends on real user focus/display interaction:
+
+- Alt+Tab while Borderless;
+- actual OS minimize -> restore while Borderless;
+- repeated user-driven mode switching through the Settings UI;
+- moving/restoring across changed multi-monitor topology and mixed DPI where available.
+
+For manual cases, confirm that the visible client size becomes valid again, the renderer does not remain suspended/occluded/resize-pending, frame submission and Present resume, and no permanent blank/white surface remains.
+
 ## Native Graphics Target
 
 The Direct3D 12 layer obtains the native top-level window target through:

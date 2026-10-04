@@ -28,6 +28,54 @@ public sealed class ClientUserSettingsTests
     }
 
     [Fact]
+    public void PersistedBorderlessSettingsCreateBorderlessStartupConfiguration()
+    {
+        string root =
+            CreateTemporaryRoot();
+
+        try
+        {
+            var store =
+                new ClientSettingsStore(
+                    root);
+            store.Save(
+                new ClientUserSettings
+                {
+                    WindowWidth = 1_920,
+                    WindowHeight = 1_080,
+                    BorderlessFullscreen = true
+                });
+
+            ClientSettingsLoadResult loaded =
+                store.Load();
+            WindowConfiguration window =
+                loaded.Settings.CreateWindowConfiguration();
+
+            Assert.False(
+                loaded.CreatedDefaults);
+            Assert.False(
+                loaded.RecoveredInvalidSettings);
+            Assert.True(
+                loaded.Settings.BorderlessFullscreen);
+            Assert.Equal(
+                1_920,
+                window.Width);
+            Assert.Equal(
+                1_080,
+                window.Height);
+            Assert.Equal(
+                WindowMode.BorderlessFullscreen,
+                window.Mode);
+        }
+        finally
+        {
+            Directory.Delete(
+                root,
+                recursive: true);
+        }
+    }
+
+    [Fact]
     public void InvalidUiScaleIsRejected()
     {
         var settings =
@@ -120,6 +168,103 @@ public sealed class ClientUserSettingsTests
             Assert.Equal(
                 PlatformKey.Up,
                 loaded.Settings.CameraBindings.PanForward);
+        }
+        finally
+        {
+            Directory.Delete(
+                root,
+                recursive: true);
+        }
+    }
+
+    [Fact]
+    public void MissingPersistedDisplayValuesUseValidatedDefaults()
+    {
+        string root =
+            CreateTemporaryRoot();
+
+        try
+        {
+            var store =
+                new ClientSettingsStore(
+                    root);
+            Directory.CreateDirectory(
+                Path.GetDirectoryName(
+                    store.SettingsPath)!);
+            File.WriteAllText(
+                store.SettingsPath,
+                """
+                {
+                  "schemaVersion": 1
+                }
+                """);
+
+            ClientSettingsLoadResult loaded =
+                store.Load();
+            WindowConfiguration window =
+                loaded.Settings.CreateWindowConfiguration();
+
+            Assert.False(
+                loaded.RecoveredInvalidSettings);
+            Assert.Equal(
+                1_600,
+                window.Width);
+            Assert.Equal(
+                900,
+                window.Height);
+            Assert.Equal(
+                WindowMode.Windowed,
+                window.Mode);
+        }
+        finally
+        {
+            Directory.Delete(
+                root,
+                recursive: true);
+        }
+    }
+
+    [Fact]
+    public void InvalidPersistedDisplayDimensionsRecoverToSafeDefaults()
+    {
+        string root =
+            CreateTemporaryRoot();
+
+        try
+        {
+            var store =
+                new ClientSettingsStore(
+                    root);
+            Directory.CreateDirectory(
+                Path.GetDirectoryName(
+                    store.SettingsPath)!);
+            File.WriteAllText(
+                store.SettingsPath,
+                """
+                {
+                  "schemaVersion": 1,
+                  "windowWidth": 640,
+                  "windowHeight": 480,
+                  "borderlessFullscreen": true
+                }
+                """);
+
+            ClientSettingsLoadResult loaded =
+                store.Load();
+            WindowConfiguration window =
+                loaded.Settings.CreateWindowConfiguration();
+
+            Assert.True(
+                loaded.RecoveredInvalidSettings);
+            Assert.Equal(
+                1_600,
+                window.Width);
+            Assert.Equal(
+                900,
+                window.Height);
+            Assert.Equal(
+                WindowMode.Windowed,
+                window.Mode);
         }
         finally
         {

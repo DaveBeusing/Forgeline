@@ -49,9 +49,10 @@ jobs:
       - name: Compile and qualify runtime assets
         run: dotnet run --project tools/ForgeLine.AssetCompiler/ForgeLine.AssetCompiler.csproj --configuration Release --no-build -- --source assets/source --runtime assets/runtime --clean --qualification-output artifacts/asset-qualification.json
 
-      - name: Windows vertical slice visual qualification smoke
+      - name: Windows window mode and visual qualification smoke
         if: runner.os == 'Windows'
-        run: dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release --no-build -- --smoke-test --render-stress 1000 --visual-qualification-output artifacts/visual-qualification.json
+        shell: pwsh
+        run: ./build/Invoke-WindowModeQualification.ps1 -Configuration Release -RenderStressInstances 1000
 
       - name: Headless diagnostics smoke test
         run: dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 64 --seed 12345 --tick-rate 20 --entities 1000 --diagnostics-output artifacts/headless-smoke.json
