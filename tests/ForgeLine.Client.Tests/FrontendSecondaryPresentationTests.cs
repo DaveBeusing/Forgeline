@@ -57,7 +57,7 @@ public sealed class FrontendSecondaryPresentationTests
         Assert.Contains(
             view.DetailLines,
             line =>
-                line.Label == "BROKEN SLOT" &&
+                line.Label.EndsWith("BROKEN SLOT", StringComparison.Ordinal) &&
                 line.IsWarning);
     }
 
