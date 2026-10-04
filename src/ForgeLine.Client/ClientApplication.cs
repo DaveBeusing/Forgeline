@@ -1799,9 +1799,9 @@ internal sealed class ClientApplication
                         ref leftHeld))
                 {
                     newGame.SetSeed(
-                        Math.Max(
-                            0,
-                            newGame.Configuration.Seed - 1));
+                        newGame.Configuration.Seed == 0
+                            ? 0
+                            : newGame.Configuration.Seed - 1);
                 }
 
                 if (ConsumeKeyPress(
@@ -1810,8 +1810,9 @@ internal sealed class ClientApplication
                         ref rightHeld))
                 {
                     newGame.SetSeed(
-                        checked(
-                            newGame.Configuration.Seed + 1));
+                        newGame.Configuration.Seed == ulong.MaxValue
+                            ? ulong.MaxValue
+                            : newGame.Configuration.Seed + 1);
                 }
 
                 if (enter)
