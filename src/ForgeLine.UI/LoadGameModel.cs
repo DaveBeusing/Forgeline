@@ -44,6 +44,8 @@ public sealed class LoadGameModel
     public bool CanContinue =>
         ContinueTarget.HasValue;
 
+    public int FocusedIndex => _focusedIndex;
+
     public LoadGameEntry? FocusedEntry =>
         _entries.Length == 0
             ? null
