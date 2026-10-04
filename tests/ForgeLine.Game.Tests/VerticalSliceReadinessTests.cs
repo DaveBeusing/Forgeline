@@ -48,11 +48,17 @@ public sealed class VerticalSliceReadinessTests
             2,
             settings.EastOpponent.MinimumSupplyTrucks);
         Assert.Equal(
-            2,
+            1,
             settings.WestOpponent.MinimumObjectivePressureUnits);
         Assert.Equal(
             2,
             settings.EastOpponent.MinimumObjectivePressureUnits);
+        Assert.True(
+            settings.WestOpponent.OffensiveFuelThreshold <
+            0.55);
+        Assert.True(
+            settings.EastOpponent.OffensiveFuelThreshold <
+            0.55);
     }
 
     [Fact]
