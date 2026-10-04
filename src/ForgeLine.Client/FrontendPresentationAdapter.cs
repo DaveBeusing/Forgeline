@@ -29,7 +29,6 @@ internal static class FrontendPresentationAdapter
                                 item.Id,
                                 menu.FocusedId,
                                 StringComparison.Ordinal)))
-                .Take(FrontendDesign.MaximumVisibleDetailRows)
                 .ToArray();
 
         return FrontendSurfaceView.MainMenu(entries);
@@ -74,15 +73,15 @@ internal static class FrontendPresentationAdapter
                 "ESC  BACK");
         }
 
+        LoadGameEntry[] visibleEntries =
+            ResolveVisibleSaves(model);
+
         FrontendDetailLineView[] lines =
-            model.Entries
+            visibleEntries
                 .Select(
                     entry =>
                         new FrontendDetailLineView(
-                            model.FocusedEntry is LoadGameEntry focused &&
-                            string.Equals(entry.Id, focused.Id, StringComparison.Ordinal)
-                                ? FrontendDesign.FitText(entry.DisplayName)
-                                : FrontendDesign.FitText(entry.DisplayName),
+                            FrontendDesign.FitText(entry.DisplayName),
                             entry.CanLoad
                                 ? $"TICK {entry.SavedTick}"
                                 : entry.State.ToString().ToUpperInvariant(),
@@ -97,6 +96,37 @@ internal static class FrontendPresentationAdapter
             lines,
             "UP/DOWN  SELECT SAVE     ENTER  LOAD     ESC  BACK",
             model.TryGetFocusedLoadTarget(out _) ? "LOAD" : string.Empty);
+    }
+
+    private static LoadGameEntry[] ResolveVisibleSaves(
+        LoadGameModel model)
+    {
+        LoadGameEntry[] entries =
+            model.Entries.ToArray();
+        if (entries.Length <= FrontendDesign.MaximumVisibleDetailRows)
+        {
+            return entries;
+        }
+
+        int focusedIndex =
+            Array.FindIndex(
+                entries,
+                entry =>
+                    model.FocusedEntry is LoadGameEntry focused &&
+                    string.Equals(
+                        entry.Id,
+                        focused.Id,
+                        StringComparison.Ordinal));
+        int start =
+            Math.Clamp(
+                focusedIndex - FrontendDesign.MaximumVisibleDetailRows / 2,
+                0,
+                entries.Length - FrontendDesign.MaximumVisibleDetailRows);
+
+        return entries
+            .Skip(start)
+            .Take(FrontendDesign.MaximumVisibleDetailRows)
+            .ToArray();
     }
 
     internal static FrontendSurfaceView Settings(
