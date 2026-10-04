@@ -620,6 +620,7 @@ internal sealed class WindowsWindow : IWindow
         }
 
         TryRefreshClientSize();
+        RefreshCurrentMonitor();
         EnqueueEvent(WindowEventKind.DpiChanged);
     }
 
