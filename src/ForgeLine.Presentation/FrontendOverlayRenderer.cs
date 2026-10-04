@@ -76,11 +76,55 @@ public sealed class FrontendOverlayRenderer : IDisposable
             EmitText(view.Status, 94 * scale, 890 * scale, new Vector4(0.82f, 0.62f, 0.20f, 1), context.Width, context.Height, scale);
             if (view.HasProgress)
             {
-                EmitProgress(94 * scale, 936 * scale, 720 * scale, 8 * scale, view.Progress, context.Width, context.Height);
+                int percent =
+                    Math.Clamp(
+                        (int)MathF.Round(
+                            view.Progress * 100f),
+                        0,
+                        100);
+                EmitText(
+                    $"{percent}%",
+                    828 * scale,
+                    926 * scale,
+                    new Vector4(0.82f, 0.84f, 0.78f, 1),
+                    context.Width,
+                    context.Height,
+                    scale);
+                EmitProgress(
+                    94 * scale,
+                    936 * scale,
+                    720 * scale,
+                    8 * scale,
+                    view.Progress,
+                    context.Width,
+                    context.Height);
             }
         }
-        else if (view.Kind == FrontendSurfaceKind.MainMenu)
+        else if (view.Kind is
+                     FrontendSurfaceKind.MainMenu or
+                     FrontendSurfaceKind.PauseMenu)
         {
+            if (view.Kind == FrontendSurfaceKind.PauseMenu)
+            {
+                EmitText(
+                    view.Title,
+                    94 * scale + contentOffset,
+                    286 * scale,
+                    new Vector4(0.95f, 0.72f, 0.22f, 1),
+                    context.Width,
+                    context.Height,
+                    scale);
+                EmitPanel(
+                    new SurfaceRect(
+                        92 * scale,
+                        330 * scale,
+                        980 * scale,
+                        2 * scale),
+                    new Vector4(0.28f, 0.32f, 0.29f, 1),
+                    context.Width,
+                    context.Height);
+            }
+
             float y = 350 * scale;
             foreach (FrontendMenuEntryView item in view.MenuEntries)
             {
@@ -269,7 +313,8 @@ public sealed class FrontendOverlayRenderer : IDisposable
         '3' => [30,1,1,14,1,1,30], '4' => [2,6,10,18,31,2,2], '5' => [31,16,16,30,1,1,30],
         '6' => [14,16,16,30,17,17,14], '7' => [31,1,2,4,8,8,8], '8' => [14,17,17,14,17,17,14],
         '9' => [14,17,17,15,1,1,14], '.' => [0,0,0,0,0,12,12], ':' => [0,12,12,0,12,12,0],
-        '/' => [1,2,4,8,16,0,0], '-' => [0,0,0,31,0,0,0], '+' => [0,4,4,31,4,4,0], _ => [0,0,0,0,0,0,0]
+        '/' => [1,2,4,8,16,0,0], '-' => [0,0,0,31,0,0,0], '+' => [0,4,4,31,4,4,0],
+        '%' => [17,2,4,8,16,0,17], _ => [0,0,0,0,0,0,0]
     };
 
     private static IGraphicsPipeline CreatePipeline(IGraphicsDevice graphics)
