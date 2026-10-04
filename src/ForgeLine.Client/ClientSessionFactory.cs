@@ -12,11 +12,11 @@ internal enum ClientSessionRequestKind : byte
 
 internal readonly record struct ClientSessionRequest(
     ClientSessionRequestKind Kind,
-    int Seed,
+    ulong Seed,
     LoadGameEntry? Save)
 {
     internal static ClientSessionRequest NewGame(
-        int seed) =>
+        ulong seed) =>
         new(
             ClientSessionRequestKind.NewGame,
             seed,
