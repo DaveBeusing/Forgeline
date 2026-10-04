@@ -48,9 +48,13 @@ internal static class FrontendPresentationAdapter
                 new FrontendDetailLineView(
                     "SEED",
                     model.Configuration.Seed.ToString(
-                        System.Globalization.CultureInfo.InvariantCulture))
+                        System.Globalization.CultureInfo.InvariantCulture),
+                    IsFocused: true,
+                    CanDecrease: model.Configuration.Seed > 0,
+                    CanIncrease: model.Configuration.Seed < ulong.MaxValue)
             ],
-            "LEFT/RIGHT  CHANGE SEED     ENTER  START MATCH     ESC  BACK");
+            "LEFT/RIGHT  CHANGE SEED     ENTER  START MATCH     ESC  BACK",
+            "START");
 
     internal static FrontendSurfaceView LoadGame(
         LoadGameModel model)
@@ -81,13 +85,17 @@ internal static class FrontendPresentationAdapter
                             entry.CanLoad
                                 ? $"TICK {entry.SavedTick}"
                                 : entry.State.ToString().ToUpperInvariant(),
-                            !entry.CanLoad))
+                            !entry.CanLoad,
+                            IsFocused:
+                                model.FocusedEntry is LoadGameEntry selected &&
+                                string.Equals(entry.Id, selected.Id, StringComparison.Ordinal)))
                 .ToArray();
 
         return FrontendSurfaceView.Detail(
             "LOAD GAME",
             lines,
-            "UP/DOWN  SELECT SAVE     ENTER  LOAD     ESC  BACK");
+            "UP/DOWN  SELECT SAVE     ENTER  LOAD     ESC  BACK",
+            model.TryGetFocusedLoadTarget(out _) ? "LOAD" : string.Empty);
     }
 
     internal static FrontendSurfaceView Settings(
@@ -107,26 +115,42 @@ internal static class FrontendPresentationAdapter
                     "DISPLAY",
                     $"{settings.WindowWidth} X {settings.WindowHeight}"),
                 new FrontendDetailLineView(
-                    focused == FrontendSettingsField.BorderlessFullscreen ? "> BORDERLESS" : "BORDERLESS",
-                    settings.BorderlessFullscreen ? "ON" : "OFF"),
+                    "BORDERLESS",
+                    settings.BorderlessFullscreen ? "ON" : "OFF",
+                    IsFocused: focused == FrontendSettingsField.BorderlessFullscreen,
+                    CanDecrease: true,
+                    CanIncrease: true),
                 new FrontendDetailLineView(
-                    focused == FrontendSettingsField.UiScale ? "> UI SCALE" : "UI SCALE",
+                    "UI SCALE",
                     settings.UiScale.ToString(
                         "0.00",
-                        System.Globalization.CultureInfo.InvariantCulture)),
+                        System.Globalization.CultureInfo.InvariantCulture),
+                    IsFocused: focused == FrontendSettingsField.UiScale,
+                    CanDecrease: settings.UiScale > FrontendDesign.MinimumScale,
+                    CanIncrease: settings.UiScale < FrontendDesign.MaximumScale),
                 new FrontendDetailLineView(
-                    focused == FrontendSettingsField.EdgeScroll ? "> EDGE SCROLL" : "EDGE SCROLL",
-                    settings.EdgeScrollEnabled ? "ON" : "OFF"),
+                    "EDGE SCROLL",
+                    settings.EdgeScrollEnabled ? "ON" : "OFF",
+                    IsFocused: focused == FrontendSettingsField.EdgeScroll,
+                    CanDecrease: true,
+                    CanIncrease: true),
                 new FrontendDetailLineView(
-                    focused == FrontendSettingsField.CameraSpeed ? "> CAMERA SPEED" : "CAMERA SPEED",
+                    "CAMERA SPEED",
                     settings.CameraPanSpeedMultiplier.ToString(
                         "0.00",
-                        System.Globalization.CultureInfo.InvariantCulture)),
+                        System.Globalization.CultureInfo.InvariantCulture),
+                    IsFocused: focused == FrontendSettingsField.CameraSpeed,
+                    CanDecrease: settings.CameraPanSpeedMultiplier > 0.25f,
+                    CanIncrease: settings.CameraPanSpeedMultiplier < 3.0f),
                 new FrontendDetailLineView(
-                    focused == FrontendSettingsField.Onboarding ? "> ONBOARDING" : "ONBOARDING",
-                    settings.ShowOnboarding ? "ON" : "OFF")
+                    "ONBOARDING",
+                    settings.ShowOnboarding ? "ON" : "OFF",
+                    IsFocused: focused == FrontendSettingsField.Onboarding,
+                    CanDecrease: true,
+                    CanIncrease: true)
             ],
-            "UP/DOWN  SELECT     LEFT/RIGHT  CHANGE     ENTER  APPLY     ESC  BACK");
+            "UP/DOWN  SELECT     LEFT/RIGHT  CHANGE     ENTER  APPLY     ESC  BACK",
+            "APPLY");
     }
 
     internal static FrontendSurfaceView Credits()
