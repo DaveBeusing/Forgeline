@@ -39,6 +39,7 @@ internal sealed class ClientApplication
     private static readonly TimeSpan IdleWait = TimeSpan.FromMilliseconds(16);
     private static readonly TimeSpan SmokeTestDuration = TimeSpan.FromMilliseconds(350);
     private static readonly TimeSpan DiagnosticInterval = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan PauseTransitionTimeout = TimeSpan.FromSeconds(2);
     private static readonly JsonSerializerOptions VisualQualificationJsonOptions =
         new()
         {
@@ -158,17 +159,46 @@ internal sealed class ClientApplication
             sessionRequest = selected;
         }
 
+        var sessionTransitionTarget =
+            new GraphicsWindowTarget(
+                window.NativeHandle.Value,
+                window.ClientSize.Width,
+                window.ClientSize.Height,
+                window.IsMinimized ||
+                window.ClientSize.IsEmpty);
+        using var sessionTransitionRenderer =
+            new ClientFrontendRenderHost(
+                sessionTransitionTarget);
+
         frontendLoading.BeginPhase(
             FrontendLoadingPhase.PreparingFrontend,
             sessionRequest.Kind ==
                 ClientSessionRequestKind.LoadGame
-                ? "Restoring saved battlefield"
-                : "Preparing battlefield");
+                ? "RESTORING SAVED BATTLEFIELD"
+                : "CREATING BATTLEFIELD SIMULATION",
+            totalSteps: 4);
+        sessionTransitionRenderer.Publish(
+            FrontendPresentationAdapter.Loading(
+                frontendLoading.State));
+        PumpBootFrame(
+            window,
+            sessionTransitionRenderer);
 
         using VerticalSliceScenario scenario =
             ClientSessionFactory.Create(
                 sessionRequest,
                 jobScheduler);
+
+        frontendLoading.ReportProgress(
+            1,
+            "PREPARING PRESENTATION STATE");
+        sessionTransitionRenderer.Publish(
+            FrontendPresentationAdapter.Loading(
+                frontendLoading.State));
+        PumpBootFrame(
+            window,
+            sessionTransitionRenderer);
+
         var snapshotBuffer =
             new PresentationSnapshotBuffer();
 
@@ -222,6 +252,16 @@ internal sealed class ClientApplication
                 presentationExtraction,
                 runtimeAssets));
 
+        frontendLoading.ReportProgress(
+            2,
+            "INITIALIZING PLAYER CONTROLS");
+        sessionTransitionRenderer.Publish(
+            FrontendPresentationAdapter.Loading(
+                frontendLoading.State));
+        PumpBootFrame(
+            window,
+            sessionTransitionRenderer);
+
         var renderWorld = new RenderWorld();
 
         BattlefieldStartPosition localStart =
@@ -260,6 +300,16 @@ internal sealed class ClientApplication
             new RtsInformationLayerController();
         var debugDraw = new DebugDraw();
 
+        frontendLoading.ReportProgress(
+            3,
+            "STARTING SIMULATION");
+        sessionTransitionRenderer.Publish(
+            FrontendPresentationAdapter.Loading(
+                frontendLoading.State));
+        PumpBootFrame(
+            window,
+            sessionTransitionRenderer);
+
         using var simulationHost =
             new ClientSimulationHost(
                 scenario,
@@ -267,6 +317,17 @@ internal sealed class ClientApplication
                 snapshotBuffer);
         _ = renderWorld.Update(
             snapshotBuffer);
+
+        frontendLoading.ReportProgress(
+            4,
+            "ENTERING BATTLEFIELD");
+        sessionTransitionRenderer.Publish(
+            FrontendPresentationAdapter.Loading(
+                frontendLoading.State));
+        PumpBootFrame(
+            window,
+            sessionTransitionRenderer);
+        sessionTransitionRenderer.Dispose();
 
         var graphicsTarget =
             new GraphicsWindowTarget(
