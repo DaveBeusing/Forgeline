@@ -84,15 +84,10 @@ internal sealed class ClientApplication
                 window.IsMinimized ||
                 window.ClientSize.IsEmpty);
 
-        var snapshotBuffer =
-            new PresentationSnapshotBuffer();
         var newGame =
             new NewGameModel();
         using var jobScheduler =
             new JobScheduler();
-
-        VerticalSliceRuntimeSettings runtimeSettings;
-        VerticalSliceScenario scenario;
         RuntimeAssetCatalog? runtimeAssets;
 
         using (var bootRenderer =
@@ -106,11 +101,6 @@ internal sealed class ClientApplication
                     frontendLoading.State));
             PumpBootFrame(window, bootRenderer);
 
-            runtimeSettings =
-                VerticalSliceRuntimeSettings.CreateClient(
-                    jobScheduler,
-                    seed: newGame.Configuration.Seed);
-
             frontendLoading.BeginPhase(
                 FrontendLoadingPhase.LoadingAssets,
                 "Loading runtime assets");
@@ -121,17 +111,6 @@ internal sealed class ClientApplication
             runtimeAssets =
                 TryLoadRuntimeAssets();
 
-            frontendLoading.BeginPhase(
-                FrontendLoadingPhase.PreparingFrontend,
-                "Preparing battlefield");
-            bootRenderer.Publish(
-                FrontendPresentationAdapter.Loading(
-                    frontendLoading.State));
-            PumpBootFrame(window, bootRenderer);
-            scenario =
-                VerticalSliceScenario.Create(
-                    runtimeSettings);
-
             frontendLoading.Complete(
                 "Command interface ready");
             bootRenderer.Publish(
@@ -140,8 +119,30 @@ internal sealed class ClientApplication
             PumpBootFrame(window, bootRenderer);
         }
 
-        using (scenario)
-        {
+        ClientSessionRequest sessionRequest =
+            smokeTest
+                ? ClientSessionRequest.NewGame(
+                    newGame.Configuration.Seed)
+                : RunFrontendSessionSelection(
+                    window,
+                    frontendShell,
+                    newGame,
+                    runtimeAssets);
+
+        frontendLoading.BeginPhase(
+            FrontendLoadingPhase.PreparingFrontend,
+            sessionRequest.Kind ==
+                ClientSessionRequestKind.LoadGame
+                ? "Restoring saved battlefield"
+                : "Preparing battlefield");
+
+        using VerticalSliceScenario scenario =
+            ClientSessionFactory.Create(
+                sessionRequest,
+                jobScheduler);
+        var snapshotBuffer =
+            new PresentationSnapshotBuffer();
+
         SimulationCoordinator simulation =
             scenario.Simulation;
         PrototypeBattlefieldDefinition prototypeBattlefield =
@@ -271,26 +272,7 @@ internal sealed class ClientApplication
         bool frontendRightHeld = false;
         bool pauseHeld = false;
         bool helpHeld = false;
-        bool matchSetupActive = !smokeTest;
-        frontendShell.Dispatch(GameFrontendAction.LoadingCompleted);
-        var newGameScreen = new NewGameModel();
-        var loadGameScreen = new LoadGameModel([]);
-        var settingsInteraction =
-            new SettingsInteractionModel();
-        var settingsScreen =
-            new SettingsModel(
-                new FrontendSettingsSnapshot(
-                    _settings.WindowWidth,
-                    _settings.WindowHeight,
-                    _settings.BorderlessFullscreen,
-                    _settings.UiScale,
-                    _settings.ShowOnboarding,
-                    _settings.EdgeScrollEnabled,
-                    _settings.CameraPanSpeedMultiplier,
-                    _settings.CameraBindings));
-        var mainMenu =
-            new MainMenuModel(
-                loadGameScreen.CanContinue);
+        bool matchSetupActive = false;
         bool userPaused = false;
         bool helpVisible = false;
         FormationTemplate activeFormation =
@@ -993,8 +975,6 @@ internal sealed class ClientApplication
                 visualQualificationOutput,
                 renderInstanceCount,
                 renderHost.LatestQualification);
-        }
-
         }
 
         return 0;
