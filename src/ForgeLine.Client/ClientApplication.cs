@@ -84,6 +84,17 @@ internal sealed class ClientApplication
                 window.IsMinimized ||
                 window.ClientSize.IsEmpty);
 
+        var snapshotBuffer =
+            new PresentationSnapshotBuffer();
+        var newGame =
+            new NewGameModel();
+        using var jobScheduler =
+            new JobScheduler();
+
+        VerticalSliceRuntimeSettings runtimeSettings;
+        VerticalSliceScenario scenario;
+        RuntimeAssetCatalog? runtimeAssets;
+
         using (var bootRenderer =
             new ClientFrontendRenderHost(bootstrapTarget))
         {
@@ -93,43 +104,40 @@ internal sealed class ClientApplication
                 totalSteps: 3);
             frontendLoading.ReportProgress(
                 1,
-                "Preparing runtime");
+                "Settings validated");
             bootRenderer.Publish(
                 FrontendPresentationAdapter.Loading(
                     frontendLoading.State));
             PumpBootFrame(window, bootRenderer);
 
+            runtimeSettings =
+                VerticalSliceRuntimeSettings.CreateClient(
+                    jobScheduler,
+                    seed: newGame.Configuration.Seed);
+            runtimeAssets =
+                TryLoadRuntimeAssets();
             frontendLoading.ReportProgress(
                 2,
-                "Loading runtime assets");
+                "Runtime assets loaded");
             bootRenderer.Publish(
                 FrontendPresentationAdapter.Loading(
                     frontendLoading.State));
             PumpBootFrame(window, bootRenderer);
 
+            scenario =
+                VerticalSliceScenario.Create(
+                    runtimeSettings);
             frontendLoading.ReportProgress(
                 3,
-                "Preparing battlefield");
+                "Battlefield ready");
             bootRenderer.Publish(
                 FrontendPresentationAdapter.Loading(
                     frontendLoading.State));
             PumpBootFrame(window, bootRenderer);
         }
 
-        var snapshotBuffer =
-            new PresentationSnapshotBuffer();
-        var newGame =
-            new NewGameModel();
-        using var jobScheduler =
-            new JobScheduler();
-        VerticalSliceRuntimeSettings runtimeSettings =
-            VerticalSliceRuntimeSettings.CreateClient(
-                jobScheduler,
-                seed: newGame.Configuration.Seed);
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
-                runtimeSettings);
-
+        using (scenario)
+        {
         SimulationCoordinator simulation =
             scenario.Simulation;
         PrototypeBattlefieldDefinition prototypeBattlefield =
@@ -165,8 +173,6 @@ internal sealed class ClientApplication
                     scenario.Services.Weapons,
                 artilleryWeapons:
                     scenario.Services.ArtilleryWeapons);
-        RuntimeAssetCatalog? runtimeAssets =
-            TryLoadRuntimeAssets();
         var presentationExtraction =
             new PresentationExtractionContext(
                 scenario,
@@ -884,6 +890,8 @@ internal sealed class ClientApplication
                 visualQualificationOutput,
                 renderInstanceCount,
                 renderHost.LatestQualification);
+        }
+
         }
 
         return 0;
