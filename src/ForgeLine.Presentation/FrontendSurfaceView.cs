@@ -67,6 +67,23 @@ public readonly record struct FrontendSurfaceView(
             [],
             "ENTER  SELECT     UP/DOWN  NAVIGATE");
 
+    public FrontendSurfaceView WithInteraction(
+        string feedback,
+        float transition,
+        bool primaryHovered,
+        bool primaryPressed,
+        bool secondaryHovered,
+        bool secondaryPressed) =>
+        this with
+        {
+            Feedback = feedback,
+            Transition = transition,
+            PrimaryHovered = primaryHovered,
+            PrimaryPressed = primaryPressed,
+            SecondaryHovered = secondaryHovered,
+            SecondaryPressed = secondaryPressed
+        };
+
     public static FrontendSurfaceView Detail(
         string title,
         IReadOnlyList<FrontendDetailLineView> lines,
