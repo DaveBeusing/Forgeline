@@ -32,6 +32,17 @@ public sealed class SettingsInteractionModel
         return FocusedField;
     }
 
+    public void Focus(FrontendSettingsField field)
+    {
+        int index = Array.IndexOf(s_fields, field);
+        if (index < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(field));
+        }
+
+        _index = index;
+    }
+
     public void Adjust(
         SettingsModel model,
         int direction)
@@ -92,6 +103,33 @@ public sealed class SettingsInteractionModel
 
 public static class FrontendHitTesting
 {
+    private const float DetailStartY = 390f;
+    private const float DetailRowHeight = 58f;
+    public static int? DetailRow(float pointerX, float pointerY, float scale, int rowCount)
+    {
+        if (rowCount <= 0 ||
+            pointerX < 92f * scale ||
+            pointerX > 1072f * scale)
+        {
+            return null;
+        }
+
+        float localY = pointerY / scale - DetailStartY;
+        if (localY < 0)
+        {
+            return null;
+        }
+
+        int row = (int)(localY / DetailRowHeight);
+        return row < rowCount ? row : null;
+    }
+
+    public static bool Footer(float pointerX, float pointerY, float scale) =>
+        pointerX >= 82f * scale &&
+        pointerX <= 1072f * scale &&
+        pointerY >= 900f * scale &&
+        pointerY <= 970f * scale;
+
     public static string? MainMenu(
         float pointerX,
         float pointerY,

@@ -1712,6 +1712,7 @@ internal sealed class ClientApplication
         bool downHeld = false;
         bool leftHeld = false;
         bool rightHeld = false;
+        bool primaryPointerHeld = false;
 
         var target =
             new GraphicsWindowTarget(
@@ -1745,9 +1746,35 @@ internal sealed class ClientApplication
                     input,
                     PlatformKey.Escape,
                     ref escapeHeld);
+            bool primaryPointerDown =
+                input.IsMouseButtonDown(
+                    PlatformMouseButton.Left);
+            bool primaryPointerPressed =
+                primaryPointerDown &&
+                !primaryPointerHeld;
+            primaryPointerHeld =
+                primaryPointerDown;
+            float frontendScale =
+                FrontendDesign.ResolveScale(
+                    window.ClientSize.Width,
+                    window.ClientSize.Height,
+                    _settings.UiScale);
 
             if (shell.Screen == GameFrontendScreen.MainMenu)
             {
+                if (input.HasPointerPosition)
+                {
+                    string? hoveredId =
+                        FrontendHitTesting.MainMenu(
+                            input.PointerPosition.X,
+                            input.PointerPosition.Y,
+                            frontendScale,
+                            mainMenu.Items);
+                    if (hoveredId is not null)
+                    {
+                        mainMenu.TryFocus(hoveredId);
+                    }
+                }
                 if (ConsumeKeyPress(
                         input,
                         PlatformKey.Up,
@@ -1764,7 +1791,14 @@ internal sealed class ClientApplication
                     mainMenu.MoveNext();
                 }
 
-                if (enter)
+                if (enter ||
+                    (primaryPointerPressed &&
+                     input.HasPointerPosition &&
+                     FrontendHitTesting.MainMenu(
+                         input.PointerPosition.X,
+                         input.PointerPosition.Y,
+                         frontendScale,
+                         mainMenu.Items) is not null))
                 {
                     GameFrontendAction action =
                         mainMenu.ActivateFocused();
@@ -1778,8 +1812,9 @@ internal sealed class ClientApplication
                     if (action == GameFrontendAction.LoadGame &&
                         loadGame.CanContinue)
                     {
-                        if (loadGame.TryGetLoadTarget(
-                                loadGame.ContinueTarget!.Id,
+                        if (loadGame.ContinueTarget is LoadGameEntry continueTarget &&
+                            loadGame.TryGetLoadTarget(
+                                continueTarget.Id,
                                 out LoadGameEntry targetSave))
                         {
                             return FrontendSessionSelectionResult.Start(
@@ -1824,6 +1859,15 @@ internal sealed class ClientApplication
             }
             else if (shell.Screen == GameFrontendScreen.LoadGame)
             {
+                if (input.HasPointerPosition &&
+                    FrontendHitTesting.DetailRow(
+                        input.PointerPosition.X,
+                        input.PointerPosition.Y,
+                        frontendScale,
+                        loadGame.Entries.Count) is int saveRow)
+                {
+                    loadGame.Focus(saveRow);
+                }
                 if (ConsumeKeyPress(
                         input,
                         PlatformKey.Up,
@@ -1840,7 +1884,7 @@ internal sealed class ClientApplication
                     loadGame.MoveNext();
                 }
 
-                if (enter &&
+                if ((enter || primaryPointerPressed) &&
                     loadGame.TryGetFocusedLoadTarget(
                         out LoadGameEntry selectedSave))
                 {
@@ -1851,6 +1895,24 @@ internal sealed class ClientApplication
             }
             else if (shell.Screen == GameFrontendScreen.Settings)
             {
+                if (input.HasPointerPosition &&
+                    FrontendHitTesting.DetailRow(
+                        input.PointerPosition.X,
+                        input.PointerPosition.Y,
+                        frontendScale,
+                        6) is int settingsRow &&
+                    settingsRow > 0)
+                {
+                    settingsInteraction.Focus(
+                        (FrontendSettingsField)settingsRow);
+
+                    if (primaryPointerPressed)
+                    {
+                        settingsInteraction.Adjust(
+                            settings,
+                            1);
+                    }
+                }
                 if (ConsumeKeyPress(
                         input,
                         PlatformKey.Up,
@@ -1915,7 +1977,13 @@ internal sealed class ClientApplication
                 }
             }
 
-            if (escape &&
+            if ((escape ||
+                 (primaryPointerPressed &&
+                  input.HasPointerPosition &&
+                  FrontendHitTesting.Footer(
+                      input.PointerPosition.X,
+                      input.PointerPosition.Y,
+                      frontendScale))) &&
                 shell.Screen != GameFrontendScreen.MainMenu)
             {
                 shell.Dispatch(

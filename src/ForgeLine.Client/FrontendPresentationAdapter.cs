@@ -74,7 +74,8 @@ internal static class FrontendPresentationAdapter
                 .Select(
                     entry =>
                         new FrontendDetailLineView(
-                            ReferenceEquals(entry, model.FocusedEntry)
+                            model.FocusedEntry is LoadGameEntry focused &&
+                            string.Equals(entry.Id, focused.Id, StringComparison.Ordinal)
                                 ? $"> {entry.DisplayName}"
                                 : entry.DisplayName,
                             entry.CanLoad
