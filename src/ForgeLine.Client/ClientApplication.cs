@@ -74,6 +74,48 @@ internal sealed class ClientApplication
 
         using IWindow window = _platform.CreateWindow(configuration);
 
+        var frontendShell = new GameFrontendShell();
+        var frontendLoading = new FrontendLoadingController();
+        var bootstrapTarget =
+            new GraphicsWindowTarget(
+                window.NativeHandle.Value,
+                window.ClientSize.Width,
+                window.ClientSize.Height,
+                window.IsMinimized ||
+                window.ClientSize.IsEmpty);
+
+        using (var bootRenderer =
+            new ClientFrontendRenderHost(bootstrapTarget))
+        {
+            frontendLoading.BeginPhase(
+                FrontendLoadingPhase.LoadingSettings,
+                "Settings validated",
+                totalSteps: 3);
+            frontendLoading.ReportProgress(
+                1,
+                "Preparing runtime");
+            bootRenderer.Publish(
+                FrontendPresentationAdapter.Loading(
+                    frontendLoading.State));
+            PumpBootFrame(window, bootRenderer);
+
+            frontendLoading.ReportProgress(
+                2,
+                "Loading runtime assets");
+            bootRenderer.Publish(
+                FrontendPresentationAdapter.Loading(
+                    frontendLoading.State));
+            PumpBootFrame(window, bootRenderer);
+
+            frontendLoading.ReportProgress(
+                3,
+                "Preparing battlefield");
+            bootRenderer.Publish(
+                FrontendPresentationAdapter.Loading(
+                    frontendLoading.State));
+            PumpBootFrame(window, bootRenderer);
+        }
+
         var snapshotBuffer =
             new PresentationSnapshotBuffer();
         var newGame =
@@ -218,9 +260,6 @@ internal sealed class ClientApplication
         bool pauseHeld = false;
         bool helpHeld = false;
         bool matchSetupActive = !smokeTest;
-        var frontendShell = new GameFrontendShell();
-        var frontendLoading = new FrontendLoadingController();
-        frontendLoading.BeginPhase(FrontendLoadingPhase.PreparingFrontend, "Preparing command interface");
         frontendLoading.Complete();
         frontendShell.Dispatch(GameFrontendAction.LoadingCompleted);
         var mainMenu = new MainMenuModel(hasValidContinueTarget: false);
@@ -514,7 +553,7 @@ internal sealed class ClientApplication
                         _settings.UiScale,
                         preAlphaUx,
                         matchSetupActive
-                            ? FrontendRenderView.MainMenuView(mainMenu)
+                            ? FrontendPresentationAdapter.MainMenu(mainMenu)
                             : null));
 
                 if (shouldPauseForWindow)
@@ -1674,6 +1713,21 @@ internal sealed class ClientApplication
             $"building={buildingPlacementController.ActiveBuilding} " +
             $"orientation={buildingPlacementController.Orientation} " +
             $"previewFreshness={buildingPlacementController.PreviewFreshness}");
+    }
+
+    private void PumpBootFrame(
+        IWindow window,
+        ClientFrontendRenderHost renderer)
+    {
+        if (!_platform.PumpEvents())
+        {
+            return;
+        }
+
+        DrainWindowEvents(window);
+        renderer.ThrowIfFaulted();
+        _platform.WaitForEvents(
+            IdleWait);
     }
 
     private static void DrainCommandResults(
