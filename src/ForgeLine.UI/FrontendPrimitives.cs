@@ -57,7 +57,7 @@ public static class FrontendDesign
         ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(userScale, 0f);
 
         var viewportScale = MathF.Min(viewportWidth / ReferenceWidth, viewportHeight / ReferenceHeight);
-        return Math.Clamp(viewportScale * userScale, MinimumScale, MaximumScale);
+        return Math.Min(viewportScale * userScale, MaximumScale);
     }
 }
 
