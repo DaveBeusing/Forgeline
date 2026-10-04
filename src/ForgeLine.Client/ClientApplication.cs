@@ -219,9 +219,10 @@ internal sealed class ClientApplication
         bool helpHeld = false;
         bool matchSetupActive = !smokeTest;
         var frontendShell = new GameFrontendShell();
-        var frontendLoading = new FrontendLoadingController(frontendShell);
+        var frontendLoading = new FrontendLoadingController();
         frontendLoading.BeginPhase(FrontendLoadingPhase.PreparingFrontend, "Preparing command interface");
         frontendLoading.Complete();
+        frontendShell.Dispatch(GameFrontendAction.LoadingCompleted);
         var mainMenu = new MainMenuModel(hasValidContinueTarget: false);
         bool userPaused = false;
         bool helpVisible = false;
