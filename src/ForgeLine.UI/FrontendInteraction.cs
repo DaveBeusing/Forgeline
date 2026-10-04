@@ -124,6 +124,40 @@ public static class FrontendHitTesting
         return row < rowCount ? row : null;
     }
 
+    public static int? DetailAdjust(float pointerX, float pointerY, float scale, int rowCount)
+    {
+        int? row = DetailRow(pointerX, pointerY, scale, rowCount);
+        if (row is null)
+        {
+            return null;
+        }
+
+        float x = pointerX / scale;
+        if (x >= 830f && x <= 902f)
+        {
+            return -1;
+        }
+
+        if (x >= 916f && x <= 988f)
+        {
+            return 1;
+        }
+
+        return null;
+    }
+
+    public static bool PrimaryAction(float pointerX, float pointerY, float scale) =>
+        pointerX >= 782f * scale &&
+        pointerX <= 1072f * scale &&
+        pointerY >= 838f * scale &&
+        pointerY <= 896f * scale;
+
+    public static bool SecondaryAction(float pointerX, float pointerY, float scale) =>
+        pointerX >= 92f * scale &&
+        pointerX <= 312f * scale &&
+        pointerY >= 838f * scale &&
+        pointerY <= 896f * scale;
+
     public static bool Footer(float pointerX, float pointerY, float scale) =>
         pointerX >= 82f * scale &&
         pointerX <= 1072f * scale &&
