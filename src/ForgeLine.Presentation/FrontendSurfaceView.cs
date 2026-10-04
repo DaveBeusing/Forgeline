@@ -19,7 +19,9 @@ public readonly record struct FrontendDetailLineView(
     bool IsWarning = false,
     bool IsFocused = false,
     bool CanDecrease = false,
-    bool CanIncrease = false);
+    bool CanIncrease = false,
+    bool IsHovered = false,
+    bool IsPressed = false);
 
 public readonly record struct FrontendSurfaceView(
     FrontendSurfaceKind Kind,
@@ -31,7 +33,13 @@ public readonly record struct FrontendSurfaceView(
     IReadOnlyList<FrontendDetailLineView> DetailLines,
     string Footer,
     string PrimaryAction = "",
-    string SecondaryAction = "BACK")
+    string SecondaryAction = "BACK",
+    string Feedback = "",
+    float Transition = 1f,
+    bool PrimaryHovered = false,
+    bool PrimaryPressed = false,
+    bool SecondaryHovered = false,
+    bool SecondaryPressed = false)
 {
     public static FrontendSurfaceView Loading(
         string status,
