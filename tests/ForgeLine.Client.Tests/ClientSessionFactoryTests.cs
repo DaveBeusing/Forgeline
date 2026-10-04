@@ -51,7 +51,7 @@ public sealed class ClientSessionFactoryTests
                 scheduler);
 
         Assert.Equal(
-            731,
-            scenario.RuntimeSettings.RandomSeed);
+            731UL,
+            scenario.RuntimeSettings.Seed);
     }
 }
