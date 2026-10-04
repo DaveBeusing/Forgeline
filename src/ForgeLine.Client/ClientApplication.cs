@@ -1907,7 +1907,9 @@ internal sealed class ClientApplication
                             frontendLayout,
                         loadGame.Entries.Count) is int saveRow)
                 {
-                    loadGame.Focus(saveRow);
+                    loadGame.FocusVisible(
+                        saveRow,
+                        FrontendDesign.MaximumVisibleDetailRows);
                 }
                 if (ConsumeKeyPress(
                         input,
