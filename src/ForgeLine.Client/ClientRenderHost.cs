@@ -6,7 +6,6 @@ using ForgeLine.Graphics;
 using ForgeLine.Presentation;
 using ForgeLine.Simulation;
 using ForgeLine.World;
-using ForgeLine.UI;
 
 namespace ForgeLine.Client;
 
@@ -46,7 +45,7 @@ internal readonly record struct ClientRenderFrame(
     RtsInformationLayerView InformationLayer = default,
     float UiScale = 1.0f,
     PreAlphaUxView PreAlphaUx = default,
-    FrontendRenderView? Frontend = null);
+    FrontendSurfaceView? Frontend = null);
 
 internal sealed class ClientRenderHost : IDisposable
 {
@@ -414,13 +413,11 @@ internal sealed class ClientRenderHost : IDisposable
                             terrain.WorldBounds,
                             current.InformationLayer,
                             current.Dpi);
-                        if (current.Frontend is FrontendRenderView frontend)
+                        if (current.Frontend is FrontendSurfaceView frontend)
                         {
                             frontendRenderer.Render(
                                 context,
-                                frontend.Screen,
-                                frontend.MainMenu,
-                                frontend.Loading,
+                                frontend,
                                 current.UiScale);
                         }
                     });
