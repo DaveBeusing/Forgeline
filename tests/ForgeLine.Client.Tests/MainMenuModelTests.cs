@@ -10,8 +10,8 @@ public sealed class MainMenuModelTests
     {
         var menu = new MainMenuModel(hasValidContinueTarget: true);
 
-        Assert.Equal("FORGELINE", menu.ProductName);
-        Assert.Equal("Build. Supply. Conquer.", menu.Tagline);
+        Assert.Equal("FORGELINE", MainMenuModel.ProductName);
+        Assert.Equal("Build. Supply. Conquer.", MainMenuModel.Tagline);
         Assert.Collection(
             menu.Items,
             item => Assert.Equal(MainMenuCommand.Continue, item.Command),
