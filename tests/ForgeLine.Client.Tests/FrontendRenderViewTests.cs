@@ -34,7 +34,8 @@ public sealed class FrontendRenderViewTests
 
         Assert.Equal(GameFrontendScreen.MainMenu, view.Screen);
         Assert.Same(menu, view.MainMenu);
-        Assert.Equal("new-game", view.MainMenu.FocusedId);
+        Assert.NotNull(view.MainMenu);
+        Assert.Equal("new-game", view.MainMenu!.FocusedId);
     }
 
     [Fact]

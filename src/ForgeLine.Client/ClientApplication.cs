@@ -271,7 +271,22 @@ internal sealed class ClientApplication
         bool helpHeld = false;
         bool matchSetupActive = !smokeTest;
         frontendShell.Dispatch(GameFrontendAction.LoadingCompleted);
-        var mainMenu = new MainMenuModel(hasValidContinueTarget: false);
+        var newGameScreen = new NewGameModel();
+        var loadGameScreen = new LoadGameModel([]);
+        var settingsScreen =
+            new SettingsModel(
+                new FrontendSettingsSnapshot(
+                    _settings.WindowWidth,
+                    _settings.WindowHeight,
+                    _settings.BorderlessFullscreen,
+                    _settings.UiScale,
+                    _settings.ShowOnboarding,
+                    _settings.EdgeScrollEnabled,
+                    _settings.CameraPanSpeedMultiplier,
+                    _settings.CameraBindings));
+        var mainMenu =
+            new MainMenuModel(
+                loadGameScreen.CanContinue);
         bool userPaused = false;
         bool helpVisible = false;
         FormationTemplate activeFormation =
@@ -437,14 +452,7 @@ internal sealed class ClientApplication
                     mainMenu.ActivateFocused();
                 frontendShell.Dispatch(action);
 
-                if (action == GameFrontendAction.NewGame)
-                {
-                    frontendShell.Dispatch(
-                        NewGameModel.Start());
-                    matchSetupActive = false;
-                    helpVisible = false;
-                }
-                else if (action == GameFrontendAction.Exit)
+                if (action == GameFrontendAction.Exit)
                 {
                     return 0;
                 }
@@ -456,6 +464,16 @@ internal sealed class ClientApplication
             {
                 frontendShell.Dispatch(
                     GameFrontendAction.Back);
+            }
+
+            if (matchSetupActive &&
+                setupStartPressed &&
+                frontendShell.Screen == GameFrontendScreen.NewGame)
+            {
+                frontendShell.Dispatch(
+                    NewGameModel.Start());
+                matchSetupActive = false;
+                helpVisible = false;
             }
 
             if (!inputMatchTerminal &&
@@ -562,7 +580,12 @@ internal sealed class ClientApplication
                         _settings.UiScale,
                         preAlphaUx,
                         matchSetupActive
-                            ? FrontendPresentationAdapter.MainMenu(mainMenu)
+                            ? CreateFrontendSurface(
+                                frontendShell.Screen,
+                                mainMenu,
+                                newGameScreen,
+                                loadGameScreen,
+                                settingsScreen)
                             : null));
 
                 if (shouldPauseForWindow)
@@ -1725,6 +1748,33 @@ internal sealed class ClientApplication
             $"orientation={buildingPlacementController.Orientation} " +
             $"previewFreshness={buildingPlacementController.PreviewFreshness}");
     }
+
+    private static FrontendSurfaceView CreateFrontendSurface(
+        GameFrontendScreen screen,
+        MainMenuModel mainMenu,
+        NewGameModel newGame,
+        LoadGameModel loadGame,
+        SettingsModel settings) =>
+        screen switch
+        {
+            GameFrontendScreen.MainMenu =>
+                FrontendPresentationAdapter.MainMenu(
+                    mainMenu),
+            GameFrontendScreen.NewGame =>
+                FrontendPresentationAdapter.NewGame(
+                    newGame),
+            GameFrontendScreen.LoadGame =>
+                FrontendPresentationAdapter.LoadGame(
+                    loadGame),
+            GameFrontendScreen.Settings =>
+                FrontendPresentationAdapter.Settings(
+                    settings),
+            GameFrontendScreen.Credits =>
+                FrontendPresentationAdapter.Credits(),
+            _ =>
+                FrontendPresentationAdapter.MainMenu(
+                    mainMenu)
+        };
 
     private void PumpBootFrame(
         IWindow window,

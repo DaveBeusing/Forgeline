@@ -3,7 +3,8 @@ namespace ForgeLine.Presentation;
 public enum FrontendSurfaceKind : byte
 {
     Loading = 1,
-    MainMenu = 2
+    MainMenu = 2,
+    Detail = 3
 }
 
 public readonly record struct FrontendMenuEntryView(
@@ -12,12 +13,20 @@ public readonly record struct FrontendMenuEntryView(
     bool IsEnabled,
     bool IsFocused);
 
+public readonly record struct FrontendDetailLineView(
+    string Label,
+    string Value,
+    bool IsWarning = false);
+
 public readonly record struct FrontendSurfaceView(
     FrontendSurfaceKind Kind,
+    string Title,
     string Status,
     bool HasProgress,
     float Progress,
-    IReadOnlyList<FrontendMenuEntryView> MenuEntries)
+    IReadOnlyList<FrontendMenuEntryView> MenuEntries,
+    IReadOnlyList<FrontendDetailLineView> DetailLines,
+    string Footer)
 {
     public static FrontendSurfaceView Loading(
         string status,
@@ -25,17 +34,37 @@ public readonly record struct FrontendSurfaceView(
         float progress) =>
         new(
             FrontendSurfaceKind.Loading,
+            string.Empty,
             status,
             hasProgress,
             progress,
-            []);
+            [],
+            [],
+            string.Empty);
 
     public static FrontendSurfaceView MainMenu(
         IReadOnlyList<FrontendMenuEntryView> entries) =>
         new(
             FrontendSurfaceKind.MainMenu,
             string.Empty,
+            string.Empty,
             false,
             0f,
-            entries);
+            entries,
+            [],
+            "ENTER  SELECT     UP/DOWN  NAVIGATE");
+
+    public static FrontendSurfaceView Detail(
+        string title,
+        IReadOnlyList<FrontendDetailLineView> lines,
+        string footer) =>
+        new(
+            FrontendSurfaceKind.Detail,
+            title,
+            string.Empty,
+            false,
+            0f,
+            [],
+            lines,
+            footer);
 }
