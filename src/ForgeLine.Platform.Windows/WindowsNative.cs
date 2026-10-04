@@ -14,6 +14,7 @@ internal static partial class WindowsNative
     internal const int GwlStyle = -16;
     internal const int GwlpUserData = -21;
 
+    internal const uint MonitorDefaultToNull = 0x00000000;
     internal const uint MonitorDefaultToNearest = 0x00000002;
 
     internal const uint MwmoInputAvailable = 0x0004;
@@ -25,6 +26,7 @@ internal static partial class WindowsNative
     internal const uint SwpNoActivate = 0x0010;
     internal const uint SwpNoZOrder = 0x0004;
     internal const uint SwpFrameChanged = 0x0020;
+    internal const uint SwpShowWindow = 0x0040;
 
     internal const int SwShow = 5;
 
@@ -96,6 +98,7 @@ internal static partial class WindowsNative
     internal const uint WsMaximizeBox = 0x00010000;
     internal const uint WsMinimizeBox = 0x00020000;
     internal const uint WsPopup = 0x80000000;
+    internal const uint WsVisible = 0x10000000;
     internal const uint WsSysMenu = 0x00080000;
     internal const uint WsThickFrame = 0x00040000;
 
@@ -232,6 +235,9 @@ internal static partial class WindowsNative
 
     [LibraryImport("user32.dll", EntryPoint = "LoadCursorW", SetLastError = true)]
     internal static partial nint LoadCursor(nint instance, nint cursorName);
+
+    [LibraryImport("user32.dll", EntryPoint = "MonitorFromRect")]
+    internal static partial nint MonitorFromRect(ref NativeRect rect, uint flags);
 
     [LibraryImport("user32.dll", EntryPoint = "MonitorFromWindow")]
     internal static partial nint MonitorFromWindow(nint windowHandle, uint flags);
