@@ -21,11 +21,32 @@ Common compiler, analyzer, nullability, deterministic-build, and formatting sett
 
 NuGet versions are managed centrally through `Directory.Packages.props`.
 
+## Semantic Versioning
+
+FORGELINE uses SemVer in `MAJOR.MINOR.PATCH` form. The authoritative components live in the root `Directory.Build.props` as `ForgeLineVersionMajor`, `ForgeLineVersionMinor`, and `ForgeLineVersionPatch`. The governed baseline is `0.1.0`.
+
+Every commit after the bootstrap commit must increment `ForgeLineVersionPatch` by exactly one. `MAJOR` and `MINOR` are explicit product/release decisions; when either changes, the patch counter still increments instead of resetting. This keeps a one-to-one mapping between repository commits and patch progression.
+
+Before creating each commit:
+
+```powershell
+pwsh ./build/Increment-PatchVersion.ps1
+```
+
+CI validates each commit between the current `master` base and the pull-request head. A branch must be rebased onto current `master`; merge commits, squash integration, repeated patch values, and skipped patch values are rejected. Integration therefore uses linear/rebase semantics.
+
+For local validation of a commit range:
+
+```powershell
+pwsh ./build/Validate-SemVer.ps1 -BaseRef <base-commit> -HeadRef HEAD
+```
+
 ## Canonical Validation Path
 
 From the repository root:
 
 ```powershell
+pwsh ./build/Validate-SemVer.ps1 -BaseRef <base-commit> -HeadRef HEAD
 dotnet restore ForgeLine.sln
 pwsh ./build/Validate-ProjectReferences.ps1
 dotnet build ForgeLine.sln --configuration Release --no-restore
@@ -45,7 +66,7 @@ The GitHub Actions CI workflow executes this sequence on pull requests targeting
 
 The CI workflow emits the required check context `build-test` from GitHub Actions. That check represents the complete job, including the natural vertical-slice terminal validation; a successful build or unit-test subset is not equivalent to the full required check.
 
-Repository settings must require that check before merge once `master` protection is applied. Documentation does not itself enforce branch protection, so the effective GitHub settings must be verified by readback. See [Project Context and Repository Governance](ProjectContext.md).
+Repository settings must require that check before merge once `master` protection is applied. Branches must be rebased onto current `master` before the final check, and integration must preserve the validated commits with rebase/linear-history semantics. Merge-commit and squash integration are incompatible with the one-commit/one-patch invariant. Documentation does not itself enforce branch protection, so the effective GitHub settings must be verified by readback. See [Project Context and Repository Governance](ProjectContext.md).
 
 ## Test Projects
 
@@ -141,7 +162,9 @@ The `Vertical Slice Soak` GitHub Actions workflow exposes the same runner throug
 
 Prefer several small, logically complete commits over broad aggregate commits.
 
-Keep unrelated formatting, refactoring, functional changes, tests, documentation, and CI adjustments separate when practical. Avoid knowingly broken intermediate commits.
+Before every commit after the semantic-versioning bootstrap, run `pwsh ./build/Increment-PatchVersion.ps1` and include the resulting `Directory.Build.props` change in that same commit. CI requires the patch component to advance by exactly one for every commit in the validated range.
+
+Keep unrelated formatting, refactoring, functional changes, tests, documentation, and CI adjustments separate when practical. Avoid knowingly broken intermediate commits. Rebase onto current `master` before final validation so the patch sequence remains contiguous.
 
 ## Documentation
 
