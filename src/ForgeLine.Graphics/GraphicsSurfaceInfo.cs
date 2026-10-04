@@ -6,4 +6,8 @@ public readonly record struct GraphicsSurfaceInfo(
     int BufferCount,
     int FrameIndex,
     bool IsSuspended,
-    string PresentMode);
+    string PresentMode,
+    bool IsOccluded = false,
+    bool ResizePending = false,
+    ulong ResizeGeneration = 0,
+    ulong AppliedResizeGeneration = 0);
