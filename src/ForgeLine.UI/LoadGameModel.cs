@@ -44,10 +44,33 @@ public sealed class LoadGameModel
     public bool CanContinue =>
         ContinueTarget.HasValue;
 
+    public int FocusedIndex => _focusedIndex;
+
     public LoadGameEntry? FocusedEntry =>
         _entries.Length == 0
             ? null
             : _entries[_focusedIndex];
+
+    public int VisibleStartIndex(int visibleCount)
+    {
+        if (visibleCount <= 0 ||
+            _entries.Length <= visibleCount)
+        {
+            return 0;
+        }
+
+        return Math.Clamp(
+            _focusedIndex - visibleCount / 2,
+            0,
+            _entries.Length - visibleCount);
+    }
+
+    public LoadGameEntry? FocusVisible(
+        int visibleIndex,
+        int visibleCount) =>
+        Focus(
+            VisibleStartIndex(visibleCount) +
+            visibleIndex);
 
     public LoadGameEntry? Focus(int index)
     {

@@ -73,15 +73,15 @@ internal static class FrontendPresentationAdapter
                 "ESC  BACK");
         }
 
+        LoadGameEntry[] visibleEntries =
+            ResolveVisibleSaves(model);
+
         FrontendDetailLineView[] lines =
-            model.Entries
+            visibleEntries
                 .Select(
                     entry =>
                         new FrontendDetailLineView(
-                            model.FocusedEntry is LoadGameEntry focused &&
-                            string.Equals(entry.Id, focused.Id, StringComparison.Ordinal)
-                                ? $"> {entry.DisplayName}"
-                                : entry.DisplayName,
+                            FrontendDesign.FitText(entry.DisplayName),
                             entry.CanLoad
                                 ? $"TICK {entry.SavedTick}"
                                 : entry.State.ToString().ToUpperInvariant(),
@@ -97,6 +97,16 @@ internal static class FrontendPresentationAdapter
             "UP/DOWN  SELECT SAVE     ENTER  LOAD     ESC  BACK",
             model.TryGetFocusedLoadTarget(out _) ? "LOAD" : string.Empty);
     }
+
+    private static LoadGameEntry[] ResolveVisibleSaves(
+        LoadGameModel model) =>
+        model.Entries
+            .Skip(
+                model.VisibleStartIndex(
+                    FrontendDesign.MaximumVisibleDetailRows))
+            .Take(
+                FrontendDesign.MaximumVisibleDetailRows)
+            .ToArray();
 
     internal static FrontendSurfaceView Settings(
         SettingsModel model,

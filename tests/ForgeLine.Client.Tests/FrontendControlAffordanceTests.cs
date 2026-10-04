@@ -64,14 +64,14 @@ public sealed class FrontendControlAffordanceTests
             FrontendHitTesting.DetailAdjust(
                 850,
                 405,
-                1.0f,
+                FrontendDesign.ResolveLayout(1920, 1080),
                 4));
         Assert.Equal(
             1,
             FrontendHitTesting.DetailAdjust(
                 940,
                 405,
-                1.0f,
+                FrontendDesign.ResolveLayout(1920, 1080),
                 4));
     }
 
@@ -82,11 +82,11 @@ public sealed class FrontendControlAffordanceTests
             FrontendHitTesting.PrimaryAction(
                 900,
                 860,
-                1.0f));
+                FrontendDesign.ResolveLayout(1920, 1080)));
         Assert.True(
             FrontendHitTesting.SecondaryAction(
                 150,
                 860,
-                1.0f));
+                FrontendDesign.ResolveLayout(1920, 1080)));
     }
 }
