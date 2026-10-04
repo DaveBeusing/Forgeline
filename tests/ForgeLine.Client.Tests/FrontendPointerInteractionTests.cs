@@ -13,20 +13,20 @@ public sealed class FrontendPointerInteractionTests
             FrontendHitTesting.DetailRow(
                 120,
                 400,
-                1.0f,
+                FrontendDesign.ResolveLayout(1920, 1080),
                 4));
         Assert.Equal(
             2,
             FrontendHitTesting.DetailRow(
                 120,
                 510,
-                1.0f,
+                FrontendDesign.ResolveLayout(1920, 1080),
                 4));
         Assert.Null(
             FrontendHitTesting.DetailRow(
                 120,
                 700,
-                1.0f,
+                FrontendDesign.ResolveLayout(1920, 1080),
                 4));
     }
 
@@ -38,7 +38,7 @@ public sealed class FrontendPointerInteractionTests
             FrontendHitTesting.DetailRow(
                 180,
                 672,
-                1.5f,
+                FrontendDesign.ResolveLayout(2880, 1620),
                 3));
     }
 
