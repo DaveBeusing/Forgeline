@@ -427,6 +427,80 @@ public sealed class AutomatedDistributionSystemTests
     }
 
     [Fact]
+    public void CriticalDeficitCanConsumeLowerPrioritySourceReserve()
+    {
+        DistributionFixture fixture = CreateFixture(sourceQuantity: 100.0);
+        fixture.Connect(fixture.SourceNode, fixture.DestinationNode);
+        fixture.AddPolicy(
+            fixture.SourceEntity,
+            minimum: 20.0,
+            target: 80.0,
+            maximum: 100.0,
+            LogisticsStockPriority.High);
+        fixture.AddPolicy(
+            fixture.DestinationEntity,
+            minimum: 10.0,
+            target: 60.0,
+            maximum: 100.0,
+            LogisticsStockPriority.Critical);
+        EntityId truck = fixture.CreateTruck(fixture.SourcePosition);
+
+        RunUntil(
+            fixture,
+            () => fixture.Inventories.GetQuantity(
+                    fixture.DestinationInventory,
+                    ResourceIds.FerrousOre) >= 60.0,
+            maximumTicks: 600);
+
+        Assert.Equal(
+            60.0,
+            fixture.Inventories.GetQuantity(
+                fixture.DestinationInventory,
+                ResourceIds.FerrousOre));
+        Assert.Equal(
+            40.0,
+            fixture.Inventories.GetQuantity(
+                fixture.SourceInventory,
+                ResourceIds.FerrousOre));
+        Assert.Equal(100.0, fixture.TotalConservedQuantity(truck));
+    }
+
+    [Fact]
+    public void CriticalDeficitPreservesEqualPrioritySourceReserve()
+    {
+        DistributionFixture fixture = CreateFixture(sourceQuantity: 100.0);
+        fixture.Connect(fixture.SourceNode, fixture.DestinationNode);
+        fixture.AddPolicy(
+            fixture.SourceEntity,
+            minimum: 20.0,
+            target: 80.0,
+            maximum: 100.0,
+            LogisticsStockPriority.Critical);
+        fixture.AddPolicy(
+            fixture.DestinationEntity,
+            minimum: 10.0,
+            target: 60.0,
+            maximum: 100.0,
+            LogisticsStockPriority.Critical);
+        _ = fixture.CreateTruck(fixture.SourcePosition);
+
+        fixture.Simulation.RunTicks(
+            600,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(
+            20.0,
+            fixture.Inventories.GetQuantity(
+                fixture.DestinationInventory,
+                ResourceIds.FerrousOre));
+        Assert.Equal(
+            80.0,
+            fixture.Inventories.GetQuantity(
+                fixture.SourceInventory,
+                ResourceIds.FerrousOre));
+    }
+
+    [Fact]
     public void AgingDoesNotPromoteLowerPriorityDemandAheadOfCriticalRecovery()
     {
         DistributionFixture fixture =

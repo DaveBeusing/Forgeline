@@ -182,6 +182,15 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
             if (hasRoute &&
                 IsManagedWaypoint(movementOrder, route))
             {
+                if (TryAdvanceStuckManagedWaypoint(
+                        context,
+                        entity,
+                        movementOrder,
+                        route))
+                {
+                    return;
+                }
+
                 return;
             }
 
@@ -517,6 +526,48 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
 
         context.Entities.RemoveComponent<
             NavigationRouteState>(entity);
+    }
+
+    private static bool TryAdvanceStuckManagedWaypoint(
+        SimulationContext context,
+        EntityId entity,
+        in MovementOrder movementOrder,
+        in NavigationRouteState route)
+    {
+        if (!context.Entities.TryGetComponent(
+                entity,
+                out GroundMovementState movementState) ||
+            movementState.Status != GroundMovementStatus.Stuck ||
+            !context.Entities.TryGetComponent(
+                entity,
+                out GroundMovement movement) ||
+            !context.Entities.TryGetComponent(
+                entity,
+                out WorldTransform transform))
+        {
+            return false;
+        }
+
+        Vector3 delta =
+            movementOrder.WorldTarget - transform.Position;
+        delta.Y = 0.0f;
+
+        float recoveryRadius =
+            movement.StopRadius +
+            (movement.Radius * 2.0f);
+
+        if (delta.LengthSquared() >
+            recoveryRadius * recoveryRadius)
+        {
+            return false;
+        }
+
+        context.Entities.RemoveComponent<MovementOrder>(entity);
+        IssueNextWaypointOrComplete(
+            context,
+            entity,
+            route);
+        return true;
     }
 
     private static bool IsManagedWaypoint(

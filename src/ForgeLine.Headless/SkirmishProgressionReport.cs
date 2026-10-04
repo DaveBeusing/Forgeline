@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using ForgeLine.Game;
 
 namespace ForgeLine.Headless;
@@ -15,7 +16,11 @@ internal sealed record SkirmishProgressionReport(
     IReadOnlyList<SkirmishEligibilityLossDiagnostic> FirstEligibilityLosses,
     IReadOnlyList<SkirmishDecisionDiagnostic> Latest)
 {
-    private static readonly JsonSerializerOptions s_jsonOptions = new() { WriteIndented = true };
+    private static readonly JsonSerializerOptions s_jsonOptions = new()
+    {
+        WriteIndented = true,
+        NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals
+    };
 
     public static void Write(
         string mainReportPath,
@@ -52,20 +57,20 @@ internal sealed record SkirmishProgressionReport(
 
         foreach (SkirmishEligibilityLossDiagnostic loss in report.FirstEligibilityLosses)
         {
-            Console.WriteLine("First eligibility loss before: " + JsonSerializer.Serialize(loss.Before));
-            Console.WriteLine("First eligibility loss after: " + JsonSerializer.Serialize(loss.After));
+            Console.WriteLine("First eligibility loss before: " + JsonSerializer.Serialize(loss.Before, s_jsonOptions));
+            Console.WriteLine("First eligibility loss after: " + JsonSerializer.Serialize(loss.After, s_jsonOptions));
         }
 
         foreach (SkirmishDecisionDiagnostic entry in report.History.TakeLast(12))
         {
             Console.WriteLine(
                 $"Transport history: tick={entry.Tick}; player={entry.Player}; " +
-                JsonSerializer.Serialize(entry.Economy.Transports));
+                JsonSerializer.Serialize(entry.Economy.Transports, s_jsonOptions));
         }
 
         foreach (SkirmishDecisionDiagnostic entry in report.Latest)
         {
-            Console.WriteLine("Latest decision detail: " + JsonSerializer.Serialize(entry));
+            Console.WriteLine("Latest decision detail: " + JsonSerializer.Serialize(entry, s_jsonOptions));
         }
 
         Console.WriteLine($"Progression report: {path}; omitted history entries={report.DroppedHistoryEntries}.");

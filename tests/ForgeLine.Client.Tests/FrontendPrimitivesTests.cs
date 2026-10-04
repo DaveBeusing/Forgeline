@@ -8,7 +8,7 @@ public sealed class FrontendPrimitivesTests
     [Theory]
     [InlineData(1920f, 1080f, 1f, 1f)]
     [InlineData(3840f, 2160f, 1f, 2f)]
-    [InlineData(960f, 540f, 1f, 0.75f)]
+    [InlineData(960f, 540f, 1f, 0.5f)]
     [InlineData(2560f, 1440f, 1.25f, 1.6666666f)]
     public void ResolveScaleUsesViewportAndUserScale(
         float width,

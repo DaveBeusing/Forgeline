@@ -3669,10 +3669,6 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     {
         if (!facility.Supports(
                 UnitProductionCapability.Logistics) ||
-            facility.ActiveUnit ==
-                UnitIds.CargoTruck ||
-            plannedUnit ==
-                UnitIds.CargoTruck ||
             !_units.TryGet(
                 UnitIds.CargoTruck,
                 out UnitDefinition? cargoTruck))
