@@ -44,9 +44,47 @@ internal static class ClientSessionFactory
                         seed: request.Seed)),
             ClientSessionRequestKind.LoadGame
                 when request.Save is LoadGameEntry save =>
-                    ClientSaveCatalog.Restore(save),
+                    RestoreForGameplay(
+                        save),
             _ =>
                 throw new InvalidOperationException(
                     $"Unsupported client session request {request.Kind}.")
         };
+
+    private static VerticalSliceScenario RestoreForGameplay(
+        LoadGameEntry save)
+    {
+        VerticalSliceScenario scenario =
+            ClientSaveCatalog.Restore(
+                save);
+
+        if (scenario.GetMatchState().Lifecycle !=
+            MatchLifecyclePhase.Paused)
+        {
+            return scenario;
+        }
+
+        try
+        {
+            var resume =
+                new SetMatchPausedCommand(
+                    scenario.BattlefieldRuntime.MatchStateEntity,
+                    paused: false);
+            scenario.Simulation.ExecuteControlCommand(
+                resume);
+
+            if (!resume.Accepted)
+            {
+                throw new InvalidOperationException(
+                    "A restored paused match could not be resumed for gameplay.");
+            }
+
+            return scenario;
+        }
+        catch
+        {
+            scenario.Dispose();
+            throw;
+        }
+    }
 }
