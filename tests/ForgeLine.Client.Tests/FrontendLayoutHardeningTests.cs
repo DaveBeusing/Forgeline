@@ -66,7 +66,7 @@ public sealed class FrontendLayoutHardeningTests
             "new-game",
             FrontendHitTesting.MainMenu(
                 320 + 100,
-                350,
+                422,
                 layout,
                 menu.Items));
         Assert.Null(
