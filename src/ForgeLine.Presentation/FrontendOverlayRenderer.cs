@@ -1,7 +1,6 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
 using ForgeLine.Graphics;
-using ForgeLine.UI;
 
 namespace ForgeLine.Presentation;
 
@@ -11,7 +10,6 @@ public sealed class FrontendOverlayRenderer : IDisposable
     private const int VertexStride = 24;
     private const float GlyphPixelSize = 3.0f;
     private const float GlyphAdvance = 18.0f;
-    private const float LineAdvance = 24.0f;
 
     private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;
@@ -31,22 +29,23 @@ public sealed class FrontendOverlayRenderer : IDisposable
 
     public void Render(
         IGraphicsCommandContext context,
-        GameFrontendScreen screen,
-        MainMenuModel? menu,
-        FrontendLoadingState loading,
+        in FrontendSurfaceView view,
         float userScale = 1.0f)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentNullException.ThrowIfNull(context);
 
         _vertexCount = 0;
-        float scale = FrontendDesign.ResolveScale(
-            context.Width,
-            context.Height,
-            userScale);
+        float viewportScale = MathF.Min(
+            context.Width / 1920f,
+            context.Height / 1080f);
+        float scale = Math.Clamp(
+            viewportScale * userScale,
+            0.75f,
+            2.0f);
 
         EmitPanel(
-            new FrontendRect(0, 0, FrontendDesign.ReferenceWidth, FrontendDesign.ReferenceHeight).Scale(scale),
+            new SurfaceRect(0, 0, 1920f, 1080f).Scale(scale),
             new Vector4(0.035f, 0.045f, 0.045f, 0.98f),
             context.Width,
             context.Height);
@@ -54,28 +53,28 @@ public sealed class FrontendOverlayRenderer : IDisposable
         EmitText("FORGELINE", 92 * scale, 82 * scale, new Vector4(0.82f, 0.84f, 0.78f, 1), context.Width, context.Height, scale);
         EmitText("BUILD. SUPPLY. CONQUER.", 94 * scale, 128 * scale, new Vector4(0.52f, 0.58f, 0.50f, 1), context.Width, context.Height, scale);
 
-        if (screen == GameFrontendScreen.Loading)
+        if (view.Kind == FrontendSurfaceKind.Loading)
         {
             EmitText("INITIALIZING COMMAND SYSTEMS", 94 * scale, 850 * scale, new Vector4(0.72f, 0.74f, 0.68f, 1), context.Width, context.Height, scale);
-            EmitText(loading.Status, 94 * scale, 890 * scale, new Vector4(0.82f, 0.62f, 0.20f, 1), context.Width, context.Height, scale);
-            if (loading.HasDeterminateProgress)
+            EmitText(view.Status, 94 * scale, 890 * scale, new Vector4(0.82f, 0.62f, 0.20f, 1), context.Width, context.Height, scale);
+            if (view.HasProgress)
             {
-                EmitProgress(94 * scale, 936 * scale, 720 * scale, 8 * scale, loading.Progress, context.Width, context.Height);
+                EmitProgress(94 * scale, 936 * scale, 720 * scale, 8 * scale, view.Progress, context.Width, context.Height);
             }
         }
-        else if (screen == GameFrontendScreen.MainMenu && menu is not null)
+        else if (view.Kind == FrontendSurfaceKind.MainMenu)
         {
             float y = 350 * scale;
-            foreach (MainMenuItem item in menu.Items)
+            foreach (FrontendMenuEntryView item in view.MenuEntries)
             {
-                bool focused = string.Equals(item.Id, menu.FocusedId, StringComparison.Ordinal);
+                bool focused = item.IsFocused;
                 Vector4 textColor = item.IsEnabled
                     ? focused ? new Vector4(0.95f, 0.72f, 0.22f, 1) : new Vector4(0.76f, 0.78f, 0.72f, 1)
                     : new Vector4(0.32f, 0.34f, 0.32f, 1);
                 if (focused)
                 {
-                    EmitPanel(new FrontendRect(82 * scale, (y - 12 * scale), 560 * scale, 52 * scale), new Vector4(0.12f, 0.14f, 0.13f, 0.95f), context.Width, context.Height);
-                    EmitPanel(new FrontendRect(82 * scale, (y - 12 * scale), 5 * scale, 52 * scale), new Vector4(0.86f, 0.61f, 0.16f, 1), context.Width, context.Height);
+                    EmitPanel(new SurfaceRect(82 * scale, (y - 12 * scale), 560 * scale, 52 * scale), new Vector4(0.12f, 0.14f, 0.13f, 0.95f), context.Width, context.Height);
+                    EmitPanel(new SurfaceRect(82 * scale, (y - 12 * scale), 5 * scale, 52 * scale), new Vector4(0.86f, 0.61f, 0.16f, 1), context.Width, context.Height);
                 }
                 EmitText(item.Label, 104 * scale, y, textColor, context.Width, context.Height, scale);
                 y += 72 * scale;
@@ -108,11 +107,11 @@ public sealed class FrontendOverlayRenderer : IDisposable
 
     private void EmitProgress(float x, float y, float width, float height, float progress, int viewportWidth, int viewportHeight)
     {
-        EmitPanel(new FrontendRect(x, y, width, height), new Vector4(0.12f, 0.14f, 0.13f, 1), viewportWidth, viewportHeight);
-        EmitPanel(new FrontendRect(x, y, width * Math.Clamp(progress, 0, 1), height), new Vector4(0.82f, 0.58f, 0.14f, 1), viewportWidth, viewportHeight);
+        EmitPanel(new SurfaceRect(x, y, width, height), new Vector4(0.12f, 0.14f, 0.13f, 1), viewportWidth, viewportHeight);
+        EmitPanel(new SurfaceRect(x, y, width * Math.Clamp(progress, 0, 1), height), new Vector4(0.82f, 0.58f, 0.14f, 1), viewportWidth, viewportHeight);
     }
 
-    private void EmitPanel(FrontendRect rect, Vector4 color, int width, int height)
+    private void EmitPanel(SurfaceRect rect, Vector4 color, int width, int height)
     {
         float left = rect.X / width * 2 - 1;
         float right = (rect.X + rect.Width) / width * 2 - 1;
@@ -132,7 +131,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
             for (int row = 0; row < 7; row++)
             for (int column = 0; column < 5; column++)
                 if ((rows[row] & (1 << (4 - column))) != 0)
-                    EmitPanel(new FrontendRect(cursor + column * GlyphPixelSize * scale, y + row * GlyphPixelSize * scale, GlyphPixelSize * scale, GlyphPixelSize * scale), color, width, height);
+                    EmitPanel(new SurfaceRect(cursor + column * GlyphPixelSize * scale, y + row * GlyphPixelSize * scale, GlyphPixelSize * scale, GlyphPixelSize * scale), color, width, height);
             cursor += GlyphAdvance * scale;
         }
     }
@@ -182,6 +181,12 @@ public sealed class FrontendOverlayRenderer : IDisposable
             PrimitiveTopology=GraphicsPrimitiveTopology.TriangleList,
             DepthEnabled=false
         });
+    }
+
+    private readonly record struct SurfaceRect(float X, float Y, float Width, float Height)
+    {
+        public SurfaceRect Scale(float scale) =>
+            new(X * scale, Y * scale, Width * scale, Height * scale);
     }
 
     [StructLayout(LayoutKind.Sequential)]

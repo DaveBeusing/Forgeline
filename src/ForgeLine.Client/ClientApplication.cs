@@ -74,20 +74,74 @@ internal sealed class ClientApplication
 
         using IWindow window = _platform.CreateWindow(configuration);
 
+        var frontendShell = new GameFrontendShell();
+        var frontendLoading = new FrontendLoadingController();
+        var bootstrapTarget =
+            new GraphicsWindowTarget(
+                window.NativeHandle.Value,
+                window.ClientSize.Width,
+                window.ClientSize.Height,
+                window.IsMinimized ||
+                window.ClientSize.IsEmpty);
+
         var snapshotBuffer =
             new PresentationSnapshotBuffer();
         var newGame =
             new NewGameModel();
         using var jobScheduler =
             new JobScheduler();
-        VerticalSliceRuntimeSettings runtimeSettings =
-            VerticalSliceRuntimeSettings.CreateClient(
-                jobScheduler,
-                seed: newGame.Configuration.Seed);
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
-                runtimeSettings);
 
+        VerticalSliceRuntimeSettings runtimeSettings;
+        VerticalSliceScenario scenario;
+        RuntimeAssetCatalog? runtimeAssets;
+
+        using (var bootRenderer =
+            new ClientFrontendRenderHost(bootstrapTarget))
+        {
+            frontendLoading.BeginPhase(
+                FrontendLoadingPhase.LoadingSettings,
+                "Settings validated");
+            bootRenderer.Publish(
+                FrontendPresentationAdapter.Loading(
+                    frontendLoading.State));
+            PumpBootFrame(window, bootRenderer);
+
+            runtimeSettings =
+                VerticalSliceRuntimeSettings.CreateClient(
+                    jobScheduler,
+                    seed: newGame.Configuration.Seed);
+
+            frontendLoading.BeginPhase(
+                FrontendLoadingPhase.LoadingAssets,
+                "Loading runtime assets");
+            bootRenderer.Publish(
+                FrontendPresentationAdapter.Loading(
+                    frontendLoading.State));
+            PumpBootFrame(window, bootRenderer);
+            runtimeAssets =
+                TryLoadRuntimeAssets();
+
+            frontendLoading.BeginPhase(
+                FrontendLoadingPhase.PreparingFrontend,
+                "Preparing battlefield");
+            bootRenderer.Publish(
+                FrontendPresentationAdapter.Loading(
+                    frontendLoading.State));
+            PumpBootFrame(window, bootRenderer);
+            scenario =
+                VerticalSliceScenario.Create(
+                    runtimeSettings);
+
+            frontendLoading.Complete(
+                "Command interface ready");
+            bootRenderer.Publish(
+                FrontendPresentationAdapter.Loading(
+                    frontendLoading.State));
+            PumpBootFrame(window, bootRenderer);
+        }
+
+        using (scenario)
+        {
         SimulationCoordinator simulation =
             scenario.Simulation;
         PrototypeBattlefieldDefinition prototypeBattlefield =
@@ -123,8 +177,6 @@ internal sealed class ClientApplication
                     scenario.Services.Weapons,
                 artilleryWeapons:
                     scenario.Services.ArtilleryWeapons);
-        RuntimeAssetCatalog? runtimeAssets =
-            TryLoadRuntimeAssets();
         var presentationExtraction =
             new PresentationExtractionContext(
                 scenario,
@@ -218,10 +270,6 @@ internal sealed class ClientApplication
         bool pauseHeld = false;
         bool helpHeld = false;
         bool matchSetupActive = !smokeTest;
-        var frontendShell = new GameFrontendShell();
-        var frontendLoading = new FrontendLoadingController();
-        frontendLoading.BeginPhase(FrontendLoadingPhase.PreparingFrontend, "Preparing command interface");
-        frontendLoading.Complete();
         frontendShell.Dispatch(GameFrontendAction.LoadingCompleted);
         var mainMenu = new MainMenuModel(hasValidContinueTarget: false);
         bool userPaused = false;
@@ -514,7 +562,7 @@ internal sealed class ClientApplication
                         _settings.UiScale,
                         preAlphaUx,
                         matchSetupActive
-                            ? FrontendRenderView.MainMenuView(mainMenu)
+                            ? FrontendPresentationAdapter.MainMenu(mainMenu)
                             : null));
 
                 if (shouldPauseForWindow)
@@ -845,6 +893,8 @@ internal sealed class ClientApplication
                 visualQualificationOutput,
                 renderInstanceCount,
                 renderHost.LatestQualification);
+        }
+
         }
 
         return 0;
@@ -1674,6 +1724,21 @@ internal sealed class ClientApplication
             $"building={buildingPlacementController.ActiveBuilding} " +
             $"orientation={buildingPlacementController.Orientation} " +
             $"previewFreshness={buildingPlacementController.PreviewFreshness}");
+    }
+
+    private void PumpBootFrame(
+        IWindow window,
+        ClientFrontendRenderHost renderer)
+    {
+        if (!_platform.PumpEvents())
+        {
+            return;
+        }
+
+        DrainWindowEvents(window);
+        renderer.ThrowIfFaulted();
+        _platform.WaitForEvents(
+            IdleWait);
     }
 
     private static void DrainCommandResults(
