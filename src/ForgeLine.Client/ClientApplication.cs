@@ -267,12 +267,16 @@ internal sealed class ClientApplication
         bool setupStartHeld = false;
         bool frontendUpHeld = false;
         bool frontendDownHeld = false;
+        bool frontendLeftHeld = false;
+        bool frontendRightHeld = false;
         bool pauseHeld = false;
         bool helpHeld = false;
         bool matchSetupActive = !smokeTest;
         frontendShell.Dispatch(GameFrontendAction.LoadingCompleted);
         var newGameScreen = new NewGameModel();
         var loadGameScreen = new LoadGameModel([]);
+        var settingsInteraction =
+            new SettingsInteractionModel();
         var settingsScreen =
             new SettingsModel(
                 new FrontendSettingsSnapshot(
@@ -407,6 +411,46 @@ internal sealed class ClientApplication
                     mainMenu.MoveNext();
                 }
             }
+
+            if (matchSetupActive &&
+                frontendShell.Screen == GameFrontendScreen.Settings)
+            {
+                if (ConsumeKeyPress(
+                        inputState,
+                        PlatformKey.Up,
+                        ref frontendUpHeld))
+                {
+                    settingsInteraction.MovePrevious();
+                }
+
+                if (ConsumeKeyPress(
+                        inputState,
+                        PlatformKey.Down,
+                        ref frontendDownHeld))
+                {
+                    settingsInteraction.MoveNext();
+                }
+
+                if (ConsumeKeyPress(
+                        inputState,
+                        PlatformKey.Left,
+                        ref frontendLeftHeld))
+                {
+                    settingsInteraction.Adjust(
+                        settingsScreen,
+                        -1);
+                }
+
+                if (ConsumeKeyPress(
+                        inputState,
+                        PlatformKey.Right,
+                        ref frontendRightHeld))
+                {
+                    settingsInteraction.Adjust(
+                        settingsScreen,
+                        1);
+                }
+            }
             bool pausePressed =
                 !matchSetupActive &&
                 ConsumeKeyPress(
@@ -474,6 +518,23 @@ internal sealed class ClientApplication
                     NewGameModel.Start());
                 matchSetupActive = false;
                 helpVisible = false;
+            }
+
+            if (matchSetupActive &&
+                setupStartPressed &&
+                frontendShell.Screen == GameFrontendScreen.Settings)
+            {
+                var settingsStore =
+                    new ClientSettingsStore(
+                        Path.GetDirectoryName(_settingsPath) ??
+                        AppContext.BaseDirectory);
+                var settingsAdapter =
+                    new ClientSettingsFrontendAdapter(
+                        settingsStore);
+                _ = settingsAdapter.Apply(
+                    settingsScreen);
+                frontendShell.Dispatch(
+                    SettingsModel.Back());
             }
 
             if (!inputMatchTerminal &&
@@ -585,7 +646,8 @@ internal sealed class ClientApplication
                                 mainMenu,
                                 newGameScreen,
                                 loadGameScreen,
-                                settingsScreen)
+                                settingsScreen,
+                                settingsInteraction)
                             : null));
 
                 if (shouldPauseForWindow)
@@ -1754,7 +1816,8 @@ internal sealed class ClientApplication
         MainMenuModel mainMenu,
         NewGameModel newGame,
         LoadGameModel loadGame,
-        SettingsModel settings) =>
+        SettingsModel settings,
+        SettingsInteractionModel settingsInteraction) =>
         screen switch
         {
             GameFrontendScreen.MainMenu =>
@@ -1768,7 +1831,8 @@ internal sealed class ClientApplication
                     loadGame),
             GameFrontendScreen.Settings =>
                 FrontendPresentationAdapter.Settings(
-                    settings),
+                    settings,
+                    settingsInteraction),
             GameFrontendScreen.Credits =>
                 FrontendPresentationAdapter.Credits(),
             _ =>
