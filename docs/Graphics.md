@@ -177,7 +177,7 @@ Startup diagnostics include:
 - swap-chain buffer count
 - present mode
 
-Runtime surface diagnostics expose current frame index and suspended state.
+Runtime surface diagnostics expose current dimensions, frame index, suspended/occluded state, pending-resize state, resize generations, submitted-frame count, and successful-Present count. The frame counters form a low-overhead qualification heartbeat: submitted frames show that command submission continues, while successful Presents distinguish an active presentation path from a renderer that is only producing GPU work.
 
 Present and resize failures include the HRESULT, D3D12 device-removed reason, and selected adapter name.
 
