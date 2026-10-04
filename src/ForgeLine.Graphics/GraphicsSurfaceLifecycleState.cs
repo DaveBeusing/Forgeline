@@ -71,8 +71,7 @@ internal sealed class GraphicsSurfaceLifecycleState
 
         if (HasPendingResize &&
             _pendingWidth == width &&
-            _pendingHeight == height &&
-            !IsSuspended)
+            _pendingHeight == height)
         {
             return false;
         }
@@ -80,7 +79,6 @@ internal sealed class GraphicsSurfaceLifecycleState
         _pendingWidth = width;
         _pendingHeight = height;
         HasPendingResize = true;
-        IsSuspended = false;
         ResizeGeneration++;
         return true;
     }
