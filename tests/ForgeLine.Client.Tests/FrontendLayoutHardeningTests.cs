@@ -63,7 +63,7 @@ public sealed class FrontendLayoutHardeningTests
             new MainMenuModel(false);
 
         Assert.Equal(
-            MainMenuModel.NewGameId,
+            "new-game",
             FrontendHitTesting.MainMenu(
                 320 + 100,
                 350,
@@ -89,7 +89,7 @@ public sealed class FrontendLayoutHardeningTests
                                 $"save-{index}",
                                 $"SAVE {index}",
                                 $"save-{index}.save.json",
-                                index,
+                                (ulong)index,
                                 LoadGameEntryState.Available)));
 
         model.Focus(10);
