@@ -7,6 +7,7 @@ using ForgeLine.Economy;
 using ForgeLine.Game;
 using ForgeLine.Graphics;
 using ForgeLine.Input;
+using ForgeLine.UI;
 using ForgeLine.Intelligence;
 using ForgeLine.Jobs;
 using ForgeLine.Logistics;
@@ -75,11 +76,14 @@ internal sealed class ClientApplication
 
         var snapshotBuffer =
             new PresentationSnapshotBuffer();
+        var newGame =
+            new NewGameModel();
         using var jobScheduler =
             new JobScheduler();
         VerticalSliceRuntimeSettings runtimeSettings =
             VerticalSliceRuntimeSettings.CreateClient(
-                jobScheduler);
+                jobScheduler,
+                seed: newGame.Configuration.Seed);
         using VerticalSliceScenario scenario =
             VerticalSliceScenario.Create(
                 runtimeSettings);

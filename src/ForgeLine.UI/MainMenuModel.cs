@@ -44,9 +44,9 @@ public sealed class MainMenuModel
             _items.Where(static item => item.IsEnabled).Select(static item => item.Id));
     }
 
-    public string ProductName => FrontendLoadingController.ProductName;
+    public static string ProductName => FrontendLoadingController.ProductName;
 
-    public string Tagline => FrontendLoadingController.Tagline;
+    public static string Tagline => FrontendLoadingController.Tagline;
 
     public IReadOnlyList<MainMenuItem> Items => _items;
 
