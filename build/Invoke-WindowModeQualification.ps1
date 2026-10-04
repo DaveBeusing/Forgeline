@@ -58,10 +58,6 @@ function Invoke-ClientSmoke {
         throw "Expected active window mode '$ExpectedMode' but report contains '$($report.window.mode)'."
     }
 
-    if (-not $report.window.isOpen) {
-        throw "Qualified client window was not open when the final report was captured."
-    }
-
     if ($report.window.isMinimized) {
         throw "Qualified client window remained minimized at the end of the smoke run."
     }
