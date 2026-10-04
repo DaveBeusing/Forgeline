@@ -10,6 +10,45 @@ public static class FrontendDesign
     public const float PanelGap = 24f;
     public const float ControlHeight = 56f;
     public const float FocusStroke = 2f;
+    public const int MaximumVisibleDetailRows = 7;
+    public const int MaximumDetailTextLength = 34;
+
+    public static FrontendLayout ResolveLayout(
+        float viewportWidth,
+        float viewportHeight,
+        float userScale = 1f)
+    {
+        float scale =
+            ResolveScale(
+                viewportWidth,
+                viewportHeight,
+                userScale);
+        float contentWidth =
+            ReferenceWidth * scale;
+        float contentHeight =
+            ReferenceHeight * scale;
+
+        return new FrontendLayout(
+            scale,
+            MathF.Max(0f, (viewportWidth - contentWidth) * 0.5f),
+            MathF.Max(0f, (viewportHeight - contentHeight) * 0.5f),
+            contentWidth,
+            contentHeight);
+    }
+
+    public static string FitText(
+        string value,
+        int maximumLength = MaximumDetailTextLength)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        ArgumentOutOfRangeException.ThrowIfLessThan(maximumLength, 4);
+
+        return value.Length <= maximumLength
+            ? value
+            : string.Concat(
+                value.AsSpan(0, maximumLength - 3),
+                "...");
+    }
 
     public static float ResolveScale(float viewportWidth, float viewportHeight, float userScale = 1f)
     {
@@ -21,6 +60,13 @@ public static class FrontendDesign
         return Math.Clamp(viewportScale * userScale, MinimumScale, MaximumScale);
     }
 }
+
+public readonly record struct FrontendLayout(
+    float Scale,
+    float OffsetX,
+    float OffsetY,
+    float ContentWidth,
+    float ContentHeight);
 
 public readonly record struct FrontendRect(float X, float Y, float Width, float Height)
 {
