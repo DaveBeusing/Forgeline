@@ -1806,6 +1806,222 @@ internal sealed class ClientApplication
             $"previewFreshness={buildingPlacementController.PreviewFreshness}");
     }
 
+    private ClientSessionRequest RunFrontendSessionSelection(
+        IWindow window,
+        GameFrontendShell shell,
+        NewGameModel newGame,
+        RuntimeAssetCatalog? runtimeAssets)
+    {
+        shell.Dispatch(
+            GameFrontendAction.LoadingCompleted);
+
+        string saveDirectory =
+            Path.Combine(
+                Environment.GetFolderPath(
+                    Environment.SpecialFolder.LocalApplicationData),
+                "FORGELINE",
+                "Saves");
+        var loadGame =
+            new LoadGameModel(
+                ClientSaveCatalog.Discover(
+                    saveDirectory));
+        var settingsInteraction =
+            new SettingsInteractionModel();
+        var settings =
+            new SettingsModel(
+                new FrontendSettingsSnapshot(
+                    _settings.WindowWidth,
+                    _settings.WindowHeight,
+                    _settings.BorderlessFullscreen,
+                    _settings.UiScale,
+                    _settings.ShowOnboarding,
+                    _settings.EdgeScrollEnabled,
+                    _settings.CameraPanSpeedMultiplier,
+                    _settings.CameraBindings));
+        var mainMenu =
+            new MainMenuModel(
+                loadGame.CanContinue);
+        var input = new InputState();
+        bool enterHeld = false;
+        bool escapeHeld = false;
+        bool upHeld = false;
+        bool downHeld = false;
+        bool leftHeld = false;
+        bool rightHeld = false;
+
+        var target =
+            new GraphicsWindowTarget(
+                window.NativeHandle.Value,
+                window.ClientSize.Width,
+                window.ClientSize.Height,
+                window.IsMinimized ||
+                window.ClientSize.IsEmpty);
+        using var renderer =
+            new ClientFrontendRenderHost(target);
+
+        while (window.IsOpen)
+        {
+            input.BeginFrame();
+            if (!_platform.PumpEvents())
+            {
+                throw new OperationCanceledException(
+                    "Frontend session selection was closed.");
+            }
+
+            DrainWindowEvents(window);
+            DrainInputEvents(window, input);
+
+            bool enter =
+                ConsumeKeyPress(
+                    input,
+                    PlatformKey.Enter,
+                    ref enterHeld);
+            bool escape =
+                ConsumeKeyPress(
+                    input,
+                    PlatformKey.Escape,
+                    ref escapeHeld);
+
+            if (shell.Screen == GameFrontendScreen.MainMenu)
+            {
+                if (ConsumeKeyPress(
+                        input,
+                        PlatformKey.Up,
+                        ref upHeld))
+                {
+                    mainMenu.MovePrevious();
+                }
+
+                if (ConsumeKeyPress(
+                        input,
+                        PlatformKey.Down,
+                        ref downHeld))
+                {
+                    mainMenu.MoveNext();
+                }
+
+                if (enter)
+                {
+                    GameFrontendAction action =
+                        mainMenu.ActivateFocused();
+
+                    if (action == GameFrontendAction.Exit)
+                    {
+                        window.RequestClose();
+                        continue;
+                    }
+
+                    if (action == GameFrontendAction.LoadGame &&
+                        loadGame.CanContinue)
+                    {
+                        if (loadGame.TryGetLoadTarget(
+                                loadGame.ContinueTarget!.Id,
+                                out LoadGameEntry targetSave))
+                        {
+                            return ClientSessionRequest.Load(
+                                targetSave);
+                        }
+                    }
+
+                    shell.Dispatch(action);
+                }
+            }
+            else if (shell.Screen == GameFrontendScreen.NewGame &&
+                     enter)
+            {
+                return ClientSessionRequest.NewGame(
+                    newGame.Configuration.Seed);
+            }
+            else if (shell.Screen == GameFrontendScreen.Settings)
+            {
+                if (ConsumeKeyPress(
+                        input,
+                        PlatformKey.Up,
+                        ref upHeld))
+                {
+                    settingsInteraction.MovePrevious();
+                }
+
+                if (ConsumeKeyPress(
+                        input,
+                        PlatformKey.Down,
+                        ref downHeld))
+                {
+                    settingsInteraction.MoveNext();
+                }
+
+                if (ConsumeKeyPress(
+                        input,
+                        PlatformKey.Left,
+                        ref leftHeld))
+                {
+                    settingsInteraction.Adjust(
+                        settings,
+                        -1);
+                }
+
+                if (ConsumeKeyPress(
+                        input,
+                        PlatformKey.Right,
+                        ref rightHeld))
+                {
+                    settingsInteraction.Adjust(
+                        settings,
+                        1);
+                }
+
+                if (enter)
+                {
+                    string settingsDirectory =
+                        Path.GetDirectoryName(_settingsPath) ??
+                        throw new InvalidOperationException(
+                            "Settings path must have a directory.");
+                    string settingsRoot =
+                        Directory.GetParent(settingsDirectory)?.FullName ??
+                        settingsDirectory;
+                    var adapter =
+                        new ClientSettingsFrontendAdapter(
+                            new ClientSettingsStore(
+                                settingsRoot));
+                    ClientUserSettings applied =
+                        adapter.Apply(settings);
+                    shell.Dispatch(
+                        SettingsModel.Back());
+
+                    if (applied.WindowWidth != _settings.WindowWidth ||
+                        applied.WindowHeight != _settings.WindowHeight ||
+                        applied.BorderlessFullscreen !=
+                            _settings.BorderlessFullscreen)
+                    {
+                        throw new ClientRestartRequestedException();
+                    }
+                }
+            }
+
+            if (escape &&
+                shell.Screen != GameFrontendScreen.MainMenu)
+            {
+                shell.Dispatch(
+                    GameFrontendAction.Back);
+            }
+
+            renderer.Publish(
+                CreateFrontendSurface(
+                    shell.Screen,
+                    mainMenu,
+                    newGame,
+                    loadGame,
+                    settings,
+                    settingsInteraction));
+            renderer.ThrowIfFaulted();
+            _platform.WaitForEvents(
+                IdleWait);
+        }
+
+        throw new OperationCanceledException(
+            "Frontend session selection was closed.");
+    }
+
     private static FrontendSurfaceView CreateFrontendSurface(
         GameFrontendScreen screen,
         MainMenuModel mainMenu,
