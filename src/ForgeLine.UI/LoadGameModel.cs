@@ -49,6 +49,17 @@ public sealed class LoadGameModel
             ? null
             : _entries[_focusedIndex];
 
+    public LoadGameEntry? Focus(int index)
+    {
+        if ((uint)index >= (uint)_entries.Length)
+        {
+            return null;
+        }
+
+        _focusedIndex = index;
+        return FocusedEntry;
+    }
+
     public LoadGameEntry? MoveNext()
     {
         if (_entries.Length == 0)
