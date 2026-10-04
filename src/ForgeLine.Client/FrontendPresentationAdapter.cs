@@ -99,35 +99,14 @@ internal static class FrontendPresentationAdapter
     }
 
     private static LoadGameEntry[] ResolveVisibleSaves(
-        LoadGameModel model)
-    {
-        LoadGameEntry[] entries =
-            model.Entries.ToArray();
-        if (entries.Length <= FrontendDesign.MaximumVisibleDetailRows)
-        {
-            return entries;
-        }
-
-        int focusedIndex =
-            Array.FindIndex(
-                entries,
-                entry =>
-                    model.FocusedEntry is LoadGameEntry focused &&
-                    string.Equals(
-                        entry.Id,
-                        focused.Id,
-                        StringComparison.Ordinal));
-        int start =
-            Math.Clamp(
-                focusedIndex - FrontendDesign.MaximumVisibleDetailRows / 2,
-                0,
-                entries.Length - FrontendDesign.MaximumVisibleDetailRows);
-
-        return entries
-            .Skip(start)
-            .Take(FrontendDesign.MaximumVisibleDetailRows)
+        LoadGameModel model) =>
+        model.Entries
+            .Skip(
+                model.VisibleStartIndex(
+                    FrontendDesign.MaximumVisibleDetailRows))
+            .Take(
+                FrontendDesign.MaximumVisibleDetailRows)
             .ToArray();
-    }
 
     internal static FrontendSurfaceView Settings(
         SettingsModel model,
