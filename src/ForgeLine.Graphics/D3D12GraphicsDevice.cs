@@ -31,6 +31,8 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
 
     private ID3D12Resource? _depthTarget;
     private ulong _nextFenceValue = 1;
+    private ulong _submittedFrameCount;
+    private ulong _presentedFrameCount;
     private int _frameIndex;
     private bool _disposed;
 
@@ -158,7 +160,9 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                     _surfaceLifecycle.IsOccluded,
                     _surfaceLifecycle.HasPendingResize,
                     _surfaceLifecycle.ResizeGeneration,
-                    _surfaceLifecycle.AppliedResizeGeneration));
+                    _surfaceLifecycle.AppliedResizeGeneration,
+                    _submittedFrameCount,
+                    _presentedFrameCount));
         }
     }
 
@@ -386,6 +390,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         _commandList.Close();
 
         _commandQueue.ExecuteCommandList(_commandList);
+        _submittedFrameCount++;
 
         var presentResult = _swapChain.Present(
             _configuration.EnableVSync ? 1u : 0u,
@@ -414,6 +419,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         else
         {
             _ = _surfaceLifecycle.MarkPresentable();
+            _presentedFrameCount++;
         }
 
         SignalSubmittedFrame();
