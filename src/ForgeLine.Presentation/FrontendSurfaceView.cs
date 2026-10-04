@@ -16,7 +16,10 @@ public readonly record struct FrontendMenuEntryView(
 public readonly record struct FrontendDetailLineView(
     string Label,
     string Value,
-    bool IsWarning = false);
+    bool IsWarning = false,
+    bool IsFocused = false,
+    bool CanDecrease = false,
+    bool CanIncrease = false);
 
 public readonly record struct FrontendSurfaceView(
     FrontendSurfaceKind Kind,
@@ -26,7 +29,9 @@ public readonly record struct FrontendSurfaceView(
     float Progress,
     IReadOnlyList<FrontendMenuEntryView> MenuEntries,
     IReadOnlyList<FrontendDetailLineView> DetailLines,
-    string Footer)
+    string Footer,
+    string PrimaryAction = "",
+    string SecondaryAction = "BACK")
 {
     public static FrontendSurfaceView Loading(
         string status,
