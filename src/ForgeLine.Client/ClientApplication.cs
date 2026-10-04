@@ -1771,11 +1771,13 @@ internal sealed class ClientApplication
                         transitionStarted).TotalMilliseconds / 140f,
                     0f,
                     1f);
-            float frontendScale =
-                FrontendDesign.ResolveScale(
+            FrontendLayout frontendLayout =
+                FrontendDesign.ResolveLayout(
                     window.ClientSize.Width,
                     window.ClientSize.Height,
                     _settings.UiScale);
+            float frontendScale =
+                frontendLayout.Scale;
 
             if (shell.Screen == GameFrontendScreen.MainMenu)
             {
@@ -1785,7 +1787,7 @@ internal sealed class ClientApplication
                         FrontendHitTesting.MainMenu(
                             input.PointerPosition.X,
                             input.PointerPosition.Y,
-                            frontendScale,
+                            frontendLayout,
                             mainMenu.Items);
                     if (hoveredId is not null)
                     {
@@ -1814,7 +1816,7 @@ internal sealed class ClientApplication
                      FrontendHitTesting.MainMenu(
                          input.PointerPosition.X,
                          input.PointerPosition.Y,
-                         frontendScale,
+                            frontendLayout,
                          mainMenu.Items) is not null))
                 {
                     GameFrontendAction action =
@@ -1872,7 +1874,7 @@ internal sealed class ClientApplication
                     FrontendHitTesting.DetailAdjust(
                         input.PointerPosition.X,
                         input.PointerPosition.Y,
-                        frontendScale,
+                            frontendLayout,
                         3) is int seedDirection)
                 {
                     newGame.SetSeed(
@@ -1891,7 +1893,7 @@ internal sealed class ClientApplication
                      FrontendHitTesting.PrimaryAction(
                          input.PointerPosition.X,
                          input.PointerPosition.Y,
-                         frontendScale)))
+                        frontendLayout)))
                 {
                     return FrontendSessionSelectionResult.Start(
                         ClientSessionRequest.NewGame(
@@ -1904,7 +1906,7 @@ internal sealed class ClientApplication
                     FrontendHitTesting.DetailRow(
                         input.PointerPosition.X,
                         input.PointerPosition.Y,
-                        frontendScale,
+                            frontendLayout,
                         loadGame.Entries.Count) is int saveRow)
                 {
                     loadGame.Focus(saveRow);
@@ -1931,7 +1933,7 @@ internal sealed class ClientApplication
                     FrontendHitTesting.PrimaryAction(
                         input.PointerPosition.X,
                         input.PointerPosition.Y,
-                        frontendScale);
+                        frontendLayout);
 
                 if (enter || loadActionClicked)
                 {
@@ -1953,7 +1955,7 @@ internal sealed class ClientApplication
                     FrontendHitTesting.DetailRow(
                         input.PointerPosition.X,
                         input.PointerPosition.Y,
-                        frontendScale,
+                            frontendLayout,
                         6) is int settingsRow &&
                     settingsRow > 0)
                 {
@@ -1964,7 +1966,7 @@ internal sealed class ClientApplication
                         FrontendHitTesting.DetailAdjust(
                             input.PointerPosition.X,
                             input.PointerPosition.Y,
-                            frontendScale,
+                            frontendLayout,
                             6) is int settingsDirection)
                     {
                         settingsInteraction.Adjust(
@@ -2014,7 +2016,7 @@ internal sealed class ClientApplication
                     FrontendHitTesting.PrimaryAction(
                         input.PointerPosition.X,
                         input.PointerPosition.Y,
-                        frontendScale);
+                        frontendLayout);
 
                 if (enter || applyClicked)
                 {
@@ -2050,11 +2052,11 @@ internal sealed class ClientApplication
                   (FrontendHitTesting.SecondaryAction(
                        input.PointerPosition.X,
                        input.PointerPosition.Y,
-                       frontendScale) ||
+                        frontendLayout) ||
                    FrontendHitTesting.Footer(
                        input.PointerPosition.X,
                        input.PointerPosition.Y,
-                       frontendScale)))) &&
+                        frontendLayout)))) &&
                 shell.Screen != GameFrontendScreen.MainMenu)
             {
                 shell.Dispatch(
@@ -2076,13 +2078,13 @@ internal sealed class ClientApplication
                     FrontendHitTesting.PrimaryAction(
                         input.PointerPosition.X,
                         input.PointerPosition.Y,
-                        frontendScale) &&
+                        frontendLayout) &&
                     !string.IsNullOrEmpty(surface.PrimaryAction);
                 bool secondaryHovered =
                     FrontendHitTesting.SecondaryAction(
                         input.PointerPosition.X,
                         input.PointerPosition.Y,
-                        frontendScale) &&
+                        frontendLayout) &&
                     !string.IsNullOrEmpty(surface.SecondaryAction);
                 surface =
                     surface.WithInteraction(
