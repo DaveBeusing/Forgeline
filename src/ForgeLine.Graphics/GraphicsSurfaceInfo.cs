@@ -10,4 +10,6 @@ public readonly record struct GraphicsSurfaceInfo(
     bool IsOccluded = false,
     bool ResizePending = false,
     ulong ResizeGeneration = 0,
-    ulong AppliedResizeGeneration = 0);
+    ulong AppliedResizeGeneration = 0,
+    ulong SubmittedFrameCount = 0,
+    ulong PresentedFrameCount = 0);
