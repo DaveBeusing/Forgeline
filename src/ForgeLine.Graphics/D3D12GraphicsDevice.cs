@@ -577,6 +577,9 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             $"generation={request.Generation} phase=synchronize");
 
         WaitForIdle();
+        Console.WriteLine(
+            $"[graphics:resize-synchronized] generation={request.Generation} " +
+            $"completedFence={_frameFence.CompletedValue}");
         ReleaseRenderTargets();
 
         var resizeResult =
