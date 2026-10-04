@@ -79,7 +79,25 @@ public sealed class FrontendOverlayRenderer : IDisposable
                 EmitText(item.Label, 104 * scale, y, textColor, context.Width, context.Height, scale);
                 y += 72 * scale;
             }
-            EmitText("ENTER  SELECT     UP/DOWN  NAVIGATE", 94 * scale, 930 * scale, new Vector4(0.40f, 0.44f, 0.40f, 1), context.Width, context.Height, scale);
+            EmitText(view.Footer, 94 * scale, 930 * scale, new Vector4(0.40f, 0.44f, 0.40f, 1), context.Width, context.Height, scale);
+        }
+        else if (view.Kind == FrontendSurfaceKind.Detail)
+        {
+            EmitText(view.Title, 94 * scale, 286 * scale, new Vector4(0.95f, 0.72f, 0.22f, 1), context.Width, context.Height, scale);
+            EmitPanel(new SurfaceRect(92 * scale, 330 * scale, 980 * scale, 2 * scale), new Vector4(0.28f, 0.32f, 0.29f, 1), context.Width, context.Height);
+
+            float y = 390 * scale;
+            foreach (FrontendDetailLineView line in view.DetailLines)
+            {
+                Vector4 valueColor = line.IsWarning
+                    ? new Vector4(0.82f, 0.42f, 0.20f, 1)
+                    : new Vector4(0.78f, 0.80f, 0.74f, 1);
+                EmitText(line.Label, 104 * scale, y, new Vector4(0.45f, 0.50f, 0.45f, 1), context.Width, context.Height, scale);
+                EmitText(line.Value, 460 * scale, y, valueColor, context.Width, context.Height, scale);
+                y += 58 * scale;
+            }
+
+            EmitText(view.Footer, 94 * scale, 930 * scale, new Vector4(0.40f, 0.44f, 0.40f, 1), context.Width, context.Height, scale);
         }
 
         if (_vertexCount == 0)
