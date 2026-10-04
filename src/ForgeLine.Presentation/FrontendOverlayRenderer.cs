@@ -13,6 +13,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
     private const float GlyphAdvance = 18.0f;
     private const float LineAdvance = 24.0f;
 
+    private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers = new(4);
     private readonly OverlayVertex[] _vertices = new OverlayVertex[MaxVertices];
@@ -22,6 +23,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
     public FrontendOverlayRenderer(IGraphicsDevice graphics)
     {
         ArgumentNullException.ThrowIfNull(graphics);
+        _graphics = graphics;
         _pipeline = CreatePipeline(graphics);
     }
 
@@ -146,7 +148,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
     private IGraphicsBuffer GetFrameVertexBuffer(int frameIndex)
     {
         if (_vertexBuffers.TryGetValue(frameIndex, out IGraphicsBuffer? buffer)) return buffer;
-        buffer = _pipeline.Graphics.CreateBuffer(new GraphicsBufferDescription((ulong)(MaxVertices * VertexStride), GraphicsBufferMemory.Upload));
+        buffer = _graphics.CreateBuffer(new GraphicsBufferDescription((ulong)(MaxVertices * VertexStride), GraphicsBufferMemory.Upload));
         _vertexBuffers.Add(frameIndex, buffer);
         return buffer;
     }
