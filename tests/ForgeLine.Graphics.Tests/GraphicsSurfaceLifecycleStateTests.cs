@@ -86,7 +86,7 @@ public sealed class GraphicsSurfaceLifecycleStateTests
             state.RequestResize(
                 1_920,
                 1_080));
-        Assert.False(
+        Assert.True(
             state.IsSuspended);
         Assert.True(
             state.HasPendingResize);
