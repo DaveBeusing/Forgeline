@@ -1983,7 +1983,7 @@ internal sealed class ClientApplication
                       input.PointerPosition.X,
                       input.PointerPosition.Y,
                       frontendScale))) &&
-                shell.Screen != GameFrontendScreen.MainMenu
+                shell.Screen != GameFrontendScreen.MainMenu)
             {
                 shell.Dispatch(
                     GameFrontendAction.Back);
