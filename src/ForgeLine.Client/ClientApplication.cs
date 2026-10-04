@@ -524,17 +524,32 @@ internal sealed class ClientApplication
                 setupStartPressed &&
                 frontendShell.Screen == GameFrontendScreen.Settings)
             {
+                string settingsDirectory =
+                    Path.GetDirectoryName(_settingsPath) ??
+                    throw new InvalidOperationException(
+                        "Settings path must have a directory.");
+                string settingsRoot =
+                    Directory.GetParent(settingsDirectory)?.FullName ??
+                    settingsDirectory;
                 var settingsStore =
                     new ClientSettingsStore(
-                        Path.GetDirectoryName(_settingsPath) ??
-                        AppContext.BaseDirectory);
+                        settingsRoot);
                 var settingsAdapter =
                     new ClientSettingsFrontendAdapter(
                         settingsStore);
-                _ = settingsAdapter.Apply(
-                    settingsScreen);
+                ClientUserSettings applied =
+                    settingsAdapter.Apply(
+                        settingsScreen);
                 frontendShell.Dispatch(
                     SettingsModel.Back());
+
+                if (applied.WindowWidth != _settings.WindowWidth ||
+                    applied.WindowHeight != _settings.WindowHeight ||
+                    applied.BorderlessFullscreen !=
+                        _settings.BorderlessFullscreen)
+                {
+                    return RestartRequestedExitCode;
+                }
             }
 
             if (!inputMatchTerminal &&
