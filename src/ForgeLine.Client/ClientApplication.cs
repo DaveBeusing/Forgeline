@@ -213,9 +213,16 @@ internal sealed class ClientApplication
         bool restartHeld = false;
         bool returnHeld = false;
         bool setupStartHeld = false;
+        bool frontendUpHeld = false;
+        bool frontendDownHeld = false;
         bool pauseHeld = false;
         bool helpHeld = false;
         bool matchSetupActive = !smokeTest;
+        var frontendShell = new GameFrontendShell();
+        var frontendLoading = new FrontendLoadingController(frontendShell);
+        frontendLoading.BeginPhase(FrontendLoadingPhase.PreparingFrontend, "Preparing command interface");
+        frontendLoading.Complete();
+        var mainMenu = new MainMenuModel(hasValidContinueTarget: false);
         bool userPaused = false;
         bool helpVisible = false;
         FormationTemplate activeFormation =
@@ -316,6 +323,26 @@ internal sealed class ClientApplication
                     inputState,
                     PlatformKey.Enter,
                     ref setupStartHeld);
+
+            if (matchSetupActive &&
+                frontendShell.Screen == GameFrontendScreen.MainMenu)
+            {
+                if (ConsumeKeyPress(
+                        inputState,
+                        PlatformKey.Up,
+                        ref frontendUpHeld))
+                {
+                    mainMenu.MovePrevious();
+                }
+
+                if (ConsumeKeyPress(
+                        inputState,
+                        PlatformKey.Down,
+                        ref frontendDownHeld))
+                {
+                    mainMenu.MoveNext();
+                }
+            }
             bool pausePressed =
                 !matchSetupActive &&
                 ConsumeKeyPress(
@@ -354,12 +381,32 @@ internal sealed class ClientApplication
             }
 
             if (matchSetupActive &&
-                setupStartPressed)
+                setupStartPressed &&
+                frontendShell.Screen == GameFrontendScreen.MainMenu)
             {
-                matchSetupActive =
-                    false;
-                helpVisible =
-                    false;
+                GameFrontendAction action =
+                    mainMenu.ActivateFocused();
+                frontendShell.Dispatch(action);
+
+                if (action == GameFrontendAction.NewGame)
+                {
+                    frontendShell.Dispatch(
+                        NewGameModel.Start());
+                    matchSetupActive = false;
+                    helpVisible = false;
+                }
+                else if (action == GameFrontendAction.Exit)
+                {
+                    return 0;
+                }
+            }
+
+            if (matchSetupActive &&
+                returnPressed &&
+                frontendShell.Screen != GameFrontendScreen.MainMenu)
+            {
+                frontendShell.Dispatch(
+                    GameFrontendAction.Back);
             }
 
             if (!inputMatchTerminal &&
@@ -464,7 +511,10 @@ internal sealed class ClientApplication
                         window.Dpi,
                         default,
                         _settings.UiScale,
-                        preAlphaUx));
+                        preAlphaUx,
+                        matchSetupActive
+                            ? FrontendRenderView.MainMenuView(mainMenu)
+                            : null));
 
                 if (shouldPauseForWindow)
                 {
