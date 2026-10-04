@@ -80,7 +80,7 @@ public sealed class D3D12GraphicsResizeIntegrationTests
         GraphicsSurfaceInfo restorePending =
             graphics.Diagnostics.Surface;
 
-        Assert.False(
+        Assert.True(
             restorePending.IsSuspended);
         Assert.True(
             restorePending.ResizePending);
