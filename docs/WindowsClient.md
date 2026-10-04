@@ -30,16 +30,22 @@ ForgeLine.Client
     ↓
 WindowsPlatform / primary window
     ↓
-Direct3D 12 device
+Direct3D 12 device + frontend renderer
     ↓
-VerticalSliceScenario (shared Gameplay runtime)
+Boot/loading → Main Menu
+    ↓
+New Game / Continue / Load Game
+    ↓
+ClientSessionRequest
+    ↓
+Fresh VerticalSliceScenario or validated save restore
     ↓
 Presentation extraction + RTS input/camera
     ↓
-Client message/render loop
+Gameplay message/render loop
 ```
 
-The client creates one primary `FORGELINE` window with a 1600×900 requested client area. Direct3D 12 initialization consumes the existing opaque native-handle boundary immediately after window creation. The gameplay runtime then constructs the canonical battlefield, participants, simulation systems, navigation, cargo transport, logistics, intelligence, combat, and match objectives without referencing Windows or presentation types.
+The client creates one primary `FORGELINE` window with a 1600×900 requested client area. Direct3D 12 initialization consumes the existing opaque native-handle boundary immediately after window creation. The boot/loading surface and main menu run before any gameplay scenario is constructed. New Game creates a fresh scenario only after the player confirms the selected seed. Continue resolves the newest valid save, while Load Game restores the explicitly selected valid save through the existing persistence service. Corrupt and incompatible saves remain visible but cannot become session requests. The resulting gameplay runtime constructs or restores the canonical battlefield, participants, simulation systems, navigation, cargo transport, logistics, intelligence, combat, and match objectives without referencing Windows or presentation types.
 
 The client-provided scheduler remains client-owned. Disposing the shared scenario does not dispose it; the client host disposes it once after the scenario. A restart leaves the current loop through the existing restart result and creates a fresh runtime on the next application session, so old authoritative routes, inventories, controllers, snapshots, or orders are not reused.
 
@@ -120,9 +126,13 @@ Platform disposal
 
 Window and platform operations are thread-affine and must remain on the thread that created them.
 
-## Pre-Alpha Shell
+## Pre-Alpha Frontend
 
-A normal interactive launch opens an explicit match-setup state before gameplay. The current vertical slice exposes Central Divide, Directorate, and the Directorate computer opponent as the available configuration. Enter starts the match, Escape exits from setup, Space toggles player pause during gameplay, and F12 opens the controls/onboarding view.
+A normal interactive launch presents a visible boot/loading sequence followed by the FORGELINE main menu before gameplay exists. The frontend exposes Continue when a valid save is available, New Game, Load Game, Settings, Credits, and Exit. New Game currently exposes Central Divide, Directorate, and a configurable deterministic seed. Load Game discovers the existing save format, keeps corrupt or incompatible entries visible but disabled, and maintains a bounded visible save window around the current focus.
+
+The frontend supports keyboard and pointer navigation. Main-menu and detail focus, primary actions, Back, seed/settings adjustment, hover/pressed feedback, and short presentation-only screen-entry transitions all use the custom Direct3D 12 frontend path. The 1920×1080 reference surface is centered and safely scaled for 16:9, 16:10, ultrawide, and smaller windows; rendering and hit testing consume the same resolved safe-area layout.
+
+After a session begins, Space toggles player pause during gameplay and F12 opens the controls/onboarding view.
 
 Setup, explicit player pause, help, and minimized/zero-size window state all use the existing simulation-owner pause control transition. They are combined as pause reasons so restoring the window cannot resume a match that remains explicitly paused or has help open.
 

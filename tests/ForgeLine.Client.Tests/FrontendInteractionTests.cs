@@ -16,7 +16,7 @@ public sealed class FrontendInteractionTests
             FrontendHitTesting.MainMenu(
                 120,
                 502,
-                1.0f,
+                FrontendDesign.ResolveLayout(1920, 1080),
                 menu.Items);
 
         Assert.Equal("load-game", hit);
@@ -33,7 +33,7 @@ public sealed class FrontendInteractionTests
             FrontendHitTesting.MainMenu(
                 120,
                 350,
-                1.0f,
+                FrontendDesign.ResolveLayout(1920, 1080),
                 menu.Items);
 
         Assert.Null(hit);
