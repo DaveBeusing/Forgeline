@@ -662,7 +662,7 @@ internal sealed class ClientApplication
                 window.IsMinimized ||
                 window.ClientSize.IsEmpty;
             bool shellBlocksGameplay =
-                userPaused ||
+                pauseMenuActive ||
                 helpVisible;
             bool shouldPauseSimulation =
                 !inputMatchTerminal &&
@@ -683,12 +683,58 @@ internal sealed class ClientApplication
                     shouldPauseSimulation;
             }
 
+            if (pauseMenuCommand ==
+                PauseMenuCommand.ReturnToMenu)
+            {
+                return RestartRequestedExitCode;
+            }
+
+            if (pauseMenuCommand is
+                    PauseMenuCommand.SaveGame or
+                    PauseMenuCommand.SaveAndReturnToMenu)
+            {
+                if (!simulationHost.WaitForPauseState(
+                        paused: true,
+                        PauseTransitionTimeout))
+                {
+                    pauseMenuFeedback =
+                        "SAVE FAILED - PAUSE TIMEOUT";
+                }
+                else if (TrySaveCurrentMatch(
+                             scenario,
+                             saveDirectory,
+                             out pauseMenuFeedback) &&
+                         pauseMenuCommand ==
+                             PauseMenuCommand.SaveAndReturnToMenu)
+                {
+                    return RestartRequestedExitCode;
+                }
+            }
+
             if (shouldPauseForWindow ||
                 shellBlocksGameplay)
             {
                 actionPanel.Close();
                 tacticalTargetingController.Cancel();
                 debugDraw.Clear();
+
+                FrontendSurfaceView? frontendSurface =
+                    null;
+
+                if (pauseMenuActive)
+                {
+                    FrontendSurfaceView pauseSurface =
+                        FrontendPresentationAdapter.PauseMenu(
+                            pauseMenu);
+                    frontendSurface =
+                        pauseSurface.WithInteraction(
+                            pauseMenuFeedback,
+                            1f,
+                            false,
+                            false,
+                            false,
+                            false);
+                }
 
                 _ = renderHost.Publish(
                     new ClientRenderFrame(
@@ -710,7 +756,7 @@ internal sealed class ClientApplication
                         default,
                         _settings.UiScale,
                         preAlphaUx,
-                        null));
+                        frontendSurface));
 
                 if (shouldPauseForWindow)
                 {
