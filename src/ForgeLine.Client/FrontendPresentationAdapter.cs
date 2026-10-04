@@ -50,7 +50,7 @@ internal static class FrontendPresentationAdapter
                     model.Configuration.Seed.ToString(
                         System.Globalization.CultureInfo.InvariantCulture))
             ],
-            "ENTER  START MATCH     ESC  BACK");
+            "LEFT/RIGHT  CHANGE SEED     ENTER  START MATCH     ESC  BACK");
 
     internal static FrontendSurfaceView LoadGame(
         LoadGameModel model)
