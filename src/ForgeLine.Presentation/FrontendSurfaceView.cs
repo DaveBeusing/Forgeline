@@ -62,7 +62,9 @@ public readonly record struct FrontendSurfaceView(
     public static FrontendSurfaceView Detail(
         string title,
         IReadOnlyList<FrontendDetailLineView> lines,
-        string footer) =>
+        string footer,
+        string primaryAction = "",
+        string secondaryAction = "BACK") =>
         new(
             FrontendSurfaceKind.Detail,
             title,
@@ -71,5 +73,7 @@ public readonly record struct FrontendSurfaceView(
             0f,
             [],
             lines,
-            footer);
+            footer,
+            primaryAction,
+            secondaryAction);
 }
