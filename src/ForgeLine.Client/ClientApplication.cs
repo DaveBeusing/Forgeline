@@ -353,12 +353,21 @@ internal sealed class ClientApplication
         bool formationToggleHeld = false;
         bool strategicOverlayToggleHeld = false;
         bool minimapToggleHeld = false;
+        var pauseMenu =
+            new PauseMenuModel();
+        string saveDirectory =
+            ResolveSaveDirectory();
         bool restartHeld = false;
         bool returnHeld = false;
         bool pauseHeld = false;
         bool helpHeld = false;
-        bool userPaused = false;
+        bool pauseMenuUpHeld = false;
+        bool pauseMenuDownHeld = false;
+        bool pauseMenuEnterHeld = false;
+        bool pauseMenuPrimaryPointerHeld = false;
+        bool pauseMenuActive = false;
         bool helpVisible = false;
+        string pauseMenuFeedback = string.Empty;
         FormationTemplate activeFormation =
             FormationTemplate.Compact;
         bool simulationPaused = false;
@@ -451,7 +460,8 @@ internal sealed class ClientApplication
                 informationLayer.ToggleMinimap();
             }
 
-            if (ConsumeKeyPress(
+            if (!pauseMenuActive &&
+                ConsumeKeyPress(
                     inputState,
                     PlatformKey.F12,
                     ref helpHeld))
@@ -490,17 +500,126 @@ internal sealed class ClientApplication
                 inputExperience?.IsMatchComplete ==
                 true;
 
+            PauseMenuCommand? pauseMenuCommand =
+                null;
+
             if (!inputMatchTerminal &&
-                pausePressed)
+                (pausePressed ||
+                 returnPressed))
             {
-                userPaused =
-                    !userPaused;
+                pauseMenuActive =
+                    !pauseMenuActive;
+                pauseMenuFeedback =
+                    string.Empty;
+                helpVisible =
+                    false;
+            }
+
+            if (pauseMenuActive &&
+                !inputMatchTerminal)
+            {
+                FrontendLayout pauseLayout =
+                    FrontendDesign.ResolveLayout(
+                        window.ClientSize.Width,
+                        window.ClientSize.Height,
+                        _settings.UiScale);
+
+                if (inputState.HasPointerPosition)
+                {
+                    string? hoveredId =
+                        FrontendHitTesting.PauseMenu(
+                            inputState.PointerPosition.X,
+                            inputState.PointerPosition.Y,
+                            pauseLayout,
+                            pauseMenu.Items);
+
+                    if (hoveredId is not null)
+                    {
+                        pauseMenu.TryFocus(
+                            hoveredId);
+                    }
+                }
+
+                if (ConsumeKeyPress(
+                        inputState,
+                        PlatformKey.Up,
+                        ref pauseMenuUpHeld))
+                {
+                    pauseMenu.MovePrevious();
+                }
+
+                if (ConsumeKeyPress(
+                        inputState,
+                        PlatformKey.Down,
+                        ref pauseMenuDownHeld))
+                {
+                    pauseMenu.MoveNext();
+                }
+
+                bool pointerDown =
+                    inputState.IsMouseButtonDown(
+                        PlatformMouseButton.Left);
+                bool pointerPressed =
+                    pointerDown &&
+                    !pauseMenuPrimaryPointerHeld;
+                pauseMenuPrimaryPointerHeld =
+                    pointerDown;
+
+                bool activate =
+                    ConsumeKeyPress(
+                        inputState,
+                        PlatformKey.Enter,
+                        ref pauseMenuEnterHeld);
+
+                if (pointerPressed &&
+                    inputState.HasPointerPosition &&
+                    FrontendHitTesting.PauseMenu(
+                        inputState.PointerPosition.X,
+                        inputState.PointerPosition.Y,
+                        pauseLayout,
+                        pauseMenu.Items) is string clickedId)
+                {
+                    pauseMenu.TryFocus(
+                        clickedId);
+                    activate =
+                        true;
+                }
+
+                if (activate)
+                {
+                    pauseMenuCommand =
+                        pauseMenu.ActivateFocused();
+
+                    if (pauseMenuCommand ==
+                        PauseMenuCommand.Resume)
+                    {
+                        pauseMenuActive =
+                            false;
+                        pauseMenuFeedback =
+                            string.Empty;
+                    }
+                }
+            }
+            else
+            {
+                pauseMenuUpHeld =
+                    inputState.IsKeyDown(
+                        PlatformKey.Up);
+                pauseMenuDownHeld =
+                    inputState.IsKeyDown(
+                        PlatformKey.Down);
+                pauseMenuEnterHeld =
+                    inputState.IsKeyDown(
+                        PlatformKey.Enter);
+                pauseMenuPrimaryPointerHeld =
+                    inputState.IsMouseButtonDown(
+                        PlatformMouseButton.Left);
             }
 
             PreAlphaUxView preAlphaUx =
                 CreatePreAlphaUxView(
                     false,
-                    userPaused,
+                    false,
                     helpVisible,
                     _settings.ShowOnboarding &&
                     !smokeTest);
