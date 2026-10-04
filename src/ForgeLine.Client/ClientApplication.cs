@@ -1850,7 +1850,31 @@ internal sealed class ClientApplication
                             : newGame.Configuration.Seed + 1);
                 }
 
-                if (enter)
+                if (primaryPointerPressed &&
+                    input.HasPointerPosition &&
+                    FrontendHitTesting.DetailAdjust(
+                        input.PointerPosition.X,
+                        input.PointerPosition.Y,
+                        frontendScale,
+                        3) is int seedDirection)
+                {
+                    newGame.SetSeed(
+                        seedDirection < 0
+                            ? newGame.Configuration.Seed == 0
+                                ? 0
+                                : newGame.Configuration.Seed - 1
+                            : newGame.Configuration.Seed == ulong.MaxValue
+                                ? ulong.MaxValue
+                                : newGame.Configuration.Seed + 1);
+                }
+
+                if (enter ||
+                    (primaryPointerPressed &&
+                     input.HasPointerPosition &&
+                     FrontendHitTesting.PrimaryAction(
+                         input.PointerPosition.X,
+                         input.PointerPosition.Y,
+                         frontendScale)))
                 {
                     return FrontendSessionSelectionResult.Start(
                         ClientSessionRequest.NewGame(
@@ -1884,7 +1908,15 @@ internal sealed class ClientApplication
                     loadGame.MoveNext();
                 }
 
-                if ((enter || primaryPointerPressed) &&
+                bool loadActionClicked =
+                    primaryPointerPressed &&
+                    input.HasPointerPosition &&
+                    FrontendHitTesting.PrimaryAction(
+                        input.PointerPosition.X,
+                        input.PointerPosition.Y,
+                        frontendScale);
+
+                if ((enter || loadActionClicked) &&
                     loadGame.TryGetFocusedLoadTarget(
                         out LoadGameEntry selectedSave))
                 {
@@ -1906,11 +1938,16 @@ internal sealed class ClientApplication
                     settingsInteraction.Focus(
                         (FrontendSettingsField)settingsRow);
 
-                    if (primaryPointerPressed)
+                    if (primaryPointerPressed &&
+                        FrontendHitTesting.DetailAdjust(
+                            input.PointerPosition.X,
+                            input.PointerPosition.Y,
+                            frontendScale,
+                            6) is int settingsDirection)
                     {
                         settingsInteraction.Adjust(
                             settings,
-                            1);
+                            settingsDirection);
                     }
                 }
                 if (ConsumeKeyPress(
@@ -1949,7 +1986,15 @@ internal sealed class ClientApplication
                         1);
                 }
 
-                if (enter)
+                bool applyClicked =
+                    primaryPointerPressed &&
+                    input.HasPointerPosition &&
+                    FrontendHitTesting.PrimaryAction(
+                        input.PointerPosition.X,
+                        input.PointerPosition.Y,
+                        frontendScale);
+
+                if (enter || applyClicked)
                 {
                     string settingsDirectory =
                         Path.GetDirectoryName(_settingsPath) ??
@@ -1980,10 +2025,14 @@ internal sealed class ClientApplication
             if ((escape ||
                  (primaryPointerPressed &&
                   input.HasPointerPosition &&
-                  FrontendHitTesting.Footer(
-                      input.PointerPosition.X,
-                      input.PointerPosition.Y,
-                      frontendScale))) &&
+                  (FrontendHitTesting.SecondaryAction(
+                       input.PointerPosition.X,
+                       input.PointerPosition.Y,
+                       frontendScale) ||
+                   FrontendHitTesting.Footer(
+                       input.PointerPosition.X,
+                       input.PointerPosition.Y,
+                       frontendScale)))) &&
                 shell.Screen != GameFrontendScreen.MainMenu)
             {
                 shell.Dispatch(
