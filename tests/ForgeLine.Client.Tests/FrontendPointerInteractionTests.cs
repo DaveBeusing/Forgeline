@@ -49,12 +49,12 @@ public sealed class FrontendPointerInteractionTests
             FrontendHitTesting.Footer(
                 200,
                 930,
-                1.0f));
+                FrontendDesign.ResolveLayout(1920, 1080)));
         Assert.False(
             FrontendHitTesting.Footer(
                 200,
                 700,
-                1.0f));
+                FrontendDesign.ResolveLayout(1920, 1080)));
     }
 
     [Fact]
