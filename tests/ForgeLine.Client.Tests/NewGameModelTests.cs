@@ -45,7 +45,7 @@ public sealed class NewGameModelTests
 
         shell.Dispatch(GameFrontendAction.LoadingCompleted);
         shell.Dispatch(GameFrontendAction.NewGame);
-        shell.Dispatch(model.Start());
+        shell.Dispatch(NewGameModel.Start());
 
         Assert.Equal(GameFrontendScreen.InGame, shell.Screen);
         Assert.True(shell.IsGameplayActive);
