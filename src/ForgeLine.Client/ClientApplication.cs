@@ -1776,8 +1776,6 @@ internal sealed class ClientApplication
                     window.ClientSize.Width,
                     window.ClientSize.Height,
                     _settings.UiScale);
-            float frontendScale =
-                frontendLayout.Scale;
 
             if (shell.Screen == GameFrontendScreen.MainMenu)
             {
