@@ -34,7 +34,7 @@ internal static class ClientSessionFactory
 {
     internal static VerticalSliceScenario Create(
         ClientSessionRequest request,
-        IJobScheduler jobScheduler) =>
+        JobScheduler jobScheduler) =>
         request.Kind switch
         {
             ClientSessionRequestKind.NewGame =>
