@@ -384,20 +384,23 @@ internal static class TextureImporter
         int count =
             0;
 
-        VisitSourcePixels(
-            source,
-            left,
-            top,
-            right,
-            bottom,
-            (pixels, offset) =>
+        for (int y = top; y < bottom; y++)
+        {
+            for (int x = left; x < right; x++)
             {
-                sums[0] += pixels[offset];
-                sums[1] += pixels[offset + 1];
-                sums[2] += pixels[offset + 2];
-                sums[3] += pixels[offset + 3];
+                int offset =
+                    checked(
+                        (y *
+                         source.Width +
+                         x) *
+                        4);
+                sums[0] += source.Pixels[offset];
+                sums[1] += source.Pixels[offset + 1];
+                sums[2] += source.Pixels[offset + 2];
+                sums[3] += source.Pixels[offset + 3];
                 count++;
-            });
+            }
+        }
 
         for (int channel = 0; channel < 4; channel++)
         {
@@ -424,27 +427,30 @@ internal static class TextureImporter
         int count =
             0;
 
-        VisitSourcePixels(
-            source,
-            left,
-            top,
-            right,
-            bottom,
-            (pixels, offset) =>
+        for (int y = top; y < bottom; y++)
+        {
+            for (int x = left; x < right; x++)
             {
+                int offset =
+                    checked(
+                        (y *
+                         source.Width +
+                         x) *
+                        4);
                 linearSums[0] +=
                     SrgbToLinear(
-                        pixels[offset]);
+                        source.Pixels[offset]);
                 linearSums[1] +=
                     SrgbToLinear(
-                        pixels[offset + 1]);
+                        source.Pixels[offset + 1]);
                 linearSums[2] +=
                     SrgbToLinear(
-                        pixels[offset + 2]);
+                        source.Pixels[offset + 2]);
                 alphaSum +=
-                    pixels[offset + 3];
+                    source.Pixels[offset + 3];
                 count++;
-            });
+            }
+        }
 
         destination[destinationOffset] =
             LinearToSrgbByte(
@@ -481,27 +487,30 @@ internal static class TextureImporter
         int count =
             0;
 
-        VisitSourcePixels(
-            source,
-            left,
-            top,
-            right,
-            bottom,
-            (pixels, offset) =>
+        for (int sourceY = top; sourceY < bottom; sourceY++)
+        {
+            for (int sourceX = left; sourceX < right; sourceX++)
             {
+                int offset =
+                    checked(
+                        (sourceY *
+                         source.Width +
+                         sourceX) *
+                        4);
                 x +=
                     DecodeNormalChannel(
-                        pixels[offset]);
+                        source.Pixels[offset]);
                 y +=
                     DecodeNormalChannel(
-                        pixels[offset + 1]);
+                        source.Pixels[offset + 1]);
                 z +=
                     DecodeNormalChannel(
-                        pixels[offset + 2]);
+                        source.Pixels[offset + 2]);
                 alphaSum +=
-                    pixels[offset + 3];
+                    source.Pixels[offset + 3];
                 count++;
-            });
+            }
+        }
 
         double length =
             Math.Sqrt(
@@ -549,19 +558,22 @@ internal static class TextureImporter
         Span<long> sums =
             stackalloc long[4];
 
-        VisitSourcePixels(
-            source,
-            left,
-            top,
-            right,
-            bottom,
-            (pixels, offset) =>
+        for (int y = top; y < bottom; y++)
+        {
+            for (int x = left; x < right; x++)
             {
-                sums[0] += pixels[offset];
-                sums[1] += pixels[offset + 1];
-                sums[2] += pixels[offset + 2];
-                sums[3] += pixels[offset + 3];
-            });
+                int offset =
+                    checked(
+                        (y *
+                         source.Width +
+                         x) *
+                        4);
+                sums[0] += source.Pixels[offset];
+                sums[1] += source.Pixels[offset + 1];
+                sums[2] += source.Pixels[offset + 2];
+                sums[3] += source.Pixels[offset + 3];
+            }
+        }
 
         long total =
             sums[0] +
@@ -640,31 +652,6 @@ internal static class TextureImporter
         }
     }
 
-    private static void VisitSourcePixels(
-        TextureData source,
-        int left,
-        int top,
-        int right,
-        int bottom,
-        SourcePixelVisitor visitor)
-    {
-        for (int y = top; y < bottom; y++)
-        {
-            for (int x = left; x < right; x++)
-            {
-                int offset =
-                    checked(
-                        (y *
-                         source.Width +
-                         x) *
-                        4);
-                visitor(
-                    source.Pixels,
-                    offset);
-            }
-        }
-    }
-
     private static byte AverageByte(
         long sum,
         int count) =>
@@ -736,10 +723,6 @@ internal static class TextureImporter
                     MidpointRounding.AwayFromZero),
                 0,
                 255));
-
-    private delegate void SourcePixelVisitor(
-        byte[] pixels,
-        int offset);
 
     private static void UnfilterRow(
         byte filter,
