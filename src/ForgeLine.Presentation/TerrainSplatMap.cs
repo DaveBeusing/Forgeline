@@ -373,6 +373,9 @@ public static class TerrainSplatMapBuilder
             height;
         byte[] current =
             pixels;
+        Span<float> sums =
+            stackalloc float[
+                TerrainChunkSplatData.LayerCount];
 
         while (true)
         {
@@ -407,10 +410,6 @@ public static class TerrainSplatMapBuilder
                         nextWidth *
                         nextHeight *
                         TerrainChunkSplatData.LayerCount)];
-
-            Span<float> sums =
-                stackalloc float[
-                    TerrainChunkSplatData.LayerCount];
 
             for (int y = 0;
                  y < nextHeight;
