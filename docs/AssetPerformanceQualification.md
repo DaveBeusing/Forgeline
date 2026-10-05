@@ -109,24 +109,31 @@ The JSON report captures the latest completed D3D12 render frame with:
 
 ## Rendering Benchmarks
 
-ForgeLine.Rendering.Benchmarks contains synthetic rendering baselines plus representative mixed-content submission cases.
+ForgeLine.Rendering.Benchmarks contains synthetic rendering baselines plus representative mixed-content submission cases. The production qualification benchmarks load the compiled `assets/runtime` catalog so object and terrain cases exercise texture/material resolution and texture binding rather than the legacy untextured fallback. Compile runtime assets first when running the benchmark host outside CI.
 
-Run the presentation qualification benchmarks with:
+Run the full rendering qualification matrix with:
 
 ~~~powershell
-dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release -- --filter "*PresentationBenchmarks*"
+dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release -- --filter "*" --job Short --artifacts artifacts/rendering-benchmarks --exporters BriefJSON
 ~~~
 
 The representative scene contains repeated Directorate armor and reconnaissance, Command Core and Vehicle Factory instances, resource deposits, vegetation, industrial props, and combat VFX.
 
-Two camera regimes are measured:
+Object/material submission is measured at:
 
-- tactical view at normal gameplay distance;
-- strategic view at long distance.
+- close tactical distance;
+- normal RTS gameplay distance;
+- strategic zoom.
 
-The benchmark is intended to reveal regression in submission cost, allocations, culling behavior, batching, LOD reduction, and VFX distance policy. BenchmarkDotNet results must be compared on equivalent hardware/runtime configurations before treating a difference as an optimization result.
+Terrain submission is measured at:
 
-Terrain-specific baselines remain available through TerrainBenchmarks.
+- close tactical distance;
+- normal representative coverage;
+- strategic distance with high terrain coverage.
+
+BenchmarkDotNet `Short` repeats measurement iterations so qualification is not based on a single timing sample. The output retains runtime and machine metadata and is published by CI under `artifacts/rendering-benchmarks`.
+
+The benchmark is intended to reveal regression in submission cost, allocations, culling behavior, material resolution/binding, LOD reduction, terrain coverage cost, and VFX distance policy. BenchmarkDotNet results must be compared on equivalent hardware/runtime configurations before treating a difference as an optimization result.
 
 ## LOD and Strategic Zoom Qualification
 

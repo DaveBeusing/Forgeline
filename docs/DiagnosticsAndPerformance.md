@@ -256,7 +256,7 @@ dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simula
 dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release
 ```
 
-The rendering host includes terrain workloads plus 1,000 near-field simple instances and 5,000 total simple instances with far-field culling. BenchmarkDotNet output includes runtime and machine information. Keep benchmark results when comparing architecture or hot-path changes so the environment remains visible.
+The rendering host loads the compiled runtime asset catalog and exercises the production textured material path. It includes close/normal/strategic mixed-content views, 1,000 near-field instances, 5,000 total instances with far-field culling, normal terrain coverage, and high terrain coverage at strategic distance. BenchmarkDotNet output includes runtime and machine information. CI runs the rendering matrix with the Short job and publishes BriefJSON output under `artifacts/rendering-benchmarks`. Keep benchmark results when comparing architecture or hot-path changes so the environment remains visible.
 
 ## Stress Scenarios
 
