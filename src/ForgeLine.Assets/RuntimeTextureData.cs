@@ -354,7 +354,8 @@ public sealed class RuntimeTextureData
 
         if (Usage is RuntimeTextureUsage.Normal or
             RuntimeTextureUsage.Orm or
-            RuntimeTextureUsage.GenericData &&
+            RuntimeTextureUsage.GenericData or
+            RuntimeTextureUsage.TerrainControl &&
             ColorSpace != RuntimeTextureColorSpace.Linear)
         {
             throw new InvalidDataException(

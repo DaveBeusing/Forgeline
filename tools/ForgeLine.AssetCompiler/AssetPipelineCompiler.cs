@@ -5,7 +5,7 @@ namespace ForgeLine.AssetCompiler;
 
 public static class AssetPipelineCompiler
 {
-    public const string CompilerVersion = "1.1.0";
+    public const string CompilerVersion = "1.2.0";
     public const int RuntimeVersion = 2;
 
     private static readonly JsonSerializerOptions JsonOptions = RuntimeAssetCatalog.CreateJsonOptions();
@@ -693,7 +693,9 @@ public static class AssetPipelineCompiler
             RuntimeAssetType.Texture => TextureImporter.Import(
                 node.SourcePath,
                 node.Definition.TextureColorSpace,
-                node.Definition.TextureUsage),
+                node.Definition.TextureUsage,
+                node.Definition.TextureGenerateMipmaps,
+                node.Definition.TextureMaxMipLevels),
             RuntimeAssetType.Material => MaterialImporter.Import(node.SourcePath),
             _ => throw new InvalidDataException($"Asset type '{node.Definition.Type}' is unsupported."),
         };
