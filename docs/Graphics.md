@@ -142,6 +142,25 @@ The swap chain uses flip-discard presentation. Defensive occlusion handling stil
 
 The command context exposes frame identity, viewport/scissor control, graphics-pipeline binding, multi-slot vertex/index buffer binding, vertex root constants, pixel texture binding, and indexed, indexed-instanced, or non-indexed draw submission. Vertex declarations distinguish per-vertex and per-instance input rates while keeping the D3D12 classification inside `ForgeLine.Graphics`. Pipelines own their root signature and pipeline state and are tied to the graphics device that created them. Texture slots are declared by the pipeline contract and become SRV descriptor tables in the D3D12 root signature. Terrain and world presentation use this boundary without exposing D3D12 objects to world or simulation code.
 
+## Production static-mesh material path
+
+The production non-terrain mesh path consumes runtime mesh version 2. Static mesh vertices carry Position, Normal, UV0, and a tangent `float4` whose W component is the tangent-space handedness. Material texturing no longer depends on mesh vertex color as surface albedo; Base Color, Normal, ORM, and Emissive come from the resolved runtime material. Instance color remains an intentional per-object/team/readability multiplier.
+
+The textured D3D12 input layout is:
+
+```text
+POSITION  float3 @  0
+NORMAL    float3 @ 12
+TEXCOORD0 float2 @ 24
+TANGENT   float4 @ 32
+```
+
+The vertex shader transforms the normal/tangent basis with the instance world basis. The pixel shader orthogonalizes the tangent, reconstructs the bitangent from `Tangent.w`, converts the sampled normal from [0,1] to tangent-space [-1,1], and transforms it through the TBN basis before the current lightweight material response. A deterministic orthogonal tangent is used only for materials that do not require a normal map and therefore receive the flat-normal fallback.
+
+Runtime mesh material IDs come from compiler-stable asset references. A one-material mesh can therefore preserve its source material identity through compiler output, GPU buffer creation, batching, and draw submission. Meshes explicitly marked as migration fallback do not enter the textured path; they remain visible through the existing untextured development path and are diagnosed by asset compilation.
+
+Debug line/procedural rendering remains independent and is not forced through the production 48-byte mesh vertex format.
+
 ## Resource Foundation
 
 `IGraphicsDevice.CreateBuffer` establishes explicit buffer ownership for GPU-local default-heap buffers and CPU-visible upload-heap buffers. `IGraphicsBuffer.SetData` provides bounded initialization of upload buffers. The terrain renderer creates persistent per-chunk vertex and index buffers once and reuses them across frames. Repeated world presentation uses one upload instance stream per swap-chain frame index so transform/tint data can be refreshed only after that frame resource has been synchronized for reuse.
