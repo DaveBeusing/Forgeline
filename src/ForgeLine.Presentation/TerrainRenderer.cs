@@ -1136,7 +1136,7 @@ public sealed class TerrainRenderer : IDisposable
 
         internal IGraphicsTexture ControlTexture { get; }
 
-        internal IReadOnlyList<TerrainLayerResource> Layers { get; }
+        internal TerrainLayerResource[] Layers { get; }
 
         internal int IndexCount { get; }
 

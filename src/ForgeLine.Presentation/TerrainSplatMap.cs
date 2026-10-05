@@ -72,8 +72,8 @@ public static class TerrainSplatMapBuilder
         ArgumentNullException.ThrowIfNull(chunk);
         ArgumentNullException.ThrowIfNull(profile);
 
-        Span<double> totals =
-            stackalloc double[
+        var totals =
+            new double[
                 TerrainPresentationProfile.MaterialSlotCount];
         AccumulateMaterialTotals(
             chunk,
@@ -284,7 +284,7 @@ public static class TerrainSplatMapBuilder
     private static byte[] CreateLevelZero(
         TerrainChunk chunk,
         TerrainPresentationProfile profile,
-        IReadOnlyList<TerrainMaterialSlot> palette)
+        TerrainMaterialSlot[] palette)
     {
         int side =
             TerrainChunkSplatData.ControlSamplesPerSide;
@@ -408,6 +408,10 @@ public static class TerrainSplatMapBuilder
                         nextHeight *
                         TerrainChunkSplatData.LayerCount)];
 
+            Span<float> sums =
+                stackalloc float[
+                    TerrainChunkSplatData.LayerCount];
+
             for (int y = 0;
                  y < nextHeight;
                  y++)
@@ -437,9 +441,7 @@ public static class TerrainSplatMapBuilder
                             (x + 1) *
                             currentWidth /
                             nextWidth);
-                    Span<float> sums =
-                        stackalloc float[
-                            TerrainChunkSplatData.LayerCount];
+                    sums.Clear();
 
                     for (int sourceY = top;
                          sourceY < bottom;
