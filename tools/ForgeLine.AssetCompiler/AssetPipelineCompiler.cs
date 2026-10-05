@@ -691,7 +691,7 @@ public static class AssetPipelineCompiler
                 new AssetCompilerDiagnostic(
                     "ASSET032",
                     AssetCompilerDiagnosticSeverity.Error,
-                    $"Material slot '{slotName}' requires texture usage '{expectedUsage}', but '{id}' declares '{referencedNode.Definition.TextureUsage}'.",
+                    $"Material slot '{slotName}' requires texture usage '{TextureUsageName(expectedUsage)}', but '{id}' declares '{TextureUsageName(referencedNode.Definition.TextureUsage)}'.",
                     owner.Id.Value,
                     owner.Definition.Source));
         }
@@ -717,10 +717,16 @@ public static class AssetPipelineCompiler
             new AssetCompilerDiagnostic(
                 "ASSETI001",
                 AssetCompilerDiagnosticSeverity.Information,
-                $"Texture compiled: usage={texture.Usage}; colorSpace={texture.ColorSpace}; dimensions={texture.Width}x{texture.Height}; mips={texture.Mips.Count}; format={texture.Format}; residentBytes={texture.ResidentByteCount}; payloadBytes={imported.Payload.LongLength}.",
+                $"Texture compiled: usage={TextureUsageName(texture.Usage)}; colorSpace={texture.ColorSpace}; dimensions={texture.Width}x{texture.Height}; mips={texture.Mips.Count}; format={texture.Format}; residentBytes={texture.ResidentByteCount}; payloadBytes={imported.Payload.LongLength}.",
                 node.Id.Value,
                 sourceRelativePath));
     }
+
+    private static string TextureUsageName(
+        RuntimeTextureUsage usage) =>
+        usage == RuntimeTextureUsage.BaseColor
+            ? nameof(RuntimeTextureUsage.BaseColor)
+            : usage.ToString();
 
     private static List<AssetNode> TopologicallyOrder(
         IReadOnlyDictionary<AssetId, AssetNode> nodes,
