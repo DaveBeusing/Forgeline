@@ -1,0 +1,8 @@
+{
+  "id": "texture.world.terrain.soil_normal",
+  "type": "texture",
+  "source": "soil_normal.tga",
+  "textureUsage": "normal",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true
+}

@@ -1,5 +1,8 @@
 {
   "id": "texture.world.terrain.dry_dirt",
   "type": "texture",
-  "source": "dry_dirt.png"
+  "source": "dry_dirt.png",
+  "textureUsage": "baseColor",
+  "textureColorSpace": "srgb",
+  "textureGenerateMipmaps": true
 }

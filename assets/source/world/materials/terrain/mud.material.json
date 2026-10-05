@@ -7,5 +7,7 @@
     1
   ],
   "metallicFactor": 0,
-  "roughnessFactor": 0.98
+  "roughnessFactor": 0.98,
+  "normalTexture": "texture.world.terrain.soil_normal",
+  "ormTexture": "texture.world.terrain.terrain_orm"
 }

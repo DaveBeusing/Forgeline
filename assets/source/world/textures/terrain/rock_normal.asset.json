@@ -1,0 +1,8 @@
+{
+  "id": "texture.world.terrain.rock_normal",
+  "type": "texture",
+  "source": "rock_normal.tga",
+  "textureUsage": "normal",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true
+}

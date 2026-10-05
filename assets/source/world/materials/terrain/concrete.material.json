@@ -1,5 +1,13 @@
 {
-  "baseColorFactor": [0.48, 0.49, 0.47, 1.0],
+  "baseColorFactor": [
+    0.48,
+    0.49,
+    0.47,
+    1
+  ],
   "metallicFactor": 0,
-  "roughnessFactor": 0.84
+  "roughnessFactor": 0.84,
+  "baseColorTexture": "texture.world.terrain.concrete_base",
+  "normalTexture": "texture.world.terrain.hard_surface_normal",
+  "ormTexture": "texture.world.terrain.terrain_orm"
 }

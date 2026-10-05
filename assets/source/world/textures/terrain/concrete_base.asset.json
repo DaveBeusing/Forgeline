@@ -1,7 +1,7 @@
 {
-  "id": "texture.world.terrain.cracked_earth",
+  "id": "texture.world.terrain.concrete_base",
   "type": "texture",
-  "source": "cracked_earth.png",
+  "source": "concrete_base.tga",
   "textureUsage": "baseColor",
   "textureColorSpace": "srgb",
   "textureGenerateMipmaps": true
