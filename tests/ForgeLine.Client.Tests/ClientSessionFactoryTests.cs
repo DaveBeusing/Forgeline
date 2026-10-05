@@ -77,6 +77,8 @@ public sealed class ClientSessionFactoryTests
                    VerticalSliceScenario.Create(
                        seed: 731))
             {
+                source.Simulation.AdvanceOneTick();
+
                 var pause =
                     new SetMatchPausedCommand(
                         source.BattlefieldRuntime.MatchStateEntity,

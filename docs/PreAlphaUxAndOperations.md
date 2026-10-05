@@ -28,6 +28,14 @@ The setup state pauses authoritative simulation through the existing client-to-s
 
 CI smoke mode bypasses interactive setup so automated validation remains bounded.
 
+## Frontend and Session Transitions
+
+The client presents explicit loading state during both application bootstrap and playable-session preparation.
+
+Starting or restoring a match publishes real preparation stages through the frontend renderer and waits for the published loading frame to be presented before advancing to the next stage. This prevents fast session creation from visually skipping the loading surface while keeping progress tied to actual completed work.
+
+Returning from an active match to the main menu tears down the current session and recreates the frontend window inside the existing process. Window recreation clears stale thread-level quit state from the previous Win32 window before normal event pumping resumes, so an intentional frontend restart is not mistaken for application shutdown.
+
 ## Pause and Help
 
 Space toggles player pause during an active match.
