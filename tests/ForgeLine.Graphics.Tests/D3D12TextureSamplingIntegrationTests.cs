@@ -227,6 +227,40 @@ public sealed class D3D12TextureSamplingIntegrationTests
         Assert.Equal(
             0,
             resources.TextureBindingFailureCount);
+        Assert.Equal(
+            4,
+            resources.PeakLoadedTextureCount);
+        Assert.Equal(
+            expectedResidentBytes,
+            resources.PeakResidentTextureBytes);
+        Assert.Equal(
+            4,
+            resources.PeakShaderResourceDescriptorsUsed);
+        Assert.Equal(
+            4,
+            resources.TextureUploadCount);
+
+        for (int frame = 0;
+             frame < 4;
+             frame++)
+        {
+            graphics.RenderFrame(
+                GraphicsColor.ForgeLineClear);
+        }
+
+        GraphicsDiagnostics steadyState =
+            graphics.Diagnostics;
+        Assert.Equal(
+            4,
+            steadyState.Resources.TextureUploadCount);
+        if (steadyState.GpuTimingAvailable)
+        {
+            Assert.NotNull(
+                steadyState.GpuFrameMilliseconds);
+            Assert.True(
+                steadyState.GpuFrameMilliseconds >=
+                0.0);
+        }
     }
 
     [Fact]
