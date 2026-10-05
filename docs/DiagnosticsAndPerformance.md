@@ -228,7 +228,7 @@ ECS baselines cover:
 - multi-component queries
 - 1,000 and 10,000 entity workloads
 
-Rendering diagnostics additionally expose frame time, CPU render time, terrain visibility/submission counts, generic instance visibility/submission counts, and development overlay allocation/GC state. GPU timestamps remain deferred until the graphics abstraction owns a clean timestamp-query/readback lifecycle.
+Rendering diagnostics additionally expose frame time, CPU render time, validated D3D12 timestamp-query GPU frame time when supported, terrain visibility/submission counts, generic instance visibility/submission counts, development overlay allocation/GC state, texture residency, SRV pressure, and texture upload/release lifetime counters.
 
 Navigation baselines cover long-distance path searches over a multi-chunk map, including sector routing, local refinement, cache reuse, expanded-node counts, and route length. Benchmark timing remains observational rather than a CI gate.
 
@@ -396,6 +396,6 @@ For before/after comparisons, retain the BenchmarkDotNet environment header, run
 
 The integrated visual qualification path combines runtime asset validation, the real Windows Direct3D 12 Vertical Slice smoke, and representative tactical/strategic rendering benchmarks.
 
-CI publishes `artifacts/asset-qualification.json` and `artifacts/visual-qualification.json`. The latter records frame/CPU-render timing, terrain submission, draw calls, instance counts, LOD distribution, VFX population, and adapter information from a completed render frame. GPU milliseconds remain unavailable until the graphics abstraction implements validated D3D12 timestamp queries.
+CI publishes `artifacts/asset-qualification.json` and `artifacts/visual-qualification.json`. The latter records frame/CPU-render timing, D3D12 timestamp-query GPU timing when available, terrain submission, draw calls, instance counts, LOD distribution, VFX population, texture residency, descriptor current/peak use, texture upload/release counters, debug-layer warning/error counts, and adapter information from a completed render frame.
 
 See [Asset Performance and Visual Qualification](AssetPerformanceQualification.md) for commands, budgets, interpretation, regression policy, and outlier handling.

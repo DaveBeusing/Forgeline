@@ -222,7 +222,7 @@ Startup diagnostics include:
 
 Runtime surface diagnostics expose current dimensions, frame index, suspended/occluded state, pending-resize state, resize generations, submitted-frame count, and successful-Present count. The frame counters form a low-overhead qualification heartbeat: submitted frames show that command submission continues, while successful Presents distinguish an active presentation path from a renderer that is only producing GPU work.
 
-Resource diagnostics expose loaded GPU texture count, resident texture bytes represented by the supplied mip payloads, SRV descriptor usage/capacity, and invalid texture-binding attempts. Presentation additionally reports resolved material count, loaded asset texture count, material/texture fallback failures, terrain control-texture count, fixed terrain texture bindings/samples per draw, and CPU terrain submission time.
+Resource diagnostics expose current and peak loaded GPU texture count, current and peak resident texture bytes represented by supplied mip payloads, current and peak SRV descriptor usage/capacity, cumulative successful texture uploads/releases, and invalid texture-binding attempts. D3D12 frame GPU time is measured with timestamp queries resolved into a readback buffer only after the corresponding frame fence completes. When the debug layer is enabled, warning/error counts are collected through the D3D12 info queue. Presentation additionally reports resolved material count, loaded asset texture count, material/texture fallback failures, terrain control-texture count, fixed terrain texture bindings/samples per draw, and CPU terrain submission time.
 
 Present and resize failures include the HRESULT, D3D12 device-removed reason, and selected adapter name.
 
@@ -237,7 +237,7 @@ The repository validates the foundation through:
 - the existing headless smoke and 10,000-entity stress validation
 - complete solution tests
 
-The Windows client smoke is a bounded terrain-rendering validation. CI records frame timing plus terrain draw/texture/descriptor pressure, but does not use hardware-specific GPU timing thresholds as pass/fail gates. The terrain shader budget remains fixed at one control sample and four samples each for Base Color, Normal, and ORM per pixel before ordinary hardware anisotropic filtering behavior.
+The Windows client smoke is a bounded terrain-rendering validation. CI records CPU frame timing, D3D12 timestamp GPU timing when supported, terrain draw/texture/descriptor pressure, residency peaks, texture lifetime counters, and debug-layer cleanliness. Hardware-specific GPU timing is not a pass/fail threshold on the Microsoft Basic Render Driver. Structural budgets remain gated. The terrain shader budget stays fixed at one control sample and four samples each for Base Color, Normal, and ORM per pixel before ordinary hardware anisotropic filtering behavior.
 
 ## Deferred Rendering Work
 
