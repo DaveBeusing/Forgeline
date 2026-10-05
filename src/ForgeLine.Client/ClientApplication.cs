@@ -2423,7 +2423,8 @@ internal sealed class ClientApplication
                     newGame,
                     loadGame,
                     settings,
-                    settingsInteraction);
+                    settingsInteraction,
+                    _settings.CameraBindings);
             if (input.HasPointerPosition &&
                 shell.Screen != GameFrontendScreen.MainMenu)
             {
@@ -2490,7 +2491,8 @@ internal sealed class ClientApplication
         NewGameModel newGame,
         LoadGameModel loadGame,
         SettingsModel settings,
-        SettingsInteractionModel settingsInteraction) =>
+        SettingsInteractionModel settingsInteraction,
+        RtsCameraBindings cameraBindings) =>
         screen switch
         {
             GameFrontendScreen.MainMenu =>
@@ -2506,6 +2508,9 @@ internal sealed class ClientApplication
                 FrontendPresentationAdapter.Settings(
                     settings,
                     settingsInteraction),
+            GameFrontendScreen.Controls =>
+                FrontendPresentationAdapter.Controls(
+                    cameraBindings),
             GameFrontendScreen.Credits =>
                 FrontendPresentationAdapter.Credits(),
             _ =>

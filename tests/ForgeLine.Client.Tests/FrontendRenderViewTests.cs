@@ -48,9 +48,9 @@ public sealed class FrontendRenderViewTests
         menu.MoveNext();
         menu.MoveNext();
 
-        Assert.Equal("settings", menu.FocusedId);
+        Assert.Equal("controls", menu.FocusedId);
         Assert.Equal(
-            GameFrontendAction.Settings,
+            GameFrontendAction.Controls,
             menu.ActivateFocused());
     }
 }

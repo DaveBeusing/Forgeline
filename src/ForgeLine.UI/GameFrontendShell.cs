@@ -9,7 +9,8 @@ public enum GameFrontendScreen : byte
     Settings = 5,
     Credits = 6,
     InGame = 7,
-    Exiting = 8
+    Exiting = 8,
+    Controls = 9
 }
 
 public enum GameFrontendAction : byte
@@ -21,7 +22,8 @@ public enum GameFrontendAction : byte
     Credits = 5,
     Back = 6,
     StartMatch = 7,
-    Exit = 8
+    Exit = 8,
+    Controls = 9
 }
 
 public sealed class GameFrontendShell
@@ -47,6 +49,8 @@ public sealed class GameFrontendShell
                 GameFrontendScreen.LoadGame,
             (GameFrontendScreen.MainMenu, GameFrontendAction.Settings) =>
                 GameFrontendScreen.Settings,
+            (GameFrontendScreen.MainMenu, GameFrontendAction.Controls) =>
+                GameFrontendScreen.Controls,
             (GameFrontendScreen.MainMenu, GameFrontendAction.Credits) =>
                 GameFrontendScreen.Credits,
             (GameFrontendScreen.MainMenu, GameFrontendAction.Exit) =>
@@ -58,6 +62,8 @@ public sealed class GameFrontendShell
             (GameFrontendScreen.LoadGame, GameFrontendAction.Back) =>
                 GameFrontendScreen.MainMenu,
             (GameFrontendScreen.Settings, GameFrontendAction.Back) =>
+                GameFrontendScreen.MainMenu,
+            (GameFrontendScreen.Controls, GameFrontendAction.Back) =>
                 GameFrontendScreen.MainMenu,
             (GameFrontendScreen.Credits, GameFrontendAction.Back) =>
                 GameFrontendScreen.MainMenu,

@@ -25,6 +25,7 @@ public sealed class GameFrontendShellTests
     [Theory]
     [InlineData(GameFrontendAction.LoadGame, GameFrontendScreen.LoadGame)]
     [InlineData(GameFrontendAction.Settings, GameFrontendScreen.Settings)]
+    [InlineData(GameFrontendAction.Controls, GameFrontendScreen.Controls)]
     [InlineData(GameFrontendAction.Credits, GameFrontendScreen.Credits)]
     public void MainMenuRoutesToSecondaryScreens(
         GameFrontendAction action,

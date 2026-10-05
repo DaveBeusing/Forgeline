@@ -1,4 +1,6 @@
 using System.Reflection;
+using ForgeLine.Input;
+using ForgeLine.Presentation;
 using ForgeLine.UI;
 using Xunit;
 
@@ -18,6 +20,7 @@ public sealed class MainMenuModelTests
             item => Assert.Equal(MainMenuCommand.Continue, item.Command),
             item => Assert.Equal(MainMenuCommand.NewGame, item.Command),
             item => Assert.Equal(MainMenuCommand.LoadGame, item.Command),
+            item => Assert.Equal(MainMenuCommand.Controls, item.Command),
             item => Assert.Equal(MainMenuCommand.Settings, item.Command),
             item => Assert.Equal(MainMenuCommand.Credits, item.Command),
             item => Assert.Equal(MainMenuCommand.Exit, item.Command));
@@ -48,6 +51,27 @@ public sealed class MainMenuModelTests
     }
 
     [Fact]
+    public void ControlsPresentationListsGameplayBindings()
+    {
+        FrontendSurfaceView view =
+            FrontendPresentationAdapter.Controls(
+                new RtsCameraBindings());
+
+        Assert.Equal(
+            "CONTROLS",
+            view.Title);
+        Assert.Equal(
+            8,
+            view.DetailLines.Count);
+        Assert.Equal(
+            "W/A/S/D",
+            view.DetailLines[0].Value);
+        Assert.Contains(
+            "F12 HELP",
+            view.DetailLines[^1].Value);
+    }
+
+    [Fact]
     public void ContinueIsDisabledAndSkippedWithoutValidTarget()
     {
         var menu = new MainMenuModel(hasValidContinueTarget: false);
@@ -70,6 +94,7 @@ public sealed class MainMenuModelTests
     [Theory]
     [InlineData("new-game", GameFrontendAction.NewGame)]
     [InlineData("load-game", GameFrontendAction.LoadGame)]
+    [InlineData("controls", GameFrontendAction.Controls)]
     [InlineData("settings", GameFrontendAction.Settings)]
     [InlineData("credits", GameFrontendAction.Credits)]
     [InlineData("exit", GameFrontendAction.Exit)]
