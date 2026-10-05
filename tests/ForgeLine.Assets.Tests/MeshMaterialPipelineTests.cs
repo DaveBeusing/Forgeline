@@ -100,7 +100,7 @@ public sealed class MeshMaterialPipelineTests
     }
 
     [Fact]
-    public void TexturedMaterialWithoutUvUsesControlledDevelopmentFallback()
+    public void TexturedMaterialWithoutUvGetsDeterministicBoxProjection()
     {
         using var workspace =
             new MeshWorkspace();
@@ -123,17 +123,60 @@ public sealed class MeshMaterialPipelineTests
                 "mesh.test.no_uv");
 
         Assert.True(result.Success);
-        Assert.False(mesh.HasUv0);
+        Assert.True(mesh.HasUv0);
         Assert.Equal(
-            -1,
+            0,
             Assert.Single(mesh.Sections).MaterialSlot);
+        Assert.DoesNotContain(
+            result.Diagnostics,
+            static diagnostic =>
+                diagnostic.Code ==
+                "ASSETW002");
         Assert.Contains(
             result.Diagnostics,
             static diagnostic =>
                 diagnostic.Code ==
-                "ASSETW002" &&
-                diagnostic.Severity ==
-                AssetCompilerDiagnosticSeverity.Warning);
+                "ASSETI002" &&
+                diagnostic.Message.Contains(
+                    "generatedUvVertices=3",
+                    StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void NormalMappedMaterialWithoutUvGeneratesProjectionAndTangents()
+    {
+        using var workspace =
+            new MeshWorkspace();
+        workspace.WriteNormalMappedMaterial();
+        workspace.WriteTriangle(
+            "meshes/projected.gltf",
+            includeNormals: true,
+            includeUv: false,
+            includeTangents: false,
+            mirroredUv: false);
+        workspace.WriteMeshAsset(
+            "mesh.test.projected",
+            "meshes/projected.gltf",
+            "material.test.normal_mapped");
+
+        AssetCompilationResult result =
+            workspace.Compile();
+        RuntimeMeshData mesh =
+            workspace.ReadMesh(
+                "mesh.test.projected");
+
+        Assert.True(result.Success);
+        Assert.True(mesh.HasUv0);
+        Assert.True(mesh.HasTangents);
+        Assert.Equal(
+            0,
+            Assert.Single(mesh.Sections).MaterialSlot);
+        Assert.All(
+            mesh.Vertices,
+            static vertex =>
+                Assert.True(
+                    float.IsFinite(
+                        vertex.TangentW)));
     }
 
     [Fact]

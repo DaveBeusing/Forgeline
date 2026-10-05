@@ -95,6 +95,7 @@ internal sealed record MeshImportSummary(
     bool HasUv0,
     bool HasTangents,
     int GeneratedNormalVertexCount,
+    int GeneratedUvVertexCount,
     int GeneratedTangentVertexCount,
     int FallbackSectionCount);
 
