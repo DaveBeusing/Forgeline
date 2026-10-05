@@ -32,6 +32,9 @@ internal sealed class D3D12GraphicsTexture : IGraphicsTexture
 
     internal long ResidentByteCount { get; }
 
+    internal bool IsDisposed =>
+        _resource is null;
+
     public void Dispose()
     {
         ID3D12Resource? resource =

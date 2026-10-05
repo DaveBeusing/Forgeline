@@ -186,6 +186,14 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
                 nameof(texture));
         }
 
+        if (d3d12Texture.IsDisposed)
+        {
+            _owner.RecordTextureBindingFailure();
+            throw new ObjectDisposedException(
+                nameof(texture),
+                "Disposed graphics textures cannot be rebound.");
+        }
+
         _commandList.SetDescriptorHeaps(_owner.ShaderResourceHeap);
 
         int rootParameterIndex =
