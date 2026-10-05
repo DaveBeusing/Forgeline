@@ -140,7 +140,7 @@ The swap chain uses flip-discard presentation. Defensive occlusion handling stil
 
 `IGraphicsDevice.RenderFrame` owns frame begin/end and accepts an optional `IGraphicsCommandContext` callback.
 
-The command context exposes frame identity, viewport/scissor control, graphics-pipeline binding, multi-slot vertex/index buffer binding, vertex root constants, pixel texture binding, and indexed, indexed-instanced, or non-indexed draw submission. Vertex declarations distinguish per-vertex and per-instance input rates while keeping the D3D12 classification inside `ForgeLine.Graphics`. Pipelines own their root signature and pipeline state and are tied to the graphics device that created them. Texture slots are declared by the pipeline contract and become SRV descriptor tables in the D3D12 root signature. Terrain and world presentation use this boundary without exposing D3D12 objects to world or simulation code.
+The command context exposes frame identity, viewport/scissor control, graphics-pipeline binding, multi-slot vertex/index buffer binding, vertex root constants, pixel texture binding, and indexed, indexed-instanced, or non-indexed draw submission. Vertex declarations distinguish per-vertex and per-instance input rates while keeping the D3D12 classification inside `ForgeLine.Graphics`. Pipelines own their root signature and pipeline state and are tied to the graphics device that created them. Texture slots are declared by the pipeline contract and become SRV descriptor tables in the D3D12 root signature. The bounded engine contract permits up to sixteen pixel SRV slots; the production terrain path deliberately uses thirteen. Terrain and world presentation use this boundary without exposing D3D12 objects to world or simulation code.
 
 ## Production static-mesh material path
 
@@ -160,6 +160,23 @@ The vertex shader transforms the normal/tangent basis with the instance world ba
 Runtime mesh material IDs come from compiler-stable asset references. A one-material mesh can therefore preserve its source material identity through compiler output, GPU buffer creation, batching, and draw submission. Meshes explicitly marked as migration fallback do not enter the textured path; they remain visible through the existing untextured development path and are diagnosed by asset compilation.
 
 Debug line/procedural rendering remains independent and is not forced through the production 48-byte mesh vertex format.
+
+## Production terrain material path
+
+The production terrain path uses one RGBA control texture and four active material layers per visible chunk. The fixed binding layout is:
+
+```text
+t0       chunk control map
+t1-t4    layer Base Color
+t5-t8    layer Normal
+t9-t12   layer ORM
+```
+
+Terrain material coordinates come from world X/Z rather than chunk-local repeating coordinates, so neighboring chunks sample the same material field at their shared edge. Each material applies its explicit tile scale. The control map remains chunk-local and clamp-sampled.
+
+The shared `s0` world-material sampler provides anisotropic filtering and trilinear mip transitions for tiled material textures. `s1` provides linear clamp filtering for the control map. Normal maps are decoded and renormalized after weighted blending; ORM is blended linearly. Vertex color is a low-frequency macro modifier only and is no longer the primary terrain albedo.
+
+The shader sample/binding budget is deliberately bounded at thirteen textures per draw, with a maximum of four active material layers. Material GPU textures are cached and reused, and each terrain chunk owns one persistent control texture. No descriptors are allocated during ordinary per-frame terrain submission.
 
 ## Resource Foundation
 
@@ -205,7 +222,7 @@ Startup diagnostics include:
 
 Runtime surface diagnostics expose current dimensions, frame index, suspended/occluded state, pending-resize state, resize generations, submitted-frame count, and successful-Present count. The frame counters form a low-overhead qualification heartbeat: submitted frames show that command submission continues, while successful Presents distinguish an active presentation path from a renderer that is only producing GPU work.
 
-Resource diagnostics expose loaded GPU texture count, resident texture bytes represented by the supplied mip payloads, SRV descriptor usage/capacity, and invalid texture-binding attempts. Presentation additionally reports resolved material count, loaded asset texture count, and material/texture fallback failures.
+Resource diagnostics expose loaded GPU texture count, resident texture bytes represented by the supplied mip payloads, SRV descriptor usage/capacity, and invalid texture-binding attempts. Presentation additionally reports resolved material count, loaded asset texture count, material/texture fallback failures, terrain control-texture count, fixed terrain texture bindings/samples per draw, and CPU terrain submission time.
 
 Present and resize failures include the HRESULT, D3D12 device-removed reason, and selected adapter name.
 
@@ -220,7 +237,7 @@ The repository validates the foundation through:
 - the existing headless smoke and 10,000-entity stress validation
 - complete solution tests
 
-The Windows client smoke is a bounded terrain-rendering validation. GPU timing thresholds are intentionally not used as CI gates.
+The Windows client smoke is a bounded terrain-rendering validation. CI records frame timing plus terrain draw/texture/descriptor pressure, but does not use hardware-specific GPU timing thresholds as pass/fail gates. The terrain shader budget remains fixed at one control sample and four samples each for Base Color, Normal, and ORM per pixel before ordinary hardware anisotropic filtering behavior.
 
 ## Deferred Rendering Work
 

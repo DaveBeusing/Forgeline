@@ -106,21 +106,15 @@ The graphics layer owns native D3D12 resources and command submission. The world
 
 ## Material and Shader
 
-The Vertical Slice terrain presentation defines eight stable material slots for grass/ground, dirt, mud, rock, gravel, industrial ground, concrete, and scorched ground.
+The Vertical Slice terrain presentation defines eight stable material IDs for grass/ground, dirt, mud, rock, gravel, industrial ground, concrete, and scorched ground. Every P0 material resolves through the ordinary runtime material contract and provides Base Color, Normal, and ORM inputs. Missing optional channels retain the shared material fallbacks; source material or image files are never opened by the runtime.
 
-When the Windows client has a compiled runtime asset catalog, `TerrainPresentationProfile` resolves each available slot from its material `.flasset` payload. Base-color, roughness, and metallic factors therefore originate from the source-to-runtime asset pipeline. Missing or invalid runtime material entries use deterministic authored fallback values; source material files are never opened at runtime.
+Each terrain chunk derives a deterministic local palette of exactly four active materials from the eight-material library. `TerrainPresentationProfile.CalculateMaterialWeights` converts the existing Central Divide elevation, slope, and authored blend-region rules into explicit normalized material weights. `TerrainSplatMapBuilder` selects the four dominant materials for that chunk and generates a 33 x 33 RGBA control texture. Every texel is normalized to a byte sum of 255; invalid or zero weights select layer zero deterministically. The control texture carries a complete normalized mip chain.
 
-The current terrain presentation uses the resolved base colors together with:
+The production D3D12 terrain shader binds one control texture plus four Base Color, four Normal, and four ORM textures. Base Color is blended with the control weights. Tangent-space normal samples are decoded, transformed against the terrain geometric basis, blended, and renormalized. ORM channels remain linear material data. The visual blend never becomes a gameplay terrain-classification input.
 
-- elevation;
-- terrain normal/slope;
-- explicit Central Divide blend regions;
-- compiled base-color terrain textures;
-- a fixed directional light.
+Terrain material UVs are calculated from world X/Z coordinates and a per-material tile scale. The world-space convention remains continuous across chunk boundaries and independent of screen resolution. Material textures use the shared anisotropic/trilinear wrap sampler and their compiler-generated mip chains; the control texture uses the shared linear clamp sampler. No negative global mip bias or forced highest-mip behavior is used.
 
-Central Divide terrain materials may reference compiled `baseColorTexture` assets. `TerrainPresentationProfile` reads only the runtime `.flasset` payload, decodes the compiler's versioned RGBA8 texture payload, and samples it in world X/Z space while the static terrain vertex buffers are built. Sampling is repeat-wrapped and bilinear; a secondary lower-frequency offset sample is blended in to reduce obvious tile repetition. Because world coordinates rather than per-chunk UVs drive the lookup, adjacent chunks share a continuous texture field without seams at chunk boundaries.
-
-This is intentionally a CPU-baked albedo path that feeds the existing terrain vertex-color renderer. It makes the authored terrain textures visible now without introducing a parallel asset format or renderer-owned simulation state. Native GPU texture sampling, mip chains, normal/ORM maps, and full multi-layer PBR terrain splatting remain later renderer work.
+Vertex color no longer contains final terrain albedo. The 48-byte terrain vertex keeps its color attribute only as a deterministic low-frequency macro/readability multiplier, leaving high-frequency Base Color and normal detail in tiled GPU textures.
 
 ## Frustum Culling
 
@@ -136,23 +130,23 @@ Culling is intentionally chunk-level in this stage. Occlusion culling, hierarchi
 
 Development terrain rendering enables chunk debugging by default in the Windows client.
 
-The terrain shader:
+The terrain shader can:
 
-- draws orange chunk borders
-- alternates a subtle coordinate-parity tint between neighboring chunks
+- draw orange chunk borders;
+- isolate each RGBA control channel;
+- visualize the four selected palette material IDs.
 
 Culled chunks are absent from submission, so movement through the world visibly exercises the culling boundary.
 
 Runtime terrain diagnostics report:
 
-- total chunks
-- visible chunks
-- culled chunks
-- submitted triangle count
-- draw calls
-- number of persistent terrain buffers
+- total, visible, and culled chunk counts;
+- submitted triangle and draw-call counts;
+- persistent terrain buffer and control-texture counts;
+- the fixed texture-binding/sample budget per terrain draw;
+- CPU terrain command-submission time.
 
-The client writes these metrics together with camera and world bounds diagnostics.
+The graphics diagnostics separately expose total resident texture bytes and SRV descriptor usage. Together these make material/descriptor growth observable without introducing per-frame descriptor allocation.
 
 ## Camera Traversal
 
@@ -204,10 +198,10 @@ Central Divide is the canonical 3,072 m × 3,072 m Vertical Slice battlefield. I
 
 Construction in the Vertical Slice now uses explicit map build zones instead of treating all world bounds as buildable. The owning start area, shared strategic sites, and bounded resource mining areas are buildable; unassigned terrain remains non-buildable while normal slope, collision, terrain, and resource-deposit validation still applies.
 
-The canonical definition can be captured as a versioned `BattlefieldMapArtifact`. `ForgeLine.MapCompiler` compiles and reloads that artifact and runs headless operational-geography qualification before CI accepts the map. See [Strategic Map and Operational Geography](StrategicMapAndOperationalGeography.md).
+The canonical definition can be captured as a versioned `BattlefieldMapArtifact`. Map format version 2 records the terrain visual profile ID, RGBA four-layer control encoding, active-layer limit, control-map resolution, and the ordered eight-material library. It does not serialize renderer objects or make visual blend weights authoritative gameplay data. `ForgeLine.MapCompiler` compiles and reloads that artifact and runs headless operational-geography qualification before CI accepts the map. See [Strategic Map and Operational Geography](StrategicMapAndOperationalGeography.md).
 
 ## Vertical Slice presentation baseline
 
-Central Divide now has a presentation layer above the simulation-owned chunked heightfield. Eight stable terrain material slots, four reusable terrain-albedo textures, map-specific blend regions, reusable world objects, decals, and vegetation are defined without adding material state to `TerrainWorld` or `TerrainChunk`.
+Central Divide now has a presentation layer above the simulation-owned chunked heightfield. Eight stable terrain material slots, nine reusable terrain texture sources, map-specific blend regions, reusable world objects, decals, and vegetation are defined without adding render material state to `TerrainWorld` or `TerrainChunk`.
 
-Terrain material factors are resolved by `TerrainPresentationProfile` from compiled runtime materials when available and converted into terrain vertex presentation data while chunk GPU buffers are created. World props and vegetation remain ordinary presentation entities using compiled runtime assets, shared cached mesh buffers, distance-selected LODs, and batched indexed instanced draws. See [World Asset Presentation](WorldAssetPresentation.md) for the stable IDs, LOD policy, map authoring examples, and current renderer boundary.
+Terrain GPU resources are resolved from compiled runtime materials while the terrain renderer creates persistent per-chunk geometry and control textures. A visible chunk submits one indexed draw with a fixed 13-texture binding budget. The canonical 12 x 12 Central Divide therefore owns 144 persistent control textures at 33 x 33 plus mips, while material textures are shared through the runtime asset cache. World props and vegetation remain ordinary presentation entities using compiled runtime assets, shared cached mesh buffers, distance-selected LODs, and batched indexed instanced draws. See [World Asset Presentation](WorldAssetPresentation.md) for the stable IDs, LOD policy, map authoring examples, and current renderer boundary.
