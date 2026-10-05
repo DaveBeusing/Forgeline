@@ -34,8 +34,11 @@ The packaged build is the qualification target. Do not substitute a repository-l
 - [ ] Setup identifies Directorate as the local faction.
 - [ ] Setup identifies the Directorate computer opponent.
 - [ ] Enter starts the match.
+- [ ] Starting or restoring a match visibly presents the loading surface before gameplay appears.
 - [ ] Escape exits from setup.
 - [ ] Space pauses and resumes an active match.
+- [ ] Return to Menu tears down the active session and restores a responsive main menu without terminating or faulting the client.
+- [ ] A second match can be started after returning to the main menu.
 - [ ] Minimize pauses simulation without busy-spinning.
 - [ ] Restore resumes according to the explicit pause state.
 - [ ] A terminal result freezes normal gameplay ticks.
