@@ -1,5 +1,17 @@
 {
-  "baseColorFactor": [0.6, 0.42, 0.76, 1.0],
+  "baseColorFactor": [
+    0.6,
+    0.42,
+    0.76,
+    1
+  ],
   "metallicFactor": 0.05,
-  "roughnessFactor": 0.82
+  "roughnessFactor": 0.82,
+  "baseColorTexture": "texture.directorate.material.resource_rock_base",
+  "normalTexture": "texture.directorate.material.resource_rock_normal",
+  "ormTexture": "texture.directorate.material.resource_rock_orm",
+  "uvScale": [
+    0.9,
+    0.9
+  ]
 }
