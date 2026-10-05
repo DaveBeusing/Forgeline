@@ -40,6 +40,7 @@ internal sealed class ClientApplication
     private static readonly TimeSpan SmokeTestDuration = TimeSpan.FromMilliseconds(350);
     private static readonly TimeSpan DiagnosticInterval = TimeSpan.FromSeconds(1);
     private static readonly TimeSpan PauseTransitionTimeout = TimeSpan.FromSeconds(2);
+    private static readonly TimeSpan FrontendFramePresentationTimeout = TimeSpan.FromSeconds(2);
     private static readonly JsonSerializerOptions VisualQualificationJsonOptions =
         new()
         {
@@ -2619,6 +2620,16 @@ internal sealed class ClientApplication
 
         DrainWindowEvents(window);
         renderer.ThrowIfFaulted();
+
+        if (!window.IsMinimized &&
+            !window.ClientSize.IsEmpty &&
+            !renderer.WaitForLatestFrame(
+                FrontendFramePresentationTimeout))
+        {
+            throw new TimeoutException(
+                "Frontend loading frame was not presented within the expected transition window.");
+        }
+
         _platform.WaitForEvents(
             IdleWait);
     }

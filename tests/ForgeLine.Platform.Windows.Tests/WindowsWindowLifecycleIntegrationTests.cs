@@ -81,4 +81,37 @@ public sealed class WindowsWindowLifecycleIntegrationTests
         Assert.True(
             sawModeChange);
     }
+    [Fact]
+    public void PlatformCanCreateWindowAfterPreviousWindowIsDisposed()
+    {
+        using var platform =
+            new WindowsPlatform();
+        var configuration =
+            new WindowConfiguration(
+                "FORGELINE Window Recreation Test",
+                1_280,
+                720,
+                resizable: true,
+                WindowMode.Windowed);
+
+        using (IWindow firstWindow =
+               platform.CreateWindow(configuration))
+        {
+            Assert.True(
+                platform.PumpEvents());
+            Assert.True(
+                firstWindow.IsOpen);
+        }
+
+        using IWindow secondWindow =
+            platform.CreateWindow(configuration);
+
+        Assert.True(
+            platform.PumpEvents());
+        Assert.True(
+            secondWindow.IsOpen);
+        Assert.True(
+            secondWindow.NativeHandle.IsValid);
+    }
+
 }

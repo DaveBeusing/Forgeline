@@ -68,4 +68,32 @@ public sealed class FrontendLoadingControllerTests
 
         Assert.Throws<InvalidOperationException>(() => loading.ReportProgress(1));
     }
+    [Fact]
+    public void CompletedBootLoadingCanTransitionIntoMatchPreparation()
+    {
+        var loading = new FrontendLoadingController();
+
+        loading.Complete(
+            "Command interface ready");
+        loading.BeginPhase(
+            FrontendLoadingPhase.PreparingFrontend,
+            "CREATING BATTLEFIELD SIMULATION",
+            totalSteps: 4);
+        loading.ReportProgress(
+            1,
+            "PREPARING PRESENTATION STATE");
+
+        Assert.False(
+            loading.State.IsComplete);
+        Assert.Equal(
+            FrontendLoadingPhase.PreparingFrontend,
+            loading.State.Phase);
+        Assert.Equal(
+            1,
+            loading.State.CompletedSteps);
+        Assert.Equal(
+            4,
+            loading.State.TotalSteps);
+    }
+
 }
