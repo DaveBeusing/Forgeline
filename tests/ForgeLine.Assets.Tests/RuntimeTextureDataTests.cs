@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using ForgeLine.Assets;
 using Xunit;
 
@@ -56,6 +57,7 @@ public sealed class RuntimeTextureDataTests
     [InlineData(RuntimeTextureUsage.Normal)]
     [InlineData(RuntimeTextureUsage.Orm)]
     [InlineData(RuntimeTextureUsage.GenericData)]
+    [InlineData(RuntimeTextureUsage.TerrainControl)]
     public void DataTexturesRequireLinearColorSpace(
         RuntimeTextureUsage usage)
     {
@@ -67,6 +69,77 @@ public sealed class RuntimeTextureDataTests
                     [0, 0, 0, 255],
                     RuntimeTextureColorSpace.Srgb,
                     usage));
+    }
+
+    [Fact]
+    public void Version2PayloadRemainsReadable()
+    {
+        using var stream =
+            new MemoryStream();
+        using (var writer =
+               new BinaryWriter(
+                   stream,
+                   System.Text.Encoding.UTF8,
+                   leaveOpen: true))
+        {
+            writer.Write(2);
+            writer.Write(1);
+            writer.Write(1);
+            writer.Write((int)RuntimeTextureFormat.Rgba8Unorm);
+            writer.Write((int)RuntimeTextureColorSpace.Srgb);
+            writer.Write((int)RuntimeTextureUsage.BaseColor);
+            writer.Write(1);
+            writer.Write(1);
+            writer.Write(1);
+            writer.Write(4);
+            writer.Write(4);
+            writer.Write(
+                new byte[]
+                {
+                    11,
+                    22,
+                    33,
+                    255
+                });
+        }
+
+        RuntimeTextureData decoded =
+            RuntimeTextureData.FromPayload(
+                stream.ToArray());
+
+        Assert.Equal(
+            RuntimeTextureUsage.BaseColor,
+            decoded.Usage);
+        Assert.Single(
+            decoded.Mips);
+        Assert.Equal(
+            22,
+            decoded.Mips[0].Pixels[1]);
+    }
+
+    [Fact]
+    public void RejectsInvalidVersion3SubresourceOffset()
+    {
+        var texture =
+            RuntimeTextureData.FromRgba8(
+                1,
+                1,
+                [1, 2, 3, 255],
+                RuntimeTextureColorSpace.Srgb,
+                RuntimeTextureUsage.BaseColor);
+        byte[] payload =
+            texture.ToPayload();
+
+        BinaryPrimitives.WriteInt32LittleEndian(
+            payload.AsSpan(
+                40,
+                4),
+            0);
+
+        Assert.Throws<InvalidDataException>(
+            () =>
+                RuntimeTextureData.FromPayload(
+                    payload));
     }
 
     [Fact]

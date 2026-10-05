@@ -149,6 +149,36 @@ public sealed class RuntimeAssetQualificationTests
     }
 
     [Fact]
+    public void QualificationRejectsMalformedTexturePayload()
+    {
+        using var runtime =
+            new RuntimeFixture();
+        RuntimeAssetRecord texture =
+            Record(
+                "texture.test.corrupt",
+                RuntimeAssetType.Texture,
+                "textures/test/corrupt.flasset");
+
+        runtime.WriteRawAsset(
+            texture,
+            [1, 2, 3, 4]);
+        runtime.WriteManifest(
+            texture);
+
+        RuntimeAssetQualificationReport report =
+            RuntimeAssetQualification.Run(
+                runtime.Root);
+
+        Assert.False(
+            report.Success);
+        Assert.Contains(
+            report.Issues,
+            static issue =>
+                issue.Code ==
+                "ASSETQ001");
+    }
+
+    [Fact]
     public void QualificationRejectsBrokenLodChains()
     {
         using var runtime =
@@ -299,11 +329,46 @@ public sealed class RuntimeAssetQualificationTests
                         '/',
                         Path.DirectorySeparatorChar));
 
+            byte[] payload =
+                record.Type switch
+                {
+                    RuntimeAssetType.Texture =>
+                        RuntimeTextureData.FromRgba8(
+                            1,
+                            1,
+                            [32, 64, 96, 255],
+                            RuntimeTextureColorSpace.Srgb,
+                            RuntimeTextureUsage.BaseColor)
+                        .ToPayload(),
+                    RuntimeAssetType.Material =>
+                        "{}"u8.ToArray(),
+                    _ =>
+                        new byte[payloadBytes]
+                };
+
             RuntimeAssetFile.Write(
                 path,
                 record.Type,
                 ReadOnlySpan<byte>.Empty,
-                new byte[payloadBytes]);
+                payload);
+        }
+
+        public void WriteRawAsset(
+            RuntimeAssetRecord record,
+            byte[] payload)
+        {
+            string path =
+                Path.Combine(
+                    Root,
+                    record.RuntimePath.Replace(
+                        '/',
+                        Path.DirectorySeparatorChar));
+
+            RuntimeAssetFile.Write(
+                path,
+                record.Type,
+                ReadOnlySpan<byte>.Empty,
+                payload);
         }
 
         public void WriteManifest(
