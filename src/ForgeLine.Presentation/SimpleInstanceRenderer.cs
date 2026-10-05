@@ -1179,6 +1179,27 @@ public sealed class SimpleInstanceRenderer : IDisposable
             });
     }
 
+    private static Matrix4x4 CreateArticulatedTransform(
+        Matrix4x4 world,
+        Vector3 pivot,
+        float yawRadians)
+    {
+        float yaw =
+            float.IsFinite(
+                yawRadians)
+                ? yawRadians
+                : 0.0f;
+
+        return
+            Matrix4x4.CreateTranslation(
+                -pivot) *
+            Matrix4x4.CreateRotationY(
+                yaw) *
+            Matrix4x4.CreateTranslation(
+                pivot) *
+            world;
+    }
+
     private static void WriteMatrix(
         Matrix4x4 matrix,
         Span<float> destination)
