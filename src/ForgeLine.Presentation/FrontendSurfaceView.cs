@@ -40,7 +40,8 @@ public readonly record struct FrontendSurfaceView(
     bool PrimaryHovered = false,
     bool PrimaryPressed = false,
     bool SecondaryHovered = false,
-    bool SecondaryPressed = false)
+    bool SecondaryPressed = false,
+    string ProductVersion = "")
 {
     public static FrontendSurfaceView Loading(
         string status,
@@ -57,7 +58,8 @@ public readonly record struct FrontendSurfaceView(
             string.Empty);
 
     public static FrontendSurfaceView MainMenu(
-        IReadOnlyList<FrontendMenuEntryView> entries) =>
+        IReadOnlyList<FrontendMenuEntryView> entries,
+        string productVersion = "") =>
         new(
             FrontendSurfaceKind.MainMenu,
             string.Empty,
@@ -66,7 +68,8 @@ public readonly record struct FrontendSurfaceView(
             0f,
             entries,
             [],
-            "ENTER  SELECT     UP/DOWN  NAVIGATE");
+            "ENTER  SELECT     UP/DOWN  NAVIGATE",
+            ProductVersion: productVersion);
 
     public static FrontendSurfaceView PauseMenu(
         IReadOnlyList<FrontendMenuEntryView> entries) =>

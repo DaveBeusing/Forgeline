@@ -86,9 +86,10 @@ The versioning rules are binding:
 - every repository commit after the versioning bootstrap increments `ForgeLineVersionPatch` by exactly one;
 - `MAJOR` and `MINOR` may only change through an explicit product/release decision and must never decrease;
 - changing `MAJOR` or `MINOR` does not reset the patch counter; the same commit still increments `PATCH` by exactly one;
-- merge commits are not permitted because they introduce an additional commit without a corresponding patch increment;
-- pull requests must therefore be rebased onto current `master` before integration and integrated with rebase/linear-history semantics rather than merge-commit or squash semantics;
-- CI validates the complete commit range and rejects missing, repeated, skipped, or decreasing patch versions;
+- each non-merge development commit consumes exactly one new patch value;
+- merge commits are structural integration commits: they may contain multiple already-versioned commits, preserve the highest integrated parent version, and do not consume an additional patch value;
+- merge and rebase integration are permitted when they preserve the individual versioned commits; squash integration is prohibited because it collapses multiple patch-bearing commits into one commit;
+- CI validates the complete commit graph and rejects missing, repeated, skipped, or decreasing development patch versions while validating merge commits separately;
 - `build/Increment-PatchVersion.ps1` is the canonical helper for preparing the version change before each commit.
 
 The bootstrap commit that first establishes `0.1.0` is the only commit without a prior governed version to increment from.
@@ -102,7 +103,7 @@ The project development model requires:
 - pull requests for integration;
 - small, logically bounded commits;
 - one semantic patch increment per commit after the versioning bootstrap;
-- linear integration using rebased commits; merge commits and squash merges are not compatible with the version invariant;
+- preserve individual versioned commits during integration; ordinary merge commits and rebase integration are allowed, while squash merges are incompatible with the version invariant;
 - successful required CI before merge;
 - no routine force pushes or branch deletion on `master`;
 - deletion of short-lived branches after successful integration when appropriate;
@@ -142,7 +143,7 @@ The minimum intended protection for `master` is:
 - require integration through a pull request;
 - require the GitHub Actions `build-test` check to succeed before merge;
 - require branches to be up to date with `master` before integration;
-- require linear history and rebase-style integration; merge commits and squash merges must be disabled for governed integration;
+- preserve individual versioned commits during integration; merge commits and rebase integration are valid, while squash merges must be disabled for governed integration;
 - prevent force pushes;
 - prevent branch deletion;
 - preserve any stronger repository or organization protections already in effect;

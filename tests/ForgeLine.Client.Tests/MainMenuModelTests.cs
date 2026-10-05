@@ -1,3 +1,4 @@
+using System.Reflection;
 using ForgeLine.UI;
 using Xunit;
 
@@ -20,6 +21,30 @@ public sealed class MainMenuModelTests
             item => Assert.Equal(MainMenuCommand.Settings, item.Command),
             item => Assert.Equal(MainMenuCommand.Credits, item.Command),
             item => Assert.Equal(MainMenuCommand.Exit, item.Command));
+    }
+
+    [Fact]
+    public void MainMenuPresentationUsesBuiltProductVersion()
+    {
+        var menu =
+            new MainMenuModel(
+                hasValidContinueTarget: false);
+
+        var view =
+            FrontendPresentationAdapter.MainMenu(
+                menu);
+        string? informationalVersion =
+            typeof(FrontendPresentationAdapter)
+                .Assembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+                .InformationalVersion;
+
+        Assert.False(
+            string.IsNullOrWhiteSpace(
+                informationalVersion));
+        Assert.Equal(
+            informationalVersion!.Split('+')[0],
+            view.ProductVersion);
     }
 
     [Fact]

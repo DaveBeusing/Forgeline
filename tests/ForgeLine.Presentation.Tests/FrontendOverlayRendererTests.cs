@@ -78,6 +78,33 @@ public sealed class FrontendOverlayRendererTests : IDisposable
             blankVertexCount);
     }
 
+    [Fact]
+    public void MainMenuRendersProductVersionWhenProvided()
+    {
+        using var renderer =
+            new FrontendOverlayRenderer(_graphics);
+        var context =
+            new FakeGraphicsCommandContext();
+
+        renderer.Render(
+            context,
+            FrontendSurfaceView.MainMenu(
+                [],
+                string.Empty));
+        int withoutVersion =
+            renderer.LastRenderedVertexCount;
+
+        renderer.Render(
+            context,
+            FrontendSurfaceView.MainMenu(
+                [],
+                "0.1.1"));
+
+        Assert.True(
+            renderer.LastRenderedVertexCount >
+            withoutVersion);
+    }
+
     private sealed class FakeGraphicsDevice : IGraphicsDevice
     {
         public GraphicsDiagnostics Diagnostics =>
