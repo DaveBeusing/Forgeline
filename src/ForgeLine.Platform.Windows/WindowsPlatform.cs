@@ -35,6 +35,7 @@ public sealed class WindowsPlatform : IPlatform
     {
         ArgumentNullException.ThrowIfNull(configuration);
         ThrowIfUnavailable();
+        PrepareForWindowCreation();
 
         return new WindowsWindow(configuration);
     }
@@ -94,6 +95,20 @@ public sealed class WindowsPlatform : IPlatform
     {
         EnsureOwnerThread();
         _disposed = true;
+    }
+
+    private void PrepareForWindowCreation()
+    {
+        while (WindowsNative.PeekMessage(
+                   out _,
+                   0,
+                   WindowsNative.WmQuit,
+                   WindowsNative.WmQuit,
+                   WindowsNative.PmRemove) != 0)
+        {
+        }
+
+        _quitRequested = false;
     }
 
     private static void EnsurePerMonitorDpiAwareness()
