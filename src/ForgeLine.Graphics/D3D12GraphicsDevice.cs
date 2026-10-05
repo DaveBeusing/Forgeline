@@ -188,6 +188,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         {
             ThrowIfDisposed();
             CaptureDebugLayerMessages();
+            CaptureCompletedGpuTimings();
 
             return new GraphicsDiagnostics(
                 _deviceInfo,
@@ -918,6 +919,34 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                 sizeof(ulong)));
         _frameTimestampReady[frameIndex] =
             true;
+    }
+
+    private void CaptureCompletedGpuTimings()
+    {
+        if (_timestampReadback is null ||
+            _timestampFrequency == 0)
+        {
+            return;
+        }
+
+        ulong completedFence =
+            _frameFence.CompletedValue;
+
+        for (int frameIndex = 0;
+             frameIndex < _frameTimestampReady.Length;
+             frameIndex++)
+        {
+            ulong fenceValue =
+                _frameFenceValues[frameIndex];
+
+            if (_frameTimestampReady[frameIndex] &&
+                fenceValue != 0 &&
+                completedFence >= fenceValue)
+            {
+                ReadCompletedGpuTiming(
+                    frameIndex);
+            }
+        }
     }
 
     private void ReadCompletedGpuTiming(
