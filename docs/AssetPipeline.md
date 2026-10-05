@@ -136,7 +136,15 @@ TGA baseline:
 - top- or bottom-origin input;
 - maximum dimension 16384.
 
-Both formats compile to the same versioned RGBA8 runtime payload. This keeps renderer-facing texture data independent of the source file format.
+Both formats compile to the same versioned RGBA8 runtime payload. The current runtime texture contract records width, height, RGBA8 format, explicit color space, semantic usage, mip count, and every supplied mip subresource with its row pitch. Legacy version-1 RGBA8 payloads remain readable as sRGB color textures. This keeps renderer-facing texture data independent of the source file format and allows complete compiler-supplied mip chains to reach the GPU without runtime filename inference.
+
+Texture source metadata may explicitly select:
+
+- `Color` with sRGB or linear metadata as authored;
+- `Normal`, `Orm`, and `GenericData`, which require linear color space;
+- `Emissive`, whose color-space treatment is explicit in metadata.
+
+The runtime does not infer normal/data-map color space from file names. Offline mip generation and compression remain compiler responsibilities rather than renderer behavior.
 
 ## Material Definitions
 
@@ -157,6 +165,10 @@ Example:
 ```
 
 Texture references are added to the material dependency graph automatically and must resolve to texture assets.
+
+At runtime, material payloads are parsed into the stable material contract rather than interpreted as D3D12 state. Presentation resolves material IDs to Base Color, Normal, ORM, and optional Emissive GPU texture bindings plus base-color factor, roughness/metallic multipliers, emissive multiplier, and UV scale. `ForgeLine.Graphics` owns the resulting texture resources, SRVs, samplers, upload synchronization, and descriptor lifetime.
+
+Missing optional maps are deterministic: white Base Color, flat tangent-space normal, neutral ORM (`R=1 AO`, `G=1 roughness`, `B=0 metallic`), and black Emissive. A referenced missing/corrupt texture or material uses a visible magenta development fallback and records diagnostics instead of producing undefined rendering.
 
 The ORM convention remains:
 
@@ -309,9 +321,9 @@ Tests cover successful compilation, invalid input, duplicate IDs, missing depend
 
 ## Current Boundary
 
-This baseline intentionally does not add final Directorate art, animation retargeting, audio conversion, a generic editor framework, automatic content generation, GPU texture compression, mip generation, or final shipping-package optimization.
+This baseline intentionally does not add final Directorate art, animation retargeting, audio conversion, a generic editor framework, automatic content generation, GPU texture compression, offline compiler mip generation, texture streaming, virtual texturing, or final shipping-package optimization.
 
-Those capabilities should extend this pipeline rather than create parallel asset formats.
+The runtime already accepts complete supplied mip chains and uploads them as immutable GPU textures. Future compression, offline mip generation, arrays, or streaming must extend this contract rather than create parallel asset formats.
 
 ## Committed Vertical Slice world assets
 

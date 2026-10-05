@@ -2,7 +2,7 @@
 
 ## Purpose
 
-`ForgeLine.Graphics` owns the ForgeLine Engine graphics backend for Windows x64. The backend remains intentionally narrow and RTS-focused: it provides Direct3D 12 device, swap-chain, frame-resource, synchronization, shader, geometry-buffer, depth-buffer, indexed-submission, and diagnostics foundations while terrain/world ownership remains outside the graphics layer.
+`ForgeLine.Graphics` owns the ForgeLine Engine graphics backend for Windows x64. The backend remains intentionally narrow and RTS-focused: it provides Direct3D 12 device, swap-chain, frame-resource, synchronization, shader, geometry-buffer, texture, descriptor, sampler, depth-buffer, indexed-submission, and diagnostics foundations while terrain/world ownership remains outside the graphics layer.
 
 Simulation and headless execution remain independent from graphics.
 
@@ -37,6 +37,9 @@ These packages use the MIT license and provide the maintained .NET bindings for 
 - graphics buffer allocations created through the device
 - DXC shader compilation
 - root signatures and graphics pipeline state created through the engine-facing pipeline contract
+- shader-visible SRV descriptor heap and descriptor allocation/reuse
+- immutable GPU-local 2D texture resources and their staged uploads
+- centralized static world/clamp sampler policy
 
 Graphics does not own or mutate simulation state.
 
@@ -137,7 +140,7 @@ The swap chain uses flip-discard presentation. Defensive occlusion handling stil
 
 `IGraphicsDevice.RenderFrame` owns frame begin/end and accepts an optional `IGraphicsCommandContext` callback.
 
-The command context exposes frame identity, viewport/scissor control, graphics-pipeline binding, multi-slot vertex/index buffer binding, vertex root constants, and indexed, indexed-instanced, or non-indexed draw submission. Vertex declarations distinguish per-vertex and per-instance input rates while keeping the D3D12 classification inside `ForgeLine.Graphics`. Pipelines own their root signature and pipeline state and are tied to the graphics device that created them. Terrain and world presentation use this boundary without exposing D3D12 objects to world or simulation code.
+The command context exposes frame identity, viewport/scissor control, graphics-pipeline binding, multi-slot vertex/index buffer binding, vertex root constants, pixel texture binding, and indexed, indexed-instanced, or non-indexed draw submission. Vertex declarations distinguish per-vertex and per-instance input rates while keeping the D3D12 classification inside `ForgeLine.Graphics`. Pipelines own their root signature and pipeline state and are tied to the graphics device that created them. Texture slots are declared by the pipeline contract and become SRV descriptor tables in the D3D12 root signature. Terrain and world presentation use this boundary without exposing D3D12 objects to world or simulation code.
 
 ## Resource Foundation
 
@@ -145,7 +148,11 @@ The command context exposes frame identity, viewport/scissor control, graphics-p
 
 The returned `IGraphicsBuffer` is caller-owned and disposable. Graphics resources must be released before the graphics device is destroyed. Debug live-object reporting helps surface lifetime violations.
 
-Texture allocation, staged GPU-local upload scheduling, descriptor-table management, and higher-level asset residency remain later work.
+`IGraphicsDevice.CreateTexture` accepts validated immutable 2D texture data containing width, height, format, color space, and a complete supplied mip set. D3D12 textures are created in the default heap, every supplied mip is copied through D3D12 copyable footprints, the resource transitions from `CopyDest` to `PixelShaderResource`, and the staging resource remains alive until the upload fence completes. Static textures are not uploaded per frame.
+
+Every live texture owns one shader-visible SRV descriptor. Descriptor indices are allocated from the graphics-owned heap and returned for reuse only when the texture is disposed after GPU retirement. Raw D3D12 descriptor handles never cross into simulation or gameplay state.
+
+Pipelines that declare pixel textures receive centralized static samplers: `s0` is the world-material sampler using wrap addressing, trilinear mip filtering, and anisotropic filtering; `s1` is a deliberate linear clamp sampler. Presentation code selects stable material/asset IDs and binds `IGraphicsTexture` objects; it does not create D3D12 sampler or descriptor state.
 
 ## Shader Compilation
 
@@ -178,6 +185,8 @@ Startup diagnostics include:
 - present mode
 
 Runtime surface diagnostics expose current dimensions, frame index, suspended/occluded state, pending-resize state, resize generations, submitted-frame count, and successful-Present count. The frame counters form a low-overhead qualification heartbeat: submitted frames show that command submission continues, while successful Presents distinguish an active presentation path from a renderer that is only producing GPU work.
+
+Resource diagnostics expose loaded GPU texture count, resident texture bytes represented by the supplied mip payloads, SRV descriptor usage/capacity, and invalid texture-binding attempts. Presentation additionally reports resolved material count, loaded asset texture count, and material/texture fallback failures.
 
 Present and resize failures include the HRESULT, D3D12 device-removed reason, and selected adapter name.
 
