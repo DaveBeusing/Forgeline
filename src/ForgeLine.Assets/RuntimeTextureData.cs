@@ -30,9 +30,10 @@ public readonly record struct RuntimeTextureMipLevel(
 
 public sealed class RuntimeTextureData
 {
-    public const int CurrentPayloadVersion = 2;
+    public const int CurrentPayloadVersion = 3;
 
     private const int LegacyPayloadVersion = 1;
+    private const int PreviousPayloadVersion = 2;
     private const int RgbaChannelCount = 4;
     private const int MaximumDimension = 16_384;
 
@@ -128,12 +129,31 @@ public sealed class RuntimeTextureData
         writer.Write((int)Usage);
         writer.Write(_mips.Length);
 
+        int dataOffset =
+            checked(
+                sizeof(int) *
+                (7 +
+                 _mips.Length *
+                 5));
+        int runningOffset =
+            dataOffset;
+
         foreach (RuntimeTextureMipLevel mip in _mips)
         {
             writer.Write(mip.Width);
             writer.Write(mip.Height);
             writer.Write(mip.RowPitch);
+            writer.Write(runningOffset);
             writer.Write(mip.Pixels.Length);
+
+            runningOffset =
+                checked(
+                    runningOffset +
+                    mip.Pixels.Length);
+        }
+
+        foreach (RuntimeTextureMipLevel mip in _mips)
+        {
             writer.Write(mip.Pixels);
         }
 
@@ -165,6 +185,10 @@ public sealed class RuntimeTextureData
         {
             LegacyPayloadVersion =>
                 ReadLegacyPayload(
+                    reader,
+                    stream),
+            PreviousPayloadVersion =>
+                ReadVersion2Payload(
                     reader,
                     stream),
             CurrentPayloadVersion =>
@@ -237,7 +261,7 @@ public sealed class RuntimeTextureData
             ]);
     }
 
-    private static RuntimeTextureData ReadCurrentPayload(
+    private static RuntimeTextureData ReadVersion2Payload(
         BinaryReader reader,
         Stream stream)
     {
@@ -321,6 +345,140 @@ public sealed class RuntimeTextureData
             usage,
             mips);
     }
+
+    private static RuntimeTextureData ReadCurrentPayload(
+        BinaryReader reader,
+        Stream stream)
+    {
+        if (stream.Length - stream.Position <
+            sizeof(int) * 6)
+        {
+            throw new InvalidDataException(
+                "Runtime texture header is truncated.");
+        }
+
+        int width =
+            reader.ReadInt32();
+        int height =
+            reader.ReadInt32();
+        var format =
+            (RuntimeTextureFormat)reader.ReadInt32();
+        var colorSpace =
+            (RuntimeTextureColorSpace)reader.ReadInt32();
+        var usage =
+            (RuntimeTextureUsage)reader.ReadInt32();
+        int mipCount =
+            reader.ReadInt32();
+
+        if (mipCount <= 0 ||
+            mipCount > 32)
+        {
+            throw new InvalidDataException(
+                $"Runtime texture payload declares invalid mip count {mipCount}.");
+        }
+
+        long tableBytes =
+            checked(
+                (long)mipCount *
+                sizeof(int) *
+                5);
+        if (stream.Length - stream.Position <
+            tableBytes)
+        {
+            throw new InvalidDataException(
+                "Runtime texture subresource table is truncated.");
+        }
+
+        var entries =
+            new SerializedMipEntry[mipCount];
+
+        for (int index = 0;
+             index < mipCount;
+             index++)
+        {
+            entries[index] =
+                new SerializedMipEntry(
+                    reader.ReadInt32(),
+                    reader.ReadInt32(),
+                    reader.ReadInt32(),
+                    reader.ReadInt32(),
+                    reader.ReadInt32());
+        }
+
+        long expectedOffset =
+            stream.Position;
+        var mips =
+            new RuntimeTextureMipLevel[mipCount];
+
+        for (int index = 0;
+             index < mipCount;
+             index++)
+        {
+            SerializedMipEntry entry =
+                entries[index];
+
+            if (entry.Offset != expectedOffset)
+            {
+                throw new InvalidDataException(
+                    $"Runtime texture mip {index} offset {entry.Offset} does not match expected offset {expectedOffset}.");
+            }
+
+            if (entry.ByteCount < 0 ||
+                entry.Offset < 0 ||
+                (long)entry.Offset +
+                entry.ByteCount >
+                stream.Length)
+            {
+                throw new InvalidDataException(
+                    $"Runtime texture mip {index} range is invalid or truncated.");
+            }
+
+            stream.Position =
+                entry.Offset;
+            byte[] pixels =
+                reader.ReadBytes(
+                    entry.ByteCount);
+            if (pixels.Length !=
+                entry.ByteCount)
+            {
+                throw new EndOfStreamException(
+                    $"Runtime texture mip {index} ended before all pixels were read.");
+            }
+
+            mips[index] =
+                new RuntimeTextureMipLevel(
+                    entry.Width,
+                    entry.Height,
+                    entry.RowPitch,
+                    pixels);
+            expectedOffset =
+                checked(
+                    (long)entry.Offset +
+                    entry.ByteCount);
+        }
+
+        if (expectedOffset !=
+            stream.Length)
+        {
+            throw new InvalidDataException(
+                "Runtime texture payload contains trailing or unreferenced data.");
+        }
+
+        return new RuntimeTextureData(
+            width,
+            height,
+            format,
+            colorSpace,
+            usage,
+            mips);
+    }
+
+    private readonly record struct SerializedMipEntry(
+        int Width,
+        int Height,
+        int RowPitch,
+        int Offset,
+        int ByteCount);
 
     private void Validate()
     {

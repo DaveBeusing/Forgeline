@@ -5,8 +5,8 @@ namespace ForgeLine.AssetCompiler;
 
 public static class AssetPipelineCompiler
 {
-    public const string CompilerVersion = "1.2.0";
-    public const int RuntimeVersion = 2;
+    public const string CompilerVersion = "1.3.0";
+    public const int RuntimeVersion = 3;
 
     private static readonly JsonSerializerOptions JsonOptions = RuntimeAssetCatalog.CreateJsonOptions();
 
