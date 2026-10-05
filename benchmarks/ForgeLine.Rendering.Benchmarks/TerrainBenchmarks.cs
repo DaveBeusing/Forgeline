@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Attributes;
+using ForgeLine.Assets;
 using ForgeLine.Graphics;
 using ForgeLine.Presentation;
 using ForgeLine.World;
@@ -30,7 +31,13 @@ public class TerrainBenchmarks : IDisposable
                 chunkRadius: 3);
 
         var graphics = new NullGraphicsDevice();
-        _renderer = new TerrainRenderer(graphics, world);
+        RuntimeAssetCatalog runtimeAssets =
+            LoadRuntimeAssets();
+        _renderer =
+            new TerrainRenderer(
+                graphics,
+                world,
+                runtimeAssets: runtimeAssets);
         TerrainWorld highCoverageWorld =
             DevelopmentTerrainFactory.CreateRepresentativeWorld(
                 settings,
@@ -38,7 +45,8 @@ public class TerrainBenchmarks : IDisposable
         _highCoverageRenderer =
             new TerrainRenderer(
                 graphics,
-                highCoverageWorld);
+                highCoverageWorld,
+                runtimeAssets: runtimeAssets);
         _closeCamera = new RtsCamera(
             new RtsCameraSettings
             {
@@ -101,6 +109,44 @@ public class TerrainBenchmarks : IDisposable
         return _highCoverageRenderer.LastDiagnostics;
     }
 
+    private static RuntimeAssetCatalog LoadRuntimeAssets()
+    {
+        string repositoryRoot =
+            FindRepositoryRoot();
+        string runtimeRoot =
+            Path.Combine(
+                repositoryRoot,
+                "assets",
+                "runtime");
+
+        return RuntimeAssetCatalog.Load(
+            runtimeRoot);
+    }
+
+    private static string FindRepositoryRoot()
+    {
+        DirectoryInfo? directory =
+            new(
+                AppContext.BaseDirectory);
+
+        while (directory is not null)
+        {
+            if (File.Exists(
+                    Path.Combine(
+                        directory.FullName,
+                        "ForgeLine.sln")))
+            {
+                return directory.FullName;
+            }
+
+            directory =
+                directory.Parent;
+        }
+
+        throw new InvalidOperationException(
+            "Could not locate the repository root from the benchmark host.");
+    }
+
     private sealed class NullGraphicsDevice : IGraphicsDevice
     {
         public GraphicsDiagnostics Diagnostics =>
@@ -113,6 +159,11 @@ public class TerrainBenchmarks : IDisposable
         public IGraphicsBuffer CreateBuffer(
             GraphicsBufferDescription description) =>
             new NullGraphicsBuffer(description);
+
+        public IGraphicsTexture CreateTexture(
+            GraphicsTextureData texture) =>
+            new NullGraphicsTexture(
+                texture.Description);
 
         public void RenderFrame(
             GraphicsColor clearColor,
@@ -143,6 +194,22 @@ public class TerrainBenchmarks : IDisposable
         }
 
         public GraphicsPipelineDescription Description { get; }
+
+        public void Dispose()
+        {
+        }
+    }
+
+    private sealed class NullGraphicsTexture : IGraphicsTexture
+    {
+        public NullGraphicsTexture(
+            GraphicsTextureDescription description)
+        {
+            Description =
+                description;
+        }
+
+        public GraphicsTextureDescription Description { get; }
 
         public void Dispose()
         {
@@ -216,6 +283,12 @@ public class TerrainBenchmarks : IDisposable
         }
 
         public void SetVertexConstants(ReadOnlySpan<float> values)
+        {
+        }
+
+        public void SetPixelTexture(
+            int slot,
+            IGraphicsTexture texture)
         {
         }
 

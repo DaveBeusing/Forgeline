@@ -1,6 +1,7 @@
 using System.Numerics;
 using BenchmarkDotNet.Attributes;
 using ForgeLine.Core;
+using ForgeLine.Assets;
 using ForgeLine.Graphics;
 using ForgeLine.Game;
 using ForgeLine.Presentation;
@@ -24,7 +25,12 @@ public class PresentationBenchmarks : IDisposable
     public void Setup()
     {
         var graphics = new NullGraphicsDevice();
-        _renderer = new SimpleInstanceRenderer(graphics);
+        RuntimeAssetCatalog runtimeAssets =
+            LoadRuntimeAssets();
+        _renderer =
+            new SimpleInstanceRenderer(
+                graphics,
+                runtimeAssets);
         _camera = new RtsCamera(
             new RtsCameraSettings
             {
@@ -103,6 +109,44 @@ public class PresentationBenchmarks : IDisposable
             _representativeWorld,
             1.0f);
         return _renderer.LastDiagnostics;
+    }
+
+    private static RuntimeAssetCatalog LoadRuntimeAssets()
+    {
+        string repositoryRoot =
+            FindRepositoryRoot();
+        string runtimeRoot =
+            Path.Combine(
+                repositoryRoot,
+                "assets",
+                "runtime");
+
+        return RuntimeAssetCatalog.Load(
+            runtimeRoot);
+    }
+
+    private static string FindRepositoryRoot()
+    {
+        DirectoryInfo? directory =
+            new(
+                AppContext.BaseDirectory);
+
+        while (directory is not null)
+        {
+            if (File.Exists(
+                    Path.Combine(
+                        directory.FullName,
+                        "ForgeLine.sln")))
+            {
+                return directory.FullName;
+            }
+
+            directory =
+                directory.Parent;
+        }
+
+        throw new InvalidOperationException(
+            "Could not locate the repository root from the benchmark host.");
     }
 
     private static RenderWorld CreateRepresentativeWorld(
@@ -324,6 +368,11 @@ public class PresentationBenchmarks : IDisposable
             GraphicsBufferDescription description) =>
             new NullGraphicsBuffer(description);
 
+        public IGraphicsTexture CreateTexture(
+            GraphicsTextureData texture) =>
+            new NullGraphicsTexture(
+                texture.Description);
+
         public void RenderFrame(
             GraphicsColor clearColor,
             Action<IGraphicsCommandContext>? recordCommands = null)
@@ -354,6 +403,22 @@ public class PresentationBenchmarks : IDisposable
         }
 
         public GraphicsPipelineDescription Description { get; }
+
+        public void Dispose()
+        {
+        }
+    }
+
+    private sealed class NullGraphicsTexture : IGraphicsTexture
+    {
+        public NullGraphicsTexture(
+            GraphicsTextureDescription description)
+        {
+            Description =
+                description;
+        }
+
+        public GraphicsTextureDescription Description { get; }
 
         public void Dispose()
         {
@@ -428,6 +493,12 @@ public class PresentationBenchmarks : IDisposable
 
         public void SetVertexConstants(
             ReadOnlySpan<float> values)
+        {
+        }
+
+        public void SetPixelTexture(
+            int slot,
+            IGraphicsTexture texture)
         {
         }
 
