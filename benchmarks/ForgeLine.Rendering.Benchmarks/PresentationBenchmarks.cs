@@ -13,6 +13,7 @@ public class PresentationBenchmarks : IDisposable
 {
     private SimpleInstanceRenderer _renderer = null!;
     private RtsCamera _camera = null!;
+    private RtsCamera _normalRtsCamera = null!;
     private RtsCamera _strategicCamera = null!;
     private NullGraphicsCommandContext _context = null!;
     private RenderWorld _visibleWorld = null!;
@@ -28,6 +29,12 @@ public class PresentationBenchmarks : IDisposable
             new RtsCameraSettings
             {
                 InitialDistance = 120.0f,
+                MaximumDistance = 1_200.0f
+            });
+        _normalRtsCamera = new RtsCamera(
+            new RtsCameraSettings
+            {
+                InitialDistance = 420.0f,
                 MaximumDistance = 1_200.0f
             });
         _strategicCamera = new RtsCamera(
@@ -71,6 +78,17 @@ public class PresentationBenchmarks : IDisposable
         _renderer.Render(
             _context,
             _camera,
+            _representativeWorld,
+            1.0f);
+        return _renderer.LastDiagnostics;
+    }
+
+    [Benchmark]
+    public InstanceRenderDiagnostics SubmitRepresentativeVerticalSliceNormalRtsView()
+    {
+        _renderer.Render(
+            _context,
+            _normalRtsCamera,
             _representativeWorld,
             1.0f);
         return _renderer.LastDiagnostics;

@@ -1257,6 +1257,8 @@ internal sealed class ClientApplication
             $"frameMs={metrics.FrameMilliseconds:F3} " +
             $"cpuRenderMs={metrics.CpuRenderMilliseconds:F3} " +
             $"gpuMs={(metrics.GpuMilliseconds?.ToString("F3", System.Globalization.CultureInfo.InvariantCulture) ?? "unavailable")} " +
+            $"gpuTiming={metrics.GpuTimingAvailable} " +
+            $"debugLayer={metrics.DebugLayerEnabled} " +
             $"draws={metrics.TotalMeasuredDrawCalls} " +
             $"instances={metrics.VisibleInstances}/{metrics.TotalInstances} " +
             $"lod={metrics.HighLodInstances}/{metrics.ReducedLodInstances} " +
@@ -1264,6 +1266,9 @@ internal sealed class ClientApplication
             $"textures={metrics.LoadedTextureCount} " +
             $"textureBytes={metrics.ResidentTextureBytes} " +
             $"descriptors={metrics.ShaderResourceDescriptorsUsed}/{metrics.ShaderResourceDescriptorCapacity} " +
+            $"descriptorPeak={metrics.PeakShaderResourceDescriptorsUsed} " +
+            $"texturePeak={metrics.PeakLoadedTextureCount}/{metrics.PeakResidentTextureBytes} " +
+            $"textureTransfers={metrics.TextureUploadCount}/{metrics.TextureReleaseCount} " +
             $"materials={metrics.LoadedMaterialCount} " +
             $"materialTextures={metrics.LoadedMaterialAssetTextureCount} " +
             $"bindingFailures={metrics.TextureBindingFailureCount + metrics.MaterialBindingFailureCount} " +

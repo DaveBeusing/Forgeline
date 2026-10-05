@@ -10,7 +10,10 @@ public class TerrainBenchmarks : IDisposable
 {
     private TerrainChunk _chunk = null!;
     private TerrainRenderer _renderer = null!;
+    private TerrainRenderer _highCoverageRenderer = null!;
+    private RtsCamera _closeCamera = null!;
     private RtsCamera _camera = null!;
+    private RtsCamera _strategicCamera = null!;
     private NullGraphicsCommandContext _context = null!;
 
     [GlobalSetup]
@@ -28,10 +31,30 @@ public class TerrainBenchmarks : IDisposable
 
         var graphics = new NullGraphicsDevice();
         _renderer = new TerrainRenderer(graphics, world);
+        TerrainWorld highCoverageWorld =
+            DevelopmentTerrainFactory.CreateRepresentativeWorld(
+                settings,
+                chunkRadius: 8);
+        _highCoverageRenderer =
+            new TerrainRenderer(
+                graphics,
+                highCoverageWorld);
+        _closeCamera = new RtsCamera(
+            new RtsCameraSettings
+            {
+                InitialDistance = 120.0f,
+                MaximumDistance = 1_200.0f
+            });
         _camera = new RtsCamera(
             new RtsCameraSettings
             {
                 InitialDistance = 420.0f,
+                MaximumDistance = 1_200.0f
+            });
+        _strategicCamera = new RtsCamera(
+            new RtsCameraSettings
+            {
+                InitialDistance = 900.0f,
                 MaximumDistance = 1_200.0f
             });
         _context = new NullGraphicsCommandContext();
@@ -43,6 +66,7 @@ public class TerrainBenchmarks : IDisposable
     public void Dispose()
     {
         _renderer?.Dispose();
+        _highCoverageRenderer?.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -51,10 +75,30 @@ public class TerrainBenchmarks : IDisposable
         TerrainMeshGenerator.Generate(_chunk);
 
     [Benchmark]
+    public TerrainRenderDiagnostics SubmitCloseTacticalTerrain()
+    {
+        _renderer.Render(
+            _context,
+            _closeCamera);
+        return _renderer.LastDiagnostics;
+    }
+
+    [Benchmark]
     public TerrainRenderDiagnostics SubmitVisibleTerrainChunks()
     {
-        _renderer.Render(_context, _camera);
+        _renderer.Render(
+            _context,
+            _camera);
         return _renderer.LastDiagnostics;
+    }
+
+    [Benchmark]
+    public TerrainRenderDiagnostics SubmitStrategicHighCoverageTerrain()
+    {
+        _highCoverageRenderer.Render(
+            _context,
+            _strategicCamera);
+        return _highCoverageRenderer.LastDiagnostics;
     }
 
     private sealed class NullGraphicsDevice : IGraphicsDevice

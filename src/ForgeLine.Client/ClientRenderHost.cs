@@ -41,7 +41,22 @@ internal readonly record struct ClientVisualQualificationSnapshot(
     int TerrainControlTextureCount = 0,
     int TerrainTextureBindingsPerDraw = 0,
     int TerrainMaximumTextureSamplesPerPixel = 0,
-    double TerrainCpuSubmissionMilliseconds = 0.0);
+    double TerrainCpuSubmissionMilliseconds = 0.0)
+{
+    public bool GpuTimingAvailable { get; init; }
+
+    public bool DebugLayerEnabled { get; init; }
+
+    public int PeakLoadedTextureCount { get; init; }
+
+    public long PeakResidentTextureBytes { get; init; }
+
+    public int PeakShaderResourceDescriptorsUsed { get; init; }
+
+    public long TextureUploadCount { get; init; }
+
+    public long TextureReleaseCount { get; init; }
+}
 
 internal readonly record struct ClientRenderFrame(
     RtsCameraState Camera,
@@ -570,7 +585,7 @@ internal sealed class ClientRenderHost : IDisposable
                 frameTiming.FramesPerSecond,
                 frameTiming.FrameMilliseconds,
                 frameTiming.CpuRenderMilliseconds,
-                GpuMilliseconds: null,
+                graphics.GpuFrameMilliseconds,
                 terrain.VisibleChunks,
                 terrain.TotalChunks,
                 terrain.SubmittedTriangles,
@@ -598,7 +613,23 @@ internal sealed class ClientRenderHost : IDisposable
                 terrain.ControlTextureCount,
                 terrain.TextureBindingsPerDraw,
                 terrain.MaximumTextureSamplesPerPixel,
-                terrain.CpuSubmissionMilliseconds);
+                terrain.CpuSubmissionMilliseconds)
+            {
+                GpuTimingAvailable =
+                    graphics.GpuTimingAvailable,
+                DebugLayerEnabled =
+                    graphics.Device.DebugLayerEnabled,
+                PeakLoadedTextureCount =
+                    graphics.Resources.PeakLoadedTextureCount,
+                PeakResidentTextureBytes =
+                    graphics.Resources.PeakResidentTextureBytes,
+                PeakShaderResourceDescriptorsUsed =
+                    graphics.Resources.PeakShaderResourceDescriptorsUsed,
+                TextureUploadCount =
+                    graphics.Resources.TextureUploadCount,
+                TextureReleaseCount =
+                    graphics.Resources.TextureReleaseCount
+            };
 
         lock (_frameGate)
         {
