@@ -677,7 +677,7 @@ public static class AssetPipelineCompiler
                 out AssetId id) ||
             !nodes.TryGetValue(
                 id,
-                out AssetNode? referencedNode) ||
+                out AssetNode referencedNode) ||
             referencedNode.Definition.Type !=
             RuntimeAssetType.Texture)
         {

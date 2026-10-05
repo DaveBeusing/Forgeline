@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.Json;
 
 namespace ForgeLine.Assets;
 
@@ -135,14 +136,30 @@ public static class RuntimeAssetQualification
 
                 runtimeBytes =
                     info.Length;
-                _ =
+                RuntimeAssetContent content =
                     catalog.Read(
                         id);
+
+                switch (record.Type)
+                {
+                    case RuntimeAssetType.Texture:
+                        _ =
+                            RuntimeTextureData.FromPayload(
+                                content.Payload);
+                        break;
+
+                    case RuntimeAssetType.Material:
+                        _ =
+                            RuntimeMaterialData.FromPayload(
+                                content.Payload);
+                        break;
+                }
             }
             catch (Exception exception) when (
                 exception is IOException or
                 UnauthorizedAccessException or
-                InvalidDataException)
+                InvalidDataException or
+                JsonException)
             {
                 issues.Add(
                     new RuntimeAssetQualificationIssue(
