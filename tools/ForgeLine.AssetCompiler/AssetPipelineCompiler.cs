@@ -304,19 +304,75 @@ public static class AssetPipelineCompiler
                 ToRelativePath(sourceRoot, sourcePath)));
         }
 
-        if (definition.Type == RuntimeAssetType.Texture &&
-            definition.TextureUsage is
-                RuntimeTextureUsage.Normal or
-                RuntimeTextureUsage.Orm or
-                RuntimeTextureUsage.GenericData &&
-            definition.TextureColorSpace != RuntimeTextureColorSpace.Linear)
+        if (definition.Type == RuntimeAssetType.Texture)
         {
-            diagnostics.Add(new AssetCompilerDiagnostic(
-                "ASSET026",
-                AssetCompilerDiagnosticSeverity.Error,
-                $"Texture usage '{definition.TextureUsage}' requires linear color space.",
-                id.Value,
-                ToRelativePath(sourceRoot, sourcePath)));
+            if (!Enum.IsDefined(definition.TextureUsage))
+            {
+                diagnostics.Add(new AssetCompilerDiagnostic(
+                    "ASSET026",
+                    AssetCompilerDiagnosticSeverity.Error,
+                    $"Texture usage '{definition.TextureUsage}' is not supported.",
+                    id.Value,
+                    ToRelativePath(sourceRoot, sourcePath)));
+            }
+
+            if (!Enum.IsDefined(definition.TextureColorSpace))
+            {
+                diagnostics.Add(new AssetCompilerDiagnostic(
+                    "ASSET027",
+                    AssetCompilerDiagnosticSeverity.Error,
+                    $"Texture color space '{definition.TextureColorSpace}' is not supported.",
+                    id.Value,
+                    ToRelativePath(sourceRoot, sourcePath)));
+            }
+
+            if (definition.TextureUsage == RuntimeTextureUsage.BaseColor &&
+                definition.TextureColorSpace != RuntimeTextureColorSpace.Srgb)
+            {
+                diagnostics.Add(new AssetCompilerDiagnostic(
+                    "ASSET028",
+                    AssetCompilerDiagnosticSeverity.Error,
+                    "Base Color textures require sRGB color space.",
+                    id.Value,
+                    ToRelativePath(sourceRoot, sourcePath)));
+            }
+
+            if (definition.TextureUsage is
+                    RuntimeTextureUsage.Normal or
+                    RuntimeTextureUsage.Orm or
+                    RuntimeTextureUsage.GenericData or
+                    RuntimeTextureUsage.TerrainControl &&
+                definition.TextureColorSpace != RuntimeTextureColorSpace.Linear)
+            {
+                diagnostics.Add(new AssetCompilerDiagnostic(
+                    "ASSET029",
+                    AssetCompilerDiagnosticSeverity.Error,
+                    $"Texture usage '{definition.TextureUsage}' requires linear color space.",
+                    id.Value,
+                    ToRelativePath(sourceRoot, sourcePath)));
+            }
+
+            if (definition.TextureMaxMipLevels is int maxMipLevels &&
+                (maxMipLevels <= 0 || maxMipLevels > 32))
+            {
+                diagnostics.Add(new AssetCompilerDiagnostic(
+                    "ASSET030",
+                    AssetCompilerDiagnosticSeverity.Error,
+                    "textureMaxMipLevels must be between 1 and 32.",
+                    id.Value,
+                    ToRelativePath(sourceRoot, sourcePath)));
+            }
+
+            if (!definition.TextureGenerateMipmaps &&
+                definition.TextureMaxMipLevels is > 1)
+            {
+                diagnostics.Add(new AssetCompilerDiagnostic(
+                    "ASSET031",
+                    AssetCompilerDiagnosticSeverity.Error,
+                    "textureMaxMipLevels cannot exceed 1 when textureGenerateMipmaps is false.",
+                    id.Value,
+                    ToRelativePath(sourceRoot, sourcePath)));
+            }
         }
 
         if (!float.IsFinite(definition.Scale) || MathF.Abs(definition.Scale - 1f) > 0.0001f)

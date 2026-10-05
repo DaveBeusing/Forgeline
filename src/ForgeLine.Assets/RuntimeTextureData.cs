@@ -13,11 +13,13 @@ public enum RuntimeTextureColorSpace
 
 public enum RuntimeTextureUsage
 {
-    Color = 1,
+    BaseColor = 1,
+    Color = BaseColor,
     Normal = 2,
     Orm = 3,
     Emissive = 4,
     GenericData = 5,
+    TerrainControl = 6,
 }
 
 public readonly record struct RuntimeTextureMipLevel(
