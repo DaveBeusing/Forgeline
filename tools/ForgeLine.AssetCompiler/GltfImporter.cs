@@ -481,7 +481,7 @@ internal static class GltfImporter
         List<VertexData> vertices,
         int vertexBase,
         int vertexCount,
-        IReadOnlyList<uint> indices)
+        uint[] indices)
     {
         var sums =
             new Vector3[vertexCount];
@@ -583,7 +583,7 @@ internal static class GltfImporter
         List<VertexData> vertices,
         int vertexBase,
         int vertexCount,
-        IReadOnlyList<uint> indices)
+        uint[] indices)
     {
         var tangentSums =
             new Vector3[vertexCount];

@@ -833,7 +833,7 @@ public static class AssetPipelineCompiler
     {
         if (node.Definition.Type == RuntimeAssetType.Mesh)
         {
-            IReadOnlyList<MeshMaterialRequirement> requirements =
+            MeshMaterialRequirement[] requirements =
                 GetMeshMaterialRequirements(
                     node,
                     nodes);
@@ -858,7 +858,7 @@ public static class AssetPipelineCompiler
         };
     }
 
-    private static IReadOnlyList<MeshMaterialRequirement> GetMeshMaterialRequirements(
+    private static MeshMaterialRequirement[] GetMeshMaterialRequirements(
         AssetNode node,
         IReadOnlyDictionary<AssetId, AssetNode> nodes)
     {

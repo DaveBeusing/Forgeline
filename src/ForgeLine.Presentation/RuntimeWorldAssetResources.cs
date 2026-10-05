@@ -626,7 +626,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
             if (materialSlots.Length > 1)
             {
                 Console.WriteLine(
-                    "[graphics:mesh] development fallback reason="multiple material slots require split draw support"");
+                    "[graphics:mesh] development fallback reason=\"multiple material slots require split draw support\"");
             }
 
             return new RuntimeMeshBuffers(
