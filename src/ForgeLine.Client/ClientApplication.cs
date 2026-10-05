@@ -2025,6 +2025,8 @@ internal sealed class ClientApplication
 
     private static RuntimeAssetCatalog? TryLoadRuntimeAssets()
     {
+        RuntimeAssetDevelopmentBootstrap.EnsureAvailable();
+
         RuntimeAssetPathResolution resolution =
             RuntimeAssetPathResolver.Resolve();
 

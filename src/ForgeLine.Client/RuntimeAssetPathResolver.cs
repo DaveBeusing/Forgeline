@@ -140,7 +140,7 @@ internal static class RuntimeAssetPathResolver
         return roots.ToArray();
     }
 
-    private static string? FindRepositoryRoot(
+    internal static string? FindRepositoryRoot(
         string startDirectory)
     {
         DirectoryInfo? directory =
