@@ -244,13 +244,20 @@ public sealed class AssetPipelineTests
         var runtime = catalog.Read(AssetId.Parse("texture.test.pixel"));
 
         Assert.True(result.Success);
-        using var stream = new MemoryStream(runtime.Payload);
-        using var reader = new BinaryReader(stream);
-        Assert.Equal(1, reader.ReadInt32());
-        Assert.Equal(1, reader.ReadInt32());
-        Assert.Equal(1, reader.ReadInt32());
-        Assert.Equal(4, reader.ReadInt32());
-        Assert.Equal(new byte[] { 12, 34, 56, 255 }, reader.ReadBytes(4));
+
+        RuntimeTextureData texture =
+            RuntimeTextureData.FromPayload(
+                runtime.Payload);
+
+        Assert.Equal(1, texture.Width);
+        Assert.Equal(1, texture.Height);
+        Assert.Equal(RuntimeTextureFormat.Rgba8Unorm, texture.Format);
+        Assert.Equal(RuntimeTextureColorSpace.Srgb, texture.ColorSpace);
+        Assert.Equal(RuntimeTextureUsage.Color, texture.Usage);
+        Assert.Single(texture.Mips);
+        Assert.Equal(
+            new byte[] { 12, 34, 56, 255 },
+            texture.Mips[0].Pixels);
     }
 
     [Fact]

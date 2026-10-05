@@ -5,18 +5,20 @@ namespace ForgeLine.Presentation;
 
 public sealed class TerrainSurfaceTexture
 {
-    private const int RuntimePayloadVersion = 1;
     private const int RgbaChannelCount = 4;
 
     private readonly byte[] _pixels;
+    private readonly int _rowPitch;
 
     private TerrainSurfaceTexture(
         int width,
         int height,
+        int rowPitch,
         byte[] pixels)
     {
         Width = width;
         Height = height;
+        _rowPitch = rowPitch;
         _pixels = pixels;
     }
 
@@ -42,71 +44,26 @@ public sealed class TerrainSurfaceTexture
     public static TerrainSurfaceTexture FromRuntimePayload(
         ReadOnlySpan<byte> payload)
     {
-        if (payload.Length < sizeof(int) * 4)
+        RuntimeTextureData texture =
+            RuntimeTextureData.FromPayload(
+                payload);
+
+        if (texture.Usage is not
+            (RuntimeTextureUsage.Color or
+             RuntimeTextureUsage.Emissive))
         {
             throw new InvalidDataException(
-                "Runtime texture payload is incomplete.");
+                $"Terrain surface texture usage {texture.Usage} is not color content.");
         }
 
-        using var stream =
-            new MemoryStream(
-                payload.ToArray(),
-                writable: false);
-        using var reader =
-            new BinaryReader(stream);
-
-        int version =
-            reader.ReadInt32();
-        int width =
-            reader.ReadInt32();
-        int height =
-            reader.ReadInt32();
-        int channels =
-            reader.ReadInt32();
-
-        if (version != RuntimePayloadVersion)
-        {
-            throw new InvalidDataException(
-                $"Runtime texture payload version {version} is not supported.");
-        }
-
-        if (width <= 0 ||
-            height <= 0 ||
-            channels != RgbaChannelCount)
-        {
-            throw new InvalidDataException(
-                $"Runtime texture payload dimensions/channels are invalid: {width}x{height}x{channels}.");
-        }
-
-        int expectedPixelBytes =
-            checked(
-                width *
-                height *
-                RgbaChannelCount);
-        long remaining =
-            stream.Length -
-            stream.Position;
-
-        if (remaining != expectedPixelBytes)
-        {
-            throw new InvalidDataException(
-                $"Runtime texture payload contains {remaining} pixel bytes; expected {expectedPixelBytes}.");
-        }
-
-        byte[] pixels =
-            reader.ReadBytes(
-                expectedPixelBytes);
-
-        if (pixels.Length != expectedPixelBytes)
-        {
-            throw new EndOfStreamException(
-                "Runtime texture payload ended before all RGBA8 pixels were read.");
-        }
+        RuntimeTextureMipLevel mip =
+            texture.Mips[0];
 
         return new TerrainSurfaceTexture(
-            width,
-            height,
-            pixels);
+            mip.Width,
+            mip.Height,
+            mip.RowPitch,
+            mip.Pixels);
     }
 
     public static TerrainSurfaceTexture FromRgba8(
@@ -114,28 +71,21 @@ public sealed class TerrainSurfaceTexture
         int height,
         ReadOnlySpan<byte> pixels)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(
-            width);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(
-            height);
-
-        int expectedLength =
-            checked(
-                width *
-                height *
-                RgbaChannelCount);
-
-        if (pixels.Length != expectedLength)
-        {
-            throw new ArgumentException(
-                $"RGBA8 data contains {pixels.Length} bytes; expected {expectedLength}.",
-                nameof(pixels));
-        }
+        RuntimeTextureData texture =
+            RuntimeTextureData.FromRgba8(
+                width,
+                height,
+                pixels,
+                RuntimeTextureColorSpace.Srgb,
+                RuntimeTextureUsage.Color);
+        RuntimeTextureMipLevel mip =
+            texture.Mips[0];
 
         return new TerrainSurfaceTexture(
-            width,
-            height,
-            pixels.ToArray());
+            mip.Width,
+            mip.Height,
+            mip.RowPitch,
+            mip.Pixels);
     }
 
     public Vector3 SampleWorld(
@@ -239,7 +189,9 @@ public sealed class TerrainSurfaceTexture
     {
         int index =
             checked(
-                (y * Width + x) *
+                y *
+                _rowPitch +
+                x *
                 RgbaChannelCount);
 
         const float reciprocalByte =
