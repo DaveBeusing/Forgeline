@@ -2619,6 +2619,16 @@ internal sealed class ClientApplication
 
         DrainWindowEvents(window);
         renderer.ThrowIfFaulted();
+
+        if (!window.IsMinimized &&
+            !window.ClientSize.IsEmpty &&
+            !renderer.WaitForLatestFrame(
+                TimeSpan.FromMilliseconds(250)))
+        {
+            throw new TimeoutException(
+                "Frontend loading frame was not presented within the expected transition window.");
+        }
+
         _platform.WaitForEvents(
             IdleWait);
     }
