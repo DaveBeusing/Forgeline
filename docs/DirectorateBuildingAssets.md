@@ -168,6 +168,21 @@ The South Ford remains a road-surface presentation family rather than a bridge m
 
 Disabling or restoring either crossing still changes the real logistics edge and navigation blocker through `StrategicInfrastructureSystem`; presentation only reflects the result.
 
+## Production material treatment
+
+Directorate building and infrastructure material IDs remain stable while their source definitions now reuse the shared production texture library:
+
+- normal/operational structures use the structural-metal Base Color/Normal/ORM family;
+- roads use reinforced-concrete Base Color/Normal/ORM;
+- bridges reuse structural metal;
+- Damaged, Critical, and Destroyed building states use the damaged-metal family;
+- Critical additionally uses the shared functional status-emissive map at a restrained multiplier;
+- Unpowered keeps the structural texture family while its existing material factors suppress visual energy.
+
+This keeps state readability tied to existing authoritative state extraction without creating unique full texture sets for each damage level. Critical presentation still includes geometry/VFX cues, so gameplay state never relies on color or emissive treatment alone.
+
+Position-only baseline glTFs receive deterministic compiler box-projected UV0 and generated tangent bases when required. Collision-only geometry remains intentionally outside the textured production-mesh rule.
+
 ## Renderer and performance
 
 Building and infrastructure meshes load through `RuntimeAssetCatalog` and `RuntimeWorldAssetResources`.
@@ -202,7 +217,7 @@ Automated coverage verifies:
 
 ## Current boundary
 
-This baseline integrates the required Vertical Slice functions without expanding gameplay mechanics. Roads are not player-constructible, rail content remains outside the current slice, and no new economic or power mechanic is introduced. Higher-detail production art, mechanical building animation, emissive texture animation, particles, audio, repair visuals, and editor-specific road placement can extend the stable contracts later.
+This baseline integrates the required Vertical Slice functions without expanding gameplay mechanics and now carries production Base Color/Normal/ORM material treatment through the existing runtime path. Roads are not player-constructible, rail content remains outside the current slice, and no new economic or power mechanic is introduced. Higher-detail unique hero art, mechanical building animation, emissive animation, audio, repair visuals, and editor-specific road placement can extend the stable contracts later.
 
 
 ## VFX integration

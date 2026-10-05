@@ -402,9 +402,39 @@ Every newly compiled texture emits an `ASSETI001` information diagnostic contain
 
 Tests cover successful compilation, invalid input, duplicate IDs, missing dependencies, LOD/collision/socket validation, dependency-triggered incremental rebuilds, stable runtime paths, PNG/TGA import, deterministic mip dimensions, sRGB filtering, normal renormalization, ORM preservation, Terrain Control normalization, byte-stable clean recompilation, texture-setting cache invalidation, runtime texture round trips, malformed subresource rejection, glTF/GLB import, bounds, and runtime catalog lookup.
 
+## Directorate shared production material library
+
+The physical Directorate/world production mesh baseline now uses a shared texture library under `assets/source/materials/directorate/`. Stable mesh and material IDs are preserved; existing unit, building, infrastructure, prop, vegetation, and resource material definitions reference shared texture assets rather than introducing per-mesh material duplication.
+
+Shared texture families are:
+
+- painted metal;
+- structural metal;
+- damaged metal;
+- reinforced concrete;
+- resource rock;
+- vegetation;
+- functional status emissive.
+
+Physical families provide Base Color, tangent-space Normal, and packed ORM. The status map is Emissive and is used only where an existing gameplay/presentation state benefits from a functional warning treatment. Texture naming follows `texture.directorate.material.<family>_<channel>`.
+
+All shared sources are deterministic repository-authored 32 x 32 tileable TGA files with no external inputs. Their provenance is recorded beside the sources. The Asset Compiler generates complete mip chains. The nineteen shared textures occupy 103,740 bytes of RGBA8 mip texels; automated validation additionally constrains their compiled `.flasset` footprint to 160,000 bytes or less.
+
+Existing generated/static meshes that need texture sampling but lack authored UV0 use the compiler's deterministic box-projection remediation. Projection is performed per triangle so seams can split vertices cleanly; normal-mapped materials then use the established tangent generator. Authored UV0/tangents remain authoritative when present. Compiler diagnostics report generated UV vertex counts alongside generated normals/tangents and any fallback sections.
+
+Production material completeness is derived dynamically from the compiled runtime manifest rather than maintained as a duplicate asset catalog. The validation covers Directorate units, buildings, infrastructure, world props, resources, and vegetation. Every included mesh must resolve a production material, Base Color/Normal/ORM dependencies, valid UV0/tangents, non-fallback material sections, and LOD-stable material identity.
+
+Intentional non-physical categories remain outside this completeness rule:
+
+- VFX meshes, whose purpose-specific effect materials are validated by the VFX asset tests;
+- decal carrier geometry and decal materials;
+- strategic/minimap/UI symbol materials;
+- collision-only meshes;
+- terrain surfaces, which use the dedicated four-layer GPU terrain material path.
+
 ## Current Boundary
 
-This baseline intentionally does not add final Directorate art, animation retargeting, audio conversion, a generic editor framework, automatic content generation, GPU block compression, texture streaming, virtual texturing, or final shipping-package optimization.
+This baseline now includes the shared Directorate production material/texturing foundation. Higher-resolution unique hero art, animation retargeting, audio conversion, a generic editor framework, GPU block compression, texture streaming, virtual texturing, and final shipping-package optimization remain future work.
 
 Offline mip generation is now a compiler responsibility and the runtime consumes the compiled chain directly. Future BC compression, texture arrays, or streaming must extend the same runtime texture contract rather than create parallel asset formats.
 
