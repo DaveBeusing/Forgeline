@@ -2025,23 +2025,20 @@ internal sealed class ClientApplication
 
     private static RuntimeAssetCatalog? TryLoadRuntimeAssets()
     {
-        string runtimeRoot =
-            Path.GetFullPath(
-                Path.Combine(
-                    "assets",
-                    "runtime"));
-        string manifestPath =
-            Path.Combine(
-                runtimeRoot,
-                RuntimeAssetCatalog.ManifestFileName);
+        RuntimeAssetDevelopmentBootstrap.EnsureAvailable();
 
-        if (!File.Exists(manifestPath))
+        RuntimeAssetPathResolution resolution =
+            RuntimeAssetPathResolver.Resolve();
+
+        if (!resolution.Found)
         {
-            Console.WriteLine(
-                $"[assets:runtime] manifest=missing root=\"{runtimeRoot}\" fallback=development");
+            Console.Error.WriteLine(
+                $"[assets:runtime] manifest=missing fallback=development candidates=\"{string.Join(';', resolution.CandidateRoots)}\"");
             return null;
         }
 
+        string runtimeRoot =
+            resolution.RuntimeRoot!;
         RuntimeAssetCatalog catalog =
             RuntimeAssetCatalog.Load(
                 runtimeRoot);
