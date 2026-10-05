@@ -15,6 +15,8 @@ public sealed record GraphicsPipelineDescription(
 
     public int VertexRootConstantCount { get; init; }
 
+    public int PixelTextureCount { get; init; }
+
     public GraphicsPrimitiveTopology PrimitiveTopology { get; init; } =
         GraphicsPrimitiveTopology.TriangleList;
 
@@ -45,6 +47,13 @@ public sealed record GraphicsPipelineDescription(
             throw new ArgumentOutOfRangeException(
                 nameof(VertexRootConstantCount),
                 "Vertex root constants must use between zero and 64 32-bit values.");
+        }
+
+        if (PixelTextureCount < 0 || PixelTextureCount > 8)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(PixelTextureCount),
+                "Pixel texture count must be between zero and eight.");
         }
 
         foreach (GraphicsVertexElement element in VertexElements)

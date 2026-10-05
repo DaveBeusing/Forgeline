@@ -27,6 +27,12 @@ public interface IGraphicsCommandContext
 
     void SetVertexConstants(ReadOnlySpan<float> values);
 
+    void SetPixelTexture(
+        int slot,
+        IGraphicsTexture texture) =>
+        throw new NotSupportedException(
+            "This graphics command context does not support texture binding.");
+
     void Draw(int vertexCount, int startVertex = 0);
 
     void DrawIndexed(

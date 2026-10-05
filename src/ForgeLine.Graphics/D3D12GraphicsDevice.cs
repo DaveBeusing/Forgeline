@@ -11,6 +11,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     private const Format BackBufferFormat = Format.R8G8B8A8_UNorm;
     private const Format DepthBufferFormat = Format.D32_Float;
     private const int DxgiStatusOccluded = 0x087A0001;
+    private const int ShaderResourceDescriptorCapacity = 4_096;
 
     private readonly GraphicsConfiguration _configuration;
     private readonly IDXGIFactory4 _factory;
@@ -19,7 +20,10 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     private readonly IDXGISwapChain3 _swapChain;
     private readonly ID3D12DescriptorHeap _rtvHeap;
     private readonly ID3D12DescriptorHeap _dsvHeap;
+    private readonly ID3D12DescriptorHeap _shaderResourceHeap;
+    private readonly D3D12DescriptorAllocator _shaderResourceDescriptors;
     private readonly uint _rtvDescriptorSize;
+    private readonly uint _shaderResourceDescriptorSize;
     private readonly ID3D12CommandAllocator[] _commandAllocators;
     private readonly ID3D12Resource[] _renderTargets;
     private readonly ulong[] _frameFenceValues;
@@ -33,6 +37,9 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     private ulong _nextFenceValue = 1;
     private ulong _submittedFrameCount;
     private ulong _presentedFrameCount;
+    private int _loadedTextureCount;
+    private long _residentTextureBytes;
+    private long _textureBindingFailureCount;
     private int _frameIndex;
     private bool _disposed;
 
@@ -105,6 +112,18 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             new DescriptorHeapDescription(
                 DescriptorHeapType.DepthStencilView,
                 1));
+        _shaderResourceHeap =
+            _device.CreateDescriptorHeap(
+                new DescriptorHeapDescription(
+                    DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView,
+                    ShaderResourceDescriptorCapacity,
+                    DescriptorHeapFlags.ShaderVisible));
+        _shaderResourceDescriptorSize =
+            _device.GetDescriptorHandleIncrementSize(
+                DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView);
+        _shaderResourceDescriptors =
+            new D3D12DescriptorAllocator(
+                ShaderResourceDescriptorCapacity);
 
         _renderTargets = new ID3D12Resource[configuration.BufferCount];
         _commandAllocators = new ID3D12CommandAllocator[configuration.BufferCount];
@@ -166,7 +185,16 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                         _submittedFrameCount,
                     PresentedFrameCount =
                         _presentedFrameCount
-                });
+                })
+            {
+                Resources =
+                    new GraphicsResourceDiagnostics(
+                        _loadedTextureCount,
+                        _residentTextureBytes,
+                        _shaderResourceDescriptors.UsedCount,
+                        _shaderResourceDescriptors.Capacity,
+                        _textureBindingFailureCount)
+            };
         }
     }
 
@@ -186,15 +214,55 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             RootSignatureFlags.DenyAmplificationShaderRootAccess |
             RootSignatureFlags.DenyMeshShaderRootAccess;
 
-        RootParameter1[]? rootParameters =
-            description.VertexRootConstantCount > 0
+        var rootParameters =
+            new List<RootParameter1>();
+
+        if (description.VertexRootConstantCount > 0)
+        {
+            rootParameters.Add(
+                new RootParameter1(
+                    new RootConstants(
+                        0,
+                        0,
+                        checked((uint)description.VertexRootConstantCount)),
+                    ShaderVisibility.Vertex));
+        }
+
+        for (int slot = 0;
+             slot < description.PixelTextureCount;
+             slot++)
+        {
+            rootParameters.Add(
+                new RootParameter1(
+                    new RootDescriptorTable1(
+                        new DescriptorRange1(
+                            DescriptorRangeType.ShaderResourceView,
+                            1,
+                            checked((uint)slot))),
+                    ShaderVisibility.Pixel));
+        }
+
+        StaticSamplerDescription[]? samplers =
+            description.PixelTextureCount > 0
                 ? [
-                    new RootParameter1(
-                        new RootConstants(
-                            0,
-                            0,
-                            checked((uint)description.VertexRootConstantCount)),
-                        ShaderVisibility.Vertex)
+                    new StaticSamplerDescription(
+                        0,
+                        Filter.Anisotropic,
+                        TextureAddressMode.Wrap,
+                        TextureAddressMode.Wrap,
+                        TextureAddressMode.Wrap,
+                        maxAnisotropy: 8,
+                        comparisonFunction: ComparisonFunction.Never,
+                        shaderVisibility: ShaderVisibility.Pixel),
+                    new StaticSamplerDescription(
+                        1,
+                        Filter.MinMagMipLinear,
+                        TextureAddressMode.Clamp,
+                        TextureAddressMode.Clamp,
+                        TextureAddressMode.Clamp,
+                        maxAnisotropy: 1,
+                        comparisonFunction: ComparisonFunction.Never,
+                        shaderVisibility: ShaderVisibility.Pixel)
                 ]
                 : null;
 
@@ -202,7 +270,10 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             _device.CreateRootSignature(
                 new RootSignatureDescription1(
                     rootSignatureFlags,
-                    rootParameters));
+                    rootParameters.Count == 0
+                        ? null
+                        : rootParameters.ToArray(),
+                    samplers));
         rootSignature.Name = "ForgeLine Graphics Root Signature";
 
         InputElementDescription[] inputElements = description.VertexElements
@@ -309,6 +380,92 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             initialState);
 
         return new D3D12GraphicsBuffer(this, description, resource);
+    }
+
+    public IGraphicsTexture CreateTexture(
+        GraphicsTextureData texture)
+    {
+        ThrowIfDisposed();
+        ArgumentNullException.ThrowIfNull(texture);
+
+        GraphicsTextureDescription description =
+            texture.Description;
+        description.Validate();
+
+        Format nativeFormat =
+            description.ColorSpace == GraphicsTextureColorSpace.Srgb
+                ? Format.R8G8B8A8_UNorm_SRgb
+                : Format.R8G8B8A8_UNorm;
+
+        ResourceDescription resourceDescription =
+            ResourceDescription.Texture2D(
+                nativeFormat,
+                checked((uint)description.Width),
+                checked((uint)description.Height),
+                mipLevels: checked((ushort)description.MipCount));
+
+        ID3D12Resource? resource = null;
+        int descriptorIndex = -1;
+
+        try
+        {
+            resource =
+                _device.CreateCommittedResource(
+                    HeapType.Default,
+                    resourceDescription,
+                    ResourceStates.CopyDest);
+            resource.Name =
+                $"ForgeLine Texture {description.Width}x{description.Height} Mips={description.MipCount}";
+
+            UploadTexture(
+                resource,
+                resourceDescription,
+                texture);
+
+            descriptorIndex =
+                _shaderResourceDescriptors.Allocate();
+
+            CpuDescriptorHandle cpuHandle =
+                new(
+                    _shaderResourceHeap.GetCPUDescriptorHandleForHeapStart(),
+                    descriptorIndex,
+                    _shaderResourceDescriptorSize);
+            GpuDescriptorHandle gpuHandle =
+                new(
+                    _shaderResourceHeap.GetGPUDescriptorHandleForHeapStart(),
+                    descriptorIndex,
+                    _shaderResourceDescriptorSize);
+
+            _device.CreateShaderResourceView(
+                resource,
+                null,
+                cpuHandle);
+
+            _loadedTextureCount++;
+            _residentTextureBytes =
+                checked(
+                    _residentTextureBytes +
+                    texture.ResidentByteCount);
+
+            return new D3D12GraphicsTexture(
+                this,
+                description,
+                resource,
+                descriptorIndex,
+                gpuHandle,
+                texture.ResidentByteCount);
+        }
+        catch
+        {
+            if (descriptorIndex >= 0)
+            {
+                _shaderResourceDescriptors.Release(
+                    descriptorIndex);
+            }
+
+            resource?.Dispose();
+            throw;
+        }
     }
 
     public void RenderFrame(
@@ -496,6 +653,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         }
 
         _commandList.Dispose();
+        _shaderResourceHeap.Dispose();
         _dsvHeap.Dispose();
         _rtvHeap.Dispose();
         _swapChain.Dispose();
@@ -517,6 +675,170 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         _device.Dispose();
         _factory.Dispose();
         _disposed = true;
+    }
+
+    internal ID3D12DescriptorHeap ShaderResourceHeap =>
+        _shaderResourceHeap;
+
+    internal void RecordTextureBindingFailure()
+    {
+        _textureBindingFailureCount++;
+    }
+
+    internal void ReleaseTexture(
+        ID3D12Resource resource,
+        int descriptorIndex,
+        long residentByteCount)
+    {
+        ArgumentNullException.ThrowIfNull(resource);
+
+        if (_disposed)
+        {
+            resource.Dispose();
+            return;
+        }
+
+        WaitForIdle();
+        resource.Dispose();
+        _shaderResourceDescriptors.Release(
+            descriptorIndex);
+        _loadedTextureCount--;
+        _residentTextureBytes =
+            checked(
+                _residentTextureBytes -
+                residentByteCount);
+    }
+
+    private void UploadTexture(
+        ID3D12Resource destination,
+        ResourceDescription resourceDescription,
+        GraphicsTextureData texture)
+    {
+        int mipCount =
+            texture.Description.MipCount;
+        var layouts =
+            new PlacedSubresourceFootPrint[mipCount];
+        var rowCounts =
+            new uint[mipCount];
+        var rowSizes =
+            new ulong[mipCount];
+
+        _device.GetCopyableFootprints(
+            resourceDescription,
+            0,
+            checked((uint)mipCount),
+            0,
+            layouts,
+            rowCounts,
+            rowSizes,
+            out ulong uploadSize);
+
+        if (uploadSize > int.MaxValue)
+        {
+            throw new GraphicsDeviceException(
+                $"Texture upload requires {uploadSize} bytes, exceeding the supported staging allocation size.");
+        }
+
+        var uploadBytes =
+            new byte[checked((int)uploadSize)];
+
+        for (int mipIndex = 0;
+             mipIndex < mipCount;
+             mipIndex++)
+        {
+            GraphicsTextureMipData mip =
+                texture.Mips[mipIndex];
+            int rowBytes =
+                checked(
+                    mip.Width *
+                    4);
+
+            if (rowSizes[mipIndex] < checked((ulong)rowBytes))
+            {
+                throw new GraphicsDeviceException(
+                    $"D3D12 copy footprint for mip {mipIndex} is smaller than the source row.");
+            }
+
+            for (int row = 0;
+                 row < mip.Height;
+                 row++)
+            {
+                int sourceOffset =
+                    checked(
+                        row *
+                        mip.RowPitch);
+                int destinationOffset =
+                    checked(
+                        (int)layouts[mipIndex].Offset +
+                        row *
+                        checked((int)layouts[mipIndex].Footprint.RowPitch));
+
+                mip.Pixels.AsSpan(
+                        sourceOffset,
+                        rowBytes)
+                    .CopyTo(
+                        uploadBytes.AsSpan(
+                            destinationOffset,
+                            rowBytes));
+            }
+        }
+
+        using ID3D12Resource upload =
+            _device.CreateCommittedResource(
+                HeapType.Upload,
+                ResourceDescription.Buffer(uploadSize),
+                ResourceStates.GenericRead);
+        upload.Name =
+            "ForgeLine Texture Upload";
+        upload.SetData<byte>(
+            uploadBytes);
+
+        using ID3D12CommandAllocator allocator =
+            _device.CreateCommandAllocator(
+                CommandListType.Direct);
+        using ID3D12GraphicsCommandList uploadList =
+            _device.CreateCommandList<ID3D12GraphicsCommandList>(
+                CommandListType.Direct,
+                allocator);
+
+        for (int mipIndex = 0;
+             mipIndex < mipCount;
+             mipIndex++)
+        {
+            uploadList.CopyTextureRegion(
+                new TextureCopyLocation(
+                    destination,
+                    checked((uint)mipIndex)),
+                0,
+                0,
+                0,
+                new TextureCopyLocation(
+                    upload,
+                    layouts[mipIndex]));
+        }
+
+        uploadList.ResourceBarrierTransition(
+            destination,
+            ResourceStates.CopyDest,
+            ResourceStates.PixelShaderResource);
+        uploadList.Close();
+
+        _commandQueue.ExecuteCommandList(
+            uploadList);
+
+        ulong fenceValue =
+            _nextFenceValue++;
+        _commandQueue.Signal(
+            _frameFence,
+            fenceValue);
+
+        if (_frameFence.CompletedValue < fenceValue)
+        {
+            _frameFence.SetEventOnCompletion(
+                fenceValue,
+                _frameFenceEvent);
+            _frameFenceEvent.WaitOne();
+        }
     }
 
     private void CreateRenderTargets(
