@@ -29,6 +29,14 @@ internal readonly record struct ClientVisualQualificationSnapshot(
     int ActiveVfxEffects,
     int VfxPoolCapacity,
     ulong DroppedVfxEffects,
+    int LoadedTextureCount,
+    long ResidentTextureBytes,
+    int ShaderResourceDescriptorsUsed,
+    int ShaderResourceDescriptorCapacity,
+    long TextureBindingFailureCount,
+    int LoadedMaterialCount,
+    int LoadedMaterialAssetTextureCount,
+    long MaterialBindingFailureCount,
     GraphicsSurfaceInfo Surface = default);
 
 internal readonly record struct ClientRenderFrame(
@@ -468,6 +476,7 @@ internal sealed class ClientRenderHost : IDisposable
                     frameTiming,
                     terrainRenderer.LastDiagnostics,
                     instanceRenderer.LastDiagnostics,
+                    instanceRenderer.MaterialDiagnostics,
                     debugDrawRenderer.LastDiagnostics,
                     snapshot.VfxMetrics,
                     renderWorld.InstanceCount);
@@ -543,6 +552,7 @@ internal sealed class ClientRenderHost : IDisposable
         in FrameTimingMetrics frameTiming,
         in TerrainRenderDiagnostics terrain,
         in InstanceRenderDiagnostics instances,
+        in RuntimeMaterialDiagnostics materials,
         in DebugDrawRenderDiagnostics debug,
         in VfxPresentationMetrics vfx,
         int totalInstances)
@@ -570,6 +580,14 @@ internal sealed class ClientRenderHost : IDisposable
                 vfx.ActiveTransientEffects,
                 vfx.PoolCapacity,
                 vfx.TotalDropped,
+                graphics.Resources.LoadedTextureCount,
+                graphics.Resources.ResidentTextureBytes,
+                graphics.Resources.ShaderResourceDescriptorsUsed,
+                graphics.Resources.ShaderResourceDescriptorCapacity,
+                graphics.Resources.TextureBindingFailureCount,
+                materials.LoadedMaterialCount,
+                materials.LoadedAssetTextureCount,
+                materials.BindingFailureCount,
                 graphics.Surface);
 
         lock (_frameGate)
