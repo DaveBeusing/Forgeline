@@ -592,7 +592,7 @@ internal static class GltfImporter
         bool generatedAny =
             false;
 
-        for (int index = 0; index < indices.Count; index += 3)
+        for (int index = 0; index < indices.Length; index += 3)
         {
             int a = checked((int)indices[index]);
             int b = checked((int)indices[index + 1]);
