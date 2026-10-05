@@ -565,15 +565,29 @@ public static class AssetPipelineCompiler
             foreach (var lod in node.Definition.Lods)
             {
                 if (AssetId.TryParse(lod.AssetId, out var lodId) &&
-                    nodes.TryGetValue(lodId, out var lodNode) &&
-                    lodNode.Definition.Type != RuntimeAssetType.Mesh)
+                    nodes.TryGetValue(lodId, out var lodNode))
                 {
-                    diagnostics.Add(new AssetCompilerDiagnostic(
-                        "ASSET020",
-                        AssetCompilerDiagnosticSeverity.Error,
-                        $"LOD reference '{lodId}' must target a mesh asset.",
-                        node.Id.Value,
-                        node.Definition.Source));
+                    if (lodNode.Definition.Type != RuntimeAssetType.Mesh)
+                    {
+                        diagnostics.Add(new AssetCompilerDiagnostic(
+                            "ASSET020",
+                            AssetCompilerDiagnosticSeverity.Error,
+                            $"LOD reference '{lodId}' must target a mesh asset.",
+                            node.Id.Value,
+                            node.Definition.Source));
+                    }
+                    else if (node.Definition.Type == RuntimeAssetType.Mesh &&
+                             !node.Definition.MaterialReferences.SequenceEqual(
+                                 lodNode.Definition.MaterialReferences,
+                                 StringComparer.Ordinal))
+                    {
+                        diagnostics.Add(new AssetCompilerDiagnostic(
+                            "ASSET033",
+                            AssetCompilerDiagnosticSeverity.Error,
+                            $"LOD reference '{lodId}' changes the mesh material-slot identity. LODs must preserve stable material references and slot order.",
+                            node.Id.Value,
+                            node.Definition.Source));
+                    }
                 }
             }
 

@@ -342,6 +342,8 @@ public sealed class RuntimeAssetQualificationTests
                         .ToPayload(),
                     RuntimeAssetType.Material =>
                         "{}"u8.ToArray(),
+                    RuntimeAssetType.Mesh =>
+                        CreateMeshPayload(),
                     _ =>
                         new byte[payloadBytes]
                 };
@@ -352,6 +354,31 @@ public sealed class RuntimeAssetQualificationTests
                 ReadOnlySpan<byte>.Empty,
                 payload);
         }
+
+        private static byte[] CreateMeshPayload() =>
+            new RuntimeMeshData(
+                RuntimeMeshAttributes.Normal,
+                [
+                    new RuntimeMeshVertex(
+                        0f, 0f, 0f,
+                        0f, 1f, 0f,
+                        0f, 0f,
+                        0f, 0f, 0f, 0f),
+                    new RuntimeMeshVertex(
+                        1f, 0f, 0f,
+                        0f, 1f, 0f,
+                        0f, 0f,
+                        0f, 0f, 0f, 0f),
+                    new RuntimeMeshVertex(
+                        0f, 0f, 1f,
+                        0f, 1f, 0f,
+                        0f, 0f,
+                        0f, 0f, 0f, 0f)
+                ],
+                [0u, 1u, 2u],
+                [],
+                [new RuntimeMeshSection(0, 3, -1)])
+            .ToPayload();
 
         public void WriteRawAsset(
             RuntimeAssetRecord record,
