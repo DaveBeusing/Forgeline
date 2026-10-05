@@ -56,6 +56,10 @@ internal readonly record struct ClientVisualQualificationSnapshot(
     public long TextureUploadCount { get; init; }
 
     public long TextureReleaseCount { get; init; }
+
+    public long DebugLayerWarningCount { get; init; }
+
+    public long DebugLayerErrorCount { get; init; }
 }
 
 internal readonly record struct ClientRenderFrame(
@@ -628,7 +632,11 @@ internal sealed class ClientRenderHost : IDisposable
                 TextureUploadCount =
                     graphics.Resources.TextureUploadCount,
                 TextureReleaseCount =
-                    graphics.Resources.TextureReleaseCount
+                    graphics.Resources.TextureReleaseCount,
+                DebugLayerWarningCount =
+                    graphics.Debug.WarningCount,
+                DebugLayerErrorCount =
+                    graphics.Debug.ErrorCount
             };
 
         lock (_frameGate)

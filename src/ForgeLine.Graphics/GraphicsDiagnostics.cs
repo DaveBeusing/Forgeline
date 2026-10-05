@@ -18,6 +18,11 @@ public sealed record GraphicsResourceDiagnostics(
     public long TextureReleaseCount { get; init; }
 }
 
+public sealed record GraphicsDebugDiagnostics(
+    bool Enabled,
+    long WarningCount,
+    long ErrorCount);
+
 public sealed record GraphicsDiagnostics(
     GraphicsDeviceInfo Device,
     GraphicsSurfaceInfo Surface)
@@ -33,4 +38,10 @@ public sealed record GraphicsDiagnostics(
     public bool GpuTimingAvailable { get; init; }
 
     public double? GpuFrameMilliseconds { get; init; }
+
+    public GraphicsDebugDiagnostics Debug { get; init; } =
+        new(
+            false,
+            0,
+            0);
 }

@@ -37,7 +37,14 @@ function Invoke-ClientSmoke {
         "--visual-qualification-output", $ReportPath
     )
 
-    & dotnet @dotnetArguments
+    $previousDebugLayer = $env:FORGELINE_D3D12_DEBUG_LAYER
+    $env:FORGELINE_D3D12_DEBUG_LAYER = "1"
+    try {
+        & dotnet @dotnetArguments
+    }
+    finally {
+        $env:FORGELINE_D3D12_DEBUG_LAYER = $previousDebugLayer
+    }
 
     if ($LASTEXITCODE -ne 0) {
         throw "Client smoke qualification failed for expected mode '$ExpectedMode' with exit code $LASTEXITCODE."
@@ -98,6 +105,51 @@ function Invoke-ClientSmoke {
 
     if ($surface.resizeGeneration -ne $surface.appliedResizeGeneration) {
         throw "Graphics resize generation $($surface.resizeGeneration) was not fully applied; last applied generation is $($surface.appliedResizeGeneration)."
+    }
+
+    $metrics = $report.metrics
+
+    if ($metrics.textureBindingFailureCount -ne 0 -or
+        $metrics.materialBindingFailureCount -ne 0) {
+        throw "Texture/material binding failures were reported during '$ExpectedMode' qualification."
+    }
+
+    if ($metrics.terrainTextureBindingsPerDraw -gt 13 -or
+        $metrics.terrainMaximumTextureSamplesPerPixel -gt 13) {
+        throw "Terrain texture/sample budget exceeded the four-layer baseline during '$ExpectedMode' qualification."
+    }
+
+    if ($metrics.totalMeasuredDrawCalls -gt 26) {
+        throw "Measured draw calls increased above the accepted Vertical Slice baseline of 26 during '$ExpectedMode' qualification."
+    }
+
+    if ($metrics.peakResidentTextureBytes -gt 2097152) {
+        throw "Peak resident texture bytes $($metrics.peakResidentTextureBytes) exceeded the 2 MiB Vertical Slice budget."
+    }
+
+    if ($metrics.peakShaderResourceDescriptorsUsed -gt 512) {
+        throw "Peak SRV descriptor use $($metrics.peakShaderResourceDescriptorsUsed) exceeded the accepted budget of 512."
+    }
+
+    if ($metrics.textureUploadCount -ne
+        ($metrics.loadedTextureCount + $metrics.textureReleaseCount)) {
+        throw "Texture lifetime accounting indicates repeated or unbalanced uploads during '$ExpectedMode' qualification."
+    }
+
+    if ($metrics.shaderResourceDescriptorsUsed -ne
+        $metrics.loadedTextureCount) {
+        throw "Current SRV descriptor usage does not match the loaded texture count during '$ExpectedMode' qualification."
+    }
+
+    if ($metrics.gpuTimingAvailable -and
+        $null -eq $metrics.gpuMilliseconds) {
+        throw "GPU timing was reported available but no completed frame timing was published."
+    }
+
+    if ($metrics.debugLayerEnabled -and
+        ($metrics.debugLayerWarningCount -ne 0 -or
+         $metrics.debugLayerErrorCount -ne 0)) {
+        throw "D3D12 debug-layer warnings/errors were reported during '$ExpectedMode' qualification."
     }
 
     Write-Host (

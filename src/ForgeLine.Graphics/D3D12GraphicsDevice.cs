@@ -33,6 +33,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     private readonly GraphicsDeviceInfo _deviceInfo;
     private readonly GraphicsSurfaceLifecycleState _surfaceLifecycle;
     private readonly bool[] _frameTimestampReady;
+    private readonly ID3D12InfoQueue? _debugInfoQueue;
 
     private ID3D12Resource? _depthTarget;
     private ID3D12QueryHeap? _timestampQueryHeap;
@@ -50,6 +51,8 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     private long _textureReleaseCount;
     private ulong _timestampFrequency;
     private double? _lastGpuFrameMilliseconds;
+    private long _debugWarningCount;
+    private long _debugErrorCount;
     private int _frameIndex;
     private bool _disposed;
 
@@ -65,6 +68,10 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             _factory,
             configuration.AllowSoftwareAdapterFallback,
             debugLayerEnabled);
+        _debugInfoQueue =
+            debugLayerEnabled
+                ? _device.QueryInterfaceOrNull<ID3D12InfoQueue>()
+                : null;
 
         _commandQueue = _device.CreateCommandQueue(CommandListType.Direct);
         _commandQueue.Name = "ForgeLine Graphics Queue";
@@ -180,6 +187,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         get
         {
             ThrowIfDisposed();
+            CaptureDebugLayerMessages();
 
             return new GraphicsDiagnostics(
                 _deviceInfo,
@@ -225,7 +233,12 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                     _timestampReadback is not null &&
                     _timestampFrequency > 0,
                 GpuFrameMilliseconds =
-                    _lastGpuFrameMilliseconds
+                    _lastGpuFrameMilliseconds,
+                Debug =
+                    new GraphicsDebugDiagnostics(
+                        _debugInfoQueue is not null,
+                        _debugWarningCount,
+                        _debugErrorCount)
             };
         }
     }
@@ -706,6 +719,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
 
         _timestampReadback?.Dispose();
         _timestampQueryHeap?.Dispose();
+        _debugInfoQueue?.Dispose();
         _commandList.Dispose();
         _shaderResourceHeap.Dispose();
         _dsvHeap.Dispose();
@@ -762,6 +776,51 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                 _residentTextureBytes -
                 residentByteCount);
         _textureReleaseCount++;
+    }
+
+    private void CaptureDebugLayerMessages()
+    {
+        if (_debugInfoQueue is null)
+        {
+            return;
+        }
+
+        try
+        {
+            ulong messageCount =
+                _debugInfoQueue.GetNumStoredMessagesAllowedByRetrievalFilter();
+
+            for (ulong index = 0;
+                 index < messageCount;
+                 index++)
+            {
+                Message message =
+                    _debugInfoQueue.GetMessage(
+                        index);
+
+                switch (message.Severity)
+                {
+                    case MessageSeverity.Warning:
+                        _debugWarningCount++;
+                        break;
+
+                    case MessageSeverity.Error:
+                    case MessageSeverity.Corruption:
+                        _debugErrorCount++;
+                        break;
+                }
+            }
+
+            if (messageCount > 0)
+            {
+                _debugInfoQueue.ClearStoredMessages();
+            }
+        }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine(
+                $"[graphics:debug-diagnostics-warning] type={exception.GetType().Name} message={exception.Message}");
+        }
     }
 
     private void TryInitializeGpuTiming(
