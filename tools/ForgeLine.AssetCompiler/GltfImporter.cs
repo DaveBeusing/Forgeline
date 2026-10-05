@@ -1076,4 +1076,3 @@ internal static class GltfImporter
 internal readonly record struct MeshMaterialRequirement(
     bool RequiresUv0,
     bool RequiresTangents);
-}
