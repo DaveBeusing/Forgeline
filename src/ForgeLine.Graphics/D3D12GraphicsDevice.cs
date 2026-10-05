@@ -789,7 +789,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         try
         {
             ulong messageCount =
-                _debugInfoQueue.GetNumStoredMessagesAllowedByRetrievalFilter();
+                _debugInfoQueue.NumStoredMessages;
 
             for (ulong index = 0;
                  index < messageCount;
@@ -852,7 +852,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                         checked(
                             (ulong)queryCount *
                             sizeof(ulong))),
-                    ResourceStates.CopyDestination);
+                    ResourceStates.CopyDest);
             _timestampReadback.Name =
                 "ForgeLine GPU Timestamp Readback";
             _timestampFrequency =
