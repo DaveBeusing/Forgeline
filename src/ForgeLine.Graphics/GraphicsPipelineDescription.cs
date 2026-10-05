@@ -49,11 +49,11 @@ public sealed record GraphicsPipelineDescription(
                 "Vertex root constants must use between zero and 64 32-bit values.");
         }
 
-        if (PixelTextureCount < 0 || PixelTextureCount > 8)
+        if (PixelTextureCount < 0 || PixelTextureCount > 16)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(PixelTextureCount),
-                "Pixel texture count must be between zero and eight.");
+                "Pixel texture count must be between zero and sixteen.");
         }
 
         foreach (GraphicsVertexElement element in VertexElements)

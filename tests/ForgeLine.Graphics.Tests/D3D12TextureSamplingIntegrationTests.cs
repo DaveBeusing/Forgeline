@@ -229,6 +229,149 @@ public sealed class D3D12TextureSamplingIntegrationTests
             resources.TextureBindingFailureCount);
     }
 
+    [Fact]
+    public void TerrainStylePipelineSupportsThirteenPixelTextureBindings()
+    {
+        using var platform =
+            new WindowsPlatform();
+        using IWindow window =
+            platform.CreateWindow(
+                new WindowConfiguration(
+                    "FORGELINE Terrain Texture Binding Test",
+                    160,
+                    120,
+                    resizable: false,
+                    WindowMode.Windowed));
+        using IGraphicsDevice graphics =
+            GraphicsDeviceFactory.CreateForWindow(
+                window,
+                new GraphicsConfiguration
+                {
+                    AllowSoftwareAdapterFallback = true,
+                    EnableDebugLayer = false,
+                    EnableVSync = false
+                });
+        using IGraphicsTexture texture =
+            graphics.CreateTexture(
+                CreateSinglePixelTexture(
+                    GraphicsTextureColorSpace.Linear,
+                    255,
+                    255,
+                    255,
+                    255));
+
+        var compiler =
+            new DxcShaderCompiler();
+        GraphicsShaderBytecode vertexShader =
+            compiler.Compile(
+                """
+                struct VertexInput
+                {
+                    float3 Position : POSITION;
+                };
+
+                float4 VSMain(VertexInput input) : SV_Position
+                {
+                    return float4(input.Position, 1.0f);
+                }
+                """,
+                GraphicsShaderStage.Vertex,
+                "VSMain",
+                "TerrainBindingVertex.hlsl");
+        GraphicsShaderBytecode pixelShader =
+            compiler.Compile(
+                """
+                Texture2D ControlTexture : register(t0);
+                Texture2D Layer0Base : register(t1);
+                Texture2D Layer1Base : register(t2);
+                Texture2D Layer2Base : register(t3);
+                Texture2D Layer3Base : register(t4);
+                Texture2D Layer0Normal : register(t5);
+                Texture2D Layer1Normal : register(t6);
+                Texture2D Layer2Normal : register(t7);
+                Texture2D Layer3Normal : register(t8);
+                Texture2D Layer0Orm : register(t9);
+                Texture2D Layer1Orm : register(t10);
+                Texture2D Layer2Orm : register(t11);
+                Texture2D Layer3Orm : register(t12);
+                SamplerState WorldSampler : register(s0);
+
+                float4 PSMain() : SV_Target0
+                {
+                    return Layer3Orm.SampleLevel(
+                        WorldSampler,
+                        float2(0.5f, 0.5f),
+                        0.0f);
+                }
+                """,
+                GraphicsShaderStage.Pixel,
+                "PSMain",
+                "TerrainBindingPixel.hlsl");
+
+        using IGraphicsPipeline pipeline =
+            graphics.CreateGraphicsPipeline(
+                new GraphicsPipelineDescription(
+                    vertexShader,
+                    pixelShader)
+                {
+                    VertexElements =
+                    [
+                        new GraphicsVertexElement(
+                            "POSITION",
+                            0,
+                            GraphicsVertexElementFormat.Float3,
+                            0)
+                    ],
+                    PixelTextureCount = 13
+                });
+
+        TexturePositionVertex[] vertices =
+        [
+            new(-0.8f, -0.8f, 0.0f),
+            new(0.0f, 0.8f, 0.0f),
+            new(0.8f, -0.8f, 0.0f)
+        ];
+        using IGraphicsBuffer vertexBuffer =
+            graphics.CreateBuffer(
+                new GraphicsBufferDescription(
+                    checked(
+                        (ulong)vertices.Length *
+                        TexturePositionVertex.SizeInBytes),
+                    GraphicsBufferMemory.Upload));
+        vertexBuffer.SetData<TexturePositionVertex>(
+            vertices);
+
+        graphics.RenderFrame(
+            GraphicsColor.ForgeLineClear,
+            context =>
+            {
+                context.SetPipeline(
+                    pipeline);
+                context.SetVertexBuffer(
+                    vertexBuffer,
+                    TexturePositionVertex.SizeInBytes);
+
+                for (int slot = 0;
+                     slot < 13;
+                     slot++)
+                {
+                    context.SetPixelTexture(
+                        slot,
+                        texture);
+                }
+
+                context.Draw(
+                    vertices.Length);
+            });
+
+        Assert.Equal(
+            1,
+            graphics.Diagnostics.Resources.LoadedTextureCount);
+        Assert.Equal(
+            0,
+            graphics.Diagnostics.Resources.TextureBindingFailureCount);
+    }
+
     private static GraphicsTextureData CreateBaseColorTextureData() =>
         new(
             new GraphicsTextureDescription(
@@ -280,6 +423,17 @@ public sealed class D3D12TextureSamplingIntegrationTests
                         alpha
                     ])
             ]);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private readonly record struct TexturePositionVertex(
+        float X,
+        float Y,
+        float Z)
+    {
+        public const int SizeInBytes =
+            sizeof(float) *
+            3;
+    }
 
     [StructLayout(LayoutKind.Sequential)]
     private readonly record struct TextureVertex(
