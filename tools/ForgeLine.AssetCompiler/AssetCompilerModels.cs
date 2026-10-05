@@ -29,6 +29,12 @@ public sealed record SourceAssetDefinition
 
     public required string Source { get; init; }
 
+    public RuntimeTextureUsage TextureUsage { get; init; } =
+        RuntimeTextureUsage.Color;
+
+    public RuntimeTextureColorSpace TextureColorSpace { get; init; } =
+        RuntimeTextureColorSpace.Srgb;
+
     public float Scale { get; init; } = 1f;
 
     public IReadOnlyList<string> Dependencies { get; init; } = [];
@@ -63,6 +69,10 @@ public sealed record MaterialSourceDefinition
     public float MetallicFactor { get; init; } = 1f;
 
     public float RoughnessFactor { get; init; } = 1f;
+
+    public float EmissiveMultiplier { get; init; } = 1f;
+
+    public float[] UvScale { get; init; } = [1f, 1f];
 
     public IReadOnlyList<string> ReferencedTextureIds =>
         new[] { BaseColorTexture, NormalTexture, OrmTexture, EmissiveTexture }

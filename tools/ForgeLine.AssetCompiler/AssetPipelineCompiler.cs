@@ -5,8 +5,8 @@ namespace ForgeLine.AssetCompiler;
 
 public static class AssetPipelineCompiler
 {
-    public const string CompilerVersion = "1.0.0";
-    public const int RuntimeVersion = 1;
+    public const string CompilerVersion = "1.1.0";
+    public const int RuntimeVersion = 2;
 
     private static readonly JsonSerializerOptions JsonOptions = RuntimeAssetCatalog.CreateJsonOptions();
 
@@ -300,6 +300,21 @@ public static class AssetPipelineCompiler
                 "ASSET009",
                 AssetCompilerDiagnosticSeverity.Error,
                 $"Source extension '{extension}' is not valid for asset type '{definition.Type}'.",
+                id.Value,
+                ToRelativePath(sourceRoot, sourcePath)));
+        }
+
+        if (definition.Type == RuntimeAssetType.Texture &&
+            definition.TextureUsage is
+                RuntimeTextureUsage.Normal or
+                RuntimeTextureUsage.Orm or
+                RuntimeTextureUsage.GenericData &&
+            definition.TextureColorSpace != RuntimeTextureColorSpace.Linear)
+        {
+            diagnostics.Add(new AssetCompilerDiagnostic(
+                "ASSET026",
+                AssetCompilerDiagnosticSeverity.Error,
+                $"Texture usage '{definition.TextureUsage}' requires linear color space.",
                 id.Value,
                 ToRelativePath(sourceRoot, sourcePath)));
         }
@@ -619,7 +634,10 @@ public static class AssetPipelineCompiler
         node.Definition.Type switch
         {
             RuntimeAssetType.Mesh => GltfImporter.Import(node.SourcePath, sourceRoot),
-            RuntimeAssetType.Texture => TextureImporter.Import(node.SourcePath),
+            RuntimeAssetType.Texture => TextureImporter.Import(
+                node.SourcePath,
+                node.Definition.TextureColorSpace,
+                node.Definition.TextureUsage),
             RuntimeAssetType.Material => MaterialImporter.Import(node.SourcePath),
             _ => throw new InvalidDataException($"Asset type '{node.Definition.Type}' is unsupported."),
         };

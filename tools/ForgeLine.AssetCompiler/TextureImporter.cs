@@ -8,7 +8,10 @@ internal static class TextureImporter
 {
     private const int MaxDimension = 16384;
 
-    public static ImportedAssetPayload Import(string path)
+    public static ImportedAssetPayload Import(
+        string path,
+        RuntimeTextureColorSpace colorSpace,
+        RuntimeTextureUsage usage)
     {
         var extension = Path.GetExtension(path);
         TextureData texture = extension.ToLowerInvariant() switch
@@ -18,16 +21,17 @@ internal static class TextureImporter
             _ => throw new InvalidDataException($"Texture format '{extension}' is not supported."),
         };
 
-        using var stream = new MemoryStream();
-        using var writer = new BinaryWriter(stream);
-        writer.Write(1);
-        writer.Write(texture.Width);
-        writer.Write(texture.Height);
-        writer.Write(4);
-        writer.Write(texture.Pixels);
-        writer.Flush();
+        var runtimeTexture = RuntimeTextureData.FromRgba8(
+            texture.Width,
+            texture.Height,
+            texture.Pixels,
+            colorSpace,
+            usage);
 
-        return new ImportedAssetPayload(stream.ToArray(), null, []);
+        return new ImportedAssetPayload(
+            runtimeTexture.ToPayload(),
+            null,
+            []);
     }
 
     private static TextureData ImportPng(string path)

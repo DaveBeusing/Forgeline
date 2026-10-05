@@ -52,6 +52,20 @@ internal static class MaterialImporter
             throw new InvalidDataException("Material roughnessFactor must be between 0 and 1.");
         }
 
+        if (!float.IsFinite(definition.EmissiveMultiplier) ||
+            definition.EmissiveMultiplier < 0f)
+        {
+            throw new InvalidDataException(
+                "Material emissiveMultiplier must be finite and non-negative.");
+        }
+
+        if (definition.UvScale.Length != 2 ||
+            definition.UvScale.Any(static value => !float.IsFinite(value) || value <= 0f))
+        {
+            throw new InvalidDataException(
+                "Material uvScale must contain two finite positive values.");
+        }
+
         foreach (var id in definition.ReferencedTextureIds)
         {
             _ = AssetId.Parse(id);

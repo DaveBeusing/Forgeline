@@ -1261,6 +1261,12 @@ internal sealed class ClientApplication
             $"instances={metrics.VisibleInstances}/{metrics.TotalInstances} " +
             $"lod={metrics.HighLodInstances}/{metrics.ReducedLodInstances} " +
             $"vfx={metrics.ActiveVfxEffects}/{metrics.VfxPoolCapacity} " +
+            $"textures={metrics.LoadedTextureCount} " +
+            $"textureBytes={metrics.ResidentTextureBytes} " +
+            $"descriptors={metrics.ShaderResourceDescriptorsUsed}/{metrics.ShaderResourceDescriptorCapacity} " +
+            $"materials={metrics.LoadedMaterialCount} " +
+            $"materialTextures={metrics.LoadedMaterialAssetTextureCount} " +
+            $"bindingFailures={metrics.TextureBindingFailureCount + metrics.MaterialBindingFailureCount} " +
             $"windowMode={window.Mode} " +
             $"surface={metrics.Surface.Width}x{metrics.Surface.Height} " +
             $"submitted={metrics.Surface.SubmittedFrameCount} " +

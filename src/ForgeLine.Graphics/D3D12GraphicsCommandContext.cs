@@ -154,6 +154,57 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         _commandList.SetGraphicsRoot32BitConstants(0, values);
     }
 
+    public void SetPixelTexture(
+        int slot,
+        IGraphicsTexture texture)
+    {
+        if (_pipeline is null)
+        {
+            _owner.RecordTextureBindingFailure();
+            throw new InvalidOperationException(
+                "A graphics pipeline must be bound before setting pixel textures.");
+        }
+
+        if (slot < 0 ||
+            slot >= _pipeline.Description.PixelTextureCount)
+        {
+            _owner.RecordTextureBindingFailure();
+            throw new ArgumentOutOfRangeException(
+                nameof(slot),
+                slot,
+                $"The current graphics pipeline declares {_pipeline.Description.PixelTextureCount} pixel textures.");
+        }
+
+        ArgumentNullException.ThrowIfNull(texture);
+
+        if (texture is not D3D12GraphicsTexture d3d12Texture ||
+            !ReferenceEquals(d3d12Texture.Owner, _owner))
+        {
+            _owner.RecordTextureBindingFailure();
+            throw new ArgumentException(
+                "The graphics texture was not created by this graphics device.",
+                nameof(texture));
+        }
+
+        if (d3d12Texture.IsDisposed)
+        {
+            _owner.RecordTextureBindingFailure();
+            throw new ObjectDisposedException(
+                nameof(texture),
+                "Disposed graphics textures cannot be rebound.");
+        }
+
+        _commandList.SetDescriptorHeaps(_owner.ShaderResourceHeap);
+
+        int rootParameterIndex =
+            (_pipeline.Description.VertexRootConstantCount > 0 ? 1 : 0) +
+            slot;
+
+        _commandList.SetGraphicsRootDescriptorTable(
+            checked((uint)rootParameterIndex),
+            d3d12Texture.GpuDescriptorHandle);
+    }
+
     public void Draw(int vertexCount, int startVertex = 0)
     {
         if (vertexCount <= 0)

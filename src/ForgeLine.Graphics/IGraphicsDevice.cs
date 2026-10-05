@@ -8,6 +8,11 @@ public interface IGraphicsDevice : IDisposable
 
     IGraphicsBuffer CreateBuffer(GraphicsBufferDescription description);
 
+    IGraphicsTexture CreateTexture(
+        GraphicsTextureData texture) =>
+        throw new NotSupportedException(
+            "This graphics device does not support textures.");
+
     void RenderFrame(
         GraphicsColor clearColor,
         Action<IGraphicsCommandContext>? recordCommands = null);
