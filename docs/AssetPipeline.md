@@ -315,7 +315,9 @@ Those capabilities should extend this pipeline rather than create parallel asset
 
 ## Committed Vertical Slice world assets
 
-The first authored world set lives below `assets/source/world/`. It includes the eight terrain material slots, eight decal materials, reusable props, vegetation, four resource-deposit families, reduced LOD meshes, and strategic resource-symbol materials.
+The first authored world set lives below `assets/source/world/`. It includes the eight terrain material slots, four terrain base-color textures, eight decal materials, reusable props, vegetation, four resource-deposit families, reduced LOD meshes, and strategic resource-symbol materials.
+
+The terrain texture IDs are `texture.world.terrain.dry_dirt`, `texture.world.terrain.cracked_earth`, `texture.world.terrain.rocky_scrub`, and `texture.world.terrain.dark_ash`. They are ordinary PNG source assets compiled through the existing texture importer into versioned RGBA8 `.flasset` payloads. Terrain materials reference them through `baseColorTexture`; presentation resolves those references from the runtime catalog and samples the compiled payload while constructing static terrain presentation data. Runtime code never reads these PNG authoring files directly.
 
 These files are normal compiler inputs. CI compiles the source tree into ignored `assets/runtime/` output before the Windows graphics smoke test. The client consumes only the runtime manifest and `.flasset` payloads; it does not read glTF or material-source JSON at runtime.
 

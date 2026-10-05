@@ -21,7 +21,10 @@ public readonly record struct TerrainMaterialDefinition(
     string AssetId,
     Vector3 BaseColor,
     float Roughness,
-    float Metallic);
+    float Metallic,
+    string? BaseColorTextureAssetId = null,
+    TerrainSurfaceTexture? BaseColorTexture = null,
+    float TextureTileMeters = 128.0f);
 
 public readonly record struct TerrainBlendRegion(
     TerrainMaterialSlot Slot,
@@ -31,6 +34,9 @@ public readonly record struct TerrainBlendRegion(
 
 public sealed class TerrainPresentationProfile
 {
+    private const float TextureInfluence = 0.72f;
+    private const float SecondaryTextureInfluence = 0.18f;
+
     private readonly Dictionary<TerrainMaterialSlot, TerrainMaterialDefinition> _materials;
     private readonly TerrainBlendRegion[] _regions;
 
@@ -90,24 +96,33 @@ public sealed class TerrainPresentationProfile
                 1.0f);
 
         Vector3 grass =
-            GetMaterial(
-                TerrainMaterialSlot.GrassGround).BaseColor;
+            SampleMaterialColor(
+                GetMaterial(
+                    TerrainMaterialSlot.GrassGround),
+                position);
         Vector3 dirt =
-            GetMaterial(
-                TerrainMaterialSlot.Dirt).BaseColor;
+            SampleMaterialColor(
+                GetMaterial(
+                    TerrainMaterialSlot.Dirt),
+                position);
         Vector3 mud =
-            GetMaterial(
-                TerrainMaterialSlot.Mud).BaseColor;
+            SampleMaterialColor(
+                GetMaterial(
+                    TerrainMaterialSlot.Mud),
+                position);
         Vector3 rock =
-            GetMaterial(
-                TerrainMaterialSlot.Rock).BaseColor;
+            SampleMaterialColor(
+                GetMaterial(
+                    TerrainMaterialSlot.Rock),
+                position);
 
         Vector3 color =
             Vector3.Lerp(
                 grass,
                 dirt,
                 Math.Clamp(
-                    elevation * 0.45f + slope * 0.45f,
+                    elevation * 0.45f +
+                    slope * 0.45f,
                     0.0f,
                     1.0f));
         color =
@@ -115,7 +130,8 @@ public sealed class TerrainPresentationProfile
                 color,
                 mud,
                 Math.Clamp(
-                    (0.28f - elevation) * 1.4f,
+                    (0.28f - elevation) *
+                    1.4f,
                     0.0f,
                     0.55f));
         color =
@@ -123,14 +139,19 @@ public sealed class TerrainPresentationProfile
                 color,
                 rock,
                 Math.Clamp(
-                    slope * 2.1f,
+                    slope *
+                    2.1f,
                     0.0f,
                     1.0f));
 
         Vector2 point =
-            new(position.X, position.Z);
+            new(
+                position.X,
+                position.Z);
 
-        for (int index = 0; index < _regions.Length; index++)
+        for (int index = 0;
+             index < _regions.Length;
+             index++)
         {
             TerrainBlendRegion region =
                 _regions[index];
@@ -147,7 +168,10 @@ public sealed class TerrainPresentationProfile
             color =
                 Vector3.Lerp(
                     color,
-                    GetMaterial(region.Slot).BaseColor,
+                    SampleMaterialColor(
+                        GetMaterial(
+                            region.Slot),
+                        position),
                     weight);
         }
 
@@ -164,14 +188,62 @@ public sealed class TerrainPresentationProfile
     {
         TerrainMaterialDefinition[] defaults =
         [
-            new(TerrainMaterialSlot.GrassGround, "material.world.terrain.grass_ground", new Vector3(0.20f, 0.30f, 0.15f), 0.90f, 0.0f),
-            new(TerrainMaterialSlot.Dirt, "material.world.terrain.dirt", new Vector3(0.34f, 0.27f, 0.18f), 0.92f, 0.0f),
-            new(TerrainMaterialSlot.Mud, "material.world.terrain.mud", new Vector3(0.20f, 0.18f, 0.13f), 0.98f, 0.0f),
-            new(TerrainMaterialSlot.Rock, "material.world.terrain.rock", new Vector3(0.38f, 0.39f, 0.37f), 0.82f, 0.0f),
-            new(TerrainMaterialSlot.Gravel, "material.world.terrain.gravel", new Vector3(0.42f, 0.40f, 0.35f), 0.88f, 0.0f),
-            new(TerrainMaterialSlot.IndustrialGround, "material.world.terrain.industrial_ground", new Vector3(0.30f, 0.31f, 0.29f), 0.78f, 0.05f),
-            new(TerrainMaterialSlot.Concrete, "material.world.terrain.concrete", new Vector3(0.48f, 0.49f, 0.47f), 0.84f, 0.0f),
-            new(TerrainMaterialSlot.Scorched, "material.world.terrain.scorched", new Vector3(0.15f, 0.13f, 0.11f), 0.96f, 0.0f)
+            new(
+                TerrainMaterialSlot.GrassGround,
+                "material.world.terrain.grass_ground",
+                new Vector3(0.20f, 0.30f, 0.15f),
+                0.90f,
+                0.0f,
+                TextureTileMeters: 160.0f),
+            new(
+                TerrainMaterialSlot.Dirt,
+                "material.world.terrain.dirt",
+                new Vector3(0.34f, 0.27f, 0.18f),
+                0.92f,
+                0.0f,
+                TextureTileMeters: 128.0f),
+            new(
+                TerrainMaterialSlot.Mud,
+                "material.world.terrain.mud",
+                new Vector3(0.20f, 0.18f, 0.13f),
+                0.98f,
+                0.0f,
+                TextureTileMeters: 112.0f),
+            new(
+                TerrainMaterialSlot.Rock,
+                "material.world.terrain.rock",
+                new Vector3(0.38f, 0.39f, 0.37f),
+                0.82f,
+                0.0f,
+                TextureTileMeters: 96.0f),
+            new(
+                TerrainMaterialSlot.Gravel,
+                "material.world.terrain.gravel",
+                new Vector3(0.42f, 0.40f, 0.35f),
+                0.88f,
+                0.0f,
+                TextureTileMeters: 80.0f),
+            new(
+                TerrainMaterialSlot.IndustrialGround,
+                "material.world.terrain.industrial_ground",
+                new Vector3(0.30f, 0.31f, 0.29f),
+                0.78f,
+                0.05f,
+                TextureTileMeters: 112.0f),
+            new(
+                TerrainMaterialSlot.Concrete,
+                "material.world.terrain.concrete",
+                new Vector3(0.48f, 0.49f, 0.47f),
+                0.84f,
+                0.0f,
+                TextureTileMeters: 96.0f),
+            new(
+                TerrainMaterialSlot.Scorched,
+                "material.world.terrain.scorched",
+                new Vector3(0.15f, 0.13f, 0.11f),
+                0.96f,
+                0.0f,
+                TextureTileMeters: 112.0f)
         ];
 
         TerrainMaterialDefinition[] materials =
@@ -186,11 +258,51 @@ public sealed class TerrainPresentationProfile
         return new TerrainPresentationProfile(
             materials,
             [
-                new(TerrainMaterialSlot.Gravel, new Vector2(1_536.0f, 1_536.0f), new Vector2(1_120.0f, 32.0f), 24.0f),
-                new(TerrainMaterialSlot.Concrete, new Vector2(1_536.0f, 920.0f), new Vector2(78.0f, 58.0f), 12.0f),
-                new(TerrainMaterialSlot.IndustrialGround, new Vector2(650.0f, 520.0f), new Vector2(150.0f, 120.0f), 28.0f),
-                new(TerrainMaterialSlot.IndustrialGround, new Vector2(2_420.0f, 2_560.0f), new Vector2(150.0f, 120.0f), 28.0f),
-                new(TerrainMaterialSlot.Scorched, new Vector2(1_610.0f, 1_690.0f), new Vector2(90.0f, 80.0f), 35.0f)
+                new(
+                    TerrainMaterialSlot.Gravel,
+                    new Vector2(
+                        1_536.0f,
+                        1_536.0f),
+                    new Vector2(
+                        1_120.0f,
+                        32.0f),
+                    24.0f),
+                new(
+                    TerrainMaterialSlot.Concrete,
+                    new Vector2(
+                        1_536.0f,
+                        920.0f),
+                    new Vector2(
+                        78.0f,
+                        58.0f),
+                    12.0f),
+                new(
+                    TerrainMaterialSlot.IndustrialGround,
+                    new Vector2(
+                        650.0f,
+                        520.0f),
+                    new Vector2(
+                        150.0f,
+                        120.0f),
+                    28.0f),
+                new(
+                    TerrainMaterialSlot.IndustrialGround,
+                    new Vector2(
+                        2_420.0f,
+                        2_560.0f),
+                    new Vector2(
+                        150.0f,
+                        120.0f),
+                    28.0f),
+                new(
+                    TerrainMaterialSlot.Scorched,
+                    new Vector2(
+                        1_610.0f,
+                        1_690.0f),
+                    new Vector2(
+                        90.0f,
+                        80.0f),
+                    35.0f)
             ]);
     }
 
@@ -242,11 +354,26 @@ public sealed class TerrainPresentationProfile
                 return fallback;
             }
 
+            string? textureAssetId =
+                TryReadTextureAssetId(
+                    root,
+                    "baseColorTexture");
+            TerrainSurfaceTexture? texture =
+                TryResolveTexture(
+                    runtimeAssets,
+                    textureAssetId);
+
             return fallback with
             {
                 BaseColor = baseColor,
                 Roughness = roughness,
-                Metallic = metallic
+                Metallic = metallic,
+                BaseColorTextureAssetId =
+                    texture is null
+                        ? null
+                        : textureAssetId,
+                BaseColorTexture =
+                    texture
             };
         }
         catch (IOException)
@@ -261,6 +388,88 @@ public sealed class TerrainPresentationProfile
         {
             return fallback;
         }
+        catch (ArgumentException)
+        {
+            return fallback;
+        }
+        catch (OverflowException)
+        {
+            return fallback;
+        }
+    }
+
+    private static TerrainSurfaceTexture? TryResolveTexture(
+        RuntimeAssetCatalog runtimeAssets,
+        string? textureAssetId)
+    {
+        if (string.IsNullOrWhiteSpace(
+                textureAssetId) ||
+            !AssetId.TryParse(
+                textureAssetId,
+                out AssetId id) ||
+            !runtimeAssets.TryGet(
+                id,
+                out RuntimeAssetRecord? record) ||
+            record is null ||
+            record.Type != RuntimeAssetType.Texture)
+        {
+            return null;
+        }
+
+        RuntimeAssetContent content =
+            runtimeAssets.Read(
+                id);
+
+        return TerrainSurfaceTexture.FromRuntimeAsset(
+            content);
+    }
+
+    private static Vector3 SampleMaterialColor(
+        in TerrainMaterialDefinition material,
+        Vector3 position)
+    {
+        TerrainSurfaceTexture? texture =
+            material.BaseColorTexture;
+
+        if (texture is null)
+        {
+            return material.BaseColor;
+        }
+
+        Vector2 point =
+            new(
+                position.X,
+                position.Z);
+        Vector3 primary =
+            texture.SampleWorld(
+                point,
+                material.TextureTileMeters);
+
+        Vector2 secondaryPoint =
+            new(
+                point.X *
+                    0.43f +
+                material.TextureTileMeters *
+                    0.37f,
+                point.Y *
+                    0.43f -
+                material.TextureTileMeters *
+                    0.29f);
+        Vector3 secondary =
+            texture.SampleWorld(
+                secondaryPoint,
+                material.TextureTileMeters *
+                2.35f);
+        Vector3 sampled =
+            Vector3.Lerp(
+                primary,
+                secondary,
+                SecondaryTextureInfluence);
+
+        return Vector3.Lerp(
+            material.BaseColor,
+            sampled,
+            TextureInfluence);
     }
 
     private static bool TryReadBaseColor(
@@ -272,7 +481,8 @@ public sealed class TerrainPresentationProfile
         if (!root.TryGetProperty(
                 "baseColorFactor",
                 out JsonElement factor) ||
-            factor.ValueKind != JsonValueKind.Array ||
+            factor.ValueKind !=
+            JsonValueKind.Array ||
             factor.GetArrayLength() != 4)
         {
             return false;
@@ -288,7 +498,8 @@ public sealed class TerrainPresentationProfile
         {
             if (!value.TryGetSingle(
                     out float channel) ||
-                !float.IsFinite(channel) ||
+                !float.IsFinite(
+                    channel) ||
                 channel < 0.0f ||
                 channel > 1.0f)
             {
@@ -325,13 +536,36 @@ public sealed class TerrainPresentationProfile
             value <= 1.0f;
     }
 
+    private static string? TryReadTextureAssetId(
+        JsonElement root,
+        string propertyName)
+    {
+        if (!root.TryGetProperty(
+                propertyName,
+                out JsonElement element) ||
+            element.ValueKind !=
+            JsonValueKind.String)
+        {
+            return null;
+        }
+
+        string? value =
+            element.GetString();
+
+        return string.IsNullOrWhiteSpace(
+                value)
+            ? null
+            : value;
+    }
+
     private static float CalculateRegionWeight(
         Vector2 point,
         in TerrainBlendRegion region)
     {
         Vector2 distance =
             Vector2.Abs(
-                point - region.Center) -
+                point -
+                region.Center) -
             region.HalfExtents;
         float dx =
             MathF.Max(
@@ -343,21 +577,27 @@ public sealed class TerrainPresentationProfile
                 0.0f);
         float outside =
             MathF.Sqrt(
-                dx * dx +
-                dz * dz);
+                dx *
+                dx +
+                dz *
+                dz);
 
         if (outside <= 0.0f)
         {
             return 0.92f;
         }
 
-        if (region.FeatherMeters <= 0.0f ||
-            outside >= region.FeatherMeters)
+        if (region.FeatherMeters <=
+                0.0f ||
+            outside >=
+                region.FeatherMeters)
         {
             return 0.0f;
         }
 
         return 0.92f *
-            (1.0f - outside / region.FeatherMeters);
+            (1.0f -
+             outside /
+             region.FeatherMeters);
     }
 }

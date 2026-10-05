@@ -90,7 +90,7 @@ public sealed class VfxAssetAuthoringTests
                         static diagnostic =>
                             $"{diagnostic.Code}: {diagnostic.Message}")));
             Assert.Equal(
-                271,
+                275,
                 result.CompiledCount);
 
             RuntimeAssetCatalog catalog =

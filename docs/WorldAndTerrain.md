@@ -78,7 +78,7 @@ Each vertex contains:
 - terrain normal
 - chunk-local UV coordinates
 
-Each quad is emitted as two indexed triangles. The initial render resolution is 33 × 33 vertices per chunk and can be changed independently of heightfield resolution.
+Each quad is emitted as two indexed triangles. The current render resolution remains 33 × 33 vertices per chunk and can be changed independently of heightfield resolution. Terrain-albedo sampling therefore uses deliberately broad world-space tile scales so the authored variation remains readable at RTS camera distances without increasing terrain buffer density.
 
 CPU mesh generation is deterministic for a given terrain chunk and mesh configuration.
 
@@ -110,14 +110,17 @@ The Vertical Slice terrain presentation defines eight stable material slots for 
 
 When the Windows client has a compiled runtime asset catalog, `TerrainPresentationProfile` resolves each available slot from its material `.flasset` payload. Base-color, roughness, and metallic factors therefore originate from the source-to-runtime asset pipeline. Missing or invalid runtime material entries use deterministic authored fallback values; source material files are never opened at runtime.
 
-The current terrain shader uses the resolved base colors together with:
+The current terrain presentation uses the resolved base colors together with:
 
 - elevation;
 - terrain normal/slope;
 - explicit Central Divide blend regions;
+- compiled base-color terrain textures;
 - a fixed directional light.
 
-Production texture splatting and texture sampling remain later renderer work. The runtime material contract and stable IDs are already in place, so adding texture-layer sampling does not require terrain simulation data to acquire renderer state.
+Central Divide terrain materials may reference compiled `baseColorTexture` assets. `TerrainPresentationProfile` reads only the runtime `.flasset` payload, decodes the compiler's versioned RGBA8 texture payload, and samples it in world X/Z space while the static terrain vertex buffers are built. Sampling is repeat-wrapped and bilinear; a secondary lower-frequency offset sample is blended in to reduce obvious tile repetition. Because world coordinates rather than per-chunk UVs drive the lookup, adjacent chunks share a continuous texture field without seams at chunk boundaries.
+
+This is intentionally a CPU-baked albedo path that feeds the existing terrain vertex-color renderer. It makes the authored terrain textures visible now without introducing a parallel asset format or renderer-owned simulation state. Native GPU texture sampling, mip chains, normal/ORM maps, and full multi-layer PBR terrain splatting remain later renderer work.
 
 ## Frustum Culling
 
@@ -205,6 +208,6 @@ The canonical definition can be captured as a versioned `BattlefieldMapArtifact`
 
 ## Vertical Slice presentation baseline
 
-Central Divide now has a presentation layer above the simulation-owned chunked heightfield. Eight stable terrain material slots, map-specific blend regions, reusable world objects, decals, and vegetation are defined without adding material state to `TerrainWorld` or `TerrainChunk`.
+Central Divide now has a presentation layer above the simulation-owned chunked heightfield. Eight stable terrain material slots, four reusable terrain-albedo textures, map-specific blend regions, reusable world objects, decals, and vegetation are defined without adding material state to `TerrainWorld` or `TerrainChunk`.
 
 Terrain material factors are resolved by `TerrainPresentationProfile` from compiled runtime materials when available and converted into terrain vertex presentation data while chunk GPU buffers are created. World props and vegetation remain ordinary presentation entities using compiled runtime assets, shared cached mesh buffers, distance-selected LODs, and batched indexed instanced draws. See [World Asset Presentation](WorldAssetPresentation.md) for the stable IDs, LOD policy, map authoring examples, and current renderer boundary.
