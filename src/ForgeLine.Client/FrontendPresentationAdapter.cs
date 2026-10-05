@@ -216,7 +216,8 @@ internal static class FrontendPresentationAdapter
     }
 
     internal static FrontendSurfaceView Controls(
-        RtsCameraBindings bindings)
+        RtsCameraBindings bindings,
+        string footer = "ESC  BACK")
     {
         ArgumentNullException.ThrowIfNull(bindings);
 
@@ -235,34 +236,35 @@ internal static class FrontendPresentationAdapter
             "CONTROLS",
             [
                 new FrontendDetailLineView(
-                    "CAMERA PAN",
-                    primaryPan),
-                new FrontendDetailLineView(
-                    "PAN ALTERNATE",
-                    alternatePan),
-                new FrontendDetailLineView(
-                    "ROTATE / PITCH",
+                    "CAMERA",
+                    $"{primaryPan} OR {alternatePan} PAN  " +
                     $"{bindings.RotateLeft.ToString().ToUpperInvariant()}/" +
                     $"{bindings.RotateRight.ToString().ToUpperInvariant()} ROTATE  " +
                     $"{bindings.PitchUp.ToString().ToUpperInvariant()}/" +
                     $"{bindings.PitchDown.ToString().ToUpperInvariant()} PITCH"),
                 new FrontendDetailLineView(
-                    "ZOOM / DRAG",
-                    $"WHEEL  {bindings.DragPanButton.ToString().ToUpperInvariant()} DRAG"),
+                    "CAMERA MOUSE",
+                    $"WHEEL ZOOM  {bindings.DragPanButton.ToString().ToUpperInvariant()} DRAG  EDGE PAN"),
                 new FrontendDetailLineView(
                     "SELECT / MOVE",
-                    "LEFT SELECT  SHIFT LEFT MULTI  RIGHT MOVE"),
+                    "LEFT SELECT  SHIFT+LEFT MULTI  RIGHT MOVE"),
                 new FrontendDetailLineView(
-                    "BUILD / PRODUCE",
-                    "B BUILD  P PROCESS  U UNITS"),
+                    "COMMAND PANELS",
+                    "B BUILD  P PROCESS  U UNITS  L LOGISTICS  Y SUPPLY  K COMBAT"),
                 new FrontendDetailLineView(
-                    "LOGISTICS / COMBAT",
-                    "L LOGISTICS  Y SUPPLY  K COMBAT"),
+                    "F1 / F2 / F3",
+                    "METRICS  WORLD DEBUG  FORMATION"),
                 new FrontendDetailLineView(
-                    "VIEW / SYSTEM",
-                    "F3 FORM  F10 OVERLAY  F11 MAP  F12 HELP  ESC PAUSE")
+                    "F4 / F5 / F6",
+                    "COMMAND CORE  POWER PLANT  EXTRACTOR"),
+                new FrontendDetailLineView(
+                    "F7 / F8 / F9",
+                    "STORAGE DEPOT  SMELTER  ROTATE BUILDING"),
+                new FrontendDetailLineView(
+                    "F10 / F11 / F12",
+                    "STRATEGIC OVERLAY  MINIMAP  HELP  ESC/SPACE PAUSE")
             ],
-            "ESC  BACK");
+            footer);
     }
 
     internal static FrontendSurfaceView Credits()

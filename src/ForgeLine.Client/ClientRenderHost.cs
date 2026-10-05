@@ -409,6 +409,13 @@ internal sealed class ClientRenderHost : IDisposable
                             context,
                             renderCamera,
                             debugDraw);
+                        informationRenderer.Render(
+                            context,
+                            renderCamera,
+                            snapshot,
+                            terrain.WorldBounds,
+                            current.InformationLayer,
+                            current.Dpi);
                         overlayRenderer.Render(
                             context,
                             overlayMetrics,
@@ -429,13 +436,6 @@ internal sealed class ClientRenderHost : IDisposable
                                 current.PreAlphaUx,
                             uiScale:
                                 current.UiScale);
-                        informationRenderer.Render(
-                            context,
-                            renderCamera,
-                            snapshot,
-                            terrain.WorldBounds,
-                            current.InformationLayer,
-                            current.Dpi);
                         if (current.Frontend is FrontendSurfaceView frontend)
                         {
                             frontendRenderer.Render(

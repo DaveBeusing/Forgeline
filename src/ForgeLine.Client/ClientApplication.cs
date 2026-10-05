@@ -346,7 +346,7 @@ internal sealed class ClientApplication
 
         PlayerCommandSubmissionReceipt? lastCommandReceipt = null;
         PlayerCommandResultReadModel? lastCommandResult = null;
-        bool overlayEnabled = true;
+        bool overlayEnabled = false;
         bool worldDebugEnabled = false;
         bool overlayToggleHeld = false;
         bool worldDebugToggleHeld = false;
@@ -366,6 +366,7 @@ internal sealed class ClientApplication
         bool pauseMenuEnterHeld = false;
         bool pauseMenuPrimaryPointerHeld = false;
         bool pauseMenuActive = false;
+        bool pauseControlsVisible = false;
         bool helpVisible = false;
         string pauseMenuFeedback = string.Empty;
         FormationTemplate activeFormation =
@@ -507,11 +508,23 @@ internal sealed class ClientApplication
                 null;
 
             if (!inputMatchTerminal &&
-                (pausePressed ||
-                 returnPressed))
+                pauseMenuActive &&
+                pauseControlsVisible &&
+                returnPressed)
+            {
+                pauseControlsVisible =
+                    false;
+                pauseMenuFeedback =
+                    string.Empty;
+            }
+            else if (!inputMatchTerminal &&
+                     (pausePressed ||
+                      returnPressed))
             {
                 pauseMenuActive =
                     !pauseMenuActive;
+                pauseControlsVisible =
+                    false;
                 pauseMenuFeedback =
                     string.Empty;
                 helpVisible =
@@ -526,39 +539,6 @@ internal sealed class ClientApplication
                         window.ClientSize.Width,
                         window.ClientSize.Height,
                         _settings.UiScale);
-
-                if (inputState.HasPointerPosition)
-                {
-                    string? hoveredId =
-                        FrontendHitTesting.PauseMenu(
-                            inputState.PointerPosition.X,
-                            inputState.PointerPosition.Y,
-                            pauseLayout,
-                            pauseMenu.Items);
-
-                    if (hoveredId is not null)
-                    {
-                        pauseMenu.TryFocus(
-                            hoveredId);
-                    }
-                }
-
-                if (ConsumeKeyPress(
-                        inputState,
-                        PlatformKey.Up,
-                        ref pauseMenuUpHeld))
-                {
-                    pauseMenu.MovePrevious();
-                }
-
-                if (ConsumeKeyPress(
-                        inputState,
-                        PlatformKey.Down,
-                        ref pauseMenuDownHeld))
-                {
-                    pauseMenu.MoveNext();
-                }
-
                 bool pointerDown =
                     inputState.IsMouseButtonDown(
                         PlatformMouseButton.Left);
@@ -568,43 +548,121 @@ internal sealed class ClientApplication
                 pauseMenuPrimaryPointerHeld =
                     pointerDown;
 
-                bool activate =
-                    ConsumeKeyPress(
-                        inputState,
-                        PlatformKey.Enter,
-                        ref pauseMenuEnterHeld);
-
-                if (pointerPressed &&
-                    inputState.HasPointerPosition &&
-                    FrontendHitTesting.PauseMenu(
-                        inputState.PointerPosition.X,
-                        inputState.PointerPosition.Y,
-                        pauseLayout,
-                        pauseMenu.Items) is string clickedId)
+                if (pauseControlsVisible)
                 {
-                    pauseMenu.TryFocus(
-                        clickedId);
-                    activate =
-                        true;
-                }
+                    pauseMenuUpHeld =
+                        inputState.IsKeyDown(
+                            PlatformKey.Up);
+                    pauseMenuDownHeld =
+                        inputState.IsKeyDown(
+                            PlatformKey.Down);
+                    pauseMenuEnterHeld =
+                        inputState.IsKeyDown(
+                            PlatformKey.Enter);
 
-                if (activate)
-                {
-                    pauseMenuCommand =
-                        pauseMenu.ActivateFocused();
-
-                    if (pauseMenuCommand ==
-                        PauseMenuCommand.Resume)
+                    if (pointerPressed &&
+                        inputState.HasPointerPosition &&
+                        (FrontendHitTesting.SecondaryAction(
+                             inputState.PointerPosition.X,
+                             inputState.PointerPosition.Y,
+                             pauseLayout) ||
+                         FrontendHitTesting.Footer(
+                             inputState.PointerPosition.X,
+                             inputState.PointerPosition.Y,
+                             pauseLayout)))
                     {
-                        pauseMenuActive =
+                        pauseControlsVisible =
                             false;
                         pauseMenuFeedback =
                             string.Empty;
                     }
                 }
+                else
+                {
+                    if (inputState.HasPointerPosition)
+                    {
+                        string? hoveredId =
+                            FrontendHitTesting.PauseMenu(
+                                inputState.PointerPosition.X,
+                                inputState.PointerPosition.Y,
+                                pauseLayout,
+                                pauseMenu.Items);
+
+                        if (hoveredId is not null)
+                        {
+                            pauseMenu.TryFocus(
+                                hoveredId);
+                        }
+                    }
+
+                    if (ConsumeKeyPress(
+                            inputState,
+                            PlatformKey.Up,
+                            ref pauseMenuUpHeld))
+                    {
+                        pauseMenu.MovePrevious();
+                    }
+
+                    if (ConsumeKeyPress(
+                            inputState,
+                            PlatformKey.Down,
+                            ref pauseMenuDownHeld))
+                    {
+                        pauseMenu.MoveNext();
+                    }
+
+                    bool activate =
+                        ConsumeKeyPress(
+                            inputState,
+                            PlatformKey.Enter,
+                            ref pauseMenuEnterHeld);
+
+                    if (pointerPressed &&
+                        inputState.HasPointerPosition &&
+                        FrontendHitTesting.PauseMenu(
+                            inputState.PointerPosition.X,
+                            inputState.PointerPosition.Y,
+                            pauseLayout,
+                            pauseMenu.Items) is string clickedId)
+                    {
+                        pauseMenu.TryFocus(
+                            clickedId);
+                        activate =
+                            true;
+                    }
+
+                    if (activate)
+                    {
+                        pauseMenuCommand =
+                            pauseMenu.ActivateFocused();
+
+                        if (pauseMenuCommand ==
+                            PauseMenuCommand.Resume)
+                        {
+                            pauseMenuActive =
+                                false;
+                            pauseControlsVisible =
+                                false;
+                            pauseMenuFeedback =
+                                string.Empty;
+                        }
+                        else if (pauseMenuCommand ==
+                                 PauseMenuCommand.Controls)
+                        {
+                            pauseControlsVisible =
+                                true;
+                            pauseMenuFeedback =
+                                string.Empty;
+                            pauseMenuCommand =
+                                null;
+                        }
+                    }
+                }
             }
             else
             {
+                pauseControlsVisible =
+                    false;
                 pauseMenuUpHeld =
                     inputState.IsKeyDown(
                         PlatformKey.Up);
@@ -727,17 +785,49 @@ internal sealed class ClientApplication
 
                 if (pauseMenuActive)
                 {
-                    FrontendSurfaceView pauseSurface =
-                        FrontendPresentationAdapter.PauseMenu(
-                            pauseMenu);
-                    frontendSurface =
-                        pauseSurface.WithInteraction(
-                            pauseMenuFeedback,
-                            1f,
-                            false,
-                            false,
-                            false,
-                            false);
+                    if (pauseControlsVisible)
+                    {
+                        FrontendSurfaceView controlsSurface =
+                            FrontendPresentationAdapter.Controls(
+                                _settings.CameraBindings,
+                                "ESC  BACK TO PAUSE");
+                        FrontendLayout pauseLayout =
+                            FrontendDesign.ResolveLayout(
+                                window.ClientSize.Width,
+                                window.ClientSize.Height,
+                                _settings.UiScale);
+                        bool secondaryHovered =
+                            inputState.HasPointerPosition &&
+                            FrontendHitTesting.SecondaryAction(
+                                inputState.PointerPosition.X,
+                                inputState.PointerPosition.Y,
+                                pauseLayout);
+
+                        frontendSurface =
+                            controlsSurface.WithInteraction(
+                                string.Empty,
+                                1f,
+                                false,
+                                false,
+                                secondaryHovered,
+                                secondaryHovered &&
+                                inputState.IsMouseButtonDown(
+                                    PlatformMouseButton.Left));
+                    }
+                    else
+                    {
+                        FrontendSurfaceView pauseSurface =
+                            FrontendPresentationAdapter.PauseMenu(
+                                pauseMenu);
+                        frontendSurface =
+                            pauseSurface.WithInteraction(
+                                pauseMenuFeedback,
+                                1f,
+                                false,
+                                false,
+                                false,
+                                false);
+                    }
                 }
 
                 _ = renderHost.Publish(

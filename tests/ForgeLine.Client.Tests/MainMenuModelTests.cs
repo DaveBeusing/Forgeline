@@ -63,11 +63,53 @@ public sealed class MainMenuModelTests
         Assert.Equal(
             8,
             view.DetailLines.Count);
-        Assert.Equal(
+        Assert.Contains(
             "W/A/S/D",
             view.DetailLines[0].Value);
         Assert.Contains(
-            "F12 HELP",
+            "UP/LEFT/DOWN/RIGHT",
+            view.DetailLines[0].Value);
+        Assert.Equal(
+            "F1 / F2 / F3",
+            view.DetailLines[4].Label);
+        Assert.Contains(
+            "METRICS",
+            view.DetailLines[4].Value);
+        Assert.Contains(
+            "WORLD DEBUG",
+            view.DetailLines[4].Value);
+        Assert.Contains(
+            "FORMATION",
+            view.DetailLines[4].Value);
+        Assert.Contains(
+            "COMMAND CORE",
+            view.DetailLines[5].Value);
+        Assert.Contains(
+            "POWER PLANT",
+            view.DetailLines[5].Value);
+        Assert.Contains(
+            "EXTRACTOR",
+            view.DetailLines[5].Value);
+        Assert.Contains(
+            "STORAGE DEPOT",
+            view.DetailLines[6].Value);
+        Assert.Contains(
+            "SMELTER",
+            view.DetailLines[6].Value);
+        Assert.Contains(
+            "ROTATE BUILDING",
+            view.DetailLines[6].Value);
+        Assert.Contains(
+            "STRATEGIC OVERLAY",
+            view.DetailLines[^1].Value);
+        Assert.Contains(
+            "MINIMAP",
+            view.DetailLines[^1].Value);
+        Assert.Contains(
+            "HELP",
+            view.DetailLines[^1].Value);
+        Assert.Contains(
+            "ESC/SPACE PAUSE",
             view.DetailLines[^1].Value);
     }
 
