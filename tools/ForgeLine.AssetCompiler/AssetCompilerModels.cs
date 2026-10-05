@@ -87,7 +87,19 @@ public sealed record MaterialSourceDefinition
             .ToArray();
 }
 
+internal sealed record MeshImportSummary(
+    int VertexCount,
+    int IndexCount,
+    int SectionCount,
+    int MaterialCount,
+    bool HasUv0,
+    bool HasTangents,
+    int GeneratedNormalVertexCount,
+    int GeneratedTangentVertexCount,
+    int FallbackSectionCount);
+
 internal sealed record ImportedAssetPayload(
     byte[] Payload,
     AssetBounds? Bounds,
-    IReadOnlyList<string> AdditionalDependencies);
+    IReadOnlyList<string> AdditionalDependencies,
+    MeshImportSummary? MeshSummary = null);

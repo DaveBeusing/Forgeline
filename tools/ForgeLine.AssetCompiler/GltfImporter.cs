@@ -1,4 +1,5 @@
 using System.Buffers.Binary;
+using System.Numerics;
 using System.Text;
 using System.Text.Json;
 using ForgeLine.Assets;
@@ -11,104 +12,155 @@ internal static class GltfImporter
     private const uint JsonChunkType = 0x4E4F534A;
     private const uint BinChunkType = 0x004E4942;
 
-    public static ImportedAssetPayload Import(string path, string sourceRoot)
+    public static ImportedAssetPayload Import(
+        string path,
+        string sourceRoot,
+        IReadOnlyList<string> materialIds,
+        IReadOnlyList<MeshMaterialRequirement> materialRequirements)
     {
-        using var gltf = Load(path, sourceRoot);
-        var root = gltf.Document.RootElement;
+        ArgumentNullException.ThrowIfNull(materialIds);
+        ArgumentNullException.ThrowIfNull(materialRequirements);
 
-        if (!root.TryGetProperty("asset", out var asset) ||
-            !asset.TryGetProperty("version", out var version) ||
+        if (materialIds.Count != materialRequirements.Count)
+        {
+            throw new ArgumentException(
+                "Mesh material IDs and import requirements must have matching counts.");
+        }
+
+        using var gltf = Load(path, sourceRoot);
+        JsonElement root = gltf.Document.RootElement;
+
+        if (!root.TryGetProperty("asset", out JsonElement asset) ||
+            !asset.TryGetProperty("version", out JsonElement version) ||
             version.GetString() is not { } versionString ||
             !versionString.StartsWith('2'))
         {
             throw new InvalidDataException("Only glTF 2.x assets are supported.");
         }
 
-        if (!root.TryGetProperty("meshes", out var meshes) || meshes.GetArrayLength() == 0)
+        if (!root.TryGetProperty("meshes", out JsonElement meshes) ||
+            meshes.GetArrayLength() == 0)
         {
             throw new InvalidDataException("glTF asset does not contain any meshes.");
         }
 
         var vertices = new List<VertexData>();
         var indices = new List<uint>();
-        var minX = float.PositiveInfinity;
-        var minY = float.PositiveInfinity;
-        var minZ = float.PositiveInfinity;
-        var maxX = float.NegativeInfinity;
-        var maxY = float.NegativeInfinity;
-        var maxZ = float.NegativeInfinity;
+        var sections = new List<RuntimeMeshSection>();
+        float minX = float.PositiveInfinity;
+        float minY = float.PositiveInfinity;
+        float minZ = float.PositiveInfinity;
+        float maxX = float.NegativeInfinity;
+        float maxY = float.NegativeInfinity;
+        float maxZ = float.NegativeInfinity;
+        bool allHaveUv0 = true;
+        bool allHaveTangents = true;
+        int generatedNormalVertexCount = 0;
+        int generatedTangentVertexCount = 0;
+        int fallbackSectionCount = 0;
 
-        foreach (var mesh in meshes.EnumerateArray())
+        foreach (JsonElement mesh in meshes.EnumerateArray())
         {
-            if (!mesh.TryGetProperty("primitives", out var primitives) || primitives.GetArrayLength() == 0)
+            if (!mesh.TryGetProperty("primitives", out JsonElement primitives) ||
+                primitives.GetArrayLength() == 0)
             {
                 throw new InvalidDataException("glTF mesh does not contain primitives.");
             }
 
-            foreach (var primitive in primitives.EnumerateArray())
+            foreach (JsonElement primitive in primitives.EnumerateArray())
             {
-                var mode = primitive.TryGetProperty("mode", out var modeProperty)
-                    ? modeProperty.GetInt32()
-                    : 4;
+                int mode =
+                    primitive.TryGetProperty("mode", out JsonElement modeProperty)
+                        ? modeProperty.GetInt32()
+                        : 4;
                 if (mode != 4)
                 {
-                    throw new InvalidDataException($"glTF primitive mode {mode} is unsupported; triangles are required.");
+                    throw new InvalidDataException(
+                        $"glTF primitive mode {mode} is unsupported; triangles are required.");
                 }
 
-                if (!primitive.TryGetProperty("attributes", out var attributes) ||
-                    !attributes.TryGetProperty("POSITION", out var positionAccessorProperty))
+                if (!primitive.TryGetProperty("attributes", out JsonElement attributes) ||
+                    !attributes.TryGetProperty("POSITION", out JsonElement positionAccessorProperty))
                 {
                     throw new InvalidDataException("glTF primitive is missing POSITION data.");
                 }
 
-                var positions = ReadFloatAccessor(
-                    root,
-                    gltf.Buffers,
-                    positionAccessorProperty.GetInt32(),
-                    "VEC3");
-
-                float[]? normals = null;
-                if (attributes.TryGetProperty("NORMAL", out var normalAccessorProperty))
-                {
-                    normals = ReadFloatAccessor(
+                float[] positions =
+                    ReadFloatAccessor(
                         root,
                         gltf.Buffers,
-                        normalAccessorProperty.GetInt32(),
+                        positionAccessorProperty.GetInt32(),
                         "VEC3");
 
+                float[]? normals = null;
+                if (attributes.TryGetProperty("NORMAL", out JsonElement normalAccessorProperty))
+                {
+                    normals =
+                        ReadFloatAccessor(
+                            root,
+                            gltf.Buffers,
+                            normalAccessorProperty.GetInt32(),
+                            "VEC3");
                     if (normals.Length != positions.Length)
                     {
-                        throw new InvalidDataException("glTF NORMAL accessor count does not match POSITION.");
+                        throw new InvalidDataException(
+                            "glTF NORMAL accessor count does not match POSITION.");
                     }
                 }
 
                 float[]? texCoords = null;
-                if (attributes.TryGetProperty("TEXCOORD_0", out var texCoordAccessorProperty))
+                if (attributes.TryGetProperty("TEXCOORD_0", out JsonElement texCoordAccessorProperty))
                 {
-                    texCoords = ReadFloatAccessor(
-                        root,
-                        gltf.Buffers,
-                        texCoordAccessorProperty.GetInt32(),
-                        "VEC2");
-
+                    texCoords =
+                        ReadFloatAccessor(
+                            root,
+                            gltf.Buffers,
+                            texCoordAccessorProperty.GetInt32(),
+                            "VEC2");
                     if (texCoords.Length / 2 != positions.Length / 3)
                     {
-                        throw new InvalidDataException("glTF TEXCOORD_0 accessor count does not match POSITION.");
+                        throw new InvalidDataException(
+                            "glTF TEXCOORD_0 accessor count does not match POSITION.");
+                    }
+
+                    if (texCoords.Any(static value => !float.IsFinite(value)))
+                    {
+                        throw new InvalidDataException(
+                            "glTF TEXCOORD_0 data contains a non-finite coordinate.");
                     }
                 }
 
-                var vertexBase = checked((uint)vertices.Count);
-                var vertexCount = positions.Length / 3;
-                for (var vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++)
+                float[]? tangents = null;
+                if (attributes.TryGetProperty("TANGENT", out JsonElement tangentAccessorProperty))
                 {
-                    var positionOffset = vertexIndex * 3;
-                    var x = positions[positionOffset];
-                    var y = positions[positionOffset + 1];
-                    var z = positions[positionOffset + 2];
-
-                    if (!float.IsFinite(x) || !float.IsFinite(y) || !float.IsFinite(z))
+                    tangents =
+                        ReadFloatAccessor(
+                            root,
+                            gltf.Buffers,
+                            tangentAccessorProperty.GetInt32(),
+                            "VEC4");
+                    if (tangents.Length / 4 != positions.Length / 3)
                     {
-                        throw new InvalidDataException("glTF POSITION data contains a non-finite coordinate.");
+                        throw new InvalidDataException(
+                            "glTF TANGENT accessor count does not match POSITION.");
+                    }
+                }
+
+                int vertexBase = vertices.Count;
+                int vertexCount = positions.Length / 3;
+                for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++)
+                {
+                    int positionOffset = vertexIndex * 3;
+                    float x = positions[positionOffset];
+                    float y = positions[positionOffset + 1];
+                    float z = positions[positionOffset + 2];
+
+                    if (!float.IsFinite(x) ||
+                        !float.IsFinite(y) ||
+                        !float.IsFinite(z))
+                    {
+                        throw new InvalidDataException(
+                            "glTF POSITION data contains a non-finite coordinate.");
                     }
 
                     minX = MathF.Min(minX, x);
@@ -118,57 +170,172 @@ internal static class GltfImporter
                     maxY = MathF.Max(maxY, y);
                     maxZ = MathF.Max(maxZ, z);
 
-                    var nx = 0f;
-                    var ny = 1f;
-                    var nz = 0f;
-                    if (normals is not null)
-                    {
-                        nx = normals[positionOffset];
-                        ny = normals[positionOffset + 1];
-                        nz = normals[positionOffset + 2];
-                    }
+                    float nx = normals is null ? 0f : normals[positionOffset];
+                    float ny = normals is null ? 0f : normals[positionOffset + 1];
+                    float nz = normals is null ? 0f : normals[positionOffset + 2];
 
-                    var u = 0f;
-                    var v = 0f;
+                    float u = 0f;
+                    float v = 0f;
                     if (texCoords is not null)
                     {
-                        var texOffset = vertexIndex * 2;
+                        int texOffset = vertexIndex * 2;
                         u = texCoords[texOffset];
                         v = texCoords[texOffset + 1];
                     }
 
-                    vertices.Add(new VertexData(x, y, z, nx, ny, nz, u, v));
+                    float tx = 0f;
+                    float ty = 0f;
+                    float tz = 0f;
+                    float tw = 0f;
+                    if (tangents is not null)
+                    {
+                        int tangentOffset = vertexIndex * 4;
+                        tx = tangents[tangentOffset];
+                        ty = tangents[tangentOffset + 1];
+                        tz = tangents[tangentOffset + 2];
+                        tw = tangents[tangentOffset + 3];
+                    }
+
+                    vertices.Add(
+                        new VertexData(
+                            x,
+                            y,
+                            z,
+                            nx,
+                            ny,
+                            nz,
+                            u,
+                            v,
+                            tx,
+                            ty,
+                            tz,
+                            tw));
                 }
 
                 uint[] primitiveIndices;
-                if (primitive.TryGetProperty("indices", out var indicesProperty))
+                if (primitive.TryGetProperty("indices", out JsonElement indicesProperty))
                 {
-                    primitiveIndices = ReadIndexAccessor(root, gltf.Buffers, indicesProperty.GetInt32());
+                    primitiveIndices =
+                        ReadIndexAccessor(
+                            root,
+                            gltf.Buffers,
+                            indicesProperty.GetInt32());
                 }
                 else
                 {
-                    primitiveIndices = new uint[vertexCount];
-                    for (var index = 0; index < vertexCount; index++)
+                    primitiveIndices =
+                        new uint[vertexCount];
+                    for (int index = 0; index < vertexCount; index++)
                     {
                         primitiveIndices[index] = (uint)index;
                     }
                 }
 
-                if (primitiveIndices.Length == 0 || primitiveIndices.Length % 3 != 0)
+                if (primitiveIndices.Length == 0 ||
+                    primitiveIndices.Length % 3 != 0)
                 {
-                    throw new InvalidDataException("glTF triangle primitive index count must be a non-zero multiple of three.");
+                    throw new InvalidDataException(
+                        "glTF triangle primitive index count must be a non-zero multiple of three.");
                 }
 
-                foreach (var index in primitiveIndices)
+                foreach (uint index in primitiveIndices)
                 {
                     if (index >= vertexCount)
                     {
                         throw new InvalidDataException(
                             $"glTF primitive index {index} exceeds vertex count {vertexCount}.");
                     }
-
-                    indices.Add(checked(vertexBase + index));
                 }
+
+                if (normals is null ||
+                    !TryNormalizeNormals(
+                        vertices,
+                        vertexBase,
+                        vertexCount))
+                {
+                    GenerateNormals(
+                        vertices,
+                        vertexBase,
+                        vertexCount,
+                        primitiveIndices);
+                    generatedNormalVertexCount +=
+                        vertexCount;
+                }
+
+                int materialSlot =
+                    ResolveMaterialSlot(
+                        primitive,
+                        materialIds.Count);
+                MeshMaterialRequirement requirement =
+                    materialSlot >= 0
+                        ? materialRequirements[materialSlot]
+                        : default;
+                bool fallbackSection =
+                    false;
+
+                if (texCoords is null)
+                {
+                    allHaveUv0 = false;
+                    if (requirement.RequiresUv0)
+                    {
+                        fallbackSection = true;
+                    }
+                }
+
+                bool hasTangents =
+                    tangents is not null &&
+                    TryNormalizeTangents(
+                        vertices,
+                        vertexBase,
+                        vertexCount);
+
+                if (!hasTangents &&
+                    requirement.RequiresTangents &&
+                    texCoords is not null)
+                {
+                    hasTangents =
+                        GenerateTangents(
+                            vertices,
+                            vertexBase,
+                            vertexCount,
+                            primitiveIndices);
+                    if (hasTangents)
+                    {
+                        generatedTangentVertexCount +=
+                            vertexCount;
+                    }
+                }
+
+                if (!hasTangents)
+                {
+                    allHaveTangents = false;
+                    if (requirement.RequiresTangents)
+                    {
+                        fallbackSection = true;
+                    }
+                }
+
+                int sectionFirstIndex =
+                    indices.Count;
+                foreach (uint index in primitiveIndices)
+                {
+                    indices.Add(
+                        checked(
+                            (uint)vertexBase +
+                            index));
+                }
+
+                if (fallbackSection)
+                {
+                    materialSlot = -1;
+                    fallbackSectionCount++;
+                }
+
+                sections.Add(
+                    new RuntimeMeshSection(
+                        sectionFirstIndex,
+                        primitiveIndices.Length,
+                        materialSlot));
             }
         }
 
@@ -177,39 +344,372 @@ internal static class GltfImporter
             throw new InvalidDataException("glTF asset produced no vertices.");
         }
 
-        var bounds = new AssetBounds(minX, minY, minZ, maxX, maxY, maxZ);
+        var bounds =
+            new AssetBounds(
+                minX,
+                minY,
+                minZ,
+                maxX,
+                maxY,
+                maxZ);
         if (!bounds.IsValid)
         {
             throw new InvalidDataException("glTF mesh bounds are invalid.");
         }
 
-        using var payloadStream = new MemoryStream();
-        using (var writer = new BinaryWriter(payloadStream, Encoding.UTF8, leaveOpen: true))
+        RuntimeMeshAttributes runtimeAttributes =
+            RuntimeMeshAttributes.Normal;
+        if (allHaveUv0)
         {
-            writer.Write(1);
-            writer.Write(vertices.Count);
-            writer.Write(indices.Count);
-
-            foreach (var vertex in vertices)
-            {
-                writer.Write(vertex.X);
-                writer.Write(vertex.Y);
-                writer.Write(vertex.Z);
-                writer.Write(vertex.Nx);
-                writer.Write(vertex.Ny);
-                writer.Write(vertex.Nz);
-                writer.Write(vertex.U);
-                writer.Write(vertex.V);
-            }
-
-            foreach (var index in indices)
-            {
-                writer.Write(index);
-            }
+            runtimeAttributes |=
+                RuntimeMeshAttributes.Uv0;
         }
 
-        return new ImportedAssetPayload(payloadStream.ToArray(), bounds, []);
+        if (allHaveTangents)
+        {
+            runtimeAttributes |=
+                RuntimeMeshAttributes.Tangent;
+        }
+
+        var runtimeVertices =
+            vertices
+                .Select(
+                    static vertex =>
+                        new RuntimeMeshVertex(
+                            vertex.X,
+                            vertex.Y,
+                            vertex.Z,
+                            vertex.Nx,
+                            vertex.Ny,
+                            vertex.Nz,
+                            vertex.U,
+                            vertex.V,
+                            vertex.Tx,
+                            vertex.Ty,
+                            vertex.Tz,
+                            vertex.Tw))
+                .ToArray();
+        var runtimeMesh =
+            new RuntimeMeshData(
+                runtimeAttributes,
+                runtimeVertices,
+                indices,
+                materialIds,
+                sections);
+
+        return new ImportedAssetPayload(
+            runtimeMesh.ToPayload(),
+            bounds,
+            [],
+            new MeshImportSummary(
+                runtimeVertices.Length,
+                indices.Count,
+                sections.Count,
+                materialIds.Count,
+                runtimeMesh.HasUv0,
+                runtimeMesh.HasTangents,
+                generatedNormalVertexCount,
+                generatedTangentVertexCount,
+                fallbackSectionCount));
     }
+
+    private static int ResolveMaterialSlot(
+        JsonElement primitive,
+        int materialCount)
+    {
+        if (primitive.TryGetProperty(
+                "material",
+                out JsonElement materialProperty))
+        {
+            int slot =
+                materialProperty.GetInt32();
+            if (slot < 0 ||
+                slot >= materialCount)
+            {
+                throw new InvalidDataException(
+                    $"glTF primitive material slot {slot} has no matching stable material reference.");
+            }
+
+            return slot;
+        }
+
+        return materialCount switch
+        {
+            0 => -1,
+            1 => 0,
+            _ => throw new InvalidDataException(
+                "glTF primitive omits its material slot while the mesh declares multiple stable material references."),
+        };
+    }
+
+    private static bool TryNormalizeNormals(
+        List<VertexData> vertices,
+        int vertexBase,
+        int vertexCount)
+    {
+        for (int index = 0; index < vertexCount; index++)
+        {
+            VertexData vertex =
+                vertices[vertexBase + index];
+            var normal =
+                new Vector3(
+                    vertex.Nx,
+                    vertex.Ny,
+                    vertex.Nz);
+            if (!IsFinite(normal) ||
+                normal.LengthSquared() <= 1e-12f)
+            {
+                return false;
+            }
+
+            normal =
+                Vector3.Normalize(
+                    normal);
+            vertices[vertexBase + index] =
+                vertex with
+                {
+                    Nx = normal.X,
+                    Ny = normal.Y,
+                    Nz = normal.Z
+                };
+        }
+
+        return true;
+    }
+
+    private static void GenerateNormals(
+        List<VertexData> vertices,
+        int vertexBase,
+        int vertexCount,
+        IReadOnlyList<uint> indices)
+    {
+        var sums =
+            new Vector3[vertexCount];
+
+        for (int index = 0; index < indices.Count; index += 3)
+        {
+            int a = checked((int)indices[index]);
+            int b = checked((int)indices[index + 1]);
+            int c = checked((int)indices[index + 2]);
+
+            Vector3 p0 =
+                Position(vertices[vertexBase + a]);
+            Vector3 p1 =
+                Position(vertices[vertexBase + b]);
+            Vector3 p2 =
+                Position(vertices[vertexBase + c]);
+            Vector3 face =
+                Vector3.Cross(
+                    p1 - p0,
+                    p2 - p0);
+
+            if (face.LengthSquared() <= 1e-12f)
+            {
+                continue;
+            }
+
+            sums[a] += face;
+            sums[b] += face;
+            sums[c] += face;
+        }
+
+        for (int index = 0; index < vertexCount; index++)
+        {
+            Vector3 normal =
+                sums[index];
+            if (normal.LengthSquared() <= 1e-12f)
+            {
+                normal =
+                    Vector3.UnitY;
+            }
+            else
+            {
+                normal =
+                    Vector3.Normalize(
+                        normal);
+            }
+
+            VertexData vertex =
+                vertices[vertexBase + index];
+            vertices[vertexBase + index] =
+                vertex with
+                {
+                    Nx = normal.X,
+                    Ny = normal.Y,
+                    Nz = normal.Z
+                };
+        }
+    }
+
+    private static bool TryNormalizeTangents(
+        List<VertexData> vertices,
+        int vertexBase,
+        int vertexCount)
+    {
+        for (int index = 0; index < vertexCount; index++)
+        {
+            VertexData vertex =
+                vertices[vertexBase + index];
+            var tangent =
+                new Vector3(
+                    vertex.Tx,
+                    vertex.Ty,
+                    vertex.Tz);
+            if (!IsFinite(tangent) ||
+                tangent.LengthSquared() <= 1e-12f ||
+                !float.IsFinite(vertex.Tw) ||
+                MathF.Abs(vertex.Tw) <= 1e-6f)
+            {
+                return false;
+            }
+
+            tangent =
+                Vector3.Normalize(
+                    tangent);
+            vertices[vertexBase + index] =
+                vertex with
+                {
+                    Tx = tangent.X,
+                    Ty = tangent.Y,
+                    Tz = tangent.Z,
+                    Tw = vertex.Tw < 0f ? -1f : 1f
+                };
+        }
+
+        return true;
+    }
+
+    private static bool GenerateTangents(
+        List<VertexData> vertices,
+        int vertexBase,
+        int vertexCount,
+        IReadOnlyList<uint> indices)
+    {
+        var tangentSums =
+            new Vector3[vertexCount];
+        var bitangentSums =
+            new Vector3[vertexCount];
+        bool generatedAny =
+            false;
+
+        for (int index = 0; index < indices.Count; index += 3)
+        {
+            int a = checked((int)indices[index]);
+            int b = checked((int)indices[index + 1]);
+            int c = checked((int)indices[index + 2]);
+            VertexData v0 = vertices[vertexBase + a];
+            VertexData v1 = vertices[vertexBase + b];
+            VertexData v2 = vertices[vertexBase + c];
+
+            Vector3 edge1 = Position(v1) - Position(v0);
+            Vector3 edge2 = Position(v2) - Position(v0);
+            float du1 = v1.U - v0.U;
+            float dv1 = v1.V - v0.V;
+            float du2 = v2.U - v0.U;
+            float dv2 = v2.V - v0.V;
+            float determinant =
+                du1 * dv2 -
+                dv1 * du2;
+
+            if (!float.IsFinite(determinant) ||
+                MathF.Abs(determinant) <= 1e-10f)
+            {
+                continue;
+            }
+
+            float reciprocal =
+                1f /
+                determinant;
+            Vector3 tangent =
+                (edge1 * dv2 -
+                 edge2 * dv1) *
+                reciprocal;
+            Vector3 bitangent =
+                (edge2 * du1 -
+                 edge1 * du2) *
+                reciprocal;
+
+            if (!IsFinite(tangent) ||
+                !IsFinite(bitangent))
+            {
+                continue;
+            }
+
+            tangentSums[a] += tangent;
+            tangentSums[b] += tangent;
+            tangentSums[c] += tangent;
+            bitangentSums[a] += bitangent;
+            bitangentSums[b] += bitangent;
+            bitangentSums[c] += bitangent;
+            generatedAny = true;
+        }
+
+        if (!generatedAny)
+        {
+            return false;
+        }
+
+        for (int index = 0; index < vertexCount; index++)
+        {
+            VertexData vertex =
+                vertices[vertexBase + index];
+            var normal =
+                Vector3.Normalize(
+                    new Vector3(
+                        vertex.Nx,
+                        vertex.Ny,
+                        vertex.Nz));
+            Vector3 tangent =
+                tangentSums[index] -
+                normal *
+                Vector3.Dot(
+                    normal,
+                    tangentSums[index]);
+
+            if (!IsFinite(tangent) ||
+                tangent.LengthSquared() <= 1e-12f)
+            {
+                return false;
+            }
+
+            tangent =
+                Vector3.Normalize(
+                    tangent);
+            float handedness =
+                Vector3.Dot(
+                    Vector3.Cross(
+                        normal,
+                        tangent),
+                    bitangentSums[index]) <
+                0f
+                    ? -1f
+                    : 1f;
+
+            vertices[vertexBase + index] =
+                vertex with
+                {
+                    Tx = tangent.X,
+                    Ty = tangent.Y,
+                    Tz = tangent.Z,
+                    Tw = handedness
+                };
+        }
+
+        return true;
+    }
+
+    private static Vector3 Position(
+        VertexData vertex) =>
+        new(
+            vertex.X,
+            vertex.Y,
+            vertex.Z);
+
+    private static bool IsFinite(
+        Vector3 value) =>
+        float.IsFinite(value.X) &&
+        float.IsFinite(value.Y) &&
+        float.IsFinite(value.Z);
 
     private static LoadedGltf Load(string path, string sourceRoot)
     {
@@ -370,7 +870,15 @@ internal static class GltfImporter
                 $"glTF accessor {accessorIndex} must be FLOAT {expectedType}.");
         }
 
-        var components = expectedType == "VEC3" ? 3 : 2;
+        int components =
+            expectedType switch
+            {
+                "VEC2" => 2,
+                "VEC3" => 3,
+                "VEC4" => 4,
+                _ => throw new InvalidDataException(
+                    $"Unsupported floating-point accessor type '{expectedType}'.")
+            };
         var count = accessor.GetProperty("count").GetInt32();
         if (count <= 0)
         {
@@ -558,5 +1066,14 @@ internal static class GltfImporter
         float Ny,
         float Nz,
         float U,
-        float V);
+        float V,
+        float Tx,
+        float Ty,
+        float Tz,
+        float Tw);
+}
+
+internal readonly record struct MeshMaterialRequirement(
+    bool RequiresUv0,
+    bool RequiresTangents);
 }
