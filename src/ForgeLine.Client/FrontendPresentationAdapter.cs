@@ -1,4 +1,5 @@
 using System.Reflection;
+using ForgeLine.Input;
 using ForgeLine.Presentation;
 using ForgeLine.UI;
 
@@ -212,6 +213,56 @@ internal static class FrontendPresentationAdapter
             ],
             "UP/DOWN  SELECT     LEFT/RIGHT  CHANGE     ENTER  APPLY     ESC  BACK",
             "APPLY");
+    }
+
+    internal static FrontendSurfaceView Controls(
+        RtsCameraBindings bindings)
+    {
+        ArgumentNullException.ThrowIfNull(bindings);
+
+        string primaryPan =
+            $"{bindings.PanForward.ToString().ToUpperInvariant()}/" +
+            $"{bindings.PanLeft.ToString().ToUpperInvariant()}/" +
+            $"{bindings.PanBackward.ToString().ToUpperInvariant()}/" +
+            bindings.PanRight.ToString().ToUpperInvariant();
+        string alternatePan =
+            $"{bindings.PanForwardAlternate.ToString().ToUpperInvariant()}/" +
+            $"{bindings.PanLeftAlternate.ToString().ToUpperInvariant()}/" +
+            $"{bindings.PanBackwardAlternate.ToString().ToUpperInvariant()}/" +
+            bindings.PanRightAlternate.ToString().ToUpperInvariant();
+
+        return FrontendSurfaceView.Detail(
+            "CONTROLS",
+            [
+                new FrontendDetailLineView(
+                    "CAMERA PAN",
+                    primaryPan),
+                new FrontendDetailLineView(
+                    "PAN ALTERNATE",
+                    alternatePan),
+                new FrontendDetailLineView(
+                    "ROTATE / PITCH",
+                    $"{bindings.RotateLeft.ToString().ToUpperInvariant()}/" +
+                    $"{bindings.RotateRight.ToString().ToUpperInvariant()} ROTATE  " +
+                    $"{bindings.PitchUp.ToString().ToUpperInvariant()}/" +
+                    $"{bindings.PitchDown.ToString().ToUpperInvariant()} PITCH"),
+                new FrontendDetailLineView(
+                    "ZOOM / DRAG",
+                    $"WHEEL  {bindings.DragPanButton.ToString().ToUpperInvariant()} DRAG"),
+                new FrontendDetailLineView(
+                    "SELECT / MOVE",
+                    "LEFT SELECT  SHIFT LEFT MULTI  RIGHT MOVE"),
+                new FrontendDetailLineView(
+                    "BUILD / PRODUCE",
+                    "B BUILD  P PROCESS  U UNITS"),
+                new FrontendDetailLineView(
+                    "LOGISTICS / COMBAT",
+                    "L LOGISTICS  Y SUPPLY  K COMBAT"),
+                new FrontendDetailLineView(
+                    "VIEW / SYSTEM",
+                    "F3 FORM  F10 OVERLAY  F11 MAP  F12 HELP  ESC PAUSE")
+            ],
+            "ESC  BACK");
     }
 
     internal static FrontendSurfaceView Credits()

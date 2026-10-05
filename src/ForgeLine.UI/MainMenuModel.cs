@@ -7,7 +7,8 @@ public enum MainMenuCommand : byte
     LoadGame = 3,
     Settings = 4,
     Credits = 5,
-    Exit = 6
+    Exit = 6,
+    Controls = 7
 }
 
 public readonly record struct MainMenuItem(
@@ -21,6 +22,7 @@ public sealed class MainMenuModel
     private const string ContinueId = "continue";
     private const string NewGameId = "new-game";
     private const string LoadGameId = "load-game";
+    private const string ControlsId = "controls";
     private const string SettingsId = "settings";
     private const string CreditsId = "credits";
     private const string ExitId = "exit";
@@ -35,6 +37,7 @@ public sealed class MainMenuModel
             new MainMenuItem(ContinueId, "CONTINUE", MainMenuCommand.Continue, hasValidContinueTarget),
             new MainMenuItem(NewGameId, "NEW GAME", MainMenuCommand.NewGame, true),
             new MainMenuItem(LoadGameId, "LOAD GAME", MainMenuCommand.LoadGame, true),
+            new MainMenuItem(ControlsId, "CONTROLS", MainMenuCommand.Controls, true),
             new MainMenuItem(SettingsId, "SETTINGS", MainMenuCommand.Settings, true),
             new MainMenuItem(CreditsId, "CREDITS", MainMenuCommand.Credits, true),
             new MainMenuItem(ExitId, "EXIT", MainMenuCommand.Exit, true)
@@ -80,6 +83,7 @@ public sealed class MainMenuModel
             MainMenuCommand.Continue => GameFrontendAction.LoadGame,
             MainMenuCommand.NewGame => GameFrontendAction.NewGame,
             MainMenuCommand.LoadGame => GameFrontendAction.LoadGame,
+            MainMenuCommand.Controls => GameFrontendAction.Controls,
             MainMenuCommand.Settings => GameFrontendAction.Settings,
             MainMenuCommand.Credits => GameFrontendAction.Credits,
             MainMenuCommand.Exit => GameFrontendAction.Exit,
