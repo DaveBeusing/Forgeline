@@ -13,6 +13,61 @@ public readonly record struct BattlefieldMapMetadata(
     float HeightMeters,
     int RecommendedPlayers);
 
+public enum BattlefieldTerrainControlEncoding : byte
+{
+    RgbaFourLayer = 1
+}
+
+public sealed record BattlefieldTerrainVisualDefinition(
+    string ProfileId,
+    BattlefieldTerrainControlEncoding ControlEncoding,
+    int ActiveLayerLimit,
+    int ControlSamplesPerSide,
+    string[] MaterialAssetIds)
+{
+    public void Validate()
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(
+            ProfileId);
+        ArgumentNullException.ThrowIfNull(
+            MaterialAssetIds);
+
+        if (ControlEncoding !=
+            BattlefieldTerrainControlEncoding.RgbaFourLayer)
+        {
+            throw new InvalidOperationException(
+                $"Unsupported terrain control encoding {ControlEncoding}.");
+        }
+
+        if (ActiveLayerLimit != 4)
+        {
+            throw new InvalidOperationException(
+                "The current terrain renderer requires exactly four active layers per chunk.");
+        }
+
+        if (ControlSamplesPerSide < 2)
+        {
+            throw new InvalidOperationException(
+                "Terrain control maps require at least two samples per side.");
+        }
+
+        if (MaterialAssetIds.Length == 0 ||
+            MaterialAssetIds.Any(
+                static id =>
+                    string.IsNullOrWhiteSpace(
+                        id)) ||
+            MaterialAssetIds.Distinct(
+                StringComparer.Ordinal)
+            .Count() !=
+            MaterialAssetIds.Length)
+        {
+            throw new InvalidOperationException(
+                "Terrain material asset IDs must be non-empty and unique.");
+        }
+    }
+}
+
+
 public readonly record struct BattlefieldStartPosition(
     PlayerId Player,
     Vector3 Position,
@@ -95,7 +150,8 @@ public sealed class PrototypeBattlefieldDefinition
         BattlefieldRoadEdgeDefinition[] roadEdges,
         BattlefieldCrossingDefinition[] crossings,
         BattlefieldObjectiveDefinition[] objectives,
-        AxisAlignedBounds[] staticNavigationObstacles)
+        AxisAlignedBounds[] staticNavigationObstacles,
+        BattlefieldTerrainVisualDefinition terrainVisual)
     {
         Metadata = metadata;
         Starts = starts;
@@ -107,6 +163,9 @@ public sealed class PrototypeBattlefieldDefinition
         Crossings = crossings;
         Objectives = objectives;
         _staticNavigationObstacles = staticNavigationObstacles;
+        TerrainVisual = terrainVisual ??
+            throw new ArgumentNullException(nameof(terrainVisual));
+        TerrainVisual.Validate();
     }
 
     public BattlefieldMapMetadata Metadata { get; }
@@ -126,6 +185,8 @@ public sealed class PrototypeBattlefieldDefinition
     public IReadOnlyList<BattlefieldCrossingDefinition> Crossings { get; }
 
     public IReadOnlyList<BattlefieldObjectiveDefinition> Objectives { get; }
+
+    public BattlefieldTerrainVisualDefinition TerrainVisual { get; }
 
     public IReadOnlyList<AxisAlignedBounds> StaticNavigationObstacles =>
         _staticNavigationObstacles;
@@ -147,7 +208,8 @@ public sealed class PrototypeBattlefieldDefinition
             CreateRoadEdges(),
             CreateCrossings(),
             CreateObjectives(),
-            CreateBarrierObstacles());
+            CreateBarrierObstacles(),
+            CreateTerrainVisual());
 
         PrototypeBattlefieldValidator.ValidateDefinition(definition);
         return definition;
@@ -209,6 +271,23 @@ public sealed class PrototypeBattlefieldDefinition
 
         return obstacles;
     }
+
+    private static BattlefieldTerrainVisualDefinition CreateTerrainVisual() =>
+        new(
+            "central_divide.production",
+            BattlefieldTerrainControlEncoding.RgbaFourLayer,
+            ActiveLayerLimit: 4,
+            ControlSamplesPerSide: 33,
+            [
+                "material.world.terrain.grass_ground",
+                "material.world.terrain.dirt",
+                "material.world.terrain.mud",
+                "material.world.terrain.rock",
+                "material.world.terrain.gravel",
+                "material.world.terrain.industrial_ground",
+                "material.world.terrain.concrete",
+                "material.world.terrain.scorched"
+            ]);
 
     private static BattlefieldStartPosition[] CreateStarts() =>
     [

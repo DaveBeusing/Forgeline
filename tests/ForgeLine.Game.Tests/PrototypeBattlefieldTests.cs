@@ -97,6 +97,25 @@ public sealed class PrototypeBattlefieldTests
             definition.Crossings.Count,
             loaded.Crossings.Length);
         Assert.Equal(
+            BattlefieldMapArtifact.CurrentFormatVersion,
+            loaded.FormatVersion);
+        Assert.Equal(
+            BattlefieldTerrainControlEncoding.RgbaFourLayer,
+            loaded.TerrainVisual.ControlEncoding);
+        Assert.Equal(
+            4,
+            loaded.TerrainVisual.ActiveLayerLimit);
+        Assert.Equal(
+            33,
+            loaded.TerrainVisual.ControlSamplesPerSide);
+        Assert.Equal(
+            8,
+            loaded.TerrainVisual.MaterialAssetIds.Length);
+        Assert.Equal(
+            definition.TerrainVisual.MaterialAssetIds,
+            loaded.TerrainVisual.MaterialAssetIds);
+
+        Assert.Equal(
             payload,
             loaded.Serialize());
     }

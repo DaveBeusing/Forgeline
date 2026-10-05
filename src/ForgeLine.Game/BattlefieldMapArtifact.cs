@@ -16,9 +16,10 @@ public sealed record BattlefieldMapArtifact(
     BattlefieldRoadEdgeDefinition[] RoadEdges,
     BattlefieldCrossingDefinition[] Crossings,
     BattlefieldObjectiveDefinition[] Objectives,
-    AxisAlignedBounds[] StaticNavigationObstacles)
+    AxisAlignedBounds[] StaticNavigationObstacles,
+    BattlefieldTerrainVisualDefinition TerrainVisual)
 {
-    public const int CurrentFormatVersion = 1;
+    public const int CurrentFormatVersion = 2;
 
     private static readonly JsonSerializerOptions SerializerOptions =
         CreateSerializerOptions();
@@ -39,7 +40,12 @@ public sealed record BattlefieldMapArtifact(
             definition.RoadEdges.ToArray(),
             definition.Crossings.ToArray(),
             definition.Objectives.ToArray(),
-            definition.StaticNavigationObstacles.ToArray());
+            definition.StaticNavigationObstacles.ToArray(),
+            definition.TerrainVisual with
+            {
+                MaterialAssetIds =
+                    definition.TerrainVisual.MaterialAssetIds.ToArray()
+            });
     }
 
     public byte[] Serialize()
@@ -93,6 +99,8 @@ public sealed record BattlefieldMapArtifact(
         ArgumentNullException.ThrowIfNull(Crossings);
         ArgumentNullException.ThrowIfNull(Objectives);
         ArgumentNullException.ThrowIfNull(StaticNavigationObstacles);
+        ArgumentNullException.ThrowIfNull(TerrainVisual);
+        TerrainVisual.Validate();
     }
 
     public void ValidateMatches(
@@ -111,12 +119,32 @@ public sealed record BattlefieldMapArtifact(
             !Crossings.SequenceEqual(definition.Crossings) ||
             !Objectives.SequenceEqual(definition.Objectives) ||
             !StaticNavigationObstacles.SequenceEqual(
-                definition.StaticNavigationObstacles))
+                definition.StaticNavigationObstacles) ||
+            !TerrainVisualMatches(
+                TerrainVisual,
+                definition.TerrainVisual))
         {
             throw new InvalidOperationException(
                 "Compiled battlefield map artifact does not match the canonical definition.");
         }
     }
+
+    private static bool TerrainVisualMatches(
+        BattlefieldTerrainVisualDefinition artifact,
+        BattlefieldTerrainVisualDefinition definition) =>
+        string.Equals(
+            artifact.ProfileId,
+            definition.ProfileId,
+            StringComparison.Ordinal) &&
+        artifact.ControlEncoding ==
+            definition.ControlEncoding &&
+        artifact.ActiveLayerLimit ==
+            definition.ActiveLayerLimit &&
+        artifact.ControlSamplesPerSide ==
+            definition.ControlSamplesPerSide &&
+        artifact.MaterialAssetIds.SequenceEqual(
+            definition.MaterialAssetIds,
+            StringComparer.Ordinal);
 
     private static JsonSerializerOptions CreateSerializerOptions()
     {
