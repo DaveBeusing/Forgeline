@@ -1,0 +1,8 @@
+{
+  "id": "texture.world.terrain.hard_surface_normal",
+  "type": "texture",
+  "source": "hard_surface_normal.tga",
+  "textureUsage": "normal",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true
+}

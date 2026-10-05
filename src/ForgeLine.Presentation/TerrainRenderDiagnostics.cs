@@ -6,4 +6,8 @@ public readonly record struct TerrainRenderDiagnostics(
     int CulledChunks,
     long SubmittedTriangles,
     int DrawCalls,
-    int UploadedBufferCount);
+    int UploadedBufferCount,
+    int ControlTextureCount = 0,
+    int TextureBindingsPerDraw = 0,
+    int MaximumTextureSamplesPerPixel = 0,
+    double CpuSubmissionMilliseconds = 0.0);

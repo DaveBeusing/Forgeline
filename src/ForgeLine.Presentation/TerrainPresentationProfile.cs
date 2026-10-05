@@ -34,6 +34,8 @@ public readonly record struct TerrainBlendRegion(
 
 public sealed class TerrainPresentationProfile
 {
+    public const int MaterialSlotCount = 8;
+
     private const float TextureInfluence = 0.72f;
     private const float SecondaryTextureInfluence = 0.18f;
 
@@ -75,6 +77,110 @@ public sealed class TerrainPresentationProfile
             out TerrainMaterialDefinition material)
             ? material
             : FallbackMaterial;
+
+    public void CalculateMaterialWeights(
+        Vector3 position,
+        Vector3 normal,
+        Span<float> destination)
+    {
+        if (destination.Length < MaterialSlotCount)
+        {
+            throw new ArgumentException(
+                $"Terrain material weights require at least {MaterialSlotCount} values.",
+                nameof(destination));
+        }
+
+        Span<float> weights =
+            destination[..MaterialSlotCount];
+        weights.Clear();
+
+        Vector3 normalized =
+            normal.LengthSquared() > 0.0001f
+                ? Vector3.Normalize(normal)
+                : Vector3.UnitY;
+        float slope =
+            Math.Clamp(
+                1.0f - normalized.Y,
+                0.0f,
+                1.0f);
+        float elevation =
+            Math.Clamp(
+                (position.Y + 20.0f) / 80.0f,
+                0.0f,
+                1.0f);
+
+        float dirtBlend =
+            Math.Clamp(
+                elevation * 0.45f +
+                slope * 0.45f,
+                0.0f,
+                1.0f);
+        weights[(int)TerrainMaterialSlot.GrassGround] =
+            1.0f - dirtBlend;
+        weights[(int)TerrainMaterialSlot.Dirt] =
+            dirtBlend;
+
+        float mudBlend =
+            Math.Clamp(
+                (0.28f - elevation) *
+                1.4f,
+                0.0f,
+                0.55f);
+        ScaleWeights(
+            weights,
+            1.0f - mudBlend);
+        weights[(int)TerrainMaterialSlot.Mud] +=
+            mudBlend;
+
+        float rockBlend =
+            Math.Clamp(
+                slope *
+                2.1f,
+                0.0f,
+                1.0f);
+        ScaleWeights(
+            weights,
+            1.0f - rockBlend);
+        weights[(int)TerrainMaterialSlot.Rock] +=
+            rockBlend;
+
+        Vector2 point =
+            new(
+                position.X,
+                position.Z);
+
+        for (int index = 0;
+             index < _regions.Length;
+             index++)
+        {
+            TerrainBlendRegion region =
+                _regions[index];
+            float weight =
+                CalculateRegionWeight(
+                    point,
+                    region);
+
+            if (weight <= 0.0f)
+            {
+                continue;
+            }
+
+            ScaleWeights(
+                weights,
+                1.0f - weight);
+            weights[(int)region.Slot] +=
+                weight;
+        }
+
+        NormalizeWeights(
+            weights);
+    }
+
+    public IReadOnlyList<TerrainMaterialDefinition> Materials =>
+        _materials
+            .OrderBy(static pair => pair.Key)
+            .Select(static pair => pair.Value)
+            .ToArray();
 
     public Vector4 SampleBaseColor(
         Vector3 position,
@@ -556,6 +662,59 @@ public sealed class TerrainPresentationProfile
                 value)
             ? null
             : value;
+    }
+
+    private static void ScaleWeights(
+        Span<float> weights,
+        float factor)
+    {
+        for (int index = 0;
+             index < weights.Length;
+             index++)
+        {
+            weights[index] *=
+                factor;
+        }
+    }
+
+    private static void NormalizeWeights(
+        Span<float> weights)
+    {
+        float total = 0.0f;
+
+        for (int index = 0;
+             index < weights.Length;
+             index++)
+        {
+            float value =
+                float.IsFinite(weights[index])
+                    ? MathF.Max(weights[index], 0.0f)
+                    : 0.0f;
+            weights[index] =
+                value;
+            total +=
+                value;
+        }
+
+        if (total <= 1e-6f)
+        {
+            weights.Clear();
+            weights[(int)TerrainMaterialSlot.Dirt] =
+                1.0f;
+            return;
+        }
+
+        float reciprocal =
+            1.0f /
+            total;
+
+        for (int index = 0;
+             index < weights.Length;
+             index++)
+        {
+            weights[index] *=
+                reciprocal;
+        }
     }
 
     private static float CalculateRegionWeight(

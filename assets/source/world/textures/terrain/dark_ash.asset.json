@@ -1,5 +1,8 @@
 {
   "id": "texture.world.terrain.dark_ash",
   "type": "texture",
-  "source": "dark_ash.png"
+  "source": "dark_ash.png",
+  "textureUsage": "baseColor",
+  "textureColorSpace": "srgb",
+  "textureGenerateMipmaps": true
 }

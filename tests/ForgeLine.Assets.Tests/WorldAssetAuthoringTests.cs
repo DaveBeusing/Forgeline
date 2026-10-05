@@ -37,7 +37,7 @@ public sealed class WorldAssetAuthoringTests
                     result.Diagnostics.Select(
                         static diagnostic =>
                             $"{diagnostic.Code}: {diagnostic.Message}")));
-            Assert.Equal(275, result.CompiledCount);
+            Assert.Equal(280, result.CompiledCount);
 
             RuntimeAssetCatalog catalog =
                 RuntimeAssetCatalog.Load(
@@ -91,6 +91,58 @@ public sealed class WorldAssetAuthoringTests
                     catalog.Contains(
                         AssetId.Parse(id)),
                     $"Compiled world catalog is missing '{id}'.");
+            }
+
+            string[] terrainMaterialIds =
+                requiredIds[..8];
+
+            foreach (string id in terrainMaterialIds)
+            {
+                RuntimeMaterialData material =
+                    RuntimeMaterialData.FromPayload(
+                        catalog.Read(
+                            AssetId.Parse(
+                                id))
+                        .Payload);
+
+                Assert.NotNull(
+                    material.BaseColorTexture);
+                Assert.NotNull(
+                    material.NormalTexture);
+                Assert.NotNull(
+                    material.OrmTexture);
+
+                RuntimeTextureData baseColor =
+                    RuntimeTextureData.FromPayload(
+                        catalog.Read(
+                            material.BaseColorTexture!.Value)
+                        .Payload);
+                RuntimeTextureData normal =
+                    RuntimeTextureData.FromPayload(
+                        catalog.Read(
+                            material.NormalTexture!.Value)
+                        .Payload);
+                RuntimeTextureData orm =
+                    RuntimeTextureData.FromPayload(
+                        catalog.Read(
+                            material.OrmTexture!.Value)
+                        .Payload);
+
+                Assert.Equal(
+                    RuntimeTextureUsage.BaseColor,
+                    baseColor.Usage);
+                Assert.Equal(
+                    RuntimeTextureUsage.Normal,
+                    normal.Usage);
+                Assert.Equal(
+                    RuntimeTextureUsage.Orm,
+                    orm.Usage);
+                Assert.True(
+                    baseColor.Mips.Count > 1);
+                Assert.True(
+                    normal.Mips.Count > 1);
+                Assert.True(
+                    orm.Mips.Count > 1);
             }
 
             RuntimeAssetRecord ferrous =

@@ -1,5 +1,8 @@
 {
   "id": "texture.world.terrain.rocky_scrub",
   "type": "texture",
-  "source": "rocky_scrub.png"
+  "source": "rocky_scrub.png",
+  "textureUsage": "baseColor",
+  "textureColorSpace": "srgb",
+  "textureGenerateMipmaps": true
 }

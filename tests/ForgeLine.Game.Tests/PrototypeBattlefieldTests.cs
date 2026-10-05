@@ -97,8 +97,55 @@ public sealed class PrototypeBattlefieldTests
             definition.Crossings.Count,
             loaded.Crossings.Length);
         Assert.Equal(
+            BattlefieldTerrainControlEncoding.RgbaFourLayer,
+            loaded.TerrainVisual.ControlEncoding);
+        Assert.Equal(
+            4,
+            loaded.TerrainVisual.ActiveLayerLimit);
+        Assert.Equal(
+            33,
+            loaded.TerrainVisual.ControlSamplesPerSide);
+        Assert.Equal(
+            8,
+            loaded.TerrainVisual.MaterialAssetIds.Length);
+        Assert.Equal(
+            definition.TerrainVisual.MaterialAssetIds,
+            loaded.TerrainVisual.MaterialAssetIds);
+
+        Assert.Equal(
             payload,
             loaded.Serialize());
+    }
+
+    [Fact]
+    public void TerrainVisualContractRejectsUnboundedOrDuplicateMaterialState()
+    {
+        var duplicateMaterials =
+            new BattlefieldTerrainVisualDefinition(
+                "invalid",
+                BattlefieldTerrainControlEncoding.RgbaFourLayer,
+                ActiveLayerLimit: 4,
+                ControlSamplesPerSide: 33,
+                [
+                    "material.world.terrain.dirt",
+                    "material.world.terrain.dirt"
+                ]);
+
+        Assert.Throws<InvalidOperationException>(
+            duplicateMaterials.Validate);
+
+        var unbounded =
+            new BattlefieldTerrainVisualDefinition(
+                "invalid",
+                BattlefieldTerrainControlEncoding.RgbaFourLayer,
+                ActiveLayerLimit: 8,
+                ControlSamplesPerSide: 33,
+                [
+                    "material.world.terrain.dirt"
+                ]);
+
+        Assert.Throws<InvalidOperationException>(
+            unbounded.Validate);
     }
 
     [Fact]

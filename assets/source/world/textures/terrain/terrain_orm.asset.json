@@ -1,0 +1,8 @@
+{
+  "id": "texture.world.terrain.terrain_orm",
+  "type": "texture",
+  "source": "terrain_orm.tga",
+  "textureUsage": "orm",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true
+}
