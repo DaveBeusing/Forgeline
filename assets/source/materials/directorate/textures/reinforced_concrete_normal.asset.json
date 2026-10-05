@@ -1,0 +1,8 @@
+{
+  "id": "texture.directorate.material.reinforced_concrete_normal",
+  "type": "texture",
+  "source": "reinforced_concrete_normal.tga",
+  "textureUsage": "normal",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true
+}

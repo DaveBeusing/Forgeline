@@ -5,7 +5,7 @@ namespace ForgeLine.AssetCompiler;
 
 public static class AssetPipelineCompiler
 {
-    public const string CompilerVersion = "1.4.0";
+    public const string CompilerVersion = "1.5.0";
     public const int RuntimeVersion = 4;
 
     private static readonly JsonSerializerOptions JsonOptions = RuntimeAssetCatalog.CreateJsonOptions();
@@ -745,7 +745,7 @@ public static class AssetPipelineCompiler
             new AssetCompilerDiagnostic(
                 "ASSETI002",
                 AssetCompilerDiagnosticSeverity.Information,
-                $"Mesh compiled: vertices={mesh.VertexCount}; indices={mesh.IndexCount}; sections={mesh.SectionCount}; materials={mesh.MaterialCount}; uv0={(mesh.HasUv0 ? "present" : "missing")}; tangents={(mesh.HasTangents ? "present" : "unavailable")}; generatedNormals={mesh.GeneratedNormalVertexCount}; generatedTangents={mesh.GeneratedTangentVertexCount}; fallbackSections={mesh.FallbackSectionCount}.",
+                $"Mesh compiled: vertices={mesh.VertexCount}; indices={mesh.IndexCount}; sections={mesh.SectionCount}; materials={mesh.MaterialCount}; uv0={(mesh.HasUv0 ? "present" : "missing")}; tangents={(mesh.HasTangents ? "present" : "unavailable")}; generatedNormals={mesh.GeneratedNormalVertexCount}; generatedUvVertices={mesh.GeneratedUvVertexCount}; generatedTangents={mesh.GeneratedTangentVertexCount}; fallbackSections={mesh.FallbackSectionCount}.",
                 node.Id.Value,
                 sourceRelativePath));
 

@@ -1,0 +1,8 @@
+{
+  "id": "texture.directorate.material.painted_metal_base",
+  "type": "texture",
+  "source": "painted_metal_base.tga",
+  "textureUsage": "baseColor",
+  "textureColorSpace": "srgb",
+  "textureGenerateMipmaps": true
+}

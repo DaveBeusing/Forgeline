@@ -1,0 +1,8 @@
+{
+  "id": "texture.directorate.material.damaged_metal_orm",
+  "type": "texture",
+  "source": "damaged_metal_orm.tga",
+  "textureUsage": "orm",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true
+}

@@ -1,0 +1,8 @@
+{
+  "id": "texture.directorate.material.structural_metal_orm",
+  "type": "texture",
+  "source": "structural_metal_orm.tga",
+  "textureUsage": "orm",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true
+}

@@ -98,6 +98,10 @@ Each family has one stable runtime material:
 material.directorate.unit.<family>
 ```
 
+Those stable IDs now resolve through the shared Directorate production texture library. Combat families use the painted-metal Base Color/Normal/ORM set; cargo and supply vehicles use the structural-metal family. Existing family-specific base-color, roughness, and metallic factors remain the role/faction tuning layer rather than duplicating texture sets. Rifle Squad uses a tighter UV scale for its smaller geometry while vehicles use broader tiling.
+
+Legacy position-only source meshes are remediated deterministically by the Asset Compiler when a textured material requires UV0. The compiler creates box-projected UV seams, then generates tangents for the normal-mapped path. No Directorate gameplay unit remains on the development material fallback solely because its baseline glTF lacked UVs.
+
 `PresentationExtractor` derives unit presentation damage state from authoritative `HealthState`:
 
 - Intact: above 67% health;
@@ -155,7 +159,7 @@ Automated coverage verifies:
 
 ## Current boundary
 
-This is the first production-oriented Directorate unit visual baseline, not final high-detail art. Final texture sets, skeletal animation, track/wheel animation, articulated turret/gun transforms, VFX, portraits, audio, and higher-fidelity destruction can replace or extend the stable contracts established here without changing gameplay IDs or creating a parallel runtime asset path.
+This is the first production-textured Directorate unit visual baseline, not final high-detail hero art. Shared Base Color/Normal/ORM textures are now active through the production GPU material path. Higher-resolution unique maps where genuinely justified, skeletal animation, track/wheel animation, articulated gun elevation/recoil, portraits, audio, and higher-fidelity destruction can extend the stable contracts without changing gameplay IDs or creating a parallel runtime asset path.
 
 
 ## VFX integration

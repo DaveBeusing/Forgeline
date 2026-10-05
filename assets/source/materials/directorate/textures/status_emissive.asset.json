@@ -1,0 +1,8 @@
+{
+  "id": "texture.directorate.material.status_emissive",
+  "type": "texture",
+  "source": "status_emissive.tga",
+  "textureUsage": "emissive",
+  "textureColorSpace": "srgb",
+  "textureGenerateMipmaps": true
+}

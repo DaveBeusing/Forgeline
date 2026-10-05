@@ -49,7 +49,7 @@ public sealed class DirectorateBuildingAssetAuthoringTests
                         static diagnostic =>
                             $"{diagnostic.Code}: {diagnostic.Message}")));
             Assert.Equal(
-                280,
+                299,
                 result.CompiledCount);
 
             RuntimeAssetCatalog catalog =

@@ -56,6 +56,7 @@ internal static class GltfImporter
         bool allHaveUv0 = true;
         bool allHaveTangents = true;
         int generatedNormalVertexCount = 0;
+        int generatedUvVertexCount = 0;
         int generatedTangentVertexCount = 0;
         int fallbackSectionCount = 0;
 
@@ -272,14 +273,31 @@ internal static class GltfImporter
                         : default;
                 bool fallbackSection =
                     false;
+                bool hasUv0 =
+                    texCoords is not null;
 
-                if (texCoords is null)
+                if (!hasUv0 &&
+                    requirement.RequiresUv0)
+                {
+                    primitiveIndices =
+                        GenerateBoxProjectedUv(
+                            vertices,
+                            vertexBase,
+                            vertexCount,
+                            primitiveIndices);
+                    vertexCount =
+                        primitiveIndices.Length;
+                    generatedUvVertexCount +=
+                        vertexCount;
+                    hasUv0 =
+                        true;
+                    tangents =
+                        null;
+                }
+
+                if (!hasUv0)
                 {
                     allHaveUv0 = false;
-                    if (requirement.RequiresUv0)
-                    {
-                        fallbackSection = true;
-                    }
                 }
 
                 bool hasTangents =
@@ -291,7 +309,7 @@ internal static class GltfImporter
 
                 if (!hasTangents &&
                     requirement.RequiresTangents &&
-                    texCoords is not null)
+                    hasUv0)
                 {
                     hasTangents =
                         GenerateTangents(
@@ -409,6 +427,7 @@ internal static class GltfImporter
                 runtimeMesh.HasUv0,
                 runtimeMesh.HasTangents,
                 generatedNormalVertexCount,
+                generatedUvVertexCount,
                 generatedTangentVertexCount,
                 fallbackSectionCount));
     }
@@ -538,6 +557,132 @@ internal static class GltfImporter
                     Ny = normal.Y,
                     Nz = normal.Z
                 };
+        }
+    }
+
+    private static uint[] GenerateBoxProjectedUv(
+        List<VertexData> vertices,
+        int vertexBase,
+        int vertexCount,
+        uint[] indices)
+    {
+        var projected =
+            new VertexData[indices.Length];
+        var projectedIndices =
+            new uint[indices.Length];
+
+        for (int triangle = 0;
+             triangle < indices.Length;
+             triangle += 3)
+        {
+            VertexData a =
+                vertices[
+                    vertexBase +
+                    checked((int)indices[triangle])];
+            VertexData b =
+                vertices[
+                    vertexBase +
+                    checked((int)indices[triangle + 1])];
+            VertexData c =
+                vertices[
+                    vertexBase +
+                    checked((int)indices[triangle + 2])];
+            Vector3 p0 =
+                Position(a);
+            Vector3 p1 =
+                Position(b);
+            Vector3 p2 =
+                Position(c);
+            Vector3 face =
+                Vector3.Cross(
+                    p1 - p0,
+                    p2 - p0);
+
+            if (!IsFinite(face) ||
+                face.LengthSquared() <= 1e-12f)
+            {
+                throw new InvalidDataException(
+                    "Cannot generate box-projected UV0 for a degenerate triangle.");
+            }
+
+            WriteProjected(
+                triangle,
+                a,
+                p0,
+                face);
+            WriteProjected(
+                triangle + 1,
+                b,
+                p1,
+                face);
+            WriteProjected(
+                triangle + 2,
+                c,
+                p2,
+                face);
+        }
+
+        vertices.RemoveRange(
+            vertexBase,
+            vertexCount);
+        vertices.AddRange(
+            projected);
+        return projectedIndices;
+
+        void WriteProjected(
+            int destination,
+            VertexData vertex,
+            Vector3 position,
+            Vector3 face)
+        {
+            Vector3 absolute =
+                Vector3.Abs(
+                    face);
+            float u;
+            float v;
+
+            if (absolute.X >= absolute.Y &&
+                absolute.X >= absolute.Z)
+            {
+                u =
+                    (face.X < 0f
+                        ? -position.Z
+                        : position.Z);
+                v =
+                    position.Y;
+            }
+            else if (absolute.Y >= absolute.Z)
+            {
+                u =
+                    position.X;
+                v =
+                    face.Y < 0f
+                        ? -position.Z
+                        : position.Z;
+            }
+            else
+            {
+                u =
+                    face.Z < 0f
+                        ? -position.X
+                        : position.X;
+                v =
+                    position.Y;
+            }
+
+            projected[destination] =
+                vertex with
+                {
+                    U = u,
+                    V = v,
+                    Tx = 0f,
+                    Ty = 0f,
+                    Tz = 0f,
+                    Tw = 0f
+                };
+            projectedIndices[destination] =
+                checked(
+                    (uint)destination);
         }
     }
 

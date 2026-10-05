@@ -48,6 +48,20 @@ Vegetation currently contains conifer, scrub, and grass-clump families. Central 
 
 Repeated world objects share compiled mesh resources through `RuntimeWorldAssetResources`. Runtime vertex/index buffers are cached by stable asset ID instead of being rebuilt per entity. Visible instances are grouped by the resolved runtime mesh and selected LOD, while transform and tint are uploaded through a per-swap-chain-frame instance stream. Each group is submitted with one indexed instanced draw, so repeated props, vegetation, deposits, and shared decal geometry no longer require one draw call per entity.
 
+## Production surface materials
+
+Reusable physical world objects now participate in the same production texture/material foundation as Directorate assets:
+
+- props use shared structural-metal textures through `material.world.prop.industrial`;
+- resource deposits share the resource-rock Base Color/Normal/ORM family while retaining resource-specific tint/material factors;
+- conifer, scrub, and grass-clump assets use the shared vegetation Base Color/Normal/ORM family.
+
+This preserves texture reuse and instancing while keeping resource/faction readability in material factors, silhouette, strategic symbols, and UI rather than requiring a unique texture set for every object.
+
+The Asset Compiler deterministically remediates missing UV0 on these static baseline meshes and generates tangent bases for their normal maps. LOD material identity is checked by the production material completeness validation.
+
+Intentional exceptions are the authored decal carrier and purpose-specific VFX/symbol/UI visuals. Terrain uses the dedicated GPU splatting pipeline and does not consume this object-mesh completeness rule.
+
 ## LOD
 
 Props, vegetation, and resource deposits define an explicit LOD1 mesh reference in their source asset metadata. `WorldPresentationCatalog` supplies the corresponding presentation distance and the renderer chooses High or Reduced LOD before resolving the runtime mesh.
