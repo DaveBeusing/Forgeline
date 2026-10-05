@@ -41,19 +41,20 @@ public sealed class TerrainSplatMapTests
             splat.Palette.Count,
             splat.Palette.Distinct().Count());
 
-        GraphicsTextureMipData levelZero =
-            splat.Mips[0];
-
-        for (int offset = 0;
-             offset < levelZero.Pixels.Length;
-             offset += 4)
+        foreach (GraphicsTextureMipData mip in
+                 splat.Mips)
         {
-            Assert.Equal(
-                255,
-                levelZero.Pixels[offset] +
-                levelZero.Pixels[offset + 1] +
-                levelZero.Pixels[offset + 2] +
-                levelZero.Pixels[offset + 3]);
+            for (int offset = 0;
+                 offset < mip.Pixels.Length;
+                 offset += 4)
+            {
+                Assert.Equal(
+                    255,
+                    mip.Pixels[offset] +
+                    mip.Pixels[offset + 1] +
+                    mip.Pixels[offset + 2] +
+                    mip.Pixels[offset + 3]);
+            }
         }
     }
 

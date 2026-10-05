@@ -37,7 +37,11 @@ internal readonly record struct ClientVisualQualificationSnapshot(
     int LoadedMaterialCount,
     int LoadedMaterialAssetTextureCount,
     long MaterialBindingFailureCount,
-    GraphicsSurfaceInfo Surface = default);
+    GraphicsSurfaceInfo Surface = default,
+    int TerrainControlTextureCount = 0,
+    int TerrainTextureBindingsPerDraw = 0,
+    int TerrainMaximumTextureSamplesPerPixel = 0,
+    double TerrainCpuSubmissionMilliseconds = 0.0);
 
 internal readonly record struct ClientRenderFrame(
     RtsCameraState Camera,
@@ -493,6 +497,8 @@ internal sealed class ClientRenderHost : IDisposable
                         $"instances={instanceRenderer.LastDiagnostics.VisibleInstances}/{renderWorld.InstanceCount} " +
                         $"lod={instanceRenderer.LastDiagnostics.HighLodInstances}/{instanceRenderer.LastDiagnostics.ReducedLodInstances} " +
                         $"draws={terrainRenderer.LastDiagnostics.DrawCalls + instanceRenderer.LastDiagnostics.DrawCalls + debugDrawRenderer.LastDiagnostics.DrawCalls} " +
+                        $"terrainSubmitMs={terrainRenderer.LastDiagnostics.CpuSubmissionMilliseconds:F3} " +
+                        $"terrainTextures={terrainRenderer.LastDiagnostics.TextureBindingsPerDraw} " +
                         $"vfx={snapshot.VfxMetrics.ActiveTransientEffects}/{snapshot.VfxMetrics.PoolCapacity} " +
                         $"vfxDropped={snapshot.VfxMetrics.TotalDropped}");
                     nextDiagnosticAt =
@@ -588,7 +594,11 @@ internal sealed class ClientRenderHost : IDisposable
                 materials.LoadedMaterialCount,
                 materials.LoadedAssetTextureCount,
                 materials.BindingFailureCount,
-                graphics.Surface);
+                graphics.Surface,
+                terrain.ControlTextureCount,
+                terrain.TextureBindingsPerDraw,
+                terrain.MaximumTextureSamplesPerPixel,
+                terrain.CpuSubmissionMilliseconds);
 
         lock (_frameGate)
         {

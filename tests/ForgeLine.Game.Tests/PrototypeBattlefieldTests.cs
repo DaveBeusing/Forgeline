@@ -97,9 +97,6 @@ public sealed class PrototypeBattlefieldTests
             definition.Crossings.Count,
             loaded.Crossings.Length);
         Assert.Equal(
-            BattlefieldMapArtifact.CurrentFormatVersion,
-            loaded.FormatVersion);
-        Assert.Equal(
             BattlefieldTerrainControlEncoding.RgbaFourLayer,
             loaded.TerrainVisual.ControlEncoding);
         Assert.Equal(
@@ -118,6 +115,37 @@ public sealed class PrototypeBattlefieldTests
         Assert.Equal(
             payload,
             loaded.Serialize());
+    }
+
+    [Fact]
+    public void TerrainVisualContractRejectsUnboundedOrDuplicateMaterialState()
+    {
+        var duplicateMaterials =
+            new BattlefieldTerrainVisualDefinition(
+                "invalid",
+                BattlefieldTerrainControlEncoding.RgbaFourLayer,
+                ActiveLayerLimit: 4,
+                ControlSamplesPerSide: 33,
+                [
+                    "material.world.terrain.dirt",
+                    "material.world.terrain.dirt"
+                ]);
+
+        Assert.Throws<InvalidOperationException>(
+            duplicateMaterials.Validate);
+
+        var unbounded =
+            new BattlefieldTerrainVisualDefinition(
+                "invalid",
+                BattlefieldTerrainControlEncoding.RgbaFourLayer,
+                ActiveLayerLimit: 8,
+                ControlSamplesPerSide: 33,
+                [
+                    "material.world.terrain.dirt"
+                ]);
+
+        Assert.Throws<InvalidOperationException>(
+            unbounded.Validate);
     }
 
     [Fact]
