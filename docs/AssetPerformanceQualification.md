@@ -60,7 +60,7 @@ The JSON report records:
 - the twelve largest generated runtime assets;
 - qualification diagnostics.
 
-Runtime byte counts are the reproducible size of generated .flasset files. They are not presented as resident GPU-memory measurements. A future renderer-residency system may add GPU allocation and residency telemetry when the graphics abstraction owns that information authoritatively.
+Runtime byte counts are the reproducible size of generated .flasset files. They are distinct from resident GPU texture bytes. The graphics qualification report records both current and peak resident texture bytes represented by uploaded mip payloads, so compiled footprint and runtime residency remain separate measurements.
 
 ### Qualification Failure Codes
 
@@ -105,28 +105,35 @@ The JSON report captures the latest completed D3D12 render frame with:
 - high-detail and reduced-LOD instance counts;
 - active VFX, pool capacity, and dropped VFX count.
 
-gpuMilliseconds is intentionally nullable and currently remains unavailable. ForgeLine Graphics does not yet expose a validated Direct3D 12 timestamp-query/readback lifecycle. GPU time must not be estimated from CPU frame time.
+`gpuMilliseconds` is populated from Direct3D 12 timestamp queries recorded around the production graphics command list and read only after the owning frame fence completes. `gpuTimingAvailable` remains explicit; unsupported timing never falls back to CPU frame time.
 
 ## Rendering Benchmarks
 
-ForgeLine.Rendering.Benchmarks contains synthetic rendering baselines plus representative mixed-content submission cases.
+ForgeLine.Rendering.Benchmarks contains synthetic rendering baselines plus representative mixed-content submission cases. The production qualification benchmarks load the compiled `assets/runtime` catalog so object and terrain cases exercise texture/material resolution and texture binding rather than the legacy untextured fallback. Compile runtime assets first when running the benchmark host outside CI.
 
-Run the presentation qualification benchmarks with:
+Run the full rendering qualification matrix with:
 
 ~~~powershell
-dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release -- --filter "*PresentationBenchmarks*"
+dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release -- --filter "*" --job Short --artifacts artifacts/rendering-benchmarks --exporters BriefJSON
 ~~~
 
 The representative scene contains repeated Directorate armor and reconnaissance, Command Core and Vehicle Factory instances, resource deposits, vegetation, industrial props, and combat VFX.
 
-Two camera regimes are measured:
+Object/material submission is measured at:
 
-- tactical view at normal gameplay distance;
-- strategic view at long distance.
+- close tactical distance;
+- normal RTS gameplay distance;
+- strategic zoom.
 
-The benchmark is intended to reveal regression in submission cost, allocations, culling behavior, batching, LOD reduction, and VFX distance policy. BenchmarkDotNet results must be compared on equivalent hardware/runtime configurations before treating a difference as an optimization result.
+Terrain submission is measured at:
 
-Terrain-specific baselines remain available through TerrainBenchmarks.
+- close tactical distance;
+- normal representative coverage;
+- strategic distance with high terrain coverage.
+
+BenchmarkDotNet `Short` repeats measurement iterations so qualification is not based on a single timing sample. The output retains runtime and machine metadata and is published by CI under `artifacts/rendering-benchmarks`.
+
+The benchmark is intended to reveal regression in submission cost, allocations, culling behavior, material resolution/binding, LOD reduction, terrain coverage cost, and VFX distance policy. BenchmarkDotNet results must be compared on equivalent hardware/runtime configurations before treating a difference as an optimization result.
 
 ## LOD and Strategic Zoom Qualification
 
@@ -164,6 +171,127 @@ Instead:
 - unusually expensive assets must be fixed or documented with measurement evidence before their cost becomes a production convention.
 
 When stable hardware baselines are established, concrete warning and failure thresholds may be added without changing the measurement model.
+
+## Accepted Textured Rendering Baseline
+
+The qualification baseline is anchored to reproducible Windows CI evidence for the same Vertical Slice scene with 1,000 render-stress instances.
+
+Historical qualification run 36770423081, before the production texture/material pipeline, reported on Microsoft Basic Render Driver:
+
+- 22.253 FPS;
+- 44.937 ms frame time;
+- 34.784 ms CPU render time;
+- 16 visible of 144 terrain chunks;
+- 26 measured terrain/instance/debug draw calls;
+- 783 visible of 1,055 total instances.
+
+Textured `master` qualification run 37345829712 on commit `c1b41f4394ccc360e2cc9c83a5f4dde6227aa96a` reported on the same Microsoft Basic Render Driver class:
+
+- 3.241 FPS;
+- 308.559 ms frame time;
+- 242.552 ms CPU render time;
+- the same 16 visible terrain chunks;
+- the same 26 measured draw calls;
+- the same 783 visible of 1,055 total instances;
+- 175 loaded GPU textures;
+- 998,540 resident texture bytes;
+- 175 of 4,096 SRV descriptors used;
+- 13 terrain texture bindings / maximum texture samples per pixel;
+- zero texture or material binding failures.
+
+The unchanged draw-call, terrain-visibility, and instance counts are the useful structural comparison: the texture/material pipeline did not introduce draw-call fragmentation in the canonical scene. The large timing increase on Microsoft Basic Render Driver reflects the much heavier texture-sampling workload on a software rasterizer and is not accepted as a target-hardware performance verdict. Target-hardware comparisons must use the same scene, resolution, camera regime, runtime, and adapter class.
+
+### Vertical Slice budgets
+
+The following budgets are tied to the measured current Vertical Slice and are enforced by the Windows qualification path where they are hardware-independent:
+
+| Metric | Accepted baseline / budget | Rationale |
+|---|---:|---|
+| Active terrain layers | 4 maximum | Production splat contract |
+| Terrain texture bindings / samples | 13 maximum | 1 control + 4 Base Color + 4 Normal + 4 ORM |
+| Canonical measured draw calls | 26 maximum | Matches both pre-texture and textured qualification evidence |
+| Peak resident texture payload bytes | 2 MiB maximum | Current measured value is 998,540 bytes; preserves approximately 2x Vertical Slice headroom |
+| Peak SRV descriptors | 512 maximum | Current measured value is 175; retains substantial headroom inside the 4,096-descriptor heap |
+| Compiled texture runtime footprint | 512 KiB maximum | Current measured texture payload footprint is 235,994 bytes |
+| Texture/material binding failures | 0 | Invalid resource state is never an accepted baseline |
+| D3D12 debug-layer warnings/errors | 0 when the layer is available | New renderer warnings require investigation |
+| Static texture upload balance | uploads = live textures + released textures | Detects accidental repeated uploads or unbalanced lifetime accounting |
+
+These are Vertical Slice qualification budgets, not final full-game limits. Deliberate content growth may revise them only with a measured before/after qualification and an updated rationale.
+
+### Target-hardware frame budget
+
+The renderer continues to target 60+ FPS on target hardware, corresponding to a 16.67 ms total frame budget. Hardware-sensitive frame and GPU timing are recorded but are not CI failure thresholds on Microsoft Basic Render Driver.
+
+Target-hardware qualification must retain:
+
+- adapter and dedicated-memory metadata;
+- viewport resolution and window mode;
+- close tactical, normal RTS, and strategic camera regimes;
+- high terrain coverage;
+- representative repeated-material industrial content;
+- representative unit formations;
+- the same asset/runtime build.
+
+Use repeated BenchmarkDotNet runs and representative/median values rather than one noisy sample. GPU timing must come from D3D12 timestamps; CPU frame time is not a substitute.
+
+### Resource lifetime and steady state
+
+The graphics diagnostics record current and peak texture residency, current and peak SRV use, cumulative successful texture uploads, and cumulative texture releases.
+
+For a steady-state client qualification:
+
+- static textures must not upload once per frame;
+- each live texture owns one SRV descriptor;
+- disposal must return its descriptor and resident-byte accounting;
+- upload count must equal live textures plus released textures;
+- intentionally persistent material and terrain-control caches may remain resident for the session;
+- repeated load/unload support must not show monotonic unexplained texture or descriptor growth.
+
+### Mip, filtering, and readability review
+
+Visual qualification must inspect the same production material path at close tactical, normal RTS, and strategic zoom plus oblique terrain views.
+
+Accept only when:
+
+- Base Color remains correctly sRGB interpreted;
+- Normal and ORM remain linear data;
+- complete compiler-generated mip chains are used;
+- trilinear transitions remain stable during zoom;
+- anisotropic sampling remains stable at oblique angles;
+- no global negative mip bias introduces shimmer;
+- distant normal detail does not create moire;
+- material detail remains subordinate to silhouette, role, and gameplay readability;
+- terrain control transitions do not expose chunk seams.
+
+### Known measurement limits
+
+The accepted baseline deliberately records the following limitations rather than inferring unavailable data:
+
+- D3D12 timestamp queries currently measure the complete production graphics command list; terrain and object/material GPU time are not yet split into separate timestamp ranges.
+- Terrain CPU submission time is available separately and remains useful for attributing CPU-side terrain regressions.
+- Microsoft Basic Render Driver is suitable for functional D3D12, descriptor, lifetime, shader, and structural qualification, but its frame/GPU timing is not a target-hardware performance baseline.
+- The repository does not yet provide a deterministic tolerance-based image comparison system. Visual mip, shimmer, anisotropic, and readability review therefore remains an explicit qualification activity rather than a brittle screenshot CI gate.
+- The current client owns visual resources for the active session. Texture lifetime regression tests exercise repeated GPU texture ownership/release directly; broader multi-session residency comparisons should be added when supported in-process map/session reload becomes a production lifecycle.
+- D3D12 debug-layer cleanliness is gated when the Windows environment exposes the layer. An unavailable debug layer is reported rather than treated as evidence of cleanliness.
+- GPU memory diagnostics currently represent texture mip payload residency tracked by ForgeLine Graphics; they are not a complete accounting of driver allocations, render targets, depth buffers, or vendor-specific residency.
+
+These limits are extension points for future diagnostics, not reasons to substitute estimates for measured values.
+
+### Re-evaluation triggers
+
+Texture streaming, virtual texturing, additional compression infrastructure, descriptor virtualization, or more complex material indirection remain deferred until measurements show that simpler policies are insufficient.
+
+Re-evaluate only when one or more of the following occurs on representative target hardware/content:
+
+- resident texture use materially exceeds the accepted Vertical Slice budget after resolution/reuse review;
+- SRV usage loses the documented headroom;
+- texture upload or load latency becomes visible during supported lifecycle transitions;
+- larger authored maps make persistent terrain-control/material residency impractical;
+- target-hardware GPU time exceeds the 16.67 ms total-frame direction because texture/material work is a measured dominant contributor;
+- compiled texture footprint grows beyond the current budget despite shared materials, mip discipline, and sensible source resolution.
+
+The first response to a measured regression remains reuse, batching, resolution correction, mip correctness, or redundant-sample removal rather than immediately adding virtual texturing.
 
 ## Visual Regression Policy
 

@@ -49,8 +49,27 @@ public static class GraphicsDeviceFactory
         GraphicsConfiguration? configuration = null)
     {
         target.Validate();
+        GraphicsConfiguration selected =
+            configuration ??
+            GraphicsConfiguration.Default;
+
+        if (configuration is null &&
+            string.Equals(
+                Environment.GetEnvironmentVariable(
+                    "FORGELINE_D3D12_DEBUG_LAYER"),
+                "1",
+                StringComparison.Ordinal))
+        {
+            selected =
+                selected with
+                {
+                    EnableDebugLayer =
+                        true
+                };
+        }
+
         return new D3D12GraphicsDevice(
             target,
-            configuration ?? GraphicsConfiguration.Default);
+            selected);
     }
 }

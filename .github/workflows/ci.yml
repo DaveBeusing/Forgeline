@@ -63,6 +63,9 @@ jobs:
         shell: pwsh
         run: ./build/Invoke-WindowModeQualification.ps1 -Configuration Release -RenderStressInstances 1000
 
+      - name: Rendering benchmark qualification
+        run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --filter "*" --job Short --artifacts artifacts/rendering-benchmarks --exporters BriefJSON
+
       - name: Headless diagnostics smoke test
         run: dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 64 --seed 12345 --tick-rate 20 --entities 1000 --diagnostics-output artifacts/headless-smoke.json
 
@@ -127,4 +130,5 @@ jobs:
           path: |
             artifacts/*.json
             artifacts/maps/*.json
+            artifacts/rendering-benchmarks/**
           if-no-files-found: warn

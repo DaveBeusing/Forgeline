@@ -227,6 +227,40 @@ public sealed class D3D12TextureSamplingIntegrationTests
         Assert.Equal(
             0,
             resources.TextureBindingFailureCount);
+        Assert.Equal(
+            4,
+            resources.PeakLoadedTextureCount);
+        Assert.Equal(
+            expectedResidentBytes,
+            resources.PeakResidentTextureBytes);
+        Assert.Equal(
+            4,
+            resources.PeakShaderResourceDescriptorsUsed);
+        Assert.Equal(
+            4,
+            resources.TextureUploadCount);
+
+        for (int frame = 0;
+             frame < 4;
+             frame++)
+        {
+            graphics.RenderFrame(
+                GraphicsColor.ForgeLineClear);
+        }
+
+        GraphicsDiagnostics steadyState =
+            graphics.Diagnostics;
+        Assert.Equal(
+            4,
+            steadyState.Resources.TextureUploadCount);
+        if (steadyState.GpuTimingAvailable)
+        {
+            Assert.NotNull(
+                steadyState.GpuFrameMilliseconds);
+            Assert.True(
+                steadyState.GpuFrameMilliseconds >=
+                0.0);
+        }
     }
 
     [Fact]
@@ -370,6 +404,80 @@ public sealed class D3D12TextureSamplingIntegrationTests
         Assert.Equal(
             0,
             graphics.Diagnostics.Resources.TextureBindingFailureCount);
+    }
+
+    [Fact]
+    public void TextureLifetimeReturnsDescriptorAndResidencyToBaseline()
+    {
+        using var platform =
+            new WindowsPlatform();
+        using IWindow window =
+            platform.CreateWindow(
+                new WindowConfiguration(
+                    "FORGELINE Texture Lifetime Test",
+                    160,
+                    120,
+                    resizable: false,
+                    WindowMode.Windowed));
+        using IGraphicsDevice graphics =
+            GraphicsDeviceFactory.CreateForWindow(
+                window,
+                new GraphicsConfiguration
+                {
+                    AllowSoftwareAdapterFallback =
+                        true,
+                    EnableDebugLayer =
+                        false,
+                    EnableVSync =
+                        false
+                });
+
+        GraphicsTextureData data =
+            CreateBaseColorTextureData();
+        IGraphicsTexture texture =
+            graphics.CreateTexture(
+                data);
+
+        GraphicsResourceDiagnostics loaded =
+            graphics.Diagnostics.Resources;
+        Assert.Equal(
+            1,
+            loaded.LoadedTextureCount);
+        Assert.Equal(
+            data.ResidentByteCount,
+            loaded.ResidentTextureBytes);
+        Assert.Equal(
+            1,
+            loaded.ShaderResourceDescriptorsUsed);
+        Assert.Equal(
+            1,
+            loaded.TextureUploadCount);
+
+        texture.Dispose();
+
+        GraphicsResourceDiagnostics released =
+            graphics.Diagnostics.Resources;
+        Assert.Equal(
+            0,
+            released.LoadedTextureCount);
+        Assert.Equal(
+            0,
+            released.ResidentTextureBytes);
+        Assert.Equal(
+            0,
+            released.ShaderResourceDescriptorsUsed);
+        Assert.Equal(
+            1,
+            released.TextureUploadCount);
+        Assert.Equal(
+            1,
+            released.TextureReleaseCount);
+        Assert.Equal(
+            1,
+            released.PeakLoadedTextureCount);
+        Assert.Equal(
+            data.ResidentByteCount,
+            released.PeakResidentTextureBytes);
     }
 
     private static GraphicsTextureData CreateBaseColorTextureData() =>

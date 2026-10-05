@@ -5,7 +5,8 @@ param(
     [int]$RenderStressInstances = 1000,
     [string]$SettingsRoot = "artifacts/window-mode-settings",
     [string]$WindowedReport = "artifacts/visual-qualification.json",
-    [string]$BorderlessReport = "artifacts/borderless-startup-qualification.json"
+    [string]$BorderlessReport = "artifacts/borderless-startup-qualification.json",
+    [string]$AssetQualificationReport = "artifacts/asset-qualification.json"
 )
 
 Set-StrictMode -Version Latest
@@ -16,6 +17,7 @@ $clientProject = Join-Path $repositoryRoot "src/ForgeLine.Client/ForgeLine.Clien
 $settingsRootPath = [System.IO.Path]::GetFullPath((Join-Path $repositoryRoot $SettingsRoot))
 $windowedReportPath = [System.IO.Path]::GetFullPath((Join-Path $repositoryRoot $WindowedReport))
 $borderlessReportPath = [System.IO.Path]::GetFullPath((Join-Path $repositoryRoot $BorderlessReport))
+$assetQualificationReportPath = [System.IO.Path]::GetFullPath((Join-Path $repositoryRoot $AssetQualificationReport))
 
 function Invoke-ClientSmoke {
     param(
@@ -37,7 +39,14 @@ function Invoke-ClientSmoke {
         "--visual-qualification-output", $ReportPath
     )
 
-    & dotnet @dotnetArguments
+    $previousDebugLayer = $env:FORGELINE_D3D12_DEBUG_LAYER
+    $env:FORGELINE_D3D12_DEBUG_LAYER = "1"
+    try {
+        & dotnet @dotnetArguments
+    }
+    finally {
+        $env:FORGELINE_D3D12_DEBUG_LAYER = $previousDebugLayer
+    }
 
     if ($LASTEXITCODE -ne 0) {
         throw "Client smoke qualification failed for expected mode '$ExpectedMode' with exit code $LASTEXITCODE."
@@ -100,6 +109,51 @@ function Invoke-ClientSmoke {
         throw "Graphics resize generation $($surface.resizeGeneration) was not fully applied; last applied generation is $($surface.appliedResizeGeneration)."
     }
 
+    $metrics = $report.metrics
+
+    if ($metrics.textureBindingFailureCount -ne 0 -or
+        $metrics.materialBindingFailureCount -ne 0) {
+        throw "Texture/material binding failures were reported during '$ExpectedMode' qualification."
+    }
+
+    if ($metrics.terrainTextureBindingsPerDraw -gt 13 -or
+        $metrics.terrainMaximumTextureSamplesPerPixel -gt 13) {
+        throw "Terrain texture/sample budget exceeded the four-layer baseline during '$ExpectedMode' qualification."
+    }
+
+    if ($metrics.totalMeasuredDrawCalls -gt 26) {
+        throw "Measured draw calls increased above the accepted Vertical Slice baseline of 26 during '$ExpectedMode' qualification."
+    }
+
+    if ($metrics.peakResidentTextureBytes -gt 2097152) {
+        throw "Peak resident texture bytes $($metrics.peakResidentTextureBytes) exceeded the 2 MiB Vertical Slice budget."
+    }
+
+    if ($metrics.peakShaderResourceDescriptorsUsed -gt 512) {
+        throw "Peak SRV descriptor use $($metrics.peakShaderResourceDescriptorsUsed) exceeded the accepted budget of 512."
+    }
+
+    if ($metrics.textureUploadCount -ne
+        ($metrics.loadedTextureCount + $metrics.textureReleaseCount)) {
+        throw "Texture lifetime accounting indicates repeated or unbalanced uploads during '$ExpectedMode' qualification."
+    }
+
+    if ($metrics.shaderResourceDescriptorsUsed -ne
+        $metrics.loadedTextureCount) {
+        throw "Current SRV descriptor usage does not match the loaded texture count during '$ExpectedMode' qualification."
+    }
+
+    if ($metrics.gpuTimingAvailable -and
+        $null -eq $metrics.gpuMilliseconds) {
+        throw "GPU timing was reported available but no completed frame timing was published."
+    }
+
+    if ($metrics.debugLayerEnabled -and
+        ($metrics.debugLayerWarningCount -ne 0 -or
+         $metrics.debugLayerErrorCount -ne 0)) {
+        throw "D3D12 debug-layer warnings/errors were reported during '$ExpectedMode' qualification."
+    }
+
     Write-Host (
         "Window mode qualification passed: mode={0}; client={1}x{2}; surface={3}x{4}; submitted={5}; presented={6}; frameIndex={7}/{8}" -f
         $ExpectedMode,
@@ -112,6 +166,14 @@ function Invoke-ClientSmoke {
         $surface.frameIndex,
         $surface.bufferCount
     )
+}
+
+if (Test-Path $assetQualificationReportPath) {
+    $assetQualification = Get-Content -Path $assetQualificationReportPath -Raw | ConvertFrom-Json -Depth 32
+
+    if ($assetQualification.textureRuntimeBytes -gt 524288) {
+        throw "Compiled texture runtime footprint $($assetQualification.textureRuntimeBytes) bytes exceeded the 512 KiB Vertical Slice budget."
+    }
 }
 
 if (Test-Path $settingsRootPath) {

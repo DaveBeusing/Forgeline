@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Attributes;
+using ForgeLine.Assets;
 using ForgeLine.Graphics;
 using ForgeLine.Presentation;
 using ForgeLine.World;
@@ -10,7 +11,10 @@ public class TerrainBenchmarks : IDisposable
 {
     private TerrainChunk _chunk = null!;
     private TerrainRenderer _renderer = null!;
+    private TerrainRenderer _highCoverageRenderer = null!;
+    private RtsCamera _closeCamera = null!;
     private RtsCamera _camera = null!;
+    private RtsCamera _strategicCamera = null!;
     private NullGraphicsCommandContext _context = null!;
 
     [GlobalSetup]
@@ -27,11 +31,38 @@ public class TerrainBenchmarks : IDisposable
                 chunkRadius: 3);
 
         var graphics = new NullGraphicsDevice();
-        _renderer = new TerrainRenderer(graphics, world);
+        RuntimeAssetCatalog runtimeAssets =
+            LoadRuntimeAssets();
+        _renderer =
+            new TerrainRenderer(
+                graphics,
+                world,
+                runtimeAssets: runtimeAssets);
+        TerrainWorld highCoverageWorld =
+            DevelopmentTerrainFactory.CreateRepresentativeWorld(
+                settings,
+                chunkRadius: 8);
+        _highCoverageRenderer =
+            new TerrainRenderer(
+                graphics,
+                highCoverageWorld,
+                runtimeAssets: runtimeAssets);
+        _closeCamera = new RtsCamera(
+            new RtsCameraSettings
+            {
+                InitialDistance = 120.0f,
+                MaximumDistance = 1_200.0f
+            });
         _camera = new RtsCamera(
             new RtsCameraSettings
             {
                 InitialDistance = 420.0f,
+                MaximumDistance = 1_200.0f
+            });
+        _strategicCamera = new RtsCamera(
+            new RtsCameraSettings
+            {
+                InitialDistance = 900.0f,
                 MaximumDistance = 1_200.0f
             });
         _context = new NullGraphicsCommandContext();
@@ -43,6 +74,7 @@ public class TerrainBenchmarks : IDisposable
     public void Dispose()
     {
         _renderer?.Dispose();
+        _highCoverageRenderer?.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -51,10 +83,68 @@ public class TerrainBenchmarks : IDisposable
         TerrainMeshGenerator.Generate(_chunk);
 
     [Benchmark]
+    public TerrainRenderDiagnostics SubmitCloseTacticalTerrain()
+    {
+        _renderer.Render(
+            _context,
+            _closeCamera);
+        return _renderer.LastDiagnostics;
+    }
+
+    [Benchmark]
     public TerrainRenderDiagnostics SubmitVisibleTerrainChunks()
     {
-        _renderer.Render(_context, _camera);
+        _renderer.Render(
+            _context,
+            _camera);
         return _renderer.LastDiagnostics;
+    }
+
+    [Benchmark]
+    public TerrainRenderDiagnostics SubmitStrategicHighCoverageTerrain()
+    {
+        _highCoverageRenderer.Render(
+            _context,
+            _strategicCamera);
+        return _highCoverageRenderer.LastDiagnostics;
+    }
+
+    private static RuntimeAssetCatalog LoadRuntimeAssets()
+    {
+        string repositoryRoot =
+            FindRepositoryRoot();
+        string runtimeRoot =
+            Path.Combine(
+                repositoryRoot,
+                "assets",
+                "runtime");
+
+        return RuntimeAssetCatalog.Load(
+            runtimeRoot);
+    }
+
+    private static string FindRepositoryRoot()
+    {
+        DirectoryInfo? directory =
+            new(
+                AppContext.BaseDirectory);
+
+        while (directory is not null)
+        {
+            if (File.Exists(
+                    Path.Combine(
+                        directory.FullName,
+                        "ForgeLine.sln")))
+            {
+                return directory.FullName;
+            }
+
+            directory =
+                directory.Parent;
+        }
+
+        throw new InvalidOperationException(
+            "Could not locate the repository root from the benchmark host.");
     }
 
     private sealed class NullGraphicsDevice : IGraphicsDevice
@@ -69,6 +159,11 @@ public class TerrainBenchmarks : IDisposable
         public IGraphicsBuffer CreateBuffer(
             GraphicsBufferDescription description) =>
             new NullGraphicsBuffer(description);
+
+        public IGraphicsTexture CreateTexture(
+            GraphicsTextureData texture) =>
+            new NullGraphicsTexture(
+                texture.Description);
 
         public void RenderFrame(
             GraphicsColor clearColor,
@@ -99,6 +194,22 @@ public class TerrainBenchmarks : IDisposable
         }
 
         public GraphicsPipelineDescription Description { get; }
+
+        public void Dispose()
+        {
+        }
+    }
+
+    private sealed class NullGraphicsTexture : IGraphicsTexture
+    {
+        public NullGraphicsTexture(
+            GraphicsTextureDescription description)
+        {
+            Description =
+                description;
+        }
+
+        public GraphicsTextureDescription Description { get; }
 
         public void Dispose()
         {
@@ -172,6 +283,12 @@ public class TerrainBenchmarks : IDisposable
         }
 
         public void SetVertexConstants(ReadOnlySpan<float> values)
+        {
+        }
+
+        public void SetPixelTexture(
+            int slot,
+            IGraphicsTexture texture)
         {
         }
 
