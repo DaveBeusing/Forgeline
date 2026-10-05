@@ -7,9 +7,14 @@ internal static class RuntimeAssetDevelopmentBootstrap
 {
     public static void EnsureAvailable()
     {
-        RuntimeAssetPathResolution resolution =
-            RuntimeAssetPathResolver.Resolve();
-        if (resolution.Found)
+        if (!string.IsNullOrWhiteSpace(
+                Environment.GetEnvironmentVariable(
+                    RuntimeAssetPathResolver.OverrideEnvironmentVariable)) ||
+            string.Equals(
+                Environment.GetEnvironmentVariable(
+                    "CI"),
+                "true",
+                StringComparison.OrdinalIgnoreCase))
         {
             return;
         }
@@ -50,7 +55,7 @@ internal static class RuntimeAssetDevelopmentBootstrap
         }
 
         Console.WriteLine(
-            $"[assets:runtime] manifest=missing action=compile root=\"{runtimeRoot}\"");
+            $"[assets:runtime] source-checkout=true action=compile root=\"{runtimeRoot}\"");
 
         var startInfo =
             new ProcessStartInfo

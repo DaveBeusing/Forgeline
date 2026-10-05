@@ -97,12 +97,6 @@ internal static class RuntimeAssetPathResolver
         Add(
             overrideRoot,
             currentDirectory);
-        Add(
-            Path.Combine(
-                applicationBaseDirectory,
-                "assets",
-                "runtime"),
-            currentDirectory);
 
         string? applicationRepositoryRoot =
             FindRepositoryRoot(
@@ -117,6 +111,12 @@ internal static class RuntimeAssetPathResolver
                 currentDirectory);
         }
 
+        Add(
+            Path.Combine(
+                applicationBaseDirectory,
+                "assets",
+                "runtime"),
+            currentDirectory);
         Add(
             Path.Combine(
                 currentDirectory,

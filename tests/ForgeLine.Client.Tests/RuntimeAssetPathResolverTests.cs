@@ -99,6 +99,68 @@ public sealed class RuntimeAssetPathResolverTests
     }
 
     [Fact]
+    public void SourceCheckoutPrefersRepositoryRuntimeAssetsOverBuildOutput()
+    {
+        string root =
+            CreateTemporaryDirectory();
+
+        try
+        {
+            string repositoryRoot =
+                Path.Combine(
+                    root,
+                    "repo");
+            Directory.CreateDirectory(
+                repositoryRoot);
+            File.WriteAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    "ForgeLine.sln"),
+                string.Empty);
+            string repositoryRuntime =
+                CreateRuntimeRoot(
+                    repositoryRoot);
+            string applicationBase =
+                Directory.CreateDirectory(
+                    Path.Combine(
+                        repositoryRoot,
+                        "src",
+                        "ForgeLine.Client",
+                        "bin",
+                        "Release",
+                        "net10.0-windows",
+                        "win-x64")).FullName;
+            string outputRuntime =
+                CreateRuntimeRoot(
+                    applicationBase);
+            string currentDirectory =
+                Directory.CreateDirectory(
+                    Path.Combine(
+                        root,
+                        "launcher")).FullName;
+
+            RuntimeAssetPathResolution resolution =
+                RuntimeAssetPathResolver.Resolve(
+                    applicationBase,
+                    currentDirectory,
+                    null);
+
+            Assert.Equal(
+                repositoryRuntime,
+                resolution.RuntimeRoot);
+            Assert.NotEqual(
+                outputRuntime,
+                resolution.RuntimeRoot);
+        }
+        finally
+        {
+            Directory.Delete(
+                root,
+                recursive: true);
+        }
+    }
+
+    [Fact]
     public void RepositoryRuntimeAssetsResolveFromNestedBuildOutput()
     {
         string root =
