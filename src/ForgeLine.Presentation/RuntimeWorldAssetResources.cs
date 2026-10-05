@@ -78,15 +78,15 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
                     GraphicsTextureColorSpace.Srgb);
 
             _whiteBaseColor =
-                whiteBaseColor;
+                whiteBaseColor!;
             _flatNormal =
-                flatNormal;
+                flatNormal!;
             _neutralOrm =
-                neutralOrm;
+                neutralOrm!;
             _blackEmissive =
-                blackEmissive;
+                blackEmissive!;
             _missingBaseColor =
-                missingBaseColor;
+                missingBaseColor!;
         }
         catch
         {

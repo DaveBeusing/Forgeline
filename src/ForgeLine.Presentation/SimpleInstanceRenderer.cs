@@ -9,12 +9,13 @@ namespace ForgeLine.Presentation;
 public sealed class SimpleInstanceRenderer : IDisposable
 {
     private const int RootConstantCount = 16;
-    private const int VertexStride = 12;
-    private const int InstanceStride = 80;
+    private const int FallbackVertexStride = 32;
+    private const int InstanceStride = 112;
     private const int MinimumInstanceCapacity = 64;
 
     private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;
+    private readonly IGraphicsPipeline? _texturedPipeline;
     private readonly IGraphicsBuffer _vertexBuffer;
     private readonly IGraphicsBuffer _indexBuffer;
     private readonly RuntimeWorldAssetResources? _runtimeAssets;
@@ -35,17 +36,22 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 : new RuntimeWorldAssetResources(
                     graphics,
                     runtimeAssets);
+        _texturedPipeline =
+            _runtimeAssets is null
+                ? null
+                : CreateTexturedPipeline(
+                    graphics);
 
         SimpleVertex[] vertices =
         [
-            new(-0.5f, -0.5f, -0.5f),
-            new( 0.5f, -0.5f, -0.5f),
-            new( 0.5f,  0.5f, -0.5f),
-            new(-0.5f,  0.5f, -0.5f),
-            new(-0.5f, -0.5f,  0.5f),
-            new( 0.5f, -0.5f,  0.5f),
-            new( 0.5f,  0.5f,  0.5f),
-            new(-0.5f,  0.5f,  0.5f)
+            new(-0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new( 0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f),
+            new( 0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f),
+            new(-0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f),
+            new(-0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new( 0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f),
+            new( 0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f),
+            new(-0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f)
         ];
 
         ushort[] indices =
@@ -60,7 +66,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
         _vertexBuffer = graphics.CreateBuffer(
             new GraphicsBufferDescription(
-                checked((ulong)vertices.Length * VertexStride),
+                checked((ulong)vertices.Length * FallbackVertexStride),
                 GraphicsBufferMemory.Upload));
         _indexBuffer = graphics.CreateBuffer(
             new GraphicsBufferDescription(
@@ -84,6 +90,10 @@ public sealed class SimpleInstanceRenderer : IDisposable
     }
 
     public InstanceRenderDiagnostics LastDiagnostics { get; private set; }
+
+    public RuntimeMaterialDiagnostics MaterialDiagnostics =>
+        _runtimeAssets?.MaterialDiagnostics ??
+        default;
 
     public void Render(
         IGraphicsCommandContext context,
@@ -152,6 +162,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 default;
             bool usesRuntimeMesh =
                 false;
+            string? materialAssetId =
+                null;
             float distance =
                 Vector3.Distance(
                     camera.Position,
@@ -176,6 +188,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 unitDefinition =
                     UnitPresentationCatalog.Get(
                         instance.UnitFeature.Unit);
+                materialAssetId =
+                    unitDefinition.MaterialAssetId;
                 hasUnitDefinition =
                     true;
                 string meshAssetId =
@@ -211,6 +225,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     BuildingPresentationCatalog.TryGet(
                         instance.BuildingFeature.Building,
                         out _);
+                materialAssetId =
+                    BuildingPresentationCatalog.ResolveMaterialAssetId(
+                        instance.BuildingFeature);
 
                 string meshAssetId =
                     BuildingPresentationCatalog.ResolveMeshAssetId(
@@ -240,6 +257,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 VfxPresentationDefinition definition =
                     VfxPresentationCatalog.Get(
                         instance.VfxFeature.Kind);
+                materialAssetId =
+                    definition.MaterialAssetId;
 
                 if (!VfxPresentationCatalog.ShouldRender(
                         instance.VfxFeature.Kind,
@@ -261,6 +280,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
             }
             else if (instance.InfrastructureFeature.IsSpecified)
             {
+                materialAssetId =
+                    InfrastructurePresentationCatalog.ResolveMaterialAssetId(
+                        instance.InfrastructureFeature);
                 string meshAssetId =
                     InfrastructurePresentationCatalog.ResolveMeshAssetId(
                         instance.InfrastructureFeature);
@@ -277,6 +299,10 @@ public sealed class SimpleInstanceRenderer : IDisposable
             }
             else if (instance.WorldFeature.IsSpecified)
             {
+                materialAssetId =
+                    WorldPresentationCatalog.Get(
+                        instance.WorldFeature.Visual)
+                    .MaterialAssetId;
                 WorldAssetLod worldLod =
                     WorldPresentationCatalog.SelectLod(
                         instance.WorldFeature,
@@ -305,9 +331,20 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 highLod++;
             }
 
+            bool usesRuntimeMaterial =
+                _runtimeAssets is not null &&
+                materialAssetId is not null;
+            RuntimeMaterialResources runtimeMaterial =
+                usesRuntimeMaterial
+                    ? _runtimeAssets!.ResolveMaterial(
+                        materialAssetId!)
+                    : default;
             Vector4 color =
                 ResolveColor(
-                    instance);
+                    instance,
+                    usesRuntimeMaterial
+                        ? runtimeMaterial.BaseColorFactor
+                        : null);
             Matrix4x4 worldMatrix =
                 instance.Transform.ToMatrix();
 
@@ -322,7 +359,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
             var key =
                 new InstanceBatchKey(
                     usesRuntimeMesh,
-                    runtimeMeshId);
+                    runtimeMeshId,
+                    usesRuntimeMaterial,
+                    runtimeMaterial.MaterialId);
 
             if (!batchLookup.TryGetValue(
                     key,
@@ -331,7 +370,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 batch =
                     new InstanceBatch(
                         usesRuntimeMesh,
-                        runtimeMesh);
+                        runtimeMesh,
+                        usesRuntimeMaterial,
+                        runtimeMaterial);
                 batchLookup.Add(
                     key,
                     batch);
@@ -340,9 +381,11 @@ public sealed class SimpleInstanceRenderer : IDisposable
             }
 
             batch.Instances.Add(
-                new InstanceRenderData(
+                CreateInstanceRenderData(
                     worldMatrix,
-                    color));
+                    color,
+                    usesRuntimeMaterial,
+                    runtimeMaterial));
 
             if (hasUnitDefinition &&
                 unitLod == UnitAssetLod.Lod0 &&
@@ -358,7 +401,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 var turretKey =
                     new InstanceBatchKey(
                         true,
-                        turretMeshId);
+                        turretMeshId,
+                        usesRuntimeMaterial,
+                        runtimeMaterial.MaterialId);
 
                 if (!batchLookup.TryGetValue(
                         turretKey,
@@ -367,7 +412,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     turretBatch =
                         new InstanceBatch(
                             true,
-                            turretMesh);
+                            turretMesh,
+                            usesRuntimeMaterial,
+                            runtimeMaterial);
                     batchLookup.Add(
                         turretKey,
                         turretBatch);
@@ -376,12 +423,14 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 }
 
                 turretBatch.Instances.Add(
-                    new InstanceRenderData(
+                    CreateInstanceRenderData(
                         CreateArticulatedTransform(
                             worldMatrix,
                             unitDefinition.TurretPivot,
                             instance.UnitFeature.AimYawRadians),
-                        color));
+                        color,
+                        usesRuntimeMaterial,
+                        runtimeMaterial));
             }
 
             string? buildingStateAssetId =
@@ -401,7 +450,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 var stateKey =
                     new InstanceBatchKey(
                         true,
-                        stateMeshId);
+                        stateMeshId,
+                        usesRuntimeMaterial,
+                        runtimeMaterial.MaterialId);
 
                 if (!batchLookup.TryGetValue(
                         stateKey,
@@ -410,7 +461,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     stateBatch =
                         new InstanceBatch(
                             true,
-                            stateMesh);
+                            stateMesh,
+                            usesRuntimeMaterial,
+                            runtimeMaterial);
                     batchLookup.Add(
                         stateKey,
                         stateBatch);
@@ -419,9 +472,11 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 }
 
                 stateBatch.Instances.Add(
-                    new InstanceRenderData(
+                    CreateInstanceRenderData(
                         worldMatrix,
-                        color));
+                        color,
+                        usesRuntimeMaterial,
+                        runtimeMaterial));
             }
         }
 
@@ -477,15 +532,10 @@ public sealed class SimpleInstanceRenderer : IDisposable
         instanceBuffer.SetData<InstanceRenderData>(
             instanceData);
 
-        context.SetPipeline(
-            _pipeline);
-
         Span<float> constants =
             stackalloc float[RootConstantCount];
         WriteMatrix(
             matrices.ViewProjection,
-            constants);
-        context.SetVertexConstants(
             constants);
 
         int draws = 0;
@@ -496,6 +546,33 @@ public sealed class SimpleInstanceRenderer : IDisposable
         {
             InstanceBatch batch =
                 batches[batchIndex];
+
+            IGraphicsPipeline pipeline =
+                batch.UsesRuntimeMaterial
+                    ? _texturedPipeline ??
+                      throw new InvalidOperationException(
+                          "The textured instance pipeline is unavailable.")
+                    : _pipeline;
+            context.SetPipeline(
+                pipeline);
+            context.SetVertexConstants(
+                constants);
+
+            if (batch.UsesRuntimeMaterial)
+            {
+                context.SetPixelTexture(
+                    0,
+                    batch.RuntimeMaterial.BaseColorTexture);
+                context.SetPixelTexture(
+                    1,
+                    batch.RuntimeMaterial.NormalTexture);
+                context.SetPixelTexture(
+                    2,
+                    batch.RuntimeMaterial.OrmTexture);
+                context.SetPixelTexture(
+                    3,
+                    batch.RuntimeMaterial.EmissiveTexture);
+            }
 
             if (batch.UsesRuntimeMesh)
             {
@@ -510,7 +587,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             {
                 context.SetVertexBuffer(
                     _vertexBuffer,
-                    VertexStride);
+                    FallbackVertexStride);
                 context.SetIndexBuffer(
                     _indexBuffer,
                     GraphicsIndexFormat.SixteenBit);
@@ -558,6 +635,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
         _runtimeAssets?.Dispose();
         _indexBuffer.Dispose();
         _vertexBuffer.Dispose();
+        _texturedPipeline?.Dispose();
         _pipeline.Dispose();
         _disposed = true;
     }
@@ -755,6 +833,253 @@ public sealed class SimpleInstanceRenderer : IDisposable
             });
     }
 
+    private static IGraphicsPipeline CreateTexturedPipeline(
+        IGraphicsDevice graphics)
+    {
+        const string vertexShaderSource = """
+            cbuffer InstanceFrame : register(b0)
+            {
+                row_major float4x4 ViewProjection;
+            };
+
+            struct VertexInput
+            {
+                float3 Position : POSITION;
+                float2 Uv : TEXCOORD0;
+                float4 WorldRow0 : INSTANCEWORLD0;
+                float4 WorldRow1 : INSTANCEWORLD1;
+                float4 WorldRow2 : INSTANCEWORLD2;
+                float4 WorldRow3 : INSTANCEWORLD3;
+                float4 Color : INSTANCECOLOR0;
+                float4 Material0 : INSTANCEMATERIAL0;
+                float4 Material1 : INSTANCEMATERIAL1;
+            };
+
+            struct VertexOutput
+            {
+                float4 Position : SV_Position;
+                float4 Color : COLOR0;
+                float2 Uv : TEXCOORD0;
+                float4 Material0 : TEXCOORD1;
+                float4 Material1 : TEXCOORD2;
+            };
+
+            VertexOutput VSMain(VertexInput input)
+            {
+                VertexOutput output;
+                row_major float4x4 world =
+                    float4x4(
+                        input.WorldRow0,
+                        input.WorldRow1,
+                        input.WorldRow2,
+                        input.WorldRow3);
+                float4 worldPosition =
+                    mul(
+                        float4(
+                            input.Position,
+                            1.0f),
+                        world);
+                output.Position =
+                    mul(
+                        worldPosition,
+                        ViewProjection);
+                output.Color =
+                    input.Color;
+                output.Uv =
+                    input.Uv;
+                output.Material0 =
+                    input.Material0;
+                output.Material1 =
+                    input.Material1;
+                return output;
+            }
+            """;
+
+        const string pixelShaderSource = """
+            Texture2D BaseColorTexture : register(t0);
+            Texture2D NormalTexture : register(t1);
+            Texture2D OrmTexture : register(t2);
+            Texture2D EmissiveTexture : register(t3);
+            SamplerState WorldMaterialSampler : register(s0);
+
+            struct PixelInput
+            {
+                float4 Position : SV_Position;
+                float4 Color : COLOR0;
+                float2 Uv : TEXCOORD0;
+                float4 Material0 : TEXCOORD1;
+                float4 Material1 : TEXCOORD2;
+            };
+
+            float4 PSMain(PixelInput input) : SV_Target0
+            {
+                float2 uv =
+                    input.Uv *
+                    input.Material0.xy;
+                float4 baseColor =
+                    BaseColorTexture.Sample(
+                        WorldMaterialSampler,
+                        uv);
+                float3 normalSample =
+                    NormalTexture.Sample(
+                        WorldMaterialSampler,
+                        uv).xyz;
+                float3 orm =
+                    OrmTexture.Sample(
+                        WorldMaterialSampler,
+                        uv).rgb;
+                float3 emissive =
+                    EmissiveTexture.Sample(
+                        WorldMaterialSampler,
+                        uv).rgb;
+
+                float ambientOcclusion =
+                    saturate(orm.r);
+                float roughness =
+                    saturate(
+                        orm.g *
+                        input.Material0.z);
+                float metallic =
+                    saturate(
+                        orm.b *
+                        input.Material0.w);
+                float normalFacing =
+                    saturate(
+                        normalSample.z);
+
+                float materialResponse =
+                    lerp(
+                        0.92f,
+                        1.0f,
+                        ambientOcclusion);
+                materialResponse *=
+                    lerp(
+                        0.99f,
+                        1.01f,
+                        normalFacing);
+                materialResponse *=
+                    lerp(
+                        1.0f,
+                        0.98f,
+                        roughness);
+                materialResponse *=
+                    lerp(
+                        1.0f,
+                        0.99f,
+                        metallic);
+
+                float3 rgb =
+                    baseColor.rgb *
+                    input.Color.rgb *
+                    materialResponse +
+                    emissive *
+                    input.Material1.x;
+
+                return float4(
+                    rgb,
+                    baseColor.a *
+                    input.Color.a);
+            }
+            """;
+
+        var compiler =
+            new DxcShaderCompiler();
+        GraphicsShaderBytecode vertexShader =
+            compiler.Compile(
+                vertexShaderSource,
+                GraphicsShaderStage.Vertex,
+                "VSMain",
+                "InstanceMaterialVertex.hlsl");
+        GraphicsShaderBytecode pixelShader =
+            compiler.Compile(
+                pixelShaderSource,
+                GraphicsShaderStage.Pixel,
+                "PSMain",
+                "InstanceMaterialPixel.hlsl");
+
+        return graphics.CreateGraphicsPipeline(
+            new GraphicsPipelineDescription(
+                vertexShader,
+                pixelShader)
+            {
+                VertexElements =
+                [
+                    new GraphicsVertexElement(
+                        "POSITION",
+                        0,
+                        GraphicsVertexElementFormat.Float3,
+                        0),
+                    new GraphicsVertexElement(
+                        "TEXCOORD",
+                        0,
+                        GraphicsVertexElementFormat.Float2,
+                        24),
+                    new GraphicsVertexElement(
+                        "INSTANCEWORLD",
+                        0,
+                        GraphicsVertexElementFormat.Float4,
+                        0,
+                        1,
+                        GraphicsVertexInputRate.PerInstance,
+                        1),
+                    new GraphicsVertexElement(
+                        "INSTANCEWORLD",
+                        1,
+                        GraphicsVertexElementFormat.Float4,
+                        16,
+                        1,
+                        GraphicsVertexInputRate.PerInstance,
+                        1),
+                    new GraphicsVertexElement(
+                        "INSTANCEWORLD",
+                        2,
+                        GraphicsVertexElementFormat.Float4,
+                        32,
+                        1,
+                        GraphicsVertexInputRate.PerInstance,
+                        1),
+                    new GraphicsVertexElement(
+                        "INSTANCEWORLD",
+                        3,
+                        GraphicsVertexElementFormat.Float4,
+                        48,
+                        1,
+                        GraphicsVertexInputRate.PerInstance,
+                        1),
+                    new GraphicsVertexElement(
+                        "INSTANCECOLOR",
+                        0,
+                        GraphicsVertexElementFormat.Float4,
+                        64,
+                        1,
+                        GraphicsVertexInputRate.PerInstance,
+                        1),
+                    new GraphicsVertexElement(
+                        "INSTANCEMATERIAL",
+                        0,
+                        GraphicsVertexElementFormat.Float4,
+                        80,
+                        1,
+                        GraphicsVertexInputRate.PerInstance,
+                        1),
+                    new GraphicsVertexElement(
+                        "INSTANCEMATERIAL",
+                        1,
+                        GraphicsVertexElementFormat.Float4,
+                        96,
+                        1,
+                        GraphicsVertexInputRate.PerInstance,
+                        1)
+                ],
+                VertexRootConstantCount =
+                    RootConstantCount,
+                PixelTextureCount =
+                    4,
+                DepthEnabled =
+                    true
+            });
+    }
+
     private static Matrix4x4 CreateArticulatedTransform(
         Matrix4x4 world,
         Vector3 pivot,
@@ -798,8 +1123,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
         destination[15] = matrix.M44;
     }
 
-    private Vector4 ResolveColor(
-        in RenderInstance instance)
+    private static Vector4 ResolveColor(
+        in RenderInstance instance,
+        Vector4? runtimeTint)
     {
         if (instance.UnitFeature.IsSpecified)
         {
@@ -807,12 +1133,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 UnitPresentationCatalog.Get(
                     instance.UnitFeature.Unit);
             Vector4 baseTint =
-                _runtimeAssets is not null &&
-                _runtimeAssets.TryGetMaterialTint(
-                    definition.MaterialAssetId,
-                    out Vector4 runtimeTint)
-                    ? runtimeTint
-                    : definition.FallbackTint;
+                runtimeTint ??
+                definition.FallbackTint;
 
             return UnitPresentationCatalog.ApplyDamageTint(
                 instance.UnitFeature,
@@ -825,57 +1147,32 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 VfxPresentationCatalog.Get(
                     instance.VfxFeature.Kind);
 
-            return
-                _runtimeAssets is not null &&
-                _runtimeAssets.TryGetMaterialTint(
-                    definition.MaterialAssetId,
-                    out Vector4 runtimeTint)
-                    ? runtimeTint
-                    : definition.FallbackTint;
+            return runtimeTint ??
+                definition.FallbackTint;
         }
 
         if (instance.BuildingFeature.IsSpecified)
         {
-            string materialAssetId =
-                BuildingPresentationCatalog.ResolveMaterialAssetId(
+            return runtimeTint ??
+                BuildingPresentationCatalog.ResolveFallbackTint(
                     instance.BuildingFeature);
-
-            return
-                _runtimeAssets is not null &&
-                _runtimeAssets.TryGetMaterialTint(
-                    materialAssetId,
-                    out Vector4 runtimeTint)
-                    ? runtimeTint
-                    : BuildingPresentationCatalog.ResolveFallbackTint(
-                        instance.BuildingFeature);
         }
 
         if (instance.InfrastructureFeature.IsSpecified)
         {
-            string materialAssetId =
-                InfrastructurePresentationCatalog.ResolveMaterialAssetId(
+            return runtimeTint ??
+                InfrastructurePresentationCatalog.ResolveFallbackTint(
                     instance.InfrastructureFeature);
-
-            return
-                _runtimeAssets is not null &&
-                _runtimeAssets.TryGetMaterialTint(
-                    materialAssetId,
-                    out Vector4 runtimeTint)
-                    ? runtimeTint
-                    : InfrastructurePresentationCatalog.ResolveFallbackTint(
-                        instance.InfrastructureFeature);
         }
 
         if (instance.WorldFeature.IsSpecified)
         {
-            return
-                _runtimeAssets is not null &&
-                _runtimeAssets.TryGetMaterialTint(
+            return runtimeTint.HasValue
+                ? WorldPresentationCatalog.ApplyStateTint(
                     instance.WorldFeature,
-                    out Vector4 runtimeTint)
-                    ? runtimeTint
-                    : WorldPresentationCatalog.ResolveTint(
-                        instance.WorldFeature);
+                    runtimeTint.Value)
+                : WorldPresentationCatalog.ResolveTint(
+                    instance.WorldFeature);
         }
 
         uint hash =
@@ -902,19 +1199,58 @@ public sealed class SimpleInstanceRenderer : IDisposable
             this);
     }
 
+    private static InstanceRenderData CreateInstanceRenderData(
+        Matrix4x4 world,
+        Vector4 color,
+        bool usesRuntimeMaterial,
+        in RuntimeMaterialResources material) =>
+        usesRuntimeMaterial
+            ? new InstanceRenderData(
+                world,
+                color,
+                new Vector4(
+                    material.UvScale.X,
+                    material.UvScale.Y,
+                    material.RoughnessFactor,
+                    material.MetallicFactor),
+                new Vector4(
+                    material.EmissiveMultiplier,
+                    0.0f,
+                    0.0f,
+                    0.0f))
+            : new InstanceRenderData(
+                world,
+                color,
+                new Vector4(
+                    1.0f,
+                    1.0f,
+                    1.0f,
+                    0.0f),
+                Vector4.Zero);
+
     private readonly record struct InstanceBatchKey(
         bool UsesRuntimeMesh,
-        AssetId RuntimeMeshId);
+        AssetId RuntimeMeshId,
+        bool UsesRuntimeMaterial,
+        AssetId RuntimeMaterialId);
 
     private sealed class InstanceBatch(
         bool usesRuntimeMesh,
-        RuntimeMeshBuffers runtimeMesh)
+        RuntimeMeshBuffers runtimeMesh,
+        bool usesRuntimeMaterial,
+        RuntimeMaterialResources runtimeMaterial)
     {
         public bool UsesRuntimeMesh { get; } =
             usesRuntimeMesh;
 
         public RuntimeMeshBuffers RuntimeMesh { get; } =
             runtimeMesh;
+
+        public bool UsesRuntimeMaterial { get; } =
+            usesRuntimeMaterial;
+
+        public RuntimeMaterialResources RuntimeMaterial { get; } =
+            runtimeMaterial;
 
         public List<InstanceRenderData> Instances { get; } =
             [];
@@ -932,11 +1268,18 @@ public sealed class SimpleInstanceRenderer : IDisposable
     [StructLayout(LayoutKind.Sequential)]
     private readonly record struct InstanceRenderData(
         Matrix4x4 World,
-        Vector4 Color);
+        Vector4 Color,
+        Vector4 Material0,
+        Vector4 Material1);
 
     [StructLayout(LayoutKind.Sequential)]
     private readonly record struct SimpleVertex(
         float X,
         float Y,
-        float Z);
+        float Z,
+        float NormalX,
+        float NormalY,
+        float NormalZ,
+        float U,
+        float V);
 }
