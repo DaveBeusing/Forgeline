@@ -142,6 +142,12 @@ public static class RuntimeAssetQualification
 
                 switch (record.Type)
                 {
+                    case RuntimeAssetType.Mesh:
+                        _ =
+                            RuntimeMeshData.FromPayload(
+                                content.Payload);
+                        break;
+
                     case RuntimeAssetType.Texture:
                         _ =
                             RuntimeTextureData.FromPayload(

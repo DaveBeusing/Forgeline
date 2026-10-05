@@ -9,7 +9,7 @@ namespace ForgeLine.Presentation;
 public sealed class SimpleInstanceRenderer : IDisposable
 {
     private const int RootConstantCount = 16;
-    private const int FallbackVertexStride = 32;
+    private const int FallbackVertexStride = 48;
     private const int InstanceStride = 112;
     private const int MinimumInstanceCapacity = 64;
 
@@ -44,14 +44,14 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
         SimpleVertex[] vertices =
         [
-            new(-0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
-            new( 0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f),
-            new( 0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f),
-            new(-0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f),
-            new(-0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
-            new( 0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f),
-            new( 0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f),
-            new(-0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f)
+            new(-0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new( 0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new( 0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new(-0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new(-0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new( 0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new( 0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new(-0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f)
         ];
 
         ushort[] indices =
@@ -331,18 +331,29 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 highLod++;
             }
 
-            bool usesRuntimeMaterial =
+            if (usesRuntimeMesh &&
+                runtimeMesh.HasMaterial)
+            {
+                materialAssetId =
+                    runtimeMesh.MaterialId.Value;
+            }
+
+            bool hasRuntimeMaterial =
                 _runtimeAssets is not null &&
                 materialAssetId is not null;
             RuntimeMaterialResources runtimeMaterial =
-                usesRuntimeMaterial
+                hasRuntimeMaterial
                     ? _runtimeAssets!.ResolveMaterial(
                         materialAssetId!)
                     : default;
+            bool usesRuntimeMaterial =
+                hasRuntimeMaterial &&
+                (!usesRuntimeMesh ||
+                 runtimeMesh.SupportsTexturedMaterial);
             Vector4 color =
                 ResolveColor(
                     instance,
-                    usesRuntimeMaterial
+                    hasRuntimeMaterial
                         ? runtimeMaterial.BaseColorFactor
                         : null);
             Matrix4x4 worldMatrix =
@@ -361,7 +372,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     usesRuntimeMesh,
                     runtimeMeshId,
                     usesRuntimeMaterial,
-                    runtimeMaterial.MaterialId);
+                    usesRuntimeMaterial
+                        ? runtimeMaterial.MaterialId
+                        : default);
 
             if (!batchLookup.TryGetValue(
                     key,
@@ -845,7 +858,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
             struct VertexInput
             {
                 float3 Position : POSITION;
+                float3 Normal : NORMAL;
                 float2 Uv : TEXCOORD0;
+                float4 Tangent : TANGENT;
                 float4 WorldRow0 : INSTANCEWORLD0;
                 float4 WorldRow1 : INSTANCEWORLD1;
                 float4 WorldRow2 : INSTANCEWORLD2;
@@ -860,8 +875,10 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 float4 Position : SV_Position;
                 float4 Color : COLOR0;
                 float2 Uv : TEXCOORD0;
-                float4 Material0 : TEXCOORD1;
-                float4 Material1 : TEXCOORD2;
+                float3 WorldNormal : TEXCOORD1;
+                float4 WorldTangent : TEXCOORD2;
+                float4 Material0 : TEXCOORD3;
+                float4 Material1 : TEXCOORD4;
             };
 
             VertexOutput VSMain(VertexInput input)
@@ -879,6 +896,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                             input.Position,
                             1.0f),
                         world);
+                float3x3 worldBasis =
+                    (float3x3)world;
+
                 output.Position =
                     mul(
                         worldPosition,
@@ -887,6 +907,17 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     input.Color;
                 output.Uv =
                     input.Uv;
+                output.WorldNormal =
+                    normalize(
+                        mul(
+                            input.Normal,
+                            worldBasis));
+                output.WorldTangent =
+                    float4(
+                        mul(
+                            input.Tangent.xyz,
+                            worldBasis),
+                        input.Tangent.w);
                 output.Material0 =
                     input.Material0;
                 output.Material1 =
@@ -907,9 +938,23 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 float4 Position : SV_Position;
                 float4 Color : COLOR0;
                 float2 Uv : TEXCOORD0;
-                float4 Material0 : TEXCOORD1;
-                float4 Material1 : TEXCOORD2;
+                float3 WorldNormal : TEXCOORD1;
+                float4 WorldTangent : TEXCOORD2;
+                float4 Material0 : TEXCOORD3;
+                float4 Material1 : TEXCOORD4;
             };
+
+            float3 BuildFallbackTangent(float3 normal)
+            {
+                float3 axis =
+                    abs(normal.y) < 0.999f
+                        ? float3(0.0f, 1.0f, 0.0f)
+                        : float3(1.0f, 0.0f, 0.0f);
+                return normalize(
+                    cross(
+                        axis,
+                        normal));
+            }
 
             float4 PSMain(PixelInput input) : SV_Target0
             {
@@ -920,10 +965,12 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     BaseColorTexture.Sample(
                         WorldMaterialSampler,
                         uv);
-                float3 normalSample =
+                float3 tangentNormal =
                     NormalTexture.Sample(
                         WorldMaterialSampler,
-                        uv).xyz;
+                        uv).xyz *
+                    2.0f -
+                    1.0f;
                 float3 orm =
                     OrmTexture.Sample(
                         WorldMaterialSampler,
@@ -932,6 +979,42 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     EmissiveTexture.Sample(
                         WorldMaterialSampler,
                         uv).rgb;
+
+                float3 normal =
+                    normalize(
+                        input.WorldNormal);
+                float3 tangent =
+                    input.WorldTangent.xyz -
+                    normal *
+                    dot(
+                        normal,
+                        input.WorldTangent.xyz);
+                tangent =
+                    dot(
+                        tangent,
+                        tangent) >
+                    1e-8f
+                        ? normalize(tangent)
+                        : BuildFallbackTangent(
+                            normal);
+                float handedness =
+                    input.WorldTangent.w < 0.0f
+                        ? -1.0f
+                        : 1.0f;
+                float3 bitangent =
+                    normalize(
+                        cross(
+                            normal,
+                            tangent)) *
+                    handedness;
+                float3 worldNormal =
+                    normalize(
+                        tangent *
+                        tangentNormal.x +
+                        bitangent *
+                        tangentNormal.y +
+                        normal *
+                        tangentNormal.z);
 
                 float ambientOcclusion =
                     saturate(orm.r);
@@ -945,7 +1028,13 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         input.Material0.w);
                 float normalFacing =
                     saturate(
-                        normalSample.z);
+                        dot(
+                            worldNormal,
+                            normalize(
+                                float3(
+                                    0.35f,
+                                    0.85f,
+                                    0.4f))));
 
                 float materialResponse =
                     lerp(
@@ -954,8 +1043,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         ambientOcclusion);
                 materialResponse *=
                     lerp(
-                        0.99f,
-                        1.01f,
+                        0.96f,
+                        1.04f,
                         normalFacing);
                 materialResponse *=
                     lerp(
@@ -1010,10 +1099,20 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         GraphicsVertexElementFormat.Float3,
                         0),
                     new GraphicsVertexElement(
+                        "NORMAL",
+                        0,
+                        GraphicsVertexElementFormat.Float3,
+                        12),
+                    new GraphicsVertexElement(
                         "TEXCOORD",
                         0,
                         GraphicsVertexElementFormat.Float2,
                         24),
+                    new GraphicsVertexElement(
+                        "TANGENT",
+                        0,
+                        GraphicsVertexElementFormat.Float4,
+                        32),
                     new GraphicsVertexElement(
                         "INSTANCEWORLD",
                         0,
@@ -1078,27 +1177,6 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 DepthEnabled =
                     true
             });
-    }
-
-    private static Matrix4x4 CreateArticulatedTransform(
-        Matrix4x4 world,
-        Vector3 pivot,
-        float yawRadians)
-    {
-        float yaw =
-            float.IsFinite(
-                yawRadians)
-                ? yawRadians
-                : 0.0f;
-
-        return
-            Matrix4x4.CreateTranslation(
-                -pivot) *
-            Matrix4x4.CreateRotationY(
-                yaw) *
-            Matrix4x4.CreateTranslation(
-                pivot) *
-            world;
     }
 
     private static void WriteMatrix(
@@ -1281,5 +1359,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
         float NormalY,
         float NormalZ,
         float U,
-        float V);
+        float V,
+        float TangentX,
+        float TangentY,
+        float TangentZ,
+        float TangentW);
 }
