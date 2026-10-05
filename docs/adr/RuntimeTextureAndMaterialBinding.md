@@ -20,12 +20,13 @@ Compiled runtime textures expose:
 - RGBA8 runtime format;
 - explicit sRGB or linear color space;
 - semantic usage;
-- one or more supplied mip levels;
-- per-mip width, height, row pitch, and byte payload.
+- one or more compiler-generated/supplied mip levels;
+- a subresource table containing per-mip width, height, row pitch, absolute byte offset, and byte count;
+- contiguous mip payload bytes.
 
-Version-1 RGBA8 payloads remain readable as sRGB color textures for compatibility. Version-2 payloads carry the explicit metadata above.
+Version-1 RGBA8 payloads remain readable as sRGB color textures for compatibility. Version-2 metadata/mip payloads also remain readable. Version 3 is the production compiler format with the explicit subresource table.
 
-Normal, ORM, and generic data textures require linear color space. Color space is not inferred from file names at runtime.
+Base Color uses sRGB. Normal, ORM, Terrain Control, and generic data textures require linear color space; Emissive carries explicit color-space intent. Color space and usage are not inferred from file names at runtime.
 
 ### Graphics ownership
 
@@ -39,7 +40,7 @@ Normal, ORM, and generic data textures require linear color space. Color space i
 - static sampler definitions;
 - texture lifetime diagnostics.
 
-Texture creation uploads every supplied mip once. Static world material textures are not re-uploaded per frame.
+The Asset Compiler generates static texture mip chains offline. Base Color filtering is performed in linear light, normal maps are renormalized, ORM remains linear packed data, and Terrain Control weights are normalized after reduction. Texture creation uploads every compiled mip once. Static world material textures are not re-uploaded per frame.
 
 One live texture consumes one shader-visible SRV descriptor. Descriptor indices return to the allocator only after the owning texture is disposed and GPU work is retired.
 
@@ -113,11 +114,12 @@ Rejected. File naming is an authoring convention, not a reliable runtime color-s
 
 - object materials can sample real GPU textures while simulation remains graphics-free;
 - existing untextured materials continue through deterministic fallback maps;
-- supplied mip chains and sRGB/linear metadata are preserved to the GPU;
+- deterministic compiler-generated mip chains and sRGB/linear metadata are preserved to the GPU;
 - repeated meshes with different materials form distinct render batches;
 - resource diagnostics can identify descriptor pressure, texture residency, and binding failures;
 - disposal currently retires GPU work before returning texture descriptors, favoring correctness over aggressive asynchronous destruction;
-- future terrain splatting can reuse the same texture/material resource foundation.
+- future terrain splatting can reuse the same texture/material resource foundation;
+- current runtime texture storage remains uncompressed RGBA8 until a deterministic, justified BC encoder is introduced.
 
 ## Re-evaluation criteria
 
