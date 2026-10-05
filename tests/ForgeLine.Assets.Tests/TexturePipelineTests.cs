@@ -8,6 +8,13 @@ namespace ForgeLine.Assets.Tests;
 
 public sealed class TexturePipelineTests
 {
+    private static readonly JsonSerializerOptions FixtureJsonOptions =
+        new()
+        {
+            WriteIndented =
+                true
+        };
+
     [Fact]
     public void GeneratesExpectedFullMipDimensionSequence()
     {
@@ -546,11 +553,7 @@ public sealed class TexturePipelineTests
                 $"textures/{name}.asset.json",
                 JsonSerializer.Serialize(
                     definition,
-                    new JsonSerializerOptions
-                    {
-                        WriteIndented =
-                            true
-                    }));
+                    FixtureJsonOptions));
         }
 
         public void WriteMaterial(
