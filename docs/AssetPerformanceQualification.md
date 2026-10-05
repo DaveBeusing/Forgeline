@@ -264,6 +264,20 @@ Accept only when:
 - material detail remains subordinate to silhouette, role, and gameplay readability;
 - terrain control transitions do not expose chunk seams.
 
+### Known measurement limits
+
+The accepted baseline deliberately records the following limitations rather than inferring unavailable data:
+
+- D3D12 timestamp queries currently measure the complete production graphics command list; terrain and object/material GPU time are not yet split into separate timestamp ranges.
+- Terrain CPU submission time is available separately and remains useful for attributing CPU-side terrain regressions.
+- Microsoft Basic Render Driver is suitable for functional D3D12, descriptor, lifetime, shader, and structural qualification, but its frame/GPU timing is not a target-hardware performance baseline.
+- The repository does not yet provide a deterministic tolerance-based image comparison system. Visual mip, shimmer, anisotropic, and readability review therefore remains an explicit qualification activity rather than a brittle screenshot CI gate.
+- The current client owns visual resources for the active session. Texture lifetime regression tests exercise repeated GPU texture ownership/release directly; broader multi-session residency comparisons should be added when supported in-process map/session reload becomes a production lifecycle.
+- D3D12 debug-layer cleanliness is gated when the Windows environment exposes the layer. An unavailable debug layer is reported rather than treated as evidence of cleanliness.
+- GPU memory diagnostics currently represent texture mip payload residency tracked by ForgeLine Graphics; they are not a complete accounting of driver allocations, render targets, depth buffers, or vendor-specific residency.
+
+These limits are extension points for future diagnostics, not reasons to substitute estimates for measured values.
+
 ### Re-evaluation triggers
 
 Texture streaming, virtual texturing, additional compression infrastructure, descriptor virtualization, or more complex material indirection remain deferred until measurements show that simpler policies are insufficient.
