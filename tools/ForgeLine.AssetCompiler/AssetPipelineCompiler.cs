@@ -5,8 +5,8 @@ namespace ForgeLine.AssetCompiler;
 
 public static class AssetPipelineCompiler
 {
-    public const string CompilerVersion = "1.3.0";
-    public const int RuntimeVersion = 3;
+    public const string CompilerVersion = "1.4.0";
+    public const int RuntimeVersion = 4;
 
     private static readonly JsonSerializerOptions JsonOptions = RuntimeAssetCatalog.CreateJsonOptions();
 
@@ -109,7 +109,7 @@ public static class AssetPipelineCompiler
                     continue;
                 }
 
-                var imported = Import(node, normalizedSourceRoot);
+                var imported = Import(node, normalizedSourceRoot, nodes);
                 AddCompilationDiagnostic(
                     node,
                     imported,
@@ -565,15 +565,29 @@ public static class AssetPipelineCompiler
             foreach (var lod in node.Definition.Lods)
             {
                 if (AssetId.TryParse(lod.AssetId, out var lodId) &&
-                    nodes.TryGetValue(lodId, out var lodNode) &&
-                    lodNode.Definition.Type != RuntimeAssetType.Mesh)
+                    nodes.TryGetValue(lodId, out var lodNode))
                 {
-                    diagnostics.Add(new AssetCompilerDiagnostic(
-                        "ASSET020",
-                        AssetCompilerDiagnosticSeverity.Error,
-                        $"LOD reference '{lodId}' must target a mesh asset.",
-                        node.Id.Value,
-                        node.Definition.Source));
+                    if (lodNode.Definition.Type != RuntimeAssetType.Mesh)
+                    {
+                        diagnostics.Add(new AssetCompilerDiagnostic(
+                            "ASSET020",
+                            AssetCompilerDiagnosticSeverity.Error,
+                            $"LOD reference '{lodId}' must target a mesh asset.",
+                            node.Id.Value,
+                            node.Definition.Source));
+                    }
+                    else if (node.Definition.Type == RuntimeAssetType.Mesh &&
+                             !node.Definition.MaterialReferences.SequenceEqual(
+                                 lodNode.Definition.MaterialReferences,
+                                 StringComparer.Ordinal))
+                    {
+                        diagnostics.Add(new AssetCompilerDiagnostic(
+                            "ASSET033",
+                            AssetCompilerDiagnosticSeverity.Error,
+                            $"LOD reference '{lodId}' changes the mesh material-slot identity. LODs must preserve stable material references and slot order.",
+                            node.Id.Value,
+                            node.Definition.Source));
+                    }
                 }
             }
 
@@ -704,23 +718,47 @@ public static class AssetPipelineCompiler
         string sourceRelativePath,
         List<AssetCompilerDiagnostic> diagnostics)
     {
-        if (node.Definition.Type !=
+        if (node.Definition.Type ==
             RuntimeAssetType.Texture)
+        {
+            RuntimeTextureData texture =
+                RuntimeTextureData.FromPayload(
+                    imported.Payload);
+
+            diagnostics.Add(
+                new AssetCompilerDiagnostic(
+                    "ASSETI001",
+                    AssetCompilerDiagnosticSeverity.Information,
+                    $"Texture compiled: usage={TextureUsageName(texture.Usage)}; colorSpace={texture.ColorSpace}; dimensions={texture.Width}x{texture.Height}; mips={texture.Mips.Count}; format={texture.Format}; residentBytes={texture.ResidentByteCount}; payloadBytes={imported.Payload.LongLength}.",
+                    node.Id.Value,
+                    sourceRelativePath));
+            return;
+        }
+
+        if (node.Definition.Type != RuntimeAssetType.Mesh ||
+            imported.MeshSummary is not { } mesh)
         {
             return;
         }
 
-        RuntimeTextureData texture =
-            RuntimeTextureData.FromPayload(
-                imported.Payload);
-
         diagnostics.Add(
             new AssetCompilerDiagnostic(
-                "ASSETI001",
+                "ASSETI002",
                 AssetCompilerDiagnosticSeverity.Information,
-                $"Texture compiled: usage={TextureUsageName(texture.Usage)}; colorSpace={texture.ColorSpace}; dimensions={texture.Width}x{texture.Height}; mips={texture.Mips.Count}; format={texture.Format}; residentBytes={texture.ResidentByteCount}; payloadBytes={imported.Payload.LongLength}.",
+                $"Mesh compiled: vertices={mesh.VertexCount}; indices={mesh.IndexCount}; sections={mesh.SectionCount}; materials={mesh.MaterialCount}; uv0={(mesh.HasUv0 ? "present" : "missing")}; tangents={(mesh.HasTangents ? "present" : "unavailable")}; generatedNormals={mesh.GeneratedNormalVertexCount}; generatedTangents={mesh.GeneratedTangentVertexCount}; fallbackSections={mesh.FallbackSectionCount}.",
                 node.Id.Value,
                 sourceRelativePath));
+
+        if (mesh.FallbackSectionCount > 0)
+        {
+            diagnostics.Add(
+                new AssetCompilerDiagnostic(
+                    "ASSETW002",
+                    AssetCompilerDiagnosticSeverity.Warning,
+                    $"{mesh.FallbackSectionCount} mesh section(s) cannot satisfy their textured material UV/tangent requirements and will use the development fallback.",
+                    node.Id.Value,
+                    sourceRelativePath));
+        }
     }
 
     private static string TextureUsageName(
@@ -788,10 +826,26 @@ public static class AssetPipelineCompiler
         }
     }
 
-    private static ImportedAssetPayload Import(AssetNode node, string sourceRoot) =>
-        node.Definition.Type switch
+    private static ImportedAssetPayload Import(
+        AssetNode node,
+        string sourceRoot,
+        IReadOnlyDictionary<AssetId, AssetNode> nodes)
+    {
+        if (node.Definition.Type == RuntimeAssetType.Mesh)
         {
-            RuntimeAssetType.Mesh => GltfImporter.Import(node.SourcePath, sourceRoot),
+            MeshMaterialRequirement[] requirements =
+                GetMeshMaterialRequirements(
+                    node,
+                    nodes);
+            return GltfImporter.Import(
+                node.SourcePath,
+                sourceRoot,
+                node.Definition.MaterialReferences,
+                requirements);
+        }
+
+        return node.Definition.Type switch
+        {
             RuntimeAssetType.Texture => TextureImporter.Import(
                 node.SourcePath,
                 node.Definition.TextureColorSpace,
@@ -799,8 +853,47 @@ public static class AssetPipelineCompiler
                 node.Definition.TextureGenerateMipmaps,
                 node.Definition.TextureMaxMipLevels),
             RuntimeAssetType.Material => MaterialImporter.Import(node.SourcePath),
-            _ => throw new InvalidDataException($"Asset type '{node.Definition.Type}' is unsupported."),
+            _ => throw new InvalidDataException(
+                $"Asset type '{node.Definition.Type}' is unsupported."),
         };
+    }
+
+    private static MeshMaterialRequirement[] GetMeshMaterialRequirements(
+        AssetNode node,
+        IReadOnlyDictionary<AssetId, AssetNode> nodes)
+    {
+        var requirements =
+            new MeshMaterialRequirement[
+                node.Definition.MaterialReferences.Count];
+
+        for (int index = 0;
+             index < node.Definition.MaterialReferences.Count;
+             index++)
+        {
+            AssetId materialId =
+                AssetId.Parse(
+                    node.Definition.MaterialReferences[index]);
+            if (!nodes.TryGetValue(
+                    materialId,
+                    out AssetNode? materialNode) ||
+                materialNode.Definition.Type != RuntimeAssetType.Material)
+            {
+                throw new InvalidDataException(
+                    $"Mesh material reference '{materialId}' does not resolve to a material asset.");
+            }
+
+            MaterialSourceDefinition material =
+                MaterialImporter.ReadDefinition(
+                    materialNode.SourcePath);
+            requirements[index] =
+                new MeshMaterialRequirement(
+                    material.ReferencedTextureIds.Count > 0,
+                    !string.IsNullOrWhiteSpace(
+                        material.NormalTexture));
+        }
+
+        return requirements;
+    }
 
     private static RuntimeAssetRecord CreateRuntimeRecord(
         AssetNode node,

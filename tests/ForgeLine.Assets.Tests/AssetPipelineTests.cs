@@ -206,12 +206,31 @@ public sealed class AssetPipelineTests
         Assert.Equal(1f, bounds.MaxX);
         Assert.Equal(1f, bounds.MaxY);
 
-        var runtime = catalog.Read(AssetId.Parse("unit.test.triangle"));
-        using var stream = new MemoryStream(runtime.Payload);
-        using var reader = new BinaryReader(stream);
-        Assert.Equal(1, reader.ReadInt32());
-        Assert.Equal(3, reader.ReadInt32());
-        Assert.Equal(3, reader.ReadInt32());
+        RuntimeAssetContent runtime =
+            catalog.Read(
+                AssetId.Parse(
+                    "unit.test.triangle"));
+        RuntimeMeshData mesh =
+            RuntimeMeshData.FromPayload(
+                runtime.Payload);
+
+        Assert.True(
+            mesh.HasNormals);
+        Assert.False(
+            mesh.HasUv0);
+        Assert.False(
+            mesh.HasTangents);
+        Assert.Equal(
+            3,
+            mesh.Vertices.Count);
+        Assert.Equal(
+            3,
+            mesh.Indices.Count);
+        Assert.Equal(
+            -1,
+            Assert.Single(
+                mesh.Sections)
+            .MaterialSlot);
     }
 
     [Fact]

@@ -6,9 +6,6 @@ namespace ForgeLine.Presentation;
 
 internal sealed class RuntimeWorldAssetResources : IDisposable
 {
-    private const int RuntimeMeshVersion = 1;
-    private const int RuntimeMeshVertexStride = 32;
-
     private readonly IGraphicsDevice _graphics;
     private readonly RuntimeAssetCatalog _catalog;
     private readonly Dictionary<AssetId, RuntimeMeshBuffers> _meshes = [];
@@ -568,58 +565,21 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
     private RuntimeMeshBuffers CreateMeshBuffers(
         byte[] payload)
     {
-        using var stream =
-            new MemoryStream(
-                payload,
-                writable: false);
-        using var reader =
-            new BinaryReader(
-                stream);
-
-        int version =
-            reader.ReadInt32();
-        if (version != RuntimeMeshVersion)
-        {
-            throw new InvalidDataException(
-                $"Runtime mesh version {version} is unsupported.");
-        }
-
-        int vertexCount =
-            reader.ReadInt32();
-        int indexCount =
-            reader.ReadInt32();
-        if (vertexCount <= 0 ||
-            indexCount <= 0 ||
-            indexCount % 3 != 0)
-        {
-            throw new InvalidDataException(
-                "Runtime mesh contains invalid vertex or index counts.");
-        }
-
+        RuntimeMeshData data =
+            RuntimeMeshData.FromPayload(
+                payload);
+        RuntimeMeshVertex[] vertices =
+            data.Vertices.ToArray();
+        uint[] indices =
+            data.Indices.ToArray();
         int vertexByteCount =
             checked(
-                vertexCount *
-                RuntimeMeshVertexStride);
+                vertices.Length *
+                RuntimeMeshData.VertexStride);
         int indexByteCount =
             checked(
-                indexCount *
+                indices.Length *
                 sizeof(uint));
-        long expectedLength =
-            12L +
-            vertexByteCount +
-            indexByteCount;
-        if (payload.LongLength != expectedLength)
-        {
-            throw new InvalidDataException(
-                "Runtime mesh payload length does not match its declared counts.");
-        }
-
-        byte[] vertexBytes =
-            reader.ReadBytes(
-                vertexByteCount);
-        byte[] indexBytes =
-            reader.ReadBytes(
-                indexByteCount);
 
         IGraphicsBuffer vertexBuffer =
             _graphics.CreateBuffer(
@@ -634,16 +594,51 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
 
         try
         {
-            vertexBuffer.SetData<byte>(
-                vertexBytes);
-            indexBuffer.SetData<byte>(
-                indexBytes);
+            vertexBuffer.SetData<RuntimeMeshVertex>(
+                vertices);
+            indexBuffer.SetData<uint>(
+                indices);
+
+            int[] materialSlots =
+                data.Sections
+                    .Select(
+                        static section =>
+                            section.MaterialSlot)
+                    .Distinct()
+                    .ToArray();
+            bool usesDevelopmentFallback =
+                materialSlots.Any(
+                    static slot =>
+                        slot < 0) ||
+                materialSlots.Length != 1;
+            bool hasMaterial =
+                !usesDevelopmentFallback &&
+                materialSlots.Length == 1 &&
+                materialSlots[0] >= 0 &&
+                materialSlots[0] < data.MaterialIds.Count;
+            AssetId materialId =
+                hasMaterial
+                    ? AssetId.Parse(
+                        data.MaterialIds[
+                            materialSlots[0]])
+                    : default;
+
+            if (materialSlots.Length > 1)
+            {
+                Console.WriteLine(
+                    "[graphics:mesh] development fallback reason=\"multiple material slots require split draw support\"");
+            }
 
             return new RuntimeMeshBuffers(
                 vertexBuffer,
                 indexBuffer,
-                RuntimeMeshVertexStride,
-                indexCount);
+                RuntimeMeshData.VertexStride,
+                indices.Length,
+                data.Attributes,
+                materialId,
+                hasMaterial,
+                usesDevelopmentFallback,
+                data.Sections.Count);
         }
         catch
         {
@@ -687,13 +682,29 @@ internal readonly record struct RuntimeMeshBuffers(
     IGraphicsBuffer VertexBuffer,
     IGraphicsBuffer IndexBuffer,
     int VertexStride,
-    int IndexCount) : IDisposable
+    int IndexCount,
+    RuntimeMeshAttributes Attributes,
+    AssetId MaterialId,
+    bool HasMaterial,
+    bool UsesDevelopmentFallback,
+    int SectionCount) : IDisposable
 {
     public bool IsValid =>
         VertexBuffer is not null &&
         IndexBuffer is not null &&
-        VertexStride > 0 &&
-        IndexCount > 0;
+        VertexStride == RuntimeMeshData.VertexStride &&
+        IndexCount > 0 &&
+        SectionCount > 0;
+
+    public bool HasUv0 =>
+        (Attributes & RuntimeMeshAttributes.Uv0) != 0;
+
+    public bool HasTangents =>
+        (Attributes & RuntimeMeshAttributes.Tangent) != 0;
+
+    public bool SupportsTexturedMaterial =>
+        HasUv0 &&
+        !UsesDevelopmentFallback;
 
     public void Dispose()
     {

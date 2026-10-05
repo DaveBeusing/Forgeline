@@ -101,8 +101,9 @@ Current supported glTF subset:
 - static mesh primitives;
 - triangle primitive mode;
 - required `POSITION` as FLOAT `VEC3`;
-- optional `NORMAL` as FLOAT `VEC3`;
+- optional source `NORMAL` as FLOAT `VEC3`;
 - optional `TEXCOORD_0` as FLOAT `VEC2`;
+- optional source `TANGENT` as FLOAT `VEC4`;
 - optional indices using unsigned byte, unsigned short, or unsigned int;
 - embedded data-URI buffers;
 - external buffers for `.gltf`;
@@ -111,7 +112,44 @@ Current supported glTF subset:
 
 Sparse accessors and non-triangle primitive modes are rejected with diagnostics.
 
-Meshes compile into a ForgeLine runtime payload containing a versioned interleaved vertex stream and 32-bit index stream. Bounds are calculated from imported positions and recorded in the runtime manifest.
+### Production mesh vertex contract
+
+Runtime mesh version 2 uses one 48-byte static-mesh vertex:
+
+```text
+Position  float3  offset  0
+Normal    float3  offset 12
+UV0       float2  offset 24
+Tangent   float4  offset 32
+```
+
+`Tangent.xyz` stores the tangent direction and `Tangent.w` stores handedness for bitangent reconstruction. The renderer reconstructs `B = cross(N, T) * handedness` and evaluates material normal maps in tangent space.
+
+Normals are normalized during import. If source normals are absent or unusable, the compiler deterministically accumulates indexed triangle face normals and normalizes the result. Existing position-only production assets therefore remain compilable without changing simulation or collision data.
+
+When a material uses a normal map and valid UV0 exists but source tangents are absent or invalid, the compiler deterministically generates tangents using triangle position/UV derivatives, Gram-Schmidt orthogonalization against the vertex normal, and a signed handedness term. Mirrored UVs preserve the opposite handedness. A normal-mapped section that cannot form a valid tangent basis is explicitly downgraded to the development fallback rather than receiving fabricated tangent-space lighting.
+
+### Material slots and migration
+
+The ordered `materialReferences` list in the mesh asset definition is the stable material-slot table. A glTF primitive `material` index maps to the same slot index. If the source primitive omits `material`, a mesh with exactly one stable material reference uses slot zero; multiple declared slots require an explicit primitive assignment.
+
+Runtime mesh version 2 serializes:
+
+- explicit vertex-attribute flags;
+- the production vertex stream;
+- 32-bit indices;
+- stable material IDs;
+- contiguous draw sections with material-slot indices.
+
+The current presentation path is optimized for the production assets in `master`, which use one material identity per render mesh/LOD. Multiple sections that resolve to different material slots remain represented in the runtime asset but are surfaced as a development fallback until split-draw batching is required by authored content. This keeps draw-call fragmentation visible instead of silently multiplying submissions.
+
+A textured material requires UV0. A normal-mapped material additionally requires a valid tangent basis. Existing meshes that do not yet satisfy those requirements remain visible through the controlled development fallback and emit `ASSETW002`. Every compiled mesh emits `ASSETI002` with vertex/index/section/material counts, UV/tangent availability, generated normal/tangent counts, and fallback-section count.
+
+LOD references must preserve the same stable material-reference identity and slot order. A lower LOD may simplify geometry, but it cannot silently change the material identity used for gameplay readability.
+
+Runtime mesh version 1 is intentionally not reinterpreted as version 2. Stale runtime mesh payloads fail with an explicit recompile diagnostic; source assets remain authoritative and the Asset Compiler regenerates the new format.
+
+Bounds are calculated from imported positions and recorded in the runtime manifest.
 
 ## Texture Import
 
