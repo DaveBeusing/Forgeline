@@ -23,6 +23,15 @@ public sealed class PauseMenuTests
                     item.Label);
             },
             item =>
+            {
+                Assert.Equal(
+                    PauseMenuCommand.Controls,
+                    item.Command);
+                Assert.Equal(
+                    "CONTROLS",
+                    item.Label);
+            },
+            item =>
                 Assert.Equal(
                     PauseMenuCommand.SaveGame,
                     item.Command),
@@ -81,12 +90,21 @@ public sealed class PauseMenuTests
                 422f,
                 layout,
                 menu.Items);
+        string? third =
+            FrontendHitTesting.PauseMenu(
+                120f,
+                494f,
+                layout,
+                menu.Items);
 
         Assert.Equal(
             "resume",
             first);
         Assert.Equal(
-            "save-game",
+            "controls",
             second);
+        Assert.Equal(
+            "save-game",
+            third);
     }
 }

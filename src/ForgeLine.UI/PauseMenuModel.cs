@@ -5,7 +5,8 @@ public enum PauseMenuCommand : byte
     Resume = 1,
     SaveGame = 2,
     SaveAndReturnToMenu = 3,
-    ReturnToMenu = 4
+    ReturnToMenu = 4,
+    Controls = 5
 }
 
 public readonly record struct PauseMenuItem(
@@ -22,6 +23,10 @@ public sealed class PauseMenuModel
             "resume",
             "RESUME",
             PauseMenuCommand.Resume),
+        new PauseMenuItem(
+            "controls",
+            "CONTROLS",
+            PauseMenuCommand.Controls),
         new PauseMenuItem(
             "save-game",
             "SAVE GAME",

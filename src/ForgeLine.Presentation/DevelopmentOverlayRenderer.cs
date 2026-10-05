@@ -107,7 +107,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         builder.Append("/");
         builder.Append(metrics.Gen2Collections);
 
-        EmitText(
+        EmitReadableText(
             builder.Written,
             12.0f,
             12.0f,
@@ -1388,7 +1388,15 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             builder.NewLine();
             builder.Append("L LOGISTICS  Y SUPPLY  K COMBAT");
             builder.NewLine();
-            builder.Append("F10 OVERLAYS  F11 MINIMAP  ESC PAUSE MENU");
+            builder.Append("F1 PERFORMANCE METRICS  F2 WORLD DEBUG  F3 FORMATION");
+            builder.NewLine();
+            builder.Append("F4 COMMAND CORE  F5 POWER PLANT  F6 EXTRACTOR");
+            builder.NewLine();
+            builder.Append("F7 STORAGE DEPOT  F8 SMELTER  F9 ROTATE BUILDING");
+            builder.NewLine();
+            builder.Append("F10 STRATEGIC OVERLAY  F11 MINIMAP  F12 CLOSE HELP");
+            builder.NewLine();
+            builder.Append("ESC OR SPACE PAUSE MENU");
             builder.NewLine();
             builder.NewLine();
             builder.Append("QUICK START");
@@ -1407,8 +1415,6 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             builder.NewLine();
             builder.Append("7 DESTROY THE ENEMY COMMAND CORE TO WIN");
             builder.NewLine();
-            builder.NewLine();
-            builder.Append("F12 CLOSE HELP");
 
             EmitReadableText(
                 builder.Written,
