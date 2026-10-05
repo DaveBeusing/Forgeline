@@ -5,7 +5,8 @@ param(
     [int]$RenderStressInstances = 1000,
     [string]$SettingsRoot = "artifacts/window-mode-settings",
     [string]$WindowedReport = "artifacts/visual-qualification.json",
-    [string]$BorderlessReport = "artifacts/borderless-startup-qualification.json"
+    [string]$BorderlessReport = "artifacts/borderless-startup-qualification.json",
+    [string]$AssetQualificationReport = "artifacts/asset-qualification.json"
 )
 
 Set-StrictMode -Version Latest
@@ -16,6 +17,7 @@ $clientProject = Join-Path $repositoryRoot "src/ForgeLine.Client/ForgeLine.Clien
 $settingsRootPath = [System.IO.Path]::GetFullPath((Join-Path $repositoryRoot $SettingsRoot))
 $windowedReportPath = [System.IO.Path]::GetFullPath((Join-Path $repositoryRoot $WindowedReport))
 $borderlessReportPath = [System.IO.Path]::GetFullPath((Join-Path $repositoryRoot $BorderlessReport))
+$assetQualificationReportPath = [System.IO.Path]::GetFullPath((Join-Path $repositoryRoot $AssetQualificationReport))
 
 function Invoke-ClientSmoke {
     param(
@@ -164,6 +166,14 @@ function Invoke-ClientSmoke {
         $surface.frameIndex,
         $surface.bufferCount
     )
+}
+
+if (Test-Path $assetQualificationReportPath) {
+    $assetQualification = Get-Content -Path $assetQualificationReportPath -Raw | ConvertFrom-Json -Depth 32
+
+    if ($assetQualification.textureRuntimeBytes -gt 524288) {
+        throw "Compiled texture runtime footprint $($assetQualification.textureRuntimeBytes) bytes exceeded the 512 KiB Vertical Slice budget."
+    }
 }
 
 if (Test-Path $settingsRootPath) {
