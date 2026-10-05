@@ -159,6 +159,25 @@ public sealed class FrontendOverlayRenderer : IDisposable
             }
 
             EmitText(view.Footer, 94 * scale, 930 * scale, new Vector4(0.40f, 0.44f, 0.40f, 1), context.Width, context.Height, scale);
+
+            if (view.Kind == FrontendSurfaceKind.MainMenu &&
+                !string.IsNullOrWhiteSpace(view.ProductVersion))
+            {
+                string versionLabel =
+                    $"VERSION {view.ProductVersion}";
+                float versionX =
+                    (1920f - 48f -
+                     versionLabel.Length * GlyphAdvance) * scale;
+
+                EmitText(
+                    versionLabel,
+                    versionX,
+                    1024f * scale,
+                    new Vector4(0.40f, 0.44f, 0.40f, 1),
+                    context.Width,
+                    context.Height,
+                    scale);
+            }
         }
         else if (view.Kind == FrontendSurfaceKind.Detail)
         {

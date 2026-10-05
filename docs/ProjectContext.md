@@ -17,6 +17,7 @@ Project-specific approval metadata is intentionally not fabricated. Until this d
 - **Runtime baseline:** .NET 10 LTS
 - **Configured SDK:** .NET SDK 10.0.401 selected by `global.json`
 - **Package management:** centrally managed through `Directory.Packages.props`
+- **Versioning:** SemVer `MAJOR.MINOR.PATCH`, centrally defined in `Directory.Build.props`; baseline `0.1.0`
 - **Interactive host baseline:** Windows x64
 - **Interactive graphics backend:** Direct3D 12
 
@@ -76,6 +77,23 @@ The following precedence applies when technical state, documentation, and govern
 
 `master` is exclusively the integration branch. New implementation work starts from current `master` unless a relevant existing branch or pull request is intentionally reused and synchronized.
 
+## Semantic Versioning Policy
+
+FORGELINE uses Semantic Versioning in `MAJOR.MINOR.PATCH` form. The authoritative version components are `ForgeLineVersionMajor`, `ForgeLineVersionMinor`, and `ForgeLineVersionPatch` in the repository-root `Directory.Build.props`. The initial governed baseline is `0.1.0`.
+
+The versioning rules are binding:
+
+- every repository commit after the versioning bootstrap increments `ForgeLineVersionPatch` by exactly one;
+- `MAJOR` and `MINOR` may only change through an explicit product/release decision and must never decrease;
+- changing `MAJOR` or `MINOR` does not reset the patch counter; the same commit still increments `PATCH` by exactly one;
+- each non-merge development commit consumes exactly one new patch value;
+- merge commits are structural integration commits: they may contain multiple already-versioned commits, preserve the highest integrated parent version, and do not consume an additional patch value;
+- merge and rebase integration are permitted when they preserve the individual versioned commits; squash integration is prohibited because it collapses multiple patch-bearing commits into one commit;
+- CI validates the complete commit graph and rejects missing, repeated, skipped, or decreasing development patch versions while validating merge commits separately;
+- `build/Increment-PatchVersion.ps1` is the canonical helper for preparing the version change before each commit.
+
+The bootstrap commit that first establishes `0.1.0` is the only commit without a prior governed version to increment from.
+
 ## Git and Integration Policy
 
 The project development model requires:
@@ -84,6 +102,8 @@ The project development model requires:
 - short-lived feature, fix, and technical branches;
 - pull requests for integration;
 - small, logically bounded commits;
+- one semantic patch increment per commit after the versioning bootstrap;
+- preserve individual versioned commits during integration; ordinary merge commits and rebase integration are allowed, while squash merges are incompatible with the version invariant;
 - successful required CI before merge;
 - no routine force pushes or branch deletion on `master`;
 - deletion of short-lived branches after successful integration when appropriate;
@@ -103,15 +123,16 @@ The check context emitted by the workflow is:
 
 The required check represents the complete CI job, not only compilation or the unit-test subset. Its current validation path includes:
 
-1. restore;
-2. project-reference validation;
-3. Release build;
-4. Windows graphics client smoke validation;
-5. headless diagnostics smoke validation;
-6. lightweight entity stress validation;
-7. the Microsoft.Testing.Platform solution test run;
-8. the natural vertical-slice terminal validation using seed 2026, an 80,000-tick limit, and `--require-terminal`;
-9. diagnostic artifact upload on success or failure.
+1. semantic-version progression and linear-history validation;
+2. restore;
+3. project-reference validation;
+4. Release build;
+5. Windows graphics client smoke validation;
+6. headless diagnostics smoke validation;
+7. lightweight entity stress validation;
+8. the Microsoft.Testing.Platform solution test run;
+9. the natural vertical-slice terminal validation using seed 2026, an 80,000-tick limit, and `--require-terminal`;
+10. diagnostic artifact upload on success or failure.
 
 The terminal-match gate must not be removed, weakened, replaced with a forced result, or given free resources merely to obtain a green check. Repeated five-match soak validation remains separate from the ordinary pull-request timing gate unless repository policy is deliberately changed.
 
@@ -121,6 +142,8 @@ The minimum intended protection for `master` is:
 
 - require integration through a pull request;
 - require the GitHub Actions `build-test` check to succeed before merge;
+- require branches to be up to date with `master` before integration;
+- preserve individual versioned commits during integration; merge commits and rebase integration are valid, while squash merges must be disabled for governed integration;
 - prevent force pushes;
 - prevent branch deletion;
 - preserve any stronger repository or organization protections already in effect;
@@ -144,7 +167,6 @@ The canonical commands and their current CI ordering are documented in [Developm
 
 The following are intentionally unresolved:
 
-- semantic or other project versioning strategy;
 - formal project-context version;
 - explicit project-context approval status;
 - Product Owner approval identity metadata;

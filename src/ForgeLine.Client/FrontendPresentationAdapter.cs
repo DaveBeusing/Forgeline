@@ -1,3 +1,4 @@
+using System.Reflection;
 using ForgeLine.Presentation;
 using ForgeLine.UI;
 
@@ -5,6 +6,9 @@ namespace ForgeLine.Client;
 
 internal static class FrontendPresentationAdapter
 {
+    private static readonly string s_productVersion =
+        ResolveProductVersion();
+
     internal static FrontendSurfaceView Loading(
         FrontendLoadingState state) =>
         FrontendSurfaceView.Loading(
@@ -31,7 +35,9 @@ internal static class FrontendPresentationAdapter
                                 StringComparison.Ordinal)))
                 .ToArray();
 
-        return FrontendSurfaceView.MainMenu(entries);
+        return FrontendSurfaceView.MainMenu(
+            entries,
+            s_productVersion);
     }
 
     internal static FrontendSurfaceView PauseMenu(
@@ -118,6 +124,29 @@ internal static class FrontendPresentationAdapter
             lines,
             "UP/DOWN  SELECT SAVE     ENTER  LOAD     ESC  BACK",
             model.TryGetFocusedLoadTarget(out _) ? "LOAD" : string.Empty);
+    }
+
+    private static string ResolveProductVersion()
+    {
+        string? informationalVersion =
+            typeof(FrontendPresentationAdapter)
+                .Assembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+                .InformationalVersion;
+
+        if (string.IsNullOrWhiteSpace(informationalVersion))
+        {
+            return "0.0.0";
+        }
+
+        int metadataSeparator =
+            informationalVersion.IndexOf(
+                '+',
+                StringComparison.Ordinal);
+
+        return metadataSeparator >= 0
+            ? informationalVersion[..metadataSeparator]
+            : informationalVersion;
     }
 
     private static LoadGameEntry[] ResolveVisibleSaves(

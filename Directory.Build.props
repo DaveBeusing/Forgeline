@@ -1,5 +1,14 @@
 <Project>
   <PropertyGroup>
+    <ForgeLineVersionMajor>0</ForgeLineVersionMajor>
+    <ForgeLineVersionMinor>1</ForgeLineVersionMinor>
+    <ForgeLineVersionPatch>1</ForgeLineVersionPatch>
+    <VersionPrefix>$(ForgeLineVersionMajor).$(ForgeLineVersionMinor).$(ForgeLineVersionPatch)</VersionPrefix>
+    <Version>$(VersionPrefix)</Version>
+    <AssemblyVersion>$(Version).0</AssemblyVersion>
+    <FileVersion>$(Version).0</FileVersion>
+    <InformationalVersion>$(Version)</InformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <LangVersion>14.0</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
