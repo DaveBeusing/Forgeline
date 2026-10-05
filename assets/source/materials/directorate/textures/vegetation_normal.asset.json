@@ -1,0 +1,8 @@
+{
+  "id": "texture.directorate.material.vegetation_normal",
+  "type": "texture",
+  "source": "vegetation_normal.tga",
+  "textureUsage": "normal",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true
+}

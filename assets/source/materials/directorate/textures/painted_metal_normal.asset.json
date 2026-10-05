@@ -1,0 +1,8 @@
+{
+  "id": "texture.directorate.material.painted_metal_normal",
+  "type": "texture",
+  "source": "painted_metal_normal.tga",
+  "textureUsage": "normal",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true
+}

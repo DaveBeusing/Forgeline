@@ -1,0 +1,8 @@
+{
+  "id": "texture.directorate.material.painted_metal_orm",
+  "type": "texture",
+  "source": "painted_metal_orm.tga",
+  "textureUsage": "orm",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true
+}

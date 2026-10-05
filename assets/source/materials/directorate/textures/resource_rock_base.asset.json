@@ -1,0 +1,8 @@
+{
+  "id": "texture.directorate.material.resource_rock_base",
+  "type": "texture",
+  "source": "resource_rock_base.tga",
+  "textureUsage": "baseColor",
+  "textureColorSpace": "srgb",
+  "textureGenerateMipmaps": true
+}

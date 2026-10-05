@@ -1,0 +1,8 @@
+{
+  "id": "texture.directorate.material.vegetation_base",
+  "type": "texture",
+  "source": "vegetation_base.tga",
+  "textureUsage": "baseColor",
+  "textureColorSpace": "srgb",
+  "textureGenerateMipmaps": true
+}

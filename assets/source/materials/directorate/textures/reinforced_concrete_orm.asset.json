@@ -1,0 +1,8 @@
+{
+  "id": "texture.directorate.material.reinforced_concrete_orm",
+  "type": "texture",
+  "source": "reinforced_concrete_orm.tga",
+  "textureUsage": "orm",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true
+}
