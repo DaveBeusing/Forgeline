@@ -18,7 +18,7 @@ public enum TerrainDebugVisualizationMode : byte
 
 public sealed class TerrainRenderer : IDisposable
 {
-    private const int TerrainRootConstantCount = 56;
+    private const int TerrainRootConstantCount = 49;
     private const int TerrainTextureCount = 13;
     private const int LayerCount = TerrainChunkSplatData.LayerCount;
 
@@ -251,15 +251,15 @@ public sealed class TerrainRenderer : IDisposable
                 resource.TriangleCount;
 
             constants[16] =
-                resource.Coordinate.X;
-            constants[17] =
-                resource.Coordinate.Z;
-            constants[18] =
                 DebugChunksEnabled
                     ? 1.0f
                     : 0.0f;
-            constants[19] =
+            constants[17] =
                 (float)DebugVisualizationMode;
+            constants[18] =
+                0.0f;
+            constants[19] =
+                0.0f;
             WriteLayerConstants(
                 resource.Layers,
                 constants);
@@ -424,18 +424,17 @@ public sealed class TerrainRenderer : IDisposable
             cbuffer TerrainFrame : register(b0)
             {
                 row_major float4x4 ViewProjection;
-                float2 ChunkCoordinate;
                 float DebugChunks;
                 float DebugMode;
+                float2 TerrainPadding;
                 float4 LayerUvScale01;
                 float4 LayerUvScale23;
-                float4 LayerBaseFactor0;
-                float4 LayerBaseFactor1;
-                float4 LayerBaseFactor2;
-                float4 LayerBaseFactor3;
+                float4 LayerBaseR;
+                float4 LayerBaseG;
+                float4 LayerBaseB;
                 float4 LayerRoughness;
                 float4 LayerMetallic;
-                float4 PaletteSlots;
+                uint PackedPaletteSlots;
             };
 
             struct VertexInput
@@ -452,19 +451,17 @@ public sealed class TerrainRenderer : IDisposable
                 float3 WorldPosition : TEXCOORD0;
                 float3 Normal : TEXCOORD1;
                 float2 LocalUv : TEXCOORD2;
-                float2 ChunkCoordinate : TEXCOORD3;
-                float DebugChunks : TEXCOORD4;
+                float DebugChunks : TEXCOORD3;
                 float4 MacroTint : COLOR0;
-                nointerpolation float DebugMode : TEXCOORD5;
-                nointerpolation float4 LayerUvScale01 : TEXCOORD6;
-                nointerpolation float4 LayerUvScale23 : TEXCOORD7;
-                nointerpolation float4 LayerBaseFactor0 : TEXCOORD8;
-                nointerpolation float4 LayerBaseFactor1 : TEXCOORD9;
-                nointerpolation float4 LayerBaseFactor2 : TEXCOORD10;
-                nointerpolation float4 LayerBaseFactor3 : TEXCOORD11;
-                nointerpolation float4 LayerRoughness : TEXCOORD12;
-                nointerpolation float4 LayerMetallic : TEXCOORD13;
-                nointerpolation float4 PaletteSlots : TEXCOORD14;
+                nointerpolation float DebugMode : TEXCOORD4;
+                nointerpolation float4 LayerUvScale01 : TEXCOORD5;
+                nointerpolation float4 LayerUvScale23 : TEXCOORD6;
+                nointerpolation float4 LayerBaseR : TEXCOORD7;
+                nointerpolation float4 LayerBaseG : TEXCOORD8;
+                nointerpolation float4 LayerBaseB : TEXCOORD9;
+                nointerpolation float4 LayerRoughness : TEXCOORD10;
+                nointerpolation float4 LayerMetallic : TEXCOORD11;
+                nointerpolation uint PackedPaletteSlots : TEXCOORD12;
             };
 
             VertexOutput VSMain(VertexInput input)
@@ -482,8 +479,6 @@ public sealed class TerrainRenderer : IDisposable
                     input.Normal;
                 output.LocalUv =
                     input.LocalUv;
-                output.ChunkCoordinate =
-                    ChunkCoordinate;
                 output.DebugChunks =
                     DebugChunks;
                 output.MacroTint =
@@ -494,20 +489,18 @@ public sealed class TerrainRenderer : IDisposable
                     LayerUvScale01;
                 output.LayerUvScale23 =
                     LayerUvScale23;
-                output.LayerBaseFactor0 =
-                    LayerBaseFactor0;
-                output.LayerBaseFactor1 =
-                    LayerBaseFactor1;
-                output.LayerBaseFactor2 =
-                    LayerBaseFactor2;
-                output.LayerBaseFactor3 =
-                    LayerBaseFactor3;
+                output.LayerBaseR =
+                    LayerBaseR;
+                output.LayerBaseG =
+                    LayerBaseG;
+                output.LayerBaseB =
+                    LayerBaseB;
                 output.LayerRoughness =
                     LayerRoughness;
                 output.LayerMetallic =
                     LayerMetallic;
-                output.PaletteSlots =
-                    PaletteSlots;
+                output.PackedPaletteSlots =
+                    PackedPaletteSlots;
                 return output;
             }
             """;
@@ -536,19 +529,17 @@ public sealed class TerrainRenderer : IDisposable
                 float3 WorldPosition : TEXCOORD0;
                 float3 Normal : TEXCOORD1;
                 float2 LocalUv : TEXCOORD2;
-                float2 ChunkCoordinate : TEXCOORD3;
-                float DebugChunks : TEXCOORD4;
+                float DebugChunks : TEXCOORD3;
                 float4 MacroTint : COLOR0;
-                nointerpolation float DebugMode : TEXCOORD5;
-                nointerpolation float4 LayerUvScale01 : TEXCOORD6;
-                nointerpolation float4 LayerUvScale23 : TEXCOORD7;
-                nointerpolation float4 LayerBaseFactor0 : TEXCOORD8;
-                nointerpolation float4 LayerBaseFactor1 : TEXCOORD9;
-                nointerpolation float4 LayerBaseFactor2 : TEXCOORD10;
-                nointerpolation float4 LayerBaseFactor3 : TEXCOORD11;
-                nointerpolation float4 LayerRoughness : TEXCOORD12;
-                nointerpolation float4 LayerMetallic : TEXCOORD13;
-                nointerpolation float4 PaletteSlots : TEXCOORD14;
+                nointerpolation float DebugMode : TEXCOORD4;
+                nointerpolation float4 LayerUvScale01 : TEXCOORD5;
+                nointerpolation float4 LayerUvScale23 : TEXCOORD6;
+                nointerpolation float4 LayerBaseR : TEXCOORD7;
+                nointerpolation float4 LayerBaseG : TEXCOORD8;
+                nointerpolation float4 LayerBaseB : TEXCOORD9;
+                nointerpolation float4 LayerRoughness : TEXCOORD10;
+                nointerpolation float4 LayerMetallic : TEXCOORD11;
+                nointerpolation uint PackedPaletteSlots : TEXCOORD12;
             };
 
             float4 NormalizeWeights(float4 weights)
@@ -631,16 +622,23 @@ public sealed class TerrainRenderer : IDisposable
                 {
                     float3 palette =
                         PaletteColor(
-                            input.PaletteSlots.x) *
+                            input.PackedPaletteSlots &
+                            0xffu) *
                             weights.x +
                         PaletteColor(
-                            input.PaletteSlots.y) *
+                            (input.PackedPaletteSlots >>
+                             8) &
+                            0xffu) *
                             weights.y +
                         PaletteColor(
-                            input.PaletteSlots.z) *
+                            (input.PackedPaletteSlots >>
+                             16) &
+                            0xffu) *
                             weights.z +
                         PaletteColor(
-                            input.PaletteSlots.w) *
+                            (input.PackedPaletteSlots >>
+                             24) &
+                            0xffu) *
                             weights.w;
                     return float4(
                         palette,
@@ -666,22 +664,34 @@ public sealed class TerrainRenderer : IDisposable
                     LayerBase0.Sample(
                         WorldMaterialSampler,
                         uv0).rgb *
-                    input.LayerBaseFactor0.rgb;
+                    float3(
+                        input.LayerBaseR.x,
+                        input.LayerBaseG.x,
+                        input.LayerBaseB.x);
                 float3 base1 =
                     LayerBase1.Sample(
                         WorldMaterialSampler,
                         uv1).rgb *
-                    input.LayerBaseFactor1.rgb;
+                    float3(
+                        input.LayerBaseR.y,
+                        input.LayerBaseG.y,
+                        input.LayerBaseB.y);
                 float3 base2 =
                     LayerBase2.Sample(
                         WorldMaterialSampler,
                         uv2).rgb *
-                    input.LayerBaseFactor2.rgb;
+                    float3(
+                        input.LayerBaseR.z,
+                        input.LayerBaseG.z,
+                        input.LayerBaseB.z);
                 float3 base3 =
                     LayerBase3.Sample(
                         WorldMaterialSampler,
                         uv3).rgb *
-                    input.LayerBaseFactor3.rgb;
+                    float3(
+                        input.LayerBaseR.w,
+                        input.LayerBaseG.w,
+                        input.LayerBaseB.w);
 
                 float3 geometricNormal =
                     normalize(
@@ -1001,26 +1011,26 @@ public sealed class TerrainRenderer : IDisposable
             constants[uvOffset + 1] =
                 resource.WorldUvScale.Y;
 
-            int colorOffset =
-                28 +
-                layer *
-                4;
-            constants[colorOffset] =
+            constants[28 + layer] =
                 material.BaseColorFactor.X;
-            constants[colorOffset + 1] =
+            constants[32 + layer] =
                 material.BaseColorFactor.Y;
-            constants[colorOffset + 2] =
+            constants[36 + layer] =
                 material.BaseColorFactor.Z;
-            constants[colorOffset + 3] =
-                material.BaseColorFactor.W;
-
-            constants[44 + layer] =
+            constants[40 + layer] =
                 material.RoughnessFactor;
-            constants[48 + layer] =
+            constants[44 + layer] =
                 material.MetallicFactor;
-            constants[52 + layer] =
-                (float)resource.Slot;
         }
+
+        uint packedPalette =
+            (uint)layers[0].Slot |
+            ((uint)layers[1].Slot << 8) |
+            ((uint)layers[2].Slot << 16) |
+            ((uint)layers[3].Slot << 24);
+        constants[48] =
+            BitConverter.UInt32BitsToSingle(
+                packedPalette);
     }
 
     private readonly record struct TerrainRenderVertex(

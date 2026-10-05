@@ -56,6 +56,14 @@ public sealed record GraphicsPipelineDescription(
                 "Pixel texture count must be between zero and sixteen.");
         }
 
+        if (VertexRootConstantCount +
+            PixelTextureCount >
+            64)
+        {
+            throw new ArgumentException(
+                "D3D12 root-signature cost exceeds 64 DWORDs; root constants and pixel descriptor tables must fit within the hardware root-signature budget.");
+        }
+
         foreach (GraphicsVertexElement element in VertexElements)
         {
             element.Validate();
