@@ -7,27 +7,44 @@ internal static class MaterialImporter
 {
     public static ImportedAssetPayload Import(string path)
     {
-        var json = File.ReadAllText(path);
-        var options = RuntimeAssetCatalog.CreateJsonOptions();
-        var definition = JsonSerializer.Deserialize<MaterialSourceDefinition>(json, options)
-            ?? throw new InvalidDataException("Material definition is empty.");
+        MaterialSourceDefinition definition =
+            ReadDefinition(
+                path);
+        var options =
+            RuntimeAssetCatalog.CreateJsonOptions();
+        byte[] normalized =
+            JsonSerializer.SerializeToUtf8Bytes(
+                definition,
+                options);
 
-        Validate(definition);
-
-        var normalized = JsonSerializer.SerializeToUtf8Bytes(definition, options);
-        return new ImportedAssetPayload(normalized, null, definition.ReferencedTextureIds);
+        return new ImportedAssetPayload(
+            normalized,
+            null,
+            definition.ReferencedTextureIds);
     }
 
-    public static IReadOnlyList<string> ReadDependencies(string path)
-    {
-        var json = File.ReadAllText(path);
-        var definition = JsonSerializer.Deserialize<MaterialSourceDefinition>(
-            json,
-            RuntimeAssetCatalog.CreateJsonOptions())
-            ?? throw new InvalidDataException("Material definition is empty.");
+    public static IReadOnlyList<string> ReadDependencies(
+        string path) =>
+        ReadDefinition(
+            path)
+        .ReferencedTextureIds;
 
-        Validate(definition);
-        return definition.ReferencedTextureIds;
+    public static MaterialSourceDefinition ReadDefinition(
+        string path)
+    {
+        string json =
+            File.ReadAllText(
+                path);
+        MaterialSourceDefinition definition =
+            JsonSerializer.Deserialize<MaterialSourceDefinition>(
+                json,
+                RuntimeAssetCatalog.CreateJsonOptions())
+            ?? throw new InvalidDataException(
+                "Material definition is empty.");
+
+        Validate(
+            definition);
+        return definition;
     }
 
     private static void Validate(MaterialSourceDefinition definition)

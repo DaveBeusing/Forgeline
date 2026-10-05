@@ -4,6 +4,7 @@ namespace ForgeLine.AssetCompiler;
 
 public enum AssetCompilerDiagnosticSeverity
 {
+    Information,
     Warning,
     Error,
 }

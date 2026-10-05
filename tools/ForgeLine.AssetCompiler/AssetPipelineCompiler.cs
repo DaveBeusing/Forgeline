@@ -110,6 +110,11 @@ public static class AssetPipelineCompiler
                 }
 
                 var imported = Import(node, normalizedSourceRoot);
+                AddCompilationDiagnostic(
+                    node,
+                    imported,
+                    sourceRelativePath,
+                    diagnostics);
                 var record = CreateRuntimeRecord(
                     node,
                     normalizedSourceRoot,
@@ -574,10 +579,12 @@ public static class AssetPipelineCompiler
 
             if (node.Definition.Type == RuntimeAssetType.Material)
             {
-                IReadOnlyList<string> materialTextures;
+                MaterialSourceDefinition material;
                 try
                 {
-                    materialTextures = MaterialImporter.ReadDependencies(node.SourcePath);
+                    material =
+                        MaterialImporter.ReadDefinition(
+                            node.SourcePath);
                 }
                 catch (Exception exception) when (
                     exception is IOException or
@@ -590,9 +597,37 @@ public static class AssetPipelineCompiler
 
                 ValidateTypedReferences(
                     node,
-                    materialTextures,
+                    material.ReferencedTextureIds,
                     RuntimeAssetType.Texture,
                     "material texture",
+                    nodes,
+                    diagnostics);
+                ValidateMaterialTextureUsage(
+                    node,
+                    material.BaseColorTexture,
+                    RuntimeTextureUsage.BaseColor,
+                    "baseColorTexture",
+                    nodes,
+                    diagnostics);
+                ValidateMaterialTextureUsage(
+                    node,
+                    material.NormalTexture,
+                    RuntimeTextureUsage.Normal,
+                    "normalTexture",
+                    nodes,
+                    diagnostics);
+                ValidateMaterialTextureUsage(
+                    node,
+                    material.OrmTexture,
+                    RuntimeTextureUsage.Orm,
+                    "ormTexture",
+                    nodes,
+                    diagnostics);
+                ValidateMaterialTextureUsage(
+                    node,
+                    material.EmissiveTexture,
+                    RuntimeTextureUsage.Emissive,
+                    "emissiveTexture",
                     nodes,
                     diagnostics);
             }
@@ -625,6 +660,66 @@ public static class AssetPipelineCompiler
                     owner.Definition.Source));
             }
         }
+    }
+
+    private static void ValidateMaterialTextureUsage(
+        AssetNode owner,
+        string? rawReference,
+        RuntimeTextureUsage expectedUsage,
+        string slotName,
+        IReadOnlyDictionary<AssetId, AssetNode> nodes,
+        List<AssetCompilerDiagnostic> diagnostics)
+    {
+        if (string.IsNullOrWhiteSpace(
+                rawReference) ||
+            !AssetId.TryParse(
+                rawReference,
+                out AssetId id) ||
+            !nodes.TryGetValue(
+                id,
+                out AssetNode? referencedNode) ||
+            referencedNode.Definition.Type !=
+            RuntimeAssetType.Texture)
+        {
+            return;
+        }
+
+        if (referencedNode.Definition.TextureUsage !=
+            expectedUsage)
+        {
+            diagnostics.Add(
+                new AssetCompilerDiagnostic(
+                    "ASSET032",
+                    AssetCompilerDiagnosticSeverity.Error,
+                    $"Material slot '{slotName}' requires texture usage '{expectedUsage}', but '{id}' declares '{referencedNode.Definition.TextureUsage}'.",
+                    owner.Id.Value,
+                    owner.Definition.Source));
+        }
+    }
+
+    private static void AddCompilationDiagnostic(
+        AssetNode node,
+        ImportedAssetPayload imported,
+        string sourceRelativePath,
+        List<AssetCompilerDiagnostic> diagnostics)
+    {
+        if (node.Definition.Type !=
+            RuntimeAssetType.Texture)
+        {
+            return;
+        }
+
+        RuntimeTextureData texture =
+            RuntimeTextureData.FromPayload(
+                imported.Payload);
+
+        diagnostics.Add(
+            new AssetCompilerDiagnostic(
+                "ASSETI001",
+                AssetCompilerDiagnosticSeverity.Information,
+                $"Texture compiled: usage={texture.Usage}; colorSpace={texture.ColorSpace}; dimensions={texture.Width}x{texture.Height}; mips={texture.Mips.Count}; format={texture.Format}; residentBytes={texture.ResidentByteCount}; payloadBytes={imported.Payload.LongLength}.",
+                node.Id.Value,
+                sourceRelativePath));
     }
 
     private static List<AssetNode> TopologicallyOrder(
