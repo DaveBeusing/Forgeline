@@ -4,6 +4,7 @@ namespace ForgeLine.AssetCompiler;
 
 public enum AssetCompilerDiagnosticSeverity
 {
+    Information,
     Warning,
     Error,
 }
@@ -30,10 +31,15 @@ public sealed record SourceAssetDefinition
     public required string Source { get; init; }
 
     public RuntimeTextureUsage TextureUsage { get; init; } =
-        RuntimeTextureUsage.Color;
+        RuntimeTextureUsage.BaseColor;
 
     public RuntimeTextureColorSpace TextureColorSpace { get; init; } =
         RuntimeTextureColorSpace.Srgb;
+
+    public bool TextureGenerateMipmaps { get; init; } =
+        true;
+
+    public int? TextureMaxMipLevels { get; init; }
 
     public float Scale { get; init; } = 1f;
 

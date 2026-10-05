@@ -11,7 +11,9 @@ internal static class TextureImporter
     public static ImportedAssetPayload Import(
         string path,
         RuntimeTextureColorSpace colorSpace,
-        RuntimeTextureUsage usage)
+        RuntimeTextureUsage usage,
+        bool generateMipmaps,
+        int? maxMipLevels)
     {
         var extension = Path.GetExtension(path);
         TextureData texture = extension.ToLowerInvariant() switch
@@ -21,12 +23,21 @@ internal static class TextureImporter
             _ => throw new InvalidDataException($"Texture format '{extension}' is not supported."),
         };
 
-        var runtimeTexture = RuntimeTextureData.FromRgba8(
-            texture.Width,
-            texture.Height,
-            texture.Pixels,
-            colorSpace,
-            usage);
+        RuntimeTextureMipLevel[] mips =
+            GenerateMipChain(
+                texture,
+                colorSpace,
+                usage,
+                generateMipmaps,
+                maxMipLevels);
+        var runtimeTexture =
+            new RuntimeTextureData(
+                texture.Width,
+                texture.Height,
+                RuntimeTextureFormat.Rgba8Unorm,
+                colorSpace,
+                usage,
+                mips);
 
         return new ImportedAssetPayload(
             runtimeTexture.ToPayload(),
@@ -199,6 +210,519 @@ internal static class TextureImporter
 
         return new TextureData(width, height, rgba);
     }
+
+    private static RuntimeTextureMipLevel[] GenerateMipChain(
+        TextureData texture,
+        RuntimeTextureColorSpace colorSpace,
+        RuntimeTextureUsage usage,
+        bool generateMipmaps,
+        int? maxMipLevels)
+    {
+        if (maxMipLevels is <= 0)
+        {
+            throw new InvalidDataException(
+                "Texture mip level limit must be positive.");
+        }
+
+        int levelLimit =
+            generateMipmaps
+                ? maxMipLevels ?? 32
+                : 1;
+        var levels =
+            new List<RuntimeTextureMipLevel>(
+                Math.Min(
+                    levelLimit,
+                    16));
+        TextureData current =
+            texture;
+
+        while (true)
+        {
+            levels.Add(
+                new RuntimeTextureMipLevel(
+                    current.Width,
+                    current.Height,
+                    checked(current.Width * 4),
+                    current.Pixels));
+
+            if (!generateMipmaps ||
+                levels.Count >= levelLimit ||
+                current.Width == 1 &&
+                current.Height == 1)
+            {
+                break;
+            }
+
+            current =
+                Downsample(
+                    current,
+                    colorSpace,
+                    usage);
+        }
+
+        return levels.ToArray();
+    }
+
+    private static TextureData Downsample(
+        TextureData source,
+        RuntimeTextureColorSpace colorSpace,
+        RuntimeTextureUsage usage)
+    {
+        int width =
+            Math.Max(
+                1,
+                source.Width / 2);
+        int height =
+            Math.Max(
+                1,
+                source.Height / 2);
+        var pixels =
+            new byte[
+                checked(
+                    width *
+                    height *
+                    4)];
+
+        for (int y = 0; y < height; y++)
+        {
+            int sourceTop =
+                y *
+                source.Height /
+                height;
+            int sourceBottom =
+                Math.Max(
+                    sourceTop + 1,
+                    (y + 1) *
+                    source.Height /
+                    height);
+
+            for (int x = 0; x < width; x++)
+            {
+                int sourceLeft =
+                    x *
+                    source.Width /
+                    width;
+                int sourceRight =
+                    Math.Max(
+                        sourceLeft + 1,
+                        (x + 1) *
+                        source.Width /
+                        width);
+                int destinationOffset =
+                    checked(
+                        (y *
+                         width +
+                         x) *
+                        4);
+
+                if (usage == RuntimeTextureUsage.Normal)
+                {
+                    WriteNormalPixel(
+                        source,
+                        sourceLeft,
+                        sourceTop,
+                        sourceRight,
+                        sourceBottom,
+                        pixels,
+                        destinationOffset);
+                }
+                else if (usage ==
+                         RuntimeTextureUsage.TerrainControl)
+                {
+                    WriteTerrainControlPixel(
+                        source,
+                        sourceLeft,
+                        sourceTop,
+                        sourceRight,
+                        sourceBottom,
+                        pixels,
+                        destinationOffset);
+                }
+                else if (colorSpace ==
+                         RuntimeTextureColorSpace.Srgb)
+                {
+                    WriteSrgbPixel(
+                        source,
+                        sourceLeft,
+                        sourceTop,
+                        sourceRight,
+                        sourceBottom,
+                        pixels,
+                        destinationOffset);
+                }
+                else
+                {
+                    WriteLinearPixel(
+                        source,
+                        sourceLeft,
+                        sourceTop,
+                        sourceRight,
+                        sourceBottom,
+                        pixels,
+                        destinationOffset);
+                }
+            }
+        }
+
+        return new TextureData(
+            width,
+            height,
+            pixels);
+    }
+
+    private static void WriteLinearPixel(
+        TextureData source,
+        int left,
+        int top,
+        int right,
+        int bottom,
+        byte[] destination,
+        int destinationOffset)
+    {
+        Span<long> sums =
+            stackalloc long[4];
+        int count =
+            0;
+
+        for (int y = top; y < bottom; y++)
+        {
+            for (int x = left; x < right; x++)
+            {
+                int offset =
+                    checked(
+                        (y *
+                         source.Width +
+                         x) *
+                        4);
+                sums[0] += source.Pixels[offset];
+                sums[1] += source.Pixels[offset + 1];
+                sums[2] += source.Pixels[offset + 2];
+                sums[3] += source.Pixels[offset + 3];
+                count++;
+            }
+        }
+
+        for (int channel = 0; channel < 4; channel++)
+        {
+            destination[destinationOffset + channel] =
+                AverageByte(
+                    sums[channel],
+                    count);
+        }
+    }
+
+    private static void WriteSrgbPixel(
+        TextureData source,
+        int left,
+        int top,
+        int right,
+        int bottom,
+        byte[] destination,
+        int destinationOffset)
+    {
+        Span<double> linearSums =
+            stackalloc double[3];
+        long alphaSum =
+            0;
+        int count =
+            0;
+
+        for (int y = top; y < bottom; y++)
+        {
+            for (int x = left; x < right; x++)
+            {
+                int offset =
+                    checked(
+                        (y *
+                         source.Width +
+                         x) *
+                        4);
+                linearSums[0] +=
+                    SrgbToLinear(
+                        source.Pixels[offset]);
+                linearSums[1] +=
+                    SrgbToLinear(
+                        source.Pixels[offset + 1]);
+                linearSums[2] +=
+                    SrgbToLinear(
+                        source.Pixels[offset + 2]);
+                alphaSum +=
+                    source.Pixels[offset + 3];
+                count++;
+            }
+        }
+
+        destination[destinationOffset] =
+            LinearToSrgbByte(
+                linearSums[0] /
+                count);
+        destination[destinationOffset + 1] =
+            LinearToSrgbByte(
+                linearSums[1] /
+                count);
+        destination[destinationOffset + 2] =
+            LinearToSrgbByte(
+                linearSums[2] /
+                count);
+        destination[destinationOffset + 3] =
+            AverageByte(
+                alphaSum,
+                count);
+    }
+
+    private static void WriteNormalPixel(
+        TextureData source,
+        int left,
+        int top,
+        int right,
+        int bottom,
+        byte[] destination,
+        int destinationOffset)
+    {
+        double x = 0.0;
+        double y = 0.0;
+        double z = 0.0;
+        long alphaSum =
+            0;
+        int count =
+            0;
+
+        for (int sourceY = top; sourceY < bottom; sourceY++)
+        {
+            for (int sourceX = left; sourceX < right; sourceX++)
+            {
+                int offset =
+                    checked(
+                        (sourceY *
+                         source.Width +
+                         sourceX) *
+                        4);
+                x +=
+                    DecodeNormalChannel(
+                        source.Pixels[offset]);
+                y +=
+                    DecodeNormalChannel(
+                        source.Pixels[offset + 1]);
+                z +=
+                    DecodeNormalChannel(
+                        source.Pixels[offset + 2]);
+                alphaSum +=
+                    source.Pixels[offset + 3];
+                count++;
+            }
+        }
+
+        double length =
+            Math.Sqrt(
+                x * x +
+                y * y +
+                z * z);
+
+        if (length <= 1e-12)
+        {
+            x = 0.0;
+            y = 0.0;
+            z = 1.0;
+        }
+        else
+        {
+            x /= length;
+            y /= length;
+            z /= length;
+        }
+
+        destination[destinationOffset] =
+            EncodeNormalChannel(
+                x);
+        destination[destinationOffset + 1] =
+            EncodeNormalChannel(
+                y);
+        destination[destinationOffset + 2] =
+            EncodeNormalChannel(
+                z);
+        destination[destinationOffset + 3] =
+            AverageByte(
+                alphaSum,
+                count);
+    }
+
+    private static void WriteTerrainControlPixel(
+        TextureData source,
+        int left,
+        int top,
+        int right,
+        int bottom,
+        byte[] destination,
+        int destinationOffset)
+    {
+        Span<long> sums =
+            stackalloc long[4];
+
+        for (int y = top; y < bottom; y++)
+        {
+            for (int x = left; x < right; x++)
+            {
+                int offset =
+                    checked(
+                        (y *
+                         source.Width +
+                         x) *
+                        4);
+                sums[0] += source.Pixels[offset];
+                sums[1] += source.Pixels[offset + 1];
+                sums[2] += source.Pixels[offset + 2];
+                sums[3] += source.Pixels[offset + 3];
+            }
+        }
+
+        long total =
+            sums[0] +
+            sums[1] +
+            sums[2] +
+            sums[3];
+
+        if (total == 0)
+        {
+            destination[destinationOffset] =
+                255;
+            destination[destinationOffset + 1] =
+                0;
+            destination[destinationOffset + 2] =
+                0;
+            destination[destinationOffset + 3] =
+                0;
+            return;
+        }
+
+        Span<int> values =
+            stackalloc int[4];
+        Span<double> remainders =
+            stackalloc double[4];
+        int assigned =
+            0;
+
+        for (int channel = 0; channel < 4; channel++)
+        {
+            double scaled =
+                sums[channel] *
+                255.0 /
+                total;
+            int whole =
+                (int)Math.Floor(
+                    scaled);
+            values[channel] =
+                whole;
+            remainders[channel] =
+                scaled -
+                whole;
+            assigned +=
+                whole;
+        }
+
+        int remaining =
+            255 -
+            assigned;
+
+        while (remaining > 0)
+        {
+            int selected =
+                0;
+
+            for (int channel = 1; channel < 4; channel++)
+            {
+                if (remainders[channel] >
+                    remainders[selected])
+                {
+                    selected =
+                        channel;
+                }
+            }
+
+            values[selected]++;
+            remainders[selected] =
+                -1.0;
+            remaining--;
+        }
+
+        for (int channel = 0; channel < 4; channel++)
+        {
+            destination[destinationOffset + channel] =
+                checked(
+                    (byte)values[channel]);
+        }
+    }
+
+    private static byte AverageByte(
+        long sum,
+        int count) =>
+        checked(
+            (byte)(
+                (sum +
+                 count / 2) /
+                count));
+
+    private static double SrgbToLinear(
+        byte value)
+    {
+        double normalized =
+            value /
+            255.0;
+
+        return normalized <= 0.04045
+            ? normalized /
+              12.92
+            : Math.Pow(
+                (normalized + 0.055) /
+                1.055,
+                2.4);
+    }
+
+    private static byte LinearToSrgbByte(
+        double value)
+    {
+        double clamped =
+            Math.Clamp(
+                value,
+                0.0,
+                1.0);
+        double srgb =
+            clamped <= 0.0031308
+                ? clamped *
+                  12.92
+                : 1.055 *
+                  Math.Pow(
+                      clamped,
+                      1.0 /
+                      2.4) -
+                  0.055;
+
+        return UnitToByte(
+            srgb);
+    }
+
+    private static double DecodeNormalChannel(
+        byte value) =>
+        value /
+        127.5 -
+        1.0;
+
+    private static byte EncodeNormalChannel(
+        double value) =>
+        UnitToByte(
+            value *
+            0.5 +
+            0.5);
+
+    private static byte UnitToByte(
+        double value) =>
+        checked(
+            (byte)Math.Clamp(
+                (int)Math.Round(
+                    value *
+                    255.0,
+                    MidpointRounding.AwayFromZero),
+                0,
+                255));
 
     private static void UnfilterRow(
         byte filter,

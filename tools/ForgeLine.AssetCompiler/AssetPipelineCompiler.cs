@@ -5,8 +5,8 @@ namespace ForgeLine.AssetCompiler;
 
 public static class AssetPipelineCompiler
 {
-    public const string CompilerVersion = "1.1.0";
-    public const int RuntimeVersion = 2;
+    public const string CompilerVersion = "1.3.0";
+    public const int RuntimeVersion = 3;
 
     private static readonly JsonSerializerOptions JsonOptions = RuntimeAssetCatalog.CreateJsonOptions();
 
@@ -110,6 +110,11 @@ public static class AssetPipelineCompiler
                 }
 
                 var imported = Import(node, normalizedSourceRoot);
+                AddCompilationDiagnostic(
+                    node,
+                    imported,
+                    sourceRelativePath,
+                    diagnostics);
                 var record = CreateRuntimeRecord(
                     node,
                     normalizedSourceRoot,
@@ -304,19 +309,75 @@ public static class AssetPipelineCompiler
                 ToRelativePath(sourceRoot, sourcePath)));
         }
 
-        if (definition.Type == RuntimeAssetType.Texture &&
-            definition.TextureUsage is
-                RuntimeTextureUsage.Normal or
-                RuntimeTextureUsage.Orm or
-                RuntimeTextureUsage.GenericData &&
-            definition.TextureColorSpace != RuntimeTextureColorSpace.Linear)
+        if (definition.Type == RuntimeAssetType.Texture)
         {
-            diagnostics.Add(new AssetCompilerDiagnostic(
-                "ASSET026",
-                AssetCompilerDiagnosticSeverity.Error,
-                $"Texture usage '{definition.TextureUsage}' requires linear color space.",
-                id.Value,
-                ToRelativePath(sourceRoot, sourcePath)));
+            if (!Enum.IsDefined(definition.TextureUsage))
+            {
+                diagnostics.Add(new AssetCompilerDiagnostic(
+                    "ASSET026",
+                    AssetCompilerDiagnosticSeverity.Error,
+                    $"Texture usage '{definition.TextureUsage}' is not supported.",
+                    id.Value,
+                    ToRelativePath(sourceRoot, sourcePath)));
+            }
+
+            if (!Enum.IsDefined(definition.TextureColorSpace))
+            {
+                diagnostics.Add(new AssetCompilerDiagnostic(
+                    "ASSET027",
+                    AssetCompilerDiagnosticSeverity.Error,
+                    $"Texture color space '{definition.TextureColorSpace}' is not supported.",
+                    id.Value,
+                    ToRelativePath(sourceRoot, sourcePath)));
+            }
+
+            if (definition.TextureUsage == RuntimeTextureUsage.BaseColor &&
+                definition.TextureColorSpace != RuntimeTextureColorSpace.Srgb)
+            {
+                diagnostics.Add(new AssetCompilerDiagnostic(
+                    "ASSET028",
+                    AssetCompilerDiagnosticSeverity.Error,
+                    "Base Color textures require sRGB color space.",
+                    id.Value,
+                    ToRelativePath(sourceRoot, sourcePath)));
+            }
+
+            if (definition.TextureUsage is
+                    RuntimeTextureUsage.Normal or
+                    RuntimeTextureUsage.Orm or
+                    RuntimeTextureUsage.GenericData or
+                    RuntimeTextureUsage.TerrainControl &&
+                definition.TextureColorSpace != RuntimeTextureColorSpace.Linear)
+            {
+                diagnostics.Add(new AssetCompilerDiagnostic(
+                    "ASSET029",
+                    AssetCompilerDiagnosticSeverity.Error,
+                    $"Texture usage '{definition.TextureUsage}' requires linear color space.",
+                    id.Value,
+                    ToRelativePath(sourceRoot, sourcePath)));
+            }
+
+            if (definition.TextureMaxMipLevels is int maxMipLevels &&
+                (maxMipLevels <= 0 || maxMipLevels > 32))
+            {
+                diagnostics.Add(new AssetCompilerDiagnostic(
+                    "ASSET030",
+                    AssetCompilerDiagnosticSeverity.Error,
+                    "textureMaxMipLevels must be between 1 and 32.",
+                    id.Value,
+                    ToRelativePath(sourceRoot, sourcePath)));
+            }
+
+            if (!definition.TextureGenerateMipmaps &&
+                definition.TextureMaxMipLevels is > 1)
+            {
+                diagnostics.Add(new AssetCompilerDiagnostic(
+                    "ASSET031",
+                    AssetCompilerDiagnosticSeverity.Error,
+                    "textureMaxMipLevels cannot exceed 1 when textureGenerateMipmaps is false.",
+                    id.Value,
+                    ToRelativePath(sourceRoot, sourcePath)));
+            }
         }
 
         if (!float.IsFinite(definition.Scale) || MathF.Abs(definition.Scale - 1f) > 0.0001f)
@@ -518,10 +579,12 @@ public static class AssetPipelineCompiler
 
             if (node.Definition.Type == RuntimeAssetType.Material)
             {
-                IReadOnlyList<string> materialTextures;
+                MaterialSourceDefinition material;
                 try
                 {
-                    materialTextures = MaterialImporter.ReadDependencies(node.SourcePath);
+                    material =
+                        MaterialImporter.ReadDefinition(
+                            node.SourcePath);
                 }
                 catch (Exception exception) when (
                     exception is IOException or
@@ -534,9 +597,37 @@ public static class AssetPipelineCompiler
 
                 ValidateTypedReferences(
                     node,
-                    materialTextures,
+                    material.ReferencedTextureIds,
                     RuntimeAssetType.Texture,
                     "material texture",
+                    nodes,
+                    diagnostics);
+                ValidateMaterialTextureUsage(
+                    node,
+                    material.BaseColorTexture,
+                    RuntimeTextureUsage.BaseColor,
+                    "baseColorTexture",
+                    nodes,
+                    diagnostics);
+                ValidateMaterialTextureUsage(
+                    node,
+                    material.NormalTexture,
+                    RuntimeTextureUsage.Normal,
+                    "normalTexture",
+                    nodes,
+                    diagnostics);
+                ValidateMaterialTextureUsage(
+                    node,
+                    material.OrmTexture,
+                    RuntimeTextureUsage.Orm,
+                    "ormTexture",
+                    nodes,
+                    diagnostics);
+                ValidateMaterialTextureUsage(
+                    node,
+                    material.EmissiveTexture,
+                    RuntimeTextureUsage.Emissive,
+                    "emissiveTexture",
                     nodes,
                     diagnostics);
             }
@@ -570,6 +661,73 @@ public static class AssetPipelineCompiler
             }
         }
     }
+
+    private static void ValidateMaterialTextureUsage(
+        AssetNode owner,
+        string? rawReference,
+        RuntimeTextureUsage expectedUsage,
+        string slotName,
+        IReadOnlyDictionary<AssetId, AssetNode> nodes,
+        List<AssetCompilerDiagnostic> diagnostics)
+    {
+        if (string.IsNullOrWhiteSpace(
+                rawReference) ||
+            !AssetId.TryParse(
+                rawReference,
+                out AssetId id) ||
+            !nodes.TryGetValue(
+                id,
+                out AssetNode? referencedNode) ||
+            referencedNode is null ||
+            referencedNode.Definition.Type !=
+            RuntimeAssetType.Texture)
+        {
+            return;
+        }
+
+        if (referencedNode.Definition.TextureUsage !=
+            expectedUsage)
+        {
+            diagnostics.Add(
+                new AssetCompilerDiagnostic(
+                    "ASSET032",
+                    AssetCompilerDiagnosticSeverity.Error,
+                    $"Material slot '{slotName}' requires texture usage '{TextureUsageName(expectedUsage)}', but '{id}' declares '{TextureUsageName(referencedNode.Definition.TextureUsage)}'.",
+                    owner.Id.Value,
+                    owner.Definition.Source));
+        }
+    }
+
+    private static void AddCompilationDiagnostic(
+        AssetNode node,
+        ImportedAssetPayload imported,
+        string sourceRelativePath,
+        List<AssetCompilerDiagnostic> diagnostics)
+    {
+        if (node.Definition.Type !=
+            RuntimeAssetType.Texture)
+        {
+            return;
+        }
+
+        RuntimeTextureData texture =
+            RuntimeTextureData.FromPayload(
+                imported.Payload);
+
+        diagnostics.Add(
+            new AssetCompilerDiagnostic(
+                "ASSETI001",
+                AssetCompilerDiagnosticSeverity.Information,
+                $"Texture compiled: usage={TextureUsageName(texture.Usage)}; colorSpace={texture.ColorSpace}; dimensions={texture.Width}x{texture.Height}; mips={texture.Mips.Count}; format={texture.Format}; residentBytes={texture.ResidentByteCount}; payloadBytes={imported.Payload.LongLength}.",
+                node.Id.Value,
+                sourceRelativePath));
+    }
+
+    private static string TextureUsageName(
+        RuntimeTextureUsage usage) =>
+        usage == RuntimeTextureUsage.BaseColor
+            ? nameof(RuntimeTextureUsage.BaseColor)
+            : usage.ToString();
 
     private static List<AssetNode> TopologicallyOrder(
         IReadOnlyDictionary<AssetId, AssetNode> nodes,
@@ -637,7 +795,9 @@ public static class AssetPipelineCompiler
             RuntimeAssetType.Texture => TextureImporter.Import(
                 node.SourcePath,
                 node.Definition.TextureColorSpace,
-                node.Definition.TextureUsage),
+                node.Definition.TextureUsage,
+                node.Definition.TextureGenerateMipmaps,
+                node.Definition.TextureMaxMipLevels),
             RuntimeAssetType.Material => MaterialImporter.Import(node.SourcePath),
             _ => throw new InvalidDataException($"Asset type '{node.Definition.Type}' is unsupported."),
         };
