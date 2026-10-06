@@ -508,15 +508,49 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
         int submittedInstances =
             0;
+        int runtimeMeshInstances =
+            0;
+        int texturedRuntimeMeshInstances =
+            0;
+        int fallbackMeshInstances =
+            0;
 
         for (int batchIndex = 0;
              batchIndex < batches.Count;
              batchIndex++)
         {
+            InstanceBatch batch =
+                batches[batchIndex];
+            int batchInstanceCount =
+                batch.Instances.Count;
+
             submittedInstances =
                 checked(
                     submittedInstances +
-                    batches[batchIndex].Instances.Count);
+                    batchInstanceCount);
+
+            if (batch.UsesRuntimeMesh)
+            {
+                runtimeMeshInstances =
+                    checked(
+                        runtimeMeshInstances +
+                        batchInstanceCount);
+
+                if (batch.UsesRuntimeMaterial)
+                {
+                    texturedRuntimeMeshInstances =
+                        checked(
+                            texturedRuntimeMeshInstances +
+                            batchInstanceCount);
+                }
+            }
+            else
+            {
+                fallbackMeshInstances =
+                    checked(
+                        fallbackMeshInstances +
+                        batchInstanceCount);
+            }
         }
 
         IGraphicsBuffer instanceBuffer =
@@ -628,7 +662,10 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 world.InstanceCount - visible,
                 draws,
                 highLod,
-                reducedLod);
+                reducedLod,
+                runtimeMeshInstances,
+                texturedRuntimeMeshInstances,
+                fallbackMeshInstances);
     }
 
     public void Dispose()

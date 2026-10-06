@@ -939,6 +939,8 @@ public sealed class TerrainRenderer : IDisposable
                     TerrainRootConstantCount,
                 PixelTextureCount =
                     TerrainTextureCount,
+                CullMode =
+                    GraphicsCullMode.None,
                 DepthEnabled =
                     true
             });

@@ -366,7 +366,17 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                         description.PrimitiveTopology,
                         "Unsupported graphics primitive topology.")
                 },
-                RasterizerState = RasterizerDescription.CullCounterClockwise,
+                RasterizerState = description.CullMode switch
+                {
+                    GraphicsCullMode.CounterClockwise =>
+                        RasterizerDescription.CullCounterClockwise,
+                    GraphicsCullMode.None =>
+                        RasterizerDescription.CullNone,
+                    _ => throw new ArgumentOutOfRangeException(
+                        nameof(description),
+                        description.CullMode,
+                        "Unsupported graphics cull mode.")
+                },
                 BlendState = BlendDescription.Opaque,
                 DepthStencilState = description.DepthEnabled
                     ? DepthStencilDescription.Default

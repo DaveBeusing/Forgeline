@@ -6,4 +6,7 @@ public readonly record struct InstanceRenderDiagnostics(
     int CulledInstances,
     int DrawCalls,
     int HighLodInstances = 0,
-    int ReducedLodInstances = 0);
+    int ReducedLodInstances = 0,
+    int RuntimeMeshInstances = 0,
+    int TexturedRuntimeMeshInstances = 0,
+    int FallbackMeshInstances = 0);

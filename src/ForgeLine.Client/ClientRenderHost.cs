@@ -60,6 +60,12 @@ internal readonly record struct ClientVisualQualificationSnapshot(
     public long DebugLayerWarningCount { get; init; }
 
     public long DebugLayerErrorCount { get; init; }
+
+    public int RuntimeMeshInstances { get; init; }
+
+    public int TexturedRuntimeMeshInstances { get; init; }
+
+    public int FallbackMeshInstances { get; init; }
 }
 
 internal readonly record struct ClientRenderFrame(
@@ -515,6 +521,9 @@ internal sealed class ClientRenderHost : IDisposable
                         $"size={diagnostics.Surface.Width}x{diagnostics.Surface.Height} " +
                         $"instances={instanceRenderer.LastDiagnostics.VisibleInstances}/{renderWorld.InstanceCount} " +
                         $"lod={instanceRenderer.LastDiagnostics.HighLodInstances}/{instanceRenderer.LastDiagnostics.ReducedLodInstances} " +
+                        $"runtimeMeshes={instanceRenderer.LastDiagnostics.RuntimeMeshInstances} " +
+                        $"texturedRuntimeMeshes={instanceRenderer.LastDiagnostics.TexturedRuntimeMeshInstances} " +
+                        $"fallbackMeshes={instanceRenderer.LastDiagnostics.FallbackMeshInstances} " +
                         $"draws={terrainRenderer.LastDiagnostics.DrawCalls + instanceRenderer.LastDiagnostics.DrawCalls + debugDrawRenderer.LastDiagnostics.DrawCalls} " +
                         $"terrainSubmitMs={terrainRenderer.LastDiagnostics.CpuSubmissionMilliseconds:F3} " +
                         $"terrainTextures={terrainRenderer.LastDiagnostics.TextureBindingsPerDraw} " +
@@ -636,7 +645,13 @@ internal sealed class ClientRenderHost : IDisposable
                 DebugLayerWarningCount =
                     graphics.Debug.WarningCount,
                 DebugLayerErrorCount =
-                    graphics.Debug.ErrorCount
+                    graphics.Debug.ErrorCount,
+                RuntimeMeshInstances =
+                    instances.RuntimeMeshInstances,
+                TexturedRuntimeMeshInstances =
+                    instances.TexturedRuntimeMeshInstances,
+                FallbackMeshInstances =
+                    instances.FallbackMeshInstances
             };
 
         lock (_frameGate)

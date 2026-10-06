@@ -116,6 +116,19 @@ function Invoke-ClientSmoke {
         throw "Texture/material binding failures were reported during '$ExpectedMode' qualification."
     }
 
+    if ($metrics.runtimeMeshInstances -le 0) {
+        throw "No runtime mesh instances were rendered during '$ExpectedMode' qualification; production geometry may have fallen back to development primitives."
+    }
+
+    if ($metrics.texturedRuntimeMeshInstances -le 0) {
+        throw "No textured runtime mesh instances were rendered during '$ExpectedMode' qualification; production material sampling was not exercised."
+    }
+
+    if ($metrics.visibleTerrainChunks -le 0 -or
+        $metrics.terrainDrawCalls -le 0) {
+        throw "No visible terrain draw was submitted during '$ExpectedMode' qualification."
+    }
+
     if ($metrics.terrainTextureBindingsPerDraw -gt 13 -or
         $metrics.terrainMaximumTextureSamplesPerPixel -gt 13) {
         throw "Terrain texture/sample budget exceeded the four-layer baseline during '$ExpectedMode' qualification."

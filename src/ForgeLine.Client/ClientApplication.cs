@@ -122,7 +122,7 @@ internal sealed class ClientApplication
                     frontendLoading.State));
             PumpBootFrame(window, bootRenderer);
             runtimeAssets =
-                TryLoadRuntimeAssets();
+                LoadRuntimeAssets();
 
             frontendLoading.Complete(
                 "Command interface ready");
@@ -2023,7 +2023,7 @@ internal sealed class ClientApplication
         }
     }
 
-    private static RuntimeAssetCatalog? TryLoadRuntimeAssets()
+    private static RuntimeAssetCatalog LoadRuntimeAssets()
     {
         RuntimeAssetDevelopmentBootstrap.EnsureAvailable();
 
@@ -2032,9 +2032,12 @@ internal sealed class ClientApplication
 
         if (!resolution.Found)
         {
-            Console.Error.WriteLine(
-                $"[assets:runtime] manifest=missing fallback=development candidates=\"{string.Join(';', resolution.CandidateRoots)}\"");
-            return null;
+            throw new InvalidOperationException(
+                "Production runtime assets are unavailable. " +
+                $"Expected '{RuntimeAssetCatalog.ManifestFileName}' in one of: " +
+                string.Join(
+                    "; ",
+                    resolution.CandidateRoots));
         }
 
         string runtimeRoot =
@@ -2042,9 +2045,73 @@ internal sealed class ClientApplication
         RuntimeAssetCatalog catalog =
             RuntimeAssetCatalog.Load(
                 runtimeRoot);
+
+        ValidateProductionRuntimeAsset(
+            catalog,
+            "building.directorate.command_core",
+            RuntimeAssetType.Mesh);
+        ValidateProductionRuntimeAsset(
+            catalog,
+            "unit.directorate.main_battle_tank",
+            RuntimeAssetType.Mesh);
+        ValidateProductionRuntimeAsset(
+            catalog,
+            "material.world.terrain.grass_ground",
+            RuntimeAssetType.Material);
+        ValidateProductionRuntimeAsset(
+            catalog,
+            "texture.world.terrain.rocky_scrub",
+            RuntimeAssetType.Texture);
+        ValidateProductionRuntimeAsset(
+            catalog,
+            "texture.directorate.material.painted_metal_base",
+            RuntimeAssetType.Texture);
+
         Console.WriteLine(
-            $"[assets:runtime] manifest=loaded assets={catalog.AssetIds.Count} root=\"{runtimeRoot}\"");
+            $"[assets:runtime] manifest=loaded assets={catalog.AssetIds.Count} root=\"{runtimeRoot}\" production=validated");
         return catalog;
+    }
+
+    private static void ValidateProductionRuntimeAsset(
+        RuntimeAssetCatalog catalog,
+        string rawAssetId,
+        RuntimeAssetType expectedType)
+    {
+        AssetId assetId =
+            AssetId.Parse(
+                rawAssetId);
+        RuntimeAssetRecord record =
+            catalog.Get(
+                assetId);
+
+        if (record.Type != expectedType)
+        {
+            throw new InvalidDataException(
+                $"Production runtime asset '{assetId}' has type {record.Type}; expected {expectedType}.");
+        }
+
+        RuntimeAssetContent content =
+            catalog.Read(
+                assetId);
+
+        switch (expectedType)
+        {
+            case RuntimeAssetType.Mesh:
+                _ = RuntimeMeshData.FromPayload(
+                    content.Payload);
+                break;
+            case RuntimeAssetType.Material:
+                _ = RuntimeMaterialData.FromPayload(
+                    content.Payload);
+                break;
+            case RuntimeAssetType.Texture:
+                _ = RuntimeTextureData.FromPayload(
+                    content.Payload);
+                break;
+            default:
+                throw new InvalidDataException(
+                    $"Production runtime asset '{assetId}' uses unsupported startup validation type {expectedType}.");
+        }
     }
 
     private static void WriteWindowState(string state, IWindow window)
