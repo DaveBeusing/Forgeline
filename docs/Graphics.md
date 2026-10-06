@@ -207,6 +207,27 @@ The current foundation:
 
 The Windows graphics smoke path now compiles the terrain vertex/pixel shaders, creates the terrain root signature and pipeline state, creates a depth target, binds indexed chunk geometry, and submits visible terrain so CI validates the native DXC and D3D12 world-rendering path.
 
+## Scene Lighting, Exposure, and Output Transfer
+
+World presentation uses one explicit scene-lighting configuration composed by the client render host and consumed by both terrain and repeated-instance rendering. The baseline is deliberately stable for an RTS camera rather than camera-reactive:
+
+- one normalized directional light with an explicit color and intensity;
+- a hemisphere-style ambient contribution that keeps shadow-facing geometry readable;
+- ambient occlusion as a bounded local visibility modifier rather than a substitute for lighting;
+- one manual exposure value;
+- an ACES-fitted tone-mapping curve;
+- explicit linear-to-sRGB output transfer for lit world surfaces.
+
+Base Color textures marked as sRGB are decoded by the D3D12 SRV before material math. Normal and ORM textures remain linear data. The swap chain intentionally remains R8G8B8A8_UNorm, so terrain and production-object shaders encode their final tone-mapped world color to sRGB before writing the back buffer. This avoids the previous path where linear material values were written directly to the UNorm surface and appeared substantially darker than intended.
+
+The transform is currently part of the terrain and object world-surface shaders instead of a general full-screen post-process. This keeps the change inside the existing one-pass world renderer, adds no full-screen draw call, and leaves player-facing UI/debug palettes on their established output path. A future HDR intermediate or general post-processing chain may centralize the output transform when such a chain is justified by additional effects.
+
+SceneLightingSettings is presentation-owned and contains the canonical defaults. The client settings file exposes sceneExposure (validated from 0.25 through 4.0) and composes that value into the immutable scene-lighting state before the render host starts. This gives development and qualification runs an explicit persisted exposure control without making exposure simulation state. Scene lighting never enters simulation state and cannot influence deterministic gameplay.
+
+The terrain shader already uses thirteen SRV descriptor tables. D3D12 root signatures are limited to 64 DWORDs, so terrain per-layer Base Color factors are packed as RGB10 values and roughness/metallic factors as paired UNorm16 values before scene-lighting constants are appended. The resulting terrain root-signature cost remains within the existing hardware limit without adding descriptors or draw calls.
+
+This baseline improves shadow-side form but does not implement cast-shadow maps. Directional shadow maps remain deferred until the renderer has a justified shadow-pass/resource design and the additional GPU/draw cost can be qualified against RTS camera coverage.
+
 ## Diagnostics
 
 Startup diagnostics include:
@@ -222,7 +243,7 @@ Startup diagnostics include:
 
 Runtime surface diagnostics expose current dimensions, frame index, suspended/occluded state, pending-resize state, resize generations, submitted-frame count, and successful-Present count. The frame counters form a low-overhead qualification heartbeat: submitted frames show that command submission continues, while successful Presents distinguish an active presentation path from a renderer that is only producing GPU work.
 
-Resource diagnostics expose current and peak loaded GPU texture count, current and peak resident texture bytes represented by supplied mip payloads, current and peak SRV descriptor usage/capacity, cumulative successful texture uploads/releases, and invalid texture-binding attempts. D3D12 frame GPU time is measured with timestamp queries resolved into a readback buffer only after the corresponding frame fence completes. When the debug layer is enabled, warning/error counts are collected through the D3D12 info queue. Presentation additionally reports resolved material count, loaded asset texture count, material/texture fallback failures, terrain control-texture count, fixed terrain texture bindings/samples per draw, and CPU terrain submission time.
+Resource diagnostics expose current and peak loaded GPU texture count, current and peak resident texture bytes represented by supplied mip payloads, current and peak SRV descriptor usage/capacity, cumulative successful texture uploads/releases, and invalid texture-binding attempts. D3D12 frame GPU time is measured with timestamp queries resolved into a readback buffer only after the corresponding frame fence completes. When the debug layer is enabled, warning/error counts are collected through the D3D12 info queue. Presentation additionally reports resolved material count, loaded asset texture count, material/texture fallback failures, terrain control-texture count, fixed terrain texture bindings/samples per draw, CPU terrain submission time, the active scene-light direction, directional/ambient intensity, manual exposure, and tone-mapping mode.
 
 Present and resize failures include the HRESULT, D3D12 device-removed reason, and selected adapter name.
 
@@ -251,7 +272,8 @@ This foundation deliberately does not implement:
 - advanced culling
 - indirect rendering
 - compute workloads
-- post-processing
+- general-purpose full-screen post-processing and HDR intermediates
+- cast-shadow maps
 - editor rendering
 - Vulkan
 

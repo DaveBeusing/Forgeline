@@ -18,6 +18,8 @@ internal sealed record ClientUserSettings
     private const float MaximumUiScale = 2.0f;
     private const float MinimumCameraPanSpeedMultiplier = 0.5f;
     private const float MaximumCameraPanSpeedMultiplier = 2.5f;
+    private const float MinimumSceneExposure = 0.25f;
+    private const float MaximumSceneExposure = 4.0f;
 
     public int SchemaVersion { get; init; } = CurrentSchemaVersion;
 
@@ -34,6 +36,9 @@ internal sealed record ClientUserSettings
     public bool EdgeScrollEnabled { get; init; } = true;
 
     public float CameraPanSpeedMultiplier { get; init; } = 1.0f;
+
+    public float SceneExposure { get; init; } =
+        SceneLightingSettings.Default.Exposure;
 
     public RtsCameraBindings CameraBindings { get; init; } = new();
 
@@ -69,6 +74,11 @@ internal sealed record ClientUserSettings
             MinimumCameraPanSpeedMultiplier,
             MaximumCameraPanSpeedMultiplier,
             nameof(CameraPanSpeedMultiplier));
+        RequireRange(
+            SceneExposure,
+            MinimumSceneExposure,
+            MaximumSceneExposure,
+            nameof(SceneExposure));
 
         ArgumentNullException.ThrowIfNull(CameraBindings);
         ValidateBindings(CameraBindings);
@@ -83,6 +93,13 @@ internal sealed record ClientUserSettings
             BorderlessFullscreen
                 ? WindowMode.BorderlessFullscreen
                 : WindowMode.Windowed);
+
+    public SceneLightingSettings CreateSceneLightingSettings() =>
+        SceneLightingSettings.Default with
+        {
+            Exposure =
+                SceneExposure
+        };
 
     public RtsCameraSettings CreateCameraSettings(
         Vector3 initialTarget) =>

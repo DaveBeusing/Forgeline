@@ -66,6 +66,21 @@ internal readonly record struct ClientVisualQualificationSnapshot(
     public int TexturedRuntimeMeshInstances { get; init; }
 
     public int FallbackMeshInstances { get; init; }
+
+    public float LightingDirectionX { get; init; }
+
+    public float LightingDirectionY { get; init; }
+
+    public float LightingDirectionZ { get; init; }
+
+    public float LightingDirectionalIntensity { get; init; }
+
+    public float LightingAmbientIntensity { get; init; }
+
+    public float LightingExposure { get; init; }
+
+    public string LightingToneMapping { get; init; } =
+        string.Empty;
 }
 
 internal readonly record struct ClientRenderFrame(
@@ -99,6 +114,7 @@ internal sealed class ClientRenderHost : IDisposable
     private readonly PresentationSnapshotBuffer? _snapshots;
     private readonly RtsCameraSettings? _cameraSettings;
     private readonly RuntimeAssetCatalog? _runtimeAssets;
+    private readonly SceneLightingSettings _sceneLighting;
     private readonly Action<ClientRenderFrame>? _testRenderAction;
     private readonly AutoResetEvent _signal = new(false);
     private readonly ManualResetEventSlim _started = new(false);
@@ -116,7 +132,8 @@ internal sealed class ClientRenderHost : IDisposable
         TerrainWorld terrain,
         PresentationSnapshotBuffer snapshots,
         RtsCameraSettings cameraSettings,
-        RuntimeAssetCatalog? runtimeAssets = null)
+        RuntimeAssetCatalog? runtimeAssets = null,
+        SceneLightingSettings? sceneLighting = null)
     {
         initialTarget.Validate();
         _initialTarget = initialTarget;
@@ -131,6 +148,10 @@ internal sealed class ClientRenderHost : IDisposable
             throw new ArgumentNullException(nameof(cameraSettings));
         _runtimeAssets =
             runtimeAssets;
+        _sceneLighting =
+            sceneLighting ??
+            SceneLightingSettings.Default;
+        _sceneLighting.Validate();
 
         _thread =
             CreateThread();
@@ -145,6 +166,8 @@ internal sealed class ClientRenderHost : IDisposable
         _testRenderAction =
             renderAction ??
             throw new ArgumentNullException(nameof(renderAction));
+        _sceneLighting =
+            SceneLightingSettings.Default;
         _thread =
             CreateThread();
         _thread.Start();
@@ -276,11 +299,13 @@ internal sealed class ClientRenderHost : IDisposable
                 new TerrainRenderer(
                     graphics,
                     terrain,
-                    runtimeAssets: _runtimeAssets);
+                    runtimeAssets: _runtimeAssets,
+                    lighting: _sceneLighting);
             using var instanceRenderer =
                 new SimpleInstanceRenderer(
                     graphics,
-                    _runtimeAssets);
+                    _runtimeAssets,
+                    _sceneLighting);
             using var debugDrawRenderer =
                 new DebugDrawRenderer(
                     graphics);
@@ -508,7 +533,8 @@ internal sealed class ClientRenderHost : IDisposable
                     instanceRenderer.MaterialDiagnostics,
                     debugDrawRenderer.LastDiagnostics,
                     snapshot.VfxMetrics,
-                    renderWorld.InstanceCount);
+                    renderWorld.InstanceCount,
+                    _sceneLighting);
 
                 if (StopwatchElapsed(
                         nextDiagnosticAt,
@@ -527,6 +553,9 @@ internal sealed class ClientRenderHost : IDisposable
                         $"draws={terrainRenderer.LastDiagnostics.DrawCalls + instanceRenderer.LastDiagnostics.DrawCalls + debugDrawRenderer.LastDiagnostics.DrawCalls} " +
                         $"terrainSubmitMs={terrainRenderer.LastDiagnostics.CpuSubmissionMilliseconds:F3} " +
                         $"terrainTextures={terrainRenderer.LastDiagnostics.TextureBindingsPerDraw} " +
+                        $"light={_sceneLighting.DirectionalIntensity:F2}/{_sceneLighting.AmbientIntensity:F2} " +
+                        $"exposure={_sceneLighting.Exposure:F2} " +
+                        $"tone={_sceneLighting.ToneMapping} " +
                         $"vfx={snapshot.VfxMetrics.ActiveTransientEffects}/{snapshot.VfxMetrics.PoolCapacity} " +
                         $"vfxDropped={snapshot.VfxMetrics.TotalDropped}");
                     nextDiagnosticAt =
@@ -589,7 +618,8 @@ internal sealed class ClientRenderHost : IDisposable
         in RuntimeMaterialDiagnostics materials,
         in DebugDrawRenderDiagnostics debug,
         in VfxPresentationMetrics vfx,
-        int totalInstances)
+        int totalInstances,
+        in SceneLightingSettings lighting)
     {
         var snapshot =
             new ClientVisualQualificationSnapshot(
@@ -651,7 +681,21 @@ internal sealed class ClientRenderHost : IDisposable
                 TexturedRuntimeMeshInstances =
                     instances.TexturedRuntimeMeshInstances,
                 FallbackMeshInstances =
-                    instances.FallbackMeshInstances
+                    instances.FallbackMeshInstances,
+                LightingDirectionX =
+                    lighting.DirectionToLight.X,
+                LightingDirectionY =
+                    lighting.DirectionToLight.Y,
+                LightingDirectionZ =
+                    lighting.DirectionToLight.Z,
+                LightingDirectionalIntensity =
+                    lighting.DirectionalIntensity,
+                LightingAmbientIntensity =
+                    lighting.AmbientIntensity,
+                LightingExposure =
+                    lighting.Exposure,
+                LightingToneMapping =
+                    lighting.ToneMapping.ToString()
             };
 
         lock (_frameGate)

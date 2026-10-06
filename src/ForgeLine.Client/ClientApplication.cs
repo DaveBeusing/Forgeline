@@ -343,7 +343,8 @@ internal sealed class ClientApplication
                 terrainWorld,
                 snapshotBuffer,
                 camera.Settings,
-                runtimeAssets);
+                runtimeAssets,
+                _settings.CreateSceneLightingSettings());
 
         PlayerCommandSubmissionReceipt? lastCommandReceipt = null;
         PlayerCommandResultReadModel? lastCommandResult = null;
@@ -1272,6 +1273,9 @@ internal sealed class ClientApplication
             $"materials={metrics.LoadedMaterialCount} " +
             $"materialTextures={metrics.LoadedMaterialAssetTextureCount} " +
             $"bindingFailures={metrics.TextureBindingFailureCount + metrics.MaterialBindingFailureCount} " +
+            $"lighting={metrics.LightingDirectionalIntensity:F2}/{metrics.LightingAmbientIntensity:F2} " +
+            $"exposure={metrics.LightingExposure:F2} " +
+            $"tone={metrics.LightingToneMapping} " +
             $"windowMode={window.Mode} " +
             $"surface={metrics.Surface.Width}x{metrics.Surface.Height} " +
             $"submitted={metrics.Surface.SubmittedFrameCount} " +

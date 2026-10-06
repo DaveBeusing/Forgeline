@@ -8,7 +8,10 @@ namespace ForgeLine.Presentation;
 
 public sealed class SimpleInstanceRenderer : IDisposable
 {
-    private const int RootConstantCount = 16;
+    private const int MatrixRootConstantCount = 16;
+    private const int RootConstantCount =
+        MatrixRootConstantCount +
+        SceneLightingSettings.ShaderConstantCount;
     private const int FallbackVertexStride = 48;
     private const int InstanceStride = 112;
     private const int MinimumInstanceCapacity = 64;
@@ -19,14 +22,21 @@ public sealed class SimpleInstanceRenderer : IDisposable
     private readonly IGraphicsBuffer _vertexBuffer;
     private readonly IGraphicsBuffer _indexBuffer;
     private readonly RuntimeWorldAssetResources? _runtimeAssets;
+    private readonly SceneLightingSettings _lighting;
     private readonly Dictionary<int, FrameInstanceBuffer> _frameInstanceBuffers = [];
     private bool _disposed;
 
     public SimpleInstanceRenderer(
         IGraphicsDevice graphics,
-        RuntimeAssetCatalog? runtimeAssets = null)
+        RuntimeAssetCatalog? runtimeAssets = null,
+        SceneLightingSettings? lighting = null)
     {
         ArgumentNullException.ThrowIfNull(graphics);
+
+        _lighting =
+            lighting ??
+            SceneLightingSettings.Default;
+        _lighting.Validate();
 
         _graphics = graphics;
         _pipeline = CreatePipeline(graphics);
@@ -44,24 +54,45 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
         SimpleVertex[] vertices =
         [
-            new(-0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
-            new( 0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
-            new( 0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
-            new(-0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
-            new(-0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
-            new( 0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
-            new( 0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
-            new(-0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f)
+            new(-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new( 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new( 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new(-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+
+            new(-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new( 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new( 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new(-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+
+            new(-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new( 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new( 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new(-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+
+            new(-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new(-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new( 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            new( 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+
+            new( 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f),
+            new( 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f),
+            new( 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f),
+            new( 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f),
+
+            new(-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f),
+            new(-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f),
+            new(-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f),
+            new(-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f)
         ];
 
         ushort[] indices =
         [
-            0, 2, 1, 0, 3, 2,
-            4, 5, 6, 4, 6, 7,
-            0, 1, 5, 0, 5, 4,
-            3, 7, 6, 3, 6, 2,
-            1, 2, 6, 1, 6, 5,
-            0, 4, 7, 0, 7, 3
+             0,  2,  1,  0,  3,  2,
+             4,  5,  6,  4,  6,  7,
+             8,  9, 10,  8, 10, 11,
+            12, 13, 14, 12, 14, 15,
+            16, 17, 18, 16, 18, 19,
+            20, 21, 22, 20, 22, 23
         ];
 
         _vertexBuffer = graphics.CreateBuffer(
@@ -90,6 +121,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
     }
 
     public InstanceRenderDiagnostics LastDiagnostics { get; private set; }
+
+    public SceneLightingSettings Lighting =>
+        _lighting;
 
     public RuntimeMaterialDiagnostics MaterialDiagnostics =>
         _runtimeAssets?.MaterialDiagnostics ??
@@ -584,6 +618,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
         WriteMatrix(
             matrices.ViewProjection,
             constants);
+        _lighting.WriteShaderConstants(
+            constants[
+                MatrixRootConstantCount..]);
 
         int draws = 0;
 
@@ -752,11 +789,16 @@ public sealed class SimpleInstanceRenderer : IDisposable
             cbuffer InstanceFrame : register(b0)
             {
                 row_major float4x4 ViewProjection;
+                float4 SceneLightDirectionIntensity;
+                float4 SceneDirectionalColorAmbientIntensity;
+                float4 SceneAmbientColorExposure;
+                float2 SceneGroundAmbientToneMapping;
             };
 
             struct VertexInput
             {
                 float3 Position : POSITION;
+                float3 Normal : NORMAL;
                 float4 WorldRow0 : INSTANCEWORLD0;
                 float4 WorldRow1 : INSTANCEWORLD1;
                 float4 WorldRow2 : INSTANCEWORLD2;
@@ -768,6 +810,11 @@ public sealed class SimpleInstanceRenderer : IDisposable
             {
                 float4 Position : SV_Position;
                 float4 Color : COLOR0;
+                float3 WorldNormal : TEXCOORD0;
+                nointerpolation float4 SceneLight : TEXCOORD1;
+                nointerpolation float4 SceneDirectionalAmbient : TEXCOORD2;
+                nointerpolation float4 SceneAmbientExposure : TEXCOORD3;
+                nointerpolation float2 SceneGroundTone : TEXCOORD4;
             };
 
             VertexOutput VSMain(VertexInput input)
@@ -785,12 +832,28 @@ public sealed class SimpleInstanceRenderer : IDisposable
                             input.Position,
                             1.0f),
                         world);
+                float3x3 worldBasis =
+                    (float3x3)world;
+
                 output.Position =
                     mul(
                         worldPosition,
                         ViewProjection);
                 output.Color =
                     input.Color;
+                output.WorldNormal =
+                    normalize(
+                        mul(
+                            input.Normal,
+                            worldBasis));
+                output.SceneLight =
+                    SceneLightDirectionIntensity;
+                output.SceneDirectionalAmbient =
+                    SceneDirectionalColorAmbientIntensity;
+                output.SceneAmbientExposure =
+                    SceneAmbientColorExposure;
+                output.SceneGroundTone =
+                    SceneGroundAmbientToneMapping;
                 return output;
             }
             """;
@@ -800,11 +863,162 @@ public sealed class SimpleInstanceRenderer : IDisposable
             {
                 float4 Position : SV_Position;
                 float4 Color : COLOR0;
+                float3 WorldNormal : TEXCOORD0;
+                nointerpolation float4 SceneLight : TEXCOORD1;
+                nointerpolation float4 SceneDirectionalAmbient : TEXCOORD2;
+                nointerpolation float4 SceneAmbientExposure : TEXCOORD3;
+                nointerpolation float2 SceneGroundTone : TEXCOORD4;
             };
+
+            float3 ToneMapAces(float3 value)
+            {
+                const float a = 2.51f;
+                const float b = 0.03f;
+                const float c = 2.43f;
+                const float d = 0.59f;
+                const float e = 0.14f;
+
+                return saturate(
+                    (value *
+                        (a * value + b)) /
+                    (value *
+                        (c * value + d) +
+                     e));
+            }
+
+            float3 LinearToSrgb(float3 value)
+            {
+                value =
+                    max(
+                        value,
+                        0.0f);
+                float3 low =
+                    value *
+                    12.92f;
+                float3 high =
+                    1.055f *
+                    pow(
+                        max(
+                            value,
+                            0.0031308f),
+                        1.0f / 2.4f) -
+                    0.055f;
+
+                return lerp(
+                    low,
+                    high,
+                    step(
+                        float3(
+                            0.0031308f,
+                            0.0031308f,
+                            0.0031308f),
+                        value));
+            }
+
+            float3 ApplySceneLighting(
+                float3 albedo,
+                float3 worldNormal,
+                float ambientOcclusion,
+                float roughness,
+                float metallic,
+                float3 emissive,
+                float4 sceneLight,
+                float4 sceneDirectionalAmbient,
+                float4 sceneAmbientExposure,
+                float2 sceneGroundTone)
+            {
+                float3 normal =
+                    normalize(
+                        worldNormal);
+                float lightFacing =
+                    saturate(
+                        dot(
+                            normal,
+                            normalize(
+                                sceneLight.xyz)));
+                float hemisphere =
+                    saturate(
+                        normal.y *
+                            0.5f +
+                        0.5f);
+                float ambientShape =
+                    lerp(
+                        sceneGroundTone.x,
+                        1.0f,
+                        hemisphere);
+                float aoResponse =
+                    lerp(
+                        0.55f,
+                        1.0f,
+                        saturate(
+                            ambientOcclusion));
+                float3 ambient =
+                    sceneAmbientExposure.rgb *
+                    sceneDirectionalAmbient.w *
+                    ambientShape *
+                    aoResponse;
+                float3 direct =
+                    sceneDirectionalAmbient.rgb *
+                    sceneLight.w *
+                    lightFacing;
+                float diffuseEnergy =
+                    lerp(
+                        1.0f,
+                        0.72f,
+                        saturate(
+                            metallic));
+                float roughnessResponse =
+                    lerp(
+                        1.02f,
+                        0.94f,
+                        saturate(
+                            roughness));
+                float3 linearColor =
+                    albedo *
+                    (ambient + direct) *
+                    diffuseEnergy *
+                    roughnessResponse +
+                    emissive;
+
+                linearColor *=
+                    sceneAmbientExposure.w;
+
+                if (sceneGroundTone.y >= 0.5f)
+                {
+                    linearColor =
+                        ToneMapAces(
+                            linearColor);
+                }
+                else
+                {
+                    linearColor =
+                        saturate(
+                            linearColor);
+                }
+
+                return LinearToSrgb(
+                    saturate(
+                        linearColor));
+            }
 
             float4 PSMain(PixelInput input) : SV_Target0
             {
-                return input.Color;
+                float3 color =
+                    ApplySceneLighting(
+                        input.Color.rgb,
+                        input.WorldNormal,
+                        1.0f,
+                        0.82f,
+                        0.0f,
+                        0.0f,
+                        input.SceneLight,
+                        input.SceneDirectionalAmbient,
+                        input.SceneAmbientExposure,
+                        input.SceneGroundTone);
+
+                return float4(
+                    color,
+                    input.Color.a);
             }
             """;
 
@@ -835,6 +1049,11 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         0,
                         GraphicsVertexElementFormat.Float3,
                         0),
+                    new GraphicsVertexElement(
+                        "NORMAL",
+                        0,
+                        GraphicsVertexElementFormat.Float3,
+                        12),
                     new GraphicsVertexElement(
                         "INSTANCEWORLD",
                         0,
@@ -890,6 +1109,10 @@ public sealed class SimpleInstanceRenderer : IDisposable
             cbuffer InstanceFrame : register(b0)
             {
                 row_major float4x4 ViewProjection;
+                float4 SceneLightDirectionIntensity;
+                float4 SceneDirectionalColorAmbientIntensity;
+                float4 SceneAmbientColorExposure;
+                float2 SceneGroundAmbientToneMapping;
             };
 
             struct VertexInput
@@ -916,6 +1139,10 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 float4 WorldTangent : TEXCOORD2;
                 float4 Material0 : TEXCOORD3;
                 float4 Material1 : TEXCOORD4;
+                nointerpolation float4 SceneLight : TEXCOORD5;
+                nointerpolation float4 SceneDirectionalAmbient : TEXCOORD6;
+                nointerpolation float4 SceneAmbientExposure : TEXCOORD7;
+                nointerpolation float2 SceneGroundTone : TEXCOORD8;
             };
 
             VertexOutput VSMain(VertexInput input)
@@ -959,6 +1186,14 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     input.Material0;
                 output.Material1 =
                     input.Material1;
+                output.SceneLight =
+                    SceneLightDirectionIntensity;
+                output.SceneDirectionalAmbient =
+                    SceneDirectionalColorAmbientIntensity;
+                output.SceneAmbientExposure =
+                    SceneAmbientColorExposure;
+                output.SceneGroundTone =
+                    SceneGroundAmbientToneMapping;
                 return output;
             }
             """;
@@ -979,6 +1214,10 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 float4 WorldTangent : TEXCOORD2;
                 float4 Material0 : TEXCOORD3;
                 float4 Material1 : TEXCOORD4;
+                nointerpolation float4 SceneLight : TEXCOORD5;
+                nointerpolation float4 SceneDirectionalAmbient : TEXCOORD6;
+                nointerpolation float4 SceneAmbientExposure : TEXCOORD7;
+                nointerpolation float2 SceneGroundTone : TEXCOORD8;
             };
 
             float3 BuildFallbackTangent(float3 normal)
@@ -991,6 +1230,137 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     cross(
                         axis,
                         normal));
+            }
+
+            float3 ToneMapAces(float3 value)
+            {
+                const float a = 2.51f;
+                const float b = 0.03f;
+                const float c = 2.43f;
+                const float d = 0.59f;
+                const float e = 0.14f;
+
+                return saturate(
+                    (value *
+                        (a * value + b)) /
+                    (value *
+                        (c * value + d) +
+                     e));
+            }
+
+            float3 LinearToSrgb(float3 value)
+            {
+                value =
+                    max(
+                        value,
+                        0.0f);
+                float3 low =
+                    value *
+                    12.92f;
+                float3 high =
+                    1.055f *
+                    pow(
+                        max(
+                            value,
+                            0.0031308f),
+                        1.0f / 2.4f) -
+                    0.055f;
+
+                return lerp(
+                    low,
+                    high,
+                    step(
+                        float3(
+                            0.0031308f,
+                            0.0031308f,
+                            0.0031308f),
+                        value));
+            }
+
+            float3 ApplySceneLighting(
+                float3 albedo,
+                float3 worldNormal,
+                float ambientOcclusion,
+                float roughness,
+                float metallic,
+                float3 emissive,
+                float4 sceneLight,
+                float4 sceneDirectionalAmbient,
+                float4 sceneAmbientExposure,
+                float2 sceneGroundTone)
+            {
+                float3 normal =
+                    normalize(
+                        worldNormal);
+                float lightFacing =
+                    saturate(
+                        dot(
+                            normal,
+                            normalize(
+                                sceneLight.xyz)));
+                float hemisphere =
+                    saturate(
+                        normal.y *
+                            0.5f +
+                        0.5f);
+                float ambientShape =
+                    lerp(
+                        sceneGroundTone.x,
+                        1.0f,
+                        hemisphere);
+                float aoResponse =
+                    lerp(
+                        0.55f,
+                        1.0f,
+                        saturate(
+                            ambientOcclusion));
+                float3 ambient =
+                    sceneAmbientExposure.rgb *
+                    sceneDirectionalAmbient.w *
+                    ambientShape *
+                    aoResponse;
+                float3 direct =
+                    sceneDirectionalAmbient.rgb *
+                    sceneLight.w *
+                    lightFacing;
+                float diffuseEnergy =
+                    lerp(
+                        1.0f,
+                        0.72f,
+                        saturate(
+                            metallic));
+                float roughnessResponse =
+                    lerp(
+                        1.02f,
+                        0.94f,
+                        saturate(
+                            roughness));
+                float3 linearColor =
+                    albedo *
+                    (ambient + direct) *
+                    diffuseEnergy *
+                    roughnessResponse +
+                    emissive;
+
+                linearColor *=
+                    sceneAmbientExposure.w;
+
+                if (sceneGroundTone.y >= 0.5f)
+                {
+                    linearColor =
+                        ToneMapAces(
+                            linearColor);
+                }
+                else
+                {
+                    linearColor =
+                        saturate(
+                            linearColor);
+                }
+
+                return LinearToSrgb(
+                    saturate(
+                        linearColor));
             }
 
             float4 PSMain(PixelInput input) : SV_Target0
@@ -1054,7 +1424,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         tangentNormal.z);
 
                 float ambientOcclusion =
-                    saturate(orm.r);
+                    saturate(
+                        orm.r);
                 float roughness =
                     saturate(
                         orm.g *
@@ -1063,46 +1434,23 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     saturate(
                         orm.b *
                         input.Material0.w);
-                float normalFacing =
-                    saturate(
-                        dot(
-                            worldNormal,
-                            normalize(
-                                float3(
-                                    0.35f,
-                                    0.85f,
-                                    0.4f))));
-
-                float materialResponse =
-                    lerp(
-                        0.92f,
-                        1.0f,
-                        ambientOcclusion);
-                materialResponse *=
-                    lerp(
-                        0.96f,
-                        1.04f,
-                        normalFacing);
-                materialResponse *=
-                    lerp(
-                        1.0f,
-                        0.98f,
-                        roughness);
-                materialResponse *=
-                    lerp(
-                        1.0f,
-                        0.99f,
-                        metallic);
-
-                float3 rgb =
-                    baseColor.rgb *
-                    input.Color.rgb *
-                    materialResponse +
-                    emissive *
-                    input.Material1.x;
+                float3 color =
+                    ApplySceneLighting(
+                        baseColor.rgb *
+                        input.Color.rgb,
+                        worldNormal,
+                        ambientOcclusion,
+                        roughness,
+                        metallic,
+                        emissive *
+                        input.Material1.x,
+                        input.SceneLight,
+                        input.SceneDirectionalAmbient,
+                        input.SceneAmbientExposure,
+                        input.SceneGroundTone);
 
                 return float4(
-                    rgb,
+                    color,
                     baseColor.a *
                     input.Color.a);
             }
