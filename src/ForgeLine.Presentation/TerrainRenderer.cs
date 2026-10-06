@@ -18,7 +18,10 @@ public enum TerrainDebugVisualizationMode : byte
 
 public sealed class TerrainRenderer : IDisposable
 {
-    private const int TerrainRootConstantCount = 49;
+    private const int TerrainBaseRootConstantCount = 49;
+    private const int TerrainRootConstantCount =
+        TerrainBaseRootConstantCount +
+        SceneLightingSettings.ShaderConstantCount;
     private const int TerrainTextureCount = 13;
     private const int LayerCount = TerrainChunkSplatData.LayerCount;
 
@@ -28,6 +31,7 @@ public sealed class TerrainRenderer : IDisposable
     private readonly IGraphicsTexture? _fallbackBaseColor;
     private readonly IGraphicsTexture? _fallbackNormal;
     private readonly IGraphicsTexture? _fallbackOrm;
+    private readonly SceneLightingSettings _lighting;
 
     private bool _disposed;
 
@@ -36,10 +40,16 @@ public sealed class TerrainRenderer : IDisposable
         TerrainWorld world,
         TerrainMeshSettings? meshSettings = null,
         TerrainPresentationProfile? presentationProfile = null,
-        RuntimeAssetCatalog? runtimeAssets = null)
+        RuntimeAssetCatalog? runtimeAssets = null,
+        SceneLightingSettings? lighting = null)
     {
         ArgumentNullException.ThrowIfNull(graphics);
         ArgumentNullException.ThrowIfNull(world);
+
+        _lighting =
+            lighting ??
+            SceneLightingSettings.Default;
+        _lighting.Validate();
 
         TerrainMeshSettings resolvedMeshSettings =
             meshSettings ??
@@ -200,6 +210,9 @@ public sealed class TerrainRenderer : IDisposable
 
     public TerrainDebugVisualizationMode DebugVisualizationMode { get; set; }
 
+    public SceneLightingSettings Lighting =>
+        _lighting;
+
     public TerrainRenderDiagnostics LastDiagnostics { get; private set; }
 
     public RuntimeMaterialDiagnostics MaterialDiagnostics =>
@@ -237,6 +250,9 @@ public sealed class TerrainRenderer : IDisposable
         WriteMatrix(
             matrices.ViewProjection,
             constants);
+        _lighting.WriteShaderConstants(
+            constants[
+                TerrainBaseRootConstantCount..]);
 
         foreach (TerrainChunkRenderResource resource in _resources)
         {
@@ -435,6 +451,10 @@ public sealed class TerrainRenderer : IDisposable
                 float4 LayerRoughness;
                 float4 LayerMetallic;
                 uint PackedPaletteSlots;
+                float4 SceneLightDirectionIntensity;
+                float4 SceneDirectionalColorAmbientIntensity;
+                float4 SceneAmbientColorExposure;
+                float2 SceneGroundAmbientToneMapping;
             };
 
             struct VertexInput
@@ -462,6 +482,10 @@ public sealed class TerrainRenderer : IDisposable
                 nointerpolation float4 LayerRoughness : TEXCOORD10;
                 nointerpolation float4 LayerMetallic : TEXCOORD11;
                 nointerpolation uint PackedPaletteSlots : TEXCOORD12;
+                nointerpolation float4 SceneLight : TEXCOORD13;
+                nointerpolation float4 SceneDirectionalAmbient : TEXCOORD14;
+                nointerpolation float4 SceneAmbientExposure : TEXCOORD15;
+                nointerpolation float2 SceneGroundTone : TEXCOORD16;
             };
 
             VertexOutput VSMain(VertexInput input)
@@ -501,6 +525,14 @@ public sealed class TerrainRenderer : IDisposable
                     LayerMetallic;
                 output.PackedPaletteSlots =
                     PackedPaletteSlots;
+                output.SceneLight =
+                    SceneLightDirectionIntensity;
+                output.SceneDirectionalAmbient =
+                    SceneDirectionalColorAmbientIntensity;
+                output.SceneAmbientExposure =
+                    SceneAmbientColorExposure;
+                output.SceneGroundTone =
+                    SceneGroundAmbientToneMapping;
                 return output;
             }
             """;
@@ -540,6 +572,10 @@ public sealed class TerrainRenderer : IDisposable
                 nointerpolation float4 LayerRoughness : TEXCOORD10;
                 nointerpolation float4 LayerMetallic : TEXCOORD11;
                 nointerpolation uint PackedPaletteSlots : TEXCOORD12;
+                nointerpolation float4 SceneLight : TEXCOORD13;
+                nointerpolation float4 SceneDirectionalAmbient : TEXCOORD14;
+                nointerpolation float4 SceneAmbientExposure : TEXCOORD15;
+                nointerpolation float2 SceneGroundTone : TEXCOORD16;
             };
 
             float4 NormalizeWeights(float4 weights)
@@ -585,6 +621,138 @@ public sealed class TerrainRenderer : IDisposable
                     0.72f *
                     frac(
                         seed);
+            }
+
+
+            float3 ToneMapAces(float3 value)
+            {
+                const float a = 2.51f;
+                const float b = 0.03f;
+                const float c = 2.43f;
+                const float d = 0.59f;
+                const float e = 0.14f;
+
+                return saturate(
+                    (value *
+                        (a * value + b)) /
+                    (value *
+                        (c * value + d) +
+                     e));
+            }
+
+            float3 LinearToSrgb(float3 value)
+            {
+                value =
+                    max(
+                        value,
+                        0.0f);
+                float3 low =
+                    value *
+                    12.92f;
+                float3 high =
+                    1.055f *
+                    pow(
+                        max(
+                            value,
+                            0.0031308f),
+                        1.0f / 2.4f) -
+                    0.055f;
+
+                return lerp(
+                    low,
+                    high,
+                    step(
+                        float3(
+                            0.0031308f,
+                            0.0031308f,
+                            0.0031308f),
+                        value));
+            }
+
+            float3 ApplySceneLighting(
+                float3 albedo,
+                float3 worldNormal,
+                float ambientOcclusion,
+                float roughness,
+                float metallic,
+                float3 emissive,
+                float4 sceneLight,
+                float4 sceneDirectionalAmbient,
+                float4 sceneAmbientExposure,
+                float2 sceneGroundTone)
+            {
+                float3 normal =
+                    normalize(
+                        worldNormal);
+                float lightFacing =
+                    saturate(
+                        dot(
+                            normal,
+                            normalize(
+                                sceneLight.xyz)));
+                float hemisphere =
+                    saturate(
+                        normal.y *
+                            0.5f +
+                        0.5f);
+                float ambientShape =
+                    lerp(
+                        sceneGroundTone.x,
+                        1.0f,
+                        hemisphere);
+                float aoResponse =
+                    lerp(
+                        0.55f,
+                        1.0f,
+                        saturate(
+                            ambientOcclusion));
+                float3 ambient =
+                    sceneAmbientExposure.rgb *
+                    sceneDirectionalAmbient.w *
+                    ambientShape *
+                    aoResponse;
+                float3 direct =
+                    sceneDirectionalAmbient.rgb *
+                    sceneLight.w *
+                    lightFacing;
+                float diffuseEnergy =
+                    lerp(
+                        1.0f,
+                        0.72f,
+                        saturate(
+                            metallic));
+                float roughnessResponse =
+                    lerp(
+                        1.02f,
+                        0.94f,
+                        saturate(
+                            roughness));
+                float3 linearColor =
+                    albedo *
+                    (ambient + direct) *
+                    diffuseEnergy *
+                    roughnessResponse +
+                    emissive;
+
+                linearColor *=
+                    sceneAmbientExposure.w;
+
+                if (sceneGroundTone.y >= 0.5f)
+                {
+                    linearColor =
+                        ToneMapAces(
+                            linearColor);
+                }
+                else
+                {
+                    linearColor =
+                        saturate(
+                            linearColor);
+                }
+
+                return LinearToSrgb(
+                    saturate(
+                        linearColor));
             }
 
             float4 PSMain(PixelInput input) : SV_Target0
@@ -832,35 +1000,18 @@ public sealed class TerrainRenderer : IDisposable
                         weights.w) *
                     input.MacroTint.rgb;
 
-                float light =
-                    0.42f +
-                    0.58f *
-                    saturate(
-                        dot(
-                            blendedNormal,
-                            normalize(
-                                float3(
-                                    0.35f,
-                                    0.85f,
-                                    -0.25f))));
-                float ambient =
-                    lerp(
-                        0.68f,
-                        1.0f,
-                        ao);
-                float materialResponse =
-                    lerp(
-                        1.04f,
-                        0.93f,
-                        roughness) *
-                    lerp(
-                        1.0f,
-                        0.94f,
-                        metallic);
-                color *=
-                    light *
-                    ambient *
-                    materialResponse;
+                color =
+                    ApplySceneLighting(
+                        color,
+                        blendedNormal,
+                        ao,
+                        roughness,
+                        metallic,
+                        0.0f,
+                        input.SceneLight,
+                        input.SceneDirectionalAmbient,
+                        input.SceneAmbientExposure,
+                        input.SceneGroundTone);
 
                 if (input.DebugChunks > 0.5f)
                 {
@@ -886,8 +1037,7 @@ public sealed class TerrainRenderer : IDisposable
                 }
 
                 return float4(
-                    saturate(
-                        color),
+                    color,
                     1.0f);
             }
             """;
