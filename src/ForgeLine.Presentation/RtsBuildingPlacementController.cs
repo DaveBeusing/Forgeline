@@ -74,9 +74,18 @@ public sealed class RtsBuildingPlacementController
         ArgumentNullException.ThrowIfNull(terrain);
         ArgumentNullException.ThrowIfNull(interaction);
 
+        bool shiftDown =
+            input.IsKeyDown(
+                PlatformKey.LeftShift) ||
+            input.IsKeyDown(
+                PlatformKey.RightShift);
+
         BuildingId previousBuilding =
             ActiveBuilding;
-        UpdateBuildingSelection(input);
+        UpdateBuildingSelection(
+            input,
+            allowSelection:
+                !shiftDown);
 
         if (previousBuilding != ActiveBuilding)
         {
@@ -90,6 +99,7 @@ public sealed class RtsBuildingPlacementController
 
         if (rotateDown &&
             !_rotateWasDown &&
+            !shiftDown &&
             IsActive)
         {
             Orientation =
@@ -287,41 +297,50 @@ public sealed class RtsBuildingPlacementController
     }
 
     private void UpdateBuildingSelection(
-        InputState input)
+        InputState input,
+        bool allowSelection)
     {
         UpdateSelectionKey(
             input,
             PlatformKey.F4,
-            BuildingIds.CommandCore);
+            BuildingIds.CommandCore,
+            allowSelection);
         UpdateSelectionKey(
             input,
             PlatformKey.F5,
-            BuildingIds.PowerPlant);
+            BuildingIds.PowerPlant,
+            allowSelection);
         UpdateSelectionKey(
             input,
             PlatformKey.F6,
-            BuildingIds.Extractor);
+            BuildingIds.Extractor,
+            allowSelection);
         UpdateSelectionKey(
             input,
             PlatformKey.F7,
-            BuildingIds.StorageDepot);
+            BuildingIds.StorageDepot,
+            allowSelection);
         UpdateSelectionKey(
             input,
             PlatformKey.F8,
-            BuildingIds.Smelter);
+            BuildingIds.Smelter,
+            allowSelection);
     }
 
     private void UpdateSelectionKey(
         InputState input,
         PlatformKey key,
-        BuildingId buildingId)
+        BuildingId buildingId,
+        bool allowSelection)
     {
         bool down =
             input.IsKeyDown(key);
         bool wasDown =
             _selectionKeys[key];
 
-        if (down && !wasDown)
+        if (down &&
+            !wasDown &&
+            allowSelection)
         {
             ActiveBuilding =
                 buildingId;
