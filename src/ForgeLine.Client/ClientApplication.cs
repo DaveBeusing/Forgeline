@@ -245,9 +245,9 @@ internal sealed class ClientApplication
                 presentationInteraction,
                 commandGateway);
 
-        simulation.RegisterTickObserver(
+        simulation.AttachTickObserver(
             commandGateway);
-        simulation.RegisterTickObserver(
+        simulation.AttachTickObserver(
             new PresentationExtractor(
                 snapshotBuffer,
                 presentationExtraction,
