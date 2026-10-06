@@ -17,12 +17,17 @@ public sealed class DebugDrawRenderer : IDisposable
         new DebugVertex[MaxLines * 2];
     private bool _disposed;
 
-    public DebugDrawRenderer(IGraphicsDevice graphics)
+    public DebugDrawRenderer(
+        IGraphicsDevice graphics,
+        bool depthEnabled = true)
     {
         ArgumentNullException.ThrowIfNull(graphics);
 
         _graphics = graphics;
-        _pipeline = CreatePipeline(graphics);
+        _pipeline =
+            CreatePipeline(
+                graphics,
+                depthEnabled);
     }
 
     public DebugDrawRenderDiagnostics LastDiagnostics { get; private set; }
@@ -113,7 +118,8 @@ public sealed class DebugDrawRenderer : IDisposable
     }
 
     private static IGraphicsPipeline CreatePipeline(
-        IGraphicsDevice graphics)
+        IGraphicsDevice graphics,
+        bool depthEnabled)
     {
         const string vertexShaderSource = """
             cbuffer DebugFrame : register(b0)
@@ -186,7 +192,7 @@ public sealed class DebugDrawRenderer : IDisposable
                 ],
                 VertexRootConstantCount = RootConstantCount,
                 PrimitiveTopology = GraphicsPrimitiveTopology.LineList,
-                DepthEnabled = true
+                DepthEnabled = depthEnabled
             });
     }
 

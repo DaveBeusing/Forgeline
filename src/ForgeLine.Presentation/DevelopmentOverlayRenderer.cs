@@ -45,7 +45,8 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         TacticalTargetingView? tacticalTargeting = null,
         FormationTemplate activeFormation = FormationTemplate.Compact,
         PreAlphaUxView preAlphaUx = default,
-        float uiScale = 1.0f)
+        float uiScale = 1.0f,
+        DebugDraw? gameplayOverlay = null)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(context);
@@ -106,6 +107,19 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         builder.Append(metrics.Gen1Collections);
         builder.Append("/");
         builder.Append(metrics.Gen2Collections);
+        builder.NewLine();
+
+        builder.Append("OVERLAY GAME ");
+        builder.Append(metrics.GameplayOverlayLines);
+        builder.Append(" DEBUG ");
+        builder.Append(metrics.DebugOverlayLines);
+        builder.Append(" DROP ");
+        builder.Append(metrics.DebugOverlayDroppedLines);
+        builder.Append(" CPU ");
+        builder.Append(
+            metrics.DebugOverlayCpuMilliseconds,
+            "F3");
+        builder.Append("MS");
 
         EmitReadableText(
             builder.Written,
@@ -152,30 +166,25 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             context.Height);
 
         if (camera is not null &&
+            gameplayOverlay is not null &&
+            gameplayOverlay.Enabled)
+        {
+            EmitWorldLabels(
+                camera,
+                gameplayOverlay,
+                context.Width,
+                context.Height);
+        }
+
+        if (camera is not null &&
             debugDraw is not null &&
             debugDraw.Enabled)
         {
-            foreach (DebugLabel label in debugDraw.Labels)
-            {
-                ScreenProjection projection =
-                    camera.WorldToScreen(
-                        label.Position,
-                        context.Width,
-                        context.Height);
-
-                if (!projection.IsVisible)
-                {
-                    continue;
-                }
-
-                EmitText(
-                    label.Text.AsSpan(),
-                    projection.Position.X,
-                    projection.Position.Y,
-                    label.Color,
-                    context.Width,
-                    context.Height);
-            }
+            EmitWorldLabels(
+                camera,
+                debugDraw,
+                context.Width,
+                context.Height);
         }
 
         if (_vertexCount == 0)
@@ -193,6 +202,35 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         context.Draw(_vertexCount);
 
         LastRenderedVertexCount = _vertexCount;
+    }
+
+    private void EmitWorldLabels(
+        RtsCamera camera,
+        DebugDraw draw,
+        int width,
+        int height)
+    {
+        foreach (DebugLabel label in draw.Labels)
+        {
+            ScreenProjection projection =
+                camera.WorldToScreen(
+                    label.Position,
+                    width,
+                    height);
+
+            if (!projection.IsVisible)
+            {
+                continue;
+            }
+
+            EmitText(
+                label.Text.AsSpan(),
+                projection.Position.X,
+                projection.Position.Y,
+                label.Color,
+                width,
+                height);
+        }
     }
 
     private void EmitPlayerExperience(
