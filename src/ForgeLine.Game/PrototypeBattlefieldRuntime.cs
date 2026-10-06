@@ -647,7 +647,7 @@ public sealed class PrototypeBattlefieldRuntime
 
     private static List<Vector3> GetRoadNodeDirections(
         PrototypeBattlefieldDefinition definition,
-        IReadOnlyDictionary<string, Vector3> roadNodePositions,
+        Dictionary<string, Vector3> roadNodePositions,
         string nodeKey,
         Vector3 nodePosition)
     {
