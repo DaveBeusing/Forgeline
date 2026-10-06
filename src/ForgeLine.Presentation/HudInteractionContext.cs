@@ -1,0 +1,54 @@
+using System.Numerics;
+using ForgeLine.Simulation;
+
+namespace ForgeLine.Presentation;
+
+public sealed class HudInteractionContext
+{
+    private SimulationSessionId _sessionId;
+
+    public SimulationSessionId SessionId =>
+        _sessionId;
+
+    public bool PointerCaptured { get; private set; }
+
+    public bool KeyboardCaptured { get; private set; }
+
+    public void BeginFrame(
+        SimulationSessionId sessionId)
+    {
+        if (sessionId.IsSpecified &&
+            sessionId != _sessionId)
+        {
+            _sessionId = sessionId;
+        }
+
+        PointerCaptured = false;
+        KeyboardCaptured = false;
+    }
+
+    public void CapturePointer(
+        bool captured = true)
+    {
+        PointerCaptured |= captured;
+    }
+
+    public void CaptureKeyboard(
+        bool captured = true)
+    {
+        KeyboardCaptured |= captured;
+    }
+
+    public bool HitTest(
+        Vector2 pointer,
+        in HudRect region) =>
+        region.Contains(pointer);
+
+    public void Reset()
+    {
+        _sessionId =
+            SimulationSessionId.None;
+        PointerCaptured = false;
+        KeyboardCaptured = false;
+    }
+}
