@@ -57,6 +57,16 @@ public static class InfrastructurePresentationCatalog
                     _ =>
                         "infrastructure.directorate.bridge.road.intact"
                 },
+            InfrastructurePresentationKind.RoadShoulder =>
+                "infrastructure.directorate.road.shoulder",
+            InfrastructurePresentationKind.RoadCurveShort =>
+                "infrastructure.directorate.road.curve_short",
+            InfrastructurePresentationKind.RoadCurveLong =>
+                "infrastructure.directorate.road.curve_long",
+            InfrastructurePresentationKind.RoadJunctionT =>
+                "infrastructure.directorate.road.junction_t",
+            InfrastructurePresentationKind.RoadJunctionCross =>
+                "infrastructure.directorate.road.junction_cross",
             InfrastructurePresentationKind.RoadSegment or
             InfrastructurePresentationKind.Ford =>
                 feature.State switch
@@ -149,6 +159,13 @@ public static class InfrastructurePresentationCatalog
             {
                 InfrastructurePresentationKind.RoadBridge =>
                     0.25f,
+                InfrastructurePresentationKind.RoadShoulder =>
+                    0.42f,
+                InfrastructurePresentationKind.RoadCurveShort or
+                InfrastructurePresentationKind.RoadCurveLong or
+                InfrastructurePresentationKind.RoadJunctionT or
+                InfrastructurePresentationKind.RoadJunctionCross =>
+                    0.49f,
                 InfrastructurePresentationKind.RoadSegment or
                 InfrastructurePresentationKind.Ford =>
                     0.48f,

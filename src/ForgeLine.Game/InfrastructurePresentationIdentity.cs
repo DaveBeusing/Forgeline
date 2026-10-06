@@ -4,7 +4,12 @@ public enum InfrastructurePresentationKind : byte
 {
     RoadSegment = 1,
     RoadBridge = 2,
-    Ford = 3
+    Ford = 3,
+    RoadShoulder = 4,
+    RoadCurveShort = 5,
+    RoadCurveLong = 6,
+    RoadJunctionT = 7,
+    RoadJunctionCross = 8
 }
 
 public readonly record struct InfrastructurePresentationIdentity
