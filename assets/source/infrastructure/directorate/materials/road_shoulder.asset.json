@@ -1,0 +1,5 @@
+{
+  "id": "material.directorate.infrastructure.road_shoulder",
+  "type": "material",
+  "source": "road_shoulder.material.json"
+}

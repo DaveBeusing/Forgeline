@@ -26,6 +26,10 @@ public static class InfrastructurePresentationCatalog
 {
     public const string RoadMaterialAssetId =
         "material.directorate.infrastructure.road";
+    public const string RoadShoulderMaterialAssetId =
+        "material.directorate.infrastructure.road_shoulder";
+    public const string RoadDamagedMaterialAssetId =
+        "material.directorate.infrastructure.road_damaged";
     public const string BridgeMaterialAssetId =
         "material.directorate.infrastructure.bridge";
 
@@ -71,11 +75,26 @@ public static class InfrastructurePresentationCatalog
     }
 
     public static string ResolveMaterialAssetId(
-        in InfrastructureFeaturePresentationMetadata feature) =>
-        feature.Kind ==
-        InfrastructurePresentationKind.RoadBridge
-            ? BridgeMaterialAssetId
-            : RoadMaterialAssetId;
+        in InfrastructureFeaturePresentationMetadata feature)
+    {
+        if (feature.Kind ==
+            InfrastructurePresentationKind.RoadBridge)
+        {
+            return BridgeMaterialAssetId;
+        }
+
+        if (feature.Kind ==
+            InfrastructurePresentationKind.RoadShoulder)
+        {
+            return RoadShoulderMaterialAssetId;
+        }
+
+        return feature.State is
+            InfrastructurePresentationState.Restoring or
+            InfrastructurePresentationState.Disabled
+                ? RoadDamagedMaterialAssetId
+                : RoadMaterialAssetId;
+    }
 
     public static string ResolveStrategicSymbolAssetId(
         in InfrastructureFeaturePresentationMetadata feature) =>

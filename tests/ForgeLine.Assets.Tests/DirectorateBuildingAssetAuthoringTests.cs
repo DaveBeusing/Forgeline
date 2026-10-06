@@ -130,6 +130,8 @@ public sealed class DirectorateBuildingAssetAuthoringTests
                 "infrastructure.directorate.bridge.road.damaged",
                 "infrastructure.directorate.bridge.road.destroyed",
                 "material.directorate.infrastructure.road",
+                "material.directorate.infrastructure.road_shoulder",
+                "material.directorate.infrastructure.road_damaged",
                 "material.directorate.infrastructure.bridge",
                 "material.directorate.symbol.infrastructure.road",
                 "material.directorate.symbol.infrastructure.bridge"

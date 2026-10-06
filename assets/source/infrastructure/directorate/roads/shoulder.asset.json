@@ -3,6 +3,6 @@
   "type": "mesh",
   "source": "../sources/road_shoulder.gltf",
   "materialReferences": [
-    "material.directorate.infrastructure.road"
+    "material.directorate.infrastructure.road_shoulder"
   ]
 }
