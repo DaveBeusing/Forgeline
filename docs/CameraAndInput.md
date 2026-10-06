@@ -107,6 +107,14 @@ This prevents stuck camera motion and cancels an in-progress selection gesture w
 
 `RtsSelectionController` independently interprets left/right mouse state plus Shift for selection and movement intent. It owns no simulation state.
 
+## HUD input precedence
+
+`HudInteractionContext` is the reusable frame-scoped boundary between player-facing HUD interaction and world interaction. The client begins a fresh HUD interaction frame for the active simulation session, accumulates pointer/keyboard capture from the action and targeting surfaces, and evaluates that result before camera input, building placement, selection, movement, or other world gestures.
+
+The action panel uses the same `GameplayHudLayout` action-dock region for rendering origin and hit testing, so DPI/UI scaling cannot cause the visual panel and its pointer-capture bounds to drift apart. A new simulation session clears transient capture state before the new session can drive world interaction.
+
+HUD capture is presentation state only. It decides which input surface receives a gesture; it never authorizes or applies gameplay state changes. Player-authored changes continue through the existing request/command boundary.
+
 ## Camera State
 
 `RtsCamera` owns only presentation state:
