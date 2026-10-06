@@ -124,6 +124,54 @@ public sealed class GameplayHudFoundationTests
     }
 
     [Fact]
+    public void EarlierPointerCaptureCannotBeReleasedByLaterSurface()
+    {
+        var context =
+            new HudInteractionContext();
+
+        context.BeginFrame(
+            new SimulationSessionId(21));
+        context.CapturePointer();
+        context.CapturePointer(
+            captured: false);
+
+        Assert.True(
+            context.PointerCaptured);
+    }
+
+    [Fact]
+    public void ActionPanelHandlesMissingSnapshotWithoutCapturingWorldInput()
+    {
+        var controller =
+            new PlayerActionPanelController();
+        var input =
+            new ForgeLine.Input.InputState();
+
+        controller.Update(
+            input,
+            snapshot: null,
+            viewportWidth: 1600,
+            viewportHeight: 900,
+            dpi: 144,
+            uiScale: 1.25f);
+
+        PlayerActionPanelView view =
+            controller.CreateView(
+                1600,
+                900,
+                actions: null,
+                dpi: 144,
+                uiScale: 1.25f);
+
+        Assert.False(
+            view.IsOpen);
+        Assert.False(
+            controller.PointerCaptured);
+        Assert.False(
+            controller.HasKeyboardFocus);
+    }
+
+    [Fact]
     public void InteractionHitTestUsesNamedRegionBounds()
     {
         GameplayHudLayout layout =
