@@ -222,7 +222,7 @@ Base Color textures marked as sRGB are decoded by the D3D12 SRV before material 
 
 The transform is currently part of the terrain and object world-surface shaders instead of a general full-screen post-process. This keeps the change inside the existing one-pass world renderer, adds no full-screen draw call, and leaves player-facing UI/debug palettes on their established output path. A future HDR intermediate or general post-processing chain may centralize the output transform when such a chain is justified by additional effects.
 
-SceneLightingSettings is presentation-owned and contains the canonical defaults. It never enters simulation state and cannot influence deterministic gameplay.
+SceneLightingSettings is presentation-owned and contains the canonical defaults. The client settings file exposes sceneExposure (validated from 0.25 through 4.0) and composes that value into the immutable scene-lighting state before the render host starts. This gives development and qualification runs an explicit persisted exposure control without making exposure simulation state. Scene lighting never enters simulation state and cannot influence deterministic gameplay.
 
 The terrain shader already uses thirteen SRV descriptor tables. D3D12 root signatures are limited to 64 DWORDs, so terrain per-layer Base Color factors are packed as RGB10 values and roughness/metallic factors as paired UNorm16 values before scene-lighting constants are appended. The resulting terrain root-signature cost remains within the existing hardware limit without adding descriptors or draw calls.
 
