@@ -1,9 +1,9 @@
 {
   "baseColorTexture": "texture.world.terrain.cracked_earth",
   "baseColorFactor": [
-    0.2,
+    0.29,
+    0.25,
     0.18,
-    0.13,
     1
   ],
   "metallicFactor": 0,

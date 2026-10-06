@@ -110,7 +110,9 @@ The presentation tests separately validate the battlefield debug overlay.
 
 ## Runtime world and infrastructure presentation
 
-The prototype now combines its authoritative map data with compiled presentation assets. Non-crossing `GroundRoad` edges produce presentation-only road entities using the Directorate road material family. The functional North Bridge resolves intact, restoring/damaged, and disabled/destroyed runtime meshes directly from `StrategicInfrastructureState`; the South Ford remains a road-surface presentation.
+The prototype now combines its authoritative map data with compiled presentation assets. Non-crossing `GroundRoad` edges produce presentation-only 12-meter road surfaces with paired shoulders. Existing road-node connectivity also selects curve and junction overlay meshes so the Central Divide corridor reads as continuous physical infrastructure rather than isolated stretched strips. The functional North Bridge resolves intact, restoring/damaged, and disabled/destroyed runtime meshes directly from `StrategicInfrastructureState`; the South Ford remains a road-surface presentation.
+
+Road shoulders use a distinct mineral material to transition toward surrounding terrain, while the operational road surface uses a lighter reinforced-concrete treatment. Damage-ready road material/mesh bindings exist for later authoritative condition state, but no road-damage gameplay is inferred from appearance.
 
 These visual entities do not participate in logistics routing, capacity, navigation blocking, restoration progress, or crossing availability. Those facts continue to come exclusively from the existing logistics and strategic-infrastructure systems.
 

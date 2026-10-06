@@ -590,6 +590,13 @@ public sealed class PrototypeBattlefieldTests
 
         int roadPresentationCount =
             0;
+        int roadShoulderCount =
+            0;
+        int roadCurveCount =
+            0;
+        int roadJunctionCount =
+            0;
+
         foreach (EntityId entity in
                  simulation.Entities.Query<InfrastructurePresentationIdentity>())
         {
@@ -597,17 +604,42 @@ public sealed class PrototypeBattlefieldTests
                 simulation.Entities.GetComponent<InfrastructurePresentationIdentity>(
                     entity);
 
-            if (presentation.Kind ==
-                InfrastructurePresentationKind.RoadSegment)
+            switch (presentation.Kind)
             {
-                roadPresentationCount++;
+                case InfrastructurePresentationKind.RoadSegment:
+                    roadPresentationCount++;
+                    break;
+                case InfrastructurePresentationKind.RoadShoulder:
+                    roadShoulderCount++;
+                    break;
+                case InfrastructurePresentationKind.RoadCurveShort:
+                case InfrastructurePresentationKind.RoadCurveLong:
+                    roadCurveCount++;
+                    break;
+                case InfrastructurePresentationKind.RoadJunctionT:
+                case InfrastructurePresentationKind.RoadJunctionCross:
+                    roadJunctionCount++;
+                    break;
             }
         }
 
-        Assert.Equal(
+        int nonCrossingRoadCount =
             definition.RoadEdges.Count -
-            definition.Crossings.Count,
+            definition.Crossings.Count;
+
+        Assert.Equal(
+            nonCrossingRoadCount,
             roadPresentationCount);
+        Assert.Equal(
+            nonCrossingRoadCount *
+            2,
+            roadShoulderCount);
+        Assert.Equal(
+            4,
+            roadCurveCount);
+        Assert.Equal(
+            2,
+            roadJunctionCount);
 
         InfrastructurePresentationIdentity northBridge =
             simulation.Entities.GetComponent<InfrastructurePresentationIdentity>(

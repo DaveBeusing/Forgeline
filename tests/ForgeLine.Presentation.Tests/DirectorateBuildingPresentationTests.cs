@@ -278,6 +278,36 @@ public sealed class DirectorateBuildingPresentationTests
             "infrastructure.directorate.bridge.road.destroyed",
             InfrastructurePresentationCatalog.ResolveMeshAssetId(
                 disabledInstance.InfrastructureFeature));
+        Assert.Equal(
+            "infrastructure.directorate.road.shoulder",
+            InfrastructurePresentationCatalog.ResolveMeshAssetId(
+                new InfrastructureFeaturePresentationMetadata(
+                    InfrastructurePresentationKind.RoadShoulder,
+                    InfrastructurePresentationState.Operational)));
+        Assert.Equal(
+            "infrastructure.directorate.road.curve_short",
+            InfrastructurePresentationCatalog.ResolveMeshAssetId(
+                new InfrastructureFeaturePresentationMetadata(
+                    InfrastructurePresentationKind.RoadCurveShort,
+                    InfrastructurePresentationState.Operational)));
+        Assert.Equal(
+            "infrastructure.directorate.road.junction_t",
+            InfrastructurePresentationCatalog.ResolveMeshAssetId(
+                new InfrastructureFeaturePresentationMetadata(
+                    InfrastructurePresentationKind.RoadJunctionT,
+                    InfrastructurePresentationState.Operational)));
+        Assert.Equal(
+            InfrastructurePresentationCatalog.RoadShoulderMaterialAssetId,
+            InfrastructurePresentationCatalog.ResolveMaterialAssetId(
+                new InfrastructureFeaturePresentationMetadata(
+                    InfrastructurePresentationKind.RoadShoulder,
+                    InfrastructurePresentationState.Operational)));
+        Assert.Equal(
+            InfrastructurePresentationCatalog.RoadDamagedMaterialAssetId,
+            InfrastructurePresentationCatalog.ResolveMaterialAssetId(
+                new InfrastructureFeaturePresentationMetadata(
+                    InfrastructurePresentationKind.RoadSegment,
+                    InfrastructurePresentationState.Disabled)));
     }
 
     [Fact]

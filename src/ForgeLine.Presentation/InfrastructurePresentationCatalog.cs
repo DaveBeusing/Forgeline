@@ -26,6 +26,10 @@ public static class InfrastructurePresentationCatalog
 {
     public const string RoadMaterialAssetId =
         "material.directorate.infrastructure.road";
+    public const string RoadShoulderMaterialAssetId =
+        "material.directorate.infrastructure.road_shoulder";
+    public const string RoadDamagedMaterialAssetId =
+        "material.directorate.infrastructure.road_damaged";
     public const string BridgeMaterialAssetId =
         "material.directorate.infrastructure.bridge";
 
@@ -53,6 +57,16 @@ public static class InfrastructurePresentationCatalog
                     _ =>
                         "infrastructure.directorate.bridge.road.intact"
                 },
+            InfrastructurePresentationKind.RoadShoulder =>
+                "infrastructure.directorate.road.shoulder",
+            InfrastructurePresentationKind.RoadCurveShort =>
+                "infrastructure.directorate.road.curve_short",
+            InfrastructurePresentationKind.RoadCurveLong =>
+                "infrastructure.directorate.road.curve_long",
+            InfrastructurePresentationKind.RoadJunctionT =>
+                "infrastructure.directorate.road.junction_t",
+            InfrastructurePresentationKind.RoadJunctionCross =>
+                "infrastructure.directorate.road.junction_cross",
             InfrastructurePresentationKind.RoadSegment or
             InfrastructurePresentationKind.Ford =>
                 feature.State switch
@@ -71,11 +85,26 @@ public static class InfrastructurePresentationCatalog
     }
 
     public static string ResolveMaterialAssetId(
-        in InfrastructureFeaturePresentationMetadata feature) =>
-        feature.Kind ==
-        InfrastructurePresentationKind.RoadBridge
-            ? BridgeMaterialAssetId
-            : RoadMaterialAssetId;
+        in InfrastructureFeaturePresentationMetadata feature)
+    {
+        if (feature.Kind ==
+            InfrastructurePresentationKind.RoadBridge)
+        {
+            return BridgeMaterialAssetId;
+        }
+
+        if (feature.Kind ==
+            InfrastructurePresentationKind.RoadShoulder)
+        {
+            return RoadShoulderMaterialAssetId;
+        }
+
+        return feature.State is
+            InfrastructurePresentationState.Restoring or
+            InfrastructurePresentationState.Disabled
+                ? RoadDamagedMaterialAssetId
+                : RoadMaterialAssetId;
+    }
 
     public static string ResolveStrategicSymbolAssetId(
         in InfrastructureFeaturePresentationMetadata feature) =>
@@ -130,6 +159,13 @@ public static class InfrastructurePresentationCatalog
             {
                 InfrastructurePresentationKind.RoadBridge =>
                     0.25f,
+                InfrastructurePresentationKind.RoadShoulder =>
+                    0.42f,
+                InfrastructurePresentationKind.RoadCurveShort or
+                InfrastructurePresentationKind.RoadCurveLong or
+                InfrastructurePresentationKind.RoadJunctionT or
+                InfrastructurePresentationKind.RoadJunctionCross =>
+                    0.49f,
                 InfrastructurePresentationKind.RoadSegment or
                 InfrastructurePresentationKind.Ford =>
                     0.48f,

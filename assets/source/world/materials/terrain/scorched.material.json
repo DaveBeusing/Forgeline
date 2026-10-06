@@ -1,9 +1,9 @@
 {
   "baseColorTexture": "texture.world.terrain.dark_ash",
   "baseColorFactor": [
-    0.15,
-    0.13,
-    0.11,
+    0.2,
+    0.17,
+    0.14,
     1
   ],
   "metallicFactor": 0,

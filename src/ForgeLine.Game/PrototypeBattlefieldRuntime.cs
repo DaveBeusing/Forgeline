@@ -263,7 +263,7 @@ public sealed class PrototypeBattlefieldRuntime
                     definition,
                     roadEdge.Key))
             {
-                CreateRoadPresentationEntity(
+                CreateRoadPresentationEntities(
                     entities,
                     roadEdge,
                     sourcePosition,
@@ -271,6 +271,11 @@ public sealed class PrototypeBattlefieldRuntime
                     checked((uint)(6_000 + index)));
             }
         }
+
+        CreateRoadNodePresentationEntities(
+            entities,
+            definition,
+            roadNodePositions);
 
         var crossingEntities =
             new Dictionary<string, EntityId>(
@@ -410,48 +415,357 @@ public sealed class PrototypeBattlefieldRuntime
         return false;
     }
 
-    private static void CreateRoadPresentationEntity(
+    private static void CreateRoadPresentationEntities(
         EntityRegistry entities,
         in BattlefieldRoadEdgeDefinition roadEdge,
         Vector3 sourcePosition,
         Vector3 destinationPosition,
         uint visualId)
     {
+        const float RoadSurfaceWidth = 12.0f;
+        const float ShoulderWidth = 2.4f;
+        const float ShoulderSourceWidth = 0.16f;
+
         Vector3 delta =
             destinationPosition -
             sourcePosition;
-        float length =
+        float horizontalLength =
             MathF.Sqrt(
-                (delta.X * delta.X) +
-                (delta.Z * delta.Z));
+                delta.X *
+                    delta.X +
+                delta.Z *
+                    delta.Z);
 
-        if (length <= 0.001f)
+        if (horizontalLength <= 0.001f)
         {
             return;
         }
 
+        float spatialLength =
+            delta.Length();
         float yaw =
             MathF.Atan2(
                 delta.X,
                 delta.Z);
+        float pitch =
+            -MathF.Atan2(
+                delta.Y,
+                horizontalLength);
+        Quaternion rotation =
+            Quaternion.CreateFromYawPitchRoll(
+                yaw,
+                pitch,
+                0.0f);
         Vector3 midpoint =
             (sourcePosition +
              destinationPosition) *
             0.5f;
+        Vector3 right =
+            new(
+                delta.Z /
+                    horizontalLength,
+                0.0f,
+                -delta.X /
+                    horizontalLength);
 
+        CreateInfrastructurePresentationEntity(
+            entities,
+            midpoint,
+            rotation,
+            new Vector3(
+                RoadSurfaceWidth,
+                0.35f,
+                spatialLength),
+            InfrastructurePresentationKind.RoadSegment,
+            roadEdge.Key,
+            visualId);
+
+        float shoulderOffset =
+            RoadSurfaceWidth *
+                0.5f +
+            ShoulderWidth *
+                0.5f;
+        float shoulderScale =
+            ShoulderWidth /
+            ShoulderSourceWidth;
+
+        CreateInfrastructurePresentationEntity(
+            entities,
+            midpoint -
+            right *
+                shoulderOffset,
+            rotation,
+            new Vector3(
+                shoulderScale,
+                0.30f,
+                spatialLength),
+            InfrastructurePresentationKind.RoadShoulder,
+            $"{roadEdge.Key}.shoulder.left",
+            checked(
+                visualId +
+                10_000U));
+        CreateInfrastructurePresentationEntity(
+            entities,
+            midpoint +
+            right *
+                shoulderOffset,
+            rotation,
+            new Vector3(
+                shoulderScale,
+                0.30f,
+                spatialLength),
+            InfrastructurePresentationKind.RoadShoulder,
+            $"{roadEdge.Key}.shoulder.right",
+            checked(
+                visualId +
+                20_000U));
+    }
+
+    private static void CreateRoadNodePresentationEntities(
+        EntityRegistry entities,
+        PrototypeBattlefieldDefinition definition,
+        Dictionary<string, Vector3> roadNodePositions)
+    {
+        const float MinimumCurveDegrees = 8.0f;
+        const float ShortCurveDegrees = 35.0f;
+
+        for (int nodeIndex = 0;
+             nodeIndex < definition.RoadNodes.Count;
+             nodeIndex++)
+        {
+            BattlefieldRoadNodeDefinition node =
+                definition.RoadNodes[nodeIndex];
+            Vector3 position =
+                roadNodePositions[
+                    node.Key];
+            List<Vector3> directions =
+                GetRoadNodeDirections(
+                    definition,
+                    roadNodePositions,
+                    node.Key,
+                    position);
+
+            InfrastructurePresentationKind kind;
+            float yaw;
+            float scale;
+
+            if (directions.Count >= 4)
+            {
+                kind =
+                    InfrastructurePresentationKind.RoadJunctionCross;
+                yaw =
+                    MathF.Atan2(
+                        directions[0].X,
+                        directions[0].Z);
+                scale =
+                    18.0f;
+            }
+            else if (directions.Count == 3)
+            {
+                kind =
+                    InfrastructurePresentationKind.RoadJunctionT;
+                yaw =
+                    ResolveTJunctionYaw(
+                        directions);
+                scale =
+                    18.0f;
+            }
+            else if (directions.Count == 2)
+            {
+                float dot =
+                    Math.Clamp(
+                        Vector3.Dot(
+                            directions[0],
+                            directions[1]),
+                        -1.0f,
+                        1.0f);
+                float deflection =
+                    MathF.PI -
+                    MathF.Acos(
+                        dot);
+                float degrees =
+                    deflection *
+                    (180.0f /
+                     MathF.PI);
+
+                if (degrees <
+                    MinimumCurveDegrees)
+                {
+                    continue;
+                }
+
+                kind =
+                    degrees >=
+                    ShortCurveDegrees
+                        ? InfrastructurePresentationKind.RoadCurveShort
+                        : InfrastructurePresentationKind.RoadCurveLong;
+
+                Vector3 bisector =
+                    directions[0] +
+                    directions[1];
+
+                if (bisector.LengthSquared() <=
+                    0.0001f)
+                {
+                    continue;
+                }
+
+                bisector =
+                    Vector3.Normalize(
+                        bisector);
+                yaw =
+                    MathF.Atan2(
+                        bisector.X,
+                        bisector.Z) -
+                    MathF.PI *
+                    0.25f;
+                scale =
+                    16.0f;
+            }
+            else
+            {
+                continue;
+            }
+
+            CreateInfrastructurePresentationEntity(
+                entities,
+                position,
+                Quaternion.CreateFromAxisAngle(
+                    Vector3.UnitY,
+                    yaw),
+                new Vector3(
+                    scale,
+                    0.35f,
+                    scale),
+                kind,
+                $"{node.Key}.surface",
+                checked(
+                    36_000U +
+                    (uint)nodeIndex));
+        }
+    }
+
+    private static List<Vector3> GetRoadNodeDirections(
+        PrototypeBattlefieldDefinition definition,
+        Dictionary<string, Vector3> roadNodePositions,
+        string nodeKey,
+        Vector3 nodePosition)
+    {
+        var directions =
+            new List<Vector3>(
+                4);
+
+        for (int edgeIndex = 0;
+             edgeIndex < definition.RoadEdges.Count;
+             edgeIndex++)
+        {
+            BattlefieldRoadEdgeDefinition edge =
+                definition.RoadEdges[edgeIndex];
+            string? otherKey =
+                string.Equals(
+                    edge.SourceNodeKey,
+                    nodeKey,
+                    StringComparison.Ordinal)
+                    ? edge.DestinationNodeKey
+                    : string.Equals(
+                        edge.DestinationNodeKey,
+                        nodeKey,
+                        StringComparison.Ordinal)
+                        ? edge.SourceNodeKey
+                        : null;
+
+            if (otherKey is null)
+            {
+                continue;
+            }
+
+            Vector3 delta =
+                roadNodePositions[
+                    otherKey] -
+                nodePosition;
+            delta.Y =
+                0.0f;
+
+            if (delta.LengthSquared() <=
+                0.0001f)
+            {
+                continue;
+            }
+
+            directions.Add(
+                Vector3.Normalize(
+                    delta));
+        }
+
+        return directions;
+    }
+
+    private static float ResolveTJunctionYaw(
+        List<Vector3> directions)
+    {
+        int oppositeLeft = 0;
+        int oppositeRight = 1;
+        float mostOpposed =
+            Vector3.Dot(
+                directions[0],
+                directions[1]);
+
+        for (int left = 0;
+             left < directions.Count - 1;
+             left++)
+        {
+            for (int right = left + 1;
+                 right < directions.Count;
+                 right++)
+            {
+                float dot =
+                    Vector3.Dot(
+                        directions[left],
+                        directions[right]);
+
+                if (dot <
+                    mostOpposed)
+                {
+                    mostOpposed =
+                        dot;
+                    oppositeLeft =
+                        left;
+                    oppositeRight =
+                        right;
+                }
+            }
+        }
+
+        int stemIndex =
+            3 -
+            oppositeLeft -
+            oppositeRight;
+        Vector3 stem =
+            directions[
+                stemIndex];
+
+        return MathF.Atan2(
+            stem.X,
+            stem.Z);
+    }
+
+    private static void CreateInfrastructurePresentationEntity(
+        EntityRegistry entities,
+        Vector3 position,
+        Quaternion rotation,
+        Vector3 scale,
+        InfrastructurePresentationKind kind,
+        string key,
+        uint visualId)
+    {
         EntityId entity =
             entities.CreateEntity();
         entities.AddComponent(
             entity,
             new WorldTransform(
-                midpoint,
-                Quaternion.CreateFromAxisAngle(
-                    Vector3.UnitY,
-                    yaw),
-                new Vector3(
-                    12.0f,
-                    0.35f,
-                    length)));
+                position,
+                rotation,
+                scale));
         entities.AddComponent(
             entity,
             new VisualIdentity(
@@ -459,8 +773,8 @@ public sealed class PrototypeBattlefieldRuntime
         entities.AddComponent(
             entity,
             new InfrastructurePresentationIdentity(
-                InfrastructurePresentationKind.RoadSegment,
-                roadEdge.Key));
+                kind,
+                key));
     }
 
     private static InfrastructurePresentationKind ResolveCrossingPresentationKind(

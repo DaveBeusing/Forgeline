@@ -1,9 +1,9 @@
 {
   "baseColorTexture": "texture.world.terrain.dry_dirt",
   "baseColorFactor": [
-    0.34,
-    0.27,
-    0.18,
+    0.42,
+    0.32,
+    0.21,
     1
   ],
   "metallicFactor": 0,
