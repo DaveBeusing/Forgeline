@@ -20,6 +20,7 @@ public class PresentationBenchmarks : IDisposable
     private RenderWorld _visibleWorld = null!;
     private RenderWorld _culledWorld = null!;
     private RenderWorld _representativeWorld = null!;
+    private RenderWorld _roadReadabilityWorld = null!;
 
     [GlobalSetup]
     public void Setup()
@@ -53,6 +54,9 @@ public class PresentationBenchmarks : IDisposable
         _visibleWorld = CreateWorld(1_000, includeFarField: false);
         _culledWorld = CreateWorld(5_000, includeFarField: true);
         _representativeWorld = CreateRepresentativeWorld(1_200);
+        _roadReadabilityWorld =
+            CreateRoadReadabilityWorld(
+                500);
     }
 
     [GlobalCleanup]
@@ -107,6 +111,39 @@ public class PresentationBenchmarks : IDisposable
             _context,
             _strategicCamera,
             _representativeWorld,
+            1.0f);
+        return _renderer.LastDiagnostics;
+    }
+
+    [Benchmark]
+    public InstanceRenderDiagnostics SubmitRoadReadabilityTacticalView()
+    {
+        _renderer.Render(
+            _context,
+            _camera,
+            _roadReadabilityWorld,
+            1.0f);
+        return _renderer.LastDiagnostics;
+    }
+
+    [Benchmark]
+    public InstanceRenderDiagnostics SubmitRoadReadabilityNormalRtsView()
+    {
+        _renderer.Render(
+            _context,
+            _normalRtsCamera,
+            _roadReadabilityWorld,
+            1.0f);
+        return _renderer.LastDiagnostics;
+    }
+
+    [Benchmark]
+    public InstanceRenderDiagnostics SubmitRoadReadabilityStrategicView()
+    {
+        _renderer.Render(
+            _context,
+            _strategicCamera,
+            _roadReadabilityWorld,
             1.0f);
         return _renderer.LastDiagnostics;
     }
@@ -279,6 +316,125 @@ public class PresentationBenchmarks : IDisposable
 
             instances[index] =
                 instance;
+        }
+
+        var buffer =
+            new PresentationSnapshotBuffer();
+        buffer.Publish(
+            new PresentationSnapshot(
+                new SimulationTick(
+                    1),
+                TimeSpan.FromMilliseconds(
+                    50),
+                count,
+                instances));
+
+        var world =
+            new RenderWorld();
+        _ =
+            world.Update(
+                buffer);
+        return world;
+    }
+
+    private static RenderWorld CreateRoadReadabilityWorld(
+        int count)
+    {
+        var instances =
+            new RenderInstance[
+                count];
+        int side =
+            checked(
+                (int)Math.Ceiling(
+                    Math.Sqrt(
+                        count)));
+        const float spacing =
+            28.0f;
+        float halfSpan =
+            (side - 1) *
+            spacing *
+            0.5f;
+
+        for (int index = 0;
+             index < count;
+             index++)
+        {
+            int xIndex =
+                index %
+                side;
+            int zIndex =
+                index /
+                side;
+            Vector3 position =
+                new(
+                    xIndex *
+                        spacing -
+                    halfSpan,
+                    0.0f,
+                    zIndex *
+                        spacing -
+                    halfSpan);
+            InfrastructurePresentationKind kind =
+                (index % 5) switch
+                {
+                    0 =>
+                        InfrastructurePresentationKind.RoadSegment,
+                    1 =>
+                        InfrastructurePresentationKind.RoadShoulder,
+                    2 =>
+                        InfrastructurePresentationKind.RoadCurveShort,
+                    3 =>
+                        InfrastructurePresentationKind.RoadJunctionT,
+                    _ =>
+                        InfrastructurePresentationKind.RoadJunctionCross
+                };
+            Vector3 scale =
+                kind switch
+                {
+                    InfrastructurePresentationKind.RoadSegment =>
+                        new Vector3(
+                            12.0f,
+                            0.35f,
+                            36.0f),
+                    InfrastructurePresentationKind.RoadShoulder =>
+                        new Vector3(
+                            15.0f,
+                            0.30f,
+                            36.0f),
+                    InfrastructurePresentationKind.RoadCurveShort =>
+                        new Vector3(
+                            16.0f,
+                            0.35f,
+                            16.0f),
+                    _ =>
+                        new Vector3(
+                            18.0f,
+                            0.35f,
+                            18.0f)
+                };
+            var entity =
+                new EntityId(
+                    checked(
+                        (uint)index +
+                        1U),
+                    1);
+
+            instances[index] =
+                new RenderInstance(
+                    entity,
+                    new RenderTransform(
+                        position,
+                        Quaternion.Identity,
+                        scale),
+                    new RenderMeshHandle(
+                        1),
+                    RenderMaterialHandle.Default,
+                    RenderVisibilityMask.World,
+                    entity.Index,
+                    InfrastructureFeature:
+                        new InfrastructureFeaturePresentationMetadata(
+                            kind,
+                            InfrastructurePresentationState.Operational));
         }
 
         var buffer =
