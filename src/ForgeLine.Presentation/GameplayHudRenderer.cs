@@ -7,8 +7,7 @@ namespace ForgeLine.Presentation;
 
 public sealed class GameplayHudRenderer : IDisposable
 {
-    private readonly RtsInformationOverlayRenderer _informationRenderer;
-    private readonly DevelopmentOverlayRenderer _playerTextRenderer;
+    private readonly IGameplayHudSurface[] _surfaces;
     private bool _disposed;
 
     public GameplayHudRenderer(
@@ -17,13 +16,32 @@ public sealed class GameplayHudRenderer : IDisposable
     {
         ArgumentNullException.ThrowIfNull(graphics);
 
-        _informationRenderer =
-            new RtsInformationOverlayRenderer(
+        _surfaces =
+        [
+            new RtsInformationHudSurface(
                 graphics,
-                runtimeAssets);
-        _playerTextRenderer =
-            new DevelopmentOverlayRenderer(
-                graphics);
+                runtimeAssets),
+            new GameplayHudLegacyTextSurface(
+                graphics)
+        ];
+    }
+
+    internal GameplayHudRenderer(
+        IGameplayHudSurface[] surfaces)
+    {
+        ArgumentNullException.ThrowIfNull(surfaces);
+
+        if (surfaces.Any(
+                static surface =>
+                    surface is null))
+        {
+            throw new ArgumentException(
+                "Gameplay HUD surfaces cannot contain null entries.",
+                nameof(surfaces));
+        }
+
+        _surfaces =
+            surfaces.ToArray();
     }
 
     public void Render(
@@ -51,37 +69,27 @@ public sealed class GameplayHudRenderer : IDisposable
                 context.Height,
                 dpi,
                 uiScale);
-
-        _informationRenderer.Render(
-            context,
-            camera,
-            snapshot,
-            worldBounds,
-            informationLayer,
-            dpi,
-            uiScale);
-
-        _playerTextRenderer.Render(
-            context,
-            default,
-            camera,
-            playerExperience:
-                snapshot.PlayerExperience,
-            showDevelopmentMetrics: false,
-            playerActions:
-                snapshot.PlayerActions,
-            actionPanel:
+        var renderContext =
+            new GameplayHudRenderContext(
+                context,
+                camera,
+                snapshot,
+                worldBounds,
+                informationLayer,
                 actionPanel,
-            tacticalTargeting:
                 tacticalTargeting,
-            activeFormation:
                 activeFormation,
-            preAlphaUx:
                 preAlphaUx,
-            uiScale:
-                layout.Scale,
-            gameplayOverlay:
+                layout,
+                dpi,
+                uiScale,
                 gameplayOverlay);
+
+        foreach (IGameplayHudSurface surface in _surfaces)
+        {
+            surface.Render(
+                renderContext);
+        }
     }
 
     public void Dispose()
@@ -91,8 +99,14 @@ public sealed class GameplayHudRenderer : IDisposable
             return;
         }
 
-        _playerTextRenderer.Dispose();
-        _informationRenderer.Dispose();
+        for (int index =
+                 _surfaces.Length - 1;
+             index >= 0;
+             index--)
+        {
+            _surfaces[index].Dispose();
+        }
+
         _disposed = true;
     }
 
