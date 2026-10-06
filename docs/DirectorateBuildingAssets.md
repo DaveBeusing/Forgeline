@@ -142,9 +142,11 @@ The initial Directorate road kit contains:
 - damaged segment;
 - destroyed segment.
 
-Central Divide already owns a real `GroundRoad` logistics graph. `PrototypeBattlefieldRuntime` now creates presentation-only road entities for non-crossing road edges from those authoritative node positions. The visual entity never participates in routing, capacity, collision, or navigation.
+Central Divide already owns a real `GroundRoad` logistics graph. `PrototypeBattlefieldRuntime` creates presentation-only road geometry from those authoritative node positions. The visual entities never participate in routing, capacity, collision, or navigation.
 
-The current map uses straight runtime presentation along each graph edge. The additional kit shapes establish stable source/runtime contracts for later map/editor authoring without adding new gameplay roads.
+Each non-crossing edge now renders a 12-meter primary surface plus two 2.4-meter shoulders. The surface follows the endpoint height slope while the shoulders use a separate gravel/dirt material family to establish a readable transition into surrounding terrain. Road nodes inspect only the already-authored graph connectivity to choose presentation geometry: degree-two turns receive short/long curve overlays, three-way nodes receive T-junction surfaces, and four-way nodes can use the cross-junction asset. These overlays smooth the visual topology without creating or modifying a logistics edge.
+
+This composition keeps road topology legible at normal and strategic RTS zoom through width, silhouette, and edge contrast rather than relying on tiny texture detail. The industrial-yard transition asset remains available for later authored yard connections without adding new gameplay roads.
 
 ## North Bridge and South Ford
 
@@ -173,7 +175,9 @@ Disabling or restoring either crossing still changes the real logistics edge and
 Directorate building and infrastructure material IDs remain stable while their source definitions now reuse the shared production texture library:
 
 - normal/operational structures use the structural-metal Base Color/Normal/ORM family;
-- roads use reinforced-concrete Base Color/Normal/ORM;
+- operational road surfaces use a brighter, high-roughness reinforced-concrete Base Color/Normal/ORM treatment;
+- road shoulders use a warmer gravel/mineral material to provide edge and terrain-transition definition;
+- damaged/destroyed road presentation has a darker, high-roughness material binding ready for future authoritative road-condition states;
 - bridges reuse structural metal;
 - Damaged, Critical, and Destroyed building states use the damaged-metal family;
 - Critical additionally uses the shared functional status-emissive map at a restrained multiplier;
@@ -210,7 +214,9 @@ Automated coverage verifies:
 - construction progress maps to foundation/frame/shell presentation;
 - power, damage, critical, and wreck state extraction;
 - critical state geometry is present in addition to material treatment;
-- Central Divide creates road presentation from the real road graph;
+- Central Divide creates road surfaces, paired shoulders, curve transitions, and junction presentation from the real road graph;
+- road presentation counts and node-shape selection remain derived from existing graph topology rather than duplicate route data;
+- road surface, shoulder, and damaged material IDs resolve through the normal runtime material path;
 - North Bridge and South Ford receive the correct infrastructure presentation identity;
 - repeated Directorate buildings retain the shared indexed-instancing path;
 - the normal Windows D3D12 smoke consumes the compiled runtime manifest.

@@ -114,7 +114,9 @@ The production D3D12 terrain shader binds one control texture plus four Base Col
 
 Terrain material UVs are calculated from world X/Z coordinates and a per-material tile scale. The world-space convention remains continuous across chunk boundaries and independent of screen resolution. Material textures use the shared anisotropic/trilinear wrap sampler and their compiler-generated mip chains; the control texture uses the shared linear clamp sampler. No negative global mip bias or forced highest-mip behavior is used.
 
-Vertex color no longer contains final terrain albedo. The 48-byte terrain vertex keeps its color attribute only as a deterministic low-frequency macro/readability multiplier, leaving high-frequency Base Color and normal detail in tiled GPU textures.
+Vertex color no longer contains final terrain albedo. The 48-byte terrain vertex keeps its color attribute only as a deterministic low-frequency macro/readability multiplier, leaving high-frequency Base Color and normal detail in tiled GPU textures. The macro multiplier combines two low-frequency world-space waves and is explicitly bounded to 0.90-1.08 so large terrain areas break up without producing high-contrast noise that competes with units or overlays.
+
+The Central Divide readability baseline deliberately separates the eight material families by value as well as hue. Grass/vegetated ground remains the dominant natural mid-value surface; dirt and mud are warmer and darker; rock and gravel are lighter mineral families; industrial ground and concrete form a distinct constructed range; scorched ground remains the darkest family without using pure black. These values are presentation inputs only and never classify gameplay terrain.
 
 ## Frustum Culling
 
