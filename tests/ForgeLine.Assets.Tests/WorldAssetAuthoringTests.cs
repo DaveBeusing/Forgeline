@@ -156,6 +156,47 @@ public sealed class WorldAssetAuthoringTests
                     lod.AssetId ==
                     "mesh.world.resource.ferrous_ore_lod1");
 
+            string[] resourceMeshIds =
+            [
+                "mesh.world.resource.ferrous_ore",
+                "mesh.world.resource.silicates",
+                "mesh.world.resource.volatiles",
+                "mesh.world.resource.rare_elements"
+            ];
+            var highDetailIndexCounts =
+                new HashSet<int>();
+
+            foreach (string resourceId in resourceMeshIds)
+            {
+                RuntimeMeshData highDetail =
+                    RuntimeMeshData.FromPayload(
+                        catalog.Read(
+                            AssetId.Parse(
+                                resourceId))
+                        .Payload);
+                RuntimeMeshData reduced =
+                    RuntimeMeshData.FromPayload(
+                        catalog.Read(
+                            AssetId.Parse(
+                                $"{resourceId}_lod1"))
+                        .Payload);
+
+                Assert.True(
+                    highDetail.Indices.Count >
+                    36,
+                    $"Resource mesh '{resourceId}' must remain clustered geometry rather than the generic box.");
+                Assert.True(
+                    reduced.Indices.Count >
+                    36,
+                    $"Reduced resource mesh '{resourceId}_lod1' must preserve a clustered silhouette.");
+                highDetailIndexCounts.Add(
+                    highDetail.Indices.Count);
+            }
+
+            Assert.Equal(
+                resourceMeshIds.Length,
+                highDetailIndexCounts.Count);
+
             RuntimeAssetRecord vegetation =
                 catalog.Get(
                     AssetId.Parse(
