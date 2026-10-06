@@ -6,6 +6,12 @@ public enum GraphicsPrimitiveTopology
     LineList
 }
 
+public enum GraphicsCullMode
+{
+    CounterClockwise,
+    None
+}
+
 public sealed record GraphicsPipelineDescription(
     GraphicsShaderBytecode VertexShader,
     GraphicsShaderBytecode PixelShader)
@@ -19,6 +25,9 @@ public sealed record GraphicsPipelineDescription(
 
     public GraphicsPrimitiveTopology PrimitiveTopology { get; init; } =
         GraphicsPrimitiveTopology.TriangleList;
+
+    public GraphicsCullMode CullMode { get; init; } =
+        GraphicsCullMode.CounterClockwise;
 
     public bool DepthEnabled { get; init; }
 
@@ -62,6 +71,14 @@ public sealed record GraphicsPipelineDescription(
         {
             throw new ArgumentException(
                 "D3D12 root-signature cost exceeds 64 DWORDs; root constants and pixel descriptor tables must fit within the hardware root-signature budget.");
+        }
+
+        if (!Enum.IsDefined(CullMode))
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(CullMode),
+                CullMode,
+                "Unsupported graphics cull mode.");
         }
 
         foreach (GraphicsVertexElement element in VertexElements)
