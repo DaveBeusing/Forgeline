@@ -2252,8 +2252,7 @@ internal sealed class ClientApplication
             input.BeginFrame();
             if (!_platform.PumpEvents())
             {
-                throw new OperationCanceledException(
-                    "Frontend session selection was closed.");
+                return FrontendSessionSelectionResult.Exit();
             }
 
             DrainWindowEvents(window);
@@ -2342,7 +2341,7 @@ internal sealed class ClientApplication
                     if (action == GameFrontendAction.Exit)
                     {
                         window.RequestClose();
-                        continue;
+                        return FrontendSessionSelectionResult.Exit();
                     }
 
                     if (action == GameFrontendAction.LoadGame &&
