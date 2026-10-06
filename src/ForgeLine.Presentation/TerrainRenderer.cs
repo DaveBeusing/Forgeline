@@ -18,7 +18,7 @@ public enum TerrainDebugVisualizationMode : byte
 
 public sealed class TerrainRenderer : IDisposable
 {
-    private const int TerrainBaseRootConstantCount = 37;
+    private const int TerrainBaseRootConstantCount = 36;
     private const int TerrainRootConstantCount =
         TerrainBaseRootConstantCount +
         SceneLightingSettings.ShaderConstantCount;
@@ -442,12 +442,12 @@ public sealed class TerrainRenderer : IDisposable
                 row_major float4x4 ViewProjection;
                 float DebugChunks;
                 float DebugMode;
-                float2 TerrainPadding;
+                uint PackedPaletteSlots;
+                float TerrainPadding;
                 float4 LayerUvScale01;
                 float4 LayerUvScale23;
                 uint4 LayerBaseColorPacked;
                 uint4 LayerSurfacePacked;
-                uint PackedPaletteSlots;
                 float4 SceneLightDirectionIntensity;
                 float4 SceneDirectionalColorAmbientIntensity;
                 float4 SceneAmbientColorExposure;
@@ -1210,7 +1210,7 @@ public sealed class TerrainRenderer : IDisposable
             ((uint)layers[1].Slot << 8) |
             ((uint)layers[2].Slot << 16) |
             ((uint)layers[3].Slot << 24);
-        constants[36] =
+        constants[18] =
             BitConverter.UInt32BitsToSingle(
                 packedPalette);
     }
