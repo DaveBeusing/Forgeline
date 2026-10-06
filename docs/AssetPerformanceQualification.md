@@ -100,7 +100,7 @@ The JSON report captures the latest completed D3D12 render frame with:
 - submitted terrain triangles;
 - terrain draw calls;
 - instance draw calls;
-- total measured world/debug draw calls;
+- total measured world, gameplay-overlay, and developer-debug draw calls;
 - visible and total render instances;
 - high-detail and reduced-LOD instance counts;
 - active VFX, pool capacity, and dropped VFX count;
@@ -112,6 +112,8 @@ The JSON report captures the latest completed D3D12 render frame with:
 `gpuMilliseconds` is populated from Direct3D 12 timestamp queries recorded around the production graphics command list and read only after the owning frame fence completes. `gpuTimingAvailable` remains explicit; unsupported timing never falls back to CPU frame time.
 
 The Windows qualification gate also requires finite positive directional-light/exposure state, non-negative ambient intensity, and the current AcesFitted tone-mapping baseline. This validates that the production scene is not silently rendered through an unconfigured lighting path. It is a structural qualification rather than an image-similarity gate.
+
+Developer diagnostics are disabled by default in the canonical smoke scene. Player-facing selection/command/strategic overlay rendering is a separate path, while developer lines are depth-tested and category-gated. When diagnostics are enabled interactively, F1 metrics report rendered gameplay-overlay lines, rendered/dropped developer-debug lines, and measured developer-overlay CPU submission time. A disabled developer overlay must submit zero developer line draw calls.
 
 ## Rendering Benchmarks
 

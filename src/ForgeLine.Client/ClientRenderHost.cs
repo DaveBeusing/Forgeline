@@ -88,10 +88,12 @@ internal readonly record struct ClientRenderFrame(
     int ViewportWidth,
     int ViewportHeight,
     bool OverlayEnabled,
-    bool WorldDebugEnabled,
+    DebugOverlayView DebugOverlay,
     PlayerActionPanelView ActionPanel,
     TacticalTargetingView TacticalTargeting,
     FormationTemplate ActiveFormation,
+    DebugLine[] GameplayLines,
+    DebugLabel[] GameplayLabels,
     DebugLine[] DebugLines,
     DebugLabel[] DebugLabels,
     uint Dpi = 96,
@@ -213,6 +215,10 @@ internal sealed class ClientRenderHost : IDisposable
         ClientRenderFrame copied =
             frame with
             {
+                GameplayLines =
+                    frame.GameplayLines.ToArray(),
+                GameplayLabels =
+                    frame.GameplayLabels.ToArray(),
                 DebugLines =
                     frame.DebugLines.ToArray(),
                 DebugLabels =
@@ -306,9 +312,14 @@ internal sealed class ClientRenderHost : IDisposable
                     graphics,
                     _runtimeAssets,
                     _sceneLighting);
+            using var gameplayOverlayRenderer =
+                new DebugDrawRenderer(
+                    graphics,
+                    depthEnabled: false);
             using var debugDrawRenderer =
                 new DebugDrawRenderer(
-                    graphics);
+                    graphics,
+                    depthEnabled: true);
             using var overlayRenderer =
                 new DevelopmentOverlayRenderer(
                     graphics);
@@ -325,6 +336,8 @@ internal sealed class ClientRenderHost : IDisposable
             var renderCamera =
                 new RtsCamera(
                     cameraSettings);
+            var gameplayDraw =
+                new DebugDraw();
             var debugDraw =
                 new DebugDraw();
             var frameTimingTracker =
@@ -338,6 +351,8 @@ internal sealed class ClientRenderHost : IDisposable
                 previousFrameAt;
             FrameTimingMetrics frameTiming =
                 default;
+            double debugOverlayCpuMilliseconds =
+                0.0;
             int width =
                 initialTarget.Width;
             int height =
@@ -433,12 +448,22 @@ internal sealed class ClientRenderHost : IDisposable
                         sinceSnapshot,
                         snapshot.TickDuration);
 
-                RebuildDebugDraw(
+                RebuildDraw(
+                    gameplayDraw,
+                    enabled: true,
+                    current.GameplayLines,
+                    current.GameplayLabels);
+                RebuildDraw(
                     debugDraw,
-                    current);
+                    current.DebugOverlay.Enabled,
+                    current.DebugLines,
+                    current.DebugLabels);
 
                 terrainRenderer.DebugChunksEnabled =
-                    current.WorldDebugEnabled;
+                    current.DebugOverlay.IsEnabled(
+                        DebugOverlayCategory.World) ||
+                    current.DebugOverlay.IsEnabled(
+                        DebugOverlayCategory.Rendering);
 
                 DevelopmentOverlayMetrics overlayMetrics =
                     CreateOverlayMetrics(
@@ -446,8 +471,10 @@ internal sealed class ClientRenderHost : IDisposable
                         snapshot,
                         terrainRenderer,
                         instanceRenderer,
+                        gameplayOverlayRenderer,
                         debugDrawRenderer,
-                        renderWorld);
+                        renderWorld,
+                        debugOverlayCpuMilliseconds);
                 PlayerExperienceSnapshot playerExperience =
                     snapshot.PlayerExperience ??
                     default;
@@ -467,10 +494,22 @@ internal sealed class ClientRenderHost : IDisposable
                             renderCamera,
                             renderWorld,
                             renderAlpha);
+                        long debugStartedAt =
+                            Stopwatch.GetTimestamp();
                         debugDrawRenderer.Render(
                             context,
                             renderCamera,
                             debugDraw);
+                        debugOverlayCpuMilliseconds =
+                            StopwatchElapsed(
+                                debugStartedAt,
+                                Stopwatch.GetTimestamp())
+                            .TotalMilliseconds;
+
+                        gameplayOverlayRenderer.Render(
+                            context,
+                            renderCamera,
+                            gameplayDraw);
                         informationRenderer.Render(
                             context,
                             renderCamera,
@@ -497,7 +536,9 @@ internal sealed class ClientRenderHost : IDisposable
                             preAlphaUx:
                                 current.PreAlphaUx,
                             uiScale:
-                                current.UiScale);
+                                current.UiScale,
+                            gameplayOverlay:
+                                gameplayDraw);
                         if (current.Frontend is FrontendSurfaceView frontend)
                         {
                             frontendRenderer.Render(
@@ -531,6 +572,7 @@ internal sealed class ClientRenderHost : IDisposable
                     terrainRenderer.LastDiagnostics,
                     instanceRenderer.LastDiagnostics,
                     instanceRenderer.MaterialDiagnostics,
+                    gameplayOverlayRenderer.LastDiagnostics,
                     debugDrawRenderer.LastDiagnostics,
                     snapshot.VfxMetrics,
                     renderWorld.InstanceCount,
@@ -550,7 +592,9 @@ internal sealed class ClientRenderHost : IDisposable
                         $"runtimeMeshes={instanceRenderer.LastDiagnostics.RuntimeMeshInstances} " +
                         $"texturedRuntimeMeshes={instanceRenderer.LastDiagnostics.TexturedRuntimeMeshInstances} " +
                         $"fallbackMeshes={instanceRenderer.LastDiagnostics.FallbackMeshInstances} " +
-                        $"draws={terrainRenderer.LastDiagnostics.DrawCalls + instanceRenderer.LastDiagnostics.DrawCalls + debugDrawRenderer.LastDiagnostics.DrawCalls} " +
+                        $"draws={terrainRenderer.LastDiagnostics.DrawCalls + instanceRenderer.LastDiagnostics.DrawCalls + gameplayOverlayRenderer.LastDiagnostics.DrawCalls + debugDrawRenderer.LastDiagnostics.DrawCalls} " +
+                        $"debugLines={debugDrawRenderer.LastDiagnostics.RenderedLines} " +
+                        $"debugCpuMs={debugOverlayCpuMilliseconds:F3} " +
                         $"terrainSubmitMs={terrainRenderer.LastDiagnostics.CpuSubmissionMilliseconds:F3} " +
                         $"terrainTextures={terrainRenderer.LastDiagnostics.TextureBindingsPerDraw} " +
                         $"light={_sceneLighting.DirectionalIntensity:F2}/{_sceneLighting.AmbientIntensity:F2} " +
@@ -616,6 +660,7 @@ internal sealed class ClientRenderHost : IDisposable
         in TerrainRenderDiagnostics terrain,
         in InstanceRenderDiagnostics instances,
         in RuntimeMaterialDiagnostics materials,
+        in DebugDrawRenderDiagnostics gameplay,
         in DebugDrawRenderDiagnostics debug,
         in VfxPresentationMetrics vfx,
         int totalInstances,
@@ -636,6 +681,7 @@ internal sealed class ClientRenderHost : IDisposable
                 instances.DrawCalls,
                 terrain.DrawCalls +
                 instances.DrawCalls +
+                gameplay.DrawCalls +
                 debug.DrawCalls,
                 instances.VisibleInstances,
                 totalInstances,
@@ -705,35 +751,42 @@ internal sealed class ClientRenderHost : IDisposable
         }
     }
 
-    private static void RebuildDebugDraw(
-        DebugDraw debugDraw,
-        in ClientRenderFrame frame)
+    private static void RebuildDraw(
+        DebugDraw draw,
+        bool enabled,
+        DebugLine[] lines,
+        DebugLabel[] labels)
     {
-        debugDraw.Clear();
-        debugDraw.Enabled =
-            frame.WorldDebugEnabled ||
-            frame.DebugLines.Length > 0 ||
-            frame.DebugLabels.Length > 0;
+        draw.Clear();
+        draw.Enabled =
+            enabled &&
+            (lines.Length > 0 ||
+             labels.Length > 0);
+
+        if (!draw.Enabled)
+        {
+            return;
+        }
 
         for (int index = 0;
-             index < frame.DebugLines.Length;
+             index < lines.Length;
              index++)
         {
             DebugLine line =
-                frame.DebugLines[index];
-            debugDraw.Line(
+                lines[index];
+            draw.Line(
                 line.Start,
                 line.End,
                 line.Color);
         }
 
         for (int index = 0;
-             index < frame.DebugLabels.Length;
+             index < labels.Length;
              index++)
         {
             DebugLabel label =
-                frame.DebugLabels[index];
-            debugDraw.Label(
+                labels[index];
+            draw.Label(
                 label.Position,
                 label.Text,
                 label.Color);
@@ -745,13 +798,17 @@ internal sealed class ClientRenderHost : IDisposable
         PresentationSnapshot snapshot,
         TerrainRenderer terrainRenderer,
         SimpleInstanceRenderer instanceRenderer,
+        DebugDrawRenderer gameplayOverlayRenderer,
         DebugDrawRenderer debugDrawRenderer,
-        RenderWorld renderWorld)
+        RenderWorld renderWorld,
+        double debugOverlayCpuMilliseconds)
     {
         TerrainRenderDiagnostics terrain =
             terrainRenderer.LastDiagnostics;
         InstanceRenderDiagnostics instances =
             instanceRenderer.LastDiagnostics;
+        DebugDrawRenderDiagnostics gameplay =
+            gameplayOverlayRenderer.LastDiagnostics;
         DebugDrawRenderDiagnostics debug =
             debugDrawRenderer.LastDiagnostics;
         SimulationDiagnosticsSnapshot? simulationDiagnostics =
@@ -777,6 +834,7 @@ internal sealed class ClientRenderHost : IDisposable
             terrain.TotalChunks,
             terrain.DrawCalls +
             instances.DrawCalls +
+            gameplay.DrawCalls +
             debug.DrawCalls,
             instances.VisibleInstances,
             renderWorld.InstanceCount,
@@ -795,7 +853,19 @@ internal sealed class ClientRenderHost : IDisposable
             0,
             simulationDiagnostics?
                 .Runtime.Gen2Collections ??
-            0);
+            0)
+        {
+            GameplayOverlayLines =
+                gameplay.RenderedLines,
+            DebugOverlayLines =
+                debug.RenderedLines,
+            DebugOverlayDroppedLines =
+                debug.DroppedLines,
+            DebugOverlayDrawCalls =
+                debug.DrawCalls,
+            DebugOverlayCpuMilliseconds =
+                debugOverlayCpuMilliseconds
+        };
     }
 
     private static TimeSpan StopwatchElapsed(

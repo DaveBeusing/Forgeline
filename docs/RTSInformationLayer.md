@@ -116,6 +116,8 @@ Marker shape communicates meaning in addition to tint. Gameplay-critical state t
 
 World markers are presentation geometry only and do not alter collision, navigation, command validation, or simulation footprints.
 
+Player-facing world markers use a dedicated gameplay-overlay path rather than the engineering debug buffer. Selection, hover, placement preview, tactical target feedback, and player strategic overlays therefore remain visible when developer diagnostics are disabled. The gameplay world-overlay renderer does not depth-test its line geometry so critical command feedback remains readable over terrain and unit geometry; engineering debug lines keep depth testing enabled.
+
 Picking, hover, selection markers, and renderer culling share the same presentation-bounds calculation. Unit bounds include conservative role-specific expansion for silhouette features such as weapons and sensors, and rotated transforms are converted to world-space axis-aligned bounds consistently. Unit rings and building footprint outlines are anchored just above the visual ground plane; building outlines also preserve authored orientation. This keeps interaction geometry aligned with visible objects without changing gameplay authority.
 
 ## Health and supply information
@@ -184,9 +186,29 @@ The overlay renderer delegates to existing read-model/debug visualization paths:
 - sensor/intelligence coverage;
 - navigation cells/routes.
 
-These overlays never become a second authority for logistics, supply, intelligence, or navigation.
+These overlays never become a second authority for logistics, supply, intelligence, or navigation. They remain player-facing presentation and are independent of the developer-diagnostic master switch. Presentation extraction requests only the diagnostic read-model families needed by the active strategic overlay rather than enabling every development capture path.
 
 Additional power/buildable-area overlays should be added only when the existing product-facing read model provides an appropriate stable presentation contract. Debug data must not be converted into new gameplay authority merely to satisfy an overlay.
+
+## Development diagnostic overlays
+
+Engineering visualization is owned separately from player-facing gameplay presentation.
+
+The developer overlay controller exposes these categories:
+
+- Navigation: ground movement, formations, navigation cells/routes;
+- World: construction sites, resource diagnostics, battlefield/crossing diagnostics;
+- Logistics: logistics graph, cargo transport, automated distribution, capacity, and battlefield supply;
+- Sensors: intelligence cells, contacts, sensors, and metrics;
+- Combat: artillery, tactical readiness, resupply decisions, weapon/projectile/impact diagnostics;
+- Entities: spatial-grid diagnostics, opponent objectives, entity IDs, and presentation bounds;
+- Rendering: renderer-oriented diagnostics such as camera target and terrain chunk visualization.
+
+The master developer switch is disabled by default. F2 toggles that master. Shift+F2 toggles Rendering; Shift+F4 through Shift+F9 toggle Navigation, World, Logistics, Sensors, Combat, and Entities. Shifted shortcuts intentionally do not activate the existing unshifted F4–F8 building-placement shortcuts or the F9 footprint-rotation shortcut.
+
+Disabled categories do not request their simulation debug-capture paths. Rendering-only diagnostics require no simulation debug snapshot. When all developer diagnostics are disabled, the debug draw path collects no primitives and performs no debug line draw call. F1 development metrics expose gameplay-overlay line count, developer-debug line count, dropped debug lines, and measured developer-overlay CPU submission time.
+
+Render ownership and ordering are explicit: world geometry renders first, depth-tested engineering debug lines render next, player-facing world markers render afterward without depth testing, and screen-space RTS information/UI renders above both. Diagnostic visibility never writes to simulation state.
 
 ## DPI and readability
 

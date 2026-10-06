@@ -35,6 +35,7 @@ internal readonly record struct PresentationInteractionRequestSnapshot(
     IReadOnlyList<EntityId> SelectedEntities,
     BuildingPlacementPreviewRequest? PlacementRequest,
     bool DebugEnabled,
+    DebugOverlayCategory DebugCategories,
     float DebugPlaneHeight,
     StrategicOverlayMode StrategicOverlay);
 
@@ -44,6 +45,8 @@ public sealed class PresentationInteractionState
     private EntityId[] _selectedEntities = [];
     private BuildingPlacementPreviewRequest? _placementRequest;
     private bool _debugEnabled;
+    private DebugOverlayCategory _debugCategories =
+        DebugOverlayCategory.All;
     private float _debugPlaneHeight;
     private StrategicOverlayMode _strategicOverlay;
     private ulong _nextPlacementRequestId = 1;
@@ -120,6 +123,15 @@ public sealed class PresentationInteractionState
 
     public void SetDebugState(
         bool enabled,
+        float planeHeight) =>
+        SetDebugState(
+            new DebugOverlayView(
+                enabled,
+                DebugOverlayCategory.All),
+            planeHeight);
+
+    public void SetDebugState(
+        in DebugOverlayView view,
         float planeHeight)
     {
         if (!float.IsFinite(planeHeight))
@@ -127,10 +139,21 @@ public sealed class PresentationInteractionState
             throw new ArgumentOutOfRangeException(nameof(planeHeight));
         }
 
+        if ((view.Categories &
+             ~DebugOverlayCategory.All) !=
+            0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(view));
+        }
+
         lock (_gate)
         {
-            _debugEnabled = enabled;
-            _debugPlaneHeight = planeHeight;
+            _debugEnabled =
+                view.Enabled;
+            _debugCategories =
+                view.EffectiveCategories;
+            _debugPlaneHeight =
+                planeHeight;
         }
     }
 
@@ -157,6 +180,9 @@ public sealed class PresentationInteractionState
                     _selectedEntities.ToArray()),
                 _placementRequest,
                 _debugEnabled,
+                _debugEnabled
+                    ? _debugCategories
+                    : DebugOverlayCategory.None,
                 _debugPlaneHeight,
                 _strategicOverlay);
         }

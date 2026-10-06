@@ -150,7 +150,9 @@ The command exposes accepted/rejected target counts and execution tick for devel
 
 ## Feedback and Diagnostics
 
-Hover and selection feedback use presentation-only debug geometry around interpolated entity bounds. This feedback does not mutate simulation state and remains independent of simulation outcomes.
+Hover, selection, placement-preview, tactical-target, and strategic-overlay feedback use a dedicated player-facing world-overlay path around immutable presentation data. They no longer share the engineering debug buffer. Player-facing line markers render after depth-tested developer diagnostics and without depth testing so selection and command feedback remain readable over terrain and world geometry. None of these visuals mutates simulation state.
+
+Engineering diagnostics use an independent category model. F2 toggles the developer master switch; Shift+F2 toggles Rendering, while Shift+F4 through Shift+F9 toggle Navigation, World, Logistics, Sensors, Combat, and Entities. Unshifted F4–F8 building shortcuts and F9 placement rotation remain unchanged. Disabled developer categories do not request their associated simulation debug-capture paths.
 
 The Windows client periodically reports:
 
@@ -161,7 +163,7 @@ The Windows client periodically reports:
 - rejected target count;
 - command execution tick.
 
-F1 continues to toggle the development metrics overlay. F2 continues to toggle broader world-debug visualization; interaction feedback remains available independently when entities are hovered or selected.
+F1 continues to toggle the development metrics overlay and now also reports player-overlay lines, developer-debug lines, dropped debug lines, and developer-overlay CPU submission cost.
 
 ## Validation
 

@@ -299,7 +299,12 @@ internal sealed class ClientApplication
             new RtsTacticalTargetingController();
         var informationLayer =
             new RtsInformationLayerController();
-        var debugDraw = new DebugDraw();
+        var debugOverlay =
+            new DebugOverlayController();
+        var gameplayDraw =
+            new DebugDraw();
+        var debugDraw =
+            new DebugDraw();
 
         frontendLoading.ReportProgress(
             3,
@@ -349,9 +354,14 @@ internal sealed class ClientApplication
         PlayerCommandSubmissionReceipt? lastCommandReceipt = null;
         PlayerCommandResultReadModel? lastCommandResult = null;
         bool overlayEnabled = false;
-        bool worldDebugEnabled = false;
         bool overlayToggleHeld = false;
-        bool worldDebugToggleHeld = false;
+        bool debugMasterToggleHeld = false;
+        bool debugNavigationToggleHeld = false;
+        bool debugWorldToggleHeld = false;
+        bool debugLogisticsToggleHeld = false;
+        bool debugSensorsToggleHeld = false;
+        bool debugCombatToggleHeld = false;
+        bool debugEntitiesToggleHeld = false;
         bool formationToggleHeld = false;
         bool strategicOverlayToggleHeld = false;
         bool minimapToggleHeld = false;
@@ -437,11 +447,16 @@ internal sealed class ClientApplication
                 PlatformKey.F1,
                 ref overlayToggleHeld,
                 ref overlayEnabled);
-            UpdateToggle(
+            UpdateDebugOverlayToggles(
                 inputState,
-                PlatformKey.F2,
-                ref worldDebugToggleHeld,
-                ref worldDebugEnabled);
+                debugOverlay,
+                ref debugMasterToggleHeld,
+                ref debugNavigationToggleHeld,
+                ref debugWorldToggleHeld,
+                ref debugLogisticsToggleHeld,
+                ref debugSensorsToggleHeld,
+                ref debugCombatToggleHeld,
+                ref debugEntitiesToggleHeld);
             UpdateFormationSelection(
                 inputState,
                 ref formationToggleHeld,
@@ -483,7 +498,7 @@ internal sealed class ClientApplication
                     ref pauseHeld);
 
             presentationInteraction.SetDebugState(
-                worldDebugEnabled,
+                debugOverlay.View,
                 camera.Target.Y);
             presentationInteraction.SetStrategicOverlay(
                 informationLayer.OverlayMode);
@@ -838,7 +853,7 @@ internal sealed class ClientApplication
                         window.ClientSize.Width,
                         window.ClientSize.Height,
                         overlayEnabled,
-                        worldDebugEnabled,
+                        debugOverlay.View,
                         actionPanel.CreateView(
                             window.ClientSize.Width,
                             window.ClientSize.Height,
@@ -846,6 +861,8 @@ internal sealed class ClientApplication
                         tacticalTargetingController.CreateView(
                             inputSnapshot),
                         activeFormation,
+                        [],
+                        [],
                         [],
                         [],
                         window.Dpi,
@@ -1062,9 +1079,8 @@ internal sealed class ClientApplication
                 tacticalTargetingController.CreateView(
                     currentSnapshot);
 
-            BuildWorldDebugVisualization(
-                debugDraw,
-                worldDebugEnabled,
+            BuildGameplayWorldOverlay(
+                gameplayDraw,
                 renderWorld,
                 renderAlpha,
                 camera,
@@ -1072,22 +1088,17 @@ internal sealed class ClientApplication
                 buildingPlacementController,
                 tacticalTargetingView,
                 informationLayer.OverlayMode,
-                currentSnapshot?.Construction,
                 currentSnapshot?.Debug);
 
-            if (worldDebugEnabled &&
-                currentSnapshot?.Debug is
-                    PresentationDebugSnapshot debugSnapshot)
-            {
-                PrototypeBattlefieldDebugVisualization.Draw(
-                    debugDraw,
-                    prototypeBattlefield,
-                    debugSnapshot.CrossingStates);
-                SkirmishOpponentDebugVisualization.Draw(
-                    debugDraw,
-                    debugSnapshot.Opponents,
-                    MaximumDebugLabels);
-            }
+            BuildDevelopmentDebugOverlay(
+                debugDraw,
+                debugOverlay.View,
+                prototypeBattlefield,
+                renderWorld,
+                renderAlpha,
+                camera,
+                currentSnapshot?.Construction,
+                currentSnapshot?.Debug);
 
             PlayerActionPanelView actionPanelView =
                 actionPanel.CreateView(
@@ -1132,10 +1143,12 @@ internal sealed class ClientApplication
                     window.ClientSize.Width,
                     window.ClientSize.Height,
                     overlayEnabled,
-                    worldDebugEnabled,
+                    debugOverlay.View,
                     actionPanelView,
                     tacticalTargetingView,
                     activeFormation,
+                    gameplayDraw.Lines.ToArray(),
+                    gameplayDraw.Labels.ToArray(),
                     debugDraw.Lines.ToArray(),
                     debugDraw.Labels.ToArray(),
                     window.Dpi,
@@ -1524,9 +1537,8 @@ internal sealed class ClientApplication
         }
     }
 
-    private static void BuildWorldDebugVisualization(
-        DebugDraw debugDraw,
-        bool worldDebugEnabled,
+    private static void BuildGameplayWorldOverlay(
+        DebugDraw gameplayDraw,
         RenderWorld renderWorld,
         float alpha,
         RtsCamera camera,
@@ -1534,10 +1546,9 @@ internal sealed class ClientApplication
         RtsBuildingPlacementController buildingPlacementController,
         TacticalTargetingView tacticalTargeting,
         StrategicOverlayMode strategicOverlayMode,
-        BuildingConstructionDebugSnapshot? constructionSnapshot,
         PresentationDebugSnapshot? debugSnapshot)
     {
-        debugDraw.Clear();
+        gameplayDraw.Clear();
 
         bool interactionFeedback =
             selectionController.Selection.Count > 0 ||
@@ -1545,46 +1556,49 @@ internal sealed class ClientApplication
             selectionController.HoveredEntity.IsValid ||
             buildingPlacementController.IsActive ||
             tacticalTargeting.HasPointerTarget ||
-            (constructionSnapshot?.Sites.Count ?? 0) > 0;
-        debugDraw.Enabled =
-            worldDebugEnabled ||
             strategicOverlayMode !=
-                StrategicOverlayMode.None ||
+                StrategicOverlayMode.None;
+        gameplayDraw.Enabled =
             interactionFeedback;
 
-        if (!debugDraw.Enabled)
+        if (!gameplayDraw.Enabled)
         {
             return;
         }
 
-        Vector4 rangeColor = new(0.2f, 0.75f, 1.0f, 1.0f);
-        Vector4 boundsColor = new(1.0f, 0.72f, 0.18f, 1.0f);
-        Vector4 pointColor = new(1.0f, 0.25f, 0.18f, 1.0f);
-        Vector4 selectedColor = new(0.25f, 1.0f, 0.35f, 1.0f);
-        Vector4 hoveredColor = new(0.15f, 0.85f, 1.0f, 1.0f);
-        Vector4 placementValidColor = new(0.15f, 1.0f, 0.35f, 1.0f);
-        Vector4 placementInvalidColor = new(1.0f, 0.2f, 0.15f, 1.0f);
-        Vector4 constructionColor = new(1.0f, 0.75f, 0.2f, 1.0f);
-        Vector4 completedColor = new(0.2f, 0.9f, 0.35f, 1.0f);
+        Vector4 selectedColor =
+            new(
+                0.25f,
+                1.0f,
+                0.35f,
+                1.0f);
+        Vector4 hoveredColor =
+            new(
+                0.15f,
+                0.85f,
+                1.0f,
+                1.0f);
+        Vector4 placementValidColor =
+            new(
+                0.15f,
+                1.0f,
+                0.35f,
+                1.0f);
+        Vector4 placementInvalidColor =
+            new(
+                1.0f,
+                0.2f,
+                0.15f,
+                1.0f);
 
-        if (buildingPlacementController.Preview is BuildingPlacementPreview placementPreview)
+        if (buildingPlacementController.Preview is
+            BuildingPlacementPreview placementPreview)
         {
             BuildingConstructionDebugVisualization.DrawPreview(
-                debugDraw,
+                gameplayDraw,
                 placementPreview,
                 placementValidColor,
                 placementInvalidColor);
-        }
-
-        if (constructionSnapshot is not null)
-        {
-            BuildingConstructionDebugVisualization.DrawConstructionSites(
-                debugDraw,
-                constructionSnapshot,
-                constructionColor,
-                completedColor,
-                maximumCompleted: worldDebugEnabled ? 64 : 0,
-                maximumLabels: 32);
         }
 
         if (strategicOverlayMode !=
@@ -1592,7 +1606,7 @@ internal sealed class ClientApplication
             debugSnapshot is not null)
         {
             RtsStrategicOverlayVisualization.Draw(
-                debugDraw,
+                gameplayDraw,
                 strategicOverlayMode,
                 debugSnapshot,
                 renderWorld.CurrentSnapshot?.Intelligence,
@@ -1602,7 +1616,7 @@ internal sealed class ClientApplication
         if (tacticalTargeting.HasPointerTarget)
         {
             RtsWorldMarkerVisualization.DrawTarget(
-                debugDraw,
+                gameplayDraw,
                 tacticalTargeting.PointerWorldTarget,
                 tacticalTargeting.PointerTargetValid,
                 new Vector4(
@@ -1617,23 +1631,121 @@ internal sealed class ClientApplication
                     1.0f));
         }
 
-        if (worldDebugEnabled &&
-            debugSnapshot is not null)
+        foreach (EntityId entity in
+                 selectionController.Selection.Entities)
         {
-            SpatialIndexDebugVisualization.DrawRadiusQuery(
-                debugDraw,
-                camera.Target,
-                40.0f,
-                rangeColor);
-            debugDraw.Point(camera.Target, 8.0f, pointColor);
+            if (!renderWorld.TryGetInterpolatedInstance(
+                    entity,
+                    alpha,
+                    out RenderInstance instance))
+            {
+                continue;
+            }
 
-            SpatialIndexDebugVisualization.DrawOccupiedCells(
-                debugDraw,
-                debugSnapshot.Spatial,
-                new Vector4(0.35f, 0.65f, 1.0f, 0.8f),
-                new Vector4(1.0f, 0.35f, 0.15f, 1.0f),
-                maximumCells: 256,
-                maximumLabels: MaximumDebugLabels);
+            RtsWorldMarkerVisualization.DrawSelected(
+                gameplayDraw,
+                instance,
+                selectedColor);
+        }
+
+        EntityId inspected =
+            selectionController.InspectedEntity;
+        if (inspected.IsValid &&
+            !selectionController.Selection.Contains(
+                inspected) &&
+            renderWorld.TryGetInterpolatedInstance(
+                inspected,
+                alpha,
+                out RenderInstance inspectedInstance))
+        {
+            RtsWorldMarkerVisualization.DrawHover(
+                gameplayDraw,
+                inspectedInstance,
+                selectedColor);
+        }
+
+        EntityId hovered =
+            selectionController.HoveredEntity;
+        if (hovered.IsValid &&
+            !selectionController.Selection.Contains(
+                hovered) &&
+            renderWorld.TryGetInterpolatedInstance(
+                hovered,
+                alpha,
+                out RenderInstance hoveredInstance))
+        {
+            RtsWorldMarkerVisualization.DrawHover(
+                gameplayDraw,
+                hoveredInstance,
+                hoveredColor);
+        }
+    }
+
+    private static void BuildDevelopmentDebugOverlay(
+        DebugDraw debugDraw,
+        in DebugOverlayView overlay,
+        PrototypeBattlefieldDefinition prototypeBattlefield,
+        RenderWorld renderWorld,
+        float alpha,
+        RtsCamera camera,
+        BuildingConstructionDebugSnapshot? constructionSnapshot,
+        PresentationDebugSnapshot? debugSnapshot)
+    {
+        debugDraw.Clear();
+        debugDraw.Enabled =
+            overlay.Enabled;
+
+        if (!debugDraw.Enabled)
+        {
+            return;
+        }
+
+        Vector4 rangeColor =
+            new(
+                0.2f,
+                0.75f,
+                1.0f,
+                1.0f);
+        Vector4 boundsColor =
+            new(
+                1.0f,
+                0.72f,
+                0.18f,
+                1.0f);
+        Vector4 pointColor =
+            new(
+                1.0f,
+                0.25f,
+                0.18f,
+                1.0f);
+
+        if (overlay.IsEnabled(
+                DebugOverlayCategory.Rendering))
+        {
+            debugDraw.Point(
+                camera.Target,
+                8.0f,
+                pointColor);
+        }
+
+        if (debugSnapshot is null)
+        {
+            if (overlay.IsEnabled(
+                    DebugOverlayCategory.Entities))
+            {
+                DrawEntityBounds(
+                    debugDraw,
+                    renderWorld,
+                    alpha,
+                    boundsColor);
+            }
+
+            return;
+        }
+
+        if (overlay.IsEnabled(
+                DebugOverlayCategory.Navigation))
+        {
             GroundMovementDebugVisualization.Draw(
                 debugDraw,
                 debugSnapshot.Movement,
@@ -1649,17 +1761,58 @@ internal sealed class ClientApplication
                     NavigationMovementClass.Tracked),
                 debugSnapshot.NavigationPath,
                 camera.Target);
+        }
+
+        if (overlay.IsEnabled(
+                DebugOverlayCategory.World))
+        {
+            if (constructionSnapshot is not null)
+            {
+                BuildingConstructionDebugVisualization.DrawConstructionSites(
+                    debugDraw,
+                    constructionSnapshot,
+                    new Vector4(
+                        1.0f,
+                        0.75f,
+                        0.2f,
+                        1.0f),
+                    new Vector4(
+                        0.2f,
+                        0.9f,
+                        0.35f,
+                        1.0f),
+                    maximumCompleted: 64,
+                    maximumLabels: 32);
+            }
+
             if (debugSnapshot.Resources is not null)
             {
                 ResourceDepositDebugVisualization.DrawDeposits(
                     debugDraw,
                     debugSnapshot.Resources,
-                    new Vector4(0.65f, 0.9f, 0.25f, 1.0f),
-                    new Vector4(0.35f, 0.35f, 0.35f, 1.0f),
+                    new Vector4(
+                        0.65f,
+                        0.9f,
+                        0.25f,
+                        1.0f),
+                    new Vector4(
+                        0.35f,
+                        0.35f,
+                        0.35f,
+                        1.0f),
                     maximumDeposits: 64,
                     maximumLabels: 8);
             }
 
+            PrototypeBattlefieldDebugVisualization.Draw(
+                debugDraw,
+                prototypeBattlefield,
+                debugSnapshot.CrossingStates);
+        }
+
+        if (overlay.IsEnabled(
+                DebugOverlayCategory.Logistics))
+        {
             if (debugSnapshot.Logistics is not null)
             {
                 LogisticsDebugVisualization.Draw(
@@ -1707,31 +1860,41 @@ internal sealed class ClientApplication
                     maximumUnits: 128,
                     maximumLabels: 20);
             }
+        }
 
-            if (renderWorld.CurrentSnapshot?.Intelligence is
+        if (overlay.IsEnabled(
+                DebugOverlayCategory.Sensors) &&
+            renderWorld.CurrentSnapshot?.Intelligence is
                 FactionIntelligenceSnapshot intelligenceSnapshot)
-            {
-                IntelligenceDebugVisualization.Draw(
-                    debugDraw,
-                    intelligenceSnapshot,
-                    maximumCells: 512,
-                    maximumContacts: 96);
-                IntelligenceDebugVisualization.DrawSensors(
-                    debugDraw,
-                    debugSnapshot.IntelligenceSensors,
-                    maximumSensors: 64);
-                IntelligenceDebugVisualization.DrawMetrics(
-                    debugDraw,
-                    debugSnapshot.IntelligenceMetrics,
-                    camera.Target + Vector3.UnitY * 6.0f);
-            }
+        {
+            IntelligenceDebugVisualization.Draw(
+                debugDraw,
+                intelligenceSnapshot,
+                maximumCells: 512,
+                maximumContacts: 96);
+            IntelligenceDebugVisualization.DrawSensors(
+                debugDraw,
+                debugSnapshot.IntelligenceSensors,
+                maximumSensors: 64);
+            IntelligenceDebugVisualization.DrawMetrics(
+                debugDraw,
+                debugSnapshot.IntelligenceMetrics,
+                camera.Target +
+                Vector3.UnitY *
+                    6.0f);
+        }
 
+        if (overlay.IsEnabled(
+                DebugOverlayCategory.Combat))
+        {
             if (debugSnapshot.Artillery is not null)
             {
                 ArtilleryDebugVisualization.Draw(
                     debugDraw,
                     debugSnapshot.Artillery,
-                    camera.Target + Vector3.UnitY * 9.0f,
+                    camera.Target +
+                    Vector3.UnitY *
+                        9.0f,
                     maximumMissions: 64,
                     maximumProjectiles: 128);
             }
@@ -1744,7 +1907,9 @@ internal sealed class ClientApplication
                     debugSnapshot.TacticalMetrics,
                     debugSnapshot.Readiness,
                     debugSnapshot.ResupplyDecisionMetrics,
-                    camera.Target + Vector3.UnitY * 13.0f,
+                    camera.Target +
+                    Vector3.UnitY *
+                        13.0f,
                     maximumUnits: 96,
                     maximumReadinessLabels: 64);
             }
@@ -1759,72 +1924,70 @@ internal sealed class ClientApplication
                     maximumHealthLabels: 32,
                     maximumImpacts: 128);
             }
+        }
 
-            int debugCount = Math.Min(
+        if (overlay.IsEnabled(
+                DebugOverlayCategory.Entities))
+        {
+            SpatialIndexDebugVisualization.DrawRadiusQuery(
+                debugDraw,
+                camera.Target,
+                40.0f,
+                rangeColor);
+            SpatialIndexDebugVisualization.DrawOccupiedCells(
+                debugDraw,
+                debugSnapshot.Spatial,
+                new Vector4(
+                    0.35f,
+                    0.65f,
+                    1.0f,
+                    0.8f),
+                new Vector4(
+                    1.0f,
+                    0.35f,
+                    0.15f,
+                    1.0f),
+                maximumCells: 256,
+                maximumLabels: MaximumDebugLabels);
+            SkirmishOpponentDebugVisualization.Draw(
+                debugDraw,
+                debugSnapshot.Opponents,
+                MaximumDebugLabels);
+            DrawEntityBounds(
+                debugDraw,
+                renderWorld,
+                alpha,
+                boundsColor);
+        }
+    }
+
+    private static void DrawEntityBounds(
+        DebugDraw debugDraw,
+        RenderWorld renderWorld,
+        float alpha,
+        Vector4 color)
+    {
+        int debugCount =
+            Math.Min(
                 renderWorld.InstanceCount,
                 MaximumDebugInstanceBoxes);
 
-            for (int index = 0; index < debugCount; index++)
-            {
-                RenderInstance instance =
-                    renderWorld.GetInterpolatedInstance(index, alpha);
-                DrawInstanceBounds(
-                    debugDraw,
-                    instance,
-                    boundsColor,
-                    index < MaximumDebugLabels
-                        ? $"E{instance.Entity.Index}"
-                        : null);
-            }
-        }
-
-        foreach (var entity in
-                 selectionController.Selection.Entities)
+        for (int index = 0;
+             index < debugCount;
+             index++)
         {
-            if (!renderWorld.TryGetInterpolatedInstance(
-                    entity,
-                    alpha,
-                    out RenderInstance instance))
-            {
-                continue;
-            }
-
-            RtsWorldMarkerVisualization.DrawSelected(
+            RenderInstance instance =
+                renderWorld.GetInterpolatedInstance(
+                    index,
+                    alpha);
+            DrawInstanceBounds(
                 debugDraw,
                 instance,
-                selectedColor);
-        }
-
-        EntityId inspected =
-            selectionController.InspectedEntity;
-        if (inspected.IsValid &&
-            !selectionController.Selection.Contains(
-                inspected) &&
-            renderWorld.TryGetInterpolatedInstance(
-                inspected,
-                alpha,
-                out RenderInstance inspectedInstance))
-        {
-            RtsWorldMarkerVisualization.DrawHover(
-                debugDraw,
-                inspectedInstance,
-                selectedColor);
-        }
-
-        EntityId hovered =
-            selectionController.HoveredEntity;
-        if (hovered.IsValid &&
-            !selectionController.Selection.Contains(
-                hovered) &&
-            renderWorld.TryGetInterpolatedInstance(
-                hovered,
-                alpha,
-                out RenderInstance hoveredInstance))
-        {
-            RtsWorldMarkerVisualization.DrawHover(
-                debugDraw,
-                hoveredInstance,
-                hoveredColor);
+                color,
+                index <
+                    MaximumDebugLabels
+                    ? $"E{instance.Entity.Index}"
+                    : null);
         }
     }
 
@@ -1834,21 +1997,27 @@ internal sealed class ClientApplication
         Vector4 color,
         string? label)
     {
-        Vector3 extents = Vector3.Max(
-            Vector3.Abs(instance.Transform.Scale) * 0.5f,
-            new Vector3(0.05f));
+        AxisAlignedBounds bounds =
+            PresentationBounds.ResolveAxisAlignedBounds(
+                instance);
+        Vector3 extents =
+            (bounds.Maximum -
+             bounds.Minimum) *
+            0.5f;
 
         debugDraw.Box(
-            new AxisAlignedBounds(
-                instance.Transform.Position - extents,
-                instance.Transform.Position + extents),
+            bounds,
             color);
 
         if (label is not null)
         {
             debugDraw.Label(
                 instance.Transform.Position +
-                new Vector3(0.0f, extents.Y + 2.0f, 0.0f),
+                new Vector3(
+                    0.0f,
+                    extents.Y +
+                    2.0f,
+                    0.0f),
                 label,
                 color);
         }
@@ -1917,6 +2086,111 @@ internal sealed class ClientApplication
         }
 
         held = down;
+    }
+
+    private static void UpdateDebugOverlayToggles(
+        InputState inputState,
+        DebugOverlayController overlay,
+        ref bool masterHeld,
+        ref bool navigationHeld,
+        ref bool worldHeld,
+        ref bool logisticsHeld,
+        ref bool sensorsHeld,
+        ref bool combatHeld,
+        ref bool entitiesHeld)
+    {
+        bool shiftDown =
+            inputState.IsKeyDown(
+                PlatformKey.LeftShift) ||
+            inputState.IsKeyDown(
+                PlatformKey.RightShift);
+
+        if (ConsumeKeyPress(
+                inputState,
+                PlatformKey.F2,
+                ref masterHeld))
+        {
+            if (shiftDown)
+            {
+                overlay.ToggleCategory(
+                    DebugOverlayCategory.Rendering);
+            }
+            else
+            {
+                overlay.ToggleMaster();
+            }
+        }
+
+        ToggleDebugCategory(
+            inputState,
+            PlatformKey.F4,
+            DebugOverlayCategory.Navigation,
+            overlay,
+            modifierActive:
+                shiftDown,
+            ref navigationHeld);
+        ToggleDebugCategory(
+            inputState,
+            PlatformKey.F5,
+            DebugOverlayCategory.World,
+            overlay,
+            modifierActive:
+                shiftDown,
+            ref worldHeld);
+        ToggleDebugCategory(
+            inputState,
+            PlatformKey.F6,
+            DebugOverlayCategory.Logistics,
+            overlay,
+            modifierActive:
+                shiftDown,
+            ref logisticsHeld);
+        ToggleDebugCategory(
+            inputState,
+            PlatformKey.F7,
+            DebugOverlayCategory.Sensors,
+            overlay,
+            modifierActive:
+                shiftDown,
+            ref sensorsHeld);
+        ToggleDebugCategory(
+            inputState,
+            PlatformKey.F8,
+            DebugOverlayCategory.Combat,
+            overlay,
+            modifierActive:
+                shiftDown,
+            ref combatHeld);
+        ToggleDebugCategory(
+            inputState,
+            PlatformKey.F9,
+            DebugOverlayCategory.Entities,
+            overlay,
+            modifierActive:
+                shiftDown,
+            ref entitiesHeld);
+    }
+
+    private static void ToggleDebugCategory(
+        InputState inputState,
+        PlatformKey key,
+        DebugOverlayCategory category,
+        DebugOverlayController overlay,
+        bool modifierActive,
+        ref bool held)
+    {
+        bool pressed =
+            ConsumeKeyPress(
+                inputState,
+                key,
+                ref held);
+
+        if (pressed &&
+            modifierActive)
+        {
+            overlay.ToggleCategory(
+                category);
+        }
     }
 
     private static void UpdateFormationSelection(
