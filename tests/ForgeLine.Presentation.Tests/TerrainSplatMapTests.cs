@@ -153,6 +153,39 @@ public sealed class TerrainSplatMapTests
                     1.0f));
     }
 
+    [Fact]
+    public void MacroVariationIsDeterministicAndReadabilityBounded()
+    {
+        System.Numerics.Vector3[] positions =
+        [
+            new(0.0f, 0.0f, 0.0f),
+            new(384.0f, 0.0f, 256.0f),
+            new(1_024.0f, 0.0f, 1_536.0f),
+            new(2_560.0f, 0.0f, 768.0f)
+        ];
+
+        float[] values =
+            positions
+                .Select(
+                    TerrainRenderer.CalculateMacroVariation)
+                .ToArray();
+
+        Assert.All(
+            values,
+            value =>
+                Assert.InRange(
+                    value,
+                    0.90f,
+                    1.08f));
+        Assert.True(
+            values.Distinct().Count() >
+            1);
+        Assert.Equal(
+            values[2],
+            TerrainRenderer.CalculateMacroVariation(
+                positions[2]));
+    }
+
     private static TerrainChunk CreateFlatChunk(
         ChunkCoordinate coordinate)
     {

@@ -1141,15 +1141,8 @@ public sealed class TerrainRenderer : IDisposable
             TerrainVertex vertex =
                 vertices[index];
             float macro =
-                0.96f +
-                0.04f *
-                MathF.Sin(
-                    vertex.Position.X *
-                        0.0037f +
-                    MathF.Sin(
-                        vertex.Position.Z *
-                        0.0043f) *
-                        1.7f);
+                CalculateMacroVariation(
+                    vertex.Position);
 
             result[index] =
                 new TerrainRenderVertex(
@@ -1164,6 +1157,35 @@ public sealed class TerrainRenderer : IDisposable
         }
 
         return result;
+    }
+
+    internal static float CalculateMacroVariation(
+        Vector3 position)
+    {
+        float broad =
+            MathF.Sin(
+                position.X *
+                    0.0019f +
+                position.Z *
+                    0.0013f);
+        float secondary =
+            MathF.Sin(
+                position.X *
+                    0.0047f -
+                position.Z *
+                    0.0039f +
+                MathF.Sin(
+                    position.Z *
+                        0.0011f));
+
+        return Math.Clamp(
+            1.0f +
+            broad *
+                0.055f +
+            secondary *
+                0.025f,
+            0.90f,
+            1.08f);
     }
 
     private static void WriteLayerConstants(
