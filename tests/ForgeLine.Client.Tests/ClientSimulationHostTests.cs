@@ -541,10 +541,12 @@ public sealed class ClientSimulationHostTests
             viewportWidth,
             720,
             OverlayEnabled: false,
-            WorldDebugEnabled: false,
+            DebugOverlayView.Disabled,
             default,
             default,
             FormationTemplate.Compact,
+            [],
+            [],
             [],
             []);
 
