@@ -170,17 +170,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 continue;
             }
 
-            Vector3 extents =
-                Vector3.Max(
-                    Vector3.Abs(
-                        instance.Transform.Scale) *
-                    0.5f,
-                    new Vector3(
-                        0.05f));
-            var bounds =
-                new AxisAlignedBounds(
-                    instance.Transform.Position - extents,
-                    instance.Transform.Position + extents);
+            AxisAlignedBounds bounds =
+                PresentationBounds.ResolveAxisAlignedBounds(
+                    instance);
 
             if (!frustum.Intersects(
                     bounds))

@@ -19,6 +19,8 @@ Simulation remains authoritative for movement, combat, health, supply, ownership
 
 The existing Combat Engineer intentionally reuses the Rifle Squad presentation family until a dedicated infantry-art package is justified. No gameplay definition or stable `UnitId` is duplicated.
 
+These meshes are also the current readability geometry baseline. Their intentionally exaggerated role features are retained rather than replaced by a parallel placeholder set: the tank is wide and gun-dominant, the scout is sensor-dominant and lighter, artillery is defined by its long weapon mass, and logistics vehicles expose rear cargo or supply modules. Recognition must remain possible from silhouette at the normal RTS camera before material color is considered.
+
 ## Source layout
 
 Editable unit assets live below:
@@ -124,6 +126,8 @@ material.directorate.symbol.<family>
 These references are owned by `UnitPresentationCatalog` and form the shared binding point for future minimap and strategic-view consumers. No second icon-name table is introduced.
 
 Normal unit selection continues to use the existing `ControllableEntity` metadata. Wreck proxies never receive that component and therefore cannot enter command selection.
+
+Presentation uses role-specific readability bounds around unit transforms for picking and frustum culling. These bounds add conservative room for features such as the tank gun, artillery barrel, scout sensor mast, and logistics modules while leaving `GroundMovement`, `CombatHitbox`, `SpatialPresence`, navigation, and collision assets unchanged. Selection rings are anchored to the unexpanded visual ground plane so the additional silhouette allowance never moves UI markers below the terrain.
 
 ## Renderer integration
 

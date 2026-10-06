@@ -114,7 +114,9 @@ World-space information markers supplement the existing selection/input model:
 
 Marker shape communicates meaning in addition to tint. Gameplay-critical state therefore does not rely on color alone.
 
-World markers are presentation geometry only and do not alter picking, collision, navigation, command validation, or simulation footprints.
+World markers are presentation geometry only and do not alter collision, navigation, command validation, or simulation footprints.
+
+Picking, hover, selection markers, and renderer culling share the same presentation-bounds calculation. Unit bounds include conservative role-specific expansion for silhouette features such as weapons and sensors, and rotated transforms are converted to world-space axis-aligned bounds consistently. Unit rings and building footprint outlines are anchored just above the visual ground plane; building outlines also preserve authored orientation. This keeps interaction geometry aligned with visible objects without changing gameplay authority.
 
 ## Health and supply information
 

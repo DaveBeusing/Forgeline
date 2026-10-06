@@ -43,14 +43,14 @@ public static class SelectionPicking
                 continue;
             }
 
-            Vector3 extents = Vector3.Max(
-                Vector3.Abs(instance.Transform.Scale) * 0.5f,
-                new Vector3(0.05f));
+            var bounds =
+                PresentationBounds.ResolveAxisAlignedBounds(
+                    instance);
 
             if (!TryIntersectBounds(
                     ray,
-                    instance.Transform.Position - extents,
-                    instance.Transform.Position + extents,
+                    bounds.Minimum,
+                    bounds.Maximum,
                     out float distance) ||
                 distance >= nearestDistance)
             {
@@ -110,15 +110,14 @@ public static class SelectionPicking
                 continue;
             }
 
-            Vector3 extents =
-                Vector3.Max(
-                    Vector3.Abs(instance.Transform.Scale) * 0.5f,
-                    new Vector3(0.05f));
+            var bounds =
+                PresentationBounds.ResolveAxisAlignedBounds(
+                    instance);
 
             if (!TryIntersectBounds(
                     ray,
-                    instance.Transform.Position - extents,
-                    instance.Transform.Position + extents,
+                    bounds.Minimum,
+                    bounds.Maximum,
                     out float distance) ||
                 distance >= nearestDistance)
             {

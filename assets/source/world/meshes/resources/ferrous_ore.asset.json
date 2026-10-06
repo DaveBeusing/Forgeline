@@ -1,7 +1,7 @@
 {
   "id": "mesh.world.resource.ferrous_ore",
   "type": "mesh",
-  "source": "../sources/world_box.gltf",
+  "source": "../sources/resource_ferrous_ore.gltf",
   "materialReferences": [
     "material.world.resource.ferrous_ore"
   ],

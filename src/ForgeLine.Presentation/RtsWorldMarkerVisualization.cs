@@ -12,13 +12,20 @@ public static class RtsWorldMarkerVisualization
     {
         ArgumentNullException.ThrowIfNull(draw);
 
-        Vector3 extents =
-            Vector3.Max(
-                Vector3.Abs(
-                    instance.Transform.Scale) *
-                0.5f,
-                new Vector3(
-                    0.5f));
+        Vector3 localExtents =
+            PresentationBounds.ResolveLocalHalfExtents(
+                instance);
+        AxisAlignedBounds bounds =
+            PresentationBounds.ResolveAxisAlignedBounds(
+                instance);
+        Vector3 worldExtents =
+            (bounds.Maximum -
+             bounds.Minimum) *
+            0.5f;
+        float markerY =
+            PresentationBounds.ResolveGroundPlaneY(
+                instance) +
+            0.08f;
 
         if (instance.Selectable.Category ==
             ForgeLine.Game.ControllableEntityCategory.Building)
@@ -26,19 +33,22 @@ public static class RtsWorldMarkerVisualization
             DrawFootprint(
                 draw,
                 instance.Transform.Position,
-                extents,
+                instance.Transform.Rotation,
+                localExtents,
+                markerY,
                 color);
             return;
         }
 
         draw.Circle(
-            instance.Transform.Position +
-            Vector3.UnitY *
-                0.15f,
+            new Vector3(
+                instance.Transform.Position.X,
+                markerY,
+                instance.Transform.Position.Z),
             MathF.Max(
-                extents.X,
-                extents.Z) *
-            1.15f,
+                worldExtents.X,
+                worldExtents.Z) *
+            1.10f,
             color,
             24);
     }
@@ -50,23 +60,26 @@ public static class RtsWorldMarkerVisualization
     {
         ArgumentNullException.ThrowIfNull(draw);
 
+        AxisAlignedBounds bounds =
+            PresentationBounds.ResolveAxisAlignedBounds(
+                instance);
+        Vector3 worldExtents =
+            (bounds.Maximum -
+             bounds.Minimum) *
+            0.5f;
         Vector3 center =
-            instance.Transform.Position +
-            Vector3.UnitY *
-                MathF.Max(
-                    0.25f,
-                    MathF.Abs(
-                        instance.Transform.Scale.Y) *
-                    0.55f);
+            new(
+                instance.Transform.Position.X,
+                bounds.Maximum.Y +
+                    0.20f,
+                instance.Transform.Position.Z);
         float radius =
             MathF.Max(
                 1.0f,
                 MathF.Max(
-                    MathF.Abs(
-                        instance.Transform.Scale.X),
-                    MathF.Abs(
-                        instance.Transform.Scale.Z)) *
-                0.35f);
+                    worldExtents.X,
+                    worldExtents.Z) *
+                0.70f);
 
         Vector3 north =
             center +
@@ -224,44 +237,66 @@ public static class RtsWorldMarkerVisualization
     private static void DrawFootprint(
         DebugDraw draw,
         Vector3 center,
-        Vector3 extents,
+        Quaternion rotation,
+        Vector3 localExtents,
+        float markerY,
         Vector4 color)
     {
-        float y =
-            center.Y +
-            0.15f;
         Vector3 p0 =
-            new(
-                center.X -
-                extents.X,
-                y,
-                center.Z -
-                extents.Z);
+            RotateGroundCorner(
+                center,
+                rotation,
+                -localExtents.X,
+                -localExtents.Z,
+                markerY);
         Vector3 p1 =
-            new(
-                center.X +
-                extents.X,
-                y,
-                center.Z -
-                extents.Z);
+            RotateGroundCorner(
+                center,
+                rotation,
+                localExtents.X,
+                -localExtents.Z,
+                markerY);
         Vector3 p2 =
-            new(
-                center.X +
-                extents.X,
-                y,
-                center.Z +
-                extents.Z);
+            RotateGroundCorner(
+                center,
+                rotation,
+                localExtents.X,
+                localExtents.Z,
+                markerY);
         Vector3 p3 =
-            new(
-                center.X -
-                extents.X,
-                y,
-                center.Z +
-                extents.Z);
+            RotateGroundCorner(
+                center,
+                rotation,
+                -localExtents.X,
+                localExtents.Z,
+                markerY);
 
         draw.Line(p0, p1, color);
         draw.Line(p1, p2, color);
         draw.Line(p2, p3, color);
         draw.Line(p3, p0, color);
+    }
+
+    private static Vector3 RotateGroundCorner(
+        Vector3 center,
+        Quaternion rotation,
+        float localX,
+        float localZ,
+        float markerY)
+    {
+        Vector3 offset =
+            Vector3.Transform(
+                new Vector3(
+                    localX,
+                    0.0f,
+                    localZ),
+                rotation);
+
+        return new Vector3(
+            center.X +
+                offset.X,
+            markerY,
+            center.Z +
+                offset.Z);
     }
 }

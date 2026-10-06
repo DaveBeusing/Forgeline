@@ -87,6 +87,8 @@ Each family has:
 
 Resource deposits are normal presentation instances and therefore visible outside the F2 debug layer.
 
+The four families now use distinct clustered source geometry instead of sharing the generic world box. Ferrous Ore reads as dense blocky ore masses; Silicates use a vertical shard/spire cluster; Volatiles use lower faceted nodules; Rare Elements use a sparse, sharply vertical asymmetric shard cluster. Reduced LOD assets preserve the same family silhouette with fewer primitives. Material tint reinforces identity but is not the primary role signal.
+
 ### Presentation states
 
 `PresentationExtractor` maps authoritative deposit state into:
@@ -140,6 +142,7 @@ The repository validates this baseline through:
 - terrain material slot and fallback tests;
 - resource state extraction tests;
 - resource inspection tests that verify deposits do not enter command selection;
+- compiled resource-mesh tests that reject a regression to generic box geometry and require distinct high-detail silhouettes;
 - LOD and strategic-symbol lookup tests;
 - compiled terrain-material resolution with deterministic missing-material fallback;
 - repeated-instance batching that verifies multiple visible instances share one instanced draw;

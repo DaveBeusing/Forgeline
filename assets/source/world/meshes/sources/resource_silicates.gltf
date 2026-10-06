@@ -1,0 +1,51 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine resource readability geometry"
+  },
+  "buffers": [
+    {
+      "byteLength": 660,
+      "uri": "data:application/octet-stream;base64,18CqvgAAAL/CND2+HwfDvQAAAL9moFq+1y+IvQAAAL/A7co8BQucvgAAAL9wJVs9zcxMvgrXoz4K16O9w8lzPQAAAL8AbYW8GDiDPgAAAL9y5Z884cVhPgAAAL9tel0+FUHCPAAAAL8f0Dg+KVwPPgAAAD/NzMw90sdrPgAAAL/qi3++xrDAPgAAAL9QLaG+DUXmPgAAAL+wDRq+MHibPgAAAL/yfa69exSuPuxROD7NzEy+SmfFvgAAAL9Zx/89HyVpvgAAAL+NdUA+rMGWvgAAAL+50LU+ZpbnvgAAAL/Jh5U+exSuvo/C9T2PwnU+23XGvQAAAL+k2cO+KACpPQAAAL8QN8u+23XGPQAAAL8fs16+KACpvQAAAL9G+E++AAAAAArXIz2amZm+AAAAAAIAAAABAAAAAAAAAAMAAAACAAAAAAAAAAEAAAAEAAAAAQAAAAIAAAAEAAAAAgAAAAMAAAAEAAAAAwAAAAAAAAAEAAAABQAAAAcAAAAGAAAABQAAAAgAAAAHAAAABQAAAAYAAAAJAAAABgAAAAcAAAAJAAAABwAAAAgAAAAJAAAACAAAAAUAAAAJAAAACgAAAAwAAAALAAAACgAAAA0AAAAMAAAACgAAAAsAAAAOAAAACwAAAAwAAAAOAAAADAAAAA0AAAAOAAAADQAAAAoAAAAOAAAADwAAABEAAAAQAAAADwAAABIAAAARAAAADwAAABAAAAATAAAAEAAAABEAAAATAAAAEQAAABIAAAATAAAAEgAAAA8AAAATAAAAFAAAABYAAAAVAAAAFAAAABcAAAAWAAAAFAAAABUAAAAYAAAAFQAAABYAAAAYAAAAFgAAABcAAAAYAAAAFwAAABQAAAAYAAAA"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 300
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 300,
+      "byteLength": 360
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 25,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5125,
+      "count": 90,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1,
+          "mode": 4
+        }
+      ]
+    }
+  ]
+}

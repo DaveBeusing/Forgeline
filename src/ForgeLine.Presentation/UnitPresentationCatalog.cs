@@ -105,6 +105,61 @@ public static class UnitPresentationCatalog
             : UnitAssetLod.Lod0;
     }
 
+    public static Vector3 ResolveReadabilityBoundsScale(
+        UnitId unit)
+    {
+        if (unit == UnitIds.MainBattleTank)
+        {
+            return new Vector3(
+                1.15f,
+                1.20f,
+                1.35f);
+        }
+
+        if (unit == UnitIds.MobileArtillery)
+        {
+            return new Vector3(
+                1.15f,
+                1.20f,
+                1.45f);
+        }
+
+        if (unit == UnitIds.ScoutVehicle)
+        {
+            return new Vector3(
+                1.15f,
+                1.35f,
+                1.15f);
+        }
+
+        if (unit == UnitIds.CargoTruck)
+        {
+            return new Vector3(
+                1.10f,
+                1.10f,
+                1.12f);
+        }
+
+        if (unit == UnitIds.SupplyTruck)
+        {
+            return new Vector3(
+                1.10f,
+                1.15f,
+                1.12f);
+        }
+
+        if (unit == UnitIds.RifleSquad ||
+            unit == UnitIds.CombatEngineer)
+        {
+            return new Vector3(
+                1.15f,
+                1.10f,
+                1.15f);
+        }
+
+        return Vector3.One;
+    }
+
     public static Vector4 ResolveFallbackTint(
         in UnitFeaturePresentationMetadata feature) =>
         ApplyDamageTint(
