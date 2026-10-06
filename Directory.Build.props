@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ForgeLineVersionMajor>0</ForgeLineVersionMajor>
     <ForgeLineVersionMinor>1</ForgeLineVersionMinor>
-    <ForgeLineVersionPatch>70</ForgeLineVersionPatch>
+    <ForgeLineVersionPatch>71</ForgeLineVersionPatch>
     <VersionPrefix>$(ForgeLineVersionMajor).$(ForgeLineVersionMinor).$(ForgeLineVersionPatch)</VersionPrefix>
     <Version>$(VersionPrefix)</Version>
     <AssemblyVersion>$(Version).0</AssemblyVersion>
