@@ -103,9 +103,15 @@ The JSON report captures the latest completed D3D12 render frame with:
 - total measured world/debug draw calls;
 - visible and total render instances;
 - high-detail and reduced-LOD instance counts;
-- active VFX, pool capacity, and dropped VFX count.
+- active VFX, pool capacity, and dropped VFX count;
+- active scene-light direction;
+- directional and ambient light intensity;
+- manual scene exposure;
+- active tone-mapping mode.
 
 `gpuMilliseconds` is populated from Direct3D 12 timestamp queries recorded around the production graphics command list and read only after the owning frame fence completes. `gpuTimingAvailable` remains explicit; unsupported timing never falls back to CPU frame time.
+
+The Windows qualification gate also requires finite positive directional-light/exposure state, non-negative ambient intensity, and the current AcesFitted tone-mapping baseline. This validates that the production scene is not silently rendered through an unconfigured lighting path. It is a structural qualification rather than an image-similarity gate.
 
 ## Rendering Benchmarks
 
