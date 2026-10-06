@@ -73,16 +73,19 @@ public sealed class PresentationExtractor : ISimulationTickObserver
             _extraction?.Interaction.Capture() ??
             default;
 
+        DebugOverlayCategory requiredDebugData =
+            DebugOverlayPolicy.ResolveRequiredData(
+                interaction.DebugCategories,
+                interaction.StrategicOverlay);
         bool diagnosticsRequested =
-            interaction.DebugEnabled ||
-            interaction.StrategicOverlay !=
-                StrategicOverlayMode.None;
+            requiredDebugData !=
+            DebugOverlayCategory.None;
 
         if (_extraction is not null)
         {
             ApplyDebugCaptureState(
                 _extraction.Scenario,
-                diagnosticsRequested);
+                requiredDebugData);
         }
 
         _vfxPool.BeginTick(
@@ -1581,30 +1584,51 @@ public sealed class PresentationExtractor : ISimulationTickObserver
 
     private static void ApplyDebugCaptureState(
         VerticalSliceScenario scenario,
-        bool enabled)
+        DebugOverlayCategory categories)
     {
+        bool navigation =
+            (categories &
+             DebugOverlayCategory.Navigation) !=
+            0;
+        bool logistics =
+            (categories &
+             DebugOverlayCategory.Logistics) !=
+            0;
+        bool sensors =
+            (categories &
+             DebugOverlayCategory.Sensors) !=
+            0;
+        bool combat =
+            (categories &
+             DebugOverlayCategory.Combat) !=
+            0;
+        bool entities =
+            (categories &
+             DebugOverlayCategory.Entities) !=
+            0;
+
         scenario.Services.GroundMovement.DebugCaptureEnabled =
-            enabled;
+            navigation;
         scenario.Services.FormationMovement.DebugCaptureEnabled =
-            enabled;
+            navigation;
         scenario.BattlefieldSupply.DebugCaptureEnabled =
-            enabled;
+            logistics;
         scenario.Services.BattlefieldIntelligence.TimingEnabled =
-            enabled;
+            sensors;
         scenario.Services.BattlefieldIntelligence.DebugCaptureEnabled =
-            enabled;
+            sensors;
         scenario.Artillery.DebugCaptureEnabled =
-            enabled;
+            combat;
         scenario.Services.TargetAcquisition.DebugCaptureEnabled =
-            enabled;
+            combat;
         scenario.Services.TacticalCombat.DebugCaptureEnabled =
-            enabled;
+            combat;
         scenario.Readiness.DebugCaptureEnabled =
-            enabled;
+            combat;
         scenario.Services.CombatDebugSnapshots.DebugCaptureEnabled =
-            enabled;
+            combat;
         scenario.Opponents.DebugCaptureEnabled =
-            enabled;
+            entities;
     }
 
     private bool IsVisibleToViewer(
