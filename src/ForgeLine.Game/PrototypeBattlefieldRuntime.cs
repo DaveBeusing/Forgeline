@@ -524,7 +524,7 @@ public sealed class PrototypeBattlefieldRuntime
     private static void CreateRoadNodePresentationEntities(
         EntityRegistry entities,
         PrototypeBattlefieldDefinition definition,
-        IReadOnlyDictionary<string, Vector3> roadNodePositions)
+        Dictionary<string, Vector3> roadNodePositions)
     {
         const float MinimumCurveDegrees = 8.0f;
         const float ShortCurveDegrees = 35.0f;
@@ -701,7 +701,7 @@ public sealed class PrototypeBattlefieldRuntime
     }
 
     private static float ResolveTJunctionYaw(
-        IReadOnlyList<Vector3> directions)
+        List<Vector3> directions)
     {
         int oppositeLeft = 0;
         int oppositeRight = 1;
