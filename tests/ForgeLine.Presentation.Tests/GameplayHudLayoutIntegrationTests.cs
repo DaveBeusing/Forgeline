@@ -26,8 +26,8 @@ public sealed class GameplayHudLayoutIntegrationTests
                 width,
                 height,
                 actions: null,
-                dpi,
-                uiScale);
+                dpi: dpi,
+                uiScale: uiScale);
 
         Assert.Equal(
             layout.ActionDock.X,
