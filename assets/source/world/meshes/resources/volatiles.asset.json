@@ -1,7 +1,7 @@
 {
   "id": "mesh.world.resource.volatiles",
   "type": "mesh",
-  "source": "../sources/world_box.gltf",
+  "source": "../sources/resource_volatiles.gltf",
   "materialReferences": [
     "material.world.resource.volatiles"
   ],
