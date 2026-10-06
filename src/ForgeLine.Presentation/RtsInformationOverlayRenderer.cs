@@ -49,7 +49,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         PresentationSnapshot snapshot,
         in AxisAlignedBounds worldBounds,
         in RtsInformationLayerView view,
-        uint dpi)
+        uint dpi,
+        float uiScale = 1.0f)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(context);
@@ -64,21 +65,26 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         }
 
         _vertexCount = 0;
+        GameplayHudLayout layout =
+            GameplayHudLayout.Create(
+                context.Width,
+                context.Height,
+                dpi,
+                uiScale);
         float scale =
-            RtsUiLayout.ScaleForDpi(
-                dpi);
+            layout.Scale;
 
         if (snapshot.PlayerExperience is
             PlayerExperienceSnapshot experience)
         {
             EmitResourceStrip(
                 experience,
-                scale,
+                layout,
                 context.Width,
                 context.Height);
             EmitSelectionStatus(
                 experience.Selection,
-                scale,
+                layout,
                 context.Width,
                 context.Height);
         }
@@ -96,7 +102,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             EmitMinimap(
                 minimap,
                 camera.Target,
-                scale,
+                layout,
                 context.Width,
                 context.Height);
         }
@@ -173,10 +179,12 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
 
     private void EmitResourceStrip(
         in PlayerExperienceSnapshot experience,
-        float scale,
+        in GameplayHudLayout layout,
         int width,
         int height)
     {
+        float scale =
+            layout.Scale;
         RtsUiIcon[] icons =
         [
             RtsUiIcon.ResourceFerrousOre,
@@ -197,13 +205,19 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 (size + gap) +
             12.0f * scale;
         float x =
-            Math.Max(
-                8.0f * scale,
-                (width -
+            layout.TopStatusBar.X +
+            MathF.Max(
+                0.0f,
+                (layout.TopStatusBar.Width -
                  panelWidth) *
                 0.5f);
         float y =
-            8.0f * scale;
+            layout.TopStatusBar.Y +
+            MathF.Max(
+                0.0f,
+                (layout.TopStatusBar.Height -
+                 size) *
+                0.5f);
 
         EmitQuad(
             x - 6.0f * scale,
@@ -236,20 +250,23 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
 
     private void EmitSelectionStatus(
         in PlayerSelectionSummary selection,
-        float scale,
+        in GameplayHudLayout layout,
         int width,
         int height)
     {
+        float scale =
+            layout.Scale;
         if (selection.Count <= 0)
         {
             return;
         }
 
         float x =
-            14.0f * scale;
+            layout.SelectionInspector.X +
+            6.0f * scale;
         float y =
-            height -
-            72.0f * scale;
+            layout.SelectionInspector.Y +
+            6.0f * scale;
         float iconSize =
             14.0f * scale;
         float barWidth =
@@ -358,27 +375,26 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     private void EmitMinimap(
         RtsMinimapModel model,
         Vector3 cameraTarget,
-        float scale,
+        in GameplayHudLayout layout,
         int width,
         int height)
     {
+        float scale =
+            layout.Scale;
         float size =
-            Math.Clamp(
-                220.0f * scale,
-                120.0f,
-                MathF.Min(
-                    width * 0.28f,
-                    height * 0.34f));
-        float margin =
-            14.0f * scale;
+            MathF.Min(
+                layout.Minimap.Width,
+                layout.Minimap.Height);
+
+        if (size <= 0.0f)
+        {
+            return;
+        }
+
         float left =
-            width -
-            size -
-            margin;
+            layout.Minimap.X;
         float top =
-            height -
-            size -
-            margin;
+            layout.Minimap.Y;
 
         EmitQuad(
             left - 3.0f,
