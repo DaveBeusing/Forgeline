@@ -183,13 +183,13 @@ public sealed class GameplayHudFoundationTests
             new HudInteractionContext();
 
         Assert.True(
-            context.HitTest(
+            HudInteractionContext.HitTest(
                 new Vector2(
                     layout.ActionDock.X + 1.0f,
                     layout.ActionDock.Y + 1.0f),
                 layout.ActionDock));
         Assert.False(
-            context.HitTest(
+            HudInteractionContext.HitTest(
                 Vector2.Zero,
                 layout.ActionDock));
     }

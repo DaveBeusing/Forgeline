@@ -39,10 +39,10 @@ public sealed class HudInteractionContext
         KeyboardCaptured |= captured;
     }
 
-    public bool HitTest(
-        Vector2 pointer,
+    public static bool HitTest(
+        Vector2 position,
         in HudRect region) =>
-        region.Contains(pointer);
+        region.Contains(position);
 
     public void Reset()
     {
