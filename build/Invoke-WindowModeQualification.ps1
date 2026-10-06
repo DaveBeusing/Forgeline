@@ -167,6 +167,16 @@ function Invoke-ClientSmoke {
         throw "D3D12 debug-layer warnings/errors were reported during '$ExpectedMode' qualification."
     }
 
+    if ($metrics.lightingDirectionalIntensity -le 0 -or
+        $metrics.lightingAmbientIntensity -lt 0 -or
+        $metrics.lightingExposure -le 0) {
+        throw "Scene lighting/exposure diagnostics were invalid during '$ExpectedMode' qualification."
+    }
+
+    if ($metrics.lightingToneMapping -ne "AcesFitted") {
+        throw "Expected AcesFitted scene tone mapping during '$ExpectedMode' qualification but observed '$($metrics.lightingToneMapping)'."
+    }
+
     Write-Host (
         "Window mode qualification passed: mode={0}; client={1}x{2}; surface={3}x{4}; submitted={5}; presented={6}; frameIndex={7}/{8}" -f
         $ExpectedMode,
