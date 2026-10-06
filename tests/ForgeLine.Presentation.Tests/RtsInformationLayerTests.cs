@@ -382,16 +382,48 @@ public sealed class RtsInformationLayerTests
             draw,
             unit,
             selectedColor);
+        DebugLine[] unitSelection =
+            draw.Lines.ToArray();
         int unitSelectionLines =
-            draw.Lines.Length;
+            unitSelection.Length;
+
+        Assert.All(
+            unitSelection,
+            line =>
+            {
+                Assert.InRange(
+                    line.Start.Y,
+                    -3.93f,
+                    -3.91f);
+                Assert.InRange(
+                    line.End.Y,
+                    -3.93f,
+                    -3.91f);
+            });
 
         draw.Clear();
         RtsWorldMarkerVisualization.DrawSelected(
             draw,
             building,
             selectedColor);
+        DebugLine[] buildingSelection =
+            draw.Lines.ToArray();
         int buildingSelectionLines =
-            draw.Lines.Length;
+            buildingSelection.Length;
+
+        Assert.All(
+            buildingSelection,
+            line =>
+            {
+                Assert.InRange(
+                    line.Start.Y,
+                    -7.93f,
+                    -7.91f);
+                Assert.InRange(
+                    line.End.Y,
+                    -7.93f,
+                    -7.91f);
+            });
 
         draw.Clear();
         RtsWorldMarkerVisualization.DrawHover(
