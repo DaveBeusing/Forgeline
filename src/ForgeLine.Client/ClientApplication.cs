@@ -2126,36 +2126,48 @@ internal sealed class ClientApplication
             PlatformKey.F4,
             DebugOverlayCategory.Navigation,
             overlay,
+            modifierActive:
+                shiftDown,
             ref navigationHeld);
         ToggleDebugCategory(
             inputState,
             PlatformKey.F5,
             DebugOverlayCategory.World,
             overlay,
+            modifierActive:
+                shiftDown,
             ref worldHeld);
         ToggleDebugCategory(
             inputState,
             PlatformKey.F6,
             DebugOverlayCategory.Logistics,
             overlay,
+            modifierActive:
+                shiftDown,
             ref logisticsHeld);
         ToggleDebugCategory(
             inputState,
             PlatformKey.F7,
             DebugOverlayCategory.Sensors,
             overlay,
+            modifierActive:
+                shiftDown,
             ref sensorsHeld);
         ToggleDebugCategory(
             inputState,
             PlatformKey.F8,
             DebugOverlayCategory.Combat,
             overlay,
+            modifierActive:
+                shiftDown,
             ref combatHeld);
         ToggleDebugCategory(
             inputState,
             PlatformKey.F9,
             DebugOverlayCategory.Entities,
             overlay,
+            modifierActive:
+                shiftDown,
             ref entitiesHeld);
     }
 
@@ -2164,12 +2176,17 @@ internal sealed class ClientApplication
         PlatformKey key,
         DebugOverlayCategory category,
         DebugOverlayController overlay,
+        bool modifierActive,
         ref bool held)
     {
-        if (ConsumeKeyPress(
+        bool pressed =
+            ConsumeKeyPress(
                 inputState,
                 key,
-                ref held))
+                ref held);
+
+        if (pressed &&
+            modifierActive)
         {
             overlay.ToggleCategory(
                 category);
