@@ -18,7 +18,7 @@ public enum TerrainDebugVisualizationMode : byte
 
 public sealed class TerrainRenderer : IDisposable
 {
-    private const int TerrainBaseRootConstantCount = 49;
+    private const int TerrainBaseRootConstantCount = 37;
     private const int TerrainRootConstantCount =
         TerrainBaseRootConstantCount +
         SceneLightingSettings.ShaderConstantCount;
@@ -445,11 +445,8 @@ public sealed class TerrainRenderer : IDisposable
                 float2 TerrainPadding;
                 float4 LayerUvScale01;
                 float4 LayerUvScale23;
-                float4 LayerBaseR;
-                float4 LayerBaseG;
-                float4 LayerBaseB;
-                float4 LayerRoughness;
-                float4 LayerMetallic;
+                uint4 LayerBaseColorPacked;
+                uint4 LayerSurfacePacked;
                 uint PackedPaletteSlots;
                 float4 SceneLightDirectionIntensity;
                 float4 SceneDirectionalColorAmbientIntensity;
@@ -476,16 +473,13 @@ public sealed class TerrainRenderer : IDisposable
                 nointerpolation float DebugMode : TEXCOORD4;
                 nointerpolation float4 LayerUvScale01 : TEXCOORD5;
                 nointerpolation float4 LayerUvScale23 : TEXCOORD6;
-                nointerpolation float4 LayerBaseR : TEXCOORD7;
-                nointerpolation float4 LayerBaseG : TEXCOORD8;
-                nointerpolation float4 LayerBaseB : TEXCOORD9;
-                nointerpolation float4 LayerRoughness : TEXCOORD10;
-                nointerpolation float4 LayerMetallic : TEXCOORD11;
-                nointerpolation uint PackedPaletteSlots : TEXCOORD12;
-                nointerpolation float4 SceneLight : TEXCOORD13;
-                nointerpolation float4 SceneDirectionalAmbient : TEXCOORD14;
-                nointerpolation float4 SceneAmbientExposure : TEXCOORD15;
-                nointerpolation float2 SceneGroundTone : TEXCOORD16;
+                nointerpolation uint4 LayerBaseColorPacked : TEXCOORD7;
+                nointerpolation uint4 LayerSurfacePacked : TEXCOORD8;
+                nointerpolation uint PackedPaletteSlots : TEXCOORD9;
+                nointerpolation float4 SceneLight : TEXCOORD10;
+                nointerpolation float4 SceneDirectionalAmbient : TEXCOORD11;
+                nointerpolation float4 SceneAmbientExposure : TEXCOORD12;
+                nointerpolation float2 SceneGroundTone : TEXCOORD13;
             };
 
             VertexOutput VSMain(VertexInput input)
@@ -513,16 +507,10 @@ public sealed class TerrainRenderer : IDisposable
                     LayerUvScale01;
                 output.LayerUvScale23 =
                     LayerUvScale23;
-                output.LayerBaseR =
-                    LayerBaseR;
-                output.LayerBaseG =
-                    LayerBaseG;
-                output.LayerBaseB =
-                    LayerBaseB;
-                output.LayerRoughness =
-                    LayerRoughness;
-                output.LayerMetallic =
-                    LayerMetallic;
+                output.LayerBaseColorPacked =
+                    LayerBaseColorPacked;
+                output.LayerSurfacePacked =
+                    LayerSurfacePacked;
                 output.PackedPaletteSlots =
                     PackedPaletteSlots;
                 output.SceneLight =
@@ -566,16 +554,13 @@ public sealed class TerrainRenderer : IDisposable
                 nointerpolation float DebugMode : TEXCOORD4;
                 nointerpolation float4 LayerUvScale01 : TEXCOORD5;
                 nointerpolation float4 LayerUvScale23 : TEXCOORD6;
-                nointerpolation float4 LayerBaseR : TEXCOORD7;
-                nointerpolation float4 LayerBaseG : TEXCOORD8;
-                nointerpolation float4 LayerBaseB : TEXCOORD9;
-                nointerpolation float4 LayerRoughness : TEXCOORD10;
-                nointerpolation float4 LayerMetallic : TEXCOORD11;
-                nointerpolation uint PackedPaletteSlots : TEXCOORD12;
-                nointerpolation float4 SceneLight : TEXCOORD13;
-                nointerpolation float4 SceneDirectionalAmbient : TEXCOORD14;
-                nointerpolation float4 SceneAmbientExposure : TEXCOORD15;
-                nointerpolation float2 SceneGroundTone : TEXCOORD16;
+                nointerpolation uint4 LayerBaseColorPacked : TEXCOORD7;
+                nointerpolation uint4 LayerSurfacePacked : TEXCOORD8;
+                nointerpolation uint PackedPaletteSlots : TEXCOORD9;
+                nointerpolation float4 SceneLight : TEXCOORD10;
+                nointerpolation float4 SceneDirectionalAmbient : TEXCOORD11;
+                nointerpolation float4 SceneAmbientExposure : TEXCOORD12;
+                nointerpolation float2 SceneGroundTone : TEXCOORD13;
             };
 
             float4 NormalizeWeights(float4 weights)
@@ -623,6 +608,22 @@ public sealed class TerrainRenderer : IDisposable
                         seed);
             }
 
+            float3 UnpackRgb10(uint packed)
+            {
+                return float3(
+                    packed & 0x3ffu,
+                    (packed >> 10) & 0x3ffu,
+                    (packed >> 20) & 0x3ffu) /
+                    1023.0f;
+            }
+
+            float2 UnpackRg16(uint packed)
+            {
+                return float2(
+                    packed & 0xffffu,
+                    (packed >> 16) & 0xffffu) /
+                    65535.0f;
+            }
 
             float3 ToneMapAces(float3 value)
             {
@@ -828,38 +829,39 @@ public sealed class TerrainRenderer : IDisposable
                     worldXZ *
                     input.LayerUvScale23.zw;
 
+                float3 baseFactor0 =
+                    UnpackRgb10(
+                        input.LayerBaseColorPacked.x);
+                float3 baseFactor1 =
+                    UnpackRgb10(
+                        input.LayerBaseColorPacked.y);
+                float3 baseFactor2 =
+                    UnpackRgb10(
+                        input.LayerBaseColorPacked.z);
+                float3 baseFactor3 =
+                    UnpackRgb10(
+                        input.LayerBaseColorPacked.w);
+
                 float3 base0 =
                     LayerBase0.Sample(
                         WorldMaterialSampler,
                         uv0).rgb *
-                    float3(
-                        input.LayerBaseR.x,
-                        input.LayerBaseG.x,
-                        input.LayerBaseB.x);
+                    baseFactor0;
                 float3 base1 =
                     LayerBase1.Sample(
                         WorldMaterialSampler,
                         uv1).rgb *
-                    float3(
-                        input.LayerBaseR.y,
-                        input.LayerBaseG.y,
-                        input.LayerBaseB.y);
+                    baseFactor1;
                 float3 base2 =
                     LayerBase2.Sample(
                         WorldMaterialSampler,
                         uv2).rgb *
-                    float3(
-                        input.LayerBaseR.z,
-                        input.LayerBaseG.z,
-                        input.LayerBaseB.z);
+                    baseFactor2;
                 float3 base3 =
                     LayerBase3.Sample(
                         WorldMaterialSampler,
                         uv3).rgb *
-                    float3(
-                        input.LayerBaseR.w,
-                        input.LayerBaseG.w,
-                        input.LayerBaseB.w);
+                    baseFactor3;
 
                 float3 geometricNormal =
                     normalize(
@@ -973,18 +975,44 @@ public sealed class TerrainRenderer : IDisposable
                     orm3 *
                         weights.w;
 
+                float2 surface0 =
+                    UnpackRg16(
+                        input.LayerSurfacePacked.x);
+                float2 surface1 =
+                    UnpackRg16(
+                        input.LayerSurfacePacked.y);
+                float2 surface2 =
+                    UnpackRg16(
+                        input.LayerSurfacePacked.z);
+                float2 surface3 =
+                    UnpackRg16(
+                        input.LayerSurfacePacked.w);
+                float roughnessFactor =
+                    surface0.x *
+                        weights.x +
+                    surface1.x *
+                        weights.y +
+                    surface2.x *
+                        weights.z +
+                    surface3.x *
+                        weights.w;
+                float metallicFactor =
+                    surface0.y *
+                        weights.x +
+                    surface1.y *
+                        weights.y +
+                    surface2.y *
+                        weights.z +
+                    surface3.y *
+                        weights.w;
                 float roughness =
                     saturate(
                         orm.g *
-                        dot(
-                            input.LayerRoughness,
-                            weights));
+                        roughnessFactor);
                 float metallic =
                     saturate(
                         orm.b *
-                        dot(
-                            input.LayerMetallic,
-                            weights));
+                        metallicFactor);
                 float ao =
                     saturate(
                         orm.r);
@@ -1007,7 +1035,10 @@ public sealed class TerrainRenderer : IDisposable
                         ao,
                         roughness,
                         metallic,
-                        0.0f,
+                        float3(
+                            0.0f,
+                            0.0f,
+                            0.0f),
                         input.SceneLight,
                         input.SceneDirectionalAmbient,
                         input.SceneAmbientExposure,
@@ -1164,15 +1195,14 @@ public sealed class TerrainRenderer : IDisposable
                 resource.WorldUvScale.Y;
 
             constants[28 + layer] =
-                material.BaseColorFactor.X;
+                BitConverter.UInt32BitsToSingle(
+                    PackRgb10(
+                        material.BaseColorFactor));
             constants[32 + layer] =
-                material.BaseColorFactor.Y;
-            constants[36 + layer] =
-                material.BaseColorFactor.Z;
-            constants[40 + layer] =
-                material.RoughnessFactor;
-            constants[44 + layer] =
-                material.MetallicFactor;
+                BitConverter.UInt32BitsToSingle(
+                    PackRg16(
+                        material.RoughnessFactor,
+                        material.MetallicFactor));
         }
 
         uint packedPalette =
@@ -1180,9 +1210,63 @@ public sealed class TerrainRenderer : IDisposable
             ((uint)layers[1].Slot << 8) |
             ((uint)layers[2].Slot << 16) |
             ((uint)layers[3].Slot << 24);
-        constants[48] =
+        constants[36] =
             BitConverter.UInt32BitsToSingle(
                 packedPalette);
+    }
+
+    private static uint PackRgb10(
+        in Vector4 color)
+    {
+        uint red =
+            PackUnorm(
+                color.X,
+                1_023);
+        uint green =
+            PackUnorm(
+                color.Y,
+                1_023);
+        uint blue =
+            PackUnorm(
+                color.Z,
+                1_023);
+
+        return red |
+            (green << 10) |
+            (blue << 20);
+    }
+
+    private static uint PackRg16(
+        float first,
+        float second)
+    {
+        uint x =
+            PackUnorm(
+                first,
+                65_535);
+        uint y =
+            PackUnorm(
+                second,
+                65_535);
+
+        return x |
+            (y << 16);
+    }
+
+    private static uint PackUnorm(
+        float value,
+        uint maximum)
+    {
+        float clamped =
+            Math.Clamp(
+                value,
+                0.0f,
+                1.0f);
+
+        return checked(
+            (uint)MathF.Round(
+                clamped *
+                maximum));
     }
 
     private readonly record struct TerrainRenderVertex(
