@@ -75,12 +75,14 @@ public sealed class DebugDrawRendererTests : IDisposable
         {
             LastPipelineDescription =
                 description;
-            return new FakeGraphicsPipeline();
+            return new FakeGraphicsPipeline(
+                description);
         }
 
         public IGraphicsBuffer CreateBuffer(
             GraphicsBufferDescription description) =>
-            new FakeGraphicsBuffer();
+            new FakeGraphicsBuffer(
+                description);
 
         public void RenderFrame(
             GraphicsColor clearColor,
@@ -108,6 +110,15 @@ public sealed class DebugDrawRendererTests : IDisposable
     private sealed class FakeGraphicsPipeline :
         IGraphicsPipeline
     {
+        public FakeGraphicsPipeline(
+            GraphicsPipelineDescription description)
+        {
+            Description =
+                description;
+        }
+
+        public GraphicsPipelineDescription Description { get; }
+
         public void Dispose()
         {
         }
@@ -116,6 +127,15 @@ public sealed class DebugDrawRendererTests : IDisposable
     private sealed class FakeGraphicsBuffer :
         IGraphicsBuffer
     {
+        public FakeGraphicsBuffer(
+            GraphicsBufferDescription description)
+        {
+            Description =
+                description;
+        }
+
+        public GraphicsBufferDescription Description { get; }
+
         public void SetData<T>(
             ReadOnlySpan<T> data,
             int offsetInBytes = 0)
