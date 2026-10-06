@@ -3,6 +3,9 @@
     <TargetFramework>net10.0-windows</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="ForgeLine.Presentation.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="../ForgeLine.Game/ForgeLine.Game.csproj" />
     <ProjectReference Include="../ForgeLine.Assets/ForgeLine.Assets.csproj" />
     <ProjectReference Include="../ForgeLine.Intelligence/ForgeLine.Intelligence.csproj" />
