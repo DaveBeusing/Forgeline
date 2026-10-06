@@ -1,5 +1,6 @@
 using ForgeLine.Input;
 using ForgeLine.Platform;
+using ForgeLine.Presentation;
 using Xunit;
 
 namespace ForgeLine.Client.Tests;
@@ -25,6 +26,9 @@ public sealed class ClientUserSettingsTests
         Assert.Equal(
             WindowMode.Windowed,
             window.Mode);
+        Assert.Equal(
+            SceneLightingSettings.Default.Exposure,
+            settings.CreateSceneLightingSettings().Exposure);
     }
 
     [Fact]
@@ -89,6 +93,20 @@ public sealed class ClientUserSettingsTests
     }
 
     [Fact]
+    public void InvalidSceneExposureIsRejected()
+    {
+        var settings =
+            new ClientUserSettings
+            {
+                SceneExposure =
+                    0.0f
+            };
+
+        Assert.Throws<InvalidDataException>(
+            settings.Validate);
+    }
+
+    [Fact]
     public void DuplicatePrimaryCameraBindingsAreRejected()
     {
         var settings =
@@ -137,6 +155,7 @@ public sealed class ClientUserSettingsTests
                     UiScale = 1.25f,
                     EdgeScrollEnabled = false,
                     CameraPanSpeedMultiplier = 1.4f,
+                    SceneExposure = 1.35f,
                     CameraBindings =
                         created.Settings.CameraBindings with
                         {
@@ -165,6 +184,12 @@ public sealed class ClientUserSettingsTests
             Assert.Equal(
                 1.4f,
                 loaded.Settings.CameraPanSpeedMultiplier);
+            Assert.Equal(
+                1.35f,
+                loaded.Settings.SceneExposure);
+            Assert.Equal(
+                1.35f,
+                loaded.Settings.CreateSceneLightingSettings().Exposure);
             Assert.Equal(
                 PlatformKey.Up,
                 loaded.Settings.CameraBindings.PanForward);

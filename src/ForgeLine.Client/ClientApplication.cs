@@ -343,7 +343,8 @@ internal sealed class ClientApplication
                 terrainWorld,
                 snapshotBuffer,
                 camera.Settings,
-                runtimeAssets);
+                runtimeAssets,
+                _settings.CreateSceneLightingSettings());
 
         PlayerCommandSubmissionReceipt? lastCommandReceipt = null;
         PlayerCommandResultReadModel? lastCommandResult = null;
