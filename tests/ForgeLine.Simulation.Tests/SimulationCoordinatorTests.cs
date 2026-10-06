@@ -200,6 +200,44 @@ public sealed class SimulationCoordinatorTests
     }
 
     [Fact]
+    public void RegisterTickObserverRejectsRegistrationAfterTickingStarts()
+    {
+        var coordinator =
+            new SimulationCoordinator();
+        coordinator.AdvanceOneTick();
+
+        Assert.Throws<InvalidOperationException>(
+            () =>
+                coordinator.RegisterTickObserver(
+                    new RecordingTickObserver()));
+    }
+
+    [Fact]
+    public void AttachedTickObserverAfterRestoreObservesFutureTicksOnly()
+    {
+        var coordinator =
+            new SimulationCoordinator();
+        coordinator.RunTicks(
+            3,
+            TestContext.Current.CancellationToken);
+        var observer =
+            new RecordingTickObserver();
+
+        coordinator.AttachTickObserver(
+            observer);
+        coordinator.AdvanceOneTick();
+
+        Assert.Single(
+            observer.Ticks);
+        Assert.Equal(
+            new SimulationTick(4),
+            observer.Ticks[0]);
+        Assert.Equal(
+            1,
+            coordinator.RegisteredTickObserverCount);
+    }
+
+    [Fact]
     public void WarmEmptyTickLoopDoesNotAllocate()
     {
         var coordinator = new SimulationCoordinator();
@@ -225,6 +263,19 @@ public sealed class SimulationCoordinatorTests
             coordinator.Clock.TickDuration.Ticks * 2_000L);
 
         Assert.True(stopwatch.Elapsed < logicalDuration);
+    }
+
+    private sealed class RecordingTickObserver : ISimulationTickObserver
+    {
+        public List<SimulationTick> Ticks { get; } =
+            new();
+
+        public void OnTickCompleted(
+            SimulationContext context)
+        {
+            Ticks.Add(
+                context.Tick);
+        }
     }
 
     private sealed class RecordingSystem : ISimulationSystem

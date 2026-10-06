@@ -75,6 +75,13 @@ public sealed class SimulationCoordinator
                 "Simulation tick observers must be registered before ticking starts.");
         }
 
+        AttachTickObserver(observer);
+    }
+
+    public void AttachTickObserver(ISimulationTickObserver observer)
+    {
+        ArgumentNullException.ThrowIfNull(observer);
+
         _tickObservers.Add(observer);
     }
 
