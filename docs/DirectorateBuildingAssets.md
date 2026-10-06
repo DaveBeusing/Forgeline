@@ -22,6 +22,8 @@ The first visual baseline intentionally uses compact modular geometry. Stable as
 
 The existing gameplay `BuildingId` values and building-definition keys remain authoritative. The presentation catalog maps those IDs to stable Directorate runtime assets rather than creating a second gameplay roster.
 
+The current compact geometry is the building readability baseline rather than a flat placement marker. Command, production, storage, and supply functions are distinguished through footprint, massing, access/loading forms, tanks, vents, and service attachments. Future art may increase fidelity, but it must preserve those normal-RTS-camera role reads.
+
 ## Source layout
 
 Editable sources live below:
@@ -111,6 +113,8 @@ building.directorate.module.collision_box
 ```
 
 That asset is a tooling/runtime visual contract only. Gameplay placement, occupancy, navigation, combat hitboxes, and construction validation continue to use existing simulation-owned footprint/spatial contracts and never change with render LOD.
+
+Presentation picking and culling use the authored visual transform and orientation rather than changing the simulation footprint. Building selection outlines are drawn on the visual ground plane and rotate with the building, preventing the outline from cutting through the building mass or becoming axis-misaligned after orientation changes.
 
 ## Strategic symbols
 

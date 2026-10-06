@@ -123,7 +123,7 @@ Run the full rendering qualification matrix with:
 dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release -- --filter "*" --job Short --artifacts artifacts/rendering-benchmarks --exporters BriefJSON
 ~~~
 
-The representative mixed-content scene contains repeated Directorate armor and reconnaissance, Command Core and Vehicle Factory instances, resource deposits, vegetation, industrial props, and combat VFX. A separate road-readability workload submits the production road surface, shoulder, curve, T-junction, and cross-junction assets through the same runtime material path.
+The representative mixed-content scene contains repeated Directorate armor and reconnaissance, Command Core and Vehicle Factory instances, resource deposits, vegetation, industrial props, and combat VFX. This scene also qualifies the current silhouette/readability geometry at tactical, normal RTS, and strategic camera distances, including the distinct clustered resource meshes and presentation-bound culling path. A separate road-readability workload submits the production road surface, shoulder, curve, T-junction, and cross-junction assets through the same runtime material path.
 
 Object/material submission is measured at:
 
