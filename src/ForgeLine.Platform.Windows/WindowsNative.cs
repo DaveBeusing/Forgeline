@@ -30,6 +30,16 @@ internal static partial class WindowsNative
 
     internal const int SwShow = 5;
 
+    internal const int Vk0 = 0x30;
+    internal const int Vk1 = 0x31;
+    internal const int Vk2 = 0x32;
+    internal const int Vk3 = 0x33;
+    internal const int Vk4 = 0x34;
+    internal const int Vk5 = 0x35;
+    internal const int Vk6 = 0x36;
+    internal const int Vk7 = 0x37;
+    internal const int Vk8 = 0x38;
+    internal const int Vk9 = 0x39;
     internal const int VkA = 0x41;
     internal const int VkB = 0x42;
     internal const int VkC = 0x43;
@@ -59,10 +69,12 @@ internal static partial class WindowsNative
     internal const int VkF11 = 0x7A;
     internal const int VkF12 = 0x7B;
     internal const int VkLeft = 0x25;
+    internal const int VkLControl = 0xA2;
     internal const int VkLShift = 0xA0;
     internal const int VkQ = 0x51;
     internal const int VkR = 0x52;
     internal const int VkRight = 0x27;
+    internal const int VkRControl = 0xA3;
     internal const int VkRShift = 0xA1;
     internal const int VkS = 0x53;
     internal const int VkSpace = 0x20;

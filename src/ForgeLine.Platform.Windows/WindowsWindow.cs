@@ -507,6 +507,16 @@ internal sealed class WindowsWindow : IWindow
     {
         key = (int)virtualKey switch
         {
+            WindowsNative.Vk0 => PlatformKey.D0,
+            WindowsNative.Vk1 => PlatformKey.D1,
+            WindowsNative.Vk2 => PlatformKey.D2,
+            WindowsNative.Vk3 => PlatformKey.D3,
+            WindowsNative.Vk4 => PlatformKey.D4,
+            WindowsNative.Vk5 => PlatformKey.D5,
+            WindowsNative.Vk6 => PlatformKey.D6,
+            WindowsNative.Vk7 => PlatformKey.D7,
+            WindowsNative.Vk8 => PlatformKey.D8,
+            WindowsNative.Vk9 => PlatformKey.D9,
             WindowsNative.VkW => PlatformKey.W,
             WindowsNative.VkA => PlatformKey.A,
             WindowsNative.VkB => PlatformKey.B,
@@ -542,6 +552,8 @@ internal sealed class WindowsWindow : IWindow
             WindowsNative.VkRight => PlatformKey.Right,
             WindowsNative.VkLShift => PlatformKey.LeftShift,
             WindowsNative.VkRShift => PlatformKey.RightShift,
+            WindowsNative.VkLControl => PlatformKey.LeftControl,
+            WindowsNative.VkRControl => PlatformKey.RightControl,
             WindowsNative.VkEscape => PlatformKey.Escape,
             WindowsNative.VkEnter => PlatformKey.Enter,
             WindowsNative.VkTab => PlatformKey.Tab,
