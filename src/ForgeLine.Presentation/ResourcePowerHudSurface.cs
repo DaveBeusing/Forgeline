@@ -8,9 +8,101 @@ using ForgeLine.Graphics;
 
 namespace ForgeLine.Presentation;
 
+internal enum HudAlertSeverity : byte
+{
+    Information = 0,
+    Warning = 1,
+    Critical = 2
+}
+
 internal static class ResourcePowerHudModel
 {
     public const int AuthoritativeResourceCount = 7;
+    public const ulong CommandFeedbackLifetimeTicks = 80;
+
+    public static bool IsCommandFeedbackVisible(
+        in PlayerExperienceSnapshot experience)
+    {
+        PlayerCommandFeedback feedback =
+            experience.Feedback;
+
+        return feedback.Kind !=
+                   PlayerCommandFeedbackKind.None &&
+               feedback.State !=
+                   PlayerCommandFeedbackState.None &&
+               experience.Tick.Value >=
+                   feedback.ResolvedAtTick.Value &&
+               experience.Tick.Value -
+                   feedback.ResolvedAtTick.Value <=
+                   CommandFeedbackLifetimeTicks;
+    }
+
+    public static HudAlertSeverity ResolveAlertSeverity(
+        PlayerAlertState alert) =>
+        alert switch
+        {
+            PlayerAlertState.CommandCoreDestroyed =>
+                HudAlertSeverity.Critical,
+            PlayerAlertState.CommandCoreDamaged =>
+                HudAlertSeverity.Critical,
+            PlayerAlertState.SupplyCritical =>
+                HudAlertSeverity.Critical,
+            PlayerAlertState.ProductionBlocked =>
+                HudAlertSeverity.Warning,
+            PlayerAlertState.LowPower =>
+                HudAlertSeverity.Warning,
+            _ =>
+                HudAlertSeverity.Information
+        };
+
+    public static int CountActiveAlerts(
+        PlayerAlertState alerts)
+    {
+        int count = 0;
+
+        if (HasAlert(
+                alerts,
+                PlayerAlertState.LowPower))
+        {
+            count++;
+        }
+
+        if (HasAlert(
+                alerts,
+                PlayerAlertState.ProductionBlocked))
+        {
+            count++;
+        }
+
+        if (HasAlert(
+                alerts,
+                PlayerAlertState.SupplyCritical))
+        {
+            count++;
+        }
+
+        if (HasAlert(
+                alerts,
+                PlayerAlertState.CommandCoreDamaged))
+        {
+            count++;
+        }
+
+        if (HasAlert(
+                alerts,
+                PlayerAlertState.CommandCoreDestroyed))
+        {
+            count++;
+        }
+
+        return count;
+    }
+
+    public static bool HasAlert(
+        PlayerAlertState alerts,
+        PlayerAlertState alert) =>
+        (alerts & alert) !=
+        PlayerAlertState.None;
 
     public static RtsUiIcon GetResourceIcon(
         int index) =>
@@ -79,7 +171,8 @@ internal sealed class ResourcePowerHudSurface : IGameplayHudSurface
     }
 
     public GameplayHudRegion Regions =>
-        GameplayHudRegion.TopStatusBar;
+        GameplayHudRegion.TopStatusBar |
+        GameplayHudRegion.AlertStack;
 
     public void Render(
         in GameplayHudRenderContext context) =>
@@ -181,6 +274,11 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         EmitTopStatusBar(
             experience,
             layout.TopStatusBar,
+            graphics.Width,
+            graphics.Height);
+        EmitNotificationStack(
+            experience,
+            layout.AlertStack,
             graphics.Width,
             graphics.Height);
 
@@ -477,6 +575,599 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 : TextColor,
             width,
             height);
+    }
+
+    private void EmitNotificationStack(
+        in PlayerExperienceSnapshot experience,
+        in HudRect region,
+        int width,
+        int height)
+    {
+        if (region.IsEmpty)
+        {
+            return;
+        }
+
+        float rowHeight =
+            21.0f * _scale;
+        int maximumRows =
+            Math.Max(
+                0,
+                (int)MathF.Floor(
+                    region.Height /
+                    rowHeight));
+
+        if (maximumRows == 0)
+        {
+            return;
+        }
+
+        bool feedbackVisible =
+            ResourcePowerHudModel.IsCommandFeedbackVisible(
+                experience);
+        int totalItems =
+            ResourcePowerHudModel.CountActiveAlerts(
+                experience.Alerts) +
+            (feedbackVisible ? 1 : 0);
+
+        if (totalItems == 0)
+        {
+            return;
+        }
+
+        int contentRows =
+            totalItems > maximumRows &&
+            maximumRows > 1
+                ? maximumRows - 1
+                : maximumRows;
+        int emitted = 0;
+        float y =
+            region.Y;
+
+        if (ResourcePowerHudModel.HasAlert(
+                experience.Alerts,
+                PlayerAlertState.CommandCoreDestroyed) &&
+            emitted < contentRows)
+        {
+            EmitAlertCard(
+                PlayerAlertState.CommandCoreDestroyed,
+                "CORE DESTROYED",
+                0,
+                region,
+                y,
+                width,
+                height);
+            emitted++;
+            y += rowHeight;
+        }
+
+        if (ResourcePowerHudModel.HasAlert(
+                experience.Alerts,
+                PlayerAlertState.CommandCoreDamaged) &&
+            emitted < contentRows)
+        {
+            EmitAlertCard(
+                PlayerAlertState.CommandCoreDamaged,
+                "CORE DAMAGED",
+                0,
+                region,
+                y,
+                width,
+                height);
+            emitted++;
+            y += rowHeight;
+        }
+
+        if (feedbackVisible &&
+            emitted < contentRows)
+        {
+            EmitCommandFeedbackCard(
+                experience.Feedback,
+                region,
+                y,
+                width,
+                height);
+            emitted++;
+            y += rowHeight;
+        }
+
+        if (ResourcePowerHudModel.HasAlert(
+                experience.Alerts,
+                PlayerAlertState.SupplyCritical) &&
+            emitted < contentRows)
+        {
+            EmitAlertCard(
+                PlayerAlertState.SupplyCritical,
+                "SUPPLY CRITICAL",
+                experience.CriticalSupplyUnits,
+                region,
+                y,
+                width,
+                height);
+            emitted++;
+            y += rowHeight;
+        }
+
+        if (ResourcePowerHudModel.HasAlert(
+                experience.Alerts,
+                PlayerAlertState.ProductionBlocked) &&
+            emitted < contentRows)
+        {
+            EmitAlertCard(
+                PlayerAlertState.ProductionBlocked,
+                "PRODUCTION BLOCKED",
+                experience.BlockedProductionFacilities,
+                region,
+                y,
+                width,
+                height);
+            emitted++;
+            y += rowHeight;
+        }
+
+        if (ResourcePowerHudModel.HasAlert(
+                experience.Alerts,
+                PlayerAlertState.LowPower) &&
+            emitted < contentRows)
+        {
+            EmitAlertCard(
+                PlayerAlertState.LowPower,
+                "POWER CONSTRAINED",
+                0,
+                region,
+                y,
+                width,
+                height);
+            emitted++;
+            y += rowHeight;
+        }
+
+        int hidden =
+            totalItems -
+            emitted;
+
+        if (hidden > 0 &&
+            emitted < maximumRows)
+        {
+            Span<char> buffer =
+                stackalloc char[32];
+            var text =
+                new HudTextBuilder(
+                    buffer);
+            text.Append("MORE ");
+            text.Append(hidden);
+
+            EmitNotificationCard(
+                RtsUiIcon.StatusAlert,
+                HudAlertSeverity.Information,
+                text.Written,
+                region,
+                y,
+                width,
+                height);
+        }
+    }
+
+    private void EmitAlertCard(
+        PlayerAlertState alert,
+        string label,
+        int count,
+        in HudRect region,
+        float y,
+        int width,
+        int height)
+    {
+        Span<char> buffer =
+            stackalloc char[96];
+        var text =
+            new HudTextBuilder(
+                buffer);
+        HudAlertSeverity severity =
+            ResourcePowerHudModel.ResolveAlertSeverity(
+                alert);
+
+        text.Append(
+            SeverityLabel(
+                severity));
+        text.Append(" ");
+        text.Append(label);
+
+        if (count > 0)
+        {
+            text.Append(" ");
+            text.Append(count);
+        }
+
+        EmitNotificationCard(
+            AlertIcon(
+                alert),
+            severity,
+            text.Written,
+            region,
+            y,
+            width,
+            height);
+    }
+
+    private void EmitCommandFeedbackCard(
+        in PlayerCommandFeedback feedback,
+        in HudRect region,
+        float y,
+        int width,
+        int height)
+    {
+        Span<char> buffer =
+            stackalloc char[128];
+        var text =
+            new HudTextBuilder(
+                buffer);
+        HudAlertSeverity severity =
+            feedback.State switch
+            {
+                PlayerCommandFeedbackState.Accepted =>
+                    HudAlertSeverity.Information,
+                PlayerCommandFeedbackState.Partial =>
+                    HudAlertSeverity.Warning,
+                PlayerCommandFeedbackState.Rejected =>
+                    HudAlertSeverity.Critical,
+                _ =>
+                    HudAlertSeverity.Information
+            };
+
+        text.Append(
+            feedback.State switch
+            {
+                PlayerCommandFeedbackState.Accepted =>
+                    "OK",
+                PlayerCommandFeedbackState.Partial =>
+                    "PART",
+                PlayerCommandFeedbackState.Rejected =>
+                    "FAIL",
+                _ =>
+                    "INFO"
+            });
+        text.Append(" ");
+        text.Append(
+            CommandLabel(
+                feedback.Kind));
+
+        if (feedback.AcceptedTargets > 0 ||
+            feedback.RejectedTargets > 0)
+        {
+            text.Append(" ");
+            text.Append(
+                feedback.AcceptedTargets);
+            text.Append("/");
+            text.Append(
+                feedback.RejectedTargets);
+        }
+
+        string failure =
+            ResolveFailureLabel(
+                feedback);
+
+        if (failure.Length > 0)
+        {
+            text.Append(" ");
+            text.Append(
+                failure);
+        }
+
+        EmitNotificationCard(
+            CommandIcon(
+                feedback.Kind),
+            severity,
+            text.Written,
+            region,
+            y,
+            width,
+            height);
+    }
+
+    private void EmitNotificationCard(
+        RtsUiIcon icon,
+        HudAlertSeverity severity,
+        ReadOnlySpan<char> text,
+        in HudRect region,
+        float y,
+        int width,
+        int height)
+    {
+        float cardHeight =
+            18.0f * _scale;
+        float markerWidth =
+            severity == HudAlertSeverity.Critical
+                ? 5.0f * _scale
+                : 3.0f * _scale;
+        Vector4 severityColor =
+            SeverityColor(
+                severity);
+
+        EmitQuad(
+            region.X,
+            y,
+            region.Width,
+            cardHeight,
+            new Vector4(
+                0.07f,
+                0.08f,
+                0.08f,
+                0.94f),
+            width,
+            height);
+        EmitQuad(
+            region.X,
+            y,
+            markerWidth,
+            cardHeight,
+            severityColor,
+            width,
+            height);
+
+        if (severity ==
+                HudAlertSeverity.Critical &&
+            markerWidth >=
+                4.0f * _scale)
+        {
+            EmitQuad(
+                region.X +
+                    markerWidth +
+                    2.0f * _scale,
+                y +
+                    3.0f * _scale,
+                2.0f * _scale,
+                cardHeight -
+                    6.0f * _scale,
+                severityColor,
+                width,
+                height);
+        }
+
+        float iconSize =
+            11.0f * _scale;
+        float iconX =
+            region.X +
+            12.0f * _scale;
+
+        EmitIcon(
+            icon,
+            iconX,
+            y +
+                (cardHeight - iconSize) *
+                0.5f,
+            iconSize,
+            width,
+            height);
+
+        float textX =
+            region.X +
+            30.0f * _scale;
+        float maximumTextWidth =
+            MathF.Max(
+                0.0f,
+                region.Right -
+                textX -
+                4.0f * _scale);
+        int maximumCharacters =
+            Math.Max(
+                0,
+                (int)MathF.Floor(
+                    maximumTextWidth /
+                    (GlyphAdvance * _scale)));
+        ReadOnlySpan<char> visible =
+            text[
+                ..Math.Min(
+                    text.Length,
+                    maximumCharacters)];
+
+        EmitText(
+            visible,
+            textX,
+            y +
+                4.0f * _scale,
+            severityColor,
+            width,
+            height);
+    }
+
+    private Vector4 SeverityColor(
+        HudAlertSeverity severity) =>
+        severity switch
+        {
+            HudAlertSeverity.Critical =>
+                ResolveColor(
+                    RtsUiIcon.StatusAlert),
+            HudAlertSeverity.Warning =>
+                new Vector4(
+                    0.96f,
+                    0.72f,
+                    0.24f,
+                    1.0f),
+            _ =>
+                ResolveColor(
+                    RtsUiIcon.SupplySupplied)
+        };
+
+    private static RtsUiIcon AlertIcon(
+        PlayerAlertState alert) =>
+        alert switch
+        {
+            PlayerAlertState.LowPower =>
+                RtsUiIcon.StatusPower,
+            PlayerAlertState.ProductionBlocked =>
+                RtsUiIcon.BuildingFactory,
+            PlayerAlertState.SupplyCritical =>
+                RtsUiIcon.SupplyCritical,
+            PlayerAlertState.CommandCoreDamaged =>
+                RtsUiIcon.StatusHealth,
+            PlayerAlertState.CommandCoreDestroyed =>
+                RtsUiIcon.BuildingCommand,
+            _ =>
+                RtsUiIcon.StatusAlert
+        };
+
+    private static RtsUiIcon CommandIcon(
+        PlayerCommandFeedbackKind kind) =>
+        kind switch
+        {
+            PlayerCommandFeedbackKind.Movement =>
+                RtsUiIcon.CommandMove,
+            PlayerCommandFeedbackKind.Construction =>
+                RtsUiIcon.CommandBuild,
+            PlayerCommandFeedbackKind.Production =>
+                RtsUiIcon.BuildingProcessing,
+            PlayerCommandFeedbackKind.UnitProduction =>
+                RtsUiIcon.BuildingFactory,
+            PlayerCommandFeedbackKind.Logistics or
+            PlayerCommandFeedbackKind.Supply =>
+                RtsUiIcon.CommandSupply,
+            PlayerCommandFeedbackKind.Tactical or
+            PlayerCommandFeedbackKind.Artillery =>
+                RtsUiIcon.CommandAttack,
+            PlayerCommandFeedbackKind.Surrender =>
+                RtsUiIcon.StatusAlert,
+            _ =>
+                RtsUiIcon.StatusAlert
+        };
+
+    private static string CommandLabel(
+        PlayerCommandFeedbackKind kind) =>
+        kind switch
+        {
+            PlayerCommandFeedbackKind.Movement =>
+                "MOVE",
+            PlayerCommandFeedbackKind.Construction =>
+                "BUILD",
+            PlayerCommandFeedbackKind.Production =>
+                "PROCESS",
+            PlayerCommandFeedbackKind.UnitProduction =>
+                "UNITS",
+            PlayerCommandFeedbackKind.Logistics =>
+                "LOGISTICS",
+            PlayerCommandFeedbackKind.Supply =>
+                "SUPPLY",
+            PlayerCommandFeedbackKind.Tactical =>
+                "TACTICAL",
+            PlayerCommandFeedbackKind.Artillery =>
+                "ARTILLERY",
+            PlayerCommandFeedbackKind.Surrender =>
+                "SURRENDER",
+            _ =>
+                "COMMAND"
+        };
+
+    private static string SeverityLabel(
+        HudAlertSeverity severity) =>
+        severity switch
+        {
+            HudAlertSeverity.Critical =>
+                "CRIT",
+            HudAlertSeverity.Warning =>
+                "WARN",
+            _ =>
+                "INFO"
+        };
+
+    private static string ResolveFailureLabel(
+        in PlayerCommandFeedback feedback)
+    {
+        if (feedback.PlacementFailure !=
+            BuildingPlacementFailureReason.None)
+        {
+            return feedback.PlacementFailure switch
+            {
+                BuildingPlacementFailureReason.UnknownBuilding =>
+                    "UNKNOWN BUILDING",
+                BuildingPlacementFailureReason.TerrainUnavailable =>
+                    "NO TERRAIN",
+                BuildingPlacementFailureReason.OutsideWorldBounds =>
+                    "OUT OF BOUNDS",
+                BuildingPlacementFailureReason.SlopeTooSteep =>
+                    "SLOPE",
+                BuildingPlacementFailureReason.Obstructed =>
+                    "OBSTRUCTED",
+                BuildingPlacementFailureReason.OutsideBuildableArea =>
+                    "NO BUILD AREA",
+                BuildingPlacementFailureReason.ResourceDepositRequired =>
+                    "DEPOSIT REQUIRED",
+                _ =>
+                    "PLACEMENT"
+            };
+        }
+
+        if (feedback.BuildRejection !=
+            BuildCommandRejectionReason.None)
+        {
+            return feedback.BuildRejection switch
+            {
+                BuildCommandRejectionReason.UnknownBuilding =>
+                    "UNKNOWN BUILDING",
+                BuildCommandRejectionReason.InvalidSourceInventory =>
+                    "INVALID SOURCE",
+                BuildCommandRejectionReason.SourceInventoryOwnershipMismatch =>
+                    "SOURCE OWNER",
+                BuildCommandRejectionReason.InsufficientResources =>
+                    "NO MATERIALS",
+                BuildCommandRejectionReason.PlacementInvalid =>
+                    "PLACEMENT",
+                _ =>
+                    "BUILD REJECTED"
+            };
+        }
+
+        if (feedback.ActionFailure !=
+            PlayerLogisticsActionFailureReason.None)
+        {
+            return feedback.ActionFailure switch
+            {
+                PlayerLogisticsActionFailureReason.InvalidTarget =>
+                    "INVALID TARGET",
+                PlayerLogisticsActionFailureReason.ForeignOwnership =>
+                    "FOREIGN TARGET",
+                PlayerLogisticsActionFailureReason.UnsupportedTarget =>
+                    "UNSUPPORTED",
+                PlayerLogisticsActionFailureReason.MissingPolicy =>
+                    "NO POLICY",
+                PlayerLogisticsActionFailureReason.InvalidThresholds =>
+                    "THRESHOLDS",
+                PlayerLogisticsActionFailureReason.ResupplyUnavailable =>
+                    "NO RESUPPLY",
+                _ =>
+                    "ACTION REJECTED"
+            };
+        }
+
+        if (feedback.TacticalFailure !=
+            PlayerTacticalActionFailureReason.None)
+        {
+            return feedback.TacticalFailure switch
+            {
+                PlayerTacticalActionFailureReason.NoEligibleUnits =>
+                    "NO UNITS",
+                PlayerTacticalActionFailureReason.TargetUnavailable =>
+                    "NO TARGET",
+                PlayerTacticalActionFailureReason.TargetNotIdentified =>
+                    "TARGET UNKNOWN",
+                PlayerTacticalActionFailureReason.FriendlyTarget =>
+                    "FRIENDLY TARGET",
+                PlayerTacticalActionFailureReason.TargetNotTargetable =>
+                    "NOT TARGETABLE",
+                PlayerTacticalActionFailureReason.UnsupportedTargetClass =>
+                    "NO WEAPON",
+                PlayerTacticalActionFailureReason.NoEligibleArtillery =>
+                    "NO ARTILLERY",
+                PlayerTacticalActionFailureReason.ArtilleryTargetUnavailable =>
+                    "NO ARTY TARGET",
+                PlayerTacticalActionFailureReason.ArtilleryOutOfRange =>
+                    "OUT OF RANGE",
+                PlayerTacticalActionFailureReason.NoRecoveryProvider =>
+                    "NO RECOVERY",
+                _ =>
+                    "TACTICAL REJECTED"
+            };
+        }
+
+        return "";
     }
 
     private static void AppendQuantity(
