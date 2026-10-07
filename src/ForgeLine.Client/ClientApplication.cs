@@ -295,6 +295,8 @@ internal sealed class ClientApplication
             new RtsBuildingPlacementController(LocalPlayer);
         var actionPanel =
             new PlayerActionPanelController();
+        var hudInteraction =
+            new HudInteractionContext();
         var tacticalTargetingController =
             new RtsTacticalTargetingController();
         var informationLayer =
@@ -515,6 +517,9 @@ internal sealed class ClientApplication
                     ref returnHeld);
             PresentationSnapshot? inputSnapshot =
                 renderWorld.CurrentSnapshot;
+            hudInteraction.BeginFrame(
+                inputSnapshot?.SessionId ??
+                SimulationSessionId.None);
             PlayerExperienceSnapshot? inputExperience =
                 inputSnapshot?.PlayerExperience;
             bool inputMatchTerminal =
@@ -857,7 +862,9 @@ internal sealed class ClientApplication
                         actionPanel.CreateView(
                             window.ClientSize.Width,
                             window.ClientSize.Height,
-                            inputSnapshot?.PlayerActions),
+                            inputSnapshot?.PlayerActions,
+                            window.Dpi,
+                            _settings.UiScale),
                         tacticalTargetingController.CreateView(
                             inputSnapshot),
                         activeFormation,
@@ -891,7 +898,9 @@ internal sealed class ClientApplication
                     inputState,
                     inputSnapshot,
                     window.ClientSize.Width,
-                    window.ClientSize.Height);
+                    window.ClientSize.Height,
+                    window.Dpi,
+                    _settings.UiScale);
 
                 if (actionPanel.HasKeyboardFocus)
                 {
@@ -918,7 +927,12 @@ internal sealed class ClientApplication
                 }
             }
 
-            if (!actionPanel.HasKeyboardFocus)
+            hudInteraction.CapturePointer(
+                actionPanel.PointerCaptured);
+            hudInteraction.CaptureKeyboard(
+                actionPanel.HasKeyboardFocus);
+
+            if (!hudInteraction.KeyboardCaptured)
             {
                 RtsCameraInputFrame cameraInput =
                     actionMapper.Map(inputState);
@@ -981,7 +995,10 @@ internal sealed class ClientApplication
                     window.ClientSize.Width,
                     window.ClientSize.Height,
                     activeFormation,
-                    actionPanel.PointerCaptured);
+                    hudInteraction.PointerCaptured);
+
+                hudInteraction.CapturePointer(
+                    tacticalTargetingController.PointerCaptured);
 
                 if (tacticalTargetingController.TryTakeRequest(
                         out PlayerActionRequest tacticalRequest))
@@ -1006,7 +1023,7 @@ internal sealed class ClientApplication
                     presentationInteraction,
                     window.ClientSize.Width,
                     window.ClientSize.Height,
-                    actionPanel.PointerCaptured);
+                    hudInteraction.PointerCaptured);
                 }
 
                 if (!buildingPlacementController.IsActive)
@@ -1019,8 +1036,7 @@ internal sealed class ClientApplication
                         window.ClientSize.Width,
                         window.ClientSize.Height,
                         renderAlpha,
-                        actionPanel.PointerCaptured ||
-                        tacticalTargetingController.PointerCaptured);
+                        hudInteraction.PointerCaptured);
 
                     if (selectionController.TryTakeMovementRequest(
                             out MovementOrderRequest movementRequest))
@@ -1104,7 +1120,9 @@ internal sealed class ClientApplication
                 actionPanel.CreateView(
                     window.ClientSize.Width,
                     window.ClientSize.Height,
-                    currentSnapshot?.PlayerActions);
+                    currentSnapshot?.PlayerActions,
+                    window.Dpi,
+                    _settings.UiScale);
             bool placementValid =
                 buildingPlacementController.PreviewFreshness ==
                     PlacementPreviewFreshness.Current &&

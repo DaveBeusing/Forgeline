@@ -320,13 +320,13 @@ internal sealed class ClientRenderHost : IDisposable
                 new DebugDrawRenderer(
                     graphics,
                     depthEnabled: true);
-            using var overlayRenderer =
-                new DevelopmentOverlayRenderer(
-                    graphics);
-            using var informationRenderer =
-                new RtsInformationOverlayRenderer(
+            using var gameplayHudRenderer =
+                new GameplayHudRenderer(
                     graphics,
                     _runtimeAssets);
+            using var developmentOverlayRenderer =
+                new DevelopmentOverlayRenderer(
+                    graphics);
             using var frontendRenderer =
                 new FrontendOverlayRenderer(
                     graphics);
@@ -510,35 +510,28 @@ internal sealed class ClientRenderHost : IDisposable
                             context,
                             renderCamera,
                             gameplayDraw);
-                        informationRenderer.Render(
+                        gameplayHudRenderer.Render(
                             context,
                             renderCamera,
                             snapshot,
                             terrain.WorldBounds,
                             current.InformationLayer,
-                            current.Dpi);
-                        overlayRenderer.Render(
+                            current.ActionPanel,
+                            current.TacticalTargeting,
+                            current.ActiveFormation,
+                            current.PreAlphaUx,
+                            current.Dpi,
+                            current.UiScale,
+                            gameplayDraw);
+                        developmentOverlayRenderer.Render(
                             context,
                             overlayMetrics,
                             renderCamera,
                             debugDraw,
-                            playerExperience,
                             showDevelopmentMetrics:
                                 current.OverlayEnabled,
-                            playerActions:
-                                snapshot.PlayerActions,
-                            actionPanel:
-                                current.ActionPanel,
-                            tacticalTargeting:
-                                current.TacticalTargeting,
-                            activeFormation:
-                                current.ActiveFormation,
-                            preAlphaUx:
-                                current.PreAlphaUx,
                             uiScale:
-                                current.UiScale,
-                            gameplayOverlay:
-                                gameplayDraw);
+                                current.UiScale);
                         if (current.Frontend is FrontendSurfaceView frontend)
                         {
                             frontendRenderer.Render(

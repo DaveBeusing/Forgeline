@@ -53,12 +53,6 @@ public readonly record struct PlayerActionPanelView(
 
 public sealed class PlayerActionPanelController
 {
-    private const float PanelWidth = 608.0f;
-    private const float PanelTop = 96.0f;
-    private const float RowStartOffset = 64.0f;
-    private const float RowHeight = 16.0f;
-    private const float PanelBottomPadding = 28.0f;
-
     private readonly Dictionary<PlatformKey, bool> _heldKeys = new();
     private bool _leftWasDown;
     private PlayerActionRequest? _pendingRequest;
@@ -103,11 +97,20 @@ public sealed class PlayerActionPanelController
         InputState input,
         PresentationSnapshot? snapshot,
         int viewportWidth,
-        int viewportHeight)
+        int viewportHeight,
+        uint dpi = 96,
+        float uiScale = 1.0f)
     {
         ArgumentNullException.ThrowIfNull(input);
         ArgumentOutOfRangeException.ThrowIfNegative(viewportWidth);
         ArgumentOutOfRangeException.ThrowIfNegative(viewportHeight);
+
+        GameplayHudLayout layout =
+            GameplayHudLayout.Create(
+                viewportWidth,
+                viewportHeight,
+                dpi,
+                uiScale);
 
         SynchronizeSession(
             snapshot?.SessionId ??
@@ -320,7 +323,9 @@ public sealed class PlayerActionPanelController
             CreateView(
                 viewportWidth,
                 viewportHeight,
-                actions);
+                actions,
+                dpi,
+                uiScale);
 
         bool leftDown =
             input.IsMouseButtonDown(
@@ -333,7 +338,7 @@ public sealed class PlayerActionPanelController
                 input.PointerPosition,
                 view,
                 rowCount,
-                viewportHeight);
+                layout);
 
         if (PointerCaptured &&
             leftDown &&
@@ -342,6 +347,7 @@ public sealed class PlayerActionPanelController
                 input.PointerPosition,
                 view,
                 rowCount,
+                layout,
                 out int pointerRow))
         {
             SelectedIndex = pointerRow;
@@ -381,8 +387,18 @@ public sealed class PlayerActionPanelController
     public PlayerActionPanelView CreateView(
         int viewportWidth,
         int viewportHeight,
-        PlayerActionSnapshot? actions) =>
-        new(
+        PlayerActionSnapshot? actions,
+        uint dpi = 96,
+        float uiScale = 1.0f)
+    {
+        GameplayHudLayout layout =
+            GameplayHudLayout.Create(
+                viewportWidth,
+                viewportHeight,
+                dpi,
+                uiScale);
+
+        return new PlayerActionPanelView(
             Mode,
             SelectedIndex,
             Priority,
@@ -397,15 +413,10 @@ public sealed class PlayerActionPanelController
             _automaticFuelThreshold,
             _automaticAmmunitionThreshold,
             PointerCaptured,
-            MathF.Max(
-                12.0f,
-                viewportWidth - PanelWidth - 12.0f),
-            MathF.Min(
-                PanelTop,
-                MathF.Max(
-                    12.0f,
-                    viewportHeight * 0.12f)),
+            layout.ActionDock.X,
+            layout.ActionDock.Y,
             _supplyPriority);
+    }
 
     public bool TryTakeRequest(
         out PlayerActionRequest request)
@@ -1077,43 +1088,45 @@ public sealed class PlayerActionPanelController
         Vector2 pointer,
         in PlayerActionPanelView view,
         int rowCount,
-        int viewportHeight)
+        in GameplayHudLayout layout)
     {
         float height =
             MathF.Min(
-                viewportHeight -
-                view.OriginY -
-                12.0f,
-                RowStartOffset +
+                MathF.Max(
+                    0.0f,
+                    layout.SafeArea.Bottom -
+                    view.OriginY),
+                layout.ActionRowStartOffset +
                 Math.Max(
                     rowCount,
                     1) *
-                RowHeight +
-                PanelBottomPadding);
+                layout.ActionRowHeight +
+                layout.ActionBottomPadding);
 
         return pointer.X >= view.OriginX &&
                pointer.X <=
                    view.OriginX +
-                   PanelWidth &&
+                   layout.ActionDock.Width &&
                pointer.Y >= view.OriginY &&
                pointer.Y <=
                    view.OriginY +
                    Math.Max(
                        height,
-                       RowStartOffset +
-                       RowHeight);
+                       layout.ActionRowStartOffset +
+                       layout.ActionRowHeight);
     }
 
     private static bool TryResolvePointerRow(
         Vector2 pointer,
         in PlayerActionPanelView view,
         int rowCount,
+        in GameplayHudLayout layout,
         out int row)
     {
         float y =
             pointer.Y -
             (view.OriginY +
-             RowStartOffset);
+             layout.ActionRowStartOffset);
 
         if (y < 0.0f)
         {
@@ -1123,7 +1136,7 @@ public sealed class PlayerActionPanelController
 
         row =
             (int)(y /
-                  RowHeight);
+                  layout.ActionRowHeight);
 
         return row >= 0 &&
                row < rowCount;

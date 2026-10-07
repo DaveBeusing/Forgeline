@@ -178,6 +178,14 @@ Disabled debug capture publishes `Debug = null` and avoids constructing that hea
 
 Because the debug request is consumed at a completed-tick boundary, changing F2 can take one simulation tick before all underlying opt-in systems reflect the new capture state. Debug data is observational and never feeds simulation decisions.
 
+## Gameplay HUD composition boundary
+
+The Windows render host has one explicit production HUD path: `GameplayHudRenderer`. It composes small RTS-specific `IGameplayHudSurface` implementations and supplies one `GameplayHudRenderContext` containing the current immutable snapshot, camera, world bounds, information-layer view, action/targeting views, DPI-aware `GameplayHudLayout`, and player-facing world overlay.
+
+The layout defines stable safe-area regions rather than allowing each feature to derive unrelated viewport-relative coordinates. Current named regions are the top status bar, selection inspector, action dock, alert stack, minimap, and optional secondary view. Layout scale starts from the existing 96-DPI baseline and combines it with the configured UI scale.
+
+The production HUD path and development diagnostics are separate owners. Turning F1 development metrics off does not disable the gameplay HUD, and enabling engineering diagnostics does not make those diagnostics player-facing state. The temporary `GameplayHudLegacyTextSurface` preserves existing pre-alpha text/action output behind the production compositor until those pieces receive dedicated surfaces.
+
 ## Development Overlay
 
 The development overlay is intentionally lightweight and uses a small built-in glyph renderer rather than a production UI/text stack.

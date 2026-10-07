@@ -77,6 +77,16 @@ The snapshot contains:
 
 The HUD never creates or advances gameplay state. Every published player-experience model carries the same completed tick as its enclosing presentation snapshot, and the enclosing snapshot carries the simulation-session ID. Rendering therefore cannot silently combine one session's match result with another session's resources or selection inspection.
 
+## Gameplay HUD composition
+
+`GameplayHudRenderer` is the production-facing root compositor for the in-match HUD. `ClientRenderHost` submits player-facing HUD state through this compositor independently from `DevelopmentOverlayRenderer`, which remains the owner of development metrics and engineering diagnostic labels.
+
+`GameplayHudLayout` resolves the shared DPI-aware safe area and named regions for the top status bar, selection inspector, action dock, alert stack, minimap, and optional secondary views. Existing resource, selection, minimap, action, targeting, feedback, and pre-alpha surfaces are routed through the composition boundary without moving gameplay authority into presentation.
+
+HUD surfaces implement the narrow `IGameplayHudSurface` contract. New surfaces should consume immutable presentation snapshots/read models, render within the named region that owns their presentation responsibility, and submit player-authored changes through the established request/command boundary. They must not acquire live ECS or simulation ownership.
+
+The current text-heavy player surface is retained behind `GameplayHudLegacyTextSurface` as a compatibility adapter while the production surfaces are migrated incrementally. The adapter is deliberately isolated beneath `GameplayHudRenderer`; it is not a reason for new player-facing features to be added to the development overlay.
+
 ## Selection and production presentation
 
 The normal RTS selection filter includes local units, logistics entities, and buildings.
@@ -177,7 +187,7 @@ Current limitations include:
 - the HUD uses the existing lightweight overlay text renderer;
 - the resource line summarizes the starting Command Core inventory rather than aggregating every distributed inventory in the economy;
 - there is no final menu shell or frontend;
-- there is no dedicated minimap render surface yet;
+- the minimap remains part of the lightweight RTS information surface rather than a final production map-control surface;
 - transient event history/notification queues are not yet persistent;
 - the surrender command path exists, but a dedicated final frontend/menu affordance is still deferred;
 - final visual hierarchy, iconography, accessibility treatment, localization, and audio feedback are deferred.
@@ -187,9 +197,9 @@ Current limitations include:
 
 The interactive match uses a reusable action palette for player-authored construction and production while keeping simulation ownership unchanged.
 
-The palette is session-scoped and consumes immutable completed-tick `PlayerActionSnapshot` data. Construction entries come from the current building catalog and Command Core inventory. Processing and unit-production entries exist only for a single selected owned compatible facility and use that facility's local input inventory.
+The palette is session-scoped and consumes immutable completed-tick `PlayerActionSnapshot` data. Construction entries come from the current building catalog and Command Core inventory. Processing and unit-production entries exist only for a single selected owned compatible facility and use that facility's local input inventory. Its screen origin and pointer bounds come from the shared DPI-aware action-dock region rather than controller-owned viewport constants.
 
-`B`, `P`, and `U` select construction, processing, and unit-production modes. While a mode owns keyboard focus, RTS camera keys are suppressed. Pointer clicks inside the panel are captured before world selection, movement, or placement. Mixed selections, foreign ownership, destroyed/stale facilities, terminal matches, and a fresh session remove incompatible transient actions instead of retaining stale authority.
+`B`, `P`, and `U` select construction, processing, and unit-production modes. While a mode owns keyboard focus, RTS camera keys are suppressed. Pointer clicks inside the panel are captured through the shared `HudInteractionContext` before world selection, movement, or placement. Mixed selections, foreign ownership, destroyed/stale facilities, terminal matches, and a fresh session remove incompatible transient actions instead of retaining stale authority.
 
 Command submission is not success feedback. `PlayerActionSnapshot.PendingCommandCount` identifies unresolved player submissions; completed results are published separately as accepted/rejected `PlayerCommandFeedback`. Production progress and block reasons remain authoritative copied state from the selected facility.
 
