@@ -73,9 +73,8 @@ public readonly record struct GameplayHudLayout(
             RtsUiLayout.ScaleForDpi(dpi) *
             normalizedUiScale;
         float margin =
-            MathF.Max(
-                8.0f,
-                12.0f * scale);
+            GameplayHudVisualStyle.ResolveSafeMargin(
+                scale);
         float safeWidth =
             MathF.Max(
                 0.0f,
@@ -110,7 +109,7 @@ public readonly record struct GameplayHudLayout(
 
         float topHeight =
             MathF.Min(
-                36.0f * scale,
+                GameplayHudVisualStyle.TopStatusBarHeight * scale,
                 safeArea.Height);
         var topStatusBar =
             new HudRect(
@@ -127,7 +126,7 @@ public readonly record struct GameplayHudLayout(
                     safeArea.Height * 0.34f));
         float minimapSize =
             MathF.Min(
-                220.0f * scale,
+                GameplayHudVisualStyle.MinimapSize * scale,
                 minimapLimit);
         var minimap =
             new HudRect(
@@ -140,7 +139,7 @@ public readonly record struct GameplayHudLayout(
 
         float selectionWidth =
             MathF.Min(
-                360.0f * scale,
+                GameplayHudVisualStyle.SelectionInspectorWidth * scale,
                 MathF.Max(
                     0.0f,
                     safeArea.Width -
@@ -148,7 +147,7 @@ public readonly record struct GameplayHudLayout(
                     margin));
         float selectionHeight =
             MathF.Min(
-                112.0f * scale,
+                GameplayHudVisualStyle.SelectionInspectorHeight * scale,
                 MathF.Max(
                     0.0f,
                     safeArea.Height -
@@ -164,7 +163,7 @@ public readonly record struct GameplayHudLayout(
 
         float actionWidth =
             MathF.Min(
-                608.0f * scale,
+                GameplayHudVisualStyle.ActionDockWidth * scale,
                 safeArea.Width * 0.46f);
         float actionTop =
             topStatusBar.Bottom +
@@ -176,7 +175,7 @@ public readonly record struct GameplayHudLayout(
                 margin);
         float actionHeight =
             MathF.Min(
-                360.0f * scale,
+                GameplayHudVisualStyle.ActionDockHeight * scale,
                 MathF.Max(
                     0.0f,
                     actionBottom -
@@ -200,7 +199,7 @@ public readonly record struct GameplayHudLayout(
             margin;
         float alertHeight =
             MathF.Min(
-                96.0f * scale,
+                GameplayHudVisualStyle.AlertStackHeight * scale,
                 MathF.Max(
                     0.0f,
                     selectionInspector.Y -
