@@ -653,31 +653,42 @@ public static class PlayerExperienceSnapshotFactory
         bool hasSingleEntityDetails =
             ownedCount == 1;
 
+        HealthState health =
+            default;
+        UnitSupplyState supply =
+            default;
+        UnitCombatReadiness readiness =
+            default;
+        PowerConsumer power =
+            default;
+        InventoryStorage storage =
+            default;
+
         bool hasHealth =
             hasSingleEntityDetails &&
             entities.TryGetComponent(
                 primary,
-                out HealthState health);
+                out health);
         bool hasSupply =
             hasSingleEntityDetails &&
             entities.TryGetComponent(
                 primary,
-                out UnitSupplyState supply);
+                out supply);
         bool hasReadiness =
             hasSingleEntityDetails &&
             entities.TryGetComponent(
                 primary,
-                out UnitCombatReadiness readiness);
+                out readiness);
         bool hasPower =
             hasSingleEntityDetails &&
             entities.TryGetComponent(
                 primary,
-                out PowerConsumer power);
+                out power);
         bool hasInventory =
             hasSingleEntityDetails &&
             entities.TryGetComponent(
                 primary,
-                out InventoryStorage storage) &&
+                out storage) &&
             inventories.Contains(storage.InventoryId);
 
         return new PlayerSelectionSummary(
