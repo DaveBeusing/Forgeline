@@ -12,6 +12,7 @@ public sealed class VerticalSliceRuntimeServices
         ResourceCatalog resources,
         BuildingDefinitionCatalog buildingDefinitions,
         UnitDefinitionCatalog unitDefinitions,
+        TechnologyDefinitionCatalog technologyDefinitions,
         ProductionRecipeCatalog productionRecipes,
         WeaponCatalog weapons,
         ArtilleryWeaponCatalog artilleryWeapons,
@@ -21,6 +22,7 @@ public sealed class VerticalSliceRuntimeServices
         BuildingCommandProcessingSystem buildingCommands,
         BuildingConstructionSystem buildingConstruction,
         UnitProductionSystem unitProduction,
+        TechnologyResearchSystem technologyResearch,
         GroundMovementSystem groundMovement,
         FormationMovementSystem formationMovement,
         HierarchicalNavigationSystem navigation,
@@ -36,6 +38,9 @@ public sealed class VerticalSliceRuntimeServices
         Resources = resources;
         BuildingDefinitions = buildingDefinitions;
         UnitDefinitions = unitDefinitions;
+        TechnologyDefinitions =
+            technologyDefinitions ??
+            throw new ArgumentNullException(nameof(technologyDefinitions));
         ProductionRecipes = productionRecipes;
         Weapons = weapons;
         ArtilleryWeapons = artilleryWeapons;
@@ -47,6 +52,9 @@ public sealed class VerticalSliceRuntimeServices
         BuildingCommands = buildingCommands;
         BuildingConstruction = buildingConstruction;
         UnitProduction = unitProduction;
+        TechnologyResearch =
+            technologyResearch ??
+            throw new ArgumentNullException(nameof(technologyResearch));
         GroundMovement = groundMovement;
         FormationMovement = formationMovement;
         Navigation = navigation;
@@ -70,6 +78,8 @@ public sealed class VerticalSliceRuntimeServices
 
     public UnitDefinitionCatalog UnitDefinitions { get; }
 
+    public TechnologyDefinitionCatalog TechnologyDefinitions { get; }
+
     public ProductionRecipeCatalog ProductionRecipes { get; }
 
     public WeaponCatalog Weapons { get; }
@@ -87,6 +97,8 @@ public sealed class VerticalSliceRuntimeServices
     public BuildingConstructionSystem BuildingConstruction { get; }
 
     public UnitProductionSystem UnitProduction { get; }
+
+    public TechnologyResearchSystem TechnologyResearch { get; }
 
     public GroundMovementSystem GroundMovement { get; }
 

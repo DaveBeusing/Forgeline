@@ -277,6 +277,8 @@ public sealed class VerticalSliceScenario : IDisposable
             DirectorateContent.CreateBuildingCatalog();
         UnitDefinitionCatalog unitDefinitions =
             DirectorateContent.CreateUnitCatalog();
+        TechnologyDefinitionCatalog technologyDefinitions =
+            DirectorateTechnologyDefinitions.CreateCatalog();
         ResourceCatalog resources =
             InitialResourceDefinitions.CreateCatalog();
         ProductionRecipeCatalog recipes =
@@ -422,6 +424,10 @@ public sealed class VerticalSliceScenario : IDisposable
                 unitDefinitions,
                 inventories,
                 unitFactory);
+        var technologyResearch =
+            new TechnologyResearchSystem(
+                technologyDefinitions,
+                inventories);
 
         SkirmishMatchInitialization initialization =
             SkirmishMatchInitializer.Initialize(
@@ -660,6 +666,7 @@ public sealed class VerticalSliceScenario : IDisposable
             power,
             production,
             unitProduction,
+            technologyResearch,
             buildingConstruction,
             extraction,
             logisticsRegistration,
@@ -697,6 +704,7 @@ public sealed class VerticalSliceScenario : IDisposable
                 resources,
                 buildingDefinitions,
                 unitDefinitions,
+                technologyDefinitions,
                 recipes,
                 weapons,
                 artilleryWeapons,
@@ -706,6 +714,7 @@ public sealed class VerticalSliceScenario : IDisposable
                 buildingCommands,
                 buildingConstruction,
                 unitProduction,
+                technologyResearch,
                 groundMovement,
                 formationMovement,
                 navigation,

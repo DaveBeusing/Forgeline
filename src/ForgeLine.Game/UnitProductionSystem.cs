@@ -193,7 +193,11 @@ public sealed class UnitProductionSystem : ISimulationSystem
                     request.UnitId,
                     out UnitDefinition? definition) ||
                 !facility.Supports(
-                    definition.RequiredProductionCapability))
+                    definition.RequiredProductionCapability) ||
+                !TechnologyStateQueries.IsCapabilityUnlocked(
+                    entities,
+                    facility.Owner,
+                    definition.RequiredTechnologyCapability))
             {
                 entities.DestroyEntity(requestEntity);
                 _rejectedRequests++;
