@@ -1519,7 +1519,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                 rect.Height,
                 enabled
                     ? CardColor
-                    : DisabledColor,
+                    : GameplayHudVisualStyle.PanelDisabled,
                 width,
                 height);
 
