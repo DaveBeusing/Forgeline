@@ -326,6 +326,15 @@ internal static class PlayerActionDockHudModel
                         "SELECT PROCESSOR");
                 }
 
+                if (index <
+                    production.Recipes.Count)
+                {
+                    return production.Recipes[index].HasInputs
+                        ? PlayerActionDockItemState.Enabled
+                        : PlayerActionDockItemState.Disabled(
+                            "MISSING INPUT");
+                }
+
                 return index <
                        production.Recipes.Count +
                        production.Requests.Count
@@ -344,7 +353,10 @@ internal static class PlayerActionDockHudModel
                 if (index <
                     units.Units.Count)
                 {
-                    return PlayerActionDockItemState.Enabled;
+                    return units.Units[index].HasInputs
+                        ? PlayerActionDockItemState.Enabled
+                        : PlayerActionDockItemState.Disabled(
+                            "MISSING INPUT");
                 }
 
                 return index <
@@ -381,6 +393,43 @@ internal static class PlayerActionDockHudModel
                     "CLOSED");
         }
     }
+
+    public static bool CanUseControl(
+        PlayerActionDockControlKind control,
+        PlayerActionPanelMode mode,
+        int index,
+        in PlayerActionPanelView panel,
+        PlayerActionSnapshot? actions) =>
+        control switch
+        {
+            PlayerActionDockControlKind.Activate =>
+                ResolveItemState(
+                    mode,
+                    index,
+                    actions).CanActivate,
+            PlayerActionDockControlKind.Cancel =>
+                CanCancel(
+                    mode,
+                    index,
+                    actions),
+            PlayerActionDockControlKind.CyclePrimary =>
+                CanCyclePrimary(
+                    mode,
+                    actions),
+            PlayerActionDockControlKind.CycleSecondary =>
+                CanCycleSecondary(
+                    mode,
+                    actions),
+            PlayerActionDockControlKind.Decrease or
+            PlayerActionDockControlKind.Increase =>
+                CanAdjust(
+                    mode,
+                    index,
+                    panel,
+                    actions),
+            _ =>
+                false
+        };
 
     public static bool CanCancel(
         PlayerActionPanelMode mode,

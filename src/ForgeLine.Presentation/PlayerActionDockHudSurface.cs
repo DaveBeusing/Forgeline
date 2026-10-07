@@ -131,7 +131,10 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
 
         if (graphics.Width <= 0 ||
             graphics.Height <= 0 ||
-            layout.ActionDock.IsEmpty)
+            layout.ActionDock.IsEmpty ||
+            snapshot.PlayerExperience is
+                PlayerExperienceSnapshot experience &&
+            experience.IsMatchComplete)
         {
             LastRenderedVertexCount = 0;
             return;
@@ -1314,36 +1317,12 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             }
 
             bool enabled =
-                control switch
-                {
-                    PlayerActionDockControlKind.Activate =>
-                        PlayerActionDockHudModel.ResolveItemState(
-                            panel.Mode,
-                            panel.SelectedIndex,
-                            actions).CanActivate,
-                    PlayerActionDockControlKind.Cancel =>
-                        PlayerActionDockHudModel.CanCancel(
-                            panel.Mode,
-                            panel.SelectedIndex,
-                            actions),
-                    PlayerActionDockControlKind.CyclePrimary =>
-                        PlayerActionDockHudModel.CanCyclePrimary(
-                            panel.Mode,
-                            actions),
-                    PlayerActionDockControlKind.CycleSecondary =>
-                        PlayerActionDockHudModel.CanCycleSecondary(
-                            panel.Mode,
-                            actions),
-                    PlayerActionDockControlKind.Decrease or
-                    PlayerActionDockControlKind.Increase =>
-                        PlayerActionDockHudModel.CanAdjust(
-                            panel.Mode,
-                            panel.SelectedIndex,
-                            panel,
-                            actions),
-                    _ =>
-                        false
-                };
+                PlayerActionDockHudModel.CanUseControl(
+                    control,
+                    panel.Mode,
+                    panel.SelectedIndex,
+                    panel,
+                    actions);
 
             EmitQuad(
                 rect.X,

@@ -117,6 +117,15 @@ public sealed class PlayerActionPanelController
         PlayerActionSnapshot? actions =
             snapshot?.PlayerActions;
 
+        if (snapshot?.PlayerExperience is
+                PlayerExperienceSnapshot experience &&
+            experience.IsMatchComplete)
+        {
+            CloseForTerminal(
+                input);
+            return;
+        }
+
         if (Pressed(input, PlatformKey.B))
         {
             ToggleMode(
@@ -258,7 +267,8 @@ public sealed class PlayerActionPanelController
         {
             HandlePointerHit(
                 hit,
-                actions);
+                actions,
+                view);
             PointerCaptured = true;
         }
 
@@ -800,7 +810,8 @@ public sealed class PlayerActionPanelController
 
     private void HandlePointerHit(
         in PlayerActionDockHitTarget hit,
-        PlayerActionSnapshot? actions)
+        PlayerActionSnapshot? actions,
+        in PlayerActionPanelView panel)
     {
         switch (hit.Kind)
         {
@@ -818,48 +829,92 @@ public sealed class PlayerActionPanelController
                     actions);
                 SynchronizeSupplyEditor(
                     actions);
+                break;
 
-                if (PlayerActionDockHudModel.ResolveItemState(
+            case PlayerActionDockControlKind.Activate:
+                if (PlayerActionDockHudModel.CanUseControl(
+                        PlayerActionDockControlKind.Activate,
                         Mode,
                         SelectedIndex,
-                        actions).CanActivate)
+                        panel,
+                        actions))
                 {
                     ActivateSelected(
-                        actions);
+                    actions);
                 }
 
                 break;
 
-            case PlayerActionDockControlKind.Activate:
-                ActivateSelected(
-                    actions);
-                break;
-
             case PlayerActionDockControlKind.Cancel:
-                CancelSelected(
+                if (PlayerActionDockHudModel.CanUseControl(
+                        PlayerActionDockControlKind.Cancel,
+                        Mode,
+                        SelectedIndex,
+                        panel,
+                        actions))
+                {
+                    CancelSelected(
                     actions);
+                }
+
                 break;
 
             case PlayerActionDockControlKind.CyclePrimary:
-                CyclePrimarySetting(
+                if (PlayerActionDockHudModel.CanUseControl(
+                        PlayerActionDockControlKind.CyclePrimary,
+                        Mode,
+                        SelectedIndex,
+                        panel,
+                        actions))
+                {
+                    CyclePrimarySetting(
                     actions);
+                }
+
                 break;
 
             case PlayerActionDockControlKind.CycleSecondary:
-                CycleSecondarySetting(
+                if (PlayerActionDockHudModel.CanUseControl(
+                        PlayerActionDockControlKind.CycleSecondary,
+                        Mode,
+                        SelectedIndex,
+                        panel,
+                        actions))
+                {
+                    CycleSecondarySetting(
                     actions);
+                }
+
                 break;
 
             case PlayerActionDockControlKind.Decrease:
-                AdjustCurrentSetting(
+                if (PlayerActionDockHudModel.CanUseControl(
+                        PlayerActionDockControlKind.Decrease,
+                        Mode,
+                        SelectedIndex,
+                        panel,
+                        actions))
+                {
+                    AdjustCurrentSetting(
                     actions,
                     -1);
+                }
+
                 break;
 
             case PlayerActionDockControlKind.Increase:
-                AdjustCurrentSetting(
+                if (PlayerActionDockHudModel.CanUseControl(
+                        PlayerActionDockControlKind.Increase,
+                        Mode,
+                        SelectedIndex,
+                        panel,
+                        actions))
+                {
+                    AdjustCurrentSetting(
                     actions,
                     1);
+                }
+
                 break;
         }
     }
@@ -1121,6 +1176,33 @@ public sealed class PlayerActionPanelController
                     0.0,
                     1.0);
         }
+    }
+
+    private void CloseForTerminal(
+        InputState input)
+    {
+        Close();
+        _pendingRequest = null;
+        _stockResourceId = ResourceId.None;
+        _supplyEntity = EntityId.Invalid;
+        _leftWasDown =
+            input.IsMouseButtonDown(
+                PlatformMouseButton.Left);
+
+        _ = Pressed(input, PlatformKey.B);
+        _ = Pressed(input, PlatformKey.P);
+        _ = Pressed(input, PlatformKey.U);
+        _ = Pressed(input, PlatformKey.L);
+        _ = Pressed(input, PlatformKey.Y);
+        _ = Pressed(input, PlatformKey.K);
+        _ = Pressed(input, PlatformKey.Escape);
+        _ = Pressed(input, PlatformKey.Tab);
+        _ = Pressed(input, PlatformKey.T);
+        _ = Pressed(input, PlatformKey.M);
+        _ = Pressed(input, PlatformKey.Left);
+        _ = Pressed(input, PlatformKey.Right);
+        _ = Pressed(input, PlatformKey.Enter);
+        _ = Pressed(input, PlatformKey.C);
     }
 
     private void SynchronizeSession(
