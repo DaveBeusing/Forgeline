@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Text.Json;
 using ForgeLine.Assets;
 using ForgeLine.Combat;
 using ForgeLine.Economy;
@@ -66,7 +65,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         new(4);
     private readonly OverlayVertex[] _vertices =
         new OverlayVertex[MaxVertices];
-    private readonly RuntimeUiPalette? _runtimePalette;
+    private readonly RuntimeUiIconPalette? _runtimePalette;
 
     private int _vertexCount;
     private float _scale = 1.0f;
@@ -85,7 +84,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         _runtimePalette =
             runtimeAssets is null
                 ? null
-                : new RuntimeUiPalette(
+                : new RuntimeUiIconPalette(
                     runtimeAssets);
     }
 
@@ -2320,78 +2319,5 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         }
     }
 
-    private sealed class RuntimeUiPalette
-    {
-        private readonly RuntimeAssetCatalog _catalog;
-        private readonly Dictionary<string, Vector4> _colors =
-            new(StringComparer.Ordinal);
 
-        public RuntimeUiPalette(
-            RuntimeAssetCatalog catalog)
-        {
-            _catalog =
-                catalog;
-        }
-
-        public bool TryResolve(
-            string rawAssetId,
-            out Vector4 color)
-        {
-            if (_colors.TryGetValue(
-                    rawAssetId,
-                    out color))
-            {
-                return true;
-            }
-
-            AssetId id =
-                AssetId.Parse(
-                    rawAssetId);
-
-            if (!_catalog.TryGet(
-                    id,
-                    out RuntimeAssetRecord? record) ||
-                record is null ||
-                record.Type !=
-                    RuntimeAssetType.Material)
-            {
-                color = default;
-                return false;
-            }
-
-            RuntimeAssetContent content =
-                _catalog.Read(
-                    id);
-
-            using JsonDocument document =
-                JsonDocument.Parse(
-                    content.Payload);
-
-            if (!document.RootElement.TryGetProperty(
-                    "baseColorFactor",
-                    out JsonElement factor) ||
-                factor.ValueKind !=
-                    JsonValueKind.Array ||
-                factor.GetArrayLength() !=
-                    4)
-            {
-                color =
-                    Vector4.One;
-            }
-            else
-            {
-                color =
-                    new Vector4(
-                        factor[0].GetSingle(),
-                        factor[1].GetSingle(),
-                        factor[2].GetSingle(),
-                        factor[3].GetSingle());
-            }
-
-            _colors.Add(
-                rawAssetId,
-                color);
-            return true;
-        }
-    }
 }
