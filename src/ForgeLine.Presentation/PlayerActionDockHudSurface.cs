@@ -238,6 +238,9 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             width,
             height);
 
+        Span<char> modeTextBuffer =
+            stackalloc char[24];
+
         for (int index = 0;
              index <
                  PlayerActionDockInteractionLayout.ModeButtonCount;
@@ -298,11 +301,9 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                 width,
                 height);
 
-            Span<char> buffer =
-                stackalloc char[24];
             var text =
                 new HudTextBuilder(
-                    buffer);
+                    modeTextBuffer);
             text.Append(
                 PlayerActionDockHudModel.ResolveModeShortcut(
                     mode));
@@ -514,7 +515,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         }
     }
 
-    private void AppendHeaderContext(
+    private static void AppendHeaderContext(
         ref HudTextBuilder text,
         PlayerActionSnapshot? actions,
         in PlayerActionPanelView panel,
@@ -905,6 +906,9 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             return;
         }
 
+        Span<char> statusBuffer =
+            stackalloc char[160];
+
         for (int index = 0;
              index < visible;
              index++)
@@ -990,8 +994,6 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                 width,
                 height);
 
-            Span<char> statusBuffer =
-                stackalloc char[160];
             var status =
                 new HudTextBuilder(
                     statusBuffer);

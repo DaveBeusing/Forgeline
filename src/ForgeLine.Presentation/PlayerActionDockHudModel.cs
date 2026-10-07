@@ -649,13 +649,13 @@ internal static class PlayerActionDockHudModel
             {
                 BuildCommandRejectionReason.UnknownBuilding =>
                     "UNKNOWN BUILDING",
-                BuildCommandRejectionReason.InvalidSource =>
+                BuildCommandRejectionReason.InvalidSourceInventory =>
                     "INVALID SOURCE",
-                BuildCommandRejectionReason.SourceOwnerMismatch =>
+                BuildCommandRejectionReason.SourceInventoryOwnershipMismatch =>
                     "SOURCE OWNER",
                 BuildCommandRejectionReason.InsufficientResources =>
                     "NO MATERIALS",
-                BuildCommandRejectionReason.InvalidPlacement =>
+                BuildCommandRejectionReason.PlacementInvalid =>
                     "PLACEMENT",
                 _ =>
                     "BUILD REJECTED"
@@ -669,11 +669,11 @@ internal static class PlayerActionDockHudModel
             {
                 PlayerLogisticsActionFailureReason.InvalidTarget =>
                     "INVALID TARGET",
-                PlayerLogisticsActionFailureReason.ForeignTarget =>
+                PlayerLogisticsActionFailureReason.ForeignOwnership =>
                     "FOREIGN TARGET",
                 PlayerLogisticsActionFailureReason.UnsupportedTarget =>
                     "UNSUPPORTED",
-                PlayerLogisticsActionFailureReason.PolicyNotFound =>
+                PlayerLogisticsActionFailureReason.MissingPolicy =>
                     "NO POLICY",
                 PlayerLogisticsActionFailureReason.InvalidThresholds =>
                     "THRESHOLDS",
@@ -691,21 +691,21 @@ internal static class PlayerActionDockHudModel
             {
                 PlayerTacticalActionFailureReason.NoEligibleUnits =>
                     "NO UNITS",
-                PlayerTacticalActionFailureReason.NoTarget =>
+                PlayerTacticalActionFailureReason.TargetUnavailable =>
                     "NO TARGET",
                 PlayerTacticalActionFailureReason.TargetNotIdentified =>
                     "TARGET UNKNOWN",
                 PlayerTacticalActionFailureReason.FriendlyTarget =>
                     "FRIENDLY TARGET",
-                PlayerTacticalActionFailureReason.TargetNotCombatant =>
+                PlayerTacticalActionFailureReason.TargetNotTargetable =>
                     "NOT TARGETABLE",
-                PlayerTacticalActionFailureReason.NoCompatibleWeapon =>
+                PlayerTacticalActionFailureReason.UnsupportedTargetClass =>
                     "NO WEAPON",
-                PlayerTacticalActionFailureReason.NoArtillery =>
+                PlayerTacticalActionFailureReason.NoEligibleArtillery =>
                     "NO ARTILLERY",
-                PlayerTacticalActionFailureReason.InvalidFireMissionTarget =>
+                PlayerTacticalActionFailureReason.ArtilleryTargetUnavailable =>
                     "NO ARTY TARGET",
-                PlayerTacticalActionFailureReason.OutOfRange =>
+                PlayerTacticalActionFailureReason.ArtilleryOutOfRange =>
                     "OUT OF RANGE",
                 PlayerTacticalActionFailureReason.NoRecoveryProvider =>
                     "NO RECOVERY",
