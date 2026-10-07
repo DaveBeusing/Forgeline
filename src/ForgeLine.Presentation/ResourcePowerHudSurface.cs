@@ -884,11 +884,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             y,
             region.Width,
             cardHeight,
-            new Vector4(
-                0.07f,
-                0.08f,
-                0.08f,
-                0.94f),
+            GameplayHudVisualStyle.PanelRaised,
             width,
             height);
         EmitQuad(
@@ -966,22 +962,16 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             height);
     }
 
-    private Vector4 SeverityColor(
+    private static Vector4 SeverityColor(
         HudAlertSeverity severity) =>
         severity switch
         {
             HudAlertSeverity.Critical =>
-                ResolveColor(
-                    RtsUiIcon.StatusAlert),
+                GameplayHudVisualStyle.Critical,
             HudAlertSeverity.Warning =>
-                new Vector4(
-                    0.96f,
-                    0.72f,
-                    0.24f,
-                    1.0f),
+                GameplayHudVisualStyle.Warning,
             _ =>
-                ResolveColor(
-                    RtsUiIcon.SupplySupplied)
+                GameplayHudVisualStyle.TextPrimary
         };
 
     private static RtsUiIcon AlertIcon(

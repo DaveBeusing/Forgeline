@@ -272,6 +272,8 @@ public sealed class PlayerActionPanelController
                 layout,
                 view.IsOpen);
 
+        PlayerActionDockHitTarget hit =
+            default;
         bool hasHit =
             PointerCaptured &&
             PlayerActionDockInteractionLayout.TryHit(
@@ -279,7 +281,7 @@ public sealed class PlayerActionPanelController
                 layout,
                 view.IsOpen,
                 itemCount,
-                out PlayerActionDockHitTarget hit);
+                out hit);
         _hoveredIndex =
             hasHit &&
             hit.Kind ==
