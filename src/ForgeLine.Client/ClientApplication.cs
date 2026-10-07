@@ -1185,7 +1185,7 @@ internal sealed class ClientApplication
                 buildingPlacementController,
                 tacticalTargetingView,
                 informationLayer.OverlayMode,
-                currentSnapshot?.Debug);
+                currentSnapshot?.StrategicOverlay);
 
             BuildDevelopmentDebugOverlay(
                 debugDraw,
@@ -1655,7 +1655,7 @@ internal sealed class ClientApplication
         RtsBuildingPlacementController buildingPlacementController,
         TacticalTargetingView tacticalTargeting,
         StrategicOverlayMode strategicOverlayMode,
-        PresentationDebugSnapshot? debugSnapshot)
+        StrategicOverlaySnapshot? strategicOverlaySnapshot)
     {
         gameplayDraw.Clear();
 
@@ -1712,14 +1712,12 @@ internal sealed class ClientApplication
 
         if (strategicOverlayMode !=
                 StrategicOverlayMode.None &&
-            debugSnapshot is not null)
+            strategicOverlaySnapshot is not null)
         {
             RtsStrategicOverlayVisualization.Draw(
                 gameplayDraw,
                 strategicOverlayMode,
-                debugSnapshot,
-                renderWorld.CurrentSnapshot?.Intelligence,
-                camera.Target);
+                strategicOverlaySnapshot);
         }
 
         if (tacticalTargeting.HasPointerTarget)

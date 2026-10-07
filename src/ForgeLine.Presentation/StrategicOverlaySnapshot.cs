@@ -452,6 +452,8 @@ internal static class StrategicOverlaySnapshotFactory
                         truck.ResupplyRangeMeters);
             }
 
+            UnitSupplyState unitSupply =
+                default;
             bool hasUnitState =
                 IsOwned(
                     entities,
@@ -459,7 +461,7 @@ internal static class StrategicOverlaySnapshotFactory
                     player) &&
                 entities.TryGetComponent(
                     entity,
-                    out UnitSupplyState unitSupply);
+                    out unitSupply);
 
             if (!providerOwned &&
                 !hasUnitState)
