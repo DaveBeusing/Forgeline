@@ -237,7 +237,9 @@ internal sealed class ClientApplication
                 weapons:
                     scenario.Services.Weapons,
                 artilleryWeapons:
-                    scenario.Services.ArtilleryWeapons);
+                    scenario.Services.ArtilleryWeapons,
+                technologies:
+                    scenario.Services.TechnologyDefinitions);
         var presentationExtraction =
             new PresentationExtractionContext(
                 scenario,
