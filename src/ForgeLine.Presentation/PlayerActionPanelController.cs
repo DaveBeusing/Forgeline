@@ -1,9 +1,7 @@
-using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Game;
 using ForgeLine.Input;
-using ForgeLine.Intelligence;
 using ForgeLine.Platform;
 using ForgeLine.Simulation;
 
@@ -268,7 +266,11 @@ public sealed class PlayerActionPanelController
             Mode != PlayerActionPanelMode.Closed &&
             Pressed(input, PlatformKey.Enter);
 
-        if (activate)
+        if (activate &&
+            PlayerActionDockHudModel.ResolveItemState(
+                Mode,
+                SelectedIndex,
+                actions).CanActivate)
         {
             ActivateSelected(actions);
         }
@@ -816,8 +818,16 @@ public sealed class PlayerActionPanelController
                     actions);
                 SynchronizeSupplyEditor(
                     actions);
-                ActivateSelected(
-                    actions);
+
+                if (PlayerActionDockHudModel.ResolveItemState(
+                        Mode,
+                        SelectedIndex,
+                        actions).CanActivate)
+                {
+                    ActivateSelected(
+                        actions);
+                }
+
                 break;
 
             case PlayerActionDockControlKind.Activate:
