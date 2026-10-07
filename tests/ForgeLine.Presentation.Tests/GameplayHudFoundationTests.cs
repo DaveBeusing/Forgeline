@@ -286,4 +286,70 @@ public sealed class GameplayHudFoundationTests
                 Vector2.Zero,
                 layout.ActionDock));
     }
+    [Fact]
+    public void HudTextGlyphPatternsHaveValidFiveBySevenDimensions()
+    {
+        var method = typeof(RtsInformationOverlayRenderer).GetMethod(
+            "TextGlyphPattern",
+            System.Reflection.BindingFlags.NonPublic |
+            System.Reflection.BindingFlags.Static);
+
+        Assert.NotNull(method);
+
+        const string glyphs = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.:/-% ?";
+        foreach (char character in glyphs)
+        {
+            string pattern = Assert.IsType<string>(
+                method.Invoke(null, [character]));
+
+            Assert.Equal(35, pattern.Length);
+            Assert.All(pattern, pixel => Assert.True(pixel is '0' or '1'));
+        }
+    }
+
+    [Fact]
+    public void HudSystemMessagesUseOnlyValidGlyphPatterns()
+    {
+        var method = typeof(RtsInformationOverlayRenderer).GetMethod(
+            "TextGlyphPattern",
+            System.Reflection.BindingFlags.NonPublic |
+            System.Reflection.BindingFlags.Static);
+
+        Assert.NotNull(method);
+
+        string[] messages =
+        [
+            PlayerSystemHudModel.OnboardingHint,
+            "MATCH SETUP",
+            "ENTER START  ESC EXIT",
+            "PAUSED",
+            "ESC OR SPACE RESUME",
+            "MATCH COMPLETE",
+            "R RESTART  ESC RETURN",
+            "VICTORY",
+            "DEFEAT",
+            "DRAW"
+        ];
+
+        for (int index = 0; index < PlayerSystemHudModel.HelpLineCount; index++)
+        {
+            foreach (char character in PlayerSystemHudModel.GetHelpLine(index))
+            {
+                string pattern = Assert.IsType<string>(
+                    method.Invoke(null, [char.ToUpperInvariant(character)]));
+                Assert.Equal(35, pattern.Length);
+            }
+        }
+
+        foreach (string message in messages)
+        {
+            foreach (char character in message)
+            {
+                string pattern = Assert.IsType<string>(
+                    method.Invoke(null, [char.ToUpperInvariant(character)]));
+                Assert.Equal(35, pattern.Length);
+            }
+        }
+    }
+
 }
