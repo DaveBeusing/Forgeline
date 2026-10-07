@@ -20,7 +20,8 @@ public enum TechnologyResearchBlockReason : byte
     MissingFacility = 4,
     MissingInventory = 5,
     MissingMaterials = 6,
-    InsufficientPower = 7
+    InsufficientPower = 7,
+    ResearchInProgress = 8
 }
 
 public readonly record struct TechnologyResearchRequest

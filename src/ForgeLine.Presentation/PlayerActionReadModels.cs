@@ -156,7 +156,9 @@ public sealed class PlayerUnitProductionActionReadModel
         UnitId unitId,
         string displayName,
         IReadOnlyList<PlayerActionResourceAmount> costs,
-        uint productionTicks)
+        uint productionTicks,
+        bool technologyUnlocked = true,
+        TechnologyCapabilityId requiredTechnologyCapability = default)
     {
         UnitId = unitId;
         DisplayName =
@@ -167,6 +169,9 @@ public sealed class PlayerUnitProductionActionReadModel
                 costs?.ToArray() ??
                 throw new ArgumentNullException(nameof(costs)));
         ProductionTicks = productionTicks;
+        TechnologyUnlocked = technologyUnlocked;
+        RequiredTechnologyCapability =
+            requiredTechnologyCapability;
     }
 
     public UnitId UnitId { get; }
@@ -176,6 +181,10 @@ public sealed class PlayerUnitProductionActionReadModel
     public IReadOnlyList<PlayerActionResourceAmount> Costs => _costs;
 
     public uint ProductionTicks { get; }
+
+    public bool TechnologyUnlocked { get; }
+
+    public TechnologyCapabilityId RequiredTechnologyCapability { get; }
 
     public bool HasInputs =>
         _costs.All(static cost => cost.IsAvailable);
@@ -468,6 +477,7 @@ public sealed class PlayerTacticalActionReadModel
 public sealed class PlayerActionSnapshot
 {
     private readonly IReadOnlyList<PlayerConstructionActionReadModel> _construction;
+    private readonly IReadOnlyList<PlayerTechnologyActionReadModel> _technology;
 
     public PlayerActionSnapshot(
         SimulationSessionId sessionId,
@@ -478,7 +488,8 @@ public sealed class PlayerActionSnapshot
         PlayerUnitProductionFacilityActionReadModel? unitProduction,
         PlayerLogisticsActionReadModel? logistics = null,
         PlayerSupplyActionReadModel? supply = null,
-        PlayerTacticalActionReadModel? tactical = null)
+        PlayerTacticalActionReadModel? tactical = null,
+        IReadOnlyList<PlayerTechnologyActionReadModel>? technology = null)
     {
         SessionId = sessionId;
         Tick = tick;
@@ -494,6 +505,10 @@ public sealed class PlayerActionSnapshot
         Logistics = logistics;
         Supply = supply;
         Tactical = tactical;
+        _technology =
+            Array.AsReadOnly(
+                technology?.ToArray() ??
+                []);
     }
 
     public SimulationSessionId SessionId { get; }
@@ -514,6 +529,9 @@ public sealed class PlayerActionSnapshot
     public PlayerSupplyActionReadModel? Supply { get; }
 
     public PlayerTacticalActionReadModel? Tactical { get; }
+
+    public IReadOnlyList<PlayerTechnologyActionReadModel> Technology =>
+        _technology;
 }
 
 internal static class PlayerActionSnapshotFactory
@@ -587,6 +605,10 @@ internal static class PlayerActionSnapshotFactory
                 scenario,
                 extraction.Player,
                 interaction.SelectedEntities);
+        PlayerTechnologyActionReadModel[] technology =
+            TechnologyActionSnapshotFactory.Capture(
+                context.Entities,
+                extraction);
 
         return new PlayerActionSnapshot(
             scenario.Simulation.SessionId,
@@ -597,7 +619,8 @@ internal static class PlayerActionSnapshotFactory
             unitProduction,
             logistics,
             supply,
-            tactical);
+            tactical,
+            technology);
     }
 
     private static PlayerConstructionActionReadModel[]
@@ -770,12 +793,20 @@ internal static class PlayerActionSnapshotFactory
                                 cost.Quantity))
                     .ToArray();
 
+            bool technologyUnlocked =
+                TechnologyStateQueries.IsCapabilityUnlocked(
+                    entities,
+                    facility.Owner,
+                    definition.RequiredTechnologyCapability);
+
             units.Add(
                 new PlayerUnitProductionActionReadModel(
                     definition.Id,
                     definition.DisplayName,
                     costs,
-                    definition.ProductionTicks));
+                    definition.ProductionTicks,
+                    technologyUnlocked,
+                    definition.RequiredTechnologyCapability));
         }
 
         var requests =
