@@ -196,6 +196,95 @@ public sealed class TechnologyResearchSystemTests
                 ResourceIds.Electronics));
     }
 
+
+    [Fact]
+    public void MissingFacilityBlocksWithoutConsumingMaterials()
+    {
+        TestWorld world =
+            CreateWorld(
+                powerFraction: 1.0,
+                steel: 200.0,
+                electronics: 100.0);
+        EntityId missingFacility =
+            new(999_999, 1);
+        EntityId request =
+            world.Simulation.Entities.CreateEntity();
+
+        world.Simulation.Entities.AddComponent(
+            request,
+            new TechnologyResearchRequest(
+                Player,
+                TechnologyIds.IndustrialStandardization,
+                missingFacility,
+                world.Inventory,
+                world.Simulation.CurrentTick));
+
+        world.Simulation.AdvanceOneTick();
+
+        TechnologyResearchRequest blocked =
+            world.Simulation.Entities
+                .GetComponent<TechnologyResearchRequest>(
+                    request);
+
+        Assert.Equal(
+            TechnologyResearchStatus.Blocked,
+            blocked.Status);
+        Assert.Equal(
+            TechnologyResearchBlockReason.MissingFacility,
+            blocked.BlockReason);
+        Assert.False(
+            blocked.MaterialsConsumed);
+        Assert.Equal(
+            0u,
+            blocked.ProgressTicks);
+        Assert.Equal(
+            200.0,
+            world.Inventories.GetQuantity(
+                world.Inventory,
+                ResourceIds.Steel));
+    }
+
+    [Fact]
+    public void ResearchStateIsIsolatedBetweenSimulationSessions()
+    {
+        TestWorld first =
+            CreateWorld(
+                powerFraction: 1.0,
+                steel: 200.0,
+                electronics: 100.0);
+        TestWorld second =
+            CreateWorld(
+                powerFraction: 1.0,
+                steel: 200.0,
+                electronics: 100.0);
+
+        _ = AddRequest(
+            first,
+            TechnologyIds.IndustrialStandardization);
+        first.Simulation.AdvanceOneTick();
+
+        Assert.NotEqual(
+            first.Simulation.SessionId,
+            second.Simulation.SessionId);
+        Assert.True(
+            TechnologyStateQueries.TryGetActiveResearch(
+                first.Simulation.Entities,
+                Player,
+                out _,
+                out _));
+        Assert.False(
+            TechnologyStateQueries.TryGetActiveResearch(
+                second.Simulation.Entities,
+                Player,
+                out _,
+                out _));
+        Assert.False(
+            TechnologyStateQueries.IsCapabilityUnlocked(
+                second.Simulation.Entities,
+                Player,
+                TechnologyCapabilityIds.FieldEngineering));
+    }
+
     private static TestWorld CreateWorld(
         BuildingId buildingId = default,
         double powerFraction = 1.0,

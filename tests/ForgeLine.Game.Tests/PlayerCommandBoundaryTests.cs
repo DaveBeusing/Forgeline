@@ -1434,6 +1434,73 @@ public sealed class PlayerCommandBoundaryTests
                 .EngagingUnits >= 0);
     }
 
+
+    [Fact]
+    public void TechnologyResearchStartAndCancelResolveThroughCommandBoundary()
+    {
+        using VerticalSliceScenario scenario =
+            CreateHumanScenario(seed: 4114);
+        PlayerCommandGateway gateway =
+            CreateGateway(scenario);
+
+        PlayerCommandSubmissionReceipt start =
+            gateway.SubmitTechnologyResearch(
+                scenario.West.Player,
+                TechnologyIds.IndustrialStandardization,
+                scenario.West.CommandCore,
+                scenario.West.CommandCore,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(start.Accepted);
+        Assert.Equal(
+            PlayerCommandKind.Technology,
+            start.Kind);
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel startResult));
+        Assert.Equal(
+            PlayerCommandKind.Technology,
+            startResult.Kind);
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            startResult.State);
+        Assert.True(
+            TechnologyStateQueries.TryGetActiveResearch(
+                scenario.Simulation.Entities,
+                scenario.West.Player,
+                out EntityId requestEntity,
+                out _));
+
+        PlayerCommandSubmissionReceipt cancel =
+            gateway.SubmitTechnologyResearchCancel(
+                scenario.West.Player,
+                requestEntity,
+                scenario.Simulation.CurrentTick);
+
+        Assert.True(cancel.Accepted);
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            gateway.Results.TryRead(
+                out PlayerCommandResultReadModel cancelResult));
+        Assert.Equal(
+            PlayerCommandKind.Technology,
+            cancelResult.Kind);
+        Assert.Equal(
+            PlayerCommandFeedbackState.Accepted,
+            cancelResult.State);
+        Assert.False(
+            TechnologyStateQueries.TryGetActiveResearch(
+                scenario.Simulation.Entities,
+                scenario.West.Player,
+                out _,
+                out _));
+    }
+
     private static VerticalSliceScenario CreateHumanScenario(
         ulong seed)
     {
@@ -1468,7 +1535,9 @@ public sealed class PlayerCommandBoundaryTests
                 weapons:
                     scenario.Services.Weapons,
                 artilleryWeapons:
-                    scenario.Services.ArtilleryWeapons);
+                    scenario.Services.ArtilleryWeapons,
+                technologies:
+                    scenario.Services.TechnologyDefinitions);
         scenario.Simulation.RegisterTickObserver(
             gateway);
         return gateway;
