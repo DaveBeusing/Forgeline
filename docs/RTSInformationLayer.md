@@ -122,6 +122,14 @@ Player-facing world markers use a dedicated gameplay-overlay path rather than th
 
 Picking, hover, selection markers, and renderer culling share the same presentation-bounds calculation. Unit bounds include conservative role-specific expansion for silhouette features such as weapons and sensors, and rotated transforms are converted to world-space axis-aligned bounds consistently. Unit rings and building footprint outlines are anchored just above the visual ground plane; building outlines also preserve authored orientation. This keeps interaction geometry aligned with visible objects without changing gameplay authority.
 
+## Selection inspector
+
+The production selection inspector is a dedicated gameplay HUD surface, separate from world-space selection markers and from engineering diagnostics. Its header uses the stable semantic role icon for a common unit/building identity when available, plus the copied display name and authorized selection count.
+
+For exactly one selected owned entity, the inspector may render Health, supply/Fuel/Ammunition, readiness, power, and current work/progress/block reason from the copied player read model. For multiple entities it renders only count and semantically safe common/generic identity; it does not infer group Health, readiness, supply, or work from the first selected entity.
+
+Selection disappearance requires no presentation history cleanup. If filtering removes the entity because it is destroyed, stale, hidden from the authorized selection path, foreign-owned, or the session/selection is cleared, the following snapshot contains an empty or changed selection summary and the inspector redraws from that state.
+
 ## Health and supply information
 
 Supply-state presentation maps the authoritative `BattlefieldSupplyStatus` values:

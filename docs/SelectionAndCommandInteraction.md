@@ -148,6 +148,16 @@ At execution time it revalidates every target against the live ECS and owner. A 
 
 The command exposes accepted/rejected target counts and execution tick for development diagnostics.
 
+## Production selection inspector
+
+World-space selection rings, building footprints, hover markers, and tactical target markers remain separate from screen-space inspection. The selected set continues to be presentation-owned interaction state, while `PlayerExperienceSnapshotFactory` copies only authorized owned selection facts at the completed-tick boundary.
+
+`PlayerSelectionSummary` now distinguishes safe common identity from single-entity detail. A single authorized entity may publish its concrete unit/building identity and operational values. A multi-selection publishes an exact common UnitId or BuildingId only when all authorized members share it; heterogeneous same-kind selections use a generic kind summary and mixed categories use `Mixed Selection`.
+
+Per-entity Health, supply, Fuel, Ammunition, readiness, power, inventory, and work data is available only when exactly one authorized entity remains after alive/ownership filtering. This prevents a primary entity from being presented as if its status represented the entire selected group. Foreign-owned, destroyed, or generation-stale entities do not contribute to the inspector summary.
+
+`SelectionInspectorHudSurface` owns the DPI-aware `SelectionInspector` HUD region and resolves existing semantic unit/building/status icons through `RtsUiIconCatalog`. Operational meaning is also expressed through explicit labels such as `SUPPLIED`, `CRITICAL`, `POWERED`, `BROWNOUT`, `RUNNING`, and `BLOCKED`, rather than color alone.
+
 ## Feedback and Diagnostics
 
 Hover, selection, placement-preview, tactical-target, and strategic-overlay feedback use a dedicated player-facing world-overlay path around immutable presentation data. They no longer share the engineering debug buffer. Player-facing line markers render after depth-tested developer diagnostics and without depth testing so selection and command feedback remain readable over terrain and world geometry. None of these visuals mutates simulation state.
