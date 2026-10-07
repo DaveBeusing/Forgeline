@@ -21,6 +21,9 @@ public sealed class GameplayHudRenderer : IDisposable
             new ResourcePowerHudSurface(
                 graphics,
                 runtimeAssets),
+            new SelectionInspectorHudSurface(
+                graphics,
+                runtimeAssets),
             new RtsInformationHudSurface(
                 graphics,
                 runtimeAssets),

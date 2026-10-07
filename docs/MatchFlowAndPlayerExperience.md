@@ -87,7 +87,17 @@ HUD surfaces implement the narrow `IGameplayHudSurface` contract. New surfaces s
 
 `ResourcePowerHudSurface` now owns the top status bar and alert stack. It renders the seven resource quantities currently present in the authoritative player resource summary, generation/demand plus explicit power state, the existing causal alert flags/counts, and short-lived resolved command feedback. Rare Elements keep their semantic resource/icon identity but are not displayed because the active skirmish starting inventory does not currently expose an authoritative Rare Elements quantity.
 
-The remaining text-heavy player output is retained behind `GameplayHudLegacyTextSurface` as a compatibility adapter while selection/action/result surfaces are migrated incrementally. Resource, power, alert, and command-feedback text has been removed from that adapter. It is deliberately isolated beneath `GameplayHudRenderer`; it is not a reason for new player-facing features to be added to the development overlay.
+The remaining text-heavy player output is retained behind `GameplayHudLegacyTextSurface` as a compatibility adapter while action/result surfaces are migrated incrementally. Resource, power, alert, command-feedback, and selected-entity inspector text has been removed from that adapter. It is deliberately isolated beneath `GameplayHudRenderer`; it is not a reason for new player-facing features to be added to the development overlay.
+
+## Selection inspector presentation
+
+The production gameplay HUD owns selected-entity inspection through `SelectionInspectorHudSurface`. The inspector consumes only the completed-tick `PlayerSelectionSummary` embedded in the current `PlayerExperienceSnapshot`; it does not query live ECS, inventory, production, power, supply, or readiness state while rendering.
+
+Single selection may expose the copied primary entity's display name, semantic unit/building role identity, Health, supply state, Fuel, Ammunition, combat readiness, power state, and current construction/processing/unit-production work information when those values are authoritative for that entity. Work progress and block reasons remain copied from the existing production systems.
+
+Multi-selection deliberately does not reuse the first selected entity's operational state as an aggregate. The summary exposes total authorized count plus an exact common unit/building identity only when every authorized selected entity shares that identity. Otherwise the inspector uses a generic Units, Buildings, Construction Sites, or Mixed Selection label. Health, supply, Fuel, Ammunition, readiness, power, inventory, and work fields are suppressed for multi-selection until a real aggregate contract exists.
+
+The inspector is presentation-only and stateless across snapshots. Selection clear, entity destruction, stale-generation filtering, session replacement, construction completion, and production-state changes are reflected by the next immutable snapshot rather than retained in HUD-owned history.
 
 ## Selection and production presentation
 
