@@ -949,6 +949,8 @@ internal sealed class ClientApplication
                 selectionController.Selection.Entities,
                 tacticalTargetingController.Mode,
                 activeFormation,
+                minimapEnabled:
+                    informationLayer.MinimapEnabled,
                 inputBlocked:
                     hudInteraction.PointerCaptured ||
                     hudInteraction.KeyboardCaptured);
@@ -987,6 +989,15 @@ internal sealed class ClientApplication
                     inputSnapshot?.Tick ??
                         SimulationTick.Zero);
                 tacticalTargetingController.Cancel();
+            }
+
+            if (minimapInteraction.TryTakeOverlaySelection(
+                    out StrategicOverlayMode selectedOverlay))
+            {
+                informationLayer.SetOverlay(
+                    selectedOverlay);
+                presentationInteraction.SetStrategicOverlay(
+                    selectedOverlay);
             }
 
             if (!hudInteraction.KeyboardCaptured)
@@ -1225,7 +1236,15 @@ internal sealed class ClientApplication
                     selectionController.IsDragSelecting,
                     selectionController.DragStart,
                     selectionController.DragCurrent,
-                    selectionController.Selection.Entities.ToArray());
+                    selectionController.Selection.Entities.ToArray(),
+                    MinimapPointerCaptured:
+                        minimapInteraction.View.PointerCaptured,
+                    MinimapPointerWorldValid:
+                        minimapInteraction.View.PointerWorldValid,
+                    MinimapPointerWorldTarget:
+                        minimapInteraction.View.PointerWorldTarget,
+                    MinimapCameraDragging:
+                        minimapInteraction.View.IsCameraDragging);
 
             _ = renderHost.Publish(
                 new ClientRenderFrame(

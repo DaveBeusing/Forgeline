@@ -138,7 +138,10 @@ public sealed class RtsMinimapInteractionTests
             camera,
             terrain,
             snapshot,
-            layout);
+            layout,
+            [],
+            TacticalTargetingMode.None,
+            FormationTemplate.Compact);
 
         Assert.NotEqual(
             afterJump,
@@ -157,7 +160,10 @@ public sealed class RtsMinimapInteractionTests
             camera,
             terrain,
             snapshot,
-            layout);
+            layout,
+            [],
+            TacticalTargetingMode.None,
+            FormationTemplate.Compact);
 
         Assert.False(
             controller.View.IsCameraDragging);
@@ -432,6 +438,105 @@ public sealed class RtsMinimapInteractionTests
     }
 
     [Fact]
+    public void SelectorHitQueuesPlayerFacingOverlayMode()
+    {
+        var controller =
+            new RtsMinimapInteractionController();
+        var information =
+            new RtsInformationLayerController();
+        var input =
+            new InputState();
+        var terrain =
+            new FlatTerrain();
+        GameplayHudLayout layout =
+            GameplayHudLayout.Create(
+                1600,
+                900,
+                96);
+        HudRect button =
+            RtsMinimapInteractionLayout.GetSelectorButtonRect(
+                layout,
+                5);
+        Vector2 pointer =
+            Center(
+                button);
+
+        MovePointer(
+            input,
+            pointer);
+        SetPrimary(
+            input,
+            true,
+            pointer);
+        controller.Update(
+            input,
+            new RtsCamera(),
+            terrain,
+            Snapshot(),
+            layout,
+            [],
+            TacticalTargetingMode.None,
+            FormationTemplate.Compact);
+
+        Assert.True(
+            controller.PointerCaptured);
+        Assert.True(
+            controller.TryTakeOverlaySelection(
+                out StrategicOverlayMode mode));
+        Assert.Equal(
+            StrategicOverlayMode.Power,
+            mode);
+
+        information.SetOverlay(
+            mode);
+        Assert.Equal(
+            StrategicOverlayMode.Power,
+            information.OverlayMode);
+    }
+
+    [Fact]
+    public void DisabledMinimapDoesNotCapturePointer()
+    {
+        var controller =
+            new RtsMinimapInteractionController();
+        var input =
+            new InputState();
+        GameplayHudLayout layout =
+            GameplayHudLayout.Create(
+                1600,
+                900,
+                96);
+        Vector2 pointer =
+            Center(
+                layout.Minimap);
+
+        MovePointer(
+            input,
+            pointer);
+        SetPrimary(
+            input,
+            true,
+            pointer);
+        controller.Update(
+            input,
+            new RtsCamera(),
+            new FlatTerrain(),
+            Snapshot(),
+            layout,
+            [],
+            TacticalTargetingMode.None,
+            FormationTemplate.Compact,
+            minimapEnabled:
+                false);
+
+        Assert.False(
+            controller.PointerCaptured);
+        Assert.False(
+            controller.TryTakeOverlaySelection(
+                out _));
+    }
+
+    [Fact]
     public void OverlayCycleIncludesPowerBeforeAll()
     {
         var controller =
@@ -453,6 +558,16 @@ public sealed class RtsMinimapInteractionTests
             StrategicOverlayMode.All,
             controller.OverlayMode);
     }
+
+    private static Vector2 Center(
+        in HudRect rect) =>
+        new(
+            rect.X +
+                rect.Width *
+                0.5f,
+            rect.Y +
+                rect.Height *
+                0.5f);
 
     private static PresentationSnapshot Snapshot(
         PlayerTacticalActionReadModel? tactical = null,

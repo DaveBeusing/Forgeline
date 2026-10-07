@@ -87,6 +87,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             EmitMinimap(
                 minimap,
                 camera.Target,
+                view,
+                snapshot.StrategicOverlay,
                 layout,
                 context.Width,
                 context.Height);
@@ -165,32 +167,39 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     private void EmitMinimap(
         RtsMinimapModel model,
         Vector3 cameraTarget,
+        in RtsInformationLayerView view,
+        StrategicOverlaySnapshot? overlay,
         in GameplayHudLayout layout,
         int width,
         int height)
     {
         float scale =
             layout.Scale;
-        float size =
-            MathF.Min(
-                layout.Minimap.Width,
-                layout.Minimap.Height);
+        HudRect map =
+            RtsMinimapInteractionLayout.GetMapRect(
+                layout);
 
-        if (size <= 0.0f)
+        if (map.IsEmpty)
         {
             return;
         }
 
-        float left =
-            layout.Minimap.X;
-        float top =
-            layout.Minimap.Y;
+        HudRect selector =
+            RtsMinimapInteractionLayout.GetSelectorRect(
+                layout);
+        HudRect legend =
+            RtsMinimapInteractionLayout.GetLegendRect(
+                layout);
 
         EmitQuad(
-            left - 3.0f,
-            top - 3.0f,
-            size + 6.0f,
-            size + 6.0f,
+            layout.Minimap.X -
+                3.0f,
+            layout.Minimap.Y -
+                3.0f,
+            layout.Minimap.Width +
+                6.0f,
+            layout.Minimap.Height +
+                6.0f,
             new Vector4(
                 0.62f,
                 0.66f,
@@ -198,11 +207,35 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 1.0f),
             width,
             height);
+
+        EmitOverlaySelector(
+            view.OverlayMode,
+            selector,
+            scale,
+            width,
+            height);
+        EmitOverlayLegend(
+            view.OverlayMode,
+            overlay,
+            legend,
+            scale,
+            width,
+            height);
+
+        float left =
+            map.X;
+        float top =
+            map.Y;
+        float mapWidth =
+            map.Width;
+        float mapHeight =
+            map.Height;
+
         EmitQuad(
             left,
             top,
-            size,
-            size,
+            mapWidth,
+            mapHeight,
             new Vector4(
                 0.13f,
                 0.15f,
@@ -252,21 +285,21 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             float cellLeft =
                 left +
                 first.X *
-                size;
+                mapWidth;
             float cellRight =
                 left +
                 second.X *
-                size;
+                mapWidth;
             float cellTop =
                 top +
                 (1.0f -
                  second.Y) *
-                size;
+                mapHeight;
             float cellBottom =
                 top +
                 (1.0f -
                  first.Y) *
-                size;
+                mapHeight;
 
             Vector4 fogColor =
                 fog.Presentation.Pattern ==
@@ -333,12 +366,12 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             float x =
                 left +
                 normalized.X *
-                size;
+                mapWidth;
             float y =
                 top +
                 (1.0f -
                  normalized.Y) *
-                size;
+                mapHeight;
 
             float symbolSize =
                 symbol.Kind is
@@ -367,12 +400,12 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         float cameraX =
             left +
             cameraPosition.X *
-            size;
+            mapWidth;
         float cameraY =
             top +
             (1.0f -
              cameraPosition.Y) *
-            size;
+            mapHeight;
         Vector4 cameraColor =
             new(
                 0.95f,
@@ -394,6 +427,323 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             2.0f,
             10.0f * scale,
             cameraColor,
+            width,
+            height);
+
+        if (view.MinimapPointerCaptured &&
+            view.MinimapPointerWorldValid)
+        {
+            Vector2 target =
+                RtsMinimapInteractionLayout.MapWorldToPointer(
+                    view.MinimapPointerWorldTarget,
+                    layout,
+                    model.WorldBounds);
+            Vector4 targetColor =
+                ResolveColor(
+                    RtsUiIconCatalog.ResolveCursor(
+                        view.Cursor));
+            float targetSize =
+                6.0f *
+                scale;
+
+            EmitQuad(
+                target.X -
+                    targetSize,
+                target.Y -
+                    1.0f,
+                targetSize *
+                    2.0f,
+                2.0f,
+                targetColor,
+                width,
+                height);
+            EmitQuad(
+                target.X -
+                    1.0f,
+                target.Y -
+                    targetSize,
+                2.0f,
+                targetSize *
+                    2.0f,
+                targetColor,
+                width,
+                height);
+        }
+    }
+
+    private void EmitOverlaySelector(
+        StrategicOverlayMode selectedMode,
+        in HudRect selector,
+        float scale,
+        int width,
+        int height)
+    {
+        EmitQuad(
+            selector.X,
+            selector.Y,
+            selector.Width,
+            selector.Height,
+            new Vector4(
+                0.055f,
+                0.065f,
+                0.065f,
+                0.98f),
+            width,
+            height);
+
+        for (int index = 0;
+             index <
+                 RtsStrategicOverlayHudModel.SelectorButtonCount;
+             index++)
+        {
+            StrategicOverlayMode mode =
+                RtsStrategicOverlayHudModel.ModeForButton(
+                    index);
+            HudRect rect;
+            float gap =
+                2.0f *
+                scale;
+            float buttonWidth =
+                MathF.Max(
+                    0.0f,
+                    (selector.Width -
+                     gap *
+                     (RtsStrategicOverlayHudModel.SelectorButtonCount -
+                      1)) /
+                    RtsStrategicOverlayHudModel.SelectorButtonCount);
+            rect =
+                new HudRect(
+                    selector.X +
+                        index *
+                        (buttonWidth + gap),
+                    selector.Y,
+                    buttonWidth,
+                    selector.Height);
+
+            bool selected =
+                mode ==
+                selectedMode;
+            EmitQuad(
+                rect.X,
+                rect.Y,
+                rect.Width,
+                rect.Height,
+                selected
+                    ? new Vector4(
+                        0.12f,
+                        0.18f,
+                        0.19f,
+                        0.98f)
+                    : new Vector4(
+                        0.075f,
+                        0.09f,
+                        0.09f,
+                        0.98f),
+                width,
+                height);
+
+            float iconSize =
+                8.0f *
+                scale;
+            EmitIcon(
+                RtsStrategicOverlayHudModel.ResolveIcon(
+                    mode),
+                rect.X +
+                    2.0f *
+                    scale,
+                rect.Y +
+                    3.0f *
+                    scale,
+                iconSize,
+                width,
+                height);
+            EmitText(
+                RtsStrategicOverlayHudModel.ResolveShortLabel(
+                    mode),
+                rect.X +
+                    12.0f *
+                    scale,
+                rect.Y +
+                    5.0f *
+                    scale,
+                rect.Right -
+                    1.0f *
+                    scale,
+                new Vector4(
+                    0.90f,
+                    0.94f,
+                    0.92f,
+                    1.0f),
+                scale *
+                    0.62f,
+                width,
+                height);
+
+            if (selected)
+            {
+                EmitQuad(
+                    rect.X,
+                    rect.Bottom -
+                        2.0f *
+                        scale,
+                    rect.Width,
+                    2.0f *
+                        scale,
+                    new Vector4(
+                        0.90f,
+                        0.94f,
+                        0.92f,
+                        1.0f),
+                    width,
+                    height);
+            }
+        }
+    }
+
+    private void EmitOverlayLegend(
+        StrategicOverlayMode mode,
+        StrategicOverlaySnapshot? overlay,
+        in HudRect legend,
+        float scale,
+        int width,
+        int height)
+    {
+        EmitQuad(
+            legend.X,
+            legend.Y,
+            legend.Width,
+            legend.Height,
+            new Vector4(
+                0.055f,
+                0.065f,
+                0.065f,
+                0.98f),
+            width,
+            height);
+
+        Span<char> buffer =
+            stackalloc char[96];
+        var text =
+            new HudTextBuilder(
+                buffer);
+        text.Append(
+            RtsStrategicOverlayHudModel.ResolveShortLabel(
+                mode));
+
+        if (overlay is not null)
+        {
+            switch (mode)
+            {
+                case StrategicOverlayMode.Logistics:
+                    text.Append(" N");
+                    text.Append(
+                        overlay.LogisticsNodes.Count);
+                    text.Append(" L");
+                    text.Append(
+                        overlay.LogisticsLinks.Count);
+                    break;
+
+                case StrategicOverlayMode.Supply:
+                    int providers = 0;
+                    int critical = 0;
+                    for (int index = 0;
+                         index <
+                             overlay.Supply.Count;
+                         index++)
+                    {
+                        StrategicSupplyReadModel item =
+                            overlay.Supply[index];
+                        if (item.IsProvider)
+                        {
+                            providers++;
+                        }
+
+                        if (item.HasUnitState &&
+                            item.Status is
+                                BattlefieldSupplyStatus.Critical or
+                                BattlefieldSupplyStatus.Unsupplied)
+                        {
+                            critical++;
+                        }
+                    }
+
+                    text.Append(" P");
+                    text.Append(
+                        providers);
+                    text.Append(" C");
+                    text.Append(
+                        critical);
+                    break;
+
+                case StrategicOverlayMode.Sensors:
+                    text.Append(" S");
+                    text.Append(
+                        overlay.Sensors.Count);
+                    break;
+
+                case StrategicOverlayMode.Navigation:
+                    text.Append(" S");
+                    text.Append(
+                        overlay.NavigationSectors.Count);
+                    text.Append(" P");
+                    text.Append(
+                        overlay.NavigationPortals.Count);
+                    break;
+
+                case StrategicOverlayMode.Power:
+                    int constrained = 0;
+                    for (int index = 0;
+                         index <
+                             overlay.PowerNetworks.Count;
+                         index++)
+                    {
+                        if (overlay.PowerNetworks[
+                                index].IsConstrained)
+                        {
+                            constrained++;
+                        }
+                    }
+
+                    text.Append(" N");
+                    text.Append(
+                        overlay.PowerNetworks.Count);
+                    text.Append(" C");
+                    text.Append(
+                        constrained);
+                    break;
+
+                case StrategicOverlayMode.All:
+                    text.Append(" LOG ");
+                    text.Append(
+                        overlay.LogisticsNodes.Count);
+                    text.Append(" SUP ");
+                    text.Append(
+                        overlay.Supply.Count);
+                    text.Append(" PWR ");
+                    text.Append(
+                        overlay.PowerNetworks.Count);
+                    break;
+            }
+        }
+
+        EmitText(
+            text.Written,
+            legend.X +
+                4.0f *
+                scale,
+            legend.Y +
+                4.0f *
+                scale,
+            legend.Right -
+                4.0f *
+                scale,
+            new Vector4(
+                0.82f,
+                0.87f,
+                0.85f,
+                1.0f),
+            scale *
+                0.68f,
             width,
             height);
     }
@@ -507,6 +857,120 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 segmentColor,
                 width,
                 height);
+        }
+    }
+
+    private void EmitText(
+        string value,
+        float x,
+        float y,
+        float right,
+        Vector4 color,
+        float glyphScale,
+        int width,
+        int height) =>
+        EmitText(
+            value.AsSpan(),
+            x,
+            y,
+            right,
+            color,
+            glyphScale,
+            width,
+            height);
+
+    private void EmitText(
+        ReadOnlySpan<char> value,
+        float x,
+        float y,
+        float right,
+        Vector4 color,
+        float glyphScale,
+        int width,
+        int height)
+    {
+        const float Advance = 6.0f;
+        float step =
+            Advance *
+            glyphScale;
+        int maximumCharacters =
+            step >
+                0.0f
+                ? Math.Max(
+                    0,
+                    (int)MathF.Floor(
+                        MathF.Max(
+                            0.0f,
+                            right -
+                            x) /
+                        step))
+                : 0;
+        int count =
+            Math.Min(
+                value.Length,
+                maximumCharacters);
+
+        for (int index = 0;
+             index < count;
+             index++)
+        {
+            EmitTextGlyph(
+                char.ToUpperInvariant(
+                    value[index]),
+                x +
+                    index *
+                    step,
+                y,
+                color,
+                glyphScale,
+                width,
+                height);
+        }
+    }
+
+    private void EmitTextGlyph(
+        char character,
+        float x,
+        float y,
+        Vector4 color,
+        float glyphScale,
+        int width,
+        int height)
+    {
+        string pattern =
+            TextGlyphPattern(
+                character);
+
+        for (int row = 0;
+             row < 7;
+             row++)
+        {
+            for (int column = 0;
+                 column < 5;
+                 column++)
+            {
+                if (pattern[
+                        row *
+                        5 +
+                        column] !=
+                    '1')
+                {
+                    continue;
+                }
+
+                EmitQuad(
+                    x +
+                        column *
+                        glyphScale,
+                    y +
+                        row *
+                        glyphScale,
+                    glyphScale,
+                    glyphScale,
+                    color,
+                    width,
+                    height);
+            }
         }
     }
 
@@ -760,6 +1224,97 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 ],
                 DepthEnabled = false
             });
+    }
+
+    private static string TextGlyphPattern(
+        char value) =>
+        value switch
+        {
+            'A' => "01110100011000111111100011000110001",
+            'B' => "11110100011000111110100011000111110",
+            'C' => "01111100001000010000100001000001111",
+            'D' => "11110100011000110001100011000111110",
+            'E' => "11111100001000011110100001000011111",
+            'F' => "11111100001000011110100001000010000",
+            'G' => "01111100001000010111100011000101111",
+            'H' => "10001100011000111111100011000110001",
+            'I' => "11111001000010000100001000010011111",
+            'J' => "00111000100001000010100101001001100",
+            'K' => "10001100101010011000101001001010001",
+            'L' => "10000100001000010000100001000011111",
+            'M' => "10001110111010110101100011000110001",
+            'N' => "10001110011010110011100011000110001",
+            'O' => "01110100011000110001100011000101110",
+            'P' => "11110100011000111110100001000010000",
+            'Q' => "01110100011000110001101011001001101",
+            'R' => "11110100011000111110101001001010001",
+            'S' => "01111100001000001110000010000111110",
+            'T' => "11111001000010000100001000010000100",
+            'U' => "10001100011000110001100011000101110",
+            'V' => "10001100011000110001100010101000100",
+            'W' => "10001100011000110101101011101110001",
+            'X' => "10001100010101000100010101000110001",
+            'Y' => "10001100010101000100001000010000100",
+            'Z' => "11111000010001000100010001000011111",
+            '0' => "01110100011001110101110011000101110",
+            '1' => "00100011000010000100001000010001110",
+            '2' => "01110100010000100010001000100011111",
+            '3' => "11110000010000101110000010000111110",
+            '4' => "00010001100101010010111110001000010",
+            '5' => "11111100001000011110000010000111110",
+            '6' => "01110100001000011110100011000101110",
+            '7' => "11111000010001000100010000100001000",
+            '8' => "01110100011000101110100011000101110",
+            '9' => "01110100011000101111000010000101110",
+            '.' => "00000000000000000000000000011000110",
+            ':' => "00000001100011000000001100011000000",
+            '/' => "00001000100010001000100001000000000",
+            '-' => "00000000000000011111000000000000000",
+            '%' => "11001000100010001000100001001100000",
+            ' ' => "",
+            _ => "11111000010001000100000000010000100"
+        };
+
+    private ref struct HudTextBuilder
+    {
+        private Span<char> _buffer;
+        private int _length;
+
+        public HudTextBuilder(
+            Span<char> buffer)
+        {
+            _buffer =
+                buffer;
+            _length = 0;
+        }
+
+        public readonly ReadOnlySpan<char> Written =>
+            _buffer[.._length];
+
+        public void Append(
+            string value)
+        {
+            if (value.AsSpan().TryCopyTo(
+                    _buffer[_length..]))
+            {
+                _length +=
+                    value.Length;
+            }
+        }
+
+        public void Append(
+            int value)
+        {
+            if (value.TryFormat(
+                    _buffer[_length..],
+                    out int written,
+                    provider:
+                        System.Globalization.CultureInfo.InvariantCulture))
+            {
+                _length +=
+                    written;
+            }
+        }
     }
 
     private static string GlyphPattern(

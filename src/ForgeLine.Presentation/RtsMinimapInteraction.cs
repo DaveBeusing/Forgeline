@@ -34,6 +34,72 @@ internal static class RtsMinimapInteractionLayout
             SelectorHeight(
                 layout));
 
+    public static HudRect GetSelectorButtonRect(
+        in GameplayHudLayout layout,
+        int index)
+    {
+        if (index < 0 ||
+            index >=
+                RtsStrategicOverlayHudModel.SelectorButtonCount)
+        {
+            return default;
+        }
+
+        HudRect selector =
+            GetSelectorRect(
+                layout);
+        float gap =
+            2.0f *
+            layout.Scale;
+        float totalGap =
+            gap *
+            (RtsStrategicOverlayHudModel.SelectorButtonCount -
+             1);
+        float width =
+            MathF.Max(
+                0.0f,
+                (selector.Width -
+                 totalGap) /
+                RtsStrategicOverlayHudModel.SelectorButtonCount);
+
+        return new HudRect(
+            selector.X +
+                index *
+                (width + gap),
+            selector.Y,
+            width,
+            selector.Height);
+    }
+
+    public static bool TryHitOverlay(
+        Vector2 pointer,
+        in GameplayHudLayout layout,
+        out StrategicOverlayMode mode)
+    {
+        for (int index = 0;
+             index <
+                 RtsStrategicOverlayHudModel.SelectorButtonCount;
+             index++)
+        {
+            if (!GetSelectorButtonRect(
+                    layout,
+                    index).Contains(
+                    pointer))
+            {
+                continue;
+            }
+
+            mode =
+                RtsStrategicOverlayHudModel.ModeForButton(
+                    index);
+            return true;
+        }
+
+        mode =
+            StrategicOverlayMode.None;
+        return false;
+    }
+
     public static HudRect GetLegendRect(
         in GameplayHudLayout layout)
     {
@@ -193,6 +259,7 @@ internal sealed class RtsMinimapInteractionController
     private bool _cameraDragging;
     private MovementOrderRequest? _pendingMovement;
     private PlayerActionRequest? _pendingAction;
+    private StrategicOverlayMode? _pendingOverlay;
 
     public bool PointerCaptured { get; private set; }
 
@@ -208,6 +275,7 @@ internal sealed class RtsMinimapInteractionController
         IReadOnlyCollection<EntityId> selectedEntities,
         TacticalTargetingMode targetingMode,
         FormationTemplate formation,
+        bool minimapEnabled = true,
         bool inputBlocked = false)
     {
         ArgumentNullException.ThrowIfNull(input);
@@ -234,6 +302,20 @@ internal sealed class RtsMinimapInteractionController
         bool secondaryPressed =
             secondaryDown &&
             !_secondaryWasDown;
+
+        if (!minimapEnabled)
+        {
+            _cameraDragging = false;
+            PointerCaptured = false;
+            _primaryWasDown =
+                primaryDown;
+            _secondaryWasDown =
+                secondaryDown;
+            View =
+                RtsMinimapInteractionView.Empty;
+            return;
+        }
+
         bool pointerInHud =
             input.HasPointerPosition &&
             layout.Minimap.Contains(
@@ -241,6 +323,11 @@ internal sealed class RtsMinimapInteractionController
         bool pointerInMap =
             input.HasPointerPosition &&
             RtsMinimapInteractionLayout.GetMapRect(
+                layout).Contains(
+                input.PointerPosition);
+        bool pointerInSelector =
+            input.HasPointerPosition &&
+            RtsMinimapInteractionLayout.GetSelectorRect(
                 layout).Contains(
                 input.PointerPosition);
 
@@ -274,6 +361,17 @@ internal sealed class RtsMinimapInteractionController
         if (!interactionAllowed)
         {
             _cameraDragging = false;
+        }
+        else if (primaryPressed &&
+                 pointerInSelector &&
+                 RtsMinimapInteractionLayout.TryHitOverlay(
+                     input.PointerPosition,
+                     layout,
+                     out StrategicOverlayMode overlay))
+        {
+            _cameraDragging = false;
+            _pendingOverlay =
+                overlay;
         }
         else if (targetingMode !=
                  TacticalTargetingMode.None)
@@ -385,6 +483,23 @@ internal sealed class RtsMinimapInteractionController
         return true;
     }
 
+    public bool TryTakeOverlaySelection(
+        out StrategicOverlayMode mode)
+    {
+        if (!_pendingOverlay.HasValue)
+        {
+            mode =
+                StrategicOverlayMode.None;
+            return false;
+        }
+
+        mode =
+            _pendingOverlay.Value;
+        _pendingOverlay =
+            null;
+        return true;
+    }
+
     public void Reset()
     {
         _sessionId =
@@ -394,6 +509,7 @@ internal sealed class RtsMinimapInteractionController
         _cameraDragging = false;
         _pendingMovement = null;
         _pendingAction = null;
+        _pendingOverlay = null;
         PointerCaptured = false;
         View =
             RtsMinimapInteractionView.Empty;
@@ -416,6 +532,7 @@ internal sealed class RtsMinimapInteractionController
         _cameraDragging = false;
         _pendingMovement = null;
         _pendingAction = null;
+        _pendingOverlay = null;
         PointerCaptured = false;
         View =
             RtsMinimapInteractionView.Empty;
