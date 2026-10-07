@@ -19,6 +19,9 @@ internal static class Program
             return 2;
         }
 
+        bool skipSplash = args.Any(argument =>
+            string.Equals(argument, "--skip-splash", StringComparison.OrdinalIgnoreCase));
+
         try
         {
             var settingsStore =
@@ -53,7 +56,8 @@ internal static class Program
                     application.Run(
                         smokeTest,
                         renderInstanceCount,
-                        visualQualificationOutput);
+                        visualQualificationOutput,
+                        skipSplash);
 
                 if (smokeTest ||
                     result !=
@@ -97,6 +101,11 @@ internal static class Program
         for (int index = 0; index < args.Length; index++)
         {
             string argument = args[index];
+
+            if (string.Equals(argument, "--skip-splash", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
 
             if (string.Equals(argument, "--smoke-test", StringComparison.OrdinalIgnoreCase))
             {
@@ -178,6 +187,6 @@ internal static class Program
         writer.WriteLine(
             "ForgeLine.Client [--smoke-test] [--render-stress <instances>] " +
             "[--visual-qualification-output <report.json>] " +
-            "[--settings-root <directory>]");
+            "[--settings-root <directory>] [--skip-splash]");
     }
 }

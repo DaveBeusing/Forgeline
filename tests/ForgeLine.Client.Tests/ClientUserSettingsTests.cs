@@ -8,6 +8,24 @@ namespace ForgeLine.Client.Tests;
 public sealed class ClientUserSettingsTests
 {
     [Fact]
+    public void StudioSplashPreferenceRoundTripsThroughSettingsStore()
+    {
+        string root = CreateTemporaryRoot();
+        try
+        {
+            var store = new ClientSettingsStore(root);
+            store.Save(new ClientUserSettings { ShowStudioSplash = false });
+            ClientSettingsLoadResult loaded = store.Load();
+            Assert.False(loaded.Settings.ShowStudioSplash);
+            Assert.False(loaded.RecoveredInvalidSettings);
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
     public void DefaultsValidateAndCreateExpectedWindowConfiguration()
     {
         var settings =

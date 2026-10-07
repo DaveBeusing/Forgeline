@@ -5,7 +5,8 @@ public enum FrontendSurfaceKind : byte
     Loading = 1,
     MainMenu = 2,
     Detail = 3,
-    PauseMenu = 4
+    PauseMenu = 4,
+    StudioSplash = 5
 }
 
 public readonly record struct FrontendMenuEntryView(
@@ -41,8 +42,16 @@ public readonly record struct FrontendSurfaceView(
     bool PrimaryPressed = false,
     bool SecondaryHovered = false,
     bool SecondaryPressed = false,
-    string ProductVersion = "")
+    string ProductVersion = "",
+    float SplashElapsedSeconds = 0f,
+    float SplashMasterOpacity = 1f)
 {
+    public static FrontendSurfaceView StudioSplash(float elapsedSeconds, float masterOpacity = 1f) =>
+        new(FrontendSurfaceKind.StudioSplash, string.Empty, string.Empty,
+            false, 0f, [], [], string.Empty,
+            SplashElapsedSeconds: elapsedSeconds,
+            SplashMasterOpacity: masterOpacity);
+
     public static FrontendSurfaceView Loading(
         string status,
         bool hasProgress,

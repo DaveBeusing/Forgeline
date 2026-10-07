@@ -1,0 +1,8 @@
+{
+  "id": "branding.undefined_behavior.splash.background",
+  "type": "texture",
+  "source": "background.tga",
+  "textureUsage": "baseColor",
+  "textureColorSpace": "srgb",
+  "textureGenerateMipmaps": true
+}

@@ -1,0 +1,8 @@
+{
+  "id": "branding.undefined_behavior.splash.separator",
+  "type": "texture",
+  "source": "separator.tga",
+  "textureUsage": "baseColor",
+  "textureColorSpace": "srgb",
+  "textureGenerateMipmaps": true
+}

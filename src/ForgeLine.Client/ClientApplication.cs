@@ -75,7 +75,8 @@ internal sealed class ClientApplication
     internal int Run(
         bool smokeTest,
         int renderInstanceCount,
-        string? visualQualificationOutput = null)
+        string? visualQualificationOutput = null,
+        bool skipSplash = false)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(renderInstanceCount);
 
@@ -123,6 +124,10 @@ internal sealed class ClientApplication
             PumpBootFrame(window, bootRenderer);
             runtimeAssets =
                 LoadRuntimeAssets();
+            if (runtimeAssets is not null)
+            {
+                bootRenderer.UseSplashAssets(runtimeAssets);
+            }
 
             frontendLoading.Complete(
                 "Command interface ready");
@@ -130,6 +135,11 @@ internal sealed class ClientApplication
                 FrontendPresentationAdapter.Loading(
                     frontendLoading.State));
             PumpBootFrame(window, bootRenderer);
+
+            if (!smokeTest && !skipSplash && _settings.ShowStudioSplash && window.IsOpen)
+            {
+                RunStudioSplash(window, bootRenderer, runtimeAssets);
+            }
         }
 
         ClientSessionRequest sessionRequest;
@@ -3095,6 +3105,70 @@ internal sealed class ClientApplication
                 FrontendPresentationAdapter.MainMenu(
                     mainMenu)
         };
+
+    private void RunStudioSplash(
+        IWindow window,
+        ClientFrontendRenderHost renderer,
+        RuntimeAssetCatalog? assets)
+    {
+        SplashScreenController? controller = null;
+        try
+        {
+            SplashDefinition? definition = assets is null
+                ? null
+                : SplashAssetPreflight.Prepare(
+                    UndefinedBehaviorStudioSplash.Create(),
+                    id => assets.Contains(AssetId.Parse(id)),
+                    message => Console.Error.WriteLine($"[studio:preflight] {message}"));
+
+            if (definition is null)
+            {
+                Console.Error.WriteLine("[studio:splash:bypass] Required studio assets unavailable.");
+                return;
+            }
+
+            controller = new SplashScreenController(definition);
+            var inputState = new InputState();
+            var timer = Stopwatch.StartNew();
+            TimeSpan previous = TimeSpan.Zero;
+            controller.Start();
+            while (window.IsOpen && !controller.IsComplete)
+            {
+                if (!_platform.PumpEvents()) break;
+                DrainWindowEvents(window);
+                DrainInputEvents(window, inputState);
+
+                TimeSpan elapsed = timer.Elapsed;
+                bool skip = inputState.IsKeyDown(PlatformKey.Escape) ||
+                            inputState.IsKeyDown(PlatformKey.Enter) ||
+                            inputState.IsKeyDown(PlatformKey.Space) ||
+                            inputState.IsMouseButtonDown(PlatformMouseButton.Left);
+                controller.Update(elapsed - previous, new SplashInputState(skip));
+                previous = elapsed;
+                if (controller.IsComplete) break;
+
+                renderer.Publish(FrontendSurfaceView.StudioSplash(
+                    (float)controller.Elapsed.TotalSeconds,
+                    controller.MasterOpacity));
+                renderer.ThrowIfFaulted();
+                if (renderer.SplashUnavailable)
+                {
+                    Console.Error.WriteLine("[studio:splash:bypass] Splash renderer could not initialize resources.");
+                    break;
+                }
+                _platform.WaitForEvents(IdleWait);
+            }
+            Console.WriteLine($"[studio:splash] completed={controller.IsComplete} skipped={controller.WasSkipped}");
+        }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine($"[studio:splash:fallback] {exception.GetType().Name}: {exception.Message}");
+        }
+        finally
+        {
+            controller?.Stop();
+        }
+    }
 
     private void PumpBootFrame(
         IWindow window,

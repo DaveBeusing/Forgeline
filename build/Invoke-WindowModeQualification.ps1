@@ -194,9 +194,18 @@ function Invoke-ClientSmoke {
 if (Test-Path $assetQualificationReportPath) {
     $assetQualification = Get-Content -Path $assetQualificationReportPath -Raw | ConvertFrom-Json -Depth 32
 
-    if ($assetQualification.textureRuntimeBytes -gt 524288) {
-        throw "Compiled texture runtime footprint $($assetQualification.textureRuntimeBytes) bytes exceeded the 512 KiB Vertical Slice budget."
+    $studioTextureBytes = [long]$assetQualification.studioSplashTextureRuntimeBytes
+    $gameplayTextureBytes = [long]$assetQualification.textureRuntimeBytes - $studioTextureBytes
+
+    if ($gameplayTextureBytes -gt 524288) {
+        throw "Compiled gameplay texture footprint $gameplayTextureBytes bytes exceeded the 512 KiB Vertical Slice budget."
     }
+
+    if ($studioTextureBytes -gt 3145728) {
+        throw "Compiled startup studio texture footprint $studioTextureBytes bytes exceeded the 3 MiB intro budget."
+    }
+
+    Write-Host "Qualified texture budgets: gameplay=$gameplayTextureBytes bytes (512 KiB max); startupStudio=$studioTextureBytes bytes (3 MiB max)."
 }
 
 if (Test-Path $settingsRootPath) {
