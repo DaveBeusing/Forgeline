@@ -151,8 +151,17 @@ public readonly record struct PlayerSelectionSummary(
     PowerOperationalState PowerState,
     bool HasInventory,
     double InventoryQuantity,
-    PlayerWorkSummary Work)
+    PlayerWorkSummary Work,
+    UnitId CommonUnitId = default,
+    BuildingId CommonBuildingId = default)
 {
+    public bool HasSingleEntityDetails =>
+        Count == 1;
+
+    public bool HasCommonIdentity =>
+        CommonUnitId.IsSpecified ||
+        CommonBuildingId.IsSpecified;
+
     public static PlayerSelectionSummary Empty =>
         new(
             0,
@@ -561,6 +570,10 @@ public static class PlayerExperienceSnapshotFactory
         int ownedCount = 0;
         PlayerSelectionKind combinedKind =
             PlayerSelectionKind.None;
+        UnitId commonUnitId =
+            UnitId.None;
+        BuildingId commonBuildingId =
+            BuildingId.None;
 
         foreach (EntityId entity in selectedEntities)
         {
@@ -584,6 +597,38 @@ public static class PlayerExperienceSnapshotFactory
                 ResolveSelectionKind(
                     entities,
                     entity);
+            UnitId unitId =
+                ResolveUnitId(
+                    entities,
+                    entity);
+            BuildingId buildingId =
+                ResolveBuildingId(
+                    entities,
+                    entity);
+
+            if (ownedCount == 1)
+            {
+                commonUnitId =
+                    unitId;
+                commonBuildingId =
+                    buildingId;
+            }
+            else
+            {
+                if (commonUnitId !=
+                    unitId)
+                {
+                    commonUnitId =
+                        UnitId.None;
+                }
+
+                if (commonBuildingId !=
+                    buildingId)
+                {
+                    commonBuildingId =
+                        BuildingId.None;
+                }
+            }
 
             combinedKind =
                 combinedKind == PlayerSelectionKind.None
@@ -599,29 +644,37 @@ public static class PlayerExperienceSnapshotFactory
         }
 
         string displayName =
-            ResolveDisplayName(
-                entities,
-                primary,
+            ResolveSelectionDisplayName(
+                combinedKind,
+                commonUnitId,
+                commonBuildingId,
                 units,
                 buildings);
+        bool hasSingleEntityDetails =
+            ownedCount == 1;
 
         bool hasHealth =
+            hasSingleEntityDetails &&
             entities.TryGetComponent(
                 primary,
                 out HealthState health);
         bool hasSupply =
+            hasSingleEntityDetails &&
             entities.TryGetComponent(
                 primary,
                 out UnitSupplyState supply);
         bool hasReadiness =
+            hasSingleEntityDetails &&
             entities.TryGetComponent(
                 primary,
                 out UnitCombatReadiness readiness);
         bool hasPower =
+            hasSingleEntityDetails &&
             entities.TryGetComponent(
                 primary,
                 out PowerConsumer power);
         bool hasInventory =
+            hasSingleEntityDetails &&
             entities.TryGetComponent(
                 primary,
                 out InventoryStorage storage) &&
@@ -659,13 +712,17 @@ public static class PlayerExperienceSnapshotFactory
                 ? inventories.GetTotalQuantity(
                     storage.InventoryId)
                 : 0.0,
-            CaptureWork(
-                entities,
-                primary,
-                production,
-                unitProduction,
-                units,
-                buildings));
+            hasSingleEntityDetails
+                ? CaptureWork(
+                    entities,
+                    primary,
+                    production,
+                    unitProduction,
+                    units,
+                    buildings)
+                : PlayerWorkSummary.None,
+            commonUnitId,
+            commonBuildingId);
     }
 
     private static PlayerWorkSummary CaptureWork(
@@ -800,43 +857,69 @@ public static class PlayerExperienceSnapshotFactory
         return PlayerSelectionKind.None;
     }
 
-    private static string ResolveDisplayName(
+    private static UnitId ResolveUnitId(
         EntityRegistry entities,
-        EntityId entity,
-        UnitDefinitionCatalog units,
-        BuildingDefinitionCatalog buildings)
+        EntityId entity) =>
+        entities.TryGetComponent(
+            entity,
+            out UnitIdentity unit)
+            ? unit.UnitId
+            : UnitId.None;
+
+    private static BuildingId ResolveBuildingId(
+        EntityRegistry entities,
+        EntityId entity)
     {
         if (entities.TryGetComponent(
                 entity,
-                out UnitIdentity unit) &&
+                out CompletedBuilding building))
+        {
+            return building.BuildingId;
+        }
+
+        return entities.TryGetComponent(
+                entity,
+                out ConstructionSite construction)
+            ? construction.BuildingId
+            : BuildingId.None;
+    }
+
+    private static string ResolveSelectionDisplayName(
+        PlayerSelectionKind kind,
+        UnitId commonUnitId,
+        BuildingId commonBuildingId,
+        UnitDefinitionCatalog units,
+        BuildingDefinitionCatalog buildings)
+    {
+        if (commonUnitId.IsSpecified &&
             units.TryGet(
-                unit.UnitId,
+                commonUnitId,
                 out UnitDefinition? unitDefinition))
         {
             return unitDefinition.DisplayName;
         }
 
-        if (entities.TryGetComponent(
-                entity,
-                out CompletedBuilding building) &&
+        if (commonBuildingId.IsSpecified &&
             buildings.TryGet(
-                building.BuildingId,
+                commonBuildingId,
                 out BuildingDefinition? buildingDefinition))
         {
             return buildingDefinition.DisplayName;
         }
 
-        if (entities.TryGetComponent(
-                entity,
-                out ConstructionSite construction) &&
-            buildings.TryGet(
-                construction.BuildingId,
-                out BuildingDefinition? constructionDefinition))
+        return kind switch
         {
-            return constructionDefinition.DisplayName;
-        }
-
-        return "Selection";
+            PlayerSelectionKind.Unit =>
+                "Units",
+            PlayerSelectionKind.Building =>
+                "Buildings",
+            PlayerSelectionKind.Construction =>
+                "Construction Sites",
+            PlayerSelectionKind.Mixed =>
+                "Mixed Selection",
+            _ =>
+                "Selection"
+        };
     }
 
     private static int CountCriticalSupplyUnits(
