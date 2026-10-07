@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Simulation;
 using Xunit;
@@ -83,10 +84,8 @@ public sealed class RtsStrategicOverlayVisualizationTests
             snapshot);
 
         Assert.Equal(
-            2,
-            draw.Points.Length);
-        Assert.Empty(
-            draw.Lines);
+            6,
+            draw.Lines.Length);
         Assert.Contains(
             draw.Labels,
             label =>
