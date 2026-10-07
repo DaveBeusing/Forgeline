@@ -85,7 +85,9 @@ The HUD never creates or advances gameplay state. Every published player-experie
 
 HUD surfaces implement the narrow `IGameplayHudSurface` contract. New surfaces should consume immutable presentation snapshots/read models, render within the named region that owns their presentation responsibility, and submit player-authored changes through the established request/command boundary. They must not acquire live ECS or simulation ownership.
 
-The current text-heavy player surface is retained behind `GameplayHudLegacyTextSurface` as a compatibility adapter while the production surfaces are migrated incrementally. The adapter is deliberately isolated beneath `GameplayHudRenderer`; it is not a reason for new player-facing features to be added to the development overlay.
+`ResourcePowerHudSurface` now owns the top status bar and alert stack. It renders the seven resource quantities currently present in the authoritative player resource summary, generation/demand plus explicit power state, the existing causal alert flags/counts, and short-lived resolved command feedback. Rare Elements keep their semantic resource/icon identity but are not displayed because the active skirmish starting inventory does not currently expose an authoritative Rare Elements quantity.
+
+The remaining text-heavy player output is retained behind `GameplayHudLegacyTextSurface` as a compatibility adapter while selection/action/result surfaces are migrated incrementally. Resource, power, alert, and command-feedback text has been removed from that adapter. It is deliberately isolated beneath `GameplayHudRenderer`; it is not a reason for new player-facing features to be added to the development overlay.
 
 ## Selection and production presentation
 
@@ -113,7 +115,7 @@ Movement results report accepted and rejected target counts. Buildings remain se
 
 Construction feedback is correlated with the `BuildCommandResult` produced by `BuildingCommandProcessingSystem`. Rejections expose the existing authoritative `BuildCommandRejectionReason` and, where relevant, the concrete `BuildingPlacementFailureReason`. The build path still revalidates placement and resources when the command executes.
 
-Feedback is transient presentation of authoritative results. It does not become gameplay state or alter command acceptance.
+Feedback is transient presentation of authoritative results. The production notification stack distinguishes accepted, partial, and rejected outcomes with explicit `OK`, `PART`, and `FAIL` labels in addition to visual severity. It remains visible for at most 80 completed simulation ticks after `ResolvedAtTick`; presentation does not use wall-clock expiry, retain an unbounded result history, become gameplay state, or alter command acceptance.
 
 ## Alerts
 
@@ -184,8 +186,8 @@ This is the minimum coherent vertical-slice player experience, not final UI poli
 
 Current limitations include:
 
-- the HUD uses the existing lightweight overlay text renderer;
-- the resource line summarizes the starting Command Core inventory rather than aggregating every distributed inventory in the economy;
+- selection/action/result compatibility output still uses the existing lightweight text renderer while the resource/power/alert/feedback surface is dedicated production HUD presentation;
+- the top resource bar summarizes the starting Command Core inventory rather than aggregating every distributed inventory in the economy;
 - there is no final menu shell or frontend;
 - the minimap remains part of the lightweight RTS information surface rather than a final production map-control surface;
 - transient event history/notification queues are not yet persistent;

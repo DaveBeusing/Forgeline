@@ -77,11 +77,6 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         if (snapshot.PlayerExperience is
             PlayerExperienceSnapshot experience)
         {
-            EmitResourceStrip(
-                experience,
-                layout,
-                context.Width,
-                context.Height);
             EmitSelectionStatus(
                 experience.Selection,
                 layout,
@@ -175,77 +170,6 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         _vertexBuffers.Clear();
         _pipeline.Dispose();
         _disposed = true;
-    }
-
-    private void EmitResourceStrip(
-        in PlayerExperienceSnapshot experience,
-        in GameplayHudLayout layout,
-        int width,
-        int height)
-    {
-        float scale =
-            layout.Scale;
-        RtsUiIcon[] icons =
-        [
-            RtsUiIcon.ResourceFerrousOre,
-            RtsUiIcon.ResourceVolatiles,
-            RtsUiIcon.ResourceSilicates,
-            RtsUiIcon.ResourceSteel,
-            RtsUiIcon.ResourceFuel,
-            RtsUiIcon.ResourceElectronics,
-            RtsUiIcon.ResourceAmmunition
-        ];
-
-        float size =
-            13.0f * scale;
-        float gap =
-            5.0f * scale;
-        float panelWidth =
-            icons.Length *
-                (size + gap) +
-            12.0f * scale;
-        float x =
-            layout.TopStatusBar.X +
-            MathF.Max(
-                0.0f,
-                (layout.TopStatusBar.Width -
-                 panelWidth) *
-                0.5f);
-        float y =
-            layout.TopStatusBar.Y +
-            MathF.Max(
-                0.0f,
-                (layout.TopStatusBar.Height -
-                 size) *
-                0.5f);
-
-        EmitQuad(
-            x - 6.0f * scale,
-            y - 5.0f * scale,
-            panelWidth,
-            size + 10.0f * scale,
-            new Vector4(
-                0.08f,
-                0.09f,
-                0.09f,
-                1.0f),
-            width,
-            height);
-
-        for (int index = 0;
-             index < icons.Length;
-             index++)
-        {
-            EmitIcon(
-                icons[index],
-                x +
-                index *
-                    (size + gap),
-                y,
-                size,
-                width,
-                height);
-        }
     }
 
     private void EmitSelectionStatus(

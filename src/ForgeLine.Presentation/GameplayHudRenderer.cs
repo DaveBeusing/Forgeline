@@ -18,6 +18,9 @@ public sealed class GameplayHudRenderer : IDisposable
 
         _surfaces =
         [
+            new ResourcePowerHudSurface(
+                graphics,
+                runtimeAssets),
             new RtsInformationHudSurface(
                 graphics,
                 runtimeAssets),

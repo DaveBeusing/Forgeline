@@ -33,7 +33,7 @@ The current asset runtime has no dedicated UI-atlas or vector-icon asset type, s
 
 ## Resource icons
 
-The resource set covers resources already exposed by the Vertical Slice:
+The semantic resource asset set covers:
 
 - Ferrous Ore;
 - Volatiles;
@@ -43,6 +43,8 @@ The resource set covers resources already exposed by the Vertical Slice:
 - Fuel;
 - Electronics;
 - Ammunition.
+
+The active player resource summary currently exposes Ferrous Ore, Volatiles, Silicates, Steel, Fuel, Electronics, and Ammunition from the authoritative Command Core inventory. Rare Elements remain a valid catalog/resource/icon identity, but the current skirmish starting inventory does not contain an authoritative Rare Elements quantity. The production HUD therefore does not fabricate or display a Rare Elements counter until the active inventory/read model exposes one.
 
 ## Unit and building roles
 
@@ -132,6 +134,18 @@ Supply-state presentation maps the authoritative `BattlefieldSupplyStatus` value
 Each state has a distinct semantic glyph/label as well as tint.
 
 Health, Fuel, and Ammunition indicators are shown only where the current selection/player read models expose those values. Power status likewise consumes existing building/player read models rather than querying or mutating power simulation from UI code.
+
+## Production status and notifications
+
+`ResourcePowerHudSurface` owns the production top status bar and alert stack. It consumes only the completed-tick `PlayerExperienceSnapshot` published with the presentation snapshot.
+
+The top bar pairs each currently authoritative player resource quantity with its stable semantic icon. Quantities use bounded compact formatting and the bar reduces the visible resource-cell count when the safe area is too narrow, exposing an overflow count rather than drawing outside the HUD region. Power presentation shows generation and demand plus an explicit `STABLE` or `CONSTRAINED` label from the authoritative player power summary.
+
+The notification stack renders the existing causal player alerts for constrained power, blocked production, critical supply, and Command Core damage/destruction. Production-blocked and supply-critical alerts retain their authoritative counts. Severity is communicated through text labels and marker shape as well as color.
+
+The most recent resolved player command is shown through the same production stack as `OK`, `PART`, or `FAIL` feedback with accepted/rejected counts and available construction, placement, logistics, supply, tactical, or artillery failure causes. Visibility is derived from completed simulation ticks and expires after 80 ticks; no wall-clock timer or presentation-owned command history is introduced.
+
+A durable generic attack-history feed remains deferred. Presentation does not synthesize historical attacks by polling current health or transient render state.
 
 ## Minimap model
 
