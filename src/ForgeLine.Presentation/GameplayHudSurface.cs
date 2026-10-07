@@ -26,6 +26,7 @@ public readonly record struct GameplayHudRenderContext(
     PlayerActionPanelView ActionPanel,
     TacticalTargetingView TacticalTargeting,
     FormationTemplate ActiveFormation,
+    CombatGroupOverviewView CombatGroups,
     PreAlphaUxView PreAlphaUx,
     GameplayHudLayout Layout,
     uint Dpi,

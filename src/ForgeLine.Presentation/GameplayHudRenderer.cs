@@ -62,6 +62,7 @@ public sealed class GameplayHudRenderer : IDisposable
         in PlayerActionPanelView actionPanel,
         in TacticalTargetingView tacticalTargeting,
         FormationTemplate activeFormation,
+        CombatGroupOverviewView combatGroups,
         in PreAlphaUxView preAlphaUx,
         uint dpi,
         float uiScale,
@@ -71,6 +72,7 @@ public sealed class GameplayHudRenderer : IDisposable
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(camera);
         ArgumentNullException.ThrowIfNull(snapshot);
+        ArgumentNullException.ThrowIfNull(combatGroups);
 
         GameplayHudLayout layout =
             GameplayHudLayout.Create(
@@ -88,6 +90,7 @@ public sealed class GameplayHudRenderer : IDisposable
                 actionPanel,
                 tacticalTargeting,
                 activeFormation,
+                combatGroups,
                 preAlphaUx,
                 layout,
                 dpi,

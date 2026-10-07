@@ -49,6 +49,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         PresentationSnapshot snapshot,
         in AxisAlignedBounds worldBounds,
         in RtsInformationLayerView view,
+        IReadOnlyCollection<ForgeLine.Core.EntityId> activeCombatGroup,
         uint dpi,
         float uiScale = 1.0f)
     {
@@ -56,6 +57,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(camera);
         ArgumentNullException.ThrowIfNull(snapshot);
+        ArgumentNullException.ThrowIfNull(activeCombatGroup);
 
         if (context.Width <= 0 ||
             context.Height <= 0)
@@ -82,7 +84,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                     worldBounds,
                     snapshot.PlayerExperience?.Player ??
                         new PlayerId(1),
-                    view.SelectedEntities);
+                    view.SelectedEntities,
+                    activeCombatGroup);
 
             EmitMinimap(
                 minimap,
@@ -391,6 +394,94 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 symbolSize,
                 width,
                 height);
+
+            if (symbol.Kind ==
+                    RtsMinimapSymbolKind.SelectedGroup &&
+                symbol.IsActiveGroup)
+            {
+                float bracketSize =
+                    11.0f *
+                    scale;
+                float half =
+                    bracketSize *
+                    0.5f;
+                float segment =
+                    3.0f *
+                    scale;
+                float thickness =
+                    MathF.Max(
+                        1.0f,
+                        1.0f *
+                        scale);
+                Vector4 activeColor =
+                    ResolveColor(
+                        RtsUiIcon.MinimapSelectedGroup);
+
+                EmitQuad(
+                    x - half,
+                    y - half,
+                    segment,
+                    thickness,
+                    activeColor,
+                    width,
+                    height);
+                EmitQuad(
+                    x - half,
+                    y - half,
+                    thickness,
+                    segment,
+                    activeColor,
+                    width,
+                    height);
+                EmitQuad(
+                    x + half - segment,
+                    y - half,
+                    segment,
+                    thickness,
+                    activeColor,
+                    width,
+                    height);
+                EmitQuad(
+                    x + half - thickness,
+                    y - half,
+                    thickness,
+                    segment,
+                    activeColor,
+                    width,
+                    height);
+                EmitQuad(
+                    x - half,
+                    y + half - thickness,
+                    segment,
+                    thickness,
+                    activeColor,
+                    width,
+                    height);
+                EmitQuad(
+                    x - half,
+                    y + half - segment,
+                    thickness,
+                    segment,
+                    activeColor,
+                    width,
+                    height);
+                EmitQuad(
+                    x + half - segment,
+                    y + half - thickness,
+                    segment,
+                    thickness,
+                    activeColor,
+                    width,
+                    height);
+                EmitQuad(
+                    x + half - thickness,
+                    y + half - segment,
+                    thickness,
+                    segment,
+                    activeColor,
+                    width,
+                    height);
+            }
         }
 
         Vector2 cameraPosition =
