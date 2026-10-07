@@ -1,3 +1,4 @@
+using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Game;
@@ -308,7 +309,7 @@ public sealed class PlayerActionPanelTests
     }
 
     [Fact]
-    public void PointerActivationIsCapturedAndFocusLossDoesNotRepeatModeToggle()
+    public void PointerSelectionAndActivationAreCapturedAndFocusLossDoesNotRepeatModeToggle()
     {
         PresentationSnapshot snapshot =
             CreateSnapshot(
@@ -346,24 +347,41 @@ public sealed class PlayerActionPanelTests
             PlayerActionPanelMode.Construction,
             controller.Mode);
 
-        input.Apply(
-            PlatformInputEvent.PointerMoved(
-                1_000,
-                168));
-        input.Apply(
-            PlatformInputEvent.MouseButtonChanged(
-                PlatformInputEventKind.MouseButtonDown,
-                PlatformMouseButton.Left,
-                1_000,
-                168));
-        controller.Update(
+        GameplayHudLayout layout =
+            GameplayHudLayout.Create(
+                1600,
+                900,
+                96);
+        HudRect card =
+            PlayerActionDockInteractionLayout.GetCardRect(
+                layout,
+                0);
+        HudRect activate =
+            PlayerActionDockInteractionLayout.GetFooterButtonRect(
+                layout,
+                0);
+
+        Click(
+            controller,
             input,
             snapshot,
-            1600,
-            900);
+            Center(card));
 
         Assert.True(
             controller.PointerCaptured);
+        Assert.Equal(
+            0,
+            controller.SelectedIndex);
+        Assert.False(
+            controller.TryTakeRequest(
+                out _));
+
+        Click(
+            controller,
+            input,
+            snapshot,
+            Center(activate));
+
         Assert.True(
             controller.TryTakeRequest(
                 out PlayerActionRequest request));
@@ -373,6 +391,308 @@ public sealed class PlayerActionPanelTests
         Assert.Equal(
             BuildingIds.PowerPlant,
             request.BuildingId);
+        Assert.Equal(
+            PlayerActionPanelMode.Closed,
+            controller.Mode);
+    }
+
+    [Fact]
+    public void PointerCannotActivateDisabledProductionCard()
+    {
+        EntityId facility =
+            new(52, 1);
+        var production =
+            new PlayerProductionFacilityActionReadModel(
+                facility,
+                EntityId.Invalid,
+                RecipeId.None,
+                ProductionStatus.Idle,
+                ProductionBlockReason.None,
+                0.0,
+                [
+                    new PlayerProductionRecipeActionReadModel(
+                        RecipeIds.Steel,
+                        "Steel",
+                        [
+                            new PlayerActionResourceAmount(
+                                ResourceIds.FerrousOre,
+                                "Ferrous Ore",
+                                10.0,
+                                0.0)
+                        ],
+                        [
+                            new PlayerActionResourceAmount(
+                                ResourceIds.Steel,
+                                "Steel",
+                                10.0,
+                                0.0)
+                        ])
+                ],
+                []);
+        PresentationSnapshot snapshot =
+            CreateSnapshot(
+                production: production);
+        var input = new InputState();
+        var controller =
+            new PlayerActionPanelController();
+
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+        Press(input, PlatformKey.P);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+        Release(input, PlatformKey.P);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        GameplayHudLayout layout =
+            GameplayHudLayout.Create(
+                1600,
+                900,
+                96);
+        Click(
+            controller,
+            input,
+            snapshot,
+            Center(
+                PlayerActionDockInteractionLayout.GetCardRect(
+                    layout,
+                    0)));
+        Click(
+            controller,
+            input,
+            snapshot,
+            Center(
+                PlayerActionDockInteractionLayout.GetFooterButtonRect(
+                    layout,
+                    0)));
+
+        Assert.True(
+            controller.PointerCaptured);
+        Assert.False(
+            controller.TryTakeRequest(
+                out _));
+        Assert.Equal(
+            "MISSING INPUT",
+            PlayerActionDockHudModel.ResolveItemState(
+                PlayerActionPanelMode.Production,
+                0,
+                snapshot.PlayerActions).DisabledReason);
+    }
+
+    [Fact]
+    public void SessionReplacementClearsOpenDockAndPendingRequest()
+    {
+        PresentationSnapshot first =
+            CreateSnapshot(
+                construction:
+                [
+                    Construction(
+                        BuildingIds.PowerPlant,
+                        "Power Plant")
+                ],
+                sessionValue: 101);
+        PresentationSnapshot replacement =
+            CreateSnapshot(
+                construction:
+                [
+                    Construction(
+                        BuildingIds.PowerPlant,
+                        "Power Plant")
+                ],
+                sessionValue: 202);
+        var input = new InputState();
+        var controller =
+            new PlayerActionPanelController();
+
+        controller.Update(
+            input,
+            first,
+            1600,
+            900);
+        Press(input, PlatformKey.B);
+        controller.Update(
+            input,
+            first,
+            1600,
+            900);
+        Release(input, PlatformKey.B);
+        controller.Update(
+            input,
+            first,
+            1600,
+            900);
+        Press(input, PlatformKey.Enter);
+        controller.Update(
+            input,
+            first,
+            1600,
+            900);
+
+        controller.Update(
+            input,
+            replacement,
+            1600,
+            900);
+
+        Assert.Equal(
+            PlayerActionPanelMode.Closed,
+            controller.Mode);
+        Assert.False(
+            controller.PointerCaptured);
+        Assert.False(
+            controller.TryTakeRequest(
+                out _));
+    }
+
+    [Fact]
+    public void StaleContextCannotSubmitAction()
+    {
+        EntityId facility =
+            new(53, 1);
+        var production =
+            new PlayerProductionFacilityActionReadModel(
+                facility,
+                EntityId.Invalid,
+                RecipeId.None,
+                ProductionStatus.Idle,
+                ProductionBlockReason.None,
+                0.0,
+                [
+                    new PlayerProductionRecipeActionReadModel(
+                        RecipeIds.Steel,
+                        "Steel",
+                        [],
+                        [])
+                ],
+                []);
+        PresentationSnapshot active =
+            CreateSnapshot(
+                production: production);
+        PresentationSnapshot stale =
+            CreateSnapshot();
+        var input = new InputState();
+        var controller =
+            new PlayerActionPanelController();
+
+        controller.Update(
+            input,
+            active,
+            1600,
+            900);
+        Press(input, PlatformKey.P);
+        controller.Update(
+            input,
+            active,
+            1600,
+            900);
+        Release(input, PlatformKey.P);
+        controller.Update(
+            input,
+            stale,
+            1600,
+            900);
+        Press(input, PlatformKey.Enter);
+        controller.Update(
+            input,
+            stale,
+            1600,
+            900);
+
+        Assert.Equal(
+            PlayerActionPanelMode.Production,
+            controller.Mode);
+        Assert.False(
+            controller.TryTakeRequest(
+                out _));
+    }
+
+    [Fact]
+    public void TerminalMatchClosesDockAndRejectsKeyboardAndPointerActions()
+    {
+        PresentationSnapshot active =
+            CreateSnapshot(
+                construction:
+                [
+                    Construction(
+                        BuildingIds.PowerPlant,
+                        "Power Plant")
+                ]);
+        PresentationSnapshot terminal =
+            CreateSnapshot(
+                construction:
+                [
+                    Construction(
+                        BuildingIds.PowerPlant,
+                        "Power Plant")
+                ],
+                terminal: true);
+        var input = new InputState();
+        var controller =
+            new PlayerActionPanelController();
+
+        controller.Update(
+            input,
+            active,
+            1600,
+            900);
+        Press(input, PlatformKey.B);
+        controller.Update(
+            input,
+            active,
+            1600,
+            900);
+        Assert.Equal(
+            PlayerActionPanelMode.Construction,
+            controller.Mode);
+
+        Release(input, PlatformKey.B);
+        controller.Update(
+            input,
+            terminal,
+            1600,
+            900);
+
+        Assert.Equal(
+            PlayerActionPanelMode.Closed,
+            controller.Mode);
+        Assert.False(
+            controller.PointerCaptured);
+
+        Press(input, PlatformKey.B);
+        input.Apply(
+            PlatformInputEvent.PointerMoved(
+                800,
+                760));
+        input.Apply(
+            PlatformInputEvent.MouseButtonChanged(
+                PlatformInputEventKind.MouseButtonDown,
+                PlatformMouseButton.Left,
+                800,
+                760));
+        controller.Update(
+            input,
+            terminal,
+            1600,
+            900);
+
+        Assert.Equal(
+            PlayerActionPanelMode.Closed,
+            controller.Mode);
+        Assert.False(
+            controller.PointerCaptured);
+        Assert.False(
+            controller.TryTakeRequest(
+                out _));
     }
 
     [Fact]
@@ -844,10 +1164,13 @@ public sealed class PlayerActionPanelTests
         PlayerUnitProductionFacilityActionReadModel? unitProduction = null,
         PlayerLogisticsActionReadModel? logistics = null,
         PlayerSupplyActionReadModel? supply = null,
-        PlayerTacticalActionReadModel? tactical = null)
+        PlayerTacticalActionReadModel? tactical = null,
+        ulong sessionValue = 101,
+        bool terminal = false)
     {
         var session =
-            new SimulationSessionId(101);
+            new SimulationSessionId(
+                sessionValue);
         var actions =
             new PlayerActionSnapshot(
                 session,
@@ -860,13 +1183,78 @@ public sealed class PlayerActionPanelTests
                 supply,
                 tactical);
 
+        PlayerExperienceSnapshot? experience =
+            terminal
+                ? new PlayerExperienceSnapshot(
+                    new PlayerId(1),
+                    new SimulationTick(4),
+                    PlayerMatchStatus.Victory,
+                    new PlayerId(1),
+                    default,
+                    default,
+                    default,
+                    PlayerSelectionSummary.Empty,
+                    PlayerAlertState.None,
+                    0,
+                    0,
+                    PlayerCommandFeedback.None,
+                    default)
+                : null;
+
         return new PresentationSnapshot(
             new SimulationTick(4),
             TimeSpan.FromMilliseconds(50),
             0,
             ReadOnlySpan<RenderInstance>.Empty,
             sessionId: session,
+            playerExperience:
+                experience,
             playerActions: actions);
+    }
+
+    private static Vector2 Center(
+        in HudRect rect) =>
+        new(
+            rect.X +
+                rect.Width *
+                0.5f,
+            rect.Y +
+                rect.Height *
+                0.5f);
+
+    private static void Click(
+        PlayerActionPanelController controller,
+        InputState input,
+        PresentationSnapshot snapshot,
+        Vector2 position)
+    {
+        input.Apply(
+            PlatformInputEvent.PointerMoved(
+                checked((int)MathF.Round(position.X)),
+                checked((int)MathF.Round(position.Y))));
+        input.Apply(
+            PlatformInputEvent.MouseButtonChanged(
+                PlatformInputEventKind.MouseButtonDown,
+                PlatformMouseButton.Left,
+                checked((int)MathF.Round(position.X)),
+                checked((int)MathF.Round(position.Y))));
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        input.Apply(
+            PlatformInputEvent.MouseButtonChanged(
+                PlatformInputEventKind.MouseButtonUp,
+                PlatformMouseButton.Left,
+                checked((int)MathF.Round(position.X)),
+                checked((int)MathF.Round(position.Y))));
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
     }
 
     private static void Press(
