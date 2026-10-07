@@ -1239,6 +1239,8 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
             RtsUiGlyph.Critical or
             RtsUiGlyph.Alert =>
                 "00100" + "00100" + "00100" + "00000" + "00100",
+            RtsUiGlyph.Empty =>
+                "11111" + "10001" + "10001" + "10001" + "11111",
             _ =>
                 "00100" + "01110" + "11111" + "01110" + "00100"
         };
