@@ -527,6 +527,7 @@ internal sealed class WindowsWindow : IWindow
             WindowsNative.VkE => PlatformKey.E,
             WindowsNative.VkR => PlatformKey.R,
             WindowsNative.VkF => PlatformKey.F,
+            WindowsNative.VkH => PlatformKey.H,
             WindowsNative.VkK => PlatformKey.K,
             WindowsNative.VkL => PlatformKey.L,
             WindowsNative.VkM => PlatformKey.M,

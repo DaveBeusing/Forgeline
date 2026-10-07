@@ -25,7 +25,8 @@ public enum PlayerCommandKind : byte
     Supply = 7,
     Tactical = 8,
     Artillery = 9,
-    Surrender = 10
+    Surrender = 10,
+    Technology = 11
 }
 
 public enum PlayerCommandSubmissionFailure : byte
@@ -128,6 +129,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
     private readonly FactionIntelligenceStore? _intelligence;
     private readonly WeaponCatalog? _weapons;
     private readonly ArtilleryWeaponCatalog? _artilleryWeapons;
+    private readonly TechnologyDefinitionCatalog? _technologies;
     private ulong _nextCorrelationId = 1;
 
     public PlayerCommandGateway(
@@ -137,7 +139,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         int maximumOutstanding = 128,
         FactionIntelligenceStore? intelligence = null,
         WeaponCatalog? weapons = null,
-        ArtilleryWeaponCatalog? artilleryWeapons = null)
+        ArtilleryWeaponCatalog? artilleryWeapons = null,
+        TechnologyDefinitionCatalog? technologies = null)
     {
         _simulation =
             simulation ??
@@ -160,6 +163,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         _intelligence = intelligence;
         _weapons = weapons;
         _artilleryWeapons = artilleryWeapons;
+        _technologies = technologies;
         _results =
             new PlayerCommandResultBuffer(
                 maximumOutstanding);
@@ -1011,6 +1015,103 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             envelope);
     }
 
+    public PlayerCommandSubmissionReceipt SubmitTechnologyResearch(
+        PlayerId issuer,
+        TechnologyId technologyId,
+        EntityId facility,
+        EntityId sourceInventory,
+        SimulationTick observedTick)
+    {
+        if (_technologies is null)
+        {
+            throw new InvalidOperationException(
+                "Technology research is not configured for this command gateway.");
+        }
+
+        if (!TryBeginSubmission(
+                PlayerCommandKind.Technology,
+                issuer,
+                observedTick,
+                out PlayerCommandCorrelationId correlation,
+                out SimulationTick targetTick,
+                out SimulationCommandSource source,
+                out PlayerCommandSubmissionReceipt rejected))
+        {
+            return rejected;
+        }
+
+        PlayerTechnologyActionCommand command =
+            PlayerTechnologyActionCommand.Start(
+                issuer,
+                technologyId,
+                facility,
+                sourceInventory,
+                observedTick,
+                _technologies);
+
+        SimulationCommandEnvelope envelope =
+            _simulation.SubmitCommand(
+                command,
+                targetTick,
+                source);
+
+        _pending.Add(
+            PendingCommand.ForTechnology(
+                correlation,
+                envelope,
+                command));
+
+        return AcceptedReceipt(
+            correlation,
+            PlayerCommandKind.Technology,
+            source,
+            observedTick,
+            envelope);
+    }
+
+    public PlayerCommandSubmissionReceipt SubmitTechnologyResearchCancel(
+        PlayerId issuer,
+        EntityId requestEntity,
+        SimulationTick observedTick)
+    {
+        if (!TryBeginSubmission(
+                PlayerCommandKind.Technology,
+                issuer,
+                observedTick,
+                out PlayerCommandCorrelationId correlation,
+                out SimulationTick targetTick,
+                out SimulationCommandSource source,
+                out PlayerCommandSubmissionReceipt rejected))
+        {
+            return rejected;
+        }
+
+        PlayerTechnologyActionCommand command =
+            PlayerTechnologyActionCommand.Cancel(
+                issuer,
+                requestEntity,
+                observedTick);
+
+        SimulationCommandEnvelope envelope =
+            _simulation.SubmitCommand(
+                command,
+                targetTick,
+                source);
+
+        _pending.Add(
+            PendingCommand.ForTechnology(
+                correlation,
+                envelope,
+                command));
+
+        return AcceptedReceipt(
+            correlation,
+            PlayerCommandKind.Technology,
+            source,
+            observedTick,
+            envelope);
+    }
+
     public void OnTickCompleted(SimulationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
@@ -1197,6 +1298,22 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     command.ExecutedAtTick,
                     PlayerLogisticsActionFailureReason.None,
                     command.FailureReason);
+            }
+
+            case PlayerCommandKind.Technology:
+            {
+                PlayerTechnologyActionCommand command =
+                    pending.TechnologyCommand!;
+
+                if (command.ExecutedAtTick == SimulationTick.Zero)
+                {
+                    return null;
+                }
+
+                return CreateActionResult(
+                    pending,
+                    command.Accepted,
+                    command.ExecutedAtTick);
             }
 
             case PlayerCommandKind.EndMatch:
@@ -1390,6 +1507,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     PlayerCommandFeedbackKind.Artillery,
                 PlayerCommandKind.Surrender =>
                     PlayerCommandFeedbackKind.Surrender,
+                PlayerCommandKind.Technology =>
+                    PlayerCommandFeedbackKind.Technology,
                 _ =>
                     PlayerCommandFeedbackKind.None
             },
@@ -1413,7 +1532,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         PlayerLogisticsActionCommand? LogisticsCommand,
         PlayerTacticalActionCommand? TacticalCommand,
         PlayerCommandResultReadModel? Result,
-        SurrenderCommand? SurrenderCommand = null)
+        SurrenderCommand? SurrenderCommand = null,
+        PlayerTechnologyActionCommand? TechnologyCommand = null)
     {
         public static PendingCommand ForMovement(
             PlayerCommandCorrelationId correlation,
@@ -1536,6 +1656,24 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 null,
                 null);
         }
+
+        public static PendingCommand ForTechnology(
+            PlayerCommandCorrelationId correlation,
+            in SimulationCommandEnvelope envelope,
+            PlayerTechnologyActionCommand command) =>
+            new(
+                correlation,
+                PlayerCommandKind.Technology,
+                envelope,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                command);
 
         public static PendingCommand ForTactical(
             PlayerCommandCorrelationId correlation,

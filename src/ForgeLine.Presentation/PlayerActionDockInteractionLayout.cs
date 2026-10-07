@@ -22,7 +22,7 @@ internal readonly record struct PlayerActionDockHitTarget(
 
 internal static class PlayerActionDockInteractionLayout
 {
-    public const int ModeButtonCount = 6;
+    public const int ModeButtonCount = 7;
     public const int FooterButtonCount = 6;
 
     public static float ModeBarHeight(
@@ -435,6 +435,9 @@ internal static class PlayerActionDockInteractionLayout
                 actions?.Tactical is null
                     ? 0
                     : 8,
+            PlayerActionPanelMode.Technology =>
+                actions?.Technology.Count ??
+                0,
             _ =>
                 0
         };
@@ -455,6 +458,8 @@ internal static class PlayerActionDockInteractionLayout
                 PlayerActionPanelMode.Supply,
             5 =>
                 PlayerActionPanelMode.Tactical,
+            6 =>
+                PlayerActionPanelMode.Technology,
             _ =>
                 PlayerActionPanelMode.Closed
         };

@@ -325,3 +325,14 @@ This is the initial information layer, not the final HUD art pass. The following
 - unsupported Patrol/Repair gameplay behavior.
 
 Future UI visual replacement should preserve stable semantic icon IDs and the simulation/presentation boundary.
+
+## Technology progression view
+
+The player action snapshot includes immutable technology action read models captured at the completed simulation tick. Each entry exposes its stable technology identity, domain, phase, prerequisite completion, physical resource costs and captured availability, required facility, current/required power fraction, research progress, active request identity, capability unlock references, and one explicit state: available, locked, blocked, researching, or completed.
+
+The technology view is presentation-only. Start and cancel interactions are translated into `PlayerActionRequest` values and routed through the existing player command gateway. Technology simulation remains authoritative and runs in the fixed-tick Production phase. Rendering never consumes materials, advances research, or grants capabilities.
+
+Blocked causes are carried semantically rather than inferred from color. Current causes include unmet prerequisite, missing facility, missing inventory, missing materials, insufficient power, already completed, invalid technology, and another active research request. The HUD prints concise text labels for those causes alongside domain/phase, facility, power, costs, prerequisite completion, and progress.
+
+The initial capability hook is exercised by Combat Engineer production, which requires the Field Engineering capability unlocked by Industrial Standardization. Unit-production validation checks the authoritative capability state independently of the HUD.
+

@@ -496,6 +496,115 @@ public sealed class PlayerActionReadModelTests
         Assert.Single(tactical.SelectedEntities);
     }
 
+
+    [Fact]
+    public void TechnologyActionsExposeImmutableAuthoritativeProgressionState()
+    {
+        using VerticalSliceScenario scenario =
+            CreateScenario(4306);
+        Assert.True(
+            scenario.Inventories.Add(
+                scenario.West.StartingInventory,
+                ResourceIds.Steel,
+                200.0).Succeeded);
+        Assert.True(
+            scenario.Inventories.Add(
+                scenario.West.StartingInventory,
+                ResourceIds.Electronics,
+                100.0).Succeeded);
+
+        var buffer =
+            RegisterExtraction(
+                scenario,
+                out _,
+                out _);
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            buffer.TryReadLatest(
+                out PresentationSnapshot snapshot));
+        PlayerTechnologyActionReadModel industrial =
+            Assert.Single(
+                snapshot.PlayerActions!.Technology,
+                technology =>
+                    technology.TechnologyId ==
+                    TechnologyIds.IndustrialStandardization);
+
+        Assert.Equal(
+            TechnologyDomain.Industry,
+            industrial.Domain);
+        Assert.Equal(
+            TechnologyPhase.IndustrialFoundation,
+            industrial.Phase);
+        Assert.Equal(
+            BuildingIds.CommandCore,
+            industrial.RequiredFacility);
+        Assert.Equal(
+            scenario.West.CommandCore,
+            industrial.Facility);
+        Assert.Equal(
+            scenario.West.CommandCore,
+            industrial.SourceInventory);
+        Assert.Equal(
+            PlayerTechnologyState.Available,
+            industrial.State);
+        PlayerActionResourceAmount capturedSteel =
+            Assert.Single(
+                industrial.Costs,
+                cost =>
+                    cost.ResourceId ==
+                    ResourceIds.Steel);
+        double capturedQuantity =
+            capturedSteel.AvailableQuantity;
+
+        Assert.True(
+            scenario.Inventories.Remove(
+                scenario.West.StartingInventory,
+                ResourceIds.Steel,
+                1.0).Succeeded);
+        Assert.Equal(
+            capturedQuantity,
+            capturedSteel.AvailableQuantity);
+
+        PlayerTechnologyActionCommand command =
+            PlayerTechnologyActionCommand.Start(
+                scenario.West.Player,
+                TechnologyIds.IndustrialStandardization,
+                scenario.West.CommandCore,
+                scenario.West.CommandCore,
+                scenario.Simulation.CurrentTick,
+                scenario.Services.TechnologyDefinitions);
+        scenario.Simulation.SubmitCommand(
+            command,
+            scenario.Simulation.CurrentTick.Next(),
+            new SimulationCommandSource(
+                scenario.West.Player.Value));
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.True(
+            buffer.TryReadLatest(
+                out PresentationSnapshot researchingSnapshot));
+        PlayerTechnologyActionReadModel researching =
+            Assert.Single(
+                researchingSnapshot.PlayerActions!.Technology,
+                technology =>
+                    technology.TechnologyId ==
+                    TechnologyIds.IndustrialStandardization);
+
+        Assert.Equal(
+            PlayerTechnologyState.Researching,
+            researching.State);
+        Assert.True(
+            researching.Progress >
+            0.0);
+        Assert.True(
+            researching.ActiveRequest.IsValid);
+        Assert.Equal(
+            PlayerTechnologyState.Available,
+            industrial.State);
+    }
+
     private static PresentationSnapshotBuffer RegisterExtraction(
         VerticalSliceScenario scenario,
         out PresentationInteractionState interaction,
@@ -515,7 +624,9 @@ public sealed class PlayerActionReadModelTests
                 weapons:
                     scenario.Services.Weapons,
                 artilleryWeapons:
-                    scenario.Services.ArtilleryWeapons);
+                    scenario.Services.ArtilleryWeapons,
+                technologies:
+                    scenario.Services.TechnologyDefinitions);
 
         scenario.Simulation.RegisterTickObserver(
             gateway);

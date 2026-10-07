@@ -32,7 +32,9 @@ public enum PlayerActionRequestKind : byte
     SubmitFireMissionContact = 22,
     Surrender = 23,
     SetSupplyPriority = 24,
-    SubmitRetreatToRecovery = 25
+    SubmitRetreatToRecovery = 25,
+    StartTechnologyResearch = 26,
+    CancelTechnologyResearch = 27
 }
 
 public readonly record struct PlayerActionRequest(
@@ -61,7 +63,9 @@ public readonly record struct PlayerActionRequest(
     IntelligenceContactKey TacticalContactKey = default,
     int TacticalRounds = 0,
     FormationTemplate TacticalFormation = FormationTemplate.Compact,
-    BattlefieldSupplyPriority SupplyPriority = BattlefieldSupplyPriority.Normal)
+    BattlefieldSupplyPriority SupplyPriority = BattlefieldSupplyPriority.Normal,
+    TechnologyId TechnologyId = default,
+    EntityId TechnologySourceInventory = default)
 {
     public static PlayerActionRequest BeginBuildingPlacement(
         BuildingId buildingId) =>
@@ -358,6 +362,40 @@ public readonly record struct PlayerActionRequest(
             entities,
             tacticalContactKey: contactKey,
             tacticalRounds: requestedRounds);
+
+    public static PlayerActionRequest StartTechnologyResearch(
+        TechnologyId technologyId,
+        EntityId facility,
+        EntityId sourceInventory) =>
+        new(
+            PlayerActionRequestKind.StartTechnologyResearch,
+            BuildingId.None,
+            facility,
+            RecipeId.None,
+            UnitId.None,
+            EntityId.Invalid,
+            false,
+            ProductionPriority.Normal,
+            ProductionRequestMode.OneShot,
+            ResourceId.None,
+            0.0,
+            TechnologyId: technologyId,
+            TechnologySourceInventory: sourceInventory);
+
+    public static PlayerActionRequest CancelTechnologyResearch(
+        EntityId requestEntity) =>
+        new(
+            PlayerActionRequestKind.CancelTechnologyResearch,
+            BuildingId.None,
+            EntityId.Invalid,
+            RecipeId.None,
+            UnitId.None,
+            requestEntity,
+            false,
+            ProductionPriority.Normal,
+            ProductionRequestMode.OneShot,
+            ResourceId.None,
+            0.0);
 
     public static PlayerActionRequest Surrender() =>
         new(

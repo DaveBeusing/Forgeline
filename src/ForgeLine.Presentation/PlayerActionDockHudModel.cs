@@ -39,6 +39,8 @@ internal static class PlayerActionDockHudModel
                 "SUPPLY",
             PlayerActionPanelMode.Tactical =>
                 "COMBAT",
+            PlayerActionPanelMode.Technology =>
+                "TECH",
             _ =>
                 "ACTIONS"
         };
@@ -59,6 +61,8 @@ internal static class PlayerActionDockHudModel
                 "Y",
             PlayerActionPanelMode.Tactical =>
                 "K",
+            PlayerActionPanelMode.Technology =>
+                "H",
             _ =>
                 string.Empty
         };
@@ -79,6 +83,8 @@ internal static class PlayerActionDockHudModel
                 RtsUiIcon.CommandSupply,
             PlayerActionPanelMode.Tactical =>
                 RtsUiIcon.CommandAttack,
+            PlayerActionPanelMode.Technology =>
+                RtsUiIcon.BuildingProcessing,
             _ =>
                 RtsUiIcon.CursorSelect
         };
@@ -144,6 +150,27 @@ internal static class PlayerActionDockHudModel
                         RtsUiIcon.CommandSupply,
                     _ =>
                         RtsUiIcon.CursorInvalid
+                };
+
+            case PlayerActionPanelMode.Technology:
+                if (index >=
+                    actions.Technology.Count)
+                {
+                    return RtsUiIcon.CursorInvalid;
+                }
+
+                return actions.Technology[index].Domain switch
+                {
+                    TechnologyDomain.Industry =>
+                        RtsUiIcon.BuildingProcessing,
+                    TechnologyDomain.Logistics =>
+                        RtsUiIcon.UnitLogistics,
+                    TechnologyDomain.Warfare =>
+                        RtsUiIcon.UnitArmor,
+                    TechnologyDomain.Intelligence =>
+                        RtsUiIcon.UnitReconnaissance,
+                    _ =>
+                        RtsUiIcon.BuildingProcessing
                 };
 
             case PlayerActionPanelMode.Tactical:
@@ -262,6 +289,12 @@ internal static class PlayerActionDockHudModel
                         string.Empty
                 };
 
+            case PlayerActionPanelMode.Technology:
+                return index <
+                    actions.Technology.Count
+                    ? actions.Technology[index].DisplayName
+                    : string.Empty;
+
             case PlayerActionPanelMode.Tactical:
                 return index switch
                 {
@@ -353,6 +386,12 @@ internal static class PlayerActionDockHudModel
                 if (index <
                     units.Units.Count)
                 {
+                    if (!units.Units[index].TechnologyUnlocked)
+                    {
+                        return PlayerActionDockItemState.Disabled(
+                            "TECH REQUIRED");
+                    }
+
                     return units.Units[index].HasInputs
                         ? PlayerActionDockItemState.Enabled
                         : PlayerActionDockItemState.Disabled(
@@ -387,6 +426,33 @@ internal static class PlayerActionDockHudModel
                 return ResolveTacticalItemState(
                     index,
                     actions.Tactical);
+
+            case PlayerActionPanelMode.Technology:
+                if (index >=
+                    actions.Technology.Count)
+                {
+                    return PlayerActionDockItemState.Disabled(
+                        "UNAVAILABLE");
+                }
+
+                PlayerTechnologyActionReadModel technology =
+                    actions.Technology[index];
+
+                return technology.State switch
+                {
+                    PlayerTechnologyState.Available =>
+                        PlayerActionDockItemState.Enabled,
+                    PlayerTechnologyState.Completed =>
+                        PlayerActionDockItemState.Disabled(
+                            "COMPLETED"),
+                    PlayerTechnologyState.Researching =>
+                        PlayerActionDockItemState.Disabled(
+                            "RESEARCHING"),
+                    _ =>
+                        PlayerActionDockItemState.Disabled(
+                            ResolveTechnologyBlockLabel(
+                                technology.BlockReason))
+                };
 
             default:
                 return PlayerActionDockItemState.Disabled(
@@ -468,6 +534,13 @@ internal static class PlayerActionDockHudModel
             return requestIndex >= 0 &&
                    requestIndex <
                        units.Requests.Count;
+        }
+
+        if (mode ==
+                PlayerActionPanelMode.Technology &&
+            index < actions.Technology.Count)
+        {
+            return actions.Technology[index].CanCancel;
         }
 
         return mode ==
@@ -558,7 +631,10 @@ internal static class PlayerActionDockHudModel
         control switch
         {
             PlayerActionDockControlKind.Activate =>
-                "ACT",
+                mode ==
+                    PlayerActionPanelMode.Technology
+                    ? "START"
+                    : "ACT",
             PlayerActionDockControlKind.Cancel =>
                 "CANCEL",
             PlayerActionDockControlKind.CyclePrimary =>
@@ -592,6 +668,68 @@ internal static class PlayerActionDockHudModel
                 "+",
             _ =>
                 string.Empty
+        };
+
+    public static string ResolveTechnologyBlockLabel(
+        TechnologyResearchBlockReason reason) =>
+        reason switch
+        {
+            TechnologyResearchBlockReason.None =>
+                "READY",
+            TechnologyResearchBlockReason.InvalidTechnology =>
+                "INVALID",
+            TechnologyResearchBlockReason.AlreadyCompleted =>
+                "COMPLETED",
+            TechnologyResearchBlockReason.UnmetPrerequisite =>
+                "PREREQUISITE",
+            TechnologyResearchBlockReason.MissingFacility =>
+                "NO FACILITY",
+            TechnologyResearchBlockReason.MissingInventory =>
+                "NO INVENTORY",
+            TechnologyResearchBlockReason.MissingMaterials =>
+                "MATERIALS",
+            TechnologyResearchBlockReason.InsufficientPower =>
+                "POWER",
+            TechnologyResearchBlockReason.ResearchInProgress =>
+                "RESEARCH ACTIVE",
+            _ =>
+                "BLOCKED"
+        };
+
+    public static string ResolveTechnologyDomainLabel(
+        TechnologyDomain domain) =>
+        domain switch
+        {
+            TechnologyDomain.Industry =>
+                "INDUSTRY",
+            TechnologyDomain.Logistics =>
+                "LOGISTICS",
+            TechnologyDomain.Warfare =>
+                "WARFARE",
+            TechnologyDomain.Intelligence =>
+                "INTEL",
+            _ =>
+                "TECH"
+        };
+
+    public static string ResolveTechnologyPhaseLabel(
+        TechnologyPhase phase) =>
+        phase switch
+        {
+            TechnologyPhase.Bootstrap =>
+                "T0",
+            TechnologyPhase.IndustrialFoundation =>
+                "T1",
+            TechnologyPhase.MechanizedWarfare =>
+                "T2",
+            TechnologyPhase.IntegratedWarfare =>
+                "T3",
+            TechnologyPhase.StrategicWarfare =>
+                "T4",
+            TechnologyPhase.IndustrialSupremacy =>
+                "T5",
+            _ =>
+                "T?"
         };
 
     public static string ResolvePlacementFailureLabel(

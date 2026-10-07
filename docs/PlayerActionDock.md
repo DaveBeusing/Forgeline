@@ -16,6 +16,7 @@ The dock is presentation-owned. It consumes immutable `PlayerActionSnapshot`, `P
 | Logistics | L | Stock policies, min/target/max, priority, distribution/bottleneck/failure, cargo state |
 | Supply | Y | Supply/Fuel/Ammunition, automatic thresholds, provider state, priority, explicit resupply |
 | Combat | K | Attack, Attack Move, Stop, Hold, Retreat, Fire Mission, Cancel Fire Mission, Recovery |
+| Technology | H | Technology domains/phases, real material/facility/power requirements, blocked state, progress, start/cancel |
 
 `Tab` selects the next card. `Enter` activates the selected action. `C` cancels/removes supported queued or policy items. `T` cycles the mode's primary setting, `M` cycles its secondary setting, and Left/Right adjust the active numeric field.
 
@@ -60,6 +61,19 @@ Supply mode shows the copied unit supply state, Fuel/Ammunition fractions, autom
 Combat mode uses only the owned tactical selection and intelligence-bounded target read model. It shows requested/eligible/rejected selection counts, common or mixed order state, identified targets, critical-supply and resupplying counts, formation context, and supported tactical actions.
 
 Attack remains identified-target gated. Attack Move and Retreat enter their existing targeting flows. Stop and Hold submit immediate commands. Fire Mission requires artillery with ammunition and uses the existing detected/identified-contact or coordinate targeting path. Cancel Fire Mission is enabled only when the copied artillery state contains an active mission. Recovery uses the existing retreat/recovery request.
+
+
+## Technology
+
+Technology mode is a presentation over authoritative simulation state. It groups the current Directorate technology catalog by domain and exposes phase, prerequisites, real material costs, required facility, required power fraction, current progress, completed state, and the authoritative reason why a technology cannot currently start or continue.
+
+Research does not spend a universal currency. Starting research creates a simulation-owned request through the normal player command boundary. The research system validates prerequisites, the required completed player-owned facility, power availability, and physical materials in the source inventory. Materials are consumed once when research can actually begin. Progress advances only during deterministic simulation ticks and pauses in an explicit blocked state when a continuing requirement is unavailable.
+
+The initial representative Directorate catalog contains Industrial Standardization (Industry/T1), Logistics Coordination (Logistics/T1), Mechanized Systems (Warfare/T2), and Sensor Fusion (Intelligence/T2). The latter three depend on Industrial Standardization. This is architecture-validation content, not the final production technology tree.
+
+Industrial Standardization unlocks the Field Engineering capability. Combat Engineer production is capability-gated by that unlock in the simulation and is also reported as technology-locked in its copied unit-production read model. The UI does not unlock units or technology directly.
+
+Technology mode uses `H`. `Enter` submits start research when the selected technology is available; `C` submits cancellation when the selected technology owns an active research request. Both actions remain subject to authoritative command execution and feedback.
 
 ## Lifetime and terminal behavior
 

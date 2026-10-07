@@ -196,6 +196,24 @@ public static class PlayerActionRequestDispatcher
                         observedTick);
                 return true;
 
+            case PlayerActionRequestKind.StartTechnologyResearch:
+                receipt =
+                    gateway.SubmitTechnologyResearch(
+                        player,
+                        request.TechnologyId,
+                        request.Facility,
+                        request.TechnologySourceInventory,
+                        observedTick);
+                return true;
+
+            case PlayerActionRequestKind.CancelTechnologyResearch:
+                receipt =
+                    gateway.SubmitTechnologyResearchCancel(
+                        player,
+                        request.RequestEntity,
+                        observedTick);
+                return true;
+
             case PlayerActionRequestKind.Surrender:
                 receipt =
                     gateway.SubmitSurrender(

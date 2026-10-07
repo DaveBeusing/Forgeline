@@ -17,7 +17,8 @@ public enum ReplayCommandKind : byte
     Tactical = 6,
     EndMatch = 7,
     Surrender = 8,
-    SetMatchPaused = 9
+    SetMatchPaused = 9,
+    Technology = 10
 }
 
 public sealed record RecordedSimulationCommand
@@ -50,6 +51,8 @@ public sealed record RecordedSimulationCommand
 
     public UnitId UnitId { get; init; }
 
+    public TechnologyId TechnologyId { get; init; }
+
     public ResourceId ResourceId { get; init; }
 
     public Vector3 Position { get; init; }
@@ -65,6 +68,8 @@ public sealed record RecordedSimulationCommand
     public PlayerProductionOperation ProductionOperation { get; init; }
 
     public PlayerUnitProductionOperation UnitProductionOperation { get; init; }
+
+    public PlayerTechnologyOperation TechnologyOperation { get; init; }
 
     public PlayerLogisticsActionOperation LogisticsOperation { get; init; }
 
@@ -336,6 +341,29 @@ public static class ReplayCommandCodec
                     };
                 return true;
 
+            case PlayerTechnologyActionCommand command:
+                recorded =
+                    Base(
+                        ReplayCommandKind.Technology) with
+                    {
+                        Issuer = command.Issuer,
+                        SubmittedAtTick =
+                            command.SubmittedAtTick.Value,
+                        TargetEntity =
+                            command.Facility,
+                        SecondaryEntity =
+                            command.RequestEntity,
+                        TechnologyId =
+                            command.TechnologyId,
+                        TechnologyOperation =
+                            command.Operation,
+                        Entities =
+                            command.SourceInventory.IsValid
+                                ? [command.SourceInventory]
+                                : []
+                    };
+                return true;
+
             case PlayerLogisticsActionCommand command:
                 recorded =
                     Base(
@@ -502,6 +530,12 @@ public static class ReplayCommandCodec
                     command,
                     submittedAtTick),
 
+            ReplayCommandKind.Technology =>
+                DecodeTechnology(
+                    command,
+                    submittedAtTick,
+                    scenario),
+
             ReplayCommandKind.Tactical =>
                 DecodeTactical(
                     command,
@@ -601,6 +635,34 @@ public static class ReplayCommandCodec
             _ =>
                 throw new InvalidDataException(
                     $"Unit-production replay operation '{command.UnitProductionOperation}' is invalid.")
+        };
+
+    private static PlayerTechnologyActionCommand DecodeTechnology(
+        RecordedSimulationCommand command,
+        SimulationTick submittedAtTick,
+        VerticalSliceScenario scenario) =>
+        command.TechnologyOperation switch
+        {
+            PlayerTechnologyOperation.Start =>
+                PlayerTechnologyActionCommand.Start(
+                    command.Issuer,
+                    command.TechnologyId,
+                    command.TargetEntity,
+                    command.Entities.Length > 0
+                        ? command.Entities[0]
+                        : EntityId.Invalid,
+                    submittedAtTick,
+                    scenario.Services.TechnologyDefinitions),
+
+            PlayerTechnologyOperation.Cancel =>
+                PlayerTechnologyActionCommand.Cancel(
+                    command.Issuer,
+                    command.SecondaryEntity,
+                    submittedAtTick),
+
+            _ =>
+                throw new InvalidDataException(
+                    $"Technology replay operation '{command.TechnologyOperation}' is invalid.")
         };
 
     private static PlayerLogisticsActionCommand DecodeLogistics(

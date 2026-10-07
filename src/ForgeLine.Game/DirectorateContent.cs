@@ -275,6 +275,8 @@ public static class DirectorateContent
             Key = "directorate.unit.combat_engineer",
             DisplayName = "Combat Engineer",
             RequiredProductionCapability = UnitProductionCapability.Infantry,
+            RequiredTechnologyCapability =
+                TechnologyCapabilityIds.FieldEngineering,
             ProductionTicks = 100,
             Costs =
             [

@@ -1143,6 +1143,140 @@ public sealed class PlayerActionPanelTests
             hold.TacticalEntities);
     }
 
+
+    [Fact]
+    public void TechnologyPaletteCreatesStartAndCancelRequests()
+    {
+        EntityId facility =
+            new(120, 1);
+        EntityId sourceInventory =
+            new(121, 1);
+        EntityId activeRequest =
+            new(122, 1);
+        var input =
+            new InputState();
+        var controller =
+            new PlayerActionPanelController();
+        PresentationSnapshot availableSnapshot =
+            CreateSnapshot(
+                technology:
+                [
+                    TechnologyAction(
+                        facility,
+                        sourceInventory,
+                        PlayerTechnologyState.Available,
+                        TechnologyResearchBlockReason.None,
+                        EntityId.Invalid)
+                ]);
+
+        controller.Update(
+            input,
+            availableSnapshot,
+            1600,
+            900);
+        Press(
+            input,
+            PlatformKey.H);
+        controller.Update(
+            input,
+            availableSnapshot,
+            1600,
+            900);
+        Release(
+            input,
+            PlatformKey.H);
+        controller.Update(
+            input,
+            availableSnapshot,
+            1600,
+            900);
+
+        Assert.Equal(
+            PlayerActionPanelMode.Technology,
+            controller.Mode);
+
+        Press(
+            input,
+            PlatformKey.Enter);
+        controller.Update(
+            input,
+            availableSnapshot,
+            1600,
+            900);
+
+        Assert.True(
+            controller.TryTakeRequest(
+                out PlayerActionRequest start));
+        Assert.Equal(
+            PlayerActionRequestKind.StartTechnologyResearch,
+            start.Kind);
+        Assert.Equal(
+            TechnologyIds.IndustrialStandardization,
+            start.TechnologyId);
+        Assert.Equal(
+            facility,
+            start.Facility);
+        Assert.Equal(
+            sourceInventory,
+            start.TechnologySourceInventory);
+
+        var cancelInput =
+            new InputState();
+        var cancelController =
+            new PlayerActionPanelController();
+        PresentationSnapshot researchingSnapshot =
+            CreateSnapshot(
+                technology:
+                [
+                    TechnologyAction(
+                        facility,
+                        sourceInventory,
+                        PlayerTechnologyState.Researching,
+                        TechnologyResearchBlockReason.None,
+                        activeRequest)
+                ]);
+
+        cancelController.Update(
+            cancelInput,
+            researchingSnapshot,
+            1600,
+            900);
+        Press(
+            cancelInput,
+            PlatformKey.H);
+        cancelController.Update(
+            cancelInput,
+            researchingSnapshot,
+            1600,
+            900);
+        Release(
+            cancelInput,
+            PlatformKey.H);
+        cancelController.Update(
+            cancelInput,
+            researchingSnapshot,
+            1600,
+            900);
+        Press(
+            cancelInput,
+            PlatformKey.C);
+        cancelController.Update(
+            cancelInput,
+            researchingSnapshot,
+            1600,
+            900);
+
+        Assert.True(
+            cancelController.TryTakeRequest(
+                out PlayerActionRequest cancel));
+        Assert.Equal(
+            PlayerActionRequestKind.CancelTechnologyResearch,
+            cancel.Kind);
+        Assert.Equal(
+            activeRequest,
+            cancel.RequestEntity);
+    }
+
     private static PlayerConstructionActionReadModel Construction(
         BuildingId buildingId,
         string name) =>
@@ -1158,6 +1292,42 @@ public sealed class PlayerActionPanelTests
             ],
             false);
 
+
+    private static PlayerTechnologyActionReadModel TechnologyAction(
+        EntityId facility,
+        EntityId sourceInventory,
+        PlayerTechnologyState state,
+        TechnologyResearchBlockReason blockReason,
+        EntityId activeRequest) =>
+        new(
+            TechnologyIds.IndustrialStandardization,
+            "directorate.technology.industrial_standardization",
+            "Industrial Standardization",
+            TechnologyDomain.Industry,
+            TechnologyPhase.IndustrialFoundation,
+            120,
+            [
+                new PlayerActionResourceAmount(
+                    ResourceIds.Steel,
+                    "Steel",
+                    80.0,
+                    200.0)
+            ],
+            [],
+            BuildingIds.CommandCore,
+            "Command Core",
+            facility,
+            sourceInventory,
+            1.0,
+            1.0,
+            state,
+            blockReason,
+            state == PlayerTechnologyState.Researching
+                ? 0.25
+                : 0.0,
+            activeRequest,
+            [TechnologyCapabilityIds.FieldEngineering]);
+
     private static PresentationSnapshot CreateSnapshot(
         IReadOnlyList<PlayerConstructionActionReadModel>? construction = null,
         PlayerProductionFacilityActionReadModel? production = null,
@@ -1165,6 +1335,7 @@ public sealed class PlayerActionPanelTests
         PlayerLogisticsActionReadModel? logistics = null,
         PlayerSupplyActionReadModel? supply = null,
         PlayerTacticalActionReadModel? tactical = null,
+        IReadOnlyList<PlayerTechnologyActionReadModel>? technology = null,
         ulong sessionValue = 101,
         bool terminal = false)
     {
@@ -1181,7 +1352,8 @@ public sealed class PlayerActionPanelTests
                 unitProduction,
                 logistics,
                 supply,
-                tactical);
+                tactical,
+                technology);
 
         PlayerExperienceSnapshot? experience =
             terminal

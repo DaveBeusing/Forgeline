@@ -92,6 +92,9 @@ public sealed record UnitDefinition
         init;
     }
 
+    public TechnologyCapabilityId RequiredTechnologyCapability { get; init; } =
+        TechnologyCapabilityId.None;
+
     public required uint ProductionTicks { get; init; }
 
     public required IReadOnlyList<UnitResourceCost> Costs { get; init; }

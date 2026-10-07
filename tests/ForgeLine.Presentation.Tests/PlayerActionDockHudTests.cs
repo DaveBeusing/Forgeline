@@ -358,12 +358,95 @@ public sealed class PlayerActionDockHudTests
         }
     }
 
+
+    [Fact]
+    public void TechnologyDockMapsModeAndAuthoritativeBlockedReason()
+    {
+        GameplayHudLayout layout =
+            GameplayHudLayout.Create(
+                1600,
+                900,
+                96);
+        HudRect technologyButton =
+            PlayerActionDockInteractionLayout.GetModeButtonRect(
+                layout,
+                6);
+
+        Assert.True(
+            PlayerActionDockInteractionLayout.TryHit(
+                Center(technologyButton),
+                layout,
+                isOpen: false,
+                itemCount: 0,
+                out PlayerActionDockHitTarget modeHit));
+        Assert.Equal(
+            PlayerActionPanelMode.Technology,
+            modeHit.Mode);
+
+        var technology =
+            new PlayerTechnologyActionReadModel(
+                TechnologyIds.MechanizedSystems,
+                "directorate.technology.mechanized_systems",
+                "Mechanized Systems",
+                TechnologyDomain.Warfare,
+                TechnologyPhase.MechanizedWarfare,
+                180,
+                [
+                    new PlayerActionResourceAmount(
+                        ResourceIds.Steel,
+                        "Steel",
+                        140.0,
+                        200.0)
+                ],
+                [
+                    new PlayerTechnologyPrerequisiteReadModel(
+                        TechnologyIds.IndustrialStandardization,
+                        "Industrial Standardization",
+                        false)
+                ],
+                BuildingIds.VehicleFactory,
+                "Vehicle Factory",
+                EntityId.Invalid,
+                new EntityId(44, 1),
+                1.0,
+                0.0,
+                PlayerTechnologyState.Locked,
+                TechnologyResearchBlockReason.UnmetPrerequisite,
+                0.0,
+                EntityId.Invalid,
+                [TechnologyCapabilityIds.MechanizedSystems]);
+        PlayerActionSnapshot actions =
+            Snapshot(
+                technology: [technology]);
+
+        PlayerActionDockItemState state =
+            PlayerActionDockHudModel.ResolveItemState(
+                PlayerActionPanelMode.Technology,
+                0,
+                actions);
+
+        Assert.False(
+            state.CanActivate);
+        Assert.Equal(
+            "PREREQUISITE",
+            state.DisabledReason);
+        Assert.Equal(
+            "TECH",
+            PlayerActionDockHudModel.ResolveModeLabel(
+                PlayerActionPanelMode.Technology));
+        Assert.Equal(
+            "H",
+            PlayerActionDockHudModel.ResolveModeShortcut(
+                PlayerActionPanelMode.Technology));
+    }
+
     private static PlayerActionSnapshot Snapshot(
         PlayerProductionFacilityActionReadModel? production = null,
         PlayerUnitProductionFacilityActionReadModel? units = null,
         PlayerLogisticsActionReadModel? logistics = null,
         PlayerSupplyActionReadModel? supply = null,
-        PlayerTacticalActionReadModel? tactical = null) =>
+        PlayerTacticalActionReadModel? tactical = null,
+        IReadOnlyList<PlayerTechnologyActionReadModel>? technology = null) =>
         new(
             new SimulationSessionId(1),
             new SimulationTick(1),
@@ -373,7 +456,8 @@ public sealed class PlayerActionDockHudTests
             units,
             logistics,
             supply,
-            tactical);
+            tactical,
+            technology);
 
     private static System.Numerics.Vector2 Center(
         in HudRect rect) =>
