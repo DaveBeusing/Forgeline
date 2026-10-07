@@ -291,6 +291,10 @@ internal sealed class ClientApplication
                 ControllableEntityCategory.Unit |
                 ControllableEntityCategory.Building |
                 ControllableEntityCategory.Logistics));
+        var combatGroupRegistry =
+            new CombatGroupRegistry();
+        var combatGroupInput =
+            new CombatGroupInputController();
         var buildingPlacementController =
             new RtsBuildingPlacementController(LocalPlayer);
         var actionPanel =
@@ -1066,6 +1070,20 @@ internal sealed class ClientApplication
                 currentExperience?.MatchStatus ==
                 PlayerMatchStatus.Active;
 
+            CombatGroupInputResult combatGroupInputResult =
+                combatGroupInput.Update(
+                    inputState,
+                    currentSnapshot,
+                    combatGroupRegistry,
+                    selectionController.Selection,
+                    inputBlocked:
+                        !gameplayActive ||
+                        hudInteraction.KeyboardCaptured ||
+                        buildingPlacementController.IsActive ||
+                        tacticalTargetingController.IsActive);
+            hudInteraction.CaptureKeyboard(
+                combatGroupInputResult.Handled);
+
             if (gameplayActive)
             {
                 tacticalTargetingController.Update(
@@ -1197,6 +1215,12 @@ internal sealed class ClientApplication
                 currentSnapshot?.Construction,
                 currentSnapshot?.Debug);
 
+            CombatGroupOverviewView combatGroupOverview =
+                CombatGroupOverviewModel.Create(
+                    combatGroupRegistry,
+                    currentSnapshot?.CombatGroups,
+                    selectionController.Selection);
+
             PlayerActionPanelView actionPanelView =
                 actionPanel.CreateView(
                     window.ClientSize.Width,
@@ -1265,7 +1289,9 @@ internal sealed class ClientApplication
                     _settings.UiScale,
                     preAlphaUx,
                     SurfaceSuspended:
-                        window.IsMinimized));
+                        window.IsMinimized,
+                    CombatGroups:
+                        combatGroupOverview));
 
             if (_platform.Clock.GetElapsedTime(nextDiagnosticAt, now) >= DiagnosticInterval)
             {

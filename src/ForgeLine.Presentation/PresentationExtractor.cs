@@ -128,6 +128,13 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                     interaction.StrategicOverlay,
                     intelligenceSnapshot);
 
+        CombatGroupOperationalSnapshot? combatGroups =
+            _extraction is null
+                ? null
+                : CombatGroupOperationalSnapshotFactory.Capture(
+                    context,
+                    _extraction.Player);
+
         BuildingPlacementPreviewReadModel? placementPreview =
             _extraction is null
                 ? null
@@ -168,7 +175,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                     _extraction.Scenario.Simulation),
                 playerActions,
                 _vfxPool.Metrics,
-                strategicOverlay));
+                strategicOverlay,
+                combatGroups));
     }
 
     private RenderInstance[] CaptureRenderInstances(

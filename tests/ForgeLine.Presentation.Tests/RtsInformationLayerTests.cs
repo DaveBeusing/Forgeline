@@ -319,6 +319,73 @@ public sealed class RtsInformationLayerTests
     }
 
     [Fact]
+    public void MinimapMarksActiveOwnedCombatGroupWithoutPromotingEnemyMembership()
+    {
+        var bounds =
+            new AxisAlignedBounds(
+                Vector3.Zero,
+                new Vector3(
+                    128.0f,
+                    10.0f,
+                    128.0f));
+        EntityId friendly =
+            new(12, 1);
+        EntityId enemy =
+            new(13, 1);
+        RenderInstance[] instances =
+        [
+            Unit(
+                friendly,
+                new Vector3(
+                    24.0f,
+                    0.0f,
+                    24.0f),
+                LocalPlayer,
+                UnitIds.MainBattleTank),
+            Unit(
+                enemy,
+                new Vector3(
+                    80.0f,
+                    0.0f,
+                    80.0f),
+                EnemyPlayer,
+                UnitIds.ScoutVehicle)
+        ];
+        var snapshot =
+            new PresentationSnapshot(
+                new SimulationTick(8),
+                TimeSpan.FromMilliseconds(50),
+                instances.Length,
+                instances);
+
+        RtsMinimapModel model =
+            RtsMinimapModelBuilder.Build(
+                snapshot,
+                bounds,
+                LocalPlayer,
+                selectedEntities: [],
+                activeGroupEntities:
+                    [friendly, enemy]);
+
+        Assert.Contains(
+            model.Symbols,
+            symbol =>
+                symbol.Kind ==
+                    RtsMinimapSymbolKind.SelectedGroup &&
+                symbol.Entity ==
+                    friendly &&
+                symbol.IsActiveGroup &&
+                !symbol.IsSelected);
+        Assert.DoesNotContain(
+            model.Symbols,
+            symbol =>
+                symbol.Kind ==
+                    RtsMinimapSymbolKind.SelectedGroup &&
+                symbol.Entity ==
+                    enemy);
+    }
+
+    [Fact]
     public void SupplyStatesResolveToDistinctSemanticIcons()
     {
         RtsUiIcon[] icons =

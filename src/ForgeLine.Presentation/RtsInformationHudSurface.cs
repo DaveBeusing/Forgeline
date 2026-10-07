@@ -19,6 +19,7 @@ internal sealed class RtsInformationHudSurface : IGameplayHudSurface
 
     public GameplayHudRegion Regions =>
         GameplayHudRegion.Minimap |
+        GameplayHudRegion.SecondaryView |
         GameplayHudRegion.GlobalOverlay;
 
     public void Render(
@@ -30,6 +31,7 @@ internal sealed class RtsInformationHudSurface : IGameplayHudSurface
             context.Snapshot,
             context.WorldBounds,
             context.InformationLayer,
+            context.CombatGroups,
             context.Dpi,
             context.UiScale);
     }

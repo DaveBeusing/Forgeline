@@ -49,6 +49,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         PresentationSnapshot snapshot,
         in AxisAlignedBounds worldBounds,
         in RtsInformationLayerView view,
+        CombatGroupOverviewView combatGroups,
         uint dpi,
         float uiScale = 1.0f)
     {
@@ -56,6 +57,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(camera);
         ArgumentNullException.ThrowIfNull(snapshot);
+        ArgumentNullException.ThrowIfNull(combatGroups);
 
         if (context.Width <= 0 ||
             context.Height <= 0)
@@ -82,7 +84,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                     worldBounds,
                     snapshot.PlayerExperience?.Player ??
                         new PlayerId(1),
-                    view.SelectedEntities);
+                    view.SelectedEntities,
+                    combatGroups.ActiveMembers);
 
             EmitMinimap(
                 minimap,
@@ -93,6 +96,13 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 context.Width,
                 context.Height);
         }
+
+        EmitCombatGroupOverview(
+            combatGroups,
+            layout.SecondaryView,
+            scale,
+            context.Width,
+            context.Height);
 
         if (view.IsDragSelecting)
         {
@@ -391,6 +401,94 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 symbolSize,
                 width,
                 height);
+
+            if (symbol.Kind ==
+                    RtsMinimapSymbolKind.SelectedGroup &&
+                symbol.IsActiveGroup)
+            {
+                float bracketSize =
+                    11.0f *
+                    scale;
+                float half =
+                    bracketSize *
+                    0.5f;
+                float segment =
+                    3.0f *
+                    scale;
+                float thickness =
+                    MathF.Max(
+                        1.0f,
+                        1.0f *
+                        scale);
+                Vector4 activeColor =
+                    ResolveColor(
+                        RtsUiIcon.MinimapSelectedGroup);
+
+                EmitQuad(
+                    x - half,
+                    y - half,
+                    segment,
+                    thickness,
+                    activeColor,
+                    width,
+                    height);
+                EmitQuad(
+                    x - half,
+                    y - half,
+                    thickness,
+                    segment,
+                    activeColor,
+                    width,
+                    height);
+                EmitQuad(
+                    x + half - segment,
+                    y - half,
+                    segment,
+                    thickness,
+                    activeColor,
+                    width,
+                    height);
+                EmitQuad(
+                    x + half - thickness,
+                    y - half,
+                    thickness,
+                    segment,
+                    activeColor,
+                    width,
+                    height);
+                EmitQuad(
+                    x - half,
+                    y + half - thickness,
+                    segment,
+                    thickness,
+                    activeColor,
+                    width,
+                    height);
+                EmitQuad(
+                    x - half,
+                    y + half - segment,
+                    thickness,
+                    segment,
+                    activeColor,
+                    width,
+                    height);
+                EmitQuad(
+                    x + half - segment,
+                    y + half - thickness,
+                    segment,
+                    thickness,
+                    activeColor,
+                    width,
+                    height);
+                EmitQuad(
+                    x + half - thickness,
+                    y + half - segment,
+                    thickness,
+                    segment,
+                    activeColor,
+                    width,
+                    height);
+            }
         }
 
         Vector2 cameraPosition =
@@ -747,6 +845,435 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             width,
             height);
     }
+
+    private void EmitCombatGroupOverview(
+        CombatGroupOverviewView overview,
+        in HudRect region,
+        float scale,
+        int width,
+        int height)
+    {
+        if (region.IsEmpty ||
+            overview.Groups.Count == 0)
+        {
+            return;
+        }
+
+        int assigned = 0;
+        for (int index = 0;
+             index < overview.Groups.Count;
+             index++)
+        {
+            if (overview.Groups[index].IsAssigned)
+            {
+                assigned++;
+            }
+        }
+
+        if (assigned == 0)
+        {
+            return;
+        }
+
+        const float BaseRowHeight = 43.0f;
+        float padding =
+            5.0f *
+            scale;
+        float headerHeight =
+            18.0f *
+            scale;
+        float rowHeight =
+            BaseRowHeight *
+            scale;
+        int visibleRows =
+            Math.Min(
+                assigned,
+                Math.Max(
+                    0,
+                    (int)MathF.Floor(
+                        MathF.Max(
+                            0.0f,
+                            region.Height -
+                            headerHeight -
+                            padding * 2.0f) /
+                        rowHeight)));
+
+        if (visibleRows <= 0)
+        {
+            return;
+        }
+
+        float panelHeight =
+            headerHeight +
+            visibleRows *
+                rowHeight +
+            padding * 2.0f;
+
+        EmitQuad(
+            region.X,
+            region.Y,
+            region.Width,
+            MathF.Min(
+                region.Height,
+                panelHeight),
+            new Vector4(
+                0.055f,
+                0.065f,
+                0.065f,
+                0.96f),
+            width,
+            height);
+
+        Span<char> headerBuffer =
+            stackalloc char[64];
+        var header =
+            new HudTextBuilder(
+                headerBuffer);
+        header.Append("COMBAT GROUPS ");
+        header.Append(assigned);
+        EmitText(
+            header.Written,
+            region.X +
+                padding,
+            region.Y +
+                5.0f *
+                scale,
+            region.Right -
+                padding,
+            new Vector4(
+                0.90f,
+                0.94f,
+                0.92f,
+                1.0f),
+            scale *
+                0.70f,
+            width,
+            height);
+
+        float y =
+            region.Y +
+            headerHeight +
+            padding;
+        int rendered = 0;
+        Span<char> primaryBuffer =
+            stackalloc char[96];
+        Span<char> statusBuffer =
+            stackalloc char[128];
+        Span<char> contextBuffer =
+            stackalloc char[96];
+
+        for (int index = 0;
+             index < overview.Groups.Count &&
+             rendered < visibleRows;
+             index++)
+        {
+            CombatGroupSummaryReadModel group =
+                overview.Groups[index];
+
+            if (!group.IsAssigned)
+            {
+                continue;
+            }
+
+            Vector4 accent =
+                group.IsActive
+                    ? new Vector4(
+                        0.96f,
+                        0.76f,
+                        0.24f,
+                        1.0f)
+                    : group.IsSelected
+                        ? new Vector4(
+                            0.34f,
+                            0.82f,
+                            0.92f,
+                            1.0f)
+                        : new Vector4(
+                            0.54f,
+                            0.59f,
+                            0.58f,
+                            1.0f);
+
+            EmitQuad(
+                region.X +
+                    padding,
+                y,
+                region.Width -
+                    padding * 2.0f,
+                rowHeight -
+                    2.0f *
+                    scale,
+                new Vector4(
+                    0.075f,
+                    0.09f,
+                    0.09f,
+                    0.96f),
+                width,
+                height);
+            EmitQuad(
+                region.X +
+                    padding,
+                y,
+                3.0f *
+                    scale,
+                rowHeight -
+                    2.0f *
+                    scale,
+                accent,
+                width,
+                height);
+
+            var primary =
+                new HudTextBuilder(
+                    primaryBuffer);
+            primary.Append("G");
+            primary.Append(group.Slot);
+            primary.Append(" ");
+            primary.Append(group.Label);
+            primary.Append("  U");
+            primary.Append(group.MemberCount);
+
+            if (group.IsActive)
+            {
+                primary.Append("  ACTIVE");
+            }
+            else if (group.IsSelected)
+            {
+                primary.Append("  SELECTED");
+            }
+
+            EmitText(
+                primary.Written,
+                region.X +
+                    10.0f *
+                    scale,
+                y +
+                    5.0f *
+                    scale,
+                region.Right -
+                    padding,
+                accent,
+                scale *
+                    0.66f,
+                width,
+                height);
+
+            var status =
+                new HudTextBuilder(
+                    statusBuffer);
+
+            if (group.HasHealth)
+            {
+                status.Append("HP ");
+                status.Append(
+                    Percent(
+                        group.Health));
+            }
+
+            if (group.HasStrength)
+            {
+                status.Append(" STR ");
+                status.Append(
+                    Percent(
+                        group.Strength));
+            }
+
+            if (group.HasReadiness)
+            {
+                status.Append(" RDY ");
+                status.Append(
+                    Percent(
+                        group.Readiness));
+            }
+
+            if (group.HasSupply)
+            {
+                status.Append(" F ");
+                status.Append(
+                    Percent(
+                        group.Fuel));
+                status.Append(" A ");
+                status.Append(
+                    Percent(
+                        group.Ammunition));
+                status.Append(" ");
+                status.Append(
+                    ResolveGroupSupplyLabel(
+                        group.SupplyStatus));
+            }
+
+            EmitText(
+                status.Written,
+                region.X +
+                    10.0f *
+                    scale,
+                y +
+                    17.0f *
+                    scale,
+                region.Right -
+                    padding,
+                new Vector4(
+                    0.82f,
+                    0.87f,
+                    0.85f,
+                    1.0f),
+                scale *
+                    0.60f,
+                width,
+                height);
+
+            var context =
+                new HudTextBuilder(
+                    contextBuffer);
+
+            if (group.HasFormation)
+            {
+                context.Append(
+                    group.MixedFormation
+                        ? "FORM MIXED"
+                        : ResolveFormationLabel(
+                            group.Formation));
+            }
+
+            if (group.HasOrder)
+            {
+                if (context.Written.Length >
+                    0)
+                {
+                    context.Append("  ");
+                }
+
+                context.Append(
+                    group.MixedOrder
+                        ? "ORDER MIXED"
+                        : ResolveOrderLabel(
+                            group.Order));
+            }
+
+            if (context.Written.Length >
+                0)
+            {
+                EmitText(
+                    context.Written,
+                    region.X +
+                        10.0f *
+                        scale,
+                    y +
+                        29.0f *
+                        scale,
+                    region.Right -
+                        padding,
+                    new Vector4(
+                        0.62f,
+                        0.68f,
+                        0.67f,
+                        1.0f),
+                    scale *
+                        0.57f,
+                    width,
+                    height);
+            }
+
+            y +=
+                rowHeight;
+            rendered++;
+        }
+
+        if (assigned >
+            visibleRows)
+        {
+            Span<char> overflowBuffer =
+                stackalloc char[32];
+            var overflow =
+                new HudTextBuilder(
+                    overflowBuffer);
+            overflow.Append("+");
+            overflow.Append(
+                assigned -
+                visibleRows);
+            overflow.Append(" MORE");
+
+            EmitText(
+                overflow.Written,
+                region.Right -
+                    66.0f *
+                    scale,
+                region.Y +
+                    5.0f *
+                    scale,
+                region.Right -
+                    padding,
+                new Vector4(
+                    0.72f,
+                    0.76f,
+                    0.75f,
+                    1.0f),
+                scale *
+                    0.60f,
+                width,
+                height);
+        }
+    }
+
+    private static int Percent(
+        double value) =>
+        (int)Math.Round(
+            Math.Clamp(
+                value,
+                0.0,
+                1.0) *
+            100.0,
+            MidpointRounding.AwayFromZero);
+
+    private static string ResolveGroupSupplyLabel(
+        BattlefieldSupplyStatus status) =>
+        status switch
+        {
+            BattlefieldSupplyStatus.Supplied =>
+                "SUPPLIED",
+            BattlefieldSupplyStatus.LowSupply =>
+                "LOW",
+            BattlefieldSupplyStatus.Critical =>
+                "CRITICAL",
+            BattlefieldSupplyStatus.Unsupplied =>
+                "EMPTY",
+            _ =>
+                "SUPPLY"
+        };
+
+    private static string ResolveFormationLabel(
+        FormationTemplate formation) =>
+        formation switch
+        {
+            FormationTemplate.Line =>
+                "FORM LINE",
+            FormationTemplate.Column =>
+                "FORM COLUMN",
+            FormationTemplate.Wedge =>
+                "FORM WEDGE",
+            FormationTemplate.Compact =>
+                "FORM COMPACT",
+            _ =>
+                "FORM"
+        };
+
+    private static string ResolveOrderLabel(
+        CombatOrderKind order) =>
+        order switch
+        {
+            CombatOrderKind.Attack =>
+                "ORDER ATTACK",
+            CombatOrderKind.AttackMove =>
+                "ORDER ATTACK MOVE",
+            CombatOrderKind.Stop =>
+                "ORDER STOP",
+            CombatOrderKind.HoldPosition =>
+                "ORDER HOLD",
+            CombatOrderKind.Retreat =>
+                "ORDER RETREAT",
+            _ =>
+                "ORDER"
+        };
 
     private void EmitSelectionRectangle(
         Vector2 first,

@@ -114,6 +114,20 @@ Build, processing, unit-production, logistics, supply, and combat views use only
 
 Pointer hit regions come from the shared DPI-aware ActionDock layout. Cards select context, footer buttons perform the corresponding action/edit operation, and the entire open dock captures pointer input before the world interaction layer.
 
+## Combat group overview
+
+The player combat-group overview is presentation-owned command organization. `CombatGroupRegistry` provides ten session-scoped local slots and stores only full-generation entity IDs that remain present in the immutable `CombatGroupOperationalSnapshot`. It does not create simulation entities or replace the simulation-owned transient movement/combat groups used to execute orders.
+
+`Ctrl+0..9` assigns the current authorized selection, `0..9` recalls a slot through the existing `SelectionSet`, and `Ctrl+Shift+0..9` clears it. Group input is suppressed while another HUD surface has keyboard capture, during placement/targeting modes, outside active gameplay, or after terminal match state. Plain Shift+digit is not consumed by combat-group logic.
+
+The compact overview occupies the shared `SecondaryView` HUD region and renders assigned groups only. Each visible row identifies the slot/label and valid unit count plus available aggregate Health, Strength, Readiness, Fuel, Ammunition, worst Battlefield Supply state, and common/mixed Formation or Tactical Order state. Active and exactly-selected groups have distinct labels and accents in addition to color.
+
+Maintenance is deliberately absent: the current runtime does not expose an authoritative per-unit Maintenance value. The HUD must not infer one from Health, Supply, Fuel, Ammunition, or Readiness.
+
+Recalling a group only changes the existing selection. All subsequent move, formation, action-dock, tactical, artillery, and minimap commands still expand to the selected entity IDs and cross the normal authoritative command boundary. Per-unit ownership, intelligence, resource, range, movement, and combat validation remains unchanged.
+
+The minimap receives only the active group's already-authorized member IDs and renders the existing selected-group semantic with an additional active bracket. No hidden or hostile entity data is added by combat-group presentation.
+
 ## Selection and world markers
 
 World-space information markers supplement the existing selection/input model:
@@ -307,7 +321,6 @@ This is the initial information layer, not the final HUD art pass. The following
 - final typography/branding;
 - final texture/vector icon rendering;
 - full technology-tree UI;
-- advanced combat-group UI;
 - new gameplay systems created solely for UI;
 - unsupported Patrol/Repair gameplay behavior.
 

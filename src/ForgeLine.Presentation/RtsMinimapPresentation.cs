@@ -48,7 +48,8 @@ public readonly record struct RtsMinimapSymbol(
     Vector3 WorldPosition,
     EntityId Entity,
     bool IsCurrent,
-    bool IsSelected);
+    bool IsSelected,
+    bool IsActiveGroup = false);
 
 public sealed class RtsMinimapModel
 {
@@ -96,7 +97,8 @@ public static class RtsMinimapModelBuilder
         PresentationSnapshot snapshot,
         in AxisAlignedBounds worldBounds,
         PlayerId localPlayer,
-        IReadOnlyCollection<EntityId>? selectedEntities = null)
+        IReadOnlyCollection<EntityId>? selectedEntities = null,
+        IReadOnlyCollection<EntityId>? activeGroupEntities = null)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
 
@@ -112,6 +114,11 @@ public static class RtsMinimapModelBuilder
                 ? []
                 : new HashSet<EntityId>(
                     selectedEntities);
+        var activeGroup =
+            activeGroupEntities is null
+                ? []
+                : new HashSet<EntityId>(
+                    activeGroupEntities);
         var symbols =
             new List<RtsMinimapSymbol>(
                 snapshot.InstanceCount + 16);
@@ -148,6 +155,10 @@ public static class RtsMinimapModelBuilder
                 bool isSelected =
                     selected.Contains(
                         instance.Entity);
+                bool isActiveGroup =
+                    friendly &&
+                    activeGroup.Contains(
+                        instance.Entity);
 
                 symbols.Add(
                     new RtsMinimapSymbol(
@@ -159,7 +170,8 @@ public static class RtsMinimapModelBuilder
                         true,
                         isSelected));
 
-                if (isSelected)
+                if (isSelected ||
+                    isActiveGroup)
                 {
                     symbols.Add(
                         new RtsMinimapSymbol(
@@ -168,7 +180,8 @@ public static class RtsMinimapModelBuilder
                             instance.Transform.Position,
                             instance.Entity,
                             true,
-                            true));
+                            isSelected,
+                            isActiveGroup));
                 }
 
                 continue;

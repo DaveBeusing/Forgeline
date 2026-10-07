@@ -101,7 +101,8 @@ internal readonly record struct ClientRenderFrame(
     float UiScale = 1.0f,
     PreAlphaUxView PreAlphaUx = default,
     FrontendSurfaceView? Frontend = null,
-    bool SurfaceSuspended = false);
+    bool SurfaceSuspended = false,
+    CombatGroupOverviewView? CombatGroups = null);
 
 internal sealed class ClientRenderHost : IDisposable
 {
@@ -519,6 +520,8 @@ internal sealed class ClientRenderHost : IDisposable
                             current.ActionPanel,
                             current.TacticalTargeting,
                             current.ActiveFormation,
+                            current.CombatGroups ??
+                                CombatGroupOverviewView.Empty,
                             current.PreAlphaUx,
                             current.Dpi,
                             current.UiScale,
