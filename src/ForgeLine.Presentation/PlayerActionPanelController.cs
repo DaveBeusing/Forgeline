@@ -165,11 +165,12 @@ public sealed class PlayerActionPanelController
             _ = Pressed(input, PlatformKey.Escape);
         }
 
-        int rowCount =
-            GetRowCount(
+        int itemCount =
+            PlayerActionDockInteractionLayout.GetItemCount(
+                Mode,
                 actions);
 
-        if (rowCount == 0)
+        if (itemCount == 0)
         {
             SelectedIndex = 0;
         }
@@ -179,13 +180,13 @@ public sealed class PlayerActionPanelController
                 Math.Clamp(
                     SelectedIndex,
                     0,
-                    rowCount - 1);
+                    itemCount - 1);
 
             if (Pressed(input, PlatformKey.Tab))
             {
                 SelectedIndex =
                     (SelectedIndex + 1) %
-                    rowCount;
+                    itemCount;
                 _desiredStockQuantity = 0.0;
                 _stockResourceId = ResourceId.None;
             }
@@ -198,125 +199,34 @@ public sealed class PlayerActionPanelController
         SynchronizeStockEditor(actions);
         SynchronizeSupplyEditor(actions);
 
-        if ((Mode is
-                 PlayerActionPanelMode.Production or
-                 PlayerActionPanelMode.UnitProduction) &&
-            Pressed(input, PlatformKey.T))
+        if (Pressed(input, PlatformKey.T))
         {
-            Priority =
-                Priority switch
-                {
-                    ProductionPriority.Normal =>
-                        ProductionPriority.High,
-                    ProductionPriority.High =>
-                        ProductionPriority.Low,
-                    _ =>
-                        ProductionPriority.Normal
-                };
-        }
-        else if (Mode == PlayerActionPanelMode.Logistics &&
-                 Pressed(input, PlatformKey.T))
-        {
-            LogisticsPriority =
-                LogisticsPriority switch
-                {
-                    LogisticsStockPriority.Normal =>
-                        LogisticsStockPriority.High,
-                    LogisticsStockPriority.High =>
-                        LogisticsStockPriority.Critical,
-                    LogisticsStockPriority.Critical =>
-                        LogisticsStockPriority.Low,
-                    _ =>
-                        LogisticsStockPriority.Normal
-                };
-        }
-        else if (Mode == PlayerActionPanelMode.Supply &&
-                 Pressed(input, PlatformKey.T))
-        {
-            _supplyPriority =
-                _supplyPriority switch
-                {
-                    BattlefieldSupplyPriority.Normal =>
-                        BattlefieldSupplyPriority.High,
-                    BattlefieldSupplyPriority.High =>
-                        BattlefieldSupplyPriority.Critical,
-                    BattlefieldSupplyPriority.Critical =>
-                        BattlefieldSupplyPriority.Low,
-                    _ =>
-                        BattlefieldSupplyPriority.Normal
-                };
-            QueueSupplyPriority(actions);
-        }
-        else
-        {
-            _ = Pressed(input, PlatformKey.T);
+            CyclePrimarySetting(
+                actions);
         }
 
-        if (Mode == PlayerActionPanelMode.Production &&
-            Pressed(input, PlatformKey.M))
+        if (Pressed(input, PlatformKey.M))
         {
-            ProductionMode =
-                ProductionMode switch
-                {
-                    ProductionRequestMode.OneShot =>
-                        ProductionRequestMode.Repeat,
-                    ProductionRequestMode.Repeat =>
-                        ProductionRequestMode.DesiredStock,
-                    _ =>
-                        ProductionRequestMode.OneShot
-                };
-            _desiredStockQuantity = 0.0;
-        }
-        else if (Mode == PlayerActionPanelMode.Logistics &&
-                 Pressed(input, PlatformKey.M))
-        {
-            StockThresholdField =
-                StockThresholdField switch
-                {
-                    PlayerStockThresholdField.Minimum =>
-                        PlayerStockThresholdField.Target,
-                    PlayerStockThresholdField.Target =>
-                        PlayerStockThresholdField.Maximum,
-                    _ =>
-                        PlayerStockThresholdField.Minimum
-                };
-        }
-        else if (Mode == PlayerActionPanelMode.Supply &&
-                 Pressed(input, PlatformKey.M))
-        {
-            _automaticResupplyEnabled =
-                !_automaticResupplyEnabled;
-            QueueAutomaticResupplyPolicy(actions);
-        }
-        else
-        {
-            _ = Pressed(input, PlatformKey.M);
+            CycleSecondarySetting(
+                actions);
         }
 
-        switch (Mode)
+        int adjustment = 0;
+        if (Pressed(input, PlatformKey.Left))
         {
-            case PlayerActionPanelMode.Production:
-                UpdateDesiredStockTarget(
-                    input,
-                    actions);
-                break;
+            adjustment--;
+        }
 
-            case PlayerActionPanelMode.Logistics:
-                UpdateStockThresholds(
-                    input,
-                    actions);
-                break;
+        if (Pressed(input, PlatformKey.Right))
+        {
+            adjustment++;
+        }
 
-            case PlayerActionPanelMode.Supply:
-                UpdateSupplyThresholds(
-                    input,
-                    actions);
-                break;
-
-            default:
-                _ = Pressed(input, PlatformKey.Left);
-                _ = Pressed(input, PlatformKey.Right);
-                break;
+        if (adjustment != 0)
+        {
+            AdjustCurrentSetting(
+                actions,
+                adjustment);
         }
 
         PlayerActionPanelView view =
@@ -332,27 +242,25 @@ public sealed class PlayerActionPanelController
                 PlatformMouseButton.Left);
 
         PointerCaptured =
-            view.IsOpen &&
             input.HasPointerPosition &&
-            IsPointerInsidePanel(
+            PlayerActionDockInteractionLayout.CapturesPointer(
                 input.PointerPosition,
-                view,
-                rowCount,
-                layout);
+                layout,
+                view.IsOpen);
 
         if (PointerCaptured &&
             leftDown &&
             !_leftWasDown &&
-            TryResolvePointerRow(
+            PlayerActionDockInteractionLayout.TryHit(
                 input.PointerPosition,
-                view,
-                rowCount,
                 layout,
-                out int pointerRow))
+                view.IsOpen,
+                itemCount,
+                out PlayerActionDockHitTarget hit))
         {
-            SelectedIndex = pointerRow;
-            _desiredStockQuantity = 0.0;
-            ActivateSelected(actions);
+            HandlePointerHit(
+                hit,
+                actions);
             PointerCaptured = true;
         }
 
@@ -848,168 +756,6 @@ public sealed class PlayerActionPanelController
             supply.Priority;
     }
 
-    private void UpdateStockThresholds(
-        InputState input,
-        PlayerActionSnapshot? actions)
-    {
-        if (actions?.Logistics is null ||
-            SelectedIndex < 0 ||
-            SelectedIndex >= actions.Logistics.Policies.Count)
-        {
-            _ = Pressed(input, PlatformKey.Left);
-            _ = Pressed(input, PlatformKey.Right);
-            return;
-        }
-
-        double step =
-            Math.Max(
-                1.0,
-                Math.Ceiling(_stockTarget * 0.1));
-
-        double delta = 0.0;
-        if (Pressed(input, PlatformKey.Left))
-        {
-            delta = -step;
-        }
-
-        if (Pressed(input, PlatformKey.Right))
-        {
-            delta = step;
-        }
-
-        if (delta == 0.0)
-        {
-            return;
-        }
-
-        switch (StockThresholdField)
-        {
-            case PlayerStockThresholdField.Minimum:
-                _stockMinimum =
-                    Math.Clamp(
-                        _stockMinimum + delta,
-                        0.0,
-                        _stockTarget);
-                break;
-
-            case PlayerStockThresholdField.Target:
-                _stockTarget =
-                    Math.Max(
-                        1.0,
-                        _stockTarget + delta);
-                _stockMinimum =
-                    Math.Min(
-                        _stockMinimum,
-                        _stockTarget);
-                _stockMaximum =
-                    Math.Max(
-                        _stockMaximum,
-                        _stockTarget);
-                break;
-
-            case PlayerStockThresholdField.Maximum:
-                _stockMaximum =
-                    Math.Max(
-                        _stockTarget,
-                        _stockMaximum + delta);
-                break;
-        }
-    }
-
-    private void UpdateSupplyThresholds(
-        InputState input,
-        PlayerActionSnapshot? actions)
-    {
-        if (!actions?.Supply.HasValue == true ||
-            SelectedIndex > 1)
-        {
-            _ = Pressed(input, PlatformKey.Left);
-            _ = Pressed(input, PlatformKey.Right);
-            return;
-        }
-
-        double delta = 0.0;
-        if (Pressed(input, PlatformKey.Left))
-        {
-            delta = -0.05;
-        }
-
-        if (Pressed(input, PlatformKey.Right))
-        {
-            delta = 0.05;
-        }
-
-        if (delta == 0.0)
-        {
-            return;
-        }
-
-        if (SelectedIndex == 0)
-        {
-            _automaticFuelThreshold =
-                Math.Clamp(
-                    _automaticFuelThreshold + delta,
-                    0.0,
-                    1.0);
-        }
-        else
-        {
-            _automaticAmmunitionThreshold =
-                Math.Clamp(
-                    _automaticAmmunitionThreshold + delta,
-                    0.0,
-                    1.0);
-        }
-    }
-
-    private void UpdateDesiredStockTarget(
-        InputState input,
-        PlayerActionSnapshot? actions)
-    {
-        if (ProductionMode !=
-                ProductionRequestMode.DesiredStock ||
-            actions?.Production is not
-                PlayerProductionFacilityActionReadModel facility ||
-            SelectedIndex < 0 ||
-            SelectedIndex >= facility.Recipes.Count)
-        {
-            _ = Pressed(input, PlatformKey.Left);
-            _ = Pressed(input, PlatformKey.Right);
-            return;
-        }
-
-        PlayerProductionRecipeActionReadModel recipe =
-            facility.Recipes[
-                SelectedIndex];
-
-        if (recipe.Outputs.Count == 0)
-        {
-            return;
-        }
-
-        double step =
-            recipe.Outputs[0].RequiredQuantity;
-        double minimum =
-            step;
-        double current =
-            ResolveDesiredStockQuantity(
-                recipe);
-
-        if (Pressed(input, PlatformKey.Left))
-        {
-            _desiredStockQuantity =
-                Math.Max(
-                    minimum,
-                    current - step);
-        }
-
-        if (Pressed(input, PlatformKey.Right))
-        {
-            _desiredStockQuantity =
-                current + step;
-        }
-    }
-
     private double ResolveDesiredStockQuantity(
         PlayerActionSnapshot? actions)
     {
@@ -1050,96 +796,321 @@ public sealed class PlayerActionPanelController
             output.RequiredQuantity * 5.0);
     }
 
-    private int GetRowCount(
-        PlayerActionSnapshot? actions) =>
-        Mode switch
-        {
-            PlayerActionPanelMode.Construction =>
-                actions?.Construction.Count ??
-                0,
-            PlayerActionPanelMode.Production =>
-                actions?.Production is
-                    PlayerProductionFacilityActionReadModel production
-                    ? production.Recipes.Count +
-                      production.Requests.Count
-                    : 0,
-            PlayerActionPanelMode.UnitProduction =>
-                actions?.UnitProduction is
-                    PlayerUnitProductionFacilityActionReadModel units
-                    ? units.Units.Count +
-                      units.Requests.Count
-                    : 0,
-            PlayerActionPanelMode.Logistics =>
-                actions?.Logistics?.Policies.Count ??
-                0,
-            PlayerActionPanelMode.Supply =>
-                actions?.Supply is null
-                    ? 0
-                    : 3,
-            PlayerActionPanelMode.Tactical =>
-                actions?.Tactical is null
-                    ? 0
-                    : 8,
-            _ =>
-                0
-        };
-
-    private static bool IsPointerInsidePanel(
-        Vector2 pointer,
-        in PlayerActionPanelView view,
-        int rowCount,
-        in GameplayHudLayout layout)
+    private void HandlePointerHit(
+        in PlayerActionDockHitTarget hit,
+        PlayerActionSnapshot? actions)
     {
-        float height =
-            MathF.Min(
-                MathF.Max(
-                    0.0f,
-                    layout.SafeArea.Bottom -
-                    view.OriginY),
-                layout.ActionRowStartOffset +
-                Math.Max(
-                    rowCount,
-                    1) *
-                layout.ActionRowHeight +
-                layout.ActionBottomPadding);
+        switch (hit.Kind)
+        {
+            case PlayerActionDockControlKind.Mode:
+                ToggleMode(
+                    hit.Mode);
+                break;
 
-        return pointer.X >= view.OriginX &&
-               pointer.X <=
-                   view.OriginX +
-                   layout.ActionDock.Width &&
-               pointer.Y >= view.OriginY &&
-               pointer.Y <=
-                   view.OriginY +
-                   Math.Max(
-                       height,
-                       layout.ActionRowStartOffset +
-                       layout.ActionRowHeight);
+            case PlayerActionDockControlKind.Item:
+                SelectedIndex =
+                    hit.ItemIndex;
+                _desiredStockQuantity = 0.0;
+                _stockResourceId = ResourceId.None;
+                SynchronizeStockEditor(
+                    actions);
+                SynchronizeSupplyEditor(
+                    actions);
+                ActivateSelected(
+                    actions);
+                break;
+
+            case PlayerActionDockControlKind.Activate:
+                ActivateSelected(
+                    actions);
+                break;
+
+            case PlayerActionDockControlKind.Cancel:
+                CancelSelected(
+                    actions);
+                break;
+
+            case PlayerActionDockControlKind.CyclePrimary:
+                CyclePrimarySetting(
+                    actions);
+                break;
+
+            case PlayerActionDockControlKind.CycleSecondary:
+                CycleSecondarySetting(
+                    actions);
+                break;
+
+            case PlayerActionDockControlKind.Decrease:
+                AdjustCurrentSetting(
+                    actions,
+                    -1);
+                break;
+
+            case PlayerActionDockControlKind.Increase:
+                AdjustCurrentSetting(
+                    actions,
+                    1);
+                break;
+        }
     }
 
-    private static bool TryResolvePointerRow(
-        Vector2 pointer,
-        in PlayerActionPanelView view,
-        int rowCount,
-        in GameplayHudLayout layout,
-        out int row)
+    private void CyclePrimarySetting(
+        PlayerActionSnapshot? actions)
     {
-        float y =
-            pointer.Y -
-            (view.OriginY +
-             layout.ActionRowStartOffset);
-
-        if (y < 0.0f)
+        if (Mode is
+            PlayerActionPanelMode.Production or
+            PlayerActionPanelMode.UnitProduction)
         {
-            row = -1;
-            return false;
+            Priority =
+                Priority switch
+                {
+                    ProductionPriority.Normal =>
+                        ProductionPriority.High,
+                    ProductionPriority.High =>
+                        ProductionPriority.Low,
+                    _ =>
+                        ProductionPriority.Normal
+                };
+            return;
         }
 
-        row =
-            (int)(y /
-                  layout.ActionRowHeight);
+        if (Mode ==
+            PlayerActionPanelMode.Logistics)
+        {
+            LogisticsPriority =
+                LogisticsPriority switch
+                {
+                    LogisticsStockPriority.Normal =>
+                        LogisticsStockPriority.High,
+                    LogisticsStockPriority.High =>
+                        LogisticsStockPriority.Critical,
+                    LogisticsStockPriority.Critical =>
+                        LogisticsStockPriority.Low,
+                    _ =>
+                        LogisticsStockPriority.Normal
+                };
+            return;
+        }
 
-        return row >= 0 &&
-               row < rowCount;
+        if (Mode ==
+            PlayerActionPanelMode.Supply)
+        {
+            _supplyPriority =
+                _supplyPriority switch
+                {
+                    BattlefieldSupplyPriority.Normal =>
+                        BattlefieldSupplyPriority.High,
+                    BattlefieldSupplyPriority.High =>
+                        BattlefieldSupplyPriority.Critical,
+                    BattlefieldSupplyPriority.Critical =>
+                        BattlefieldSupplyPriority.Low,
+                    _ =>
+                        BattlefieldSupplyPriority.Normal
+                };
+            QueueSupplyPriority(
+                actions);
+        }
+    }
+
+    private void CycleSecondarySetting(
+        PlayerActionSnapshot? actions)
+    {
+        if (Mode ==
+            PlayerActionPanelMode.Production)
+        {
+            ProductionMode =
+                ProductionMode switch
+                {
+                    ProductionRequestMode.OneShot =>
+                        ProductionRequestMode.Repeat,
+                    ProductionRequestMode.Repeat =>
+                        ProductionRequestMode.DesiredStock,
+                    _ =>
+                        ProductionRequestMode.OneShot
+                };
+            _desiredStockQuantity = 0.0;
+            return;
+        }
+
+        if (Mode ==
+            PlayerActionPanelMode.Logistics)
+        {
+            StockThresholdField =
+                StockThresholdField switch
+                {
+                    PlayerStockThresholdField.Minimum =>
+                        PlayerStockThresholdField.Target,
+                    PlayerStockThresholdField.Target =>
+                        PlayerStockThresholdField.Maximum,
+                    _ =>
+                        PlayerStockThresholdField.Minimum
+                };
+            return;
+        }
+
+        if (Mode ==
+            PlayerActionPanelMode.Supply)
+        {
+            _automaticResupplyEnabled =
+                !_automaticResupplyEnabled;
+            QueueAutomaticResupplyPolicy(
+                actions);
+        }
+    }
+
+    private void AdjustCurrentSetting(
+        PlayerActionSnapshot? actions,
+        int direction)
+    {
+        if (direction == 0)
+        {
+            return;
+        }
+
+        switch (Mode)
+        {
+            case PlayerActionPanelMode.Production:
+                AdjustDesiredStockTarget(
+                    actions,
+                    direction);
+                break;
+
+            case PlayerActionPanelMode.Logistics:
+                AdjustStockThreshold(
+                    actions,
+                    direction);
+                break;
+
+            case PlayerActionPanelMode.Supply:
+                AdjustSupplyThreshold(
+                    actions,
+                    direction);
+                break;
+        }
+    }
+
+    private void AdjustDesiredStockTarget(
+        PlayerActionSnapshot? actions,
+        int direction)
+    {
+        if (ProductionMode !=
+                ProductionRequestMode.DesiredStock ||
+            actions?.Production is not
+                PlayerProductionFacilityActionReadModel facility ||
+            SelectedIndex < 0 ||
+            SelectedIndex >= facility.Recipes.Count)
+        {
+            return;
+        }
+
+        PlayerProductionRecipeActionReadModel recipe =
+            facility.Recipes[
+                SelectedIndex];
+
+        if (recipe.Outputs.Count == 0)
+        {
+            return;
+        }
+
+        double step =
+            recipe.Outputs[0].RequiredQuantity;
+        double current =
+            ResolveDesiredStockQuantity(
+                recipe);
+
+        _desiredStockQuantity =
+            Math.Max(
+                step,
+                current +
+                direction *
+                step);
+    }
+
+    private void AdjustStockThreshold(
+        PlayerActionSnapshot? actions,
+        int direction)
+    {
+        if (actions?.Logistics is null ||
+            SelectedIndex < 0 ||
+            SelectedIndex >= actions.Logistics.Policies.Count)
+        {
+            return;
+        }
+
+        double step =
+            Math.Max(
+                1.0,
+                Math.Ceiling(
+                    _stockTarget *
+                    0.1));
+        double delta =
+            direction *
+            step;
+
+        switch (StockThresholdField)
+        {
+            case PlayerStockThresholdField.Minimum:
+                _stockMinimum =
+                    Math.Clamp(
+                        _stockMinimum + delta,
+                        0.0,
+                        _stockTarget);
+                break;
+
+            case PlayerStockThresholdField.Target:
+                _stockTarget =
+                    Math.Max(
+                        1.0,
+                        _stockTarget + delta);
+                _stockMinimum =
+                    Math.Min(
+                        _stockMinimum,
+                        _stockTarget);
+                _stockMaximum =
+                    Math.Max(
+                        _stockMaximum,
+                        _stockTarget);
+                break;
+
+            case PlayerStockThresholdField.Maximum:
+                _stockMaximum =
+                    Math.Max(
+                        _stockTarget,
+                        _stockMaximum + delta);
+                break;
+        }
+    }
+
+    private void AdjustSupplyThreshold(
+        PlayerActionSnapshot? actions,
+        int direction)
+    {
+        if (!actions?.Supply.HasValue == true ||
+            SelectedIndex > 1)
+        {
+            return;
+        }
+
+        double delta =
+            direction *
+            0.05;
+
+        if (SelectedIndex == 0)
+        {
+            _automaticFuelThreshold =
+                Math.Clamp(
+                    _automaticFuelThreshold + delta,
+                    0.0,
+                    1.0);
+        }
+        else
+        {
+            _automaticAmmunitionThreshold =
+                Math.Clamp(
+                    _automaticAmmunitionThreshold + delta,
+                    0.0,
+                    1.0);
+        }
     }
 
     private void SynchronizeSession(
