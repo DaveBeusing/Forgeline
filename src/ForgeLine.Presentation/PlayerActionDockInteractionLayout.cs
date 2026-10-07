@@ -459,7 +459,7 @@ internal static class PlayerActionDockInteractionLayout
                 PlayerActionPanelMode.Closed
         };
 
-    private static PlayerActionDockControlKind FooterControl(
+    public static PlayerActionDockControlKind FooterControl(
         int index) =>
         index switch
         {

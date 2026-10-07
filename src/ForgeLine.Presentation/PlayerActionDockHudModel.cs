@@ -734,14 +734,14 @@ internal static class PlayerActionDockHudModel
         {
             CargoTransportLifecycleState.Idle =>
                 "IDLE",
+            CargoTransportLifecycleState.ToOrigin =>
+                "TO ORIGIN",
             CargoTransportLifecycleState.Loading =>
                 "LOADING",
-            CargoTransportLifecycleState.TravelingToDestination =>
+            CargoTransportLifecycleState.ToDestination =>
                 "TRAVELING",
             CargoTransportLifecycleState.Unloading =>
                 "UNLOADING",
-            CargoTransportLifecycleState.Returning =>
-                "RETURNING",
             CargoTransportLifecycleState.Waiting =>
                 "WAITING",
             CargoTransportLifecycleState.Failed =>
@@ -768,6 +768,208 @@ internal static class PlayerActionDockHudModel
                 "BLOCKED",
             _ =>
                 "NONE"
+        };
+
+    public static string ResolveProductionBlockLabel(
+        ProductionBlockReason reason) =>
+        reason switch
+        {
+            ProductionBlockReason.None =>
+                string.Empty,
+            ProductionBlockReason.NoInput =>
+                "NO INPUT",
+            ProductionBlockReason.OutputFull =>
+                "OUTPUT FULL",
+            ProductionBlockReason.NoPower =>
+                "NO POWER",
+            ProductionBlockReason.Paused =>
+                "PAUSED",
+            ProductionBlockReason.DesiredStockReached =>
+                "TARGET REACHED",
+            ProductionBlockReason.UnsupportedRecipe =>
+                "UNSUPPORTED",
+            ProductionBlockReason.InvalidInventory =>
+                "INVENTORY",
+            _ =>
+                "BLOCKED"
+        };
+
+    public static string ResolveUnitProductionBlockLabel(
+        UnitProductionBlockReason reason) =>
+        reason switch
+        {
+            UnitProductionBlockReason.None =>
+                string.Empty,
+            UnitProductionBlockReason.NoInput =>
+                "NO INPUT",
+            UnitProductionBlockReason.NoPower =>
+                "NO POWER",
+            UnitProductionBlockReason.Paused =>
+                "PAUSED",
+            UnitProductionBlockReason.UnsupportedUnit =>
+                "UNSUPPORTED",
+            UnitProductionBlockReason.InvalidFacility =>
+                "INVALID FACILITY",
+            _ =>
+                "BLOCKED"
+        };
+
+    public static string ResolveTransportFailureLabel(
+        LogisticsTransportRequestFailureReason reason) =>
+        reason switch
+        {
+            LogisticsTransportRequestFailureReason.None =>
+                string.Empty,
+            LogisticsTransportRequestFailureReason.DestinationUnavailable =>
+                "DEST UNAVAILABLE",
+            LogisticsTransportRequestFailureReason.NoSourceSurplus =>
+                "NO SOURCE STOCK",
+            LogisticsTransportRequestFailureReason.NoRoute =>
+                "NO ROUTE",
+            LogisticsTransportRequestFailureReason.NoTruckAvailable =>
+                "NO TRUCK",
+            LogisticsTransportRequestFailureReason.ReservationFailed =>
+                "RESERVATION",
+            LogisticsTransportRequestFailureReason.AssignmentFailed =>
+                "ASSIGNMENT",
+            LogisticsTransportRequestFailureReason.TransportFailed =>
+                "TRANSPORT",
+            LogisticsTransportRequestFailureReason.RetryLimitReached =>
+                "RETRY LIMIT",
+            LogisticsTransportRequestFailureReason.CapacitySaturated =>
+                "CAPACITY",
+            LogisticsTransportRequestFailureReason.DestinationFull =>
+                "DEST FULL",
+            _ =>
+                "DISTRIBUTION"
+        };
+
+    public static string ResolveBottleneckLabel(
+        LogisticsBottleneckReason reason) =>
+        reason switch
+        {
+            LogisticsBottleneckReason.None =>
+                string.Empty,
+            LogisticsBottleneckReason.InsufficientSourceStock =>
+                "SOURCE STOCK",
+            LogisticsBottleneckReason.InsufficientTruckCapacity =>
+                "TRUCK CAPACITY",
+            LogisticsBottleneckReason.SaturatedLinkOrHub =>
+                "LINK SATURATED",
+            LogisticsBottleneckReason.DisconnectedRoute =>
+                "NO ROUTE",
+            LogisticsBottleneckReason.DestinationFull =>
+                "DEST FULL",
+            LogisticsBottleneckReason.DestinationUnavailable =>
+                "DEST UNAVAILABLE",
+            LogisticsBottleneckReason.TransportFailure =>
+                "TRANSPORT",
+            _ =>
+                "BOTTLENECK"
+        };
+
+    public static string ResolveCargoWaitLabel(
+        CargoTransportWaitReason reason) =>
+        reason switch
+        {
+            CargoTransportWaitReason.None =>
+                string.Empty,
+            CargoTransportWaitReason.OriginUnavailable =>
+                "ORIGIN UNAVAILABLE",
+            CargoTransportWaitReason.OriginResourceUnavailable =>
+                "SOURCE EMPTY",
+            CargoTransportWaitReason.RouteUnavailable =>
+                "NO ROUTE",
+            CargoTransportWaitReason.RouteInvalidated =>
+                "ROUTE INVALID",
+            CargoTransportWaitReason.DestinationUnavailable =>
+                "DEST UNAVAILABLE",
+            CargoTransportWaitReason.DestinationCapacity =>
+                "DEST FULL",
+            _ =>
+                "WAITING"
+        };
+
+    public static string ResolveCargoFailureLabel(
+        CargoTransportFailureReason reason) =>
+        reason switch
+        {
+            CargoTransportFailureReason.None =>
+                string.Empty,
+            CargoTransportFailureReason.InvalidTransport =>
+                "INVALID TRUCK",
+            CargoTransportFailureReason.InvalidOrigin =>
+                "INVALID ORIGIN",
+            CargoTransportFailureReason.InvalidDestination =>
+                "INVALID DEST",
+            CargoTransportFailureReason.InvalidRouteAnchor =>
+                "ROUTE ANCHOR",
+            CargoTransportFailureReason.CargoInventoryUnavailable =>
+                "CARGO INVENTORY",
+            CargoTransportFailureReason.SourceInventoryUnavailable =>
+                "SOURCE INVENTORY",
+            CargoTransportFailureReason.DestinationInventoryUnavailable =>
+                "DEST INVENTORY",
+            CargoTransportFailureReason.CargoCapacityInsufficient =>
+                "NO CAPACITY",
+            CargoTransportFailureReason.TransferFailed =>
+                "TRANSFER",
+            CargoTransportFailureReason.NavigationFailed =>
+                "NAVIGATION",
+            _ =>
+                "TRANSPORT"
+        };
+
+    public static string ResolvePriorityLabel(
+        ProductionPriority priority) =>
+        priority switch
+        {
+            ProductionPriority.High =>
+                "HIGH",
+            ProductionPriority.Low =>
+                "LOW",
+            _ =>
+                "NORMAL"
+        };
+
+    public static string ResolveLogisticsPriorityLabel(
+        LogisticsStockPriority priority) =>
+        priority switch
+        {
+            LogisticsStockPriority.Critical =>
+                "CRITICAL",
+            LogisticsStockPriority.High =>
+                "HIGH",
+            LogisticsStockPriority.Low =>
+                "LOW",
+            _ =>
+                "NORMAL"
+        };
+
+    public static string ResolveSupplyPriorityLabel(
+        BattlefieldSupplyPriority priority) =>
+        priority switch
+        {
+            BattlefieldSupplyPriority.Critical =>
+                "CRITICAL",
+            BattlefieldSupplyPriority.High =>
+                "HIGH",
+            BattlefieldSupplyPriority.Low =>
+                "LOW",
+            _ =>
+                "NORMAL"
+        };
+
+    public static string ResolveProductionModeLabel(
+        ProductionRequestMode mode) =>
+        mode switch
+        {
+            ProductionRequestMode.Repeat =>
+                "REPEAT",
+            ProductionRequestMode.DesiredStock =>
+                "STOCK",
+            _ =>
+                "ONCE"
         };
 
     private static PlayerActionDockItemState ResolveTacticalItemState(
