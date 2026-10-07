@@ -33,7 +33,8 @@ internal sealed class RtsInformationHudSurface : IGameplayHudSurface
             context.InformationLayer,
             context.CombatGroups,
             context.Dpi,
-            context.UiScale);
+            context.UiScale,
+            context.PreAlphaUx);
     }
 
     public void Dispose() =>

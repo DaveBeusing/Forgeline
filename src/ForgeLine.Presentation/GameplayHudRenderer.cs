@@ -29,9 +29,7 @@ public sealed class GameplayHudRenderer : IDisposable
                 runtimeAssets),
             new RtsInformationHudSurface(
                 graphics,
-                runtimeAssets),
-            new GameplayHudLegacyTextSurface(
-                graphics)
+                runtimeAssets)
         ];
     }
 

@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Game;
 using ForgeLine.Simulation;
 using Xunit;
 
@@ -136,6 +137,35 @@ public sealed class GameplayHudFoundationTests
         Assert.NotEqual(
             selected.Fill,
             disabled.Fill);
+    }
+
+    [Theory]
+    [InlineData(PlayerMatchStatus.Victory, "VICTORY")]
+    [InlineData(PlayerMatchStatus.Defeat, "DEFEAT")]
+    [InlineData(PlayerMatchStatus.Draw, "DRAW")]
+    public void SystemOverlayUsesExplicitMatchResultText(
+        PlayerMatchStatus status,
+        string expected)
+    {
+        Assert.Equal(
+            expected,
+            PlayerSystemHudModel.ResolveMatchResultLabel(
+                status));
+    }
+
+    [Fact]
+    public void HelpIncludesTechnologyAndObjectiveWithoutColorDependence()
+    {
+        Assert.Contains(
+            "H TECHNOLOGY",
+            PlayerSystemHudModel.GetHelpLine(
+                2),
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "OBJECTIVE",
+            PlayerSystemHudModel.GetHelpLine(
+                PlayerSystemHudModel.HelpLineCount - 1),
+            StringComparison.Ordinal);
     }
 
     [Fact]

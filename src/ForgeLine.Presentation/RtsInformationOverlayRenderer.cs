@@ -51,7 +51,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         in RtsInformationLayerView view,
         CombatGroupOverviewView combatGroups,
         uint dpi,
-        float uiScale = 1.0f)
+        float uiScale = 1.0f,
+        PreAlphaUxView preAlphaUx = default)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(context);
@@ -101,6 +102,12 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             combatGroups,
             layout.SecondaryView,
             scale,
+            context.Width,
+            context.Height);
+        EmitSystemOverlay(
+            snapshot.PlayerExperience,
+            preAlphaUx,
+            layout,
             context.Width,
             context.Height);
 
@@ -210,11 +217,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 6.0f,
             layout.Minimap.Height +
                 6.0f,
-            new Vector4(
-                0.62f,
-                0.66f,
-                0.62f,
-                1.0f),
+            GameplayHudVisualStyle.Border,
             width,
             height);
 
@@ -846,6 +849,269 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             height);
     }
 
+    private void EmitSystemOverlay(
+        PlayerExperienceSnapshot? experience,
+        in PreAlphaUxView view,
+        in GameplayHudLayout layout,
+        int width,
+        int height)
+    {
+        if (experience.HasValue &&
+            experience.Value.IsMatchComplete)
+        {
+            EmitTerminalOverlay(
+                experience.Value,
+                layout,
+                width,
+                height);
+            return;
+        }
+
+        switch (view.Mode)
+        {
+            case PreAlphaUxMode.MatchSetup:
+                EmitSystemPanel(
+                    "MATCH SETUP",
+                    "ENTER START  ESC EXIT",
+                    "F12 CONTROLS",
+                    layout,
+                    width,
+                    height);
+                break;
+
+            case PreAlphaUxMode.Paused:
+                EmitSystemPanel(
+                    "PAUSED",
+                    "ESC OR SPACE RESUME",
+                    "F12 CONTROLS",
+                    layout,
+                    width,
+                    height);
+                break;
+
+            case PreAlphaUxMode.Help:
+                EmitHelpPanel(
+                    layout,
+                    width,
+                    height);
+                break;
+
+            default:
+                if (view.ShowOnboarding)
+                {
+                    EmitOnboardingHint(
+                        layout,
+                        width,
+                        height);
+                }
+
+                break;
+        }
+    }
+
+    private void EmitTerminalOverlay(
+        in PlayerExperienceSnapshot experience,
+        in GameplayHudLayout layout,
+        int width,
+        int height)
+    {
+        string result =
+            PlayerSystemHudModel.ResolveMatchResultLabel(
+                experience.MatchStatus);
+        EmitSystemPanel(
+            result,
+            "R RESTART  ESC RETURN",
+            "MATCH COMPLETE",
+            layout,
+            width,
+            height);
+    }
+
+    private void EmitSystemPanel(
+        string title,
+        string primary,
+        string secondary,
+        in GameplayHudLayout layout,
+        int width,
+        int height)
+    {
+        float scale =
+            layout.Scale;
+        float panelWidth =
+            MathF.Min(
+                480.0f * scale,
+                layout.SafeArea.Width);
+        float panelHeight =
+            MathF.Min(
+                112.0f * scale,
+                layout.SafeArea.Height);
+        float x =
+            layout.SafeArea.X +
+            MathF.Max(
+                0.0f,
+                (layout.SafeArea.Width -
+                 panelWidth) *
+                0.5f);
+        float y =
+            layout.SafeArea.Y +
+            MathF.Max(
+                0.0f,
+                layout.SafeArea.Height *
+                0.24f);
+
+        EmitQuad(
+            x,
+            y,
+            panelWidth,
+            panelHeight,
+            GameplayHudVisualStyle.PanelBackground,
+            width,
+            height);
+        EmitQuad(
+            x,
+            y,
+            GameplayHudVisualStyle.StateRailThickness *
+            scale,
+            panelHeight,
+            GameplayHudVisualStyle.Focus,
+            width,
+            height);
+        EmitText(
+            title,
+            x + 18.0f * scale,
+            y + 16.0f * scale,
+            x + panelWidth - 12.0f * scale,
+            GameplayHudVisualStyle.TextPrimary,
+            scale,
+            width,
+            height);
+        EmitText(
+            primary,
+            x + 18.0f * scale,
+            y + 46.0f * scale,
+            x + panelWidth - 12.0f * scale,
+            GameplayHudVisualStyle.TextPrimary,
+            scale * 0.78f,
+            width,
+            height);
+        EmitText(
+            secondary,
+            x + 18.0f * scale,
+            y + 68.0f * scale,
+            x + panelWidth - 12.0f * scale,
+            GameplayHudVisualStyle.TextSecondary,
+            scale * 0.72f,
+            width,
+            height);
+    }
+
+    private void EmitHelpPanel(
+        in GameplayHudLayout layout,
+        int width,
+        int height)
+    {
+        float scale =
+            layout.Scale;
+        float panelWidth =
+            MathF.Min(
+                720.0f * scale,
+                layout.SafeArea.Width);
+        float panelHeight =
+            MathF.Min(
+                250.0f * scale,
+                layout.SafeArea.Height);
+        float x =
+            layout.SafeArea.X +
+            MathF.Max(
+                0.0f,
+                (layout.SafeArea.Width -
+                 panelWidth) *
+                0.5f);
+        float y =
+            layout.SafeArea.Y +
+            MathF.Max(
+                0.0f,
+                (layout.SafeArea.Height -
+                 panelHeight) *
+                0.18f);
+
+        EmitQuad(
+            x,
+            y,
+            panelWidth,
+            panelHeight,
+            GameplayHudVisualStyle.PanelBackground,
+            width,
+            height);
+        EmitQuad(
+            x,
+            y,
+            panelWidth,
+            GameplayHudVisualStyle.BorderThickness *
+            scale,
+            GameplayHudVisualStyle.Focus,
+            width,
+            height);
+
+        EmitText(
+            "CONTROLS",
+            x + 16.0f * scale,
+            y + 14.0f * scale,
+            x + panelWidth - 12.0f * scale,
+            GameplayHudVisualStyle.TextPrimary,
+            scale,
+            width,
+            height);
+
+        for (int index = 0;
+             index < PlayerSystemHudModel.HelpLineCount;
+             index++)
+        {
+            EmitText(
+                PlayerSystemHudModel.GetHelpLine(
+                    index),
+                x + 16.0f * scale,
+                y + (44.0f + index * 24.0f) * scale,
+                x + panelWidth - 12.0f * scale,
+                GameplayHudVisualStyle.TextSecondary,
+                scale * 0.72f,
+                width,
+                height);
+        }
+    }
+
+    private void EmitOnboardingHint(
+        in GameplayHudLayout layout,
+        int width,
+        int height)
+    {
+        float scale =
+            layout.Scale;
+        string hint =
+            PlayerSystemHudModel.OnboardingHint;
+        float x =
+            layout.SafeArea.X +
+            GameplayHudVisualStyle.CompactPadding *
+            scale;
+        float y =
+            MathF.Max(
+                layout.TopStatusBar.Bottom +
+                GameplayHudVisualStyle.CompactGap *
+                scale,
+                layout.SafeArea.Bottom -
+                18.0f * scale);
+
+        EmitText(
+            hint,
+            x,
+            y,
+            layout.SafeArea.Right,
+            GameplayHudVisualStyle.TextSecondary,
+            scale * 0.68f,
+            width,
+            height);
+    }
+
     private void EmitCombatGroupOverview(
         CombatGroupOverviewView overview,
         in HudRect region,
@@ -916,11 +1182,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             MathF.Min(
                 region.Height,
                 panelHeight),
-            new Vector4(
-                0.055f,
-                0.065f,
-                0.065f,
-                0.96f),
+            GameplayHudVisualStyle.PanelBackground,
             width,
             height);
 
@@ -1003,11 +1265,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 rowHeight -
                     2.0f *
                     scale,
-                new Vector4(
-                    0.075f,
-                    0.09f,
-                    0.09f,
-                    0.96f),
+                GameplayHudVisualStyle.PanelRaised,
                 width,
                 height);
             EmitQuad(
