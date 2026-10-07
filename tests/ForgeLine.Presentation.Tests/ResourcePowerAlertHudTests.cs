@@ -40,8 +40,8 @@ public sealed class ResourcePowerAlertHudTests
         ];
 
         Assert.Equal(
-            expectedIcons.Length,
-            ResourcePowerHudModel.AuthoritativeResourceCount);
+            ResourcePowerHudModel.AuthoritativeResourceCount,
+            expectedIcons.Length);
 
         for (int index = 0;
              index < expectedIcons.Length;
