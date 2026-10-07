@@ -315,14 +315,14 @@ internal static class StrategicOverlaySnapshotFactory
         PresentationExtractionContext extraction,
         StrategicLogisticsNodeReadModel[] localNodes)
     {
-        if (localNodes.Count == 0)
+        if (localNodes.Length == 0)
         {
             return [];
         }
 
         var positions =
             new Dictionary<LogisticsNodeId, Vector3>(
-                localNodes.Count);
+                localNodes.Length);
         IReadOnlyList<LogisticsNode> nodes =
             extraction.Scenario.Logistics.GetNodes();
 
@@ -335,7 +335,7 @@ internal static class StrategicOverlaySnapshotFactory
 
             for (int localIndex = 0;
                  localIndex <
-                     localNodes.Count;
+                     localNodes.Length;
                  localIndex++)
             {
                 if (localNodes[
