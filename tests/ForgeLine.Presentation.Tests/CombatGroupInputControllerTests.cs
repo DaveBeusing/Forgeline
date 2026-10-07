@@ -241,6 +241,61 @@ public sealed class CombatGroupInputControllerTests
                 4));
     }
 
+    [Fact]
+    public void ShiftDigitDoesNotRecallOrModifyAssignedGroup()
+    {
+        EntityId first =
+            new(50, 1);
+        EntityId second =
+            new(51, 1);
+        PresentationSnapshot snapshot =
+            Snapshot(
+                new SimulationSessionId(6),
+                [first, second]);
+        var registry =
+            new CombatGroupRegistry();
+        var selection =
+            new SelectionSet();
+        var controller =
+            new CombatGroupInputController();
+        var input =
+            new InputState();
+
+        registry.Synchronize(
+            snapshot.SessionId,
+            snapshot.CombatGroups!.EligibleEntities);
+        registry.Assign(
+            5,
+            [first, second],
+            snapshot.CombatGroups.EligibleEntities);
+        selection.SetSingle(
+            first);
+
+        KeyDown(
+            input,
+            PlatformKey.LeftShift);
+        KeyDown(
+            input,
+            PlatformKey.D5);
+
+        CombatGroupInputResult result =
+            controller.Update(
+                input,
+                snapshot,
+                registry,
+                selection);
+
+        Assert.False(
+            result.Handled);
+        Assert.Equal(
+            new[] { first },
+            selection.ToArray());
+        Assert.Equal(
+            new[] { first, second },
+            registry.GetValidMembers(
+                5));
+    }
+
     [Theory]
     [InlineData(0, PlatformKey.D0)]
     [InlineData(1, PlatformKey.D1)]

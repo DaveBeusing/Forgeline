@@ -175,6 +175,53 @@ public sealed class CombatGroupOverviewModelTests
     }
 
     [Fact]
+    public void PartialSelectionDoesNotReportGroupAsSelected()
+    {
+        EntityId first =
+            new(25, 1);
+        EntityId second =
+            new(26, 1);
+        var operational =
+            new CombatGroupOperationalSnapshot(
+                new SimulationTick(6),
+                [
+                    Member(
+                        first),
+                    Member(
+                        second)
+                ]);
+        var registry =
+            new CombatGroupRegistry();
+        var selection =
+            new SelectionSet();
+
+        registry.Synchronize(
+            new SimulationSessionId(4),
+            operational.EligibleEntities);
+        registry.Assign(
+            4,
+            [first, second],
+            operational.EligibleEntities);
+        selection.SetSingle(
+            first);
+
+        CombatGroupSummaryReadModel summary =
+            CombatGroupOverviewModel.Create(
+                    registry,
+                    operational,
+                    selection)
+                .Groups[4];
+
+        Assert.True(
+            summary.IsActive);
+        Assert.False(
+            summary.IsSelected);
+        Assert.Equal(
+            2,
+            summary.MemberCount);
+    }
+
+    [Fact]
     public void MissingRuntimeFactsRemainExplicitlyUnavailable()
     {
         EntityId entity =

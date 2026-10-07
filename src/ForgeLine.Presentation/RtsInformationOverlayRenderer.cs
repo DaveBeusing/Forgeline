@@ -955,6 +955,12 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             headerHeight +
             padding;
         int rendered = 0;
+        Span<char> primaryBuffer =
+            stackalloc char[96];
+        Span<char> statusBuffer =
+            stackalloc char[128];
+        Span<char> contextBuffer =
+            stackalloc char[96];
 
         for (int index = 0;
              index < overview.Groups.Count &&
@@ -1017,8 +1023,6 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 width,
                 height);
 
-            Span<char> primaryBuffer =
-                stackalloc char[96];
             var primary =
                 new HudTextBuilder(
                     primaryBuffer);
@@ -1054,8 +1058,6 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 width,
                 height);
 
-            Span<char> statusBuffer =
-                stackalloc char[128];
             var status =
                 new HudTextBuilder(
                     statusBuffer);
@@ -1120,8 +1122,6 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 width,
                 height);
 
-            Span<char> contextBuffer =
-                stackalloc char[96];
             var context =
                 new HudTextBuilder(
                     contextBuffer);
