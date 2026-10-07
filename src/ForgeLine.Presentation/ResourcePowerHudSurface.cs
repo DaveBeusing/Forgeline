@@ -124,6 +124,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             0.69f,
             1.0f);
 
+    private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers =
         new(4);
@@ -139,7 +140,9 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         IGraphicsDevice graphics,
         RuntimeAssetCatalog? runtimeAssets)
     {
-        ArgumentNullException.ThrowIfNull(graphics);
+        _graphics =
+            graphics ??
+            throw new ArgumentNullException(nameof(graphics));
 
         _pipeline =
             CreatePipeline(
@@ -189,7 +192,6 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
 
         IGraphicsBuffer vertexBuffer =
             GetFrameVertexBuffer(
-                graphics,
                 graphics.FrameIndex);
         vertexBuffer.SetData<OverlayVertex>(
             _vertices.AsSpan(
@@ -749,7 +751,6 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
     }
 
     private IGraphicsBuffer GetFrameVertexBuffer(
-        IGraphicsCommandContext graphics,
         int frameIndex)
     {
         if (_vertexBuffers.TryGetValue(
@@ -759,17 +760,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             return buffer;
         }
 
-        IGraphicsDevice? device =
-            graphics.Device;
-
-        if (device is null)
-        {
-            throw new InvalidOperationException(
-                "The HUD graphics context does not expose its owning device.");
-        }
-
         buffer =
-            device.CreateBuffer(
+            _graphics.CreateBuffer(
                 new GraphicsBufferDescription(
                     checked(
                         (ulong)_vertices.Length *
