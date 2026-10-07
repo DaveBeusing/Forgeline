@@ -370,7 +370,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                 layout);
         float x =
             header.X +
-            7.0f *
+            GameplayHudVisualStyle.PanelPadding *
             _scale;
         float y =
             header.Y +
@@ -1151,6 +1151,20 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
 
         switch (visual.Pattern)
         {
+            case HudStatePattern.Underline:
+                EmitQuad(
+                    rect.X,
+                    rect.Bottom -
+                        GameplayHudVisualStyle.StateRailThickness *
+                        _scale,
+                    rect.Width,
+                    GameplayHudVisualStyle.StateRailThickness *
+                    _scale,
+                    visual.Border,
+                    width,
+                    height);
+                break;
+
             case HudStatePattern.LeftRail:
                 EmitQuad(
                     rect.X,

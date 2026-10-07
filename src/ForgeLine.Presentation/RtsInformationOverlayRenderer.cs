@@ -1088,15 +1088,25 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             layout.Scale;
         string hint =
             PlayerSystemHudModel.OnboardingHint;
-        float x =
-            layout.SafeArea.X +
-            GameplayHudVisualStyle.CompactPadding *
+        float gap =
+            GameplayHudVisualStyle.CompactGap *
             scale;
+        float x =
+            layout.SelectionInspector.Right +
+            gap;
+        float right =
+            layout.Minimap.X -
+            gap;
+
+        if (right <= x)
+        {
+            return;
+        }
+
         float y =
             MathF.Max(
                 layout.TopStatusBar.Bottom +
-                GameplayHudVisualStyle.CompactGap *
-                scale,
+                gap,
                 layout.SafeArea.Bottom -
                 18.0f * scale);
 
@@ -1104,7 +1114,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             hint,
             x,
             y,
-            layout.SafeArea.Right,
+            right,
             GameplayHudVisualStyle.TextSecondary,
             scale * 0.68f,
             width,

@@ -97,7 +97,7 @@ internal static class GameplayHudVisualStyle
             return new HudStateVisual(
                 PanelPressed,
                 Focus,
-                HudStatePattern.Outline);
+                HudStatePattern.Underline);
         }
 
         if (selected)

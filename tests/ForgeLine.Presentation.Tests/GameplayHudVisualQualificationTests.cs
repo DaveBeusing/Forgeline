@@ -200,7 +200,7 @@ public sealed class GameplayHudVisualQualificationTests
             HudStatePattern.Outline,
             hovered.Pattern);
         Assert.Equal(
-            HudStatePattern.Outline,
+            HudStatePattern.Underline,
             pressed.Pattern);
         Assert.Equal(
             HudStatePattern.LeftRail,

@@ -134,6 +134,13 @@ public sealed class GameplayHudFoundationTests
         Assert.Equal(
             HudStatePattern.DoubleRail,
             disabled.Pattern);
+        Assert.Equal(
+            HudStatePattern.Underline,
+            GameplayHudVisualStyle.ResolveItemState(
+                selected: false,
+                hovered: true,
+                pressed: true,
+                enabled: true).Pattern);
         Assert.NotEqual(
             selected.Fill,
             disabled.Fill);

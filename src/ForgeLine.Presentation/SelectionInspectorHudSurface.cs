@@ -563,7 +563,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
                 4.0f *
                 _scale,
             barWidth,
-            5.0f *
+            GameplayHudVisualStyle.ProgressBarThickness *
                 _scale,
             fraction,
             ResolveColor(
