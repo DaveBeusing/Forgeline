@@ -210,6 +210,27 @@ Recovery-aware Retreat uses this same group path. `RetreatToRecovery` resolves o
 
 The Simulation benchmark host contains `FormationRoutingBenchmarks`, comparing 10/50/100 independent strategic path searches with one shared formation route. Benchmark timing remains observational and is not a hardware-sensitive CI gate.
 
+## Player combat groups
+
+Persistent player combat groups are **client/presentation organizational state**, not simulation-owned movement or combat-group entities. `CombatGroupRegistry` owns ten session-scoped slots for the local player and stores full-generation `EntityId` values only. A session replacement clears all assignments, labels, and the active slot.
+
+This is intentionally separate from simulation-owned `MovementGroup`, `CombatGroupMember`, and `CombatGroupIntent` state. Those simulation types are transient execution structures created by real movement/tactical commands. A player control group does not become a new ECS entity, does not grant buffs, and does not own formation, readiness, supply, or combat behavior.
+
+The registry synchronizes against the completed-tick `CombatGroupOperationalSnapshot`. Only locally owned selectable Unit/Logistics entities copied into that snapshot are eligible. Destroyed entities, invalid entities, foreign entities, and stale entity generations are removed deterministically. Reuse of the same entity index with a new generation does not recreate group membership.
+
+Default controls follow standard RTS conventions without replacing existing bindings:
+
+- `Ctrl+0..9`: assign the current owned selection to a slot;
+- `0..9`: recall the slot into the existing `SelectionSet`;
+- `Ctrl+Shift+0..9`: clear the slot;
+- `Shift+0..9`: intentionally performs no combat-group action.
+
+Recall changes only the existing presentation selection. Subsequent movement, formation, action-dock, tactical, and minimap commands therefore continue through the same existing request/command path and per-unit validation. Combat groups do not submit commands directly.
+
+The operational summary is derived from immutable completed-tick member data. It may aggregate Health, Combat Readiness Strength/Overall Readiness, Battlefield Supply, Fuel, Ammunition, current formation, and common/mixed tactical order state. Maintenance is **not** shown because there is currently no authoritative per-unit runtime Maintenance value to copy.
+
+The production HUD uses the `SecondaryView` region for a compact overview of assigned groups. Active and exactly selected groups are visually distinct, and the minimap brackets members of the active group using the existing selected-group semantic without exposing enemy information.
+
 ## Current Boundaries
 
 The current system deliberately does not include:
