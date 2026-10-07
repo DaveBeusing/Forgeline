@@ -301,6 +301,8 @@ internal sealed class ClientApplication
             new RtsTacticalTargetingController();
         var informationLayer =
             new RtsInformationLayerController();
+        var minimapInteraction =
+            new RtsMinimapInteractionController();
         var debugOverlay =
             new DebugOverlayController();
         var gameplayDraw =
@@ -932,10 +934,78 @@ internal sealed class ClientApplication
             hudInteraction.CaptureKeyboard(
                 actionPanel.HasKeyboardFocus);
 
+            GameplayHudLayout interactionLayout =
+                GameplayHudLayout.Create(
+                    window.ClientSize.Width,
+                    window.ClientSize.Height,
+                    window.Dpi,
+                    _settings.UiScale);
+            minimapInteraction.Update(
+                inputState,
+                camera,
+                terrainWorld,
+                inputSnapshot,
+                interactionLayout,
+                selectionController.Selection.Entities,
+                tacticalTargetingController.Mode,
+                activeFormation,
+                inputBlocked:
+                    hudInteraction.PointerCaptured ||
+                    hudInteraction.KeyboardCaptured);
+            hudInteraction.CapturePointer(
+                minimapInteraction.PointerCaptured);
+
+            if (minimapInteraction.TryTakeMovementRequest(
+                    out MovementOrderRequest minimapMovement))
+            {
+                EntityId[] movementEntities =
+                    minimapMovement.Entities.ToArray();
+                SimulationTick observedTick =
+                    inputSnapshot?.Tick ??
+                    SimulationTick.Zero;
+
+                RequireSubmission(
+                    simulationHost,
+                    gateway =>
+                        gateway.SubmitMovement(
+                            LocalPlayer,
+                            movementEntities,
+                            minimapMovement.WorldTarget,
+                            observedTick,
+                            activeFormation));
+            }
+
+            if (minimapInteraction.TryTakeActionRequest(
+                    out PlayerActionRequest minimapAction))
+            {
+                DispatchPlayerActionRequest(
+                    minimapAction,
+                    simulationHost,
+                    buildingPlacementController,
+                    tacticalTargetingController,
+                    presentationInteraction,
+                    inputSnapshot?.Tick ??
+                        SimulationTick.Zero);
+                tacticalTargetingController.Cancel();
+            }
+
             if (!hudInteraction.KeyboardCaptured)
             {
                 RtsCameraInputFrame cameraInput =
                     actionMapper.Map(inputState);
+
+                if (hudInteraction.PointerCaptured)
+                {
+                    cameraInput =
+                        cameraInput with
+                        {
+                            DragPan = false,
+                            HasPointerPosition = false,
+                            PointerDelta =
+                                Vector2.Zero
+                        };
+                }
+
                 camera.Update(
                     cameraInput,
                     cameraDeltaSeconds,
@@ -1129,8 +1199,10 @@ internal sealed class ClientApplication
                 buildingPlacementController.Preview?.IsValid ==
                     true;
             RtsCursorKind cursor =
-                RtsCursorResolver.Resolve(
-                    new RtsCursorContext(
+                minimapInteraction.PointerCaptured
+                    ? minimapInteraction.View.Cursor
+                    : RtsCursorResolver.Resolve(
+                        new RtsCursorContext(
                         inputState.HasPointerPosition,
                         selectionController.IsDragSelecting,
                         inputState.IsMouseButtonDown(
