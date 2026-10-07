@@ -150,23 +150,11 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
     private const float GlyphAdvance = 6.6f;
 
     private static readonly Vector4 PanelColor =
-        new(
-            0.055f,
-            0.065f,
-            0.065f,
-            0.97f);
+        GameplayHudVisualStyle.PanelBackground;
     private static readonly Vector4 TextColor =
-        new(
-            0.92f,
-            0.95f,
-            0.94f,
-            1.0f);
+        GameplayHudVisualStyle.TextPrimary;
     private static readonly Vector4 MutedTextColor =
-        new(
-            0.66f,
-            0.71f,
-            0.70f,
-            1.0f);
+        GameplayHudVisualStyle.TextSecondary;
 
     private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;
@@ -280,10 +268,10 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         int height)
     {
         float padding =
-            7.0f *
+            GameplayHudVisualStyle.PanelPadding *
             _scale;
         float iconSize =
-            18.0f *
+            GameplayHudVisualStyle.PrimaryIconSize *
             _scale;
         float x =
             region.X +

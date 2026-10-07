@@ -208,29 +208,13 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
     private const float GlyphAdvance = 7.5f;
 
     private static readonly Vector4 PanelColor =
-        new(
-            0.055f,
-            0.065f,
-            0.065f,
-            0.96f);
+        GameplayHudVisualStyle.PanelBackground;
     private static readonly Vector4 DividerColor =
-        new(
-            0.32f,
-            0.35f,
-            0.34f,
-            0.90f);
+        GameplayHudVisualStyle.Border;
     private static readonly Vector4 TextColor =
-        new(
-            0.92f,
-            0.95f,
-            0.94f,
-            1.0f);
+        GameplayHudVisualStyle.TextPrimary;
     private static readonly Vector4 MutedTextColor =
-        new(
-            0.66f,
-            0.70f,
-            0.69f,
-            1.0f);
+        GameplayHudVisualStyle.TextSecondary;
 
     private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;

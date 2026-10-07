@@ -117,17 +117,21 @@ public sealed class GameplayHudFoundationTests
         HudStateVisual selected =
             GameplayHudVisualStyle.ResolveItemState(
                 selected: true,
+                hovered: false,
+                pressed: false,
                 enabled: true);
         HudStateVisual disabled =
             GameplayHudVisualStyle.ResolveItemState(
                 selected: false,
+                hovered: false,
+                pressed: false,
                 enabled: false);
 
         Assert.Equal(
             HudStatePattern.LeftRail,
             selected.Pattern);
         Assert.Equal(
-            HudStatePattern.Cross,
+            HudStatePattern.DoubleRail,
             disabled.Pattern);
         Assert.NotEqual(
             selected.Fill,

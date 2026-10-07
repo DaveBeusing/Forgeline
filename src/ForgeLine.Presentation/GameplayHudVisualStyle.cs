@@ -8,7 +8,7 @@ internal enum HudStatePattern : byte
     Underline = 1,
     LeftRail = 2,
     Outline = 3,
-    Cross = 4
+    DoubleRail = 4
 }
 
 internal readonly record struct HudStateVisual(
@@ -46,6 +46,12 @@ internal static class GameplayHudVisualStyle
     public static readonly Vector4 PanelSelected =
         new(0.12f, 0.18f, 0.19f, 0.98f);
 
+    public static readonly Vector4 PanelHovered =
+        new(0.09f, 0.12f, 0.12f, 0.98f);
+
+    public static readonly Vector4 PanelPressed =
+        new(0.10f, 0.15f, 0.16f, 0.98f);
+
     public static readonly Vector4 PanelDisabled =
         new(0.055f, 0.06f, 0.06f, 0.88f);
 
@@ -74,6 +80,8 @@ internal static class GameplayHudVisualStyle
 
     public static HudStateVisual ResolveItemState(
         bool selected,
+        bool hovered,
+        bool pressed,
         bool enabled)
     {
         if (!enabled)
@@ -81,7 +89,15 @@ internal static class GameplayHudVisualStyle
             return new HudStateVisual(
                 PanelDisabled,
                 Border,
-                HudStatePattern.Cross);
+                HudStatePattern.DoubleRail);
+        }
+
+        if (pressed)
+        {
+            return new HudStateVisual(
+                PanelPressed,
+                Focus,
+                HudStatePattern.Outline);
         }
 
         if (selected)
@@ -90,6 +106,14 @@ internal static class GameplayHudVisualStyle
                 PanelSelected,
                 Focus,
                 HudStatePattern.LeftRail);
+        }
+
+        if (hovered)
+        {
+            return new HudStateVisual(
+                PanelHovered,
+                Border,
+                HudStatePattern.Outline);
         }
 
         return new HudStateVisual(
