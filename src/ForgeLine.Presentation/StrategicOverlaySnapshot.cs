@@ -313,7 +313,7 @@ internal static class StrategicOverlaySnapshotFactory
 
     private static StrategicLogisticsLinkReadModel[] CaptureLogisticsLinks(
         PresentationExtractionContext extraction,
-        IReadOnlyList<StrategicLogisticsNodeReadModel> localNodes)
+        StrategicLogisticsNodeReadModel[] localNodes)
     {
         if (localNodes.Count == 0)
         {

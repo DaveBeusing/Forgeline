@@ -335,17 +335,19 @@ internal sealed class RtsMinimapInteractionController
             pointerInHud ||
             _cameraDragging;
 
+        Vector3 flatTarget = default;
+        float terrainHeight = 0.0f;
         bool hasWorldTarget =
             pointerInMap &&
             RtsMinimapInteractionLayout.TryMapPointerToWorld(
                 input.PointerPosition,
                 layout,
                 terrain.WorldBounds,
-                out Vector3 flatTarget) &&
+                out flatTarget) &&
             terrain.TrySampleHeight(
                 flatTarget.X,
                 flatTarget.Z,
-                out float terrainHeight);
+                out terrainHeight);
         Vector3 worldTarget =
             hasWorldTarget
                 ? new Vector3(
