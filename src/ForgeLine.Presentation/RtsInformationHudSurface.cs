@@ -30,7 +30,7 @@ internal sealed class RtsInformationHudSurface : IGameplayHudSurface
             context.Snapshot,
             context.WorldBounds,
             context.InformationLayer,
-            context.CombatGroups.ActiveMembers,
+            context.CombatGroups,
             context.Dpi,
             context.UiScale);
     }
