@@ -37,6 +37,21 @@ internal static class ResourcePowerHudModel
                    CommandFeedbackLifetimeTicks;
     }
 
+    public static string ResolvePowerStateLabel(
+        in PlayerPowerSummary power) =>
+        power.IsConstrained
+            ? "CONSTRAINED"
+            : "STABLE";
+
+    public static int ResolveNotificationCount(
+        in PlayerExperienceSnapshot experience) =>
+        CountActiveAlerts(
+            experience.Alerts) +
+        (IsCommandFeedbackVisible(
+            experience)
+            ? 1
+            : 0);
+
     public static HudAlertSeverity ResolveAlertSeverity(
         PlayerAlertState alert) =>
         alert switch
@@ -540,9 +555,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             power.Demand);
         text.Append(" ");
         text.Append(
-            power.IsConstrained
-                ? "CONSTRAINED"
-                : "STABLE");
+            ResourcePowerHudModel.ResolvePowerStateLabel(
+                power));
 
         float textX =
             x +
@@ -606,9 +620,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             ResourcePowerHudModel.IsCommandFeedbackVisible(
                 experience);
         int totalItems =
-            ResourcePowerHudModel.CountActiveAlerts(
-                experience.Alerts) +
-            (feedbackVisible ? 1 : 0);
+            ResourcePowerHudModel.ResolveNotificationCount(
+                experience);
 
         if (totalItems == 0)
         {
