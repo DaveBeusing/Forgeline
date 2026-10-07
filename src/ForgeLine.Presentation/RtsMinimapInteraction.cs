@@ -235,7 +235,7 @@ internal static class RtsMinimapInteractionLayout
     }
 }
 
-internal readonly record struct RtsMinimapInteractionView(
+public readonly record struct RtsMinimapInteractionView(
     bool PointerCaptured,
     bool IsCameraDragging,
     bool PointerWorldValid,
@@ -251,7 +251,7 @@ internal readonly record struct RtsMinimapInteractionView(
             RtsCursorKind.Default);
 }
 
-internal sealed class RtsMinimapInteractionController
+public sealed class RtsMinimapInteractionController
 {
     private SimulationSessionId _sessionId;
     private bool _primaryWasDown;

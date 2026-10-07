@@ -661,5 +661,22 @@ public sealed class RtsMinimapInteractionTests
                     : 0.0f;
             return inside;
         }
+
+        public bool TrySampleNormal(
+            float worldX,
+            float worldZ,
+            out Vector3 normal)
+        {
+            bool inside =
+                worldX >= 0.0f &&
+                worldX <= 1_024.0f &&
+                worldZ >= 0.0f &&
+                worldZ <= 1_024.0f;
+            normal =
+                inside
+                    ? Vector3.UnitY
+                    : default;
+            return inside;
+        }
     }
 }
