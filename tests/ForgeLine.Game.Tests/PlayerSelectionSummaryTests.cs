@@ -29,7 +29,7 @@ public sealed class PlayerSelectionSummaryTests
             BuildingIds.CommandCore,
             selection.CommonBuildingId);
         Assert.Equal(
-            BuildingId.None,
+            UnitId.None,
             selection.CommonUnitId);
         Assert.True(
             selection.HasSingleEntityDetails);
@@ -71,7 +71,7 @@ public sealed class PlayerSelectionSummaryTests
             UnitIds.CargoTruck,
             selection.CommonUnitId);
         Assert.Equal(
-            UnitId.None,
+            BuildingId.None,
             selection.CommonBuildingId);
         Assert.Equal(
             scenario.Services.UnitDefinitions[
