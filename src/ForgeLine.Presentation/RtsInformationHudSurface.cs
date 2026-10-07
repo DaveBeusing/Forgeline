@@ -19,6 +19,7 @@ internal sealed class RtsInformationHudSurface : IGameplayHudSurface
 
     public GameplayHudRegion Regions =>
         GameplayHudRegion.Minimap |
+        GameplayHudRegion.SecondaryView |
         GameplayHudRegion.GlobalOverlay;
 
     public void Render(
