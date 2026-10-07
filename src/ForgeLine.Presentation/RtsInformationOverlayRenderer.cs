@@ -1731,9 +1731,21 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         int width,
         int height)
     {
+        // Whitespace advances the cursor without emitting geometry.
+        if (character == ' ')
+        {
+            return;
+        }
+
         string pattern =
             TextGlyphPattern(
                 character);
+
+        // Malformed glyph data must never terminate the render loop.
+        if (pattern.Length != 35)
+        {
+            pattern = TextGlyphPattern('?');
+        }
 
         for (int row = 0;
              row < 7;
@@ -2065,7 +2077,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             '/' => "00001000100010001000100001000000000",
             '-' => "00000000000000011111000000000000000",
             '%' => "11001000100010001000100001001100000",
-            ' ' => "",
+            ' ' => "00000000000000000000000000000000000",
             _ => "11111000010001000100000000010000100"
         };
 
