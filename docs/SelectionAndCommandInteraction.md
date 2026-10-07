@@ -198,9 +198,21 @@ See [Formation Movement and Group Orders](FormationMovementAndGroupOrders.md) fo
 
 The full solution build, project-reference validation, Windows client smoke test, headless smoke tests, and complete test suite remain the CI gate.
 
+## Production player action dock
+
+`PlayerActionPanelController` remains the presentation-owned interaction state for the player command surface, while `PlayerActionDockHudSurface` owns the DPI-aware `ActionDock` HUD region. The dock is a visual/interaction replacement for the former text palette; it does not introduce a second command path.
+
+The six contextual modes are Build (`B`), Process (`P`), Units (`U`), Logistics (`L`), Supply (`Y`), and Combat (`K`). `Tab` changes the selected card, `Enter` activates it, `C` cancels/removes the selected queue or policy item where supported, `T` cycles the primary setting, `M` cycles the secondary setting, and Left/Right adjust the currently editable numeric setting. Pointer input hits the same mode/card/footer model; clicking a card selects it, and the explicit `ACT` footer control performs the same activation represented by `Enter`.
+
+Pointer capture is derived from the shared `GameplayHudLayout.ActionDock` geometry. A pointer press inside the dock is consumed before world selection, movement, building placement, or tactical targeting can interpret that same click. Disabled controls use the same availability model in rendering and controller dispatch, so a disabled footer button cannot submit an action merely because it was clicked.
+
+The dock only exposes currently implemented actions. Semantic icons may exist for Patrol, Repair, or other future commands, but those actions are not placed in the dock until gameplay and request/command support exists. All visible actions continue to create `PlayerActionRequest` values and cross the existing dispatcher/gateway boundary; UI activation is submission intent, not proof of authoritative success.
+
+Session replacement closes the dock and clears pending presentation-owned requests/editor state. A terminal player-experience snapshot closes and suppresses the dock entirely so no post-result Build, Process, Unit, Logistics, Supply, or Combat request can be authored from this surface.
+
 ## Tactical Targeting
 
-Owned selection and enemy targeting remain separate interactions. `K` opens the shared player combat palette for the current owned selection. Attack, AttackMove, Retreat, and Fire Mission enter a transient targeting mode; `Escape`, focus loss, session replacement, terminal match state, or opening another action mode cancels that targeting state.
+Owned selection and enemy targeting remain separate interactions. `K` opens the Combat mode of the production player action dock for the current owned selection. Attack, AttackMove, Retreat, and Fire Mission enter a transient targeting mode; `Escape`, focus loss, session replacement, terminal match state, or opening another action mode cancels that targeting state.
 
 Attack picking never scans foreign render instances or live ECS transforms. Presentation receives only current identified enemy candidates copied into `PlayerTacticalActionReadModel`; each candidate contains the authoritative entity identifier needed for the later command plus its intelligence-approved last-known position and compatibility count. The target controller projects only those copied positions for hit testing.
 

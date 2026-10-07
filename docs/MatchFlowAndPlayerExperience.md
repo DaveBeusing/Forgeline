@@ -81,13 +81,25 @@ The HUD never creates or advances gameplay state. Every published player-experie
 
 `GameplayHudRenderer` is the production-facing root compositor for the in-match HUD. `ClientRenderHost` submits player-facing HUD state through this compositor independently from `DevelopmentOverlayRenderer`, which remains the owner of development metrics and engineering diagnostic labels.
 
-`GameplayHudLayout` resolves the shared DPI-aware safe area and named regions for the top status bar, selection inspector, action dock, alert stack, minimap, and optional secondary views. Existing resource, selection, minimap, action, targeting, feedback, and pre-alpha surfaces are routed through the composition boundary without moving gameplay authority into presentation.
+`GameplayHudLayout` resolves the shared DPI-aware safe area and named regions for the top status bar, selection inspector, action dock, alert stack, minimap, and optional secondary views. Resource/power, selection inspection, the production player action dock, minimap, targeting, feedback, and remaining compatibility surfaces are routed through the composition boundary without moving gameplay authority into presentation.
 
 HUD surfaces implement the narrow `IGameplayHudSurface` contract. New surfaces should consume immutable presentation snapshots/read models, render within the named region that owns their presentation responsibility, and submit player-authored changes through the established request/command boundary. They must not acquire live ECS or simulation ownership.
 
 `ResourcePowerHudSurface` now owns the top status bar and alert stack. It renders the seven resource quantities currently present in the authoritative player resource summary, generation/demand plus explicit power state, the existing causal alert flags/counts, and short-lived resolved command feedback. Rare Elements keep their semantic resource/icon identity but are not displayed because the active skirmish starting inventory does not currently expose an authoritative Rare Elements quantity.
 
-The remaining text-heavy player output is retained behind `GameplayHudLegacyTextSurface` as a compatibility adapter while action/result surfaces are migrated incrementally. Resource, power, alert, command-feedback, and selected-entity inspector text has been removed from that adapter. It is deliberately isolated beneath `GameplayHudRenderer`; it is not a reason for new player-facing features to be added to the development overlay.
+The remaining text-heavy compatibility output is retained behind `GameplayHudLegacyTextSurface` for residual pre-alpha guidance/result presentation. Resource, power, alert, command-feedback, selected-entity inspection, and the player action palette have been removed from that adapter. It is deliberately isolated beneath `GameplayHudRenderer`; new player-facing features must not be added to the development overlay.
+
+## Player action dock presentation
+
+The production action surface is `PlayerActionDockHudSurface`, backed by the existing `PlayerActionPanelController` and immutable `PlayerActionSnapshot`. It covers the currently implemented Build → Process → Produce → Logistics → Supply → Fight loop without allowing presentation to mutate authoritative state directly.
+
+Build cards expose authored building identity, real construction costs, current captured resource availability, deposit requirements, and placement feedback from the existing placement preview/result path. Process cards expose recipe input/output availability, priority, one-shot/repeat/desired-stock mode, desired-stock target, active progress/block state, queued requests, pause/resume, and cancel. Unit-production cards expose real costs, authored production ticks, queue state, active progress/block state, cancellation, and rally-point presence.
+
+Logistics cards expose current stock quantity, minimum/target/maximum policy editing, priority, distribution state, bottleneck/transport failure information, and selected cargo lifecycle/wait/failure state when the read model contains it. Supply mode exposes current supply/Fuel/Ammunition, automatic thresholds and enablement, provider state, supply priority, and explicit resupply. Combat mode exposes eligible/rejected selection counts, common/mixed order state, identified target count, critical/resupplying counts, supported immediate/targeted combat actions, and authoritative artillery ammunition/range/mission information.
+
+The dock never treats a click as command success. It submits the same `PlayerActionRequest` contracts used before the visual replacement; resolved command feedback still comes from the simulation-owned command/result boundary. Known unavailable actions are rendered disabled with a concise reason. Unsupported Patrol/Repair behavior is not fabricated merely because semantic command icons exist.
+
+Keyboard and pointer interaction share the same action model and HUD hit regions. Session replacement clears dock state; terminal match snapshots suppress the dock and reject new action input.
 
 ## Selection inspector presentation
 

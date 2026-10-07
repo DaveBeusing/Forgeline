@@ -15,7 +15,6 @@ internal sealed class GameplayHudLegacyTextSurface : IGameplayHudSurface
     }
 
     public GameplayHudRegion Regions =>
-        GameplayHudRegion.ActionDock |
         GameplayHudRegion.AlertStack |
         GameplayHudRegion.SecondaryView |
         GameplayHudRegion.GlobalOverlay;
