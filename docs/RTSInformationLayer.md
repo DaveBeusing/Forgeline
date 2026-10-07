@@ -191,6 +191,18 @@ Detected contacts use opaque intelligence data. An unidentified contact is not p
 
 Minimap coordinates are derived from canonical world bounds. The model never owns movement, objective, resource, or intelligence state.
 
+## Minimap interaction
+
+`RtsMinimapInteractionController` turns the rendered minimap into a presentation-owned RTS control surface without creating a parallel command system. The DPI-aware minimap map rectangle is distinct from the overlay selector and legend regions, and the same geometry is used for hit testing and world-coordinate conversion.
+
+Primary pointer input inside the map recenters the presentation camera; holding and dragging continues to update the camera target. Camera motion never mutates simulation state. Secondary pointer input with a current owned selection creates the existing `MovementOrderRequest`, which continues through the normal client/gateway command path.
+
+When a tactical targeting mode is active, primary minimap clicks reuse the existing tactical request contracts. Direct Attack can resolve only an `Identified` tactical target already present in the intelligence-filtered read model. Detected-only contacts are never promoted to live entity IDs for direct attack. Fire Mission may use the existing opaque `IntelligenceContactKey`; coordinate fire is accepted for submission only when the target terrain cell is currently visible, and simulation performs final validation.
+
+The minimap captures pointer interaction before world selection, placement, movement, or targeting handlers can consume the same gesture. Cursor state communicates pan, move, attack/attack-move, and invalid tactical targets explicitly. Session replacement clears pending minimap interaction state, and terminal match state disables gameplay interaction.
+
+The player-facing selector above the map provides direct access to None, Logistics, Supply, Sensors, Navigation, Power, and All while preserving the existing keyboard overlay cycle.
+
 ## Fog of war
 
 Fog presentation follows the intelligence states currently exposed by simulation:
@@ -208,19 +220,21 @@ Pattern plus opacity is used so visibility state is not communicated by color al
 `RtsInformationLayerController` owns only presentation enablement. The current strategic overlay cycle is:
 
 ```text
-None -> Logistics -> Supply -> Sensors -> Navigation -> All -> None
+None -> Logistics -> Supply -> Sensors -> Navigation -> Power -> All -> None
 ```
 
-The overlay renderer delegates to existing read-model/debug visualization paths:
+Production strategic overlays consume `StrategicOverlaySnapshot`, a dedicated immutable player-facing contract captured at the completed-tick presentation boundary. The current modes expose:
 
-- logistics routes/nodes, cargo transport, automated distribution, and capacity;
-- battlefield supply providers/units;
-- sensor/intelligence coverage;
-- navigation cells/routes.
+- Logistics: authorized logistics nodes and logical transport links;
+- Supply: owned provider/depot/truck and unit supply state;
+- Sensors: owned visual/radar sensor ranges;
+- Navigation: canonical navigation sectors and portals;
+- Power: owned generator/consumer state grouped by logical `PowerNetworkId`;
+- All: a bounded combination with explicit layer limits to avoid unreadable clutter.
 
-These overlays never become a second authority for logistics, supply, intelligence, or navigation. They remain player-facing presentation and are independent of the developer-diagnostic master switch. Presentation extraction requests only the diagnostic read-model families needed by the active strategic overlay rather than enabling every development capture path.
+These overlays never become a second authority for logistics, supply, intelligence, navigation, or power. They are independent of the developer-diagnostic master switch and no longer require arbitrary engineering debug snapshots to drive normal player-facing rendering.
 
-Additional power/buildable-area overlays should be added only when the existing product-facing read model provides an appropriate stable presentation contract. Debug data must not be converted into new gameplay authority merely to satisfy an overlay.
+Power presentation is explicitly logical. It may group or label generators and consumers by `PowerNetworkId` and show generation, demand, allocation, deficit, powered/brownout/offline state, but it does **not** draw transmission lines between entities because the current simulation does not model a physical transmission topology. A logical network relationship must not be visualized as a fabricated physical cable or route.
 
 ## Development diagnostic overlays
 
@@ -276,7 +290,12 @@ Automated coverage includes:
 - minimap symbol mapping;
 - opaque detected-contact handling;
 - selection/target/invalid marker generation;
-- strategic-overlay enable/disable cycling;
+- minimap coordinate conversion, camera jump/drag, pointer capture, and command submission;
+- direct-attack intelligence filtering and opaque detected-contact fire missions;
+- strategic-overlay selector and keyboard cycling including Power;
+- player-facing strategic overlay extraction independent of development debug capture;
+- logical power-network presentation without fabricated physical links;
+- bounded All-overlay layering;
 - client/render integration through the standard Windows smoke path.
 
 The complete source-asset count includes the UI semantic material assets and is validated by the existing asset-pipeline test suite.
@@ -289,7 +308,6 @@ This is the initial information layer, not the final HUD art pass. The following
 - final texture/vector icon rendering;
 - full technology-tree UI;
 - advanced combat-group UI;
-- minimap-issued commands;
 - new gameplay systems created solely for UI;
 - unsupported Patrol/Repair gameplay behavior.
 

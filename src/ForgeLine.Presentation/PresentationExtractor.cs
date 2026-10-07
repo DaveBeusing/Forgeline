@@ -117,6 +117,17 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                     _extraction,
                     interaction);
 
+        StrategicOverlaySnapshot? strategicOverlay =
+            _extraction is null ||
+            interaction.StrategicOverlay ==
+                StrategicOverlayMode.None
+                ? null
+                : StrategicOverlaySnapshotFactory.Capture(
+                    context,
+                    _extraction,
+                    interaction.StrategicOverlay,
+                    intelligenceSnapshot);
+
         BuildingPlacementPreviewReadModel? placementPreview =
             _extraction is null
                 ? null
@@ -156,7 +167,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 _extraction?.Scenario.Simulation.Diagnostics.Capture(
                     _extraction.Scenario.Simulation),
                 playerActions,
-                _vfxPool.Metrics));
+                _vfxPool.Metrics,
+                strategicOverlay));
     }
 
     private RenderInstance[] CaptureRenderInstances(

@@ -244,6 +244,20 @@ public sealed class RtsCamera
         return new ScreenProjection(screen, ndc.Z, visible);
     }
 
+    public void CenterOn(
+        Vector3 target)
+    {
+        if (!float.IsFinite(target.X) ||
+            !float.IsFinite(target.Y) ||
+            !float.IsFinite(target.Z))
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(target));
+        }
+
+        Target = target;
+    }
+
     public RtsCameraState CaptureState() =>
         new(
             Target,

@@ -354,7 +354,11 @@ public readonly record struct RtsInformationLayerView(
     bool IsDragSelecting,
     Vector2 DragStart,
     Vector2 DragCurrent,
-    EntityId[] SelectedEntities)
+    EntityId[] SelectedEntities,
+    bool MinimapPointerCaptured = false,
+    bool MinimapPointerWorldValid = false,
+    Vector3 MinimapPointerWorldTarget = default,
+    bool MinimapCameraDragging = false)
 {
     public static RtsInformationLayerView Empty =>
         new(
@@ -381,6 +385,20 @@ public sealed class RtsInformationLayerController
         MinimapEnabled =
             !MinimapEnabled;
 
+    public void SetOverlay(
+        StrategicOverlayMode mode)
+    {
+        if (!Enum.IsDefined(
+                mode))
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(mode));
+        }
+
+        OverlayMode =
+            mode;
+    }
+
     public void CycleOverlay()
     {
         OverlayMode =
@@ -395,6 +413,8 @@ public sealed class RtsInformationLayerController
                 StrategicOverlayMode.Sensors =>
                     StrategicOverlayMode.Navigation,
                 StrategicOverlayMode.Navigation =>
+                    StrategicOverlayMode.Power,
+                StrategicOverlayMode.Power =>
                     StrategicOverlayMode.All,
                 _ =>
                     StrategicOverlayMode.None

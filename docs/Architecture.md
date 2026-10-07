@@ -207,7 +207,7 @@ Bounded copied command-result buffer
 HUD / interaction feedback
 ```
 
-The renderer consumes extracted presentation/world data and does not determine simulation outcomes. `PresentationExtractor` observes the completed post-tick boundary and publishes one coherent envelope containing copied render instances, faction-filtered intelligence, local HUD/selection inspection, placement preview results, construction state, copied diagnostics, and optional copied debug state. `RenderWorld` retains previous/current snapshots for visual transform interpolation only within one `SimulationSessionId`.
+The renderer consumes extracted presentation/world data and does not determine simulation outcomes. `PresentationExtractor` observes the completed post-tick boundary and publishes one coherent envelope containing copied render instances, faction-filtered intelligence, local HUD/selection inspection, placement preview results, construction state, player-facing strategic-overlay state, copied diagnostics, and optional copied debug state. `RenderWorld` retains previous/current snapshots for visual transform interpolation only within one `SimulationSessionId`.
 
 Selection picking operates against extracted instances. It filters hidden/off-screen, foreign-owned, and disallowed-category entities before returning the same full-generation `EntityId` used by simulation. Player commands cross back through `PlayerCommandGateway`, which records correlation/source/tick/sequence metadata and publishes resolved outcomes as copied bounded results instead of exposing mutable command objects to rendering.
 
@@ -230,6 +230,17 @@ See `docs/PresentationExtractionAndDebugging.md` for extraction timing, snapshot
 **Ownership and migration.** Immutable catalogs, terrain queries, camera/input state, renderer diagnostics, and host tick control remain safely outside the dynamic snapshot. Runtime ECS/inventory/system reads required to build player-facing models occur only inside completed-tick extraction. Client-only smoke/render-stress setup may mutate simulation as explicit host test/setup behavior and is not a presentation read path.
 
 **Re-evaluate when.** Revisit the boundary when independent simulation execution is introduced, when networking/replay requires a different command transport, when snapshot copy cost is measured as material, or when a new player control needs data not represented by the bounded contracts. New controls extend these contracts rather than restoring live dynamic reads.
+
+
+
+### Strategic map interaction boundary
+
+The minimap is presentation-owned navigation and command input. Camera jump/drag modifies only the presentation camera. Move, Attack, Attack Move, Retreat, and Fire Mission requests originating from the minimap reuse the same movement/tactical request and command boundaries as world-space interaction; the minimap does not schedule simulation commands directly.
+
+Strategic overlays consume `StrategicOverlaySnapshot`, not developer-debug state. Logistics, Supply, Sensors, Navigation, and logical Power information is copied at the completed-tick boundary. Direct enemy entity targeting remains limited to identified intelligence. Detected contacts remain opaque keys/last-known intelligence suitable only for command paths that already support them.
+
+Power-network presentation reflects logical `PowerNetworkId` membership and operational state only. No physical transmission topology is modeled, so no physical power lines may be inferred or rendered from logical network membership.
+
 
 ## Performance Direction
 

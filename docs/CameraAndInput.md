@@ -107,6 +107,16 @@ This prevents stuck camera motion and cancels an in-progress selection gesture w
 
 `RtsSelectionController` independently interprets left/right mouse state plus Shift for selection and movement intent. It owns no simulation state.
 
+## Minimap camera and command input
+
+The production minimap uses the same canonical X/Z world bounds as the minimap model. Pointer coordinates are normalized within the DPI-aware map rectangle and converted back to world X/Z; terrain sampling supplies the presentation target height.
+
+Left click recenters the camera and left-drag pans it continuously. This changes only `RtsCamera` presentation state. Right click with a non-empty current selection produces the existing movement-order request instead of mutating movement components directly.
+
+During Attack, Attack Move, Retreat, or Fire Mission targeting, minimap clicks use the existing tactical `PlayerActionRequest` path. Direct Attack accepts only currently `Identified` tactical targets copied into the player action snapshot. Detected contacts remain opaque intelligence contacts and cannot leak hidden entity IDs or live transforms into direct attack behavior. Fire Mission may carry an `IntelligenceContactKey` or a currently visible coordinate and is revalidated by simulation.
+
+The minimap captures its pointer gesture through `HudInteractionContext`, so the same click cannot also become world selection, placement, or a second movement/targeting gesture.
+
 ## HUD input precedence
 
 `HudInteractionContext` is the reusable frame-scoped boundary between player-facing HUD interaction and world interaction. The client begins a fresh HUD interaction frame for the active simulation session, accumulates pointer/keyboard capture from the action and targeting surfaces, and evaluates that result before camera input, building placement, selection, movement, or other world gestures.

@@ -143,30 +143,11 @@ public static class DebugOverlayPolicy
         DebugOverlayCategory debugCategories,
         StrategicOverlayMode strategicOverlay)
     {
-        DebugOverlayCategory result =
+        _ = strategicOverlay;
+
+        return
             debugCategories &
             SimulationDataCategories;
-
-        result |=
-            strategicOverlay switch
-            {
-                StrategicOverlayMode.Logistics =>
-                    DebugOverlayCategory.Logistics,
-                StrategicOverlayMode.Supply =>
-                    DebugOverlayCategory.Logistics,
-                StrategicOverlayMode.Sensors =>
-                    DebugOverlayCategory.Sensors,
-                StrategicOverlayMode.Navigation =>
-                    DebugOverlayCategory.Navigation,
-                StrategicOverlayMode.All =>
-                    DebugOverlayCategory.Navigation |
-                    DebugOverlayCategory.Logistics |
-                    DebugOverlayCategory.Sensors,
-                _ =>
-                    DebugOverlayCategory.None
-            };
-
-        return result;
     }
 
     public static bool RequiresPresentationDebugSnapshot(
