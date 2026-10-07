@@ -106,7 +106,7 @@ The cursor set includes:
 
 ## Player action dock
 
-The production command surface uses the existing semantic icon catalog but exposes only actions backed by current gameplay/read-model contracts. The six mode buttons are Build, Process, Units, Logistics, Supply, and Combat. Semantic Patrol or Repair icons remain available to future UI work, but the dock does not manufacture unsupported gameplay behavior from those assets.
+The production command surface uses the existing semantic icon catalog but exposes only actions backed by current gameplay/read-model contracts. The seven mode buttons are Build, Process, Units, Logistics, Supply, Combat, and Technology. Semantic Patrol or Repair icons remain available to future UI work, but the dock does not manufacture unsupported gameplay behavior from those assets.
 
 Cards and footer controls render enabled/disabled state from the same model used by pointer/keyboard dispatch. When the immutable action snapshot already knows that a build lacks materials, a recipe or unit lacks inputs, an Attack lacks an identified target, artillery has no ammunition, or there is no active fire mission to cancel, the control is visibly disabled with an explicit reason instead of silently failing.
 
@@ -270,20 +270,24 @@ Disabled categories do not request their simulation debug-capture paths. Renderi
 
 Render ownership and ordering are explicit: world geometry renders first, depth-tested engineering debug lines render next, player-facing world markers render afterward without depth testing, and screen-space RTS information/UI renders above both. Diagnostic visibility never writes to simulation state.
 
-## DPI and readability
+## Production HUD visual language and readability
 
-UI geometry uses a 96-DPI reference scale through `RtsUiLayout.ScaleForDpi`, bounded to avoid pathological sizes.
+`GameplayHudVisualStyle` is the shared in-match visual contract. It centralizes safe-area margins, core panel dimensions, padding/gaps, icon sizes, state-rail and border thickness, progress-bar thickness, panel levels, primary/secondary text, focus treatment, and warning/critical severity colors. Individual HUD surfaces retain RTS-specific composition, but they no longer own unrelated copies of those production measurements.
 
-The baseline favors:
+UI geometry uses a 96-DPI reference scale through `RtsUiLayout.ScaleForDpi`, bounded to avoid pathological sizes. Automated qualification covers 1280×720, 1920×1080, 2560×1440, representative 3440×1440 ultrawide geometry, and higher-DPI values including 144 and 192 DPI. Named regions must remain inside the shared safe area and avoid critical cross-surface overlap.
 
-- compact geometric silhouettes;
-- short semantic labels;
-- shape changes in addition to tint;
-- world-space outlines for selection/targets;
-- fog patterns plus opacity;
-- strategic symbols distinct from detailed unit/building art.
+Interaction meaning is redundant by design:
 
-This keeps small-size meaning readable across terrain/background variation without making color the only carrier of state.
+- selected items use a persistent left rail plus text state;
+- hovered and pressed controls use an outline/fill change rather than tint alone;
+- disabled controls retain a non-color double-rail treatment and an explicit reason;
+- alerts include INFO/WARN/CRIT text, semantic icons, and severity marker geometry;
+- supply, technology, power, terminal-result, and fog states retain explicit labels/icons/patterns;
+- world selection/target markers use shape and outline semantics.
+
+The visual language favors compact geometric silhouettes, restrained industrial panels, short semantic labels, and function before decoration. This keeps small-size meaning readable across terrain/background variation without making faction or status color the sole carrier of state.
+
+The semantic icon path remains `RtsUiIconCatalog` -> stable `ui.icon.*` ID -> `RuntimeUiIconPalette` material lookup plus the existing procedural glyph. Runtime palette resolution is centralized and cached rather than duplicated per HUD renderer. The current asset runtime still has no dedicated UI atlas/vector type, so this pass deliberately does not introduce an ad-hoc parallel format.
 
 ## Runtime integration
 
@@ -316,15 +320,15 @@ The complete source-asset count includes the UI semantic material assets and is 
 
 ## Current boundaries
 
-This is the initial information layer, not the final HUD art pass. The following remain outside this baseline:
+The production HUD visual/readability pass is implemented for the current milestone, but authored shipping art remains intentionally separate from the runtime contract. The following remain outside this baseline:
 
-- final typography/branding;
-- final texture/vector icon rendering;
-- full technology-tree UI;
+- a dedicated compiler/runtime UI atlas or vector-icon representation;
+- localization and final shipping typography;
+- a complete production technology content tree beyond the current architecture-validation set;
 - new gameplay systems created solely for UI;
 - unsupported Patrol/Repair gameplay behavior.
 
-Future UI visual replacement should preserve stable semantic icon IDs and the simulation/presentation boundary.
+Future authored icon or typography work must preserve stable semantic IDs, use the normal asset compiler/runtime catalog, and preserve the simulation/presentation boundary.
 
 ## Technology progression view
 

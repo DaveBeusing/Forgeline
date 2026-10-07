@@ -1293,6 +1293,117 @@ public sealed class PlayerActionPanelTests
             false);
 
 
+    [Fact]
+    public void TechnologyPaletteExposesHoverAndPressedVisualState()
+    {
+        EntityId facility =
+            new(130, 1);
+        EntityId sourceInventory =
+            new(131, 1);
+        var input =
+            new InputState();
+        var controller =
+            new PlayerActionPanelController();
+        PresentationSnapshot snapshot =
+            CreateSnapshot(
+                technology:
+                [
+                    TechnologyAction(
+                        facility,
+                        sourceInventory,
+                        PlayerTechnologyState.Available,
+                        TechnologyResearchBlockReason.None,
+                        EntityId.Invalid)
+                ]);
+
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+        Press(
+            input,
+            PlatformKey.H);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+        Release(
+            input,
+            PlatformKey.H);
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        GameplayHudLayout layout =
+            GameplayHudLayout.Create(
+                1600,
+                900,
+                96);
+        HudRect card =
+            PlayerActionDockInteractionLayout.GetCardRect(
+                layout,
+                0);
+        int x =
+            checked((int)MathF.Round(
+                card.X +
+                card.Width * 0.5f));
+        int y =
+            checked((int)MathF.Round(
+                card.Y +
+                card.Height * 0.5f));
+
+        input.Apply(
+            PlatformInputEvent.PointerMoved(
+                x,
+                y));
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        PlayerActionPanelView hovered =
+            controller.CreateView(
+                1600,
+                900,
+                snapshot.PlayerActions);
+
+        Assert.Equal(
+            0,
+            hovered.HoveredIndex);
+        Assert.False(
+            hovered.PointerPressed);
+
+        input.Apply(
+            PlatformInputEvent.MouseButtonChanged(
+                PlatformInputEventKind.MouseButtonDown,
+                PlatformMouseButton.Left,
+                x,
+                y));
+        controller.Update(
+            input,
+            snapshot,
+            1600,
+            900);
+
+        PlayerActionPanelView pressed =
+            controller.CreateView(
+                1600,
+                900,
+                snapshot.PlayerActions);
+
+        Assert.Equal(
+            0,
+            pressed.HoveredIndex);
+        Assert.True(
+            pressed.PointerPressed);
+    }
+
+
     private static PlayerTechnologyActionReadModel TechnologyAction(
         EntityId facility,
         EntityId sourceInventory,

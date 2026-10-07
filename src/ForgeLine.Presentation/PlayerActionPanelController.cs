@@ -44,7 +44,9 @@ public readonly record struct PlayerActionPanelView(
     float OriginX,
     float OriginY,
     BattlefieldSupplyPriority SupplyPriority =
-        BattlefieldSupplyPriority.Normal)
+        BattlefieldSupplyPriority.Normal,
+    int HoveredIndex = -1,
+    bool PointerPressed = false)
 {
     public bool IsOpen =>
         Mode != PlayerActionPanelMode.Closed;
@@ -67,6 +69,8 @@ public sealed class PlayerActionPanelController
     private bool _automaticResupplyEnabled;
     private BattlefieldSupplyPriority _supplyPriority =
         BattlefieldSupplyPriority.Normal;
+    private int _hoveredIndex = -1;
+    private bool _pointerPressed;
 
     public PlayerActionPanelMode Mode { get; private set; }
 
@@ -91,6 +95,12 @@ public sealed class PlayerActionPanelController
 
     public bool HasKeyboardFocus =>
         Mode != PlayerActionPanelMode.Closed;
+
+    public int HoveredIndex =>
+        _hoveredIndex;
+
+    public bool PointerPressed =>
+        _pointerPressed;
 
     public void Update(
         InputState input,
@@ -262,15 +272,29 @@ public sealed class PlayerActionPanelController
                 layout,
                 view.IsOpen);
 
-        if (PointerCaptured &&
-            leftDown &&
-            !_leftWasDown &&
+        PlayerActionDockHitTarget hit =
+            default;
+        bool hasHit =
+            PointerCaptured &&
             PlayerActionDockInteractionLayout.TryHit(
                 input.PointerPosition,
                 layout,
                 view.IsOpen,
                 itemCount,
-                out PlayerActionDockHitTarget hit))
+                out hit);
+        _hoveredIndex =
+            hasHit &&
+            hit.Kind ==
+                PlayerActionDockControlKind.Item
+                ? hit.ItemIndex
+                : -1;
+        _pointerPressed =
+            hasHit &&
+            leftDown;
+
+        if (hasHit &&
+            leftDown &&
+            !_leftWasDown)
         {
             HandlePointerHit(
                 hit,
@@ -343,7 +367,9 @@ public sealed class PlayerActionPanelController
             PointerCaptured,
             layout.ActionDock.X,
             layout.ActionDock.Y,
-            _supplyPriority);
+            _supplyPriority,
+            _hoveredIndex,
+            _pointerPressed);
     }
 
     public bool TryTakeRequest(
@@ -367,6 +393,8 @@ public sealed class PlayerActionPanelController
             PlayerActionPanelMode.Closed;
         SelectedIndex = 0;
         PointerCaptured = false;
+        _hoveredIndex = -1;
+        _pointerPressed = false;
         _desiredStockQuantity = 0.0;
     }
 
@@ -378,6 +406,8 @@ public sealed class PlayerActionPanelController
                 ? PlayerActionPanelMode.Closed
                 : requested;
         SelectedIndex = 0;
+        _hoveredIndex = -1;
+        _pointerPressed = false;
         _desiredStockQuantity = 0.0;
         _stockResourceId = ResourceId.None;
         _supplyEntity = EntityId.Invalid;

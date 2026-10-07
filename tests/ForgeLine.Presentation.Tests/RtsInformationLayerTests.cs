@@ -54,6 +54,37 @@ public sealed class RtsInformationLayerTests
     }
 
     [Fact]
+    public void ProductionIconContractsRemainSemanticAndAssetPipelineCompatible()
+    {
+        foreach (RtsUiIconDefinition definition in
+                 RtsUiIconCatalog.All)
+        {
+            Assert.StartsWith(
+                "ui.icon.",
+                definition.AssetId,
+                StringComparison.Ordinal);
+            Assert.NotEqual(
+                RtsUiGlyph.None,
+                definition.Glyph);
+            Assert.False(
+                string.IsNullOrWhiteSpace(
+                    definition.ShortLabel));
+            Assert.True(
+                float.IsFinite(
+                    definition.FallbackTint.X));
+            Assert.True(
+                float.IsFinite(
+                    definition.FallbackTint.Y));
+            Assert.True(
+                float.IsFinite(
+                    definition.FallbackTint.Z));
+            Assert.True(
+                float.IsFinite(
+                    definition.FallbackTint.W));
+        }
+    }
+
+    [Fact]
     public void CursorResolverUsesGeometrySemanticBeforeGenericMovement()
     {
         RtsCursorContext buildInvalid =

@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Game;
 using ForgeLine.Simulation;
 using Xunit;
 
@@ -37,6 +38,8 @@ public sealed class GameplayHudFoundationTests
     [InlineData(1280, 720, 96)]
     [InlineData(1920, 1080, 96)]
     [InlineData(2560, 1440, 144)]
+    [InlineData(3440, 1440, 96)]
+    [InlineData(3440, 1440, 144)]
     public void NamedRegionsRemainSeparated(
         int width,
         int height,
@@ -80,6 +83,96 @@ public sealed class GameplayHudFoundationTests
                 new Vector2(
                     layout.Minimap.Right,
                     layout.Minimap.Bottom)));
+    }
+
+    [Theory]
+    [InlineData(96, 1.0f)]
+    [InlineData(120, 1.25f)]
+    [InlineData(144, 1.5f)]
+    [InlineData(192, 2.0f)]
+    public void SharedVisualMetricsScaleWithDpi(
+        uint dpi,
+        float expectedScale)
+    {
+        GameplayHudLayout layout =
+            GameplayHudLayout.Create(
+                1920,
+                1080,
+                dpi);
+
+        Assert.Equal(
+            expectedScale,
+            layout.Scale);
+        Assert.True(
+            layout.SafeArea.X >=
+            GameplayHudVisualStyle.MinimumSafeMargin);
+        Assert.Equal(
+            GameplayHudVisualStyle.TopStatusBarHeight *
+            layout.Scale,
+            layout.TopStatusBar.Height);
+    }
+
+    [Fact]
+    public void ItemStatesCarryNonColorCues()
+    {
+        HudStateVisual selected =
+            GameplayHudVisualStyle.ResolveItemState(
+                selected: true,
+                hovered: false,
+                pressed: false,
+                enabled: true);
+        HudStateVisual disabled =
+            GameplayHudVisualStyle.ResolveItemState(
+                selected: false,
+                hovered: false,
+                pressed: false,
+                enabled: false);
+
+        Assert.Equal(
+            HudStatePattern.LeftRail,
+            selected.Pattern);
+        Assert.Equal(
+            HudStatePattern.DoubleRail,
+            disabled.Pattern);
+        Assert.Equal(
+            HudStatePattern.Underline,
+            GameplayHudVisualStyle.ResolveItemState(
+                selected: false,
+                hovered: true,
+                pressed: true,
+                enabled: true).Pattern);
+        Assert.NotEqual(
+            selected.Fill,
+            disabled.Fill);
+    }
+
+    [Theory]
+    [InlineData(PlayerMatchStatus.Victory, "VICTORY")]
+    [InlineData(PlayerMatchStatus.Defeat, "DEFEAT")]
+    [InlineData(PlayerMatchStatus.Draw, "DRAW")]
+    public void SystemOverlayUsesExplicitMatchResultText(
+        PlayerMatchStatus status,
+        string expected)
+    {
+        Assert.Equal(
+            expected,
+            PlayerSystemHudModel.ResolveMatchResultLabel(
+                status));
+    }
+
+    [Fact]
+    public void HelpIncludesTechnologyAndObjectiveWithoutColorDependence()
+    {
+        Assert.Contains(
+            "H TECHNOLOGY",
+            PlayerSystemHudModel.GetHelpLine(
+                2),
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "OBJECTIVE",
+            PlayerSystemHudModel.GetHelpLine(
+                PlayerSystemHudModel.HelpLineCount - 1),
+            StringComparison.Ordinal);
     }
 
     [Fact]

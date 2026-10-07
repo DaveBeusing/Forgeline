@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Text.Json;
 using ForgeLine.Assets;
 using ForgeLine.Combat;
 using ForgeLine.Economy;
@@ -50,41 +49,15 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
     private const float GlyphAdvance = 6.4f;
 
     private static readonly Vector4 PanelColor =
-        new(
-            0.045f,
-            0.055f,
-            0.055f,
-            0.98f);
+        GameplayHudVisualStyle.PanelBackground;
     private static readonly Vector4 CardColor =
-        new(
-            0.075f,
-            0.09f,
-            0.09f,
-            0.98f);
+        GameplayHudVisualStyle.PanelRaised;
     private static readonly Vector4 SelectedColor =
-        new(
-            0.12f,
-            0.18f,
-            0.19f,
-            0.98f);
-    private static readonly Vector4 DisabledColor =
-        new(
-            0.055f,
-            0.06f,
-            0.06f,
-            0.88f);
+        GameplayHudVisualStyle.PanelSelected;
     private static readonly Vector4 TextColor =
-        new(
-            0.93f,
-            0.96f,
-            0.95f,
-            1.0f);
+        GameplayHudVisualStyle.TextPrimary;
     private static readonly Vector4 MutedTextColor =
-        new(
-            0.62f,
-            0.68f,
-            0.67f,
-            1.0f);
+        GameplayHudVisualStyle.TextSecondary;
 
     private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;
@@ -92,7 +65,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         new(4);
     private readonly OverlayVertex[] _vertices =
         new OverlayVertex[MaxVertices];
-    private readonly RuntimeUiPalette? _runtimePalette;
+    private readonly RuntimeUiIconPalette? _runtimePalette;
 
     private int _vertexCount;
     private float _scale = 1.0f;
@@ -111,7 +84,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         _runtimePalette =
             runtimeAssets is null
                 ? null
-                : new RuntimeUiPalette(
+                : new RuntimeUiIconPalette(
                     runtimeAssets);
     }
 
@@ -286,7 +259,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             }
 
             float iconSize =
-                12.0f *
+                GameplayHudVisualStyle.SmallIconSize *
                 _scale;
             EmitIcon(
                 PlayerActionDockHudModel.ResolveModeIcon(
@@ -397,7 +370,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                 layout);
         float x =
             header.X +
-            7.0f *
+            GameplayHudVisualStyle.PanelPadding *
             _scale;
         float y =
             header.Y +
@@ -1028,38 +1001,35 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                 index ==
                 panel.SelectedIndex;
 
+            bool hovered =
+                panel.HoveredIndex ==
+                index;
+            bool pressed =
+                hovered &&
+                panel.PointerPressed;
+            HudStateVisual visual =
+                GameplayHudVisualStyle.ResolveItemState(
+                    selected,
+                    hovered,
+                    pressed,
+                    state.CanActivate);
+
             EmitQuad(
                 rect.X,
                 rect.Y,
                 rect.Width,
                 rect.Height,
-                !state.CanActivate
-                    ? DisabledColor
-                    : selected
-                        ? SelectedColor
-                        : CardColor,
+                visual.Fill,
+                width,
+                height);
+            EmitItemStateCue(
+                rect,
+                visual,
                 width,
                 height);
 
-            if (selected)
-            {
-                EmitQuad(
-                    rect.X,
-                    rect.Y,
-                    3.0f *
-                    _scale,
-                    rect.Height,
-                    ResolveColor(
-                        PlayerActionDockHudModel.ResolveItemIcon(
-                            panel.Mode,
-                            index,
-                            actions)),
-                    width,
-                    height);
-            }
-
             float iconSize =
-                13.0f *
+                GameplayHudVisualStyle.ActionIconSize *
                 _scale;
             EmitIcon(
                 PlayerActionDockHudModel.ResolveItemIcon(
@@ -1163,6 +1133,102 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                 MutedTextColor,
                 width,
                 height);
+        }
+    }
+
+    private void EmitItemStateCue(
+        in HudRect rect,
+        in HudStateVisual visual,
+        int width,
+        int height)
+    {
+        float rail =
+            GameplayHudVisualStyle.StateRailThickness *
+            _scale;
+        float border =
+            GameplayHudVisualStyle.BorderThickness *
+            _scale;
+
+        switch (visual.Pattern)
+        {
+            case HudStatePattern.Underline:
+                EmitQuad(
+                    rect.X,
+                    rect.Bottom -
+                        GameplayHudVisualStyle.StateRailThickness *
+                        _scale,
+                    rect.Width,
+                    GameplayHudVisualStyle.StateRailThickness *
+                    _scale,
+                    visual.Border,
+                    width,
+                    height);
+                break;
+
+            case HudStatePattern.LeftRail:
+                EmitQuad(
+                    rect.X,
+                    rect.Y,
+                    rail,
+                    rect.Height,
+                    visual.Border,
+                    width,
+                    height);
+                break;
+
+            case HudStatePattern.Outline:
+                EmitQuad(
+                    rect.X,
+                    rect.Y,
+                    rect.Width,
+                    border,
+                    visual.Border,
+                    width,
+                    height);
+                EmitQuad(
+                    rect.X,
+                    rect.Bottom - border,
+                    rect.Width,
+                    border,
+                    visual.Border,
+                    width,
+                    height);
+                EmitQuad(
+                    rect.X,
+                    rect.Y,
+                    border,
+                    rect.Height,
+                    visual.Border,
+                    width,
+                    height);
+                EmitQuad(
+                    rect.Right - border,
+                    rect.Y,
+                    border,
+                    rect.Height,
+                    visual.Border,
+                    width,
+                    height);
+                break;
+
+            case HudStatePattern.DoubleRail:
+                EmitQuad(
+                    rect.X,
+                    rect.Y,
+                    rect.Width,
+                    border,
+                    visual.Border,
+                    width,
+                    height);
+                EmitQuad(
+                    rect.X,
+                    rect.Bottom - border,
+                    rect.Width,
+                    border,
+                    visual.Border,
+                    width,
+                    height);
+                break;
         }
     }
 
@@ -1453,7 +1519,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                 rect.Height,
                 enabled
                     ? CardColor
-                    : DisabledColor,
+                    : GameplayHudVisualStyle.PanelDisabled,
                 width,
                 height);
 
@@ -2267,78 +2333,5 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         }
     }
 
-    private sealed class RuntimeUiPalette
-    {
-        private readonly RuntimeAssetCatalog _catalog;
-        private readonly Dictionary<string, Vector4> _colors =
-            new(StringComparer.Ordinal);
 
-        public RuntimeUiPalette(
-            RuntimeAssetCatalog catalog)
-        {
-            _catalog =
-                catalog;
-        }
-
-        public bool TryResolve(
-            string rawAssetId,
-            out Vector4 color)
-        {
-            if (_colors.TryGetValue(
-                    rawAssetId,
-                    out color))
-            {
-                return true;
-            }
-
-            AssetId id =
-                AssetId.Parse(
-                    rawAssetId);
-
-            if (!_catalog.TryGet(
-                    id,
-                    out RuntimeAssetRecord? record) ||
-                record is null ||
-                record.Type !=
-                    RuntimeAssetType.Material)
-            {
-                color = default;
-                return false;
-            }
-
-            RuntimeAssetContent content =
-                _catalog.Read(
-                    id);
-
-            using JsonDocument document =
-                JsonDocument.Parse(
-                    content.Payload);
-
-            if (!document.RootElement.TryGetProperty(
-                    "baseColorFactor",
-                    out JsonElement factor) ||
-                factor.ValueKind !=
-                    JsonValueKind.Array ||
-                factor.GetArrayLength() !=
-                    4)
-            {
-                color =
-                    Vector4.One;
-            }
-            else
-            {
-                color =
-                    new Vector4(
-                        factor[0].GetSingle(),
-                        factor[1].GetSingle(),
-                        factor[2].GetSingle(),
-                        factor[3].GetSingle());
-            }
-
-            _colors.Add(
-                rawAssetId,
-                color);
-            return true;
-        }
-    }
 }

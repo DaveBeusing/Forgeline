@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Text.Json;
 using ForgeLine.Assets;
 using ForgeLine.Economy;
 using ForgeLine.Game;
@@ -150,23 +149,11 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
     private const float GlyphAdvance = 6.6f;
 
     private static readonly Vector4 PanelColor =
-        new(
-            0.055f,
-            0.065f,
-            0.065f,
-            0.97f);
+        GameplayHudVisualStyle.PanelBackground;
     private static readonly Vector4 TextColor =
-        new(
-            0.92f,
-            0.95f,
-            0.94f,
-            1.0f);
+        GameplayHudVisualStyle.TextPrimary;
     private static readonly Vector4 MutedTextColor =
-        new(
-            0.66f,
-            0.71f,
-            0.70f,
-            1.0f);
+        GameplayHudVisualStyle.TextSecondary;
 
     private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;
@@ -174,7 +161,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         new(4);
     private readonly OverlayVertex[] _vertices =
         new OverlayVertex[MaxVertices];
-    private readonly RuntimeUiPalette? _runtimePalette;
+    private readonly RuntimeUiIconPalette? _runtimePalette;
 
     private int _vertexCount;
     private float _scale = 1.0f;
@@ -193,7 +180,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         _runtimePalette =
             runtimeAssets is null
                 ? null
-                : new RuntimeUiPalette(
+                : new RuntimeUiIconPalette(
                     runtimeAssets);
     }
 
@@ -280,10 +267,10 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         int height)
     {
         float padding =
-            7.0f *
+            GameplayHudVisualStyle.PanelPadding *
             _scale;
         float iconSize =
-            18.0f *
+            GameplayHudVisualStyle.PrimaryIconSize *
             _scale;
         float x =
             region.X +
@@ -576,7 +563,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
                 4.0f *
                 _scale,
             barWidth,
-            5.0f *
+            GameplayHudVisualStyle.ProgressBarThickness *
                 _scale,
             fraction,
             ResolveColor(
@@ -1362,78 +1349,5 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         }
     }
 
-    private sealed class RuntimeUiPalette
-    {
-        private readonly RuntimeAssetCatalog _catalog;
-        private readonly Dictionary<string, Vector4> _colors =
-            new(StringComparer.Ordinal);
 
-        public RuntimeUiPalette(
-            RuntimeAssetCatalog catalog)
-        {
-            _catalog =
-                catalog;
-        }
-
-        public bool TryResolve(
-            string rawAssetId,
-            out Vector4 color)
-        {
-            if (_colors.TryGetValue(
-                    rawAssetId,
-                    out color))
-            {
-                return true;
-            }
-
-            AssetId id =
-                AssetId.Parse(
-                    rawAssetId);
-
-            if (!_catalog.TryGet(
-                    id,
-                    out RuntimeAssetRecord? record) ||
-                record is null ||
-                record.Type !=
-                    RuntimeAssetType.Material)
-            {
-                color = default;
-                return false;
-            }
-
-            RuntimeAssetContent content =
-                _catalog.Read(
-                    id);
-
-            using JsonDocument document =
-                JsonDocument.Parse(
-                    content.Payload);
-
-            if (!document.RootElement.TryGetProperty(
-                    "baseColorFactor",
-                    out JsonElement factor) ||
-                factor.ValueKind !=
-                    JsonValueKind.Array ||
-                factor.GetArrayLength() !=
-                    4)
-            {
-                color =
-                    Vector4.One;
-            }
-            else
-            {
-                color =
-                    new Vector4(
-                        factor[0].GetSingle(),
-                        factor[1].GetSingle(),
-                        factor[2].GetSingle(),
-                        factor[3].GetSingle());
-            }
-
-            _colors.Add(
-                rawAssetId,
-                color);
-            return true;
-        }
-    }
 }

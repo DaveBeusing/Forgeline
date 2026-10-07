@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Text.Json;
 using ForgeLine.Assets;
 using ForgeLine.Game;
 using ForgeLine.Graphics;
@@ -208,29 +207,13 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
     private const float GlyphAdvance = 7.5f;
 
     private static readonly Vector4 PanelColor =
-        new(
-            0.055f,
-            0.065f,
-            0.065f,
-            0.96f);
+        GameplayHudVisualStyle.PanelBackground;
     private static readonly Vector4 DividerColor =
-        new(
-            0.32f,
-            0.35f,
-            0.34f,
-            0.90f);
+        GameplayHudVisualStyle.Border;
     private static readonly Vector4 TextColor =
-        new(
-            0.92f,
-            0.95f,
-            0.94f,
-            1.0f);
+        GameplayHudVisualStyle.TextPrimary;
     private static readonly Vector4 MutedTextColor =
-        new(
-            0.66f,
-            0.70f,
-            0.69f,
-            1.0f);
+        GameplayHudVisualStyle.TextSecondary;
 
     private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;
@@ -238,7 +221,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         new(4);
     private readonly OverlayVertex[] _vertices =
         new OverlayVertex[MaxVertices];
-    private readonly RuntimeUiPalette? _runtimePalette;
+    private readonly RuntimeUiIconPalette? _runtimePalette;
 
     private int _vertexCount;
     private float _scale = 1.0f;
@@ -258,7 +241,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         _runtimePalette =
             runtimeAssets is null
                 ? null
-                : new RuntimeUiPalette(
+                : new RuntimeUiIconPalette(
                     runtimeAssets);
     }
 
@@ -901,11 +884,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             y,
             region.Width,
             cardHeight,
-            new Vector4(
-                0.07f,
-                0.08f,
-                0.08f,
-                0.94f),
+            GameplayHudVisualStyle.PanelRaised,
             width,
             height);
         EmitQuad(
@@ -983,22 +962,16 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             height);
     }
 
-    private Vector4 SeverityColor(
+    private static Vector4 SeverityColor(
         HudAlertSeverity severity) =>
         severity switch
         {
             HudAlertSeverity.Critical =>
-                ResolveColor(
-                    RtsUiIcon.StatusAlert),
+                GameplayHudVisualStyle.Critical,
             HudAlertSeverity.Warning =>
-                new Vector4(
-                    0.96f,
-                    0.72f,
-                    0.24f,
-                    1.0f),
+                GameplayHudVisualStyle.Warning,
             _ =>
-                ResolveColor(
-                    RtsUiIcon.SupplySupplied)
+                GameplayHudVisualStyle.TextPrimary
         };
 
     private static RtsUiIcon AlertIcon(
@@ -1693,77 +1666,5 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         }
     }
 
-    private sealed class RuntimeUiPalette
-    {
-        private readonly RuntimeAssetCatalog _catalog;
-        private readonly Dictionary<string, Vector4> _colors =
-            new(StringComparer.Ordinal);
 
-        public RuntimeUiPalette(
-            RuntimeAssetCatalog catalog)
-        {
-            _catalog = catalog;
-        }
-
-        public bool TryResolve(
-            string rawAssetId,
-            out Vector4 color)
-        {
-            if (_colors.TryGetValue(
-                    rawAssetId,
-                    out color))
-            {
-                return true;
-            }
-
-            AssetId id =
-                AssetId.Parse(
-                    rawAssetId);
-
-            if (!_catalog.TryGet(
-                    id,
-                    out RuntimeAssetRecord? record) ||
-                record is null ||
-                record.Type !=
-                    RuntimeAssetType.Material)
-            {
-                color = default;
-                return false;
-            }
-
-            RuntimeAssetContent content =
-                _catalog.Read(
-                    id);
-
-            using JsonDocument document =
-                JsonDocument.Parse(
-                    content.Payload);
-
-            if (!document.RootElement.TryGetProperty(
-                    "baseColorFactor",
-                    out JsonElement factor) ||
-                factor.ValueKind !=
-                    JsonValueKind.Array ||
-                factor.GetArrayLength() !=
-                    4)
-            {
-                color =
-                    Vector4.One;
-            }
-            else
-            {
-                color =
-                    new Vector4(
-                        factor[0].GetSingle(),
-                        factor[1].GetSingle(),
-                        factor[2].GetSingle(),
-                        factor[3].GetSingle());
-            }
-
-            _colors.Add(
-                rawAssetId,
-                color);
-            return true;
-        }
-    }
 }
