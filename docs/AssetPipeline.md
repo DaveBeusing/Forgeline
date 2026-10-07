@@ -351,7 +351,9 @@ assets/source/ui/
 
 Semantic UI IDs use the `ui.icon.*` namespace and compile through the existing material asset path. The current renderer draws compact procedural glyph geometry while compiled material records provide stable runtime identity and tint data. This avoids introducing a parallel atlas/vector format before the asset runtime owns one.
 
-The set covers resources, unit/building roles, commands, cursors, supply states, minimap/strategic symbols, and status indicators. Runtime UI code resolves IDs through `RtsUiIconCatalog`; features do not own duplicate file-path copies. Future texture/vector icon payloads may replace the visual representation while preserving these stable IDs.
+The set covers resources, unit/building roles, commands, cursors, supply states, minimap/strategic symbols, and status indicators. Runtime UI code resolves IDs through `RtsUiIconCatalog`; features do not own duplicate file-path copies. `RuntimeUiIconPalette` is the single cached material/tint resolver shared by the production HUD renderers, so each surface does not reparse the same runtime material payload independently.
+
+The runtime still exposes no dedicated UI vector/atlas type. Production HUD qualification therefore keeps procedural glyphs as the supported representation rather than loading authoring files directly or adding a hand-maintained runtime format. A future texture/vector icon payload must be added through the normal Asset Compiler and `RuntimeAssetCatalog`, preserve the existing `ui.icon.*` IDs, and demonstrate the same DPI/readability behavior.
 
 See [RTS Information Layer](RTSInformationLayer.md) for mapping and presentation ownership.
 

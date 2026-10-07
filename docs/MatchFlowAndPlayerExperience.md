@@ -81,13 +81,13 @@ The HUD never creates or advances gameplay state. Every published player-experie
 
 `GameplayHudRenderer` is the production-facing root compositor for the in-match HUD. `ClientRenderHost` submits player-facing HUD state through this compositor independently from `DevelopmentOverlayRenderer`, which remains the owner of development metrics and engineering diagnostic labels.
 
-`GameplayHudLayout` resolves the shared DPI-aware safe area and named regions for the top status bar, selection inspector, action dock, alert stack, minimap, and optional secondary views. Resource/power, selection inspection, the production player action dock, minimap, targeting, feedback, and remaining compatibility surfaces are routed through the composition boundary without moving gameplay authority into presentation.
+`GameplayHudLayout` resolves the shared DPI-aware safe area and named regions for the top status bar, selection inspector, action dock, alert stack, minimap, and optional secondary views. `GameplayHudVisualStyle` centralizes production panel geometry, spacing, icon scale, text hierarchy, state rails/outlines, alert severity colors, and progress-bar thickness so the major surfaces share one visual vocabulary without moving gameplay authority into presentation.
 
 HUD surfaces implement the narrow `IGameplayHudSurface` contract. New surfaces should consume immutable presentation snapshots/read models, render within the named region that owns their presentation responsibility, and submit player-authored changes through the established request/command boundary. They must not acquire live ECS or simulation ownership.
 
 `ResourcePowerHudSurface` now owns the top status bar and alert stack. It renders the seven resource quantities currently present in the authoritative player resource summary, generation/demand plus explicit power state, the existing causal alert flags/counts, and short-lived resolved command feedback. Rare Elements keep their semantic resource/icon identity but are not displayed because the active skirmish starting inventory does not currently expose an authoritative Rare Elements quantity.
 
-The remaining text-heavy compatibility output is retained behind `GameplayHudLegacyTextSurface` for residual pre-alpha guidance/result presentation. Resource, power, alert, command-feedback, selected-entity inspection, and the player action palette have been removed from that adapter. It is deliberately isolated beneath `GameplayHudRenderer`; new player-facing features must not be added to the development overlay.
+Residual match-result, pause, help, and onboarding presentation now renders through the production RTS information surface. `GameplayHudLegacyTextSurface` has been removed. `DevelopmentOverlayRenderer` is reserved for F1/F2 engineering diagnostics and is not a normal player-facing HUD owner.
 
 ## Player action dock presentation
 
@@ -208,13 +208,12 @@ This is the minimum coherent vertical-slice player experience, not final UI poli
 
 Current limitations include:
 
-- selection/action/result compatibility output still uses the existing lightweight text renderer while the resource/power/alert/feedback surface is dedicated production HUD presentation;
 - the top resource bar summarizes the starting Command Core inventory rather than aggregating every distributed inventory in the economy;
-- there is no final menu shell or frontend;
-- the minimap remains part of the lightweight RTS information surface rather than a final production map-control surface;
 - transient event history/notification queues are not yet persistent;
 - the surrender command path exists, but a dedicated final frontend/menu affordance is still deferred;
-- final visual hierarchy, iconography, accessibility treatment, localization, and audio feedback are deferred.
+- localization, audio feedback, and a future authored UI atlas/vector representation remain deferred.
+
+The in-match HUD itself now has a qualified production visual hierarchy. Common 1280×720, 1920×1080, 2560×1440, and representative 3440×1440 layouts are covered at the 96-DPI baseline and higher-DPI values. Selected, hovered, pressed, disabled, warning, critical, fog, supply, technology, and terminal states retain explicit text/icon/shape or pattern meaning instead of relying on tint alone.
 
 
 ## Player Action Surface
