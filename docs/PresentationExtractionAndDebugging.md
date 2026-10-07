@@ -178,6 +178,16 @@ Disabled debug capture publishes `Debug = null` and avoids constructing that hea
 
 Because the debug request is consumed at a completed-tick boundary, changing F2 can take one simulation tick before all underlying opt-in systems reflect the new capture state. Debug data is observational and never feeds simulation decisions.
 
+## Player-facing strategic overlay extraction
+
+Strategic overlays use a dedicated `StrategicOverlaySnapshot` published with the normal presentation snapshot. Extraction is mode-aware and copies stable player-facing Logistics, Supply, Sensors, Navigation, and Power read models at the completed-tick boundary.
+
+This contract is intentionally separate from `PresentationDebugSnapshot`. Enabling a strategic overlay does not require enabling developer diagnostics, and the overlay renderer does not treat arbitrary debug data as gameplay authority. Owned entity/component state is copied by the extractor; battlefield intelligence remains faction-filtered before presentation.
+
+The Power overlay copies logical `PowerNetworkId` membership plus generator/consumer operating state and network aggregates. Because no physical transmission topology exists in the authoritative model, the player-facing contract contains no fabricated power-link collection and the renderer draws no power lines.
+
+`All` combines overlay families with bounded visualization counts and ordering rather than attempting to render every diagnostic primitive.
+
 ## Gameplay HUD composition boundary
 
 The Windows render host has one explicit production HUD path: `GameplayHudRenderer`. It composes small RTS-specific `IGameplayHudSurface` implementations and supplies one `GameplayHudRenderContext` containing the current immutable snapshot, camera, world bounds, information-layer view, action/targeting views, DPI-aware `GameplayHudLayout`, and player-facing world overlay.
