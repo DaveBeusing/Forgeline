@@ -15,7 +15,8 @@ public enum PlayerActionPanelMode : byte
     UnitProduction = 3,
     Logistics = 4,
     Supply = 5,
-    Tactical = 6
+    Tactical = 6,
+    Technology = 7
 }
 
 public enum PlayerStockThresholdField : byte
@@ -162,6 +163,12 @@ public sealed class PlayerActionPanelController
                 PlayerActionPanelMode.Tactical);
         }
 
+        if (Pressed(input, PlatformKey.H))
+        {
+            ToggleMode(
+                PlayerActionPanelMode.Technology);
+        }
+
         if (Mode != PlayerActionPanelMode.Closed &&
             Pressed(input, PlatformKey.Escape))
         {
@@ -289,7 +296,8 @@ public sealed class PlayerActionPanelController
             (Mode is
                  PlayerActionPanelMode.Production or
                  PlayerActionPanelMode.UnitProduction or
-                 PlayerActionPanelMode.Logistics) &&
+                 PlayerActionPanelMode.Logistics or
+                 PlayerActionPanelMode.Technology) &&
             Pressed(input, PlatformKey.C);
 
         if (cancel)
@@ -421,6 +429,11 @@ public sealed class PlayerActionPanelController
             case PlayerActionPanelMode.Tactical:
                 ActivateTactical(
                     actions.Tactical);
+                break;
+
+            case PlayerActionPanelMode.Technology:
+                ActivateTechnology(
+                    actions.Technology);
                 break;
         }
     }
@@ -590,6 +603,32 @@ public sealed class PlayerActionPanelController
                 _automaticResupplyEnabled);
     }
 
+    private void ActivateTechnology(
+        IReadOnlyList<PlayerTechnologyActionReadModel> technologies)
+    {
+        if (SelectedIndex < 0 ||
+            SelectedIndex >= technologies.Count)
+        {
+            return;
+        }
+
+        PlayerTechnologyActionReadModel technology =
+            technologies[SelectedIndex];
+
+        if (!technology.CanStart ||
+            !technology.Facility.IsValid ||
+            !technology.SourceInventory.IsValid)
+        {
+            return;
+        }
+
+        _pendingRequest =
+            PlayerActionRequest.StartTechnologyResearch(
+                technology.TechnologyId,
+                technology.Facility,
+                technology.SourceInventory);
+    }
+
     private void ActivateTactical(
         PlayerTacticalActionReadModel? tactical)
     {
@@ -690,6 +729,24 @@ public sealed class PlayerActionPanelController
                         unitProduction.Requests[
                             requestIndex].RequestEntity);
             }
+        }
+
+        if (Mode ==
+                PlayerActionPanelMode.Technology &&
+            SelectedIndex >= 0 &&
+            SelectedIndex < actions.Technology.Count)
+        {
+            PlayerTechnologyActionReadModel technology =
+                actions.Technology[SelectedIndex];
+
+            if (technology.CanCancel)
+            {
+                _pendingRequest =
+                    PlayerActionRequest.CancelTechnologyResearch(
+                        technology.ActiveRequest);
+            }
+
+            return;
         }
 
         if (Mode ==
@@ -1195,6 +1252,7 @@ public sealed class PlayerActionPanelController
         _ = Pressed(input, PlatformKey.L);
         _ = Pressed(input, PlatformKey.Y);
         _ = Pressed(input, PlatformKey.K);
+        _ = Pressed(input, PlatformKey.H);
         _ = Pressed(input, PlatformKey.Escape);
         _ = Pressed(input, PlatformKey.Tab);
         _ = Pressed(input, PlatformKey.T);

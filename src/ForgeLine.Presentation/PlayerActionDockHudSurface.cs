@@ -572,6 +572,13 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                     targeting,
                     activeFormation);
                 break;
+
+            case PlayerActionPanelMode.Technology:
+                AppendTechnologyHeader(
+                    ref text,
+                    actions.Technology,
+                    panel.SelectedIndex);
+                break;
         }
     }
 
@@ -804,6 +811,101 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         text.Append(
             PlayerActionDockHudModel.ResolveSupplyProviderStateLabel(
                 value.ProviderState));
+    }
+
+    private static void AppendTechnologyHeader(
+        ref HudTextBuilder text,
+        IReadOnlyList<PlayerTechnologyActionReadModel> technologies,
+        int selectedIndex)
+    {
+        if (selectedIndex < 0 ||
+            selectedIndex >= technologies.Count)
+        {
+            text.Append("SELECT TECHNOLOGY");
+            return;
+        }
+
+        PlayerTechnologyActionReadModel technology =
+            technologies[selectedIndex];
+
+        text.Append(
+            PlayerActionDockHudModel.ResolveTechnologyDomainLabel(
+                technology.Domain));
+        text.Append(" ");
+        text.Append(
+            PlayerActionDockHudModel.ResolveTechnologyPhaseLabel(
+                technology.Phase));
+        text.Append("  ");
+
+        if (technology.State ==
+            PlayerTechnologyState.Researching)
+        {
+            text.Append("RESEARCH ");
+            text.Append(
+                technology.Progress *
+                100.0,
+                "F0");
+            text.Append("%");
+        }
+        else if (technology.State ==
+                 PlayerTechnologyState.Completed)
+        {
+            text.Append("COMPLETED");
+        }
+        else if (technology.State ==
+                 PlayerTechnologyState.Available)
+        {
+            text.Append("AVAILABLE");
+        }
+        else
+        {
+            text.Append(
+                PlayerActionDockHudModel.ResolveTechnologyBlockLabel(
+                    technology.BlockReason));
+        }
+
+        text.Append("  FAC ");
+        text.Append(
+            technology.RequiredFacilityName);
+        if (!technology.Facility.IsValid)
+        {
+            text.Append(" MISSING");
+        }
+
+        text.Append("  PWR ");
+        text.Append(
+            technology.CurrentPowerFraction *
+            100.0,
+            "F0");
+        text.Append("/");
+        text.Append(
+            technology.RequiredPowerFraction *
+            100.0,
+            "F0");
+        text.Append("%  COST ");
+        AppendAmounts(
+            ref text,
+            technology.Costs);
+
+        if (technology.Prerequisites.Count > 0)
+        {
+            int completed = 0;
+            for (int index = 0;
+                 index < technology.Prerequisites.Count;
+                 index++)
+            {
+                if (technology.Prerequisites[index].Completed)
+                {
+                    completed++;
+                }
+            }
+
+            text.Append("  PRE ");
+            text.Append(completed);
+            text.Append("/");
+            text.Append(
+                technology.Prerequisites.Count);
+        }
     }
 
     private static void AppendTacticalHeader(
@@ -1248,6 +1350,24 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                             supply.ProviderState));
                 }
 
+                break;
+            }
+
+            case PlayerActionPanelMode.Technology:
+            {
+                PlayerTechnologyActionReadModel technology =
+                    actions.Technology[index];
+                text.Append(
+                    PlayerActionDockHudModel.ResolveTechnologyDomainLabel(
+                        technology.Domain));
+                text.Append(" ");
+                text.Append(
+                    PlayerActionDockHudModel.ResolveTechnologyPhaseLabel(
+                        technology.Phase));
+                text.Append(" ");
+                text.Append(
+                    technology.ResearchTicks);
+                text.Append("T");
                 break;
             }
 
