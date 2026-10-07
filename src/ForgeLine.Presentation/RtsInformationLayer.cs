@@ -171,6 +171,7 @@ public enum StrategicOverlayMode : byte
     Supply,
     Sensors,
     Navigation,
+    Power,
     All
 }
 

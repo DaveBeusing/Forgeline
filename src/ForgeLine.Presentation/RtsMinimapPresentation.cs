@@ -395,6 +395,8 @@ public sealed class RtsInformationLayerController
                 StrategicOverlayMode.Sensors =>
                     StrategicOverlayMode.Navigation,
                 StrategicOverlayMode.Navigation =>
+                    StrategicOverlayMode.Power,
+                StrategicOverlayMode.Power =>
                     StrategicOverlayMode.All,
                 _ =>
                     StrategicOverlayMode.None
