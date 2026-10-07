@@ -104,6 +104,16 @@ The cursor set includes:
 
 `RtsCursorResolver` derives the cursor from current presentation interaction state. Building-placement validity and tactical-target validity take precedence over generic movement. Unsupported gameplay actions are never created by cursor selection.
 
+## Player action dock
+
+The production command surface uses the existing semantic icon catalog but exposes only actions backed by current gameplay/read-model contracts. The six mode buttons are Build, Process, Units, Logistics, Supply, and Combat. Semantic Patrol or Repair icons remain available to future UI work, but the dock does not manufacture unsupported gameplay behavior from those assets.
+
+Cards and footer controls render enabled/disabled state from the same model used by pointer/keyboard dispatch. When the immutable action snapshot already knows that a build lacks materials, a recipe or unit lacks inputs, an Attack lacks an identified target, artillery has no ammunition, or there is no active fire mission to cancel, the control is visibly disabled with an explicit reason instead of silently failing.
+
+Build, processing, unit-production, logistics, supply, and combat views use only existing copied read-model values: costs and captured availability; queue/progress/block state; rally presence; stock thresholds/priority/distribution/bottlenecks; cargo lifecycle/wait/failure; supply thresholds/provider/priority; tactical eligibility/order/target counts; and artillery ammunition/range/mission state. Resolved acceptance/rejection remains command feedback, not renderer-owned state.
+
+Pointer hit regions come from the shared DPI-aware ActionDock layout. Cards select context, footer buttons perform the corresponding action/edit operation, and the entire open dock captures pointer input before the world interaction layer.
+
 ## Selection and world markers
 
 World-space information markers supplement the existing selection/input model:
