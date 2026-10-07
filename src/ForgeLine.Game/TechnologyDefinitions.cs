@@ -13,6 +13,18 @@ public readonly record struct TechnologyId(uint Value) : IComparable<TechnologyI
     public int CompareTo(TechnologyId other) =>
         Value.CompareTo(other.Value);
 
+    public static bool operator <(TechnologyId left, TechnologyId right) =>
+        left.CompareTo(right) < 0;
+
+    public static bool operator <=(TechnologyId left, TechnologyId right) =>
+        left.CompareTo(right) <= 0;
+
+    public static bool operator >(TechnologyId left, TechnologyId right) =>
+        left.CompareTo(right) > 0;
+
+    public static bool operator >=(TechnologyId left, TechnologyId right) =>
+        left.CompareTo(right) >= 0;
+
     public override string ToString() =>
         Value.ToString(
             System.Globalization.CultureInfo.InvariantCulture);
@@ -27,6 +39,26 @@ public readonly record struct TechnologyCapabilityId(uint Value) :
 
     public int CompareTo(TechnologyCapabilityId other) =>
         Value.CompareTo(other.Value);
+
+    public static bool operator <(
+        TechnologyCapabilityId left,
+        TechnologyCapabilityId right) =>
+        left.CompareTo(right) < 0;
+
+    public static bool operator <=(
+        TechnologyCapabilityId left,
+        TechnologyCapabilityId right) =>
+        left.CompareTo(right) <= 0;
+
+    public static bool operator >(
+        TechnologyCapabilityId left,
+        TechnologyCapabilityId right) =>
+        left.CompareTo(right) > 0;
+
+    public static bool operator >=(
+        TechnologyCapabilityId left,
+        TechnologyCapabilityId right) =>
+        left.CompareTo(right) >= 0;
 
     public override string ToString() =>
         Value.ToString(
