@@ -112,30 +112,29 @@ public sealed class ResourcePowerAlertHudTests
                 constrained));
     }
 
-    [Theory]
-    [InlineData(
-        PlayerAlertState.LowPower,
-        HudAlertSeverity.Warning)]
-    [InlineData(
-        PlayerAlertState.ProductionBlocked,
-        HudAlertSeverity.Warning)]
-    [InlineData(
-        PlayerAlertState.SupplyCritical,
-        HudAlertSeverity.Critical)]
-    [InlineData(
-        PlayerAlertState.CommandCoreDamaged,
-        HudAlertSeverity.Critical)]
-    [InlineData(
-        PlayerAlertState.CommandCoreDestroyed,
-        HudAlertSeverity.Critical)]
-    public void AlertSeverityHasExplicitSemanticMapping(
-        PlayerAlertState alert,
-        HudAlertSeverity expected)
+    [Fact]
+    public void AlertSeverityHasExplicitSemanticMapping()
     {
         Assert.Equal(
-            expected,
+            HudAlertSeverity.Warning,
             ResourcePowerHudModel.ResolveAlertSeverity(
-                alert));
+                PlayerAlertState.LowPower));
+        Assert.Equal(
+            HudAlertSeverity.Warning,
+            ResourcePowerHudModel.ResolveAlertSeverity(
+                PlayerAlertState.ProductionBlocked));
+        Assert.Equal(
+            HudAlertSeverity.Critical,
+            ResourcePowerHudModel.ResolveAlertSeverity(
+                PlayerAlertState.SupplyCritical));
+        Assert.Equal(
+            HudAlertSeverity.Critical,
+            ResourcePowerHudModel.ResolveAlertSeverity(
+                PlayerAlertState.CommandCoreDamaged));
+        Assert.Equal(
+            HudAlertSeverity.Critical,
+            ResourcePowerHudModel.ResolveAlertSeverity(
+                PlayerAlertState.CommandCoreDestroyed));
     }
 
     [Fact]
