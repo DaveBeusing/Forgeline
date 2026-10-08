@@ -439,7 +439,6 @@ internal sealed class ClientApplication
             _startup.SessionLoadEnded(true);
             return window.IsOpen ? SessionReturnToMenuExitCode : 0;
         }
-        sessionTransitionRenderer.Dispose();
 
         var graphicsTarget =
             new GraphicsWindowTarget(
@@ -457,7 +456,8 @@ internal sealed class ClientApplication
                 camera.Settings,
                 runtimeAssets,
                 _settings.CreateSceneLightingSettings(),
-                _startup, asynchronousStartup: true, expectedSession: simulationHost.SessionId);
+                _startup, asynchronousStartup: true, expectedSession: simulationHost.SessionId,
+                transitionHost: sessionTransitionRenderer);
         bool playable = ClientSessionLoadingLoop.WaitForPresentation(
             pumpEvents: () =>
             {

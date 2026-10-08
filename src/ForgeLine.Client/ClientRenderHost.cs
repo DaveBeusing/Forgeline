@@ -116,6 +116,7 @@ internal sealed class ClientRenderHost : IDisposable
     private int _gameplayPresented;
     private readonly bool _asynchronousStartup;
     private readonly SimulationSessionId? _expectedSession;
+    private readonly ClientFrontendRenderHost? _frontendOwner;
     private readonly object _frameGate = new();
     private readonly object _disposeGate = new();
     private readonly object _faultWaitGate = new();
@@ -149,11 +150,15 @@ internal sealed class ClientRenderHost : IDisposable
         SceneLightingSettings? sceneLighting = null,
         StartupDiagnostics? startup = null,
         bool asynchronousStartup = false,
-        SimulationSessionId? expectedSession = null)
+        SimulationSessionId? expectedSession = null,
+        ClientFrontendRenderHost? transitionHost = null)
     {
         _startup = startup ?? StartupDiagnostics.Disabled;
         _asynchronousStartup = asynchronousStartup;
         _expectedSession = expectedSession;
+        _frontendOwner = transitionHost;
+        if (transitionHost is not null && !asynchronousStartup)
+            throw new ArgumentException("A renderer continuation requires asynchronous startup.", nameof(asynchronousStartup));
         initialTarget.Validate();
         _initialTarget = initialTarget;
         _terrain =
@@ -172,9 +177,9 @@ internal sealed class ClientRenderHost : IDisposable
             SceneLightingSettings.Default;
         _sceneLighting.Validate();
 
-        _thread =
-            CreateThread();
-        if (asynchronousStartup) _thread.Start();
+        _thread = transitionHost?.ExecutionThread ?? CreateThread();
+        if (transitionHost is not null) transitionHost.ContinueWith(device => RenderLoop(device));
+        else if (asynchronousStartup) _thread.Start();
         else StartAndWait();
     }
 
@@ -289,6 +294,9 @@ internal sealed class ClientRenderHost : IDisposable
     public void ThrowIfFaulted()
     {
         Volatile.Read(ref _failure)?.Throw();
+        _frontendOwner?.ThrowIfFaulted();
+        if (_frontendOwner is not null && !_thread.IsAlive && !_started.IsSet && Volatile.Read(ref _stopping) == 0)
+            throw new InvalidOperationException("The render owner stopped before gameplay initialization.");
     }
 
     public void Dispose()
@@ -338,10 +346,13 @@ internal sealed class ClientRenderHost : IDisposable
         }
     }
 
-    private void RenderLoop()
+    private void RenderLoop() => RenderLoop(null);
+
+    private void RenderLoop(IGraphicsDevice? existingDevice)
     {
         try
         {
+            if (Volatile.Read(ref _stopping) != 0) return;
             if (_testRenderAction is not null)
             {
                 RunTestRenderLoop(
@@ -366,9 +377,15 @@ internal sealed class ClientRenderHost : IDisposable
                 throw new InvalidOperationException(
                     "Render camera settings were not configured.");
 
-            using IGraphicsDevice graphics =
-                GraphicsDeviceFactory.CreateForWindowTarget(
-                    initialTarget);
+            using IGraphicsDevice? ownedGraphics = existingDevice is null
+                ? GraphicsDeviceFactory.CreateForWindowTarget(initialTarget) : null;
+            IGraphicsDevice graphics = existingDevice ?? ownedGraphics!;
+            if (existingDevice is not null)
+            {
+                graphics.WaitForIdle();
+                graphics.Resize(initialTarget.Suspended ? 0 : initialTarget.Width,
+                    initialTarget.Suspended ? 0 : initialTarget.Height);
+            }
             using var terrainRenderer =
                 new TerrainRenderer(
                     graphics,

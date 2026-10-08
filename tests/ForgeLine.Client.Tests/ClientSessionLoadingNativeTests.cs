@@ -12,6 +12,40 @@ namespace ForgeLine.Client.Tests;
 
 public sealed class ClientSessionLoadingNativeTests
 {
+    [Fact]
+    public void CancelDuringQueuedGraphicsContinuationStopsTheOriginalOwnerBeforeSessionDisposal()
+    {
+        using var platform = new WindowsPlatform();
+        using IWindow window = platform.CreateWindow(new WindowConfiguration("FORGELINE Session Cancellation Test", 640, 360));
+        var target = new GraphicsWindowTarget(window.NativeHandle.Value, 640, 360, false);
+        using var transition = new ClientFrontendRenderHost(target,
+            initialSurface: ClientSessionLoadingLoop.Surface(new(ClientSessionLoadPhase.ScenarioAssembly)),
+            asynchronousStartup: true);
+        var timeout = Stopwatch.StartNew();
+        while (!transition.HasPresentedFrame)
+        {
+            Assert.True(timeout.Elapsed < TimeSpan.FromSeconds(30));
+            Assert.True(platform.PumpEvents());
+            transition.ThrowIfFaulted();
+            platform.WaitForEvents(TimeSpan.FromMilliseconds(16));
+        }
+        using ClientLoadedSession loaded = ClientSessionFactory.CreateOwned(
+            ClientSessionRequest.NewGame(947), _ => { }, TestContext.Current.CancellationToken);
+        var cameraSettings = new ClientUserSettings().CreateCameraSettings(new Vector3(700, 0, 1500));
+        using var renderer = new ClientRenderHost(target, loaded.Runtime.Terrain,
+            new PresentationSnapshotBuffer(), cameraSettings, asynchronousStartup: true, transitionHost: transition);
+        renderer.RequestStop();
+        while (renderer.IsExecutionThreadAlive)
+        {
+            Assert.True(timeout.Elapsed < TimeSpan.FromSeconds(30));
+            Assert.True(platform.PumpEvents());
+            platform.WaitForEvents(TimeSpan.FromMilliseconds(16));
+        }
+        renderer.ThrowIfFaulted();
+        Assert.False(transition.ExecutionThread.IsAlive);
+        Assert.False(renderer.HasPresentedGameplayFrame);
+    }
+
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
@@ -65,10 +99,10 @@ public sealed class ClientSessionLoadingNativeTests
             simulation.ThrowIfFaulted(); Assert.True(Pump());
             platform.WaitForEvents(TimeSpan.FromMilliseconds(16));
         }
-        transition.Dispose();
         var cameraSettings = new ClientUserSettings().CreateCameraSettings(new Vector3(700, 0, 1500));
         using var renderer = new ClientRenderHost(target, runtime.Terrain, snapshots, cameraSettings,
-            startup: diagnostics, asynchronousStartup: true, expectedSession: simulation.SessionId);
+            startup: diagnostics, asynchronousStartup: true, expectedSession: simulation.SessionId,
+            transitionHost: transition);
         var camera = new RtsCamera(cameraSettings);
         ClientRenderFrame Frame(FrontendSurfaceView? frontend) => new(camera.CaptureState(),
             640, 360, false, default, default, default, FormationTemplate.Compact, [], [], [], [], Frontend: frontend);
