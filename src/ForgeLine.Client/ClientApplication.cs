@@ -53,12 +53,15 @@ internal sealed class ClientApplication
     private readonly IPlatform _platform;
     private readonly ClientUserSettings _settings;
     private readonly string _settingsPath;
+    private readonly StartupDiagnostics _startup;
 
     internal ClientApplication(
         IPlatform platform,
         ClientUserSettings? settings = null,
-        string? settingsPath = null)
+        string? settingsPath = null,
+        StartupDiagnostics? startup = null)
     {
+        _startup = startup ?? StartupDiagnostics.Disabled;
         _platform =
             platform ??
             throw new ArgumentNullException(nameof(platform));
@@ -83,7 +86,9 @@ internal sealed class ClientApplication
         WindowConfiguration configuration =
             _settings.CreateWindowConfiguration();
 
-        using IWindow window = _platform.CreateWindow(configuration);
+        using IWindow window = _startup.Measure(StartupPhase.Window,
+            () => _platform.CreateWindow(configuration));
+        _startup.Mark(StartupPhase.WindowVisible);
         ClientWindowQualificationSnapshot qualificationWindow =
             CaptureWindowQualification(
                 window);
@@ -105,7 +110,8 @@ internal sealed class ClientApplication
         RuntimeAssetCatalog? runtimeAssets;
 
         using (var bootRenderer =
-            new ClientFrontendRenderHost(bootstrapTarget))
+            _startup.Measure(StartupPhase.BootRenderer,
+                () => new ClientFrontendRenderHost(bootstrapTarget, _startup)))
         {
             frontendLoading.BeginPhase(
                 FrontendLoadingPhase.LoadingSettings,
@@ -123,7 +129,8 @@ internal sealed class ClientApplication
                     frontendLoading.State));
             PumpBootFrame(window, bootRenderer);
             runtimeAssets =
-                LoadRuntimeAssets();
+                _startup.Measure(StartupPhase.RuntimeAssets, LoadRuntimeAssets);
+            _startup.Mark(StartupPhase.RuntimeAssetsReady);
             if (runtimeAssets is not null)
             {
                 bootRenderer.UseSplashAssets(runtimeAssets);
@@ -139,6 +146,13 @@ internal sealed class ClientApplication
             if (!smokeTest && !skipSplash && _settings.ShowStudioSplash && window.IsOpen)
             {
                 RunStudioSplash(window, bootRenderer, runtimeAssets);
+            }
+            else
+            {
+                _startup.Begin(StartupPhase.StudioSplash);
+                _startup.End(StartupPhase.StudioSplash, StartupEventKind.Skipped,
+                    detail: smokeTest ? "SmokeMode" : skipSplash ? "CommandLine" :
+                        !_settings.ShowStudioSplash ? "Settings" : "WindowClosed");
             }
         }
 
@@ -170,6 +184,7 @@ internal sealed class ClientApplication
             sessionRequest = selected;
         }
 
+        _startup.BeginSession();
         var sessionTransitionTarget =
             new GraphicsWindowTarget(
                 window.NativeHandle.Value,
@@ -196,9 +211,9 @@ internal sealed class ClientApplication
             sessionTransitionRenderer);
 
         using MatchRuntime scenario =
-            ClientSessionFactory.Create(
-                sessionRequest,
-                jobScheduler);
+            _startup.Measure(StartupPhase.SessionReconstruction,
+                () => ClientSessionFactory.Create(sessionRequest, jobScheduler), 1);
+        _startup.Mark(StartupPhase.SessionRuntimeReady, 1);
 
         frontendLoading.ReportProgress(
             1,
@@ -362,6 +377,7 @@ internal sealed class ClientApplication
                 window.ClientSize.Height,
                 window.IsMinimized ||
                 window.ClientSize.IsEmpty);
+        _startup.Begin(StartupPhase.GameplayRenderer, 1);
         using var renderHost =
             new ClientRenderHost(
                 graphicsTarget,
@@ -369,7 +385,9 @@ internal sealed class ClientApplication
                 snapshotBuffer,
                 camera.Settings,
                 runtimeAssets,
-                _settings.CreateSceneLightingSettings());
+                _settings.CreateSceneLightingSettings(),
+                _startup);
+        _startup.End(StartupPhase.GameplayRenderer, sessionId: 1);
 
         PlayerCommandSubmissionReceipt? lastCommandReceipt = null;
         PlayerCommandResultReadModel? lastCommandResult = null;
@@ -2625,6 +2643,7 @@ internal sealed class ClientApplication
         GameFrontendShell shell,
         NewGameModel newGame)
     {
+        _startup.Begin(StartupPhase.Frontend);
         shell.Dispatch(
             GameFrontendAction.LoadingCompleted);
 
@@ -2670,7 +2689,9 @@ internal sealed class ClientApplication
                 window.IsMinimized ||
                 window.ClientSize.IsEmpty);
         using var renderer =
-            new ClientFrontendRenderHost(target);
+            new ClientFrontendRenderHost(target, _startup);
+        _startup.End(StartupPhase.Frontend);
+        _startup.Mark(StartupPhase.FrontendReady);
 
         while (window.IsOpen)
         {
@@ -2682,6 +2703,7 @@ internal sealed class ClientApplication
 
             DrainWindowEvents(window);
             DrainInputEvents(window, input);
+            _startup.MenuInteractive();
 
             bool enter =
                 ConsumeKeyPress(
@@ -3114,6 +3136,7 @@ internal sealed class ClientApplication
         RuntimeAssetCatalog? assets)
     {
         SplashScreenController? controller = null;
+        _startup.Begin(StartupPhase.StudioSplash);
         try
         {
             SplashDefinition? definition = assets is null
@@ -3125,6 +3148,7 @@ internal sealed class ClientApplication
 
             if (definition is null)
             {
+                _startup.End(StartupPhase.StudioSplash, StartupEventKind.Failed, detail: "AssetsUnavailable");
                 Console.Error.WriteLine("[studio:splash:bypass] Required studio assets unavailable.");
                 return;
             }
@@ -3155,15 +3179,22 @@ internal sealed class ClientApplication
                 renderer.ThrowIfFaulted();
                 if (renderer.SplashUnavailable)
                 {
+                    _startup.End(StartupPhase.StudioSplash, StartupEventKind.Failed, detail: "RendererUnavailable");
                     Console.Error.WriteLine("[studio:splash:bypass] Splash renderer could not initialize resources.");
                     break;
                 }
                 _platform.WaitForEvents(IdleWait);
             }
+            _startup.End(StartupPhase.StudioSplash,
+                controller.WasSkipped ? StartupEventKind.Skipped :
+                controller.IsComplete ? StartupEventKind.Completed : StartupEventKind.Cancelled);
             Console.WriteLine($"[studio:splash] completed={controller.IsComplete} skipped={controller.WasSkipped}");
         }
         catch (Exception exception)
         {
+            _startup.End(StartupPhase.StudioSplash,
+                exception is OperationCanceledException ? StartupEventKind.Cancelled : StartupEventKind.Failed,
+                detail: exception.GetType().Name);
             Console.Error.WriteLine($"[studio:splash:fallback] {exception.GetType().Name}: {exception.Message}");
         }
         finally

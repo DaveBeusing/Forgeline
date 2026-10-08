@@ -610,6 +610,8 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         }
     }
 
+    public ulong PresentedFrameCount => _presentedFrameCount;
+
     public void RenderFrame(
         GraphicsColor clearColor,
         Action<IGraphicsCommandContext>? recordCommands = null)

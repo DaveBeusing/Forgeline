@@ -1,5 +1,7 @@
 # Diagnostics and Performance
 
+For Windows launch, frontend and session readiness timing, see [Startup Timing and Readiness](StartupDiagnostics.md). Use `--startup-diagnostics-output <report.json>` on the client to collect opt-in monotonic phase events.
+
 ForgeLine Engine treats correctness diagnostics and performance measurement as part of the engine foundation rather than late-stage tooling.
 
 ## Diagnostic Model
