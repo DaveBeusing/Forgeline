@@ -37,6 +37,8 @@ public sealed record RuntimeAssetQualificationReport
 
     public required long TextureRuntimeBytes { get; init; }
 
+    public long StudioSplashTextureRuntimeBytes { get; init; }
+
     public required long MaterialRuntimeBytes { get; init; }
 
     public required TimeSpan CatalogLoadDuration { get; init; }
@@ -99,6 +101,7 @@ public static class RuntimeAssetQualification
         long totalBytes = 0;
         long meshBytes = 0;
         long textureBytes = 0;
+        long studioSplashTextureBytes = 0;
         long materialBytes = 0;
         int meshCount = 0;
         int textureCount = 0;
@@ -202,6 +205,13 @@ public static class RuntimeAssetQualification
                         checked(
                             textureBytes +
                             runtimeBytes);
+                    if (record.Id.StartsWith(
+                        "branding.undefined_behavior.splash.",
+                        StringComparison.Ordinal))
+                    {
+                        studioSplashTextureBytes = checked(
+                            studioSplashTextureBytes + runtimeBytes);
+                    }
                     break;
 
                 case RuntimeAssetType.Material:
@@ -237,6 +247,8 @@ public static class RuntimeAssetQualification
                 meshBytes,
             TextureRuntimeBytes =
                 textureBytes,
+            StudioSplashTextureRuntimeBytes =
+                studioSplashTextureBytes,
             MaterialRuntimeBytes =
                 materialBytes,
             CatalogLoadDuration =

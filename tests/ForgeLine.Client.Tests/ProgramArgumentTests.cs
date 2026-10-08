@@ -52,4 +52,18 @@ public sealed class ProgramArgumentTests
         Assert.False(
             parsed);
     }
+    [Fact]
+    public void StudioSplashBypassFlagIsAccepted()
+    {
+        bool parsed = Program.TryParseArguments(
+            ["--skip-splash", "--settings-root", "artifacts/settings"],
+            out bool smokeTest,
+            out int renderInstances,
+            out _,
+            out string? settingsRoot);
+        Assert.True(parsed);
+        Assert.False(smokeTest);
+        Assert.Equal(0, renderInstances);
+        Assert.Equal("artifacts/settings", settingsRoot);
+    }
 }

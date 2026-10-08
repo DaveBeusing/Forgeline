@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.ExceptionServices;
+using ForgeLine.Assets;
 using ForgeLine.Graphics;
 using ForgeLine.Presentation;
 
@@ -14,10 +15,12 @@ internal sealed class ClientFrontendRenderHost : IDisposable
     private readonly ManualResetEventSlim _frameRendered = new(false);
     private readonly Thread _thread;
     private FrontendSurfaceView? _latest;
+    private RuntimeAssetCatalog? _splashAssets;
     private long _publishedSequence;
     private long _renderedSequence;
     private ExceptionDispatchInfo? _failure;
     private int _stopping;
+    private int _splashUnavailable;
     private bool _disposed;
 
     internal ClientFrontendRenderHost(
@@ -46,6 +49,13 @@ internal sealed class ClientFrontendRenderHost : IDisposable
             _frameRendered.Reset();
         }
 
+        _signal.Set();
+    }
+
+    internal void UseSplashAssets(RuntimeAssetCatalog assets)
+    {
+        ArgumentNullException.ThrowIfNull(assets);
+        lock (_gate) _splashAssets = assets;
         _signal.Set();
     }
 
@@ -90,6 +100,8 @@ internal sealed class ClientFrontendRenderHost : IDisposable
         return true;
     }
 
+    internal bool SplashUnavailable => Volatile.Read(ref _splashUnavailable) != 0;
+
     internal void ThrowIfFaulted() =>
         Volatile.Read(ref _failure)?.Throw();
 
@@ -123,15 +135,19 @@ internal sealed class ClientFrontendRenderHost : IDisposable
             using var renderer =
                 new FrontendOverlayRenderer(graphics);
             _started.Set();
-
+            StudioSplashTextureRenderer? splashRenderer = null;
+            try
+            {
             while (Volatile.Read(ref _stopping) == 0)
             {
                 _signal.WaitOne(TimeSpan.FromMilliseconds(16));
                 FrontendSurfaceView? view;
+                RuntimeAssetCatalog? splashAssets;
                 long sequence;
                 lock (_gate)
                 {
                     view = _latest;
+                    splashAssets = _splashAssets;
                     sequence = _publishedSequence;
                 }
 
@@ -142,16 +158,47 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                     continue;
                 }
 
+                if (view.Value.Kind == FrontendSurfaceKind.StudioSplash &&
+                    splashRenderer is null && splashAssets is not null)
+                {
+                    try
+                    {
+                        splashRenderer = new StudioSplashTextureRenderer(graphics, splashAssets);
+                        if (!splashRenderer.HasAssets)
+                            Volatile.Write(ref _splashUnavailable, 1);
+                    }
+                    catch (Exception error)
+                    {
+                        Volatile.Write(ref _splashUnavailable, 1);
+                        Console.Error.WriteLine($"[studio:renderer:fallback] {error.Message}");
+                    }
+                }
+
                 graphics.RenderFrame(
                     GraphicsColor.ForgeLineClear,
                     context =>
-                        renderer.Render(
-                            context,
-                            view.Value));
+                    {
+                        if (view.Value.Kind == FrontendSurfaceKind.StudioSplash &&
+                            splashRenderer?.HasAssets == true)
+                        {
+                            splashRenderer.Render(context,
+                                view.Value.SplashElapsedSeconds,
+                                view.Value.SplashMasterOpacity);
+                        }
+                        else
+                        {
+                            renderer.Render(context, view.Value);
+                        }
+                    });
                 Volatile.Write(
                     ref _renderedSequence,
                     sequence);
                 _frameRendered.Set();
+            }
+            }
+            finally
+            {
+                splashRenderer?.Dispose();
             }
         }
         catch (Exception exception)

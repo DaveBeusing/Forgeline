@@ -80,6 +80,24 @@ public sealed class FrontendOverlayRenderer : IDisposable
             context.Width,
             context.Height);
 
+        if (view.Kind == FrontendSurfaceKind.StudioSplash)
+        {
+            float seconds = Math.Clamp(view.SplashElapsedSeconds, 0f, 3f);
+            float monogramAlpha = SplashOpacity(seconds, 0.8f, 1.35f, 2.7f, 3f) * view.SplashMasterOpacity;
+            float wordmarkAlpha = SplashOpacity(seconds, 1.25f, 2.05f, 2.7f, 3f) * view.SplashMasterOpacity;
+            float subtitleAlpha = SplashOpacity(seconds, 1.95f, 2.35f, 2.7f, 3f) * view.SplashMasterOpacity;
+            EmitText("U/B", 894 * scale, 344 * scale,
+                SplashTint(0.94f, 0.72f, 0.28f, monogramAlpha),
+                context.Width, context.Height, 3f * scale);
+            EmitText("UNDEF BHVIOR", 680 * scale, 566 * scale,
+                SplashTint(0.90f, 0.91f, 0.87f, wordmarkAlpha),
+                context.Width, context.Height, 2.2f * scale);
+            EmitText("UNDEFINED BEHAVIOR STUDIOS", 650 * scale, 694 * scale,
+                SplashTint(0.56f, 0.61f, 0.58f, subtitleAlpha),
+                context.Width, context.Height, 1.1f * scale);
+        }
+        else
+        {
         EmitText("FORGELINE", 92 * scale, 82 * scale, new Vector4(0.82f, 0.84f, 0.78f, 1), context.Width, context.Height, scale);
         EmitText("BUILD. SUPPLY. CONQUER.", 94 * scale, 128 * scale, new Vector4(0.52f, 0.58f, 0.50f, 1), context.Width, context.Height, scale);
 
@@ -232,6 +250,8 @@ public sealed class FrontendOverlayRenderer : IDisposable
             EmitText(view.Footer, 94 * scale, 930 * scale, new Vector4(0.40f, 0.44f, 0.40f, 1), context.Width, context.Height, scale);
         }
 
+        }
+
         if (_vertexCount == 0)
         {
             LastRenderedVertexCount = 0;
@@ -253,6 +273,23 @@ public sealed class FrontendOverlayRenderer : IDisposable
         _vertexBuffers.Clear();
         _pipeline.Dispose();
         _disposed = true;
+    }
+
+    private static Vector4 SplashTint(float red, float green, float blue, float opacity)
+    {
+        float a = Math.Clamp(opacity, 0f, 1f);
+        return new Vector4(0.035f + (red - 0.035f) * a,
+            0.045f + (green - 0.045f) * a,
+            0.045f + (blue - 0.045f) * a, 1f);
+    }
+
+    private static float SplashOpacity(float time, float fadeInStart, float fadeInEnd,
+        float fadeOutStart, float fadeOutEnd)
+    {
+        if (time <= fadeInStart || time >= fadeOutEnd) return 0f;
+        if (time < fadeInEnd) return Math.Clamp((time - fadeInStart) / (fadeInEnd - fadeInStart), 0f, 1f);
+        if (time > fadeOutStart) return Math.Clamp((fadeOutEnd - time) / (fadeOutEnd - fadeOutStart), 0f, 1f);
+        return 1f;
     }
 
     private void EmitControlButton(string label, float x, float y, float width, float height, int viewportWidth, int viewportHeight, float scale)

@@ -33,6 +33,8 @@ internal sealed record ClientUserSettings
 
     public bool ShowOnboarding { get; init; } = true;
 
+    public bool ShowStudioSplash { get; init; } = true;
+
     public bool EdgeScrollEnabled { get; init; } = true;
 
     public float CameraPanSpeedMultiplier { get; init; } = 1.0f;
