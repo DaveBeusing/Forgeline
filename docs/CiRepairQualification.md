@@ -26,6 +26,10 @@ Asset loading and frontend preparation use two transient, dedicated CPU/I/O work
 
 Before creating a replacement window, the platform drains all pending messages and resets its quit state. Windows generates the previous window's WM_QUIT only once higher-priority messages are exhausted, so filtering for quit alone could leave shutdown pending. The recreation regression covers both an empty queue and an explicitly queued thread message, retaining valid-handle, open-window and successful-pump assertions.
 
+## Cargo recovery queue ownership
+
+Cargo replacement remains the critical production goal until the live fleet reaches its target. Unbuilt requests cannot haul their own missing inputs. When a high-priority supply or reconnaissance request lacks materials, cargo recovery can cancel it and start an already queued cargo replacement. Running production retains its slot and reserved inputs. Supply and reconnaissance queueing preserve replacement materials while the live cargo fleet is deficient. The targeted regressions verify pending-versus-live capacity, blocked high-priority preemption and preservation of running production. Physical logistics and production costs remain authoritative.
+
 ## Validation status
 
 Canonical Release solution build: zero warnings/errors. Complete solution suite before the startup ownership regression: 1,074 tests, 1,072 passed, zero failed, two native lifetime cases skipped unless explicitly enabled. Focused validation: 45 presentation cases, both repaired game cases and all 54 asset cases pass. Canonical map and clean runtime-asset compilation qualify. Negative smoke-budget probes reject an extra instance batch and a duplicate terrain draw. Updated full-suite and two-processor startup validation results are recorded on the repair pull request.

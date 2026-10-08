@@ -11,6 +11,103 @@ namespace ForgeLine.Game.Tests;
 public sealed class SkirmishProductionPolicyTests
 {
     [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void QueuedCargoRecoveryPreemptsOnlyBlockedSupplyProduction(bool supplyInputsAvailable)
+    {
+        using MatchRuntime scenario = CentralDivideScenario.Create(
+            CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
+        EntityRegistry entities = scenario.Simulation.Entities;
+        var owner = new ForgeLine.Game.PlayerId(1);
+        EntityId lostCargo = EntityId.Invalid;
+        foreach (EntityId entity in entities.Query<ControllableEntity, UnitIdentity>())
+            if (entities.GetComponent<ControllableEntity>(entity).Owner == owner &&
+                entities.GetComponent<UnitIdentity>(entity).UnitId == UnitIds.CargoTruck)
+            { lostCargo = entity; break; }
+        Assert.True(entities.DestroyEntity(lostCargo));
+        InventoryId input = scenario.Inventories.CreateInventory(new InventorySpecification(4_000.0));
+        foreach (UnitResourceCost cost in DirectorateContent.CreateUnitCatalog()[
+                     supplyInputsAvailable ? UnitIds.SupplyTruck : UnitIds.CargoTruck].Costs)
+            Assert.True(scenario.Inventories.Add(input, cost.ResourceId, cost.Quantity).Succeeded);
+        EntityId factory = entities.CreateEntity();
+        entities.AddComponent(factory, entities.GetComponent<WorldTransform>(scenario.GetBase(owner).CommandCore));
+        entities.AddComponent(factory, new CompletedBuilding(BuildingIds.VehicleFactory, owner, SimulationTick.Zero));
+        entities.AddComponent(factory, new ControllableEntity(owner, ControllableEntityCategory.Building));
+        entities.AddComponent(factory, new UnitProductionFacility(input,
+            UnitProductionCapability.Vehicle | UnitProductionCapability.Logistics,
+            owner, Vector3.Zero, SimulationTick.Zero));
+        entities.AddComponent(factory, new PowerNetworkMembership(new PowerNetworkId(10_006)));
+        entities.AddComponent(factory, new PowerGenerator(10.0));
+        entities.AddComponent(factory, new PowerConsumer(1.0, PowerPriority.Industrial, enabled: true));
+        var supply = new QueueUnitProductionCommand(owner, factory, UnitIds.SupplyTruck,
+            SimulationTick.Zero, ProductionPriority.High);
+        var cargo = new QueueUnitProductionCommand(owner, factory, UnitIds.CargoTruck,
+            SimulationTick.Zero, ProductionPriority.High);
+        scenario.Simulation.SubmitCommand(supply, SimulationTick.Zero.Next());
+        scenario.Simulation.SubmitCommand(cargo, SimulationTick.Zero.Next());
+
+        scenario.Simulation.RunTicks(3, TestContext.Current.CancellationToken);
+
+        Assert.True(supply.Accepted);
+        Assert.True(cargo.Accepted);
+        UnitProductionFacility recovered = entities.GetComponent<UnitProductionFacility>(factory);
+        Assert.Equal(supplyInputsAvailable ? UnitIds.SupplyTruck : UnitIds.CargoTruck, recovered.ActiveUnit);
+        Assert.Equal(UnitProductionStatus.Running, recovered.Status);
+        Assert.True(recovered.InputsReserved);
+    }
+
+    [Fact]
+    public void PendingCargoReplacementsDoNotReleaseTheirMaterialReserveForSupplyProduction()
+    {
+        using MatchRuntime scenario = CentralDivideScenario.Create(
+            CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
+        EntityRegistry entities = scenario.Simulation.Entities;
+        var owner = new ForgeLine.Game.PlayerId(1);
+        var cargo = new List<EntityId>();
+        foreach (EntityId entity in entities.Query<ControllableEntity, UnitIdentity>())
+            if (entities.GetComponent<ControllableEntity>(entity).Owner == owner &&
+                entities.GetComponent<UnitIdentity>(entity).UnitId == UnitIds.CargoTruck)
+                cargo.Add(entity);
+        foreach (EntityId entity in cargo)
+            Assert.True(entities.DestroyEntity(entity));
+
+        InventoryId input = scenario.Inventories.CreateInventory(new InventorySpecification(4_000.0));
+        UnitDefinition supply = DirectorateContent.CreateUnitCatalog()[UnitIds.SupplyTruck];
+        foreach (UnitResourceCost cost in supply.Costs)
+            Assert.True(scenario.Inventories.Add(input, cost.ResourceId, cost.Quantity).Succeeded);
+
+        EntityId factory = entities.CreateEntity();
+        entities.AddComponent(factory, entities.GetComponent<WorldTransform>(scenario.GetBase(owner).CommandCore));
+        entities.AddComponent(factory, new CompletedBuilding(BuildingIds.VehicleFactory, owner, SimulationTick.Zero));
+        entities.AddComponent(factory, new ControllableEntity(owner, ControllableEntityCategory.Building));
+        entities.AddComponent(factory, new UnitProductionFacility(input,
+            UnitProductionCapability.Vehicle | UnitProductionCapability.Logistics,
+            owner, Vector3.Zero, SimulationTick.Zero));
+        entities.AddComponent(factory, new PowerNetworkMembership(new PowerNetworkId(10_005)));
+        // Keep requests pending so their unbuilt vehicles cannot count as a live fleet.
+        entities.AddComponent(factory, new PowerGenerator(10.0, enabled: false));
+        entities.AddComponent(factory, new PowerConsumer(1.0, PowerPriority.Industrial, enabled: true));
+        var requests = new[]
+        {
+            new QueueUnitProductionCommand(owner, factory, UnitIds.CargoTruck, SimulationTick.Zero),
+            new QueueUnitProductionCommand(owner, factory, UnitIds.CargoTruck, SimulationTick.Zero)
+        };
+        foreach (var request in requests)
+            scenario.Simulation.SubmitCommand(request, SimulationTick.Zero.Next());
+
+        scenario.Simulation.RunTicks(3, TestContext.Current.CancellationToken);
+
+        Assert.All(requests, request => Assert.True(request.Accepted));
+        foreach (EntityId entity in entities.Query<UnitProductionRequest>())
+            if (entities.GetComponent<UnitProductionRequest>(entity).Facility == factory)
+                Assert.NotEqual(UnitIds.SupplyTruck, entities.GetComponent<UnitProductionRequest>(entity).UnitId);
+        Assert.NotEqual(UnitIds.SupplyTruck, entities.GetComponent<UnitProductionFacility>(factory).ActiveUnit);
+        Assert.Equal(0, scenario.CountUnits(owner, UnitIds.CargoTruck));
+        foreach (UnitResourceCost cost in supply.Costs)
+            Assert.Equal(cost.Quantity, scenario.Inventories.GetAvailableQuantity(input, cost.ResourceId));
+    }
+
+    [Theory]
     [InlineData(4, 150.0)]
     [InlineData(6, 50.0)]
     [InlineData(5, 100.0)]

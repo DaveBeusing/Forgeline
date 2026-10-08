@@ -3704,10 +3704,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     2,
                     4));
 
+        // Queued vehicles cannot haul their own missing production inputs.
         return GetUnitCount(
-                   owned,
-                   UnitIds.CargoTruck) +
-               GetPendingUnitCount(
                    owned,
                    UnitIds.CargoTruck) <
                cargoTarget;
@@ -3944,7 +3942,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         command.Execute(context);
     }
 
-    private static void EnsureCriticalLogisticsRecovery(
+    private void EnsureCriticalLogisticsRecovery(
         SimulationContext context,
         OwnedState owned,
         SkirmishOpponentConfiguration configuration)
@@ -4052,7 +4050,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
     }
 
-    private static bool EnsureCriticalLogisticsProduction(
+    private bool EnsureCriticalLogisticsProduction(
         SimulationContext context,
         OwnedState owned,
         EntityId facilityEntity,
@@ -4164,8 +4162,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             context.Entities.TryGetComponent(
                 activeRequest,
                 out active) &&
-            active.Priority.CompareTo(
-                ProductionPriority.High) > 0 &&
+            (active.Priority.CompareTo(ProductionPriority.High) > 0 ||
+             (candidate == UnitIds.CargoTruck && active.Priority == ProductionPriority.High)) &&
             !context.Entities.HasComponent<
                 UnitProductionCancellationRequest>(
                     activeRequest);
@@ -4205,7 +4203,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         if (!candidateQueued &&
             liveRequests <
-                configuration.MaximumQueuedUnitsPerFacility)
+                configuration.MaximumQueuedUnitsPerFacility &&
+            (!RequiresCargoReplacementReserve(owned, configuration) ||
+             HasLogisticsReplacementReserve(facility, candidate)))
         {
             QueueUnitProduction(
                 context,
@@ -4223,7 +4223,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return true;
     }
 
-    private static bool EnsureReconnaissanceRecoveryProduction(
+    private bool EnsureReconnaissanceRecoveryProduction(
         SimulationContext context,
         OwnedState owned,
         EntityId facilityEntity,
@@ -4377,7 +4377,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         if (!scoutQueued &&
             liveRequests <
-                configuration.MaximumQueuedUnitsPerFacility)
+                configuration.MaximumQueuedUnitsPerFacility &&
+            (!RequiresCargoReplacementReserve(owned, configuration) ||
+             HasLogisticsReplacementReserve(facility, UnitIds.ScoutVehicle)))
         {
             QueueUnitProduction(
                 context,
@@ -4414,12 +4416,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             GetUnitCount(
                 owned,
                 UnitIds.CargoTruck);
-        owned.PendingUnitCounts.TryGetValue(
-            UnitIds.CargoTruck,
-            out int pendingCargo);
-
-        if (cargoCount + pendingCargo <
-            cargoTarget)
+        // A blocked queued replacement cannot make the live fleet healthy.
+        if (cargoCount < cargoTarget)
         {
             return UnitIds.CargoTruck;
         }
