@@ -134,9 +134,7 @@ function Invoke-ClientSmoke {
         throw "Terrain texture/sample budget exceeded the four-layer baseline during '$ExpectedMode' qualification."
     }
 
-    if ($metrics.totalMeasuredDrawCalls -gt 26) {
-        throw "Measured draw calls increased above the accepted Vertical Slice baseline of 26 during '$ExpectedMode' qualification."
-    }
+    & (Join-Path $PSScriptRoot 'Validate-VisualDrawBudgets.ps1') -Metrics $metrics
 
     if ($metrics.peakResidentTextureBytes -gt 2097152) {
         throw "Peak resident texture bytes $($metrics.peakResidentTextureBytes) exceeded the 2 MiB Vertical Slice budget."

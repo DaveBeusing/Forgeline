@@ -502,6 +502,11 @@ public sealed class PlayerActionReadModelTests
     {
         using MatchRuntime scenario =
             CreateScenario(4306);
+        EntityId generator = scenario.Simulation.Entities.CreateEntity();
+        scenario.Simulation.Entities.AddComponent(generator, new PowerGenerator(40.0));
+        scenario.Simulation.Entities.AddComponent(generator,
+            scenario.Simulation.Entities.GetComponent<PowerNetworkMembership>(
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore));
         Assert.True(
             scenario.Inventories.Add(
                 scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,

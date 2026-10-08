@@ -71,50 +71,27 @@ public sealed class DebugOverlayStateTests
     }
 
     [Theory]
-    [InlineData(
-        StrategicOverlayMode.Logistics,
-        DebugOverlayCategory.Logistics)]
-    [InlineData(
-        StrategicOverlayMode.Supply,
-        DebugOverlayCategory.Logistics)]
-    [InlineData(
-        StrategicOverlayMode.Sensors,
-        DebugOverlayCategory.Sensors)]
-    [InlineData(
-        StrategicOverlayMode.Navigation,
-        DebugOverlayCategory.Navigation)]
-    public void StrategicOverlayRequestsOnlyItsRequiredDebugData(
-        StrategicOverlayMode mode,
-        DebugOverlayCategory expected)
+    [InlineData(StrategicOverlayMode.Logistics)]
+    [InlineData(StrategicOverlayMode.Supply)]
+    [InlineData(StrategicOverlayMode.Sensors)]
+    [InlineData(StrategicOverlayMode.Navigation)]
+    [InlineData(StrategicOverlayMode.Power)]
+    [InlineData(StrategicOverlayMode.All)]
+    public void StrategicOverlaysUsePlayerSnapshotsWithoutDeveloperDebugCapture(StrategicOverlayMode mode)
     {
-        Assert.Equal(
-            expected,
-            DebugOverlayPolicy.ResolveRequiredData(
-                DebugOverlayCategory.None,
-                mode));
+        Assert.Equal(DebugOverlayCategory.None,
+            DebugOverlayPolicy.ResolveRequiredData(DebugOverlayCategory.None, mode));
+        Assert.False(DebugOverlayPolicy.RequiresPresentationDebugSnapshot(DebugOverlayCategory.None, mode));
     }
 
     [Fact]
-    public void AllStrategicOverlayDoesNotEnableUnrelatedDevelopmentCategories()
+    public void AllStrategicOverlayPreservesOnlyExplicitDeveloperDebugCategories()
     {
-        DebugOverlayCategory required =
-            DebugOverlayPolicy.ResolveRequiredData(
-                DebugOverlayCategory.None,
-                StrategicOverlayMode.All);
-
-        Assert.Equal(
-            DebugOverlayCategory.Navigation |
-            DebugOverlayCategory.Logistics |
-            DebugOverlayCategory.Sensors,
-            required);
-        Assert.False(
-            (required &
-             DebugOverlayCategory.Combat) !=
-            0);
-        Assert.False(
-            (required &
-             DebugOverlayCategory.Entities) !=
-            0);
+        const DebugOverlayCategory requested = DebugOverlayCategory.Navigation | DebugOverlayCategory.Logistics;
+        DebugOverlayCategory required = DebugOverlayPolicy.ResolveRequiredData(requested, StrategicOverlayMode.All);
+        Assert.Equal(requested, required);
+        Assert.False((required & DebugOverlayCategory.Combat) != 0);
+        Assert.False((required & DebugOverlayCategory.Entities) != 0);
     }
 
     [Fact]

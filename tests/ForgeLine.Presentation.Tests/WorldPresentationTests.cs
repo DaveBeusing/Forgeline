@@ -156,9 +156,9 @@ public sealed class WorldPresentationTests
                     TerrainMaterialSlot.Dirt);
             Assert.Equal(
                 new Vector3(
-                    0.34f,
-                    0.27f,
-                    0.18f),
+                    0.42f,
+                    0.32f,
+                    0.21f),
                 dirt.BaseColor);
         }
         finally

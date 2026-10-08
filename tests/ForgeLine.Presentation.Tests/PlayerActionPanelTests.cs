@@ -3,6 +3,7 @@ using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Game;
 using ForgeLine.Input;
+using ForgeLine.Intelligence;
 using ForgeLine.Platform;
 using ForgeLine.Simulation;
 using Xunit;
@@ -1036,7 +1037,8 @@ public sealed class PlayerActionPanelTests
                 mixedOrderState: false,
                 currentOrder: default,
                 currentStatus: default,
-                targets: [],
+                targets: [new PlayerTacticalTargetReadModel(new(91, 1), default,
+                    Vector3.Zero, IntelligenceState.Identified, SimulationTick.Zero, 1)],
                 artillery: []);
         PresentationSnapshot snapshot =
             CreateSnapshot(

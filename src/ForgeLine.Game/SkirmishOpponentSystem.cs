@@ -1199,7 +1199,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return true;
     }
 
-    private static bool TryRecoverForce(
+    private bool TryRecoverForce(
         SimulationContext context,
         SkirmishOpponentController controller,
         OwnedState owned,
@@ -1276,7 +1276,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
-        ReleaseSupplyEscortMovementForRecovery(
+        bool recoveryEscortsReleased = ReleaseSupplyEscortMovementForRecovery(
             context,
             controller,
             owned);
@@ -1291,14 +1291,43 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     retreatUnits,
                     deepOffensiveCommitted);
 
-            var command =
-                new RetreatCommand(
-                    controller.Player,
-                    retreatUnits.ToArray(),
-                    recovery,
-                    context.Tick,
-                    FormationTemplate.Column);
-            command.Execute(context);
+            if (deepOffensiveCommitted)
+            {
+                for (int index = retreatUnits.Count - 1; index >= 0; index--)
+                {
+                    EntityId unit = retreatUnits[index];
+                    if (!context.Entities.TryGetComponent(unit, out WorldTransform transform) ||
+                        BattlefieldResupplyPlanner.CanReachProvider(context, _inventories, unit,
+                            HorizontalDistanceSquared(transform.Position, recovery), range: 0.0f))
+                    {
+                        continue;
+                    }
+
+                    // Preserve the remaining fuel for mobile resupply rather
+                    // than starting a retreat that cannot reach its destination.
+                    if (!context.Entities.TryGetComponent(unit, out CombatOrderState order) ||
+                        order.Kind != CombatOrderKind.HoldPosition)
+                    {
+                        new HoldPositionCommand(controller.Player, [unit], context.Tick).Execute(context);
+                    }
+
+                    retreatUnits.RemoveAt(index);
+                }
+            }
+
+            EntityId[] newlyRecovering = SelectUnitsNeedingCombatOrder(
+                context, retreatUnits.ToArray(), CombatOrderKind.Retreat, recovery);
+            if (newlyRecovering.Length > 0)
+            {
+                var command =
+                    new RetreatCommand(
+                        controller.Player,
+                        newlyRecovering,
+                        recovery,
+                        context.Tick,
+                        FormationTemplate.Column);
+                command.Execute(context);
+            }
         }
 
         bool attackForceEstablished =
@@ -1314,7 +1343,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     owned.CombatUnits.Count
             );
 
-        return forceWideRecovery;
+        // Give automatic resupply a tick to claim an escort whose advance
+        // was just released, before offensive planning assigns it again.
+        return forceWideRecovery || recoveryEscortsReleased;
     }
 
     private bool TryExpand(
@@ -1434,6 +1465,17 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return true;
     }
 
+    private bool IsEnemyCommandCoreIdentified(
+        SimulationContext context,
+        FactionId faction,
+        FactionIntelligenceSnapshot intelligence) =>
+        intelligence.Contacts.Any(contact =>
+            contact.IsCurrent && contact.State == IntelligenceState.Identified &&
+            _intelligence.TryResolveCurrentlyIdentifiedEntity(faction, contact.ContactKey, out EntityId entity) &&
+            context.Entities.IsAlive(entity) &&
+            context.Entities.TryGetComponent(entity, out CompletedBuilding building) &&
+            building.BuildingId == BuildingIds.CommandCore);
+
     private bool TryScout(
         SimulationContext context,
         SkirmishOpponentController controller,
@@ -1445,22 +1487,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         objective = Vector3.Zero;
 
         bool enemyCommandCoreIdentified =
-            intelligence.Contacts.Any(
-                contact =>
-                    contact.IsCurrent &&
-                    contact.State ==
-                        IntelligenceState.Identified &&
-                    _intelligence.TryResolveCurrentlyIdentifiedEntity(
-                        controller.Faction,
-                        contact.ContactKey,
-                        out EntityId identifiedEntity) &&
-                    context.Entities.IsAlive(
-                        identifiedEntity) &&
-                    context.Entities.TryGetComponent(
-                        identifiedEntity,
-                        out CompletedBuilding completed) &&
-                    completed.BuildingId ==
-                        BuildingIds.CommandCore);
+            IsEnemyCommandCoreIdentified(context, controller.Faction, intelligence);
 
         if (enemyCommandCoreIdentified)
         {
@@ -1471,7 +1498,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             FindIdleUnit(
                 context,
                 owned,
-                UnitIds.ScoutVehicle);
+                UnitIds.ScoutVehicle,
+                ResolveConfiguration(controller.Player));
 
         if (!scout.IsValid)
         {
@@ -1513,7 +1541,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
             objective =
                 enemyPosition +
-                towardHome * 260.0f;
+                towardHome * (_units[UnitIds.ScoutVehicle].RadarIdentificationRangeMeters * 0.5f);
         }
         else
         {
@@ -1591,14 +1619,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         EntityId reconReserve =
             ResolveReconReserveScout(
                 owned);
-        bool reconnaissanceEstablished =
-            intelligence.Contacts.Any(
-                static contact =>
-                    contact.IsCurrent);
         EntityId protectedReconScout =
-            reconnaissanceEstablished
-                ? EntityId.Invalid
-                : reconReserve;
+            reconReserve;
 
         EntityId[] attackers =
             owned.CombatUnits
@@ -1862,11 +1884,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return true;
     }
 
-    private static void ReleaseSupplyEscortMovementForRecovery(
+    private static bool ReleaseSupplyEscortMovementForRecovery(
         SimulationContext context,
         SkirmishOpponentController controller,
         OwnedState owned)
     {
+        bool released = false;
+        EntityId scout = ResolveReconReserveScout(owned);
         for (int index = 0; index < owned.Units.Count; index++)
         {
             EntityId candidate = owned.Units[index];
@@ -1878,6 +1902,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     candidate) ||
                 context.Entities.HasComponent<SupplyRescueAssignment>(
                     candidate) ||
+                IsProtectingReconScout(context, candidate, scout) ||
                 !TacticalCommandUtilities.TryGetMovementIntent(
                     context,
                     candidate,
@@ -1917,8 +1942,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     [candidate],
                     context.Tick)
                     .Execute(context);
+                released = true;
             }
         }
+        return released;
     }
 
     private void EnsureReconSupplySupport(
@@ -1946,9 +1973,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
 
         bool reconnaissanceEstablished =
-            intelligence.Contacts.Any(
-                static contact =>
-                    contact.IsCurrent);
+            IsEnemyCommandCoreIdentified(context, controller.Faction, intelligence);
 
         if (reconnaissanceEstablished)
         {
@@ -3287,8 +3312,20 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             (owned.PowerGeneration <
                  owned.PowerDemand ||
              owned.OfflineConsumers > 0);
+        bool forwardConstructionRequired =
+            !RequiresCargoReplacementReserve(owned, configuration) &&
+            owned.CombatUnits.Count >= configuration.MinimumAttackUnits &&
+            GetUnitCount(owned, UnitIds.MainBattleTank) >=
+                configuration.MinimumObjectivePressureUnits &&
+            (CountRemoteBuildings(
+                 context, owned, BuildingIds.LogisticsHub,
+                 controller.HomePosition, minimumDistanceMeters: 500.0f) < 2 ||
+             SelectUnsupportedRemoteHub(
+                 context, owned, controller.HomePosition,
+                 minimumDistanceMeters: 500.0f,
+                 supportRadiusMeters: 260.0f).HasValue);
         LogisticsStockPriority constructionRawPriority =
-            powerRecoveryRequired
+            powerRecoveryRequired || forwardConstructionRequired
                 ? LogisticsStockPriority.Critical
                 : LogisticsStockPriority.High;
 
@@ -3372,7 +3409,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     80.0,
                     240.0,
                     500.0,
-                    LogisticsStockPriority.High);
+                    facility.Status == ProductionStatus.NoInput
+                        ? LogisticsStockPriority.Critical
+                        : LogisticsStockPriority.High);
             }
 
             if (facility.Supports(
@@ -3453,10 +3492,16 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     owned,
                     UnitIds.MainBattleTank) >=
                     configuration.MinimumObjectivePressureUnits;
+            bool cargoFleetRecovery =
+                facility.Supports(UnitProductionCapability.Logistics) &&
+                RequiresCargoReplacementReserve(owned, configuration);
+            bool blockedLogisticsProduction =
+                facility.Supports(UnitProductionCapability.Logistics) &&
+                facility.Status == UnitProductionStatus.NoInput;
             LogisticsStockPriority productionPriority =
                 plannedUnit ==
                     UnitIds.MainBattleTank ||
-                matureReconnaissanceRecovery
+                matureReconnaissanceRecovery || cargoFleetRecovery || blockedLogisticsProduction
                     ? LogisticsStockPriority.Critical
                     : LogisticsStockPriority.High;
 
@@ -3480,30 +3525,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 80.0,
                 160.0,
                 productionPriority);
-            int cargoTarget =
-                Math.Max(
-                    configuration.MinimumCargoTrucks,
-                    Math.Clamp(
-                        owned.SupplyDepots.Count,
-                        2,
-                        4));
-            int cargoCount =
-                GetUnitCount(
-                    owned,
-                    UnitIds.CargoTruck);
-            owned.PendingUnitCounts.TryGetValue(
-                UnitIds.CargoTruck,
-                out int pendingCargo);
-            bool cargoFleetRecovery =
-                facility.Supports(
-                    UnitProductionCapability.Logistics) &&
-                cargoCount + pendingCargo <
-                    cargoTarget;
-
             LogisticsStockPriority fuelPriority =
                 plannedUnit ==
                     UnitIds.MainBattleTank ||
-                matureReconnaissanceRecovery
+                matureReconnaissanceRecovery || cargoFleetRecovery || blockedLogisticsProduction
                     ? LogisticsStockPriority.Critical
                     : LogisticsStockPriority.High;
 
@@ -3704,10 +3729,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     2,
                     4));
 
+        // Queued vehicles cannot haul their own missing production inputs.
         return GetUnitCount(
-                   owned,
-                   UnitIds.CargoTruck) +
-               GetPendingUnitCount(
                    owned,
                    UnitIds.CargoTruck) <
                cargoTarget;
@@ -3944,7 +3967,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         command.Execute(context);
     }
 
-    private static void EnsureCriticalLogisticsRecovery(
+    private void EnsureCriticalLogisticsRecovery(
         SimulationContext context,
         OwnedState owned,
         SkirmishOpponentConfiguration configuration)
@@ -4052,7 +4075,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
     }
 
-    private static bool EnsureCriticalLogisticsProduction(
+    private bool EnsureCriticalLogisticsProduction(
         SimulationContext context,
         OwnedState owned,
         EntityId facilityEntity,
@@ -4164,8 +4187,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             context.Entities.TryGetComponent(
                 activeRequest,
                 out active) &&
-            active.Priority.CompareTo(
-                ProductionPriority.High) > 0 &&
+            (active.Priority.CompareTo(ProductionPriority.High) > 0 ||
+             (candidate == UnitIds.CargoTruck && active.Priority == ProductionPriority.High)) &&
             !context.Entities.HasComponent<
                 UnitProductionCancellationRequest>(
                     activeRequest);
@@ -4205,7 +4228,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         if (!candidateQueued &&
             liveRequests <
-                configuration.MaximumQueuedUnitsPerFacility)
+                configuration.MaximumQueuedUnitsPerFacility &&
+            (!RequiresCargoReplacementReserve(owned, configuration) ||
+             HasLogisticsReplacementReserve(facility, candidate)))
         {
             QueueUnitProduction(
                 context,
@@ -4223,7 +4248,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return true;
     }
 
-    private static bool EnsureReconnaissanceRecoveryProduction(
+    private bool EnsureReconnaissanceRecoveryProduction(
         SimulationContext context,
         OwnedState owned,
         EntityId facilityEntity,
@@ -4377,7 +4402,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         if (!scoutQueued &&
             liveRequests <
-                configuration.MaximumQueuedUnitsPerFacility)
+                configuration.MaximumQueuedUnitsPerFacility &&
+            (!RequiresCargoReplacementReserve(owned, configuration) ||
+             HasLogisticsReplacementReserve(facility, UnitIds.ScoutVehicle)))
         {
             QueueUnitProduction(
                 context,
@@ -4414,12 +4441,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             GetUnitCount(
                 owned,
                 UnitIds.CargoTruck);
-        owned.PendingUnitCounts.TryGetValue(
-            UnitIds.CargoTruck,
-            out int pendingCargo);
-
-        if (cargoCount + pendingCargo <
-            cargoTarget)
+        // A blocked queued replacement cannot make the live fleet healthy.
+        if (cargoCount < cargoTarget)
         {
             return UnitIds.CargoTruck;
         }
@@ -5510,7 +5533,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private static EntityId FindIdleUnit(
         SimulationContext context,
         OwnedState owned,
-        UnitId unitId)
+        UnitId unitId,
+        SkirmishOpponentConfiguration configuration)
     {
         foreach (var pair in
                  owned.UnitByEntity
@@ -5548,7 +5572,15 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 order.Kind == CombatOrderKind.Retreat &&
                 (hasMovementIntent || hasResupplyOrder))
             {
-                continue;
+                bool recovered = !hasResupplyOrder &&
+                    context.Entities.TryGetComponent(entity, out UnitCombatReadiness readiness) &&
+                    readiness.OverallReadiness >= configuration.OffensiveReadinessThreshold &&
+                    readiness.Fuel >= configuration.OffensiveFuelThreshold &&
+                    readiness.Ammunition >= configuration.ResupplyThreshold;
+                if (!recovered)
+                {
+                    continue;
+                }
             }
 
             if (hasCombatOrder &&
@@ -5559,6 +5591,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             }
 
             if (hasResupplyOrder)
+            {
+                continue;
+            }
+
+            if (context.Entities.TryGetComponent(entity, out UnitCombatReadiness availableReadiness) &&
+                (availableReadiness.OverallReadiness < configuration.OffensiveReadinessThreshold ||
+                 availableReadiness.Fuel < configuration.OffensiveFuelThreshold ||
+                 availableReadiness.Ammunition < configuration.ResupplyThreshold))
             {
                 continue;
             }
@@ -5879,9 +5919,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             ResolveReconReserveScout(
                 owned);
         EntityId protectedReconScout =
-            force.CurrentHostileContacts > 0
-                ? EntityId.Invalid
-                : reconReserve;
+            reconReserve;
 
         int eligibleAttackers = 0;
         int objectivePressureUnits = 0;

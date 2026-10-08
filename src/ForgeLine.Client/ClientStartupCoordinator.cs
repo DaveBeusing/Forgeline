@@ -27,8 +27,8 @@ internal sealed class ClientStartupCoordinator<TAssets, TFrontend> : IDisposable
         ArgumentNullException.ThrowIfNull(loadAssets);
         ArgumentNullException.ThrowIfNull(prepareFrontend);
         _cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        _assets = Task.Run(() => Execute(loadAssets));
-        _frontend = Task.Run(() => Execute(prepareFrontend));
+        _assets = StartOwned(loadAssets);
+        _frontend = StartOwned(prepareFrontend);
         _completion = Task.WhenAll(_assets, _frontend);
     }
 
@@ -70,6 +70,11 @@ internal sealed class ClientStartupCoordinator<TAssets, TFrontend> : IDisposable
         if (_frontend.IsFaulted) _ = _frontend.GetAwaiter().GetResult();
         _cancellation.Token.ThrowIfCancellationRequested();
     }
+
+    // Startup operations may block on I/O; dedicated workers avoid thread-pool starvation.
+    private Task<T> StartOwned<T>(Func<CancellationToken, T> operation) where T : class =>
+        Task.Factory.StartNew(() => Execute(operation), CancellationToken.None,
+            TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
     private T Execute<T>(Func<CancellationToken, T> operation) where T : class
     {

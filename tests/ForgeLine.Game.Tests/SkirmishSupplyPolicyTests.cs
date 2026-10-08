@@ -10,6 +10,78 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class SkirmishSupplyPolicyTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void UnaffordableForwardRetreatWaitsForPhysicalMobileResupply(bool reconnaissance)
+    {
+        using MatchRuntime scenario = CentralDivideScenario.Create(
+            CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
+        var entities = scenario.Simulation.Entities;
+        var owner = scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player;
+        Vector3 home = entities.GetComponent<WorldTransform>(scenario.GetBase(owner).CommandCore).Position;
+        foreach (EntityId controller in entities.Query<SkirmishOpponentController, SkirmishOpponentState>())
+        {
+            if (entities.GetComponent<SkirmishOpponentController>(controller).Player == owner)
+            {
+                var state = entities.GetComponent<SkirmishOpponentState>(controller);
+                entities.SetComponent(controller, state with { DeepOffensiveCommitted = true });
+            }
+        }
+
+        var catalog = DirectorateContent.CreateUnitCatalog();
+        EntityId unit = scenario.UnitFactory.Create(
+            catalog[reconnaissance ? UnitIds.ScoutVehicle : UnitIds.MainBattleTank],
+            home + new Vector3(700.0f, 0.0f, 0.0f), owner);
+        UnitFuelState fuel = entities.GetComponent<UnitFuelState>(unit);
+        double initialFuel = fuel.Capacity * 0.05;
+        double removed = scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel) - initialFuel;
+        Assert.True(scenario.Inventories.Remove(fuel.InventoryId, ResourceIds.Fuel, removed).Succeeded);
+
+        scenario.Simulation.RunTicks(22, TestContext.Current.CancellationToken);
+
+        Assert.Equal(CombatOrderKind.HoldPosition, entities.GetComponent<CombatOrderState>(unit).Kind);
+        Assert.Equal(initialFuel, scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel), precision: 6);
+        Assert.False(entities.HasComponent<MovementGroupMember>(unit));
+
+        Vector3 position = entities.GetComponent<WorldTransform>(unit).Position;
+        EntityId truck = scenario.UnitFactory.Create(catalog[UnitIds.SupplyTruck],
+            position + new Vector3(15.0f, 0.0f, 0.0f), owner);
+        SupplyTruck supply = entities.GetComponent<SupplyTruck>(truck);
+        Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Fuel, supply.FuelTarget).Succeeded);
+        Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Ammunition, supply.AmmunitionTarget).Succeeded);
+
+        scenario.Simulation.RunTicks(100, TestContext.Current.CancellationToken);
+
+        Assert.True(scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel) > initialFuel);
+        Assert.True(scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel) < supply.FuelTarget);
+    }
+
+    [Fact]
+    public void ContinuingRecoveryPreservesAcceptedRetreatOrder()
+    {
+        using MatchRuntime scenario = CentralDivideScenario.Create(
+            CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
+        var entities = scenario.Simulation.Entities;
+        var owner = scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player;
+        Vector3 home = entities.GetComponent<WorldTransform>(scenario.GetBase(owner).CommandCore).Position;
+        EntityId unit = scenario.UnitFactory.Create(
+            DirectorateContent.CreateUnitCatalog()[UnitIds.RifleSquad],
+            home + new Vector3(700.0f, 0.0f, 0.0f), owner);
+        UnitFuelState fuel = entities.GetComponent<UnitFuelState>(unit);
+        double quantity = scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel);
+        Assert.True(scenario.Inventories.Remove(fuel.InventoryId, ResourceIds.Fuel, quantity * 0.8).Succeeded);
+
+        scenario.Simulation.RunTicks(12, TestContext.Current.CancellationToken);
+        CombatOrderState initial = entities.GetComponent<CombatOrderState>(unit);
+        Assert.Equal(CombatOrderKind.Retreat, initial.Kind);
+
+        scenario.Simulation.RunTicks(10, TestContext.Current.CancellationToken);
+
+        Assert.Equal(initial.AcceptedAtTick,
+            entities.GetComponent<CombatOrderState>(unit).AcceptedAtTick);
+    }
+
     [Fact]
     public void EmptySupplyTruckAvoidsBlockedLoadingFaceAndLoadsPhysicalStock()
     {
@@ -256,8 +328,13 @@ public sealed class SkirmishSupplyPolicyTests
             combatPolicy.FuelThreshold);
     }
 
-    [Fact]
-    public void ReconnaissanceAdvanceSharesRouteWithPhysicalSupplyEscort()
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    public void ReconnaissanceAdvanceSharesRouteWithPhysicalSupplyEscort(
+        bool unrelatedEnemyDetected,
+        bool scoutRecovered)
     {
         using MatchRuntime scenario =
             CentralDivideScenario.Create(
@@ -275,17 +352,30 @@ public sealed class SkirmishSupplyPolicyTests
             scenario.UnitFactory.Create(
                 units[UnitIds.ScoutVehicle],
                 core.Position +
-                    new Vector3(30.0f, 0.0f, 0.0f),
+                    new Vector3(unrelatedEnemyDetected || scoutRecovered ? 600.0f : 30.0f, 0.0f, 0.0f),
                 scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         EntityId supply =
             scenario.UnitFactory.Create(
                 units[UnitIds.SupplyTruck],
                 core.Position +
-                    new Vector3(35.0f, 0.0f, 0.0f),
+                    new Vector3(unrelatedEnemyDetected || scoutRecovered ? 605.0f : 35.0f, 0.0f, 0.0f),
                 scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         SupplyTruck supplyState =
             entities.GetComponent<SupplyTruck>(
                 supply);
+        if (unrelatedEnemyDetected)
+        {
+            scenario.UnitFactory.Create(units[UnitIds.RifleSquad],
+                core.Position + new Vector3(900.0f, 0.0f, 0.0f),
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).Player);
+        }
+        if (scoutRecovered)
+        {
+            scenario.Simulation.SubmitCommand(new RetreatCommand(
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
+                [scout], core.Position, SimulationTick.Zero, FormationTemplate.Column),
+                SimulationTick.Zero.Next());
+        }
 
         Assert.True(
             scenario.Inventories.Add(
@@ -299,7 +389,7 @@ public sealed class SkirmishSupplyPolicyTests
                 supplyState.AmmunitionTarget).Succeeded);
 
         scenario.Simulation.RunTicks(
-            20,
+            30,
             TestContext.Current.CancellationToken);
 
         Assert.True(
@@ -320,6 +410,19 @@ public sealed class SkirmishSupplyPolicyTests
             scoutGroup.Group,
             supplyGroup.Group);
         Assert.True(scoutGroup.Group.IsValid);
+        Vector3 opposingCore = entities.GetComponent<WorldTransform>(
+            scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore).Position;
+        float identificationRange = units[UnitIds.ScoutVehicle].RadarIdentificationRangeMeters;
+        Assert.InRange(Vector2.Distance(new Vector2(scoutOrder.Destination.X, scoutOrder.Destination.Z),
+            new Vector2(opposingCore.X, opposingCore.Z)), 0.0f, identificationRange);
+        Assert.Equal(GroundMovementStatus.Moving,
+            entities.GetComponent<GroundMovementState>(supply).Status);
+        if (unrelatedEnemyDetected)
+        {
+            Assert.Contains(scenario.Intelligence.Capture(
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Faction).Contacts,
+                contact => contact.IsCurrent);
+        }
     }
 
     [Fact]
@@ -515,11 +618,23 @@ public sealed class SkirmishSupplyPolicyTests
     }
 
 
-    [Fact]
-    public void FuelRecoveryPoliciesPrioritizeFieldSupplyOverVehicleProduction()
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    [InlineData(false, true)]
+    public void FuelRecoveryPoliciesPrioritizeFieldSupplyAndLiveCargoRecovery(
+        bool cargoLost,
+        bool replacementQueued)
     {
-        MatchRuntime scenario = CentralDivideScenario.Create(
-            CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
+        MatchScenarioSettings validation = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation);
+        using MatchRuntime scenario = CentralDivideScenario.Create(validation with
+        {
+            OpponentConfigurations = new Dictionary<ulong, SkirmishOpponentConfiguration>(validation.OpponentConfigurations)
+            {
+                [1] = validation.OpponentConfigurations[1] with { ReactionCadenceTicks = 1 }
+            }
+        });
         EntityRegistry entities = scenario.Simulation.Entities;
         WorldTransform transform =
             entities.GetComponent<WorldTransform>(
@@ -601,7 +716,50 @@ public sealed class SkirmishSupplyPolicyTests
                 Vector3.Zero,
                 SimulationTick.Zero));
 
-        scenario.Simulation.AdvanceOneTick();
+        if (cargoLost)
+        {
+            EntityId cargo = default;
+            foreach (EntityId entity in entities.Query<ControllableEntity, UnitIdentity>())
+            {
+                if (entities.GetComponent<ControllableEntity>(entity).Owner ==
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player &&
+                    entities.GetComponent<UnitIdentity>(entity).UnitId == UnitIds.CargoTruck)
+                {
+                    cargo = entity;
+                    break;
+                }
+            }
+            Assert.True(entities.DestroyEntity(cargo));
+        }
+
+        QueueUnitProductionCommand? replacement = null;
+        if (replacementQueued)
+        {
+            var network = new PowerNetworkId(10_001);
+            entities.AddComponent(vehicleFactory, new PowerNetworkMembership(network));
+            entities.AddComponent(vehicleFactory, new PowerGenerator(10.0));
+            entities.AddComponent(vehicleFactory, new PowerConsumer(1.0, PowerPriority.Industrial, enabled: true));
+            replacement = new QueueUnitProductionCommand(
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
+                vehicleFactory,
+                UnitIds.CargoTruck,
+                SimulationTick.Zero,
+                ProductionPriority.High);
+            scenario.Simulation.SubmitCommand(replacement, SimulationTick.Zero.Next());
+        }
+
+        scenario.Simulation.RunTicks(replacementQueued ? 2UL : 1UL, TestContext.Current.CancellationToken);
+        if (replacement is not null)
+        {
+            Assert.True(replacement.Accepted);
+            bool queued = false;
+            foreach (EntityId entity in entities.Query<UnitProductionRequest>())
+            {
+                UnitProductionRequest request = entities.GetComponent<UnitProductionRequest>(entity);
+                queued |= request.Facility == vehicleFactory && request.UnitId == UnitIds.CargoTruck;
+            }
+            Assert.True(queued);
+        }
 
         LogisticsStockPolicy coreSteel =
             FindStockPolicy(
@@ -648,16 +806,64 @@ public sealed class SkirmishSupplyPolicyTests
                 ResourceIds.Fuel);
 
         Assert.Equal(
-            LogisticsStockPriority.High,
+            cargoLost || replacementQueued ? LogisticsStockPriority.Critical : LogisticsStockPriority.High,
             factoryFuel.Priority);
         Assert.Equal(
-            240.0,
+            cargoLost ? 360.0 : 240.0,
             factoryFuel.DesiredMinimum,
             precision: 6);
         Assert.Equal(
-            240.0,
+            cargoLost ? 360.0 : 240.0,
             factoryFuel.DesiredTarget,
             precision: 6);
+        foreach (ResourceId resource in new[] { ResourceIds.Steel, ResourceIds.Electronics })
+        {
+            Assert.Equal(cargoLost || replacementQueued ? LogisticsStockPriority.Critical : LogisticsStockPriority.High,
+                FindStockPolicy(entities, vehicleFactory, resource).Priority);
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void SteelInputRecoveryDoesNotRetainConstructionStockWhenProductionIsBlocked(
+        bool outputStockSatisfied)
+    {
+        MatchScenarioSettings validation = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation);
+        using MatchRuntime scenario = CentralDivideScenario.Create(validation with
+        {
+            OpponentConfigurations = new Dictionary<ulong, SkirmishOpponentConfiguration>(validation.OpponentConfigurations)
+            {
+                [1] = validation.OpponentConfigurations[1] with { ReactionCadenceTicks = 1 }
+            }
+        });
+        EntityRegistry entities = scenario.Simulation.Entities;
+        var player = scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player;
+        InventoryId input = scenario.Inventories.CreateInventory(new InventorySpecification(1_000.0));
+        InventoryId output = scenario.Inventories.CreateInventory(new InventorySpecification(1_000.0));
+        if (outputStockSatisfied)
+        {
+            Assert.True(scenario.Inventories.Add(output, ResourceIds.Steel, 600.0).Succeeded);
+        }
+        EntityId smelter = entities.CreateEntity();
+        entities.AddComponent(smelter, entities.GetComponent<WorldTransform>(scenario.GetBase(player).CommandCore));
+        entities.AddComponent(smelter, new CompletedBuilding(BuildingIds.Smelter, player, SimulationTick.Zero));
+        entities.AddComponent(smelter, new ControllableEntity(player, ControllableEntityCategory.Building));
+        entities.AddComponent(smelter, new ProductionFacility(input, output, ProductionCapability.SteelProcessing, SimulationTick.Zero));
+        entities.AddComponent(smelter, new PowerNetworkMembership(new PowerNetworkId(10_002)));
+        entities.AddComponent(smelter, new PowerGenerator(10.0));
+        entities.AddComponent(smelter, new PowerConsumer(1.0, PowerPriority.Industrial, enabled: true));
+
+        scenario.Simulation.RunTicks(2, TestContext.Current.CancellationToken);
+
+        ProductionFacility facility = entities.GetComponent<ProductionFacility>(smelter);
+        Assert.Equal(outputStockSatisfied ? ProductionStatus.Idle : ProductionStatus.NoInput, facility.Status);
+        LogisticsStockPolicy policy = FindStockPolicy(entities, smelter, ResourceIds.FerrousOre);
+        Assert.Equal(outputStockSatisfied ? LogisticsStockPriority.High : LogisticsStockPriority.Critical, policy.Priority);
+        Assert.Equal(80.0, policy.DesiredMinimum);
+        Assert.Equal(240.0, policy.DesiredTarget);
+        Assert.Equal(650.0,
+            FindStockPolicy(entities, scenario.GetBase(player).CommandCore, ResourceIds.FerrousOre).DesiredTarget);
     }
 
     private static LogisticsStockPolicy FindStockPolicy(

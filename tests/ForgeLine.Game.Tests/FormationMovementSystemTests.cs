@@ -103,6 +103,67 @@ public sealed class FormationMovementSystemTests
     }
 
     [Fact]
+    public void ProjectedSlotsAdvancePastAnAsymmetricObstacle()
+    {
+        TerrainWorld terrain = CreateFlatWorld(4, 4);
+        NavigationWorld world = NavigationWorld.Build(terrain,
+            [new AxisAlignedBounds(new Vector3(0.0f, -1.0f, 40.0f),
+                new Vector3(17.0f, 4.0f, 60.0f)),
+             new AxisAlignedBounds(new Vector3(45.0f, -1.0f, 20.0f),
+                new Vector3(90.0f, 4.0f, 80.0f))],
+            new NavigationGridSettings { CellSizeMeters = 4.0f, StaticObstacleClearanceMeters = 0.0f },
+            new NavigationSectorSettings { SectorSizeCells = 4 });
+        var simulation = new SimulationCoordinator(ticksPerSecond: 20);
+        var pathfinder = new HierarchicalPathfinder(world);
+        var formations = new FormationMovementSystem(pathfinder) { DebugCaptureEnabled = true };
+        simulation.RegisterSystem(formations);
+        simulation.RegisterSystem(new HierarchicalNavigationSystem(pathfinder));
+        simulation.RegisterSystem(new GroundMovementSystem(terrain));
+        EntityId[] units = CreateUnits(simulation, 20, new Vector3(20.0f, 0.5f, 8.0f));
+        var command = new MoveEntitiesCommand(LocalPlayer, units,
+            new Vector3(40.0f, 0.0f, 104.0f), SimulationTick.Zero, FormationTemplate.Line);
+        simulation.SubmitCommand(command, new SimulationTick(1), new SimulationCommandSource(LocalPlayer.Value));
+
+        simulation.RunTicks(2000, TestContext.Current.CancellationToken);
+
+        Assert.True(formations.LastDiagnostics.BlockedSlotProjectionCount > 0);
+        Assert.False(simulation.Entities.IsAlive(command.CreatedMovementGroup),
+            string.Join("\n", formations.CaptureDebugSnapshot().Groups) + "\n" +
+            string.Join("\n", formations.CaptureDebugSnapshot().Slots));
+        Assert.All(units, unit => Assert.True(
+            simulation.Entities.GetComponent<WorldTransform>(unit).Position.Z > 80.0f));
+    }
+
+    [Fact]
+    public void StuckMemberRoutesIndependentlyWithoutHoldingBackFormation()
+    {
+        FormationScenario scenario = CreateScenario(4, FormationTemplate.Column);
+        scenario.Simulation.RunTicks(3, TestContext.Current.CancellationToken);
+        EntityId unit = scenario.Units[0];
+        var entities = scenario.Simulation.Entities;
+        GroundMovementState state = entities.GetComponent<GroundMovementState>(unit);
+        entities.SetComponent(unit, state with
+        {
+            Status = GroundMovementStatus.Stuck,
+            StalledTicks = GroundMovementSystemOptions.DefaultStuckTickThreshold
+        });
+
+        scenario.Simulation.AdvanceOneTick();
+
+        Assert.False(entities.HasComponent<MovementGroupMember>(unit));
+        Assert.False(entities.HasComponent<FormationMovementConstraint>(unit));
+        Assert.Equal(3, scenario.FormationSystem.LastDiagnostics.ActiveMemberCount);
+        Assert.Equal(1UL, scenario.NavigationSystem.LastDiagnostics.QueuedPathCount);
+        Assert.True(entities.TryGetComponent(unit, out NavigationPendingPath pending));
+        Assert.Equal(scenario.InitialCommand.WorldTarget, pending.OriginalOrder.WorldTarget);
+
+        scenario.Simulation.RunTicks(1000, TestContext.Current.CancellationToken);
+
+        Assert.True(Vector3.Distance(entities.GetComponent<WorldTransform>(unit).Position,
+            scenario.InitialCommand.WorldTarget) < 3.0f);
+    }
+
+    [Fact]
     public void LineFormationProducesStableLateralSlotOrdering()
     {
         FormationScenario scenario = CreateScenario(
