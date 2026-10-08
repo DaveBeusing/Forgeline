@@ -151,4 +151,12 @@ public class GroundMovementBenchmarks
     {
         return _simulation.RunTicks(10);
     }
+
+    internal ulong MoveOneThousandEntitiesForOneTick()
+    {
+        _simulation.AdvanceOneTick();
+        return _simulation.CurrentTick.Value;
+    }
+
+    internal int ActualEntities => _simulation.Entities.EntityCount;
 }

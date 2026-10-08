@@ -150,7 +150,7 @@ public class PresentationBenchmarks : IDisposable
         return _renderer.LastDiagnostics;
     }
 
-    private static RuntimeAssetCatalog LoadRuntimeAssets()
+    internal static RuntimeAssetCatalog LoadRuntimeAssets()
     {
         string repositoryRoot =
             FindRepositoryRoot();
@@ -188,7 +188,7 @@ public class PresentationBenchmarks : IDisposable
             "Could not locate the repository root from the benchmark host.");
     }
 
-    private static RenderWorld CreateRepresentativeWorld(
+    internal static RenderWorld CreateRepresentativeWorld(
         int count)
     {
         var instances =
@@ -513,7 +513,7 @@ public class PresentationBenchmarks : IDisposable
         return world;
     }
 
-    private sealed class NullGraphicsDevice : IGraphicsDevice
+    internal sealed class NullGraphicsDevice : IGraphicsDevice
     {
         public GraphicsDiagnostics Diagnostics =>
             throw new NotSupportedException();
@@ -605,7 +605,7 @@ public class PresentationBenchmarks : IDisposable
         }
     }
 
-    private sealed class NullGraphicsCommandContext :
+    internal sealed class NullGraphicsCommandContext :
         IGraphicsCommandContext
     {
         public int Width => 1600;
