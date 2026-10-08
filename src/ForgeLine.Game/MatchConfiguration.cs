@@ -110,7 +110,7 @@ public sealed class MatchConfiguration
             $"Player {player} is not configured for this match.");
     }
 
-    public void ValidateAgainst(PrototypeBattlefieldDefinition battlefield)
+    public void ValidateAgainst(BattlefieldDefinition battlefield)
     {
         ArgumentNullException.ThrowIfNull(battlefield);
 
@@ -152,8 +152,8 @@ public sealed class MatchConfiguration
         }
     }
 
-    public static MatchConfiguration CreateVerticalSlice(
-        PrototypeBattlefieldDefinition battlefield,
+    public static MatchConfiguration CreateCentralDivide(
+        BattlefieldDefinition battlefield,
         ulong seed = 17)
     {
         ArgumentNullException.ThrowIfNull(battlefield);
@@ -207,12 +207,13 @@ public sealed class SkirmishMatchInitialization
 public static class SkirmishMatchInitializer
 {
     public static SkirmishMatchInitialization Initialize(
+        MatchComposition composition,
         EntityRegistry entities,
         InventoryStore inventories,
         UnitFactory unitFactory,
         TerrainWorld terrain,
-        PrototypeBattlefieldDefinition battlefield,
-        PrototypeBattlefieldRuntime battlefieldRuntime,
+        BattlefieldDefinition battlefield,
+        BattlefieldRuntime battlefieldRuntime,
         MatchConfiguration configuration,
         SkirmishStartingStock? startingStock = null)
     {
@@ -223,6 +224,7 @@ public static class SkirmishMatchInitializer
         ArgumentNullException.ThrowIfNull(battlefield);
         ArgumentNullException.ThrowIfNull(battlefieldRuntime);
         ArgumentNullException.ThrowIfNull(configuration);
+        ArgumentNullException.ThrowIfNull(composition);
 
         configuration.ValidateAgainst(battlefield);
 
@@ -240,13 +242,9 @@ public static class SkirmishMatchInitializer
                 battlefield.Starts[participant.StartIndex];
 
             SkirmishStartingBase startingBase =
-                SkirmishStartingBaseFactory.Create(
-                    entities,
-                    inventories,
-                    unitFactory,
-                    terrain,
-                    start,
-                    startingStock);
+                composition.CreateStartingBase(
+                    entities, inventories, unitFactory, terrain, start,
+                    composition.Content, startingStock ?? SkirmishStartingStock.Standard);
 
             if (!participant.IsComputerControlled &&
                 entities.IsAlive(startingBase.Controller))
@@ -263,7 +261,8 @@ public static class SkirmishMatchInitializer
             entities,
             bases.ToDictionary(
                 static pair => pair.Key,
-                static pair => pair.Value.CommandCore));
+                static pair => pair.Value.CommandCore),
+            allowUnassignedStarts: true);
 
         return new SkirmishMatchInitialization(
             configuration,

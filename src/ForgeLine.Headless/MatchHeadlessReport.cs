@@ -6,7 +6,8 @@ using ForgeLine.Simulation;
 
 namespace ForgeLine.Headless;
 
-internal sealed record VerticalSliceHeadlessReport(
+internal sealed record MatchHeadlessReport(
+    int SchemaVersion,
     string Runtime,
     string OperatingSystem,
     string ProcessArchitecture,
@@ -15,7 +16,7 @@ internal sealed record VerticalSliceHeadlessReport(
     ulong RequestedTicksPerMatch,
     int RequestedMatches,
     double ElapsedMilliseconds,
-    IReadOnlyList<VerticalSliceMatchReport> Matches)
+    IReadOnlyList<MatchExecutionReport> Matches)
 {
     private static readonly JsonSerializerOptions s_jsonOptions =
         new()
@@ -23,14 +24,15 @@ internal sealed record VerticalSliceHeadlessReport(
             WriteIndented = true
         };
 
-    public static VerticalSliceHeadlessReport Create(
+    public static MatchHeadlessReport Create(
         HeadlessOptions options,
         TimeSpan elapsed,
-        IReadOnlyList<VerticalSliceMatchReport> matches)
+        IReadOnlyList<MatchExecutionReport> matches)
     {
         ArgumentNullException.ThrowIfNull(matches);
 
-        return new VerticalSliceHeadlessReport(
+        return new MatchHeadlessReport(
+            2,
             RuntimeInformation.FrameworkDescription,
             RuntimeInformation.OSDescription,
             RuntimeInformation.ProcessArchitecture.ToString(),
@@ -66,7 +68,7 @@ internal sealed record VerticalSliceHeadlessReport(
     }
 }
 
-internal sealed record VerticalSliceMatchReport(
+internal sealed record MatchExecutionReport(
     int MatchIndex,
     ulong Seed,
     ulong ExecutedTicks,
@@ -98,15 +100,14 @@ internal sealed record VerticalSliceMatchReport(
     ulong TotalArtilleryShots,
     ulong TotalArtilleryImpacts,
     double TotalArtilleryAmmunitionConsumed,
-    VerticalSliceSideReport West,
-    VerticalSliceSideReport East)
+    IReadOnlyList<MatchParticipantReport> Participants)
 {
-    public static VerticalSliceMatchReport Capture(
+    public static MatchExecutionReport Capture(
         int matchIndex,
         ulong seed,
         ulong executedTicks,
         TimeSpan elapsed,
-        VerticalSliceScenario scenario)
+        MatchRuntime scenario)
     {
         ArgumentNullException.ThrowIfNull(scenario);
 
@@ -118,7 +119,7 @@ internal sealed record VerticalSliceMatchReport(
         double elapsedSeconds =
             elapsed.TotalSeconds;
 
-        return new VerticalSliceMatchReport(
+        return new MatchExecutionReport(
             matchIndex,
             seed,
             executedTicks,
@@ -154,16 +155,12 @@ internal sealed record VerticalSliceMatchReport(
             scenario.Artillery.Metrics.TotalShotsFired,
             scenario.Artillery.Metrics.TotalImpacts,
             scenario.Artillery.Metrics.TotalAmmunitionConsumed,
-            CaptureSide(
-                scenario,
-                scenario.West),
-            CaptureSide(
-                scenario,
-                scenario.East));
+            scenario.MatchConfiguration.Participants.Select(participant =>
+                CaptureSide(scenario, scenario.GetBase(participant.Player))).ToArray());
     }
 
-    private static VerticalSliceSideReport CaptureSide(
-        VerticalSliceScenario scenario,
+    private static MatchParticipantReport CaptureSide(
+        MatchRuntime scenario,
         SkirmishStartingBase side)
     {
         SkirmishOpponentState opponent =
@@ -175,7 +172,7 @@ internal sealed record VerticalSliceMatchReport(
                     entry.Player ==
                     side.Player);
 
-        return new VerticalSliceSideReport(
+        return new MatchParticipantReport(
             side.Player.Value,
             opponent.StrategicState.ToString(),
             opponent.ActiveGoal.ToString(),
@@ -262,7 +259,7 @@ internal sealed record VerticalSliceMatchReport(
     }
 
     private static int CountActiveResupplyOrders(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         PlayerId player)
     {
         int count = 0;
@@ -283,7 +280,7 @@ internal sealed record VerticalSliceMatchReport(
     }
 
     private static string BuildUnitProductionSummary(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         PlayerId player)
     {
         var entries =
@@ -347,7 +344,7 @@ internal sealed record MatchLifecycleReport(
     }
 }
 
-internal sealed record VerticalSliceSideReport(
+internal sealed record MatchParticipantReport(
     ulong Player,
     string StrategicState,
     string ActiveGoal,

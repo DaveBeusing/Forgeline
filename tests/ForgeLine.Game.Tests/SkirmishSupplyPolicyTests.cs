@@ -13,18 +13,18 @@ public sealed class SkirmishSupplyPolicyTests
     [Fact]
     public void EmptySupplyTruckAvoidsBlockedLoadingFaceAndLoadsPhysicalStock()
     {
-        VerticalSliceScenario scenario = VerticalSliceScenario.Create(
-            VerticalSliceScenarioSettings.Create(VerticalSliceScenarioProfile.Validation));
+        MatchRuntime scenario = CentralDivideScenario.Create(
+            CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
         var entities = scenario.Simulation.Entities;
         InventoryId inventory = scenario.Inventories.CreateInventory(new InventorySpecification(2_500.0));
         Assert.True(scenario.Inventories.Add(inventory, ResourceIds.Fuel, 600.0).Succeeded);
         Assert.True(scenario.Inventories.Add(inventory, ResourceIds.Ammunition, 800.0).Succeeded);
         EntityId depot = entities.CreateEntity();
         entities.AddComponent(depot, new WorldTransform(new Vector3(420.0f, 0.0f, 1800.0f), Quaternion.Identity, Vector3.One));
-        entities.AddComponent(depot, new CompletedBuilding(BuildingIds.SupplyDepot, scenario.West.Player, SimulationTick.Zero));
-        entities.AddComponent(depot, new SupplyDepot(inventory, scenario.West.Player));
+        entities.AddComponent(depot, new CompletedBuilding(BuildingIds.SupplyDepot, scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player, SimulationTick.Zero));
+        entities.AddComponent(depot, new SupplyDepot(inventory, scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player));
         entities.AddComponent(depot, new SpatialPresence(new Vector3(8.0f, 4.0f, 8.0f),
-            new SpatialEntryMetadata(scenario.West.Player.Value, 0, SpatialMobility.Static)));
+            new SpatialEntryMetadata(scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player.Value, 0, SpatialMobility.Static)));
 
         EntityId blockedFace = entities.CreateEntity();
         entities.AddComponent(
@@ -38,13 +38,13 @@ public sealed class SkirmishSupplyPolicyTests
             new SpatialPresence(
                 new Vector3(6.0f, 4.0f, 6.0f),
                 new SpatialEntryMetadata(
-                    scenario.West.Player.Value,
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player.Value,
                     0,
                     SpatialMobility.Static)));
 
         EntityId truck = scenario.UnitFactory.Create(
             DirectorateContent.CreateUnitCatalog()[UnitIds.SupplyTruck],
-            new Vector3(360.0f, 0.0f, 1800.0f), scenario.West.Player);
+            new Vector3(360.0f, 0.0f, 1800.0f), scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         SupplyTruck supply = entities.GetComponent<SupplyTruck>(truck);
 
         scenario.Simulation.RunTicks(600, TestContext.Current.CancellationToken);
@@ -67,8 +67,8 @@ public sealed class SkirmishSupplyPolicyTests
     [Fact]
     public void CombatRecoveryDoesNotCancelSupplyTruckLoadingMovement()
     {
-        VerticalSliceScenario scenario = VerticalSliceScenario.Create(
-            VerticalSliceScenarioSettings.Create(VerticalSliceScenarioProfile.Validation));
+        MatchRuntime scenario = CentralDivideScenario.Create(
+            CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
         EntityRegistry entities = scenario.Simulation.Entities;
 
         InventoryId depotInventory =
@@ -96,19 +96,19 @@ public sealed class SkirmishSupplyPolicyTests
             depot,
             new CompletedBuilding(
                 BuildingIds.SupplyDepot,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 SimulationTick.Zero));
         entities.AddComponent(
             depot,
             new SupplyDepot(
                 depotInventory,
-                scenario.West.Player));
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player));
         entities.AddComponent(
             depot,
             new SpatialPresence(
                 new Vector3(8.0f, 4.0f, 8.0f),
                 new SpatialEntryMetadata(
-                    scenario.West.Player.Value,
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player.Value,
                     0,
                     SpatialMobility.Static)));
 
@@ -118,7 +118,7 @@ public sealed class SkirmishSupplyPolicyTests
             scenario.UnitFactory.Create(
                 units[UnitIds.RifleSquad],
                 new Vector3(500.0f, 0.0f, 1800.0f),
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         UnitFuelState recoveryFuel =
             entities.GetComponent<UnitFuelState>(
                 recoveryUnit);
@@ -136,7 +136,7 @@ public sealed class SkirmishSupplyPolicyTests
             scenario.UnitFactory.Create(
                 units[UnitIds.SupplyTruck],
                 new Vector3(360.0f, 0.0f, 1800.0f),
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         SupplyTruck supply =
             entities.GetComponent<SupplyTruck>(
                 truck);
@@ -170,42 +170,42 @@ public sealed class SkirmishSupplyPolicyTests
     [Fact]
     public void FieldSupplyTruckPreservesFrontlineAvailabilityBeforeSelfRefuel()
     {
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
-                VerticalSliceScenarioSettings.Create(
-                    VerticalSliceScenarioProfile.Validation));
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
+                CentralDivideScenario.CreateSettings(
+                    MatchScenarioProfile.Validation));
         EntityRegistry entities =
             scenario.Simulation.Entities;
         UnitDefinitionCatalog units =
             DirectorateContent.CreateUnitCatalog();
         WorldTransform core =
             entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
 
         EntityId cargo =
             scenario.UnitFactory.Create(
                 units[UnitIds.CargoTruck],
                 core.Position +
                     new Vector3(20.0f, 0.0f, 0.0f),
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         EntityId supply =
             scenario.UnitFactory.Create(
                 units[UnitIds.SupplyTruck],
                 core.Position +
                     new Vector3(30.0f, 0.0f, 0.0f),
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         EntityId combat =
             scenario.UnitFactory.Create(
                 units[UnitIds.RifleSquad],
                 core.Position +
                     new Vector3(40.0f, 0.0f, 0.0f),
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         EntityId scout =
             scenario.UnitFactory.Create(
                 units[UnitIds.ScoutVehicle],
                 core.Position +
                     new Vector3(50.0f, 0.0f, 0.0f),
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
 
         scenario.Simulation.RunTicks(
             25,
@@ -236,19 +236,19 @@ public sealed class SkirmishSupplyPolicyTests
             supplyPolicy.FuelThreshold <
             cargoPolicy.FuelThreshold);
         Assert.Equal(
-            scenario.RuntimeSettings.Scenario.WestOpponent.OffensiveFuelThreshold,
+            scenario.RuntimeSettings.Scenario.OpponentConfigurations[1].OffensiveFuelThreshold,
             combatPolicy.FuelThreshold,
             precision: 6);
         Assert.Equal(
-            scenario.RuntimeSettings.Scenario.WestOpponent.ResupplyThreshold,
+            scenario.RuntimeSettings.Scenario.OpponentConfigurations[1].ResupplyThreshold,
             combatPolicy.AmmunitionThreshold,
             precision: 6);
         Assert.Equal(
-            scenario.RuntimeSettings.Scenario.WestOpponent.ResupplyThreshold,
+            scenario.RuntimeSettings.Scenario.OpponentConfigurations[1].ResupplyThreshold,
             scoutPolicy.FuelThreshold,
             precision: 6);
         Assert.Equal(
-            scenario.RuntimeSettings.Scenario.WestOpponent.ResupplyThreshold,
+            scenario.RuntimeSettings.Scenario.OpponentConfigurations[1].ResupplyThreshold,
             scoutPolicy.AmmunitionThreshold,
             precision: 6);
         Assert.True(
@@ -259,30 +259,30 @@ public sealed class SkirmishSupplyPolicyTests
     [Fact]
     public void ReconnaissanceAdvanceSharesRouteWithPhysicalSupplyEscort()
     {
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
-                VerticalSliceScenarioSettings.Create(
-                    VerticalSliceScenarioProfile.Validation));
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
+                CentralDivideScenario.CreateSettings(
+                    MatchScenarioProfile.Validation));
         EntityRegistry entities =
             scenario.Simulation.Entities;
         UnitDefinitionCatalog units =
             DirectorateContent.CreateUnitCatalog();
         WorldTransform core =
             entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
 
         EntityId scout =
             scenario.UnitFactory.Create(
                 units[UnitIds.ScoutVehicle],
                 core.Position +
                     new Vector3(30.0f, 0.0f, 0.0f),
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         EntityId supply =
             scenario.UnitFactory.Create(
                 units[UnitIds.SupplyTruck],
                 core.Position +
                     new Vector3(35.0f, 0.0f, 0.0f),
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         SupplyTruck supplyState =
             entities.GetComponent<SupplyTruck>(
                 supply);
@@ -325,24 +325,24 @@ public sealed class SkirmishSupplyPolicyTests
     [Fact]
     public void PartiallyLoadedSupplyTruckReturnsForOffensiveReserve()
     {
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
-                VerticalSliceScenarioSettings.Create(
-                    VerticalSliceScenarioProfile.Validation));
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
+                CentralDivideScenario.CreateSettings(
+                    MatchScenarioProfile.Validation));
         EntityRegistry entities =
             scenario.Simulation.Entities;
         UnitDefinitionCatalog units =
             DirectorateContent.CreateUnitCatalog();
         WorldTransform core =
             entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
 
         EntityId truck =
             scenario.UnitFactory.Create(
                 units[UnitIds.SupplyTruck],
                 core.Position +
                     new Vector3(120.0f, 0.0f, 0.0f),
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         SupplyTruck supply =
             entities.GetComponent<SupplyTruck>(
                 truck);
@@ -369,7 +369,7 @@ public sealed class SkirmishSupplyPolicyTests
         entities.AddComponent(
             truck,
             new MovementOrder(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 staleForwardTarget,
                 scenario.Simulation.CurrentTick,
                 scenario.Simulation.CurrentTick));
@@ -408,20 +408,20 @@ public sealed class SkirmishSupplyPolicyTests
     [Fact]
     public void SupplyTruckRetargetsFromRemoteDepotToCloserCommandCore()
     {
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
-                VerticalSliceScenarioSettings.Create(
-                    VerticalSliceScenarioProfile.Validation));
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
+                CentralDivideScenario.CreateSettings(
+                    MatchScenarioProfile.Validation));
         EntityRegistry entities =
             scenario.Simulation.Entities;
         UnitDefinitionCatalog units =
             DirectorateContent.CreateUnitCatalog();
         WorldTransform core =
             entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
         SupplyProvider coreProvider =
             entities.GetComponent<SupplyProvider>(
-                scenario.West.CommandCore);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
 
         Assert.True(
             scenario.Inventories.GetAvailableQuantity(
@@ -457,13 +457,13 @@ public sealed class SkirmishSupplyPolicyTests
             remoteDepot,
             new CompletedBuilding(
                 BuildingIds.SupplyDepot,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 SimulationTick.Zero));
         entities.AddComponent(
             remoteDepot,
             new SupplyDepot(
                 remoteInventory,
-                scenario.West.Player));
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player));
 
         EntityId truck =
             scenario.UnitFactory.Create(
@@ -473,7 +473,7 @@ public sealed class SkirmishSupplyPolicyTests
                         120.0f,
                         0.0f,
                         0.0f),
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         SupplyTruck supply =
             entities.GetComponent<SupplyTruck>(
                 truck);
@@ -483,7 +483,7 @@ public sealed class SkirmishSupplyPolicyTests
         entities.AddComponent(
             truck,
             new MovementOrder(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 remoteLoadingTarget,
                 scenario.Simulation.CurrentTick,
                 scenario.Simulation.CurrentTick));
@@ -518,12 +518,12 @@ public sealed class SkirmishSupplyPolicyTests
     [Fact]
     public void FuelRecoveryPoliciesPrioritizeFieldSupplyOverVehicleProduction()
     {
-        VerticalSliceScenario scenario = VerticalSliceScenario.Create(
-            VerticalSliceScenarioSettings.Create(VerticalSliceScenarioProfile.Validation));
+        MatchRuntime scenario = CentralDivideScenario.Create(
+            CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
         EntityRegistry entities = scenario.Simulation.Entities;
         WorldTransform transform =
             entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
 
         InventoryId refineryInput =
             scenario.Inventories.CreateInventory(
@@ -537,12 +537,12 @@ public sealed class SkirmishSupplyPolicyTests
             refinery,
             new CompletedBuilding(
                 BuildingIds.Refinery,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 SimulationTick.Zero));
         entities.AddComponent(
             refinery,
             new ControllableEntity(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 ControllableEntityCategory.Building));
         entities.AddComponent(
             refinery,
@@ -561,19 +561,19 @@ public sealed class SkirmishSupplyPolicyTests
             supplyDepot,
             new CompletedBuilding(
                 BuildingIds.SupplyDepot,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 SimulationTick.Zero));
         entities.AddComponent(
             supplyDepot,
             new ControllableEntity(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 ControllableEntityCategory.Building |
                     ControllableEntityCategory.Logistics));
         entities.AddComponent(
             supplyDepot,
             new SupplyDepot(
                 depotInventory,
-                scenario.West.Player));
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player));
 
         InventoryId factoryInput =
             scenario.Inventories.CreateInventory(
@@ -584,12 +584,12 @@ public sealed class SkirmishSupplyPolicyTests
             vehicleFactory,
             new CompletedBuilding(
                 BuildingIds.VehicleFactory,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 SimulationTick.Zero));
         entities.AddComponent(
             vehicleFactory,
             new ControllableEntity(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 ControllableEntityCategory.Building));
         entities.AddComponent(
             vehicleFactory,
@@ -597,7 +597,7 @@ public sealed class SkirmishSupplyPolicyTests
                 factoryInput,
                 UnitProductionCapability.Vehicle |
                 UnitProductionCapability.Logistics,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 Vector3.Zero,
                 SimulationTick.Zero));
 
@@ -606,7 +606,7 @@ public sealed class SkirmishSupplyPolicyTests
         LogisticsStockPolicy coreSteel =
             FindStockPolicy(
                 entities,
-                scenario.West.CommandCore,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
                 ResourceIds.Steel);
 
         Assert.Equal(

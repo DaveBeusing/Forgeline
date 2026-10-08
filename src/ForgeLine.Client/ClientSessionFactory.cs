@@ -15,6 +15,14 @@ internal readonly record struct ClientSessionRequest(
     ulong Seed,
     LoadGameEntry? Save)
 {
+    internal MatchRuntimeSettings? RuntimeSettings { get; init; }
+
+    internal static ClientSessionRequest NewGame(MatchRuntimeSettings settings)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        return NewGame(settings.Seed) with { RuntimeSettings = settings };
+    }
+
     internal static ClientSessionRequest NewGame(
         ulong seed) =>
         new(
@@ -32,31 +40,37 @@ internal readonly record struct ClientSessionRequest(
 
 internal static class ClientSessionFactory
 {
-    internal static VerticalSliceScenario Create(
+    internal static MatchRuntime Create(
         ClientSessionRequest request,
-        JobScheduler jobScheduler) =>
+        JobScheduler jobScheduler,
+        Func<string, MatchComposition>? resolveComposition = null) =>
         request.Kind switch
         {
             ClientSessionRequestKind.NewGame =>
-                VerticalSliceScenario.Create(
-                    VerticalSliceRuntimeSettings.CreateClient(
+                MatchRuntime.Create(
+                    (request.RuntimeSettings ?? CentralDivideScenario.CreateClient(
                         jobScheduler,
-                        seed: request.Seed)),
+                        seed: request.Seed)) with
+                    {
+                        Scheduler = jobScheduler,
+                        SchedulerOwnership = MatchSchedulerOwnership.Host
+                    }),
             ClientSessionRequestKind.LoadGame
                 when request.Save is LoadGameEntry save =>
                     RestoreForGameplay(
-                        save),
+                        save, resolveComposition),
             _ =>
                 throw new InvalidOperationException(
                     $"Unsupported client session request {request.Kind}.")
         };
 
-    private static VerticalSliceScenario RestoreForGameplay(
-        LoadGameEntry save)
+    private static MatchRuntime RestoreForGameplay(
+        LoadGameEntry save,
+        Func<string, MatchComposition>? resolveComposition)
     {
-        VerticalSliceScenario scenario =
+        MatchRuntime scenario =
             ClientSaveCatalog.Restore(
-                save);
+                save, resolveComposition);
 
         if (scenario.GetMatchState().Lifecycle !=
             MatchLifecyclePhase.Paused)

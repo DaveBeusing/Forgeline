@@ -175,7 +175,7 @@ public sealed class ClientSimulationHostTests
                 boundaryCapacity: 1);
 
         EntityId unit =
-            fixture.Scenario.West.StartingUnits[0];
+            fixture.Scenario.GetBase(new PlayerId(1)).StartingUnits[0];
         SimulationTick observed =
             fixture.Host.CurrentTick;
 
@@ -184,7 +184,7 @@ public sealed class ClientSimulationHostTests
                 fixture.Host.SessionId,
                 gateway =>
                     gateway.SubmitMovement(
-                        fixture.Scenario.West.Player,
+                        fixture.Scenario.GetBase(new PlayerId(1)).Player,
                         [unit],
                         new Vector3(480.0f, 0.0f, 1_480.0f),
                         observed,
@@ -195,7 +195,7 @@ public sealed class ClientSimulationHostTests
                 fixture.Host.SessionId,
                 gateway =>
                     gateway.SubmitMovement(
-                        fixture.Scenario.West.Player,
+                        fixture.Scenario.GetBase(new PlayerId(1)).Player,
                         [unit],
                         new Vector3(500.0f, 0.0f, 1_480.0f),
                         observed,
@@ -213,7 +213,7 @@ public sealed class ClientSimulationHostTests
                 fixture.Host.SessionId,
                 gateway =>
                     gateway.SubmitMovement(
-                        fixture.Scenario.West.Player,
+                        fixture.Scenario.GetBase(new PlayerId(1)).Player,
                         [unit],
                         new Vector3(520.0f, 0.0f, 1_480.0f),
                         fixture.Host.CurrentTick,
@@ -240,7 +240,7 @@ public sealed class ClientSimulationHostTests
                         ref gatewayCalls);
 
                     return gateway.SubmitEndMatch(
-                        fixture.Scenario.West.Player,
+                        fixture.Scenario.GetBase(new PlayerId(1)).Player,
                         fixture.Host.CurrentTick);
                 }));
 
@@ -267,7 +267,7 @@ public sealed class ClientSimulationHostTests
 
         int gatewayCalls = 0;
         EntityId unit =
-            fixture.Scenario.West.StartingUnits[0];
+            fixture.Scenario.GetBase(new PlayerId(1)).StartingUnits[0];
         SimulationTick observed =
             fixture.Host.CurrentTick;
 
@@ -280,7 +280,7 @@ public sealed class ClientSimulationHostTests
                         ref gatewayCalls);
 
                     return gateway.SubmitMovement(
-                        fixture.Scenario.West.Player,
+                        fixture.Scenario.GetBase(new PlayerId(1)).Player,
                         [unit],
                         new Vector3(480.0f, 0.0f, 1_500.0f),
                         observed,
@@ -324,7 +324,7 @@ public sealed class ClientSimulationHostTests
 
         Assert.True(
             fixture.Host.TryRunSmokeCompletion(
-                fixture.Scenario.East.CommandCore));
+                fixture.Scenario.GetBase(new PlayerId(2)).CommandCore));
         Assert.True(
             fixture.Host.WaitForTerminalState(
                 terminal: true,
@@ -340,7 +340,7 @@ public sealed class ClientSimulationHostTests
         Assert.True(
             fixture.Host.TryAcknowledgeTerminal(
                 fixture.Host.SessionId,
-                fixture.Scenario.West.Player,
+                fixture.Scenario.GetBase(new PlayerId(1)).Player,
                 terminalTick));
         Assert.True(
             fixture.Host.WaitForPlayerMatchStatus(
@@ -622,7 +622,7 @@ public sealed class ClientSimulationHostTests
         private bool _disposed;
 
         private ClientHostFixture(
-            VerticalSliceScenario scenario,
+            MatchRuntime scenario,
             PresentationSnapshotBuffer snapshots,
             ClientSimulationHost host)
         {
@@ -631,7 +631,7 @@ public sealed class ClientSimulationHostTests
             Host = host;
         }
 
-        public VerticalSliceScenario Scenario { get; }
+        public MatchRuntime Scenario { get; }
 
         public PresentationSnapshotBuffer Snapshots { get; }
 
@@ -641,11 +641,11 @@ public sealed class ClientSimulationHostTests
             int boundaryCapacity = 32,
             ISimulationSystem? additionalSystem = null)
         {
-            VerticalSliceScenarioSettings settings =
-                VerticalSliceScenarioSettings.Create(
-                    VerticalSliceScenarioProfile.Gameplay);
-            VerticalSliceRuntimeSettings runtime =
-                VerticalSliceRuntimeSettings.CreateHeadless(
+            MatchScenarioSettings settings =
+                CentralDivideScenario.CreateSettings(
+                    MatchScenarioProfile.Gameplay);
+            MatchRuntimeSettings runtime =
+                CentralDivideScenario.CreateHeadless(
                     settings.Profile,
                     seed: 9147,
                     enableDiagnostics: false,
@@ -653,14 +653,14 @@ public sealed class ClientSimulationHostTests
                 {
                     Scenario = settings,
                     Participants =
-                        VerticalSliceRuntimeSettings
+                        CentralDivideScenario
                             .CreateDefaultParticipants(
                                 westComputerControlled: false,
                                 eastComputerControlled: true)
                 };
 
-            VerticalSliceScenario scenario =
-                VerticalSliceScenario.Create(
+            MatchRuntime scenario =
+                CentralDivideScenario.Create(
                     runtime);
 
             if (additionalSystem is not null)
@@ -685,7 +685,7 @@ public sealed class ClientSimulationHostTests
             var extraction =
                 new PresentationExtractionContext(
                     scenario,
-                    scenario.West.Player,
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                     interaction,
                     commands);
 

@@ -7,10 +7,10 @@ public sealed class BattlefieldBuildableAreaQuery : IBuildableAreaQuery
 {
     private const float ResourceZonePaddingMeters = 72.0f;
 
-    private readonly PrototypeBattlefieldDefinition _battlefield;
+    private readonly BattlefieldDefinition _battlefield;
 
     public BattlefieldBuildableAreaQuery(
-        PrototypeBattlefieldDefinition battlefield)
+        BattlefieldDefinition battlefield)
     {
         _battlefield =
             battlefield ??

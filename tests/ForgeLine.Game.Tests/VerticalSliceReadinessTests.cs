@@ -9,9 +9,9 @@ public sealed class VerticalSliceReadinessTests
     [Fact]
     public void HeadlessRuntimeUsesTwoComputerControlledParticipants()
     {
-        VerticalSliceRuntimeSettings runtime =
-            VerticalSliceRuntimeSettings.CreateHeadless(
-                VerticalSliceScenarioProfile.Validation,
+        MatchRuntimeSettings runtime =
+            CentralDivideScenario.CreateHeadless(
+                MatchScenarioProfile.Validation,
                 seed: 2026);
 
         Assert.Equal(2, runtime.Participants.Count);
@@ -31,66 +31,66 @@ public sealed class VerticalSliceReadinessTests
     [Fact]
     public void ValidationOpponentBalancesLogisticsAndObjectivePressure()
     {
-        VerticalSliceScenarioSettings settings =
-            VerticalSliceScenarioSettings.Create(
-                VerticalSliceScenarioProfile.Validation);
+        MatchScenarioSettings settings =
+            CentralDivideScenario.CreateSettings(
+                MatchScenarioProfile.Validation);
 
         Assert.Equal(
             2,
-            settings.WestOpponent.MinimumCargoTrucks);
+            settings.OpponentConfigurations[1].MinimumCargoTrucks);
         Assert.Equal(
             2,
-            settings.EastOpponent.MinimumCargoTrucks);
+            settings.OpponentConfigurations[2].MinimumCargoTrucks);
         Assert.Equal(
             2,
-            settings.WestOpponent.MinimumSupplyTrucks);
+            settings.OpponentConfigurations[1].MinimumSupplyTrucks);
         Assert.Equal(
             2,
-            settings.EastOpponent.MinimumSupplyTrucks);
+            settings.OpponentConfigurations[2].MinimumSupplyTrucks);
         Assert.Equal(
             1,
-            settings.WestOpponent.MinimumObjectivePressureUnits);
+            settings.OpponentConfigurations[1].MinimumObjectivePressureUnits);
         Assert.Equal(
             2,
-            settings.EastOpponent.MinimumObjectivePressureUnits);
+            settings.OpponentConfigurations[2].MinimumObjectivePressureUnits);
         Assert.True(
-            settings.WestOpponent.OffensiveFuelThreshold <
+            settings.OpponentConfigurations[1].OffensiveFuelThreshold <
             0.55);
         Assert.True(
-            settings.EastOpponent.OffensiveFuelThreshold <
+            settings.OpponentConfigurations[2].OffensiveFuelThreshold <
             0.55);
     }
 
     [Fact]
     public void ValidationProfileDoesNotReplaceGameplayDefaults()
     {
-        VerticalSliceScenarioSettings gameplay =
-            VerticalSliceScenarioSettings.Create(
-                VerticalSliceScenarioProfile.Gameplay);
-        VerticalSliceScenarioSettings validation =
-            VerticalSliceScenarioSettings.Create(
-                VerticalSliceScenarioProfile.Validation);
+        MatchScenarioSettings gameplay =
+            CentralDivideScenario.CreateSettings(
+                MatchScenarioProfile.Gameplay);
+        MatchScenarioSettings validation =
+            CentralDivideScenario.CreateSettings(
+                MatchScenarioProfile.Validation);
 
         Assert.Equal(
             SkirmishStartingStock.Standard,
             gameplay.StartingStock);
         Assert.Equal(
             20U,
-            gameplay.WestOpponent.ReactionCadenceTicks);
+            gameplay.OpponentConfigurations[1].ReactionCadenceTicks);
         Assert.Equal(
             0.65,
-            gameplay.WestOpponent.Aggression,
+            gameplay.OpponentConfigurations[1].Aggression,
             precision: 6);
 
         Assert.NotEqual(
             gameplay.StartingStock,
             validation.StartingStock);
         Assert.NotEqual(
-            gameplay.WestOpponent,
-            validation.WestOpponent);
+            gameplay.OpponentConfigurations[1],
+            validation.OpponentConfigurations[1]);
         Assert.NotEqual(
-            validation.WestOpponent,
-            validation.EastOpponent);
+            validation.OpponentConfigurations[1],
+            validation.OpponentConfigurations[2]);
     }
 
     [Fact]
@@ -100,9 +100,9 @@ public sealed class VerticalSliceReadinessTests
             SkirmishScenarioHarness.Create(
                 seed: 2026);
 
-        VerticalSliceScenarioSettings settings =
-            VerticalSliceScenarioSettings.Create(
-                VerticalSliceScenarioProfile.Validation);
+        MatchScenarioSettings settings =
+            CentralDivideScenario.CreateSettings(
+                MatchScenarioProfile.Validation);
 
         bool progressed =
             scenario.RunUntil(
@@ -120,35 +120,35 @@ public sealed class VerticalSliceReadinessTests
 
         Assert.True(
             progressed,
-            $"Readiness stalled: depots={scenario.CountBuildings(scenario.West.Player, BuildingIds.SupplyDepot)}; " +
-            $"tanks={scenario.CountUnits(scenario.West.Player, UnitIds.MainBattleTank)}; " +
-            $"contacts={scenario.Intelligence.GetContactCount(scenario.West.Faction)}; " +
-            $"goal={scenario.GetOpponentState(scenario.West.Player).ActiveGoal}.");
+            $"Readiness stalled: depots={scenario.CountBuildings(scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player, BuildingIds.SupplyDepot)}; " +
+            $"tanks={scenario.CountUnits(scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player, UnitIds.MainBattleTank)}; " +
+            $"contacts={scenario.Intelligence.GetContactCount(scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Faction)}; " +
+            $"goal={scenario.GetOpponentState(scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player).ActiveGoal}.");
         Assert.True(
             scenario.GetOpponentState(
-                scenario.West.Player).ExpansionSiteCursor > 0,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player).ExpansionSiteCursor > 0,
             "Validation opponent never established a canonical-map expansion.");
 
         Assert.NotEqual(
             SkirmishStrategicGoal.RecoverSupply,
             scenario.GetOpponentState(
-                scenario.West.Player).ActiveGoal);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player).ActiveGoal);
     }
 
     [Fact]
     public void FreshVerticalSliceSessionDoesNotRetainTerminalState()
     {
-        VerticalSliceScenarioSettings settings =
-            VerticalSliceScenarioSettings.Create(
-                VerticalSliceScenarioProfile.Validation);
-        VerticalSliceScenario first =
-            VerticalSliceScenario.Create(
+        MatchScenarioSettings settings =
+            CentralDivideScenario.CreateSettings(
+                MatchScenarioProfile.Validation);
+        MatchRuntime first =
+            CentralDivideScenario.Create(
                 settings,
                 seed: 2026);
 
         Assert.True(
             first.Simulation.Entities.DestroyEntity(
-                first.East.CommandCore));
+                first.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore));
         first.Simulation.AdvanceOneTick();
 
         MatchState completed =
@@ -156,11 +156,11 @@ public sealed class VerticalSliceReadinessTests
 
         Assert.True(completed.IsTerminal);
         Assert.Equal(
-            first.West.Player,
+            first.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
             completed.Winner);
 
-        VerticalSliceScenario restarted =
-            VerticalSliceScenario.Create(
+        MatchRuntime restarted =
+            CentralDivideScenario.Create(
                 settings,
                 seed: 2026);
         MatchState fresh =
@@ -174,9 +174,9 @@ public sealed class VerticalSliceReadinessTests
             restarted.Simulation.CurrentTick);
         Assert.True(
             restarted.Simulation.Entities.IsAlive(
-                restarted.West.CommandCore));
+                restarted.GetBase(new PlayerId(1)).CommandCore));
         Assert.True(
             restarted.Simulation.Entities.IsAlive(
-                restarted.East.CommandCore));
+                restarted.GetBase(new PlayerId(2)).CommandCore));
     }
 }

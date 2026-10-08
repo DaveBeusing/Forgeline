@@ -10,15 +10,15 @@ public sealed class SkirmishProgressionHistoryTests
     [Fact]
     public void HistoryRetainsOpeningAndBoundedTailWhenTransitionsOverflowCapacity()
     {
-        VerticalSliceScenarioSettings settings = VerticalSliceScenarioSettings.Create(VerticalSliceScenarioProfile.Validation);
-        VerticalSliceScenario scenario = VerticalSliceScenario.Create(settings, seed: 2026);
+        MatchScenarioSettings settings = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation);
+        MatchRuntime scenario = CentralDivideScenario.Create(settings, seed: 2026);
         scenario.Simulation.RegisterSystem(new DecisionTransitionFixture());
         var diagnostics = new SkirmishProgressionDiagnostics(
             scenario.Inventories, DirectorateContent.CreateUnitCatalog(),
             new Dictionary<PlayerId, SkirmishOpponentConfiguration>
             {
-                [scenario.West.Player] = settings.WestOpponent,
-                [scenario.East.Player] = settings.EastOpponent
+                [scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player] = settings.OpponentConfigurations[1],
+                [scenario.GetBase(new ForgeLine.Game.PlayerId(2)).Player] = settings.OpponentConfigurations[2]
             });
         scenario.Simulation.RegisterSystem(diagnostics);
         scenario.Simulation.RunTicks(16, TestContext.Current.CancellationToken);

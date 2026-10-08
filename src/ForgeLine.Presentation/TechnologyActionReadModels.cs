@@ -148,7 +148,7 @@ internal static class TechnologyActionSnapshotFactory
         ArgumentNullException.ThrowIfNull(entities);
         ArgumentNullException.ThrowIfNull(extraction);
 
-        VerticalSliceScenario scenario =
+        MatchRuntime scenario =
             extraction.Scenario;
         TechnologyDefinitionCatalog catalog =
             scenario.Services.TechnologyDefinitions;

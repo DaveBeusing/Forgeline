@@ -195,7 +195,7 @@ internal sealed class ClientApplication
             window,
             sessionTransitionRenderer);
 
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             ClientSessionFactory.Create(
                 sessionRequest,
                 jobScheduler);
@@ -215,14 +215,14 @@ internal sealed class ClientApplication
 
         SimulationCoordinator simulation =
             scenario.Simulation;
-        PrototypeBattlefieldDefinition prototypeBattlefield =
+        BattlefieldDefinition prototypeBattlefield =
             scenario.Battlefield;
         TerrainWorld terrainWorld =
             scenario.Terrain;
         SkirmishStartingBase westBase =
-            scenario.West;
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1));
         SkirmishStartingBase eastBase =
-            scenario.East;
+            scenario.GetBase(new ForgeLine.Game.PlayerId(2));
 
         if (renderInstanceCount > 0)
         {
@@ -1379,7 +1379,7 @@ internal sealed class ClientApplication
             new
             {
                 scene =
-                    "vertical-slice-client",
+                    "match-client",
                 renderStressInstances,
                 settings =
                     new
@@ -1829,7 +1829,7 @@ internal sealed class ClientApplication
     private static void BuildDevelopmentDebugOverlay(
         DebugDraw debugDraw,
         in DebugOverlayView overlay,
-        PrototypeBattlefieldDefinition prototypeBattlefield,
+        BattlefieldDefinition prototypeBattlefield,
         RenderWorld renderWorld,
         float alpha,
         RtsCamera camera,
@@ -1949,7 +1949,7 @@ internal sealed class ClientApplication
                     maximumLabels: 8);
             }
 
-            PrototypeBattlefieldDebugVisualization.Draw(
+            BattlefieldDebugVisualization.Draw(
                 debugDraw,
                 prototypeBattlefield,
                 debugSnapshot.CrossingStates);
@@ -2392,7 +2392,7 @@ internal sealed class ClientApplication
             "Saves");
 
     private static bool TrySaveCurrentMatch(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         string saveDirectory,
         out string feedback)
     {

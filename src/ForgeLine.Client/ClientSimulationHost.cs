@@ -37,7 +37,7 @@ internal sealed class ClientSimulationHost : IDisposable
     private readonly object _disposeGate = new();
     private readonly object _faultWaitGate = new();
     private readonly object _progressGate = new();
-    private readonly VerticalSliceScenario _scenario;
+    private readonly MatchRuntime _scenario;
     private readonly SimulationCoordinator _simulation;
     private readonly PlayerCommandGateway _commands;
     private readonly PresentationSnapshotBuffer _snapshots;
@@ -61,7 +61,7 @@ internal sealed class ClientSimulationHost : IDisposable
     private bool _disposed;
 
     public ClientSimulationHost(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         PlayerCommandGateway commands,
         PresentationSnapshotBuffer snapshots,
         int boundaryCapacity = DefaultBoundaryCapacity)

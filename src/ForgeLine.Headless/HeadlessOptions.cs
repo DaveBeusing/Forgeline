@@ -6,12 +6,12 @@ namespace ForgeLine.Headless;
 internal enum HeadlessScenarioKind : byte
 {
     Lightweight = 1,
-    VerticalSlice = 2
+    Match = 2
 }
 
 internal readonly record struct HeadlessOptions(
     HeadlessScenarioKind Scenario,
-    VerticalSliceScenarioProfile Profile,
+    MatchScenarioProfile Profile,
     ulong TickCount,
     ulong Seed,
     int TickRate,
@@ -33,8 +33,8 @@ internal readonly record struct HeadlessOptions(
 
         HeadlessScenarioKind scenario =
             HeadlessScenarioKind.Lightweight;
-        VerticalSliceScenarioProfile profile =
-            VerticalSliceScenarioProfile.Gameplay;
+        MatchScenarioProfile profile =
+            MatchScenarioProfile.Gameplay;
         ulong tickCount = 1_000;
         ulong seed = 1;
         int tickRate =
@@ -138,7 +138,7 @@ internal readonly record struct HeadlessOptions(
                             ref index,
                             argument);
                     scenario =
-                        HeadlessScenarioKind.VerticalSlice;
+                        HeadlessScenarioKind.Match;
                     break;
 
                 case "--replay-output":
@@ -148,7 +148,7 @@ internal readonly record struct HeadlessOptions(
                             ref index,
                             argument);
                     scenario =
-                        HeadlessScenarioKind.VerticalSlice;
+                        HeadlessScenarioKind.Match;
                     break;
 
                 case "--load-input":
@@ -158,7 +158,7 @@ internal readonly record struct HeadlessOptions(
                             ref index,
                             argument);
                     scenario =
-                        HeadlessScenarioKind.VerticalSlice;
+                        HeadlessScenarioKind.Match;
                     break;
 
                 case "--replay-input":
@@ -168,7 +168,7 @@ internal readonly record struct HeadlessOptions(
                             ref index,
                             argument);
                     scenario =
-                        HeadlessScenarioKind.VerticalSlice;
+                        HeadlessScenarioKind.Match;
                     break;
 
                 case "--help":
@@ -222,7 +222,7 @@ internal readonly record struct HeadlessOptions(
 
     private static void ValidateCombination(
         HeadlessScenarioKind scenario,
-        VerticalSliceScenarioProfile profile,
+        MatchScenarioProfile profile,
         int tickRate,
         int entityCount,
         int matchCount,
@@ -235,13 +235,13 @@ internal readonly record struct HeadlessOptions(
         string? loadInput,
         string? replayInput)
     {
-        if (scenario == HeadlessScenarioKind.VerticalSlice)
+        if (scenario == HeadlessScenarioKind.Match)
         {
             if (tickRate !=
                 ForgeLine.Simulation.FixedTickClock.DefaultTicksPerSecond)
             {
                 throw new ArgumentException(
-                    "The vertical-slice scenario uses the canonical 20 Hz simulation rate.",
+                    "The match scenario uses the canonical 20 Hz simulation rate.",
                     nameof(tickRate));
             }
 
@@ -304,27 +304,27 @@ internal readonly record struct HeadlessOptions(
             replayInput is not null)
         {
             throw new ArgumentException(
-                "Telemetry and save/replay options are only valid for the vertical-slice scenario.");
+                "Telemetry and save/replay options are only valid for the match scenario.");
         }
 
-        if (profile != VerticalSliceScenarioProfile.Gameplay)
+        if (profile != MatchScenarioProfile.Gameplay)
         {
             throw new ArgumentException(
-                "--profile is only valid for the vertical-slice scenario.",
+                "--profile is only valid for the match scenario.",
                 nameof(profile));
         }
 
         if (matchCount != 1)
         {
             throw new ArgumentException(
-                "--matches is only valid for the vertical-slice scenario.",
+                "--matches is only valid for the match scenario.",
                 nameof(matchCount));
         }
 
         if (requireTerminal)
         {
             throw new ArgumentException(
-                "--require-terminal is only valid for the vertical-slice scenario.",
+                "--require-terminal is only valid for the match scenario.",
                 nameof(requireTerminal));
         }
     }
@@ -334,24 +334,24 @@ internal readonly record struct HeadlessOptions(
         {
             "lightweight" =>
                 HeadlessScenarioKind.Lightweight,
-            "vertical-slice" =>
-                HeadlessScenarioKind.VerticalSlice,
+            "central-divide" or "vertical-slice" =>
+                HeadlessScenarioKind.Match,
             _ =>
                 throw new ArgumentException(
                     $"Unknown headless scenario '{value}'.")
         };
 
-    private static VerticalSliceScenarioProfile ParseProfile(
+    private static MatchScenarioProfile ParseProfile(
         string value) =>
         value.ToLowerInvariant() switch
         {
             "gameplay" =>
-                VerticalSliceScenarioProfile.Gameplay,
+                MatchScenarioProfile.Gameplay,
             "validation" =>
-                VerticalSliceScenarioProfile.Validation,
+                MatchScenarioProfile.Validation,
             _ =>
                 throw new ArgumentException(
-                    $"Unknown vertical-slice profile '{value}'.")
+                    $"Unknown match profile '{value}'.")
         };
 
     private static ulong ParseUInt64(

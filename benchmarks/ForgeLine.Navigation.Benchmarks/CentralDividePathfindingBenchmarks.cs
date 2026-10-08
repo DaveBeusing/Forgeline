@@ -7,7 +7,7 @@ namespace ForgeLine.Navigation.Benchmarks;
 [MemoryDiagnoser]
 public class CentralDividePathfindingBenchmarks
 {
-    private PrototypeBattlefieldDefinition _battlefield = null!;
+    private BattlefieldDefinition _battlefield = null!;
     private TerrainWorld _terrain = null!;
     private NavigationCapabilities _tracked;
     private System.Numerics.Vector3 _westStart;
@@ -20,9 +20,9 @@ public class CentralDividePathfindingBenchmarks
     public void Setup()
     {
         _battlefield =
-            PrototypeBattlefieldDefinition.Create();
+            CentralDivideBattlefield.Create();
         _terrain =
-            PrototypeBattlefieldTerrainFactory.Create(
+            CentralDivideTerrainFactory.Create(
                 _battlefield);
 
         var gridSettings =

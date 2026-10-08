@@ -15,10 +15,10 @@ public sealed class PrototypeBattlefieldTests
     [Fact]
     public void CanonicalDefinitionProvidesValidatedVerticalSliceLayout()
     {
-        PrototypeBattlefieldDefinition definition =
-            PrototypeBattlefieldDefinition.Create();
+        BattlefieldDefinition definition =
+            CentralDivideBattlefield.Create();
         TerrainWorld terrain =
-            PrototypeBattlefieldTerrainFactory.Create(
+            CentralDivideTerrainFactory.Create(
                 definition);
 
         Assert.Equal(
@@ -69,8 +69,8 @@ public sealed class PrototypeBattlefieldTests
     [Fact]
     public void CanonicalMapArtifactRoundTripsStrategicDefinition()
     {
-        PrototypeBattlefieldDefinition definition =
-            PrototypeBattlefieldDefinition.Create();
+        BattlefieldDefinition definition =
+            CentralDivideBattlefield.Create();
 
         BattlefieldMapArtifact artifact =
             BattlefieldMapArtifact.Capture(
@@ -151,10 +151,10 @@ public sealed class PrototypeBattlefieldTests
     [Fact]
     public void CanonicalMapOperationalGeographyQualifiesHeadlessly()
     {
-        PrototypeBattlefieldDefinition definition =
-            PrototypeBattlefieldDefinition.Create();
+        BattlefieldDefinition definition =
+            CentralDivideBattlefield.Create();
         TerrainWorld terrain =
-            PrototypeBattlefieldTerrainFactory.Create(
+            CentralDivideTerrainFactory.Create(
                 definition);
 
         BattlefieldOperationalGeographyReport report =
@@ -196,8 +196,8 @@ public sealed class PrototypeBattlefieldTests
     [Fact]
     public void CanonicalMapUsesExplicitStrategicBuildZones()
     {
-        PrototypeBattlefieldDefinition definition =
-            PrototypeBattlefieldDefinition.Create();
+        BattlefieldDefinition definition =
+            CentralDivideBattlefield.Create();
         var query =
             new BattlefieldBuildableAreaQuery(
                 definition);
@@ -233,17 +233,17 @@ public sealed class PrototypeBattlefieldTests
     [Fact]
     public void CrossingDisruptionReroutesNavigationAndLogisticsAndRestorationRecovers()
     {
-        PrototypeBattlefieldDefinition definition =
-            PrototypeBattlefieldDefinition.Create();
+        BattlefieldDefinition definition =
+            CentralDivideBattlefield.Create();
         TerrainWorld terrain =
-            PrototypeBattlefieldTerrainFactory.Create(
+            CentralDivideTerrainFactory.Create(
                 definition);
         var simulation =
             new SimulationCoordinator();
         var logistics =
             new LogisticsNetwork();
-        PrototypeBattlefieldRuntime runtime =
-            PrototypeBattlefieldRuntime.Load(
+        BattlefieldRuntime runtime =
+            BattlefieldRuntime.Load(
                 simulation.Entities,
                 definition,
                 terrain,
@@ -423,17 +423,17 @@ public sealed class PrototypeBattlefieldTests
     [Fact]
     public void CommandCoreObjectivesResolveVictoryFromSimulationOwnedState()
     {
-        PrototypeBattlefieldDefinition definition =
-            PrototypeBattlefieldDefinition.Create();
+        BattlefieldDefinition definition =
+            CentralDivideBattlefield.Create();
         TerrainWorld terrain =
-            PrototypeBattlefieldTerrainFactory.Create(
+            CentralDivideTerrainFactory.Create(
                 definition);
         var simulation =
             new SimulationCoordinator();
         var logistics =
             new LogisticsNetwork();
-        PrototypeBattlefieldRuntime runtime =
-            PrototypeBattlefieldRuntime.Load(
+        BattlefieldRuntime runtime =
+            BattlefieldRuntime.Load(
                 simulation.Entities,
                 definition,
                 terrain,
@@ -535,18 +535,18 @@ public sealed class PrototypeBattlefieldTests
     [Fact]
     public void RuntimeSpawnsFiniteDepositsAndStrategicCrossingsHeadlessly()
     {
-        PrototypeBattlefieldDefinition definition =
-            PrototypeBattlefieldDefinition.Create();
+        BattlefieldDefinition definition =
+            CentralDivideBattlefield.Create();
         TerrainWorld terrain =
-            PrototypeBattlefieldTerrainFactory.Create(
+            CentralDivideTerrainFactory.Create(
                 definition);
         var simulation =
             new SimulationCoordinator();
         var logistics =
             new LogisticsNetwork();
 
-        PrototypeBattlefieldRuntime runtime =
-            PrototypeBattlefieldRuntime.Load(
+        BattlefieldRuntime runtime =
+            BattlefieldRuntime.Load(
                 simulation.Entities,
                 definition,
                 terrain,

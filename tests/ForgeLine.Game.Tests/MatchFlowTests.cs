@@ -278,11 +278,11 @@ public sealed class MatchFlowTests
     [Fact]
     public void VerticalSliceConfigurationMatchesPrototypeAssignments()
     {
-        PrototypeBattlefieldDefinition battlefield =
-            PrototypeBattlefieldDefinition.Create();
+        BattlefieldDefinition battlefield =
+            CentralDivideBattlefield.Create();
 
         MatchConfiguration configuration =
-            MatchConfiguration.CreateVerticalSlice(
+            MatchConfiguration.CreateCentralDivide(
                 battlefield,
                 seed: 12345);
 
@@ -314,7 +314,7 @@ public sealed class MatchFlowTests
     {
         private MatchFixture(
             SimulationCoordinator simulation,
-            PrototypeBattlefieldRuntime runtime,
+            BattlefieldRuntime runtime,
             Dictionary<PlayerId, EntityId> commandCores)
         {
             Simulation = simulation;
@@ -324,23 +324,23 @@ public sealed class MatchFlowTests
 
         public SimulationCoordinator Simulation { get; }
 
-        public PrototypeBattlefieldRuntime Runtime { get; }
+        public BattlefieldRuntime Runtime { get; }
 
         public Dictionary<PlayerId, EntityId> CommandCores { get; }
 
         public static MatchFixture Create()
         {
-            PrototypeBattlefieldDefinition definition =
-                PrototypeBattlefieldDefinition.Create();
+            BattlefieldDefinition definition =
+                CentralDivideBattlefield.Create();
             var simulation =
                 new SimulationCoordinator();
             var logistics =
                 new LogisticsNetwork();
-            PrototypeBattlefieldRuntime runtime =
-                PrototypeBattlefieldRuntime.Load(
+            BattlefieldRuntime runtime =
+                BattlefieldRuntime.Load(
                     simulation.Entities,
                     definition,
-                    PrototypeBattlefieldTerrainFactory.Create(
+                    CentralDivideTerrainFactory.Create(
                         definition),
                     logistics);
             var commandCores =

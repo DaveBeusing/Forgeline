@@ -18,10 +18,10 @@ public sealed class SkirmishProductionPolicyTests
         int resourceValue,
         double availableQuantity)
     {
-        VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
-                VerticalSliceScenarioSettings.Create(
-                    VerticalSliceScenarioProfile.Validation));
+        MatchRuntime scenario =
+            CentralDivideScenario.Create(
+                CentralDivideScenario.CreateSettings(
+                    MatchScenarioProfile.Validation));
         var resource = new ResourceId(checked((uint)resourceValue));
         UnitDefinitionCatalog units =
             DirectorateContent.CreateUnitCatalog();
@@ -29,11 +29,11 @@ public sealed class SkirmishProductionPolicyTests
             units[UnitIds.MainBattleTank];
         WorldTransform coreTransform =
             scenario.Simulation.Entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
         scenario.UnitFactory.Create(
             units[UnitIds.ScoutVehicle],
             coreTransform.Position,
-            scenario.West.Player);
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         InventoryId input = scenario.Inventories.CreateInventory(
             new InventorySpecification(4_000.0));
 
@@ -49,28 +49,28 @@ public sealed class SkirmishProductionPolicyTests
         scenario.Simulation.Entities.AddComponent(
             factory,
             scenario.Simulation.Entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore));
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore));
         scenario.Simulation.Entities.AddComponent(
             factory,
             new CompletedBuilding(
                 BuildingIds.VehicleFactory,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 SimulationTick.Zero));
         scenario.Simulation.Entities.AddComponent(
             factory,
             new ControllableEntity(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 ControllableEntityCategory.Building));
         scenario.Simulation.Entities.AddComponent(
             factory,
             new UnitProductionFacility(
                 input,
                 UnitProductionCapability.Vehicle | UnitProductionCapability.Logistics,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 Vector3.Zero,
                 SimulationTick.Zero));
         var command = new QueueUnitProductionCommand(
-            scenario.West.Player,
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
             factory,
             UnitIds.MainBattleTank,
             SimulationTick.Zero);
@@ -101,17 +101,17 @@ public sealed class SkirmishProductionPolicyTests
     [Fact]
     public void ObjectivePressureFactoryOutranksRoutineUnitMaterialDemand()
     {
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
-                VerticalSliceScenarioSettings.Create(
-                    VerticalSliceScenarioProfile.Validation));
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
+                CentralDivideScenario.CreateSettings(
+                    MatchScenarioProfile.Validation));
         EntityRegistry entities =
             scenario.Simulation.Entities;
         UnitDefinitionCatalog units =
             DirectorateContent.CreateUnitCatalog();
         WorldTransform coreTransform =
             entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
 
         InventoryId barracksInput =
             scenario.Inventories.CreateInventory(
@@ -123,19 +123,19 @@ public sealed class SkirmishProductionPolicyTests
             barracks,
             new CompletedBuilding(
                 BuildingIds.Barracks,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 SimulationTick.Zero));
         entities.AddComponent(
             barracks,
             new ControllableEntity(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 ControllableEntityCategory.Building));
         entities.AddComponent(
             barracks,
             new UnitProductionFacility(
                 barracksInput,
                 UnitProductionCapability.Infantry,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 Vector3.Zero,
                 SimulationTick.Zero));
 
@@ -146,7 +146,7 @@ public sealed class SkirmishProductionPolicyTests
         {
             if (entities.GetComponent<ControllableEntity>(
                     entity).Owner ==
-                    scenario.West.Player &&
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player &&
                 entities.GetComponent<UnitIdentity>(
                     entity).UnitId ==
                     UnitIds.SupplyTruck)
@@ -156,19 +156,19 @@ public sealed class SkirmishProductionPolicyTests
         }
 
         while (supplyTrucks <
-               scenario.RuntimeSettings.Scenario.WestOpponent.MinimumSupplyTrucks)
+               scenario.RuntimeSettings.Scenario.OpponentConfigurations[1].MinimumSupplyTrucks)
         {
             scenario.UnitFactory.Create(
                 units[UnitIds.SupplyTruck],
                 coreTransform.Position,
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
             supplyTrucks++;
         }
 
         scenario.UnitFactory.Create(
             units[UnitIds.ScoutVehicle],
             coreTransform.Position,
-            scenario.West.Player);
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
 
         InventoryId vehicleInput =
             scenario.Inventories.CreateInventory(
@@ -180,12 +180,12 @@ public sealed class SkirmishProductionPolicyTests
             vehicleFactory,
             new CompletedBuilding(
                 BuildingIds.VehicleFactory,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 SimulationTick.Zero));
         entities.AddComponent(
             vehicleFactory,
             new ControllableEntity(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 ControllableEntityCategory.Building));
         entities.AddComponent(
             vehicleFactory,
@@ -193,7 +193,7 @@ public sealed class SkirmishProductionPolicyTests
                 vehicleInput,
                 UnitProductionCapability.Vehicle |
                 UnitProductionCapability.Logistics,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 Vector3.Zero,
                 SimulationTick.Zero));
 
@@ -232,11 +232,11 @@ public sealed class SkirmishProductionPolicyTests
     [Fact]
     public void ObjectivePressureUnitsPrecedeOptionalVehicleGrowth()
     {
-        VerticalSliceScenarioSettings validation =
-            VerticalSliceScenarioSettings.Create(
-                VerticalSliceScenarioProfile.Validation);
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
+        MatchScenarioSettings validation =
+            CentralDivideScenario.CreateSettings(
+                MatchScenarioProfile.Validation);
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
                 validation);
         EntityRegistry entities =
             scenario.Simulation.Entities;
@@ -244,7 +244,7 @@ public sealed class SkirmishProductionPolicyTests
             DirectorateContent.CreateUnitCatalog();
         WorldTransform coreTransform =
             entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
 
         int supplyTrucks = 0;
         foreach (EntityId entity in
@@ -253,7 +253,7 @@ public sealed class SkirmishProductionPolicyTests
         {
             if (entities.GetComponent<ControllableEntity>(
                     entity).Owner ==
-                    scenario.West.Player &&
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player &&
                 entities.GetComponent<UnitIdentity>(
                     entity).UnitId ==
                     UnitIds.SupplyTruck)
@@ -263,19 +263,19 @@ public sealed class SkirmishProductionPolicyTests
         }
 
         while (supplyTrucks <
-               validation.WestOpponent.MinimumSupplyTrucks)
+               validation.OpponentConfigurations[1].MinimumSupplyTrucks)
         {
             scenario.UnitFactory.Create(
                 units[UnitIds.SupplyTruck],
                 coreTransform.Position,
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
             supplyTrucks++;
         }
 
         scenario.UnitFactory.Create(
             units[UnitIds.ScoutVehicle],
             coreTransform.Position,
-            scenario.West.Player);
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
 
         InventoryId input =
             scenario.Inventories.CreateInventory(
@@ -290,12 +290,12 @@ public sealed class SkirmishProductionPolicyTests
             factory,
             new CompletedBuilding(
                 BuildingIds.VehicleFactory,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 SimulationTick.Zero));
         entities.AddComponent(
             factory,
             new ControllableEntity(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 ControllableEntityCategory.Building));
         entities.AddComponent(
             factory,
@@ -303,7 +303,7 @@ public sealed class SkirmishProductionPolicyTests
                 input,
                 UnitProductionCapability.Vehicle |
                 UnitProductionCapability.Logistics,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 Vector3.Zero,
                 SimulationTick.Zero));
         var network =
@@ -405,11 +405,11 @@ public sealed class SkirmishProductionPolicyTests
     [Fact]
     public void HealthyCargoFleetDoesNotBlockArtilleryProductionReserve()
     {
-        VerticalSliceScenarioSettings validation =
-            VerticalSliceScenarioSettings.Create(
-                VerticalSliceScenarioProfile.Validation);
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
+        MatchScenarioSettings validation =
+            CentralDivideScenario.CreateSettings(
+                MatchScenarioProfile.Validation);
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
                 validation);
         EntityRegistry entities =
             scenario.Simulation.Entities;
@@ -417,7 +417,7 @@ public sealed class SkirmishProductionPolicyTests
             DirectorateContent.CreateUnitCatalog();
         WorldTransform coreTransform =
             entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
 
         int depotCount = 0;
         int cargoCount = 0;
@@ -434,7 +434,7 @@ public sealed class SkirmishProductionPolicyTests
                     entity);
 
             if (building.Owner ==
-                    scenario.West.Player &&
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player &&
                 building.BuildingId ==
                     BuildingIds.SupplyDepot)
             {
@@ -448,7 +448,7 @@ public sealed class SkirmishProductionPolicyTests
         {
             if (entities.GetComponent<ControllableEntity>(
                     entity).Owner !=
-                scenario.West.Player)
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player)
             {
                 continue;
             }
@@ -477,7 +477,7 @@ public sealed class SkirmishProductionPolicyTests
 
         int cargoTarget =
             Math.Max(
-                validation.WestOpponent.MinimumCargoTrucks,
+                validation.OpponentConfigurations[1].MinimumCargoTrucks,
                 Math.Clamp(
                     depotCount,
                     2,
@@ -488,17 +488,17 @@ public sealed class SkirmishProductionPolicyTests
             scenario.UnitFactory.Create(
                 units[UnitIds.CargoTruck],
                 coreTransform.Position,
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
             cargoCount++;
         }
 
         while (supplyCount <
-               validation.WestOpponent.MinimumSupplyTrucks)
+               validation.OpponentConfigurations[1].MinimumSupplyTrucks)
         {
             scenario.UnitFactory.Create(
                 units[UnitIds.SupplyTruck],
                 coreTransform.Position,
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
             supplyCount++;
         }
 
@@ -507,17 +507,17 @@ public sealed class SkirmishProductionPolicyTests
             scenario.UnitFactory.Create(
                 units[UnitIds.ScoutVehicle],
                 coreTransform.Position,
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
             scoutCount++;
         }
 
         while (tankCount <
-               validation.WestOpponent.MinimumObjectivePressureUnits)
+               validation.OpponentConfigurations[1].MinimumObjectivePressureUnits)
         {
             scenario.UnitFactory.Create(
                 units[UnitIds.MainBattleTank],
                 coreTransform.Position,
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
             tankCount++;
         }
 
@@ -534,12 +534,12 @@ public sealed class SkirmishProductionPolicyTests
             factory,
             new CompletedBuilding(
                 BuildingIds.VehicleFactory,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 SimulationTick.Zero));
         entities.AddComponent(
             factory,
             new ControllableEntity(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 ControllableEntityCategory.Building));
         entities.AddComponent(
             factory,
@@ -547,7 +547,7 @@ public sealed class SkirmishProductionPolicyTests
                 input,
                 UnitProductionCapability.Vehicle |
                 UnitProductionCapability.Logistics,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 Vector3.Zero,
                 SimulationTick.Zero));
 
@@ -641,15 +641,15 @@ public sealed class SkirmishProductionPolicyTests
     [Fact]
     public void ExpandedSupplyNetworkQueuesAdditionalCargoRecovery()
     {
-        VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
-                VerticalSliceScenarioSettings.Create(
-                    VerticalSliceScenarioProfile.Validation));
+        MatchRuntime scenario =
+            CentralDivideScenario.Create(
+                CentralDivideScenario.CreateSettings(
+                    MatchScenarioProfile.Validation));
         EntityRegistry entities =
             scenario.Simulation.Entities;
         WorldTransform coreTransform =
             entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
 
         for (int index = 0; index < 3; index++)
         {
@@ -665,13 +665,13 @@ public sealed class SkirmishProductionPolicyTests
                 depot,
                 new CompletedBuilding(
                     BuildingIds.SupplyDepot,
-                    scenario.West.Player,
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                     SimulationTick.Zero));
             entities.AddComponent(
                 depot,
                 new SupplyDepot(
                     depotInventory,
-                    scenario.West.Player));
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player));
         }
 
         InventoryId input =
@@ -686,7 +686,7 @@ public sealed class SkirmishProductionPolicyTests
             factory,
             new CompletedBuilding(
                 BuildingIds.VehicleFactory,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 SimulationTick.Zero));
         entities.AddComponent(
             factory,
@@ -694,7 +694,7 @@ public sealed class SkirmishProductionPolicyTests
                 input,
                 UnitProductionCapability.Vehicle |
                 UnitProductionCapability.Logistics,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 Vector3.Zero,
                 SimulationTick.Zero));
         var isolatedNetwork =
@@ -742,19 +742,22 @@ public sealed class SkirmishProductionPolicyTests
     [Fact]
     public void LostScoutPreemptsBlockedRoutineVehicleProduction()
     {
-        VerticalSliceScenarioSettings validation =
-            VerticalSliceScenarioSettings.Create(
-                VerticalSliceScenarioProfile.Validation);
-        VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
+        MatchScenarioSettings validation =
+            CentralDivideScenario.CreateSettings(
+                MatchScenarioProfile.Validation);
+        MatchRuntime scenario =
+            CentralDivideScenario.Create(
                 validation with
                 {
-                    WestOpponent =
-                        validation.WestOpponent with
+                    OpponentConfigurations = new Dictionary<ulong, SkirmishOpponentConfiguration>(validation.OpponentConfigurations)
+                    {
+                        [1] =
+                        validation.OpponentConfigurations[1] with
                         {
                             MinimumCargoTrucks = 2,
                             MinimumSupplyTrucks = 1
                         }
+                    }
                 });
         EntityRegistry entities =
             scenario.Simulation.Entities;
@@ -762,7 +765,7 @@ public sealed class SkirmishProductionPolicyTests
             DirectorateContent.CreateUnitCatalog();
         Vector3 stagingPosition =
             entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore).Position;
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore).Position;
 
         var cargo =
             new List<EntityId>();
@@ -777,7 +780,7 @@ public sealed class SkirmishProductionPolicyTests
         {
             if (entities.GetComponent<ControllableEntity>(
                     entity).Owner !=
-                scenario.West.Player)
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player)
             {
                 continue;
             }
@@ -806,7 +809,7 @@ public sealed class SkirmishProductionPolicyTests
                 scenario.UnitFactory.Create(
                     units[UnitIds.CargoTruck],
                     stagingPosition,
-                    scenario.West.Player));
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player));
         }
 
         if (!hasSupply)
@@ -814,7 +817,7 @@ public sealed class SkirmishProductionPolicyTests
             scenario.UnitFactory.Create(
                 units[UnitIds.SupplyTruck],
                 stagingPosition,
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         }
 
         if (scouts.Count == 0)
@@ -823,7 +826,7 @@ public sealed class SkirmishProductionPolicyTests
                 scenario.UnitFactory.Create(
                     units[UnitIds.ScoutVehicle],
                     stagingPosition,
-                    scenario.West.Player));
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player));
         }
 
         int tankCount = 0;
@@ -833,7 +836,7 @@ public sealed class SkirmishProductionPolicyTests
         {
             if (entities.GetComponent<ControllableEntity>(
                     entity).Owner ==
-                    scenario.West.Player &&
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player &&
                 entities.GetComponent<UnitIdentity>(
                     entity).UnitId ==
                     UnitIds.MainBattleTank)
@@ -843,12 +846,12 @@ public sealed class SkirmishProductionPolicyTests
         }
 
         while (tankCount <
-               validation.WestOpponent.MinimumObjectivePressureUnits)
+               validation.OpponentConfigurations[1].MinimumObjectivePressureUnits)
         {
             scenario.UnitFactory.Create(
                 units[UnitIds.MainBattleTank],
                 stagingPosition,
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
             tankCount++;
         }
 
@@ -860,17 +863,17 @@ public sealed class SkirmishProductionPolicyTests
         entities.AddComponent(
             factory,
             entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore));
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore));
         entities.AddComponent(
             factory,
             new CompletedBuilding(
                 BuildingIds.VehicleFactory,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 SimulationTick.Zero));
         entities.AddComponent(
             factory,
             new ControllableEntity(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 ControllableEntityCategory.Building));
         entities.AddComponent(
             factory,
@@ -878,7 +881,7 @@ public sealed class SkirmishProductionPolicyTests
                 input,
                 UnitProductionCapability.Vehicle |
                 UnitProductionCapability.Logistics,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 Vector3.Zero,
                 SimulationTick.Zero));
 
@@ -901,13 +904,13 @@ public sealed class SkirmishProductionPolicyTests
 
         var firstTank =
             new QueueUnitProductionCommand(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 factory,
                 UnitIds.MainBattleTank,
                 SimulationTick.Zero);
         var secondTank =
             new QueueUnitProductionCommand(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 factory,
                 UnitIds.MainBattleTank,
                 SimulationTick.Zero);
@@ -943,7 +946,7 @@ public sealed class SkirmishProductionPolicyTests
         }
 
         scenario.Simulation.RunTicks(
-            validation.WestOpponent.ReactionCadenceTicks + 2,
+            validation.OpponentConfigurations[1].ReactionCadenceTicks + 2,
             TestContext.Current.CancellationToken);
 
         UnitProductionFacility recovered =
@@ -1000,11 +1003,11 @@ public sealed class SkirmishProductionPolicyTests
     [Fact]
     public void MatureSupplyRecoveryPreemptsBlockedOptionalVehicleProduction()
     {
-        VerticalSliceScenarioSettings validation =
-            VerticalSliceScenarioSettings.Create(
-                VerticalSliceScenarioProfile.Validation);
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
+        MatchScenarioSettings validation =
+            CentralDivideScenario.CreateSettings(
+                MatchScenarioProfile.Validation);
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
                 validation);
         EntityRegistry entities =
             scenario.Simulation.Entities;
@@ -1012,7 +1015,7 @@ public sealed class SkirmishProductionPolicyTests
             DirectorateContent.CreateUnitCatalog();
         Vector3 stagingPosition =
             entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore).Position;
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore).Position;
 
         int depotCount = 0;
         int cargoCount = 0;
@@ -1031,7 +1034,7 @@ public sealed class SkirmishProductionPolicyTests
                     entity);
 
             if (building.Owner ==
-                    scenario.West.Player &&
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player &&
                 building.BuildingId ==
                     BuildingIds.SupplyDepot)
             {
@@ -1061,13 +1064,13 @@ public sealed class SkirmishProductionPolicyTests
                 depot,
                 new CompletedBuilding(
                     BuildingIds.SupplyDepot,
-                    scenario.West.Player,
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                     SimulationTick.Zero));
             entities.AddComponent(
                 depot,
                 new SupplyDepot(
                     depotInventory,
-                    scenario.West.Player));
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player));
             depotCount++;
         }
 
@@ -1077,7 +1080,7 @@ public sealed class SkirmishProductionPolicyTests
         {
             if (entities.GetComponent<ControllableEntity>(
                     entity).Owner !=
-                scenario.West.Player)
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player)
             {
                 continue;
             }
@@ -1110,7 +1113,7 @@ public sealed class SkirmishProductionPolicyTests
 
         int cargoTarget =
             Math.Max(
-                validation.WestOpponent.MinimumCargoTrucks,
+                validation.OpponentConfigurations[1].MinimumCargoTrucks,
                 Math.Clamp(
                     depotCount,
                     2,
@@ -1120,12 +1123,12 @@ public sealed class SkirmishProductionPolicyTests
             scenario.UnitFactory.Create(
                 units[UnitIds.CargoTruck],
                 stagingPosition,
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
             cargoCount++;
         }
 
         int matureSupplyTarget =
-            validation.WestOpponent.ResolveMatureSupplyTruckTarget(
+            validation.OpponentConfigurations[1].ResolveMatureSupplyTruckTarget(
                 depotCount);
         while (supplyTrucks.Count <
                matureSupplyTarget)
@@ -1134,7 +1137,7 @@ public sealed class SkirmishProductionPolicyTests
                 scenario.UnitFactory.Create(
                     units[UnitIds.SupplyTruck],
                     stagingPosition,
-                    scenario.West.Player));
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player));
         }
 
         while (scoutCount < 1)
@@ -1142,17 +1145,17 @@ public sealed class SkirmishProductionPolicyTests
             scenario.UnitFactory.Create(
                 units[UnitIds.ScoutVehicle],
                 stagingPosition,
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
             scoutCount++;
         }
 
         while (tankCount <
-               validation.WestOpponent.MinimumObjectivePressureUnits)
+               validation.OpponentConfigurations[1].MinimumObjectivePressureUnits)
         {
             scenario.UnitFactory.Create(
                 units[UnitIds.MainBattleTank],
                 stagingPosition,
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
             tankCount++;
         }
 
@@ -1161,7 +1164,7 @@ public sealed class SkirmishProductionPolicyTests
             scenario.UnitFactory.Create(
                 units[UnitIds.MobileArtillery],
                 stagingPosition,
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
             artilleryCount++;
         }
 
@@ -1174,17 +1177,17 @@ public sealed class SkirmishProductionPolicyTests
         entities.AddComponent(
             factory,
             entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore));
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore));
         entities.AddComponent(
             factory,
             new CompletedBuilding(
                 BuildingIds.VehicleFactory,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 SimulationTick.Zero));
         entities.AddComponent(
             factory,
             new ControllableEntity(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 ControllableEntityCategory.Building));
         entities.AddComponent(
             factory,
@@ -1192,7 +1195,7 @@ public sealed class SkirmishProductionPolicyTests
                 input,
                 UnitProductionCapability.Vehicle |
                 UnitProductionCapability.Logistics,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 Vector3.Zero,
                 SimulationTick.Zero));
         var isolatedNetwork =
@@ -1214,7 +1217,7 @@ public sealed class SkirmishProductionPolicyTests
 
         var optionalArtillery =
             new QueueUnitProductionCommand(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 factory,
                 UnitIds.MobileArtillery,
                 SimulationTick.Zero);
@@ -1286,19 +1289,22 @@ public sealed class SkirmishProductionPolicyTests
     [Fact]
     public void MissingCargoTruckPreemptsBlockedCombatProduction()
     {
-        VerticalSliceScenarioSettings validation =
-            VerticalSliceScenarioSettings.Create(
-                VerticalSliceScenarioProfile.Validation);
-        VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
+        MatchScenarioSettings validation =
+            CentralDivideScenario.CreateSettings(
+                MatchScenarioProfile.Validation);
+        MatchRuntime scenario =
+            CentralDivideScenario.Create(
                 validation with
                 {
-                    WestOpponent =
-                        validation.WestOpponent with
+                    OpponentConfigurations = new Dictionary<ulong, SkirmishOpponentConfiguration>(validation.OpponentConfigurations)
+                    {
+                        [1] =
+                        validation.OpponentConfigurations[1] with
                         {
                             MinimumCargoTrucks = 2,
                             MinimumSupplyTrucks = 1
                         }
+                    }
                 });
         var entities =
             scenario.Simulation.Entities;
@@ -1318,7 +1324,7 @@ public sealed class SkirmishProductionPolicyTests
                      QueryIterationOrder.StableByEntityIndex))
         {
             if (entities.GetComponent<ControllableEntity>(entity).Owner !=
-                scenario.West.Player)
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player)
             {
                 continue;
             }
@@ -1339,14 +1345,14 @@ public sealed class SkirmishProductionPolicyTests
 
         Vector3 stagingPosition =
             entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore).Position;
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore).Position;
         while (westCargo.Count < 2)
         {
             westCargo.Add(
                 scenario.UnitFactory.Create(
                     cargoDefinition,
                     stagingPosition,
-                    scenario.West.Player));
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player));
         }
 
         if (!hasSupplyTruck)
@@ -1354,7 +1360,7 @@ public sealed class SkirmishProductionPolicyTests
             scenario.UnitFactory.Create(
                 supplyDefinition,
                 stagingPosition,
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         }
 
         bool hasScout = false;
@@ -1364,7 +1370,7 @@ public sealed class SkirmishProductionPolicyTests
         {
             if (entities.GetComponent<ControllableEntity>(
                     entity).Owner ==
-                    scenario.West.Player &&
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player &&
                 entities.GetComponent<UnitIdentity>(
                     entity).UnitId ==
                     UnitIds.ScoutVehicle)
@@ -1379,7 +1385,7 @@ public sealed class SkirmishProductionPolicyTests
             scenario.UnitFactory.Create(
                 units[UnitIds.ScoutVehicle],
                 stagingPosition,
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         }
 
         InventoryId input =
@@ -1390,12 +1396,12 @@ public sealed class SkirmishProductionPolicyTests
         entities.AddComponent(
             factory,
             entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore));
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore));
         entities.AddComponent(
             factory,
             new CompletedBuilding(
                 BuildingIds.VehicleFactory,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 SimulationTick.Zero));
         entities.AddComponent(
             factory,
@@ -1403,7 +1409,7 @@ public sealed class SkirmishProductionPolicyTests
                 input,
                 UnitProductionCapability.Vehicle |
                 UnitProductionCapability.Logistics,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 Vector3.Zero,
                 SimulationTick.Zero));
         var isolatedNetwork =
@@ -1425,13 +1431,13 @@ public sealed class SkirmishProductionPolicyTests
 
         var firstTank =
             new QueueUnitProductionCommand(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 factory,
                 UnitIds.MainBattleTank,
                 SimulationTick.Zero);
         var secondTank =
             new QueueUnitProductionCommand(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 factory,
                 UnitIds.MainBattleTank,
                 SimulationTick.Zero);

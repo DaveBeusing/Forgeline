@@ -158,7 +158,7 @@ public sealed class GameplayTelemetryCollector
     public const int CurrentSchemaVersion = 1;
 
     private const string MatchOwner = "match";
-    private readonly VerticalSliceScenario _scenario;
+    private readonly MatchRuntime _scenario;
     private readonly Dictionary<EntityId, DepositObservation> _deposits =
         new();
     private readonly Dictionary<EntityId, UnitObservation> _units =
@@ -207,8 +207,7 @@ public sealed class GameplayTelemetryCollector
         new();
     private readonly Dictionary<EntityId, UnitObservation> _unitScratch =
         new();
-    private readonly string _westOwner;
-    private readonly string _eastOwner;
+    private readonly Dictionary<PlayerId, string> _playerOwners = new();
 
     private ulong _observedTicks;
     private ulong _supplyShortageTicks;
@@ -216,15 +215,13 @@ public sealed class GameplayTelemetryCollector
     private double _totalCargoTravelTicks;
     private ulong _maximumCargoTravelTicks;
 
-    public GameplayTelemetryCollector(VerticalSliceScenario scenario)
+    public GameplayTelemetryCollector(MatchRuntime scenario)
     {
         _scenario =
             scenario ??
             throw new ArgumentNullException(nameof(scenario));
-        _westOwner =
-            $"player:{_scenario.West.Player.Value}";
-        _eastOwner =
-            $"player:{_scenario.East.Player.Value}";
+        foreach (var participant in _scenario.MatchConfiguration.Participants)
+            _playerOwners.Add(participant.Player, $"player:{participant.Player.Value}");
 
         CaptureInitialDeposits();
         CaptureInitialUnits();
@@ -969,10 +966,8 @@ public sealed class GameplayTelemetryCollector
 
     private void ObserveObjectives()
     {
-        ObserveObjective(
-            _scenario.West.Player);
-        ObserveObjective(
-            _scenario.East.Player);
+        foreach (var participant in _scenario.MatchConfiguration.Participants)
+            ObserveObjective(participant.Player);
     }
 
     private void ObserveObjective(PlayerId player)
@@ -1439,21 +1434,10 @@ public sealed class GameplayTelemetryCollector
         UnitProductionMetrics units =
             _scenario.UnitProduction.Metrics;
 
-        GameplayFrontDebugSummary[] fronts =
-        [
-            CaptureFront(
-                _scenario.West.Player),
-            CaptureFront(
-                _scenario.East.Player)
-        ];
-
-        GameplayObjectiveDebugSummary[] objectives =
-        [
-            CaptureObjective(
-                _scenario.West.Player),
-            CaptureObjective(
-                _scenario.East.Player)
-        ];
+        GameplayFrontDebugSummary[] fronts = _scenario.MatchConfiguration.Participants
+            .Select(participant => CaptureFront(participant.Player)).ToArray();
+        GameplayObjectiveDebugSummary[] objectives = _scenario.MatchConfiguration.Participants
+            .Select(participant => CaptureObjective(participant.Player)).ToArray();
 
         return new GameplayTelemetryDebugSummary(
             new GameplaySupplyDebugSummary(
@@ -1559,60 +1543,19 @@ public sealed class GameplayTelemetryCollector
             : unit.ToString();
     }
 
-    private string OwnerForNetwork(PowerNetworkId network)
-    {
-        if (network.Value ==
-            _scenario.West.Player.Value)
-        {
-            return _westOwner;
-        }
+    private string OwnerForNetwork(PowerNetworkId network) =>
+        _playerOwners.TryGetValue(new PlayerId(network.Value), out string? owner)
+            ? owner : $"network:{network.Value}";
 
-        if (network.Value ==
-            _scenario.East.Player.Value)
-        {
-            return _eastOwner;
-        }
-
-        return $"network:{network.Value}";
-    }
-
-    private string OwnerForPlayer(PlayerId player)
-    {
-        if (player ==
-            _scenario.West.Player)
-        {
-            return _westOwner;
-        }
-
-        if (player ==
-            _scenario.East.Player)
-        {
-            return _eastOwner;
-        }
-
-        return $"player:{player.Value}";
-    }
+    private string OwnerForPlayer(PlayerId player) =>
+        _playerOwners.TryGetValue(player, out string? owner) ? owner : $"player:{player.Value}";
 
     private string OwnerForFaction(FactionId faction)
     {
-        if (!faction.IsSpecified)
-        {
-            return MatchOwner;
-        }
-
-        if (faction.Value ==
-            _scenario.West.Player.Value)
-        {
-            return _westOwner;
-        }
-
-        if (faction.Value ==
-            _scenario.East.Player.Value)
-        {
-            return _eastOwner;
-        }
-
-        return $"player:{faction.Value}";
+        if (!faction.IsSpecified) return MatchOwner;
+        foreach (var participant in _scenario.MatchConfiguration.Participants)
+            if (participant.Faction == faction) return OwnerForPlayer(participant.Player);
+        return $"faction:{faction.Value}";
     }
 
     private double LogicalSeconds() =>

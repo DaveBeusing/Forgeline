@@ -3,13 +3,13 @@ using Xunit;
 
 namespace ForgeLine.Presentation.Tests;
 
-public sealed class PrototypeBattlefieldDebugVisualizationTests
+public sealed class BattlefieldDebugVisualizationTests
 {
     [Fact]
     public void PrototypeOverlayDrawsStrategicMapLayers()
     {
-        PrototypeBattlefieldDefinition definition =
-            PrototypeBattlefieldDefinition.Create();
+        BattlefieldDefinition definition =
+            CentralDivideBattlefield.Create();
         var states =
             new Dictionary<
                 string,
@@ -26,7 +26,7 @@ public sealed class PrototypeBattlefieldDebugVisualizationTests
                 Enabled = true
             };
 
-        PrototypeBattlefieldDebugVisualization.Draw(
+        BattlefieldDebugVisualization.Draw(
             debugDraw,
             definition,
             states);

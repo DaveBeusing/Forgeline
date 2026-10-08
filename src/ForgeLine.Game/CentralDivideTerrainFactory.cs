@@ -2,10 +2,10 @@ using ForgeLine.World;
 
 namespace ForgeLine.Game;
 
-public static class PrototypeBattlefieldTerrainFactory
+public static class CentralDivideTerrainFactory
 {
     public static TerrainWorld Create(
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         WorldGridSettings? settings = null)
     {
         ArgumentNullException.ThrowIfNull(definition);

@@ -33,7 +33,7 @@ public static class BattlefieldOperationalGeographyValidator
     ];
 
     public static BattlefieldOperationalGeographyReport Validate(
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         TerrainWorld terrain,
         NavigationGridSettings? gridSettings = null,
         NavigationSectorSettings? sectorSettings = null)
@@ -41,7 +41,7 @@ public static class BattlefieldOperationalGeographyValidator
         ArgumentNullException.ThrowIfNull(definition);
         ArgumentNullException.ThrowIfNull(terrain);
 
-        PrototypeBattlefieldValidator.ValidateDefinition(
+        BattlefieldValidator.ValidateDefinition(
             definition);
 
         NavigationGridSettings resolvedGrid =
@@ -390,7 +390,7 @@ public static class BattlefieldOperationalGeographyValidator
     }
 
     private static void ValidateExpansionPressure(
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         List<string> errors)
     {
         for (int resourceIndex = 0;
@@ -459,7 +459,7 @@ public static class BattlefieldOperationalGeographyValidator
     }
 
     private static void ValidateBuildableAreas(
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         List<string> errors)
     {
         var query =
@@ -549,7 +549,7 @@ public static class BattlefieldOperationalGeographyValidator
                 position.Z + 1.0f));
 
     private static bool HasRoadRoute(
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         string startKey,
         string destinationKey,
         string excludedEdgeKey)
@@ -638,7 +638,7 @@ public static class BattlefieldOperationalGeographyValidator
     }
 
     private static (float Minimum, float Maximum) SampleElevationRange(
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         TerrainWorld terrain)
     {
         const int samplesPerAxis = 17;

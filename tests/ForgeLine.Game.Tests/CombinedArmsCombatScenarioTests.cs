@@ -13,30 +13,30 @@ public sealed class CombinedArmsCombatScenarioTests
     [Fact]
     public void ScoutIdentificationEnablesArtilleryStrikeBeyondArtilleryVision()
     {
-        VerticalSliceRuntimeSettings runtime =
-            VerticalSliceRuntimeSettings.CreateHeadless(
-                VerticalSliceScenarioProfile.Gameplay,
+        MatchRuntimeSettings runtime =
+            CentralDivideScenario.CreateHeadless(
+                MatchScenarioProfile.Gameplay,
                 seed: 5701) with
             {
                 Participants =
-                    VerticalSliceRuntimeSettings.CreateDefaultParticipants(
+                    CentralDivideScenario.CreateDefaultParticipants(
                         westComputerControlled: false,
                         eastComputerControlled: false)
             };
 
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
                 runtime,
                 TestContext.Current.CancellationToken);
 
         WorldTransform westCore =
             scenario.Simulation.Entities
                 .GetComponent<WorldTransform>(
-                    scenario.West.CommandCore);
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
         WorldTransform eastCore =
             scenario.Simulation.Entities
                 .GetComponent<WorldTransform>(
-                    scenario.East.CommandCore);
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore);
 
         Vector3 direction =
             eastCore.Position -
@@ -61,20 +61,20 @@ public sealed class CombinedArmsCombatScenarioTests
                 scenario.Services.UnitDefinitions[
                     UnitIds.MobileArtillery],
                 artilleryPosition,
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         EntityId enemy =
             scenario.UnitFactory.Create(
                 scenario.Services.UnitDefinitions[
                     UnitIds.RifleSquad],
                 enemyPosition,
-                scenario.East.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).Player);
 
         scenario.Simulation.RunTicks(
             6,
             TestContext.Current.CancellationToken);
 
         FactionId westFaction =
-            new((uint)scenario.West.Player.Value);
+            new((uint)scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player.Value);
         IntelligenceContactKey contactKey =
             IntelligenceContactKey.FromEntity(
                 enemy);
@@ -92,7 +92,7 @@ public sealed class CombinedArmsCombatScenarioTests
                 scenario.Services.UnitDefinitions[
                     UnitIds.ScoutVehicle],
                 scoutPosition,
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
 
         scenario.Simulation.RunTicks(
             6,
@@ -112,7 +112,7 @@ public sealed class CombinedArmsCombatScenarioTests
 
         PlayerTacticalActionCommand mission =
             PlayerTacticalActionCommand.FireMissionContact(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [artillery],
                 contactKey,
                 requestedRounds: 1,

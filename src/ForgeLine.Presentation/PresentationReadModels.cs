@@ -318,7 +318,7 @@ public sealed class PresentationDebugSnapshot
 public sealed class PresentationExtractionContext
 {
     public PresentationExtractionContext(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         PlayerId player,
         PresentationInteractionState interaction,
         PlayerCommandGateway commands)
@@ -348,17 +348,12 @@ public sealed class PresentationExtractionContext
                 nameof(commands));
         }
 
-        Side =
-            player == scenario.West.Player
-                ? scenario.West
-                : player == scenario.East.Player
-                    ? scenario.East
-                    : throw new ArgumentOutOfRangeException(
-                        nameof(player),
-                        "Player is not part of the vertical-slice match.");
+        Side = scenario.Initialization.Bases.TryGetValue(player, out SkirmishStartingBase startingBase)
+            ? startingBase
+            : throw new ArgumentOutOfRangeException(nameof(player), "Player is not part of the match.");
     }
 
-    public VerticalSliceScenario Scenario { get; }
+    public MatchRuntime Scenario { get; }
 
     public PlayerId Player { get; }
 

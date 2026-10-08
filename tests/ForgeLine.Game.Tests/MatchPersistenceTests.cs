@@ -12,7 +12,7 @@ public sealed class MatchPersistenceTests
     [Fact]
     public void ActiveMatchSaveRoundTripsAndContinuesDeterministically()
     {
-        using VerticalSliceScenario original =
+        using MatchRuntime original =
             CreateScenario(
                 seed: 2026);
 
@@ -40,7 +40,7 @@ public sealed class MatchPersistenceTests
             MatchPersistenceSerializer.DeserializeSave(
                 document);
 
-        using VerticalSliceScenario restored =
+        using MatchRuntime restored =
             MatchPersistenceService.Restore(
                 restoredData);
 
@@ -54,11 +54,11 @@ public sealed class MatchPersistenceTests
             original.GetMatchState(),
             restored.GetMatchState());
 
-        VerticalSliceAuthoritativeSnapshot expected =
-            VerticalSliceAuthoritativeSnapshot.Capture(
+        MatchAuthoritativeSnapshot expected =
+            MatchAuthoritativeSnapshot.Capture(
                 original);
-        VerticalSliceAuthoritativeSnapshot actual =
-            VerticalSliceAuthoritativeSnapshot.Capture(
+        MatchAuthoritativeSnapshot actual =
+            MatchAuthoritativeSnapshot.Capture(
                 restored);
 
         Assert.True(
@@ -74,10 +74,10 @@ public sealed class MatchPersistenceTests
             TestContext.Current.CancellationToken);
 
         Assert.Equal(
-            VerticalSliceAuthoritativeSnapshot
+            MatchAuthoritativeSnapshot
                 .Capture(original)
                 .ComputeSha256(),
-            VerticalSliceAuthoritativeSnapshot
+            MatchAuthoritativeSnapshot
                 .Capture(restored)
                 .ComputeSha256());
     }
@@ -85,18 +85,18 @@ public sealed class MatchPersistenceTests
     [Fact]
     public void PendingPlayerCommandSurvivesSaveAndRecovery()
     {
-        using VerticalSliceScenario original =
+        using MatchRuntime original =
             CreateScenario(
                 seed: 77,
                 westComputerControlled: false);
 
         EntityId unit =
             Assert.Single(
-                original.West.StartingUnits.Take(1));
+                original.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits.Take(1));
 
         var command =
             new MoveEntitiesCommand(
-                original.West.Player,
+                original.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [unit],
                 new Vector3(
                     900.0f,
@@ -110,7 +110,7 @@ public sealed class MatchPersistenceTests
                 command,
                 new SimulationTick(200),
                 new SimulationCommandSource(
-                    original.West.Player.Value));
+                    original.GetBase(new ForgeLine.Game.PlayerId(1)).Player.Value));
 
         Assert.Equal(
             1UL,
@@ -130,7 +130,7 @@ public sealed class MatchPersistenceTests
             1,
             original.Simulation.PendingCommandCount);
 
-        using VerticalSliceScenario restored =
+        using MatchRuntime restored =
             MatchPersistenceService.Restore(
                 save);
 
@@ -146,10 +146,10 @@ public sealed class MatchPersistenceTests
             TestContext.Current.CancellationToken);
 
         Assert.Equal(
-            VerticalSliceAuthoritativeSnapshot
+            MatchAuthoritativeSnapshot
                 .Capture(original)
                 .ComputeSha256(),
-            VerticalSliceAuthoritativeSnapshot
+            MatchAuthoritativeSnapshot
                 .Capture(restored)
                 .ComputeSha256());
     }
@@ -157,17 +157,17 @@ public sealed class MatchPersistenceTests
     [Fact]
     public void ReplayReconstructsRecordedPlayerCommandAndFinalState()
     {
-        using VerticalSliceScenario original =
+        using MatchRuntime original =
             CreateScenario(
                 seed: 91,
                 westComputerControlled: false);
 
         EntityId unit =
-            original.West.StartingUnits[0];
+            original.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
 
         original.Simulation.SubmitCommand(
             new MoveEntitiesCommand(
-                original.West.Player,
+                original.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [unit],
                 new Vector3(
                     850.0f,
@@ -177,7 +177,7 @@ public sealed class MatchPersistenceTests
                 FormationTemplate.Wedge),
             new SimulationTick(1),
             new SimulationCommandSource(
-                original.West.Player.Value));
+                original.GetBase(new ForgeLine.Game.PlayerId(1)).Player.Value));
 
         original.Simulation.RunTicks(
             600,
@@ -196,7 +196,7 @@ public sealed class MatchPersistenceTests
         Assert.Single(
             restoredReplay.Commands);
 
-        using VerticalSliceScenario playback =
+        using MatchRuntime playback =
             MatchPersistenceService.PlayReplay(
                 restoredReplay);
 
@@ -211,7 +211,7 @@ public sealed class MatchPersistenceTests
             playback.GetMatchState());
         Assert.Equal(
             replay.FinalStateSha256,
-            VerticalSliceAuthoritativeSnapshot
+            MatchAuthoritativeSnapshot
                 .Capture(playback)
                 .ComputeSha256());
     }
@@ -219,7 +219,7 @@ public sealed class MatchPersistenceTests
     [Fact]
     public void CorruptDocumentFailsBeforeRecovery()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateScenario(
                 seed: 123);
 
@@ -252,7 +252,7 @@ public sealed class MatchPersistenceTests
     [Fact]
     public void FormatVersionMismatchFailsSafely()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateScenario(
                 seed: 124);
 
@@ -285,7 +285,7 @@ public sealed class MatchPersistenceTests
     [Fact]
     public void TamperedAuthoritativeCheckpointIsRejected()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateScenario(
                 seed: 125);
 
@@ -319,7 +319,7 @@ public sealed class MatchPersistenceTests
     [Fact]
     public void ReplayDivergenceIsRejected()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateScenario(
                 seed: 126);
 
@@ -352,7 +352,7 @@ public sealed class MatchPersistenceTests
     [Fact]
     public void ControlCommandsReplayAtTheirOriginalTickBoundary()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateScenario(
                 seed: 127,
                 westComputerControlled: false);
@@ -380,7 +380,7 @@ public sealed class MatchPersistenceTests
                 static command =>
                     command.IsControl));
 
-        using VerticalSliceScenario playback =
+        using MatchRuntime playback =
             MatchPersistenceService.PlayReplay(
                 replay);
 
@@ -389,7 +389,7 @@ public sealed class MatchPersistenceTests
             playback.GetMatchState());
         Assert.Equal(
             replay.FinalStateSha256,
-            VerticalSliceAuthoritativeSnapshot
+            MatchAuthoritativeSnapshot
                 .Capture(playback)
                 .ComputeSha256());
     }
@@ -397,7 +397,7 @@ public sealed class MatchPersistenceTests
     [Fact]
     public void UnsupportedQueuedCommandPreventsUnsafeSave()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateScenario(
                 seed: 128);
 
@@ -420,7 +420,7 @@ public sealed class MatchPersistenceTests
     [Fact]
     public void RepeatedSaveLoadKeepsResourceStateStable()
     {
-        VerticalSliceScenario current =
+        MatchRuntime current =
             CreateScenario(
                 seed: 2027);
 
@@ -439,7 +439,7 @@ public sealed class MatchPersistenceTests
                 MatchSaveData save =
                     MatchPersistenceService.CaptureSave(
                         current);
-                VerticalSliceScenario restored =
+                MatchRuntime restored =
                     MatchPersistenceService.Restore(
                         save);
 
@@ -497,23 +497,23 @@ public sealed class MatchPersistenceTests
         }
     }
 
-    private static VerticalSliceScenario CreateScenario(
+    private static MatchRuntime CreateScenario(
         ulong seed,
         bool westComputerControlled = true)
     {
-        VerticalSliceRuntimeSettings runtime =
-            VerticalSliceRuntimeSettings.CreateHeadless(
-                VerticalSliceScenarioProfile.Validation,
+        MatchRuntimeSettings runtime =
+            CentralDivideScenario.CreateHeadless(
+                MatchScenarioProfile.Validation,
                 seed) with
             {
                 Participants =
-                    VerticalSliceRuntimeSettings
+                    CentralDivideScenario
                         .CreateDefaultParticipants(
                             westComputerControlled,
                             eastComputerControlled: true)
             };
 
-        return VerticalSliceScenario.Create(
+        return CentralDivideScenario.Create(
             runtime,
             TestContext.Current.CancellationToken);
     }

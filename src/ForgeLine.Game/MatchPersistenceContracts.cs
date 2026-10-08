@@ -34,38 +34,42 @@ public sealed class MatchPersistenceException : Exception
     public MatchPersistenceFailureReason Reason { get; }
 }
 
-public sealed record PersistedVerticalSliceConfiguration(
-    VerticalSliceScenarioSettings Scenario,
+public sealed record PersistedMatchConfiguration(
+    MatchScenarioSettings Scenario,
     ulong Seed,
     IReadOnlyList<MatchParticipantConfiguration> Participants,
     bool EnableDiagnostics,
     bool EnableDebugCapture,
     bool EnableSpatialQueryTiming,
-    int InitialEntityCapacity)
+    int InitialEntityCapacity,
+    string CompositionKey)
 {
-    public static PersistedVerticalSliceConfiguration Capture(
-        VerticalSliceRuntimeSettings settings)
+    public static PersistedMatchConfiguration Capture(
+        MatchRuntimeSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
 
-        return new PersistedVerticalSliceConfiguration(
+        return new PersistedMatchConfiguration(
             settings.Scenario,
             settings.Seed,
             settings.Participants.ToArray(),
             settings.EnableDiagnostics,
             settings.EnableDebugCapture,
             settings.EnableSpatialQueryTiming,
-            settings.InitialEntityCapacity);
+            settings.InitialEntityCapacity,
+            settings.Composition.Key);
     }
 
-    public VerticalSliceRuntimeSettings CreateHeadlessRuntimeSettings()
+    public MatchRuntimeSettings CreateHeadlessRuntimeSettings(
+        Func<string, MatchComposition>? resolveComposition = null)
     {
         ArgumentNullException.ThrowIfNull(Scenario);
         ArgumentNullException.ThrowIfNull(Participants);
 
         var settings =
-            new VerticalSliceRuntimeSettings
+            new MatchRuntimeSettings
             {
+                Composition = (resolveComposition ?? ResolveBuiltin)(CompositionKey),
                 Scenario = Scenario,
                 Seed = Seed,
                 Participants =
@@ -79,26 +83,32 @@ public sealed record PersistedVerticalSliceConfiguration(
                 InitialEntityCapacity =
                     InitialEntityCapacity,
                 SchedulerOwnership =
-                    VerticalSliceSchedulerOwnership.None
+                    MatchSchedulerOwnership.None
             };
 
+        if (!string.Equals(settings.Composition.Key, CompositionKey, StringComparison.Ordinal))
+            throw new InvalidOperationException("Resolved composition does not match saved identity.");
         settings.Validate();
         return settings;
     }
+    private static MatchComposition ResolveBuiltin(string key) =>
+        key == CentralDivideScenario.CompositionKey
+            ? CentralDivideScenario.CreateComposition()
+            : throw new InvalidOperationException($"Unknown match composition: {key}. Supply its content resolver.");
 }
 
 public sealed record MatchSaveData(
     int SchemaVersion,
-    PersistedVerticalSliceConfiguration Configuration,
+    PersistedMatchConfiguration Configuration,
     ulong SavedTick,
     ulong RandomState,
     IReadOnlyList<RecordedSimulationCommand> Commands,
-    VerticalSliceAuthoritativeSnapshot State,
+    MatchAuthoritativeSnapshot State,
     string StateSha256);
 
 public sealed record MatchReplayData(
     int SchemaVersion,
-    PersistedVerticalSliceConfiguration Configuration,
+    PersistedMatchConfiguration Configuration,
     ulong FinalTick,
     ulong FinalRandomState,
     IReadOnlyList<RecordedSimulationCommand> Commands,

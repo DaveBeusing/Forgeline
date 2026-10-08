@@ -484,7 +484,7 @@ public static class ReplayCommandCodec
 
     public static ISimulationCommand Decode(
         RecordedSimulationCommand command,
-        VerticalSliceScenario scenario)
+        MatchRuntime scenario)
     {
         ArgumentNullException.ThrowIfNull(command);
         ArgumentNullException.ThrowIfNull(scenario);
@@ -640,7 +640,7 @@ public static class ReplayCommandCodec
     private static PlayerTechnologyActionCommand DecodeTechnology(
         RecordedSimulationCommand command,
         SimulationTick submittedAtTick,
-        VerticalSliceScenario scenario) =>
+        MatchRuntime scenario) =>
         command.TechnologyOperation switch
         {
             PlayerTechnologyOperation.Start =>
@@ -718,7 +718,7 @@ public static class ReplayCommandCodec
     private static PlayerTacticalActionCommand DecodeTactical(
         RecordedSimulationCommand command,
         SimulationTick submittedAtTick,
-        VerticalSliceScenario scenario) =>
+        MatchRuntime scenario) =>
         command.TacticalOperation switch
         {
             PlayerTacticalActionOperation.Attack =>

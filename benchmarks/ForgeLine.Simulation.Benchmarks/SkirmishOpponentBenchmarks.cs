@@ -6,7 +6,7 @@ namespace ForgeLine.Simulation.Benchmarks;
 [MemoryDiagnoser]
 public class SkirmishOpponentBenchmarks
 {
-    private VerticalSliceScenario? _scenario;
+    private MatchRuntime? _scenario;
     private uint _reactionCadenceTicks;
 
     [Params(false, true)]
@@ -21,13 +21,13 @@ public class SkirmishOpponentBenchmarks
     [IterationSetup]
     public void Setup()
     {
-        VerticalSliceScenarioSettings settings =
-            VerticalSliceScenarioSettings.Create(
-                VerticalSliceScenarioProfile.Validation);
+        MatchScenarioSettings settings =
+            CentralDivideScenario.CreateSettings(
+                MatchScenarioProfile.Validation);
         _reactionCadenceTicks =
-            settings.WestOpponent.ReactionCadenceTicks;
-        VerticalSliceRuntimeSettings runtime =
-            VerticalSliceRuntimeSettings.CreateHeadless(
+            settings.OpponentConfigurations[1].ReactionCadenceTicks;
+        MatchRuntimeSettings runtime =
+            CentralDivideScenario.CreateHeadless(
                 settings.Profile,
                 seed: 7331,
                 enableDiagnostics: DiagnosticsEnabled,
@@ -35,13 +35,13 @@ public class SkirmishOpponentBenchmarks
             {
                 Scenario = settings,
                 Participants =
-                    VerticalSliceRuntimeSettings.CreateDefaultParticipants(
+                    CentralDivideScenario.CreateDefaultParticipants(
                         westComputerControlled: true,
                         eastComputerControlled: TwoControllers)
             };
 
         _scenario =
-            VerticalSliceScenario.Create(runtime);
+            CentralDivideScenario.Create(runtime);
         _scenario.Simulation.RunTicks(
             checked((ulong)ScenarioAgeTicks));
     }
@@ -49,7 +49,7 @@ public class SkirmishOpponentBenchmarks
     [Benchmark]
     public SkirmishOpponentWorkMetrics EightNonDecisionTicks()
     {
-        VerticalSliceScenario scenario =
+        MatchRuntime scenario =
             _scenario ??
             throw new InvalidOperationException(
                 "Benchmark scenario is not initialized.");
@@ -61,7 +61,7 @@ public class SkirmishOpponentBenchmarks
     [Benchmark]
     public SkirmishOpponentWorkMetrics DecisionCadenceWindow()
     {
-        VerticalSliceScenario scenario =
+        MatchRuntime scenario =
             _scenario ??
             throw new InvalidOperationException(
                 "Benchmark scenario is not initialized.");

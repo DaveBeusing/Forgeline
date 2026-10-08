@@ -11,7 +11,7 @@ public readonly record struct PrototypeRoadAccessMetrics(
     long AddedConnections,
     long RemovedConnections);
 
-public sealed class PrototypeRoadAccessSystem : ISimulationSystem
+public sealed class RoadAccessSystem : ISimulationSystem
 {
     private readonly LogisticsNetwork _network;
     private readonly IReadOnlyDictionary<string, LogisticsNodeId> _roadNodes;
@@ -21,7 +21,7 @@ public sealed class PrototypeRoadAccessSystem : ISimulationSystem
     private long _addedConnections;
     private long _removedConnections;
 
-    public PrototypeRoadAccessSystem(
+    public RoadAccessSystem(
         LogisticsNetwork network,
         IReadOnlyDictionary<string, LogisticsNodeId> roadNodes,
         double maximumAccessDistanceMeters = 700.0)
