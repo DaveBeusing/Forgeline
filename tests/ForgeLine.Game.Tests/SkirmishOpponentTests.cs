@@ -740,13 +740,19 @@ public sealed class SkirmishOpponentTests
     }
 
     [Fact]
-    public void EastOffensiveObjectiveAdvancesIntoOpponentHalf()
+    public void EastOffensiveObjectiveAdvancesIntoOpponentHalfAgainstStationaryBase()
     {
         SkirmishScenarioHarness scenario =
             SkirmishScenarioHarness.Create(
                 seed: 2026);
         scenario.Opponents.DebugCaptureEnabled =
             true;
+
+        // Isolate the eastern opponent's planning from the west controller winning the
+        // competing match before the east force can make an offensive decision.
+        // The west base, units, intelligence and combat remain authoritative.
+        scenario.Simulation.Entities.RemoveComponent<SkirmishOpponentController>(
+            scenario.West.Controller);
 
         bool reachedAttack =
             scenario.RunUntil(
@@ -764,7 +770,7 @@ public sealed class SkirmishOpponentTests
 
         Assert.True(
             reachedAttack,
-            DescribeScenario(scenario));
+            DescribePlayer(scenario, scenario.East, scenario.GetOpponentState(scenario.East.Player)));
 
         SkirmishOpponentDebugReadModel decision =
             Assert.Single(

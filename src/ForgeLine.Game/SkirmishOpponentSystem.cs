@@ -1567,6 +1567,25 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
+        Vector3 scoutPosition = context.Entities.GetComponent<WorldTransform>(scout).Position;
+        Vector3 escortPosition = context.Entities.GetComponent<WorldTransform>(escort).Position;
+        if (HorizontalDistanceSquared(scoutPosition, escortPosition) > 32.0f * 32.0f)
+        {
+            if (!HaveCombatOrder(context, [scout], CombatOrderKind.AttackMove, scoutPosition))
+            {
+                new AttackMoveCommand(controller.Player, [scout], scoutPosition, context.Tick,
+                    FormationTemplate.Column, pursuitLeashMeters: 90.0f).Execute(context);
+            }
+
+            if (!TacticalCommandUtilities.TryGetMovementIntent(context, escort, out MovementOrder escortIntent) ||
+                HorizontalDistanceSquared(escortIntent.WorldTarget, scoutPosition) > 16.0f)
+            {
+                new MoveEntitiesCommand(controller.Player, [escort], scoutPosition, context.Tick).Execute(context);
+            }
+
+            return true;
+        }
+
         var command =
             new AttackMoveCommand(
                 controller.Player,
@@ -2754,6 +2773,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 owned.UnitByEntity.TryGetValue(
                     unit,
                     out UnitId unitId);
+            bool reconnaissanceRecovering = hasIdentity && unitId == UnitIds.ScoutVehicle &&
+                context.Entities.TryGetComponent(unit, out CombatOrderState reconnaissanceOrder) &&
+                reconnaissanceOrder.Kind is CombatOrderKind.HoldPosition or CombatOrderKind.Retreat;
             AutomaticResupplyPolicy resupplyPolicy =
                 hasIdentity &&
                 unitId == UnitIds.SupplyTruck
@@ -2763,7 +2785,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         ? cargoResupplyPolicy
                         : hasIdentity &&
                           unitId == UnitIds.ScoutVehicle
-                            ? reconnaissanceResupplyPolicy
+                            ? reconnaissanceRecovering ? combatResupplyPolicy : reconnaissanceResupplyPolicy
                             : combatResupplyPolicy;
 
             var policyCommand =
@@ -4269,12 +4291,12 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             GetUnitCount(
                 owned,
                 UnitIds.ScoutVehicle);
-        int pendingScouts =
-            GetPendingUnitCount(
-                owned,
-                UnitIds.ScoutVehicle);
-
-        if (scoutCount + pendingScouts >= 1)
+        int pendingScouts = GetPendingUnitCount(owned, UnitIds.ScoutVehicle);
+        // Preserve initial mobilization; a lost scout in an established force
+        // still needs ownership of the production slot even when queued.
+        if (scoutCount >= 1 ||
+            (pendingScouts >= 1 &&
+             GetUnitCount(owned, UnitIds.MainBattleTank) < configuration.MinimumObjectivePressureUnits))
         {
             return false;
         }
@@ -5559,7 +5581,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 TacticalCommandUtilities.TryGetMovementIntent(
                     context,
                     entity,
-                    out _);
+                    out _) ||
+                context.Entities.HasComponent<MovementGroupMember>(entity);
             bool hasResupplyOrder =
                 context.Entities.HasComponent<ResupplyOrder>(
                     entity);
@@ -5585,7 +5608,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
             if (hasCombatOrder &&
                 order.Kind == CombatOrderKind.AttackMove &&
-                hasMovementIntent)
+                hasMovementIntent &&
+                (!context.Entities.TryGetComponent(entity, out TacticalCombatState tacticalState) ||
+                 tacticalState.Status != CombatOrderStatus.Complete))
             {
                 continue;
             }

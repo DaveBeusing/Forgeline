@@ -876,8 +876,11 @@ public sealed class SkirmishProductionPolicyTests
         Assert.True(queuedRecoveryCargo);
     }
 
-    [Fact]
-    public void LostScoutPreemptsBlockedRoutineVehicleProduction()
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public void LostScoutPreemptsBlockedRoutineVehicleProduction(bool scoutAlreadyQueued, bool blockedArtillery)
     {
         MatchScenarioSettings validation =
             CentralDivideScenario.CreateSettings(
@@ -1043,7 +1046,7 @@ public sealed class SkirmishProductionPolicyTests
             new QueueUnitProductionCommand(
                 scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 factory,
-                UnitIds.MainBattleTank,
+                blockedArtillery ? UnitIds.MobileArtillery : UnitIds.MainBattleTank,
                 SimulationTick.Zero);
         var secondTank =
             new QueueUnitProductionCommand(
@@ -1067,7 +1070,7 @@ public sealed class SkirmishProductionPolicyTests
             entities.GetComponent<UnitProductionFacility>(
                 factory);
         Assert.Equal(
-            UnitIds.MainBattleTank,
+            blockedArtillery ? UnitIds.MobileArtillery : UnitIds.MainBattleTank,
             blocked.ActiveUnit);
         Assert.Equal(
             UnitProductionStatus.NoInput,
@@ -1080,6 +1083,14 @@ public sealed class SkirmishProductionPolicyTests
             Assert.True(
                 entities.DestroyEntity(
                     scouts[index]));
+        }
+
+        if (scoutAlreadyQueued)
+        {
+            scenario.Simulation.SubmitCommand(new QueueUnitProductionCommand(
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
+                factory, UnitIds.ScoutVehicle, scenario.Simulation.CurrentTick),
+                scenario.Simulation.CurrentTick.Next());
         }
 
         scenario.Simulation.RunTicks(
