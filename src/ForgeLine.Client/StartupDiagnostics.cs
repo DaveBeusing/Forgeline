@@ -10,7 +10,8 @@ internal enum StartupPhase
     Frontend, SessionReconstruction, GameplayRenderer,
     WindowVisible, FirstPresentedFrame, StudioSplashFirstFrame,
     MainMenuFirstFrame, MainMenuInteractive, RuntimeAssetsReady,
-    FrontendReady, SessionRuntimeReady, FirstGameplayFrame, ApplicationReady, Run, SessionReady
+    FrontendReady, SessionRuntimeReady, FirstGameplayFrame, ApplicationReady, Run, SessionReady,
+    SplashBootstrapFirstFrame, SaveCatalog, FrontendDependenciesReady, SplashArtwork
 }
 
 internal enum StartupEventKind { Started, Completed, Milestone, Skipped, Failed, Cancelled }
@@ -23,7 +24,7 @@ internal readonly record struct StartupEvent(
 // Collection is bounded and performs no serialization, logging or file I/O on owner threads.
 internal sealed class StartupDiagnostics
 {
-    private const int PhaseCount = (int)StartupPhase.SessionReady + 1;
+    private const int PhaseCount = (int)StartupPhase.SplashArtwork + 1;
     internal static StartupDiagnostics Disabled { get; } = new();
     private readonly object _gate = new();
     private readonly StartupEvent[]? _events;

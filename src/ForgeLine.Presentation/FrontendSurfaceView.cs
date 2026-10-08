@@ -44,13 +44,18 @@ public readonly record struct FrontendSurfaceView(
     bool SecondaryPressed = false,
     string ProductVersion = "",
     float SplashElapsedSeconds = 0f,
-    float SplashMasterOpacity = 1f)
+    float SplashMasterOpacity = 1f,
+    bool SplashBootstrap = false)
 {
     public static FrontendSurfaceView StudioSplash(float elapsedSeconds, float masterOpacity = 1f) =>
         new(FrontendSurfaceKind.StudioSplash, string.Empty, string.Empty,
             false, 0f, [], [], string.Empty,
             SplashElapsedSeconds: elapsedSeconds,
             SplashMasterOpacity: masterOpacity);
+
+    // Uses built-in glyph geometry, independent of runtime manifests and textures.
+    public static FrontendSurfaceView StudioSplashBootstrap(float elapsedSeconds = 0f, float masterOpacity = 1f) =>
+        StudioSplash(elapsedSeconds, masterOpacity) with { SplashBootstrap = true };
 
     public static FrontendSurfaceView Loading(
         string status,

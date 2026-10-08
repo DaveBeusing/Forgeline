@@ -1,4 +1,5 @@
 using ForgeLine.Graphics;
+using System.Runtime.InteropServices;
 using Xunit;
 
 namespace ForgeLine.Presentation.Tests;
@@ -11,6 +12,19 @@ public sealed class FrontendOverlayRendererTests : IDisposable
     {
         _graphics.Dispose();
         GC.SuppressFinalize(this);
+    }
+
+    [Fact]
+    public void BootstrapBrandIsVisibleAtTimeZeroWithoutTextures()
+    {
+        using var renderer = new FrontendOverlayRenderer(_graphics);
+        var context = new FakeGraphicsCommandContext();
+        renderer.Render(context, FrontendSurfaceView.StudioSplash(0));
+        int visibleBrandVertices = _graphics.LastBuffer!.VisibleBrandVertices;
+        renderer.Render(context, FrontendSurfaceView.StudioSplashBootstrap());
+        Assert.Equal(0, visibleBrandVertices);
+        Assert.True(_graphics.LastBuffer.VisibleBrandVertices > 0);
+        Assert.True(FrontendSurfaceView.StudioSplashBootstrap().SplashBootstrap);
     }
 
     [Fact]
@@ -107,6 +121,7 @@ public sealed class FrontendOverlayRendererTests : IDisposable
 
     private sealed class FakeGraphicsDevice : IGraphicsDevice
     {
+        internal FakeGraphicsBuffer? LastBuffer { get; private set; }
         public GraphicsDiagnostics Diagnostics =>
             throw new NotSupportedException();
 
@@ -116,7 +131,7 @@ public sealed class FrontendOverlayRendererTests : IDisposable
 
         public IGraphicsBuffer CreateBuffer(
             GraphicsBufferDescription description) =>
-            new FakeGraphicsBuffer(description);
+            LastBuffer = new FakeGraphicsBuffer(description);
 
         public void RenderFrame(
             GraphicsColor clearColor,
@@ -156,6 +171,7 @@ public sealed class FrontendOverlayRendererTests : IDisposable
 
     private sealed class FakeGraphicsBuffer : IGraphicsBuffer
     {
+        internal int VisibleBrandVertices { get; private set; }
         public FakeGraphicsBuffer(
             GraphicsBufferDescription description)
         {
@@ -169,6 +185,12 @@ public sealed class FrontendOverlayRendererTests : IDisposable
             int offsetInBytes = 0)
             where T : unmanaged
         {
+            ReadOnlySpan<byte> bytes = MemoryMarshal.AsBytes(data);
+            VisibleBrandVertices = 0;
+            // Position float2 followed by Color float4; first six vertices are the backdrop.
+            for (int offset = 6 * 24; offset < bytes.Length; offset += 24)
+                if (BitConverter.ToSingle(bytes.Slice(offset + 8, 4)) > 0.5f)
+                    VisibleBrandVertices++;
         }
 
         public void Dispose()

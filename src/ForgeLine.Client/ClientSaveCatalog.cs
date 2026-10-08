@@ -5,9 +5,14 @@ namespace ForgeLine.Client;
 internal static class ClientSaveCatalog
 {
     internal static IReadOnlyList<ForgeLine.UI.LoadGameEntry> Discover(
-        string directory)
+        string directory) => Discover(directory, CancellationToken.None);
+
+    internal static IReadOnlyList<ForgeLine.UI.LoadGameEntry> Discover(
+            string directory,
+            CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(directory);
+        cancellationToken.ThrowIfCancellationRequested();
 
         string fullDirectory =
             Path.GetFullPath(directory);
@@ -32,6 +37,7 @@ internal static class ClientSaveCatalog
 
         for (int index = 0; index < paths.Length; index++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             string path = paths[index];
             string id =
                 Path.GetFileName(path);
@@ -90,7 +96,8 @@ internal static class ClientSaveCatalog
             }
         }
 
-        return entries;
+        cancellationToken.ThrowIfCancellationRequested();
+        return entries.AsReadOnly();
     }
 
     internal static MatchRuntime Restore(

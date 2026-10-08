@@ -83,9 +83,12 @@ public sealed class FrontendOverlayRenderer : IDisposable
         if (view.Kind == FrontendSurfaceKind.StudioSplash)
         {
             float seconds = Math.Clamp(view.SplashElapsedSeconds, 0f, 3f);
-            float monogramAlpha = SplashOpacity(seconds, 0.8f, 1.35f, 2.7f, 3f) * view.SplashMasterOpacity;
-            float wordmarkAlpha = SplashOpacity(seconds, 1.25f, 2.05f, 2.7f, 3f) * view.SplashMasterOpacity;
-            float subtitleAlpha = SplashOpacity(seconds, 1.95f, 2.35f, 2.7f, 3f) * view.SplashMasterOpacity;
+            float monogramAlpha = view.SplashBootstrap ? view.SplashMasterOpacity :
+                SplashOpacity(seconds, 0.8f, 1.35f, 2.7f, 3f) * view.SplashMasterOpacity;
+            float wordmarkAlpha = view.SplashBootstrap ? view.SplashMasterOpacity :
+                SplashOpacity(seconds, 1.25f, 2.05f, 2.7f, 3f) * view.SplashMasterOpacity;
+            float subtitleAlpha = view.SplashBootstrap ? view.SplashMasterOpacity :
+                SplashOpacity(seconds, 1.95f, 2.35f, 2.7f, 3f) * view.SplashMasterOpacity;
             EmitText("U/B", 894 * scale, 344 * scale,
                 SplashTint(0.94f, 0.72f, 0.28f, monogramAlpha),
                 context.Width, context.Height, 3f * scale);

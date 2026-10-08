@@ -5,8 +5,9 @@ namespace ForgeLine.Client;
 
 internal static class RuntimeAssetDevelopmentBootstrap
 {
-    public static void EnsureAvailable()
+    public static void EnsureAvailable(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (!string.IsNullOrWhiteSpace(
                 Environment.GetEnvironmentVariable(
                     RuntimeAssetPathResolver.OverrideEnvironmentVariable)) ||
@@ -62,7 +63,8 @@ internal static class RuntimeAssetDevelopmentBootstrap
             {
                 FileName = "dotnet",
                 WorkingDirectory = repositoryRoot,
-                UseShellExecute = false
+                UseShellExecute = false,
+                CreateNoWindow = true
             };
         startInfo.ArgumentList.Add(
             "run");
@@ -97,7 +99,7 @@ internal static class RuntimeAssetDevelopmentBootstrap
                 return;
             }
 
-            compiler.WaitForExit();
+            WaitForCompiler(compiler, cancellationToken);
             if (compiler.ExitCode != 0)
             {
                 Console.Error.WriteLine(
@@ -121,6 +123,25 @@ internal static class RuntimeAssetDevelopmentBootstrap
         {
             Console.Error.WriteLine(
                 $"[assets:runtime] compile=failed type={exception.GetType().Name} message={exception.Message}");
+        }
+    }
+
+    internal static void WaitForCompiler(Process compiler, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(compiler);
+        try
+        {
+            compiler.WaitForExitAsync(cancellationToken).GetAwaiter().GetResult();
+        }
+        catch (OperationCanceledException)
+        {
+            if (!compiler.HasExited)
+            {
+                try { compiler.Kill(entireProcessTree: true); }
+                catch (InvalidOperationException) when (compiler.HasExited) { }
+            }
+            compiler.WaitForExit();
+            throw;
         }
     }
 }

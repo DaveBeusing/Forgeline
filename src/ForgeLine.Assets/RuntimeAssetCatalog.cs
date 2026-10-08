@@ -26,9 +26,13 @@ public sealed class RuntimeAssetCatalog
 
     public IReadOnlyCollection<AssetId> AssetIds => records.Keys;
 
-    public static RuntimeAssetCatalog Load(string runtimeRoot)
+    public static RuntimeAssetCatalog Load(string runtimeRoot) =>
+        LoadCancellable(runtimeRoot, CancellationToken.None);
+
+    public static RuntimeAssetCatalog LoadCancellable(string runtimeRoot, CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(runtimeRoot);
+        cancellationToken.ThrowIfCancellationRequested();
 
         var normalizedRoot = Path.GetFullPath(runtimeRoot);
         var manifestPath = Path.Combine(normalizedRoot, ManifestFileName);
@@ -38,6 +42,7 @@ public sealed class RuntimeAssetCatalog
         }
 
         var json = File.ReadAllText(manifestPath);
+        cancellationToken.ThrowIfCancellationRequested();
         var manifest = JsonSerializer.Deserialize<RuntimeAssetManifest>(json, JsonOptions)
             ?? throw new InvalidDataException("Runtime asset manifest is empty.");
 
@@ -50,6 +55,7 @@ public sealed class RuntimeAssetCatalog
         var records = new Dictionary<AssetId, RuntimeAssetRecord>();
         foreach (var record in manifest.Assets)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var id = AssetId.Parse(record.Id);
             if (!records.TryAdd(id, record))
             {
