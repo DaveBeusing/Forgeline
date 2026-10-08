@@ -155,6 +155,7 @@ Start with these detailed references rather than using the README as an exhausti
 
 - [Development workflow](docs/Development.md) and [Architecture](docs/Architecture.md)
 - [Render scratch and snapshot ownership](docs/adr/RenderFrameScratchAndSnapshotOwnership.md)
+- [Scalability workloads, budgets and qualification](docs/ScalabilityQualification.md)
 - [GPU resource retirement and fault shutdown](docs/adr/GpuResourceRetirementAndFaultShutdown.md)
 - [Central Divide scenario](docs/CentralDivideScenario.md) and [Central Divide battlefield](docs/CentralDivideBattlefield.md)
 - [Simulation runtime](docs/SimulationRuntime.md) and [Hierarchical navigation](docs/HierarchicalNavigation.md)

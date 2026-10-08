@@ -3,3 +3,5 @@
 Repository-wide build configuration is centralized in the root `Directory.Build.props`, `Directory.Packages.props`, and `global.json`.
 
 Additional build scripts belong in this directory when they become necessary. The foundation intentionally avoids wrapper scripts until they add value beyond the canonical .NET CLI commands.
+
+`Invoke-ScalabilityQualification.ps1` captures the bounded CPU matrix, optional extended samples and opt-in native GPU reports. `Compare-ScalabilityReports.ps1` checks comparison metadata and produces advisory percentile/allocation deltas. See [Scalability qualification](../docs/ScalabilityQualification.md) for prerequisites and interpretation.
