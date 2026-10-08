@@ -270,6 +270,27 @@ This opt-in mode separates instance submission, 1,000-entity transform/visual ex
 
 The backend is null graphics: no native copy, fence wait, presentation or GPU timing is measured. Publication samples copying, lock admission and signalling on the producer; allocation on the render thread is excluded. Its fixture has 128 lines and 64 labels per gameplay/debug layer with no selected entities. GC counts include other process threads. Shared-runner timing is descriptive. The independent Frame hot paths workflow enforces CPU ownership and zero-allocation warm submission contracts and publishes measurements; it does not replace or relax build-test. See [scratch and snapshot ownership](adr/RenderFrameScratchAndSnapshotOwnership.md).
 
+For a fully culled latency investigation, run a separate process with:
+
+```powershell
+dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --culled-hotpath artifacts/culled-hotpath.json
+```
+
+This uses a fresh renderer for each of two cases: 5,000 culled instances from a fresh state, and the same scene after 1,024 near-field submissions have populated retained scratch. It checks 5,000 total/culled instances, zero visible instances and zero draws before sampling. Each case then uses the same 1,024 culled warmups, GC settling and 8,192 samples as the general mode. No publication worker is started. The general mode also starts its periodically waking publication worker only when publication measurements begin. The isolated report includes the renderer assembly SHA-256 because a version alone cannot identify an experimental baseline build.
+
+Compare separate original/changed binaries in alternating ABBA order, keep runtime/assets/sampling equal, and record processor affinity and power settings. Do not run builds concurrently with samples. CPU affinity can reduce scheduler variation but does not make a shared machine stable hardware. CI uploads the isolated report and checks the scene contract; it does not gate timing percentiles.
+
+The initial scratch-reuse comparison recorded fully culled p95 of 392.6 -> 503.0 microseconds. Follow-up used the original renderer from `665189f98656eba693ec627314a3665665b69fc5` and the merged renderer from `64099bffff7191c2118b89358aaf89bc3a0ce2c6`, with identical harnesses and Release dependencies (.NET 10.0.12, Windows 26200, 24 logical processors). Four unpinned processes per variant produced fresh-case p95 ranges of 399.6-471.1 versus 411.5-616.3 microseconds, and after-visible ranges of 411.2-609.4 versus 416.0-620.9. These remain noisy and include worse changed tails.
+
+A further original/changed/changed/original sequence pinned every process to logical processor 2 (affinity mask 4). Medians of the two process percentiles per variant were:
+
+| Case | p50 original / changed (us) | p95 original / changed (us) | p99 original / changed (us) |
+| --- | --- | --- | --- |
+| Fresh fully culled | 366.5 / 351.1 | 475.3 / 464.7 | 584.4 / 496.6 |
+| Fully culled after visible | 355.7 / 350.5 | 432.4 / 433.1 | 454.5 / 468.2 |
+
+All sampled diagnostics match, with 112 -> 0 allocated bytes/op and no GC collections. The after-visible case does not reproduce the original p95 regression under this control, but its p99 remains slightly worse. This does not prove a universal latency improvement or identify the original regression's cause. Scratch reuse remains unchanged; stable-hardware tail qualification and native GPU pacing remain open.
+
 Targeted canonical tests use the framework's [MTP class filters](https://xunit.net/docs/getting-started/v3/microsoft-testing-platform):
 
 ```powershell
