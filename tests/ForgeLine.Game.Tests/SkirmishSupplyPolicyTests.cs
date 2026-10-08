@@ -11,9 +11,10 @@ namespace ForgeLine.Game.Tests;
 public sealed class SkirmishSupplyPolicyTests
 {
     [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public void UnaffordableForwardRetreatWaitsForPhysicalMobileResupply(bool reconnaissance)
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public void UnaffordableForwardRetreatWaitsForPhysicalMobileResupply(bool reconnaissance, bool partialRecovery)
     {
         using MatchRuntime scenario = CentralDivideScenario.Create(
             CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
@@ -34,9 +35,14 @@ public sealed class SkirmishSupplyPolicyTests
             catalog[reconnaissance ? UnitIds.ScoutVehicle : UnitIds.MainBattleTank],
             home + new Vector3(700.0f, 0.0f, 0.0f), owner);
         UnitFuelState fuel = entities.GetComponent<UnitFuelState>(unit);
-        double initialFuel = fuel.Capacity * 0.05;
+        double initialFuel = fuel.Capacity * (partialRecovery ? 0.30 : 0.05);
         double removed = scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel) - initialFuel;
         Assert.True(scenario.Inventories.Remove(fuel.InventoryId, ResourceIds.Fuel, removed).Succeeded);
+        if (partialRecovery)
+        {
+            scenario.Simulation.SubmitCommand(new HoldPositionCommand(owner, [unit], SimulationTick.Zero),
+                SimulationTick.Zero.Next());
+        }
 
         scenario.Simulation.RunTicks(22, TestContext.Current.CancellationToken);
 
@@ -46,14 +52,19 @@ public sealed class SkirmishSupplyPolicyTests
 
         Vector3 position = entities.GetComponent<WorldTransform>(unit).Position;
         EntityId truck = scenario.UnitFactory.Create(catalog[UnitIds.SupplyTruck],
-            position + new Vector3(15.0f, 0.0f, 0.0f), owner);
+            position + new Vector3(partialRecovery ? 80.0f : 15.0f, 0.0f, 0.0f), owner);
         SupplyTruck supply = entities.GetComponent<SupplyTruck>(truck);
         Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Fuel, supply.FuelTarget).Succeeded);
         Assert.True(scenario.Inventories.Add(supply.InventoryId, ResourceIds.Ammunition, supply.AmmunitionTarget).Succeeded);
 
-        scenario.Simulation.RunTicks(100, TestContext.Current.CancellationToken);
+        scenario.Simulation.RunTicks(partialRecovery ? 400UL : 100UL, TestContext.Current.CancellationToken);
 
-        Assert.True(scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel) > initialFuel);
+        Assert.True(scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel) > initialFuel,
+            $"fuel={scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel)}; " +
+            $"policy={entities.GetComponent<AutomaticResupplyPolicy>(unit)}; " +
+            $"resupply={entities.HasComponent<ResupplyOrder>(unit)}; " +
+            $"position={entities.GetComponent<WorldTransform>(unit).Position}; " +
+            $"provider={entities.GetComponent<WorldTransform>(truck).Position}");
         Assert.True(scenario.Inventories.GetQuantity(supply.InventoryId, ResourceIds.Fuel) < supply.FuelTarget);
     }
 
@@ -332,9 +343,15 @@ public sealed class SkirmishSupplyPolicyTests
     [InlineData(false, false)]
     [InlineData(true, false)]
     [InlineData(false, true)]
+    [InlineData(false, false, true)]
+    [InlineData(false, false, false, true)]
+    [InlineData(false, false, false, false, true)]
     public void ReconnaissanceAdvanceSharesRouteWithPhysicalSupplyEscort(
         bool unrelatedEnemyDetected,
-        bool scoutRecovered)
+        bool scoutRecovered,
+        bool scoutAdvanceCompleted = false,
+        bool scoutBetweenWaypoints = false,
+        bool escortSeparated = false)
     {
         using MatchRuntime scenario =
             CentralDivideScenario.Create(
@@ -352,7 +369,7 @@ public sealed class SkirmishSupplyPolicyTests
             scenario.UnitFactory.Create(
                 units[UnitIds.ScoutVehicle],
                 core.Position +
-                    new Vector3(unrelatedEnemyDetected || scoutRecovered ? 600.0f : 30.0f, 0.0f, 0.0f),
+                    new Vector3(unrelatedEnemyDetected || scoutRecovered || escortSeparated ? 600.0f : 30.0f, 0.0f, 0.0f),
                 scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         EntityId supply =
             scenario.UnitFactory.Create(
@@ -376,6 +393,14 @@ public sealed class SkirmishSupplyPolicyTests
                 [scout], core.Position, SimulationTick.Zero, FormationTemplate.Column),
                 SimulationTick.Zero.Next());
         }
+        if (scoutAdvanceCompleted)
+        {
+            Vector3 scoutPosition = entities.GetComponent<WorldTransform>(scout).Position;
+            scenario.Simulation.SubmitCommand(new AttackMoveCommand(
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
+                [scout], scoutPosition, SimulationTick.Zero, FormationTemplate.Column),
+                SimulationTick.Zero.Next());
+        }
 
         Assert.True(
             scenario.Inventories.Add(
@@ -391,6 +416,21 @@ public sealed class SkirmishSupplyPolicyTests
         scenario.Simulation.RunTicks(
             30,
             TestContext.Current.CancellationToken);
+
+        if (escortSeparated)
+        {
+            Assert.False(entities.HasComponent<MovementGroupMember>(scout));
+            Vector3 waitingPosition = entities.GetComponent<WorldTransform>(scout).Position;
+            Assert.InRange(Vector2.Distance(new Vector2(core.Position.X + 600.0f, core.Position.Z),
+                new Vector2(waitingPosition.X, waitingPosition.Z)), 0.0f, 3.0f);
+            Assert.Equal(GroundMovementStatus.Moving,
+                entities.GetComponent<GroundMovementState>(supply).Status);
+            for (int tick = 0; tick < 2_000 && !entities.HasComponent<MovementGroupMember>(scout); tick++)
+            {
+                scenario.Simulation.RunTicks(1, TestContext.Current.CancellationToken);
+            }
+            scenario.Simulation.RunTicks(10, TestContext.Current.CancellationToken);
+        }
 
         Assert.True(
             entities.TryGetComponent(
@@ -417,6 +457,15 @@ public sealed class SkirmishSupplyPolicyTests
             new Vector2(opposingCore.X, opposingCore.Z)), 0.0f, identificationRange);
         Assert.Equal(GroundMovementStatus.Moving,
             entities.GetComponent<GroundMovementState>(supply).Status);
+        if (scoutBetweenWaypoints)
+        {
+            // Arriving at a formation slot clears the local order before
+            // the shared route advances to its next waypoint.
+            entities.RemoveComponent<MovementOrder>(scout);
+            scenario.Simulation.RunTicks(1, TestContext.Current.CancellationToken);
+            Assert.Equal(scoutGroup.Group,
+                entities.GetComponent<MovementGroupMember>(scout).Group);
+        }
         if (unrelatedEnemyDetected)
         {
             Assert.Contains(scenario.Intelligence.Capture(
