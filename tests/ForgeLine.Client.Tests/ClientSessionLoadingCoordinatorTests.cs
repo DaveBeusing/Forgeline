@@ -84,6 +84,7 @@ public sealed class ClientSessionLoadingCoordinatorTests
         using var entered = new ManualResetEventSlim();
         using var cancelled = new ManualResetEventSlim();
         using var release = new ManualResetEventSlim();
+        using var disposing = new CountdownEvent(2);
         var session = new Session();
         using var coordinator = new ClientSessionLoadingCoordinator<Session>((token, _) =>
         {
@@ -92,10 +93,17 @@ public sealed class ClientSessionLoadingCoordinatorTests
             return session;
         }, TestContext.Current.CancellationToken);
         Assert.True(entered.Wait(Timeout, TestContext.Current.CancellationToken));
-        Task first = Task.Run(coordinator.Dispose, TestContext.Current.CancellationToken);
-        Task second = Task.Run(coordinator.Dispose, TestContext.Current.CancellationToken);
+        // Blocking join calls need independent callers, not shared test-pool capacity.
+        Task StartDisposer() => Task.Factory.StartNew(() =>
+        {
+            disposing.Signal();
+            coordinator.Dispose();
+        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        Task first = StartDisposer();
+        Task second = StartDisposer();
         try
         {
+            Assert.True(disposing.Wait(Timeout, TestContext.Current.CancellationToken));
             Assert.True(cancelled.Wait(Timeout, TestContext.Current.CancellationToken));
             Assert.False(first.IsCompleted); Assert.False(second.IsCompleted);
         }
