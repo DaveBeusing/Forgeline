@@ -256,8 +256,13 @@ public sealed class SkirmishSupplyPolicyTests
             combatPolicy.FuelThreshold);
     }
 
-    [Fact]
-    public void ReconnaissanceAdvanceSharesRouteWithPhysicalSupplyEscort()
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    public void ReconnaissanceAdvanceSharesRouteWithPhysicalSupplyEscort(
+        bool unrelatedEnemyDetected,
+        bool scoutRecovered)
     {
         using MatchRuntime scenario =
             CentralDivideScenario.Create(
@@ -275,17 +280,30 @@ public sealed class SkirmishSupplyPolicyTests
             scenario.UnitFactory.Create(
                 units[UnitIds.ScoutVehicle],
                 core.Position +
-                    new Vector3(30.0f, 0.0f, 0.0f),
+                    new Vector3(unrelatedEnemyDetected || scoutRecovered ? 600.0f : 30.0f, 0.0f, 0.0f),
                 scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         EntityId supply =
             scenario.UnitFactory.Create(
                 units[UnitIds.SupplyTruck],
                 core.Position +
-                    new Vector3(35.0f, 0.0f, 0.0f),
+                    new Vector3(unrelatedEnemyDetected || scoutRecovered ? 605.0f : 35.0f, 0.0f, 0.0f),
                 scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         SupplyTruck supplyState =
             entities.GetComponent<SupplyTruck>(
                 supply);
+        if (unrelatedEnemyDetected)
+        {
+            scenario.UnitFactory.Create(units[UnitIds.RifleSquad],
+                core.Position + new Vector3(900.0f, 0.0f, 0.0f),
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).Player);
+        }
+        if (scoutRecovered)
+        {
+            scenario.Simulation.SubmitCommand(new RetreatCommand(
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
+                [scout], core.Position, SimulationTick.Zero, FormationTemplate.Column),
+                SimulationTick.Zero.Next());
+        }
 
         Assert.True(
             scenario.Inventories.Add(
@@ -299,7 +317,7 @@ public sealed class SkirmishSupplyPolicyTests
                 supplyState.AmmunitionTarget).Succeeded);
 
         scenario.Simulation.RunTicks(
-            20,
+            30,
             TestContext.Current.CancellationToken);
 
         Assert.True(
@@ -320,6 +338,14 @@ public sealed class SkirmishSupplyPolicyTests
             scoutGroup.Group,
             supplyGroup.Group);
         Assert.True(scoutGroup.Group.IsValid);
+        Assert.Equal(GroundMovementStatus.Moving,
+            entities.GetComponent<GroundMovementState>(supply).Status);
+        if (unrelatedEnemyDetected)
+        {
+            Assert.Contains(scenario.Intelligence.Capture(
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Faction).Contacts,
+                contact => contact.IsCurrent);
+        }
     }
 
     [Fact]

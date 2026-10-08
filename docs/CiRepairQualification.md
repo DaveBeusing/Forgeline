@@ -40,6 +40,8 @@ Cargo recovery refill targets depend on the live fleet, including when replaceme
 
 ## Validation status
 
+Reconnaissance supply escorts remain attached until the opposing command core is currently identified. Incidental enemy-unit sightings do not complete that objective. A recovered scout without an active resupply order can resume reconnaissance before completing obsolete retreat movement, using the configured readiness, fuel and ammunition admission thresholds. The regression retains shared-route checks, verifies active escort movement after unrelated enemy contact, and verifies recovered-scout redeployment; both new cases fail with the prior policy.
+
 Blocked steel production raises Ferrous Ore input delivery to Critical, so an otherwise healthy construction reserve cannot prevent raw material from reaching an empty smelter. A satisfied output target retains the normal High priority and existing 80/240 input thresholds. The readiness fixture waits for both attack readiness and expansion within its original 50,000-tick budget, avoiding an assumption about which milestone occurs first.
 
 Canonical Release solution build: zero warnings/errors. Complete solution suite before the startup ownership regression: 1,074 tests, 1,072 passed, zero failed, two native lifetime cases skipped unless explicitly enabled. Focused validation: 45 presentation cases, both repaired game cases and all 54 asset cases pass. Canonical map and clean runtime-asset compilation qualify. Negative smoke-budget probes reject an extra instance batch and a duplicate terrain draw. Updated full-suite and two-processor startup validation results are recorded on the repair pull request.

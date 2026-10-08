@@ -1434,6 +1434,17 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return true;
     }
 
+    private bool IsEnemyCommandCoreIdentified(
+        SimulationContext context,
+        FactionId faction,
+        FactionIntelligenceSnapshot intelligence) =>
+        intelligence.Contacts.Any(contact =>
+            contact.IsCurrent && contact.State == IntelligenceState.Identified &&
+            _intelligence.TryResolveCurrentlyIdentifiedEntity(faction, contact.ContactKey, out EntityId entity) &&
+            context.Entities.IsAlive(entity) &&
+            context.Entities.TryGetComponent(entity, out CompletedBuilding building) &&
+            building.BuildingId == BuildingIds.CommandCore);
+
     private bool TryScout(
         SimulationContext context,
         SkirmishOpponentController controller,
@@ -1445,22 +1456,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         objective = Vector3.Zero;
 
         bool enemyCommandCoreIdentified =
-            intelligence.Contacts.Any(
-                contact =>
-                    contact.IsCurrent &&
-                    contact.State ==
-                        IntelligenceState.Identified &&
-                    _intelligence.TryResolveCurrentlyIdentifiedEntity(
-                        controller.Faction,
-                        contact.ContactKey,
-                        out EntityId identifiedEntity) &&
-                    context.Entities.IsAlive(
-                        identifiedEntity) &&
-                    context.Entities.TryGetComponent(
-                        identifiedEntity,
-                        out CompletedBuilding completed) &&
-                    completed.BuildingId ==
-                        BuildingIds.CommandCore);
+            IsEnemyCommandCoreIdentified(context, controller.Faction, intelligence);
 
         if (enemyCommandCoreIdentified)
         {
@@ -1471,7 +1467,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             FindIdleUnit(
                 context,
                 owned,
-                UnitIds.ScoutVehicle);
+                UnitIds.ScoutVehicle,
+                ResolveConfiguration(controller.Player));
 
         if (!scout.IsValid)
         {
@@ -1591,14 +1588,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         EntityId reconReserve =
             ResolveReconReserveScout(
                 owned);
-        bool reconnaissanceEstablished =
-            intelligence.Contacts.Any(
-                static contact =>
-                    contact.IsCurrent);
         EntityId protectedReconScout =
-            reconnaissanceEstablished
-                ? EntityId.Invalid
-                : reconReserve;
+            reconReserve;
 
         EntityId[] attackers =
             owned.CombatUnits
@@ -1946,9 +1937,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
 
         bool reconnaissanceEstablished =
-            intelligence.Contacts.Any(
-                static contact =>
-                    contact.IsCurrent);
+            IsEnemyCommandCoreIdentified(context, controller.Faction, intelligence);
 
         if (reconnaissanceEstablished)
         {
@@ -5496,7 +5485,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private static EntityId FindIdleUnit(
         SimulationContext context,
         OwnedState owned,
-        UnitId unitId)
+        UnitId unitId,
+        SkirmishOpponentConfiguration configuration)
     {
         foreach (var pair in
                  owned.UnitByEntity
@@ -5534,7 +5524,15 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 order.Kind == CombatOrderKind.Retreat &&
                 (hasMovementIntent || hasResupplyOrder))
             {
-                continue;
+                bool recovered = !hasResupplyOrder &&
+                    context.Entities.TryGetComponent(entity, out UnitCombatReadiness readiness) &&
+                    readiness.OverallReadiness >= configuration.OffensiveReadinessThreshold &&
+                    readiness.Fuel >= configuration.OffensiveFuelThreshold &&
+                    readiness.Ammunition >= configuration.ResupplyThreshold;
+                if (!recovered)
+                {
+                    continue;
+                }
             }
 
             if (hasCombatOrder &&
@@ -5865,9 +5863,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             ResolveReconReserveScout(
                 owned);
         EntityId protectedReconScout =
-            force.CurrentHostileContacts > 0
-                ? EntityId.Invalid
-                : reconReserve;
+            reconReserve;
 
         int eligibleAttackers = 0;
         int objectivePressureUnits = 0;
