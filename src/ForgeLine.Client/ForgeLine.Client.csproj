@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <PlatformTarget>x64</PlatformTarget>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <ApplicationIcon>../../assets/source/branding/forgeline/application/forgeline.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../ForgeLine.Platform.Windows/ForgeLine.Platform.Windows.csproj" />
