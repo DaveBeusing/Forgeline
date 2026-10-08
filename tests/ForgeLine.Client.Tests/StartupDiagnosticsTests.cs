@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using ForgeLine.Game;
+using ForgeLine.Jobs;
 using ForgeLine.Presentation;
 using Xunit;
 
@@ -8,6 +10,48 @@ public sealed class StartupDiagnosticsTests
 {
     private static StartupDiagnostics Create() =>
         new(Stopwatch.GetTimestamp(), Guid.NewGuid(), 1);
+
+    [Fact]
+    public void InstrumentationPreservesAuthoritativeSnapshot()
+    {
+        static string Capture(StartupDiagnostics diagnostics)
+        {
+            MatchRuntimeSettings settings = CentralDivideScenario.CreateHeadless(
+                MatchScenarioProfile.Gameplay, seed: 745);
+            settings = settings with
+            {
+                Participants = settings.Participants.Select(participant =>
+                    new MatchParticipantConfiguration(participant.Player,
+                        participant.Faction, participant.StartIndex, false)).ToArray()
+            };
+            using var scheduler = new JobScheduler();
+            diagnostics.BeginSession();
+            using MatchRuntime runtime = diagnostics.Measure(StartupPhase.SessionReconstruction,
+                () => ClientSessionFactory.Create(ClientSessionRequest.NewGame(settings), scheduler), 1);
+            diagnostics.Mark(StartupPhase.SessionRuntimeReady, 1);
+            runtime.Simulation.RunTicks(8, TestContext.Current.CancellationToken);
+            diagnostics.GameplayPresented();
+            diagnostics.Finish();
+            return MatchAuthoritativeSnapshot.Capture(runtime).ComputeSha256();
+        }
+
+        Assert.Equal(Capture(StartupDiagnostics.Disabled), Capture(Create()));
+    }
+
+    [Fact]
+    public void ErrorAfterReadinessRemainsAVisibleRunFailure()
+    {
+        var diagnostics = Create();
+        diagnostics.Begin(StartupPhase.Launch);
+        diagnostics.Begin(StartupPhase.Run);
+        diagnostics.Mark(StartupPhase.MainMenuFirstFrame);
+        diagnostics.MenuInteractive();
+        diagnostics.Finish(new InvalidOperationException("late failure"));
+        Assert.Equal(StartupReadiness.Failed, diagnostics.ApplicationReadiness);
+        Assert.True(diagnostics.Has(StartupPhase.ApplicationReady));
+        Assert.Contains(diagnostics.Snapshot(), e => e.Phase == StartupPhase.Run &&
+            e.Kind == StartupEventKind.Failed && e.Detail == nameof(InvalidOperationException));
+    }
 
     [Fact]
     public void OccludedOrUnpresentedViewsCannotClaimFirstFrames()
