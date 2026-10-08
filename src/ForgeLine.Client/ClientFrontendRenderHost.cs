@@ -19,6 +19,7 @@ internal sealed class ClientFrontendRenderHost : IDisposable
     private readonly Thread _thread;
     private FrontendSurfaceView? _latest;
     private RuntimeAssetCatalog? _splashAssets;
+    private Action<IGraphicsDevice>? _nextStage;
     private long _publishedSequence;
     private long _presentedSequence;
     private int _surfaceWidth;
@@ -82,6 +83,22 @@ internal sealed class ClientFrontendRenderHost : IDisposable
     }
 
     internal bool HasPresentedFrame => Volatile.Read(ref _presentedSequence) > 0;
+    internal Thread ExecutionThread => _thread;
+
+    // Continue on the device's creating thread; never move GPU ownership to another thread.
+    internal void ContinueWith(Action<IGraphicsDevice> nextStage)
+    {
+        ArgumentNullException.ThrowIfNull(nextStage);
+        ThrowIfFaulted();
+        lock (_gate)
+        {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+            if (_nextStage is not null || Volatile.Read(ref _stopping) != 0)
+                throw new InvalidOperationException("The frontend render owner cannot accept another stage.");
+            _nextStage = nextStage;
+        }
+        _signal.Set();
+    }
 
     internal void UpdateSurface(int width, int height, bool suspended)
     {
@@ -181,15 +198,31 @@ internal sealed class ClientFrontendRenderHost : IDisposable
             using IGraphicsDevice graphics =
                 GraphicsDeviceFactory.CreateForWindowTarget(
                     _target);
-            using var renderer =
-                new FrontendOverlayRenderer(graphics);
-            if (_asynchronousStartup) _startup.End(StartupPhase.BootRenderer);
+            Action<IGraphicsDevice>? nextStage = RenderFrontend(graphics);
+            if (nextStage is not null) nextStage(graphics);
+        }
+        catch (Exception exception)
+        {
+            if (_asynchronousStartup)
+                _startup.End(StartupPhase.BootRenderer, StartupEventKind.Failed,
+                    detail: exception.GetType().Name);
+            Volatile.Write(ref _failure, ExceptionDispatchInfo.Capture(exception));
             _started.Set();
-            int width = _target.Width, height = _target.Height;
-            bool suspended = _target.Suspended;
-            StudioSplashTextureRenderer? splashRenderer = null;
-            try
-            {
+            _frameRendered.Set();
+        }
+    }
+
+    private Action<IGraphicsDevice>? RenderFrontend(IGraphicsDevice graphics)
+    {
+        using var renderer =
+            new FrontendOverlayRenderer(graphics);
+        if (_asynchronousStartup) _startup.End(StartupPhase.BootRenderer);
+        _started.Set();
+        int width = _target.Width, height = _target.Height;
+        bool suspended = _target.Suspended;
+        StudioSplashTextureRenderer? splashRenderer = null;
+        try
+        {
             while (Volatile.Read(ref _stopping) == 0)
             {
                 _signal.WaitOne(TimeSpan.FromMilliseconds(16));
@@ -200,6 +233,7 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                 bool requestedSuspended;
                 lock (_gate)
                 {
+                    if (_nextStage is not null) return _nextStage;
                     view = _latest;
                     splashAssets = _splashAssets;
                     sequence = _publishedSequence;
@@ -270,22 +304,11 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                     _frameRendered.Set();
                 }
             }
-            }
-            finally
-            {
-                splashRenderer?.Dispose();
-            }
         }
-        catch (Exception exception)
+        finally
         {
-            if (_asynchronousStartup)
-                _startup.End(StartupPhase.BootRenderer, StartupEventKind.Failed,
-                    detail: exception.GetType().Name);
-            Volatile.Write(
-                ref _failure,
-                ExceptionDispatchInfo.Capture(exception));
-            _started.Set();
-            _frameRendered.Set();
+            splashRenderer?.Dispose();
         }
+        return null;
     }
 }

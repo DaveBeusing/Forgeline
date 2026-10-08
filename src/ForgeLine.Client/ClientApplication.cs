@@ -168,76 +168,126 @@ internal sealed class ClientApplication
             frontendLoading.Complete("Command interface ready");
         }
 
-        ClientSessionRequest sessionRequest;
-        if (smokeTest)
+        string sessionFeedback = string.Empty;
+        while (window.IsOpen)
         {
-            sessionRequest =
-                ClientSessionRequest.NewGame(
-                    newGame.Configuration.Seed);
-        }
-        else
-        {
-            FrontendSessionSelectionResult selection =
-                RunFrontendSessionSelection(
-                    window,
-                    frontendShell,
-                    newGame,
-                    startupSaves);
-
-            if (selection.RestartRequested)
+            ClientSessionRequest sessionRequest;
+            if (smokeTest)
+                sessionRequest = ClientSessionRequest.NewGame(newGame.Configuration.Seed);
+            else
             {
-                return RestartRequestedExitCode;
+                FrontendSessionSelectionResult selection = RunFrontendSessionSelection(window,
+                    new GameFrontendShell(), newGame, startupSaves, sessionFeedback);
+                if (selection.RestartRequested) return RestartRequestedExitCode;
+                if (selection.Session is not ClientSessionRequest selected) return 0;
+                sessionRequest = selected;
             }
-
-            if (selection.Session is not ClientSessionRequest selected)
+            try
             {
-                return 0;
+                int result = RunMatchSession(window, runtimeAssets, sessionRequest, smokeTest,
+                    renderInstanceCount, visualQualificationOutput, qualificationWindow);
+                if (result != SessionReturnToMenuExitCode || smokeTest) return result;
+                sessionFeedback = "SESSION LOAD CANCELLED";
             }
-
-            sessionRequest = selected;
+            catch (ClientSessionLoadingException error) when (!smokeTest && window.IsOpen)
+            {
+                _startup.SessionLoadEnded(false, error.Category.ToString());
+                Console.Error.WriteLine($"[session:load-failed] category={error.Category} {error}");
+                sessionFeedback = $"LOAD FAILED - {error.UserMessage}";
+            }
         }
+        return 0;
+    }
 
-        using var jobScheduler = new JobScheduler();
+    private const int SessionReturnToMenuExitCode = 11;
+
+    private int RunMatchSession(IWindow window, RuntimeAssetCatalog runtimeAssets,
+        ClientSessionRequest sessionRequest, bool smokeTest, int renderInstanceCount,
+        string? visualQualificationOutput, ClientWindowQualificationSnapshot qualificationWindow)
+    {
+        bool activated = false;
+        ClientSessionLoadPhase loadingPhase = ClientSessionLoadPhase.Configuration;
         _startup.BeginSession();
-        var sessionTransitionTarget =
-            new GraphicsWindowTarget(
-                window.NativeHandle.Value,
-                window.ClientSize.Width,
-                window.ClientSize.Height,
-                window.IsMinimized ||
-                window.ClientSize.IsEmpty);
-        using var sessionTransitionRenderer =
-            new ClientFrontendRenderHost(
-                sessionTransitionTarget);
-
-        frontendLoading.BeginPhase(
-            FrontendLoadingPhase.PreparingFrontend,
-            sessionRequest.Kind ==
-                ClientSessionRequestKind.LoadGame
-                ? "RESTORING SAVED BATTLEFIELD"
-                : "CREATING BATTLEFIELD SIMULATION",
-            totalSteps: 4);
-        sessionTransitionRenderer.Publish(
-            FrontendPresentationAdapter.Loading(
-                frontendLoading.State));
-        PumpBootFrame(
-            window,
-            sessionTransitionRenderer);
-
-        using MatchRuntime scenario =
-            _startup.Measure(StartupPhase.SessionReconstruction,
-                () => ClientSessionFactory.Create(sessionRequest, jobScheduler), 1);
-        _startup.Mark(StartupPhase.SessionRuntimeReady, 1);
-
-        frontendLoading.ReportProgress(
-            1,
-            "PREPARING PRESENTATION STATE");
-        sessionTransitionRenderer.Publish(
-            FrontendPresentationAdapter.Loading(
-                frontendLoading.State));
-        PumpBootFrame(
-            window,
-            sessionTransitionRenderer);
+        int sessionId = _startup.CurrentSessionId;
+        try
+        {
+        var sessionTransitionTarget = new GraphicsWindowTarget(window.NativeHandle.Value,
+            window.ClientSize.Width, window.ClientSize.Height, window.IsMinimized || window.ClientSize.IsEmpty);
+        using var sessionTransitionRenderer = new ClientFrontendRenderHost(sessionTransitionTarget,
+            initialSurface: ClientSessionLoadingLoop.Surface(new(ClientSessionLoadPhase.Configuration)),
+            asynchronousStartup: true);
+        var loadingInput = new InputState();
+        ClientLoadedSession loaded;
+        using (var coordinator = new ClientSessionLoadingCoordinator<ClientLoadedSession>((token, report) =>
+        {
+            StartupPhase? activePhase = null;
+            ClientSessionLoadProgress last = default;
+            void Track(ClientSessionLoadProgress progress)
+            {
+                StartupPhase phase = progress.Phase switch
+                {
+                    ClientSessionLoadPhase.Configuration => StartupPhase.SessionConfiguration,
+                    ClientSessionLoadPhase.ScenarioAssembly => StartupPhase.SessionAssembly,
+                    ClientSessionLoadPhase.Replay => StartupPhase.SessionReplay,
+                    ClientSessionLoadPhase.HashVerification => StartupPhase.SessionVerification,
+                    _ => throw new InvalidOperationException("Unexpected construction phase.")
+                };
+                if (activePhase != phase)
+                {
+                    if (activePhase.HasValue) _startup.End(activePhase.Value, sessionId: sessionId,
+                        detail: last.HasProgress ? $"Ticks={last.CompletedTicks}/{last.TotalTicks}" : null);
+                    _startup.Begin(phase, sessionId);
+                    activePhase = phase;
+                }
+                last = progress;
+                report(progress);
+            }
+            ClientLoadedSession result = _startup.Measure(StartupPhase.SessionReconstruction,
+                () => ClientSessionFactory.CreateOwned(sessionRequest, Track, token), sessionId);
+            try
+            {
+                if (renderInstanceCount > 0)
+                    PopulateSimulationEntities(result.Runtime.Simulation, result.Runtime.Terrain,
+                        renderInstanceCount, token);
+                token.ThrowIfCancellationRequested();
+                if (activePhase.HasValue) _startup.End(activePhase.Value, sessionId: sessionId);
+                return result;
+            }
+            catch { result.Dispose(); throw; }
+        }))
+        {
+            bool completed = ClientSessionLoadingLoop.Wait(coordinator,
+                pumpEvents: () =>
+                {
+                    if (!PumpSessionLoadingEvents(window, loadingInput)) return false;
+                    sessionTransitionRenderer.ThrowIfFaulted();
+                    sessionTransitionRenderer.UpdateSurface(window.ClientSize.Width, window.ClientSize.Height,
+                        window.IsMinimized || window.ClientSize.IsEmpty);
+                    return true;
+                },
+                cancelRequested: () => loadingInput.IsKeyDown(PlatformKey.Escape),
+                publish: view => sessionTransitionRenderer.Publish(view),
+                waitForEvents: () => _platform.WaitForEvents(IdleWait));
+            if (!completed)
+            {
+                _startup.SessionLoadEnded(true);
+                return window.IsOpen ? SessionReturnToMenuExitCode : 0;
+            }
+            if (!coordinator.TryTake(out ClientLoadedSession? result) || result is null)
+                throw new InvalidOperationException("A completed session could not be transferred.");
+            loaded = result;
+        }
+        using var loadedSession = loaded;
+        MatchRuntime scenario = loadedSession.Runtime;
+        _startup.Mark(StartupPhase.SessionRuntimeReady, sessionId);
+        loadingPhase = ClientSessionLoadPhase.PresentationBinding;
+        _startup.Begin(StartupPhase.SessionPresentationBinding, sessionId);
+        sessionTransitionRenderer.Publish(ClientSessionLoadingLoop.Surface(new(loadingPhase)));
+        if (!PumpSessionLoadingEvents(window, loadingInput) || loadingInput.IsKeyDown(PlatformKey.Escape))
+        {
+            _startup.SessionLoadEnded(true);
+            return window.IsOpen ? SessionReturnToMenuExitCode : 0;
+        }
 
         var snapshotBuffer =
             new PresentationSnapshotBuffer();
@@ -252,14 +302,6 @@ internal sealed class ClientApplication
             scenario.GetBase(new ForgeLine.Game.PlayerId(1));
         SkirmishStartingBase eastBase =
             scenario.GetBase(new ForgeLine.Game.PlayerId(2));
-
-        if (renderInstanceCount > 0)
-        {
-            PopulateSimulationEntities(
-                simulation,
-                terrainWorld,
-                renderInstanceCount);
-        }
 
         EntityId constructionInventory =
             westBase.CommandCore;
@@ -294,15 +336,12 @@ internal sealed class ClientApplication
                 presentationExtraction,
                 runtimeAssets));
 
-        frontendLoading.ReportProgress(
-            2,
-            "INITIALIZING PLAYER CONTROLS");
-        sessionTransitionRenderer.Publish(
-            FrontendPresentationAdapter.Loading(
-                frontendLoading.State));
-        PumpBootFrame(
-            window,
-            sessionTransitionRenderer);
+        sessionTransitionRenderer.Publish(ClientSessionLoadingLoop.Surface(new(loadingPhase)));
+        if (!PumpSessionLoadingEvents(window, loadingInput) || loadingInput.IsKeyDown(PlatformKey.Escape))
+        {
+            _startup.SessionLoadEnded(true);
+            return window.IsOpen ? SessionReturnToMenuExitCode : 0;
+        }
 
         var renderWorld = new RenderWorld();
 
@@ -355,34 +394,51 @@ internal sealed class ClientApplication
         var debugDraw =
             new DebugDraw();
 
-        frontendLoading.ReportProgress(
-            3,
-            "STARTING SIMULATION");
-        sessionTransitionRenderer.Publish(
-            FrontendPresentationAdapter.Loading(
-                frontendLoading.State));
-        PumpBootFrame(
-            window,
-            sessionTransitionRenderer);
+        sessionTransitionRenderer.Publish(ClientSessionLoadingLoop.Surface(new(loadingPhase)));
+        if (!PumpSessionLoadingEvents(window, loadingInput) || loadingInput.IsKeyDown(PlatformKey.Escape))
+        {
+            _startup.SessionLoadEnded(true);
+            return window.IsOpen ? SessionReturnToMenuExitCode : 0;
+        }
 
         using var simulationHost =
             new ClientSimulationHost(
                 scenario,
                 commandGateway,
-                snapshotBuffer);
-        _ = renderWorld.Update(
-            snapshotBuffer);
+                snapshotBuffer, asynchronousStartup: true);
+        bool snapshotReady = ClientSessionLoadingLoop.WaitForPresentation(
+            pumpEvents: () =>
+            {
+                simulationHost.ThrowIfFaulted();
+                sessionTransitionRenderer.ThrowIfFaulted();
+                return PumpSessionLoadingEvents(window, loadingInput);
+            },
+            cancelRequested: () => loadingInput.IsKeyDown(PlatformKey.Escape),
+            firstFramePresented: () => snapshotBuffer.TryReadLatest(out _),
+            publish: () =>
+            {
+                sessionTransitionRenderer.UpdateSurface(window.ClientSize.Width, window.ClientSize.Height,
+                    window.IsMinimized || window.ClientSize.IsEmpty);
+                sessionTransitionRenderer.Publish(ClientSessionLoadingLoop.Surface(new(loadingPhase)));
+            },
+            waitForEvents: () => _platform.WaitForEvents(IdleWait),
+            requestStop: simulationHost.RequestStop,
+            ownersStopped: () => !simulationHost.IsExecutionThreadAlive);
+        if (!snapshotReady)
+        {
+            _startup.SessionLoadEnded(true);
+            return window.IsOpen ? SessionReturnToMenuExitCode : 0;
+        }
+        _ = renderWorld.Update(snapshotBuffer);
+        _startup.End(StartupPhase.SessionPresentationBinding, sessionId: sessionId);
+        loadingPhase = ClientSessionLoadPhase.RendererReadiness;
 
-        frontendLoading.ReportProgress(
-            4,
-            "ENTERING BATTLEFIELD");
-        sessionTransitionRenderer.Publish(
-            FrontendPresentationAdapter.Loading(
-                frontendLoading.State));
-        PumpBootFrame(
-            window,
-            sessionTransitionRenderer);
-        sessionTransitionRenderer.Dispose();
+        sessionTransitionRenderer.Publish(ClientSessionLoadingLoop.Surface(new(loadingPhase)));
+        if (!PumpSessionLoadingEvents(window, loadingInput) || loadingInput.IsKeyDown(PlatformKey.Escape))
+        {
+            _startup.SessionLoadEnded(true);
+            return window.IsOpen ? SessionReturnToMenuExitCode : 0;
+        }
 
         var graphicsTarget =
             new GraphicsWindowTarget(
@@ -391,7 +447,7 @@ internal sealed class ClientApplication
                 window.ClientSize.Height,
                 window.IsMinimized ||
                 window.ClientSize.IsEmpty);
-        _startup.Begin(StartupPhase.GameplayRenderer, 1);
+        _startup.Begin(StartupPhase.GameplayRenderer, sessionId);
         using var renderHost =
             new ClientRenderHost(
                 graphicsTarget,
@@ -400,8 +456,32 @@ internal sealed class ClientApplication
                 camera.Settings,
                 runtimeAssets,
                 _settings.CreateSceneLightingSettings(),
-                _startup);
-        _startup.End(StartupPhase.GameplayRenderer, sessionId: 1);
+                _startup, asynchronousStartup: true, expectedSession: simulationHost.SessionId,
+                transitionHost: sessionTransitionRenderer);
+        bool playable = ClientSessionLoadingLoop.WaitForPresentation(
+            pumpEvents: () =>
+            {
+                simulationHost.ThrowIfFaulted();
+                renderHost.ThrowIfFaulted();
+                return PumpSessionLoadingEvents(window, loadingInput);
+            },
+            cancelRequested: () => loadingInput.IsKeyDown(PlatformKey.Escape),
+            firstFramePresented: () => renderHost.HasPresentedGameplayFrame,
+            publish: () => renderHost.Publish(new ClientRenderFrame(camera.CaptureState(),
+                window.ClientSize.Width, window.ClientSize.Height, false, default, default, default,
+                FormationTemplate.Compact, [], [], [], [], window.Dpi, UiScale: _settings.UiScale,
+                Frontend: renderHost.RendererInitialized ? null : ClientSessionLoadingLoop.Surface(new(loadingPhase)),
+                SurfaceSuspended: window.IsMinimized || window.ClientSize.IsEmpty)),
+            waitForEvents: () => _platform.WaitForEvents(IdleWait),
+            requestStop: () => { renderHost.RequestStop(); simulationHost.RequestStop(); },
+            ownersStopped: () => !renderHost.IsExecutionThreadAlive && !simulationHost.IsExecutionThreadAlive);
+        if (!playable)
+        {
+            _startup.SessionLoadEnded(true);
+            return window.IsOpen ? SessionReturnToMenuExitCode : 0;
+        }
+        _startup.Mark(StartupPhase.SessionRendererReady, sessionId);
+        activated = true;
 
         PlayerCommandSubmissionReceipt? lastCommandReceipt = null;
         PlayerCommandResultReadModel? lastCommandResult = null;
@@ -1382,6 +1462,20 @@ internal sealed class ClientApplication
         }
 
         return 0;
+        }
+        catch (Exception error) when (!activated && error is not ClientSessionLoadingException)
+        {
+            throw ClientSessionLoadingException.From(error, loadingPhase);
+        }
+    }
+
+    private bool PumpSessionLoadingEvents(IWindow window, InputState input)
+    {
+        input.BeginFrame();
+        if (!window.IsOpen || !_platform.PumpEvents()) return false;
+        DrainWindowEvents(window);
+        DrainInputEvents(window, input);
+        return window.IsOpen;
     }
 
     private void WriteVisualQualificationReport(
@@ -1591,7 +1685,8 @@ internal sealed class ClientApplication
     private static void PopulateSimulationEntities(
         SimulationCoordinator simulation,
         TerrainWorld terrainWorld,
-        int entityCount)
+        int entityCount,
+        CancellationToken cancellationToken = default)
     {
         int side = checked((int)Math.Ceiling(Math.Sqrt(entityCount)));
         const float spacing = 12.0f;
@@ -1599,6 +1694,7 @@ internal sealed class ClientApplication
 
         for (int index = 0; index < entityCount; index++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             int xIndex = index % side;
             int zIndex = index / side;
             float x =
@@ -2663,7 +2759,8 @@ internal sealed class ClientApplication
         IWindow window,
         GameFrontendShell shell,
         NewGameModel newGame,
-        IReadOnlyList<LoadGameEntry> startupSaves)
+        IReadOnlyList<LoadGameEntry> startupSaves,
+        string initialFeedback = "")
     {
         _startup.Begin(StartupPhase.Frontend);
         shell.Dispatch(
@@ -2695,7 +2792,7 @@ internal sealed class ClientApplication
         bool leftHeld = false;
         bool rightHeld = false;
         bool primaryPointerHeld = false;
-        string frontendFeedback = string.Empty;
+        string frontendFeedback = initialFeedback;
         GameFrontendScreen transitionScreen = shell.Screen;
         long transitionStarted = Stopwatch.GetTimestamp();
 

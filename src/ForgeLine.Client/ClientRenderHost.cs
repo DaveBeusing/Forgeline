@@ -113,6 +113,10 @@ internal sealed class ClientRenderHost : IDisposable
 
     private readonly StartupDiagnostics _startup = StartupDiagnostics.Disabled;
     private bool _startupPresented;
+    private int _gameplayPresented;
+    private readonly bool _asynchronousStartup;
+    private readonly SimulationSessionId? _expectedSession;
+    private readonly ClientFrontendRenderHost? _frontendOwner;
     private readonly object _frameGate = new();
     private readonly object _disposeGate = new();
     private readonly object _faultWaitGate = new();
@@ -144,9 +148,17 @@ internal sealed class ClientRenderHost : IDisposable
         RtsCameraSettings cameraSettings,
         RuntimeAssetCatalog? runtimeAssets = null,
         SceneLightingSettings? sceneLighting = null,
-        StartupDiagnostics? startup = null)
+        StartupDiagnostics? startup = null,
+        bool asynchronousStartup = false,
+        SimulationSessionId? expectedSession = null,
+        ClientFrontendRenderHost? transitionHost = null)
     {
         _startup = startup ?? StartupDiagnostics.Disabled;
+        _asynchronousStartup = asynchronousStartup;
+        _expectedSession = expectedSession;
+        _frontendOwner = transitionHost;
+        if (transitionHost is not null && !asynchronousStartup)
+            throw new ArgumentException("A renderer continuation requires asynchronous startup.", nameof(asynchronousStartup));
         initialTarget.Validate();
         _initialTarget = initialTarget;
         _terrain =
@@ -165,9 +177,10 @@ internal sealed class ClientRenderHost : IDisposable
             SceneLightingSettings.Default;
         _sceneLighting.Validate();
 
-        _thread =
-            CreateThread();
-        StartAndWait();
+        _thread = transitionHost?.ExecutionThread ?? CreateThread();
+        if (transitionHost is not null) transitionHost.ContinueWith(device => RenderLoop(device));
+        else if (asynchronousStartup) _thread.Start();
+        else StartAndWait();
     }
 
     internal ClientRenderHost(
@@ -185,6 +198,17 @@ internal sealed class ClientRenderHost : IDisposable
 
     internal bool IsExecutionThreadAlive =>
         _thread.IsAlive;
+    internal bool HasPresentedGameplayFrame => Volatile.Read(ref _gameplayPresented) != 0;
+    internal bool RendererInitialized => _started.IsSet;
+    internal void RequestStop()
+    {
+        lock (_disposeGate)
+        {
+            if (_disposed) return;
+            Volatile.Write(ref _stopping, 1);
+            _signal.Set();
+        }
+    }
     internal bool IsStopping => Volatile.Read(ref _stopping) != 0;
     internal ClientRenderHealth Health => new(
         IsExecutionThreadAlive,
@@ -270,6 +294,9 @@ internal sealed class ClientRenderHost : IDisposable
     public void ThrowIfFaulted()
     {
         Volatile.Read(ref _failure)?.Throw();
+        _frontendOwner?.ThrowIfFaulted();
+        if (_frontendOwner is not null && !_thread.IsAlive && !_started.IsSet && Volatile.Read(ref _stopping) == 0)
+            throw new InvalidOperationException("The render owner stopped before gameplay initialization.");
     }
 
     public void Dispose()
@@ -319,10 +346,13 @@ internal sealed class ClientRenderHost : IDisposable
         }
     }
 
-    private void RenderLoop()
+    private void RenderLoop() => RenderLoop(null);
+
+    private void RenderLoop(IGraphicsDevice? existingDevice)
     {
         try
         {
+            if (Volatile.Read(ref _stopping) != 0) return;
             if (_testRenderAction is not null)
             {
                 RunTestRenderLoop(
@@ -347,9 +377,15 @@ internal sealed class ClientRenderHost : IDisposable
                 throw new InvalidOperationException(
                     "Render camera settings were not configured.");
 
-            using IGraphicsDevice graphics =
-                GraphicsDeviceFactory.CreateForWindowTarget(
-                    initialTarget);
+            using IGraphicsDevice? ownedGraphics = existingDevice is null
+                ? GraphicsDeviceFactory.CreateForWindowTarget(initialTarget) : null;
+            IGraphicsDevice graphics = existingDevice ?? ownedGraphics!;
+            if (existingDevice is not null)
+            {
+                graphics.WaitForIdle();
+                graphics.Resize(initialTarget.Suspended ? 0 : initialTarget.Width,
+                    initialTarget.Suspended ? 0 : initialTarget.Height);
+            }
             using var terrainRenderer =
                 new TerrainRenderer(
                     graphics,
@@ -411,6 +447,8 @@ internal sealed class ClientRenderHost : IDisposable
                 width <= 0 ||
                 height <= 0;
 
+            if (_asynchronousStartup)
+                _startup.End(StartupPhase.GameplayRenderer, sessionId: _startup.CurrentSessionId);
             _started.Set();
 
             while (Volatile.Read(ref _stopping) == 0)
@@ -531,7 +569,7 @@ internal sealed class ClientRenderHost : IDisposable
                 long renderStartedAt =
                     Stopwatch.GetTimestamp();
 
-                ulong presentedBefore = !_startupPresented && _startup.Enabled ? graphics.PresentedFrameCount : 0;
+                ulong presentedBefore = !_startupPresented ? graphics.PresentedFrameCount : 0;
                 graphics.RenderFrame(
                     GraphicsColor.ForgeLineClear,
                     context =>
@@ -593,11 +631,12 @@ internal sealed class ClientRenderHost : IDisposable
                         }
                     });
 
-                if (!_startupPresented && _startup.Enabled &&
-                    graphics.PresentedFrameCount > presentedBefore && current.Frontend is null)
+                if (!_startupPresented && graphics.PresentedFrameCount > presentedBefore && current.Frontend is null &&
+                    (!_expectedSession.HasValue || snapshot.SessionId == _expectedSession.Value))
                 {
                     _startup.GameplayPresented();
                     _startupPresented = true;
+                    Volatile.Write(ref _gameplayPresented, 1);
                 }
 
                 long renderFinishedAt =

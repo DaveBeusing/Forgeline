@@ -11,7 +11,9 @@ internal enum StartupPhase
     WindowVisible, FirstPresentedFrame, StudioSplashFirstFrame,
     MainMenuFirstFrame, MainMenuInteractive, RuntimeAssetsReady,
     FrontendReady, SessionRuntimeReady, FirstGameplayFrame, ApplicationReady, Run, SessionReady,
-    SplashBootstrapFirstFrame, SaveCatalog, FrontendDependenciesReady, SplashArtwork
+    SplashBootstrapFirstFrame, SaveCatalog, FrontendDependenciesReady, SplashArtwork,
+    SessionLoadRequested, SessionConfiguration, SessionAssembly, SessionReplay, SessionVerification,
+    SessionPresentationBinding, SessionRendererReady, SessionLoadFailed, SessionLoadCancelled
 }
 
 internal enum StartupEventKind { Started, Completed, Milestone, Skipped, Failed, Cancelled }
@@ -24,7 +26,7 @@ internal readonly record struct StartupEvent(
 // Collection is bounded and performs no serialization, logging or file I/O on owner threads.
 internal sealed class StartupDiagnostics
 {
-    private const int PhaseCount = (int)StartupPhase.SplashArtwork + 1;
+    private const int PhaseCount = (int)StartupPhase.SessionLoadCancelled + 1;
     internal static StartupDiagnostics Disabled { get; } = new();
     private readonly object _gate = new();
     private readonly StartupEvent[]? _events;
@@ -36,6 +38,7 @@ internal sealed class StartupDiagnostics
     private StartupReadiness _application;
     private StartupReadiness _session;
     private bool _sessionStarted;
+    private int _sessionId;
 
     private StartupDiagnostics() { }
 
@@ -53,6 +56,7 @@ internal sealed class StartupDiagnostics
     internal Guid ProcessId { get; }
     internal int LaunchId { get; }
     internal bool Enabled => _events is not null;
+    internal int CurrentSessionId { get { lock (_gate) return Enabled ? _sessionId : 1; } }
     internal StartupReadiness ApplicationReadiness { get { lock (_gate) return _application; } }
     internal StartupReadiness SessionReadiness { get { lock (_gate) return _session; } }
 
@@ -101,7 +105,7 @@ internal sealed class StartupDiagnostics
         }
     }
 
-    internal void Mark(StartupPhase phase, int sessionId = 0)
+    internal void Mark(StartupPhase phase, int sessionId = 0, string? detail = null)
     {
         if (!Enabled) return;
         lock (_gate)
@@ -109,7 +113,7 @@ internal sealed class StartupDiagnostics
             int slot = Slot(phase, sessionId);
             if (_milestones![slot]) return;
             _milestones[slot] = true;
-            Add(phase, StartupEventKind.Milestone, sessionId, Stopwatch.GetTimestamp(), null, null);
+            Add(phase, StartupEventKind.Milestone, sessionId, Stopwatch.GetTimestamp(), null, detail);
         }
     }
 
@@ -122,7 +126,32 @@ internal sealed class StartupDiagnostics
     internal void BeginSession()
     {
         if (!Enabled) return;
-        lock (_gate) _sessionStarted = true;
+        lock (_gate)
+        {
+            if (_sessionStarted)
+            {
+                for (int phase = 0; phase < PhaseCount; phase++)
+                    End((StartupPhase)phase, StartupEventKind.Cancelled, _sessionId);
+                Array.Fill(_starts!, -1L, PhaseCount, PhaseCount);
+                Array.Clear(_milestones!, PhaseCount, PhaseCount);
+            }
+            _sessionStarted = true;
+            _session = StartupReadiness.Pending;
+            _sessionId++;
+            Mark(StartupPhase.SessionLoadRequested, _sessionId);
+        }
+    }
+
+    internal void SessionLoadEnded(bool cancelled, string? detail = null)
+    {
+        if (!Enabled) return;
+        lock (_gate)
+        {
+            _session = cancelled ? StartupReadiness.Cancelled : StartupReadiness.Failed;
+            Mark(cancelled ? StartupPhase.SessionLoadCancelled : StartupPhase.SessionLoadFailed, _sessionId, detail);
+            for (int phase = 0; phase < PhaseCount; phase++)
+                End((StartupPhase)phase, cancelled ? StartupEventKind.Cancelled : StartupEventKind.Failed, _sessionId, detail);
+        }
     }
 
     internal void MenuInteractive()
@@ -142,8 +171,8 @@ internal sealed class StartupDiagnostics
         {
             if (!_sessionStarted || _session != StartupReadiness.Pending) return;
             Mark(StartupPhase.FirstPresentedFrame);
-            Mark(StartupPhase.FirstGameplayFrame, 1);
-            Mark(StartupPhase.SessionReady, 1);
+            Mark(StartupPhase.FirstGameplayFrame, _sessionId);
+            Mark(StartupPhase.SessionReady, _sessionId);
             _session = StartupReadiness.Ready;
             ReadyApplication();
         }
@@ -172,7 +201,7 @@ internal sealed class StartupDiagnostics
                 ? StartupEventKind.Completed : kind, detail: error?.GetType().Name);
             for (int slot = 0; slot < _starts!.Length; slot++)
                 if (_starts[slot] >= 0)
-                    End((StartupPhase)(slot % PhaseCount), kind, slot / PhaseCount, error?.GetType().Name);
+                    End((StartupPhase)(slot % PhaseCount), kind, slot < PhaseCount ? 0 : _sessionId, error?.GetType().Name);
         }
     }
 
@@ -225,8 +254,7 @@ internal sealed class StartupDiagnostics
     private static int Slot(StartupPhase phase, int sessionId)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(sessionId);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(sessionId, 1);
-        return (int)phase + sessionId * PhaseCount;
+        return (int)phase + (sessionId == 0 ? 0 : PhaseCount);
     }
 
     private void Add(StartupPhase phase, StartupEventKind kind, int sessionId,

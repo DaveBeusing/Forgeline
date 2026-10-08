@@ -16,7 +16,7 @@ The interactive client uses three explicit long-lived owners:
 
 1. **Platform owner** — the thread that creates `WindowsPlatform` and `IWindow`. It alone pumps Win32 messages, drains input/window events, reads mutable window state, updates presentation-only interaction controllers, and publishes copied render/input intent.
 2. **Simulation owner** — a dedicated `ForgeLine Simulation` thread. It alone advances `SimulationCoordinator`, calls `PlayerCommandGateway`, mutates ECS/game state after startup handoff, and applies terminal control transitions.
-3. **Render owner** — a dedicated `ForgeLine Render` thread. It creates and disposes the D3D12 device, swap chain, renderers, graphics resources, command submission, resize handling, and GPU-idle shutdown.
+3. **Render owner** — a dedicated graphics thread. The `ForgeLine Frontend Render` thread continues into gameplay for an interactive session; standalone gameplay hosts use `ForgeLine Render`. It creates and disposes the D3D12 device, swap chain, renderers, graphics resources, command submission, resize handling, and GPU-idle shutdown.
 
 The existing `JobScheduler` remains a persistent worker pool below the simulation owner. Worker completion remains an explicit boundary inside a complete simulation command/system invocation; workers do not own platform or graphics APIs.
 
@@ -24,16 +24,19 @@ The existing `JobScheduler` remains a persistent worker pool below the simulatio
 
 Before session construction, the platform owner creates the window and starts the frontend render owner asynchronously with copied native target state and an asset-independent branded surface. Two transient cancellable CPU/I/O jobs load and validate the runtime catalog and discover saves. They never access mutable window state, GPU resources or simulation state. Completed catalog and read-only save products cross an explicit coordinator handoff after both workers succeed and the intro completes or is skipped. The platform owner pumps events throughout; copied dimensions and suspension state cross to the render owner, which alone resizes its surface. Startup shutdown cancels and joins both jobs, including termination and joining of development compiler children. The gameplay job scheduler is constructed only after session selection.
 
-Startup remains composed on the platform owner while authoritative state is not yet running:
+Session composition runs on a dedicated transient CPU owner before authoritative ticking begins. A `ClientLoadedSession` bundle owns the complete runtime and, for new games, the host scheduler. It transfers once or is disposed after worker completion. Restore retains the existing headless scheduler policy. No loading worker touches platform or GPU APIs. The transition is:
 
 1. create Windows platform/window;
-2. create shared match runtime and host-owned job scheduler;
-3. perform optional render-stress fixture population before simulation execution begins;
+2. create/restore the verified match runtime and owned host scheduler on the loading worker;
+3. perform optional render-stress fixture population on that worker before simulation execution begins;
 4. register command-result and presentation tick observers;
 5. create presentation-only interaction/camera state;
-6. start the simulation owner, which performs the first complete tick and publishes the first immutable snapshot;
+6. start the simulation owner asynchronously and keep pumping until it publishes the first completed-tick snapshot;
 7. copy the HWND, initial client size, and suspended state into `GraphicsWindowTarget`;
-8. start the render owner, which creates all graphics resources from that copied target.
+8. queue gameplay initialization as a continuation on the original graphics thread, retaining its device and swap chain while the loading frame stays displayed;
+9. keep pumping and copying render intent until the requested simulation identity has a successful non-occluded gameplay presentation, then enable gameplay input.
+
+Escape before activation requests cooperative stop and keeps pumping while construction, simulation or graphics owners finish. Disposal joins them before releasing the runtime/scheduler. A failed candidate returns to the menu with categorized diagnostics; a retry owns a fresh coordinator and session correlation. Loading overlays and renderer initialization cannot establish playable readiness.
 
 After the simulation owner starts, the platform/render owners do not directly mutate or query live ECS, inventories, or simulation systems.
 
