@@ -75,6 +75,8 @@ Restart disposes the current execution owners and shared runtime before construc
 
 ## Failure and disposal
 
+Admission and shutdown share synchronization gates; concurrent disposers all wait for the owner. Faulting submissions preserve one failed completion. See [GPU Resource Retirement and Fault Shutdown](GpuResourceRetirementAndFaultShutdown.md) for GPU retirement and restart requirements.
+
 Simulation and render owner failures are captured with their original exception and surfaced on the platform owner. The platform loop checks both owners every iteration.
 
 Shutdown order is:

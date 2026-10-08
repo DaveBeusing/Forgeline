@@ -99,9 +99,9 @@ transition RenderTarget → Present
     ↓
 close and execute command list
     ↓
-present swap chain
+signal frame fence and stamp recorded resource uses
     ↓
-signal frame fence
+present swap chain
     ↓
 advance to the swap chain's current back-buffer index
 ```
@@ -279,6 +279,8 @@ This foundation deliberately does not implement:
 
 
 ## Render-thread ownership
+
+See [GPU Resource Retirement and Fault Shutdown](adr/GpuResourceRetirementAndFaultShutdown.md) for resource retirement, upload-write safety, bounded health counters and fatal device-loss policy.
 
 The interactive client gives all D3D12 lifetime and submission to one dedicated render owner. Device creation, swap-chain creation, pipelines, buffers, renderer objects, `RenderFrame`, resize, `WaitForIdle`, and disposal all execute on that owner.
 

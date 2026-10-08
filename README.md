@@ -152,6 +152,7 @@ docs/         Technical documentation
 Start with these detailed references rather than using the README as an exhaustive subsystem specification:
 
 - [Development workflow](docs/Development.md) and [Architecture](docs/Architecture.md)
+- [GPU resource retirement and fault shutdown](docs/adr/GpuResourceRetirementAndFaultShutdown.md)
 - [Directorate vertical slice](docs/DirectorateVerticalSlice.md) and [Prototype battlefield](docs/PrototypeBattlefield.md)
 - [Simulation runtime](docs/SimulationRuntime.md) and [Hierarchical navigation](docs/HierarchicalNavigation.md)
 - [Industrial production](docs/IndustrialProduction.md), [Logistics routing](docs/LogisticsNetworkAndRouting.md), and [Battlefield supply](docs/BattlefieldSupply.md)
