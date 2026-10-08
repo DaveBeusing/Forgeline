@@ -27,6 +27,7 @@ public sealed record GraphicsDiagnostics(
     GraphicsDeviceInfo Device,
     GraphicsSurfaceInfo Surface)
 {
+    public GraphicsHealthDiagnostics Health { get; init; } = new(0, 0, 0, 0, 0, 0, null);
     public GraphicsResourceDiagnostics Resources { get; init; } =
         new(
             0,
@@ -45,3 +46,12 @@ public sealed record GraphicsDiagnostics(
             0,
             0);
 }
+
+public readonly record struct GraphicsHealthDiagnostics(
+    int LiveResourceCount,
+    int PendingRetirementCount,
+    int PeakPendingRetirementCount,
+    long ReleasedResourceCount,
+    long FenceWaitCount,
+    long SubmissionFaultCount,
+    string? FailureReasonCode);

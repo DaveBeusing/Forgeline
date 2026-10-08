@@ -6,6 +6,7 @@ internal sealed class D3D12GraphicsPipeline : IGraphicsPipeline
 {
     private ID3D12RootSignature? _rootSignature;
     private ID3D12PipelineState? _pipelineState;
+    internal GraphicsResourceRetirement.Resource Lifetime { get; }
 
     internal D3D12GraphicsPipeline(
         D3D12GraphicsDevice owner,
@@ -17,6 +18,11 @@ internal sealed class D3D12GraphicsPipeline : IGraphicsPipeline
         Description = description;
         _rootSignature = rootSignature;
         _pipelineState = pipelineState;
+        Lifetime = owner.RegisterResource(() =>
+        {
+            pipelineState.Dispose();
+            rootSignature.Dispose();
+        });
     }
 
     public GraphicsPipelineDescription Description { get; }
@@ -31,9 +37,8 @@ internal sealed class D3D12GraphicsPipeline : IGraphicsPipeline
 
     public void Dispose()
     {
-        _pipelineState?.Dispose();
+        Owner.RetireResource(Lifetime);
         _pipelineState = null;
-        _rootSignature?.Dispose();
         _rootSignature = null;
     }
 }

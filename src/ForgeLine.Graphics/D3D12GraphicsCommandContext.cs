@@ -11,6 +11,13 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
     private readonly ID3D12GraphicsCommandList _commandList;
 
     private D3D12GraphicsPipeline? _pipeline;
+    private bool _closed;
+    internal void Close() => _closed = true;
+    private void ValidateRecording()
+    {
+        ObjectDisposedException.ThrowIf(_closed, this);
+        _owner.ValidateRecording();
+    }
 
     internal D3D12GraphicsCommandContext(
         D3D12GraphicsDevice owner,
@@ -34,6 +41,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
 
     public void SetViewport(float x, float y, float width, float height)
     {
+        ValidateRecording();
         if (width <= 0 || height <= 0)
         {
             throw new ArgumentOutOfRangeException(
@@ -46,6 +54,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
 
     public void SetScissor(int left, int top, int right, int bottom)
     {
+        ValidateRecording();
         if (right <= left || bottom <= top)
         {
             throw new ArgumentOutOfRangeException(
@@ -59,6 +68,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
 
     public void SetPipeline(IGraphicsPipeline pipeline)
     {
+        ValidateRecording();
         ArgumentNullException.ThrowIfNull(pipeline);
 
         if (pipeline is not D3D12GraphicsPipeline d3d12Pipeline ||
@@ -69,6 +79,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
                 nameof(pipeline));
         }
 
+        _owner.UseResource(d3d12Pipeline.Lifetime);
         _pipeline = d3d12Pipeline;
         _commandList.SetGraphicsRootSignature(d3d12Pipeline.RootSignature);
         _commandList.SetPipelineState(d3d12Pipeline.PipelineState);
@@ -131,6 +142,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
 
     public void SetVertexConstants(ReadOnlySpan<float> values)
     {
+        ValidateRecording();
         if (_pipeline is null)
         {
             throw new InvalidOperationException(
@@ -158,6 +170,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         int slot,
         IGraphicsTexture texture)
     {
+        ValidateRecording();
         if (_pipeline is null)
         {
             _owner.RecordTextureBindingFailure();
@@ -194,6 +207,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
                 "Disposed graphics textures cannot be rebound.");
         }
 
+        _owner.UseResource(d3d12Texture.Lifetime);
         _commandList.SetDescriptorHeaps(_owner.ShaderResourceHeap);
 
         int rootParameterIndex =
@@ -207,6 +221,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
 
     public void Draw(int vertexCount, int startVertex = 0)
     {
+        ValidateRecording();
         if (vertexCount <= 0)
         {
             throw new ArgumentOutOfRangeException(
@@ -247,6 +262,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         int baseVertex = 0,
         int startInstance = 0)
     {
+        ValidateRecording();
         if (indexCount <= 0)
         {
             throw new ArgumentOutOfRangeException(
@@ -276,6 +292,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
 
     private D3D12GraphicsBuffer ValidateBuffer(IGraphicsBuffer buffer)
     {
+        ValidateRecording();
         ArgumentNullException.ThrowIfNull(buffer);
 
         if (buffer is not D3D12GraphicsBuffer d3d12Buffer ||
@@ -286,6 +303,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
                 nameof(buffer));
         }
 
+        _owner.UseResource(d3d12Buffer.Lifetime);
         return d3d12Buffer;
     }
 

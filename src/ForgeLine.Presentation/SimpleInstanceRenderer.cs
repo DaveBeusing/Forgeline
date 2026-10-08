@@ -39,22 +39,24 @@ public sealed class SimpleInstanceRenderer : IDisposable
         _lighting.Validate();
 
         _graphics = graphics;
-        _pipeline = CreatePipeline(graphics);
-        _runtimeAssets =
-            runtimeAssets is null
-                ? null
-                : new RuntimeWorldAssetResources(
-                    graphics,
-                    runtimeAssets);
-        _texturedPipeline =
-            _runtimeAssets is null
-                ? null
-                : CreateTexturedPipeline(
-                    graphics);
+        try
+        {
+            _pipeline = CreatePipeline(graphics);
+            _runtimeAssets =
+                runtimeAssets is null
+                    ? null
+                    : new RuntimeWorldAssetResources(
+                        graphics,
+                        runtimeAssets);
+            _texturedPipeline =
+                _runtimeAssets is null
+                    ? null
+                    : CreateTexturedPipeline(
+                        graphics);
 
-        SimpleVertex[] vertices =
-        [
-            new(-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+            SimpleVertex[] vertices =
+            [
+                new(-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
             new( 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
             new( 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
             new(-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f),
@@ -83,29 +85,27 @@ public sealed class SimpleInstanceRenderer : IDisposable
             new(-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f),
             new(-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f),
             new(-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f)
-        ];
+            ];
 
-        ushort[] indices =
-        [
-             0,  2,  1,  0,  3,  2,
+            ushort[] indices =
+            [
+                 0,  2,  1,  0,  3,  2,
              4,  5,  6,  4,  6,  7,
              8,  9, 10,  8, 10, 11,
             12, 13, 14, 12, 14, 15,
             16, 17, 18, 16, 18, 19,
             20, 21, 22, 20, 22, 23
-        ];
+            ];
 
-        _vertexBuffer = graphics.CreateBuffer(
-            new GraphicsBufferDescription(
-                checked((ulong)vertices.Length * FallbackVertexStride),
-                GraphicsBufferMemory.Upload));
-        _indexBuffer = graphics.CreateBuffer(
-            new GraphicsBufferDescription(
-                checked((ulong)indices.Length * sizeof(ushort)),
-                GraphicsBufferMemory.Upload));
+            _vertexBuffer = graphics.CreateBuffer(
+                new GraphicsBufferDescription(
+                    checked((ulong)vertices.Length * FallbackVertexStride),
+                    GraphicsBufferMemory.Upload));
+            _indexBuffer = graphics.CreateBuffer(
+                new GraphicsBufferDescription(
+                    checked((ulong)indices.Length * sizeof(ushort)),
+                    GraphicsBufferMemory.Upload));
 
-        try
-        {
             _vertexBuffer.SetData<SimpleVertex>(
                 vertices);
             _indexBuffer.SetData<ushort>(
@@ -113,9 +113,11 @@ public sealed class SimpleInstanceRenderer : IDisposable
         }
         catch
         {
-            _indexBuffer.Dispose();
-            _vertexBuffer.Dispose();
-            _pipeline.Dispose();
+            _indexBuffer?.Dispose();
+            _vertexBuffer?.Dispose();
+            _texturedPipeline?.Dispose();
+            _runtimeAssets?.Dispose();
+            _pipeline?.Dispose();
             throw;
         }
     }
