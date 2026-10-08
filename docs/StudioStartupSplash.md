@@ -4,11 +4,13 @@
 
 The reusable startup splash domain lives in `ForgeLine.Presentation`. It is not part of simulation time, world state, ECS, or gameplay snapshots. The studio presentation is defined by `UndefinedBehaviorStudioSplash.Create()`.
 
-The client displays the introduction after runtime asset loading and before the main-menu session selector. Normal play uses the compiled-texture compositor on the existing graphics device; when required runtime branding assets are unavailable, the splash stage is bypassed with a diagnostic so the main menu remains accessible.
+The client starts an asset-independent branded surface immediately after creating the window. Built-in glyph geometry displays the U/B mark, wordmark and subtitle without opening the runtime manifest or loading textures. The render owner initializes asynchronously while the platform owner continues pumping events. Runtime catalog discovery, development compilation and validation run concurrently with independent save-catalog discovery.
+
+After the first successful presentation, available runtime artwork may replace the bootstrap geometry on the same render owner. Missing required branding textures or failed texture initialization retain the text/vector fallback. A missing or invalid required runtime manifest remains a startup error; branding fallback does not waive production asset validation.
 
 ## Branding and timing
 
-The official studio name is **Undefined Behavior Studios**, with the compact **U/B** mark and **UNDEF BHVIOR** wordmark. The default timeline lasts 3 seconds, with a 1.15-second minimum display interval and a 0.3-second skip fade. Timing data belongs to the splash definition, not the graphics backend.
+The official studio name is **Undefined Behavior Studios**, with the compact **U/B** mark and **UNDEF BHVIOR** wordmark. The default timeline lasts 3 seconds, with a 1.15-second minimum display interval and a 0.3-second skip fade. Timing starts when the platform loop observes the first successful presentation, so graphics setup does not consume the visible interval. Timing data belongs to the splash definition, not the graphics backend.
 
 The canonical asset identifiers are:
 
@@ -25,7 +27,9 @@ The canonical asset identifiers are:
 
 `SplashDefinition` validates the identity, duration, layer uniqueness, asset identifiers, normalized geometry, and keyframe ranges. `SplashTimelineEvaluator` evaluates scalar animation channels and offsets without heap allocations on its normal path. `SplashScreenController` manages presentation elapsed time, completion, skip state, and a short fade. `ISplashRenderer` defines the engine-independent presentation boundary.
 
-`SplashAssetPreflight.Prepare()` checks every referenced texture before playback. Missing background and other non-brand layers are optional; a missing monogram, wordmark or studio subtitle aborts the splash and must allow client startup to continue. Lookup exceptions are reported through the caller's diagnostic callback and handled as missing assets.
+`SplashAssetPreflight.Prepare()` checks every referenced texture before enabling the compiled-artwork path. Missing background and other non-brand layers are optional; a missing monogram, wordmark or studio subtitle selects the bootstrap fallback. Lookup exceptions are reported through the caller's diagnostic callback and handled as missing assets.
+
+`ClientStartupCoordinator` owns two cancellable CPU/I/O jobs and their completed products. Intro completion or skip and frontend dependency readiness are independent gates. If the intro ends first, an indeterminate loading surface remains responsive until both products complete. If dependencies finish first, the existing intro/skip rules apply. Completed products are reused exactly once by frontend initialization; skipping never starts another load. Closing, failure and restart cancel and join the jobs before disposal. Cancelling development compilation terminates and waits for its child process tree.
 
 ## Integration requirements
 

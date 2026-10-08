@@ -22,6 +22,8 @@ The existing `JobScheduler` remains a persistent worker pool below the simulatio
 
 ## Startup and handoff
 
+Before session construction, the platform owner creates the window and starts the frontend render owner asynchronously with copied native target state and an asset-independent branded surface. Two transient cancellable CPU/I/O jobs load and validate the runtime catalog and discover saves. They never access mutable window state, GPU resources or simulation state. Completed catalog and read-only save products cross an explicit coordinator handoff after both workers succeed and the intro completes or is skipped. The platform owner pumps events throughout; copied dimensions and suspension state cross to the render owner, which alone resizes its surface. Startup shutdown cancels and joins both jobs, including termination and joining of development compiler children. The gameplay job scheduler is constructed only after session selection.
+
 Startup remains composed on the platform owner while authoritative state is not yet running:
 
 1. create Windows platform/window;
