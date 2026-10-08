@@ -113,6 +113,9 @@ internal sealed class ClientRenderHost : IDisposable
 
     private readonly StartupDiagnostics _startup = StartupDiagnostics.Disabled;
     private bool _startupPresented;
+    private int _gameplayPresented;
+    private readonly bool _asynchronousStartup;
+    private readonly SimulationSessionId? _expectedSession;
     private readonly object _frameGate = new();
     private readonly object _disposeGate = new();
     private readonly object _faultWaitGate = new();
@@ -144,9 +147,13 @@ internal sealed class ClientRenderHost : IDisposable
         RtsCameraSettings cameraSettings,
         RuntimeAssetCatalog? runtimeAssets = null,
         SceneLightingSettings? sceneLighting = null,
-        StartupDiagnostics? startup = null)
+        StartupDiagnostics? startup = null,
+        bool asynchronousStartup = false,
+        SimulationSessionId? expectedSession = null)
     {
         _startup = startup ?? StartupDiagnostics.Disabled;
+        _asynchronousStartup = asynchronousStartup;
+        _expectedSession = expectedSession;
         initialTarget.Validate();
         _initialTarget = initialTarget;
         _terrain =
@@ -167,7 +174,8 @@ internal sealed class ClientRenderHost : IDisposable
 
         _thread =
             CreateThread();
-        StartAndWait();
+        if (asynchronousStartup) _thread.Start();
+        else StartAndWait();
     }
 
     internal ClientRenderHost(
@@ -185,6 +193,17 @@ internal sealed class ClientRenderHost : IDisposable
 
     internal bool IsExecutionThreadAlive =>
         _thread.IsAlive;
+    internal bool HasPresentedGameplayFrame => Volatile.Read(ref _gameplayPresented) != 0;
+    internal bool RendererInitialized => _started.IsSet;
+    internal void RequestStop()
+    {
+        lock (_disposeGate)
+        {
+            if (_disposed) return;
+            Volatile.Write(ref _stopping, 1);
+            _signal.Set();
+        }
+    }
     internal bool IsStopping => Volatile.Read(ref _stopping) != 0;
     internal ClientRenderHealth Health => new(
         IsExecutionThreadAlive,
@@ -411,6 +430,8 @@ internal sealed class ClientRenderHost : IDisposable
                 width <= 0 ||
                 height <= 0;
 
+            if (_asynchronousStartup)
+                _startup.End(StartupPhase.GameplayRenderer, sessionId: _startup.CurrentSessionId);
             _started.Set();
 
             while (Volatile.Read(ref _stopping) == 0)
@@ -531,7 +552,7 @@ internal sealed class ClientRenderHost : IDisposable
                 long renderStartedAt =
                     Stopwatch.GetTimestamp();
 
-                ulong presentedBefore = !_startupPresented && _startup.Enabled ? graphics.PresentedFrameCount : 0;
+                ulong presentedBefore = !_startupPresented ? graphics.PresentedFrameCount : 0;
                 graphics.RenderFrame(
                     GraphicsColor.ForgeLineClear,
                     context =>
@@ -593,11 +614,12 @@ internal sealed class ClientRenderHost : IDisposable
                         }
                     });
 
-                if (!_startupPresented && _startup.Enabled &&
-                    graphics.PresentedFrameCount > presentedBefore && current.Frontend is null)
+                if (!_startupPresented && graphics.PresentedFrameCount > presentedBefore && current.Frontend is null &&
+                    (!_expectedSession.HasValue || snapshot.SessionId == _expectedSession.Value))
                 {
                     _startup.GameplayPresented();
                     _startupPresented = true;
+                    Volatile.Write(ref _gameplayPresented, 1);
                 }
 
                 long renderFinishedAt =

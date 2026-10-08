@@ -64,7 +64,8 @@ internal sealed class ClientSimulationHost : IDisposable
         MatchRuntime scenario,
         PlayerCommandGateway commands,
         PresentationSnapshotBuffer snapshots,
-        int boundaryCapacity = DefaultBoundaryCapacity)
+        int boundaryCapacity = DefaultBoundaryCapacity,
+        bool asynchronousStartup = false)
     {
         _scenario =
             scenario ??
@@ -104,7 +105,7 @@ internal sealed class ClientSimulationHost : IDisposable
         _thread.Start();
         try
         {
-            _started.Wait();
+            if (!asynchronousStartup) _started.Wait();
             ThrowIfFaulted();
         }
         catch
@@ -411,6 +412,16 @@ internal sealed class ClientSimulationHost : IDisposable
     public void ThrowIfFaulted()
     {
         Volatile.Read(ref _failure)?.Throw();
+    }
+
+    internal void RequestStop()
+    {
+        lock (_boundaryGate)
+        {
+            if (_disposed) return;
+            Volatile.Write(ref _stopping, 1);
+            _signal.Set();
+        }
     }
 
     public void Dispose()

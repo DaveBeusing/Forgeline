@@ -53,6 +53,7 @@ internal sealed class ClientSessionLoadingException : Exception
 internal sealed class ClientSessionLoadingCoordinator<TSession> : IDisposable where TSession : class, IDisposable
 {
     private readonly object _gate = new();
+    private readonly object _disposeGate = new();
     private readonly CancellationTokenSource _cancellation;
     private readonly Thread _worker;
     private TSession? _result;
@@ -119,15 +120,21 @@ internal sealed class ClientSessionLoadingCoordinator<TSession> : IDisposable wh
 
     public void Dispose()
     {
+        lock (_disposeGate)
+        {
         lock (_gate) { if (_disposed) return; _disposed = true; }
         try
         {
             try { _cancellation.Cancel(); }
-            finally { _worker.Join(); }
-            TSession? result;
-            lock (_gate) { result = _result; _result = null; }
-            result?.Dispose();
+            finally
+            {
+                _worker.Join();
+                TSession? result;
+                lock (_gate) { result = _result; _result = null; }
+                result?.Dispose();
+            }
         }
         finally { _cancellation.Dispose(); }
+        }
     }
 }

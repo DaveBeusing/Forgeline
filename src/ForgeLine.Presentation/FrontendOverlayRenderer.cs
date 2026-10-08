@@ -108,6 +108,8 @@ public sealed class FrontendOverlayRenderer : IDisposable
         {
             EmitText("INITIALIZING COMMAND SYSTEMS", 94 * scale, 850 * scale, new Vector4(0.72f, 0.74f, 0.68f, 1), context.Width, context.Height, scale);
             EmitText(view.Status, 94 * scale, 890 * scale, new Vector4(0.82f, 0.62f, 0.20f, 1), context.Width, context.Height, scale);
+            if (!string.IsNullOrEmpty(view.Feedback))
+                EmitText(view.Feedback, 94 * scale, 982 * scale, new Vector4(0.52f, 0.58f, 0.50f, 1), context.Width, context.Height, scale);
             if (view.HasProgress)
             {
                 int percent =
