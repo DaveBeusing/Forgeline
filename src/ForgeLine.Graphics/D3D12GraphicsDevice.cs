@@ -12,6 +12,14 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     private const Format DepthBufferFormat = Format.D32_Float;
     private const int DxgiStatusOccluded = 0x087A0001;
     private const int ShaderResourceDescriptorCapacity = 4_096;
+    // A live GPU timeout is fatal for this process. Keep ownership rooted until process exit.
+    private static D3D12GraphicsDevice? s_unretiredDevice;
+    private readonly int _ownerThreadId = Environment.CurrentManagedThreadId;
+    private readonly GraphicsResourceRetirement _resources = new();
+    private bool _recording;
+    private GraphicsDeviceException? _failure;
+    private long _fenceWaitCount;
+    private long _submissionFaultCount;
 
     private readonly GraphicsConfiguration _configuration;
     private readonly IDXGIFactory4 _factory;
@@ -60,135 +68,151 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     {
         _configuration = configuration;
         configuration.Validate();
-
-        bool debugLayerEnabled = TryEnableDebugLayer(configuration.EnableDebugLayer);
-        _factory = DXGI.CreateDXGIFactory2<IDXGIFactory4>(debugLayerEnabled);
-
-        (_device, _deviceInfo) = CreateDevice(
-            _factory,
-            configuration.AllowSoftwareAdapterFallback,
-            debugLayerEnabled);
-        _debugInfoQueue =
-            debugLayerEnabled
-                ? _device.QueryInterfaceOrNull<ID3D12InfoQueue>()
-                : null;
-
-        _commandQueue = _device.CreateCommandQueue(CommandListType.Direct);
-        _commandQueue.Name = "ForgeLine Graphics Queue";
-
-        int initialWidth =
-            Math.Max(
-                target.Width,
-                1);
-        int initialHeight =
-            Math.Max(
-                target.Height,
-                1);
-        _surfaceLifecycle =
-            new GraphicsSurfaceLifecycleState(
-                initialWidth,
-                initialHeight,
-                target.Suspended ||
-                target.Width <= 0 ||
-                target.Height <= 0);
-
-        SwapChainDescription1 swapChainDescription = new()
+        if (Volatile.Read(ref s_unretiredDevice) is not null)
         {
-            Width = (uint)initialWidth,
-            Height = (uint)initialHeight,
-            Format = BackBufferFormat,
-            Stereo = false,
-            SampleDescription = new SampleDescription(1, 0),
-            BufferUsage = Usage.RenderTargetOutput,
-            BufferCount = (uint)configuration.BufferCount,
-            Scaling = Scaling.Stretch,
-            SwapEffect = SwapEffect.FlipDiscard
-        };
-
-        using (IDXGISwapChain1 swapChain = _factory.CreateSwapChainForHwnd(
-                   _commandQueue,
-                   target.NativeHandle,
-                   swapChainDescription))
-        {
-            _factory.MakeWindowAssociation(
-                target.NativeHandle,
-                WindowAssociationFlags.IgnoreAltEnter);
-
-            _swapChain = swapChain.QueryInterface<IDXGISwapChain3>();
+            throw new GraphicsDeviceException("GPU shutdown is unresolved; restart the process.", "gpu-shutdown-pending");
         }
 
-        _frameIndex = checked((int)_swapChain.CurrentBackBufferIndex);
+        try
+        {
+            bool debugLayerEnabled = TryEnableDebugLayer(configuration.EnableDebugLayer);
+            _factory = DXGI.CreateDXGIFactory2<IDXGIFactory4>(debugLayerEnabled);
 
-        _rtvHeap = _device.CreateDescriptorHeap(
-            new DescriptorHeapDescription(
-                DescriptorHeapType.RenderTargetView,
-                (uint)configuration.BufferCount));
-        _rtvDescriptorSize =
-            _device.GetDescriptorHandleIncrementSize(DescriptorHeapType.RenderTargetView);
-        _dsvHeap = _device.CreateDescriptorHeap(
-            new DescriptorHeapDescription(
-                DescriptorHeapType.DepthStencilView,
-                1));
-        _shaderResourceHeap =
-            _device.CreateDescriptorHeap(
+            (_device, _deviceInfo) = CreateDevice(
+                _factory,
+                configuration.AllowSoftwareAdapterFallback,
+                debugLayerEnabled);
+            _debugInfoQueue =
+                debugLayerEnabled
+                    ? _device.QueryInterfaceOrNull<ID3D12InfoQueue>()
+                    : null;
+
+            _commandQueue = _device.CreateCommandQueue(CommandListType.Direct);
+            _commandQueue.Name = "ForgeLine Graphics Queue";
+
+            int initialWidth =
+                Math.Max(
+                    target.Width,
+                    1);
+            int initialHeight =
+                Math.Max(
+                    target.Height,
+                    1);
+            _surfaceLifecycle =
+                new GraphicsSurfaceLifecycleState(
+                    initialWidth,
+                    initialHeight,
+                    target.Suspended ||
+                    target.Width <= 0 ||
+                    target.Height <= 0);
+
+            SwapChainDescription1 swapChainDescription = new()
+            {
+                Width = (uint)initialWidth,
+                Height = (uint)initialHeight,
+                Format = BackBufferFormat,
+                Stereo = false,
+                SampleDescription = new SampleDescription(1, 0),
+                BufferUsage = Usage.RenderTargetOutput,
+                BufferCount = (uint)configuration.BufferCount,
+                Scaling = Scaling.Stretch,
+                SwapEffect = SwapEffect.FlipDiscard
+            };
+
+            using (IDXGISwapChain1 swapChain = _factory.CreateSwapChainForHwnd(
+                       _commandQueue,
+                       target.NativeHandle,
+                       swapChainDescription))
+            {
+                _factory.MakeWindowAssociation(
+                    target.NativeHandle,
+                    WindowAssociationFlags.IgnoreAltEnter);
+
+                _swapChain = swapChain.QueryInterface<IDXGISwapChain3>();
+            }
+
+            _frameIndex = checked((int)_swapChain.CurrentBackBufferIndex);
+
+            _rtvHeap = _device.CreateDescriptorHeap(
                 new DescriptorHeapDescription(
-                    DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView,
-                    ShaderResourceDescriptorCapacity,
-                    DescriptorHeapFlags.ShaderVisible));
-        _shaderResourceDescriptorSize =
-            _device.GetDescriptorHandleIncrementSize(
-                DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView);
-        _shaderResourceDescriptors =
-            new D3D12DescriptorAllocator(
-                ShaderResourceDescriptorCapacity);
+                    DescriptorHeapType.RenderTargetView,
+                    (uint)configuration.BufferCount));
+            _rtvDescriptorSize =
+                _device.GetDescriptorHandleIncrementSize(DescriptorHeapType.RenderTargetView);
+            _dsvHeap = _device.CreateDescriptorHeap(
+                new DescriptorHeapDescription(
+                    DescriptorHeapType.DepthStencilView,
+                    1));
+            _shaderResourceHeap =
+                _device.CreateDescriptorHeap(
+                    new DescriptorHeapDescription(
+                        DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView,
+                        ShaderResourceDescriptorCapacity,
+                        DescriptorHeapFlags.ShaderVisible));
+            _shaderResourceDescriptorSize =
+                _device.GetDescriptorHandleIncrementSize(
+                    DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView);
+            _shaderResourceDescriptors =
+                new D3D12DescriptorAllocator(
+                    ShaderResourceDescriptorCapacity);
 
-        _renderTargets = new ID3D12Resource[configuration.BufferCount];
-        _commandAllocators = new ID3D12CommandAllocator[configuration.BufferCount];
-        _frameFenceValues = new ulong[configuration.BufferCount];
-        _frameTimestampReady = new bool[configuration.BufferCount];
+            _renderTargets = new ID3D12Resource[configuration.BufferCount];
+            _commandAllocators = new ID3D12CommandAllocator[configuration.BufferCount];
+            _frameFenceValues = new ulong[configuration.BufferCount];
+            _frameTimestampReady = new bool[configuration.BufferCount];
 
-        CreateRenderTargets(
-            initialWidth,
-            initialHeight);
+            CreateRenderTargets(
+                initialWidth,
+                initialHeight);
 
-        for (int index = 0; index < configuration.BufferCount; index++)
-        {
-            _commandAllocators[index] =
-                _device.CreateCommandAllocator(CommandListType.Direct);
-            _commandAllocators[index].Name = $"ForgeLine Frame Allocator {index}";
+            for (int index = 0; index < configuration.BufferCount; index++)
+            {
+                _commandAllocators[index] =
+                    _device.CreateCommandAllocator(CommandListType.Direct);
+                _commandAllocators[index].Name = $"ForgeLine Frame Allocator {index}";
+            }
+
+            _commandList = _device.CreateCommandList<ID3D12GraphicsCommandList>(
+                CommandListType.Direct,
+                _commandAllocators[0]);
+            _commandList.Name = "ForgeLine Graphics Command List";
+            _commandList.Close();
+
+            _frameFence = _device.CreateFence(0);
+            _frameFence.Name = "ForgeLine Frame Fence";
+            _frameFenceEvent = new AutoResetEvent(false);
+
+            TryInitializeGpuTiming(
+                configuration.BufferCount);
+
+            Console.WriteLine(
+                $"[graphics:device] adapter=\"{_deviceInfo.AdapterName}\" " +
+                $"featureLevel={_deviceInfo.FeatureLevel} " +
+                $"vramBytes={_deviceInfo.DedicatedVideoMemoryBytes} " +
+                $"software={_deviceInfo.IsSoftwareAdapter} " +
+                $"debugLayer={_deviceInfo.DebugLayerEnabled}");
+            Console.WriteLine(
+                $"[graphics:surface] size={_surfaceLifecycle.Width}x{_surfaceLifecycle.Height} " +
+                $"buffers={configuration.BufferCount} present={PresentMode}");
         }
-
-        _commandList = _device.CreateCommandList<ID3D12GraphicsCommandList>(
-            CommandListType.Direct,
-            _commandAllocators[0]);
-        _commandList.Name = "ForgeLine Graphics Command List";
-        _commandList.Close();
-
-        _frameFence = _device.CreateFence(0);
-        _frameFence.Name = "ForgeLine Frame Fence";
-        _frameFenceEvent = new AutoResetEvent(false);
-
-        TryInitializeGpuTiming(
-            configuration.BufferCount);
-
-        Console.WriteLine(
-            $"[graphics:device] adapter=\"{_deviceInfo.AdapterName}\" " +
-            $"featureLevel={_deviceInfo.FeatureLevel} " +
-            $"vramBytes={_deviceInfo.DedicatedVideoMemoryBytes} " +
-            $"software={_deviceInfo.IsSoftwareAdapter} " +
-            $"debugLayer={_deviceInfo.DebugLayerEnabled}");
-        Console.WriteLine(
-            $"[graphics:surface] size={_surfaceLifecycle.Width}x{_surfaceLifecycle.Height} " +
-            $"buffers={configuration.BufferCount} present={PresentMode}");
+        catch
+        {
+            DisposeNativeObjects();
+            throw;
+        }
     }
 
     public GraphicsDiagnostics Diagnostics
     {
         get
         {
-            ThrowIfDisposed();
-            CaptureDebugLayerMessages();
-            CaptureCompletedGpuTimings();
+            VerifyOwner();
+            ObjectDisposedException.ThrowIf(_disposed, this);
+            if (_failure is null)
+            {
+                CaptureDebugLayerMessages();
+                CaptureCompletedGpuTimings();
+            }
 
             return new GraphicsDiagnostics(
                 _deviceInfo,
@@ -235,6 +259,14 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                     _timestampFrequency > 0,
                 GpuFrameMilliseconds =
                     _lastGpuFrameMilliseconds,
+                Health = new GraphicsHealthDiagnostics(
+                    _resources.LiveCount,
+                    _resources.PendingCount,
+                    _resources.PeakPendingCount,
+                    _resources.ReleasedCount,
+                    _fenceWaitCount,
+                    _submissionFaultCount,
+                    _failure?.ReasonCode),
                 Debug =
                     new GraphicsDebugDiagnostics(
                         _debugInfoQueue is not null,
@@ -447,6 +479,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         GraphicsTextureDescription description =
             texture.Description;
         description.Validate();
+        long residentByteCount = texture.ResidentByteCount;
 
         Format nativeFormat =
             description.ColorSpace == GraphicsTextureColorSpace.Srgb
@@ -462,6 +495,8 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
 
         ID3D12Resource? resource = null;
         int descriptorIndex = -1;
+        GraphicsResourceRetirement.Resource? lifetime = null;
+        bool committed = false;
 
         try
         {
@@ -472,11 +507,24 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                     ResourceStates.CopyDest);
             resource.Name =
                 $"ForgeLine Texture {description.Width}x{description.Height} Mips={description.MipCount}";
+            ID3D12Resource ownedResource = resource;
+            lifetime = RegisterResource(() =>
+            {
+                if (committed)
+                {
+                        ReleaseTexture(ownedResource, descriptorIndex, residentByteCount);
+                }
+                else
+                {
+                    ownedResource.Dispose();
+                }
+            });
 
             UploadTexture(
                 resource,
                 resourceDescription,
-                texture);
+                texture,
+                lifetime);
 
             descriptorIndex =
                 _shaderResourceDescriptors.Allocate();
@@ -516,13 +564,15 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                     _peakShaderResourceDescriptorsUsed,
                     _shaderResourceDescriptors.UsedCount);
 
+            committed = true;
             return new D3D12GraphicsTexture(
                 this,
                 description,
                 resource,
                 descriptorIndex,
                 gpuHandle,
-                texture.ResidentByteCount);
+                texture.ResidentByteCount,
+                lifetime);
         }
         catch
         {
@@ -532,7 +582,14 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                     descriptorIndex);
             }
 
-            resource?.Dispose();
+            if (lifetime is not null)
+            {
+                RetireResource(lifetime);
+            }
+            else
+            {
+                resource?.Dispose();
+            }
             throw;
         }
     }
@@ -542,6 +599,28 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         Action<IGraphicsCommandContext>? recordCommands = null)
     {
         ThrowIfDisposed();
+        ThrowIfRecording();
+        try
+        {
+            RenderFrameCore(clearColor, recordCommands);
+        }
+        catch (Exception exception)
+        {
+            _submissionFaultCount++;
+            _failure = exception as GraphicsDeviceException ??
+                new GraphicsDeviceException("Graphics frame failed; restart the client session.", exception);
+            Console.Error.WriteLine($"[graphics:frame-failed] reason={_failure.ReasonCode} message={exception.Message}");
+            throw;
+        }
+        finally
+        {
+            _recording = false;
+        }
+    }
+
+    private void RenderFrameCore(GraphicsColor clearColor, Action<IGraphicsCommandContext>? recordCommands)
+    {
+        _resources.Collect(GetCompletedFence());
 
         ApplyPendingResize();
 
@@ -563,6 +642,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         ID3D12CommandAllocator allocator = _commandAllocators[_frameIndex];
         allocator.Reset();
         _commandList.Reset(allocator);
+        _recording = true;
         BeginGpuTiming(
             _frameIndex);
 
@@ -615,7 +695,14 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             0,
             width,
             height);
-        recordCommands?.Invoke(context);
+        try
+        {
+            recordCommands?.Invoke(context);
+        }
+        finally
+        {
+            context.Close();
+        }
 
         EndGpuTiming(
             _frameIndex);
@@ -628,6 +715,8 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
 
         _commandQueue.ExecuteCommandList(_commandList);
         _submittedFrameCount++;
+        SignalSubmittedFrame();
+        _recording = false;
 
         var presentResult = _swapChain.Present(
             _configuration.EnableVSync ? 1u : 0u,
@@ -659,12 +748,13 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             _presentedFrameCount++;
         }
 
-        SignalSubmittedFrame();
+        _frameIndex = GetCurrentBackBufferIndex();
     }
 
     public void Resize(int width, int height)
     {
         ThrowIfDisposed();
+        ThrowIfRecording();
 
         if (!_surfaceLifecycle.RequestResize(
                 width,
@@ -690,21 +780,26 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     public void WaitForIdle()
     {
         ThrowIfDisposed();
+        ThrowIfRecording();
+        WaitForIdleCore();
+    }
+
+    private void WaitForIdleCore()
+    {
 
         ulong fenceValue = _nextFenceValue++;
-        _commandQueue.Signal(_frameFence, fenceValue);
+        CheckResult(_commandQueue.Signal(_frameFence, fenceValue), "fence-signal-failed");
 
-        if (_frameFence.CompletedValue < fenceValue)
-        {
-            _frameFence.SetEventOnCompletion(fenceValue, _frameFenceEvent);
-            _frameFenceEvent.WaitOne();
-        }
+        WaitForFence(fenceValue);
+        _resources.Collect(GetCompletedFence());
 
         Array.Clear(_frameFenceValues);
     }
 
     public void Dispose()
     {
+        VerifyOwner();
+        ThrowIfRecording();
         if (_disposed)
         {
             return;
@@ -712,36 +807,52 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
 
         try
         {
-            WaitForIdle();
+            WaitForIdleCore();
         }
         catch (Exception exception)
         {
             Console.Error.WriteLine(
                 $"[graphics:shutdown-warning] type={exception.GetType().Name} " +
                 $"message={exception.Message}");
+            if (!_device.DeviceRemovedReason.Failure)
+            {
+                // Retain native ownership if a live GPU has not retired its work.
+                _ = Interlocked.CompareExchange(ref s_unretiredDevice, this, null);
+                throw;
+            }
         }
 
-        ReleaseRenderTargets();
+        _resources.ReleaseAll();
+        DisposeNativeObjects();
+        _disposed = true;
+    }
 
-        foreach (ID3D12CommandAllocator allocator in _commandAllocators)
+    private void DisposeNativeObjects()
+    {
+        if (_renderTargets is not null)
         {
-            allocator.Dispose();
+            ReleaseRenderTargets();
+        }
+
+        foreach (ID3D12CommandAllocator? allocator in _commandAllocators ?? [])
+        {
+            allocator?.Dispose();
         }
 
         _timestampReadback?.Dispose();
         _timestampQueryHeap?.Dispose();
         _debugInfoQueue?.Dispose();
-        _commandList.Dispose();
-        _shaderResourceHeap.Dispose();
-        _dsvHeap.Dispose();
-        _rtvHeap.Dispose();
-        _swapChain.Dispose();
-        _frameFence.Dispose();
-        _frameFenceEvent.Dispose();
-        _commandQueue.Dispose();
+        _commandList?.Dispose();
+        _shaderResourceHeap?.Dispose();
+        _dsvHeap?.Dispose();
+        _rtvHeap?.Dispose();
+        _swapChain?.Dispose();
+        _frameFence?.Dispose();
+        _frameFenceEvent?.Dispose();
+        _commandQueue?.Dispose();
 
 #if DEBUG
-        if (_deviceInfo.DebugLayerEnabled)
+        if (_deviceInfo?.DebugLayerEnabled == true)
         {
             using ID3D12DebugDevice? debugDevice =
                 _device.QueryInterfaceOrNull<ID3D12DebugDevice>();
@@ -751,9 +862,8 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         }
 #endif
 
-        _device.Dispose();
-        _factory.Dispose();
-        _disposed = true;
+        _device?.Dispose();
+        _factory?.Dispose();
     }
 
     internal ID3D12DescriptorHeap ShaderResourceHeap =>
@@ -777,7 +887,6 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             return;
         }
 
-        WaitForIdle();
         resource.Dispose();
         _shaderResourceDescriptors.Release(
             descriptorIndex);
@@ -998,7 +1107,8 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     private void UploadTexture(
         ID3D12Resource destination,
         ResourceDescription resourceDescription,
-        GraphicsTextureData texture)
+        GraphicsTextureData texture,
+        GraphicsResourceRetirement.Resource destinationLifetime)
     {
         int mipCount =
             texture.Description.MipCount;
@@ -1069,61 +1179,85 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             }
         }
 
-        using ID3D12Resource upload =
-            _device.CreateCommittedResource(
-                HeapType.Upload,
-                ResourceDescription.Buffer(uploadSize),
-                ResourceStates.GenericRead);
-        upload.Name =
-            "ForgeLine Texture Upload";
-        upload.SetData<byte>(
-            uploadBytes);
-
-        using ID3D12CommandAllocator allocator =
-            _device.CreateCommandAllocator(
-                CommandListType.Direct);
-        using ID3D12GraphicsCommandList uploadList =
-            _device.CreateCommandList<ID3D12GraphicsCommandList>(
-                CommandListType.Direct,
-                allocator);
-
-        for (int mipIndex = 0;
-             mipIndex < mipCount;
-             mipIndex++)
+        var staging = new List<GraphicsResourceRetirement.Resource>(3);
+        try
         {
-            uploadList.CopyTextureRegion(
-                new TextureCopyLocation(
-                    destination,
-                    checked((uint)mipIndex)),
-                0,
-                0,
-                0,
-                new TextureCopyLocation(
-                    upload,
-                    layouts[mipIndex]));
+            ID3D12Resource upload =
+                _device.CreateCommittedResource(
+                    HeapType.Upload,
+                    ResourceDescription.Buffer(uploadSize),
+                    ResourceStates.GenericRead);
+            staging.Add(RegisterResource(upload.Dispose));
+            upload.Name =
+                "ForgeLine Texture Upload";
+            upload.SetData<byte>(
+                uploadBytes);
+
+            ID3D12CommandAllocator allocator =
+                _device.CreateCommandAllocator(
+                    CommandListType.Direct);
+            staging.Add(RegisterResource(allocator.Dispose));
+            ID3D12GraphicsCommandList uploadList =
+                _device.CreateCommandList<ID3D12GraphicsCommandList>(
+                    CommandListType.Direct,
+                    allocator);
+            staging.Add(RegisterResource(uploadList.Dispose));
+
+            for (int mipIndex = 0;
+                 mipIndex < mipCount;
+                 mipIndex++)
+            {
+                uploadList.CopyTextureRegion(
+                    new TextureCopyLocation(
+                        destination,
+                        checked((uint)mipIndex)),
+                    0,
+                    0,
+                    0,
+                    new TextureCopyLocation(
+                        upload,
+                        layouts[mipIndex]));
+            }
+
+            uploadList.ResourceBarrierTransition(
+                destination,
+                ResourceStates.CopyDest,
+                ResourceStates.PixelShaderResource);
+            uploadList.Close();
+
+            destinationLifetime.Recording = true;
+            foreach (GraphicsResourceRetirement.Resource item in staging)
+            {
+                item.Recording = true;
+            }
+            _commandQueue.ExecuteCommandList(
+                uploadList);
+
+            ulong fenceValue =
+                _nextFenceValue++;
+            CheckResult(_commandQueue.Signal(
+                _frameFence,
+                fenceValue), "upload-signal-failed");
+            destinationLifetime.LastUseFence = fenceValue;
+            destinationLifetime.Recording = false;
+            foreach (GraphicsResourceRetirement.Resource item in staging)
+            {
+                item.LastUseFence = fenceValue;
+                item.Recording = false;
+            }
+            WaitForFence(fenceValue);
         }
-
-        uploadList.ResourceBarrierTransition(
-            destination,
-            ResourceStates.CopyDest,
-            ResourceStates.PixelShaderResource);
-        uploadList.Close();
-
-        _commandQueue.ExecuteCommandList(
-            uploadList);
-
-        ulong fenceValue =
-            _nextFenceValue++;
-        _commandQueue.Signal(
-            _frameFence,
-            fenceValue);
-
-        if (_frameFence.CompletedValue < fenceValue)
+        catch (Exception exception)
         {
-            _frameFence.SetEventOnCompletion(
-                fenceValue,
-                _frameFenceEvent);
-            _frameFenceEvent.WaitOne();
+            _failure = exception as GraphicsDeviceException ?? new GraphicsDeviceException("Texture upload failed.", exception);
+            throw;
+        }
+        finally
+        {
+            foreach (GraphicsResourceRetirement.Resource item in staging)
+            {
+                RetireResource(item);
+            }
         }
     }
 
@@ -1271,13 +1405,12 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     {
         ulong fenceValue =
             _nextFenceValue++;
-        _commandQueue.Signal(
+        CheckResult(_commandQueue.Signal(
             _frameFence,
-            fenceValue);
+            fenceValue), "fence-signal-failed");
         _frameFenceValues[_frameIndex] =
             fenceValue;
-        _frameIndex =
-            GetCurrentBackBufferIndex();
+        _resources.CompleteRecording(fenceValue);
     }
 
     private int GetCurrentBackBufferIndex()
@@ -1300,13 +1433,11 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     private void WaitForFrame(int frameIndex)
     {
         ulong fenceValue = _frameFenceValues[frameIndex];
-        if (fenceValue == 0 || _frameFence.CompletedValue >= fenceValue)
+        if (fenceValue == 0)
         {
             return;
         }
-
-        _frameFence.SetEventOnCompletion(fenceValue, _frameFenceEvent);
-        _frameFenceEvent.WaitOne();
+        WaitForFence(fenceValue);
     }
 
     private static Format ToNativeFormat(GraphicsVertexElementFormat format) =>
@@ -1327,7 +1458,8 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         return new GraphicsDeviceException(
             $"{message} HRESULT=0x{resultCode:X8}; " +
             $"deviceRemovedReason=0x{removedReason:X8}; " +
-            $"adapter=\"{_deviceInfo.AdapterName}\".");
+            $"adapter=\"{_deviceInfo.AdapterName}\".",
+            removedReason < 0 ? "device-removed" : "presentation-failed");
     }
 
     private static bool TryEnableDebugLayer(bool requested)
@@ -1425,6 +1557,116 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
 
     private void ThrowIfDisposed()
     {
+        VerifyOwner();
         ObjectDisposedException.ThrowIf(_disposed, this);
+        if (_failure is not null)
+        {
+            throw _failure;
+        }
+    }
+
+    private void VerifyOwner()
+    {
+        if (Environment.CurrentManagedThreadId != _ownerThreadId)
+        {
+            throw new InvalidOperationException("Graphics operations must run on the creating render thread.");
+        }
+    }
+
+    private void ThrowIfRecording()
+    {
+        if (_recording)
+        {
+            throw new InvalidOperationException("This graphics operation is unavailable during frame recording.");
+        }
+    }
+
+    internal GraphicsResourceRetirement.Resource RegisterResource(Action release) => _resources.Register(release);
+
+    internal void UseResource(GraphicsResourceRetirement.Resource resource)
+    {
+        ValidateRecording();
+        _resources.Use(resource);
+    }
+
+    internal void ValidateRecording()
+    {
+        ThrowIfDisposed();
+        if (!_recording)
+        {
+            throw new InvalidOperationException("Command recording has ended.");
+        }
+    }
+
+    internal void ValidateWrite(GraphicsResourceRetirement.Resource resource)
+    {
+        ThrowIfDisposed();
+        resource.ValidateWrite(GetCompletedFence());
+    }
+
+    internal void RetireResource(GraphicsResourceRetirement.Resource resource)
+    {
+        VerifyOwner();
+        if (resource.IsDisposed)
+        {
+            return;
+        }
+        if (_failure is not null || _device.DeviceRemovedReason.Failure)
+        {
+            resource.IsDisposed = true;
+            return;
+        }
+        ulong completed = GetCompletedFence();
+        _resources.Collect(completed);
+        if (_resources.PendingCount == GraphicsResourceRetirement.Capacity && !_recording)
+        {
+            WaitForIdleCore();
+            completed = GetCompletedFence();
+        }
+        _resources.Retire(resource, completed);
+    }
+
+    private ulong GetCompletedFence()
+    {
+        ulong value = _frameFence.CompletedValue;
+        if (value == ulong.MaxValue)
+        {
+            throw CreateDeviceFailure("Direct3D 12 device removed during fence observation.", _device.DeviceRemovedReason.Code);
+        }
+        return value;
+    }
+
+    private void WaitForFence(ulong fenceValue)
+    {
+        if (GetCompletedFence() >= fenceValue)
+        {
+            return;
+        }
+        _fenceWaitCount++;
+        CheckResult(_frameFence.SetEventOnCompletion(fenceValue, _frameFenceEvent), "fence-event-failed");
+        long started = System.Diagnostics.Stopwatch.GetTimestamp();
+        while (!_frameFenceEvent.WaitOne(100))
+        {
+            if (GetCompletedFence() >= fenceValue)
+            {
+                return;
+            }
+            if (System.Diagnostics.Stopwatch.GetElapsedTime(started) >= TimeSpan.FromSeconds(10))
+            {
+                throw new GraphicsDeviceException("GPU fence did not complete within ten seconds; restart the client session.", "fence-timeout");
+            }
+        }
+        _ = GetCompletedFence();
+    }
+
+    private void CheckResult(SharpGen.Runtime.Result result, string reasonCode)
+    {
+        if (result.Failure)
+        {
+            int removedReason = _device.DeviceRemovedReason.Code;
+            throw new GraphicsDeviceException(
+                $"Direct3D 12 operation failed. HRESULT=0x{result.Code:X8}; deviceRemovedReason=0x{removedReason:X8}; adapter=\"{_deviceInfo.AdapterName}\".",
+                removedReason < 0 ? "device-removed" : reasonCode);
+        }
     }
 }

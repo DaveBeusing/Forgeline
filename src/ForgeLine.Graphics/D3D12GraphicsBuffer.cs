@@ -6,6 +6,7 @@ namespace ForgeLine.Graphics;
 internal sealed class D3D12GraphicsBuffer : IGraphicsBuffer
 {
     private ID3D12Resource? _resource;
+    internal GraphicsResourceRetirement.Resource Lifetime { get; }
 
     internal D3D12GraphicsBuffer(
         D3D12GraphicsDevice owner,
@@ -15,6 +16,7 @@ internal sealed class D3D12GraphicsBuffer : IGraphicsBuffer
         Owner = owner;
         Description = description;
         _resource = resource;
+        Lifetime = owner.RegisterResource(resource.Dispose);
     }
 
     public GraphicsBufferDescription Description { get; }
@@ -27,6 +29,7 @@ internal sealed class D3D12GraphicsBuffer : IGraphicsBuffer
     public void SetData<T>(ReadOnlySpan<T> data, int offsetInBytes = 0)
         where T : unmanaged
     {
+        Owner.ValidateWrite(Lifetime);
         if (Description.Memory != GraphicsBufferMemory.Upload)
         {
             throw new InvalidOperationException(
@@ -54,7 +57,7 @@ internal sealed class D3D12GraphicsBuffer : IGraphicsBuffer
 
     public void Dispose()
     {
-        _resource?.Dispose();
+        Owner.RetireResource(Lifetime);
         _resource = null;
     }
 }

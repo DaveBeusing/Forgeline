@@ -4,7 +4,7 @@ namespace ForgeLine.Graphics;
 
 internal sealed class D3D12GraphicsTexture : IGraphicsTexture
 {
-    private ID3D12Resource? _resource;
+    internal GraphicsResourceRetirement.Resource Lifetime { get; }
 
     internal D3D12GraphicsTexture(
         D3D12GraphicsDevice owner,
@@ -12,14 +12,15 @@ internal sealed class D3D12GraphicsTexture : IGraphicsTexture
         ID3D12Resource resource,
         int descriptorIndex,
         GpuDescriptorHandle gpuDescriptorHandle,
-        long residentByteCount)
+        long residentByteCount,
+        GraphicsResourceRetirement.Resource lifetime)
     {
         Owner = owner;
         Description = description;
-        _resource = resource;
         DescriptorIndex = descriptorIndex;
         GpuDescriptorHandle = gpuDescriptorHandle;
         ResidentByteCount = residentByteCount;
+        Lifetime = lifetime;
     }
 
     public GraphicsTextureDescription Description { get; }
@@ -33,21 +34,10 @@ internal sealed class D3D12GraphicsTexture : IGraphicsTexture
     internal long ResidentByteCount { get; }
 
     internal bool IsDisposed =>
-        _resource is null;
+        Lifetime.IsDisposed;
 
     public void Dispose()
     {
-        ID3D12Resource? resource =
-            Interlocked.Exchange(ref _resource, null);
-
-        if (resource is null)
-        {
-            return;
-        }
-
-        Owner.ReleaseTexture(
-            resource,
-            DescriptorIndex,
-            ResidentByteCount);
+        Owner.RetireResource(Lifetime);
     }
 }
