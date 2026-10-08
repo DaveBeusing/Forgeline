@@ -13,6 +13,73 @@ public sealed class ClientSimulationHostTests
         TimeSpan.FromSeconds(5);
 
     [Fact]
+    public async Task ConcurrentRenderDisposersWaitForTheActiveFrame()
+    {
+        using var entered = new ManualResetEventSlim();
+        using var release = new ManualResetEventSlim();
+        using var host = new ClientRenderHost(_ =>
+        {
+            entered.Set();
+            release.Wait(TestContext.Current.CancellationToken);
+        });
+        host.Publish(CreateRenderFrame(800));
+        Assert.True(entered.Wait(TestTimeout, TestContext.Current.CancellationToken));
+        Task first = Task.Run(host.Dispose, TestContext.Current.CancellationToken);
+        Task second = Task.Run(host.Dispose, TestContext.Current.CancellationToken);
+        try
+        {
+            Assert.True(SpinWait.SpinUntil(() => host.IsStopping, TestTimeout));
+            Assert.False(first.IsCompleted);
+            Assert.False(second.IsCompleted);
+            Assert.False(host.Publish(CreateRenderFrame(1024)));
+        }
+        finally
+        {
+            release.Set();
+        }
+        await Task.WhenAll(first, second).WaitAsync(TestTimeout, TestContext.Current.CancellationToken);
+        Assert.False(host.IsExecutionThreadAlive);
+        host.Dispose();
+    }
+
+    [Fact]
+    public async Task ConcurrentSimulationDisposersWaitForTheActiveTick()
+    {
+        using var slowSystem = new ControlledSlowSystem(new SimulationTick(2), TestContext.Current.CancellationToken);
+        using ClientHostFixture fixture = ClientHostFixture.Create(additionalSystem: slowSystem);
+        Assert.True(slowSystem.Entered.Wait(TestTimeout, TestContext.Current.CancellationToken));
+        Task first = Task.Run(fixture.Host.Dispose, TestContext.Current.CancellationToken);
+        Task second = Task.Run(fixture.Host.Dispose, TestContext.Current.CancellationToken);
+        try
+        {
+            Assert.True(SpinWait.SpinUntil(() => fixture.Host.IsStopping, TestTimeout));
+            Assert.False(first.IsCompleted);
+            Assert.False(second.IsCompleted);
+            Assert.False(fixture.Host.TrySetPaused(true));
+        }
+        finally
+        {
+            slowSystem.Release();
+        }
+        await Task.WhenAll(first, second).WaitAsync(TestTimeout, TestContext.Current.CancellationToken);
+        Assert.False(fixture.Host.IsExecutionThreadAlive);
+    }
+
+    [Fact]
+    public void FaultingSubmissionPublishesOneCompletionAndRestoresBoundaryAccounting()
+    {
+        using ClientHostFixture fixture = ClientHostFixture.Create();
+        Assert.True(fixture.Host.TrySubmit(fixture.Host.SessionId, static _ =>
+            throw new InvalidOperationException("controlled submission failure")));
+        Assert.True(fixture.Host.WaitForFault(TestTimeout));
+        Assert.Throws<InvalidOperationException>(fixture.Host.ThrowIfFaulted);
+        Assert.True(fixture.Host.TryReadSubmissionCompletion(out ClientSubmissionCompletion completion));
+        Assert.Equal(ClientSubmissionFailure.Faulted, completion.Failure);
+        Assert.False(fixture.Host.TryReadSubmissionCompletion(out _));
+        Assert.Equal(0, fixture.Host.OutstandingHostMessages);
+    }
+
+    [Fact]
     public void SimulationOwnerAdvancesWithoutBlockingCallingThread()
     {
         using var slowSystem =

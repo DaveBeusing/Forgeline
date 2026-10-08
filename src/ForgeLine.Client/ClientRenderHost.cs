@@ -112,6 +112,8 @@ internal sealed class ClientRenderHost : IDisposable
         TimeSpan.FromSeconds(1);
 
     private readonly object _frameGate = new();
+    private readonly object _disposeGate = new();
+    private readonly object _faultWaitGate = new();
     private readonly GraphicsWindowTarget? _initialTarget;
     private readonly TerrainWorld? _terrain;
     private readonly PresentationSnapshotBuffer? _snapshots;
@@ -128,6 +130,9 @@ internal sealed class ClientRenderHost : IDisposable
     private ClientVisualQualificationSnapshot? _latestQualification;
     private ExceptionDispatchInfo? _failure;
     private int _stopping;
+    private long _publishedFrames;
+    private long _completedFrames;
+    private long _lastCompletedFrameAt;
     private bool _disposed;
 
     public ClientRenderHost(
@@ -158,9 +163,7 @@ internal sealed class ClientRenderHost : IDisposable
 
         _thread =
             CreateThread();
-        _thread.Start();
-        _started.Wait();
-        ThrowIfFaulted();
+        StartAndWait();
     }
 
     internal ClientRenderHost(
@@ -173,13 +176,19 @@ internal sealed class ClientRenderHost : IDisposable
             SceneLightingSettings.Default;
         _thread =
             CreateThread();
-        _thread.Start();
-        _started.Wait();
-        ThrowIfFaulted();
+        StartAndWait();
     }
 
     internal bool IsExecutionThreadAlive =>
         _thread.IsAlive;
+    internal bool IsStopping => Volatile.Read(ref _stopping) != 0;
+    internal ClientRenderHealth Health => new(
+        IsExecutionThreadAlive,
+        IsStopping,
+        Volatile.Read(ref _publishedFrames),
+        Volatile.Read(ref _completedFrames),
+        Volatile.Read(ref _lastCompletedFrameAt),
+        Volatile.Read(ref _failure) is not null);
 
     internal ClientVisualQualificationSnapshot? LatestQualification
     {
@@ -198,7 +207,11 @@ internal sealed class ClientRenderHost : IDisposable
         ArgumentOutOfRangeException.ThrowIfLessThan(
             timeout,
             TimeSpan.Zero);
-        return _faulted.Wait(timeout);
+        lock (_faultWaitGate)
+        {
+            ThrowIfDisposed();
+            return _faulted.Wait(timeout);
+        }
     }
 
     private Thread CreateThread() =>
@@ -236,10 +249,17 @@ internal sealed class ClientRenderHost : IDisposable
 
         lock (_frameGate)
         {
+            ThrowIfDisposed();
+            ThrowIfFaulted();
+            if (Volatile.Read(ref _stopping) != 0)
+            {
+                return false;
+            }
             _latestFrame = copied;
+            Interlocked.Increment(ref _publishedFrames);
+            _signal.Set();
         }
 
-        _signal.Set();
         return true;
     }
 
@@ -250,25 +270,49 @@ internal sealed class ClientRenderHost : IDisposable
 
     public void Dispose()
     {
-        if (_disposed)
+        if (Thread.CurrentThread == _thread)
         {
-            return;
+            throw new InvalidOperationException("The render owner cannot join itself.");
         }
-
-        Interlocked.Exchange(
-            ref _stopping,
-            1);
-        _signal.Set();
-
-        if (Thread.CurrentThread != _thread)
+        lock (_disposeGate)
         {
+            lock (_frameGate)
+            {
+                if (_disposed)
+                {
+                    return;
+                }
+                Volatile.Write(ref _stopping, 1);
+                _signal.Set();
+            }
             _thread.Join();
+            lock (_frameGate)
+            {
+                lock (_faultWaitGate)
+                {
+                    _faulted.Dispose();
+                    _disposed = true;
+                }
+                _started.Dispose();
+                _signal.Dispose();
+                _disposed = true;
+            }
         }
+    }
 
-        _faulted.Dispose();
-        _started.Dispose();
-        _signal.Dispose();
-        _disposed = true;
+    private void StartAndWait()
+    {
+        _thread.Start();
+        try
+        {
+            _started.Wait();
+            ThrowIfFaulted();
+        }
+        catch
+        {
+            Dispose();
+            throw;
+        }
     }
 
     private void RenderLoop()
@@ -546,6 +590,8 @@ internal sealed class ClientRenderHost : IDisposable
 
                 long renderFinishedAt =
                     Stopwatch.GetTimestamp();
+                Interlocked.Increment(ref _completedFrames);
+                Volatile.Write(ref _lastCompletedFrameAt, renderFinishedAt);
                 TimeSpan frameElapsed =
                     StopwatchElapsed(
                         previousFrameAt,
@@ -591,6 +637,7 @@ internal sealed class ClientRenderHost : IDisposable
                         $"draws={terrainRenderer.LastDiagnostics.DrawCalls + instanceRenderer.LastDiagnostics.DrawCalls + gameplayOverlayRenderer.LastDiagnostics.DrawCalls + debugDrawRenderer.LastDiagnostics.DrawCalls} " +
                         $"debugLines={debugDrawRenderer.LastDiagnostics.RenderedLines} " +
                         $"debugCpuMs={debugOverlayCpuMilliseconds:F3} " +
+                        $"pendingRetirement={graphics.Diagnostics.Health.PendingRetirementCount} " +
                         $"terrainSubmitMs={terrainRenderer.LastDiagnostics.CpuSubmissionMilliseconds:F3} " +
                         $"terrainTextures={terrainRenderer.LastDiagnostics.TextureBindingsPerDraw} " +
                         $"light={_sceneLighting.DirectionalIntensity:F2}/{_sceneLighting.AmbientIntensity:F2} " +
@@ -638,6 +685,8 @@ internal sealed class ClientRenderHost : IDisposable
             {
                 renderAction(
                     frame.Value);
+                Interlocked.Increment(ref _completedFrames);
+                Volatile.Write(ref _lastCompletedFrameAt, Stopwatch.GetTimestamp());
             }
         }
     }
@@ -874,7 +923,15 @@ internal sealed class ClientRenderHost : IDisposable
     private void ThrowIfDisposed()
     {
         ObjectDisposedException.ThrowIf(
-            _disposed,
+            Volatile.Read(ref _disposed),
             this);
     }
 }
+
+internal readonly record struct ClientRenderHealth(
+    bool ThreadAlive,
+    bool Stopping,
+    long PublishedFrames,
+    long CompletedFrames,
+    long LastCompletedFrameTimestamp,
+    bool Faulted);

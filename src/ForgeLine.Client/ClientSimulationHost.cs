@@ -14,7 +14,8 @@ internal enum ClientSubmissionFailure : byte
     BoundaryFull = 1,
     OldSession = 2,
     Terminal = 3,
-    Stopping = 4
+    Stopping = 4,
+    Faulted = 5
 }
 
 internal readonly record struct ClientSubmissionCompletion(
@@ -33,6 +34,8 @@ internal sealed class ClientSimulationHost : IDisposable
     private const int MaximumCatchUpTicks = 5;
 
     private readonly object _boundaryGate = new();
+    private readonly object _disposeGate = new();
+    private readonly object _faultWaitGate = new();
     private readonly object _progressGate = new();
     private readonly VerticalSliceScenario _scenario;
     private readonly SimulationCoordinator _simulation;
@@ -99,8 +102,16 @@ internal sealed class ClientSimulationHost : IDisposable
                 Name = "ForgeLine Simulation"
             };
         _thread.Start();
-        _started.Wait();
-        ThrowIfFaulted();
+        try
+        {
+            _started.Wait();
+            ThrowIfFaulted();
+        }
+        catch
+        {
+            Dispose();
+            throw;
+        }
     }
 
     public SimulationSessionId SessionId =>
@@ -327,6 +338,7 @@ internal sealed class ClientSimulationHost : IDisposable
 
     internal bool IsExecutionThreadAlive =>
         _thread.IsAlive;
+    internal bool IsStopping => Volatile.Read(ref _stopping) != 0;
 
     internal bool WaitForFault(
         TimeSpan timeout)
@@ -334,7 +346,11 @@ internal sealed class ClientSimulationHost : IDisposable
         ArgumentOutOfRangeException.ThrowIfLessThan(
             timeout,
             TimeSpan.Zero);
-        return _faulted.Wait(timeout);
+        lock (_faultWaitGate)
+        {
+            ThrowIfDisposed();
+            return _faulted.Wait(timeout);
+        }
     }
 
     public bool TrySubmit(
@@ -399,26 +415,35 @@ internal sealed class ClientSimulationHost : IDisposable
 
     public void Dispose()
     {
-        if (_disposed)
+        if (Thread.CurrentThread == _thread)
         {
-            return;
+            throw new InvalidOperationException("The simulation owner cannot join itself.");
         }
-
-        Interlocked.Exchange(
-            ref _stopping,
-            1);
-        _signal.Set();
-
-        if (Thread.CurrentThread !=
-            _thread)
+        lock (_disposeGate)
         {
+            lock (_boundaryGate)
+            {
+                if (_disposed)
+                {
+                    return;
+                }
+                Volatile.Write(ref _stopping, 1);
+                _signal.Set();
+            }
             _thread.Join();
+            lock (_boundaryGate)
+            {
+                lock (_faultWaitGate)
+                {
+                    _faulted.Dispose();
+                    _disposed = true;
+                }
+                _started.Dispose();
+                _signal.Dispose();
+                _disposed = true;
+            }
         }
-
-        _faulted.Dispose();
-        _started.Dispose();
-        _signal.Dispose();
-        _disposed = true;
+        NotifyProgress();
     }
 
     private void SimulationLoop()
@@ -525,8 +550,13 @@ internal sealed class ClientSimulationHost : IDisposable
         }
         finally
         {
+            lock (_boundaryGate)
+            {
+                Volatile.Write(ref _stopping, 1);
+            }
             RejectRemainingSubmissions(
-                ClientSubmissionFailure.Stopping);
+                _failure is null ? ClientSubmissionFailure.Stopping : ClientSubmissionFailure.Faulted);
+            NotifyProgress();
         }
     }
 
@@ -611,14 +641,16 @@ internal sealed class ClientSimulationHost : IDisposable
             return;
         }
 
-        PlayerCommandSubmissionReceipt receipt =
-            message.Submission!(
-                _commands);
-
-        PublishCompletion(
-            message.Sequence,
-            ClientSubmissionFailure.None,
-            receipt);
+        try
+        {
+            PlayerCommandSubmissionReceipt receipt = message.Submission!(_commands);
+            PublishCompletion(message.Sequence, ClientSubmissionFailure.None, receipt);
+        }
+        catch
+        {
+            PublishCompletion(message.Sequence, ClientSubmissionFailure.Faulted, receipt: null);
+            throw;
+        }
     }
 
     private void ProcessPauseChange(bool paused)
@@ -735,6 +767,12 @@ internal sealed class ClientSimulationHost : IDisposable
 
         lock (_boundaryGate)
         {
+            ThrowIfDisposed();
+            ThrowIfFaulted();
+            if (Volatile.Read(ref _stopping) != 0)
+            {
+                return false;
+            }
             if (_queuedCount +
                 _inFlightSubmissions +
                 _completionCount >=
@@ -746,9 +784,9 @@ internal sealed class ClientSimulationHost : IDisposable
             _messages.Enqueue(
                 message);
             _queuedCount++;
+            _signal.Set();
         }
 
-        _signal.Set();
         return true;
     }
 
@@ -858,7 +896,7 @@ internal sealed class ClientSimulationHost : IDisposable
     private void ThrowIfDisposed()
     {
         ObjectDisposedException.ThrowIf(
-            _disposed,
+            Volatile.Read(ref _disposed),
             this);
     }
 
