@@ -130,10 +130,12 @@ internal sealed class ClientFrontendRenderHost : IDisposable
     }
 
     internal static bool ObservePresentation(StartupDiagnostics startup, ulong previous, ulong current,
-        FrontendSurfaceKind kind, bool splashRendered)
+        FrontendSurfaceKind kind, bool splashRendered, bool bootstrapRendered = false)
     {
         if (current <= previous) return false;
         startup.Mark(StartupPhase.FirstPresentedFrame);
+        if (kind == FrontendSurfaceKind.StudioSplash && bootstrapRendered)
+            startup.Mark(StartupPhase.SplashBootstrapFirstFrame);
         if (kind == FrontendSurfaceKind.StudioSplash && splashRendered)
             startup.Mark(StartupPhase.StudioSplashFirstFrame);
         if (kind == FrontendSurfaceKind.MainMenu)
@@ -175,7 +177,7 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                 }
 
                 if (view.Value.Kind == FrontendSurfaceKind.StudioSplash &&
-                    splashRenderer is null && splashAssets is not null)
+                    !view.Value.SplashBootstrap && splashRenderer is null && splashAssets is not null)
                 {
                     try
                     {
@@ -195,6 +197,7 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                     context =>
                     {
                         if (view.Value.Kind == FrontendSurfaceKind.StudioSplash &&
+                            !view.Value.SplashBootstrap &&
                             splashRenderer?.HasAssets == true)
                         {
                             splashRenderer.Render(context,
@@ -207,7 +210,9 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                         }
                     });
                 if (_startup.Enabled && ObservePresentation(_startup, _presentedFrames,
-                    graphics.PresentedFrameCount, view.Value.Kind, splashRenderer?.HasAssets == true))
+                    graphics.PresentedFrameCount, view.Value.Kind,
+                    !view.Value.SplashBootstrap && splashRenderer?.HasAssets == true,
+                    view.Value.SplashBootstrap))
                 {
                     _presentedFrames = graphics.PresentedFrameCount;
                 }
