@@ -149,12 +149,13 @@ Simulation code is written in a deterministic-friendly style:
 
 Perfect cross-machine bit-level determinism is not a first-prototype requirement.
 
-## Shared Vertical-Slice Runtime Composition
+## Shared Match Runtime Composition
 
-`VerticalSliceScenario` is the authoritative construction path for the canonical vertical-slice gameplay runtime. The Windows client, headless vertical-slice execution, and scenario-level tests delegate world, entity, inventory, logistics, intelligence, navigation, combat, supply, production, objective, and opponent-system construction to this game-layer composition instead of recreating parallel stacks.
+`MatchRuntime` is the authoritative construction path for the shared match runtime. The Windows client, headless match execution, and scenario-level tests delegate world, entity, inventory, logistics, intelligence, navigation, combat, supply, production, objective, and opponent-system construction to this game-layer composition instead of recreating parallel stacks.
 
-`VerticalSliceRuntimeSettings` makes host choices explicit:
+`MatchRuntimeSettings` makes host choices explicit:
 
+- authored map, content catalogs, terrain/spawn factories and system selection;
 - scenario profile and deterministic seed;
 - participant/start assignments and computer-control flags;
 - diagnostics and spatial-query timing;
@@ -167,13 +168,13 @@ The `Gameplay` profile retains product-facing navigation and distribution behavi
 
 Navigation is constructed once inside the shared runtime. Starting static gameplay entities are incorporated into the initial navigation obstacle set, then the same `HierarchicalNavigationSystem` instance is supplied to `CargoTransportSystem` and `StrategicInfrastructureSystem`. Cargo approach projection and later infrastructure topology invalidation consequently observe the same navigation world.
 
-Scheduler ownership is explicit. A host-provided `JobScheduler` remains host-owned and is not disposed by `VerticalSliceScenario`; a runtime-owned scheduler is disposed with the scenario and also cleaned up if scenario creation fails. Headless execution may deliberately run without a scheduler. Disposing a scenario never owns or tears down an externally supplied scheduler.
+Scheduler ownership is explicit. A host-provided `JobScheduler` remains host-owned and is not disposed by `MatchRuntime`; a runtime-owned scheduler is disposed with the scenario and also cleaned up if scenario creation fails. Headless execution may deliberately run without a scheduler. Disposing a scenario never owns or tears down an externally supplied scheduler.
 
-A restart constructs a new `VerticalSliceScenario`. Authoritative ECS state, inventories, routes, controller state, navigation requests, orders, and match state are therefore recreated rather than retained from the prior match.
+A restart constructs a new `MatchRuntime`. Authoritative ECS state, inventories, routes, controller state, navigation requests, orders, and match state are therefore recreated rather than retained from the prior match.
 
 ## Headless Runtime
 
-`ForgeLine.Headless` delegates vertical-slice gameplay construction to `VerticalSliceScenario` and adds only headless execution, cancellation, diagnostics/reporting, and command-line configuration. It has no graphics, audio, UI, presentation, client, or Windows-windowing dependency.
+`ForgeLine.Headless` delegates match composition to `MatchRuntime` and adds only headless execution, cancellation, diagnostics/reporting, and command-line configuration. It has no graphics, audio, UI, presentation, client, or Windows-windowing dependency.
 
 Headless execution supports a configurable tick count, deterministic seed, and logical tick-rate override. It intentionally runs faster than real time when work permits; wall-clock timing is used only for host diagnostics and never to mutate simulation state.
 
@@ -301,13 +302,13 @@ See `docs/CombatOrdersAndReadiness.md`. Directorate faction data, stable unit de
 
 ## Prototype Battlefield and Strategic Infrastructure Boundary
 
-The canonical `Central Divide` battlefield is game content, not a presentation script. `PrototypeBattlefieldDefinition` owns stable map metadata, starts, finite resource locations, build/expansion sites, road topology, crossings, and Command Core objective positions. `PrototypeBattlefieldTerrainFactory` produces the deterministic chunked `TerrainWorld`, and `PrototypeBattlefieldRuntime` materializes finite deposits and the road corridor through the existing economy and logistics types.
+The canonical `Central Divide` battlefield is game content, not a presentation script. `BattlefieldDefinition` owns stable map metadata, starts, finite resource locations, build/expansion sites, road topology, crossings, and Command Core objective positions. `CentralDivideTerrainFactory` produces the deterministic chunked `TerrainWorld`, and `BattlefieldRuntime` materializes finite deposits and the road corridor through the existing economy and logistics types.
 
 Strategic crossings use the generic `StrategicInfrastructure` / `StrategicInfrastructureState` lifecycle. `StrategicInfrastructureSystem` is simulation-authoritative: disabling a crossing disables its real logistics edge and publishes a new `NavigationWorld` with that crossing blocked. The new navigation version invalidates cached/stale paths through the existing navigation boundary. Restoration remains unavailable while its fixed-tick progress advances and only re-enables logistics and navigation on completion.
 
 `MatchObjectiveSystem` owns match completion state. Command Core objective registration adds the normal combat-target components required by the existing targeting, damage, and entity-lifecycle systems rather than introducing objective-specific damage. Presentation may visualize map landmarks and infrastructure state, but it never decides reachability, restoration, or victory.
 
-See `docs/PrototypeBattlefield.md`.
+See `docs/CentralDivideBattlefield.md`.
 
 
 ## Skirmish Opponent Authority Boundary
@@ -345,3 +346,5 @@ Minimize/pause, terminal freeze/acknowledgement, restart, shutdown, and owner fa
 `ForgeLine.Game` owns stable world-presentation identities and canonical Central Divide placement data without reading asset files. `ForgeLine.Presentation` maps those identities to stable runtime asset IDs, derives resource presentation state, selects LODs, and caches compiled mesh buffers. `ForgeLine.Client` loads the generated `RuntimeAssetCatalog` and passes it to the render host.
 
 This preserves the intended direction: source assets -> Asset Compiler -> runtime assets -> Presentation/Graphics. Simulation never loads source or runtime rendering assets.
+
+Reusable match ownership, injected composition, preset boundaries and schema migration are specified in [Match Runtime and Scenario Composition](adr/MatchRuntimeAndScenarioComposition.md).

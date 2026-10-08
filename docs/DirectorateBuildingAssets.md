@@ -146,7 +146,7 @@ The initial Directorate road kit contains:
 - damaged segment;
 - destroyed segment.
 
-Central Divide already owns a real `GroundRoad` logistics graph. `PrototypeBattlefieldRuntime` creates presentation-only road geometry from those authoritative node positions. The visual entities never participate in routing, capacity, collision, or navigation.
+Central Divide already owns a real `GroundRoad` logistics graph. `BattlefieldRuntime` creates presentation-only road geometry from those authoritative node positions. The visual entities never participate in routing, capacity, collision, or navigation.
 
 Each non-crossing edge now renders a 12-meter primary surface plus two 2.4-meter shoulders. The surface follows the endpoint height slope while the shoulders use a separate gravel/dirt material family to establish a readable transition into surrounding terrain. Road nodes inspect only the already-authored graph connectivity to choose presentation geometry: degree-two turns receive short/long curve overlays, three-way nodes receive T-junction surfaces, and four-way nodes can use the cross-junction asset. These overlays smooth the visual topology without creating or modifying a logistics edge.
 

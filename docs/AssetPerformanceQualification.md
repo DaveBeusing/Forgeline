@@ -79,7 +79,7 @@ Any error makes qualification fail and returns a non-zero Asset Compiler exit co
 
 ## Integrated Vertical Slice Visual Scene
 
-The canonical integrated smoke scene is the normal Windows client running the actual VerticalSliceScenario.
+The canonical integrated smoke scene is the normal Windows client running the actual MatchRuntime.
 
 CI adds a representative repeated-entity load without replacing the real scenario:
 

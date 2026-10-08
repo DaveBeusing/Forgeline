@@ -4,7 +4,7 @@
 
 `ForgeLine.Client` is the interactive Windows x64 host. It owns the native application lifecycle, Direct3D 12 graphics foundation, RTS input/camera stack, presentation extraction, rendering, and real-time frame pacing without introducing Win32 or D3D12 details into world, simulation, or game rules.
 
-Authoritative vertical-slice gameplay construction is owned by `VerticalSliceScenario` in `ForgeLine.Game`. The client creates that shared runtime with the `Gameplay` profile, Player 1 explicitly human-controlled, Player 2 computer-controlled, and a host-owned `JobScheduler`. It then adds only presentation/platform concerns around the shared simulation.
+Authoritative match composition is owned by `MatchRuntime` in `ForgeLine.Game`. The client creates that shared runtime with the `Gameplay` profile, Player 1 explicitly human-controlled, Player 2 computer-controlled, and a host-owned `JobScheduler`. It then adds only presentation/platform concerns around the shared simulation.
 
 The client consumes the platform input stream through `ForgeLine.Input` and updates the presentation-only RTS camera and interaction controllers on the platform owner. A dedicated simulation owner advances the fixed-tick runtime and publishes immutable snapshots; a dedicated render owner consumes the latest complete snapshot and renders the authoritative skirmish together with depth-tested chunked terrain. RTS selection, movement commands, hierarchical navigation, shared-route formation movement, and the integrated tactical systems are active development capabilities. Synthetic render instances are opt-in through `--render-stress`, are created after gameplay runtime construction, and therefore do not participate in the authoritative starting navigation obstacle set. Production unit art, the final RTS combat-command UI, and audio playback remain deferred.
 
@@ -38,7 +38,7 @@ New Game / Continue / Load Game
     ↓
 ClientSessionRequest
     ↓
-Fresh VerticalSliceScenario or validated save restore
+Fresh MatchRuntime or validated save restore
     ↓
 Presentation extraction + RTS input/camera
     ↓

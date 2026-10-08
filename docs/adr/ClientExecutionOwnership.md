@@ -25,7 +25,7 @@ The existing `JobScheduler` remains a persistent worker pool below the simulatio
 Startup remains composed on the platform owner while authoritative state is not yet running:
 
 1. create Windows platform/window;
-2. create shared vertical-slice runtime and host-owned job scheduler;
+2. create shared match runtime and host-owned job scheduler;
 3. perform optional render-stress fixture population before simulation execution begins;
 4. register command-result and presentation tick observers;
 5. create presentation-only interaction/camera state;
@@ -84,7 +84,7 @@ Shutdown order is:
 1. stop accepting/publishing new platform work;
 2. stop/join render owner and retire GPU work/resources;
 3. stop/join simulation owner after the current complete tick/message;
-4. dispose the shared vertical-slice scenario;
+4. dispose the shared match runtime;
 5. drain/dispose the host-owned job scheduler;
 6. dispose the platform window/platform.
 

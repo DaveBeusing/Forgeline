@@ -136,15 +136,15 @@ These summaries are diagnostic observations only. They do not create hidden game
 
 Create a five-match deterministic validation batch:
 
-    dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --matches 5 --require-terminal --telemetry-output artifacts/balance-telemetry.json
+    dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario central-divide --profile validation --ticks 80000 --seed 2026 --matches 5 --require-terminal --telemetry-output artifacts/balance-telemetry.json
 
 Diagnostics and gameplay telemetry can be emitted together:
 
-    dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --matches 5 --require-terminal --diagnostics-output artifacts/vertical-slice-soak.json --telemetry-output artifacts/vertical-slice-soak.telemetry.json
+    dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario central-divide --profile validation --ticks 80000 --seed 2026 --matches 5 --require-terminal --diagnostics-output artifacts/match-soak.json --telemetry-output artifacts/match-soak.telemetry.json
 
 The repository helper does this by default:
 
-    pwsh ./build/Run-VerticalSliceSoak.ps1 -Profile validation -Matches 5 -TicksPerMatch 80000 -Seed 2026
+    pwsh ./build/Run-MatchSoak.ps1 -Profile validation -Matches 5 -TicksPerMatch 80000 -Seed 2026
 
 ## Aggregation
 
@@ -160,7 +160,7 @@ A missing milestone is not converted into tick zero. The milestone sample count 
 
 Compare a new batch against a previously retained telemetry report:
 
-    dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --matches 5 --require-terminal --telemetry-output artifacts/current.json --telemetry-baseline artifacts/baseline.json
+    dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario central-divide --profile validation --ticks 80000 --seed 2026 --matches 5 --require-terminal --telemetry-output artifacts/current.json --telemetry-baseline artifacts/baseline.json
 
 Comparison is performed only for metric series present in both reports with the same name, owner, dimension, and unit.
 
@@ -179,4 +179,4 @@ Gameplay telemetry coverage includes:
 - batch aggregation and comparison;
 - long-run finite/non-negative metric validation.
 
-The canonical CI terminal match emits both engine diagnostics and gameplay telemetry. The manually dispatched Vertical Slice Soak workflow emits both reports for multi-match analysis.
+The canonical CI terminal match emits both engine diagnostics and gameplay telemetry. The manually dispatched Match Soak workflow emits both reports for multi-match analysis.

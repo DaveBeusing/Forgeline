@@ -10,7 +10,7 @@ Unlike conventional RTS resource economies, factories, power networks, cargo tra
 
 ## The Game
 
-The core loop is **Extract → Process → Manufacture → Supply → Fight → Expand**.
+The core loop is **Extract â†’ Process â†’ Manufacture â†’ Supply â†’ Fight â†’ Expand**.
 
 - **Build:** Extract finite resources, process Steel/Fuel/Electronics, construct infrastructure, and automate production.
 - **Supply:** Move cargo through capacity-constrained networks; keep combat forces fueled, armed, and operational.
@@ -18,13 +18,13 @@ The core loop is **Extract → Process → Manufacture → Supply → Fight → 
 
 ### Current playable slice
 
-The current pre-alpha slice centers on **Central Divide**, a **3.072 × 3.072 km** two-player battlefield with contested resources, a North Bridge, an alternate South Ford, expansion areas, and destructible transport links.
+The current pre-alpha slice centers on **Central Divide**, a **3.072 Ã— 3.072 km** two-player battlefield with contested resources, a North Bridge, an alternate South Ford, expansion areas, and destructible transport links.
 
 It includes:
 
 | Area | Implemented foundation |
 | --- | --- |
-| Faction | **Directorate** — 13 constructible structures and 7 producible units |
+| Faction | **Directorate** â€” 13 constructible structures and 7 producible units |
 | Economy | Resource extraction, inventory/storage, power allocation, recipes, and production queues |
 | Logistics | Graph routing, Cargo/Supply Trucks, automatic distribution, Fuel/Ammunition resupply, and disruption |
 | Warfare | Infantry and vehicles, directional armor, suppression, repairs, artillery, and tactical commands |
@@ -110,7 +110,7 @@ dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configur
 Run an accelerated, repeatable full-match validation:
 
 ```powershell
-dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --require-terminal
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario central-divide --profile validation --ticks 80000 --seed 2026 --require-terminal
 ```
 
 The `validation` profile is intended for bounded testing, not gameplay balancing; the `gameplay` profile retains player-facing defaults.
@@ -129,7 +129,7 @@ CI checks architecture, builds, tests, Windows client startup, map artifacts, an
 The headless host supports versioned checkpoints and command-based replay:
 
 ```powershell
-dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 5000 --seed 2026 --save-output artifacts/match.save.json --replay-output artifacts/match.replay.json
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario central-divide --profile validation --ticks 5000 --seed 2026 --save-output artifacts/match.save.json --replay-output artifacts/match.replay.json
 ```
 
 See [Save, Load, Replay, and Recovery](docs/SaveLoadReplayAndRecovery.md) for validation and recovery behavior.
@@ -149,11 +149,13 @@ docs/         Technical documentation
 
 ## Documentation
 
+- [Match runtime and scenario composition](docs/adr/MatchRuntimeAndScenarioComposition.md)
+
 Start with these detailed references rather than using the README as an exhaustive subsystem specification:
 
 - [Development workflow](docs/Development.md) and [Architecture](docs/Architecture.md)
 - [GPU resource retirement and fault shutdown](docs/adr/GpuResourceRetirementAndFaultShutdown.md)
-- [Directorate vertical slice](docs/DirectorateVerticalSlice.md) and [Prototype battlefield](docs/PrototypeBattlefield.md)
+- [Central Divide scenario](docs/CentralDivideScenario.md) and [Central Divide battlefield](docs/CentralDivideBattlefield.md)
 - [Simulation runtime](docs/SimulationRuntime.md) and [Hierarchical navigation](docs/HierarchicalNavigation.md)
 - [Industrial production](docs/IndustrialProduction.md), [Logistics routing](docs/LogisticsNetworkAndRouting.md), and [Battlefield supply](docs/BattlefieldSupply.md)
 - [Combat execution](docs/CombatExecution.md), [Battlefield intelligence](docs/BattlefieldIntelligence.md), and [Skirmish opponent](docs/SkirmishOpponent.md)
@@ -161,4 +163,4 @@ Start with these detailed references rather than using the README as an exhausti
 
 ---
 
-**FORGELINE — Build. Supply. Conquer.**
+**FORGELINE â€” Build. Supply. Conquer.**
