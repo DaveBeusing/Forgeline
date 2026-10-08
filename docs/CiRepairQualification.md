@@ -30,6 +30,14 @@ Before creating a replacement window, the platform drains all pending messages a
 
 Cargo replacement remains the critical production goal until the live fleet reaches its target. Unbuilt requests cannot haul their own missing inputs. When a high-priority supply or reconnaissance request lacks materials, cargo recovery can cancel it and start an already queued cargo replacement. Running production retains its slot and reserved inputs. Supply and reconnaissance queueing preserve replacement materials while the live cargo fleet is deficient. The targeted regressions verify pending-versus-live capacity, blocked high-priority preemption and preservation of running production. Physical logistics and production costs remain authoritative.
 
+## Blocking disposal regression ownership
+
+The concurrent session-disposal fixture uses two dedicated workers and waits for both callers to enter before releasing session construction. Blocking joins do not depend on shared test thread-pool capacity. The existing five-second checks, completed-worker assertion and exactly-once result disposal remain enforced.
+
+## Production refill recovery
+
+Cargo recovery refill targets depend on the live fleet, including when replacements are already queued. A missing cargo vehicle or a logistics-capable factory blocked on inputs raises production-material deliveries to Critical. This lets functioning carriers refill production before the fleet is exhausted, while operational field supply remains Critical. Healthy, unblocked factories keep their normal priorities. Regression cases cover a healthy fleet, a missing truck, an unbuilt replacement and blocked production with a healthy fleet; they retain exact material thresholds and depot priorities. No inputs, replacement vehicles or match outcomes are granted.
+
 ## Validation status
 
 Canonical Release solution build: zero warnings/errors. Complete solution suite before the startup ownership regression: 1,074 tests, 1,072 passed, zero failed, two native lifetime cases skipped unless explicitly enabled. Focused validation: 45 presentation cases, both repaired game cases and all 54 asset cases pass. Canonical map and clean runtime-asset compilation qualify. Negative smoke-budget probes reject an extra instance batch and a duplicate terrain draw. Updated full-suite and two-processor startup validation results are recorded on the repair pull request.

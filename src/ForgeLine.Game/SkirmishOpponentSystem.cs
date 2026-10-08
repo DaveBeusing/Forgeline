@@ -3453,10 +3453,16 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     owned,
                     UnitIds.MainBattleTank) >=
                     configuration.MinimumObjectivePressureUnits;
+            bool cargoFleetRecovery =
+                facility.Supports(UnitProductionCapability.Logistics) &&
+                RequiresCargoReplacementReserve(owned, configuration);
+            bool blockedLogisticsProduction =
+                facility.Supports(UnitProductionCapability.Logistics) &&
+                facility.Status == UnitProductionStatus.NoInput;
             LogisticsStockPriority productionPriority =
                 plannedUnit ==
                     UnitIds.MainBattleTank ||
-                matureReconnaissanceRecovery
+                matureReconnaissanceRecovery || cargoFleetRecovery || blockedLogisticsProduction
                     ? LogisticsStockPriority.Critical
                     : LogisticsStockPriority.High;
 
@@ -3480,30 +3486,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 80.0,
                 160.0,
                 productionPriority);
-            int cargoTarget =
-                Math.Max(
-                    configuration.MinimumCargoTrucks,
-                    Math.Clamp(
-                        owned.SupplyDepots.Count,
-                        2,
-                        4));
-            int cargoCount =
-                GetUnitCount(
-                    owned,
-                    UnitIds.CargoTruck);
-            owned.PendingUnitCounts.TryGetValue(
-                UnitIds.CargoTruck,
-                out int pendingCargo);
-            bool cargoFleetRecovery =
-                facility.Supports(
-                    UnitProductionCapability.Logistics) &&
-                cargoCount + pendingCargo <
-                    cargoTarget;
-
             LogisticsStockPriority fuelPriority =
                 plannedUnit ==
                     UnitIds.MainBattleTank ||
-                matureReconnaissanceRecovery
+                matureReconnaissanceRecovery || cargoFleetRecovery || blockedLogisticsProduction
                     ? LogisticsStockPriority.Critical
                     : LogisticsStockPriority.High;
 

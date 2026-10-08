@@ -515,11 +515,23 @@ public sealed class SkirmishSupplyPolicyTests
     }
 
 
-    [Fact]
-    public void FuelRecoveryPoliciesPrioritizeFieldSupplyOverVehicleProduction()
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    [InlineData(false, true)]
+    public void FuelRecoveryPoliciesPrioritizeFieldSupplyAndLiveCargoRecovery(
+        bool cargoLost,
+        bool replacementQueued)
     {
-        MatchRuntime scenario = CentralDivideScenario.Create(
-            CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
+        MatchScenarioSettings validation = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation);
+        using MatchRuntime scenario = CentralDivideScenario.Create(validation with
+        {
+            OpponentConfigurations = new Dictionary<ulong, SkirmishOpponentConfiguration>(validation.OpponentConfigurations)
+            {
+                [1] = validation.OpponentConfigurations[1] with { ReactionCadenceTicks = 1 }
+            }
+        });
         EntityRegistry entities = scenario.Simulation.Entities;
         WorldTransform transform =
             entities.GetComponent<WorldTransform>(
@@ -601,7 +613,50 @@ public sealed class SkirmishSupplyPolicyTests
                 Vector3.Zero,
                 SimulationTick.Zero));
 
-        scenario.Simulation.AdvanceOneTick();
+        if (cargoLost)
+        {
+            EntityId cargo = default;
+            foreach (EntityId entity in entities.Query<ControllableEntity, UnitIdentity>())
+            {
+                if (entities.GetComponent<ControllableEntity>(entity).Owner ==
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player &&
+                    entities.GetComponent<UnitIdentity>(entity).UnitId == UnitIds.CargoTruck)
+                {
+                    cargo = entity;
+                    break;
+                }
+            }
+            Assert.True(entities.DestroyEntity(cargo));
+        }
+
+        QueueUnitProductionCommand? replacement = null;
+        if (replacementQueued)
+        {
+            var network = new PowerNetworkId(10_001);
+            entities.AddComponent(vehicleFactory, new PowerNetworkMembership(network));
+            entities.AddComponent(vehicleFactory, new PowerGenerator(10.0));
+            entities.AddComponent(vehicleFactory, new PowerConsumer(1.0, PowerPriority.Industrial, enabled: true));
+            replacement = new QueueUnitProductionCommand(
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
+                vehicleFactory,
+                UnitIds.CargoTruck,
+                SimulationTick.Zero,
+                ProductionPriority.High);
+            scenario.Simulation.SubmitCommand(replacement, SimulationTick.Zero.Next());
+        }
+
+        scenario.Simulation.RunTicks(replacementQueued ? 2UL : 1UL, TestContext.Current.CancellationToken);
+        if (replacement is not null)
+        {
+            Assert.True(replacement.Accepted);
+            bool queued = false;
+            foreach (EntityId entity in entities.Query<UnitProductionRequest>())
+            {
+                UnitProductionRequest request = entities.GetComponent<UnitProductionRequest>(entity);
+                queued |= request.Facility == vehicleFactory && request.UnitId == UnitIds.CargoTruck;
+            }
+            Assert.True(queued);
+        }
 
         LogisticsStockPolicy coreSteel =
             FindStockPolicy(
@@ -648,16 +703,21 @@ public sealed class SkirmishSupplyPolicyTests
                 ResourceIds.Fuel);
 
         Assert.Equal(
-            LogisticsStockPriority.High,
+            cargoLost || replacementQueued ? LogisticsStockPriority.Critical : LogisticsStockPriority.High,
             factoryFuel.Priority);
         Assert.Equal(
-            240.0,
+            cargoLost ? 360.0 : 240.0,
             factoryFuel.DesiredMinimum,
             precision: 6);
         Assert.Equal(
-            240.0,
+            cargoLost ? 360.0 : 240.0,
             factoryFuel.DesiredTarget,
             precision: 6);
+        foreach (ResourceId resource in new[] { ResourceIds.Steel, ResourceIds.Electronics })
+        {
+            Assert.Equal(cargoLost || replacementQueued ? LogisticsStockPriority.Critical : LogisticsStockPriority.High,
+                FindStockPolicy(entities, vehicleFactory, resource).Priority);
+        }
     }
 
     private static LogisticsStockPolicy FindStockPolicy(
