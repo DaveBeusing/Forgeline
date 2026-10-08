@@ -395,6 +395,59 @@ public sealed class MatchPersistenceTests
     }
 
     [Fact]
+    public void RestoreAndReplayResolvePauseControlsAgainstReconstructedMatchState()
+    {
+        using MatchRuntime scenario =
+            CreateScenario(
+                seed: 129,
+                westComputerControlled: false);
+
+        scenario.Simulation.RunTicks(
+            20,
+            TestContext.Current.CancellationToken);
+
+        scenario.Simulation.ExecuteControlCommand(
+            new SetMatchPausedCommand(
+                scenario.BattlefieldRuntime.MatchStateEntity,
+                paused: true));
+        scenario.Simulation.ExecuteControlCommand(
+            new SetMatchPausedCommand(
+                scenario.BattlefieldRuntime.MatchStateEntity,
+                paused: false));
+
+        MatchSaveData save =
+            MatchPersistenceService.CaptureSave(
+                scenario);
+        MatchReplayData replay =
+            MatchPersistenceService.CaptureReplay(
+                scenario);
+
+        // The saved ID is a runtime-local reference, not a stable replay identity.
+        RecordedSimulationCommand[] controlsWithoutRuntimeIds =
+            save.Commands
+                .Select(
+                    static command =>
+                        command.Kind == ReplayCommandKind.SetMatchPaused
+                            ? command with { TargetEntity = default }
+                            : command)
+                .ToArray();
+
+        using MatchRuntime restored =
+            MatchPersistenceService.Restore(
+                save with { Commands = controlsWithoutRuntimeIds });
+        using MatchRuntime playback =
+            MatchPersistenceService.PlayReplay(
+                replay with { Commands = controlsWithoutRuntimeIds });
+
+        Assert.Equal(
+            save.StateSha256,
+            MatchAuthoritativeSnapshot.Capture(restored).ComputeSha256());
+        Assert.Equal(
+            replay.FinalStateSha256,
+            MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
+    }
+
+    [Fact]
     public void UnsupportedQueuedCommandPreventsUnsafeSave()
     {
         using MatchRuntime scenario =
