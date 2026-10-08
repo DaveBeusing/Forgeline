@@ -396,7 +396,7 @@ public sealed class TacticalTargetingInteractionTests
     [Fact]
     public void SharedRequestDispatcherSubmitsResolvedTacticalAction()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateScenario(4401);
         var gateway =
             new PlayerCommandGateway(
@@ -413,11 +413,11 @@ public sealed class TacticalTargetingInteractionTests
             gateway);
 
         EntityId attacker =
-            scenario.West.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
         EntityId target =
-            scenario.East.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(2)).StartingUnits[0];
         FactionId faction =
-            new((uint)scenario.West.Player.Value);
+            new((uint)scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player.Value);
         IntelligenceSignature signature =
             scenario.Simulation.Entities
                 .GetComponent<IntelligenceSignature>(
@@ -445,7 +445,7 @@ public sealed class TacticalTargetingInteractionTests
         Assert.True(
             PlayerActionRequestDispatcher.TryDispatch(
                 request,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 gateway,
                 scenario.Simulation.CurrentTick,
                 out PlayerCommandSubmissionReceipt receipt));
@@ -530,21 +530,21 @@ public sealed class TacticalTargetingInteractionTests
                 actions);
     }
 
-    private static VerticalSliceScenario CreateScenario(
+    private static MatchRuntime CreateScenario(
         ulong seed)
     {
-        VerticalSliceRuntimeSettings runtime =
-            VerticalSliceRuntimeSettings.CreateHeadless(
-                VerticalSliceScenarioProfile.Gameplay,
+        MatchRuntimeSettings runtime =
+            CentralDivideScenario.CreateHeadless(
+                MatchScenarioProfile.Gameplay,
                 seed) with
             {
                 Participants =
-                    VerticalSliceRuntimeSettings.CreateDefaultParticipants(
+                    CentralDivideScenario.CreateDefaultParticipants(
                         westComputerControlled: false,
                         eastComputerControlled: false)
             };
 
-        return VerticalSliceScenario.Create(
+        return CentralDivideScenario.Create(
             runtime,
             TestContext.Current.CancellationToken);
     }

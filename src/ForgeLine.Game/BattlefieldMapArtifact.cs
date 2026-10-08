@@ -25,7 +25,7 @@ public sealed record BattlefieldMapArtifact(
         CreateSerializerOptions();
 
     public static BattlefieldMapArtifact Capture(
-        PrototypeBattlefieldDefinition definition)
+        BattlefieldDefinition definition)
     {
         ArgumentNullException.ThrowIfNull(definition);
 
@@ -104,7 +104,7 @@ public sealed record BattlefieldMapArtifact(
     }
 
     public void ValidateMatches(
-        PrototypeBattlefieldDefinition definition)
+        BattlefieldDefinition definition)
     {
         ArgumentNullException.ThrowIfNull(definition);
         Validate();

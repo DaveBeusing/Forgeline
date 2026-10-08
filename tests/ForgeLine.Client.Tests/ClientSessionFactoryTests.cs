@@ -45,7 +45,7 @@ public sealed class ClientSessionFactoryTests
     {
         using var scheduler =
             new JobScheduler();
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             ClientSessionFactory.Create(
                 ClientSessionRequest.NewGame(731),
                 scheduler);
@@ -53,6 +53,28 @@ public sealed class ClientSessionFactoryTests
         Assert.Equal(
             731UL,
             scenario.RuntimeSettings.Seed);
+    }
+
+    [Fact]
+    public void ExplicitCompositionUsesHostOwnedSchedulerAndPreservesHeadlessCheckpoint()
+    {
+        MatchRuntimeSettings settings = CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Gameplay, seed: 745);
+        settings = settings with
+        {
+            Composition = settings.Composition with { Key = "test.client-composition.v1" },
+            Participants = settings.Participants.Select(participant => new MatchParticipantConfiguration(
+                participant.Player, participant.Faction, participant.StartIndex, false)).ToArray()
+        };
+        using var scheduler = new JobScheduler();
+        using MatchRuntime client = ClientSessionFactory.Create(ClientSessionRequest.NewGame(settings), scheduler);
+        using MatchRuntime headless = MatchRuntime.Create(settings, TestContext.Current.CancellationToken);
+        client.Simulation.RunTicks(8, TestContext.Current.CancellationToken);
+        headless.Simulation.RunTicks(8, TestContext.Current.CancellationToken);
+        Assert.Same(settings.Composition, client.RuntimeSettings.Composition);
+        Assert.Same(scheduler, client.Scheduler);
+        Assert.False(client.OwnsScheduler);
+        Assert.Equal(MatchAuthoritativeSnapshot.Capture(headless).ComputeSha256(),
+            MatchAuthoritativeSnapshot.Capture(client).ComputeSha256());
     }
 
     [Fact]
@@ -73,8 +95,8 @@ public sealed class ClientSessionFactoryTests
                     directory,
                     "paused.save.json");
 
-            using (VerticalSliceScenario source =
-                   VerticalSliceScenario.Create(
+            using (MatchRuntime source =
+                   CentralDivideScenario.Create(
                        seed: 731))
             {
                 source.Simulation.AdvanceOneTick();
@@ -107,7 +129,7 @@ public sealed class ClientSessionFactoryTests
                     LoadGameEntryState.Available);
             using var scheduler =
                 new JobScheduler();
-            using VerticalSliceScenario restored =
+            using MatchRuntime restored =
                 ClientSessionFactory.Create(
                     ClientSessionRequest.Load(
                         entry),

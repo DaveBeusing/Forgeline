@@ -83,38 +83,38 @@ public sealed class SkirmishOpponentTests
 
             Assert.Equal(
                 scenario.Inventories.GetQuantity(
-                    scenario.West.StartingInventory,
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,
                     resource),
                 scenario.Inventories.GetQuantity(
-                    scenario.East.StartingInventory,
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(2)).StartingInventory,
                     resource));
         }
 
         Assert.Equal(
             1,
             scenario.CountUnits(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 UnitIds.CombatEngineer));
         Assert.Equal(
             1,
             scenario.CountUnits(
-                scenario.East.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).Player,
                 UnitIds.CombatEngineer));
         Assert.Equal(
             2,
             scenario.CountUnits(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 UnitIds.CargoTruck));
         Assert.Equal(
             2,
             scenario.CountUnits(
-                scenario.East.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).Player,
                 UnitIds.CargoTruck));
 
         EntityId westCargo =
-            scenario.West.StartingUnits[1];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[1];
         EntityId eastCargo =
-            scenario.East.StartingUnits[1];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(2)).StartingUnits[1];
 
         Assert.Equal(
             UnitIds.CargoTruck,
@@ -132,10 +132,10 @@ public sealed class SkirmishOpponentTests
                 eastCargo);
         WorldTransform westCoreTransform =
             scenario.Simulation.Entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
         WorldTransform eastCoreTransform =
             scenario.Simulation.Entities.GetComponent<WorldTransform>(
-                scenario.East.CommandCore);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore);
 
         float westCargoOffsetX =
             westCargoTransform.Position.X -
@@ -156,11 +156,11 @@ public sealed class SkirmishOpponentTests
         Assert.Equal(
             SkirmishStrategicState.Bootstrap,
             scenario.GetOpponentState(
-                scenario.West.Player).StrategicState);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player).StrategicState);
         Assert.Equal(
             SkirmishStrategicState.Bootstrap,
             scenario.GetOpponentState(
-                scenario.East.Player).StrategicState);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).Player).StrategicState);
     }
 
     [Fact]
@@ -222,25 +222,25 @@ public sealed class SkirmishOpponentTests
             DescribeScenario(scenario));
         Assert.True(
             scenario.GetOpponentState(
-                scenario.West.Player).DecisionsTaken > 0);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player).DecisionsTaken > 0);
         Assert.True(
             scenario.GetOpponentState(
-                scenario.East.Player).DecisionsTaken > 0);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).Player).DecisionsTaken > 0);
     }
 
 
     [Fact]
     public void PowerRecoveryCanAddCapacityWhenFourPlantsStillCannotMeetDemand()
     {
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
-                VerticalSliceScenarioSettings.Create(
-                    VerticalSliceScenarioProfile.Validation));
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
+                CentralDivideScenario.CreateSettings(
+                    MatchScenarioProfile.Validation));
         EntityRegistry entities =
             scenario.Simulation.Entities;
         WorldTransform core =
             entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
 
         int powerPlants = 0;
 
@@ -253,7 +253,7 @@ public sealed class SkirmishOpponentTests
                     entity);
 
             if (building.Owner ==
-                    scenario.West.Player &&
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player &&
                 building.BuildingId ==
                     BuildingIds.PowerPlant)
             {
@@ -279,7 +279,7 @@ public sealed class SkirmishOpponentTests
                 plant,
                 new CompletedBuilding(
                     BuildingIds.PowerPlant,
-                    scenario.West.Player,
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                     SimulationTick.Zero));
             entities.AddComponent(
                 plant,
@@ -294,7 +294,7 @@ public sealed class SkirmishOpponentTests
             overloadedConsumer,
             new CompletedBuilding(
                 BuildingIds.StorageDepot,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 SimulationTick.Zero));
         entities.AddComponent(
             overloadedConsumer,
@@ -319,7 +319,7 @@ public sealed class SkirmishOpponentTests
                     site);
 
             if (construction.Owner ==
-                    scenario.West.Player &&
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player &&
                 construction.BuildingId ==
                     BuildingIds.PowerPlant)
             {
@@ -367,9 +367,9 @@ public sealed class SkirmishOpponentTests
             }
 
             FactionId faction =
-                intent.Issuer == scenario.West.Player
-                    ? scenario.West.Faction
-                    : scenario.East.Faction;
+                intent.Issuer == scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player
+                    ? scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Faction
+                    : scenario.GetBase(new ForgeLine.Game.PlayerId(2)).Faction;
             FactionIntelligenceSnapshot intelligence =
                 scenario.Intelligence.Capture(
                     faction);
@@ -407,7 +407,7 @@ public sealed class SkirmishOpponentTests
             true;
 
         EntityId unit =
-            scenario.West.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
         EntityId group =
             scenario.Simulation.Entities.CreateEntity();
         Vector3 destination =
@@ -417,7 +417,7 @@ public sealed class SkirmishOpponentTests
             group,
             new CombatGroupIntent(
                 CombatOrderKind.AttackMove,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 destination,
                 hasDestination: true,
                 EntityId.Invalid,
@@ -469,10 +469,10 @@ public sealed class SkirmishOpponentTests
 
         WorldTransform coreTransform =
             scenario.Simulation.Entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
         var recovery =
             new RetreatRecoveryState(
-                scenario.West.CommandCore,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
                 RetreatRecoveryReason.RepairAndSupply,
                 coreTransform.Position,
                 scenario.Simulation.CurrentTick);
@@ -498,7 +498,7 @@ public sealed class SkirmishOpponentTests
                 scenario.Opponents.DebugSnapshot,
                 entry =>
                     entry.Player ==
-                    scenario.West.Player);
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
 
         Assert.Equal(
             SkirmishOperationalObjective.StabilizeEconomy,
@@ -543,38 +543,38 @@ public sealed class SkirmishOpponentTests
 
         Assert.Equal(
             first.GetOpponentState(
-                first.West.Player),
+                first.GetBase(new ForgeLine.Game.PlayerId(1)).Player),
             second.GetOpponentState(
-                second.West.Player));
+                second.GetBase(new ForgeLine.Game.PlayerId(1)).Player));
         Assert.Equal(
             first.GetOpponentState(
-                first.East.Player),
+                first.GetBase(new ForgeLine.Game.PlayerId(2)).Player),
             second.GetOpponentState(
-                second.East.Player));
+                second.GetBase(new ForgeLine.Game.PlayerId(2)).Player));
         Assert.Equal(
             first.GetMatchState(),
             second.GetMatchState());
 
         Assert.Equal(
             first.CountBuildings(
-                first.West.Player,
+                first.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 BuildingIds.PowerPlant),
             second.CountBuildings(
-                second.West.Player,
+                second.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 BuildingIds.PowerPlant));
         Assert.Equal(
             first.CountBuildings(
-                first.East.Player,
+                first.GetBase(new ForgeLine.Game.PlayerId(2)).Player,
                 BuildingIds.VehicleFactory),
             second.CountBuildings(
-                second.East.Player,
+                second.GetBase(new ForgeLine.Game.PlayerId(2)).Player,
                 BuildingIds.VehicleFactory));
     }
 
     [Fact]
     public void NonDecisionTicksSkipDecisionOnlyAssessmentWithoutDebugCapture()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateMeasuredScenario(
                 enableOpponentDebugCapture: false);
 
@@ -624,7 +624,7 @@ public sealed class SkirmishOpponentTests
     [Fact]
     public void DebugCaptureKeepsNonDecisionAssessmentsFresh()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateMeasuredScenario(
                 enableOpponentDebugCapture: true);
 
@@ -682,7 +682,7 @@ public sealed class SkirmishOpponentTests
     [Fact]
     public void OpponentScratchStateFollowsControllerLifetime()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateMeasuredScenario(
                 enableOpponentDebugCapture: false);
 
@@ -714,7 +714,7 @@ public sealed class SkirmishOpponentTests
                         entity);
 
             if (controller.Player ==
-                scenario.East.Player)
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).Player)
             {
                 removedController = entity;
                 break;
@@ -771,7 +771,7 @@ public sealed class SkirmishOpponentTests
                 scenario.Opponents.DebugSnapshot,
                 snapshot =>
                     snapshot.Player ==
-                    scenario.East.Player);
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(2)).Player);
 
         float center =
             scenario.Battlefield.Metadata.WidthMeters *
@@ -827,10 +827,10 @@ public sealed class SkirmishOpponentTests
             DescribeScenario(scenario));
         Assert.True(
             scenario.GetOpponentState(
-                scenario.West.Player).DecisionsTaken > 20);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player).DecisionsTaken > 20);
         Assert.True(
             scenario.GetOpponentState(
-                scenario.East.Player).DecisionsTaken > 20);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).Player).DecisionsTaken > 20);
         Assert.True(
             scenario.CargoTransport.Metrics.DeliveredQuantity > 0.0);
         Assert.True(
@@ -838,15 +838,15 @@ public sealed class SkirmishOpponentTests
             scenario.BattlefieldSupply.Metrics.TotalAmmunitionTransferred > 0.0);
         Assert.True(
             scenario.Intelligence.GetContactCount(
-                scenario.West.Faction) > 0 ||
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Faction) > 0 ||
             scenario.Intelligence.GetContactCount(
-                scenario.East.Faction) > 0);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).Faction) > 0);
     }
 
     private static long MeasureNonDecisionAllocations(
         bool enableOpponentDebugCapture)
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateMeasuredScenario(
                 enableOpponentDebugCapture);
 
@@ -866,14 +866,14 @@ public sealed class SkirmishOpponentTests
             before;
     }
 
-    private static VerticalSliceScenario CreateMeasuredScenario(
+    private static MatchRuntime CreateMeasuredScenario(
         bool enableOpponentDebugCapture)
     {
-        VerticalSliceScenarioSettings settings =
-            VerticalSliceScenarioSettings.Create(
-                VerticalSliceScenarioProfile.Validation);
-        VerticalSliceRuntimeSettings runtime =
-            VerticalSliceRuntimeSettings.CreateHeadless(
+        MatchScenarioSettings settings =
+            CentralDivideScenario.CreateSettings(
+                MatchScenarioProfile.Validation);
+        MatchRuntimeSettings runtime =
+            CentralDivideScenario.CreateHeadless(
                 settings.Profile,
                 seed: 7331,
                 enableDiagnostics: false,
@@ -881,8 +881,8 @@ public sealed class SkirmishOpponentTests
             {
                 Scenario = settings
             };
-        VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(runtime);
+        MatchRuntime scenario =
+            CentralDivideScenario.Create(runtime);
         scenario.Opponents.DebugCaptureEnabled =
             enableOpponentDebugCapture;
         return scenario;
@@ -918,10 +918,10 @@ public sealed class SkirmishOpponentTests
     {
         SkirmishOpponentState west =
             scenario.GetOpponentState(
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         SkirmishOpponentState east =
             scenario.GetOpponentState(
-                scenario.East.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).Player);
         MatchState match =
             scenario.GetMatchState();
 
@@ -929,12 +929,12 @@ public sealed class SkirmishOpponentTests
             $"match={match.Status}; " +
             DescribePlayer(
                 scenario,
-                scenario.West,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)),
                 west) +
             "; " +
             DescribePlayer(
                 scenario,
-                scenario.East,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)),
                 east);
     }
 

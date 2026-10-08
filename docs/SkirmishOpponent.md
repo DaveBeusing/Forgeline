@@ -158,7 +158,7 @@ A first eligibility loss identifies the immediate admission mechanism, not neces
 
 ## Headless Validation
 
-VerticalSliceScenario is the reusable game composition for the Central Divide simulation stack without graphics. SkirmishScenarioHarness is a thin test wrapper rather than a duplicate composition.
+MatchRuntime is the reusable game composition for the Central Divide simulation stack without graphics. SkirmishScenarioHarness is a thin test wrapper rather than a duplicate composition.
 
 Deterministic scenarios cover symmetric authoritative starts, power and raw-resource recovery through normal construction, intelligence authorization for direct combat targets, same-seed strategic progression, and bounded Build-Supply-Conquer progression through bootstrap, expansion, reconnaissance, logistics movement, and combat-group formation.
 
@@ -166,7 +166,7 @@ Focused deterministic scenarios and bounded strategic progression belong in the 
 
 Forced-objective lifecycle tests verify objective handling only; they are not evidence of a naturally completed match.
 
-Repeated multi-match soak uses the same runtime through build/Run-VerticalSliceSoak.ps1 or the manually dispatched soak workflow and remains separate from hardware-sensitive PR timing gates. Inspect every requested match, retain failing outcomes, and record the seed sequence. A successful seed or a passing unit suite alone does not establish general gameplay balance or universal termination.
+Repeated multi-match soak uses the same runtime through build/Run-MatchSoak.ps1 or the manually dispatched soak workflow and remains separate from hardware-sensitive PR timing gates. Inspect every requested match, retain failing outcomes, and record the seed sequence. A successful seed or a passing unit suite alone does not establish general gameplay balance or universal termination.
 
 The normal gameplay profile keeps the product-facing starting stock, default strategic-controller settings, and interactive navigation resolution. The validation profile intentionally uses accelerated resources, asymmetric attacker/defender pacing, and a coarser navigation grid for bounded coverage. Those values are not gameplay balance values. Failed progression must not be hidden by reducing attack thresholds, removing resource costs, forcing a match result, or weakening the terminal gate.
 

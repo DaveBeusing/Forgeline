@@ -17,7 +17,7 @@ public sealed class PlayerActionReadModelTests
     [Fact]
     public void ConstructionActionsMirrorCatalogAndOwnCapturedInventoryValues()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateScenario(4301);
         var buffer =
             RegisterExtraction(
@@ -61,7 +61,7 @@ public sealed class PlayerActionReadModelTests
 
         Assert.True(
             scenario.Inventories.Remove(
-                scenario.West.StartingInventory,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,
                 ResourceIds.FerrousOre,
                 1.0).Succeeded);
 
@@ -71,17 +71,17 @@ public sealed class PlayerActionReadModelTests
         Assert.NotEqual(
             captured,
             scenario.Inventories.GetQuantity(
-                scenario.West.StartingInventory,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,
                 ResourceIds.FerrousOre));
 
         interaction.SetSelection(
-            [scenario.West.CommandCore]);
+            [scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore]);
     }
 
     [Fact]
     public void ProductionActionsUseSelectedFacilityInventoryAndRejectMixedOrForeignSelection()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateScenario(4302);
         InventoryId input =
             scenario.Inventories.CreateInventory(
@@ -132,7 +132,7 @@ public sealed class PlayerActionReadModelTests
             Assert.Single(steel.Inputs).AvailableQuantity);
         Assert.True(
             scenario.Inventories.GetQuantity(
-                scenario.West.StartingInventory,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,
                 ResourceIds.FerrousOre) >
             0.0);
 
@@ -146,7 +146,7 @@ public sealed class PlayerActionReadModelTests
             Assert.Single(steel.Inputs).AvailableQuantity);
 
         interaction.SetSelection(
-            [facility, scenario.West.CommandCore]);
+            [facility, scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore]);
         scenario.Simulation.AdvanceOneTick();
         Assert.True(
             buffer.TryReadLatest(out snapshot));
@@ -169,7 +169,7 @@ public sealed class PlayerActionReadModelTests
     [Fact]
     public void UnitProductionActionsCoverSupportedCatalogAndExposeRealCosts()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateScenario(4303);
         InventoryId input =
             scenario.Inventories.CreateInventory(
@@ -244,7 +244,7 @@ public sealed class PlayerActionReadModelTests
     [Fact]
     public void LogisticsAndSupplyActionsExposeOwnedAuthoritativeState()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateScenario(4304);
         var buffer =
             RegisterExtraction(
@@ -257,7 +257,7 @@ public sealed class PlayerActionReadModelTests
         scenario.Simulation.Entities.AddComponent(
             policyEntity,
             new LogisticsStockPolicy(
-                scenario.West.CommandCore,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
                 ResourceIds.Fuel,
                 50.0,
                 100.0,
@@ -265,7 +265,7 @@ public sealed class PlayerActionReadModelTests
                 LogisticsStockPriority.High));
 
         interaction.SetSelection(
-            [scenario.West.CommandCore]);
+            [scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore]);
         scenario.Simulation.AdvanceOneTick();
 
         Assert.True(
@@ -287,7 +287,7 @@ public sealed class PlayerActionReadModelTests
         Assert.True(fuel.CurrentQuantity > 0.0);
 
         EntityId cargoTruck =
-            scenario.West.StartingUnits[1];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[1];
         interaction.SetSelection([cargoTruck]);
         scenario.Simulation.AdvanceOneTick();
         Assert.True(
@@ -296,7 +296,7 @@ public sealed class PlayerActionReadModelTests
             snapshot.PlayerActions?.Logistics?.Cargo);
 
         EntityId engineer =
-            scenario.West.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
         scenario.Simulation.Entities.SetComponent(
             engineer,
             new UnitSupplyPriority(
@@ -305,7 +305,7 @@ public sealed class PlayerActionReadModelTests
         WorldTransform commandCoreTransform =
             scenario.Simulation.Entities
                 .GetComponent<WorldTransform>(
-                    scenario.West.CommandCore);
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
         WorldTransform engineerTransform =
             scenario.Simulation.Entities
                 .GetComponent<WorldTransform>(
@@ -340,7 +340,7 @@ public sealed class PlayerActionReadModelTests
         scenario.Simulation.Entities.AddComponent(
             engineer,
             new RetreatRecoveryState(
-                scenario.West.CommandCore,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
                 RetreatRecoveryReason.RepairAndSupply,
                 commandCoreTransform.Position,
                 scenario.Simulation.CurrentTick));
@@ -376,11 +376,11 @@ public sealed class PlayerActionReadModelTests
             RetreatRecoveryReason.RepairAndSupply,
             tactical.RetreatReason);
         Assert.Equal(
-            scenario.West.CommandCore,
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
             tactical.RetreatProvider);
 
         interaction.SetSelection(
-            [scenario.West.CommandCore, engineer]);
+            [scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore, engineer]);
         scenario.Simulation.AdvanceOneTick();
         Assert.True(
             buffer.TryReadLatest(out snapshot));
@@ -388,7 +388,7 @@ public sealed class PlayerActionReadModelTests
         Assert.Null(snapshot.PlayerActions?.Supply);
 
         interaction.SetSelection(
-            [scenario.East.CommandCore]);
+            [scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore]);
         scenario.Simulation.AdvanceOneTick();
         Assert.True(
             buffer.TryReadLatest(out snapshot));
@@ -399,7 +399,7 @@ public sealed class PlayerActionReadModelTests
     [Fact]
     public void TacticalActionsExposeOwnedStateAndCurrentIdentifiedTargets()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateScenario(4305);
         var buffer =
             RegisterExtraction(
@@ -407,9 +407,9 @@ public sealed class PlayerActionReadModelTests
                 out PresentationInteractionState interaction,
                 out _);
         EntityId engineer =
-            scenario.West.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
         EntityId enemy =
-            scenario.East.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(2)).StartingUnits[0];
         WorldTransform engineerTransform =
             scenario.Simulation.Entities
                 .GetComponent<WorldTransform>(
@@ -460,7 +460,7 @@ public sealed class PlayerActionReadModelTests
                     UnitIds.MobileArtillery],
                 engineerTransform.Position +
                     new Vector3(10.0f, 0.0f, 0.0f),
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         interaction.SetSelection([artillery]);
         scenario.Simulation.AdvanceOneTick();
 
@@ -482,7 +482,7 @@ public sealed class PlayerActionReadModelTests
         Assert.Equal(700.0f, artilleryState.MaximumRangeMeters);
 
         interaction.SetSelection(
-            [engineer, scenario.East.StartingUnits[1]]);
+            [engineer, scenario.GetBase(new ForgeLine.Game.PlayerId(2)).StartingUnits[1]]);
         scenario.Simulation.AdvanceOneTick();
 
         Assert.True(
@@ -500,16 +500,16 @@ public sealed class PlayerActionReadModelTests
     [Fact]
     public void TechnologyActionsExposeImmutableAuthoritativeProgressionState()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateScenario(4306);
         Assert.True(
             scenario.Inventories.Add(
-                scenario.West.StartingInventory,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,
                 ResourceIds.Steel,
                 200.0).Succeeded);
         Assert.True(
             scenario.Inventories.Add(
-                scenario.West.StartingInventory,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,
                 ResourceIds.Electronics,
                 100.0).Succeeded);
 
@@ -541,10 +541,10 @@ public sealed class PlayerActionReadModelTests
             BuildingIds.CommandCore,
             industrial.RequiredFacility);
         Assert.Equal(
-            scenario.West.CommandCore,
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
             industrial.Facility);
         Assert.Equal(
-            scenario.West.CommandCore,
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
             industrial.SourceInventory);
         Assert.Equal(
             PlayerTechnologyState.Available,
@@ -560,7 +560,7 @@ public sealed class PlayerActionReadModelTests
 
         Assert.True(
             scenario.Inventories.Remove(
-                scenario.West.StartingInventory,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,
                 ResourceIds.Steel,
                 1.0).Succeeded);
         Assert.Equal(
@@ -569,17 +569,17 @@ public sealed class PlayerActionReadModelTests
 
         PlayerTechnologyActionCommand command =
             PlayerTechnologyActionCommand.Start(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 TechnologyIds.IndustrialStandardization,
-                scenario.West.CommandCore,
-                scenario.West.CommandCore,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
                 scenario.Simulation.CurrentTick,
                 scenario.Services.TechnologyDefinitions);
         scenario.Simulation.SubmitCommand(
             command,
             scenario.Simulation.CurrentTick.Next(),
             new SimulationCommandSource(
-                scenario.West.Player.Value));
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player.Value));
         scenario.Simulation.AdvanceOneTick();
 
         Assert.True(
@@ -606,7 +606,7 @@ public sealed class PlayerActionReadModelTests
     }
 
     private static PresentationSnapshotBuffer RegisterExtraction(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         out PresentationInteractionState interaction,
         out PlayerCommandGateway gateway)
     {
@@ -642,21 +642,21 @@ public sealed class PlayerActionReadModelTests
         return buffer;
     }
 
-    private static VerticalSliceScenario CreateScenario(
+    private static MatchRuntime CreateScenario(
         ulong seed)
     {
-        VerticalSliceRuntimeSettings runtime =
-            VerticalSliceRuntimeSettings.CreateHeadless(
-                VerticalSliceScenarioProfile.Gameplay,
+        MatchRuntimeSettings runtime =
+            CentralDivideScenario.CreateHeadless(
+                MatchScenarioProfile.Gameplay,
                 seed) with
             {
                 Participants =
-                    VerticalSliceRuntimeSettings.CreateDefaultParticipants(
+                    CentralDivideScenario.CreateDefaultParticipants(
                         westComputerControlled: false,
                         eastComputerControlled: false)
             };
 
-        return VerticalSliceScenario.Create(
+        return CentralDivideScenario.Create(
             runtime,
             TestContext.Current.CancellationToken);
     }

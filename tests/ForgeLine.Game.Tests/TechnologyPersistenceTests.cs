@@ -9,16 +9,16 @@ public sealed class TechnologyPersistenceTests
     [Fact]
     public void InProgressResearchReconstructsDeterministicallyFromRecordedCommand()
     {
-        using VerticalSliceScenario original =
+        using MatchRuntime original =
             CreateScenario(
                 seed: 4412);
 
         PlayerTechnologyActionCommand command =
             PlayerTechnologyActionCommand.Start(
-                original.West.Player,
+                original.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 TechnologyIds.IndustrialStandardization,
-                original.West.CommandCore,
-                original.West.CommandCore,
+                original.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
+                original.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
                 original.Simulation.CurrentTick,
                 original.Services.TechnologyDefinitions);
 
@@ -26,7 +26,7 @@ public sealed class TechnologyPersistenceTests
             command,
             original.Simulation.CurrentTick.Next(),
             new SimulationCommandSource(
-                original.West.Player.Value));
+                original.GetBase(new ForgeLine.Game.PlayerId(1)).Player.Value));
         original.Simulation.RunTicks(
             20,
             TestContext.Current.CancellationToken);
@@ -34,7 +34,7 @@ public sealed class TechnologyPersistenceTests
         Assert.True(
             TechnologyStateQueries.TryGetActiveResearch(
                 original.Simulation.Entities,
-                original.West.Player,
+                original.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 out _,
                 out TechnologyResearchRequest before));
         Assert.True(
@@ -45,14 +45,14 @@ public sealed class TechnologyPersistenceTests
             MatchPersistenceService.CaptureSave(
                 original);
 
-        using VerticalSliceScenario restored =
+        using MatchRuntime restored =
             MatchPersistenceService.Restore(
                 save);
 
         Assert.True(
             TechnologyStateQueries.TryGetActiveResearch(
                 restored.Simulation.Entities,
-                restored.West.Player,
+                restored.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 out _,
                 out TechnologyResearchRequest after));
         Assert.Equal(
@@ -66,27 +66,27 @@ public sealed class TechnologyPersistenceTests
             after.MaterialsConsumed);
         Assert.Equal(
             save.StateSha256,
-            VerticalSliceAuthoritativeSnapshot
+            MatchAuthoritativeSnapshot
                 .Capture(restored)
                 .ComputeSha256());
     }
 
-    private static VerticalSliceScenario CreateScenario(
+    private static MatchRuntime CreateScenario(
         ulong seed)
     {
-        VerticalSliceRuntimeSettings runtime =
-            VerticalSliceRuntimeSettings.CreateHeadless(
-                VerticalSliceScenarioProfile.Gameplay,
+        MatchRuntimeSettings runtime =
+            CentralDivideScenario.CreateHeadless(
+                MatchScenarioProfile.Gameplay,
                 seed) with
             {
                 Participants =
-                    VerticalSliceRuntimeSettings
+                    CentralDivideScenario
                         .CreateDefaultParticipants(
                             westComputerControlled: false,
                             eastComputerControlled: false)
             };
 
-        return VerticalSliceScenario.Create(
+        return CentralDivideScenario.Create(
             runtime,
             TestContext.Current.CancellationToken);
     }

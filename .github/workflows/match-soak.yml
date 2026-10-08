@@ -1,10 +1,10 @@
-name: Vertical Slice Soak
+name: Match Soak
 
 on:
   workflow_dispatch:
     inputs:
       profile:
-        description: Vertical-slice balance profile
+        description: Match balance profile
         required: true
         default: validation
         type: choice
@@ -58,23 +58,24 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
-      - name: Run vertical slice soak
+      - name: Run match soak
         shell: pwsh
         run: >
-          ./build/Run-VerticalSliceSoak.ps1
+          ./build/Run-MatchSoak.ps1
+          -NoBuild
           -Profile "${{ inputs.profile }}"
           -Matches ${{ inputs.matches }}
           -TicksPerMatch ${{ inputs.ticks_per_match }}
           -Seed ${{ inputs.seed }}
-          -Output "artifacts/vertical-slice-soak.json"
-          -TelemetryOutput "artifacts/vertical-slice-soak.telemetry.json"
+          -Output "artifacts/match-soak.json"
+          -TelemetryOutput "artifacts/match-soak.telemetry.json"
 
       - name: Upload soak report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: vertical-slice-soak
+          name: match-soak
           path: |
-            artifacts/vertical-slice-soak.json
-            artifacts/vertical-slice-soak.telemetry.json
+            artifacts/match-soak.json
+            artifacts/match-soak.telemetry.json
           if-no-files-found: warn

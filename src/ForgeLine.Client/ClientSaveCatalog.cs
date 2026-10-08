@@ -93,8 +93,9 @@ internal static class ClientSaveCatalog
         return entries;
     }
 
-    internal static VerticalSliceScenario Restore(
-        ForgeLine.UI.LoadGameEntry entry)
+    internal static MatchRuntime Restore(
+        ForgeLine.UI.LoadGameEntry entry,
+        Func<string, MatchComposition>? resolveComposition = null)
     {
         if (!entry.CanLoad)
         {
@@ -106,6 +107,6 @@ internal static class ClientSaveCatalog
             MatchPersistenceSerializer.ReadSave(
                 entry.Path);
         return MatchPersistenceService.Restore(
-            save);
+            save, resolveComposition);
     }
 }

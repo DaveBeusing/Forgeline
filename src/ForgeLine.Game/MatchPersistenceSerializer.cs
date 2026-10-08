@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace ForgeLine.Game;
@@ -8,7 +9,7 @@ namespace ForgeLine.Game;
 public static class MatchPersistenceSerializer
 {
     public const int CurrentFormatVersion = 1;
-    public const int CurrentSchemaVersion = 1;
+    public const int CurrentSchemaVersion = 2;
     public const string Magic = "FORGELINE_MATCH";
 
     private const long MaximumDocumentBytes =
@@ -155,7 +156,7 @@ public static class MatchPersistenceSerializer
 
             T? payload =
                 JsonSerializer.Deserialize<T>(
-                    envelope.Payload,
+                    MigratePayload(envelope.Payload),
                     s_jsonOptions);
 
             return payload ??
@@ -181,6 +182,36 @@ public static class MatchPersistenceSerializer
                 "The match document contains unsupported serialized data.",
                 exception);
         }
+    }
+
+    // The envelope checksum is validated before migration. Schema 1 has no type-name
+    // discriminators: only its preset opponent fields and absent composition key differ.
+    private static string MigratePayload(string payload)
+    {
+        JsonNode root = JsonNode.Parse(payload) ?? throw new JsonException("Empty match payload.");
+        if (root["SchemaVersion"]?.GetValue<int>() != 1)
+        {
+            if (root["SchemaVersion"]?.GetValue<int>() == 2 &&
+                string.IsNullOrWhiteSpace(root["Configuration"]?["CompositionKey"]?.GetValue<string>()))
+            {
+                throw new JsonException("Missing match composition identity.");
+            }
+            return payload;
+        }
+        JsonNode configuration = root["Configuration"] ?? throw new JsonException("Missing configuration.");
+        JsonNode scenario = configuration["Scenario"] ?? throw new JsonException("Missing scenario.");
+        if (scenario["OpponentConfigurations"] is null)
+        {
+            scenario["OpponentConfigurations"] = new JsonObject
+            {
+                ["1"] = scenario["WestOpponent"]?.DeepClone() ?? throw new JsonException("Missing west policy."),
+                ["2"] = scenario["EastOpponent"]?.DeepClone() ?? throw new JsonException("Missing east policy.")
+            };
+            scenario.AsObject().Remove("WestOpponent");
+            scenario.AsObject().Remove("EastOpponent");
+        }
+        configuration["CompositionKey"] ??= CentralDivideScenario.CompositionKey;
+        return root.ToJsonString();
     }
 
     private static void WriteDocument(

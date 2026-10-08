@@ -9,10 +9,10 @@ public sealed class GameplayTelemetryTests
     [Fact]
     public void ObservationDoesNotMutateAuthoritativeState()
     {
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
-                VerticalSliceScenarioSettings.Create(
-                    VerticalSliceScenarioProfile.Validation),
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
+                CentralDivideScenario.CreateSettings(
+                    MatchScenarioProfile.Validation),
                 seed: 2026);
         var telemetry =
             new GameplayTelemetryCollector(
@@ -62,10 +62,10 @@ public sealed class GameplayTelemetryTests
     [Fact]
     public void ResourceIncomeCrossChecksExtractionMetrics()
     {
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
-                VerticalSliceScenarioSettings.Create(
-                    VerticalSliceScenarioProfile.Validation),
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
+                CentralDivideScenario.CreateSettings(
+                    MatchScenarioProfile.Validation),
                 seed: 2026);
         var telemetry =
             new GameplayTelemetryCollector(
@@ -260,10 +260,10 @@ public sealed class GameplayTelemetryTests
                 startingSeed +
                 (ulong)matchIndex;
 
-            using VerticalSliceScenario scenario =
-                VerticalSliceScenario.Create(
-                    VerticalSliceScenarioSettings.Create(
-                        VerticalSliceScenarioProfile.Validation),
+            using MatchRuntime scenario =
+                CentralDivideScenario.Create(
+                    CentralDivideScenario.CreateSettings(
+                        MatchScenarioProfile.Validation),
                     seed);
             var telemetry =
                 new GameplayTelemetryCollector(
@@ -346,10 +346,10 @@ public sealed class GameplayTelemetryTests
         ulong seed,
         int ticks)
     {
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
-                VerticalSliceScenarioSettings.Create(
-                    VerticalSliceScenarioProfile.Validation),
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
+                CentralDivideScenario.CreateSettings(
+                    MatchScenarioProfile.Validation),
                 seed);
         var telemetry =
             new GameplayTelemetryCollector(
@@ -364,7 +364,7 @@ public sealed class GameplayTelemetryTests
     }
 
     private static void RunTicks(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         GameplayTelemetryCollector telemetry,
         int ticks)
     {

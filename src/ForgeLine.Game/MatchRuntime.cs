@@ -10,21 +10,21 @@ using ForgeLine.World;
 
 namespace ForgeLine.Game;
 
-public sealed class VerticalSliceScenario : IDisposable
+public sealed class MatchRuntime : IDisposable
 {
     private readonly JobScheduler? _ownedScheduler;
     private bool _disposed;
 
-    private VerticalSliceScenario(
-        VerticalSliceRuntimeSettings runtimeSettings,
+    private MatchRuntime(
+        MatchRuntimeSettings runtimeSettings,
         MatchConfiguration matchConfiguration,
         JobScheduler? scheduler,
         bool ownsScheduler,
-        VerticalSliceRuntimeServices services,
+        MatchRuntimeServices services,
         SimulationCoordinator simulation,
-        PrototypeBattlefieldDefinition battlefield,
+        BattlefieldDefinition battlefield,
         TerrainWorld terrain,
-        PrototypeBattlefieldRuntime battlefieldRuntime,
+        BattlefieldRuntime battlefieldRuntime,
         InventoryStore inventories,
         LogisticsNetwork logistics,
         CargoTransportSystem cargoTransport,
@@ -39,8 +39,7 @@ public sealed class VerticalSliceScenario : IDisposable
         FactionIntelligenceStore intelligence,
         SkirmishOpponentSystem opponents,
         UnitFactory unitFactory,
-        SkirmishStartingBase west,
-        SkirmishStartingBase east)
+        SkirmishMatchInitialization initialization)
     {
         RuntimeSettings = runtimeSettings;
         MatchConfiguration = matchConfiguration;
@@ -69,11 +68,10 @@ public sealed class VerticalSliceScenario : IDisposable
         Opponents = opponents;
         UnitFactory = unitFactory;
         Replay = new MatchReplayRecorder(simulation);
-        West = west;
-        East = east;
+        Initialization = initialization;
     }
 
-    public VerticalSliceRuntimeSettings RuntimeSettings { get; }
+    public MatchRuntimeSettings RuntimeSettings { get; }
 
     public MatchConfiguration MatchConfiguration { get; }
 
@@ -81,15 +79,15 @@ public sealed class VerticalSliceScenario : IDisposable
 
     public bool OwnsScheduler => _ownedScheduler is not null;
 
-    public VerticalSliceRuntimeServices Services { get; }
+    public MatchRuntimeServices Services { get; }
 
     public SimulationCoordinator Simulation { get; }
 
-    public PrototypeBattlefieldDefinition Battlefield { get; }
+    public BattlefieldDefinition Battlefield { get; }
 
     public TerrainWorld Terrain { get; }
 
-    public PrototypeBattlefieldRuntime BattlefieldRuntime { get; }
+    public BattlefieldRuntime BattlefieldRuntime { get; }
 
     public InventoryStore Inventories { get; }
 
@@ -121,68 +119,12 @@ public sealed class VerticalSliceScenario : IDisposable
 
     public MatchReplayRecorder Replay { get; }
 
-    public SkirmishStartingBase West { get; }
+    public SkirmishMatchInitialization Initialization { get; }
 
-    public SkirmishStartingBase East { get; }
+    public SkirmishStartingBase GetBase(PlayerId player) => Initialization.GetBase(player);
 
-    public static VerticalSliceScenario Create(
-        VerticalSliceScenarioSettings settings,
-        ulong seed = 17,
-        bool enableDiagnostics = false)
-    {
-        ArgumentNullException.ThrowIfNull(settings);
-
-        VerticalSliceRuntimeSettings runtime =
-            VerticalSliceRuntimeSettings.CreateHeadless(
-                settings.Profile,
-                seed,
-                enableDiagnostics,
-                enableDebugCapture: true) with
-            {
-                Scenario = settings
-            };
-
-        return Create(runtime);
-    }
-
-    public static VerticalSliceScenario Create(
-        ulong seed = 17,
-        SkirmishOpponentConfiguration? westConfiguration = null,
-        SkirmishOpponentConfiguration? eastConfiguration = null,
-        SkirmishStartingStock? startingStock = null,
-        bool enableDiagnostics = false)
-    {
-        VerticalSliceScenarioSettings gameplay =
-            VerticalSliceScenarioSettings.Create(
-                VerticalSliceScenarioProfile.Gameplay);
-
-        VerticalSliceScenarioSettings configured =
-            gameplay with
-            {
-                WestOpponent =
-                    westConfiguration ??
-                    gameplay.WestOpponent,
-                EastOpponent =
-                    eastConfiguration ??
-                    gameplay.EastOpponent,
-                StartingStock =
-                    startingStock ??
-                    gameplay.StartingStock
-            };
-
-        return Create(
-            VerticalSliceRuntimeSettings.CreateHeadless(
-                configured.Profile,
-                seed,
-                enableDiagnostics,
-                enableDebugCapture: enableDiagnostics) with
-            {
-                Scenario = configured
-            });
-    }
-
-    public static VerticalSliceScenario Create(
-        VerticalSliceRuntimeSettings runtimeSettings,
+    public static MatchRuntime Create(
+        MatchRuntimeSettings runtimeSettings,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(runtimeSettings);
@@ -192,19 +134,19 @@ public sealed class VerticalSliceScenario : IDisposable
         JobScheduler? scheduler =
             runtimeSettings.SchedulerOwnership switch
             {
-                VerticalSliceSchedulerOwnership.None =>
+                MatchSchedulerOwnership.None =>
                     null,
-                VerticalSliceSchedulerOwnership.Host =>
+                MatchSchedulerOwnership.Host =>
                     runtimeSettings.Scheduler,
-                VerticalSliceSchedulerOwnership.Runtime =>
+                MatchSchedulerOwnership.Runtime =>
                     new JobScheduler(),
                 _ =>
                     throw new InvalidOperationException(
-                        "Vertical-slice scheduler ownership is invalid.")
+                        "Match scheduler ownership is invalid.")
             };
         bool ownsScheduler =
             runtimeSettings.SchedulerOwnership ==
-            VerticalSliceSchedulerOwnership.Runtime;
+            MatchSchedulerOwnership.Runtime;
 
         try
         {
@@ -225,23 +167,22 @@ public sealed class VerticalSliceScenario : IDisposable
         }
     }
 
-    private static VerticalSliceScenario CreateCore(
-        VerticalSliceRuntimeSettings runtimeSettings,
+    private static MatchRuntime CreateCore(
+        MatchRuntimeSettings runtimeSettings,
         JobScheduler? scheduler,
         bool ownsScheduler,
         CancellationToken cancellationToken)
     {
-        VerticalSliceScenarioSettings settings =
+        MatchScenarioSettings settings =
             runtimeSettings.Scenario;
 
-        PrototypeBattlefieldDefinition battlefield =
-            PrototypeBattlefieldDefinition.Create();
+        BattlefieldDefinition battlefield =
+            runtimeSettings.Composition.Battlefield;
         MatchConfiguration matchConfiguration =
             runtimeSettings.CreateMatchConfiguration(
                 battlefield);
         TerrainWorld terrain =
-            PrototypeBattlefieldTerrainFactory.Create(
-                battlefield);
+            runtimeSettings.Composition.CreateTerrain(battlefield);
 
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -273,34 +214,15 @@ public sealed class VerticalSliceScenario : IDisposable
             new SpatialIndexSynchronizer(
                 spatialIndex);
 
-        BuildingDefinitionCatalog buildingDefinitions =
-            DirectorateContent.CreateBuildingCatalog();
-        UnitDefinitionCatalog unitDefinitions =
-            DirectorateContent.CreateUnitCatalog();
-        TechnologyDefinitionCatalog technologyDefinitions =
-            DirectorateTechnologyDefinitions.CreateCatalog();
-        ResourceCatalog resources =
-            InitialResourceDefinitions.CreateCatalog();
-        ProductionRecipeCatalog recipes =
-            InitialProductionRecipes.CreateCatalog();
-        WeaponCatalog weapons =
-            DirectorateContent.CreateWeaponCatalog();
-        ArmorCatalog armor =
-            DirectorateContent.CreateArmorCatalog();
-        ArtilleryWeaponCatalog artilleryWeapons =
-            DirectorateContent.CreateArtilleryWeaponCatalog();
-        FactionContentDefinition faction =
-            DirectorateContent.CreateFactionDefinition();
-
-        GameContentValidator.ValidateDirectorate(
-            faction,
-            resources,
-            buildingDefinitions,
-            unitDefinitions,
-            recipes,
-            weapons,
-            armor,
-            artilleryWeapons);
+        MatchContent content = runtimeSettings.Composition.Content;
+        BuildingDefinitionCatalog buildingDefinitions = content.Buildings;
+        UnitDefinitionCatalog unitDefinitions = content.Units;
+        TechnologyDefinitionCatalog technologyDefinitions = content.Technologies;
+        ResourceCatalog resources = content.Resources;
+        ProductionRecipeCatalog recipes = content.Recipes;
+        WeaponCatalog weapons = content.Weapons;
+        ArmorCatalog armor = content.Armor;
+        ArtilleryWeaponCatalog artilleryWeapons = content.Artillery;
 
         var inventories =
             new InventoryStore();
@@ -334,8 +256,8 @@ public sealed class VerticalSliceScenario : IDisposable
 
         var logistics =
             new LogisticsNetwork();
-        PrototypeBattlefieldRuntime battlefieldRuntime =
-            PrototypeBattlefieldRuntime.Load(
+        BattlefieldRuntime battlefieldRuntime =
+            BattlefieldRuntime.Load(
                 simulation.Entities,
                 battlefield,
                 terrain,
@@ -431,6 +353,7 @@ public sealed class VerticalSliceScenario : IDisposable
 
         SkirmishMatchInitialization initialization =
             SkirmishMatchInitializer.Initialize(
+                runtimeSettings.Composition,
                 simulation.Entities,
                 inventories,
                 unitFactory,
@@ -439,13 +362,6 @@ public sealed class VerticalSliceScenario : IDisposable
                 battlefieldRuntime,
                 matchConfiguration,
                 settings.StartingStock);
-        SkirmishStartingBase west =
-            initialization.GetBase(
-                new PlayerId(1));
-        SkirmishStartingBase east =
-            initialization.GetBase(
-                new PlayerId(2));
-
         AxisAlignedBounds[] entityObstacles =
             CollectStaticNavigationObstacles(
                 simulation);
@@ -592,7 +508,7 @@ public sealed class VerticalSliceScenario : IDisposable
             new BuildingLogisticsRegistrationSystem(
                 logistics);
         var roadAccess =
-            new PrototypeRoadAccessSystem(
+            new RoadAccessSystem(
                 logistics,
                 battlefieldRuntime.RoadNodes);
 
@@ -615,9 +531,9 @@ public sealed class VerticalSliceScenario : IDisposable
 
             configurations.Add(
                 participant.Player,
-                participant.Player == west.Player
-                    ? settings.WestOpponent
-                    : settings.EastOpponent);
+                settings.OpponentConfigurations.TryGetValue(participant.Player.Value, out var policy)
+                    ? policy
+                    : throw new InvalidOperationException($"No opponent policy for player {participant.Player}."));
         }
 
         var opponents =
@@ -679,6 +595,8 @@ public sealed class VerticalSliceScenario : IDisposable
             combatDebugSnapshots
         ];
 
+        systems = runtimeSettings.Composition.ConfigureSystems(systems).ToArray();
+
         var registeredSystemTypes =
             new Type[systems.Length];
 
@@ -700,7 +618,7 @@ public sealed class VerticalSliceScenario : IDisposable
             battlefieldRuntime.MatchStateEntity);
 
         var services =
-            new VerticalSliceRuntimeServices(
+            new MatchRuntimeServices(
                 resources,
                 buildingDefinitions,
                 unitDefinitions,
@@ -727,7 +645,7 @@ public sealed class VerticalSliceScenario : IDisposable
                 combatDebugSnapshots,
                 registeredSystemTypes);
 
-        return new VerticalSliceScenario(
+        return new MatchRuntime(
             runtimeSettings,
             matchConfiguration,
             scheduler,
@@ -751,8 +669,7 @@ public sealed class VerticalSliceScenario : IDisposable
             intelligence,
             opponents,
             unitFactory,
-            west,
-            east);
+            initialization);
     }
 
     private static AxisAlignedBounds[] CollectStaticNavigationObstacles(
@@ -797,12 +714,12 @@ public sealed class VerticalSliceScenario : IDisposable
     public SkirmishOpponentState GetOpponentState(
         PlayerId player)
     {
-        EntityId controller =
-            player == West.Player
-                ? West.Controller
-                : player == East.Player
-                    ? East.Controller
-                    : EntityId.Invalid;
+        EntityId controller = GetBase(player).Controller;
+
+        if (!Simulation.Entities.IsAlive(controller))
+        {
+            return SkirmishOpponentState.Initial;
+        }
 
         if (!controller.IsValid)
         {
@@ -880,7 +797,7 @@ public sealed class VerticalSliceScenario : IDisposable
     }
 
     public bool RunUntil(
-        Func<VerticalSliceScenario, bool> condition,
+        Func<MatchRuntime, bool> condition,
         ulong maximumTicks,
         CancellationToken cancellationToken = default)
     {

@@ -24,7 +24,7 @@ internal sealed record SkirmishProgressionReport(
 
     public static void Write(
         string mainReportPath,
-        VerticalSliceScenarioProfile profile,
+        MatchScenarioProfile profile,
         int matchIndex,
         ulong seed,
         ulong executedTicks,

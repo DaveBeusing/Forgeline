@@ -62,8 +62,8 @@ internal static class Program
                     RunLightweight(
                         options,
                         shutdown.Token),
-                HeadlessScenarioKind.VerticalSlice =>
-                    RunVerticalSlice(
+                HeadlessScenarioKind.Match =>
+                    RunMatch(
                         options,
                         shutdown.Token),
                 _ =>
@@ -138,15 +138,15 @@ internal static class Program
             : 0;
     }
 
-    private static int RunVerticalSlice(
+    private static int RunMatch(
         HeadlessOptions options,
         CancellationToken cancellationToken)
     {
-        VerticalSliceScenarioSettings settings =
-            VerticalSliceScenarioSettings.Create(
+        MatchScenarioSettings settings =
+            CentralDivideScenario.CreateSettings(
                 options.Profile);
         var reports =
-            new List<VerticalSliceMatchReport>(
+            new List<MatchExecutionReport>(
                 options.MatchCount);
         var telemetryMatches =
             new List<GameplayTelemetryMatch>(
@@ -164,8 +164,8 @@ internal static class Program
                 checked(
                     options.Seed +
                     (ulong)matchIndex);
-            VerticalSliceRuntimeSettings runtimeSettings =
-                VerticalSliceRuntimeSettings.CreateHeadless(
+            MatchRuntimeSettings runtimeSettings =
+                CentralDivideScenario.CreateHeadless(
                     settings.Profile,
                     matchSeed,
                     enableDiagnostics: true,
@@ -176,8 +176,8 @@ internal static class Program
                 {
                     Scenario = settings
                 };
-            using VerticalSliceScenario scenario =
-                VerticalSliceScenario.Create(
+            using MatchRuntime scenario =
+                CentralDivideScenario.Create(
                     runtimeSettings,
                     cancellationToken);
             GameplayTelemetryCollector? telemetry =
@@ -190,12 +190,9 @@ internal static class Program
             {
                 progression = new SkirmishProgressionDiagnostics(
                     scenario.Inventories,
-                    DirectorateContent.CreateUnitCatalog(),
-                    new Dictionary<PlayerId, SkirmishOpponentConfiguration>
-                    {
-                        [scenario.West.Player] = settings.WestOpponent,
-                        [scenario.East.Player] = settings.EastOpponent
-                    },
+                    scenario.Services.UnitDefinitions,
+                    settings.OpponentConfigurations.ToDictionary(
+                        pair => new PlayerId(pair.Key), pair => pair.Value),
                     scenario.Intelligence);
                 scenario.Simulation.RegisterSystem(progression);
             }
@@ -223,8 +220,8 @@ internal static class Program
 
             matchStopwatch.Stop();
 
-            VerticalSliceMatchReport report =
-                VerticalSliceMatchReport.Capture(
+            MatchExecutionReport report =
+                MatchExecutionReport.Capture(
                     matchIndex + 1,
                     matchSeed,
                     executedTicks,
@@ -246,7 +243,7 @@ internal static class Program
             }
 
             Console.WriteLine(
-                $"Vertical slice match {report.MatchIndex}/{options.MatchCount}: " +
+                $"Match {report.MatchIndex}/{options.MatchCount}: " +
                 $"status={report.MatchStatus}; lifecycle={report.Lifecycle.Phase}; " +
                 $"outcome={report.Lifecycle.Outcome}; reason={report.Lifecycle.TerminationReason}; " +
                 $"winner={report.Winner}; ticks={report.ExecutedTicks}; logical={report.LogicalSeconds:F1}s; " +
@@ -262,17 +259,10 @@ internal static class Program
                 $"supplyAmmo={report.TotalAmmunitionTransferred:F1}; " +
                 $"artilleryShots={report.TotalArtilleryShots}; " +
                 $"artilleryImpacts={report.TotalArtilleryImpacts}; " +
-                $"westContacts={report.West.KnownHostileContacts}; " +
-                $"eastContacts={report.East.KnownHostileContacts}; " +
-                $"westReadiness={report.West.AverageReadiness:F3}; " +
-                $"eastReadiness={report.East.AverageReadiness:F3}.");
+                $"participants={report.Participants.Count}.");
 
-            WriteSideSummary(
-                "west",
-                report.West);
-            WriteSideSummary(
-                "east",
-                report.East);
+            foreach (var participant in report.Participants)
+                WriteSideSummary($"player:{participant.Player}", participant);
 
             if (progression is not null && options.DiagnosticsOutput is not null)
             {
@@ -311,7 +301,7 @@ internal static class Program
             {
                 terminalFailure = true;
                 Console.Error.WriteLine(
-                    $"Vertical slice match {report.MatchIndex} did not complete its lifecycle within {options.TickCount} ticks.");
+                    $"Match {report.MatchIndex} did not complete its lifecycle within {options.TickCount} ticks.");
                 break;
             }
         }
@@ -319,7 +309,7 @@ internal static class Program
         overallStopwatch.Stop();
 
         var overallReport =
-            VerticalSliceHeadlessReport.Create(
+            MatchHeadlessReport.Create(
                 options,
                 overallStopwatch.Elapsed,
                 reports);
@@ -368,11 +358,11 @@ internal static class Program
             MatchSaveData save =
                 MatchPersistenceSerializer.ReadSave(
                     path);
-            using VerticalSliceScenario restored =
+            using MatchRuntime restored =
                 MatchPersistenceService.Restore(
                     save);
-            VerticalSliceAuthoritativeSnapshot state =
-                VerticalSliceAuthoritativeSnapshot.Capture(
+            MatchAuthoritativeSnapshot state =
+                MatchAuthoritativeSnapshot.Capture(
                     restored);
 
             Console.WriteLine(
@@ -401,11 +391,11 @@ internal static class Program
             MatchReplayData replay =
                 MatchPersistenceSerializer.ReadReplay(
                     path);
-            using VerticalSliceScenario playback =
+            using MatchRuntime playback =
                 MatchPersistenceService.PlayReplay(
                     replay);
-            VerticalSliceAuthoritativeSnapshot state =
-                VerticalSliceAuthoritativeSnapshot.Capture(
+            MatchAuthoritativeSnapshot state =
+                MatchAuthoritativeSnapshot.Capture(
                     playback);
 
             Console.WriteLine(
@@ -427,7 +417,7 @@ internal static class Program
     }
 
     private static void FinalizeHeadlessMatch(
-        VerticalSliceScenario scenario)
+        MatchRuntime scenario)
     {
         MatchParticipantConfiguration participant =
             scenario.MatchConfiguration.Participants[0];
@@ -447,7 +437,7 @@ internal static class Program
         }
     }
 
-    private static void WriteDistributionSummary(VerticalSliceScenario scenario)
+    private static void WriteDistributionSummary(MatchRuntime scenario)
     {
         const int maximumRequests = 128;
         IReadOnlyList<LogisticsTransportRequestReadModel> requests =
@@ -471,7 +461,7 @@ internal static class Program
 
     private static void WriteSideSummary(
         string label,
-        VerticalSliceSideReport side)
+        MatchParticipantReport side)
     {
         Console.WriteLine(
             $"{label}: state={side.StrategicState}; goal={side.ActiveGoal}; " +
@@ -547,21 +537,21 @@ internal static class Program
     private static void WriteUsage(TextWriter writer)
     {
         writer.WriteLine("ForgeLine.Headless");
-        writer.WriteLine("  --scenario <lightweight|vertical-slice>");
+        writer.WriteLine("  --scenario <lightweight|central-divide>");
         writer.WriteLine("                               Scenario to execute (default: lightweight).");
         writer.WriteLine("  --profile <gameplay|validation>");
-        writer.WriteLine("                               Vertical-slice balance profile (default: gameplay).");
+        writer.WriteLine("                               Match balance profile (default: gameplay).");
         writer.WriteLine("  --ticks <count>              Ticks to execute, or maximum ticks per match (default: 1000).");
         writer.WriteLine("  --seed <value>               Deterministic simulation seed (default: 1).");
         writer.WriteLine("  --tick-rate <hz>             Logical simulation tick rate (default: 20).");
         writer.WriteLine("  --entities <count>           Lightweight scenario entity count.");
-        writer.WriteLine("  --matches <count>            Fresh vertical-slice matches to execute (default: 1).");
-        writer.WriteLine("  --require-terminal           Fail if a vertical-slice match does not end within the tick budget.");
+        writer.WriteLine("  --matches <count>            Fresh match matches to execute (default: 1).");
+        writer.WriteLine("  --require-terminal           Fail if a match does not end within the tick budget.");
         writer.WriteLine("  --diagnostics-output <path>  Write a structured JSON diagnostics report.");
         writer.WriteLine("  --telemetry-output <path>    Write observational gameplay telemetry and batch aggregates.");
         writer.WriteLine("  --telemetry-baseline <path>  Compare telemetry aggregates with a prior telemetry report.");
-        writer.WriteLine("  --save-output <path>         Write a versioned match save after one vertical-slice match.");
-        writer.WriteLine("  --replay-output <path>       Write a deterministic command replay after one vertical-slice match.");
+        writer.WriteLine("  --save-output <path>         Write a versioned match save after one match.");
+        writer.WriteLine("  --replay-output <path>       Write a deterministic command replay after one match.");
         writer.WriteLine("  --load-input <path>          Validate and reconstruct a saved match, then exit.");
         writer.WriteLine("  --replay-input <path>        Play and validate a replay, then exit.");
         writer.WriteLine("  --help, -h                   Show this help.");

@@ -14,7 +14,7 @@ public sealed class PlayerConstructionProductionFlowTests
     [Fact]
     public void PlayerCommandsBuildProductionChainAndProduceInfantryVehicleAndSupportUnit()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateScenario(4110);
         var gateway =
             new PlayerCommandGateway(
@@ -40,11 +40,11 @@ public sealed class PlayerConstructionProductionFlowTests
                     buildingId);
             PlayerCommandSubmissionReceipt receipt =
                 gateway.SubmitBuild(
-                    scenario.West.Player,
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                     buildingId,
                     position,
                     BuildingOrientation.North,
-                    scenario.West.CommandCore,
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
                     scenario.Simulation.CurrentTick);
 
             Assert.True(receipt.Accepted);
@@ -96,14 +96,14 @@ public sealed class PlayerConstructionProductionFlowTests
 
         Assert.True(
             scenario.Inventories.Transfer(
-                scenario.West.StartingInventory,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,
                 processing.InputInventory,
                 ResourceIds.FerrousOre,
                 10.0).Succeeded);
 
         PlayerCommandSubmissionReceipt steelReceipt =
             gateway.SubmitProduction(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 smelter,
                 RecipeIds.Steel,
                 scenario.Simulation.CurrentTick);
@@ -199,7 +199,7 @@ public sealed class PlayerConstructionProductionFlowTests
     [Fact]
     public void PlayerPoliciesPhysicallyDeliverForwardSupplyAndRecoverUnit()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateScenario(4113);
         var gateway =
             new PlayerCommandGateway(
@@ -217,13 +217,13 @@ public sealed class PlayerConstructionProductionFlowTests
         {
             PlayerCommandSubmissionReceipt receipt =
                 gateway.SubmitBuild(
-                    scenario.West.Player,
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                     buildingId,
                     FindOpenPlacement(
                         scenario,
                         buildingId),
                     BuildingOrientation.North,
-                    scenario.West.CommandCore,
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
                     scenario.Simulation.CurrentTick);
 
             Assert.True(receipt.Accepted);
@@ -258,11 +258,11 @@ public sealed class PlayerConstructionProductionFlowTests
 
         double sourceFuelBefore =
             scenario.Inventories.GetQuantity(
-                scenario.West.StartingInventory,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,
                 ResourceIds.Fuel);
         double sourceAmmoBefore =
             scenario.Inventories.GetQuantity(
-                scenario.West.StartingInventory,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,
                 ResourceIds.Ammunition);
 
         foreach ((ResourceId Resource, double Minimum, double Target, double Maximum)
@@ -275,7 +275,7 @@ public sealed class PlayerConstructionProductionFlowTests
         {
             PlayerCommandSubmissionReceipt receipt =
                 gateway.SubmitLogisticsStockPolicy(
-                    scenario.West.Player,
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                     supplyDepot,
                     policy.Resource,
                     policy.Minimum,
@@ -311,21 +311,21 @@ public sealed class PlayerConstructionProductionFlowTests
                 .CompletedRequestCount > 0);
         Assert.True(
             scenario.Inventories.GetQuantity(
-                scenario.West.StartingInventory,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,
                 ResourceIds.Fuel) <
             sourceFuelBefore);
         Assert.True(
             scenario.Inventories.GetQuantity(
-                scenario.West.StartingInventory,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,
                 ResourceIds.Ammunition) <
             sourceAmmoBefore);
 
         SupplyProvider coreProvider =
             scenario.Simulation.Entities
                 .GetComponent<SupplyProvider>(
-                    scenario.West.CommandCore);
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
         scenario.Simulation.Entities.SetComponent(
-            scenario.West.CommandCore,
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
             new SupplyProvider(
                 coreProvider.InventoryId,
                 coreProvider.Owner,
@@ -333,7 +333,7 @@ public sealed class PlayerConstructionProductionFlowTests
                 enabled: false));
 
         EntityId recipient =
-            scenario.West.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
         UnitFuelState fuelState =
             scenario.Simulation.Entities
                 .GetComponent<UnitFuelState>(
@@ -369,7 +369,7 @@ public sealed class PlayerConstructionProductionFlowTests
 
         PlayerCommandSubmissionReceipt resupply =
             gateway.SubmitResupply(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 recipient,
                 scenario.Simulation.CurrentTick);
 
@@ -419,7 +419,7 @@ public sealed class PlayerConstructionProductionFlowTests
     [Fact]
     public void PlayerCommandsBuildSupplyAndReconThroughNaturalSystems()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateScenario(4119);
         var gateway =
             new PlayerCommandGateway(
@@ -442,11 +442,11 @@ public sealed class PlayerConstructionProductionFlowTests
         WorldTransform westCore =
             scenario.Simulation.Entities
                 .GetComponent<WorldTransform>(
-                    scenario.West.CommandCore);
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
         WorldTransform eastCore =
             scenario.Simulation.Entities
                 .GetComponent<WorldTransform>(
-                    scenario.East.CommandCore);
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore);
         Vector3 towardWest =
             Vector3.Normalize(
                 new Vector3(
@@ -742,7 +742,7 @@ public sealed class PlayerConstructionProductionFlowTests
 
         Assert.True(
             gateway.SubmitMovement(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [supplyTruck],
                 supplyTruckLoadPoint,
                 scenario.Simulation.CurrentTick,
@@ -778,7 +778,7 @@ public sealed class PlayerConstructionProductionFlowTests
 
         Assert.True(
             gateway.SubmitMovement(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [scout],
                 scoutRefuelPoint,
                 scenario.Simulation.CurrentTick,
@@ -826,7 +826,7 @@ public sealed class PlayerConstructionProductionFlowTests
             towardWest * 260.0f;
         Assert.True(
             gateway.SubmitMovement(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [scout, supplyTruck],
                 reconnaissancePoint,
                 scenario.Simulation.CurrentTick,
@@ -835,7 +835,7 @@ public sealed class PlayerConstructionProductionFlowTests
         Assert.True(gateway.Results.TryRead(out _));
 
         FactionId westFaction =
-            new((uint)scenario.West.Player.Value);
+            new((uint)scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player.Value);
         WorldTransform scoutBeforeRecon =
             scenario.Simulation.Entities
                 .GetComponent<WorldTransform>(
@@ -859,7 +859,7 @@ public sealed class PlayerConstructionProductionFlowTests
                  scenario.Intelligence
                      .IsEntityCurrentlyIdentified(
                          westFaction,
-                         scenario.East.CommandCore));
+                         scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore));
              tick++)
         {
             scenario.Simulation.AdvanceOneTick();
@@ -916,7 +916,7 @@ public sealed class PlayerConstructionProductionFlowTests
             $"match={scenario.GetMatchState().Status}; ticks={reconnaissanceTickBudget}.");
         Assert.True(
             scenario.Simulation.Entities.IsAlive(
-                scenario.East.CommandCore));
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore));
         Assert.Equal(
             MatchStatus.Running,
             scenario.GetMatchState().Status);
@@ -929,14 +929,14 @@ public sealed class PlayerConstructionProductionFlowTests
     }
 
     private static PlayerCommandResultReadModel DispatchAction(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         PlayerCommandGateway gateway,
         in PlayerActionRequest request)
     {
         Assert.True(
             PlayerActionRequestDispatcher.TryDispatch(
                 request,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 gateway,
                 scenario.Simulation.CurrentTick,
                 out PlayerCommandSubmissionReceipt receipt));
@@ -952,18 +952,18 @@ public sealed class PlayerConstructionProductionFlowTests
     }
 
     private static void BuildPlayerBuilding(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         PlayerCommandGateway gateway,
         BuildingId buildingId,
         Vector3 position)
     {
         PlayerCommandSubmissionReceipt receipt =
             gateway.SubmitBuild(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 buildingId,
                 position,
                 BuildingOrientation.North,
-                scenario.West.CommandCore,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
                 scenario.Simulation.CurrentTick);
 
         Assert.True(receipt.Accepted);
@@ -977,7 +977,7 @@ public sealed class PlayerConstructionProductionFlowTests
     }
 
     private static void RemoveStockPolicies(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         PlayerCommandGateway gateway,
         params EntityId[] targets)
     {
@@ -1016,7 +1016,7 @@ public sealed class PlayerConstructionProductionFlowTests
     }
 
     private static void SubmitStockPolicy(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         PlayerCommandGateway gateway,
         EntityId targetEntity,
         ResourceId resource,
@@ -1042,7 +1042,7 @@ public sealed class PlayerConstructionProductionFlowTests
     }
 
     private static EntityId[] FindOwnedUnits(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         UnitId unitId)
     {
         var result =
@@ -1065,7 +1065,7 @@ public sealed class PlayerConstructionProductionFlowTests
 
             if (identity.UnitId == unitId &&
                 controllable.Owner ==
-                    scenario.West.Player)
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player)
             {
                 result.Add(entity);
             }
@@ -1075,7 +1075,7 @@ public sealed class PlayerConstructionProductionFlowTests
     }
 
     private static Vector3 FindOpenPlacementNear(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         BuildingId buildingId,
         Vector3 center)
     {
@@ -1108,7 +1108,7 @@ public sealed class PlayerConstructionProductionFlowTests
                         scenario.Services.BuildingPlacement
                             .CreatePreview(
                                 scenario.Simulation.Entities,
-                                scenario.West.Player,
+                                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                                 buildingId,
                                 candidate,
                                 BuildingOrientation.North);
@@ -1126,7 +1126,7 @@ public sealed class PlayerConstructionProductionFlowTests
     }
 
     private static void QueueUnit(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         PlayerCommandGateway gateway,
         EntityId facility,
         UnitId unitId)
@@ -1145,7 +1145,7 @@ public sealed class PlayerConstructionProductionFlowTests
     }
 
     private static void TransferUnitCost(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         InventoryId destination,
         UnitDefinition definition)
     {
@@ -1153,7 +1153,7 @@ public sealed class PlayerConstructionProductionFlowTests
         {
             Assert.True(
                 scenario.Inventories.Transfer(
-                    scenario.West.StartingInventory,
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,
                     destination,
                     cost.ResourceId,
                     cost.Quantity).Succeeded);
@@ -1161,7 +1161,7 @@ public sealed class PlayerConstructionProductionFlowTests
     }
 
     private static void TransferRemainingUnitCost(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         InventoryId destination,
         UnitDefinition definition,
         ResourceId partiallyTransferredResource,
@@ -1183,7 +1183,7 @@ public sealed class PlayerConstructionProductionFlowTests
 
             Assert.True(
                 scenario.Inventories.Transfer(
-                    scenario.West.StartingInventory,
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,
                     destination,
                     cost.ResourceId,
                     quantity).Succeeded);
@@ -1191,12 +1191,12 @@ public sealed class PlayerConstructionProductionFlowTests
     }
 
     private static Vector3 FindOpenPlacement(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         BuildingId buildingId)
     {
         WorldTransform commandCore =
             scenario.Simulation.Entities.GetComponent<WorldTransform>(
-                scenario.West.CommandCore);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
 
         for (int radius = 2;
              radius <= 9;
@@ -1225,7 +1225,7 @@ public sealed class PlayerConstructionProductionFlowTests
                     BuildingPlacementPreview preview =
                         scenario.Services.BuildingPlacement.CreatePreview(
                             scenario.Simulation.Entities,
-                            scenario.West.Player,
+                            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                             buildingId,
                             candidate,
                             BuildingOrientation.North);
@@ -1243,7 +1243,7 @@ public sealed class PlayerConstructionProductionFlowTests
     }
 
     private static EntityId FindCompletedBuilding(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         BuildingId buildingId)
     {
         foreach (EntityId entity in
@@ -1255,7 +1255,7 @@ public sealed class PlayerConstructionProductionFlowTests
                     entity);
 
             if (completed.Owner ==
-                    scenario.West.Player &&
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player &&
                 completed.BuildingId ==
                     buildingId)
             {
@@ -1268,7 +1268,7 @@ public sealed class PlayerConstructionProductionFlowTests
     }
 
     private static int CountOwnedUnits(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         UnitId unitId)
     {
         int count = 0;
@@ -1288,7 +1288,7 @@ public sealed class PlayerConstructionProductionFlowTests
 
             if (identity.UnitId == unitId &&
                 controllable.Owner ==
-                    scenario.West.Player)
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player)
             {
                 count++;
             }
@@ -1298,7 +1298,7 @@ public sealed class PlayerConstructionProductionFlowTests
     }
 
     private static void RunUntil(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         Func<bool> condition,
         int maximumTicks)
     {
@@ -1313,21 +1313,21 @@ public sealed class PlayerConstructionProductionFlowTests
         Assert.True(condition());
     }
 
-    private static VerticalSliceScenario CreateScenario(
+    private static MatchRuntime CreateScenario(
         ulong seed)
     {
-        VerticalSliceRuntimeSettings runtime =
-            VerticalSliceRuntimeSettings.CreateHeadless(
-                VerticalSliceScenarioProfile.Gameplay,
+        MatchRuntimeSettings runtime =
+            CentralDivideScenario.CreateHeadless(
+                MatchScenarioProfile.Gameplay,
                 seed) with
             {
                 Participants =
-                    VerticalSliceRuntimeSettings.CreateDefaultParticipants(
+                    CentralDivideScenario.CreateDefaultParticipants(
                         westComputerControlled: false,
                         eastComputerControlled: false)
             };
 
-        return VerticalSliceScenario.Create(
+        return CentralDivideScenario.Create(
             runtime,
             TestContext.Current.CancellationToken);
     }

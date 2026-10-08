@@ -118,7 +118,7 @@ These values make results interpretable across different machines. They are meas
 For integrated readiness work, the headless host can execute the complete Central Divide vertical slice:
 
 ```powershell
-dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --require-terminal --diagnostics-output artifacts/opponent-full-match.json
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario central-divide --profile validation --ticks 80000 --seed 2026 --require-terminal --diagnostics-output artifacts/opponent-full-match.json
 ```
 
 The vertical-slice report adds match outcome/pacing, entity and pending-command state, tick timing, observed allocation/GC activity, Cargo Transport completion/failure/route counters, Automated Distribution state, Battlefield Supply transfer totals, Artillery shot/impact totals, and per-side economy/power/industry/intelligence/readiness/force summaries.
@@ -130,7 +130,7 @@ Engine/runtime diagnostics answer questions about execution behavior, failure in
 A vertical-slice batch can emit both:
 
 ```powershell
-dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --matches 5 --require-terminal --diagnostics-output artifacts/vertical-slice-soak.json --telemetry-output artifacts/vertical-slice-soak.telemetry.json
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario central-divide --profile validation --ticks 80000 --seed 2026 --matches 5 --require-terminal --diagnostics-output artifacts/match-soak.json --telemetry-output artifacts/match-soak.telemetry.json
 ```
 
 The telemetry report records each match seed, stable gameplay metric series, progression milestones, compact supply/production/front/objective summaries, aggregate distributions, and optional comparison against a prior compatible report. It does not contain renderer timing and does not participate in authoritative gameplay.
@@ -144,7 +144,7 @@ Persistence validation is a separate correctness path from engine timing diagnos
 A bounded run can emit both recovery documents:
 
 ```powershell
-dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario vertical-slice --profile validation --ticks 256 --seed 4242 --save-output artifacts/recovery.save.json --replay-output artifacts/recovery.replay.json
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario central-divide --profile validation --ticks 256 --seed 4242 --save-output artifacts/recovery.save.json --replay-output artifacts/recovery.replay.json
 ```
 
 The same headless executable validates each document independently:
@@ -270,7 +270,7 @@ The simulation test suite also verifies that 10,000 lightweight ECS entities can
 
 Combat scale measurement is available through the simulation BenchmarkDotNet host with 100/1,000 simultaneously armed direct-fire entities and 100/1,000 moving physical projectiles. Logistics stress coverage remains separate so the measured workload is attributable to the subsystem under test.
 
-Repeated full-match endurance runs use `build/Run-VerticalSliceSoak.ps1` or the manually dispatched `Vertical Slice Soak` workflow. These runs create a fresh simulation for every match and emit separate engine-diagnostics and gameplay-telemetry reports. They are deliberately not hard PR timing gates.
+Repeated full-match endurance runs use `build/Run-MatchSoak.ps1` or the manually dispatched `Match Soak` workflow. These runs create a fresh simulation for every match and emit separate engine-diagnostics and gameplay-telemetry reports. They are deliberately not hard PR timing gates.
 
 ## Interpreting Results
 

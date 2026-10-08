@@ -11,21 +11,21 @@ public sealed record MatchCompatibilityReport(
 public static class MatchPersistenceService
 {
     public static MatchSaveData CaptureSave(
-        VerticalSliceScenario scenario)
+        MatchRuntime scenario)
     {
         ArgumentNullException.ThrowIfNull(scenario);
         RequireCompleteCommandHistory(
             scenario);
 
-        VerticalSliceAuthoritativeSnapshot state =
-            VerticalSliceAuthoritativeSnapshot.Capture(
+        MatchAuthoritativeSnapshot state =
+            MatchAuthoritativeSnapshot.Capture(
                 scenario);
         string stateHash =
             state.ComputeSha256();
 
         return new MatchSaveData(
             MatchPersistenceSerializer.CurrentSchemaVersion,
-            PersistedVerticalSliceConfiguration.Capture(
+            PersistedMatchConfiguration.Capture(
                 scenario.RuntimeSettings),
             scenario.Simulation.CurrentTick.Value,
             scenario.Simulation.Random.State,
@@ -35,19 +35,19 @@ public static class MatchPersistenceService
     }
 
     public static MatchReplayData CaptureReplay(
-        VerticalSliceScenario scenario)
+        MatchRuntime scenario)
     {
         ArgumentNullException.ThrowIfNull(scenario);
         RequireCompleteCommandHistory(
             scenario);
 
-        VerticalSliceAuthoritativeSnapshot state =
-            VerticalSliceAuthoritativeSnapshot.Capture(
+        MatchAuthoritativeSnapshot state =
+            MatchAuthoritativeSnapshot.Capture(
                 scenario);
 
         return new MatchReplayData(
             MatchPersistenceSerializer.CurrentSchemaVersion,
-            PersistedVerticalSliceConfiguration.Capture(
+            PersistedMatchConfiguration.Capture(
                 scenario.RuntimeSettings),
             scenario.Simulation.CurrentTick.Value,
             scenario.Simulation.Random.State,
@@ -56,8 +56,9 @@ public static class MatchPersistenceService
             state.ComputeSha256());
     }
 
-    public static VerticalSliceScenario Restore(
-        MatchSaveData save)
+    public static MatchRuntime Restore(
+        MatchSaveData save,
+        Func<string, MatchComposition>? resolveComposition = null)
     {
         ValidateSave(
             save);
@@ -68,23 +69,26 @@ public static class MatchPersistenceService
             save.RandomState,
             save.Commands,
             save.StateSha256,
-            save.State);
+            save.State,
+            resolveComposition);
     }
 
-    public static VerticalSliceScenario PlayReplay(
-        MatchReplayData replay)
+    public static MatchRuntime PlayReplay(
+        MatchReplayData replay,
+        Func<string, MatchComposition>? resolveComposition = null)
     {
         ValidateReplay(
             replay);
 
-        VerticalSliceScenario? scenario = null;
+        MatchRuntime? scenario = null;
 
         try
         {
             scenario =
                 CreateAndSchedule(
                     replay.Configuration,
-                    replay.Commands);
+                    replay.Commands,
+                    resolveComposition);
             RunToTickWithControls(
                 scenario,
                 replay.FinalTick,
@@ -109,8 +113,8 @@ public static class MatchPersistenceService
                     $"Replay match lifecycle diverged at tick {replay.FinalTick}.");
             }
 
-            VerticalSliceAuthoritativeSnapshot actual =
-                VerticalSliceAuthoritativeSnapshot.Capture(
+            MatchAuthoritativeSnapshot actual =
+                MatchAuthoritativeSnapshot.Capture(
                     scenario);
             string actualHash =
                 actual.ComputeSha256();
@@ -125,7 +129,7 @@ public static class MatchPersistenceService
                     $"Replay authoritative state diverged at tick {replay.FinalTick}: expected {replay.FinalStateSha256}, actual {actualHash}.");
             }
 
-            VerticalSliceScenario result =
+            MatchRuntime result =
                 scenario;
             scenario = null;
             return result;
@@ -148,8 +152,8 @@ public static class MatchPersistenceService
     }
 
     public static MatchCompatibilityReport Compare(
-        VerticalSliceAuthoritativeSnapshot expected,
-        VerticalSliceAuthoritativeSnapshot actual)
+        MatchAuthoritativeSnapshot expected,
+        MatchAuthoritativeSnapshot actual)
     {
         ArgumentNullException.ThrowIfNull(expected);
         ArgumentNullException.ThrowIfNull(actual);
@@ -240,22 +244,24 @@ public static class MatchPersistenceService
             differences);
     }
 
-    private static VerticalSliceScenario Reconstruct(
-        PersistedVerticalSliceConfiguration configuration,
+    private static MatchRuntime Reconstruct(
+        PersistedMatchConfiguration configuration,
         ulong targetTick,
         ulong expectedRandomState,
         IReadOnlyList<RecordedSimulationCommand> commands,
         string expectedStateHash,
-        VerticalSliceAuthoritativeSnapshot expectedState)
+        MatchAuthoritativeSnapshot expectedState,
+        Func<string, MatchComposition>? resolveComposition)
     {
-        VerticalSliceScenario? scenario = null;
+        MatchRuntime? scenario = null;
 
         try
         {
             scenario =
                 CreateAndSchedule(
                     configuration,
-                    commands);
+                    commands,
+                    resolveComposition);
             RunToTickWithControls(
                 scenario,
                 targetTick,
@@ -269,8 +275,8 @@ public static class MatchPersistenceService
                     $"Loaded random state diverged at tick {targetTick}: expected {expectedRandomState}, actual {scenario.Simulation.Random.State}.");
             }
 
-            VerticalSliceAuthoritativeSnapshot actualState =
-                VerticalSliceAuthoritativeSnapshot.Capture(
+            MatchAuthoritativeSnapshot actualState =
+                MatchAuthoritativeSnapshot.Capture(
                     scenario);
             MatchCompatibilityReport compatibility =
                 Compare(
@@ -295,7 +301,7 @@ public static class MatchPersistenceService
                     $"Loaded match state is incompatible: {detail}. Expected {expectedStateHash}; reconstructed {compatibility.ActualSha256}.");
             }
 
-            VerticalSliceScenario result =
+            MatchRuntime result =
                 scenario;
             scenario = null;
             return result;
@@ -317,17 +323,18 @@ public static class MatchPersistenceService
         }
     }
 
-    private static VerticalSliceScenario CreateAndSchedule(
-        PersistedVerticalSliceConfiguration configuration,
-        IReadOnlyList<RecordedSimulationCommand> commands)
+    private static MatchRuntime CreateAndSchedule(
+        PersistedMatchConfiguration configuration,
+        IReadOnlyList<RecordedSimulationCommand> commands,
+        Func<string, MatchComposition>? resolveComposition)
     {
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(commands);
 
-        VerticalSliceRuntimeSettings runtime =
-            configuration.CreateHeadlessRuntimeSettings();
-        VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
+        MatchRuntimeSettings runtime =
+            configuration.CreateHeadlessRuntimeSettings(resolveComposition);
+        MatchRuntime scenario =
+            MatchRuntime.Create(
                 runtime);
 
         try
@@ -395,7 +402,7 @@ public static class MatchPersistenceService
     }
 
     private static void RunToTickWithControls(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         ulong targetTick,
         IReadOnlyList<RecordedSimulationCommand> commands)
     {
@@ -518,11 +525,11 @@ public static class MatchPersistenceService
             save.SavedTick);
 
         if (save.State.SchemaVersion !=
-            VerticalSliceAuthoritativeSnapshot.CurrentSchemaVersion)
+            MatchAuthoritativeSnapshot.CurrentSchemaVersion)
         {
             throw Failure(
                 MatchPersistenceFailureReason.IncompatibleVersion,
-                $"Save state schema {save.State.SchemaVersion} is incompatible with state schema {VerticalSliceAuthoritativeSnapshot.CurrentSchemaVersion}.");
+                $"Save state schema {save.State.SchemaVersion} is incompatible with state schema {MatchAuthoritativeSnapshot.CurrentSchemaVersion}.");
         }
 
         if (save.SavedTick !=
@@ -577,8 +584,7 @@ public static class MatchPersistenceService
     private static void ValidateSchema(
         int schemaVersion)
     {
-        if (schemaVersion !=
-            MatchPersistenceSerializer.CurrentSchemaVersion)
+        if (schemaVersion is < 1 or > MatchPersistenceSerializer.CurrentSchemaVersion)
         {
             throw Failure(
                 MatchPersistenceFailureReason.IncompatibleVersion,
@@ -587,7 +593,7 @@ public static class MatchPersistenceService
     }
 
     private static void RequireCompleteCommandHistory(
-        VerticalSliceScenario scenario)
+        MatchRuntime scenario)
     {
         if (scenario.Replay.IsComplete)
         {

@@ -37,7 +37,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private readonly InventoryStore _inventories;
     private readonly BuildingPlacementService _placement;
     private readonly FactionIntelligenceStore _intelligence;
-    private readonly PrototypeBattlefieldDefinition _battlefield;
+    private readonly BattlefieldDefinition _battlefield;
     private static readonly SkirmishOpponentConfiguration DefaultConfiguration =
         CreateDefaultConfiguration();
 
@@ -68,7 +68,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         InventoryStore inventories,
         BuildingPlacementService placement,
         FactionIntelligenceStore intelligence,
-        PrototypeBattlefieldDefinition battlefield,
+        BattlefieldDefinition battlefield,
         IReadOnlyDictionary<PlayerId, SkirmishOpponentConfiguration>? configurations = null)
     {
         _buildings = buildings ??

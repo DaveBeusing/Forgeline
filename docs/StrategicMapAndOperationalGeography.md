@@ -94,7 +94,7 @@ Road nodes connect:
 
 Road edges expose routing cost and transport capacity.
 
-Buildings may connect to the road network through the existing `PrototypeRoadAccessSystem`. The strategic-map work does not introduce a second logistics graph.
+Buildings may connect to the road network through the existing `RoadAccessSystem`. The strategic-map work does not introduce a second logistics graph.
 
 ## Strategic Crossings
 

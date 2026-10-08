@@ -4,17 +4,10 @@ using ForgeLine.Economy;
 
 namespace ForgeLine.Game;
 
-public static class PrototypeBattlefieldValidator
+public static class BattlefieldValidator
 {
-    private static readonly ResourceId[] BootstrapResources =
-    [
-        ResourceIds.FerrousOre,
-        ResourceIds.Volatiles,
-        ResourceIds.Silicates
-    ];
-
     public static void ValidateDefinition(
-        PrototypeBattlefieldDefinition definition)
+        BattlefieldDefinition definition)
     {
         ArgumentNullException.ThrowIfNull(definition);
 
@@ -48,7 +41,7 @@ public static class PrototypeBattlefieldValidator
         if (errors.Count > 0)
         {
             throw new InvalidOperationException(
-                "Prototype battlefield validation failed:" +
+                "Battlefield validation failed:" +
                 Environment.NewLine +
                 string.Join(
                     Environment.NewLine,
@@ -58,7 +51,7 @@ public static class PrototypeBattlefieldValidator
     }
 
     private static void ValidateMetadata(
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         List<string> errors)
     {
         BattlefieldMapMetadata metadata =
@@ -73,30 +66,28 @@ public static class PrototypeBattlefieldValidator
 
         if (!float.IsFinite(metadata.WidthMeters) ||
             !float.IsFinite(metadata.HeightMeters) ||
-            metadata.WidthMeters < 2_000.0f ||
-            metadata.WidthMeters > 4_000.0f ||
-            metadata.HeightMeters < 2_000.0f ||
-            metadata.HeightMeters > 4_000.0f)
+            metadata.WidthMeters <= 0.0f ||
+            metadata.HeightMeters <= 0.0f)
         {
             errors.Add(
-                "Prototype dimensions must remain within the 2-4 km vertical-slice envelope.");
+                "Battlefield dimensions must be finite and positive.");
         }
 
-        if (metadata.RecommendedPlayers != 2)
+        if (metadata.RecommendedPlayers < 2)
         {
             errors.Add(
-                "The canonical prototype battlefield requires exactly two opposing players.");
+                "A battlefield requires at least two players.");
         }
     }
 
     private static void ValidateStarts(
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         List<string> errors)
     {
-        if (definition.Starts.Count != 2)
+        if (definition.Starts.Count < 2)
         {
             errors.Add(
-                "Exactly two start areas are required.");
+                "At least two start areas are required.");
             return;
         }
 
@@ -139,7 +130,7 @@ public static class PrototypeBattlefieldValidator
     }
 
     private static void ValidateResources(
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         List<string> errors)
     {
         ValidateUniqueKeys(
@@ -170,47 +161,10 @@ public static class PrototypeBattlefieldValidator
             }
         }
 
-        for (int startIndex = 0;
-             startIndex < definition.Starts.Count;
-             startIndex++)
-        {
-            BattlefieldStartPosition start =
-                definition.Starts[startIndex];
-
-            for (int resourceIndex = 0;
-                 resourceIndex < BootstrapResources.Length;
-                 resourceIndex++)
-            {
-                ResourceId required =
-                    BootstrapResources[resourceIndex];
-
-                bool accessible =
-                    definition.Resources.Any(
-                        deposit =>
-                            !deposit.Contested &&
-                            deposit.ResourceId == required &&
-                            HorizontalDistance(
-                                deposit.Center,
-                                start.Position) <= 450.0f);
-
-                if (!accessible)
-                {
-                    errors.Add(
-                        $"Start {start.Player} lacks nearby bootstrap resource {required}.");
-                }
-            }
-        }
-
-        if (!definition.Resources.Any(
-                static resource => resource.Contested))
-        {
-            errors.Add(
-                "At least one richer contested resource deposit is required.");
-        }
     }
 
     private static void ValidateWorldObjects(
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         List<string> errors)
     {
         ValidateUniqueKeys(
@@ -248,7 +202,7 @@ public static class PrototypeBattlefieldValidator
     }
 
     private static void ValidateSites(
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         List<string> errors)
     {
         ValidateUniqueKeys(
@@ -256,24 +210,6 @@ public static class PrototypeBattlefieldValidator
                 static site => site.Key),
             "strategic site",
             errors);
-
-        BattlefieldSiteKind[] required =
-        [
-            BattlefieldSiteKind.Expansion,
-            BattlefieldSiteKind.MiningOutpost,
-            BattlefieldSiteKind.ForwardOperatingBase
-        ];
-
-        for (int index = 0; index < required.Length; index++)
-        {
-            BattlefieldSiteKind kind = required[index];
-            if (!definition.Sites.Any(
-                    site => site.Kind == kind))
-            {
-                errors.Add(
-                    $"Strategic site type '{kind}' is missing.");
-            }
-        }
 
         for (int index = 0; index < definition.Sites.Count; index++)
         {
@@ -296,7 +232,7 @@ public static class PrototypeBattlefieldValidator
     }
 
     private static void ValidateRoadTopology(
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         List<string> errors)
     {
         ValidateUniqueKeys(
@@ -343,15 +279,9 @@ public static class PrototypeBattlefieldValidator
     }
 
     private static void ValidateCrossings(
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         List<string> errors)
     {
-        if (definition.Crossings.Count < 2)
-        {
-            errors.Add(
-                "At least two strategically distinct crossings are required.");
-        }
-
         ValidateUniqueKeys(
             definition.Crossings.Select(
                 static crossing => crossing.Key),
@@ -389,16 +319,11 @@ public static class PrototypeBattlefieldValidator
             }
         }
 
-        if (!definition.Crossings.Any(
-                static crossing => crossing.Restorable))
-        {
-            errors.Add(
-                "At least one crossing must support authoritative restoration.");
-        }
+
     }
 
     private static void ValidateObjectives(
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         List<string> errors)
     {
         if (definition.Objectives.Count !=
@@ -460,7 +385,7 @@ public static class PrototypeBattlefieldValidator
     }
 
     private static void ValidatePoint(
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         Vector3 point,
         string label,
         List<string> errors)

@@ -35,7 +35,7 @@ Every save or replay document contains:
 
 Writes use a temporary file followed by atomic replacement. A partially written temporary file is never treated as the requested save path.
 
-The current reader accepts only its current format/schema version. Unlimited backward compatibility is not implied.
+The current reader accepts envelope format 1 and payload schemas 1 and 2. Schema 1 describes the existing Central Divide preset and is migrated explicitly. Schema 2 requires a composition identity. Unlimited backward compatibility is not implied.
 
 ## Save Payload
 
@@ -90,7 +90,7 @@ If a queued or control command type cannot be represented by the current replay 
 Create both a save and replay from a bounded Vertical Slice run:
 
 ```powershell
-dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 5000 --seed 2026 --save-output artifacts/match.save.json --replay-output artifacts/match.replay.json
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario central-divide --profile validation --ticks 5000 --seed 2026 --save-output artifacts/match.save.json --replay-output artifacts/match.replay.json
 ```
 
 Validate a save by reconstructing it and comparing the authoritative checkpoint:
@@ -147,3 +147,7 @@ Repository validation covers:
 - a headless save/replay recovery smoke in CI.
 
 The full repository build, tests, and existing natural terminal-match validation remain required alongside the focused persistence checks.
+
+## Match composition migration
+
+New save/replay payloads use schema 2 with a reproducible composition key and per-player opponent policies. Schema 1 remains readable after envelope checksum validation; its two preset policies migrate to participant keys 1/2. The checkpoint schema, original map key and command discriminators remain stable. Custom composition recovery requires an explicit key resolver and verifies the reconstructed state before returning it. See [Match Runtime and Scenario Composition](adr/MatchRuntimeAndScenarioComposition.md).

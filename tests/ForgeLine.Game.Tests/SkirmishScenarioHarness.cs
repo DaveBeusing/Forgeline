@@ -9,20 +9,22 @@ namespace ForgeLine.Game.Tests;
 
 internal sealed class SkirmishScenarioHarness
 {
-    private readonly VerticalSliceScenario _scenario;
+    private readonly MatchRuntime _scenario;
 
-    private SkirmishScenarioHarness(VerticalSliceScenario scenario)
+    private SkirmishScenarioHarness(MatchRuntime scenario)
     {
         _scenario = scenario;
     }
 
+    public SkirmishStartingBase GetBase(PlayerId player) => _scenario.GetBase(player);
+
     public SimulationCoordinator Simulation => _scenario.Simulation;
 
-    public PrototypeBattlefieldDefinition Battlefield => _scenario.Battlefield;
+    public BattlefieldDefinition Battlefield => _scenario.Battlefield;
 
     public TerrainWorld Terrain => _scenario.Terrain;
 
-    public PrototypeBattlefieldRuntime BattlefieldRuntime =>
+    public BattlefieldRuntime BattlefieldRuntime =>
         _scenario.BattlefieldRuntime;
 
     public InventoryStore Inventories => _scenario.Inventories;
@@ -55,9 +57,9 @@ internal sealed class SkirmishScenarioHarness
 
     public UnitFactory UnitFactory => _scenario.UnitFactory;
 
-    public SkirmishStartingBase West => _scenario.West;
+    public SkirmishStartingBase West => _scenario.GetBase(new PlayerId(1));
 
-    public SkirmishStartingBase East => _scenario.East;
+    public SkirmishStartingBase East => _scenario.GetBase(new PlayerId(2));
 
     public static SkirmishScenarioHarness Create(
         ulong seed = 17,
@@ -65,26 +67,29 @@ internal sealed class SkirmishScenarioHarness
         SkirmishOpponentConfiguration? eastConfiguration = null,
         SkirmishStartingStock? startingStock = null)
     {
-        VerticalSliceScenarioSettings validation =
-            VerticalSliceScenarioSettings.Create(
-                VerticalSliceScenarioProfile.Validation);
+        MatchScenarioSettings validation =
+            CentralDivideScenario.CreateSettings(
+                MatchScenarioProfile.Validation);
 
-        VerticalSliceScenarioSettings configured =
+        MatchScenarioSettings configured =
             validation with
             {
-                WestOpponent =
+                OpponentConfigurations = new Dictionary<ulong, SkirmishOpponentConfiguration>
+                {
+                    [1] =
                     westConfiguration ??
-                    validation.WestOpponent,
-                EastOpponent =
+                    validation.OpponentConfigurations[1],
+                    [2] =
                     eastConfiguration ??
-                    validation.EastOpponent,
+                    validation.OpponentConfigurations[2],
+                },
                 StartingStock =
                     startingStock ??
                     validation.StartingStock
             };
 
         return new SkirmishScenarioHarness(
-            VerticalSliceScenario.Create(
+            CentralDivideScenario.Create(
                 configured,
                 seed));
     }

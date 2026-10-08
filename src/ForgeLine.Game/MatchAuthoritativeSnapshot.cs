@@ -15,7 +15,7 @@ public sealed record AuthoritativeDomainSnapshot(
     string Name,
     string Json);
 
-public sealed record VerticalSliceAuthoritativeSnapshot(
+public sealed record MatchAuthoritativeSnapshot(
     int SchemaVersion,
     string BattlefieldKey,
     ulong Tick,
@@ -36,8 +36,8 @@ public sealed record VerticalSliceAuthoritativeSnapshot(
                     .AllowNamedFloatingPointLiterals
         };
 
-    public static VerticalSliceAuthoritativeSnapshot Capture(
-        VerticalSliceScenario scenario)
+    public static MatchAuthoritativeSnapshot Capture(
+        MatchRuntime scenario)
     {
         ArgumentNullException.ThrowIfNull(scenario);
 
@@ -55,18 +55,17 @@ public sealed record VerticalSliceAuthoritativeSnapshot(
                     scenario.Logistics.GetNodes()),
                 CaptureDomain(
                     "logistics.edges",
-                    scenario.Logistics.GetEdges()),
-                CaptureDomain(
-                    "intelligence.player_1",
-                    scenario.Intelligence.Capture(
-                        new FactionId(1))),
-                CaptureDomain(
-                    "intelligence.player_2",
-                    scenario.Intelligence.Capture(
-                        new FactionId(2)))
+                    scenario.Logistics.GetEdges())
             };
 
-        return new VerticalSliceAuthoritativeSnapshot(
+        foreach (var participant in scenario.MatchConfiguration.Participants)
+        {
+            domains.Add(CaptureDomain($"intelligence.player_{participant.Player.Value}",
+                scenario.Intelligence.Capture(participant.Faction)));
+        }
+
+
+        return new MatchAuthoritativeSnapshot(
             CurrentSchemaVersion,
             scenario.Battlefield.Metadata.Key,
             scenario.Simulation.CurrentTick.Value,

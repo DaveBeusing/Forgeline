@@ -7,15 +7,15 @@ using ForgeLine.World;
 
 namespace ForgeLine.Game;
 
-public sealed class PrototypeBattlefieldRuntime
+public sealed class BattlefieldRuntime
 {
     private readonly Dictionary<string, LogisticsNodeId> _roadNodes;
     private readonly Dictionary<string, LogisticsEdgeId> _roadEdges;
     private readonly Dictionary<string, EntityId> _crossingEntities;
     private readonly EntityId[] _worldPresentationEntities;
 
-    private PrototypeBattlefieldRuntime(
-        PrototypeBattlefieldDefinition definition,
+    private BattlefieldRuntime(
+        BattlefieldDefinition definition,
         TerrainWorld terrain,
         LogisticsNetwork logistics,
         IReadOnlyList<EntityId> resourceEntities,
@@ -36,7 +36,7 @@ public sealed class PrototypeBattlefieldRuntime
         MatchStateEntity = matchStateEntity;
     }
 
-    public PrototypeBattlefieldDefinition Definition { get; }
+    public BattlefieldDefinition Definition { get; }
 
     public TerrainWorld Terrain { get; }
 
@@ -58,9 +58,9 @@ public sealed class PrototypeBattlefieldRuntime
 
     public EntityId MatchStateEntity { get; }
 
-    public static PrototypeBattlefieldRuntime Load(
+    public static BattlefieldRuntime Load(
         EntityRegistry entities,
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         TerrainWorld terrain,
         LogisticsNetwork logistics)
     {
@@ -69,7 +69,7 @@ public sealed class PrototypeBattlefieldRuntime
         ArgumentNullException.ThrowIfNull(terrain);
         ArgumentNullException.ThrowIfNull(logistics);
 
-        PrototypeBattlefieldValidator.ValidateDefinition(
+        BattlefieldValidator.ValidateDefinition(
             definition);
 
         var resources =
@@ -343,7 +343,7 @@ public sealed class PrototypeBattlefieldRuntime
             MatchObjectiveSystem.CreateMatchStateEntity(
                 entities);
 
-        return new PrototypeBattlefieldRuntime(
+        return new BattlefieldRuntime(
             definition,
             terrain,
             logistics,
@@ -357,7 +357,8 @@ public sealed class PrototypeBattlefieldRuntime
 
     public IReadOnlyList<EntityId> AttachCommandCoreObjectives(
         EntityRegistry entities,
-        IReadOnlyDictionary<PlayerId, EntityId> commandCores)
+        IReadOnlyDictionary<PlayerId, EntityId> commandCores,
+        bool allowUnassignedStarts = false)
     {
         ArgumentNullException.ThrowIfNull(entities);
         ArgumentNullException.ThrowIfNull(commandCores);
@@ -377,6 +378,10 @@ public sealed class PrototypeBattlefieldRuntime
                     definition.Owner,
                     out EntityId commandCore))
             {
+                if (allowUnassignedStarts)
+                {
+                    continue;
+                }
                 throw new InvalidOperationException(
                     $"Missing Command Core for player {definition.Owner}.");
             }
@@ -396,7 +401,7 @@ public sealed class PrototypeBattlefieldRuntime
     }
 
     private static bool IsCrossingEdge(
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         string roadEdgeKey)
     {
         for (int index = 0;
@@ -523,7 +528,7 @@ public sealed class PrototypeBattlefieldRuntime
 
     private static void CreateRoadNodePresentationEntities(
         EntityRegistry entities,
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         Dictionary<string, Vector3> roadNodePositions)
     {
         const float MinimumCurveDegrees = 8.0f;
@@ -646,7 +651,7 @@ public sealed class PrototypeBattlefieldRuntime
     }
 
     private static List<Vector3> GetRoadNodeDirections(
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         Dictionary<string, Vector3> roadNodePositions,
         string nodeKey,
         Vector3 nodePosition)

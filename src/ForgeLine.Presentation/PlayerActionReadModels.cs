@@ -544,7 +544,7 @@ internal static class PlayerActionSnapshotFactory
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(extraction);
 
-        VerticalSliceScenario scenario =
+        MatchRuntime scenario =
             extraction.Scenario;
 
         PlayerConstructionActionReadModel[] construction =
@@ -625,7 +625,7 @@ internal static class PlayerActionSnapshotFactory
 
     private static PlayerConstructionActionReadModel[]
         CaptureConstructionActions(
-            VerticalSliceScenario scenario,
+            MatchRuntime scenario,
             InventoryId constructionInventory)
     {
         var actions =
@@ -659,7 +659,7 @@ internal static class PlayerActionSnapshotFactory
     private static PlayerProductionFacilityActionReadModel
         CaptureProductionFacility(
             EntityRegistry entities,
-            VerticalSliceScenario scenario,
+            MatchRuntime scenario,
             EntityId entity,
             ProductionFacility facility)
     {
@@ -766,7 +766,7 @@ internal static class PlayerActionSnapshotFactory
     private static PlayerUnitProductionFacilityActionReadModel
         CaptureUnitProductionFacility(
             EntityRegistry entities,
-            VerticalSliceScenario scenario,
+            MatchRuntime scenario,
             EntityId entity,
             UnitProductionFacility facility)
     {
@@ -877,7 +877,7 @@ internal static class PlayerActionSnapshotFactory
 
     private static PlayerTacticalActionReadModel? CaptureTactical(
         EntityRegistry entities,
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         PlayerId player,
         IReadOnlyList<EntityId> selectedEntities)
     {
@@ -1201,7 +1201,7 @@ internal static class PlayerActionSnapshotFactory
 
     private static PlayerLogisticsActionReadModel? CaptureLogistics(
         EntityRegistry entities,
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         EntityId entity)
     {
         bool hasInventory =
@@ -1338,7 +1338,7 @@ internal static class PlayerActionSnapshotFactory
 
     private static PlayerSupplyActionReadModel? CaptureSupply(
         EntityRegistry entities,
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         EntityId entity)
     {
         bool recipient =
@@ -1478,7 +1478,7 @@ internal static class PlayerActionSnapshotFactory
     }
 
     private static void ResolveDistributionStatus(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         EntityRegistry entities,
         EntityId policyEntity,
         out PlayerDistributionActionState state,
@@ -1565,7 +1565,7 @@ internal static class PlayerActionSnapshotFactory
 
     private static void ResolveProviderState(
         EntityRegistry entities,
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         EntityId recipient,
         EntityId provider,
         out PlayerSupplyProviderState state,
@@ -1677,7 +1677,7 @@ internal static class PlayerActionSnapshotFactory
     }
 
     private static PlayerActionResourceAmount CreateAmount(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         InventoryId inventory,
         ResourceId resourceId,
         double requiredQuantity)

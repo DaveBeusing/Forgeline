@@ -15,17 +15,17 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void MovementResultCarriesSessionCorrelationAndExecutionTick()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateHumanScenario(seed: 4101);
         var gateway =
             CreateGateway(scenario);
 
         EntityId unit =
-            scenario.West.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
 
         PlayerCommandSubmissionReceipt receipt =
             gateway.SubmitMovement(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [unit],
                 new Vector3(32.0f, 0.0f, 32.0f),
                 scenario.Simulation.CurrentTick,
@@ -67,25 +67,25 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void ResultDeliveryIsOrderedAndSurvivesDelayedConsumption()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateHumanScenario(seed: 4102);
         var gateway =
             CreateGateway(
                 scenario,
                 maximumOutstanding: 4);
         EntityId unit =
-            scenario.West.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
 
         PlayerCommandSubmissionReceipt first =
             gateway.SubmitMovement(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [unit],
                 new Vector3(24.0f, 0.0f, 24.0f),
                 scenario.Simulation.CurrentTick,
                 FormationTemplate.Compact);
         PlayerCommandSubmissionReceipt second =
             gateway.SubmitMovement(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [unit],
                 new Vector3(48.0f, 0.0f, 48.0f),
                 scenario.Simulation.CurrentTick,
@@ -117,14 +117,14 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void FullBoundaryRejectsNewSubmissionWithoutDroppingExistingResults()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateHumanScenario(seed: 4103);
         var gateway =
             CreateGateway(
                 scenario,
                 maximumOutstanding: 2);
         EntityId unit =
-            scenario.West.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
 
         PlayerCommandSubmissionReceipt first =
             SubmitMovement(
@@ -171,9 +171,9 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void FreshRuntimeUsesDifferentSessionIdentity()
     {
-        using VerticalSliceScenario first =
+        using MatchRuntime first =
             CreateHumanScenario(seed: 4104);
-        using VerticalSliceScenario second =
+        using MatchRuntime second =
             CreateHumanScenario(seed: 4104);
 
         Assert.True(
@@ -188,12 +188,12 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void PendingResultRemainsBoundToOriginalSessionAcrossRestart()
     {
-        using VerticalSliceScenario first =
+        using MatchRuntime first =
             CreateHumanScenario(seed: 4105);
         var firstGateway =
             CreateGateway(first);
         EntityId firstUnit =
-            first.West.StartingUnits[0];
+            first.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
 
         PlayerCommandSubmissionReceipt receipt =
             SubmitMovement(
@@ -209,7 +209,7 @@ public sealed class PlayerCommandBoundaryTests
             1,
             firstGateway.Results.Count);
 
-        using VerticalSliceScenario restarted =
+        using MatchRuntime restarted =
             CreateHumanScenario(seed: 4105);
         var restartedGateway =
             CreateGateway(restarted);
@@ -237,14 +237,14 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void TerminalEndMatchResultIsDeliveredThroughBoundary()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateHumanScenario(seed: 4106);
         var gateway =
             CreateGateway(scenario);
 
         Assert.True(
             scenario.Simulation.Entities.DestroyEntity(
-                scenario.East.CommandCore));
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore));
         scenario.Simulation.AdvanceOneTick();
 
         Assert.True(
@@ -252,7 +252,7 @@ public sealed class PlayerCommandBoundaryTests
 
         PlayerCommandSubmissionReceipt receipt =
             gateway.SubmitEndMatch(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 scenario.Simulation.CurrentTick);
 
         Assert.True(receipt.Accepted);
@@ -282,7 +282,7 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void ProductionSubmissionRejectsFacilityOwnedByAnotherPlayer()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateHumanScenario(seed: 4107);
         PlayerCommandGateway gateway =
             CreateGateway(scenario);
@@ -310,7 +310,7 @@ public sealed class PlayerCommandBoundaryTests
 
         PlayerCommandSubmissionReceipt receipt =
             gateway.SubmitProduction(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 facility,
                 RecipeIds.Steel,
                 scenario.Simulation.CurrentTick);
@@ -335,7 +335,7 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void UnitProductionSubmissionUsesOwnedFacilityAndPublishesAcceptedResult()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateHumanScenario(seed: 4108);
         PlayerCommandGateway gateway =
             CreateGateway(scenario);
@@ -348,20 +348,20 @@ public sealed class PlayerCommandBoundaryTests
         scenario.Simulation.Entities.AddComponent(
             facility,
             new ControllableEntity(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 ControllableEntityCategory.Building));
         scenario.Simulation.Entities.AddComponent(
             facility,
             new UnitProductionFacility(
                 input,
                 UnitProductionCapability.Infantry,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 Vector3.Zero,
                 scenario.Simulation.CurrentTick));
 
         PlayerCommandSubmissionReceipt receipt =
             gateway.SubmitUnitProduction(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 facility,
                 UnitIds.RifleSquad,
                 scenario.Simulation.CurrentTick);
@@ -386,7 +386,7 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void UnitProductionRallyPointSubmissionEnforcesFacilityOwnership()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateHumanScenario(seed: 4109);
         PlayerCommandGateway gateway =
             CreateGateway(scenario);
@@ -403,7 +403,7 @@ public sealed class PlayerCommandBoundaryTests
             new UnitProductionFacility(
                 input,
                 UnitProductionCapability.Vehicle,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 Vector3.Zero,
                 scenario.Simulation.CurrentTick));
         scenario.Simulation.Entities.AddComponent(
@@ -411,7 +411,7 @@ public sealed class PlayerCommandBoundaryTests
             new UnitProductionFacility(
                 input,
                 UnitProductionCapability.Vehicle,
-                scenario.East.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).Player,
                 Vector3.Zero,
                 scenario.Simulation.CurrentTick));
 
@@ -420,7 +420,7 @@ public sealed class PlayerCommandBoundaryTests
 
         PlayerCommandSubmissionReceipt owned =
             gateway.SubmitUnitProductionRallyPoint(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 ownedFacility,
                 rallyPoint,
                 scenario.Simulation.CurrentTick);
@@ -446,7 +446,7 @@ public sealed class PlayerCommandBoundaryTests
 
         PlayerCommandSubmissionReceipt foreign =
             gateway.SubmitUnitProductionRallyPoint(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 foreignFacility,
                 rallyPoint,
                 scenario.Simulation.CurrentTick);
@@ -469,15 +469,15 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void LogisticsStockPolicySubmissionEnforcesOwnershipAndThresholds()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateHumanScenario(seed: 4111);
         PlayerCommandGateway gateway =
             CreateGateway(scenario);
 
         PlayerCommandSubmissionReceipt owned =
             gateway.SubmitLogisticsStockPolicy(
-                scenario.West.Player,
-                scenario.West.CommandCore,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
                 ResourceIds.Fuel,
                 50.0,
                 100.0,
@@ -506,7 +506,7 @@ public sealed class PlayerCommandBoundaryTests
                         entity);
 
             if (candidate.TargetEntity ==
-                    scenario.West.CommandCore &&
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore &&
                 candidate.ResourceId ==
                     ResourceIds.Fuel)
             {
@@ -520,8 +520,8 @@ public sealed class PlayerCommandBoundaryTests
 
         PlayerCommandSubmissionReceipt foreign =
             gateway.SubmitLogisticsStockPolicy(
-                scenario.West.Player,
-                scenario.East.CommandCore,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore,
                 ResourceIds.Fuel,
                 10.0,
                 20.0,
@@ -544,8 +544,8 @@ public sealed class PlayerCommandBoundaryTests
 
         PlayerCommandSubmissionReceipt invalid =
             gateway.SubmitLogisticsStockPolicy(
-                scenario.West.Player,
-                scenario.West.CommandCore,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
                 ResourceIds.Ammunition,
                 30.0,
                 20.0,
@@ -568,8 +568,8 @@ public sealed class PlayerCommandBoundaryTests
 
         PlayerCommandSubmissionReceipt nonFinite =
             gateway.SubmitLogisticsStockPolicy(
-                scenario.West.Player,
-                scenario.West.CommandCore,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
                 ResourceIds.Electronics,
                 double.NaN,
                 20.0,
@@ -594,16 +594,16 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void AutomaticResupplyPolicySubmissionUpdatesOwnedUnit()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateHumanScenario(seed: 4112);
         PlayerCommandGateway gateway =
             CreateGateway(scenario);
         EntityId unit =
-            scenario.West.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
 
         PlayerCommandSubmissionReceipt receipt =
             gateway.SubmitAutomaticResupplyPolicy(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 unit,
                 ammunitionThreshold: 0.35,
                 fuelThreshold: 0.4,
@@ -635,18 +635,18 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void SupplyPrioritySubmissionEnforcesOwnership()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateHumanScenario(seed: 4113);
         PlayerCommandGateway gateway =
             CreateGateway(scenario);
         EntityId ownedUnit =
-            scenario.West.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
         EntityId foreignUnit =
-            scenario.East.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(2)).StartingUnits[0];
 
         PlayerCommandSubmissionReceipt owned =
             gateway.SubmitSupplyPriority(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 ownedUnit,
                 BattlefieldSupplyPriority.Critical,
                 scenario.Simulation.CurrentTick);
@@ -672,7 +672,7 @@ public sealed class PlayerCommandBoundaryTests
 
         PlayerCommandSubmissionReceipt foreign =
             gateway.SubmitSupplyPriority(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 foreignUnit,
                 BattlefieldSupplyPriority.High,
                 scenario.Simulation.CurrentTick);
@@ -700,16 +700,16 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void RetreatToRecoveryUsesOwnedCombinedSupportProvider()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateHumanScenario(seed: 4117);
         PlayerCommandGateway gateway =
             CreateGateway(scenario);
         EntityId unit =
-            scenario.West.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
 
         PlayerCommandSubmissionReceipt receipt =
             gateway.SubmitRetreatToRecovery(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [unit],
                 scenario.Simulation.CurrentTick,
                 FormationTemplate.Column);
@@ -732,7 +732,7 @@ public sealed class PlayerCommandBoundaryTests
                 .GetComponent<RetreatRecoveryState>(
                     unit);
         Assert.Equal(
-            scenario.West.CommandCore,
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
             recovery.Provider);
         Assert.Equal(
             RetreatRecoveryReason.RepairAndSupply,
@@ -753,16 +753,16 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void TacticalAttackRequiresCurrentIdentifiedEnemy()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateHumanScenario(seed: 4114);
         PlayerCommandGateway gateway =
             CreateGateway(scenario);
         EntityId attacker =
-            scenario.West.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
         EntityId target =
-            scenario.East.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(2)).StartingUnits[0];
         FactionId westFaction =
-            new((uint)scenario.West.Player.Value);
+            new((uint)scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player.Value);
 
         IntelligenceSignature signature =
             scenario.Simulation.Entities
@@ -785,7 +785,7 @@ public sealed class PlayerCommandBoundaryTests
 
         PlayerCommandSubmissionReceipt receipt =
             gateway.SubmitAttack(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [attacker],
                 target,
                 scenario.Simulation.CurrentTick);
@@ -810,7 +810,7 @@ public sealed class PlayerCommandBoundaryTests
 
         PlayerCommandSubmissionReceipt stale =
             gateway.SubmitAttack(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [attacker],
                 target,
                 scenario.Simulation.CurrentTick);
@@ -832,20 +832,20 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void TacticalAttackPublishesPartialResultForMixedSelection()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateHumanScenario(seed: 4115);
         PlayerCommandGateway gateway =
             CreateGateway(scenario);
         EntityId attacker =
-            scenario.West.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
         EntityId cargo =
-            scenario.West.StartingUnits[1];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[1];
         EntityId foreign =
-            scenario.East.StartingUnits[1];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(2)).StartingUnits[1];
         EntityId target =
-            scenario.East.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(2)).StartingUnits[0];
         FactionId westFaction =
-            new((uint)scenario.West.Player.Value);
+            new((uint)scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player.Value);
 
         IntelligenceSignature signature =
             scenario.Simulation.Entities
@@ -867,7 +867,7 @@ public sealed class PlayerCommandBoundaryTests
 
         PlayerCommandSubmissionReceipt receipt =
             gateway.SubmitAttack(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [attacker, cargo, foreign],
                 target,
                 scenario.Simulation.CurrentTick);
@@ -888,12 +888,12 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void TacticalMovementCommandsPreserveDistinctOrderSemantics()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateHumanScenario(seed: 4116);
         PlayerCommandGateway gateway =
             CreateGateway(scenario);
         EntityId unit =
-            scenario.West.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
         WorldTransform transform =
             scenario.Simulation.Entities
                 .GetComponent<WorldTransform>(
@@ -907,7 +907,7 @@ public sealed class PlayerCommandBoundaryTests
 
         Assert.True(
             gateway.SubmitAttackMove(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [unit],
                 first,
                 scenario.Simulation.CurrentTick,
@@ -928,7 +928,7 @@ public sealed class PlayerCommandBoundaryTests
 
         Assert.True(
             gateway.SubmitHoldPosition(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [unit],
                 scenario.Simulation.CurrentTick).Accepted);
         scenario.Simulation.AdvanceOneTick();
@@ -941,7 +941,7 @@ public sealed class PlayerCommandBoundaryTests
 
         Assert.True(
             gateway.SubmitStopCombat(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [unit],
                 scenario.Simulation.CurrentTick).Accepted);
         scenario.Simulation.AdvanceOneTick();
@@ -954,7 +954,7 @@ public sealed class PlayerCommandBoundaryTests
 
         Assert.True(
             gateway.SubmitRetreat(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [unit],
                 second,
                 scenario.Simulation.CurrentTick,
@@ -977,12 +977,12 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void PlayerFireMissionUsesStoredContactCoordinate()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateHumanScenario(seed: 4117);
         PlayerCommandGateway gateway =
             CreateGateway(scenario);
         EntityId target =
-            scenario.East.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(2)).StartingUnits[0];
         WorldTransform targetTransform =
             scenario.Simulation.Entities
                 .GetComponent<WorldTransform>(
@@ -1006,9 +1006,9 @@ public sealed class PlayerCommandBoundaryTests
                 scenario.Services.UnitDefinitions[
                     UnitIds.MobileArtillery],
                 artilleryPosition,
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         FactionId westFaction =
-            new((uint)scenario.West.Player.Value);
+            new((uint)scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player.Value);
         IntelligenceSignature signature =
             scenario.Simulation.Entities
                 .GetComponent<IntelligenceSignature>(
@@ -1038,7 +1038,7 @@ public sealed class PlayerCommandBoundaryTests
                 target);
         PlayerCommandSubmissionReceipt receipt =
             gateway.SubmitFireMission(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [artillery],
                 key,
                 requestedRounds: 1,
@@ -1082,16 +1082,16 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void TacticalAttackRejectsDetectedDeadAndIncompatibleTargets()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateHumanScenario(seed: 4120);
         PlayerCommandGateway gateway =
             CreateGateway(scenario);
         EntityId attacker =
-            scenario.West.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
         EntityId target =
-            scenario.East.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(2)).StartingUnits[0];
         FactionId faction =
-            new((uint)scenario.West.Player.Value);
+            new((uint)scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player.Value);
         IntelligenceSignature targetSignature =
             scenario.Simulation.Entities
                 .GetComponent<IntelligenceSignature>(
@@ -1113,7 +1113,7 @@ public sealed class PlayerCommandBoundaryTests
 
         Assert.True(
             gateway.SubmitAttack(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [attacker],
                 target,
                 scenario.Simulation.CurrentTick).Accepted);
@@ -1129,16 +1129,16 @@ public sealed class PlayerCommandBoundaryTests
         IntelligenceSignature coreSignature =
             scenario.Simulation.Entities
                 .GetComponent<IntelligenceSignature>(
-                    scenario.East.CommandCore);
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore);
         WorldTransform coreTransform =
             scenario.Simulation.Entities
                 .GetComponent<WorldTransform>(
-                    scenario.East.CommandCore);
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore);
         scenario.Intelligence.BeginTick(
             scenario.Simulation.CurrentTick);
         scenario.Intelligence.Observe(
             faction,
-            scenario.East.CommandCore,
+            scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore,
             coreSignature,
             coreTransform.Position,
             IntelligenceState.Identified,
@@ -1146,9 +1146,9 @@ public sealed class PlayerCommandBoundaryTests
 
         Assert.True(
             gateway.SubmitAttack(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [attacker],
-                scenario.East.CommandCore,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore,
                 scenario.Simulation.CurrentTick).Accepted);
         scenario.Simulation.AdvanceOneTick();
 
@@ -1174,7 +1174,7 @@ public sealed class PlayerCommandBoundaryTests
 
         Assert.True(
             gateway.SubmitAttack(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [attacker],
                 target,
                 scenario.Simulation.CurrentTick).Accepted);
@@ -1191,14 +1191,14 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void PlayerArtilleryReportsRangeAndUsesNormalNoAmmoState()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateHumanScenario(seed: 4121);
         PlayerCommandGateway gateway =
             CreateGateway(scenario);
         WorldTransform westCore =
             scenario.Simulation.Entities
                 .GetComponent<WorldTransform>(
-                    scenario.West.CommandCore);
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
         Vector3 artilleryPosition =
             westCore.Position +
             new Vector3(120.0f, 0.0f, 0.0f);
@@ -1215,15 +1215,15 @@ public sealed class PlayerCommandBoundaryTests
                 scenario.Services.UnitDefinitions[
                     UnitIds.MobileArtillery],
                 artilleryPosition,
-                scenario.West.Player);
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         EntityId contactEntity =
-            scenario.East.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(2)).StartingUnits[0];
         IntelligenceSignature signature =
             scenario.Simulation.Entities
                 .GetComponent<IntelligenceSignature>(
                     contactEntity);
         FactionId faction =
-            new((uint)scenario.West.Player.Value);
+            new((uint)scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player.Value);
         IntelligenceContactKey key =
             IntelligenceContactKey.FromEntity(
                 contactEntity);
@@ -1241,7 +1241,7 @@ public sealed class PlayerCommandBoundaryTests
 
         Assert.True(
             gateway.SubmitFireMission(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [artillery],
                 key,
                 requestedRounds: 1,
@@ -1268,7 +1268,7 @@ public sealed class PlayerCommandBoundaryTests
 
         PlayerCommandSubmissionReceipt disableAutomaticResupply =
             gateway.SubmitAutomaticResupplyPolicy(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 artillery,
                 ammunitionThreshold: 0.2,
                 fuelThreshold: 0.2,
@@ -1300,7 +1300,7 @@ public sealed class PlayerCommandBoundaryTests
 
         Assert.True(
             gateway.SubmitFireMission(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 [artillery],
                 key,
                 requestedRounds: 1,
@@ -1339,14 +1339,14 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void PlayerAttackNaturallyDestroysCommandCoreAndResolvesVictory()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateHumanScenario(seed: 4118);
         PlayerCommandGateway gateway =
             CreateGateway(scenario);
         WorldTransform coreTransform =
             scenario.Simulation.Entities
                 .GetComponent<WorldTransform>(
-                    scenario.East.CommandCore);
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore);
         var attackers =
             new List<EntityId>();
 
@@ -1373,21 +1373,21 @@ public sealed class PlayerCommandBoundaryTests
                     scenario.Services.UnitDefinitions[
                         UnitIds.MainBattleTank],
                     position,
-                    scenario.West.Player));
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player));
         }
 
         FactionId westFaction =
-            new((uint)scenario.West.Player.Value);
+            new((uint)scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player.Value);
         IntelligenceSignature coreSignature =
             scenario.Simulation.Entities
                 .GetComponent<IntelligenceSignature>(
-                    scenario.East.CommandCore);
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore);
 
         scenario.Intelligence.BeginTick(
             scenario.Simulation.CurrentTick);
         scenario.Intelligence.Observe(
             westFaction,
-            scenario.East.CommandCore,
+            scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore,
             coreSignature,
             coreTransform.Position,
             IntelligenceState.Identified,
@@ -1395,9 +1395,9 @@ public sealed class PlayerCommandBoundaryTests
 
         Assert.True(
             gateway.SubmitAttack(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 attackers.ToArray(),
-                scenario.East.CommandCore,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore,
                 scenario.Simulation.CurrentTick).Accepted);
 
         scenario.Simulation.AdvanceOneTick();
@@ -1424,11 +1424,11 @@ public sealed class PlayerCommandBoundaryTests
             MatchStatus.Victory,
             match.Status);
         Assert.Equal(
-            scenario.West.Player,
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
             match.Winner);
         Assert.False(
             scenario.Simulation.Entities.IsAlive(
-                scenario.East.CommandCore));
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore));
         Assert.True(
             scenario.Services.TacticalCombat.Metrics
                 .EngagingUnits >= 0);
@@ -1438,17 +1438,17 @@ public sealed class PlayerCommandBoundaryTests
     [Fact]
     public void TechnologyResearchStartAndCancelResolveThroughCommandBoundary()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateHumanScenario(seed: 4114);
         PlayerCommandGateway gateway =
             CreateGateway(scenario);
 
         PlayerCommandSubmissionReceipt start =
             gateway.SubmitTechnologyResearch(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 TechnologyIds.IndustrialStandardization,
-                scenario.West.CommandCore,
-                scenario.West.CommandCore,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
                 scenario.Simulation.CurrentTick);
 
         Assert.True(start.Accepted);
@@ -1470,13 +1470,13 @@ public sealed class PlayerCommandBoundaryTests
         Assert.True(
             TechnologyStateQueries.TryGetActiveResearch(
                 scenario.Simulation.Entities,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 out EntityId requestEntity,
                 out _));
 
         PlayerCommandSubmissionReceipt cancel =
             gateway.SubmitTechnologyResearchCancel(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 requestEntity,
                 scenario.Simulation.CurrentTick);
 
@@ -1496,32 +1496,32 @@ public sealed class PlayerCommandBoundaryTests
         Assert.False(
             TechnologyStateQueries.TryGetActiveResearch(
                 scenario.Simulation.Entities,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 out _,
                 out _));
     }
 
-    private static VerticalSliceScenario CreateHumanScenario(
+    private static MatchRuntime CreateHumanScenario(
         ulong seed)
     {
-        VerticalSliceRuntimeSettings runtime =
-            VerticalSliceRuntimeSettings.CreateHeadless(
-                VerticalSliceScenarioProfile.Gameplay,
+        MatchRuntimeSettings runtime =
+            CentralDivideScenario.CreateHeadless(
+                MatchScenarioProfile.Gameplay,
                 seed) with
             {
                 Participants =
-                    VerticalSliceRuntimeSettings.CreateDefaultParticipants(
+                    CentralDivideScenario.CreateDefaultParticipants(
                         westComputerControlled: false,
                         eastComputerControlled: false)
             };
 
-        return VerticalSliceScenario.Create(
+        return CentralDivideScenario.Create(
             runtime,
             TestContext.Current.CancellationToken);
     }
 
     private static PlayerCommandGateway CreateGateway(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         int maximumOutstanding = 128)
     {
         var gateway =
@@ -1545,11 +1545,11 @@ public sealed class PlayerCommandBoundaryTests
 
     private static PlayerCommandSubmissionReceipt SubmitMovement(
         PlayerCommandGateway gateway,
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         EntityId unit,
         float coordinate) =>
         gateway.SubmitMovement(
-            scenario.West.Player,
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
             [unit],
             new Vector3(
                 coordinate,

@@ -4,7 +4,7 @@
 
 `Central Divide` is the canonical FORGELINE vertical-slice battlefield. It is a 3,072 × 3,072 meter two-player map designed to force the production, logistics, intelligence, terrain, disruption, and combined-arms systems to interact in one scenario.
 
-The map is authored as typed game-content data through `PrototypeBattlefieldDefinition`. `ForgeLine.MapCompiler` now captures that definition into the versioned `BattlefieldMapArtifact`, reloads the compiled payload, and runs operational-geography qualification. Gameplay does not depend on editor-only state; the typed definition remains the current runtime source while the artifact establishes the compiler handoff for later editor-authored maps.
+The map is authored as typed game-content data through `BattlefieldDefinition`. `ForgeLine.MapCompiler` now captures that definition into the versioned `BattlefieldMapArtifact`, reloads the compiled payload, and runs operational-geography qualification. Gameplay does not depend on editor-only state; the typed definition remains the current runtime source while the artifact establishes the compiler handoff for later editor-authored maps.
 
 ## Strategic Layout
 
@@ -29,7 +29,7 @@ The North Bridge is the efficient high-capacity route. The South Ford is a longe
 
 ## Terrain and Navigation
 
-`PrototypeBattlefieldTerrainFactory` creates deterministic chunked terrain using the normal `TerrainWorld` model. The divide is formed from elevation plus explicit static navigation blockers. Only the two crossing gaps allow direct ground transit.
+`CentralDivideTerrainFactory` creates deterministic chunked terrain using the normal `TerrainWorld` model. The divide is formed from elevation plus explicit static navigation blockers. Only the two crossing gaps allow direct ground transit.
 
 The interactive client builds the normal hierarchical navigation world over this terrain. Strategic-infrastructure state replaces the `NavigationWorld` with a new `NavigationVersion`; cached high-level routes are cleared and stale route results are rejected by the existing navigation system.
 
@@ -37,7 +37,7 @@ A disabled or restoring crossing contributes its passage bounds as a navigation 
 
 ## Logistics Corridor
 
-`PrototypeBattlefieldRuntime` creates the battlefield corridor as real `LogisticsNetwork` nodes and `GroundRoad` edges. Crossing definitions hold stable references to their corresponding logistics edge.
+`BattlefieldRuntime` creates the battlefield corridor as real `LogisticsNetwork` nodes and `GroundRoad` edges. Crossing definitions hold stable references to their corresponding logistics edge.
 
 `StrategicInfrastructureSystem` changes the actual edge availability. Disabling a crossing invalidates cached logistics routes and forces any reachable route to use another enabled crossing. Restoration re-enables the same topology rather than creating a separate scripted bypass.
 
@@ -87,7 +87,7 @@ All visuals remain diagnostic overlays; navigation and logistics behavior comes 
 
 ## Validation
 
-`PrototypeBattlefieldValidator` fails loading for invalid dimensions, duplicate or missing stable keys, invalid road references, insufficient crossing data, missing bootstrap resources, invalid strategic sites, or objective/start mismatches.
+`BattlefieldValidator` fails loading for invalid dimensions, duplicate or missing stable keys, invalid road references, insufficient crossing data, missing bootstrap resources, invalid strategic sites, or objective/start mismatches.
 
 `BattlefieldOperationalGeographyValidator` additionally qualifies every strategic-site route and a bounded traversable approach for every resource deposit from the spawns, explicit buildability, expansion pressure, elevation range, and both navigation and road alternatives after either crossing is individually unavailable. CI runs this qualification through `ForgeLine.MapCompiler` and retains the compiled map/report as diagnostics.
 

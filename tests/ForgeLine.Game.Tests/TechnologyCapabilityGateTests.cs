@@ -11,7 +11,7 @@ public sealed class TechnologyCapabilityGateTests
     [Fact]
     public void CombatEngineerProductionRequiresFieldEngineeringUnlock()
     {
-        using VerticalSliceScenario scenario =
+        using MatchRuntime scenario =
             CreateScenario(
                 seed: 4411);
         InventoryId input =
@@ -25,14 +25,14 @@ public sealed class TechnologyCapabilityGateTests
             new UnitProductionFacility(
                 input,
                 UnitProductionCapability.Infantry,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 Vector3.Zero,
                 scenario.Simulation.CurrentTick));
 
         Assert.False(
             TechnologyStateQueries.IsCapabilityUnlocked(
                 scenario.Simulation.Entities,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 TechnologyCapabilityIds.FieldEngineering));
 
         EntityId blockedRequest =
@@ -56,7 +56,7 @@ public sealed class TechnologyCapabilityGateTests
         scenario.Simulation.Entities.AddComponent(
             unlockEntity,
             new TechnologyCapabilityUnlock(
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 TechnologyCapabilityIds.FieldEngineering,
                 TechnologyIds.IndustrialStandardization,
                 scenario.Simulation.CurrentTick));
@@ -88,22 +88,22 @@ public sealed class TechnologyCapabilityGateTests
             state.ActiveUnit);
     }
 
-    private static VerticalSliceScenario CreateScenario(
+    private static MatchRuntime CreateScenario(
         ulong seed)
     {
-        VerticalSliceRuntimeSettings runtime =
-            VerticalSliceRuntimeSettings.CreateHeadless(
-                VerticalSliceScenarioProfile.Gameplay,
+        MatchRuntimeSettings runtime =
+            CentralDivideScenario.CreateHeadless(
+                MatchScenarioProfile.Gameplay,
                 seed) with
             {
                 Participants =
-                    VerticalSliceRuntimeSettings
+                    CentralDivideScenario
                         .CreateDefaultParticipants(
                             westComputerControlled: false,
                             eastComputerControlled: false)
             };
 
-        return VerticalSliceScenario.Create(
+        return CentralDivideScenario.Create(
             runtime,
             TestContext.Current.CancellationToken);
     }

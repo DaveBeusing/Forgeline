@@ -55,12 +55,14 @@ dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuratio
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 64 --seed 12345 --tick-rate 20 --entities 1000 --diagnostics-output artifacts/headless-smoke.json
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 16 --seed 67890 --tick-rate 20 --entities 10000 --diagnostics-output artifacts/headless-stress-10000.json
 dotnet test --solution ForgeLine.sln --configuration Release --no-build
-dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --require-terminal --diagnostics-output artifacts/vertical-slice-match.json
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario central-divide --profile validation --ticks 80000 --seed 2026 --require-terminal --diagnostics-output artifacts/match.json
 ```
 
 The GitHub Actions CI workflow executes this sequence on pull requests targeting `master` and on pushes to `master`. Windows client smoke validation is guarded to Windows runners, while headless diagnostic JSON files are uploaded as the `engine-diagnostics` workflow artifact.
 
 ## Pull Requests and Required Check
+
+After the Release build, `pwsh ./build/Run-MatchSoak.ps1 -NoBuild` runs the canonical preset soak without rebuilding. Omit `-NoBuild` to retain the normal build-and-run behavior. The legacy `Run-VerticalSliceSoak.ps1` forwards to the new script and preserves its historical default report paths. The canonical CLI is `--scenario central-divide`; `--scenario vertical-slice` remains an alias.
 
 `master` is the integration branch. Integration is intended to occur through pull requests from short-lived technical branches.
 
@@ -72,7 +74,7 @@ Repository settings must require that check before merge once `master` protectio
 
 The repository contains focused test projects for Core, ECS, Jobs, World, Simulation, Navigation, Logistics, Game, Platform.Windows, Graphics, Input, and Presentation.
 
-Functional tests belong with the systems they validate and should cover controlled failure behavior as well as successful behavior. Directorate content validation and bounded vertical-slice scenarios run in `ForgeLine.Game.Tests` and remain fully headless. Central Divide definition validation, compiled-map roundtrip, explicit build-zone policy, complete strategic/resource reachability, disruption/rerouting/restoration, finite-resource loading, and Command Core objective tests also run in `ForgeLine.Game.Tests` without a presentation dependency. Skirmish-opponent validation reuses `VerticalSliceScenario` for shortage recovery, intelligence-constrained direct targeting, same-seed strategic progression, integrated Build–Supply–Conquer coverage, and fresh-session cleanup. CI additionally executes one bounded terminal match through the real headless host. Repeated multi-match soak remains an on-demand workflow rather than a per-PR timing gate.
+Functional tests belong with the systems they validate and should cover controlled failure behavior as well as successful behavior. Directorate content validation and bounded vertical-slice scenarios run in `ForgeLine.Game.Tests` and remain fully headless. Central Divide definition validation, compiled-map roundtrip, explicit build-zone policy, complete strategic/resource reachability, disruption/rerouting/restoration, finite-resource loading, and Command Core objective tests also run in `ForgeLine.Game.Tests` without a presentation dependency. Skirmish-opponent validation reuses `MatchRuntime` for shortage recovery, intelligence-constrained direct targeting, same-seed strategic progression, integrated Build–Supply–Conquer coverage, and fresh-session cleanup. CI additionally executes one bounded terminal match through the real headless host. Repeated multi-match soak remains an on-demand workflow rather than a per-PR timing gate.
 
 Job tests verify range coverage, dependency ordering, fences, exception propagation, one-worker execution, cancellation-aware shutdown, bounded stress execution, and instrumentation. Simulation tests verify fixed tick counts, explicit phase order, command scheduling and stable ordering, deterministic seeded behavior, job-boundary integration, fast headless-style execution, allocation behavior, diagnostics, reusable test scenarios, and bounded entity stress. Simulation tests must remain runnable without starting the interactive client. Navigation tests cover movement-class traversability, obstacle blocking, sector decomposition, portals, high-level routing, choke points, bounded local refinement, cache reuse, explicit route failure, and large-map hierarchy scaling. Logistics tests cover connected and disconnected graphs, disabled infrastructure, alternate routes, deterministic equal-cost ties, node removal, versioned cache invalidation, transport-mode filtering, and minimum-capacity filtering. Game tests additionally cover job-scheduled navigation handoff, stale-result rejection, fixed-tick ground locomotion, arrival, acceleration and turn limits, terrain/slope handling, spatial chunk crossing, local separation, static obstacle steering, stuck detection, one shared strategic route for 10/50/100-unit selections, stable formation slots, unit removal, replacement orders, choke-point fallback, concurrent groups, a 1,000-unit movement stress scenario, economic-building logistics registration, physical cargo transport, load/unload conservation, route invalidation/rerouting, destination-capacity recovery, vehicle-loss semantics, bounded multi-transport stress, throughput-window enforcement, congestion-aware alternate routing, persistent node/edge disruption and restoration, saturation backlog/recovery, route-churn reservation cleanup, hitscan cadence and reload timing, authoritative Ammunition depletion, range rejection, physical projectile travel/collision, exactly-once impact, stale source/target handling, zero-health lifecycle destruction, repeatable headless combat outcomes, Front/Side/Rear/Top armor classification, penetration mitigation, target-class filtering, deterministic target priority, reacquisition, fire-policy behavior, and target-availability/line-of-fire hooks, persistent exploration, visual-visibility loss, radar-only contacts, Detected/Identified transitions, faction isolation, hidden-target exclusion, last-known moving contacts, faction-safe presentation filtering, hidden artillery-coordinate rejection, radar-contact fire missions, indirect min/max range, projectile travel, exactly-once area damage, Ammunition exhaustion, Battlefield-Supply-driven mission recovery, Attack/pursuit-leash behavior, AttackMove engagement/resume, Hold/Stop semantics, group target spreading, real automatic resupply, Retreat, derived unit/group readiness, entity-loss strength degradation, and intelligence-constrained tactical test-opponent behavior.
 
@@ -105,7 +107,7 @@ Correctness tests remain separate from benchmark timing. Benchmark timing thresh
 
 ## Windows Client Host
 
-The interactive client owns the native Windows host, Direct3D 12 graphics backend, RTS input/camera stack, immutable presentation extraction, frame pacing, and development visualization. Canonical gameplay construction is delegated to `VerticalSliceScenario` using the `Gameplay` profile. Player 1 is explicitly human-controlled and Player 2 computer-controlled; the local slot therefore does not receive a strategic opponent controller.
+The interactive client owns the native Windows host, Direct3D 12 graphics backend, RTS input/camera stack, immutable presentation extraction, frame pacing, and development visualization. Canonical gameplay construction is delegated to `MatchRuntime` using the `Gameplay` profile. Player 1 is explicitly human-controlled and Player 2 computer-controlled; the local slot therefore does not receive a strategic opponent controller.
 
 The client supplies a host-owned `JobScheduler` to the shared runtime. Scenario disposal does not dispose that scheduler; the client host owns its single disposal. Match restart creates a fresh shared scenario so ECS state, inventories, navigation state, routes, controllers, and orders do not leak between sessions.
 
@@ -144,7 +146,7 @@ The development host supports lightweight engine stress and complete vertical-sl
 --help
 ```
 
-The logical tick rate describes simulation time. Headless execution does not sleep to match real time and may run substantially faster than the configured logical rate. The vertical-slice runtime remains fixed at the canonical 20 Hz simulation rate and uses the same `VerticalSliceScenario` construction path as the Windows client.
+The logical tick rate describes simulation time. Headless execution does not sleep to match real time and may run substantially faster than the configured logical rate. The vertical-slice runtime remains fixed at the canonical 20 Hz simulation rate and uses the same `MatchRuntime` construction path as the Windows client.
 
 `gameplay` preserves product-facing starting stock, opponent behavior, 16 m navigation cells with 8-cell sectors, and the normal distribution retry/attempt/fairness policy (20 ticks / 4 attempts / 200 aging ticks). `validation` deliberately retains accelerated starting stock and opponent behavior, 32 m navigation cells with 4-cell sectors, and its faster distribution policy (10 / 8 / 100) for deterministic CI/soak coverage. Validation tuning must not be treated as product balance.
 
@@ -153,10 +155,10 @@ Headless participant assignments are explicit runtime settings rather than hidde
 Run repeated fresh sessions with:
 
 ```powershell
-pwsh ./build/Run-VerticalSliceSoak.ps1 -Profile validation -Matches 5 -TicksPerMatch 80000 -Seed 2026
+pwsh ./build/Run-MatchSoak.ps1 -Profile validation -Matches 5 -TicksPerMatch 80000 -Seed 2026
 ```
 
-The `Vertical Slice Soak` GitHub Actions workflow exposes the same runner through manual dispatch and uploads the JSON report.
+The `Match Soak` GitHub Actions workflow exposes the same runner through manual dispatch and uploads the JSON report.
 
 ## Commit Discipline
 
@@ -175,4 +177,4 @@ Documentation changes with implementation. When project responsibilities, depend
 
 The skirmish opponent is a game-composition layer, not an alternate simulation authority. New behavior must preserve the command boundary, faction-scoped intelligence, real resource costs, physical Fuel/Ammunition, and normal logistics/movement/combat execution. Difficulty/configuration changes may adjust decision cadence and thresholds but must not alter simulation advantages.
 
-Use `VerticalSliceScenario` as the canonical reusable game composition and `SkirmishScenarioHarness` as its test-facing wrapper. Keep focused deterministic scenarios in the normal test suite; CI also executes one accelerated terminal validation match, while repeated multi-match soak remains on demand. See [Skirmish Opponent](SkirmishOpponent.md) for behavior, allowed knowledge, configuration, diagnostics, and current limitations.
+Use `MatchRuntime` as the canonical reusable game composition and `SkirmishScenarioHarness` as its test-facing wrapper. Keep focused deterministic scenarios in the normal test suite; CI also executes one accelerated terminal validation match, while repeated multi-match soak remains on demand. See [Skirmish Opponent](SkirmishOpponent.md) for behavior, allowed knowledge, configuration, diagnostics, and current limitations.

@@ -20,10 +20,10 @@ internal static class Program
             CompilerOptions options =
                 CompilerOptions.Parse(args);
 
-            PrototypeBattlefieldDefinition definition =
-                PrototypeBattlefieldDefinition.Create();
+            BattlefieldDefinition definition =
+                CentralDivideBattlefield.Create();
             TerrainWorld terrain =
-                PrototypeBattlefieldTerrainFactory.Create(
+                CentralDivideTerrainFactory.Create(
                     definition);
 
             var gridSettings =

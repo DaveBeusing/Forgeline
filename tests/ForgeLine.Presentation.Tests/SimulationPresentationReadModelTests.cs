@@ -17,7 +17,7 @@ public sealed class SimulationPresentationReadModelTests
     [Fact]
     public void CompletedTickSnapshotOwnsPlayerStateAndSessionIdentity()
     {
-        using VerticalSliceScenario scenario = CreateScenario(4201);
+        using MatchRuntime scenario = CreateScenario(4201);
         var buffer = new PresentationSnapshotBuffer();
         var interaction = new PresentationInteractionState();
         var gateway = new PlayerCommandGateway(
@@ -25,7 +25,7 @@ public sealed class SimulationPresentationReadModelTests
             scenario.Services.BuildingCommands,
             scenario.BattlefieldRuntime.MatchStateEntity);
 
-        interaction.SetSelection([scenario.West.CommandCore]);
+        interaction.SetSelection([scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore]);
         scenario.Simulation.RegisterTickObserver(gateway);
         scenario.Simulation.RegisterTickObserver(
             new PresentationExtractor(
@@ -43,13 +43,13 @@ public sealed class SimulationPresentationReadModelTests
         Assert.True(snapshot.PlayerExperience.HasValue);
         Assert.Equal(snapshot.Tick, snapshot.PlayerExperience.Value.Tick);
         Assert.Equal(
-            scenario.West.CommandCore,
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
             snapshot.PlayerExperience.Value.Selection.PrimaryEntity);
 
         PlayerExperienceSnapshot captured = snapshot.PlayerExperience.Value;
         Assert.True(
             scenario.Simulation.Entities.DestroyEntity(
-                scenario.West.CommandCore));
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore));
 
         Assert.Equal(captured, snapshot.PlayerExperience.Value);
     }
@@ -57,7 +57,7 @@ public sealed class SimulationPresentationReadModelTests
     [Fact]
     public void HiddenEnemyStateIsExcludedFromPresentationAndSelection()
     {
-        using VerticalSliceScenario scenario = CreateScenario(4203);
+        using MatchRuntime scenario = CreateScenario(4203);
         var buffer = new PresentationSnapshotBuffer();
         var interaction = new PresentationInteractionState();
         var gateway = new PlayerCommandGateway(
@@ -124,7 +124,7 @@ public sealed class SimulationPresentationReadModelTests
     [Fact]
     public void ReusedEntityIndexDoesNotReviveStaleSelection()
     {
-        using VerticalSliceScenario scenario = CreateScenario(4204);
+        using MatchRuntime scenario = CreateScenario(4204);
         var buffer = new PresentationSnapshotBuffer();
         var interaction = new PresentationInteractionState();
         var gateway = new PlayerCommandGateway(
@@ -338,7 +338,7 @@ public sealed class SimulationPresentationReadModelTests
     [Fact]
     public void DisabledDebugCapturePublishesNoHeavyDebugEnvelope()
     {
-        using VerticalSliceScenario scenario = CreateScenario(4202);
+        using MatchRuntime scenario = CreateScenario(4202);
         var buffer = new PresentationSnapshotBuffer();
         var interaction = new PresentationInteractionState();
         var gateway = new PlayerCommandGateway(
@@ -424,20 +424,20 @@ public sealed class SimulationPresentationReadModelTests
         Assert.Equal(0, controller.Selection.Count);
     }
 
-    private static VerticalSliceScenario CreateScenario(ulong seed)
+    private static MatchRuntime CreateScenario(ulong seed)
     {
-        VerticalSliceRuntimeSettings runtime =
-            VerticalSliceRuntimeSettings.CreateHeadless(
-                VerticalSliceScenarioProfile.Gameplay,
+        MatchRuntimeSettings runtime =
+            CentralDivideScenario.CreateHeadless(
+                MatchScenarioProfile.Gameplay,
                 seed) with
             {
                 Participants =
-                    VerticalSliceRuntimeSettings.CreateDefaultParticipants(
+                    CentralDivideScenario.CreateDefaultParticipants(
                         westComputerControlled: false,
                         eastComputerControlled: false)
             };
 
-        return VerticalSliceScenario.Create(
+        return CentralDivideScenario.Create(
             runtime,
             TestContext.Current.CancellationToken);
     }

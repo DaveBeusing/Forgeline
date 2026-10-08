@@ -3,11 +3,11 @@ using ForgeLine.Game;
 
 namespace ForgeLine.Presentation;
 
-public static class PrototypeBattlefieldDebugVisualization
+public static class BattlefieldDebugVisualization
 {
     public static void Draw(
         DebugDraw debugDraw,
-        PrototypeBattlefieldDefinition definition,
+        BattlefieldDefinition definition,
         IReadOnlyDictionary<
             string,
             StrategicInfrastructureOperationalState>? crossingStates = null)

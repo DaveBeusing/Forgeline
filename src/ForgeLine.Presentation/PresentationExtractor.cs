@@ -670,7 +670,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
     {
         PresentationExtractionContext extraction =
             _extraction!;
-        VerticalSliceScenario scenario =
+        MatchRuntime scenario =
             extraction.Scenario;
 
         return PlayerExperienceSnapshotFactory.Capture(
@@ -722,7 +722,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
         SimulationContext context,
         bool debugEnabled)
     {
-        VerticalSliceScenario scenario =
+        MatchRuntime scenario =
             _extraction!.Scenario;
 
         if (!debugEnabled &&
@@ -741,7 +741,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
         in PresentationInteractionRequestSnapshot interaction,
         BuildingConstructionDebugSnapshot? construction)
     {
-        VerticalSliceScenario scenario =
+        MatchRuntime scenario =
             _extraction!.Scenario;
 
         ResourceExtractionDebugSnapshot resources =
@@ -1603,7 +1603,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
         RenderTransform Transform);
 
     private static void ApplyDebugCaptureState(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         DebugOverlayCategory categories)
     {
         bool navigation =
@@ -1690,7 +1690,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
         string,
         StrategicInfrastructureOperationalState> CaptureCrossingStates(
         EntityRegistry entities,
-        PrototypeBattlefieldRuntime runtime)
+        BattlefieldRuntime runtime)
     {
         var states =
             new Dictionary<

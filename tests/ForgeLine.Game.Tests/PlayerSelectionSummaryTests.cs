@@ -10,14 +10,14 @@ public sealed class PlayerSelectionSummaryTests
     [Fact]
     public void SingleBuildingCarriesAuthoritativeIdentityAndDetails()
     {
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
                 seed: 6201);
 
         PlayerSelectionSummary selection =
             CaptureSelection(
                 scenario,
-                [scenario.West.CommandCore]);
+                [scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore]);
 
         Assert.Equal(
             1,
@@ -48,13 +48,13 @@ public sealed class PlayerSelectionSummaryTests
     [Fact]
     public void SameTypeMultiSelectionKeepsOnlySafeCommonIdentity()
     {
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
                 seed: 6202);
         EntityId firstCargo =
-            scenario.West.StartingUnits[1];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[1];
         EntityId secondCargo =
-            scenario.West.StartingUnits[2];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[2];
 
         PlayerSelectionSummary selection =
             CaptureSelection(
@@ -95,13 +95,13 @@ public sealed class PlayerSelectionSummaryTests
     [Fact]
     public void HeterogeneousUnitSelectionDoesNotBorrowPrimaryEntityStatus()
     {
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
                 seed: 6203);
         EntityId engineer =
-            scenario.West.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
         EntityId cargo =
-            scenario.West.StartingUnits[1];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[1];
 
         PlayerSelectionSummary selection =
             CaptureSelection(
@@ -134,16 +134,16 @@ public sealed class PlayerSelectionSummaryTests
     [Fact]
     public void MixedSelectionUsesGenericAggregateSummary()
     {
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
                 seed: 6204);
 
         PlayerSelectionSummary selection =
             CaptureSelection(
                 scenario,
                 [
-                    scenario.West.StartingUnits[0],
-                    scenario.West.CommandCore
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0],
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore
                 ]);
 
         Assert.Equal(
@@ -168,13 +168,13 @@ public sealed class PlayerSelectionSummaryTests
     [Fact]
     public void ForeignAndDestroyedEntitiesAreFilteredBeforeInspection()
     {
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
                 seed: 6205);
         EntityId owned =
-            scenario.West.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingUnits[0];
         EntityId foreign =
-            scenario.East.StartingUnits[0];
+            scenario.GetBase(new ForgeLine.Game.PlayerId(2)).StartingUnits[0];
 
         PlayerSelectionSummary filtered =
             CaptureSelection(
@@ -203,15 +203,15 @@ public sealed class PlayerSelectionSummaryTests
     }
 
     private static PlayerSelectionSummary CaptureSelection(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         IReadOnlyCollection<EntityId> selected)
     {
         PlayerExperienceSnapshot experience =
             PlayerExperienceSnapshotFactory.Capture(
                 scenario.Simulation.Entities,
-                scenario.West.Player,
-                scenario.West.CommandCore,
-                scenario.West.StartingInventory,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,
                 scenario.BattlefieldRuntime.MatchStateEntity,
                 selected,
                 scenario.Inventories,

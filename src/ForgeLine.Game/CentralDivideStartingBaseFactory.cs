@@ -37,7 +37,7 @@ public readonly record struct SkirmishStartingBase(
     InventoryId StartingInventory,
     IReadOnlyList<EntityId> StartingUnits);
 
-public static class SkirmishStartingBaseFactory
+public static class CentralDivideStartingBaseFactory
 {
     private const double CommandCoreMaximumHealth = 1_200.0;
     private const int CommandCoreTargetPriority = 100;
@@ -48,7 +48,8 @@ public static class SkirmishStartingBaseFactory
         UnitFactory unitFactory,
         TerrainWorld terrain,
         BattlefieldStartPosition start,
-        SkirmishStartingStock? startingStock = null)
+        SkirmishStartingStock? startingStock = null,
+        UnitDefinitionCatalog? unitDefinitions = null)
     {
         ArgumentNullException.ThrowIfNull(entities);
         ArgumentNullException.ThrowIfNull(inventories);
@@ -197,7 +198,7 @@ public static class SkirmishStartingBaseFactory
                 coreScale * 0.5f));
 
         UnitDefinitionCatalog units =
-            DirectorateContent.CreateUnitCatalog();
+            unitDefinitions ?? DirectorateContent.CreateUnitCatalog();
         Vector3 outward =
             ResolveOutwardDirection(start);
 

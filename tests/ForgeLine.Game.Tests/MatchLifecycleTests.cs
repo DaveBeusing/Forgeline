@@ -62,8 +62,8 @@ public sealed class MatchLifecycleTests
     [Fact]
     public void SurrenderFlowsThroughActionDispatcherCommandGatewayAndResultBuffer()
     {
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
                 seed: 9876);
         var gateway =
             new PlayerCommandGateway(
@@ -122,19 +122,19 @@ public sealed class MatchLifecycleTests
             state.DefeatedPlayer);
         Assert.True(
             scenario.Simulation.Entities.IsAlive(
-                scenario.East.CommandCore));
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore));
     }
 
     [Fact]
     public void EndMatchFinalizationPreservesAuthoritativeTerminalReason()
     {
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
                 seed: 2468);
 
         Assert.True(
             scenario.Simulation.Entities.DestroyEntity(
-                scenario.East.CommandCore));
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore));
         scenario.Simulation.AdvanceOneTick();
 
         MatchState ending =
@@ -192,8 +192,8 @@ public sealed class MatchLifecycleTests
     {
         SimulationSessionId completedSession;
 
-        using (VerticalSliceScenario first =
-               VerticalSliceScenario.Create(
+        using (MatchRuntime first =
+               CentralDivideScenario.Create(
                    seed: 1234))
         {
             completedSession =
@@ -201,7 +201,7 @@ public sealed class MatchLifecycleTests
 
             Assert.True(
                 first.Simulation.Entities.DestroyEntity(
-                    first.East.CommandCore));
+                    first.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore));
             first.Simulation.AdvanceOneTick();
 
             var finalize =
@@ -219,8 +219,8 @@ public sealed class MatchLifecycleTests
                 first.GetMatchState().Lifecycle);
         }
 
-        using VerticalSliceScenario restarted =
-            VerticalSliceScenario.Create(
+        using MatchRuntime restarted =
+            CentralDivideScenario.Create(
                 seed: 1234);
 
         MatchState fresh =
@@ -255,10 +255,10 @@ public sealed class MatchLifecycleTests
             fresh.FinalizedAtTick);
         Assert.True(
             restarted.Simulation.Entities.IsAlive(
-                restarted.West.CommandCore));
+                restarted.GetBase(new PlayerId(1)).CommandCore));
         Assert.True(
             restarted.Simulation.Entities.IsAlive(
-                restarted.East.CommandCore));
+                restarted.GetBase(new PlayerId(2)).CommandCore));
         Assert.Equal(
             0,
             restarted.Simulation.PendingCommandCount);
@@ -307,13 +307,13 @@ public sealed class MatchLifecycleTests
     [Fact]
     public void LifecycleDiagnosticsCaptureReasonWinnerAndTransitionHistory()
     {
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
                 seed: 321);
 
         Assert.True(
             scenario.Simulation.Entities.DestroyEntity(
-                scenario.East.CommandCore));
+                scenario.GetBase(new ForgeLine.Game.PlayerId(2)).CommandCore));
         scenario.Simulation.AdvanceOneTick();
 
         MatchLifecycleDiagnosticsSnapshot diagnostics =

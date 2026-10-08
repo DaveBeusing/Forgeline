@@ -6,9 +6,9 @@ using ForgeLine.World;
 
 namespace ForgeLine.Game;
 
-public sealed class VerticalSliceRuntimeServices
+public sealed class MatchRuntimeServices
 {
-    internal VerticalSliceRuntimeServices(
+    internal MatchRuntimeServices(
         ResourceCatalog resources,
         BuildingDefinitionCatalog buildingDefinitions,
         UnitDefinitionCatalog unitDefinitions,

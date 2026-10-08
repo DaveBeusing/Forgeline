@@ -75,7 +75,7 @@ jobs:
       - name: Save and replay recovery smoke
         shell: pwsh
         run: |
-          dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario vertical-slice --profile validation --ticks 256 --seed 4242 --save-output artifacts/recovery-smoke.save.json --replay-output artifacts/recovery-smoke.replay.json
+          dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario central-divide --profile validation --ticks 256 --seed 4242 --save-output artifacts/recovery-smoke.save.json --replay-output artifacts/recovery-smoke.replay.json
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --load-input artifacts/recovery-smoke.save.json
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -112,7 +112,7 @@ jobs:
           }
 
       - name: Two-opponent full-match validation
-        run: dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --matches 1 --require-terminal --diagnostics-output artifacts/opponent-full-match.json --telemetry-output artifacts/opponent-balance-telemetry.json
+        run: dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario central-divide --profile validation --ticks 80000 --seed 2026 --matches 1 --require-terminal --diagnostics-output artifacts/opponent-full-match.json --telemetry-output artifacts/opponent-balance-telemetry.json
 
       - name: Upload pre-alpha package
         if: always()

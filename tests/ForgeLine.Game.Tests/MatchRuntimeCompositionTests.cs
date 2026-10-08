@@ -10,17 +10,17 @@ using Xunit;
 
 namespace ForgeLine.Game.Tests;
 
-public sealed class VerticalSliceRuntimeCompositionTests
+public sealed class MatchRuntimeCompositionTests
 {
     [Fact]
     public void GameplayAndValidationKeepExplicitDistributionPolicies()
     {
-        VerticalSliceScenarioSettings gameplay =
-            VerticalSliceScenarioSettings.Create(
-                VerticalSliceScenarioProfile.Gameplay);
-        VerticalSliceScenarioSettings validation =
-            VerticalSliceScenarioSettings.Create(
-                VerticalSliceScenarioProfile.Validation);
+        MatchScenarioSettings gameplay =
+            CentralDivideScenario.CreateSettings(
+                MatchScenarioProfile.Gameplay);
+        MatchScenarioSettings validation =
+            CentralDivideScenario.CreateSettings(
+                MatchScenarioProfile.Validation);
 
         Assert.Equal(20UL, gameplay.DistributionRetryDelayTicks);
         Assert.Equal(4U, gameplay.DistributionMaximumTransportAttempts);
@@ -34,25 +34,25 @@ public sealed class VerticalSliceRuntimeCompositionTests
     [Fact]
     public void EquivalentGameplayConfigurationsShareSystemOrderWhileParticipantControlRemainsExplicit()
     {
-        VerticalSliceRuntimeSettings computerRuntime =
-            VerticalSliceRuntimeSettings.CreateHeadless(
-                VerticalSliceScenarioProfile.Gameplay,
+        MatchRuntimeSettings computerRuntime =
+            CentralDivideScenario.CreateHeadless(
+                MatchScenarioProfile.Gameplay,
                 seed: 91);
-        VerticalSliceRuntimeSettings playerRuntime =
+        MatchRuntimeSettings playerRuntime =
             computerRuntime with
             {
                 Participants =
-                    VerticalSliceRuntimeSettings.CreateDefaultParticipants(
+                    CentralDivideScenario.CreateDefaultParticipants(
                         westComputerControlled: false,
                         eastComputerControlled: true)
             };
 
-        using VerticalSliceScenario computerScenario =
-            VerticalSliceScenario.Create(
+        using MatchRuntime computerScenario =
+            CentralDivideScenario.Create(
                 computerRuntime,
                 TestContext.Current.CancellationToken);
-        using VerticalSliceScenario playerScenario =
-            VerticalSliceScenario.Create(
+        using MatchRuntime playerScenario =
+            CentralDivideScenario.Create(
                 playerRuntime,
                 TestContext.Current.CancellationToken);
 
@@ -68,42 +68,42 @@ public sealed class VerticalSliceRuntimeCompositionTests
 
         Assert.True(
             computerScenario.Simulation.Entities.IsAlive(
-                computerScenario.West.Controller));
+                computerScenario.GetBase(new ForgeLine.Game.PlayerId(1)).Controller));
         Assert.False(
             playerScenario.Simulation.Entities.IsAlive(
-                playerScenario.West.Controller));
+                playerScenario.GetBase(new ForgeLine.Game.PlayerId(1)).Controller));
         Assert.True(
             playerScenario.Simulation.Entities.IsAlive(
-                playerScenario.East.Controller));
+                playerScenario.GetBase(new ForgeLine.Game.PlayerId(2)).Controller));
 
         Assert.True(
             computerScenario.MatchConfiguration
                 .GetParticipant(
-                    computerScenario.West.Player)
+                    computerScenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player)
                 .IsComputerControlled);
         Assert.False(
             playerScenario.MatchConfiguration
                 .GetParticipant(
-                    playerScenario.West.Player)
+                    playerScenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player)
                 .IsComputerControlled);
     }
 
     [Fact]
     public void SharedRuntimeUsesNavigableApproachForBlockedStartingCore()
     {
-        VerticalSliceRuntimeSettings runtime =
-            VerticalSliceRuntimeSettings.CreateHeadless(
-                VerticalSliceScenarioProfile.Gameplay,
+        MatchRuntimeSettings runtime =
+            CentralDivideScenario.CreateHeadless(
+                MatchScenarioProfile.Gameplay,
                 seed: 123) with
             {
                 Participants =
-                    VerticalSliceRuntimeSettings.CreateDefaultParticipants(
+                    CentralDivideScenario.CreateDefaultParticipants(
                         westComputerControlled: false,
                         eastComputerControlled: false)
             };
 
-        using VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
+        using MatchRuntime scenario =
+            CentralDivideScenario.Create(
                 runtime,
                 TestContext.Current.CancellationToken);
 
@@ -115,7 +115,7 @@ public sealed class VerticalSliceRuntimeCompositionTests
         WorldTransform coreTransform =
             scenario.Simulation.Entities.GetComponent<
                 WorldTransform>(
-                    scenario.West.CommandCore);
+                    scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
 
         Assert.True(
             grid.TryWorldToCell(
@@ -187,7 +187,7 @@ public sealed class VerticalSliceRuntimeCompositionTests
                 scenario.Simulation.Entities,
                 scenario.Inventories,
                 truckStart,
-                scenario.West.Player,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 scenario.CargoTransport);
         CargoTransport transport =
             scenario.Simulation.Entities.GetComponent<
@@ -197,7 +197,7 @@ public sealed class VerticalSliceRuntimeCompositionTests
         const double quantity = 25.0;
         double before =
             scenario.Inventories.GetQuantity(
-                scenario.West.StartingInventory,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,
                 ResourceIds.Steel) +
             scenario.Inventories.GetQuantity(
                 destinationInventory,
@@ -260,7 +260,7 @@ public sealed class VerticalSliceRuntimeCompositionTests
 
         double after =
             scenario.Inventories.GetQuantity(
-                scenario.West.StartingInventory,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).StartingInventory,
                 ResourceIds.Steel) +
             scenario.Inventories.GetQuantity(
                 destinationInventory,
@@ -280,12 +280,12 @@ public sealed class VerticalSliceRuntimeCompositionTests
     {
         using var scheduler =
             new JobScheduler();
-        VerticalSliceRuntimeSettings runtime =
-            VerticalSliceRuntimeSettings.CreateClient(
+        MatchRuntimeSettings runtime =
+            CentralDivideScenario.CreateClient(
                 scheduler,
                 seed: 77);
-        VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
+        MatchRuntime scenario =
+            CentralDivideScenario.Create(
                 runtime,
                 TestContext.Current.CancellationToken);
 
@@ -306,15 +306,15 @@ public sealed class VerticalSliceRuntimeCompositionTests
     [Fact]
     public void RuntimeOwnedSchedulerIsDisposedWithScenario()
     {
-        VerticalSliceRuntimeSettings runtime =
-            VerticalSliceRuntimeSettings.CreateOwned(
-                VerticalSliceScenarioProfile.Gameplay,
+        MatchRuntimeSettings runtime =
+            CentralDivideScenario.CreateOwned(
+                MatchScenarioProfile.Gameplay,
                 seed: 78,
-                VerticalSliceRuntimeSettings.CreateDefaultParticipants(
+                CentralDivideScenario.CreateDefaultParticipants(
                     westComputerControlled: true,
                     eastComputerControlled: true));
-        VerticalSliceScenario scenario =
-            VerticalSliceScenario.Create(
+        MatchRuntime scenario =
+            CentralDivideScenario.Create(
                 runtime,
                 TestContext.Current.CancellationToken);
         JobScheduler scheduler =
@@ -339,34 +339,34 @@ public sealed class VerticalSliceRuntimeCompositionTests
             new CancellationTokenSource();
         cancellation.Cancel();
 
-        VerticalSliceRuntimeSettings runtime =
-            VerticalSliceRuntimeSettings.CreateOwned(
-                VerticalSliceScenarioProfile.Gameplay,
+        MatchRuntimeSettings runtime =
+            CentralDivideScenario.CreateOwned(
+                MatchScenarioProfile.Gameplay,
                 seed: 79,
-                VerticalSliceRuntimeSettings.CreateDefaultParticipants(
+                CentralDivideScenario.CreateDefaultParticipants(
                     westComputerControlled: true,
                     eastComputerControlled: true));
 
         Assert.Throws<OperationCanceledException>(
             () =>
-                VerticalSliceScenario.Create(
+                CentralDivideScenario.Create(
                     runtime,
                     cancellation.Token));
     }
 
     private static LogisticsNodeId GetOrCreateSourceNode(
-        VerticalSliceScenario scenario,
+        MatchRuntime scenario,
         Vector3 position)
     {
         if (scenario.Logistics.TryGetNodeForEntity(
-                scenario.West.CommandCore,
+                scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
                 out LogisticsNodeId existing))
         {
             return existing;
         }
 
         return scenario.Logistics.AddNode(
-            scenario.West.CommandCore,
+            scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore,
             position,
             LogisticsNodeKind.StorageDepot,
             LogisticsNodeCapabilities.CargoSource |
