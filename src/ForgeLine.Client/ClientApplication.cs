@@ -193,8 +193,7 @@ internal sealed class ClientApplication
             {
                 _startup.SessionLoadEnded(false, error.Category.ToString());
                 Console.Error.WriteLine($"[session:load-failed] category={error.Category} {error}");
-                sessionFeedback = $"LOAD FAILED - {error.Category}: {error.Message}".Replace('\n', ' ').Replace('\r', ' ');
-                if (sessionFeedback.Length > 100) sessionFeedback = sessionFeedback[..97] + "...";
+                sessionFeedback = $"LOAD FAILED - {error.UserMessage}";
             }
         }
         return 0;

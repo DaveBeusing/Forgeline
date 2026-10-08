@@ -24,6 +24,16 @@ internal sealed class ClientSessionLoadingException : Exception
     internal ClientSessionLoadingException(ClientSessionLoadError category, Exception cause)
         : base(cause.Message, cause) => Category = category;
     internal ClientSessionLoadError Category { get; }
+    internal string UserMessage => Category switch
+    {
+        ClientSessionLoadError.CorruptSave => "SAVE DATA IS CORRUPT",
+        ClientSessionLoadError.IncompatibleSave => "SAVE VERSION IS INCOMPATIBLE",
+        ClientSessionLoadError.StateVerification => "SAVED STATE DOES NOT MATCH",
+        ClientSessionLoadError.Replay => "SAVE COULD NOT BE RECONSTRUCTED",
+        ClientSessionLoadError.Presentation => "PRESENTATION SETUP FAILED",
+        ClientSessionLoadError.Renderer => "GRAPHICS SETUP FAILED",
+        _ => "SESSION CONFIGURATION IS INVALID"
+    };
 
     internal static ClientSessionLoadingException From(Exception error, ClientSessionLoadPhase phase)
     {

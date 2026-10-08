@@ -77,4 +77,31 @@ public sealed class ClientSessionLoadingCoordinatorTests
         Assert.Contains("Control command", coordinator.Failure.Message);
         Assert.False(coordinator.TryTake(out _));
     }
+
+    [Fact]
+    public async Task ConcurrentDisposersWaitForWorkerAndDisposeResultOnce()
+    {
+        using var entered = new ManualResetEventSlim();
+        using var cancelled = new ManualResetEventSlim();
+        using var release = new ManualResetEventSlim();
+        var session = new Session();
+        using var coordinator = new ClientSessionLoadingCoordinator<Session>((token, _) =>
+        {
+            using var registration = token.Register(cancelled.Set);
+            entered.Set(); release.Wait(TestContext.Current.CancellationToken);
+            return session;
+        }, TestContext.Current.CancellationToken);
+        Assert.True(entered.Wait(Timeout, TestContext.Current.CancellationToken));
+        Task first = Task.Run(coordinator.Dispose, TestContext.Current.CancellationToken);
+        Task second = Task.Run(coordinator.Dispose, TestContext.Current.CancellationToken);
+        try
+        {
+            Assert.True(cancelled.Wait(Timeout, TestContext.Current.CancellationToken));
+            Assert.False(first.IsCompleted); Assert.False(second.IsCompleted);
+        }
+        finally { release.Set(); }
+        await Task.WhenAll(first, second).WaitAsync(Timeout, TestContext.Current.CancellationToken);
+        Assert.False(coordinator.WorkerAlive);
+        Assert.Equal(1, session.Disposals);
+    }
 }
