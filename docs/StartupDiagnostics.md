@@ -8,7 +8,7 @@ Launch with `--startup-diagnostics-output <report.json>`. With no option, collec
 
 Every event contains a sequence, raw monotonic Stopwatch timestamp, milliseconds since managed `Program.Main` entry, optional phase duration, phase, outcome and session correlation. This origin excludes OS process creation and runtime initialization before Main. `StopwatchFrequency` permits conversion of raw timestamps. Wall-clock adjustments cannot change durations.
 
-`ProcessId` is a diagnostic GUID shared across in-process restarts. `LaunchId` advances for each settings/window/application launch; later launches write `<name>-launch2.json`, etc., preserving the first report. `SessionId=0` denotes launch/frontend work; `SessionId=1` denotes the single match requested during that launch. A restart creates another launch and a fresh match correlation.
+`ProcessId` is a diagnostic GUID shared across in-process restarts. `LaunchId` advances for each settings/window/application launch; later launches write `<name>-launch2.json`, etc., preserving the first report. `SessionId=0` denotes launch/frontend work. Positive SessionIds advance for each match request/retry within that window. A new attempt resets current session phase/readiness slots while preserving earlier events in the bounded report. A restart creates another launch and a fresh match correlation.
 
 ## Phase and milestone definitions
 
@@ -32,8 +32,16 @@ Every event contains a sequence, raw monotonic Stopwatch timestamp, milliseconds
 | MainMenuInteractive | Platform input loop observes the presented menu; internal frontend preparation alone is insufficient |
 | ApplicationReady | Presented interactive menu on normal launch; first presented gameplay frame in smoke mode, which bypasses menu selection |
 | SessionReconstruction / SessionRuntimeReady | New-game creation or validated save reconstruction returns a complete MatchRuntime; this does not claim GPU or gameplay readiness |
-| GameplayRenderer | Gameplay device, terrain/instance/HUD resources and render owner initialized |
+| SessionLoadRequested | New positive session correlation for construction or retry |
+| SessionConfiguration / SessionAssembly | Worker-side validation and CPU scenario composition |
+| SessionReplay / SessionVerification | Complete replay tick/control boundaries and mandatory RNG/checkpoint/authoritative hash verification |
+| SessionPresentationBinding | Platform-owned gateway/observer binding through the first completed simulation snapshot |
+| SessionRendererReady | Platform loop observes actual matching gameplay presentation after renderer initialization |
+| SessionLoadFailed / SessionLoadCancelled | Recoverable pre-activation failure/category or cancelled request; previous menu application readiness is retained |
+| GameplayRenderer | Gameplay terrain/instance/HUD resources initialized on the original graphics owner, retaining the transition device/swap chain |
 | FirstGameplayFrame / SessionReady | Actual successful gameplay presentation after simulation snapshot and control preparation; a frontend overlay does not qualify |
+
+Session construction uses a dedicated CPU owner and immutable latest progress. Replay updates occur at most every 64 complete tick/control boundaries plus initial/final observations; diagnostic phase timing remains bounded and does not append an event per tick. Gameplay presentation requires the requested simulation identity and a successful non-occluded Present. Readiness is also checked with diagnostic collection disabled. See [Asynchronous session loading](AsynchronousSessionLoading.md).
 
 The graphics device's presentation counter advances only after successful non-occluded Present. Publishing a view, invoking a render callback, submitting commands, suspended surfaces and occlusion cannot establish a presented milestone. This measures Present return, not GPU completion or physical monitor scan-out. The client observes the counter on its existing graphics owner thread without allocating a complete graphics diagnostics snapshot.
 

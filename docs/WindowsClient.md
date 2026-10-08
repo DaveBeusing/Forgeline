@@ -38,7 +38,7 @@ New Game / Continue / Load Game
     ↓
 ClientSessionRequest
     ↓
-Fresh MatchRuntime or validated save restore
+Dedicated CPU session loader: fresh runtime or validated save restore
     ↓
 Presentation extraction + RTS input/camera
     ↓
@@ -51,7 +51,9 @@ Before the runtime catalog is loaded, a source-checkout launch resolves the repo
 
 If no valid runtime manifest can be resolved after this process, startup fails with the candidate roots in its diagnostic. Production terrain/material textures require a valid compiled runtime catalog; the branded bootstrap fallback does not waive those checks. Simulation and headless ownership remain unchanged. New Game creates a fresh scenario only after the player confirms the selected seed. Continue resolves the newest valid save, while Load Game restores the explicitly selected valid save through the existing persistence service. Corrupt and incompatible saves remain visible but cannot become session requests. The resulting gameplay runtime constructs or restores the canonical battlefield, participants, simulation systems, navigation, cargo transport, logistics, intelligence, combat, and match objectives without referencing Windows or presentation types.
 
-The client-provided scheduler remains client-owned. Disposing the shared scenario does not dispose it; the client host disposes it once after the scenario. A restart leaves the current loop through the existing restart result and creates a fresh runtime on the next application session, so old authoritative routes, inventories, controllers, snapshots, or orders are not reused.
+After session selection, a dedicated loading worker creates or restores the complete verified runtime while the window continues pumping events and showing phase progress. Escape cancels loading and returns to the menu after the worker and any preparation owners stop. Recoverable load errors return a clear menu message and preserve the source save. Presentation observers bind only after transfer; gameplay input waits for a matching completed snapshot and a successful gameplay presentation. See [Asynchronous session loading](AsynchronousSessionLoading.md).
+
+The client-provided scheduler remains client-owned. The loading worker creates it for new games, and the transferred session bundle disposes the runtime before its host scheduler exactly once. Restore retains the existing reconstruction scheduler policy. A restart leaves the current loop through the existing restart result and creates a fresh runtime on the next application session, so old authoritative routes, inventories, controllers, snapshots, or orders are not reused.
 
 ## Message Loop
 

@@ -1,0 +1,33 @@
+# Asynchronous match session loading
+
+## Construction and ownership
+
+After New Game, Continue or Load Game, the Windows client starts one dedicated session-loading thread. It performs configuration validation, CPU scenario assembly, save reading and deterministic reconstruction. Independent startup products remain reused; session retries do not reload the runtime asset catalog.
+
+For a new game, the worker creates the host-owned job scheduler. `ClientLoadedSession` owns both the complete runtime and that scheduler, disposing the runtime before the scheduler. Restore preserves the existing headless reconstruction scheduler policy. A result transfers once through the coordinator after construction succeeds; abandoned, cancelled or failed results are disposed after the construction owner completes. Concurrent disposers wait for that owner. No worker accesses mutable window state, UI controllers, D3D12 objects or renderer resources.
+
+The platform owner binds the command gateway and presentation observers only after transfer. The simulation owner then publishes its first completed-tick snapshot. Simulation and gameplay graphics initialization are asynchronous; the platform continues pumping input, window events and copied resize/suspension state while waiting. The original graphics thread continues from frontend rendering into gameplay initialization using its existing device and swap chain. Frontend renderer resources retire on that same creating thread; the displayed loading frame remains until gameplay presents. No graphics device transfers between threads. Gameplay input is enabled after a non-occluded successful gameplay presentation with the requested simulation session identity. Renderer initialization, published requests and loading overlays alone cannot qualify activation.
+
+## Progress and deterministic restore
+
+Immutable progress identifies configuration, scenario assembly, replay, authoritative verification, presentation binding and renderer readiness. Configuration/assembly/verification/graphics stages are indeterminate. Replay progress is the actual completed tick divided by the saved target tick, reported initially, every 64 complete tick/control boundaries and at the final tick. A zero-tick checkpoint remains indeterminate. Progress is not inferred from elapsed time and does not alter simulation pacing or command order.
+
+`MatchPersistenceService.RestoreCancellable` preserves the existing `Restore` API. Cancellation is checked before construction, during command scheduling and between complete replay tick/control boundaries. A running tick is completed rather than partially applied. The existing recording-order, scheduled-sequence, pause/resume control, RNG, checkpoint checksum and reconstructed authoritative hash checks remain mandatory. The replay-control correction from PR #132 is already integrated; no invalid controls are skipped. Source save files are read only and never silently repaired or overwritten.
+
+## Cancellation and recovery
+
+Press Escape during loading to return to the menu. Construction observes cooperative cancellation; the platform continues pumping while the worker finishes. During simulation/graphics preparation it requests owner shutdown and pumps until those owners stop, then disposes and joins them before returning. Window close cancels construction and joins all owners before releasing the runtime. CPU construction and graphics API calls that cannot be interrupted finish on their owners; no thread is forcibly terminated.
+
+Corrupt/incompatible saves, replay failures, state verification, configuration, presentation and graphics errors have separate categories. A pre-activation failure disposes the candidate session and returns the interactive client to its existing menu, with a concise user-facing explanation. Full cause and exception details remain in the session failure log. A valid retry creates a fresh coordinator and runtime. Errors after gameplay activation preserve the existing terminal host failure behavior. Smoke mode propagates failures to its exit/report path rather than hiding them through menu recovery.
+
+## Diagnostics and qualification
+
+Each request/retry receives a new positive SessionId within the launch. Previous failure events remain historical; current session readiness resets to Pending. Application readiness from a previously presented interactive menu is retained while a candidate session fails or is cancelled. SessionRuntimeReady denotes completed verified CPU construction; FirstGameplayFrame/SessionReady denote actual matching gameplay presentation. Bounded diagnostic collection stores phase transitions, not one event per replay tick. See `StartupDiagnostics.md` for event definitions.
+
+Local validation includes 18 client session-loading cases and six cancellable restore cases: single transfer/disposal, concurrent shutdown, both enabled/disabled instrumentation paths, deliberate worker stalls, cancellation at all reconstruction phases and during queued native graphics continuation, native loading-overlay exclusion, actual gameplay handoff, a 1,024-tick replay with continued event pumping, checkpoint hash equality and deterministic continuation. Corrupt, incompatible and divergent file loads preserve the exact original bytes and allow a separate valid retry; paused restoration resumes through the validated control path. The 11 existing persistence cases and all 179 client cases passed.
+
+Both bounded Windows gameplay smoke paths passed after the retained-swap-chain handoff: default smoke arguments and `--skip-splash --render-stress 1000` with visual qualification. Each session used one graphics device throughout loading and gameplay. These smoke paths deliberately skip the intro and cannot qualify interactive splash/menu behavior.
+
+Release solution build passed with zero warnings/errors only using the local `ApplicationIcon=` workaround. The forced canonical client compile remains blocked by the unchanged CS7065 application-icon error. The final clean full-solution run recorded 1,072 total: 1,054 passed, 16 previously recorded failures (Presentation 9, Assets 5, Game 2), and two opt-in GPU cases skipped. No complete successful CI or release qualification is implied.
+
+Before release, resolve the existing build/test blockers and complete interactive New Game/Continue/Load Game, Escape at each preparation stage, window close/minimize/restore, repeated invalid-save/valid-save attempts, and settings-driven restart on supported Windows hardware. The native integration tests exercise actual owner/presentation boundaries, but do not replace full-client visual/lifetime qualification or packaged-install checks. No startup speedup is claimed.

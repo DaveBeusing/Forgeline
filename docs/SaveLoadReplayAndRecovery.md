@@ -19,6 +19,8 @@ A fresh Vertical Slice runtime is created from the saved configuration. Queued c
 
 Only a fully validated reconstructed scenario is returned. Corrupt, incompatible, incomplete, or divergent data disposes the temporary runtime and returns a controlled persistence failure.
 
+The Windows client runs construction/restoration on a dedicated session-loading owner and keeps the frontend event pump active. `RestoreCancellable` exposes immutable configuration/assembly/replay/verification progress and cooperative cancellation at complete tick/control boundaries while preserving the existing `Restore` contract. Replay order, RNG and checkpoint/hash verification are unchanged. Failed or cancelled candidates return to the menu without modifying the source save; graphics and presentation readiness remain separate from reconstruction success. See [Asynchronous session loading](AsynchronousSessionLoading.md).
+
 This model preserves stable entity identifiers and internal subsystem state through deterministic reconstruction while retaining a serialized authoritative checkpoint for corruption and compatibility diagnostics.
 
 ## File Format
