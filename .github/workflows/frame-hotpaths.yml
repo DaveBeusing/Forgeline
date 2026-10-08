@@ -28,6 +28,8 @@ jobs:
         run: dotnet run --project tools/ForgeLine.AssetCompiler/ForgeLine.AssetCompiler.csproj --configuration Release --no-build -- --source assets/source --runtime assets/runtime --clean --qualification-output artifacts/asset-qualification.json
       - name: Capture CPU frame measurements
         run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --frame-hotpaths artifacts/frame-hotpaths.json
+      - name: Capture isolated fully culled measurements
+        run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --culled-hotpath artifacts/culled-hotpath.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:

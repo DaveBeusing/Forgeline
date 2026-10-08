@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text.Json;
 using ForgeLine.Client;
 using ForgeLine.Game;
@@ -14,6 +15,42 @@ internal static class FrameHotPathMeasurements
     private const int Warmup = 1024;
     private const int Samples = 8192;
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
+
+    public static void RunCulled(string output)
+    {
+        var results = new List<object>();
+        foreach (bool afterVisible in new[] { false, true })
+        {
+            using var renderer = new PresentationBenchmarks();
+            renderer.Setup();
+            if (afterVisible)
+                for (int i = 0; i < Warmup; i++) _ = renderer.Submit1000NearFieldInstances();
+            InstanceRenderDiagnostics probe = renderer.Submit5000InstancesWithCulling();
+            if (probe.TotalInstances != 5000 || probe.VisibleInstances != 0 ||
+                probe.CulledInstances != 5000 || probe.DrawCalls != 0)
+                throw new InvalidOperationException("The fully culled fixture changed; timing comparison is invalid.");
+            results.Add(Measure(afterVisible ? "culled-after-visible" : "culled-fresh",
+                () => renderer.Submit5000InstancesWithCulling()));
+        }
+        Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output))!);
+        File.WriteAllText(output, JsonSerializer.Serialize(new
+        {
+            SchemaVersion = 1,
+            Backend = "CPU null graphics; isolated culling without a publication thread",
+            Runtime = RuntimeInformation.FrameworkDescription,
+            OS = RuntimeInformation.OSDescription,
+            ProcessorCount = Environment.ProcessorCount,
+            BuildVersion = typeof(SimpleInstanceRenderer).Assembly.GetName().Version?.ToString(),
+            RendererAssemblySha256 = Convert.ToHexString(SHA256.HashData(
+                File.ReadAllBytes(typeof(SimpleInstanceRenderer).Assembly.Location))),
+            Warmup,
+            Samples,
+            Viewport = "1600x900",
+            Alpha = 1.0f,
+            Results = results
+        }, JsonOptions));
+        Console.WriteLine($"Culled hot-path measurements: {Path.GetFullPath(output)}");
+    }
 
     public static void Run(string output)
     {
@@ -30,10 +67,6 @@ internal static class FrameHotPathMeasurements
             simulation.Entities.AddComponent(entity, new VisualIdentity(1));
         }
 
-        using var host = new ClientRenderHost(static _ => { });
-        var frame = new ClientRenderFrame(new RtsCamera().CaptureState(), 1600, 900, false,
-            DebugOverlayView.Disabled, default, default, FormationTemplate.Compact,
-            new DebugLine[128], new DebugLabel[64], new DebugLine[128], new DebugLabel[64]);
         var results = new List<object>
         {
             Measure("render-near-1000", () => renderer.Submit1000NearFieldInstances(), () => renderer.SubmissionMetrics),
@@ -41,9 +74,15 @@ internal static class FrameHotPathMeasurements
             Measure("render-mixed-tactical", () => renderer.SubmitRepresentativeVerticalSliceTacticalView(), () => renderer.SubmissionMetrics),
             Measure("render-mixed-normal", () => renderer.SubmitRepresentativeVerticalSliceNormalRtsView(), () => renderer.SubmissionMetrics),
             Measure("render-mixed-strategic", () => renderer.SubmitRepresentativeVerticalSliceStrategicView(), () => renderer.SubmissionMetrics),
-            Measure("extraction-1000", () => { simulation.AdvanceOneTick(); return snapshots.TryReadLatest(out var s) ? s.InstanceCount : 0; }),
-            Measure("publish-128-lines-64-labels-per-layer", () => host.Publish(frame))
+            Measure("extraction-1000", () => { simulation.AdvanceOneTick(); return snapshots.TryReadLatest(out var s) ? s.InstanceCount : 0; })
         };
+        // The publication worker wakes periodically even before receiving a frame.
+        // Start it only after the independent render/extraction measurements.
+        using var host = new ClientRenderHost(static _ => { });
+        var frame = new ClientRenderFrame(new RtsCamera().CaptureState(), 1600, 900, false,
+            DebugOverlayView.Disabled, default, default, FormationTemplate.Compact,
+            new DebugLine[128], new DebugLabel[64], new DebugLine[128], new DebugLabel[64]);
+        results.Add(Measure("publish-128-lines-64-labels-per-layer", () => host.Publish(frame)));
         string? directory = Path.GetDirectoryName(Path.GetFullPath(output));
         Directory.CreateDirectory(directory!);
         File.WriteAllText(output, JsonSerializer.Serialize(new
