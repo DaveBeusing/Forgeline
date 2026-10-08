@@ -18,8 +18,12 @@ The previous fixed total of 26 draws was tied to an older camera view. Terrain d
 
 The observed Windowed 1600×900 view uses 18 terrain draws plus 11 instance draws; the BorderlessFullscreen 5120×2160 view uses 22 plus 11. Both canonical window-mode smoke checks pass with successful Presents, matching client/surface dimensions, no pending resize/occlusion, balanced texture accounting and zero material binding failures. Existing texture/sample, residency and descriptor limits remain enforced. The local Windows Graphics Tools debug layer was unavailable; zero warning/error counters alone do not establish debug-layer qualification.
 
+## Startup worker ownership
+
+Asset loading and frontend preparation use two transient, dedicated CPU/I/O workers. Blocking startup work therefore does not wait for shared thread-pool capacity on smaller machines. Both workers remain cancellable and are joined before shutdown; platform, renderer and simulation ownership is unchanged. Regression coverage verifies that both operations run on distinct dedicated threads separate from their caller.
+
 ## Validation status
 
-Canonical Release solution build: zero warnings/errors. Complete solution suite: 1,074 tests, 1,072 passed, zero failed, two native lifetime cases skipped unless explicitly enabled. Focused validation: 45 presentation cases, both repaired game cases and all 54 asset cases pass. Canonical map and clean runtime-asset compilation qualify. Negative smoke-budget probes reject an extra instance batch and a duplicate terrain draw.
+Canonical Release solution build: zero warnings/errors. Complete solution suite before the startup ownership regression: 1,074 tests, 1,072 passed, zero failed, two native lifetime cases skipped unless explicitly enabled. Focused validation: 45 presentation cases, both repaired game cases and all 54 asset cases pass. Canonical map and clean runtime-asset compilation qualify. Negative smoke-budget probes reject an extra instance batch and a duplicate terrain draw. Updated full-suite and two-processor startup validation results are recorded on the repair pull request.
 
 Published workflow conclusions, packaging and hosted qualification results belong to the repair pull request's final validation record. Local timings are observations and do not establish a startup or rendering speedup. The dedicated self-hosted GPU lane and full interactive lifecycle/release checks remain separate qualification requirements.

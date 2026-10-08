@@ -7,6 +7,35 @@ public sealed class ClientStartupCoordinatorTests
     private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(5);
 
     [Fact]
+    public void BlockingStartupWorkersHaveDedicatedThreadsSeparateFromTheirOwner()
+    {
+        using var entered = new CountdownEvent(2);
+        using var release = new ManualResetEventSlim();
+        int owner = Environment.CurrentManagedThreadId;
+        object Work(CancellationToken token)
+        {
+            var worker = Thread.CurrentThread;
+            entered.Signal();
+            release.Wait(token);
+            return (worker.ManagedThreadId, worker.IsThreadPoolThread);
+        }
+        using var coordinator = new ClientStartupCoordinator<object, object>(Work, Work,
+            TestContext.Current.CancellationToken);
+        Assert.True(entered.Wait(Timeout, TestContext.Current.CancellationToken));
+        release.Set();
+        coordinator.CompleteSplash();
+        Assert.True(SpinWait.SpinUntil(() => coordinator.CanEnterFrontend, Timeout));
+        var results = coordinator.GetResults();
+        var assets = Assert.IsType<(int Id, bool IsPool)>(results.Assets);
+        var frontend = Assert.IsType<(int Id, bool IsPool)>(results.Frontend);
+        Assert.False(assets.IsPool);
+        Assert.False(frontend.IsPool);
+        Assert.NotEqual(owner, assets.Id);
+        Assert.NotEqual(owner, frontend.Id);
+        Assert.NotEqual(assets.Id, frontend.Id);
+    }
+
+    [Fact]
     public void IntroCompletingFirstDoesNotReleaseIncompleteDependencies()
     {
         using var release = new ManualResetEventSlim();
