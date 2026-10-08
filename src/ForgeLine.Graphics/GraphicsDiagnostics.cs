@@ -27,6 +27,7 @@ public sealed record GraphicsDiagnostics(
     GraphicsDeviceInfo Device,
     GraphicsSurfaceInfo Surface)
 {
+    public GraphicsMemoryDiagnostics? Memory { get; init; }
     public GraphicsHealthDiagnostics Health { get; init; } = new(0, 0, 0, 0, 0, 0, null);
     public GraphicsResourceDiagnostics Resources { get; init; } =
         new(
@@ -46,6 +47,14 @@ public sealed record GraphicsDiagnostics(
             0,
             0);
 }
+
+public sealed record GraphicsMemoryDiagnostics(
+    bool Available,
+    ulong LocalBudgetBytes,
+    ulong LocalUsageBytes,
+    ulong NonLocalBudgetBytes,
+    ulong NonLocalUsageBytes,
+    string? FailureReason);
 
 public readonly record struct GraphicsHealthDiagnostics(
     int LiveResourceCount,

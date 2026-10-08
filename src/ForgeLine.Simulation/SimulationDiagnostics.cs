@@ -6,6 +6,8 @@ namespace ForgeLine.Simulation;
 public sealed class SimulationDiagnostics
 {
     private readonly bool _enabled;
+    private readonly bool _trackPhaseTiming;
+    private readonly long[] _lastPhaseTicks;
     private readonly long _startingAllocatedBytes;
     private readonly int _startingGen0Collections;
     private readonly int _startingGen1Collections;
@@ -19,6 +21,8 @@ public sealed class SimulationDiagnostics
     internal SimulationDiagnostics(SimulationDiagnosticsOptions? options)
     {
         _enabled = options?.Enabled == true;
+        _trackPhaseTiming = _enabled && options?.TrackPhaseTiming == true;
+        _lastPhaseTicks = _trackPhaseTiming ? new long[SimulationPhaseOrder.All.Length] : [];
 
         if (_enabled)
         {
@@ -30,6 +34,30 @@ public sealed class SimulationDiagnostics
     }
 
     public bool Enabled => _enabled;
+
+    public bool PhaseTimingEnabled => _trackPhaseTiming;
+
+    public TimeSpan LastTickObserversDuration { get; private set; }
+
+    public TimeSpan GetLastPhaseDuration(SimulationPhase phase)
+    {
+        int index = SimulationPhaseOrder.GetIndex(phase);
+        return _trackPhaseTiming ? ToTimeSpan(_lastPhaseTicks[index]) : TimeSpan.Zero;
+    }
+
+    internal long BeginPhase() => _trackPhaseTiming ? Stopwatch.GetTimestamp() : 0;
+
+    internal void EndPhase(SimulationPhase phase, long started)
+    {
+        if (_trackPhaseTiming)
+            _lastPhaseTicks[SimulationPhaseOrder.GetIndex(phase)] = Stopwatch.GetTimestamp() - started;
+    }
+
+    internal void EndTickObservers(long started)
+    {
+        if (_trackPhaseTiming)
+            LastTickObserversDuration = ToTimeSpan(Stopwatch.GetTimestamp() - started);
+    }
 
     internal TickMeasurement BeginTick()
     {

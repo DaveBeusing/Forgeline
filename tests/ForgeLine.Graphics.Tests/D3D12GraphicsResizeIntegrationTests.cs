@@ -27,7 +27,8 @@ public sealed class D3D12GraphicsResizeIntegrationTests
                 {
                     AllowSoftwareAdapterFallback = true,
                     EnableDebugLayer = false,
-                    EnableVSync = false
+                    EnableVSync = false,
+                    EnableMemoryDiagnostics = true
                 });
 
         graphics.RenderFrame(
@@ -35,6 +36,13 @@ public sealed class D3D12GraphicsResizeIntegrationTests
 
         GraphicsSurfaceInfo initial =
             graphics.Diagnostics.Surface;
+
+        var memory = graphics.Diagnostics.Memory;
+        Assert.NotNull(memory);
+        if (memory.Available)
+            Assert.True(memory.LocalBudgetBytes > 0 || memory.NonLocalBudgetBytes > 0);
+        else
+            Assert.False(string.IsNullOrWhiteSpace(memory.FailureReason));
 
         Assert.True(
             initial.SubmittedFrameCount > 0);

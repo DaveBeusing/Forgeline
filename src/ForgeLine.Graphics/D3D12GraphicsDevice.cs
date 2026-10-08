@@ -234,6 +234,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                         _presentedFrameCount
                 })
             {
+                Memory = _configuration.EnableMemoryDiagnostics && _failure is null ? CaptureMemoryBudget() : null,
                 Resources =
                     new GraphicsResourceDiagnostics(
                         _loadedTextureCount,
@@ -277,6 +278,21 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     }
 
     private string PresentMode => _configuration.EnableVSync ? "VSync" : "Immediate";
+
+    private GraphicsMemoryDiagnostics CaptureMemoryBudget()
+    {
+        try
+        {
+            using var adapter = _factory.EnumAdapterByLuid<IDXGIAdapter3>((Vortice.Luid)_device.AdapterLuid);
+            QueryVideoMemoryInfo local = adapter.QueryVideoMemoryInfo(0, MemorySegmentGroup.Local);
+            QueryVideoMemoryInfo nonLocal = adapter.QueryVideoMemoryInfo(0, MemorySegmentGroup.NonLocal);
+            return new GraphicsMemoryDiagnostics(true, local.Budget, local.CurrentUsage, nonLocal.Budget, nonLocal.CurrentUsage, null);
+        }
+        catch (SharpGen.Runtime.SharpGenException exception)
+        {
+            return new GraphicsMemoryDiagnostics(false, 0, 0, 0, 0, exception.ResultCode.ToString());
+        }
+    }
 
     public IGraphicsPipeline CreateGraphicsPipeline(GraphicsPipelineDescription description)
     {

@@ -19,6 +19,8 @@ public sealed record GraphicsConfiguration
 
     public bool EnableVSync { get; init; } = true;
 
+    public bool EnableMemoryDiagnostics { get; init; }
+
     internal void Validate()
     {
         if (BufferCount is < MinimumBufferCount or > MaximumBufferCount)
