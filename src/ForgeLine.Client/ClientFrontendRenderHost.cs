@@ -11,6 +11,7 @@ internal sealed class ClientFrontendRenderHost : IDisposable
     private readonly object _gate = new();
     private readonly GraphicsWindowTarget _target;
     private readonly StartupDiagnostics _startup;
+    private readonly bool _asynchronousStartup;
     private ulong _presentedFrames;
     private readonly AutoResetEvent _signal = new(false);
     private readonly ManualResetEventSlim _started = new(false);
@@ -19,7 +20,10 @@ internal sealed class ClientFrontendRenderHost : IDisposable
     private FrontendSurfaceView? _latest;
     private RuntimeAssetCatalog? _splashAssets;
     private long _publishedSequence;
-    private long _renderedSequence;
+    private long _presentedSequence;
+    private int _surfaceWidth;
+    private int _surfaceHeight;
+    private bool _surfaceSuspended;
     private ExceptionDispatchInfo? _failure;
     private int _stopping;
     private int _splashUnavailable;
@@ -27,19 +31,33 @@ internal sealed class ClientFrontendRenderHost : IDisposable
 
     internal ClientFrontendRenderHost(
         in GraphicsWindowTarget target,
-        StartupDiagnostics? startup = null)
+        StartupDiagnostics? startup = null,
+        FrontendSurfaceView? initialSurface = null,
+        bool asynchronousStartup = false)
     {
         _startup = startup ?? StartupDiagnostics.Disabled;
         target.Validate();
         _target = target;
+        _asynchronousStartup = asynchronousStartup;
+        _surfaceWidth = target.Width;
+        _surfaceHeight = target.Height;
+        _surfaceSuspended = target.Suspended;
+        if (initialSurface.HasValue)
+        {
+            _latest = initialSurface;
+            _publishedSequence = 1;
+        }
         _thread = new Thread(RenderLoop)
         {
             IsBackground = true,
             Name = "ForgeLine Frontend Render"
         };
         _thread.Start();
-        _started.Wait();
-        ThrowIfFaulted();
+        if (!asynchronousStartup)
+        {
+            _started.Wait();
+            ThrowIfFaulted();
+        }
     }
 
     internal void Publish(
@@ -63,6 +81,19 @@ internal sealed class ClientFrontendRenderHost : IDisposable
         _signal.Set();
     }
 
+    internal bool HasPresentedFrame => Volatile.Read(ref _presentedSequence) > 0;
+
+    internal void UpdateSurface(int width, int height, bool suspended)
+    {
+        lock (_gate)
+        {
+            _surfaceWidth = width;
+            _surfaceHeight = height;
+            _surfaceSuspended = suspended || width <= 0 || height <= 0;
+        }
+        _signal.Set();
+    }
+
     internal bool WaitForLatestFrame(TimeSpan timeout)
     {
         if (timeout < TimeSpan.Zero)
@@ -81,13 +112,13 @@ internal sealed class ClientFrontendRenderHost : IDisposable
         }
 
         if (expectedSequence == 0 ||
-            Volatile.Read(ref _renderedSequence) >= expectedSequence)
+            Volatile.Read(ref _presentedSequence) >= expectedSequence)
         {
             return true;
         }
 
         var stopwatch = Stopwatch.StartNew();
-        while (Volatile.Read(ref _renderedSequence) < expectedSequence)
+        while (Volatile.Read(ref _presentedSequence) < expectedSequence)
         {
             TimeSpan remaining = timeout - stopwatch.Elapsed;
             if (remaining <= TimeSpan.Zero ||
@@ -152,7 +183,10 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                     _target);
             using var renderer =
                 new FrontendOverlayRenderer(graphics);
+            if (_asynchronousStartup) _startup.End(StartupPhase.BootRenderer);
             _started.Set();
+            int width = _target.Width, height = _target.Height;
+            bool suspended = _target.Suspended;
             StudioSplashTextureRenderer? splashRenderer = null;
             try
             {
@@ -162,18 +196,35 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                 FrontendSurfaceView? view;
                 RuntimeAssetCatalog? splashAssets;
                 long sequence;
+                int requestedWidth, requestedHeight;
+                bool requestedSuspended;
                 lock (_gate)
                 {
                     view = _latest;
                     splashAssets = _splashAssets;
                     sequence = _publishedSequence;
+                    requestedWidth = _surfaceWidth;
+                    requestedHeight = _surfaceHeight;
+                    requestedSuspended = _surfaceSuspended;
                 }
 
-                if (!view.HasValue ||
-                    _target.Width <= 0 ||
-                    _target.Height <= 0)
+                if (!view.HasValue)
                 {
                     continue;
+                }
+
+                if (requestedSuspended)
+                {
+                    if (!suspended) graphics.Resize(0, 0);
+                    suspended = true;
+                    continue;
+                }
+                if (suspended || width != requestedWidth || height != requestedHeight)
+                {
+                    graphics.Resize(requestedWidth, requestedHeight);
+                    width = requestedWidth;
+                    height = requestedHeight;
+                    suspended = false;
                 }
 
                 if (view.Value.Kind == FrontendSurfaceKind.StudioSplash &&
@@ -209,17 +260,15 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                             renderer.Render(context, view.Value);
                         }
                     });
-                if (_startup.Enabled && ObservePresentation(_startup, _presentedFrames,
+                if (ObservePresentation(_startup, _presentedFrames,
                     graphics.PresentedFrameCount, view.Value.Kind,
                     !view.Value.SplashBootstrap && splashRenderer?.HasAssets == true,
                     view.Value.SplashBootstrap))
                 {
                     _presentedFrames = graphics.PresentedFrameCount;
+                    Volatile.Write(ref _presentedSequence, sequence);
+                    _frameRendered.Set();
                 }
-                Volatile.Write(
-                    ref _renderedSequence,
-                    sequence);
-                _frameRendered.Set();
             }
             }
             finally
@@ -229,10 +278,14 @@ internal sealed class ClientFrontendRenderHost : IDisposable
         }
         catch (Exception exception)
         {
+            if (_asynchronousStartup)
+                _startup.End(StartupPhase.BootRenderer, StartupEventKind.Failed,
+                    detail: exception.GetType().Name);
             Volatile.Write(
                 ref _failure,
                 ExceptionDispatchInfo.Capture(exception));
             _started.Set();
+            _frameRendered.Set();
         }
     }
 }
