@@ -40,6 +40,8 @@ Cargo recovery refill targets depend on the live fleet, including when replaceme
 
 ## Validation status
 
+After recovery releases an advancing supply escort, offensive planning waits for the next decision instead of immediately issuing another advance. Automatic resupply can claim the released provider on the intervening tick. Active reconnaissance escorts and existing loading/rescue assignments retain ownership. Existing bounded offensive and supply-loading tests qualify this handoff without changing their tick budgets.
+
 Reconnaissance supply escorts remain attached until the opposing command core is currently identified. Incidental enemy-unit sightings do not complete that objective. A recovered scout without an active resupply order can resume reconnaissance before completing obsolete retreat movement, using the configured readiness, fuel and ammunition admission thresholds. The regression retains shared-route checks, verifies active escort movement after unrelated enemy contact, and verifies recovered-scout redeployment; both new cases fail with the prior policy.
 
 Blocked steel production raises Ferrous Ore input delivery to Critical, so an otherwise healthy construction reserve cannot prevent raw material from reaching an empty smelter. A satisfied output target retains the normal High priority and existing 80/240 input thresholds. The readiness fixture waits for both attack readiness and expansion within its original 50,000-tick budget, avoiding an assumption about which milestone occurs first.

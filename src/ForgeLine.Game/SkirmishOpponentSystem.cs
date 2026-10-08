@@ -1276,7 +1276,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
-        ReleaseSupplyEscortMovementForRecovery(
+        bool recoveryEscortsReleased = ReleaseSupplyEscortMovementForRecovery(
             context,
             controller,
             owned);
@@ -1314,7 +1314,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     owned.CombatUnits.Count
             );
 
-        return forceWideRecovery;
+        // Give automatic resupply a tick to claim an escort whose advance
+        // was just released, before offensive planning assigns it again.
+        return forceWideRecovery || recoveryEscortsReleased;
     }
 
     private bool TryExpand(
@@ -1853,11 +1855,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return true;
     }
 
-    private static void ReleaseSupplyEscortMovementForRecovery(
+    private static bool ReleaseSupplyEscortMovementForRecovery(
         SimulationContext context,
         SkirmishOpponentController controller,
         OwnedState owned)
     {
+        bool released = false;
+        EntityId scout = ResolveReconReserveScout(owned);
         for (int index = 0; index < owned.Units.Count; index++)
         {
             EntityId candidate = owned.Units[index];
@@ -1869,6 +1873,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     candidate) ||
                 context.Entities.HasComponent<SupplyRescueAssignment>(
                     candidate) ||
+                IsProtectingReconScout(context, candidate, scout) ||
                 !TacticalCommandUtilities.TryGetMovementIntent(
                     context,
                     candidate,
@@ -1908,8 +1913,10 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     [candidate],
                     context.Tick)
                     .Execute(context);
+                released = true;
             }
         }
+        return released;
     }
 
     private void EnsureReconSupplySupport(
