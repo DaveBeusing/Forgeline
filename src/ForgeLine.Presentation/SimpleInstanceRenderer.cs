@@ -15,6 +15,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
     private const int FallbackVertexStride = 48;
     private const int InstanceStride = 112;
     private const int MinimumInstanceCapacity = 64;
+    private const int MaximumRetainedScratchInstances = 65_536;
+    private const int MaximumRetainedScratchBatches = 256;
 
     private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;
@@ -24,6 +26,10 @@ public sealed class SimpleInstanceRenderer : IDisposable
     private readonly RuntimeWorldAssetResources? _runtimeAssets;
     private readonly SceneLightingSettings _lighting;
     private readonly Dictionary<int, FrameInstanceBuffer> _frameInstanceBuffers = [];
+    private readonly Dictionary<InstanceBatchKey, InstanceBatch> _batchLookup = [];
+    private readonly List<InstanceBatch> _batches = [];
+    private InstanceRenderData[] _instanceStaging = [];
+    private int _activeBatchCount;
     private bool _disposed;
 
     public SimpleInstanceRenderer(
@@ -124,6 +130,21 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
     public InstanceRenderDiagnostics LastDiagnostics { get; private set; }
 
+    public InstanceSubmissionMetrics SubmissionMetrics
+    {
+        get
+        {
+            long retained = 0;
+            foreach (InstanceBatch batch in _batches) retained += batch.Instances.Capacity;
+            int textured = 0;
+            for (int i = 0; i < _activeBatchCount; i++)
+                if (_batches[i].UsesRuntimeMaterial) textured++;
+            int submitted = LastDiagnostics.RuntimeMeshInstances + LastDiagnostics.FallbackMeshInstances;
+            return new InstanceSubmissionMetrics(_instanceStaging.Length, retained, _batches.Count,
+                submitted, (long)submitted * InstanceStride, LastDiagnostics.DrawCalls, textured * 4);
+        }
+    }
+
     public SceneLightingSettings Lighting =>
         _lighting;
 
@@ -149,10 +170,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
         ViewFrustum frustum =
             ViewFrustum.FromViewProjection(
                 matrices.ViewProjection);
-        var batchLookup =
-            new Dictionary<InstanceBatchKey, InstanceBatch>();
-        var batches =
-            new List<InstanceBatch>();
+        ResetScratch();
+        var batchLookup = _batchLookup;
+        var batches = _batches;
 
         int visible = 0;
         int highLod = 0;
@@ -409,15 +429,13 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     out InstanceBatch? batch))
             {
                 batch =
-                    new InstanceBatch(
+                    RentBatch(
                         usesRuntimeMesh,
                         runtimeMesh,
                         usesRuntimeMaterial,
                         runtimeMaterial);
                 batchLookup.Add(
                     key,
-                    batch);
-                batches.Add(
                     batch);
             }
 
@@ -451,15 +469,13 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         out InstanceBatch? turretBatch))
                 {
                     turretBatch =
-                        new InstanceBatch(
+                        RentBatch(
                             true,
                             turretMesh,
                             usesRuntimeMaterial,
                             runtimeMaterial);
                     batchLookup.Add(
                         turretKey,
-                        turretBatch);
-                    batches.Add(
                         turretBatch);
                 }
 
@@ -500,15 +516,13 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         out InstanceBatch? stateBatch))
                 {
                     stateBatch =
-                        new InstanceBatch(
+                        RentBatch(
                             true,
                             stateMesh,
                             usesRuntimeMaterial,
                             runtimeMaterial);
                     batchLookup.Add(
                         stateKey,
-                        stateBatch);
-                    batches.Add(
                         stateBatch);
                 }
 
@@ -544,7 +558,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             0;
 
         for (int batchIndex = 0;
-             batchIndex < batches.Count;
+             batchIndex < _activeBatchCount;
              batchIndex++)
         {
             InstanceBatch batch =
@@ -585,12 +599,17 @@ public sealed class SimpleInstanceRenderer : IDisposable
             GetFrameInstanceBuffer(
                 context.FrameIndex,
                 submittedInstances);
-        var instanceData =
-            new InstanceRenderData[submittedInstances];
+        if (_instanceStaging.Length < submittedInstances)
+        {
+            int capacity = Math.Max(MinimumInstanceCapacity, _instanceStaging.Length);
+            while (capacity < submittedInstances) capacity = checked(capacity * 2);
+            _instanceStaging = new InstanceRenderData[capacity];
+        }
+        var instanceData = _instanceStaging;
         int writeOffset = 0;
 
         for (int batchIndex = 0;
-             batchIndex < batches.Count;
+             batchIndex < _activeBatchCount;
              batchIndex++)
         {
             InstanceBatch batch =
@@ -605,7 +624,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
         }
 
         instanceBuffer.SetData<InstanceRenderData>(
-            instanceData);
+            instanceData.AsSpan(0, submittedInstances));
 
         Span<float> constants =
             stackalloc float[RootConstantCount];
@@ -619,7 +638,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
         int draws = 0;
 
         for (int batchIndex = 0;
-             batchIndex < batches.Count;
+             batchIndex < _activeBatchCount;
              batchIndex++)
         {
             InstanceBatch batch =
@@ -713,12 +732,53 @@ public sealed class SimpleInstanceRenderer : IDisposable
         }
 
         _frameInstanceBuffers.Clear();
+        _batchLookup.Clear();
+        _batches.Clear();
+        _instanceStaging = [];
         _runtimeAssets?.Dispose();
         _indexBuffer.Dispose();
         _vertexBuffer.Dispose();
         _texturedPipeline?.Dispose();
         _pipeline.Dispose();
         _disposed = true;
+    }
+
+    private void ResetScratch()
+    {
+        // Only the render owner uses scratch; no span escapes synchronous SetData.
+        _batchLookup.Clear();
+        long retainedInstances = 0;
+        foreach (InstanceBatch batch in _batches)
+        {
+            retainedInstances += batch.Instances.Capacity;
+            batch.Reset();
+        }
+        if (_batches.Count > MaximumRetainedScratchBatches ||
+            retainedInstances > MaximumRetainedScratchInstances)
+        {
+            _batches.Clear();
+            _batches.TrimExcess();
+            _batchLookup.TrimExcess();
+        }
+        if (_instanceStaging.Length > MaximumRetainedScratchInstances)
+            _instanceStaging = [];
+        _activeBatchCount = 0;
+    }
+
+    private InstanceBatch RentBatch(
+        bool usesRuntimeMesh,
+        RuntimeMeshBuffers runtimeMesh,
+        bool usesRuntimeMaterial,
+        RuntimeMaterialResources runtimeMaterial)
+    {
+        if (_activeBatchCount == _batches.Count)
+            _batches.Add(new InstanceBatch());
+        InstanceBatch batch = _batches[_activeBatchCount++];
+        batch.UsesRuntimeMesh = usesRuntimeMesh;
+        batch.RuntimeMesh = runtimeMesh;
+        batch.UsesRuntimeMaterial = usesRuntimeMaterial;
+        batch.RuntimeMaterial = runtimeMaterial;
+        return batch;
     }
 
     private IGraphicsBuffer GetFrameInstanceBuffer(
@@ -1712,28 +1772,30 @@ public sealed class SimpleInstanceRenderer : IDisposable
         bool UsesRuntimeMaterial,
         AssetId RuntimeMaterialId);
 
-    private sealed class InstanceBatch(
-        bool usesRuntimeMesh,
-        RuntimeMeshBuffers runtimeMesh,
-        bool usesRuntimeMaterial,
-        RuntimeMaterialResources runtimeMaterial)
+    private sealed class InstanceBatch
     {
-        public bool UsesRuntimeMesh { get; } =
-            usesRuntimeMesh;
+        public bool UsesRuntimeMesh { get; set; }
 
-        public RuntimeMeshBuffers RuntimeMesh { get; } =
-            runtimeMesh;
+        public RuntimeMeshBuffers RuntimeMesh { get; set; }
 
-        public bool UsesRuntimeMaterial { get; } =
-            usesRuntimeMaterial;
+        public bool UsesRuntimeMaterial { get; set; }
 
-        public RuntimeMaterialResources RuntimeMaterial { get; } =
-            runtimeMaterial;
+        public RuntimeMaterialResources RuntimeMaterial { get; set; }
 
         public List<InstanceRenderData> Instances { get; } =
             [];
 
         public int InstanceOffset { get; set; }
+
+        public void Reset()
+        {
+            Instances.Clear();
+            UsesRuntimeMesh = false;
+            RuntimeMesh = default;
+            UsesRuntimeMaterial = false;
+            RuntimeMaterial = default;
+            InstanceOffset = 0;
+        }
     }
 
     private sealed class FrameInstanceBuffer

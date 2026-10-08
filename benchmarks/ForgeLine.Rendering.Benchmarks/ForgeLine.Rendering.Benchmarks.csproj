@@ -5,6 +5,7 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="../../src/ForgeLine.Client/ForgeLine.Client.csproj" />
     <PackageReference Include="BenchmarkDotNet" />
     <ProjectReference Include="../../src/ForgeLine.Graphics/ForgeLine.Graphics.csproj" />
     <ProjectReference Include="../../src/ForgeLine.Presentation/ForgeLine.Presentation.csproj" />

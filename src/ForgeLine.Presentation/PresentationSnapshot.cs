@@ -24,6 +24,27 @@ public sealed class PresentationSnapshot
         VfxPresentationMetrics vfxMetrics = default,
         StrategicOverlaySnapshot? strategicOverlay = null,
         CombatGroupOperationalSnapshot? combatGroups = null)
+        : this(instances.ToArray(), tick, tickDuration, simulationEntityCount, intelligence, sessionId, playerExperience, placementPreview, debug, construction, simulationDiagnostics, playerActions, vfxMetrics, strategicOverlay, combatGroups)
+    {
+    }
+
+    // Only extraction transfers a fresh, unaliased array; readers can retain it indefinitely.
+    internal PresentationSnapshot(
+        RenderInstance[] ownedInstances,
+        SimulationTick tick,
+        TimeSpan tickDuration,
+        int simulationEntityCount,
+        FactionIntelligenceSnapshot? intelligence = null,
+        SimulationSessionId sessionId = default,
+        PlayerExperienceSnapshot? playerExperience = null,
+        BuildingPlacementPreviewReadModel? placementPreview = null,
+        PresentationDebugSnapshot? debug = null,
+        BuildingConstructionDebugSnapshot? construction = null,
+        SimulationDiagnosticsSnapshot? simulationDiagnostics = null,
+        PlayerActionSnapshot? playerActions = null,
+        VfxPresentationMetrics vfxMetrics = default,
+        StrategicOverlaySnapshot? strategicOverlay = null,
+        CombatGroupOperationalSnapshot? combatGroups = null)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(
             tickDuration,
@@ -45,7 +66,7 @@ public sealed class PresentationSnapshot
         VfxMetrics = vfxMetrics;
         StrategicOverlay = strategicOverlay;
         CombatGroups = combatGroups;
-        _instances = instances.ToArray();
+        _instances = ownedInstances;
     }
 
     public SimulationSessionId SessionId { get; }

@@ -160,10 +160,10 @@ public sealed class PresentationExtractor : ISimulationTickObserver
 
         _buffer.Publish(
             new PresentationSnapshot(
+                instances,
                 context.Tick,
                 context.TickDuration,
                 context.Entities.EntityCount,
-                instances,
                 intelligenceSnapshot,
                 _extraction?.Scenario.Simulation.SessionId ??
                     SimulationSessionId.None,
@@ -291,6 +291,10 @@ public sealed class PresentationExtractor : ISimulationTickObserver
         QueueProjectileVfx(
             context);
         QueuePooledVfx();
+
+        // This fresh array is transferred to the snapshot and never reused.
+        if (_queuedVfx.Count == 0 && baseIndex == baseInstances.Length)
+            return baseInstances;
 
         if (baseIndex == 0 &&
             _queuedVfx.Count == 0)

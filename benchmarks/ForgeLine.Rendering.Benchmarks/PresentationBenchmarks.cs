@@ -22,6 +22,8 @@ public class PresentationBenchmarks : IDisposable
     private RenderWorld _representativeWorld = null!;
     private RenderWorld _roadReadabilityWorld = null!;
 
+    public InstanceSubmissionMetrics SubmissionMetrics => _renderer.SubmissionMetrics;
+
     [GlobalSetup]
     public void Setup()
     {

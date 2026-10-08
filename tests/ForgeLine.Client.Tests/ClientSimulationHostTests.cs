@@ -617,6 +617,38 @@ public sealed class ClientSimulationHostTests
             [],
             []);
 
+    [Fact]
+    public void PublishedArraysRemainOwnedAcrossMutationAndDroppedFrames()
+    {
+        using var entered = new ManualResetEventSlim(false);
+        using var release = new ManualResetEventSlim(false);
+        using var observed = new ManualResetEventSlim(false);
+        DebugLine captured = default;
+        int renders = 0;
+        using var host = new ClientRenderHost(frame =>
+        {
+            if (Interlocked.Increment(ref renders) != 1) return;
+            entered.Set();
+            release.Wait(TestContext.Current.CancellationToken);
+            captured = frame.GameplayLines[0];
+            observed.Set();
+        });
+        var original = new DebugLine(System.Numerics.Vector3.One, System.Numerics.Vector3.Zero, System.Numerics.Vector4.One);
+        DebugLine[] source = [original];
+        try
+        {
+            Assert.True(host.Publish(CreateRenderFrame(800) with { GameplayLines = source }));
+            Assert.True(entered.Wait(TestTimeout, TestContext.Current.CancellationToken));
+            source[0] = default;
+            for (int i = 0; i < 128; i++)
+                Assert.True(host.Publish(CreateRenderFrame(800) with { GameplayLines = new DebugLine[i + 1] }));
+            release.Set();
+            Assert.True(observed.Wait(TestTimeout, TestContext.Current.CancellationToken));
+            Assert.Equal(original, captured);
+        }
+        finally { release.Set(); }
+    }
+
     private sealed class ClientHostFixture : IDisposable
     {
         private bool _disposed;
