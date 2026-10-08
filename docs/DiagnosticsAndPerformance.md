@@ -260,6 +260,8 @@ The rendering host loads the compiled runtime asset catalog and exercises the pr
 
 ### Frame hot-path measurements
 
+For correlated workload-scale samples, phase clocks, memory/resource windows and the opt-in native lane, see [Scalability qualification](ScalabilityQualification.md). Timing gates remain advisory until reference hardware and measurement noise are controlled.
+
 After the Release build and runtime asset compilation, capture a CPU-only fixed-fixture comparison with:
 
 ```powershell

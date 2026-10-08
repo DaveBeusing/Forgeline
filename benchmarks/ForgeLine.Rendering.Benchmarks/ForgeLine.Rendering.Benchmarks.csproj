@@ -5,6 +5,7 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../ScalabilityMeasurement.cs" Link="ScalabilityMeasurement.cs" />
     <ProjectReference Include="../../src/ForgeLine.Client/ForgeLine.Client.csproj" />
     <PackageReference Include="BenchmarkDotNet" />
     <ProjectReference Include="../../src/ForgeLine.Graphics/ForgeLine.Graphics.csproj" />

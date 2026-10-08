@@ -197,7 +197,8 @@ public sealed class MatchRuntime : IDisposable
                     new SimulationDiagnosticsOptions
                     {
                         Enabled =
-                            runtimeSettings.EnableDiagnostics
+                            runtimeSettings.EnableDiagnostics,
+                        TrackPhaseTiming = runtimeSettings.EnablePhaseTiming
                     });
 
         var spatialIndex =

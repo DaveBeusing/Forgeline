@@ -148,28 +148,58 @@ public sealed class SimulationCoordinator
             _context.Tick = tick;
             _context.TickDuration = Clock.TickDuration;
 
+            if (Diagnostics.PhaseTimingEnabled)
+            {
+                ExecuteTimedTick(tick);
+                return;
+            }
+
             ReadOnlySpan<SimulationPhase> phases = SimulationPhaseOrder.All;
             for (int index = 0; index < phases.Length; index++)
             {
                 SimulationPhase phase = phases[index];
                 _context.Phase = phase;
-
                 if (phase == SimulationPhase.InputCommands)
-                {
                     _commandsProcessed += (ulong)_commands.ExecuteForTick(tick, _context);
-                }
-
                 _systemInvocations += (ulong)_systems.ExecutePhase(phase, _context);
             }
-
             for (int index = 0; index < _tickObservers.Count; index++)
-            {
                 _tickObservers[index].OnTickCompleted(_context);
-            }
         }
         finally
         {
             Diagnostics.EndTick(measurement);
+        }
+    }
+
+    private void ExecuteTimedTick(SimulationTick tick)
+    {
+        ReadOnlySpan<SimulationPhase> phases = SimulationPhaseOrder.All;
+        for (int index = 0; index < phases.Length; index++)
+        {
+            SimulationPhase phase = phases[index];
+            _context.Phase = phase;
+            long phaseStarted = Diagnostics.BeginPhase();
+            try
+            {
+                if (phase == SimulationPhase.InputCommands)
+                    _commandsProcessed += (ulong)_commands.ExecuteForTick(tick, _context);
+                _systemInvocations += (ulong)_systems.ExecutePhase(phase, _context);
+            }
+            finally
+            {
+                Diagnostics.EndPhase(phase, phaseStarted);
+            }
+        }
+        long observersStarted = Diagnostics.BeginPhase();
+        try
+        {
+            for (int index = 0; index < _tickObservers.Count; index++)
+                _tickObservers[index].OnTickCompleted(_context);
+        }
+        finally
+        {
+            Diagnostics.EndTickObservers(observersStarted);
         }
     }
 

@@ -1340,6 +1340,8 @@ internal sealed class ClientApplication
         if (!string.IsNullOrWhiteSpace(
                 visualQualificationOutput))
         {
+            renderHost.Dispose();
+            renderHost.ThrowIfFaulted();
             WriteVisualQualificationReport(
                 visualQualificationOutput,
                 renderInstanceCount,

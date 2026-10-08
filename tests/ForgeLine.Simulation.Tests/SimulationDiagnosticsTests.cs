@@ -6,6 +6,62 @@ namespace ForgeLine.Simulation.Tests;
 public sealed class SimulationDiagnosticsTests
 {
     [Fact]
+    public void PhaseTimingPreservesSeededCommandAndObserverOrder()
+    {
+        var plain = new SimulationCoordinator(seed: 77);
+        var timed = new SimulationCoordinator(seed: 77,
+            diagnosticsOptions: new SimulationDiagnosticsOptions { Enabled = true, TrackPhaseTiming = true });
+        var plainObserver = new CountingObserver();
+        var timedObserver = new CountingObserver();
+        plain.RegisterTickObserver(plainObserver);
+        timed.RegisterTickObserver(timedObserver);
+        EntityId first = plain.Entities.CreateEntity(), second = timed.Entities.CreateEntity();
+        plain.Entities.AddComponent(first, new Accumulator(0));
+        timed.Entities.AddComponent(second, new Accumulator(0));
+        for (ulong tick = 1; tick <= 32; tick++)
+        {
+            plain.SubmitCommand(new RandomAccumulateCommand(first), new SimulationTick(tick));
+            timed.SubmitCommand(new RandomAccumulateCommand(second), new SimulationTick(tick));
+        }
+        plain.RunTicks(32, TestContext.Current.CancellationToken);
+        timed.RunTicks(32, TestContext.Current.CancellationToken);
+        Assert.Equal(plain.Entities.GetComponent<Accumulator>(first), timed.Entities.GetComponent<Accumulator>(second));
+        Assert.Equal(plain.Random.State, timed.Random.State);
+        Assert.Equal(plain.Metrics, timed.Metrics);
+        Assert.Equal(plainObserver.Ticks, timedObserver.Ticks);
+        Assert.Equal(32UL, timedObserver.Ticks);
+        Assert.True(timed.Diagnostics.PhaseTimingEnabled);
+        foreach (var phase in SimulationPhaseOrder.All)
+            Assert.True(timed.Diagnostics.GetLastPhaseDuration(phase) >= TimeSpan.Zero);
+        Assert.True(timed.Diagnostics.LastTickObserversDuration >= TimeSpan.Zero);
+    }
+
+    [Fact]
+    public void PhaseTimingRequiresEnabledDiagnosticsAndDoesNotAllocatePerTick()
+    {
+        var disabled = new SimulationCoordinator(diagnosticsOptions:
+            new SimulationDiagnosticsOptions { TrackPhaseTiming = true });
+        disabled.AdvanceOneTick();
+        Assert.False(disabled.Diagnostics.PhaseTimingEnabled);
+        Assert.Equal(TimeSpan.Zero, disabled.Diagnostics.GetLastPhaseDuration(SimulationPhase.Movement));
+        var timed = new SimulationCoordinator(diagnosticsOptions:
+            new SimulationDiagnosticsOptions { Enabled = true, TrackPhaseTiming = true });
+        timed.RunTicks(32, TestContext.Current.CancellationToken);
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        timed.RunTicks(64, TestContext.Current.CancellationToken);
+        Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
+    }
+
+    private sealed class CountingObserver : ISimulationTickObserver
+    {
+        public ulong Ticks { get; private set; }
+        public void OnTickCompleted(SimulationContext context)
+        {
+            Assert.Equal(++Ticks, context.Tick.Value);
+        }
+    }
+
+    [Fact]
     public void DiagnosticsCaptureTickEntityComponentAndRuntimeState()
     {
         using var harness = new SimulationTestHarness(

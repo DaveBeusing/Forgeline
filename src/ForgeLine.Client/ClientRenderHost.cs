@@ -651,6 +651,14 @@ internal sealed class ClientRenderHost : IDisposable
             }
 
             graphics.WaitForIdle();
+            GraphicsDiagnostics completedGraphics = graphics.Diagnostics;
+            lock (_frameGate)
+            {
+                if (_latestQualification is { } qualification)
+                {
+                    _latestQualification = CompleteGpuQualification(qualification, completedGraphics);
+                }
+            }
         }
         catch (Exception exception)
         {
@@ -698,6 +706,17 @@ internal sealed class ClientRenderHost : IDisposable
             return _latestFrame;
         }
     }
+
+    internal static ClientVisualQualificationSnapshot CompleteGpuQualification(
+        in ClientVisualQualificationSnapshot snapshot,
+        GraphicsDiagnostics completedGraphics) => snapshot with
+        {
+            GpuTimingAvailable = completedGraphics.GpuTimingAvailable,
+            GpuMilliseconds = completedGraphics.GpuTimingAvailable ? completedGraphics.GpuFrameMilliseconds : null,
+            DebugLayerEnabled = completedGraphics.Device.DebugLayerEnabled,
+            DebugLayerWarningCount = completedGraphics.Debug.WarningCount,
+            DebugLayerErrorCount = completedGraphics.Debug.ErrorCount
+        };
 
     private void PublishQualification(
         GraphicsDiagnostics graphics,

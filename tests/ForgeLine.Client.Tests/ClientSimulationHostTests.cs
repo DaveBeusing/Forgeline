@@ -1,6 +1,7 @@
 using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Game;
+using ForgeLine.Graphics;
 using ForgeLine.Presentation;
 using ForgeLine.Simulation;
 using Xunit;
@@ -9,6 +10,47 @@ namespace ForgeLine.Client.Tests;
 
 public sealed class ClientSimulationHostTests
 {
+    [Fact]
+    public void CompletedGpuQualificationPreservesMeasuredSceneAndCpuCounters()
+    {
+        ClientVisualQualificationSnapshot snapshot = default(ClientVisualQualificationSnapshot) with
+        {
+            VisibleInstances = 17,
+            FrameMilliseconds = 8.0,
+            CpuRenderMilliseconds = 3.0,
+            TotalMeasuredDrawCalls = 5
+        };
+        var graphics = new GraphicsDiagnostics(new GraphicsDeviceInfo("test", 0, false, "test", true), default)
+        {
+            GpuTimingAvailable = true,
+            GpuFrameMilliseconds = 2.5,
+            Debug = new GraphicsDebugDiagnostics(true, 1, 2)
+        };
+        ClientVisualQualificationSnapshot completed = ClientRenderHost.CompleteGpuQualification(snapshot, graphics);
+        Assert.Equal(snapshot with
+        {
+            GpuTimingAvailable = true,
+            GpuMilliseconds = 2.5,
+            DebugLayerEnabled = true,
+            DebugLayerWarningCount = 1,
+            DebugLayerErrorCount = 2
+        }, completed);
+    }
+
+    [Fact]
+    public void CompletedGpuQualificationDoesNotInventUnavailableTiming()
+    {
+        ClientVisualQualificationSnapshot snapshot = default(ClientVisualQualificationSnapshot) with
+        {
+            GpuTimingAvailable = true,
+            GpuMilliseconds = 9
+        };
+        var graphics = new GraphicsDiagnostics(new GraphicsDeviceInfo("test", 0, false, "test", false), default);
+        ClientVisualQualificationSnapshot completed = ClientRenderHost.CompleteGpuQualification(snapshot, graphics);
+        Assert.False(completed.GpuTimingAvailable);
+        Assert.Null(completed.GpuMilliseconds);
+    }
+
     private static readonly TimeSpan TestTimeout =
         TimeSpan.FromSeconds(5);
 

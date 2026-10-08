@@ -26,6 +26,8 @@ public sealed record MatchRuntimeSettings
 
     public bool EnableDiagnostics { get; init; }
 
+    public bool EnablePhaseTiming { get; init; }
+
     public bool EnableDebugCapture { get; init; }
 
     public bool EnableSpatialQueryTiming { get; init; }

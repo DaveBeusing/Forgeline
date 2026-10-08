@@ -17,6 +17,10 @@ public class JobSchedulerBenchmarks : IDisposable
     [Params(256, 1_024)]
     public int BatchSize { get; set; }
 
+    public int WorkerCount { get; set; } = Math.Max(1, Environment.ProcessorCount - 1);
+
+    internal JobSchedulerMetrics Metrics => _scheduler.GetMetrics();
+
     [GlobalSetup]
     public void Setup()
     {
@@ -26,7 +30,7 @@ public class JobSchedulerBenchmarks : IDisposable
         _scheduler = new JobScheduler(
             new JobSchedulerOptions
             {
-                WorkerCount = Math.Max(1, Environment.ProcessorCount - 1),
+                WorkerCount = WorkerCount,
                 WorkerNamePrefix = "ForgeLine Benchmark Worker"
             });
     }
