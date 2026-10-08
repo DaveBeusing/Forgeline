@@ -91,6 +91,8 @@ public sealed class DirectorateVerticalSliceSmokeTests
         simulation.RegisterSystem(buildingCommands);
         simulation.RegisterSystem(construction);
         simulation.RegisterSystem(unitProduction);
+        var technologies = DirectorateTechnologyDefinitions.CreateCatalog();
+        simulation.RegisterSystem(new TechnologyResearchSystem(technologies, inventories));
         simulation.RegisterSystem(battlefieldSupply);
 
         EntityId source =
@@ -192,6 +194,18 @@ public sealed class DirectorateVerticalSliceSmokeTests
 
         EntityId barracks =
             completedBuildings[BuildingIds.Barracks];
+        EntityId commandCore = completedBuildings[BuildingIds.CommandCore];
+        FullyPowerFacility(simulation, commandCore);
+        var research = PlayerTechnologyActionCommand.Start(Player,
+            TechnologyIds.IndustrialStandardization, commandCore, source,
+            simulation.CurrentTick, technologies);
+        simulation.SubmitCommand(research, simulation.CurrentTick.Next(),
+            new SimulationCommandSource(Player.Value));
+        simulation.RunTicks(technologies[TechnologyIds.IndustrialStandardization].ResearchTicks,
+            TestContext.Current.CancellationToken);
+        Assert.True(research.Accepted);
+        Assert.True(TechnologyStateQueries.IsCapabilityUnlocked(simulation.Entities,
+            Player, TechnologyCapabilityIds.FieldEngineering));
         EntityId vehicleFactory =
             completedBuildings[BuildingIds.VehicleFactory];
 
@@ -475,6 +489,8 @@ public sealed class DirectorateVerticalSliceSmokeTests
         simulation.Entities.AddComponent(
             source,
             new InventoryStorage(inventory));
+        simulation.Entities.AddComponent(source,
+            new ControllableEntity(Player, ControllableEntityCategory.Building));
         simulation.Entities.AddComponent(
             source,
             new StorageDepot(

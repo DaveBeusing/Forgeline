@@ -591,6 +591,10 @@ public sealed class RtsInformationLayerTests
             controller.OverlayMode);
         controller.CycleOverlay();
         Assert.Equal(
+            StrategicOverlayMode.Power,
+            controller.OverlayMode);
+        controller.CycleOverlay();
+        Assert.Equal(
             StrategicOverlayMode.All,
             controller.OverlayMode);
         controller.CycleOverlay();
