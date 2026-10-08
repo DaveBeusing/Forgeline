@@ -1,232 +1,163 @@
 # FORGELINE
 
-**Build. Supply. Conquer.**
+> **Build. Supply. Conquer.**
 
-FORGELINE is a large-scale real-time strategy game where industrial production, logistics, intelligence, and direct battlefield command form one interconnected war machine.
+**FORGELINE** is a large-scale real-time strategy game combining classic battlefield command with industrial production, physical logistics, automation, and intelligence.
 
-The project is built on **ForgeLine Engine**, a custom C#/.NET RTS engine designed specifically for large-scale, deterministic-friendly simulation. It is not intended to become a general-purpose game engine.
+**Build the industry. Supply the army. Control the battlefield.**
 
-## Technical Baseline
+Unlike conventional RTS resource economies, factories, power networks, cargo transport, ammunition, and fuel are part of the war itself. Disrupting a bridge or supply route can matter as much as winning a direct engagement.
 
-- C# 14
-- .NET 10 LTS
-- Windows x64 as the initial client platform
-- Direct3D 12 as the initial graphics backend
-- data-oriented, ECS-first architecture
-- fixed-tick, headless-capable simulation
-- custom job system
-- chunk-based world model
-- hierarchical RTS navigation
-- graph-based logistics simulation
-- strict simulation/presentation separation
-- multiplayer-aware architecture with networking deferred
+## The Game
 
-Repository-specific governance, source precedence, validation requirements, and unresolved approval decisions are documented in [Project Context and Repository Governance](docs/ProjectContext.md).
+The core loop is **Extract → Process → Manufacture → Supply → Fight → Expand**.
 
-Implemented engine foundations currently include the repository architecture, stable entity/component storage, a command-driven fixed-tick simulation runtime, deterministic simulation-owned randomness, a persistent-worker job scheduler, opt-in engine diagnostics, repeatable headless test scenarios, performance baselines, a standalone headless host, the native Windows interactive client host, the Direct3D 12 graphics foundation, the production-oriented RTS camera/input stack, the first chunked heightfield world, a chunk-aware uniform spatial index for world queries, the simulation-to-presentation snapshot pipeline with interpolated generic render instances and debug drawing, plus RTS selection and movement-order interaction, hierarchical ground navigation with movement-class traversability, sector portals, high-level routing, corridor-bounded local refinement and job-scheduled path requests, shared-route multi-unit formation movement with stable line/column/wedge/compact slots and choke-point fallback, together with authoritative fixed-tick ground locomotion, terrain/slope following, local separation, simple static-obstacle steering, and movement diagnostics, plus finite world resource deposits for Ferrous Ore, Volatiles, and Silicates with deterministic-friendly fixed-tick extraction, depletion, ownership validation, metrics, debug read models, and headless coverage, together with capacity-limited aggregate inventories, resource filters, reservations, atomic transfers, storage-depot state, and extractor-output backpressure, plus authoritative logical power networks with generator/consumer state, Critical/Industrial/Optional priority allocation, deterministic brownout handling, diagnostics, data-driven power profiles, and power-aware extraction throughput, together with data-driven building definitions, terrain/footprint/resource placement validation, command-driven construction, inventory reservations, cancellation refunds, fixed-tick progress, completion-time capability activation, and player-facing placement diagnostics, plus deterministic industrial recipes for Steel, Fuel, and Electronics with dedicated processing facilities, input reservations, power and output blocking, repeat/priority queues, desired-stock automation, diagnostics, headless end-to-end validation, and throughput benchmarks, together with a versioned graph-based logistics network, stable economic-node registration, capacity-aware route policies, deterministic route discovery, explicit invalidation/caching, diagnostics, and debug visualization, plus physical Cargo Truck transport with aggregate cargo inventories, fixed-tick load/move/unload lifecycle, logistics-route-to-navigation integration, destination-capacity waiting, route-version rerouting, vehicle-loss semantics, transport diagnostics, headless conservation coverage, and multi-transport benchmarks, together with simulation-authoritative weapons/projectiles/damage, directional armor, weapon-vs-armor penetration, target classes, deterministic spatial target acquisition, fire-policy hooks, combat diagnostics, and headless correctness coverage, plus faction-authoritative battlefield intelligence with persistent exploration, current visual visibility, visual/radar sensors, detected-versus-identified contacts, last-known positions, intelligence-safe targeting, faction-filtered presentation extraction, diagnostics, and scale benchmarks, together with intelligence-driven artillery fire missions, min/max-range validation, deterministic ballistic arcs, dispersion, terrain impact, radial damage, authoritative Ammunition depletion, real battlefield-resupply recovery, debug visualization, and simultaneous-fire benchmarks, plus Phase-5 tactical combat orders with Attack/AttackMove/Stop/Hold/Retreat behavior, pursuit leashes, group target coordination, real automatic-resupply decisions, derived unit/group readiness, an intelligence-constrained tactical test opponent, and 100/1,000-unit tactical benchmarks, together with terrain-aware direct-fire occlusion, fixed-tick infantry suppression, physical Steel-backed repair recovery at Command Cores/Supply Depots, recovery-aware Retreat through the existing shared formation/navigation path, and combined reconnaissance-to-artillery validation.
+- **Build:** Extract finite resources, process Steel/Fuel/Electronics, construct infrastructure, and automate production.
+- **Supply:** Move cargo through capacity-constrained networks; keep combat forces fueled, armed, and operational.
+- **Conquer:** Use reconnaissance, formations, terrain, artillery, and combined arms to defeat an opponent.
 
-The first playable faction-content vertical slice is now the **Directorate**: 13 constructible structures and 7 producible units are defined through stable content data, including Barracks/Vehicle Factory unit production, real material and power requirements, physical Fuel/Ammunition initialization, Cargo/Supply Truck integration, Scout/Radar intelligence, direct-fire weapons, directional armor, and Mobile Artillery fire missions. The six core Vertical Slice unit families resolve through compiled Directorate unit meshes/materials with LOD0–LOD2, independent collision references, gameplay-facing sockets, damage/wreck presentation, strategic-symbol bindings, and instanced rendering; Combat Engineer currently reuses the Rifle Squad visual family. The nine core industrial building families now likewise use compiled Directorate assets, shared construction/state modules, LOD0–LOD2, separate visual collision contracts, strategic-symbol bindings, and authoritative construction/power/damage presentation. Central Divide also renders its real GroundRoad corridor and North Bridge through compiled infrastructure assets while routing and disruption remain simulation-owned. See [Directorate Vertical Slice](docs/DirectorateVerticalSlice.md), [Directorate Unit Assets](docs/DirectorateUnitAssets.md), and [Directorate Building and Infrastructure Assets](docs/DirectorateBuildingAssets.md).
+### Current playable slice
 
-The first combat/destruction/logistics VFX baseline is also integrated through the production asset pipeline: muzzle and projectile families, impacts, explosions, damage smoke/fire/sparks, destruction layers, cargo loading/unloading, and actual refuel/rearm transfers are presentation-driven from existing combat/logistics state. Transient effects use a fixed-capacity reusable pool, fine detail is distance-reduced at strategic zoom, and D3D12 rendering reuses the indexed-instancing path. Repair gameplay now exposes authoritative `RepairRecoveryState`; dedicated repair VFX remain deferred and can consume that state without owning repair authority. See [Combat, Destruction, and Logistics VFX](docs/CombatAndLogisticsVfx.md).
+The current pre-alpha slice centers on **Central Divide**, a **3.072 × 3.072 km** two-player battlefield with contested resources, a North Bridge, an alternate South Ford, expansion areas, and destructible transport links.
 
-The initial RTS information layer now adds stable semantic resource/role/command/cursor/status icon assets, shape-aware selection and targeting markers, supply/health/fuel/ammunition presentation, a faction-intelligence-bounded minimap with fog-of-war patterns and strategic symbols, and presentation-only Logistics/Supply/Sensors/Navigation overlays. UI state is derived from immutable presentation/read-model data and never duplicates simulation authority. See [RTS Information Layer](docs/RTSInformationLayer.md).
+It includes:
 
-Role-aware combat formations, convoy specialization, detailed ballistic penetration, advanced artillery deployment, advanced semantic cover tactics, morale beyond the current suppression model, dedicated maintenance resources, mobile repair specialization, road-lane discipline, road/rail navigation bonuses, air/naval navigation, advanced dynamic replanning, permanent combat groups, minimap commands, terrain texture streaming, interactive editor functionality, final production art replacement, and networking remain deferred to their owning implementation stages. The Vertical Slice now includes the initial terrain/world/resource presentation baseline with compiled world meshes/materials, decals, reusable props, vegetation, resource-deposit states, inspection feedback, strategic-symbol references, and LOD-aware runtime lookup; see [World Asset Presentation](docs/WorldAssetPresentation.md). The source-to-runtime asset baseline now supports stable IDs, validation, incremental compilation, static glTF/GLB meshes, PNG/TGA textures, material definitions, dependency tracking, and runtime lookup; see [Asset Pipeline](docs/AssetPipeline.md).
+| Area | Implemented foundation |
+| --- | --- |
+| Faction | **Directorate** — 13 constructible structures and 7 producible units |
+| Economy | Resource extraction, inventory/storage, power allocation, recipes, and production queues |
+| Logistics | Graph routing, Cargo/Supply Trucks, automatic distribution, Fuel/Ammunition resupply, and disruption |
+| Warfare | Infantry and vehicles, directional armor, suppression, repairs, artillery, and tactical commands |
+| Intelligence | Fog of war, radar/visual sensors, detection/identification, and intelligence-limited targeting |
+| Opponent | Computer-controlled skirmish opponent using the same construction, economy, supply, and combat rules |
+| Match flow | Setup, pause, victory/surrender, results, and fresh-match restart |
+| Presentation | Native D3D12 rendering, faction assets, terrain, minimap, strategic overlays, and combat/logistics effects |
 
-The canonical playable battlefield vertical slice is **Central Divide**, a 3.072 × 3.072 km two-player scenario with finite bootstrap and contested resources, explicit base/expansion/mining/FOB build zones, a central terrain barrier, the efficient North Bridge and alternate South Ford, real logistics edges, navigation invalidation on crossing disruption, fixed-tick restoration, simulation-owned Command Core objectives, and F10 strategic-overlay presentation and developer diagnostics. The Windows development client loads this battlefield by default; CI compiles a versioned map artifact and qualifies critical reachability, expansion pressure, elevation, and single-crossing-loss alternatives. See [Strategic Map and Operational Geography](docs/StrategicMapAndOperationalGeography.md) and [Prototype Battlefield](docs/PrototypeBattlefield.md).
+The six main unit families and nine core industrial building families use compiled Directorate assets, including LODs and gameplay-relevant visual states. Combat Engineer currently shares the Rifle Squad visual family.
 
-The full skirmish opponent plays the same authoritative vertical-slice loop as the player: real starting stock, construction, power, extraction, processing, logistics stock policies, unit production, expansion, reconnaissance, defense, combat groups/formations, Fuel/Ammunition supply, retreat/recovery, artillery, and Command Core pressure. Player-equivalent policy changes use ownership-validated gameplay commands; runtime enemy state enters decisions only through faction intelligence. Developer diagnostic categories expose strategic and operational objectives, active combat-group intent, supply requirement, and retreat reason without changing opponent simulation. Headless validation starts two computer-controlled participants and CI requires a natural terminal match within 80,000 ticks. See [Skirmish Opponent](docs/SkirmishOpponent.md).
+**Status:** This is a developing *pre-alpha vertical slice*, not a completed or production-ready game. Advanced tactics, rail gameplay, interactive map editing, other factions, and multiplayer remain future work.
 
-The Windows client now runs the complete vertical-slice skirmish lifecycle through explicit `Initializing -> Ready -> Running <-> Paused -> Ending -> Completed` states. Command Core destruction and surrender resolve authoritative outcomes with terminal reasons; the player HUD receives copied lifecycle/result state rather than owning match authority. Terminal matches stop advancing gameplay; press `R` to create a fresh match session or `Escape` to finalize and end the completed session. F1 now toggles development metrics while leaving the player HUD visible. See [Match Flow and Player Experience](docs/MatchFlowAndPlayerExperience.md).
+## ForgeLine Engine
 
-The pre-alpha client shell now adds an explicit Central Divide / Directorate / computer-opponent match setup screen, validated persistent user settings, camera rebinding through the existing camera-binding contract, Space pause, F12 controls/onboarding, scalable overlay text, best-effort local failure reports, and a reproducible Windows x64 packaging path with packaged fresh-install CI smoke validation. See [Pre-Alpha UX and Operations](docs/PreAlphaUxAndOperations.md) and the [Pre-Alpha Verification Checklist](docs/PreAlphaVerificationChecklist.md).
+FORGELINE runs on **ForgeLine Engine**, a purpose-built C#/.NET RTS engine rather than Unity, Unreal, or a general-purpose engine.
 
-## Repository Layout
+| Technology | Baseline |
+| --- | --- |
+| Language | **C# 14** |
+| Runtime | **.NET 10 LTS**; SDK pinned in `global.json` (currently **10.0.401**) |
+| Platform | Windows x64 |
+| Graphics | Custom **Direct3D 12** renderer |
+| Simulation | Fixed-tick, command-driven, headless-capable; **20 Hz** target |
+| Data model | Data-oriented, custom **Entity Component System (ECS)** |
+| Concurrency | Persistent-worker job scheduler |
+| World | Chunk-based terrain and spatial queries |
+| Navigation | Hierarchical ground routing, local steering, shared formation routes |
+| Logistics | Graph-based capacity and transport simulation |
+| Data/assets | Stable IDs, data-driven definitions, source-to-runtime compilation |
+| Persistence | Authoritative save/load and command-based replay |
+| Architecture | Strict simulation/presentation separation; future networking considered but deferred |
 
-```text
-src/          Engine, simulation, game, presentation, client, and headless projects
-tools/        FORGELINE-specific editor and compiler hosts
-tests/        Unit and simulation-oriented test projects
-benchmarks/   Performance benchmark hosts
-build/        Repository validation and future build-support scripts
-docs/         Architecture and development documentation
-.github/      Continuous integration workflows
-```
+**Architectural rule:** Simulation state is authoritative. Input enters through validated commands; presentation consumes snapshots and cannot change game state directly. This supports repeatable headless tests, replays, and eventual multiplayer work.
 
-## Prerequisites
+The codebase is organized into engine, simulation, game, presentation, Windows client, headless host, tooling, and tests. See [Architecture](docs/Architecture.md) and [Project Governance](docs/ProjectContext.md).
 
-Install the .NET SDK version selected by `global.json`.
+## Getting Started
 
-The current foundation targets .NET SDK **10.0.401**.
+**Requirements:** Windows x64, the .NET SDK specified by `global.json`, and a Direct3D 12-capable graphics environment. The Windows client can fall back to WARP for supported development/smoke scenarios.
 
-## Restore
+From the repository root:
 
 ```powershell
 dotnet restore ForgeLine.sln
-```
-
-## Validate Architecture
-
-```powershell
-pwsh ./build/Validate-ProjectReferences.ps1
-```
-
-This validates the project-reference graph, rejects circular references, and enforces key simulation and headless dependency boundaries.
-
-## Build
-
-```powershell
 dotnet build ForgeLine.sln --configuration Release
-```
-
-## Test
-
-```powershell
 dotnet test --solution ForgeLine.sln --configuration Release
 ```
 
-## Windows Client
-
-Launch the native Windows x64 client host:
+### Play the development client
 
 ```powershell
 dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release
 ```
 
-When the client is launched from a source checkout, it keeps `assets/runtime` current by running the Asset Compiler before loading the runtime catalog. Runtime assets are resolved independently from the process working directory: source checkouts prefer the repository `assets/runtime`, while published builds load the packaged `assets/runtime` beside the executable. Set `FORGELINE_RUNTIME_ASSETS` to an explicit runtime-asset directory to override automatic discovery and source-checkout compilation.
+The client opens the Central Divide / Directorate skirmish flow. In a source checkout, it also refreshes compiled runtime assets before loading them. Packaged builds resolve assets beside the executable; `FORGELINE_RUNTIME_ASSETS` overrides asset discovery.
 
-The current client creates a DPI-aware native Win32 window, initializes Direct3D 12, runs the fixed-tick simulation, extracts immutable presentation snapshots, and renders the authoritative Central Divide skirmish together with the chunked terrain. Synthetic render-load entities are disabled during normal play and are created only when `--render-stress` is requested. Left click selects a visible local unit, logistics entity, or building, Shift + left click toggles selection, left-drag performs box selection, and right click submits a movement order through the fixed-tick command queue. A single eligible ground unit uses hierarchical navigation directly; multi-unit selections create one shared strategic route and formation-relative local targets before authoritative locomotion moves each member. F1 toggles the development metrics overlay. F2 toggles the developer-diagnostic master, while Shift+F2 toggles Rendering diagnostics and Shift+F4 through Shift+F9 toggle Navigation, World, Logistics, Sensors, Combat, and Entities respectively. F3 cycles the development formation selection through Compact, Line, Column, and Wedge. `B` opens the catalog-driven construction palette, `P` opens industrial production for one selected owned processing facility, `U` opens unit production for one selected owned Barracks or Vehicle Factory, `L` opens stock-policy/cargo controls for one selected owned logistics-capable entity, `Y` opens battlefield-supply controls, and `K` opens tactical combat for the current owned selection. The RTS information layer also exposes the minimap, semantic cursor/marker feedback, and a presentation-only strategic-overlay cycle for Logistics, Supply, Sensors, Navigation, and All views. `Tab` navigates actions and `Enter` activates them. Combat exposes Attack, AttackMove, Stop, Hold Position, Retreat, Retreat to Recovery, Fire Mission, and fire-mission cancellation; targeted actions enter a dedicated click mode and `Escape` cancels that mode. Direct Attack can pick only currently identified hostile targets from faction intelligence, while Fire Mission may use an opaque detected/identified contact or currently visible ground. `F3` continues to cycle Compact, Line, Column, and Wedge for formation-aware movement. `C` cancels/removes supported queued or stock-policy actions, `T` cycles the active production/logistics priority, and `M` cycles industrial mode, the edited stock threshold, or automatic-resupply enablement depending on the active panel. Unshifted F4–F8 remain direct development shortcuts for Command Core, Power Plant, Mine / Extractor, Storage Depot, and Smelter placement; unshifted F9 rotates the selected footprint clockwise, left click submits a valid placement as a simulation command, and Escape exits placement mode. Developer diagnostics are grouped by Navigation, World, Logistics, Sensors, Combat, Entities, and Rendering so movement/steering/navigation, world/construction/resource state, logistics/supply, intelligence, combat/readiness, spatial/entity bounds, and renderer/chunk diagnostics can be enabled independently. Player-facing selection, placement, tactical-target, and F10 strategic-overlay feedback stays on a separate presentation path and remains available with developer diagnostics disabled.
+**Main controls**
 
-Run the bounded client smoke validation used by CI:
+| Action | Input |
+| --- | --- |
+| Select / multi-select / box-select | Left click / Shift + left click / left drag |
+| Issue movement order | Right click |
+| Pause | Space |
+| Controls and onboarding | F12 |
+| Build / industrial production / unit production | B / P / U |
+| Logistics / supply / combat commands | L / Y / K |
+| Strategic overlays | F10 |
+| Development metrics | F1 |
+| Restart completed match / end session | R / Escape |
 
-```powershell
-dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release -- --smoke-test --render-stress 1000
-```
+Additional interaction and diagnostics shortcuts are documented in [Windows Client](docs/WindowsClient.md), [Camera and Input](docs/CameraAndInput.md), and [RTS Information Layer](docs/RTSInformationLayer.md).
 
-The smoke mode creates the same native window, initializes Direct3D 12 with hardware-adapter selection and WARP fallback, generates the development world, runs the fixed-tick simulation/presentation pipeline, renders terrain and test entities briefly, then requests a clean shutdown.
+## Development and Validation
 
-See [Windows Client](docs/WindowsClient.md) for the platform boundary, window lifecycle, supported modes, DPI behavior, and validation procedure. See [Graphics](docs/Graphics.md) for Direct3D 12 ownership, frame synchronization, resize behavior, shader compilation, diagnostics, and resource lifetime. See [RTS Camera and Input](docs/CameraAndInput.md) for controls, coordinate conventions, action mapping, focus-loss behavior, and screen/world APIs. See [Selection and Command Interaction](docs/SelectionAndCommandInteraction.md) for selection ownership, picking/filtering, movement-command flow, and stale-entity handling. See [World and Terrain](docs/WorldAndTerrain.md) for world units, chunk/region coordinates, heightfield semantics, mesh generation, culling, diagnostics, and headless terrain queries. See [Spatial Index and World Queries](docs/SpatialIndexAndWorldQueries.md) for spatial entry ownership, cell mapping, query semantics, movement synchronization, diagnostics, and performance constraints. See [Ground Movement and Local Steering](docs/GroundMovementAndSteering.md) for fixed-tick locomotion, terrain and slope semantics, arrival, local separation, obstacle steering, stuck detection, diagnostics, and current limitations. See [Hierarchical Navigation](docs/HierarchicalNavigation.md) for movement classes, traversability, sectors/portals, path refinement, request lifecycle, version invalidation, caching, diagnostics, and benchmarks. See [Formation Movement and Group Orders](docs/FormationMovementAndGroupOrders.md) for shared-route group movement, formation templates, stable slot assignment, speed cohesion, choke-point fallback, diagnostics, and stress coverage. See [Resource Deposits and Extraction](docs/ResourceDepositsAndExtraction.md) for stable resource IDs, finite deposit semantics, extractor eligibility, depletion, diagnostics, headless tests, and stress benchmarks. See [Inventory and Storage](docs/InventoryAndStorage.md) for capacity, filtering, reservation, transfer, storage-depot, and extractor-output semantics. See [Power Networks](docs/PowerNetworks.md) for logical network membership, generation/demand aggregation, priority shortage allocation, brownout semantics, diagnostics, and the future physical-grid boundary. See [Building Placement and Construction](docs/BuildingPlacementAndConstruction.md) for building definitions, footprints, preview versus authoritative validation, construction resource policy, cancellation, progress, activation, controls, and diagnostics.
+### Headless simulation
 
-## Headless Simulation
-
-Run the simulation without graphics, audio, UI, or window creation:
+Run simulation without a window, graphics, or audio:
 
 ```powershell
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --ticks 1000 --seed 1 --tick-rate 20
 ```
 
-The headless host executes logical simulation ticks as quickly as the machine permits. The configured tick rate defines simulation time; it does not force wall-clock pacing. Vertical-slice runs stop normal ticking when an authoritative match result is reached, finalize that result through the shared match lifecycle, and include lifecycle phase, outcome, terminal reason, winner/defeated participant, transition ticks, and transition count in structured diagnostics.
-
-Create a repeatable lightweight-entity stress scenario and write structured diagnostics:
+Run an accelerated, repeatable full-match validation:
 
 ```powershell
-dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --ticks 64 --seed 42 --entities 10000 --diagnostics-output artifacts/stress-10000.json
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --require-terminal
 ```
 
-Run the canonical vertical-slice stack headlessly. The `gameplay` profile uses product-facing starting stock, opponent settings, and 16 m / 8-cell navigation sectors; the `validation` profile is explicitly accelerated and uses 32 m / 4-cell sectors for bounded deterministic validation without changing gameplay defaults:
+The `validation` profile is intended for bounded testing, not gameplay balancing; the `gameplay` profile retains player-facing defaults.
+
+### Architecture and client smoke checks
 
 ```powershell
-dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --require-terminal --diagnostics-output artifacts/opponent-full-match.json
+pwsh ./build/Validate-ProjectReferences.ps1
+dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release -- --smoke-test --render-stress 1000
 ```
 
-Collect a separate structured gameplay/balance report, including stable metrics, progression milestones, per-match seeds, multi-match aggregation, and optional baseline comparison:
+CI checks architecture, builds, tests, Windows client startup, map artifacts, and bounded terminal skirmish behavior. BenchmarkDotNet hosts cover ECS, navigation, simulation, logistics, combat, and rendering. Performance targets are engineering goals, not guaranteed frame rates or entity counts.
 
-```powershell
-dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 80000 --seed 2026 --matches 5 --require-terminal --telemetry-output artifacts/balance-telemetry.json
-```
+### Save, load, and replay
 
-See [Gameplay Telemetry and Match Analysis](docs/GameplayTelemetry.md) for metric semantics, ownership, aggregation, comparison, and validation.
-
-Create a versioned authoritative checkpoint and deterministic replay from one Vertical Slice run:
+The headless host supports versioned checkpoints and command-based replay:
 
 ```powershell
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario vertical-slice --profile validation --ticks 5000 --seed 2026 --save-output artifacts/match.save.json --replay-output artifacts/match.replay.json
 ```
 
-Validate recovery without exposing a partially restored match:
+See [Save, Load, Replay, and Recovery](docs/SaveLoadReplayAndRecovery.md) for validation and recovery behavior.
 
-```powershell
-dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --load-input artifacts/match.save.json
-dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --replay-input artifacts/match.replay.json
+## Repository
+
+```text
+src/          Engine, simulation, game, client, and headless host
+assets/       Source assets and compiled runtime assets
+tools/        Specialized editors and asset/map compilation
+tests/        Unit, integration, and headless tests
+benchmarks/   Performance benchmarks
+build/        Validation and build-support scripts
+docs/         Technical documentation
+.github/      CI workflows
 ```
 
-See [Save, Load, Replay, and Recovery](docs/SaveLoadReplayAndRecovery.md) for versioning, authoritative-state coverage, command recording, transactional reconstruction, failure handling, and determinism boundaries.
+## Documentation
 
-Run repeated fresh-match soak validation outside the normal PR duration budget:
+Start with these detailed references rather than using the README as an exhaustive subsystem specification:
 
-```powershell
-pwsh ./build/Run-VerticalSliceSoak.ps1 -Profile validation -Matches 5 -TicksPerMatch 80000 -Seed 2026
-```
+- [Development workflow](docs/Development.md) and [Architecture](docs/Architecture.md)
+- [Directorate vertical slice](docs/DirectorateVerticalSlice.md) and [Prototype battlefield](docs/PrototypeBattlefield.md)
+- [Simulation runtime](docs/SimulationRuntime.md) and [Hierarchical navigation](docs/HierarchicalNavigation.md)
+- [Industrial production](docs/IndustrialProduction.md), [Logistics routing](docs/LogisticsNetworkAndRouting.md), and [Battlefield supply](docs/BattlefieldSupply.md)
+- [Combat execution](docs/CombatExecution.md), [Battlefield intelligence](docs/BattlefieldIntelligence.md), and [Skirmish opponent](docs/SkirmishOpponent.md)
+- [Asset pipeline](docs/AssetPipeline.md), [Match flow](docs/MatchFlowAndPlayerExperience.md), and [Pre-alpha operations](docs/PreAlphaUxAndOperations.md)
 
-## Diagnostics
+---
 
-Opt-in diagnostics expose tick timing, entity/component counts, job metrics, managed allocation and GC observations, and runtime environment metadata without coupling simulation to presentation or platform code.
-
-See [Diagnostics and Performance](docs/DiagnosticsAndPerformance.md) for invariant conventions, engine/runtime metric interpretation, headless diagnostics, stress scenarios, and regression investigation. Gameplay/balance evidence is intentionally exported separately; see [Gameplay Telemetry and Match Analysis](docs/GameplayTelemetry.md).
-
-## Benchmarks
-
-BenchmarkDotNet hosts cover the implemented ECS, hierarchical navigation, shared-versus-independent formation routing, simulation, command-processing, job-scheduler, spatial-query, 1,000-unit ground-movement, 100/1,000/10,000-pair resource extraction, 100/1,000/10,000-operation inventory transfer batches, 100/1,000/10,000-consumer power-network allocation, 100/1,000/5,000-facility industrial production, 1,000/10,000-node logistics routing and reachability, 100/500-vehicle physical cargo transport batches, 64/256-hub automated distribution scheduling, 100/1,000-request logistics capacity routing and repeated topology-change workloads, 100/1,000-weapon direct-fire ticks, 100/1,000-projectile movement ticks, 100/1,000-candidate target-acquisition workloads, 100/1,000-unit mixed sensor workloads, 10/100 simultaneous artillery fire missions, 100/1,000-unit tactical acquisition/coordination workloads, 100/1,000-check terrain line-of-fire workloads, 100/1,000-unit suppression updates, and rendering foundations.
-
-Examples:
-
-```powershell
-dotnet run --project benchmarks/ForgeLine.Ecs.Benchmarks/ForgeLine.Ecs.Benchmarks.csproj --configuration Release
-dotnet run --project benchmarks/ForgeLine.Navigation.Benchmarks/ForgeLine.Navigation.Benchmarks.csproj --configuration Release
-dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simulation.Benchmarks.csproj --configuration Release
-dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release
-```
-
-Benchmark timing is measurement evidence rather than a hardware-sensitive CI pass/fail gate.
-
-## Architecture
-
-See [Architecture](docs/Architecture.md) for project responsibilities and dependency rules.
-
-See [Presentation Extraction and Debugging](docs/PresentationExtractionAndDebugging.md) for snapshot ownership, interpolation, debug tooling, overlay metrics, and rendering baselines.
-
-See [Selection and Command Interaction](docs/SelectionAndCommandInteraction.md) for player interaction state, picking, ownership/category filtering, and simulation-safe movement orders.
-
-See [Ground Movement and Local Steering](docs/GroundMovementAndSteering.md) for authoritative locomotion and short-range steering semantics.
-
-See [Hierarchical Navigation](docs/HierarchicalNavigation.md) for long-range ground routing and the path-request lifecycle.
-
-See [Formation Movement and Group Orders](docs/FormationMovementAndGroupOrders.md) for multi-unit shared routing, formation slots, cohesion, fallback behavior, diagnostics, and scale validation.
-
-See [Simulation Runtime](docs/SimulationRuntime.md) for fixed-tick semantics, phase ordering, commands, deterministic randomness, and headless execution.
-
-See [Save, Load, Replay, and Recovery](docs/SaveLoadReplayAndRecovery.md) for match persistence, replay recording/playback, authoritative checkpoint validation, and controlled recovery behavior.
-
-See [Resource Deposits and Extraction](docs/ResourceDepositsAndExtraction.md) for the authoritative raw-resource simulation contract.
-
-See [Inventory and Storage](docs/InventoryAndStorage.md) for aggregate inventory ownership, capacity/filter rules, reservation semantics, atomic transfers, diagnostics, and extraction integration.
-
-See [Power Networks](docs/PowerNetworks.md) for continuous-capacity semantics, logical membership, priority allocation, brownout behavior, operational states, diagnostics, and future physical-grid refinement.
-
-See [Building Placement and Construction](docs/BuildingPlacementAndConstruction.md) for the authoritative building construction lifecycle, player placement flow, resource reservations, cancellation/refunds, and capability activation.
-
-See [Industrial Production](docs/IndustrialProduction.md) for recipe data, processing facilities, inventory reservation/commit semantics, power and output blocking, queue priorities, desired-stock automation, diagnostics, headless validation, and performance coverage.
-
-See [Logistics Network and Routing](docs/LogisticsNetworkAndRouting.md) for logistics node/edge semantics, transport modes, capacity metadata, deterministic routing, version invalidation, route caching, economic-building registration, diagnostics, and future transport-mode extension points.
-
-See [Cargo Transport Operations](docs/CargoTransportOperations.md) for Cargo Truck capacity, physical transport lifecycle, load/unload conservation, partial loads, route-to-navigation integration, waiting/reroute behavior, vehicle-loss semantics, diagnostics, and stress coverage.
-
-See [Automated Distribution and Logistics Hubs](docs/AutomatedDistributionAndLogisticsHubs.md) for Logistics Hub capability, min/target/max stock policies, deterministic request scheduling, reservations, source selection, Cargo Truck assignment, priority/fairness, retry handling, diagnostics, and scale validation.
-
-See [Battlefield Supply](docs/BattlefieldSupply.md) for Fuel and Ammunition consumption, Supply Depots, Supply Trucks, priority-aware automatic resupply, operational supply states, the Resupply command, diagnostics, and conservation rules.
-
-See [Logistics Capacity and Disruption](docs/LogisticsCapacityAndDisruption.md) for throughput windows, saturation, backlog, congestion-aware routing, infrastructure disable/restore, bottleneck diagnosis, recovery semantics, debug visualization, and scale validation.
-
-See [Combat Execution](docs/CombatExecution.md) for weapon definitions, authoritative Ammunition consumption, hitscan and physical projectiles, damage/destruction lifecycle, combat events, diagnostics, debug visualization, tests, and scale benchmarks.
-
-See [Armor and Target Acquisition](docs/ArmorAndTargetAcquisition.md) for directional armor zones, penetration, target classes, deterministic acquisition/priority, fire policies, intelligence and line-of-fire hooks, diagnostics, and dense-field benchmarks.
-
-See [Battlefield Intelligence](docs/BattlefieldIntelligence.md) for faction-specific exploration/visibility, visual and radar sensing, Detected/Identified contacts, last-known behavior, intelligence-safe targeting, Fog-of-War presentation data, diagnostics, and scale benchmarks.
-
-See [Artillery and Indirect Fire](docs/ArtilleryAndIndirectFire.md) for intelligence-valid coordinate missions, mission lifecycle, ballistic shell travel, terrain impact, area damage, Ammunition and battlefield-resupply integration, diagnostics, and benchmarks.
-
-See [Combat Orders, Tactical Behavior, and Readiness](docs/CombatOrdersAndReadiness.md) for Attack/AttackMove/Stop/Hold/Retreat semantics, suppression, physical repair recovery, recovery-aware retreat, pursuit leashes, group target assignment, automatic resupply decisions, unit/group readiness, tactical test-opponent constraints, diagnostics, and load benchmarks.
-
-See [RTS Information Layer](docs/RTSInformationLayer.md) for semantic icon IDs, cursor resolution, selection/target markers, supply indicators, minimap/fog-of-war mapping, strategic overlays, DPI behavior, and UI/simulation ownership boundaries.
-
-See [Development](docs/Development.md) for the canonical development and validation workflow.
+**FORGELINE — Build. Supply. Conquer.**
