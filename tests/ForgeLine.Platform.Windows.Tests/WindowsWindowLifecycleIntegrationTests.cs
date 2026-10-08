@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using ForgeLine.Platform;
 using Xunit;
 
@@ -81,8 +82,10 @@ public sealed class WindowsWindowLifecycleIntegrationTests
         Assert.True(
             sawModeChange);
     }
-    [Fact]
-    public void PlatformCanCreateWindowAfterPreviousWindowIsDisposed()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void PlatformCanCreateWindowAfterPreviousWindowIsDisposed(bool queueMessageBeforeRecreation)
     {
         using var platform =
             new WindowsPlatform();
@@ -103,6 +106,12 @@ public sealed class WindowsWindowLifecycleIntegrationTests
                 firstWindow.IsOpen);
         }
 
+        if (queueMessageBeforeRecreation)
+        {
+            // A posted thread message defers generation of the previous window's WM_QUIT.
+            Assert.NotEqual(0, PostMessage(0, 0x8000, 0, 0));
+        }
+
         using IWindow secondWindow =
             platform.CreateWindow(configuration);
 
@@ -114,4 +123,6 @@ public sealed class WindowsWindowLifecycleIntegrationTests
             secondWindow.NativeHandle.IsValid);
     }
 
+    [DllImport("user32.dll", EntryPoint = "PostMessageW", SetLastError = true)]
+    private static extern int PostMessage(nint window, uint message, nuint wParam, nint lParam);
 }

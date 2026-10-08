@@ -22,6 +22,10 @@ The observed Windowed 1600×900 view uses 18 terrain draws plus 11 instance draw
 
 Asset loading and frontend preparation use two transient, dedicated CPU/I/O workers. Blocking startup work therefore does not wait for shared thread-pool capacity on smaller machines. Both workers remain cancellable and are joined before shutdown; platform, renderer and simulation ownership is unchanged. Regression coverage verifies that both operations run on distinct dedicated threads separate from their caller.
 
+## Window recreation
+
+Before creating a replacement window, the platform drains all pending messages and resets its quit state. Windows generates the previous window's WM_QUIT only once higher-priority messages are exhausted, so filtering for quit alone could leave shutdown pending. The recreation regression covers both an empty queue and an explicitly queued thread message, retaining valid-handle, open-window and successful-pump assertions.
+
 ## Validation status
 
 Canonical Release solution build: zero warnings/errors. Complete solution suite before the startup ownership regression: 1,074 tests, 1,072 passed, zero failed, two native lifetime cases skipped unless explicitly enabled. Focused validation: 45 presentation cases, both repaired game cases and all 54 asset cases pass. Canonical map and clean runtime-asset compilation qualify. Negative smoke-budget probes reject an extra instance batch and a duplicate terrain draw. Updated full-suite and two-processor startup validation results are recorded on the repair pull request.

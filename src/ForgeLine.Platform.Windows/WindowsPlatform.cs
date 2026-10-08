@@ -100,12 +100,19 @@ public sealed class WindowsPlatform : IPlatform
     private void PrepareForWindowCreation()
     {
         while (WindowsNative.PeekMessage(
-                   out _,
+                   out var message,
                    0,
-                   WindowsNative.WmQuit,
-                   WindowsNative.WmQuit,
+                   0,
+                   0,
                    WindowsNative.PmRemove) != 0)
         {
+            // WM_QUIT is generated only after higher-priority messages are drained.
+            // A quit-only filter can leave a previous window's quit pending.
+            if (message.Message != WindowsNative.WmQuit)
+            {
+                _ = WindowsNative.TranslateMessage(ref message);
+                _ = WindowsNative.DispatchMessage(ref message);
+            }
         }
 
         _quitRequested = false;
