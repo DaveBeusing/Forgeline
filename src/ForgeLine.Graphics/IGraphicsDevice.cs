@@ -8,6 +8,9 @@ public interface IGraphicsDevice : IDisposable
     // the wrapper immediately; native release follows its final GPU use.
     GraphicsDiagnostics Diagnostics { get; }
 
+    // Advances only after a non-occluded successful swap-chain presentation.
+    ulong PresentedFrameCount => Diagnostics.Surface.PresentedFrameCount;
+
     IGraphicsPipeline CreateGraphicsPipeline(GraphicsPipelineDescription description);
 
     IGraphicsBuffer CreateBuffer(GraphicsBufferDescription description);

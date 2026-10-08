@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using ForgeLine.Platform.Windows;
 
 namespace ForgeLine.Client;
@@ -9,6 +10,11 @@ internal static class Program
     [STAThread]
     public static int Main(string[] args)
     {
+        bool diagnosticsRequested = args.Any(argument =>
+            string.Equals(argument, "--startup-diagnostics-output", StringComparison.OrdinalIgnoreCase));
+        long processEntryTimestamp = diagnosticsRequested ? Stopwatch.GetTimestamp() : 0;
+        Guid processId = diagnosticsRequested ? Guid.NewGuid() : Guid.Empty;
+        StartupDiagnostics startup = StartupDiagnostics.Disabled;
         if (!TryParseArguments(
                 args,
                 out bool smokeTest,
@@ -22,6 +28,16 @@ internal static class Program
         bool skipSplash = args.Any(argument =>
             string.Equals(argument, "--skip-splash", StringComparison.OrdinalIgnoreCase));
 
+        string? diagnosticsOutput = null;
+        for (int index = 0; index < args.Length - 1; index++)
+            if (string.Equals(args[index], "--startup-diagnostics-output", StringComparison.OrdinalIgnoreCase))
+                diagnosticsOutput = args[++index];
+        int launchId = diagnosticsOutput is null ? 0 : 1;
+        startup = diagnosticsOutput is null ? StartupDiagnostics.Disabled
+            : new StartupDiagnostics(processEntryTimestamp, processId, launchId);
+        startup.Begin(StartupPhase.Launch);
+        startup.Begin(StartupPhase.Run);
+
         try
         {
             var settingsStore =
@@ -33,7 +49,7 @@ internal static class Program
             while (true)
             {
                 ClientSettingsLoadResult settingsLoad =
-                    settingsStore.Load();
+                    startup.Measure(StartupPhase.Settings, settingsStore.Load);
 
                 Console.WriteLine(
                     $"[settings:loaded] path=\"{settingsLoad.Path}\" " +
@@ -51,7 +67,8 @@ internal static class Program
                     new ClientApplication(
                         platform,
                         settingsLoad.Settings,
-                        settingsLoad.Path);
+                        settingsLoad.Path,
+                        startup);
                 int result =
                     application.Run(
                         smokeTest,
@@ -59,16 +76,30 @@ internal static class Program
                         visualQualificationOutput,
                         skipSplash);
 
+                startup.Finish();
+                if (diagnosticsOutput is not null)
+                    startup.WriteReport(ReportPath(diagnosticsOutput, launchId));
+
                 if (smokeTest ||
                     result !=
                     ClientApplication.RestartRequestedExitCode)
                 {
                     return result;
                 }
+
+                if (diagnosticsOutput is not null)
+                {
+                    startup = new StartupDiagnostics(processEntryTimestamp, processId, ++launchId);
+                    startup.Begin(StartupPhase.Launch);
+                    startup.Begin(StartupPhase.Run);
+                }
             }
         }
         catch (Exception exception)
         {
+            startup.Finish(exception);
+            if (diagnosticsOutput is not null)
+                startup.WriteReport(ReportPath(diagnosticsOutput, launchId));
             string? report =
                 ClientDiagnostics.WriteCrashReport(
                     exception);
@@ -101,6 +132,17 @@ internal static class Program
         for (int index = 0; index < args.Length; index++)
         {
             string argument = args[index];
+
+            if (string.Equals(argument, "--startup-diagnostics-output", StringComparison.OrdinalIgnoreCase))
+            {
+                if (index + 1 >= args.Length || args[index + 1].StartsWith("--", StringComparison.Ordinal))
+                {
+                    Console.Error.WriteLine("--startup-diagnostics-output requires a file path.");
+                    return false;
+                }
+                index++;
+                continue;
+            }
 
             if (string.Equals(argument, "--skip-splash", StringComparison.OrdinalIgnoreCase))
             {
@@ -182,11 +224,16 @@ internal static class Program
         return true;
     }
 
+    private static string ReportPath(string output, int launchId) =>
+        launchId <= 1 ? output : Path.Combine(Path.GetDirectoryName(output) ?? string.Empty,
+            $"{Path.GetFileNameWithoutExtension(output)}-launch{launchId}{Path.GetExtension(output)}");
+
     private static void WriteUsage(TextWriter writer)
     {
         writer.WriteLine(
             "ForgeLine.Client [--smoke-test] [--render-stress <instances>] " +
             "[--visual-qualification-output <report.json>] " +
-            "[--settings-root <directory>] [--skip-splash]");
+            "[--settings-root <directory>] [--skip-splash] " +
+            "[--startup-diagnostics-output <report.json>]");
     }
 }

@@ -10,6 +10,8 @@ internal sealed class ClientFrontendRenderHost : IDisposable
 {
     private readonly object _gate = new();
     private readonly GraphicsWindowTarget _target;
+    private readonly StartupDiagnostics _startup;
+    private ulong _presentedFrames;
     private readonly AutoResetEvent _signal = new(false);
     private readonly ManualResetEventSlim _started = new(false);
     private readonly ManualResetEventSlim _frameRendered = new(false);
@@ -24,8 +26,10 @@ internal sealed class ClientFrontendRenderHost : IDisposable
     private bool _disposed;
 
     internal ClientFrontendRenderHost(
-        in GraphicsWindowTarget target)
+        in GraphicsWindowTarget target,
+        StartupDiagnostics? startup = null)
     {
+        _startup = startup ?? StartupDiagnostics.Disabled;
         target.Validate();
         _target = target;
         _thread = new Thread(RenderLoop)
@@ -125,6 +129,18 @@ internal sealed class ClientFrontendRenderHost : IDisposable
         _disposed = true;
     }
 
+    internal static bool ObservePresentation(StartupDiagnostics startup, ulong previous, ulong current,
+        FrontendSurfaceKind kind, bool splashRendered)
+    {
+        if (current <= previous) return false;
+        startup.Mark(StartupPhase.FirstPresentedFrame);
+        if (kind == FrontendSurfaceKind.StudioSplash && splashRendered)
+            startup.Mark(StartupPhase.StudioSplashFirstFrame);
+        if (kind == FrontendSurfaceKind.MainMenu)
+            startup.Mark(StartupPhase.MainMenuFirstFrame);
+        return true;
+    }
+
     private void RenderLoop()
     {
         try
@@ -190,6 +206,11 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                             renderer.Render(context, view.Value);
                         }
                     });
+                if (_startup.Enabled && ObservePresentation(_startup, _presentedFrames,
+                    graphics.PresentedFrameCount, view.Value.Kind, splashRenderer?.HasAssets == true))
+                {
+                    _presentedFrames = graphics.PresentedFrameCount;
+                }
                 Volatile.Write(
                     ref _renderedSequence,
                     sequence);

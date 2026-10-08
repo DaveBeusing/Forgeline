@@ -111,6 +111,8 @@ internal sealed class ClientRenderHost : IDisposable
     private static readonly TimeSpan DiagnosticInterval =
         TimeSpan.FromSeconds(1);
 
+    private readonly StartupDiagnostics _startup = StartupDiagnostics.Disabled;
+    private bool _startupPresented;
     private readonly object _frameGate = new();
     private readonly object _disposeGate = new();
     private readonly object _faultWaitGate = new();
@@ -141,8 +143,10 @@ internal sealed class ClientRenderHost : IDisposable
         PresentationSnapshotBuffer snapshots,
         RtsCameraSettings cameraSettings,
         RuntimeAssetCatalog? runtimeAssets = null,
-        SceneLightingSettings? sceneLighting = null)
+        SceneLightingSettings? sceneLighting = null,
+        StartupDiagnostics? startup = null)
     {
+        _startup = startup ?? StartupDiagnostics.Disabled;
         initialTarget.Validate();
         _initialTarget = initialTarget;
         _terrain =
@@ -527,6 +531,7 @@ internal sealed class ClientRenderHost : IDisposable
                 long renderStartedAt =
                     Stopwatch.GetTimestamp();
 
+                ulong presentedBefore = !_startupPresented && _startup.Enabled ? graphics.PresentedFrameCount : 0;
                 graphics.RenderFrame(
                     GraphicsColor.ForgeLineClear,
                     context =>
@@ -587,6 +592,13 @@ internal sealed class ClientRenderHost : IDisposable
                                 current.UiScale);
                         }
                     });
+
+                if (!_startupPresented && _startup.Enabled &&
+                    graphics.PresentedFrameCount > presentedBefore && current.Frontend is null)
+                {
+                    _startup.GameplayPresented();
+                    _startupPresented = true;
+                }
 
                 long renderFinishedAt =
                     Stopwatch.GetTimestamp();
