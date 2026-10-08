@@ -47,7 +47,7 @@ public sealed record GraphicsDiagnostics(
             0);
 }
 
-public sealed record GraphicsHealthDiagnostics(
+public readonly record struct GraphicsHealthDiagnostics(
     int LiveResourceCount,
     int PendingRetirementCount,
     int PeakPendingRetirementCount,

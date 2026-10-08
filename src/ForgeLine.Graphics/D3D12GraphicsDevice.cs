@@ -1645,18 +1645,14 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         _fenceWaitCount++;
         CheckResult(_frameFence.SetEventOnCompletion(fenceValue, _frameFenceEvent), "fence-event-failed");
         long started = System.Diagnostics.Stopwatch.GetTimestamp();
-        while (!_frameFenceEvent.WaitOne(100))
+        while (GetCompletedFence() < fenceValue)
         {
-            if (GetCompletedFence() >= fenceValue)
-            {
-                return;
-            }
+            _ = _frameFenceEvent.WaitOne(100);
             if (System.Diagnostics.Stopwatch.GetElapsedTime(started) >= TimeSpan.FromSeconds(10))
             {
                 throw new GraphicsDeviceException("GPU fence did not complete within ten seconds; restart the client session.", "fence-timeout");
             }
         }
-        _ = GetCompletedFence();
     }
 
     private void CheckResult(SharpGen.Runtime.Result result, string reasonCode)
