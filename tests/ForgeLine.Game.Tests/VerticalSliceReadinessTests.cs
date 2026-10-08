@@ -114,7 +114,9 @@ public sealed class VerticalSliceReadinessTests
                         current.West.Faction) > 0 &&
                     current.GetOpponentState(
                         current.West.Player).ActiveGoal ==
-                    SkirmishStrategicGoal.AttackObjective,
+                    SkirmishStrategicGoal.AttackObjective &&
+                    current.GetOpponentState(
+                        current.West.Player).ExpansionSiteCursor > 0,
                 maximumTicks: 50_000,
                 TestContext.Current.CancellationToken);
 

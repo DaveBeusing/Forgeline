@@ -40,6 +40,8 @@ Cargo recovery refill targets depend on the live fleet, including when replaceme
 
 ## Validation status
 
+Blocked steel production raises Ferrous Ore input delivery to Critical, so an otherwise healthy construction reserve cannot prevent raw material from reaching an empty smelter. A satisfied output target retains the normal High priority and existing 80/240 input thresholds. The readiness fixture waits for both attack readiness and expansion within its original 50,000-tick budget, avoiding an assumption about which milestone occurs first.
+
 Canonical Release solution build: zero warnings/errors. Complete solution suite before the startup ownership regression: 1,074 tests, 1,072 passed, zero failed, two native lifetime cases skipped unless explicitly enabled. Focused validation: 45 presentation cases, both repaired game cases and all 54 asset cases pass. Canonical map and clean runtime-asset compilation qualify. Negative smoke-budget probes reject an extra instance batch and a duplicate terrain draw. Updated full-suite and two-processor startup validation results are recorded on the repair pull request.
 
 Published workflow conclusions, packaging and hosted qualification results belong to the repair pull request's final validation record. Local timings are observations and do not establish a startup or rendering speedup. The dedicated self-hosted GPU lane and full interactive lifecycle/release checks remain separate qualification requirements.

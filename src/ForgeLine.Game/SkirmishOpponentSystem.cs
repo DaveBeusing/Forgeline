@@ -3372,7 +3372,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     80.0,
                     240.0,
                     500.0,
-                    LogisticsStockPriority.High);
+                    facility.Status == ProductionStatus.NoInput
+                        ? LogisticsStockPriority.Critical
+                        : LogisticsStockPriority.High);
             }
 
             if (facility.Supports(

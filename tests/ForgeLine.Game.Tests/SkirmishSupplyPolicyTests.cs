@@ -720,6 +720,49 @@ public sealed class SkirmishSupplyPolicyTests
         }
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void SteelInputRecoveryDoesNotRetainConstructionStockWhenProductionIsBlocked(
+        bool outputStockSatisfied)
+    {
+        MatchScenarioSettings validation = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation);
+        using MatchRuntime scenario = CentralDivideScenario.Create(validation with
+        {
+            OpponentConfigurations = new Dictionary<ulong, SkirmishOpponentConfiguration>(validation.OpponentConfigurations)
+            {
+                [1] = validation.OpponentConfigurations[1] with { ReactionCadenceTicks = 1 }
+            }
+        });
+        EntityRegistry entities = scenario.Simulation.Entities;
+        var player = scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player;
+        InventoryId input = scenario.Inventories.CreateInventory(new InventorySpecification(1_000.0));
+        InventoryId output = scenario.Inventories.CreateInventory(new InventorySpecification(1_000.0));
+        if (outputStockSatisfied)
+        {
+            Assert.True(scenario.Inventories.Add(output, ResourceIds.Steel, 600.0).Succeeded);
+        }
+        EntityId smelter = entities.CreateEntity();
+        entities.AddComponent(smelter, entities.GetComponent<WorldTransform>(scenario.GetBase(player).CommandCore));
+        entities.AddComponent(smelter, new CompletedBuilding(BuildingIds.Smelter, player, SimulationTick.Zero));
+        entities.AddComponent(smelter, new ControllableEntity(player, ControllableEntityCategory.Building));
+        entities.AddComponent(smelter, new ProductionFacility(input, output, ProductionCapability.SteelProcessing, SimulationTick.Zero));
+        entities.AddComponent(smelter, new PowerNetworkMembership(new PowerNetworkId(10_002)));
+        entities.AddComponent(smelter, new PowerGenerator(10.0));
+        entities.AddComponent(smelter, new PowerConsumer(1.0, PowerPriority.Industrial, enabled: true));
+
+        scenario.Simulation.RunTicks(2, TestContext.Current.CancellationToken);
+
+        ProductionFacility facility = entities.GetComponent<ProductionFacility>(smelter);
+        Assert.Equal(outputStockSatisfied ? ProductionStatus.Idle : ProductionStatus.NoInput, facility.Status);
+        LogisticsStockPolicy policy = FindStockPolicy(entities, smelter, ResourceIds.FerrousOre);
+        Assert.Equal(outputStockSatisfied ? LogisticsStockPriority.High : LogisticsStockPriority.Critical, policy.Priority);
+        Assert.Equal(80.0, policy.DesiredMinimum);
+        Assert.Equal(240.0, policy.DesiredTarget);
+        Assert.Equal(650.0,
+            FindStockPolicy(entities, scenario.GetBase(player).CommandCore, ResourceIds.FerrousOre).DesiredTarget);
+    }
+
     private static LogisticsStockPolicy FindStockPolicy(
         EntityRegistry entities,
         EntityId target,
