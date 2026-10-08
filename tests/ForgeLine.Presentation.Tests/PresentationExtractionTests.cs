@@ -8,6 +8,71 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class PresentationExtractionTests
 {
     [Fact]
+    public async Task OwnedExtractionRemainsImmutableDuringConcurrentPublication()
+    {
+        var buffer = new PresentationSnapshotBuffer();
+        var simulation = new SimulationCoordinator();
+        simulation.RegisterTickObserver(new PresentationExtractor(buffer));
+        var entity = simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(entity, new WorldTransform(Vector3.One, Quaternion.Identity, Vector3.One));
+        simulation.Entities.AddComponent(entity, new VisualIdentity(1));
+        simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var retained));
+        Task producer = Task.Run(() =>
+        {
+            for (uint tick = 2; tick <= 200; tick++)
+            {
+                simulation.Entities.SetComponent(entity, new WorldTransform(new Vector3(tick, 1, 1), Quaternion.Identity, Vector3.One));
+                if (tick % 10 == 0)
+                {
+                    var added = simulation.Entities.CreateEntity();
+                    simulation.Entities.AddComponent(added, new WorldTransform(Vector3.Zero, Quaternion.Identity, Vector3.One));
+                    simulation.Entities.AddComponent(added, new VisualIdentity(1));
+                }
+                simulation.AdvanceOneTick();
+            }
+        }, TestContext.Current.CancellationToken);
+        Task reader = Task.Run(() =>
+        {
+            while (!producer.IsCompleted)
+            {
+                if (buffer.TryReadLatest(out var snapshot))
+                    Assert.Equal((float)snapshot.Tick.Value, snapshot.Instances[0].Transform.Position.X);
+                Assert.Equal(Vector3.One, retained.Instances[0].Transform.Position);
+                Thread.Yield();
+            }
+        }, TestContext.Current.CancellationToken);
+        await Task.WhenAll(producer, reader);
+        Assert.Equal(Vector3.One, retained.Instances[0].Transform.Position);
+    }
+
+    [Fact]
+    public void RetainedExtractedSnapshotSurvivesLaterTicksAndPopulationGrowth()
+    {
+        var buffer = new PresentationSnapshotBuffer();
+        var extractor = new PresentationExtractor(buffer);
+        var simulation = new SimulationCoordinator();
+        simulation.RegisterTickObserver(extractor);
+        var first = simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(first, new WorldTransform(Vector3.One, Quaternion.Identity, Vector3.One));
+        simulation.Entities.AddComponent(first, new VisualIdentity(1));
+        simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var retained));
+        for (int i = 0; i < 128; i++)
+        {
+            var entity = simulation.Entities.CreateEntity();
+            simulation.Entities.AddComponent(entity, new WorldTransform(Vector3.Zero, Quaternion.Identity, Vector3.One));
+            simulation.Entities.AddComponent(entity, new VisualIdentity(1));
+        }
+        simulation.Entities.SetComponent(first, new WorldTransform(Vector3.Zero, Quaternion.Identity, Vector3.One));
+        simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var latest));
+        Assert.Equal(129, latest.InstanceCount);
+        Assert.Equal(1, retained.InstanceCount);
+        Assert.Equal(Vector3.One, retained.Instances[0].Transform.Position);
+    }
+
+    [Fact]
     public void ExtractedSnapshotOwnsCopiedTransformState()
     {
         var buffer = new PresentationSnapshotBuffer();

@@ -12,6 +12,104 @@ public sealed class SimpleInstanceRendererTests : IDisposable
     private readonly FakeGraphicsDevice _graphics = new();
 
     [Fact]
+    public void OversizedScratchIsReleasedBeforeNextSmallFrame()
+    {
+        var camera = new RtsCamera();
+        using var renderer = new SimpleInstanceRenderer(_graphics);
+        var context = new FakeGraphicsCommandContext();
+        var buffer = new PresentationSnapshotBuffer();
+        var large = new RenderInstance[65_537];
+        for (int i = 0; i < large.Length; i++)
+            large[i] = Instance(new EntityId((uint)i + 1, 1), camera.Target, Vector3.One);
+        buffer.Publish(new PresentationSnapshot(new SimulationTick(1), TimeSpan.FromMilliseconds(50), large.Length, large));
+        var world = new RenderWorld();
+        Assert.True(world.Update(buffer));
+        renderer.Render(context, camera, world, 1.0f);
+        Assert.Equal(large.Length, renderer.SubmissionMetrics.SubmittedInstances);
+        buffer.Publish(new PresentationSnapshot(new SimulationTick(2), TimeSpan.FromMilliseconds(50), 1, large.AsSpan(0, 1)));
+        Assert.True(world.Update(buffer));
+        renderer.Render(context, camera, world, 1.0f);
+        Assert.InRange(renderer.SubmissionMetrics.StagingCapacity, 1, 64);
+        Assert.InRange(renderer.SubmissionMetrics.BatchInstanceCapacity, 1L, 64L);
+        Assert.Equal(1, context.LastInstanceCount);
+    }
+
+    [Fact]
+    public void FailedUploadGrowthRetainsPreviousBufferAndRecovers()
+    {
+        var camera = new RtsCamera();
+        using var renderer = new SimpleInstanceRenderer(_graphics);
+        var context = new FakeGraphicsCommandContext();
+        var buffer = new PresentationSnapshotBuffer();
+        var instance = Instance(new EntityId(1, 1), camera.Target, Vector3.One);
+        buffer.Publish(new PresentationSnapshot(new SimulationTick(1), TimeSpan.FromMilliseconds(50), 1, new[] { instance }));
+        var world = new RenderWorld();
+        Assert.True(world.Update(buffer));
+        renderer.Render(context, camera, world, 1.0f);
+        var previous = _graphics.Buffers[^1];
+        _graphics.FailBufferCreation = 4;
+        buffer.Publish(new PresentationSnapshot(new SimulationTick(2), TimeSpan.FromMilliseconds(50), 128,
+            Enumerable.Repeat(instance, 128).ToArray()));
+        Assert.True(world.Update(buffer));
+        Assert.Throws<InvalidOperationException>(() => renderer.Render(context, camera, world, 1.0f));
+        Assert.Equal(0, previous.DisposeCount);
+        _graphics.FailBufferCreation = 0;
+        buffer.Publish(new PresentationSnapshot(new SimulationTick(3), TimeSpan.FromMilliseconds(50), 1, new[] { instance }));
+        Assert.True(world.Update(buffer));
+        renderer.Render(context, camera, world, 1.0f);
+        Assert.Equal(1, context.LastInstanceCount);
+        Assert.Equal(112, previous.LastWriteBytes);
+    }
+
+    [Fact]
+    public void GrowthEmptyFramesAndRecoveryPreserveExactSubmission()
+    {
+        _graphics.CaptureUploads = true;
+        var camera = new RtsCamera();
+        using var renderer = new SimpleInstanceRenderer(_graphics);
+        var context = new FakeGraphicsCommandContext();
+        foreach (int count in new[] { 128, 1, 0, 257, 3 })
+        {
+            var instances = new RenderInstance[count];
+            for (int i = 0; i < count; i++)
+                instances[i] = Instance(new EntityId((uint)i + 1, 1), camera.Target, Vector3.One);
+            var buffer = new PresentationSnapshotBuffer();
+            buffer.Publish(new PresentationSnapshot(new SimulationTick(1), TimeSpan.FromMilliseconds(50), count, instances));
+            var world = new RenderWorld();
+            Assert.True(world.Update(buffer));
+            renderer.Render(context, camera, world, 1.0f);
+            Assert.Equal(count, renderer.LastDiagnostics.VisibleInstances);
+            Assert.Equal(count == 0 ? 0 : 1, renderer.LastDiagnostics.DrawCalls);
+            if (count > 0)
+            {
+                Assert.Equal(count, context.LastInstanceCount);
+                Assert.Equal(count * 112, _graphics.Buffers[^1].LastWriteBytes);
+                using var referenceGraphics = new FakeGraphicsDevice { CaptureUploads = true };
+                using var reference = new SimpleInstanceRenderer(referenceGraphics);
+                reference.Render(new FakeGraphicsCommandContext(), camera, world, 1.0f);
+                Assert.Equal(referenceGraphics.Buffers[^1].LastUpload, _graphics.Buffers[^1].LastUpload);
+            }
+        }
+    }
+
+    [Fact]
+    public void WarmSubmissionDoesNotAllocatePerFrameScratch()
+    {
+        var camera = new RtsCamera();
+        var buffer = new PresentationSnapshotBuffer();
+        buffer.Publish(new PresentationSnapshot(new SimulationTick(1), TimeSpan.FromMilliseconds(50), 1,
+            new[] { Instance(new EntityId(1, 1), camera.Target, Vector3.One) }));
+        var world = new RenderWorld();
+        Assert.True(world.Update(buffer));
+        using var renderer = new SimpleInstanceRenderer(_graphics);
+        var context = new FakeGraphicsCommandContext();
+        for (int i = 0; i < 32; i++) renderer.Render(context, camera, world, 1.0f);
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        for (int i = 0; i < 64; i++) renderer.Render(context, camera, world, 1.0f);
+        Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
+    }
+
+    [Fact]
     public void PartialBufferInitializationReleasesPreviouslyCreatedResources()
     {
         _graphics.FailBufferCreation = 2;
@@ -396,6 +494,7 @@ public sealed class SimpleInstanceRendererTests : IDisposable
 
     private sealed class FakeGraphicsDevice : IGraphicsDevice
     {
+        public bool CaptureUploads { get; set; }
         public int FailBufferCreation { get; set; }
         public List<FakeGraphicsBuffer> Buffers { get; } = [];
         public List<FakeGraphicsPipeline> Pipelines { get; } = [];
@@ -417,7 +516,7 @@ public sealed class SimpleInstanceRendererTests : IDisposable
             {
                 throw new InvalidOperationException("controlled buffer allocation failure");
             }
-            var buffer = new FakeGraphicsBuffer(description);
+            var buffer = new FakeGraphicsBuffer(description) { CaptureUploads = CaptureUploads };
             Buffers.Add(buffer);
             return buffer;
         }
@@ -462,6 +561,9 @@ public sealed class SimpleInstanceRendererTests : IDisposable
 
     private sealed class FakeGraphicsBuffer : IGraphicsBuffer
     {
+        public bool CaptureUploads { get; init; }
+        public byte[] LastUpload { get; private set; } = [];
+        public int LastWriteBytes { get; private set; }
         public int DisposeCount { get; private set; }
         public FakeGraphicsBuffer(
             GraphicsBufferDescription description)
@@ -476,6 +578,8 @@ public sealed class SimpleInstanceRendererTests : IDisposable
             int offsetInBytes = 0)
             where T : unmanaged
         {
+            LastWriteBytes = data.Length * System.Runtime.CompilerServices.Unsafe.SizeOf<T>();
+            if (CaptureUploads) LastUpload = System.Runtime.InteropServices.MemoryMarshal.AsBytes(data).ToArray();
         }
 
         public void Dispose()
