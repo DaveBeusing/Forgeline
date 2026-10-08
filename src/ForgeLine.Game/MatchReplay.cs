@@ -556,7 +556,7 @@ public static class ReplayCommandCodec
 
             ReplayCommandKind.SetMatchPaused =>
                 new SetMatchPausedCommand(
-                    command.TargetEntity,
+                    scenario.BattlefieldRuntime.MatchStateEntity,
                     command.Enabled),
 
             _ =>
