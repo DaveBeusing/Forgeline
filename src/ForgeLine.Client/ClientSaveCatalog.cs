@@ -102,8 +102,16 @@ internal static class ClientSaveCatalog
 
     internal static MatchRuntime Restore(
         ForgeLine.UI.LoadGameEntry entry,
+        Func<string, MatchComposition>? resolveComposition = null) =>
+        RestoreCancellable(entry, CancellationToken.None, resolveComposition: resolveComposition);
+
+    internal static MatchRuntime RestoreCancellable(
+        ForgeLine.UI.LoadGameEntry entry,
+        CancellationToken cancellationToken,
+        Action<MatchRestorationProgress>? reportProgress = null,
         Func<string, MatchComposition>? resolveComposition = null)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (!entry.CanLoad)
         {
             throw new InvalidOperationException(
@@ -113,7 +121,8 @@ internal static class ClientSaveCatalog
         MatchSaveData save =
             MatchPersistenceSerializer.ReadSave(
                 entry.Path);
-        return MatchPersistenceService.Restore(
-            save, resolveComposition);
+        cancellationToken.ThrowIfCancellationRequested();
+        return MatchPersistenceService.RestoreCancellable(
+            save, cancellationToken, reportProgress, resolveComposition);
     }
 }

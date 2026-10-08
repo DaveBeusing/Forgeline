@@ -44,42 +44,81 @@ internal static class ClientSessionFactory
         ClientSessionRequest request,
         JobScheduler jobScheduler,
         Func<string, MatchComposition>? resolveComposition = null) =>
+        CreateCancellable(request, jobScheduler, CancellationToken.None, null, resolveComposition);
+
+    internal static MatchRuntime CreateCancellable(
+        ClientSessionRequest request,
+        JobScheduler? jobScheduler,
+        CancellationToken cancellationToken,
+        Action<ClientSessionLoadProgress>? reportProgress = null,
+        Func<string, MatchComposition>? resolveComposition = null)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        reportProgress?.Invoke(new(ClientSessionLoadPhase.Configuration));
+        if (request.Kind == ClientSessionRequestKind.NewGame)
+        {
+            ArgumentNullException.ThrowIfNull(jobScheduler);
+            reportProgress?.Invoke(new(ClientSessionLoadPhase.ScenarioAssembly));
+        }
+        return
         request.Kind switch
         {
             ClientSessionRequestKind.NewGame =>
                 MatchRuntime.Create(
                     (request.RuntimeSettings ?? CentralDivideScenario.CreateClient(
-                        jobScheduler,
+                        jobScheduler ?? throw new InvalidOperationException("New sessions require an owned scheduler."),
                         seed: request.Seed)) with
                     {
                         Scheduler = jobScheduler,
                         SchedulerOwnership = MatchSchedulerOwnership.Host
-                    }),
+                    }, cancellationToken),
             ClientSessionRequestKind.LoadGame
                 when request.Save is LoadGameEntry save =>
                     RestoreForGameplay(
-                        save, resolveComposition),
+                        save, resolveComposition, reportProgress, cancellationToken),
             _ =>
                 throw new InvalidOperationException(
                     $"Unsupported client session request {request.Kind}.")
         };
+    }
+
+    internal static ClientLoadedSession CreateOwned(
+        ClientSessionRequest request, Action<ClientSessionLoadProgress> reportProgress,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        JobScheduler? scheduler = request.Kind == ClientSessionRequestKind.NewGame ? new JobScheduler() : null;
+        MatchRuntime? runtime = null;
+        try
+        {
+            runtime = CreateCancellable(request, scheduler, cancellationToken, reportProgress);
+            cancellationToken.ThrowIfCancellationRequested();
+            return new ClientLoadedSession(runtime, scheduler);
+        }
+        catch
+        {
+            try { runtime?.Dispose(); }
+            finally { scheduler?.Dispose(); }
+            throw;
+        }
+    }
 
     private static MatchRuntime RestoreForGameplay(
         LoadGameEntry save,
-        Func<string, MatchComposition>? resolveComposition)
+        Func<string, MatchComposition>? resolveComposition,
+        Action<ClientSessionLoadProgress>? reportProgress,
+        CancellationToken cancellationToken)
     {
         MatchRuntime scenario =
-            ClientSaveCatalog.Restore(
-                save, resolveComposition);
-
-        if (scenario.GetMatchState().Lifecycle !=
-            MatchLifecyclePhase.Paused)
-        {
-            return scenario;
-        }
+            ClientSaveCatalog.RestoreCancellable(
+                save, cancellationToken, progress => reportProgress?.Invoke(new(
+                    (ClientSessionLoadPhase)progress.Phase, progress.CompletedTicks, progress.TotalTicks)),
+                resolveComposition);
 
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (scenario.GetMatchState().Lifecycle != MatchLifecyclePhase.Paused) return scenario;
             var resume =
                 new SetMatchPausedCommand(
                     scenario.BattlefieldRuntime.MatchStateEntity,
@@ -100,5 +139,17 @@ internal static class ClientSessionFactory
             scenario.Dispose();
             throw;
         }
+    }
+}
+
+internal sealed class ClientLoadedSession(MatchRuntime runtime, JobScheduler? scheduler) : IDisposable
+{
+    private int _disposed;
+    internal MatchRuntime Runtime { get; } = runtime;
+    public void Dispose()
+    {
+        if (Interlocked.Exchange(ref _disposed, 1) != 0) return;
+        try { Runtime.Dispose(); }
+        finally { scheduler?.Dispose(); }
     }
 }

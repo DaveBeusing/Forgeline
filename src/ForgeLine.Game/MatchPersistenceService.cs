@@ -58,10 +58,20 @@ public static class MatchPersistenceService
 
     public static MatchRuntime Restore(
         MatchSaveData save,
+        Func<string, MatchComposition>? resolveComposition = null) =>
+        RestoreCancellable(save, CancellationToken.None, resolveComposition: resolveComposition);
+
+    public static MatchRuntime RestoreCancellable(
+        MatchSaveData save,
+        CancellationToken cancellationToken,
+        Action<MatchRestorationProgress>? reportProgress = null,
         Func<string, MatchComposition>? resolveComposition = null)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        reportProgress?.Invoke(new(MatchRestorationPhase.Configuration));
         ValidateSave(
             save);
+        cancellationToken.ThrowIfCancellationRequested();
 
         return Reconstruct(
             save.Configuration,
@@ -70,7 +80,7 @@ public static class MatchPersistenceService
             save.Commands,
             save.StateSha256,
             save.State,
-            resolveComposition);
+            resolveComposition, reportProgress, cancellationToken);
     }
 
     public static MatchRuntime PlayReplay(
@@ -251,21 +261,28 @@ public static class MatchPersistenceService
         IReadOnlyList<RecordedSimulationCommand> commands,
         string expectedStateHash,
         MatchAuthoritativeSnapshot expectedState,
-        Func<string, MatchComposition>? resolveComposition)
+        Func<string, MatchComposition>? resolveComposition,
+        Action<MatchRestorationProgress>? reportProgress,
+        CancellationToken cancellationToken)
     {
         MatchRuntime? scenario = null;
 
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            reportProgress?.Invoke(new(MatchRestorationPhase.ScenarioAssembly));
             scenario =
                 CreateAndSchedule(
                     configuration,
                     commands,
-                    resolveComposition);
+                    resolveComposition, cancellationToken);
             RunToTickWithControls(
                 scenario,
                 targetTick,
-                commands);
+                commands, reportProgress, cancellationToken);
+
+            cancellationToken.ThrowIfCancellationRequested();
+            reportProgress?.Invoke(new(MatchRestorationPhase.HashVerification, targetTick, targetTick));
 
             if (scenario.Simulation.Random.State !=
                 expectedRandomState)
@@ -303,8 +320,13 @@ public static class MatchPersistenceService
 
             MatchRuntime result =
                 scenario;
+            cancellationToken.ThrowIfCancellationRequested();
             scenario = null;
             return result;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
         }
         catch (MatchPersistenceException)
         {
@@ -326,7 +348,8 @@ public static class MatchPersistenceService
     private static MatchRuntime CreateAndSchedule(
         PersistedMatchConfiguration configuration,
         IReadOnlyList<RecordedSimulationCommand> commands,
-        Func<string, MatchComposition>? resolveComposition)
+        Func<string, MatchComposition>? resolveComposition,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(commands);
@@ -335,7 +358,7 @@ public static class MatchPersistenceService
             configuration.CreateHeadlessRuntimeSettings(resolveComposition);
         MatchRuntime scenario =
             MatchRuntime.Create(
-                runtime);
+                runtime, cancellationToken);
 
         try
         {
@@ -355,6 +378,7 @@ public static class MatchPersistenceService
                  index < scheduled.Length;
                  index++)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 RecordedSimulationCommand entry =
                     scheduled[index];
 
@@ -404,7 +428,9 @@ public static class MatchPersistenceService
     private static void RunToTickWithControls(
         MatchRuntime scenario,
         ulong targetTick,
-        IReadOnlyList<RecordedSimulationCommand> commands)
+        IReadOnlyList<RecordedSimulationCommand> commands,
+        Action<MatchRestorationProgress>? reportProgress = null,
+        CancellationToken cancellationToken = default)
     {
         RecordedSimulationCommand[] controls =
             commands
@@ -416,10 +442,12 @@ public static class MatchPersistenceService
                         command.RecordingOrder)
                 .ToArray();
         int controlIndex = 0;
+        reportProgress?.Invoke(new(MatchRestorationPhase.Replay, scenario.Simulation.CurrentTick.Value, targetTick));
 
         while (scenario.Simulation.CurrentTick.Value <
                targetTick)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             scenario.Simulation.AdvanceOneTick();
             ulong currentTick =
                 scenario.Simulation.CurrentTick.Value;
@@ -437,7 +465,11 @@ public static class MatchPersistenceService
                     control);
                 controlIndex++;
             }
+            // Report only complete tick/control boundaries; observers never alter replay scheduling.
+            if (currentTick % 64 == 0 || currentTick == targetTick)
+                reportProgress?.Invoke(new(MatchRestorationPhase.Replay, currentTick, targetTick));
         }
+        cancellationToken.ThrowIfCancellationRequested();
 
         if (controlIndex !=
             controls.Length)
