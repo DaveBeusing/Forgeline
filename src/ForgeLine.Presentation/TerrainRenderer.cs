@@ -60,50 +60,47 @@ public sealed class TerrainRenderer : IDisposable
                 runtimeAssets);
         resolvedMeshSettings.Validate();
 
-        _pipeline =
-            CreateTerrainPipeline(
-                graphics);
-        _runtimeAssets =
-            runtimeAssets is null
-                ? null
-                : new RuntimeWorldAssetResources(
-                    graphics,
-                    runtimeAssets);
-
-        if (_runtimeAssets is null)
-        {
-            _fallbackBaseColor =
-                CreateSolidTexture(
-                    graphics,
-                    255,
-                    255,
-                    255,
-                    255,
-                    GraphicsTextureColorSpace.Srgb);
-            _fallbackNormal =
-                CreateSolidTexture(
-                    graphics,
-                    128,
-                    128,
-                    255,
-                    255,
-                    GraphicsTextureColorSpace.Linear);
-            _fallbackOrm =
-                CreateSolidTexture(
-                    graphics,
-                    255,
-                    255,
-                    0,
-                    255,
-                    GraphicsTextureColorSpace.Linear);
-        }
-
-        var resources =
-            new List<TerrainChunkRenderResource>(
-                world.Chunks.Count);
-
+        var resources = new List<TerrainChunkRenderResource>(world.Chunks.Count);
         try
         {
+            _pipeline =
+                CreateTerrainPipeline(
+                    graphics);
+            _runtimeAssets =
+                runtimeAssets is null
+                    ? null
+                    : new RuntimeWorldAssetResources(
+                        graphics,
+                        runtimeAssets);
+
+            if (_runtimeAssets is null)
+            {
+                _fallbackBaseColor =
+                    CreateSolidTexture(
+                        graphics,
+                        255,
+                        255,
+                        255,
+                        255,
+                        GraphicsTextureColorSpace.Srgb);
+                _fallbackNormal =
+                    CreateSolidTexture(
+                        graphics,
+                        128,
+                        128,
+                        255,
+                        255,
+                        GraphicsTextureColorSpace.Linear);
+                _fallbackOrm =
+                    CreateSolidTexture(
+                        graphics,
+                        255,
+                        255,
+                        0,
+                        255,
+                        GraphicsTextureColorSpace.Linear);
+            }
+
             foreach (TerrainChunk chunk in world.Chunks)
             {
                 TerrainMeshData mesh =
@@ -120,33 +117,35 @@ public sealed class TerrainRenderer : IDisposable
                 IGraphicsTexture controlTexture =
                     graphics.CreateTexture(
                         splat.CreateTextureData());
-                TerrainLayerResource[] layers =
-                    CreateLayers(
-                        splat.Palette,
-                        resolvedProfile);
-
-                ulong vertexBytes =
-                    checked(
-                        (ulong)renderVertices.Length *
-                        TerrainRenderVertex.SizeInBytes);
-                ulong indexBytes =
-                    checked(
-                        (ulong)mesh.Indices.Length *
-                        sizeof(uint));
-
-                IGraphicsBuffer vertexBuffer =
-                    graphics.CreateBuffer(
-                        new GraphicsBufferDescription(
-                            vertexBytes,
-                            GraphicsBufferMemory.Upload));
-                IGraphicsBuffer indexBuffer =
-                    graphics.CreateBuffer(
-                        new GraphicsBufferDescription(
-                            indexBytes,
-                            GraphicsBufferMemory.Upload));
-
+                IGraphicsBuffer? vertexBuffer = null;
+                IGraphicsBuffer? indexBuffer = null;
                 try
                 {
+                    TerrainLayerResource[] layers =
+                        CreateLayers(
+                            splat.Palette,
+                            resolvedProfile);
+
+                    ulong vertexBytes =
+                        checked(
+                            (ulong)renderVertices.Length *
+                            TerrainRenderVertex.SizeInBytes);
+                    ulong indexBytes =
+                        checked(
+                            (ulong)mesh.Indices.Length *
+                            sizeof(uint));
+
+                    vertexBuffer =
+                        graphics.CreateBuffer(
+                            new GraphicsBufferDescription(
+                                vertexBytes,
+                                GraphicsBufferMemory.Upload));
+                    indexBuffer =
+                        graphics.CreateBuffer(
+                            new GraphicsBufferDescription(
+                                indexBytes,
+                                GraphicsBufferMemory.Upload));
+
                     vertexBuffer.SetData<TerrainRenderVertex>(
                         renderVertices);
                     indexBuffer.SetData<uint>(
@@ -165,8 +164,8 @@ public sealed class TerrainRenderer : IDisposable
                 }
                 catch
                 {
-                    indexBuffer.Dispose();
-                    vertexBuffer.Dispose();
+                    indexBuffer?.Dispose();
+                    vertexBuffer?.Dispose();
                     controlTexture.Dispose();
                     throw;
                 }
@@ -186,7 +185,7 @@ public sealed class TerrainRenderer : IDisposable
             _fallbackNormal?.Dispose();
             _fallbackBaseColor?.Dispose();
             _runtimeAssets?.Dispose();
-            _pipeline.Dispose();
+            _pipeline?.Dispose();
             throw;
         }
 

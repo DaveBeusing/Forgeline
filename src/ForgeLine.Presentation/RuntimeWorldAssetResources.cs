@@ -586,14 +586,15 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
                 new GraphicsBufferDescription(
                     checked((ulong)vertexByteCount),
                     GraphicsBufferMemory.Upload));
-        IGraphicsBuffer indexBuffer =
-            _graphics.CreateBuffer(
-                new GraphicsBufferDescription(
-                    checked((ulong)indexByteCount),
-                    GraphicsBufferMemory.Upload));
-
+        IGraphicsBuffer? indexBuffer = null;
         try
         {
+            indexBuffer =
+                _graphics.CreateBuffer(
+                    new GraphicsBufferDescription(
+                        checked((ulong)indexByteCount),
+                        GraphicsBufferMemory.Upload));
+
             vertexBuffer.SetData<RuntimeMeshVertex>(
                 vertices);
             indexBuffer.SetData<uint>(
@@ -642,7 +643,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
         }
         catch
         {
-            indexBuffer.Dispose();
+            indexBuffer?.Dispose();
             vertexBuffer.Dispose();
             throw;
         }

@@ -11,6 +11,17 @@ public sealed class SimpleInstanceRendererTests : IDisposable
 {
     private readonly FakeGraphicsDevice _graphics = new();
 
+    [Fact]
+    public void PartialBufferInitializationReleasesPreviouslyCreatedResources()
+    {
+        _graphics.FailBufferCreation = 2;
+        Assert.Throws<InvalidOperationException>(() => new SimpleInstanceRenderer(_graphics));
+        Assert.Single(_graphics.Buffers);
+        Assert.Equal(1, _graphics.Buffers[0].DisposeCount);
+        Assert.Single(_graphics.Pipelines);
+        Assert.Equal(1, _graphics.Pipelines[0].DisposeCount);
+    }
+
     public void Dispose()
     {
         _graphics.Dispose();
@@ -385,16 +396,31 @@ public sealed class SimpleInstanceRendererTests : IDisposable
 
     private sealed class FakeGraphicsDevice : IGraphicsDevice
     {
+        public int FailBufferCreation { get; set; }
+        public List<FakeGraphicsBuffer> Buffers { get; } = [];
+        public List<FakeGraphicsPipeline> Pipelines { get; } = [];
         public GraphicsDiagnostics Diagnostics =>
             throw new NotSupportedException();
 
         public IGraphicsPipeline CreateGraphicsPipeline(
-            GraphicsPipelineDescription description) =>
-            new FakeGraphicsPipeline(description);
+            GraphicsPipelineDescription description)
+        {
+            var pipeline = new FakeGraphicsPipeline(description);
+            Pipelines.Add(pipeline);
+            return pipeline;
+        }
 
         public IGraphicsBuffer CreateBuffer(
-            GraphicsBufferDescription description) =>
-            new FakeGraphicsBuffer(description);
+            GraphicsBufferDescription description)
+        {
+            if (FailBufferCreation == Buffers.Count + 1)
+            {
+                throw new InvalidOperationException("controlled buffer allocation failure");
+            }
+            var buffer = new FakeGraphicsBuffer(description);
+            Buffers.Add(buffer);
+            return buffer;
+        }
 
         public void RenderFrame(
             GraphicsColor clearColor,
@@ -419,6 +445,7 @@ public sealed class SimpleInstanceRendererTests : IDisposable
 
     private sealed class FakeGraphicsPipeline : IGraphicsPipeline
     {
+        public int DisposeCount { get; private set; }
         public FakeGraphicsPipeline(
             GraphicsPipelineDescription description)
         {
@@ -429,11 +456,13 @@ public sealed class SimpleInstanceRendererTests : IDisposable
 
         public void Dispose()
         {
+            DisposeCount++;
         }
     }
 
     private sealed class FakeGraphicsBuffer : IGraphicsBuffer
     {
+        public int DisposeCount { get; private set; }
         public FakeGraphicsBuffer(
             GraphicsBufferDescription description)
         {
@@ -451,6 +480,7 @@ public sealed class SimpleInstanceRendererTests : IDisposable
 
         public void Dispose()
         {
+            DisposeCount++;
         }
     }
 
