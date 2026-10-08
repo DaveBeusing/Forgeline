@@ -348,3 +348,7 @@ Minimize/pause, terminal freeze/acknowledgement, restart, shutdown, and owner fa
 This preserves the intended direction: source assets -> Asset Compiler -> runtime assets -> Presentation/Graphics. Simulation never loads source or runtime rendering assets.
 
 Reusable match ownership, injected composition, preset boundaries and schema migration are specified in [Match Runtime and Scenario Composition](adr/MatchRuntimeAndScenarioComposition.md).
+
+## Render scratch ownership
+
+Instance batching and contiguous CPU upload staging belong to the render owner and are reused within explicit retention limits. Extracted render arrays transfer to immutable GC-owned snapshots without a second copy; public snapshot inputs and client frame-publication arrays retain defensive copy semantics. GPU frame-index fences and retirement remain authoritative for upload-buffer replacement. See [Render frame scratch and snapshot ownership](adr/RenderFrameScratchAndSnapshotOwnership.md) for capacities, failure behavior and measurement limits.

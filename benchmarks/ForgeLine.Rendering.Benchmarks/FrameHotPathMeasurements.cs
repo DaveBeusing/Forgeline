@@ -36,11 +36,11 @@ internal static class FrameHotPathMeasurements
             new DebugLine[128], new DebugLabel[64], new DebugLine[128], new DebugLabel[64]);
         var results = new List<object>
         {
-            Measure("render-near-1000", () => renderer.Submit1000NearFieldInstances()),
-            Measure("render-culled-5000", () => renderer.Submit5000InstancesWithCulling()),
-            Measure("render-mixed-tactical", () => renderer.SubmitRepresentativeVerticalSliceTacticalView()),
-            Measure("render-mixed-normal", () => renderer.SubmitRepresentativeVerticalSliceNormalRtsView()),
-            Measure("render-mixed-strategic", () => renderer.SubmitRepresentativeVerticalSliceStrategicView()),
+            Measure("render-near-1000", () => renderer.Submit1000NearFieldInstances(), () => renderer.SubmissionMetrics),
+            Measure("render-culled-5000", () => renderer.Submit5000InstancesWithCulling(), () => renderer.SubmissionMetrics),
+            Measure("render-mixed-tactical", () => renderer.SubmitRepresentativeVerticalSliceTacticalView(), () => renderer.SubmissionMetrics),
+            Measure("render-mixed-normal", () => renderer.SubmitRepresentativeVerticalSliceNormalRtsView(), () => renderer.SubmissionMetrics),
+            Measure("render-mixed-strategic", () => renderer.SubmitRepresentativeVerticalSliceStrategicView(), () => renderer.SubmissionMetrics),
             Measure("extraction-1000", () => { simulation.AdvanceOneTick(); return snapshots.TryReadLatest(out var s) ? s.InstanceCount : 0; }),
             Measure("publish-128-lines-64-labels-per-layer", () => host.Publish(frame))
         };
@@ -65,7 +65,7 @@ internal static class FrameHotPathMeasurements
         Console.WriteLine($"Frame hot-path measurements: {Path.GetFullPath(output)}");
     }
 
-    private static object Measure<T>(string name, Func<T> action)
+    private static object Measure<T>(string name, Func<T> action, Func<object>? submission = null)
     {
         for (int i = 0; i < Warmup; i++) _ = action();
         // Settle retained warm state before each independent stage, outside sampling.
@@ -97,7 +97,7 @@ internal static class FrameHotPathMeasurements
             OperationsPerSecond = Samples / seconds,
             GenCollections = collections,
             LastResult = last,
-            Submission = (object?)null
+            Submission = submission?.Invoke()
         };
     }
 }

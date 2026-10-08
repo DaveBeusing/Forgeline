@@ -258,6 +258,25 @@ dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Renderi
 
 The rendering host loads the compiled runtime asset catalog and exercises the production textured material path. It includes close/normal/strategic mixed-content views, 1,000 near-field instances, 5,000 total instances with far-field culling, normal terrain coverage, and high terrain coverage at strategic distance. BenchmarkDotNet output includes runtime and machine information. CI runs the rendering matrix with the Short job and publishes BriefJSON output under `artifacts/rendering-benchmarks`. Keep benchmark results when comparing architecture or hot-path changes so the environment remains visible.
 
+### Frame hot-path measurements
+
+After the Release build and runtime asset compilation, capture a CPU-only fixed-fixture comparison with:
+
+```powershell
+dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --frame-hotpaths artifacts/frame-hotpaths.json
+```
+
+This opt-in mode separates instance submission, 1,000-entity transform/visual extraction and asynchronous frame publication. It reports p50/p95/p99 CPU operation latency, producer-thread allocated bytes, process GC collections, throughput and final scene/draw counts. Submission also reports retained scratch capacities, populated upload bytes and pipeline/texture binding command counts. The fixed camera workloads are the existing rendering fixtures, at alpha 1 and 1600x900, with 1,024 warmups and 8,192 samples. Keep the same runtime assets, machine, power mode, Release build and sampling setup; run without concurrent builds. Repeat comparisons before making timing claims.
+
+The backend is null graphics: no native copy, fence wait, presentation or GPU timing is measured. Publication samples copying, lock admission and signalling on the producer; allocation on the render thread is excluded. Its fixture has 128 lines and 64 labels per gameplay/debug layer with no selected entities. GC counts include other process threads. Shared-runner timing is descriptive. The independent Frame hot paths workflow enforces CPU ownership and zero-allocation warm submission contracts and publishes measurements; it does not replace or relax build-test. See [scratch and snapshot ownership](adr/RenderFrameScratchAndSnapshotOwnership.md).
+
+Targeted canonical tests use the framework's [MTP class filters](https://xunit.net/docs/getting-started/v3/microsoft-testing-platform):
+
+```powershell
+dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.SimpleInstanceRendererTests ForgeLine.Presentation.Tests.PresentationExtractionTests
+dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ClientSimulationHostTests
+```
+
 ## Stress Scenarios
 
 Bounded lightweight-entity and integrated vertical-slice scenarios are available directly from the host:
