@@ -14,6 +14,43 @@ public sealed class HierarchicalNavigationSystemTests
     private static readonly PlayerId LocalPlayer = new(1);
 
     [Fact]
+    public void StuckWaypointReplansFromCurrentPositionWithoutChangingDestination()
+    {
+        var simulation = new SimulationCoordinator(ticksPerSecond: 20);
+        var navigation = new HierarchicalNavigationSystem(
+            new HierarchicalPathfinder(CreateNavigationWorld(CreateFlatWorld())));
+        EntityId unit = AddUnit(simulation, new Vector3(4.0f, 0.5f, 4.0f));
+        Vector3 destination = new(60.0f, 0.0f, 28.0f);
+        simulation.Entities.AddComponent(unit,
+            new MovementOrder(LocalPlayer, destination, SimulationTick.Zero, new SimulationTick(1)));
+        simulation.RegisterSystem(navigation);
+        simulation.RunTicks(2, TestContext.Current.CancellationToken);
+        MovementOrder waypoint = simulation.Entities.GetComponent<MovementOrder>(unit);
+        Vector3 current = new(10.0f, 0.5f, 20.0f);
+        WorldTransform transform = simulation.Entities.GetComponent<WorldTransform>(unit);
+        simulation.Entities.SetComponent(unit, transform with { Position = current });
+        GroundMovementState state = simulation.Entities.GetComponent<GroundMovementState>(unit);
+        simulation.Entities.SetComponent(unit, state with
+        {
+            Status = GroundMovementStatus.Stuck,
+            ObservedOrderTick = waypoint.AcceptedAtTick,
+            StalledTicks = GroundMovementSystemOptions.DefaultStuckTickThreshold
+        });
+
+        simulation.AdvanceOneTick();
+
+        NavigationPendingPath pending = simulation.Entities.GetComponent<NavigationPendingPath>(unit);
+        Assert.Equal(current, pending.Request.Start);
+        Assert.Equal(destination, pending.Request.Destination);
+        Assert.Equal(SimulationTick.Zero, pending.OriginalOrder.SubmittedAtTick);
+        Assert.Equal(simulation.CurrentTick, pending.OriginalOrder.AcceptedAtTick);
+        simulation.AdvanceOneTick();
+        Assert.False(simulation.Entities.HasComponent<NavigationPendingPath>(unit));
+        Assert.Equal(destination,
+            simulation.Entities.GetComponent<NavigationRouteState>(unit).OriginalOrder.WorldTarget);
+    }
+
+    [Fact]
     public void ScheduledHierarchicalRouteFeedsGroundMovementWaypoints()
     {
         TerrainWorld terrain = CreateFlatWorld();

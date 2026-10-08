@@ -10,6 +10,44 @@ public sealed class GroundMovementSystemTests
 {
     private static readonly PlayerId LocalPlayer = new(1);
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ProgressTrackingDistinguishesSlowTravelFromOscillation(bool oscillating)
+    {
+        var simulation = new SimulationCoordinator(ticksPerSecond: 20);
+        var movementSystem = new GroundMovementSystem(CreateFlatTerrain(64.0f),
+            options: new GroundMovementSystemOptions
+            {
+                StuckTickThreshold = 6,
+                ProgressEpsilonMeters = 0.01f
+            });
+        EntityId unit = AddGroundUnit(simulation, new Vector3(8.0f, 0.5f, 8.0f),
+            CreateMovement(maximumSpeed: 0.1f, acceleration: 100.0f,
+                deceleration: 100.0f, turnRateRadiansPerSecond: MathF.Tau));
+        AddOrder(simulation, unit, new Vector3(56.0f, 0.0f, 8.0f), new SimulationTick(1));
+        simulation.RegisterSystem(movementSystem);
+
+        for (int tick = 0; tick < 40; tick++)
+        {
+            if (oscillating)
+            {
+                // Repeated collision displacement returns the unit to the
+                // same two positions without advancing along its route.
+                WorldTransform transform = simulation.Entities.GetComponent<WorldTransform>(unit);
+                simulation.Entities.SetComponent(unit, transform with
+                {
+                    Position = new Vector3(8.0f + (tick % 2) * 0.2f, 0.5f, 8.0f)
+                });
+            }
+            simulation.AdvanceOneTick();
+        }
+
+        GroundMovementState state = simulation.Entities.GetComponent<GroundMovementState>(unit);
+        Assert.Equal(oscillating ? GroundMovementStatus.Stuck : GroundMovementStatus.Moving, state.Status);
+        Assert.Equal(oscillating, state.StalledTicks >= 6);
+    }
+
     [Fact]
     public void ConstantVelocityCoversSameDistanceAcrossTickRates()
     {

@@ -11,6 +11,46 @@ namespace ForgeLine.Game.Tests;
 public sealed class SkirmishProductionPolicyTests
 {
     [Theory]
+    [InlineData(true, false, LogisticsStockPriority.Critical)]
+    [InlineData(true, true, LogisticsStockPriority.High)]
+    [InlineData(false, false, LogisticsStockPriority.High)]
+    public void ForwardConstructionReserveYieldsToCargoRecoveryAndInitialMobilization(
+        bool establishedForce, bool cargoLost, LogisticsStockPriority expectedPriority)
+    {
+        using MatchRuntime scenario = CentralDivideScenario.Create(
+            CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation));
+        EntityRegistry entities = scenario.Simulation.Entities;
+        var owner = new ForgeLine.Game.PlayerId(1);
+        EntityId core = scenario.GetBase(owner).CommandCore;
+        Vector3 position = entities.GetComponent<WorldTransform>(core).Position;
+        entities.AddComponent(core, new PowerGenerator(100.0));
+        if (establishedForce)
+        {
+            UnitDefinitionCatalog units = DirectorateContent.CreateUnitCatalog();
+            scenario.UnitFactory.Create(units[UnitIds.MainBattleTank], position, owner);
+            for (int index = 0; index < 3; index++)
+                scenario.UnitFactory.Create(units[UnitIds.RifleSquad], position, owner);
+        }
+        if (cargoLost)
+        {
+            var cargo = new List<EntityId>();
+            foreach (EntityId entity in entities.Query<ControllableEntity, UnitIdentity>())
+                if (entities.GetComponent<ControllableEntity>(entity).Owner == owner &&
+                    entities.GetComponent<UnitIdentity>(entity).UnitId == UnitIds.CargoTruck)
+                    cargo.Add(entity);
+            foreach (EntityId entity in cargo)
+                Assert.True(entities.DestroyEntity(entity));
+        }
+
+        scenario.Simulation.RunTicks(12, TestContext.Current.CancellationToken);
+
+        LogisticsStockPolicy policy = FindStockPolicy(entities, core, ResourceIds.FerrousOre);
+        Assert.Equal(expectedPriority, policy.Priority);
+        Assert.Equal(220.0, policy.DesiredMinimum);
+        Assert.Equal(650.0, policy.DesiredTarget);
+    }
+
+    [Theory]
     [InlineData(false)]
     [InlineData(true)]
     public void QueuedCargoRecoveryPreemptsOnlyBlockedSupplyProduction(bool supplyInputsAvailable)

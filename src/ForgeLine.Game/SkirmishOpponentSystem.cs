@@ -1199,7 +1199,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return true;
     }
 
-    private static bool TryRecoverForce(
+    private bool TryRecoverForce(
         SimulationContext context,
         SkirmishOpponentController controller,
         OwnedState owned,
@@ -1291,14 +1291,43 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     retreatUnits,
                     deepOffensiveCommitted);
 
-            var command =
-                new RetreatCommand(
-                    controller.Player,
-                    retreatUnits.ToArray(),
-                    recovery,
-                    context.Tick,
-                    FormationTemplate.Column);
-            command.Execute(context);
+            if (deepOffensiveCommitted)
+            {
+                for (int index = retreatUnits.Count - 1; index >= 0; index--)
+                {
+                    EntityId unit = retreatUnits[index];
+                    if (!context.Entities.TryGetComponent(unit, out WorldTransform transform) ||
+                        BattlefieldResupplyPlanner.CanReachProvider(context, _inventories, unit,
+                            HorizontalDistanceSquared(transform.Position, recovery), range: 0.0f))
+                    {
+                        continue;
+                    }
+
+                    // Preserve the remaining fuel for mobile resupply rather
+                    // than starting a retreat that cannot reach its destination.
+                    if (!context.Entities.TryGetComponent(unit, out CombatOrderState order) ||
+                        order.Kind != CombatOrderKind.HoldPosition)
+                    {
+                        new HoldPositionCommand(controller.Player, [unit], context.Tick).Execute(context);
+                    }
+
+                    retreatUnits.RemoveAt(index);
+                }
+            }
+
+            EntityId[] newlyRecovering = SelectUnitsNeedingCombatOrder(
+                context, retreatUnits.ToArray(), CombatOrderKind.Retreat, recovery);
+            if (newlyRecovering.Length > 0)
+            {
+                var command =
+                    new RetreatCommand(
+                        controller.Player,
+                        newlyRecovering,
+                        recovery,
+                        context.Tick,
+                        FormationTemplate.Column);
+                command.Execute(context);
+            }
         }
 
         bool attackForceEstablished =
@@ -1512,7 +1541,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
             objective =
                 enemyPosition +
-                towardHome * 260.0f;
+                towardHome * (_units[UnitIds.ScoutVehicle].RadarIdentificationRangeMeters * 0.5f);
         }
         else
         {
@@ -3283,8 +3312,20 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             (owned.PowerGeneration <
                  owned.PowerDemand ||
              owned.OfflineConsumers > 0);
+        bool forwardConstructionRequired =
+            !RequiresCargoReplacementReserve(owned, configuration) &&
+            owned.CombatUnits.Count >= configuration.MinimumAttackUnits &&
+            GetUnitCount(owned, UnitIds.MainBattleTank) >=
+                configuration.MinimumObjectivePressureUnits &&
+            (CountRemoteBuildings(
+                 context, owned, BuildingIds.LogisticsHub,
+                 controller.HomePosition, minimumDistanceMeters: 500.0f) < 2 ||
+             SelectUnsupportedRemoteHub(
+                 context, owned, controller.HomePosition,
+                 minimumDistanceMeters: 500.0f,
+                 supportRadiusMeters: 260.0f).HasValue);
         LogisticsStockPriority constructionRawPriority =
-            powerRecoveryRequired
+            powerRecoveryRequired || forwardConstructionRequired
                 ? LogisticsStockPriority.Critical
                 : LogisticsStockPriority.High;
 
@@ -5550,6 +5591,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             }
 
             if (hasResupplyOrder)
+            {
+                continue;
+            }
+
+            if (context.Entities.TryGetComponent(entity, out UnitCombatReadiness availableReadiness) &&
+                (availableReadiness.OverallReadiness < configuration.OffensiveReadinessThreshold ||
+                 availableReadiness.Fuel < configuration.OffensiveFuelThreshold ||
+                 availableReadiness.Ammunition < configuration.ResupplyThreshold))
             {
                 continue;
             }

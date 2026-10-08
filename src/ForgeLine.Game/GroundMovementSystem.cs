@@ -458,7 +458,9 @@ public sealed class GroundMovementSystem : ISimulationSystem
             heading,
             status,
             order.AcceptedAtTick,
-            newDistance,
+            // Back-and-forth collision motion is not forward progress.
+            // Retain the best distance until movement advances meaningfully.
+            progress >= _options.ProgressEpsilonMeters ? newDistance : previousDistance,
             stalledTicks);
 
         var updatedTransform = transform with

@@ -222,6 +222,37 @@ public sealed class FormationMovementSystem : ISimulationSystem
         in MovementGroupState previousState,
         List<MemberRuntime> members)
     {
+        // A local slot can be across an obstacle from a lagging member even
+        // when the shared route is valid. Route that member from its own
+        // position instead of holding the whole formation back.
+        for (int index = members.Count - 1; index >= 0; index--)
+        {
+            EntityId entity = members[index].Entity;
+            if (!context.Entities.TryGetComponent(entity, out GroundMovementState movementState) ||
+                movementState.Status != GroundMovementStatus.Stuck ||
+                !context.Entities.TryGetComponent(entity, out MovementOrder localOrder) ||
+                localOrder.Kind != MovementOrderKind.FormationLocal)
+            {
+                continue;
+            }
+
+            context.Entities.RemoveComponent<MovementGroupMember>(entity);
+            if (context.Entities.HasComponent<FormationMovementConstraint>(entity))
+            {
+                context.Entities.RemoveComponent<FormationMovementConstraint>(entity);
+            }
+
+            context.Entities.SetComponent(entity,
+                new MovementOrder(order.Issuer, order.Destination, order.SubmittedAtTick, context.Tick));
+            members.RemoveAt(index);
+        }
+
+        if (members.Count == 0)
+        {
+            _groupsToDestroy.Add(group);
+            return;
+        }
+
         GroupMetrics metrics = CalculateGroupMetrics(members);
 
         _activeGroupCount++;
@@ -314,6 +345,29 @@ public sealed class FormationMovementSystem : ISimulationSystem
             route.NextWaypointIndex,
             0,
             route.Path.Waypoints.Count - 1);
+
+        // Obstacle projection can shift the slots away from the waypoint's
+        // center. Finishing those local orders also finishes the route leg.
+        bool localSlotsReached = previousState.Status == MovementGroupStatus.Moving;
+        for (int index = 0; index < members.Count; index++)
+        {
+            MemberRuntime member = members[index];
+            bool reached = context.Entities.TryGetComponent(member.Entity, out MovementOrder localOrder)
+                ? localOrder.Kind == MovementOrderKind.FormationLocal &&
+                  HorizontalDistance(member.Position, localOrder.WorldTarget) <=
+                    MathF.Max(_options.ArrivalToleranceMeters, member.Movement.StopRadius + 0.25f)
+                : context.Entities.TryGetComponent(member.Entity, out GroundMovementState localState) &&
+                  localState.Status == GroundMovementStatus.Arrived;
+            if (!reached)
+            {
+                localSlotsReached = false;
+                break;
+            }
+        }
+        if (localSlotsReached && waypointIndex < route.Path.Waypoints.Count - 1)
+        {
+            waypointIndex++;
+        }
 
         waypointIndex = AdvanceWaypoint(
             route.Path,

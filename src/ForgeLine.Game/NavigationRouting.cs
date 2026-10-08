@@ -191,6 +191,17 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
                     return;
                 }
 
+                if (context.Entities.TryGetComponent(entity, out GroundMovementState movementState) &&
+                    movementState.Status == GroundMovementStatus.Stuck &&
+                    movementState.ObservedOrderTick == movementOrder.AcceptedAtTick)
+                {
+                    RemoveRoute(context, entity, removeManagedOrder: true);
+                    var recoveryOrder = new MovementOrder(
+                        route.OriginalOrder.Issuer, route.OriginalOrder.WorldTarget,
+                        route.OriginalOrder.SubmittedAtTick, context.Tick);
+                    ScheduleRequest(context, entity, transform, agent, recoveryOrder);
+                }
+
                 return;
             }
 
@@ -538,6 +549,7 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
                 entity,
                 out GroundMovementState movementState) ||
             movementState.Status != GroundMovementStatus.Stuck ||
+            movementState.ObservedOrderTick != movementOrder.AcceptedAtTick ||
             !context.Entities.TryGetComponent(
                 entity,
                 out GroundMovement movement) ||
