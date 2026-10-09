@@ -1,13 +1,13 @@
 {
   "baseColorTexture": "texture.world.terrain.dry_dirt",
   "baseColorFactor": [
-    0.42,
-    0.32,
-    0.21,
+    1,
+    1,
+    1,
     1
   ],
   "metallicFactor": 0,
-  "roughnessFactor": 0.92,
-  "normalTexture": "texture.world.terrain.soil_normal",
-  "ormTexture": "texture.world.terrain.terrain_orm"
+  "roughnessFactor": 1,
+  "normalTexture": "texture.world.terrain.dry_dirt_normal",
+  "ormTexture": "texture.world.terrain.dry_dirt_orm"
 }

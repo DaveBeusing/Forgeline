@@ -1,0 +1,10 @@
+{
+  "id": "texture.world.terrain.rocky_scrub_normal",
+  "type": "texture",
+  "source": "rocky_scrub_production_normal.png",
+  "textureUsage": "normal",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 512,
+  "textureFormat": "bc7Unorm"
+}

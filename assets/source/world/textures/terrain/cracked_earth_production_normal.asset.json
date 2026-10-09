@@ -1,0 +1,10 @@
+{
+  "id": "texture.world.terrain.cracked_earth_normal",
+  "type": "texture",
+  "source": "cracked_earth_production_normal.png",
+  "textureUsage": "normal",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 512,
+  "textureFormat": "bc7Unorm"
+}

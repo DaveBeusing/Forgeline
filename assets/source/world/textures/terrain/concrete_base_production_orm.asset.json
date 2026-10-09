@@ -1,0 +1,10 @@
+{
+  "id": "texture.world.terrain.concrete_base_orm",
+  "type": "texture",
+  "source": "concrete_base_production_orm.png",
+  "textureUsage": "orm",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 512,
+  "textureFormat": "bc7Unorm"
+}

@@ -8,3 +8,4 @@ TestResults/
 BenchmarkDotNet.Artifacts/
 artifacts/
 assets/runtime/
+__pycache__/

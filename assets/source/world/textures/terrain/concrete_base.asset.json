@@ -1,8 +1,10 @@
 {
   "id": "texture.world.terrain.concrete_base",
   "type": "texture",
-  "source": "concrete_base.tga",
+  "source": "concrete_base_production_base.png",
   "textureUsage": "baseColor",
   "textureColorSpace": "srgb",
-  "textureGenerateMipmaps": true
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 1024,
+  "textureFormat": "rgba8Unorm"
 }

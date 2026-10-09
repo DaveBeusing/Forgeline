@@ -1,0 +1,10 @@
+{
+  "id": "texture.world.terrain.dark_ash_normal",
+  "type": "texture",
+  "source": "dark_ash_production_normal.png",
+  "textureUsage": "normal",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 512,
+  "textureFormat": "bc7Unorm"
+}

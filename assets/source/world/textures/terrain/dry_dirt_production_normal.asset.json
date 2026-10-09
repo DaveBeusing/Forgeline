@@ -1,0 +1,10 @@
+{
+  "id": "texture.world.terrain.dry_dirt_normal",
+  "type": "texture",
+  "source": "dry_dirt_production_normal.png",
+  "textureUsage": "normal",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 512,
+  "textureFormat": "bc7Unorm"
+}

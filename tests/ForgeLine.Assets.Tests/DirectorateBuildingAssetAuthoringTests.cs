@@ -37,13 +37,7 @@ public sealed class DirectorateBuildingAssetAuthoringTests
         try
         {
             AssetCompilationResult result =
-                AssetPipelineCompiler.Compile(
-                    Path.Combine(
-                        repositoryRoot,
-                        "assets",
-                        "source"),
-                    runtimeRoot,
-                    clean: true);
+                ProductionAssetFixture.CompileTo(runtimeRoot);
 
             Assert.True(
                 result.Success,

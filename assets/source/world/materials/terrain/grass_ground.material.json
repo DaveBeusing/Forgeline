@@ -1,13 +1,13 @@
 {
   "baseColorTexture": "texture.world.terrain.rocky_scrub",
   "baseColorFactor": [
-    0.29,
-    0.39,
-    0.22,
+    1,
+    1,
+    1,
     1
   ],
   "metallicFactor": 0,
-  "roughnessFactor": 0.9,
-  "normalTexture": "texture.world.terrain.soil_normal",
-  "ormTexture": "texture.world.terrain.terrain_orm"
+  "roughnessFactor": 1,
+  "normalTexture": "texture.world.terrain.rocky_scrub_normal",
+  "ormTexture": "texture.world.terrain.rocky_scrub_orm"
 }
