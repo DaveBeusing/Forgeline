@@ -44,6 +44,30 @@ The camera target/focus point lies on arbitrary world coordinates. The Windows c
 
 ## Default Controls
 
+The gameplay client uses the perspective reference from `RtsVisualReference`:
+45 degrees yaw from +Z toward +X, -55 degrees engine pitch (55 degrees downward
+from the horizontal), 45 degrees vertical field of view, and zero roll.
+Camera-to-target distances are 120 m for close tactical, 420 m for normal gameplay,
+and 1,000 m for strategic review. Interactive zoom remains clamped to 20–1,200 m.
+`--reference-zoom CloseTactical|NormalGameplay|Strategic` selects a launch bookmark
+without persisting a user preference. Authoring uses 2560 x 1440 at 100% render/UI
+scale; compatibility review includes 1920 x 1080, 3840 x 2160, and 3440 x 1440.
+The reusable `RtsCameraSettings` defaults remain available to isolated tools;
+the game client explicitly uses the reference configuration.
+
+Unit, completed-building, prop and resource rendering selects existing mesh LODs
+from the projected bounding-sphere diameter in 1440-height reference pixels.
+This incorporates object scale, view depth and field of view while preserving
+relative screen coverage across display resolutions. Thresholds are 90/28 pixels
+for units, 150/45 for buildings, and 65 pixels for the world's reduced mesh.
+A 12% hysteresis band retains the previous visible object's LOD. Entity generation
+and stable presentation identity prevent a recycled entity inheriting another
+object's state; invisible/removed objects leave history after the next frame.
+Construction/destruction representations and collision remain independent.
+Missing unit/building reduced meshes retain the base mesh when available.
+
+These thresholds require visual qualification before production acceptance.
+
 `Home` focuses the current owned, live Command Core using the completed-tick display snapshot. If no core survives, the lowest stable owned completed-building identity is the fallback; with no eligible building it does nothing. Focus preserves yaw, pitch, zoom and selection and never submits a gameplay command. A custom camera binding using Home takes precedence and disables the fixed home shortcut.
 
 Control groups retain Ctrl+digit assignment, digit recall and Ctrl+Shift+digit clearing. Two separate unmodified presses of the same assigned digit within 350 ms recall and then focus the current visible owned surviving members' mean position. The interval is constructor-configurable for tests. Holds, modifiers, another slot, empty groups, session replacement, help/pause and display/focus transitions break the sequence. Short key presses completed between frames are retained once; operating-system repeats are ignored.
