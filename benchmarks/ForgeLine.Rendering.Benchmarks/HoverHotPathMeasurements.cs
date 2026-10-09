@@ -38,7 +38,7 @@ internal static class HoverHotPathMeasurements
         File.WriteAllText(output, JsonSerializer.Serialize(new
         {
             SchemaVersion = 1,
-            Backend = "CPU null graphics; input, resolution and full HUD with active world, dock or detected-contact tooltip; excludes GPU upload, wait and present",
+            Backend = "CPU null graphics; input, resolution and full HUD with active guidance and world, dock or detected-contact tooltip; excludes GPU upload, wait and present",
             Runtime = RuntimeInformation.FrameworkDescription,
             BuildVersion = typeof(GameplayHudRenderer).Assembly.GetName().Version?.ToString(),
             Warmup,
@@ -47,7 +47,7 @@ internal static class HoverHotPathMeasurements
             Results = results
         }, JsonOptions));
         if (results.Any(result => result.AllocatedBytes != 0 || result.HudVertices <= 0 || result.HudVertices > 1_000_000 ||
-            result.TooltipVertices <= 0 || result.TooltipVertices > 131_072))
+            result.TooltipVertices <= 0 || result.TooltipVertices > 131_072 || result.GuidanceVertices <= 0 || result.GuidanceVertices > 262_144))
             throw new InvalidOperationException("Hover hot paths violated allocation or geometry budgets; inspect the report.");
         Console.WriteLine($"Hover hot paths: {results.Count} cases; zero allocation and bounded geometry; {Path.GetFullPath(output)}");
     }
@@ -70,11 +70,11 @@ internal static class HoverHotPathMeasurements
         Array.Sort(times);
         return new(width, height, dpi, scale, count, dock, detected,
             bytes, times[Samples / 2], times[(int)(Samples * .95)], times[(int)(Samples * .99)], times[^1],
-            fixture.Hud.LastRenderedVertexCount, fixture.Hud.LastHoverTooltipVertexCount);
+            fixture.Hud.LastRenderedVertexCount, fixture.Hud.LastHoverTooltipVertexCount, fixture.Hud.LastGuidanceVertexCount);
     }
     private sealed record Measurement(int Width, int Height, uint Dpi, float UiScale, int EntityCount, bool Dock, bool DetectedContact,
         long AllocatedBytes, double P50Microseconds, double P95Microseconds, double P99Microseconds,
-        double MaximumMicroseconds, int HudVertices, int TooltipVertices);
+        double MaximumMicroseconds, int HudVertices, int TooltipVertices, int GuidanceVertices);
 
     private sealed class Fixture : IDisposable
     {
@@ -90,6 +90,7 @@ internal static class HoverHotPathMeasurements
         private readonly float _scale;
         private readonly bool _dock;
         private readonly bool _detected;
+        private readonly PreAlphaUxView _ux;
         private int _frame;
         public GameplayHudRenderer Hud { get; }
 
@@ -137,8 +138,10 @@ internal static class HoverHotPathMeasurements
                     playerExperience: default(PlayerExperienceSnapshot) with { Player = new PlayerId(1) },
                     playerActions: dock ? actions : null,
                     hover: new PlayerHoverSummary(_entity, session, tick, PlayerHoverCategory.Unit, details.DisplayName,
-                        RtsUiIcon.UnitArmor, details));
+                        RtsUiIcon.UnitArmor, details),
+                    guidance: new PlayerGuidanceSummary(session, tick, new PlayerId(1), PlayerGuidanceMilestone.CommandCore | PlayerGuidanceMilestone.Supply));
             }
+            _ux = default(PreAlphaUxView) with { ShowOnboarding = true, Guidance = new EarlyGameGuidanceController().Update(_snapshots[0], true) };
             var card = new Vector2(_layout.ActionDock.X + 20 * _layout.Scale, _layout.ActionDock.Y + 100 * _layout.Scale);
             var position = dock ? card : detected ? _camera.WorldToScreen(Vector3.Zero, width, height).Position : new Vector2(width / 2, height / 2);
             _input.Apply(PlatformInputEvent.PointerMoved((int)position.X, (int)position.Y));
@@ -152,7 +155,7 @@ internal static class HoverHotPathMeasurements
             if (_frame > Warmup && !view.Ready) throw new InvalidOperationException("Hover fixture is not active.");
             Hud.Render(_context, _camera, snapshot, new AxisAlignedBounds(new Vector3(-1000), new Vector3(1000)),
                 RtsInformationLayerView.Empty, _panel, default, FormationTemplate.Compact, CombatGroupOverviewView.Empty,
-                default, _dpi, _scale, hoverTooltip: view);
+                _ux, _dpi, _scale, hoverTooltip: view);
         }
 
         public void Dispose() => Hud.Dispose();

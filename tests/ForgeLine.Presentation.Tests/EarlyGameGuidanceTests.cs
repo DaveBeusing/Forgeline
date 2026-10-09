@@ -2,6 +2,7 @@ using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Game;
+using ForgeLine.Intelligence;
 using ForgeLine.Simulation;
 using Xunit;
 
@@ -128,6 +129,63 @@ public sealed class EarlyGameGuidanceTests
         scenario.Simulation.AdvanceOneTick();
         Assert.True(buffer.TryReadLatest(out var snapshot));
         Assert.False(snapshot.Guidance!.Value.Observed.HasFlag(PlayerGuidanceMilestone.Power));
+    }
+
+    [Fact]
+    public void ExtractionRequiresObservedLocalWorkAndScoutingRequiresCurrentPermittedContact()
+    {
+        using var scenario = WorldHoverExtractionTests.CreateScenario();
+        var entities = scenario.Simulation.Entities;
+        var deposit = entities.CreateEntity();
+        entities.AddComponent(deposit, new ResourceDeposit(ResourceIds.FerrousOre,
+            new ForgeLine.World.AxisAlignedBounds(Vector3.Zero, Vector3.One), 100, 1));
+        var extractor = entities.CreateEntity();
+        entities.AddComponent(extractor, new ControllableEntity(new PlayerId(1), ControllableEntityCategory.Building));
+        entities.AddComponent(extractor, new ResourceExtractor(deposit, ResourceIds.FerrousOre, 10,
+            new FactionId(1), outputInventory: scenario.GetBase(new PlayerId(1)).CommandCore));
+        var enemy = scenario.GetBase(new PlayerId(2)).CommandCore;
+        bool detected = false;
+        scenario.Simulation.RegisterTickObserver(new ContactObserver(context =>
+        {
+            scenario.Intelligence.BeginTick(context.Tick);
+            if (detected) scenario.Intelligence.Observe(new FactionId(1), enemy,
+                entities.GetComponent<IntelligenceSignature>(enemy), Vector3.Zero, IntelligenceState.Detected, context.Tick);
+        }));
+        var buffer = WorldHoverExtractionTests.Observe(scenario, new PresentationInteractionState());
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var hidden));
+        Assert.True(hidden.Guidance!.Value.Observed.HasFlag(PlayerGuidanceMilestone.FerrousExtraction));
+        Assert.False(hidden.Guidance.Value.Observed.HasFlag(PlayerGuidanceMilestone.OpponentContact));
+        detected = true;
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var contact));
+        Assert.True(contact.Guidance!.Value.Observed.HasFlag(PlayerGuidanceMilestone.OpponentContact));
+        Assert.Equal(0u, Assert.Single(contact.Intelligence!.Contacts).IdentityKey);
+        detected = false;
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var lost));
+        Assert.False(lost.Guidance!.Value.Observed.HasFlag(PlayerGuidanceMilestone.OpponentContact));
+    }
+
+    [Fact]
+    public void RejectedBuildingCommandCannotCompleteMilestone()
+    {
+        using var scenario = WorldHoverExtractionTests.CreateScenario();
+        var gateway = new PlayerCommandGateway(scenario.Simulation, scenario.Services.BuildingCommands, scenario.BattlefieldRuntime.MatchStateEntity);
+        scenario.Simulation.RegisterTickObserver(gateway);
+        var buffer = WorldHoverExtractionTests.Observe(scenario, new PresentationInteractionState());
+        Assert.True(gateway.SubmitBuild(new PlayerId(1), BuildingIds.PowerPlant, new Vector3(-100000), BuildingOrientation.North,
+            scenario.GetBase(new PlayerId(1)).CommandCore, scenario.Simulation.CurrentTick).Accepted);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(gateway.Results.TryRead(out var result));
+        Assert.Equal(PlayerCommandFeedbackState.Rejected, result.State);
+        Assert.True(buffer.TryReadLatest(out var snapshot));
+        Assert.False(snapshot.Guidance!.Value.Observed.HasFlag(PlayerGuidanceMilestone.Power));
+    }
+
+    private sealed class ContactObserver(Action<SimulationContext> action) : ISimulationTickObserver
+    {
+        public void OnTickCompleted(SimulationContext context) => action(context);
     }
 
     internal static PresentationSnapshot Snapshot(PlayerGuidanceMilestone observed, ulong tick = 1, ulong session = 1, bool terminal = false) =>

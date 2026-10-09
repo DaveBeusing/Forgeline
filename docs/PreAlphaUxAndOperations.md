@@ -53,6 +53,14 @@ Restore does not incorrectly resume a match that is still explicitly paused or d
 
 ## Minimal Onboarding
 
+The optional match guide shows the first unobserved objective, a current binding, a short explanation and the next goal when space permits. **Shift + F12** hides/shows it for the current session; unshifted F1/F12 still opens help. The existing **Onboarding** setting controls persistent default visibility, so there is no settings schema migration. Hiding the guide does not stop milestone observation or prevent RTS actions. Toggle frames consume held input and cancel in-progress pointer/placement/targeting gestures.
+
+The canonical start already provides a Command Core, construction stock and a stocked supply provider. It therefore starts at **Establish Power**, without treating starting Steel as processed output. The advisory sequence covers Ferrous Ore extraction, Steel processing, a Vehicle Factory, fielding a Scout, available supply, permitted opponent contact, and the actual Command Core objective. Players may act in any order; already observed steps are skipped. No camera movement, resource grants, scripted build choices, tutorial timers or simulation achievements are introduced.
+
+The compact card occupies the upper secondary information region; combat-group information uses the remainder. At high scale/small viewports the objective and binding take priority over context/next text. Alerts retain their own region. Visible guide/placement cards block world clicks, including press origins that subsequently move outside the card, but have no clickable commands. Guidance is suppressed during help/pause, focus loss, drag selection, camera drag, placement, targeting and terminal results. Placement feedback replaces the guide while building placement is active and remains available with Onboarding disabled.
+
+Guide observations are session-local presentation state. Save/load reconstructs progress from extant authorized state and persisted production counters; presentation history for buildings/units already destroyed before restoration is not a durable achievement. Restart/session replacement clears observations and the temporary hidden state. See [milestone sources](MatchFlowAndPlayerExperience.md#early-game-guidance-observations).
+
 The controls reference lists implemented camera, selection, movement, construction, production, logistics, supply and combat bindings, plus the Command Core objective. It uses active camera bindings and indicates whether edge pan is disabled. F1/F12, Escape or Back closes it without forwarding the closing gesture to gameplay. Shift + F1 toggles development metrics.
 
 The minimum complete vertical-slice workflow is:

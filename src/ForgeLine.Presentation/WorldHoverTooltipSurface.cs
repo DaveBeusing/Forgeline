@@ -58,6 +58,8 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         Line(resolved.Title, true);
         Line(resolved.Role);
         Line(resolved.Status);
+        Line(resolved.WorkStatus);
+        Line(resolved.Explanation);
         if (resolved.World is { } world) EmitWorld(world);
         if (resolved.Costs is { } costs) EmitAmounts(costs, "NEED");
         if (resolved.Outputs is { } outputs) EmitAmounts(outputs, "OUT");
@@ -98,6 +100,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
     {
         int count = 2 + (content.Status.Length > 0 ? 1 : 0) + (content.Hint.Length > 0 ? 1 : 0) +
             (content.Requirement.Length > 0 ? 1 : 0) + (content.ProductionTicks.HasValue ? 1 : 0);
+        count += (content.WorkStatus.Length > 0 ? 1 : 0) + (content.Explanation.Length > 0 ? 1 : 0);
         if (content.World is { } world)
         {
             var details = world.OwnedDetails;

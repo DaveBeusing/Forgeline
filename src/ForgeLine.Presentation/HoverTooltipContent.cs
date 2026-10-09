@@ -10,7 +10,8 @@ internal readonly record struct HoverTooltipContent(
     IReadOnlyList<PlayerActionResourceAmount>? Outputs = null,
     uint? ProductionTicks = null,
     string Requirement = "",
-    IReadOnlyList<PlayerTechnologyPrerequisiteReadModel>? Prerequisites = null);
+    IReadOnlyList<PlayerTechnologyPrerequisiteReadModel>? Prerequisites = null,
+    string WorkStatus = "", string Explanation = "");
 
 internal static class HoverTooltipResolver
 {
@@ -46,7 +47,8 @@ internal static class HoverTooltipResolver
             _ => RtsUiIconCatalog.Get(world.RoleIcon).ShortLabel
         };
         string hint = world.OwnedDetails.Count == 1 ? "LEFT CLICK TO SELECT" : string.Empty;
-        return new(world.DisplayName, role, world.ExtractionState, hint, world);
+        return new(world.DisplayName, role, world.ExtractionState, hint, world,
+            Explanation: ProductionContextFeedback.Explain(world.OwnedDetails.Work.BlockReason));
     }
 
     private static HoverTooltipContent? ResolveDock(PresentationSnapshot snapshot, in HoverTooltipView view,
@@ -102,8 +104,16 @@ internal static class HoverTooltipResolver
                     break;
             }
         }
+        string workReason = mode switch
+        {
+            PlayerActionPanelMode.Production when actions.Production is { } processing => PlayerActionDockHudModel.ResolveProductionBlockLabel(processing.BlockReason),
+            PlayerActionPanelMode.UnitProduction when actions.UnitProduction is { } factory => PlayerActionDockHudModel.ResolveUnitProductionBlockLabel(factory.BlockReason),
+            _ => string.Empty
+        };
         return new(title, PlayerActionDockHudModel.ResolveModeLabel(mode), status, hint,
-            Costs: costs, Outputs: outputs, ProductionTicks: ticks, Requirement: requirement, Prerequisites: prerequisites);
+            Costs: costs, Outputs: outputs, ProductionTicks: ticks, Requirement: requirement, Prerequisites: prerequisites,
+            WorkStatus: ProductionContextFeedback.WorkLabel(workReason),
+            Explanation: ProductionContextFeedback.Explain(enabled ? workReason : state.DisabledReason));
     }
 
     private static string ResolveControlTitle(PlayerActionDockControlKind control, PlayerActionPanelMode mode)

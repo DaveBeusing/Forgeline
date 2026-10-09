@@ -23,6 +23,7 @@ internal sealed class RtsInformationHudSurface : IGameplayHudSurface
         GameplayHudRegion.GlobalOverlay;
 
     public int LastRenderedVertexCount => _renderer.LastRenderedVertexCount;
+    public int LastGuidanceVertexCount => _renderer.LastGuidanceVertexCount;
 
     public void Render(
         in GameplayHudRenderContext context)

@@ -52,6 +52,7 @@ internal static class PlayerGuidanceSummaryFactory
             if (entities.TryGetComponent(entity, out UnitIdentity unit) && unit.UnitId == UnitIds.ScoutVehicle)
                 observed |= PlayerGuidanceMilestone.Scout;
             if (entities.TryGetComponent(entity, out SupplyProvider provider) && provider.Owner == extraction.Player && provider.Enabled &&
+                entities.HasComponent<WorldTransform>(entity) &&
                 (!entities.TryGetComponent(entity, out SupplyDepot depot) || depot.State == SupplyDepotState.Operational) &&
                 extraction.Scenario.Inventories.Contains(provider.InventoryId) &&
                 extraction.Scenario.Inventories.GetAvailableQuantity(provider.InventoryId, ResourceIds.Fuel) > 0 &&
@@ -59,7 +60,8 @@ internal static class PlayerGuidanceSummaryFactory
                 observed |= PlayerGuidanceMilestone.Supply;
         }
         // Opaque current contacts are sufficient evidence of scouting; no enemy ECS lookup is needed.
-        if (intelligence is not null && intelligence.Tick == context.Tick)
+        if (intelligence is not null && intelligence.Tick == context.Tick &&
+            intelligence.Faction == new FactionId(checked((uint)extraction.Player.Value)))
             for (int i = 0; i < intelligence.Contacts.Count; i++)
                 if (intelligence.Contacts[i].IsCurrent && intelligence.Contacts[i].State is IntelligenceState.Detected or IntelligenceState.Identified)
                 { observed |= PlayerGuidanceMilestone.OpponentContact; break; }
