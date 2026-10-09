@@ -400,7 +400,8 @@ internal sealed class ClientRenderHost : IDisposable
             using var gameplayOverlayRenderer =
                 new DebugDrawRenderer(
                     graphics,
-                    depthEnabled: false);
+                    depthEnabled: false,
+                    lineWidthPixels: 3.0f);
             using var debugDrawRenderer =
                 new DebugDrawRenderer(
                     graphics,
@@ -597,7 +598,8 @@ internal sealed class ClientRenderHost : IDisposable
                         gameplayOverlayRenderer.Render(
                             context,
                             renderCamera,
-                            gameplayDraw);
+                            gameplayDraw,
+                            RtsUiLayout.ScaleForDpi(current.Dpi) * current.UiScale);
                         gameplayHudRenderer.Render(
                             context,
                             renderCamera,
