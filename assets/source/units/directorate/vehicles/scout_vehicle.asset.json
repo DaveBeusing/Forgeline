@@ -1,7 +1,7 @@
 {
   "id": "unit.directorate.scout_vehicle",
   "type": "mesh",
-  "source": "../sources/scout_vehicle_lod0.gltf",
+  "source": "../sources/scout_vehicle_lod0_production.gltf",
   "materialReferences": [
     "material.directorate.unit.scout_vehicle"
   ],

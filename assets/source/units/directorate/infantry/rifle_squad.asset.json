@@ -1,7 +1,7 @@
 {
   "id": "unit.directorate.rifle_squad",
   "type": "mesh",
-  "source": "../sources/rifle_squad_lod0.gltf",
+  "source": "../sources/rifle_squad_lod0_production.gltf",
   "materialReferences": [
     "material.directorate.unit.rifle_squad"
   ],

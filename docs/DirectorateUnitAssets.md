@@ -23,6 +23,13 @@ These meshes are also the current readability geometry baseline. Their intention
 
 ## Source layout
 
+The six unit families and articulated tank turret now have sibling production
+LOD0 sources with manufactured edge bevels. They preserve their original
+bounds, pivots, UV regions and sockets. All atlas materials bind native
+4096-pixel Base Color/Normal/ORM masters through explicit runtime caps.
+See [Production surfaces](ProductionSurfaceMasters.md). Existing reduced LODs,
+collision assets and infantry animation boundaries remain in force.
+
 Editable unit assets live below:
 
 ```text

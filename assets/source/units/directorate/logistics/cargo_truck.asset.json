@@ -1,7 +1,7 @@
 {
   "id": "unit.directorate.cargo_truck",
   "type": "mesh",
-  "source": "../sources/cargo_truck_lod0.gltf",
+  "source": "../sources/cargo_truck_lod0_production.gltf",
   "materialReferences": [
     "material.directorate.unit.cargo_truck"
   ],
