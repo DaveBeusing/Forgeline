@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.logistics_hub.lod2",
+  "type": "mesh",
+  "source": "sources/logistics_hub_lod1.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

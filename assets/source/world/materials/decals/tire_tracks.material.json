@@ -1,5 +1,19 @@
 {
-  "baseColorFactor": [0.18, 0.17, 0.15, 1.0],
+  "baseColorFactor": [
+    1,
+    1,
+    1,
+    1
+  ],
   "metallicFactor": 0,
-  "roughnessFactor": 0.94
+  "roughnessFactor": 0.94,
+  "baseColorTexture": "texture.world.decal.atlas_base",
+  "uvScale": [
+    0.214,
+    0.464
+  ],
+  "uvOffset": [
+    0.018,
+    0.018
+  ]
 }

@@ -1,17 +1,17 @@
 {
   "baseColorFactor": [
-    0.29,
-    0.31,
-    0.27,
+    1,
+    1,
+    1,
     1
   ],
-  "metallicFactor": 0.2,
-  "roughnessFactor": 0.72,
-  "baseColorTexture": "texture.directorate.material.painted_metal_base",
+  "metallicFactor": 1,
+  "roughnessFactor": 1,
+  "baseColorTexture": "texture.directorate.surface.atlas_base",
   "normalTexture": "texture.directorate.material.painted_metal_normal",
-  "ormTexture": "texture.directorate.material.painted_metal_orm",
+  "ormTexture": "texture.directorate.surface.atlas_orm",
   "uvScale": [
-    0.75,
-    0.75
+    1,
+    1
   ]
 }

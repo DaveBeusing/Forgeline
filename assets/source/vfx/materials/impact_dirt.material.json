@@ -1,10 +1,19 @@
 {
   "baseColorFactor": [
-    0.46,
-    0.34,
-    0.22,
+    1,
+    1,
+    1,
     1
   ],
   "metallicFactor": 0,
-  "roughnessFactor": 0.95
+  "roughnessFactor": 0.9,
+  "baseColorTexture": "texture.vfx.atlas_base",
+  "uvScale": [
+    0.214,
+    0.214
+  ],
+  "uvOffset": [
+    0.518,
+    0.018
+  ]
 }

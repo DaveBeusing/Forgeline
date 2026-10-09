@@ -380,7 +380,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
             }
 
             if (usesRuntimeMesh &&
-                runtimeMesh.HasMaterial)
+                runtimeMesh.HasMaterial &&
+                !hasBuildingDefinition)
             {
                 materialAssetId =
                     runtimeMesh.MaterialId.Value;
@@ -1421,11 +1422,22 @@ public sealed class SimpleInstanceRenderer : IDisposable
             {
                 float2 uv =
                     input.Uv *
-                    input.Material0.xy;
+                    input.Material0.xy + input.Material1.yz;
                 float4 baseColor =
                     BaseColorTexture.Sample(
                         WorldMaterialSampler,
                         uv);
+                // Ordered coverage preserves transparent sprite/decal edges in
+                // the existing depth-tested instanced pass without sorting.
+                static const float coverageThresholds[16] = {
+                    0.03125f, 0.53125f, 0.15625f, 0.65625f,
+                    0.78125f, 0.28125f, 0.90625f, 0.40625f,
+                    0.21875f, 0.71875f, 0.09375f, 0.59375f,
+                    0.96875f, 0.46875f, 0.84375f, 0.34375f
+                };
+                uint2 coveragePixel = uint2(input.Position.xy) & 3;
+                clip(baseColor.a * input.Color.a -
+                    coverageThresholds[coveragePixel.y * 4 + coveragePixel.x]);
                 float3 tangentNormal =
                     NormalTexture.Sample(
                         WorldMaterialSampler,
@@ -1613,6 +1625,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     RootConstantCount,
                 PixelTextureCount =
                     4,
+                // Imported glTF surfaces use counterclockwise outward winding.
+                CullMode = GraphicsCullMode.Clockwise,
                 DepthEnabled =
                     true
             });
@@ -1753,8 +1767,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     material.MetallicFactor),
                 new Vector4(
                     material.EmissiveMultiplier,
-                    0.0f,
-                    0.0f,
+                    material.UvOffset.X,
+                    material.UvOffset.Y,
                     0.0f))
             : new InstanceRenderData(
                 world,

@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.radar.lod1",
+  "type": "mesh",
+  "source": "sources/radar_lod1.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

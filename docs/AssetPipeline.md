@@ -325,7 +325,7 @@ Editable road and bridge sources live under:
 assets/source/infrastructure/directorate/
 ```
 
-The nine primary building assets expose LOD1/LOD2 references and share `building.directorate.module.collision_box` as a simplified visual/tooling collision contract. Shared construction and state modules reduce duplicate geometry while preserving stable IDs. Directorate road and bridge meshes compile through the same runtime manifest and are consumed by presentation only; authoritative building footprints, logistics edges, and navigation blockers remain game/simulation data.
+The thirteen primary building assets expose LOD1/LOD2 references and share `building.directorate.module.collision_box` as a simplified visual/tooling collision contract. Shared construction and state modules reduce duplicate geometry while preserving stable IDs. Directorate road and bridge meshes compile through the same runtime manifest and are consumed by presentation only; authoritative building footprints, logistics edges, and navigation blockers remain game/simulation data.
 
 Road presentation keeps separate stable material contracts for the main reinforced-concrete surface, the gravel/mineral shoulder transition, and damage-ready road states. Those materials reuse existing compiled texture families and therefore introduce no parallel texture loader, custom sampler path, or runtime source-file access. Curves, junctions, shoulders, and straight segments remain ordinary compiled meshes and batch through the existing infrastructure rendering path.
 
@@ -422,7 +422,7 @@ Shared texture families are:
 
 Physical families provide Base Color, tangent-space Normal, and packed ORM. The status map is Emissive and is used only where an existing gameplay/presentation state benefits from a functional warning treatment. Texture naming follows `texture.directorate.material.<family>_<channel>`.
 
-All shared sources are deterministic repository-authored 32 x 32 tileable TGA files with no external inputs. Their provenance is recorded beside the sources. The Asset Compiler generates complete mip chains. The nineteen shared textures occupy 103,740 bytes of RGBA8 mip texels; automated validation additionally constrains their compiled `.flasset` footprint to 160,000 bytes or less.
+The original nineteen shared sources remain deterministic repository-authored 32 x 32 tileable TGA files. Their provenance is recorded beside the sources. The Asset Compiler generates complete mip chains. The nineteen shared textures occupy 103,740 bytes of RGBA8 mip texels; automated validation additionally constrains their compiled `.flasset` footprint to 160,000 bytes or less.
 
 Existing generated/static meshes that need texture sampling but lack authored UV0 use the compiler's deterministic box-projection remediation. Projection is performed per triangle so seams can split vertices cleanly; normal-mapped materials then use the established tangent generator. Authored UV0/tangents remain authoritative when present. Compiler diagnostics report generated UV vertex counts alongside generated normals/tangents and any fallback sections.
 
@@ -467,3 +467,15 @@ See [Directorate Unit Assets](DirectorateUnitAssets.md) for the complete unit pr
 Every successful compiler invocation now performs a second runtime qualification pass. The pass opens every generated payload, decodes texture/material runtime payloads, validates runtime references and LOD chains, records generated asset footprint by type, and reports the largest runtime assets. This catches malformed texture tables, mip ranges, dimensions, or material payloads before packaging.
 
 CI writes the structured result to `artifacts/asset-qualification.json`. See [Asset Performance and Visual Qualification](AssetPerformanceQualification.md) for the complete acceptance and measurement procedure.
+
+## Concept surface and effect completion
+
+The current catalog contains 324 assets: 158 meshes, 39 textures and 127 materials. Shared concept atlases add component-specific armor, steel, rubber, canvas, sensor glass, warning, wood and foliage colors, plus matching numeric surface ORM. Authored UV seams preserve one material per physical mesh and its LOD identity. World decal and VFX families now have real RGBA texture bindings rather than factor-only colors; the shared materialless decal carrier accepts the externally selected placement material.
+
+`textureMaxDimension` optionally bounds the largest offline runtime dimension from 1 to 16384. The compiler repeatedly applies its existing semantic downsampling until the limit is satisfied, then generates the requested mip chain. Aspect ratio follows the existing integer mip reduction. Source images remain editable at their authoring resolution. The setting participates in the source/build hash and invalidates dependent cached output. Compiler version is 1.6.0.
+
+Mesh materials also support finite two-component `uvOffset` (default `[0,0]`). The instance shader samples `uv * uvScale + uvOffset` for all four material channels without enlarging the 112-byte instance stream. Terrain retains its dedicated splatting path. Atlas materials deliberately cap mip depth and inset their UV regions so filtered sampling cannot merge adjacent cells. Transparent object/decal pixels use ordered coverage in the existing depth-tested pass; this is a coverage treatment, not sorted volumetric transparency.
+
+Authored surface, decal and effect layouts and provenance are documented beside their sources. The original terrain material family and procedural strategic/UI glyph contracts remain in use.
+
+Imported glTF mesh exteriors use counterclockwise outward winding. The textured object pipeline selects clockwise-face culling so those exterior surfaces remain visible, while the existing terrain and fallback primitive pipeline conventions remain separate. The graphics API exposes both winding choices explicitly.

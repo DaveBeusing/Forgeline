@@ -1,7 +1,7 @@
 {
   "id": "mesh.world.vegetation.conifer",
   "type": "mesh",
-  "source": "../sources/world_billboard.gltf",
+  "source": "../sources/mesh_world_vegetation_conifer.gltf",
   "materialReferences": [
     "material.world.vegetation"
   ],

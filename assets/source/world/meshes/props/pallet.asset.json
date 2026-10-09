@@ -1,7 +1,7 @@
 {
   "id": "mesh.world.prop.pallet",
   "type": "mesh",
-  "source": "../sources/world_box.gltf",
+  "source": "../sources/mesh_world_prop_pallet.gltf",
   "materialReferences": [
     "material.world.prop.industrial"
   ],

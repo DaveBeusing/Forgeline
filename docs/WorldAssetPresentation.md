@@ -52,9 +52,9 @@ Repeated world objects share compiled mesh resources through `RuntimeWorldAssetR
 
 Reusable physical world objects now participate in the same production texture/material foundation as Directorate assets:
 
-- props use shared structural-metal textures through `material.world.prop.industrial`;
-- resource deposits share the resource-rock Base Color/Normal/ORM family while retaining resource-specific tint/material factors;
-- conifer, scrub, and grass-clump assets use the shared vegetation Base Color/Normal/ORM family.
+- props use the concept color/ORM atlas through `material.world.prop.industrial`, with component UV layouts for steel, wood, concrete, rock and service panels;
+- resource deposits sample the mineral cell and retain the shared resource-rock normal family plus resource-specific color factors;
+- conifer, scrub, and grass-clump assets select their own foliage cells while retaining the shared vegetation normal family.
 
 This preserves texture reuse and instancing while keeping resource/faction readability in material factors, silhouette, strategic symbols, and UI rather than requiring a unique texture set for every object.
 
@@ -150,3 +150,7 @@ The repository validates this baseline through:
 - the existing Windows graphics smoke and 1,000-instance render-stress path, now run after runtime asset compilation.
 
 Generated `assets/runtime` content remains ignored by Git and must never be edited as source.
+
+## Concept texture completion
+
+Every prop and vegetation mesh now has an authored surface-region UV layout; wood pallets, mineral rocks, concrete barriers, service crates, foliage and machinery retain shared material IDs while sampling the appropriate concept surface cell. Resource-family color and silhouette identity remain intact. The eight existing world decals use their RGBA atlas with bounded mip depth, placement-selected material regions and ordered alpha coverage. The terrain texture family remains complete through the existing GPU splatting path.

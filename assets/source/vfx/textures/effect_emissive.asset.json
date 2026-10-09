@@ -1,0 +1,9 @@
+{
+  "id": "texture.vfx.atlas_emissive",
+  "type": "texture",
+  "source": "effect_atlas.png",
+  "textureUsage": "emissive",
+  "textureColorSpace": "srgb",
+  "textureMaxDimension": 512,
+  "textureMaxMipLevels": 4
+}

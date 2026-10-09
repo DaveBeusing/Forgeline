@@ -362,6 +362,11 @@ public static class BuildingPresentationCatalog
                 0.28f,
                 1.0f));
 
+        Add(BuildingIds.LogisticsHub, "logistics_hub", "supply", new Vector4(0.32f, 0.35f, 0.29f, 1.0f));
+        Add(BuildingIds.AmmunitionPlant, "ammunition_plant", "processing", new Vector4(0.34f, 0.30f, 0.26f, 1.0f));
+        Add(BuildingIds.Barracks, "barracks", "factory", new Vector4(0.30f, 0.32f, 0.29f, 1.0f));
+        Add(BuildingIds.Radar, "radar", "command", new Vector4(0.30f, 0.32f, 0.29f, 1.0f));
+
         return result;
 
         void Add(

@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.barracks.lod2",
+  "type": "mesh",
+  "source": "sources/barracks_lod1.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

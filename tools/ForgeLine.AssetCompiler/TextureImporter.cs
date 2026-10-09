@@ -13,7 +13,8 @@ internal static class TextureImporter
         RuntimeTextureColorSpace colorSpace,
         RuntimeTextureUsage usage,
         bool generateMipmaps,
-        int? maxMipLevels)
+        int? maxMipLevels,
+        int? maxDimension = null)
     {
         var extension = Path.GetExtension(path);
         TextureData texture = extension.ToLowerInvariant() switch
@@ -22,6 +23,19 @@ internal static class TextureImporter
             ".tga" => ImportTga(path),
             _ => throw new InvalidDataException($"Texture format '{extension}' is not supported."),
         };
+
+        if (maxDimension is int limit)
+        {
+            if (limit <= 0 || limit > MaxDimension)
+            {
+                throw new InvalidDataException("textureMaxDimension must be between 1 and 16384.");
+            }
+
+            while (texture.Width > limit || texture.Height > limit)
+            {
+                texture = Downsample(texture, colorSpace, usage);
+            }
+        }
 
         RuntimeTextureMipLevel[] mips =
             GenerateMipChain(

@@ -193,3 +193,7 @@ The normal Windows D3D12 smoke remains the runtime integration check for the com
 The current asset runtime has no dedicated particle, ribbon, GPU-emitter, or effect-graph asset type. The baseline therefore uses mesh/material effects and fixed-tick presentation lifetimes. Alpha-rich smoke, particle animation, richer debris motion, decals created by impacts, GPU emitters, and final production VFX can evolve behind the stable presentation/event contracts.
 
 Final audio is separate. Repair effects remain deferred until repair gameplay exposes an authoritative trigger.
+
+## Authored effect textures
+
+All 36 existing effect mesh sources now have normalized face UVs and sample the shared RGBA effect atlas through the ten stable material families. Emissive bindings are present for fire, flashes, sparks, projectiles and logistics transfer. Cell UV transforms, retained atlas mip depth and ordered alpha coverage avoid opaque rectangular backgrounds while preserving the existing pool, lifetime and distance budgets. See [effect source layout](../assets/source/vfx/textures/README.md).

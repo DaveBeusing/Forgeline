@@ -1,17 +1,17 @@
 {
   "baseColorFactor": [
-    0.28,
-    0.25,
-    0.21,
+    1,
+    1,
+    1,
     1
   ],
-  "metallicFactor": 0.01,
-  "roughnessFactor": 0.97,
-  "baseColorTexture": "texture.directorate.material.reinforced_concrete_base",
+  "metallicFactor": 1,
+  "roughnessFactor": 1,
+  "baseColorTexture": "texture.directorate.surface.atlas_base",
   "normalTexture": "texture.directorate.material.reinforced_concrete_normal",
-  "ormTexture": "texture.directorate.material.reinforced_concrete_orm",
+  "ormTexture": "texture.directorate.surface.atlas_orm",
   "uvScale": [
-    3.0,
-    3.0
+    1,
+    1
   ]
 }

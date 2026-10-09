@@ -41,6 +41,8 @@ public sealed record SourceAssetDefinition
 
     public int? TextureMaxMipLevels { get; init; }
 
+    public int? TextureMaxDimension { get; init; }
+
     public float Scale { get; init; } = 1f;
 
     public IReadOnlyList<string> Dependencies { get; init; } = [];
@@ -79,6 +81,8 @@ public sealed record MaterialSourceDefinition
     public float EmissiveMultiplier { get; init; } = 1f;
 
     public float[] UvScale { get; init; } = [1f, 1f];
+
+    public float[] UvOffset { get; init; } = [0f, 0f];
 
     public IReadOnlyList<string> ReferencedTextureIds =>
         new[] { BaseColorTexture, NormalTexture, OrmTexture, EmissiveTexture }

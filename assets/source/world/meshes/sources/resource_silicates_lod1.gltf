@@ -5,19 +5,29 @@
   },
   "buffers": [
     {
-      "byteLength": 396,
-      "uri": "data:application/octet-stream;base64,5wCmvgAAAL8w8Ea+87vSvAAAAL9om2W+N3eKOwAAAL/QHZg9S6uWvgAAAL9AdNU9Ctcjvilcjz6PwnW9rTeUPQAAAL8v/O28XXmoPgAAAL8ts0o8AESTPgAAAL8LwYk+8Ij9PAAAAL9dF2k+7FE4Ph+F6z6PwvU9a8FivQAAAL93y8S+QE8oPgAAAL+obMq+opEzPgAAAL+12TO+47c1vQAAAL9Tlyi+j8J1PQrXoz0pXI++AAAAAAIAAAABAAAAAAAAAAMAAAACAAAAAAAAAAEAAAAEAAAAAQAAAAIAAAAEAAAAAgAAAAMAAAAEAAAAAwAAAAAAAAAEAAAABQAAAAcAAAAGAAAABQAAAAgAAAAHAAAABQAAAAYAAAAJAAAABgAAAAcAAAAJAAAABwAAAAgAAAAJAAAACAAAAAUAAAAJAAAACgAAAAwAAAALAAAACgAAAA0AAAAMAAAACgAAAAsAAAAOAAAACwAAAAwAAAAOAAAADAAAAA0AAAAOAAAADQAAAAoAAAAOAAAA"
+      "byteLength": 1752,
+      "uri": "data:application/octet-stream;base64,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"
     }
   ],
   "bufferViews": [
     {
       "buffer": 0,
       "byteOffset": 0,
-      "byteLength": 180
+      "byteLength": 576
     },
     {
       "buffer": 0,
-      "byteOffset": 180,
+      "byteOffset": 576,
+      "byteLength": 576
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1152,
+      "byteLength": 384
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1536,
       "byteLength": 216
     }
   ],
@@ -25,11 +35,23 @@
     {
       "bufferView": 0,
       "componentType": 5126,
-      "count": 15,
+      "count": 48,
       "type": "VEC3"
     },
     {
       "bufferView": 1,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
       "componentType": 5125,
       "count": 54,
       "type": "SCALAR"
@@ -40,9 +62,11 @@
       "primitives": [
         {
           "attributes": {
-            "POSITION": 0
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
           },
-          "indices": 1,
+          "indices": 3,
           "mode": 4
         }
       ]

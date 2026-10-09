@@ -220,9 +220,9 @@ The following budgets are tied to the measured current Vertical Slice and are en
 | Active terrain layers | 4 maximum | Production splat contract |
 | Terrain texture bindings / samples | 13 maximum | 1 control + 4 Base Color + 4 Normal + 4 ORM |
 | Canonical measured draw calls | 26 maximum | Matches both pre-texture and textured qualification evidence |
-| Peak resident texture payload bytes | 2 MiB maximum | Current measured value is 998,540 bytes; preserves approximately 2x Vertical Slice headroom |
+| Peak resident texture payload bytes | 4 MiB maximum | Concept surface completion measures 2,085,616 bytes in the canonical stress scene and 2,208,276 bytes in the full object/effect/state gallery |
 | Peak SRV descriptors | 512 maximum | Current measured value is 175; retains substantial headroom inside the 4,096-descriptor heap |
-| Compiled texture runtime footprint | 512 KiB maximum | Current measured texture payload footprint is 235,994 bytes |
+| Compiled gameplay texture runtime footprint | 3 MiB maximum | Concept surface completion measures 2,404,260 bytes, excluding the separately budgeted studio splash |
 | Texture/material binding failures | 0 | Invalid resource state is never an accepted baseline |
 | D3D12 debug-layer warnings/errors | 0 when the layer is available | New renderer warnings require investigation |
 | Static texture upload balance | uploads = live textures + released textures | Detects accidental repeated uploads or unbalanced lifetime accounting |
@@ -361,3 +361,9 @@ When a regression or expensive asset is found:
 8. Record any intentionally retained high-cost outlier with its gameplay/readability justification.
 
 This keeps optimization measurement-driven and prevents arbitrary content degradation.
+
+## Concept surface completion measurements
+
+The complete catalog contains 324 assets and 5,127,670 compiled bytes. Texture runtime footprint is 4,190,251 bytes including 1,785,991 studio-splash bytes; gameplay textures account for 2,404,260 bytes. The new bounded atlases provide all physical component surfaces, eight decals and the ten shared effect material families. The 3 MiB gameplay compilation budget and 4 MiB GPU residency budget reflect this measured content growth; studio splash retains its separate 3 MiB budget. Descriptor, terrain sample, upload balance and instance draw limits are unchanged.
+
+A native D3D12 gallery renders all thirteen buildings, seven units, twenty-six world features, thirty-six effects, twenty-four infrastructure state cases and eight construction/operational/damage cases: 114 visible instances and 118 textured runtime mesh submissions including state attachments, zero fallback meshes and zero material/texture binding failures. It loads 39 materials and thirteen asset textures, with 2,208,276 resident bytes including renderer fallback textures. A six-object LOD0 closeup also renders the articulated tank turret and confirms visible exterior roofs, armor and decals. The canonical 1,000-instance stress run on NVIDIA RTX PRO 5000 Blackwell at 1600 x 900 measures eleven instance draws plus eighteen visible terrain draws, 2,085,616 resident bytes and 5.865 ms completed GPU frame time. Windowed and 5120 x 2160 borderless startup qualification pass; the larger borderless frame measures 19.689 ms GPU time and is not a 60 FPS performance claim. The requested local D3D12 debug layer is unavailable, so local reports do not claim native debug-layer qualification. Hosted graphics qualification remains required.

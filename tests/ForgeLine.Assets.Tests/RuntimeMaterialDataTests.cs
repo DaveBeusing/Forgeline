@@ -20,7 +20,8 @@ public sealed class RuntimeMaterialDataTests
                   "metallicFactor": 0.25,
                   "roughnessFactor": 0.65,
                   "emissiveMultiplier": 2.5,
-                  "uvScale": [2.0, 3.0]
+                  "uvScale": [2.0, 3.0],
+                  "uvOffset": [0.25, -0.5]
                 }
                 """u8);
 
@@ -61,6 +62,7 @@ public sealed class RuntimeMaterialDataTests
                 2.0f,
                 3.0f),
             material.UvScale);
+        Assert.Equal(new Vector2(0.25f, -0.5f), material.UvOffset);
     }
 
     [Fact]
@@ -93,6 +95,7 @@ public sealed class RuntimeMaterialDataTests
         Assert.Equal(
             Vector2.One,
             material.UvScale);
+        Assert.Equal(Vector2.Zero, material.UvOffset);
     }
 
     [Fact]
@@ -119,5 +122,15 @@ public sealed class RuntimeMaterialDataTests
                       "uvScale": [1.0, 0.0]
                     }
                     """u8));
+    }
+
+    [Theory]
+    [InlineData("{\"uvOffset\":[1]}")]
+    [InlineData("{\"uvOffset\":[1,\"x\"]}")]
+    [InlineData("{\"uvOffset\":[1,2,3]}")]
+    public void InvalidAtlasOffsetFailsClearly(string json)
+    {
+        Assert.Throws<InvalidDataException>(() => RuntimeMaterialData.FromPayload(
+            System.Text.Encoding.UTF8.GetBytes(json)));
     }
 }

@@ -1,7 +1,7 @@
 {
   "id": "mesh.world.vegetation.grass_clump",
   "type": "mesh",
-  "source": "../sources/world_billboard.gltf",
+  "source": "../sources/mesh_world_vegetation_grass_clump.gltf",
   "materialReferences": [
     "material.world.vegetation"
   ],
