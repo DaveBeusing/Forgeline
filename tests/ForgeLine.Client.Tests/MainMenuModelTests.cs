@@ -71,8 +71,11 @@ public sealed class MainMenuModelTests
             "CONTROLS",
             view.Title);
         Assert.Equal(
-            10,
+            11,
             view.DetailLines.Count);
+        Assert.Equal("OPTIONAL GUIDE", view.DetailLines[^2].Label);
+        Assert.Contains("SHIFT+F12 SHOW / HIDE", view.DetailLines[^2].Value);
+        Assert.Contains("ONBOARDING SETTING", view.DetailLines[^2].Value);
         Assert.Contains(
             "W/A/S/D",
             view.DetailLines[0].Value);
