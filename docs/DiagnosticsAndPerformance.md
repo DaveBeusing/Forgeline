@@ -20,6 +20,10 @@ The invariant mechanism is intended for states that indicate engine correctness 
 
 ## Simulation Diagnostics
 
+The always-visible gameplay runtime readout is independent of opt-in simulation timing diagnostics. `ClientSimulationHost` increments an atomic counter only after `AdvanceOneTick` completes, including snapshot publication. Its copied telemetry contains session identity and running/paused/terminal state without exposing live ECS state. `ClientRenderHost` observes this counter and successful Present count with a monotonic clock; `RuntimeMetricsSampler` computes independent rates over 750 ms windows. No target tick rate, cumulative tick index, CPU duration estimate or synchronous GPU readback feeds these rates. Formatting uses a stack buffer and existing HUD glyph geometry.
+
+Native visual qualification reports also include HUD readiness, submitted HUD vertex count and the current runtime metrics view. Window-mode qualification requires a player-bound HUD with nonzero geometry. This proves composition and binding; the screen-space culling regression tests cover the winding fault, and the interactive checklist covers visual appearance and input behavior.
+
 `SimulationCoordinator` exposes opt-in diagnostics through `SimulationDiagnostics`.
 
 Diagnostics are disabled by default. Disabled diagnostics do not collect tick timing or allocation deltas and retain the allocation-free empty-tick behavior verified by the simulation tests.

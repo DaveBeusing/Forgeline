@@ -198,6 +198,10 @@ Default controls are W/A/S/D or Arrow Keys to pan, Q/E to rotate, R/F to change 
 
 The player-facing HUD is rendered through the existing lightweight overlay path but is independent from the Shift + F1 development metrics toggle.
 
+The top-right readout shows successful frame presentations per second (`FPS`) and completed simulation ticks per second (`SIM … TPS`). Independent 750 ms windows measure actual throughput, including missed render publications and stalled simulation ticks. Warm-up and unavailable observations show an em dash; paused and terminal simulation show `PAUSED` and `STOPPED`. Backgrounding, suspension, restart and gaps longer than two seconds clear stale readings. The readout reserves its own safe-area region beside the resource strip and does not capture world clicks.
+
+The HUD explicitly waits for a snapshot or player data before rendering authoritative resources. Screen-space panels and glyphs disable face culling and depth testing; the world renders first, followed by gameplay HUD, optional development diagnostics and modal frontend. Empty selection keeps its existing guidance, and contextual actions remain backed by the copied gameplay read models.
+
 It displays the current match state, elapsed time, core resource stock, local power generation/demand, local intelligence counts, owned selection details, Health/Fuel/Ammunition/readiness, building power/inventory information, construction or production progress, and current block reasons.
 
 Alerts are derived from authoritative state for constrained power, blocked production, critical supply, and Command Core damage/destruction. Enemy information is not obtained through raw UI-side entity inspection; intelligence summaries remain scoped to the local faction's intelligence store.

@@ -135,6 +135,15 @@ The packaged build is the qualification target. Do not substitute a repository-l
 - [ ] Restart once and verify that no prior session state survives.
 - [ ] Exit cleanly.
 
+## Gameplay HUD and runtime metrics qualification
+
+- [ ] Start a skirmish with development metrics hidden. Resources/power, empty-selection guidance, contextual commands, minimap and real alerts appear. Select a unit and a factory; inspector and production/supply actions reflect their actual state. F1/F12 and pause remain modal; Shift + F1 does not toggle the gameplay HUD.
+- [ ] At 800×600, 1280×720, 1920×1080 and ultrawide, repeat with 100/150/200% DPI and user UI scale. FPS/SIM remain within top-right margins, separate from resources and alerts, without covering command buttons.
+- [ ] Click the metric readout and adjacent gap, then action buttons and the minimap. Metrics/gap pass through to the world; buttons and enabled minimap consume their interactions without duplicate world selection/orders.
+- [ ] At 60/144 Hz and with changing render load, FPS follows successful presentations; SIM reports observed ticks per second, independent of FPS and cumulative tick index. Values warm up over 750 ms and update at that cadence; compare with a non-default tick-rate test session where available.
+- [ ] Pause/resume, alt-tab, minimize/restore, resize and move between monitors with different DPI. Resume starts a fresh sample window; unavailable rates show a dash and paused/terminal simulation does not retain a running TPS value. Modal menus retain priority over gameplay surfaces.
+- [ ] Restart and return to the menu, then start again. No previous match values or input capture persist; initial snapshot/player-data waiting state has no fabricated resources or actions.
+
 ## Selection and order feedback qualification
 
 - [ ] Select one vehicle and a large building: circular rings enclose each visual footprint and remain ground-aligned across slopes, camera yaw/pitch and near/far zoom. Construction/collision footprints retain their shapes.
