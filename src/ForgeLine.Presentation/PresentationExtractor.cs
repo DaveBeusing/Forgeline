@@ -177,7 +177,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 _vfxPool.Metrics,
                 strategicOverlay,
                 combatGroups,
-                _extraction is null ? null : PlayerHoverSummaryFactory.Capture(
+                _extraction is null || interaction.HoverSessionId != _extraction.Scenario.Simulation.SessionId
+                    ? null : PlayerHoverSummaryFactory.Capture(
                     context, _extraction, interaction.HoveredEntity)));
     }
 

@@ -506,6 +506,7 @@ internal sealed class ClientApplication
         bool returnHeld = false;
         bool pauseHeld = false;
         var helpController = new GameplayHelpController();
+        var hoverTooltip = new HoverTooltipController();
         bool helpPointerHeld = false;
         bool pauseMenuUpHeld = false;
         bool pauseMenuDownHeld = false;
@@ -967,6 +968,8 @@ internal sealed class ClientApplication
             if (shouldPauseForWindow ||
                 shellBlocksGameplay || modalFrame || shellChanged || !window.IsFocused)
             {
+                hoverTooltip.Reset();
+                presentationInteraction.SetHover(EntityId.Invalid, SimulationSessionId.None);
                 actionPanel.Close();
                 tacticalTargetingController.Cancel();
                 debugDraw.Clear();
@@ -1447,6 +1450,14 @@ internal sealed class ClientApplication
                     MinimapCameraDragging:
                         minimapInteraction.View.IsCameraDragging);
 
+            HoverTooltipView tooltipView = hoverTooltip.Update(inputState, currentSnapshot,
+                selectionController.HoveredEntity, camera, interactionLayout, actionPanelView,
+                selectionController.IsDragSelecting || buildingPlacementController.IsActive ||
+                tacticalTargetingView.Mode != TacticalTargetingMode.None || simulationPaused ||
+                !window.IsFocused || window.IsMinimized,
+                hudInteraction.PointerCaptured, frameElapsed);
+            presentationInteraction.SetHover(tooltipView.Entity, tooltipView.SessionId);
+
             _ = renderHost.Publish(
                 new ClientRenderFrame(
                     camera.CaptureState(),
@@ -1469,7 +1480,8 @@ internal sealed class ClientApplication
                         window.IsMinimized,
                     CombatGroups:
                         combatGroupOverview,
-                    MetricsActive: window.IsFocused && !window.IsMinimized));
+                    MetricsActive: window.IsFocused && !window.IsMinimized,
+                    HoverTooltip: tooltipView));
 
             if (_platform.Clock.GetElapsedTime(nextDiagnosticAt, now) >= DiagnosticInterval)
             {
