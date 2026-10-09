@@ -296,12 +296,10 @@ public sealed class RtsMinimapInteractionController
         bool secondaryDown =
             input.IsMouseButtonDown(
                 PlatformMouseButton.Right);
-        bool primaryPressed =
-            primaryDown &&
-            !_primaryWasDown;
-        bool secondaryPressed =
-            secondaryDown &&
-            !_secondaryWasDown;
+        bool hasPrimaryPress = input.TryGetMousePressPosition(PlatformMouseButton.Left, out Vector2 primaryOrigin);
+        bool hasSecondaryPress = input.TryGetMousePressPosition(PlatformMouseButton.Right, out Vector2 secondaryOrigin);
+        bool primaryPressed = (hasPrimaryPress || primaryDown) && !_primaryWasDown;
+        bool secondaryPressed = (hasSecondaryPress || secondaryDown) && !_secondaryWasDown;
 
         if (!minimapEnabled)
         {
@@ -330,6 +328,10 @@ public sealed class RtsMinimapInteractionController
             RtsMinimapInteractionLayout.GetSelectorRect(
                 layout).Contains(
                 input.PointerPosition);
+
+        bool primaryStartedInMap = !hasPrimaryPress || RtsMinimapInteractionLayout.GetMapRect(layout).Contains(primaryOrigin);
+        bool secondaryStartedInMap = !hasSecondaryPress || RtsMinimapInteractionLayout.GetMapRect(layout).Contains(secondaryOrigin);
+        bool primaryStartedInSelector = !hasPrimaryPress || RtsMinimapInteractionLayout.GetSelectorRect(layout).Contains(primaryOrigin);
 
         PointerCaptured =
             pointerInHud ||
@@ -365,6 +367,7 @@ public sealed class RtsMinimapInteractionController
             _cameraDragging = false;
         }
         else if (primaryPressed &&
+                 primaryStartedInSelector &&
                  pointerInSelector &&
                  RtsMinimapInteractionLayout.TryHitOverlay(
                      input.PointerPosition,
@@ -381,6 +384,7 @@ public sealed class RtsMinimapInteractionController
             _cameraDragging = false;
 
             if (primaryPressed &&
+                primaryStartedInMap &&
                 pointerInMap &&
                 hasWorldTarget &&
                 TryCreateTacticalRequest(
@@ -399,6 +403,7 @@ public sealed class RtsMinimapInteractionController
         else
         {
             if (primaryPressed &&
+                primaryStartedInMap &&
                 pointerInMap &&
                 hasWorldTarget)
             {
@@ -416,6 +421,7 @@ public sealed class RtsMinimapInteractionController
             }
 
             if (secondaryPressed &&
+                secondaryStartedInMap &&
                 pointerInMap &&
                 hasWorldTarget &&
                 selectedEntities.Count > 0)
