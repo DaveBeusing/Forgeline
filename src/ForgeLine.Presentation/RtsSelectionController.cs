@@ -23,6 +23,9 @@ public sealed class RtsSelectionController
     private Vector2 _selectionCurrent;
     private MovementOrderRequest? _pendingMovementRequest;
     private SimulationSessionId _sessionId;
+    private int _viewportWidth;
+    private int _viewportHeight;
+    private float _pointerScale;
 
     public RtsSelectionController(SelectionFilter filter)
     {
@@ -91,7 +94,14 @@ public sealed class RtsSelectionController
         bool rightDown =
             input.IsMouseButtonDown(PlatformMouseButton.Right);
 
-        if (pointerCaptured || input.FocusLostThisFrame || viewportWidth <= 0 || viewportHeight <= 0)
+        float normalizedScale = float.IsFinite(pointerScale) ? Math.Clamp(pointerScale, 0.5f, 4.0f) : 1.0f;
+        bool displayChangedDuringGesture = _selectionGestureActive &&
+            (_viewportWidth != viewportWidth || _viewportHeight != viewportHeight || _pointerScale != normalizedScale);
+        _viewportWidth = viewportWidth;
+        _viewportHeight = viewportHeight;
+        _pointerScale = normalizedScale;
+
+        if (pointerCaptured || input.FocusLostThisFrame || displayChangedDuringGesture || viewportWidth <= 0 || viewportHeight <= 0)
         {
             _pendingMovementRequest = null;
             PointerMovementTargetValid = false;
@@ -158,8 +168,7 @@ public sealed class RtsSelectionController
         {
             _selectionGestureActive = true;
             _dragThresholdCrossed = false;
-            _dragThreshold = DragThresholdPixels *
-                (float.IsFinite(pointerScale) ? Math.Clamp(pointerScale, 0.5f, 4.0f) : 1.0f);
+            _dragThreshold = DragThresholdPixels * normalizedScale;
             _selectionStart = leftPressed ? pressPosition : pointer;
             _selectionCurrent = pointer;
             UpdateDragThreshold();
