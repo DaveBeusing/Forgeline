@@ -13,8 +13,7 @@ public sealed class DebugDrawRenderer : IDisposable
     private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers = new(4);
-    private readonly DebugVertex[] _vertices =
-        new DebugVertex[MaxLines * 2];
+    private readonly DebugVertex[] _vertices;
     private bool _disposed;
     private readonly ScreenLineVertex[]? _screenVertices;
     private readonly float _lineWidthPixels;
@@ -32,12 +31,13 @@ public sealed class DebugDrawRenderer : IDisposable
             throw new ArgumentOutOfRangeException(nameof(lineWidthPixels));
         }
         _lineWidthPixels = lineWidthPixels;
+        _vertices = lineWidthPixels > 0.0f ? [] : new DebugVertex[MaxLines * 2];
         if (lineWidthPixels > 0.0f)
         {
             _screenVertices = new ScreenLineVertex[MaxLines * 6];
         }
         _pipeline =
-            _screenVertices is not null ? CreateScreenLinePipeline(graphics) : CreatePipeline(
+            _screenVertices is not null ? CreateScreenLinePipeline(graphics, depthEnabled) : CreatePipeline(
                 graphics,
                 depthEnabled);
     }
@@ -186,7 +186,7 @@ public sealed class DebugDrawRenderer : IDisposable
         LastDiagnostics = new(lines.Length, vertexCount / 6, lines.Length - vertexCount / 6, vertexCount > 0 ? 1 : 0);
     }
 
-    private static IGraphicsPipeline CreateScreenLinePipeline(IGraphicsDevice graphics)
+    private static IGraphicsPipeline CreateScreenLinePipeline(IGraphicsDevice graphics, bool depthEnabled)
     {
         const string source = """
             struct VertexInput { float4 Position : POSITION; float4 Color : COLOR0; float2 Edge : TEXCOORD0; };
@@ -213,7 +213,7 @@ public sealed class DebugDrawRenderer : IDisposable
             ],
             CullMode = GraphicsCullMode.None,
             AlphaBlendEnabled = true,
-            DepthEnabled = false
+            DepthEnabled = depthEnabled
         });
     }
 

@@ -89,6 +89,9 @@ public sealed class SelectionOverlayRenderingTests
             Assert.True(HudInteractionContext.BlocksWorldPointer(new(rect.X + 1, rect.Y + 1), layout, true));
         }
         Assert.False(HudInteractionContext.BlocksWorldPointer(new(960, 540), layout, true));
+        Vector2 beneathCollapsedDock = new(layout.ActionDock.X + 1, layout.ActionDock.Y + 70f * layout.Scale);
+        Assert.False(HudInteractionContext.BlocksWorldPointer(beneathCollapsedDock, layout, true, actionDockExpanded: false));
+        Assert.True(HudInteractionContext.BlocksWorldPointer(beneathCollapsedDock, layout, true));
     }
 
     [StructLayout(LayoutKind.Sequential)]

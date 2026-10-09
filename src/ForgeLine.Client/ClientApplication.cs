@@ -1131,12 +1131,12 @@ internal sealed class ClientApplication
             if (inputState.HasPointerPosition)
             {
                 bool hudPointer = HudInteractionContext.BlocksWorldPointer(
-                    inputState.PointerPosition, interactionLayout, informationLayer.MinimapEnabled);
+                    inputState.PointerPosition, interactionLayout, informationLayer.MinimapEnabled, actionPanel.IsOpen);
                 ReadOnlySpan<PlatformMouseButton> pointerButtons = [PlatformMouseButton.Left, PlatformMouseButton.Right];
                 foreach (PlatformMouseButton button in pointerButtons)
                 {
                     hudPointer |= inputState.TryGetMousePressPosition(button, out Vector2 press) &&
-                        HudInteractionContext.BlocksWorldPointer(press, interactionLayout, informationLayer.MinimapEnabled);
+                        HudInteractionContext.BlocksWorldPointer(press, interactionLayout, informationLayer.MinimapEnabled, actionPanel.IsOpen);
                 }
                 hudInteraction.CapturePointer(hudPointer);
             }
@@ -1281,6 +1281,7 @@ internal sealed class ClientApplication
                             SimulationTick.Zero);
                 }
 
+                bool placementWasActive = buildingPlacementController.IsActive;
                 if (!tacticalTargetingController.IsActive)
                 {
                     buildingPlacementController.Update(
@@ -1294,7 +1295,14 @@ internal sealed class ClientApplication
                     hudInteraction.PointerCaptured);
                 }
 
-                if (!buildingPlacementController.IsActive)
+                bool placementCaptured = placementWasActive || buildingPlacementController.IsActive;
+                if (placementCaptured)
+                {
+                    selectionController.Update(inputState, camera, renderWorld, terrainWorld,
+                        window.ClientSize.Width, window.ClientSize.Height, renderAlpha,
+                        pointerCaptured: true, pointerScale: interactionLayout.Scale);
+                }
+                else
                 {
                     selectionController.Update(
                         inputState,
