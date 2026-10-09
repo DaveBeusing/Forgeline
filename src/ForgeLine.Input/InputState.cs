@@ -80,6 +80,12 @@ public sealed class InputState
                 _focusLostThisFrame = true;
                 break;
 
+            case PlatformInputEventKind.PointerLeft:
+                _hasPointerPosition = false;
+                _pointerDelta = Vector2.Zero;
+                _mouseButtonsDown.Clear();
+                break;
+
             default:
                 throw new ArgumentOutOfRangeException(
                     nameof(inputEvent),

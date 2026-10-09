@@ -827,6 +827,20 @@ internal sealed class ClientApplication
             if (helpChanged || shellChanged || inputState.FocusLostThisFrame)
             {
                 inputState.SuppressHeldInput();
+                pauseHeld = false;
+                returnHeld = false;
+                restartHeld = false;
+                overlayToggleHeld = false;
+                formationToggleHeld = false;
+                strategicOverlayToggleHeld = false;
+                minimapToggleHeld = false;
+                debugMasterToggleHeld = false;
+                debugNavigationToggleHeld = false;
+                debugWorldToggleHeld = false;
+                debugLogisticsToggleHeld = false;
+                debugSensorsToggleHeld = false;
+                debugCombatToggleHeld = false;
+                debugEntitiesToggleHeld = false;
                 selectionController.CancelPointerInteraction();
                 minimapInteraction.Reset();
                 combatGroupInput.Reset();

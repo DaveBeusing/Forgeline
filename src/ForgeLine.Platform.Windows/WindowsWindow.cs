@@ -406,7 +406,22 @@ internal sealed class WindowsWindow : IWindow
 
             case WindowsNative.WmMouseMove:
                 (int moveX, int moveY) = DecodePointerPosition(lParam);
+                var tracking = new WindowsNative.MouseTracking
+                {
+                    Size = WindowsNative.MouseTrackingSize,
+                    Flags = WindowsNative.TmeLeave,
+                    Window = _handle
+                };
+                if (WindowsNative.TrackMouseEvent(ref tracking) == 0)
+                {
+                    _inputEvents.Enqueue(PlatformInputEvent.PointerLeft());
+                    return 0;
+                }
                 _inputEvents.Enqueue(PlatformInputEvent.PointerMoved(moveX, moveY));
+                return 0;
+
+            case WindowsNative.WmMouseLeave:
+                _inputEvents.Enqueue(PlatformInputEvent.PointerLeft());
                 return 0;
 
             case WindowsNative.WmMouseWheel:

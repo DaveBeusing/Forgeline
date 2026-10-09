@@ -8,7 +8,8 @@ public enum PlatformInputEventKind
     MouseButtonUp = 3,
     PointerMoved = 4,
     MouseWheel = 5,
-    FocusLost = 6
+    FocusLost = 6,
+    PointerLeft = 7
 }
 
 public readonly record struct PlatformInputEvent(
@@ -55,4 +56,8 @@ public readonly record struct PlatformInputEvent(
             0,
             0,
             0);
+
+    public static PlatformInputEvent PointerLeft() =>
+        new(PlatformInputEventKind.PointerLeft, PlatformKey.Unknown,
+            PlatformMouseButton.None, 0, 0, 0);
 }
