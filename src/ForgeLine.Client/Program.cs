@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using ForgeLine.Platform.Windows;
+using ForgeLine.Presentation;
 
 namespace ForgeLine.Client;
 
@@ -27,6 +28,10 @@ internal static class Program
 
         bool skipSplash = args.Any(argument =>
             string.Equals(argument, "--skip-splash", StringComparison.OrdinalIgnoreCase));
+        RtsReferenceZoom referenceZoom = RtsReferenceZoom.NormalGameplay;
+        for (int index = 0; index < args.Length - 1; index++)
+            if (string.Equals(args[index], "--reference-zoom", StringComparison.OrdinalIgnoreCase))
+                referenceZoom = Enum.Parse<RtsReferenceZoom>(args[++index], ignoreCase: true);
 
         string? diagnosticsOutput = null;
         for (int index = 0; index < args.Length - 1; index++)
@@ -66,7 +71,7 @@ internal static class Program
                 var application =
                     new ClientApplication(
                         platform,
-                        settingsLoad.Settings,
+                        settingsLoad.Settings with { ReferenceZoom = referenceZoom },
                         settingsLoad.Path,
                         startup);
                 int result =
@@ -132,6 +137,17 @@ internal static class Program
         for (int index = 0; index < args.Length; index++)
         {
             string argument = args[index];
+
+            if (string.Equals(argument, "--reference-zoom", StringComparison.OrdinalIgnoreCase))
+            {
+                if (index + 1 >= args.Length ||
+                    !Enum.TryParse(args[++index], true, out RtsReferenceZoom zoom) || !Enum.IsDefined(zoom))
+                {
+                    Console.Error.WriteLine("--reference-zoom requires CloseTactical, NormalGameplay or Strategic.");
+                    return false;
+                }
+                continue;
+            }
 
             if (string.Equals(argument, "--startup-diagnostics-output", StringComparison.OrdinalIgnoreCase))
             {
@@ -234,6 +250,7 @@ internal static class Program
             "ForgeLine.Client [--smoke-test] [--render-stress <instances>] " +
             "[--visual-qualification-output <report.json>] " +
             "[--settings-root <directory>] [--skip-splash] " +
-            "[--startup-diagnostics-output <report.json>]");
+            "[--startup-diagnostics-output <report.json>] " +
+            "[--reference-zoom <CloseTactical|NormalGameplay|Strategic>]");
     }
 }

@@ -1637,6 +1637,7 @@ internal sealed class ClientApplication
                     {
                         path =
                             _settingsPath,
+                        referenceZoom = _settings.ReferenceZoom.ToString(),
                         requestedMode =
                             _settings.BorderlessFullscreen
                                 ? WindowMode.BorderlessFullscreen.ToString()
