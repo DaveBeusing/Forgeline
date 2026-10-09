@@ -1,5 +1,13 @@
 # Match Flow and Player Experience
 
+## Completed-tick hover inspection
+
+`PresentationInteractionState.SetHover` publishes the render owner's full-generation entity identity and observing session. `PresentationExtractor` captures at most one `PlayerHoverSummary` per completed tick, ignoring mismatched-session requests and destroyed/stale entities. The summary travels inside the same immutable `PresentationSnapshot` as instances, intelligence and player actions; UI does not poll ECS. Owned summaries reuse the ownership-filtered `PlayerExperienceSnapshotFactory.CaptureSelection` copier without changing actual selection.
+
+Authorization precedes publication: deposit facts require current visible terrain, foreign entities require current faction identification, and private operational facts are copied only for local ownership. Detected contact tooltip content comes solely from current opaque `FactionIntelligenceSnapshot` contacts and has no entity summary or unit identity. The tooltip resolver checks copied tick/session/entity identity and current instance/contact presence again to discard delayed responses. Retained snapshots remain immutable, but stale summaries cannot be displayed against a new tick/session or a reused entity index.
+
+`HoverTooltipController` owns presentation delay/cancellation. `ClientRenderFrame` carries its immutable view to `WorldHoverTooltipSurface`, the last gameplay HUD surface. World and dock domain resolvers share its bounded panel, existing glyphs and visual style; modal frontend surfaces remain above it. Tooltip state and text are transient and never enter simulation/savegames. See [hover controls and information visibility](SelectionAndCommandInteraction.md#hover-tooltips).
+
 ## Purpose
 
 The vertical-slice match flow turns the existing FORGELINE simulation systems into one complete skirmish lifecycle. Match authority remains inside simulation state; the client only submits commands and renders player-specific read models.

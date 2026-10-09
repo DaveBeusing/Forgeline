@@ -30,6 +30,12 @@ internal static class Program
             return;
         }
 
+        if (args is ["--hover-hotpaths", string hoverOutput])
+        {
+            HoverHotPathMeasurements.Run(hoverOutput);
+            return;
+        }
+
         BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
     }
 }
