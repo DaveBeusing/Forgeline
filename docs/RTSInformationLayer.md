@@ -344,3 +344,5 @@ The initial capability hook is exercised by Combat Engineer production, which re
 
 Selection marquee and short-lived order markers follow the frame-owned interaction contract in [Selection and Command Interaction](SelectionAndCommandInteraction.md). Player world lines use bounded reusable screen-expanded geometry with soft alpha edges; the marquee uses clipped fill plus contrast outlines. These visuals do not certify authoritative command acceptance.
 
+The information renderer rebuilds minimap symbols, selection/group membership and fog cells in render-owner scratch collections. Each update clears prior contents while retaining capacity, including across session replacement. Borrowed frame lists are consumed immediately by that renderer and never published. The public `RtsMinimapModelBuilder.Build` still returns an owned immutable copy for external callers; both paths use the same mapping rules. See [Interaction qualification](InteractionQualification.md) for state/display coverage and the warm allocation guard.
+
