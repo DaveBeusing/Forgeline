@@ -504,7 +504,7 @@ internal sealed class ClientApplication
         bool restartHeld = false;
         bool returnHeld = false;
         bool pauseHeld = false;
-        bool helpHeld = false;
+        var helpController = new GameplayHelpController();
         bool pauseMenuUpHeld = false;
         bool pauseMenuDownHeld = false;
         bool pauseMenuEnterHeld = false;
@@ -574,57 +574,51 @@ internal sealed class ClientApplication
                 frameElapsed.TotalSeconds,
                 MaximumCameraDeltaSeconds);
 
-            UpdateToggle(
-                inputState,
-                PlatformKey.F1,
-                ref overlayToggleHeld,
-                ref overlayEnabled);
-            UpdateDebugOverlayToggles(
-                inputState,
-                debugOverlay,
-                ref debugMasterToggleHeld,
-                ref debugNavigationToggleHeld,
-                ref debugWorldToggleHeld,
-                ref debugLogisticsToggleHeld,
-                ref debugSensorsToggleHeld,
-                ref debugCombatToggleHeld,
-                ref debugEntitiesToggleHeld);
-            UpdateFormationSelection(
-                inputState,
-                ref formationToggleHeld,
-                ref activeFormation);
-
-            if (ConsumeKeyPress(
-                    inputState,
-                    PlatformKey.F10,
-                    ref strategicOverlayToggleHeld))
+            bool wasShellBlocking = pauseMenuActive || helpVisible;
+            bool helpChanged = helpController.Update(inputState, !pauseMenuActive);
+            helpVisible = helpController.Visible;
+            bool modalFrame = wasShellBlocking || helpController.BlocksGameplayThisFrame;
+            bool metricsDown = inputState.IsKeyDown(PlatformKey.F1) &&
+                (inputState.IsKeyDown(PlatformKey.LeftShift) || inputState.IsKeyDown(PlatformKey.RightShift));
+            if (!modalFrame && metricsDown && !overlayToggleHeld)
+                overlayEnabled = !overlayEnabled;
+            overlayToggleHeld = metricsDown;
+            if (!modalFrame)
             {
-                informationLayer.CycleOverlay();
-            }
-
-            if (ConsumeKeyPress(
+                UpdateDebugOverlayToggles(
                     inputState,
-                    PlatformKey.F11,
-                    ref minimapToggleHeld))
-            {
-                informationLayer.ToggleMinimap();
-            }
-
-            bool helpPressed =
-                ConsumeKeyPress(
+                    debugOverlay,
+                    ref debugMasterToggleHeld,
+                    ref debugNavigationToggleHeld,
+                    ref debugWorldToggleHeld,
+                    ref debugLogisticsToggleHeld,
+                    ref debugSensorsToggleHeld,
+                    ref debugCombatToggleHeld,
+                    ref debugEntitiesToggleHeld);
+                UpdateFormationSelection(
                     inputState,
-                    PlatformKey.F12,
-                    ref helpHeld);
+                    ref formationToggleHeld,
+                    ref activeFormation);
 
-            if (!pauseMenuActive &&
-                helpPressed)
-            {
-                helpVisible =
-                    !helpVisible;
+                if (ConsumeKeyPress(
+                        inputState,
+                        PlatformKey.F10,
+                        ref strategicOverlayToggleHeld))
+                {
+                    informationLayer.CycleOverlay();
+                }
+
+                if (ConsumeKeyPress(
+                        inputState,
+                        PlatformKey.F11,
+                        ref minimapToggleHeld))
+                {
+                    informationLayer.ToggleMinimap();
+                }
             }
 
             bool pausePressed =
-                ConsumeKeyPress(
+                !helpController.BlocksGameplayThisFrame && ConsumeKeyPress(
                     inputState,
                     PlatformKey.Space,
                     ref pauseHeld);
@@ -636,12 +630,12 @@ internal sealed class ClientApplication
                 informationLayer.OverlayMode);
 
             bool restartPressed =
-                ConsumeKeyPress(
+                !modalFrame && ConsumeKeyPress(
                     inputState,
                     PlatformKey.R,
                     ref restartHeld);
             bool returnPressed =
-                ConsumeKeyPress(
+                !helpController.BlocksGameplayThisFrame && ConsumeKeyPress(
                     inputState,
                     PlatformKey.Escape,
                     ref returnHeld);
@@ -829,11 +823,23 @@ internal sealed class ClientApplication
                         PlatformMouseButton.Left);
             }
 
+            bool shellChanged = wasShellBlocking != (pauseMenuActive || helpVisible);
+            if (helpChanged || shellChanged || inputState.FocusLostThisFrame)
+            {
+                inputState.SuppressHeldInput();
+                selectionController.CancelPointerInteraction();
+                minimapInteraction.Reset();
+                combatGroupInput.Reset();
+                actionPanel.Close();
+                tacticalTargetingController.Cancel();
+                buildingPlacementController.Cancel(presentationInteraction);
+            }
+
             PreAlphaUxView preAlphaUx =
                 CreatePreAlphaUxView(
                     false,
                     false,
-                    helpVisible,
+                    false,
                     _settings.ShowOnboarding &&
                     !smokeTest);
 
@@ -926,7 +932,7 @@ internal sealed class ClientApplication
             }
 
             if (shouldPauseForWindow ||
-                shellBlocksGameplay)
+                shellBlocksGameplay || modalFrame || shellChanged || !window.IsFocused)
             {
                 actionPanel.Close();
                 tacticalTargetingController.Cancel();
@@ -942,7 +948,7 @@ internal sealed class ClientApplication
                         FrontendSurfaceView controlsSurface =
                             FrontendPresentationAdapter.Controls(
                                 _settings.CameraBindings,
-                                "ESC  BACK TO PAUSE");
+                                "ESC  BACK TO PAUSE", _settings.EdgeScrollEnabled);
                         FrontendLayout pauseLayout =
                             FrontendDesign.ResolveLayout(
                                 window.ClientSize.Width,
@@ -980,6 +986,11 @@ internal sealed class ClientApplication
                                 false,
                                 false);
                     }
+                }
+                else if (helpVisible)
+                {
+                    frontendSurface = FrontendPresentationAdapter.Controls(
+                        _settings.CameraBindings, "F1 / F12 / ESC  CLOSE", _settings.EdgeScrollEnabled);
                 }
 
                 _ = renderHost.Publish(
@@ -1131,19 +1142,7 @@ internal sealed class ClientApplication
             if (!hudInteraction.KeyboardCaptured)
             {
                 RtsCameraInputFrame cameraInput =
-                    actionMapper.Map(inputState);
-
-                if (hudInteraction.PointerCaptured)
-                {
-                    cameraInput =
-                        cameraInput with
-                        {
-                            DragPan = false,
-                            HasPointerPosition = false,
-                            PointerDelta =
-                                Vector2.Zero
-                        };
-                }
+                    actionMapper.Map(inputState, hudInteraction.PointerCaptured);
 
                 camera.Update(
                     cameraInput,

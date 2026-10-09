@@ -61,7 +61,7 @@ public sealed class MainMenuModelTests
             "CONTROLS",
             view.Title);
         Assert.Equal(
-            8,
+            9,
             view.DetailLines.Count);
         Assert.Contains(
             "W/A/S/D",
@@ -73,7 +73,7 @@ public sealed class MainMenuModelTests
             "F1 / F2 / F3",
             view.DetailLines[4].Label);
         Assert.Contains(
-            "METRICS",
+            "HELP",
             view.DetailLines[4].Value);
         Assert.Contains(
             "WORLD DEBUG",

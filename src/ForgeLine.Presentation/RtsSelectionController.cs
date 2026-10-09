@@ -48,6 +48,15 @@ public sealed class RtsSelectionController
 
     public Vector2 DragCurrent => _selectionCurrent;
 
+    public void CancelPointerInteraction()
+    {
+        _selectionGestureActive = false;
+        _pendingMovementRequest = null;
+        _leftWasDown = false;
+        _rightWasDown = false;
+        HoveredEntity = EntityId.Invalid;
+    }
+
     public void Update(
         InputState input,
         RtsCamera camera,

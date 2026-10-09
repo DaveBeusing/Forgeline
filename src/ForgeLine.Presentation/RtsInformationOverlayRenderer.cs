@@ -872,7 +872,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 EmitSystemPanel(
                     "MATCH SETUP",
                     "ENTER START  ESC EXIT",
-                    "F12 CONTROLS",
+                    "F1 CONTROLS",
                     layout,
                     width,
                     height);
@@ -882,7 +882,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 EmitSystemPanel(
                     "PAUSED",
                     "ESC OR SPACE RESUME",
-                    "F12 CONTROLS",
+                    "F1 CONTROLS",
                     layout,
                     width,
                     height);

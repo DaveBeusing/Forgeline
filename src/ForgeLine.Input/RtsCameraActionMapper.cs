@@ -12,7 +12,7 @@ public sealed class RtsCameraActionMapper
 
     public RtsCameraBindings Bindings { get; }
 
-    public RtsCameraInputFrame Map(InputState state)
+    public RtsCameraInputFrame Map(InputState state, bool pointerCaptured = false)
     {
         ArgumentNullException.ThrowIfNull(state);
 
@@ -42,11 +42,11 @@ public sealed class RtsCameraActionMapper
             pan,
             rotation,
             pitch,
-            state.WheelDelta / 120.0f,
-            state.IsMouseButtonDown(Bindings.DragPanButton),
-            state.HasPointerPosition,
+            pointerCaptured ? 0 : state.WheelDelta / 120.0f,
+            !pointerCaptured && state.IsMouseButtonDown(Bindings.DragPanButton),
+            !pointerCaptured && state.HasPointerPosition,
             state.PointerPosition,
-            state.PointerDelta);
+            pointerCaptured ? Vector2.Zero : state.PointerDelta);
     }
 
     private static bool IsEitherDown(
