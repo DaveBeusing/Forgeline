@@ -40,7 +40,8 @@ internal static class SelectionHotPathMeasurements
             Backend = "CPU input and picking; idle hover or two click edges selecting visible same-type units; excludes simulation, HUD geometry, GPU and Present",
             BuildVersion = typeof(RtsSelectionController).Assembly.GetName().Version?.ToString(),
             Runtime = RuntimeInformation.FrameworkDescription,
-            Warmup, Samples,
+            Warmup,
+            Samples,
             TimingPolicy = "Timing is observational; zero warm allocation and expected selection count are hard gates.",
             Results = results
         }, JsonOptions));
