@@ -40,10 +40,9 @@ internal static class PlayerSystemHudModel
             5 =>
                 "ESC OR SPACE PAUSE  SHIFT+F1 METRICS  F2 WORLD DEBUG",
             6 => "SHIFT+F12 SHOW / HIDE OPTIONAL MATCH GUIDE",
-            7 =>
-                "OBJECTIVE DESTROY THE ENEMY COMMAND CORE",
-            8 => "HOME BASE FOCUS  CTRL+DIGIT ASSIGN  DOUBLE DIGIT GROUP FOCUS",
-            9 => "SHIFT+CLICK REPEAT BUILD AFTER ACCEPTANCE  F9 ROTATE  ESC CANCEL",
+            7 => "HOME BASE FOCUS  CTRL+DIGIT ASSIGN  DOUBLE DIGIT GROUP FOCUS",
+            8 => "SHIFT+CLICK REPEAT BUILD AFTER ACCEPTANCE  F9 ROTATE  ESC CANCEL",
+            9 => "OBJECTIVE DESTROY THE ENEMY COMMAND CORE",
             _ =>
                 string.Empty
         };
