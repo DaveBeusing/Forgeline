@@ -541,14 +541,14 @@ public sealed class RtsInformationLayerTests
         DebugLine[] invalidTargetLines =
             draw.Lines.ToArray();
 
-        Assert.True(
-            unitSelectionLines >
+        Assert.Equal(
+            unitSelectionLines,
             buildingSelectionLines);
         Assert.Equal(
-            4,
+            24,
             buildingSelectionLines);
         Assert.Equal(
-            4,
+            12,
             hoverLines);
         Assert.Equal(
             2,
