@@ -1,6 +1,6 @@
 # Directorate concept surface atlas
 
-The original surface atlas follows the Directorate Concept Sheet V1 palette and functional material vocabulary: olive painted armor, graphite structural steel, rubber, canvas, blue sensor glass, restrained warning stripes, concrete and maintained wear. It is a shared original authoring texture guided by the concept palette and materials. The editable RGB source is 1254 x 1254. Existing tangent-normal texture families remain shared.
+The production surface atlas follows the Directorate palette and functional material vocabulary: olive painted armor, graphite structural steel, rubber, canvas, blue sensor glass, restrained warning stripes, concrete and maintained wear. Native 4096 x 4096 Base Color, Normal and ORM sources replace the historical 1254-pixel color/128-pixel numeric baseline. Historical sources remain editable references. See [Production surface masters](../../../../../docs/ProductionSurfaceMasters.md) for authoring, geometry and qualification policy.
 
 The 4 x 4 cells are, in row-major order:
 
@@ -13,7 +13,7 @@ The 4 x 4 cells are, in row-major order:
 
 Authored UV seams place each component inside its intended cell with a 0.018 normalized inset. Wheels/tracks use rubber; infantry and cargo coverings use canvas; sensor/cab faces use glass; barrels and hot process machinery use heat-treated metal; service access and barrier faces use warnings. Prop and vegetation primitives have their own UV layouts while preserving stable mesh, material and LOD IDs.
 
-`surface_orm.tga` is original numeric material data, not color imagery. It contains one AO/roughness/metalness triple per cell with the production R/G/B contract. Rubber, canvas, concrete, wood and vegetation have zero metalness; glass has a smoother response; exposed structural steel has higher metalness. The 128 x 128 map uses top-origin RGBA TGA storage. Its cell triples are:
+The historical `surface_orm.tga` is retained as reference data. Production ORM uses shared height/wear fields with the R = AO, G = roughness, B = metallic contract. Rubber, canvas, concrete, wood, glass and vegetation have zero metalness; glass has a smoother response; exposed structural steel has higher metalness. The old reference cell triples were:
 
 ```text
 (240,184,85) (240,152,220) (255,240,0) (255,245,0)
@@ -22,4 +22,4 @@ Authored UV seams place each component inside its intended cell with a 0.018 nor
 (240,245,0) (245,245,0) (245,245,0) (240,180,110)
 ```
 
-Offline compilation limits the color atlas to a maximum dimension of 512 (the authored odd dimension reduces to 313) and four mip levels. It remains RGBA8 because portable BC resources require aligned top-level dimensions. ORM uses three levels and BC7 linear storage: 21,504 resident bytes compared with 86,016 RGBA8 bytes. Retained terminal dimensions and UV insets limit filtering across neighboring cells. Runtime never reads PNG/TGA sources.
+Offline compilation derives BC7 Base Color at 2048, Normal at 1024 and ORM at 512. Their terminal mips retain 128 x 128 dimensions and existing UV insets protect neighboring cells. All atlas materials use the matching Normal atlas. Runtime never reads PNG/TGA sources. The three texture chains occupy 7,323,648 resident bytes; this is not a total VRAM metric.

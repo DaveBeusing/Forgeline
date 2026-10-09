@@ -84,10 +84,7 @@ public sealed class RtsUiAssetAuthoringTests
         try
         {
             AssetCompilationResult result =
-                AssetPipelineCompiler.Compile(
-                    Path.Combine(repositoryRoot, "assets", "source"),
-                    runtimeRoot,
-                    clean: true);
+                ProductionAssetFixture.CompileTo(runtimeRoot);
 
             Assert.True(
                 result.Success,
@@ -96,7 +93,7 @@ public sealed class RtsUiAssetAuthoringTests
                     result.Diagnostics.Select(
                         static diagnostic =>
                             $"{diagnostic.Code}: {diagnostic.Message}")));
-            Assert.Equal(324, result.CompiledCount);
+            Assert.Equal(325, result.CompiledCount);
             Assert.Equal(61, RequiredIds.Length);
             Assert.Equal(
                 RequiredIds.Length,

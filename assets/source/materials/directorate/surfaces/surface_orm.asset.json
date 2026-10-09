@@ -1,10 +1,11 @@
 {
   "id": "texture.directorate.surface.atlas_orm",
   "type": "texture",
-  "textureFormat": "bc7Unorm",
-  "source": "surface_orm.tga",
+  "source": "production_surface_orm.png",
   "textureUsage": "orm",
   "textureColorSpace": "linear",
-  "textureMaxDimension": 128,
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 512,
+  "textureFormat": "bc7Unorm",
   "textureMaxMipLevels": 3
 }
