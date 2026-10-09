@@ -15,6 +15,105 @@ public sealed class SelectionInteractionTests
     private static readonly PlayerId ForeignPlayer = new(2);
 
     [Fact]
+    public void ForeignHoverCannotSelectAndHiddenForeignObjectsCannotHover()
+    {
+        var camera = CreateCamera();
+        var foreign = new EntityId(51, 1);
+        var visible = Instance(foreign, Vector3.Zero, ForeignPlayer, ControllableEntityCategory.Unit);
+        var controller = new RtsSelectionController(new SelectionFilter(LocalPlayer, ControllableEntityCategory.Unit));
+        var input = new InputState();
+        input.Apply(PlatformInputEvent.PointerMoved(800, 450));
+        controller.Update(input, camera, CreateWorld(visible), new FlatTerrain(), 1600, 900, 1);
+        Assert.Equal(foreign, controller.HoveredEntity);
+        Assert.False(controller.CanSelectHoveredEntity);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Left, 800, 450));
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Left, 800, 450));
+        controller.Update(input, camera, CreateWorld(visible), new FlatTerrain(), 1600, 900, 1);
+        Assert.Equal(0, controller.Selection.Count);
+        input.BeginFrame();
+        controller.Update(input, camera, CreateWorld(visible with { Visibility = RenderVisibilityMask.None }), new FlatTerrain(), 1600, 900, 1);
+        Assert.False(controller.HoveredEntity.IsValid);
+    }
+
+    [Theory]
+    [InlineData(-1, -1)]
+    [InlineData(-1, 1)]
+    [InlineData(1, -1)]
+    [InlineData(1, 1)]
+    public void DragInEveryDirectionSelectsTheSameProjectedCenter(int xDirection, int yDirection)
+    {
+        var camera = CreateCamera();
+        var entity = new EntityId(41, 1);
+        var world = CreateWorld(Instance(entity, Vector3.Zero, LocalPlayer, ControllableEntityCategory.Unit));
+        var controller = new RtsSelectionController(new SelectionFilter(LocalPlayer, ControllableEntityCategory.Unit));
+        var input = new InputState();
+        int x = 800 - xDirection * 80;
+        int y = 450 - yDirection * 80;
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Left, x, y));
+        controller.Update(input, camera, world, new FlatTerrain(), 1600, 900, 1);
+        input.BeginFrame();
+        x = 800 + xDirection * 80;
+        y = 450 + yDirection * 80;
+        input.Apply(PlatformInputEvent.PointerMoved(x, y));
+        controller.Update(input, camera, world, new FlatTerrain(), 1600, 900, 1);
+        Assert.True(controller.IsDragSelecting);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Left, x, y));
+        controller.Update(input, camera, world, new FlatTerrain(), 1600, 900, 1);
+        Assert.True(controller.Selection.Contains(entity));
+        Assert.False(controller.IsDragSelecting);
+    }
+
+    [Fact]
+    public void DpiThresholdLatchesUntilReleaseAndFocusLossCancelsWithoutSelection()
+    {
+        var camera = CreateCamera();
+        var controller = new RtsSelectionController(new SelectionFilter(LocalPlayer, ControllableEntityCategory.Unit));
+        var world = CreateWorld();
+        var input = new InputState();
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Left, 700, 350));
+        controller.Update(input, camera, world, new FlatTerrain(), 1600, 900, 1, pointerScale: 2);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.PointerMoved(711, 350));
+        controller.Update(input, camera, world, new FlatTerrain(), 1600, 900, 1, pointerScale: 2);
+        Assert.False(controller.IsDragSelecting);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.PointerMoved(712, 350));
+        controller.Update(input, camera, world, new FlatTerrain(), 1600, 900, 1, pointerScale: 2);
+        Assert.True(controller.IsDragSelecting);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.PointerMoved(700, 350));
+        controller.Update(input, camera, world, new FlatTerrain(), 1600, 900, 1);
+        Assert.True(controller.IsDragSelecting);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.FocusLost());
+        input.Apply(PlatformInputEvent.PointerMoved(800, 450));
+        controller.Update(input, camera, world, new FlatTerrain(), 1600, 900, 1);
+        Assert.False(controller.IsDragSelecting);
+        Assert.Equal(0, controller.Selection.Count);
+    }
+
+    [Fact]
+    public void ClickAndReleaseBetweenUpdatesIsNotLost()
+    {
+        var camera = CreateCamera();
+        var entity = new EntityId(42, 1);
+        var world = CreateWorld(Instance(entity, Vector3.Zero, LocalPlayer, ControllableEntityCategory.Unit));
+        var controller = new RtsSelectionController(new SelectionFilter(LocalPlayer, ControllableEntityCategory.Unit));
+        var input = new InputState();
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Left, 800, 450));
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Left, 800, 450));
+        controller.Update(input, camera, world, new FlatTerrain(), 1600, 900, 1);
+        Assert.True(controller.Selection.Contains(entity));
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Right, 900, 450));
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Right, 900, 450));
+        controller.Update(input, camera, world, new FlatTerrain(), 1600, 900, 1);
+        Assert.True(controller.TryTakeMovementRequest(out _));
+    }
+
+    [Fact]
     public void ModalTransitionCancelsDragAndPendingOrdersWithoutClearingSelection()
     {
         var camera = CreateCamera();

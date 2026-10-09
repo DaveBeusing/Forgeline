@@ -40,6 +40,17 @@ public sealed class SelectionMarkerTests
     }
 
     [Fact]
+    public void MinimumZoomRadiusAndForeignHoverRemainDistinctWithoutColor()
+    {
+        var draw = new DebugDraw { Enabled = true };
+        RenderInstance instance = Instance(ControllableEntityCategory.Unit, new(1f));
+        RtsWorldMarkerVisualization.DrawHover(draw, instance, Vector4.One, minimumRadius: 8f, foreignOwned: true);
+        Assert.Equal(16, draw.Lines.Length);
+        Assert.All(draw.Lines.ToArray(), line =>
+            Assert.InRange(new Vector2(line.Start.X, line.Start.Z).Length(), 7.999f, 8.001f));
+    }
+
+    [Fact]
     public void ThousandSelectedObjectsFitExistingSingleBatchLineBudget()
     {
         var draw = new DebugDraw { Enabled = true };

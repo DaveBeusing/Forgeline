@@ -570,6 +570,8 @@ internal sealed class ClientApplication
             long now = _platform.Clock.GetTimestamp();
             TimeSpan frameElapsed = _platform.Clock.GetElapsedTime(previousFrameAt, now);
             previousFrameAt = now;
+            selectionController.CommandFeedback.Advance(frameElapsed);
+            tacticalTargetingController.CommandFeedback.Advance(frameElapsed);
 
             float cameraDeltaSeconds = (float)Math.Min(
                 frameElapsed.TotalSeconds,
@@ -1126,6 +1128,19 @@ internal sealed class ClientApplication
             hudInteraction.CapturePointer(
                 minimapInteraction.PointerCaptured);
 
+            if (inputState.HasPointerPosition)
+            {
+                bool hudPointer = HudInteractionContext.BlocksWorldPointer(
+                    inputState.PointerPosition, interactionLayout, informationLayer.MinimapEnabled);
+                ReadOnlySpan<PlatformMouseButton> pointerButtons = [PlatformMouseButton.Left, PlatformMouseButton.Right];
+                foreach (PlatformMouseButton button in pointerButtons)
+                {
+                    hudPointer |= inputState.TryGetMousePressPosition(button, out Vector2 press) &&
+                        HudInteractionContext.BlocksWorldPointer(press, interactionLayout, informationLayer.MinimapEnabled);
+                }
+                hudInteraction.CapturePointer(hudPointer);
+            }
+
             if (minimapInteraction.TryTakeMovementRequest(
                     out MovementOrderRequest minimapMovement))
             {
@@ -1144,6 +1159,7 @@ internal sealed class ClientApplication
                             minimapMovement.WorldTarget,
                             observedTick,
                             activeFormation));
+                selectionController.CommandFeedback.Show(minimapMovement.WorldTarget, valid: true);
             }
 
             if (minimapInteraction.TryTakeActionRequest(
@@ -1288,7 +1304,8 @@ internal sealed class ClientApplication
                         window.ClientSize.Width,
                         window.ClientSize.Height,
                         renderAlpha,
-                        hudInteraction.PointerCaptured);
+                        hudInteraction.PointerCaptured,
+                        interactionLayout.Scale);
 
                     if (selectionController.TryTakeMovementRequest(
                             out MovementOrderRequest movementRequest))
@@ -1355,6 +1372,10 @@ internal sealed class ClientApplication
                 selectionController,
                 buildingPlacementController,
                 tacticalTargetingView,
+                terrainWorld,
+                tacticalTargetingController.CommandFeedback,
+                MathF.Max(1.0f, camera.Distance * MathF.Tan(camera.Settings.VerticalFieldOfViewRadians * 0.5f) *
+                    12.0f * interactionLayout.Scale / Math.Max(1, window.ClientSize.Height)),
                 informationLayer.OverlayMode,
                 currentSnapshot?.StrategicOverlay);
 
@@ -1399,10 +1420,11 @@ internal sealed class ClientApplication
                         placementValid,
                         tacticalTargetingView.Mode,
                         tacticalTargetingView.PointerTargetValid,
-                        selectionController.HoveredEntity.IsValid,
+                        selectionController.CanSelectHoveredEntity,
                         selectionController.Selection.Count > 0,
                         actionPanel.Mode ==
-                            PlayerActionPanelMode.Supply));
+                            PlayerActionPanelMode.Supply,
+                        selectionController.PointerMovementTargetValid));
             var informationView =
                 new RtsInformationLayerView(
                     informationLayer.MinimapEnabled,
@@ -1851,6 +1873,9 @@ internal sealed class ClientApplication
         RtsSelectionController selectionController,
         RtsBuildingPlacementController buildingPlacementController,
         TacticalTargetingView tacticalTargeting,
+        ITerrainQuery terrain,
+        RtsCommandFeedback tacticalFeedback,
+        float minimumMarkerRadius,
         StrategicOverlayMode strategicOverlayMode,
         StrategicOverlaySnapshot? strategicOverlaySnapshot)
     {
@@ -1862,6 +1887,8 @@ internal sealed class ClientApplication
             selectionController.HoveredEntity.IsValid ||
             buildingPlacementController.IsActive ||
             tacticalTargeting.HasPointerTarget ||
+            tacticalFeedback.IsVisible ||
+            selectionController.CommandFeedback.IsVisible ||
             strategicOverlayMode !=
                 StrategicOverlayMode.None;
         gameplayDraw.Enabled =
@@ -1871,6 +1898,9 @@ internal sealed class ClientApplication
         {
             return;
         }
+
+        selectionController.CommandFeedback.Draw(gameplayDraw);
+        tacticalFeedback.Draw(gameplayDraw);
 
         Vector4 selectedColor =
             new(
@@ -1949,7 +1979,9 @@ internal sealed class ClientApplication
             RtsWorldMarkerVisualization.DrawSelected(
                 gameplayDraw,
                 instance,
-                selectedColor);
+                selectedColor,
+                terrain,
+                minimumMarkerRadius);
         }
 
         EntityId inspected =
@@ -1965,7 +1997,9 @@ internal sealed class ClientApplication
             RtsWorldMarkerVisualization.DrawHover(
                 gameplayDraw,
                 inspectedInstance,
-                selectedColor);
+                selectedColor,
+                terrain,
+                minimumMarkerRadius);
         }
 
         EntityId hovered =
@@ -1981,7 +2015,11 @@ internal sealed class ClientApplication
             RtsWorldMarkerVisualization.DrawHover(
                 gameplayDraw,
                 hoveredInstance,
-                hoveredColor);
+                hoveredInstance.Selectable.Owner.IsSpecified && hoveredInstance.Selectable.Owner != LocalPlayer
+                    ? new Vector4(1.0f, 0.45f, 0.2f, 1.0f) : hoveredColor,
+                terrain,
+                minimumMarkerRadius,
+                foreignOwned: hoveredInstance.Selectable.Owner.IsSpecified && hoveredInstance.Selectable.Owner != LocalPlayer);
         }
     }
 

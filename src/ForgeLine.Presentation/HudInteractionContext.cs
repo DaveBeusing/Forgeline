@@ -44,6 +44,12 @@ public sealed class HudInteractionContext
         in HudRect region) =>
         region.Contains(position);
 
+    public static bool BlocksWorldPointer(Vector2 position, in GameplayHudLayout layout, bool minimapEnabled) =>
+        layout.TopStatusBar.Contains(position) ||
+        layout.SelectionInspector.Contains(position) ||
+        layout.ActionDock.Contains(position) ||
+        (minimapEnabled && layout.Minimap.Contains(position));
+
     public void Reset()
     {
         _sessionId =

@@ -206,7 +206,8 @@ public readonly record struct RtsCursorContext(
     bool TacticalTargetValid,
     bool HoveredSelectable,
     bool HasSelection,
-    bool SupplyModeActive = false);
+    bool SupplyModeActive = false,
+    bool MovementTargetValid = true);
 
 public static class RtsCursorResolver
 {
@@ -263,7 +264,7 @@ public static class RtsCursorResolver
         }
 
         return context.HasSelection
-            ? RtsCursorKind.Move
+            ? (context.MovementTargetValid ? RtsCursorKind.Move : RtsCursorKind.Invalid)
             : RtsCursorKind.Default;
     }
 }

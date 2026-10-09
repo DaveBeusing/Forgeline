@@ -9,18 +9,36 @@ public static class RtsWorldMarkerVisualization
         DebugDraw draw,
         in RenderInstance instance,
         Vector4 color,
-        ITerrainQuery? terrain = null)
+        ITerrainQuery? terrain = null,
+        float minimumRadius = 1.0f)
     {
-        DrawRing(draw, instance, color, terrain, dashed: false);
+        DrawRing(draw, instance, color, terrain, dashed: false, minimumRadius);
     }
 
     public static void DrawHover(
         DebugDraw draw,
         in RenderInstance instance,
         Vector4 color,
-        ITerrainQuery? terrain = null)
+        ITerrainQuery? terrain = null,
+        float minimumRadius = 1.0f,
+        bool foreignOwned = false)
     {
-        DrawRing(draw, instance, color, terrain, dashed: true);
+        DrawRing(draw, instance, color, terrain, dashed: true, minimumRadius);
+        if (foreignOwned && draw.Enabled && (instance.Visibility & RenderVisibilityMask.World) != 0 &&
+            instance.Mesh.IsValid && instance.Material.IsValid)
+        {
+            Vector3 extents = PresentationBounds.ResolveLocalHalfExtents(instance);
+            float radius = MathF.Max(minimumRadius, new Vector2(extents.X, extents.Z).Length() * 1.08f);
+            Vector3 center = instance.Transform.Position;
+            float fallbackHeight = PresentationBounds.ResolveGroundPlaneY(instance);
+            for (int index = 0; index < 4; index++)
+            {
+                float angle = index * MathF.PI * 0.5f;
+                Vector2 direction = new(MathF.Cos(angle), MathF.Sin(angle));
+                draw.Line(GroundPoint(center.X + direction.X * radius, center.Z + direction.Y * radius, fallbackHeight, terrain),
+                    GroundPoint(center.X + direction.X * radius * 1.2f, center.Z + direction.Y * radius * 1.2f, fallbackHeight, terrain), color);
+            }
+        }
     }
 
     private static void DrawRing(
@@ -28,7 +46,8 @@ public static class RtsWorldMarkerVisualization
         in RenderInstance instance,
         Vector4 color,
         ITerrainQuery? terrain,
-        bool dashed)
+        bool dashed,
+        float minimumRadius)
     {
         ArgumentNullException.ThrowIfNull(draw);
         if (!draw.Enabled || (instance.Visibility & RenderVisibilityMask.World) == 0 ||
@@ -38,7 +57,8 @@ public static class RtsWorldMarkerVisualization
         }
 
         Vector3 extents = PresentationBounds.ResolveLocalHalfExtents(instance);
-        float radius = MathF.Max(1.0f, new Vector2(extents.X, extents.Z).Length() * 1.08f);
+        float radius = MathF.Max(float.IsFinite(minimumRadius) ? MathF.Max(1.0f, minimumRadius) : 1.0f,
+            new Vector2(extents.X, extents.Z).Length() * 1.08f);
         Vector3 center = instance.Transform.Position;
         float fallbackHeight = PresentationBounds.ResolveGroundPlaneY(instance);
         const int segments = 24;
