@@ -215,3 +215,5 @@ Terrain remains world/presentation state rather than simulation gameplay state. 
 Camera tests verify view-projected left/right and forward/backward movement after rotation, keyboard/edge equivalence, drag polarity, 60/144 Hz distance, zoom limits and resized viewport edges. Input tests cover focus loss, pointer leave/re-entry, HUD pointer capture and held-input suppression. Client tests cover first-press help, repeat suppression, F1/F12 and Escape close, Back dismissal and focus transitions. Selection tests cover modal drag cancellation with selection preserved. Frontend tests verify the complete controls text and footer at 1024x720, 1600x900 and 2560x1440, including raised UI scale and reusable buffer growth.
 
 Camera target navigation remains unbounded as before; zoom and pitch retain their configured bounds. No new map clamp or projection was introduced.
+
+The integrated controller journey covers keyboard/drag pan, zoom bounds, unit/building selection, commands, first-press help, focus recovery and display changes. See [Interaction qualification](InteractionQualification.md) for the state matrix, automated limits and manual display checklist.
