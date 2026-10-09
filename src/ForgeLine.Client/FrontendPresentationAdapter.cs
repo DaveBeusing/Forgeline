@@ -269,6 +269,9 @@ internal static class FrontendPresentationAdapter
                     "OBJECTIVE",
                     "DESTROY THE ENEMY COMMAND CORE"),
                 new FrontendDetailLineView(
+                    "OPTIONAL GUIDE",
+                    "SHIFT+F12 SHOW / HIDE  ONBOARDING SETTING CONTROLS DEFAULT"),
+                new FrontendDetailLineView(
                     "F10 / F11 / F12",
                     "STRATEGIC OVERLAY  MINIMAP  HELP  ESC/SPACE PAUSE")
             ],

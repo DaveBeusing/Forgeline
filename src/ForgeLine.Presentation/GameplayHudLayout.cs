@@ -208,7 +208,9 @@ public readonly record struct GameplayHudLayout(
                     0.0f,
                     selectionInspector.Y -
                     alertTop -
-                    margin));
+                    margin -
+                    MathF.Min(100 * MathF.Min(scale, 1.25f),
+                        MathF.Max(0, selectionInspector.Y - alertTop - margin) * 0.5f) - margin));
         var alertStack =
             new HudRect(
                 safeArea.X,

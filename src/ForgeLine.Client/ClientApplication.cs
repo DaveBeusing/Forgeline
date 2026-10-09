@@ -506,6 +506,8 @@ internal sealed class ClientApplication
         bool returnHeld = false;
         bool pauseHeld = false;
         var helpController = new GameplayHelpController();
+        var guidanceInteraction = new GameplayGuidanceInteraction();
+        var guidance = new EarlyGameGuidanceController();
         var hoverTooltip = new HoverTooltipController();
         bool helpPointerHeld = false;
         bool pauseMenuUpHeld = false;
@@ -580,6 +582,9 @@ internal sealed class ClientApplication
                 MaximumCameraDeltaSeconds);
 
             bool wasShellBlocking = pauseMenuActive || helpVisible;
+            guidanceInteraction.Update(inputState, renderWorld.CurrentSnapshot?.SessionId ?? SimulationSessionId.None,
+                _settings.ShowOnboarding && !smokeTest && !wasShellBlocking && window.IsFocused &&
+                renderWorld.CurrentSnapshot?.PlayerExperience is { IsMatchComplete: false });
             bool helpPointerDown = inputState.IsMouseButtonDown(PlatformMouseButton.Left);
             bool helpPointerPressed = helpPointerDown && !helpPointerHeld;
             helpPointerHeld = helpPointerDown;
@@ -597,7 +602,7 @@ internal sealed class ClientApplication
                 }
             }
             helpVisible = helpController.Visible;
-            bool modalFrame = wasShellBlocking || helpController.BlocksGameplayThisFrame;
+            bool modalFrame = wasShellBlocking || helpController.BlocksGameplayThisFrame || guidanceInteraction.BlocksGameplayThisFrame;
             bool metricsDown = inputState.IsKeyDown(PlatformKey.F1) &&
                 (inputState.IsKeyDown(PlatformKey.LeftShift) || inputState.IsKeyDown(PlatformKey.RightShift));
             if (!modalFrame && metricsDown && !overlayToggleHeld)
@@ -844,7 +849,7 @@ internal sealed class ClientApplication
             }
 
             bool shellChanged = wasShellBlocking != (pauseMenuActive || helpVisible);
-            if (helpChanged || shellChanged || inputState.FocusLostThisFrame)
+            if (helpChanged || shellChanged || inputState.FocusLostThisFrame || guidanceInteraction.BlocksGameplayThisFrame)
             {
                 inputState.SuppressHeldInput();
                 pauseHeld = false;
@@ -875,7 +880,7 @@ internal sealed class ClientApplication
                     false,
                     false,
                     _settings.ShowOnboarding &&
-                    !smokeTest);
+                    !smokeTest && !guidanceInteraction.Hidden);
 
             if (inputExperience?.MatchStatus ==
                     PlayerMatchStatus.Ended &&
@@ -1134,7 +1139,10 @@ internal sealed class ClientApplication
                 minimapInteraction.PointerCaptured);
 
             hudInteraction.CapturePointer(HudInteractionContext.CapturesWorldPointer(
-                inputState, interactionLayout, informationLayer.MinimapEnabled, actionPanel.Mode != PlayerActionPanelMode.Closed));
+                inputState, interactionLayout, informationLayer.MinimapEnabled, actionPanel.Mode != PlayerActionPanelMode.Closed,
+                buildingPlacementController.IsActive ||
+                (_settings.ShowOnboarding && !smokeTest && !guidanceInteraction.Hidden && inputSnapshot?.Guidance is not null &&
+                    !selectionController.IsDragSelecting && !tacticalTargetingController.IsActive)));
 
             if (minimapInteraction.TryTakeMovementRequest(
                     out MovementOrderRequest minimapMovement))
@@ -1457,6 +1465,15 @@ internal sealed class ClientApplication
                 !window.IsFocused || window.IsMinimized,
                 hudInteraction.PointerCaptured, frameElapsed);
             presentationInteraction.SetHover(tooltipView.Entity, tooltipView.SessionId);
+
+            preAlphaUx = preAlphaUx with
+            {
+                Guidance = guidance.Update(currentSnapshot, preAlphaUx.ShowOnboarding && !guidanceInteraction.Hidden,
+                    simulationPaused || !window.IsFocused || selectionController.IsDragSelecting || buildingPlacementController.IsActive ||
+                    tacticalTargetingView.Mode != TacticalTargetingMode.None || inputState.IsMouseButtonDown(PlatformMouseButton.Middle)),
+                Placement = buildingPlacementController.IsActive && !simulationPaused && window.IsFocused
+                    ? PlacementContextFeedback.Resolve(buildingPlacementController, currentSnapshot) : default
+            };
 
             _ = renderHost.Publish(
                 new ClientRenderFrame(
