@@ -14,6 +14,12 @@ Drag selection, held pointer buttons/camera drag, wheel motion, placement, tacti
 
 ## Purpose
 
+Two left clicks within 350 ms and the latched 6-pixel DPI/UI-scaled movement threshold select only currently screen-visible owned controllable units of the same authored `UnitId`. Both click targets must have current permitted identities; the first entity's full generation must still exist. Different units of the same type can participate inside the threshold. Buildings, missing unit identity, resources, foreign/hidden objects and wrecks never expand selection. Shift clicks retain single-object toggle semantics. Drag, camera/zoom, display, focus, modal, targeting, placement, intervening inspection and session transitions cancel the sequence. One processed click never submits a movement order.
+
+Click completion reuses the nearest current hover hit, so a foreign object in front does not expose an owned selectable behind it through a second ownership-only raycast. Same-type selection scans only the current render world; no map-wide or live ECS query is used. Selection remains stably ordered and duplicate-free; retained list capacity avoids allocating one tree node per unit on each repeated same-type selection.
+
+Context cursors use existing compiled cursor identities. UI ownership wins over world cursors. Move requires current owned visible copied movement capability; selecting only an immobile building keeps the default cursor. Attack/AttackMove/FireMission/Retreat cursors occur only in the existing validated targeting mode. A Supply panel alone is not a supply-targeting gesture. Repair and Patrol affordances are not inferred. Build requires a matching valid preview without a known copied material shortage; pending command results use the default cursor. Preview/cursor validity never authorizes the eventual command.
+
 The first RTS interaction layer connects visible controllable presentation entities to the authoritative fixed-tick simulation command pipeline without allowing input or rendering code to mutate live simulation state.
 
 The implemented flow is:

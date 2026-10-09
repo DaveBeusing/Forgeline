@@ -207,14 +207,17 @@ public readonly record struct RtsCursorContext(
     bool HoveredSelectable,
     bool HasSelection,
     bool SupplyModeActive = false,
-    bool MovementTargetValid = true);
+    bool MovementTargetValid = true,
+    bool PointerCaptured = false,
+    bool MovementSelectionSupported = true,
+    bool SupplyTargetSupported = false);
 
 public static class RtsCursorResolver
 {
     public static RtsCursorKind Resolve(
         in RtsCursorContext context)
     {
-        if (!context.HasPointer)
+        if (!context.HasPointer || context.PointerCaptured)
         {
             return RtsCursorKind.Default;
         }
@@ -253,7 +256,7 @@ public static class RtsCursorResolver
             };
         }
 
-        if (context.SupplyModeActive)
+        if (context.SupplyModeActive && context.SupplyTargetSupported)
         {
             return RtsCursorKind.Supply;
         }
@@ -263,9 +266,18 @@ public static class RtsCursorResolver
             return RtsCursorKind.Select;
         }
 
-        return context.HasSelection
+        return context.HasSelection && context.MovementSelectionSupported
             ? (context.MovementTargetValid ? RtsCursorKind.Move : RtsCursorKind.Invalid)
             : RtsCursorKind.Default;
+    }
+
+    public static bool CanMoveSelection(PresentationSnapshot? snapshot, SelectionSet selection, PlayerId player)
+    {
+        if (snapshot is null || !snapshot.SessionId.IsSpecified || snapshot.PlayerExperience?.IsMatchComplete == true) return false;
+        foreach (ref readonly var instance in snapshot.Instances)
+            if (selection.Contains(instance.Entity) && instance.Selectable.Owner == player && instance.Selectable.CanMove &&
+                (instance.Visibility & RenderVisibilityMask.World) != 0 && !instance.UnitFeature.IsWreck) return true;
+        return false;
     }
 }
 

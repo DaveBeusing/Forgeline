@@ -187,6 +187,20 @@ public static class SelectionPicking
         return result.ToArray();
     }
 
+    public static void SelectVisibleUnitType(RtsCamera camera, RenderWorld world, in SelectionFilter filter,
+        ForgeLine.Game.UnitId unit, int width, int height, float alpha, SelectionSet selection)
+    {
+        if (!unit.IsSpecified) return;
+        selection.Clear();
+        for (int i = 0; i < world.InstanceCount; i++)
+        {
+            var instance = world.GetInterpolatedInstance(i, alpha);
+            if (instance.UnitFeature.Unit == unit && !instance.UnitFeature.IsWreck &&
+                (instance.Selectable.Category & ForgeLine.Game.ControllableEntityCategory.Unit) != 0 &&
+                IsSelectable(instance, camera, filter, width, height)) selection.Add(instance.Entity);
+        }
+    }
+
     private static bool IsSelectable(
         in RenderInstance instance,
         RtsCamera camera,
