@@ -37,7 +37,8 @@ internal sealed class ClientApplication
     private static readonly PlayerId LocalPlayer = new(1);
     private static readonly PlayerId OpposingPlayer = new(2);
     private static readonly TimeSpan IdleWait = TimeSpan.FromMilliseconds(16);
-    private static readonly TimeSpan SmokeTestDuration = TimeSpan.FromMilliseconds(350);
+    private static readonly TimeSpan SmokeTestDuration = TimeSpan.FromMilliseconds(1500);
+    private static readonly TimeSpan SmokeCompletionDelay = TimeSpan.FromMilliseconds(1000);
     private static readonly TimeSpan DiagnosticInterval = TimeSpan.FromSeconds(1);
     private static readonly TimeSpan PauseTransitionTimeout = TimeSpan.FromSeconds(2);
     private static readonly TimeSpan FrontendFramePresentationTimeout = TimeSpan.FromSeconds(2);
@@ -457,7 +458,7 @@ internal sealed class ClientApplication
                 runtimeAssets,
                 _settings.CreateSceneLightingSettings(),
                 _startup, asynchronousStartup: true, expectedSession: simulationHost.SessionId,
-                transitionHost: sessionTransitionRenderer);
+                transitionHost: sessionTransitionRenderer, simulationTelemetry: simulationHost.CaptureTelemetry);
         bool playable = ClientSessionLoadingLoop.WaitForPresentation(
             pumpEvents: () =>
             {
@@ -1049,7 +1050,8 @@ internal sealed class ClientApplication
                         default,
                         _settings.UiScale,
                         preAlphaUx,
-                        frontendSurface));
+                        frontendSurface,
+                        MetricsActive: window.IsFocused && !window.IsMinimized));
 
                 if (shouldPauseForWindow)
                 {
@@ -1214,7 +1216,9 @@ internal sealed class ClientApplication
                 currentSnapshot?.PlayerExperience;
 
             if (smokeTest &&
-                !smokeCompletionRequested)
+                !smokeCompletionRequested &&
+                _platform.Clock.GetElapsedTime(startedAt, now) >= SmokeCompletionDelay &&
+                renderHost.LatestQualification is { LastMeasuredRunningRates: not null })
             {
                 if (!simulationHost.TryRunSmokeCompletion(
                         eastBase.CommandCore))
@@ -1474,7 +1478,8 @@ internal sealed class ClientApplication
                     SurfaceSuspended:
                         window.IsMinimized,
                     CombatGroups:
-                        combatGroupOverview));
+                        combatGroupOverview,
+                    MetricsActive: window.IsFocused && !window.IsMinimized));
 
             if (_platform.Clock.GetElapsedTime(nextDiagnosticAt, now) >= DiagnosticInterval)
             {

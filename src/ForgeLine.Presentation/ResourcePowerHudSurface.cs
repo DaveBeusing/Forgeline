@@ -188,12 +188,18 @@ internal sealed class ResourcePowerHudSurface : IGameplayHudSurface
         GameplayHudRegion.TopStatusBar |
         GameplayHudRegion.AlertStack;
 
+    public int LastRenderedVertexCount => _renderer.LastRenderedVertexCount;
+
     public void Render(
         in GameplayHudRenderContext context) =>
         _renderer.Render(
             context.Graphics,
             context.Snapshot,
-            context.Layout);
+            context.Layout,
+            context.RuntimeMetrics);
+
+    public void RenderWaiting(IGraphicsCommandContext graphics, in GameplayHudLayout layout,
+        in RuntimeMetricsView metrics) => _renderer.Render(graphics, null, layout, metrics);
 
     public void Dispose() =>
         _renderer.Dispose();
@@ -249,18 +255,16 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
 
     public void Render(
         IGraphicsCommandContext graphics,
-        PresentationSnapshot snapshot,
-        in GameplayHudLayout layout)
+        PresentationSnapshot? snapshot,
+        in GameplayHudLayout layout,
+        in RuntimeMetricsView metrics = default)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(graphics);
-        ArgumentNullException.ThrowIfNull(snapshot);
 
         if (graphics.Width <= 0 ||
             graphics.Height <= 0 ||
-            layout.TopStatusBar.IsEmpty ||
-            snapshot.PlayerExperience is not
-                PlayerExperienceSnapshot experience)
+            layout.SafeArea.IsEmpty)
         {
             LastRenderedVertexCount = 0;
             return;
@@ -269,16 +273,24 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         _vertexCount = 0;
         _scale = layout.Scale;
 
-        EmitTopStatusBar(
-            experience,
-            layout.TopStatusBar,
-            graphics.Width,
-            graphics.Height);
-        EmitNotificationStack(
-            experience,
-            layout.AlertStack,
-            graphics.Width,
-            graphics.Height);
+        if (!layout.TopStatusBar.IsEmpty)
+        {
+            if (snapshot?.PlayerExperience is PlayerExperienceSnapshot experience)
+            {
+                EmitTopStatusBar(experience, layout.TopStatusBar, graphics.Width, graphics.Height);
+                EmitNotificationStack(experience, layout.AlertStack, graphics.Width, graphics.Height);
+            }
+            else
+            {
+                HudRect bar = layout.TopStatusBar;
+                EmitQuad(bar.X, bar.Y, bar.Width, bar.Height, PanelColor, graphics.Width, graphics.Height);
+                ReadOnlySpan<char> label = snapshot is null ? "WAITING FOR MATCH" : "WAITING FOR PLAYER DATA";
+                int count = Math.Min(label.Length, Math.Max(0, (int)((bar.Width - 16 * _scale) / (GlyphAdvance * _scale))));
+                EmitText(label[..count], bar.X + 8 * _scale, bar.Y + 12 * _scale,
+                    MutedTextColor, graphics.Width, graphics.Height);
+            }
+        }
+        EmitRuntimeMetrics(metrics, layout.RuntimeMetrics, graphics.Width, graphics.Height);
 
         if (_vertexCount == 0)
         {
@@ -322,6 +334,37 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         _vertexBuffers.Clear();
         _pipeline.Dispose();
         _disposed = true;
+    }
+
+    private void EmitRuntimeMetrics(in RuntimeMetricsView metrics, in HudRect region, int width, int height)
+    {
+        if (region.IsEmpty) return;
+        EmitQuad(region.X, region.Y, region.Width, region.Height, PanelColor, width, height);
+        float originalScale = _scale;
+        _scale = MathF.Min(_scale, MathF.Min(region.Width / 142.0f, region.Height / 36.0f));
+        Span<char> text = stackalloc char[32];
+        var builder = new HudTextBuilder(text);
+        builder.Append("FPS  ");
+        if (metrics.FramesPerSecond is double fps)
+        {
+            if (fps >= 10000) builder.Append(">9999");
+            else builder.Append(fps, "F0");
+        }
+        else builder.Append("—");
+        EmitText(builder.Written, region.X + 8 * _scale, region.Y + 6 * _scale, MutedTextColor, width, height);
+        builder = new HudTextBuilder(text);
+        builder.Append("SIM  ");
+        if (metrics.SimulationState == RuntimeSimulationState.Paused) builder.Append("PAUSED");
+        else if (metrics.SimulationState == RuntimeSimulationState.Stopped) builder.Append("STOPPED");
+        else if (metrics.TicksPerSecond is double tps)
+        {
+            if (tps >= 10000) builder.Append(">9999");
+            else builder.Append(tps, "F1");
+            builder.Append(" TPS");
+        }
+        else builder.Append("— TPS");
+        EmitText(builder.Written, region.X + 8 * _scale, region.Y + 21 * _scale, MutedTextColor, width, height);
+        _scale = originalScale;
     }
 
     private void EmitTopStatusBar(
@@ -1521,6 +1564,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                         GraphicsVertexElementFormat.Float4,
                         8)
                 ],
+                CullMode = GraphicsCullMode.None,
                 DepthEnabled = false
             });
     }
@@ -1592,7 +1636,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             '9' => "01110100011000101111000010000101110",
             '.' => "00000000000000000000000000011000110",
             '/' => "00001000100010001000100001000000000",
-            '-' => "00000000000000011111000000000000000",
+            '-' or '—' => "00000000000000011111000000000000000",
+            '>' => "10000010000010000010001000100010000",
             '+' => "00000001000010011111001000010000000",
             ' ' => "",
             _ => "11111000010001000100000000010000100"

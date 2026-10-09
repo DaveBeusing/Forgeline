@@ -730,6 +730,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                         GraphicsVertexElementFormat.Float4,
                         8)
                 ],
+                CullMode = GraphicsCullMode.None,
                 DepthEnabled = false
             });
     }

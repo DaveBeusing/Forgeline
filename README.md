@@ -33,6 +33,8 @@ It includes:
 | Match flow | Setup, pause, victory/surrender, results, and fresh-match restart |
 | Presentation | Native D3D12 rendering, faction assets, terrain, minimap, strategic overlays, and combat/logistics effects |
 
+The gameplay HUD includes authoritative resources/power, selection details and contextual commands. Its small top-right FPS/SIM readout measures actual presented frames and completed ticks per second independently. See [Windows Client](docs/WindowsClient.md#match-hud) for availability and pause behavior.
+
 The six main unit families and all thirteen industrial building families use compiled Directorate assets, including LODs and gameplay-relevant visual states. Combat Engineer currently shares the Rifle Squad visual family.
 
 **Status:** This is a developing *pre-alpha vertical slice*, not a completed or production-ready game. Advanced tactics, rail gameplay, interactive map editing, other factions, and multiplayer remain future work.

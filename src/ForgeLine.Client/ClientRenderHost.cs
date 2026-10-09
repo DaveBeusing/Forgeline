@@ -45,6 +45,14 @@ internal readonly record struct ClientVisualQualificationSnapshot(
 {
     public bool GpuTimingAvailable { get; init; }
 
+    public GameplayHudState GameplayHudState { get; init; }
+
+    public int GameplayHudVertexCount { get; init; }
+
+    public RuntimeMetricsView RuntimeMetrics { get; init; }
+
+    public RuntimeMetricsView? LastMeasuredRunningRates { get; init; }
+
     public bool DebugLayerEnabled { get; init; }
 
     public int PeakLoadedTextureCount { get; init; }
@@ -102,7 +110,8 @@ internal readonly record struct ClientRenderFrame(
     PreAlphaUxView PreAlphaUx = default,
     FrontendSurfaceView? Frontend = null,
     bool SurfaceSuspended = false,
-    CombatGroupOverviewView? CombatGroups = null);
+    CombatGroupOverviewView? CombatGroups = null,
+    bool MetricsActive = true);
 
 internal sealed class ClientRenderHost : IDisposable
 {
@@ -117,6 +126,7 @@ internal sealed class ClientRenderHost : IDisposable
     private readonly bool _asynchronousStartup;
     private readonly SimulationSessionId? _expectedSession;
     private readonly ClientFrontendRenderHost? _frontendOwner;
+    private readonly Func<ClientSimulationTelemetry>? _simulationTelemetry;
     private readonly object _frameGate = new();
     private readonly object _disposeGate = new();
     private readonly object _faultWaitGate = new();
@@ -151,12 +161,14 @@ internal sealed class ClientRenderHost : IDisposable
         StartupDiagnostics? startup = null,
         bool asynchronousStartup = false,
         SimulationSessionId? expectedSession = null,
-        ClientFrontendRenderHost? transitionHost = null)
+        ClientFrontendRenderHost? transitionHost = null,
+        Func<ClientSimulationTelemetry>? simulationTelemetry = null)
     {
         _startup = startup ?? StartupDiagnostics.Disabled;
         _asynchronousStartup = asynchronousStartup;
         _expectedSession = expectedSession;
         _frontendOwner = transitionHost;
+        _simulationTelemetry = simulationTelemetry;
         if (transitionHost is not null && !asynchronousStartup)
             throw new ArgumentException("A renderer continuation requires asynchronous startup.", nameof(asynchronousStartup));
         initialTarget.Validate();
@@ -428,6 +440,8 @@ internal sealed class ClientRenderHost : IDisposable
                 new DebugDraw();
             var frameTimingTracker =
                 new FrameTimingTracker();
+            var runtimeMetricsSampler = new RuntimeMetricsSampler();
+            RuntimeMetricsView? lastMeasuredRunningRates = null;
 
             long previousFrameAt =
                 Stopwatch.GetTimestamp();
@@ -474,6 +488,7 @@ internal sealed class ClientRenderHost : IDisposable
 
                 if (current.SurfaceSuspended)
                 {
+                    runtimeMetricsSampler.Reset();
                     if (!surfaceSuspended)
                     {
                         graphics.Resize(
@@ -489,6 +504,7 @@ internal sealed class ClientRenderHost : IDisposable
                 if (current.ViewportWidth <= 0 ||
                     current.ViewportHeight <= 0)
                 {
+                    runtimeMetricsSampler.Reset();
                     continue;
                 }
 
@@ -522,6 +538,16 @@ internal sealed class ClientRenderHost : IDisposable
 
                 if (snapshot is null)
                 {
+                    runtimeMetricsSampler.Reset();
+                    graphics.RenderFrame(GraphicsColor.ForgeLineClear, context =>
+                    {
+                        gameplayHudRenderer.Render(context, renderCamera, null, terrain.WorldBounds,
+                            current.InformationLayer, current.ActionPanel, current.TacticalTargeting,
+                            current.ActiveFormation, current.CombatGroups ?? CombatGroupOverviewView.Empty,
+                            current.PreAlphaUx, current.Dpi, current.UiScale);
+                        if (current.Frontend is FrontendSurfaceView loading)
+                            frontendRenderer.Render(context, loading, current.UiScale);
+                    });
                     continue;
                 }
 
@@ -569,6 +595,15 @@ internal sealed class ClientRenderHost : IDisposable
 
                 long renderStartedAt =
                     Stopwatch.GetTimestamp();
+                ClientSimulationTelemetry telemetry = _simulationTelemetry?.Invoke() ?? default;
+                RuntimeMetricsView runtimeMetrics = runtimeMetricsSampler.Sample(
+                    TimeSpan.FromSeconds((double)renderStartedAt / Stopwatch.Frequency),
+                    graphics.PresentedFrameCount, telemetry.CompletedTicks, snapshot.SessionId,
+                    telemetry.SessionId == snapshot.SessionId ? telemetry.State : RuntimeSimulationState.Unavailable,
+                    current.MetricsActive);
+                if (runtimeMetrics.SimulationState == RuntimeSimulationState.Running &&
+                    runtimeMetrics.FramesPerSecond.HasValue && runtimeMetrics.TicksPerSecond.HasValue)
+                    lastMeasuredRunningRates = runtimeMetrics;
 
                 ulong presentedBefore = !_startupPresented ? graphics.PresentedFrameCount : 0;
                 graphics.RenderFrame(
@@ -614,7 +649,8 @@ internal sealed class ClientRenderHost : IDisposable
                             current.PreAlphaUx,
                             current.Dpi,
                             current.UiScale,
-                            gameplayDraw);
+                            gameplayDraw,
+                            runtimeMetrics);
                         developmentOverlayRenderer.Render(
                             context,
                             overlayMetrics,
@@ -671,7 +707,8 @@ internal sealed class ClientRenderHost : IDisposable
                     debugDrawRenderer.LastDiagnostics,
                     snapshot.VfxMetrics,
                     renderWorld.InstanceCount,
-                    _sceneLighting);
+                    _sceneLighting, gameplayHudRenderer.State, gameplayHudRenderer.LastRenderedVertexCount,
+                    runtimeMetrics, lastMeasuredRunningRates);
 
                 if (StopwatchElapsed(
                         nextDiagnosticAt,
@@ -781,7 +818,11 @@ internal sealed class ClientRenderHost : IDisposable
         in DebugDrawRenderDiagnostics debug,
         in VfxPresentationMetrics vfx,
         int totalInstances,
-        in SceneLightingSettings lighting)
+        in SceneLightingSettings lighting,
+        GameplayHudState hudState,
+        int hudVertexCount,
+        in RuntimeMetricsView runtimeMetrics,
+        RuntimeMetricsView? lastMeasuredRunningRates)
     {
         var snapshot =
             new ClientVisualQualificationSnapshot(
@@ -821,6 +862,10 @@ internal sealed class ClientRenderHost : IDisposable
                 terrain.MaximumTextureSamplesPerPixel,
                 terrain.CpuSubmissionMilliseconds)
             {
+                GameplayHudState = hudState,
+                GameplayHudVertexCount = hudVertexCount,
+                RuntimeMetrics = runtimeMetrics,
+                LastMeasuredRunningRates = lastMeasuredRunningRates,
                 GpuTimingAvailable =
                     graphics.GpuTimingAvailable,
                 DebugLayerEnabled =

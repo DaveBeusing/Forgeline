@@ -44,6 +44,10 @@ public readonly record struct GameplayHudLayout(
     HudRect Minimap,
     HudRect SecondaryView)
 {
+    public HudRect RuntimeMetrics => SafeArea.IsEmpty ? default : new HudRect(
+        SafeArea.Right - MathF.Min(142.0f * Scale, SafeArea.Width), SafeArea.Y,
+        MathF.Min(142.0f * Scale, SafeArea.Width), TopStatusBar.Height);
+
     public float ActionRowStartOffset =>
         64.0f * Scale;
 
@@ -115,7 +119,7 @@ public readonly record struct GameplayHudLayout(
             new HudRect(
                 safeArea.X,
                 safeArea.Y,
-                safeArea.Width,
+                MathF.Max(0.0f, safeArea.Width - 142.0f * scale - margin),
                 topHeight);
 
         float minimapLimit =

@@ -130,6 +130,8 @@ internal sealed class SelectionInspectorHudSurface : IGameplayHudSurface
     public GameplayHudRegion Regions =>
         GameplayHudRegion.SelectionInspector;
 
+    public int LastRenderedVertexCount => _renderer.LastRenderedVertexCount;
+
     public void Render(
         in GameplayHudRenderContext context) =>
         _renderer.Render(
@@ -1171,6 +1173,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
                         GraphicsVertexElementFormat.Float4,
                         8)
                 ],
+                CullMode = GraphicsCullMode.None,
                 DepthEnabled = false
             });
     }

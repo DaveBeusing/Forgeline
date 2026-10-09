@@ -61,14 +61,37 @@ public sealed class DevelopmentOverlayRendererTests : IDisposable
             hiddenVertexCount);
     }
 
+    [Fact]
+    public void ScreenSpaceHudPipelinesNeverCullPanelsOrGlyphs()
+    {
+        using var resources = new ResourcePowerHudSurface(_graphics, null);
+        using var selection = new SelectionInspectorHudSurface(_graphics, null);
+        using var actions = new PlayerActionDockHudSurface(_graphics, null);
+        using var information = new RtsInformationHudSurface(_graphics, null);
+        using var development = new DevelopmentOverlayRenderer(_graphics);
+        Assert.Equal(5, _graphics.Pipelines.Count);
+        Assert.All(_graphics.Pipelines, pipeline =>
+        {
+            Assert.Equal(GraphicsCullMode.None, pipeline.CullMode);
+            Assert.False(pipeline.DepthEnabled);
+        });
+    }
     private sealed class FakeGraphicsDevice : IGraphicsDevice
     {
+        public List<GraphicsPipelineDescription> Pipelines { get; } = [];
+
         public GraphicsDiagnostics Diagnostics =>
             throw new NotSupportedException();
 
         public IGraphicsPipeline CreateGraphicsPipeline(
             GraphicsPipelineDescription description) =>
-            new FakeGraphicsPipeline(description);
+            CapturePipeline(description);
+
+        private FakeGraphicsPipeline CapturePipeline(GraphicsPipelineDescription description)
+        {
+            Pipelines.Add(description);
+            return new FakeGraphicsPipeline(description);
+        }
 
         public IGraphicsBuffer CreateBuffer(
             GraphicsBufferDescription description) =>

@@ -95,9 +95,9 @@ public sealed class SelectionOverlayRenderingTests
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    private readonly record struct Vertex(Vector2 Position, Vector4 Color);
+    internal readonly record struct Vertex(Vector2 Position, Vector4 Color);
 
-    private sealed class RecordingDevice : IGraphicsDevice
+    internal sealed class RecordingDevice : IGraphicsDevice
     {
         public GraphicsPipelineDescription? Pipeline { get; private set; }
         public RecordingBuffer? Buffer { get; private set; }
@@ -120,7 +120,7 @@ public sealed class SelectionOverlayRenderingTests
         public void Dispose() { }
     }
 
-    private sealed class RecordingBuffer(GraphicsBufferDescription description) : IGraphicsBuffer
+    internal sealed class RecordingBuffer(GraphicsBufferDescription description) : IGraphicsBuffer
     {
         public GraphicsBufferDescription Description => description;
         public Vertex[] Vertices { get; private set; } = [];
@@ -129,10 +129,10 @@ public sealed class SelectionOverlayRenderingTests
         public void Dispose() { }
     }
 
-    private sealed class RecordingContext : IGraphicsCommandContext
+    internal sealed class RecordingContext : IGraphicsCommandContext
     {
-        public int Width => 1600;
-        public int Height => 900;
+        public int Width { get; init; } = 1600;
+        public int Height { get; init; } = 900;
         public int FrameIndex => 0;
         public void SetViewport(float x, float y, float width, float height) { }
         public void SetScissor(int left, int top, int right, int bottom) { }
