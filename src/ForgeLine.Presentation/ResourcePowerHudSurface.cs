@@ -1521,6 +1521,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                         GraphicsVertexElementFormat.Float4,
                         8)
                 ],
+                CullMode = GraphicsCullMode.None,
                 DepthEnabled = false
             });
     }

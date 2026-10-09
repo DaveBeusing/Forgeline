@@ -1171,6 +1171,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
                         GraphicsVertexElementFormat.Float4,
                         8)
                 ],
+                CullMode = GraphicsCullMode.None,
                 DepthEnabled = false
             });
     }
