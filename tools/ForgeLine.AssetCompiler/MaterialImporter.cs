@@ -87,5 +87,11 @@ internal static class MaterialImporter
         {
             _ = AssetId.Parse(id);
         }
+
+        if (definition.UvOffset.Length != 2 ||
+            definition.UvOffset.Any(static value => !float.IsFinite(value)))
+        {
+            throw new InvalidDataException("Material uvOffset must contain two finite values.");
+        }
     }
 }

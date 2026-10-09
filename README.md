@@ -33,7 +33,7 @@ It includes:
 | Match flow | Setup, pause, victory/surrender, results, and fresh-match restart |
 | Presentation | Native D3D12 rendering, faction assets, terrain, minimap, strategic overlays, and combat/logistics effects |
 
-The six main unit families and nine core industrial building families use compiled Directorate assets, including LODs and gameplay-relevant visual states. Combat Engineer currently shares the Rifle Squad visual family.
+The six main unit families and all thirteen industrial building families use compiled Directorate assets, including LODs and gameplay-relevant visual states. Combat Engineer currently shares the Rifle Squad visual family.
 
 **Status:** This is a developing *pre-alpha vertical slice*, not a completed or production-ready game. Advanced tactics, rail gameplay, interactive map editing, other factions, and multiplayer remain future work.
 

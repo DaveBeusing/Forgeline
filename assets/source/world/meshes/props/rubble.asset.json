@@ -1,7 +1,7 @@
 {
   "id": "mesh.world.prop.rubble",
   "type": "mesh",
-  "source": "../sources/world_box.gltf",
+  "source": "../sources/mesh_world_prop_rubble.gltf",
   "materialReferences": [
     "material.world.prop.industrial"
   ],

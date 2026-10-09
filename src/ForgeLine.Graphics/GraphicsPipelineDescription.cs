@@ -9,7 +9,8 @@ public enum GraphicsPrimitiveTopology
 public enum GraphicsCullMode
 {
     CounterClockwise,
-    None
+    None,
+    Clockwise
 }
 
 public sealed record GraphicsPipelineDescription(

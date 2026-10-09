@@ -24,7 +24,11 @@ public sealed class DirectorateBuildingPresentationTests
             BuildingIds.VehicleFactory,
             BuildingIds.StorageDepot,
             BuildingIds.SupplyDepot,
-            BuildingIds.PowerPlant
+            BuildingIds.PowerPlant,
+            BuildingIds.LogisticsHub,
+            BuildingIds.AmmunitionPlant,
+            BuildingIds.Barracks,
+            BuildingIds.Radar
         ];
 
         foreach (BuildingId building in

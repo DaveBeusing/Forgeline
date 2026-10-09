@@ -1,0 +1,9 @@
+{
+  "id": "texture.vfx.atlas_base",
+  "type": "texture",
+  "source": "effect_atlas.png",
+  "textureUsage": "baseColor",
+  "textureColorSpace": "srgb",
+  "textureMaxDimension": 512,
+  "textureMaxMipLevels": 4
+}

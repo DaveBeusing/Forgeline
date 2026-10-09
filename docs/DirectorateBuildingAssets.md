@@ -19,6 +19,10 @@ The first visual baseline intentionally uses compact modular geometry. Stable as
 | Storage Depot | `building.directorate.storage_depot` | warehouses and repeated storage modules |
 | Supply Depot | `building.directorate.supply_depot` | storage plus readable distribution/service modules |
 | Power Plant | `building.directorate.power_plant` | generation hall and distribution/exhaust structures |
+| Logistics Hub | `building.directorate.logistics_hub` | loading lanes, cargo modules, service gantry |
+| Ammunition Plant | `building.directorate.ammunition_plant` | reinforced processing chambers, warning access, exhaust |
+| Barracks | `building.directorate.barracks` | repeated quarters, canvas panels, central service entry |
+| Radar | `building.directorate.radar` | raised sensor array, support tower, equipment cabinets |
 
 The existing gameplay `BuildingId` values and building-definition keys remain authoritative. The presentation catalog maps those IDs to stable Directorate runtime assets rather than creating a second gameplay roster.
 
@@ -61,7 +65,7 @@ building.directorate.module.destroyed
 building.directorate.module.collision_box
 ```
 
-The construction and state modules are intentionally shared by all nine families. This keeps the initial art vocabulary consistent and makes repeated geometry eligible for the existing indexed-instancing path.
+The construction and state modules are intentionally shared by all thirteen families. This keeps the initial art vocabulary consistent and makes repeated geometry eligible for the existing indexed-instancing path.
 
 ## Construction presentation
 
@@ -106,7 +110,7 @@ The wreck has no command, combat, production, power, storage, or navigation auth
 
 Each primary family exposes LOD0, LOD1, and LOD2 references. The current presentation thresholds are 220 m and 620 m.
 
-All nine primary assets reference the shared simplified collision asset:
+All thirteen primary assets reference the shared simplified collision asset:
 
 ```text
 building.directorate.module.collision_box
@@ -178,12 +182,12 @@ Disabling or restoring either crossing still changes the real logistics edge and
 
 Directorate building and infrastructure material IDs remain stable while their source definitions now reuse the shared production texture library:
 
-- normal/operational structures use the structural-metal Base Color/Normal/ORM family;
-- operational road surfaces use a brighter, high-roughness reinforced-concrete Base Color/Normal/ORM treatment;
+- normal/operational structures select structural steel, equipment, concrete, warning and sensor cells through authored component UVs;
+- operational road surfaces use the brighter, high-roughness concrete atlas cell and existing hard-surface normal detail;
 - road shoulders use a warmer gravel/mineral material to provide edge and terrain-transition definition;
 - damaged/destroyed road presentation has a darker, high-roughness material binding ready for future authoritative road-condition states;
-- bridges reuse structural metal;
-- Damaged, Critical, and Destroyed building states use the damaged-metal family;
+- bridges select structural metal and concrete cells;
+- Damaged, Critical, and Destroyed building states select the worn armor atlas cell and damaged-metal normal family;
 - Critical additionally uses the shared functional status-emissive map at a restrained multiplier;
 - Unpowered keeps the structural texture family while its existing material factors suppress visual energy.
 
@@ -210,7 +214,7 @@ Repeated buildings therefore share the same batching architecture as units and w
 
 Automated coverage verifies:
 
-- all nine building families compile;
+- all thirteen building families compile;
 - LOD and shared collision references resolve;
 - shared construction/state modules resolve;
 - building and infrastructure strategic symbols resolve;
@@ -237,3 +241,11 @@ Building damage and destruction presentation is extended by the shared VFX layer
 Damaged buildings receive light smoke, Critical buildings receive heavier smoke/fire/sparks, and destroyed building wrecks receive one-shot building-scale destruction layers plus persistent wreck smoke/fire. These effects consume the existing `HealthState` and presentation-only wreck identity and never alter building footprint, occupancy, combat, production, power, or logistics authority.
 
 Supply/cargo effects are likewise driven only when existing transport/supply state reports real loading, unloading, refuel, or rearm activity.
+
+## Concept surface completion
+
+All thirteen constructible building classes now have textured compiled geometry and LOD bindings. Logistics Hub, Ammunition Plant, Barracks and Radar no longer use the untextured placement cube. Their compact functional layouts use the same construction/state kit, collision contract and strategic symbols as the other classes. Source geometry changes presentation only.
+
+Building, road and bridge UVs select concrete, structural steel, service panels, glass, warning and heat-treated surfaces from the shared concept atlas. Existing stable material IDs and instancing remain intact. See [surface authoring](../assets/source/materials/directorate/surfaces/README.md).
+
+State material selection takes precedence over the static primary mesh material, so Unpowered, Damaged and Critical treatment is not overwritten by the operational material. The existing 112-byte instance stream carries atlas scale/offset and emissive strength.

@@ -5,19 +5,29 @@
   },
   "buffers": [
     {
-      "byteLength": 480,
-      "uri": "data:application/octet-stream;base64,pMmHvqgIib2bO5C8EftOPlYCpLzBl0G+lbZCPqqHyz3Bl0G+4uuNvjD/Vj2bO5C8lbZCvko4c73Bl0E+4uuNPpigTLybO5A8pMmHPi302j2bO5A8EftOvjXYdT3Bl0E+jvC2PbBJrbwDyBK9Wh6xPkQaQL3b6pU94zq2PnxzVz3b6pU9tGLLPXR0oD0DyBK9IMKFO8dxTrwizSo+P3mFPt0RHb1IOo0+yJWKPuJ7ej1IOo0+PHJmPKf4sT0izSo+AAAAAAIAAAABAAAAAAAAAAMAAAACAAAABAAAAAUAAAAGAAAABAAAAAYAAAAHAAAAAAAAAAEAAAAFAAAAAAAAAAUAAAAEAAAAAwAAAAcAAAAGAAAAAwAAAAYAAAACAAAAAQAAAAIAAAAGAAAAAQAAAAYAAAAFAAAAAAAAAAQAAAAHAAAAAAAAAAcAAAADAAAACAAAAAoAAAAJAAAACAAAAAsAAAAKAAAADAAAAA0AAAAOAAAADAAAAA4AAAAPAAAACAAAAAkAAAANAAAACAAAAA0AAAAMAAAACwAAAA8AAAAOAAAACwAAAA4AAAAKAAAACQAAAAoAAAAOAAAACQAAAA4AAAANAAAACAAAAAwAAAAPAAAACAAAAA8AAAALAAAA"
+      "byteLength": 1952,
+      "uri": "data:application/octet-stream;base64,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"
     }
   ],
   "bufferViews": [
     {
       "buffer": 0,
       "byteOffset": 0,
-      "byteLength": 192
+      "byteLength": 624
     },
     {
       "buffer": 0,
-      "byteOffset": 192,
+      "byteOffset": 624,
+      "byteLength": 624
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1248,
+      "byteLength": 416
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1664,
       "byteLength": 288
     }
   ],
@@ -25,11 +35,23 @@
     {
       "bufferView": 0,
       "componentType": 5126,
-      "count": 16,
+      "count": 52,
       "type": "VEC3"
     },
     {
       "bufferView": 1,
+      "componentType": 5126,
+      "count": 52,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 52,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
       "componentType": 5125,
       "count": 72,
       "type": "SCALAR"
@@ -40,9 +62,11 @@
       "primitives": [
         {
           "attributes": {
-            "POSITION": 0
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
           },
-          "indices": 1,
+          "indices": 3,
           "mode": 4
         }
       ]

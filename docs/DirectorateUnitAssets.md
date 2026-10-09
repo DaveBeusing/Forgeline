@@ -100,7 +100,7 @@ Each family has one stable runtime material:
 material.directorate.unit.<family>
 ```
 
-Those stable IDs now resolve through the shared Directorate production texture library. Combat families use the painted-metal Base Color/Normal/ORM set; cargo and supply vehicles use the structural-metal family. Existing family-specific base-color, roughness, and metallic factors remain the role/faction tuning layer rather than duplicating texture sets. Rifle Squad uses a tighter UV scale for its smaller geometry while vehicles use broader tiling.
+Those stable IDs resolve through the shared concept surface color and ORM atlases, with existing painted/structural tangent-normal families retained. Authored component UV seams distinguish painted armor, rubber wheels/tracks, canvas infantry/cargo coverings, blue sensor/cab glass, heat-treated barrels and marked logistics modules. The single material per mesh and its LOD identity remain stable; the atlas provides per-surface roughness/metalness without duplicating full texture sets per vehicle.
 
 Legacy position-only source meshes are remediated deterministically by the Asset Compiler when a textured material requires UV0. The compiler creates box-projected UV seams, then generates tangents for the normal-mapped path. No Directorate gameplay unit remains on the development material fallback solely because its baseline glTF lacked UVs.
 

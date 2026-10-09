@@ -14,6 +14,8 @@ public sealed record RuntimeMaterialData(
     float EmissiveMultiplier,
     Vector2 UvScale)
 {
+    public Vector2 UvOffset { get; init; }
+
     public static RuntimeMaterialData FromPayload(
         ReadOnlySpan<byte> payload)
     {
@@ -87,7 +89,22 @@ public sealed record RuntimeMaterialData(
             metallicFactor,
             roughnessFactor,
             emissiveMultiplier,
-            uvScale);
+            uvScale)
+        {
+            UvOffset = ReadFiniteVector2(root, "uvOffset")
+        };
+    }
+
+    private static Vector2 ReadFiniteVector2(JsonElement root, string name)
+    {
+        if (!root.TryGetProperty(name, out JsonElement value))
+            return Vector2.Zero;
+        if (value.ValueKind != JsonValueKind.Array || value.GetArrayLength() != 2 ||
+            value[0].ValueKind != JsonValueKind.Number || value[1].ValueKind != JsonValueKind.Number ||
+            !value[0].TryGetSingle(out float x) || !float.IsFinite(x) ||
+            !value[1].TryGetSingle(out float y) || !float.IsFinite(y))
+            throw new InvalidDataException($"Runtime material property '{name}' must contain two finite values.");
+        return new Vector2(x, y);
     }
 
     private static AssetId? ReadOptionalAssetId(

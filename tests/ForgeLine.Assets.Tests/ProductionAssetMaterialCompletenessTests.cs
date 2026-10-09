@@ -71,6 +71,40 @@ public sealed class ProductionAssetMaterialCompletenessTests
                     issues);
             }
 
+            foreach (RuntimeAssetRecord record in catalog.Manifest.Assets.Where(
+                static record => record.Type == RuntimeAssetType.Material &&
+                    (record.Id.StartsWith("material.world.decal.", StringComparison.Ordinal) ||
+                     record.Id.StartsWith("material.vfx.", StringComparison.Ordinal))))
+            {
+                RuntimeMaterialData material = RuntimeMaterialData.FromPayload(
+                    catalog.Read(AssetId.Parse(record.Id)).Payload);
+                Assert.NotNull(material.BaseColorTexture);
+                Assert.InRange(material.UvOffset.X, 0f, 1f - material.UvScale.X);
+                Assert.InRange(material.UvOffset.Y, 0f, 1f - material.UvScale.Y);
+                Assert.InRange(material.UvScale.X, 0.01f, 0.25f);
+                Assert.InRange(material.UvScale.Y, 0.01f, 0.5f);
+                RuntimeTextureData texture = RuntimeTextureData.FromPayload(
+                    catalog.Read(material.BaseColorTexture!.Value).Payload);
+                Assert.InRange(texture.Width, 1, 512);
+                Assert.InRange(texture.Height, 1, 512);
+                Assert.True(texture.Mips[^1].Width >= 32, "Atlas mips must retain isolated cells.");
+                byte[] pixels = texture.Mips[0].Pixels;
+                Assert.Contains(Enumerable.Range(0, pixels.Length / 4),
+                    index => pixels[index * 4 + 3] == 0);
+                Assert.Contains(Enumerable.Range(0, pixels.Length / 4),
+                    index => pixels[index * 4 + 3] >= 128);
+            }
+
+            foreach (RuntimeAssetRecord record in catalog.Manifest.Assets.Where(
+                static record => record.Type == RuntimeAssetType.Mesh &&
+                    record.Id.StartsWith("vfx.", StringComparison.Ordinal)))
+            {
+                RuntimeMeshData effectMesh = RuntimeMeshData.FromPayload(
+                    catalog.Read(AssetId.Parse(record.Id)).Payload);
+                Assert.True(effectMesh.HasUv0, $"{record.Id}: effect texture coordinates are missing.");
+                Assert.DoesNotContain(effectMesh.Sections, section => section.MaterialSlot < 0);
+            }
+
             Assert.True(
                 issues.Count == 0,
                 "Production material inventory contains unresolved entries:" +

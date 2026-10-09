@@ -5,7 +5,7 @@ namespace ForgeLine.AssetCompiler;
 
 public static class AssetPipelineCompiler
 {
-    public const string CompilerVersion = "1.5.0";
+    public const string CompilerVersion = "1.6.0";
     public const int RuntimeVersion = 4;
 
     private static readonly JsonSerializerOptions JsonOptions = RuntimeAssetCatalog.CreateJsonOptions();
@@ -353,6 +353,17 @@ public static class AssetPipelineCompiler
                     "ASSET029",
                     AssetCompilerDiagnosticSeverity.Error,
                     $"Texture usage '{definition.TextureUsage}' requires linear color space.",
+                    id.Value,
+                    ToRelativePath(sourceRoot, sourcePath)));
+            }
+
+            if (definition.TextureMaxDimension is int maxDimension &&
+                (maxDimension <= 0 || maxDimension > 16384))
+            {
+                diagnostics.Add(new AssetCompilerDiagnostic(
+                    "ASSET034",
+                    AssetCompilerDiagnosticSeverity.Error,
+                    "textureMaxDimension must be between 1 and 16384.",
                     id.Value,
                     ToRelativePath(sourceRoot, sourcePath)));
             }
@@ -851,7 +862,8 @@ public static class AssetPipelineCompiler
                 node.Definition.TextureColorSpace,
                 node.Definition.TextureUsage,
                 node.Definition.TextureGenerateMipmaps,
-                node.Definition.TextureMaxMipLevels),
+                node.Definition.TextureMaxMipLevels,
+                node.Definition.TextureMaxDimension),
             RuntimeAssetType.Material => MaterialImporter.Import(node.SourcePath),
             _ => throw new InvalidDataException(
                 $"Asset type '{node.Definition.Type}' is unsupported."),

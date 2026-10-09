@@ -1,0 +1,9 @@
+{
+  "id": "texture.directorate.surface.atlas_base",
+  "type": "texture",
+  "source": "surface_atlas.png",
+  "textureUsage": "baseColor",
+  "textureColorSpace": "srgb",
+  "textureMaxDimension": 512,
+  "textureMaxMipLevels": 4
+}

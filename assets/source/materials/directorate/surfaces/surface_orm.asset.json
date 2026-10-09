@@ -1,0 +1,9 @@
+{
+  "id": "texture.directorate.surface.atlas_orm",
+  "type": "texture",
+  "source": "surface_orm.tga",
+  "textureUsage": "orm",
+  "textureColorSpace": "linear",
+  "textureMaxDimension": 128,
+  "textureMaxMipLevels": 3
+}

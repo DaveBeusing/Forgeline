@@ -16,7 +16,11 @@ public sealed class DirectorateBuildingAssetAuthoringTests
         "vehicle_factory",
         "storage_depot",
         "supply_depot",
-        "power_plant"
+        "power_plant",
+        "logistics_hub",
+        "ammunition_plant",
+        "barracks",
+        "radar"
     ];
 
     [Fact]
@@ -49,7 +53,7 @@ public sealed class DirectorateBuildingAssetAuthoringTests
                         static diagnostic =>
                             $"{diagnostic.Code}: {diagnostic.Message}")));
             Assert.Equal(
-                307,
+                324,
                 result.CompiledCount);
 
             RuntimeAssetCatalog catalog =

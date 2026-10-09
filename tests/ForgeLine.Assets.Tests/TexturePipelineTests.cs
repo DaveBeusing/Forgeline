@@ -8,6 +8,45 @@ namespace ForgeLine.Assets.Tests;
 
 public sealed class TexturePipelineTests
 {
+    [Fact]
+    public void RuntimeResolutionCapFiltersSourceAndInvalidatesCachedOutput()
+    {
+        using var workspace = new TextureWorkspace();
+        const string id = "texture.test.resolution_cap";
+        workspace.WriteTexture(id, RuntimeTextureUsage.BaseColor,
+            RuntimeTextureColorSpace.Srgb, 8, 4, SolidPixels(8, 4, 128, 64, 32, 255));
+        Assert.True(workspace.Compile().Success);
+        Assert.Equal(8, workspace.ReadTexture(id).Width);
+        workspace.WriteTextureDefinition(id, RuntimeTextureUsage.BaseColor,
+            RuntimeTextureColorSpace.Srgb, true, null, maxDimension: 2);
+        AssetCompilationResult changed = workspace.Compile();
+        Assert.True(changed.Success);
+        Assert.Equal(1, changed.CompiledCount);
+        RuntimeTextureData capped = workspace.ReadTexture(id);
+        Assert.Equal(2, capped.Width);
+        Assert.Equal(1, capped.Height);
+        Assert.Equal(2, capped.Mips.Count);
+        Assert.Equal(128, capped.Mips[0].Pixels[0]);
+        Assert.Equal(1, workspace.Compile().SkippedCount);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(16385)]
+    public void InvalidRuntimeResolutionCapIsRejected(int limit)
+    {
+        using var workspace = new TextureWorkspace();
+        const string id = "texture.test.invalid_cap";
+        workspace.WriteTexture(id, RuntimeTextureUsage.BaseColor,
+            RuntimeTextureColorSpace.Srgb, 2, 2, SolidPixels(2, 2, 128, 64, 32, 255));
+        workspace.WriteTextureDefinition(id, RuntimeTextureUsage.BaseColor,
+            RuntimeTextureColorSpace.Srgb, true, null, maxDimension: limit);
+        AssetCompilationResult result = workspace.Compile();
+        Assert.False(result.Success);
+        Assert.Contains(result.Diagnostics, diagnostic => diagnostic.Code == "ASSET034");
+    }
+
     private static readonly JsonSerializerOptions FixtureJsonOptions =
         new()
         {
@@ -517,7 +556,8 @@ public sealed class TexturePipelineTests
             RuntimeTextureUsage usage,
             RuntimeTextureColorSpace colorSpace,
             bool generateMipmaps,
-            int? maxMipLevels)
+            int? maxMipLevels,
+            int? maxDimension = null)
         {
             string name =
                 FileName(
@@ -548,6 +588,9 @@ public sealed class TexturePipelineTests
                 definition["textureMaxMipLevels"] =
                     maxMipLevels.Value;
             }
+
+            if (maxDimension.HasValue)
+                definition["textureMaxDimension"] = maxDimension.Value;
 
             WriteText(
                 $"textures/{name}.asset.json",

@@ -420,6 +420,8 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                         RasterizerDescription.CullCounterClockwise,
                     GraphicsCullMode.None =>
                         RasterizerDescription.CullNone,
+                    GraphicsCullMode.Clockwise =>
+                        RasterizerDescription.CullClockwise,
                     _ => throw new ArgumentOutOfRangeException(
                         nameof(description),
                         description.CullMode,

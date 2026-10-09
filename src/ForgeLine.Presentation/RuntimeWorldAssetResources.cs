@@ -393,7 +393,10 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
             data.MetallicFactor,
             data.EmissiveMultiplier,
             data.UvScale,
-            hasBindingFailure);
+            hasBindingFailure)
+        {
+            UvOffset = data.UvOffset
+        };
     }
 
     private RuntimeMaterialResources CreateMissingMaterial(
@@ -610,7 +613,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
             bool usesDevelopmentFallback =
                 materialSlots.Any(
                     static slot =>
-                        slot < 0) ||
+                        slot < 0) && data.MaterialIds.Count > 0 ||
                 materialSlots.Length != 1;
             bool hasMaterial =
                 !usesDevelopmentFallback &&
@@ -673,7 +676,10 @@ internal readonly record struct RuntimeMaterialResources(
     float MetallicFactor,
     float EmissiveMultiplier,
     Vector2 UvScale,
-    bool UsesDevelopmentFallback);
+    bool UsesDevelopmentFallback)
+{
+    public Vector2 UvOffset { get; init; }
+}
 
 internal readonly record struct RuntimeTextureResource(
     IGraphicsTexture Texture,
