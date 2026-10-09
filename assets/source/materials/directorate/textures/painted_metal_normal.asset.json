@@ -1,6 +1,7 @@
 {
   "id": "texture.directorate.material.painted_metal_normal",
   "type": "texture",
+  "textureFormat": "bc7Unorm",
   "source": "painted_metal_normal.tga",
   "textureUsage": "normal",
   "textureColorSpace": "linear",

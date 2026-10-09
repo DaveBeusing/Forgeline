@@ -1,6 +1,7 @@
 {
   "id": "texture.directorate.material.reinforced_concrete_normal",
   "type": "texture",
+  "textureFormat": "bc7Unorm",
   "source": "reinforced_concrete_normal.tga",
   "textureUsage": "normal",
   "textureColorSpace": "linear",

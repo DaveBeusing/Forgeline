@@ -1,6 +1,8 @@
 using System.Buffers.Binary;
 using System.IO.Compression;
 using ForgeLine.Assets;
+using BCnEncoder.Encoder;
+using BCnEncoder.Shared;
 
 namespace ForgeLine.AssetCompiler;
 
@@ -14,7 +16,8 @@ internal static class TextureImporter
         RuntimeTextureUsage usage,
         bool generateMipmaps,
         int? maxMipLevels,
-        int? maxDimension = null)
+        int? maxDimension = null,
+        RuntimeTextureFormat format = RuntimeTextureFormat.Rgba8Unorm)
     {
         var extension = Path.GetExtension(path);
         TextureData texture = extension.ToLowerInvariant() switch
@@ -44,11 +47,34 @@ internal static class TextureImporter
                 usage,
                 generateMipmaps,
                 maxMipLevels);
+        if (format == RuntimeTextureFormat.Bc7Unorm)
+        {
+            if (texture.Width % 4 != 0 || texture.Height % 4 != 0)
+            {
+                throw new InvalidDataException($"BC7 runtime top-level dimensions must be multiples of 4; actual {texture.Width}x{texture.Height}. Use RGBA8 or author aligned dimensions.");
+            }
+            if (usage is RuntimeTextureUsage.TerrainControl or RuntimeTextureUsage.GenericData)
+            {
+                throw new InvalidDataException($"Texture usage {usage} requires lossless RGBA8 runtime storage.");
+            }
+
+            var encoder = new BcEncoder(CompressionFormat.Bc7);
+            encoder.OutputOptions.GenerateMipMaps = false;
+            encoder.OutputOptions.Quality = CompressionQuality.BestQuality;
+            encoder.Options.IsParallel = false;
+            mips = mips.Select(mip => new RuntimeTextureMipLevel(
+                mip.Width, mip.Height, checked(((mip.Width + 3) / 4) * 16),
+                encoder.EncodeToRawBytes(mip.Pixels, mip.Width, mip.Height, PixelFormat.Rgba32)[0])).ToArray();
+        }
+        else if (format != RuntimeTextureFormat.Rgba8Unorm)
+        {
+            throw new InvalidDataException($"Texture runtime format {format} is unsupported.");
+        }
         var runtimeTexture =
             new RuntimeTextureData(
                 texture.Width,
                 texture.Height,
-                RuntimeTextureFormat.Rgba8Unorm,
+                format,
                 colorSpace,
                 usage,
                 mips);

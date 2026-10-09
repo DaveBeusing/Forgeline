@@ -205,9 +205,9 @@ Odd dimensions use deterministic area coverage when reducing to the next `max(1,
 
 ### Runtime format and compression
 
-The current compiler emits `Rgba8Unorm` payloads. The Direct3D 12 runtime applies the sRGB interpretation from texture metadata when creating the GPU resource/view.
+The compiler supports `Rgba8Unorm` (default) and explicit `textureFormat: "bc7Unorm"` payloads. The Direct3D 12 runtime applies the sRGB interpretation from texture metadata when creating the GPU resource/view, including BC7 sRGB views.
 
-GPU-native BC compression is intentionally not claimed yet. The repository does not currently contain a justified deterministic BC encoder, and adding one solely to report compressed support would introduce unnecessary dependency and licensing/maintenance cost. The uncompressed path is correct and measurable: compiler diagnostics report resident mip bytes and serialized payload bytes, while runtime qualification reports total texture footprint. A future BC implementation must extend the same usage/color-space/mip contract and demonstrate deterministic output.
+BC7 compression uses the pinned BCnEncoder.Net 2.3.0 dependency (MIT/Unlicense) in the offline compiler only. Semantic resizing/mip generation runs before compression; normal maps retain all three normalized channels, and ORM remains linear RGB. BestQuality, single-thread encoding makes clean rebuilds deterministic. BC7 stores 16 bytes per 4 x 4 block, including a complete block for small mips. Validation and D3D12 upload use block rows rather than pixel rows. Top-level dimensions must be multiples of four; control maps and generic numeric data require lossless RGBA8. Invalid combinations fail with asset/source context. Terrain's legacy CPU color sampler explicitly requires RGBA8; GPU material sampling supports BC7 through the shared resource path.
 
 ### Runtime texture representation
 
@@ -422,7 +422,7 @@ Shared texture families are:
 
 Physical families provide Base Color, tangent-space Normal, and packed ORM. The status map is Emissive and is used only where an existing gameplay/presentation state benefits from a functional warning treatment. Texture naming follows `texture.directorate.material.<family>_<channel>`.
 
-The original nineteen shared sources remain deterministic repository-authored 32 x 32 tileable TGA files. Their provenance is recorded beside the sources. The Asset Compiler generates complete mip chains. The nineteen shared textures occupy 103,740 bytes of RGBA8 mip texels; automated validation additionally constrains their compiled `.flasset` footprint to 160,000 bytes or less.
+The original nineteen shared sources remain deterministic repository-authored 32 x 32 tileable TGA files. Their provenance is recorded beside the sources. The compiler generates complete semantic mip chains and compresses these sources to BC7. Their resident texels now occupy 26,448 bytes, compared with 103,740 RGBA8 bytes. Tests require BC7 format and the exact resident budget while retaining the existing compiled-container ceiling. The 128 x 128 shared surface ORM atlas also uses BC7. The color atlas retains RGBA8 because its compiled odd dimension is incompatible with the portable BC top-level constraint.
 
 Existing generated/static meshes that need texture sampling but lack authored UV0 use the compiler's deterministic box-projection remediation. Projection is performed per triangle so seams can split vertices cleanly; normal-mapped materials then use the established tangent generator. Authored UV0/tangents remain authoritative when present. Compiler diagnostics report generated UV vertex counts alongside generated normals/tangents and any fallback sections.
 
@@ -438,9 +438,9 @@ Intentional non-physical categories remain outside this completeness rule:
 
 ## Current Boundary
 
-This baseline now includes the shared Directorate production material/texturing foundation. Higher-resolution unique hero art, animation retargeting, audio conversion, a generic editor framework, GPU block compression, texture streaming, virtual texturing, and final shipping-package optimization remain future work.
+This baseline includes shared Directorate materials and BC7 runtime textures. Higher-resolution production masters, unique hero art, animation retargeting, audio conversion, a generic editor framework, texture streaming, virtual texturing, and final shipping-package optimization remain acceptance work.
 
-Offline mip generation is now a compiler responsibility and the runtime consumes the compiled chain directly. Future BC compression, texture arrays, or streaming must extend the same runtime texture contract rather than create parallel asset formats.
+Offline mip generation and compression are compiler responsibilities and runtime consumes the compiled chain directly. Texture arrays or streaming must extend this same contract.
 
 ## Committed Vertical Slice world assets
 

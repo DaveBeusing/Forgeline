@@ -1,6 +1,7 @@
 {
   "id": "texture.directorate.material.reinforced_concrete_orm",
   "type": "texture",
+  "textureFormat": "bc7Unorm",
   "source": "reinforced_concrete_orm.tga",
   "textureUsage": "orm",
   "textureColorSpace": "linear",

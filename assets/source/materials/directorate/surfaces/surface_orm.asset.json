@@ -1,6 +1,7 @@
 {
   "id": "texture.directorate.surface.atlas_orm",
   "type": "texture",
+  "textureFormat": "bc7Unorm",
   "source": "surface_orm.tga",
   "textureUsage": "orm",
   "textureColorSpace": "linear",

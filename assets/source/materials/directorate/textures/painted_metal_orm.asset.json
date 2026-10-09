@@ -1,6 +1,7 @@
 {
   "id": "texture.directorate.material.painted_metal_orm",
   "type": "texture",
+  "textureFormat": "bc7Unorm",
   "source": "painted_metal_orm.tga",
   "textureUsage": "orm",
   "textureColorSpace": "linear",

@@ -1,6 +1,7 @@
 {
   "id": "texture.directorate.material.vegetation_orm",
   "type": "texture",
+  "textureFormat": "bc7Unorm",
   "source": "vegetation_orm.tga",
   "textureUsage": "orm",
   "textureColorSpace": "linear",

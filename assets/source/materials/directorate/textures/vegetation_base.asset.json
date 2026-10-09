@@ -1,6 +1,7 @@
 {
   "id": "texture.directorate.material.vegetation_base",
   "type": "texture",
+  "textureFormat": "bc7Unorm",
   "source": "vegetation_base.tga",
   "textureUsage": "baseColor",
   "textureColorSpace": "srgb",

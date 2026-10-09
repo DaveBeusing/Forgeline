@@ -1,6 +1,7 @@
 {
   "id": "texture.directorate.material.status_emissive",
   "type": "texture",
+  "textureFormat": "bc7Unorm",
   "source": "status_emissive.tga",
   "textureUsage": "emissive",
   "textureColorSpace": "srgb",

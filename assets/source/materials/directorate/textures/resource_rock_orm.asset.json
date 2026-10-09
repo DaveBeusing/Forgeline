@@ -1,6 +1,7 @@
 {
   "id": "texture.directorate.material.resource_rock_orm",
   "type": "texture",
+  "textureFormat": "bc7Unorm",
   "source": "resource_rock_orm.tga",
   "textureUsage": "orm",
   "textureColorSpace": "linear",

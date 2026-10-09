@@ -1,6 +1,7 @@
 {
   "id": "texture.directorate.material.resource_rock_normal",
   "type": "texture",
+  "textureFormat": "bc7Unorm",
   "source": "resource_rock_normal.tga",
   "textureUsage": "normal",
   "textureColorSpace": "linear",

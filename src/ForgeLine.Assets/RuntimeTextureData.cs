@@ -3,6 +3,7 @@ namespace ForgeLine.Assets;
 public enum RuntimeTextureFormat
 {
     Rgba8Unorm = 1,
+    Bc7Unorm = 2,
 }
 
 public enum RuntimeTextureColorSpace
@@ -73,10 +74,10 @@ public sealed class RuntimeTextureData
 
     public long ResidentByteCount =>
         _mips.Sum(
-            static mip =>
+                mip =>
                 checked(
                     (long)mip.RowPitch *
-                    mip.Height));
+                    (Format == RuntimeTextureFormat.Bc7Unorm ? (mip.Height + 3) / 4 : mip.Height)));
 
     public static RuntimeTextureData FromRgba8(
         int width,
@@ -504,10 +505,15 @@ public sealed class RuntimeTextureData
                 $"Runtime texture usage {(int)Usage} is invalid.");
         }
 
-        if (Format != RuntimeTextureFormat.Rgba8Unorm)
+        if (Format is not (RuntimeTextureFormat.Rgba8Unorm or RuntimeTextureFormat.Bc7Unorm))
         {
             throw new InvalidDataException(
                 $"Runtime texture format {Format} is not supported.");
+        }
+
+        if (Format == RuntimeTextureFormat.Bc7Unorm && (Width % 4 != 0 || Height % 4 != 0))
+        {
+            throw new InvalidDataException("BC7 top-level dimensions must be multiples of four.");
         }
 
         if (Usage is RuntimeTextureUsage.Normal or
@@ -547,7 +553,7 @@ public sealed class RuntimeTextureData
             }
 
             int minimumRowPitch =
-                checked(
+                Format == RuntimeTextureFormat.Bc7Unorm ? checked(((mip.Width + 3) / 4) * 16) : checked(
                     mip.Width *
                     RgbaChannelCount);
 
@@ -560,7 +566,7 @@ public sealed class RuntimeTextureData
             int expectedBytes =
                 checked(
                     mip.RowPitch *
-                    mip.Height);
+                    (Format == RuntimeTextureFormat.Bc7Unorm ? (mip.Height + 3) / 4 : mip.Height));
 
             if (mip.Pixels is null ||
                 mip.Pixels.Length != expectedBytes)

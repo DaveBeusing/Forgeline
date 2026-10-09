@@ -1,6 +1,7 @@
 {
   "id": "texture.directorate.material.structural_metal_base",
   "type": "texture",
+  "textureFormat": "bc7Unorm",
   "source": "structural_metal_base.tga",
   "textureUsage": "baseColor",
   "textureColorSpace": "srgb",

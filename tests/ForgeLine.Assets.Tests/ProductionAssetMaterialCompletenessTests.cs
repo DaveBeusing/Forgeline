@@ -7,7 +7,7 @@ namespace ForgeLine.Assets.Tests;
 public sealed class ProductionAssetMaterialCompletenessTests
 {
     private const int ExpectedSharedTextureCount = 19;
-    private const long ExpectedSharedResidentBytes = 103_740;
+    private const long ExpectedSharedResidentBytes = 26_448;
 
     [Fact]
     public void PhysicalProductionMeshesResolveCompleteTexturedMaterials()
@@ -186,6 +186,7 @@ public sealed class ProductionAssetMaterialCompletenessTests
                             AssetId.Parse(
                                 record.Id))
                         .Payload);
+                Assert.Equal(RuntimeTextureFormat.Bc7Unorm, texture.Format);
                 residentBytes +=
                     texture.ResidentByteCount;
                 compiledBytes +=

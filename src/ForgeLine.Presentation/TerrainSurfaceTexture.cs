@@ -59,6 +59,11 @@ public sealed class TerrainSurfaceTexture
         RuntimeTextureMipLevel mip =
             texture.Mips[0];
 
+        if (texture.Format != RuntimeTextureFormat.Rgba8Unorm)
+        {
+            throw new InvalidDataException("CPU terrain sampling requires RGBA8 texture data.");
+        }
+
         return new TerrainSurfaceTexture(
             mip.Width,
             mip.Height,
