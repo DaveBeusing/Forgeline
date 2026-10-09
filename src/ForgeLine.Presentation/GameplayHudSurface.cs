@@ -31,11 +31,14 @@ public readonly record struct GameplayHudRenderContext(
     GameplayHudLayout Layout,
     uint Dpi,
     float UiScale,
-    DebugDraw? GameplayOverlay);
+    DebugDraw? GameplayOverlay,
+    RuntimeMetricsView RuntimeMetrics = default);
 
 public interface IGameplayHudSurface : IDisposable
 {
     GameplayHudRegion Regions { get; }
+
+    int LastRenderedVertexCount => 0;
 
     void Render(
         in GameplayHudRenderContext context);

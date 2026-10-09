@@ -124,6 +124,19 @@ internal sealed class ClientSimulationHost : IDisposable
     public bool IsPaused =>
         Volatile.Read(ref _paused) != 0;
 
+    private long _completedTicks;
+
+    internal ClientSimulationTelemetry CaptureTelemetry() => new(SessionId,
+        checked((ulong)Volatile.Read(ref _completedTicks)),
+        IsTerminalFrozen ? RuntimeSimulationState.Stopped :
+        IsPaused ? RuntimeSimulationState.Paused : RuntimeSimulationState.Running);
+
+    private void AdvanceOneTick()
+    {
+        _simulation.AdvanceOneTick();
+        Interlocked.Increment(ref _completedTicks);
+    }
+
     public bool IsTerminalFrozen =>
         Volatile.Read(ref _terminalFrozen) != 0;
 
@@ -461,7 +474,7 @@ internal sealed class ClientSimulationHost : IDisposable
     {
         try
         {
-            _simulation.AdvanceOneTick();
+            AdvanceOneTick();
             NotifyProgress();
             UpdateTerminalState();
 
@@ -525,7 +538,7 @@ internal sealed class ClientSimulationHost : IDisposable
                         break;
                     }
 
-                    _simulation.AdvanceOneTick();
+                    AdvanceOneTick();
                     NotifyProgress();
                     UpdateTerminalState();
 
@@ -721,7 +734,7 @@ internal sealed class ClientSimulationHost : IDisposable
     {
         while (_simulation.CurrentTick.Value < 2)
         {
-            _simulation.AdvanceOneTick();
+            AdvanceOneTick();
             NotifyProgress();
         }
 
@@ -732,7 +745,7 @@ internal sealed class ClientSimulationHost : IDisposable
                 message.SmokeCommandCore);
         }
 
-        _simulation.AdvanceOneTick();
+        AdvanceOneTick();
         NotifyProgress();
         UpdateTerminalState();
     }

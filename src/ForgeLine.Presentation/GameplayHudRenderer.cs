@@ -5,9 +5,17 @@ using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
 
+public enum GameplayHudState : byte
+{
+    WaitingForSnapshot,
+    WaitingForPlayerData,
+    Ready
+}
+
 public sealed class GameplayHudRenderer : IDisposable
 {
     private readonly IGameplayHudSurface[] _surfaces;
+    private readonly ResourcePowerHudSurface? _statusSurface;
     private bool _disposed;
 
     public GameplayHudRenderer(
@@ -16,11 +24,10 @@ public sealed class GameplayHudRenderer : IDisposable
     {
         ArgumentNullException.ThrowIfNull(graphics);
 
+        _statusSurface = new ResourcePowerHudSurface(graphics, runtimeAssets);
         _surfaces =
         [
-            new ResourcePowerHudSurface(
-                graphics,
-                runtimeAssets),
+            _statusSurface,
             new SelectionInspectorHudSurface(
                 graphics,
                 runtimeAssets),
@@ -32,6 +39,14 @@ public sealed class GameplayHudRenderer : IDisposable
                 runtimeAssets)
         ];
     }
+
+    public GameplayHudState State { get; private set; }
+
+    public int LastRenderedVertexCount { get; private set; }
+
+    public static GameplayHudState ResolveState(PresentationSnapshot? snapshot) =>
+        snapshot is null ? GameplayHudState.WaitingForSnapshot :
+        snapshot.PlayerExperience is null ? GameplayHudState.WaitingForPlayerData : GameplayHudState.Ready;
 
     internal GameplayHudRenderer(
         IGameplayHudSurface[] surfaces)
@@ -54,7 +69,7 @@ public sealed class GameplayHudRenderer : IDisposable
     public void Render(
         IGraphicsCommandContext context,
         RtsCamera camera,
-        PresentationSnapshot snapshot,
+        PresentationSnapshot? snapshot,
         in AxisAlignedBounds worldBounds,
         in RtsInformationLayerView informationLayer,
         in PlayerActionPanelView actionPanel,
@@ -64,12 +79,12 @@ public sealed class GameplayHudRenderer : IDisposable
         in PreAlphaUxView preAlphaUx,
         uint dpi,
         float uiScale,
-        DebugDraw? gameplayOverlay = null)
+        DebugDraw? gameplayOverlay = null,
+        RuntimeMetricsView runtimeMetrics = default)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(camera);
-        ArgumentNullException.ThrowIfNull(snapshot);
         ArgumentNullException.ThrowIfNull(combatGroups);
 
         GameplayHudLayout layout =
@@ -78,6 +93,14 @@ public sealed class GameplayHudRenderer : IDisposable
                 context.Height,
                 dpi,
                 uiScale);
+        State = ResolveState(snapshot);
+        LastRenderedVertexCount = 0;
+        if (snapshot is null)
+        {
+            _statusSurface?.RenderWaiting(context, layout, runtimeMetrics);
+            LastRenderedVertexCount = _statusSurface?.LastRenderedVertexCount ?? 0;
+            return;
+        }
         var renderContext =
             new GameplayHudRenderContext(
                 context,
@@ -93,12 +116,14 @@ public sealed class GameplayHudRenderer : IDisposable
                 layout,
                 dpi,
                 uiScale,
-                gameplayOverlay);
+                gameplayOverlay,
+                runtimeMetrics);
 
         foreach (IGameplayHudSurface surface in _surfaces)
         {
             surface.Render(
                 renderContext);
+            LastRenderedVertexCount += surface.LastRenderedVertexCount;
         }
     }
 

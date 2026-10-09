@@ -191,6 +191,10 @@ public sealed class ClientSimulationHostTests
 
         SimulationTick pausedAt =
             fixture.Host.CurrentTick;
+        ClientSimulationTelemetry pausedTelemetry = fixture.Host.CaptureTelemetry();
+        Assert.Equal(fixture.Host.SessionId, pausedTelemetry.SessionId);
+        Assert.Equal(pausedAt.Value, pausedTelemetry.CompletedTicks);
+        Assert.Equal(RuntimeSimulationState.Paused, pausedTelemetry.State);
 
         Assert.True(
             fixture.Host.TrySetPaused(
@@ -207,6 +211,27 @@ public sealed class ClientSimulationHostTests
                 new SimulationTick(
                     pausedAt.Value + 1),
                 TestTimeout));
+        ClientSimulationTelemetry resumedTelemetry = fixture.Host.CaptureTelemetry();
+        Assert.True(resumedTelemetry.CompletedTicks > pausedTelemetry.CompletedTicks);
+        Assert.Equal(RuntimeSimulationState.Running, resumedTelemetry.State);
+    }
+
+    [Fact]
+    public void RuntimeTelemetryCountsOnlyFullyCompletedTicks()
+    {
+        using var slowSystem = new ControlledSlowSystem(new SimulationTick(2), TestContext.Current.CancellationToken);
+        using ClientHostFixture fixture = ClientHostFixture.Create(additionalSystem: slowSystem);
+        try
+        {
+            Assert.True(slowSystem.Entered.Wait(TestTimeout, TestContext.Current.CancellationToken));
+            Assert.Equal(1UL, fixture.Host.CaptureTelemetry().CompletedTicks);
+        }
+        finally
+        {
+            slowSystem.Release();
+        }
+        Assert.True(fixture.Host.WaitForTickAtLeast(new SimulationTick(2), TestTimeout));
+        Assert.True(fixture.Host.CaptureTelemetry().CompletedTicks >= 2);
     }
 
     [Fact]

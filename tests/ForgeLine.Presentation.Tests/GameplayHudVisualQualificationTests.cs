@@ -77,9 +77,10 @@ public sealed class GameplayHudVisualQualificationTests
             new HudRect(
                 12.0f,
                 12.0f,
-                1896.0f,
+                1742.0f,
                 36.0f),
             layout.TopStatusBar);
+        Assert.Equal(new HudRect(1766.0f, 12.0f, 142.0f, 36.0f), layout.RuntimeMetrics);
         Assert.Equal(
             new HudRect(
                 1688.0f,

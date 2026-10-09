@@ -457,7 +457,7 @@ internal sealed class ClientApplication
                 runtimeAssets,
                 _settings.CreateSceneLightingSettings(),
                 _startup, asynchronousStartup: true, expectedSession: simulationHost.SessionId,
-                transitionHost: sessionTransitionRenderer);
+                transitionHost: sessionTransitionRenderer, simulationTelemetry: simulationHost.CaptureTelemetry);
         bool playable = ClientSessionLoadingLoop.WaitForPresentation(
             pumpEvents: () =>
             {
@@ -1049,7 +1049,8 @@ internal sealed class ClientApplication
                         default,
                         _settings.UiScale,
                         preAlphaUx,
-                        frontendSurface));
+                        frontendSurface,
+                        MetricsActive: window.IsFocused && !window.IsMinimized));
 
                 if (shouldPauseForWindow)
                 {
@@ -1474,7 +1475,8 @@ internal sealed class ClientApplication
                     SurfaceSuspended:
                         window.IsMinimized,
                     CombatGroups:
-                        combatGroupOverview));
+                        combatGroupOverview,
+                    MetricsActive: window.IsFocused && !window.IsMinimized));
 
             if (_platform.Clock.GetElapsedTime(nextDiagnosticAt, now) >= DiagnosticInterval)
             {

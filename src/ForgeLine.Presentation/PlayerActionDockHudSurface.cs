@@ -27,6 +27,8 @@ internal sealed class PlayerActionDockHudSurface : IGameplayHudSurface
     public GameplayHudRegion Regions =>
         GameplayHudRegion.ActionDock;
 
+    public int LastRenderedVertexCount => _renderer.LastRenderedVertexCount;
+
     public void Render(
         in GameplayHudRenderContext context) =>
         _renderer.Render(

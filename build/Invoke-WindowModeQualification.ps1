@@ -111,6 +111,10 @@ function Invoke-ClientSmoke {
 
     $metrics = $report.metrics
 
+    if ($metrics.gameplayHudState -ne 2 -or $metrics.gameplayHudVertexCount -le 0) {
+        throw "Gameplay HUD did not bind player data and submit geometry during '$ExpectedMode' qualification."
+    }
+
     if ($metrics.textureBindingFailureCount -ne 0 -or
         $metrics.materialBindingFailureCount -ne 0) {
         throw "Texture/material binding failures were reported during '$ExpectedMode' qualification."
