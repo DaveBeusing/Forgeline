@@ -62,6 +62,24 @@ public sealed class ProductionAssetMaterialCompletenessTests
             RuntimeAssetCatalog catalog =
                 RuntimeAssetCatalog.Load(
                     runtimeRoot);
+
+            long productionResidentBytes = 0;
+            int productionTextureCount = 0;
+            foreach (string definitionPath in Directory.EnumerateFiles(
+                Path.Combine(repositoryRoot, "assets", "source"), "*.asset.json", SearchOption.AllDirectories))
+            {
+                using var json = System.Text.Json.JsonDocument.Parse(File.ReadAllText(definitionPath));
+                var definition = json.RootElement;
+                if (definition.GetProperty("type").GetString() != "texture" ||
+                    !definition.GetProperty("source").GetString()!.Contains("production", StringComparison.Ordinal)) continue;
+                var texture = RuntimeTextureData.FromPayload(catalog.Read(
+                    AssetId.Parse(definition.GetProperty("id").GetString()!)).Payload);
+                productionResidentBytes += texture.ResidentByteCount;
+                productionTextureCount++;
+            }
+            Assert.Equal(24, productionTextureCount);
+            Assert.Equal(51_364_204L, productionResidentBytes);
+
             RuntimeAssetRecord[] productionMeshes =
                 catalog.Manifest.Assets
                     .Where(

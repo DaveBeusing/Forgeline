@@ -145,8 +145,10 @@ function Invoke-ClientSmoke {
 
     & (Join-Path $PSScriptRoot 'Validate-VisualDrawBudgets.ps1') -Metrics $metrics
 
-    if ($metrics.peakResidentTextureBytes -gt 4194304) {
-        throw "Peak resident texture bytes $($metrics.peakResidentTextureBytes) exceeded the 4 MiB Vertical Slice budget."
+    # Native production PBR maps allocate 51,364,204 bytes; the bounded scene
+    # allowance includes control/UI/effect textures and display-dependent masks.
+    if ($metrics.peakResidentTextureBytes -gt 67108864) {
+        throw "Peak resident texture bytes $($metrics.peakResidentTextureBytes) exceeded the 64 MiB production scene budget."
     }
 
     if ($metrics.peakShaderResourceDescriptorsUsed -gt 512) {
@@ -204,15 +206,15 @@ if (Test-Path $assetQualificationReportPath) {
     $studioTextureBytes = [long]$assetQualification.studioSplashTextureRuntimeBytes
     $gameplayTextureBytes = [long]$assetQualification.textureRuntimeBytes - $studioTextureBytes
 
-    if ($gameplayTextureBytes -gt 3145728) {
-        throw "Compiled gameplay texture footprint $gameplayTextureBytes bytes exceeded the 3 MiB Vertical Slice budget."
+    if ($gameplayTextureBytes -gt 58720256) {
+        throw "Compiled gameplay texture footprint $gameplayTextureBytes bytes exceeded the 56 MiB production catalog budget."
     }
 
     if ($studioTextureBytes -gt 3145728) {
         throw "Compiled startup studio texture footprint $studioTextureBytes bytes exceeded the 3 MiB intro budget."
     }
 
-    Write-Host "Qualified texture budgets: gameplay=$gameplayTextureBytes bytes (3 MiB max); startupStudio=$studioTextureBytes bytes (3 MiB max)."
+    Write-Host "Qualified texture budgets: gameplay=$gameplayTextureBytes bytes (56 MiB max); startupStudio=$studioTextureBytes bytes (3 MiB max)."
 }
 
 if (Test-Path $settingsRootPath) {

@@ -37,6 +37,24 @@ uses a varying tangent field, a six-degree maximum decoded error, repeat-build
 equality and quality-change cache invalidation. This numeric tolerance is not
 a substitute for visual review of the authored surfaces.
 
+## Enforced production allocation budgets
+
+The twenty-four compiled physical texture chains allocate exactly 51,364,204
+bytes: 7,323,648 for the atlas and 44,040,556 for terrain. The material
+completeness test reads the compiled payloads and enforces this exact sum and
+the twenty-four-map count. The original nineteen-map 26,448-byte budget
+remains separately enforced.
+
+The old 3 MiB compiled/4 MiB resident gameplay limits described the tiny
+prototype sources. The production window qualification now bounds compiled
+gameplay textures at 56 MiB, allowing container/UI/effect overhead above the
+measured 53,008,312-byte catalog footprint. The native scene has a 64 MiB peak
+resident texture limit for the physical maps, control masks, UI and effects.
+Observed production reference runs allocate 52,187,924–52,707,564 texture
+bytes. Splash/intro textures retain their separate 3 MiB limit; draw,
+descriptor, sample-count, binding and resource-lifetime gates remain enforced.
+These are texture allocation limits, not a total-VRAM or frame-rate guarantee.
+
 `build/Refine-ProductionMeshes.py` authors small manufactured edge bevels
 while preserving outer bounds, component UV orientation, pivots and stable
 asset IDs. Unit LOD0, articulated tank turret, building LOD0 and supported prop
