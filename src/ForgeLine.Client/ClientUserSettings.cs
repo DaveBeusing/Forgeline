@@ -44,6 +44,9 @@ internal sealed record ClientUserSettings
 
     public RtsCameraBindings CameraBindings { get; init; } = new();
 
+    [JsonIgnore]
+    public RtsReferenceZoom ReferenceZoom { get; init; } = RtsReferenceZoom.NormalGameplay;
+
     public void Validate()
     {
         if (SchemaVersion != CurrentSchemaVersion)
@@ -105,17 +108,11 @@ internal sealed record ClientUserSettings
 
     public RtsCameraSettings CreateCameraSettings(
         Vector3 initialTarget) =>
-        new()
+        RtsVisualReference.CreateCameraSettings(initialTarget, ReferenceZoom) with
         {
-            InitialTarget = initialTarget,
-            InitialDistance = 420.0f,
-            MinimumDistance = 20.0f,
-            MaximumDistance = 1_200.0f,
-            PanReferenceDistance = 180.0f,
             BasePanSpeedUnitsPerSecond =
                 42.0f *
                 CameraPanSpeedMultiplier,
-            MaximumPanSpeedScale = 5.0f,
             EdgeScrollEnabled = EdgeScrollEnabled
         };
 

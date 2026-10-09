@@ -108,7 +108,7 @@ The wreck has no command, combat, production, power, storage, or navigation auth
 
 ## LOD and collision
 
-Each primary family exposes LOD0, LOD1, and LOD2 references. The current presentation thresholds are 220 m and 620 m.
+Each primary family exposes LOD0, LOD1, and LOD2 references. Completed-building rendering uses projected size with 150/45 reference-pixel thresholds and 12% hysteresis. Legacy distance-selection helpers remain in the catalog. Construction and destruction use their purpose-specific representations. See [Camera and Input](CameraAndInput.md).
 
 All thirteen primary assets reference the shared simplified collision asset:
 

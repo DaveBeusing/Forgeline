@@ -3,6 +3,7 @@ namespace ForgeLine.Graphics;
 public enum GraphicsTextureFormat
 {
     Rgba8Unorm = 1,
+    Bc7Unorm = 2,
 }
 
 public enum GraphicsTextureColorSpace
@@ -43,6 +44,11 @@ public sealed record GraphicsTextureDescription(
             throw new ArgumentOutOfRangeException(nameof(ColorSpace));
         }
 
+        if (Format == GraphicsTextureFormat.Bc7Unorm && (Width % 4 != 0 || Height % 4 != 0))
+        {
+            throw new ArgumentException("BC7 top-level dimensions must be multiples of four.");
+        }
+
         if (MipCount <= 0 || MipCount > 32)
         {
             throw new ArgumentOutOfRangeException(
@@ -75,8 +81,10 @@ public sealed class GraphicsTextureData
 
     public long ResidentByteCount =>
         _mips.Sum(
-            static mip =>
-                checked((long)mip.RowPitch * mip.Height));
+            mip =>
+                checked((long)mip.RowPitch * GetRowCount(mip.Height)));
+
+    private int GetRowCount(int height) => Description.Format == GraphicsTextureFormat.Bc7Unorm ? (height + 3) / 4 : height;
 
     private void Validate()
     {
@@ -89,7 +97,7 @@ public sealed class GraphicsTextureData
                 nameof(_mips));
         }
 
-        if (Description.Format != GraphicsTextureFormat.Rgba8Unorm)
+        if (Description.Format is not (GraphicsTextureFormat.Rgba8Unorm or GraphicsTextureFormat.Bc7Unorm))
         {
             throw new NotSupportedException(
                 $"Texture format {Description.Format} is not supported.");
@@ -109,15 +117,15 @@ public sealed class GraphicsTextureData
                     nameof(_mips));
             }
 
-            int minimumRowPitch = checked(mip.Width * RgbaChannelCount);
+            int minimumRowPitch = Description.Format == GraphicsTextureFormat.Bc7Unorm ? checked(((mip.Width + 3) / 4) * 16) : checked(mip.Width * RgbaChannelCount);
             if (mip.RowPitch < minimumRowPitch)
             {
                 throw new ArgumentException(
-                    $"Texture mip {index} row pitch is smaller than its RGBA8 row width.",
+                    $"Texture mip {index} row pitch is smaller than its format row width.",
                     nameof(_mips));
             }
 
-            int expectedBytes = checked(mip.RowPitch * mip.Height);
+            int expectedBytes = checked(mip.RowPitch * GetRowCount(mip.Height));
             if (mip.Pixels is null || mip.Pixels.Length != expectedBytes)
             {
                 throw new ArgumentException(

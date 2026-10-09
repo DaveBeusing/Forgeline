@@ -8,6 +8,52 @@ namespace ForgeLine.Assets.Tests;
 
 public sealed class TexturePipelineTests
 {
+    [Theory]
+    [InlineData(RuntimeTextureUsage.TerrainControl, 8, 8)]
+    [InlineData(RuntimeTextureUsage.GenericData, 8, 8)]
+    [InlineData(RuntimeTextureUsage.Normal, 7, 8)]
+    public void RejectsBc7ForLosslessDataOrUnalignedTopLevel(RuntimeTextureUsage usage, int width, int height)
+    {
+        using var workspace = new TextureWorkspace();
+        const string id = "texture.test.invalid_compression";
+        workspace.WriteTexture(id, usage, RuntimeTextureColorSpace.Linear,
+            width, height, SolidPixels(width, height, 128, 128, 255, 255));
+        workspace.WriteTextureDefinition(id, usage, RuntimeTextureColorSpace.Linear,
+            true, null, format: "bc7Unorm");
+        Assert.False(workspace.Compile().Success);
+    }
+    [Fact]
+    public void Bc7CompilationRetainsSemanticMipsAndIsDeterministic()
+    {
+        using var workspace = new TextureWorkspace();
+        const string id = "texture.test.compressed";
+        workspace.WriteTexture(id, RuntimeTextureUsage.Normal, RuntimeTextureColorSpace.Linear,
+            8, 8, SolidPixels(8, 8, 128, 128, 255, 255));
+        workspace.WriteTextureDefinition(id, RuntimeTextureUsage.Normal, RuntimeTextureColorSpace.Linear,
+            true, null, format: "bc7Unorm");
+        AssetCompilationResult result = workspace.Compile();
+        Assert.True(result.Success, string.Join("; ", result.Diagnostics.Select(d => d.Message)));
+        RuntimeTextureData texture = workspace.ReadTexture(id);
+        Assert.Equal(RuntimeTextureFormat.Bc7Unorm, texture.Format);
+        Assert.Equal(4, texture.Mips.Count);
+        Assert.Equal(112, texture.ResidentByteCount);
+        var decoder = new BCnEncoder.Decoder.BcDecoder();
+        var decoded = decoder.DecodeRaw(texture.Mips[0].Pixels, 8, 8, BCnEncoder.Shared.CompressionFormat.Bc7);
+        Assert.All(decoded, pixel =>
+        {
+            Assert.InRange((int)pixel.r, 126, 130);
+            Assert.InRange((int)pixel.g, 126, 130);
+            Assert.InRange((int)pixel.b, 253, 255);
+        });
+        byte[] before = texture.ToPayload();
+        Assert.True(workspace.Compile(clean: true).Success);
+        Assert.Equal(before, workspace.ReadTexture(id).ToPayload());
+        Assert.Equal(1, workspace.Compile().SkippedCount);
+        workspace.WriteTextureDefinition(id, RuntimeTextureUsage.Normal, RuntimeTextureColorSpace.Linear, true, null);
+        Assert.Equal(1, workspace.Compile().CompiledCount);
+        Assert.Equal(RuntimeTextureFormat.Rgba8Unorm, workspace.ReadTexture(id).Format);
+    }
+
     [Fact]
     public void RuntimeResolutionCapFiltersSourceAndInvalidatesCachedOutput()
     {
@@ -557,7 +603,8 @@ public sealed class TexturePipelineTests
             RuntimeTextureColorSpace colorSpace,
             bool generateMipmaps,
             int? maxMipLevels,
-            int? maxDimension = null)
+            int? maxDimension = null,
+            string? format = null)
         {
             string name =
                 FileName(
@@ -591,6 +638,7 @@ public sealed class TexturePipelineTests
 
             if (maxDimension.HasValue)
                 definition["textureMaxDimension"] = maxDimension.Value;
+            if (format is not null) definition["textureFormat"] = format;
 
             WriteText(
                 $"textures/{name}.asset.json",

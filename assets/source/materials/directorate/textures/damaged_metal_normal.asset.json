@@ -1,6 +1,7 @@
 {
   "id": "texture.directorate.material.damaged_metal_normal",
   "type": "texture",
+  "textureFormat": "bc7Unorm",
   "source": "damaged_metal_normal.tga",
   "textureUsage": "normal",
   "textureColorSpace": "linear",

@@ -9,4 +9,8 @@ public readonly record struct InstanceRenderDiagnostics(
     int ReducedLodInstances = 0,
     int RuntimeMeshInstances = 0,
     int TexturedRuntimeMeshInstances = 0,
-    int FallbackMeshInstances = 0);
+    int FallbackMeshInstances = 0)
+{
+    public int Lod1Instances { get; init; }
+    public int Lod2Instances { get; init; }
+}

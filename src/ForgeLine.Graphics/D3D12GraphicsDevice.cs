@@ -502,7 +502,9 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         long residentByteCount = texture.ResidentByteCount;
 
         Format nativeFormat =
-            description.ColorSpace == GraphicsTextureColorSpace.Srgb
+            description.Format == GraphicsTextureFormat.Bc7Unorm
+                ? (description.ColorSpace == GraphicsTextureColorSpace.Srgb ? Format.BC7_UNorm_SRgb : Format.BC7_UNorm)
+                : description.ColorSpace == GraphicsTextureColorSpace.Srgb
                 ? Format.R8G8B8A8_UNorm_SRgb
                 : Format.R8G8B8A8_UNorm;
 
@@ -1167,9 +1169,9 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             GraphicsTextureMipData mip =
                 texture.Mips[mipIndex];
             int rowBytes =
-                checked(
-                    mip.Width *
-                    4);
+                texture.Description.Format == GraphicsTextureFormat.Bc7Unorm
+                    ? checked(((mip.Width + 3) / 4) * 16)
+                    : checked(mip.Width * 4);
 
             if (rowSizes[mipIndex] < checked((ulong)rowBytes))
             {
@@ -1178,7 +1180,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             }
 
             for (int row = 0;
-                 row < mip.Height;
+                 row < checked((int)rowCounts[mipIndex]);
                  row++)
             {
                 int sourceOffset =

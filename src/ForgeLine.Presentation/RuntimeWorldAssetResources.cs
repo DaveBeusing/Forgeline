@@ -514,7 +514,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
                 new GraphicsTextureDescription(
                     data.Width,
                     data.Height,
-                    GraphicsTextureFormat.Rgba8Unorm,
+                    data.Format == RuntimeTextureFormat.Bc7Unorm ? GraphicsTextureFormat.Bc7Unorm : GraphicsTextureFormat.Rgba8Unorm,
                     data.ColorSpace ==
                     RuntimeTextureColorSpace.Srgb
                         ? GraphicsTextureColorSpace.Srgb

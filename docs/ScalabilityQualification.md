@@ -17,7 +17,8 @@ The 20 Hz simulation and 60 FPS rendering targets imply 50 ms per tick and 16.67
 | Renderer empty / medium / large strategic | 0 / 1,000 / 10,000 mixed instances; no rendered terrain / 49 / 289 total chunks | Terrain, instance and total submission timings; actual visibility/draws |
 | Renderer effects/debug UI | 1,200 mixed instances including VFX; 49 chunks; 128 debug lines; development text overlay | Submission with optional debug/UI work; excludes complete gameplay HUD |
 | Rapid camera | Same mixed scene, deterministic pan/yaw and distance motion | Visibility, LOD distribution, submission/upload tails and retention |
-| LOD boundary | One tank at the target, distance alternates 139.99 / 140.01 m across its 140 m LOD0/1 boundary | Alternating visible LODs are required; current selection is stateless, without hysteresis |
+| LOD boundary | One tank at the target; camera distance is derived from its projected radius and FOV, then alternates 0.8 / 1.3 times the nominal boundary distance | Alternating visible LODs are required across both sides of the hysteresis band |
+| LOD hysteresis | Same projected-size fixture; distance alternates 0.999 / 1.001 times the nominal boundary distance | One visible high-detail tank must remain stable inside the band; no LOD thrashing |
 | Scene reload | Fresh instance renderer, first submission, disposal, 1,000 mixed instances | Lazy mesh/material load and upload cost; native live resources return to baseline |
 | Extraction/publication | Existing fixed `--frame-hotpaths` scenarios | Separate extraction and publisher timing/allocation; no complete main-thread stall claim |
 

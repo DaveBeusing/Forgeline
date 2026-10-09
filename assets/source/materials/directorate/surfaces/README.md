@@ -22,4 +22,4 @@ Authored UV seams place each component inside its intended cell with a 0.018 nor
 (240,245,0) (245,245,0) (245,245,0) (240,180,110)
 ```
 
-Offline compilation limits the color atlas to a maximum dimension of 512 (the authored odd dimension reduces to 313) and four mip levels. ORM uses three levels. The retained terminal dimensions and UV insets prevent filtering across neighboring cells. Runtime never reads PNG/TGA sources.
+Offline compilation limits the color atlas to a maximum dimension of 512 (the authored odd dimension reduces to 313) and four mip levels. It remains RGBA8 because portable BC resources require aligned top-level dimensions. ORM uses three levels and BC7 linear storage: 21,504 resident bytes compared with 86,016 RGBA8 bytes. Retained terminal dimensions and UV insets limit filtering across neighboring cells. Runtime never reads PNG/TGA sources.

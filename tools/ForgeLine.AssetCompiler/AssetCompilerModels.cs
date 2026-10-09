@@ -43,6 +43,8 @@ public sealed record SourceAssetDefinition
 
     public int? TextureMaxDimension { get; init; }
 
+    public RuntimeTextureFormat TextureFormat { get; init; } = RuntimeTextureFormat.Rgba8Unorm;
+
     public float Scale { get; init; } = 1f;
 
     public IReadOnlyList<string> Dependencies { get; init; } = [];

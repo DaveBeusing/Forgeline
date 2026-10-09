@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using ForgeLine.Assets;
 using ForgeLine.Graphics;
 using ForgeLine.World;
+using ForgeLine.Core;
 
 namespace ForgeLine.Presentation;
 
@@ -28,6 +29,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
     private readonly Dictionary<int, FrameInstanceBuffer> _frameInstanceBuffers = [];
     private readonly Dictionary<InstanceBatchKey, InstanceBatch> _batchLookup = [];
     private readonly List<InstanceBatch> _batches = [];
+    private Dictionary<(EntityId Entity, uint Identity), int> _previousLods = [];
+    private Dictionary<(EntityId Entity, uint Identity), int> _currentLods = [];
     private InstanceRenderData[] _instanceStaging = [];
     private int _activeBatchCount;
     private bool _disposed;
@@ -171,12 +174,15 @@ public sealed class SimpleInstanceRenderer : IDisposable
             ViewFrustum.FromViewProjection(
                 matrices.ViewProjection);
         ResetScratch();
+        _currentLods.Clear();
         var batchLookup = _batchLookup;
         var batches = _batches;
 
         int visible = 0;
         int highLod = 0;
         int reducedLod = 0;
+        int lod1Instances = 0;
+        int lod2Instances = 0;
 
         for (int index = 0; index < world.InstanceCount; index++)
         {
@@ -216,6 +222,13 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 Vector3.Distance(
                     camera.Position,
                     instance.Transform.Position);
+            float projectedDiameter = ScreenSpaceLod.ProjectedDiameter(
+                instance.Transform.Position,
+                PresentationBounds.ResolveLocalHalfExtents(instance).Length(),
+                matrices, context.Height);
+            var lodKey = (instance.Entity, instance.DebugIdentity);
+            bool hasLodIdentity = instance.Entity.IsValid || instance.DebugIdentity != 0;
+            int previousLod = hasLodIdentity && _previousLods.TryGetValue(lodKey, out int retainedLod) ? retainedLod : 0;
             UnitAssetLod unitLod =
                 UnitAssetLod.Lod0;
             UnitPresentationDefinition unitDefinition =
@@ -230,9 +243,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
             if (instance.UnitFeature.IsSpecified)
             {
                 unitLod =
-                    UnitPresentationCatalog.SelectLod(
-                        instance.UnitFeature,
-                        distance);
+                    instance.UnitFeature.IsWreck ? UnitAssetLod.Lod2
+                        : (UnitAssetLod)ScreenSpaceLod.Select(projectedDiameter, previousLod);
+                if (hasLodIdentity) _currentLods[lodKey] = (int)unitLod;
                 unitDefinition =
                     UnitPresentationCatalog.Get(
                         instance.UnitFeature.Unit);
@@ -254,6 +267,16 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         out runtimeMeshId) &&
                     runtimeMesh.IsValid;
 
+                if (!usesRuntimeMesh && _runtimeAssets is not null && unitLod != UnitAssetLod.Lod0 && !instance.UnitFeature.IsWreck)
+                {
+                    unitLod = UnitAssetLod.Lod0;
+                    usesRuntimeMesh = _runtimeAssets.TryGetMesh(unitDefinition.MeshAssetId,
+                        out runtimeMesh, out runtimeMeshId) && runtimeMesh.IsValid;
+                    if (hasLodIdentity) _currentLods[lodKey] = (int)unitLod;
+                }
+                if (unitLod == UnitAssetLod.Lod1) lod1Instances++;
+                if (unitLod == UnitAssetLod.Lod2) lod2Instances++;
+
                 if (unitLod == UnitAssetLod.Lod0)
                 {
                     highLod++;
@@ -266,9 +289,10 @@ public sealed class SimpleInstanceRenderer : IDisposable
             else if (instance.BuildingFeature.IsSpecified)
             {
                 buildingLod =
-                    BuildingPresentationCatalog.SelectLod(
-                        instance.BuildingFeature,
-                        distance);
+                    instance.BuildingFeature.IsConstruction || instance.BuildingFeature.IsDestroyed
+                        ? BuildingAssetLod.Lod0
+                        : (BuildingAssetLod)ScreenSpaceLod.Select(projectedDiameter, previousLod, 150.0f, 45.0f);
+                if (hasLodIdentity) _currentLods[lodKey] = (int)buildingLod;
                 hasBuildingDefinition =
                     BuildingPresentationCatalog.TryGet(
                         instance.BuildingFeature.Building,
@@ -289,6 +313,18 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         out runtimeMesh,
                         out runtimeMeshId) &&
                     runtimeMesh.IsValid;
+
+                if (!usesRuntimeMesh && _runtimeAssets is not null && buildingLod != BuildingAssetLod.Lod0)
+                {
+                    buildingLod = BuildingAssetLod.Lod0;
+                    usesRuntimeMesh = _runtimeAssets.TryGetMesh(
+                        BuildingPresentationCatalog.ResolveMeshAssetId(instance.BuildingFeature, buildingLod),
+                        out runtimeMesh, out runtimeMeshId) && runtimeMesh.IsValid;
+                    if (hasLodIdentity) _currentLods[lodKey] = (int)buildingLod;
+                }
+
+                if (buildingLod == BuildingAssetLod.Lod1) lod1Instances++;
+                if (buildingLod == BuildingAssetLod.Lod2) lod2Instances++;
 
                 if (buildingLod ==
                     BuildingAssetLod.Lod0)
@@ -352,9 +388,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         instance.WorldFeature.Visual)
                     .MaterialAssetId;
                 WorldAssetLod worldLod =
-                    WorldPresentationCatalog.SelectLod(
-                        instance.WorldFeature,
-                        distance);
+                    ScreenSpaceLod.Select(projectedDiameter, previousLod, 65.0f, 18.0f) > 0
+                        ? WorldAssetLod.Reduced : WorldAssetLod.High;
+                if (hasLodIdentity) _currentLods[lodKey] = worldLod == WorldAssetLod.Reduced ? 1 : 0;
 
                 usesRuntimeMesh =
                     _runtimeAssets is not null &&
@@ -367,6 +403,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
                 if (worldLod == WorldAssetLod.Reduced)
                 {
+                    lod1Instances++;
                     reducedLod++;
                 }
                 else
@@ -545,7 +582,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     world.InstanceCount,
                     0,
                     highLod,
-                    reducedLod);
+                    reducedLod) { Lod1Instances = lod1Instances, Lod2Instances = lod2Instances };
             return;
         }
 
@@ -716,7 +753,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 reducedLod,
                 runtimeMeshInstances,
                 texturedRuntimeMeshInstances,
-                fallbackMeshInstances);
+                fallbackMeshInstances) { Lod1Instances = lod1Instances, Lod2Instances = lod2Instances };
     }
 
     public void Dispose()
@@ -736,6 +773,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
         _batchLookup.Clear();
         _batches.Clear();
         _instanceStaging = [];
+        _previousLods.Clear();
+        _currentLods.Clear();
         _runtimeAssets?.Dispose();
         _indexBuffer.Dispose();
         _vertexBuffer.Dispose();
@@ -746,6 +785,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
     private void ResetScratch()
     {
+        (_previousLods, _currentLods) = (_currentLods, _previousLods);
         // Only the render owner uses scratch; no span escapes synchronous SetData.
         _batchLookup.Clear();
         long retainedInstances = 0;

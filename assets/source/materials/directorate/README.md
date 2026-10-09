@@ -20,8 +20,8 @@ Each physical family provides Base Color, tangent-space Normal, and packed ORM w
 
 The sources are deliberately compact 32 x 32 tileable RGBA textures. They are a reusable baseline for RTS-scale material separation rather than unique baked detail. The Asset Compiler generates complete mip chains, while material factors, UV scale, geometry silhouette, state overlays, and faction/readability treatment provide higher-level variation.
 
-A complete RGBA8 32 x 32 mip chain contains 5,460 texel bytes. The nineteen shared textures therefore represent 103,740 bytes of uncompressed runtime texel data before container metadata.
+A complete BC7 32 x 32 mip chain contains 1,392 bytes. The nineteen shared textures therefore occupy 26,448 runtime bytes before container metadata, compared with 103,740 bytes in RGBA8. Editable TGA sources remain lossless. These small sources are a material foundation; they do not satisfy the higher-resolution production-master acceptance requirement.
 
 ## Concept surface completion
 
-The physical production mesh set now uses the component-specific [surface atlas](surfaces/README.md) and numeric ORM atlas. The original nineteen textures remain stable reusable assets, including the tangent-normal families and functional status emissive. Their historical 103,740-byte budget is still validated independently. New surface atlases have explicit runtime resolution/mip limits and are included in the measured gameplay texture budget.
+The physical production mesh set uses the component-specific [surface atlas](surfaces/README.md) and numeric ORM atlas. The original nineteen textures remain stable reusable assets, including tangent-normal families and functional status emissive. Their BC7 budget is validated independently. Surface atlases have explicit runtime resolution/mip limits and contribute to the measured gameplay texture budget.

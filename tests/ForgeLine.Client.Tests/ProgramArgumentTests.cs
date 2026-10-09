@@ -4,6 +4,17 @@ namespace ForgeLine.Client.Tests;
 
 public sealed class ProgramArgumentTests
 {
+    [Theory]
+    [InlineData("CloseTactical", true)]
+    [InlineData("NormalGameplay", true)]
+    [InlineData("Strategic", true)]
+    [InlineData("invalid", false)]
+    [InlineData("999", false)]
+    public void ReferenceZoomValidatesPresetName(string zoom, bool expected)
+    {
+        Assert.Equal(expected, Program.TryParseArguments(["--reference-zoom", zoom], out _, out _, out _, out _));
+        Assert.False(Program.TryParseArguments(["--reference-zoom"], out _, out _, out _, out _));
+    }
     [Fact]
     public void QualificationArgumentsAcceptIsolatedSettingsRoot()
     {

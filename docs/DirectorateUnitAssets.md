@@ -48,7 +48,7 @@ Each six-family LOD0 mesh references explicit LOD1 and LOD2 assets in compiler m
 - LOD2 preserves only strategic-scale silhouette features.
 - Wreck presentation uses the LOD2 geometry with the wreck damage-state treatment rather than introducing six unique wreck meshes without demonstrated visual value.
 
-The presentation catalog defines the current camera-distance thresholds. Renderer selection is presentation-only and never changes simulation state.
+The renderer uses projected bounding-sphere size with 90/28 reference-pixel thresholds and 12% hysteresis. Legacy distance-selection helpers remain available in the catalog, but do not drive production rendering. See [Camera and Input](CameraAndInput.md). Selection is presentation-only and never changes simulation state.
 
 ## Collision and gameplay footprint
 
@@ -136,7 +136,7 @@ Presentation uses role-specific readability bounds around unit transforms for pi
 `SimpleInstanceRenderer`:
 
 1. resolves the unit presentation definition;
-2. chooses LOD0/LOD1/LOD2 from camera distance;
+2. chooses LOD0/LOD1/LOD2 from projected size with retained-state hysteresis;
 3. resolves the stable runtime mesh from `RuntimeAssetCatalog`;
 4. resolves the compiled material tint;
 5. applies authoritative damage-state presentation;

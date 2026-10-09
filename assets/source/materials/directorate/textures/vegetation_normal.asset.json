@@ -1,6 +1,7 @@
 {
   "id": "texture.directorate.material.vegetation_normal",
   "type": "texture",
+  "textureFormat": "bc7Unorm",
   "source": "vegetation_normal.tga",
   "textureUsage": "normal",
   "textureColorSpace": "linear",

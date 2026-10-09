@@ -44,6 +44,8 @@ internal readonly record struct ClientVisualQualificationSnapshot(
     double TerrainCpuSubmissionMilliseconds = 0.0)
 {
     public bool GpuTimingAvailable { get; init; }
+    public int Lod1Instances { get; init; }
+    public int Lod2Instances { get; init; }
 
     public GameplayHudState GameplayHudState { get; init; }
 
@@ -865,6 +867,8 @@ internal sealed class ClientRenderHost : IDisposable
                 terrain.CpuSubmissionMilliseconds)
             {
                 GameplayHudState = hudState,
+                Lod1Instances = instances.Lod1Instances,
+                Lod2Instances = instances.Lod2Instances,
                 GameplayHudVertexCount = hudVertexCount,
                 RuntimeMetrics = runtimeMetrics,
                 LastMeasuredRunningRates = lastMeasuredRunningRates,

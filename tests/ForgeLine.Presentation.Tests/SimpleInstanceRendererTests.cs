@@ -12,6 +12,26 @@ public sealed class SimpleInstanceRendererTests : IDisposable
     private readonly FakeGraphicsDevice _graphics = new();
 
     [Fact]
+    public void CloseWreckReportsTheReducedLodUsedByItsMesh()
+    {
+        var camera = new RtsCamera(new RtsCameraSettings { InitialDistance = 12 });
+        var instance = Instance(new EntityId(1, 1), camera.Target, new Vector3(4)) with
+        {
+            UnitFeature = new UnitFeaturePresentationMetadata(UnitIds.MainBattleTank, UnitPresentationDamageState.Wreck)
+        };
+        var snapshots = new PresentationSnapshotBuffer();
+        snapshots.Publish(new PresentationSnapshot(new SimulationTick(1), TimeSpan.FromMilliseconds(50), 1, [instance]));
+        var world = new RenderWorld();
+        Assert.True(world.Update(snapshots));
+        using var renderer = new SimpleInstanceRenderer(_graphics);
+        renderer.Render(new FakeGraphicsCommandContext(), camera, world, 1);
+        Assert.Equal(1, renderer.LastDiagnostics.VisibleInstances);
+        Assert.Equal(0, renderer.LastDiagnostics.HighLodInstances);
+        Assert.Equal(1, renderer.LastDiagnostics.ReducedLodInstances);
+        Assert.Equal(1, renderer.LastDiagnostics.Lod2Instances);
+    }
+
+    [Fact]
     public void OversizedScratchIsReleasedBeforeNextSmallFrame()
     {
         var camera = new RtsCamera();
