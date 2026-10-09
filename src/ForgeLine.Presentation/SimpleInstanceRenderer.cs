@@ -243,7 +243,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
             if (instance.UnitFeature.IsSpecified)
             {
                 unitLod =
-                    (UnitAssetLod)ScreenSpaceLod.Select(projectedDiameter, previousLod);
+                    instance.UnitFeature.IsWreck ? UnitAssetLod.Lod2
+                        : (UnitAssetLod)ScreenSpaceLod.Select(projectedDiameter, previousLod);
                 if (hasLodIdentity) _currentLods[lodKey] = (int)unitLod;
                 unitDefinition =
                     UnitPresentationCatalog.Get(
