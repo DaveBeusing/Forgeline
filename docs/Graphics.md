@@ -268,7 +268,6 @@ This foundation deliberately does not implement:
 - model loading
 - render extraction from ECS/game state
 - fog-of-war rendering
-- selection outlines
 - advanced culling
 - indirect rendering
 - compute workloads
@@ -293,3 +292,8 @@ The renderer consumes immutable presentation snapshots and copied camera/debug/U
 A slow render frame can delay later GPU submissions, but it cannot execute or block authoritative simulation ticks. A slow simulation tick leaves the renderer free to reuse the newest completed snapshot.
 
 See [Client Execution Ownership](adr/ClientExecutionOwnership.md).
+
+
+## Player interaction overlays
+
+Graphics pipelines expose opt-in non-premultiplied alpha blending; opaque rendering remains the default. The RTS information overlay opts in for marquee fill and outlines. The player world overlay reuses the bounded debug geometry source with optional screen-space line expansion, soft alpha edges and one triangle batch. The render owner applies the active DPI/UI scale. Developer line rendering retains its existing path. See [Selection and Command Interaction](SelectionAndCommandInteraction.md) for marker semantics and budgets.

@@ -331,4 +331,3 @@ public sealed class DebugDrawRenderer : IDisposable
     [StructLayout(LayoutKind.Sequential)]
     private readonly record struct ScreenLineVertex(Vector4 Position, Vector4 Color, Vector2 Edge);
 }
-
