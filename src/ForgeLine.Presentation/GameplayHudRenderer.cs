@@ -46,6 +46,7 @@ public sealed class GameplayHudRenderer : IDisposable
     public int LastRenderedVertexCount { get; private set; }
 
     public int LastHoverTooltipVertexCount { get; private set; }
+    public int LastGuidanceVertexCount { get; private set; }
 
     public static GameplayHudState ResolveState(PresentationSnapshot? snapshot) =>
         snapshot is null ? GameplayHudState.WaitingForSnapshot :
@@ -100,6 +101,7 @@ public sealed class GameplayHudRenderer : IDisposable
         State = ResolveState(snapshot);
         LastRenderedVertexCount = 0;
         LastHoverTooltipVertexCount = 0;
+        LastGuidanceVertexCount = 0;
         if (snapshot is null)
         {
             _statusSurface?.RenderWaiting(context, layout, runtimeMetrics);
@@ -130,6 +132,8 @@ public sealed class GameplayHudRenderer : IDisposable
             surface.Render(
                 renderContext);
             LastRenderedVertexCount += surface.LastRenderedVertexCount;
+            if (surface is RtsInformationHudSurface information)
+                LastGuidanceVertexCount = information.LastGuidanceVertexCount;
             if (surface is WorldHoverTooltipSurface)
                 LastHoverTooltipVertexCount = surface.LastRenderedVertexCount;
         }

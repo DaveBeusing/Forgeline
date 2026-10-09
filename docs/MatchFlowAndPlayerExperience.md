@@ -14,6 +14,26 @@ The vertical-slice match flow turns the existing FORGELINE simulation systems in
 
 The current playable configuration uses the Central Divide prototype battlefield, Player 1 as the local Directorate side, Player 2 as the computer-controlled opposing side, and a seeded simulation.
 
+## Early-game guidance observations
+
+`PresentationExtractor` publishes a bounded `PlayerGuidanceSummary` at completed ticks. It contains only observing player, session, tick and milestone bits. Operational component and inventory reads follow local ownership validation; opponent progress comes from current faction-specific opaque/identified contacts, with no hostile ECS query. `EarlyGameGuidanceController` retains observed bits within one session, skips out-of-order completion, rejects older/incoherent snapshots, and suppresses terminal output. It neither submits commands nor changes simulation/save state. Static guidance text lives in `EarlyGameGuidanceCatalog`.
+
+| Goal | Implemented source / observation |
+| --- | --- |
+| Command Core | Owned completed Command Core; already supplied at canonical start |
+| Power | Owned completed Power Plant with enabled, generating `PowerGenerator` |
+| Ferrous extraction | Owned Ferrous Ore extractor in a post-tick productive extraction state, including output/power-constrained extraction |
+| Steel | Owned authored Steel-only Smelter with a completed processing cycle; starting stock and queued requests do not count |
+| Vehicle Factory | Owned completed Vehicle Factory, not a submitted command or construction site |
+| Field Scout | Existing owned Scout Vehicle identity; this describes field presence rather than a simulated production achievement |
+| Supply available | Enabled owned provider with available Fuel and Ammunition; Supply Depots also require Operational state. This is availability, not proof of a completed delivery or route coverage |
+| Scout opponent | Current permitted detected/identified contact; opaque detection is sufficient and does not disclose identity |
+| Defeat Command Core | Advisory objective only; victory/defeat remains the authoritative match result and suppresses guidance |
+
+Buildings, production, supply and intelligence mechanics are already implemented. Their minimum guidance evidence requires the narrow completed-tick summary above because selection/action snapshots intentionally describe only the selected facility. Observation is not persistent achievement history: restoration rebuilds from remaining authorized state/counters, and previously destroyed objects or unobserved past contacts are not invented. Exact per-resource historical extraction totals and per-unit historical production achievements are not added.
+
+Placement feedback and the guide share a compact information region through `PreAlphaUxView`. Immutable frame views retain session identity; placement quantities also retain tick identity. Shared hover resolvers explain copied processing/unit-production block reasons: deliver inputs for NoInput, add power for NoPower, move stored output for OutputFull, and inspect/cancel a paused request. Disabled material/technology choices retain their source-of-truth eligibility. An executable queue request may coexist with blocked current work; the explanation does not redefine queue authority or interpret a click as acceptance. Existing accepted/partial/rejected HUD command feedback remains authoritative.
+
 ## Match configuration and initialization
 
 `MatchConfiguration` contains the map key, simulation seed, and participant assignments. Each `MatchParticipantConfiguration` declares:

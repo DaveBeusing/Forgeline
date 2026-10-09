@@ -4,10 +4,10 @@ namespace ForgeLine.Presentation;
 
 internal static class PlayerSystemHudModel
 {
-    public const int HelpLineCount = 7;
+    public const int HelpLineCount = 8;
 
     public const string OnboardingHint =
-        "F1 HELP  ESC PAUSE  GOAL DESTROY ENEMY COMMAND CORE";
+        "F1 HELP  SPACE PAUSE  SHIFT+F12 GUIDE";
 
     public static string ResolveMatchResultLabel(
         PlayerMatchStatus status) =>
@@ -39,7 +39,8 @@ internal static class PlayerSystemHudModel
                 "F10 STRATEGIC OVERLAY  F11 MINIMAP  F1/F12/ESC CLOSE HELP",
             5 =>
                 "ESC OR SPACE PAUSE  SHIFT+F1 METRICS  F2 WORLD DEBUG",
-            6 =>
+            6 => "SHIFT+F12 SHOW / HIDE OPTIONAL MATCH GUIDE",
+            7 =>
                 "OBJECTIVE DESTROY THE ENEMY COMMAND CORE",
             _ =>
                 string.Empty

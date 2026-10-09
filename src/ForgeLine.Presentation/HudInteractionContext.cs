@@ -47,26 +47,27 @@ public sealed class HudInteractionContext
         region.Contains(position);
 
     public static bool BlocksWorldPointer(
-        Vector2 position, in GameplayHudLayout layout, bool minimapEnabled, bool actionDockExpanded = true) =>
+        Vector2 position, in GameplayHudLayout layout, bool minimapEnabled, bool actionDockExpanded = true, bool guidanceVisible = false) =>
         layout.TopStatusBar.Contains(position) ||
         layout.SelectionInspector.Contains(position) ||
         (actionDockExpanded
             ? layout.ActionDock.Contains(position)
             : new HudRect(layout.ActionDock.X, layout.ActionDock.Y, layout.ActionDock.Width,
                 MathF.Min(layout.ActionDock.Height, 59.0f * layout.Scale)).Contains(position)) ||
-        (minimapEnabled && layout.Minimap.Contains(position));
+        (minimapEnabled && layout.Minimap.Contains(position)) ||
+        (guidanceVisible && GameplayGuidanceLayout.Resolve(layout).Contains(position));
 
     public static bool CapturesWorldPointer(
-        InputState input, in GameplayHudLayout layout, bool minimapEnabled, bool actionDockExpanded = true)
+        InputState input, in GameplayHudLayout layout, bool minimapEnabled, bool actionDockExpanded = true, bool guidanceVisible = false)
     {
         ArgumentNullException.ThrowIfNull(input);
         if (!input.HasPointerPosition) return false;
-        if (BlocksWorldPointer(input.PointerPosition, layout, minimapEnabled, actionDockExpanded)) return true;
+        if (BlocksWorldPointer(input.PointerPosition, layout, minimapEnabled, actionDockExpanded, guidanceVisible)) return true;
         ReadOnlySpan<PlatformMouseButton> buttons = [PlatformMouseButton.Left, PlatformMouseButton.Right];
         foreach (PlatformMouseButton button in buttons)
         {
             if (input.TryGetMousePressPosition(button, out Vector2 origin) &&
-                BlocksWorldPointer(origin, layout, minimapEnabled, actionDockExpanded)) return true;
+                BlocksWorldPointer(origin, layout, minimapEnabled, actionDockExpanded, guidanceVisible)) return true;
         }
         return false;
     }

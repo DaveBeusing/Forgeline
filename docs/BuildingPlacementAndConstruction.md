@@ -77,6 +77,10 @@ A click can produce a build request only from a `Current` valid preview. Stale/u
 
 ## Authoritative placement validation
 
+The compact context card distinguishes **placement check pending**, **stale preview**, **current invalid reason**, **location valid at captured tick**, and **missing core materials**. Invalid text uses the existing allowed failure labels (bounds, slope, terrain, buildable area, obstruction or required deposit); it never names an obstructing entity or exposes a deposit reference. Freshness takes precedence over old validity and costs. For a current valid location, material text uses only the coherent Action Dock construction model's captured Command Core quantities; missing/stale action models omit amounts. Only as many bounded cost rows as fit are shown.
+
+This text cannot authorize placement. Left click requests construction from the existing current-valid preview path; execution still revalidates location, ownership and inventory. A shortage hint does not grant resources or fabricate a deficit from absent data. F9 rotates and Escape cancels. The context card captures world clicks to prevent requests through its text, and old-session/tick views are discarded at render time.
+
 `BuildingCommandProcessingSystem` runs during `SimulationPhase.OrderProcessing`. It re-evaluates placement from simulation-owned state when the command executes.
 
 Validation includes:

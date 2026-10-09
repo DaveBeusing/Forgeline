@@ -43,6 +43,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     }
 
     public int LastRenderedVertexCount { get; private set; }
+    internal HudRect LastGuidanceBounds { get; private set; }
+    public int LastGuidanceVertexCount { get; private set; }
 
     public void Render(
         IGraphicsCommandContext context,
@@ -60,6 +62,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         ArgumentNullException.ThrowIfNull(camera);
         ArgumentNullException.ThrowIfNull(snapshot);
         ArgumentNullException.ThrowIfNull(combatGroups);
+        LastGuidanceBounds = default;
+        LastGuidanceVertexCount = 0;
 
         if (context.Width <= 0 ||
             context.Height <= 0)
@@ -100,9 +104,14 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 context.Height);
         }
 
+        bool placementVisible = preAlphaUx.Placement.Visible && preAlphaUx.Placement.SessionId == snapshot.SessionId && preAlphaUx.Placement.Tick == snapshot.Tick;
+        bool contextVisible = preAlphaUx.Mode == PreAlphaUxMode.None && !view.IsDragSelecting && snapshot.PlayerExperience is { IsMatchComplete: false } &&
+            ((preAlphaUx.Guidance.Visible && preAlphaUx.Guidance.SessionId == snapshot.SessionId) ||
+                placementVisible);
+        if (contextVisible) EmitContextGuidance(preAlphaUx, placementVisible, layout, context.Width, context.Height);
         EmitCombatGroupOverview(
             combatGroups,
-            layout.SecondaryView,
+            GameplayGuidanceLayout.Remaining(layout, contextVisible),
             scale,
             context.Width,
             context.Height);
@@ -900,7 +909,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 break;
 
             default:
-                if (view.ShowOnboarding)
+                if (view.ShowOnboarding && !view.Guidance.Visible && !view.Placement.Visible)
                 {
                     EmitOnboardingHint(
                         layout,
@@ -1082,6 +1091,53 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 height);
         }
     }
+
+    private void EmitContextGuidance(in PreAlphaUxView view, bool placement, in GameplayHudLayout layout, int width, int height)
+    {
+        var region = GameplayGuidanceLayout.Resolve(layout);
+        if (region.IsEmpty) return;
+        float scale = MathF.Min(layout.Scale, 1.25f);
+        float padding = 5 * scale;
+        float lineHeight = 14 * scale;
+        int lines = Math.Min(6, (int)((region.Height - padding * 2) / lineHeight));
+        if (lines < 2) return;
+        int start = _vertexCount;
+        LastGuidanceBounds = region;
+        EmitQuad(region.X, region.Y, region.Width, region.Height, GameplayHudVisualStyle.PanelBackground, width, height);
+        EmitQuad(region.X, region.Y, 2 * scale, region.Height, GameplayHudVisualStyle.Focus, width, height);
+        ContextLine(placement ? view.Placement.Title : view.Guidance.Objective, 0, region, scale, width, height);
+        ContextLine(placement ? view.Placement.Reason : view.Guidance.Binding, 1, region, scale, width, height);
+        if (lines > 2) ContextLine(placement ? view.Placement.Hint : view.Guidance.Context, 2, region, scale, width, height);
+        if (!placement)
+        {
+            if (lines > 3 && view.Guidance.Next.Length > 0)
+            {
+                Span<char> buffer = stackalloc char[96];
+                var text = new HudTextBuilder(buffer);
+                text.Append("NEXT: "); text.Append(view.Guidance.Next);
+                ContextLine(text.Written, 3, region, scale, width, height);
+            }
+            if (lines > 4) ContextLine("OPTIONAL GUIDE / SHIFT+F12 HIDE / F1 HELP", 4, region, scale, width, height);
+        }
+        else if (view.Placement.Costs is { } costs)
+        {
+            Span<char> buffer = stackalloc char[128];
+            for (int i = 0; i < Math.Min(costs.Count, lines - 3); i++)
+            {
+                var text = new HudTextBuilder(buffer);
+                text.Append(costs[i].DisplayName); text.Append(" CORE ");
+                text.Append(costs[i].AvailableQuantity); text.Append(" / NEED ");
+                text.Append(costs[i].RequiredQuantity);
+                ContextLine(text.Written, i + 3, region, scale, width, height);
+            }
+        }
+        LastGuidanceVertexCount = _vertexCount - start;
+    }
+
+    private void ContextLine(ReadOnlySpan<char> text, int line, in HudRect region, float scale, int width, int height) =>
+        EmitText(text, region.X + 6 * scale, region.Y + (5 + line * 14) * scale, region.Right - 5 * scale,
+            line == 0 ? GameplayHudVisualStyle.TextPrimary : GameplayHudVisualStyle.TextSecondary,
+            scale * (line == 0 ? .8f : .68f), width, height);
 
     private void EmitOnboardingHint(
         in GameplayHudLayout layout,
@@ -2113,6 +2169,12 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
 
         public readonly ReadOnlySpan<char> Written =>
             _buffer[.._length];
+
+        public void Append(double value)
+        {
+            if (value.TryFormat(_buffer[_length..], out int written, "F0", System.Globalization.CultureInfo.InvariantCulture))
+                _length += written;
+        }
 
         public void Append(
             string value)
