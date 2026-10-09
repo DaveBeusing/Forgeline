@@ -64,7 +64,7 @@ Intentional exceptions are the authored decal carrier and purpose-specific VFX/s
 
 ## LOD
 
-Props, vegetation, and resource deposits define an explicit LOD1 mesh reference in their source asset metadata. `WorldPresentationCatalog` supplies the corresponding presentation distance and the renderer chooses High or Reduced LOD before resolving the runtime mesh.
+Props, vegetation, and resource deposits define an explicit LOD1 mesh reference in source metadata. Production rendering chooses High or Reduced from projected bounding-sphere size around a 65-reference-pixel threshold with 12% hysteresis. Catalog distance helpers remain available for compatibility. See [Camera and Input](CameraAndInput.md).
 
 LOD assets currently use deliberately compact primitive source geometry suitable for the Vertical Slice baseline. They are stable replacement points for later production meshes without changing gameplay data or world-object identities.
 

@@ -34,7 +34,8 @@ internal static class RenderingScalabilityMeasurements
             new Scene("large-strategic", 10000, 8, 900, false, false),
             new Scene("mixed-effects-debug-ui", 1200, 3, 120, true, false),
             new Scene("rapid-camera-lod", 1200, 3, 420, true, true),
-            new Scene("lod-boundary", 1, 0, 140, false, false)
+            new Scene("lod-boundary", 1, 0, 140, false, false),
+            new Scene("lod-hysteresis", 1, 0, 140, false, false)
         })
         {
             var settings = new WorldGridSettings();
@@ -43,6 +44,13 @@ internal static class RenderingScalabilityMeasurements
                 : DevelopmentTerrainFactory.CreateRepresentativeWorld(settings, scene.Radius);
             var world = PresentationBenchmarks.CreateRepresentativeWorld(scene.Instances);
             var camera = new RtsCamera(new RtsCameraSettings { InitialDistance = scene.Distance, MaximumDistance = 1200 });
+            float lodBoundaryDistance = 0;
+            if (scene.Name is "lod-boundary" or "lod-hysteresis")
+            {
+                RenderInstance fixture = world.GetInterpolatedInstance(0, 1);
+                float radius = PresentationBounds.ResolveLocalHalfExtents(fixture).Length();
+                lodBoundaryDistance = radius * camera.GetMatrices(1600, 900).Projection.M22 * RtsVisualReference.Height / 90.0f;
+            }
             using var instances = new SimpleInstanceRenderer(graphics, assets);
             using var terrain = scene.Radius < 0 ? null : new TerrainRenderer(graphics, terrainWorld, runtimeAssets: assets);
             using var lines = new DebugDrawRenderer(graphics);
@@ -81,7 +89,11 @@ internal static class RenderingScalabilityMeasurements
             {
                 long started = Stopwatch.GetTimestamp();
                 if (scene.Name == "lod-boundary")
-                    camera.ApplyState(camera.CaptureState() with { Distance = frame % 2 == 0 ? 139.99f : 140.01f });
+                    // Cross both sides of the projected-size hysteresis band.
+                    camera.ApplyState(camera.CaptureState() with { Distance = lodBoundaryDistance * (frame % 2 == 0 ? 0.8f : 1.3f) });
+                if (scene.Name == "lod-hysteresis")
+                    // Tiny oscillation around the nominal threshold must retain LOD.
+                    camera.ApplyState(camera.CaptureState() with { Distance = lodBoundaryDistance * (frame % 2 == 0 ? 0.999f : 1.001f) });
                 if (scene.Motion)
                 {
                     var state = camera.CaptureState();
@@ -136,6 +148,8 @@ internal static class RenderingScalabilityMeasurements
             double[] availableGpu = gpuMs.Where(x => x.HasValue).Select(x => x!.Value).ToArray();
             if (scene.Name == "lod-boundary" && (visible.Any(x => x != 1) || highLod.Zip(highLod.Skip(1)).Any(x => x.First == x.Second)))
                 throw new InvalidOperationException("The LOD boundary fixture did not exercise alternating visible LODs.");
+            if (scene.Name == "lod-hysteresis" && (visible.Any(x => x != 1) || highLod.Any(x => x != 1)))
+                throw new InvalidOperationException("The LOD hysteresis fixture did not retain visible high detail inside its stability band.");
             results.Add(new
             {
                 Scene = scene.Name,
