@@ -122,6 +122,18 @@ public static class RtsMinimapModelBuilder
         var symbols =
             new List<RtsMinimapSymbol>(
                 snapshot.InstanceCount + 16);
+        var fogCells = new List<RtsFogCell>();
+        Populate(snapshot, selected, activeGroup, symbols, fogCells, localPlayer);
+        return new RtsMinimapModel(worldBounds,
+            snapshot.Intelligence?.CellSizeMeters ?? IntelligenceGridSettings.DefaultCellSizeMeters,
+            fogCells, symbols);
+    }
+
+    internal static void Populate(PresentationSnapshot snapshot, HashSet<EntityId> selected,
+        HashSet<EntityId> activeGroup, List<RtsMinimapSymbol> symbols, List<RtsFogCell> fogCells, PlayerId localPlayer)
+    {
+        symbols.Clear();
+        fogCells.Clear();
 
         for (int index = 0;
              index < snapshot.InstanceCount;
@@ -277,20 +289,13 @@ public static class RtsMinimapModelBuilder
 
         FactionIntelligenceSnapshot? intelligence =
             snapshot.Intelligence;
-        RtsFogCell[] fogCells =
-            intelligence is null
-                ? []
-                : intelligence.Cells
-                    .Select(
-                        static cell =>
-                            new RtsFogCell(
-                                cell.Cell,
-                                RtsFogPresentation.Resolve(
-                                    cell.State)))
-                    .ToArray();
-
         if (intelligence is not null)
         {
+            for (int index = 0; index < intelligence.Cells.Count; index++)
+            {
+                var cell = intelligence.Cells[index];
+                fogCells.Add(new RtsFogCell(cell.Cell, RtsFogPresentation.Resolve(cell.State)));
+            }
             for (int index = 0;
                  index < intelligence.Contacts.Count;
                  index++)
@@ -314,13 +319,6 @@ public static class RtsMinimapModelBuilder
                         false));
             }
         }
-
-        return new RtsMinimapModel(
-            worldBounds,
-            intelligence?.CellSizeMeters ??
-                IntelligenceGridSettings.DefaultCellSizeMeters,
-            fogCells,
-            symbols);
     }
 
     public static Vector2 NormalizeWorldPosition(
@@ -355,6 +353,47 @@ public static class RtsMinimapModelBuilder
                 depth,
                 0.0f,
                 1.0f));
+    }
+}
+
+internal readonly record struct RtsMinimapFrame(AxisAlignedBounds WorldBounds, float IntelligenceCellSizeMeters,
+    IReadOnlyList<RtsFogCell> FogCells, IReadOnlyList<RtsMinimapSymbol> Symbols);
+
+/// <summary>Render-owner scratch; frame lists are borrowed until the next update and must not be published.</summary>
+internal sealed class RtsMinimapScratch
+{
+    private readonly HashSet<EntityId> _selected = [];
+    private readonly HashSet<EntityId> _activeGroup = [];
+    private readonly List<RtsMinimapSymbol> _symbols = [];
+    private readonly List<RtsFogCell> _fogCells = [];
+
+    public RtsMinimapFrame Update(PresentationSnapshot snapshot, in AxisAlignedBounds bounds,
+        PlayerId player, IReadOnlyCollection<EntityId> selected, IReadOnlyCollection<EntityId> activeGroup)
+    {
+        ArgumentNullException.ThrowIfNull(snapshot);
+        if (!player.IsSpecified) throw new ArgumentException("Minimap mapping requires a local player.", nameof(player));
+        FillSet(_selected, selected);
+        FillSet(_activeGroup, activeGroup);
+        RtsMinimapModelBuilder.Populate(snapshot, _selected, _activeGroup, _symbols, _fogCells, player);
+        return new RtsMinimapFrame(bounds,
+            snapshot.Intelligence?.CellSizeMeters ?? IntelligenceGridSettings.DefaultCellSizeMeters, _fogCells, _symbols);
+    }
+
+    private static void FillSet(HashSet<EntityId> target, IReadOnlyCollection<EntityId> source)
+    {
+        target.Clear();
+        if (source is IReadOnlyList<EntityId> indexed)
+        {
+            for (int index = 0; index < indexed.Count; index++) target.Add(indexed[index]);
+        }
+        else if (source is HashSet<EntityId> set)
+        {
+            foreach (EntityId entity in set) target.Add(entity);
+        }
+        else
+        {
+            foreach (EntityId entity in source) target.Add(entity);
+        }
     }
 }
 

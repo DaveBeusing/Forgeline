@@ -19,6 +19,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     private readonly OverlayVertex[] _vertices =
         new OverlayVertex[MaxVertices];
     private readonly RuntimeUiIconPalette? _runtimePalette;
+    private readonly RtsMinimapScratch _minimapScratch = new();
 
     private int _vertexCount;
     private int _vertexLimit = MaxVertices;
@@ -80,8 +81,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
 
         if (view.MinimapEnabled)
         {
-            RtsMinimapModel minimap =
-                RtsMinimapModelBuilder.Build(
+            RtsMinimapFrame minimap =
+                _minimapScratch.Update(
                     snapshot,
                     worldBounds,
                     snapshot.PlayerExperience?.Player ??
@@ -184,7 +185,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     }
 
     private void EmitMinimap(
-        RtsMinimapModel model,
+        in RtsMinimapFrame model,
         Vector3 cameraTarget,
         in RtsInformationLayerView view,
         StrategicOverlaySnapshot? overlay,

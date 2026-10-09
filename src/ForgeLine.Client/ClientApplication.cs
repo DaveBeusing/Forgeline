@@ -1130,18 +1130,8 @@ internal sealed class ClientApplication
             hudInteraction.CapturePointer(
                 minimapInteraction.PointerCaptured);
 
-            if (inputState.HasPointerPosition)
-            {
-                bool hudPointer = HudInteractionContext.BlocksWorldPointer(
-                    inputState.PointerPosition, interactionLayout, informationLayer.MinimapEnabled, actionPanel.Mode != PlayerActionPanelMode.Closed);
-                ReadOnlySpan<PlatformMouseButton> pointerButtons = [PlatformMouseButton.Left, PlatformMouseButton.Right];
-                foreach (PlatformMouseButton button in pointerButtons)
-                {
-                    hudPointer |= inputState.TryGetMousePressPosition(button, out Vector2 press) &&
-                        HudInteractionContext.BlocksWorldPointer(press, interactionLayout, informationLayer.MinimapEnabled, actionPanel.Mode != PlayerActionPanelMode.Closed);
-                }
-                hudInteraction.CapturePointer(hudPointer);
-            }
+            hudInteraction.CapturePointer(HudInteractionContext.CapturesWorldPointer(
+                inputState, interactionLayout, informationLayer.MinimapEnabled, actionPanel.Mode != PlayerActionPanelMode.Closed));
 
             if (minimapInteraction.TryTakeMovementRequest(
                     out MovementOrderRequest minimapMovement))

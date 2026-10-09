@@ -607,6 +607,54 @@ public sealed class RtsInformationLayerTests
             controller.MinimapEnabled);
     }
 
+    [Fact]
+    public void RenderScratchRebuildsAcrossFogSelectionAndSessionChangesWithoutMutatingOwnedModels()
+    {
+        var bounds = new AxisAlignedBounds(Vector3.Zero, new Vector3(128, 10, 128));
+        var entity = new EntityId(1, 1);
+        var intelligence = new FactionIntelligenceStore(new IntelligenceGridSettings { CellSizeMeters = 32 });
+        intelligence.BeginTick(new SimulationTick(7));
+        intelligence.MarkVisibleCircle(LocalFaction, new Vector3(24, 0, 24), 20);
+        intelligence.Observe(LocalFaction, new EntityId(99, 1), new IntelligenceSignature(EnemyFaction, identityKey: 501),
+            new Vector3(96, 0, 96), IntelligenceState.Detected, new SimulationTick(7));
+        var first = new PresentationSnapshot(new SimulationTick(7), TimeSpan.FromMilliseconds(50), 1,
+            [Unit(entity, new Vector3(20, 0, 20), LocalPlayer, UnitIds.MainBattleTank)],
+            intelligence.Capture(LocalFaction, bounds), sessionId: new SimulationSessionId(1));
+        var empty = new PresentationSnapshot(new SimulationTick(1), TimeSpan.FromMilliseconds(50), 0, [],
+            sessionId: new SimulationSessionId(2));
+        EntityId[] selected = [entity];
+        EntityId[] none = [];
+        var owned = RtsMinimapModelBuilder.Build(first, bounds, LocalPlayer, selected, selected);
+        var scratch = new RtsMinimapScratch();
+        var frame = scratch.Update(first, bounds, LocalPlayer, selected, selected);
+        Assert.Equal(owned.Symbols, frame.Symbols);
+        Assert.Equal(owned.FogCells, frame.FogCells);
+        Assert.Contains(frame.Symbols, symbol => symbol.IsSelected && symbol.IsActiveGroup);
+        Assert.Contains(frame.Symbols, symbol => symbol.Kind == RtsMinimapSymbolKind.DetectedContact);
+        frame = scratch.Update(empty, bounds, LocalPlayer, none, none);
+        Assert.Empty(frame.Symbols);
+        Assert.Empty(frame.FogCells);
+        Assert.NotEmpty(owned.Symbols);
+        Assert.NotEmpty(owned.FogCells);
+        frame = scratch.Update(first, bounds, LocalPlayer, none, none);
+        Assert.DoesNotContain(frame.Symbols, symbol => symbol.IsSelected || symbol.IsActiveGroup);
+        Assert.Equal(RtsMinimapModelBuilder.Build(first, bounds, LocalPlayer).Symbols, frame.Symbols);
+
+        // Alternate published snapshots and selection states; warm both retained capacities first.
+        for (int index = 0; index < 128; index++)
+        {
+            scratch.Update(first, bounds, LocalPlayer, selected, selected);
+            scratch.Update(empty, bounds, LocalPlayer, none, none);
+        }
+        long allocated = GC.GetAllocatedBytesForCurrentThread();
+        for (int index = 0; index < 256; index++)
+        {
+            scratch.Update(first, bounds, LocalPlayer, selected, selected);
+            scratch.Update(empty, bounds, LocalPlayer, none, none);
+        }
+        Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - allocated);
+    }
+
     private static RenderInstance Unit(
         EntityId entity,
         Vector3 position,

@@ -24,6 +24,12 @@ internal static class Program
             return;
         }
 
+        if (args is ["--interaction-hotpaths", string interactionOutput])
+        {
+            InteractionHotPathMeasurements.Run(interactionOutput);
+            return;
+        }
+
         BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
     }
 }

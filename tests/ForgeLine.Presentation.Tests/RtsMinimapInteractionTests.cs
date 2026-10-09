@@ -12,6 +12,33 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class RtsMinimapInteractionTests
 {
+    [Theory]
+    [InlineData(PlatformMouseButton.Left, true)]
+    [InlineData(PlatformMouseButton.Right, true)]
+    [InlineData(PlatformMouseButton.Left, false)]
+    [InlineData(PlatformMouseButton.Right, false)]
+    public void CompletedClicksUseRetainedEdgesAndRespectPressOrigin(PlatformMouseButton button, bool startsInside)
+    {
+        var terrain = new FlatTerrain();
+        var camera = new RtsCamera(new RtsCameraSettings { EdgeScrollEnabled = false, InitialTarget = Vector3.Zero });
+        var controller = new RtsMinimapInteractionController();
+        var input = new InputState();
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        var map = RtsMinimapInteractionLayout.GetMapRect(layout);
+        var end = new Vector2(map.X + map.Width * 0.75f, map.Y + map.Height * 0.25f);
+        var start = startsInside ? end : new Vector2(800, 450);
+        var initialTarget = camera.Target;
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown, button, (int)start.X, (int)start.Y));
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp, button, (int)end.X, (int)end.Y));
+        controller.Update(input, camera, terrain, null, layout, [new EntityId(1, 1)],
+            TacticalTargetingMode.None, FormationTemplate.Compact);
+
+        Assert.False(controller.View.IsCameraDragging);
+        Assert.Equal(button == PlatformMouseButton.Right && startsInside, controller.TryTakeMovementRequest(out _));
+        Assert.Equal(button == PlatformMouseButton.Left && startsInside, camera.Target != initialTarget);
+        Assert.False(controller.TryTakeMovementRequest(out _));
+    }
+
     [Fact]
     public void CoordinateMappingRoundTripsCanonicalWorldBounds()
     {

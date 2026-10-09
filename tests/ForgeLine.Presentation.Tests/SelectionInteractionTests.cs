@@ -84,7 +84,7 @@ public sealed class SelectionInteractionTests
         Assert.True(controller.IsDragSelecting);
         input.BeginFrame();
         input.Apply(PlatformInputEvent.PointerMoved(700, 350));
-        controller.Update(input, camera, world, new FlatTerrain(), 1600, 900, 1);
+        controller.Update(input, camera, world, new FlatTerrain(), 1600, 900, 1, pointerScale: 2);
         Assert.True(controller.IsDragSelecting);
         input.BeginFrame();
         input.Apply(PlatformInputEvent.FocusLost());
@@ -416,6 +416,39 @@ public sealed class SelectionInteractionTests
         Assert.Equal(
             EntityId.Invalid,
             controller.HoveredEntity);
+    }
+
+    [Theory]
+    [InlineData(1280, 720, 1.0f)]
+    [InlineData(1600, 900, 1.25f)]
+    [InlineData(1600, 900, 1.5f)]
+    [InlineData(1600, 900, 2.0f)]
+    public void DisplayChangesCancelDragWithoutSelectingOrRestartingHeldGesture(int width, int height, float scale)
+    {
+        var camera = CreateCamera();
+        var entity = new EntityId(21, 1);
+        var world = CreateWorld(Instance(entity, Vector3.Zero, LocalPlayer, ControllableEntityCategory.Unit));
+        var controller = new RtsSelectionController(new SelectionFilter(LocalPlayer, ControllableEntityCategory.Unit));
+        var terrain = new FlatTerrain();
+        var input = new InputState();
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Left, 720, 370));
+        controller.Update(input, camera, world, terrain, 1600, 900, 1.0f);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.PointerMoved(880, 530));
+        controller.Update(input, camera, world, terrain, 1600, 900, 1.0f);
+        Assert.True(controller.IsDragSelecting);
+        input.BeginFrame();
+        controller.Update(input, camera, world, terrain, width, height, 1.0f, pointerScale: scale);
+        Assert.False(controller.IsDragSelecting);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.PointerMoved(900, 550));
+        controller.Update(input, camera, world, terrain, width, height, 1.0f, pointerScale: scale);
+        Assert.False(controller.IsDragSelecting);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Left, 900, 550));
+        controller.Update(input, camera, world, terrain, width, height, 1.0f, pointerScale: scale);
+        Assert.Equal(0, controller.Selection.Count);
+        Assert.False(controller.TryTakeMovementRequest(out _));
     }
 
     private static RtsCamera CreateCamera() =>
