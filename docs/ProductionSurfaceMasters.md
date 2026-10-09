@@ -69,8 +69,10 @@ Y follows the existing tangent-space convention; normals are renormalized
 during runtime-size and mip generation. The existing terrain macro splatting
 and layer selection continue to apply. Control maps remain lossless data.
 
-Terrain coverage stays at its existing 80–160 metres per tile: 6.4–12.8 runtime
-Base Color texels per metre, 25.6–51.2 source texels per metre. The shared atlas
+Production terrain covers 24–32 metres per tile: 32–42.7 runtime Base Color
+texels per metre, 128–170.7 source texels per metre. This replaces the old
+80–160 metre coverage without raising texture memory; macro layer blending
+still operates at world scale. The shared atlas
 has 512 runtime Base Color texels per cell; density on individual components
 depends on their established UV layout and world scale. No uniform density
 claim is made for the whole object set. Runtime caps require camera review
