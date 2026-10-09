@@ -54,5 +54,6 @@ public enum PlatformKey
     D8,
     D9,
     LeftControl,
-    RightControl
+    RightControl,
+    Home
 }

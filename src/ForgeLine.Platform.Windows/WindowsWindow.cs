@@ -574,6 +574,7 @@ internal sealed class WindowsWindow : IWindow
             WindowsNative.VkEnter => PlatformKey.Enter,
             WindowsNative.VkTab => PlatformKey.Tab,
             WindowsNative.VkSpace => PlatformKey.Space,
+            WindowsNative.VkHome => PlatformKey.Home,
             _ => PlatformKey.Unknown
         };
 
