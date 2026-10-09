@@ -179,7 +179,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 combatGroups,
                 _extraction is null || interaction.HoverSessionId != _extraction.Scenario.Simulation.SessionId
                     ? null : PlayerHoverSummaryFactory.Capture(
-                    context, _extraction, interaction.HoveredEntity)));
+                    context, _extraction, interaction.HoveredEntity),
+                _extraction is null ? null : PlayerGuidanceSummaryFactory.Capture(context, _extraction, intelligenceSnapshot)));
     }
 
     private RenderInstance[] CaptureRenderInstances(
