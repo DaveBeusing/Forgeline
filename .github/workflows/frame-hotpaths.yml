@@ -24,12 +24,19 @@ jobs:
         run: dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.SimpleInstanceRendererTests ForgeLine.Presentation.Tests.PresentationExtractionTests
       - name: Concurrent frame publication contracts
         run: dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ClientSimulationHostTests
+      - name: Integrated interaction and display contracts
+        run: |
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.GameplayInteractionJourneyTests ForgeLine.Client.Tests.GameplayHelpControllerTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.GameplayDisplayQualificationTests ForgeLine.Presentation.Tests.SelectionInteractionTests ForgeLine.Presentation.Tests.RtsMinimapInteractionTests
       - name: Compile runtime assets
         run: dotnet run --project tools/ForgeLine.AssetCompiler/ForgeLine.AssetCompiler.csproj --configuration Release --no-build -- --source assets/source --runtime assets/runtime --clean --qualification-output artifacts/asset-qualification.json
       - name: Capture CPU frame measurements
         run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --frame-hotpaths artifacts/frame-hotpaths.json
       - name: Capture isolated fully culled measurements
         run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --culled-hotpath artifacts/culled-hotpath.json
+      - name: Guard interaction allocations and capture CPU measurements
+        run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --interaction-hotpaths artifacts/interaction-hotpaths.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:

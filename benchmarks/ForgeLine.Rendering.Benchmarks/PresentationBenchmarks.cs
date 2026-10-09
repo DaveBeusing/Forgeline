@@ -608,9 +608,9 @@ public class PresentationBenchmarks : IDisposable
     internal sealed class NullGraphicsCommandContext :
         IGraphicsCommandContext
     {
-        public int Width => 1600;
+        public int Width { get; init; } = 1600;
 
-        public int Height => 900;
+        public int Height { get; init; } = 900;
 
         public int FrameIndex => 0;
 
