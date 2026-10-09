@@ -2,6 +2,12 @@
 
 ## Purpose
 
+Hold Shift when clicking a current valid placement to continue placing that building after its matching authoritative acceptance. Each click submits at most one request; held buttons cannot repeat. Submission acceptance only acknowledges the queue, and a pending request blocks further placement with explicit pending feedback. A rejected command keeps placement intent but invalidates the preview. A successful unmodified click ends placement. Releasing Shift after the click does not change the submitted continuation intent; the next unmodified successful click ends the sequence.
+
+Continuation requires a new preview request identity, matching building/orientation/location and completed tick at or after the result. The previous valid preview is discarded immediately on submission. Construction resource, footprint and same-tick conflicts remain revalidated by the existing command pipeline. Host submission sequence and command correlation identity connect results to the correct intent; unrelated/late results cannot revive canceled placement.
+
+F9 rotation is remembered for the last stable building type during the session, including after successful single placement and reselection. Switching building type starts at North. Escape, focus loss, help/pause, incompatible panel mode, display change and session replacement clear repeat/pending state and rotation memory. No orientation or placement authority is persisted to saves or settings.
+
 FORGELINE uses an authoritative, command-driven construction lifecycle. The interactive client may preview a building footprint and explain whether the current location appears valid, but only simulation command execution decides whether construction starts.
 
 The initial construction slice supports:

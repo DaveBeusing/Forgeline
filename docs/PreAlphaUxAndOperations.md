@@ -2,6 +2,8 @@
 
 ## Purpose
 
+RTS shortcuts: Home focuses the current owned home building; double-tapping an assigned unmodified digit within 350 ms focuses its currently visible surviving group members. Double-left-click within 350 ms and the scaled movement threshold expands only owned visible units with the same stable type. Shift+click requests building continuation after authoritative acceptance; F9 rotates, and Escape cancels. Help lists these bindings. Brief focus/repeat/pending messages are nonblocking and never report a click as authoritative success.
+
 The pre-alpha client shell turns the completed vertical-slice runtime into a launchable Windows product surface without moving gameplay authority out of simulation.
 
 The current shell deliberately stays small. It exposes only choices that exist in the vertical slice and builds on the existing lightweight overlay renderer rather than introducing a second frontend framework.

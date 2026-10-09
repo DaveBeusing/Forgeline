@@ -4,7 +4,8 @@ namespace ForgeLine.Presentation;
 
 public readonly record struct SelectablePresentationMetadata(
     PlayerId Owner,
-    ControllableEntityCategory Category)
+    ControllableEntityCategory Category,
+    bool CanMove = false)
 {
     public static SelectablePresentationMetadata None => default;
 

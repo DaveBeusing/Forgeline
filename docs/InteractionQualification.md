@@ -18,6 +18,12 @@ Manual acceptance: guide/placement/tooltip text contrast on bright and dark terr
 
 ## Evidence boundary
 
+`CameraFocusInteractionTests`, `SameTypeSelectionTests`, `ContextCursorTests` and `RepeatPlacementTests` cover copied identities, current generation/ownership/visibility, short key edges, timeout/capture/session boundaries, matching construction results and preview invalidation. Existing group, selection, minimap, 64-profile geometry and integrated client journeys remain required. `KeyPressEdgeTests` verifies release-between-frames, repeat and suppression semantics. The simulation-host capacity test verifies that the returned submission sequence matches its eventual completion.
+
+`--selection-hotpaths artifacts/selection-hotpaths.json` adds 48 cases: idle hover and two click edges against 1/1,000 visible owned same-type units, 1024x720/1600x900/3440x1440, 96/144 DPI and scales 0.75/2. Each case warms 128 cycles and samples 256, with zero warm allocations and exact expected selection count as hard gates. Report construction and fixture creation are outside sampling. Timing is observational CPU input/picking, excluding HUD, simulation, GPU and Present. Existing full-HUD hover and interaction gates remain unchanged.
+
+Manual checks still required: native Home/group focus with held gestures; double-click/toggle/marquee interactions on crowded bright/dark terrain; actual cursor alignment; Shift placement with acceptance/rejection and rotation; help/pause/terminal recovery; windowed 1600x900 and ultrawide/borderless at 96/144 DPI and UI-scale extremes; live monitor/DPI/resize transitions and 60/144 Hz viewing. Native startup smoke does not qualify those active interactions or screenshot appearance.
+
 Qualification uses the existing input state, camera, selection, minimap, help, HUD and rate samplers. `GameplayInteractionJourneyTests` supplies immutable presentation snapshots and synthetic platform events to these production controllers. The client and tests share the HUD hit/click-origin policy. This exercises controller routing and state transitions without launching the full menu, issuing native Windows input or mutating simulation entities.
 
 `ClientSimulationHostTests` separately verifies real command receipts, completed-tick telemetry and pause/resume boundaries. `Invoke-WindowModeQualification.ps1` launches the actual D3D12 client and checks startup, ready HUD geometry, real measured running FPS/TPS and windowed/borderless lifecycle. It does not click through the controls or inspect framebuffer appearance.

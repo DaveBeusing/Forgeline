@@ -909,9 +909,10 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 break;
 
             default:
-                if (view.ShowOnboarding && !view.Guidance.Visible && !view.Placement.Visible)
+                if (!string.IsNullOrEmpty(view.InteractionHint) || (view.ShowOnboarding && !view.Guidance.Visible && !view.Placement.Visible))
                 {
                     EmitOnboardingHint(
+                        view.InteractionHint,
                         layout,
                         width,
                         height);
@@ -1140,6 +1141,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             scale * (line == 0 ? .8f : .68f), width, height);
 
     private void EmitOnboardingHint(
+        string? interactionHint,
         in GameplayHudLayout layout,
         int width,
         int height)
@@ -1147,7 +1149,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         float scale =
             layout.Scale;
         string hint =
-            PlayerSystemHudModel.OnboardingHint;
+            !string.IsNullOrEmpty(interactionHint) ? interactionHint : PlayerSystemHudModel.OnboardingHint;
         float gap =
             GameplayHudVisualStyle.CompactGap *
             scale;

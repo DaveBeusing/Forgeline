@@ -370,11 +370,18 @@ internal sealed class ClientSimulationHost : IDisposable
     public bool TrySubmit(
         SimulationSessionId expectedSession,
         Func<PlayerCommandGateway, PlayerCommandSubmissionReceipt> submission)
+        => TrySubmit(expectedSession, submission, out _);
+
+    public bool TrySubmit(
+        SimulationSessionId expectedSession,
+        Func<PlayerCommandGateway, PlayerCommandSubmissionReceipt> submission,
+        out ulong hostSequence)
     {
         ArgumentNullException.ThrowIfNull(submission);
 
         ulong sequence =
             AllocateHostSequence();
+        hostSequence = sequence;
 
         return TryQueue(
             HostMessage.CreateSubmission(

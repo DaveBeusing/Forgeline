@@ -4,16 +4,23 @@ namespace ForgeLine.Presentation;
 
 public sealed class SelectionSet
 {
-    private readonly SortedSet<EntityId> _entities = [];
+    private readonly List<EntityId> _entities = [];
 
     public int Count => _entities.Count;
 
     public IReadOnlyCollection<EntityId> Entities => _entities;
 
     public bool Contains(EntityId entity) =>
-        entity.IsValid && _entities.Contains(entity);
+        entity.IsValid && _entities.BinarySearch(entity) >= 0;
 
     public void Clear() => _entities.Clear();
+
+    internal void Add(EntityId entity)
+    {
+        if (!entity.IsValid) return;
+        int index = _entities.BinarySearch(entity);
+        if (index < 0) _entities.Insert(~index, entity);
+    }
 
     public void SetSingle(EntityId entity)
     {
@@ -32,10 +39,12 @@ public sealed class SelectionSet
             return;
         }
 
-        if (!_entities.Remove(entity))
+        int index = _entities.BinarySearch(entity);
+        if (index < 0)
         {
-            _entities.Add(entity);
+            _entities.Insert(~index, entity);
         }
+        else _entities.RemoveAt(index);
     }
 
     public void Replace(ReadOnlySpan<EntityId> entities)
@@ -52,8 +61,11 @@ public sealed class SelectionSet
         }
     }
 
-    public void Remove(EntityId entity) =>
-        _entities.Remove(entity);
+    public void Remove(EntityId entity)
+    {
+        int index = _entities.BinarySearch(entity);
+        if (index >= 0) _entities.RemoveAt(index);
+    }
 
     public EntityId[] ToArray()
     {
@@ -68,7 +80,7 @@ public sealed class SelectionSet
         {
             if (entities[index].IsValid)
             {
-                _entities.Add(entities[index]);
+                Add(entities[index]);
             }
         }
     }

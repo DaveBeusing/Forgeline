@@ -234,7 +234,9 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 controllable.IsControllable
                     ? new SelectablePresentationMetadata(
                         controllable.Owner,
-                        controllable.Category)
+                        controllable.Category,
+                        _extraction is not null && controllable.Owner == _extraction.Player &&
+                        entities.HasComponent<GroundMovement>(entity))
                     : SelectablePresentationMetadata.None;
 
             WorldFeaturePresentationMetadata worldFeature =

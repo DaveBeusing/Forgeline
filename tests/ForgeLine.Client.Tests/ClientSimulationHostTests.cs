@@ -255,7 +255,7 @@ public sealed class ClientSimulationHostTests
                         [unit],
                         new Vector3(480.0f, 0.0f, 1_480.0f),
                         observed,
-                        FormationTemplate.Compact)));
+                        FormationTemplate.Compact), out ulong firstHostSequence));
 
         Assert.False(
             fixture.Host.TrySubmit(
@@ -274,6 +274,7 @@ public sealed class ClientSimulationHostTests
                 out ClientSubmissionCompletion first));
         Assert.True(
             first.Accepted);
+        Assert.Equal(firstHostSequence, first.HostSequence);
 
         Assert.True(
             fixture.Host.TrySubmit(

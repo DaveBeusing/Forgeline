@@ -44,6 +44,12 @@ The camera target/focus point lies on arbitrary world coordinates. The Windows c
 
 ## Default Controls
 
+`Home` focuses the current owned, live Command Core using the completed-tick display snapshot. If no core survives, the lowest stable owned completed-building identity is the fallback; with no eligible building it does nothing. Focus preserves yaw, pitch, zoom and selection and never submits a gameplay command. A custom camera binding using Home takes precedence and disables the fixed home shortcut.
+
+Control groups retain Ctrl+digit assignment, digit recall and Ctrl+Shift+digit clearing. Two separate unmodified presses of the same assigned digit within 350 ms recall and then focus the current visible owned surviving members' mean position. The interval is constructor-configurable for tests. Holds, modifiers, another slot, empty groups, session replacement, help/pause and display/focus transitions break the sequence. Short key presses completed between frames are retained once; operating-system repeats are ignored.
+
+Focus cancels held world/minimap gestures and shows a brief nonblocking camera message. Viewport, DPI and UI-scale changes suppress held input until release and cancel placement, targeting and double-click/double-tap state. Native interactive monitor transitions remain manual qualification.
+
 | Action | Default |
 | --- | --- |
 | Pan forward | W or Up Arrow |
@@ -126,7 +132,7 @@ The minimap captures its pointer gesture through `HudInteractionContext`, so the
 
 The action panel uses the same `GameplayHudLayout` action-dock region for rendering origin and hit testing, so DPI/UI scaling cannot cause the visual panel and its pointer-capture bounds to drift apart. A new simulation session clears transient capture state before the new session can drive world interaction.
 
-Modal help and pause capture input before all HUD and world handling. Both their opening and closing frames consume input; selection gestures, placement, minimap drags, targeting and pending presentation requests are cancelled without clearing the current selection. Help uses the existing frontend controls renderer, with a complete bounded text stream and ten rows above the Back button. Controls fit within the physical viewport even when UI scale is raised; rendering and Back hit testing share that scale. Growth reuses buffers after the first required increase, up to 131,072 vertices (3 MiB per frontend frame buffer).
+Modal help and pause capture input before all HUD and world handling. Both their opening and closing frames consume input; selection gestures, placement, minimap drags, targeting and pending presentation requests are cancelled without clearing the current selection. Help uses the existing frontend controls renderer, with a complete bounded text stream and the complete current control rows above the Back button. Controls fit within the physical viewport even when UI scale is raised; rendering and Back hit testing share that scale. Growth reuses buffers after the first required increase, up to 131,072 vertices (3 MiB per frontend frame buffer).
 
 HUD pointer capture masks camera wheel, drag and edge input at the action-mapping boundary while preserving keyboard camera navigation when keyboard focus is free. Unfocused windows cannot dispatch gameplay input.
 

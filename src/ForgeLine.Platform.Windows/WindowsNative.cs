@@ -95,6 +95,7 @@ internal static partial class WindowsNative
     internal const int VkRShift = 0xA1;
     internal const int VkS = 0x53;
     internal const int VkSpace = 0x20;
+    internal const int VkHome = 0x24;
     internal const int VkUp = 0x26;
     internal const int VkDown = 0x28;
     internal const int VkW = 0x57;

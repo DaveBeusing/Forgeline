@@ -71,11 +71,16 @@ public sealed class MainMenuModelTests
             "CONTROLS",
             view.Title);
         Assert.Equal(
-            11,
+            12,
             view.DetailLines.Count);
         Assert.Equal("OPTIONAL GUIDE", view.DetailLines[^2].Label);
         Assert.Contains("SHIFT+F12 SHOW / HIDE", view.DetailLines[^2].Value);
         Assert.Contains("ONBOARDING SETTING", view.DetailLines[^2].Value);
+        Assert.Contains("HOME BASE FOCUS", view.DetailLines[1].Value);
+        Assert.Contains("DOUBLE LEFT SAME-TYPE VISIBLE UNITS", view.DetailLines[2].Value);
+        Assert.Equal("CONTROL GROUPS", view.DetailLines[8].Label);
+        Assert.Contains("DOUBLE DIGIT FOCUS", view.DetailLines[8].Value);
+        Assert.Contains("SHIFT+CLICK REPEAT AFTER ACCEPTANCE", view.DetailLines[6].Value);
         Assert.Contains(
             "W/A/S/D",
             view.DetailLines[0].Value);

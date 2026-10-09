@@ -201,7 +201,7 @@ public sealed class EarlyGameGuidanceTests
         throw new InvalidOperationException("Completed test building missing.");
     }
 
-    private static Vector3 FindPlacement(MatchRuntime scenario, BuildingId building)
+    internal static Vector3 FindPlacement(MatchRuntime scenario, BuildingId building)
     {
         var core = scenario.Simulation.Entities.GetComponent<WorldTransform>(scenario.GetBase(new PlayerId(1)).CommandCore).Position;
         for (int x = 60; x < 500; x += 35)

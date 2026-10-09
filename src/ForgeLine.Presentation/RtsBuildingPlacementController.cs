@@ -36,6 +36,20 @@ public sealed class RtsBuildingPlacementController
     private Vector3 _requestedPosition;
     private BuildingId _requestedBuilding;
     private BuildingOrientation _requestedOrientation;
+    private SimulationSessionId _session;
+    private BuildingId _rememberedBuilding;
+    private BuildingOrientation _rememberedOrientation;
+    private bool _awaitingResult;
+    private bool _repeatAtClick;
+    private PlayerCommandCorrelationId _correlation;
+    private SimulationTick _minimumPreviewTick;
+    private int _width;
+    private int _height;
+    private float _displayScale;
+
+    public bool AwaitingResult => _awaitingResult;
+    public string InteractionHint => _awaitingResult ? "BUILD REQUEST PENDING" :
+        IsActive ? "SHIFT + CLICK REPEAT AFTER ACCEPTANCE / F9 ROTATE / ESC CANCEL" : string.Empty;
 
     public RtsBuildingPlacementController(PlayerId issuer)
     {
@@ -67,12 +81,25 @@ public sealed class RtsBuildingPlacementController
         PresentationInteractionState interaction,
         int viewportWidth,
         int viewportHeight,
-        bool pointerCaptured = false)
+        bool pointerCaptured = false,
+        float displayScale = 1)
     {
         ArgumentNullException.ThrowIfNull(input);
         ArgumentNullException.ThrowIfNull(camera);
         ArgumentNullException.ThrowIfNull(terrain);
         ArgumentNullException.ThrowIfNull(interaction);
+        bool sessionChanged = snapshot?.SessionId is { IsSpecified: true } session && _session.IsSpecified && session != _session;
+        if (snapshot?.SessionId is { IsSpecified: true } currentSession) _session = currentSession;
+        bool displayChanged = _width != 0 && (_width != viewportWidth || _height != viewportHeight || _displayScale != displayScale);
+        _width = viewportWidth; _height = viewportHeight; _displayScale = displayScale;
+        if (sessionChanged || displayChanged || input.FocusLostThisFrame || snapshot?.PlayerExperience?.IsMatchComplete == true)
+        {
+            Cancel(interaction);
+            _leftWasDown = input.IsMouseButtonDown(PlatformMouseButton.Left);
+            _rotateWasDown = input.IsKeyDown(PlatformKey.F9);
+            foreach (var key in _selectionKeys.Keys) _selectionKeys[key] = input.IsKeyDown(key);
+            return;
+        }
 
         bool shiftDown =
             input.IsKeyDown(
@@ -85,7 +112,7 @@ public sealed class RtsBuildingPlacementController
         UpdateBuildingSelection(
             input,
             allowSelection:
-                !shiftDown);
+                !shiftDown && !_awaitingResult);
 
         if (previousBuilding != ActiveBuilding)
         {
@@ -100,11 +127,13 @@ public sealed class RtsBuildingPlacementController
         if (rotateDown &&
             !_rotateWasDown &&
             !shiftDown &&
-            IsActive)
+            IsActive && !_awaitingResult)
         {
             Orientation =
                 (BuildingOrientation)
                 (((int)Orientation + 1) % 4);
+            _rememberedBuilding = ActiveBuilding;
+            _rememberedOrientation = Orientation;
             ResetPreviewRequest(
                 interaction);
         }
@@ -118,14 +147,7 @@ public sealed class RtsBuildingPlacementController
         if (escapeDown &&
             !_escapeWasDown)
         {
-            ActiveBuilding =
-                BuildingId.None;
-            Preview = null;
-            PreviewFreshness =
-                PlacementPreviewFreshness.Unavailable;
-            _pendingRequest = null;
-            ResetPreviewRequest(
-                interaction);
+            Cancel(interaction);
         }
 
         _escapeWasDown = escapeDown;
@@ -136,9 +158,16 @@ public sealed class RtsBuildingPlacementController
 
         if (pointerCaptured)
         {
+            _pendingRequest = null;
+            Preview = null;
+            PreviewFreshness = PlacementPreviewFreshness.Unavailable;
+            ResetPreviewRequest(interaction);
             _leftWasDown = leftDown;
             return;
         }
+
+        if (_awaitingResult)
+        { _leftWasDown = leftDown; return; }
 
         if (!IsActive ||
             !input.HasPointerPosition ||
@@ -166,7 +195,7 @@ public sealed class RtsBuildingPlacementController
         ApplyPreview(
             snapshot);
 
-        if (leftDown &&
+        if ((leftDown || input.TryGetMousePressPosition(PlatformMouseButton.Left, out _)) &&
             !_leftWasDown &&
             PreviewFreshness ==
                 PlacementPreviewFreshness.Current &&
@@ -181,13 +210,20 @@ public sealed class RtsBuildingPlacementController
                     preview.Orientation,
                     _previewRequestId,
                     snapshot!.Tick);
+            _awaitingResult = true;
+            _repeatAtClick = shiftDown;
+            _correlation = default;
+            Preview = null;
+            PreviewFreshness = PlacementPreviewFreshness.Unavailable;
+            ResetPreviewRequest(interaction);
         }
 
         _leftWasDown = leftDown;
     }
 
     public void Cancel(
-        PresentationInteractionState interaction)
+        PresentationInteractionState interaction,
+        bool clearOrientation = true)
     {
         ArgumentNullException.ThrowIfNull(interaction);
 
@@ -196,6 +232,10 @@ public sealed class RtsBuildingPlacementController
         PreviewFreshness =
             PlacementPreviewFreshness.Unavailable;
         _pendingRequest = null;
+        _awaitingResult = false;
+        _correlation = default;
+        _repeatAtClick = false;
+        if (clearOrientation) { _rememberedBuilding = default; _rememberedOrientation = default; Orientation = default; _minimumPreviewTick = default; }
         ResetPreviewRequest(interaction);
     }
 
@@ -208,6 +248,9 @@ public sealed class RtsBuildingPlacementController
         }
 
         ActiveBuilding = buildingId;
+        Orientation = _rememberedBuilding == buildingId ? _rememberedOrientation : BuildingOrientation.North;
+        _rememberedBuilding = buildingId;
+        _rememberedOrientation = Orientation;
         Preview = null;
         PreviewFreshness =
             PlacementPreviewFreshness.Unavailable;
@@ -215,6 +258,30 @@ public sealed class RtsBuildingPlacementController
         _hasPreviewRequest = false;
         _previewRequestId = 0;
         _requestedBuilding = BuildingId.None;
+        _awaitingResult = false;
+        _correlation = default;
+    }
+
+    public void ObserveSubmission(PlayerCommandSubmissionReceipt? receipt, PresentationInteractionState interaction)
+    {
+        if (!_awaitingResult || _correlation.IsSpecified) return;
+        if (receipt is not { Accepted: true, Kind: PlayerCommandKind.Construction } accepted || accepted.SessionId != _session)
+        { _awaitingResult = false; ResetPreviewRequest(interaction); return; }
+        _correlation = accepted.CorrelationId;
+    }
+
+    public void ObserveResult(in PlayerCommandResultReadModel result, PresentationInteractionState interaction)
+    {
+        if (!_awaitingResult || !_correlation.IsSpecified || result.SessionId != _session ||
+            result.Kind != PlayerCommandKind.Construction || result.CorrelationId != _correlation) return;
+        _awaitingResult = false;
+        _correlation = default;
+        _minimumPreviewTick = result.ResolvedAtTick;
+        Preview = null;
+        PreviewFreshness = PlacementPreviewFreshness.Unavailable;
+        ResetPreviewRequest(interaction);
+        if (result.State == PlayerCommandFeedbackState.Accepted && !_repeatAtClick) Cancel(interaction, clearOrientation: false);
+        _repeatAtClick = false;
     }
 
     public bool TryTakePlacementRequest(
@@ -282,8 +349,13 @@ public sealed class RtsBuildingPlacementController
             readModel.Preview;
 
         PreviewFreshness =
-            readModel.RequestId ==
-                _previewRequestId
+            readModel.RequestId == _previewRequestId && _hasPreviewRequest &&
+                readModel.CompletedTick == snapshot.Tick && snapshot.Tick.Value >= _minimumPreviewTick.Value &&
+                readModel.Preview.BuildingId == ActiveBuilding && readModel.Preview.Orientation == Orientation &&
+                // The authoritative footprint raises Y to its highest terrain sample; X/Z identify the requested site.
+                float.IsFinite(readModel.Preview.GroundPosition.Y) &&
+                Vector2.DistanceSquared(new(readModel.Preview.GroundPosition.X, readModel.Preview.GroundPosition.Z),
+                    new(_requestedPosition.X, _requestedPosition.Z)) <= TargetChangeToleranceSquared
                 ? PlacementPreviewFreshness.Current
                 : PlacementPreviewFreshness.Stale;
     }
@@ -342,8 +414,7 @@ public sealed class RtsBuildingPlacementController
             !wasDown &&
             allowSelection)
         {
-            ActiveBuilding =
-                buildingId;
+            SelectBuilding(buildingId);
         }
 
         _selectionKeys[key] =

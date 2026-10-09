@@ -14,7 +14,8 @@ public enum CombatGroupInputAction : byte
 
 public readonly record struct CombatGroupInputResult(
     CombatGroupInputAction Action,
-    int Slot)
+    int Slot,
+    bool FocusRequested = false)
 {
     public bool Handled =>
         Action !=
@@ -28,6 +29,18 @@ public readonly record struct CombatGroupInputResult(
 
 public sealed class CombatGroupInputController
 {
+    private readonly ulong[] _pressSequences = new ulong[CombatGroupRegistry.SlotCount];
+    private readonly TimeSpan _doubleTapInterval;
+    private TimeSpan _time;
+    private TimeSpan _lastRecallTime;
+    private int _lastRecallSlot = -1;
+    private SimulationSessionId _session;
+
+    public CombatGroupInputController(TimeSpan? doubleTapInterval = null)
+    {
+        _doubleTapInterval = doubleTapInterval ?? TimeSpan.FromMilliseconds(350);
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(_doubleTapInterval, TimeSpan.Zero);
+    }
     private readonly bool[] _held =
         new bool[
             CombatGroupRegistry.SlotCount];
@@ -37,11 +50,17 @@ public sealed class CombatGroupInputController
         PresentationSnapshot? snapshot,
         CombatGroupRegistry registry,
         SelectionSet selection,
-        bool inputBlocked = false)
+        bool inputBlocked = false,
+        TimeSpan elapsed = default)
     {
         ArgumentNullException.ThrowIfNull(input);
         ArgumentNullException.ThrowIfNull(registry);
         ArgumentNullException.ThrowIfNull(selection);
+        ArgumentOutOfRangeException.ThrowIfLessThan(elapsed, TimeSpan.Zero);
+        _time += elapsed;
+        if (_session != snapshot?.SessionId || inputBlocked || input.FocusLostThisFrame || snapshot?.PlayerExperience?.IsMatchComplete == true)
+            _lastRecallSlot = -1;
+        _session = snapshot?.SessionId ?? default;
 
         IReadOnlyCollection<ForgeLine.Core.EntityId> valid =
             snapshot?.CombatGroups?.EligibleEntities ??
@@ -64,6 +83,7 @@ public sealed class CombatGroupInputController
                 PlatformKey.LeftShift) ||
             input.IsKeyDown(
                 PlatformKey.RightShift);
+        if (control || shift) _lastRecallSlot = -1;
 
         CombatGroupInputResult result =
             CombatGroupInputResult.None;
@@ -79,14 +99,15 @@ public sealed class CombatGroupInputController
             bool down =
                 input.IsKeyDown(
                     key);
-            bool pressed =
-                down &&
-                !_held[slot];
+            ulong sequence = input.KeyPressSequence(key);
+            bool pressed = input.WasKeyPressed(key) && sequence != _pressSequences[slot];
+            _pressSequences[slot] = sequence;
             _held[slot] =
                 down;
 
             if (!pressed ||
                 inputBlocked ||
+                input.FocusLostThisFrame ||
                 terminal ||
                 snapshot?.CombatGroups is null ||
                 result.Handled)
@@ -97,6 +118,7 @@ public sealed class CombatGroupInputController
             if (control &&
                 shift)
             {
+                _lastRecallSlot = -1;
                 registry.Clear(
                     slot);
                 result =
@@ -106,6 +128,7 @@ public sealed class CombatGroupInputController
             }
             else if (control)
             {
+                _lastRecallSlot = -1;
                 int assigned =
                     registry.Assign(
                         slot,
@@ -129,8 +152,12 @@ public sealed class CombatGroupInputController
                 result =
                     new CombatGroupInputResult(
                         CombatGroupInputAction.Recalled,
-                        slot);
+                        slot,
+                        _lastRecallSlot == slot && _time - _lastRecallTime <= _doubleTapInterval);
+                _lastRecallSlot = result.FocusRequested ? -1 : slot;
+                _lastRecallTime = _time;
             }
+            else _lastRecallSlot = -1;
         }
 
         return result;
@@ -140,6 +167,7 @@ public sealed class CombatGroupInputController
     {
         Array.Clear(
             _held);
+        _lastRecallSlot = -1;
     }
 
     public static PlatformKey ResolveKey(

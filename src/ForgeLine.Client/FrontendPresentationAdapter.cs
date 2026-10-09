@@ -246,10 +246,11 @@ internal static class FrontendPresentationAdapter
                 new FrontendDetailLineView(
                     "CAMERA MOUSE",
                     $"WHEEL ZOOM  {bindings.DragPanButton.ToString().ToUpperInvariant()} DRAG  " +
-                    (edgeScrollEnabled ? "EDGE PAN" : "EDGE PAN DISABLED")),
+                    (edgeScrollEnabled ? "EDGE PAN" : "EDGE PAN DISABLED") +
+                    (RtsCameraFocusController.IsHomeCameraBinding(bindings) ? "  HOME USES CAMERA BINDING" : "  HOME BASE FOCUS")),
                 new FrontendDetailLineView(
                     "SELECT / MOVE",
-                    "LEFT SELECT  SHIFT+LEFT MULTI  RIGHT MOVE"),
+                    "LEFT SELECT  DOUBLE LEFT SAME-TYPE VISIBLE UNITS  SHIFT+LEFT MULTI  RIGHT MOVE"),
                 new FrontendDetailLineView(
                     "COMMAND PANELS",
                     "B BUILD  P PROCESS  U UNITS  L LOGISTICS  Y SUPPLY  K COMBAT  H TECHNOLOGY"),
@@ -261,10 +262,13 @@ internal static class FrontendPresentationAdapter
                     "COMMAND CORE  POWER PLANT  EXTRACTOR"),
                 new FrontendDetailLineView(
                     "F7 / F8 / F9",
-                    "STORAGE DEPOT  SMELTER  ROTATE BUILDING"),
+                    "STORAGE DEPOT  SMELTER  ROTATE BUILDING  SHIFT+CLICK REPEAT AFTER ACCEPTANCE"),
                 new FrontendDetailLineView(
                     "DEVELOPER METRICS",
                     "SHIFT+F1 TOGGLE PERFORMANCE METRICS"),
+                new FrontendDetailLineView(
+                    "CONTROL GROUPS",
+                    "CTRL+DIGIT ASSIGN  DIGIT RECALL  DOUBLE DIGIT FOCUS  CTRL+SHIFT+DIGIT CLEAR"),
                 new FrontendDetailLineView(
                     "OBJECTIVE",
                     "DESTROY THE ENEMY COMMAND CORE"),
