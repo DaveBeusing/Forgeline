@@ -269,7 +269,7 @@ internal static class FrontendPresentationAdapter
                     "F10 / F11 / F12",
                     "STRATEGIC OVERLAY  MINIMAP  HELP  ESC/SPACE PAUSE")
             ],
-            footer);
+            footer) with { Kind = FrontendSurfaceKind.Controls };
     }
 
     internal static FrontendSurfaceView Credits()

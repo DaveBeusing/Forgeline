@@ -7,6 +7,7 @@ namespace ForgeLine.Presentation;
 public sealed class FrontendOverlayRenderer : IDisposable
 {
     private const int MaxVertices = 16_384;
+    private const int MaxControlsVertices = 131_072;
     private const int VertexStride = 24;
     private const float GlyphPixelSize = 3.0f;
     private const float GlyphAdvance = 18.0f;
@@ -14,7 +15,8 @@ public sealed class FrontendOverlayRenderer : IDisposable
     private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers = new(4);
-    private readonly OverlayVertex[] _vertices = new OverlayVertex[MaxVertices];
+    private OverlayVertex[] _vertices = new OverlayVertex[MaxVertices];
+    private int _vertexLimit = MaxVertices;
     private int _vertexCount;
     private float _offsetX;
     private float _offsetY;
@@ -38,6 +40,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
         ArgumentNullException.ThrowIfNull(context);
 
         _vertexCount = 0;
+        _vertexLimit = view.Kind == FrontendSurfaceKind.Controls ? MaxControlsVertices : MaxVertices;
         _offsetX = 0f;
         _offsetY = 0f;
         float viewportScale = MathF.Min(
@@ -202,10 +205,11 @@ public sealed class FrontendOverlayRenderer : IDisposable
                     scale);
             }
         }
-        else if (view.Kind == FrontendSurfaceKind.Detail)
+        else if (view.Kind is FrontendSurfaceKind.Detail or FrontendSurfaceKind.Controls)
         {
+            bool controls = view.Kind == FrontendSurfaceKind.Controls;
             EmitText(view.Title, 94 * scale + contentOffset, 286 * scale, new Vector4(0.95f, 0.72f, 0.22f, 1), context.Width, context.Height, scale);
-            EmitPanel(new SurfaceRect(92 * scale, 330 * scale, 980 * scale, 2 * scale), new Vector4(0.28f, 0.32f, 0.29f, 1), context.Width, context.Height);
+            EmitPanel(new SurfaceRect(92 * scale, 330 * scale, (controls ? 1740 : 980) * scale, 2 * scale), new Vector4(0.28f, 0.32f, 0.29f, 1), context.Width, context.Height);
 
             float y = 390 * scale;
             foreach (FrontendDetailLineView line in view.DetailLines)
@@ -226,8 +230,13 @@ public sealed class FrontendOverlayRenderer : IDisposable
                     : line.IsFocused
                         ? new Vector4(0.95f, 0.72f, 0.22f, 1)
                         : new Vector4(0.78f, 0.80f, 0.74f, 1);
-                EmitText(line.Label, 112 * scale, y, new Vector4(0.45f, 0.50f, 0.45f, 1), context.Width, context.Height, scale);
-                EmitText(line.Value, 460 * scale, y, valueColor, context.Width, context.Height, scale);
+                float valueScale = controls
+                    ? MathF.Min(scale, 1370f * scale / MathF.Max(1f, line.Value.Length * GlyphAdvance))
+                    : scale;
+                EmitText(line.Label, 112 * scale, y, controls
+                    ? new Vector4(0.60f, 0.65f, 0.60f, 1)
+                    : new Vector4(0.45f, 0.50f, 0.45f, 1), context.Width, context.Height, scale);
+                EmitText(line.Value, 460 * scale, y, valueColor, context.Width, context.Height, valueScale);
 
                 if (line.CanDecrease)
                 {
@@ -239,7 +248,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
                     EmitControlButton("+", 916 * scale, (y - 13 * scale), 72 * scale, 42 * scale, context.Width, context.Height, scale);
                 }
 
-                y += 58 * scale;
+                y += (controls ? 44 : 58) * scale;
             }
 
             if (!string.IsNullOrEmpty(view.PrimaryAction))
@@ -358,7 +367,9 @@ public sealed class FrontendOverlayRenderer : IDisposable
 
     private void EmitTriangle(float ax,float ay,float bx,float by,float cx,float cy,Vector4 color)
     {
-        if (_vertexCount + 3 > MaxVertices) return;
+        if (_vertexCount + 3 > _vertexLimit) return;
+        if (_vertexCount + 3 > _vertices.Length)
+            Array.Resize(ref _vertices, Math.Min(_vertices.Length * 2, _vertexLimit));
         _vertices[_vertexCount++] = new OverlayVertex(new Vector2(ax,ay),color);
         _vertices[_vertexCount++] = new OverlayVertex(new Vector2(bx,by),color);
         _vertices[_vertexCount++] = new OverlayVertex(new Vector2(cx,cy),color);
@@ -366,9 +377,13 @@ public sealed class FrontendOverlayRenderer : IDisposable
 
     private IGraphicsBuffer GetFrameVertexBuffer(int frameIndex)
     {
-        if (_vertexBuffers.TryGetValue(frameIndex, out IGraphicsBuffer? buffer)) return buffer;
-        buffer = _graphics.CreateBuffer(new GraphicsBufferDescription((ulong)(MaxVertices * VertexStride), GraphicsBufferMemory.Upload));
-        _vertexBuffers.Add(frameIndex, buffer);
+        if (_vertexBuffers.TryGetValue(frameIndex, out IGraphicsBuffer? buffer))
+        {
+            if (buffer.Description.SizeInBytes >= (ulong)(_vertices.Length * VertexStride)) return buffer;
+            buffer.Dispose();
+        }
+        buffer = _graphics.CreateBuffer(new GraphicsBufferDescription((ulong)(_vertices.Length * VertexStride), GraphicsBufferMemory.Upload));
+        _vertexBuffers[frameIndex] = buffer;
         return buffer;
     }
 
