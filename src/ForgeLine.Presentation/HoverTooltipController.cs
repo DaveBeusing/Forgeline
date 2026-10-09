@@ -66,8 +66,9 @@ public sealed class HoverTooltipController
             {
                 float nearest = 12 * layout.Scale;
                 nearest *= nearest;
-                foreach (var contact in intelligence.Contacts)
+                for (int i = 0; i < intelligence.Contacts.Count; i++)
                 {
+                    var contact = intelligence.Contacts[i];
                     if (!contact.IsCurrent || contact.State != IntelligenceState.Detected) continue;
                     var projection = camera.WorldToScreen(contact.LastKnownPosition, layout.ViewportWidth, layout.ViewportHeight);
                     float distance = Vector2.DistanceSquared(projection.Position, pointer);

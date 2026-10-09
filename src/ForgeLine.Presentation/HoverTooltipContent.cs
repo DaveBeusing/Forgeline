@@ -23,9 +23,12 @@ internal static class HoverTooltipResolver
         if (view.Contact.IsSpecified)
         {
             if (snapshot.Intelligence is not { } intelligence || intelligence.Tick != snapshot.Tick) return null;
-            foreach (var contact in intelligence.Contacts)
+            for (int i = 0; i < intelligence.Contacts.Count; i++)
+            {
+                var contact = intelligence.Contacts[i];
                 if (contact.ContactKey == view.Contact && contact.IsCurrent && contact.State == IntelligenceState.Detected)
                     return new("UNKNOWN CONTACT", "DETECTED", "IDENTITY UNAVAILABLE", "");
+            }
             return null;
         }
         if (snapshot.Hover is not { } world || world.Entity != view.Entity ||

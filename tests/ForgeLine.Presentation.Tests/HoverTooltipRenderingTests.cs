@@ -3,6 +3,9 @@ using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Game;
 using ForgeLine.Graphics;
+using ForgeLine.Input;
+using ForgeLine.Intelligence;
+using ForgeLine.Platform;
 using ForgeLine.Simulation;
 using ForgeLine.World;
 using Xunit;
@@ -46,24 +49,52 @@ public sealed class HoverTooltipRenderingTests
     }
 
     [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public void WarmWorldAndDockRenderingHaveZeroManagedAllocations(bool dock)
+    [InlineData("world")]
+    [InlineData("dock")]
+    [InlineData("contact")]
+    public void WarmTooltipRenderingHasZeroManagedAllocations(string domain)
     {
+        bool dock = domain == "dock";
         using var graphics = new RetainedDevice();
         using var surface = new WorldHoverTooltipSurface(graphics);
         var layout = GameplayHudLayout.Create(1600, 900, 96);
         var actions = new PlayerActionSnapshot(new SimulationSessionId(1), new SimulationTick(1),
             [new PlayerConstructionActionReadModel(BuildingIds.Extractor, "Mine / Extractor",
                 [new PlayerActionResourceAmount(ResourceIds.Steel, "Steel", 25, 10)], true)], 0, null, null);
-        var snapshot = HoverTooltipTests.Snapshot(actions: actions);
+        var intelligence = new FactionIntelligenceStore();
+        intelligence.BeginTick(new SimulationTick(1));
+        intelligence.Observe(new FactionId(1), new EntityId(11, 1), new IntelligenceSignature(new FactionId(2), 999),
+            Vector3.Zero, IntelligenceState.Detected, new SimulationTick(1));
+        var snapshot = HoverTooltipTests.Snapshot(actions: actions, intelligence: intelligence.Capture(new FactionId(1)));
         var panel = dock ? default(PlayerActionPanelView) with { Mode = PlayerActionPanelMode.Construction } : default;
         var view = new HoverTooltipView(snapshot.SessionId, new EntityId(11, 1), default, new Vector2(800, 450),
             true, 1600, 900, 1, panel.Mode, dock ? (int)PlayerActionDockControlKind.Item : 0, 0);
         var context = Context(new RecordingContext(), snapshot, layout, view) with { ActionPanel = panel };
+        var input = new InputState();
+        var controller = new HoverTooltipController();
+        var camera = new RtsCamera();
+        var screen = camera.WorldToScreen(Vector3.Zero, 1600, 900);
+        input.Apply(PlatformInputEvent.PointerMoved((int)screen.Position.X, (int)screen.Position.Y));
+        if (domain == "contact")
+        {
+            view = controller.Update(input, snapshot, EntityId.Invalid, camera, layout, default, false, false, TimeSpan.Zero);
+            view = controller.Update(input, snapshot, EntityId.Invalid, camera, layout, default, false, false, HoverTooltipController.DefaultDelay);
+            Assert.True(view.Contact.IsSpecified);
+            Assert.True(view.Ready);
+            context = context with { HoverTooltip = view };
+        }
         for (int i = 0; i < 128; i++) surface.Render(context);
         long start = GC.GetAllocatedBytesForCurrentThread();
-        for (int i = 0; i < 256; i++) surface.Render(context);
+        for (int i = 0; i < 256; i++)
+        {
+            if (domain == "contact")
+                context = context with
+                {
+                    HoverTooltip = controller.Update(input, snapshot, EntityId.Invalid, camera, layout,
+                    default, false, false, TimeSpan.FromMilliseconds(16))
+                };
+            surface.Render(context);
+        }
         long bytes = GC.GetAllocatedBytesForCurrentThread() - start;
         Assert.Equal(0, bytes);
         Assert.InRange(surface.LastRenderedVertexCount, 13, WorldHoverTooltipSurface.MaxVertices);

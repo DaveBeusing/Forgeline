@@ -6,6 +6,7 @@ using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Game;
 using ForgeLine.Input;
+using ForgeLine.Intelligence;
 using ForgeLine.Platform;
 using ForgeLine.Presentation;
 using ForgeLine.Simulation;
@@ -26,29 +27,18 @@ internal static class HoverHotPathMeasurements
         foreach (var profile in new[] { (1600, 900, 96u), (1600, 900, 144u), (5120, 2160, 144u) })
             foreach (float scale in new[] { .75f, 1f, 2f })
                 foreach (int count in new[] { 1, 1000 })
-                    foreach (bool dock in new[] { false, true })
+                    foreach (int kind in new[] { 0, 1, 2 })
                     {
-                        using var fixture = new Fixture(profile.Item1, profile.Item2, profile.Item3, scale, count, dock);
-                        for (int i = 0; i < Warmup; i++) fixture.Frame();
-                        var times = new double[Samples];
-                        long start = GC.GetAllocatedBytesForCurrentThread();
-                        for (int i = 0; i < Samples; i++)
-                        {
-                            long timestamp = Stopwatch.GetTimestamp();
-                            fixture.Frame();
-                            times[i] = Stopwatch.GetElapsedTime(timestamp).TotalMicroseconds;
-                        }
-                        long bytes = GC.GetAllocatedBytesForCurrentThread() - start;
-                        Array.Sort(times);
-                        results.Add(new(profile.Item1, profile.Item2, profile.Item3, scale, count, dock,
-                            bytes, times[Samples / 2], times[(int)(Samples * .95)], times[(int)(Samples * .99)], times[^1],
-                fixture.Hud.LastRenderedVertexCount, fixture.Hud.LastHoverTooltipVertexCount));
+                        bool dock = kind == 1;
+                        bool detected = kind == 2;
+                        using var fixture = new Fixture(profile.Item1, profile.Item2, profile.Item3, scale, count, dock, detected);
+                        results.Add(Measure(fixture, profile.Item1, profile.Item2, profile.Item3, scale, count, dock, detected));
                     }
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output))!);
         File.WriteAllText(output, JsonSerializer.Serialize(new
         {
             SchemaVersion = 1,
-            Backend = "CPU null graphics; input, resolution and full HUD with active world or dock tooltip; excludes GPU upload, wait and present",
+            Backend = "CPU null graphics; input, resolution and full HUD with active world, dock or detected-contact tooltip; excludes GPU upload, wait and present",
             Runtime = RuntimeInformation.FrameworkDescription,
             BuildVersion = typeof(GameplayHudRenderer).Assembly.GetName().Version?.ToString(),
             Warmup,
@@ -62,7 +52,27 @@ internal static class HoverHotPathMeasurements
         Console.WriteLine($"Hover hot paths: {results.Count} cases; zero allocation and bounded geometry; {Path.GetFullPath(output)}");
     }
 
-    private sealed record Measurement(int Width, int Height, uint Dpi, float UiScale, int EntityCount, bool Dock,
+    private static Measurement Measure(Fixture fixture, int width, int height, uint dpi, float scale, int count, bool dock, bool detected)
+    {
+        for (int i = 0; i < Warmup; i++) fixture.Frame();
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+        var times = new double[Samples];
+        long start = GC.GetAllocatedBytesForCurrentThread();
+        for (int i = 0; i < Samples; i++)
+        {
+            long timestamp = Stopwatch.GetTimestamp();
+            fixture.Frame();
+            times[i] = Stopwatch.GetElapsedTime(timestamp).TotalMicroseconds;
+        }
+        long bytes = GC.GetAllocatedBytesForCurrentThread() - start;
+        Array.Sort(times);
+        return new(width, height, dpi, scale, count, dock, detected,
+            bytes, times[Samples / 2], times[(int)(Samples * .95)], times[(int)(Samples * .99)], times[^1],
+            fixture.Hud.LastRenderedVertexCount, fixture.Hud.LastHoverTooltipVertexCount);
+    }
+    private sealed record Measurement(int Width, int Height, uint Dpi, float UiScale, int EntityCount, bool Dock, bool DetectedContact,
         long AllocatedBytes, double P50Microseconds, double P95Microseconds, double P99Microseconds,
         double MaximumMicroseconds, int HudVertices, int TooltipVertices);
 
@@ -79,12 +89,13 @@ internal static class HoverHotPathMeasurements
         private readonly uint _dpi;
         private readonly float _scale;
         private readonly bool _dock;
+        private readonly bool _detected;
         private int _frame;
         public GameplayHudRenderer Hud { get; }
 
-        public Fixture(int width, int height, uint dpi, float scale, int count, bool dock)
+        public Fixture(int width, int height, uint dpi, float scale, int count, bool dock, bool detected)
         {
-            _dpi = dpi; _scale = scale; _dock = dock;
+            _dpi = dpi; _scale = scale; _dock = dock; _detected = detected;
             _context = new NullGraphicsCommandContext { Width = width, Height = height };
             _layout = GameplayHudLayout.Create(width, height, dpi, scale);
             _panel = default(PlayerActionPanelView) with { Mode = dock ? PlayerActionPanelMode.Construction : PlayerActionPanelMode.Closed };
@@ -117,21 +128,26 @@ internal static class HoverHotPathMeasurements
                 var actions = new PlayerActionSnapshot(session, tick,
                     [new PlayerConstructionActionReadModel(BuildingIds.Extractor, "Mine / Extractor",
                         [new PlayerActionResourceAmount(ResourceIds.Steel, "Steel", 25, 10)], true)], 0, null, null);
+                var intelligence = new FactionIntelligenceStore();
+                intelligence.BeginTick(tick);
+                intelligence.Observe(new FactionId(1), _entity, new IntelligenceSignature(new FactionId(2), 999),
+                    Vector3.Zero, IntelligenceState.Detected, tick);
                 _snapshots[i] = new(tick, TimeSpan.FromMilliseconds(50), count, instances, sessionId: session,
+                    intelligence: detected ? intelligence.Capture(new FactionId(1)) : null,
                     playerExperience: default(PlayerExperienceSnapshot) with { Player = new PlayerId(1) },
                     playerActions: dock ? actions : null,
                     hover: new PlayerHoverSummary(_entity, session, tick, PlayerHoverCategory.Unit, details.DisplayName,
                         RtsUiIcon.UnitArmor, details));
             }
             var card = new Vector2(_layout.ActionDock.X + 20 * _layout.Scale, _layout.ActionDock.Y + 100 * _layout.Scale);
-            var position = dock ? card : new Vector2(width / 2, height / 2);
+            var position = dock ? card : detected ? _camera.WorldToScreen(Vector3.Zero, width, height).Position : new Vector2(width / 2, height / 2);
             _input.Apply(PlatformInputEvent.PointerMoved((int)position.X, (int)position.Y));
         }
 
         public void Frame()
         {
             var snapshot = _snapshots[_frame++ % 2];
-            var view = _hover.Update(_input, snapshot, _entity, _camera, _layout, _panel,
+            var view = _hover.Update(_input, snapshot, _detected ? EntityId.Invalid : _entity, _camera, _layout, _panel,
                 false, _dock, TimeSpan.FromMilliseconds(16));
             if (_frame > Warmup && !view.Ready) throw new InvalidOperationException("Hover fixture is not active.");
             Hud.Render(_context, _camera, snapshot, new AxisAlignedBounds(new Vector3(-1000), new Vector3(1000)),
