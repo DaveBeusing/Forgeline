@@ -556,7 +556,7 @@ public static class PlayerExperienceSnapshotFactory
             0);
     }
 
-    private static PlayerSelectionSummary CaptureSelection(
+    public static PlayerSelectionSummary CaptureSelection(
         EntityRegistry entities,
         PlayerId player,
         IReadOnlyCollection<EntityId> selectedEntities,
