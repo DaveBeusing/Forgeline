@@ -427,7 +427,9 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                         description.CullMode,
                         "Unsupported graphics cull mode.")
                 },
-                BlendState = BlendDescription.Opaque,
+                BlendState = description.AlphaBlendEnabled
+                    ? BlendDescription.NonPremultiplied
+                    : BlendDescription.Opaque,
                 DepthStencilState = description.DepthEnabled
                     ? DepthStencilDescription.Default
                     : DepthStencilDescription.None,
