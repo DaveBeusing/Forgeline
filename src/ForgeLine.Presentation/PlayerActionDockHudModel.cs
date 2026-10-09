@@ -736,7 +736,6 @@ internal static class PlayerActionDockHudModel
         BuildingPlacementFailureReason failure) =>
         failure switch
         {
-            BuildingPlacementFailureReason.UnknownBuilding => "UNKNOWN BUILDING",
             BuildingPlacementFailureReason.None =>
                 "VALID",
             BuildingPlacementFailureReason.UnknownBuilding =>
