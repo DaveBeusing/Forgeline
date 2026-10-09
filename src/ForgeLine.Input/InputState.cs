@@ -7,6 +7,8 @@ public sealed class InputState
 {
     private readonly HashSet<PlatformKey> _keysDown = [];
     private readonly HashSet<PlatformMouseButton> _mouseButtonsDown = [];
+    private readonly HashSet<PlatformKey> _suppressedKeys = [];
+    private readonly HashSet<PlatformMouseButton> _suppressedButtons = [];
 
     private bool _hasPointerPosition;
     private Vector2 _pointerPosition;
@@ -37,7 +39,7 @@ public sealed class InputState
         switch (inputEvent.Kind)
         {
             case PlatformInputEventKind.KeyDown:
-                if (inputEvent.Key != PlatformKey.Unknown)
+                if (inputEvent.Key != PlatformKey.Unknown && !_suppressedKeys.Contains(inputEvent.Key))
                 {
                     _keysDown.Add(inputEvent.Key);
                 }
@@ -45,12 +47,13 @@ public sealed class InputState
                 break;
 
             case PlatformInputEventKind.KeyUp:
+                _suppressedKeys.Remove(inputEvent.Key);
                 _keysDown.Remove(inputEvent.Key);
                 break;
 
             case PlatformInputEventKind.MouseButtonDown:
                 UpdatePointerPosition(inputEvent.PointerX, inputEvent.PointerY, accumulateDelta: false);
-                if (inputEvent.MouseButton != PlatformMouseButton.None)
+                if (inputEvent.MouseButton != PlatformMouseButton.None && !_suppressedButtons.Contains(inputEvent.MouseButton))
                 {
                     _mouseButtonsDown.Add(inputEvent.MouseButton);
                 }
@@ -58,6 +61,7 @@ public sealed class InputState
                 break;
 
             case PlatformInputEventKind.MouseButtonUp:
+                _suppressedButtons.Remove(inputEvent.MouseButton);
                 UpdatePointerPosition(inputEvent.PointerX, inputEvent.PointerY, accumulateDelta: false);
                 _mouseButtonsDown.Remove(inputEvent.MouseButton);
                 break;
@@ -76,6 +80,12 @@ public sealed class InputState
                 _focusLostThisFrame = true;
                 break;
 
+            case PlatformInputEventKind.PointerLeft:
+                _hasPointerPosition = false;
+                _pointerDelta = Vector2.Zero;
+                _mouseButtonsDown.Clear();
+                break;
+
             default:
                 throw new ArgumentOutOfRangeException(
                     nameof(inputEvent),
@@ -91,12 +101,25 @@ public sealed class InputState
 
     public void Reset()
     {
+        _suppressedKeys.Clear();
+        _suppressedButtons.Clear();
         _keysDown.Clear();
         _mouseButtonsDown.Clear();
         _hasPointerPosition = false;
         _pointerDelta = Vector2.Zero;
         _wheelDelta = 0;
         _focusLostThisFrame = false;
+    }
+
+    public void SuppressHeldInput()
+    {
+        _suppressedKeys.UnionWith(_keysDown);
+        _suppressedButtons.UnionWith(_mouseButtonsDown);
+        _keysDown.Clear();
+        _mouseButtonsDown.Clear();
+        _hasPointerPosition = false;
+        _pointerDelta = Vector2.Zero;
+        _wheelDelta = 0;
     }
 
     private void UpdatePointerPosition(int x, int y, bool accumulateDelta)

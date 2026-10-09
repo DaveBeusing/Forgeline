@@ -6,7 +6,8 @@ public enum FrontendSurfaceKind : byte
     MainMenu = 2,
     Detail = 3,
     PauseMenu = 4,
-    StudioSplash = 5
+    StudioSplash = 5,
+    Controls = 6
 }
 
 public readonly record struct FrontendMenuEntryView(

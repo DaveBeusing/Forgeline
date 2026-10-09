@@ -217,7 +217,8 @@ internal static class FrontendPresentationAdapter
 
     internal static FrontendSurfaceView Controls(
         RtsCameraBindings bindings,
-        string footer = "ESC  BACK")
+        string footer = "ESC  BACK",
+        bool edgeScrollEnabled = true)
     {
         ArgumentNullException.ThrowIfNull(bindings);
 
@@ -244,16 +245,17 @@ internal static class FrontendPresentationAdapter
                     $"{bindings.PitchDown.ToString().ToUpperInvariant()} PITCH"),
                 new FrontendDetailLineView(
                     "CAMERA MOUSE",
-                    $"WHEEL ZOOM  {bindings.DragPanButton.ToString().ToUpperInvariant()} DRAG  EDGE PAN"),
+                    $"WHEEL ZOOM  {bindings.DragPanButton.ToString().ToUpperInvariant()} DRAG  " +
+                    (edgeScrollEnabled ? "EDGE PAN" : "EDGE PAN DISABLED")),
                 new FrontendDetailLineView(
                     "SELECT / MOVE",
                     "LEFT SELECT  SHIFT+LEFT MULTI  RIGHT MOVE"),
                 new FrontendDetailLineView(
                     "COMMAND PANELS",
-                    "B BUILD  P PROCESS  U UNITS  L LOGISTICS  Y SUPPLY  K COMBAT"),
+                    "B BUILD  P PROCESS  U UNITS  L LOGISTICS  Y SUPPLY  K COMBAT  H TECHNOLOGY"),
                 new FrontendDetailLineView(
                     "F1 / F2 / F3",
-                    "METRICS  WORLD DEBUG  FORMATION"),
+                    "HELP  WORLD DEBUG  FORMATION"),
                 new FrontendDetailLineView(
                     "F4 / F5 / F6",
                     "COMMAND CORE  POWER PLANT  EXTRACTOR"),
@@ -261,10 +263,16 @@ internal static class FrontendPresentationAdapter
                     "F7 / F8 / F9",
                     "STORAGE DEPOT  SMELTER  ROTATE BUILDING"),
                 new FrontendDetailLineView(
+                    "DEVELOPER METRICS",
+                    "SHIFT+F1 TOGGLE PERFORMANCE METRICS"),
+                new FrontendDetailLineView(
+                    "OBJECTIVE",
+                    "DESTROY THE ENEMY COMMAND CORE"),
+                new FrontendDetailLineView(
                     "F10 / F11 / F12",
                     "STRATEGIC OVERLAY  MINIMAP  HELP  ESC/SPACE PAUSE")
             ],
-            footer);
+            footer) with { Kind = FrontendSurfaceKind.Controls };
     }
 
     internal static FrontendSurfaceView Credits()

@@ -87,7 +87,7 @@ HUD surfaces implement the narrow `IGameplayHudSurface` contract. New surfaces s
 
 `ResourcePowerHudSurface` now owns the top status bar and alert stack. It renders the seven resource quantities currently present in the authoritative player resource summary, generation/demand plus explicit power state, the existing causal alert flags/counts, and short-lived resolved command feedback. Rare Elements keep their semantic resource/icon identity but are not displayed because the active skirmish starting inventory does not currently expose an authoritative Rare Elements quantity.
 
-Residual match-result, pause, help, and onboarding presentation now renders through the production RTS information surface. `GameplayHudLegacyTextSurface` has been removed. `DevelopmentOverlayRenderer` is reserved for F1/F2 engineering diagnostics and is not a normal player-facing HUD owner.
+Match results and compact onboarding render through the production RTS information surface. Pause and F1/F12 controls use the shared frontend renderer; controls are modal and pause authoritative gameplay through the existing simulation-owner boundary. `GameplayHudLegacyTextSurface` has been removed. `DevelopmentOverlayRenderer` is reserved for Shift + F1 / F2 engineering diagnostics and is not a normal player-facing HUD owner.
 
 ## Player action dock presentation
 

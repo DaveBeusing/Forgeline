@@ -14,6 +14,29 @@ public sealed class FrontendOverlayRendererTests : IDisposable
         GC.SuppressFinalize(this);
     }
 
+    [Theory]
+    [InlineData(1024, 720)]
+    [InlineData(1600, 900)]
+    [InlineData(2560, 1440)]
+    public void CompleteControlsReferenceFitsViewportAndReusesGrownBuffer(int width, int height)
+    {
+        using var renderer = new FrontendOverlayRenderer(_graphics);
+        var context = new FakeGraphicsCommandContext { Width = width, Height = height };
+        var lines = Enumerable.Range(0, 10).Select(_ => new FrontendDetailLineView("CAMERA", new string('A', 100))).ToArray();
+        var view = FrontendSurfaceView.Detail("CONTROLS", lines, "F1 / F12 / ESC CLOSE")
+            with { Kind = FrontendSurfaceKind.Controls };
+        renderer.Render(context, view, userScale: 2f);
+        int withFooter = renderer.LastRenderedVertexCount;
+        var buffer = _graphics.LastBuffer;
+        Assert.InRange(withFooter, 16385, 131071);
+        Assert.InRange(buffer!.MaximumAbsoluteX, 0, 1.001f);
+        renderer.Render(context, view with { Footer = "" }, userScale: 2f);
+        Assert.True(renderer.LastRenderedVertexCount < withFooter);
+        Assert.Same(buffer, _graphics.LastBuffer);
+        renderer.Render(context, view, userScale: 2f);
+        Assert.Equal(withFooter, renderer.LastRenderedVertexCount);
+    }
+
     [Fact]
     public void BootstrapBrandIsVisibleAtTimeZeroWithoutTextures()
     {
@@ -179,6 +202,7 @@ public sealed class FrontendOverlayRendererTests : IDisposable
         }
 
         public GraphicsBufferDescription Description { get; }
+        public float MaximumAbsoluteX { get; private set; }
 
         public void SetData<T>(
             ReadOnlySpan<T> data,
@@ -187,10 +211,14 @@ public sealed class FrontendOverlayRendererTests : IDisposable
         {
             ReadOnlySpan<byte> bytes = MemoryMarshal.AsBytes(data);
             VisibleBrandVertices = 0;
+            MaximumAbsoluteX = 0;
             // Position float2 followed by Color float4; first six vertices are the backdrop.
             for (int offset = 6 * 24; offset < bytes.Length; offset += 24)
+            {
+                MaximumAbsoluteX = MathF.Max(MaximumAbsoluteX, MathF.Abs(BitConverter.ToSingle(bytes.Slice(offset, 4))));
                 if (BitConverter.ToSingle(bytes.Slice(offset + 8, 4)) > 0.5f)
                     VisibleBrandVertices++;
+            }
         }
 
         public void Dispose()
@@ -201,9 +229,9 @@ public sealed class FrontendOverlayRendererTests : IDisposable
     private sealed class FakeGraphicsCommandContext :
         IGraphicsCommandContext
     {
-        public int Width => 1600;
+        public int Width { get; init; } = 1600;
 
-        public int Height => 900;
+        public int Height { get; init; } = 900;
 
         public int FrameIndex => 0;
 

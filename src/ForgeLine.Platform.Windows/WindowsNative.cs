@@ -4,6 +4,22 @@ namespace ForgeLine.Platform.Windows;
 
 internal static partial class WindowsNative
 {
+    internal const uint WmMouseLeave = 0x02A3;
+    internal const uint TmeLeave = 0x00000002;
+    internal static readonly uint MouseTrackingSize = (uint)Marshal.SizeOf<MouseTracking>();
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct MouseTracking
+    {
+        internal uint Size;
+        internal uint Flags;
+        internal nint Window;
+        internal uint HoverTime;
+    }
+
+    [LibraryImport("user32.dll", EntryPoint = "TrackMouseEvent", SetLastError = true)]
+    internal static partial int TrackMouseEvent(ref MouseTracking tracking);
+
     internal const uint CsHorizontalRedraw = 0x0002;
     internal const uint CsVerticalRedraw = 0x0001;
 

@@ -88,11 +88,11 @@ The client opens the Central Divide / Directorate skirmish flow. In a source che
 | Select / multi-select / box-select | Left click / Shift + left click / left drag |
 | Issue movement order | Right click |
 | Pause | Space |
-| Controls and onboarding | F12 |
+| Controls reference | F1 or F12 |
 | Build / industrial production / unit production | B / P / U |
 | Logistics / supply / combat commands | L / Y / K |
 | Strategic overlays | F10 |
-| Development metrics | F1 |
+| Development metrics | Shift + F1 |
 | Restart completed match / end session | R / Escape |
 
 Additional interaction and diagnostics shortcuts are documented in [Windows Client](docs/WindowsClient.md), [Camera and Input](docs/CameraAndInput.md), and [RTS Information Layer](docs/RTSInformationLayer.md).

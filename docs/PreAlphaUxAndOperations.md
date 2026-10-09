@@ -22,7 +22,7 @@ Controls:
 
 - Enter starts the configured match;
 - Escape exits the client;
-- F12 opens controls and onboarding.
+- after the match starts, F1 (or F12) opens the controls reference.
 
 The setup state pauses authoritative simulation through the existing client-to-simulation control boundary. It does not emulate pause by merely suppressing rendering or player input.
 
@@ -40,20 +40,22 @@ Returning from an active match to the main menu tears down the current session a
 
 Space toggles player pause during an active match.
 
-F12 toggles the help/onboarding surface. Help also pauses gameplay through the same simulation control transition so a fresh player can read controls without the match advancing in the background.
+F1 (or F12) toggles the controls reference. Help also pauses gameplay through the same simulation control transition so a fresh player can read controls without the match advancing in the background.
 
 Window minimize remains an independent pause reason. The effective simulation pause state is the combination of:
 
 - minimized or zero-size window;
 - match setup;
 - explicit player pause;
-- open help/onboarding.
+- open controls.
 
 Restore does not incorrectly resume a match that is still explicitly paused or displaying help.
 
 ## Minimal Onboarding
 
-The F12 surface documents the minimum complete vertical-slice workflow:
+The controls reference lists implemented camera, selection, movement, construction, production, logistics, supply and combat bindings, plus the Command Core objective. It uses active camera bindings and indicates whether edge pan is disabled. F1/F12, Escape or Back closes it without forwarding the closing gesture to gameplay. Shift + F1 toggles development metrics.
+
+The minimum complete vertical-slice workflow is:
 
 1. move the camera and select units;
 2. move and scout;
@@ -63,7 +65,7 @@ The F12 surface documents the minimum complete vertical-slice workflow:
 6. use tactical combat and artillery;
 7. destroy the enemy Command Core.
 
-The compact gameplay hint keeps F12, Space, and the current victory objective discoverable when onboarding is enabled.
+The compact gameplay hint keeps F1, Space, and the current victory objective discoverable when onboarding is enabled.
 
 ## Settings
 

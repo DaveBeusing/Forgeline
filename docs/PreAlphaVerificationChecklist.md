@@ -47,7 +47,14 @@ The packaged build is the qualification target. Do not substitute a repository-l
 
 ## Input, Camera, and Help
 
-- [ ] F12 opens and closes the controls/onboarding view.
+- [ ] F1 opens readable controls on its first press; F1/F12 toggle, Escape and Back close. Holding or repeating the help key does not reopen it.
+- [ ] Escape closes help without opening pause; help pauses gameplay and preserves the current selection.
+- [ ] While help is visible, camera, selection, building placement, orders, formation and overlay shortcuts do not act on the world. Closing help with held movement keys or mouse buttons requires release before a new action.
+- [ ] A/Left and the left edge move the view left, D/Right and the right edge move right, W/Up and S/Down stay correctly oriented, before and after camera rotation.
+- [ ] Repeat pan checks at 60 and 144 Hz, resized/windowed/borderless modes and 100/150/200 percent DPI. All ten controls rows and Back remain visible at each configured UI scale.
+- [ ] Leaving the client viewport stops edge pan; re-entering does not jump a drag. Wheel-up zooms in and wheel-down zooms out; neither crosses configured zoom limits or leaks through a captured HUD surface.
+- [ ] Open help during left selection drag, minimap drag, middle camera drag and building placement; close after releasing outside the window or alt-tabbing. No gesture resumes and no unintended order is submitted.
+- [ ] Shift + F1 toggles metrics during gameplay. F1 opens help even with onboarding disabled.
 - [ ] Camera pan bindings match the persisted settings.
 - [ ] Alternate camera bindings remain functional.
 - [ ] Rotation and pitch bindings match the persisted settings.

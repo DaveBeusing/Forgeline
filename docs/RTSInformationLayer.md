@@ -266,7 +266,7 @@ The developer overlay controller exposes these categories:
 
 The master developer switch is disabled by default. F2 toggles that master. Shift+F2 toggles Rendering; Shift+F4 through Shift+F9 toggle Navigation, World, Logistics, Sensors, Combat, and Entities. Shifted shortcuts intentionally do not activate the existing unshifted F4–F8 building-placement shortcuts or the F9 footprint-rotation shortcut.
 
-Disabled categories do not request their simulation debug-capture paths. Rendering-only diagnostics require no simulation debug snapshot. When all developer diagnostics are disabled, the debug draw path collects no primitives and performs no debug line draw call. F1 development metrics expose gameplay-overlay line count, developer-debug line count, dropped debug lines, and measured developer-overlay CPU submission time.
+Disabled categories do not request their simulation debug-capture paths. Rendering-only diagnostics require no simulation debug snapshot. When all developer diagnostics are disabled, the debug draw path collects no primitives and performs no debug line draw call. Shift + F1 development metrics expose gameplay-overlay line count, developer-debug line count, dropped debug lines, and measured developer-overlay CPU submission time.
 
 Render ownership and ordering are explicit: world geometry renders first, depth-tested engineering debug lines render next, player-facing world markers render afterward without depth testing, and screen-space RTS information/UI renders above both. Diagnostic visibility never writes to simulation state.
 

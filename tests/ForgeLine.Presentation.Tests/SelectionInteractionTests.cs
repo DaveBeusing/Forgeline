@@ -15,6 +15,34 @@ public sealed class SelectionInteractionTests
     private static readonly PlayerId ForeignPlayer = new(2);
 
     [Fact]
+    public void ModalTransitionCancelsDragAndPendingOrdersWithoutClearingSelection()
+    {
+        var camera = CreateCamera();
+        var entity = new EntityId(21, 1);
+        var world = CreateWorld(Instance(entity, Vector3.Zero, LocalPlayer, ControllableEntityCategory.Unit));
+        var terrain = new FlatTerrain();
+        var input = new InputState();
+        var controller = new RtsSelectionController(new SelectionFilter(LocalPlayer, ControllableEntityCategory.Unit));
+        controller.Selection.SetSingle(entity);
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown,
+            PlatformMouseButton.Left, 700, 350));
+        controller.Update(input, camera, world, terrain, 1600, 900, 1);
+        input.Apply(PlatformInputEvent.PointerMoved(900, 550));
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown,
+            PlatformMouseButton.Right, 900, 550));
+        controller.Update(input, camera, world, terrain, 1600, 900, 1);
+        Assert.True(controller.IsDragSelecting);
+        controller.CancelPointerInteraction();
+        input.SuppressHeldInput();
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp,
+            PlatformMouseButton.Left, 900, 550));
+        controller.Update(input, camera, world, terrain, 1600, 900, 1);
+        Assert.False(controller.IsDragSelecting);
+        Assert.True(controller.Selection.Contains(entity));
+        Assert.False(controller.TryTakeMovementRequest(out _));
+    }
+
+    [Fact]
     public void SelectionSetSupportsSingleToggleAndReplacement()
     {
         var selection = new SelectionSet();

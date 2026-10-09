@@ -360,7 +360,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             builder.NewLine();
             builder.Append("ESC EXIT");
             builder.NewLine();
-            builder.Append("F12 CONTROLS AND ONBOARDING");
+            builder.Append("F1 CONTROLS AND ONBOARDING");
             builder.NewLine();
             builder.NewLine();
             builder.Append("SETTINGS ");
@@ -386,7 +386,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             builder.NewLine();
             builder.Append("ESC OR SPACE RESUME");
             builder.NewLine();
-            builder.Append("F12 CONTROLS");
+            builder.Append("F1 CONTROLS");
 
             EmitReadableText(
                 builder.Written,
@@ -434,13 +434,13 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             builder.NewLine();
             builder.Append("L LOGISTICS  Y SUPPLY  K COMBAT");
             builder.NewLine();
-            builder.Append("F1 PERFORMANCE METRICS  F2 WORLD DEBUG  F3 FORMATION");
+            builder.Append("SHIFT+F1 PERFORMANCE METRICS  F2 WORLD DEBUG  F3 FORMATION");
             builder.NewLine();
             builder.Append("F4 COMMAND CORE  F5 POWER PLANT  F6 EXTRACTOR");
             builder.NewLine();
             builder.Append("F7 STORAGE DEPOT  F8 SMELTER  F9 ROTATE BUILDING");
             builder.NewLine();
-            builder.Append("F10 STRATEGIC OVERLAY  F11 MINIMAP  F12 CLOSE HELP");
+            builder.Append("F10 STRATEGIC OVERLAY  F11 MINIMAP  F1/F12/ESC CLOSE HELP");
             builder.NewLine();
             builder.Append("ESC OR SPACE PAUSE MENU");
             builder.NewLine();
@@ -478,7 +478,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
 
         if (view.ShowOnboarding)
         {
-            builder.Append("F12 HELP  ESC PAUSE MENU  GOAL DESTROY ENEMY COMMAND CORE");
+            builder.Append("F1 HELP  ESC PAUSE MENU  GOAL DESTROY ENEMY COMMAND CORE");
 
             EmitReadableText(
                 builder.Written,
