@@ -101,6 +101,8 @@ Selected units and buildings use terrain-aligned circular rings. Hover uses a br
 
 Additional interaction and diagnostics shortcuts are documented in [Windows Client](docs/WindowsClient.md), [Camera and Input](docs/CameraAndInput.md), and [RTS Information Layer](docs/RTSInformationLayer.md).
 
+See [Interaction qualification](docs/InteractionQualification.md) for the integrated control/state matrix, display coverage, overlay/HUD performance checks and manual visual acceptance checklist.
+
 ## Development and Validation
 
 ### Headless simulation

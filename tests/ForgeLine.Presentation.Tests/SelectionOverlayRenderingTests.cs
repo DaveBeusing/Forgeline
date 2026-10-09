@@ -99,15 +99,23 @@ public sealed class SelectionOverlayRenderingTests
 
     internal sealed class RecordingDevice : IGraphicsDevice
     {
+        public List<RecordingBuffer> Buffers { get; } = [];
+        public List<GraphicsPipelineDescription> Pipelines { get; } = [];
         public GraphicsPipelineDescription? Pipeline { get; private set; }
         public RecordingBuffer? Buffer { get; private set; }
         public GraphicsDiagnostics Diagnostics => throw new NotSupportedException();
         public IGraphicsPipeline CreateGraphicsPipeline(GraphicsPipelineDescription description)
         {
             Pipeline = description;
+            Pipelines.Add(description);
             return new RecordingPipeline(description);
         }
-        public IGraphicsBuffer CreateBuffer(GraphicsBufferDescription description) => Buffer = new(description);
+        public IGraphicsBuffer CreateBuffer(GraphicsBufferDescription description)
+        {
+            Buffer = new(description);
+            Buffers.Add(Buffer);
+            return Buffer;
+        }
         public void RenderFrame(GraphicsColor color, Action<IGraphicsCommandContext>? commands = null) => commands?.Invoke(new RecordingContext());
         public void Resize(int width, int height) { }
         public void WaitForIdle() { }
