@@ -1,7 +1,7 @@
 {
   "id": "mesh.world.prop.fence",
   "type": "mesh",
-  "source": "../sources/mesh_world_prop_fence.gltf",
+  "source": "../sources/mesh_world_prop_fence_production.gltf",
   "materialReferences": [
     "material.world.prop.industrial"
   ],

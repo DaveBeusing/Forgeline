@@ -1,7 +1,7 @@
 {
   "id": "mesh.world.prop.rock",
   "type": "mesh",
-  "source": "../sources/mesh_world_prop_rock.gltf",
+  "source": "../sources/mesh_world_prop_rock_production.gltf",
   "materialReferences": [
     "material.world.prop.industrial"
   ],

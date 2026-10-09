@@ -1,7 +1,7 @@
 {
   "id": "mesh.world.prop.concrete_block",
   "type": "mesh",
-  "source": "../sources/mesh_world_prop_concrete_block.gltf",
+  "source": "../sources/mesh_world_prop_concrete_block_production.gltf",
   "materialReferences": [
     "material.world.prop.industrial"
   ],

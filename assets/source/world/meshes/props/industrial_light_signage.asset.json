@@ -1,7 +1,7 @@
 {
   "id": "mesh.world.prop.industrial_light_signage",
   "type": "mesh",
-  "source": "../sources/mesh_world_prop_industrial_light_signage.gltf",
+  "source": "../sources/mesh_world_prop_industrial_light_signage_production.gltf",
   "materialReferences": [
     "material.world.prop.industrial"
   ],
