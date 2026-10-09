@@ -11,6 +11,60 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class SameTypeSelectionTests
 {
+    [Theory]
+    [InlineData(1f, 1)]
+    [InlineData(2f, 2)]
+    public void DoubleClickMovementThresholdUsesCurrentDisplayScale(float scale, int expected)
+    {
+        var input = new InputState();
+        var camera = Camera();
+        var controller = Controller();
+        var world = World(Unit(1, Vector3.Zero), Unit(2, new(12, 0, 0)));
+        Click(input, controller, camera, world, scale);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Left, 807, 450));
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Left, 807, 450));
+        controller.Update(input, camera, world, new FlatTerrain(), 1600, 900, 1, pointerScale: scale, elapsed: TimeSpan.FromMilliseconds(100));
+        Assert.Equal(expected, controller.Selection.Count);
+    }
+
+    [Fact]
+    public void DifferentNearbyUnitsOfSameTypeCanFormTheDoubleClickPair()
+    {
+        var first = Unit(1, Vector3.Zero) with { Transform = new(Vector3.Zero, Quaternion.Identity, new Vector3(.25f)) };
+        var second = first with { Entity = new(2, 1), Transform = first.Transform with { Position = new(-.7f, 0, 0) } };
+        var world = World(first, second, Unit(3, new(12, 0, 0)));
+        var input = new InputState();
+        var camera = Camera();
+        var controller = Controller();
+        Click(input, controller, camera, world);
+        Assert.True(controller.Selection.Contains(first.Entity));
+        input.BeginFrame();
+        var p = camera.WorldToScreen(second.Transform.Position, 1600, 900).Position;
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Left, (int)MathF.Round(p.X), (int)MathF.Round(p.Y)));
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Left, (int)MathF.Round(p.X), (int)MathF.Round(p.Y)));
+        controller.Update(input, camera, world, new FlatTerrain(), 1600, 900, 1, elapsed: TimeSpan.FromMilliseconds(100));
+        Assert.Equal(3, controller.Selection.Count);
+    }
+
+    [Fact]
+    public void InterveningDragBreaksTheClickPair()
+    {
+        var world = World(Unit(1, Vector3.Zero), Unit(2, new(12, 0, 0)));
+        var camera = Camera();
+        var input = new InputState();
+        var controller = Controller();
+        Click(input, controller, camera, world);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Left, 800, 450));
+        controller.Update(input, camera, world, new FlatTerrain(), 1600, 900, 1);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Left, 850, 450));
+        controller.Update(input, camera, world, new FlatTerrain(), 1600, 900, 1);
+        Click(input, controller, camera, world);
+        Assert.Equal(1, controller.Selection.Count);
+    }
+
     [Fact]
     public void DoubleClickSelectsOnlyVisibleOwnedSameStableTypeAndNeverIssuesMovement()
     {

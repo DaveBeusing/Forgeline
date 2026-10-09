@@ -25,4 +25,5 @@ public readonly record struct PreAlphaUxView(
     string DragPanBinding,
     string SettingsPath,
     EarlyGameGuidanceView Guidance = default,
-    PlacementContextFeedbackView Placement = default);
+    PlacementContextFeedbackView Placement = default,
+    string InteractionHint = "");

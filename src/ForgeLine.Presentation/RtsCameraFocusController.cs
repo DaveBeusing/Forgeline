@@ -14,6 +14,8 @@ public sealed class RtsCameraFocusController(PlayerId player)
     private TimeSpan _feedbackRemaining;
     public string Feedback { get; private set; } = string.Empty;
 
+    public void ResetFeedback() { Feedback = string.Empty; _feedbackRemaining = default; }
+
     public bool Update(InputState input, PresentationSnapshot? snapshot, RtsCamera camera,
         SelectionSet groupSelection, bool focusGroup, TimeSpan elapsed, bool blocked = false,
         RtsCameraBindings? bindings = null)
@@ -31,7 +33,7 @@ public sealed class RtsCameraFocusController(PlayerId player)
             snapshot.PlayerExperience?.IsMatchComplete == true) return false;
         bool modified = input.IsKeyDown(PlatformKey.LeftControl) || input.IsKeyDown(PlatformKey.RightControl) ||
             input.IsKeyDown(PlatformKey.LeftShift) || input.IsKeyDown(PlatformKey.RightShift);
-        if (home && !modified && !UsesHome(bindings) && TryHome(snapshot, player, out Vector3 target))
+        if (home && !modified && !IsHomeCameraBinding(bindings) && TryHome(snapshot, player, out Vector3 target))
         {
             camera.CenterOn(target);
             Feedback = "CAMERA FOCUSED ON HOME BASE";
@@ -78,7 +80,7 @@ public sealed class RtsCameraFocusController(PlayerId player)
         !instance.BuildingFeature.IsDestroyed && float.IsFinite(instance.Transform.Position.X) &&
         float.IsFinite(instance.Transform.Position.Y) && float.IsFinite(instance.Transform.Position.Z);
 
-    private static bool UsesHome(RtsCameraBindings? b) => b is not null &&
+    public static bool IsHomeCameraBinding(RtsCameraBindings? b) => b is not null &&
         (b.PanForward == PlatformKey.Home || b.PanForwardAlternate == PlatformKey.Home ||
          b.PanBackward == PlatformKey.Home || b.PanBackwardAlternate == PlatformKey.Home ||
          b.PanLeft == PlatformKey.Home || b.PanLeftAlternate == PlatformKey.Home ||

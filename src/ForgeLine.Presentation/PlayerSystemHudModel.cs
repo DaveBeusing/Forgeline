@@ -4,10 +4,10 @@ namespace ForgeLine.Presentation;
 
 internal static class PlayerSystemHudModel
 {
-    public const int HelpLineCount = 8;
+    public const int HelpLineCount = 10;
 
     public const string OnboardingHint =
-        "F1 HELP  SPACE PAUSE  SHIFT+F12 GUIDE";
+        "HOME BASE  F1 HELP  SPACE PAUSE  SHIFT+F12 GUIDE";
 
     public static string ResolveMatchResultLabel(
         PlayerMatchStatus status) =>
@@ -30,7 +30,7 @@ internal static class PlayerSystemHudModel
             0 =>
                 "WASD/ARROWS PAN  QE ROTATE  RF PITCH  WHEEL ZOOM",
             1 =>
-                "LEFT CLICK SELECT  SHIFT LEFT CLICK MULTI SELECT",
+                "LEFT SELECT  DOUBLE LEFT VISIBLE SAME-TYPE UNITS  SHIFT LEFT MULTI",
             2 =>
                 "RIGHT CLICK MOVE  K COMBAT  H TECHNOLOGY",
             3 =>
@@ -42,6 +42,8 @@ internal static class PlayerSystemHudModel
             6 => "SHIFT+F12 SHOW / HIDE OPTIONAL MATCH GUIDE",
             7 =>
                 "OBJECTIVE DESTROY THE ENEMY COMMAND CORE",
+            8 => "HOME BASE FOCUS  CTRL+DIGIT ASSIGN  DOUBLE DIGIT GROUP FOCUS",
+            9 => "SHIFT+CLICK REPEAT BUILD AFTER ACCEPTANCE  F9 ROTATE  ESC CANCEL",
             _ =>
                 string.Empty
         };

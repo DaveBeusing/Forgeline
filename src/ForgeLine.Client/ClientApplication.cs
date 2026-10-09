@@ -508,6 +508,8 @@ internal sealed class ClientApplication
         var helpController = new GameplayHelpController();
         var guidanceInteraction = new GameplayGuidanceInteraction();
         var guidance = new EarlyGameGuidanceController();
+        var cameraFocus = new RtsCameraFocusController(LocalPlayer);
+        ulong pendingPlacementHostSequence = 0;
         var hoverTooltip = new HoverTooltipController();
         bool helpPointerHeld = false;
         bool pauseMenuUpHeld = false;
@@ -542,6 +544,7 @@ internal sealed class ClientApplication
         long previousFrameAt = startedAt;
         long nextDiagnosticAt = startedAt;
         bool smokeMatchCompleted = false;
+        var interactionDisplay = (window.ClientSize.Width, window.ClientSize.Height, window.Dpi, _settings.UiScale);
 
         while (window.IsOpen)
         {
@@ -554,6 +557,18 @@ internal sealed class ClientApplication
 
             DrainWindowEvents(window);
             DrainInputEvents(window, inputState);
+            var currentDisplay = (window.ClientSize.Width, window.ClientSize.Height, window.Dpi, _settings.UiScale);
+            if (currentDisplay != interactionDisplay)
+            {
+                inputState.SuppressHeldInput();
+                selectionController.CancelPointerInteraction();
+                minimapInteraction.Reset();
+                combatGroupInput.Reset();
+                cameraFocus.ResetFeedback();
+                buildingPlacementController.Cancel(presentationInteraction);
+                tacticalTargetingController.Cancel();
+            }
+            interactionDisplay = currentDisplay;
 
             if (window.IsOpen &&
                 !window.ClientSize.IsEmpty)
@@ -569,7 +584,10 @@ internal sealed class ClientApplication
                 snapshotBuffer);
             DrainSubmissionCompletions(
                 simulationHost,
-                ref lastCommandReceipt);
+                ref lastCommandReceipt,
+                buildingPlacementController,
+                presentationInteraction,
+                ref pendingPlacementHostSequence);
 
             long now = _platform.Clock.GetTimestamp();
             TimeSpan frameElapsed = _platform.Clock.GetElapsedTime(previousFrameAt, now);
@@ -870,6 +888,7 @@ internal sealed class ClientApplication
                 minimapInteraction.Reset();
                 combatGroupInput.Reset();
                 actionPanel.Close();
+                cameraFocus.ResetFeedback();
                 tacticalTargetingController.Cancel();
                 buildingPlacementController.Cancel(presentationInteraction);
             }
@@ -1254,9 +1273,22 @@ internal sealed class ClientApplication
                         !gameplayActive ||
                         hudInteraction.KeyboardCaptured ||
                         buildingPlacementController.IsActive ||
-                        tacticalTargetingController.IsActive);
+                        tacticalTargetingController.IsActive,
+                    elapsed: frameElapsed);
             hudInteraction.CaptureKeyboard(
                 combatGroupInputResult.Handled);
+            if (cameraFocus.Update(inputState, currentSnapshot, camera, selectionController.Selection,
+                combatGroupInputResult.FocusRequested, frameElapsed,
+                blocked: !gameplayActive || simulationPaused || !window.IsFocused ||
+                    (hudInteraction.KeyboardCaptured && !combatGroupInputResult.Handled) ||
+                    buildingPlacementController.IsActive || tacticalTargetingController.IsActive,
+                bindings: _settings.CameraBindings))
+            {
+                selectionController.CancelPointerInteraction();
+                minimapInteraction.Reset();
+                inputState.SuppressHeldInput();
+            }
+            bool uiPointerCaptured = hudInteraction.PointerCaptured;
 
             if (gameplayActive)
             {
@@ -1297,7 +1329,8 @@ internal sealed class ClientApplication
                     presentationInteraction,
                     window.ClientSize.Width,
                     window.ClientSize.Height,
-                    hudInteraction.PointerCaptured);
+                    hudInteraction.PointerCaptured,
+                    displayScale: interactionLayout.Scale);
                 }
 
                 bool placementCaptured = placementWasActive || buildingPlacementController.IsActive;
@@ -1305,7 +1338,7 @@ internal sealed class ClientApplication
                 {
                     selectionController.Update(inputState, camera, renderWorld, terrainWorld,
                         window.ClientSize.Width, window.ClientSize.Height, renderAlpha,
-                        pointerCaptured: true, pointerScale: interactionLayout.Scale);
+                        pointerCaptured: true, pointerScale: interactionLayout.Scale, elapsed: frameElapsed);
                 }
                 else
                 {
@@ -1318,7 +1351,8 @@ internal sealed class ClientApplication
                         window.ClientSize.Height,
                         renderAlpha,
                         hudInteraction.PointerCaptured,
-                        interactionLayout.Scale);
+                        interactionLayout.Scale,
+                        elapsed: frameElapsed);
 
                     if (selectionController.TryTakeMovementRequest(
                             out MovementOrderRequest movementRequest))
@@ -1351,8 +1385,7 @@ internal sealed class ClientApplication
                         currentSnapshot?.Tick ??
                         SimulationTick.Zero;
 
-                    RequireSubmission(
-                        simulationHost,
+                    if (!simulationHost.TrySubmit(simulationHost.SessionId,
                         gateway =>
                             gateway.SubmitBuild(
                                 LocalPlayer,
@@ -1360,7 +1393,12 @@ internal sealed class ClientApplication
                                 placementRequest.Position,
                                 placementRequest.Orientation,
                                 constructionInventory,
-                                observedTick));
+                                observedTick),
+                        out pendingPlacementHostSequence))
+                    {
+                        buildingPlacementController.ObserveSubmission(null, presentationInteraction);
+                        pendingPlacementHostSequence = 0;
+                    }
                 }
             }
             else
@@ -1371,7 +1409,9 @@ internal sealed class ClientApplication
 
             DrainCommandResults(
                 commandGateway,
-                ref lastCommandResult);
+                ref lastCommandResult,
+                buildingPlacementController,
+                presentationInteraction);
 
             TacticalTargetingView tacticalTargetingView =
                 tacticalTargetingController.CreateView(
@@ -1415,11 +1455,9 @@ internal sealed class ClientApplication
                     currentSnapshot?.PlayerActions,
                     window.Dpi,
                     _settings.UiScale);
-            bool placementValid =
-                buildingPlacementController.PreviewFreshness ==
-                    PlacementPreviewFreshness.Current &&
-                buildingPlacementController.Preview?.IsValid ==
-                    true;
+            PlacementContextFeedbackView placementFeedback = buildingPlacementController.IsActive && !simulationPaused && window.IsFocused
+                ? PlacementContextFeedback.Resolve(buildingPlacementController, currentSnapshot) : default;
+            bool placementValid = placementFeedback.State == PlacementContextState.Valid;
             RtsCursorKind cursor =
                 minimapInteraction.PointerCaptured
                     ? minimapInteraction.View.Cursor
@@ -1437,7 +1475,9 @@ internal sealed class ClientApplication
                         selectionController.Selection.Count > 0,
                         actionPanel.Mode ==
                             PlayerActionPanelMode.Supply,
-                        selectionController.PointerMovementTargetValid));
+                        selectionController.PointerMovementTargetValid,
+                        PointerCaptured: !gameplayActive || simulationPaused || !window.IsFocused || uiPointerCaptured || buildingPlacementController.AwaitingResult,
+                        MovementSelectionSupported: RtsCursorResolver.CanMoveSelection(currentSnapshot, selectionController.Selection, LocalPlayer)));
             var informationView =
                 new RtsInformationLayerView(
                     informationLayer.MinimapEnabled,
@@ -1468,11 +1508,11 @@ internal sealed class ClientApplication
 
             preAlphaUx = preAlphaUx with
             {
+                InteractionHint = buildingPlacementController.IsActive ? buildingPlacementController.InteractionHint : cameraFocus.Feedback,
                 Guidance = guidance.Update(currentSnapshot, preAlphaUx.ShowOnboarding && !guidanceInteraction.Hidden,
                     simulationPaused || !window.IsFocused || selectionController.IsDragSelecting || buildingPlacementController.IsActive ||
                     tacticalTargetingView.Mode != TacticalTargetingMode.None || inputState.IsMouseButtonDown(PlatformMouseButton.Middle)),
-                Placement = buildingPlacementController.IsActive && !simulationPaused && window.IsFocused
-                    ? PlacementContextFeedback.Resolve(buildingPlacementController, currentSnapshot) : default
+                Placement = placementFeedback
             };
 
             _ = renderHost.Publish(
@@ -1742,11 +1782,19 @@ internal sealed class ClientApplication
 
     private static void DrainSubmissionCompletions(
         ClientSimulationHost simulationHost,
-        ref PlayerCommandSubmissionReceipt? lastCommandReceipt)
+        ref PlayerCommandSubmissionReceipt? lastCommandReceipt,
+        RtsBuildingPlacementController placement,
+        PresentationInteractionState interaction,
+        ref ulong placementHostSequence)
     {
         while (simulationHost.TryReadSubmissionCompletion(
                    out ClientSubmissionCompletion completion))
         {
+            if (completion.HostSequence == placementHostSequence)
+            {
+                placement.ObserveSubmission(completion.Receipt, interaction);
+                placementHostSequence = 0;
+            }
             if (completion.Receipt is
                 PlayerCommandSubmissionReceipt receipt)
             {
@@ -3373,11 +3421,14 @@ internal sealed class ClientApplication
 
     private static void DrainCommandResults(
         PlayerCommandGateway commandGateway,
-        ref PlayerCommandResultReadModel? lastCommandResult)
+        ref PlayerCommandResultReadModel? lastCommandResult,
+        RtsBuildingPlacementController placement,
+        PresentationInteractionState interaction)
     {
         while (commandGateway.Results.TryRead(
                    out PlayerCommandResultReadModel result))
         {
+            placement.ObserveResult(result, interaction);
             lastCommandResult =
                 result;
         }

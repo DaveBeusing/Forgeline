@@ -16,7 +16,7 @@ public sealed class CameraFocusInteractionTests
         var core = Instance(1, new(90, 2, 40), BuildingIds.CommandCore);
         var factory = Instance(2, new(40, 0, 20), BuildingIds.VehicleFactory);
         var foreign = Instance(3, new(900, 0, 900), BuildingIds.CommandCore) with
-            { Selectable = new(new PlayerId(2), ControllableEntityCategory.Building) };
+        { Selectable = new(new PlayerId(2), ControllableEntityCategory.Building) };
         var camera = new RtsCamera();
         var old = camera.CaptureState();
         var selection = new SelectionSet();
