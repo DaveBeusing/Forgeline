@@ -83,7 +83,16 @@ public sealed class HoverTooltipRenderingTests
             Assert.True(view.Ready);
             context = context with { HoverTooltip = view };
         }
-        for (int i = 0; i < 128; i++) surface.Render(context);
+        for (int i = 0; i < 128; i++)
+        {
+            if (domain == "contact")
+                context = context with
+                {
+                    HoverTooltip = controller.Update(input, snapshot, EntityId.Invalid, camera, layout,
+                    default, false, false, TimeSpan.FromMilliseconds(16))
+                };
+            surface.Render(context);
+        }
         long start = GC.GetAllocatedBytesForCurrentThread();
         for (int i = 0; i < 256; i++)
         {

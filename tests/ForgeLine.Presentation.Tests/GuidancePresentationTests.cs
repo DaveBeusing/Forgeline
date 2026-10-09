@@ -103,8 +103,12 @@ public sealed class GuidancePresentationTests
         var context = new RecordingContext();
         var camera = new RtsCamera();
         var controller = new EarlyGameGuidanceController();
-        for (int i = 0; i < 128; i++) renderer.Render(context, camera, snapshot, default,
-            RtsInformationLayerView.Empty, CombatGroupOverviewView.Empty, 96, preAlphaUx: ux);
+        for (int i = 0; i < 128; i++)
+        {
+            ux = ux with { Guidance = controller.Update(snapshot, true) };
+            renderer.Render(context, camera, snapshot, default,
+                RtsInformationLayerView.Empty, CombatGroupOverviewView.Empty, 96, preAlphaUx: ux);
+        }
         long start = GC.GetAllocatedBytesForCurrentThread();
         for (int i = 0; i < 256; i++)
         {
