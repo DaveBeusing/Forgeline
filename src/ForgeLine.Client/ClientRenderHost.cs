@@ -51,6 +51,8 @@ internal readonly record struct ClientVisualQualificationSnapshot(
 
     public RuntimeMetricsView RuntimeMetrics { get; init; }
 
+    public RuntimeMetricsView? LastMeasuredRunningRates { get; init; }
+
     public bool DebugLayerEnabled { get; init; }
 
     public int PeakLoadedTextureCount { get; init; }
@@ -439,6 +441,7 @@ internal sealed class ClientRenderHost : IDisposable
             var frameTimingTracker =
                 new FrameTimingTracker();
             var runtimeMetricsSampler = new RuntimeMetricsSampler();
+            RuntimeMetricsView? lastMeasuredRunningRates = null;
 
             long previousFrameAt =
                 Stopwatch.GetTimestamp();
@@ -598,6 +601,9 @@ internal sealed class ClientRenderHost : IDisposable
                     graphics.PresentedFrameCount, telemetry.CompletedTicks, snapshot.SessionId,
                     telemetry.SessionId == snapshot.SessionId ? telemetry.State : RuntimeSimulationState.Unavailable,
                     current.MetricsActive);
+                if (runtimeMetrics.SimulationState == RuntimeSimulationState.Running &&
+                    runtimeMetrics.FramesPerSecond.HasValue && runtimeMetrics.TicksPerSecond.HasValue)
+                    lastMeasuredRunningRates = runtimeMetrics;
 
                 ulong presentedBefore = !_startupPresented ? graphics.PresentedFrameCount : 0;
                 graphics.RenderFrame(
@@ -702,7 +708,7 @@ internal sealed class ClientRenderHost : IDisposable
                     snapshot.VfxMetrics,
                     renderWorld.InstanceCount,
                     _sceneLighting, gameplayHudRenderer.State, gameplayHudRenderer.LastRenderedVertexCount,
-                    runtimeMetrics);
+                    runtimeMetrics, lastMeasuredRunningRates);
 
                 if (StopwatchElapsed(
                         nextDiagnosticAt,
@@ -815,7 +821,8 @@ internal sealed class ClientRenderHost : IDisposable
         in SceneLightingSettings lighting,
         GameplayHudState hudState,
         int hudVertexCount,
-        in RuntimeMetricsView runtimeMetrics)
+        in RuntimeMetricsView runtimeMetrics,
+        RuntimeMetricsView? lastMeasuredRunningRates)
     {
         var snapshot =
             new ClientVisualQualificationSnapshot(
@@ -858,6 +865,7 @@ internal sealed class ClientRenderHost : IDisposable
                 GameplayHudState = hudState,
                 GameplayHudVertexCount = hudVertexCount,
                 RuntimeMetrics = runtimeMetrics,
+                LastMeasuredRunningRates = lastMeasuredRunningRates,
                 GpuTimingAvailable =
                     graphics.GpuTimingAvailable,
                 DebugLayerEnabled =
