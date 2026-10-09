@@ -47,7 +47,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
             context.Width / 1920f,
             context.Height / 1080f);
         float scale = Math.Min(
-            viewportScale * userScale,
+            viewportScale * (view.Kind == FrontendSurfaceKind.Controls ? Math.Min(userScale, 1f) : userScale),
             2.0f);
         float offsetX =
             MathF.Max(

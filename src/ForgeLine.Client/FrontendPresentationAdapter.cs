@@ -266,6 +266,9 @@ internal static class FrontendPresentationAdapter
                     "DEVELOPER METRICS",
                     "SHIFT+F1 TOGGLE PERFORMANCE METRICS"),
                 new FrontendDetailLineView(
+                    "OBJECTIVE",
+                    "DESTROY THE ENEMY COMMAND CORE"),
+                new FrontendDetailLineView(
                     "F10 / F11 / F12",
                     "STRATEGIC OVERLAY  MINIMAP  HELP  ESC/SPACE PAUSE")
             ],

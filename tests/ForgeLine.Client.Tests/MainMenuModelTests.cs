@@ -61,7 +61,7 @@ public sealed class MainMenuModelTests
             "CONTROLS",
             view.Title);
         Assert.Equal(
-            9,
+            10,
             view.DetailLines.Count);
         Assert.Contains(
             "W/A/S/D",

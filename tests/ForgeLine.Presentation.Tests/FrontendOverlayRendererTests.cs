@@ -22,18 +22,18 @@ public sealed class FrontendOverlayRendererTests : IDisposable
     {
         using var renderer = new FrontendOverlayRenderer(_graphics);
         var context = new FakeGraphicsCommandContext { Width = width, Height = height };
-        var lines = Enumerable.Range(0, 9).Select(_ => new FrontendDetailLineView("CAMERA", new string('A', 100))).ToArray();
+        var lines = Enumerable.Range(0, 10).Select(_ => new FrontendDetailLineView("CAMERA", new string('A', 100))).ToArray();
         var view = FrontendSurfaceView.Detail("CONTROLS", lines, "F1 / F12 / ESC CLOSE")
             with { Kind = FrontendSurfaceKind.Controls };
-        renderer.Render(context, view);
+        renderer.Render(context, view, userScale: 2f);
         int withFooter = renderer.LastRenderedVertexCount;
         var buffer = _graphics.LastBuffer;
         Assert.InRange(withFooter, 16385, 131071);
         Assert.InRange(buffer!.MaximumAbsoluteX, 0, 1.001f);
-        renderer.Render(context, view with { Footer = "" });
+        renderer.Render(context, view with { Footer = "" }, userScale: 2f);
         Assert.True(renderer.LastRenderedVertexCount < withFooter);
         Assert.Same(buffer, _graphics.LastBuffer);
-        renderer.Render(context, view);
+        renderer.Render(context, view, userScale: 2f);
         Assert.Equal(withFooter, renderer.LastRenderedVertexCount);
     }
 

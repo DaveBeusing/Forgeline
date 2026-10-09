@@ -584,7 +584,7 @@ internal sealed class ClientApplication
                 !window.ClientSize.IsEmpty)
             {
                 FrontendLayout helpLayout = FrontendDesign.ResolveLayout(
-                    window.ClientSize.Width, window.ClientSize.Height, _settings.UiScale);
+                    window.ClientSize.Width, window.ClientSize.Height, Math.Min(_settings.UiScale, 1f));
                 if (FrontendHitTesting.SecondaryAction(inputState.PointerPosition.X, inputState.PointerPosition.Y, helpLayout) ||
                     FrontendHitTesting.Footer(inputState.PointerPosition.X, inputState.PointerPosition.Y, helpLayout))
                 {
@@ -700,7 +700,7 @@ internal sealed class ClientApplication
                     FrontendDesign.ResolveLayout(
                         window.ClientSize.Width,
                         window.ClientSize.Height,
-                        _settings.UiScale);
+                        pauseControlsVisible ? Math.Min(_settings.UiScale, 1f) : _settings.UiScale);
                 bool pointerDown =
                     inputState.IsMouseButtonDown(
                         PlatformMouseButton.Left);
@@ -983,7 +983,7 @@ internal sealed class ClientApplication
                             FrontendDesign.ResolveLayout(
                                 window.ClientSize.Width,
                                 window.ClientSize.Height,
-                                _settings.UiScale);
+                                Math.Min(_settings.UiScale, 1f));
                         bool secondaryHovered =
                             inputState.HasPointerPosition &&
                             FrontendHitTesting.SecondaryAction(
@@ -2884,7 +2884,7 @@ internal sealed class ClientApplication
                 FrontendDesign.ResolveLayout(
                     window.ClientSize.Width,
                     window.ClientSize.Height,
-                    _settings.UiScale);
+                    shell.Screen == GameFrontendScreen.Controls ? Math.Min(_settings.UiScale, 1f) : _settings.UiScale);
 
             if (shell.Screen == GameFrontendScreen.MainMenu)
             {
