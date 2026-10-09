@@ -374,7 +374,7 @@ See [Spatial Index and World Queries](SpatialIndexAndWorldQueries.md) for query 
 
 ## Presentation Diagnostics
 
-The Windows client development overlay can be toggled with F1. World debug visualization can be toggled with F2. The presentation path, metric semantics, extraction ownership, and render baselines are documented in [Presentation Extraction and Debugging](PresentationExtractionAndDebugging.md).
+The Windows client development overlay can be toggled with Shift + F1. World debug visualization can be toggled with F2. The presentation path, metric semantics, extraction ownership, and render baselines are documented in [Presentation Extraction and Debugging](PresentationExtractionAndDebugging.md).
 
 ## Navigation Diagnostics
 

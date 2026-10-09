@@ -9,6 +9,16 @@ namespace ForgeLine.Client.Tests;
 public sealed class MainMenuModelTests
 {
     [Fact]
+    public void ControlsReflectCustomCameraKeysAndDisabledEdgeScroll()
+    {
+        var bindings = new RtsCameraBindings { PanLeft = ForgeLine.Platform.PlatformKey.H };
+        var view = FrontendPresentationAdapter.Controls(bindings, edgeScrollEnabled: false);
+        Assert.Equal(FrontendSurfaceKind.Controls, view.Kind);
+        Assert.Contains("W/H/S/D", view.DetailLines[0].Value);
+        Assert.Contains("EDGE PAN DISABLED", view.DetailLines[1].Value);
+    }
+
+    [Fact]
     public void MenuPublishesForgelineIdentityAndExpectedActions()
     {
         var menu = new MainMenuModel(hasValidContinueTarget: true);

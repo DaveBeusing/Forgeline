@@ -3180,7 +3180,8 @@ internal sealed class ClientApplication
                     loadGame,
                     settings,
                     settingsInteraction,
-                    _settings.CameraBindings);
+                    _settings.CameraBindings,
+                    _settings.EdgeScrollEnabled);
             if (input.HasPointerPosition &&
                 shell.Screen != GameFrontendScreen.MainMenu)
             {
@@ -3248,7 +3249,8 @@ internal sealed class ClientApplication
         LoadGameModel loadGame,
         SettingsModel settings,
         SettingsInteractionModel settingsInteraction,
-        RtsCameraBindings cameraBindings) =>
+        RtsCameraBindings cameraBindings,
+        bool edgeScrollEnabled) =>
         screen switch
         {
             GameFrontendScreen.MainMenu =>
@@ -3266,7 +3268,7 @@ internal sealed class ClientApplication
                     settingsInteraction),
             GameFrontendScreen.Controls =>
                 FrontendPresentationAdapter.Controls(
-                    cameraBindings),
+                    cameraBindings, edgeScrollEnabled: edgeScrollEnabled),
             GameFrontendScreen.Credits =>
                 FrontendPresentationAdapter.Credits(),
             _ =>

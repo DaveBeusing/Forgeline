@@ -173,7 +173,7 @@ The Windows client periodically reports:
 - rejected target count;
 - command execution tick.
 
-F1 continues to toggle the development metrics overlay and now also reports player-overlay lines, developer-debug lines, dropped debug lines, and developer-overlay CPU submission cost.
+Shift + F1 toggles the development metrics overlay and now also reports player-overlay lines, developer-debug lines, dropped debug lines, and developer-overlay CPU submission cost.
 
 ## Validation
 
