@@ -17,6 +17,8 @@ public sealed class RtsSelectionController
     private bool _leftWasDown;
     private bool _rightWasDown;
     private bool _selectionGestureActive;
+    private bool _dragThresholdCrossed;
+    private float _dragThreshold = DragThresholdPixels;
     private Vector2 _selectionStart;
     private Vector2 _selectionCurrent;
     private MovementOrderRequest? _pendingMovementRequest;
@@ -35,14 +37,19 @@ public sealed class RtsSelectionController
 
     public SelectionSet Selection { get; } = new();
 
+    public RtsCommandFeedback CommandFeedback { get; } = new();
+
+    public bool PointerMovementTargetValid { get; private set; }
+
     public EntityId HoveredEntity { get; private set; } = EntityId.Invalid;
+
+    public bool CanSelectHoveredEntity { get; private set; }
 
     public EntityId InspectedEntity { get; private set; } = EntityId.Invalid;
 
     public bool IsDragSelecting =>
         _selectionGestureActive &&
-        Vector2.DistanceSquared(_selectionStart, _selectionCurrent) >=
-        DragThresholdPixels * DragThresholdPixels;
+        _dragThresholdCrossed;
 
     public Vector2 DragStart => _selectionStart;
 
@@ -51,10 +58,13 @@ public sealed class RtsSelectionController
     public void CancelPointerInteraction()
     {
         _selectionGestureActive = false;
+        CommandFeedback.Clear();
+        PointerMovementTargetValid = false;
         _pendingMovementRequest = null;
         _leftWasDown = false;
         _rightWasDown = false;
         HoveredEntity = EntityId.Invalid;
+        CanSelectHoveredEntity = false;
     }
 
     public void Update(
@@ -65,7 +75,8 @@ public sealed class RtsSelectionController
         int viewportWidth,
         int viewportHeight,
         float interpolationAlpha,
-        bool pointerCaptured = false)
+        bool pointerCaptured = false,
+        float pointerScale = 1.0f)
     {
         ArgumentNullException.ThrowIfNull(input);
         ArgumentNullException.ThrowIfNull(camera);
@@ -73,14 +84,17 @@ public sealed class RtsSelectionController
         ArgumentNullException.ThrowIfNull(terrain);
 
         SynchronizeSession(world);
+        CanSelectHoveredEntity = false;
 
         bool leftDown =
             input.IsMouseButtonDown(PlatformMouseButton.Left);
         bool rightDown =
             input.IsMouseButtonDown(PlatformMouseButton.Right);
 
-        if (pointerCaptured)
+        if (pointerCaptured || input.FocusLostThisFrame || viewportWidth <= 0 || viewportHeight <= 0)
         {
+            _pendingMovementRequest = null;
+            PointerMovementTargetValid = false;
             HoveredEntity = EntityId.Invalid;
             _selectionGestureActive = false;
             _leftWasDown = leftDown;
@@ -90,6 +104,8 @@ public sealed class RtsSelectionController
 
         if (!input.HasPointerPosition)
         {
+            _pendingMovementRequest = null;
+            PointerMovementTargetValid = false;
             HoveredEntity = EntityId.Invalid;
             _selectionGestureActive = false;
             _leftWasDown = leftDown;
@@ -98,6 +114,14 @@ public sealed class RtsSelectionController
         }
 
         Vector2 pointer = input.PointerPosition;
+        if (!float.IsFinite(pointer.X) || !float.IsFinite(pointer.Y) ||
+            pointer.X < 0 || pointer.Y < 0 || pointer.X > viewportWidth || pointer.Y > viewportHeight)
+        {
+            CancelPointerInteraction();
+            _leftWasDown = leftDown;
+            _rightWasDown = rightDown;
+            return;
+        }
 
         if (SelectionPicking.TryPick(
                 camera,
@@ -107,9 +131,12 @@ public sealed class RtsSelectionController
                 viewportWidth,
                 viewportHeight,
                 interpolationAlpha,
-                out EntityId hovered))
+                out EntityId hovered,
+                requireOwnership: false))
         {
             HoveredEntity = hovered;
+            CanSelectHoveredEntity = world.TryGetInterpolatedInstance(hovered, interpolationAlpha, out RenderInstance hoveredInstance) &&
+                _filter.Allows(hoveredInstance.Selectable);
         }
         else
         {
@@ -126,22 +153,29 @@ public sealed class RtsSelectionController
                     : EntityId.Invalid;
         }
 
-        if (leftDown && !_leftWasDown)
+        bool leftPressed = input.TryGetMousePressPosition(PlatformMouseButton.Left, out Vector2 pressPosition);
+        if ((leftPressed || leftDown) && !_leftWasDown)
         {
             _selectionGestureActive = true;
-            _selectionStart = pointer;
+            _dragThresholdCrossed = false;
+            _dragThreshold = DragThresholdPixels *
+                (float.IsFinite(pointerScale) ? Math.Clamp(pointerScale, 0.5f, 4.0f) : 1.0f);
+            _selectionStart = leftPressed ? pressPosition : pointer;
             _selectionCurrent = pointer;
+            UpdateDragThreshold();
         }
         else if (leftDown && _selectionGestureActive)
         {
             _selectionCurrent = pointer;
+            UpdateDragThreshold();
         }
 
         if (!leftDown &&
-            _leftWasDown &&
+            (_leftWasDown || input.WasMouseButtonReleased(PlatformMouseButton.Left)) &&
             _selectionGestureActive)
         {
             _selectionCurrent = pointer;
+            UpdateDragThreshold();
             CompleteSelection(
                 input,
                 camera,
@@ -152,20 +186,25 @@ public sealed class RtsSelectionController
             _selectionGestureActive = false;
         }
 
-        if (rightDown &&
-            !_rightWasDown &&
-            Selection.Count > 0 &&
-            TryResolveMovementTarget(
+        PointerMovementTargetValid = TryResolveMovementTarget(
                 camera,
                 terrain,
                 pointer,
                 viewportWidth,
                 viewportHeight,
-                out Vector3 worldTarget))
+                out Vector3 worldTarget);
+        if ((input.TryGetMousePressPosition(PlatformMouseButton.Right, out _) || rightDown) && !_rightWasDown &&
+            Selection.Count > 0)
         {
-            _pendingMovementRequest = new MovementOrderRequest(
-                Selection.ToArray(),
-                worldTarget);
+            if (camera.TryScreenPointToWorldOnHorizontalPlane(pointer, camera.Target.Y,
+                    viewportWidth, viewportHeight, out Vector3 fallbackTarget))
+            {
+                CommandFeedback.Show(PointerMovementTargetValid ? worldTarget : fallbackTarget, PointerMovementTargetValid);
+            }
+            if (PointerMovementTargetValid)
+            {
+                _pendingMovementRequest = new MovementOrderRequest(Selection.ToArray(), worldTarget);
+            }
         }
 
         _leftWasDown = leftDown;
@@ -186,6 +225,12 @@ public sealed class RtsSelectionController
         return true;
     }
 
+    private void UpdateDragThreshold()
+    {
+        _dragThresholdCrossed |= Vector2.DistanceSquared(_selectionStart, _selectionCurrent) >=
+            _dragThreshold * _dragThreshold;
+    }
+
     private void SynchronizeSession(
         RenderWorld world)
     {
@@ -200,6 +245,7 @@ public sealed class RtsSelectionController
         }
 
         _sessionId = sessionId;
+        CommandFeedback.Clear();
         Selection.Clear();
         HoveredEntity = EntityId.Invalid;
         InspectedEntity = EntityId.Invalid;
@@ -248,9 +294,12 @@ public sealed class RtsSelectionController
             return;
         }
 
-        if (HoveredEntity.IsValid &&
+        EntityId clickedEntity = SelectionPicking.TryPick(camera, world, _filter, _selectionCurrent,
+            viewportWidth, viewportHeight, interpolationAlpha, out EntityId selectable)
+            ? selectable : HoveredEntity;
+        if (clickedEntity.IsValid &&
             world.TryGetInterpolatedInstance(
-                HoveredEntity,
+                clickedEntity,
                 interpolationAlpha,
                 out RenderInstance hoveredInstance))
         {
@@ -259,11 +308,11 @@ public sealed class RtsSelectionController
             {
                 if (toggle)
                 {
-                    Selection.Toggle(HoveredEntity);
+                    Selection.Toggle(clickedEntity);
                 }
                 else
                 {
-                    Selection.SetSingle(HoveredEntity);
+                    Selection.SetSingle(clickedEntity);
                 }
 
                 InspectedEntity = EntityId.Invalid;
@@ -272,7 +321,7 @@ public sealed class RtsSelectionController
 
             if (hoveredInstance.WorldFeature.IsInspectable)
             {
-                InspectedEntity = HoveredEntity;
+                InspectedEntity = clickedEntity;
                 if (!toggle)
                 {
                     Selection.Clear();

@@ -52,6 +52,8 @@ public sealed class RtsTacticalTargetingController
 
     public TacticalTargetingMode Mode { get; private set; }
 
+    public RtsCommandFeedback CommandFeedback { get; } = new();
+
     public bool IsActive =>
         Mode != TacticalTargetingMode.None;
 
@@ -165,6 +167,11 @@ public sealed class RtsTacticalTargetingController
             leftDown &&
             !_leftWasDown)
         {
+            if (_hasPointerTarget)
+            {
+                CommandFeedback.Show(_pointerWorldTarget, _pointerTargetValid,
+                    Mode is TacticalTargetingMode.Attack or TacticalTargetingMode.AttackMove or TacticalTargetingMode.FireMission);
+            }
             TryResolveTarget(
                 camera,
                 terrain,
@@ -215,6 +222,7 @@ public sealed class RtsTacticalTargetingController
 
     public void Cancel()
     {
+        CommandFeedback.Clear();
         Mode =
             TacticalTargetingMode.None;
         _entities = [];

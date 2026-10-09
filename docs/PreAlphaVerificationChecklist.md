@@ -134,3 +134,13 @@ The packaged build is the qualification target. Do not substitute a repository-l
 - [ ] Confirm that the terminal result is clear.
 - [ ] Restart once and verify that no prior session state survives.
 - [ ] Exit cleanly.
+
+## Selection and order feedback qualification
+
+- [ ] Select one vehicle and a large building: circular rings enclose each visual footprint and remain ground-aligned across slopes, camera yaw/pitch and near/far zoom. Construction/collision footprints retain their shapes.
+- [ ] Compare solid selected rings with broken hover rings. Visible foreign ownership has radial ticks and a distinct color; hidden objects cannot be hovered or marked.
+- [ ] Drag in all four directions at 60/144 Hz, resize, and repeat at 100/150/200% DPI with raised UI scale. A faint fill and contrasting outline follow the pointer every rendered frame and match projected-center selection.
+- [ ] Test short clicks, threshold jitter, returning to the press point after crossing the threshold, and Shift click/box toggling.
+- [ ] Start/release over the HUD, enter placement or help during a drag, leave the viewport and alt-tab. No ghost marquee, selection change, duplicate placement click or world order follows cancellation.
+- [ ] Right-click a valid movement destination and an invalid terrain location. Use existing Attack, AttackMove, Retreat and FireMission targeting. Circle/cross, attack inner circle and invalid X/cursor agree with the mode and expire after 0.8 seconds; authoritative HUD results remain separate.
+- [ ] Select 1,000 entities where practical and inspect player overlay CPU time, one draw batch and dropped-line counters. The automated structural budget covers 24,000 ring segments; interactive timing remains hardware-specific.

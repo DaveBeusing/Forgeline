@@ -13,19 +13,31 @@ public sealed class DebugDrawRenderer : IDisposable
     private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers = new(4);
-    private readonly DebugVertex[] _vertices =
-        new DebugVertex[MaxLines * 2];
+    private readonly DebugVertex[] _vertices;
     private bool _disposed;
+    private readonly ScreenLineVertex[]? _screenVertices;
+    private readonly float _lineWidthPixels;
 
     public DebugDrawRenderer(
         IGraphicsDevice graphics,
-        bool depthEnabled = true)
+        bool depthEnabled = true,
+        float lineWidthPixels = 0.0f)
     {
         ArgumentNullException.ThrowIfNull(graphics);
 
         _graphics = graphics;
+        if (!float.IsFinite(lineWidthPixels) || lineWidthPixels < 0.0f || lineWidthPixels > 8.0f)
+        {
+            throw new ArgumentOutOfRangeException(nameof(lineWidthPixels));
+        }
+        _lineWidthPixels = lineWidthPixels;
+        _vertices = lineWidthPixels > 0.0f ? [] : new DebugVertex[MaxLines * 2];
+        if (lineWidthPixels > 0.0f)
+        {
+            _screenVertices = new ScreenLineVertex[MaxLines * 6];
+        }
         _pipeline =
-            CreatePipeline(
+            _screenVertices is not null ? CreateScreenLinePipeline(graphics, depthEnabled) : CreatePipeline(
                 graphics,
                 depthEnabled);
     }
@@ -35,7 +47,8 @@ public sealed class DebugDrawRenderer : IDisposable
     public void Render(
         IGraphicsCommandContext context,
         RtsCamera camera,
-        DebugDraw debugDraw)
+        DebugDraw debugDraw,
+        float uiScale = 1.0f)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(context);
@@ -50,6 +63,11 @@ public sealed class DebugDrawRenderer : IDisposable
         }
 
         int renderedLines = Math.Min(lines.Length, MaxLines);
+        if (_screenVertices is not null)
+        {
+            RenderScreenLines(context, camera, lines, renderedLines, uiScale);
+            return;
+        }
         int vertexCount = renderedLines * 2;
 
         for (int index = 0; index < renderedLines; index++)
@@ -111,10 +129,92 @@ public sealed class DebugDrawRenderer : IDisposable
 
         buffer = _graphics.CreateBuffer(
             new GraphicsBufferDescription(
-                checked((ulong)_vertices.Length * VertexStride),
+                _screenVertices is null
+                    ? checked((ulong)_vertices.Length * VertexStride)
+                    : checked((ulong)_screenVertices.Length * 40),
                 GraphicsBufferMemory.Upload));
         _vertexBuffers.Add(frameIndex, buffer);
         return buffer;
+    }
+
+    private void RenderScreenLines(
+        IGraphicsCommandContext context, RtsCamera camera, ReadOnlySpan<DebugLine> lines, int count, float uiScale)
+    {
+        if (context.Width <= 0 || context.Height <= 0)
+        {
+            LastDiagnostics = default;
+            return;
+        }
+        Matrix4x4 viewProjection = camera.GetMatrices(context.Width, context.Height).ViewProjection;
+        float halfWidth = _lineWidthPixels * (float.IsFinite(uiScale) ? Math.Clamp(uiScale, 0.5f, 4.0f) : 1.0f) * 0.5f;
+        int vertexCount = 0;
+        for (int index = 0; index < count; index++)
+        {
+            DebugLine line = lines[index];
+            Vector4 first = Vector4.Transform(new Vector4(line.Start, 1.0f), viewProjection);
+            Vector4 second = Vector4.Transform(new Vector4(line.End, 1.0f), viewProjection);
+            if (first.W <= 1e-5f || second.W <= 1e-5f || first.Z < 0.0f || second.Z < 0.0f)
+            {
+                continue;
+            }
+            Vector2 delta = new((second.X / second.W - first.X / first.W) * context.Width,
+                (second.Y / second.W - first.Y / first.W) * context.Height);
+            if (!float.IsFinite(delta.LengthSquared()) || delta.LengthSquared() <= 1e-8f)
+            {
+                continue;
+            }
+            Vector2 perpendicular = Vector2.Normalize(new Vector2(-delta.Y, delta.X));
+            Vector4 offset = new(perpendicular.X * halfWidth * 2.0f / context.Width,
+                perpendicular.Y * halfWidth * 2.0f / context.Height, 0.0f, 0.0f);
+            Vector4 firstOffset = offset * first.W;
+            Vector4 secondOffset = offset * second.W;
+            _screenVertices![vertexCount++] = new(first - firstOffset, line.Color, new Vector2(-1.0f, 0.0f));
+            _screenVertices[vertexCount++] = new(first + firstOffset, line.Color, new Vector2(1.0f, 0.0f));
+            _screenVertices[vertexCount++] = new(second + secondOffset, line.Color, new Vector2(1.0f, 0.0f));
+            _screenVertices[vertexCount++] = new(first - firstOffset, line.Color, new Vector2(-1.0f, 0.0f));
+            _screenVertices[vertexCount++] = new(second + secondOffset, line.Color, new Vector2(1.0f, 0.0f));
+            _screenVertices[vertexCount++] = new(second - secondOffset, line.Color, new Vector2(-1.0f, 0.0f));
+        }
+        if (vertexCount > 0)
+        {
+            IGraphicsBuffer buffer = GetFrameVertexBuffer(context.FrameIndex);
+            buffer.SetData<ScreenLineVertex>(_screenVertices.AsSpan(0, vertexCount));
+            context.SetPipeline(_pipeline);
+            context.SetVertexBuffer(buffer, 40);
+            context.Draw(vertexCount);
+        }
+        LastDiagnostics = new(lines.Length, vertexCount / 6, lines.Length - vertexCount / 6, vertexCount > 0 ? 1 : 0);
+    }
+
+    private static IGraphicsPipeline CreateScreenLinePipeline(IGraphicsDevice graphics, bool depthEnabled)
+    {
+        const string source = """
+            struct VertexInput { float4 Position : POSITION; float4 Color : COLOR0; float2 Edge : TEXCOORD0; };
+            struct VertexOutput { float4 Position : SV_Position; float4 Color : COLOR0; noperspective float Edge : TEXCOORD0; };
+            VertexOutput VSMain(VertexInput input) {
+                VertexOutput output;
+                output.Position = input.Position; output.Color = input.Color; output.Edge = input.Edge.x;
+                return output;
+            }
+            float4 PSMain(VertexOutput input) : SV_Target0 {
+                return float4(input.Color.rgb, input.Color.a * (1.0f - smoothstep(0.45f, 1.0f, abs(input.Edge))));
+            }
+            """;
+        var compiler = new DxcShaderCompiler();
+        return graphics.CreateGraphicsPipeline(new GraphicsPipelineDescription(
+            compiler.Compile(source, GraphicsShaderStage.Vertex, "VSMain", "PlayerWorldLineVertex.hlsl"),
+            compiler.Compile(source, GraphicsShaderStage.Pixel, "PSMain", "PlayerWorldLinePixel.hlsl"))
+        {
+            VertexElements =
+            [
+                new("POSITION", 0, GraphicsVertexElementFormat.Float4, 0),
+                new("COLOR", 0, GraphicsVertexElementFormat.Float4, 16),
+                new("TEXCOORD", 0, GraphicsVertexElementFormat.Float2, 32)
+            ],
+            CullMode = GraphicsCullMode.None,
+            AlphaBlendEnabled = true,
+            DepthEnabled = depthEnabled
+        });
     }
 
     private static IGraphicsPipeline CreatePipeline(
@@ -227,4 +327,7 @@ public sealed class DebugDrawRenderer : IDisposable
     private readonly record struct DebugVertex(
         Vector3 Position,
         Vector4 Color);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private readonly record struct ScreenLineVertex(Vector4 Position, Vector4 Color, Vector2 Edge);
 }

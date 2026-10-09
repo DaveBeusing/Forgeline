@@ -36,7 +36,7 @@ GroundMovementSystem
 authoritative WorldTransform
 ```
 
-Strategic hierarchical navigation and shared-route formation movement are implemented. Role-aware combat formations, attack orders, permanent control groups, minimap commands, and final interaction styling remain deferred.
+Strategic navigation, shared-route formation movement, tactical targeting, combat groups and minimap commands use their existing command boundaries. Interaction feedback remains presentation-owned.
 
 ## Ownership Boundaries
 
@@ -85,7 +85,7 @@ Picking requires all of the following:
 - ownership matches the local selection filter;
 - category intersects the allowed category filter.
 
-The development client currently allows local `Unit` and `Logistics` categories. Local `Building` placeholders and opposing-player entities remain visible but cannot be selected by that player filter.
+The client allows local `Unit`, `Building` and `Logistics` categories. Visible foreign-owned objects can be hovered but cannot enter the local selection. Hidden/non-world instances produce neither hover nor selection markers.
 
 Presentation-only picking therefore cannot select hidden/non-world instances.
 
@@ -103,9 +103,9 @@ Initial interaction conventions are:
 | Movement order | Right click with a non-empty selection |
 | Cycle development formation | F3 (Compact → Line → Column → Wedge) |
 
-A drag becomes box selection after a small screen-space threshold so normal clicks are not interpreted as accidental boxes.
+A drag becomes box selection after six logical pixels, scaled by the active DPI/UI layout at press time. Crossing the threshold latches box mode until release, even if the pointer returns near its starting point. Mouse press/release edges retain clicks completed between frame updates.
 
-Focus loss clears raw input state. An interrupted selection gesture is cancelled when pointer validity is lost.
+Focus loss, pointer leave, HUD capture, help/pause and placement capture cancel the selection gesture without changing the selected set. Presses beginning on captured HUD geometry and releases over HUD cannot become world selection or orders. The placement-confirmation frame remains captured.
 
 ## Screen and Box Picking
 
@@ -150,7 +150,7 @@ The command exposes accepted/rejected target counts and execution tick for devel
 
 ## Production selection inspector
 
-World-space selection rings, building footprints, hover markers, and tactical target markers remain separate from screen-space inspection. The selected set continues to be presentation-owned interaction state, while `PlayerExperienceSnapshotFactory` copies only authorized owned selection facts at the completed-tick boundary.
+World-space selection rings, hover markers, placement footprints and tactical target markers remain separate from screen-space inspection. The selected set continues to be presentation-owned interaction state, while `PlayerExperienceSnapshotFactory` copies only authorized owned selection facts at the completed-tick boundary.
 
 `PlayerSelectionSummary` now distinguishes safe common identity from single-entity detail. A single authorized entity may publish its concrete unit/building identity and operational values. A multi-selection publishes an exact common UnitId or BuildingId only when all authorized members share it; heterogeneous same-kind selections use a generic kind summary and mixed categories use `Mixed Selection`.
 
@@ -160,7 +160,7 @@ Per-entity Health, supply, Fuel, Ammunition, readiness, power, inventory, and wo
 
 ## Feedback and Diagnostics
 
-Hover, selection, placement-preview, tactical-target, and strategic-overlay feedback use a dedicated player-facing world-overlay path around immutable presentation data. They no longer share the engineering debug buffer. Player-facing line markers render after depth-tested developer diagnostics and without depth testing so selection and command feedback remain readable over terrain and world geometry. None of these visuals mutates simulation state.
+Hover, selection, placement-preview, tactical-target, and strategic-overlay feedback use a dedicated player-facing world-overlay path around immutable presentation data. They no longer share the engineering debug buffer. Player-facing line markers render after depth-tested developer diagnostics and without depth testing so selection and command feedback remain readable over terrain and world geometry. None of these visuals mutates simulation state. Normal units and buildings use 24-segment circular rings sized to enclose presentation footprint bounds with padding, with a zoom/DPI minimum radius. Every vertex samples terrain height with the visual ground plane as fallback. Hover uses a broken ring; foreign ownership adds four radial ticks as well as a distinct color. Construction/collision footprints retain their existing shapes.
 
 Engineering diagnostics use an independent category model. F2 toggles the developer master switch; Shift+F2 toggles Rendering, while Shift+F4 through Shift+F9 toggle Navigation, World, Logistics, Sensors, Combat, and Entities. Unshifted F4–F8 building shortcuts and F9 placement rotation remain unchanged. Disabled developer categories do not request their associated simulation debug-capture paths.
 
@@ -219,3 +219,13 @@ Attack picking never scans foreign render instances or live ECS transforms. Pres
 Fire Mission targeting is intentionally broader than direct Attack. Detected or identified contacts are selected by opaque `IntelligenceContactKey` and retain their stored last-known coordinates. A click that does not select a contact becomes a coordinate request; the simulation accepts that coordinate only when its intelligence cell is currently visible.
 
 While a tactical targeting mode is active, its left click is captured through the end of the frame so it cannot also change owned selection or create a movement request. Normal right-click movement and normal owned selection semantics remain unchanged outside targeting mode.
+
+## Selection and command feedback rendering
+
+The normalized drag marquee follows current pointer state in each published presentation frame, independently of simulation ticks. It is clipped to the client gameplay viewport, drawn with a faint 10% alpha fill, a dark contrast border and a DPI-scaled colored outline. The information renderer reserves geometry capacity for the marquee/cursor after other overlays. Box picking still uses visible eligible projected entity centers; Shift retains the existing toggle semantics.
+
+Player world lines use the existing bounded overlay renderer with reusable screen-expanded triangles, a three-pixel reference width scaled by DPI/UI settings and soft alpha edges. They retain the established depth-disabled player feedback policy and one draw batch. Developer lines retain their depth policy and original line path. A thousand selected objects require 24,000 lines, below the 32,768-line cap; the expanded buffer is bounded at 7.5 MiB per frame slot.
+
+Movement clicks and existing tactical targeting clicks display presentation-only feedback for 0.8 seconds. Movement uses a circle/cross, attack-family requests add an inner circle, and invalid spatial targets use an X plus the existing invalid cursor. These indicate local targeting/submission intent, not authoritative acceptance or persistent simulation orders. Existing command-result HUD messages remain authoritative. Frame time expires the markers; focus/modal/session transitions clear them.
+
+Automated coverage includes four drag directions, quick clicks, DPI threshold latching, cancellation, ownership/hidden-object filtering, footprint/terrain geometry, zoom minimum radius, marquee clipping/blending/cancellation, feedback expiry and a thousand-ring single-batch budget. Manual zoom/terrain/camera-angle, 60/144 Hz, high-DPI and HUD-overlap verification remains part of the pre-alpha checklist.

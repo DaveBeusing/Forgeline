@@ -133,7 +133,7 @@ The minimap receives only the active group's already-authorized member IDs and r
 World-space information markers supplement the existing selection/input model:
 
 - unit selection rings;
-- building footprint/selection outlines;
+- circular building selection rings; placement footprints retain their construction shape;
 - hover highlights;
 - tactical target markers;
 - invalid-order markers.
@@ -144,7 +144,7 @@ World markers are presentation geometry only and do not alter collision, navigat
 
 Player-facing world markers use a dedicated gameplay-overlay path rather than the engineering debug buffer. Selection, hover, placement preview, tactical target feedback, and player strategic overlays therefore remain visible when developer diagnostics are disabled. The gameplay world-overlay renderer does not depth-test its line geometry so critical command feedback remains readable over terrain and unit geometry; engineering debug lines keep depth testing enabled.
 
-Picking, hover, selection markers, and renderer culling share the same presentation-bounds calculation. Unit bounds include conservative role-specific expansion for silhouette features such as weapons and sensors, and rotated transforms are converted to world-space axis-aligned bounds consistently. Unit rings and building footprint outlines are anchored just above the visual ground plane; building outlines also preserve authored orientation. This keeps interaction geometry aligned with visible objects without changing gameplay authority.
+Picking, hover, selection markers, and renderer culling share the same presentation-bounds calculation. Unit bounds include conservative role-specific expansion for silhouette features such as weapons and sensors, and rotated transforms are converted to world-space axis-aligned bounds consistently. Unit and building selection rings enclose horizontal bounds with padding and sample terrain per vertex, with the visual ground plane as fallback. Their minimum radius follows zoom and DPI. Hover uses broken rings, with additional radial ticks for visible foreign ownership. This keeps interaction geometry aligned with visible objects without changing gameplay authority.
 
 ## Selection inspector
 
@@ -339,4 +339,8 @@ The technology view is presentation-only. Start and cancel interactions are tran
 Blocked causes are carried semantically rather than inferred from color. Current causes include unmet prerequisite, missing facility, missing inventory, missing materials, insufficient power, already completed, invalid technology, and another active research request. The HUD prints concise text labels for those causes alongside domain/phase, facility, power, costs, prerequisite completion, and progress.
 
 The initial capability hook is exercised by Combat Engineer production, which requires the Field Engineering capability unlocked by Industrial Standardization. Unit-production validation checks the authoritative capability state independently of the HUD.
+
+
+
+Selection marquee and short-lived order markers follow the frame-owned interaction contract in [Selection and Command Interaction](SelectionAndCommandInteraction.md). Player world lines use bounded reusable screen-expanded geometry with soft alpha edges; the marquee uses clipped fill plus contrast outlines. These visuals do not certify authoritative command acceptance.
 

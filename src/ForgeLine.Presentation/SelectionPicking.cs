@@ -15,7 +15,8 @@ public static class SelectionPicking
         int viewportWidth,
         int viewportHeight,
         float interpolationAlpha,
-        out EntityId entity)
+        out EntityId entity,
+        bool requireOwnership = true)
     {
         ArgumentNullException.ThrowIfNull(camera);
         ArgumentNullException.ThrowIfNull(world);
@@ -38,7 +39,8 @@ public static class SelectionPicking
                     camera,
                     filter,
                     viewportWidth,
-                    viewportHeight))
+                    viewportHeight,
+                    requireOwnership))
             {
                 continue;
             }
@@ -190,12 +192,15 @@ public static class SelectionPicking
         RtsCamera camera,
         in SelectionFilter filter,
         int viewportWidth,
-        int viewportHeight)
+        int viewportHeight,
+        bool requireOwnership = true)
     {
         if ((instance.Visibility & RenderVisibilityMask.World) == 0 ||
             !instance.Mesh.IsValid ||
             !instance.Material.IsValid ||
-            !filter.Allows(instance.Selectable))
+            !(requireOwnership
+                ? filter.Allows(instance.Selectable)
+                : instance.Selectable.IsSelectable && (instance.Selectable.Category & filter.Categories) != 0))
         {
             return false;
         }

@@ -21,6 +21,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     private readonly RuntimeUiIconPalette? _runtimePalette;
 
     private int _vertexCount;
+    private int _vertexLimit = MaxVertices;
     private bool _disposed;
 
     public RtsInformationOverlayRenderer(
@@ -67,6 +68,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         }
 
         _vertexCount = 0;
+        _vertexLimit = MaxVertices - 2048;
         GameplayHudLayout layout =
             GameplayHudLayout.Create(
                 context.Width,
@@ -110,6 +112,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             context.Width,
             context.Height);
 
+        _vertexLimit = MaxVertices;
         if (view.IsDragSelecting)
         {
             EmitSelectionRectangle(
@@ -1563,15 +1566,26 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 1.0f,
                 2.0f * scale);
 
-        EmitQuad(
-            minimum.X,
-            minimum.Y,
-            maximum.X -
-                minimum.X,
-            thickness,
-            color,
-            width,
-            height);
+        minimum = Vector2.Clamp(minimum, Vector2.Zero, new Vector2(width, height));
+        maximum = Vector2.Clamp(maximum, Vector2.Zero, new Vector2(width, height));
+        thickness = MathF.Min(thickness, MathF.Min(maximum.X - minimum.X, maximum.Y - minimum.Y));
+        if (thickness <= 0.0f)
+        {
+            return;
+        }
+
+        EmitQuad(minimum.X, minimum.Y, maximum.X - minimum.X, maximum.Y - minimum.Y,
+            new Vector4(color.X, color.Y, color.Z, 0.10f), width, height);
+        EmitRectangleOutline(minimum, maximum, thickness + 2.0f * scale,
+            new Vector4(0.01f, 0.02f, 0.03f, 0.95f), width, height);
+        EmitRectangleOutline(minimum, maximum, thickness, color, width, height);
+    }
+
+    private void EmitRectangleOutline(
+        Vector2 minimum, Vector2 maximum, float thickness, Vector4 color, int width, int height)
+    {
+        thickness = MathF.Min(thickness, MathF.Min(maximum.X - minimum.X, maximum.Y - minimum.Y));
+        EmitQuad(minimum.X, minimum.Y, maximum.X - minimum.X, thickness, color, width, height);
         EmitQuad(
             minimum.X,
             maximum.Y -
@@ -1860,7 +1874,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         int height)
     {
         if (_vertexCount >
-                MaxVertices -
+                _vertexLimit -
                 6 ||
             width <= 0 ||
             height <= 0 ||
@@ -2028,7 +2042,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                         GraphicsVertexElementFormat.Float4,
                         8)
                 ],
-                DepthEnabled = false
+                DepthEnabled = false,
+                AlphaBlendEnabled = true
             });
     }
 

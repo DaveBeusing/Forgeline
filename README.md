@@ -95,6 +95,8 @@ The client opens the Central Divide / Directorate skirmish flow. In a source che
 | Development metrics | Shift + F1 |
 | Restart completed match / end session | R / Escape |
 
+Selected units and buildings use terrain-aligned circular rings. Hover uses a broken ring; foreign ownership adds radial ticks. Left-drag shows a faint filled marquee with a contrasting outline. Brief move/attack/invalid markers acknowledge targeting intent; command results still arrive through the existing HUD.
+
 Additional interaction and diagnostics shortcuts are documented in [Windows Client](docs/WindowsClient.md), [Camera and Input](docs/CameraAndInput.md), and [RTS Information Layer](docs/RTSInformationLayer.md).
 
 ## Development and Validation

@@ -1,3 +1,5 @@
+using System.Numerics;
+using System.Runtime.InteropServices;
 using ForgeLine.Graphics;
 using Xunit;
 
@@ -28,6 +30,44 @@ public sealed class DebugDrawRendererTests : IDisposable
         Assert.Equal(
             depthEnabled,
             _graphics.LastPipelineDescription?.DepthEnabled);
+    }
+
+    [Fact]
+    public void ThousandPlayerRingsUseOneBlendedBatchAndReuseTheirBuffer()
+    {
+        using var renderer = new DebugDrawRenderer(_graphics, depthEnabled: false, lineWidthPixels: 3.0f);
+        var draw = new DebugDraw { Enabled = true };
+        for (int index = 0; index < 1000; index++)
+        {
+            draw.Circle(Vector3.Zero, 4.0f, Vector4.One, 24);
+        }
+        var context = new FakeGraphicsCommandContext();
+        renderer.Render(context, new RtsCamera(), draw);
+        Assert.Equal(1, context.DrawCalls);
+        Assert.Equal(24_000, renderer.LastDiagnostics.RenderedLines);
+        Assert.Equal(0, renderer.LastDiagnostics.DroppedLines);
+        Assert.Equal(GraphicsPrimitiveTopology.TriangleList, _graphics.LastPipelineDescription!.PrimitiveTopology);
+        Assert.True(_graphics.LastPipelineDescription.AlphaBlendEnabled);
+        Assert.False(_graphics.LastPipelineDescription.DepthEnabled);
+        var buffer = _graphics.LastBuffer;
+        Assert.Equal(24_000 * 6 * 40, buffer!.Data.Length);
+        renderer.Render(context, new RtsCamera(), draw, uiScale: 2.0f);
+        Assert.Same(buffer, _graphics.LastBuffer);
+    }
+
+    [Theory]
+    [InlineData(1.0f)]
+    [InlineData(2.0f)]
+    public void PlayerLineWidthIsMeasuredInPixels(float scale)
+    {
+        using var renderer = new DebugDrawRenderer(_graphics, false, 3.0f);
+        var draw = new DebugDraw { Enabled = true };
+        draw.Line(new(-4, 0, 0), new(4, 0, 0), Vector4.One);
+        renderer.Render(new FakeGraphicsCommandContext(), new RtsCamera(), draw, scale);
+        ReadOnlySpan<float> values = MemoryMarshal.Cast<byte, float>(_graphics.LastBuffer!.Data);
+        Vector2 first = new(values[0] / values[3] * 800, values[1] / values[3] * 450);
+        Vector2 second = new(values[10] / values[13] * 800, values[11] / values[13] * 450);
+        Assert.InRange(Vector2.Distance(first, second), 3.0f * scale - 0.01f, 3.0f * scale + 0.01f);
     }
 
     [Fact]
@@ -70,6 +110,8 @@ public sealed class DebugDrawRendererTests : IDisposable
         public GraphicsDiagnostics Diagnostics =>
             throw new NotSupportedException();
 
+        public FakeGraphicsBuffer? LastBuffer { get; private set; }
+
         public IGraphicsPipeline CreateGraphicsPipeline(
             GraphicsPipelineDescription description)
         {
@@ -81,7 +123,7 @@ public sealed class DebugDrawRendererTests : IDisposable
 
         public IGraphicsBuffer CreateBuffer(
             GraphicsBufferDescription description) =>
-            new FakeGraphicsBuffer(
+            LastBuffer = new FakeGraphicsBuffer(
                 description);
 
         public void RenderFrame(
@@ -136,11 +178,14 @@ public sealed class DebugDrawRendererTests : IDisposable
 
         public GraphicsBufferDescription Description { get; }
 
+        public byte[] Data { get; private set; } = [];
+
         public void SetData<T>(
             ReadOnlySpan<T> data,
             int offsetInBytes = 0)
             where T : unmanaged
         {
+            Data = MemoryMarshal.AsBytes(data).ToArray();
         }
 
         public void Dispose()

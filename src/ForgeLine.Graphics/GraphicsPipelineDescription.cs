@@ -32,6 +32,8 @@ public sealed record GraphicsPipelineDescription(
 
     public bool DepthEnabled { get; init; }
 
+    public bool AlphaBlendEnabled { get; init; }
+
     internal void Validate()
     {
         ArgumentNullException.ThrowIfNull(VertexShader);

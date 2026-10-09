@@ -9,6 +9,8 @@ public sealed class InputState
     private readonly HashSet<PlatformMouseButton> _mouseButtonsDown = [];
     private readonly HashSet<PlatformKey> _suppressedKeys = [];
     private readonly HashSet<PlatformMouseButton> _suppressedButtons = [];
+    private readonly Dictionary<PlatformMouseButton, Vector2> _mousePressPositions = [];
+    private readonly HashSet<PlatformMouseButton> _mouseButtonsReleased = [];
 
     private bool _hasPointerPosition;
     private Vector2 _pointerPosition;
@@ -29,6 +31,8 @@ public sealed class InputState
 
     public void BeginFrame()
     {
+        _mousePressPositions.Clear();
+        _mouseButtonsReleased.Clear();
         _pointerDelta = Vector2.Zero;
         _wheelDelta = 0;
         _focusLostThisFrame = false;
@@ -56,11 +60,13 @@ public sealed class InputState
                 if (inputEvent.MouseButton != PlatformMouseButton.None && !_suppressedButtons.Contains(inputEvent.MouseButton))
                 {
                     _mouseButtonsDown.Add(inputEvent.MouseButton);
+                    _mousePressPositions.TryAdd(inputEvent.MouseButton, _pointerPosition);
                 }
 
                 break;
 
             case PlatformInputEventKind.MouseButtonUp:
+                _mouseButtonsReleased.Add(inputEvent.MouseButton);
                 _suppressedButtons.Remove(inputEvent.MouseButton);
                 UpdatePointerPosition(inputEvent.PointerX, inputEvent.PointerY, accumulateDelta: false);
                 _mouseButtonsDown.Remove(inputEvent.MouseButton);
@@ -81,6 +87,8 @@ public sealed class InputState
                 break;
 
             case PlatformInputEventKind.PointerLeft:
+                _mousePressPositions.Clear();
+                _mouseButtonsReleased.Clear();
                 _hasPointerPosition = false;
                 _pointerDelta = Vector2.Zero;
                 _mouseButtonsDown.Clear();
@@ -99,8 +107,16 @@ public sealed class InputState
     public bool IsMouseButtonDown(PlatformMouseButton button) =>
         _mouseButtonsDown.Contains(button);
 
+    public bool TryGetMousePressPosition(PlatformMouseButton button, out Vector2 position) =>
+        _mousePressPositions.TryGetValue(button, out position);
+
+    public bool WasMouseButtonReleased(PlatformMouseButton button) =>
+        _mouseButtonsReleased.Contains(button);
+
     public void Reset()
     {
+        _mousePressPositions.Clear();
+        _mouseButtonsReleased.Clear();
         _suppressedKeys.Clear();
         _suppressedButtons.Clear();
         _keysDown.Clear();
@@ -113,6 +129,8 @@ public sealed class InputState
 
     public void SuppressHeldInput()
     {
+        _mousePressPositions.Clear();
+        _mouseButtonsReleased.Clear();
         _suppressedKeys.UnionWith(_keysDown);
         _suppressedButtons.UnionWith(_mouseButtonsDown);
         _keysDown.Clear();
