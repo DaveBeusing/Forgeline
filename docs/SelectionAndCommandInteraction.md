@@ -1,5 +1,17 @@
 # Selection and Command Interaction
 
+## Hover tooltips
+
+Keeping the pointer on a world object or Action Dock control for 175 ms reveals a compact, noninteractive tooltip. The delay uses elapsed presentation time, independently of simulation ticks; moving more than three scaled pixels, changing target, or changing viewport/DPI/UI scale starts a new delay. Long frame gaps clear the delay. Tooltips never capture pointer input or issue commands.
+
+Owned units, buildings and construction sites show their authored identity/semantic role and available Health, supply/Fuel/Ammunition, readiness, power and work facts. Missing facts are omitted. Visible deposits show resource identity, copied remaining quantity, locally owned extraction state where present and the existing Mine / Extractor requirement. Unexplored or no-longer-visible deposits show nothing; foreign extractor operational state is not copied.
+
+Current detected contacts are picked near their copied opaque world position and display only `UNKNOWN CONTACT / DETECTED`. Identified hostile entities may show authored identity, with no health, inventory, supply, readiness, production or orders. Losing current intelligence immediately removes the applicable tooltip at the next published snapshot.
+
+Action Dock hits take precedence over world hover and use exactly the dock's mode/card/footer geometry and captured availability model. Tooltips explain disabled reasons, authored costs and copied availability, recipe outputs, production ticks, deposit/technology/facility prerequisites, panel shortcuts and supported control actions. Availability is a captured observation; command execution still revalidates through the authoritative command boundary. Closing or switching the dock invalidates old card/footer tooltips.
+
+Drag selection, held pointer buttons/camera drag, wheel motion, placement, tactical targeting, modal help/pause, focus loss, minimization, terminal state and session replacement suppress hover. The panel flips/clamps inside the DPI-aware safe area and fits the available vertical space to keep clear of the cursor; extreme scale or tiny viewports can shorten the visible text. Compact text is bounded to twelve lines and 48 characters per line, including up to three cost rows, two output rows and two prerequisite rows. The existing inspector/dock remains the detailed view. Per-user tooltip settings and top-bar hover are deferred; no settings/save migration is introduced.
+
 ## Purpose
 
 The first RTS interaction layer connects visible controllable presentation entities to the authoritative fixed-tick simulation command pipeline without allowing input or rendering code to mutate live simulation state.

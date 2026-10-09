@@ -29,6 +29,8 @@ jobs:
           dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.GameplayInteractionJourneyTests ForgeLine.Client.Tests.GameplayHelpControllerTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.GameplayDisplayQualificationTests ForgeLine.Presentation.Tests.SelectionInteractionTests ForgeLine.Presentation.Tests.RtsMinimapInteractionTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.WorldHoverExtractionTests ForgeLine.Presentation.Tests.HoverTooltipTests ForgeLine.Presentation.Tests.HoverTooltipRenderingTests
       - name: Compile runtime assets
         run: dotnet run --project tools/ForgeLine.AssetCompiler/ForgeLine.AssetCompiler.csproj --configuration Release --no-build -- --source assets/source --runtime assets/runtime --clean --qualification-output artifacts/asset-qualification.json
       - name: Capture CPU frame measurements
@@ -37,6 +39,8 @@ jobs:
         run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --culled-hotpath artifacts/culled-hotpath.json
       - name: Guard interaction allocations and capture CPU measurements
         run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --interaction-hotpaths artifacts/interaction-hotpaths.json
+      - name: Guard active hover allocations and capture CPU measurements
+        run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --hover-hotpaths artifacts/hover-hotpaths.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -38,6 +38,7 @@ public sealed class PlayerConstructionActionReadModel
                 costs?.ToArray() ??
                 throw new ArgumentNullException(nameof(costs)));
         RequiresResourceDeposit = requiresResourceDeposit;
+        HasRequiredResources = _costs.All(static cost => cost.IsAvailable);
     }
 
     public BuildingId BuildingId { get; }
@@ -48,8 +49,7 @@ public sealed class PlayerConstructionActionReadModel
 
     public bool RequiresResourceDeposit { get; }
 
-    public bool HasRequiredResources =>
-        _costs.All(static cost => cost.IsAvailable);
+    public bool HasRequiredResources { get; }
 }
 
 public sealed class PlayerProductionRecipeActionReadModel
@@ -75,6 +75,7 @@ public sealed class PlayerProductionRecipeActionReadModel
             Array.AsReadOnly(
                 outputs?.ToArray() ??
                 throw new ArgumentNullException(nameof(outputs)));
+        HasInputs = _inputs.All(static input => input.IsAvailable);
     }
 
     public RecipeId RecipeId { get; }
@@ -85,8 +86,7 @@ public sealed class PlayerProductionRecipeActionReadModel
 
     public IReadOnlyList<PlayerActionResourceAmount> Outputs => _outputs;
 
-    public bool HasInputs =>
-        _inputs.All(static input => input.IsAvailable);
+    public bool HasInputs { get; }
 }
 
 public readonly record struct PlayerProductionRequestReadModel(
@@ -172,6 +172,7 @@ public sealed class PlayerUnitProductionActionReadModel
         TechnologyUnlocked = technologyUnlocked;
         RequiredTechnologyCapability =
             requiredTechnologyCapability;
+        HasInputs = _costs.All(static cost => cost.IsAvailable);
     }
 
     public UnitId UnitId { get; }
@@ -186,8 +187,7 @@ public sealed class PlayerUnitProductionActionReadModel
 
     public TechnologyCapabilityId RequiredTechnologyCapability { get; }
 
-    public bool HasInputs =>
-        _costs.All(static cost => cost.IsAvailable);
+    public bool HasInputs { get; }
 }
 
 public readonly record struct PlayerUnitProductionRequestReadModel(

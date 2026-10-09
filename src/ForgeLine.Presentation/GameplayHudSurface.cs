@@ -32,7 +32,8 @@ public readonly record struct GameplayHudRenderContext(
     uint Dpi,
     float UiScale,
     DebugDraw? GameplayOverlay,
-    RuntimeMetricsView RuntimeMetrics = default);
+    RuntimeMetricsView RuntimeMetrics = default,
+    HoverTooltipView HoverTooltip = default);
 
 public interface IGameplayHudSurface : IDisposable
 {

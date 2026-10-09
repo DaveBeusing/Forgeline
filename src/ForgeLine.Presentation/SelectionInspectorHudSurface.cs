@@ -1102,8 +1102,9 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         return buffer;
     }
 
-    private static IGraphicsPipeline CreatePipeline(
-        IGraphicsDevice graphics)
+    internal static IGraphicsPipeline CreatePipeline(
+        IGraphicsDevice graphics,
+        bool alphaBlendEnabled = false)
     {
         const string vertexShaderSource = """
             struct VertexInput
@@ -1174,6 +1175,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
                         8)
                 ],
                 CullMode = GraphicsCullMode.None,
+                AlphaBlendEnabled = alphaBlendEnabled,
                 DepthEnabled = false
             });
     }
@@ -1235,7 +1237,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
                 "00100" + "01110" + "11111" + "01110" + "00100"
         };
 
-    private static string TextGlyphPattern(
+    internal static string TextGlyphPattern(
         char value) =>
         value switch
         {

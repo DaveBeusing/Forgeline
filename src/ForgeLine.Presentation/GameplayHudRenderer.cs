@@ -36,13 +36,16 @@ public sealed class GameplayHudRenderer : IDisposable
                 runtimeAssets),
             new RtsInformationHudSurface(
                 graphics,
-                runtimeAssets)
+                runtimeAssets),
+            new WorldHoverTooltipSurface(graphics)
         ];
     }
 
     public GameplayHudState State { get; private set; }
 
     public int LastRenderedVertexCount { get; private set; }
+
+    public int LastHoverTooltipVertexCount { get; private set; }
 
     public static GameplayHudState ResolveState(PresentationSnapshot? snapshot) =>
         snapshot is null ? GameplayHudState.WaitingForSnapshot :
@@ -80,7 +83,8 @@ public sealed class GameplayHudRenderer : IDisposable
         uint dpi,
         float uiScale,
         DebugDraw? gameplayOverlay = null,
-        RuntimeMetricsView runtimeMetrics = default)
+        RuntimeMetricsView runtimeMetrics = default,
+        HoverTooltipView hoverTooltip = default)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(context);
@@ -95,6 +99,7 @@ public sealed class GameplayHudRenderer : IDisposable
                 uiScale);
         State = ResolveState(snapshot);
         LastRenderedVertexCount = 0;
+        LastHoverTooltipVertexCount = 0;
         if (snapshot is null)
         {
             _statusSurface?.RenderWaiting(context, layout, runtimeMetrics);
@@ -117,13 +122,16 @@ public sealed class GameplayHudRenderer : IDisposable
                 dpi,
                 uiScale,
                 gameplayOverlay,
-                runtimeMetrics);
+                runtimeMetrics,
+                hoverTooltip);
 
         foreach (IGameplayHudSurface surface in _surfaces)
         {
             surface.Render(
                 renderContext);
             LastRenderedVertexCount += surface.LastRenderedVertexCount;
+            if (surface is WorldHoverTooltipSurface)
+                LastHoverTooltipVertexCount = surface.LastRenderedVertexCount;
         }
     }
 
