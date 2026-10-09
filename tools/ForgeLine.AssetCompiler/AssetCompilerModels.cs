@@ -22,6 +22,12 @@ public sealed record AssetCompilationResult(
     int SkippedCount,
     IReadOnlyList<AssetCompilerDiagnostic> Diagnostics);
 
+public enum TextureCompressionQuality
+{
+    Balanced,
+    Best,
+}
+
 public sealed record SourceAssetDefinition
 {
     public required string Id { get; init; }
@@ -44,6 +50,8 @@ public sealed record SourceAssetDefinition
     public int? TextureMaxDimension { get; init; }
 
     public RuntimeTextureFormat TextureFormat { get; init; } = RuntimeTextureFormat.Rgba8Unorm;
+
+    public TextureCompressionQuality TextureCompressionQuality { get; init; } = TextureCompressionQuality.Best;
 
     public float Scale { get; init; } = 1f;
 

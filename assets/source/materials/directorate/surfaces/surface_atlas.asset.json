@@ -7,5 +7,6 @@
   "textureGenerateMipmaps": true,
   "textureMaxDimension": 2048,
   "textureFormat": "bc7Unorm",
-  "textureMaxMipLevels": 5
+  "textureMaxMipLevels": 5,
+  "textureCompressionQuality": "balanced"
 }

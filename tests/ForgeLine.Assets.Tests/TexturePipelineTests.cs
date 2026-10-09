@@ -8,6 +8,51 @@ namespace ForgeLine.Assets.Tests;
 
 public sealed class TexturePipelineTests
 {
+    [Fact]
+    public void BalancedCompressionPreservesNormalDirectionAndQualityInvalidatesCache()
+    {
+        using var workspace = new TextureWorkspace();
+        const string id = "texture.test.production_normal";
+        const int size = 32;
+        byte[] pixels = new byte[size * size * 4];
+        for (int y = 0; y < size; y++)
+        for (int x = 0; x < size; x++)
+        {
+            var direction = System.Numerics.Vector3.Normalize(new(
+                MathF.Sin(x * MathF.PI / 8) * 0.35f,
+                MathF.Cos(y * MathF.PI / 8) * 0.35f, 1));
+            int offset = (y * size + x) * 4;
+            pixels[offset] = (byte)MathF.Round((direction.X * 0.5f + 0.5f) * 255);
+            pixels[offset + 1] = (byte)MathF.Round((direction.Y * 0.5f + 0.5f) * 255);
+            pixels[offset + 2] = (byte)MathF.Round((direction.Z * 0.5f + 0.5f) * 255);
+            pixels[offset + 3] = 255;
+        }
+        workspace.WriteTexture(id, RuntimeTextureUsage.Normal, RuntimeTextureColorSpace.Linear, size, size, pixels);
+        workspace.WriteTextureDefinition(id, RuntimeTextureUsage.Normal, RuntimeTextureColorSpace.Linear,
+            true, null, format: "bc7Unorm", compressionQuality: "balanced");
+        Assert.True(workspace.Compile().Success);
+        var texture = workspace.ReadTexture(id);
+        var decoded = new BCnEncoder.Decoder.BcDecoder().DecodeRaw(texture.Mips[0].Pixels, size, size, BCnEncoder.Shared.CompressionFormat.Bc7);
+        for (int index = 0; index < decoded.Length; index++)
+        {
+            var expected = System.Numerics.Vector3.Normalize(new(pixels[index * 4] / 127.5f - 1,
+                pixels[index * 4 + 1] / 127.5f - 1, pixels[index * 4 + 2] / 127.5f - 1));
+            var actual = System.Numerics.Vector3.Normalize(new(decoded[index].r / 127.5f - 1,
+                decoded[index].g / 127.5f - 1, decoded[index].b / 127.5f - 1));
+            Assert.True(System.Numerics.Vector3.Dot(expected, actual) >= MathF.Cos(6 * MathF.PI / 180),
+                "Compressed tangent normal deviates by more than six degrees.");
+        }
+        byte[] before = texture.ToPayload();
+        Assert.True(workspace.Compile(clean: true).Success);
+        Assert.Equal(before, workspace.ReadTexture(id).ToPayload());
+        Assert.Equal(1, workspace.Compile().SkippedCount);
+        workspace.WriteTextureDefinition(id, RuntimeTextureUsage.Normal, RuntimeTextureColorSpace.Linear,
+            true, null, format: "bc7Unorm", compressionQuality: "best");
+        Assert.Equal(1, workspace.Compile().CompiledCount);
+        workspace.WriteTextureDefinition(id, RuntimeTextureUsage.Normal, RuntimeTextureColorSpace.Linear,
+            true, null, format: "bc7Unorm", compressionQuality: "999");
+        Assert.False(workspace.Compile().Success);
+    }
     [Theory]
     [InlineData(RuntimeTextureUsage.TerrainControl, 8, 8)]
     [InlineData(RuntimeTextureUsage.GenericData, 8, 8)]
@@ -604,7 +649,8 @@ public sealed class TexturePipelineTests
             bool generateMipmaps,
             int? maxMipLevels,
             int? maxDimension = null,
-            string? format = null)
+            string? format = null,
+            string? compressionQuality = null)
         {
             string name =
                 FileName(
@@ -639,6 +685,7 @@ public sealed class TexturePipelineTests
             if (maxDimension.HasValue)
                 definition["textureMaxDimension"] = maxDimension.Value;
             if (format is not null) definition["textureFormat"] = format;
+            if (compressionQuality is not null) definition["textureCompressionQuality"] = compressionQuality;
 
             WriteText(
                 $"textures/{name}.asset.json",

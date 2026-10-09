@@ -17,7 +17,8 @@ internal static class TextureImporter
         bool generateMipmaps,
         int? maxMipLevels,
         int? maxDimension = null,
-        RuntimeTextureFormat format = RuntimeTextureFormat.Rgba8Unorm)
+        RuntimeTextureFormat format = RuntimeTextureFormat.Rgba8Unorm,
+        TextureCompressionQuality compressionQuality = TextureCompressionQuality.Best)
     {
         var extension = Path.GetExtension(path);
         TextureData texture = extension.ToLowerInvariant() switch
@@ -60,7 +61,8 @@ internal static class TextureImporter
 
             var encoder = new BcEncoder(CompressionFormat.Bc7);
             encoder.OutputOptions.GenerateMipMaps = false;
-            encoder.OutputOptions.Quality = CompressionQuality.BestQuality;
+            encoder.OutputOptions.Quality = compressionQuality == TextureCompressionQuality.Balanced
+                ? CompressionQuality.Balanced : CompressionQuality.BestQuality;
             encoder.Options.IsParallel = false;
             mips = mips.Select(mip => new RuntimeTextureMipLevel(
                 mip.Width, mip.Height, checked(((mip.Width + 3) / 4) * 16),

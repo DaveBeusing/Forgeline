@@ -48,6 +48,8 @@ def definition(path, asset_id, source, usage, cap, compressed=True, mips=None):
                 textureFormat='bc7Unorm' if compressed else 'rgba8Unorm')
     if mips:
         data['textureMaxMipLevels'] = mips
+    if compressed:
+        data['textureCompressionQuality'] = 'balanced'
     path.write_text(json.dumps(data, indent=2) + '\n')
 
 

@@ -27,6 +27,16 @@ protect adjacent cells. Runtime limits are explicit, not inferred from source
 dimensions. The texture chains occupy 5,586,944 + 1,392,640 + 344,064 =
 7,323,648 bytes. This is a texture allocation budget, not total GPU memory.
 
+Production BC7 sources explicitly choose `textureCompressionQuality: balanced`.
+The historical textures retain the default `best`. Large detailed normal maps
+made clean best-quality encoding prohibitively slow for routine authoring
+validation. Both settings preserve format, channel semantics and resident size.
+The compiler validates the setting, includes it in cache identity and keeps
+encoding single-threaded and deterministic. The normal-direction regression
+uses a varying tangent field, a six-degree maximum decoded error, repeat-build
+equality and quality-change cache invalidation. This numeric tolerance is not
+a substitute for visual review of the authored surfaces.
+
 `build/Refine-ProductionMeshes.py` authors small manufactured edge bevels
 while preserving outer bounds, component UV orientation, pivots and stable
 asset IDs. Unit LOD0, articulated tank turret, building LOD0 and supported prop

@@ -5,7 +5,7 @@ namespace ForgeLine.AssetCompiler;
 
 public static class AssetPipelineCompiler
 {
-    public const string CompilerVersion = "1.7.0";
+    public const string CompilerVersion = "1.8.0";
     public const int RuntimeVersion = 4;
 
     private static readonly JsonSerializerOptions JsonOptions = RuntimeAssetCatalog.CreateJsonOptions();
@@ -375,6 +375,14 @@ public static class AssetPipelineCompiler
                 diagnostics.Add(new AssetCompilerDiagnostic(
                     "ASSET035", AssetCompilerDiagnosticSeverity.Error,
                     $"Texture format {definition.TextureFormat} is invalid for usage {definition.TextureUsage}; control/data maps require RGBA8.",
+                    id.Value, ToRelativePath(sourceRoot, sourcePath)));
+            }
+
+            if (!Enum.IsDefined(definition.TextureCompressionQuality))
+            {
+                diagnostics.Add(new AssetCompilerDiagnostic(
+                    "ASSET036", AssetCompilerDiagnosticSeverity.Error,
+                    $"Texture compression quality {definition.TextureCompressionQuality} is invalid; expected balanced or best.",
                     id.Value, ToRelativePath(sourceRoot, sourcePath)));
             }
 
@@ -874,7 +882,8 @@ public static class AssetPipelineCompiler
                 node.Definition.TextureGenerateMipmaps,
                 node.Definition.TextureMaxMipLevels,
                 node.Definition.TextureMaxDimension,
-                node.Definition.TextureFormat),
+                node.Definition.TextureFormat,
+                node.Definition.TextureCompressionQuality),
             RuntimeAssetType.Material => MaterialImporter.Import(node.SourcePath),
             _ => throw new InvalidDataException(
                 $"Asset type '{node.Definition.Type}' is unsupported."),

@@ -6,5 +6,6 @@
   "textureColorSpace": "linear",
   "textureGenerateMipmaps": true,
   "textureMaxDimension": 512,
-  "textureFormat": "bc7Unorm"
+  "textureFormat": "bc7Unorm",
+  "textureCompressionQuality": "balanced"
 }
