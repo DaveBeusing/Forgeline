@@ -6,6 +6,63 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class RtsCameraTests
 {
+    [Theory]
+    [InlineData(0f, -1f, 0f)]
+    [InlineData(0f, 1f, 0f)]
+    [InlineData(1.2f, -1f, 0f)]
+    [InlineData(1.2f, 1f, 0f)]
+    [InlineData(-2.4f, 0f, 1f)]
+    [InlineData(-2.4f, 0f, -1f)]
+    public void PanAxesAgreeWithProjectedViewAtEveryYaw(float yaw, float x, float y)
+    {
+        var camera = new RtsCamera(StableMovementSettings() with { InitialYawRadians = yaw });
+        Vector3 initial = camera.Target;
+        camera.Update(Frame(pan: new(x, y)), 0.1f, 1600, 900);
+        Vector2 projectedMovement = camera.WorldToScreen(initial, 1600, 900).Position - new Vector2(800, 450);
+        if (x != 0) Assert.True(projectedMovement.X * x < 0);
+        if (y != 0) Assert.True(projectedMovement.Y * y > 0);
+    }
+
+    [Theory]
+    [InlineData(ForgeLine.Platform.PlatformKey.A, 0, 450)]
+    [InlineData(ForgeLine.Platform.PlatformKey.Left, 0, 450)]
+    [InlineData(ForgeLine.Platform.PlatformKey.D, 1599, 450)]
+    [InlineData(ForgeLine.Platform.PlatformKey.Right, 1599, 450)]
+    [InlineData(ForgeLine.Platform.PlatformKey.W, 800, 0)]
+    [InlineData(ForgeLine.Platform.PlatformKey.S, 800, 899)]
+    public void KeyboardAndEdgePanHaveEquivalentDirections(ForgeLine.Platform.PlatformKey key, int x, int y)
+    {
+        var keyboard = new RtsCamera(StableMovementSettings());
+        var edge = new RtsCamera(StableMovementSettings() with { EdgeScrollEnabled = true });
+        var input = new InputState();
+        input.Apply(ForgeLine.Platform.PlatformInputEvent.KeyChanged(ForgeLine.Platform.PlatformInputEventKind.KeyDown, key));
+        keyboard.Update(new RtsCameraActionMapper().Map(input), 0.1f, 1600, 900);
+        edge.Update(Frame(hasPointerPosition: true, pointerPosition: new(x, y)), 0.1f, 1600, 900);
+        Assert.InRange(Vector3.Dot(Vector3.Normalize(keyboard.Target), Vector3.Normalize(edge.Target)), 0.9999f, 1.0001f);
+    }
+
+    [Theory]
+    [InlineData(60)]
+    [InlineData(144)]
+    public void HorizontalPanDistanceMatchesElapsedTimeAcrossFrameRates(int frames)
+    {
+        var camera = new RtsCamera(StableMovementSettings());
+        for (int i = 0; i < frames; i++) camera.Update(Frame(pan: Vector2.UnitX), 1f / frames, 960, 540);
+        Assert.InRange(Vector3.Distance(camera.Target, camera.GroundRight * camera.Settings.BasePanSpeedUnitsPerSecond), 0, 0.001f);
+    }
+
+    [Theory]
+    [InlineData(-1, 450)]
+    [InlineData(1600, 450)]
+    [InlineData(800, -1)]
+    [InlineData(800, 900)]
+    public void PointerOutsideResizedViewportDoesNotEdgePan(int x, int y)
+    {
+        var camera = new RtsCamera(StableMovementSettings() with { EdgeScrollEnabled = true });
+        camera.Update(Frame(hasPointerPosition: true, pointerPosition: new(x, y)), 1, 1600, 900);
+        Assert.Equal(Vector3.Zero, camera.Target);
+    }
+
     [Fact]
     public void KeyboardPanIsFrameRateIndependent()
     {

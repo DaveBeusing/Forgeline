@@ -7,6 +7,59 @@ namespace ForgeLine.Input.Tests;
 public sealed class RtsCameraInputTests
 {
     [Fact]
+    public void LeavingViewportStopsEdgeScrollAndReentryDoesNotAccumulateDragDelta()
+    {
+        var input = new InputState();
+        input.Apply(PlatformInputEvent.PointerMoved(1, 450));
+        input.Apply(PlatformInputEvent.PointerLeft());
+        var frame = new RtsCameraActionMapper().Map(input);
+        Assert.False(frame.HasPointerPosition);
+        Assert.Equal(Vector2.Zero, frame.PointerDelta);
+        input.Apply(PlatformInputEvent.PointerMoved(1500, 450));
+        Assert.True(input.HasPointerPosition);
+        Assert.Equal(Vector2.Zero, input.PointerDelta);
+    }
+
+    [Fact]
+    public void HudPointerCaptureSuppressesWheelDragAndEdgePanButPreservesKeyboardPan()
+    {
+        var state = new InputState();
+        state.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.D));
+        state.Apply(PlatformInputEvent.PointerMoved(0, 20));
+        state.Apply(PlatformInputEvent.PointerMoved(0, 30));
+        state.Apply(PlatformInputEvent.MouseWheel(0, 30, 120));
+        state.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown,
+            PlatformMouseButton.Middle, 0, 30));
+        var frame = new RtsCameraActionMapper().Map(state, pointerCaptured: true);
+        Assert.Equal(Vector2.UnitX, frame.Pan);
+        Assert.Equal(0, frame.ZoomSteps);
+        Assert.False(frame.DragPan);
+        Assert.False(frame.HasPointerPosition);
+        Assert.Equal(Vector2.Zero, frame.PointerDelta);
+    }
+
+    [Fact]
+    public void SuppressedHeldInputRequiresReleaseAndFocusLossClearsSuppression()
+    {
+        var state = new InputState();
+        state.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.W));
+        state.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown,
+            PlatformMouseButton.Left, 100, 100));
+        state.SuppressHeldInput();
+        state.BeginFrame();
+        state.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.W));
+        Assert.False(state.IsKeyDown(PlatformKey.W));
+        state.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp,
+            PlatformMouseButton.Left, 100, 100));
+        state.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown,
+            PlatformMouseButton.Left, 100, 100));
+        Assert.True(state.IsMouseButtonDown(PlatformMouseButton.Left));
+        state.Apply(PlatformInputEvent.FocusLost());
+        state.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.W));
+        Assert.True(state.IsKeyDown(PlatformKey.W));
+    }
+
+    [Fact]
     public void InputStatePreservesHeldStateAndResetsFrameTransientValues()
     {
         var state = new InputState();
