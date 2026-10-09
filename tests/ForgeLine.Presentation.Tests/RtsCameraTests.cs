@@ -200,7 +200,7 @@ public sealed class RtsCameraTests
             1600,
             900);
 
-        Assert.True(camera.Target.X < 0.0f);
+        Assert.True(camera.Target.X > 0.0f);
     }
 
     [Fact]
@@ -222,7 +222,7 @@ public sealed class RtsCameraTests
             1600,
             900);
 
-        Assert.InRange(camera.Target.X, -5.001f, -4.999f);
+        Assert.InRange(camera.Target.X, 4.999f, 5.001f);
     }
 
     private static RtsCameraSettings StableMovementSettings() =>

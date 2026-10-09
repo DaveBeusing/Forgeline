@@ -53,7 +53,7 @@ public sealed class RtsCamera
         Vector3.Normalize(new Vector3(MathF.Sin(YawRadians), 0.0f, MathF.Cos(YawRadians)));
 
     public Vector3 GroundRight =>
-        Vector3.Normalize(new Vector3(MathF.Cos(YawRadians), 0.0f, -MathF.Sin(YawRadians)));
+        Vector3.Normalize(Vector3.Cross(GroundForward, Vector3.UnitY));
 
     public void Update(
         RtsCameraInputFrame input,
