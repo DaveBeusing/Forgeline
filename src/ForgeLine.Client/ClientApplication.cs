@@ -505,6 +505,7 @@ internal sealed class ClientApplication
         bool returnHeld = false;
         bool pauseHeld = false;
         var helpController = new GameplayHelpController();
+        bool helpPointerHeld = false;
         bool pauseMenuUpHeld = false;
         bool pauseMenuDownHeld = false;
         bool pauseMenuEnterHeld = false;
@@ -575,7 +576,22 @@ internal sealed class ClientApplication
                 MaximumCameraDeltaSeconds);
 
             bool wasShellBlocking = pauseMenuActive || helpVisible;
+            bool helpPointerDown = inputState.IsMouseButtonDown(PlatformMouseButton.Left);
+            bool helpPointerPressed = helpPointerDown && !helpPointerHeld;
+            helpPointerHeld = helpPointerDown;
             bool helpChanged = helpController.Update(inputState, !pauseMenuActive);
+            if (helpController.Visible && helpPointerPressed && inputState.HasPointerPosition &&
+                !window.ClientSize.IsEmpty)
+            {
+                FrontendLayout helpLayout = FrontendDesign.ResolveLayout(
+                    window.ClientSize.Width, window.ClientSize.Height, _settings.UiScale);
+                if (FrontendHitTesting.SecondaryAction(inputState.PointerPosition.X, inputState.PointerPosition.Y, helpLayout) ||
+                    FrontendHitTesting.Footer(inputState.PointerPosition.X, inputState.PointerPosition.Y, helpLayout))
+                {
+                    helpController.Dismiss(inputState);
+                    helpChanged = true;
+                }
+            }
             helpVisible = helpController.Visible;
             bool modalFrame = wasShellBlocking || helpController.BlocksGameplayThisFrame;
             bool metricsDown = inputState.IsKeyDown(PlatformKey.F1) &&

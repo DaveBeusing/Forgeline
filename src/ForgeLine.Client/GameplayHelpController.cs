@@ -12,6 +12,13 @@ internal sealed class GameplayHelpController
 
     public bool BlocksGameplayThisFrame { get; private set; }
 
+    public void Dismiss(InputState input)
+    {
+        BlocksGameplayThisFrame = Visible;
+        Visible = false;
+        input.SuppressHeldInput();
+    }
+
     public bool Update(InputState input, bool enabled)
     {
         bool shift = input.IsKeyDown(PlatformKey.LeftShift) || input.IsKeyDown(PlatformKey.RightShift);
