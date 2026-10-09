@@ -1,71 +1,70 @@
 # FORGELINE
 
-> **Build. Supply. Conquer.**
+<div align="center">
 
-**FORGELINE** is a large-scale real-time strategy game combining classic battlefield command with industrial production, physical logistics, automation, and intelligence.
+### BUILD. SUPPLY. CONQUER.
 
-**Build the industry. Supply the army. Control the battlefield.**
+**Large-scale RTS · Industrial Production · Physical Logistics · Combined-Arms Warfare**
 
-Unlike conventional RTS resource economies, factories, power networks, cargo transport, ammunition, and fuel are part of the war itself. Disrupting a bridge or supply route can matter as much as winning a direct engagement.
+*Build the industrial machine that sustains the army that wins the war.*
 
-## The Game
+[Gameplay](#gameplay) · [Pre-Alpha](#playable-pre-alpha) · [Getting Started](#getting-started) · [Engine](#forgeline-engine) · [Documentation](#documentation)
 
-The core loop is **Extract â†’ Process â†’ Manufacture â†’ Supply â†’ Fight â†’ Expand**.
+</div>
 
-- **Build:** Extract finite resources, process Steel/Fuel/Electronics, construct infrastructure, and automate production.
-- **Supply:** Move cargo through capacity-constrained networks; keep combat forces fueled, armed, and operational.
-- **Conquer:** Use reconnaissance, formations, terrain, artillery, and combined arms to defeat an opponent.
+---
 
-### Current playable slice
+## Overview
 
-The current pre-alpha slice centers on **Central Divide**, a **3.072 Ã— 3.072 km** two-player battlefield with contested resources, a North Bridge, an alternate South Ford, expansion areas, and destructible transport links.
+**FORGELINE** is a real-time strategy game combining direct battlefield command with industry, supply chains, intelligence, and automation. Build factories, transport resources, sustain combat units, and destroy the infrastructure supporting your opponent.
 
-It includes:
+> **Preparation matters more than click speed.** Logistics creates strategic opportunities, not repetitive chores.
 
-| Area | Implemented foundation |
-| --- | --- |
-| Faction | **Directorate** â€” 13 constructible structures and 7 producible units |
-| Economy | Resource extraction, inventory/storage, power allocation, recipes, and production queues |
-| Logistics | Graph routing, Cargo/Supply Trucks, automatic distribution, Fuel/Ammunition resupply, and disruption |
-| Warfare | Infantry and vehicles, directional armor, suppression, repairs, artillery, and tactical commands |
-| Intelligence | Fog of war, radar/visual sensors, detection/identification, and intelligence-limited targeting |
-| Opponent | Computer-controlled skirmish opponent using the same construction, economy, supply, and combat rules |
-| Match flow | Setup, pause, victory/surrender, results, and fresh-match restart |
-| Presentation | Native D3D12 rendering, faction assets, terrain, minimap, strategic overlays, and combat/logistics effects |
+## Gameplay
 
-The gameplay HUD includes authoritative resources/power, selection details and contextual commands. Its small top-right FPS/SIM readout measures actual presented frames and completed ticks per second independently. See [Windows Client](docs/WindowsClient.md#match-hud) for availability and pause behavior.
+| Pillar | What you do |
+| :--- | :--- |
+| **Build** | Extract finite resources, refine materials, power factories, manufacture units, and automate production. |
+| **Supply** | Establish roads, transport routes, depots, fuel and ammunition distribution, and maintenance capacity. |
+| **Conquer** | Reconnoiter, position combined-arms forces, exploit terrain, disrupt supply lines, and advance the frontline. |
 
-The six main unit families and all thirteen industrial building families use compiled Directorate assets, including LODs and gameplay-relevant visual states. Combat Engineer currently shares the Rifle Squad visual family.
+**Core gameplay loop**
 
-**Status:** This is a developing *pre-alpha vertical slice*, not a completed or production-ready game. Advanced tactics, rail gameplay, interactive map editing, other factions, and multiplayer remain future work.
+```text
+Extract → Process → Manufacture → Supply → Fight → Expand → Automate → Scale
+```
 
-## ForgeLine Engine
+Unlike a conventional RTS economy, **industry is part of the battlefield**. Destroying a bridge, cutting off fuel, or disabling production can decide the outcome of a battle.
 
-FORGELINE runs on **ForgeLine Engine**, a purpose-built C#/.NET RTS engine rather than Unity, Unreal, or a general-purpose engine.
+## Playable Pre-Alpha
 
-| Technology | Baseline |
-| --- | --- |
-| Language | **C# 14** |
-| Runtime | **.NET 10 LTS**; SDK pinned in `global.json` (currently **10.0.401**) |
-| Platform | Windows x64 |
-| Graphics | Custom **Direct3D 12** renderer |
-| Simulation | Fixed-tick, command-driven, headless-capable; **20 Hz** target |
-| Data model | Data-oriented, custom **Entity Component System (ECS)** |
-| Concurrency | Persistent-worker job scheduler |
-| World | Chunk-based terrain and spatial queries |
-| Navigation | Hierarchical ground routing, local steering, shared formation routes |
-| Logistics | Graph-based capacity and transport simulation |
-| Data/assets | Stable IDs, data-driven definitions, source-to-runtime compilation |
-| Persistence | Authoritative save/load and command-based replay |
-| Architecture | Strict simulation/presentation separation; future networking considered but deferred |
+The current development slice centers on **Central Divide**, a **3.072 × 3.072 km** two-player map featuring contested resources, a North Bridge, an alternative South Ford, expansion sites, and destructible transport links.
 
-**Architectural rule:** Simulation state is authoritative. Input enters through validated commands; presentation consumes snapshots and cannot change game state directly. This supports repeatable headless tests, replays, and eventual multiplayer work.
+| System | Present in the development slice |
+| :--- | :--- |
+| **Directorate** | 13 constructible structures and 7 producible units |
+| **Industry** | Extraction, storage, power distribution, recipes, and production queues |
+| **Logistics** | Capacity-based graph routing, cargo/supply trucks, automated distribution, fuel and ammunition resupply |
+| **Combat** | Infantry, vehicles, directional armor, suppression, repairs, artillery, and tactical orders |
+| **Intelligence** | Fog of war, radar and visual sensors, detection/identification, information-limited targeting |
+| **Skirmish** | Computer-controlled opponent operating under the same core economy, supply, and combat rules |
+| **Match flow** | Setup, pause, victory/surrender, results, and restart |
+| **Presentation** | Native Direct3D 12, terrain, Directorate assets, HUD, minimap, strategic overlays, and effects |
 
-The codebase is organized into engine, simulation, game, presentation, Windows client, headless host, tooling, and tests. See [Architecture](docs/Architecture.md) and [Project Governance](docs/ProjectContext.md).
+The Windows client provides resource and power information, contextual commands, and independent FPS/simulation-rate readings. Directorate unit and building families use compiled assets with LOD and gameplay-relevant visual states. The Combat Engineer currently shares the Rifle Squad visual family.
+
+**Development status:** This is a **pre-alpha vertical slice**, not a finished game. Rail gameplay, more advanced tactics, interactive map editing, other factions, and multiplayer remain future work.
+
+See [Central Divide](docs/CentralDivideScenario.md) and the [Windows client guide](docs/WindowsClient.md).
 
 ## Getting Started
 
-**Requirements:** Windows x64, the .NET SDK specified by `global.json`, and a Direct3D 12-capable graphics environment. The Windows client can fall back to WARP for supported development/smoke scenarios.
+### Prerequisites
+
+- **Windows x64**
+- **.NET SDK 10.0.401**, pinned in [`global.json`](global.json)
+- A **Direct3D 12-capable** graphics environment; WARP fallback supports designated development/smoke scenarios
+- **PowerShell** for validation scripts
 
 From the repository root:
 
@@ -75,100 +74,128 @@ dotnet build ForgeLine.sln --configuration Release
 dotnet test --solution ForgeLine.sln --configuration Release
 ```
 
-### Play the development client
+The repository selects **Microsoft.Testing.Platform** through `global.json`.
+
+### Launch the client
 
 ```powershell
 dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release
 ```
 
-The client opens the Central Divide / Directorate skirmish flow. In a source checkout, it also refreshes compiled runtime assets before loading them. Packaged builds resolve assets beside the executable; `FORGELINE_RUNTIME_ASSETS` overrides asset discovery.
+The client starts the Central Divide / Directorate skirmish flow. Source checkouts refresh compiled assets before loading. Packaged builds locate assets beside the executable; `FORGELINE_RUNTIME_ASSETS` overrides asset discovery.
 
-**Main controls**
+### Essential controls
 
-| Action | Input |
-| --- | --- |
-| Select / multi-select / box-select | Left click / Shift + left click / left drag |
-| Issue movement order | Right click |
+| Action | Default input |
+| :--- | :--- |
+| Select / add / box-select | Left click / Shift + left click / left drag |
+| Move units | Right click |
 | Pause | Space |
-| Controls reference | F1 or F12 |
 | Build / industrial production / unit production | B / P / U |
 | Logistics / supply / combat commands | L / Y / K |
 | Strategic overlays | F10 |
+| Controls help | F1 or F12 |
 | Development metrics | Shift + F1 |
-| Restart completed match / end session | R / Escape |
+| Restart finished match / exit session | R / Escape |
 
-Selected units and buildings use terrain-aligned circular rings. Hover uses a broken ring; foreign ownership adds radial ticks. Left-drag shows a faint filled marquee with a contrasting outline. Brief move/attack/invalid markers acknowledge targeting intent; command results still arrive through the existing HUD.
+Additional behavior is covered by [Windows Client](docs/WindowsClient.md) and [Camera and Input](docs/CameraAndInput.md).
 
-Additional interaction and diagnostics shortcuts are documented in [Windows Client](docs/WindowsClient.md), [Camera and Input](docs/CameraAndInput.md), and [RTS Information Layer](docs/RTSInformationLayer.md).
+## ForgeLine Engine
 
-See [Interaction qualification](docs/InteractionQualification.md) for the integrated control/state matrix, display coverage, overlay/HUD performance checks and manual visual acceptance checklist.
+FORGELINE is built on **ForgeLine Engine**, a purpose-built C#/.NET RTS engine—not Unity, Unreal, or a general-purpose engine.
+
+| Area | Baseline |
+| :--- | :--- |
+| Language / runtime | **C# 14 · .NET 10 LTS** |
+| Target | **Windows x64** |
+| Renderer | Custom **Direct3D 12** |
+| Simulation | Fixed-tick, command-driven, headless-capable; **20 Hz target** |
+| Entity architecture | Data-oriented custom ECS |
+| Multithreading | Persistent-worker job scheduler |
+| World / navigation | Chunk-based world, hierarchical paths, local steering, formation corridors |
+| Logistics | Graph-based transport and capacity simulation |
+| Content | Stable data identifiers, compiled source-to-runtime assets |
+| Recovery | Versioned save/load and command replay |
+| Design | Strict simulation/presentation separation; future networking considered |
+
+```text
+Player Input → Validated Commands → Fixed-Tick Simulation
+                                         │
+                         ┌───────────────┴───────────────┐
+                         │ ECS / World / Jobs / Gameplay │
+                         └───────────────┬───────────────┘
+                                         │
+                               Presentation Snapshots
+                                         │
+                                  D3D12 Renderer
+```
+
+**Architectural invariant:** Simulation is authoritative. The UI submits commands; the renderer consumes extracted snapshots and cannot mutate gameplay state.
+
+See [Architecture](docs/Architecture.md) and [Project Context](docs/ProjectContext.md).
 
 ## Development and Validation
 
 ### Headless simulation
 
-Run simulation without a window, graphics, or audio:
-
 ```powershell
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --ticks 1000 --seed 1 --tick-rate 20
 ```
 
-Run an accelerated, repeatable full-match validation:
+A repeatable, bounded terminal-match scenario:
 
 ```powershell
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario central-divide --profile validation --ticks 80000 --seed 2026 --require-terminal
 ```
 
-The `validation` profile is intended for bounded testing, not gameplay balancing; the `gameplay` profile retains player-facing defaults.
+The `validation` profile supports automated qualification; `gameplay` retains player-facing defaults.
 
-### Architecture and client smoke checks
+### Architecture and renderer checks
 
 ```powershell
 pwsh ./build/Validate-ProjectReferences.ps1
 dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release -- --smoke-test --render-stress 1000
 ```
 
-CI checks architecture, builds, tests, Windows client startup, map artifacts, and bounded terminal skirmish behavior. BenchmarkDotNet hosts cover ECS, navigation, simulation, logistics, combat, and rendering. Performance targets are engineering goals, not guaranteed frame rates or entity counts.
-
-### Save, load, and replay
-
-The headless host supports versioned checkpoints and command-based replay:
+### Save and replay
 
 ```powershell
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario central-divide --profile validation --ticks 5000 --seed 2026 --save-output artifacts/match.save.json --replay-output artifacts/match.replay.json
 ```
 
-See [Save, Load, Replay, and Recovery](docs/SaveLoadReplayAndRecovery.md) for validation and recovery behavior.
+See [Save, Load, Replay, and Recovery](docs/SaveLoadReplayAndRecovery.md).
 
-## Repository
+**Note:** Frame-rate, simulation, and entity-scale targets are engineering goals, not performance guarantees.
+
+## Repository Structure
 
 ```text
-src/          Engine, simulation, game, client, and headless host
-assets/       Source assets and compiled runtime assets
-tools/        Specialized editors and asset/map compilation
-tests/        Unit, integration, and headless tests
+src/          Engine, simulation, game, Windows client, headless host
+assets/       Editable source and compiled runtime assets
+tools/        Editors, asset and map compilation
+tests/        Unit, integration and headless tests
 benchmarks/   Performance benchmarks
-build/        Validation and build-support scripts
-docs/         Technical documentation
+build/        Validation scripts
+docs/         Technical and operational documentation
 .github/      CI workflows
 ```
 
 ## Documentation
 
-- [Match runtime and scenario composition](docs/adr/MatchRuntimeAndScenarioComposition.md)
-
-Start with these detailed references rather than using the README as an exhaustive subsystem specification:
-
-- [Development workflow](docs/Development.md) and [Architecture](docs/Architecture.md)
-- [Render scratch and snapshot ownership](docs/adr/RenderFrameScratchAndSnapshotOwnership.md)
-- [Scalability workloads, budgets and qualification](docs/ScalabilityQualification.md)
-- [GPU resource retirement and fault shutdown](docs/adr/GpuResourceRetirementAndFaultShutdown.md)
-- [Central Divide scenario](docs/CentralDivideScenario.md) and [Central Divide battlefield](docs/CentralDivideBattlefield.md)
-- [Simulation runtime](docs/SimulationRuntime.md) and [Hierarchical navigation](docs/HierarchicalNavigation.md)
-- [Industrial production](docs/IndustrialProduction.md), [Logistics routing](docs/LogisticsNetworkAndRouting.md), and [Battlefield supply](docs/BattlefieldSupply.md)
-- [Combat execution](docs/CombatExecution.md), [Battlefield intelligence](docs/BattlefieldIntelligence.md), and [Skirmish opponent](docs/SkirmishOpponent.md)
-- [Asset pipeline](docs/AssetPipeline.md), [Match flow](docs/MatchFlowAndPlayerExperience.md), and [Pre-alpha operations](docs/PreAlphaUxAndOperations.md)
+| Topic | References |
+| :--- | :--- |
+| **Development** | [Development workflow](docs/Development.md) · [Architecture](docs/Architecture.md) |
+| **Client and controls** | [Windows Client](docs/WindowsClient.md) · [Camera and Input](docs/CameraAndInput.md) · [Interaction Qualification](docs/InteractionQualification.md) |
+| **World and runtime** | [Central Divide Battlefield](docs/CentralDivideBattlefield.md) · [Simulation Runtime](docs/SimulationRuntime.md) · [Navigation](docs/HierarchicalNavigation.md) |
+| **Economy and supply** | [Industrial Production](docs/IndustrialProduction.md) · [Logistics Routing](docs/LogisticsNetworkAndRouting.md) · [Battlefield Supply](docs/BattlefieldSupply.md) |
+| **Warfare** | [Combat Execution](docs/CombatExecution.md) · [Battlefield Intelligence](docs/BattlefieldIntelligence.md) · [Skirmish Opponent](docs/SkirmishOpponent.md) |
+| **Production and quality** | [Asset Pipeline](docs/AssetPipeline.md) · [Scalability Qualification](docs/ScalabilityQualification.md) · [Pre-Alpha Operations](docs/PreAlphaUxAndOperations.md) |
+| **Architecture decisions** | [Match Runtime Composition](docs/adr/MatchRuntimeAndScenarioComposition.md) · [Render Snapshot Ownership](docs/adr/RenderFrameScratchAndSnapshotOwnership.md) · [GPU Resource Safety](docs/adr/GpuResourceRetirementAndFaultShutdown.md) |
 
 ---
 
-**FORGELINE â€” Build. Supply. Conquer.**
+<div align="center">
+
+**FORGELINE — Build. Supply. Conquer.**
+
+</div>
