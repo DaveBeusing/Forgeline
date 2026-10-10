@@ -275,3 +275,8 @@ See [Client Execution Ownership](adr/ClientExecutionOwnership.md).
 ### Selected combat-group card
 
 Multiple selected entities show a compact inspector card with total, live owned unit and combat-eligible counts, type cells, component-covered means and critical-member focus controls. Click type cells to narrow the presentation selection; Ctrl+digits and recall retain their existing assignments. Focus controls move only the camera. F3/NEXT changes the intended formation for subsequent orders. Pause/help, focus loss, resize, placement/targeting and session changes consume pending card presses.
+
+
+## Optional operations surface
+
+The operations panel shares HUD safe-area/DPI bounds and retained upload resources. It occupies the left column above selection; the Action Dock, minimap and world remain available. The tab reserves the guidance bottom band. Client render frames carry immutable operations interaction state; completed-tick snapshots carry copied facility and route facts. Help/pause frames that skip normal gameplay explicitly cancel retained dashboard clicks. No second UI framework or simulation write path is introduced. See [operations controls and qualification](ProductionAndLogisticsOperations.md).

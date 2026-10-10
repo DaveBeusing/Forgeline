@@ -6,6 +6,11 @@ internal static class Program
 {
     public static void Main(string[] args)
     {
+        if (args is ["--operations-hotpaths", string operationsOutput])
+        {
+            OperationsMeasurements.Run(operationsOutput);
+            return;
+        }
         if (args is ["--combat-group-hotpaths", string groupOutput])
         {
             CombatGroupMeasurements.Run(groupOutput);

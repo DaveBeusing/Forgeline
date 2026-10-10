@@ -261,3 +261,8 @@ Resize and DPI/UI-scale changes cancel an active selection gesture; a still-held
 ## Multi-selection group controls
 
 The inspector shows per-type owned unit composition and component-covered HP/readiness/fuel/ammunition means for multi-selection. Click a nonzero type cell to select that subgroup; saved Ctrl+digit assignments stay intact. HP<=25% and SUPPLY! focus controls cycle authorized live members needing attention, without orders or selection changes. FOCUS GROUP and the existing F3 formation cycle are available in the same card. See [Formation Movement and Group Orders](FormationMovementAndGroupOrders.md#current-selection-group-card) for aggregation and partial-command semantics.
+
+
+## Operations overview
+
+Click OPERATIONS above the inspector, the resource/power strip, a reported alert or the selected facility inspector to open the nonmodal operations view. Filter and page copied local facilities, inspect reported causes, focus facilities/adjacent route endpoints and open their existing Action Dock controls. Focus issues no orders; control entry waits for the exact new selection capture. Targeting hides the view temporarily; modal, pause, focus and resize transitions consume clicks. See [operations authority and limits](ProductionAndLogisticsOperations.md).

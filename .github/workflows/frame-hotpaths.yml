@@ -26,6 +26,8 @@ jobs:
         run: dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ClientSimulationHostTests
       - name: Integrated interaction and display contracts
         run: |
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.OperationsTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.SelectedCombatGroupTests ForgeLine.Presentation.Tests.CombatGroupOverviewModelTests ForgeLine.Presentation.Tests.CombatGroupInputControllerTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.ContextualCommandTests
@@ -45,6 +47,8 @@ jobs:
         run: dotnet run --project tools/ForgeLine.AssetCompiler/ForgeLine.AssetCompiler.csproj --configuration Release --no-build -- --source assets/source --runtime assets/runtime --clean --qualification-output artifacts/asset-qualification.json
       - name: Guard combat-group allocation bounds
         run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --combat-group-hotpaths artifacts/combat-group-hotpaths.json
+      - name: Guard operations dashboard allocation bounds
+        run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --operations-hotpaths artifacts/operations-hotpaths.json
       - name: Capture CPU frame measurements
         run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --frame-hotpaths artifacts/frame-hotpaths.json
       - name: Capture isolated fully culled measurements

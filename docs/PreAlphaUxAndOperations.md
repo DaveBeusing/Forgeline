@@ -188,3 +188,8 @@ Automated CI covers:
 - canonical terminal-match validation.
 
 Manual qualification is defined in [Pre-Alpha Verification Checklist](PreAlphaVerificationChecklist.md) and includes DPI/UI scaling, keyboard flow, setup/help/pause behavior, settings recovery, clean package launch, and one complete packaged match.
+
+
+## Operations onboarding and acceptance
+
+OPERATIONS above the selection inspector opens the optional overview. Resource/power, alert and single-facility inspector clicks provide contextual entry without a new shortcut. Use Filter, Next Page, a facility row, Focus Facility/Focus Next or Open Existing Controls. Reported shortages explain observed facts; they do not invent economic causes. Net flow remains explicitly unavailable. Manual active-policy/route-focus journeys, terrain contrast, extreme-scale readability and monitor DPI/focus transitions remain acceptance items. See [operations limits](ProductionAndLogisticsOperations.md).

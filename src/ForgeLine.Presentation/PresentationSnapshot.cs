@@ -25,8 +25,9 @@ public sealed class PresentationSnapshot
         StrategicOverlaySnapshot? strategicOverlay = null,
         CombatGroupOperationalSnapshot? combatGroups = null,
         PlayerHoverSummary? hover = null,
-        PlayerGuidanceSummary? guidance = null)
-        : this(instances.ToArray(), tick, tickDuration, simulationEntityCount, intelligence, sessionId, playerExperience, placementPreview, debug, construction, simulationDiagnostics, playerActions, vfxMetrics, strategicOverlay, combatGroups, hover, guidance)
+        PlayerGuidanceSummary? guidance = null,
+        OperationsSnapshot? operations = null)
+        : this(instances.ToArray(), tick, tickDuration, simulationEntityCount, intelligence, sessionId, playerExperience, placementPreview, debug, construction, simulationDiagnostics, playerActions, vfxMetrics, strategicOverlay, combatGroups, hover, guidance, operations)
     {
     }
 
@@ -48,7 +49,8 @@ public sealed class PresentationSnapshot
         StrategicOverlaySnapshot? strategicOverlay = null,
         CombatGroupOperationalSnapshot? combatGroups = null,
         PlayerHoverSummary? hover = null,
-        PlayerGuidanceSummary? guidance = null)
+        PlayerGuidanceSummary? guidance = null,
+        OperationsSnapshot? operations = null)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(
             tickDuration,
@@ -72,6 +74,7 @@ public sealed class PresentationSnapshot
         CombatGroups = combatGroups;
         Hover = hover;
         Guidance = guidance;
+        Operations = operations;
         _instances = ownedInstances;
     }
 
@@ -106,6 +109,7 @@ public sealed class PresentationSnapshot
     public PlayerHoverSummary? Hover { get; }
 
     public PlayerGuidanceSummary? Guidance { get; }
+    public OperationsSnapshot? Operations { get; }
 
     public int InstanceCount => _instances.Length;
 

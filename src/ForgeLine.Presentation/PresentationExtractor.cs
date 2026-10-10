@@ -181,7 +181,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 _extraction is null || interaction.HoverSessionId != _extraction.Scenario.Simulation.SessionId
                     ? null : PlayerHoverSummaryFactory.Capture(
                     context, _extraction, interaction.HoveredEntity),
-                _extraction is null ? null : PlayerGuidanceSummaryFactory.Capture(context, _extraction, intelligenceSnapshot)));
+                _extraction is null ? null : PlayerGuidanceSummaryFactory.Capture(context, _extraction, intelligenceSnapshot),
+                _extraction is not null && interaction.OperationsOpen ? OperationsSnapshotFactory.Capture(context, _extraction) : null));
     }
 
     private RenderInstance[] CaptureRenderInstances(

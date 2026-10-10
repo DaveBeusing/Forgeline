@@ -377,6 +377,7 @@ internal sealed class ClientApplication
         var combatGroupInput =
             new CombatGroupInputController();
         var combatGroupCard = new CombatGroupCardController();
+        var operationsController = new OperationsController();
         var memberFocusSelection = new SelectionSet();
         var buildingPlacementController =
             new RtsBuildingPlacementController(LocalPlayer);
@@ -994,6 +995,7 @@ internal sealed class ClientApplication
             if (shouldPauseForWindow ||
                 shellBlocksGameplay || modalFrame || shellChanged || !window.IsFocused)
             {
+                operationsController.CancelInput(inputState);
                 hoverTooltip.Reset();
                 presentationInteraction.SetHover(EntityId.Invalid, SimulationSessionId.None);
                 actionPanel.Close();
@@ -1147,6 +1149,28 @@ internal sealed class ClientApplication
                 selectionController.Selection, interactionLayout,
                 blocked: modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
                     buildingPlacementController.IsActive || tacticalTargetingController.IsActive);
+            var operationsResult = operationsController.Update(inputState, inputSnapshot, interactionLayout, presentationInteraction,
+                blocked: modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
+                    buildingPlacementController.IsActive || tacticalTargetingController.IsActive);
+            hudInteraction.CapturePointer(operationsResult.Captured);
+            if (operationsResult.Navigate.IsValid && inputSnapshot is not null)
+            {
+                memberFocusSelection.SetSingle(operationsResult.Navigate);
+                if (RtsCameraFocusController.TryGroup(inputSnapshot, LocalPlayer, memberFocusSelection, out Vector3 operationsTarget))
+                {
+                    camera.CenterOn(operationsTarget);
+                    selectionController.CancelPointerInteraction();
+                    minimapInteraction.Reset();
+                    if (operationsResult.Controls != PlayerActionPanelMode.Closed)
+                    {
+                        selectionController.Selection.SetSingle(operationsResult.Navigate);
+                        presentationInteraction.SetSelection(selectionController.Selection.Entities);
+                        inputState.SuppressHeldInput();
+                        actionPanel.OpenOperationsControls(operationsResult.Controls);
+                        hudInteraction.CaptureKeyboard(actionPanel.HasKeyboardFocus);
+                    }
+                }
+            }
             hudInteraction.CapturePointer(cardResult.Captured);
             if (cardResult.SelectionChanged)
             {
@@ -1564,7 +1588,8 @@ internal sealed class ClientApplication
                     CombatGroups:
                         combatGroupOverview,
                     MetricsActive: window.IsFocused && !window.IsMinimized,
-                    HoverTooltip: tooltipView));
+                    HoverTooltip: tooltipView,
+                    Operations: operationsController.View));
 
             if (_platform.Clock.GetElapsedTime(nextDiagnosticAt, now) >= DiagnosticInterval)
             {
