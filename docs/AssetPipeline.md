@@ -2,6 +2,8 @@
 
 ## Purpose
 
+For live per-asset timing, memory, cache decisions and development-launch diagnostics, see [Asset Startup Diagnostics](AssetStartupDiagnostics.md).
+
 ForgeLine uses an explicit source-to-runtime asset boundary. Editable authoring files live under `assets/source/`; the Asset Compiler validates and compiles them into runtime-only artifacts under `assets/runtime/`. Runtime code consumes the compiled manifest and `.flasset` files through `ForgeLine.Assets` and never discovers authoring files directly.
 
 The initial production baseline covers static glTF/GLB meshes, PNG/TGA textures, PBR-oriented material definitions, stable asset IDs, dependency validation, LOD/collision/socket metadata, incremental compilation, deterministic runtime paths, actionable diagnostics, and runtime lookup/loading.
