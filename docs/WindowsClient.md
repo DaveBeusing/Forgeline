@@ -280,3 +280,7 @@ Multiple selected entities show a compact inspector card with total, live owned 
 ## Optional operations surface
 
 The operations panel shares HUD safe-area/DPI bounds and retained upload resources. It occupies the left column above selection; the Action Dock, minimap and world remain available. The tab reserves the guidance bottom band. Client render frames carry immutable operations interaction state; completed-tick snapshots carry copied facility and route facts. Help/pause frames that skip normal gameplay explicitly cancel retained dashboard clicks. No second UI framework or simulation write path is introduced. See [operations controls and qualification](ProductionAndLogisticsOperations.md).
+
+## Alert and strategic-layer controls
+
+FOCUS alert rows center/select their revalidated local target; OPS explains unavailable navigation and opens the relevant operations filter. Existing minimap layer buttons, F10 cycling, F11 visibility and targeting/drag controls remain. Full layer names, explicit N/A - UPDATING, and shape keys distinguish unavailable data from captured states; brownout adds a diamond. See [authority and qualification](ActionableAlertsAndStrategicMap.md).

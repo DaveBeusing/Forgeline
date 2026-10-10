@@ -203,3 +203,5 @@ docs/         Technical and operational documentation
 Multi-selection provides owned unit type filters, component-covered operational averages and damaged/critical-supply member focus controls. Saved control groups remain available; the card F3/NEXT control uses the existing formation cycle. See [group-card controls](docs/FormationMovementAndGroupOrders.md#current-selection-group-card).
 
 The optional OPERATIONS tab provides local production, stock, power and logistics bottleneck inspection. Resource/power-strip, alert and facility-inspector clicks open relevant views; existing facility controls remain available. See [operations controls and limits](docs/ProductionAndLogisticsOperations.md).
+
+Alert rows marked FOCUS select and center an authorized affected target; OPS and MORE open existing operations filters with unavailable-target explanations. The existing minimap selector has full layer names and shape legends; F10/F11 controls remain available. See [alert and strategic-map semantics](docs/ActionableAlertsAndStrategicMap.md).

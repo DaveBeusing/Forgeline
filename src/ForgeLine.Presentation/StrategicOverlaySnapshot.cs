@@ -101,14 +101,14 @@ public readonly record struct StrategicPowerNetworkReadModel(
 
 public sealed class StrategicOverlaySnapshot
 {
-    private readonly StrategicLogisticsNodeReadModel[] _logisticsNodes;
-    private readonly StrategicLogisticsLinkReadModel[] _logisticsLinks;
-    private readonly StrategicSupplyReadModel[] _supply;
-    private readonly StrategicSensorReadModel[] _sensors;
-    private readonly StrategicNavigationSectorReadModel[] _navigationSectors;
-    private readonly StrategicNavigationPortalReadModel[] _navigationPortals;
-    private readonly StrategicPowerEntityReadModel[] _powerEntities;
-    private readonly StrategicPowerNetworkReadModel[] _powerNetworks;
+    private readonly IReadOnlyList<StrategicLogisticsNodeReadModel> _logisticsNodes;
+    private readonly IReadOnlyList<StrategicLogisticsLinkReadModel> _logisticsLinks;
+    private readonly IReadOnlyList<StrategicSupplyReadModel> _supply;
+    private readonly IReadOnlyList<StrategicSensorReadModel> _sensors;
+    private readonly IReadOnlyList<StrategicNavigationSectorReadModel> _navigationSectors;
+    private readonly IReadOnlyList<StrategicNavigationPortalReadModel> _navigationPortals;
+    private readonly IReadOnlyList<StrategicPowerEntityReadModel> _powerEntities;
+    private readonly IReadOnlyList<StrategicPowerNetworkReadModel> _powerNetworks;
 
     public StrategicOverlaySnapshot(
         SimulationTick tick,
@@ -120,45 +120,49 @@ public sealed class StrategicOverlaySnapshot
         IReadOnlyList<StrategicNavigationSectorReadModel> navigationSectors,
         IReadOnlyList<StrategicNavigationPortalReadModel> navigationPortals,
         IReadOnlyList<StrategicPowerEntityReadModel> powerEntities,
-        IReadOnlyList<StrategicPowerNetworkReadModel> powerNetworks)
+        IReadOnlyList<StrategicPowerNetworkReadModel> powerNetworks,
+        SimulationSessionId session = default, PlayerId player = default)
     {
         Tick = tick;
+        Session = session; Player = player;
         RequestedMode = requestedMode;
         _logisticsNodes =
-            logisticsNodes?.ToArray() ??
+            Array.AsReadOnly(logisticsNodes?.ToArray() ??
             throw new ArgumentNullException(
-                nameof(logisticsNodes));
+                nameof(logisticsNodes)));
         _logisticsLinks =
-            logisticsLinks?.ToArray() ??
+            Array.AsReadOnly(logisticsLinks?.ToArray() ??
             throw new ArgumentNullException(
-                nameof(logisticsLinks));
+                nameof(logisticsLinks)));
         _supply =
-            supply?.ToArray() ??
+            Array.AsReadOnly(supply?.ToArray() ??
             throw new ArgumentNullException(
-                nameof(supply));
+                nameof(supply)));
         _sensors =
-            sensors?.ToArray() ??
+            Array.AsReadOnly(sensors?.ToArray() ??
             throw new ArgumentNullException(
-                nameof(sensors));
+                nameof(sensors)));
         _navigationSectors =
-            navigationSectors?.ToArray() ??
+            Array.AsReadOnly(navigationSectors?.ToArray() ??
             throw new ArgumentNullException(
-                nameof(navigationSectors));
+                nameof(navigationSectors)));
         _navigationPortals =
-            navigationPortals?.ToArray() ??
+            Array.AsReadOnly(navigationPortals?.ToArray() ??
             throw new ArgumentNullException(
-                nameof(navigationPortals));
+                nameof(navigationPortals)));
         _powerEntities =
-            powerEntities?.ToArray() ??
+            Array.AsReadOnly(powerEntities?.ToArray() ??
             throw new ArgumentNullException(
-                nameof(powerEntities));
+                nameof(powerEntities)));
         _powerNetworks =
-            powerNetworks?.ToArray() ??
+            Array.AsReadOnly(powerNetworks?.ToArray() ??
             throw new ArgumentNullException(
-                nameof(powerNetworks));
+                nameof(powerNetworks)));
     }
 
     public SimulationTick Tick { get; }
+    public SimulationSessionId Session { get; }
+    public PlayerId Player { get; }
 
     public StrategicOverlayMode RequestedMode { get; }
 
@@ -271,7 +275,7 @@ internal static class StrategicOverlaySnapshotFactory
             navigationSectors,
             navigationPortals,
             powerEntities,
-            powerNetworks);
+            powerNetworks, extraction.Scenario.Simulation.SessionId, extraction.Player);
     }
 
     private static StrategicLogisticsNodeReadModel[] CaptureLogisticsNodes(

@@ -266,3 +266,7 @@ The inspector shows per-type owned unit composition and component-covered HP/rea
 ## Operations overview
 
 Click OPERATIONS above the inspector, the resource/power strip, a reported alert or the selected facility inspector to open the nonmodal operations view. Filter and page copied local facilities, inspect reported causes, focus facilities/adjacent route endpoints and open their existing Action Dock controls. Focus issues no orders; control entry waits for the exact new selection capture. Targeting hides the view temporarily; modal, pause, focus and resize transitions consume clicks. See [operations authority and limits](ProductionAndLogisticsOperations.md).
+
+## Actionable alerts
+
+Alert clicks reuse owned full-generation camera focus and selection inspection. Missing destinations open the appropriate operations filter; navigation issues no order. Retained edges are canceled by lifecycle/display transitions; targeting suppresses activation and open operations owns covered alert space. See [shared input and fallback semantics](ActionableAlertsAndStrategicMap.md).

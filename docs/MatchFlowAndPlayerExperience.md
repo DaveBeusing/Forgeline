@@ -300,3 +300,7 @@ Multi-selection presents owned live unit composition and covered averages instea
 ## Production and logistics overview
 
 An optional operations surface centralizes local facility stock, queues, power and reported bottlenecks. Stored-cargo-inclusive totals have a broader scope than the construction-resource strip. Net flow and missing utilization show N/A. Existing production/stock/supply policy controls remain in the Action Dock; opening controls does not imply accepted execution. See [operations details](ProductionAndLogisticsOperations.md).
+
+## Alert condition lifecycle
+
+The presentation alert view retains one bounded identity per session/player/condition/onset tick. Resolution removes the condition and recurrence starts a fresh identity. Restart/restore resets lifecycle capture; pause retains completed state and terminal navigation is disabled. Existing condition rules and simulation mechanics are unchanged. See [actionable alert scope](ActionableAlertsAndStrategicMap.md).
