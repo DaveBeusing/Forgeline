@@ -21,6 +21,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
     private readonly PresentationExtractionContext? _extraction;
     private readonly RuntimeAssetCatalog? _runtimeAssets;
     private readonly VfxEffectPool _vfxPool = new();
+    private readonly AlertLifecycleTracker _alerts = new();
     private readonly List<QueuedVfxInstance> _queuedVfx = new(256);
     private readonly HashSet<EntityId> _seenWrecks = [];
     private readonly Dictionary<EntityId, UnitSupplyState> _previousSupplyStates = [];
@@ -182,7 +183,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                     ? null : PlayerHoverSummaryFactory.Capture(
                     context, _extraction, interaction.HoveredEntity),
                 _extraction is null ? null : PlayerGuidanceSummaryFactory.Capture(context, _extraction, intelligenceSnapshot),
-                _extraction is not null && interaction.OperationsOpen ? OperationsSnapshotFactory.Capture(context, _extraction) : null));
+                _extraction is not null && interaction.OperationsOpen ? OperationsSnapshotFactory.Capture(context, _extraction) : null,
+                _extraction is not null && playerExperience is { } experience ? _alerts.Capture(context, _extraction, experience) : null));
     }
 
     private RenderInstance[] CaptureRenderInstances(
