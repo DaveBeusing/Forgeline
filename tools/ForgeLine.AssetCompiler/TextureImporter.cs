@@ -23,6 +23,7 @@ internal static class TextureImporter
     {
         using AssetCompilationReporter? ownedReporter = reporter is null ? new(null) : null;
         reporter ??= ownedReporter!;
+        using IDisposable texturePermit = Bc7TextureEncoder.AcquireTextureSlot(reporter, assetId, path);
         var extension = Path.GetExtension(path);
         TextureData texture = reporter.Measure("texture-decode", () => extension.ToLowerInvariant() switch
         {
