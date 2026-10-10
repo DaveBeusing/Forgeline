@@ -47,7 +47,9 @@ public readonly record struct PlayerActionPanelView(
         BattlefieldSupplyPriority.Normal,
     int HoveredIndex = -1,
     bool PointerPressed = false,
-    bool ContextualPending = false)
+    bool ContextualPending = false,
+    SimulationTick? ContextualActivationTick = null,
+    SimulationSessionId ContextualSessionId = default)
 {
     public bool IsOpen =>
         Mode != PlayerActionPanelMode.Closed;
@@ -299,10 +301,11 @@ public sealed class PlayerActionPanelController
         bool hasPress = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var pressOrigin);
         var clickPosition = hasPress ? pressOrigin : input.PointerPosition;
         bool clicked = !displayChanged && !sessionChanged && freshPress && hasPress && input.HasPointerPosition;
-        if (clicked && ContextualCommandModel.TryHit(clickPosition, snapshot, layout, out var command))
+        if (clicked && ContextualCommandModel.TryHit(clickPosition, snapshot, layout, out var command,
+                localPending: ContextualCommandModel.HasPending(view, snapshot)))
         {
             PointerCaptured = true;
-            if (command.Availability.CanActivate && (command.OpensMode || _contextualActivationTick is null))
+            if (command.Availability.CanActivate)
             {
                 if (command.OpensMode) ToggleMode(command.Mode);
                 else
@@ -417,7 +420,9 @@ public sealed class PlayerActionPanelController
             _supplyPriority,
             _hoveredIndex,
             _pointerPressed,
-            _contextualActivationTick.HasValue);
+            _contextualActivationTick.HasValue,
+            _contextualActivationTick,
+            _sessionId);
     }
 
     public bool TryTakeRequest(

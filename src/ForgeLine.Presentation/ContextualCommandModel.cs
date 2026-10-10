@@ -12,6 +12,10 @@ internal readonly record struct ContextualCommand(
 
 internal static class ContextualCommandModel
 {
+    public static bool HasPending(in PlayerActionPanelView panel, PresentationSnapshot? snapshot) =>
+        panel.ContextualPending && panel.ContextualActivationTick == snapshot?.Tick &&
+        panel.ContextualSessionId == snapshot?.SessionId;
+
     public static PlayerActionSnapshot? ResolveActions(PresentationSnapshot? snapshot) =>
         PlayerActionDockHudModel.ResolveActions(snapshot) is { } actions &&
         snapshot!.PlayerExperience is { IsMatchComplete: false } experience && experience.Tick == snapshot.Tick
@@ -20,7 +24,7 @@ internal static class ContextualCommandModel
     public static string Status(PresentationSnapshot? snapshot)
     {
         if (snapshot?.PlayerExperience is { IsMatchComplete: true }) return "MATCH COMPLETE";
-        if (ResolveActions(snapshot) is null) return "WAITING FOR COMMAND DATA";
+        if (ResolveActions(snapshot) is null) return "UPDATING COMMANDS";
         if (snapshot!.PlayerExperience!.Value.Selection.Count == 0) return "SELECT UNIT OR BUILDING";
         return snapshot.PlayerExperience.Value.Selection.Kind == PlayerSelectionKind.Mixed
             ? "MIXED SELECTION - ELIGIBLE UNITS ONLY" : "SELECTION COMMANDS";
@@ -33,7 +37,8 @@ internal static class ContextualCommandModel
         return count;
     }
 
-    public static bool TryGet(PresentationSnapshot? snapshot, int index, out ContextualCommand command)
+    public static bool TryGet(PresentationSnapshot? snapshot, int index, out ContextualCommand command,
+        bool localPending = false)
     {
         command = default;
         var actions = ResolveActions(snapshot);
@@ -46,7 +51,7 @@ internal static class ContextualCommandModel
             command = new(PlayerActionPanelMode.Tactical, index,
                 PlayerActionDockHudModel.ResolveItemTitle(PlayerActionPanelMode.Tactical, index, actions),
                 "K / TAB / ENTER",
-                actions.PendingCommandCount > 0 ? PlayerActionDockItemState.Disabled("REQUEST PENDING") :
+                localPending || actions.PendingCommandCount > 0 ? PlayerActionDockItemState.Disabled("REQUEST PENDING") :
                     PlayerActionDockHudModel.ResolveItemState(PlayerActionPanelMode.Tactical, index, actions));
             return true;
         }
@@ -79,9 +84,9 @@ internal static class ContextualCommandModel
     }
 
     public static bool TryHit(Vector2 pointer, PresentationSnapshot? snapshot,
-        in GameplayHudLayout layout, out ContextualCommand command)
+        in GameplayHudLayout layout, out ContextualCommand command, bool localPending = false)
     {
-        for (int i = 0; TryGet(snapshot, i, out command); i++)
+        for (int i = 0; TryGet(snapshot, i, out command, localPending); i++)
             if (Button(layout, i).Contains(pointer)) return true;
         command = default;
         return false;

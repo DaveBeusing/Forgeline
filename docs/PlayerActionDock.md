@@ -25,6 +25,8 @@ Primary commands require matching snapshot/action session and tick identities. C
 pending commands disable tactical controls, and local activation is limited to once per
 captured tick. Targeting and pending labels show intent; copied command-result feedback
 establishes acceptance or rejection. Stop/Hold cancel active target or placement gestures.
+The local pending session/tick is copied into the panel view; rendering, hover and
+dispatch use that same pending availability. A newer tick/session cannot inherit it.
 
 Shared bounds own the entire primary panel, including disabled/empty space. Retained
 mouse sequences recognize quick clicks and consume each press once; resize/session

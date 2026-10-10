@@ -206,7 +206,8 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         EmitQuad(region.X, region.Y, region.Width, region.Height, PanelColor, width, height);
         EmitClippedText(ContextualCommandModel.Status(snapshot), region.X + 5 * _scale,
             region.Y + 5 * _scale, region.Right - 5 * _scale, TextColor, width, height);
-        for (int i = 0; ContextualCommandModel.TryGet(snapshot, i, out var command); i++)
+        bool localPending = ContextualCommandModel.HasPending(panel, snapshot);
+        for (int i = 0; ContextualCommandModel.TryGet(snapshot, i, out var command, localPending); i++)
         {
             HudRect button = ContextualCommandModel.Button(layout, i);
             EmitQuad(button.X, button.Y, button.Width, button.Height,
@@ -220,7 +221,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                 MutedTextColor, width, height);
         }
         string footer = targeting.IsActive ? "TARGETING - ESC CANCELS" :
-            panel.ContextualPending || snapshot.PlayerActions?.PendingCommandCount > 0 ? "REQUEST PENDING - WAIT FOR RESULT" : "ADVANCED: B P U L Y K H";
+            localPending || snapshot.PlayerActions?.PendingCommandCount > 0 ? "REQUEST PENDING - WAIT FOR RESULT" : "ADVANCED: B P U L Y K H";
         EmitClippedText(footer, region.X + 5 * _scale, region.Bottom - 14 * _scale,
             region.Right - 5 * _scale, MutedTextColor, width, height);
         _scale = previousScale;

@@ -124,6 +124,12 @@ public sealed class ContextualCommandTests
         Assert.True(controller.PointerCaptured);
         Assert.True(controller.TryTakeRequest(out var request));
         Assert.Equal(PlayerActionRequestKind.SubmitStopCombat, request.Kind);
+        var view = controller.CreateView(1600, 900, snapshot.PlayerActions);
+        Assert.True(ContextualCommandModel.HasPending(view, snapshot));
+        Assert.True(ContextualCommandModel.TryGet(snapshot, 2, out var localPending,
+            ContextualCommandModel.HasPending(view, snapshot)));
+        Assert.Equal("REQUEST PENDING", localPending.Availability.DisabledReason);
+        Assert.False(ContextualCommandModel.HasPending(view, Snapshot(sessionValue: 2, actionSession: 2)));
         input.BeginFrame();
         Click(input, 2);
         controller.Update(input, snapshot, 1600, 900);
