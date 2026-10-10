@@ -33,6 +33,7 @@ public sealed class TerrainRenderer : IDisposable
     private readonly IGraphicsTexture? _fallbackNormal;
     private readonly IGraphicsTexture? _fallbackOrm;
     private readonly SceneLightingSettings _lighting;
+    private readonly TerrainSurfaceDetailSettings _surfaceDetail;
 
     private bool _disposed;
 
@@ -42,7 +43,8 @@ public sealed class TerrainRenderer : IDisposable
         TerrainMeshSettings? meshSettings = null,
         TerrainPresentationProfile? presentationProfile = null,
         RuntimeAssetCatalog? runtimeAssets = null,
-        SceneLightingSettings? lighting = null)
+        SceneLightingSettings? lighting = null,
+        TerrainSurfaceDetailSettings? surfaceDetail = null)
     {
         ArgumentNullException.ThrowIfNull(graphics);
         ArgumentNullException.ThrowIfNull(world);
@@ -51,6 +53,8 @@ public sealed class TerrainRenderer : IDisposable
             lighting ??
             SceneLightingSettings.Default;
         _lighting.Validate();
+        _surfaceDetail = surfaceDetail ?? TerrainSurfaceDetailSettings.Default;
+        _surfaceDetail.Validate();
 
         TerrainMeshSettings resolvedMeshSettings =
             meshSettings ??
@@ -66,7 +70,7 @@ public sealed class TerrainRenderer : IDisposable
         {
             _pipeline =
                 CreateTerrainPipeline(
-                    graphics);
+                    graphics, _surfaceDetail);
             if (graphics.DirectionalShadows.Enabled) _shadowPipeline = DirectionalShadowCasterPipeline.Create(graphics, false);
             _runtimeAssets =
                 runtimeAssets is null
@@ -319,7 +323,11 @@ public sealed class TerrainRenderer : IDisposable
                 _resources.Length,
                 TerrainTextureCount,
                 TerrainTextureCount,
-                submissionMilliseconds);
+                submissionMilliseconds)
+            {
+                SurfaceDetailEnabled = _surfaceDetail.Enabled,
+                RootSignatureDwords = _shadowPipeline is null ? TerrainRootConstantCount + TerrainTextureCount : 18
+            };
     }
 
     public void Dispose()
@@ -461,7 +469,7 @@ public sealed class TerrainRenderer : IDisposable
     }
 
     private static IGraphicsPipeline CreateTerrainPipeline(
-        IGraphicsDevice graphics)
+        IGraphicsDevice graphics, TerrainSurfaceDetailSettings surfaceDetail)
     {
         const string vertexShaderSource = """
             cbuffer TerrainFrame : register(b0)
@@ -552,7 +560,7 @@ public sealed class TerrainRenderer : IDisposable
             }
             """;
 
-        const string pixelShaderSource = """
+        string pixelShaderSource = """
             Texture2D ControlTexture : register(t0);
             Texture2D LayerBase0 : register(t1);
             Texture2D LayerBase1 : register(t2);
@@ -850,164 +858,32 @@ public sealed class TerrainRenderer : IDisposable
 
                 float2 worldXZ =
                     input.WorldPosition.xz;
-                float2 uv0 =
-                    worldXZ *
-                    input.LayerUvScale01.xy;
-                float2 uv1 =
-                    worldXZ *
-                    input.LayerUvScale01.zw;
-                float2 uv2 =
-                    worldXZ *
-                    input.LayerUvScale23.xy;
-                float2 uv3 =
-                    worldXZ *
-                    input.LayerUvScale23.zw;
-
-                float3 baseFactor0 =
-                    UnpackRgb10(
-                        input.LayerBaseColorPacked.x);
-                float3 baseFactor1 =
-                    UnpackRgb10(
-                        input.LayerBaseColorPacked.y);
-                float3 baseFactor2 =
-                    UnpackRgb10(
-                        input.LayerBaseColorPacked.z);
-                float3 baseFactor3 =
-                    UnpackRgb10(
-                        input.LayerBaseColorPacked.w);
-
-                float3 base0 =
-                    LayerBase0.Sample(
-                        WorldMaterialSampler,
-                        uv0).rgb *
-                    baseFactor0;
-                float3 base1 =
-                    LayerBase1.Sample(
-                        WorldMaterialSampler,
-                        uv1).rgb *
-                    baseFactor1;
-                float3 base2 =
-                    LayerBase2.Sample(
-                        WorldMaterialSampler,
-                        uv2).rgb *
-                    baseFactor2;
-                float3 base3 =
-                    LayerBase3.Sample(
-                        WorldMaterialSampler,
-                        uv3).rgb *
-                    baseFactor3;
-
-                float3 geometricNormal =
-                    normalize(
-                        input.Normal);
-                float3 tangent =
-                    float3(
-                        1.0f,
-                        0.0f,
-                        0.0f) -
-                    geometricNormal *
-                    geometricNormal.x;
-
-                if (dot(tangent, tangent) <
-                    0.0001f)
-                {
-                    tangent =
-                        float3(
-                            0.0f,
-                            0.0f,
-                            1.0f) -
-                        geometricNormal *
-                        geometricNormal.z;
-                }
-
-                tangent =
-                    normalize(
-                        tangent);
-                float3 bitangent =
-                    normalize(
-                        cross(
-                            geometricNormal,
-                            tangent)) *
-                    -1.0f;
-
-                float3 normal0 =
-                    DecodeNormal(
-                        LayerNormal0.Sample(
-                            WorldMaterialSampler,
-                            uv0).xyz);
-                float3 normal1 =
-                    DecodeNormal(
-                        LayerNormal1.Sample(
-                            WorldMaterialSampler,
-                            uv1).xyz);
-                float3 normal2 =
-                    DecodeNormal(
-                        LayerNormal2.Sample(
-                            WorldMaterialSampler,
-                            uv2).xyz);
-                float3 normal3 =
-                    DecodeNormal(
-                        LayerNormal3.Sample(
-                            WorldMaterialSampler,
-                            uv3).xyz);
-
-                normal0 =
-                    normalize(
-                        tangent * normal0.x +
-                        bitangent * normal0.y +
-                        geometricNormal * normal0.z);
-                normal1 =
-                    normalize(
-                        tangent * normal1.x +
-                        bitangent * normal1.y +
-                        geometricNormal * normal1.z);
-                normal2 =
-                    normalize(
-                        tangent * normal2.x +
-                        bitangent * normal2.y +
-                        geometricNormal * normal2.z);
-                normal3 =
-                    normalize(
-                        tangent * normal3.x +
-                        bitangent * normal3.y +
-                        geometricNormal * normal3.z);
-
-                float3 blendedNormal =
-                    normalize(
-                        normal0 *
-                            weights.x +
-                        normal1 *
-                            weights.y +
-                        normal2 *
-                            weights.z +
-                        normal3 *
-                            weights.w);
-
-                float3 orm0 =
-                    LayerOrm0.Sample(
-                        WorldMaterialSampler,
-                        uv0).rgb;
-                float3 orm1 =
-                    LayerOrm1.Sample(
-                        WorldMaterialSampler,
-                        uv1).rgb;
-                float3 orm2 =
-                    LayerOrm2.Sample(
-                        WorldMaterialSampler,
-                        uv2).rgb;
-                float3 orm3 =
-                    LayerOrm3.Sample(
-                        WorldMaterialSampler,
-                        uv3).rgb;
-                float3 orm =
-                    orm0 *
-                        weights.x +
-                    orm1 *
-                        weights.y +
-                    orm2 *
-                        weights.z +
-                    orm3 *
-                        weights.w;
+                float3 geometricNormal = normalize(input.Normal);
+                float3 tangent = float3(1, 0, 0) - geometricNormal * geometricNormal.x;
+                if (dot(tangent, tangent) < .0001) tangent = float3(0, 0, 1) - geometricNormal * geometricNormal.z;
+                tangent = normalize(tangent);
+                float3 bitangent = -normalize(cross(geometricNormal, tangent));
+                float3 dx = ddx(input.WorldPosition);
+                float3 dy = ddy(input.WorldPosition);
+                TerrainSurface layer0 = SampleTerrainSurface(LayerBase0, LayerNormal0, LayerOrm0,
+                    input.WorldPosition, geometricNormal, input.LayerUvScale01.xy, input.PackedPaletteSlots & 255,
+                    weights.x, dx, dy, tangent, bitangent);
+                TerrainSurface layer1 = SampleTerrainSurface(LayerBase1, LayerNormal1, LayerOrm1,
+                    input.WorldPosition, geometricNormal, input.LayerUvScale01.zw, (input.PackedPaletteSlots >> 8) & 255,
+                    weights.y, dx, dy, tangent, bitangent);
+                TerrainSurface layer2 = SampleTerrainSurface(LayerBase2, LayerNormal2, LayerOrm2,
+                    input.WorldPosition, geometricNormal, input.LayerUvScale23.xy, (input.PackedPaletteSlots >> 16) & 255,
+                    weights.z, dx, dy, tangent, bitangent);
+                TerrainSurface layer3 = SampleTerrainSurface(LayerBase3, LayerNormal3, LayerOrm3,
+                    input.WorldPosition, geometricNormal, input.LayerUvScale23.zw, (input.PackedPaletteSlots >> 24) & 255,
+                    weights.w, dx, dy, tangent, bitangent);
+                float3 base0 = layer0.Color * UnpackRgb10(input.LayerBaseColorPacked.x);
+                float3 base1 = layer1.Color * UnpackRgb10(input.LayerBaseColorPacked.y);
+                float3 base2 = layer2.Color * UnpackRgb10(input.LayerBaseColorPacked.z);
+                float3 base3 = layer3.Color * UnpackRgb10(input.LayerBaseColorPacked.w);
+                float3 blendedNormal = normalize(layer0.Normal * weights.x + layer1.Normal * weights.y
+                    + layer2.Normal * weights.z + layer3.Normal * weights.w);
+                float3 orm = layer0.Orm * weights.x + layer1.Orm * weights.y + layer2.Orm * weights.z + layer3.Orm * weights.w;
 
                 float2 surface0 =
                     UnpackRg16(
@@ -1062,6 +938,8 @@ public sealed class TerrainRenderer : IDisposable
                         weights.w) *
                     input.MacroTint.rgb;
 
+                ApplyTerrainMicroDetail(input.WorldPosition, dx, dy, color, blendedNormal);
+
                 color =
                     ApplySceneLighting(
                         color,
@@ -1108,6 +986,9 @@ public sealed class TerrainRenderer : IDisposable
             }
             """;
 
+        pixelShaderSource = pixelShaderSource.Replace("float4 PSMain(PixelInput input)",
+            TerrainSurfaceShader.Source + "\nfloat4 PSMain(PixelInput input)", StringComparison.Ordinal);
+
         var compiler =
             new DxcShaderCompiler();
         GraphicsShaderBytecode vertexShader =
@@ -1118,7 +999,7 @@ public sealed class TerrainRenderer : IDisposable
                 "TerrainVertex.hlsl");
         GraphicsShaderBytecode pixelShader =
             compiler.Compile(
-                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n#define DEBUG_ALPHA -2.0f\n" : "#define LINEAR_SCENE 0\n#define DEBUG_ALPHA 1.0f\n") + (graphics.DirectionalShadows.Enabled ? DirectionalShadowShader.Source : DirectionalShadowShader.Disabled) + pixelShaderSource,
+                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n#define DEBUG_ALPHA -2.0f\n" : "#define LINEAR_SCENE 0\n#define DEBUG_ALPHA 1.0f\n") + (graphics.DirectionalShadows.Enabled ? DirectionalShadowShader.Source : DirectionalShadowShader.Disabled) + TerrainSurfaceShader.Constants(surfaceDetail) + pixelShaderSource,
                 GraphicsShaderStage.Pixel,
                 "PSMain",
                 "TerrainPixel.hlsl");
