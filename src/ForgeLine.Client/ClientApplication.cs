@@ -1146,7 +1146,7 @@ internal sealed class ClientApplication
             CombatGroupCardResult cardResult = combatGroupCard.Update(inputState, inputSnapshot,
                 selectionController.Selection, interactionLayout,
                 blocked: modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
-                    hudInteraction.KeyboardCaptured || buildingPlacementController.IsActive || tacticalTargetingController.IsActive);
+                    buildingPlacementController.IsActive || tacticalTargetingController.IsActive);
             hudInteraction.CapturePointer(cardResult.Captured);
             if (cardResult.SelectionChanged)
             {
