@@ -34,11 +34,17 @@ public sealed record GraphicsPipelineDescription(
 
     public bool AlphaBlendEnabled { get; init; }
 
+    public GraphicsFrameTargetFormat TargetFormat { get; init; } = GraphicsFrameTargetFormat.Rgba8Unorm;
+
     internal void Validate()
     {
         ArgumentNullException.ThrowIfNull(VertexShader);
         ArgumentNullException.ThrowIfNull(PixelShader);
         ArgumentNullException.ThrowIfNull(VertexElements);
+        if (TargetFormat is not (GraphicsFrameTargetFormat.Rgba8Unorm or GraphicsFrameTargetFormat.Rgba16Float))
+            throw new ArgumentOutOfRangeException(nameof(TargetFormat));
+        if (TargetFormat == GraphicsFrameTargetFormat.Rgba16Float && AlphaBlendEnabled)
+            throw new NotSupportedException("Linear scene composition currently supports opaque world pipelines only.");
 
         if (VertexShader.Stage != GraphicsShaderStage.Vertex)
         {

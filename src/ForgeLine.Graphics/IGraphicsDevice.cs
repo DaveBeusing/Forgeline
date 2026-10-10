@@ -8,6 +8,15 @@ public interface IGraphicsDevice : IDisposable
     // the wrapper immediately; native release follows its final GPU use.
     GraphicsDiagnostics Diagnostics { get; }
 
+    GraphicsSceneOutputSettings SceneOutput => new(false, 1, true);
+
+    void ConfigureSceneOutput(GraphicsSceneOutputSettings settings)
+    {
+        settings.Validate();
+        if (settings.Enabled)
+            throw new NotSupportedException("This graphics device does not support linear scene composition.");
+    }
+
     // Advances only after a non-occluded successful swap-chain presentation.
     ulong PresentedFrameCount => Diagnostics.Surface.PresentedFrameCount;
 

@@ -17,12 +17,16 @@ public sealed record GraphicsConfiguration
 
     public bool AllowSoftwareAdapterFallback { get; init; } = true;
 
+    public bool ForceSoftwareAdapter { get; init; }
+
     public bool EnableVSync { get; init; } = true;
 
     public bool EnableMemoryDiagnostics { get; init; }
 
     internal void Validate()
     {
+        if (ForceSoftwareAdapter && !AllowSoftwareAdapterFallback)
+            throw new ArgumentException("Forced WARP requires software adapters to be allowed.");
         if (BufferCount is < MinimumBufferCount or > MaximumBufferCount)
         {
             throw new ArgumentOutOfRangeException(

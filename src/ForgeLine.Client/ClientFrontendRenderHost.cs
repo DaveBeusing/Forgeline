@@ -281,6 +281,7 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                     GraphicsColor.ForgeLineClear,
                     context =>
                     {
+                        context.BeginPass(GraphicsFramePass.Overlay);
                         if (view.Value.Kind == FrontendSurfaceKind.StudioSplash &&
                             !view.Value.SplashBootstrap &&
                             splashRenderer?.HasAssets == true)

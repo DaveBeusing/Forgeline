@@ -160,9 +160,17 @@ function Invoke-ClientSmoke {
         throw "Texture lifetime accounting indicates repeated or unbalanced uploads during '$ExpectedMode' qualification."
     }
 
+    $sceneDescriptors = 0
+    if ($null -ne $metrics.PSObject.Properties['framePasses'] -and $null -ne $metrics.framePasses -and
+        $null -ne $metrics.framePasses.plan.scene) {
+        $sceneDescriptors = $metrics.framePasses.plan.scene.resourceCount
+        if ($sceneDescriptors -ne $surface.bufferCount) {
+            throw "Scene target count does not match the back-buffer count during '$ExpectedMode' qualification."
+        }
+    }
     if ($metrics.shaderResourceDescriptorsUsed -ne
-        $metrics.loadedTextureCount) {
-        throw "Current SRV descriptor usage does not match the loaded texture count during '$ExpectedMode' qualification."
+        ($metrics.loadedTextureCount + $sceneDescriptors)) {
+        throw "Current SRV descriptor usage does not match asset textures plus scene targets during '$ExpectedMode' qualification."
     }
 
     if ($metrics.gpuTimingAvailable -and

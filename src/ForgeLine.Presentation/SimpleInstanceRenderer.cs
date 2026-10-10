@@ -1075,6 +1075,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     roughnessResponse +
                     emissive;
 
+            #if LINEAR_SCENE
+                return linearColor;
+            #endif
                 linearColor *=
                     sceneAmbientExposure.w;
 
@@ -1127,7 +1130,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 "InstanceVertex.hlsl");
         GraphicsShaderBytecode pixelShader =
             compiler.Compile(
-                pixelShaderSource,
+                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n" : "#define LINEAR_SCENE 0\n") + pixelShaderSource,
                 GraphicsShaderStage.Pixel,
                 "PSMain",
                 "InstancePixel.hlsl");
@@ -1137,6 +1140,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 vertexShader,
                 pixelShader)
             {
+                TargetFormat = graphics.SceneOutput.Enabled ? GraphicsFrameTargetFormat.Rgba16Float : GraphicsFrameTargetFormat.Rgba8Unorm,
                 VertexElements =
                 [
                     new GraphicsVertexElement(
@@ -1437,6 +1441,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     roughnessResponse +
                     emissive;
 
+            #if LINEAR_SCENE
+                return linearColor;
+            #endif
                 linearColor *=
                     sceneAmbientExposure.w;
 
@@ -1572,7 +1579,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 "InstanceMaterialVertex.hlsl");
         GraphicsShaderBytecode pixelShader =
             compiler.Compile(
-                pixelShaderSource,
+                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n" : "#define LINEAR_SCENE 0\n") + pixelShaderSource,
                 GraphicsShaderStage.Pixel,
                 "PSMain",
                 "InstanceMaterialPixel.hlsl");
@@ -1582,6 +1589,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 vertexShader,
                 pixelShader)
             {
+                TargetFormat = graphics.SceneOutput.Enabled ? GraphicsFrameTargetFormat.Rgba16Float : GraphicsFrameTargetFormat.Rgba8Unorm,
                 VertexElements =
                 [
                     new GraphicsVertexElement(
