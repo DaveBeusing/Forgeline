@@ -242,3 +242,17 @@ The current system deliberately does not include:
 - multi-army traffic scheduling.
 
 Those behaviors can build on the movement-group identity, shared-route lifecycle, and stable-slot foundation without moving locomotion ownership out of `GroundMovementSystem`.
+
+## Current-selection group card
+
+Multi-selection replaces single-entity inspector details with a compact group card. GROUP is the current presentation selection count, UNITS is the number of copied owned live Unit/Logistics members in that selection, and COMBAT is the subset with the existing WorldTransform/Combatant tactical eligibility. Buildings remain part of GROUP but never enter unit composition or numeric averages. Unknown authored types appear under OTHER. Full-generation identities are indexed and deduplicated once per completed-tick owned-member snapshot.
+
+HP and readiness are unweighted arithmetic means of members carrying those components. Fuel and ammunition are unweighted means over members with UnitSupplyState. Each percentage shows its contributing member count in parentheses; no coverage displays N/A rather than zero or full readiness. Missing components never contribute a fabricated value. These aggregates do not imply identical capabilities or acceptance by all selected members.
+
+Click INF, ENG, SCOUT, TANK, ART, CARGO, SUPPLY or OTHER to replace the current selection with that copied owned subtype. These represent Rifle Squad, Combat Engineer, Scout Vehicle, Main Battle Tank, Mobile Artillery, Cargo Truck, Supply Truck and unknown identities. Zero-count cells are inactive. Filtering never rewrites saved control-group slots, simulation group ownership, routes or orders. Recall still restores the assigned group.
+
+HP<=25% marks critically damaged members; SUPPLY! marks Critical/Unsupplied members. Their FOCUS buttons cycle through the currently eligible selected members in stable entity order. Camera focus revalidates owned live world instances and finite copied positions; it preserves yaw, pitch and zoom and neither changes selection nor issues an order. FOCUS GROUP centers on authorized selected instances. Hidden, foreign, wrecked or missing identities cannot be used as focus targets.
+
+The F3/NEXT control cycles the existing intended formation (Compact, Line, Column, Wedge). It applies to subsequent normal movement/tactical requests and does not claim the army has already adopted it. Existing contextual tactical commands and advanced Combat dock remain the command path. LAST CMD shows the latest copied resolved command feedback, including exact accepted/rejected target counts and PARTIAL; this is historical command feedback, not a result attributed to the current filtered subgroup.
+
+Rendering and input share CombatGroupCardLayout within the existing SelectionInspector region. Font/control size fits its width and height at high DPI/UI scale. Focus, modal, placement/targeting, pause, display and session transitions consume pending press edges. Session/tick mismatches disable the card. A selection-count mismatch while awaiting the next copied summary keeps the existing aggregate fallback rather than acting on stale controls.
