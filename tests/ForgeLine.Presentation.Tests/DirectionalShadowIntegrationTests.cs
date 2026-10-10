@@ -72,6 +72,12 @@ public sealed class DirectionalShadowIntegrationTests
         Assert.Equal(shadowed, Capture(true, false));
         byte[] withHidden = Capture(true, true);
         Assert.Equal(shadowed, withHidden);
+        if (distance == 25)
+        {
+            byte[] withoutContact = Capture(true, false, 0);
+            Assert.True(shadowed.Where((value, index) => value != withoutContact[index]).Any());
+            for (int i = 0; i < shadowed.Length; i++) Assert.InRange(shadowed[i], 0, withoutContact[i] + 1);
+        }
         Assert.True(baseline.Where((value, index) => value != shadowed[index]).Any());
         string? captureDirectory = Environment.GetEnvironmentVariable("FORGELINE_SHADOW_CAPTURE_DIRECTORY");
         if (!string.IsNullOrEmpty(captureDirectory) && !linear && distance == 25 && rasterScale == 1)
@@ -97,7 +103,7 @@ public sealed class DirectionalShadowIntegrationTests
         Assert.Equal(0, graphics.Diagnostics.DirectionalShadows!.Value.TexturePayloadBytes);
         Assert.Equal(linear ? 3 : 0, graphics.Diagnostics.Resources.ShaderResourceDescriptorsUsed);
 
-        byte[] Capture(bool enabled, bool includeHidden)
+        byte[] Capture(bool enabled, bool includeHidden, float contactStrength = 0.12f)
         {
             graphics.ConfigureDirectionalShadows(new(enabled ? DirectionalShadowQuality.Low : DirectionalShadowQuality.Disabled));
             using var renderer = new TerrainRenderer(graphics, terrain) { DebugChunksEnabled = false };
@@ -111,7 +117,8 @@ public sealed class DirectionalShadowIntegrationTests
             {
                 if (enabled)
                 {
-                    var frame = DirectionalShadowProjection.Create(camera.CaptureState(), SceneLightingSettings.Default, graphics.DirectionalShadows);
+                    var frame = DirectionalShadowProjection.Create(camera.CaptureState(), SceneLightingSettings.Default, graphics.DirectionalShadows)
+                        with { ContactStrength = contactStrength };
                     context.BeginDirectionalShadowPass(frame);
                     int draws = renderer.RenderShadow(context, frame, 128);
                     objects.RenderShadow(context, camera, world, 1, frame, 1024 - draws, 256 - draws);

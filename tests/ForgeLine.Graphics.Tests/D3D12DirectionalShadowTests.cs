@@ -36,9 +36,10 @@ public sealed class D3D12DirectionalShadowTests
     }
 
     [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public void MissingEndAndReversedShadowPassFaultBeforeSubmission(bool reversed)
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    public void MissingEndReversedAndRecordingFailuresNeverPublishSubmission(int failure)
     {
         using var platform = new WindowsPlatform();
         using IWindow window = platform.CreateWindow(new WindowConfiguration("FORGELINE Shadow Fault Test", 320, 240));
@@ -47,10 +48,17 @@ public sealed class D3D12DirectionalShadowTests
         graphics.ConfigureDirectionalShadows(new(DirectionalShadowQuality.Low));
         Assert.Throws<InvalidOperationException>(() => graphics.RenderFrame(GraphicsColor.ForgeLineClear, context =>
         {
-            if (reversed) context.BeginPass(GraphicsFramePass.Overlay);
+            if (failure == 1) context.BeginPass(GraphicsFramePass.Overlay);
             context.BeginDirectionalShadowPass(new(Matrix4x4.Identity, Vector3.Zero, 1, 1));
+            if (failure == 2)
+            {
+                context.EndDirectionalShadowPass();
+                throw new InvalidOperationException("Controlled recording failure.");
+            }
         }));
         Assert.Equal(0UL, graphics.Diagnostics.Surface.SubmittedFrameCount);
         Assert.Equal(1, graphics.Diagnostics.Health.SubmissionFaultCount);
+        Assert.Null(graphics.Diagnostics.DirectionalShadows!.Value.CpuMilliseconds);
+        Assert.Equal(0UL, graphics.Diagnostics.DirectionalShadows.Value.CpuSubmission);
     }
 }

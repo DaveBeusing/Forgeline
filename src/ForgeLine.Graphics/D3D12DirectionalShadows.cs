@@ -21,6 +21,9 @@ internal sealed partial class D3D12GraphicsDevice
     private int _constantOffset;
     private int _shadowDraws;
     private int _shadowCasters;
+    private int _submittedShadowDraws;
+    private int _submittedShadowCasters;
+    private double? _submittedShadowCpu;
     private long _shadowStarted;
     private double? _shadowCpu;
     private double? _shadowGpu;
@@ -42,6 +45,8 @@ internal sealed partial class D3D12GraphicsDevice
         _directionalShadows = settings;
         _shadowCpu = _shadowGpu = null;
         _shadowDraws = _shadowCasters = 0;
+        _submittedShadowDraws = _submittedShadowCasters = 0;
+        _submittedShadowCpu = null;
         _shadowGpuFence = 0;
         if (!settings.Enabled) return;
         int count = _configuration.BufferCount;
@@ -202,5 +207,16 @@ internal sealed partial class D3D12GraphicsDevice
 
     private GraphicsDirectionalShadowDiagnostics ShadowDiagnostics => new(_directionalShadows.Quality, _directionalShadows.Resolution,
         _directionalShadows.CascadeCount, _directionalShadows.PayloadBytes(_configuration.BufferCount),
-        _directionalShadows.Enabled ? _configuration.BufferCount : 0, _shadowDraws, _shadowCasters, _shadowCpu, _shadowGpuFence, _shadowGpu);
+        _directionalShadows.Enabled ? _configuration.BufferCount : 0, _submittedShadowDraws, _submittedShadowCasters, _submittedShadowCpu, _shadowGpuFence, _shadowGpu)
+    {
+        CpuSubmission = _cpuTimingSubmission,
+        ConstantUploadBytes = _directionalShadows.Enabled ? (long)_configuration.BufferCount * 256 * 4096 : 0
+    };
+
+    private void PublishDirectionalShadowSubmission()
+    {
+        _submittedShadowDraws = _shadowDraws;
+        _submittedShadowCasters = _shadowCasters;
+        _submittedShadowCpu = _shadowCpu;
+    }
 }

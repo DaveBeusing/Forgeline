@@ -18,6 +18,8 @@ Qualification covers:
 
 The process extends the existing asset compiler, presentation diagnostics, rendering benchmarks, and Windows client smoke path. It does not introduce a second asset pipeline or a graphics dependency into simulation or headless projects.
 
+Directional shadow qualification uses the same production asset renderers and the immutable viewer-authorized instance set. `FORGELINE_SHADOW_QUALITY` selects the optional profile. Reports separately account for shadow depth targets, frame upload arenas, caster/draw caps and completed-fence GPU shadow cost; these are not asset texture payloads. The existing asset residency and terrain/material draw thresholds remain intact. The isolated native comparison and acceptance limits are documented in [Graphics](Graphics.md#directional-shadows-and-contact-occlusion). WARP pixel/structural tests establish correctness, while target-GPU measurements compare equivalent disabled/enabled workloads. Physical DPI transitions, arbitrary moving-unit/camera visual review, long graphics soak and device removal remain separate manual acceptance.
+
 ## Acceptance Model
 
 A gameplay asset is qualified only when all applicable production conditions remain true:

@@ -325,6 +325,8 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(description);
         description.Validate();
+        if (description.VertexConstantsInBuffer && !_directionalShadows.Enabled)
+            throw new NotSupportedException("Buffered frame constants require the directional shadow frame arena.");
 
         RootSignatureFlags rootSignatureFlags =
             RootSignatureFlags.AllowInputAssemblerInputLayout |
@@ -796,6 +798,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         _commandQueue.ExecuteCommandList(_commandList);
         _submittedFrameCount++;
         SignalSubmittedFrame();
+        PublishDirectionalShadowSubmission();
         _cpuTimingSubmission = _submittedFrameCount;
         _worldCpuMilliseconds = Math.Max(0, _recordedWorldCpuMilliseconds - (_shadowCpu ?? 0));
         _overlayCpuMilliseconds = _recordedOverlayCpuMilliseconds;

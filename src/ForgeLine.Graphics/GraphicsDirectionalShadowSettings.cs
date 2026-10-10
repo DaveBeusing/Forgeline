@@ -42,4 +42,9 @@ public readonly record struct GraphicsDirectionalShadowFrame(Matrix4x4 ViewProje
 
 public readonly record struct GraphicsDirectionalShadowDiagnostics(DirectionalShadowQuality Quality, int Resolution, int CascadeCount,
     long TexturePayloadBytes, int ShaderResourceDescriptors, int DrawCalls, int SubmittedCasters, double? CpuMilliseconds,
-    ulong GpuSubmissionFence, double? GpuMilliseconds);
+    ulong GpuSubmissionFence, double? GpuMilliseconds)
+{
+    public ulong CpuSubmission { get; init; }
+    public long ConstantUploadBytes { get; init; }
+    public int MaximumPcfDepthSamples => Quality == DirectionalShadowQuality.Disabled ? 0 : 4;
+}
