@@ -71,6 +71,8 @@ public sealed class OperationsController
     private bool _initialized;
     private EntityId _lastRouteFocus;
     public OperationsView View { get; private set; }
+    public void OpenCategory(OperationsCategory category, SimulationSessionId session, PresentationInteractionState interaction)
+    { View = new(true, category, Session: session); interaction.SetOperationsOpen(true); }
     public void CancelInput(InputState input) => _press = input.MousePressSequence(PlatformMouseButton.Left);
     public OperationsInteraction Update(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout,
         PresentationInteractionState interaction, bool blocked = false)

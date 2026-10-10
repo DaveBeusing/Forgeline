@@ -281,7 +281,9 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             if (snapshot?.PlayerExperience is PlayerExperienceSnapshot experience)
             {
                 EmitTopStatusBar(experience, layout.TopStatusBar, graphics.Width, graphics.Height);
-                EmitNotificationStack(experience, layout.AlertStack, graphics.Width, graphics.Height);
+                if (ActionableAlertSnapshot.Resolve(snapshot) is { } alerts)
+                    EmitActionableNotifications(experience, alerts, layout, graphics.Width, graphics.Height);
+                else EmitNotificationStack(experience, layout.AlertStack, graphics.Width, graphics.Height);
             }
             else
             {
@@ -790,6 +792,28 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         }
     }
 
+    private void EmitActionableNotifications(in PlayerExperienceSnapshot experience, ActionableAlertSnapshot alerts, in GameplayHudLayout layout, int width, int height)
+    {
+        int maximum = (int)(layout.AlertStack.Height / (21 * layout.Scale));
+        for (int row = 0; row < maximum; row++)
+        {
+            var item = ActionableAlertLayout.Item(experience, layout, row);
+            var rect = ActionableAlertLayout.Row(layout, row);
+            if (item.Feedback) EmitCommandFeedbackCard(experience.Feedback, layout.AlertStack, rect.Y, width, height);
+            else if (item.Hidden > 0) EmitAlertCard(PlayerAlertState.None, "MORE - OPEN OPS", item.Hidden, layout.AlertStack, rect.Y, width, height);
+            else if (item.Kind != PlayerAlertState.None)
+                for (int i = 0; i < alerts.Alerts.Count; i++)
+                {
+                    var alert = alerts.Alerts[i];
+                    if (alert.Identity.Kind != item.Kind) continue;
+                    int count = item.Kind == PlayerAlertState.SupplyCritical ? experience.CriticalSupplyUnits :
+                        item.Kind == PlayerAlertState.ProductionBlocked ? experience.BlockedProductionFacilities : 0;
+                    EmitAlertCard(item.Kind, alert.Label, count, layout.AlertStack, rect.Y, width, height, alert.Target.IsValid ? " FOCUS" : " OPS");
+                    break;
+                }
+        }
+    }
+
     private void EmitAlertCard(
         PlayerAlertState alert,
         string label,
@@ -797,7 +821,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         in HudRect region,
         float y,
         int width,
-        int height)
+        int height, string suffix = "")
     {
         Span<char> buffer =
             stackalloc char[96];
@@ -813,6 +837,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 severity));
         text.Append(" ");
         text.Append(label);
+        text.Append(suffix);
 
         if (count > 0)
         {
