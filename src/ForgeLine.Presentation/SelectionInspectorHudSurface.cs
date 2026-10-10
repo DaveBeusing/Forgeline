@@ -137,7 +137,9 @@ internal sealed class SelectionInspectorHudSurface : IGameplayHudSurface
         _renderer.Render(
             context.Graphics,
             context.Snapshot,
-            context.Layout);
+            context.Layout,
+            context.CombatGroups.Selection,
+            context.ActiveFormation);
 
     public void Dispose() =>
         _renderer.Dispose();
@@ -191,7 +193,9 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
     public void Render(
         IGraphicsCommandContext graphics,
         PresentationSnapshot snapshot,
-        in GameplayHudLayout layout)
+        in GameplayHudLayout layout,
+        SelectedCombatGroup? group = null,
+        FormationTemplate formation = default)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(graphics);
@@ -212,7 +216,10 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         _scale =
             layout.Scale;
 
-        EmitInspector(
+        if (experience.Selection.Count > 1 && group is not null && group.Tick == snapshot.Tick &&
+            group.TotalCount == experience.Selection.Count && SelectedCombatGroup.Resolve(snapshot) is not null)
+            EmitGroupCard(group, experience.Feedback, formation, layout, graphics.Width, graphics.Height);
+        else EmitInspector(
             experience.Selection,
             layout.SelectionInspector,
             graphics.Width,
@@ -261,6 +268,66 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         _pipeline.Dispose();
         _disposed = true;
     }
+
+    private void EmitGroupCard(SelectedCombatGroup group, in PlayerCommandFeedback feedback,
+        FormationTemplate formation, in GameplayHudLayout layout, int width, int height)
+    {
+        _scale = CombatGroupCardLayout.Scale(layout);
+        HudRect region = layout.SelectionInspector;
+        EmitQuad(region.X, region.Y, region.Width, region.Height, PanelColor, width, height);
+        Span<char> buffer = stackalloc char[128];
+        var text = new HudTextBuilder(buffer);
+        text.Append("GROUP "); text.Append(group.TotalCount); text.Append(" LIVE "); text.Append(group.LiveCount);
+        text.Append(" COMBAT "); text.Append(group.CombatCount);
+        GroupText(text.Written, 6, region, TextColor, width, height);
+        text = new HudTextBuilder(buffer);
+        text.Append("AVG HP "); AppendCovered(ref text, group.Health, group.HealthCount);
+        text.Append(" READY "); AppendCovered(ref text, group.Readiness, group.ReadinessCount);
+        GroupText(text.Written, 18, region, MutedTextColor, width, height);
+        text = new HudTextBuilder(buffer);
+        text.Append("AVG FUEL "); AppendCovered(ref text, group.Fuel, group.SupplyCount);
+        text.Append(" AMMO "); AppendCovered(ref text, group.Ammunition, group.SupplyCount);
+        GroupText(text.Written, 30, region, MutedTextColor, width, height);
+        for (int index = 0; index < 12; index++)
+        {
+            var rect = CombatGroupCardLayout.Control(layout, index);
+            text = new HudTextBuilder(buffer);
+            bool enabled;
+            if (index < 8)
+            {
+                int count = group.Composition(index);
+                text.Append(SelectedCombatGroup.TypeLabel(index)); text.Append(" "); text.Append(count);
+                enabled = count > 0;
+            }
+            else if (index == 8)
+            { text.Append("HP<=25% "); text.Append(group.DamagedCount); text.Append(" FOCUS"); enabled = group.DamagedCount > 0; }
+            else if (index == 9)
+            { text.Append("SUPPLY! "); text.Append(group.UnsuppliedCount); text.Append(" FOCUS"); enabled = group.UnsuppliedCount > 0; }
+            else if (index == 10)
+            { text.Append("F3 "); text.Append(formation switch { FormationTemplate.Line => "LINE", FormationTemplate.Column => "COLUMN", FormationTemplate.Wedge => "WEDGE", _ => "COMPACT" }); text.Append(" NEXT"); enabled = group.CombatCount > 0; }
+            else { text.Append("FOCUS GROUP"); enabled = group.LiveCount > 0; }
+            EmitQuad(rect.X, rect.Y, rect.Width, rect.Height, enabled ? GameplayHudVisualStyle.PanelRaised : PanelColor, width, height);
+            EmitClippedText(text.Written, rect.X + _scale, rect.Y + _scale, rect.Right - _scale,
+                enabled ? TextColor : MutedTextColor, width, height);
+        }
+        text = new HudTextBuilder(buffer);
+        text.Append("LAST CMD ");
+        text.Append(feedback.State switch { PlayerCommandFeedbackState.Partial => "PARTIAL ",
+            PlayerCommandFeedbackState.Accepted => "ACCEPTED ", PlayerCommandFeedbackState.Rejected => "REJECTED ", _ => "NONE" });
+        if (feedback.State != PlayerCommandFeedbackState.None)
+        { text.Append(feedback.AcceptedTargets); text.Append(" OK / "); text.Append(feedback.RejectedTargets); text.Append(" REJECTED"); }
+        GroupText(text.Written, 98, region, TextColor, width, height);
+    }
+
+    private static void AppendCovered(ref HudTextBuilder text, double value, int count)
+    {
+        if (count == 0) { text.Append("N/A"); return; }
+        text.Append(value * 100, "F0"); text.Append("%("); text.Append(count); text.Append(")");
+    }
+
+    private void GroupText(ReadOnlySpan<char> text, float offset, in HudRect region, Vector4 color, int width, int height) =>
+        EmitClippedText(text, region.X + 6 * _scale, region.Y + offset * _scale,
+            region.Right - 6 * _scale, color, width, height);
 
     private void EmitInspector(
         in PlayerSelectionSummary selection,
