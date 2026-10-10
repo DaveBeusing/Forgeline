@@ -16,9 +16,17 @@ public static class OperationsLayout
     public const int PageSize = 6;
     public static HudRect Entry(in GameplayHudLayout layout)
     {
-        float y = MathF.Max(layout.TopStatusBar.Bottom, layout.SelectionInspector.Y - 20 * layout.Scale);
-        return new(layout.SecondaryView.X, y, MathF.Min(126 * layout.Scale, layout.SelectionInspector.Width),
-            MathF.Min(16 * layout.Scale, MathF.Max(0, layout.SelectionInspector.Y - y)));
+        float band = EntryBand(layout);
+        if (band <= 0) return default;
+        float scale = MathF.Min(MathF.Min(layout.Scale, 1.25f), band / 20);
+        return new(layout.SecondaryView.X, layout.SecondaryView.Bottom - band + 2 * scale,
+            MathF.Min(126 * scale, layout.SecondaryView.Width), 16 * scale);
+    }
+    internal static float EntryBand(in GameplayHudLayout layout)
+    {
+        float scale = MathF.Min(layout.Scale, 1.25f);
+        float band = MathF.Min(20 * scale, MathF.Max(0, layout.SecondaryView.Height - 38 * scale));
+        return band >= 14 * scale ? band : 0;
     }
     public static HudRect Panel(in GameplayHudLayout layout) => new(layout.SafeArea.X, layout.TopStatusBar.Bottom + 8 * layout.Scale,
         MathF.Min(450 * layout.Scale, MathF.Max(0, layout.ActionDock.X - layout.SafeArea.X - 8 * layout.Scale)),

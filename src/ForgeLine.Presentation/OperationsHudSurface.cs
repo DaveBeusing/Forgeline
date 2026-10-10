@@ -30,9 +30,11 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
         _count = 0; _line = 0;
         _scale = MathF.Min(context.Layout.Scale, OperationsLayout.Entry(context.Layout).Width / 126);
         _bounds = OperationsLayout.Entry(context.Layout);
-        if (_bounds.IsEmpty) return;
-        Quad(_bounds, GameplayHudVisualStyle.PanelBackground);
-        Line("OPERATIONS", true);
+        if (!_bounds.IsEmpty)
+        {
+            Quad(_bounds, GameplayHudVisualStyle.PanelBackground);
+            Line("OPERATIONS", true);
+        }
         var view = context.Operations;
         if (view.Open && !view.Suppressed && view.Session == context.Snapshot.SessionId)
         {
@@ -109,6 +111,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                 }
             }
         }
+        if (_count == 0) return;
         if (!_buffers.TryGetValue(context.Graphics.FrameIndex, out var buffer))
         { buffer = _graphics.CreateBuffer(new GraphicsBufferDescription(MaxVertices * 24UL, GraphicsBufferMemory.Upload)); _buffers.Add(context.Graphics.FrameIndex, buffer); }
         buffer.SetData<OperationsVertex>(_vertices.AsSpan(0, _count));

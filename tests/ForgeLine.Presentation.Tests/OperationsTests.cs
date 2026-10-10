@@ -221,7 +221,7 @@ public sealed class OperationsTests
             Assert.True(panel.Contains(new(control.X, control.Y)));
             Assert.True(panel.Contains(new(control.Right, control.Bottom)));
         }
-        Assert.False(OperationsLayout.Entry(layout).Intersects(layout.SecondaryView));
+        Assert.False(OperationsLayout.Entry(layout).Intersects(GameplayGuidanceLayout.Resolve(layout)));
         var data = new OperationsSnapshot(new(1), new(4), new(1), [Facility(new(1, 1))], [], [], 1, 0);
         using var device = new SelectionOverlayRenderingTests.RecordingDevice();
         using var renderer = new OperationsHudSurface(device);
