@@ -151,6 +151,17 @@ public sealed class ActionableAlertTests
         for (int i = 0; i < 256; i++) controller.Update(input, snapshot, layout);
         Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
     }
+    [Fact]
+    public void RowGapsCapturePointerWithoutActivatingInvisibleControls()
+    {
+        var controller = new ActionableAlertController(); var input = new InputState(); var layout = GameplayHudLayout.Create(1600, 900, 96);
+        var snapshot = Snapshot(new AlertLifecycleTracker().Capture(new(1), Experience(4, PlayerAlertState.LowPower), []));
+        controller.Update(input, snapshot, layout);
+        var gap = new HudRect(layout.AlertStack.X, layout.AlertStack.Y + 19 * layout.Scale, layout.AlertStack.Width, layout.Scale);
+        Click(input, gap);
+        var result = controller.Update(input, snapshot, layout);
+        Assert.True(result.Captured); Assert.False(result.OpenOperations); Assert.False(result.Target.IsValid);
+    }
     private static PlayerExperienceSnapshot Experience(ulong tick = 4, PlayerAlertState flags = default) =>
         default(PlayerExperienceSnapshot) with { Tick = new(tick), Player = new(1), Alerts = flags, MatchStatus = PlayerMatchStatus.Active };
     private static PresentationSnapshot Snapshot(ActionableAlertSnapshot alerts, ulong tick = 4, ulong session = 1, uint player = 1, bool terminal = false) =>

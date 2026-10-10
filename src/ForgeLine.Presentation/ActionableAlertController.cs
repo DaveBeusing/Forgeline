@@ -10,7 +10,7 @@ public readonly record struct AlertNotification(PlayerAlertState Kind, bool Feed
 public static class ActionableAlertLayout
 {
     public static HudRect Row(in GameplayHudLayout layout, int row) => new(layout.AlertStack.X,
-        layout.AlertStack.Y + row * 21 * layout.Scale, layout.AlertStack.Width, 21 * layout.Scale);
+        layout.AlertStack.Y + row * 21 * layout.Scale, layout.AlertStack.Width, 18 * layout.Scale);
     public static AlertNotification Item(in PlayerExperienceSnapshot experience, in GameplayHudLayout layout, int row)
     {
         int maximum = (int)(layout.AlertStack.Height / (21 * layout.Scale));
@@ -57,7 +57,7 @@ public sealed class ActionableAlertController
         bool captured = input.HasPointerPosition && layout.AlertStack.Contains(input.PointerPosition) || fresh && originValid && layout.AlertStack.Contains(origin);
         if (!fresh || changed || !originValid || !layout.AlertStack.Contains(origin) || !input.HasPointerPosition || !layout.AlertStack.Contains(input.PointerPosition)) return new(captured);
         int row = (int)((origin.Y - layout.AlertStack.Y) / (21 * layout.Scale));
-        if (!ActionableAlertLayout.Row(layout, row).Contains(input.PointerPosition)) return new(true);
+        if (!ActionableAlertLayout.Row(layout, row).Contains(origin) || !ActionableAlertLayout.Row(layout, row).Contains(input.PointerPosition)) return new(true);
         var item = ActionableAlertLayout.Item(experience, layout, row);
         if (item.Hidden > 0) return new(true, OpenOperations: true);
         if (item.Kind == PlayerAlertState.None) return new(true);
