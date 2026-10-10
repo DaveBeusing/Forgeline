@@ -50,6 +50,9 @@ derive PATCH from Git history or commit CI-generated versions back to a branch.
 | InformationalVersion | Version with SDK-appended full SourceRevisionId exactly once |
 
 Numeric version components are limited to 65534 for .NET/Windows fields.
+The migration deliberately normalizes historical per-commit assembly identities
+to `0.1.0.0`; precompiled external consumers of old library identities must be
+rebuilt. No stable SDK binding compatibility is promised by the 0.y.z baseline.
 The menu displays version/channel and 12 SHA characters; crash reports record
 the full informational version, channel, full SHA and CI run/attempt ID.
 PR provenance identifies the tested synthetic merge commit.
@@ -70,6 +73,10 @@ reserves a new number, including attempts of the same commit with different
 inputs. Once a stable tag exists, the line is closed to further prereleases.
 Stable reruns fail on any existing release, including incomplete drafts.
 Release creation/upload never updates, clobbers or deletes existing assets.
+Publication also creates the atomic permanent claim
+`release-publication/vX.Y.Z[-channel.N]`. Claims prevent concurrent publication
+or retry after interruption under the same version, independently of release
+draft behavior. Existing releases and drafts are checked with pagination.
 
 PR jobs have read-only repository permissions and never reserve tags or run
 publication. The write-permitted allocation job executes only on canonical
@@ -115,6 +122,7 @@ activation blockers until an administrator applies and verifies them:
 - Protect master and require the complete `build-test` check, up-to-date PRs,
   no force-push/deletion and the established no-squash convention.
 - Protect `v*` tags against update/deletion, including unused reservations.
+- Protect `release-publication/*` claims against update/deletion.
 - Enable GitHub immutable releases.
 - Configure the `release` environment to allow master only and require the
   release owner's review as appropriate for candidate/stable authorization.
@@ -132,6 +140,7 @@ The adoption audit found master unprotected and an empty ruleset collection.
 pwsh ./build/Validate-SemVer.ps1 -BaseRef origin/master
 pwsh ./build/Test-Versioning.ps1
 pwsh ./build/Test-VersionAllocation.ps1
+pwsh ./build/Test-ReleasePublication.ps1
 pwsh ./build/Validate-ProjectReferences.ps1
 dotnet build ForgeLine.sln --configuration Release
 dotnet test --solution ForgeLine.sln --configuration Release --no-build

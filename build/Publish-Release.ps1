@@ -37,8 +37,20 @@ $notes = Get-Content -LiteralPath $NotesPath -Raw
 if ([string]::IsNullOrWhiteSpace($notes)) { throw 'Release notes must not be empty.' }
 $notes += "`n`nVersion: $Version`nSource: $SourceRevision`nBuild: $($provenance.runUrl)`nSHA-256: $checksum`n"
 
-# Creation fails on every collision, including an incomplete draft from an
-# interrupted attempt. There is no update/clobber/delete path.
+# Enumerate authenticated releases, including drafts, before claiming the
+# publication. Pagination prevents old collisions from escaping the check.
+for ($page = 1; ; $page++) {
+    $existing = @(Invoke-GitHub -Path "repos/$repo/releases?per_page=100&page=$page")
+    if (@($existing | Where-Object tag_name -eq $tagName).Count) { throw 'Release or draft already exists.' }
+    if ($existing.Count -lt 100) { break }
+}
+# Atomic durable publication claim: no two jobs, or reruns after interruption,
+# can publish different bytes under one version even if draft creation is delayed.
+# Claims are permanent and must not be deleted or moved.
+$claim = Invoke-GitHub -Method POST -Path "repos/$repo/git/refs" -Body @{
+    ref = "refs/tags/release-publication/$tagName"; sha = $reference.object.sha
+}
+# There is no update/clobber/delete path.
 $release = Invoke-GitHub -Method POST -Path "repos/$repo/releases" -Body @{
     tag_name = $tagName; name = "FORGELINE $Version"; body = $notes
     draft = $true; prerelease = $Version.Contains('-')

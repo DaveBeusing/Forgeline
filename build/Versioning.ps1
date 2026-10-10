@@ -32,5 +32,10 @@ function Invoke-GitHub {
     if ($null -ne $Body) { $result = $Body | ConvertTo-Json -Depth 20 -Compress | & gh @arguments --input - }
     else { $result = & gh @arguments }
     if ($LASTEXITCODE -ne 0) { throw "GitHub $Method $Path failed; publication is prohibited." }
-    return ($result -join "`n" | ConvertFrom-Json)
+    $parsed = $result -join "`n" | ConvertFrom-Json -NoEnumerate
+    # Empty registry/release lists must produce zero objects, not a null entry
+    # that strict-mode property filters would treat as a malformed response.
+    foreach ($item in @($parsed)) {
+        if ($null -ne $item) { Write-Output $item }
+    }
 }

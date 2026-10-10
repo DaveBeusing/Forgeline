@@ -91,6 +91,7 @@ jobs:
         run: |
           ./build/Test-Versioning.ps1
           ./build/Test-VersionAllocation.ps1
+          ./build/Test-ReleasePublication.ps1
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v6
