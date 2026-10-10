@@ -194,7 +194,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: engine-diagnostics
+          name: engine-diagnostics-${{ env.FORGELINE_BUILD_VERSION }}-attempt-${{ github.run_attempt }}
           path: |
             artifacts/*.json
             artifacts/maps/*.json
