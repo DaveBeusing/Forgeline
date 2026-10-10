@@ -35,7 +35,8 @@ public readonly record struct GameplayHudRenderContext(
     DebugDraw? GameplayOverlay,
     RuntimeMetricsView RuntimeMetrics = default,
     HoverTooltipView HoverTooltip = default,
-    bool ShowRuntimeMetrics = false);
+    bool ShowRuntimeMetrics = false,
+    OperationsView Operations = default);
 
 public interface IGameplayHudSurface : IDisposable
 {

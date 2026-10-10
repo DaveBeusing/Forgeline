@@ -246,7 +246,7 @@ public readonly record struct GameplayHudLayout(
                 MathF.Max(
                     0.0f,
                     secondaryBottom -
-                    secondaryTop));
+                    secondaryTop - 20 * scale));
 
         return new GameplayHudLayout(
             viewportWidth,

@@ -37,7 +37,8 @@ public sealed class GameplayHudRenderer : IDisposable
             new RtsInformationHudSurface(
                 graphics,
                 runtimeAssets),
-            new WorldHoverTooltipSurface(graphics)
+            new WorldHoverTooltipSurface(graphics),
+            new OperationsHudSurface(graphics)
         ];
     }
 
@@ -86,7 +87,8 @@ public sealed class GameplayHudRenderer : IDisposable
         DebugDraw? gameplayOverlay = null,
         RuntimeMetricsView runtimeMetrics = default,
         HoverTooltipView hoverTooltip = default,
-        bool showRuntimeMetrics = false)
+        bool showRuntimeMetrics = false,
+        OperationsView operations = default)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(context);
@@ -127,7 +129,8 @@ public sealed class GameplayHudRenderer : IDisposable
                 gameplayOverlay,
                 runtimeMetrics,
                 hoverTooltip,
-                showRuntimeMetrics);
+                showRuntimeMetrics,
+                operations);
 
         foreach (IGameplayHudSurface surface in _surfaces)
         {

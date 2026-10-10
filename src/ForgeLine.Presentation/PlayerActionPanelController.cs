@@ -457,6 +457,15 @@ public sealed class PlayerActionPanelController
         _desiredStockQuantity = 0.0;
     }
 
+    public void OpenOperationsControls(PlayerActionPanelMode mode)
+    {
+        if (mode is not (PlayerActionPanelMode.Production or PlayerActionPanelMode.UnitProduction or PlayerActionPanelMode.Logistics or PlayerActionPanelMode.Supply)) return;
+        Close();
+        _pendingRequest = null;
+        _contextualActivationTick = null;
+        ToggleMode(mode);
+    }
+
     private void ToggleMode(
         PlayerActionPanelMode requested)
     {

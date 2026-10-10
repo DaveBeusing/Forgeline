@@ -114,7 +114,8 @@ internal readonly record struct ClientRenderFrame(
     bool SurfaceSuspended = false,
     CombatGroupOverviewView? CombatGroups = null,
     bool MetricsActive = true,
-    HoverTooltipView HoverTooltip = default);
+    HoverTooltipView HoverTooltip = default,
+    OperationsView Operations = default);
 
 internal sealed class ClientRenderHost : IDisposable
 {
@@ -655,7 +656,8 @@ internal sealed class ClientRenderHost : IDisposable
                             gameplayDraw,
                             runtimeMetrics,
                             current.HoverTooltip,
-                            showRuntimeMetrics: current.OverlayEnabled);
+                            showRuntimeMetrics: current.OverlayEnabled,
+                            operations: current.Operations);
                         developmentOverlayRenderer.Render(
                             context,
                             overlayMetrics,
