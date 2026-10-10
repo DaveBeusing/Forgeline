@@ -1,5 +1,6 @@
 using System.Numerics;
 using ForgeLine.Game;
+using ForgeLine.Input;
 
 namespace ForgeLine.Presentation;
 
@@ -38,8 +39,9 @@ internal static class ContextualCommandModel
     }
 
     public static bool TryGet(PresentationSnapshot? snapshot, int index, out ContextualCommand command,
-        bool localPending = false, bool selectionPending = false)
+        bool localPending = false, bool selectionPending = false, GameplayBindingRegistry? bindings = null)
     {
+        bindings ??= GameplayBindingRegistry.Default;
         command = default;
         var actions = ResolveActions(snapshot);
         if (index < 0 || actions is null || snapshot!.PlayerExperience is not { } experience ||
@@ -50,7 +52,7 @@ internal static class ContextualCommandModel
             if (index >= 6) return false;
             command = new(PlayerActionPanelMode.Tactical, index,
                 PlayerActionDockHudModel.ResolveItemTitle(PlayerActionPanelMode.Tactical, index, actions),
-                "K / TAB / ENTER",
+                bindings.TacticalPrompt,
                 selectionPending ? PlayerActionDockItemState.Disabled("UPDATING SELECTION") :
                 localPending || actions.PendingCommandCount > 0 ? PlayerActionDockItemState.Disabled("REQUEST PENDING") :
                     PlayerActionDockHudModel.ResolveItemState(PlayerActionPanelMode.Tactical, index, actions));
@@ -66,7 +68,7 @@ internal static class ContextualCommandModel
         else if (actions.Supply is not null && index-- == 0) mode = PlayerActionPanelMode.Supply;
         if (mode == PlayerActionPanelMode.Closed) return false;
         command = new(mode, -1, PlayerActionDockHudModel.ResolveModeLabel(mode),
-            PlayerActionDockHudModel.ResolveModeShortcut(mode), selectionPending ?
+            PlayerActionDockHudModel.ResolveModeShortcut(mode, bindings), selectionPending ?
                 PlayerActionDockItemState.Disabled("UPDATING SELECTION") : PlayerActionDockItemState.Enabled);
         return true;
     }

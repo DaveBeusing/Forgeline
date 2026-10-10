@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using ForgeLine.Game;
+using ForgeLine.Input;
 using ForgeLine.Graphics;
 
 namespace ForgeLine.Presentation;
@@ -19,6 +20,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers = new(4);
     private readonly OverlayVertex[] _vertices =
         new OverlayVertex[MaxVertices];
+    private GameplayBindingRegistry _bindings = GameplayBindingRegistry.Default;
     private int _vertexCount;
     private float _uiScale = 1.0f;
     private bool _disposed;
@@ -49,6 +51,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         DebugDraw? gameplayOverlay = null)
     {
         ThrowIfDisposed();
+        _bindings = preAlphaUx.Bindings ?? GameplayBindingRegistry.Default;
         ArgumentNullException.ThrowIfNull(context);
 
         _vertexCount = 0;
@@ -384,7 +387,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         {
             builder.Append("PAUSED");
             builder.NewLine();
-            builder.Append("ESC OR SPACE RESUME");
+            builder.Append(_bindings.Text("ESC OR SPACE RESUME"));
             builder.NewLine();
             builder.Append("F1 CONTROLS");
 
@@ -430,19 +433,19 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             builder.NewLine();
             builder.Append("LEFT CLICK SELECT  SHIFT LEFT CLICK MULTI SELECT");
             builder.NewLine();
-            builder.Append("RIGHT CLICK MOVE  B BUILD  P PROCESS  U UNITS");
+            builder.Append(_bindings.Text("RIGHT CLICK MOVE  B BUILD  P PROCESS  U UNITS"));
             builder.NewLine();
-            builder.Append("L LOGISTICS  Y SUPPLY  K COMBAT");
+            builder.Append(_bindings.Text("L LOGISTICS  Y SUPPLY  K COMBAT"));
             builder.NewLine();
-            builder.Append("SHIFT+F1 PERFORMANCE METRICS  F2 WORLD DEBUG  F3 FORMATION");
+            builder.Append(_bindings.Text("SHIFT+F1 PERFORMANCE METRICS  F2 WORLD DEBUG  F3 FORMATION"));
             builder.NewLine();
-            builder.Append("F4 COMMAND CORE  F5 POWER PLANT  F6 EXTRACTOR");
+            builder.Append(_bindings.Text("F4 COMMAND CORE  F5 POWER PLANT  F6 EXTRACTOR"));
             builder.NewLine();
-            builder.Append("F7 STORAGE DEPOT  F8 SMELTER  F9 ROTATE BUILDING");
+            builder.Append(_bindings.Text("F7 STORAGE DEPOT  F8 SMELTER  F9 ROTATE BUILDING"));
             builder.NewLine();
-            builder.Append("F10 STRATEGIC OVERLAY  F11 MINIMAP  F1/F12/ESC CLOSE HELP");
+            builder.Append(_bindings.Text("F10 STRATEGIC OVERLAY  F11 MINIMAP  F1/F12/ESC CLOSE HELP"));
             builder.NewLine();
-            builder.Append("ESC OR SPACE PAUSE MENU");
+            builder.Append(_bindings.Text("ESC OR SPACE PAUSE MENU"));
             builder.NewLine();
             builder.NewLine();
             builder.Append("QUICK START");
@@ -451,13 +454,13 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             builder.NewLine();
             builder.Append("2 RIGHT CLICK TO MOVE AND SCOUT");
             builder.NewLine();
-            builder.Append("3 BUILD POWER AND INDUSTRY WITH B");
+            builder.Append(_bindings.Text("3 BUILD POWER AND INDUSTRY WITH B"));
             builder.NewLine();
-            builder.Append("4 PROCESS MATERIALS WITH P AND PRODUCE UNITS WITH U");
+            builder.Append(_bindings.Text("4 PROCESS MATERIALS WITH P AND PRODUCE UNITS WITH U"));
             builder.NewLine();
-            builder.Append("5 USE L AND Y TO KEEP THE FRONT SUPPLIED");
+            builder.Append(_bindings.Text("5 USE L AND Y TO KEEP THE FRONT SUPPLIED"));
             builder.NewLine();
-            builder.Append("6 USE K FOR ATTACK ATTACK-MOVE RETREAT AND ARTILLERY");
+            builder.Append(_bindings.Text("6 USE K FOR ATTACK ATTACK-MOVE RETREAT AND ARTILLERY"));
             builder.NewLine();
             builder.Append("7 DESTROY THE ENEMY COMMAND CORE TO WIN");
             builder.NewLine();

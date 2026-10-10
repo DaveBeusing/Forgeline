@@ -117,3 +117,7 @@ Run `OperationsTests` for owned opt-in capture, retained/deduplicated inventorie
 ## Alert and strategic-map contracts
 
 Run ActionableAlertTests and StrategicMapExperienceTests with existing minimap, intelligence, display and client journeys. The alert-map-hotpaths mode checks active-alert full HUD/minimap and idle input at 1/10/100/1000 entities across seven layers, 128 warmups and 256 samples, with zero warm allocation. It excludes live extraction, world overlay drawing, GPU and Present. See [manual limits and authority](ActionableAlertsAndStrategicMap.md).
+
+## Gameplay binding and visual contracts
+
+Registry, settings recovery/editor and rebinding tests cover conflicts, camera preservation, migration, keyboard-only use, modal suppression and focus/resize boundaries. The committed command geometry fixture checks 135 display/scale/state combinations with long labels and alternate bindings. The gameplay UI benchmark records 120 warmed cases with glyph/vertex counts, managed allocation and requested upload bytes/calls. Native startup qualification and the manual screenshot/monitor checklist remain separate acceptance evidence. See [measurement scope and manual protocol](GameplayInputAccessibilityAndQualification.md).

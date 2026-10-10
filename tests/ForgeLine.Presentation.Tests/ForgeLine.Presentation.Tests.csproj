@@ -11,4 +11,7 @@
     <ProjectReference Include="../../src/ForgeLine.Presentation/ForgeLine.Presentation.csproj" />
     <ProjectReference Include="../../src/ForgeLine.Input/ForgeLine.Input.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Fixtures/gameplay-ui-geometry.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

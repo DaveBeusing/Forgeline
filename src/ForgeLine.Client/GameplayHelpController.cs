@@ -22,8 +22,8 @@ internal sealed class GameplayHelpController
     public bool Update(InputState input, bool enabled)
     {
         bool shift = input.IsKeyDown(PlatformKey.LeftShift) || input.IsKeyDown(PlatformKey.RightShift);
-        bool help = !shift && (input.IsKeyDown(PlatformKey.F1) || input.IsKeyDown(PlatformKey.F12));
-        bool escape = input.IsKeyDown(PlatformKey.Escape);
+        bool help = !shift && (input.IsKeyDown(GameplayBindingRegistry.HelpKey) || input.IsKeyDown(GameplayBindingRegistry.HelpAlias));
+        bool escape = input.IsKeyDown(GameplayBindingRegistry.CancelKey);
         bool wasVisible = Visible;
 
         if (enabled && help && !_helpHeld)

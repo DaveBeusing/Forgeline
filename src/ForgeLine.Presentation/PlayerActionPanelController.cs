@@ -50,7 +50,7 @@ public readonly record struct PlayerActionPanelView(
     bool ContextualPending = false,
     SimulationTick? ContextualActivationTick = null,
     SimulationSessionId ContextualSessionId = default,
-    bool SelectionPending = false)
+    bool SelectionPending = false, GameplayBindingRegistry? Bindings = null, int ContextualHoveredIndex = -1, bool ContextualPressed = false)
 {
     public bool IsOpen =>
         Mode != PlayerActionPanelMode.Closed;
@@ -58,6 +58,9 @@ public readonly record struct PlayerActionPanelView(
 
 public sealed class PlayerActionPanelController
 {
+    private readonly ulong[] _keySequences = new ulong[Enum.GetValues<PlatformKey>().Length];
+    private readonly GameplayBindingRegistry _bindings;
+    public PlayerActionPanelController(GameplayBindingRegistry? bindings = null) { _bindings = bindings ?? GameplayBindingRegistry.Default; }
     private readonly Dictionary<PlatformKey, bool> _heldKeys = new();
     private bool _leftWasDown;
     private PlayerActionRequest? _pendingRequest;
@@ -74,6 +77,16 @@ public sealed class PlayerActionPanelController
     private BattlefieldSupplyPriority _supplyPriority =
         BattlefieldSupplyPriority.Normal;
     private int _hoveredIndex = -1;
+    private int _contextualHoveredIndex = -1;
+    private bool _contextualPressed;
+    private TimeSpan _feedbackRemaining;
+    public string Feedback { get; private set; } = string.Empty;
+    public void AdvanceFeedback(TimeSpan elapsed)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(elapsed, TimeSpan.Zero);
+        _feedbackRemaining -= elapsed;
+        if (_feedbackRemaining <= TimeSpan.Zero) Feedback = string.Empty;
+    }
     private bool _pointerPressed;
     private GameplayHudLayout _lastPointerLayout;
     private bool _hasPointerLayout;
@@ -121,6 +134,8 @@ public sealed class PlayerActionPanelController
         SelectionSet? currentSelection = null)
     {
         _currentSelection = currentSelection;
+        _contextualHoveredIndex = -1;
+        _contextualPressed = false;
         ArgumentNullException.ThrowIfNull(input);
         ArgumentOutOfRangeException.ThrowIfNegative(viewportWidth);
         ArgumentOutOfRangeException.ThrowIfNegative(viewportHeight);
@@ -140,6 +155,7 @@ public sealed class PlayerActionPanelController
         _leftPressSequence = pressSequence;
         if (input.FocusLostThisFrame && !input.HasPointerPosition)
         {
+            Feedback = string.Empty;
             _pendingRequest = null;
             PointerCaptured = false;
             _hoveredIndex = -1;
@@ -168,43 +184,52 @@ public sealed class PlayerActionPanelController
             return;
         }
 
-        if (Pressed(input, PlatformKey.B))
+        if (displayChanged || sessionChanged)
+        {
+            _pendingRequest = null;
+            input.SuppressHeldInput();
+            for (int i = 0; i < _keySequences.Length; i++) _keySequences[i] = input.KeyPressSequence((PlatformKey)i);
+            _hoveredIndex = -1; _pointerPressed = false;
+            return;
+        }
+
+        if (Pressed(input, _bindings.Key(GameplayAction.Build)))
         {
             ToggleMode(
                 PlayerActionPanelMode.Construction);
         }
 
-        if (Pressed(input, PlatformKey.P))
+        if (Pressed(input, _bindings.Key(GameplayAction.Process)))
         {
             ToggleMode(
                 PlayerActionPanelMode.Production);
         }
 
-        if (Pressed(input, PlatformKey.U))
+        if (Pressed(input, _bindings.Key(GameplayAction.Units)))
         {
             ToggleMode(
                 PlayerActionPanelMode.UnitProduction);
         }
 
-        if (Pressed(input, PlatformKey.L))
+        if (Pressed(input, _bindings.Key(GameplayAction.Logistics)))
         {
             ToggleMode(
                 PlayerActionPanelMode.Logistics);
         }
 
-        if (Pressed(input, PlatformKey.Y))
+        if (Pressed(input, _bindings.Key(GameplayAction.Supply)))
         {
             ToggleMode(
                 PlayerActionPanelMode.Supply);
         }
 
-        if (Pressed(input, PlatformKey.K))
+        if (Pressed(input, _bindings.Key(GameplayAction.Combat)))
         {
             ToggleMode(
                 PlayerActionPanelMode.Tactical);
         }
 
-        if (Pressed(input, PlatformKey.H))
+        if (Pressed(input, _bindings.Key(GameplayAction.Technology)))
         {
             ToggleMode(
                 PlayerActionPanelMode.Technology);
@@ -214,6 +239,8 @@ public sealed class PlayerActionPanelController
             Pressed(input, PlatformKey.Escape))
         {
             Close();
+            Feedback = "CANCELLED - PANEL CLOSED";
+            _feedbackRemaining = TimeSpan.FromSeconds(3);
         }
         else
         {
@@ -237,7 +264,7 @@ public sealed class PlayerActionPanelController
                     0,
                     itemCount - 1);
 
-            if (Pressed(input, PlatformKey.Tab))
+            if (Pressed(input, _bindings.Key(GameplayAction.NextItem)))
             {
                 SelectedIndex =
                     (SelectedIndex + 1) %
@@ -247,32 +274,32 @@ public sealed class PlayerActionPanelController
             }
             else
             {
-                _ = Pressed(input, PlatformKey.Tab);
+                _ = Pressed(input, _bindings.Key(GameplayAction.NextItem));
             }
         }
 
         SynchronizeStockEditor(actions);
         SynchronizeSupplyEditor(actions);
 
-        if (Pressed(input, PlatformKey.T))
+        if (Pressed(input, _bindings.Key(GameplayAction.PrimarySetting)))
         {
             CyclePrimarySetting(
                 actions);
         }
 
-        if (Pressed(input, PlatformKey.M))
+        if (Pressed(input, _bindings.Key(GameplayAction.SecondarySetting)))
         {
             CycleSecondarySetting(
                 actions);
         }
 
         int adjustment = 0;
-        if (Pressed(input, PlatformKey.Left))
+        if (Pressed(input, _bindings.Key(GameplayAction.Decrease)))
         {
             adjustment--;
         }
 
-        if (Pressed(input, PlatformKey.Right))
+        if (Pressed(input, _bindings.Key(GameplayAction.Increase)))
         {
             adjustment++;
         }
@@ -283,6 +310,12 @@ public sealed class PlayerActionPanelController
                 actions,
                 adjustment);
         }
+
+        if (input.HasPointerPosition)
+            for (int i = 0; ContextualCommandModel.TryGet(snapshot, i, out _); i++)
+                if (ContextualCommandModel.Button(layout, i).Contains(input.PointerPosition))
+                    _contextualHoveredIndex = i;
+        _contextualPressed = _contextualHoveredIndex >= 0 && input.IsMouseButtonDown(PlatformMouseButton.Left);
 
         PlayerActionPanelView view =
             CreateView(
@@ -323,8 +356,8 @@ public sealed class PlayerActionPanelController
             }
             _leftWasDown = leftDown;
             PointerCaptured = true;
-            _ = Pressed(input, PlatformKey.Enter);
-            _ = Pressed(input, PlatformKey.C);
+            _ = Pressed(input, _bindings.Key(GameplayAction.Activate));
+            _ = Pressed(input, _bindings.Key(GameplayAction.CancelJob));
             return;
         }
 
@@ -360,7 +393,7 @@ public sealed class PlayerActionPanelController
 
         bool activate =
             Mode != PlayerActionPanelMode.Closed &&
-            Pressed(input, PlatformKey.Enter);
+            Pressed(input, _bindings.Key(GameplayAction.Activate));
 
         if (activate &&
             PlayerActionDockHudModel.ResolveItemState(
@@ -377,7 +410,7 @@ public sealed class PlayerActionPanelController
                  PlayerActionPanelMode.UnitProduction or
                  PlayerActionPanelMode.Logistics or
                  PlayerActionPanelMode.Technology) &&
-            Pressed(input, PlatformKey.C);
+            Pressed(input, _bindings.Key(GameplayAction.CancelJob));
 
         if (cancel)
         {
@@ -385,7 +418,7 @@ public sealed class PlayerActionPanelController
         }
         else
         {
-            _ = Pressed(input, PlatformKey.C);
+            _ = Pressed(input, _bindings.Key(GameplayAction.CancelJob));
         }
 
         _leftWasDown = leftDown;
@@ -428,7 +461,7 @@ public sealed class PlayerActionPanelController
             _contextualActivationTick.HasValue,
             _contextualActivationTick,
             _sessionId,
-            !PlayerActionDockHudModel.MatchesSelection(actions, _currentSelection));
+            !PlayerActionDockHudModel.MatchesSelection(actions, _currentSelection), _bindings, _contextualHoveredIndex, _contextualPressed);
     }
 
     public bool TryTakeRequest(
@@ -448,6 +481,8 @@ public sealed class PlayerActionPanelController
 
     public void Close()
     {
+        Feedback = string.Empty;
+        _feedbackRemaining = default;
         Mode =
             PlayerActionPanelMode.Closed;
         SelectedIndex = 0;
@@ -469,6 +504,7 @@ public sealed class PlayerActionPanelController
     private void ToggleMode(
         PlayerActionPanelMode requested)
     {
+        Feedback = string.Empty;
         Mode =
             Mode == requested
                 ? PlayerActionPanelMode.Closed
@@ -1344,21 +1380,21 @@ public sealed class PlayerActionPanelController
             input.IsMouseButtonDown(
                 PlatformMouseButton.Left);
 
-        _ = Pressed(input, PlatformKey.B);
-        _ = Pressed(input, PlatformKey.P);
-        _ = Pressed(input, PlatformKey.U);
-        _ = Pressed(input, PlatformKey.L);
-        _ = Pressed(input, PlatformKey.Y);
-        _ = Pressed(input, PlatformKey.K);
-        _ = Pressed(input, PlatformKey.H);
+        _ = Pressed(input, _bindings.Key(GameplayAction.Build));
+        _ = Pressed(input, _bindings.Key(GameplayAction.Process));
+        _ = Pressed(input, _bindings.Key(GameplayAction.Units));
+        _ = Pressed(input, _bindings.Key(GameplayAction.Logistics));
+        _ = Pressed(input, _bindings.Key(GameplayAction.Supply));
+        _ = Pressed(input, _bindings.Key(GameplayAction.Combat));
+        _ = Pressed(input, _bindings.Key(GameplayAction.Technology));
         _ = Pressed(input, PlatformKey.Escape);
-        _ = Pressed(input, PlatformKey.Tab);
-        _ = Pressed(input, PlatformKey.T);
-        _ = Pressed(input, PlatformKey.M);
-        _ = Pressed(input, PlatformKey.Left);
-        _ = Pressed(input, PlatformKey.Right);
-        _ = Pressed(input, PlatformKey.Enter);
-        _ = Pressed(input, PlatformKey.C);
+        _ = Pressed(input, _bindings.Key(GameplayAction.NextItem));
+        _ = Pressed(input, _bindings.Key(GameplayAction.PrimarySetting));
+        _ = Pressed(input, _bindings.Key(GameplayAction.SecondarySetting));
+        _ = Pressed(input, _bindings.Key(GameplayAction.Decrease));
+        _ = Pressed(input, _bindings.Key(GameplayAction.Increase));
+        _ = Pressed(input, _bindings.Key(GameplayAction.Activate));
+        _ = Pressed(input, _bindings.Key(GameplayAction.CancelJob));
     }
 
     private void SynchronizeSession(
@@ -1371,6 +1407,7 @@ public sealed class PlayerActionPanelController
         }
 
         _sessionId = sessionId;
+        Feedback = string.Empty;
         Mode =
             PlayerActionPanelMode.Closed;
         SelectedIndex = 0;
@@ -1410,7 +1447,9 @@ public sealed class PlayerActionPanelController
         _heldKeys[key] =
             down;
 
-        return down &&
-               !held;
+        ulong sequence = input.KeyPressSequence(key);
+        bool shortPress = input.WasKeyPressed(key) && sequence != _keySequences[(int)key];
+        _keySequences[(int)key] = sequence;
+        return down && !held || shortPress;
     }
 }

@@ -19,6 +19,8 @@ public sealed class RtsBuildingPlacementController
     private const float TargetChangeToleranceSquared = 0.01f;
 
     private readonly PlayerId _issuer;
+    private readonly GameplayBindingRegistry _bindings;
+    private readonly string _placementHint;
     private bool _leftWasDown;
     private bool _escapeWasDown;
     private bool _rotateWasDown;
@@ -47,11 +49,12 @@ public sealed class RtsBuildingPlacementController
     private int _height;
     private float _displayScale;
 
+    public GameplayBindingRegistry Bindings => _bindings;
     public bool AwaitingResult => _awaitingResult;
     public string InteractionHint => _awaitingResult ? "BUILD REQUEST PENDING" :
-        IsActive ? "SHIFT + CLICK REPEAT AFTER ACCEPTANCE / F9 ROTATE / ESC CANCEL" : string.Empty;
+        IsActive ? _placementHint : string.Empty;
 
-    public RtsBuildingPlacementController(PlayerId issuer)
+    public RtsBuildingPlacementController(PlayerId issuer, GameplayBindingRegistry? bindings = null)
     {
         if (!issuer.IsSpecified)
         {
@@ -59,6 +62,11 @@ public sealed class RtsBuildingPlacementController
         }
 
         _issuer = issuer;
+        _bindings = bindings ?? GameplayBindingRegistry.Default;
+        _placementHint = $"SHIFT + CLICK REPEAT AFTER ACCEPTANCE / {_bindings.Prompt(GameplayAction.RotatePlacement)} ROTATE / ESC CANCEL";
+        _selectionKeys.Clear();
+        for (int i = (int)GameplayAction.CorePlacement; i <= (int)GameplayAction.SmelterPlacement; i++)
+            _selectionKeys.TryAdd(_bindings.Key((GameplayAction)i), false);
     }
 
     public BuildingId ActiveBuilding { get; private set; } = BuildingId.None;
@@ -96,7 +104,7 @@ public sealed class RtsBuildingPlacementController
         {
             Cancel(interaction);
             _leftWasDown = input.IsMouseButtonDown(PlatformMouseButton.Left);
-            _rotateWasDown = input.IsKeyDown(PlatformKey.F9);
+            _rotateWasDown = input.IsKeyDown(_bindings.Key(GameplayAction.RotatePlacement));
             foreach (var key in _selectionKeys.Keys) _selectionKeys[key] = input.IsKeyDown(key);
             return;
         }
@@ -122,7 +130,7 @@ public sealed class RtsBuildingPlacementController
 
         bool rotateDown =
             input.IsKeyDown(
-                PlatformKey.F9);
+                _bindings.Key(GameplayAction.RotatePlacement));
 
         if (rotateDown &&
             !_rotateWasDown &&
@@ -374,27 +382,27 @@ public sealed class RtsBuildingPlacementController
     {
         UpdateSelectionKey(
             input,
-            PlatformKey.F4,
+            _bindings.Key(GameplayAction.CorePlacement),
             BuildingIds.CommandCore,
             allowSelection);
         UpdateSelectionKey(
             input,
-            PlatformKey.F5,
+            _bindings.Key(GameplayAction.PowerPlacement),
             BuildingIds.PowerPlant,
             allowSelection);
         UpdateSelectionKey(
             input,
-            PlatformKey.F6,
+            _bindings.Key(GameplayAction.ExtractorPlacement),
             BuildingIds.Extractor,
             allowSelection);
         UpdateSelectionKey(
             input,
-            PlatformKey.F7,
+            _bindings.Key(GameplayAction.StoragePlacement),
             BuildingIds.StorageDepot,
             allowSelection);
         UpdateSelectionKey(
             input,
-            PlatformKey.F8,
+            _bindings.Key(GameplayAction.SmelterPlacement),
             BuildingIds.Smelter,
             allowSelection);
     }

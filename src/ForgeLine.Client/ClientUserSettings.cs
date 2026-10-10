@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Nodes;
 using ForgeLine.Input;
 using ForgeLine.Platform;
 using ForgeLine.Presentation;
@@ -9,7 +10,7 @@ namespace ForgeLine.Client;
 
 internal sealed record ClientUserSettings
 {
-    internal const int CurrentSchemaVersion = 1;
+    internal const int CurrentSchemaVersion = 2;
     private const int MinimumWindowWidth = 1_024;
     private const int MinimumWindowHeight = 720;
     private const int MaximumWindowWidth = 7_680;
@@ -43,6 +44,8 @@ internal sealed record ClientUserSettings
         SceneLightingSettings.Default.Exposure;
 
     public RtsCameraBindings CameraBindings { get; init; } = new();
+
+    public GameplayBindings GameplayBindings { get; init; } = new();
 
     [JsonIgnore]
     public RtsReferenceZoom ReferenceZoom { get; init; } = RtsReferenceZoom.NormalGameplay;
@@ -87,6 +90,7 @@ internal sealed record ClientUserSettings
 
         ArgumentNullException.ThrowIfNull(CameraBindings);
         ValidateBindings(CameraBindings);
+        _ = new GameplayBindingRegistry(GameplayBindings, CameraBindings);
     }
 
     public WindowConfiguration CreateWindowConfiguration() =>
@@ -236,21 +240,43 @@ internal sealed class ClientSettingsStore
         {
             string json =
                 File.ReadAllText(_path);
+            var document = JsonNode.Parse(json) as JsonObject ?? throw new InvalidDataException("Settings object is missing.");
+            string? gameplayProperty = document.Select(x => x.Key).FirstOrDefault(x => string.Equals(x, "gameplayBindings", StringComparison.OrdinalIgnoreCase));
+            JsonNode? gameplay = gameplayProperty is null ? null : document[gameplayProperty];
+            if (gameplayProperty is not null) document.Remove(gameplayProperty);
             ClientUserSettings settings =
                 JsonSerializer.Deserialize<ClientUserSettings>(
-                    json,
+                    document.ToJsonString(),
                     JsonOptions) ??
                 throw new InvalidDataException(
                     "Settings file did not contain a settings object.");
 
+            bool migrated = settings.SchemaVersion == 1;
+            if (migrated) settings = settings with { SchemaVersion = ClientUserSettings.CurrentSchemaVersion };
             settings.Validate();
+            string? bindingRecovery = null;
+            if (gameplayProperty is not null)
+            {
+                try
+                {
+                    GameplayBindings parsed = gameplay?.Deserialize<GameplayBindings>(JsonOptions) ?? throw new InvalidDataException("Gameplay bindings are missing.");
+                    _ = new GameplayBindingRegistry(parsed, settings.CameraBindings);
+                    settings = settings with { GameplayBindings = parsed };
+                }
+                catch (Exception exception) when (exception is JsonException or InvalidDataException or ArgumentException)
+                {
+                    bindingRecovery = $"Gameplay bindings reset: {exception.Message} Saved camera/display settings were preserved.";
+                    _ = TryQuarantineInvalidSettings();
+                }
+            }
+            if (migrated || bindingRecovery is not null) Save(settings);
 
             return new ClientSettingsLoadResult(
                 settings,
                 _path,
                 CreatedDefaults: false,
-                RecoveredInvalidSettings: false,
-                RecoveryMessage: null);
+                RecoveredInvalidSettings: bindingRecovery is not null,
+                RecoveryMessage: bindingRecovery);
         }
         catch (Exception exception)
             when (exception is JsonException or

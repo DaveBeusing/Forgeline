@@ -270,3 +270,7 @@ Click OPERATIONS above the inspector, the resource/power strip, a reported alert
 ## Actionable alerts
 
 Alert clicks reuse owned full-generation camera focus and selection inspection. Missing destinations open the appropriate operations filter; navigation issues no order. Retained edges are canceled by lifecycle/display transitions; targeting suppresses activation and open operations owns covered alert space. See [shared input and fallback semantics](ActionableAlertsAndStrategicMap.md).
+
+## Gameplay shortcuts and interaction feedback
+
+Dock mode, navigation, activation and cancellation shortcuts are configurable through the shared registry. Contextual cards and help display that mapping. Focus rails, hover outlines, pressed underlines and disabled double rails accompany text; command results retain authoritative accepted/partial/rejected counts. Escape closing a dock reports CANCELLED - PANEL CLOSED for three seconds without submitting an order. Resize, focus loss, modal transitions and session replacement consume key edges and held inputs. See [binding and feedback rules](GameplayInputAccessibilityAndQualification.md).

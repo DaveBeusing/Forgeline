@@ -53,6 +53,7 @@ internal sealed class ClientApplication
 
     private readonly IPlatform _platform;
     private readonly ClientUserSettings _settings;
+    private readonly GameplayBindingRegistry _gameplayBindings;
     private readonly string _settingsPath;
     private readonly StartupDiagnostics _startup;
 
@@ -70,6 +71,7 @@ internal sealed class ClientApplication
             settings ??
             new ClientUserSettings();
         _settings.Validate();
+        _gameplayBindings = new(_settings.GameplayBindings, _settings.CameraBindings);
         _settingsPath =
             string.IsNullOrWhiteSpace(settingsPath)
                 ? "default settings"
@@ -381,9 +383,9 @@ internal sealed class ClientApplication
         var alertController = new ActionableAlertController();
         var memberFocusSelection = new SelectionSet();
         var buildingPlacementController =
-            new RtsBuildingPlacementController(LocalPlayer);
+            new RtsBuildingPlacementController(LocalPlayer, _gameplayBindings);
         var actionPanel =
-            new PlayerActionPanelController();
+            new PlayerActionPanelController(_gameplayBindings);
         var hudInteraction =
             new HudInteractionContext();
         var tacticalTargetingController =
@@ -597,6 +599,7 @@ internal sealed class ClientApplication
             TimeSpan frameElapsed = _platform.Clock.GetElapsedTime(previousFrameAt, now);
             previousFrameAt = now;
             selectionController.CommandFeedback.Advance(frameElapsed);
+            actionPanel.AdvanceFeedback(frameElapsed);
             tacticalTargetingController.CommandFeedback.Advance(frameElapsed);
 
             float cameraDeltaSeconds = (float)Math.Min(
@@ -649,7 +652,7 @@ internal sealed class ClientApplication
 
                 if (ConsumeKeyPress(
                         inputState,
-                        PlatformKey.F10,
+                        _gameplayBindings.Key(GameplayAction.Overlay),
                         ref strategicOverlayToggleHeld))
                 {
                     informationLayer.CycleOverlay();
@@ -657,7 +660,7 @@ internal sealed class ClientApplication
 
                 if (ConsumeKeyPress(
                         inputState,
-                        PlatformKey.F11,
+                        _gameplayBindings.Key(GameplayAction.Minimap),
                         ref minimapToggleHeld))
                 {
                     informationLayer.ToggleMinimap();
@@ -667,7 +670,7 @@ internal sealed class ClientApplication
             bool pausePressed =
                 !helpController.BlocksGameplayThisFrame && ConsumeKeyPress(
                     inputState,
-                    PlatformKey.Space,
+                    _gameplayBindings.Key(GameplayAction.Pause),
                     ref pauseHeld);
 
             presentationInteraction.SetDebugState(
@@ -1014,7 +1017,7 @@ internal sealed class ClientApplication
                         FrontendSurfaceView controlsSurface =
                             FrontendPresentationAdapter.Controls(
                                 _settings.CameraBindings,
-                                "ESC  BACK TO PAUSE", _settings.EdgeScrollEnabled);
+                                "ESC  BACK TO PAUSE", _settings.EdgeScrollEnabled, gameplay: _gameplayBindings);
                         FrontendLayout pauseLayout =
                             FrontendDesign.ResolveLayout(
                                 window.ClientSize.Width,
@@ -1056,7 +1059,7 @@ internal sealed class ClientApplication
                 else if (helpVisible)
                 {
                     frontendSurface = FrontendPresentationAdapter.Controls(
-                        _settings.CameraBindings, "F1 / F12 / ESC  CLOSE", _settings.EdgeScrollEnabled);
+                        _settings.CameraBindings, "F1 / F12 / ESC  CLOSE", _settings.EdgeScrollEnabled, gameplay: _gameplayBindings);
                 }
 
                 _ = renderHost.Publish(
@@ -1360,7 +1363,7 @@ internal sealed class ClientApplication
                 blocked: !gameplayActive || simulationPaused || !window.IsFocused ||
                     (hudInteraction.KeyboardCaptured && !combatGroupInputResult.Handled) ||
                     buildingPlacementController.IsActive || tacticalTargetingController.IsActive,
-                bindings: _settings.CameraBindings))
+                bindings: _settings.CameraBindings, gameplayBindings: _gameplayBindings))
             {
                 selectionController.CancelPointerInteraction();
                 minimapInteraction.Reset();
@@ -1586,10 +1589,10 @@ internal sealed class ClientApplication
 
             preAlphaUx = preAlphaUx with
             {
-                InteractionHint = buildingPlacementController.IsActive ? buildingPlacementController.InteractionHint : alertController.Feedback.Length > 0 ? alertController.Feedback : cameraFocus.Feedback,
+                InteractionHint = buildingPlacementController.IsActive ? buildingPlacementController.InteractionHint : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback,
                 Guidance = guidance.Update(currentSnapshot, preAlphaUx.ShowOnboarding && !guidanceInteraction.Hidden,
                     simulationPaused || !window.IsFocused || selectionController.IsDragSelecting || buildingPlacementController.IsActive ||
-                    tacticalTargetingView.Mode != TacticalTargetingMode.None || inputState.IsMouseButtonDown(PlatformMouseButton.Middle)),
+                    tacticalTargetingView.Mode != TacticalTargetingMode.None || inputState.IsMouseButtonDown(PlatformMouseButton.Middle), _gameplayBindings),
                 Placement = placementFeedback
             };
 
@@ -2564,7 +2567,7 @@ internal sealed class ClientApplication
             bindings.PitchUp.ToString(),
             bindings.PitchDown.ToString(),
             bindings.DragPanButton.ToString(),
-            _settingsPath);
+            _settingsPath, Bindings: _gameplayBindings);
     }
 
     private static bool ConsumeKeyPress(
@@ -2710,12 +2713,12 @@ internal sealed class ClientApplication
         _ => FormationTemplate.Compact
     };
 
-    private static void UpdateFormationSelection(
+    private void UpdateFormationSelection(
         InputState inputState,
         ref bool held,
         ref FormationTemplate activeFormation)
     {
-        bool down = inputState.IsKeyDown(PlatformKey.F3);
+        bool down = inputState.IsKeyDown(_gameplayBindings.Key(GameplayAction.Formation));
 
         if (down && !held)
         {
@@ -3015,7 +3018,7 @@ internal sealed class ClientApplication
                     _settings.ShowOnboarding,
                     _settings.EdgeScrollEnabled,
                     _settings.CameraPanSpeedMultiplier,
-                    _settings.CameraBindings));
+                    _settings.CameraBindings, _settings.GameplayBindings));
         var mainMenu =
             new MainMenuModel(
                 loadGame.CanContinue);
@@ -3271,18 +3274,17 @@ internal sealed class ClientApplication
                         input.PointerPosition.X,
                         input.PointerPosition.Y,
                             frontendLayout,
-                        6) is int settingsRow &&
-                    settingsRow > 0)
+                        settingsInteraction.VisibleRowCount) is int settingsRow &&
+                    settingsRow + settingsInteraction.VisibleStart > 0)
                 {
-                    settingsInteraction.Focus(
-                        (FrontendSettingsField)settingsRow);
+                    if (primaryPointerPressed) settingsInteraction.FocusVisible(settingsRow);
 
                     if (primaryPointerPressed &&
                         FrontendHitTesting.DetailAdjust(
                             input.PointerPosition.X,
                             input.PointerPosition.Y,
                             frontendLayout,
-                            6) is int settingsDirection)
+                            settingsInteraction.VisibleRowCount) is int settingsDirection)
                     {
                         settingsInteraction.Adjust(
                             settings,
@@ -3333,7 +3335,7 @@ internal sealed class ClientApplication
                         input.PointerPosition.Y,
                         frontendLayout);
 
-                if (enter || applyClicked)
+                if ((enter || applyClicked) && settingsInteraction.CanApply)
                 {
                     string settingsDirectory =
                         Path.GetDirectoryName(_settingsPath) ??
@@ -3351,7 +3353,8 @@ internal sealed class ClientApplication
                     shell.Dispatch(
                         SettingsModel.Back());
 
-                    if (applied.WindowWidth != _settings.WindowWidth ||
+                    if (applied.GameplayBindings != _settings.GameplayBindings ||
+                        applied.WindowWidth != _settings.WindowWidth ||
                         applied.WindowHeight != _settings.WindowHeight ||
                         applied.BorderlessFullscreen !=
                             _settings.BorderlessFullscreen)
@@ -3387,7 +3390,7 @@ internal sealed class ClientApplication
                     settings,
                     settingsInteraction,
                     _settings.CameraBindings,
-                    _settings.EdgeScrollEnabled);
+                    _settings.EdgeScrollEnabled, gameplay: _gameplayBindings);
             if (input.HasPointerPosition &&
                 shell.Screen != GameFrontendScreen.MainMenu)
             {
@@ -3456,7 +3459,7 @@ internal sealed class ClientApplication
         SettingsModel settings,
         SettingsInteractionModel settingsInteraction,
         RtsCameraBindings cameraBindings,
-        bool edgeScrollEnabled) =>
+        bool edgeScrollEnabled, GameplayBindingRegistry? gameplay = null) =>
         screen switch
         {
             GameFrontendScreen.MainMenu =>
@@ -3474,7 +3477,7 @@ internal sealed class ClientApplication
                     settingsInteraction),
             GameFrontendScreen.Controls =>
                 FrontendPresentationAdapter.Controls(
-                    cameraBindings, edgeScrollEnabled: edgeScrollEnabled),
+                    cameraBindings, edgeScrollEnabled: edgeScrollEnabled, gameplay: gameplay),
             GameFrontendScreen.Credits =>
                 FrontendPresentationAdapter.Credits(),
             _ =>

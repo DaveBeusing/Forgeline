@@ -1,6 +1,7 @@
 using ForgeLine.Combat;
 using ForgeLine.Economy;
 using ForgeLine.Game;
+using ForgeLine.Input;
 using ForgeLine.Logistics;
 
 namespace ForgeLine.Presentation;
@@ -62,27 +63,15 @@ internal static class PlayerActionDockHudModel
                 "ACTIONS"
         };
 
-    public static string ResolveModeShortcut(
-        PlayerActionPanelMode mode) =>
-        mode switch
-        {
-            PlayerActionPanelMode.Construction =>
-                "B",
-            PlayerActionPanelMode.Production =>
-                "P",
-            PlayerActionPanelMode.UnitProduction =>
-                "U",
-            PlayerActionPanelMode.Logistics =>
-                "L",
-            PlayerActionPanelMode.Supply =>
-                "Y",
-            PlayerActionPanelMode.Tactical =>
-                "K",
-            PlayerActionPanelMode.Technology =>
-                "H",
-            _ =>
-                string.Empty
-        };
+    public static string ResolveModeShortcut(PlayerActionPanelMode mode, GameplayBindingRegistry? bindings = null) =>
+        mode == PlayerActionPanelMode.Closed ? string.Empty : (bindings ?? GameplayBindingRegistry.Default).Prompt(ModeAction(mode));
+    public static GameplayAction ModeAction(PlayerActionPanelMode mode) => mode switch
+    {
+        PlayerActionPanelMode.Construction => GameplayAction.Build, PlayerActionPanelMode.Production => GameplayAction.Process,
+        PlayerActionPanelMode.UnitProduction => GameplayAction.Units, PlayerActionPanelMode.Logistics => GameplayAction.Logistics,
+        PlayerActionPanelMode.Supply => GameplayAction.Supply, PlayerActionPanelMode.Tactical => GameplayAction.Combat,
+        _ => GameplayAction.Technology
+    };
 
     public static RtsUiIcon ResolveModeIcon(
         PlayerActionPanelMode mode) =>

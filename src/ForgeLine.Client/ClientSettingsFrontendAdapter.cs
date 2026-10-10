@@ -31,7 +31,7 @@ internal sealed class ClientSettingsFrontendAdapter
         FrontendSettingsSnapshot snapshot =
             model.Settings;
         var settings =
-            new ClientUserSettings
+            _store.Load().Settings with
             {
                 WindowWidth = snapshot.WindowWidth,
                 WindowHeight = snapshot.WindowHeight,
@@ -45,7 +45,8 @@ internal sealed class ClientSettingsFrontendAdapter
                 CameraPanSpeedMultiplier =
                     snapshot.CameraPanSpeedMultiplier,
                 CameraBindings =
-                    snapshot.CameraBindings
+                    snapshot.CameraBindings,
+                GameplayBindings = snapshot.GameplayBindings ?? new()
             };
 
         settings.Validate();
@@ -66,6 +67,6 @@ internal sealed class ClientSettingsFrontendAdapter
             settings.ShowOnboarding,
             settings.EdgeScrollEnabled,
             settings.CameraPanSpeedMultiplier,
-            settings.CameraBindings);
+            settings.CameraBindings, settings.GameplayBindings);
     }
 }

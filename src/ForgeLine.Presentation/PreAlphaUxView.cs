@@ -1,3 +1,5 @@
+using ForgeLine.Input;
+
 namespace ForgeLine.Presentation;
 
 public enum PreAlphaUxMode
@@ -26,4 +28,4 @@ public readonly record struct PreAlphaUxView(
     string SettingsPath,
     EarlyGameGuidanceView Guidance = default,
     PlacementContextFeedbackView Placement = default,
-    string InteractionHint = "");
+    string InteractionHint = "", GameplayBindingRegistry? Bindings = null);

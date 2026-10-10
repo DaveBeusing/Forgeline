@@ -1,4 +1,5 @@
 using ForgeLine.Simulation;
+using ForgeLine.Input;
 
 namespace ForgeLine.Presentation;
 
@@ -32,7 +33,7 @@ public sealed class EarlyGameGuidanceController
 
     public PlayerGuidanceMilestone Observed => _observed;
 
-    public EarlyGameGuidanceView Update(PresentationSnapshot? snapshot, bool enabled, bool blocked = false)
+    public EarlyGameGuidanceView Update(PresentationSnapshot? snapshot, bool enabled, bool blocked = false, GameplayBindingRegistry? bindings = null)
     {
         if (snapshot is null || !snapshot.SessionId.IsSpecified) return default;
         if (_session != snapshot.SessionId)
@@ -50,7 +51,7 @@ public sealed class EarlyGameGuidanceController
         while (next < EarlyGameGuidanceCatalog.Steps.Length - 1 &&
             (_observed & EarlyGameGuidanceCatalog.Steps[next].Milestone) != 0) next++;
         var step = EarlyGameGuidanceCatalog.Steps[current];
-        return new(true, step.Objective, step.Context, step.Binding,
+        return new(true, step.Objective, step.Context, (bindings ?? GameplayBindingRegistry.Default).Text(step.Binding),
             next < EarlyGameGuidanceCatalog.Steps.Length ? EarlyGameGuidanceCatalog.Steps[next].Objective : string.Empty, _session);
     }
 }

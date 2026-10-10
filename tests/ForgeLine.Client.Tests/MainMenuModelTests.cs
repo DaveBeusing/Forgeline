@@ -88,7 +88,7 @@ public sealed class MainMenuModelTests
             "UP/LEFT/DOWN/RIGHT",
             view.DetailLines[0].Value);
         Assert.Equal(
-            "F1 / F2 / F3",
+            "HELP / WORLD / FORMATION",
             view.DetailLines[4].Label);
         Assert.Contains(
             "HELP",

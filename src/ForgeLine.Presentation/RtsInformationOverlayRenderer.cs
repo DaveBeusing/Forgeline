@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using ForgeLine.Assets;
 using ForgeLine.Game;
+using ForgeLine.Input;
 using ForgeLine.Graphics;
 using ForgeLine.World;
 
@@ -21,6 +22,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     private readonly RuntimeUiIconPalette? _runtimePalette;
     private readonly RtsMinimapScratch _minimapScratch = new();
 
+    private GameplayBindingRegistry _bindings = GameplayBindingRegistry.Default;
     private int _vertexCount;
     private int _vertexLimit = MaxVertices;
     private bool _disposed;
@@ -58,6 +60,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         PreAlphaUxView preAlphaUx = default)
     {
         ThrowIfDisposed();
+        _bindings = preAlphaUx.Bindings ?? GameplayBindingRegistry.Default;
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(camera);
         ArgumentNullException.ThrowIfNull(snapshot);
@@ -757,7 +760,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         float fittedScale = MathF.Min(scale * .58f, legend.Height / 18);
         EmitText(text.Written, legend.X + 3 * scale, legend.Y + 2 * scale, legend.Right - 3 * scale,
             GameplayHudVisualStyle.TextPrimary, fittedScale, width, height);
-        EmitText(RtsStrategicOverlayHudModel.Legend(mode), legend.X + 3 * scale, legend.Y + 10 * scale, legend.Right - 3 * scale,
+        EmitText(_bindings.Text(RtsStrategicOverlayHudModel.Legend(mode)), legend.X + 3 * scale, legend.Y + 10 * scale, legend.Right - 3 * scale,
             GameplayHudVisualStyle.TextSecondary, fittedScale, width, height);
     }
 
@@ -794,7 +797,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             case PreAlphaUxMode.Paused:
                 EmitSystemPanel(
                     "PAUSED",
-                    "ESC OR SPACE RESUME",
+                    _bindings.Text("ESC OR SPACE RESUME"),
                     "F1 CONTROLS",
                     layout,
                     width,
@@ -981,8 +984,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
              index++)
         {
             EmitText(
-                PlayerSystemHudModel.GetHelpLine(
-                    index),
+                _bindings.Text(PlayerSystemHudModel.GetHelpLine(
+                    index)),
                 x + 16.0f * scale,
                 y + (44.0f + index * 24.0f) * scale,
                 x + panelWidth - 12.0f * scale,
@@ -1049,7 +1052,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         float scale =
             layout.Scale;
         string hint =
-            !string.IsNullOrEmpty(interactionHint) ? interactionHint : PlayerSystemHudModel.OnboardingHint;
+            !string.IsNullOrEmpty(interactionHint) ? interactionHint : _bindings.Text(PlayerSystemHudModel.OnboardingHint);
         float gap =
             GameplayHudVisualStyle.CompactGap *
             scale;

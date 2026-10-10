@@ -1,4 +1,5 @@
 using ForgeLine.Game;
+using ForgeLine.Input;
 using ForgeLine.Intelligence;
 
 namespace ForgeLine.Presentation;
@@ -48,7 +49,7 @@ internal static class HoverTooltipResolver
         };
         string hint = world.OwnedDetails.Count == 1 ? "LEFT CLICK TO SELECT" : string.Empty;
         return new(world.DisplayName, role, world.ExtractionState, hint, world,
-            Explanation: ProductionContextFeedback.Explain(world.OwnedDetails.Work.BlockReason));
+            Explanation: (panel.Bindings ?? GameplayBindingRegistry.Default).Text(ProductionContextFeedback.Explain(world.OwnedDetails.Work.BlockReason)));
     }
 
     private static HoverTooltipContent? ResolveDock(PresentationSnapshot snapshot, in HoverTooltipView view,
@@ -59,16 +60,16 @@ internal static class HoverTooltipResolver
         if (view.Contextual)
         {
             for (int i = 0; ContextualCommandModel.TryGet(snapshot, i, out var command,
-                    ContextualCommandModel.HasPending(panel, snapshot), panel.SelectionPending); i++)
+                    ContextualCommandModel.HasPending(panel, snapshot), panel.SelectionPending, panel.Bindings); i++)
                 if (command.Mode == mode && command.ItemIndex == view.DockIndex)
                     return new(command.Label, "SELECTION COMMAND", command.Availability.CanActivate
                         ? "AVAILABLE" : command.Availability.DisabledReason,
-                        command.OpensMode ? command.Shortcut + " OPENS ADVANCED MODE" : "CLICK OR K / TAB / ENTER; WATCH COMMAND FEEDBACK");
+                        command.OpensMode ? command.Shortcut + " OPENS ADVANCED MODE" : (panel.Bindings ?? GameplayBindingRegistry.Default).Text("CLICK OR K / TAB / ENTER; WATCH COMMAND FEEDBACK"));
             return null;
         }
         if (control == PlayerActionDockControlKind.Mode)
             return new(PlayerActionDockHudModel.ResolveModeLabel(mode), "ACTION PANEL",
-                PlayerActionDockHudModel.ResolveModeShortcut(mode), "CLICK TO OPEN / CLOSE");
+                PlayerActionDockHudModel.ResolveModeShortcut(mode, panel.Bindings), "CLICK TO OPEN / CLOSE");
         if (panel.SelectionPending || !panel.IsOpen || panel.Mode != mode || snapshot.PlayerActions is not { } actions ||
             actions.SessionId != snapshot.SessionId || actions.Tick != snapshot.Tick) return null;
         int index = view.DockIndex;
@@ -123,7 +124,7 @@ internal static class HoverTooltipResolver
         return new(title, PlayerActionDockHudModel.ResolveModeLabel(mode), status, hint,
             Costs: costs, Outputs: outputs, ProductionTicks: ticks, Requirement: requirement, Prerequisites: prerequisites,
             WorkStatus: ProductionContextFeedback.WorkLabel(workReason),
-            Explanation: ProductionContextFeedback.Explain(enabled ? workReason : state.DisabledReason));
+            Explanation: (panel.Bindings ?? GameplayBindingRegistry.Default).Text(ProductionContextFeedback.Explain(enabled ? workReason : state.DisabledReason)));
     }
 
     private static string ResolveControlTitle(PlayerActionDockControlKind control, PlayerActionPanelMode mode)

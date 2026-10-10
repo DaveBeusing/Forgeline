@@ -73,7 +73,7 @@ public sealed class FrontendInteractionTests
         interaction.MovePrevious();
 
         Assert.Equal(
-            FrontendSettingsField.Onboarding,
+            FrontendSettingsField.BindingKey,
             interaction.FocusedField);
     }
 }

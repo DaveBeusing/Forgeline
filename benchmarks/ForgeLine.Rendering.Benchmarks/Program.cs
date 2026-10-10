@@ -6,6 +6,11 @@ internal static class Program
 {
     public static void Main(string[] args)
     {
+        if (args is ["--gameplay-ui-hotpaths", string gameplayUiOutput])
+        {
+            GameplayUiMeasurements.Run(gameplayUiOutput);
+            return;
+        }
         if (args is ["--alert-map-hotpaths", string alertMapOutput])
         {
             AlertMapMeasurements.Run(alertMapOutput);
