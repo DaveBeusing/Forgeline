@@ -1,0 +1,27 @@
+# Actionable Alerts and Strategic Map
+
+The alert stack keeps the existing critical/warning/information text, icons and command-result cards. Current Core Destroyed, Core Damaged, Critical Supply, Blocked Production and Constrained Power conditions have at most five copied records. Their identity is session, player, condition and onset tick. Repeated completed ticks keep the identity; resolution removes the record, recurrence starts another identity. Fresh sessions or tick rollback reset lifecycle state. Pausing preserves the last completed capture. Terminal alerts remain visible but cannot activate navigation. No history, sound, dismissal command or per-tick popup is introduced.
+
+## Navigation and relevance
+
+FOCUS means a captured locally owned candidate exists. Clicking focuses and selects it for the existing inspector, after current world visibility, ownership and full entity generation are checked again. The Command Core destination is the configured local core. Supply, factory and power destinations choose the first eligible owned live candidate in stable entity order whose existing component reports the relevant condition. Aggregate counts remain visible. This chooses a representative affected target; it does not claim every contributing cause belongs to that one entity.
+
+OPS indicates no captured spatial candidate. Clicking opens the existing Supply, Power or Blocked operations filter and explains that the target is unavailable. A target that disappeared or cannot be shown receives the same fallback. Operations capture may need the next completed tick; its waiting state remains explicit. Overflow MORE opens Blocked operations. Command-result cards are informational and do not repeat or resubmit commands. Navigation creates no simulation request and does not equate intent with accepted execution.
+
+The optional operations panel covers the left alert area while open, so it owns that space. Help/pause and focus changes consume retained press edges; targeting and placement suppress alert activation. A short click is handled once only when press and release remain on the same shared row. Resize/session transitions discard activation. Existing action/minimap/world pointer priority is preserved. At compact scales the existing stack can retain only the highest-priority row, or collapse; the resource-strip and operations entry remain available. No unrelated outer HUD layout changes are made.
+
+## Strategic layers
+
+The existing seven-button minimap selector remains OFF, LOG, SUP, SEN, NAV, PWR and ALL. The selected legend gives the full layer name, local captured count and shape key. F10 still cycles layers and F11 still toggles the minimap. Existing map click/drag, right-click orders and tactical targeting remain on their original paths.
+
+Strategic snapshots now copy read-only lists and carry player/session/tick/requested-mode identity. The legend says N/A - UPDATING and world strategic drawing is withheld while any identity differs or a match is terminal. Captured zero local items means zero captured items, not healthy global infrastructure. Unknown enemy infrastructure remains unknown: no markers, sensors or data are added to intelligence. Existing authorized local/observed extraction is reused.
+
+Routes use lines with a cross for disabled links. Route capacity is configured throughput; utilization remains N/A because this layer does not capture current capacity-window telemetry. Supply uses range rings and crosses for critical/offline states. Sensor rings show existing visual/radar ranges, not guaranteed identification or omniscient coverage. Navigation boxes/portal points reflect available observed navigation data. Power remains logical membership without fabricated wires: offline uses a cross and brownout adds a four-line diamond, alongside explicit bounded labels. Shape and text supplement color.
+
+## Costs and qualification
+
+Alert capture runs at the existing completed-tick cadence (20 Hz for canonical matches), scans owned controllable candidates once and retains at most five records. Source scan cost scales with candidates; no constant-time extraction claim is made. Existing strategic capture and geometry caps are preserved. The added brownout shape adds four lines per retained brownout marker, at most 128 markers in Power or 48 in All. The retained HUD reads copied lists and performs no live ECS query.
+
+`ActionableAlertTests` and `StrategicMapExperienceTests` cover deduplication, resolution/recurrence, session/rollback, destruction, ownership, lifecycle input guards, unavailable destinations, compact geometry, strategic freshness, immutable lists and brownout shape. Existing minimap, display, intelligence and client journeys remain regression gates. `--alert-map-hotpaths artifacts/alert-map-hotpaths.json` measures active-alert full HUD/minimap plus idle alert input at 1/10/100/1000 entities across all seven layers, with 128 warmups and 256 samples. Warm managed allocation must remain zero. CPU/null-graphics timings exclude extraction, world overlay drawing, GPU uploads, waits and Present and do not establish FPS acceptance.
+
+Native startup/window qualification checks composition and material bindings. Live alert-to-inspector/operations journeys, save/load interaction, terrain contrast, tiny-scale text, monitor DPI/focus transitions and steady-state GPU performance require separate manual acceptance. Startup smoke does not claim those results.

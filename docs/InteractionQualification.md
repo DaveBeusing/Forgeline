@@ -113,3 +113,7 @@ Manual acceptance remains: native mixed-army type-filter/recall journeys, critic
 ## Operations contracts and costs
 
 Run `OperationsTests` for owned opt-in capture, retained/deduplicated inventories, real factory block states and existing pause commands, disconnected/disabled routes, 1/10/100/1000-node topology, safe-area/DPI geometry and input lifecycle cancellation. `--operations-hotpaths artifacts/operations-hotpaths.json` measures full HUD/idle input and bounded snapshot copying at the same facility sizes with 128 warmups and 256 samples. Rendering/input has a strict zero warm-allocation gate. Null graphics timings exclude simulation extraction/GPU/Present; native startup smoke does not qualify active operations interaction. See [complete semantics and acceptance limits](ProductionAndLogisticsOperations.md).
+
+## Alert and strategic-map contracts
+
+Run ActionableAlertTests and StrategicMapExperienceTests with existing minimap, intelligence, display and client journeys. The alert-map-hotpaths mode checks active-alert full HUD/minimap and idle input at 1/10/100/1000 entities across seven layers, 128 warmups and 256 samples, with zero warm allocation. It excludes live extraction, world overlay drawing, GPU and Present. See [manual limits and authority](ActionableAlertsAndStrategicMap.md).

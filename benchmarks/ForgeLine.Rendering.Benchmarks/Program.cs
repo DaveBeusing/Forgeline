@@ -6,6 +6,11 @@ internal static class Program
 {
     public static void Main(string[] args)
     {
+        if (args is ["--alert-map-hotpaths", string alertMapOutput])
+        {
+            AlertMapMeasurements.Run(alertMapOutput);
+            return;
+        }
         if (args is ["--operations-hotpaths", string operationsOutput])
         {
             OperationsMeasurements.Run(operationsOutput);

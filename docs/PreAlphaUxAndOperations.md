@@ -193,3 +193,7 @@ Manual qualification is defined in [Pre-Alpha Verification Checklist](PreAlphaVe
 ## Operations onboarding and acceptance
 
 OPERATIONS above the selection inspector opens the optional overview. Resource/power, alert and single-facility inspector clicks provide contextual entry without a new shortcut. Use Filter, Next Page, a facility row, Focus Facility/Focus Next or Open Existing Controls. Reported shortages explain observed facts; they do not invent economic causes. Net flow remains explicitly unavailable. Manual active-policy/route-focus journeys, terrain contrast, extreme-scale readability and monitor DPI/focus transitions remain acceptance items. See [operations limits](ProductionAndLogisticsOperations.md).
+
+## Alert and map onboarding
+
+FOCUS inspects a representative affected owned target. OPS or MORE opens existing operations; unavailable or stale targets receive an explanation. Command result cards remain informational. Use the existing minimap buttons or F10/F11; selected legends show full labels and shape meanings, with unavailable captures explicitly marked. Live navigation, save/load interaction, contrast, extreme-scale text and monitor transitions remain manual acceptance. See [full behavior and limits](ActionableAlertsAndStrategicMap.md).
