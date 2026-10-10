@@ -156,17 +156,8 @@ internal sealed class ClientApplication
                 },
                 waitForEvents: () => _platform.WaitForEvents(IdleWait),
                 firstFramePresented: () => bootRenderer.HasPresentedFrame,
-                enableArtwork: assets =>
-                {
-                    SplashDefinition? definition = SplashAssetPreflight.Prepare(
-                        UndefinedBehaviorStudioSplash.Create(),
-                        id => assets.Contains(AssetId.Parse(id)),
-                        message => Console.Error.WriteLine($"[studio:preflight] {message}"));
-                    if (definition is null) return false;
-                    bootRenderer.UseSplashAssets(assets);
-                    return true;
-                },
-                artworkFailed: () => bootRenderer.SplashUnavailable);
+                videoUnavailable: () => bootRenderer.SplashUnavailable,
+                splashFramePresented: () => bootRenderer.HasPresentedSplashFrame);
             if (!completed) return 0;
             ClientStartupResult<RuntimeAssetCatalog, IReadOnlyList<LoadGameEntry>> products = coordinator.GetResults();
             runtimeAssets = products.Assets;

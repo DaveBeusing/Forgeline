@@ -42,7 +42,7 @@ internal sealed class StudioSplashVideoRenderer : IDisposable
         try { return new StudioSplashVideoRenderer(graphics, path); }
         catch (Exception error) when (error is IOException or InvalidOperationException or NotSupportedException)
         {
-            Console.Error.WriteLine($"[studio:video:fallback] {error.Message}");
+            Console.Error.WriteLine($"[studio:video:unavailable] {error.Message}");
             return null;
         }
     }
@@ -54,7 +54,17 @@ internal sealed class StudioSplashVideoRenderer : IDisposable
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         if (_decoder.Failure is Exception failure) throw new InvalidDataException("Studio video decode failed.", failure);
-        if (!_decoder.TryRead((long)(Math.Clamp(elapsedSeconds, 0, 10) * TimeSpan.TicksPerSecond), out StudioVideoFrame? frame)) return;
+        // Prime the first frame even when its encoded timestamp is slightly above zero.
+        StudioVideoFrame? frame;
+        bool available = HasFrame
+            ? _decoder.TryRead((long)(Math.Clamp(elapsedSeconds, 0, 10) * TimeSpan.TicksPerSecond), out frame)
+            : _decoder.TryReadFirst(out frame);
+        if (!available)
+        {
+            if (!HasFrame && _decoder.WorkerCompleted)
+                throw new InvalidDataException("Studio video contains no playable frames.");
+            return;
+        }
         IGraphicsTexture next = _graphics.CreateTexture(new GraphicsTextureData(
             new(frame!.Width, frame.Height, GraphicsTextureFormat.Rgba8Unorm, GraphicsTextureColorSpace.Linear, 1),
             [new(frame.Width, frame.Height, frame.Width * 4, frame.Pixels)]));

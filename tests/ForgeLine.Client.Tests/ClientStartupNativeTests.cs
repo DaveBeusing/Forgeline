@@ -50,12 +50,13 @@ public sealed class ClientStartupNativeTests
             {
                 renderer.UpdateSurface(window.ClientSize.Width, window.ClientSize.Height,
                     window.IsMinimized || window.ClientSize.IsEmpty);
+                Assert.False(view.SplashBootstrap);
                 renderer.Publish(view);
             },
             waitForEvents: () => platform.WaitForEvents(TimeSpan.FromMilliseconds(16)),
             firstFramePresented: () => renderer.HasPresentedFrame,
-            enableArtwork: _ => false,
-            artworkFailed: () => renderer.SplashUnavailable);
+            videoUnavailable: () => renderer.SplashUnavailable,
+            splashFramePresented: () => renderer.HasPresentedSplashFrame);
         Assert.True(ready);
         Assert.True(diagnostics.Has(StartupPhase.StudioSplashFirstFrame));
         Assert.Equal(10, presentedPumps);

@@ -37,17 +37,20 @@ public sealed class FrontendOverlayRendererTests : IDisposable
         Assert.Equal(withFooter, renderer.LastRenderedVertexCount);
     }
 
-    [Fact]
-    public void BootstrapBrandIsVisibleAtTimeZeroWithoutTextures()
+    [Theory]
+    [InlineData(0f)]
+    [InlineData(1.5f)]
+    [InlineData(9f)]
+    public void StudioPlaybackNeverDrawsLegacyBranding(float seconds)
     {
         using var renderer = new FrontendOverlayRenderer(_graphics);
         var context = new FakeGraphicsCommandContext();
-        renderer.Render(context, FrontendSurfaceView.StudioSplash(0));
-        int visibleBrandVertices = _graphics.LastBuffer!.VisibleBrandVertices;
-        renderer.Render(context, FrontendSurfaceView.StudioSplashBootstrap());
-        Assert.Equal(0, visibleBrandVertices);
-        Assert.True(_graphics.LastBuffer.VisibleBrandVertices > 0);
-        Assert.True(FrontendSurfaceView.StudioSplashBootstrap().SplashBootstrap);
+        renderer.Render(context, FrontendSurfaceView.MainMenu([]));
+        Assert.True(renderer.LastRenderedVertexCount > 0);
+        renderer.Render(context, FrontendSurfaceView.StudioSplash(seconds));
+        Assert.Equal(0, renderer.LastRenderedVertexCount);
+        renderer.Render(context, FrontendSurfaceView.StudioSplashBootstrap(seconds));
+        Assert.Equal(0, renderer.LastRenderedVertexCount);
     }
 
     [Fact]

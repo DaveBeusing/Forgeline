@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Runtime.ExceptionServices;
-using ForgeLine.Assets;
 using ForgeLine.Graphics;
 using ForgeLine.Presentation;
 
@@ -18,7 +17,6 @@ internal sealed class ClientFrontendRenderHost : IDisposable
     private readonly ManualResetEventSlim _frameRendered = new(false);
     private readonly Thread _thread;
     private FrontendSurfaceView? _latest;
-    private RuntimeAssetCatalog? _splashAssets;
     private Action<IGraphicsDevice>? _nextStage;
     private long _publishedSequence;
     private long _presentedSequence;
@@ -28,6 +26,7 @@ internal sealed class ClientFrontendRenderHost : IDisposable
     private ExceptionDispatchInfo? _failure;
     private int _stopping;
     private int _splashUnavailable;
+    private int _splashPresented;
     private bool _disposed;
 
     internal ClientFrontendRenderHost(
@@ -75,13 +74,7 @@ internal sealed class ClientFrontendRenderHost : IDisposable
         _signal.Set();
     }
 
-    internal void UseSplashAssets(RuntimeAssetCatalog assets)
-    {
-        ArgumentNullException.ThrowIfNull(assets);
-        lock (_gate) _splashAssets = assets;
-        _signal.Set();
-    }
-
+    internal bool HasPresentedSplashFrame => Volatile.Read(ref _splashPresented) != 0;
     internal bool HasPresentedFrame => Volatile.Read(ref _presentedSequence) > 0;
     internal Thread ExecutionThread => _thread;
 
@@ -220,7 +213,6 @@ internal sealed class ClientFrontendRenderHost : IDisposable
         _started.Set();
         int width = _target.Width, height = _target.Height;
         bool suspended = _target.Suspended;
-        StudioSplashTextureRenderer? splashRenderer = null;
         StudioSplashVideoRenderer? videoRenderer = null;
         bool videoAttempted = false;
         try
@@ -229,7 +221,6 @@ internal sealed class ClientFrontendRenderHost : IDisposable
             {
                 _signal.WaitOne(TimeSpan.FromMilliseconds(16));
                 FrontendSurfaceView? view;
-                RuntimeAssetCatalog? splashAssets;
                 long sequence;
                 int requestedWidth, requestedHeight;
                 bool requestedSuspended;
@@ -237,7 +228,6 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                 {
                     if (_nextStage is not null) return _nextStage;
                     view = _latest;
-                    splashAssets = _splashAssets;
                     sequence = _publishedSequence;
                     requestedWidth = _surfaceWidth;
                     requestedHeight = _surfaceHeight;
@@ -267,6 +257,7 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                 {
                     videoAttempted = true;
                     videoRenderer = StudioSplashVideoRenderer.TryCreate(graphics);
+                    if (videoRenderer is null) Volatile.Write(ref _splashUnavailable, 1);
                 }
                 if (view.Value.Kind != FrontendSurfaceKind.StudioSplash)
                 {
@@ -282,30 +273,15 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                     }
                     catch (Exception error) when (error is IOException or InvalidDataException or InvalidOperationException or NotSupportedException)
                     {
-                        Console.Error.WriteLine($"[studio:video:fallback] {error.Message}");
+                        Console.Error.WriteLine($"[studio:video:unavailable] {error.Message}");
                         videoRenderer.Dispose();
                         videoRenderer = null;
-                    }
-                }
-
-                if (videoRenderer?.HasFrame != true && view.Value.Kind == FrontendSurfaceKind.StudioSplash &&
-                    !view.Value.SplashBootstrap && splashRenderer is null && splashAssets is not null)
-                {
-                    try
-                    {
-                        splashRenderer = new StudioSplashTextureRenderer(graphics, splashAssets);
-                        if (!splashRenderer.HasAssets)
-                            Volatile.Write(ref _splashUnavailable, 1);
-                    }
-                    catch (Exception error)
-                    {
                         Volatile.Write(ref _splashUnavailable, 1);
-                        Console.Error.WriteLine($"[studio:renderer:fallback] {error.Message}");
                     }
                 }
 
                 graphics.RenderFrame(
-                    view.Value.Kind == FrontendSurfaceKind.StudioSplash && videoRenderer?.HasFrame == true
+                    view.Value.Kind == FrontendSurfaceKind.StudioSplash
                         ? new GraphicsColor(0, 0, 0, 1) : GraphicsColor.ForgeLineClear,
                     context =>
                     {
@@ -314,24 +290,18 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                         {
                             videoRenderer.Render(context, view.Value.SplashMasterOpacity);
                         }
-                        else if (view.Value.Kind == FrontendSurfaceKind.StudioSplash &&
-                            !view.Value.SplashBootstrap &&
-                            splashRenderer?.HasAssets == true)
-                        {
-                            splashRenderer.Render(context,
-                                view.Value.SplashElapsedSeconds,
-                                view.Value.SplashMasterOpacity);
-                        }
-                        else
+                        else if (view.Value.Kind != FrontendSurfaceKind.StudioSplash)
                         {
                             renderer.Render(context, view.Value);
                         }
                     });
                 if (ObservePresentation(_startup, _presentedFrames,
                     graphics.PresentedFrameCount, view.Value.Kind,
-                    videoRenderer?.HasFrame == true || !view.Value.SplashBootstrap && splashRenderer?.HasAssets == true,
-                    view.Value.SplashBootstrap && videoRenderer?.HasFrame != true))
+                    videoRenderer?.HasFrame == true,
+                    view.Value.Kind == FrontendSurfaceKind.StudioSplash && videoRenderer?.HasFrame != true))
                 {
+                    if (view.Value.Kind == FrontendSurfaceKind.StudioSplash && videoRenderer?.HasFrame == true)
+                        Volatile.Write(ref _splashPresented, 1);
                     _presentedFrames = graphics.PresentedFrameCount;
                     Volatile.Write(ref _presentedSequence, sequence);
                     _frameRendered.Set();
@@ -341,7 +311,6 @@ internal sealed class ClientFrontendRenderHost : IDisposable
         finally
         {
             videoRenderer?.Dispose();
-            splashRenderer?.Dispose();
         }
         return null;
     }

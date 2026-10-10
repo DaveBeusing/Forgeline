@@ -23,7 +23,13 @@ internal static partial class WindowsNative
     internal const uint CsHorizontalRedraw = 0x0002;
     internal const uint CsVerticalRedraw = 0x0001;
 
-    internal const int ColorWindow = 5;
+    internal const int BlackBrush = 4;
+
+    [LibraryImport("gdi32.dll")]
+    internal static partial nint GetStockObject(int objectIndex);
+
+    [LibraryImport("dwmapi.dll")]
+    internal static partial int DwmSetWindowAttribute(nint window, uint attribute, ref int value, uint size);
     internal const int CursorArrow = 32512;
     internal const int CurrentWindowPosition = unchecked((int)0x80000000);
 

@@ -26,6 +26,14 @@ internal sealed class StudioVideoDecoder : IDisposable
     internal Exception? Failure => Volatile.Read(ref _failure);
     internal bool WorkerCompleted => !_worker.IsAlive;
 
+    internal bool TryReadFirst(out StudioVideoFrame? frame)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        frame = _pending;
+        _pending = null;
+        return frame is not null || _frames.TryTake(out frame);
+    }
+
     internal bool TryRead(long timestamp, out StudioVideoFrame? frame)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);

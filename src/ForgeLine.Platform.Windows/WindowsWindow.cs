@@ -94,14 +94,17 @@ internal sealed class WindowsWindow : IWindow
                 ReadClientSizeOrThrow());
             RefreshCurrentMonitor();
 
-            _ = WindowsNative.ShowWindow(_handle, WindowsNative.SwShow);
-            _ = WindowsNative.UpdateWindow(_handle);
+            // Apply the dark caption before the first visible window; older DWM versions may ignore it.
+            int darkCaption = 1;
+            _ = WindowsNative.DwmSetWindowAttribute(_handle, 20, ref darkCaption, sizeof(int));
 
             if (configuration.Mode != WindowMode.Windowed)
             {
                 SetMode(configuration.Mode);
             }
 
+            _ = WindowsNative.ShowWindow(_handle, WindowsNative.SwShow);
+            _ = WindowsNative.UpdateWindow(_handle);
             EnqueueEvent(WindowEventKind.Created);
         }
         catch
@@ -288,7 +291,7 @@ internal sealed class WindowsWindow : IWindow
                     WindowProcedure = Marshal.GetFunctionPointerForDelegate(WindowProcedure),
                     Instance = s_instanceHandle,
                     Cursor = WindowsNative.LoadCursor(0, new nint(WindowsNative.CursorArrow)),
-                    BackgroundBrush = new nint(WindowsNative.ColorWindow + 1),
+                    BackgroundBrush = WindowsNative.GetStockObject(WindowsNative.BlackBrush),
                     ClassName = className
                 };
 
