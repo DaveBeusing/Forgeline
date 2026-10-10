@@ -220,7 +220,7 @@ World presentation uses one explicit scene-lighting configuration composed by th
 
 Base Color textures marked as sRGB are decoded by the D3D12 SRV before material math. Normal and ORM textures remain linear data. The swap chain intentionally remains R8G8B8A8_UNorm, so terrain and production-object shaders encode their final tone-mapped world color to sRGB before writing the back buffer. This avoids the previous path where linear material values were written directly to the UNorm surface and appeared substantially darker than intended.
 
-The transform is currently part of the terrain and object world-surface shaders instead of a general full-screen post-process. This keeps the change inside the existing one-pass world renderer, adds no full-screen draw call, and leaves player-facing UI/debug palettes on their established output path. A future HDR intermediate or general post-processing chain may centralize the output transform when such a chain is justified by additional effects.
+Direct output remains the default: terrain and object world-surface shaders apply the transform themselves, with no intermediate or fullscreen draw. Optional linear scene composition emits linear world lighting into a frame-indexed FP16 target and applies the same exposure, ACES and output transfer in one shared fullscreen triangle. Player-facing UI/debug palettes retain their output-space path. General effects remain deferred.
 
 SceneLightingSettings is presentation-owned and contains the canonical defaults. The client settings file exposes sceneExposure (validated from 0.25 through 4.0) and composes that value into the immutable scene-lighting state before the render host starts. This gives development and qualification runs an explicit persisted exposure control without making exposure simulation state. Scene lighting never enters simulation state and cannot influence deterministic gameplay.
 
@@ -271,7 +271,7 @@ This foundation deliberately does not implement:
 - advanced culling
 - indirect rendering
 - compute workloads
-- general-purpose full-screen post-processing and HDR intermediates
+- general-purpose post-processing effects and HDR display output
 - cast-shadow maps
 - editor rendering
 - Vulkan
@@ -297,3 +297,33 @@ See [Client Execution Ownership](adr/ClientExecutionOwnership.md).
 ## Player interaction overlays
 
 Graphics pipelines expose opt-in non-premultiplied alpha blending; opaque rendering remains the default. The RTS information overlay opts in for marquee fill and outlines. The player world overlay reuses the bounded debug geometry source with optional screen-space line expansion, soft alpha edges and one triangle batch. The render owner applies the active DPI/UI scale. Developer line rendering retains its existing path. See [Selection and Command Interaction](SelectionAndCommandInteraction.md) for marker semantics and budgets.
+
+## Explicit passes and optional linear scene output
+
+`IGraphicsCommandContext.BeginPass` marks World and Overlay in their original submission order. Graphics performs optional composition at the boundary; World submission after Overlay is rejected. The render host places terrain/objects in World and all debug lines, interaction geometry, HUD, development metrics and frontend surfaces in Overlay. Loading and splash paths enter Overlay directly.
+
+For development rollout, set `FORGELINE_LINEAR_SCENE_OUTPUT=1` before launching the client. Omit it or set it to 0 for direct output. The render owner configures exposure/tone mapping before world renderer construction. Unsupported devices reject enabled composition explicitly. Native startup failure remains an actionable session failure; no silent fallback changes a requested path.
+
+Scene targets use R16G16B16A16_FLOAT, one target and SRV per swap-chain index, and the existing frame reuse fences. Resize recreates them only after all frames retire. Minimize/occlusion retain the existing no-submission behavior; device loss and shutdown retain the existing ownership policy. Pipeline target formats are checked against the active pass. Only opaque world pipelines are supported in the scene target. Clear/terrain debug pixels carry an output-space alpha tag, which composition preserves. Details and future-effect constraints: [Explicit Frame Passes and Scene Composition](adr/ExplicitFramePassesAndSceneComposition.md).
+
+`GraphicsDiagnostics.Frame` and client qualification `metrics.FramePasses` expose the target plan, CPU submission identity, completed GPU fence, World/composition/Overlay timings and absent-feature reasons. CPU measurements cover command recording, with clear/setup included in World; they exclude allocator waits and Present. GPU measurements are delayed until fence completion and partition the measured frame. Old-size/configuration measurements are cleared. Target bytes are logical texel payload, not total driver VRAM. At three buffers, scene payload is 21.1 MiB at 1280×720, 47.5 MiB at 1920×1080 and 189.8 MiB at 3840×2160. Direct output adds zero scene bytes and zero composition draws.
+
+Native graphics tests perform readback only on explicit qualification captures, comparing linear/sRGB material transfer, alpha, overlays, enabled/disabled composition, resize and suspension on hardware and forced WARP. Production presentation tests compare terrain, procedural objects, debug lines and terrain debug palettes at three camera distances. FP16 world precision is bounded to one 8-bit step; the tested overlay pixels are exact. New native presentation fixtures run separately from parallel CPU allocation fixtures. Existing allocation assertions remain unchanged.
+
+The isolated hardware comparison is opt-in:
+
+```powershell
+$env:FORGELINE_PASS_BENCHMARK_OUTPUT = Join-Path (Get-Location) 'artifacts/scene-pass-performance.json'
+$env:FORGELINE_BENCHMARK_DRIVER = '<installed driver version>'
+dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.ScenePassPerformanceQualificationTests
+```
+
+Observed on NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU, driver 32.0.15.9653, 1280×720, three buffers, VSync off, nine fixed representative terrain chunks, exposure 1.15, ACES, 64 warmups and 512 CPU samples per mode. GPU statistics sample distinct completed fences; no concurrent asset build or validation command ran during measurement.
+
+| Camera distance | Direct GPU mean ms | Scene GPU mean ms | Composition GPU mean ms | Direct CPU mean ms | Scene CPU mean ms |
+| --- | --- | --- | --- | --- | --- |
+| 25 | 0.897 | 1.193 | 0.169 | 7.466 | 3.615 |
+| 90 | 0.993 | 1.145 | 0.141 | 3.512 | 3.442 |
+| 240 | 1.786 | 1.572 | 0.105 | 4.235 | 3.753 |
+
+CPU figures include frame reuse/Present overhead in the benchmark's outer frame call and differ from pass-recording diagnostics. Sequential samples remain sensitive to clocks, scheduling and warmup; no CPU improvement or portable GPU threshold is claimed. This fixture excludes gameplay, objects and HUD. WARP establishes functional correctness only. Sustained full-client throughput, physical-monitor readability, extended resize/occlusion soak and real device removal remain separate acceptance work.

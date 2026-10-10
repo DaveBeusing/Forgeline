@@ -19,7 +19,16 @@ if ($Metrics.instanceDrawCalls -le 0 -or $Metrics.instanceDrawCalls -gt 11) {
     throw 'Instance draw calls exceeded the canonical mesh/material batch budget of 11.'
 }
 
-if ($Metrics.totalMeasuredDrawCalls -ne ($Metrics.terrainDrawCalls + $Metrics.instanceDrawCalls) -or
-    $Metrics.totalMeasuredDrawCalls -gt ($Metrics.visibleTerrainChunks + 11)) {
+$compositeDrawCalls = 0
+if ($null -ne $Metrics.PSObject.Properties['framePasses'] -and $null -ne $Metrics.framePasses -and
+    $null -ne $Metrics.framePasses.PSObject.Properties['compositeDrawCalls']) {
+    $compositeDrawCalls = $Metrics.framePasses.compositeDrawCalls
+    if ($compositeDrawCalls -lt 0 -or $compositeDrawCalls -gt 1) {
+        throw 'Scene composition must submit at most one fullscreen draw.'
+    }
+}
+
+if ($Metrics.totalMeasuredDrawCalls -ne ($Metrics.terrainDrawCalls + $Metrics.instanceDrawCalls + $compositeDrawCalls) -or
+    $Metrics.totalMeasuredDrawCalls -gt ($Metrics.visibleTerrainChunks + 11 + $compositeDrawCalls)) {
     throw 'Measured draw calls exceeded the visible-terrain plus instance-batch budget.'
 }
