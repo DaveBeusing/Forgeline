@@ -76,7 +76,8 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                     var panel = _bounds; _line = 0;
                     _bounds = new(panel.X, panel.Y + 264 * _scale, panel.Width, 52 * _scale);
                     OperationsFacility? selected = null;
-                    foreach (var row in data.Facilities) if (row.Entity == view.Selected) { selected = row; break; }
+                    for (int rowIndex = 0; rowIndex < data.Facilities.Count; rowIndex++)
+                        if (data.Facilities[rowIndex].Entity == view.Selected) { selected = data.Facilities[rowIndex]; break; }
                     if (selected is { } detail)
                     {
                         Line(detail.Explanation);
@@ -84,9 +85,12 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                         b.Append(" POWER "); Number(ref b, detail.AllocatedPower); b.Append(" / "); Number(ref b, detail.PowerDemand);
                         b.Append(" LOAD "); Number(ref b, detail.Utilization, "P0"); Line(b.Written);
                         int routes = 0, unavailable = 0; double linkCapacity = 0;
-                        foreach (var route in data.Routes)
+                        for (int routeIndex = 0; routeIndex < data.Routes.Count; routeIndex++)
+                        {
+                            var route = data.Routes[routeIndex];
                             if (route.Source == detail.Entity || route.Destination == detail.Entity)
                             { routes++; linkCapacity += route.CapacityPerSecond; if (!route.Enabled) unavailable++; }
+                        }
                         b = new(text); b.Append("LISTED LINKS "); b.Number(routes, "0"); b.Append(" DISABLED "); b.Number(unavailable, "0");
                         b.Append(" CAP/S "); b.Number(linkCapacity, "0"); b.Append(" / FOCUS NEXT"); Line(b.Written);
                     }

@@ -38,9 +38,12 @@ public static class OperationsLayout
     public static OperationsFacility? Row(OperationsSnapshot snapshot, in OperationsView view, int index)
     {
         int skip = Math.Max(0, view.Page) * PageSize + index;
-        foreach (var row in snapshot.Facilities)
+        for (int rowIndex = 0; rowIndex < snapshot.Facilities.Count; rowIndex++)
+        {
+            var row = snapshot.Facilities[rowIndex];
             if (view.Filter == OperationsCategory.All || row.Category == view.Filter || view.Filter == OperationsCategory.Blocked && row.Cause.Length > 0)
             { if (skip-- == 0) return row; }
+        }
         return null;
     }
 }
@@ -54,6 +57,7 @@ public sealed class OperationsController
     private bool _initialized;
     private EntityId _lastRouteFocus;
     public OperationsView View { get; private set; }
+    public void CancelInput(InputState input) => _press = input.MousePressSequence(PlatformMouseButton.Left);
     public OperationsInteraction Update(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout,
         PresentationInteractionState interaction, bool blocked = false)
     {

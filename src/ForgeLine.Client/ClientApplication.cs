@@ -995,6 +995,7 @@ internal sealed class ClientApplication
             if (shouldPauseForWindow ||
                 shellBlocksGameplay || modalFrame || shellChanged || !window.IsFocused)
             {
+                operationsController.CancelInput(inputState);
                 hoverTooltip.Reset();
                 presentationInteraction.SetHover(EntityId.Invalid, SimulationSessionId.None);
                 actionPanel.Close();
@@ -1165,6 +1166,7 @@ internal sealed class ClientApplication
                         selectionController.Selection.SetSingle(operationsResult.Navigate);
                         presentationInteraction.SetSelection(selectionController.Selection.Entities);
                         actionPanel.OpenOperationsControls(operationsResult.Controls);
+                        hudInteraction.CaptureKeyboard(actionPanel.HasKeyboardFocus);
                     }
                 }
             }

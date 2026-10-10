@@ -93,6 +93,7 @@ internal static class OperationsSnapshotFactory
             bool cargo = entities.TryGetComponent(entity, out CargoTransport cargoTransport);
             bool node = scenario.Logistics.TryGetNodeForEntity(entity, out var nodeId) && scenario.Logistics.TryGetNode(nodeId, out _);
             if (node) localNodes[nodeId] = entity;
+            if (!(processing || units || depot || provider || consumer || generator || storage || hub || cargo || node)) continue;
             var held = new HashSet<InventoryId>();
             if (processing) { held.Add(production.InputInventory); held.Add(production.OutputInventory); }
             if (units) held.Add(factory.InputInventory);
@@ -105,27 +106,32 @@ internal static class OperationsSnapshotFactory
             foreach (var inventory in held)
                 if (scenario.Inventories.Contains(inventory))
                 { inventories.Add(inventory); hasInventory = true; quantity += scenario.Inventories.GetTotalQuantity(inventory); totalCapacity += scenario.Inventories.GetTotalCapacity(inventory); }
-            if (!(processing || units || depot || provider || consumer || generator || storage || hub || cargo || node)) continue;
             count++;
-            if (rows.Count == OperationsSnapshot.MaximumFacilities) continue;
             var category = processing || units ? OperationsCategory.Production : depot || provider ? OperationsCategory.Supply :
                 storage || hub || cargo || node ? OperationsCategory.Logistics : OperationsCategory.Power;
             string status = processing ? production.Status.ToString() : units ? factory.Status.ToString() :
-                consumer ? power.State.ToString() : generator ? generation.State.ToString() : "AVAILABLE";
+                depot ? supplyDepot.State.ToString() : provider ? supplyProvider.Enabled ? "ENABLED" : "DISABLED" :
+                hub ? logisticsHub.State.ToString() : consumer ? power.State.ToString() : generator ? generation.State.ToString() : "AVAILABLE";
             string cause = processing && production.BlockReason != ProductionBlockReason.None ? production.BlockReason.ToString() :
                 units && factory.BlockReason != UnitProductionBlockReason.None ? factory.BlockReason.ToString() :
-                consumer && power.State != PowerOperationalState.Powered ? "NoPower" : string.Empty;
+                consumer && power.State != PowerOperationalState.Powered ? power.State.ToString() : string.Empty;
             if (distribution.TryGetValue(entity, out string? transportCause)) cause = cause.Length > 0 ? cause + "/" + transportCause : transportCause;
             string name = category.ToString();
             if (entities.TryGetComponent(entity, out CompletedBuilding identity) && scenario.Services.BuildingDefinitions.TryGet(identity.BuildingId, out var definition))
                 name = definition.DisplayName;
             nodeCapacity.TryGetValue(nodeId, out var measured);
             double? transportCapacity = node && scenario.Logistics.TryGetNode(nodeId, out var topology) ? topology.ThroughputCapacityPerSecond : null;
-            rows.Add(new(entity, name, category, status, cause, Explain(cause), queues.GetValueOrDefault(entity),
+            var row = new OperationsFacility(entity, name, category, status, cause, Explain(cause), queues.GetValueOrDefault(entity),
                 hasInventory ? quantity : null, hasInventory ? totalCapacity : null, consumer ? power.Demand : null,
                 consumer ? power.AllocatedPower : null, transportCapacity, nodeCapacity.ContainsKey(nodeId) ? measured.Utilization : null,
                 processing ? PlayerActionPanelMode.Production : units ? PlayerActionPanelMode.UnitProduction :
-                depot || provider ? PlayerActionPanelMode.Supply : hasInventory || cargo ? PlayerActionPanelMode.Logistics : PlayerActionPanelMode.Closed));
+                depot || provider ? PlayerActionPanelMode.Supply : hasInventory || cargo ? PlayerActionPanelMode.Logistics : PlayerActionPanelMode.Closed);
+            if (rows.Count < OperationsSnapshot.MaximumFacilities) rows.Add(row);
+            else if (cause.Length > 0)
+            {
+                int replace = rows.FindIndex(static retained => retained.Cause.Length == 0);
+                if (replace >= 0) rows[replace] = row;
+            }
         }
         var routes = new List<OperationsRoute>(OperationsSnapshot.MaximumRoutes);
         int routeCount = 0;
@@ -144,6 +150,8 @@ internal static class OperationsSnapshotFactory
             foreach (var inventory in inventories) quantity += scenario.Inventories.GetQuantity(inventory, resource.Id);
             resources.Add(new(resource.Id, resource.DisplayName, quantity, null));
         }
+        rows.Sort(static (a, b) =>
+        { int priority = (a.Cause.Length == 0).CompareTo(b.Cause.Length == 0); return priority != 0 ? priority : a.Entity.CompareTo(b.Entity); });
         return new(scenario.Simulation.SessionId, context.Tick, extraction.Player, rows, resources, routes, count, routeCount);
         void Count(EntityId entity) { if (Owned(entity)) queues[entity] = queues.GetValueOrDefault(entity) + 1; }
         bool Owned(EntityId entity) => entities.TryGetComponent(entity, out ControllableEntity owner) &&
@@ -154,6 +162,8 @@ internal static class OperationsSnapshotFactory
     {
         "NoInput" => "INPUT STOCK INSUFFICIENT - CHECK LOGISTICS",
         "NoPower" => "ALLOCATED POWER BELOW REQUIREMENT",
+        "Brownout" => "REPORTED POWER BROWNOUT",
+        "Offline" => "REPORTED POWER CONSUMER OFFLINE",
         "OutputFull" => "OUTPUT STORAGE FULL - CHECK COLLECTION",
         "Paused" => "REQUEST PAUSED BY POLICY",
         "DesiredStockReached" => "TARGET STOCK REACHED",
