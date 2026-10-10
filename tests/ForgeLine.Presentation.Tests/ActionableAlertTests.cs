@@ -162,6 +162,27 @@ public sealed class ActionableAlertTests
         var result = controller.Update(input, snapshot, layout);
         Assert.True(result.Captured); Assert.False(result.OpenOperations); Assert.False(result.Target.IsValid);
     }
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void HeldPressWaitsForReleaseAndRejectsResolvedOrRecurringIdentity(bool resolved)
+    {
+        var tracker = new AlertLifecycleTracker(); var controller = new ActionableAlertController(); var input = new InputState();
+        var snapshot = Snapshot(tracker.Capture(new(1), Experience(4, PlayerAlertState.LowPower), []));
+        var layout = GameplayHudLayout.Create(1600, 900, 96); var rect = ActionableAlertLayout.Row(layout, 0);
+        controller.Update(input, snapshot, layout);
+        int x = (int)(rect.X + 10), y = (int)(rect.Y + 5);
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Left, x, y));
+        Assert.False(controller.Update(input, snapshot, layout).OpenOperations);
+        if (resolved)
+        {
+            tracker.Capture(new(1), Experience(5), []);
+            snapshot = Snapshot(tracker.Capture(new(1), Experience(6, PlayerAlertState.LowPower), []), tick: 6);
+        }
+        input.BeginFrame(); input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Left, x, y));
+        Assert.Equal(!resolved, controller.Update(input, snapshot, layout).OpenOperations);
+        Assert.False(controller.Update(input, snapshot, layout).OpenOperations);
+    }
     private static PlayerExperienceSnapshot Experience(ulong tick = 4, PlayerAlertState flags = default) =>
         default(PlayerExperienceSnapshot) with { Tick = new(tick), Player = new(1), Alerts = flags, MatchStatus = PlayerMatchStatus.Active };
     private static PresentationSnapshot Snapshot(ActionableAlertSnapshot alerts, ulong tick = 4, ulong session = 1, uint player = 1, bool terminal = false) =>
