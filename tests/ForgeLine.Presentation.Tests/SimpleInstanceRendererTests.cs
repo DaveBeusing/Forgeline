@@ -12,6 +12,36 @@ public sealed class SimpleInstanceRendererTests : IDisposable
     private readonly FakeGraphicsDevice _graphics = new();
 
     [Fact]
+    public void AnimatedVegetationKeepsOneBatchAndHiddenInstancesOutOfUploads()
+    {
+        _graphics.CaptureUploads = true;
+        var camera = new RtsCamera(new() { InitialDistance = 30 });
+        var tree = Instance(new EntityId(1, 1), camera.Target, new Vector3(6)) with
+        {
+            WorldFeature = new(WorldVisualId.VegetationConifer, WorldPresentationKind.Vegetation, default, false)
+        };
+        var hidden = tree with { Entity = new(3, 1), Visibility = RenderVisibilityMask.Debug };
+        var buffer = new PresentationSnapshotBuffer();
+        buffer.Publish(new(new SimulationTick(1), TimeSpan.FromMilliseconds(50), 3,
+            [tree, tree with { Entity = new(2, 1), Transform = tree.Transform with { Position = camera.Target + new Vector3(3, 0, 0) } }, hidden]));
+        var world = new RenderWorld();
+        Assert.True(world.Update(buffer));
+        using var renderer = new SimpleInstanceRenderer(_graphics);
+        var context = new FakeGraphicsCommandContext();
+        renderer.Render(context, camera, world, 1, presentationSeconds: 1);
+        byte[] first = _graphics.Buffers[^1].LastUpload;
+        Assert.Equal(2, renderer.LastDiagnostics.VisibleInstances);
+        Assert.Equal(1, renderer.LastDiagnostics.DrawCalls);
+        Assert.Equal(2, renderer.SubmissionMetrics.SubmittedInstances);
+        Assert.Equal(2, renderer.LastDiagnostics.AnimatedVegetationInstances);
+        renderer.Render(context, camera, world, 1, presentationSeconds: 2);
+        Assert.NotEqual(first, _graphics.Buffers[^1].LastUpload);
+        Assert.Equal(1, renderer.LastDiagnostics.DrawCalls);
+        Assert.Equal(tree.Transform, world.GetInterpolatedInstance(0, 1).Transform);
+        Assert.Throws<ArgumentOutOfRangeException>(() => renderer.Render(context, camera, world, 1, double.PositiveInfinity));
+    }
+
+    [Fact]
     public void CloseWreckReportsTheReducedLodUsedByItsMesh()
     {
         var camera = new RtsCamera(new RtsCameraSettings { InitialDistance = 12 });

@@ -48,12 +48,29 @@ public sealed class TerrainPresentationProfile
     {
         ArgumentNullException.ThrowIfNull(materials);
 
+        TerrainMaterialDefinition[] definitions = materials.ToArray();
+        foreach (TerrainMaterialDefinition material in definitions)
+        {
+            if (!Enum.IsDefined(material.Slot) || !AssetId.TryParse(material.AssetId, out _) ||
+                !float.IsFinite(material.TextureTileMeters) || material.TextureTileMeters < 1 || material.TextureTileMeters > 512 ||
+                !float.IsFinite(material.Roughness) || material.Roughness < 0 || material.Roughness > 1 ||
+                !float.IsFinite(material.Metallic) || material.Metallic < 0 || material.Metallic > 1 ||
+                !float.IsFinite(material.BaseColor.X) || !float.IsFinite(material.BaseColor.Y) || !float.IsFinite(material.BaseColor.Z) ||
+                material.BaseColor.X < 0 || material.BaseColor.Y < 0 || material.BaseColor.Z < 0)
+                throw new ArgumentException("Terrain materials require valid IDs, slots, finite factors and a 1–512m tile.", nameof(materials));
+        }
+
         _materials =
-            materials.ToDictionary(
+            definitions.ToDictionary(
                 static material => material.Slot);
         _regions =
             regions?.ToArray() ??
             [];
+        foreach (TerrainBlendRegion region in _regions)
+            if (!Enum.IsDefined(region.Slot) || !float.IsFinite(region.Center.X) || !float.IsFinite(region.Center.Y) ||
+                !float.IsFinite(region.HalfExtents.X) || !float.IsFinite(region.HalfExtents.Y) ||
+                region.HalfExtents.X <= 0 || region.HalfExtents.Y <= 0 || !float.IsFinite(region.FeatherMeters) || region.FeatherMeters < 0)
+                throw new ArgumentException("Terrain regions require finite centers, positive extents and non-negative feathering.", nameof(regions));
 
         FallbackMaterial =
             _materials.TryGetValue(
@@ -364,6 +381,7 @@ public sealed class TerrainPresentationProfile
         return new TerrainPresentationProfile(
             materials,
             [
+                new(TerrainMaterialSlot.Mud, new Vector2(1_536, 1_536), new Vector2(1_120, 44), 24),
                 new(
                     TerrainMaterialSlot.Gravel,
                     new Vector2(
@@ -754,9 +772,7 @@ public sealed class TerrainPresentationProfile
             return 0.0f;
         }
 
-        return 0.92f *
-            (1.0f -
-             outside /
-             region.FeatherMeters);
+        float t = 1.0f - outside / region.FeatherMeters;
+        return 0.92f * t * t * (3.0f - 2.0f * t);
     }
 }

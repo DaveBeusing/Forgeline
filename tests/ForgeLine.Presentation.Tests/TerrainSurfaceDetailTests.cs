@@ -1,4 +1,6 @@
 using System.Numerics;
+using System.Text.Json;
+using ForgeLine.Assets;
 using ForgeLine.Graphics;
 using ForgeLine.Platform;
 using ForgeLine.Platform.Windows;
@@ -90,6 +92,65 @@ public sealed class TerrainSurfaceDetailTests
         {
             using var renderer = new TerrainRenderer(graphics, terrain, surfaceDetail: detail) { DebugChunksEnabled = false };
             return graphics.CaptureFrame(GraphicsColor.ForgeLineClear, context => renderer.Render(context, camera));
+        }
+    }
+
+    [Fact]
+    public void SteepRockChangesProjectionWithTheExistingMaterialSamples()
+    {
+        string root = Path.Combine(Path.GetTempPath(), "forgeline-rock-projection-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            var records = new List<RuntimeAssetRecord>();
+            byte[] stripes = new byte[8 * 8 * 4];
+            for (int pixel = 0; pixel < 64; pixel++)
+            {
+                stripes[pixel * 4] = pixel % 8 < 4 ? (byte)200 : (byte)40;
+                stripes[pixel * 4 + 1] = pixel % 8 < 4 ? (byte)40 : (byte)200;
+                stripes[pixel * 4 + 2] = 80;
+                stripes[pixel * 4 + 3] = 255;
+            }
+            var texture = new RuntimeTextureData(8, 8, RuntimeTextureFormat.Rgba8Unorm, RuntimeTextureColorSpace.Srgb,
+                RuntimeTextureUsage.BaseColor, [new(8, 8, 32, stripes)]);
+            Write("texture.test.rock", RuntimeAssetType.Texture, texture.ToPayload());
+            var definitions = TerrainPresentationProfile.CreateCentralDivide().Materials;
+            foreach (var material in definitions)
+                Write(material.AssetId, RuntimeAssetType.Material, """{"baseColorTexture":"texture.test.rock"}"""u8.ToArray());
+            File.WriteAllText(Path.Combine(root, RuntimeAssetCatalog.ManifestFileName), JsonSerializer.Serialize(
+                new RuntimeAssetManifest { CompilerVersion = "test", Assets = records }, RuntimeAssetCatalog.CreateJsonOptions()));
+            using var platform = new WindowsPlatform();
+            using IWindow window = platform.CreateWindow(new WindowConfiguration("FORGELINE Rock Projection Test", 320, 240));
+            using var graphics = (D3D12GraphicsDevice)GraphicsDeviceFactory.CreateForWindow(window,
+                new() { ForceSoftwareAdapter = true, EnableDebugLayer = false, EnableVSync = false });
+            var terrain = new TerrainWorld(new WorldGridSettings { HeightSamplesPerSide = 2 },
+                [new TerrainChunk(new(0, 0), new TerrainHeightfield(2, 256, [0, 512, 0, 512]))]);
+            var camera = new RtsCamera(new() { InitialTarget = new(128, 256, 128), InitialDistance = 120 });
+            var profile = new TerrainPresentationProfile(definitions.Select(material => material with { TextureTileMeters = 32 }));
+            var detail = TerrainSurfaceDetailSettings.Default with { MicroColorStrength = 0, MicroNormalStrength = 0 };
+            byte[] before = Capture(detail with { Enabled = false });
+            byte[] after = Capture(detail);
+            Assert.NotEqual(before, after);
+            Assert.Equal(after, Capture(detail));
+            Assert.Equal(0, graphics.Diagnostics.Resources.TextureBindingFailureCount);
+
+            byte[] Capture(TerrainSurfaceDetailSettings settings)
+            {
+                using var renderer = new TerrainRenderer(graphics, terrain, presentationProfile: profile,
+                    runtimeAssets: RuntimeAssetCatalog.Load(root), surfaceDetail: settings) { DebugChunksEnabled = false };
+                return graphics.CaptureFrame(GraphicsColor.ForgeLineClear, context => renderer.Render(context, camera));
+            }
+            void Write(string id, RuntimeAssetType type, byte[] payload)
+            {
+                string file = id + ".flasset";
+                RuntimeAssetFile.Write(Path.Combine(root, file), type, [], payload);
+                records.Add(new() { Id = id, Type = type, SourcePath = file, RuntimePath = file, SourceHash = "test",
+                    BuildHash = "test", RuntimeVersion = 1, CompilerVersion = "test" });
+            }
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
         }
     }
 }

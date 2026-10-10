@@ -163,27 +163,31 @@ public sealed class SimpleInstanceRenderer : IDisposable
         IGraphicsCommandContext context,
         RtsCamera camera,
         RenderWorld world,
-        float alpha)
-        => RenderCore(context, camera, world, alpha);
+        float alpha,
+        double? presentationSeconds = null)
+        => RenderCore(context, camera, world, alpha, presentationSeconds: presentationSeconds);
 
     public void RenderShadow(IGraphicsCommandContext context, RtsCamera camera, RenderWorld world, float alpha,
-        GraphicsDirectionalShadowFrame frame, int maximumCasters, int maximumDraws)
+        GraphicsDirectionalShadowFrame frame, int maximumCasters, int maximumDraws, double? presentationSeconds = null)
     {
         frame.Validate();
         ArgumentOutOfRangeException.ThrowIfNegative(maximumCasters);
         ArgumentOutOfRangeException.ThrowIfNegative(maximumDraws);
         InstanceRenderDiagnostics prior = LastDiagnostics;
-        RenderCore(context, camera, world, alpha, frame.ViewProjection, maximumCasters, maximumDraws);
+        RenderCore(context, camera, world, alpha, frame.ViewProjection, maximumCasters, maximumDraws, presentationSeconds);
         LastDiagnostics = prior;
     }
 
     private void RenderCore(IGraphicsCommandContext context, RtsCamera camera, RenderWorld world, float alpha,
-        Matrix4x4? shadowProjection = null, int maximumCasters = int.MaxValue, int maximumDraws = int.MaxValue)
+        Matrix4x4? shadowProjection = null, int maximumCasters = int.MaxValue, int maximumDraws = int.MaxValue,
+        double? presentationSeconds = null)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(camera);
         ArgumentNullException.ThrowIfNull(world);
+        if (presentationSeconds is { } seconds && (!double.IsFinite(seconds) || seconds < 0))
+            throw new ArgumentOutOfRangeException(nameof(presentationSeconds));
 
         CameraMatrices matrices =
             camera.GetMatrices(
@@ -198,6 +202,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
         var batches = _batches;
 
         int visible = 0;
+        int animatedVegetation = 0;
         int highLod = 0;
         int reducedLod = 0;
         int lod1Instances = 0;
@@ -220,8 +225,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
             }
 
             AxisAlignedBounds bounds =
-                PresentationBounds.ResolveAxisAlignedBounds(
-                    instance);
+                presentationSeconds.HasValue ? VegetationVisualMotion.CullingBounds(instance) :
+                    PresentationBounds.ResolveAxisAlignedBounds(instance);
 
             if (!frustum.Intersects(
                     bounds))
@@ -465,7 +470,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         ? runtimeMaterial.BaseColorFactor
                         : null);
             Matrix4x4 worldMatrix =
-                instance.Transform.ToMatrix();
+                presentationSeconds.HasValue ? VegetationVisualMotion.Transform(instance, projectedDiameter, presentationSeconds.Value) :
+                    instance.Transform.ToMatrix();
+            if (presentationSeconds.HasValue && projectedDiameter > 18 && VegetationVisualMotion.Applies(instance)) animatedVegetation++;
 
             if (instance.InfrastructureFeature.IsSpecified)
             {
@@ -779,7 +786,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 reducedLod,
                 runtimeMeshInstances,
                 texturedRuntimeMeshInstances,
-                fallbackMeshInstances) { Lod1Instances = lod1Instances, Lod2Instances = lod2Instances };
+                fallbackMeshInstances) { Lod1Instances = lod1Instances, Lod2Instances = lod2Instances, AnimatedVegetationInstances = animatedVegetation };
     }
 
     public void Dispose()

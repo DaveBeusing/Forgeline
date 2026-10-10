@@ -9,5 +9,9 @@
   "metallicFactor": 0,
   "roughnessFactor": 1,
   "normalTexture": "texture.world.terrain.dark_ash_normal",
-  "ormTexture": "texture.world.terrain.dark_ash_orm"
+  "ormTexture": "texture.world.terrain.dark_ash_orm",
+  "uvScale": [
+    1.25,
+    1.25
+  ]
 }

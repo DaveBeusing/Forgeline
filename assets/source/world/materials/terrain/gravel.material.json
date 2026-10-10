@@ -9,5 +9,9 @@
   "metallicFactor": 0,
   "roughnessFactor": 1,
   "normalTexture": "texture.world.terrain.crushed_gravel_normal",
-  "ormTexture": "texture.world.terrain.crushed_gravel_orm"
+  "ormTexture": "texture.world.terrain.crushed_gravel_orm",
+  "uvScale": [
+    2,
+    2
+  ]
 }

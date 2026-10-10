@@ -13,4 +13,5 @@ public readonly record struct InstanceRenderDiagnostics(
 {
     public int Lod1Instances { get; init; }
     public int Lod2Instances { get; init; }
+    public int AnimatedVegetationInstances { get; init; }
 }
