@@ -45,7 +45,8 @@ internal sealed class ClientSettingsFrontendAdapter
                 CameraPanSpeedMultiplier =
                     snapshot.CameraPanSpeedMultiplier,
                 CameraBindings =
-                    snapshot.CameraBindings
+                    snapshot.CameraBindings,
+                GameplayBindings = snapshot.GameplayBindings ?? new()
             };
 
         settings.Validate();
@@ -66,6 +67,6 @@ internal sealed class ClientSettingsFrontendAdapter
             settings.ShowOnboarding,
             settings.EdgeScrollEnabled,
             settings.CameraPanSpeedMultiplier,
-            settings.CameraBindings);
+            settings.CameraBindings, settings.GameplayBindings);
     }
 }

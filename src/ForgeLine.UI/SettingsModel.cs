@@ -11,7 +11,7 @@ public readonly record struct FrontendSettingsSnapshot(
     bool ShowOnboarding,
     bool EdgeScrollEnabled,
     float CameraPanSpeedMultiplier,
-    RtsCameraBindings CameraBindings);
+    RtsCameraBindings CameraBindings, GameplayBindings? GameplayBindings = null);
 
 public sealed class SettingsModel
 {
@@ -67,6 +67,12 @@ public sealed class SettingsModel
         {
             CameraBindings = bindings
         };
+    }
+
+    public void SetGameplayBindings(GameplayBindings bindings)
+    {
+        _ = new GameplayBindingRegistry(bindings, Settings.CameraBindings);
+        Settings = Settings with { GameplayBindings = bindings };
     }
 
     public static GameFrontendAction Back() =>
