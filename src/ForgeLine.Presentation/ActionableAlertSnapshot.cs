@@ -40,8 +40,11 @@ public sealed class AlertLifecycleTracker
     private SimulationTick _tick;
     public static PlayerAlertState Kind(int index) => index switch
     {
-        0 => PlayerAlertState.CommandCoreDestroyed, 1 => PlayerAlertState.CommandCoreDamaged,
-        2 => PlayerAlertState.SupplyCritical, 3 => PlayerAlertState.ProductionBlocked, _ => PlayerAlertState.LowPower
+        0 => PlayerAlertState.CommandCoreDestroyed,
+        1 => PlayerAlertState.CommandCoreDamaged,
+        2 => PlayerAlertState.SupplyCritical,
+        3 => PlayerAlertState.ProductionBlocked,
+        _ => PlayerAlertState.LowPower
     };
     public ActionableAlertSnapshot Capture(SimulationSessionId session, in PlayerExperienceSnapshot experience, ReadOnlySpan<EntityId> targets)
     {
@@ -61,17 +64,26 @@ public sealed class AlertLifecycleTracker
     }
     public static string Label(PlayerAlertState kind) => kind switch
     {
-        PlayerAlertState.CommandCoreDestroyed => "CORE DESTROYED", PlayerAlertState.CommandCoreDamaged => "CORE DAMAGED",
-        PlayerAlertState.SupplyCritical => "SUPPLY CRITICAL", PlayerAlertState.ProductionBlocked => "PRODUCTION BLOCKED", _ => "POWER CONSTRAINED"
+        PlayerAlertState.CommandCoreDestroyed => "CORE DESTROYED",
+        PlayerAlertState.CommandCoreDamaged => "CORE DAMAGED",
+        PlayerAlertState.SupplyCritical => "SUPPLY CRITICAL",
+        PlayerAlertState.ProductionBlocked => "PRODUCTION BLOCKED",
+        _ => "POWER CONSTRAINED"
     };
     public static OperationsCategory Category(PlayerAlertState kind) => kind switch
     {
-        PlayerAlertState.SupplyCritical => OperationsCategory.Supply, PlayerAlertState.LowPower => OperationsCategory.Power, _ => OperationsCategory.Blocked
+        PlayerAlertState.SupplyCritical => OperationsCategory.Supply,
+        PlayerAlertState.LowPower => OperationsCategory.Power,
+        _ => OperationsCategory.Blocked
     };
     public static RtsUiIcon Icon(PlayerAlertState kind) => kind switch
     {
-        PlayerAlertState.SupplyCritical => RtsUiIcon.CommandSupply, PlayerAlertState.LowPower => RtsUiIcon.StatusPower,
-        PlayerAlertState.ProductionBlocked => RtsUiIcon.BuildingFactory, _ => RtsUiIcon.StatusAlert
+        PlayerAlertState.SupplyCritical => RtsUiIcon.SupplyCritical,
+        PlayerAlertState.LowPower => RtsUiIcon.StatusPower,
+        PlayerAlertState.ProductionBlocked => RtsUiIcon.BuildingFactory,
+        PlayerAlertState.CommandCoreDamaged => RtsUiIcon.StatusHealth,
+        PlayerAlertState.CommandCoreDestroyed => RtsUiIcon.BuildingCommand,
+        _ => RtsUiIcon.StatusAlert
     };
 
     internal ActionableAlertSnapshot Capture(SimulationContext context, PresentationExtractionContext extraction, in PlayerExperienceSnapshot experience)
