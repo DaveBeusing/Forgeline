@@ -5,8 +5,8 @@ using ForgeLine.Economy;
 using ForgeLine.Game;
 using ForgeLine.Graphics;
 using ForgeLine.Input;
-using ForgeLine.Platform;
 using ForgeLine.Logistics;
+using ForgeLine.Platform;
 using ForgeLine.Simulation;
 using Xunit;
 
@@ -15,7 +15,9 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class OperationsTests
 {
     [Theory]
-    [InlineData(0, 0)] [InlineData(10, 10)] [InlineData(320, 180)]
+    [InlineData(0, 0)]
+    [InlineData(10, 10)]
+    [InlineData(320, 180)]
     public void CollapsedViewportsHaveNoOffscreenOperationsTab(int width, int height)
     {
         var layout = GameplayHudLayout.Create(width, height, 192, 2);
