@@ -12,6 +12,10 @@ using static ForgeLine.Presentation.Tests.SelectionOverlayRenderingTests;
 
 namespace ForgeLine.Presentation.Tests;
 
+[CollectionDefinition("Gameplay UI geometry", DisableParallelization = true)]
+public sealed class GameplayUiFixtureTestGroup;
+
+[Collection("Gameplay UI geometry")]
 public sealed class GameplayUiFixtureTests
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
@@ -20,12 +24,12 @@ public sealed class GameplayUiFixtureTests
     {
         var fixtures = new SortedDictionary<string, Fixture>(StringComparer.Ordinal);
         var bindings = new GameplayBindingRegistry(new GameplayBindings().With(GameplayAction.Build, ForgeLine.Platform.PlatformKey.G));
+        using var device = new RecordingDevice();
+        using var renderer = new PlayerActionDockHudRenderer(device, null);
         foreach (var profile in new[] { (1024, 720, 96u), (1920, 1080, 144u), (1920, 1200, 192u), (3440, 1440, 144u), (3840, 2160, 192u) })
             foreach (float scale in new[] { .75f, 1f, 2f })
                 foreach (string state in new[] { "Ready", "Focus", "Hover", "Pressed", "Disabled", "Pending", "Accepted", "Rejected", "Cancelled" })
                 {
-                    using var device = new RecordingDevice();
-                    using var renderer = new PlayerActionDockHudRenderer(device, null);
                     var snapshot = GameplayRebindingTests.Snapshot();
                     bool disabled = state == "Disabled";
                     if (disabled)
