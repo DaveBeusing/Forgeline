@@ -23,23 +23,29 @@ public readonly record struct CombatGroupMemberReadModel(
     bool HasOrder,
     CombatOrderKind Order,
     bool HasOrderStatus,
-    CombatOrderStatus OrderStatus);
+    CombatOrderStatus OrderStatus,
+    UnitId Unit = default,
+    bool CombatEligible = false);
 
 public sealed class CombatGroupOperationalSnapshot
 {
     private readonly CombatGroupMemberReadModel[] _members;
     private readonly EntityId[] _eligibleEntities;
+    private readonly Dictionary<EntityId, CombatGroupMemberReadModel> _lookup;
 
     public CombatGroupOperationalSnapshot(
         SimulationTick tick,
-        IReadOnlyList<CombatGroupMemberReadModel> members)
+        IReadOnlyList<CombatGroupMemberReadModel> members,
+        SimulationSessionId sessionId = default)
     {
         ArgumentNullException.ThrowIfNull(members);
 
+        SessionId = sessionId;
         Tick =
             tick;
         _members =
-            members.ToArray();
+            members.Where(static member => member.Entity.IsValid).DistinctBy(static member => member.Entity).ToArray();
+        _lookup = _members.ToDictionary(static member => member.Entity);
         _eligibleEntities =
             new EntityId[
                 _members.Length];
@@ -53,6 +59,8 @@ public sealed class CombatGroupOperationalSnapshot
         }
     }
 
+    public SimulationSessionId SessionId { get; }
+
     public SimulationTick Tick { get; }
 
     public IReadOnlyList<CombatGroupMemberReadModel> Members =>
@@ -61,27 +69,9 @@ public sealed class CombatGroupOperationalSnapshot
     public IReadOnlyCollection<EntityId> EligibleEntities =>
         _eligibleEntities;
 
-    public bool TryGet(
-        EntityId entity,
-        out CombatGroupMemberReadModel member)
-    {
-        for (int index = 0;
-             index < _members.Length;
-             index++)
-        {
-            if (_members[index].Entity ==
-                entity)
-            {
-                member =
-                    _members[index];
-                return true;
-            }
-        }
+    public bool TryGet(EntityId entity, out CombatGroupMemberReadModel member) =>
+        _lookup.TryGetValue(entity, out member);
 
-        member =
-            default;
-        return false;
-    }
 }
 
 public readonly record struct CombatGroupSummaryReadModel(
@@ -122,16 +112,20 @@ public sealed class CombatGroupOverviewView
 
     public CombatGroupOverviewView(
         IReadOnlyList<CombatGroupSummaryReadModel> groups,
-        IReadOnlyCollection<EntityId> activeMembers)
+        IReadOnlyCollection<EntityId> activeMembers,
+        SelectedCombatGroup? selection = null)
     {
         ArgumentNullException.ThrowIfNull(groups);
         ArgumentNullException.ThrowIfNull(activeMembers);
 
+        Selection = selection;
         _groups =
             groups.ToArray();
         _activeMembers =
             activeMembers.ToArray();
     }
+
+    public SelectedCombatGroup? Selection { get; }
 
     public IReadOnlyList<CombatGroupSummaryReadModel> Groups =>
         _groups;
@@ -181,7 +175,8 @@ public static class CombatGroupOverviewModel
 
         return new CombatGroupOverviewView(
             summaries,
-            registry.GetActiveMembers());
+            registry.GetActiveMembers(),
+            SelectedCombatGroup.Create(operational, selection));
     }
 
     private static CombatGroupSummaryReadModel Summarize(
@@ -461,7 +456,8 @@ internal static class CombatGroupOperationalSnapshotFactory
 {
     public static CombatGroupOperationalSnapshot Capture(
         SimulationContext context,
-        PlayerId player)
+        PlayerId player,
+        SimulationSessionId sessionId = default)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -479,7 +475,7 @@ internal static class CombatGroupOperationalSnapshotFactory
                 entities.GetComponent<ControllableEntity>(
                     entity);
 
-            if (controllable.Owner !=
+            if (!controllable.IsControllable || controllable.Owner !=
                     player ||
                 (controllable.Category &
                  (ControllableEntityCategory.Unit |
@@ -576,11 +572,14 @@ internal static class CombatGroupOperationalSnapshotFactory
                     hasOrderStatus,
                     hasOrderStatus
                         ? tactical.Status
-                        : default));
+                        : default,
+                    entities.TryGetComponent(entity, out UnitIdentity identity) ? identity.UnitId : default,
+                    entities.HasComponent<WorldTransform>(entity) && entities.HasComponent<Combatant>(entity)));
         }
 
         return new CombatGroupOperationalSnapshot(
             context.Tick,
-            members);
+            members,
+            sessionId);
     }
 }
