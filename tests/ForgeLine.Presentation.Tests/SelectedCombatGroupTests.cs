@@ -12,6 +12,17 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class SelectedCombatGroupTests
 {
+    [Fact]
+    public void CoverageAndCriticalLabelsUseRecognizedPunctuationGlyphs()
+    {
+        foreach (char symbol in "<=()!")
+        {
+            string glyph = SelectionInspectorHudRenderer.TextGlyphPattern(symbol);
+            Assert.Equal(35, glyph.Length);
+            Assert.NotEqual(SelectionInspectorHudRenderer.TextGlyphPattern('?'), glyph);
+        }
+    }
+
     [Theory]
     [InlineData(1)]
     [InlineData(10)]
