@@ -18,6 +18,7 @@ internal static class Program
         string sourceRoot = Path.Combine("assets", "source");
         string runtimeRoot = Path.Combine("assets", "runtime");
         string? qualificationOutput = null;
+        string? progressLog = null;
         var clean = false;
 
         try
@@ -39,6 +40,9 @@ internal static class Program
                     case "--clean":
                         clean = true;
                         break;
+                    case "--progress-log":
+                        progressLog = ReadValue(args, ref index, argument);
+                        break;
                     default:
                         Console.Error.WriteLine($"Unknown argument '{argument}'.");
                         PrintUsage();
@@ -53,10 +57,15 @@ internal static class Program
             return 2;
         }
 
-        var result = AssetPipelineCompiler.Compile(sourceRoot, runtimeRoot, clean);
+        using var log = new AssetCompilationLog(progressLog);
+        using var reporter = new AssetCompilationReporter(log.Write);
+        var result = AssetPipelineCompiler.Compile(sourceRoot, runtimeRoot, clean, log.Write);
 
         foreach (var diagnostic in result.Diagnostics)
         {
+            reporter.Report("diagnostic", diagnostic.Severity.ToString().ToLowerInvariant(),
+                id: diagnostic.AssetId, path: diagnostic.SourcePath,
+                detail: $"{diagnostic.Code}: {diagnostic.Message}");
             var location = diagnostic.SourcePath is null ? string.Empty : $" [{diagnostic.SourcePath}]";
             var asset = diagnostic.AssetId is null ? string.Empty : $" ({diagnostic.AssetId})";
             Console.WriteLine(
@@ -72,13 +81,14 @@ internal static class Program
             return 1;
         }
 
-        RuntimeAssetQualificationReport qualification =
-            RuntimeAssetQualification.Run(
-                runtimeRoot);
+        RuntimeAssetQualificationReport qualification = reporter.Measure("qualification",
+            () => RuntimeAssetQualification.Run(runtimeRoot));
 
         foreach (RuntimeAssetQualificationIssue issue in
                  qualification.Issues)
         {
+            reporter.Report("qualification-diagnostic", issue.Severity.ToString().ToLowerInvariant(),
+                id: issue.AssetId, path: issue.RuntimePath, detail: $"{issue.Code}: {issue.Message}");
             string runtimePath =
                 issue.RuntimePath is null
                     ? string.Empty
@@ -165,6 +175,6 @@ internal static class Program
     {
         Console.WriteLine(
             "ForgeLine.AssetCompiler [--source <assets/source>] [--runtime <assets/runtime>] " +
-            "[--clean] [--qualification-output <report.json>]");
+            "[--clean] [--qualification-output <report.json>] [--progress-log <progress.jsonl>]");
     }
 }

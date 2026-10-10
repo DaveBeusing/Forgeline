@@ -18,15 +18,21 @@ internal static class TextureImporter
         int? maxMipLevels,
         int? maxDimension = null,
         RuntimeTextureFormat format = RuntimeTextureFormat.Rgba8Unorm,
-        TextureCompressionQuality compressionQuality = TextureCompressionQuality.Best)
+        TextureCompressionQuality compressionQuality = TextureCompressionQuality.Best,
+        AssetCompilationReporter? reporter = null, string? assetId = null)
     {
+        using AssetCompilationReporter? ownedReporter = reporter is null ? new(null) : null;
+        reporter ??= ownedReporter!;
         var extension = Path.GetExtension(path);
-        TextureData texture = extension.ToLowerInvariant() switch
+        TextureData texture = reporter.Measure("texture-decode", () => extension.ToLowerInvariant() switch
         {
             ".png" => ImportPng(path),
             ".tga" => ImportTga(path),
             _ => throw new InvalidDataException($"Texture format '{extension}' is not supported."),
-        };
+        }, assetId, path);
+
+        reporter.Report("texture-decoded", "completed", id: assetId, path: path,
+            detail: $"width={texture.Width} height={texture.Height} rgbaBytes={texture.Pixels.LongLength} targetMax={maxDimension}");
 
         if (maxDimension is int limit)
         {
@@ -37,17 +43,18 @@ internal static class TextureImporter
 
             while (texture.Width > limit || texture.Height > limit)
             {
-                texture = Downsample(texture, colorSpace, usage);
+                texture = reporter.Measure("texture-resize", () => Downsample(texture, colorSpace, usage), assetId, path, $"width={texture.Width} height={texture.Height} targetMax={limit}");
             }
         }
 
         RuntimeTextureMipLevel[] mips =
-            GenerateMipChain(
+            reporter.Measure("texture-mips", () => GenerateMipChain(
                 texture,
                 colorSpace,
                 usage,
                 generateMipmaps,
-                maxMipLevels);
+                maxMipLevels), assetId, path, $"width={texture.Width} height={texture.Height} format={format}");
+        texture = new TextureData(texture.Width, texture.Height, []);
         if (format == RuntimeTextureFormat.Bc7Unorm)
         {
             if (texture.Width % 4 != 0 || texture.Height % 4 != 0)
@@ -63,10 +70,17 @@ internal static class TextureImporter
             encoder.OutputOptions.GenerateMipMaps = false;
             encoder.OutputOptions.Quality = compressionQuality == TextureCompressionQuality.Balanced
                 ? CompressionQuality.Balanced : CompressionQuality.BestQuality;
-            encoder.Options.IsParallel = false;
-            mips = mips.Select(mip => new RuntimeTextureMipLevel(
-                mip.Width, mip.Height, checked(((mip.Width + 3) / 4) * 16),
-                encoder.EncodeToRawBytes(mip.Pixels, mip.Width, mip.Height, PixelFormat.Rgba32)[0])).ToArray();
+            encoder.Options.IsParallel = Bc7TextureEncoder.WorkerCount > 1;
+            encoder.Options.TaskCount = Bc7TextureEncoder.WorkerCount;
+            for (int level = 0; level < mips.Length; level++)
+            {
+                RuntimeTextureMipLevel mip = mips[level];
+                byte[] encoded = reporter.Measure("texture-bc7", () =>
+                    Bc7TextureEncoder.Encode(encoder, mip, reporter, assetId, path, level),
+                    assetId, path, $"mip={level} width={mip.Width} height={mip.Height} quality={compressionQuality} inputBytes={mip.Pixels.LongLength}");
+                mips[level] = new RuntimeTextureMipLevel(mip.Width, mip.Height,
+                    checked(((mip.Width + 3) / 4) * 16), encoded);
+            }
         }
         else if (format != RuntimeTextureFormat.Rgba8Unorm)
         {
@@ -82,7 +96,7 @@ internal static class TextureImporter
                 mips);
 
         return new ImportedAssetPayload(
-            runtimeTexture.ToPayload(),
+            reporter.Measure("texture-payload", runtimeTexture.ToPayload, assetId, path),
             null,
             []);
     }
@@ -162,43 +176,36 @@ internal static class TextureImporter
         var expectedLength = checked((rowBytes + 1) * height);
         compressed.Position = 0;
 
-        byte[] filtered;
-        using (var zlib = new ZLibStream(compressed, CompressionMode.Decompress, leaveOpen: true))
-        using (var decoded = new MemoryStream(expectedLength))
-        {
-            zlib.CopyTo(decoded);
-            filtered = decoded.ToArray();
-        }
-
-        if (filtered.Length != expectedLength)
-        {
-            throw new InvalidDataException(
-                $"PNG decompressed to {filtered.Length} bytes; expected {expectedLength} bytes.");
-        }
-
-        var scanlines = new byte[checked(rowBytes * height)];
-        for (var y = 0; y < height; y++)
-        {
-            var filter = filtered[y * (rowBytes + 1)];
-            var sourceRow = filtered.AsSpan(y * (rowBytes + 1) + 1, rowBytes);
-            var targetRow = scanlines.AsSpan(y * rowBytes, rowBytes);
-            var previousRow = y == 0
-                ? ReadOnlySpan<byte>.Empty
-                : scanlines.AsSpan((y - 1) * rowBytes, rowBytes);
-
-            UnfilterRow(filter, sourceRow, targetRow, previousRow, sourceBytesPerPixel);
-        }
-
+        // Bound inflation to the declared scanlines and retain only two unfiltered rows.
+        // Full-image filtered, decoded and scanline copies multiplied peak memory.
+        using var zlib = new ZLibStream(compressed, CompressionMode.Decompress, leaveOpen: true);
+        var sourceRow = new byte[rowBytes];
+        var currentRow = new byte[rowBytes];
+        var previousRow = new byte[rowBytes];
         var rgba = new byte[checked(width * height * 4)];
-        var sourceOffset = 0;
-        var targetOffset = 0;
-        for (var pixel = 0; pixel < width * height; pixel++)
+        for (int y = 0; y < height; y++)
         {
-            rgba[targetOffset++] = scanlines[sourceOffset++];
-            rgba[targetOffset++] = scanlines[sourceOffset++];
-            rgba[targetOffset++] = scanlines[sourceOffset++];
-            rgba[targetOffset++] = sourceBytesPerPixel == 4 ? scanlines[sourceOffset++] : (byte)255;
+            int filter = zlib.ReadByte();
+            if (filter < 0) throw new InvalidDataException($"PNG scanline {y} is missing; expected {expectedLength} decompressed bytes.");
+            try { zlib.ReadExactly(sourceRow); }
+            catch (EndOfStreamException exception)
+            { throw new InvalidDataException($"PNG scanline {y} is truncated; expected {rowBytes} row bytes.", exception); }
+            UnfilterRow((byte)filter, sourceRow, currentRow,
+                y == 0 ? ReadOnlySpan<byte>.Empty : previousRow, sourceBytesPerPixel);
+            Span<byte> targetRow = rgba.AsSpan(checked(y * width * 4), checked(width * 4));
+            if (sourceBytesPerPixel == 4) currentRow.CopyTo(targetRow);
+            else
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    currentRow.AsSpan(x * 3, 3).CopyTo(targetRow.Slice(x * 4, 3));
+                    targetRow[x * 4 + 3] = 255;
+                }
+            }
+            (previousRow, currentRow) = (currentRow, previousRow);
         }
+        if (zlib.ReadByte() != -1)
+            throw new InvalidDataException($"PNG contains data beyond {expectedLength} declared decompressed bytes.");
 
         return new TextureData(width, height, rgba);
     }

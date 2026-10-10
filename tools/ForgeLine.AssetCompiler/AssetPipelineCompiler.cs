@@ -13,11 +13,14 @@ public static class AssetPipelineCompiler
     public static AssetCompilationResult Compile(
         string sourceRoot,
         string runtimeRoot,
-        bool clean = false)
+        bool clean = false,
+        Action<AssetCompilationProgress>? progress = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sourceRoot);
         ArgumentException.ThrowIfNullOrWhiteSpace(runtimeRoot);
 
+        using var reporter = new AssetCompilationReporter(progress);
+        reporter.Report("compile", "started", detail: $"source={sourceRoot} runtime={runtimeRoot} clean={clean}");
         var diagnostics = new List<AssetCompilerDiagnostic>();
         var normalizedSourceRoot = Path.GetFullPath(sourceRoot);
         var normalizedRuntimeRoot = Path.GetFullPath(runtimeRoot);
@@ -51,20 +54,20 @@ public static class AssetPipelineCompiler
 
         Directory.CreateDirectory(normalizedRuntimeRoot);
 
-        var nodes = DiscoverAssets(normalizedSourceRoot, diagnostics);
+        var nodes = reporter.Measure("discovery", () => DiscoverAssets(normalizedSourceRoot, diagnostics));
         if (HasErrors(diagnostics))
         {
             return new AssetCompilationResult(false, 0, 0, diagnostics);
         }
 
-        ValidateReferences(nodes, diagnostics);
-        var orderedNodes = TopologicallyOrder(nodes, diagnostics);
+        reporter.Measure("reference-validation", () => { ValidateReferences(nodes, diagnostics); return true; });
+        var orderedNodes = reporter.Measure("dependency-order", () => TopologicallyOrder(nodes, diagnostics));
         if (HasErrors(diagnostics))
         {
             return new AssetCompilationResult(false, 0, 0, diagnostics);
         }
 
-        var previousManifest = LoadPreviousManifest(normalizedRuntimeRoot, diagnostics);
+        var previousManifest = reporter.Measure("previous-manifest", () => LoadPreviousManifest(normalizedRuntimeRoot, diagnostics));
         var previousById = previousManifest?.Assets.ToDictionary(
             static record => record.Id,
             StringComparer.Ordinal) ?? new Dictionary<string, RuntimeAssetRecord>(StringComparer.Ordinal);
@@ -77,10 +80,9 @@ public static class AssetPipelineCompiler
         {
             try
             {
-                var sourceHash = AssetHashing.ComputeAssetSourceHash(
-                    node.DefinitionPath,
-                    node.SourcePath,
-                    normalizedSourceRoot);
+                var sourceHash = reporter.Measure("source-hash", () => AssetHashing.ComputeAssetSourceHash(
+                    node.DefinitionPath, node.SourcePath, normalizedSourceRoot),
+                    node.Id.Value, node.SourcePath, $"sourceBytes={new FileInfo(node.SourcePath).Length}");
 
                 var dependencyBuildHashes = node.Dependencies
                     .Select(id => recordsById[id].BuildHash)
@@ -106,10 +108,19 @@ public static class AssetPipelineCompiler
                 {
                     recordsById[node.Id] = previous;
                     skippedCount++;
+                    reporter.Report("asset", "unchanged", id: node.Id.Value, path: node.SourcePath);
                     continue;
                 }
 
-                var imported = Import(node, normalizedSourceRoot, nodes);
+                string rebuildReason = previous is null ? "new-or-missing-manifest"
+                    : !File.Exists(runtimeFullPath) ? "missing-payload"
+                    : !string.Equals(previous.SourceHash, sourceHash, StringComparison.Ordinal) ? "source-changed"
+                    : previousManifest!.CompilerVersion != CompilerVersion ? "compiler-changed"
+                    : !string.Equals(previous.BuildHash, buildHash, StringComparison.Ordinal) ? "dependency-changed"
+                    : "source-or-runtime-path-changed";
+                reporter.Report("asset", "rebuild", id: node.Id.Value, path: node.SourcePath,
+                    detail: $"reason={rebuildReason} type={node.Definition.Type} format={node.Definition.TextureFormat} quality={node.Definition.TextureCompressionQuality}");
+                var imported = reporter.Measure("import", () => Import(node, normalizedSourceRoot, nodes, reporter), node.Id.Value, node.SourcePath);
                 AddCompilationDiagnostic(
                     node,
                     imported,
@@ -123,7 +134,8 @@ public static class AssetPipelineCompiler
                     runtimePath,
                     imported.Bounds);
                 var metadata = JsonSerializer.SerializeToUtf8Bytes(record, JsonOptions);
-                WriteAtomically(runtimeFullPath, node.Definition.Type, metadata, imported.Payload);
+                reporter.Measure("runtime-write", () => { WriteAtomically(runtimeFullPath, node.Definition.Type, metadata, imported.Payload); return true; },
+                    node.Id.Value, runtimeFullPath, $"payloadBytes={imported.Payload.LongLength}");
 
                 recordsById[node.Id] = record;
                 compiledCount++;
@@ -156,7 +168,8 @@ public static class AssetPipelineCompiler
                 .ToArray(),
         };
 
-        WriteManifestAtomically(normalizedRuntimeRoot, manifest);
+        reporter.Measure("manifest-write", () => { WriteManifestAtomically(normalizedRuntimeRoot, manifest); return true; });
+        reporter.Report("compile", "completed", detail: $"compiled={compiledCount} unchanged={skippedCount}");
         return new AssetCompilationResult(true, compiledCount, skippedCount, diagnostics);
     }
 
@@ -858,7 +871,7 @@ public static class AssetPipelineCompiler
     private static ImportedAssetPayload Import(
         AssetNode node,
         string sourceRoot,
-        IReadOnlyDictionary<AssetId, AssetNode> nodes)
+        IReadOnlyDictionary<AssetId, AssetNode> nodes, AssetCompilationReporter reporter)
     {
         if (node.Definition.Type == RuntimeAssetType.Mesh)
         {
@@ -883,7 +896,7 @@ public static class AssetPipelineCompiler
                 node.Definition.TextureMaxMipLevels,
                 node.Definition.TextureMaxDimension,
                 node.Definition.TextureFormat,
-                node.Definition.TextureCompressionQuality),
+                node.Definition.TextureCompressionQuality, reporter, node.Id.Value),
             RuntimeAssetType.Material => MaterialImporter.Import(node.SourcePath),
             _ => throw new InvalidDataException(
                 $"Asset type '{node.Definition.Type}' is unsupported."),

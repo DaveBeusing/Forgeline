@@ -8,6 +8,53 @@ namespace ForgeLine.Assets.Tests;
 
 public sealed class TexturePipelineTests
 {
+    [Theory]
+    [InlineData("balanced")]
+    [InlineData("best")]
+    public void BandedCompressionMatchesSerialBytesAcrossMipsAndPartialBands(string quality)
+    {
+        using var workspace = new TextureWorkspace();
+        const string id = "texture.test.band_parity";
+        const int width = 32;
+        const int height = 260;
+        byte[] pixels = new byte[width * height * 4];
+        for (int index = 0; index < pixels.Length; index++)
+            pixels[index] = (byte)((index * 37 + index / 19) % 256);
+        workspace.WriteTexture(id, RuntimeTextureUsage.BaseColor, RuntimeTextureColorSpace.Srgb,
+            width, height, pixels);
+        Assert.True(workspace.Compile().Success);
+        RuntimeTextureData raw = workspace.ReadTexture(id);
+        workspace.WriteTextureDefinition(id, RuntimeTextureUsage.BaseColor, RuntimeTextureColorSpace.Srgb,
+            true, null, format: "bc7Unorm", compressionQuality: quality);
+        var progress = new List<AssetCompilationProgress>();
+        Assert.True(AssetPipelineCompiler.Compile(workspace.SourceRoot, workspace.RuntimeRoot,
+            progress: progress.Add).Success);
+        RuntimeTextureData compressed = workspace.ReadTexture(id);
+        var serial = new BCnEncoder.Encoder.BcEncoder(BCnEncoder.Shared.CompressionFormat.Bc7);
+        serial.Options.IsParallel = false;
+        serial.OutputOptions.GenerateMipMaps = false;
+        serial.OutputOptions.Quality = quality == "balanced"
+            ? BCnEncoder.Encoder.CompressionQuality.Balanced
+            : BCnEncoder.Encoder.CompressionQuality.BestQuality;
+        Assert.Equal(raw.Mips.Count, compressed.Mips.Count);
+        for (int level = 0; level < raw.Mips.Count; level++)
+        {
+            RuntimeTextureMipLevel mip = raw.Mips[level];
+            Assert.Equal(serial.EncodeToRawBytes(mip.Pixels, mip.Width, mip.Height,
+                BCnEncoder.Encoder.PixelFormat.Rgba32)[0], compressed.Mips[level].Pixels);
+        }
+        Assert.Contains(progress, p => p.Stage == "texture-bc7-band" && p.Detail!.Contains("row=256 rows=4", StringComparison.Ordinal));
+        Assert.Contains(progress, p => p.Stage == "runtime-write" && p.State == "completed");
+        Assert.All(progress, p => Assert.True(p.ElapsedMilliseconds >= 0 && p.ManagedBytes >= 0));
+        byte[] before = compressed.ToPayload();
+        progress.Clear();
+        Assert.Equal(1, AssetPipelineCompiler.Compile(workspace.SourceRoot, workspace.RuntimeRoot,
+            progress: progress.Add).SkippedCount);
+        Assert.Contains(progress, p => p.State == "unchanged" && p.AssetId == id);
+        Assert.DoesNotContain(progress, p => p.Stage == "texture-bc7");
+        Assert.Equal(before, workspace.ReadTexture(id).ToPayload());
+    }
+
     [Fact]
     public void BalancedCompressionPreservesNormalDirectionAndQualityInvalidatesCache()
     {
