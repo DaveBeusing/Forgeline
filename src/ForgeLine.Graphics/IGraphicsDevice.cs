@@ -2,6 +2,12 @@ namespace ForgeLine.Graphics;
 
 public interface IGraphicsDevice : IDisposable
 {
+    GraphicsDirectionalShadowSettings DirectionalShadows => default;
+    void ConfigureDirectionalShadows(GraphicsDirectionalShadowSettings settings)
+    {
+        settings.Validate();
+        if (settings.Enabled) throw new NotSupportedException("Directional shadows are unsupported by this graphics device.");
+    }
     // The device and its resources have one creating-thread owner. Command contexts
     // are valid only inside RenderFrame's callback. A frame index is reusable only
     // after its previous GPU submission completes. Resource disposal invalidates

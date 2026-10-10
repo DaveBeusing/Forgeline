@@ -34,6 +34,9 @@ public sealed record GraphicsPipelineDescription(
 
     public bool AlphaBlendEnabled { get; init; }
 
+    public bool VertexConstantsInBuffer { get; init; }
+    public bool DirectionalShadowReceiver { get; init; }
+
     public GraphicsFrameTargetFormat TargetFormat { get; init; } = GraphicsFrameTargetFormat.Rgba8Unorm;
 
     internal void Validate()
@@ -41,8 +44,12 @@ public sealed record GraphicsPipelineDescription(
         ArgumentNullException.ThrowIfNull(VertexShader);
         ArgumentNullException.ThrowIfNull(PixelShader);
         ArgumentNullException.ThrowIfNull(VertexElements);
-        if (TargetFormat is not (GraphicsFrameTargetFormat.Rgba8Unorm or GraphicsFrameTargetFormat.Rgba16Float))
+        if (TargetFormat is not (GraphicsFrameTargetFormat.Rgba8Unorm or GraphicsFrameTargetFormat.Rgba16Float or GraphicsFrameTargetFormat.Depth32Float))
             throw new ArgumentOutOfRangeException(nameof(TargetFormat));
+        if (TargetFormat == GraphicsFrameTargetFormat.Depth32Float && (!DepthEnabled || AlphaBlendEnabled || DirectionalShadowReceiver))
+            throw new ArgumentException("Shadow depth pipelines require depth writes and cannot blend or sample themselves.");
+        if (DirectionalShadowReceiver && (!VertexConstantsInBuffer || VertexRootConstantCount == 0 || PixelTextureCount > 15))
+            throw new ArgumentException("Shadow receivers use buffered frame constants and reserve texture register t15.");
         if (TargetFormat == GraphicsFrameTargetFormat.Rgba16Float && AlphaBlendEnabled)
             throw new NotSupportedException("Linear scene composition currently supports opaque world pipelines only.");
 
@@ -74,8 +81,8 @@ public sealed record GraphicsPipelineDescription(
                 "Pixel texture count must be between zero and sixteen.");
         }
 
-        if (VertexRootConstantCount +
-            PixelTextureCount >
+        if ((VertexConstantsInBuffer ? 2 : VertexRootConstantCount) +
+            PixelTextureCount + (DirectionalShadowReceiver ? 3 : 0) >
             64)
         {
             throw new ArgumentException(

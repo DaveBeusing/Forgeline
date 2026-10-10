@@ -21,12 +21,14 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
     private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;
+    private readonly IGraphicsPipeline? _shadowPipeline;
     private readonly IGraphicsPipeline? _texturedPipeline;
     private readonly IGraphicsBuffer _vertexBuffer;
     private readonly IGraphicsBuffer _indexBuffer;
     private readonly RuntimeWorldAssetResources? _runtimeAssets;
     private readonly SceneLightingSettings _lighting;
     private readonly Dictionary<int, FrameInstanceBuffer> _frameInstanceBuffers = [];
+    private readonly Dictionary<int, FrameInstanceBuffer> _shadowFrameInstanceBuffers = [];
     private readonly Dictionary<InstanceBatchKey, InstanceBatch> _batchLookup = [];
     private readonly List<InstanceBatch> _batches = [];
     private Dictionary<(EntityId Entity, uint Identity), int> _previousLods = [];
@@ -51,6 +53,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
         try
         {
             _pipeline = CreatePipeline(graphics);
+            if (graphics.DirectionalShadows.Enabled) _shadowPipeline = DirectionalShadowCasterPipeline.Create(graphics, true);
             _runtimeAssets =
                 runtimeAssets is null
                     ? null
@@ -127,6 +130,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             _texturedPipeline?.Dispose();
             _runtimeAssets?.Dispose();
             _pipeline?.Dispose();
+            _shadowPipeline?.Dispose();
             throw;
         }
     }
@@ -160,6 +164,21 @@ public sealed class SimpleInstanceRenderer : IDisposable
         RtsCamera camera,
         RenderWorld world,
         float alpha)
+        => RenderCore(context, camera, world, alpha);
+
+    public void RenderShadow(IGraphicsCommandContext context, RtsCamera camera, RenderWorld world, float alpha,
+        GraphicsDirectionalShadowFrame frame, int maximumCasters, int maximumDraws)
+    {
+        frame.Validate();
+        ArgumentOutOfRangeException.ThrowIfNegative(maximumCasters);
+        ArgumentOutOfRangeException.ThrowIfNegative(maximumDraws);
+        InstanceRenderDiagnostics prior = LastDiagnostics;
+        RenderCore(context, camera, world, alpha, frame.ViewProjection, maximumCasters, maximumDraws);
+        LastDiagnostics = prior;
+    }
+
+    private void RenderCore(IGraphicsCommandContext context, RtsCamera camera, RenderWorld world, float alpha,
+        Matrix4x4? shadowProjection = null, int maximumCasters = int.MaxValue, int maximumDraws = int.MaxValue)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(context);
@@ -172,9 +191,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 context.Height);
         ViewFrustum frustum =
             ViewFrustum.FromViewProjection(
-                matrices.ViewProjection);
-        ResetScratch();
-        _currentLods.Clear();
+                shadowProjection ?? matrices.ViewProjection);
+        ResetScratch(shadowProjection.HasValue);
+        if (!shadowProjection.HasValue) _currentLods.Clear();
         var batchLookup = _batchLookup;
         var batches = _batches;
 
@@ -186,10 +205,12 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
         for (int index = 0; index < world.InstanceCount; index++)
         {
+            if (visible >= maximumCasters) break;
             RenderInstance instance =
                 world.GetInterpolatedInstance(
                     index,
                     alpha);
+            if (shadowProjection.HasValue && instance.VfxFeature.IsSpecified) continue;
 
             if ((instance.Visibility & RenderVisibilityMask.World) == 0 ||
                 !instance.Mesh.IsValid ||
@@ -228,7 +249,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 matrices, context.Height);
             var lodKey = (instance.Entity, instance.DebugIdentity);
             bool hasLodIdentity = instance.Entity.IsValid || instance.DebugIdentity != 0;
-            int previousLod = hasLodIdentity && _previousLods.TryGetValue(lodKey, out int retainedLod) ? retainedLod : 0;
+            var lodHistory = shadowProjection.HasValue ? _currentLods : _previousLods;
+            int previousLod = hasLodIdentity && lodHistory.TryGetValue(lodKey, out int retainedLod) ? retainedLod : 0;
             UnitAssetLod unitLod =
                 UnitAssetLod.Lod0;
             UnitPresentationDefinition unitDefinition =
@@ -245,7 +267,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 unitLod =
                     instance.UnitFeature.IsWreck ? UnitAssetLod.Lod2
                         : (UnitAssetLod)ScreenSpaceLod.Select(projectedDiameter, previousLod);
-                if (hasLodIdentity) _currentLods[lodKey] = (int)unitLod;
+                if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = (int)unitLod;
                 unitDefinition =
                     UnitPresentationCatalog.Get(
                         instance.UnitFeature.Unit);
@@ -272,7 +294,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     unitLod = UnitAssetLod.Lod0;
                     usesRuntimeMesh = _runtimeAssets.TryGetMesh(unitDefinition.MeshAssetId,
                         out runtimeMesh, out runtimeMeshId) && runtimeMesh.IsValid;
-                    if (hasLodIdentity) _currentLods[lodKey] = (int)unitLod;
+                    if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = (int)unitLod;
                 }
                 if (unitLod == UnitAssetLod.Lod1) lod1Instances++;
                 if (unitLod == UnitAssetLod.Lod2) lod2Instances++;
@@ -292,7 +314,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     instance.BuildingFeature.IsConstruction || instance.BuildingFeature.IsDestroyed
                         ? BuildingAssetLod.Lod0
                         : (BuildingAssetLod)ScreenSpaceLod.Select(projectedDiameter, previousLod, 150.0f, 45.0f);
-                if (hasLodIdentity) _currentLods[lodKey] = (int)buildingLod;
+                if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = (int)buildingLod;
                 hasBuildingDefinition =
                     BuildingPresentationCatalog.TryGet(
                         instance.BuildingFeature.Building,
@@ -320,7 +342,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     usesRuntimeMesh = _runtimeAssets.TryGetMesh(
                         BuildingPresentationCatalog.ResolveMeshAssetId(instance.BuildingFeature, buildingLod),
                         out runtimeMesh, out runtimeMeshId) && runtimeMesh.IsValid;
-                    if (hasLodIdentity) _currentLods[lodKey] = (int)buildingLod;
+                    if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = (int)buildingLod;
                 }
 
                 if (buildingLod == BuildingAssetLod.Lod1) lod1Instances++;
@@ -390,7 +412,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 WorldAssetLod worldLod =
                     ScreenSpaceLod.Select(projectedDiameter, previousLod, 65.0f, 18.0f) > 0
                         ? WorldAssetLod.Reduced : WorldAssetLod.High;
-                if (hasLodIdentity) _currentLods[lodKey] = worldLod == WorldAssetLod.Reduced ? 1 : 0;
+                if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = worldLod == WorldAssetLod.Reduced ? 1 : 0;
 
                 usesRuntimeMesh =
                     _runtimeAssets is not null &&
@@ -636,7 +658,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
         IGraphicsBuffer instanceBuffer =
             GetFrameInstanceBuffer(
                 context.FrameIndex,
-                submittedInstances);
+                submittedInstances, shadowProjection.HasValue);
         if (_instanceStaging.Length < submittedInstances)
         {
             int capacity = Math.Max(MinimumInstanceCapacity, _instanceStaging.Length);
@@ -667,13 +689,14 @@ public sealed class SimpleInstanceRenderer : IDisposable
         Span<float> constants =
             stackalloc float[RootConstantCount];
         WriteMatrix(
-            matrices.ViewProjection,
+            shadowProjection ?? matrices.ViewProjection,
             constants);
         _lighting.WriteShaderConstants(
             constants[
                 MatrixRootConstantCount..]);
 
         int draws = 0;
+        int shadowSubmitted = 0;
 
         for (int batchIndex = 0;
              batchIndex < _activeBatchCount;
@@ -683,7 +706,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 batches[batchIndex];
 
             IGraphicsPipeline pipeline =
-                batch.UsesRuntimeMaterial
+                shadowProjection.HasValue ? _shadowPipeline ?? throw new NotSupportedException("Object shadows were not configured at construction.") : batch.UsesRuntimeMaterial
                     ? _texturedPipeline ??
                       throw new InvalidOperationException(
                           "The textured instance pipeline is unavailable.")
@@ -691,9 +714,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
             context.SetPipeline(
                 pipeline);
             context.SetVertexConstants(
-                constants);
+                shadowProjection.HasValue ? constants[..16] : constants);
 
-            if (batch.UsesRuntimeMaterial)
+            if (batch.UsesRuntimeMaterial && !shadowProjection.HasValue)
             {
                 context.SetPixelTexture(
                     0,
@@ -735,11 +758,14 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     batch.InstanceOffset *
                     InstanceStride),
                 inputSlot: 1);
+            int drawInstances = shadowProjection.HasValue ? Math.Min(batch.Instances.Count, maximumCasters - shadowSubmitted) : batch.Instances.Count;
+            if (drawInstances == 0 || draws >= maximumDraws) break;
             context.DrawIndexedInstanced(
                 batch.UsesRuntimeMesh
                     ? batch.RuntimeMesh.IndexCount
                     : 36,
-                batch.Instances.Count);
+                drawInstances);
+            shadowSubmitted += drawInstances;
             draws++;
         }
 
@@ -770,6 +796,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
         }
 
         _frameInstanceBuffers.Clear();
+        foreach (FrameInstanceBuffer frameBuffer in _shadowFrameInstanceBuffers.Values) frameBuffer.Buffer?.Dispose();
+        _shadowFrameInstanceBuffers.Clear();
         _batchLookup.Clear();
         _batches.Clear();
         _instanceStaging = [];
@@ -780,12 +808,13 @@ public sealed class SimpleInstanceRenderer : IDisposable
         _vertexBuffer.Dispose();
         _texturedPipeline?.Dispose();
         _pipeline.Dispose();
+        _shadowPipeline?.Dispose();
         _disposed = true;
     }
 
-    private void ResetScratch()
+    private void ResetScratch(bool shadow = false)
     {
-        (_previousLods, _currentLods) = (_currentLods, _previousLods);
+        if (!shadow) (_previousLods, _currentLods) = (_currentLods, _previousLods);
         // Only the render owner uses scratch; no span escapes synchronous SetData.
         _batchLookup.Clear();
         long retainedInstances = 0;
@@ -824,20 +853,21 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
     private IGraphicsBuffer GetFrameInstanceBuffer(
         int frameIndex,
-        int requiredInstances)
+        int requiredInstances, bool shadow = false)
     {
+        Dictionary<int, FrameInstanceBuffer> frameBuffers = shadow ? _shadowFrameInstanceBuffers : _frameInstanceBuffers;
         ArgumentOutOfRangeException.ThrowIfNegative(
             frameIndex);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(
             requiredInstances);
 
-        if (!_frameInstanceBuffers.TryGetValue(
+        if (!frameBuffers.TryGetValue(
                 frameIndex,
                 out FrameInstanceBuffer? frameBuffer))
         {
             frameBuffer =
                 new FrameInstanceBuffer();
-            _frameInstanceBuffers.Add(
+            frameBuffers.Add(
                 frameIndex,
                 frameBuffer);
         }
@@ -905,6 +935,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             {
                 float4 Position : SV_Position;
                 float4 Color : COLOR0;
+                float3 WorldPosition : TEXCOORD14;
                 float3 WorldNormal : TEXCOORD0;
                 nointerpolation float4 SceneLight : TEXCOORD1;
                 nointerpolation float4 SceneDirectionalAmbient : TEXCOORD2;
@@ -930,6 +961,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 float3x3 worldBasis =
                     (float3x3)world;
 
+                output.WorldPosition = worldPosition.xyz;
                 output.Position =
                     mul(
                         worldPosition,
@@ -958,6 +990,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             {
                 float4 Position : SV_Position;
                 float4 Color : COLOR0;
+                float3 WorldPosition : TEXCOORD14;
                 float3 WorldNormal : TEXCOORD0;
                 nointerpolation float4 SceneLight : TEXCOORD1;
                 nointerpolation float4 SceneDirectionalAmbient : TEXCOORD2;
@@ -1020,7 +1053,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 float4 sceneLight,
                 float4 sceneDirectionalAmbient,
                 float4 sceneAmbientExposure,
-                float2 sceneGroundTone)
+                float2 sceneGroundTone,
+                float3 worldPosition)
             {
                 float3 normal =
                     normalize(
@@ -1068,6 +1102,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         0.94f,
                         saturate(
                             roughness));
+                float2 shadow = SampleDirectionalShadow(worldPosition, normal);
+                ambient *= shadow.y;
+                direct *= shadow.x;
                 float3 linearColor =
                     albedo *
                     (ambient + direct) *
@@ -1112,7 +1149,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         input.SceneLight,
                         input.SceneDirectionalAmbient,
                         input.SceneAmbientExposure,
-                        input.SceneGroundTone);
+                        input.SceneGroundTone,
+                        input.WorldPosition);
 
                 return float4(
                     color,
@@ -1130,7 +1168,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 "InstanceVertex.hlsl");
         GraphicsShaderBytecode pixelShader =
             compiler.Compile(
-                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n" : "#define LINEAR_SCENE 0\n") + pixelShaderSource,
+                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n" : "#define LINEAR_SCENE 0\n") + (graphics.DirectionalShadows.Enabled ? DirectionalShadowShader.Source : DirectionalShadowShader.Disabled) + pixelShaderSource,
                 GraphicsShaderStage.Pixel,
                 "PSMain",
                 "InstancePixel.hlsl");
@@ -1140,6 +1178,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 vertexShader,
                 pixelShader)
             {
+                VertexConstantsInBuffer = graphics.DirectionalShadows.Enabled,
+                DirectionalShadowReceiver = graphics.DirectionalShadows.Enabled,
                 TargetFormat = graphics.SceneOutput.Enabled ? GraphicsFrameTargetFormat.Rgba16Float : GraphicsFrameTargetFormat.Rgba8Unorm,
                 VertexElements =
                 [
@@ -1233,6 +1273,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             {
                 float4 Position : SV_Position;
                 float4 Color : COLOR0;
+                float3 WorldPosition : TEXCOORD14;
                 float2 Uv : TEXCOORD0;
                 float3 WorldNormal : TEXCOORD1;
                 float4 WorldTangent : TEXCOORD2;
@@ -1262,6 +1303,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 float3x3 worldBasis =
                     (float3x3)world;
 
+                output.WorldPosition = worldPosition.xyz;
                 output.Position =
                     mul(
                         worldPosition,
@@ -1308,6 +1350,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             {
                 float4 Position : SV_Position;
                 float4 Color : COLOR0;
+                float3 WorldPosition : TEXCOORD14;
                 float2 Uv : TEXCOORD0;
                 float3 WorldNormal : TEXCOORD1;
                 float4 WorldTangent : TEXCOORD2;
@@ -1386,7 +1429,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 float4 sceneLight,
                 float4 sceneDirectionalAmbient,
                 float4 sceneAmbientExposure,
-                float2 sceneGroundTone)
+                float2 sceneGroundTone,
+                float3 worldPosition)
             {
                 float3 normal =
                     normalize(
@@ -1434,6 +1478,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         0.94f,
                         saturate(
                             roughness));
+                float2 shadow = SampleDirectionalShadow(worldPosition, normal);
+                ambient *= shadow.y;
+                direct *= shadow.x;
                 float3 linearColor =
                     albedo *
                     (ambient + direct) *
@@ -1560,7 +1607,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         input.SceneLight,
                         input.SceneDirectionalAmbient,
                         input.SceneAmbientExposure,
-                        input.SceneGroundTone);
+                        input.SceneGroundTone,
+                        input.WorldPosition);
 
                 return float4(
                     color,
@@ -1579,7 +1627,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 "InstanceMaterialVertex.hlsl");
         GraphicsShaderBytecode pixelShader =
             compiler.Compile(
-                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n" : "#define LINEAR_SCENE 0\n") + pixelShaderSource,
+                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n" : "#define LINEAR_SCENE 0\n") + (graphics.DirectionalShadows.Enabled ? DirectionalShadowShader.Source : DirectionalShadowShader.Disabled) + pixelShaderSource,
                 GraphicsShaderStage.Pixel,
                 "PSMain",
                 "InstanceMaterialPixel.hlsl");
@@ -1589,6 +1637,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 vertexShader,
                 pixelShader)
             {
+                VertexConstantsInBuffer = graphics.DirectionalShadows.Enabled,
+                DirectionalShadowReceiver = graphics.DirectionalShadows.Enabled,
                 TargetFormat = graphics.SceneOutput.Enabled ? GraphicsFrameTargetFormat.Rgba16Float : GraphicsFrameTargetFormat.Rgba8Unorm,
                 VertexElements =
                 [

@@ -226,7 +226,7 @@ SceneLightingSettings is presentation-owned and contains the canonical defaults.
 
 The terrain shader already uses thirteen SRV descriptor tables. D3D12 root signatures are limited to 64 DWORDs, so terrain per-layer Base Color factors are packed as RGB10 values and roughness/metallic factors as paired UNorm16 values before scene-lighting constants are appended. The resulting terrain root-signature cost remains within the existing hardware limit without adding descriptors or draw calls.
 
-This baseline improves shadow-side form but does not implement cast-shadow maps. Directional shadow maps remain deferred until the renderer has a justified shadow-pass/resource design and the additional GPU/draw cost can be qualified against RTS camera coverage.
+The optional directional depth pass adds cast shadows and bounded local contact occlusion to this lighting path. Its coverage, quality budgets and qualification are described below.
 
 ## Diagnostics
 
@@ -272,7 +272,6 @@ This foundation deliberately does not implement:
 - indirect rendering
 - compute workloads
 - general-purpose post-processing effects and HDR display output
-- cast-shadow maps
 - editor rendering
 - Vulkan
 
@@ -327,3 +326,42 @@ Observed on NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU, driver 32.0.15.
 | 240 | 1.786 | 1.572 | 0.105 | 4.235 | 3.753 |
 
 CPU figures include frame reuse/Present overhead in the benchmark's outer frame call and differ from pass-recording diagnostics. Sequential samples remain sensitive to clocks, scheduling and warmup; no CPU improvement or portable GPU threshold is claimed. This fixture excludes gameplay, objects and HUD. WARP establishes functional correctness only. Sustained full-client throughput, physical-monitor readability, extended resize/occlusion soak and real device removal remain separate acceptance work.
+
+## Directional shadows and contact occlusion
+
+Set `FORGELINE_SHADOW_QUALITY=Low`, `Medium` or `High` before starting the client. Omit it or use `Disabled` for the default path with no shadow allocation or extra depth draws. Unknown profiles fail explicitly. Shadows work with direct output and optional linear scene composition; UI/debug overlays remain outside lighting. Profiles are composed before renderer construction; runtime profile changes require rebuilding the renderers.
+
+| Profile | Map resolution | Radius (m) | Maximum caster submissions | Maximum depth draws | Depth payload, three buffers |
+| --- | --- | --- | --- | --- | --- |
+| Disabled | 0 | 0 | 0 | 0 | 0 |
+| Low | 1024² | 180 | 1024 | 256 | 12 MiB |
+| Medium | 2048² | 450 | 4096 | 256 | 48 MiB |
+| High | 4096² | 750 | 8192 | 256 | 192 MiB |
+
+Each enabled profile uses one stable camera-relative orthographic map, the measured alternative to cascades. Coverage remains fixed as zoom changes, X/Y placement snaps to whole light-space texels, and receivers fade near the map/radius boundary. Strategic zoom therefore has deliberately limited shadow distance. Terrain uses at most 128 depth draws; objects consume the remaining budgets. VFX and hidden entities do not cast. Caster order follows the immutable authorized snapshot; dense scenes can omit later casters when capped.
+
+The graphics device owns R32 typeless targets with D32 depth/R32 shader-resource views and one SRV per back buffer. Fence reuse, configure/disable, suspension, resize and fatal device-loss ownership follow the established frame contract. Fixed-resolution targets survive window resize. Buffered per-draw constants keep terrain within the root-signature budget; the fixed arena adds 3 MiB at three buffers, independently from depth texel payload. Neither figure is total driver VRAM.
+
+Four bilinearly weighted depth comparisons implement PCF; receiver-plane correction and bounded bias address sloped receivers. Shadows attenuate direct light only. Local contact occlusion uses actual depth-blocker separation, fades to zero within 1.5 metres and affects ambient by at most 15% (12% default). It is separate from material AO and is not SSAO/GTAO. Hemisphere ambient, emissive, exposure and output transfer remain intact. See [Directional Shadow Depth and Contact Occlusion](adr/DirectionalShadowDepthAndContactOcclusion.md).
+
+`GraphicsDiagnostics.DirectionalShadows` and client qualification `metrics.directionalShadows` report profile, resolution, one-map count, target bytes, descriptors, successful CPU submission identity, draw/caster counts, CPU recording cost and completed-fence GPU shadow time. `Frame.Plan.Shadow` includes the target/lifetime contract. World pass timings exclude the depth pass; total GPU frame timing includes it. Asset texture residency excludes render targets, which are reported separately. Visual qualification retains the existing terrain/material budgets and adds only the explicit shadow draw/descriptor counts.
+
+Hardware qualification command:
+
+```powershell
+$env:FORGELINE_SHADOW_BENCHMARK_OUTPUT = Join-Path (Get-Location) 'artifacts/directional-shadow-performance.json'
+$env:FORGELINE_BENCHMARK_DRIVER = '<installed driver version>'
+dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.DirectionalShadowPerformanceTests
+```
+
+Observed on NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU, driver 32.0.15.9653, 1280×720, three buffers, VSync off, nine representative chunks and 1000 opaque instances. Each sequential Disabled/Low/Medium/High pair uses 64 warmups and 256 samples. GPU statistics use distinct completed fences. No concurrent asset compilation, build or validation command ran during the measurement.
+
+| Camera distance | Disabled total GPU ms | Low total / depth GPU ms | Medium total / depth GPU ms | High total / depth GPU ms |
+| --- | --- | --- | --- | --- |
+| 120 m | 1.67 | 3.76 / 0.72 | 4.19 / 1.20 | 4.17 / 1.22 |
+| 420 m | 2.93 | 4.02 / 0.77 | 4.46 / 1.31 | 4.55 / 1.29 |
+| 1000 m | 2.68 | 3.74 / 0.88 | 4.20 / 1.27 | 4.17 / 1.20 |
+
+Disabled CPU means were 8.33/4.00/3.92 ms; enabled means ranged 4.48–5.31 ms and include frame reuse/Present. Sequential clocks/scheduling make the first result unsuitable for claiming CPU improvement. These are workload-specific costs, not a sustained full-client FPS guarantee. The initial pre-change terrain-only scene-pass baseline is recorded separately and is not numerically compared against this denser workload.
+
+WARP regressions cover enabled/disabled pixels, hidden-caster invariance, identical static frames, direct/linear output, disable/re-enable, resize/suspend, descriptor reuse, invalid matrices and pass/configuration faults. Reference zooms 120/420/1000 m and raster scales 100/150/200% pass; raster scaling does not qualify physical monitor transitions. A 10000-instance test confirms the Low 1024-caster cap. Native production-client windowed/borderless qualification also exercises real Directorate assets with Medium shadows and linear output. Physical-monitor legibility, moving-unit/shimmer review under arbitrary camera motion, long occlusion/resize soak and actual device removal remain manual acceptance work.

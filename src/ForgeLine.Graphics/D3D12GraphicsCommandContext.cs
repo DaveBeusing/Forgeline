@@ -39,6 +39,20 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
 
     public int FrameIndex { get; }
 
+    public void BeginDirectionalShadowPass(GraphicsDirectionalShadowFrame frame)
+    {
+        ValidateRecording();
+        _owner.BeginDirectionalShadowPass(frame);
+        _pipeline = null;
+    }
+
+    public void EndDirectionalShadowPass()
+    {
+        ValidateRecording();
+        _owner.EndDirectionalShadowPass();
+        _pipeline = null;
+    }
+
     public void BeginPass(GraphicsFramePass pass)
     {
         ValidateRecording();
@@ -92,6 +106,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         _pipeline = d3d12Pipeline;
         _commandList.SetGraphicsRootSignature(d3d12Pipeline.RootSignature);
         _commandList.SetPipelineState(d3d12Pipeline.PipelineState);
+        if (pipeline.Description.DirectionalShadowReceiver) _owner.BindDirectionalShadowReceiver(d3d12Pipeline);
         _commandList.IASetPrimitiveTopology(
             d3d12Pipeline.Description.PrimitiveTopology switch
             {
@@ -172,7 +187,8 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
                 nameof(values));
         }
 
-        _commandList.SetGraphicsRoot32BitConstants(0, values);
+        if (_pipeline.Description.VertexConstantsInBuffer) _owner.SetBufferedVertexConstants(values);
+        else _commandList.SetGraphicsRoot32BitConstants(0, values);
     }
 
     public void SetPixelTexture(
@@ -247,6 +263,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
                 "The start vertex cannot be negative.");
         }
 
+        _owner.RecordDirectionalShadowDraw(1);
         _commandList.DrawInstanced(
             checked((uint)vertexCount),
             1,
@@ -291,6 +308,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         ArgumentOutOfRangeException.ThrowIfNegative(startIndex);
         ArgumentOutOfRangeException.ThrowIfNegative(startInstance);
 
+        _owner.RecordDirectionalShadowDraw(instanceCount);
         _commandList.DrawIndexedInstanced(
             checked((uint)indexCount),
             checked((uint)instanceCount),

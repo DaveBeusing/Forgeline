@@ -8,6 +8,9 @@ public interface IGraphicsCommandContext
 
     int FrameIndex { get; }
 
+    void BeginDirectionalShadowPass(GraphicsDirectionalShadowFrame frame) => throw new NotSupportedException();
+    void EndDirectionalShadowPass() => throw new NotSupportedException();
+
     // Markers preserve the direct-output submission path. World precedes Overlay;
     // repeating the current marker is harmless. Native contexts validate ordering.
     void BeginPass(GraphicsFramePass pass) { }

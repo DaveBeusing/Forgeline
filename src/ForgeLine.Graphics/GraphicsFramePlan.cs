@@ -36,7 +36,7 @@ public readonly record struct GraphicsFrameTargetDescriptor(
 /// <summary>The direct-output frame contract. Contains no transient copies or allocations.</summary>
 public readonly record struct GraphicsFramePlan
 {
-    public GraphicsFramePlan(int width, int height, int bufferCount, bool linearScene = false)
+    public GraphicsFramePlan(int width, int height, int bufferCount, bool linearScene = false, int shadowResolution = 0)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(width);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(height);
@@ -49,12 +49,16 @@ public readonly record struct GraphicsFramePlan
             GraphicsFrameTargetLifetime.Surface, 1);
         Scene = linearScene ? new(width, height, GraphicsFrameTargetFormat.Rgba16Float,
             GraphicsFrameTargetLifetime.BackBuffer, bufferCount) : null;
+        ArgumentOutOfRangeException.ThrowIfNegative(shadowResolution);
+        Shadow = shadowResolution > 0 ? new(shadowResolution, shadowResolution, GraphicsFrameTargetFormat.Depth32Float,
+            GraphicsFrameTargetLifetime.BackBuffer, bufferCount) : null;
     }
 
     public GraphicsFrameTargetDescriptor Output { get; }
     public GraphicsFrameTargetDescriptor Depth { get; }
     public GraphicsFrameTargetDescriptor? Scene { get; }
-    public long TransientPayloadBytes => Scene?.PayloadBytes ?? 0;
+    public GraphicsFrameTargetDescriptor? Shadow { get; }
+    public long TransientPayloadBytes => checked((Scene?.PayloadBytes ?? 0) + (Shadow?.PayloadBytes ?? 0));
 }
 
 internal struct GraphicsFramePassState

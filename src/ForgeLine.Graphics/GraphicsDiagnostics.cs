@@ -28,6 +28,7 @@ public sealed record GraphicsDiagnostics(
     GraphicsSurfaceInfo Surface)
 {
     public GraphicsFrameDiagnostics? Frame { get; init; }
+    public GraphicsDirectionalShadowDiagnostics? DirectionalShadows { get; init; }
     public GraphicsMemoryDiagnostics? Memory { get; init; }
     public GraphicsHealthDiagnostics Health { get; init; } = new(0, 0, 0, 0, 0, 0, null);
     public GraphicsResourceDiagnostics Resources { get; init; } =
