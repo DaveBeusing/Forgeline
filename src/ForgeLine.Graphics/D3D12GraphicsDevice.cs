@@ -1122,6 +1122,9 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
 
         ulong completedFence =
             _frameFence.CompletedValue;
+        // Device removal is not completed work and must never publish a timing sample.
+        if (completedFence == ulong.MaxValue)
+            return;
 
         for (int frameIndex = 0;
              frameIndex < _frameTimestampReady.Length;
