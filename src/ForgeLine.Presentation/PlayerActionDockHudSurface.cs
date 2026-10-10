@@ -25,7 +25,7 @@ internal sealed class PlayerActionDockHudSurface : IGameplayHudSurface
     }
 
     public GameplayHudRegion Regions =>
-        GameplayHudRegion.ActionDock;
+        GameplayHudRegion.ActionDock | GameplayHudRegion.PrimaryCommands;
 
     public int LastRenderedVertexCount => _renderer.LastRenderedVertexCount;
 
@@ -119,6 +119,8 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         _scale =
             layout.Scale;
 
+        EmitPrimaryCommands(snapshot, panel, targeting, layout, graphics.Width, graphics.Height);
+
         EmitModeBar(
             panel.Mode,
             layout,
@@ -126,7 +128,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             graphics.Height);
 
         PlayerActionSnapshot? actions =
-            snapshot.PlayerActions;
+            PlayerActionDockHudModel.ResolveActions(snapshot);
 
         if (panel.IsOpen)
         {
@@ -192,6 +194,37 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         _vertexBuffers.Clear();
         _pipeline.Dispose();
         _disposed = true;
+    }
+
+    private void EmitPrimaryCommands(PresentationSnapshot snapshot, in PlayerActionPanelView panel, in TacticalTargetingView targeting,
+        in GameplayHudLayout layout, int width, int height)
+    {
+        HudRect region = layout.PrimaryCommands;
+        if (region.IsEmpty) return;
+        float previousScale = _scale;
+        _scale = ContextualCommandModel.TextScale(layout);
+        EmitQuad(region.X, region.Y, region.Width, region.Height, PanelColor, width, height);
+        EmitClippedText(ContextualCommandModel.Status(snapshot), region.X + 5 * _scale,
+            region.Y + 5 * _scale, region.Right - 5 * _scale, TextColor, width, height);
+        bool localPending = ContextualCommandModel.HasPending(panel, snapshot);
+        for (int i = 0; ContextualCommandModel.TryGet(snapshot, i, out var command, localPending); i++)
+        {
+            HudRect button = ContextualCommandModel.Button(layout, i);
+            EmitQuad(button.X, button.Y, button.Width, button.Height,
+                command.Availability.CanActivate ? CardColor : GameplayHudVisualStyle.PanelDisabled, width, height);
+            EmitQuad(button.X, button.Y, 2 * _scale, button.Height,
+                command.Availability.CanActivate ? GameplayHudVisualStyle.Focus : GameplayHudVisualStyle.Warning, width, height);
+            EmitClippedText(command.Label, button.X + 5 * _scale, button.Y + 4 * _scale,
+                button.Right - 4 * _scale, TextColor, width, height);
+            EmitClippedText(command.Availability.CanActivate ? command.Shortcut : command.Availability.DisabledReason,
+                button.X + 5 * _scale, button.Y + 18 * _scale, button.Right - 4 * _scale,
+                MutedTextColor, width, height);
+        }
+        string footer = targeting.IsActive ? "TARGETING - ESC CANCELS" :
+            localPending || snapshot.PlayerActions?.PendingCommandCount > 0 ? "REQUEST PENDING - WAIT FOR RESULT" : "ADVANCED: B P U L Y K H";
+        EmitClippedText(footer, region.X + 5 * _scale, region.Bottom - 14 * _scale,
+            region.Right - 5 * _scale, MutedTextColor, width, height);
+        _scale = previousScale;
     }
 
     private void EmitModeBar(

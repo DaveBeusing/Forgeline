@@ -18,7 +18,8 @@ public readonly record struct HoverTooltipView(
     float Scale,
     PlayerActionPanelMode DockMode = PlayerActionPanelMode.Closed,
     int DockControl = 0,
-    int DockIndex = -1);
+    int DockIndex = -1,
+    bool Contextual = false);
 
 public sealed class HoverTooltipController
 {
@@ -47,7 +48,14 @@ public sealed class HoverTooltipController
         var next = new HoverTooltipView(snapshot.SessionId, EntityId.Invalid, default, pointer,
             false, layout.ViewportWidth, layout.ViewportHeight, layout.Scale);
         int count = PlayerActionDockInteractionLayout.GetItemCount(panel.Mode, snapshot.PlayerActions);
-        if (PlayerActionDockInteractionLayout.TryHit(pointer, layout, panel.IsOpen, count, out var hit))
+        if (ContextualCommandModel.TryHit(pointer, snapshot, layout, out var command,
+                localPending: ContextualCommandModel.HasPending(panel, snapshot)))
+        {
+            next = next with { DockMode = command.Mode,
+                DockControl = (int)(command.OpensMode ? PlayerActionDockControlKind.Mode : PlayerActionDockControlKind.Item),
+                DockIndex = command.ItemIndex, Contextual = true };
+        }
+        else if (PlayerActionDockInteractionLayout.TryHit(pointer, layout, panel.IsOpen, count, out var hit))
         {
             next = next with
             {
@@ -83,6 +91,7 @@ public sealed class HoverTooltipController
         bool changed = next.SessionId != _candidate.SessionId || next.Entity != _candidate.Entity ||
             next.Contact != _candidate.Contact || next.DockMode != _candidate.DockMode ||
             next.DockControl != _candidate.DockControl || next.DockIndex != _candidate.DockIndex ||
+            next.Contextual != _candidate.Contextual ||
             next.ViewportWidth != _candidate.ViewportWidth || next.ViewportHeight != _candidate.ViewportHeight ||
             next.Scale != _candidate.Scale || Vector2.DistanceSquared(pointer, _anchor) > 9 * layout.Scale * layout.Scale;
         if (changed)

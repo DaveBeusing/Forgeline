@@ -23,6 +23,12 @@ internal readonly record struct PlayerActionDockItemState(
 
 internal static class PlayerActionDockHudModel
 {
+    public static PlayerActionSnapshot? ResolveActions(PresentationSnapshot? snapshot) =>
+        snapshot is not null && snapshot.SessionId.IsSpecified &&
+        snapshot.PlayerActions is { } actions && actions.SessionId == snapshot.SessionId &&
+        actions.Tick == snapshot.Tick && snapshot.PlayerExperience is not { IsMatchComplete: true }
+            ? actions : null;
+
     public static string ResolveModeLabel(
         PlayerActionPanelMode mode) =>
         mode switch

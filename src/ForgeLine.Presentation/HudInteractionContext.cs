@@ -50,6 +50,7 @@ public sealed class HudInteractionContext
         Vector2 position, in GameplayHudLayout layout, bool minimapEnabled, bool actionDockExpanded = true, bool guidanceVisible = false) =>
         layout.TopStatusBar.Contains(position) ||
         layout.SelectionInspector.Contains(position) ||
+        layout.PrimaryCommands.Contains(position) ||
         (actionDockExpanded
             ? layout.ActionDock.Contains(position)
             : new HudRect(layout.ActionDock.X, layout.ActionDock.Y, layout.ActionDock.Width,

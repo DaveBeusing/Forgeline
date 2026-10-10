@@ -1,5 +1,20 @@
 # RTS interaction qualification
 
+## Contextual commands and hierarchy
+
+`ContextualCommandTests` covers unit/mixed/empty/immobile selections, incoherent session
+or tick data, terminal state, disabled attack/artillery, captured pending state, quick
+clicks, duplicate tick suppression, resize cancellation, hover and Command Core opening.
+The 1024x720 through 3840x2160 display matrix includes 96/144/192 DPI and raised UI scale;
+rendering remains inside clip space. Mapping has a zero warm allocation assertion over
+256 traversals. `MousePressSequenceTests` verifies release edges, repeated down, new
+presses and suppression. Existing full-HUD geometry, help/modal, minimap, authority,
+hover/selection hot-path and native window smoke gates remain required.
+
+Manual acceptance: contextual text/disabled-reason contrast, active native command and
+facility journeys, high-scale readability, and monitor DPI/focus changes. Startup smoke
+does not establish interactive or framebuffer acceptance.
+
 ## Hover qualification
 
 `WorldHoverExtractionTests` exercises owned identity/work, missing facts, detected/identified/lost enemies, visible/hidden deposits, foreign extraction-state suppression, destruction and stale generations through completed-tick extraction. `HoverTooltipTests` verifies the 175 ms delay without sleeping, target/session changes, gesture/modal/capture/focus suppression, display resets, dock precedence/closure and stale response rejection. `HoverTooltipRenderingTests` checks safe geometry at 1600x900 and 5120x2160, 96/144/192 DPI and 0.75–2.0 UI scale, alpha/depth/cull policy, reusable buffers and zero warm managed allocations for active world/dock/detected-contact tooltips, including contact picking.

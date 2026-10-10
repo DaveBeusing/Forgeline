@@ -654,7 +654,8 @@ internal sealed class ClientRenderHost : IDisposable
                             current.UiScale,
                             gameplayDraw,
                             runtimeMetrics,
-                            current.HoverTooltip);
+                            current.HoverTooltip,
+                            showRuntimeMetrics: current.OverlayEnabled);
                         developmentOverlayRenderer.Render(
                             context,
                             overlayMetrics,

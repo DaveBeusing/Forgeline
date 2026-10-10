@@ -46,7 +46,10 @@ public readonly record struct PlayerActionPanelView(
     BattlefieldSupplyPriority SupplyPriority =
         BattlefieldSupplyPriority.Normal,
     int HoveredIndex = -1,
-    bool PointerPressed = false)
+    bool PointerPressed = false,
+    bool ContextualPending = false,
+    SimulationTick? ContextualActivationTick = null,
+    SimulationSessionId ContextualSessionId = default)
 {
     public bool IsOpen =>
         Mode != PlayerActionPanelMode.Closed;
@@ -71,6 +74,10 @@ public sealed class PlayerActionPanelController
         BattlefieldSupplyPriority.Normal;
     private int _hoveredIndex = -1;
     private bool _pointerPressed;
+    private GameplayHudLayout _lastPointerLayout;
+    private bool _hasPointerLayout;
+    private ulong _leftPressSequence;
+    private SimulationTick? _contextualActivationTick;
 
     public PlayerActionPanelMode Mode { get; private set; }
 
@@ -121,12 +128,31 @@ public sealed class PlayerActionPanelController
                 dpi,
                 uiScale);
 
+        bool displayChanged = _hasPointerLayout && _lastPointerLayout != layout;
+        _lastPointerLayout = layout;
+        _hasPointerLayout = true;
+        ulong pressSequence = input.MousePressSequence(PlatformMouseButton.Left);
+        bool freshPress = pressSequence != _leftPressSequence;
+        _leftPressSequence = pressSequence;
+        if (input.FocusLostThisFrame && !input.HasPointerPosition)
+        {
+            _pendingRequest = null;
+            PointerCaptured = false;
+            _hoveredIndex = -1;
+            _pointerPressed = false;
+            _leftWasDown = false;
+            _heldKeys.Clear();
+            return;
+        }
+
+        bool sessionChanged = _sessionId.IsSpecified && snapshot?.SessionId != _sessionId;
+        if (_contextualActivationTick != snapshot?.Tick) _contextualActivationTick = null;
         SynchronizeSession(
             snapshot?.SessionId ??
             SimulationSessionId.None);
 
         PlayerActionSnapshot? actions =
-            snapshot?.PlayerActions;
+            PlayerActionDockHudModel.ResolveActions(snapshot);
 
         if (snapshot?.PlayerExperience is
                 PlayerExperienceSnapshot experience &&
@@ -267,10 +293,35 @@ public sealed class PlayerActionPanelController
 
         PointerCaptured =
             input.HasPointerPosition &&
-            PlayerActionDockInteractionLayout.CapturesPointer(
+            (layout.PrimaryCommands.Contains(input.PointerPosition) || PlayerActionDockInteractionLayout.CapturesPointer(
                 input.PointerPosition,
                 layout,
-                view.IsOpen);
+                view.IsOpen));
+
+        bool hasPress = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var pressOrigin);
+        var clickPosition = hasPress ? pressOrigin : input.PointerPosition;
+        bool clicked = !displayChanged && !sessionChanged && freshPress && hasPress && input.HasPointerPosition;
+        if (clicked && ContextualCommandModel.TryHit(clickPosition, snapshot, layout, out var command,
+                localPending: ContextualCommandModel.HasPending(view, snapshot)))
+        {
+            PointerCaptured = true;
+            if (command.Availability.CanActivate)
+            {
+                if (command.OpensMode) ToggleMode(command.Mode);
+                else
+                {
+                    Mode = command.Mode;
+                    SelectedIndex = command.ItemIndex;
+                    ActivateSelected(ContextualCommandModel.ResolveActions(snapshot));
+                    _contextualActivationTick = snapshot!.Tick;
+                }
+            }
+            _leftWasDown = leftDown;
+            PointerCaptured = true;
+            _ = Pressed(input, PlatformKey.Enter);
+            _ = Pressed(input, PlatformKey.C);
+            return;
+        }
 
         PlayerActionDockHitTarget hit =
             default;
@@ -292,12 +343,11 @@ public sealed class PlayerActionPanelController
             hasHit &&
             leftDown;
 
-        if (hasHit &&
-            leftDown &&
-            !_leftWasDown)
+        if (clicked && PlayerActionDockInteractionLayout.TryHit(clickPosition, layout,
+                view.IsOpen, itemCount, out var clickHit))
         {
             HandlePointerHit(
-                hit,
+                clickHit,
                 actions,
                 view);
             PointerCaptured = true;
@@ -369,7 +419,10 @@ public sealed class PlayerActionPanelController
             layout.ActionDock.Y,
             _supplyPriority,
             _hoveredIndex,
-            _pointerPressed);
+            _pointerPressed,
+            _contextualActivationTick.HasValue,
+            _contextualActivationTick,
+            _sessionId);
     }
 
     public bool TryTakeRequest(
@@ -1320,6 +1373,7 @@ public sealed class PlayerActionPanelController
         _supplyEntity = EntityId.Invalid;
         PointerCaptured = false;
         _pendingRequest = null;
+        _contextualActivationTick = null;
         _desiredStockQuantity = 0.0;
         _heldKeys.Clear();
         _leftWasDown = false;

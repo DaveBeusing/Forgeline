@@ -44,6 +44,18 @@ public readonly record struct GameplayHudLayout(
     HudRect Minimap,
     HudRect SecondaryView)
 {
+    public HudRect PrimaryCommands
+    {
+        get
+        {
+            float gap = GameplayHudVisualStyle.ResolveSafeMargin(Scale);
+            float x = SelectionInspector.Right + gap;
+            float width = MathF.Min(608 * Scale, MathF.Max(0, Minimap.X - gap - x));
+            float y = MathF.Max(SelectionInspector.Y, Minimap.Y);
+            return new HudRect(x, y, width, MathF.Max(0, SafeArea.Bottom - y));
+        }
+    }
+
     public HudRect RuntimeMetrics => SafeArea.IsEmpty ? default : new HudRect(
         SafeArea.Right - MathF.Min(142.0f * Scale, SafeArea.Width), SafeArea.Y,
         MathF.Min(142.0f * Scale, SafeArea.Width), TopStatusBar.Height);
@@ -144,11 +156,11 @@ public readonly record struct GameplayHudLayout(
         float selectionWidth =
             MathF.Min(
                 GameplayHudVisualStyle.SelectionInspectorWidth * scale,
-                MathF.Max(
+                MathF.Min(safeArea.Width * 0.30f, MathF.Max(
                     0.0f,
                     safeArea.Width -
                     minimap.Width -
-                    margin));
+                    margin)));
         float selectionHeight =
             MathF.Min(
                 GameplayHudVisualStyle.SelectionInspectorHeight * scale,

@@ -8,6 +8,32 @@ The dock is presentation-owned. It consumes immutable `PlayerActionSnapshot`, `P
 
 ## Modes and shortcuts
 
+The primary selection-command panel sits between the selection inspector and minimap.
+Combat-eligible selections expose Attack, Attack Move, Stop, Hold, Retreat and Fire
+Mission through existing handlers. Mixed selections operate on eligible units only;
+disabled controls retain their reason and hover explanation. No Patrol or Repair is
+inferred. Command Core opens Build; copied unit-production, processing, logistics and
+supply capabilities open their advanced modes. Empty selection prompts selection while
+the advanced mode bar remains available.
+
+Primary tactical buttons activate by click. The keyboard alternative is `K`, `Tab` to
+the desired card, then `Enter`; these are not new single-key combat bindings. A facility
+button changes mode without submitting production. All seven advanced modes remain.
+Hover explanations use the same captured availability as rendering and dispatch.
+
+Primary commands require matching snapshot/action session and tick identities. Captured
+pending commands disable tactical controls, and local activation is limited to once per
+captured tick. Targeting and pending labels show intent; copied command-result feedback
+establishes acceptance or rejection. Stop/Hold cancel active target or placement gestures.
+The local pending session/tick is copied into the panel view; rendering, hover and
+dispatch use that same pending availability. A newer tick/session cannot inherit it.
+
+Shared bounds own the entire primary panel, including disabled/empty space. Retained
+mouse sequences recognize quick clicks and consume each press once; resize/session
+transitions discard the affected press. High DPI/UI scale fits the primary panel below
+the advanced dock. Extreme narrow/high-scale profiles fit text compactly; hover exposes
+full disabled reasons.
+
 | Mode | Shortcut | Current gameplay coverage |
 | --- | --- | --- |
 | Build | B | Building selection, costs, resource availability, deposit requirement, placement transition |
