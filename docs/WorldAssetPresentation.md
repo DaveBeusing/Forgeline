@@ -8,6 +8,25 @@ Runtime code never opens files from `assets/source`. CI and local authoring work
 
 ## Terrain material family
 
+Terrain surface refinement keeps the eight IDs and four active layers per chunk. Base color remains sRGB; normals and ORM remain linear. The world sampler remains 8x anisotropic with the compiled mip chain. Terrain still binds thirteen textures and performs at most thirteen material/control samples per pixel. The direct root signature costs 63 DWORDs; shadow receivers retain buffered constants and cost 18. No extra texture, descriptor, target, overlay geometry or terrain draw is introduced.
+
+`TerrainSurfaceDetailSettings` is a copied construction-time presentation value. Its default enables a 4m repeating color/normal detail with strengths 0.04/0.06. The pixel footprint fades detail between 0.08 and 0.30 of that tile (0.32–1.20m per pixel by default), before minified detail aliases. Color strength is limited to 0–0.08, normal strength to 0–0.12, tile size to 1–32m, and rock slope start/end to validated ordered thresholds. Disabled compiles out both additions; recreate the renderer to change this shader policy. Broad world-space macro tint remains within its existing 0.90–1.08 bound.
+
+Only Rock adapts its existing projection on steep surfaces. Between `1 - abs(normal.y)` of 0.25 and 0.60, UVs transition from XZ to the dominant side plane (ZY for X-facing rock, XY for Z-facing rock). Base, normal and ORM use the same projected coordinates and explicit final-coordinate gradients. Tangential side normal perturbations preserve neutral-map geometry. This bounded slope approximation retains the sample ceiling; it is not seamless triplanar blending. Dominant-axis changes on arbitrary diagonal cliffs remain a visual authoring consideration.
+
+Material source `uvScale` controls the same base/normal/ORM physical scale, multiplied by the profile tile. The reusable refined palette uses:
+
+| Material | Profile tile | Authored UV scale | Effective repeat |
+| --- | ---: | ---: | ---: |
+| Grass / dirt / rock | 32m | 1 | 32m |
+| Mud | 24m | 1.5 | 16m |
+| Gravel | 24m | 2 | 12m |
+| Industrial ground | 32m | 1.5 | 21.33m |
+| Concrete | 24m | 1.5 | 16m |
+| Scorched | 32m | 1.25 | 25.6m |
+
+Authored rectangular blend regions now use a cubic smoothstep feather with zero derivative at each end. The road's mud shoulder precedes its gravel region, so the authored gravel center remains dominant. Concrete aprons, industrial yards and scorched regions retain their locations, palette identities and existing decal family. Profile validation rejects invalid IDs/slots, non-finite factors/centers, invalid tiles/extents and negative feathering before control-map uploads. These presentation regions never modify terrain height, navigation, collision or battlefield definitions.
+
 Central Divide defines eight stable terrain material slots:
 
 | Slot | Stable material asset ID |
@@ -41,6 +60,10 @@ The initial decal material family contains:
 Central Divide contains representative placements as `BattlefieldWorldObjectDefinition` records. The authored decal plane is `mesh.world.decal.quad`; material choice remains per placed world feature.
 
 ## Reusable props and vegetation
+
+The render host supplies one monotonic visual time to both world and shadow instance submission. Conifer, scrub and grass-clump transforms receive a bounded 8-second periodic bend around their authored local origin (root at Y=0; mesh height Y=0..1). Maximum motion is 0.025 radians. Amplitude fades continuously from zero at an 18-pixel projected diameter to full at 72 pixels, independently of LOD switches. Omitting explicit visual time retains static transforms.
+
+The motion operates on copied, already viewer-authorized instances, after the World visibility filter and LOD selection. Batch keys, mesh/material IDs, instance strides, collision and selection bounds are unchanged. Conservative render-only bounds cover the authored plant height and its complete sweep; shadow submission uses the same phase. `AnimatedVegetationInstances` reports participating visible plants. Hidden contacts, targetability, concealment, minimap and tactical icons retain their authoritative policies.
 
 The first repeat-friendly prop catalog contains rock, barrier, concrete block, crate, drum, pallet, pipe section, utility box, fence, industrial light/signage, and rubble visuals.
 

@@ -10,4 +10,8 @@ public readonly record struct TerrainRenderDiagnostics(
     int ControlTextureCount = 0,
     int TextureBindingsPerDraw = 0,
     int MaximumTextureSamplesPerPixel = 0,
-    double CpuSubmissionMilliseconds = 0.0);
+    double CpuSubmissionMilliseconds = 0.0)
+{
+    public bool SurfaceDetailEnabled { get; init; }
+    public int RootSignatureDwords { get; init; }
+}

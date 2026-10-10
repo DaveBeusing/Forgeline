@@ -49,6 +49,9 @@ internal readonly record struct ClientVisualQualificationSnapshot(
     public GraphicsAtmosphereDiagnostics? Atmosphere { get; init; }
     public int Lod1Instances { get; init; }
     public int Lod2Instances { get; init; }
+    public int AnimatedVegetationInstances { get; init; }
+    public bool TerrainSurfaceDetailEnabled { get; init; }
+    public int TerrainRootSignatureDwords { get; init; }
 
     public GameplayHudState GameplayHudState { get; init; }
 
@@ -475,6 +478,7 @@ internal sealed class ClientRenderHost : IDisposable
 
             long previousFrameAt =
                 Stopwatch.GetTimestamp();
+            long visualMotionStartedAt = previousFrameAt;
             long snapshotObservedAt =
                 previousFrameAt;
             long nextDiagnosticAt =
@@ -650,7 +654,8 @@ internal sealed class ClientRenderHost : IDisposable
                             context.BeginDirectionalShadowPass(shadowFrame);
                             int terrainShadows = terrainRenderer.RenderShadow(context, shadowFrame, Math.Min(128, shadowSettings.MaximumDraws));
                             instanceRenderer.RenderShadow(context, renderCamera, renderWorld, renderAlpha, shadowFrame,
-                                shadowSettings.MaximumCasters - terrainShadows, shadowSettings.MaximumDraws - terrainShadows);
+                                shadowSettings.MaximumCasters - terrainShadows, shadowSettings.MaximumDraws - terrainShadows,
+                                (double)(renderStartedAt - visualMotionStartedAt) / Stopwatch.Frequency);
                             context.EndDirectionalShadowPass();
                         }
                         terrainRenderer.Render(
@@ -660,7 +665,8 @@ internal sealed class ClientRenderHost : IDisposable
                             context,
                             renderCamera,
                             renderWorld,
-                            renderAlpha);
+                            renderAlpha,
+                            (double)(renderStartedAt - visualMotionStartedAt) / Stopwatch.Frequency);
                         context.BeginPass(GraphicsFramePass.Overlay);
                         long debugStartedAt =
                             Stopwatch.GetTimestamp();
@@ -915,6 +921,9 @@ internal sealed class ClientRenderHost : IDisposable
                 GameplayHudState = hudState,
                 Lod1Instances = instances.Lod1Instances,
                 Lod2Instances = instances.Lod2Instances,
+                AnimatedVegetationInstances = instances.AnimatedVegetationInstances,
+                TerrainSurfaceDetailEnabled = terrain.SurfaceDetailEnabled,
+                TerrainRootSignatureDwords = terrain.RootSignatureDwords,
                 GameplayHudVertexCount = hudVertexCount,
                 RuntimeMetrics = runtimeMetrics,
                 LastMeasuredRunningRates = lastMeasuredRunningRates,

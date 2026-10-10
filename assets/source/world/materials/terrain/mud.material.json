@@ -9,5 +9,9 @@
   "metallicFactor": 0,
   "roughnessFactor": 1,
   "normalTexture": "texture.world.terrain.cracked_earth_normal",
-  "ormTexture": "texture.world.terrain.cracked_earth_orm"
+  "ormTexture": "texture.world.terrain.cracked_earth_orm",
+  "uvScale": [
+    1.5,
+    1.5
+  ]
 }

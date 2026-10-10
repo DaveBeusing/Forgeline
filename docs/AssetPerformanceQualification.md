@@ -1,5 +1,42 @@
 # Asset Performance and Visual Qualification
 
+## Terrain surface and vegetation comparison
+
+The production-renderer baseline is `bc6676894edc824ad746ed21eca660fea40e4734`. `TerrainFidelityQualificationTests` first captured that terrain implementation, then the refined implementation with clean compiled production materials. Both runs used NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU, driver 32.0.15.9653, 1280x720, the complete 144-chunk canonical Central Divide, exposure 1.15/ACES, VSync off, no objects/shadows/atmosphere, 64 warmups and 512 samples per viewpoint. GPU world timing therefore measures terrain submission alone; only distinct completed fence values contribute. CPU frame timing includes Present/frame reuse. No local graphics/build/asset workloads overlapped the GPU measurements.
+
+| Viewpoint / distance | Baseline terrain GPU ms | Refined terrain GPU ms | Visible chunks |
+| --- | ---: | ---: | ---: |
+| Ridge road / 120m | 3.55 | 2.35 | 10 |
+| Ridge road / 420m | 6.15 | 4.96 | 24 |
+| Ridge road / 1000m | 14.28 | 13.03 | 84 |
+| Bridge apron / 120m | 1.92 | 1.59 | 6 |
+| Bridge apron / 420m | 4.59 | 4.64 | 20 |
+| Bridge apron / 1000m | 12.38 | 12.54 | 80 |
+| Industrial yard / 120m | 1.19 | 1.43 | 4 |
+| Industrial yard / 420m | 4.70 | 4.56 | 21 |
+| Industrial yard / 1000m | 9.08 | 8.98 | 55 |
+
+All pairs retained their chunk/draw counts and exactly 44,864,256 resident asset/control texture bytes (42.79 MiB). There are no added texture descriptors, render targets, instancing keys or material families. The three existing FP16 scene buffers require 21.1 MiB at this resolution, separately from texture residency. Clean asset qualification retains 341 assets and valid material/LOD/collision references; the five small material parameter changes yield 56,678,783 compiled runtime bytes. Existing 64 MiB scene-texture, 512-SRV, thirteen-sample and canonical draw-budget gates are unchanged.
+
+The vegetation fixture uses 256 identical compiled conifers and one excluded Debug-only instance at the same three distances, with matched visible counts of 256 and one instanced draw in every static/moving pair. Explicit 1-second visual time produces visible near-camera motion; the snapshot and batch identities remain unchanged. Total GPU means were 0.64/0.89ms (static/moving, 120m), 0.47/0.82ms (420m), and 0.65/0.99ms (1000m). CPU frame means were 5.91/3.67ms, 3.40/3.59ms, and 3.03/4.10ms respectively. Those include driver/Present variability; neither these sequential samples nor lower terrain timings establish a portable improvement or a sustained full-client FPS guarantee. A 20m plant can still exceed the 18-pixel motion cutoff at 1000m; suppression depends on projected size, rather than a universal camera-distance cutoff.
+
+### Reproduce fixed views and captures
+
+Run clean asset compilation first, then leave the GPU idle before the isolated fixture:
+
+```powershell
+dotnet build ForgeLine.sln --configuration Release
+dotnet run --project tools/ForgeLine.AssetCompiler/ForgeLine.AssetCompiler.csproj --configuration Release --no-build -- --source assets/source --runtime assets/runtime --clean --qualification-output artifacts/terrain-assets.json
+$env:FORGELINE_TERRAIN_QUALIFICATION_OUTPUT = 'artifacts/terrain-after.json'
+$env:FORGELINE_BENCHMARK_DRIVER = '<actual driver version>'
+dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.TerrainFidelityQualificationTests
+Remove-Item Env:FORGELINE_TERRAIN_QUALIFICATION_OUTPUT, Env:FORGELINE_BENCHMARK_DRIVER
+```
+
+The fixture resolves relative paths against the checkout; `FORGELINE_TERRAIN_RUNTIME_ROOT` optionally supplies another compiled catalog. It exports full-resolution PPMs and JSON camera state with actual distances, target height, yaw and pitch. Terrain targets are XZ=(1536,1536), (1536,920) and (650,520), with Y sampled from the unchanged canonical heightfield. Default yaw is 45 degrees and pitch -55 degrees; reference distances are 120/420/1000m. Compare identical output filenames from the baseline fixture revision and changed revision side by side, with the same hardware, settings and scene data. Terrain-only captures qualify road/shoulder, concrete apron, yard and long-view palette readability, not a full populated bridge scene.
+
+Automated WARP checks cover a genuinely steep textured rock plane, deterministic captures, direct/linear/shadow/atmosphere integration, resize and exact removal of unresolved micro detail at strategic pixel footprints. They are not hardware performance results. Physical-monitor readability/DPI changes, arbitrary diagonal projection seams under a moving camera, extended resize/occlusion/device-removal soak and sustained full populated-client performance remain manual acceptance. The local optional D3D12 debug layer is unavailable.
+
 ## Purpose
 
 FORGELINE qualifies the integrated Vertical Slice visual asset set as a system rather than accepting assets only because they compile or render in isolation.
