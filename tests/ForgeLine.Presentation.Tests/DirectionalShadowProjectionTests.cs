@@ -38,5 +38,23 @@ public sealed class DirectionalShadowProjectionTests
         Assert.Throws<ArgumentOutOfRangeException>(() => new GraphicsDirectionalShadowSettings((DirectionalShadowQuality)99).Validate());
         Assert.Throws<ArgumentException>(() => new GraphicsDirectionalShadowFrame(default, default, 1, 1).Validate());
         Assert.Throws<ArgumentException>(() => new GraphicsDirectionalShadowFrame(Matrix4x4.Identity, default, 1, 1, 0.9f).Validate());
+        var invalid = Matrix4x4.Identity;
+        invalid.M33 = float.NaN;
+        Assert.Throws<ArgumentException>(() => new GraphicsDirectionalShadowFrame(invalid, default, 1, 1).Validate());
+        Assert.Throws<ArgumentOutOfRangeException>(() => new GraphicsDirectionalShadowSettings(DirectionalShadowQuality.Low).PayloadBytes(0));
+    }
+
+    [Fact]
+    public void SubTexelCameraTranslationDoesNotMoveTheShadowGrid()
+    {
+        var settings = new GraphicsDirectionalShadowSettings(DirectionalShadowQuality.Low);
+        var lighting = SceneLightingSettings.Default;
+        var camera = new RtsCameraState(Vector3.Zero, 0, -1, 420, false, default);
+        Matrix4x4 orientation = Matrix4x4.CreateLookAt(lighting.DirectionToLight, Vector3.Zero, Vector3.UnitY);
+        Matrix4x4.Invert(orientation, out Matrix4x4 inverse);
+        Vector3 delta = Vector3.TransformNormal(Vector3.UnitX * (2 * settings.Radius / settings.Resolution * 0.1f), inverse);
+        var first = DirectionalShadowProjection.Create(camera, lighting, settings);
+        var moved = DirectionalShadowProjection.Create(camera with { Target = delta }, lighting, settings);
+        Assert.InRange(Vector3.Distance(first.Center, moved.Center), 0, 0.00001f);
     }
 }

@@ -48,7 +48,7 @@ public sealed record GraphicsPipelineDescription(
             throw new ArgumentOutOfRangeException(nameof(TargetFormat));
         if (TargetFormat == GraphicsFrameTargetFormat.Depth32Float && (!DepthEnabled || AlphaBlendEnabled || DirectionalShadowReceiver))
             throw new ArgumentException("Shadow depth pipelines require depth writes and cannot blend or sample themselves.");
-        if (DirectionalShadowReceiver && (!VertexConstantsInBuffer || PixelTextureCount > 15))
+        if (DirectionalShadowReceiver && (!VertexConstantsInBuffer || VertexRootConstantCount == 0 || PixelTextureCount > 15))
             throw new ArgumentException("Shadow receivers use buffered frame constants and reserve texture register t15.");
         if (TargetFormat == GraphicsFrameTargetFormat.Rgba16Float && AlphaBlendEnabled)
             throw new NotSupportedException("Linear scene composition currently supports opaque world pipelines only.");

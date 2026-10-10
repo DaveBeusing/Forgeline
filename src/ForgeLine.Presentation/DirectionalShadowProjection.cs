@@ -11,6 +11,8 @@ public static class DirectionalShadowProjection
         settings.Validate();
         lighting.Validate();
         if (!settings.Enabled) throw new ArgumentException("A disabled profile has no shadow projection.", nameof(settings));
+        if (!float.IsFinite(camera.Target.X) || !float.IsFinite(camera.Target.Y) || !float.IsFinite(camera.Target.Z))
+            throw new ArgumentException("Shadow camera target must be finite.", nameof(camera));
         Vector3 direction = Vector3.Normalize(lighting.DirectionToLight);
         Vector3 up = MathF.Abs(direction.Y) > 0.98f ? Vector3.UnitZ : Vector3.UnitY;
         Matrix4x4 orientation = Matrix4x4.CreateLookAt(direction, Vector3.Zero, up);

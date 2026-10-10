@@ -20,19 +20,27 @@ internal static class DirectionalShadowShader
             fade *= 1 - smoothstep(0.8, 1, length(position.xz - ShadowCenterRadius.xz) / ShadowCenterRadius.w);
             float bias = (0.03 + 0.1 * (1 - saturate(normal.y))) / ShadowParameters.y;
             int size = (int)ShadowParameters.x;
-            int2 pixel = int2(uv * size);
+            float2 texel = uv * size - 0.5;
+            int2 pixel = int2(floor(texel));
+            float2 fraction = frac(texel);
+            float2 du = ddx(uv), dv = ddy(uv);
+            float determinant = du.x * dv.y - du.y * dv.x;
+            float2 plane = abs(determinant) > 1e-10 ?
+                float2(ddx(p.z) * dv.y - ddy(p.z) * du.y, ddy(p.z) * du.x - ddx(p.z) * dv.x) / determinant : 0;
             float visibility = 0;
             float contact = 0;
-            [unroll] for (int y = -1; y <= 1; y++) {
-                [unroll] for (int x = -1; x <= 1; x++) {
+            [unroll] for (int y = 0; y <= 1; y++) {
+                [unroll] for (int x = 0; x <= 1; x++) {
+                    float weight = (x == 0 ? 1 - fraction.x : fraction.x) * (y == 0 ? 1 - fraction.y : fraction.y);
                     float blocker = DirectionalDepth.Load(int3(clamp(pixel + int2(x, y), 0, size - 1), 0));
-                    float gap = (p.z - blocker) * ShadowParameters.y;
-                    visibility += p.z - bias <= blocker ? 1 : 0;
-                    contact += gap > bias * ShadowParameters.y ? 1 - smoothstep(0.1, 1.5, gap) : 0;
+                    float receiver = p.z + dot(plane, (float2(pixel + int2(x, y)) + 0.5) / size - uv);
+                    float gap = (receiver - blocker) * ShadowParameters.y;
+                    visibility += (receiver - bias <= blocker ? 1 : 0) * weight;
+                    contact += (gap > bias * ShadowParameters.y ? 1 - smoothstep(0.1, 1.5, gap) : 0) * weight;
                 }
             }
             // Contact is local to an actual depth blocker and changes ambient by at most 15%.
-            return float2(lerp(1, visibility / 9, fade), 1 - contact / 9 * fade * ShadowParameters.z);
+            return float2(lerp(1, visibility, fade), 1 - contact * fade * ShadowParameters.z);
         }
 
         """;

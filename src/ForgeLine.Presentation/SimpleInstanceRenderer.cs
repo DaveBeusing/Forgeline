@@ -266,7 +266,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 unitLod =
                     instance.UnitFeature.IsWreck ? UnitAssetLod.Lod2
                         : (UnitAssetLod)ScreenSpaceLod.Select(projectedDiameter, previousLod);
-                if (hasLodIdentity) _currentLods[lodKey] = (int)unitLod;
+                if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = (int)unitLod;
                 unitDefinition =
                     UnitPresentationCatalog.Get(
                         instance.UnitFeature.Unit);
@@ -293,7 +293,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     unitLod = UnitAssetLod.Lod0;
                     usesRuntimeMesh = _runtimeAssets.TryGetMesh(unitDefinition.MeshAssetId,
                         out runtimeMesh, out runtimeMeshId) && runtimeMesh.IsValid;
-                    if (hasLodIdentity) _currentLods[lodKey] = (int)unitLod;
+                    if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = (int)unitLod;
                 }
                 if (unitLod == UnitAssetLod.Lod1) lod1Instances++;
                 if (unitLod == UnitAssetLod.Lod2) lod2Instances++;
@@ -313,7 +313,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     instance.BuildingFeature.IsConstruction || instance.BuildingFeature.IsDestroyed
                         ? BuildingAssetLod.Lod0
                         : (BuildingAssetLod)ScreenSpaceLod.Select(projectedDiameter, previousLod, 150.0f, 45.0f);
-                if (hasLodIdentity) _currentLods[lodKey] = (int)buildingLod;
+                if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = (int)buildingLod;
                 hasBuildingDefinition =
                     BuildingPresentationCatalog.TryGet(
                         instance.BuildingFeature.Building,
@@ -341,7 +341,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     usesRuntimeMesh = _runtimeAssets.TryGetMesh(
                         BuildingPresentationCatalog.ResolveMeshAssetId(instance.BuildingFeature, buildingLod),
                         out runtimeMesh, out runtimeMeshId) && runtimeMesh.IsValid;
-                    if (hasLodIdentity) _currentLods[lodKey] = (int)buildingLod;
+                    if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = (int)buildingLod;
                 }
 
                 if (buildingLod == BuildingAssetLod.Lod1) lod1Instances++;
@@ -411,7 +411,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 WorldAssetLod worldLod =
                     ScreenSpaceLod.Select(projectedDiameter, previousLod, 65.0f, 18.0f) > 0
                         ? WorldAssetLod.Reduced : WorldAssetLod.High;
-                if (hasLodIdentity) _currentLods[lodKey] = worldLod == WorldAssetLod.Reduced ? 1 : 0;
+                if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = worldLod == WorldAssetLod.Reduced ? 1 : 0;
 
                 usesRuntimeMesh =
                     _runtimeAssets is not null &&

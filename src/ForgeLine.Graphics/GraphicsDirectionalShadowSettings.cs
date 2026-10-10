@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace ForgeLine.Graphics;
 
@@ -12,7 +13,12 @@ public readonly record struct GraphicsDirectionalShadowSettings(DirectionalShado
     public float Radius => Quality switch { DirectionalShadowQuality.Low => 180, DirectionalShadowQuality.Medium => 450, DirectionalShadowQuality.High => 750, _ => 0 };
     public int MaximumCasters => Quality switch { DirectionalShadowQuality.Low => 1024, DirectionalShadowQuality.Medium => 4096, DirectionalShadowQuality.High => 8192, _ => 0 };
     public int MaximumDraws => Enabled ? 256 : 0;
-    public long PayloadBytes(int buffers) => checked((long)Resolution * Resolution * 4 * buffers);
+    public long PayloadBytes(int buffers)
+    {
+        if (buffers is < GraphicsConfiguration.MinimumBufferCount or > GraphicsConfiguration.MaximumBufferCount)
+            throw new ArgumentOutOfRangeException(nameof(buffers));
+        return checked((long)Resolution * Resolution * 4 * buffers);
+    }
     public void Validate()
     {
         if (!Enum.IsDefined(Quality)) throw new ArgumentOutOfRangeException(nameof(Quality));
@@ -23,6 +29,9 @@ public readonly record struct GraphicsDirectionalShadowFrame(Matrix4x4 ViewProje
 {
     public void Validate()
     {
+        Matrix4x4 projection = ViewProjection;
+        foreach (float component in MemoryMarshal.Cast<Matrix4x4, float>(MemoryMarshal.CreateReadOnlySpan(ref projection, 1)))
+            if (!float.IsFinite(component)) throw new ArgumentException("Shadow matrix must be finite.");
         if (!float.IsFinite(Center.X) || !float.IsFinite(Center.Y) || !float.IsFinite(Center.Z) ||
             !float.IsFinite(Radius) || Radius <= 0 || !float.IsFinite(DepthRange) || DepthRange <= 0 ||
             !float.IsFinite(ContactStrength) || ContactStrength is < 0 or > 0.15f ||
