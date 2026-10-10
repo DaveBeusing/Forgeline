@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using ForgeLine.Assets;
 using ForgeLine.Economy;
 using ForgeLine.Game;
+using ForgeLine.Input;
 using ForgeLine.Graphics;
 
 namespace ForgeLine.Presentation;
@@ -139,7 +140,7 @@ internal sealed class SelectionInspectorHudSurface : IGameplayHudSurface
             context.Snapshot,
             context.Layout,
             context.CombatGroups.Selection,
-            context.ActiveFormation);
+            context.ActiveFormation, context.ActionPanel.Bindings);
 
     public void Dispose() =>
         _renderer.Dispose();
@@ -195,7 +196,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         PresentationSnapshot snapshot,
         in GameplayHudLayout layout,
         SelectedCombatGroup? group = null,
-        FormationTemplate formation = default)
+        FormationTemplate formation = default, GameplayBindingRegistry? bindings = null)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(graphics);
@@ -218,7 +219,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
 
         if (experience.Selection.Count > 1 && group is not null && group.Tick == snapshot.Tick &&
             group.TotalCount == experience.Selection.Count && SelectedCombatGroup.Resolve(snapshot) is not null)
-            EmitGroupCard(group, experience.Feedback, formation, layout, graphics.Width, graphics.Height);
+            EmitGroupCard(group, experience.Feedback, formation, bindings ?? GameplayBindingRegistry.Default, layout, graphics.Width, graphics.Height);
         else EmitInspector(
             experience.Selection,
             layout.SelectionInspector,
@@ -270,7 +271,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
     }
 
     private void EmitGroupCard(SelectedCombatGroup group, in PlayerCommandFeedback feedback,
-        FormationTemplate formation, in GameplayHudLayout layout, int width, int height)
+        FormationTemplate formation, GameplayBindingRegistry bindings, in GameplayHudLayout layout, int width, int height)
     {
         _scale = CombatGroupCardLayout.Scale(layout);
         HudRect region = layout.SelectionInspector;
@@ -304,7 +305,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
             else if (index == 9)
             { text.Append("SUPPLY! "); text.Append(group.UnsuppliedCount); text.Append(" FOCUS"); enabled = group.UnsuppliedCount > 0; }
             else if (index == 10)
-            { text.Append("F3 "); text.Append(formation switch { FormationTemplate.Line => "LINE", FormationTemplate.Column => "COLUMN", FormationTemplate.Wedge => "WEDGE", _ => "COMPACT" }); text.Append(" NEXT"); enabled = group.CombatCount > 0; }
+            { text.Append(bindings.Prompt(GameplayAction.Formation)); text.Append(" "); text.Append(formation switch { FormationTemplate.Line => "LINE", FormationTemplate.Column => "COLUMN", FormationTemplate.Wedge => "WEDGE", _ => "COMPACT" }); text.Append(" NEXT"); enabled = group.CombatCount > 0; }
             else { text.Append("FOCUS GROUP"); enabled = group.LiveCount > 0; }
             EmitQuad(rect.X, rect.Y, rect.Width, rect.Height, enabled ? GameplayHudVisualStyle.PanelRaised : PanelColor, width, height);
             EmitClippedText(text.Written, rect.X + _scale, rect.Y + _scale, rect.Right - _scale,

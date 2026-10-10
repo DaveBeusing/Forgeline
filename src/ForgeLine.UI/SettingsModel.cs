@@ -19,9 +19,11 @@ public sealed class SettingsModel
         FrontendSettingsSnapshot settings)
     {
         Settings = settings;
+        Bindings = new(settings.GameplayBindings ?? new(), settings.CameraBindings);
     }
 
     public FrontendSettingsSnapshot Settings { get; private set; }
+    public GameplayBindingRegistry Bindings { get; private set; }
 
     public void SetDisplay(
         int width,
@@ -67,12 +69,14 @@ public sealed class SettingsModel
         {
             CameraBindings = bindings
         };
+        Bindings = new(Settings.GameplayBindings ?? new(), bindings);
     }
 
     public void SetGameplayBindings(GameplayBindings bindings)
     {
-        _ = new GameplayBindingRegistry(bindings, Settings.CameraBindings);
+        var registry = new GameplayBindingRegistry(bindings, Settings.CameraBindings);
         Settings = Settings with { GameplayBindings = bindings };
+        Bindings = registry;
     }
 
     public static GameFrontendAction Back() =>

@@ -18,11 +18,12 @@ public sealed class RtsCameraFocusController(PlayerId player)
 
     public bool Update(InputState input, PresentationSnapshot? snapshot, RtsCamera camera,
         SelectionSet groupSelection, bool focusGroup, TimeSpan elapsed, bool blocked = false,
-        RtsCameraBindings? bindings = null)
+        RtsCameraBindings? bindings = null, GameplayBindingRegistry? gameplayBindings = null)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(elapsed, TimeSpan.Zero);
-        ulong sequence = input.KeyPressSequence(PlatformKey.Home);
-        bool home = input.WasKeyPressed(PlatformKey.Home) && sequence != _homeSequence;
+        PlatformKey focusKey = gameplayBindings?.Key(GameplayAction.FocusBase) ?? PlatformKey.Home;
+        ulong sequence = input.KeyPressSequence(focusKey);
+        bool home = input.WasKeyPressed(focusKey) && sequence != _homeSequence;
         _homeSequence = sequence;
         if (_session != snapshot?.SessionId || blocked || input.FocusLostThisFrame)
         { Feedback = string.Empty; _feedbackRemaining = default; }
@@ -33,7 +34,7 @@ public sealed class RtsCameraFocusController(PlayerId player)
             snapshot.PlayerExperience?.IsMatchComplete == true) return false;
         bool modified = input.IsKeyDown(PlatformKey.LeftControl) || input.IsKeyDown(PlatformKey.RightControl) ||
             input.IsKeyDown(PlatformKey.LeftShift) || input.IsKeyDown(PlatformKey.RightShift);
-        if (home && !modified && !IsHomeCameraBinding(bindings) && TryHome(snapshot, player, out Vector3 target))
+        if (home && !modified && !GameplayBindingRegistry.UsesCamera(bindings, focusKey) && TryHome(snapshot, player, out Vector3 target))
         {
             camera.CenterOn(target);
             Feedback = "CAMERA FOCUSED ON HOME BASE";

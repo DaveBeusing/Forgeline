@@ -240,7 +240,7 @@ internal sealed class ClientSettingsStore
         {
             string json =
                 File.ReadAllText(_path);
-            var document = JsonNode.Parse(json)?.AsObject() ?? throw new InvalidDataException("Settings object is missing.");
+            var document = JsonNode.Parse(json) as JsonObject ?? throw new InvalidDataException("Settings object is missing.");
             string? gameplayProperty = document.Select(x => x.Key).FirstOrDefault(x => string.Equals(x, "gameplayBindings", StringComparison.OrdinalIgnoreCase));
             JsonNode? gameplay = gameplayProperty is null ? null : document[gameplayProperty];
             if (gameplayProperty is not null) document.Remove(gameplayProperty);

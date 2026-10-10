@@ -6,6 +6,7 @@ using ForgeLine.Combat;
 using ForgeLine.Economy;
 using ForgeLine.Game;
 using ForgeLine.Graphics;
+using ForgeLine.Input;
 using ForgeLine.Logistics;
 
 namespace ForgeLine.Presentation;
@@ -123,6 +124,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
 
         EmitModeBar(
             panel.Mode,
+            panel.Bindings,
             layout,
             graphics.Width,
             graphics.Height);
@@ -206,22 +208,30 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         EmitQuad(region.X, region.Y, region.Width, region.Height, PanelColor, width, height);
         EmitClippedText(ContextualCommandModel.Status(snapshot), region.X + 5 * _scale,
             region.Y + 5 * _scale, region.Right - 5 * _scale, TextColor, width, height);
+        Span<char> promptBuffer = stackalloc char[128];
         bool localPending = ContextualCommandModel.HasPending(panel, snapshot);
-        for (int i = 0; ContextualCommandModel.TryGet(snapshot, i, out var command, localPending, panel.SelectionPending); i++)
+        for (int i = 0; ContextualCommandModel.TryGet(snapshot, i, out var command, localPending, panel.SelectionPending, panel.Bindings); i++)
         {
             HudRect button = ContextualCommandModel.Button(layout, i);
-            EmitQuad(button.X, button.Y, button.Width, button.Height,
-                command.Availability.CanActivate ? CardColor : GameplayHudVisualStyle.PanelDisabled, width, height);
-            EmitQuad(button.X, button.Y, 2 * _scale, button.Height,
-                command.Availability.CanActivate ? GameplayHudVisualStyle.Focus : GameplayHudVisualStyle.Warning, width, height);
+            bool focused = panel.IsOpen && panel.Mode == command.Mode && (command.OpensMode || panel.SelectedIndex == command.ItemIndex);
+            bool hovered = panel.ContextualHoveredIndex == i;
+            var visual = GameplayHudVisualStyle.ResolveItemState(focused, hovered, hovered && panel.ContextualPressed, command.Availability.CanActivate);
+            EmitQuad(button.X, button.Y, button.Width, button.Height, visual.Fill, width, height);
+            EmitItemStateCue(button, visual, width, height);
             EmitClippedText(command.Label, button.X + 5 * _scale, button.Y + 4 * _scale,
                 button.Right - 4 * _scale, TextColor, width, height);
-            EmitClippedText(command.Availability.CanActivate ? command.Shortcut : command.Availability.DisabledReason,
-                button.X + 5 * _scale, button.Y + 18 * _scale, button.Right - 4 * _scale,
+            var prompt = new HudTextBuilder(promptBuffer);
+            if (command.Availability.CanActivate)
+            {
+                prompt.Append(hovered && panel.ContextualPressed ? "PRESS " : focused ? "FOCUS " : hovered ? "HOVER " : string.Empty);
+                prompt.Append(command.Shortcut);
+            }
+            else prompt.Append(command.Availability.DisabledReason);
+            EmitClippedText(prompt.Written, button.X + 5 * _scale, button.Y + 18 * _scale, button.Right - 4 * _scale,
                 MutedTextColor, width, height);
         }
         string footer = targeting.IsActive ? "TARGETING - ESC CANCELS" :
-            localPending || snapshot.PlayerActions?.PendingCommandCount > 0 ? "REQUEST PENDING - WAIT FOR RESULT" : "ADVANCED: B P U L Y K H";
+            localPending || snapshot.PlayerActions?.PendingCommandCount > 0 ? "REQUEST PENDING - WAIT FOR RESULT" : (panel.Bindings ?? GameplayBindingRegistry.Default).DockModesPrompt;
         EmitClippedText(footer, region.X + 5 * _scale, region.Bottom - 14 * _scale,
             region.Right - 5 * _scale, MutedTextColor, width, height);
         _scale = previousScale;
@@ -229,6 +239,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
 
     private void EmitModeBar(
         PlayerActionPanelMode activeMode,
+        GameplayBindingRegistry? bindings,
         in GameplayHudLayout layout,
         int width,
         int height)
@@ -314,7 +325,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                     modeTextBuffer);
             text.Append(
                 PlayerActionDockHudModel.ResolveModeShortcut(
-                    mode));
+                    mode, bindings));
             text.Append(" ");
             text.Append(
                 PlayerActionDockHudModel.ResolveModeLabel(

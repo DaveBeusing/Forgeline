@@ -31,7 +31,7 @@ internal sealed class ClientSettingsFrontendAdapter
         FrontendSettingsSnapshot snapshot =
             model.Settings;
         var settings =
-            new ClientUserSettings
+            _store.Load().Settings with
             {
                 WindowWidth = snapshot.WindowWidth,
                 WindowHeight = snapshot.WindowHeight,

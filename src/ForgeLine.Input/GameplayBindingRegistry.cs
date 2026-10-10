@@ -1,4 +1,5 @@
 using ForgeLine.Platform;
+using System.Text.RegularExpressions;
 
 namespace ForgeLine.Input;
 
@@ -18,6 +19,16 @@ public sealed record GameplayBindings
 /// <summary>One immutable mapping and prompt catalog; dock keys intentionally replace camera keys while the dock owns focus.</summary>
 public sealed class GameplayBindingRegistry
 {
+    public const PlatformKey HelpKey = PlatformKey.F1;
+    public const PlatformKey HelpAlias = PlatformKey.F12;
+    public const PlatformKey CancelKey = PlatformKey.Escape;
+    public static IReadOnlyList<string> FixedBindings { get; } = Array.AsReadOnly(new[]
+    {
+        "F1 / F12 HELP", "ESC CANCEL / PAUSE", "LEFT SELECT / DOUBLE LEFT VISIBLE SAME TYPE",
+        "SHIFT + LEFT EXTEND SELECTION", "RIGHT MOVE / TARGET", "CTRL + DIGIT ASSIGN / DIGIT RECALL / DOUBLE DIGIT FOCUS",
+        "CTRL + SHIFT + DIGIT CLEAR", "SHIFT + CLICK REPEAT ACCEPTED BUILD", "SHIFT + F1 METRICS",
+        "SHIFT + F12 GUIDE", "F2 WORLD DEBUG / SHIFT + F4-F9 DEBUG CATEGORIES", "R RESTART TERMINAL MATCH"
+    });
     private static readonly GameplayBindingDefinition[] DefinitionsArray =
     [
         new(GameplayAction.Build, PlatformKey.B, "BUILD", GameplayBindingScope.Global),
@@ -50,7 +61,10 @@ public sealed class GameplayBindingRegistry
     public static GameplayBindingRegistry Default { get; } = new(new());
     private readonly PlatformKey[] _keys = new PlatformKey[DefinitionsArray.Length];
     private readonly string[] _prompts = new string[DefinitionsArray.Length];
+    private readonly Dictionary<string, string> _text = new(StringComparer.Ordinal);
+    public string Text(string englishTemplate) => _text.TryGetValue(englishTemplate, out var text) ? text : englishTemplate;
     public string DockModesPrompt { get; }
+    public string PanelsHelpPrompt { get; }
     public string TacticalPrompt { get; }
     public string DockNavigationPrompt { get; }
     public GameplayBindingRegistry(GameplayBindings bindings, RtsCameraBindings? camera = null)
@@ -76,7 +90,15 @@ public sealed class GameplayBindingRegistry
             _prompts[i] = blocked ? "CAMERA KEY" : KeyLabel(_keys[i]);
             if (blocked) _keys[i] = PlatformKey.Unknown;
         }
+        var substitutions = new Dictionary<string, string>(StringComparer.Ordinal);
+        for (int i = 0; i < DefinitionsArray.Length; i++)
+            if (DefinitionsArray[i].Action is not (GameplayAction.Decrease or GameplayAction.Increase or GameplayAction.PrimarySetting or GameplayAction.SecondarySetting or GameplayAction.CancelJob))
+                substitutions.Add(KeyLabel(DefinitionsArray[i].DefaultKey), _prompts[i]);
+        string pattern = @"\b(?:" + string.Join("|", substitutions.Keys.Select(Regex.Escape)) + @")\b";
+        foreach (string template in GameplayPromptCatalog.English)
+            _text.Add(template, Regex.Replace(template, pattern, match => substitutions[match.Value], RegexOptions.CultureInvariant));
         DockModesPrompt = string.Join(" ", _prompts.Take(7));
+        PanelsHelpPrompt = string.Join("  ", DefinitionsArray.Take(7).Select(x => Prompt(x.Action) + " " + x.Label));
         TacticalPrompt = $"{Prompt(GameplayAction.Combat)} / {Prompt(GameplayAction.NextItem)} / {Prompt(GameplayAction.Activate)}";
         DockNavigationPrompt = $"{Prompt(GameplayAction.NextItem)} NEXT  {Prompt(GameplayAction.Activate)} ACT  {Prompt(GameplayAction.CancelJob)} CANCEL";
     }

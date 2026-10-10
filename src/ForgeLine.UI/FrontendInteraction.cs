@@ -1,3 +1,6 @@
+using ForgeLine.Input;
+using ForgeLine.Platform;
+
 namespace ForgeLine.UI;
 
 public enum FrontendSettingsField : byte
@@ -6,7 +9,9 @@ public enum FrontendSettingsField : byte
     UiScale = 2,
     EdgeScroll = 3,
     CameraSpeed = 4,
-    Onboarding = 5
+    Onboarding = 5,
+    BindingAction = 6,
+    BindingKey = 7
 }
 
 public sealed class SettingsInteractionModel
@@ -14,6 +19,15 @@ public sealed class SettingsInteractionModel
     private static readonly FrontendSettingsField[] s_fields =
         Enum.GetValues<FrontendSettingsField>();
     private int _index;
+    private static readonly PlatformKey[] Keys = Enum.GetValues<PlatformKey>();
+    public bool CanApply { get; private set; } = true;
+    private PlatformKey? _candidate;
+    public PlatformKey? BindingCandidate => _candidate;
+    public GameplayAction BindingAction { get; private set; }
+    public string BindingFeedback { get; private set; } = string.Empty;
+    public int VisibleStart => FocusedField == FrontendSettingsField.BindingKey ? 1 : 0;
+    public int VisibleRowCount => Math.Min(7, s_fields.Length + 1 - VisibleStart);
+    public void FocusVisible(int row) => Focus((FrontendSettingsField)(row + VisibleStart));
 
     public FrontendSettingsField FocusedField =>
         s_fields[_index];
@@ -89,6 +103,30 @@ public sealed class SettingsInteractionModel
                         Math.Sign(direction) * 0.1f,
                         0.25f,
                         3.0f));
+                break;
+            case FrontendSettingsField.BindingAction:
+                BindingAction = (GameplayAction)(((int)BindingAction + Math.Sign(direction) + GameplayBindingRegistry.Definitions.Count) % GameplayBindingRegistry.Definitions.Count);
+                _candidate = null;
+                CanApply = true;
+                BindingFeedback = string.Empty;
+                break;
+            case FrontendSettingsField.BindingKey:
+                var bindings = settings.GameplayBindings ?? new();
+                var registry = model.Bindings;
+
+                PlatformKey current = _candidate ?? registry.Key(BindingAction);
+                if (current == PlatformKey.Unknown) current = GameplayBindingRegistry.Definitions[(int)BindingAction].DefaultKey;
+                int keyIndex = Array.IndexOf(Keys, current);
+                keyIndex = (keyIndex + Math.Sign(direction) + Keys.Length) % Keys.Length;
+                PlatformKey candidate = Keys[keyIndex];
+                _candidate = candidate;
+                try
+                {
+                    model.SetGameplayBindings(bindings.With(BindingAction, candidate));
+                    CanApply = true;
+                    BindingFeedback = "BINDING READY - APPLY TO SAVE";
+                }
+                catch (InvalidDataException exception) { CanApply = false; BindingFeedback = exception.Message.ToUpperInvariant(); }
                 break;
             case FrontendSettingsField.Onboarding:
                 model.SetOnboarding(

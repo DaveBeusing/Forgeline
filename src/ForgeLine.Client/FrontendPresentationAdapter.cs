@@ -169,10 +169,13 @@ internal static class FrontendPresentationAdapter
             model.Settings;
 
         FrontendSettingsField? focused = interaction?.FocusedField;
+        GameplayAction action = interaction?.BindingAction ?? GameplayAction.Build;
+        var registry = model.Bindings;
 
         return FrontendSurfaceView.Detail(
             "SETTINGS",
-            [
+            new FrontendDetailLineView[]
+            {
                 new FrontendDetailLineView(
                     "DISPLAY",
                     $"{settings.WindowWidth} X {settings.WindowHeight}"),
@@ -210,17 +213,23 @@ internal static class FrontendPresentationAdapter
                     IsFocused: focused == FrontendSettingsField.Onboarding,
                     CanDecrease: true,
                     CanIncrease: true)
-            ],
-            "UP/DOWN  SELECT     LEFT/RIGHT  CHANGE     ENTER  APPLY     ESC  BACK",
-            "APPLY");
+                , new FrontendDetailLineView("GAMEPLAY ACTION", GameplayBindingRegistry.Definitions[(int)action].Label,
+                    IsFocused: focused == FrontendSettingsField.BindingAction, CanDecrease: true, CanIncrease: true),
+                new FrontendDetailLineView("GAMEPLAY KEY", interaction?.BindingCandidate is { } candidate ?
+                    GameplayBindingRegistry.KeyLabel(candidate) : registry.Prompt(action),
+                    IsFocused: focused == FrontendSettingsField.BindingKey, CanDecrease: true, CanIncrease: true)
+            }.Skip(interaction?.VisibleStart ?? 0).Take(7).ToArray(),
+            string.IsNullOrEmpty(interaction?.BindingFeedback) ? "UP/DOWN  SELECT     LEFT/RIGHT  CHANGE     ENTER  APPLY     ESC  BACK" : interaction.BindingFeedback,
+            interaction?.CanApply == false ? string.Empty : "APPLY");
     }
 
     internal static FrontendSurfaceView Controls(
         RtsCameraBindings bindings,
         string footer = "ESC  BACK",
-        bool edgeScrollEnabled = true)
+        bool edgeScrollEnabled = true, GameplayBindingRegistry? gameplay = null)
     {
         ArgumentNullException.ThrowIfNull(bindings);
+        gameplay ??= GameplayBindingRegistry.Default;
 
         string primaryPan =
             $"{bindings.PanForward.ToString().ToUpperInvariant()}/" +
@@ -247,22 +256,22 @@ internal static class FrontendPresentationAdapter
                     "CAMERA MOUSE",
                     $"WHEEL ZOOM  {bindings.DragPanButton.ToString().ToUpperInvariant()} DRAG  " +
                     (edgeScrollEnabled ? "EDGE PAN" : "EDGE PAN DISABLED") +
-                    (RtsCameraFocusController.IsHomeCameraBinding(bindings) ? "  HOME USES CAMERA BINDING" : "  HOME BASE FOCUS")),
+                    (RtsCameraFocusController.IsHomeCameraBinding(bindings) ? "  HOME USES CAMERA BINDING" : $"  {gameplay.Prompt(GameplayAction.FocusBase)} BASE FOCUS")),
                 new FrontendDetailLineView(
                     "SELECT / MOVE",
                     "LEFT SELECT  DOUBLE LEFT SAME-TYPE VISIBLE UNITS  SHIFT+LEFT MULTI  RIGHT MOVE"),
                 new FrontendDetailLineView(
                     "COMMAND PANELS",
-                    "B BUILD  P PROCESS  U UNITS  L LOGISTICS  Y SUPPLY  K COMBAT  H TECHNOLOGY"),
+                    gameplay.PanelsHelpPrompt + "; " + gameplay.DockNavigationPrompt),
                 new FrontendDetailLineView(
-                    "F1 / F2 / F3",
-                    "HELP  WORLD DEBUG  FORMATION"),
+                    "HELP / WORLD / FORMATION",
+                    "F1 HELP  F2 WORLD DEBUG  " + gameplay.Prompt(GameplayAction.Formation) + " FORMATION"),
                 new FrontendDetailLineView(
-                    "F4 / F5 / F6",
-                    "COMMAND CORE  POWER PLANT  EXTRACTOR"),
+                    "PLACEMENT",
+                    gameplay.Prompt(GameplayAction.CorePlacement) + " COMMAND CORE  " + gameplay.Prompt(GameplayAction.PowerPlacement) + " POWER PLANT  " + gameplay.Prompt(GameplayAction.ExtractorPlacement) + " EXTRACTOR"),
                 new FrontendDetailLineView(
-                    "F7 / F8 / F9",
-                    "STORAGE DEPOT  SMELTER  ROTATE BUILDING  SHIFT+CLICK REPEAT AFTER ACCEPTANCE"),
+                    "PLACEMENT / ROTATE",
+                    gameplay.Prompt(GameplayAction.StoragePlacement) + " STORAGE DEPOT  " + gameplay.Prompt(GameplayAction.SmelterPlacement) + " SMELTER  " + gameplay.Prompt(GameplayAction.RotatePlacement) + " ROTATE BUILDING  SHIFT+CLICK REPEAT AFTER ACCEPTANCE"),
                 new FrontendDetailLineView(
                     "DEVELOPER METRICS",
                     "SHIFT+F1 TOGGLE PERFORMANCE METRICS"),
@@ -276,8 +285,8 @@ internal static class FrontendPresentationAdapter
                     "OPTIONAL GUIDE",
                     "SHIFT+F12 SHOW / HIDE  ONBOARDING SETTING CONTROLS DEFAULT"),
                 new FrontendDetailLineView(
-                    "F10 / F11 / F12",
-                    "STRATEGIC OVERLAY  MINIMAP  HELP  ESC/SPACE PAUSE")
+                    "MAP / HELP / PAUSE",
+                    gameplay.Prompt(GameplayAction.Overlay) + " STRATEGIC OVERLAY  " + gameplay.Prompt(GameplayAction.Minimap) + " MINIMAP  F12 HELP  ESC/" + gameplay.Prompt(GameplayAction.Pause) + " PAUSE")
             ],
             footer) with { Kind = FrontendSurfaceKind.Controls };
     }
