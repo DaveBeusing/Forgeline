@@ -46,7 +46,8 @@ public readonly record struct PlayerActionPanelView(
     BattlefieldSupplyPriority SupplyPriority =
         BattlefieldSupplyPriority.Normal,
     int HoveredIndex = -1,
-    bool PointerPressed = false)
+    bool PointerPressed = false,
+    bool ContextualPending = false)
 {
     public bool IsOpen =>
         Mode != PlayerActionPanelMode.Closed;
@@ -73,6 +74,7 @@ public sealed class PlayerActionPanelController
     private bool _pointerPressed;
     private GameplayHudLayout _lastPointerLayout;
     private bool _hasPointerLayout;
+    private SimulationTick? _contextualActivationTick;
 
     public PlayerActionPanelMode Mode { get; private set; }
 
@@ -128,12 +130,16 @@ public sealed class PlayerActionPanelController
         _hasPointerLayout = true;
         if (input.FocusLostThisFrame)
         {
-            Close();
             _pendingRequest = null;
+            PointerCaptured = false;
+            _hoveredIndex = -1;
+            _pointerPressed = false;
             _leftWasDown = false;
             return;
         }
 
+        bool sessionChanged = _sessionId.IsSpecified && snapshot?.SessionId != _sessionId;
+        if (_contextualActivationTick != snapshot?.Tick) _contextualActivationTick = null;
         SynchronizeSession(
             snapshot?.SessionId ??
             SimulationSessionId.None);
@@ -287,11 +293,11 @@ public sealed class PlayerActionPanelController
 
         bool hasPress = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var pressOrigin);
         var clickPosition = hasPress ? pressOrigin : input.PointerPosition;
-        bool clicked = !displayChanged && (hasPress || (leftDown && !_leftWasDown));
+        bool clicked = !displayChanged && !sessionChanged && (hasPress || (leftDown && !_leftWasDown));
         if (clicked && ContextualCommandModel.TryHit(clickPosition, snapshot, layout, out var command))
         {
             PointerCaptured = true;
-            if (command.Availability.CanActivate)
+            if (command.Availability.CanActivate && (command.OpensMode || _contextualActivationTick is null))
             {
                 if (command.OpensMode) ToggleMode(command.Mode);
                 else
@@ -299,9 +305,12 @@ public sealed class PlayerActionPanelController
                     Mode = command.Mode;
                     SelectedIndex = command.ItemIndex;
                     ActivateSelected(ContextualCommandModel.ResolveActions(snapshot));
+                    _contextualActivationTick = snapshot!.Tick;
                 }
             }
             _leftWasDown = leftDown;
+            _ = Pressed(input, PlatformKey.Enter);
+            _ = Pressed(input, PlatformKey.C);
             return;
         }
 
@@ -401,7 +410,8 @@ public sealed class PlayerActionPanelController
             layout.ActionDock.Y,
             _supplyPriority,
             _hoveredIndex,
-            _pointerPressed);
+            _pointerPressed,
+            _contextualActivationTick.HasValue);
     }
 
     public bool TryTakeRequest(
@@ -1352,6 +1362,7 @@ public sealed class PlayerActionPanelController
         _supplyEntity = EntityId.Invalid;
         PointerCaptured = false;
         _pendingRequest = null;
+        _contextualActivationTick = null;
         _desiredStockQuantity = 0.0;
         _heldKeys.Clear();
         _leftWasDown = false;

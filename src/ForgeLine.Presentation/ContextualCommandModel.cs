@@ -47,7 +47,8 @@ internal static class ContextualCommandModel
             command = new(PlayerActionPanelMode.Tactical, index,
                 PlayerActionDockHudModel.ResolveItemTitle(PlayerActionPanelMode.Tactical, index, actions),
                 "K / TAB / ENTER",
-                PlayerActionDockHudModel.ResolveItemState(PlayerActionPanelMode.Tactical, index, actions));
+                actions.PendingCommandCount > 0 ? PlayerActionDockItemState.Disabled("REQUEST PENDING") :
+                    PlayerActionDockHudModel.ResolveItemState(PlayerActionPanelMode.Tactical, index, actions));
             return true;
         }
 

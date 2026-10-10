@@ -56,6 +56,15 @@ internal static class HoverTooltipResolver
     {
         var control = (PlayerActionDockControlKind)view.DockControl;
         var mode = view.DockMode;
+        if (view.Contextual)
+        {
+            for (int i = 0; ContextualCommandModel.TryGet(snapshot, i, out var command); i++)
+                if (command.Mode == mode && command.ItemIndex == view.DockIndex)
+                    return new(command.Label, "SELECTION COMMAND", command.Availability.CanActivate
+                        ? "AVAILABLE AT CAPTURED TICK" : command.Availability.DisabledReason,
+                        command.OpensMode ? command.Shortcut + " OPENS ADVANCED MODE" : "CLICK OR K / TAB / ENTER; ORDERS REQUIRE ACCEPTANCE");
+            return null;
+        }
         if (control == PlayerActionDockControlKind.Mode)
             return new(PlayerActionDockHudModel.ResolveModeLabel(mode), "ACTION PANEL",
                 PlayerActionDockHudModel.ResolveModeShortcut(mode), "CLICK TO OPEN / CLOSE");

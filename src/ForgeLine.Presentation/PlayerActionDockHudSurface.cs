@@ -119,7 +119,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         _scale =
             layout.Scale;
 
-        EmitPrimaryCommands(snapshot, targeting, layout, graphics.Width, graphics.Height);
+        EmitPrimaryCommands(snapshot, panel, targeting, layout, graphics.Width, graphics.Height);
 
         EmitModeBar(
             panel.Mode,
@@ -196,7 +196,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         _disposed = true;
     }
 
-    private void EmitPrimaryCommands(PresentationSnapshot snapshot, in TacticalTargetingView targeting,
+    private void EmitPrimaryCommands(PresentationSnapshot snapshot, in PlayerActionPanelView panel, in TacticalTargetingView targeting,
         in GameplayHudLayout layout, int width, int height)
     {
         HudRect region = layout.PrimaryCommands;
@@ -220,7 +220,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                 MutedTextColor, width, height);
         }
         string footer = targeting.IsActive ? "TARGETING - ESC CANCELS" :
-            snapshot.PlayerActions?.PendingCommandCount > 0 ? "REQUEST PENDING - WAIT FOR RESULT" : "ADVANCED: B P U L Y K H";
+            panel.ContextualPending || snapshot.PlayerActions?.PendingCommandCount > 0 ? "REQUEST PENDING - WAIT FOR RESULT" : "ADVANCED: B P U L Y K H";
         EmitClippedText(footer, region.X + 5 * _scale, region.Bottom - 14 * _scale,
             region.Right - 5 * _scale, MutedTextColor, width, height);
         _scale = previousScale;
