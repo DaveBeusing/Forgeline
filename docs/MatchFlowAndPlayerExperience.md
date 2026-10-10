@@ -291,3 +291,7 @@ A completed Victory/Defeat/Draw snapshot causes the simulation owner to freeze n
 Minimize pause is an explicit `SetMatchPausedCommand` control transition between complete ticks. The authoritative match lifecycle changes to `Paused` and back to `Running` without executing a gameplay tick; pause is not inferred from whether the renderer happens to submit a frame.
 
 Restart stops and joins the render/simulation owners before the shared runtime and job scheduler are disposed, then creates a fresh runtime/session. Requests carry the expected `SimulationSessionId`; old-session or terminal gameplay work is rejected before it can reach the authoritative command scheduler.
+
+### Group operational information
+
+Multi-selection presents owned live unit composition and covered averages instead of one member's details. The displayed contributor counts and N/A distinguish missing components from low readiness or supply. Group/type filtering and member focus affect only presentation selection or camera state. Exact accepted/rejected counts from the latest resolved command retain PARTIAL feedback; selecting a subgroup does not reinterpret that historical result.

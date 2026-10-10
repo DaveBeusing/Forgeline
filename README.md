@@ -199,3 +199,5 @@ docs/         Technical and operational documentation
 **FORGELINE — Build. Supply. Conquer.**
 
 </div>
+
+Multi-selection provides owned unit type filters, component-covered operational averages and damaged/critical-supply member focus controls. Saved control groups remain available; the card F3/NEXT control uses the existing formation cycle. See [group-card controls](docs/FormationMovementAndGroupOrders.md#current-selection-group-card).

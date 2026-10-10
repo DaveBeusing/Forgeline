@@ -47,9 +47,9 @@ public sealed class HoverTooltipController
 
         var next = new HoverTooltipView(snapshot.SessionId, EntityId.Invalid, default, pointer,
             false, layout.ViewportWidth, layout.ViewportHeight, layout.Scale);
-        int count = PlayerActionDockInteractionLayout.GetItemCount(panel.Mode, snapshot.PlayerActions);
+        int count = panel.SelectionPending ? 0 : PlayerActionDockInteractionLayout.GetItemCount(panel.Mode, snapshot.PlayerActions);
         if (ContextualCommandModel.TryHit(pointer, snapshot, layout, out var command,
-                localPending: ContextualCommandModel.HasPending(panel, snapshot)))
+                localPending: ContextualCommandModel.HasPending(panel, snapshot), selectionPending: panel.SelectionPending))
         {
             next = next with { DockMode = command.Mode,
                 DockControl = (int)(command.OpensMode ? PlayerActionDockControlKind.Mode : PlayerActionDockControlKind.Item),

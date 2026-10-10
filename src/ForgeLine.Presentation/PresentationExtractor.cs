@@ -133,7 +133,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 ? null
                 : CombatGroupOperationalSnapshotFactory.Capture(
                     context,
-                    _extraction.Player);
+                    _extraction.Player,
+                    _extraction.Scenario.Simulation.SessionId);
 
         BuildingPlacementPreviewReadModel? placementPreview =
             _extraction is null

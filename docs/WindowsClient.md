@@ -271,3 +271,7 @@ Minimize explicitly requests simulation pause and independently suspends zero-si
 A terminal completed-tick snapshot freezes normal simulation ticks while event pumping and terminal rendering continue. Escape applies a non-ticking simulation-owned `EndMatchCommand` control transition. Restart shuts down the old render/simulation owners and constructs a fresh session.
 
 See [Client Execution Ownership](adr/ClientExecutionOwnership.md).
+
+### Selected combat-group card
+
+Multiple selected entities show a compact inspector card with total, live owned unit and combat-eligible counts, type cells, component-covered means and critical-member focus controls. Click type cells to narrow the presentation selection; Ctrl+digits and recall retain their existing assignments. Focus controls move only the camera. F3/NEXT changes the intended formation for subsequent orders. Pause/help, focus loss, resize, placement/targeting and session changes consume pending card presses.

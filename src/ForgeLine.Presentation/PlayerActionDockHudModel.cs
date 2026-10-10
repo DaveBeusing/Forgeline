@@ -23,6 +23,17 @@ internal readonly record struct PlayerActionDockItemState(
 
 internal static class PlayerActionDockHudModel
 {
+    public static bool MatchesSelection(PlayerActionSnapshot? actions, SelectionSet? selection)
+    {
+        if (selection is null) return true;
+        if (actions is null) return false;
+        if (actions.Tactical is not { } tactical) return selection.Count == 0;
+        if (tactical.SelectedEntities.Count != selection.Count) return false;
+        for (int i = 0; i < tactical.SelectedEntities.Count; i++)
+            if (!selection.Contains(tactical.SelectedEntities[i])) return false;
+        return true;
+    }
+
     public static PlayerActionSnapshot? ResolveActions(PresentationSnapshot? snapshot) =>
         snapshot is not null && snapshot.SessionId.IsSpecified &&
         snapshot.PlayerActions is { } actions && actions.SessionId == snapshot.SessionId &&

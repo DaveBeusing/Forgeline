@@ -376,6 +376,8 @@ internal sealed class ClientApplication
             new CombatGroupRegistry();
         var combatGroupInput =
             new CombatGroupInputController();
+        var combatGroupCard = new CombatGroupCardController();
+        var memberFocusSelection = new SelectionSet();
         var buildingPlacementController =
             new RtsBuildingPlacementController(LocalPlayer);
         var actionPanel =
@@ -1102,7 +1104,8 @@ internal sealed class ClientApplication
                     window.ClientSize.Width,
                     window.ClientSize.Height,
                     window.Dpi,
-                    _settings.UiScale);
+                    _settings.UiScale,
+                    currentSelection: selectionController.Selection);
 
                 if (actionPanel.HasKeyboardFocus)
                 {
@@ -1140,6 +1143,29 @@ internal sealed class ClientApplication
                     window.ClientSize.Height,
                     window.Dpi,
                     _settings.UiScale);
+            CombatGroupCardResult cardResult = combatGroupCard.Update(inputState, inputSnapshot,
+                selectionController.Selection, interactionLayout,
+                blocked: modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
+                    buildingPlacementController.IsActive || tacticalTargetingController.IsActive);
+            hudInteraction.CapturePointer(cardResult.Captured);
+            if (cardResult.SelectionChanged)
+            {
+                selectionController.CancelPointerInteraction();
+                presentationInteraction.SetSelection(selectionController.Selection.Entities);
+            }
+            if (cardResult.CycleFormation)
+                activeFormation = NextFormation(activeFormation);
+            if (cardResult.FocusMember.IsValid || cardResult.FocusSelection)
+            {
+                memberFocusSelection.SetSingle(cardResult.FocusMember);
+                if (inputSnapshot is not null && RtsCameraFocusController.TryGroup(inputSnapshot, LocalPlayer,
+                    cardResult.FocusSelection ? selectionController.Selection : memberFocusSelection, out Vector3 focusTarget))
+                {
+                    camera.CenterOn(focusTarget);
+                    selectionController.CancelPointerInteraction();
+                    minimapInteraction.Reset();
+                }
+            }
             minimapInteraction.Update(
                 inputState,
                 camera,
@@ -1445,7 +1471,7 @@ internal sealed class ClientApplication
             CombatGroupOverviewView combatGroupOverview =
                 CombatGroupOverviewModel.Create(
                     combatGroupRegistry,
-                    currentSnapshot?.CombatGroups,
+                    SelectedCombatGroup.Resolve(currentSnapshot),
                     selectionController.Selection);
 
             PlayerActionPanelView actionPanelView =
@@ -2623,6 +2649,14 @@ internal sealed class ClientApplication
         }
     }
 
+    private static FormationTemplate NextFormation(FormationTemplate formation) => formation switch
+    {
+        FormationTemplate.Compact => FormationTemplate.Line,
+        FormationTemplate.Line => FormationTemplate.Column,
+        FormationTemplate.Column => FormationTemplate.Wedge,
+        _ => FormationTemplate.Compact
+    };
+
     private static void UpdateFormationSelection(
         InputState inputState,
         ref bool held,
@@ -2632,14 +2666,7 @@ internal sealed class ClientApplication
 
         if (down && !held)
         {
-            activeFormation = activeFormation switch
-            {
-                FormationTemplate.Compact => FormationTemplate.Line,
-                FormationTemplate.Line => FormationTemplate.Column,
-                FormationTemplate.Column => FormationTemplate.Wedge,
-                FormationTemplate.Wedge => FormationTemplate.Compact,
-                _ => FormationTemplate.Compact
-            };
+            activeFormation = NextFormation(activeFormation);
         }
 
         held = down;

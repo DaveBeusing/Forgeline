@@ -110,3 +110,5 @@ When the player experience becomes terminal, the controller closes the dock, cle
 ## Validation
 
 Focused tests cover existing request creation plus dock hit testing, pointer capture, card selection versus explicit activation, disabled input actions, session replacement, stale context, terminal behavior, supported tactical action inventory, and DPI/UI-scale-bounded layout. Repository CI remains responsible for the Release solution build, project-reference checks, client/window qualification, and the broader test suite.
+
+Primary/advanced action controls wait until copied tactical selection identities exactly match the current presentation selection, including full entity generation. While a filtered selection awaits capture, primary controls show UPDATING SELECTION and advanced item actions remain unavailable. Matching counts alone cannot authorize a request to a different subgroup.
