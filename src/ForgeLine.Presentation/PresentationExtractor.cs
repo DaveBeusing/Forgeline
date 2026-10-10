@@ -289,6 +289,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                     infrastructureFeature);
 
             QueuePersistentStateVfx(
+                entity,
                 transform,
                 unitFeature,
                 buildingFeature);
@@ -357,7 +358,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                     (uint)queued.Kind,
                     VfxFeature:
                         new VfxFeaturePresentationMetadata(
-                            queued.Kind));
+                            queued.Kind, queued.EmitterId, queued.Generation, queued.Continuous));
         }
 
         return instances;
@@ -1200,11 +1201,12 @@ public sealed class PresentationExtractor : ISimulationTickObserver
             _queuedVfx.Add(
                 new QueuedVfxInstance(
                     effect.Kind,
-                    effect.Transform));
+                    effect.Transform, 0x8000_0000_0000_0000UL | (uint)(index + 1), effect.Generation));
         }
     }
 
     private void QueuePersistentStateVfx(
+        EntityId entity,
         in WorldTransform transform,
         in UnitFeaturePresentationMetadata unit,
         in BuildingFeaturePresentationMetadata building)
@@ -1229,28 +1231,28 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 case UnitPresentationDamageState.Damaged:
                     QueueAt(
                         VfxEffectKind.PersistentLightSmoke,
-                        anchor);
+                        anchor, entity);
                     break;
 
                 case UnitPresentationDamageState.Critical:
                     QueueAt(
                         VfxEffectKind.PersistentHeavySmoke,
-                        anchor);
+                        anchor, entity);
                     QueueAt(
                         VfxEffectKind.PersistentFire,
-                        anchor);
+                        anchor, entity);
                     QueueAt(
                         VfxEffectKind.PersistentSparks,
-                        anchor);
+                        anchor, entity);
                     break;
 
                 case UnitPresentationDamageState.Wreck:
                     QueueAt(
                         VfxEffectKind.PersistentHeavySmoke,
-                        anchor);
+                        anchor, entity);
                     QueueAt(
                         VfxEffectKind.PersistentFire,
-                        anchor);
+                        anchor, entity);
                     break;
             }
         }
@@ -1262,28 +1264,28 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 case BuildingPresentationState.Damaged:
                     QueueAt(
                         VfxEffectKind.PersistentLightSmoke,
-                        anchor);
+                        anchor, entity);
                     break;
 
                 case BuildingPresentationState.Critical:
                     QueueAt(
                         VfxEffectKind.PersistentHeavySmoke,
-                        anchor);
+                        anchor, entity);
                     QueueAt(
                         VfxEffectKind.PersistentFire,
-                        anchor);
+                        anchor, entity);
                     QueueAt(
                         VfxEffectKind.PersistentSparks,
-                        anchor);
+                        anchor, entity);
                     break;
 
                 case BuildingPresentationState.Destroyed:
                     QueueAt(
                         VfxEffectKind.DestructionSmokePlume,
-                        anchor);
+                        anchor, entity);
                     QueueAt(
                         VfxEffectKind.DestructionPersistentFire,
-                        anchor);
+                        anchor, entity);
                     break;
             }
         }
@@ -1391,7 +1393,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
 
     private void QueueAt(
         VfxEffectKind kind,
-        Vector3 position)
+        Vector3 position,
+        EntityId owner = default)
     {
         VfxPresentationDefinition definition =
             VfxPresentationCatalog.Get(
@@ -1403,7 +1406,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 new RenderTransform(
                     position,
                     Quaternion.Identity,
-                    definition.BaseScale)));
+                    definition.BaseScale), ((ulong)owner.Generation << 32) | owner.Index, owner.Generation, owner.IsValid));
     }
 
     private void SpawnAt(
@@ -1614,7 +1617,10 @@ public sealed class PresentationExtractor : ISimulationTickObserver
 
     private readonly record struct QueuedVfxInstance(
         VfxEffectKind Kind,
-        RenderTransform Transform);
+        RenderTransform Transform,
+        ulong EmitterId = 0,
+        uint Generation = 0,
+        bool Continuous = false);
 
     private static void ApplyDebugCaptureState(
         MatchRuntime scenario,
