@@ -9,6 +9,7 @@ public enum GraphicsFramePass
 public enum GraphicsFrameTargetFormat
 {
     Rgba8Unorm,
+    Rgba16Float,
     Depth32Float
 }
 
@@ -28,13 +29,14 @@ public readonly record struct GraphicsFrameTargetDescriptor(
     int ResourceCount)
 {
     // Logical texel payload, excluding allocation alignment and driver overhead.
-    public long PayloadBytes => checked((long)Width * Height * 4 * ResourceCount);
+    public long PayloadBytes => checked((long)Width * Height *
+        (Format == GraphicsFrameTargetFormat.Rgba16Float ? 8 : 4) * ResourceCount);
 }
 
 /// <summary>The direct-output frame contract. Contains no transient copies or allocations.</summary>
 public readonly record struct GraphicsFramePlan
 {
-    public GraphicsFramePlan(int width, int height, int bufferCount)
+    public GraphicsFramePlan(int width, int height, int bufferCount, bool linearScene = false)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(width);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(height);
@@ -45,11 +47,14 @@ public readonly record struct GraphicsFramePlan
             GraphicsFrameTargetLifetime.BackBuffer, bufferCount);
         Depth = new(width, height, GraphicsFrameTargetFormat.Depth32Float,
             GraphicsFrameTargetLifetime.Surface, 1);
+        Scene = linearScene ? new(width, height, GraphicsFrameTargetFormat.Rgba16Float,
+            GraphicsFrameTargetLifetime.BackBuffer, bufferCount) : null;
     }
 
     public GraphicsFrameTargetDescriptor Output { get; }
     public GraphicsFrameTargetDescriptor Depth { get; }
-    public long TransientPayloadBytes { get; }
+    public GraphicsFrameTargetDescriptor? Scene { get; }
+    public long TransientPayloadBytes => Scene?.PayloadBytes ?? 0;
 }
 
 internal struct GraphicsFramePassState

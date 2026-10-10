@@ -58,7 +58,10 @@ public readonly record struct GraphicsFrameDiagnostics(
     double? WorldGpuMilliseconds,
     double? OverlayGpuMilliseconds)
 {
-    public string IntermediateUnavailableReason { get; init; } = "Linear scene target and composite pass are not implemented.";
+    public double? CompositeCpuMilliseconds { get; init; }
+    public double? CompositeGpuMilliseconds { get; init; }
+    public string? GpuTimingUnavailableReason { get; init; }
+    public string? IntermediateUnavailableReason { get; init; } = "Linear scene composition is disabled.";
 }
 
 public sealed record GraphicsMemoryDiagnostics(

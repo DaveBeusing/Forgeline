@@ -6,7 +6,7 @@ using Vortice.Mathematics;
 
 namespace ForgeLine.Graphics;
 
-internal sealed class D3D12GraphicsDevice : IGraphicsDevice
+internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
 {
     private const Format BackBufferFormat = Format.R8G8B8A8_UNorm;
     private const Format DepthBufferFormat = Format.D32_Float;
@@ -48,6 +48,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     private double? _overlayCpuMilliseconds;
     private double? _worldGpuMilliseconds;
     private double? _overlayGpuMilliseconds;
+    private double? _compositeGpuMilliseconds;
     private ulong _gpuTimingFence;
     private ulong _cpuTimingSubmission;
     private double _recordedWorldCpuMilliseconds;
@@ -69,6 +70,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     private long _textureUploadCount;
     private long _textureReleaseCount;
     private ulong _timestampFrequency;
+    private string? _gpuTimingUnavailableReason;
     private double? _lastGpuFrameMilliseconds;
     private long _debugWarningCount;
     private long _debugErrorCount;
@@ -92,7 +94,8 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             (_device, _deviceInfo) = CreateDevice(
                 _factory,
                 configuration.AllowSoftwareAdapterFallback,
-                debugLayerEnabled);
+                debugLayerEnabled,
+                configuration.ForceSoftwareAdapter);
             _debugInfoQueue =
                 debugLayerEnabled
                     ? _device.QueryInterfaceOrNull<ID3D12InfoQueue>()
@@ -147,7 +150,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             _rtvHeap = _device.CreateDescriptorHeap(
                 new DescriptorHeapDescription(
                     DescriptorHeapType.RenderTargetView,
-                    (uint)configuration.BufferCount));
+                    (uint)configuration.BufferCount * 2));
             _rtvDescriptorSize =
                 _device.GetDescriptorHandleIncrementSize(DescriptorHeapType.RenderTargetView);
             _dsvHeap = _device.CreateDescriptorHeap(
@@ -247,9 +250,15 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                 })
             {
                 Frame = new GraphicsFrameDiagnostics(
-                    new GraphicsFramePlan(_surfaceLifecycle.Width, _surfaceLifecycle.Height, _configuration.BufferCount),
+                    new GraphicsFramePlan(_surfaceLifecycle.Width, _surfaceLifecycle.Height, _configuration.BufferCount, _sceneOutput.Enabled),
                     _cpuTimingSubmission, _worldCpuMilliseconds, _overlayCpuMilliseconds,
-                    _gpuTimingFence, _worldGpuMilliseconds, _overlayGpuMilliseconds),
+                    _gpuTimingFence, _worldGpuMilliseconds, _overlayGpuMilliseconds)
+                {
+                    CompositeCpuMilliseconds = _compositeCpuMilliseconds,
+                    CompositeGpuMilliseconds = _compositeGpuMilliseconds,
+                    GpuTimingUnavailableReason = _gpuTimingUnavailableReason,
+                    IntermediateUnavailableReason = _sceneOutput.Enabled ? null : "Linear scene composition is disabled."
+                },
                 Memory = _configuration.EnableMemoryDiagnostics && _failure is null ? CaptureMemoryBudget() : null,
                 Resources =
                     new GraphicsResourceDiagnostics(
@@ -449,7 +458,8 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                 DepthStencilState = description.DepthEnabled
                     ? DepthStencilDescription.Default
                     : DepthStencilDescription.None,
-                RenderTargetFormats = [BackBufferFormat],
+                RenderTargetFormats = [description.TargetFormat == GraphicsFrameTargetFormat.Rgba16Float
+                    ? Format.R16G16B16A16_Float : BackBufferFormat],
                 DepthStencilFormat = DepthBufferFormat,
                 SampleDescription = SampleDescription.Default
             };
@@ -684,6 +694,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         _commandList.Reset(allocator);
         _recording = true;
         _passState = default;
+        _recordedCompositeCpuMilliseconds = null;
         _frameHasOverlay[_frameIndex] = false;
         _passStartedAt = System.Diagnostics.Stopwatch.GetTimestamp();
         BeginGpuTiming(
@@ -704,13 +715,20 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             _dsvHeap.GetCPUDescriptorHandleForHeapStart();
 
         _commandList.OMSetRenderTargets(rtv, dsv);
+        if (_sceneOutput.Enabled)
+        {
+            _commandList.ResourceBarrierTransition(_sceneTargets![_frameIndex],
+                ResourceStates.PixelShaderResource, ResourceStates.RenderTarget);
+            rtv = SceneRtv(_frameIndex);
+            _commandList.OMSetRenderTargets(rtv, dsv);
+        }
         _commandList.ClearRenderTargetView(
             rtv,
             new Color4(
                 clearColor.Red,
                 clearColor.Green,
                 clearColor.Blue,
-                clearColor.Alpha));
+                _sceneOutput.Enabled ? -1.0f - clearColor.Alpha : clearColor.Alpha));
         _commandList.ClearDepthStencilView(
             dsv,
             ClearFlags.Depth,
@@ -741,6 +759,8 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         try
         {
             recordCommands?.Invoke(context);
+            if (_sceneOutput.Enabled && _passState.Current == GraphicsFramePass.World)
+                context.BeginPass(GraphicsFramePass.Overlay);
         }
         finally
         {
@@ -750,6 +770,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         FinishPassTiming();
         EndGpuTiming(
             _frameIndex);
+        RecordFrameCapture(backBuffer);
 
         _commandList.ResourceBarrierTransition(
             backBuffer,
@@ -763,6 +784,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         _cpuTimingSubmission = _submittedFrameCount;
         _worldCpuMilliseconds = _recordedWorldCpuMilliseconds;
         _overlayCpuMilliseconds = _recordedOverlayCpuMilliseconds;
+        _compositeCpuMilliseconds = _recordedCompositeCpuMilliseconds;
         _recording = false;
 
         var presentResult = _swapChain.Present(
@@ -1000,13 +1022,14 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                     out ulong frequency).Failure ||
                 frequency == 0)
             {
+                _gpuTimingUnavailableReason = "The direct queue does not expose a valid timestamp frequency.";
                 return;
             }
 
             uint queryCount =
                 checked(
                     (uint)bufferCount *
-                    3U);
+                    4U);
             _timestampQueryHeap =
                 _device.CreateQueryHeap<ID3D12QueryHeap>(
                     new QueryHeapDescription(
@@ -1027,6 +1050,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         }
         catch (Exception exception)
         {
+            _gpuTimingUnavailableReason = exception.Message;
             _timestampReadback?.Dispose();
             _timestampReadback =
                 null;
@@ -1051,7 +1075,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         uint queryIndex =
             checked(
                 (uint)frameIndex *
-                3U);
+                4U);
         _commandList.EndQuery(
             _timestampQueryHeap,
             QueryType.Timestamp,
@@ -1070,7 +1094,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         uint queryIndex =
             checked(
                 (uint)frameIndex *
-                3U);
+                4U);
         _commandList.EndQuery(
             _timestampQueryHeap,
             QueryType.Timestamp,
@@ -1079,7 +1103,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             _timestampQueryHeap,
             QueryType.Timestamp,
             queryIndex,
-            3,
+            4,
             _timestampReadback,
             checked(
                 (ulong)queryIndex *
@@ -1129,7 +1153,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         int offset =
             checked(
                 frameIndex *
-                3 *
+                4 *
                 sizeof(ulong));
         ulong start =
             _timestampReadback.GetData<ulong>(
@@ -1140,7 +1164,8 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                     offset +
                     sizeof(ulong)));
 
-        ulong overlayStart = _timestampReadback.GetData<ulong>(offset + 2 * sizeof(ulong));
+        ulong worldEnd = _timestampReadback.GetData<ulong>(offset + 2 * sizeof(ulong));
+        ulong overlayStart = _timestampReadback.GetData<ulong>(offset + 3 * sizeof(ulong));
 
         if (end >= start && _frameFenceValues[frameIndex] > _gpuTimingFence)
         {
@@ -1148,9 +1173,11 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                 (end - start) *
                 1000.0 /
                 _timestampFrequency;
-            if (overlayStart >= start && overlayStart <= end)
+            if (worldEnd >= start && overlayStart >= worldEnd && overlayStart <= end)
             {
-                _worldGpuMilliseconds = (overlayStart - start) * 1000.0 / _timestampFrequency;
+                _worldGpuMilliseconds = (worldEnd - start) * 1000.0 / _timestampFrequency;
+                _compositeGpuMilliseconds = _sceneOutput.Enabled
+                    ? (overlayStart - worldEnd) * 1000.0 / _timestampFrequency : null;
                 _overlayGpuMilliseconds = _frameHasOverlay[frameIndex]
                     ? (end - overlayStart) * 1000.0 / _timestampFrequency : null;
                 _gpuTimingFence = _frameFenceValues[frameIndex];
@@ -1161,22 +1188,34 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             false;
     }
 
-    internal void BeginPass(GraphicsFramePass pass)
+    internal GraphicsFrameTargetFormat ActiveTargetFormat => _sceneOutput.Enabled && _passState.Current == GraphicsFramePass.World
+        ? GraphicsFrameTargetFormat.Rgba16Float : GraphicsFrameTargetFormat.Rgba8Unorm;
+
+    internal bool BeginPass(GraphicsFramePass pass)
     {
         ValidateRecording();
         if (!_passState.Enter(pass))
-            return;
+            return false;
         long now = System.Diagnostics.Stopwatch.GetTimestamp();
         _recordedWorldCpuMilliseconds = System.Diagnostics.Stopwatch.GetElapsedTime(_passStartedAt, now).TotalMilliseconds;
-        _passStartedAt = now;
-        _frameHasOverlay[_frameIndex] = true;
         WritePassBoundary();
+        ComposeScene();
+        WriteOverlayBoundary();
+        _passStartedAt = System.Diagnostics.Stopwatch.GetTimestamp();
+        _frameHasOverlay[_frameIndex] = true;
+        return true;
     }
 
     private void WritePassBoundary()
     {
         if (_timestampQueryHeap is not null)
-            _commandList.EndQuery(_timestampQueryHeap, QueryType.Timestamp, checked((uint)_frameIndex * 3U + 2U));
+            _commandList.EndQuery(_timestampQueryHeap, QueryType.Timestamp, checked((uint)_frameIndex * 4U + 2U));
+    }
+
+    private void WriteOverlayBoundary()
+    {
+        if (_timestampQueryHeap is not null)
+            _commandList.EndQuery(_timestampQueryHeap, QueryType.Timestamp, checked((uint)_frameIndex * 4U + 3U));
     }
 
     private void FinishPassTiming()
@@ -1189,6 +1228,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             _recordedWorldCpuMilliseconds = elapsed;
             _recordedOverlayCpuMilliseconds = null;
             WritePassBoundary();
+            WriteOverlayBoundary();
         }
     }
 
@@ -1390,10 +1430,12 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             _depthTarget,
             depthViewDescription,
             _dsvHeap.GetCPUDescriptorHandleForHeapStart());
+        CreateSceneTargets(width, height);
     }
 
     private void ReleaseRenderTargets()
     {
+        ReleaseSceneTargets();
         _depthTarget?.Dispose();
         _depthTarget = null;
 
@@ -1449,17 +1491,25 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         _frameIndex = frameIndex;
         _surfaceLifecycle.CompleteResize(
             request);
+        ResetFrameMeasurements();
+
+        Console.WriteLine(
+            $"[graphics:resize-applied] size={request.Width}x{request.Height} " +
+            $"generation={request.Generation} frameIndex={_frameIndex} " +
+            $"buffers={_configuration.BufferCount}");
+    }
+
+    private void ResetFrameMeasurements()
+    {
         _cpuTimingSubmission = 0;
         _gpuTimingFence = 0;
         _worldCpuMilliseconds = 0;
         _overlayCpuMilliseconds = null;
         _worldGpuMilliseconds = null;
         _overlayGpuMilliseconds = null;
-
-        Console.WriteLine(
-            $"[graphics:resize-applied] size={request.Width}x{request.Height} " +
-            $"generation={request.Generation} frameIndex={_frameIndex} " +
-            $"buffers={_configuration.BufferCount}");
+        _compositeGpuMilliseconds = null;
+        _compositeCpuMilliseconds = null;
+        _lastGpuFrameMilliseconds = null;
     }
 
     private bool TryRecoverOcclusion()
@@ -1582,10 +1632,11 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     private static (ID3D12Device Device, GraphicsDeviceInfo Info) CreateDevice(
         IDXGIFactory4 factory,
         bool allowSoftwareAdapterFallback,
-        bool debugLayerEnabled)
+        bool debugLayerEnabled,
+        bool forceSoftwareAdapter)
     {
         for (uint adapterIndex = 0;
-             factory.EnumAdapters1(adapterIndex, out IDXGIAdapter1? adapter).Success;
+             !forceSoftwareAdapter && factory.EnumAdapters1(adapterIndex, out IDXGIAdapter1? adapter).Success;
              adapterIndex++)
         {
             using (adapter)

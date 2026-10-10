@@ -42,7 +42,8 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
     public void BeginPass(GraphicsFramePass pass)
     {
         ValidateRecording();
-        _owner.BeginPass(pass);
+        if (_owner.BeginPass(pass))
+            _pipeline = null;
     }
 
     public void SetViewport(float x, float y, float width, float height)
@@ -76,6 +77,8 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
     {
         ValidateRecording();
         ArgumentNullException.ThrowIfNull(pipeline);
+        if (pipeline.Description.TargetFormat != _owner.ActiveTargetFormat)
+            throw new ArgumentException("Pipeline output format does not match the active frame pass.", nameof(pipeline));
 
         if (pipeline is not D3D12GraphicsPipeline d3d12Pipeline ||
             !ReferenceEquals(d3d12Pipeline.Owner, _owner))

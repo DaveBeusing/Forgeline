@@ -44,6 +44,7 @@ internal readonly record struct ClientVisualQualificationSnapshot(
     double TerrainCpuSubmissionMilliseconds = 0.0)
 {
     public bool GpuTimingAvailable { get; init; }
+    public GraphicsFrameDiagnostics? FramePasses { get; init; }
     public int Lod1Instances { get; init; }
     public int Lod2Instances { get; init; }
 
@@ -396,6 +397,9 @@ internal sealed class ClientRenderHost : IDisposable
             using IGraphicsDevice? ownedGraphics = existingDevice is null
                 ? GraphicsDeviceFactory.CreateForWindowTarget(initialTarget) : null;
             IGraphicsDevice graphics = existingDevice ?? ownedGraphics!;
+            graphics.ConfigureSceneOutput(new GraphicsSceneOutputSettings(
+                Environment.GetEnvironmentVariable("FORGELINE_LINEAR_SCENE_OUTPUT") == "1",
+                _sceneLighting.Exposure, _sceneLighting.ToneMapping == SceneToneMappingMode.AcesFitted));
             if (existingDevice is not null)
             {
                 graphics.WaitForIdle();
@@ -812,6 +816,7 @@ internal sealed class ClientRenderHost : IDisposable
         GraphicsDiagnostics completedGraphics) => snapshot with
         {
             GpuTimingAvailable = completedGraphics.GpuTimingAvailable,
+            FramePasses = completedGraphics.Frame,
             GpuMilliseconds = completedGraphics.GpuTimingAvailable ? completedGraphics.GpuFrameMilliseconds : null,
             DebugLayerEnabled = completedGraphics.Device.DebugLayerEnabled,
             DebugLayerWarningCount = completedGraphics.Debug.WarningCount,
@@ -880,6 +885,7 @@ internal sealed class ClientRenderHost : IDisposable
                 LastMeasuredRunningRates = lastMeasuredRunningRates,
                 GpuTimingAvailable =
                     graphics.GpuTimingAvailable,
+                FramePasses = graphics.Frame,
                 DebugLayerEnabled =
                     graphics.Device.DebugLayerEnabled,
                 PeakLoadedTextureCount =

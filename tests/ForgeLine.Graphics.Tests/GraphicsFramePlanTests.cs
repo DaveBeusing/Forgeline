@@ -43,4 +43,22 @@ public sealed class GraphicsFramePlanTests
         var plan = new GraphicsFramePlan(16384, 16384, 4);
         Assert.Equal(4_294_967_296L, plan.Output.PayloadBytes);
     }
+
+    [Fact]
+    public void OptionalSceneUsesOneFp16TargetPerReusableFrame()
+    {
+        var plan = new GraphicsFramePlan(1920, 1080, 3, linearScene: true);
+        Assert.Equal(49_766_400, plan.TransientPayloadBytes);
+        Assert.Equal(GraphicsFrameTargetFormat.Rgba16Float, plan.Scene!.Value.Format);
+        Assert.Equal(GraphicsFrameTargetLifetime.BackBuffer, plan.Scene.Value.Lifetime);
+    }
+
+    [Theory]
+    [InlineData(0.0f)]
+    [InlineData(-1.0f)]
+    [InlineData(float.NaN)]
+    [InlineData(float.PositiveInfinity)]
+    [InlineData(17.0f)]
+    public void InvalidSceneExposureIsRejected(float exposure) =>
+        Assert.Throws<ArgumentOutOfRangeException>(() => new GraphicsSceneOutputSettings(true, exposure, true).Validate());
 }

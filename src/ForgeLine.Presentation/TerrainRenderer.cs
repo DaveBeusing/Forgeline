@@ -734,6 +734,9 @@ public sealed class TerrainRenderer : IDisposable
                     roughnessResponse +
                     emissive;
 
+            #if LINEAR_SCENE
+                return linearColor;
+            #endif
                 linearColor *=
                     sceneAmbientExposure.w;
 
@@ -783,7 +786,7 @@ public sealed class TerrainRenderer : IDisposable
                         value,
                         value,
                         value,
-                        1.0f);
+                        DEBUG_ALPHA);
                 }
 
                 if (input.DebugMode >= 4.5f)
@@ -810,7 +813,7 @@ public sealed class TerrainRenderer : IDisposable
                             weights.w;
                     return float4(
                         palette,
-                        1.0f);
+                        DEBUG_ALPHA);
                 }
 
                 float2 worldXZ =
@@ -1062,7 +1065,7 @@ public sealed class TerrainRenderer : IDisposable
                             1.0f,
                             0.55f,
                             0.08f,
-                            1.0f);
+                            DEBUG_ALPHA);
                     }
                 }
 
@@ -1082,7 +1085,7 @@ public sealed class TerrainRenderer : IDisposable
                 "TerrainVertex.hlsl");
         GraphicsShaderBytecode pixelShader =
             compiler.Compile(
-                pixelShaderSource,
+                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n#define DEBUG_ALPHA -2.0f\n" : "#define LINEAR_SCENE 0\n#define DEBUG_ALPHA 1.0f\n") + pixelShaderSource,
                 GraphicsShaderStage.Pixel,
                 "PSMain",
                 "TerrainPixel.hlsl");
@@ -1092,6 +1095,7 @@ public sealed class TerrainRenderer : IDisposable
                 vertexShader,
                 pixelShader)
             {
+                TargetFormat = graphics.SceneOutput.Enabled ? GraphicsFrameTargetFormat.Rgba16Float : GraphicsFrameTargetFormat.Rgba8Unorm,
                 VertexElements =
                 [
                     new GraphicsVertexElement(
