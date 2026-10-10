@@ -1165,6 +1165,7 @@ internal sealed class ClientApplication
                     {
                         selectionController.Selection.SetSingle(operationsResult.Navigate);
                         presentationInteraction.SetSelection(selectionController.Selection.Entities);
+                        inputState.SuppressHeldInput();
                         actionPanel.OpenOperationsControls(operationsResult.Controls);
                         hudInteraction.CaptureKeyboard(actionPanel.HasKeyboardFocus);
                     }

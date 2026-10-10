@@ -15,6 +15,16 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class OperationsTests
 {
     [Theory]
+    [InlineData(0, 0)] [InlineData(10, 10)] [InlineData(320, 180)]
+    public void CollapsedViewportsHaveNoOffscreenOperationsTab(int width, int height)
+    {
+        var layout = GameplayHudLayout.Create(width, height, 192, 2);
+        var tab = OperationsLayout.Entry(layout);
+        if (tab.IsEmpty) return;
+        Assert.True(layout.SafeArea.Contains(new(tab.X, tab.Y)));
+        Assert.True(layout.SafeArea.Contains(new(tab.Right, tab.Bottom)));
+    }
+    [Theory]
     [InlineData(1)]
     [InlineData(10)]
     [InlineData(100)]

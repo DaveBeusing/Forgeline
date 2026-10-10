@@ -14,8 +14,12 @@ public readonly record struct OperationsInteraction(bool Captured, EntityId Navi
 public static class OperationsLayout
 {
     public const int PageSize = 6;
-    public static HudRect Entry(in GameplayHudLayout layout) => new(layout.SecondaryView.X,
-        layout.SelectionInspector.Y - 20 * layout.Scale, MathF.Min(126 * layout.Scale, layout.SelectionInspector.Width), 16 * layout.Scale);
+    public static HudRect Entry(in GameplayHudLayout layout)
+    {
+        float y = MathF.Max(layout.TopStatusBar.Bottom, layout.SelectionInspector.Y - 20 * layout.Scale);
+        return new(layout.SecondaryView.X, y, MathF.Min(126 * layout.Scale, layout.SelectionInspector.Width),
+            MathF.Min(16 * layout.Scale, MathF.Max(0, layout.SelectionInspector.Y - y)));
+    }
     public static HudRect Panel(in GameplayHudLayout layout) => new(layout.SafeArea.X, layout.TopStatusBar.Bottom + 8 * layout.Scale,
         MathF.Min(450 * layout.Scale, MathF.Max(0, layout.ActionDock.X - layout.SafeArea.X - 8 * layout.Scale)),
         MathF.Max(0, layout.SelectionInspector.Y - layout.TopStatusBar.Bottom - 36 * layout.Scale));
