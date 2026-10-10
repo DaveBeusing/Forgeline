@@ -1,0 +1,12 @@
+{
+  "id": "texture.directorate.surface.atlas_normal",
+  "type": "texture",
+  "source": "production_surface_normal.png",
+  "textureUsage": "normal",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 1024,
+  "textureFormat": "bc7Unorm",
+  "textureMaxMipLevels": 4,
+  "textureCompressionQuality": "balanced"
+}

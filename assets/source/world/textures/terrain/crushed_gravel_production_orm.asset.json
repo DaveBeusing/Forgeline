@@ -1,0 +1,11 @@
+{
+  "id": "texture.world.terrain.crushed_gravel_orm",
+  "type": "texture",
+  "source": "crushed_gravel_production_orm.png",
+  "textureUsage": "orm",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 512,
+  "textureFormat": "bc7Unorm",
+  "textureCompressionQuality": "balanced"
+}

@@ -10,6 +10,32 @@ public sealed class ProductionAssetMaterialCompletenessTests
     private const long ExpectedSharedResidentBytes = 26_448;
 
     [Fact]
+    public void ProductionSurfaceMastersRetainNativeDetailAndExplicitRuntimeCaps()
+    {
+        string sourceRoot = Path.Combine(FindRepositoryRoot(), "assets", "source");
+        int masters = 0;
+        Span<byte> header = stackalloc byte[24];
+        foreach (string path in Directory.EnumerateFiles(sourceRoot, "*.asset.json", SearchOption.AllDirectories))
+        {
+            using var json = System.Text.Json.JsonDocument.Parse(File.ReadAllText(path));
+            var root = json.RootElement;
+            if (root.GetProperty("type").GetString() != "texture") continue;
+            string source = root.GetProperty("source").GetString()!;
+            if (!source.Contains("production", StringComparison.Ordinal)) continue;
+            using var file = File.OpenRead(Path.Combine(Path.GetDirectoryName(path)!, source));
+            file.ReadExactly(header);
+            Assert.Equal(4096, System.Buffers.Binary.BinaryPrimitives.ReadInt32BigEndian(header[16..20]));
+            Assert.Equal(4096, System.Buffers.Binary.BinaryPrimitives.ReadInt32BigEndian(header[20..24]));
+            Assert.InRange(root.GetProperty("textureMaxDimension").GetInt32(), 512, 2048);
+            Assert.True(root.GetProperty("textureGenerateMipmaps").GetBoolean());
+            string usage = root.GetProperty("textureUsage").GetString()!;
+            Assert.Equal(usage == "baseColor" ? "srgb" : "linear", root.GetProperty("textureColorSpace").GetString());
+            masters++;
+        }
+        Assert.Equal(24, masters);
+    }
+
+    [Fact]
     public void PhysicalProductionMeshesResolveCompleteTexturedMaterials()
     {
         string repositoryRoot =
@@ -23,13 +49,7 @@ public sealed class ProductionAssetMaterialCompletenessTests
         try
         {
             AssetCompilationResult result =
-                AssetPipelineCompiler.Compile(
-                    Path.Combine(
-                        repositoryRoot,
-                        "assets",
-                        "source"),
-                    runtimeRoot,
-                    clean: true);
+                ProductionAssetFixture.CompileTo(runtimeRoot);
 
             Assert.True(
                 result.Success,
@@ -42,6 +62,24 @@ public sealed class ProductionAssetMaterialCompletenessTests
             RuntimeAssetCatalog catalog =
                 RuntimeAssetCatalog.Load(
                     runtimeRoot);
+
+            long productionResidentBytes = 0;
+            int productionTextureCount = 0;
+            foreach (string definitionPath in Directory.EnumerateFiles(
+                Path.Combine(repositoryRoot, "assets", "source"), "*.asset.json", SearchOption.AllDirectories))
+            {
+                using var json = System.Text.Json.JsonDocument.Parse(File.ReadAllText(definitionPath));
+                var definition = json.RootElement;
+                if (definition.GetProperty("type").GetString() != "texture" ||
+                    !definition.GetProperty("source").GetString()!.Contains("production", StringComparison.Ordinal)) continue;
+                var texture = RuntimeTextureData.FromPayload(catalog.Read(
+                    AssetId.Parse(definition.GetProperty("id").GetString()!)).Payload);
+                productionResidentBytes += texture.ResidentByteCount;
+                productionTextureCount++;
+            }
+            Assert.Equal(24, productionTextureCount);
+            Assert.Equal(51_364_204L, productionResidentBytes);
+
             RuntimeAssetRecord[] productionMeshes =
                 catalog.Manifest.Assets
                     .Where(
@@ -139,13 +177,7 @@ public sealed class ProductionAssetMaterialCompletenessTests
         try
         {
             AssetCompilationResult result =
-                AssetPipelineCompiler.Compile(
-                    Path.Combine(
-                        repositoryRoot,
-                        "assets",
-                        "source"),
-                    runtimeRoot,
-                    clean: true);
+                ProductionAssetFixture.CompileTo(runtimeRoot);
 
             Assert.True(
                 result.Success);

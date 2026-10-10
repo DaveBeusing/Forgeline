@@ -1,8 +1,10 @@
 {
   "id": "texture.world.terrain.cracked_earth",
   "type": "texture",
-  "source": "cracked_earth.png",
+  "source": "cracked_earth_production_base.png",
   "textureUsage": "baseColor",
   "textureColorSpace": "srgb",
-  "textureGenerateMipmaps": true
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 1024,
+  "textureFormat": "rgba8Unorm"
 }

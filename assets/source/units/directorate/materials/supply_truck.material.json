@@ -8,7 +8,7 @@
   "metallicFactor": 1,
   "roughnessFactor": 1,
   "baseColorTexture": "texture.directorate.surface.atlas_base",
-  "normalTexture": "texture.directorate.material.structural_metal_normal",
+  "normalTexture": "texture.directorate.surface.atlas_normal",
   "ormTexture": "texture.directorate.surface.atlas_orm",
   "uvScale": [
     1,

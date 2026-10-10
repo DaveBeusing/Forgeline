@@ -18,7 +18,9 @@ existing mesh path. Simulation, collision and navigation remain independent.
 Semantic mip generation and BC7 compression extend the existing runtime format.
 Nineteen shared texture chains occupy 26,448 bytes (previously 103,740); the
 surface ORM atlas occupies 21,504 bytes (previously 86,016). These twenty
-resources save 138,804 resident bytes. The color atlas retains RGBA8.
+resources originally saved 138,804 resident bytes. The subsequent production
+atlas now derives three BC7 maps from native 4096-pixel sources. Terrain has
+seven complete source-master families. See [Production surfaces](ProductionSurfaceMasters.md).
 See [Asset Pipeline](AssetPipeline.md).
 
 ## Reproducible inventory and runtime checks
@@ -37,10 +39,11 @@ dimensions and flags masters below 2048 pixels for review. The flag is advisory:
 dimensions alone do not prove useful detail; tiny repeated textures can be
 deliberate. No source is enlarged to manufacture a numerical quality pass.
 
-Current inventory: 324 assets, 158 meshes, 39 textures and 127 materials.
-Compiled container footprint: 4,985,866 bytes, including 790,803 mesh bytes and
-4,048,447 texture bytes. Container sizes include metadata and studio splash
-assets; they are not GPU allocations or residency.
+Current inventory: 341 assets, 158 meshes, 56 textures and 127 materials.
+Production texture budgets are documented in [Production surfaces](ProductionSurfaceMasters.md).
+Container sizes include metadata and studio splash assets; they are not GPU
+allocations or residency. The original 324-asset baseline occupied 4,985,866
+container bytes; do not use that historical figure for the new production set.
 
 The matrix runs the production Central Divide smoke scene with 1,000 opt-in
 synthetic render instances, isolated settings and all twelve display/zoom
@@ -62,12 +65,10 @@ included background validation activity and is exploratory evidence; it does
 not establish a controlled 60+ FPS acceptance result. Windowed 3840 x 2160
 requests produced 3840 x 2130 surfaces, leaving exact 4K unqualified.
 
-- Terrain sources and original shared material families remain small baseline
-  textures. The shared color atlas source is 1254 x 1254. These are not accepted
-  4K/8K production masters.
-- Produce and visually qualify model/source-master upgrades while preserving
-  silhouette, function, faction, scale, pivots, sockets, damage, UVs and tangents.
-  Existing mesh families have not been replaced by newly qualified model art.
+- Native 4096-pixel terrain and shared surface masters are implemented, with
+  matched PBR channels. Manufactured LOD0 components and seven prop silhouettes
+  have new sources. Visually qualify those upgrades at the reference camera;
+  compiler validation does not substitute for final art acceptance.
 - Define world coverage and texel density per material from the normal camera;
   choose runtime caps from screen use and memory budgets. Category alone must
   not force 8K sources or runtime allocations.

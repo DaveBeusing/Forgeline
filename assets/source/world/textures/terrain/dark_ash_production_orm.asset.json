@@ -1,0 +1,11 @@
+{
+  "id": "texture.world.terrain.dark_ash_orm",
+  "type": "texture",
+  "source": "dark_ash_production_orm.png",
+  "textureUsage": "orm",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 512,
+  "textureFormat": "bc7Unorm",
+  "textureCompressionQuality": "balanced"
+}

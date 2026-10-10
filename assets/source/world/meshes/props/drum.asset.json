@@ -1,7 +1,7 @@
 {
   "id": "mesh.world.prop.drum",
   "type": "mesh",
-  "source": "../sources/mesh_world_prop_drum.gltf",
+  "source": "../sources/mesh_world_prop_drum_production.gltf",
   "materialReferences": [
     "material.world.prop.industrial"
   ],

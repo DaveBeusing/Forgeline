@@ -24,4 +24,4 @@ A complete BC7 32 x 32 mip chain contains 1,392 bytes. The nineteen shared textu
 
 ## Concept surface completion
 
-The physical production mesh set uses the component-specific [surface atlas](surfaces/README.md) and numeric ORM atlas. The original nineteen textures remain stable reusable assets, including tangent-normal families and functional status emissive. Their BC7 budget is validated independently. Surface atlases have explicit runtime resolution/mip limits and contribute to the measured gameplay texture budget.
+The physical production mesh set uses the component-specific [production surface atlas](surfaces/README.md), with native 4096-pixel Base Color, Normal and ORM masters. All atlas users bind its matching tangent-space Normal map. The original nineteen textures remain stable reusable assets and retain their independently validated BC7 budget. See [Production surface masters](../../../../docs/ProductionSurfaceMasters.md) for the explicit runtime budgets and acceptance limits.

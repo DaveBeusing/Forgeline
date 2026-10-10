@@ -1,9 +1,12 @@
 {
   "id": "texture.directorate.surface.atlas_base",
   "type": "texture",
-  "source": "surface_atlas.png",
+  "source": "production_surface_base.png",
   "textureUsage": "baseColor",
   "textureColorSpace": "srgb",
-  "textureMaxDimension": 512,
-  "textureMaxMipLevels": 4
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 2048,
+  "textureFormat": "bc7Unorm",
+  "textureMaxMipLevels": 5,
+  "textureCompressionQuality": "balanced"
 }

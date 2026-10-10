@@ -1,7 +1,7 @@
 {
   "id": "mesh.world.prop.utility_box",
   "type": "mesh",
-  "source": "../sources/mesh_world_prop_utility_box.gltf",
+  "source": "../sources/mesh_world_prop_utility_box_production.gltf",
   "materialReferences": [
     "material.world.prop.industrial"
   ],

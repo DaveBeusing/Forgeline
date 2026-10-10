@@ -1,13 +1,13 @@
 {
-  "baseColorTexture": "texture.world.terrain.rocky_scrub",
+  "baseColorTexture": "texture.world.terrain.bedrock",
   "baseColorFactor": [
-    0.46,
-    0.47,
-    0.44,
+    1,
+    1,
+    1,
     1
   ],
   "metallicFactor": 0,
-  "roughnessFactor": 0.82,
-  "normalTexture": "texture.world.terrain.rock_normal",
-  "ormTexture": "texture.world.terrain.terrain_orm"
+  "roughnessFactor": 1,
+  "normalTexture": "texture.world.terrain.bedrock_normal",
+  "ormTexture": "texture.world.terrain.bedrock_orm"
 }

@@ -1,0 +1,10 @@
+{
+  "id": "texture.world.terrain.bedrock",
+  "type": "texture",
+  "source": "bedrock_production_base.png",
+  "textureUsage": "baseColor",
+  "textureColorSpace": "srgb",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 1024,
+  "textureFormat": "rgba8Unorm"
+}

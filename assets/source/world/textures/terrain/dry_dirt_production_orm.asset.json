@@ -1,0 +1,11 @@
+{
+  "id": "texture.world.terrain.dry_dirt_orm",
+  "type": "texture",
+  "source": "dry_dirt_production_orm.png",
+  "textureUsage": "orm",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 512,
+  "textureFormat": "bc7Unorm",
+  "textureCompressionQuality": "balanced"
+}

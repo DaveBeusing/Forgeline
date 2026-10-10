@@ -1,0 +1,11 @@
+{
+  "id": "texture.world.terrain.bedrock_orm",
+  "type": "texture",
+  "source": "bedrock_production_orm.png",
+  "textureUsage": "orm",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 512,
+  "textureFormat": "bc7Unorm",
+  "textureCompressionQuality": "balanced"
+}

@@ -1,5 +1,12 @@
 # Build Support
 
+`Author-ProductionSurfaces.py` rebuilds native 4096-pixel physical texture
+masters (numpy/Pillow). Run `Refine-ProductionMeshes.py` followed by
+`Author-IndustrialProps.py` to reproduce the corresponding manufactured
+bevels and functional prop silhouettes. Run `Author-UnitRunningGear.py` after
+the bevel pass for wheels, track belts and hollow barrels. See
+[Production surfaces](../docs/ProductionSurfaceMasters.md).
+
 `Export-VisualAssetInventory.ps1` exports source/runtime bindings, LODs, collision,
 sockets and source texture dimensions from the compiled catalog.
 `Invoke-RtsReferenceQualification.ps1` runs twelve resolution/zoom smoke cases

@@ -1,13 +1,13 @@
 {
   "baseColorTexture": "texture.world.terrain.dark_ash",
   "baseColorFactor": [
-    0.37,
-    0.38,
-    0.35,
+    1,
+    1,
+    1,
     1
   ],
-  "metallicFactor": 0.05,
-  "roughnessFactor": 0.78,
-  "normalTexture": "texture.world.terrain.hard_surface_normal",
-  "ormTexture": "texture.world.terrain.terrain_orm"
+  "metallicFactor": 0,
+  "roughnessFactor": 1,
+  "normalTexture": "texture.world.terrain.dark_ash_normal",
+  "ormTexture": "texture.world.terrain.dark_ash_orm"
 }

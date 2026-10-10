@@ -25,10 +25,7 @@ public sealed class WorldAssetAuthoringTests
         try
         {
             AssetCompilationResult result =
-                AssetPipelineCompiler.Compile(
-                    sourceRoot,
-                    runtimeRoot,
-                    clean: true);
+                ProductionAssetFixture.CompileTo(runtimeRoot);
 
             Assert.True(
                 result.Success,
@@ -37,7 +34,7 @@ public sealed class WorldAssetAuthoringTests
                     result.Diagnostics.Select(
                         static diagnostic =>
                             $"{diagnostic.Code}: {diagnostic.Message}")));
-            Assert.Equal(324, result.CompiledCount);
+            Assert.Equal(341, result.CompiledCount);
 
             RuntimeAssetCatalog catalog =
                 RuntimeAssetCatalog.Load(

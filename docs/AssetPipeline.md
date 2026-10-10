@@ -153,6 +153,12 @@ Bounds are calculated from imported positions and recorded in the runtime manife
 
 ## Texture Import
 
+BC7 sources can specify `textureCompressionQuality` as `balanced` or `best`.
+The default remains `best`; the native production surface masters explicitly
+use `balanced` to bound offline authoring cost. Invalid values are rejected
+and quality changes invalidate the source cache. Runtime format, mip semantics
+and resident byte sizes are unchanged by this offline setting.
+
 Supported editable source extensions:
 
 ```text

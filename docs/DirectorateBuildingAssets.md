@@ -1,5 +1,11 @@
 # Directorate Building and Infrastructure Assets
 
+Twelve building families have new manufactured-bevel LOD0 sources preserving
+their original outer bounds and sockets. The extractor's non-box topology is
+retained. The shared production atlas now has matched native 4096-pixel Base
+Color, Normal and ORM masters. See [Production surfaces](ProductionSurfaceMasters.md)
+for authoring tools, runtime caps and remaining visual acceptance work.
+
 ## Purpose
 
 The Directorate building and infrastructure presentation set connects the existing authoritative construction, economy, power, production, logistics, combat-damage, and strategic-infrastructure state to compiled runtime visuals. Presentation never owns or duplicates those gameplay states.

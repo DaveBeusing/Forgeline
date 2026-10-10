@@ -1,7 +1,7 @@
 {
   "id": "mesh.world.prop.barrier",
   "type": "mesh",
-  "source": "../sources/mesh_world_prop_barrier.gltf",
+  "source": "../sources/mesh_world_prop_barrier_production.gltf",
   "materialReferences": [
     "material.world.prop.industrial"
   ],

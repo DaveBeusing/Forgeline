@@ -66,7 +66,11 @@ Intentional exceptions are the authored decal carrier and purpose-specific VFX/s
 
 Props, vegetation, and resource deposits define an explicit LOD1 mesh reference in source metadata. Production rendering chooses High or Reduced from projected bounding-sphere size around a 65-reference-pixel threshold with 12% hysteresis. Catalog distance helpers remain available for compatibility. See [Camera and Input](CameraAndInput.md).
 
-LOD assets currently use deliberately compact primitive source geometry suitable for the Vertical Slice baseline. They are stable replacement points for later production meshes without changing gameplay data or world-object identities.
+Reduced LOD assets retain deliberately compact source geometry. High-detail
+props now use manufactured bevels or new functional drum, pipe, pallet, fence,
+lamp, rock and rubble geometry. Native 4096-pixel atlas masters supply their
+matched physical surface channels; terrain has seven independent source
+families. See [Production surfaces](ProductionSurfaceMasters.md).
 
 ## Resource deposit families
 

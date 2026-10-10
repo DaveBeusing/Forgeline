@@ -1,0 +1,75 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine industrial prop authoring"
+  },
+  "buffers": [
+    {
+      "byteLength": 1728,
+      "uri": "data:application/octet-stream;base64,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"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 576
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 576,
+      "byteLength": 576
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1152,
+      "byteLength": 384
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1536,
+      "byteLength": 192
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5125,
+      "count": 48,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "mode": 4
+        }
+      ]
+    }
+  ]
+}

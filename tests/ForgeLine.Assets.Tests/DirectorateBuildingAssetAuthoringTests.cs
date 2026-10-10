@@ -37,13 +37,7 @@ public sealed class DirectorateBuildingAssetAuthoringTests
         try
         {
             AssetCompilationResult result =
-                AssetPipelineCompiler.Compile(
-                    Path.Combine(
-                        repositoryRoot,
-                        "assets",
-                        "source"),
-                    runtimeRoot,
-                    clean: true);
+                ProductionAssetFixture.CompileTo(runtimeRoot);
 
             Assert.True(
                 result.Success,
@@ -53,7 +47,7 @@ public sealed class DirectorateBuildingAssetAuthoringTests
                         static diagnostic =>
                             $"{diagnostic.Code}: {diagnostic.Message}")));
             Assert.Equal(
-                324,
+                341,
                 result.CompiledCount);
 
             RuntimeAssetCatalog catalog =

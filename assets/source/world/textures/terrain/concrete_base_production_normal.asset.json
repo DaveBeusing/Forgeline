@@ -1,0 +1,11 @@
+{
+  "id": "texture.world.terrain.concrete_base_normal",
+  "type": "texture",
+  "source": "concrete_base_production_normal.png",
+  "textureUsage": "normal",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true,
+  "textureMaxDimension": 512,
+  "textureFormat": "bc7Unorm",
+  "textureCompressionQuality": "balanced"
+}
