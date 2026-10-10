@@ -56,8 +56,13 @@ public sealed class MainMenuModelTests
             string.IsNullOrWhiteSpace(
                 informationalVersion));
         Assert.Equal(
-            informationalVersion!.Split('+')[0],
+            ClientBuildIdentity.DisplayVersion,
             view.ProductVersion);
+        Assert.Matches("^[0-9a-f]{40}$", ClientBuildIdentity.SourceRevision);
+        Assert.EndsWith(
+            ClientBuildIdentity.SourceRevision[..12],
+            view.ProductVersion,
+            StringComparison.Ordinal);
     }
 
     [Fact]

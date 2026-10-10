@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -32,19 +31,19 @@ internal static class ClientDiagnostics
 
             var builder =
                 new StringBuilder();
-            Assembly assembly =
-                typeof(ClientDiagnostics).Assembly;
-            Version? version =
-                assembly.GetName().Version;
-
             builder.AppendLine("FORGELINE client failure report");
             builder.Append("TimestampUtc: ");
             builder.AppendLine(
                 DateTimeOffset.UtcNow.ToString("O"));
             builder.Append("Version: ");
             builder.AppendLine(
-                version?.ToString() ??
-                "unknown");
+                ClientBuildIdentity.InformationalVersion);
+            builder.Append("Channel: ");
+            builder.AppendLine(ClientBuildIdentity.Channel);
+            builder.Append("SourceRevision: ");
+            builder.AppendLine(ClientBuildIdentity.SourceRevision);
+            builder.Append("BuildId: ");
+            builder.AppendLine(ClientBuildIdentity.BuildId);
             builder.Append("OS: ");
             builder.AppendLine(
                 RuntimeInformation.OSDescription);

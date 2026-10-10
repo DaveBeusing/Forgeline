@@ -4,11 +4,13 @@
     <ForgeLineVersionMinor>1</ForgeLineVersionMinor>
     <ForgeLineVersionPatch>333</ForgeLineVersionPatch>
     <VersionPrefix>$(ForgeLineVersionMajor).$(ForgeLineVersionMinor).$(ForgeLineVersionPatch)</VersionPrefix>
-    <Version>$(VersionPrefix)</Version>
-    <AssemblyVersion>$(Version).0</AssemblyVersion>
-    <FileVersion>$(Version).0</FileVersion>
+    <Version Condition="'$(FORGELINE_BUILD_VERSION)' != ''">$(FORGELINE_BUILD_VERSION)</Version>
+    <Version Condition="'$(Version)' == ''">$(VersionPrefix)-dev</Version>
+    <PackageVersion>$(Version)</PackageVersion>
+    <AssemblyVersion>$(ForgeLineVersionMajor).$(ForgeLineVersionMinor).0.0</AssemblyVersion>
+    <FileVersion>$(VersionPrefix).0</FileVersion>
     <InformationalVersion>$(Version)</InformationalVersion>
-    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
     <LangVersion>14.0</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -18,4 +20,7 @@
     <Deterministic>true</Deterministic>
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
+  <ItemGroup>
+    <AssemblyMetadata Include="BuildId" Value="$(GITHUB_RUN_ID).$(GITHUB_RUN_ATTEMPT)" Condition="'$(GITHUB_RUN_ID)' != ''" />
+  </ItemGroup>
 </Project>
