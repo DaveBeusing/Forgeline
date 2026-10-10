@@ -70,7 +70,10 @@ An orphan annotated tag object after a collision is not a reserved number.
 
 CI run numbers and commit counts are not allocators. Every prerelease rerun
 reserves a new number, including attempts of the same commit with different
-inputs. Once a stable tag exists, the line is closed to further prereleases.
+inputs. Use **Rerun all jobs**: partial release-job reruns are rejected when the
+allocation belongs to an earlier attempt. Validation artifact names include
+version and attempt, so prior uploads cannot collide with a new run.
+Once a stable tag exists, the line is closed to further prereleases.
 Stable reruns fail on any existing release, including incomplete drafts.
 Release creation/upload never updates, clobbers or deletes existing assets.
 Publication also creates the atomic permanent claim

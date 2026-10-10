@@ -49,5 +49,9 @@ if ($Channel -eq 'pr') {
     }
 }
 Assert-BuildVersion -Version $version
-if ($env:GITHUB_OUTPUT) { "version=$version" >> $env:GITHUB_OUTPUT; "sha=$sha" >> $env:GITHUB_OUTPUT }
+if ($env:GITHUB_OUTPUT) {
+    "version=$version" >> $env:GITHUB_OUTPUT
+    "sha=$sha" >> $env:GITHUB_OUTPUT
+    "attempt=$env:GITHUB_RUN_ATTEMPT" >> $env:GITHUB_OUTPUT
+}
 Write-Host "Build identity: $version+$sha"

@@ -40,6 +40,7 @@ jobs:
     outputs:
       version: ${{ steps.identity.outputs.version }}
       sha: ${{ steps.identity.outputs.sha }}
+      attempt: ${{ steps.identity.outputs.attempt }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -71,6 +72,16 @@ jobs:
         id: pr-version
         shell: pwsh
         run: ./build/Set-BuildVersion.ps1 -Channel pr
+
+      - name: Reject reused release allocation on partial reruns
+        if: github.event_name != 'pull_request'
+        shell: pwsh
+        env:
+          RESERVED_ATTEMPT: ${{ needs.reserve-version.outputs.attempt }}
+        run: |
+          if ($env:RESERVED_ATTEMPT -ne $env:GITHUB_RUN_ATTEMPT) {
+            throw 'Rerun all jobs to allocate a fresh version; partial release rebuilds are prohibited.'
+          }
 
       - name: Use PR identity throughout validation and packaging
         if: github.event_name == 'pull_request'
@@ -174,7 +185,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: pre-alpha-package
+          name: pre-alpha-package-${{ env.FORGELINE_BUILD_VERSION }}-attempt-${{ github.run_attempt }}
           path: artifacts/prealpha/FORGELINE-*
           if-no-files-found: error
           retention-days: 30
@@ -198,13 +209,21 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Reject publication-only reruns
+        shell: pwsh
+        env:
+          RESERVED_ATTEMPT: ${{ needs.reserve-version.outputs.attempt }}
+        run: |
+          if ($env:RESERVED_ATTEMPT -ne $env:GITHUB_RUN_ATTEMPT) {
+            throw 'Rerun all jobs; publication must use this attempt of the successful validation run.'
+          }
       - uses: actions/checkout@v7
         with:
           ref: ${{ needs.reserve-version.outputs.sha }}
           fetch-depth: 0
       - uses: actions/download-artifact@v4
         with:
-          name: pre-alpha-package
+          name: pre-alpha-package-${{ needs.reserve-version.outputs.version }}-attempt-${{ github.run_attempt }}
           path: artifacts/release
       - name: Publish the exact tested artifact
         shell: pwsh
