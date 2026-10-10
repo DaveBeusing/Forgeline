@@ -365,3 +365,55 @@ Observed on NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU, driver 32.0.15.
 Disabled CPU means were 8.33/4.00/3.92 ms; enabled means ranged 4.48–5.31 ms and include frame reuse/Present. Sequential clocks/scheduling make the first result unsuitable for claiming CPU improvement. These are workload-specific costs, not a sustained full-client FPS guarantee. The initial pre-change terrain-only scene-pass baseline is recorded separately and is not numerically compared against this denser workload.
 
 WARP regressions cover enabled/disabled pixels, hidden-caster invariance, identical static frames, direct/linear output, disable/re-enable, resize/suspend, descriptor reuse, invalid matrices and pass/configuration faults. Reference zooms 120/420/1000 m and raster scales 100/150/200% pass; raster scaling does not qualify physical monitor transitions. A 10000-instance test confirms the Low 1024-caster cap. Native production-client windowed/borderless qualification also exercises real Directorate assets with Medium shadows and linear output. Physical-monitor legibility, moving-unit/shimmer review under arbitrary camera motion, long occlusion/resize soak and actual device removal remain manual acceptance work.
+
+## Atmospheric fog and scene depth
+
+Atmospheric fog is optional visual state, separate from tactical fog of war. Set `FORGELINE_ATMOSPHERE_QUALITY=Distance` or `Height`, or persist `sceneAtmosphere` in the client settings file. `Disabled` is the default. Invalid profiles/ranges fail explicitly; older files retain disabled defaults. An enabled profile selects the existing linear scene output automatically. Disable atmosphere before disabling that output through the graphics API.
+
+The persisted controls are `quality`, `colorRed/Green/Blue` (linear RGB, 0–4), `density` (0–0.01 per metre), `startDistance` (0–2000 m), `baseHeight` (-1000–10000 m), `heightFalloff` (0–0.1 per metre), `maximumOpacity` (0–0.65) and `zoomCompensation` (0–1). Defaults are RGB 0.58/0.66/0.76, density 0.0012, start 100 m, base 0 m, falloff 0.02, opacity 0.5 and compensation 0.75. Density zero preserves the original scene output.
+
+| Profile | Extinction | Additional depth targets | Depth SRVs | Additional composition draws over linear output |
+| --- | --- | --- | --- | --- |
+| Disabled | None | 0 | 0 | 0 |
+| Distance | Exponential distance after the start threshold | 0 | 1 | 0 |
+| Height | Distance weighted by exponential height density | 0 | 1 | 0 |
+
+A pixel-center depth read reconstructs world position using the copied inverse view-projection. Height fog uses a bounded analytic segment average with a stable near-horizontal limit; deduction of start distance uses that mean density. Density is compensated toward a 420 m RTS reference using a clamped 0.35–2 multiplier. The opacity ceiling retains at least 35% of surface contribution. Fog color is mixed into linear lighting before the one existing exposure/ACES/sRGB transform. There is no temporal history, blur, neighborhood sampling or volumetric lighting.
+
+The graphics-owned depth buffer uses typeless R32 storage with D32 write and R32 sample views when enabled. The surface-owned depth payload is reused; ordered queue barriers unbind the DSV for composition, sample, return to depth-write state and restore it before overlays. Resolution changes retire/recreate the descriptor with the existing idle/fault policy. Clear-depth pixels, output-space clear/debug colors and a missing camera bypass fog. Missing camera data produces an explicit diagnostic reason; incomplete frame recording never publishes an applied submission.
+
+Enabling fog from direct output still requires the FP16 scene targets: 21.1 MiB at 1280×720, 33.0 MiB at 1600×900 or 253.1 MiB at 5120×2160 for three buffers. There is no additional fog target beyond these. `GraphicsDiagnostics.Atmosphere` and client `metrics.atmosphere` distinguish zero additional depth-target bytes, required scene payload, one depth descriptor, effective density, successful CPU submission identity and completed-fence composition GPU time. The latter includes output transfer and fog; it is not a separate arithmetic-only fog timer. `Frame.Plan.DepthShaderReadable` declares the scene-depth contract.
+
+HUD, minimap, tactical icons, warnings, debug lines and intelligence markers stay in the later output-space Overlay pass. Fog consumes only depth/color already rendered from authorized immutable visuals; it does not read faction data, expose hidden entities or change targetability. Existing opaque VFX keep their normal world-depth ordering. General transparent volumetric smoke/soft particles remain outside the opaque scene-composition contract. See [Atmospheric Scene Depth Composition](adr/AtmosphericSceneDepthComposition.md) and [Battlefield Intelligence](BattlefieldIntelligence.md).
+
+Reproducible pixel comparisons:
+
+```powershell
+$env:FORGELINE_ATMOSPHERE_CAPTURE_DIRECTORY = Join-Path (Get-Location) 'artifacts/atmosphere-captures'
+dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.AtmosphereIntegrationTests
+```
+
+The paired PPM captures use the production terrain/object renderers and actual 120/420/1000 m cameras. The test matrix covers 100/150/200% raster scales, static equality, hidden-object invariance, disabling and shadow compatibility. Native hardware/WARP tests compare distance extinction to an analytic reference, height extinction to independent numerical integration, and test exposure 0.25/1.15/4, exact overlay preservation, missing camera, zero density, resize/suspend, descriptor release and recording failure. Raster scaling does not qualify physical-monitor DPI transitions. Moving-camera/bridge/unit silhouettes, smoke art-direction, long occlusion/resize soak and real device removal remain manual acceptance.
+
+Hardware comparison:
+
+```powershell
+$env:FORGELINE_ATMOSPHERE_BENCHMARK_OUTPUT = Join-Path (Get-Location) 'artifacts/atmosphere-performance.json'
+$env:FORGELINE_BENCHMARK_DRIVER = '<installed driver version>'
+dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.AtmospherePerformanceQualificationTests
+```
+
+Observed on NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU, driver 32.0.15.9653, 1280×720, three buffers, VSync off, nine fixed representative terrain chunks, exposure 1.15 and ACES. Every sequential Direct/Linear/Distance/Height pair uses 64 warmups and 512 CPU samples; GPU statistics sample distinct completed fences. No build, asset compilation or second native qualification overlapped the measurement.
+
+| Camera | Direct total GPU ms | Linear total / composition ms | Distance total / composition ms | Height total / composition ms |
+| --- | --- | --- | --- | --- |
+| 25 m | 0.92 | 1.21 / 0.19 | 1.24 / 0.23 | 1.29 / 0.25 |
+| 90 m | 1.05 | 1.22 / 0.18 | 1.33 / 0.20 | 1.34 / 0.23 |
+| 120 m | 1.27 | 1.44 / 0.17 | 1.48 / 0.24 | 1.43 / 0.26 |
+| 240 m | 1.75 | 1.78 / 0.11 | 1.80 / 0.16 | 1.69 / 0.17 |
+| 420 m | 1.82 | 1.80 / 0.10 | 1.58 / 0.15 | 1.84 / 0.17 |
+| 1000 m | 1.45 | 1.48 / 0.09 | 1.48 / 0.09 | 1.61 / 0.10 |
+
+Before the changes, equivalent 25/90/240 m direct GPU means were 1.02/1.10/1.49 ms and linear means 1.03/1.06/1.59 ms (composition 0.17/0.14/0.10 ms). Sequential total-time variation prevents claiming a total GPU or CPU improvement. The paired output-stage increment for fog is approximately 0.00–0.09 ms in this workload. CPU includes allocator reuse/Present, not only fog recording. This fixture excludes objects, simulation and HUD; WARP timings are never hardware performance evidence.
+
+Production-client windowed/borderless qualification passed with Height fog, Medium shadows and 1000 extra instances, zero material/texture binding failures and 186 SRVs (179 asset, three scene, three shadow, one depth). Observed completed-frame GPU total/composition timings were 14.69/0.22 ms at 1600×900 and 51.53/8.61 ms at 5120×2160. These short-run samples are functional evidence, not controlled before/after comparisons or sustained FPS guarantees. High resolution materially increases output cost; Disabled retains the direct fallback.
