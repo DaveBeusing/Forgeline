@@ -201,3 +201,5 @@ docs/         Technical and operational documentation
 </div>
 
 Multi-selection provides owned unit type filters, component-covered operational averages and damaged/critical-supply member focus controls. Saved control groups remain available; the card F3/NEXT control uses the existing formation cycle. See [group-card controls](docs/FormationMovementAndGroupOrders.md#current-selection-group-card).
+
+The optional OPERATIONS tab provides local production, stock, power and logistics bottleneck inspection. Resource/power-strip, alert and facility-inspector clicks open relevant views; existing facility controls remain available. See [operations controls and limits](docs/ProductionAndLogisticsOperations.md).

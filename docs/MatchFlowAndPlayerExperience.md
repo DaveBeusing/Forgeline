@@ -295,3 +295,8 @@ Restart stops and joins the render/simulation owners before the shared runtime a
 ### Group operational information
 
 Multi-selection presents owned live unit composition and covered averages instead of one member's details. The displayed contributor counts and N/A distinguish missing components from low readiness or supply. Group/type filtering and member focus affect only presentation selection or camera state. Exact accepted/rejected counts from the latest resolved command retain PARTIAL feedback; selecting a subgroup does not reinterpret that historical result.
+
+
+## Production and logistics overview
+
+An optional operations surface centralizes local facility stock, queues, power and reported bottlenecks. Stored-cargo-inclusive totals have a broader scope than the construction-resource strip. Net flow and missing utilization show N/A. Existing production/stock/supply policy controls remain in the Action Dock; opening controls does not imply accepted execution. See [operations details](ProductionAndLogisticsOperations.md).
