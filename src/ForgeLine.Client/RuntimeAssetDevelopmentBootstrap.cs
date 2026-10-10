@@ -86,6 +86,11 @@ internal static class RuntimeAssetDevelopmentBootstrap
             "--runtime");
         startInfo.ArgumentList.Add(
             runtimeRoot);
+        string progressPath = Path.Combine(repositoryRoot, "artifacts", "asset-startup",
+            $"compile-{Environment.ProcessId}.jsonl");
+        startInfo.ArgumentList.Add("--progress-log");
+        startInfo.ArgumentList.Add(progressPath);
+        Console.WriteLine($"[assets:runtime] progressLog=\"{progressPath}\" launcher=dotnet-run configuration=Release");
 
         try
         {
@@ -99,7 +104,10 @@ internal static class RuntimeAssetDevelopmentBootstrap
                 return;
             }
 
+            long start = Stopwatch.GetTimestamp();
+            Console.WriteLine($"[assets:runtime] launcherPid={compiler.Id} state=waiting");
             WaitForCompiler(compiler, cancellationToken);
+            Console.WriteLine($"[assets:runtime] launcherPid={compiler.Id} elapsedMs={Stopwatch.GetElapsedTime(start).TotalMilliseconds:F1} exitCode={compiler.ExitCode}");
             if (compiler.ExitCode != 0)
             {
                 Console.Error.WriteLine(
@@ -131,10 +139,28 @@ internal static class RuntimeAssetDevelopmentBootstrap
         ArgumentNullException.ThrowIfNull(compiler);
         try
         {
-            compiler.WaitForExitAsync(cancellationToken).GetAwaiter().GetResult();
+            long start = Stopwatch.GetTimestamp();
+            Task completion = compiler.WaitForExitAsync(cancellationToken);
+            while (true)
+            {
+                try
+                {
+                    completion.WaitAsync(TimeSpan.FromSeconds(5), cancellationToken).GetAwaiter().GetResult();
+                    break;
+                }
+                catch (TimeoutException)
+                {
+                    compiler.Refresh();
+                    Console.WriteLine($"[assets:runtime] launcherPid={compiler.Id} state=waiting " +
+                        $"elapsedMs={Stopwatch.GetElapsedTime(start).TotalMilliseconds:F1} " +
+                        $"launcherCpuMs={compiler.TotalProcessorTime.TotalMilliseconds:F1} " +
+                        $"launcherWorkingSetBytes={compiler.WorkingSet64} launcherPrivateBytes={compiler.PrivateMemorySize64}");
+                }
+            }
         }
         catch (OperationCanceledException)
         {
+            Console.WriteLine($"[assets:runtime] launcherPid={compiler.Id} state=cancelled action=terminate-process-tree");
             if (!compiler.HasExited)
             {
                 try { compiler.Kill(entireProcessTree: true); }
