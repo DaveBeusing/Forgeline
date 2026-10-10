@@ -51,7 +51,8 @@ public readonly record struct GameplayHudLayout(
             float gap = GameplayHudVisualStyle.ResolveSafeMargin(Scale);
             float x = SelectionInspector.Right + gap;
             float width = MathF.Min(608 * Scale, MathF.Max(0, Minimap.X - gap - x));
-            return new HudRect(x, SelectionInspector.Y, width, SelectionInspector.Height);
+            float y = MathF.Max(SelectionInspector.Y, Minimap.Y);
+            return new HudRect(x, y, width, MathF.Max(0, SafeArea.Bottom - y));
         }
     }
 

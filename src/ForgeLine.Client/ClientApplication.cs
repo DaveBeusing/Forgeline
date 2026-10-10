@@ -1720,6 +1720,13 @@ internal sealed class ClientApplication
     {
         switch (request.Kind)
         {
+            case PlayerActionRequestKind.SubmitStopCombat:
+            case PlayerActionRequestKind.SubmitHoldPosition:
+                tacticalTargetingController.Cancel();
+                if (buildingPlacementController.IsActive)
+                    buildingPlacementController.Cancel(presentationInteraction);
+                break;
+
             case PlayerActionRequestKind.BeginBuildingPlacement:
                 tacticalTargetingController.Cancel();
                 buildingPlacementController.SelectBuilding(

@@ -74,6 +74,7 @@ public sealed class PlayerActionPanelController
     private bool _pointerPressed;
     private GameplayHudLayout _lastPointerLayout;
     private bool _hasPointerLayout;
+    private ulong _leftPressSequence;
     private SimulationTick? _contextualActivationTick;
 
     public PlayerActionPanelMode Mode { get; private set; }
@@ -128,13 +129,17 @@ public sealed class PlayerActionPanelController
         bool displayChanged = _hasPointerLayout && _lastPointerLayout != layout;
         _lastPointerLayout = layout;
         _hasPointerLayout = true;
-        if (input.FocusLostThisFrame)
+        ulong pressSequence = input.MousePressSequence(PlatformMouseButton.Left);
+        bool freshPress = pressSequence != _leftPressSequence;
+        _leftPressSequence = pressSequence;
+        if (input.FocusLostThisFrame && !input.HasPointerPosition)
         {
             _pendingRequest = null;
             PointerCaptured = false;
             _hoveredIndex = -1;
             _pointerPressed = false;
             _leftWasDown = false;
+            _heldKeys.Clear();
             return;
         }
 
@@ -293,7 +298,7 @@ public sealed class PlayerActionPanelController
 
         bool hasPress = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var pressOrigin);
         var clickPosition = hasPress ? pressOrigin : input.PointerPosition;
-        bool clicked = !displayChanged && !sessionChanged && (hasPress || (leftDown && !_leftWasDown));
+        bool clicked = !displayChanged && !sessionChanged && freshPress;
         if (clicked && ContextualCommandModel.TryHit(clickPosition, snapshot, layout, out var command))
         {
             PointerCaptured = true;
@@ -309,6 +314,7 @@ public sealed class PlayerActionPanelController
                 }
             }
             _leftWasDown = leftDown;
+            PointerCaptured = true;
             _ = Pressed(input, PlatformKey.Enter);
             _ = Pressed(input, PlatformKey.C);
             return;
