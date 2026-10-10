@@ -45,4 +45,7 @@ public readonly record struct GraphicsAtmosphereView(Matrix4x4 InverseViewProjec
 
 public readonly record struct GraphicsAtmosphereDiagnostics(AtmosphereQuality Quality, bool Applied,
     int DepthDescriptors, long AdditionalTargetBytes, float EffectiveDensity, ulong CpuSubmission,
-    ulong GpuSubmissionFence, double? CompositionGpuMilliseconds, string? UnavailableReason);
+    ulong GpuSubmissionFence, double? CompositionGpuMilliseconds, string? UnavailableReason)
+{
+    public long RequiredScenePayloadBytes { get; init; }
+}

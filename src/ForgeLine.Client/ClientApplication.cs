@@ -458,7 +458,8 @@ internal sealed class ClientApplication
                 runtimeAssets,
                 _settings.CreateSceneLightingSettings(),
                 _startup, asynchronousStartup: true, expectedSession: simulationHost.SessionId,
-                transitionHost: sessionTransitionRenderer, simulationTelemetry: simulationHost.CaptureTelemetry);
+                transitionHost: sessionTransitionRenderer, simulationTelemetry: simulationHost.CaptureTelemetry,
+                sceneAtmosphere: _settings.SceneAtmosphere);
         bool playable = ClientSessionLoadingLoop.WaitForPresentation(
             pumpEvents: () =>
             {

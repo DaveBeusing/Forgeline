@@ -2,6 +2,12 @@ namespace ForgeLine.Graphics;
 
 public interface IGraphicsDevice : IDisposable
 {
+    GraphicsAtmosphereSettings Atmosphere => GraphicsAtmosphereSettings.Default;
+    void ConfigureAtmosphere(GraphicsAtmosphereSettings settings)
+    {
+        settings.Validate();
+        if (settings.Enabled) throw new NotSupportedException("Atmospheric depth composition is unsupported by this graphics device.");
+    }
     GraphicsDirectionalShadowSettings DirectionalShadows => default;
     void ConfigureDirectionalShadows(GraphicsDirectionalShadowSettings settings)
     {

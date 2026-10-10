@@ -44,6 +44,7 @@ internal sealed record ClientUserSettings
         SceneLightingSettings.Default.Exposure;
 
     public RtsCameraBindings CameraBindings { get; init; } = new();
+    public SceneAtmosphereSettings SceneAtmosphere { get; init; } = SceneAtmosphereSettings.Default;
 
     public GameplayBindings GameplayBindings { get; init; } = new();
 
@@ -89,6 +90,7 @@ internal sealed record ClientUserSettings
             nameof(SceneExposure));
 
         ArgumentNullException.ThrowIfNull(CameraBindings);
+        SceneAtmosphere.Validate();
         ValidateBindings(CameraBindings);
         _ = new GameplayBindingRegistry(GameplayBindings, CameraBindings);
     }

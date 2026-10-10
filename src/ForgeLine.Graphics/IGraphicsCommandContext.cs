@@ -2,6 +2,7 @@ namespace ForgeLine.Graphics;
 
 public interface IGraphicsCommandContext
 {
+    void SetAtmosphereView(GraphicsAtmosphereView view) => throw new NotSupportedException();
     int Width { get; }
 
     int Height { get; }

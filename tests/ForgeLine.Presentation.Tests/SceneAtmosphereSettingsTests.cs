@@ -13,7 +13,11 @@ public sealed class SceneAtmosphereSettingsTests
         settings.Validate();
         Assert.False(settings.Graphics.Enabled);
         foreach (float zoom in new[] { 25f, 420f, 1000f })
-            SceneAtmosphereSettings.CreateView(new RtsCamera(new() { InitialDistance = zoom }), 512, 320).Validate();
+        {
+            var view = SceneAtmosphereSettings.CreateView(new RtsCamera(new() { InitialDistance = zoom, MaximumDistance = 2000 }), 512, 320);
+            view.Validate();
+            Assert.Equal(zoom, view.CameraDistance);
+        }
     }
 
     [Fact]

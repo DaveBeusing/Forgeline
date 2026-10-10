@@ -250,8 +250,9 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 })
             {
                 DirectionalShadows = ShadowDiagnostics,
+                Atmosphere = AtmosphereDiagnostics,
                 Frame = new GraphicsFrameDiagnostics(
-                    new GraphicsFramePlan(_surfaceLifecycle.Width, _surfaceLifecycle.Height, _configuration.BufferCount, _sceneOutput.Enabled, _directionalShadows.Resolution),
+                    new GraphicsFramePlan(_surfaceLifecycle.Width, _surfaceLifecycle.Height, _configuration.BufferCount, _sceneOutput.Enabled, _directionalShadows.Resolution, _atmosphere.Enabled),
                     _cpuTimingSubmission, _worldCpuMilliseconds, _overlayCpuMilliseconds,
                     _gpuTimingFence, _worldGpuMilliseconds, _overlayGpuMilliseconds)
                 {
@@ -707,6 +708,9 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         _recording = true;
         _constantOffset = 256;
         _shadowRecorded = _shadowRecording = _worldDrawRecorded = false;
+        _atmosphereView = null;
+        _recordedAtmosphereApplied = false;
+        _recordedAtmosphereDensity = 0;
         _shadowDraws = _shadowCasters = 0;
         _shadowCpu = null;
         _passState = default;
@@ -799,6 +803,8 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         _submittedFrameCount++;
         SignalSubmittedFrame();
         PublishDirectionalShadowSubmission();
+        _submittedAtmosphereApplied = _recordedAtmosphereApplied;
+        _submittedAtmosphereDensity = _recordedAtmosphereDensity;
         _cpuTimingSubmission = _submittedFrameCount;
         _worldCpuMilliseconds = Math.Max(0, _recordedWorldCpuMilliseconds - (_shadowCpu ?? 0));
         _overlayCpuMilliseconds = _recordedOverlayCpuMilliseconds;
@@ -1433,7 +1439,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         }
 
         ResourceDescription depthDescription = ResourceDescription.Texture2D(
-            DepthBufferFormat,
+            _atmosphere.Enabled ? Format.R32_Typeless : DepthBufferFormat,
             checked((uint)width),
             checked((uint)height),
             flags: ResourceFlags.AllowDepthStencil);
@@ -1456,12 +1462,14 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             _depthTarget,
             depthViewDescription,
             _dsvHeap.GetCPUDescriptorHandleForHeapStart());
+        CreateAtmosphereDepthView();
         CreateSceneTargets(width, height);
     }
 
     private void ReleaseRenderTargets()
     {
         ReleaseSceneTargets();
+        ReleaseAtmosphereDepthView();
         _depthTarget?.Dispose();
         _depthTarget = null;
 
@@ -1527,6 +1535,8 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
 
     private void ResetFrameMeasurements()
     {
+        _submittedAtmosphereApplied = false;
+        _submittedAtmosphereDensity = 0;
         _submittedShadowDraws = _submittedShadowCasters = 0;
         _submittedShadowCpu = null;
         _shadowGpu = null;
