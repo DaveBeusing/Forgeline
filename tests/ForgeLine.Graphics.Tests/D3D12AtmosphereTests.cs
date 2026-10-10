@@ -37,9 +37,38 @@ public sealed class D3D12AtmosphereTests
         int overlay = (20 * 320 + 280) * 4;
         Assert.Equal(missing.AsSpan(clear, 4).ToArray(), fog.AsSpan(clear, 4).ToArray());
         Assert.Equal(missing.AsSpan(overlay, 4).ToArray(), fog.AsSpan(overlay, 4).ToArray());
+        foreach (float exposure in new[] { 0.25f, 1.15f, 4f })
+        {
+            graphics.ConfigureSceneOutput(new(true, exposure, true));
+            byte[] exposed = Capture(true);
+            float value = expectedLinear * exposure;
+            float mapped = Math.Clamp((value * (2.51f * value + 0.03f)) /
+                (value * (2.43f * value + 0.59f) + 0.14f), 0, 1);
+            int expectedMapped = (int)MathF.Round((1.055f * MathF.Pow(mapped, 1 / 2.4f) - 0.055f) * 255);
+            Assert.InRange(Math.Abs(exposed[center] - expectedMapped), 0, 1);
+            Assert.Equal(missing.AsSpan(overlay, 4).ToArray(), exposed.AsSpan(overlay, 4).ToArray());
+        }
+        graphics.ConfigureSceneOutput(new(true, 1, false));
+        if (quality == AtmosphereQuality.Height)
+        {
+            graphics.ConfigureAtmosphere(settings with { HeightFalloff = 0.05f });
+            byte[] elevated = Capture(true, 100);
+            // Numerical integration is independent of the shader's closed-form integral.
+            const int samples = 4096;
+            double densityIntegral = 0;
+            double worldY = 1 - 2 * (120.5 / 240);
+            for (int i = 0; i < samples; i++)
+                densityIntegral += Math.Exp(-(100 + (worldY - 100) * ((i + 0.5) / samples)) * 0.05);
+            double rayLength = Math.Sqrt(100.5 * 100.5 + (worldY - 100) * (worldY - 100));
+            double opacity = 1 - Math.Exp(-rayLength * 0.005 * densityIntegral / samples);
+            int numericalByte = (int)Math.Round((1.055 * Math.Pow(opacity, 1 / 2.4) - 0.055) * 255);
+            Assert.InRange(Math.Abs(elevated[center] - numericalByte), 0, 1);
+            Assert.True(elevated[center] < fog[center]);
+        }
         graphics.ConfigureAtmosphere(settings with { Density = 0 });
         Assert.Equal(missing, Capture(true));
         Assert.Equal(4, graphics.Diagnostics.Resources.ShaderResourceDescriptorsUsed);
+        Assert.Equal(4, graphics.Diagnostics.Resources.PeakShaderResourceDescriptorsUsed);
         Assert.Throws<InvalidOperationException>(() => graphics.ConfigureSceneOutput(new(false, 1, false)));
         graphics.Resize(0, 0);
         ulong submitted = graphics.Diagnostics.Surface.SubmittedFrameCount;
@@ -54,7 +83,7 @@ public sealed class D3D12AtmosphereTests
         graphics.ConfigureSceneOutput(new(false, 1, false));
         Assert.Equal(0, graphics.Diagnostics.Resources.ShaderResourceDescriptorsUsed);
 
-        byte[] Capture(bool view)
+        byte[] Capture(bool view, float cameraHeight = 0)
         {
             var compiler = new DxcShaderCompiler();
             var vertex = compiler.Compile("""
@@ -74,7 +103,7 @@ public sealed class D3D12AtmosphereTests
             return graphics.CaptureFrame(GraphicsColor.ForgeLineClear, context =>
             {
                 Assert.Throws<InvalidOperationException>(() => graphics.ConfigureAtmosphere(settings));
-                if (view) context.SetAtmosphereView(new(Matrix4x4.Identity, new(0, 0, -100), 420));
+                if (view) context.SetAtmosphereView(new(Matrix4x4.Identity, new(0, cameraHeight, -100), 420));
                 context.SetPipeline(world);
                 context.SetScissor(context.Width / 4, 0, context.Width * 3 / 4, context.Height);
                 context.Draw(3);
