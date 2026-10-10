@@ -39,6 +39,9 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
 
     public int FrameIndex { get; }
 
+    public void BeginParticlePass() { ValidateRecording(); _owner.BeginParticlePass(); _pipeline = null; }
+    public void EndParticlePass() { ValidateRecording(); _owner.EndParticlePass(); _pipeline = null; }
+
     public void SetAtmosphereView(GraphicsAtmosphereView view)
     {
         ValidateRecording();
@@ -113,6 +116,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         _commandList.SetGraphicsRootSignature(d3d12Pipeline.RootSignature);
         _commandList.SetPipelineState(d3d12Pipeline.PipelineState);
         if (pipeline.Description.DirectionalShadowReceiver) _owner.BindDirectionalShadowReceiver(d3d12Pipeline);
+        _owner.ValidateParticlePipeline(d3d12Pipeline);
         _commandList.IASetPrimitiveTopology(
             d3d12Pipeline.Description.PrimitiveTopology switch
             {

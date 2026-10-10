@@ -23,11 +23,14 @@ public sealed record GraphicsDebugDiagnostics(
     long WarningCount,
     long ErrorCount);
 
+public readonly record struct GraphicsParticleDiagnostics(bool DepthEnabled, ulong GpuSubmissionFence, double? UpdateAndRenderGpuMilliseconds, int DepthDescriptors);
+
 public sealed record GraphicsDiagnostics(
     GraphicsDeviceInfo Device,
     GraphicsSurfaceInfo Surface)
 {
     public GraphicsFrameDiagnostics? Frame { get; init; }
+    public GraphicsParticleDiagnostics? Particles { get; init; }
     public GraphicsDirectionalShadowDiagnostics? DirectionalShadows { get; init; }
     public GraphicsAtmosphereDiagnostics? Atmosphere { get; init; }
     public GraphicsMemoryDiagnostics? Memory { get; init; }

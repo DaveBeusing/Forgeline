@@ -2,6 +2,8 @@ namespace ForgeLine.Graphics;
 
 public interface IGraphicsDevice : IDisposable
 {
+    bool SupportsParticleRendering => false;
+    void ConfigureParticleDepth(bool enabled) { if (enabled) throw new NotSupportedException("Depth-aware particles are unsupported."); }
     GraphicsAtmosphereSettings Atmosphere => GraphicsAtmosphereSettings.Default;
     void ConfigureAtmosphere(GraphicsAtmosphereSettings settings)
     {

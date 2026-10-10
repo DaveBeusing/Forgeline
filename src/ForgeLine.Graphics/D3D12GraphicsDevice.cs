@@ -251,8 +251,9 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             {
                 DirectionalShadows = ShadowDiagnostics,
                 Atmosphere = AtmosphereDiagnostics,
+                Particles = new(_particleDepth, _particleGpuFence, _particleGpu, _particleDepth ? 1 : 0),
                 Frame = new GraphicsFrameDiagnostics(
-                    new GraphicsFramePlan(_surfaceLifecycle.Width, _surfaceLifecycle.Height, _configuration.BufferCount, _sceneOutput.Enabled, _directionalShadows.Resolution, _atmosphere.Enabled),
+                    new GraphicsFramePlan(_surfaceLifecycle.Width, _surfaceLifecycle.Height, _configuration.BufferCount, _sceneOutput.Enabled, _directionalShadows.Resolution, _atmosphere.Enabled || _particleDepth),
                     _cpuTimingSubmission, _worldCpuMilliseconds, _overlayCpuMilliseconds,
                     _gpuTimingFence, _worldGpuMilliseconds, _overlayGpuMilliseconds)
                 {
@@ -374,6 +375,12 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             rootParameters.Add(new RootParameter1(new RootDescriptorTable1(new DescriptorRange1(DescriptorRangeType.ShaderResourceView, 1, 15)), ShaderVisibility.Pixel));
         }
 
+        if (description.SceneDepthReceiver)
+        {
+            if (!_particleDepth) throw new NotSupportedException("Particle depth must be configured before pipeline creation.");
+            rootParameters.Add(new RootParameter1(new RootDescriptorTable1(new DescriptorRange1(DescriptorRangeType.ShaderResourceView, 1, 15)), ShaderVisibility.Pixel));
+        }
+
         StaticSamplerDescription[]? samplers =
             description.PixelTextureCount > 0
                 ? [
@@ -476,6 +483,16 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 DepthStencilFormat = DepthBufferFormat,
                 SampleDescription = SampleDescription.Default
             };
+
+            if (description.SceneDepthReceiver)
+            {
+                // A blended scene pixel must not retain the negative clear/debug
+                // alpha sentinel consumed by the final output transform.
+                var blend = BlendDescription.NonPremultiplied;
+                blend.RenderTarget[0].SourceBlendAlpha = Blend.One;
+                blend.RenderTarget[0].DestinationBlendAlpha = Blend.Zero;
+                pipelineStateDescription.BlendState = blend;
+            }
 
             ID3D12PipelineState pipelineState =
                 _device.CreateGraphicsPipelineState(pipelineStateDescription);
@@ -708,6 +725,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         _recording = true;
         _constantOffset = 256;
         _shadowRecorded = _shadowRecording = _worldDrawRecorded = false;
+        _particleRecording = _particleRecorded = false;
         _atmosphereView = null;
         _recordedAtmosphereApplied = false;
         _recordedAtmosphereDensity = 0;
@@ -924,6 +942,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
     private void DisposeNativeObjects()
     {
         ReleaseDirectionalShadows();
+        ReleaseParticleQueries();
         if (_renderTargets is not null)
         {
             ReleaseRenderTargets();
@@ -1195,6 +1214,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         ulong worldEnd = _timestampReadback.GetData<ulong>(offset + 2 * sizeof(ulong));
         ulong overlayStart = _timestampReadback.GetData<ulong>(offset + 3 * sizeof(ulong));
         ReadCompletedShadowTiming(frameIndex);
+        ReadCompletedParticleTiming(frameIndex);
 
         if (end >= start && _frameFenceValues[frameIndex] > _gpuTimingFence)
         {
@@ -1225,7 +1245,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
     internal bool BeginPass(GraphicsFramePass pass)
     {
         ValidateRecording();
-        if (_shadowRecording) throw new InvalidOperationException("End the shadow pass before entering world or overlay passes.");
+        if (_shadowRecording || _particleRecording) throw new InvalidOperationException("End shadow/particle submission before entering world or overlay passes.");
         if (!_passState.Enter(pass))
             return false;
         long now = System.Diagnostics.Stopwatch.GetTimestamp();
@@ -1439,7 +1459,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         }
 
         ResourceDescription depthDescription = ResourceDescription.Texture2D(
-            _atmosphere.Enabled ? Format.R32_Typeless : DepthBufferFormat,
+            (_atmosphere.Enabled || _particleDepth) ? Format.R32_Typeless : DepthBufferFormat,
             checked((uint)width),
             checked((uint)height),
             flags: ResourceFlags.AllowDepthStencil);
@@ -1535,6 +1555,8 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
 
     private void ResetFrameMeasurements()
     {
+        _particleGpu = null; _particleGpuFence = 0;
+        if (_particleSamples is not null) Array.Clear(_particleSamples);
         _submittedAtmosphereApplied = false;
         _submittedAtmosphereDensity = 0;
         _submittedShadowDraws = _submittedShadowCasters = 0;
