@@ -50,6 +50,7 @@ internal static class Program
                     settingsRoot);
             using var platform =
                 new WindowsPlatform();
+            bool applicationRestart = false;
 
             while (true)
             {
@@ -79,7 +80,8 @@ internal static class Program
                         smokeTest,
                         renderInstanceCount,
                         visualQualificationOutput,
-                        skipSplash);
+                        skipSplash,
+                        applicationRestart);
 
                 startup.Finish();
                 if (diagnosticsOutput is not null)
@@ -92,6 +94,7 @@ internal static class Program
                     return result;
                 }
 
+                applicationRestart = true;
                 if (diagnosticsOutput is not null)
                 {
                     startup = new StartupDiagnostics(processEntryTimestamp, processId, ++launchId);

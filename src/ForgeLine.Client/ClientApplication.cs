@@ -82,7 +82,8 @@ internal sealed class ClientApplication
         bool smokeTest,
         int renderInstanceCount,
         string? visualQualificationOutput = null,
-        bool skipSplash = false)
+        bool skipSplash = false,
+        bool applicationRestart = false)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(renderInstanceCount);
 
@@ -110,7 +111,9 @@ internal sealed class ClientApplication
             new NewGameModel();
         RuntimeAssetCatalog runtimeAssets;
         IReadOnlyList<LoadGameEntry> startupSaves;
-        bool showSplash = !smokeTest && !skipSplash && _settings.ShowStudioSplash;
+        string? splashBypassReason = ClientStartupLoop.SplashBypassReason(
+            smokeTest, skipSplash, _settings.ShowStudioSplash, applicationRestart);
+        bool showSplash = splashBypassReason is null;
         _startup.Begin(StartupPhase.BootRenderer);
         using (var bootRenderer = new ClientFrontendRenderHost(bootstrapTarget, _startup,
             ClientStartupLoop.InitialSurface(showSplash), asynchronousStartup: true))
@@ -130,7 +133,7 @@ internal sealed class ClientApplication
                         ClientSaveCatalog.Discover(startupSaveDirectory, token)));
             var startupInput = new InputState();
             bool completed = ClientStartupLoop.Run(coordinator, showSplash,
-                smokeTest ? "SmokeMode" : skipSplash ? "CommandLine" : "Settings", _startup,
+                splashBypassReason ?? string.Empty, _startup,
                 pumpEvents: () =>
                 {
                     startupInput.BeginFrame();
