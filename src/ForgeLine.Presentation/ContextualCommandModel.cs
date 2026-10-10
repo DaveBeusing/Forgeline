@@ -13,9 +13,8 @@ internal readonly record struct ContextualCommand(
 internal static class ContextualCommandModel
 {
     public static PlayerActionSnapshot? ResolveActions(PresentationSnapshot? snapshot) =>
-        snapshot?.PlayerActions is { } actions &&
-        actions.SessionId == snapshot.SessionId && actions.Tick == snapshot.Tick &&
-        snapshot.PlayerExperience is { IsMatchComplete: false }
+        PlayerActionDockHudModel.ResolveActions(snapshot) is { } actions &&
+        snapshot!.PlayerExperience is { IsMatchComplete: false } experience && experience.Tick == snapshot.Tick
             ? actions : null;
 
     public static string Status(PresentationSnapshot? snapshot)

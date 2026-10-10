@@ -107,6 +107,8 @@ public sealed class ContextualCommandTests
         Assert.Equal(0, ContextualCommandModel.Count(Snapshot(kind: PlayerSelectionKind.Building, eligible: 0)));
         Assert.Equal(0, ContextualCommandModel.Count(Snapshot(actionTick: 3)));
         Assert.Equal(0, ContextualCommandModel.Count(Snapshot(actionSession: 2)));
+        Assert.Equal(0, ContextualCommandModel.Count(Snapshot(experienceTick: 3)));
+        Assert.Equal(0, ContextualCommandModel.Count(Snapshot(sessionValue: 0, actionSession: 0)));
         Assert.Equal(0, ContextualCommandModel.Count(Snapshot(terminal: true)));
         Assert.Equal("MATCH COMPLETE", ContextualCommandModel.Status(Snapshot(terminal: true)));
     }
@@ -161,6 +163,27 @@ public sealed class ContextualCommandTests
     }
 
     [Fact]
+    public void SuppressionFocusLossAndSessionChangeDiscardRecordedEdges()
+    {
+        var controller = new PlayerActionPanelController();
+        var input = new InputState();
+        controller.Update(input, Snapshot(), 1600, 900);
+        Click(input, 2);
+        input.SuppressHeldInput();
+        controller.Update(input, Snapshot(), 1600, 900);
+        Assert.False(controller.TryTakeRequest(out _));
+        input.Reset();
+        Click(input, 2);
+        input.Apply(PlatformInputEvent.FocusLost());
+        controller.Update(input, Snapshot(), 1600, 900);
+        Assert.False(controller.TryTakeRequest(out _));
+        input.BeginFrame();
+        Click(input, 2);
+        controller.Update(input, Snapshot(sessionValue: 2, actionSession: 2), 1600, 900);
+        Assert.False(controller.TryTakeRequest(out _));
+    }
+
+    [Fact]
     public void RepeatedContextMappingHasNoWarmAllocations()
     {
         var snapshot = Snapshot();
@@ -173,11 +196,12 @@ public sealed class ContextualCommandTests
 
     private static PresentationSnapshot Snapshot(PlayerSelectionKind kind = PlayerSelectionKind.Unit,
         int count = 1, int eligible = 1, ulong actionTick = 4, ulong actionSession = 1,
-        bool terminal = false, int pending = 0, bool core = false)
+        bool terminal = false, int pending = 0, bool core = false,
+        ulong sessionValue = 1, ulong experienceTick = 4)
     {
         var tick = new SimulationTick(4);
-        var session = new SimulationSessionId(1);
-        var experience = default(PlayerExperienceSnapshot) with { Tick = tick,
+        var session = new SimulationSessionId(sessionValue);
+        var experience = default(PlayerExperienceSnapshot) with { Tick = new SimulationTick(experienceTick),
             Selection = PlayerSelectionSummary.Empty with { Count = count, Kind = kind,
                 CommonBuildingId = core ? BuildingIds.CommandCore : default },
             MatchStatus = terminal ? PlayerMatchStatus.Victory : default };

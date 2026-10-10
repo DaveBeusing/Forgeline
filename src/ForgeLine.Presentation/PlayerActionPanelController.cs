@@ -150,7 +150,7 @@ public sealed class PlayerActionPanelController
             SimulationSessionId.None);
 
         PlayerActionSnapshot? actions =
-            snapshot?.PlayerActions;
+            PlayerActionDockHudModel.ResolveActions(snapshot);
 
         if (snapshot?.PlayerExperience is
                 PlayerExperienceSnapshot experience &&
@@ -298,7 +298,7 @@ public sealed class PlayerActionPanelController
 
         bool hasPress = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var pressOrigin);
         var clickPosition = hasPress ? pressOrigin : input.PointerPosition;
-        bool clicked = !displayChanged && !sessionChanged && freshPress;
+        bool clicked = !displayChanged && !sessionChanged && freshPress && hasPress && input.HasPointerPosition;
         if (clicked && ContextualCommandModel.TryHit(clickPosition, snapshot, layout, out var command))
         {
             PointerCaptured = true;

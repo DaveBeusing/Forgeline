@@ -128,7 +128,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             graphics.Height);
 
         PlayerActionSnapshot? actions =
-            snapshot.PlayerActions;
+            PlayerActionDockHudModel.ResolveActions(snapshot);
 
         if (panel.IsOpen)
         {
