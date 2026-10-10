@@ -23,6 +23,8 @@ internal sealed partial class D3D12GraphicsDevice
         ThrowIfDisposed();
         ThrowIfRecording();
         settings.Validate();
+        if (_atmosphere.Enabled && !settings.Enabled)
+            throw new InvalidOperationException("Disable atmosphere before disabling linear scene composition.");
         if (settings == _sceneOutput)
             return;
         WaitForIdle();
@@ -104,6 +106,7 @@ internal sealed partial class D3D12GraphicsDevice
 
     private D3D12GraphicsPipeline CreateSceneComposite()
     {
+        if (_atmosphere.Enabled) return CreateAtmosphereComposite();
         var compiler = new DxcShaderCompiler();
         GraphicsShaderBytecode vertex = compiler.Compile("""
             cbuffer OutputSettings : register(b0) { float Exposure; float Aces; };
@@ -145,8 +148,14 @@ internal sealed partial class D3D12GraphicsDevice
         long started = System.Diagnostics.Stopwatch.GetTimestamp();
         _commandList.ResourceBarrierTransition(_sceneTargets![_frameIndex],
             ResourceStates.RenderTarget, ResourceStates.PixelShaderResource);
+        if (_atmosphere.Enabled)
+        {
+            _commandList.OMSetRenderTargets(new CpuDescriptorHandle(_rtvHeap.GetCPUDescriptorHandleForHeapStart(),
+                _frameIndex, _rtvDescriptorSize));
+            _commandList.ResourceBarrierTransition(_depthTarget!, ResourceStates.DepthWrite, ResourceStates.PixelShaderResource);
+        }
         _commandList.OMSetRenderTargets(new CpuDescriptorHandle(_rtvHeap.GetCPUDescriptorHandleForHeapStart(),
-            _frameIndex, _rtvDescriptorSize), _dsvHeap.GetCPUDescriptorHandleForHeapStart());
+            _frameIndex, _rtvDescriptorSize), _atmosphere.Enabled ? null : _dsvHeap.GetCPUDescriptorHandleForHeapStart());
         _commandList.RSSetViewport(0, 0, _surfaceLifecycle.Width, _surfaceLifecycle.Height);
         _commandList.RSSetScissorRect(Vortice.Mathematics.RectI.FromLTRB(0, 0, _surfaceLifecycle.Width, _surfaceLifecycle.Height));
         UseResource(_sceneComposite!.Lifetime);
@@ -156,9 +165,26 @@ internal sealed partial class D3D12GraphicsDevice
         _commandList.SetDescriptorHeaps(_shaderResourceHeap);
         _commandList.SetGraphicsRootDescriptorTable(1, new GpuDescriptorHandle(
             _shaderResourceHeap.GetGPUDescriptorHandleForHeapStart(), _sceneDescriptors![_frameIndex], _shaderResourceDescriptorSize));
-        ReadOnlySpan<float> settings = stackalloc float[] { _sceneOutput.Exposure, _sceneOutput.AcesFitted ? 1 : 0 };
-        _commandList.SetGraphicsRoot32BitConstants(0, settings);
+        if (_atmosphere.Enabled)
+        {
+            _commandList.SetGraphicsRootDescriptorTable(2, new GpuDescriptorHandle(
+                _shaderResourceHeap.GetGPUDescriptorHandleForHeapStart(), _atmosphereDepthDescriptor, _shaderResourceDescriptorSize));
+            Span<float> constants = stackalloc float[32];
+            WriteAtmosphereConstants(constants);
+            _commandList.SetGraphicsRoot32BitConstants(0, constants);
+        }
+        else
+        {
+            ReadOnlySpan<float> settings = stackalloc float[] { _sceneOutput.Exposure, _sceneOutput.AcesFitted ? 1 : 0 };
+            _commandList.SetGraphicsRoot32BitConstants(0, settings);
+        }
         _commandList.DrawInstanced(3, 1, 0, 0);
+        if (_atmosphere.Enabled)
+        {
+            _commandList.ResourceBarrierTransition(_depthTarget!, ResourceStates.PixelShaderResource, ResourceStates.DepthWrite);
+            _commandList.OMSetRenderTargets(new CpuDescriptorHandle(_rtvHeap.GetCPUDescriptorHandleForHeapStart(),
+                _frameIndex, _rtvDescriptorSize), _dsvHeap.GetCPUDescriptorHandleForHeapStart());
+        }
         _recordedCompositeCpuMilliseconds = System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
     }
 }

@@ -175,8 +175,15 @@ function Invoke-ClientSmoke {
             throw "Shadow descriptor count does not match the back-buffer count during '$ExpectedMode' qualification."
         }
     }
+    $atmosphereDescriptors = 0
+    if ($null -ne $metrics.PSObject.Properties['atmosphere'] -and $null -ne $metrics.atmosphere) {
+        $atmosphereDescriptors = $metrics.atmosphere.depthDescriptors
+        if ($atmosphereDescriptors -notin @(0, 1)) {
+            throw "Atmosphere must reuse the surface depth with at most one SRV during '$ExpectedMode' qualification."
+        }
+    }
     if ($metrics.shaderResourceDescriptorsUsed -ne
-        ($metrics.loadedTextureCount + $sceneDescriptors + $shadowDescriptors)) {
+        ($metrics.loadedTextureCount + $sceneDescriptors + $shadowDescriptors + $atmosphereDescriptors)) {
         throw "Current SRV descriptor usage does not match asset textures plus scene targets during '$ExpectedMode' qualification."
     }
 

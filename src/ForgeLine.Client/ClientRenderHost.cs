@@ -46,6 +46,7 @@ internal readonly record struct ClientVisualQualificationSnapshot(
     public bool GpuTimingAvailable { get; init; }
     public GraphicsFrameDiagnostics? FramePasses { get; init; }
     public GraphicsDirectionalShadowDiagnostics? DirectionalShadows { get; init; }
+    public GraphicsAtmosphereDiagnostics? Atmosphere { get; init; }
     public int Lod1Instances { get; init; }
     public int Lod2Instances { get; init; }
 
@@ -142,6 +143,7 @@ internal sealed class ClientRenderHost : IDisposable
     private readonly RtsCameraSettings? _cameraSettings;
     private readonly RuntimeAssetCatalog? _runtimeAssets;
     private readonly SceneLightingSettings _sceneLighting;
+    private readonly SceneAtmosphereSettings _sceneAtmosphere = SceneAtmosphereSettings.Default;
     private readonly Action<ClientRenderFrame>? _testRenderAction;
     private readonly AutoResetEvent _signal = new(false);
     private readonly ManualResetEventSlim _started = new(false);
@@ -168,7 +170,8 @@ internal sealed class ClientRenderHost : IDisposable
         bool asynchronousStartup = false,
         SimulationSessionId? expectedSession = null,
         ClientFrontendRenderHost? transitionHost = null,
-        Func<ClientSimulationTelemetry>? simulationTelemetry = null)
+        Func<ClientSimulationTelemetry>? simulationTelemetry = null,
+        SceneAtmosphereSettings? sceneAtmosphere = null)
     {
         _startup = startup ?? StartupDiagnostics.Disabled;
         _asynchronousStartup = asynchronousStartup;
@@ -194,6 +197,8 @@ internal sealed class ClientRenderHost : IDisposable
             sceneLighting ??
             SceneLightingSettings.Default;
         _sceneLighting.Validate();
+        _sceneAtmosphere = sceneAtmosphere ?? SceneAtmosphereSettings.Default;
+        _sceneAtmosphere.Validate();
 
         _thread = transitionHost?.ExecutionThread ?? CreateThread();
         if (transitionHost is not null) transitionHost.ContinueWith(device => RenderLoop(device));
@@ -398,9 +403,19 @@ internal sealed class ClientRenderHost : IDisposable
             using IGraphicsDevice? ownedGraphics = existingDevice is null
                 ? GraphicsDeviceFactory.CreateForWindowTarget(initialTarget) : null;
             IGraphicsDevice graphics = existingDevice ?? ownedGraphics!;
+            GraphicsAtmosphereSettings atmosphere = _sceneAtmosphere.Graphics;
+            string? atmosphereProfile = Environment.GetEnvironmentVariable("FORGELINE_ATMOSPHERE_QUALITY");
+            if (!string.IsNullOrEmpty(atmosphereProfile))
+            {
+                if (!Enum.TryParse(atmosphereProfile, true, out AtmosphereQuality quality) || !Enum.IsDefined(quality))
+                    throw new ArgumentException("FORGELINE_ATMOSPHERE_QUALITY must be Disabled, Distance or Height.");
+                atmosphere = atmosphere with { Quality = quality };
+            }
+            atmosphere.Validate();
             graphics.ConfigureSceneOutput(new GraphicsSceneOutputSettings(
-                Environment.GetEnvironmentVariable("FORGELINE_LINEAR_SCENE_OUTPUT") == "1",
+                atmosphere.Enabled || Environment.GetEnvironmentVariable("FORGELINE_LINEAR_SCENE_OUTPUT") == "1",
                 _sceneLighting.Exposure, _sceneLighting.ToneMapping == SceneToneMappingMode.AcesFitted));
+            graphics.ConfigureAtmosphere(atmosphere);
             string? shadowProfile = Environment.GetEnvironmentVariable("FORGELINE_SHADOW_QUALITY");
             if (!string.IsNullOrEmpty(shadowProfile) && !Enum.TryParse(shadowProfile, true, out DirectionalShadowQuality _))
                 throw new ArgumentException("FORGELINE_SHADOW_QUALITY must be Disabled, Low, Medium or High.");
@@ -627,6 +642,8 @@ internal sealed class ClientRenderHost : IDisposable
                     context =>
                     {
                         context.BeginPass(GraphicsFramePass.World);
+                        if (atmosphere.Enabled)
+                            context.SetAtmosphereView(SceneAtmosphereSettings.CreateView(renderCamera, context.Width, context.Height));
                         if (shadowSettings.Enabled)
                         {
                             GraphicsDirectionalShadowFrame shadowFrame = DirectionalShadowProjection.Create(current.Camera, _sceneLighting, shadowSettings);
@@ -834,6 +851,7 @@ internal sealed class ClientRenderHost : IDisposable
             GpuTimingAvailable = completedGraphics.GpuTimingAvailable,
             FramePasses = completedGraphics.Frame,
             DirectionalShadows = completedGraphics.DirectionalShadows,
+            Atmosphere = completedGraphics.Atmosphere,
             GpuMilliseconds = completedGraphics.GpuTimingAvailable ? completedGraphics.GpuFrameMilliseconds : null,
             DebugLayerEnabled = completedGraphics.Device.DebugLayerEnabled,
             DebugLayerWarningCount = completedGraphics.Debug.WarningCount,
@@ -904,6 +922,7 @@ internal sealed class ClientRenderHost : IDisposable
                     graphics.GpuTimingAvailable,
                 FramePasses = graphics.Frame,
                 DirectionalShadows = graphics.DirectionalShadows,
+                Atmosphere = graphics.Atmosphere,
                 DebugLayerEnabled =
                     graphics.Device.DebugLayerEnabled,
                 PeakLoadedTextureCount =

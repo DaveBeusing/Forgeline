@@ -299,3 +299,11 @@ The development tactical opponent consumes `FactionIntelligenceSnapshot` rather 
 This preserves the same hidden-state boundary used by player targeting.
 
 See [Combat Orders, Tactical Behavior, and Readiness](CombatOrdersAndReadiness.md).
+
+## Atmospheric visual haze
+
+Atmospheric scene fog is independent of tactical fog of war. Its copied color, distance/height density and camera values belong to Presentation/Client and Graphics; they never enter intelligence stores, targeting policy, simulation commands, saves or replays. It affects only already authorized world color/depth before output transfer.
+
+Unexplored/hidden enemy transforms cannot supply fog depth, color or shadow casters. Radar-only and last-known contacts remain bounded copied Overlay markers, with the existing identity/targetability rules. HUD, minimap, warning colors and tactical icons are composed after haze. Atmospheric opacity is not an intelligence state and cannot grant or revoke detection, identification or a combat target.
+
+Native pixel regressions verify hidden-object invariance and exact Overlay preservation; existing extraction/targeting and deterministic save tests remain authoritative. See [Graphics](Graphics.md#atmospheric-fog-and-scene-depth) for visual controls and qualification limits.

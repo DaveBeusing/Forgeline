@@ -39,6 +39,12 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
 
     public int FrameIndex { get; }
 
+    public void SetAtmosphereView(GraphicsAtmosphereView view)
+    {
+        ValidateRecording();
+        _owner.SetAtmosphereView(view);
+    }
+
     public void BeginDirectionalShadowPass(GraphicsDirectionalShadowFrame frame)
     {
         ValidateRecording();
