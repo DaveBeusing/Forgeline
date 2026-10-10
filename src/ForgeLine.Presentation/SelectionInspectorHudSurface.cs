@@ -277,7 +277,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         EmitQuad(region.X, region.Y, region.Width, region.Height, PanelColor, width, height);
         Span<char> buffer = stackalloc char[128];
         var text = new HudTextBuilder(buffer);
-        text.Append("GROUP "); text.Append(group.TotalCount); text.Append(" LIVE "); text.Append(group.LiveCount);
+        text.Append("GROUP "); text.Append(group.TotalCount); text.Append(" UNITS "); text.Append(group.LiveCount);
         text.Append(" COMBAT "); text.Append(group.CombatCount);
         GroupText(text.Written, 6, region, TextColor, width, height);
         text = new HudTextBuilder(buffer);

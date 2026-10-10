@@ -17,6 +17,8 @@ public sealed class CombatGroupCardController
     private GameplayHudLayout _layout;
     private bool _hasLayout;
     private readonly List<EntityId> _filtered = [];
+    private EntityId _lastDamaged;
+    private EntityId _lastUnsupplied;
 
     public CombatGroupCardResult Update(InputState input, PresentationSnapshot? snapshot,
         SelectionSet selection, in GameplayHudLayout layout, bool blocked = false)
@@ -29,6 +31,7 @@ public sealed class CombatGroupCardController
         bool transition = _hasLayout && (_layout != layout || _session != snapshot?.SessionId);
         _layout = layout;
         _hasLayout = true;
+        if (transition || blocked || input.FocusLostThisFrame) { _lastDamaged = default; _lastUnsupplied = default; }
         _session = snapshot?.SessionId ?? default;
         bool captured = input.HasPointerPosition && layout.SelectionInspector.Contains(input.PointerPosition);
         bool pressedInside = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin) &&
@@ -53,12 +56,29 @@ public sealed class CombatGroupCardController
             }
             return index switch
             {
-                8 => new(true, FocusMember: group.DamagedMember),
-                9 => new(true, FocusMember: group.UnsuppliedMember),
+                8 => new(true, FocusMember: NextAttention(operational, selection, damaged: true)),
+                9 => new(true, FocusMember: NextAttention(operational, selection, damaged: false)),
                 10 => new(true, CycleFormation: group.CombatCount > 0),
                 _ => new(true, FocusSelection: group.LiveCount > 0)
             };
         }
         return new(captured);
     }
+    private EntityId NextAttention(CombatGroupOperationalSnapshot operational, SelectionSet selection, bool damaged)
+    {
+        EntityId previous = damaged ? _lastDamaged : _lastUnsupplied;
+        EntityId first = default, next = default;
+        foreach (EntityId entity in selection.Entities)
+        {
+            if (!operational.TryGet(entity, out var member) || !(damaged
+                ? member.HasHealth && member.HealthFraction <= 0.25
+                : member.HasSupply && member.SupplyStatus is BattlefieldSupplyStatus.Critical or BattlefieldSupplyStatus.Unsupplied)) continue;
+            if (!first.IsValid) first = entity;
+            if (!next.IsValid && entity.CompareTo(previous) > 0) next = entity;
+        }
+        if (!next.IsValid) next = first;
+        if (damaged) _lastDamaged = next; else _lastUnsupplied = next;
+        return next;
+    }
+
 }

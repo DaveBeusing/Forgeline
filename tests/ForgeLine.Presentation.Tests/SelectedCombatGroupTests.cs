@@ -3,6 +3,7 @@ using ForgeLine.Game;
 using ForgeLine.Simulation;
 using ForgeLine.Input;
 using ForgeLine.Graphics;
+using ForgeLine.Combat;
 using ForgeLine.Platform;
 using System.Numerics;
 using Xunit;
@@ -49,6 +50,77 @@ public sealed class SelectedCombatGroupTests
         Assert.Equal(1, group.LiveCount);
         Assert.Equal(1, group.Composition(7));
         Assert.Equal(new EntityId(2, 1), group.DamagedMember);
+    }
+
+    [Fact]
+    public void ExtractionCopiesOnlyOwnedLiveControllableUnitsAndRetainedFactsStayImmutable()
+    {
+        using var scenario = WorldHoverExtractionTests.CreateScenario();
+        var entities = scenario.Simulation.Entities;
+        EntityId Add(uint owner, ControllableEntityCategory category, double health)
+        {
+            var entity = entities.CreateEntity();
+            entities.AddComponent(entity, new ControllableEntity(new PlayerId(owner), category));
+            entities.AddComponent(entity, new UnitIdentity(UnitIds.MainBattleTank, new(1)));
+            entities.AddComponent(entity, new HealthState(health, 100));
+            return entity;
+        }
+        var owned = Add(1, ControllableEntityCategory.Unit, 20);
+        var foreign = Add(2, ControllableEntityCategory.Unit, 80);
+        var dead = Add(1, ControllableEntityCategory.Unit, 0);
+        var building = Add(1, ControllableEntityCategory.Building, 80);
+        var disabled = Add(1, ControllableEntityCategory.None, 80);
+        var buffer = WorldHoverExtractionTests.Observe(scenario, new PresentationInteractionState());
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var snapshot));
+        var operational = Assert.IsType<CombatGroupOperationalSnapshot>(SelectedCombatGroup.Resolve(snapshot));
+        Assert.Equal(snapshot.SessionId, operational.SessionId);
+        Assert.True(operational.TryGet(owned, out var member));
+        Assert.Equal(UnitIds.MainBattleTank, member.Unit);
+        Assert.False(member.CombatEligible);
+        Assert.False(operational.TryGet(foreign, out _));
+        Assert.False(operational.TryGet(dead, out _));
+        Assert.False(operational.TryGet(building, out _));
+        Assert.False(operational.TryGet(disabled, out _));
+        entities.SetComponent(owned, HealthState.Full(100));
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(operational.TryGet(owned, out var retained));
+        Assert.Equal(0.2, retained.HealthFraction);
+        var exposed = Assert.IsAssignableFrom<IList<CombatGroupMemberReadModel>>(operational.Members);
+        Assert.Throws<NotSupportedException>(() => exposed[0] = default);
+    }
+
+    [Fact]
+    public void AttentionFocusCyclesWithoutSelectingOrOrderingMembers()
+    {
+        var snapshot = Snapshot();
+        var selection = Selection();
+        var controller = new CombatGroupCardController();
+        var input = new InputState();
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        Click(input, layout, 8);
+        Assert.Equal(new EntityId(1, 1), controller.Update(input, snapshot, selection, layout).FocusMember);
+        Click(input, layout, 8);
+        Assert.Equal(new EntityId(2, 1), controller.Update(input, snapshot, selection, layout).FocusMember);
+        Click(input, layout, 8);
+        Assert.Equal(new EntityId(1, 1), controller.Update(input, snapshot, selection, layout).FocusMember);
+        Assert.Equal(2, selection.Count);
+    }
+
+    [Fact]
+    public void RebuildingSummaryAllocatesBoundedStorageIndependentOfArmySize()
+    {
+        var members = Enumerable.Range(1, 1000).Select(i => Member(new EntityId((uint)i, 1), UnitIds.MainBattleTank, true)).ToArray();
+        var selection = new SelectionSet();
+        selection.Replace(members.Select(static member => member.Entity).ToArray());
+        var operational = new CombatGroupOperationalSnapshot(new(4), members);
+        for (int i = 0; i < 128; i++) _ = SelectedCombatGroup.Create(operational, selection);
+        long start = GC.GetAllocatedBytesForCurrentThread();
+        int count = 0;
+        for (int i = 0; i < 256; i++) count = SelectedCombatGroup.Create(operational, selection).LiveCount;
+        long allocated = GC.GetAllocatedBytesForCurrentThread() - start;
+        Assert.Equal(1000, count);
+        Assert.InRange(allocated, 0, 256 * 512);
     }
 
     internal static CombatGroupMemberReadModel Member(EntityId entity, UnitId unit, bool combat) =>

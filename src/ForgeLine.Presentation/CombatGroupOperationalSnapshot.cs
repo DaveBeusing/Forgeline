@@ -32,6 +32,8 @@ public sealed class CombatGroupOperationalSnapshot
     private readonly CombatGroupMemberReadModel[] _members;
     private readonly EntityId[] _eligibleEntities;
     private readonly Dictionary<EntityId, CombatGroupMemberReadModel> _lookup;
+    private readonly IReadOnlyList<CombatGroupMemberReadModel> _memberView;
+    private readonly IReadOnlyCollection<EntityId> _eligibleView;
 
     public CombatGroupOperationalSnapshot(
         SimulationTick tick,
@@ -46,6 +48,7 @@ public sealed class CombatGroupOperationalSnapshot
         _members =
             members.Where(static member => member.Entity.IsValid).DistinctBy(static member => member.Entity).ToArray();
         _lookup = _members.ToDictionary(static member => member.Entity);
+        _memberView = Array.AsReadOnly(_members);
         _eligibleEntities =
             new EntityId[
                 _members.Length];
@@ -57,6 +60,7 @@ public sealed class CombatGroupOperationalSnapshot
             _eligibleEntities[index] =
                 _members[index].Entity;
         }
+        _eligibleView = Array.AsReadOnly(_eligibleEntities);
     }
 
     public SimulationSessionId SessionId { get; }
@@ -64,10 +68,10 @@ public sealed class CombatGroupOperationalSnapshot
     public SimulationTick Tick { get; }
 
     public IReadOnlyList<CombatGroupMemberReadModel> Members =>
-        _members;
+        _memberView;
 
     public IReadOnlyCollection<EntityId> EligibleEntities =>
-        _eligibleEntities;
+        _eligibleView;
 
     public bool TryGet(EntityId entity, out CombatGroupMemberReadModel member) =>
         _lookup.TryGetValue(entity, out member);
@@ -149,7 +153,7 @@ public static class CombatGroupOverviewModel
         ArgumentNullException.ThrowIfNull(registry);
         ArgumentNullException.ThrowIfNull(selection);
 
-        if (operational is null)
+        if (operational is null || (operational.SessionId.IsSpecified && operational.SessionId != registry.SessionId))
         {
             return CombatGroupOverviewView.Empty;
         }

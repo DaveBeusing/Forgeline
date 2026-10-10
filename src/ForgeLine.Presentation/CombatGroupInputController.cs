@@ -62,8 +62,11 @@ public sealed class CombatGroupInputController
             _lastRecallSlot = -1;
         _session = snapshot?.SessionId ?? default;
 
+        CombatGroupOperationalSnapshot? operational = snapshot?.CombatGroups;
+        if (operational is not null && (operational.Tick != snapshot!.Tick ||
+            (operational.SessionId.IsSpecified && operational.SessionId != snapshot.SessionId))) operational = null;
         IReadOnlyCollection<ForgeLine.Core.EntityId> valid =
-            snapshot?.CombatGroups?.EligibleEntities ??
+            operational?.EligibleEntities ??
             Array.Empty<ForgeLine.Core.EntityId>();
         registry.Synchronize(
             snapshot?.SessionId ??
@@ -109,7 +112,7 @@ public sealed class CombatGroupInputController
                 inputBlocked ||
                 input.FocusLostThisFrame ||
                 terminal ||
-                snapshot?.CombatGroups is null ||
+                operational is null ||
                 result.Handled)
             {
                 continue;
