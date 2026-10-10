@@ -378,6 +378,7 @@ internal sealed class ClientApplication
             new CombatGroupInputController();
         var combatGroupCard = new CombatGroupCardController();
         var operationsController = new OperationsController();
+        var alertController = new ActionableAlertController();
         var memberFocusSelection = new SelectionSet();
         var buildingPlacementController =
             new RtsBuildingPlacementController(LocalPlayer);
@@ -996,6 +997,7 @@ internal sealed class ClientApplication
                 shellBlocksGameplay || modalFrame || shellChanged || !window.IsFocused)
             {
                 operationsController.CancelInput(inputState);
+                alertController.CancelInput(inputState);
                 hoverTooltip.Reset();
                 presentationInteraction.SetHover(EntityId.Invalid, SimulationSessionId.None);
                 actionPanel.Close();
@@ -1149,8 +1151,34 @@ internal sealed class ClientApplication
                 selectionController.Selection, interactionLayout,
                 blocked: modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
                     buildingPlacementController.IsActive || tacticalTargetingController.IsActive);
-            var operationsResult = operationsController.Update(inputState, inputSnapshot, interactionLayout, presentationInteraction,
+            var alertResult = alertController.Update(inputState, inputSnapshot, interactionLayout,
                 blocked: modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
+                    buildingPlacementController.IsActive || tacticalTargetingController.IsActive ||
+                    operationsController.View.Open && !operationsController.View.Suppressed, seconds: frameElapsed.TotalSeconds);
+            hudInteraction.CapturePointer(alertResult.Captured);
+            if (alertResult.Target.IsValid && inputSnapshot is not null)
+            {
+                memberFocusSelection.SetSingle(alertResult.Target);
+                if (RtsCameraFocusController.TryGroup(inputSnapshot, LocalPlayer, memberFocusSelection, out Vector3 alertTarget))
+                {
+                    camera.CenterOn(alertTarget);
+                    selectionController.Selection.SetSingle(alertResult.Target);
+                    presentationInteraction.SetSelection(selectionController.Selection.Entities);
+                    selectionController.CancelPointerInteraction();
+                    minimapInteraction.Reset();
+                    actionPanel.Close();
+                    inputState.SuppressHeldInput();
+                }
+                else
+                {
+                    alertController.Unavailable();
+                    operationsController.OpenCategory(alertResult.Category, inputSnapshot.SessionId, presentationInteraction);
+                }
+            }
+            if (alertResult.OpenOperations && inputSnapshot is not null)
+                operationsController.OpenCategory(alertResult.Category, inputSnapshot.SessionId, presentationInteraction);
+            var operationsResult = operationsController.Update(inputState, inputSnapshot, interactionLayout, presentationInteraction,
+                blocked: alertResult.Captured || modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
                     buildingPlacementController.IsActive || tacticalTargetingController.IsActive);
             hudInteraction.CapturePointer(operationsResult.Captured);
             if (operationsResult.Navigate.IsValid && inputSnapshot is not null)
@@ -1480,7 +1508,7 @@ internal sealed class ClientApplication
                 MathF.Max(1.0f, camera.Distance * MathF.Tan(camera.Settings.VerticalFieldOfViewRadians * 0.5f) *
                     12.0f * interactionLayout.Scale / Math.Max(1, window.ClientSize.Height)),
                 informationLayer.OverlayMode,
-                currentSnapshot?.StrategicOverlay);
+                RtsStrategicOverlayHudModel.IsCurrent(currentSnapshot, informationLayer.OverlayMode) ? currentSnapshot?.StrategicOverlay : null);
 
             BuildDevelopmentDebugOverlay(
                 debugDraw,
@@ -1558,7 +1586,7 @@ internal sealed class ClientApplication
 
             preAlphaUx = preAlphaUx with
             {
-                InteractionHint = buildingPlacementController.IsActive ? buildingPlacementController.InteractionHint : cameraFocus.Feedback,
+                InteractionHint = buildingPlacementController.IsActive ? buildingPlacementController.InteractionHint : alertController.Feedback.Length > 0 ? alertController.Feedback : cameraFocus.Feedback,
                 Guidance = guidance.Update(currentSnapshot, preAlphaUx.ShowOnboarding && !guidanceInteraction.Hidden,
                     simulationPaused || !window.IsFocused || selectionController.IsDragSelecting || buildingPlacementController.IsActive ||
                     tacticalTargetingView.Mode != TacticalTargetingMode.None || inputState.IsMouseButtonDown(PlatformMouseButton.Middle)),

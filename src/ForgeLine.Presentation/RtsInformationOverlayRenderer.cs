@@ -98,7 +98,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 minimap,
                 camera.Target,
                 view,
-                snapshot.StrategicOverlay,
+                RtsStrategicOverlayHudModel.IsCurrent(snapshot, view.OverlayMode) ? snapshot.StrategicOverlay : null,
                 layout,
                 context.Width,
                 context.Height);
@@ -734,131 +734,31 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             width,
             height);
 
-        Span<char> buffer =
-            stackalloc char[96];
-        var text =
-            new HudTextBuilder(
-                buffer);
-        text.Append(
-            RtsStrategicOverlayHudModel.ResolveShortLabel(
-                mode));
-
-        if (overlay is not null)
+        Span<char> buffer = stackalloc char[96];
+        var text = new HudTextBuilder(buffer);
+        text.Append(RtsStrategicOverlayHudModel.Label(mode));
+        if (mode != StrategicOverlayMode.None)
         {
-            switch (mode)
+            if (overlay is null) text.Append(" N/A - UPDATING");
+            else
             {
-                case StrategicOverlayMode.Logistics:
-                    text.Append(" N");
-                    text.Append(
-                        overlay.LogisticsNodes.Count);
-                    text.Append(" L");
-                    text.Append(
-                        overlay.LogisticsLinks.Count);
-                    break;
-
-                case StrategicOverlayMode.Supply:
-                    int providers = 0;
-                    int critical = 0;
-                    for (int index = 0;
-                         index <
-                             overlay.Supply.Count;
-                         index++)
-                    {
-                        StrategicSupplyReadModel item =
-                            overlay.Supply[index];
-                        if (item.IsProvider)
-                        {
-                            providers++;
-                        }
-
-                        if (item.HasUnitState &&
-                            item.Status is
-                                BattlefieldSupplyStatus.Critical or
-                                BattlefieldSupplyStatus.Unsupplied)
-                        {
-                            critical++;
-                        }
-                    }
-
-                    text.Append(" P");
-                    text.Append(
-                        providers);
-                    text.Append(" C");
-                    text.Append(
-                        critical);
-                    break;
-
-                case StrategicOverlayMode.Sensors:
-                    text.Append(" S");
-                    text.Append(
-                        overlay.Sensors.Count);
-                    break;
-
-                case StrategicOverlayMode.Navigation:
-                    text.Append(" S");
-                    text.Append(
-                        overlay.NavigationSectors.Count);
-                    text.Append(" P");
-                    text.Append(
-                        overlay.NavigationPortals.Count);
-                    break;
-
-                case StrategicOverlayMode.Power:
-                    int constrained = 0;
-                    for (int index = 0;
-                         index <
-                             overlay.PowerNetworks.Count;
-                         index++)
-                    {
-                        if (overlay.PowerNetworks[
-                                index].IsConstrained)
-                        {
-                            constrained++;
-                        }
-                    }
-
-                    text.Append(" N");
-                    text.Append(
-                        overlay.PowerNetworks.Count);
-                    text.Append(" C");
-                    text.Append(
-                        constrained);
-                    break;
-
-                case StrategicOverlayMode.All:
-                    text.Append(" LOG ");
-                    text.Append(
-                        overlay.LogisticsNodes.Count);
-                    text.Append(" SUP ");
-                    text.Append(
-                        overlay.Supply.Count);
-                    text.Append(" PWR ");
-                    text.Append(
-                        overlay.PowerNetworks.Count);
-                    break;
+                int count = mode switch
+                {
+                    StrategicOverlayMode.Logistics => overlay.LogisticsLinks.Count,
+                    StrategicOverlayMode.Supply => overlay.Supply.Count,
+                    StrategicOverlayMode.Sensors => overlay.Sensors.Count,
+                    StrategicOverlayMode.Navigation => overlay.NavigationSectors.Count,
+                    StrategicOverlayMode.Power => overlay.PowerEntities.Count,
+                    _ => overlay.LogisticsNodes.Count + overlay.Supply.Count + overlay.PowerEntities.Count
+                };
+                text.Append(" LOCAL "); text.Append(count);
             }
         }
-
-        EmitText(
-            text.Written,
-            legend.X +
-                4.0f *
-                scale,
-            legend.Y +
-                4.0f *
-                scale,
-            legend.Right -
-                4.0f *
-                scale,
-            new Vector4(
-                0.82f,
-                0.87f,
-                0.85f,
-                1.0f),
-            scale *
-                0.68f,
-            width,
-            height);
+        float fittedScale = MathF.Min(scale * .58f, legend.Height / 18);
+        EmitText(text.Written, legend.X + 3 * scale, legend.Y + 2 * scale, legend.Right - 3 * scale,
+            GameplayHudVisualStyle.TextPrimary, fittedScale, width, height);
+        EmitText(RtsStrategicOverlayHudModel.Legend(mode), legend.X + 3 * scale, legend.Y + 10 * scale, legend.Right - 3 * scale,
+            GameplayHudVisualStyle.TextSecondary, fittedScale, width, height);
     }
 
     private void EmitSystemOverlay(

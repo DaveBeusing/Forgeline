@@ -607,6 +607,13 @@ public static class RtsStrategicOverlayVisualization
                     color);
             }
 
+            if (state == PowerOperationalState.Brownout)
+            {
+                var a = marker + new Vector3(-3, 0, 0); var b = marker + new Vector3(0, 0, 3);
+                var c = marker + new Vector3(3, 0, 0); var d = marker + new Vector3(0, 0, -3);
+                draw.Line(a, b, color); draw.Line(b, c, color); draw.Line(c, d, color); draw.Line(d, a, color);
+            }
+
             if (entityLabels <
                     (compact
                         ? 2
