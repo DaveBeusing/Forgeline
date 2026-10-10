@@ -1,11 +1,11 @@
+using System.Numerics;
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Game;
-using ForgeLine.Simulation;
-using ForgeLine.Input;
 using ForgeLine.Graphics;
-using ForgeLine.Combat;
+using ForgeLine.Input;
 using ForgeLine.Platform;
-using System.Numerics;
+using ForgeLine.Simulation;
 using Xunit;
 
 namespace ForgeLine.Presentation.Tests;
@@ -229,8 +229,11 @@ public sealed class SelectedCombatGroupTests
     private static PresentationSnapshot Snapshot(ulong session = 1, ulong memberTick = 4)
     {
         var tick = new SimulationTick(4);
-        var experience = default(PlayerExperienceSnapshot) with { Tick = tick,
-            Selection = PlayerSelectionSummary.Empty with { Count = 2, Kind = PlayerSelectionKind.Mixed } };
+        var experience = default(PlayerExperienceSnapshot) with
+        {
+            Tick = tick,
+            Selection = PlayerSelectionSummary.Empty with { Count = 2, Kind = PlayerSelectionKind.Mixed }
+        };
         var members = new CombatGroupOperationalSnapshot(new SimulationTick(memberTick),
             [Member(new EntityId(1, 1), UnitIds.MainBattleTank, true), Member(new EntityId(2, 1), UnitIds.SupplyTruck, false)], new(session));
         return new(tick, TimeSpan.Zero, 2, [], sessionId: new(session), playerExperience: experience, combatGroups: members);

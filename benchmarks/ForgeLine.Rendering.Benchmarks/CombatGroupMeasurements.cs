@@ -32,8 +32,12 @@ internal static class CombatGroupMeasurements
                 var operational = new CombatGroupOperationalSnapshot(tick, members, session);
                 var group = SelectedCombatGroup.Create(operational, selection);
                 var view = new CombatGroupOverviewView([], [], group);
-                var experience = default(PlayerExperienceSnapshot) with { Tick = tick, Player = new(1),
-                    Selection = PlayerSelectionSummary.Empty with { Count = count, Kind = PlayerSelectionKind.Unit } };
+                var experience = default(PlayerExperienceSnapshot) with
+                {
+                    Tick = tick,
+                    Player = new(1),
+                    Selection = PlayerSelectionSummary.Empty with { Count = count, Kind = PlayerSelectionKind.Unit }
+                };
                 var snapshot = new PresentationSnapshot(tick, TimeSpan.Zero, count, [], sessionId: session,
                     playerExperience: experience, combatGroups: operational);
                 using var device = new PresentationBenchmarks.NullGraphicsDevice();
@@ -62,7 +66,8 @@ internal static class CombatGroupMeasurements
             SchemaVersion = 1,
             BuildVersion = typeof(SelectedCombatGroup).Assembly.GetName().Version?.ToString(),
             Backend = "CPU null graphics; copied member indexing, summary rebuild, retained full HUD and idle input; excludes ECS extraction, GPU, waits and Present",
-            Warmup, Samples,
+            Warmup,
+            Samples,
             TimingPolicy = "Timing is observational. HUD/input has zero warm allocation; summaries have constant bounded storage; snapshot copies have linear bounded storage.",
             Results = results
         }, JsonOptions));

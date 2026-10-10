@@ -28,7 +28,14 @@ public sealed class SelectedCombatGroup
     public static int TypeIndex(UnitId unit) => unit.Value is >= 1 and <= 7 ? (int)unit.Value - 1 : 7;
     public static string TypeLabel(int index) => index switch
     {
-        0 => "INF", 1 => "ENG", 2 => "SCOUT", 3 => "TANK", 4 => "ART", 5 => "CARGO", 6 => "SUPPLY", _ => "OTHER"
+        0 => "INF",
+        1 => "ENG",
+        2 => "SCOUT",
+        3 => "TANK",
+        4 => "ART",
+        5 => "CARGO",
+        6 => "SUPPLY",
+        _ => "OTHER"
     };
 
     public static CombatGroupOperationalSnapshot? Resolve(PresentationSnapshot? snapshot) =>
