@@ -115,7 +115,7 @@ public sealed class SettingsInteractionModel
                 var registry = model.Bindings;
 
                 PlatformKey current = _candidate ?? registry.Key(BindingAction);
-                if (current == PlatformKey.Unknown) current = GameplayBindingRegistry.Definitions[(int)BindingAction].DefaultKey;
+                if (_candidate is null && current == PlatformKey.Unknown) current = GameplayBindingRegistry.Definitions[(int)BindingAction].DefaultKey;
                 int keyIndex = Array.IndexOf(Keys, current);
                 keyIndex = (keyIndex + Math.Sign(direction) + Keys.Length) % Keys.Length;
                 PlatformKey candidate = Keys[keyIndex];

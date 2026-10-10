@@ -47,6 +47,14 @@ public sealed class GameplayBindingRegistryTests
         Assert.Throws<InvalidDataException>(() => new GameplayBindingRegistry(new GameplayBindings().With(GameplayAction.Build, PlatformKey.A), camera));
     }
     [Fact]
+    public void DockHelpListsEveryMappedNavigationAndSettingKey()
+    {
+        var registry = new GameplayBindingRegistry(new GameplayBindings()
+            .With(GameplayAction.PrimarySetting, PlatformKey.G).With(GameplayAction.SecondarySetting, PlatformKey.I)
+            .With(GameplayAction.Decrease, PlatformKey.J).With(GameplayAction.Increase, PlatformKey.N));
+        Assert.Equal("TAB NEXT  ENTER ACT  C CANCEL  G PRIMARY  I SECONDARY  J/N ADJUST", registry.DockNavigationPrompt);
+    }
+    [Fact]
     public void WarmLookupDoesNotAllocate()
     {
         var registry = GameplayBindingRegistry.Default;

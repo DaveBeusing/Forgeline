@@ -100,7 +100,7 @@ public sealed class GameplayBindingRegistry
         DockModesPrompt = string.Join(" ", _prompts.Take(7));
         PanelsHelpPrompt = string.Join("  ", DefinitionsArray.Take(7).Select(x => Prompt(x.Action) + " " + x.Label));
         TacticalPrompt = $"{Prompt(GameplayAction.Combat)} / {Prompt(GameplayAction.NextItem)} / {Prompt(GameplayAction.Activate)}";
-        DockNavigationPrompt = $"{Prompt(GameplayAction.NextItem)} NEXT  {Prompt(GameplayAction.Activate)} ACT  {Prompt(GameplayAction.CancelJob)} CANCEL";
+        DockNavigationPrompt = $"{Prompt(GameplayAction.NextItem)} NEXT  {Prompt(GameplayAction.Activate)} ACT  {Prompt(GameplayAction.CancelJob)} CANCEL  {Prompt(GameplayAction.PrimarySetting)} PRIMARY  {Prompt(GameplayAction.SecondarySetting)} SECONDARY  {Prompt(GameplayAction.Decrease)}/{Prompt(GameplayAction.Increase)} ADJUST";
     }
     public PlatformKey Key(GameplayAction action) => _keys[(int)action];
     public string Prompt(GameplayAction action) => _prompts[(int)action];

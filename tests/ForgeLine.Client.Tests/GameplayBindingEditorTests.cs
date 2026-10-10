@@ -39,6 +39,27 @@ public sealed class GameplayBindingEditorTests
         Assert.Equal(GameplayAction.Process, editor.BindingAction);
     }
     [Fact]
+    public void ControlsRetainReboundBaseFocusAlongsideLegacyHomeCameraMapping()
+    {
+        var camera = new RtsCameraBindings { PanForward = PlatformKey.Home };
+        var bindings = new GameplayBindingRegistry(new GameplayBindings().With(GameplayAction.FocusBase, PlatformKey.G), camera);
+        var controls = FrontendPresentationAdapter.Controls(camera, gameplay: bindings);
+        Assert.Contains(controls.DetailLines, line => line.Value.Contains("HOME USES CAMERA BINDING", StringComparison.Ordinal) &&
+            line.Value.Contains("G BASE FOCUS", StringComparison.Ordinal));
+    }
+    [Fact]
+    public void CandidateCyclingTraversesReservedUnknownEntryWithoutJumpingToDefault()
+    {
+        var model = Model(); model.SetGameplayBindings(new GameplayBindings().With(GameplayAction.Build, PlatformKey.Z));
+        var editor = new SettingsInteractionModel(); editor.Focus(FrontendSettingsField.BindingKey);
+        editor.Adjust(model, 1);
+        Assert.Equal(PlatformKey.Unknown, editor.BindingCandidate); Assert.False(editor.CanApply);
+        editor.Adjust(model, 1);
+        Assert.Equal(PlatformKey.W, editor.BindingCandidate); Assert.False(editor.CanApply);
+        Assert.Contains("CAMERA", editor.BindingFeedback);
+        Assert.Equal(PlatformKey.Z, model.Bindings.Key(GameplayAction.Build));
+    }
+    [Fact]
     public void HelpSuppressesReboundHeldInputUntilPhysicalRelease()
     {
         var input = new InputState(); var help = new GameplayHelpController();

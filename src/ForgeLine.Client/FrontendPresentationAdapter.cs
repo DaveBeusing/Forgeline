@@ -256,7 +256,8 @@ internal static class FrontendPresentationAdapter
                     "CAMERA MOUSE",
                     $"WHEEL ZOOM  {bindings.DragPanButton.ToString().ToUpperInvariant()} DRAG  " +
                     (edgeScrollEnabled ? "EDGE PAN" : "EDGE PAN DISABLED") +
-                    (RtsCameraFocusController.IsHomeCameraBinding(bindings) ? "  HOME USES CAMERA BINDING" : $"  {gameplay.Prompt(GameplayAction.FocusBase)} BASE FOCUS")),
+                    (RtsCameraFocusController.IsHomeCameraBinding(bindings) ? "  HOME USES CAMERA BINDING" : string.Empty) +
+                    $"  {gameplay.Prompt(GameplayAction.FocusBase)} BASE FOCUS"),
                 new FrontendDetailLineView(
                     "SELECT / MOVE",
                     "LEFT SELECT  DOUBLE LEFT SAME-TYPE VISIBLE UNITS  SHIFT+LEFT MULTI  RIGHT MOVE"),
