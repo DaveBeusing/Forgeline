@@ -76,6 +76,7 @@ public sealed class D3D12SceneCompositionTests
             Assert.NotNull(frame.Plan.Scene);
             Assert.Equal((long)surface.Width * surface.Height * 8 * surface.BufferCount, frame.Plan.TransientPayloadBytes);
             Assert.NotNull(frame.CompositeCpuMilliseconds);
+            Assert.Equal(1, frame.CompositeDrawCalls);
             if (graphics.Diagnostics.GpuTimingAvailable)
                 Assert.NotNull(frame.CompositeGpuMilliseconds);
             Assert.Null(frame.IntermediateUnavailableReason);

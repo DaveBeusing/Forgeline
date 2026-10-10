@@ -59,6 +59,7 @@ public readonly record struct GraphicsFrameDiagnostics(
     double? OverlayGpuMilliseconds)
 {
     public double? CompositeCpuMilliseconds { get; init; }
+    public int CompositeDrawCalls => CompositeCpuMilliseconds.HasValue ? 1 : 0;
     public double? CompositeGpuMilliseconds { get; init; }
     public string? GpuTimingUnavailableReason { get; init; }
     public string? IntermediateUnavailableReason { get; init; } = "Linear scene composition is disabled.";

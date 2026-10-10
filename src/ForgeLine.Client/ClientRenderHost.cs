@@ -855,7 +855,7 @@ internal sealed class ClientRenderHost : IDisposable
                 terrain.DrawCalls +
                 instances.DrawCalls +
                 gameplay.DrawCalls +
-                debug.DrawCalls,
+                debug.DrawCalls + (graphics.Frame?.CompositeDrawCalls ?? 0),
                 instances.VisibleInstances,
                 totalInstances,
                 instances.HighLodInstances,
