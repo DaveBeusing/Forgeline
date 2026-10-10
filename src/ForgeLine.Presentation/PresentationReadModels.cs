@@ -39,7 +39,8 @@ internal readonly record struct PresentationInteractionRequestSnapshot(
     float DebugPlaneHeight,
     StrategicOverlayMode StrategicOverlay,
     EntityId HoveredEntity,
-    SimulationSessionId HoverSessionId);
+    SimulationSessionId HoverSessionId,
+    bool OperationsOpen = false);
 
 public sealed class PresentationInteractionState
 {
@@ -54,6 +55,12 @@ public sealed class PresentationInteractionState
     private ulong _nextPlacementRequestId = 1;
     private EntityId _hoveredEntity;
     private SimulationSessionId _hoverSessionId;
+    private bool _operationsOpen;
+
+    public void SetOperationsOpen(bool open)
+    {
+        lock (_gate) _operationsOpen = open;
+    }
 
     public void SetHover(EntityId entity, SimulationSessionId sessionId)
     {
@@ -199,7 +206,8 @@ public sealed class PresentationInteractionState
                 _debugPlaneHeight,
                 _strategicOverlay,
                 _hoveredEntity,
-                _hoverSessionId);
+                _hoverSessionId,
+                _operationsOpen);
         }
     }
 }
