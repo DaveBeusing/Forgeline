@@ -12,6 +12,54 @@ public sealed class ClientStartupLoopTests
         new(Stopwatch.GetTimestamp(), Guid.NewGuid(), 1);
 
     [Theory]
+    [InlineData(false, false, true, false, null)]
+    [InlineData(false, false, false, false, "Settings")]
+    [InlineData(false, true, true, false, "CommandLine")]
+    [InlineData(true, false, true, false, "SmokeMode")]
+    [InlineData(false, false, true, true, "ApplicationRestart")]
+    [InlineData(false, false, false, true, "ApplicationRestart")]
+    [InlineData(false, true, true, true, "ApplicationRestart")]
+    [InlineData(true, false, true, true, "ApplicationRestart")]
+    public void SplashEligibilityRespectsProcessLifetimeAndBypasses(
+        bool smokeTest, bool skipSplash, bool showStudioSplash, bool applicationRestart,
+        string? expectedReason)
+    {
+        Assert.Equal(expectedReason, ClientStartupLoop.SplashBypassReason(
+            smokeTest, skipSplash, showStudioSplash, applicationRestart));
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void RestartLoadsFreshDependenciesWithoutPublishingBranding(bool diagnosticsEnabled)
+    {
+        StartupDiagnostics diagnostics = diagnosticsEnabled ? Diagnostics() : StartupDiagnostics.Disabled;
+        string? reason = ClientStartupLoop.SplashBypassReason(false, false, true, true);
+        using var coordinator = new ClientStartupCoordinator<object, object>(
+            _ => new object(), _ => new object(), TestContext.Current.CancellationToken);
+        Assert.True(SpinWait.SpinUntil(() => coordinator.DependenciesReady, Timeout));
+        var views = new List<FrontendSurfaceView>();
+        bool completed = ClientStartupLoop.Run(coordinator, reason is null, reason!, diagnostics,
+            pumpEvents: () => true,
+            readInput: () => throw new InvalidOperationException("Restart must bypass splash input."),
+            publish: views.Add,
+            waitForEvents: () => throw new InvalidOperationException("Ready restart must bypass splash timing."),
+            firstFramePresented: () => true,
+            enableArtwork: _ => throw new InvalidOperationException("Restart must not load branding textures."),
+            artworkFailed: () => false);
+        Assert.True(completed);
+        Assert.True(coordinator.CanEnterFrontend);
+        Assert.All(views, view => Assert.Equal(FrontendSurfaceKind.Loading, view.Kind));
+        Assert.All(views, view => Assert.False(view.SplashBootstrap));
+        if (diagnosticsEnabled)
+            Assert.Contains(diagnostics.Snapshot(), entry => entry.Phase == StartupPhase.StudioSplash &&
+                entry.Kind == StartupEventKind.Skipped && entry.Detail == "ApplicationRestart");
+
+        // A fresh process remains eligible, even after a previous process restarted.
+        Assert.Null(ClientStartupLoop.SplashBypassReason(false, false, true, false));
+    }
+
+    [Theory]
     [InlineData(true)]
     [InlineData(false)]
     public void SlowLoadingKeepsPumpingAndPublishingBeforeDependenciesComplete(bool showSplash)

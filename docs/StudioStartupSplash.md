@@ -37,6 +37,8 @@ The interactive Windows client plays the studio splash after graphics initializa
 
 The client consumes the existing platform input abstraction for Enter, Space, Escape and primary mouse button. Skip requests before the minimum visible interval do not immediately end playback. The persisted `showStudioSplash` setting enables/disables playback; `--skip-splash` bypasses it. Smoke tests and non-client tools do not display the splash.
 
+The splash is eligible only on the first client startup in each process. Returning to the main menu, saving and returning, or applying settings that recreate the client bypasses playback without changing the persisted preference. Startup diagnostics record `ApplicationRestart` as the bypass reason. A fresh process reads the preference again.
+
 The six studio source textures and asset definitions live under `assets/source/branding/undefined_behavior/splash/` and are compiled by the existing asset compiler. The renderer resolves stable runtime IDs through the manifest and never loads source art directly.
 
 ## Verification

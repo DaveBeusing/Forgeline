@@ -5,6 +5,13 @@ namespace ForgeLine.Client;
 
 internal static class ClientStartupLoop
 {
+    internal static string? SplashBypassReason(
+        bool smokeTest, bool skipSplash, bool showStudioSplash, bool applicationRestart) =>
+        applicationRestart ? "ApplicationRestart" :
+        smokeTest ? "SmokeMode" :
+        skipSplash ? "CommandLine" :
+        !showStudioSplash ? "Settings" : null;
+
     internal static FrontendSurfaceView InitialSurface(bool showSplash) =>
         showSplash ? FrontendSurfaceView.StudioSplashBootstrap() :
             FrontendSurfaceView.Loading("LOADING RUNTIME ASSETS", false, 0);
