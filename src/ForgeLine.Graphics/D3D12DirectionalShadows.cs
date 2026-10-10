@@ -122,6 +122,8 @@ internal sealed partial class D3D12GraphicsDevice
     {
         ValidateRecording();
         frame.Validate();
+        if (frame.Radius > _directionalShadows.Radius || frame.DepthRange > _directionalShadows.Radius * 4)
+            throw new ArgumentException("Shadow frame coverage exceeds the selected quality profile.", nameof(frame));
         if (!_directionalShadows.Enabled || _shadowRecorded || _shadowRecording || _worldDrawRecorded || _passState.Current != GraphicsFramePass.World)
             throw new InvalidOperationException("An enabled shadow pass must precede all world and overlay draws exactly once.");
         _shadowRecording = true;

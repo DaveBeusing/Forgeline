@@ -1527,6 +1527,8 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
 
     private void ResetFrameMeasurements()
     {
+        _submittedShadowDraws = _submittedShadowCasters = 0;
+        _submittedShadowCpu = null;
         _shadowGpu = null;
         _shadowGpuFence = 0;
         if (_shadowSamples is not null) Array.Clear(_shadowSamples);

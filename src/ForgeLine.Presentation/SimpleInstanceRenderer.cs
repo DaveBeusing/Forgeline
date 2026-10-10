@@ -249,7 +249,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 matrices, context.Height);
             var lodKey = (instance.Entity, instance.DebugIdentity);
             bool hasLodIdentity = instance.Entity.IsValid || instance.DebugIdentity != 0;
-            int previousLod = hasLodIdentity && _previousLods.TryGetValue(lodKey, out int retainedLod) ? retainedLod : 0;
+            var lodHistory = shadowProjection.HasValue ? _currentLods : _previousLods;
+            int previousLod = hasLodIdentity && lodHistory.TryGetValue(lodKey, out int retainedLod) ? retainedLod : 0;
             UnitAssetLod unitLod =
                 UnitAssetLod.Lod0;
             UnitPresentationDefinition unitDefinition =
