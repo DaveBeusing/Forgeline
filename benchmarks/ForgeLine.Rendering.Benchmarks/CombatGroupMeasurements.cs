@@ -39,20 +39,26 @@ internal static class CombatGroupMeasurements
                     Selection = PlayerSelectionSummary.Empty with { Count = count, Kind = PlayerSelectionKind.Unit }
                 };
                 var snapshot = new PresentationSnapshot(tick, TimeSpan.Zero, count, [], sessionId: session,
-                    playerExperience: experience, combatGroups: operational);
+                    playerExperience: experience, combatGroups: operational,
+                    playerActions: new PlayerActionSnapshot(session, tick, [], 0, null, null,
+                        tactical: new PlayerTacticalActionReadModel(members.Select(static member => member.Entity).ToArray(),
+                            count, group.CombatCount, 0, 0, 0, false, false, default, default, [], [])));
                 using var device = new PresentationBenchmarks.NullGraphicsDevice();
                 using var renderer = new GameplayHudRenderer(device);
                 var graphics = new PresentationBenchmarks.NullGraphicsCommandContext();
                 var camera = new RtsCamera();
                 var controller = new CombatGroupCardController();
+                var actionPanel = new PlayerActionPanelController();
                 var input = new InputState();
                 var layout = GameplayHudLayout.Create(1600, 900, 96);
                 var bounds = new AxisAlignedBounds(System.Numerics.Vector3.Zero, new(2048, 100, 2048));
                 void Frame()
                 {
                     _ = controller.Update(input, snapshot, selection, layout);
+                    actionPanel.Update(input, snapshot, 1600, 900, currentSelection: selection);
+                    var panel = actionPanel.CreateView(1600, 900, snapshot.PlayerActions);
                     renderer.Render(graphics, camera, snapshot, bounds, RtsInformationLayerView.Empty,
-                        default, default, FormationTemplate.Compact, view, default, 96, 1);
+                        panel, default, FormationTemplate.Compact, view, default, 96, 1);
                 }
                 results.Add(Measure("HUD and idle input", count, mixed, Frame, 0));
                 results.Add(Measure("Selection summary rebuild", count, mixed,

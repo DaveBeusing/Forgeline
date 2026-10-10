@@ -128,7 +128,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             graphics.Height);
 
         PlayerActionSnapshot? actions =
-            PlayerActionDockHudModel.ResolveActions(snapshot);
+            panel.SelectionPending ? null : PlayerActionDockHudModel.ResolveActions(snapshot);
 
         if (panel.IsOpen)
         {
@@ -207,7 +207,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         EmitClippedText(ContextualCommandModel.Status(snapshot), region.X + 5 * _scale,
             region.Y + 5 * _scale, region.Right - 5 * _scale, TextColor, width, height);
         bool localPending = ContextualCommandModel.HasPending(panel, snapshot);
-        for (int i = 0; ContextualCommandModel.TryGet(snapshot, i, out var command, localPending); i++)
+        for (int i = 0; ContextualCommandModel.TryGet(snapshot, i, out var command, localPending, panel.SelectionPending); i++)
         {
             HudRect button = ContextualCommandModel.Button(layout, i);
             EmitQuad(button.X, button.Y, button.Width, button.Height,

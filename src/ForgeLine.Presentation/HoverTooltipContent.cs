@@ -59,7 +59,7 @@ internal static class HoverTooltipResolver
         if (view.Contextual)
         {
             for (int i = 0; ContextualCommandModel.TryGet(snapshot, i, out var command,
-                    ContextualCommandModel.HasPending(panel, snapshot)); i++)
+                    ContextualCommandModel.HasPending(panel, snapshot), panel.SelectionPending); i++)
                 if (command.Mode == mode && command.ItemIndex == view.DockIndex)
                     return new(command.Label, "SELECTION COMMAND", command.Availability.CanActivate
                         ? "AVAILABLE" : command.Availability.DisabledReason,
@@ -69,7 +69,7 @@ internal static class HoverTooltipResolver
         if (control == PlayerActionDockControlKind.Mode)
             return new(PlayerActionDockHudModel.ResolveModeLabel(mode), "ACTION PANEL",
                 PlayerActionDockHudModel.ResolveModeShortcut(mode), "CLICK TO OPEN / CLOSE");
-        if (!panel.IsOpen || panel.Mode != mode || snapshot.PlayerActions is not { } actions ||
+        if (panel.SelectionPending || !panel.IsOpen || panel.Mode != mode || snapshot.PlayerActions is not { } actions ||
             actions.SessionId != snapshot.SessionId || actions.Tick != snapshot.Tick) return null;
         int index = view.DockIndex;
         if (control != PlayerActionDockControlKind.Item && index != panel.SelectedIndex) return null;

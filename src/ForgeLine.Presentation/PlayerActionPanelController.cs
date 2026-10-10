@@ -49,7 +49,8 @@ public readonly record struct PlayerActionPanelView(
     bool PointerPressed = false,
     bool ContextualPending = false,
     SimulationTick? ContextualActivationTick = null,
-    SimulationSessionId ContextualSessionId = default)
+    SimulationSessionId ContextualSessionId = default,
+    bool SelectionPending = false)
 {
     public bool IsOpen =>
         Mode != PlayerActionPanelMode.Closed;
@@ -78,6 +79,7 @@ public sealed class PlayerActionPanelController
     private bool _hasPointerLayout;
     private ulong _leftPressSequence;
     private SimulationTick? _contextualActivationTick;
+    private SelectionSet? _currentSelection;
 
     public PlayerActionPanelMode Mode { get; private set; }
 
@@ -115,8 +117,10 @@ public sealed class PlayerActionPanelController
         int viewportWidth,
         int viewportHeight,
         uint dpi = 96,
-        float uiScale = 1.0f)
+        float uiScale = 1.0f,
+        SelectionSet? currentSelection = null)
     {
+        _currentSelection = currentSelection;
         ArgumentNullException.ThrowIfNull(input);
         ArgumentOutOfRangeException.ThrowIfNegative(viewportWidth);
         ArgumentOutOfRangeException.ThrowIfNegative(viewportHeight);
@@ -153,6 +157,7 @@ public sealed class PlayerActionPanelController
 
         PlayerActionSnapshot? actions =
             PlayerActionDockHudModel.ResolveActions(snapshot);
+        if (!PlayerActionDockHudModel.MatchesSelection(actions, currentSelection)) actions = null;
 
         if (snapshot?.PlayerExperience is
                 PlayerExperienceSnapshot experience &&
@@ -302,7 +307,7 @@ public sealed class PlayerActionPanelController
         var clickPosition = hasPress ? pressOrigin : input.PointerPosition;
         bool clicked = !displayChanged && !sessionChanged && freshPress && hasPress && input.HasPointerPosition;
         if (clicked && ContextualCommandModel.TryHit(clickPosition, snapshot, layout, out var command,
-                localPending: ContextualCommandModel.HasPending(view, snapshot)))
+                localPending: ContextualCommandModel.HasPending(view, snapshot), selectionPending: view.SelectionPending))
         {
             PointerCaptured = true;
             if (command.Availability.CanActivate)
@@ -422,7 +427,8 @@ public sealed class PlayerActionPanelController
             _pointerPressed,
             _contextualActivationTick.HasValue,
             _contextualActivationTick,
-            _sessionId);
+            _sessionId,
+            !PlayerActionDockHudModel.MatchesSelection(actions, _currentSelection));
     }
 
     public bool TryTakeRequest(

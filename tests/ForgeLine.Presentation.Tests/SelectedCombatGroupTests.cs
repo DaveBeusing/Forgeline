@@ -226,6 +226,56 @@ public sealed class SelectedCombatGroupTests
     private static SelectionSet Selection()
     { var result = new SelectionSet(); result.Replace([new EntityId(1, 1), new EntityId(2, 1)]); return result; }
 
+    [Fact]
+    public void ContextualActionsWaitForExactFilteredSelectionCapture()
+    {
+        PresentationSnapshot Actions(EntityId[] captured)
+        {
+            var tick = new SimulationTick(4);
+            var tactical = new PlayerTacticalActionReadModel(captured, captured.Length, captured.Length, 0,
+                0, 0, false, false, default, default, [], []);
+            var actions = new PlayerActionSnapshot(new(1), tick, [], 0, null, null, tactical: tactical);
+            var experience = default(PlayerExperienceSnapshot) with
+            {
+                Tick = tick,
+                Selection = PlayerSelectionSummary.Empty with { Count = captured.Length, Kind = PlayerSelectionKind.Unit }
+            };
+            return new(tick, TimeSpan.Zero, captured.Length, [], sessionId: new(1),
+                playerExperience: experience, playerActions: actions);
+        }
+        var selection = new SelectionSet();
+        selection.SetSingle(new EntityId(1, 1));
+        var old = Actions([new EntityId(1, 1), new EntityId(2, 1)]);
+        var controller = new PlayerActionPanelController();
+        var input = new InputState();
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        void ClickStop()
+        {
+            input.BeginFrame();
+            var rect = ContextualCommandModel.Button(layout, 2);
+            int x = (int)(rect.X + rect.Width / 2), y = (int)(rect.Y + rect.Height / 2);
+            input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Left, x, y));
+            input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Left, x, y));
+        }
+        ClickStop();
+        controller.Update(input, old, 1600, 900, currentSelection: selection);
+        var view = controller.CreateView(1600, 900, old.PlayerActions);
+        Assert.True(view.SelectionPending);
+        Assert.True(ContextualCommandModel.TryGet(old, 2, out var disabled, selectionPending: view.SelectionPending));
+        Assert.Equal("UPDATING SELECTION", disabled.Availability.DisabledReason);
+        Assert.False(controller.TryTakeRequest(out _));
+        var wrongIdentity = Actions([new EntityId(2, 1)]);
+        Assert.False(PlayerActionDockHudModel.MatchesSelection(wrongIdentity.PlayerActions, selection));
+        ClickStop();
+        controller.Update(input, wrongIdentity, 1600, 900, currentSelection: selection);
+        Assert.False(controller.TryTakeRequest(out _));
+        ClickStop();
+        controller.Update(input, Actions([new EntityId(1, 1)]), 1600, 900, currentSelection: selection);
+        Assert.True(controller.TryTakeRequest(out var request));
+        Assert.Equal(PlayerActionRequestKind.SubmitStopCombat, request.Kind);
+        Assert.Equal(new[] { new EntityId(1, 1) }, request.TacticalEntities);
+    }
+
     private static PresentationSnapshot Snapshot(ulong session = 1, ulong memberTick = 4)
     {
         var tick = new SimulationTick(4);

@@ -1104,7 +1104,8 @@ internal sealed class ClientApplication
                     window.ClientSize.Width,
                     window.ClientSize.Height,
                     window.Dpi,
-                    _settings.UiScale);
+                    _settings.UiScale,
+                    currentSelection: selectionController.Selection);
 
                 if (actionPanel.HasKeyboardFocus)
                 {

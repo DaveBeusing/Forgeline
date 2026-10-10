@@ -38,7 +38,7 @@ internal static class ContextualCommandModel
     }
 
     public static bool TryGet(PresentationSnapshot? snapshot, int index, out ContextualCommand command,
-        bool localPending = false)
+        bool localPending = false, bool selectionPending = false)
     {
         command = default;
         var actions = ResolveActions(snapshot);
@@ -51,6 +51,7 @@ internal static class ContextualCommandModel
             command = new(PlayerActionPanelMode.Tactical, index,
                 PlayerActionDockHudModel.ResolveItemTitle(PlayerActionPanelMode.Tactical, index, actions),
                 "K / TAB / ENTER",
+                selectionPending ? PlayerActionDockItemState.Disabled("UPDATING SELECTION") :
                 localPending || actions.PendingCommandCount > 0 ? PlayerActionDockItemState.Disabled("REQUEST PENDING") :
                     PlayerActionDockHudModel.ResolveItemState(PlayerActionPanelMode.Tactical, index, actions));
             return true;
@@ -65,7 +66,8 @@ internal static class ContextualCommandModel
         else if (actions.Supply is not null && index-- == 0) mode = PlayerActionPanelMode.Supply;
         if (mode == PlayerActionPanelMode.Closed) return false;
         command = new(mode, -1, PlayerActionDockHudModel.ResolveModeLabel(mode),
-            PlayerActionDockHudModel.ResolveModeShortcut(mode), PlayerActionDockItemState.Enabled);
+            PlayerActionDockHudModel.ResolveModeShortcut(mode), selectionPending ?
+                PlayerActionDockItemState.Disabled("UPDATING SELECTION") : PlayerActionDockItemState.Enabled);
         return true;
     }
 
@@ -84,9 +86,9 @@ internal static class ContextualCommandModel
     }
 
     public static bool TryHit(Vector2 pointer, PresentationSnapshot? snapshot,
-        in GameplayHudLayout layout, out ContextualCommand command, bool localPending = false)
+        in GameplayHudLayout layout, out ContextualCommand command, bool localPending = false, bool selectionPending = false)
     {
-        for (int i = 0; TryGet(snapshot, i, out command, localPending); i++)
+        for (int i = 0; TryGet(snapshot, i, out command, localPending, selectionPending); i++)
             if (Button(layout, i).Contains(pointer)) return true;
         command = default;
         return false;
