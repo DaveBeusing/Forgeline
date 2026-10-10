@@ -155,7 +155,7 @@ The publish path is:
 
 The distributable archive is:
 
-    artifacts/prealpha/FORGELINE-prealpha-win-x64.zip
+    artifacts/prealpha/FORGELINE-<build-version>-win-x64.zip
 
 The package includes:
 

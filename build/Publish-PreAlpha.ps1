@@ -7,6 +7,17 @@ param(
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
+. "$PSScriptRoot/Versioning.ps1"
+$buildVersion = if ($env:FORGELINE_BUILD_VERSION) { $env:FORGELINE_BUILD_VERSION } else { "$(Get-ProductVersion)-dev" }
+Assert-BuildVersion -Version $buildVersion
+$sourceRevision = (& git rev-parse HEAD).Trim()
+if ($LASTEXITCODE -ne 0 -or $sourceRevision -notmatch '^[0-9a-f]{40}$') { throw "Full Git SHA required." }
+$dirty = @(& git status --porcelain --untracked-files=normal)
+if ($LASTEXITCODE -ne 0) { throw "Cannot inspect source cleanliness." }
+if ($buildVersion -notmatch '-(dev|pr\.)' -and $dirty.Count) { throw "Published builds require a clean source tree." }
+$sdk = (& dotnet --version).Trim()
+if ($LASTEXITCODE -ne 0) { throw "Cannot identify SDK." }
+$buildTime = [DateTimeOffset]::UtcNow.ToString("O")
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $project = Join-Path $repoRoot "src/ForgeLine.Client/ForgeLine.Client.csproj"
@@ -55,6 +66,18 @@ function Publish-Client {
     Copy-Item $readme (Join-Path $Destination "README.md") -Force
     Copy-Item $checklist (Join-Path $Destination "PreAlphaVerificationChecklist.md") -Force
 
+    # The same approved inputs and timestamp are reused for reproducibility.
+    @{
+        product = "FORGELINE"; productVersion = Get-ProductVersion
+        version = $buildVersion; informationalVersion = "$buildVersion+$sourceRevision"
+        sourceRevision = $sourceRevision; repository = "https://github.com/DaveBeusing/Forgeline"
+        channel = if ($buildVersion.Contains('-')) { $buildVersion.Split('-')[1].Split('.')[0] } else { "stable" }
+        buildTimeUtc = $buildTime; runId = $env:GITHUB_RUN_ID; runAttempt = $env:GITHUB_RUN_ATTEMPT
+        runUrl = if ($env:GITHUB_RUN_ID) { "https://github.com/DaveBeusing/Forgeline/actions/runs/$env:GITHUB_RUN_ID" } else { $null }
+        targetFramework = "net10.0-windows"; runtimeIdentifier = "win-x64"
+        configuration = $Configuration; sdk = $sdk; sourceTreeClean = ($dirty.Count -eq 0)
+    } | ConvertTo-Json -Depth 10 | Set-Content (Join-Path $Destination "build-provenance.json") -Encoding utf8NoBOM
+
     $manifestPath = Join-Path $Destination "manifest.sha256"
     Get-ChildItem $Destination -File -Recurse |
         Where-Object { $_.FullName -ne $manifestPath } |
@@ -88,6 +111,14 @@ function Compare-PublishTrees {
 }
 
 $outputRootAbsolute = [System.IO.Path]::GetFullPath((Join-Path $repoRoot $OutputRoot))
+$allowedRoot = [System.IO.Path]::GetFullPath((Join-Path $repoRoot "artifacts")) + [System.IO.Path]::DirectorySeparatorChar
+if (-not ($outputRootAbsolute + [System.IO.Path]::DirectorySeparatorChar).StartsWith($allowedRoot, [StringComparison]::OrdinalIgnoreCase)) {
+    throw "Package output must remain inside repository artifacts."
+}
+$archivePath = Join-Path $outputRootAbsolute "FORGELINE-$buildVersion-win-x64.zip"
+foreach ($path in @($archivePath, "$archivePath.sha256", "$archivePath.provenance.json")) {
+    if (Test-Path -LiteralPath $path) { throw "Artifact already exists: $path. Refusing replacement." }
+}
 $publishDirectory = Join-Path $outputRootAbsolute "win-x64/publish"
 
 if ($VerifyReproducible) {
@@ -111,12 +142,10 @@ else {
     Publish-Client -Destination $publishDirectory | Out-Null
 }
 
-$archivePath = Join-Path $outputRootAbsolute "FORGELINE-prealpha-win-x64.zip"
-if (Test-Path $archivePath) {
-    Remove-Item $archivePath -Force
-}
-
 Compress-Archive -Path (Join-Path $publishDirectory "*") -DestinationPath $archivePath -CompressionLevel Optimal
+$archiveHash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash.ToLowerInvariant()
+"$archiveHash  $([System.IO.Path]::GetFileName($archivePath))" | Set-Content "$archivePath.sha256" -Encoding utf8NoBOM
+Copy-Item (Join-Path $publishDirectory "build-provenance.json") "$archivePath.provenance.json"
 
 Write-Output "Pre-alpha publish: $publishDirectory"
 Write-Output "Pre-alpha archive: $archivePath"

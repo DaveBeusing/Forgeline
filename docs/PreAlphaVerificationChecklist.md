@@ -15,7 +15,7 @@ The packaged build is the qualification target. Do not substitute a repository-l
 - [ ] Runtime asset compilation and qualification pass.
 - [ ] `build/Publish-PreAlpha.ps1 -VerifyReproducible` succeeds.
 - [ ] Two independent publish passes produce identical SHA-256 manifests.
-- [ ] `FORGELINE-prealpha-win-x64.zip` is produced.
+- [ ] `FORGELINE-<build-version>-win-x64.zip` is produced.
 - [ ] The archive contains the client executable, runtime assets, README, this checklist, and `manifest.sha256`.
 
 ## Fresh-Install Launch
