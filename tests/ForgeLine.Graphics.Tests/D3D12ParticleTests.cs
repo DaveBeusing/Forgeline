@@ -35,6 +35,8 @@ public sealed class D3D12ParticleTests
             {
                 context.SetPipeline(ground); context.Draw(3);
                 particles.Render(context,data,Matrix4x4.Identity,Vector3.UnitX,Vector3.UnitY,1,-1,1,false,linear);
+                context.SetPipeline(ground);
+                Assert.Throws<InvalidOperationException>(()=>context.Draw(3));
                 context.BeginPass(GraphicsFramePass.Overlay);
             });
         }

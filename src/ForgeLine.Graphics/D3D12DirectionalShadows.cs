@@ -186,6 +186,8 @@ internal sealed partial class D3D12GraphicsDevice
 
     internal void RecordDirectionalShadowDraw(int instances)
     {
+        if (_particleRecorded && !_particleRecording && _passState.Current == GraphicsFramePass.World)
+            throw new InvalidOperationException("Opaque world draws must precede particle submission.");
         if (!_shadowRecording) { _worldDrawRecorded = true; return; }
         if (_shadowDraws >= _directionalShadows.MaximumDraws || instances > _directionalShadows.MaximumCasters - _shadowCasters)
             throw new InvalidOperationException("Directional shadow submissions exceed the selected quality budget.");

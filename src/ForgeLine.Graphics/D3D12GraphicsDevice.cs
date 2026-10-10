@@ -797,7 +797,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         try
         {
             recordCommands?.Invoke(context);
-            if (_shadowRecording) throw new InvalidOperationException("The directional shadow pass was not ended.");
+            if (_shadowRecording || _particleRecording) throw new InvalidOperationException("The shadow or particle submission was not ended.");
             if (_sceneOutput.Enabled && _passState.Current == GraphicsFramePass.World)
                 context.BeginPass(GraphicsFramePass.Overlay);
         }

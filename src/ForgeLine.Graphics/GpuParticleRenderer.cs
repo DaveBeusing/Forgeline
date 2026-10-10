@@ -115,6 +115,7 @@ public sealed class GpuParticleRenderer : IDisposable
             if(!float.IsFinite(value)) throw new ArgumentException("Particle projection must be finite.",nameof(viewProjection));
         if(!float.IsFinite(projectionA) || !float.IsFinite(projectionB) || MathF.Abs(projectionB)<.000001f || !float.IsFinite(exposure) || exposure is < .25f or > 4)
             throw new ArgumentException("Particle depth and exposure must be finite and valid.");
+        if(!FiniteBasis(right) || !FiniteBasis(up)) throw new ArgumentException("Particle camera basis must be finite and nonzero.");
         foreach(var particle in particles) particle.Validate();
         _frames[context.FrameIndex].SetData(particles);
         context.BeginParticlePass();
@@ -141,4 +142,5 @@ public sealed class GpuParticleRenderer : IDisposable
         foreach (var frame in _frames) frame.Dispose();
         _indices.Dispose(); _pipeline.Dispose(); _disposed = true;
     }
+    private static bool FiniteBasis(Vector3 value) => float.IsFinite(value.X) && float.IsFinite(value.Y) && float.IsFinite(value.Z) && value.LengthSquared() > .000001f;
 }
