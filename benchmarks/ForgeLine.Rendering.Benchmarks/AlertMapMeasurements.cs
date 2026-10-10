@@ -69,6 +69,7 @@ internal static class AlertMapMeasurements
             BuildVersion = typeof(ActionableAlertSnapshot).Assembly.GetName().Version?.ToString(),
             Warmup = warmup,
             Samples = samples,
+            TieredCompilation = Environment.GetEnvironmentVariable("DOTNET_TieredCompilation") ?? "Runtime default",
             Backend = "Full HUD/minimap with active alerts and idle alert input; CPU null graphics; excludes extraction, world overlay drawing, GPU, waits and Present",
             Results = results
         }, JsonOptions));

@@ -52,6 +52,8 @@ jobs:
       - name: Guard operations dashboard allocation bounds
         run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --operations-hotpaths artifacts/operations-hotpaths.json
       - name: Guard actionable alerts and strategic map allocation bounds
+        env:
+          DOTNET_TieredCompilation: 0
         run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --alert-map-hotpaths artifacts/alert-map-hotpaths.json
       - name: Capture CPU frame measurements
         run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --frame-hotpaths artifacts/frame-hotpaths.json
