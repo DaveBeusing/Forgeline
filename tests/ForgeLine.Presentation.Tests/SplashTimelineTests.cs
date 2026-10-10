@@ -48,7 +48,7 @@ public sealed class SplashTimelineTests
     {
         SplashDefinition definition = UndefinedBehaviorStudioSplash.Create();
         definition.Validate();
-        var invalid = definition with { MinimumVisibleDuration = TimeSpan.FromSeconds(4) };
+        var invalid = definition with { MinimumVisibleDuration = TimeSpan.FromSeconds(11) };
         Assert.Throws<ArgumentException>(() => invalid.Validate());
     }
 
@@ -71,7 +71,9 @@ public sealed class SplashTimelineTests
     {
         var controller = new SplashScreenController(UndefinedBehaviorStudioSplash.Create());
         controller.Start();
-        controller.Update(TimeSpan.FromSeconds(3), new SplashInputState(false));
+        controller.Update(TimeSpan.FromSeconds(9.99), new SplashInputState(false));
+        Assert.False(controller.IsComplete);
+        controller.Update(TimeSpan.FromSeconds(0.01), new SplashInputState(false));
         Assert.True(controller.IsComplete);
         Assert.False(controller.WasSkipped);
     }

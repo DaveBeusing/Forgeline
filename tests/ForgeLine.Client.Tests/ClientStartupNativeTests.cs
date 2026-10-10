@@ -45,7 +45,7 @@ public sealed class ClientStartupNativeTests
                 }
                 return open;
             },
-            readInput: () => new SplashInputState(true),
+            readInput: () => new SplashInputState(diagnostics.Has(StartupPhase.StudioSplashFirstFrame)),
             publish: view =>
             {
                 renderer.UpdateSurface(window.ClientSize.Width, window.ClientSize.Height,
@@ -57,6 +57,7 @@ public sealed class ClientStartupNativeTests
             enableArtwork: _ => false,
             artworkFailed: () => renderer.SplashUnavailable);
         Assert.True(ready);
+        Assert.True(diagnostics.Has(StartupPhase.StudioSplashFirstFrame));
         Assert.Equal(10, presentedPumps);
         Assert.NotNull(coordinator.GetResults().Assets);
         Assert.False(diagnostics.Has(StartupPhase.MainMenuFirstFrame));
