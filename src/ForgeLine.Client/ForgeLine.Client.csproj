@@ -7,6 +7,9 @@
     <ApplicationIcon>../../assets/source/branding/forgeline/application/forgeline.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Vortice.MediaFoundation" />
+    <Content Include="../../assets/source/branding/undefined_behavior/splash/studio-intro.mp4" Link="assets/runtime/branding/studio-intro.mp4" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="../../assets/source/branding/undefined_behavior/splash/studio-intro.wav" Link="assets/runtime/branding/studio-intro.wav" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <ProjectReference Include="../ForgeLine.Platform.Windows/ForgeLine.Platform.Windows.csproj" />
     <ProjectReference Include="../ForgeLine.Graphics/ForgeLine.Graphics.csproj" />
     <ProjectReference Include="../ForgeLine.Audio/ForgeLine.Audio.csproj" />

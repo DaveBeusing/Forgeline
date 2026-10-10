@@ -10,7 +10,13 @@ After the first successful presentation, available runtime artwork may replace t
 
 ## Branding and timing
 
-The official studio name is **Undefined Behavior Studios**, with the compact **U/B** mark and **UNDEF BHVIOR** wordmark. The default timeline lasts 3 seconds, with a 1.15-second minimum display interval and a 0.3-second skip fade. Timing starts when the platform loop observes the first successful presentation, so graphics setup does not consume the visible interval. Timing data belongs to the splash definition, not the graphics backend.
+The official studio name is **Undefined Behavior Studios**, with the compact **U/B** mark and **UNDEF BHVIOR** wordmark. The default timeline lasts 10 seconds, with a 1.15-second minimum display interval and a 0.3-second skip fade. Timing starts when the platform loop observes the first successful presentation, so graphics setup does not consume the visible interval. Timing data belongs to the splash definition, not the graphics backend.
+
+The Windows client prefers the approved cinematic master, `studio-intro.mp4` (1672x940, 30 fps, exactly ten seconds), with the matching stereo PCM soundtrack, `studio-intro.wav`. These files are packaged into `assets/runtime/branding` by the client project for both build and publish. The master includes the camera move, logo/room parallax, three particle depth planes, drifting fog, metal highlights and final fade to black.
+
+Media Foundation decodes on a dedicated CPU thread with a two-frame bounded queue. The render owner consumes frames by the existing presentation timestamp, uploads them before command recording and retires GPU resources through the graphics device's fence-aware lifetime. The soundtrack begins at the current presentation offset and follows skip-fade opacity. Leaving the splash, closing or restarting cancels and joins decoding, resets the audio device and disposes GPU resources. No simulation clock is involved.
+
+The bootstrap remains the first surface. Missing or invalid video falls back to compiled studio textures and then built-in geometry. An unavailable audio device keeps the video playing silently. Runtime manifest validation and dependency readiness are unchanged. The legacy texture fallback holds its final brand until the ten-second timeline finishes.
 
 The canonical asset identifiers are:
 
