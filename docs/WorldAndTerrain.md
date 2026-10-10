@@ -1,5 +1,7 @@
 # World and Terrain
 
+Terrain appearance continues to belong to Presentation and compiled material assets. Surface detail, slope-adaptive UVs, smoother blend regions and decorative plant motion do not change the authoritative heightfield, terrain normals, navigation, collision, concealment or intelligence. See [World Asset Presentation](WorldAssetPresentation.md) for authoring and [Bounded Terrain Surface Refinement](adr/BoundedTerrainSurfaceRefinement.md) for ownership and qualification.
+
 ## Purpose
 
 `ForgeLine.World` owns the canonical spatial model and the first headless terrain representation for FORGELINE. Terrain rendering consumes this data through `ForgeLine.Presentation`; world state does not contain Direct3D 12 resources or presentation state.

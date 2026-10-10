@@ -1,5 +1,7 @@
 # Graphics
 
+Terrain surface refinement retains the existing four-layer/thirteen-texture pipeline, thirteen-sample ceiling, 63-DWORD direct root signature and 18-DWORD buffered shadow receiver. Pixel-footprint-filtered color/normal detail and Rock-only slope-adaptive coordinates share existing textures and passes. Construction-time settings validate before native allocation; no new GPU target or descriptor class is introduced. Vegetation uses copied, viewer-authorized instance transforms with the same phase in World and SunShadowDepth. Authoring ranges, culling/LOD policy and qualified viewpoints are described in [World Asset Presentation](WorldAssetPresentation.md); the architectural choice is recorded in [Bounded Terrain Surface Refinement](adr/BoundedTerrainSurfaceRefinement.md).
+
 ## Purpose
 
 `ForgeLine.Graphics` owns the ForgeLine Engine graphics backend for Windows x64. The backend remains intentionally narrow and RTS-focused: it provides Direct3D 12 device, swap-chain, frame-resource, synchronization, shader, geometry-buffer, texture, descriptor, sampler, depth-buffer, indexed-submission, and diagnostics foundations while terrain/world ownership remains outside the graphics layer.
