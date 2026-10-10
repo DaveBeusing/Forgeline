@@ -7,6 +7,32 @@ namespace ForgeLine.Platform.Windows.Tests;
 public sealed class WindowsWindowLifecycleIntegrationTests
 {
     [Fact]
+    public void WindowBackgroundIsBlackBeforeGraphicsInitialization()
+    {
+        using var platform = new WindowsPlatform();
+        using IWindow window = platform.CreateWindow(new WindowConfiguration("Startup background test", 640, 360));
+        nint brush = GetClassLongPtr(window.NativeHandle.Value, -10); // GCLP_HBRBACKGROUND
+        Assert.NotEqual(nint.Zero, brush);
+        Assert.Equal(Marshal.SizeOf<NativeBrush>(), GetObject(brush, Marshal.SizeOf<NativeBrush>(), out NativeBrush details));
+        Assert.Equal(0u, details.Style); // BS_SOLID
+        Assert.Equal(0u, details.Color); // RGB(0, 0, 0)
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct NativeBrush
+    {
+        public uint Style;
+        public uint Color;
+        public nuint Hatch;
+    }
+
+    [DllImport("user32.dll", EntryPoint = "GetClassLongPtrW")]
+    private static extern nint GetClassLongPtr(nint window, int index);
+
+    [DllImport("gdi32.dll", EntryPoint = "GetObjectW")]
+    private static extern int GetObject(nint handle, int size, out NativeBrush brush);
+
+    [Fact]
     public void BorderlessStartupAndRoundTripKeepValidRenderableClientState()
     {
         using var platform =

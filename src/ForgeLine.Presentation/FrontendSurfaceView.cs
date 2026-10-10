@@ -54,7 +54,7 @@ public readonly record struct FrontendSurfaceView(
             SplashElapsedSeconds: elapsedSeconds,
             SplashMasterOpacity: masterOpacity);
 
-    // Uses built-in glyph geometry, independent of runtime manifests and textures.
+    // Legacy view flag retained for callers; the studio compositor does not draw an overlay.
     public static FrontendSurfaceView StudioSplashBootstrap(float elapsedSeconds = 0f, float masterOpacity = 1f) =>
         StudioSplash(elapsedSeconds, masterOpacity) with { SplashBootstrap = true };
 

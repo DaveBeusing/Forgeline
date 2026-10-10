@@ -45,8 +45,7 @@ public sealed class ClientStartupLoopTests
             publish: views.Add,
             waitForEvents: () => throw new InvalidOperationException("Ready restart must bypass splash timing."),
             firstFramePresented: () => true,
-            enableArtwork: _ => throw new InvalidOperationException("Restart must not load branding textures."),
-            artworkFailed: () => false);
+            videoUnavailable: () => false);
         Assert.True(completed);
         Assert.True(coordinator.CanEnterFrontend);
         Assert.All(views, view => Assert.Equal(FrontendSurfaceKind.Loading, view.Kind));
@@ -90,15 +89,14 @@ public sealed class ClientStartupLoopTests
             publish: view => { Assert.Equal(owner, Environment.CurrentManagedThreadId); views.Add(view); },
             waitForEvents: () => { elapsed += TimeSpan.FromMilliseconds(100); Thread.Sleep(1); },
             firstFramePresented: () => pumps >= 2,
-            enableArtwork: _ => false,
-            artworkFailed: () => false,
+            videoUnavailable: () => false,
             elapsedProvider: () => elapsed);
         Assert.True(result);
         Assert.True(pumps >= 30);
         Assert.Equal(1, assetLoads);
         Assert.Equal(1, saveLoads);
         Assert.All(views, view => Assert.False(view.HasProgress));
-        Assert.Equal(showSplash, views[0].SplashBootstrap);
+        Assert.False(views[0].SplashBootstrap);
         Assert.Contains(views, view => view.Kind == FrontendSurfaceKind.Loading);
         Assert.True(diagnostics.Has(StartupPhase.FrontendDependenciesReady));
     }
@@ -112,32 +110,45 @@ public sealed class ClientStartupLoopTests
         int pumps = 0;
         bool result = ClientStartupLoop.Run(coordinator, false, "SmokeMode", Diagnostics(),
             () => { pumps++; return true; }, () => default, _ => { }, () => { },
-            () => pumps >= 10, _ => false, () => false);
+            () => pumps >= 10, () => false);
         Assert.True(result);
         Assert.Equal(10, pumps);
     }
 
     [Fact]
-    public void ArtworkFailureReturnsToBootstrapWithoutBlockingReadiness()
+    public void VideoFailureSkipsWithoutPublishingLegacyBranding()
     {
         using var coordinator = new ClientStartupCoordinator<object, object>(
             _ => new object(), _ => new object(), TestContext.Current.CancellationToken);
         Assert.True(SpinWait.SpinUntil(() => coordinator.DependenciesReady, Timeout));
         var diagnostics = Diagnostics();
         var views = new List<FrontendSurfaceView>();
-        TimeSpan elapsed = TimeSpan.Zero;
-        int artworkLoads = 0, pumps = 0;
         bool result = ClientStartupLoop.Run(coordinator, true, string.Empty, diagnostics,
-            () => { Assert.True(++pumps < 100); return true; },
-            () => new SplashInputState(true), views.Add,
-            () => elapsed += TimeSpan.FromMilliseconds(100), () => true,
-            _ => { artworkLoads++; return true; }, () => true, () => elapsed);
+            () => true, () => default, views.Add, () => { }, () => true,
+            () => true, splashFramePresented: () => false);
         Assert.True(result);
-        Assert.Equal(1, artworkLoads);
-        Assert.Contains(views, view => view.SplashBootstrap);
-        Assert.Contains(diagnostics.Snapshot(), e => e.Phase == StartupPhase.SplashArtwork &&
-            e.Kind == StartupEventKind.Failed);
-        Assert.False(diagnostics.Has(StartupPhase.ApplicationReady));
+        Assert.All(views, view => Assert.False(view.SplashBootstrap));
+        Assert.Contains(diagnostics.Snapshot(), e => e.Phase == StartupPhase.StudioSplash &&
+            e.Kind == StartupEventKind.Skipped && e.Detail == "VideoUnavailable");
+    }
+
+    [Fact]
+    public void TenSecondClockStartsWithAnimationRatherThanBlackStartupFrames()
+    {
+        using var coordinator = new ClientStartupCoordinator<object, object>(
+            _ => new object(), _ => new object(), TestContext.Current.CancellationToken);
+        Assert.True(SpinWait.SpinUntil(() => coordinator.DependenciesReady, Timeout));
+        TimeSpan elapsed = TimeSpan.Zero;
+        var views = new List<FrontendSurfaceView>();
+        bool result = ClientStartupLoop.Run(coordinator, true, string.Empty, Diagnostics(),
+            () => { Assert.True(elapsed.TotalSeconds < 20); return true; },
+            () => default, views.Add, () => elapsed += TimeSpan.FromSeconds(1),
+            () => true, () => false, () => elapsed,
+            splashFramePresented: () => elapsed.TotalSeconds >= 4);
+        Assert.True(result);
+        Assert.Equal(TimeSpan.FromSeconds(14), elapsed);
+        Assert.All(views.Take(5), view => Assert.Equal(0, view.SplashElapsedSeconds));
+        Assert.All(views, view => Assert.False(view.SplashBootstrap));
     }
 
     [Fact]
@@ -156,7 +167,7 @@ public sealed class ClientStartupLoopTests
         var diagnostics = Diagnostics();
         Assert.True(entered.Wait(Timeout, TestContext.Current.CancellationToken));
         bool result = ClientStartupLoop.Run(coordinator, true, string.Empty, diagnostics,
-            () => false, () => default, _ => { }, () => { }, () => false, _ => false, () => false);
+            () => false, () => default, _ => { }, () => { }, () => false, () => false);
         coordinator.Dispose();
         Assert.False(result);
         Assert.True(coordinator.WorkersCompleted);
@@ -181,7 +192,7 @@ public sealed class ClientStartupLoopTests
             var diagnostics = Diagnostics();
             Exception? error = Record.Exception(() => ClientStartupLoop.Run(coordinator, false, "Settings", diagnostics,
                 () => true, () => default, _ => { }, () => Thread.Sleep(1),
-                () => true, _ => false, () => false));
+                () => true, () => false));
             if (createInvalidManifest) Assert.IsAssignableFrom<System.Text.Json.JsonException>(error);
             else Assert.IsType<FileNotFoundException>(error);
             Assert.False(diagnostics.Has(StartupPhase.FrontendDependenciesReady));
