@@ -7,7 +7,7 @@ using ForgeLine.Simulation;
 namespace ForgeLine.Presentation;
 
 public readonly record struct OperationsView(bool Open, OperationsCategory Filter = OperationsCategory.All,
-    int Page = 0, EntityId Selected = default, SimulationSessionId Session = default);
+    int Page = 0, EntityId Selected = default, SimulationSessionId Session = default, bool Suppressed = false);
 public readonly record struct OperationsInteraction(bool Captured, EntityId Navigate = default,
     PlayerActionPanelMode Controls = PlayerActionPanelMode.Closed);
 
@@ -41,7 +41,9 @@ public static class OperationsLayout
         for (int rowIndex = 0; rowIndex < snapshot.Facilities.Count; rowIndex++)
         {
             var row = snapshot.Facilities[rowIndex];
-            if (view.Filter == OperationsCategory.All || row.Category == view.Filter || view.Filter == OperationsCategory.Blocked && row.Cause.Length > 0)
+            if (view.Filter == OperationsCategory.All || row.Category == view.Filter ||
+                view.Filter == OperationsCategory.Power && (row.PowerDemand.HasValue || row.GenerationCapacity.HasValue) ||
+                view.Filter == OperationsCategory.Blocked && row.Cause.Length > 0)
             { if (skip-- == 0) return row; }
         }
         return null;
@@ -68,7 +70,14 @@ public sealed class OperationsController
         _initialized = true; _layout = layout; _session = snapshot?.SessionId ?? default;
         if (newSession || snapshot?.PlayerExperience?.IsMatchComplete == true)
         { View = default; _lastRouteFocus = default; interaction.SetOperationsOpen(false); }
-        if (blocked || input.FocusLostThisFrame) { interaction.SetOperationsOpen(View.Open); return default; }
+        View = View with { Suppressed = blocked || input.FocusLostThisFrame };
+        if (View.Suppressed)
+        {
+            interaction.SetOperationsOpen(false);
+            var tab = OperationsLayout.Entry(layout);
+            return new(input.HasPointerPosition && tab.Contains(input.PointerPosition));
+        }
+        interaction.SetOperationsOpen(View.Open);
         var entry = OperationsLayout.Entry(layout);
         var panel = OperationsLayout.Panel(layout);
         bool captured = input.HasPointerPosition && (entry.Contains(input.PointerPosition) || View.Open && panel.Contains(input.PointerPosition));

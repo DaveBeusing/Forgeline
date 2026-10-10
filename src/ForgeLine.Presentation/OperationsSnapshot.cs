@@ -14,7 +14,7 @@ public enum OperationsCategory : byte { All, Production, Logistics, Supply, Powe
 public readonly record struct OperationsFacility(EntityId Entity, string Name, OperationsCategory Category,
     string Status, string Cause, string Explanation, int QueueCount, double? InventoryQuantity,
     double? InventoryCapacity, double? PowerDemand, double? AllocatedPower,
-    double? TransportCapacity, double? Utilization, PlayerActionPanelMode Controls);
+    double? TransportCapacity, double? Utilization, PlayerActionPanelMode Controls, double? GenerationCapacity = null);
 
 public readonly record struct OperationsResource(ResourceId Resource, string Name, double Quantity, double? NetRate);
 
@@ -125,7 +125,8 @@ internal static class OperationsSnapshotFactory
                 hasInventory ? quantity : null, hasInventory ? totalCapacity : null, consumer ? power.Demand : null,
                 consumer ? power.AllocatedPower : null, transportCapacity, nodeCapacity.ContainsKey(nodeId) ? measured.Utilization : null,
                 processing ? PlayerActionPanelMode.Production : units ? PlayerActionPanelMode.UnitProduction :
-                depot || provider ? PlayerActionPanelMode.Supply : hasInventory || cargo ? PlayerActionPanelMode.Logistics : PlayerActionPanelMode.Closed);
+                depot || provider ? PlayerActionPanelMode.Supply : hasInventory || cargo ? PlayerActionPanelMode.Logistics : PlayerActionPanelMode.Closed,
+                generator ? generation.MaximumGeneration : null);
             if (rows.Count < OperationsSnapshot.MaximumFacilities) rows.Add(row);
             else if (cause.Length > 0)
             {

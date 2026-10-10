@@ -15,7 +15,10 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class OperationsTests
 {
     [Theory]
-    [InlineData(1)] [InlineData(10)] [InlineData(100)] [InlineData(1000)]
+    [InlineData(1)]
+    [InlineData(10)]
+    [InlineData(100)]
+    [InlineData(1000)]
     public void LargeOwnedTopologyKeepsBoundedRoutesAndExcludesForeignLinks(int count)
     {
         using var scenario = WorldHoverExtractionTests.CreateScenario();
@@ -155,7 +158,10 @@ public sealed class OperationsTests
     }
 
     [Theory]
-    [InlineData(1)] [InlineData(10)] [InlineData(100)] [InlineData(1000)]
+    [InlineData(1)]
+    [InlineData(10)]
+    [InlineData(100)]
+    [InlineData(1000)]
     public void SnapshotBoundsListsAndPreservesTotalAndGeneration(int count)
     {
         var input = Enumerable.Range(1, count).Select(i => Facility(new((uint)i, 7))).ToArray();
@@ -187,8 +193,10 @@ public sealed class OperationsTests
     }
 
     [Theory]
-    [InlineData(1024, 720, 96, 1)] [InlineData(1600, 900, 144, 1)]
-    [InlineData(1920, 1080, 192, 2)] [InlineData(3840, 2160, 192, 1)]
+    [InlineData(1024, 720, 96, 1)]
+    [InlineData(1600, 900, 144, 1)]
+    [InlineData(1920, 1080, 192, 2)]
+    [InlineData(3840, 2160, 192, 1)]
     public void SharedControlsFitSafeAreaAndKeepDockMinimapAvailable(int width, int height, uint dpi, float uiScale)
     {
         var layout = GameplayHudLayout.Create(width, height, dpi, uiScale);
@@ -252,8 +260,28 @@ public sealed class OperationsTests
         controller.Update(input, Snapshot(session: 2), changed, interaction); Assert.False(controller.View.Open);
     }
 
+    [Fact]
+    public void TargetingSuppressesViewAndModalSkippedFramesDiscardClicks()
+    {
+        var input = new InputState(); var interaction = new PresentationInteractionState();
+        var controller = new OperationsController(); var snapshot = Snapshot();
+        var layout = GameplayHudLayout.Create(1600, 900, 96);
+        controller.Update(input, snapshot, layout, interaction);
+        Click(input, OperationsLayout.Entry(layout)); controller.Update(input, snapshot, layout, interaction);
+        Assert.True(controller.View.Open);
+        controller.Update(input, snapshot, layout, interaction, blocked: true);
+        Assert.True(controller.View.Suppressed); Assert.False(interaction.Capture().OperationsOpen);
+        Click(input, OperationsLayout.Control(layout, 0)); controller.CancelInput(input);
+        controller.Update(input, snapshot, layout, interaction);
+        Assert.True(controller.View.Open); Assert.False(controller.View.Suppressed);
+    }
+
     [Theory]
-    [InlineData(0)] [InlineData(1)] [InlineData(10)] [InlineData(100)] [InlineData(1000)]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(10)]
+    [InlineData(100)]
+    [InlineData(1000)]
     public void OverviewAndRenderInputHaveZeroWarmAllocation(int count)
     {
         var facilities = Enumerable.Range(1, count).Select(i => Facility(new((uint)i, 1))).ToArray();
@@ -274,8 +302,12 @@ public sealed class OperationsTests
         "NoInput", "NoInput", "INPUT STOCK INSUFFICIENT", 2, null, null, null, null, null, null, PlayerActionPanelMode.Production);
     private static PresentationSnapshot Snapshot(OperationsSnapshot? data = null, ulong tick = 4, ulong session = 1, uint player = 1, bool terminal = false)
     {
-        var experience = default(PlayerExperienceSnapshot) with { Player = new(player), Tick = new(tick),
-            MatchStatus = terminal ? PlayerMatchStatus.Victory : default };
+        var experience = default(PlayerExperienceSnapshot) with
+        {
+            Player = new(player),
+            Tick = new(tick),
+            MatchStatus = terminal ? PlayerMatchStatus.Victory : default
+        };
         return new(new(tick), TimeSpan.FromSeconds(.05), 0, [], sessionId: new(session), playerExperience: experience, operations: data);
     }
     private static void Click(InputState input, HudRect rect)
@@ -290,7 +322,9 @@ public sealed class OperationsTests
         public IGraphicsPipeline CreateGraphicsPipeline(GraphicsPipelineDescription description) => new Pipeline(description);
         public IGraphicsBuffer CreateBuffer(GraphicsBufferDescription description) => new Buffer(description);
         public void RenderFrame(GraphicsColor color, Action<IGraphicsCommandContext>? commands = null) { }
-        public void Resize(int width, int height) { } public void WaitForIdle() { } public void Dispose() { }
+        public void Resize(int width, int height) { }
+        public void WaitForIdle() { }
+        public void Dispose() { }
     }
     private sealed class Pipeline(GraphicsPipelineDescription description) : IGraphicsPipeline
     { public GraphicsPipelineDescription Description => description; public void Dispose() { } }

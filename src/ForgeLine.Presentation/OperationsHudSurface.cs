@@ -33,7 +33,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
         Quad(_bounds, GameplayHudVisualStyle.PanelBackground);
         Line("OPERATIONS", true);
         var view = context.Operations;
-        if (view.Open && view.Session == context.Snapshot.SessionId)
+        if (view.Open && !view.Suppressed && view.Session == context.Snapshot.SessionId)
         {
             _scale = OperationsLayout.Scale(context.Layout);
             _bounds = OperationsLayout.Panel(context.Layout); _line = 0;
@@ -62,14 +62,20 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                     { b = new(text); b.Append(data.Resources[6].Name); b.Append(" "); b.Number(data.Resources[6].Quantity, "0"); Line(b.Written); }
                     _line = 0;
                     Control(context.Layout, 1, view.Filter switch
-                    { OperationsCategory.Production => "PRODUCTION", OperationsCategory.Logistics => "LOGISTICS", OperationsCategory.Supply => "SUPPLY",
-                        OperationsCategory.Power => "POWER", OperationsCategory.Blocked => "BLOCKED", _ => "ALL FACILITIES" });
+                    {
+                        OperationsCategory.Production => "PRODUCTION",
+                        OperationsCategory.Logistics => "LOGISTICS",
+                        OperationsCategory.Supply => "SUPPLY",
+                        OperationsCategory.Power => "POWER",
+                        OperationsCategory.Blocked => "BLOCKED",
+                        _ => "ALL FACILITIES"
+                    });
                     Control(context.Layout, 2, "NEXT PAGE");
                     for (int i = 0; i < OperationsLayout.PageSize; i++)
                     {
                         b = new(text);
                         if (OperationsLayout.Row(data, view, i) is { } row)
-                        { b.Append(row.Entity == view.Selected ? "> " : "  "); b.Append(row.Name); b.Append(" / "); b.Append(row.Status); b.Append(" / Q "); b.Number(row.QueueCount, "0"); }
+                        { b.Append(row.Entity == view.Selected ? "> " : "  "); b.Append(row.Name); b.Append(" / "); b.Append(row.Cause.Length > 0 ? row.Cause : row.Status); b.Append(" / Q "); b.Number(row.QueueCount, "0"); }
                         else b.Append(i == 0 ? "NO MATCHING FACILITIES" : "");
                         Control(context.Layout, i + 3, b.Written);
                     }
@@ -83,16 +89,17 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                         Line(detail.Explanation);
                         b = new(text); b.Append("STOCK "); Number(ref b, detail.InventoryQuantity); b.Append(" / "); Number(ref b, detail.InventoryCapacity);
                         b.Append(" POWER "); Number(ref b, detail.AllocatedPower); b.Append(" / "); Number(ref b, detail.PowerDemand);
+                        b.Append(" GENMAX "); Number(ref b, detail.GenerationCapacity);
                         b.Append(" LOAD "); Number(ref b, detail.Utilization, "P0"); Line(b.Written);
-                        int routes = 0, unavailable = 0; double linkCapacity = 0;
+                        int routes = 0, unavailable = 0;
                         for (int routeIndex = 0; routeIndex < data.Routes.Count; routeIndex++)
                         {
                             var route = data.Routes[routeIndex];
                             if (route.Source == detail.Entity || route.Destination == detail.Entity)
-                            { routes++; linkCapacity += route.CapacityPerSecond; if (!route.Enabled) unavailable++; }
+                            { routes++; if (!route.Enabled) unavailable++; }
                         }
                         b = new(text); b.Append("LISTED LINKS "); b.Number(routes, "0"); b.Append(" DISABLED "); b.Number(unavailable, "0");
-                        b.Append(" CAP/S "); b.Number(linkCapacity, "0"); b.Append(" / FOCUS NEXT"); Line(b.Written);
+                        b.Append(" NODE CAP/S "); Number(ref b, detail.TransportCapacity); b.Append(" / FOCUS NEXT"); Line(b.Written);
                     }
                     else Line("SELECT A FACILITY FOR CAUSE AND CONTROLS");
                     _bounds = panel;
