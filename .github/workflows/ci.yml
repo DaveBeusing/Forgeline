@@ -7,6 +7,17 @@ on:
   pull_request:
     branches:
       - master
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Explicit release stage (all existing quality gates apply)
+        type: choice
+        options: [rc, stable]
+        required: true
+      release_tag:
+        description: Existing annotated vMAJOR.MINOR.PATCH tag for stable
+        type: string
+        required: false
 
 permissions:
   contents: read
@@ -21,8 +32,34 @@ env:
   TESTINGPLATFORM_TELEMETRY_OPTOUT: "1"
 
 jobs:
-  build-test:
+  reserve-version:
+    if: github.event_name != 'pull_request'
     runs-on: windows-latest
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.identity.outputs.version }}
+      sha: ${{ steps.identity.outputs.sha }}
+      attempt: ${{ steps.identity.outputs.attempt }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Allocate durable release identity
+        id: identity
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_CHANNEL: ${{ inputs.channel || 'preview' }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: ./build/Set-BuildVersion.ps1 -Channel $env:RELEASE_CHANNEL -ReleaseTag $env:RELEASE_TAG
+
+  build-test:
+    needs: reserve-version
+    if: ${{ !cancelled() && (github.event_name == 'pull_request' || needs.reserve-version.result == 'success') }}
+    runs-on: windows-latest
+    env:
+      FORGELINE_BUILD_VERSION: ${{ needs.reserve-version.outputs.version }}
 
     steps:
       - name: Check out repository
@@ -30,12 +67,42 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Validate semantic version progression
+      - name: Assign isolated PR identity
+        if: github.event_name == 'pull_request'
+        id: pr-version
+        shell: pwsh
+        run: ./build/Set-BuildVersion.ps1 -Channel pr
+
+      - name: Reject reused release allocation on partial reruns
+        if: github.event_name != 'pull_request'
+        shell: pwsh
+        env:
+          RESERVED_ATTEMPT: ${{ needs.reserve-version.outputs.attempt }}
+        run: |
+          if ($env:RESERVED_ATTEMPT -ne $env:GITHUB_RUN_ATTEMPT) {
+            throw 'Rerun all jobs to allocate a fresh version; partial release rebuilds are prohibited.'
+          }
+
+      - name: Use PR identity throughout validation and packaging
+        if: github.event_name == 'pull_request'
+        shell: pwsh
+        env:
+          PR_VERSION: ${{ steps.pr-version.outputs.version }}
+        run: '"FORGELINE_BUILD_VERSION=$env:PR_VERSION" >> $env:GITHUB_ENV'
+
+      - name: Validate release configuration
         shell: pwsh
         env:
           FORGELINE_VERSION_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
           FORGELINE_VERSION_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
         run: ./build/Validate-SemVer.ps1 -BaseRef "$env:FORGELINE_VERSION_BASE" -HeadRef "$env:FORGELINE_VERSION_HEAD"
+
+      - name: Version allocation and metadata contracts
+        shell: pwsh
+        run: |
+          ./build/Test-Versioning.ps1
+          ./build/Test-VersionAllocation.ps1
+          ./build/Test-ReleasePublication.ps1
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v6
@@ -115,20 +182,57 @@ jobs:
         run: dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario central-divide --profile validation --ticks 80000 --seed 2026 --matches 1 --require-terminal --diagnostics-output artifacts/opponent-full-match.json --telemetry-output artifacts/opponent-balance-telemetry.json
 
       - name: Upload pre-alpha package
-        if: always()
+        if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: pre-alpha-package
-          path: artifacts/prealpha/FORGELINE-prealpha-win-x64.zip
-          if-no-files-found: warn
+          name: pre-alpha-package-${{ env.FORGELINE_BUILD_VERSION }}-attempt-${{ github.run_attempt }}
+          path: artifacts/prealpha/FORGELINE-*
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Upload engine diagnostic artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: engine-diagnostics
+          name: engine-diagnostics-${{ env.FORGELINE_BUILD_VERSION }}-attempt-${{ github.run_attempt }}
           path: |
             artifacts/*.json
             artifacts/maps/*.json
             artifacts/rendering-benchmarks/**
           if-no-files-found: warn
+
+  publish-release:
+    needs: [reserve-version, build-test]
+    if: ${{ github.event_name != 'pull_request' && needs.build-test.result == 'success' }}
+    runs-on: windows-latest
+    environment: release
+    permissions:
+      contents: write
+    steps:
+      - name: Reject publication-only reruns
+        shell: pwsh
+        env:
+          RESERVED_ATTEMPT: ${{ needs.reserve-version.outputs.attempt }}
+        run: |
+          if ($env:RESERVED_ATTEMPT -ne $env:GITHUB_RUN_ATTEMPT) {
+            throw 'Rerun all jobs; publication must use this attempt of the successful validation run.'
+          }
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.reserve-version.outputs.sha }}
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: pre-alpha-package-${{ needs.reserve-version.outputs.version }}-attempt-${{ github.run_attempt }}
+          path: artifacts/release
+      - name: Publish the exact tested artifact
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ADMIN_READ_TOKEN: ${{ secrets.RELEASE_ADMIN_READ_TOKEN }}
+          BUILD_VERSION: ${{ needs.reserve-version.outputs.version }}
+          SOURCE_REVISION: ${{ needs.reserve-version.outputs.sha }}
+        run: |
+          . ./build/Versioning.ps1
+          $notes = if ($env:BUILD_VERSION -match '-preview\.') { 'docs/releases/Preview.md' } else { "docs/releases/$(Get-ProductVersion).md" }
+          ./build/Publish-Release.ps1 -Version $env:BUILD_VERSION -SourceRevision $env:SOURCE_REVISION -NotesPath $notes

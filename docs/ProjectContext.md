@@ -79,21 +79,14 @@ The following precedence applies when technical state, documentation, and govern
 
 ## Semantic Versioning Policy
 
-FORGELINE uses Semantic Versioning in `MAJOR.MINOR.PATCH` form. The authoritative version components are `ForgeLineVersionMajor`, `ForgeLineVersionMinor`, and `ForgeLineVersionPatch` in the repository-root `Directory.Build.props`. The initial governed baseline is `0.1.0`.
+FORGELINE adopts [Unified Versioning Standard 1.0](UnifiedVersioningStandard.md)
+through the release-versioning migration. The repository mapping and release
+procedure are defined in [Release Versioning](ReleaseVersioning.md).
 
-The versioning rules are binding:
-
-- every repository commit after the versioning bootstrap increments `ForgeLineVersionPatch` by exactly one;
-- `MAJOR` and `MINOR` may only change through an explicit product/release decision and must never decrease;
-- changing `MAJOR` or `MINOR` does not reset the patch counter; the same commit still increments `PATCH` by exactly one;
-- each non-merge development commit consumes exactly one new patch value;
-- merge commits are structural integration commits: they may contain multiple already-versioned commits, preserve the highest integrated parent version, and do not consume an additional patch value;
-- merge and rebase integration are permitted when they preserve the individual versioned commits; squash integration is prohibited because it collapses multiple patch-bearing commits into one commit;
-- CI validates the complete commit graph and rejects missing, repeated, skipped, or decreasing development patch versions while validating merge commits separately;
-- `build/Increment-PatchVersion.ps1` is the canonical helper for preparing the version change before each commit.
-
-The bootstrap commit that first establishes `0.1.0` is the only commit without a prior governed version to increment from.
-
+Product versions change for release scope, not for commits or merges. Existing
+historical versions, tags and commit history are preserved. The migration keeps
+0.1.333 as its target; it does not claim that this historical development number
+was a stable release. The next boundary requires an explicit release decision.
 ## Git and Integration Policy
 
 The project development model requires:
@@ -102,8 +95,8 @@ The project development model requires:
 - short-lived feature, fix, and technical branches;
 - pull requests for integration;
 - small, logically bounded commits;
-- one semantic patch increment per commit after the versioning bootstrap;
-- preserve individual versioned commits during integration; ordinary merge commits and rebase integration are allowed, while squash merges are incompatible with the version invariant;
+- release-related SemVer changes only; no per-commit PATCH increment;
+- preserve small technical commits; ordinary merge and rebase integration remain allowed and the established no-squash workflow remains in force;
 - successful required CI before merge;
 - no routine force pushes or branch deletion on `master`;
 - deletion of short-lived branches after successful integration when appropriate;
@@ -123,7 +116,7 @@ The check context emitted by the workflow is:
 
 The required check represents the complete CI job, not only compilation or the unit-test subset. Its current validation path includes:
 
-1. semantic-version progression and linear-history validation;
+1. release configuration, build identity and version allocation contract validation;
 2. restore;
 3. project-reference validation;
 4. Release build;
@@ -143,7 +136,7 @@ The minimum intended protection for `master` is:
 - require integration through a pull request;
 - require the GitHub Actions `build-test` check to succeed before merge;
 - require branches to be up to date with `master` before integration;
-- preserve individual versioned commits during integration; merge commits and rebase integration are valid, while squash merges must be disabled for governed integration;
+- preserve individual technical commits; merge and rebase integration are valid and squash integration remains disabled by policy;
 - prevent force pushes;
 - prevent branch deletion;
 - preserve any stronger repository or organization protections already in effect;
