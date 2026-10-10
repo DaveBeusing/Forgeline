@@ -112,3 +112,7 @@ When the player experience becomes terminal, the controller closes the dock, cle
 Focused tests cover existing request creation plus dock hit testing, pointer capture, card selection versus explicit activation, disabled input actions, session replacement, stale context, terminal behavior, supported tactical action inventory, and DPI/UI-scale-bounded layout. Repository CI remains responsible for the Release solution build, project-reference checks, client/window qualification, and the broader test suite.
 
 Primary/advanced action controls wait until copied tactical selection identities exactly match the current presentation selection, including full entity generation. While a filtered selection awaits capture, primary controls show UPDATING SELECTION and advanced item actions remain unavailable. Matching counts alone cannot authorize a request to a different subgroup.
+
+## Configurable keyboard controls
+
+The keys described above are defaults. Settings can rebind mode, next-item, primary/secondary setting, decrease/increase, activation and cancel-job actions. Cards and controls help use the same session registry. Dock navigation intentionally takes precedence over camera movement while the panel owns keyboard focus; global shortcuts cannot be explicitly rebound onto camera keys. Escape remains fixed. See [complete conflict and migration rules](GameplayInputAccessibilityAndQualification.md).

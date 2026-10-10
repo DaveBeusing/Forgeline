@@ -68,7 +68,7 @@ Missing unit/building reduced meshes retain the base mesh when available.
 
 These thresholds require visual qualification before production acceptance.
 
-`Home` focuses the current owned, live Command Core using the completed-tick display snapshot. If no core survives, the lowest stable owned completed-building identity is the fallback; with no eligible building it does nothing. Focus preserves yaw, pitch, zoom and selection and never submits a gameplay command. A custom camera binding using Home takes precedence and disables the fixed home shortcut.
+`Home` focuses the current owned, live Command Core using the completed-tick display snapshot. If no core survives, the lowest stable owned completed-building identity is the fallback; with no eligible building it does nothing. Focus preserves yaw, pitch, zoom and selection and never submits a gameplay command. Base focus is configurable through the gameplay registry. A custom camera binding using Home takes precedence over the default gameplay shortcut; help shows CAMERA KEY until base focus is rebound.
 
 Control groups retain Ctrl+digit assignment, digit recall and Ctrl+Shift+digit clearing. Two separate unmodified presses of the same assigned digit within 350 ms recall and then focus the current visible owned surviving members' mean position. The interval is constructor-configurable for tests. Holds, modifiers, another slot, empty groups, session replacement, help/pause and display/focus transitions break the sequence. Short key presses completed between frames are retained once; operating-system repeats are ignored.
 
@@ -93,9 +93,9 @@ Focus cancels held world/minimap gestures and shows a brief nonblocking camera m
 | Toggle box selection | Shift + Left-drag |
 | Movement order | Right Mouse Button |
 
-Camera bindings are represented by `RtsCameraBindings`. Selection conventions currently use the standard mouse buttons and Shift directly; command-panel remapping remains a later UI/settings concern.
+Camera bindings are represented by `RtsCameraBindings`. Selection conventions use the standard mouse buttons and Shift directly. Gameplay shortcuts use the shared `GameplayBindingRegistry`, with camera-aware conflict validation and cached key captions.
 
-The pre-alpha client persists the existing `RtsCameraBindings` contract in `%LOCALAPPDATA%\\FORGELINE\\settings.json`. Camera pan, rotation, pitch, and drag-pan bindings can therefore be changed without adding a second input model. Settings validation rejects unknown/no-button values and duplicate primary camera actions. Selection, command-panel, and gameplay-action rebinding remains deferred until those surfaces have equivalent conflict handling and discoverability.
+The pre-alpha client persists the existing `RtsCameraBindings` contract in `%LOCALAPPDATA%\\FORGELINE\\settings.json`. Camera pan, rotation, pitch, and drag-pan bindings can therefore be changed without adding a second input model. Settings validation rejects unknown/no-button values and duplicate primary camera actions. Settings also exposes twenty-five gameplay actions, including dock navigation and activation. Schema 1 migrates without rewriting camera values; invalid gameplay overrides alone recover while valid camera/display settings survive. See [editing and overlap rules](GameplayInputAccessibilityAndQualification.md).
 
 `F1` (or `F12`) toggles the in-game controls reference. F1, F12, Escape, and the Back button close it. Escape closes help without opening pause. The reference uses active camera bindings and the configured edge-scroll state. `Shift + F1` toggles development metrics; `Space` toggles explicit player pause. Help and pause use the existing simulation-owner control boundary.
 

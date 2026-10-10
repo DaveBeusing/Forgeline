@@ -55,7 +55,7 @@ Restore does not incorrectly resume a match that is still explicitly paused or d
 
 ## Minimal Onboarding
 
-The optional match guide shows the first unobserved objective, a current binding, a short explanation and the next goal when space permits. **Shift + F12** hides/shows it for the current session; unshifted F1/F12 still opens help. The existing **Onboarding** setting controls persistent default visibility, so there is no settings schema migration. Hiding the guide does not stop milestone observation or prevent RTS actions. Toggle frames consume held input and cancel in-progress pointer/placement/targeting gestures.
+The optional match guide shows the first unobserved objective, a current binding, a short explanation and the next goal when space permits. **Shift + F12** hides/shows it for the current session; unshifted F1/F12 still opens help. The existing **Onboarding** setting controls persistent default visibility, and remains unchanged by the gameplay-binding schema migration. Hiding the guide does not stop milestone observation or prevent RTS actions. Toggle frames consume held input and cancel in-progress pointer/placement/targeting gestures.
 
 The canonical start already provides a Command Core, construction stock and a stocked supply provider. It therefore starts at **Establish Power**, without treating starting Steel as processed output. The advisory sequence covers Ferrous Ore extraction, Steel processing, a Vehicle Factory, fielding a Scout, available supply, permitted opponent contact, and the actual Command Core objective. Players may act in any order; already observed steps are skipped. No camera movement, resource grants, scripted build choices, tutorial timers or simulation achievements are introduced.
 
@@ -63,7 +63,7 @@ The compact card occupies the upper secondary information region; combat-group i
 
 Guide observations are session-local presentation state. Save/load reconstructs progress from extant authorized state and persisted production counters; presentation history for buildings/units already destroyed before restoration is not a durable achievement. Restart/session replacement clears observations and the temporary hidden state. See [milestone sources](MatchFlowAndPlayerExperience.md#early-game-guidance-observations).
 
-The controls reference lists implemented camera, selection, movement, construction, production, logistics, supply and combat bindings, plus the Command Core objective. It uses active camera bindings and indicates whether edge pan is disabled. F1/F12, Escape or Back closes it without forwarding the closing gesture to gameplay. Shift + F1 toggles development metrics.
+The controls reference lists implemented camera, selection, movement, construction, production, logistics, supply and combat bindings, plus the Command Core objective. It uses active camera and gameplay bindings and indicates whether edge pan is disabled. F1/F12, Escape or Back closes it without forwarding the closing gesture to gameplay. Shift + F1 toggles development metrics.
 
 The minimum complete vertical-slice workflow is:
 
@@ -75,7 +75,7 @@ The minimum complete vertical-slice workflow is:
 6. use tactical combat and artillery;
 7. destroy the enemy Command Core.
 
-The compact gameplay hint keeps F1, Space, and the current victory objective discoverable when onboarding is enabled.
+The compact gameplay hint keeps F1, the mapped pause key, and the current victory objective discoverable when onboarding is enabled.
 
 ## Settings
 
@@ -92,7 +92,8 @@ The current schema contains:
 - edge-scrolling enablement;
 - camera pan-speed multiplier;
 - camera key bindings;
-- drag-pan mouse binding.
+- drag-pan mouse binding;
+- gameplay shortcut overrides with camera/modal/group conflict validation.
 
 Settings are typed and validated before window or camera creation.
 
@@ -107,7 +108,7 @@ Primary camera actions require unique non-unknown keys. Invalid drag-pan binding
 
 If the settings file is missing, validated defaults are created. If it is malformed, uses an unsupported schema, or contains invalid values, the invalid file is moved to a timestamped settings.json.invalid-* file and a fresh validated default file is written.
 
-Camera rebinding is intentionally limited to the existing RtsCameraBindings surface. Selection, command-panel, and gameplay action rebinding are not falsely exposed before those systems have a complete conflict and discoverability model.
+GAMEPLAY ACTION selects one of twenty-five supported actions; GAMEPLAY KEY selects a candidate. Invalid candidates retain the valid draft, display the conflict and disable APPLY. Changing the mapping restarts the frontend window before a match begins. Camera settings remain independent and preserved. Schema 1 migrates to schema 2; invalid gameplay data alone recovers without discarding valid camera/display values. Mouse selection, group digits, help and Escape stay fixed. Onboarding, placement and controls prompts share the cached registry. See [binding rules and qualification](GameplayInputAccessibilityAndQualification.md).
 
 ## UI Scale and DPI
 

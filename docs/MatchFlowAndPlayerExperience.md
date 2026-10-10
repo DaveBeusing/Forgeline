@@ -304,3 +304,7 @@ An optional operations surface centralizes local facility stock, queues, power a
 ## Alert condition lifecycle
 
 The presentation alert view retains one bounded identity per session/player/condition/onset tick. Resolution removes the condition and recurrence starts a fresh identity. Restart/restore resets lifecycle capture; pause retains completed state and terminal navigation is disabled. Existing condition rules and simulation mechanics are unchanged. See [actionable alert scope](ActionableAlertsAndStrategicMap.md).
+
+## Gameplay prompt discovery
+
+Settings exposes supported gameplay shortcuts with conflict feedback before APPLY. Active-session help, command cards and early-game guidance share the saved mapping; gameplay-binding changes restart the frontend session before starting a match. The guide stays advisory and continues to observe only authorized completed-tick progress. Fixed mouse/group/help controls remain available. See [gameplay binding behavior](GameplayInputAccessibilityAndQualification.md).
