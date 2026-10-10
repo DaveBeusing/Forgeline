@@ -1,8 +1,8 @@
 # Unified Versioning Standard
 
-**Status:** Proposed project-wide policy  
-**Applies to:** .NET-based software projects, including Depot, DepotManager, rtaime, FORGELINE / ForgeLine Engine, Singularity, Sentum, and related tools where adopted  
-**Version of this document:** 1.0  
+**Status:** Proposed project-wide policy\
+**Applies to:** .NET-based software projects, including Depot, DepotManager, rtaime, FORGELINE / ForgeLine Engine, Singularity, Sentum, and related tools where adopted\
+**Version of this document:** 1.0\
 **Effective date:** Upon project-specific adoption
 
 ## 1. Purpose

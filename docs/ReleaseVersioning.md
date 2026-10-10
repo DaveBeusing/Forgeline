@@ -152,3 +152,38 @@ dotnet test --solution ForgeLine.sln --configuration Release --no-build
 Build metadata regressions run in the Client tests. CI supplies
 `FORGELINE_BUILD_VERSION` for its complete build/package path; this environment
 value must not be changed between compilation, tests and packaging.
+
+## Adoption validation results
+
+Local validation on 2026-10-10:
+
+- Release solution build: zero warnings/errors. The C# build and complete suite
+  used implementation commit `daf6d2e`; later implementation changes affect only
+  release scripts and workflow handling, with their own regression checks.
+- Version grammar, numeric field limits, independent preview/RC numbering,
+  collision recovery, rerun allocation and PR isolation: passed.
+- Publication simulation: PR exclusion, immutability gate, checksum checks,
+  draft/upload/publication order and durable collision refusal passed.
+- Architecture: 42-project graph passed with no cycles or boundary violations.
+- CI workflow: actionlint 1.7.12 passed.
+- Directly affected client metadata, diagnostics and menu tests: 15 passed.
+- Complete solution tests: 1,621 passed, one failed, five opt-in hardware tests
+  skipped (1,627 total). The failure was
+  `ClientStartupNativeTests.BrandedFramePresentsWhileAssetWorkerIsBlockedAndMenuWaitsForHandoff`,
+  with a startup presentation timeout. Its code and 30-second limit are unchanged
+  from master. The isolated rerun passed in 11 seconds with that same limit.
+  This does not turn the original complete run into a passing run, and no
+  independent baseline reproduction is claimed.
+- Runtime asset qualification: 341 assets, including 158 meshes, 56 textures
+  and 127 materials, passed.
+- Real package validation at `0e0d632ebb93701becac5c376a215f342cb94c3d`:
+  two publish trees were byte-identical. The validation-only version was
+  `0.1.333-pr.165.1.1`, source cleanliness was true, and SDK was 10.0.401.
+  ZIP SHA-256, all 400 internal file checksums and agreement of internal/external
+  provenance passed. A repeat with the same output name refused replacement.
+
+PR #165 remains draft until final-head hosted CI is qualified. Hosted CI,
+Frame hot paths and Scalability checks were queued at the final status read.
+Native immutable publication has been simulated, not executed; repository
+configuration and release-owner prerequisites above remain activation blockers.
+No release/tag/history rewrite or merge was performed.
