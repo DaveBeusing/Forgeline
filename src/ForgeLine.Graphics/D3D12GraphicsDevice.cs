@@ -249,8 +249,9 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                         _presentedFrameCount
                 })
             {
+                DirectionalShadows = ShadowDiagnostics,
                 Frame = new GraphicsFrameDiagnostics(
-                    new GraphicsFramePlan(_surfaceLifecycle.Width, _surfaceLifecycle.Height, _configuration.BufferCount, _sceneOutput.Enabled),
+                    new GraphicsFramePlan(_surfaceLifecycle.Width, _surfaceLifecycle.Height, _configuration.BufferCount, _sceneOutput.Enabled, _directionalShadows.Resolution),
                     _cpuTimingSubmission, _worldCpuMilliseconds, _overlayCpuMilliseconds,
                     _gpuTimingFence, _worldGpuMilliseconds, _overlayGpuMilliseconds)
                 {
@@ -345,6 +346,8 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                         0,
                         checked((uint)description.VertexRootConstantCount)),
                     ShaderVisibility.Vertex));
+            if (description.VertexConstantsInBuffer)
+                rootParameters[0] = new RootParameter1(RootParameterType.ConstantBufferView, new RootDescriptor1(0, 0), ShaderVisibility.Vertex);
         }
 
         for (int slot = 0;
@@ -359,6 +362,13 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                             1,
                             checked((uint)slot))),
                     ShaderVisibility.Pixel));
+        }
+
+        if (description.DirectionalShadowReceiver)
+        {
+            if (!_directionalShadows.Enabled) throw new NotSupportedException("Shadow receiver pipelines require enabled directional shadows.");
+            rootParameters.Add(new RootParameter1(RootParameterType.ConstantBufferView, new RootDescriptor1(1, 0), ShaderVisibility.Pixel));
+            rootParameters.Add(new RootParameter1(new RootDescriptorTable1(new DescriptorRange1(DescriptorRangeType.ShaderResourceView, 1, 15)), ShaderVisibility.Pixel));
         }
 
         StaticSamplerDescription[]? samplers =
@@ -458,8 +468,8 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 DepthStencilState = description.DepthEnabled
                     ? DepthStencilDescription.Default
                     : DepthStencilDescription.None,
-                RenderTargetFormats = [description.TargetFormat == GraphicsFrameTargetFormat.Rgba16Float
-                    ? Format.R16G16B16A16_Float : BackBufferFormat],
+                RenderTargetFormats = description.TargetFormat == GraphicsFrameTargetFormat.Depth32Float ? [] :
+                    [description.TargetFormat == GraphicsFrameTargetFormat.Rgba16Float ? Format.R16G16B16A16_Float : BackBufferFormat],
                 DepthStencilFormat = DepthBufferFormat,
                 SampleDescription = SampleDescription.Default
             };
@@ -693,6 +703,10 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         allocator.Reset();
         _commandList.Reset(allocator);
         _recording = true;
+        _constantOffset = 256;
+        _shadowRecorded = _shadowRecording = _worldDrawRecorded = false;
+        _shadowDraws = _shadowCasters = 0;
+        _shadowCpu = null;
         _passState = default;
         _recordedCompositeCpuMilliseconds = null;
         _frameHasOverlay[_frameIndex] = false;
@@ -759,6 +773,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         try
         {
             recordCommands?.Invoke(context);
+            if (_shadowRecording) throw new InvalidOperationException("The directional shadow pass was not ended.");
             if (_sceneOutput.Enabled && _passState.Current == GraphicsFramePass.World)
                 context.BeginPass(GraphicsFramePass.Overlay);
         }
@@ -782,7 +797,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         _submittedFrameCount++;
         SignalSubmittedFrame();
         _cpuTimingSubmission = _submittedFrameCount;
-        _worldCpuMilliseconds = _recordedWorldCpuMilliseconds;
+        _worldCpuMilliseconds = Math.Max(0, _recordedWorldCpuMilliseconds - (_shadowCpu ?? 0));
         _overlayCpuMilliseconds = _recordedOverlayCpuMilliseconds;
         _compositeCpuMilliseconds = _recordedCompositeCpuMilliseconds;
         _recording = false;
@@ -899,6 +914,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
 
     private void DisposeNativeObjects()
     {
+        ReleaseDirectionalShadows();
         if (_renderTargets is not null)
         {
             ReleaseRenderTargets();
@@ -1169,6 +1185,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
 
         ulong worldEnd = _timestampReadback.GetData<ulong>(offset + 2 * sizeof(ulong));
         ulong overlayStart = _timestampReadback.GetData<ulong>(offset + 3 * sizeof(ulong));
+        ReadCompletedShadowTiming(frameIndex);
 
         if (end >= start && _frameFenceValues[frameIndex] > _gpuTimingFence)
         {
@@ -1178,7 +1195,8 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 _timestampFrequency;
             if (worldEnd >= start && overlayStart >= worldEnd && overlayStart <= end)
             {
-                _worldGpuMilliseconds = (worldEnd - start) * 1000.0 / _timestampFrequency;
+                _worldGpuMilliseconds = Math.Max(0, (worldEnd - start) * 1000.0 / _timestampFrequency -
+                    (_shadowGpuFence == _frameFenceValues[frameIndex] ? _shadowGpu ?? 0 : 0));
                 _compositeGpuMilliseconds = _sceneOutput.Enabled
                     ? (overlayStart - worldEnd) * 1000.0 / _timestampFrequency : null;
                 _overlayGpuMilliseconds = _frameHasOverlay[frameIndex]
@@ -1191,12 +1209,14 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             false;
     }
 
-    internal GraphicsFrameTargetFormat ActiveTargetFormat => _sceneOutput.Enabled && _passState.Current == GraphicsFramePass.World
+    internal GraphicsFrameTargetFormat ActiveTargetFormat => _shadowRecording ? GraphicsFrameTargetFormat.Depth32Float :
+        _sceneOutput.Enabled && _passState.Current == GraphicsFramePass.World
         ? GraphicsFrameTargetFormat.Rgba16Float : GraphicsFrameTargetFormat.Rgba8Unorm;
 
     internal bool BeginPass(GraphicsFramePass pass)
     {
         ValidateRecording();
+        if (_shadowRecording) throw new InvalidOperationException("End the shadow pass before entering world or overlay passes.");
         if (!_passState.Enter(pass))
             return false;
         long now = System.Diagnostics.Stopwatch.GetTimestamp();
@@ -1504,6 +1524,9 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
 
     private void ResetFrameMeasurements()
     {
+        _shadowGpu = null;
+        _shadowGpuFence = 0;
+        if (_shadowSamples is not null) Array.Clear(_shadowSamples);
         _cpuTimingSubmission = 0;
         _gpuTimingFence = 0;
         _worldCpuMilliseconds = 0;

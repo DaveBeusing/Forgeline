@@ -26,6 +26,7 @@ public sealed class TerrainRenderer : IDisposable
     private const int LayerCount = TerrainChunkSplatData.LayerCount;
 
     private readonly IGraphicsPipeline _pipeline;
+    private readonly IGraphicsPipeline? _shadowPipeline;
     private readonly TerrainChunkRenderResource[] _resources;
     private readonly RuntimeWorldAssetResources? _runtimeAssets;
     private readonly IGraphicsTexture? _fallbackBaseColor;
@@ -66,6 +67,7 @@ public sealed class TerrainRenderer : IDisposable
             _pipeline =
                 CreateTerrainPipeline(
                     graphics);
+            if (graphics.DirectionalShadows.Enabled) _shadowPipeline = DirectionalShadowCasterPipeline.Create(graphics, false);
             _runtimeAssets =
                 runtimeAssets is null
                     ? null
@@ -186,6 +188,7 @@ public sealed class TerrainRenderer : IDisposable
             _fallbackBaseColor?.Dispose();
             _runtimeAssets?.Dispose();
             _pipeline?.Dispose();
+            _shadowPipeline?.Dispose();
             throw;
         }
 
@@ -336,7 +339,32 @@ public sealed class TerrainRenderer : IDisposable
         _fallbackBaseColor?.Dispose();
         _runtimeAssets?.Dispose();
         _pipeline.Dispose();
+        _shadowPipeline?.Dispose();
         _disposed = true;
+    }
+
+    public int RenderShadow(IGraphicsCommandContext context, GraphicsDirectionalShadowFrame frame, int maximumDraws)
+    {
+        ThrowIfDisposed();
+        ArgumentNullException.ThrowIfNull(context);
+        frame.Validate();
+        ArgumentOutOfRangeException.ThrowIfNegative(maximumDraws);
+        context.SetPipeline(_shadowPipeline ?? throw new NotSupportedException("Terrain shadows were not configured at construction."));
+        Span<float> constants = stackalloc float[16];
+        WriteMatrix(frame.ViewProjection, constants);
+        context.SetVertexConstants(constants);
+        ViewFrustum frustum = ViewFrustum.FromViewProjection(frame.ViewProjection);
+        int draws = 0;
+        foreach (TerrainChunkRenderResource resource in _resources)
+        {
+            if (draws >= maximumDraws) break;
+            if (!frustum.Intersects(resource.Bounds)) continue;
+            context.SetVertexBuffer(resource.VertexBuffer, TerrainRenderVertex.SizeInBytes);
+            context.SetIndexBuffer(resource.IndexBuffer, GraphicsIndexFormat.ThirtyTwoBit);
+            context.DrawIndexed(resource.IndexCount);
+            draws++;
+        }
+        return draws;
     }
 
     private TerrainLayerResource[] CreateLayers(
@@ -679,7 +707,8 @@ public sealed class TerrainRenderer : IDisposable
                 float4 sceneLight,
                 float4 sceneDirectionalAmbient,
                 float4 sceneAmbientExposure,
-                float2 sceneGroundTone)
+                float2 sceneGroundTone,
+                float3 worldPosition)
             {
                 float3 normal =
                     normalize(
@@ -727,6 +756,9 @@ public sealed class TerrainRenderer : IDisposable
                         0.94f,
                         saturate(
                             roughness));
+                float2 shadow = SampleDirectionalShadow(worldPosition, normal);
+                ambient *= shadow.y;
+                direct *= shadow.x;
                 float3 linearColor =
                     albedo *
                     (ambient + direct) *
@@ -1044,7 +1076,8 @@ public sealed class TerrainRenderer : IDisposable
                         input.SceneLight,
                         input.SceneDirectionalAmbient,
                         input.SceneAmbientExposure,
-                        input.SceneGroundTone);
+                        input.SceneGroundTone,
+                        input.WorldPosition);
 
                 if (input.DebugChunks > 0.5f)
                 {
@@ -1085,7 +1118,7 @@ public sealed class TerrainRenderer : IDisposable
                 "TerrainVertex.hlsl");
         GraphicsShaderBytecode pixelShader =
             compiler.Compile(
-                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n#define DEBUG_ALPHA -2.0f\n" : "#define LINEAR_SCENE 0\n#define DEBUG_ALPHA 1.0f\n") + pixelShaderSource,
+                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n#define DEBUG_ALPHA -2.0f\n" : "#define LINEAR_SCENE 0\n#define DEBUG_ALPHA 1.0f\n") + (graphics.DirectionalShadows.Enabled ? DirectionalShadowShader.Source : DirectionalShadowShader.Disabled) + pixelShaderSource,
                 GraphicsShaderStage.Pixel,
                 "PSMain",
                 "TerrainPixel.hlsl");
@@ -1095,6 +1128,8 @@ public sealed class TerrainRenderer : IDisposable
                 vertexShader,
                 pixelShader)
             {
+                VertexConstantsInBuffer = graphics.DirectionalShadows.Enabled,
+                DirectionalShadowReceiver = graphics.DirectionalShadows.Enabled,
                 TargetFormat = graphics.SceneOutput.Enabled ? GraphicsFrameTargetFormat.Rgba16Float : GraphicsFrameTargetFormat.Rgba8Unorm,
                 VertexElements =
                 [

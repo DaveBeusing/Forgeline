@@ -168,8 +168,15 @@ function Invoke-ClientSmoke {
             throw "Scene target count does not match the back-buffer count during '$ExpectedMode' qualification."
         }
     }
+    $shadowDescriptors = 0
+    if ($null -ne $metrics.PSObject.Properties['directionalShadows'] -and $null -ne $metrics.directionalShadows) {
+        $shadowDescriptors = $metrics.directionalShadows.shaderResourceDescriptors
+        if ($shadowDescriptors -ne 0 -and $shadowDescriptors -ne $surface.bufferCount) {
+            throw "Shadow descriptor count does not match the back-buffer count during '$ExpectedMode' qualification."
+        }
+    }
     if ($metrics.shaderResourceDescriptorsUsed -ne
-        ($metrics.loadedTextureCount + $sceneDescriptors)) {
+        ($metrics.loadedTextureCount + $sceneDescriptors + $shadowDescriptors)) {
         throw "Current SRV descriptor usage does not match asset textures plus scene targets during '$ExpectedMode' qualification."
     }
 

@@ -28,7 +28,15 @@ if ($null -ne $Metrics.PSObject.Properties['framePasses'] -and $null -ne $Metric
     }
 }
 
-if ($Metrics.totalMeasuredDrawCalls -ne ($Metrics.terrainDrawCalls + $Metrics.instanceDrawCalls + $compositeDrawCalls) -or
-    $Metrics.totalMeasuredDrawCalls -gt ($Metrics.visibleTerrainChunks + 11 + $compositeDrawCalls)) {
+$shadowDrawCalls = 0
+if ($null -ne $Metrics.PSObject.Properties['directionalShadows'] -and $null -ne $Metrics.directionalShadows) {
+    $shadowDrawCalls = $Metrics.directionalShadows.drawCalls
+    if ($shadowDrawCalls -lt 0 -or $shadowDrawCalls -gt 256) {
+        throw 'Directional shadow draws exceeded the bounded quality budget of 256.'
+    }
+}
+
+if ($Metrics.totalMeasuredDrawCalls -ne ($Metrics.terrainDrawCalls + $Metrics.instanceDrawCalls + $compositeDrawCalls + $shadowDrawCalls) -or
+    $Metrics.totalMeasuredDrawCalls -gt ($Metrics.visibleTerrainChunks + 11 + $compositeDrawCalls + $shadowDrawCalls)) {
     throw 'Measured draw calls exceeded the visible-terrain plus instance-batch budget.'
 }

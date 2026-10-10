@@ -45,6 +45,7 @@ internal readonly record struct ClientVisualQualificationSnapshot(
 {
     public bool GpuTimingAvailable { get; init; }
     public GraphicsFrameDiagnostics? FramePasses { get; init; }
+    public GraphicsDirectionalShadowDiagnostics? DirectionalShadows { get; init; }
     public int Lod1Instances { get; init; }
     public int Lod2Instances { get; init; }
 
@@ -400,6 +401,12 @@ internal sealed class ClientRenderHost : IDisposable
             graphics.ConfigureSceneOutput(new GraphicsSceneOutputSettings(
                 Environment.GetEnvironmentVariable("FORGELINE_LINEAR_SCENE_OUTPUT") == "1",
                 _sceneLighting.Exposure, _sceneLighting.ToneMapping == SceneToneMappingMode.AcesFitted));
+            string? shadowProfile = Environment.GetEnvironmentVariable("FORGELINE_SHADOW_QUALITY");
+            if (!string.IsNullOrEmpty(shadowProfile) && !Enum.TryParse(shadowProfile, true, out DirectionalShadowQuality _))
+                throw new ArgumentException("FORGELINE_SHADOW_QUALITY must be Disabled, Low, Medium or High.");
+            var shadowSettings = new GraphicsDirectionalShadowSettings(string.IsNullOrEmpty(shadowProfile) ? DirectionalShadowQuality.Disabled :
+                Enum.Parse<DirectionalShadowQuality>(shadowProfile, true));
+            graphics.ConfigureDirectionalShadows(shadowSettings);
             if (existingDevice is not null)
             {
                 graphics.WaitForIdle();
@@ -620,6 +627,15 @@ internal sealed class ClientRenderHost : IDisposable
                     context =>
                     {
                         context.BeginPass(GraphicsFramePass.World);
+                        if (shadowSettings.Enabled)
+                        {
+                            GraphicsDirectionalShadowFrame shadowFrame = DirectionalShadowProjection.Create(current.Camera, _sceneLighting, shadowSettings);
+                            context.BeginDirectionalShadowPass(shadowFrame);
+                            int terrainShadows = terrainRenderer.RenderShadow(context, shadowFrame, Math.Min(128, shadowSettings.MaximumDraws));
+                            instanceRenderer.RenderShadow(context, renderCamera, renderWorld, renderAlpha, shadowFrame,
+                                shadowSettings.MaximumCasters - terrainShadows, shadowSettings.MaximumDraws - terrainShadows);
+                            context.EndDirectionalShadowPass();
+                        }
                         terrainRenderer.Render(
                             context,
                             renderCamera);
@@ -817,6 +833,7 @@ internal sealed class ClientRenderHost : IDisposable
         {
             GpuTimingAvailable = completedGraphics.GpuTimingAvailable,
             FramePasses = completedGraphics.Frame,
+            DirectionalShadows = completedGraphics.DirectionalShadows,
             GpuMilliseconds = completedGraphics.GpuTimingAvailable ? completedGraphics.GpuFrameMilliseconds : null,
             DebugLayerEnabled = completedGraphics.Device.DebugLayerEnabled,
             DebugLayerWarningCount = completedGraphics.Debug.WarningCount,
@@ -855,7 +872,7 @@ internal sealed class ClientRenderHost : IDisposable
                 terrain.DrawCalls +
                 instances.DrawCalls +
                 gameplay.DrawCalls +
-                debug.DrawCalls + (graphics.Frame?.CompositeDrawCalls ?? 0),
+                debug.DrawCalls + (graphics.Frame?.CompositeDrawCalls ?? 0) + (graphics.DirectionalShadows?.DrawCalls ?? 0),
                 instances.VisibleInstances,
                 totalInstances,
                 instances.HighLodInstances,
@@ -886,6 +903,7 @@ internal sealed class ClientRenderHost : IDisposable
                 GpuTimingAvailable =
                     graphics.GpuTimingAvailable,
                 FramePasses = graphics.Frame,
+                DirectionalShadows = graphics.DirectionalShadows,
                 DebugLayerEnabled =
                     graphics.Device.DebugLayerEnabled,
                 PeakLoadedTextureCount =
