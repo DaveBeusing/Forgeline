@@ -59,6 +59,7 @@ public sealed class D3D12ParticleTests
     [Fact]
     public void PipelineBudgetAndParticleCapacityRejectInvalidPaths()
     {
+        Assert.Throws<ArgumentException>(()=>new GraphicsParticle(new(0,0,0,float.NaN),new(0,0,0,1),Vector4.One,new(1,0,0,0)).Validate());
         var compiler=new DxcShaderCompiler();
         var vs=compiler.Compile("float4 VSMain() : SV_Position { return float4(0,0,0,1); }",GraphicsShaderStage.Vertex,"VSMain","ParticleContractVertex.hlsl");
         var ps=compiler.Compile("float4 PSMain() : SV_Target0 { return 1; }",GraphicsShaderStage.Pixel,"PSMain","ParticleContractPixel.hlsl");

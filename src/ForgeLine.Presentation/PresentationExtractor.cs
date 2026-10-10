@@ -358,7 +358,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                     (uint)queued.Kind,
                     VfxFeature:
                         new VfxFeaturePresentationMetadata(
-                            queued.Kind, queued.EmitterId, queued.Generation, queued.Continuous));
+                            queued.Kind, queued.EmitterId, queued.Generation, queued.Continuous, queued.SpawnedAtTick));
         }
 
         return instances;
@@ -1201,7 +1201,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
             _queuedVfx.Add(
                 new QueuedVfxInstance(
                     effect.Kind,
-                    effect.Transform, 0x8000_0000_0000_0000UL | (uint)(index + 1), effect.Generation));
+                    effect.Transform, 0x8000_0000_0000_0000UL | (uint)(index + 1), effect.Generation, false, effect.SpawnedAtTick.Value));
         }
     }
 
@@ -1620,7 +1620,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
         RenderTransform Transform,
         ulong EmitterId = 0,
         uint Generation = 0,
-        bool Continuous = false);
+        bool Continuous = false,
+        ulong SpawnedAtTick = 0);
 
     private static void ApplyDebugCaptureState(
         MatchRuntime scenario,

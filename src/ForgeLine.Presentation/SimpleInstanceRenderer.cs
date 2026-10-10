@@ -164,8 +164,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
         RtsCamera camera,
         RenderWorld world,
         float alpha,
-        double? presentationSeconds = null)
-        => RenderCore(context, camera, world, alpha, presentationSeconds: presentationSeconds);
+        double? presentationSeconds = null,
+        ParticleVfxRenderer? particles = null)
+        => RenderCore(context, camera, world, alpha, presentationSeconds: presentationSeconds, particles: particles);
 
     public void RenderShadow(IGraphicsCommandContext context, RtsCamera camera, RenderWorld world, float alpha,
         GraphicsDirectionalShadowFrame frame, int maximumCasters, int maximumDraws, double? presentationSeconds = null)
@@ -180,7 +181,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
     private void RenderCore(IGraphicsCommandContext context, RtsCamera camera, RenderWorld world, float alpha,
         Matrix4x4? shadowProjection = null, int maximumCasters = int.MaxValue, int maximumDraws = int.MaxValue,
-        double? presentationSeconds = null)
+        double? presentationSeconds = null, ParticleVfxRenderer? particles = null)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(context);
@@ -216,6 +217,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     index,
                     alpha);
             if (shadowProjection.HasValue && instance.VfxFeature.IsSpecified) continue;
+            if (!shadowProjection.HasValue && particles?.Replaces(instance) == true) continue;
 
             if ((instance.Visibility & RenderVisibilityMask.World) == 0 ||
                 !instance.Mesh.IsValid ||

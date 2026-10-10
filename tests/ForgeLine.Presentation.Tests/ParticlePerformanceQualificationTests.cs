@@ -30,6 +30,8 @@ public sealed class ParticlePerformanceQualificationTests
         Assert.False(graphics.Diagnostics.Device.IsSoftwareAdapter);
         graphics.ConfigureSceneOutput(new(true, 1.15f, true));
         using var meshes = new SimpleInstanceRenderer(graphics, catalog);
+        bool enabled = Environment.GetEnvironmentVariable("FORGELINE_PARTICLE_QUALIFICATION_ENABLED") == "1";
+        using var particles = new ParticleVfxRenderer(graphics,catalog,new(enabled ? ParticleQuality.Medium : ParticleQuality.Disabled));
         var instances = new RenderInstance[257];
         VfxEffectKind[] kinds = [VfxEffectKind.DestructionSmokePlume, VfxEffectKind.DestructionDustCloud,
             VfxEffectKind.DestructionSparkEmission, VfxEffectKind.ExplosionBuilding];
@@ -49,14 +51,22 @@ public sealed class ParticlePerformanceQualificationTests
         Directory.CreateDirectory(Path.GetDirectoryName(output)!);
         foreach (float distance in new[] { 120f, 420f, 1000f })
         {
+            snapshots.Publish(new(new SimulationTick(1),TimeSpan.FromMilliseconds(50),instances.Length,instances,sessionId:new((ulong)distance)));
+            Assert.True(world.Update(snapshots));
             var camera = new RtsCamera(new() { InitialTarget = Vector3.Zero, InitialDistance = distance, MaximumDistance = 2000 });
+            // One fixed 0.2-second burst age keeps pixel/overdraw work comparable.
+            particles.Prepare(world,camera,1280,720,.1);
+            particles.Prepare(world,camera,1280,720,.1);
+            particles.Prepare(world,camera,1280,720,.1);
             Action<IGraphicsCommandContext> record = context =>
             {
-                meshes.Render(context, camera, world, 1);
+                particles.Prepare(world,camera,context.Width,context.Height,0);
+                meshes.Render(context, camera, world, 1,particles:particles);
+                particles.Render(context,camera);
                 context.BeginPass(GraphicsFramePass.Overlay);
             };
             for (int i = 0; i < 64; i++) graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
-            var cpu = new double[512]; var gpu = new List<double>(); ulong lastFence = 0;
+            var cpu = new double[512]; var gpu = new List<double>(); var particleGpu = new List<double>(); ulong lastFence = 0, lastParticleFence=0;
             for (int i = 0; i < cpu.Length; i++)
             {
                 long start = Stopwatch.GetTimestamp();
@@ -68,6 +78,8 @@ public sealed class ParticlePerformanceQualificationTests
                     lastFence = frame.GpuSubmissionFence;
                     if (diagnostics.GpuFrameMilliseconds is { } ms) gpu.Add(ms);
                 }
+                if(diagnostics.Particles is { UpdateAndRenderGpuMilliseconds: { } measured } pd && pd.GpuSubmissionFence > lastParticleFence)
+                { lastParticleFence=pd.GpuSubmissionFence;particleGpu.Add(measured); }
             }
             graphics.WaitForIdle();
             byte[] pixels = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
@@ -78,9 +90,11 @@ public sealed class ParticlePerformanceQualificationTests
             }
             Assert.NotEmpty(gpu); Array.Sort(cpu);
             results.Add(new { distance, camera = camera.CaptureState(), cpuMeanMs = cpu.Average(), cpuP99Ms = cpu[506],
-                gpuMeanMs = gpu.Average(), gpuSamples = gpu.Count, meshes = meshes.LastDiagnostics, resources = graphics.Diagnostics.Resources });
+                gpuMeanMs = gpu.Average(), gpuSamples = gpu.Count, particleGpuMeanMs=particleGpu.Count>0 ? (double?)particleGpu.Average() : null,
+                particles=particles.Diagnostics, meshes = meshes.LastDiagnostics, resources = graphics.Diagnostics.Resources,
+                memory=graphics.Diagnostics.Memory });
         }
-        File.WriteAllText(output, JsonSerializer.Serialize(new { graphics.Diagnostics.Device,
+        File.WriteAllText(output, JsonSerializer.Serialize(new { graphics.Diagnostics.Device, enabled,
             driver = Environment.GetEnvironmentVariable("FORGELINE_BENCHMARK_DRIVER"),
             method = "256 copied production smoke/dust/spark/building-explosion effects and one hidden instance; actual 120/420/1000m zoom, 1280x720 FP16/ACES exposure1.15, VSync off, 64 warmups/512 samples, unique completed fences; CPU includes Present and fence reuse.", results },
             ReportOptions));

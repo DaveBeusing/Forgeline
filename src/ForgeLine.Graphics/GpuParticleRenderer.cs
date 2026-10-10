@@ -6,7 +6,17 @@ namespace ForgeLine.Graphics;
 // Immutable initial conditions. Position and velocity evolution are evaluated by
 // the vertex shader; no particle positions are read back or written by gameplay.
 [StructLayout(LayoutKind.Sequential)]
-public readonly record struct GraphicsParticle(Vector4 OriginAge, Vector4 VelocityLife, Vector4 Color, Vector4 Shape);
+public readonly record struct GraphicsParticle(Vector4 OriginAge, Vector4 VelocityLife, Vector4 Color, Vector4 Shape)
+{
+    internal void Validate()
+    {
+        if (!Finite(OriginAge) || OriginAge.W < 0 || !Finite(VelocityLife) || VelocityLife.W is < .05f or > 4 ||
+            !Finite(Color) || Color.W is < 0 or > 1 || Color.X < 0 || Color.Y < 0 || Color.Z < 0 ||
+            !Finite(Shape) || Shape.X is <= 0 or > 8 || MathF.Abs(Shape.Y) > 20 || Shape.Z is < 0 or > 3)
+            throw new ArgumentException("Particle initial conditions must be finite and bounded.");
+    }
+    private static bool Finite(Vector4 value) => float.IsFinite(value.X) && float.IsFinite(value.Y) && float.IsFinite(value.Z) && float.IsFinite(value.W);
+}
 
 public sealed class GpuParticleRenderer : IDisposable
 {
@@ -101,6 +111,11 @@ public sealed class GpuParticleRenderer : IDisposable
         ArgumentNullException.ThrowIfNull(context);
         if (particles.Length > _capacity || (uint)context.FrameIndex >= (uint)_frames.Length) throw new ArgumentOutOfRangeException(nameof(particles));
         if (particles.IsEmpty) return;
+        foreach (float value in MemoryMarshal.Cast<Matrix4x4,float>(MemoryMarshal.CreateReadOnlySpan(ref viewProjection,1)))
+            if(!float.IsFinite(value)) throw new ArgumentException("Particle projection must be finite.",nameof(viewProjection));
+        if(!float.IsFinite(projectionA) || !float.IsFinite(projectionB) || MathF.Abs(projectionB)<.000001f || !float.IsFinite(exposure) || exposure is < .25f or > 4)
+            throw new ArgumentException("Particle depth and exposure must be finite and valid.");
+        foreach(var particle in particles) particle.Validate();
         _frames[context.FrameIndex].SetData(particles);
         context.BeginParticlePass();
         try

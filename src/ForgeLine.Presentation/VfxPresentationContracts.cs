@@ -110,7 +110,8 @@ public readonly record struct VfxFeaturePresentationMetadata(
     VfxEffectKind Kind,
     ulong EmitterId = 0,
     uint EmitterGeneration = 0,
-    bool Continuous = false)
+    bool Continuous = false,
+    ulong SpawnedAtTick = 0)
 {
     public static VfxFeaturePresentationMetadata None =>
         default;

@@ -47,6 +47,8 @@ internal readonly record struct ClientVisualQualificationSnapshot(
     public GraphicsFrameDiagnostics? FramePasses { get; init; }
     public GraphicsDirectionalShadowDiagnostics? DirectionalShadows { get; init; }
     public GraphicsAtmosphereDiagnostics? Atmosphere { get; init; }
+    public ParticleVfxDiagnostics Particles { get; init; }
+    public GraphicsParticleDiagnostics? ParticleGpu { get; init; }
     public int Lod1Instances { get; init; }
     public int Lod2Instances { get; init; }
     public int AnimatedVegetationInstances { get; init; }
@@ -147,6 +149,7 @@ internal sealed class ClientRenderHost : IDisposable
     private readonly RuntimeAssetCatalog? _runtimeAssets;
     private readonly SceneLightingSettings _sceneLighting;
     private readonly SceneAtmosphereSettings _sceneAtmosphere = SceneAtmosphereSettings.Default;
+    private readonly ParticleSettings _particleSettings = ParticleSettings.Default;
     private readonly Action<ClientRenderFrame>? _testRenderAction;
     private readonly AutoResetEvent _signal = new(false);
     private readonly ManualResetEventSlim _started = new(false);
@@ -174,7 +177,8 @@ internal sealed class ClientRenderHost : IDisposable
         SimulationSessionId? expectedSession = null,
         ClientFrontendRenderHost? transitionHost = null,
         Func<ClientSimulationTelemetry>? simulationTelemetry = null,
-        SceneAtmosphereSettings? sceneAtmosphere = null)
+        SceneAtmosphereSettings? sceneAtmosphere = null,
+        ParticleSettings? particles = null)
     {
         _startup = startup ?? StartupDiagnostics.Disabled;
         _asynchronousStartup = asynchronousStartup;
@@ -202,6 +206,8 @@ internal sealed class ClientRenderHost : IDisposable
         _sceneLighting.Validate();
         _sceneAtmosphere = sceneAtmosphere ?? SceneAtmosphereSettings.Default;
         _sceneAtmosphere.Validate();
+        _particleSettings = particles ?? ParticleSettings.Default;
+        _particleSettings.Validate();
 
         _thread = transitionHost?.ExecutionThread ?? CreateThread();
         if (transitionHost is not null) transitionHost.ContinueWith(device => RenderLoop(device));
@@ -442,6 +448,16 @@ internal sealed class ClientRenderHost : IDisposable
                     graphics,
                     _runtimeAssets,
                     _sceneLighting);
+            string? particleProfile = Environment.GetEnvironmentVariable("FORGELINE_PARTICLE_QUALITY");
+            var particleSettings = _particleSettings;
+            if (!string.IsNullOrEmpty(particleProfile))
+            {
+                if (!Enum.TryParse(particleProfile,true,out ParticleQuality quality) || !Enum.IsDefined(quality))
+                    throw new ArgumentException("FORGELINE_PARTICLE_QUALITY must be Disabled, Low, Medium or High.");
+                particleSettings = new(quality);
+            }
+            using var particleRenderer = new ParticleVfxRenderer(graphics,_runtimeAssets,particleSettings,_sceneLighting);
+            long lastParticleFrame = Stopwatch.GetTimestamp();
             using var gameplayOverlayRenderer =
                 new DebugDrawRenderer(
                     graphics,
@@ -596,6 +612,8 @@ internal sealed class ClientRenderHost : IDisposable
                     RenderInterpolation.CalculateAlpha(
                         sinceSnapshot,
                         snapshot.TickDuration);
+                double particleDelta = Stopwatch.GetElapsedTime(lastParticleFrame,now).TotalSeconds;
+                lastParticleFrame = now;
 
                 RebuildDraw(
                     gameplayDraw,
@@ -661,12 +679,16 @@ internal sealed class ClientRenderHost : IDisposable
                         terrainRenderer.Render(
                             context,
                             renderCamera);
+                        particleRenderer.Prepare(renderWorld,renderCamera,context.Width,context.Height,particleDelta,
+                            current.PreAlphaUx.Mode is PreAlphaUxMode.Paused or PreAlphaUxMode.Help || !current.MetricsActive);
                         instanceRenderer.Render(
                             context,
                             renderCamera,
                             renderWorld,
                             renderAlpha,
-                            (double)(renderStartedAt - visualMotionStartedAt) / Stopwatch.Frequency);
+                            (double)(renderStartedAt - visualMotionStartedAt) / Stopwatch.Frequency,
+                            particleRenderer);
+                        particleRenderer.Render(context,renderCamera);
                         context.BeginPass(GraphicsFramePass.Overlay);
                         long debugStartedAt =
                             Stopwatch.GetTimestamp();
@@ -761,7 +783,7 @@ internal sealed class ClientRenderHost : IDisposable
                     snapshot.VfxMetrics,
                     renderWorld.InstanceCount,
                     _sceneLighting, gameplayHudRenderer.State, gameplayHudRenderer.LastRenderedVertexCount,
-                    runtimeMetrics, lastMeasuredRunningRates);
+                    runtimeMetrics, lastMeasuredRunningRates,particleRenderer.Diagnostics);
 
                 if (StopwatchElapsed(
                         nextDiagnosticAt,
@@ -787,7 +809,11 @@ internal sealed class ClientRenderHost : IDisposable
                         $"exposure={_sceneLighting.Exposure:F2} " +
                         $"tone={_sceneLighting.ToneMapping} " +
                         $"vfx={snapshot.VfxMetrics.ActiveTransientEffects}/{snapshot.VfxMetrics.PoolCapacity} " +
-                        $"vfxDropped={snapshot.VfxMetrics.TotalDropped}");
+                        $"vfxDropped={snapshot.VfxMetrics.TotalDropped} " +
+                        $"particles={particleRenderer.Diagnostics.ActiveParticles}/{particleRenderer.Diagnostics.Capacity} " +
+                        $"particleDropped={particleRenderer.Diagnostics.DroppedParticles} " +
+                        $"particleBytes={particleRenderer.Diagnostics.BufferBytes} " +
+                        $"particleGpuMs={diagnostics.Particles?.UpdateAndRenderGpuMilliseconds:F3}");
                     nextDiagnosticAt =
                         renderFinishedAt;
                 }
@@ -858,6 +884,7 @@ internal sealed class ClientRenderHost : IDisposable
             FramePasses = completedGraphics.Frame,
             DirectionalShadows = completedGraphics.DirectionalShadows,
             Atmosphere = completedGraphics.Atmosphere,
+            ParticleGpu = completedGraphics.Particles,
             GpuMilliseconds = completedGraphics.GpuTimingAvailable ? completedGraphics.GpuFrameMilliseconds : null,
             DebugLayerEnabled = completedGraphics.Device.DebugLayerEnabled,
             DebugLayerWarningCount = completedGraphics.Debug.WarningCount,
@@ -878,7 +905,8 @@ internal sealed class ClientRenderHost : IDisposable
         GameplayHudState hudState,
         int hudVertexCount,
         in RuntimeMetricsView runtimeMetrics,
-        RuntimeMetricsView? lastMeasuredRunningRates)
+        RuntimeMetricsView? lastMeasuredRunningRates,
+        ParticleVfxDiagnostics particles = default)
     {
         var snapshot =
             new ClientVisualQualificationSnapshot(
@@ -896,7 +924,7 @@ internal sealed class ClientRenderHost : IDisposable
                 terrain.DrawCalls +
                 instances.DrawCalls +
                 gameplay.DrawCalls +
-                debug.DrawCalls + (graphics.Frame?.CompositeDrawCalls ?? 0) + (graphics.DirectionalShadows?.DrawCalls ?? 0),
+                debug.DrawCalls + particles.DrawCalls + (graphics.Frame?.CompositeDrawCalls ?? 0) + (graphics.DirectionalShadows?.DrawCalls ?? 0),
                 instances.VisibleInstances,
                 totalInstances,
                 instances.HighLodInstances,
@@ -932,6 +960,8 @@ internal sealed class ClientRenderHost : IDisposable
                 FramePasses = graphics.Frame,
                 DirectionalShadows = graphics.DirectionalShadows,
                 Atmosphere = graphics.Atmosphere,
+                Particles = particles,
+                ParticleGpu = graphics.Particles,
                 DebugLayerEnabled =
                     graphics.Device.DebugLayerEnabled,
                 PeakLoadedTextureCount =

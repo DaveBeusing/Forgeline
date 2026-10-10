@@ -45,6 +45,7 @@ internal sealed record ClientUserSettings
 
     public RtsCameraBindings CameraBindings { get; init; } = new();
     public SceneAtmosphereSettings SceneAtmosphere { get; init; } = SceneAtmosphereSettings.Default;
+    public ParticleSettings Particles { get; init; } = ParticleSettings.Default;
 
     public GameplayBindings GameplayBindings { get; init; } = new();
 
@@ -91,6 +92,7 @@ internal sealed record ClientUserSettings
 
         ArgumentNullException.ThrowIfNull(CameraBindings);
         SceneAtmosphere.Validate();
+        Particles.Validate();
         ValidateBindings(CameraBindings);
         _ = new GameplayBindingRegistry(GameplayBindings, CameraBindings);
     }
