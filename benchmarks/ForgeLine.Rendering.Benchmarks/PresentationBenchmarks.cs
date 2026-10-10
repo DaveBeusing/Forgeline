@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Runtime.InteropServices;
 using BenchmarkDotNet.Attributes;
 using ForgeLine.Core;
 using ForgeLine.Assets;
@@ -515,6 +516,9 @@ public class PresentationBenchmarks : IDisposable
 
     internal sealed class NullGraphicsDevice : IGraphicsDevice
     {
+        public long UploadedBytes { get; private set; }
+        public long UploadCalls { get; private set; }
+        internal void RecordUpload(int bytes) { UploadedBytes += bytes; UploadCalls++; }
         public GraphicsDiagnostics Diagnostics =>
             throw new NotSupportedException();
 
@@ -524,7 +528,7 @@ public class PresentationBenchmarks : IDisposable
 
         public IGraphicsBuffer CreateBuffer(
             GraphicsBufferDescription description) =>
-            new NullGraphicsBuffer(description);
+            new NullGraphicsBuffer(description, this);
 
         public IGraphicsTexture CreateTexture(
             GraphicsTextureData texture) =>
@@ -585,10 +589,11 @@ public class PresentationBenchmarks : IDisposable
 
     private sealed class NullGraphicsBuffer : IGraphicsBuffer
     {
-        public NullGraphicsBuffer(
-            GraphicsBufferDescription description)
+        private readonly NullGraphicsDevice _owner;
+        public NullGraphicsBuffer(GraphicsBufferDescription description, NullGraphicsDevice owner)
         {
             Description = description;
+            _owner = owner;
         }
 
         public GraphicsBufferDescription Description { get; }
@@ -598,6 +603,7 @@ public class PresentationBenchmarks : IDisposable
             int offsetInBytes = 0)
             where T : unmanaged
         {
+            _owner.RecordUpload(MemoryMarshal.AsBytes(data).Length);
         }
 
         public void Dispose()

@@ -26,6 +26,12 @@ jobs:
         run: dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ClientSimulationHostTests
       - name: Integrated interaction and display contracts
         run: |
+          dotnet test --project tests/ForgeLine.Input.Tests/ForgeLine.Input.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Input.Tests.GameplayBindingRegistryTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.GameplayBindingSettingsTests ForgeLine.Client.Tests.GameplayBindingEditorTests ForgeLine.Client.Tests.GameplayHelpControllerTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.GameplayRebindingTests ForgeLine.Presentation.Tests.GameplayUiFixtureTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.ActionableAlertTests ForgeLine.Presentation.Tests.StrategicMapExperienceTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.OperationsTests
@@ -55,6 +61,10 @@ jobs:
         env:
           DOTNET_TieredCompilation: 0
         run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --alert-map-hotpaths artifacts/alert-map-hotpaths.json
+      - name: Guard rebound gameplay UI allocations and upload requests
+        env:
+          DOTNET_TieredCompilation: 0
+        run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --gameplay-ui-hotpaths artifacts/gameplay-ui-hotpaths.json
       - name: Capture CPU frame measurements
         run: dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release --no-build -- --frame-hotpaths artifacts/frame-hotpaths.json
       - name: Capture isolated fully culled measurements

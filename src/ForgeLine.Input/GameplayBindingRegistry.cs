@@ -109,8 +109,10 @@ public sealed class GameplayBindingRegistry
         PlatformKey.F1 or PlatformKey.F2 or PlatformKey.F12 or PlatformKey.Escape) && key is not (>= PlatformKey.D0 and <= PlatformKey.D9);
     public static string KeyLabel(PlatformKey key) => key switch
     {
-        PlatformKey.Unknown => "UNBOUND", PlatformKey.LeftControl or PlatformKey.RightControl => "CTRL",
-        PlatformKey.LeftShift or PlatformKey.RightShift => "SHIFT", _ => key.ToString().ToUpperInvariant()
+        PlatformKey.Unknown => "UNBOUND",
+        PlatformKey.LeftControl or PlatformKey.RightControl => "CTRL",
+        PlatformKey.LeftShift or PlatformKey.RightShift => "SHIFT",
+        _ => key.ToString().ToUpperInvariant()
     };
     public static bool UsesCamera(RtsCameraBindings? b, PlatformKey key) => b is not null &&
         (b.PanForward == key || b.PanForwardAlternate == key || b.PanBackward == key || b.PanBackwardAlternate == key ||

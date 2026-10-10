@@ -30,7 +30,8 @@ public sealed class GameplayBindingSettingsTests
         }
         finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
     }
-    [Fact] public void MigratesLegacyAndPersistsRebindWithoutChangingCamera()
+    [Fact]
+    public void MigratesLegacyAndPersistsRebindWithoutChangingCamera()
     {
         string root = Path.Combine(Path.GetTempPath(), "forgeline-binding-tests", Guid.NewGuid().ToString("N"));
         try

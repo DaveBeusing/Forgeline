@@ -7,7 +7,8 @@ namespace ForgeLine.Client.Tests;
 
 public sealed class GameplayBindingEditorTests
 {
-    [Fact] public void KeyboardEditorRejectsCameraAndReservedCandidatesThenSavesSupportedLetter()
+    [Fact]
+    public void KeyboardEditorRejectsCameraAndReservedCandidatesThenSavesSupportedLetter()
     {
         var model = Model(); var editor = new SettingsInteractionModel();
         editor.Focus(FrontendSettingsField.BindingKey);
@@ -25,7 +26,8 @@ public sealed class GameplayBindingEditorTests
         Assert.Contains(controls.DetailLines, line => line.Label == "COMMAND PANELS" && line.Value.StartsWith("G BUILD", StringComparison.Ordinal));
         Assert.Equal(7, FrontendPresentationAdapter.Settings(model, editor).DetailLines.Count);
     }
-    [Fact] public void ScrolledSettingsRowsRetainCorrectKeyboardAndPointerIdentity()
+    [Fact]
+    public void ScrolledSettingsRowsRetainCorrectKeyboardAndPointerIdentity()
     {
         var editor = new SettingsInteractionModel(); editor.Focus(FrontendSettingsField.BindingKey);
         Assert.Equal(1, editor.VisibleStart);
@@ -36,7 +38,8 @@ public sealed class GameplayBindingEditorTests
         editor.Adjust(Model(), 1);
         Assert.Equal(GameplayAction.Process, editor.BindingAction);
     }
-    [Fact] public void HelpSuppressesReboundHeldInputUntilPhysicalRelease()
+    [Fact]
+    public void HelpSuppressesReboundHeldInputUntilPhysicalRelease()
     {
         var input = new InputState(); var help = new GameplayHelpController();
         input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.G));
