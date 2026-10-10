@@ -20,6 +20,10 @@ public sealed class D3D12SceneCompositionTests
         using IGraphicsPipeline overlay = graphics.CreateGraphicsPipeline(new(
             compiler.Compile("float4 VSMain(uint id : SV_VertexID) : SV_Position { return float4(0,0,0,1); }", GraphicsShaderStage.Vertex, "VSMain", "SceneGuardVertex.hlsl"),
             compiler.Compile("float4 PSMain() : SV_Target0 { return float4(1,1,1,1); }", GraphicsShaderStage.Pixel, "PSMain", "SceneGuardPixel.hlsl")));
+        Assert.Throws<NotSupportedException>(() => graphics.CreateGraphicsPipeline(overlay.Description with
+        {
+            TargetFormat = GraphicsFrameTargetFormat.Rgba16Float, AlphaBlendEnabled = true
+        }));
         graphics.RenderFrame(GraphicsColor.ForgeLineClear, context =>
         {
             Assert.Throws<ArgumentException>(() => context.SetPipeline(overlay));
@@ -115,7 +119,7 @@ public sealed class D3D12SceneCompositionTests
                 else value = saturate(value);
                 value = lerp(1.055 * pow(max(value,0),1.0/2.4) - 0.055, value * 12.92, step(value,0.0031308));
             #endif
-                return float4(value,1);
+                return float4(value,0.5);
             }
             """, GraphicsShaderStage.Pixel, "PSMain", "ColorContractPixel.hlsl");
         using IGraphicsPipeline world = graphics.CreateGraphicsPipeline(new(vertex, pixel)
@@ -129,7 +133,7 @@ public sealed class D3D12SceneCompositionTests
         {
             CullMode = GraphicsCullMode.None, VertexRootConstantCount = 2
         });
-        return graphics.CaptureFrame(GraphicsColor.ForgeLineClear, context =>
+        return graphics.CaptureFrame(new GraphicsColor(0.015f, 0.025f, 0.055f, 0.5f), context =>
         {
             context.SetPipeline(world);
             context.SetVertexConstants([exposure, aces ? 1 : 0]);

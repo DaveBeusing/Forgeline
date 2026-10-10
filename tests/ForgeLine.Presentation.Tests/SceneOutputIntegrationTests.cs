@@ -9,6 +9,10 @@ using Xunit;
 
 namespace ForgeLine.Presentation.Tests;
 
+[CollectionDefinition("Native scene output", DisableParallelization = true)]
+public sealed class NativeSceneOutputTestGroup;
+
+[Collection("Native scene output")]
 public sealed class SceneOutputIntegrationTests
 {
     [Theory]

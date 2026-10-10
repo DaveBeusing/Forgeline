@@ -128,7 +128,7 @@ internal sealed partial class D3D12GraphicsDevice
                 else value = saturate(value);
                 float3 lo = value * 12.92;
                 float3 hi = 1.055 * pow(max(value, 0), 1.0 / 2.4) - 0.055;
-                return float4(lerp(hi, lo, step(value, 0.0031308)), 1);
+                return float4(lerp(hi, lo, step(value, 0.0031308)), scene.a);
             }
             """, GraphicsShaderStage.Pixel, "PSMain", "SceneCompositePixel.hlsl");
         return (D3D12GraphicsPipeline)CreateGraphicsPipeline(new GraphicsPipelineDescription(vertex, pixel)

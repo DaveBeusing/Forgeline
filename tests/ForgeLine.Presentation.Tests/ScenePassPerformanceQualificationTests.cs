@@ -8,6 +8,7 @@ using Xunit;
 
 namespace ForgeLine.Presentation.Tests;
 
+[Collection("Native scene output")]
 public sealed class ScenePassPerformanceQualificationTests
 {
     private static readonly JsonSerializerOptions ReportOptions = new() { WriteIndented = true };
