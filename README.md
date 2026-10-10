@@ -51,7 +51,7 @@ The current development slice centers on **Central Divide**, a **3.072 × 3.072 
 | **Match flow** | Setup, pause, victory/surrender, results, and restart |
 | **Presentation** | Native Direct3D 12, terrain, Directorate assets, HUD, minimap, strategic overlays, and effects |
 
-The Windows client provides resource and power information, contextual commands, and independent FPS/simulation-rate readings. Directorate unit and building families use compiled assets with LOD and gameplay-relevant visual states. The Combat Engineer currently shares the Rifle Squad visual family.
+The Windows client provides resource and power information, selection-derived contextual commands, and opt-in FPS/simulation-rate readings through Shift + F1. Directorate unit and building families use compiled assets with LOD and gameplay-relevant visual states. The Combat Engineer currently shares the Rifle Squad visual family.
 
 **Development status:** This is a **pre-alpha vertical slice**, not a finished game. Rail gameplay, more advanced tactics, interactive map editing, other factions, and multiplayer remain future work.
 

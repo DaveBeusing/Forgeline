@@ -119,6 +119,13 @@ Match results and compact onboarding render through the production RTS informati
 
 ## Player action dock presentation
 
+Primary commands sit beside the selection inspector in adaptive shared geometry.
+Combat capabilities expose a small direct-action set; copied building/facility capabilities
+open existing advanced modes. Empty, mixed, stale and terminal states have explicit
+boundaries. All seven advanced modes remain available. Copied action availability drives
+rendering, hover explanations and dispatch; pending intent is separate from result feedback.
+FPS/TPS display is opt-in through Shift + F1; measurement and smoke checks remain active.
+
 The production action surface is `PlayerActionDockHudSurface`, backed by the existing `PlayerActionPanelController` and immutable `PlayerActionSnapshot`. It covers the currently implemented Build → Process → Produce → Logistics → Supply → Fight loop without allowing presentation to mutate authoritative state directly.
 
 Build cards expose authored building identity, real construction costs, current captured resource availability, deposit requirements, and placement feedback from the existing placement preview/result path. Process cards expose recipe input/output availability, priority, one-shot/repeat/desired-stock mode, desired-stock target, active progress/block state, queued requests, pause/resume, and cancel. Unit-production cards expose real costs, authored production ticks, queue state, active progress/block state, cancellation, and rally-point presence.

@@ -198,7 +198,13 @@ Default controls are W/A/S/D or Arrow Keys to pan, Q/E to rotate, R/F to change 
 
 The player-facing HUD is rendered through the existing lightweight overlay path but is independent from the Shift + F1 development metrics toggle.
 
-The top-right readout shows successful frame presentations per second (`FPS`) and completed simulation ticks per second (`SIM … TPS`). Independent 750 ms windows measure actual throughput, including missed render publications and stalled simulation ticks. Warm-up and unavailable observations show an em dash; paused and terminal simulation show `PAUSED` and `STOPPED`. Backgrounding, suspension, restart and gaps longer than two seconds clear stale readings. The readout reserves its own safe-area region beside the resource strip and does not capture world clicks.
+The top-right readout is opt-in with Shift + F1. It shows successful frame presentations per second (`FPS`) and completed simulation ticks per second (`SIM … TPS`). Measurement remains active while hidden. Independent 750 ms windows measure actual throughput, including missed render publications and stalled simulation ticks. Warm-up and unavailable observations show an em dash; paused and terminal simulation show `PAUSED` and `STOPPED`. Backgrounding, suspension, restart and gaps longer than two seconds clear stale readings. The readout reserves its own safe-area region beside the resource strip and does not capture world clicks.
+
+Selection commands occupy a shared adaptive panel beside the selection inspector.
+Combat actions activate by click; Command Core and copied facility capabilities open
+the existing advanced Action Dock. Disabled reasons use captured availability, and
+pending intent is distinct from command results. B/P/U/L/Y/K/H bindings remain unchanged.
+See [Player Action Dock](PlayerActionDock.md).
 
 The HUD explicitly waits for a snapshot or player data before rendering authoritative resources. Screen-space panels and glyphs disable face culling and depth testing; the world renders first, followed by gameplay HUD, optional development diagnostics and modal frontend. Empty selection keeps its existing guidance, and contextual actions remain backed by the copied gameplay read models.
 

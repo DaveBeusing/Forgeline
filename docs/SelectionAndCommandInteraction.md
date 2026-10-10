@@ -1,5 +1,13 @@
 # Selection and Command Interaction
 
+The primary contextual command panel shares rendering and pointer bounds beside the
+selection inspector. Combat-eligible units expose existing tactical commands; Command
+Core and copied facility capabilities open the advanced dock. Disabled reasons appear
+on controls and in hover help. Tactical clicks submit intent through the existing request
+boundary; K/Tab/Enter remains the keyboard alternative. Mixed selections use eligible
+members, and missing/stale/terminal data cannot activate primary commands. Stop/Hold
+cancel targeting and placement. See [Player Action Dock](PlayerActionDock.md).
+
 ## Hover tooltips
 
 Keeping the pointer on a world object or Action Dock control for 175 ms reveals a compact, noninteractive tooltip. The delay uses elapsed presentation time, independently of simulation ticks; moving more than three scaled pixels, changing target, or changing viewport/DPI/UI scale starts a new delay. Long frame gaps clear the delay. Tooltips never capture pointer input or issue commands.
