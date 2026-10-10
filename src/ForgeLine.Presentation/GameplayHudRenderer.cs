@@ -85,7 +85,8 @@ public sealed class GameplayHudRenderer : IDisposable
         float uiScale,
         DebugDraw? gameplayOverlay = null,
         RuntimeMetricsView runtimeMetrics = default,
-        HoverTooltipView hoverTooltip = default)
+        HoverTooltipView hoverTooltip = default,
+        bool showRuntimeMetrics = false)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(context);
@@ -104,7 +105,7 @@ public sealed class GameplayHudRenderer : IDisposable
         LastGuidanceVertexCount = 0;
         if (snapshot is null)
         {
-            _statusSurface?.RenderWaiting(context, layout, runtimeMetrics);
+            _statusSurface?.RenderWaiting(context, layout, runtimeMetrics, showRuntimeMetrics);
             LastRenderedVertexCount = _statusSurface?.LastRenderedVertexCount ?? 0;
             return;
         }
@@ -125,7 +126,8 @@ public sealed class GameplayHudRenderer : IDisposable
                 uiScale,
                 gameplayOverlay,
                 runtimeMetrics,
-                hoverTooltip);
+                hoverTooltip,
+                showRuntimeMetrics);
 
         foreach (IGameplayHudSurface surface in _surfaces)
         {

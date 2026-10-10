@@ -14,7 +14,8 @@ public enum GameplayHudRegion : byte
     AlertStack = 1 << 3,
     Minimap = 1 << 4,
     SecondaryView = 1 << 5,
-    GlobalOverlay = 1 << 6
+    GlobalOverlay = 1 << 6,
+    PrimaryCommands = 1 << 7
 }
 
 public readonly record struct GameplayHudRenderContext(
@@ -33,7 +34,8 @@ public readonly record struct GameplayHudRenderContext(
     float UiScale,
     DebugDraw? GameplayOverlay,
     RuntimeMetricsView RuntimeMetrics = default,
-    HoverTooltipView HoverTooltip = default);
+    HoverTooltipView HoverTooltip = default,
+    bool ShowRuntimeMetrics = false);
 
 public interface IGameplayHudSurface : IDisposable
 {

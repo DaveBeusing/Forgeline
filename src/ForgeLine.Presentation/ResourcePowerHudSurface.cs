@@ -196,10 +196,12 @@ internal sealed class ResourcePowerHudSurface : IGameplayHudSurface
             context.Graphics,
             context.Snapshot,
             context.Layout,
-            context.RuntimeMetrics);
+            context.RuntimeMetrics,
+            context.ShowRuntimeMetrics);
 
     public void RenderWaiting(IGraphicsCommandContext graphics, in GameplayHudLayout layout,
-        in RuntimeMetricsView metrics) => _renderer.Render(graphics, null, layout, metrics);
+        in RuntimeMetricsView metrics, bool showRuntimeMetrics = false) =>
+        _renderer.Render(graphics, null, layout, metrics, showRuntimeMetrics);
 
     public void Dispose() =>
         _renderer.Dispose();
@@ -257,7 +259,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         IGraphicsCommandContext graphics,
         PresentationSnapshot? snapshot,
         in GameplayHudLayout layout,
-        in RuntimeMetricsView metrics = default)
+        in RuntimeMetricsView metrics = default,
+        bool showRuntimeMetrics = true)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(graphics);
@@ -290,7 +293,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                     MutedTextColor, graphics.Width, graphics.Height);
             }
         }
-        EmitRuntimeMetrics(metrics, layout.RuntimeMetrics, graphics.Width, graphics.Height);
+        if (showRuntimeMetrics) EmitRuntimeMetrics(metrics, layout.RuntimeMetrics, graphics.Width, graphics.Height);
 
         if (_vertexCount == 0)
         {

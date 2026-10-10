@@ -71,6 +71,8 @@ public sealed class PlayerActionPanelController
         BattlefieldSupplyPriority.Normal;
     private int _hoveredIndex = -1;
     private bool _pointerPressed;
+    private GameplayHudLayout _lastPointerLayout;
+    private bool _hasPointerLayout;
 
     public PlayerActionPanelMode Mode { get; private set; }
 
@@ -120,6 +122,17 @@ public sealed class PlayerActionPanelController
                 viewportHeight,
                 dpi,
                 uiScale);
+
+        bool displayChanged = _hasPointerLayout && _lastPointerLayout != layout;
+        _lastPointerLayout = layout;
+        _hasPointerLayout = true;
+        if (input.FocusLostThisFrame)
+        {
+            Close();
+            _pendingRequest = null;
+            _leftWasDown = false;
+            return;
+        }
 
         SynchronizeSession(
             snapshot?.SessionId ??
@@ -267,10 +280,30 @@ public sealed class PlayerActionPanelController
 
         PointerCaptured =
             input.HasPointerPosition &&
-            PlayerActionDockInteractionLayout.CapturesPointer(
+            (layout.PrimaryCommands.Contains(input.PointerPosition) || PlayerActionDockInteractionLayout.CapturesPointer(
                 input.PointerPosition,
                 layout,
-                view.IsOpen);
+                view.IsOpen));
+
+        bool hasPress = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var pressOrigin);
+        var clickPosition = hasPress ? pressOrigin : input.PointerPosition;
+        bool clicked = !displayChanged && (hasPress || (leftDown && !_leftWasDown));
+        if (clicked && ContextualCommandModel.TryHit(clickPosition, snapshot, layout, out var command))
+        {
+            PointerCaptured = true;
+            if (command.Availability.CanActivate)
+            {
+                if (command.OpensMode) ToggleMode(command.Mode);
+                else
+                {
+                    Mode = command.Mode;
+                    SelectedIndex = command.ItemIndex;
+                    ActivateSelected(ContextualCommandModel.ResolveActions(snapshot));
+                }
+            }
+            _leftWasDown = leftDown;
+            return;
+        }
 
         PlayerActionDockHitTarget hit =
             default;
@@ -292,12 +325,11 @@ public sealed class PlayerActionPanelController
             hasHit &&
             leftDown;
 
-        if (hasHit &&
-            leftDown &&
-            !_leftWasDown)
+        if (clicked && PlayerActionDockInteractionLayout.TryHit(clickPosition, layout,
+                view.IsOpen, itemCount, out var clickHit))
         {
             HandlePointerHit(
-                hit,
+                clickHit,
                 actions,
                 view);
             PointerCaptured = true;
