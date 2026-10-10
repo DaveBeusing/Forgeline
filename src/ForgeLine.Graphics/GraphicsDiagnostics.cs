@@ -27,6 +27,7 @@ public sealed record GraphicsDiagnostics(
     GraphicsDeviceInfo Device,
     GraphicsSurfaceInfo Surface)
 {
+    public GraphicsFrameDiagnostics? Frame { get; init; }
     public GraphicsMemoryDiagnostics? Memory { get; init; }
     public GraphicsHealthDiagnostics Health { get; init; } = new(0, 0, 0, 0, 0, 0, null);
     public GraphicsResourceDiagnostics Resources { get; init; } =
@@ -46,6 +47,18 @@ public sealed record GraphicsDiagnostics(
             false,
             0,
             0);
+}
+
+public readonly record struct GraphicsFrameDiagnostics(
+    GraphicsFramePlan Plan,
+    ulong CpuSubmission,
+    double WorldCpuMilliseconds,
+    double? OverlayCpuMilliseconds,
+    ulong GpuSubmissionFence,
+    double? WorldGpuMilliseconds,
+    double? OverlayGpuMilliseconds)
+{
+    public string IntermediateUnavailableReason { get; init; } = "Linear scene target and composite pass are not implemented.";
 }
 
 public sealed record GraphicsMemoryDiagnostics(

@@ -545,6 +545,7 @@ internal sealed class ClientRenderHost : IDisposable
                     runtimeMetricsSampler.Reset();
                     graphics.RenderFrame(GraphicsColor.ForgeLineClear, context =>
                     {
+                        context.BeginPass(GraphicsFramePass.Overlay);
                         gameplayHudRenderer.Render(context, renderCamera, null, terrain.WorldBounds,
                             current.InformationLayer, current.ActionPanel, current.TacticalTargeting,
                             current.ActiveFormation, current.CombatGroups ?? CombatGroupOverviewView.Empty,
@@ -614,6 +615,7 @@ internal sealed class ClientRenderHost : IDisposable
                     GraphicsColor.ForgeLineClear,
                     context =>
                     {
+                        context.BeginPass(GraphicsFramePass.World);
                         terrainRenderer.Render(
                             context,
                             renderCamera);
@@ -622,6 +624,7 @@ internal sealed class ClientRenderHost : IDisposable
                             renderCamera,
                             renderWorld,
                             renderAlpha);
+                        context.BeginPass(GraphicsFramePass.Overlay);
                         long debugStartedAt =
                             Stopwatch.GetTimestamp();
                         debugDrawRenderer.Render(

@@ -39,6 +39,12 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
 
     public int FrameIndex { get; }
 
+    public void BeginPass(GraphicsFramePass pass)
+    {
+        ValidateRecording();
+        _owner.BeginPass(pass);
+    }
+
     public void SetViewport(float x, float y, float width, float height)
     {
         ValidateRecording();

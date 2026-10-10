@@ -41,6 +41,17 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
     private readonly GraphicsDeviceInfo _deviceInfo;
     private readonly GraphicsSurfaceLifecycleState _surfaceLifecycle;
     private readonly bool[] _frameTimestampReady;
+    private readonly bool[] _frameHasOverlay;
+    private GraphicsFramePassState _passState;
+    private long _passStartedAt;
+    private double _worldCpuMilliseconds;
+    private double? _overlayCpuMilliseconds;
+    private double? _worldGpuMilliseconds;
+    private double? _overlayGpuMilliseconds;
+    private ulong _gpuTimingFence;
+    private ulong _cpuTimingSubmission;
+    private double _recordedWorldCpuMilliseconds;
+    private double? _recordedOverlayCpuMilliseconds;
     private readonly ID3D12InfoQueue? _debugInfoQueue;
 
     private ID3D12Resource? _depthTarget;
@@ -160,6 +171,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             _commandAllocators = new ID3D12CommandAllocator[configuration.BufferCount];
             _frameFenceValues = new ulong[configuration.BufferCount];
             _frameTimestampReady = new bool[configuration.BufferCount];
+            _frameHasOverlay = new bool[configuration.BufferCount];
 
             CreateRenderTargets(
                 initialWidth,
@@ -234,6 +246,10 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                         _presentedFrameCount
                 })
             {
+                Frame = new GraphicsFrameDiagnostics(
+                    new GraphicsFramePlan(_surfaceLifecycle.Width, _surfaceLifecycle.Height, _configuration.BufferCount),
+                    _cpuTimingSubmission, _worldCpuMilliseconds, _overlayCpuMilliseconds,
+                    _gpuTimingFence, _worldGpuMilliseconds, _overlayGpuMilliseconds),
                 Memory = _configuration.EnableMemoryDiagnostics && _failure is null ? CaptureMemoryBudget() : null,
                 Resources =
                     new GraphicsResourceDiagnostics(
@@ -667,6 +683,9 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         allocator.Reset();
         _commandList.Reset(allocator);
         _recording = true;
+        _passState = default;
+        _frameHasOverlay[_frameIndex] = false;
+        _passStartedAt = System.Diagnostics.Stopwatch.GetTimestamp();
         BeginGpuTiming(
             _frameIndex);
 
@@ -728,6 +747,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             context.Close();
         }
 
+        FinishPassTiming();
         EndGpuTiming(
             _frameIndex);
 
@@ -740,6 +760,9 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         _commandQueue.ExecuteCommandList(_commandList);
         _submittedFrameCount++;
         SignalSubmittedFrame();
+        _cpuTimingSubmission = _submittedFrameCount;
+        _worldCpuMilliseconds = _recordedWorldCpuMilliseconds;
+        _overlayCpuMilliseconds = _recordedOverlayCpuMilliseconds;
         _recording = false;
 
         var presentResult = _swapChain.Present(
@@ -817,6 +840,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         WaitForFence(fenceValue);
         _resources.Collect(GetCompletedFence());
 
+        CaptureCompletedGpuTimings();
         Array.Clear(_frameFenceValues);
     }
 
@@ -982,7 +1006,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             uint queryCount =
                 checked(
                     (uint)bufferCount *
-                    2U);
+                    3U);
             _timestampQueryHeap =
                 _device.CreateQueryHeap<ID3D12QueryHeap>(
                     new QueryHeapDescription(
@@ -1027,7 +1051,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         uint queryIndex =
             checked(
                 (uint)frameIndex *
-                2U);
+                3U);
         _commandList.EndQuery(
             _timestampQueryHeap,
             QueryType.Timestamp,
@@ -1046,7 +1070,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         uint queryIndex =
             checked(
                 (uint)frameIndex *
-                2U);
+                3U);
         _commandList.EndQuery(
             _timestampQueryHeap,
             QueryType.Timestamp,
@@ -1055,7 +1079,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
             _timestampQueryHeap,
             QueryType.Timestamp,
             queryIndex,
-            2,
+            3,
             _timestampReadback,
             checked(
                 (ulong)queryIndex *
@@ -1105,7 +1129,7 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         int offset =
             checked(
                 frameIndex *
-                2 *
+                3 *
                 sizeof(ulong));
         ulong start =
             _timestampReadback.GetData<ulong>(
@@ -1116,16 +1140,56 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
                     offset +
                     sizeof(ulong)));
 
-        if (end >= start)
+        ulong overlayStart = _timestampReadback.GetData<ulong>(offset + 2 * sizeof(ulong));
+
+        if (end >= start && _frameFenceValues[frameIndex] > _gpuTimingFence)
         {
             _lastGpuFrameMilliseconds =
                 (end - start) *
                 1000.0 /
                 _timestampFrequency;
+            if (overlayStart >= start && overlayStart <= end)
+            {
+                _worldGpuMilliseconds = (overlayStart - start) * 1000.0 / _timestampFrequency;
+                _overlayGpuMilliseconds = _frameHasOverlay[frameIndex]
+                    ? (end - overlayStart) * 1000.0 / _timestampFrequency : null;
+                _gpuTimingFence = _frameFenceValues[frameIndex];
+            }
         }
 
         _frameTimestampReady[frameIndex] =
             false;
+    }
+
+    internal void BeginPass(GraphicsFramePass pass)
+    {
+        ValidateRecording();
+        if (!_passState.Enter(pass))
+            return;
+        long now = System.Diagnostics.Stopwatch.GetTimestamp();
+        _recordedWorldCpuMilliseconds = System.Diagnostics.Stopwatch.GetElapsedTime(_passStartedAt, now).TotalMilliseconds;
+        _passStartedAt = now;
+        _frameHasOverlay[_frameIndex] = true;
+        WritePassBoundary();
+    }
+
+    private void WritePassBoundary()
+    {
+        if (_timestampQueryHeap is not null)
+            _commandList.EndQuery(_timestampQueryHeap, QueryType.Timestamp, checked((uint)_frameIndex * 3U + 2U));
+    }
+
+    private void FinishPassTiming()
+    {
+        double elapsed = System.Diagnostics.Stopwatch.GetElapsedTime(_passStartedAt).TotalMilliseconds;
+        if (_frameHasOverlay[_frameIndex])
+            _recordedOverlayCpuMilliseconds = elapsed;
+        else
+        {
+            _recordedWorldCpuMilliseconds = elapsed;
+            _recordedOverlayCpuMilliseconds = null;
+            WritePassBoundary();
+        }
     }
 
     private void UploadTexture(
@@ -1385,6 +1449,12 @@ internal sealed class D3D12GraphicsDevice : IGraphicsDevice
         _frameIndex = frameIndex;
         _surfaceLifecycle.CompleteResize(
             request);
+        _cpuTimingSubmission = 0;
+        _gpuTimingFence = 0;
+        _worldCpuMilliseconds = 0;
+        _overlayCpuMilliseconds = null;
+        _worldGpuMilliseconds = null;
+        _overlayGpuMilliseconds = null;
 
         Console.WriteLine(
             $"[graphics:resize-applied] size={request.Width}x{request.Height} " +
