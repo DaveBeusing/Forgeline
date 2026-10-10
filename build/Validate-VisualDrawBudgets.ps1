@@ -20,7 +20,8 @@ if ($Metrics.instanceDrawCalls -le 0 -or $Metrics.instanceDrawCalls -gt 11) {
 }
 
 $compositeDrawCalls = 0
-if ($null -ne $Metrics.PSObject.Properties['framePasses'] -and $null -ne $Metrics.framePasses) {
+if ($null -ne $Metrics.PSObject.Properties['framePasses'] -and $null -ne $Metrics.framePasses -and
+    $null -ne $Metrics.framePasses.PSObject.Properties['compositeDrawCalls']) {
     $compositeDrawCalls = $Metrics.framePasses.compositeDrawCalls
     if ($compositeDrawCalls -lt 0 -or $compositeDrawCalls -gt 1) {
         throw 'Scene composition must submit at most one fullscreen draw.'
