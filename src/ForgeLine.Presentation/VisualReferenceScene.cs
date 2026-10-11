@@ -20,7 +20,7 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
     private static readonly JsonSerializerOptions FingerprintOptions = new() { IncludeFields = true };
     public const ulong Seed = 2026;
     public const int FixedTick = 32;
-    public const int FixtureVersion = 1;
+    public const int FixtureVersion = 2;
 
     public static VisualReferenceScene Create(VisualReferenceSceneKind kind, TerrainWorld terrain, bool includeHiddenEnemy = true)
     {
@@ -40,7 +40,13 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
         simulation.Entities.AddComponent(sensor, new VisualSensorState(new(1), rangeMeters: 130));
         foreach (var item in battlefield.WorldObjects)
         {
-            EntityId entity = Add(new(item.Position.X - target.X, .08f, item.Position.Z - target.Z), item.Scale, yaw: item.RotationDegrees * MathF.PI / 180);
+            float groundOffset = item.Kind switch
+            {
+                WorldPresentationKind.Decal => .04f,
+                WorldPresentationKind.Vegetation => 0,
+                _ => item.Scale.Y * .5f
+            };
+            EntityId entity = Add(new(item.Position.X - target.X, groundOffset, item.Position.Z - target.Z), item.Scale, yaw: item.RotationDegrees * MathF.PI / 180);
             simulation.Entities.AddComponent(entity, new WorldPresentationIdentity(item.Visual, item.Kind));
         }
         foreach (var item in battlefield.Resources)

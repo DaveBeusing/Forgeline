@@ -1,59 +1,59 @@
 {
   "asset": {
     "version": "2.0",
-    "generator": "ForgeLine world primitive"
+    "generator": "ForgeLine world vegetation authoring"
   },
   "buffers": [
     {
-      "byteLength": 152,
-      "uri": "data:application/octet-stream;base64,AAAAvwAAAAAAAAAAAAAAPwAAgD8AAAAAAAAAPwAAAAAAAAAAAAAAvwAAgD8AAAAAAAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/ppsEP1pkez9aZDs/pptEP1pkOz9aZHs/ppsEP6abRD8AAAAAAQAAAAIAAAAAAAAAAwAAAAEAAAA="
+      "byteLength": 1296,
+      "uri": "data:application/octet-stream;base64,AAAAvwAAAAAAAACAAAAAPwAAAAAAAAAAj8J1PQAAgD8AAAAAj8J1PQAAgD8AAAAAAAAAPwAAAAAAAAAAAAAAvwAAAAAAAACA17PdvgAAAAAAAIC+17PdPgAAAAAAAIA+m9VUPQAAgD+PwvU8m9VUPQAAgD+PwvU817PdPgAAAAAAAIA+17PdvgAAAAAAAIC+AACAvgAAAADXs92+AACAPgAAAADXs90+j8L1PAAAgD+b1VQ9j8L1PAAAgD+b1VQ9AACAPgAAAADXs90+AACAvgAAAADXs92+MjENpAAAAAAAAAC/MjENJAAAAAAAAAA/Y4uHIgAAgD+PwnU9Y4uHIgAAgD+PwnU9MjENJAAAAAAAAAA/MjENpAAAAAAAAAC/AACAPgAAAADXs92+AACAvgAAAADXs90+j8L1vAAAgD+b1VQ9j8L1vAAAgD+b1VQ9AACAvgAAAADXs90+AACAPgAAAADXs92+17PdPgAAAAAAAIC+17PdvgAAAAAAAIA+m9VUvQAAgD+PwvU8m9VUvQAAgD+PwvU817PdvgAAAAAAAIA+17PdPgAAAAAAAIC+AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAvwAAAKTXs10/AAAAvwAAAKTXs10/AAAAvwAAAKTXs10/AAAAPwAAgCPXs12/AAAAPwAAgCPXs12/AAAAPwAAgCPXs12/17NdvwAAACQAAAA/17NdvwAAACQAAAA/17NdvwAAACQAAAA/17NdPwAAgKMAAAC/17NdPwAAgKMAAAC/17NdPwAAgKMAAAC/AACAvwAAAIoyMY0kAACAvwAAAIoyMY0kAACAvwAAAIoyMY0kAACAPwAAgAkyMY2kAACAPwAAgAkyMY2kAACAPwAAgAkyMY2k17NdvwAAAAAAAAC/17NdvwAAAAAAAAC/17NdvwAAAAAAAAC/17NdPwAAAAAAAAA/17NdPwAAAAAAAAA/17NdPwAAAAAAAAA/AAAAvwAAACTXs12/AAAAvwAAACTXs12/AAAAvwAAACTXs12/AAAAPwAAgKPXs10/AAAAPwAAgKPXs10/AAAAPwAAgKPXs10/ppsEP1pkez9aZDs/WmR7PwAAID+mm0Q/ppsEP1pkez9aZDs/WmR7PwAAID+mm0Q/ppsEP1pkez9aZDs/WmR7PwAAID+mm0Q/ppsEP1pkez9aZDs/WmR7PwAAID+mm0Q/ppsEP1pkez9aZDs/WmR7PwAAID+mm0Q/ppsEP1pkez9aZDs/WmR7PwAAID+mm0Q/ppsEP1pkez9aZDs/WmR7PwAAID+mm0Q/ppsEP1pkez9aZDs/WmR7PwAAID+mm0Q/ppsEP1pkez9aZDs/WmR7PwAAID+mm0Q/ppsEP1pkez9aZDs/WmR7PwAAID+mm0Q/ppsEP1pkez9aZDs/WmR7PwAAID+mm0Q/ppsEP1pkez9aZDs/WmR7PwAAID+mm0Q/AAAAAAEAAAACAAAAAwAAAAQAAAAFAAAABgAAAAcAAAAIAAAACQAAAAoAAAALAAAADAAAAA0AAAAOAAAADwAAABAAAAARAAAAEgAAABMAAAAUAAAAFQAAABYAAAAXAAAAGAAAABkAAAAaAAAAGwAAABwAAAAdAAAAHgAAAB8AAAAgAAAAIQAAACIAAAAjAAAA"
     }
   ],
   "bufferViews": [
     {
       "buffer": 0,
       "byteOffset": 0,
-      "byteLength": 48
+      "byteLength": 432
     },
     {
       "buffer": 0,
-      "byteOffset": 48,
-      "byteLength": 48
+      "byteOffset": 432,
+      "byteLength": 432
     },
     {
       "buffer": 0,
-      "byteOffset": 96,
-      "byteLength": 32
+      "byteOffset": 864,
+      "byteLength": 288
     },
     {
       "buffer": 0,
-      "byteOffset": 128,
-      "byteLength": 24
+      "byteOffset": 1152,
+      "byteLength": 144
     }
   ],
   "accessors": [
     {
       "bufferView": 0,
       "componentType": 5126,
-      "count": 4,
+      "count": 36,
       "type": "VEC3"
     },
     {
       "bufferView": 1,
       "componentType": 5126,
-      "count": 4,
+      "count": 36,
       "type": "VEC3"
     },
     {
       "bufferView": 2,
       "componentType": 5126,
-      "count": 4,
+      "count": 36,
       "type": "VEC2"
     },
     {
       "bufferView": 3,
       "componentType": 5125,
-      "count": 6,
+      "count": 36,
       "type": "SCALAR"
     }
   ],

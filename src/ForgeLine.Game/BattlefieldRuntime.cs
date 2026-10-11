@@ -137,10 +137,12 @@ public sealed class BattlefieldRuntime
                 SampleTerrainPosition(
                     terrain,
                     worldObject.Position);
-            float heightOffset =
-                worldObject.Kind == WorldPresentationKind.Decal
-                    ? 0.04f
-                    : worldObject.Scale.Y * 0.5f;
+            float heightOffset = worldObject.Kind switch
+            {
+                WorldPresentationKind.Decal => 0.04f,
+                WorldPresentationKind.Vegetation => 0,
+                _ => worldObject.Scale.Y * 0.5f
+            };
             float radians =
                 worldObject.RotationDegrees *
                 (MathF.PI / 180.0f);

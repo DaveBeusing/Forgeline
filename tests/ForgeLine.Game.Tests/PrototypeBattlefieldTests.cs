@@ -588,6 +588,21 @@ public sealed class PrototypeBattlefieldTests
             definition.WorldObjects.Count,
             runtime.WorldPresentationEntities.Count);
 
+        foreach (EntityId decoration in runtime.WorldPresentationEntities)
+        {
+            Assert.False(simulation.Entities.HasComponent<ControllableEntity>(decoration));
+            Assert.False(simulation.Entities.HasComponent<ResourceDeposit>(decoration));
+            Assert.False(simulation.Entities.HasComponent<HealthState>(decoration));
+            var visual = simulation.Entities.GetComponent<WorldPresentationIdentity>(decoration);
+            Assert.False(visual.Inspectable);
+            if (visual.Kind == WorldPresentationKind.Vegetation)
+            {
+                var transform = simulation.Entities.GetComponent<WorldTransform>(decoration);
+                Assert.True(terrain.TrySampleHeight(transform.Position.X, transform.Position.Z, out float height));
+                Assert.Equal(height, transform.Position.Y, 5);
+            }
+        }
+
         int roadPresentationCount =
             0;
         int roadShoulderCount =
