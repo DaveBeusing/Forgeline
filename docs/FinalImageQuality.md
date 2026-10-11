@@ -118,3 +118,22 @@ sparse strategic silhouettes and bright saturated mesh fallback remain
 content/readability limitations. Sharpening, bloom and temporal resources
 are not justified by these observations. Neutral exposure/grade, restrained
 fog and final-resolution overlays remain the supported baseline.
+
+## Software adapter regression
+
+Hosted window qualification exposed Microsoft Basic Render Driver selected
+through normal adapter enumeration with its software flag unset. Its
+Microsoft vendor/device identity 0x1414/0x8c is specified in the
+[DXGI overview](https://learn.microsoft.com/en-us/windows/win32/direct3ddxgi/d3d10-graphics-programming-guide-dxgi).
+Classification now excludes that identity from hardware selection as well
+as flagged software adapters and uses the existing allowed WARP fallback.
+Integrated/virtual hardware is not classified from zero dedicated memory
+or a display name. This restores the existing software-Low quality policy
+without changing quality limits or the stale-rate guard. Hardware capture
+selection and the rendering shaders are unaffected. Six identity regressions
+cover unset/remote flags and unrelated Microsoft, Intel and NVIDIA devices.
+
+The complete local solution run at 6a372a0 passed 1,704 tests with nine
+opt-in cases skipped (1,713 total). The later adapter-classification change
+requires its focused/native graphics and quality regressions plus the
+current hosted required build-test; PR #175 records their final outcomes.
