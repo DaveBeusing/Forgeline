@@ -1,7 +1,7 @@
 # FORGELINE
 
 Build and release identity follows [Release Versioning](docs/ReleaseVersioning.md).
-Product versions change for release scope; commits do not increment PATCH.
+Each PR increments PATCH once; CI does not automatically create tags or releases.
 
 Source-checkout asset compilation emits live stage and memory progress and saves a flushed JSON-lines log under `artifacts/asset-startup/`. See [Asset startup diagnostics](docs/AssetStartupDiagnostics.md) to investigate slow launches and cold texture compilation.
 

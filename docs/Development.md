@@ -23,14 +23,14 @@ NuGet versions are managed centrally through `Directory.Packages.props`.
 
 ## Semantic Versioning
 
-FORGELINE adopts [Unified Versioning Standard 1.0](UnifiedVersioningStandard.md).
-See [Release Versioning](ReleaseVersioning.md) for release scope, metadata,
-preview/RC allocation, immutable publication and the migration baseline.
+Each PR increments PATCH exactly once relative to current master.
+Run `pwsh ./build/Increment-PrVersion.ps1 -BaseRef origin/master` and commit
+Directory.Build.props with the PR. Repeating preparation against the same base
+does not increment again. CI validates the PR as a whole; commits and reruns
+do not consume versions. Concurrent PRs must rebase and refresh their version.
+See [PR Versioning](ReleaseVersioning.md) for metadata and artifact identity.
+CI does not create tags or publish releases.
 
-Do not increment PATCH per commit. Validate the current release configuration
-with `pwsh ./build/Validate-SemVer.ps1` and allocator contracts with
-`pwsh ./build/Test-Versioning.ps1`. CI supplies one build identity throughout
-build, tests and packaging. PR artifacts are isolated validation artifacts.
 ## Canonical Validation Path
 
 From the repository root:
@@ -154,9 +154,8 @@ The `Match Soak` GitHub Actions workflow exposes the same runner through manual 
 
 Prefer several small, logically complete commits over broad aggregate commits.
 
-Commits and merges do not automatically change the product version. Keep
-unrelated changes separate, preserve history and validate the release
-configuration. Release-version changes must document scope and compatibility.
+Prepare one PATCH increment per PR against current master. Keep unrelated
+changes separate, preserve history and validate the PR version.
 The existing no-squash integration convention remains in force.
 ## Documentation
 
