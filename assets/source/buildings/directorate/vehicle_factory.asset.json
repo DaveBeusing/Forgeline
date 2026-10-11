@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.vehicle_factory",
   "type": "mesh",
-  "source": "sources/vehicle_factory_lod0_production_motion.gltf",
+  "source": "sources/vehicle_factory_lod0_detailed.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ],
@@ -60,6 +60,13 @@
       "travel": 0.25,
       "firstIndex": 660,
       "indexCount": 132
+    },
+    {
+      "name": "fidelity_0",
+      "firstIndex": 792,
+      "indexCount": 180,
+      "parent": -1,
+      "motion": "static"
     }
   ]
 }

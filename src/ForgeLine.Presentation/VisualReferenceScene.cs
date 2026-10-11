@@ -11,7 +11,7 @@ using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
 
-public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat, MechanicalIdle, MechanicalMoving, MechanicalFiring, MechanicalLoading, MechanicalUnpowered, MechanicalBroken }
+public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat, MechanicalIdle, MechanicalMoving, MechanicalFiring, MechanicalLoading, MechanicalUnpowered, MechanicalBroken, DirectorateUnits, DirectorateBuildingStates }
 
 // Authored presentation acceptance states, not economic/combat simulations or gameplay presets.
 public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3 Target,
@@ -78,6 +78,36 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
                 simulation.Entities.AddComponent(building, new ControllableEntity(new(1), ControllableEntityCategory.Building));
             }
         }
+        if (kind == VisualReferenceSceneKind.DirectorateUnits)
+        {
+            UnitId[] units = [UnitIds.RifleSquad, UnitIds.CombatEngineer, UnitIds.ScoutVehicle,
+                UnitIds.MainBattleTank, UnitIds.MobileArtillery, UnitIds.CargoTruck, UnitIds.SupplyTruck];
+            var definitions = DirectorateContent.CreateUnitCatalog();
+            for (int i = 0; i < units.Length; i++)
+            {
+                var definition = definitions[units[i]];
+                EntityId unit = Add(new((i % 4 - 1.5f) * 14, definition.Movement.HeightOffset,
+                    (i / 4 - .5f) * 20), definition.VisualScale);
+                simulation.Entities.AddComponent(unit, new UnitIdentity(units[i], new(1)));
+                simulation.Entities.AddComponent(unit, new ControllableEntity(new(1), ControllableEntityCategory.Unit));
+            }
+        }
+        if (kind == VisualReferenceSceneKind.DirectorateBuildingStates)
+        {
+            BuildingId[] buildings = [BuildingIds.CommandCore, BuildingIds.VehicleFactory, BuildingIds.PowerPlant];
+            var definitions = DirectorateContent.CreateBuildingCatalog();
+            for (int row = 0; row < 3; row++)
+            for (int column = 0; column < buildings.Length; column++)
+            {
+                var footprint = definitions[buildings[column]].Footprint;
+                EntityId building = Add(new((column - 1) * 27, footprint.Height * .5f, (row - 1) * 27),
+                    new(footprint.Width, footprint.Height, footprint.Depth));
+                simulation.Entities.AddComponent(building, new CompletedBuilding(buildings[column], new(1), SimulationTick.Zero));
+                simulation.Entities.AddComponent(building, new ControllableEntity(new(1), ControllableEntityCategory.Building));
+                if (row == 1) simulation.Entities.AddComponent(building, new PowerConsumer(100));
+                if (row == 2) simulation.Entities.AddComponent(building, new HealthState(20, 100));
+            }
+        }
         if (kind is VisualReferenceSceneKind.FormationConvoy or VisualReferenceSceneKind.LogisticsCorridor)
         {
             for (int i = 0; i < 15; i++)
@@ -102,7 +132,7 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
             simulation.Entities.AddComponent(building, new CompletedBuilding(BuildingIds.VehicleFactory, new(1), SimulationTick.Zero));
             simulation.Entities.AddComponent(building, new HealthState(20, 100));
         }
-        bool mechanical = kind >= VisualReferenceSceneKind.MechanicalIdle;
+        bool mechanical = kind is >= VisualReferenceSceneKind.MechanicalIdle and <= VisualReferenceSceneKind.MechanicalBroken;
         if (mechanical)
         {
             UnitId[] units = [UnitIds.MainBattleTank, UnitIds.ScoutVehicle, UnitIds.CargoTruck, UnitIds.SupplyTruck];

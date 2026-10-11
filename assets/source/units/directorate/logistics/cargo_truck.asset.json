@@ -1,7 +1,7 @@
 {
   "id": "unit.directorate.cargo_truck",
   "type": "mesh",
-  "source": "../sources/cargo_truck_lod0_production_motion.gltf",
+  "source": "../sources/cargo_truck_lod0_detailed.gltf",
   "materialReferences": [
     "material.directorate.unit.cargo_truck"
   ],
@@ -98,6 +98,13 @@
       "travel": 0,
       "firstIndex": 972,
       "indexCount": 192
+    },
+    {
+      "name": "fidelity_0",
+      "firstIndex": 1164,
+      "indexCount": 324,
+      "parent": -1,
+      "motion": "static"
     }
   ]
 }

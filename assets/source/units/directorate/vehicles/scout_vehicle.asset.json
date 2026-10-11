@@ -1,7 +1,7 @@
 {
   "id": "unit.directorate.scout_vehicle",
   "type": "mesh",
-  "source": "../sources/scout_vehicle_lod0_production_motion.gltf",
+  "source": "../sources/scout_vehicle_lod0_detailed.gltf",
   "materialReferences": [
     "material.directorate.unit.scout_vehicle"
   ],
@@ -152,6 +152,30 @@
       "travel": 0,
       "firstIndex": 1680,
       "indexCount": 132
+    },
+    {
+      "name": "fidelity_0",
+      "firstIndex": 1812,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "fidelity_1",
+      "firstIndex": 1848,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "radar",
+      "socket": "motion_sensor",
+      "rate": 0.6,
+      "travel": 0
+    },
+    {
+      "name": "fidelity_2",
+      "firstIndex": 1884,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
     }
   ]
 }

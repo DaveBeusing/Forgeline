@@ -99,6 +99,10 @@ if __name__=='__main__':
         if any(s in name for s in ('.collision','.lod1','.lod2','_lod1','_lod2','.module.','.symbol.','.state.')): continue
         if not d.get('lods') and name!='unit.directorate.main_battle_tank.turret': continue
         source=(meta.parent/d['source']).resolve()
+        if source.stem.endswith('_motion'):
+            source=source.with_name(source.stem.removesuffix('_motion')+'.gltf')
+        if source.stem.endswith('_detailed'):
+            source=source.with_name(source.stem.removesuffix('_detailed')+'.gltf')
         if source.stem.endswith('_production'):
             source=source.with_name(source.stem.removesuffix('_production')+'.gltf')
         if source.suffix!='.gltf': continue
