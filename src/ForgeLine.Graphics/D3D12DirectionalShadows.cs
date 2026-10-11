@@ -7,9 +7,7 @@ namespace ForgeLine.Graphics;
 
 internal sealed partial class D3D12GraphicsDevice
 {
-    // Both consumers require a materialized read-only depth layout. Keep that
-    // layout consistent across frame targets, including frames without readback.
-    private const ResourceStates ShadowReadState = ResourceStates.PixelShaderResource | ResourceStates.CopySource;
+    private const ResourceStates ShadowReadState = ResourceStates.PixelShaderResource;
     private GraphicsDirectionalShadowSettings _directionalShadows;
     private ID3D12Resource[]? _shadowTargets;
     private ID3D12Resource[]? _shadowConstants;

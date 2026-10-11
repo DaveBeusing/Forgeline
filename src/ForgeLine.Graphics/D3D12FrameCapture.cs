@@ -94,8 +94,10 @@ internal sealed partial class D3D12GraphicsDevice
         if (_captureShadowTarget is null) return;
         UseResource(_captureShadowLifetime!);
         ID3D12Resource depth = _shadowTargets![_frameIndex];
+        _commandList.ResourceBarrierTransition(depth, ResourceStates.PixelShaderResource, ResourceStates.CopySource);
         _commandList.CopyTextureRegion(new TextureCopyLocation(_captureShadowTarget, _captureShadowFootprint), 0, 0, 0,
             new TextureCopyLocation(depth, 0));
+        _commandList.ResourceBarrierTransition(depth, ResourceStates.CopySource, ResourceStates.PixelShaderResource);
         _captureShadowRecorded = true;
     }
 
