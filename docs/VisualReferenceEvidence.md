@@ -29,6 +29,8 @@ On unequal fixed pixels, both native PNGs and per-frame upload fingerprints are 
 
 Each scene/zoom/display/profile case constructs fresh production renderers before warmup. This prevents LOD hysteresis and emitter history from depending on matrix order. Particles are first prepared at zero elapsed time, then advanced through two bounded0.1s preparation steps and held paused; authored new bursts therefore have0.2s visual age. Persistent effects retain their fixed-tick source age in addition. Construction, asset upload and these preparation steps precede the timed sample window.
 
+For complete investigation evidence, add `-ContinueAfterMismatch`. All eight readbacks are still compared exactly; mismatches retain native images, hashes and channel/delta counts. Failed cases remain false in `repeatPixelsEqual`. The final manifest is `structural-failure`, failure.json lists failed keys, the process exits nonzero and baseline comparison rejects it. Dimensions, source/runtime attestation and unsafe resource failures still abort immediately. This mode collects a complete failing matrix; it never relaxes acceptance. A High shadow-edge repeatability defect observed on the recorded hardware remains a precise native qualification blocker rather than an accepted golden.
+
 ## Review rubric
 
 Record pass/fail/pending per scene/profile/zoom/display, with image filename, region and observed defect. Inspect full-resolution frames and relevant1:1 crops; contact sheets are navigation aids.

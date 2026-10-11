@@ -15,8 +15,8 @@ internal static class DirectionalShadowShader
             float3 p = projected.xyz / projected.w;
             float2 uv = p.xy * float2(0.5, -0.5) + 0.5;
             // Evaluate quad derivatives before coverage and determinant branches.
-            float2 du = ddx_fine(uv), dv = ddy_fine(uv);
-            float dzdx = ddx_fine(p.z), dzdy = ddy_fine(p.z);
+            float2 du = ddx(uv), dv = ddy(uv);
+            float dzdx = ddx(p.z), dzdy = ddy(p.z);
             if (any(uv <= 0) || any(uv >= 1) || p.z <= 0 || p.z >= 1) return float2(1, 1);
             float edge = max(abs(p.x), abs(p.y));
             float fade = 1 - smoothstep(0.82, 0.98, edge);

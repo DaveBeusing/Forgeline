@@ -36,6 +36,8 @@ try {
     Reject { & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -ReportPath (Join-Path $root 'unstable.json') }
     $capture.repeatPixelsEqual=$true; $manifest.status='in-progress'; Write-Manifests
     Reject { & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -ReportPath (Join-Path $root 'incomplete.json') }
+    $manifest.status='structural-failure'; Write-Manifests
+    Reject { & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -ReportPath (Join-Path $root 'failed-complete.json') }
     Write-Output 'Reference dimensions/checksums, incomplete-state rejection and read-only baseline contracts passed.'
 } finally {
     $resolved = [IO.Path]::GetFullPath($root)

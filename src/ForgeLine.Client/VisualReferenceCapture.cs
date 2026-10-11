@@ -24,6 +24,7 @@ internal sealed record VisualReferenceCaptureRequest
     public int Warmups { get; init; } = 32;
     public int Samples { get; init; } = 128;
     public int RepeatCaptures { get; init; } = 8;
+    public bool ContinueAfterMismatch { get; init; }
     public VisualReferenceSceneKind[] Scenes { get; init; } = Enum.GetValues<VisualReferenceSceneKind>();
     public RenderQuality[] Profiles { get; init; } = Enum.GetValues<RenderQuality>();
     public RtsReferenceDisplay[] Displays { get; init; } = RtsVisualReference.Displays.ToArray();
@@ -57,6 +58,7 @@ internal static class VisualReferenceCapture
         bool outputCreated = false;
         var captures = new List<object>();
         var captureInputs = new List<object>();
+        var failedCaptures = new List<string>();
         try
         {
             request = JsonSerializer.Deserialize<VisualReferenceCaptureRequest>(File.ReadAllText(requestPath), JsonOptions)
@@ -163,6 +165,8 @@ internal static class VisualReferenceCapture
                         (measured.Debug.Enabled && measured.Debug.ErrorCount != 0))
                         throw new InvalidOperationException("Capture contains failed bindings or fallback meshes.");
                     byte[] rgba = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
+                    bool repeatPixelsEqual = true;
+                    var repeatFailures = new List<object>();
                     ReadOnlyMemory<byte> shadowDepth = graphics.CaptureShadowDepth;
                     captureInputs.Add(new { frameIndex = recordFrameIndex, fingerprint = graphics.CaptureInputFingerprint,
                         shadowFingerprint = shadowDepth.IsEmpty ? null : Convert.ToHexString(SHA256.HashData(shadowDepth.Span)) });
@@ -173,8 +177,10 @@ internal static class VisualReferenceCapture
                             shadowFingerprint = graphics.CaptureShadowDepth.IsEmpty ? null : Convert.ToHexString(SHA256.HashData(graphics.CaptureShadowDepth.Span)) });
                         if (!rgba.AsSpan().SequenceEqual(repeated))
                         {
-                            ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, $"failed-{key}-first.png"), display.Width, display.Height, rgba);
-                            ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, $"failed-{key}-repeat.png"), display.Width, display.Height, repeated);
+                            if (repeatPixelsEqual)
+                                ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, $"failed-{key}-first.png"), display.Width, display.Height, rgba);
+                            string failedImage = $"failed-{key}-repeat-{repetition:D2}.png";
+                            ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, failedImage), display.Width, display.Height, repeated);
                             if (!shadowDepth.IsEmpty)
                             {
                                 File.WriteAllBytes(Path.Combine(request.OutputRoot, $"failed-{key}-first.depth"), shadowDepth.Span);
@@ -183,9 +189,15 @@ internal static class VisualReferenceCapture
                             int differences = 0, maximumDelta = 0;
                             for (int i = 0; i < rgba.Length; i++)
                                 if (rgba[i] != repeated[i]) { differences++; maximumDelta = Math.Max(maximumDelta, Math.Abs(rgba[i] - repeated[i])); }
-                            throw new InvalidOperationException($"Repeated fixed-state pixels differ on repetition {repetition}: {differences} channels, maximum delta {maximumDelta}; failed images exported.");
+                            string failure = $"Repeated fixed-state pixels differ on repetition {repetition}: {differences} channels, maximum delta {maximumDelta}; failed images exported.";
+                            if (!request.ContinueAfterMismatch) throw new InvalidOperationException(failure);
+                            Console.Error.WriteLine($"[reference:mismatch] {key}: {failure}");
+                            repeatPixelsEqual = false;
+                            repeatFailures.Add(new { repetition, differences, maximumDelta, image = failedImage,
+                                imageSha256 = FileHash(Path.Combine(request.OutputRoot, failedImage)) });
                         }
                     }
+                    if (!repeatPixelsEqual) failedCaptures.Add(key);
                     string image = key + ".png";
                     ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, image), display.Width, display.Height, rgba);
                     var motionImages = new List<object>();
@@ -209,7 +221,7 @@ internal static class VisualReferenceCapture
                         rasterDpi, uiScale = 1, requestedQuality = quality, profile, lighting,
                         cpu = Distribution(cpu), gpu = Distribution(gpu.ToArray()), fps = Distribution(cpu.Select(x => 1000 / x).ToArray()),
                         terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, materials = meshes.MaterialDiagnostics, particles = particles.Diagnostics,
-                        hudVertices = hud.LastRenderedVertexCount, graphics = measured, repeatPixelsEqual = true, request.RepeatCaptures,
+                        hudVertices = hud.LastRenderedVertexCount, graphics = measured, repeatPixelsEqual, request.RepeatCaptures, repeatFailures,
                         captureInputs = captureInputs.ToArray(),
                         motionImages, motionMethod = "Eight adjacent camera poses, no timing claim; readback stalls prevent judder acceptance.", visualReview = "pending" });
                     WriteManifest("in-progress", null);
@@ -217,8 +229,12 @@ internal static class VisualReferenceCapture
                 graphics.WaitForIdle();
             }
             if (runtimeFingerprint != RuntimeFingerprint(request.RuntimeRoot)) throw new InvalidOperationException("Runtime assets changed during qualification.");
-            WriteManifest("structural-pass", null);
-            return 0;
+            string? aggregateFailure = failedCaptures.Count == 0 ? null : $"{failedCaptures.Count} fixed-state cases contain unequal native pixels.";
+            WriteManifest(aggregateFailure is null ? "structural-pass" : "structural-failure", aggregateFailure);
+            if (aggregateFailure is not null)
+                File.WriteAllText(Path.Combine(request.OutputRoot, "failure.json"), JsonSerializer.Serialize(new
+                { status = "structural-failure", error = aggregateFailure, completedCaptures = captures.Count, failedCaptures }, JsonOptions));
+            return aggregateFailure is null ? 0 : 1;
 
             void WriteManifest(string status, string? error) => File.WriteAllText(Path.Combine(request.OutputRoot, "manifest.json"),
                 JsonSerializer.Serialize(new { schemaVersion = 1, status, error, request.Commit, buildIdentity = identity,
@@ -226,7 +242,7 @@ internal static class VisualReferenceCapture
                     runtimeFingerprint, request.Driver, software = request.Software, fixtureVersion = VisualReferenceScene.FixtureVersion,
                     capturePath = "D3D12 swap-chain backbuffer readback before Present; full-resolution native output, independent of host-window clamp",
                     method = "Authored immutable presentation states; fixed 32 completed extraction ticks, VSync off, frozen visual age1.6s and particle age.2s. CPU includes frame reuse/Present. Distinct completed GPU fences. Readbacks/PNG export excluded. No live gameplay or sustained-motion FPS claim.",
-                    request.Warmups, request.Samples, captures, humanVisualAcceptance = "pending" }, JsonOptions));
+                    request.Warmups, request.Samples, request.ContinueAfterMismatch, failedCaptures, captures, humanVisualAcceptance = "pending" }, JsonOptions));
         }
         catch (Exception error)
         {
