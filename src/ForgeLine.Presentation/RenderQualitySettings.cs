@@ -33,6 +33,7 @@ public readonly record struct RenderQualitySettings
 
         ulong Payload(RenderQuality quality) => checked((ulong)width * (ulong)height * 8 * (ulong)buffers +
             (ulong)new GraphicsDirectionalShadowSettings((DirectionalShadowQuality)((int)quality + 1)).PayloadBytes(buffers) +
+            (ulong)new GraphicsDirectionalShadowSettings((DirectionalShadowQuality)((int)quality + 1)).ConstantUploadPayloadBytes(buffers) +
             (ulong)new ParticleSettings((ParticleQuality)((int)quality + 1)).Capacity * 64 * (ulong)buffers + 12);
         RenderQualityProfile Profile(RenderQuality activeQuality, bool linear, string? reason) => new(requested, activeQuality, linear,
             new(linear ? (DirectionalShadowQuality)((int)activeQuality + 1) : DirectionalShadowQuality.Disabled),

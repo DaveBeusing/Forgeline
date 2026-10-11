@@ -442,6 +442,9 @@ internal sealed class ClientRenderHost : IDisposable
                 atmosphere = atmosphere with { Quality = quality };
             }
             atmosphere.Validate();
+            graphics.ConfigurePostProcessing(GraphicsPostProcessingSettings.Neutral);
+            if (!qualityProfile.LinearScene && graphics.Atmosphere.Enabled)
+                graphics.ConfigureAtmosphere(GraphicsAtmosphereSettings.Default);
             graphics.ConfigureSceneOutput(new GraphicsSceneOutputSettings(
                 qualityProfile.LinearScene || atmosphere.Enabled || Environment.GetEnvironmentVariable("FORGELINE_LINEAR_SCENE_OUTPUT") == "1",
                 _sceneLighting.Exposure, _sceneLighting.ToneMapping == SceneToneMappingMode.AcesFitted));

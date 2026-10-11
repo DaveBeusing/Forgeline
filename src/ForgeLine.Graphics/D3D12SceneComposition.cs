@@ -45,7 +45,7 @@ internal sealed partial class D3D12GraphicsDevice
         ThrowIfRecording();
         settings.Validate();
         if ((_atmosphere.Enabled || _postProcessing != GraphicsPostProcessingSettings.Neutral) && !settings.Enabled)
-            throw new InvalidOperationException("Disable atmosphere before disabling linear scene composition.");
+            throw new InvalidOperationException("Disable atmosphere and postprocessing before disabling linear scene composition.");
         if (settings == _sceneOutput)
             return;
         WaitForIdle();

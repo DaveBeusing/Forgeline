@@ -7,6 +7,7 @@ public enum DirectionalShadowQuality { Disabled, Low, Medium, High }
 
 public readonly record struct GraphicsDirectionalShadowSettings(DirectionalShadowQuality Quality)
 {
+    public const int ConstantArenaBytesPerFrame = 256 * 4096;
     public bool Enabled => Quality != DirectionalShadowQuality.Disabled;
     public int Resolution => Quality switch { DirectionalShadowQuality.Low => 1024, DirectionalShadowQuality.Medium => 2048, DirectionalShadowQuality.High => 4096, _ => 0 };
     public int CascadeCount => Enabled ? 1 : 0;
@@ -18,6 +19,12 @@ public readonly record struct GraphicsDirectionalShadowSettings(DirectionalShado
         if (buffers is < GraphicsConfiguration.MinimumBufferCount or > GraphicsConfiguration.MaximumBufferCount)
             throw new ArgumentOutOfRangeException(nameof(buffers));
         return checked((long)Resolution * Resolution * 4 * buffers);
+    }
+    public long ConstantUploadPayloadBytes(int buffers)
+    {
+        if (buffers is < GraphicsConfiguration.MinimumBufferCount or > GraphicsConfiguration.MaximumBufferCount)
+            throw new ArgumentOutOfRangeException(nameof(buffers));
+        return Enabled ? (long)ConstantArenaBytesPerFrame * buffers : 0;
     }
     public void Validate()
     {

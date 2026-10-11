@@ -77,7 +77,7 @@ internal sealed partial class D3D12GraphicsDevice
                 }, new CpuDescriptorHandle(_shaderResourceHeap.GetCPUDescriptorHandleForHeapStart(), descriptor, _shaderResourceDescriptorSize));
                 // Slot zero holds shadow frame data; subsequent aligned slots hold per-draw b0 constants.
                 _shadowConstants[i] = _device.CreateCommittedResource(HeapType.Upload,
-                    ResourceDescription.Buffer(256 * 4096), ResourceStates.GenericRead);
+                    ResourceDescription.Buffer(GraphicsDirectionalShadowSettings.ConstantArenaBytesPerFrame), ResourceStates.GenericRead);
                 _shadowConstants[i].Name = $"ForgeLine Shadow Frame Constants {i}";
             }
             _peakShaderResourceDescriptorsUsed = Math.Max(_peakShaderResourceDescriptorsUsed, _shaderResourceDescriptors.UsedCount);
