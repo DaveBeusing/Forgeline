@@ -333,12 +333,12 @@ CPU figures include frame reuse/Present overhead in the benchmark's outer frame 
 
 Set `FORGELINE_SHADOW_QUALITY=Low`, `Medium` or `High` before starting the client. Omit it or use `Disabled` for the default path with no shadow allocation or extra depth draws. Unknown profiles fail explicitly. Shadows work with direct output and optional linear scene composition; UI/debug overlays remain outside lighting. Profiles are composed before renderer construction; runtime profile changes require rebuilding the renderers.
 
-| Profile | Map resolution | Radius (m) | Maximum caster submissions | Maximum depth draws | Depth payload, three buffers |
+| Profile | Map resolution | Radius (m) | Maximum caster submissions | Maximum depth draws | Depth + receiver payload, three buffers |
 | --- | --- | --- | --- | --- | --- |
 | Disabled | 0 | 0 | 0 | 0 | 0 |
-| Low | 1024² | 180 | 1024 | 256 | 12 MiB |
-| Medium | 2048² | 450 | 4096 | 256 | 48 MiB |
-| High | 4096² | 750 | 8192 | 256 | 192 MiB |
+| Low | 1024² | 180 | 1024 | 256 | 24 MiB |
+| Medium | 2048² | 450 | 4096 | 256 | 96 MiB |
+| High | 4096² | 750 | 8192 | 256 | 384 MiB |
 
 Each enabled profile uses one stable camera-relative orthographic map, the measured alternative to cascades. Coverage remains fixed as zoom changes, X/Y placement snaps to whole light-space texels, and receivers fade near the map/radius boundary. Strategic zoom therefore has deliberately limited shadow distance. Terrain uses at most 128 depth draws; objects consume the remaining budgets. VFX and hidden entities do not cast. Caster order follows the immutable authorized snapshot; dense scenes can omit later casters when capped.
 
@@ -443,4 +443,4 @@ Explicit `IGraphicsDevice.CaptureFrame` qualification reads the native swap-chai
 
 Capture input fingerprints cover dynamic upload bytes and vertex, shadow-frame and composite constants while explicit readback is active. They exclude GPU addresses and are diagnostic evidence rather than a complete command-stream attestation. Optional `captureShadowDepth: true` reads the native shadow depth for investigation; ordinary captures leave this memory empty. Both resources remain fence-owned, and a skipped backbuffer copy rejects capture.
 
-Directional depth uses the combined read-only `PixelShaderResource | CopySource` state after casting and before the next depth-write pass. A High reference case on the recorded hardware produced two differing edge pixels across frame targets despite identical upload fingerprints; an explicit depth copy eliminated the difference. Keeping the same materialized readable layout in ordinary frames passed128 repeat captures without any depth copy. The driver-internal mechanism is unproven; the bounded workaround is covered by native repeatability, hidden-caster, resize, resource-release and performance qualification.
+Directional depth transitions from depth-write to copy-source after casting. Each frame copies it once into a plain R32 receiver texture, which transitions from pixel-read to copy-destination and back before world sampling. This separates sampled depth from depth-attachment layout. A High reference case on the recorded hardware produced two differing edge pixels across frame targets despite identical upload fingerprints; a diagnostic depth copy eliminated the difference. A combined read state alone passed an isolated128-repeat test but failed after broader allocation reuse, so it was insufficient. The driver-internal mechanism remains unproven. The materialized receiver path applies to ordinary frames, includes both texture sets in quality budgeting/frame plans, and is covered by native repeatability, hidden-caster, resize, resource-release and performance qualification. The single copy is included in shadow GPU timing.
