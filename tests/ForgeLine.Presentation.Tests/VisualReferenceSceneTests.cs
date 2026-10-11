@@ -48,6 +48,7 @@ public sealed class VisualReferenceSceneTests
         Assert.All(buildings, x => Assert.Equal(new System.Numerics.Vector3(20, 12, 20), x.Transform.Scale));
         Assert.Contains(buildings, x => x.BuildingFeature.IsDestroyed);
         Assert.Equal(3, buildings.Count(x => x.BuildingFeature.IsConstruction));
+        Assert.Equal(PlayerSelectionKind.Building, scene.Snapshot.PlayerExperience!.Value.Selection.Kind);
     }
 
     [Fact]

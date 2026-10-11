@@ -126,7 +126,12 @@ internal static class VisualReferenceCapture
                     var selected = fixture.Snapshot.Instances.ToArray().Where(x => x.Selectable.IsSelectable).Take(3).Select(x => x.Entity).ToArray();
                     var indicators = new DebugDraw { Enabled = true };
                     foreach (var instance in fixture.Snapshot.Instances.ToArray().Where(x => selected.Contains(x.Entity)))
-                        indicators.Circle(instance.Transform.Position + Vector3.UnitY, 5, new(0, .8f, .2f, 1));
+                    {
+                        if (fixture.Kind == VisualReferenceSceneKind.CommandCoreProduction)
+                            RtsWorldMarkerVisualization.DrawSelected(indicators, instance, new(0, .8f, .2f, 1), terrain);
+                        else
+                            indicators.Circle(instance.Transform.Position + Vector3.UnitY, 5, new(0, .8f, .2f, 1));
+                    }
                     var information = RtsInformationLayerView.Empty with { SelectedEntities = selected };
                     uint rasterDpi = request.RasterDpi != 0 ? request.RasterDpi :
                         display.Height == 2160 ? 192u : display.Height == 1440 ? 144u : 96u;

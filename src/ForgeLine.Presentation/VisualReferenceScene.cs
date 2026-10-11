@@ -113,7 +113,7 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
             var footprint = DirectorateContent.CreateBuildingCatalog()[BuildingIds.CommandCore].Footprint;
             for (int i = 0; i < 8; i++)
             {
-                EntityId building = Add(new((i % 4 - 1.5f) * 26, footprint.Height * .5f, (i / 4 - .5f) * 28),
+                EntityId building = Add(new((i % 4 - 1.5f) * 22, footprint.Height * .5f, (i / 4 - .5f) * 22),
                     new(footprint.Width, footprint.Height, footprint.Depth));
                 if (i < 3)
                     simulation.Entities.AddComponent(building, new ConstructionSite(BuildingIds.CommandCore,
@@ -227,7 +227,8 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
                 Selection = PlayerSelectionSummary.Empty with
                 {
                     Count = Math.Min(3, visible.Count(x => x.Selectable.Owner == new PlayerId(1))),
-                    Kind = kind == VisualReferenceSceneKind.IndustrialBase ? PlayerSelectionKind.Building : PlayerSelectionKind.Unit,
+                    Kind = kind is VisualReferenceSceneKind.IndustrialBase or VisualReferenceSceneKind.CommandCoreProduction
+                        ? PlayerSelectionKind.Building : PlayerSelectionKind.Unit,
                     DisplayName = kind.ToString()
                 }
             }, playerActions: new(new(1), extracted.Tick,
