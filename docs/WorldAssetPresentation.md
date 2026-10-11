@@ -2,6 +2,9 @@
 
 ## Purpose
 
+Current authored groups, road-aligned material transitions, rooted volumetric
+vegetation and qualification limits are described in [Environment composition](EnvironmentDressing.md).
+
 The Vertical Slice world presentation baseline turns the Central Divide gameplay map into a readable RTS battlefield while keeping simulation, authoring assets, compiled runtime assets, and renderer concerns separate.
 
 Runtime code never opens files from `assets/source`. CI and local authoring workflows compile those files with `ForgeLine.AssetCompiler` into `assets/runtime`; the Windows client consumes the resulting `RuntimeAssetCatalog`.
