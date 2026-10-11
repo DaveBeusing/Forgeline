@@ -97,6 +97,8 @@ Correctness tests remain separate from benchmark timing. Benchmark timing thresh
 
 ## Windows Client Host
 
+Compile runtime assets explicitly before launching a source checkout. The interactive client never starts source compilation. A native bootstrap window appears before settings and graphics initialization; changed startup events are checkpointed under the local user diagnostics directory. See [Startup timing](StartupDiagnostics.md) and [Early Native Bootstrap](adr/EarlyNativeBootstrap.md).
+
 The interactive client owns the native Windows host, Direct3D 12 graphics backend, RTS input/camera stack, immutable presentation extraction, frame pacing, and development visualization. Canonical gameplay construction is delegated to `MatchRuntime` using the `Gameplay` profile. Player 1 is explicitly human-controlled and Player 2 computer-controlled; the local slot therefore does not receive a strategic opponent controller.
 
 The client supplies a host-owned `JobScheduler` to the shared runtime. Scenario disposal does not dispose that scheduler; the client host owns its single disposal. Match restart creates a fresh shared scenario so ECS state, inventories, navigation state, routes, controllers, and orders do not leak between sessions.

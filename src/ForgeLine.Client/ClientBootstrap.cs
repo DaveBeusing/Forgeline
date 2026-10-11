@@ -35,15 +35,15 @@ internal static class ClientBootstrap
             diagnostics.Mark(StartupPhase.ProcessEntered, detail: "Managed entry; excludes runtime bootstrap");
             diagnostics.Begin(StartupPhase.Launch);
             diagnostics.Begin(StartupPhase.Run);
+            using IWindow window = diagnostics.Measure(StartupPhase.Window,
+                () => platform.CreateBootstrapWindow(new WindowConfiguration("FORGELINE", 1600, 900)));
+            diagnostics.Mark(StartupPhase.WindowVisible);
+            if (platform.BootstrapPainted(window)) diagnostics.Mark(StartupPhase.NativeBootstrapFirstFrame);
             string path = output is null ? Path.Combine(Environment.GetFolderPath(
                 Environment.SpecialFolder.LocalApplicationData), "FORGELINE", "diagnostics",
                 $"startup-{Environment.ProcessId}-{launch}.json") : launch == 1 ? output :
                 Path.Combine(Path.GetDirectoryName(output) ?? string.Empty,
                     $"{Path.GetFileNameWithoutExtension(output)}-launch{launch}{Path.GetExtension(output)}");
-            using IWindow window = diagnostics.Measure(StartupPhase.Window,
-                () => platform.CreateBootstrapWindow(new WindowConfiguration("FORGELINE", 1600, 900)));
-            diagnostics.Mark(StartupPhase.WindowVisible);
-            if (platform.BootstrapPainted(window)) diagnostics.Mark(StartupPhase.NativeBootstrapFirstFrame);
             using var checkpoint = new StartupCheckpoint(diagnostics, path);
             try
             {
