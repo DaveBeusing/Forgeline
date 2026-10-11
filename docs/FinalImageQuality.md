@@ -137,3 +137,13 @@ The complete local solution run at 6a372a0 passed 1,704 tests with nine
 opt-in cases skipped (1,713 total). The later adapter-classification change
 requires its focused/native graphics and quality regressions plus the
 current hosted required build-test; PR #175 records their final outcomes.
+Adapter revision ed18513 builds with zero warnings/errors. Direct executable
+runs pass 67 graphics tests (two opt-in skips) and 722 presentation tests
+(seven skips). A client run with writable temporary files outside the repo
+passes 239/240; one startup timing assertion fails. The isolated startup
+class recheck passes all 20 cases, so this intermittent assertion remains
+visible rather than reporting a clean complete client run. Earlier attempts
+hit sandbox named-pipe access or temporary-path/repository discovery errors.
+The full solution result above predates only the adapter correction.
+Publishing this correction is pending explicit user authorization following
+an automatic approval-review rejection; hosted checks have not tested it.
