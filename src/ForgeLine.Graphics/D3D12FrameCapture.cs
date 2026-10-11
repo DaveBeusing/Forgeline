@@ -10,8 +10,9 @@ internal sealed partial class D3D12GraphicsDevice
 
     // Qualification only: a requested capture adds one copy and waits for completion.
     // Normal RenderFrame never allocates a readback resource or copies the output.
-    internal byte[] CaptureFrame(GraphicsColor clearColor, Action<IGraphicsCommandContext> commands)
+    public byte[] CaptureFrame(GraphicsColor clearColor, Action<IGraphicsCommandContext> commands)
     {
+        ArgumentNullException.ThrowIfNull(commands);
         ThrowIfDisposed();
         ThrowIfRecording();
         if (_surfaceLifecycle.IsSuspended || _surfaceLifecycle.HasPendingResize || _surfaceLifecycle.IsOccluded)
