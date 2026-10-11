@@ -98,6 +98,44 @@ before raising them, especially for strategic views.
 
 ## Qualification
 
+### Directorate material separation and fittings
+
+`build/Author-DirectorateDetails.py` follows the bevel and running-gear passes.
+It derives seven LOD0 siblings from retained production sources: tank access
+hatches, scout observation/sensor glass, truck windscreens and cooling grilles,
+cargo straps, supply service vents, Command Core observation glass, factory
+portal framing and plant heat exchangers. The pass asserts identical outer
+bounds, retains the original position/normal/index prefixes and uses the same
+material slot. It changes neither sockets nor collision assets. Added geometry
+is 396 triangles across the seven sources, not per visible instance. Reduced
+unit geometry is retained. The three selected building families remap broad
+upward grille faces to painted roof surfaces at every existing LOD; dedicated
+vents retain their material. Their LOD1/2 triangle counts stay unchanged.
+
+Intact paint, warnings, rubber, canvas, glass, concrete, wood, rock and vegetation
+are dielectric. Painted cells expose metallic substrate only through their
+authored wear mask; roughness and reflectance use the same mask. Structural
+steel uses a lighter neutral reflectance to separate it from rubber and dark
+gunmetal. Glass no longer inherits metal-panel joints or fasteners. Base Color
+remains sRGB, Normal/ORM linear, with ORM = AO/roughness/metallic. No light or
+cast shadow is baked into these changes, and no emissive channel is added.
+
+The atlas retains its 4x4 identities, 0.018 UV inset, runtime caps and terminal
+128-pixel mips. At the smallest mip the inset is 2.304 texels, versus 36.864
+Base Color texels at mip zero. Fittings use the same inset and single material
+batch. Surface sources are deterministic mathematical authoring and fittings
+are repository-authored geometry under the repository license; there is no
+third-party source material. The existing 7,323,648-byte atlas allocation and
+51,364,204-byte physical texture allocation are unchanged.
+
+Acceptance remains zoom-specific: at 120m inspect glass/armor/rubber separation,
+functional fittings, tangents and supported attachment silhouettes; at 420m
+retain cab/cargo, gun/sensor and building-role separation without relying on
+subpixel surface detail; at 1000m retain stable reduced silhouettes and state
+indicators, without spending geometry on invisible fittings. LOD3/impostors
+require measured benefit and are not introduced. Static reference images do
+not qualify continuous zoom popping or sustained moving-camera shimmer.
+
 `build/Author-IndustrialProps.py` follows the bevel authoring pass and replaces
 seven prop sources with functional detail: ribbed closed drums, hollow flanged
 pipes, slatted pallets with feet, fences with posts and rails, pole-mounted
