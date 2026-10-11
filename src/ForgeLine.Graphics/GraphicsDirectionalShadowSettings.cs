@@ -18,7 +18,8 @@ public readonly record struct GraphicsDirectionalShadowSettings(DirectionalShado
     {
         if (buffers is < GraphicsConfiguration.MinimumBufferCount or > GraphicsConfiguration.MaximumBufferCount)
             throw new ArgumentOutOfRangeException(nameof(buffers));
-        return checked((long)Resolution * Resolution * 4 * buffers);
+        // One caster depth target and one materialized receiver texture per frame.
+        return checked((long)Resolution * Resolution * 8 * buffers);
     }
     public long ConstantUploadPayloadBytes(int buffers)
     {

@@ -27,7 +27,11 @@ public sealed class D3D12DirectionalShadowTests
                 context.BeginPass(GraphicsFramePass.Overlay);
             });
             graphics.WaitForIdle();
-            Assert.Equal(graphics.Diagnostics.DirectionalShadows!.Value.TexturePayloadBytes, graphics.Diagnostics.Frame!.Value.Plan.Shadow!.Value.PayloadBytes);
+            var plan = graphics.Diagnostics.Frame!.Value.Plan;
+            Assert.Equal(3, plan.Shadow!.Value.ResourceCount);
+            Assert.Equal(plan.Shadow.Value, plan.ShadowReceiver!.Value);
+            Assert.Equal(graphics.Diagnostics.DirectionalShadows!.Value.TexturePayloadBytes,
+                plan.Shadow.Value.PayloadBytes + plan.ShadowReceiver.Value.PayloadBytes);
             if (graphics.Diagnostics.GpuTimingAvailable) Assert.NotNull(graphics.Diagnostics.DirectionalShadows!.Value.GpuMilliseconds);
         }
         graphics.ConfigureDirectionalShadows(default);
