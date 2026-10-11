@@ -126,7 +126,7 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
             simulation.Entities.AddComponent(building, new CompletedBuilding(BuildingIds.VehicleFactory, new(1), SimulationTick.Zero));
             simulation.Entities.AddComponent(building, new HealthState(20, 100));
         }
-        bool mechanical = kind >= VisualReferenceSceneKind.MechanicalIdle;
+        bool mechanical = kind is >= VisualReferenceSceneKind.MechanicalIdle and <= VisualReferenceSceneKind.MechanicalBroken;
         if (mechanical)
         {
             UnitId[] units = [UnitIds.MainBattleTank, UnitIds.ScoutVehicle, UnitIds.CargoTruck, UnitIds.SupplyTruck];

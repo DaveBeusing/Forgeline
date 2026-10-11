@@ -100,7 +100,9 @@ before raising them, especially for strategic views.
 
 ### Directorate material separation and fittings
 
-`build/Author-DirectorateDetails.py` follows the bevel and running-gear passes.
+`build/Author-DirectorateDetails.py` follows the bevel, running-gear and mechanical
+partition passes. Existing mechanical ranges and sockets are retained; appended
+fittings use bounded static ranges, while scout sensor glass shares radar motion.
 It derives seven LOD0 siblings from retained production sources: tank access
 hatches, scout observation/sensor glass, truck windscreens and cooling grilles,
 cargo straps, supply service vents, Command Core observation glass, factory
