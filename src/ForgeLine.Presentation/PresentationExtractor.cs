@@ -946,8 +946,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
             new RenderTransform(
                 muzzlePosition,
                 IsVisibleToViewer(entities, combatEvent.Source)
-                    ? Quaternion.CreateFromYawPitchRoll(ResolveAimYaw(entities, combatEvent.Source),
-                        -ResolveAimElevation(entities, combatEvent.Source), 0) * sourceTransform.Rotation
+                    ? sourceTransform.Rotation * Quaternion.CreateFromYawPitchRoll(ResolveAimYaw(entities, combatEvent.Source),
+                        -ResolveAimElevation(entities, combatEvent.Source), 0)
                     : Quaternion.Identity,
                 muzzleDefinition.BaseScale),
             combatEvent.Tick);
