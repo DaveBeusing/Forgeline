@@ -344,7 +344,7 @@ The first response to a measured regression remains reuse, batching, resolution 
 
 ## Visual Regression Policy
 
-The repository does not currently provide a stable screenshot/reference-image comparison subsystem. A large unrelated visual-regression framework is therefore not introduced solely for this qualification pass.
+The repository provides a bounded native capture and metadata comparison lane. It has no accepted visual goldens or automated image-similarity acceptance subsystem. A large unrelated visual-regression framework is not introduced for this qualification pass.
 
 Current visual regression coverage is provided by:
 
@@ -355,7 +355,7 @@ Current visual regression coverage is provided by:
 - representative tactical/strategic rendering benchmarks;
 - explicit strategic/minimap semantic presentation tests.
 
-Reference-image capture can be added later when the renderer has a stable deterministic capture path and comparison policy. At that point, capture configuration, tolerance, target hardware/driver expectations, and update procedure must be documented together.
+The optional [native visual reference lane](VisualReferenceEvidence.md) now exports deterministic fixed-state images, build/runtime metadata and read-only baseline reports. Checksums, actual dimensions, bindings and repeated pixels are structural criteria. No accepted goldens or automated image-similarity tolerance exists; visual acceptance uses the explicit review rubric and records pending/manual gaps.
 
 ## CI Qualification
 

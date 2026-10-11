@@ -54,6 +54,12 @@ is unqualified. This workflow validates loading/binding/display behavior; it
 does not provide a fixed-tick art-review scene, screenshots or a performance
 guarantee.
 
+## Fixed-state native evidence
+
+The optional `Invoke-RtsReferenceQualification.ps1 -Capture` lane extends the original loading smoke with six immutable reference states, all four native resolutions, three zooms and Low/Medium/High profiles. PNGs, source/runtime hashes, actual backbuffer dimensions, repeated pixels, CPU/GPU distributions and resource diagnostics form a metadata manifest. A comparison report protects baselines and distinguishes structural qualification from pending human art review. See [Native visual reference evidence](VisualReferenceEvidence.md) for fixtures, methodology, review rubric, failure handling and WARP/hardware separation.
+
+Exact 3840×2160 backbuffer output is verified independently of the host window. This does not certify a physical 4K monitor or monitor-DPI transitions. The original smoke remains available without image readback.
+
 ## Production art and acceptance work still required
 
 Local smoke measurements used an NVIDIA RTX PRO 5000 Blackwell Generation
@@ -72,9 +78,9 @@ requests produced 3840 x 2130 surfaces, leaving exact 4K unqualified.
 - Define world coverage and texel density per material from the normal camera;
   choose runtime caps from screen use and memory budgets. Category alone must
   not force 8K sources or runtime allocations.
-- Produce a fixed-tick scene with the requested unit/building/resource families,
-  bridge/road, props, vegetation, decals, damage and selection/fog. Capture and
-  review all required zoom/display combinations under stable lighting.
+- Review the fixed-state unit/building/resource, bridge/road, prop, vegetation,
+  decal, damage, selection and intelligence captures under the evidence rubric;
+  none is automatically promoted to an accepted visual golden.
 - Qualify terrain blur/tiling/shimmer, alpha coverage, material response, shadows,
   LOD transitions and unit/background separation. Data tests cannot establish
   these perceptual outcomes.
