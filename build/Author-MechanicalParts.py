@@ -23,6 +23,8 @@ def load(path):
 def author(meta):
     d = json.loads(meta.read_text())
     path = (meta.parent / d['source']).resolve()
+    if path.stem.endswith('_detailed'):
+        path = path.with_name(path.stem.removesuffix('_detailed') + '_production.gltf')
     if path.stem.endswith('_motion'):
         path = path.with_name(path.stem.removesuffix('_motion') + '.gltf')
     original = path.with_name(path.stem.removesuffix('_production') + '.gltf')

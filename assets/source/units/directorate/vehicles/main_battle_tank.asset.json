@@ -1,7 +1,7 @@
 {
   "id": "unit.directorate.main_battle_tank",
   "type": "mesh",
-  "source": "../sources/main_battle_tank_lod0_production_motion.gltf",
+  "source": "../sources/main_battle_tank_lod0_detailed.gltf",
   "materialReferences": [
     "material.directorate.unit.main_battle_tank"
   ],
@@ -180,6 +180,34 @@
       "travel": 0,
       "firstIndex": 1896,
       "indexCount": 192
+    },
+    {
+      "name": "fidelity_0",
+      "firstIndex": 2088,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "fidelity_1",
+      "firstIndex": 2124,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "fidelity_2",
+      "firstIndex": 2160,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "fidelity_3",
+      "firstIndex": 2196,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
     }
   ]
 }

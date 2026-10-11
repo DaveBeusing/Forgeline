@@ -1,7 +1,7 @@
 {
   "id": "unit.directorate.cargo_truck",
   "type": "mesh",
-  "source": "../sources/cargo_truck_lod0_production_motion.gltf",
+  "source": "../sources/cargo_truck_lod0_detailed.gltf",
   "materialReferences": [
     "material.directorate.unit.cargo_truck"
   ],
@@ -98,6 +98,69 @@
       "travel": 0,
       "firstIndex": 972,
       "indexCount": 192
+    },
+    {
+      "name": "fidelity_0",
+      "firstIndex": 1164,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "fidelity_1",
+      "firstIndex": 1200,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "fidelity_2",
+      "firstIndex": 1236,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "fidelity_3",
+      "firstIndex": 1272,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "fidelity_4",
+      "firstIndex": 1308,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "fidelity_5",
+      "firstIndex": 1344,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "fidelity_6",
+      "firstIndex": 1380,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "fidelity_7",
+      "firstIndex": 1416,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "fidelity_8",
+      "firstIndex": 1452,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
     }
   ]
 }

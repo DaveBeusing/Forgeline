@@ -1,8 +1,8 @@
 """Author bounded functional fittings over retained production mesh sources.
 
-Run after the existing bevel/running-gear passes. Original production sources,
-    collision meshes and sockets remain unchanged. Reduced building LODs retain
-    the roof material separation without extra fittings.
+Run after the existing bevel/running-gear and mechanical partition passes.
+Original production sources, collision meshes and sockets remain unchanged.
+Reduced building LODs retain roof material separation without extra fittings.
 All fittings use the existing atlas and single material slot.
 """
 import base64
@@ -75,10 +75,11 @@ def author():
             continue
         source = (meta.parent/definition['source']).resolve()
         reduced = '.lod' in definition['id']
+        mechanical = definition.get('mechanicalParts', [])
         if source.stem.endswith('_detailed'):
-            suffix = '.gltf' if reduced else '_production.gltf'
+            suffix = '.gltf' if reduced else '_production_motion.gltf' if mechanical else '_production.gltf'
             source = source.with_name(source.stem.removesuffix('_detailed')+suffix)
-        if not reduced and not source.stem.endswith('_production'):
+        if not reduced and not source.stem.endswith(('_production', '_production_motion')):
             raise ValueError(f'Expected retained production source: {source}')
         gltf = json.loads(source.read_text())
         primitive = gltf['meshes'][0]['primitives'][0]
@@ -98,6 +99,19 @@ def author():
             arrays = [np.concatenate((old,np.asarray(new)),axis=0).astype('<f4')
                       for old,new in zip(original,(detail.p,detail.n,detail.uv))]
             arrays.append(np.concatenate((indices,np.asarray(detail.idx)+len(original[0]))).astype('<u4'))
+            if mechanical:
+                # Retain all existing moving ranges. Appended details form explicit
+                # ranges, with sensor glass sharing the sensor's authored motion.
+                mechanical = [p for p in mechanical if not p['name'].startswith('fidelity_')]
+                offset = len(indices)
+                for i in range(len(detail.idx)//36):
+                    part = dict(name=f'fidelity_{i}', firstIndex=offset+i*36,
+                                indexCount=36, parent=-1, motion='static')
+                    if name == 'scout_vehicle' and i == 1:
+                        sensor = next(p for p in mechanical if p['name'] == 'sensor')
+                        part.update({k: sensor[k] for k in ('motion','socket','rate','travel')})
+                    mechanical.append(part)
+                definition['mechanicalParts'] = mechanical
         if not (np.array_equal(arrays[0].min(0),original[0].min(0)) and
                 np.array_equal(arrays[0].max(0),original[0].max(0))):
             raise ValueError(f'Fittings exceed original bounds: {source}')
@@ -110,7 +124,8 @@ def author():
         gltf['buffers'] = [dict(byteLength=len(blob),uri='data:application/octet-stream;base64,'+base64.b64encode(blob).decode())]
         gltf['bufferViews'] = views; gltf['accessors'] = accessors
         gltf['asset']['generator'] = 'ForgeLine functional fittings authoring'
-        output = source.with_name(source.stem.removesuffix('_production')+'_detailed.gltf')
+        stem = source.stem.removesuffix('_motion').removesuffix('_production')
+        output = source.with_name(stem+'_detailed.gltf')
         output.write_text(json.dumps(gltf,indent=2)+'\n')
         definition['source'] = str(Path(definition['source']).with_name(output.name)).replace('\\','/')
         meta.write_text(json.dumps(definition,indent=2)+'\n')

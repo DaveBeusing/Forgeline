@@ -1,7 +1,7 @@
 {
   "id": "unit.directorate.supply_truck",
   "type": "mesh",
-  "source": "../sources/supply_truck_lod0_production_motion.gltf",
+  "source": "../sources/supply_truck_lod0_detailed.gltf",
   "materialReferences": [
     "material.directorate.unit.supply_truck"
   ],
@@ -104,6 +104,41 @@
       "travel": 0,
       "firstIndex": 1236,
       "indexCount": 192
+    },
+    {
+      "name": "fidelity_0",
+      "firstIndex": 1428,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "fidelity_1",
+      "firstIndex": 1464,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "fidelity_2",
+      "firstIndex": 1500,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "fidelity_3",
+      "firstIndex": 1536,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "fidelity_4",
+      "firstIndex": 1572,
+      "indexCount": 36,
+      "parent": -1,
+      "motion": "static"
     }
   ]
 }
