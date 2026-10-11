@@ -57,6 +57,9 @@ internal static class ClientBootstrap
             {
                 diagnostics.Mark(StartupPhase.StartupFailed, detail: error.GetType().Name);
                 diagnostics.Finish(error);
+                if (window.IsOpen)
+                    platform.UpdateBootstrap(window, "STARTUP FAILED\n" + error.Message +
+                        "\nClose this window to exit. Diagnostics: " + path, failed: true);
                 checkpoint.Flush();
                 string? report = ClientDiagnostics.WriteCrashReport(error);
                 Console.Error.WriteLine($"[startup:failed] {error}");

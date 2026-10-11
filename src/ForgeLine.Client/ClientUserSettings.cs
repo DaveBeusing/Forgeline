@@ -280,6 +280,7 @@ internal sealed class ClientSettingsStore
                     _ = TryQuarantineInvalidSettings();
                 }
             }
+            cancellationToken.ThrowIfCancellationRequested();
             if (migrated || bindingRecovery is not null) Save(settings);
 
             return new ClientSettingsLoadResult(
@@ -296,6 +297,7 @@ internal sealed class ClientSettingsStore
                   IOException or
                   UnauthorizedAccessException)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             string? recoveryPath =
                 TryQuarantineInvalidSettings();
             var defaults =

@@ -23,11 +23,12 @@ internal static partial class WindowsBootstrapSurface
         try
         {
             if (WindowsNative.GetClientRect(window, out var bounds) == 0) return false;
-            _ = FillRect(dc, ref bounds, WindowsNative.GetStockObject(WindowsNative.BlackBrush));
+            if (bounds.Width <= 0 || bounds.Height <= 0 ||
+                FillRect(dc, ref bounds, WindowsNative.GetStockObject(WindowsNative.BlackBrush)) == 0) return false;
             _ = SetBkMode(dc, 1);
             int Scale(int value) => Math.Max(1, (int)Math.Round(value * dpi / 96d));
             int center = bounds.Height / 2;
-            Text(dc, "FORGELINE", new() { Left = 12, Top = center - Scale(60),
+            bool brandDrawn = Text(dc, "FORGELINE", new() { Left = 12, Top = center - Scale(60),
                 Right = bounds.Right - 12, Bottom = center }, Scale(38), 700, 0x00E2E8EE);
             var accent = new WindowsNative.NativeRect { Left = bounds.Width / 2 - Scale(64),
                 Top = center + Scale(4), Right = bounds.Width / 2 + Scale(64), Bottom = center + Scale(6) };
@@ -37,15 +38,15 @@ internal static partial class WindowsBootstrapSurface
                 try { _ = FillRect(dc, ref accent, brush); }
                 finally { _ = DeleteObject(brush); }
             }
-            Text(dc, status, new() { Left = Scale(24), Top = center + Scale(30),
+            bool statusDrawn = Text(dc, status, new() { Left = Scale(24), Top = center + Scale(30),
                 Right = bounds.Right - Scale(24), Bottom = bounds.Bottom - Scale(12) },
                 Scale(16), 400, failed ? 0x008CA8EEu : 0x00A2A9AEu);
-            return true;
+            return brandDrawn && statusDrawn;
         }
         finally { _ = EndPaint(window, ref paint); }
     }
 
-    private static void Text(nint dc, string text, WindowsNative.NativeRect bounds,
+    private static bool Text(nint dc, string text, WindowsNative.NativeRect bounds,
         int height, int weight, uint color)
     {
         nint font = CreateFont(-height, 0, 0, 0, weight, 0, 0, 0, 1, 0, 0, 5, 0, "Segoe UI");
@@ -53,7 +54,7 @@ internal static partial class WindowsBootstrapSurface
         try
         {
             _ = SetTextColor(dc, color);
-            _ = DrawText(dc, text, text.Length, ref bounds, 0x00000001 | 0x00000010 | 0x00000800);
+            return DrawText(dc, text, text.Length, ref bounds, 0x00000001 | 0x00000010 | 0x00000800) > 0;
         }
         finally
         {
