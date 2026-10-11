@@ -456,3 +456,10 @@ include mechanical part-instance counts and transform scratch size. Static or
 missing pose data uses the original whole-mesh draw. Close-range motion fades
 to neutral before the existing LOD0/LOD1 hysteresis band; reduced geometry stays
 static. No new GPU resources or per-entity render controllers are allocated.
+
+### Battlefield effect refinement
+
+Smoke, dust, sparks, blast, fire and heavy muzzle visuals share the existing
+64-byte analytic particle stream and depth-fade path. Type-specific velocity,
+growth, heat decay and admission diagnostics add no render targets, textures,
+UAV simulation or scheduler. See [effect contracts and qualification](BattlefieldEffectCatalog.md).
