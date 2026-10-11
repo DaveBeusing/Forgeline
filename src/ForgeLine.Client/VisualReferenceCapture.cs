@@ -56,6 +56,7 @@ internal static class VisualReferenceCapture
         VisualReferenceCaptureRequest? request = null;
         bool outputCreated = false;
         var captures = new List<object>();
+        var captureInputs = new List<object>();
         try
         {
             request = JsonSerializer.Deserialize<VisualReferenceCaptureRequest>(File.ReadAllText(requestPath), JsonOptions)
@@ -116,8 +117,11 @@ internal static class VisualReferenceCapture
                         indicators.Circle(instance.Transform.Position + Vector3.UnitY, 5, new(0, .8f, .2f, 1));
                     var information = RtsInformationLayerView.Empty with { SelectedEntities = selected };
                     uint rasterDpi = display.Height == 2160 ? 192u : display.Height == 1440 ? 144u : 96u;
+                    int recordFrameIndex = -1;
+                    captureInputs.Clear();
                     Action<IGraphicsCommandContext> record = context =>
                     {
+                        recordFrameIndex = context.FrameIndex;
                         if (graphics.Atmosphere.Enabled) context.SetAtmosphereView(SceneAtmosphereSettings.CreateView(camera, context.Width, context.Height));
                         if (profile.Shadows.Enabled)
                         {
@@ -157,9 +161,11 @@ internal static class VisualReferenceCapture
                         (measured.Debug.Enabled && measured.Debug.ErrorCount != 0))
                         throw new InvalidOperationException("Capture contains failed bindings or fallback meshes.");
                     byte[] rgba = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
+                    captureInputs.Add(new { frameIndex = recordFrameIndex, fingerprint = graphics.CaptureInputFingerprint });
                     for (int repetition = 1; repetition < request.RepeatCaptures; repetition++)
                     {
                         byte[] repeated = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
+                        captureInputs.Add(new { frameIndex = recordFrameIndex, fingerprint = graphics.CaptureInputFingerprint });
                         if (!rgba.AsSpan().SequenceEqual(repeated))
                         {
                             ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, $"failed-{key}-first.png"), display.Width, display.Height, rgba);
@@ -194,6 +200,7 @@ internal static class VisualReferenceCapture
                         cpu = Distribution(cpu), gpu = Distribution(gpu.ToArray()), fps = Distribution(cpu.Select(x => 1000 / x).ToArray()),
                         terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, materials = meshes.MaterialDiagnostics, particles = particles.Diagnostics,
                         hudVertices = hud.LastRenderedVertexCount, graphics = measured, repeatPixelsEqual = true, request.RepeatCaptures,
+                        captureInputs = captureInputs.ToArray(),
                         motionImages, motionMethod = "Eight adjacent camera poses, no timing claim; readback stalls prevent judder acceptance.", visualReview = "pending" });
                     WriteManifest("in-progress", null);
                 }
@@ -216,7 +223,7 @@ internal static class VisualReferenceCapture
             Console.Error.WriteLine($"[reference:failure] {error.GetType().Name}: {error.Message}");
             // Never overwrite an existing evidence directory after a rejected request.
             if (request is not null && outputCreated)
-                File.WriteAllText(Path.Combine(request.OutputRoot, "failure.json"), JsonSerializer.Serialize(new { status = "structural-failure", error = error.ToString(), completedCaptures = captures.Count }, JsonOptions));
+                File.WriteAllText(Path.Combine(request.OutputRoot, "failure.json"), JsonSerializer.Serialize(new { status = "structural-failure", error = error.ToString(), completedCaptures = captures.Count, captureInputs }, JsonOptions));
             return 1;
         }
     }

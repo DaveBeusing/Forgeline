@@ -135,6 +135,7 @@ internal sealed partial class D3D12GraphicsDevice
         data[16] = frame.Center.X; data[17] = frame.Center.Y; data[18] = frame.Center.Z; data[19] = frame.Radius;
         data[20] = _directionalShadows.Resolution; data[21] = frame.DepthRange; data[22] = frame.ContactStrength; data[23] = 1;
         _shadowConstants![_frameIndex].SetData<float>(data);
+        RecordCaptureInput(MemoryMarshal.AsBytes(data));
         if (_shadowQueries is not null)
             _commandList.EndQuery(_shadowQueries, QueryType.Timestamp, checked((uint)_frameIndex * 2));
         _commandList.ResourceBarrierTransition(_shadowTargets![_frameIndex], ResourceStates.PixelShaderResource, ResourceStates.DepthWrite);
