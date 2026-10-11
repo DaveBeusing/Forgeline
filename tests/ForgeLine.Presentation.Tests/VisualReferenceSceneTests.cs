@@ -19,6 +19,8 @@ public sealed class VisualReferenceSceneTests
     [InlineData(VisualReferenceSceneKind.LogisticsCorridor)]
     [InlineData(VisualReferenceSceneKind.DamageDestruction)]
     [InlineData(VisualReferenceSceneKind.BattlefieldCombat)]
+    [InlineData(VisualReferenceSceneKind.DirectorateUnits)]
+    [InlineData(VisualReferenceSceneKind.DirectorateBuildingStates)]
     public void FreshFixturesRetainTheSameImmutableState(VisualReferenceSceneKind kind)
     {
         var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
@@ -31,6 +33,30 @@ public sealed class VisualReferenceSceneTests
         Assert.All(first.Snapshot.Instances.ToArray(), instance =>
             Assert.True(instance.UnitFeature.IsSpecified || instance.BuildingFeature.IsSpecified ||
                 instance.WorldFeature.IsSpecified || instance.InfrastructureFeature.IsSpecified || instance.VfxFeature.IsSpecified));
+    }
+
+    [Fact]
+    public void UnitGalleryUsesEveryProductionIdentityAndGameplayScale()
+    {
+        var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+        var scene = VisualReferenceScene.Create(VisualReferenceSceneKind.DirectorateUnits, terrain);
+        var units = scene.Snapshot.Instances.ToArray().Where(x => x.UnitFeature.IsSpecified).ToArray();
+        Assert.Equal(7, units.Length);
+        Assert.Equal(7, units.Select(x => x.UnitFeature.Unit).Distinct().Count());
+        var definitions = DirectorateContent.CreateUnitCatalog();
+        Assert.All(units, unit => Assert.Equal(definitions[unit.UnitFeature.Unit].VisualScale, unit.Transform.Scale));
+    }
+
+    [Fact]
+    public void BuildingGalleryExtractsOperationalUnpoweredAndCriticalStates()
+    {
+        var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+        var scene = VisualReferenceScene.Create(VisualReferenceSceneKind.DirectorateBuildingStates, terrain);
+        var buildings = scene.Snapshot.Instances.ToArray().Where(x => x.BuildingFeature.IsSpecified).ToArray();
+        Assert.Equal(9, buildings.Length);
+        foreach (var id in new[] { BuildingIds.CommandCore, BuildingIds.VehicleFactory, BuildingIds.PowerPlant })
+            Assert.Equal(new[] { BuildingPresentationState.Operational, BuildingPresentationState.Unpowered, BuildingPresentationState.Critical },
+                buildings.Where(x => x.BuildingFeature.Building == id).Select(x => x.BuildingFeature.State).Order());
     }
 
     [Fact]

@@ -33,6 +33,18 @@ For complete investigation evidence, add `-ContinueAfterMismatch`. All eight rea
 
 ## Review rubric
 
+Two optional material galleries extend the same capture path without changing
+the six default fixtures. `-Scenes DirectorateUnits` shows all seven producible
+unit identities at their catalog visual scales and ground offsets; Combat
+Engineer retains the established Rifle Squad mesh. `-Scenes
+DirectorateBuildingStates` shows Command Core, Vehicle Factory and Power Plant
+in three rows: operational, unpowered and critical. The latter states pass
+through the existing completed-tick extractor, not renderer overrides. Use
+`IndustrialBase` for the full thirteen-building roster. Record gallery captures
+at all three reference zooms alongside the unchanged default fixtures. The
+request permits at most eight distinct scenes. No gallery is an accepted golden
+until native output and the rubric have been reviewed.
+
 Record pass/fail/pending per scene/profile/zoom/display, with image filename, region and observed defect. Inspect full-resolution frames and relevant1:1 crops; contact sheets are navigation aids.
 
 | Criterion | Observable acceptance |
