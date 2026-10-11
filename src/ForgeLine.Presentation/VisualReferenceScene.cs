@@ -57,6 +57,7 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
         }
         foreach (var item in battlefield.Resources)
         {
+            if (kind == VisualReferenceSceneKind.CommandCoreProduction) continue;
             EntityId deposit = Add(new(item.Center.X - target.X, 0, item.Center.Z - target.Z), new(item.HalfExtents.X * 2, 8, item.HalfExtents.Z * 2));
             simulation.Entities.AddComponent(deposit, WorldPresentationIdentity.ForResource(item.ResourceId));
             simulation.Entities.AddComponent(deposit, new ResourceDeposit(item.ResourceId,
