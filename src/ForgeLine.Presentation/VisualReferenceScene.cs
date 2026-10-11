@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using ForgeLine.Combat;
 using ForgeLine.Core;
+using ForgeLine.Economy;
 using ForgeLine.Game;
 using ForgeLine.Intelligence;
 using ForgeLine.Simulation;
@@ -42,6 +43,13 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
             EntityId entity = Add(new(item.Position.X - target.X, .08f, item.Position.Z - target.Z), item.Scale, yaw: item.RotationDegrees * MathF.PI / 180);
             simulation.Entities.AddComponent(entity, new WorldPresentationIdentity(item.Visual, item.Kind));
         }
+        foreach (var item in battlefield.Resources)
+        {
+            EntityId deposit = Add(new(item.Center.X - target.X, 0, item.Center.Z - target.Z), new(item.HalfExtents.X * 2, 8, item.HalfExtents.Z * 2));
+            simulation.Entities.AddComponent(deposit, WorldPresentationIdentity.ForResource(item.ResourceId));
+            simulation.Entities.AddComponent(deposit, new ResourceDeposit(item.ResourceId,
+                new(item.Center - item.HalfExtents, item.Center + item.HalfExtents), item.TotalQuantity, item.ExtractionRatePerSecond));
+        }
         if (kind != VisualReferenceSceneKind.DaylightTerrain)
         {
             for (int i = 0; i < 18; i++)
@@ -61,6 +69,7 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
             {
                 EntityId building = Add(new((i % 4 - 1.5f) * 27, 0, (i / 4 - 1.5f) * 27), new(16, 10, 16));
                 simulation.Entities.AddComponent(building, new CompletedBuilding(buildings[i], new(1), SimulationTick.Zero));
+                simulation.Entities.AddComponent(building, new ControllableEntity(new(1), ControllableEntityCategory.Building));
             }
         }
         if (kind is VisualReferenceSceneKind.FormationConvoy or VisualReferenceSceneKind.LogisticsCorridor)
@@ -69,9 +78,10 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
                 Unit(i % 3 == 0 ? UnitIds.CargoTruck : UnitIds.MainBattleTank, new((i % 3 - 1) * 10, 0, (i / 3 - 2) * 14));
             for (int i = -3; i <= 3; i++)
             {
-                EntityId road = Add(new(0, .08f, i * 20), new(12, .2f, 20));
+                bool bridge = kind == VisualReferenceSceneKind.LogisticsCorridor && i == 0;
+                EntityId road = Add(new(0, .08f, i * 20), bridge ? new(18, 4, 42) : new(12, .2f, 20));
                 simulation.Entities.AddComponent(road, new InfrastructurePresentationIdentity(
-                    kind == VisualReferenceSceneKind.LogisticsCorridor && i == 0 ? InfrastructurePresentationKind.RoadBridge : InfrastructurePresentationKind.RoadSegment, $"reference-road-{i}"));
+                    bridge ? InfrastructurePresentationKind.RoadBridge : InfrastructurePresentationKind.RoadSegment, $"reference-road-{i}"));
             }
         }
         if (kind is VisualReferenceSceneKind.DamageDestruction or VisualReferenceSceneKind.BattlefieldCombat)
@@ -121,11 +131,22 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
             }
         }
         var snapshot = new PresentationSnapshot(extracted.Tick, extracted.TickDuration, extracted.SimulationEntityCount,
-            visible.ToArray(), extracted.Intelligence, new(1), experience, vfxMetrics: extracted.VfxMetrics);
+            visible.ToArray(), extracted.Intelligence, new(1), experience with
+            {
+                Selection = PlayerSelectionSummary.Empty with
+                {
+                    Count = Math.Min(3, visible.Count(x => x.Selectable.Owner == new PlayerId(1))),
+                    Kind = kind == VisualReferenceSceneKind.IndustrialBase ? PlayerSelectionKind.Building : PlayerSelectionKind.Unit,
+                    DisplayName = kind.ToString()
+                }
+            }, playerActions: new(new(1), extracted.Tick,
+                [new(BuildingIds.PowerPlant, "Power Plant", [], true), new(BuildingIds.VehicleFactory, "Vehicle Factory", [], true)],
+                0, null, null), vfxMetrics: extracted.VfxMetrics);
         string fingerprint = Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new
         {
-            version = FixtureVersion, kind, seed = Seed, tick = snapshot.Tick.Value,
-            instances = snapshot.Instances.ToArray(), cells = snapshot.Intelligence!.Cells, contacts = snapshot.Intelligence.Contacts
+            version = FixtureVersion, kind, target, seed = Seed, tick = snapshot.Tick.Value,
+            instances = snapshot.Instances.ToArray(), cells = snapshot.Intelligence!.Cells, contacts = snapshot.Intelligence.Contacts,
+            snapshot.PlayerExperience, snapshot.PlayerActions
         }, FingerprintOptions)));
         return new(kind, target, snapshot, hidden, fingerprint);
 

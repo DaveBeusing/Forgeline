@@ -4,11 +4,13 @@ param([Parameter(Mandatory)][string]$CurrentRoot, [string]$BaselineRoot,
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $current = Get-Content -LiteralPath (Join-Path $CurrentRoot 'manifest.json') -Raw | ConvertFrom-Json
+if ($current.schemaVersion -ne 1) { throw 'Unsupported evidence schema.' }
 if ($current.status -ne 'structural-pass') { throw "Incomplete native capture: $($current.status)." }
 $baseline = $null
 if ($BaselineRoot) {
     if ([IO.Path]::GetFullPath($CurrentRoot) -eq [IO.Path]::GetFullPath($BaselineRoot)) { throw 'Baseline and current evidence must be distinct.' }
     $baseline = Get-Content -LiteralPath (Join-Path $BaselineRoot 'manifest.json') -Raw | ConvertFrom-Json
+    if ($baseline.schemaVersion -ne 1) { throw 'Unsupported baseline schema.' }
     if ($baseline.status -ne 'structural-pass') { throw 'Baseline is not structurally qualified.' }
 }
 function Confirm-Image([string]$Root, [string]$Image, [string]$Hash, [int]$Width, [int]$Height) {
@@ -27,7 +29,7 @@ $seen = @{}
 $rows = foreach ($capture in $current.captures) {
     if ($seen.ContainsKey($capture.key)) { throw "Duplicate capture key: $($capture.key)" }; $seen[$capture.key] = $true
     if ($capture.actualSurface.width -ne $capture.requestedDisplay.width -or $capture.actualSurface.height -ne $capture.requestedDisplay.height) { throw 'Unqualified native dimensions.' }
-    if (-not $capture.repeatPixelsEqual -or $capture.graphics.resources.textureBindingFailureCount -ne 0 -or $capture.instances.fallbackMeshInstances -ne 0) { throw 'Failed deterministic/resource capture contract.' }
+    if (-not $capture.repeatPixelsEqual -or $capture.graphics.resources.textureBindingFailureCount -ne 0 -or $capture.materials.bindingFailureCount -ne 0 -or $capture.instances.fallbackMeshInstances -ne 0) { throw 'Failed deterministic/resource capture contract.' }
     Confirm-Image $CurrentRoot $capture.image $capture.imageSha256 $capture.actualSurface.width $capture.actualSurface.height
     foreach ($motion in $capture.motionImages) { Confirm-Image $CurrentRoot $motion.image $motion.imageSha256 $capture.actualSurface.width $capture.actualSurface.height }
     $previous = $null

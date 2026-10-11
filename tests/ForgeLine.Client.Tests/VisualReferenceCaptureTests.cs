@@ -1,6 +1,8 @@
 using System.Buffers.Binary;
 using System.IO.Compression;
 using System.Text;
+using System.Reflection;
+using System.Text.Json;
 using ForgeLine.Presentation;
 using Xunit;
 
@@ -8,6 +10,36 @@ namespace ForgeLine.Client.Tests;
 
 public sealed class VisualReferenceCaptureTests
 {
+    [Fact]
+    public void RejectedAndFailedRequestsCannotOverwriteExistingEvidence()
+    {
+        string root = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            string output = Path.Combine(root, "existing"); Directory.CreateDirectory(output);
+            string marker = Path.Combine(output, "baseline.txt"); File.WriteAllText(marker, "retain");
+            string identity = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
+            var request = new VisualReferenceCaptureRequest { OutputRoot = output, Commit = identity[^40..], RuntimeRoot = Path.Combine(root, "missing-runtime") };
+            string path = Path.Combine(root, "request.json");
+            File.WriteAllText(path, JsonSerializer.Serialize(request, VisualReferenceCapture.JsonOptions));
+            Assert.Equal(1, VisualReferenceCapture.Run(path));
+            Assert.Equal("retain", File.ReadAllText(marker));
+            Assert.Single(Directory.GetFiles(output));
+            output = Path.Combine(root, "failed");
+            File.WriteAllText(path, JsonSerializer.Serialize(request with { OutputRoot = output }, VisualReferenceCapture.JsonOptions));
+            Assert.Equal(1, VisualReferenceCapture.Run(path));
+            using var failure = JsonDocument.Parse(File.ReadAllText(Path.Combine(output, "failure.json")));
+            Assert.Equal("structural-failure", failure.RootElement.GetProperty("status").GetString());
+            Assert.Equal(0, failure.RootElement.GetProperty("completedCaptures").GetInt32());
+            Assert.Empty(Directory.GetFiles(output, "*.png"));
+            output = Path.Combine(root, "wrong-build");
+            File.WriteAllText(path, JsonSerializer.Serialize(request with { OutputRoot = output, Commit = new('0',40) }, VisualReferenceCapture.JsonOptions));
+            Assert.Equal(1, VisualReferenceCapture.Run(path));
+            Assert.False(Directory.Exists(output));
+        }
+        finally { Directory.Delete(root, true); }
+    }
     [Fact]
     public void MatrixRejectsInvalidAndDuplicateStatesBeforeNativeStartup()
     {

@@ -150,7 +150,9 @@ internal static class VisualReferenceCapture
                     var measured = graphics.Diagnostics;
                     if (measured.Surface.Width != display.Width || measured.Surface.Height != display.Height)
                         throw new InvalidOperationException("Actual native surface dimensions differ from the capture request.");
-                    if (measured.Resources.TextureBindingFailureCount != 0 || meshes.LastDiagnostics.FallbackMeshInstances != 0)
+                    if (measured.Resources.TextureBindingFailureCount != 0 || meshes.MaterialDiagnostics.BindingFailureCount != 0 ||
+                        meshes.LastDiagnostics.FallbackMeshInstances != 0 || measured.Health.PendingRetirementCount != 0 ||
+                        (measured.Debug.Enabled && measured.Debug.ErrorCount != 0))
                         throw new InvalidOperationException("Capture contains failed bindings or fallback meshes.");
                     byte[] rgba = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
                     byte[] repeated = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
@@ -177,7 +179,7 @@ internal static class VisualReferenceCapture
                         requestedDisplay = display, actualSurface = measured.Surface, hostWindow = window.ClientSize,
                         rasterDpi, uiScale = 1, requestedQuality = quality, profile, lighting,
                         cpu = Distribution(cpu), gpu = Distribution(gpu.ToArray()), fps = Distribution(cpu.Select(x => 1000 / x).ToArray()),
-                        terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, particles = particles.Diagnostics,
+                        terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, materials = meshes.MaterialDiagnostics, particles = particles.Diagnostics,
                         hudVertices = hud.LastRenderedVertexCount, graphics = measured, repeatPixelsEqual = true,
                         motionImages, motionMethod = "Eight adjacent camera poses, no timing claim; readback stalls prevent judder acceptance.", visualReview = "pending" });
                     WriteManifest("in-progress", null);

@@ -257,5 +257,6 @@ internal static class Program
             "[--settings-root <directory>] [--skip-splash] " +
             "[--startup-diagnostics-output <report.json>] " +
             "[--reference-zoom <CloseTactical|NormalGameplay|Strategic>]");
+        writer.WriteLine("Standalone native evidence: ForgeLine.Client --reference-capture-request <request.json>");
     }
 }
