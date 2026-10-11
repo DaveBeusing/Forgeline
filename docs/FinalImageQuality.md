@@ -145,5 +145,5 @@ class recheck passes all 20 cases, so this intermittent assertion remains
 visible rather than reporting a clean complete client run. Earlier attempts
 hit sandbox named-pipe access or temporary-path/repository discovery errors.
 The full solution result above predates only the adapter correction.
-Publishing this correction is pending explicit user authorization following
-an automatic approval-review rejection; hosted checks have not tested it.
+The adapter correction was published after explicit user authorization following
+an automatic approval-review rejection; current-head hosted checks are pending.
