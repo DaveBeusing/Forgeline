@@ -156,7 +156,15 @@ internal static class VisualReferenceCapture
                         throw new InvalidOperationException("Capture contains failed bindings or fallback meshes.");
                     byte[] rgba = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
                     byte[] repeated = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
-                    if (!rgba.AsSpan().SequenceEqual(repeated)) throw new InvalidOperationException("Repeated fixed-state pixels differ.");
+                    if (!rgba.AsSpan().SequenceEqual(repeated))
+                    {
+                        ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, $"failed-{key}-first.png"), display.Width, display.Height, rgba);
+                        ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, $"failed-{key}-repeat.png"), display.Width, display.Height, repeated);
+                        int differences = 0, maximumDelta = 0;
+                        for (int i = 0; i < rgba.Length; i++)
+                            if (rgba[i] != repeated[i]) { differences++; maximumDelta = Math.Max(maximumDelta, Math.Abs(rgba[i] - repeated[i])); }
+                        throw new InvalidOperationException($"Repeated fixed-state pixels differ: {differences} channels, maximum delta {maximumDelta}; failed images exported.");
+                    }
                     string image = key + ".png";
                     ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, image), display.Width, display.Height, rgba);
                     var motionImages = new List<object>();
