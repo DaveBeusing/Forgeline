@@ -68,13 +68,14 @@ public sealed class DirectorateBuildingAssetAuthoringTests
                 Assert.Equal(.56f, mesh.Vertices.Max(v => v.Y), precision: 5);
                 Assert.Equal(-.34f, mesh.Vertices.Min(v => v.Z), precision: 5);
                 Assert.Equal(.48f, mesh.Vertices.Max(v => v.Z), precision: 5);
+                Assert.Contains(mesh.Vertices, v => v.Z > .47f && MathF.Abs(v.X) < .14f && v.Y <= -.49f);
                 // The loading mouth stays open below the lintel, not a painted box face.
                 Assert.DoesNotContain(mesh.Vertices, v => MathF.Abs(v.X) < .09f && v.Z > .30f &&
                     v.Y > -.32f && v.Y < -.10f);
             });
             RuntimeAssetRecord command = catalog.Get(AssetId.Parse("building.directorate.command_core"));
             Assert.Equal(3, command.Sockets.Count);
-            Assert.Contains(command.Sockets, s => s.Name == "service_access" && s.Y == -.36f);
+            Assert.Contains(command.Sockets, s => s.Name == "service_access" && s.Y == -.414f && s.Z == .25f);
             foreach (string state in new[] { "foundation", "structural_frame", "partial_shell", "unpowered", "damaged", "critical", "destroyed" })
             {
                 RuntimeMeshData mesh = ReadCommandMesh("." + state);

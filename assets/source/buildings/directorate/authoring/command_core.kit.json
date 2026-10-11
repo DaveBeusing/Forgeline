@@ -16,7 +16,7 @@
   "atlas": "texture.directorate.surface.atlas_base",
   "provenance": {
     "author": "ForgeLine",
-    "license": "Repository license; original procedural geometry; no external mesh inputs"
+    "license": "Original repository geometry; no third-party inputs or separate external license grant"
   },
   "intactModules": [
     "foundation",
@@ -29,48 +29,6 @@
     {
       "name": "foundation",
       "parts": [
-        {
-          "name": "reinforced_ground_slab",
-          "kind": "box",
-          "min": [
-            -0.505,
-            -0.5,
-            -0.34
-          ],
-          "max": [
-            0.505,
-            -0.425,
-            0.48
-          ],
-          "cell": 6,
-          "lods": [
-            0,
-            1,
-            2
-          ],
-          "bevel": 0.014
-        },
-        {
-          "name": "recessed_foundation_course",
-          "kind": "box",
-          "min": [
-            -0.475,
-            -0.425,
-            -0.315
-          ],
-          "max": [
-            0.475,
-            -0.375,
-            0.455
-          ],
-          "cell": 6,
-          "lods": [
-            0,
-            1,
-            2
-          ],
-          "bevel": 0.006
-        },
         {
           "name": "blast_shoulder_-1",
           "kind": "box",
@@ -226,6 +184,155 @@
             0
           ],
           "bevel": 0.006
+        },
+        {
+          "name": "reinforced_ground_slab_left",
+          "kind": "box",
+          "min": [
+            -0.505,
+            -0.5,
+            -0.34
+          ],
+          "max": [
+            -0.13,
+            -0.425,
+            0.48
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.014
+        },
+        {
+          "name": "reinforced_ground_slab_right",
+          "kind": "box",
+          "min": [
+            0.13,
+            -0.5,
+            -0.34
+          ],
+          "max": [
+            0.505,
+            -0.425,
+            0.48
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.014
+        },
+        {
+          "name": "reinforced_ground_slab_rear",
+          "kind": "box",
+          "min": [
+            -0.13,
+            -0.5,
+            -0.34
+          ],
+          "max": [
+            0.13,
+            -0.425,
+            0.25
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.014
+        },
+        {
+          "name": "recessed_foundation_course_left",
+          "kind": "box",
+          "min": [
+            -0.475,
+            -0.425,
+            -0.315
+          ],
+          "max": [
+            -0.13,
+            -0.375,
+            0.455
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.006
+        },
+        {
+          "name": "recessed_foundation_course_right",
+          "kind": "box",
+          "min": [
+            0.13,
+            -0.425,
+            -0.315
+          ],
+          "max": [
+            0.475,
+            -0.375,
+            0.455
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.006
+        },
+        {
+          "name": "recessed_foundation_course_rear",
+          "kind": "box",
+          "min": [
+            -0.13,
+            -0.425,
+            -0.315
+          ],
+          "max": [
+            0.13,
+            -0.375,
+            -0.125
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.006
+        },
+        {
+          "name": "vehicle_access_ramp",
+          "kind": "ramp",
+          "width": [
+            -0.13,
+            0.13
+          ],
+          "depth": [
+            0.25,
+            0.48
+          ],
+          "heights": [
+            -0.5,
+            -0.414,
+            -0.495
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ]
         }
       ]
     },
@@ -787,13 +894,13 @@
           "kind": "box",
           "min": [
             -0.13,
-            -0.375,
+            -0.425,
             -0.125
           ],
           "max": [
             0.13,
-            -0.36,
-            0.455
+            -0.414,
+            0.25
           ],
           "cell": 6,
           "lods": [
@@ -808,7 +915,7 @@
           "kind": "box",
           "min": [
             -0.115,
-            -0.36,
+            -0.425,
             -0.128
           ],
           "max": [
@@ -829,7 +936,7 @@
           "kind": "box",
           "min": [
             -0.157,
-            -0.37,
+            -0.425,
             0.25
           ],
           "max": [
@@ -850,7 +957,7 @@
           "kind": "box",
           "min": [
             -0.19099999999999998,
-            -0.375,
+            -0.425,
             0.355
           ],
           "max": [
@@ -870,7 +977,7 @@
           "kind": "box",
           "min": [
             0.11300000000000002,
-            -0.37,
+            -0.425,
             0.25
           ],
           "max": [
@@ -891,7 +998,7 @@
           "kind": "box",
           "min": [
             0.155,
-            -0.375,
+            -0.425,
             0.355
           ],
           "max": [
@@ -964,63 +1071,6 @@
           "lods": [
             0,
             1
-          ],
-          "bevel": 0.006
-        },
-        {
-          "name": "lane_marker",
-          "kind": "box",
-          "min": [
-            -0.012,
-            -0.358,
-            0.3
-          ],
-          "max": [
-            0.012,
-            -0.354,
-            0.325
-          ],
-          "cell": 5,
-          "lods": [
-            0
-          ],
-          "bevel": 0.006
-        },
-        {
-          "name": "lane_marker",
-          "kind": "box",
-          "min": [
-            -0.012,
-            -0.358,
-            0.365
-          ],
-          "max": [
-            0.012,
-            -0.354,
-            0.39
-          ],
-          "cell": 5,
-          "lods": [
-            0
-          ],
-          "bevel": 0.006
-        },
-        {
-          "name": "lane_marker",
-          "kind": "box",
-          "min": [
-            -0.012,
-            -0.358,
-            0.43
-          ],
-          "max": [
-            0.012,
-            -0.354,
-            0.455
-          ],
-          "cell": 5,
-          "lods": [
-            0
           ],
           "bevel": 0.006
         }

@@ -55,16 +55,16 @@ use this dedicated exporter when regenerating the Command Core.
 
 | Runtime identity suffix | glTF filename | Triangles |
 | --- | --- | ---: |
-| primary | command_core_assembled_lod0.gltf | 4188 |
-| .lod1 | command_core_assembled_lod1.gltf | 892 |
-| .lod2 | command_core_assembled_lod2.gltf | 288 |
-| .foundation | command_core_foundation.gltf | 48 |
-| .structural_frame | command_core_structural_frame.gltf | 180 |
-| .partial_shell | command_core_partial_shell.gltf | 228 |
+| primary | command_core_assembled_lod0.gltf | 4244 |
+| .lod1 | command_core_assembled_lod1.gltf | 952 |
+| .lod2 | command_core_assembled_lod2.gltf | 348 |
+| .foundation | command_core_foundation.gltf | 108 |
+| .structural_frame | command_core_structural_frame.gltf | 240 |
+| .partial_shell | command_core_partial_shell.gltf | 288 |
 | .unpowered | command_core_unpowered.gltf | 36 |
 | .damaged | command_core_damaged.gltf | 48 |
 | .critical | command_core_critical.gltf | 180 |
-| .destroyed | command_core_destroyed.gltf | 144 |
+| .destroyed | command_core_destroyed.gltf | 204 |
 
 All runtime identities have explicit asset metadata and one material section.
 The three new LOD silhouettes retain the complete foundation, armoured wing
@@ -87,7 +87,7 @@ Destroyed substitutes low collapsed mass and a fallen communications mast.
 State priority, construction progress thresholds and authority are unchanged.
 
 Primary socket anchors are communications (0,.395,.06), service_access
-(0,-.36,.38), roof_maintenance (.29,.19,.05). They are normalized in the
+(0,-.414,.25), roof_maintenance (.29,.19,.05). They are normalized in the
 retained visual coordinate system and do not drive gameplay. The unchanged
 shared collision proxy and 20 x 20 x 12m gameplay definition remain authoritative.
 The new bottom -.5 seats at the centre sample; the existing terrain slope and
@@ -120,3 +120,8 @@ fixture checks fixed states; it does not prove continuous lifecycle motion,
 selection interaction, physical-monitor readability or gameplay acceptance.
 
 Build, runtime and capture results are recorded below after qualification.
+
+The raised foundation has a real sloped service ramp and a cut-through lane.
+It rises from a six-centimetre front lip to the 1.032m loading floor across
+4.6m, within the retained bounds. The entry anchor follows that threshold.
+The ramp is cosmetic; vehicle pathing does not sample its triangles.

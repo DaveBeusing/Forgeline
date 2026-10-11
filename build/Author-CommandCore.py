@@ -114,6 +114,17 @@ class Mesh:
                 self.face(pts,cell,n)
                 self.face(np.asarray(pts)-.004*n,1,-n)
 
+    def ramp(self, part):
+        x0,x1 = part['width']
+        z0,z1 = part['depth']
+        base,back,front = part['heights']
+        points = np.array([[x0,base,z0],[x1,base,z0],[x1,base,z1],[x0,base,z1],
+                           [x0,back,z0],[x1,back,z0],[x1,front,z1],[x0,front,z1]])
+        for indices,outward in (([0,3,2,1],[0,-1,0]),([4,5,6,7],[0,1,0]),
+                                ([0,1,5,4],[0,0,-1]),([3,7,6,2],[0,0,1]),
+                                ([0,4,7,3],[-1,0,0]),([1,2,6,5],[1,0,0])):
+            self.face(points[indices],part['cell'],outward)
+
     def export(self, path):
         arrays=[np.asarray(self.positions,'<f4'),np.asarray(self.normals,'<f4'),
                 np.asarray(self.uvs,'<f4'),np.asarray(self.indices,'<u4')]
@@ -152,6 +163,8 @@ def assemble(kit, lod, groups=None, state=None):
                 mesh.cylinder(part['start'],part['end'],part['radius'],cell,part['sides'][lod],part.get('inner',0))
             elif kind=='dish':
                 mesh.dish(part['centre'],part['radius'],cell,part['sides'][lod],part['rings'][lod])
+            elif kind=='ramp':
+                mesh.ramp(part)
             else:
                 raise ValueError(f'Unknown component kind: {kind}')
     return mesh
