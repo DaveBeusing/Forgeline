@@ -14,6 +14,9 @@ internal static class DirectionalShadowShader
             float4 projected = mul(float4(position, 1), ShadowProjection);
             float3 p = projected.xyz / projected.w;
             float2 uv = p.xy * float2(0.5, -0.5) + 0.5;
+            // Evaluate quad derivatives before coverage and determinant branches.
+            float2 du = ddx(uv), dv = ddy(uv);
+            float dzdx = ddx(p.z), dzdy = ddy(p.z);
             if (any(uv <= 0) || any(uv >= 1) || p.z <= 0 || p.z >= 1) return float2(1, 1);
             float edge = max(abs(p.x), abs(p.y));
             float fade = 1 - smoothstep(0.82, 0.98, edge);
@@ -23,10 +26,9 @@ internal static class DirectionalShadowShader
             float2 texel = uv * size - 0.5;
             int2 pixel = int2(floor(texel));
             float2 fraction = frac(texel);
-            float2 du = ddx(uv), dv = ddy(uv);
             float determinant = du.x * dv.y - du.y * dv.x;
             float2 plane = abs(determinant) > 1e-10 ?
-                float2(ddx(p.z) * dv.y - ddy(p.z) * du.y, ddy(p.z) * du.x - ddx(p.z) * dv.x) / determinant : 0;
+                float2(dzdx * dv.y - dzdy * du.y, dzdy * du.x - dzdx * dv.x) / determinant : 0;
             float visibility = 0;
             float contact = 0;
             [unroll] for (int y = 0; y <= 1; y++) {
