@@ -14,6 +14,8 @@ namespace ForgeLine.Presentation;
 
 public sealed class PresentationExtractor : ISimulationTickObserver
 {
+    private readonly MechanicalPoseHistory _mechanicalHistory = new();
+    private readonly HashSet<EntityId> _mechanicalShots = [];
     private readonly PresentationSnapshotBuffer _buffer;
     private readonly FactionIntelligenceStore? _intelligence;
     private readonly FactionId _viewingFaction;
@@ -113,6 +115,9 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 requiredDebugData);
         }
 
+        _mechanicalShots.Clear();
+        _mechanicalHistory.Begin(_extraction?.Scenario.Simulation.SessionId ?? SimulationSessionId.None,
+            context.Tick.Value, context.TickDuration.TotalSeconds);
         _vfxPool.BeginTick(
             context.Tick);
         CaptureCombatVfx(
@@ -315,7 +320,12 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                     worldFeature,
                     unitFeature,
                     buildingFeature,
-                    infrastructureFeature);
+                    infrastructureFeature,
+                    MechanicalPose: unitFeature.IsSpecified || buildingFeature.IsSpecified
+                        ? _mechanicalHistory.Capture(entity, transform.Position, transform.Rotation,
+                            unitFeature.IsSpecified && !unitFeature.IsWreck || buildingFeature.State == BuildingPresentationState.Operational,
+                            _mechanicalShots.Contains(entity), ResolveAimElevation(entities, entity),
+                            buildingFeature.State == BuildingPresentationState.Operational) : default);
 
             QueuePersistentStateVfx(
                 entity,
@@ -396,7 +406,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
         return instances;
     }
 
-    private static UnitFeaturePresentationMetadata ResolveUnitPresentationState(
+    private UnitFeaturePresentationMetadata ResolveUnitPresentationState(
         EntityRegistry entities,
         EntityId entity)
     {
@@ -448,7 +458,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 entity));
     }
 
-    private static float ResolveAimYaw(
+    private float ResolveAimYaw(
         EntityRegistry entities,
         EntityId entity)
     {
@@ -456,6 +466,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 entity,
                 out WeaponState weapon) ||
             !weapon.Target.IsValid ||
+            !IsVisibleToViewer(entities, weapon.Target) ||
             !entities.IsAlive(
                 weapon.Target) ||
             !entities.TryGetComponent(
@@ -503,6 +514,15 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 delta));
     }
 
+    private float ResolveAimElevation(EntityRegistry entities, EntityId entity)
+    {
+        if (!entities.TryGetComponent(entity, out WeaponState weapon) || !weapon.Target.IsValid ||
+            !entities.IsAlive(weapon.Target) || !IsVisibleToViewer(entities, weapon.Target) ||
+            !entities.TryGetComponent(entity, out WorldTransform source) ||
+            !entities.TryGetComponent(weapon.Target, out WorldTransform target)) return 0;
+        Vector3 direction = Vector3.Transform(target.Position - source.Position, Quaternion.Inverse(source.Rotation));
+        return Math.Clamp(MathF.Atan2(direction.Y, MathF.Sqrt(direction.X * direction.X + direction.Z * direction.Z)), -0.15f, 0.55f);
+    }
     private static BuildingFeaturePresentationMetadata ResolveBuildingPresentationState(
         EntityRegistry entities,
         EntityId entity)
@@ -858,6 +878,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
             switch (combatEvent.Type)
             {
                 case CombatEventType.ShotFired:
+                    _mechanicalShots.Add(combatEvent.Source);
                     CaptureShotVfx(
                         context.Entities,
                         events,

@@ -214,7 +214,7 @@ internal static class VisualReferenceCapture
                         }
                         camera.ApplyState(original);
                     }
-                    captures.Add(new { key, image, imageSha256 = FileHash(Path.Combine(request.OutputRoot, image)),
+                    captures.Add(new { submission = meshes.SubmissionMetrics, key, image, imageSha256 = FileHash(Path.Combine(request.OutputRoot, image)),
                         pixelSha256 = Convert.ToHexString(SHA256.HashData(rgba)), fixture.Kind, fixture.Fingerprint,
                         seed = VisualReferenceScene.Seed, tick = fixture.Snapshot.Tick.Value, camera = camera.CaptureState(),
                         requestedDisplay = display, actualSurface = measured.Surface, hostWindow = window.ClientSize,

@@ -93,3 +93,15 @@ requests produced 3840 x 2130 surfaces, leaving exact 4K unqualified.
 The full higher-resolution visual upgrade remains incomplete until this art,
 capture and performance work is accepted. Engineering checks do not promote
 unreviewed source art to production acceptance.
+
+## Mechanical state gallery
+
+The native capture lane accepts `MechanicalIdle`, `MechanicalMoving`,
+`MechanicalFiring`, `MechanicalLoading`, `MechanicalUnpowered` and
+`MechanicalBroken`. Each authored immutable scene places the Main Battle Tank,
+Scout Vehicle, Cargo Truck, Supply Truck and Vehicle Factory at the same camera
+reference. Fixture version 2 includes explicit copied mechanical poses. These
+are reproducible presentation states, not claims of natural loading or combat.
+Use the existing three zoom references and record actual profile/display,
+CPU/GPU distributions, submission ranges and residency. Repeated still captures
+do not establish sustained motion, wheel contact or LOD-transition acceptance.

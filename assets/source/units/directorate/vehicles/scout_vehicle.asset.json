@@ -1,7 +1,7 @@
 {
   "id": "unit.directorate.scout_vehicle",
   "type": "mesh",
-  "source": "../sources/scout_vehicle_lod0_production.gltf",
+  "source": "../sources/scout_vehicle_lod0_production_motion.gltf",
   "materialReferences": [
     "material.directorate.unit.scout_vehicle"
   ],
@@ -31,6 +31,127 @@
       "x": 0,
       "y": 0.48,
       "z": 0.02
+    },
+    {
+      "name": "motion_wheel_2",
+      "x": -0.38999998569488525,
+      "y": -0.08000000566244125,
+      "z": 0.23999999463558197
+    },
+    {
+      "name": "motion_wheel_3",
+      "x": -0.38999998569488525,
+      "y": -0.08000000566244125,
+      "z": 0.0
+    },
+    {
+      "name": "motion_wheel_4",
+      "x": -0.38999998569488525,
+      "y": -0.08000000566244125,
+      "z": -0.23999999463558197
+    },
+    {
+      "name": "motion_wheel_5",
+      "x": 0.38999998569488525,
+      "y": -0.08000000566244125,
+      "z": 0.23999999463558197
+    },
+    {
+      "name": "motion_wheel_6",
+      "x": 0.38999998569488525,
+      "y": -0.08000000566244125,
+      "z": 0.0
+    },
+    {
+      "name": "motion_wheel_7",
+      "x": 0.38999998569488525,
+      "y": -0.08000000566244125,
+      "z": -0.23999999463558197
+    },
+    {
+      "name": "motion_sensor",
+      "x": 0.0,
+      "y": 0.47999998927116394,
+      "z": 0.020000001415610313
+    }
+  ],
+  "mechanicalParts": [
+    {
+      "name": "body",
+      "firstIndex": 0,
+      "indexCount": 528,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "wheel_2",
+      "parent": -1,
+      "motion": "wheel",
+      "socket": "motion_wheel_2",
+      "rate": 1.5,
+      "travel": 0,
+      "firstIndex": 528,
+      "indexCount": 192
+    },
+    {
+      "name": "wheel_3",
+      "parent": -1,
+      "motion": "wheel",
+      "socket": "motion_wheel_3",
+      "rate": 1.5,
+      "travel": 0,
+      "firstIndex": 720,
+      "indexCount": 192
+    },
+    {
+      "name": "wheel_4",
+      "parent": -1,
+      "motion": "wheel",
+      "socket": "motion_wheel_4",
+      "rate": 1.5,
+      "travel": 0,
+      "firstIndex": 912,
+      "indexCount": 192
+    },
+    {
+      "name": "wheel_5",
+      "parent": -1,
+      "motion": "wheel",
+      "socket": "motion_wheel_5",
+      "rate": 1.5,
+      "travel": 0,
+      "firstIndex": 1104,
+      "indexCount": 192
+    },
+    {
+      "name": "wheel_6",
+      "parent": -1,
+      "motion": "wheel",
+      "socket": "motion_wheel_6",
+      "rate": 1.5,
+      "travel": 0,
+      "firstIndex": 1296,
+      "indexCount": 192
+    },
+    {
+      "name": "wheel_7",
+      "parent": -1,
+      "motion": "wheel",
+      "socket": "motion_wheel_7",
+      "rate": 1.5,
+      "travel": 0,
+      "firstIndex": 1488,
+      "indexCount": 192
+    },
+    {
+      "name": "sensor",
+      "parent": -1,
+      "motion": "radar",
+      "socket": "motion_sensor",
+      "rate": 0.6,
+      "travel": 0,
+      "firstIndex": 1680,
+      "indexCount": 132
     }
   ]
 }

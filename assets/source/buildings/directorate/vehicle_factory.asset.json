@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.vehicle_factory",
   "type": "mesh",
-  "source": "sources/vehicle_factory_lod0_production.gltf",
+  "source": "sources/vehicle_factory_lod0_production_motion.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ],
@@ -18,5 +18,48 @@
     }
   ],
   "collisionRequired": true,
-  "collisionReference": "building.directorate.module.collision_box"
+  "collisionReference": "building.directorate.module.collision_box",
+  "sockets": [
+    {
+      "name": "motion_loading_door",
+      "x": 0.0,
+      "y": -0.11999999731779099,
+      "z": 0.4000000059604645
+    },
+    {
+      "name": "motion_overhead_crane",
+      "x": 0.0,
+      "y": 0.24,
+      "z": -0.05
+    }
+  ],
+  "mechanicalParts": [
+    {
+      "name": "body",
+      "firstIndex": 0,
+      "indexCount": 528,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "loading_door",
+      "parent": -1,
+      "motion": "door",
+      "socket": "motion_loading_door",
+      "rate": 1,
+      "travel": 0.27,
+      "firstIndex": 528,
+      "indexCount": 132
+    },
+    {
+      "name": "overhead_crane",
+      "parent": -1,
+      "motion": "crane",
+      "socket": "motion_overhead_crane",
+      "rate": 0.25,
+      "travel": 0.25,
+      "firstIndex": 660,
+      "indexCount": 132
+    }
+  ]
 }

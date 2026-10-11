@@ -444,3 +444,15 @@ Explicit `IGraphicsDevice.CaptureFrame` qualification reads the native swap-chai
 Capture input fingerprints cover dynamic upload bytes and vertex, shadow-frame and composite constants while explicit readback is active. They exclude GPU addresses and are diagnostic evidence rather than a complete command-stream attestation. Optional `captureShadowDepth: true` reads the native shadow depth for investigation; ordinary captures leave this memory empty. Both resources remain fence-owned, and a skipped backbuffer copy rejects capture.
 
 Native reference investigation found a High shadow-edge variance across frame targets despite identical upload fingerprints. Diagnostic depth readback changed that observation; altered readable states, an extra receiver texture and fine derivatives did not establish repeatability under broader allocation reuse. Those speculative resource/copy changes are not part of the renderer. The cause remains unresolved and exact native frame qualification must report the failed cases. The original bounded shadow targets, payload and normal frame path remain in place; receiver derivatives are evaluated before varying coverage branches.
+
+## Mechanical rigid parts
+
+Compiled mechanical triangle ranges share the existing vertex/index buffers.
+The presentation renderer composes at most 32 rigid transforms into 2 KiB of
+stack scratch, batches each range across entities and uses the existing indexed
+instance draw with a start-index offset. GPU frame buffers, fences, retirement,
+shadow submission and disposal retain existing ownership. Submission metrics
+include mechanical part-instance counts and transform scratch size. Static or
+missing pose data uses the original whole-mesh draw. Close-range motion fades
+to neutral before the existing LOD0/LOD1 hysteresis band; reduced geometry stays
+static. No new GPU resources or per-entity render controllers are allocated.

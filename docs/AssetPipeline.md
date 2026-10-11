@@ -492,3 +492,14 @@ Mesh materials also support finite two-component `uvOffset` (default `[0,0]`). T
 Authored surface, decal and effect layouts and provenance are documented beside their sources. The original terrain material family and procedural strategic/UI glyph contracts remain in use.
 
 Imported glTF mesh exteriors use counterclockwise outward winding. The textured object pipeline selects clockwise-face culling so those exterior surfaces remain visible, while the existing terrain and fallback primitive pipeline conventions remain separate. The graphics API exposes both winding choices explicitly.
+
+## Rigid mechanical mesh authoring
+
+Optional `mechanicalParts` metadata partitions a mesh into at most 32 contiguous
+triangle ranges. Each moving range references a validated socket and a preceding
+parent, with finite bounded rate/travel. All indices must be covered exactly
+once. `build/Author-MechanicalParts.py` follows the production bevel/running-gear
+passes and writes sibling `_motion.gltf` files. It verifies component bounds
+against the original source before reordering indices. Materials, vertex data,
+collision and stable asset IDs remain unchanged. Generated runtime assets are
+not source files. See [mechanical motion ownership](adr/BoundedMechanicalMotion.md).

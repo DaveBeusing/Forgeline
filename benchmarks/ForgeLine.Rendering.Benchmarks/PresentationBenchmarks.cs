@@ -19,6 +19,8 @@ public class PresentationBenchmarks : IDisposable
     private RtsCamera _strategicCamera = null!;
     private NullGraphicsCommandContext _context = null!;
     private RenderWorld _visibleWorld = null!;
+    private RenderWorld _mechanicalWorld = null!;
+    private RenderWorld _mechanicalStaticWorld = null!;
     private RenderWorld _culledWorld = null!;
     private RenderWorld _representativeWorld = null!;
     private RenderWorld _roadReadabilityWorld = null!;
@@ -55,6 +57,8 @@ public class PresentationBenchmarks : IDisposable
             });
         _context = new NullGraphicsCommandContext();
         _visibleWorld = CreateWorld(1_000, includeFarField: false);
+        _mechanicalWorld = CreateMechanicalWorld(true);
+        _mechanicalStaticWorld = CreateMechanicalWorld(false);
         _culledWorld = CreateWorld(5_000, includeFarField: true);
         _representativeWorld = CreateRepresentativeWorld(1_200);
         _roadReadabilityWorld =
@@ -62,6 +66,31 @@ public class PresentationBenchmarks : IDisposable
                 500);
     }
 
+    public InstanceRenderDiagnostics Submit1000MechanicalInstances(bool animated)
+    {
+        _renderer.Render(_context, _camera, animated ? _mechanicalWorld : _mechanicalStaticWorld, 1);
+        return _renderer.LastDiagnostics;
+    }
+
+    private static RenderWorld CreateMechanicalWorld(bool animated)
+    {
+        var instances = new RenderInstance[1000];
+        UnitId[] units = [UnitIds.MainBattleTank, UnitIds.ScoutVehicle, UnitIds.CargoTruck, UnitIds.SupplyTruck];
+        for (int i = 0; i < instances.Length; i++)
+        {
+            // Deliberately overlapping CPU submission stress; not a gameplay layout or GPU workload.
+            var unit = new UnitFeaturePresentationMetadata(units[i % units.Length], UnitPresentationDamageState.Intact, .3f);
+            instances[i] = new(new EntityId((uint)i + 1, 1),
+                new RenderTransform(new Vector3(i % 32 * .5f - 8, 0, i / 32 * .5f - 8), Quaternion.Identity, new Vector3(4, 3, 7)),
+                new RenderMeshHandle(1), RenderMaterialHandle.Default, RenderVisibilityMask.World,
+                UnitFeature: unit, MechanicalPose: animated ? new(true, 2.3, 1.6, 1.6, 1.55, .15f, 0) : default);
+        }
+        var buffer = new PresentationSnapshotBuffer();
+        buffer.Publish(new(new SimulationTick(32), TimeSpan.FromMilliseconds(50), 1000, instances));
+        var world = new RenderWorld();
+        world.Update(buffer);
+        return world;
+    }
     [GlobalCleanup]
     public void Cleanup() => Dispose();
 
