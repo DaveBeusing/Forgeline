@@ -1,7 +1,7 @@
 {
   "id": "unit.directorate.cargo_truck",
   "type": "mesh",
-  "source": "../sources/cargo_truck_lod0_production.gltf",
+  "source": "../sources/cargo_truck_lod0_production_motion.gltf",
   "materialReferences": [
     "material.directorate.unit.cargo_truck"
   ],
@@ -25,6 +25,79 @@
       "x": 0,
       "y": 0.12,
       "z": -0.38
+    },
+    {
+      "name": "motion_wheel_3",
+      "x": -0.3799999952316284,
+      "y": -0.11999999731779099,
+      "z": 0.26999998092651367
+    },
+    {
+      "name": "motion_wheel_4",
+      "x": 0.3799999952316284,
+      "y": -0.11999999731779099,
+      "z": 0.26999998092651367
+    },
+    {
+      "name": "motion_wheel_5",
+      "x": -0.3799999952316284,
+      "y": -0.11999999731779099,
+      "z": -0.2199999988079071
+    },
+    {
+      "name": "motion_wheel_6",
+      "x": 0.3799999952316284,
+      "y": -0.11999999731779099,
+      "z": -0.2199999988079071
+    }
+  ],
+  "mechanicalParts": [
+    {
+      "name": "body",
+      "firstIndex": 0,
+      "indexCount": 396,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "wheel_3",
+      "parent": -1,
+      "motion": "wheel",
+      "socket": "motion_wheel_3",
+      "rate": 1.5,
+      "travel": 0,
+      "firstIndex": 396,
+      "indexCount": 192
+    },
+    {
+      "name": "wheel_4",
+      "parent": -1,
+      "motion": "wheel",
+      "socket": "motion_wheel_4",
+      "rate": 1.5,
+      "travel": 0,
+      "firstIndex": 588,
+      "indexCount": 192
+    },
+    {
+      "name": "wheel_5",
+      "parent": -1,
+      "motion": "wheel",
+      "socket": "motion_wheel_5",
+      "rate": 1.5,
+      "travel": 0,
+      "firstIndex": 780,
+      "indexCount": 192
+    },
+    {
+      "name": "wheel_6",
+      "parent": -1,
+      "motion": "wheel",
+      "socket": "motion_wheel_6",
+      "rate": 1.5,
+      "travel": 0,
+      "firstIndex": 972,
+      "indexCount": 192
     }
   ]
 }
