@@ -56,12 +56,12 @@ def definition(path, asset_id, source, usage, cap, compressed=True, mips=None):
 def atlas():
     n = 1024
     y, x = np.mgrid[:n, :n].astype(np.float32) / n
-    palette = [(87,94,65),(58,64,65),(29,32,32),(91,91,62),
+    palette = [(87,94,65),(110,117,120),(29,32,32),(91,91,62),
                (28,54,65),(173,142,42),(145,145,134),(73,68,61),
                (78,84,56),(49,55,56),(109,83,53),(119,115,104),
                (45,64,38),(73,83,43),(113,109,62),(71,79,57)]
     rough = [.72,.56,.94,.94,.23,.78,.91,.65,.87,.68,.90,.90,.96,.96,.96,.73]
-    metal = [.12,.88,0,0,0,.05,0,.85,.32,.8,0,0,0,0,0,.14]
+    metal = [0,.88,0,0,0,0,0,.85,0,.8,0,0,0,0,0,0]
     colors, heights, orms = [], [], []
     for i, color in enumerate(palette):
         grain = noise(n, 128, 71+i)
@@ -69,7 +69,7 @@ def atlas():
         h = grain * .008
         variation = grain*2 + macro*5
         wear = np.zeros((n,n), dtype=np.float32)
-        if i in (0,1,4,7,8,9,15):
+        if i in (0,1,7,8,9,15):
             # Panel gaps and flush fasteners are actual height features.
             gap = (np.abs((x+.015) % .5-.25) > .244) | (np.abs((y+.015) % .5-.25) > .244)
             h -= gap*.035
@@ -145,10 +145,14 @@ def atlas():
             variation+=botanical*38-8
         c = np.asarray(color,dtype=np.float32)[None,None,:] + variation[:,:,None]
         if i in (0,8,15):
-            c = c*(1-wear[:,:,None]*.5) + np.array([102,100,87])*wear[:,:,None]*.5
+            # Only exposed substrate is metallic; intact paint is dielectric.
+            wear = np.clip(wear,0,1)
+            c = c*(1-wear[:,:,None]) + np.array([164,169,172])*wear[:,:,None]
         ao = np.clip(1+np.minimum(h,0)*2,.78,1)
         r = np.clip(rough[i]+macro*.025+grain*.012+wear*.08,.12,.99)
-        m = np.clip(metal[i]+wear*.35,0,1) if i in (0,8,15) else np.full_like(h,metal[i])
+        if i in (0,8,15):
+            r = r*(1-wear) + .48*wear
+        m = wear*.95 if i in (0,8,15) else np.full_like(h,metal[i])
         colors.append(c); heights.append(h); orms.append(np.stack((ao,r,m),2)*255)
     path = ROOT/'assets/source/materials/directorate/surfaces'
     def assemble(items):
