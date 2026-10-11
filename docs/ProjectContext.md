@@ -79,14 +79,11 @@ The following precedence applies when technical state, documentation, and govern
 
 ## Semantic Versioning Policy
 
-FORGELINE adopts [Unified Versioning Standard 1.0](UnifiedVersioningStandard.md)
-through the release-versioning migration. The repository mapping and release
-procedure are defined in [Release Versioning](ReleaseVersioning.md).
-
-Product versions change for release scope, not for commits or merges. Existing
-historical versions, tags and commit history are preserved. The migration keeps
-0.1.333 as its target; it does not claim that this historical development number
-was a stable release. The next boundary requires an explicit release decision.
+FORGELINE increments PATCH once per PR relative to current master.
+Individual commits and validation reruns do not consume PATCH. Automatic
+tag allocation and release publication are disabled. Historical tags and
+versions remain intact. [PR Versioning](ReleaseVersioning.md) defines the current
+repository policy and supersedes the previous release-only mapping.
 ## Git and Integration Policy
 
 The project development model requires:
@@ -95,7 +92,7 @@ The project development model requires:
 - short-lived feature, fix, and technical branches;
 - pull requests for integration;
 - small, logically bounded commits;
-- release-related SemVer changes only; no per-commit PATCH increment;
+- one PATCH increment per PR; no per-commit increment or automatic tags;
 - preserve small technical commits; ordinary merge and rebase integration remain allowed and the established no-squash workflow remains in force;
 - successful required CI before merge;
 - no routine force pushes or branch deletion on `master`;
@@ -116,7 +113,7 @@ The check context emitted by the workflow is:
 
 The required check represents the complete CI job, not only compilation or the unit-test subset. Its current validation path includes:
 
-1. release configuration, build identity and version allocation contract validation;
+1. PR version, build identity and version contract validation;
 2. restore;
 3. project-reference validation;
 4. Release build;

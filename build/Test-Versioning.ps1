@@ -15,8 +15,10 @@ foreach ($suffix in @('preview.0', 'preview.01', 'rc.-1', 'preview', 'pr.1.2', '
     Assert-Rejected { Assert-BuildVersion -Version "$product-$suffix" }
 }
 Assert-Rejected { Get-ProductVersion -Content '<Project><PropertyGroup><ForgeLineVersionMajor>0</ForgeLineVersionMajor><ForgeLineVersionMinor>1</ForgeLineVersionMinor><ForgeLineVersionPatch>65535</ForgeLineVersionPatch></PropertyGroup></Project>' }
-Assert-Equal 1 (Get-NextChannelNumber -Tags @() -ProductVersion $product -Channel preview)
-Assert-Equal 43 (Get-NextChannelNumber -Tags @("v$product-preview.2", "v$product-preview.42", "v$product-rc.99", 'v9.0.0-preview.200') -ProductVersion $product -Channel preview)
-Assert-Equal 1 (Get-NextChannelNumber -Tags @("v$product-preview.42") -ProductVersion $product -Channel rc)
-Assert-Equal 1 (Get-NextChannelNumber -Tags @("v$product-preview.42") -ProductVersion '0.2.0' -Channel preview)
-Write-Host 'Version grammar, channel isolation, sequence gaps/reset and numeric metadata limits passed.'
+Assert-Equal '0.1.338' (Get-NextPrVersion '0.1.337')
+Assert-PrVersion '0.1.337' '0.1.338'
+Assert-Rejected { Assert-PrVersion '0.1.337' '0.1.337' }
+Assert-Rejected { Assert-PrVersion '0.1.337' '0.1.339' }
+Assert-Rejected { Assert-PrVersion '0.1.337' '0.2.0' }
+Assert-Rejected { Get-NextPrVersion '0.1.65534' }
+Write-Host 'Version grammar, one PATCH per PR and numeric metadata limits passed.'
