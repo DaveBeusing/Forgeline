@@ -11,6 +11,7 @@ param(
     [ValidateSet('640x360','1920x1080','2560x1440','3840x2160','3440x1440')][string[]]$Displays = @('1920x1080','2560x1440','3840x2160','3440x1440'),
     [ValidateRange(3,4096)][int]$Warmups = 32,
     [ValidateRange(8,8192)][int]$Samples = 128,
+    [ValidateRange(2,128)][int]$RepeatCaptures = 8,
     [string]$BaselineRoot
 )
 
@@ -27,7 +28,7 @@ if ($Capture) {
     $drivers = @(Get-CimInstance Win32_VideoController | ForEach-Object { "$($_.Name): $($_.DriverVersion)" }) -join '; '
     $request = @{
         outputRoot = $referenceRoot; commit = $commit; runtimeRoot = Join-Path $repositoryRoot 'assets/runtime'
-        driver = $drivers; software = [bool]$Software; warmups = $Warmups; samples = $Samples
+        driver = $drivers; software = [bool]$Software; warmups = $Warmups; samples = $Samples; repeatCaptures = $RepeatCaptures
         scenes = $Scenes; profiles = $Profiles; zooms = $Zooms
         displays = @($Displays | ForEach-Object { $parts = $_.Split('x'); @{ width = [int]$parts[0]; height = [int]$parts[1] } })
     }

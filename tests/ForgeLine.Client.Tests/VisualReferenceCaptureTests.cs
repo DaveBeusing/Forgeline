@@ -51,6 +51,7 @@ public sealed class VisualReferenceCaptureTests
         Assert.Throws<ArgumentException>(() => (request with { Displays = [new(3840, 2130)] }).Validate());
         Assert.Throws<ArgumentException>(() => (request with { Scenes = [VisualReferenceSceneKind.BattlefieldCombat, VisualReferenceSceneKind.BattlefieldCombat] }).Validate());
         Assert.Throws<ArgumentOutOfRangeException>(() => (request with { Samples = 0 }).Validate());
+        Assert.Throws<ArgumentOutOfRangeException>(() => (request with { RepeatCaptures = 1 }).Validate());
         Assert.False(Program.TryParseArguments(["--reference-capture-request"], out _, out _, out _, out _));
     }
 

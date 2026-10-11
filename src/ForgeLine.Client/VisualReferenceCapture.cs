@@ -23,6 +23,7 @@ internal sealed record VisualReferenceCaptureRequest
     public bool Software { get; init; }
     public int Warmups { get; init; } = 32;
     public int Samples { get; init; } = 128;
+    public int RepeatCaptures { get; init; } = 8;
     public VisualReferenceSceneKind[] Scenes { get; init; } = Enum.GetValues<VisualReferenceSceneKind>();
     public RenderQuality[] Profiles { get; init; } = Enum.GetValues<RenderQuality>();
     public RtsReferenceDisplay[] Displays { get; init; } = RtsVisualReference.Displays.ToArray();
@@ -33,6 +34,7 @@ internal sealed record VisualReferenceCaptureRequest
         ArgumentException.ThrowIfNullOrWhiteSpace(RuntimeRoot);
         if (Commit is null || Commit.Length != 40 || Commit.Any(c => !Uri.IsHexDigit(c))) throw new ArgumentException("Capture requires a complete source commit.");
         if (Warmups is < 3 or > 4096 || Samples is < 8 or > 8192) throw new ArgumentOutOfRangeException(nameof(Samples));
+        if (RepeatCaptures is < 2 or > 128) throw new ArgumentOutOfRangeException(nameof(RepeatCaptures));
         if (Scenes is null || Profiles is null || Displays is null || Zooms is null ||
             Scenes.Length is < 1 or > 6 || Profiles.Length is < 1 or > 3 || Displays.Length is < 1 or > 4 || Zooms.Length is < 1 or > 3 ||
             Scenes.Any(x => !Enum.IsDefined(x)) || Profiles.Any(x => !Enum.IsDefined(x)) || Zooms.Any(x => !Enum.IsDefined(x)) ||
@@ -155,15 +157,18 @@ internal static class VisualReferenceCapture
                         (measured.Debug.Enabled && measured.Debug.ErrorCount != 0))
                         throw new InvalidOperationException("Capture contains failed bindings or fallback meshes.");
                     byte[] rgba = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
-                    byte[] repeated = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
-                    if (!rgba.AsSpan().SequenceEqual(repeated))
+                    for (int repetition = 1; repetition < request.RepeatCaptures; repetition++)
                     {
-                        ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, $"failed-{key}-first.png"), display.Width, display.Height, rgba);
-                        ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, $"failed-{key}-repeat.png"), display.Width, display.Height, repeated);
-                        int differences = 0, maximumDelta = 0;
-                        for (int i = 0; i < rgba.Length; i++)
-                            if (rgba[i] != repeated[i]) { differences++; maximumDelta = Math.Max(maximumDelta, Math.Abs(rgba[i] - repeated[i])); }
-                        throw new InvalidOperationException($"Repeated fixed-state pixels differ: {differences} channels, maximum delta {maximumDelta}; failed images exported.");
+                        byte[] repeated = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
+                        if (!rgba.AsSpan().SequenceEqual(repeated))
+                        {
+                            ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, $"failed-{key}-first.png"), display.Width, display.Height, rgba);
+                            ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, $"failed-{key}-repeat.png"), display.Width, display.Height, repeated);
+                            int differences = 0, maximumDelta = 0;
+                            for (int i = 0; i < rgba.Length; i++)
+                                if (rgba[i] != repeated[i]) { differences++; maximumDelta = Math.Max(maximumDelta, Math.Abs(rgba[i] - repeated[i])); }
+                            throw new InvalidOperationException($"Repeated fixed-state pixels differ on repetition {repetition}: {differences} channels, maximum delta {maximumDelta}; failed images exported.");
+                        }
                     }
                     string image = key + ".png";
                     ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, image), display.Width, display.Height, rgba);
@@ -188,7 +193,7 @@ internal static class VisualReferenceCapture
                         rasterDpi, uiScale = 1, requestedQuality = quality, profile, lighting,
                         cpu = Distribution(cpu), gpu = Distribution(gpu.ToArray()), fps = Distribution(cpu.Select(x => 1000 / x).ToArray()),
                         terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, materials = meshes.MaterialDiagnostics, particles = particles.Diagnostics,
-                        hudVertices = hud.LastRenderedVertexCount, graphics = measured, repeatPixelsEqual = true,
+                        hudVertices = hud.LastRenderedVertexCount, graphics = measured, repeatPixelsEqual = true, request.RepeatCaptures,
                         motionImages, motionMethod = "Eight adjacent camera poses, no timing claim; readback stalls prevent judder acceptance.", visualReview = "pending" });
                     WriteManifest("in-progress", null);
                 }
