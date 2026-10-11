@@ -1,5 +1,10 @@
 # Asset Pipeline
 
+World vegetation source geometry can be reproduced with
+`python build/Author-WorldVegetation.py`. It retains the existing source paths,
+stable IDs, material atlas regions and High/Reduced chains. Compile its glTF
+outputs through the normal compiler; see [environment composition](EnvironmentDressing.md).
+
 ## Purpose
 
 For live per-asset timing, memory, cache decisions and development-launch diagnostics, see [Asset Startup Diagnostics](AssetStartupDiagnostics.md).

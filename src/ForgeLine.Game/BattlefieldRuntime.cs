@@ -133,14 +133,17 @@ public sealed class BattlefieldRuntime
         {
             BattlefieldWorldObjectDefinition worldObject =
                 definition.WorldObjects[index];
+            // Static dressing must not shift authoritative entity IDs or replay checkpoints.
+            if (worldObject.PresentationOnly) continue;
             Vector3 ground =
                 SampleTerrainPosition(
                     terrain,
                     worldObject.Position);
-            float heightOffset =
-                worldObject.Kind == WorldPresentationKind.Decal
-                    ? 0.04f
-                    : worldObject.Scale.Y * 0.5f;
+            float heightOffset = worldObject.Kind switch
+            {
+                WorldPresentationKind.Decal => 0.04f,
+                _ => worldObject.Scale.Y * 0.5f
+            };
             float radians =
                 worldObject.RotationDegrees *
                 (MathF.PI / 180.0f);

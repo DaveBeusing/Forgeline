@@ -89,7 +89,8 @@ public readonly record struct BattlefieldWorldObjectDefinition(
     WorldPresentationKind Kind,
     Vector3 Position,
     Vector3 Scale,
-    float RotationDegrees);
+    float RotationDegrees,
+    bool PresentationOnly = false);
 
 public enum BattlefieldSiteKind : byte
 {

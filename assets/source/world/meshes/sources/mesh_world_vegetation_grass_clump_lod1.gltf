@@ -1,59 +1,59 @@
 {
   "asset": {
     "version": "2.0",
-    "generator": "ForgeLine world primitive"
+    "generator": "ForgeLine world vegetation authoring"
   },
   "buffers": [
     {
-      "byteLength": 152,
-      "uri": "data:application/octet-stream;base64,AAAAvwAAAAAAAAAAAAAAPwAAgD8AAAAAAAAAPwAAAAAAAAAAAAAAvwAAgD8AAAAAAAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/ppsEP1pkez9aZDs/pptEP1pkOz9aZHs/ppsEP6abRD8AAAAAAQAAAAIAAAAAAAAAAwAAAAEAAAA="
+      "byteLength": 648,
+      "uri": "data:application/octet-stream;base64,AAAAvwAAAAAAAACAAAAAPwAAAAAAAAAAj8J1PQAAgD8AAAAAj8J1PQAAgD8AAAAAAAAAPwAAAAAAAAAAAAAAvwAAAAAAAACAAACAvgAAAADXs92+AACAPgAAAADXs90+j8L1PAAAgD+b1VQ9j8L1PAAAgD+b1VQ9AACAPgAAAADXs90+AACAvgAAAADXs92+AACAPgAAAADXs92+AACAvgAAAADXs90+j8L1vAAAgD+b1VQ9j8L1vAAAgD+b1VQ9AACAvgAAAADXs90+AACAPgAAAADXs92+AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/17NdvwAAACQAAAA/17NdvwAAACQAAAA/17NdvwAAACQAAAA/17NdPwAAgKMAAAC/17NdPwAAgKMAAAC/17NdPwAAgKMAAAC/17NdvwAAAAAAAAC/17NdvwAAAAAAAAC/17NdvwAAAAAAAAC/17NdPwAAAAAAAAA/17NdPwAAAAAAAAA/17NdPwAAAAAAAAA/ppsEP1pkez9aZDs/WmR7PwAAID+mm0Q/ppsEP1pkez9aZDs/WmR7PwAAID+mm0Q/ppsEP1pkez9aZDs/WmR7PwAAID+mm0Q/ppsEP1pkez9aZDs/WmR7PwAAID+mm0Q/ppsEP1pkez9aZDs/WmR7PwAAID+mm0Q/ppsEP1pkez9aZDs/WmR7PwAAID+mm0Q/AAAAAAEAAAACAAAAAwAAAAQAAAAFAAAABgAAAAcAAAAIAAAACQAAAAoAAAALAAAADAAAAA0AAAAOAAAADwAAABAAAAARAAAA"
     }
   ],
   "bufferViews": [
     {
       "buffer": 0,
       "byteOffset": 0,
-      "byteLength": 48
+      "byteLength": 216
     },
     {
       "buffer": 0,
-      "byteOffset": 48,
-      "byteLength": 48
+      "byteOffset": 216,
+      "byteLength": 216
     },
     {
       "buffer": 0,
-      "byteOffset": 96,
-      "byteLength": 32
+      "byteOffset": 432,
+      "byteLength": 144
     },
     {
       "buffer": 0,
-      "byteOffset": 128,
-      "byteLength": 24
+      "byteOffset": 576,
+      "byteLength": 72
     }
   ],
   "accessors": [
     {
       "bufferView": 0,
       "componentType": 5126,
-      "count": 4,
+      "count": 18,
       "type": "VEC3"
     },
     {
       "bufferView": 1,
       "componentType": 5126,
-      "count": 4,
+      "count": 18,
       "type": "VEC3"
     },
     {
       "bufferView": 2,
       "componentType": 5126,
-      "count": 4,
+      "count": 18,
       "type": "VEC2"
     },
     {
       "bufferView": 3,
       "componentType": 5125,
-      "count": 6,
+      "count": 18,
       "type": "SCALAR"
     }
   ],

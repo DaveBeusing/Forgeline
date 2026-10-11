@@ -14,6 +14,38 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class WorldPresentationTests
 {
     [Fact]
+    public void StaticDressingPublishesRootedNonInteractiveInstancesWithoutChangingReplayState()
+    {
+        using var reference = CentralDivideScenario.Create(seed: 831);
+        using var scenario = CentralDivideScenario.Create(seed: 831);
+        var buffer = new PresentationSnapshotBuffer();
+        var gateway = new PlayerCommandGateway(scenario.Simulation, scenario.Services.BuildingCommands,
+            scenario.BattlefieldRuntime.MatchStateEntity);
+        scenario.Simulation.RegisterTickObserver(new PresentationExtractor(buffer,
+            new PresentationExtractionContext(scenario, new(1), new PresentationInteractionState(), gateway)));
+        reference.Simulation.RunTicks(4, TestContext.Current.CancellationToken);
+        scenario.Simulation.RunTicks(4, TestContext.Current.CancellationToken);
+        Assert.Equal(MatchAuthoritativeSnapshot.Capture(reference).ComputeSha256(),
+            MatchAuthoritativeSnapshot.Capture(scenario).ComputeSha256());
+        Assert.Equal("848FABF78754FA4136EB56D03B5059B5FAA2EC91F2C145CA2FFA022C7251549B",
+            MatchAuthoritativeSnapshot.Capture(scenario).ComputeSha256());
+        Assert.True(buffer.TryReadLatest(out var snapshot));
+        var dressing = snapshot.Instances.ToArray().Where(x => x.Entity.Index >= 0xE000_0000U && x.Entity.Index < 0xF000_0000U).ToArray();
+        Assert.Equal(scenario.Battlefield.WorldObjects.Count(x => x.PresentationOnly), dressing.Length);
+        Assert.All(dressing, item =>
+        {
+            Assert.False(scenario.Simulation.Entities.IsAlive(item.Entity));
+            Assert.False(item.WorldFeature.Inspectable);
+            Assert.Equal(SelectablePresentationMetadata.None, item.Selectable);
+        });
+        foreach (var item in snapshot.Instances.ToArray().Where(x => x.WorldFeature.Kind == WorldPresentationKind.Vegetation))
+        {
+            Assert.True(scenario.Terrain.TrySampleHeight(item.Transform.Position.X, item.Transform.Position.Z, out float ground));
+            Assert.Equal(ground, item.Transform.Position.Y, 5);
+        }
+    }
+
+    [Fact]
     public void CentralDivideTerrainProfileDefinesAllInitialMaterialSlots()
     {
         TerrainPresentationProfile profile =
@@ -36,7 +68,7 @@ public sealed class WorldPresentationTests
                 Vector3.UnitY);
         Vector4 road =
             profile.SampleBaseColor(
-                new Vector3(1_536.0f, 6.0f, 1_536.0f),
+                new Vector3(800.0f, 6.0f, 1_536.0f),
                 Vector3.UnitY);
 
         Assert.NotEqual(field, road);
