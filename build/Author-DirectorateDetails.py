@@ -107,7 +107,7 @@ def author():
                 for i in range(len(detail.idx)//36):
                     part = dict(name=f'fidelity_{i}', firstIndex=offset+i*36,
                                 indexCount=36, parent=-1, motion='static')
-                    if name == 'scout_vehicle' and i == 1:
+                    if targets[definition['id']] == 'scout_vehicle' and i == 1:
                         sensor = next(p for p in mechanical if p['name'] == 'sensor')
                         part.update({k: sensor[k] for k in ('motion','socket','rate','travel')})
                     mechanical.append(part)

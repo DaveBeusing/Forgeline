@@ -165,7 +165,10 @@
       "firstIndex": 1848,
       "indexCount": 36,
       "parent": -1,
-      "motion": "static"
+      "motion": "radar",
+      "socket": "motion_sensor",
+      "rate": 0.6,
+      "travel": 0
     },
     {
       "name": "fidelity_2",
