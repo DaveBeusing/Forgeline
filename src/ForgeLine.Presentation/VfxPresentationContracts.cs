@@ -107,7 +107,11 @@ public readonly record struct VfxPresentationDefinition(
 }
 
 public readonly record struct VfxFeaturePresentationMetadata(
-    VfxEffectKind Kind)
+    VfxEffectKind Kind,
+    ulong EmitterId = 0,
+    uint EmitterGeneration = 0,
+    bool Continuous = false,
+    ulong SpawnedAtTick = 0)
 {
     public static VfxFeaturePresentationMetadata None =>
         default;

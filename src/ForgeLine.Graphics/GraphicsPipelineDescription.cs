@@ -34,6 +34,8 @@ public sealed record GraphicsPipelineDescription(
 
     public bool AlphaBlendEnabled { get; init; }
 
+    public bool SceneDepthReceiver { get; init; }
+
     public bool VertexConstantsInBuffer { get; init; }
     public bool DirectionalShadowReceiver { get; init; }
 
@@ -50,8 +52,10 @@ public sealed record GraphicsPipelineDescription(
             throw new ArgumentException("Shadow depth pipelines require depth writes and cannot blend or sample themselves.");
         if (DirectionalShadowReceiver && (!VertexConstantsInBuffer || VertexRootConstantCount == 0 || PixelTextureCount > 15))
             throw new ArgumentException("Shadow receivers use buffered frame constants and reserve texture register t15.");
-        if (TargetFormat == GraphicsFrameTargetFormat.Rgba16Float && AlphaBlendEnabled)
-            throw new NotSupportedException("Linear scene composition currently supports opaque world pipelines only.");
+        if (SceneDepthReceiver && (DepthEnabled || DirectionalShadowReceiver || PixelTextureCount > 15 || !AlphaBlendEnabled || TargetFormat == GraphicsFrameTargetFormat.Depth32Float))
+            throw new ArgumentException("Scene-depth receivers require a blended color pipeline without depth writes and reserve t15.");
+        if (TargetFormat == GraphicsFrameTargetFormat.Rgba16Float && AlphaBlendEnabled && !SceneDepthReceiver)
+            throw new NotSupportedException("Linear blending requires the explicit depth-aware particle path.");
 
         if (VertexShader.Stage != GraphicsShaderStage.Vertex)
         {
@@ -82,7 +86,7 @@ public sealed record GraphicsPipelineDescription(
         }
 
         if ((VertexConstantsInBuffer ? 2 : VertexRootConstantCount) +
-            PixelTextureCount + (DirectionalShadowReceiver ? 3 : 0) >
+            PixelTextureCount + (DirectionalShadowReceiver ? 3 : 0) + (SceneDepthReceiver ? 1 : 0) >
             64)
         {
             throw new ArgumentException(

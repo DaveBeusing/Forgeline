@@ -11,6 +11,28 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class VfxPresentationTests
 {
     [Fact]
+    public void PersistentEmitterIdentitySurvivesSnapshotReordering()
+    {
+        var simulation=new SimulationCoordinator();var snapshots=new PresentationSnapshotBuffer();
+        simulation.RegisterTickObserver(new PresentationExtractor(snapshots));
+        EntityId first=simulation.Entities.CreateEntity(),second=simulation.Entities.CreateEntity();
+        foreach(var entity in new[] { first,second })
+        {
+            AddRenderable(simulation,entity);
+            simulation.Entities.AddComponent(entity,new UnitIdentity(UnitIds.MainBattleTank,DirectorateContent.FactionId));
+            simulation.Entities.AddComponent(entity,new HealthState(120,560));
+        }
+        simulation.AdvanceOneTick();Assert.True(snapshots.TryReadLatest(out var before));
+        ulong key=((ulong)second.Generation<<32)|second.Index;
+        var prior=Assert.Single(before.Instances.ToArray(),x=>x.VfxFeature.Kind==VfxEffectKind.PersistentHeavySmoke && x.VfxFeature.EmitterId==key);
+        simulation.Entities.SetComponent(first,new HealthState(560,560));
+        simulation.AdvanceOneTick();Assert.True(snapshots.TryReadLatest(out var after));
+        var current=Assert.Single(after.Instances.ToArray(),x=>x.VfxFeature.Kind==VfxEffectKind.PersistentHeavySmoke && x.VfxFeature.EmitterId==key);
+        Assert.NotEqual(prior.Entity,current.Entity);
+        Assert.Equal(prior.VfxFeature,current.VfxFeature);
+        Assert.True(current.VfxFeature.Continuous);
+    }
+    [Fact]
     public void CombatEventsMapToDirectorateEffectFamilies()
     {
         var shot =

@@ -4,7 +4,7 @@
 
 ForgeLine VFX are a presentation consequence of authoritative simulation state. They communicate fire, impacts, damage, destruction, cargo handling, and battlefield resupply without determining hits, damage, transfers, movement, or destruction.
 
-The initial baseline intentionally uses compact compiled mesh/material effects rather than a separate particle runtime. This establishes stable effect IDs, event bindings, pooling, distance policy, socket anchors, renderer batching, and diagnostics on the existing production asset pipeline. A future particle implementation can replace individual authored visuals without moving gameplay authority into presentation.
+The compiled mesh/material effects remain the compatibility baseline. A bounded GPU analytic particle runtime now replaces selected smoke, dust, spark and explosion visuals behind those same stable effect IDs, event bindings and viewer-authorized snapshots. It does not create a new event source or move gameplay authority into presentation.
 
 ## Source layout
 
@@ -19,7 +19,7 @@ assets/source/vfx/
 
 Generated runtime output remains compiler-owned below `assets/runtime/`.
 
-The initial set contributes 36 effect meshes and 10 VFX materials. Together with the existing source tree, the current clean compile contains 210 runtime assets.
+The initial set contributes 36 effect meshes and 10 VFX materials. Together with the existing source tree, the current clean compile contains 341 runtime assets. Particles add no source assets or runtime asset schema.
 
 ## Combat event bindings
 
@@ -190,10 +190,38 @@ The normal Windows D3D12 smoke remains the runtime integration check for the com
 
 ## Current boundaries
 
-The current asset runtime has no dedicated particle, ribbon, GPU-emitter, or effect-graph asset type. The baseline therefore uses mesh/material effects and fixed-tick presentation lifetimes. Alpha-rich smoke, particle animation, richer debris motion, decals created by impacts, GPU emitters, and final production VFX can evolve behind the stable presentation/event contracts.
+The asset runtime still has no dedicated ribbon or effect-graph type. Version-1 presentation emitter descriptors reuse existing mesh/material IDs and palette/scale, while the GPU runtime evaluates procedural sprites. Mesh fallback retains the authored atlas. New impact decals, independent trails and compute/indirect simulation remain outside this implementation.
 
 Final audio is separate. Repair effects remain deferred until repair gameplay exposes an authoritative trigger.
 
 ## Authored effect textures
 
 All 36 existing effect mesh sources now have normalized face UVs and sample the shared RGBA effect atlas through the ten stable material families. Emissive bindings are present for fire, flashes, sparks, projectiles and logistics transfer. Cell UV transforms, retained atlas mip depth and ordered alpha coverage avoid opaque rectangular backgrounds while preserving the existing pool, lifetime and distance budgets. See [effect source layout](../assets/source/vfx/textures/README.md).
+
+
+## Bounded GPU particle runtime
+
+`ParticleEmitterDescriptor` version 1 maps the existing smoke, dust/impact-dirt, spark/impact-metal and explosion material families. Other muzzle/projectile/fire/logistics visuals retain their production mesh path. Descriptor validation preserves stable asset pairs and caps count (1–32), lifetime (0.05–4 seconds), radius (up to 8m), speed (up to 40m/s) and acceleration magnitude (up to 20m/s²). Runtime mesh/material payloads are checked before enabling each mapping; unavailable or corrupt mappings retain mesh fallback.
+
+`ParticleVfxRenderer` consumes only copied World-visible instances. Its state key is the copied pool slot/generation for bursts, or full entity identity/effect kind for persistent state. The old synthetic display ID remains compatible, but does not determine emitter continuity. Source spawn ticks suppress already-aged bursts; persistent effects continuously stagger reproducible visual ages. Removing an authorized instance clears its particles immediately. A changed session clears the emitter cache, clock, seeds and counters.
+
+The render clock advances by at most 0.1 seconds per frame. Pause/help, unfocused/minimized metric suspension and terminal freeze stop visual age; long stalls do not create catch-up spawn storms. No particle clock, descriptor, seed or buffer enters save/replay, combat, collision, selection, navigation, intelligence or simulation state.
+
+Quality is persisted as `particles.quality` in client settings; `FORGELINE_PARTICLE_QUALITY` provides a validated qualification override. Changing quality requires renderer/session recreation. Disabled uses the original mesh rendering path.
+
+| Quality | Particle limit | Maximum conservative screen coverage | Upload payload, 3 frame streams plus indices |
+| --- | ---: | ---: | ---: |
+| Disabled | 0 | 0 | 0 |
+| Low | 512 | 0.5 frame areas | 98,316 bytes |
+| Medium (default) | 2,048 | 1 frame area | 393,228 bytes |
+| High | 4,096 | 2 frame areas | 786,444 bytes |
+
+At most 2,048 emitter identities are retained. Candidate admission prioritizes large explosions, then smoke/dust, then sparks; nearer effects win within a priority, with stable-ID tie breaking. The inherited maximum-distance rules remain. Sub-two-pixel sparks disappear; explosions retain a three-pixel projected radius where the eight-metre radius cap permits. A conservative nearest-depth estimate includes all allowed motion/growth. Every particle has at most a 96-pixel projected diameter and the summed quad area stays inside the tier's fill budget. Rejected effects retain the original mesh path; this fill budget bounds particles, not the independently bounded mesh fallback.
+
+Initial conditions occupy 64 bytes per particle. Graphics owns one indexed quad, fixed synchronized frame upload streams and one alpha-blended draw. Velocity, gravity, bounded smoke curl, lifetime fade and billboard expansion are evaluated in the vertex shader. CPU emission/sorting reuses fixed scratch arrays and emits no per-frame allocation after warmup. There is no UAV, indirect dispatch, particle texture, additional render target or GPU particle readback.
+
+The pixel shader rejects sprites behind opaque scene depth and fades intersections over 0.8m. It never writes depth. Particles compose after opaque world and before output/overlay; linear output receives exposure/ACES once. Atmosphere can share the same depth descriptor. Atmospheric extinction still uses opaque depth, and far-to-near sorting uses emitter anchors, so translucent layering/fog is approximate. See [the architecture decision](adr/BoundedAnalyticGpuParticles.md).
+
+Diagnostics include active/peak particles, active emitters, capacity, admitted/cycled emission totals, cumulative rejected particle frame requests, mesh-fallback count, conservative screen coverage, preparation CPU time, fixed/peak buffer payload and particle draw count. Graphics reports the combined analytic update/render GPU time and its completed fence; separate compute-update time is unavailable because no compute pass exists. Native adapter memory budgets remain graphics-owned. Logical upload payload excludes heap alignment and driver allocation and is not asserted as dedicated VRAM.
+
+Window-mode smoke validates production startup/shutdown/composition. Focused tests additionally cover finite/negative descriptors, asset failure fallback, partial GPU initialization cleanup, stable/reordered effect identity, deterministic seeds, copied burst age, pause, session reset, hidden copies, allocation-free steady preparation, saturation, terrain/atmosphere integration, direct/linear depth rejection, soft intersections, minimize/resize and fence retirement. Hardware comparisons and reproduction are in [GPU particle qualification](GpuParticleQualification.md).

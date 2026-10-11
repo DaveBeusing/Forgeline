@@ -55,7 +55,7 @@ internal sealed partial class D3D12GraphicsDevice
 
     private void CreateAtmosphereDepthView()
     {
-        if (!_atmosphere.Enabled) return;
+        if (!_atmosphere.Enabled && !_particleDepth) return;
         _atmosphereDepthDescriptor = _shaderResourceDescriptors.Allocate();
         _device.CreateShaderResourceView(_depthTarget!, new ShaderResourceViewDescription
         {

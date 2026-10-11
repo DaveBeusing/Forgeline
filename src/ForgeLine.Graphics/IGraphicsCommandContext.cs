@@ -2,6 +2,8 @@ namespace ForgeLine.Graphics;
 
 public interface IGraphicsCommandContext
 {
+    void BeginParticlePass() => throw new NotSupportedException();
+    void EndParticlePass() => throw new NotSupportedException();
     void SetAtmosphereView(GraphicsAtmosphereView view) => throw new NotSupportedException();
     int Width { get; }
 

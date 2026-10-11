@@ -8,6 +8,20 @@ namespace ForgeLine.Client.Tests;
 public sealed class ClientUserSettingsTests
 {
     [Fact]
+    public void ParticleQualityRoundTripsAndRejectsUnknownValues()
+    {
+        string root=CreateTemporaryRoot();
+        try
+        {
+            var store=new ClientSettingsStore(root);
+            store.Save(new ClientUserSettings { Particles=new(ParticleQuality.Low) });
+            Assert.Equal(ParticleQuality.Low,store.Load().Settings.Particles.Quality);
+            Assert.Equal(ParticleQuality.Medium,new ClientUserSettings().Particles.Quality);
+            Assert.Throws<ArgumentOutOfRangeException>(()=>new ClientUserSettings { Particles=new((ParticleQuality)255) }.Validate());
+        }
+        finally { Directory.Delete(root,true); }
+    }
+    [Fact]
     public void StudioSplashPreferenceRoundTripsThroughSettingsStore()
     {
         string root = CreateTemporaryRoot();
