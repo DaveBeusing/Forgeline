@@ -36,6 +36,15 @@ Rotation and strength are validated construction-time values. The eight material
 IDs, four-layer control maps, thirteen GPU samples, shaders and resource owners
 remain unchanged.
 
+Initial changed captures exposed a narrow-road dropout at chunk boundaries:
+area-only palette selection could discard a locally dominant authored material.
+A regression reproduces this with a road spanning two chunks beside broad rock.
+Palette selection now reserves locally dominant gravel/concrete/industrial/scorch
+surfaces (sample peak at least 0.5), then uses the existing total-area ordering
+and stable slot tie-break within exactly four layers. This changes only control
+map construction; it adds no shader samples or native resources. Continuous
+material-boundary quality still requires inspecting the corrected captures.
+
 ## Vegetation and distance
 
 `build/Author-WorldVegetation.py` produces native glTF source geometry using only

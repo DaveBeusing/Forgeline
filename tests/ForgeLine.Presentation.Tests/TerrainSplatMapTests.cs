@@ -7,6 +7,22 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class TerrainSplatMapTests
 {
     [Fact]
+    public void NarrowRoadAtChunkBoundarySurvivesBroadNaturalMaterials()
+    {
+        var profile = new TerrainPresentationProfile(TerrainPresentationProfile.CreateCentralDivide().Materials,
+            [new(TerrainMaterialSlot.Rock, new(128, 128), new(100, 100), 20, Strength: .8f),
+             new(TerrainMaterialSlot.Gravel, new(256, 128), new(4, 30), 8)]);
+        foreach (int x in new[] { 0, 1 })
+        {
+            var splat = TerrainSplatMapBuilder.Build(CreateFlatChunk(new(x, 0)), profile);
+            int channel = splat.Palette.ToList().IndexOf(TerrainMaterialSlot.Gravel);
+            Assert.True(channel >= 0, "A locally dominant road must not disappear at a chunk boundary.");
+            int pixel = (16 * TerrainChunkSplatData.ControlSamplesPerSide + (x == 0 ? 32 : 0)) * 4;
+            Assert.InRange(splat.Mips[0].Pixels[pixel + channel], 230, 255);
+        }
+    }
+
+    [Fact]
     public void ZeroControlWeightsUseDeterministicFirstLayerFallback()
     {
         Span<byte> encoded =
