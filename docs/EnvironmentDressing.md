@@ -77,25 +77,37 @@ environment qualification directories. The baseline used eight warmup frames,
 native production capture lane. These are short fixture measurements, excluding
 readback, not sustained game FPS or portable performance thresholds.
 
-The integration base is `b25f003` (mechanical motion, PR #172); the source before
-the final qualification notes is `7c258cd`. The following evidence is retained
+The integration base is `b25f003` (mechanical motion, PR #172). Final images use
+`9cc66de`; `59d593c` subsequently fixes only the default capture request matrix
+and its tests (the explicit captured matrices are unchanged). Evidence is retained
 locally, with native manifests recording their exact source/build identity:
 
 | Evidence | Scope and result |
 | --- | --- |
-| `environment-integrated-build-clean.log` | Release, zero warnings/errors; fixture-version-only rebuild follows before final captures. |
+| `environment-matrix-fix-build.log` | Final Release build, zero warnings/errors. Version 0.1.341 is one PATCH above the integration base; the 42-project architecture graph passes. |
+| `environment-final-*-tests.log`, `environment-matrix-fix-client-tests.log` | All 14 test modules pass when run separately: 1,690 succeeded, nine optional hardware measurements skipped, no remaining failures. The game module is recorded separately below. |
 | `environment-integrated-game-tests.log` | All 390 game tests pass, including the recorded schema-1 replay. |
 | `environment-replay-test.log` | Six world-presentation tests pass; extraction preserves the historical `848FAB...1549B` checkpoint and emits non-interactive rooted dressing. |
+| `environment-replay-parity.json` | Seed 2026, 64 ticks: all 23 deterministic diagnostic fields match the starting revision, including 103 entities. Timing/allocation/GC fields are excluded. |
 | `environment-integrated-map.json` | 71 reachability, two alternate-navigation and two alternate-road checks pass. |
+| `environment-integrated-assets.json` | Clean compilation: 341 assets (158 meshes, 56 textures, 127 materials), 56,729,669 container bytes, no qualification issues. All 80 asset tests pass separately. |
+| `environment-final-medium` | 36 native images: three environment scenes, three zooms, 1080p/QHD/4K/ultrawide; 24 additional QHD camera poses. Eight identical readbacks per fixed state. No fallback meshes or material-binding failures. |
+| `environment-final-profiles` | All 18 Low/High 1080p images for the same three scenes/zooms pass eight repeated readbacks. |
 | `environment-corrected` | Nine Medium 1080p native images at `623c83f`, eight identical readbacks each; corrected narrow-road dropout. |
 | `environment-large-displays` | 27 QHD/4K/ultrawide images and QHD camera poses at `1c40c6a`; preceding palette correction and mechanical integration, not final-head acceptance. |
-| `environment-terminal.json` | Earlier implementation completed at tick 42,922, winner 1, Command Core destroyed. |
+| `environment-final-terminal.json` | Final implementation completed at tick 42,922, winner 1, Command Core destroyed; 314 simulation entities. |
+| `environment-final-windowed-validated.json` | Final 1,000-instance smoke passes the canonical Windowed assertions: 1600x900, 49 presented frames, 75 total draws, 186 peak SRVs and zero binding failures. The unchanged assertion function was invoked separately with its build-directory path resolved; this is not a pass of the combined borderless script. |
 | `environment-windowed.json` | Earlier 1,000-instance smoke: 1600x900, 117 presented frames, 75 total measured draws, zero texture/material binding failures. |
 
-The earlier native captures retained 52,707,564 resident texture bytes. The
+The final native captures retain 52,707,564 resident texture bytes. The earlier
 windowed smoke measured 46.45 FPS, 19.75ms CPU render and 6.55ms GPU on the RTX PRO
-5000 Blackwell laptop. Concurrent CPU work and short measurement windows prevent
-speedup or sustained-frame-rate conclusions. The environment mesh payload adds
+5000 Blackwell laptop; the final short startup run measured 7.10 FPS, 138.36ms CPU
+render and 6.80ms GPU (completed active window 7.44 FPS / 19.84 TPS). This large
+CPU variance is not a stable performance qualification or a 60-FPS acceptance.
+Controlled sustained profiling remains required. The final IndustrialBase normal
+1080p fixed-state image has CPU/GPU medians of 14.16/13.46ms, 29 instance draws,
+102 visible instances and 82 reduced instances; that is a different workload.
+Concurrent CPU work and short windows prevent speedup conclusions. The environment mesh payload adds
 31,558 bytes; textures are unchanged by this PR.
 
 The first full-suite attempt correctly exposed a replay regression from adding
@@ -104,12 +116,23 @@ roots legacy vegetation during extraction; neither stored checkpoints nor their
 verification were relaxed. That first run also had a native client handoff
 timeout and a D3D12 `0xC0000005` while native modules ran concurrently. Its asset
 test was stopped before the clean integration build; it is not a passing suite.
+Isolated final Graphics, Presentation and Client runs pass. The integrated
+mechanical gallery also exposed an invalid default request (all twelve enum
+values against a six-scene limit). The six original defaults are now explicit;
+optional galleries remain selectable and the existing failure/evidence-retention
+tests pass. No acceptance guard or test expectation was relaxed.
 
 The borderless 5120x2160 smoke rendered but remained unfocused. Completion requires
 an active FPS/TPS measurement window; the run never produced one and was stopped.
 No borderless, focus-recovery or physical-display acceptance is claimed. The
-debug layer was requested but unavailable on this machine. Existing High-profile
-shadow-edge repeatability and slow software-runner smoke limitations remain.
+debug layer was requested but unavailable on this machine. The 18 Low/High images
+above pass for these three environment scenes; broader High-profile shadow-edge
+qualification and slow software-runner smoke limitations remain separate.
+
+Hosted runs for `7c258cd` passed Frame hot paths and Scalability qualification.
+The main CI passed build, map, assets, evidence contracts and native WARP capture,
+then remained in the window-mode smoke. Final-head hosted completion is still
+required; local passes do not replace it.
 
 Visual review found clearer conifer silhouettes and industrial groupings with
 open approaches. Repetitive natural ground and some broad material boundaries
