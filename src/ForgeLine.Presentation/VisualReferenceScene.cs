@@ -11,7 +11,7 @@ using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
 
-public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat, MechanicalIdle, MechanicalMoving, MechanicalFiring, MechanicalLoading, MechanicalUnpowered, MechanicalBroken, DirectorateUnits, DirectorateBuildingStates }
+public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat, MechanicalIdle, MechanicalMoving, MechanicalFiring, MechanicalLoading, MechanicalUnpowered, MechanicalBroken, DirectorateUnits, DirectorateBuildingStates, CommandCoreProduction }
 
 // Authored presentation acceptance states, not economic/combat simulations or gameplay presets.
 public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3 Target,
@@ -106,6 +106,28 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
                 simulation.Entities.AddComponent(building, new ControllableEntity(new(1), ControllableEntityCategory.Building));
                 if (row == 1) simulation.Entities.AddComponent(building, new PowerConsumer(100));
                 if (row == 2) simulation.Entities.AddComponent(building, new HealthState(20, 100));
+            }
+        }
+        if (kind == VisualReferenceSceneKind.CommandCoreProduction)
+        {
+            var footprint = DirectorateContent.CreateBuildingCatalog()[BuildingIds.CommandCore].Footprint;
+            for (int i = 0; i < 8; i++)
+            {
+                EntityId building = Add(new((i % 4 - 1.5f) * 26, footprint.Height * .5f, (i / 4 - .5f) * 28),
+                    new(footprint.Width, footprint.Height, footprint.Depth));
+                if (i < 3)
+                    simulation.Entities.AddComponent(building, new ConstructionSite(BuildingIds.CommandCore,
+                        new(1), new(1), SimulationTick.Zero, 100, (uint)(i * 40)));
+                else if (i == 7)
+                    simulation.Entities.AddComponent(building, new BuildingWreckPresentationIdentity(BuildingIds.CommandCore, new(1)));
+                else
+                {
+                    simulation.Entities.AddComponent(building, new CompletedBuilding(BuildingIds.CommandCore, new(1), SimulationTick.Zero));
+                    if (i == 4) simulation.Entities.AddComponent(building, new PowerConsumer(20));
+                    if (i >= 5) simulation.Entities.AddComponent(building, new HealthState(i == 5 ? 50 : 20, 100));
+                }
+                if (i != 7)
+                    simulation.Entities.AddComponent(building, new ControllableEntity(new(1), ControllableEntityCategory.Building));
             }
         }
         if (kind is VisualReferenceSceneKind.FormationConvoy or VisualReferenceSceneKind.LogisticsCorridor)

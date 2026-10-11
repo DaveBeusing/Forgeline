@@ -324,19 +324,19 @@ public sealed class DirectorateBuildingPresentationTests
                     BuildingIds.PowerPlant,
                     BuildingPresentationState.Unpowered)));
         Assert.Equal(
-            BuildingPresentationCatalog.DamagedStateAssetId,
+            "building.directorate.command_core.damaged",
             BuildingPresentationCatalog.ResolveStateAttachmentAssetId(
                 new BuildingFeaturePresentationMetadata(
                     BuildingIds.CommandCore,
                     BuildingPresentationState.Damaged)));
         Assert.Equal(
-            BuildingPresentationCatalog.CriticalStateAssetId,
+            "building.directorate.command_core.critical",
             BuildingPresentationCatalog.ResolveStateAttachmentAssetId(
                 new BuildingFeaturePresentationMetadata(
                     BuildingIds.CommandCore,
                     BuildingPresentationState.Critical)));
         Assert.Equal(
-            BuildingPresentationCatalog.DestroyedAssetId,
+            "building.directorate.command_core.destroyed",
             BuildingPresentationCatalog.ResolveMeshAssetId(
                 new BuildingFeaturePresentationMetadata(
                     BuildingIds.CommandCore,

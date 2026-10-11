@@ -21,6 +21,7 @@ public sealed class VisualReferenceSceneTests
     [InlineData(VisualReferenceSceneKind.BattlefieldCombat)]
     [InlineData(VisualReferenceSceneKind.DirectorateUnits)]
     [InlineData(VisualReferenceSceneKind.DirectorateBuildingStates)]
+    [InlineData(VisualReferenceSceneKind.CommandCoreProduction)]
     public void FreshFixturesRetainTheSameImmutableState(VisualReferenceSceneKind kind)
     {
         var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
@@ -33,6 +34,20 @@ public sealed class VisualReferenceSceneTests
         Assert.All(first.Snapshot.Instances.ToArray(), instance =>
             Assert.True(instance.UnitFeature.IsSpecified || instance.BuildingFeature.IsSpecified ||
                 instance.WorldFeature.IsSpecified || instance.InfrastructureFeature.IsSpecified || instance.VfxFeature.IsSpecified));
+    }
+
+    [Fact]
+    public void CommandCoreGalleryUsesAuthoritativeConstructionHealthPowerAndWreckStates()
+    {
+        var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+        var scene = VisualReferenceScene.Create(VisualReferenceSceneKind.CommandCoreProduction, terrain);
+        var buildings = scene.Snapshot.Instances.ToArray().Where(x => x.BuildingFeature.IsSpecified).ToArray();
+        Assert.Equal(8, buildings.Length);
+        Assert.All(buildings, x => Assert.Equal(BuildingIds.CommandCore, x.BuildingFeature.Building));
+        Assert.Equal(8, buildings.Select(x => x.BuildingFeature.State).Distinct().Count());
+        Assert.All(buildings, x => Assert.Equal(new System.Numerics.Vector3(20, 12, 20), x.Transform.Scale));
+        Assert.Contains(buildings, x => x.BuildingFeature.IsDestroyed);
+        Assert.Equal(3, buildings.Count(x => x.BuildingFeature.IsConstruction));
     }
 
     [Fact]
