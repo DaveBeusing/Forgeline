@@ -115,3 +115,12 @@ in six channels (maximum delta 25), leaving the matrix failed. The cause
 is not isolated. Fixed-age captures also miss the short muzzle phase and
 cannot establish sustained motion acceptance. See the
 [full qualification and unresolved gates](BattlefieldEffectCatalog.md#qualification-at-51219a4-01343).
+
+### Final image matrix
+
+The 0.1.344 matrix covers all six fixtures, Low/Medium/High, three RTS
+zooms and all four native displays. It records 214 stable rows out of 216;
+two High Full-HD tactical states remain unequal, so no golden is accepted.
+Eight explicit-DPI 4K/Ultrawide rows pass structurally. See
+[Final Image Quality](FinalImageQuality.md) for before/after, timing and
+physical/motion/borderless limits.

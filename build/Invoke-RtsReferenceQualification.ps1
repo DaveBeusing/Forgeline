@@ -13,6 +13,7 @@ param(
     [ValidateRange(8,8192)][int]$Samples = 128,
     [ValidateRange(2,128)][int]$RepeatCaptures = 8,
     [switch]$ContinueAfterMismatch,
+    [ValidateSet(0,96,120,144,192)][uint]$RasterDpi = 0,
     [string]$BaselineRoot
 )
 
@@ -29,7 +30,7 @@ if ($Capture) {
     $drivers = @(Get-CimInstance Win32_VideoController | ForEach-Object { "$($_.Name): $($_.DriverVersion)" }) -join '; '
     $request = @{
         outputRoot = $referenceRoot; commit = $commit; runtimeRoot = Join-Path $repositoryRoot 'assets/runtime'
-        driver = $drivers; software = [bool]$Software; warmups = $Warmups; samples = $Samples; repeatCaptures = $RepeatCaptures; continueAfterMismatch = [bool]$ContinueAfterMismatch
+        driver = $drivers; software = [bool]$Software; warmups = $Warmups; samples = $Samples; repeatCaptures = $RepeatCaptures; continueAfterMismatch = [bool]$ContinueAfterMismatch; rasterDpi = $RasterDpi
         scenes = $Scenes; profiles = $Profiles; zooms = $Zooms
         displays = @($Displays | ForEach-Object { $parts = $_.Split('x'); @{ width = [int]$parts[0]; height = [int]$parts[1] } })
     }
@@ -44,7 +45,7 @@ if ($Capture) {
     & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $referenceRoot -BaselineRoot $BaselineRoot
     return
 }
-if ($Software -or $BaselineRoot) { throw 'Software and baseline comparison require explicit -Capture mode.' }
+if ($Software -or $BaselineRoot -or $RasterDpi) { throw 'Software, raster DPI and baseline comparison require explicit -Capture mode.' }
 $displays = @(@(1920, 1080), @(2560, 1440), @(3840, 2160), @(3440, 1440))
 foreach ($display in $displays) {
     foreach ($zoom in @('CloseTactical', 'NormalGameplay', 'Strategic')) {

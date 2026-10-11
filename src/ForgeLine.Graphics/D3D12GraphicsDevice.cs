@@ -1695,6 +1695,11 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         return true;
     }
 
+    internal static bool IsSoftwareAdapter(in AdapterDescription1 description) =>
+        (description.Flags & AdapterFlags.Software) != AdapterFlags.None ||
+        // The primary Basic Render Driver can omit the software flag.
+        (description.VendorId == 0x1414 && description.DeviceId == 0x8c);
+
     private static (ID3D12Device Device, GraphicsDeviceInfo Info) CreateDevice(
         IDXGIFactory4 factory,
         bool allowSoftwareAdapterFallback,
@@ -1708,7 +1713,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             using (adapter)
             {
                 AdapterDescription1 description = adapter!.Description1;
-                if ((description.Flags & AdapterFlags.Software) != AdapterFlags.None)
+                if (IsSoftwareAdapter(description))
                 {
                     continue;
                 }

@@ -33,6 +33,12 @@ For complete investigation evidence, add `-ContinueAfterMismatch`. All eight rea
 
 ## Review rubric
 
+Use `-RasterDpi 96`, `120`, `144` or `192` with explicit `-Capture` to
+inspect production HUD rasterization independently of native display size.
+Zero retains the height-derived default. Explicit settings add a `-DpiN`
+capture-key suffix and record the actual raster DPI. These are pixel/layout
+checks; they do not attest physical Windows monitor scaling or readability.
+
 Two optional material galleries extend the same capture path without changing
 the six default fixtures. `-Scenes DirectorateUnits` shows all seven producible
 unit identities at their catalog visual scales and ground offsets; Combat

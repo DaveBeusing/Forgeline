@@ -11,6 +11,62 @@ public sealed class NativePostProcessingGroup;
 public sealed class PostProcessingTests
 {
     [Fact]
+    public void EqualLuminanceEdgesAndSinglePixelDetailsRetainCoverage()
+    {
+        using var platform = new WindowsPlatform();
+        using IWindow window = platform.CreateWindow(new("FORGELINE Color Edge Test", 320, 240));
+        using var graphics = (D3D12GraphicsDevice)GraphicsDeviceFactory.CreateForWindow(window,
+            new() { ForceSoftwareAdapter = true, EnableVSync = false, EnableDebugLayer = false });
+        graphics.ConfigureSceneOutput(new(true, 1, false));
+        var compiler = new DxcShaderCompiler();
+        var vertex = compiler.Compile("float4 VSMain(uint id:SV_VertexID):SV_Position { float2 uv=float2((id<<1)&2,id&2); return float4(uv*float2(2,-2)+float2(-1,1),.5,1); }",
+            GraphicsShaderStage.Vertex, "VSMain", "ColorEdgeVertex.hlsl");
+        var pixel = compiler.Compile("""
+            float4 PSMain(float4 p:SV_Position):SV_Target0 {
+                int2 q=int2(p.xy);
+                if(q.y<100) return float4(q.x==q.y ? float3(1,0,0) : float3(0,0.2126/0.7152,0),1);
+                if(q.y==160) return float4(1,1,1,1);
+                if(q.y>=200) {
+                    float dark=q.x==q.y ? 0.02 : 0.8;
+                    return float4(dark.xxx,1);
+                }
+                float intensity=q.x==q.y ? 1 : 0.02;
+                return float4(intensity.xxx,1);
+            }
+            """, GraphicsShaderStage.Pixel, "PSMain", "ColorEdgePixel.hlsl");
+        using var world = graphics.CreateGraphicsPipeline(new(vertex, pixel)
+            { TargetFormat = GraphicsFrameTargetFormat.Rgba16Float, CullMode = GraphicsCullMode.None });
+        byte[] neutral = Capture();
+        graphics.ConfigurePostProcessing(new() { Antialiasing = SpatialAntialiasing.High });
+        byte[] filtered = Capture();
+        string? root = Environment.GetEnvironmentVariable("FORGELINE_POST_REGRESSION_OUTPUT");
+        if (!string.IsNullOrWhiteSpace(root))
+        {
+            Directory.CreateDirectory(root);
+            Save("neutral", neutral); Save("aa", filtered);
+            void Save(string name, byte[] pixels)
+            {
+                using var file = File.Create(Path.Combine(root, $"post-color-{name}.ppm"));
+                file.Write(System.Text.Encoding.ASCII.GetBytes("P6\n320 240\n255\n"));
+                for (int index = 0; index < pixels.Length; index += 4) file.Write(pixels.AsSpan(index, 3));
+            }
+        }
+        int neighbor = (60 * 320 + 61) * 4;
+        Assert.Equal(0, neutral[neighbor]);
+        Assert.InRange(filtered[neighbor], 50, 180); // Equal-luminance hue edges need partial coverage too.
+        int diagonal = (120 * 320 + 120) * 4;
+        Assert.InRange(filtered[diagonal], 235, 254); // A one-pixel detail retains at least 85% linear intensity.
+        int darkDiagonal = (210 * 320 + 210) * 4;
+        Assert.InRange(filtered[darkDiagonal], 80, 120); // Dark silhouettes retain the same contrast protection.
+        int axis = (160 * 320 + 200) * 4;
+        Assert.Equal(neutral.AsSpan(axis, 4).ToArray(), filtered.AsSpan(axis, 4).ToArray());
+        int flat = (180 * 320 + 20) * 4;
+        Assert.Equal(neutral.AsSpan(flat, 4).ToArray(), filtered.AsSpan(flat, 4).ToArray());
+        Assert.Equal(filtered, Capture());
+        byte[] Capture() => graphics.CaptureFrame(GraphicsColor.ForgeLineClear, c => { c.SetPipeline(world); c.Draw(3); });
+    }
+
+    [Fact]
     public void InvalidGradeAndAntialiasingFailBeforeAllocation()
     {
         foreach (var settings in new[] {

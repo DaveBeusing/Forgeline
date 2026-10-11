@@ -25,6 +25,7 @@ internal sealed record VisualReferenceCaptureRequest
     public int Samples { get; init; } = 128;
     public int RepeatCaptures { get; init; } = 8;
     public bool ContinueAfterMismatch { get; init; }
+    public uint RasterDpi { get; init; }
     public VisualReferenceSceneKind[] Scenes { get; init; } =
     [
         VisualReferenceSceneKind.DaylightTerrain, VisualReferenceSceneKind.IndustrialBase,
@@ -41,6 +42,7 @@ internal sealed record VisualReferenceCaptureRequest
         if (Commit is null || Commit.Length != 40 || Commit.Any(c => !Uri.IsHexDigit(c))) throw new ArgumentException("Capture requires a complete source commit.");
         if (Warmups is < 3 or > 4096 || Samples is < 8 or > 8192) throw new ArgumentOutOfRangeException(nameof(Samples));
         if (RepeatCaptures is < 2 or > 128) throw new ArgumentOutOfRangeException(nameof(RepeatCaptures));
+        if (RasterDpi is not (0 or 96 or 120 or 144 or 192)) throw new ArgumentOutOfRangeException(nameof(RasterDpi));
         if (Scenes is null || Profiles is null || Displays is null || Zooms is null ||
             Scenes.Length is < 1 or > 14 || Profiles.Length is < 1 or > 3 || Displays.Length is < 1 or > 4 || Zooms.Length is < 1 or > 3 ||
             Scenes.Any(x => !Enum.IsDefined(x)) || Profiles.Any(x => !Enum.IsDefined(x)) || Zooms.Any(x => !Enum.IsDefined(x)) ||
@@ -113,6 +115,7 @@ internal static class VisualReferenceCapture
                     using var selection = new DebugDrawRenderer(graphics, depthEnabled: false, lineWidthPixels: 3);
                     if (!platform.PumpEvents()) throw new OperationCanceledException("Reference window was closed.");
                     string key = $"{fixture.Kind}-{display.Width}x{display.Height}-{quality}-{zoom}";
+                    if (request.RasterDpi != 0) key += $"-Dpi{request.RasterDpi}";
                     Console.WriteLine($"[reference:capture] {key}");
                     var camera = new RtsCamera(RtsVisualReference.CreateCameraSettings(fixture.Target, zoom));
                     var buffer = new PresentationSnapshotBuffer(); buffer.Publish(fixture.Snapshot);
@@ -125,7 +128,8 @@ internal static class VisualReferenceCapture
                     foreach (var instance in fixture.Snapshot.Instances.ToArray().Where(x => selected.Contains(x.Entity)))
                         indicators.Circle(instance.Transform.Position + Vector3.UnitY, 5, new(0, .8f, .2f, 1));
                     var information = RtsInformationLayerView.Empty with { SelectedEntities = selected };
-                    uint rasterDpi = display.Height == 2160 ? 192u : display.Height == 1440 ? 144u : 96u;
+                    uint rasterDpi = request.RasterDpi != 0 ? request.RasterDpi :
+                        display.Height == 2160 ? 192u : display.Height == 1440 ? 144u : 96u;
                     int recordFrameIndex = -1;
                     captureInputs.Clear();
                     Action<IGraphicsCommandContext> record = context =>

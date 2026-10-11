@@ -991,6 +991,24 @@ internal sealed class ClientApplication
                 }
             }
 
+            // Smoke completion must be evaluated before the unfocused-window input exit.
+            if (smokeTest)
+            {
+                if (!smokeCompletionRequested &&
+                    _platform.Clock.GetElapsedTime(startedAt, now) >= SmokeCompletionDelay &&
+                    renderHost.LatestQualification is { LastMeasuredRunningRates: not null })
+                {
+                    if (!simulationHost.TryRunSmokeCompletion(eastBase.CommandCore))
+                        throw new InvalidOperationException("Simulation control boundary is full while scheduling smoke completion.");
+                    smokeCompletionRequested = true;
+                }
+                if (smokeCompletionRequested &&
+                    renderWorld.CurrentSnapshot?.PlayerExperience?.MatchStatus == PlayerMatchStatus.Victory)
+                    smokeMatchCompleted = true;
+                if (smokeMatchCompleted && _platform.Clock.GetElapsedTime(startedAt, now) >= SmokeTestDuration)
+                    window.RequestClose();
+            }
+
             if (shouldPauseForWindow ||
                 shellBlocksGameplay || modalFrame || shellChanged || !window.IsFocused)
             {
@@ -1082,7 +1100,7 @@ internal sealed class ClientApplication
                         _settings.UiScale,
                         preAlphaUx,
                         frontendSurface,
-                        MetricsActive: window.IsFocused && !window.IsMinimized));
+                        MetricsActive: (smokeTest || window.IsFocused) && !window.IsMinimized));
 
                 if (shouldPauseForWindow)
                 {
@@ -1295,13 +1313,6 @@ internal sealed class ClientApplication
                     window.ClientSize.Height);
             }
 
-            if (smokeTest &&
-                smokeMatchCompleted &&
-                _platform.Clock.GetElapsedTime(startedAt, now) >= SmokeTestDuration)
-            {
-                window.RequestClose();
-            }
-
             _ = renderWorld.Update(
                 snapshotBuffer);
 
@@ -1310,30 +1321,6 @@ internal sealed class ClientApplication
             const float renderAlpha = 1.0f;
             PlayerExperienceSnapshot? currentExperience =
                 currentSnapshot?.PlayerExperience;
-
-            if (smokeTest &&
-                !smokeCompletionRequested &&
-                _platform.Clock.GetElapsedTime(startedAt, now) >= SmokeCompletionDelay &&
-                renderHost.LatestQualification is { LastMeasuredRunningRates: not null })
-            {
-                if (!simulationHost.TryRunSmokeCompletion(
-                        eastBase.CommandCore))
-                {
-                    throw new InvalidOperationException(
-                        "Simulation control boundary is full while scheduling smoke completion.");
-                }
-
-                smokeCompletionRequested = true;
-            }
-
-            if (smokeTest &&
-                smokeCompletionRequested &&
-                !smokeMatchCompleted &&
-                currentExperience?.MatchStatus ==
-                    PlayerMatchStatus.Victory)
-            {
-                smokeMatchCompleted = true;
-            }
 
             bool gameplayActive =
                 currentExperience?.MatchStatus ==
@@ -1613,7 +1600,7 @@ internal sealed class ClientApplication
                         window.IsMinimized,
                     CombatGroups:
                         combatGroupOverview,
-                    MetricsActive: window.IsFocused && !window.IsMinimized,
+                    MetricsActive: (smokeTest || window.IsFocused) && !window.IsMinimized,
                     HoverTooltip: tooltipView,
                     Operations: operationsController.View));
 
