@@ -42,6 +42,9 @@ internal static class SceneCompositeShader
             return lerp(1.055*pow(max(value,0),1.0/2.4)-0.055,value*12.92,step(value,0.0031308));
         }
         float Luma(float3 value) { return dot(value,float3(0.2126,0.7152,0.0722)); }
+        float ColorDistance(float3 a, float3 b) {
+            float3 delta=abs(a-b); return max(delta.r,max(delta.g,delta.b));
+        }
         float3 DisplayLinear(float4 scene, int2 pixel, Output input, uint2 dimensions) {
             // Authored output-space clear/debug pixels bypass fog, grade and tone mapping.
             if(scene.a<0) return Decode(scene.rgb);
@@ -88,12 +91,17 @@ internal static class SceneCompositeShader
                 float3 south=SampleDisplayLinear(pixel+int2(0,1),input,dimensions);
                 float3 west=SampleDisplayLinear(pixel+int2(-1,0),input,dimensions);
                 float3 east=SampleDisplayLinear(pixel+int2(1,0),input,dimensions);
-                float center=Luma(value), n=Luma(north), s=Luma(south), w=Luma(west), e=Luma(east);
-                float low=min(center,min(min(n,s),min(w,e))), high=max(center,max(max(n,s),max(w,e)));
-                // Five bounded samples, no history. Retain at least 70% of a thin silhouette.
-                if(high-low>max(0.025,high*0.125)) {
-                    float3 along=abs(n-s)<abs(w-e) ? (north+south)*0.5 : (west+east)*0.5;
-                    value=lerp(value,along,input.Post.x);
+                float3 low=min(value,min(min(north,south),min(west,east)));
+                float3 high=max(value,max(max(north,south),max(west,east)));
+                float range=ColorDistance(high,low);
+                // Chroma-aware detection also covers equal-luminance material edges.
+                if(range>max(0.025,max(high.r,max(high.g,high.b))*0.125)) {
+                    bool vertical=ColorDistance(north,south)<ColorDistance(west,east);
+                    float3 first=vertical ? north : west, second=vertical ? south : east;
+                    // Preserve isolated bright/dark or colored one-pixel details more strongly.
+                    bool detail=dot(value-first,value-second)>0 && ColorDistance(first,second)<range*0.25;
+                    float blend=input.Post.x*(detail ? 0.5 : 1);
+                    value=lerp(value,(first+second)*0.5,blend);
                 }
             }
             return float4(Encode(value),scene.a);
