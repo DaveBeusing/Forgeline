@@ -104,10 +104,12 @@ def author():
                 # ranges, with sensor glass sharing the sensor's authored motion.
                 mechanical = [p for p in mechanical if not p['name'].startswith('fidelity_')]
                 offset = len(indices)
-                for i in range(len(detail.idx)//36):
+                is_scout = targets[definition['id']] == 'scout_vehicle'
+                ranges = [36, 36, 36] if is_scout else [len(detail.idx)]
+                for i, count in enumerate(ranges):
                     part = dict(name=f'fidelity_{i}', firstIndex=offset+i*36,
-                                indexCount=36, parent=-1, motion='static')
-                    if targets[definition['id']] == 'scout_vehicle' and i == 1:
+                                indexCount=count, parent=-1, motion='static')
+                    if is_scout and i == 1:
                         sensor = next(p for p in mechanical if p['name'] == 'sensor')
                         part.update({k: sensor[k] for k in ('motion','socket','rate','travel')})
                     mechanical.append(part)

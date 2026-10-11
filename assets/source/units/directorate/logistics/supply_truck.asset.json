@@ -108,35 +108,7 @@
     {
       "name": "fidelity_0",
       "firstIndex": 1428,
-      "indexCount": 36,
-      "parent": -1,
-      "motion": "static"
-    },
-    {
-      "name": "fidelity_1",
-      "firstIndex": 1464,
-      "indexCount": 36,
-      "parent": -1,
-      "motion": "static"
-    },
-    {
-      "name": "fidelity_2",
-      "firstIndex": 1500,
-      "indexCount": 36,
-      "parent": -1,
-      "motion": "static"
-    },
-    {
-      "name": "fidelity_3",
-      "firstIndex": 1536,
-      "indexCount": 36,
-      "parent": -1,
-      "motion": "static"
-    },
-    {
-      "name": "fidelity_4",
-      "firstIndex": 1572,
-      "indexCount": 36,
+      "indexCount": 180,
       "parent": -1,
       "motion": "static"
     }

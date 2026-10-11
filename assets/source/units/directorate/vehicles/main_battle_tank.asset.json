@@ -184,28 +184,7 @@
     {
       "name": "fidelity_0",
       "firstIndex": 2088,
-      "indexCount": 36,
-      "parent": -1,
-      "motion": "static"
-    },
-    {
-      "name": "fidelity_1",
-      "firstIndex": 2124,
-      "indexCount": 36,
-      "parent": -1,
-      "motion": "static"
-    },
-    {
-      "name": "fidelity_2",
-      "firstIndex": 2160,
-      "indexCount": 36,
-      "parent": -1,
-      "motion": "static"
-    },
-    {
-      "name": "fidelity_3",
-      "firstIndex": 2196,
-      "indexCount": 36,
+      "indexCount": 144,
       "parent": -1,
       "motion": "static"
     }
