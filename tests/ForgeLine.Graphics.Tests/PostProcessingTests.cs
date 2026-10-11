@@ -26,6 +26,10 @@ public sealed class PostProcessingTests
                 int2 q=int2(p.xy);
                 if(q.y<100) return float4(q.x==q.y ? float3(1,0,0) : float3(0,0.2126/0.7152,0),1);
                 if(q.y==160) return float4(1,1,1,1);
+                if(q.y>=200) {
+                    float dark=q.x==q.y ? 0.02 : 0.8;
+                    return float4(dark.xxx,1);
+                }
                 float intensity=q.x==q.y ? 1 : 0.02;
                 return float4(intensity.xxx,1);
             }
@@ -52,6 +56,8 @@ public sealed class PostProcessingTests
         Assert.InRange(filtered[neighbor], 50, 180); // Equal-luminance hue edges need partial coverage too.
         int diagonal = (120 * 320 + 120) * 4;
         Assert.InRange(filtered[diagonal], 235, 254); // A one-pixel detail retains at least 85% linear intensity.
+        int darkDiagonal = (210 * 320 + 210) * 4;
+        Assert.InRange(filtered[darkDiagonal], 80, 120); // Dark silhouettes retain the same contrast protection.
         int axis = (160 * 320 + 200) * 4;
         Assert.Equal(neutral.AsSpan(axis, 4).ToArray(), filtered.AsSpan(axis, 4).ToArray());
         int flat = (180 * 320 + 20) * 4;

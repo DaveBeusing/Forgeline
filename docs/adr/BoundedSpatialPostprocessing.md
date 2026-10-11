@@ -6,7 +6,7 @@ Use the existing frame-indexed FP16 scene targets and one final fullscreen trian
 
 The composite has one 40-DWORD vertex constant block and one scene descriptor, plus one shared depth descriptor when fog is active. It explicitly reuses the center scene sample and reads four clamped neighbors only when spatial AA is enabled. Fog uses the corresponding opaque depth at each sampled location. Five scene reads and at most five depth reads are bounded; there are no intermediate targets, history textures, jitter, motion vectors or reconstruction.
 
-The edge filter chooses the neighbor direction with lower luminance gradient and retains at least 70% of the original display-linear color. The low/high AA settings blend 20%/30%. Clear/debug centers are preserved exactly. The result receives one output transfer. Exposure is manual; conservative grade bounds limit contrast to 0.95–1.08, saturation to 0.95–1.05 and white-balance/tint factors to ±0.1. Default grading is neutral.
+The edge filter detects contrast using the maximum RGB-channel range and chooses the neighbor direction with lower RGB difference. This includes equal-luminance hue boundaries. The low/high AA settings blend at most 20%/30%, retaining at least 70% of the original display-linear color. Isolated bright/dark or colored details against similar opposite neighbors halve that blend, retaining at least 85% at High. Clear/debug centers are preserved exactly. The result receives one output transfer. Exposure is manual; conservative grade bounds limit contrast to 0.95–1.08, saturation to 0.95–1.05 and white-balance/tint factors to ±0.1. Default grading is neutral.
 
 ## Quality ownership and fallback
 

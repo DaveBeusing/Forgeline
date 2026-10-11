@@ -33,6 +33,11 @@ Set `FORGELINE_POST_REGRESSION_OUTPUT` to an absolute output directory when runn
 
 ## Matched baseline and isolated AA
 
+The table above states maximum AA blend. RGB contrast now includes
+equal-luminance boundaries; isolated one-pixel details halve that blend.
+The original qualification below remains historical measurement evidence.
+Current image/DPI comparisons are recorded in [Final Image Quality](FinalImageQuality.md).
+
 Pre-change master `6f81805d44fc4dad04f9971d508e15b079ab15a9` was built and measured before graphics changes. Hardware: NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU, driver 32.0.15.9653, feature level 12_1, 25,309,478,912 dedicated bytes reported. All measurements use 1280×720, VSync off, exposure 1.15/ACES, 64 warmups and 512 CPU samples; only unique completed GPU fences contribute. CPU includes Present and frame reuse. Run-to-run driver scheduling/thermal variance is not a portable FPS or speedup result.
 
 The existing nine-chunk representative terrain workload is identical before/after, with default target (0,0,0), yaw 0°, pitch −50° and 25/90/240m cameras. There are no objects, shadows, fog, particles or gameplay UI in this isolated comparison. Native direct/composed regression tests establish neutral color equivalence within one UNorm byte; the new AA/grade are neutral for the changed-neutral comparison.
