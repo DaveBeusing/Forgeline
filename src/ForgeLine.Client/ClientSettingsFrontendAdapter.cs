@@ -30,14 +30,16 @@ internal sealed class ClientSettingsFrontendAdapter
 
         FrontendSettingsSnapshot snapshot =
             model.Settings;
+        ClientUserSettings saved = _store.Load().Settings;
         var settings =
-            _store.Load().Settings with
+            saved with
             {
                 WindowWidth = snapshot.WindowWidth,
                 WindowHeight = snapshot.WindowHeight,
                 BorderlessFullscreen =
                     snapshot.BorderlessFullscreen,
                 UiScale = snapshot.UiScale,
+                RenderQuality = saved.RenderQuality with { Quality = (ForgeLine.Presentation.RenderQuality)snapshot.RenderQuality },
                 ShowOnboarding =
                     snapshot.ShowOnboarding,
                 EdgeScrollEnabled =
@@ -67,6 +69,6 @@ internal sealed class ClientSettingsFrontendAdapter
             settings.ShowOnboarding,
             settings.EdgeScrollEnabled,
             settings.CameraPanSpeedMultiplier,
-            settings.CameraBindings, settings.GameplayBindings);
+            settings.CameraBindings, settings.GameplayBindings, (FrontendRenderQuality)settings.RenderQuality.Quality);
     }
 }

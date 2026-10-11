@@ -27,6 +27,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
     private readonly IGraphicsBuffer _indexBuffer;
     private readonly RuntimeWorldAssetResources? _runtimeAssets;
     private readonly SceneLightingSettings _lighting;
+    private readonly float _lodDiameterScale;
     private readonly Dictionary<int, FrameInstanceBuffer> _frameInstanceBuffers = [];
     private readonly Dictionary<int, FrameInstanceBuffer> _shadowFrameInstanceBuffers = [];
     private readonly Dictionary<InstanceBatchKey, InstanceBatch> _batchLookup = [];
@@ -40,7 +41,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
     public SimpleInstanceRenderer(
         IGraphicsDevice graphics,
         RuntimeAssetCatalog? runtimeAssets = null,
-        SceneLightingSettings? lighting = null)
+        SceneLightingSettings? lighting = null, float lodDiameterScale = 1)
     {
         ArgumentNullException.ThrowIfNull(graphics);
 
@@ -48,6 +49,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
             lighting ??
             SceneLightingSettings.Default;
         _lighting.Validate();
+        if (!float.IsFinite(lodDiameterScale) || lodDiameterScale is < .8f or > 1.1f)
+            throw new ArgumentOutOfRangeException(nameof(lodDiameterScale));
+        _lodDiameterScale = lodDiameterScale;
 
         _graphics = graphics;
         try
@@ -273,7 +277,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             {
                 unitLod =
                     instance.UnitFeature.IsWreck ? UnitAssetLod.Lod2
-                        : (UnitAssetLod)ScreenSpaceLod.Select(projectedDiameter, previousLod);
+                        : (UnitAssetLod)ScreenSpaceLod.Select(projectedDiameter * _lodDiameterScale, previousLod);
                 if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = (int)unitLod;
                 unitDefinition =
                     UnitPresentationCatalog.Get(
@@ -320,7 +324,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 buildingLod =
                     instance.BuildingFeature.IsConstruction || instance.BuildingFeature.IsDestroyed
                         ? BuildingAssetLod.Lod0
-                        : (BuildingAssetLod)ScreenSpaceLod.Select(projectedDiameter, previousLod, 150.0f, 45.0f);
+                        : (BuildingAssetLod)ScreenSpaceLod.Select(projectedDiameter * _lodDiameterScale, previousLod, 150.0f, 45.0f);
                 if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = (int)buildingLod;
                 hasBuildingDefinition =
                     BuildingPresentationCatalog.TryGet(
@@ -417,7 +421,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         instance.WorldFeature.Visual)
                     .MaterialAssetId;
                 WorldAssetLod worldLod =
-                    ScreenSpaceLod.Select(projectedDiameter, previousLod, 65.0f, 18.0f) > 0
+                    ScreenSpaceLod.Select(projectedDiameter * _lodDiameterScale, previousLod, 65.0f, 18.0f) > 0
                         ? WorldAssetLod.Reduced : WorldAssetLod.High;
                 if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = worldLod == WorldAssetLod.Reduced ? 1 : 0;
 

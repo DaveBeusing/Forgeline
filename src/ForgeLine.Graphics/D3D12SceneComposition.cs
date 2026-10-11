@@ -6,6 +6,27 @@ namespace ForgeLine.Graphics;
 
 internal sealed partial class D3D12GraphicsDevice
 {
+    private GraphicsPostProcessingSettings _postProcessing = GraphicsPostProcessingSettings.Neutral;
+    public ulong? AvailableMemoryBudgetBytes
+    {
+        get
+        {
+            ThrowIfDisposed();
+            GraphicsMemoryDiagnostics budget = CaptureMemoryBudget();
+            return budget.Available && budget.LocalBudgetBytes > 0 ?
+                budget.LocalBudgetBytes > budget.LocalUsageBytes ? budget.LocalBudgetBytes - budget.LocalUsageBytes : 0 : null;
+        }
+    }
+    public bool SupportsPostProcessing => true;
+    public GraphicsPostProcessingSettings PostProcessing { get { ThrowIfDisposed(); return _postProcessing; } }
+    public void ConfigurePostProcessing(GraphicsPostProcessingSettings settings)
+    {
+        ThrowIfDisposed(); ThrowIfRecording(); settings.Validate();
+        if (!_sceneOutput.Enabled && settings != GraphicsPostProcessingSettings.Neutral)
+            throw new InvalidOperationException("Postprocessing requires linear scene output.");
+        _postProcessing = settings;
+        ResetFrameMeasurements();
+    }
     private GraphicsSceneOutputSettings _sceneOutput = new(false, 1, true);
     private ID3D12Resource[]? _sceneTargets;
     private int[]? _sceneDescriptors;
@@ -23,8 +44,8 @@ internal sealed partial class D3D12GraphicsDevice
         ThrowIfDisposed();
         ThrowIfRecording();
         settings.Validate();
-        if (_atmosphere.Enabled && !settings.Enabled)
-            throw new InvalidOperationException("Disable atmosphere before disabling linear scene composition.");
+        if ((_atmosphere.Enabled || _postProcessing != GraphicsPostProcessingSettings.Neutral) && !settings.Enabled)
+            throw new InvalidOperationException("Disable atmosphere and postprocessing before disabling linear scene composition.");
         if (settings == _sceneOutput)
             return;
         WaitForIdle();
@@ -106,37 +127,14 @@ internal sealed partial class D3D12GraphicsDevice
 
     private D3D12GraphicsPipeline CreateSceneComposite()
     {
-        if (_atmosphere.Enabled) return CreateAtmosphereComposite();
         var compiler = new DxcShaderCompiler();
-        GraphicsShaderBytecode vertex = compiler.Compile("""
-            cbuffer OutputSettings : register(b0) { float Exposure; float Aces; };
-            struct Output { float4 Position : SV_Position; nointerpolation float2 Settings : TEXCOORD0; };
-            Output VSMain(uint id : SV_VertexID) {
-                Output o;
-                float2 uv = float2((id << 1) & 2, id & 2);
-                o.Position = float4(uv * float2(2, -2) + float2(-1, 1), 0, 1);
-                o.Settings = float2(Exposure, Aces);
-                return o;
-            }
-            """, GraphicsShaderStage.Vertex, "VSMain", "SceneCompositeVertex.hlsl");
-        GraphicsShaderBytecode pixel = compiler.Compile("""
-            Texture2D<float4> Scene : register(t0);
-            float4 PSMain(float4 position : SV_Position, nointerpolation float2 settings : TEXCOORD0) : SV_Target0 {
-                float4 scene = Scene.Load(int3(int2(position.xy), 0));
-                // A negative alpha identifies an authored output-space clear/debug pixel.
-                if (scene.a < 0) return float4(scene.rgb, -scene.a - 1);
-                float3 value = scene.rgb * settings.x;
-                if (settings.y >= 0.5)
-                    value = saturate((value * (2.51 * value + 0.03)) / (value * (2.43 * value + 0.59) + 0.14));
-                else value = saturate(value);
-                float3 lo = value * 12.92;
-                float3 hi = 1.055 * pow(max(value, 0), 1.0 / 2.4) - 0.055;
-                return float4(lerp(hi, lo, step(value, 0.0031308)), scene.a);
-            }
-            """, GraphicsShaderStage.Pixel, "PSMain", "SceneCompositePixel.hlsl");
-        return (D3D12GraphicsPipeline)CreateGraphicsPipeline(new GraphicsPipelineDescription(vertex, pixel)
+        var vertex = compiler.Compile(SceneCompositeShader.Vertex, GraphicsShaderStage.Vertex, "VSMain", "SceneCompositeVertex.hlsl");
+        var pixel = compiler.Compile((_atmosphere.Enabled ? "#define ATMOSPHERE 1\n" : "#define ATMOSPHERE 0\n") +
+            SceneCompositeShader.Pixel, GraphicsShaderStage.Pixel, "PSMain", "SceneCompositePixel.hlsl");
+        return (D3D12GraphicsPipeline)CreateGraphicsPipeline(new(vertex, pixel)
         {
-            CullMode = GraphicsCullMode.None, PixelTextureCount = 1, VertexRootConstantCount = 2
+            CullMode = GraphicsCullMode.None, PixelTextureCount = _atmosphere.Enabled ? 2 : 1,
+            VertexRootConstantCount = SceneCompositeShader.ConstantCount
         });
     }
 
@@ -169,15 +167,13 @@ internal sealed partial class D3D12GraphicsDevice
         {
             _commandList.SetGraphicsRootDescriptorTable(2, new GpuDescriptorHandle(
                 _shaderResourceHeap.GetGPUDescriptorHandleForHeapStart(), _atmosphereDepthDescriptor, _shaderResourceDescriptorSize));
-            Span<float> constants = stackalloc float[32];
-            WriteAtmosphereConstants(constants);
-            _commandList.SetGraphicsRoot32BitConstants(0, constants);
         }
-        else
-        {
-            ReadOnlySpan<float> settings = stackalloc float[] { _sceneOutput.Exposure, _sceneOutput.AcesFitted ? 1 : 0 };
-            _commandList.SetGraphicsRoot32BitConstants(0, settings);
-        }
+        Span<float> constants = stackalloc float[SceneCompositeShader.ConstantCount];
+        WriteAtmosphereConstants(constants);
+        constants[32] = _postProcessing.WhiteBalance; constants[33] = _postProcessing.Tint;
+        constants[34] = _postProcessing.Contrast; constants[35] = _postProcessing.Saturation;
+        constants[36] = _postProcessing.EdgeBlend;
+        _commandList.SetGraphicsRoot32BitConstants(0, constants);
         _commandList.DrawInstanced(3, 1, 0, 0);
         if (_atmosphere.Enabled)
         {

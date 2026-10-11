@@ -11,7 +11,8 @@ public enum FrontendSettingsField : byte
     CameraSpeed = 4,
     Onboarding = 5,
     BindingAction = 6,
-    BindingKey = 7
+    BindingKey = 7,
+    RenderQuality = 8
 }
 
 public sealed class SettingsInteractionModel
@@ -25,7 +26,7 @@ public sealed class SettingsInteractionModel
     public PlatformKey? BindingCandidate => _candidate;
     public GameplayAction BindingAction { get; private set; }
     public string BindingFeedback { get; private set; } = string.Empty;
-    public int VisibleStart => FocusedField == FrontendSettingsField.BindingKey ? 1 : 0;
+    public int VisibleStart => Math.Max(0, (int)FocusedField - 6);
     public int VisibleRowCount => Math.Min(7, s_fields.Length + 1 - VisibleStart);
     public void FocusVisible(int row) => Focus((FrontendSettingsField)(row + VisibleStart));
 
@@ -127,6 +128,9 @@ public sealed class SettingsInteractionModel
                     BindingFeedback = "BINDING READY - APPLY TO SAVE";
                 }
                 catch (InvalidDataException exception) { CanApply = false; BindingFeedback = exception.Message.ToUpperInvariant(); }
+                break;
+            case FrontendSettingsField.RenderQuality:
+                model.SetRenderQuality((FrontendRenderQuality)(((int)settings.RenderQuality + Math.Sign(direction) + 3) % 3));
                 break;
             case FrontendSettingsField.Onboarding:
                 model.SetOnboarding(

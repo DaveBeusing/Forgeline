@@ -73,7 +73,8 @@ public sealed class FrontendInteractionTests
         interaction.MovePrevious();
 
         Assert.Equal(
-            FrontendSettingsField.BindingKey,
+            FrontendSettingsField.RenderQuality,
             interaction.FocusedField);
+        Assert.Equal(FrontendSettingsField.BorderlessFullscreen, interaction.MoveNext());
     }
 }
