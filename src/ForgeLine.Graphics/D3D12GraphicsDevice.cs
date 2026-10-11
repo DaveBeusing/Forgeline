@@ -251,6 +251,9 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             {
                 DirectionalShadows = ShadowDiagnostics,
                 Atmosphere = AtmosphereDiagnostics,
+                PostProcessing = new(true, _sceneOutput.Enabled ? _postProcessing.Antialiasing : SpatialAntialiasing.Disabled,
+                    1, _sceneTargets?.Length ?? 0, _sceneTargets is null ? 0 : checked((long)_surfaceLifecycle.Width * _surfaceLifecycle.Height * 8 * _configuration.BufferCount),
+                    0, 0, _sceneOutput.Enabled ? (_postProcessing.EdgeBlend > 0 ? 5 : 1) : 0, _gpuTimingFence, _compositeGpuMilliseconds),
                 Particles = new(_particleDepth, _particleGpuFence, _particleGpu, _particleDepth ? 1 : 0),
                 Frame = new GraphicsFrameDiagnostics(
                     new GraphicsFramePlan(_surfaceLifecycle.Width, _surfaceLifecycle.Height, _configuration.BufferCount, _sceneOutput.Enabled, _directionalShadows.Resolution, _atmosphere.Enabled || _particleDepth),

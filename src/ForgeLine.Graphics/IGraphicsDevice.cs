@@ -2,6 +2,13 @@ namespace ForgeLine.Graphics;
 
 public interface IGraphicsDevice : IDisposable
 {
+    bool SupportsPostProcessing => false;
+    GraphicsPostProcessingSettings PostProcessing => GraphicsPostProcessingSettings.Neutral;
+    void ConfigurePostProcessing(GraphicsPostProcessingSettings settings)
+    {
+        settings.Validate();
+        if (settings != GraphicsPostProcessingSettings.Neutral) throw new NotSupportedException("Postprocessing is unsupported.");
+    }
     bool SupportsParticleRendering => false;
     void ConfigureParticleDepth(bool enabled) { if (enabled) throw new NotSupportedException("Depth-aware particles are unsupported."); }
     GraphicsAtmosphereSettings Atmosphere => GraphicsAtmosphereSettings.Default;

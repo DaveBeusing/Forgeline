@@ -29,6 +29,7 @@ public sealed record GraphicsDiagnostics(
     GraphicsDeviceInfo Device,
     GraphicsSurfaceInfo Surface)
 {
+    public GraphicsPostProcessingDiagnostics? PostProcessing { get; init; }
     public GraphicsFrameDiagnostics? Frame { get; init; }
     public GraphicsParticleDiagnostics? Particles { get; init; }
     public GraphicsDirectionalShadowDiagnostics? DirectionalShadows { get; init; }
