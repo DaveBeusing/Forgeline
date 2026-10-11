@@ -59,6 +59,7 @@ public interface IGraphicsDevice : IDisposable
     byte[] CaptureFrame(GraphicsColor clearColor, Action<IGraphicsCommandContext> recordCommands) =>
         throw new NotSupportedException("Native frame capture is unsupported.");
     string? CaptureInputFingerprint => null;
+    ReadOnlyMemory<byte> CaptureShadowDepth => ReadOnlyMemory<byte>.Empty;
 
     void Resize(int width, int height);
 

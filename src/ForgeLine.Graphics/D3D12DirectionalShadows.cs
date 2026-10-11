@@ -150,6 +150,7 @@ internal sealed partial class D3D12GraphicsDevice
         ValidateRecording();
         if (!_shadowRecording) throw new InvalidOperationException("No directional shadow pass is active.");
         _commandList.ResourceBarrierTransition(_shadowTargets![_frameIndex], ResourceStates.DepthWrite, ResourceStates.PixelShaderResource);
+        RecordShadowCapture();
         if (_shadowQueries is not null)
         {
             uint query = checked((uint)_frameIndex * 2);
