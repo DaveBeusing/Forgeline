@@ -4,12 +4,78 @@ using ForgeLine.Core;
 using ForgeLine.Game;
 using ForgeLine.Logistics;
 using ForgeLine.Simulation;
+using ForgeLine.Intelligence;
+using ForgeLine.World;
 using Xunit;
 
 namespace ForgeLine.Presentation.Tests;
 
 public sealed class VfxPresentationTests
 {
+    [Fact]
+    public void RetainedDestructionEffectsDisappearWhenTerrainVisibilityIsLost()
+    {
+        var simulation = new SimulationCoordinator();
+        var intelligence = new FactionIntelligenceStore(new IntelligenceGridSettings { CellSizeMeters = 16 });
+        simulation.RegisterSystem(new BattlefieldIntelligenceSystem(intelligence));
+        var snapshots = new PresentationSnapshotBuffer();
+        simulation.RegisterTickObserver(new PresentationExtractor(snapshots, intelligence, new(1),
+            new AxisAlignedBounds(new(-64, -1, -64), new(64, 1, 64))));
+        var sensor = simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(sensor, new WorldTransform(Vector3.Zero, Quaternion.Identity, Vector3.One));
+        simulation.Entities.AddComponent(sensor, new VisualSensorState(new(1), rangeMeters: 50));
+        var wreck = simulation.Entities.CreateEntity();
+        AddRenderable(simulation, wreck);
+        simulation.Entities.AddComponent(wreck, new UnitWreckPresentationIdentity(UnitIds.MainBattleTank, new(2)));
+        simulation.Entities.AddComponent(wreck, new IntelligenceSignature(new(2), identityKey: 42));
+        simulation.AdvanceOneTick();
+        Assert.True(snapshots.TryReadLatest(out var visible));
+        Assert.Contains(visible.Instances.ToArray(), x => x.VfxFeature.Kind == VfxEffectKind.ExplosionVehicle);
+        Assert.Single(visible.Instances.ToArray(), x => x.VfxFeature.Kind == VfxEffectKind.PersistentHeavySmoke);
+        Assert.DoesNotContain(visible.Instances.ToArray(), x => x.VfxFeature.Kind == VfxEffectKind.DestructionSmokePlume);
+        simulation.Entities.DestroyEntity(sensor);
+        simulation.AdvanceOneTick();
+        Assert.True(snapshots.TryReadLatest(out var hidden));
+        Assert.DoesNotContain(hidden.Instances.ToArray(), x => x.VfxFeature.IsSpecified);
+        Assert.True(hidden.VfxMetrics.ActiveTransientEffects > 0);
+    }
+
+    [Fact]
+    public void VehicleDustRequiresContiguousMovementAndStopsAtIdleOrTeleport()
+    {
+        var simulation = new SimulationCoordinator();
+        var snapshots = new PresentationSnapshotBuffer();
+        simulation.RegisterTickObserver(new PresentationExtractor(snapshots));
+        var entity = simulation.Entities.CreateEntity();
+        AddRenderable(simulation, entity);
+        simulation.Entities.AddComponent(entity, new UnitIdentity(UnitIds.MainBattleTank, DirectorateContent.FactionId));
+        void AssertDust(bool expected)
+        {
+            simulation.AdvanceOneTick();
+            Assert.True(snapshots.TryReadLatest(out var snapshot));
+            Assert.Equal(expected, snapshot.Instances.ToArray().Any(x => x.VfxFeature.Kind == VfxEffectKind.PersistentDust));
+        }
+        AssertDust(false);
+        var transform = simulation.Entities.GetComponent<WorldTransform>(entity);
+        simulation.Entities.SetComponent(entity, transform with { Position = new(0, 0, 1) });
+        AssertDust(true);
+        AssertDust(false);
+        simulation.Entities.SetComponent(entity, transform with { Position = new(0, 0, 100) });
+        AssertDust(false);
+    }
+
+    [Fact]
+    public void ResetDropsOldPoolEventsAndRetainsBoundedStorage()
+    {
+        var pool = new VfxEffectPool(2);
+        pool.TrySpawn(VfxEffectKind.ExplosionVehicle, new(Vector3.Zero, Quaternion.Identity, Vector3.One), new(10));
+        pool.Reset();
+        Assert.Equal(0, pool.ActiveCount);
+        Assert.Equal(0UL, pool.Metrics.TotalSpawned);
+        Assert.Equal(2, pool.Capacity);
+        Assert.All(pool.Slots.ToArray(), x => Assert.False(x.Active));
+    }
+
     [Fact]
     public void PersistentEmitterIdentitySurvivesSnapshotReordering()
     {

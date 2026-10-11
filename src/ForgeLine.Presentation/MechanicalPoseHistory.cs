@@ -58,5 +58,9 @@ internal sealed class MechanicalPoseHistory
         return pose;
     }
 
+    public bool HasMoved(EntityId entity) => _current.TryGetValue(entity, out var current) &&
+        _previous.TryGetValue(entity, out var previous) &&
+        Math.Abs(current.Pose.TravelMeters - previous.Pose.TravelMeters) > .02;
+
     private readonly record struct Entry(Vector3 Position, MechanicalPose Pose);
 }
