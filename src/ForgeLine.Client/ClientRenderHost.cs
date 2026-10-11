@@ -478,7 +478,8 @@ internal sealed class ClientRenderHost : IDisposable
                     throw new ArgumentException("FORGELINE_PARTICLE_QUALITY must be Disabled, Low, Medium or High.");
                 particleSettings = new(quality);
             }
-            qualityProfile = qualityProfile with { Shadows = shadowSettings, Atmosphere = atmosphere.Quality, Particles = particleSettings };
+            qualityProfile = qualityProfile with { Shadows = shadowSettings, Atmosphere = atmosphere.Quality,
+                Particles = particleSettings, PostProcessing = graphics.PostProcessing };
             using var particleRenderer = new ParticleVfxRenderer(graphics,_runtimeAssets,particleSettings,_sceneLighting);
             long lastParticleFrame = Stopwatch.GetTimestamp();
             using var gameplayOverlayRenderer =

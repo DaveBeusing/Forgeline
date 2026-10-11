@@ -42,9 +42,7 @@ internal static class SceneCompositeShader
             return lerp(1.055*pow(max(value,0),1.0/2.4)-0.055,value*12.92,step(value,0.0031308));
         }
         float Luma(float3 value) { return dot(value,float3(0.2126,0.7152,0.0722)); }
-        float3 DisplayLinear(int2 pixel, Output input, uint2 dimensions) {
-            pixel=clamp(pixel,int2(0,0),int2(dimensions)-1);
-            float4 scene=Scene.Load(int3(pixel,0));
+        float3 DisplayLinear(float4 scene, int2 pixel, Output input, uint2 dimensions) {
             // Authored output-space clear/debug pixels bypass fog, grade and tone mapping.
             if(scene.a<0) return Decode(scene.rgb);
             float3 value=scene.rgb;
@@ -75,17 +73,21 @@ internal static class SceneCompositeShader
             value=saturate(lerp(Luma(value).xxx,value,input.Grade.w));
             return saturate((value-0.18)*input.Grade.z+0.18);
         }
+        float3 SampleDisplayLinear(int2 pixel, Output input, uint2 dimensions) {
+            pixel=clamp(pixel,int2(0,0),int2(dimensions)-1);
+            return DisplayLinear(Scene.Load(int3(pixel,0)),pixel,input,dimensions);
+        }
         float4 PSMain(Output input) : SV_Target0 {
             int2 pixel=int2(input.Position.xy);
             float4 scene=Scene.Load(int3(pixel,0));
             if(scene.a<0) return float4(scene.rgb,-scene.a-1);
             uint width,height; Scene.GetDimensions(width,height); uint2 dimensions=uint2(width,height);
-            float3 value=DisplayLinear(pixel,input,dimensions);
+            float3 value=DisplayLinear(scene,pixel,input,dimensions);
             if(input.Post.x>0) {
-                float3 north=DisplayLinear(pixel+int2(0,-1),input,dimensions);
-                float3 south=DisplayLinear(pixel+int2(0,1),input,dimensions);
-                float3 west=DisplayLinear(pixel+int2(-1,0),input,dimensions);
-                float3 east=DisplayLinear(pixel+int2(1,0),input,dimensions);
+                float3 north=SampleDisplayLinear(pixel+int2(0,-1),input,dimensions);
+                float3 south=SampleDisplayLinear(pixel+int2(0,1),input,dimensions);
+                float3 west=SampleDisplayLinear(pixel+int2(-1,0),input,dimensions);
+                float3 east=SampleDisplayLinear(pixel+int2(1,0),input,dimensions);
                 float center=Luma(value), n=Luma(north), s=Luma(south), w=Luma(west), e=Luma(east);
                 float low=min(center,min(min(n,s),min(w,e))), high=max(center,max(max(n,s),max(w,e)));
                 // Five bounded samples, no history. Retain at least 70% of a thin silhouette.

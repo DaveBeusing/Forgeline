@@ -44,6 +44,18 @@ public sealed class PostProcessingTests
         byte[] baseline=Capture();
         graphics.ConfigurePostProcessing(high);
         byte[] aa=Capture();
+        string? captureRoot=Environment.GetEnvironmentVariable("FORGELINE_POST_REGRESSION_OUTPUT");
+        if(!string.IsNullOrWhiteSpace(captureRoot))
+        {
+            Directory.CreateDirectory(captureRoot);
+            Save("neutral",baseline);Save("aa",aa);
+            void Save(string name,byte[] pixels)
+            {
+                using var file=File.Create(Path.Combine(captureRoot,$"post-edge-{atmosphere}-{name}.ppm"));
+                file.Write(System.Text.Encoding.ASCII.GetBytes("P6\n320 240\n255\n"));
+                for(int pixel=0;pixel<pixels.Length;pixel+=4) file.Write(pixels.AsSpan(pixel,3));
+            }
+        }
         Assert.Equal(aa,Capture());
         int thin=(120*320+120)*4;
         Assert.Equal(255,baseline[thin]);

@@ -36,7 +36,7 @@ public readonly record struct RenderQualitySettings
             (ulong)new ParticleSettings((ParticleQuality)((int)quality + 1)).Capacity * 64 * (ulong)buffers + 12);
         RenderQualityProfile Profile(RenderQuality activeQuality, bool linear, string? reason) => new(requested, activeQuality, linear,
             new(linear ? (DirectionalShadowQuality)((int)activeQuality + 1) : DirectionalShadowQuality.Disabled),
-            linear ? (activeQuality == RenderQuality.Low ? AtmosphereQuality.Distance : AtmosphereQuality.Height) : AtmosphereQuality.Disabled,
+            linear && activeQuality != RenderQuality.Low ? AtmosphereQuality.Height : AtmosphereQuality.Disabled,
             new(linear ? (ParticleQuality)((int)activeQuality + 1) : ParticleQuality.Disabled),
             activeQuality == RenderQuality.Low ? TerrainSurfaceDetailSettings.Disabled : TerrainSurfaceDetailSettings.Default,
             activeQuality switch { RenderQuality.Low => .8f, RenderQuality.High => 1.1f, _ => 1 },

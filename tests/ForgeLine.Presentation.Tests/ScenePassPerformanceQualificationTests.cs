@@ -31,6 +31,13 @@ public sealed class ScenePassPerformanceQualificationTests
         {
             SceneLightingSettings lighting = SceneLightingSettings.Default;
             graphics.ConfigureSceneOutput(new(enabled, lighting.Exposure, true));
+            string? aa = Environment.GetEnvironmentVariable("FORGELINE_POST_QUALIFICATION_AA");
+            if (enabled && !string.IsNullOrWhiteSpace(aa))
+            {
+                if (!Enum.TryParse(aa, true, out SpatialAntialiasing antialiasing) || !Enum.IsDefined(antialiasing))
+                    throw new ArgumentException("FORGELINE_POST_QUALIFICATION_AA must be Disabled, Low or High.");
+                graphics.ConfigurePostProcessing(new() { Antialiasing=antialiasing });
+            }
             using var renderer = new TerrainRenderer(graphics, terrain, lighting: lighting) { DebugChunksEnabled = false };
             var camera = new RtsCamera(new RtsCameraSettings { InitialDistance = distance });
             Action<IGraphicsCommandContext> record = context =>
@@ -58,6 +65,15 @@ public sealed class ScenePassPerformanceQualificationTests
                 }
             }
             graphics.WaitForIdle();
+            if (enabled)
+            {
+                string destination=Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_PASS_BENCHMARK_OUTPUT")!);
+                Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+                byte[] pixels=graphics.CaptureFrame(GraphicsColor.ForgeLineClear,record);
+                using var capture=File.Create(Path.Combine(Path.GetDirectoryName(destination)!, $"{Path.GetFileNameWithoutExtension(destination)}-{distance}.ppm"));
+                capture.Write(System.Text.Encoding.ASCII.GetBytes("P6\n1280 720\n255\n"));
+                for(int pixel=0;pixel<pixels.Length;pixel+=4) capture.Write(pixels.AsSpan(pixel,3));
+            }
             Array.Sort(cpu);
             results.Add(new
             {
@@ -68,6 +84,7 @@ public sealed class ScenePassPerformanceQualificationTests
                 renderer.LastDiagnostics.VisibleChunks, renderer.LastDiagnostics.DrawCalls,
                 targets = graphics.Diagnostics.Frame!.Value.Plan
             });
+            graphics.ConfigurePostProcessing(GraphicsPostProcessingSettings.Neutral);
         }
         string output = Path.GetFullPath(Environment.GetEnvironmentVariable("FORGELINE_PASS_BENCHMARK_OUTPUT")!);
         Directory.CreateDirectory(Path.GetDirectoryName(output)!);

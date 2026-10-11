@@ -25,6 +25,7 @@ public sealed class RenderQualitySettingsTests
         Assert.Equal(SpatialAntialiasing.Disabled,exhausted.PostProcessing.Antialiasing);
         Assert.False(requested.Resolve(false,false,1280,720,3).LinearScene);
         Assert.Equal(RenderQuality.Low,requested.Resolve(true,true,1280,720,3).Active);
+        Assert.Equal(AtmosphereQuality.Disabled,requested.Resolve(true,true,1280,720,3).Atmosphere);
         Assert.Equal(RenderQuality.High,requested.Quality);
         Assert.Throws<ArgumentOutOfRangeException>(()=>new RenderQualitySettings { Quality=(RenderQuality)255 }.Validate());
         Assert.Throws<ArgumentOutOfRangeException>(()=>requested.Resolve(true,false,0,720,3));
