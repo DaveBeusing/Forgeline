@@ -19,7 +19,7 @@ internal sealed partial class D3D12GraphicsDevice
 
     // Qualification only: a requested capture adds one copy and waits for completion.
     // Normal RenderFrame never allocates a readback resource or copies the output.
-    public byte[] CaptureFrame(GraphicsColor clearColor, Action<IGraphicsCommandContext> commands)
+    public byte[] CaptureFrame(GraphicsColor clearColor, Action<IGraphicsCommandContext> commands, bool captureShadowDepth = false)
     {
         ArgumentNullException.ThrowIfNull(commands);
         ThrowIfDisposed();
@@ -44,7 +44,7 @@ internal sealed partial class D3D12GraphicsDevice
         {
             _captureInputHash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
             ulong shadowBytes = 0;
-            if (_directionalShadows.Enabled)
+            if (captureShadowDepth && _directionalShadows.Enabled)
             {
                 _device.GetCopyableFootprints(_shadowTargets![_frameIndex].Description, 0, 1, 0,
                     footprints, new uint[1], new ulong[1], out shadowBytes);
@@ -91,10 +91,8 @@ internal sealed partial class D3D12GraphicsDevice
         if (_captureShadowTarget is null) return;
         UseResource(_captureShadowLifetime!);
         ID3D12Resource depth = _shadowTargets![_frameIndex];
-        _commandList.ResourceBarrierTransition(depth, ResourceStates.PixelShaderResource, ResourceStates.CopySource);
         _commandList.CopyTextureRegion(new TextureCopyLocation(_captureShadowTarget, _captureShadowFootprint), 0, 0, 0,
             new TextureCopyLocation(depth, 0));
-        _commandList.ResourceBarrierTransition(depth, ResourceStates.CopySource, ResourceStates.PixelShaderResource);
         _captureShadowRecorded = true;
     }
 

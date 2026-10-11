@@ -7,6 +7,9 @@ namespace ForgeLine.Graphics;
 
 internal sealed partial class D3D12GraphicsDevice
 {
+    // Both consumers require a materialized read-only depth layout. Keep that
+    // layout consistent across frame targets, including frames without readback.
+    private const ResourceStates ShadowReadState = ResourceStates.PixelShaderResource | ResourceStates.CopySource;
     private GraphicsDirectionalShadowSettings _directionalShadows;
     private ID3D12Resource[]? _shadowTargets;
     private ID3D12Resource[]? _shadowConstants;
@@ -62,7 +65,7 @@ internal sealed partial class D3D12GraphicsDevice
             {
                 _shadowTargets[i] = _device.CreateCommittedResource(HeapType.Default,
                     ResourceDescription.Texture2D(Format.R32_Typeless, checked((uint)settings.Resolution), checked((uint)settings.Resolution),
-                        mipLevels: 1, flags: ResourceFlags.AllowDepthStencil), ResourceStates.PixelShaderResource,
+                        mipLevels: 1, flags: ResourceFlags.AllowDepthStencil), ShadowReadState,
                     new ClearValue(Format.D32_Float, 1, 0));
                 _shadowTargets[i].Name = $"ForgeLine Directional Shadow {i}";
                 _device.CreateDepthStencilView(_shadowTargets[i], new DepthStencilViewDescription
@@ -138,7 +141,7 @@ internal sealed partial class D3D12GraphicsDevice
         RecordCaptureInput(MemoryMarshal.AsBytes(data));
         if (_shadowQueries is not null)
             _commandList.EndQuery(_shadowQueries, QueryType.Timestamp, checked((uint)_frameIndex * 2));
-        _commandList.ResourceBarrierTransition(_shadowTargets![_frameIndex], ResourceStates.PixelShaderResource, ResourceStates.DepthWrite);
+        _commandList.ResourceBarrierTransition(_shadowTargets![_frameIndex], ShadowReadState, ResourceStates.DepthWrite);
         _commandList.OMSetRenderTargets(Array.Empty<CpuDescriptorHandle>(), ShadowDsv(_frameIndex));
         _commandList.ClearDepthStencilView(ShadowDsv(_frameIndex), ClearFlags.Depth, 1, 0);
         _commandList.RSSetViewport(0, 0, _directionalShadows.Resolution, _directionalShadows.Resolution);
@@ -149,7 +152,7 @@ internal sealed partial class D3D12GraphicsDevice
     {
         ValidateRecording();
         if (!_shadowRecording) throw new InvalidOperationException("No directional shadow pass is active.");
-        _commandList.ResourceBarrierTransition(_shadowTargets![_frameIndex], ResourceStates.DepthWrite, ResourceStates.PixelShaderResource);
+        _commandList.ResourceBarrierTransition(_shadowTargets![_frameIndex], ResourceStates.DepthWrite, ShadowReadState);
         RecordShadowCapture();
         if (_shadowQueries is not null)
         {

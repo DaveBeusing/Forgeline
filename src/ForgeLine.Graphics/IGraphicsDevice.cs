@@ -56,7 +56,7 @@ public interface IGraphicsDevice : IDisposable
         Action<IGraphicsCommandContext>? recordCommands = null);
 
     // Explicit qualification readback on the creating thread; never part of ordinary frames.
-    byte[] CaptureFrame(GraphicsColor clearColor, Action<IGraphicsCommandContext> recordCommands) =>
+    byte[] CaptureFrame(GraphicsColor clearColor, Action<IGraphicsCommandContext> recordCommands, bool captureShadowDepth = false) =>
         throw new NotSupportedException("Native frame capture is unsupported.");
     string? CaptureInputFingerprint => null;
     ReadOnlyMemory<byte> CaptureShadowDepth => ReadOnlyMemory<byte>.Empty;
