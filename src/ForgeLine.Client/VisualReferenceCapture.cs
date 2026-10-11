@@ -1,0 +1,227 @@
+using System.Diagnostics;
+using System.Numerics;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using ForgeLine.Assets;
+using ForgeLine.Game;
+using ForgeLine.Graphics;
+using ForgeLine.Platform;
+using ForgeLine.Platform.Windows;
+using ForgeLine.Presentation;
+
+namespace ForgeLine.Client;
+
+internal sealed record VisualReferenceCaptureRequest
+{
+    public required string OutputRoot { get; init; }
+    public required string Commit { get; init; }
+    public required string RuntimeRoot { get; init; }
+    public string? Driver { get; init; }
+    public bool Software { get; init; }
+    public int Warmups { get; init; } = 32;
+    public int Samples { get; init; } = 128;
+    public VisualReferenceSceneKind[] Scenes { get; init; } = Enum.GetValues<VisualReferenceSceneKind>();
+    public RenderQuality[] Profiles { get; init; } = Enum.GetValues<RenderQuality>();
+    public RtsReferenceDisplay[] Displays { get; init; } = RtsVisualReference.Displays.ToArray();
+    public RtsReferenceZoom[] Zooms { get; init; } = Enum.GetValues<RtsReferenceZoom>();
+    public void Validate()
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(OutputRoot);
+        ArgumentException.ThrowIfNullOrWhiteSpace(RuntimeRoot);
+        if (Commit is null || Commit.Length != 40 || Commit.Any(c => !Uri.IsHexDigit(c))) throw new ArgumentException("Capture requires a complete source commit.");
+        if (Warmups is < 3 or > 4096 || Samples is < 8 or > 8192) throw new ArgumentOutOfRangeException(nameof(Samples));
+        if (Scenes is null || Profiles is null || Displays is null || Zooms is null ||
+            Scenes.Length is < 1 or > 6 || Profiles.Length is < 1 or > 3 || Displays.Length is < 1 or > 4 || Zooms.Length is < 1 or > 3 ||
+            Scenes.Any(x => !Enum.IsDefined(x)) || Profiles.Any(x => !Enum.IsDefined(x)) || Zooms.Any(x => !Enum.IsDefined(x)) ||
+            Displays.Any(x => !RtsVisualReference.Displays.Contains(x)) ||
+            Scenes.Distinct().Count() != Scenes.Length || Profiles.Distinct().Count() != Profiles.Length ||
+            Zooms.Distinct().Count() != Zooms.Length || Displays.Distinct().Count() != Displays.Length)
+            throw new ArgumentException("Capture matrix contains an unsupported or duplicated entry.");
+    }
+}
+
+internal static class VisualReferenceCapture
+{
+    internal static readonly JsonSerializerOptions JsonOptions = new()
+    { WriteIndented = true, IncludeFields = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        Converters = { new JsonStringEnumConverter() } };
+
+    internal static int Run(string requestPath)
+    {
+        VisualReferenceCaptureRequest? request = null;
+        bool outputCreated = false;
+        var captures = new List<object>();
+        try
+        {
+            request = JsonSerializer.Deserialize<VisualReferenceCaptureRequest>(File.ReadAllText(requestPath), JsonOptions)
+                ?? throw new ArgumentException("Empty capture request.");
+            request.Validate();
+            string identity = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
+            if (!identity.EndsWith(request.Commit, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("Requested commit does not match the built client. Rebuild this revision.");
+            if (Directory.Exists(request.OutputRoot) && Directory.EnumerateFileSystemEntries(request.OutputRoot).Any())
+                throw new IOException("Evidence output must be empty; existing baselines are never overwritten.");
+            Directory.CreateDirectory(request.OutputRoot);
+            outputCreated = true;
+            string runtimeFingerprint = RuntimeFingerprint(request.RuntimeRoot);
+            var catalog = RuntimeAssetCatalog.Load(request.RuntimeRoot);
+            var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+            var fixtures = request.Scenes.Select(x => VisualReferenceScene.Create(x, terrain)).ToArray();
+            using var platform = new WindowsPlatform();
+            using IWindow window = platform.CreateWindow(new("FORGELINE Reference Capture", 1280, 720));
+            using var graphics = GraphicsDeviceFactory.CreateForWindow(window, new()
+            { EnableVSync = false, EnableMemoryDiagnostics = true, ForceSoftwareAdapter = request.Software,
+                AllowSoftwareAdapterFallback = request.Software });
+            if (graphics.Diagnostics.Device.IsSoftwareAdapter != request.Software)
+                throw new InvalidOperationException("Capture adapter does not match the requested lane.");
+            var lighting = SceneLightingSettings.Default;
+            foreach (var display in request.Displays)
+            foreach (var quality in request.Profiles)
+            {
+                graphics.ConfigurePostProcessing(GraphicsPostProcessingSettings.Neutral);
+                graphics.ConfigureAtmosphere(GraphicsAtmosphereSettings.Default with { Quality = AtmosphereQuality.Disabled });
+                graphics.ConfigureDirectionalShadows(default);
+                graphics.ConfigureSceneOutput(new(false, lighting.Exposure, true));
+                graphics.Resize(display.Width, display.Height);
+                graphics.RenderFrame(GraphicsColor.ForgeLineClear);
+                var profile = new RenderQualitySettings { Quality = quality }.Resolve(graphics.SupportsPostProcessing,
+                    graphics.Diagnostics.Device.IsSoftwareAdapter, display.Width, display.Height, 3, graphics.AvailableMemoryBudgetBytes);
+                graphics.ConfigureSceneOutput(new(profile.LinearScene, lighting.Exposure, true));
+                graphics.ConfigureAtmosphere(GraphicsAtmosphereSettings.Default with { Quality = profile.Atmosphere });
+                graphics.ConfigureDirectionalShadows(profile.Shadows);
+                graphics.ConfigurePostProcessing(profile.PostProcessing);
+                using var ground = new TerrainRenderer(graphics, terrain, runtimeAssets: catalog, surfaceDetail: profile.TerrainDetail) { DebugChunksEnabled = false };
+                using var meshes = new SimpleInstanceRenderer(graphics, catalog, lodDiameterScale: profile.LodDiameterScale);
+                using var particles = new ParticleVfxRenderer(graphics, catalog, profile.Particles);
+                using var hud = new GameplayHudRenderer(graphics, catalog);
+                using var selection = new DebugDrawRenderer(graphics, depthEnabled: false, lineWidthPixels: 3);
+                foreach (var fixture in fixtures)
+                foreach (var zoom in request.Zooms)
+                {
+                    if (!platform.PumpEvents()) throw new OperationCanceledException("Reference window was closed.");
+                    string key = $"{fixture.Kind}-{display.Width}x{display.Height}-{quality}-{zoom}";
+                    Console.WriteLine($"[reference:capture] {key}");
+                    var camera = new RtsCamera(RtsVisualReference.CreateCameraSettings(fixture.Target, zoom));
+                    var buffer = new PresentationSnapshotBuffer(); buffer.Publish(fixture.Snapshot);
+                    var world = new RenderWorld(); world.Update(buffer);
+                    particles.Prepare(world, camera, display.Width, display.Height, .2);
+                    var selected = fixture.Snapshot.Instances.ToArray().Where(x => x.Selectable.IsSelectable).Take(3).Select(x => x.Entity).ToArray();
+                    var indicators = new DebugDraw { Enabled = true };
+                    foreach (var instance in fixture.Snapshot.Instances.ToArray().Where(x => selected.Contains(x.Entity)))
+                        indicators.Circle(instance.Transform.Position + Vector3.UnitY, 5, new(0, .8f, .2f, 1));
+                    var information = RtsInformationLayerView.Empty with { SelectedEntities = selected };
+                    uint rasterDpi = display.Height == 2160 ? 192u : display.Height == 1440 ? 144u : 96u;
+                    Action<IGraphicsCommandContext> record = context =>
+                    {
+                        if (graphics.Atmosphere.Enabled) context.SetAtmosphereView(SceneAtmosphereSettings.CreateView(camera, context.Width, context.Height));
+                        if (profile.Shadows.Enabled)
+                        {
+                            var shadow = DirectionalShadowProjection.Create(camera.CaptureState(), lighting, profile.Shadows);
+                            context.BeginDirectionalShadowPass(shadow);
+                            int draws = ground.RenderShadow(context, shadow, 128);
+                            meshes.RenderShadow(context, camera, world, 1, shadow, profile.Shadows.MaximumCasters - draws, profile.Shadows.MaximumDraws - draws, 1.6);
+                            context.EndDirectionalShadowPass();
+                        }
+                        ground.Render(context, camera);
+                        particles.Prepare(world, camera, context.Width, context.Height, 0, true);
+                        meshes.Render(context, camera, world, 1, 1.6, particles);
+                        particles.Render(context, camera);
+                        context.BeginPass(GraphicsFramePass.Overlay);
+                        selection.Render(context, camera, indicators);
+                        hud.Render(context, camera, fixture.Snapshot, terrain.WorldBounds, information, default, default,
+                            FormationTemplate.Compact, CombatGroupOverviewView.Empty, default, rasterDpi, 1);
+                    };
+                    for (int i = 0; i < request.Warmups; i++) graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
+                    var cpu = new double[request.Samples]; var gpu = new List<double>(); ulong lastFence = 0;
+                    for (int i = 0; i < cpu.Length; i++)
+                    {
+                        long start = Stopwatch.GetTimestamp(); graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
+                        cpu[i] = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
+                        if (graphics.Diagnostics.Frame is { } frame && frame.GpuSubmissionFence > lastFence)
+                        {
+                            lastFence = frame.GpuSubmissionFence;
+                            if (graphics.Diagnostics.GpuFrameMilliseconds is { } milliseconds) gpu.Add(milliseconds);
+                        }
+                    }
+                    graphics.WaitForIdle();
+                    var measured = graphics.Diagnostics;
+                    if (measured.Surface.Width != display.Width || measured.Surface.Height != display.Height)
+                        throw new InvalidOperationException("Actual native surface dimensions differ from the capture request.");
+                    if (measured.Resources.TextureBindingFailureCount != 0 || meshes.LastDiagnostics.FallbackMeshInstances != 0)
+                        throw new InvalidOperationException("Capture contains failed bindings or fallback meshes.");
+                    byte[] rgba = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
+                    byte[] repeated = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
+                    if (!rgba.AsSpan().SequenceEqual(repeated)) throw new InvalidOperationException("Repeated fixed-state pixels differ.");
+                    string image = key + ".png";
+                    ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, image), display.Width, display.Height, rgba);
+                    var motionImages = new List<object>();
+                    if (display.Width == RtsVisualReference.Width && quality == RenderQuality.Medium && zoom == RtsReferenceZoom.NormalGameplay)
+                    {
+                        var original = camera.CaptureState();
+                        for (int step = 0; step < 8; step++)
+                        {
+                            camera.ApplyState(original with { Target = original.Target + new Vector3(step * .5f, 0, step * .5f), YawRadians = original.YawRadians + step * .005f });
+                            string motionImage = $"{key}-motion-{step:D2}.png";
+                            byte[] motion = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
+                            ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, motionImage), display.Width, display.Height, motion);
+                            motionImages.Add(new { image = motionImage, imageSha256 = FileHash(Path.Combine(request.OutputRoot, motionImage)), camera = camera.CaptureState() });
+                        }
+                        camera.ApplyState(original);
+                    }
+                    captures.Add(new { key, image, imageSha256 = FileHash(Path.Combine(request.OutputRoot, image)),
+                        pixelSha256 = Convert.ToHexString(SHA256.HashData(rgba)), fixture.Kind, fixture.Fingerprint,
+                        seed = VisualReferenceScene.Seed, tick = fixture.Snapshot.Tick.Value, camera = camera.CaptureState(),
+                        requestedDisplay = display, actualSurface = measured.Surface, hostWindow = window.ClientSize,
+                        rasterDpi, uiScale = 1, requestedQuality = quality, profile, lighting,
+                        cpu = Distribution(cpu), gpu = Distribution(gpu.ToArray()), fps = Distribution(cpu.Select(x => 1000 / x).ToArray()),
+                        terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, particles = particles.Diagnostics,
+                        hudVertices = hud.LastRenderedVertexCount, graphics = measured, repeatPixelsEqual = true,
+                        motionImages, motionMethod = "Eight adjacent camera poses, no timing claim; readback stalls prevent judder acceptance.", visualReview = "pending" });
+                    WriteManifest("in-progress", null);
+                }
+                graphics.WaitForIdle();
+            }
+            if (runtimeFingerprint != RuntimeFingerprint(request.RuntimeRoot)) throw new InvalidOperationException("Runtime assets changed during qualification.");
+            WriteManifest("structural-pass", null);
+            return 0;
+
+            void WriteManifest(string status, string? error) => File.WriteAllText(Path.Combine(request.OutputRoot, "manifest.json"),
+                JsonSerializer.Serialize(new { schemaVersion = 1, status, error, request.Commit, buildIdentity = identity,
+                    runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
+                    runtimeFingerprint, request.Driver, software = request.Software, fixtureVersion = VisualReferenceScene.FixtureVersion,
+                    capturePath = "D3D12 swap-chain backbuffer readback before Present; full-resolution native output, independent of host-window clamp",
+                    method = "Authored immutable presentation states; fixed 32 completed extraction ticks, VSync off, frozen visual age1.6s and particle age.2s. CPU includes frame reuse/Present. Distinct completed GPU fences. Readbacks/PNG export excluded. No live gameplay or sustained-motion FPS claim.",
+                    request.Warmups, request.Samples, captures, humanVisualAcceptance = "pending" }, JsonOptions));
+        }
+        catch (Exception error)
+        {
+            Console.Error.WriteLine($"[reference:failure] {error.GetType().Name}: {error.Message}");
+            // Never overwrite an existing evidence directory after a rejected request.
+            if (request is not null && outputCreated)
+                File.WriteAllText(Path.Combine(request.OutputRoot, "failure.json"), JsonSerializer.Serialize(new { status = "structural-failure", error = error.ToString(), completedCaptures = captures.Count }, JsonOptions));
+            return 1;
+        }
+    }
+
+    internal static object Distribution(double[] values)
+    {
+        Array.Sort(values);
+        return values.Length == 0 ? new { samples = 0, mean = (double?)null, p50 = (double?)null, p95 = (double?)null, p99 = (double?)null }
+            : new { samples = values.Length, mean = (double?)values.Average(), p50 = (double?)values[(int)((values.Length - 1) * .5)],
+                p95 = (double?)values[(int)((values.Length - 1) * .95)], p99 = (double?)values[(int)((values.Length - 1) * .99)] };
+    }
+    internal static string FileHash(string path) => Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path)));
+    internal static string RuntimeFingerprint(string root)
+    {
+        using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        foreach (string path in Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories).Order(StringComparer.Ordinal))
+        {
+            hash.AppendData(Encoding.UTF8.GetBytes(Path.GetRelativePath(root, path).Replace('\\', '/')));
+            hash.AppendData(Convert.FromHexString(FileHash(path)));
+        }
+        return Convert.ToHexString(hash.GetHashAndReset());
+    }
+}
