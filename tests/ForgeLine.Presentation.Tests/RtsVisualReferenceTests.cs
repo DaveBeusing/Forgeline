@@ -48,6 +48,16 @@ public sealed class RtsVisualReferenceTests
     }
 
     [Fact]
+    public void HighQualityRetainsFullDetailWhenSphereIntersectsTheCamera()
+    {
+        var camera = new RtsCamera(RtsVisualReference.CreateCameraSettings(Vector3.Zero, RtsReferenceZoom.CloseTactical));
+        float diameter = ScreenSpaceLod.ProjectedDiameter(camera.Position, 5, camera.GetMatrices(1920, 1080), 1080);
+        Assert.Equal(0, ScreenSpaceLod.Select(diameter, 2, diameterScale: 1.08f));
+        Assert.Equal(0, ScreenSpaceLod.Select(diameter, 2, 150, 45, 1.08f));
+        Assert.Equal(0, ScreenSpaceLod.Select(diameter, 2, 65, 18, 1.08f));
+    }
+
+    [Fact]
     public void HysteresisPreventsOscillationAndAllowsLargeZoomJumps()
     {
         Assert.Equal(0, ScreenSpaceLod.Select(85, 0));
