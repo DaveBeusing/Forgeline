@@ -54,6 +54,22 @@ for ($sample = 0; $sample -le $Samples; $sample++) {
             $event = $report.Events | Where-Object { $_.Phase -eq $phase -and $_.Kind -eq 'Milestone' } | Select-Object -First 1
             $phases[$phase] = if ($null -ne $event) { $event.ElapsedMilliseconds } else { $null }
         }
+        if (-not $BaselineExitHook) {
+            $nativeFrame = $phases['NativeBootstrapFirstFrame']
+            if ($null -eq $nativeFrame -or $null -eq $phases['GraphicsReady'] -or
+                $null -eq $phases['FirstPresentedFrame'] -or $nativeFrame -ge $phases['FirstPresentedFrame']) {
+                throw "Startup sample $sample did not paint native feedback before graphics presentation."
+            }
+            foreach ($event in $report.Events) {
+                if ($event.Kind -eq 'Started' -and $event.Phase -in @('Settings', 'BootRenderer', 'RuntimeAssets') -and
+                    $event.ElapsedMilliseconds -le $nativeFrame) {
+                    throw "Startup sample $sample began $($event.Phase) before native painting."
+                }
+            }
+        }
+        if ($IncludeStudioIntro -and $null -eq $phases['StudioSplashFirstFrame']) {
+            throw "Startup sample $sample did not present the requested studio video; inspect its bypass/failure evidence."
+        }
         $observations += [PSCustomObject]@{ sample = $sample; warmup = ($sample -eq 0);
             launchToWindowObservationMs = $windowObserved; launchToExitMs = $clock.Elapsed.TotalMilliseconds;
             phases = $phases; report = $reportPath }
