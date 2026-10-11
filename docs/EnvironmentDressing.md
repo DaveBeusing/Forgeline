@@ -77,8 +77,43 @@ environment qualification directories. The baseline used eight warmup frames,
 native production capture lane. These are short fixture measurements, excluding
 readback, not sustained game FPS or portable performance thresholds.
 
-Implementation validation and changed-image review are pending. Required gates,
-native 1000-instance stress, map/assets, headless behavior, 4K/ultrawide and
-hosted `build-test` must be reported separately before acceptance. Existing High
-shadow-edge repeatability and slow software-runner smoke limitations are not
-resolved by environment art changes.
+The integration base is `b25f003` (mechanical motion, PR #172); the source before
+the final qualification notes is `7c258cd`. The following evidence is retained
+locally, with native manifests recording their exact source/build identity:
+
+| Evidence | Scope and result |
+| --- | --- |
+| `environment-integrated-build-clean.log` | Release, zero warnings/errors; fixture-version-only rebuild follows before final captures. |
+| `environment-integrated-game-tests.log` | All 390 game tests pass, including the recorded schema-1 replay. |
+| `environment-replay-test.log` | Six world-presentation tests pass; extraction preserves the historical `848FAB...1549B` checkpoint and emits non-interactive rooted dressing. |
+| `environment-integrated-map.json` | 71 reachability, two alternate-navigation and two alternate-road checks pass. |
+| `environment-corrected` | Nine Medium 1080p native images at `623c83f`, eight identical readbacks each; corrected narrow-road dropout. |
+| `environment-large-displays` | 27 QHD/4K/ultrawide images and QHD camera poses at `1c40c6a`; preceding palette correction and mechanical integration, not final-head acceptance. |
+| `environment-terminal.json` | Earlier implementation completed at tick 42,922, winner 1, Command Core destroyed. |
+| `environment-windowed.json` | Earlier 1,000-instance smoke: 1600x900, 117 presented frames, 75 total measured draws, zero texture/material binding failures. |
+
+The earlier native captures retained 52,707,564 resident texture bytes. The
+windowed smoke measured 46.45 FPS, 19.75ms CPU render and 6.55ms GPU on the RTX PRO
+5000 Blackwell laptop. Concurrent CPU work and short measurement windows prevent
+speedup or sustained-frame-rate conclusions. The environment mesh payload adds
+31,558 bytes; textures are unchanged by this PR.
+
+The first full-suite attempt correctly exposed a replay regression from adding
+decorative ECS entities. The final implementation removes that allocation and
+roots legacy vegetation during extraction; neither stored checkpoints nor their
+verification were relaxed. That first run also had a native client handoff
+timeout and a D3D12 `0xC0000005` while native modules ran concurrently. Its asset
+test was stopped before the clean integration build; it is not a passing suite.
+
+The borderless 5120x2160 smoke rendered but remained unfocused. Completion requires
+an active FPS/TPS measurement window; the run never produced one and was stopped.
+No borderless, focus-recovery or physical-display acceptance is claimed. The
+debug layer was requested but unavailable on this machine. Existing High-profile
+shadow-edge repeatability and slow software-runner smoke limitations remain.
+
+Visual review found clearer conifer silhouettes and industrial groupings with
+open approaches. Repetitive natural ground and some broad material boundaries
+remain visible. Continuous motion/LOD transitions and final art acceptance remain
+human review items; repeatable screenshots are structural evidence, not approved
+goldens. The PR remains a draft until required hosted gates and these acceptance
+items are resolved.
