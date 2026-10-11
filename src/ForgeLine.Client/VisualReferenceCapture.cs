@@ -36,7 +36,7 @@ internal sealed record VisualReferenceCaptureRequest
         if (Scenes is null || Profiles is null || Displays is null || Zooms is null ||
             Scenes.Length is < 1 or > 6 || Profiles.Length is < 1 or > 3 || Displays.Length is < 1 or > 4 || Zooms.Length is < 1 or > 3 ||
             Scenes.Any(x => !Enum.IsDefined(x)) || Profiles.Any(x => !Enum.IsDefined(x)) || Zooms.Any(x => !Enum.IsDefined(x)) ||
-            Displays.Any(x => !RtsVisualReference.Displays.Contains(x)) ||
+            Displays.Any(x => !RtsVisualReference.Displays.Contains(x) && !(Software && x == new RtsReferenceDisplay(640, 360))) ||
             Scenes.Distinct().Count() != Scenes.Length || Profiles.Distinct().Count() != Profiles.Length ||
             Zooms.Distinct().Count() != Zooms.Length || Displays.Distinct().Count() != Displays.Length)
             throw new ArgumentException("Capture matrix contains an unsupported or duplicated entry.");

@@ -76,7 +76,7 @@ jobs:
       - name: Native WARP reference capture
         if: runner.os == 'Windows'
         shell: pwsh
-        run: ./build/Invoke-RtsReferenceQualification.ps1 -Capture -Software -Scenes BattlefieldCombat -Profiles Low -Zooms NormalGameplay -Displays 1920x1080 -Warmups 3 -Samples 8 -OutputRoot artifacts/visual-reference-warp
+        run: ./build/Invoke-RtsReferenceQualification.ps1 -Capture -Software -Scenes BattlefieldCombat -Profiles Low -Zooms NormalGameplay -Displays 640x360 -Warmups 3 -Samples 8 -OutputRoot artifacts/visual-reference-warp
 
       - name: Windows window mode and visual qualification smoke
         if: runner.os == 'Windows'

@@ -45,6 +45,8 @@ public sealed class VisualReferenceCaptureTests
     {
         var request = new VisualReferenceCaptureRequest { OutputRoot = "unused", RuntimeRoot = "unused", Commit = new('a', 40) };
         request.Validate();
+        Assert.Throws<ArgumentException>(() => (request with { Displays = [new(640, 360)] }).Validate());
+        (request with { Software = true, Displays = [new(640, 360)] }).Validate();
         Assert.Throws<ArgumentException>(() => (request with { Commit = "stale" }).Validate());
         Assert.Throws<ArgumentException>(() => (request with { Displays = [new(3840, 2130)] }).Validate());
         Assert.Throws<ArgumentException>(() => (request with { Scenes = [VisualReferenceSceneKind.BattlefieldCombat, VisualReferenceSceneKind.BattlefieldCombat] }).Validate());
