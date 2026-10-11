@@ -159,6 +159,20 @@ public static class BuildingPresentationCatalog
                 nameof(feature));
         }
 
+        if (feature.Building == BuildingIds.CommandCore)
+        {
+            string? representation = feature.State switch
+            {
+                BuildingPresentationState.ConstructionFoundation => "foundation",
+                BuildingPresentationState.ConstructionFrame => "structural_frame",
+                BuildingPresentationState.ConstructionShell => "partial_shell",
+                BuildingPresentationState.Destroyed => "destroyed",
+                _ => null
+            };
+            if (representation is not null)
+                return "building.directorate.command_core." + representation;
+        }
+
         return feature.State switch
         {
             BuildingPresentationState.ConstructionFoundation =>
@@ -176,8 +190,22 @@ public static class BuildingPresentationCatalog
     }
 
     public static string? ResolveStateAttachmentAssetId(
-        in BuildingFeaturePresentationMetadata feature) =>
-        feature.State switch
+        in BuildingFeaturePresentationMetadata feature)
+    {
+        if (feature.Building == BuildingIds.CommandCore)
+        {
+            string? attachment = feature.State switch
+            {
+                BuildingPresentationState.Unpowered => "unpowered",
+                BuildingPresentationState.Damaged => "damaged",
+                BuildingPresentationState.Critical => "critical",
+                _ => null
+            };
+            if (attachment is not null)
+                return "building.directorate.command_core." + attachment;
+        }
+
+        return feature.State switch
         {
             BuildingPresentationState.Idle =>
                 IdleStateAssetId,
@@ -190,6 +218,7 @@ public static class BuildingPresentationCatalog
             _ =>
                 null
         };
+    }
 
     public static string ResolveMaterialAssetId(
         in BuildingFeaturePresentationMetadata feature) =>
