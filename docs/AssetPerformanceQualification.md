@@ -439,3 +439,10 @@ fill admission and existing buffer ownership. Matched isolated measurements
 show mixed timing changes, with no general speedup claim. Native repetition,
 window smoke and outstanding visual gates are recorded in the
 [battlefield effect catalog](BattlefieldEffectCatalog.md#qualification-at-51219a4-01343).
+
+### Final image refinement
+
+The bounded composite uses RGB edge contrast and reduced blending for
+isolated details without new samples, asset IDs or residency. Hardware
+before/after methods, complete scene/display/DPI evidence and unresolved
+performance/visual gates are in [Final Image Quality](FinalImageQuality.md).
