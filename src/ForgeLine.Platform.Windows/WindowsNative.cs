@@ -109,6 +109,11 @@ internal static partial class WindowsNative
     internal const uint WaitFailed = 0xFFFFFFFF;
 
     internal const uint WmClose = 0x0010;
+    internal const uint WmPaint = 0x000F;
+    internal const uint WmEraseBackground = 0x0014;
+
+    [LibraryImport("user32.dll")]
+    internal static partial int InvalidateRect(nint window, nint rect, int erase);
     internal const uint WmDestroy = 0x0002;
     internal const uint WmDpiChanged = 0x02E0;
     internal const uint WmKeyDown = 0x0100;
