@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using ForgeLine.Graphics;
 using ForgeLine.Platform;
 using ForgeLine.Platform.Windows;
@@ -9,6 +10,21 @@ namespace ForgeLine.Client.Tests;
 
 public sealed class ClientStartupNativeTests
 {
+    [Fact]
+    public void EscapeCancelsNativeBootstrapAndPendingEventsAreDrained()
+    {
+        using var platform = new WindowsPlatform();
+        using IWindow window = platform.CreateBootstrapWindow(new WindowConfiguration("FORGELINE", 640, 360));
+        Assert.True(ClientBootstrap.PumpBootstrap(platform, window));
+        Assert.False(window.TryDequeueEvent(out _));
+        _ = SendMessage(window.NativeHandle.Value, 0x0100, 0x1B, 0);
+        Assert.False(ClientBootstrap.PumpBootstrap(platform, window));
+        Assert.False(window.IsOpen);
+    }
+
+    [DllImport("user32.dll", EntryPoint = "SendMessageW")]
+    private static extern nint SendMessage(nint window, uint message, nuint wParam, nint lParam);
+
     [Fact]
     public void BrandedFramePresentsWhileAssetWorkerIsBlockedAndMenuWaitsForHandoff()
     {

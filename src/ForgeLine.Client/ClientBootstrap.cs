@@ -59,7 +59,7 @@ internal static class ClientBootstrap
                 diagnostics.Finish(error);
                 if (window.IsOpen)
                     platform.UpdateBootstrap(window, "STARTUP FAILED\n" + error.Message +
-                        "\nClose this window to exit. Diagnostics: " + path, failed: true);
+                        "\nClose this window or press Escape to exit. Diagnostics: " + path, failed: true);
                 checkpoint.Flush();
                 string? report = ClientDiagnostics.WriteCrashReport(error);
                 Console.Error.WriteLine($"[startup:failed] {error}");
@@ -67,10 +67,10 @@ internal static class ClientBootstrap
                 if (window.IsOpen)
                 {
                     platform.UpdateBootstrap(window, "STARTUP FAILED\n" + error.Message +
-                        "\nClose this window to exit. Diagnostics: " + (report ?? path), failed: true);
+                        "\nClose this window or press Escape to exit. Diagnostics: " + (report ?? path), failed: true);
                     // Automation records the visible failure but does not wait for user input.
                     if (!smokeTest && !menuSmoke)
-                        while (window.IsOpen && platform.PumpEvents())
+                        while (PumpBootstrap(platform, window))
                             platform.WaitForEvents(TimeSpan.FromMilliseconds(16));
                 }
                 return error is OperationCanceledException ? 0 : 1;
@@ -93,7 +93,7 @@ internal static class ClientBootstrap
         {
             while (!settings.IsCompleted)
             {
-                if (!window.IsOpen || !platform.PumpEvents())
+                if (!PumpBootstrap(platform, window))
                 {
                     cancellation.Cancel();
                     return 0;
@@ -101,7 +101,7 @@ internal static class ClientBootstrap
                 platform.WaitForEvents(TimeSpan.FromMilliseconds(16));
             }
             ClientSettingsLoadResult loaded = settings.GetAwaiter().GetResult();
-            if (!window.IsOpen || !platform.PumpEvents()) return 0;
+            if (!PumpBootstrap(platform, window)) return 0;
             Console.WriteLine($"[settings:loaded] path=\"{loaded.Path}\" createdDefaults={loaded.CreatedDefaults} recoveredInvalid={loaded.RecoveredInvalidSettings}");
             if (!string.IsNullOrWhiteSpace(loaded.RecoveryMessage))
                 Console.WriteLine($"[settings:recovery] {loaded.RecoveryMessage}");
@@ -132,5 +132,20 @@ internal static class ClientBootstrap
         for (int i = 0; i < args.Length - 1; i++)
             if (string.Equals(args[i], option, StringComparison.OrdinalIgnoreCase)) return args[i + 1];
         return null;
+    }
+
+    internal static bool PumpBootstrap(WindowsPlatform platform, IWindow window)
+    {
+        if (!window.IsOpen || !platform.PumpEvents()) return false;
+        while (window.TryDequeueEvent(out _)) { }
+        while (window.TryDequeueInputEvent(out PlatformInputEvent input))
+        {
+            if (input.Kind == PlatformInputEventKind.KeyDown && input.Key == PlatformKey.Escape)
+            {
+                window.RequestClose();
+                return false;
+            }
+        }
+        return window.IsOpen;
     }
 }
