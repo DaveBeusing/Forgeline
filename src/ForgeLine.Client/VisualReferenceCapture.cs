@@ -25,7 +25,12 @@ internal sealed record VisualReferenceCaptureRequest
     public int Samples { get; init; } = 128;
     public int RepeatCaptures { get; init; } = 8;
     public bool ContinueAfterMismatch { get; init; }
-    public VisualReferenceSceneKind[] Scenes { get; init; } = Enum.GetValues<VisualReferenceSceneKind>();
+    public VisualReferenceSceneKind[] Scenes { get; init; } =
+    [
+        VisualReferenceSceneKind.DaylightTerrain, VisualReferenceSceneKind.IndustrialBase,
+        VisualReferenceSceneKind.FormationConvoy, VisualReferenceSceneKind.LogisticsCorridor,
+        VisualReferenceSceneKind.DamageDestruction, VisualReferenceSceneKind.BattlefieldCombat
+    ];
     public RenderQuality[] Profiles { get; init; } = Enum.GetValues<RenderQuality>();
     public RtsReferenceDisplay[] Displays { get; init; } = RtsVisualReference.Displays.ToArray();
     public RtsReferenceZoom[] Zooms { get; init; } = Enum.GetValues<RtsReferenceZoom>();
