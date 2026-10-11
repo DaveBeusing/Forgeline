@@ -1082,7 +1082,7 @@ internal sealed class ClientApplication
                         _settings.UiScale,
                         preAlphaUx,
                         frontendSurface,
-                        MetricsActive: window.IsFocused && !window.IsMinimized));
+                        MetricsActive: (smokeTest || window.IsFocused) && !window.IsMinimized));
 
                 if (shouldPauseForWindow)
                 {
@@ -1613,7 +1613,7 @@ internal sealed class ClientApplication
                         window.IsMinimized,
                     CombatGroups:
                         combatGroupOverview,
-                    MetricsActive: window.IsFocused && !window.IsMinimized,
+                    MetricsActive: (smokeTest || window.IsFocused) && !window.IsMinimized,
                     HoverTooltip: tooltipView,
                     Operations: operationsController.View));
 
