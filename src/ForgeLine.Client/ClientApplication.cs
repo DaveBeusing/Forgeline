@@ -14,6 +14,7 @@ using ForgeLine.Jobs;
 using ForgeLine.Logistics;
 using ForgeLine.Navigation;
 using ForgeLine.Platform;
+using ForgeLine.Platform.Windows;
 using ForgeLine.Presentation;
 using ForgeLine.Simulation;
 using ForgeLine.World;
@@ -83,15 +84,18 @@ internal sealed class ClientApplication
         int renderInstanceCount,
         string? visualQualificationOutput = null,
         bool skipSplash = false,
-        bool applicationRestart = false)
+        bool applicationRestart = false,
+        IWindow? bootstrapWindow = null,
+        bool menuSmoke = false)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(renderInstanceCount);
 
         WindowConfiguration configuration =
             _settings.CreateWindowConfiguration();
 
-        using IWindow window = _startup.Measure(StartupPhase.Window,
-            () => _platform.CreateWindow(configuration));
+        using IWindow? ownedWindow = bootstrapWindow is null ? _startup.Measure(StartupPhase.Window,
+            () => _platform.CreateWindow(configuration)) : null;
+        IWindow window = bootstrapWindow ?? ownedWindow!;
         _startup.Mark(StartupPhase.WindowVisible);
         ClientWindowQualificationSnapshot qualificationWindow =
             CaptureWindowQualification(
@@ -115,8 +119,8 @@ internal sealed class ClientApplication
             smokeTest, skipSplash, _settings.ShowStudioSplash, applicationRestart);
         bool showSplash = splashBypassReason is null;
         _startup.Begin(StartupPhase.BootRenderer);
-        using (var bootRenderer = new ClientFrontendRenderHost(bootstrapTarget, _startup,
-            ClientStartupLoop.InitialSurface(showSplash), asynchronousStartup: true))
+        using var bootRenderer = new ClientFrontendRenderHost(bootstrapTarget, _startup,
+            ClientStartupLoop.InitialSurface(showSplash), asynchronousStartup: true);
         {
             string startupSaveDirectory = ResolveSaveDirectory();
             using var coordinator = new ClientStartupCoordinator<RuntimeAssetCatalog, IReadOnlyList<LoadGameEntry>>(
@@ -141,6 +145,8 @@ internal sealed class ClientApplication
                     DrainWindowEvents(window);
                     DrainInputEvents(window, startupInput);
                     bootRenderer.ThrowIfFaulted();
+                    if (bootRenderer.HasPresentedFrame && _platform is WindowsPlatform windows)
+                        windows.CompleteBootstrap(window);
                     return window.IsOpen;
                 },
                 readInput: () => new SplashInputState(
@@ -165,6 +171,7 @@ internal sealed class ClientApplication
             frontendLoading.Complete("Command interface ready");
         }
 
+        bool bootRendererAvailable = true;
         string sessionFeedback = string.Empty;
         while (window.IsOpen)
         {
@@ -174,11 +181,13 @@ internal sealed class ClientApplication
             else
             {
                 FrontendSessionSelectionResult selection = RunFrontendSessionSelection(window,
-                    new GameFrontendShell(), newGame, startupSaves, sessionFeedback);
+                    new GameFrontendShell(), newGame, startupSaves, sessionFeedback, menuSmoke, bootRendererAvailable ? bootRenderer : null);
                 if (selection.RestartRequested) return RestartRequestedExitCode;
                 if (selection.Session is not ClientSessionRequest selected) return 0;
                 sessionRequest = selected;
             }
+            bootRenderer.Dispose();
+            bootRendererAvailable = false;
             try
             {
                 int result = RunMatchSession(window, runtimeAssets, sessionRequest, smokeTest,
@@ -239,6 +248,8 @@ internal sealed class ClientApplication
                 last = progress;
                 report(progress);
             }
+            ValidateGameplayAssets(runtimeAssets, token);
+            _startup.Mark(StartupPhase.GameplayAssetsReady, sessionId);
             ClientLoadedSession result = _startup.Measure(StartupPhase.SessionReconstruction,
                 () => ClientSessionFactory.CreateOwned(sessionRequest, Track, token), sessionId);
             try
@@ -2798,7 +2809,6 @@ internal sealed class ClientApplication
 
     private static RuntimeAssetCatalog LoadRuntimeAssets(CancellationToken cancellationToken)
     {
-        RuntimeAssetDevelopmentBootstrap.EnsureAvailable(cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
 
         RuntimeAssetPathResolution resolution =
@@ -2820,6 +2830,14 @@ internal sealed class ClientApplication
             RuntimeAssetCatalog.LoadCancellable(
                 runtimeRoot, cancellationToken);
 
+        Console.WriteLine(
+            $"[assets:runtime] manifest=loaded assets={catalog.AssetIds.Count} root=\"{runtimeRoot}\" manifest=validated gameplay=deferred");
+        cancellationToken.ThrowIfCancellationRequested();
+        return catalog;
+    }
+
+    private static void ValidateGameplayAssets(RuntimeAssetCatalog catalog, CancellationToken cancellationToken)
+    {
         cancellationToken.ThrowIfCancellationRequested();
         ValidateProductionRuntimeAsset(
             catalog,
@@ -2846,10 +2864,6 @@ internal sealed class ClientApplication
             "texture.directorate.material.painted_metal_base",
             RuntimeAssetType.Texture);
 
-        Console.WriteLine(
-            $"[assets:runtime] manifest=loaded assets={catalog.AssetIds.Count} root=\"{runtimeRoot}\" production=validated");
-        cancellationToken.ThrowIfCancellationRequested();
-        return catalog;
     }
 
     private static void ValidateProductionRuntimeAsset(
@@ -2980,7 +2994,7 @@ internal sealed class ClientApplication
         GameFrontendShell shell,
         NewGameModel newGame,
         IReadOnlyList<LoadGameEntry> startupSaves,
-        string initialFeedback = "")
+        string initialFeedback = "", bool menuSmoke = false, ClientFrontendRenderHost? initialRenderer = null)
     {
         _startup.Begin(StartupPhase.Frontend);
         shell.Dispatch(
@@ -3023,8 +3037,9 @@ internal sealed class ClientApplication
                 window.ClientSize.Height,
                 window.IsMinimized ||
                 window.ClientSize.IsEmpty);
-        using var renderer =
-            new ClientFrontendRenderHost(target, _startup);
+        using ClientFrontendRenderHost? ownedRenderer = initialRenderer is null
+            ? new ClientFrontendRenderHost(target, _startup, asynchronousStartup: true) : null;
+        ClientFrontendRenderHost renderer = initialRenderer ?? ownedRenderer!;
         _startup.End(StartupPhase.Frontend);
         _startup.Mark(StartupPhase.FrontendReady);
 
@@ -3039,6 +3054,8 @@ internal sealed class ClientApplication
             DrainWindowEvents(window);
             DrainInputEvents(window, input);
             _startup.MenuInteractive();
+            if (menuSmoke && _startup.ApplicationReadiness == StartupReadiness.Ready)
+                return FrontendSessionSelectionResult.Exit();
 
             bool enter =
                 ConsumeKeyPress(

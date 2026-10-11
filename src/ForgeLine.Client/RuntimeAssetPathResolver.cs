@@ -98,6 +98,14 @@ internal static class RuntimeAssetPathResolver
             overrideRoot,
             currentDirectory);
 
+        // An explicit installation is authoritative, including a broken one.
+        if (!string.IsNullOrWhiteSpace(overrideRoot)) return roots.ToArray();
+        if (File.Exists(Path.Combine(applicationBaseDirectory, "build-provenance.json")))
+        {
+            Add(Path.Combine(applicationBaseDirectory, "assets", "runtime"), currentDirectory);
+            return roots.ToArray();
+        }
+
         string? applicationRepositoryRoot =
             FindRepositoryRoot(
                 applicationBaseDirectory);

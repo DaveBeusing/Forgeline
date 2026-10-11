@@ -13,8 +13,10 @@ public sealed class ClientStartupNativeTests
     public void BrandedFramePresentsWhileAssetWorkerIsBlockedAndMenuWaitsForHandoff()
     {
         using var platform = new WindowsPlatform();
-        using IWindow window = platform.CreateWindow(new WindowConfiguration(
+        using IWindow window = platform.CreateBootstrapWindow(new WindowConfiguration(
             "FORGELINE Startup Presentation Test", 640, 360));
+        Assert.True(platform.BootstrapPainted(window));
+        nint bootstrapHandle = window.NativeHandle.Value;
         using var release = new ManualResetEventSlim();
         var diagnostics = new StartupDiagnostics(Stopwatch.GetTimestamp(), Guid.NewGuid(), 1);
         diagnostics.Begin(StartupPhase.BootRenderer);
@@ -39,6 +41,8 @@ public sealed class ClientStartupNativeTests
                 bool open = platform.PumpEvents() && window.IsOpen;
                 if (renderer.HasPresentedFrame && !release.IsSet && ++presentedPumps == 10)
                 {
+                    platform.CompleteBootstrap(window);
+                    Assert.Equal(bootstrapHandle, window.NativeHandle.Value);
                     Assert.False(coordinator.DependenciesReady);
                     Assert.True(diagnostics.Has(StartupPhase.SplashBootstrapFirstFrame));
                     release.Set();
