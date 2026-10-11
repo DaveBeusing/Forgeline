@@ -27,6 +27,11 @@ This can cause an initial size transition for non-default settings, but creates
 no second window or additional taskbar entry. DPI and monitor changes continue
 through the existing window lifecycle.
 
+The packaged apphost uses the Windows GUI subsystem, avoiding a separate console
+window on ordinary desktop launch. Redirected diagnostic output and exit codes
+remain available to qualification scripts; player failures have a native surface
+and persistent reports. Escape closes the early bootstrap or error surface.
+
 Two existing bounded workers then prepare the validated runtime manifest and
 save entries. Gameplay payload checks are deferred to the cancellable session
 construction worker, before constructing a simulation. Menu readiness does not
