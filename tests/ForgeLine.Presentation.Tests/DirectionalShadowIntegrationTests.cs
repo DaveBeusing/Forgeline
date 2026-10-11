@@ -102,7 +102,7 @@ public sealed class DirectionalShadowIntegrationTests
         var diagnostics = graphics.Diagnostics.DirectionalShadows!.Value;
         Assert.True(diagnostics.DrawCalls > 0);
         Assert.InRange(diagnostics.SubmittedCasters, 1, 1024);
-        Assert.Equal(24L * 1024 * 1024, diagnostics.TexturePayloadBytes);
+        Assert.Equal(12L * 1024 * 1024, diagnostics.TexturePayloadBytes);
         Assert.Equal(3, diagnostics.ShaderResourceDescriptors);
         if (graphics.Diagnostics.GpuTimingAvailable) Assert.NotNull(diagnostics.GpuMilliseconds);
         ulong submitted = graphics.Diagnostics.Surface.SubmittedFrameCount;

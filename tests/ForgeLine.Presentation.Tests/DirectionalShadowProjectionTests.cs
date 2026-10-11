@@ -19,7 +19,7 @@ public sealed class DirectionalShadowProjectionTests
         Assert.Equal(resolution, settings.Resolution);
         Assert.Equal(radius, frame.Radius);
         Assert.Equal(1, settings.CascadeCount);
-        Assert.Equal((long)resolution * resolution * 24, settings.PayloadBytes(3));
+        Assert.Equal((long)resolution * resolution * 12, settings.PayloadBytes(3));
         Vector3 center = Vector3.Transform(frame.Center, frame.ViewProjection);
         Assert.InRange(MathF.Abs(center.X), 0, 0.00001f);
         Assert.InRange(MathF.Abs(center.Y), 0, 0.00001f);
