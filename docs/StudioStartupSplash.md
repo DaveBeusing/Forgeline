@@ -4,7 +4,7 @@
 
 The reusable startup splash domain lives in `ForgeLine.Presentation`. It is not part of simulation time, world state, ECS, or gameplay snapshots. The studio presentation is defined by `UndefinedBehaviorStudioSplash.Create()`.
 
-The Windows client creates a black window with a dark caption and presents a black surface while the packaged video decoder initializes. No legacy glyph, texture splash or wordmark is drawn before the animation. The render owner initializes asynchronously while the platform owner continues pumping events. Runtime catalog discovery, development compilation and validation run concurrently with independent save-catalog discovery. A missing or invalid required runtime manifest remains a startup error.
+The Windows client first paints an assembly-owned FORGELINE wordmark and phase label using native GDI. It retains the same window while settings and graphics initialize. The render owner initializes asynchronously; D3D12 draws a loading label while the packaged video decoder prepares its first frame. Runtime manifest validation and save discovery run on independent workers. Source compilation is an explicit build action. Missing or invalid manifests remain visible startup errors. The first menu reuses the bootstrap renderer and swap chain.
 
 ## Branding and timing
 

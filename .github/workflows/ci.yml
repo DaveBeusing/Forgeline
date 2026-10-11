@@ -131,6 +131,11 @@ jobs:
             throw "Fresh-install smoke did not create validated user settings."
           }
 
+      - name: Packaged startup menu lifecycle
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./build/Invoke-StartupQualification.ps1 -ClientPath artifacts/prealpha/win-x64/publish/ForgeLine.Client.exe -Samples 2
+
       - name: Two-opponent full-match validation
         run: dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario central-divide --profile validation --ticks 80000 --seed 2026 --matches 1 --require-terminal --diagnostics-output artifacts/opponent-full-match.json --telemetry-output artifacts/opponent-balance-telemetry.json
 
@@ -153,4 +158,5 @@ jobs:
             artifacts/maps/*.json
             artifacts/visual-reference-warp/**
             artifacts/rendering-benchmarks/**
+            artifacts/startup-qualification/**
           if-no-files-found: warn
