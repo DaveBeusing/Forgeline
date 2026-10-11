@@ -101,8 +101,8 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
         {
             UnitId[] units = [UnitIds.MainBattleTank, UnitIds.ScoutVehicle, UnitIds.CargoTruck, UnitIds.SupplyTruck];
             for (int i = 0; i < units.Length; i++)
-                Unit(units[i], new((i - 1.5f) * 9, 0, 8));
-            EntityId factory = Add(new(0, 0, -12), new(16, 10, 16));
+                Unit(units[i], new((i - 1.5f) * 9, .75f, 8));
+            EntityId factory = Add(new(0, 3.9f, -12), new(16, 10, 16));
             simulation.Entities.AddComponent(factory, new CompletedBuilding(BuildingIds.VehicleFactory, new(1), SimulationTick.Zero));
         }        EntityId hidden = default;
         if (kind == VisualReferenceSceneKind.BattlefieldCombat)
