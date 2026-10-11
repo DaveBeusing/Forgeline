@@ -52,10 +52,20 @@ public sealed class DirectorateSurfaceConsistencyTests
             foreach (string id in ids)
             {
                 var record = catalog.Get(AssetId.Parse(id));
+                if (id == "unit.directorate.scout_vehicle")
+                {
+                    var sensor = Assert.Single(record.MechanicalParts, x => x.Name == "sensor");
+                    var glass = Assert.Single(record.MechanicalParts, x => x.Name == "fidelity_1");
+                    Assert.Equal(sensor.Motion, glass.Motion);
+                    Assert.Equal(sensor.Socket, glass.Socket);
+                    Assert.Equal(sensor.Rate, glass.Rate);
+                }
                 foreach (string meshId in new[] { id }.Concat(record.Lods.Select(x => x.AssetId)))
                 {
                     var mesh = RuntimeMeshData.FromPayload(catalog.Read(AssetId.Parse(meshId)).Payload);
                     Assert.True(mesh.HasTangents);
+                    var meshRecord = catalog.Get(AssetId.Parse(meshId));
+                    MechanicalMeshValidation.Validate(meshRecord.MechanicalParts, meshRecord.Sockets, mesh.Indices.Count);
                     Assert.All(mesh.Vertices, vertex =>
                     {
                         var n = new Vector3(vertex.NormalX, vertex.NormalY, vertex.NormalZ);
