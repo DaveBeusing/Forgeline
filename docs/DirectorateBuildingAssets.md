@@ -124,7 +124,7 @@ building.directorate.module.collision_box
 
 That asset is a tooling/runtime visual contract only. Gameplay placement, occupancy, navigation, combat hitboxes, and construction validation continue to use existing simulation-owned footprint/spatial contracts and never change with render LOD.
 
-Presentation picking and culling use the authored visual transform and orientation rather than changing the simulation footprint. Building selection outlines are drawn on the visual ground plane and rotate with the building, preventing the outline from cutting through the building mass or becoming axis-misaligned after orientation changes.
+Presentation picking and culling use the authored visual transform and orientation rather than changing the simulation footprint. The current production selection marker follows sampled terrain around the building bounds as a circle; it does not trace a rotated rectangular foundation. The Command Core review fixture uses this same marker.
 
 ## Strategic symbols
 
