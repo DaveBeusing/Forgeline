@@ -22,8 +22,11 @@ New placements reserve the complete rotated horizontal bounding circle plus
 12m around construction rectangles, 24m around resource envelopes, 32m around
 crossings and 28m around road centerlines. The conservative rule can omit an
 authored candidate; it never moves gameplay data. Existing placements keep their
-stable keys. Decorations retain only transform and visual components; they are
-not selection targets, collision obstacles, concealment or buildability inputs.
+stable keys. The 444 additions carry `PresentationOnly` in the map artifact and
+are cached as render instances when the presentation extractor is constructed.
+They do not allocate ECS entities or shift gameplay IDs. The original 27 ECS
+decorations and their transforms remain replay-stable. Additions are not
+selection targets, collision obstacles, concealment or buildability inputs.
 Static public scenery uses the existing extraction/visibility policy. No new
 world fog mask or hidden-enemy information is introduced.
 
@@ -54,10 +57,11 @@ scrub uses two crowns and grass uses intersecting double-sided blades. High and
 reduced meshes retain Y=0..1 and a bounded horizontal envelope. Triangle counts
 are conifer 80/48, scrub 40/24 and grass 12/6. No third-party material is added.
 
-The production loader and reference fixtures now put rooted vegetation at ground
-height. Centered props retain half-height placement and decals retain their small
-ground offset. The fixture version advances to 2 so changed image content cannot
-be mistaken for an identical acceptance fixture.
+Production extraction and reference fixtures put rooted vegetation at ground
+height without mutating legacy simulation transforms. Centered props retain
+half-height placement and decals retain their small ground offset. The fixture
+version advances to 3 after integration with mechanical-motion fixture version 2
+so changed content cannot be mistaken for an identical acceptance fixture.
 
 Existing projected-size LOD, hysteresis, instancing, conservative vegetation
 culling and visual-time motion remain authoritative. There is no new CPU update
