@@ -96,21 +96,23 @@ internal static class VisualReferenceCapture
                 graphics.ConfigureAtmosphere(GraphicsAtmosphereSettings.Default with { Quality = profile.Atmosphere });
                 graphics.ConfigureDirectionalShadows(profile.Shadows);
                 graphics.ConfigurePostProcessing(profile.PostProcessing);
-                using var ground = new TerrainRenderer(graphics, terrain, runtimeAssets: catalog, surfaceDetail: profile.TerrainDetail) { DebugChunksEnabled = false };
-                using var meshes = new SimpleInstanceRenderer(graphics, catalog, lodDiameterScale: profile.LodDiameterScale);
-                using var particles = new ParticleVfxRenderer(graphics, catalog, profile.Particles);
-                using var hud = new GameplayHudRenderer(graphics, catalog);
-                using var selection = new DebugDrawRenderer(graphics, depthEnabled: false, lineWidthPixels: 3);
                 foreach (var fixture in fixtures)
                 foreach (var zoom in request.Zooms)
                 {
+                    using var ground = new TerrainRenderer(graphics, terrain, runtimeAssets: catalog, surfaceDetail: profile.TerrainDetail) { DebugChunksEnabled = false };
+                    using var meshes = new SimpleInstanceRenderer(graphics, catalog, lodDiameterScale: profile.LodDiameterScale);
+                    using var particles = new ParticleVfxRenderer(graphics, catalog, profile.Particles);
+                    using var hud = new GameplayHudRenderer(graphics, catalog);
+                    using var selection = new DebugDrawRenderer(graphics, depthEnabled: false, lineWidthPixels: 3);
                     if (!platform.PumpEvents()) throw new OperationCanceledException("Reference window was closed.");
                     string key = $"{fixture.Kind}-{display.Width}x{display.Height}-{quality}-{zoom}";
                     Console.WriteLine($"[reference:capture] {key}");
                     var camera = new RtsCamera(RtsVisualReference.CreateCameraSettings(fixture.Target, zoom));
                     var buffer = new PresentationSnapshotBuffer(); buffer.Publish(fixture.Snapshot);
                     var world = new RenderWorld(); world.Update(buffer);
-                    particles.Prepare(world, camera, display.Width, display.Height, .2);
+                    particles.Prepare(world, camera, display.Width, display.Height, 0);
+                    particles.Prepare(world, camera, display.Width, display.Height, .1);
+                    particles.Prepare(world, camera, display.Width, display.Height, .1);
                     var selected = fixture.Snapshot.Instances.ToArray().Where(x => x.Selectable.IsSelectable).Take(3).Select(x => x.Entity).ToArray();
                     var indicators = new DebugDraw { Enabled = true };
                     foreach (var instance in fixture.Snapshot.Instances.ToArray().Where(x => selected.Contains(x.Entity)))

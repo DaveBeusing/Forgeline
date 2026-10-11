@@ -27,6 +27,8 @@ Compare checks manifest completion, unique keys, actual dimensions, RGBA PNG hea
 
 On unequal fixed pixels, both native PNGs and per-frame upload fingerprints are retained. Optional native shadow-depth investigation has a separate API flag; the normal reference matrix performs no shadow-depth readback and records null shadow fingerprints. The complete matrix checks eight successive readbacks across the existing frame resources, without a pixel tolerance. Shadow receiver derivatives are evaluated before varying coverage branches, and High LOD scaling preserves the near-camera sentinel without overflow.
 
+Each scene/zoom/display/profile case constructs fresh production renderers before warmup. This prevents LOD hysteresis and emitter history from depending on matrix order. Particles are first prepared at zero elapsed time, then advanced through two bounded0.1s preparation steps and held paused; authored new bursts therefore have0.2s visual age. Persistent effects retain their fixed-tick source age in addition. Construction, asset upload and these preparation steps precede the timed sample window.
+
 ## Review rubric
 
 Record pass/fail/pending per scene/profile/zoom/display, with image filename, region and observed defect. Inspect full-resolution frames and relevant1:1 crops; contact sheets are navigation aids.
