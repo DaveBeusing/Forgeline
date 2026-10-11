@@ -8,6 +8,34 @@ namespace ForgeLine.Client.Tests;
 public sealed class ClientSettingsFrontendAdapterTests
 {
     [Fact]
+    public void QualityControlPersistsWithoutResettingGradeOrCameraAndRemainsVisible()
+    {
+        string root = CreateTemporaryRoot();
+        try
+        {
+            var store = new ClientSettingsStore(root);
+            store.Save(new ClientUserSettings {
+                RenderQuality = new() { Quality=ForgeLine.Presentation.RenderQuality.High,
+                    ColorGrade=new() { WhiteBalance=.04f } }, CameraPanSpeedMultiplier=1.3f });
+            var adapter = new ClientSettingsFrontendAdapter(store);
+            var model = adapter.Load();
+            Assert.Equal(FrontendRenderQuality.High,model.Settings.RenderQuality);
+            var interaction = new SettingsInteractionModel();
+            interaction.Focus(FrontendSettingsField.RenderQuality);
+            interaction.Adjust(model,1);
+            Assert.Equal(FrontendRenderQuality.Low,model.Settings.RenderQuality);
+            Assert.Equal(2,interaction.VisibleStart);
+            Assert.Contains(FrontendPresentationAdapter.Settings(model,interaction).DetailLines!,line=>line.Label=="GRAPHICS QUALITY");
+            adapter.Apply(model);
+            var saved=store.Load().Settings;
+            Assert.Equal(ForgeLine.Presentation.RenderQuality.Low,saved.RenderQuality.Quality);
+            Assert.Equal(.04f,saved.RenderQuality.ColorGrade.WhiteBalance);
+            Assert.Equal(1.3f,saved.CameraPanSpeedMultiplier);
+        }
+        finally { Directory.Delete(root,true); }
+    }
+
+    [Fact]
     public void LoadUsesExistingSettingsStore()
     {
         string root = CreateTemporaryRoot();

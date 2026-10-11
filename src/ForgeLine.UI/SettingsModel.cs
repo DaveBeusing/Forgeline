@@ -3,6 +3,8 @@ using ForgeLine.Platform;
 
 namespace ForgeLine.UI;
 
+public enum FrontendRenderQuality { Low, Medium, High }
+
 public readonly record struct FrontendSettingsSnapshot(
     int WindowWidth,
     int WindowHeight,
@@ -11,7 +13,8 @@ public readonly record struct FrontendSettingsSnapshot(
     bool ShowOnboarding,
     bool EdgeScrollEnabled,
     float CameraPanSpeedMultiplier,
-    RtsCameraBindings CameraBindings, GameplayBindings? GameplayBindings = null);
+    RtsCameraBindings CameraBindings, GameplayBindings? GameplayBindings = null,
+    FrontendRenderQuality RenderQuality = FrontendRenderQuality.Medium);
 
 public sealed class SettingsModel
 {
@@ -38,6 +41,12 @@ public sealed class SettingsModel
             BorderlessFullscreen = borderlessFullscreen,
             UiScale = uiScale
         };
+    }
+
+    public void SetRenderQuality(FrontendRenderQuality quality)
+    {
+        if (!Enum.IsDefined(quality)) throw new ArgumentOutOfRangeException(nameof(quality));
+        Settings = Settings with { RenderQuality = quality };
     }
 
     public void SetCamera(

@@ -193,7 +193,9 @@ internal static class FrontendPresentationAdapter
                     IsFocused: focused == FrontendSettingsField.BindingAction, CanDecrease: true, CanIncrease: true),
                 new FrontendDetailLineView("GAMEPLAY KEY", interaction?.BindingCandidate is { } candidate ?
                     GameplayBindingRegistry.KeyLabel(candidate) : registry.Prompt(action),
-                    IsFocused: focused == FrontendSettingsField.BindingKey, CanDecrease: true, CanIncrease: true)
+                    IsFocused: focused == FrontendSettingsField.BindingKey, CanDecrease: true, CanIncrease: true),
+                new FrontendDetailLineView("GRAPHICS QUALITY", settings.RenderQuality.ToString().ToUpperInvariant(),
+                    IsFocused: focused == FrontendSettingsField.RenderQuality, CanDecrease: true, CanIncrease: true)
             }.Skip(interaction?.VisibleStart ?? 0).Take(7).ToArray(),
             string.IsNullOrEmpty(interaction?.BindingFeedback) ? "UP/DOWN  SELECT     LEFT/RIGHT  CHANGE     ENTER  APPLY     ESC  BACK" : interaction.BindingFeedback,
             interaction?.CanApply == false ? string.Empty : "APPLY");

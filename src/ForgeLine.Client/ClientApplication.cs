@@ -459,7 +459,7 @@ internal sealed class ClientApplication
                 _settings.CreateSceneLightingSettings(),
                 _startup, asynchronousStartup: true, expectedSession: simulationHost.SessionId,
                 transitionHost: sessionTransitionRenderer, simulationTelemetry: simulationHost.CaptureTelemetry,
-                sceneAtmosphere: _settings.SceneAtmosphere, particles: _settings.Particles);
+                sceneAtmosphere: _settings.SceneAtmosphere, particles: _settings.Particles, renderQuality: _settings.RenderQuality);
         bool playable = ClientSessionLoadingLoop.WaitForPresentation(
             pumpEvents: () =>
             {

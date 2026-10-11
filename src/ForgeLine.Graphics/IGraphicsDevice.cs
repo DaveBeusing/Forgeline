@@ -2,6 +2,7 @@ namespace ForgeLine.Graphics;
 
 public interface IGraphicsDevice : IDisposable
 {
+    ulong? AvailableMemoryBudgetBytes => null;
     bool SupportsPostProcessing => false;
     GraphicsPostProcessingSettings PostProcessing => GraphicsPostProcessingSettings.Neutral;
     void ConfigurePostProcessing(GraphicsPostProcessingSettings settings)

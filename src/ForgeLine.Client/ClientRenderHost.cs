@@ -49,6 +49,8 @@ internal readonly record struct ClientVisualQualificationSnapshot(
     public GraphicsAtmosphereDiagnostics? Atmosphere { get; init; }
     public ParticleVfxDiagnostics Particles { get; init; }
     public GraphicsParticleDiagnostics? ParticleGpu { get; init; }
+    public RenderQualityProfile QualityProfile { get; init; }
+    public GraphicsPostProcessingDiagnostics? PostProcessing { get; init; }
     public int Lod1Instances { get; init; }
     public int Lod2Instances { get; init; }
     public int AnimatedVegetationInstances { get; init; }
@@ -150,6 +152,7 @@ internal sealed class ClientRenderHost : IDisposable
     private readonly SceneLightingSettings _sceneLighting;
     private readonly SceneAtmosphereSettings _sceneAtmosphere = SceneAtmosphereSettings.Default;
     private readonly ParticleSettings _particleSettings = ParticleSettings.Default;
+    private readonly RenderQualitySettings _renderQuality = new();
     private readonly Action<ClientRenderFrame>? _testRenderAction;
     private readonly AutoResetEvent _signal = new(false);
     private readonly ManualResetEventSlim _started = new(false);
@@ -178,7 +181,8 @@ internal sealed class ClientRenderHost : IDisposable
         ClientFrontendRenderHost? transitionHost = null,
         Func<ClientSimulationTelemetry>? simulationTelemetry = null,
         SceneAtmosphereSettings? sceneAtmosphere = null,
-        ParticleSettings? particles = null)
+        ParticleSettings? particles = null,
+        RenderQualitySettings? renderQuality = null)
     {
         _startup = startup ?? StartupDiagnostics.Disabled;
         _asynchronousStartup = asynchronousStartup;
@@ -208,6 +212,8 @@ internal sealed class ClientRenderHost : IDisposable
         _sceneAtmosphere.Validate();
         _particleSettings = particles ?? ParticleSettings.Default;
         _particleSettings.Validate();
+        _renderQuality = renderQuality ?? new();
+        _renderQuality.Validate();
 
         _thread = transitionHost?.ExecutionThread ?? CreateThread();
         if (transitionHost is not null) transitionHost.ContinueWith(device => RenderLoop(device));
@@ -412,7 +418,22 @@ internal sealed class ClientRenderHost : IDisposable
             using IGraphicsDevice? ownedGraphics = existingDevice is null
                 ? GraphicsDeviceFactory.CreateForWindowTarget(initialTarget) : null;
             IGraphicsDevice graphics = existingDevice ?? ownedGraphics!;
-            GraphicsAtmosphereSettings atmosphere = _sceneAtmosphere.Graphics;
+            var qualitySettings = _renderQuality;
+            string? qualityOverride = Environment.GetEnvironmentVariable("FORGELINE_RENDER_QUALITY");
+            if (!string.IsNullOrEmpty(qualityOverride))
+            {
+                if (!Enum.TryParse(qualityOverride, true, out RenderQuality quality) || !Enum.IsDefined(quality))
+                    throw new ArgumentException("FORGELINE_RENDER_QUALITY must be Low, Medium or High.");
+                qualitySettings = qualitySettings with { Quality = quality };
+            }
+            RenderQualityProfile qualityProfile = qualitySettings.Resolve(graphics.SupportsPostProcessing,
+                graphics.Diagnostics.Device.IsSoftwareAdapter, Math.Max(1, initialTarget.Width), Math.Max(1, initialTarget.Height),
+                graphics.Diagnostics.Surface.BufferCount, graphics.AvailableMemoryBudgetBytes);
+            GraphicsAtmosphereSettings atmosphere = _sceneAtmosphere.Graphics with
+            {
+                Quality = _sceneAtmosphere.Quality != AtmosphereQuality.Disabled && qualityProfile.LinearScene ?
+                    _sceneAtmosphere.Quality : qualityProfile.Atmosphere
+            };
             string? atmosphereProfile = Environment.GetEnvironmentVariable("FORGELINE_ATMOSPHERE_QUALITY");
             if (!string.IsNullOrEmpty(atmosphereProfile))
             {
@@ -422,13 +443,14 @@ internal sealed class ClientRenderHost : IDisposable
             }
             atmosphere.Validate();
             graphics.ConfigureSceneOutput(new GraphicsSceneOutputSettings(
-                atmosphere.Enabled || Environment.GetEnvironmentVariable("FORGELINE_LINEAR_SCENE_OUTPUT") == "1",
+                qualityProfile.LinearScene || atmosphere.Enabled || Environment.GetEnvironmentVariable("FORGELINE_LINEAR_SCENE_OUTPUT") == "1",
                 _sceneLighting.Exposure, _sceneLighting.ToneMapping == SceneToneMappingMode.AcesFitted));
             graphics.ConfigureAtmosphere(atmosphere);
+            graphics.ConfigurePostProcessing(qualityProfile.LinearScene ? qualityProfile.PostProcessing : GraphicsPostProcessingSettings.Neutral);
             string? shadowProfile = Environment.GetEnvironmentVariable("FORGELINE_SHADOW_QUALITY");
             if (!string.IsNullOrEmpty(shadowProfile) && !Enum.TryParse(shadowProfile, true, out DirectionalShadowQuality _))
                 throw new ArgumentException("FORGELINE_SHADOW_QUALITY must be Disabled, Low, Medium or High.");
-            var shadowSettings = new GraphicsDirectionalShadowSettings(string.IsNullOrEmpty(shadowProfile) ? DirectionalShadowQuality.Disabled :
+            var shadowSettings = new GraphicsDirectionalShadowSettings(string.IsNullOrEmpty(shadowProfile) ? qualityProfile.Shadows.Quality :
                 Enum.Parse<DirectionalShadowQuality>(shadowProfile, true));
             graphics.ConfigureDirectionalShadows(shadowSettings);
             if (existingDevice is not null)
@@ -442,20 +464,21 @@ internal sealed class ClientRenderHost : IDisposable
                     graphics,
                     terrain,
                     runtimeAssets: _runtimeAssets,
-                    lighting: _sceneLighting);
+                    lighting: _sceneLighting, surfaceDetail: qualityProfile.TerrainDetail);
             using var instanceRenderer =
                 new SimpleInstanceRenderer(
                     graphics,
                     _runtimeAssets,
-                    _sceneLighting);
+                    _sceneLighting, lodDiameterScale: qualityProfile.LodDiameterScale);
             string? particleProfile = Environment.GetEnvironmentVariable("FORGELINE_PARTICLE_QUALITY");
-            var particleSettings = _particleSettings;
+            var particleSettings = qualityProfile.LinearScene && _particleSettings != ParticleSettings.Default ? _particleSettings : qualityProfile.Particles;
             if (!string.IsNullOrEmpty(particleProfile))
             {
                 if (!Enum.TryParse(particleProfile,true,out ParticleQuality quality) || !Enum.IsDefined(quality))
                     throw new ArgumentException("FORGELINE_PARTICLE_QUALITY must be Disabled, Low, Medium or High.");
                 particleSettings = new(quality);
             }
+            qualityProfile = qualityProfile with { Shadows = shadowSettings, Atmosphere = atmosphere.Quality, Particles = particleSettings };
             using var particleRenderer = new ParticleVfxRenderer(graphics,_runtimeAssets,particleSettings,_sceneLighting);
             long lastParticleFrame = Stopwatch.GetTimestamp();
             using var gameplayOverlayRenderer =
@@ -783,7 +806,7 @@ internal sealed class ClientRenderHost : IDisposable
                     snapshot.VfxMetrics,
                     renderWorld.InstanceCount,
                     _sceneLighting, gameplayHudRenderer.State, gameplayHudRenderer.LastRenderedVertexCount,
-                    runtimeMetrics, lastMeasuredRunningRates,particleRenderer.Diagnostics);
+                    runtimeMetrics, lastMeasuredRunningRates,particleRenderer.Diagnostics, qualityProfile);
 
                 if (StopwatchElapsed(
                         nextDiagnosticAt,
@@ -813,7 +836,10 @@ internal sealed class ClientRenderHost : IDisposable
                         $"particles={particleRenderer.Diagnostics.ActiveParticles}/{particleRenderer.Diagnostics.Capacity} " +
                         $"particleDropped={particleRenderer.Diagnostics.DroppedParticles} " +
                         $"particleBytes={particleRenderer.Diagnostics.BufferBytes} " +
-                        $"particleGpuMs={diagnostics.Particles?.UpdateAndRenderGpuMilliseconds:F3}");
+                        $"particleGpuMs={diagnostics.Particles?.UpdateAndRenderGpuMilliseconds:F3} " +
+                        $"quality={qualityProfile.Active} requestedQuality={qualityProfile.Requested} " +
+                        $"aa={diagnostics.PostProcessing?.Antialiasing} scale={diagnostics.PostProcessing?.ResolutionScale:F2} " +
+                        $"postGpuMs={diagnostics.PostProcessing?.GpuMilliseconds:F3} qualityFallback={qualityProfile.FallbackReason}");
                     nextDiagnosticAt =
                         renderFinishedAt;
                 }
@@ -885,6 +911,7 @@ internal sealed class ClientRenderHost : IDisposable
             DirectionalShadows = completedGraphics.DirectionalShadows,
             Atmosphere = completedGraphics.Atmosphere,
             ParticleGpu = completedGraphics.Particles,
+            PostProcessing = completedGraphics.PostProcessing,
             GpuMilliseconds = completedGraphics.GpuTimingAvailable ? completedGraphics.GpuFrameMilliseconds : null,
             DebugLayerEnabled = completedGraphics.Device.DebugLayerEnabled,
             DebugLayerWarningCount = completedGraphics.Debug.WarningCount,
@@ -906,7 +933,7 @@ internal sealed class ClientRenderHost : IDisposable
         int hudVertexCount,
         in RuntimeMetricsView runtimeMetrics,
         RuntimeMetricsView? lastMeasuredRunningRates,
-        ParticleVfxDiagnostics particles = default)
+        ParticleVfxDiagnostics particles = default, RenderQualityProfile qualityProfile = default)
     {
         var snapshot =
             new ClientVisualQualificationSnapshot(
@@ -962,6 +989,8 @@ internal sealed class ClientRenderHost : IDisposable
                 Atmosphere = graphics.Atmosphere,
                 Particles = particles,
                 ParticleGpu = graphics.Particles,
+                QualityProfile = qualityProfile,
+                PostProcessing = graphics.PostProcessing,
                 DebugLayerEnabled =
                     graphics.Device.DebugLayerEnabled,
                 PeakLoadedTextureCount =

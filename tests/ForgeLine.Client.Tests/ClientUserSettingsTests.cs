@@ -8,6 +8,22 @@ namespace ForgeLine.Client.Tests;
 public sealed class ClientUserSettingsTests
 {
     [Fact]
+    public void InvalidRenderGradeRecoversThroughTheExistingSettingsStore()
+    {
+        string root=CreateTemporaryRoot();
+        try
+        {
+            var store=new ClientSettingsStore(root);
+            store.Save(new ClientUserSettings());
+            File.WriteAllText(store.SettingsPath,"{\"renderQuality\":{\"quality\":\"High\",\"colorGrade\":{\"contrast\":0}}}");
+            var recovered=store.Load();
+            Assert.True(recovered.RecoveredInvalidSettings);
+            Assert.Equal(RenderQuality.Medium,recovered.Settings.RenderQuality.Quality);
+            Assert.Equal(1,recovered.Settings.RenderQuality.ColorGrade.Contrast);
+        }
+        finally { Directory.Delete(root,true); }
+    }
+    [Fact]
     public void ParticleQualityRoundTripsAndRejectsUnknownValues()
     {
         string root=CreateTemporaryRoot();

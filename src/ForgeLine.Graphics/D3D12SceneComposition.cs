@@ -7,6 +7,16 @@ namespace ForgeLine.Graphics;
 internal sealed partial class D3D12GraphicsDevice
 {
     private GraphicsPostProcessingSettings _postProcessing = GraphicsPostProcessingSettings.Neutral;
+    public ulong? AvailableMemoryBudgetBytes
+    {
+        get
+        {
+            ThrowIfDisposed();
+            GraphicsMemoryDiagnostics budget = CaptureMemoryBudget();
+            return budget.Available && budget.LocalBudgetBytes > 0 ?
+                budget.LocalBudgetBytes > budget.LocalUsageBytes ? budget.LocalBudgetBytes - budget.LocalUsageBytes : 0 : null;
+        }
+    }
     public bool SupportsPostProcessing => true;
     public GraphicsPostProcessingSettings PostProcessing { get { ThrowIfDisposed(); return _postProcessing; } }
     public void ConfigurePostProcessing(GraphicsPostProcessingSettings settings)
