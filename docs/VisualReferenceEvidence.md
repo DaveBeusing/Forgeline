@@ -25,6 +25,8 @@ CPU timings include submission, Present and frame reuse, excluding capture/encod
 
 Compare checks manifest completion, unique keys, actual dimensions, RGBA PNG header/hash, repeated pixels, zero binding failures and no fallback meshes. Baselines remain read-only. Matching file checksums are exact-byte evidence; changed fixtures/hardware are classified, not silently compared as equivalent. No accepted goldens or automated similarity/art-quality thresholds exist. Failures return nonzero and a failure.json after output initialization; incomplete progress manifests cannot qualify. Request/binary mismatch or an existing output directory is rejected before native startup without overwriting evidence.
 
+On unequal fixed pixels, both native PNGs and per-frame upload fingerprints are retained. Optional native shadow-depth investigation has a separate API flag; the normal reference matrix performs no shadow-depth readback and records null shadow fingerprints. The complete matrix checks eight successive readbacks across the existing frame resources, without a pixel tolerance. Shadow receiver derivatives are evaluated before varying coverage branches, and High LOD scaling preserves the near-camera sentinel without overflow.
+
 ## Review rubric
 
 Record pass/fail/pending per scene/profile/zoom/display, with image filename, region and observed defect. Inspect full-resolution frames and relevant1:1 crops; contact sheets are navigation aids.

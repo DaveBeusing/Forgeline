@@ -18,4 +18,6 @@ The authored fixtures are reproducible but omit live simulation cost, natural ev
 
 ## Re-evaluation
 
+Frame-resource investigation found a High shadow-edge variance with identical CPU upload fingerprints. A diagnostic depth copy made128 readbacks equal; a combined shader/copy-readable depth state then made128 ordinary captures equal without that diagnostic copy. The native state transition is shared with gameplay, while optional depth readback and input hashing remain explicit capture operations. Retaining a capture-only layout change would hide a difference from ordinary frames and was rejected. The precise driver mechanism remains unproven; revisit this workaround if equivalent-hardware repeatability or shadow performance regresses.
+
 Extend these same contracts if accepted human-reviewed goldens, natural fixed-tick gameplay recordings, sustained camera/LOD sequences or physical display qualification become available. Any automated similarity tolerance requires evidence and an explicit baseline-update policy. See [Native visual reference evidence](../VisualReferenceEvidence.md) for reproduction, rubric and remaining manual acceptance.

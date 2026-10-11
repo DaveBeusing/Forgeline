@@ -69,12 +69,25 @@ public sealed class DirectionalShadowIntegrationTests
         graphics.ConfigureSceneOutput(new(linear, 1.15f, true));
         byte[] baseline = Capture(false, false);
         byte[] shadowed = Capture(true, false);
+        Assert.True(graphics.CaptureShadowDepth.IsEmpty);
+        Assert.NotNull(graphics.CaptureInputFingerprint);
         Assert.Equal(shadowed, Capture(true, false));
         byte[] withHidden = Capture(true, true);
         Assert.Equal(shadowed, withHidden);
         if (distance == 25)
         {
+            Assert.Equal(shadowed, Capture(true, false, captureShadowDepth: true));
+            Assert.Equal(1024 * 1024 * sizeof(float), graphics.CaptureShadowDepth.Length);
+            bool blocker = false, clear = false;
+            foreach (float depthValue in System.Runtime.InteropServices.MemoryMarshal.Cast<byte, float>(graphics.CaptureShadowDepth.Span))
+            {
+                blocker |= depthValue > 0 && depthValue < 1;
+                clear |= depthValue == 1;
+                if (blocker && clear) break;
+            }
+            Assert.True(blocker && clear);
             byte[] withoutContact = Capture(true, false, 0);
+            Assert.True(graphics.CaptureShadowDepth.IsEmpty);
             Assert.True(shadowed.Where((value, index) => value != withoutContact[index]).Any());
             for (int i = 0; i < shadowed.Length; i++) Assert.InRange(shadowed[i], 0, withoutContact[i] + 1);
         }
@@ -103,7 +116,7 @@ public sealed class DirectionalShadowIntegrationTests
         Assert.Equal(0, graphics.Diagnostics.DirectionalShadows!.Value.TexturePayloadBytes);
         Assert.Equal(linear ? 3 : 0, graphics.Diagnostics.Resources.ShaderResourceDescriptorsUsed);
 
-        byte[] Capture(bool enabled, bool includeHidden, float contactStrength = 0.12f)
+        byte[] Capture(bool enabled, bool includeHidden, float contactStrength = 0.12f, bool captureShadowDepth = false)
         {
             graphics.ConfigureDirectionalShadows(new(enabled ? DirectionalShadowQuality.Low : DirectionalShadowQuality.Disabled));
             using var renderer = new TerrainRenderer(graphics, terrain) { DebugChunksEnabled = false };
@@ -127,7 +140,7 @@ public sealed class DirectionalShadowIntegrationTests
                 renderer.Render(context, camera);
                 objects.Render(context, camera, world, 1);
                 context.BeginPass(GraphicsFramePass.Overlay);
-            });
+            }, captureShadowDepth);
         }
 
         void Export(string name, byte[] data)

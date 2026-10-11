@@ -163,18 +163,21 @@ internal static class VisualReferenceCapture
                     byte[] rgba = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
                     ReadOnlyMemory<byte> shadowDepth = graphics.CaptureShadowDepth;
                     captureInputs.Add(new { frameIndex = recordFrameIndex, fingerprint = graphics.CaptureInputFingerprint,
-                        shadowFingerprint = Convert.ToHexString(SHA256.HashData(shadowDepth.Span)) });
+                        shadowFingerprint = shadowDepth.IsEmpty ? null : Convert.ToHexString(SHA256.HashData(shadowDepth.Span)) });
                     for (int repetition = 1; repetition < request.RepeatCaptures; repetition++)
                     {
                         byte[] repeated = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
                         captureInputs.Add(new { frameIndex = recordFrameIndex, fingerprint = graphics.CaptureInputFingerprint,
-                            shadowFingerprint = Convert.ToHexString(SHA256.HashData(graphics.CaptureShadowDepth.Span)) });
+                            shadowFingerprint = graphics.CaptureShadowDepth.IsEmpty ? null : Convert.ToHexString(SHA256.HashData(graphics.CaptureShadowDepth.Span)) });
                         if (!rgba.AsSpan().SequenceEqual(repeated))
                         {
                             ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, $"failed-{key}-first.png"), display.Width, display.Height, rgba);
                             ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, $"failed-{key}-repeat.png"), display.Width, display.Height, repeated);
-                            File.WriteAllBytes(Path.Combine(request.OutputRoot, $"failed-{key}-first.depth"), shadowDepth.Span);
-                            File.WriteAllBytes(Path.Combine(request.OutputRoot, $"failed-{key}-repeat.depth"), graphics.CaptureShadowDepth.Span);
+                            if (!shadowDepth.IsEmpty)
+                            {
+                                File.WriteAllBytes(Path.Combine(request.OutputRoot, $"failed-{key}-first.depth"), shadowDepth.Span);
+                                File.WriteAllBytes(Path.Combine(request.OutputRoot, $"failed-{key}-repeat.depth"), graphics.CaptureShadowDepth.Span);
+                            }
                             int differences = 0, maximumDelta = 0;
                             for (int i = 0; i < rgba.Length; i++)
                                 if (rgba[i] != repeated[i]) { differences++; maximumDelta = Math.Max(maximumDelta, Math.Abs(rgba[i] - repeated[i])); }

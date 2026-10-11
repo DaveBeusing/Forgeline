@@ -13,6 +13,7 @@ internal sealed partial class D3D12GraphicsDevice
     private GraphicsResourceRetirement.Resource? _captureShadowLifetime;
     private PlacedSubresourceFootPrint _captureShadowFootprint;
     private bool _captureShadowRecorded;
+    private bool _captureFrameRecorded;
     public string? CaptureInputFingerprint { get; private set; }
     public ReadOnlyMemory<byte> CaptureShadowDepth { get; private set; }
     internal void RecordCaptureInput(ReadOnlySpan<byte> values) => _captureInputHash?.AppendData(values);
@@ -40,6 +41,7 @@ internal sealed partial class D3D12GraphicsDevice
         CaptureInputFingerprint = null;
         CaptureShadowDepth = ReadOnlyMemory<byte>.Empty;
         _captureShadowRecorded = false;
+        _captureFrameRecorded = false;
         try
         {
             _captureInputHash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
@@ -56,6 +58,7 @@ internal sealed partial class D3D12GraphicsDevice
                 _captureShadowTarget = shadowReadback;
             }
             RenderFrame(clearColor, commands);
+            if (!_captureFrameRecorded) throw new InvalidOperationException("Native frame capture did not submit a backbuffer copy.");
             CaptureInputFingerprint = Convert.ToHexString(_captureInputHash.GetHashAndReset());
             WaitForIdle();
             if (_captureShadowRecorded)
@@ -104,6 +107,7 @@ internal sealed partial class D3D12GraphicsDevice
         _commandList.ResourceBarrierTransition(backBuffer, ResourceStates.RenderTarget, ResourceStates.CopySource);
         _commandList.CopyTextureRegion(new TextureCopyLocation(_captureTarget, _captureFootprint), 0, 0, 0,
             new TextureCopyLocation(backBuffer, 0));
+        _captureFrameRecorded = true;
         _commandList.ResourceBarrierTransition(backBuffer, ResourceStates.CopySource, ResourceStates.RenderTarget);
     }
 }
