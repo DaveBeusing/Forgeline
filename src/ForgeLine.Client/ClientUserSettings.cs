@@ -225,13 +225,17 @@ internal sealed class ClientSettingsStore
 
     internal string SettingsPath => _path;
 
-    internal ClientSettingsLoadResult Load()
+    internal ClientSettingsLoadResult Load() => LoadCancellable(CancellationToken.None);
+
+    internal ClientSettingsLoadResult LoadCancellable(CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (!File.Exists(_path))
         {
             var defaults =
                 new ClientUserSettings();
             defaults.Validate();
+            cancellationToken.ThrowIfCancellationRequested();
             Save(defaults);
 
             return new ClientSettingsLoadResult(
@@ -246,6 +250,7 @@ internal sealed class ClientSettingsStore
         {
             string json =
                 File.ReadAllText(_path);
+            cancellationToken.ThrowIfCancellationRequested();
             var document = JsonNode.Parse(json) as JsonObject ?? throw new InvalidDataException("Settings object is missing.");
             string? gameplayProperty = document.Select(x => x.Key).FirstOrDefault(x => string.Equals(x, "gameplayBindings", StringComparison.OrdinalIgnoreCase));
             JsonNode? gameplay = gameplayProperty is null ? null : document[gameplayProperty];

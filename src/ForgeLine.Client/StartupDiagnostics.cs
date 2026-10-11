@@ -13,7 +13,8 @@ internal enum StartupPhase
     FrontendReady, SessionRuntimeReady, FirstGameplayFrame, ApplicationReady, Run, SessionReady,
     SplashBootstrapFirstFrame, SaveCatalog, FrontendDependenciesReady, SplashArtwork,
     SessionLoadRequested, SessionConfiguration, SessionAssembly, SessionReplay, SessionVerification,
-    SessionPresentationBinding, SessionRendererReady, SessionLoadFailed, SessionLoadCancelled
+    SessionPresentationBinding, SessionRendererReady, SessionLoadFailed, SessionLoadCancelled,
+    ProcessEntered, NativeBootstrapFirstFrame, GraphicsReady, StartupFailed, GameplayAssetsReady
 }
 
 internal enum StartupEventKind { Started, Completed, Milestone, Skipped, Failed, Cancelled }
@@ -26,7 +27,7 @@ internal readonly record struct StartupEvent(
 // Collection is bounded and performs no serialization, logging or file I/O on owner threads.
 internal sealed class StartupDiagnostics
 {
-    private const int PhaseCount = (int)StartupPhase.SessionLoadCancelled + 1;
+    private const int PhaseCount = (int)StartupPhase.GameplayAssetsReady + 1;
     internal static StartupDiagnostics Disabled { get; } = new();
     private readonly object _gate = new();
     private readonly StartupEvent[]? _events;
@@ -113,7 +114,8 @@ internal sealed class StartupDiagnostics
             int slot = Slot(phase, sessionId);
             if (_milestones![slot]) return;
             _milestones[slot] = true;
-            Add(phase, StartupEventKind.Milestone, sessionId, Stopwatch.GetTimestamp(), null, detail);
+            Add(phase, StartupEventKind.Milestone, sessionId,
+                phase == StartupPhase.ProcessEntered ? _origin : Stopwatch.GetTimestamp(), null, detail);
         }
     }
 
@@ -211,7 +213,7 @@ internal sealed class StartupDiagnostics
         lock (_gate) return _events![.._count];
     }
 
-    internal void WriteReport(string path)
+    internal void WriteReport(string path, bool announce = true)
     {
         if (!Enabled) return;
         object report;
@@ -230,8 +232,10 @@ internal sealed class StartupDiagnostics
         {
             string fullPath = Path.GetFullPath(path);
             Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
-            File.WriteAllText(fullPath, JsonSerializer.Serialize(report, ReportSerialization.Options));
-            Console.WriteLine($"[startup:report] path=\"{fullPath}\"");
+            string temporary = fullPath + ".tmp";
+            File.WriteAllText(temporary, JsonSerializer.Serialize(report, ReportSerialization.Options));
+            File.Move(temporary, fullPath, overwrite: true);
+            if (announce) Console.WriteLine($"[startup:report] path=\"{fullPath}\"");
         }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException or NotSupportedException or ArgumentException)
         {
