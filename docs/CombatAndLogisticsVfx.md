@@ -201,7 +201,7 @@ All 36 existing effect mesh sources now have normalized face UVs and sample the 
 
 ## Bounded GPU particle runtime
 
-`ParticleEmitterDescriptor` version 1 maps the existing smoke, dust/impact-dirt, spark/impact-metal and explosion material families. Other muzzle/projectile/fire/logistics visuals retain their production mesh path. Descriptor validation preserves stable asset pairs and caps count (1–32), lifetime (0.05–4 seconds), radius (up to 8m), speed (up to 40m/s) and acceleration magnitude (up to 20m/s²). Runtime mesh/material payloads are checked before enabling each mapping; unavailable or corrupt mappings retain mesh fallback.
+`ParticleEmitterDescriptor` version 1 maps the existing smoke, dust/impact-dirt, spark/impact-metal, explosion, fire and heavy-weapon muzzle families. Infantry muzzle, projectile and logistics visuals retain their production mesh path. Descriptor validation preserves stable asset pairs and caps count (1–32), lifetime (0.05–4 seconds), radius (up to 8m), speed (up to 40m/s) and acceleration magnitude (up to 20m/s²). Runtime mesh/material payloads are checked before enabling each mapping; unavailable or corrupt mappings retain mesh fallback.
 
 `ParticleVfxRenderer` consumes only copied World-visible instances. Its state key is the copied pool slot/generation for bursts, or full entity identity/effect kind for persistent state. The old synthetic display ID remains compatible, but does not determine emitter continuity. Source spawn ticks suppress already-aged bursts; persistent effects continuously stagger reproducible visual ages. Removing an authorized instance clears its particles immediately. A changed session clears the emitter cache, clock, seeds and counters.
 

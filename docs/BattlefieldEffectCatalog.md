@@ -39,3 +39,32 @@ deferred until equivalent native captures demonstrate a material intersection
 or parallax deficiency and profiling establishes a target/time/memory budget.
 A future alternative must reuse graphics-owned depth/lifetime contracts;
 neither a second scheduler nor gameplay-affecting debris is justified here.
+
+## Implemented refinement
+
+Smoke uses slow upward drift and a 2.8-second cycle; dust uses a low radial
+spread; sparks use a 0.45-second gravity arc and faster opacity decay. Heavy
+muzzles use a 0.15-second cone aligned to visible aim. Blast size grows to
+twice its admitted radius while hot color transitions to charcoal. Fire uses
+a staggered 1.2-second upward cycle. All velocities are normalized before
+applying the declared speed, so conservative reach estimates bound motion.
+Existing curl and maximum twofold size growth remain included in fill limits.
+
+The muzzle socket applies cannon elevation about gun_pivot and turret yaw
+about the catalog pivot before the body transform. A shot starts at the
+unrecoiled position; existing mechanical recoil follows the same visible shot.
+Moving vehicle dust reuses contiguous mechanical history and is rooted on
+sampled terrain. Idle entities and teleport discontinuities produce no dust.
+This is a ground-dust presentation policy, not a terrain wetness simulation.
+
+The existing synthetic density baseline exposed bright mesh fallback under
+fill saturation. Explosion/spark material emission multipliers are reduced
+from 1.2 to 0.35/0.45 without changing atlas IDs, UVs, resolution or bindings.
+Per-visual particle populations supplement existing rejection, fallback,
+coverage, memory, CPU and completed-fence GPU counters.
+
+Repeated extraction of a tick cannot emit combat events twice. Rewind/session
+changes clear transient extraction history and particle time. Persisting pool
+entries recheck terrain visibility, including both tracer endpoints. Visible
+impact positions cannot reveal hidden target classes or hidden shooter socket
+transforms. These filters do not change combat, intelligence or replay data.

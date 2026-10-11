@@ -1,9 +1,30 @@
 using Xunit;
+using System.Numerics;
 
 namespace ForgeLine.Presentation.Tests;
 
 public sealed class ParticleEmitterDescriptorTests
 {
+    [Fact]
+    public void SpawnDirectionsRespectConservativeReachAndHeavyMuzzleAim()
+    {
+        foreach (var source in VfxPresentationCatalog.All)
+        {
+            if (!ParticleEmitterDescriptor.TryResolve(source.Kind, out var descriptor)) continue;
+            for (int i = 0; i < 32; i++)
+            {
+                Vector3 velocity = descriptor.InitialVelocity(i * .3f, i / 31f, Quaternion.Identity);
+                Assert.InRange(velocity.Length(), 0, descriptor.SpeedMetersPerSecond + .0001f);
+                if (descriptor.Visual == ParticleVisualKind.Dust) Assert.InRange(velocity.Y, 0, .3f);
+            }
+        }
+        Assert.True(ParticleEmitterDescriptor.TryResolve(VfxEffectKind.MuzzleTankCannon, out var muzzle));
+        Vector3 aimed = muzzle.InitialVelocity(0, 1, Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.PI / 2));
+        Assert.True(aimed.X > MathF.Abs(aimed.Z) * 4);
+        Assert.True(ParticleEmitterDescriptor.TryResolve(VfxEffectKind.PersistentFire, out var fire));
+        Assert.Equal(ParticleVisualKind.Fire, fire.Visual);
+    }
+
     [Fact]
     public void DescriptorsReuseExistingAssetsAndBoundMotion()
     {

@@ -138,10 +138,14 @@ public sealed class ParticleVfxRendererTests : IDisposable
         Assert.Equal(8UL,renderer.Diagnostics.EmittedParticles);
     }
 
-    [Fact]
-    public void RepeatedDestructionAndQualityCapsRetainBoundedBuffersAndMeshFallback()
+    [Theory]
+    [InlineData(ParticleQuality.Low)]
+    [InlineData(ParticleQuality.Medium)]
+    [InlineData(ParticleQuality.High)]
+    public void RepeatedDestructionAndQualityCapsRetainBoundedBuffersAndMeshFallback(ParticleQuality quality)
     {
-        using var device=new Device();using var renderer=new ParticleVfxRenderer(device,_catalog,new(ParticleQuality.Low));
+        var settings = new ParticleSettings(quality);
+        using var device=new Device();using var renderer=new ParticleVfxRenderer(device,_catalog,settings);
         var camera=new RtsCamera(new() { InitialTarget=Vector3.Zero,InitialDistance=420 });
         var effects=Enumerable.Range(1,600).Select(i=>Effect((uint)i,VfxEffectKind.ExplosionBuilding)).ToArray();
         long bytes=0;
@@ -149,8 +153,8 @@ public sealed class ParticleVfxRendererTests : IDisposable
         {
             var current=effects.Select(x=>x with { VfxFeature=x.VfxFeature with { EmitterGeneration=(uint)frame+1 } }).ToArray();
             renderer.Prepare(World(current),camera,1280,720,.05);
-            Assert.InRange(renderer.Diagnostics.ActiveParticles,1,512);
-            Assert.InRange(renderer.Diagnostics.ScreenCoverage,0,.5f);
+            Assert.InRange(renderer.Diagnostics.ActiveParticles,1,settings.Capacity);
+            Assert.InRange(renderer.Diagnostics.ScreenCoverage,0,settings.MaximumScreenCoverage);
             Assert.True(renderer.Diagnostics.FallbackEffects>0);
             if(frame==0) bytes=renderer.Diagnostics.BufferBytes;
             Assert.Equal(bytes,renderer.Diagnostics.BufferBytes);
@@ -158,6 +162,23 @@ public sealed class ParticleVfxRendererTests : IDisposable
         }
         Assert.True(renderer.Diagnostics.DroppedParticles>0);
         renderer.Dispose();Assert.Equal(0,device.LiveBuffers);
+    }
+
+    [Fact]
+    public void RewindingCopiedTicksResetsCosmeticTimeAndTypeCounts()
+    {
+        using var device = new Device();
+        using var renderer = new ParticleVfxRenderer(device, _catalog);
+        var camera = new RtsCamera(new() { InitialTarget = Vector3.Zero, InitialDistance = 120 });
+        var fire = Effect(1, VfxEffectKind.PersistentFire, true);
+        renderer.Prepare(World([fire], tick: 10), camera, 1280, 720, .1);
+        var initial = renderer.Particles.ToArray();
+        Assert.Equal(8, renderer.Diagnostics.ByType.Fire);
+        renderer.Prepare(World([fire], tick: 11), camera, 1280, 720, .1);
+        Assert.NotEqual(initial, renderer.Particles.ToArray());
+        renderer.Prepare(World([fire], tick: 1), camera, 1280, 720, .1);
+        Assert.Equal(initial, renderer.Particles.ToArray());
+        Assert.Equal(8UL, renderer.Diagnostics.EmittedParticles);
     }
 
     [Theory]

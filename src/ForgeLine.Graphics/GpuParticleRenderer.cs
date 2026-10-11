@@ -12,7 +12,7 @@ public readonly record struct GraphicsParticle(Vector4 OriginAge, Vector4 Veloci
     {
         if (!Finite(OriginAge) || OriginAge.W < 0 || !Finite(VelocityLife) || VelocityLife.W is < .05f or > 4 ||
             !Finite(Color) || Color.W is < 0 or > 1 || Color.X < 0 || Color.Y < 0 || Color.Z < 0 ||
-            !Finite(Shape) || Shape.X is <= 0 or > 8 || MathF.Abs(Shape.Y) > 20 || Shape.Z is < 0 or > 3)
+            !Finite(Shape) || Shape.X is <= 0 or > 8 || MathF.Abs(Shape.Y) > 20 || Shape.Z is < 0 or > 5)
             throw new ArgumentException("Particle initial conditions must be finite and bounded.");
     }
     private static bool Finite(Vector4 value) => float.IsFinite(value.X) && float.IsFinite(value.Y) && float.IsFinite(value.Z) && float.IsFinite(value.W);
@@ -53,10 +53,17 @@ public sealed class GpuParticleRenderer : IDisposable
                 float3 position = p.OriginAge.xyz + p.VelocityLife.xyz * age;
                 position.y += .5 * p.Shape.y * age * age;
                 if (p.Shape.z < 1.5) position.xz += sin(age * 2 + p.Shape.w) * age * .3;
-                float size = p.Shape.x * (p.Shape.z < 1.5 ? 1 + fraction : 1 - fraction * .3);
+                float size = p.Shape.x * (p.Shape.z < 1.5 ? 1 + fraction : p.Shape.z == 3 ? .5 + 1.5 * fraction : 1 - fraction * .3);
                 float2 corner = corners[vertex];
                 Output o; o.Position = mul(float4(position + (Right.xyz * corner.x + Up.xyz * corner.y) * size,1), VP);
-                o.Uv = corner; o.Color = p.Color; o.Color.a *= smoothstep(0,.08,fraction) * (1-fraction);
+                o.Uv = corner; o.Color = p.Color;
+                float fadeIn = p.Shape.z == 2 || p.Shape.z == 5 ? 1 : smoothstep(0,.08,fraction);
+                o.Color.a *= fadeIn * (1-fraction) * (p.Shape.z == 2 ? 1-fraction : 1);
+                if (p.Shape.z == 3 || p.Shape.z == 5)
+                    o.Color.rgb = lerp(p.Color.rgb, float3(.13,.12,.11), smoothstep(.08,.65,fraction));
+                if (p.Shape.z == 4)
+                    o.Color.rgb = lerp(float3(1.1,.48,.12), float3(.22,.09,.035), fraction);
+                if (p.Shape.z == 0) o.Color.rgb *= .7 + .3 * fraction;
                 o.Shape = p.Shape; o.DepthSettings = DepthSettings; o.OutputSettings = OutputSettings; return o;
             }
             """, GraphicsShaderStage.Vertex, "VSMain", "ParticleVertex.hlsl");
