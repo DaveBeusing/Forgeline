@@ -19,7 +19,7 @@ for ($sample = 0; $sample -le $Samples; $sample++) {
     $start.WorkingDirectory = Split-Path -Parent $client
     $start.UseShellExecute = $false
     $start.CreateNoWindow = $true
-    $start.WindowStyle = [Diagnostics.ProcessWindowStyle]::Hidden
+    $start.WindowStyle = [Diagnostics.ProcessWindowStyle]::Normal
     $start.RedirectStandardOutput = $true
     $start.RedirectStandardError = $true
     foreach ($argument in @('--settings-root', (Join-Path $destination 'settings'),
@@ -44,8 +44,6 @@ for ($sample = 0; $sample -le $Samples; $sample++) {
                 throw "Startup sample $sample timed out; retain its pending checkpoint."
             }
         }
-        $stdout.GetAwaiter().GetResult() | Set-Content (Join-Path $destination "launch-$sample.stdout.log")
-        $stderr.GetAwaiter().GetResult() | Set-Content (Join-Path $destination "launch-$sample.stderr.log")
         if ($process.ExitCode -ne 0) { throw "Startup sample $sample exited $($process.ExitCode)." }
         $report = Get-Content -LiteralPath $reportPath -Raw | ConvertFrom-Json -Depth 32
         if ($report.ApplicationReadiness -ne 'Ready' -or $report.SessionReadiness -ne 'NotRequested' -or
@@ -60,7 +58,13 @@ for ($sample = 0; $sample -le $Samples; $sample++) {
             launchToWindowObservationMs = $windowObserved; launchToExitMs = $clock.Elapsed.TotalMilliseconds;
             phases = $phases; report = $reportPath }
     }
-    finally { $process.Dispose() }
+    finally {
+        if ($process.HasExited) {
+            $stdout.GetAwaiter().GetResult() | Set-Content (Join-Path $destination "launch-$sample.stdout.log")
+            $stderr.GetAwaiter().GetResult() | Set-Content (Join-Path $destination "launch-$sample.stderr.log")
+        }
+        $process.Dispose()
+    }
 }
 $summary = [PSCustomObject]@{ client = $client; measuredAtUtc = [DateTimeOffset]::UtcNow.ToString('O');
     cpu = @(Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores, NumberOfLogicalProcessors);
