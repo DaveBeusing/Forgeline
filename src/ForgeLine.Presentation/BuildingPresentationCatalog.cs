@@ -163,14 +163,14 @@ public static class BuildingPresentationCatalog
         {
             string? representation = feature.State switch
             {
-                BuildingPresentationState.ConstructionFoundation => "foundation",
-                BuildingPresentationState.ConstructionFrame => "structural_frame",
-                BuildingPresentationState.ConstructionShell => "partial_shell",
-                BuildingPresentationState.Destroyed => "destroyed",
+                BuildingPresentationState.ConstructionFoundation => "building.directorate.command_core.foundation",
+                BuildingPresentationState.ConstructionFrame => "building.directorate.command_core.structural_frame",
+                BuildingPresentationState.ConstructionShell => "building.directorate.command_core.partial_shell",
+                BuildingPresentationState.Destroyed => "building.directorate.command_core.destroyed",
                 _ => null
             };
             if (representation is not null)
-                return "building.directorate.command_core." + representation;
+                return representation;
         }
 
         return feature.State switch
@@ -196,13 +196,13 @@ public static class BuildingPresentationCatalog
         {
             string? attachment = feature.State switch
             {
-                BuildingPresentationState.Unpowered => "unpowered",
-                BuildingPresentationState.Damaged => "damaged",
-                BuildingPresentationState.Critical => "critical",
+                BuildingPresentationState.Unpowered => "building.directorate.command_core.unpowered",
+                BuildingPresentationState.Damaged => "building.directorate.command_core.damaged",
+                BuildingPresentationState.Critical => "building.directorate.command_core.critical",
                 _ => null
             };
             if (attachment is not null)
-                return "building.directorate.command_core." + attachment;
+                return attachment;
         }
 
         return feature.State switch

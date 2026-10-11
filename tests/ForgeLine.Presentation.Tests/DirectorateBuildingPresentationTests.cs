@@ -315,6 +315,40 @@ public sealed class DirectorateBuildingPresentationTests
     }
 
     [Fact]
+    public void RepeatedCommandCoreStateResolutionDoesNotAllocateAssetNamesPerFrame()
+    {
+        BuildingFeaturePresentationMetadata[] states =
+        [
+            new(BuildingIds.CommandCore, BuildingPresentationState.ConstructionFoundation),
+            new(BuildingIds.CommandCore, BuildingPresentationState.ConstructionFrame),
+            new(BuildingIds.CommandCore, BuildingPresentationState.ConstructionShell),
+            new(BuildingIds.CommandCore, BuildingPresentationState.Operational),
+            new(BuildingIds.CommandCore, BuildingPresentationState.Unpowered),
+            new(BuildingIds.CommandCore, BuildingPresentationState.Damaged),
+            new(BuildingIds.CommandCore, BuildingPresentationState.Critical),
+            new(BuildingIds.CommandCore, BuildingPresentationState.Destroyed)
+        ];
+        _ = ResolveNames();
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        int resolvedCharacters = 0;
+        for (int i = 0; i < 1000; i++) resolvedCharacters += ResolveNames();
+        long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+        Assert.True(resolvedCharacters > 0);
+        Assert.Equal(0, allocated);
+
+        int ResolveNames()
+        {
+            int characters = 0;
+            foreach (var state in states)
+            {
+                characters += BuildingPresentationCatalog.ResolveMeshAssetId(state, BuildingAssetLod.Lod1).Length;
+                characters += BuildingPresentationCatalog.ResolveStateAttachmentAssetId(state)?.Length ?? 0;
+            }
+            return characters;
+        }
+    }
+
+    [Fact]
     public void CriticalOperationalStatesUseGeometryAttachmentsNotOnlyTint()
     {
         Assert.Equal(
