@@ -45,6 +45,8 @@ public sealed class VisualReferenceCaptureTests
     {
         var request = new VisualReferenceCaptureRequest { OutputRoot = "unused", RuntimeRoot = "unused", Commit = new('a', 40) };
         request.Validate();
+        foreach (uint dpi in new[] { 0u, 96u, 120u, 144u, 192u }) (request with { RasterDpi = dpi }).Validate();
+        Assert.Throws<ArgumentOutOfRangeException>(() => (request with { RasterDpi = 193 }).Validate());
         Assert.Equal(6, request.Scenes.Length);
         (request with { Scenes = [VisualReferenceSceneKind.MechanicalMoving] }).Validate();
         Assert.Throws<ArgumentException>(() => (request with { Displays = [new(640, 360)] }).Validate());
