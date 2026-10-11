@@ -40,6 +40,12 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
         simulation.Entities.AddComponent(sensor, new VisualSensorState(new(1), rangeMeters: 130));
         foreach (var item in battlefield.WorldObjects)
         {
+            // Keep the eight authored review plots clear of unrelated dressing.
+            Vector3 relative = item.Position - target;
+            if (kind == VisualReferenceSceneKind.CommandCoreProduction &&
+                MathF.Abs(relative.X) <= 44 + item.Scale.X * .5f &&
+                MathF.Abs(relative.Z) <= 22 + item.Scale.Z * .5f)
+                continue;
             float groundOffset = item.Kind switch
             {
                 WorldPresentationKind.Decal => .04f,

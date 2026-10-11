@@ -49,6 +49,9 @@ public sealed class VisualReferenceSceneTests
         Assert.Contains(buildings, x => x.BuildingFeature.IsDestroyed);
         Assert.Equal(3, buildings.Count(x => x.BuildingFeature.IsConstruction));
         Assert.Equal(PlayerSelectionKind.Building, scene.Snapshot.PlayerExperience!.Value.Selection.Kind);
+        Assert.DoesNotContain(scene.Snapshot.Instances.ToArray(), x => x.WorldFeature.IsSpecified &&
+            MathF.Abs(x.Transform.Position.X - scene.Target.X) <= 44 + x.Transform.Scale.X * .5f &&
+            MathF.Abs(x.Transform.Position.Z - scene.Target.Z) <= 22 + x.Transform.Scale.Z * .5f);
     }
 
     [Fact]
