@@ -16,26 +16,16 @@ function Assert-BuildVersion {
     $prefix = [regex]::Escape($ProductVersion)
     if ($Version -notmatch "^$prefix(?:-(?:dev|preview\.[1-9][0-9]*|rc\.[1-9][0-9]*|pr\.[1-9][0-9]*\.[1-9][0-9]*\.[1-9][0-9]*))?$") { throw "Invalid build version '$Version' for $ProductVersion." }
 }
-function Get-NextChannelNumber {
-    param([string[]]$Tags, [string]$ProductVersion, [ValidateSet('preview', 'rc')][string]$Channel)
-    $pattern = '^v' + [regex]::Escape($ProductVersion) + '-' + $Channel + '\.([1-9][0-9]*)$'
-    [long]$maximum = 0
-    foreach ($tag in $Tags) {
-        if ($tag -match $pattern) { $maximum = [Math]::Max($maximum, [long]$Matches[1]) }
-    }
-    if ($maximum -eq [long]::MaxValue) { throw "Channel sequence exhausted." }
-    return $maximum + 1
+function Get-NextPrVersion {
+    param([string]$BaseVersion)
+    $base = [version]$BaseVersion
+    if ($base.Build -ge 65534) { throw 'PATCH exhausted .NET metadata range; select a new MAJOR/MINOR boundary explicitly.' }
+    return "$($base.Major).$($base.Minor).$($base.Build + 1)"
 }
-function Invoke-GitHub {
-    param([string]$Path, [ValidateSet('GET', 'POST', 'PATCH')][string]$Method = 'GET', $Body)
-    $arguments = @('api', '--method', $Method, $Path)
-    if ($null -ne $Body) { $result = $Body | ConvertTo-Json -Depth 20 -Compress | & gh @arguments --input - }
-    else { $result = & gh @arguments }
-    if ($LASTEXITCODE -ne 0) { throw "GitHub $Method $Path failed; publication is prohibited." }
-    $parsed = $result -join "`n" | ConvertFrom-Json -NoEnumerate
-    # Empty registry/release lists must produce zero objects, not a null entry
-    # that strict-mode property filters would treat as a malformed response.
-    foreach ($item in @($parsed)) {
-        if ($null -ne $item) { Write-Output $item }
+function Assert-PrVersion {
+    param([string]$BaseVersion, [string]$HeadVersion)
+    $expected = Get-NextPrVersion -BaseVersion $BaseVersion
+    if ($HeadVersion -ne $expected) {
+        throw "Each PR requires exactly one PATCH increment: expected $expected, received $HeadVersion. Run Increment-PrVersion.ps1 against the current base."
     }
 }
