@@ -11,6 +11,8 @@ internal static class Program
     [STAThread]
     public static int Main(string[] args)
     {
+        if (args.Length == 2 && args[0] == "--reference-capture-request")
+            return VisualReferenceCapture.Run(args[1]);
         bool diagnosticsRequested = args.Any(argument =>
             string.Equals(argument, "--startup-diagnostics-output", StringComparison.OrdinalIgnoreCase));
         long processEntryTimestamp = diagnosticsRequested ? Stopwatch.GetTimestamp() : 0;
@@ -255,5 +257,6 @@ internal static class Program
             "[--settings-root <directory>] [--skip-splash] " +
             "[--startup-diagnostics-output <report.json>] " +
             "[--reference-zoom <CloseTactical|NormalGameplay|Strategic>]");
+        writer.WriteLine("Standalone native evidence: ForgeLine.Client --reference-capture-request <request.json>");
     }
 }

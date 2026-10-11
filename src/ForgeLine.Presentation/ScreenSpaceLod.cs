@@ -28,18 +28,22 @@ public static class ScreenSpaceLod
         return radius * matrices.Projection.M22 * RtsVisualReference.Height / depth;
     }
 
-    public static int Select(float diameter, int previousLod, float lod1Pixels = 90.0f, float lod2Pixels = 28.0f)
+    public static int Select(float diameter, int previousLod, float lod1Pixels = 90.0f, float lod2Pixels = 28.0f, float diameterScale = 1)
     {
         if (!float.IsFinite(diameter) || diameter < 0.0f ||
             !float.IsFinite(lod1Pixels) || !float.IsFinite(lod2Pixels) ||
-            lod2Pixels <= 0.0f || lod1Pixels <= lod2Pixels || previousLod is < 0 or > 2)
+            lod2Pixels <= 0.0f || lod1Pixels <= lod2Pixels || previousLod is < 0 or > 2 ||
+            !float.IsFinite(diameterScale) || diameterScale <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(diameter));
         }
 
         float first = lod1Pixels * (previousLod >= 1 ? 1.0f + Hysteresis : 1.0f - Hysteresis);
         float second = lod2Pixels * (previousLod >= 2 ? 1.0f + Hysteresis : 1.0f - Hysteresis);
-        if (diameter < second) return 2;
-        return diameter < first ? 1 : 0;
+        // The near-camera sentinel is float.MaxValue. Quality scaling must not
+        // overflow it before selecting the highest geometric detail.
+        double scaledDiameter = (double)diameter * diameterScale;
+        if (scaledDiameter < second) return 2;
+        return scaledDiameter < first ? 1 : 0;
     }
 }

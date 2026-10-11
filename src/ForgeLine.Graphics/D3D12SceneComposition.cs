@@ -173,6 +173,7 @@ internal sealed partial class D3D12GraphicsDevice
         constants[32] = _postProcessing.WhiteBalance; constants[33] = _postProcessing.Tint;
         constants[34] = _postProcessing.Contrast; constants[35] = _postProcessing.Saturation;
         constants[36] = _postProcessing.EdgeBlend;
+        RecordCaptureInput(System.Runtime.InteropServices.MemoryMarshal.AsBytes(constants));
         _commandList.SetGraphicsRoot32BitConstants(0, constants);
         _commandList.DrawInstanced(3, 1, 0, 0);
         if (_atmosphere.Enabled)

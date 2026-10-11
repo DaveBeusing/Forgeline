@@ -197,6 +197,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
                 nameof(values));
         }
 
+        _owner.RecordCaptureInput(System.Runtime.InteropServices.MemoryMarshal.AsBytes(values));
         if (_pipeline.Description.VertexConstantsInBuffer) _owner.SetBufferedVertexConstants(values);
         else _commandList.SetGraphicsRoot32BitConstants(0, values);
     }

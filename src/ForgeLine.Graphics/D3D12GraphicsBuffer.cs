@@ -53,6 +53,7 @@ internal sealed class D3D12GraphicsBuffer : IGraphicsBuffer
         }
 
         Resource.SetData(data, offsetInBytes);
+        Owner.RecordCaptureInput(MemoryMarshal.AsBytes(data));
     }
 
     public void Dispose()

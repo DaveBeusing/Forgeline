@@ -277,7 +277,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             {
                 unitLod =
                     instance.UnitFeature.IsWreck ? UnitAssetLod.Lod2
-                        : (UnitAssetLod)ScreenSpaceLod.Select(projectedDiameter * _lodDiameterScale, previousLod);
+                        : (UnitAssetLod)ScreenSpaceLod.Select(projectedDiameter, previousLod, diameterScale: _lodDiameterScale);
                 if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = (int)unitLod;
                 unitDefinition =
                     UnitPresentationCatalog.Get(
@@ -324,7 +324,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 buildingLod =
                     instance.BuildingFeature.IsConstruction || instance.BuildingFeature.IsDestroyed
                         ? BuildingAssetLod.Lod0
-                        : (BuildingAssetLod)ScreenSpaceLod.Select(projectedDiameter * _lodDiameterScale, previousLod, 150.0f, 45.0f);
+                        : (BuildingAssetLod)ScreenSpaceLod.Select(projectedDiameter, previousLod, 150.0f, 45.0f, _lodDiameterScale);
                 if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = (int)buildingLod;
                 hasBuildingDefinition =
                     BuildingPresentationCatalog.TryGet(
@@ -421,7 +421,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         instance.WorldFeature.Visual)
                     .MaterialAssetId;
                 WorldAssetLod worldLod =
-                    ScreenSpaceLod.Select(projectedDiameter * _lodDiameterScale, previousLod, 65.0f, 18.0f) > 0
+                    ScreenSpaceLod.Select(projectedDiameter, previousLod, 65.0f, 18.0f, _lodDiameterScale) > 0
                         ? WorldAssetLod.Reduced : WorldAssetLod.High;
                 if (hasLodIdentity && !shadowProjection.HasValue) _currentLods[lodKey] = worldLod == WorldAssetLod.Reduced ? 1 : 0;
 
