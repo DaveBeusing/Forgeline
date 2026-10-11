@@ -63,6 +63,8 @@ for ($sample = 0; $sample -le $Samples; $sample++) {
     finally { $process.Dispose() }
 }
 $summary = [PSCustomObject]@{ client = $client; measuredAtUtc = [DateTimeOffset]::UtcNow.ToString('O');
+    cpu = @(Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores, NumberOfLogicalProcessors);
+    graphics = @(Get-CimInstance Win32_VideoController | Select-Object Name, DriverVersion);
     cacheCondition = 'Warm repetitions after one excluded warmup; no cache eviction or reboot';
     includesStudioIntro = [bool]$IncludeStudioIntro; baselineExitHook = [bool]$BaselineExitHook;
     observations = $observations }

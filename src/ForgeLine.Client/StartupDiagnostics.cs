@@ -225,6 +225,9 @@ internal sealed class StartupDiagnostics
                 ApplicationReadiness = _application,
                 SessionReadiness = _sessionStarted ? _session.ToString() : "NotRequested",
                 DroppedEvents = _dropped, Events = Snapshot(),
+                OperatingSystemProcessId = Environment.ProcessId,
+                BuildVersion = ClientBuildIdentity.InformationalVersion,
+                SourceRevision = ClientBuildIdentity.SourceRevision,
                 Runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
                 OS = System.Runtime.InteropServices.RuntimeInformation.OSDescription
             };
