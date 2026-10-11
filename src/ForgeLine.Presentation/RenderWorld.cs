@@ -81,7 +81,9 @@ public sealed class RenderWorld
             Transform = RenderTransform.Interpolate(
                 previousInstance.Transform,
                 currentInstance.Transform,
-                alpha)
+                alpha),
+            MechanicalPose = MechanicalPose.Interpolate(previousInstance.MechanicalPose, currentInstance.MechanicalPose, alpha),
+            UnitFeature = currentInstance.UnitFeature with { AimYawRadians = InterpolateYaw(previousInstance.UnitFeature.AimYawRadians, currentInstance.UnitFeature.AimYawRadians, alpha) }
         };
     }
 
@@ -113,10 +115,15 @@ public sealed class RenderWorld
             Transform = RenderTransform.Interpolate(
                 previous.Transform,
                 current.Transform,
-                alpha)
+                alpha),
+            MechanicalPose = MechanicalPose.Interpolate(previous.MechanicalPose, current.MechanicalPose, alpha),
+            UnitFeature = current.UnitFeature with { AimYawRadians = InterpolateYaw(previous.UnitFeature.AimYawRadians, current.UnitFeature.AimYawRadians, alpha) }
         };
         return true;
     }
+
+    private static float InterpolateYaw(float previous, float current, float alpha) =>
+        previous + MathF.IEEERemainder(current - previous, MathF.Tau) * (float.IsFinite(alpha) ? Math.Clamp(alpha, 0, 1) : 1);
 
     private static bool TryFindByEntity(
         PresentationSnapshot snapshot,

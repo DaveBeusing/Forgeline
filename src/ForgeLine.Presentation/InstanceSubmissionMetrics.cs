@@ -8,4 +8,8 @@ public readonly record struct InstanceSubmissionMetrics(
     int SubmittedInstances,
     long UploadBytes,
     int PipelineBindings,
-    int TextureBindings);
+    int TextureBindings)
+{
+    public int MechanicalPartInstances { get; init; }
+    public int MechanicalTransformScratchBytes { get; init; }
+}

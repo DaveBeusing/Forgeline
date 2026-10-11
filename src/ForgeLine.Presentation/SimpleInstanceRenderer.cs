@@ -147,12 +147,16 @@ public sealed class SimpleInstanceRenderer : IDisposable
         {
             long retained = 0;
             foreach (InstanceBatch batch in _batches) retained += batch.Instances.Capacity;
+            int mechanical = 0;
+            for (int i = 0; i < _activeBatchCount; i++)
+                if (_batches[i].RuntimeMesh.MechanicalParts is { Length: > 0 }) mechanical += _batches[i].Instances.Count;
             int textured = 0;
             for (int i = 0; i < _activeBatchCount; i++)
                 if (_batches[i].UsesRuntimeMaterial) textured++;
             int submitted = LastDiagnostics.RuntimeMeshInstances + LastDiagnostics.FallbackMeshInstances;
             return new InstanceSubmissionMetrics(_instanceStaging.Length, retained, _batches.Count,
-                submitted, (long)submitted * InstanceStride, LastDiagnostics.DrawCalls, textured * 4);
+                submitted, (long)submitted * InstanceStride, LastDiagnostics.DrawCalls, textured * 4)
+            { MechanicalPartInstances = mechanical, MechanicalTransformScratchBytes = MechanicalMeshValidation.MaximumParts * 64 };
         }
     }
 
@@ -488,37 +492,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         worldMatrix);
             }
 
-            var key =
-                new InstanceBatchKey(
-                    usesRuntimeMesh,
-                    runtimeMeshId,
-                    usesRuntimeMaterial,
-                    usesRuntimeMaterial
-                        ? runtimeMaterial.MaterialId
-                        : default);
-
-            if (!batchLookup.TryGetValue(
-                    key,
-                    out InstanceBatch? batch))
-            {
-                batch =
-                    RentBatch(
-                        usesRuntimeMesh,
-                        runtimeMesh,
-                        usesRuntimeMaterial,
-                        runtimeMaterial);
-                batchLookup.Add(
-                    key,
-                    batch);
-            }
-
-            batch.Instances.Add(
-                CreateInstanceRenderData(
-                    worldMatrix,
-                    color,
-                    usesRuntimeMaterial,
-                    runtimeMaterial));
-
+            float motionWeight = MechanicalDetailWeight(projectedDiameter, hasBuildingDefinition ? 150 : 90, _lodDiameterScale);
+            AddMechanicalBatches(instance, worldMatrix, color, usesRuntimeMesh, runtimeMesh,
+                runtimeMeshId, usesRuntimeMaterial, runtimeMaterial, motionWeight);
             if (hasUnitDefinition &&
                 unitLod == UnitAssetLod.Lod0 &&
                 !instance.UnitFeature.IsWreck &&
@@ -530,39 +506,10 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     out AssetId turretMeshId) &&
                 turretMesh.IsValid)
             {
-                var turretKey =
-                    new InstanceBatchKey(
-                        true,
-                        turretMeshId,
-                        usesRuntimeMaterial,
-                        runtimeMaterial.MaterialId);
-
-                if (!batchLookup.TryGetValue(
-                        turretKey,
-                        out InstanceBatch? turretBatch))
-                {
-                    turretBatch =
-                        RentBatch(
-                            true,
-                            turretMesh,
-                            usesRuntimeMaterial,
-                            runtimeMaterial);
-                    batchLookup.Add(
-                        turretKey,
-                        turretBatch);
-                }
-
-                turretBatch.Instances.Add(
-                    CreateInstanceRenderData(
-                        CreateArticulatedTransform(
-                            worldMatrix,
-                            unitDefinition.TurretPivot,
-                            instance.UnitFeature.AimYawRadians),
-                        color,
-                        usesRuntimeMaterial,
-                        runtimeMaterial));
+                AddMechanicalBatches(instance,
+                    CreateArticulatedTransform(worldMatrix, unitDefinition.TurretPivot, instance.UnitFeature.AimYawRadians * motionWeight),
+                    color, true, turretMesh, turretMeshId, usesRuntimeMaterial, runtimeMaterial, motionWeight);
             }
-
             string? buildingStateAssetId =
                 hasBuildingDefinition
                     ? BuildingPresentationCatalog.ResolveStateAttachmentAssetId(
@@ -777,7 +724,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 batch.UsesRuntimeMesh
                     ? batch.RuntimeMesh.IndexCount
                     : 36,
-                drawInstances);
+                drawInstances,
+                startIndex: batch.UsesRuntimeMesh ? batch.RuntimeMesh.FirstIndex : 0);
             shadowSubmitted += drawInstances;
             draws++;
         }
@@ -1743,6 +1691,40 @@ public sealed class SimpleInstanceRenderer : IDisposable
             });
     }
 
+    internal static float MechanicalDetailWeight(float diameter, float threshold, float scale)
+    {
+        float t = (float)Math.Clamp(((double)diameter * scale - threshold * (1 + ScreenSpaceLod.Hysteresis)) / (threshold * .5), 0, 1);
+        return t * t * (3 - 2 * t);
+    }
+
+    private void AddMechanicalBatches(in RenderInstance instance, Matrix4x4 world, Vector4 color,
+        bool usesMesh, RuntimeMeshBuffers mesh, AssetId meshId, bool usesMaterial, RuntimeMaterialResources material, float motionWeight)
+    {
+        ReadOnlySpan<MechanicalPartBinding> parts = instance.MechanicalPose.IsSpecified && motionWeight > 0
+            ? mesh.MechanicalParts : null;
+        Span<Matrix4x4> transforms = stackalloc Matrix4x4[MechanicalMeshValidation.MaximumParts];
+        if (usesMesh && parts.Length > 0)
+            MechanicalTransforms.Compose(parts, instance, world, transforms, motionWeight);
+        int count = usesMesh && parts.Length > 0 ? parts.Length : 1;
+        for (int i = 0; i < count; i++)
+        {
+            bool articulated = usesMesh && parts.Length > 0;
+            RuntimeMeshBuffers slice = articulated ? mesh with
+            {
+                FirstIndex = parts[i].Part.FirstIndex,
+                IndexCount = parts[i].Part.IndexCount
+            } : mesh;
+            var key = new InstanceBatchKey(usesMesh, meshId, usesMaterial,
+                usesMaterial ? material.MaterialId : default, articulated ? i : -1);
+            if (!_batchLookup.TryGetValue(key, out InstanceBatch? batch))
+            {
+                batch = RentBatch(usesMesh, slice, usesMaterial, material);
+                _batchLookup.Add(key, batch);
+            }
+            batch.Instances.Add(CreateInstanceRenderData(articulated ? transforms[i] : world,
+                color, usesMaterial, material));
+        }
+    }
     private static Matrix4x4 CreateArticulatedTransform(
         Matrix4x4 world,
         Vector3 pivot,
@@ -1895,7 +1877,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
         bool UsesRuntimeMesh,
         AssetId RuntimeMeshId,
         bool UsesRuntimeMaterial,
-        AssetId RuntimeMaterialId);
+        AssetId RuntimeMaterialId,
+        int PartIndex = -1);
 
     private sealed class InstanceBatch
     {
