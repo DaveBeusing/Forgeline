@@ -120,7 +120,8 @@ public static class CentralDivideBattlefield
         WorldObject("decal.blast.center", WorldVisualId.DecalBlastMark, WorldPresentationKind.Decal, 1_640, 1_630, 16, 0.08f, 16, 0),
         WorldObject("decal.shell.south", WorldVisualId.DecalShellImpact, WorldPresentationKind.Decal, 1_420, 2_310, 8, 0.08f, 8, 0),
         WorldObject("decal.scorch.east", WorldVisualId.DecalScorchMark, WorldPresentationKind.Decal, 2_365, 2_545, 14, 0.08f, 12, 0),
-        WorldObject("decal.crack.north", WorldVisualId.DecalConcreteCrack, WorldPresentationKind.Decal, 1_535, 918, 18, 0.08f, 10, 90)
+        WorldObject("decal.crack.north", WorldVisualId.DecalConcreteCrack, WorldPresentationKind.Decal, 1_535, 918, 18, 0.08f, 10, 90),
+        .. CentralDivideDressing.Create(CreateStarts(), CreateResources(), CreateSites(), CreateRoadNodes(), CreateRoadEdges(), CreateCrossings())
     ];
 
     private static BattlefieldSiteDefinition[] CreateSites() =>

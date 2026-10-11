@@ -36,7 +36,7 @@ public sealed class WorldPresentationTests
                 Vector3.UnitY);
         Vector4 road =
             profile.SampleBaseColor(
-                new Vector3(1_536.0f, 6.0f, 1_536.0f),
+                new Vector3(800.0f, 6.0f, 1_536.0f),
                 Vector3.UnitY);
 
         Assert.NotEqual(field, road);

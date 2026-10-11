@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Text.Json;
 using ForgeLine.Assets;
+using ForgeLine.Game;
 
 namespace ForgeLine.Presentation;
 
@@ -30,7 +31,9 @@ public readonly record struct TerrainBlendRegion(
     TerrainMaterialSlot Slot,
     Vector2 Center,
     Vector2 HalfExtents,
-    float FeatherMeters);
+    float FeatherMeters,
+    float RotationRadians = 0,
+    float Strength = .92f);
 
 public sealed class TerrainPresentationProfile
 {
@@ -69,7 +72,8 @@ public sealed class TerrainPresentationProfile
         foreach (TerrainBlendRegion region in _regions)
             if (!Enum.IsDefined(region.Slot) || !float.IsFinite(region.Center.X) || !float.IsFinite(region.Center.Y) ||
                 !float.IsFinite(region.HalfExtents.X) || !float.IsFinite(region.HalfExtents.Y) ||
-                region.HalfExtents.X <= 0 || region.HalfExtents.Y <= 0 || !float.IsFinite(region.FeatherMeters) || region.FeatherMeters < 0)
+                region.HalfExtents.X <= 0 || region.HalfExtents.Y <= 0 || !float.IsFinite(region.FeatherMeters) || region.FeatherMeters < 0 ||
+                !float.IsFinite(region.RotationRadians) || !float.IsFinite(region.Strength) || region.Strength < 0 || region.Strength > 1)
                 throw new ArgumentException("Terrain regions require finite centers, positive extents and non-negative feathering.", nameof(regions));
 
         FallbackMaterial =
@@ -381,16 +385,17 @@ public sealed class TerrainPresentationProfile
         return new TerrainPresentationProfile(
             materials,
             [
-                new(TerrainMaterialSlot.Mud, new Vector2(1_536, 1_536), new Vector2(1_120, 44), 24),
-                new(
-                    TerrainMaterialSlot.Gravel,
-                    new Vector2(
-                        1_536.0f,
-                        1_536.0f),
-                    new Vector2(
-                        1_120.0f,
-                        32.0f),
-                    24.0f),
+                new(TerrainMaterialSlot.Dirt, new(430, 720), new(110, 45), 100, .2f, .3f),
+                new(TerrainMaterialSlot.Dirt, new(1050, 440), new(130, 60), 110, 1.1f, .24f),
+                new(TerrainMaterialSlot.Dirt, new(2630, 2770), new(110, 45), 100, -.2f, .3f),
+                new(TerrainMaterialSlot.Dirt, new(2040, 2680), new(130, 60), 110, -1.1f, .24f),
+                new(TerrainMaterialSlot.Rock, new(1300, 580), new(90, 35), 80, -.5f, .28f),
+                new(TerrainMaterialSlot.Rock, new(1820, 2630), new(90, 35), 80, .3f, .28f),
+                .. CreateRoadRegions(),
+                new(TerrainMaterialSlot.IndustrialGround, new(650, 305), new(43, 27), 22),
+                new(TerrainMaterialSlot.IndustrialGround, new(2420, 2775), new(43, 27), 22),
+                new(TerrainMaterialSlot.IndustrialGround, new(460, 1220), new(43, 27), 22),
+                new(TerrainMaterialSlot.IndustrialGround, new(2610, 1220), new(43, 27), 22),
                 new(
                     TerrainMaterialSlot.Concrete,
                     new Vector2(
@@ -408,7 +413,7 @@ public sealed class TerrainPresentationProfile
                     new Vector2(
                         150.0f,
                         120.0f),
-                    28.0f),
+                    70.0f),
                 new(
                     TerrainMaterialSlot.IndustrialGround,
                     new Vector2(
@@ -417,7 +422,7 @@ public sealed class TerrainPresentationProfile
                     new Vector2(
                         150.0f,
                         120.0f),
-                    28.0f),
+                    70.0f),
                 new(
                     TerrainMaterialSlot.Scorched,
                     new Vector2(
@@ -428,6 +433,22 @@ public sealed class TerrainPresentationProfile
                         80.0f),
                     35.0f)
             ]);
+    }
+
+    private static IEnumerable<TerrainBlendRegion> CreateRoadRegions()
+    {
+        BattlefieldDefinition map = CentralDivideBattlefield.Create();
+        // Apply all shoulders before gravel so junction overlaps cannot muddy a road center.
+        foreach (TerrainMaterialSlot slot in new[] { TerrainMaterialSlot.Mud, TerrainMaterialSlot.Gravel })
+        foreach (BattlefieldRoadEdgeDefinition edge in map.RoadEdges)
+        {
+            Vector3 a = map.RoadNodes.First(x => x.Key == edge.SourceNodeKey).Position;
+            Vector3 b = map.RoadNodes.First(x => x.Key == edge.DestinationNodeKey).Position;
+            Vector2 delta = new(b.X - a.X, b.Z - a.Z);
+            yield return new(slot, new((a.X + b.X) * .5f, (a.Z + b.Z) * .5f),
+                new(delta.Length() * .5f, slot == TerrainMaterialSlot.Mud ? 14 : 8),
+                slot == TerrainMaterialSlot.Mud ? 18 : 8, MathF.Atan2(delta.Y, delta.X));
+        }
     }
 
     private static TerrainMaterialDefinition ResolveRuntimeMaterial(
@@ -739,11 +760,11 @@ public sealed class TerrainPresentationProfile
         Vector2 point,
         in TerrainBlendRegion region)
     {
-        Vector2 distance =
-            Vector2.Abs(
-                point -
-                region.Center) -
-            region.HalfExtents;
+        Vector2 offset = point - region.Center;
+        float cosine = MathF.Cos(region.RotationRadians);
+        float sine = MathF.Sin(region.RotationRadians);
+        Vector2 local = new(offset.X * cosine + offset.Y * sine, -offset.X * sine + offset.Y * cosine);
+        Vector2 distance = Vector2.Abs(local) - region.HalfExtents;
         float dx =
             MathF.Max(
                 distance.X,
@@ -761,7 +782,7 @@ public sealed class TerrainPresentationProfile
 
         if (outside <= 0.0f)
         {
-            return 0.92f;
+            return region.Strength;
         }
 
         if (region.FeatherMeters <=
@@ -773,6 +794,6 @@ public sealed class TerrainPresentationProfile
         }
 
         float t = 1.0f - outside / region.FeatherMeters;
-        return 0.92f * t * t * (3.0f - 2.0f * t);
+        return region.Strength * t * t * (3.0f - 2.0f * t);
     }
 }
