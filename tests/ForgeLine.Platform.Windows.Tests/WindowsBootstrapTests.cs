@@ -1,10 +1,40 @@
 using ForgeLine.Platform;
+using System.Runtime.InteropServices;
 using Xunit;
 
 namespace ForgeLine.Platform.Windows.Tests;
 
 public sealed class WindowsBootstrapTests
 {
+    [Theory]
+    [InlineData(96u)]
+    [InlineData(144u)]
+    [InlineData(192u)]
+    [InlineData(288u)]
+    public void DpiChangesRepaintTheSameBootstrapWindow(uint dpi)
+    {
+        using var platform = new WindowsPlatform();
+        using IWindow window = platform.CreateBootstrapWindow(new WindowConfiguration("FORGELINE", 640, 360));
+        nint handle = window.NativeHandle.Value;
+        var bounds = new WindowsNative.NativeRect { Left = 100, Top = 100,
+            Right = 100 + (int)(800 * dpi / 96), Bottom = 100 + (int)(600 * dpi / 96) };
+        nint suggested = Marshal.AllocHGlobal(Marshal.SizeOf<WindowsNative.NativeRect>());
+        try
+        {
+            Marshal.StructureToPtr(bounds, suggested, false);
+            _ = SendMessage(handle, 0x02E0, dpi | ((nuint)dpi << 16), suggested);
+            platform.UpdateBootstrap(window, "PREPARING GRAPHICS");
+            Assert.Equal(dpi, window.Dpi);
+            Assert.Equal(handle, window.NativeHandle.Value);
+            Assert.True(platform.BootstrapPainted(window));
+            Assert.False(window.ClientSize.IsEmpty);
+        }
+        finally { Marshal.FreeHGlobal(suggested); }
+    }
+
+    [DllImport("user32.dll", EntryPoint = "SendMessageW")]
+    private static extern nint SendMessage(nint window, uint message, nuint wParam, nint lParam);
+
     [Fact]
     public void BootstrapPaintsBeforeGraphicsAndRetainsItsWindowThroughConfigurationAndHandoff()
     {
