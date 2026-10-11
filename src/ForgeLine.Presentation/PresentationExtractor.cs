@@ -20,6 +20,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
     private readonly AxisAlignedBounds? _intelligenceWorldBounds;
     private readonly PresentationExtractionContext? _extraction;
     private readonly RuntimeAssetCatalog? _runtimeAssets;
+    private readonly RenderInstance[] _staticDressing = [];
     private readonly VfxEffectPool _vfxPool = new();
     private readonly AlertLifecycleTracker _alerts = new();
     private readonly List<QueuedVfxInstance> _queuedVfx = new(256);
@@ -64,6 +65,29 @@ public sealed class PresentationExtractor : ISimulationTickObserver
             runtimeAssets)
     {
         _extraction = extraction;
+        _staticDressing = CaptureStaticDressing(extraction.Scenario);
+    }
+
+    private static RenderInstance[] CaptureStaticDressing(MatchRuntime scenario)
+    {
+        var instances = new List<RenderInstance>();
+        foreach (var item in scenario.Battlefield.WorldObjects)
+        {
+            if (!item.PresentationOnly) continue;
+            if (!scenario.Terrain.TrySampleHeight(item.Position.X, item.Position.Z, out float height))
+                throw new InvalidOperationException($"Dressing '{item.Key}' lies outside terrain.");
+            float offset = item.Kind == WorldPresentationKind.Vegetation ? 0
+                : item.Kind == WorldPresentationKind.Decal ? .04f : item.Scale.Y * .5f;
+            // A separate presentation identity range cannot consume simulation allocator slots.
+            uint identity = checked(0xE000_0000U + (uint)instances.Count);
+            instances.Add(new(new EntityId(identity, 1),
+                new(new(item.Position.X, height + offset, item.Position.Z),
+                    Quaternion.CreateFromAxisAngle(Vector3.UnitY, item.RotationDegrees * MathF.PI / 180), item.Scale),
+                new(checked(5_000u + (uint)item.Visual)), RenderMaterialHandle.Default,
+                RenderVisibilityMask.World, identity,
+                WorldFeature: new(item.Visual, item.Kind, default, Inspectable: false)));
+        }
+        return instances.ToArray();
     }
 
     public void OnTickCompleted(SimulationContext context)
@@ -202,10 +226,10 @@ public sealed class PresentationExtractor : ISimulationTickObserver
         _queuedVfx.Clear();
 
         var baseInstances =
-            visualCount == 0
+            visualCount + _staticDressing.Length == 0
                 ? []
                 : new RenderInstance[
-                    visualCount];
+                    checked(visualCount + _staticDressing.Length)];
         int baseIndex =
             0;
 
@@ -270,6 +294,11 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                     entities,
                     entity);
 
+            // Keep legacy ECS transforms replay-stable; root the mesh only in presentation.
+            if (_extraction is not null && worldFeature.Kind == WorldPresentationKind.Vegetation &&
+                _extraction.Scenario.Terrain.TrySampleHeight(transform.Position.X, transform.Position.Z, out float ground))
+                transform = transform with { Position = transform.Position with { Y = ground } };
+
             baseInstances[baseIndex++] =
                 new RenderInstance(
                     entity,
@@ -298,6 +327,9 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 entity,
                 transform);
         }
+
+        _staticDressing.CopyTo(baseInstances, baseIndex);
+        baseIndex += _staticDressing.Length;
 
         QueueProjectileVfx(
             context);

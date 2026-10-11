@@ -16,6 +16,7 @@ public sealed class EnvironmentDressingTests
         Assert.Equal(map.WorldObjects.Count, map.WorldObjects.Select(x => x.Key).Distinct().Count());
         foreach (var item in dressing)
         {
+            Assert.True(item.PresentationOnly);
             Assert.Contains(item.Kind, new[] { WorldPresentationKind.Prop, WorldPresentationKind.Vegetation, WorldPresentationKind.Decal });
             var p = new Vector2(item.Position.X, item.Position.Z);
             float radius = new Vector2(item.Scale.X, item.Scale.Z).Length() / 2;

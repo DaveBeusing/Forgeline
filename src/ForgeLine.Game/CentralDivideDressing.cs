@@ -89,7 +89,7 @@ internal static class CentralDivideDressing
             }
             WorldPresentationKind kind = visual >= WorldVisualId.DecalTireTracks ? WorldPresentationKind.Decal
                 : visual >= WorldVisualId.VegetationConifer ? WorldPresentationKind.Vegetation : WorldPresentationKind.Prop;
-            objects.Add(new($"dressing.{key}", visual, kind, new(p.X, 0, p.Y), scale, yaw));
+            objects.Add(new($"dressing.{key}", visual, kind, new(p.X, 0, p.Y), scale, yaw, PresentationOnly: true));
         }
     }
 

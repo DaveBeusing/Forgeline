@@ -585,7 +585,7 @@ public sealed class PrototypeBattlefieldTests
         }
 
         Assert.Equal(
-            definition.WorldObjects.Count,
+            definition.WorldObjects.Count(x => !x.PresentationOnly),
             runtime.WorldPresentationEntities.Count);
 
         foreach (EntityId decoration in runtime.WorldPresentationEntities)
@@ -599,7 +599,7 @@ public sealed class PrototypeBattlefieldTests
             {
                 var transform = simulation.Entities.GetComponent<WorldTransform>(decoration);
                 Assert.True(terrain.TrySampleHeight(transform.Position.X, transform.Position.Z, out float height));
-                Assert.Equal(height, transform.Position.Y, 5);
+                Assert.Equal(height + transform.Scale.Y * .5f, transform.Position.Y, 5);
             }
         }
 
