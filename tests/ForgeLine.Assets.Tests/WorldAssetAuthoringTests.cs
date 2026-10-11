@@ -194,6 +194,27 @@ public sealed class WorldAssetAuthoringTests
                 resourceMeshIds.Length,
                 highDetailIndexCounts.Count);
 
+            foreach (string family in new[] { "conifer", "scrub", "grass_clump" })
+            {
+                RuntimeMeshData high = RuntimeMeshData.FromPayload(catalog.Read(AssetId.Parse($"mesh.world.vegetation.{family}")).Payload);
+                RuntimeMeshData low = RuntimeMeshData.FromPayload(catalog.Read(AssetId.Parse($"mesh.world.vegetation.{family}_lod1")).Payload);
+                Assert.True(low.Indices.Count < high.Indices.Count);
+                Assert.Equal(high.MaterialIds.ToArray(), low.MaterialIds.ToArray());
+                foreach (RuntimeMeshData mesh in new[] { high, low })
+                {
+                    Assert.True(mesh.HasUv0 && mesh.HasTangents);
+                    Assert.Equal(0, mesh.Vertices.Min(x => x.Y), 5);
+                    Assert.Equal(1, mesh.Vertices.Max(x => x.Y), 5);
+                    Assert.True(mesh.Vertices.Max(x => x.Z) - mesh.Vertices.Min(x => x.Z) > .8f,
+                        $"{family} must remain volumetric instead of a single plane.");
+                    Assert.All(mesh.Vertices, x =>
+                    {
+                        Assert.InRange(x.X, -.50001f, .50001f);
+                        Assert.InRange(x.Z, -.50001f, .50001f);
+                    });
+                }
+            }
+
             RuntimeAssetRecord vegetation =
                 catalog.Get(
                     AssetId.Parse(

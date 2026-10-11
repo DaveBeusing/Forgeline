@@ -75,10 +75,12 @@ public static class TerrainSplatMapBuilder
         var totals =
             new double[
                 TerrainPresentationProfile.MaterialSlotCount];
+        var peaks = new float[TerrainPresentationProfile.MaterialSlotCount];
         AccumulateMaterialTotals(
             chunk,
             profile,
-            totals);
+            totals,
+            peaks);
 
         TerrainMaterialSlot[] palette =
             Enumerable
@@ -86,6 +88,8 @@ public static class TerrainSplatMapBuilder
                     0,
                     TerrainPresentationProfile.MaterialSlotCount)
                 .OrderByDescending(
+                    index => index >= (int)TerrainMaterialSlot.Gravel && peaks[index] >= .5f)
+                .ThenByDescending(
                     index =>
                         totals[index])
                 .ThenBy(
@@ -232,7 +236,8 @@ public static class TerrainSplatMapBuilder
     private static void AccumulateMaterialTotals(
         TerrainChunk chunk,
         TerrainPresentationProfile profile,
-        Span<double> totals)
+        Span<double> totals,
+        Span<float> peaks)
     {
         Span<float> weights =
             stackalloc float[
@@ -276,6 +281,9 @@ public static class TerrainSplatMapBuilder
                 {
                     totals[slot] +=
                         weights[slot];
+                    // Keep locally dominant authored paths/aprons even when their total area is small.
+                    // The fixed four-layer budget and deterministic area ordering remain unchanged.
+                    peaks[slot] = MathF.Max(peaks[slot], weights[slot]);
                 }
             }
         }
