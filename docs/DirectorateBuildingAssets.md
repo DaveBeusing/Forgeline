@@ -255,3 +255,12 @@ All thirteen constructible building classes now have textured compiled geometry 
 Building, road and bridge UVs select concrete, structural steel, service panels, glass, warning and heat-treated surfaces from the shared concept atlas. Existing stable material IDs and instancing remain intact. See [surface authoring](../assets/source/materials/directorate/surfaces/README.md).
 
 State material selection takes precedence over the static primary mesh material, so Unpowered, Damaged and Critical treatment is not overwritten by the operational material. The existing 112-byte instance stream carries atlas scale/offset and emissive strength.
+
+## Command Core production geometry
+
+The Command Core now uses its dedicated editable modular kit, assembled glTF
+LOD0/1/2 and seven state meshes. Its stable primary identity, gameplay footprint,
+collision proxy, atlas maps and state authority are retained. Only its cosmetic
+foundation reaches the existing ground plane; other buildings keep the shared
+construction/state vocabulary. See [Command Core production](CommandCoreProduction.md)
+for dimensions, new anchors, source mapping, provenance and qualification limits.
