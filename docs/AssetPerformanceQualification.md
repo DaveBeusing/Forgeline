@@ -431,3 +431,11 @@ phase resets, invisible-entity history eviction, interpolation clamps and
 zero-allocation composition for 1,000 instances. Native and hosted validation
 results for this change are recorded during qualification; no final visual or
 performance acceptance is inferred from compilation.
+
+### Battlefield effect qualification
+
+The 0.1.343 analytic effect refinement retains bounded particle capacities,
+fill admission and existing buffer ownership. Matched isolated measurements
+show mixed timing changes, with no general speedup claim. Native repetition,
+window smoke and outstanding visual gates are recorded in the
+[battlefield effect catalog](BattlefieldEffectCatalog.md#qualification-at-51219a4-01343).

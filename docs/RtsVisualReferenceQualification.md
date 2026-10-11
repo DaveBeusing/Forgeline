@@ -105,3 +105,13 @@ are reproducible presentation states, not claims of natural loading or combat.
 Use the existing three zoom references and record actual profile/display,
 CPU/GPU distributions, submission ranges and residency. Repeated still captures
 do not establish sustained motion, wheel contact or LOD-transition acceptance.
+
+### Battlefield VFX capture result
+
+The 0.1.343 hardware matrix for BattlefieldCombat and DamageDestruction
+contains 18 native 1920x1080 captures across three profiles and zooms.
+Seventeen are pixel-stable; BattlefieldCombat High CloseTactical differs
+in six channels (maximum delta 25), leaving the matrix failed. The cause
+is not isolated. Fixed-age captures also miss the short muzzle phase and
+cannot establish sustained motion acceptance. See the
+[full qualification and unresolved gates](BattlefieldEffectCatalog.md#qualification-at-51219a4-01343).

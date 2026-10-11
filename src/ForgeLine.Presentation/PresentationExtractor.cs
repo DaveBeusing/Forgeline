@@ -24,6 +24,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
     private readonly RuntimeAssetCatalog? _runtimeAssets;
     private readonly RenderInstance[] _staticDressing = [];
     private readonly VfxEffectPool _vfxPool = new();
+    private ulong? _vfxTick;
+    private SimulationSessionId _vfxSession;
     private readonly AlertLifecycleTracker _alerts = new();
     private readonly List<QueuedVfxInstance> _queuedVfx = new(256);
     private readonly HashSet<EntityId> _seenWrecks = [];
@@ -120,8 +122,13 @@ public sealed class PresentationExtractor : ISimulationTickObserver
             context.Tick.Value, context.TickDuration.TotalSeconds);
         _vfxPool.BeginTick(
             context.Tick);
-        CaptureCombatVfx(
-            context);
+        SimulationSessionId vfxSession = _extraction?.Scenario.Simulation.SessionId ?? SimulationSessionId.None;
+        if (_vfxTick.HasValue && (vfxSession != _vfxSession || context.Tick.Value < _vfxTick.Value))
+        {
+            _vfxPool.Reset(); _seenWrecks.Clear(); _previousSupplyStates.Clear(); _vfxTick = null;
+        }
+        if (_vfxTick != context.Tick.Value) CaptureCombatVfx(context);
+        _vfxTick = context.Tick.Value; _vfxSession = vfxSession;
         CaptureNewWreckVfx(
             context);
 
@@ -332,6 +339,16 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 transform,
                 unitFeature,
                 buildingFeature);
+            if (unitFeature.IsSpecified && !unitFeature.IsWreck &&
+                entities.TryGetComponent(entity, out UnitIdentity movingUnit) &&
+                movingUnit.UnitId != UnitIds.RifleSquad && movingUnit.UnitId != UnitIds.CombatEngineer &&
+                _mechanicalHistory.HasMoved(entity))
+            {
+                Vector3 dust = transform.Position - Vector3.Transform(Vector3.UnitZ * MathF.Abs(transform.Scale.Z) * .35f, transform.Rotation);
+                if (_extraction is not null && _extraction.Scenario.Terrain.TrySampleHeight(dust.X, dust.Z, out float dustGround))
+                    dust.Y = dustGround + .15f;
+                QueueAt(VfxEffectKind.PersistentDust, dust, entity);
+            }
             QueueLogisticsVfx(
                 entities,
                 entity,
@@ -905,7 +922,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
             VfxPresentationCatalog.ResolveCombatEvent(
                 combatEvent);
         WorldTransform sourceTransform =
-            entities.TryGetComponent(
+            IsVisibleToViewer(entities, combatEvent.Source) && entities.TryGetComponent(
                 combatEvent.Source,
                 out WorldTransform source)
                 ? source
@@ -914,11 +931,11 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                     Quaternion.Identity,
                     Vector3.One);
         Vector3 muzzlePosition =
-            ResolveSocketWorldPosition(
+            IsVisibleToViewer(entities, combatEvent.Source) ? ResolveSocketWorldPosition(
                 entities,
                 combatEvent.Source,
                 "weapon_muzzle",
-                sourceTransform.Position);
+                sourceTransform.Position) : combatEvent.Position;
 
         VfxPresentationDefinition muzzleDefinition =
             VfxPresentationCatalog.Get(
@@ -928,7 +945,10 @@ public sealed class PresentationExtractor : ISimulationTickObserver
             muzzle,
             new RenderTransform(
                 muzzlePosition,
-                sourceTransform.Rotation,
+                IsVisibleToViewer(entities, combatEvent.Source)
+                    ? sourceTransform.Rotation * Quaternion.CreateFromYawPitchRoll(ResolveAimYaw(entities, combatEvent.Source),
+                        -ResolveAimElevation(entities, combatEvent.Source), 0)
+                    : Quaternion.Identity,
                 muzzleDefinition.BaseScale),
             combatEvent.Tick);
 
@@ -974,7 +994,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 candidate.Target !=
                     combatEvent.Target ||
                 candidate.Weapon !=
-                    combatEvent.Weapon)
+                    combatEvent.Weapon || candidate.Tick != combatEvent.Tick ||
+                !IsCombatEffectVisible(entities, candidate) || !IsPositionVisible(candidate.Position))
             {
                 continue;
             }
@@ -994,7 +1015,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
         in CombatEvent combatEvent)
     {
         TargetClass? targetClass =
-            entities.TryGetComponent(
+            IsVisibleToViewer(entities, combatEvent.Target) && entities.TryGetComponent(
                 combatEvent.Target,
                 out Targetable targetable)
                 ? targetable.Class
@@ -1083,14 +1104,6 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 transform.Position,
                 context.Tick);
             SpawnAt(
-                VfxEffectKind.DestructionSmokePlume,
-                transform.Position,
-                context.Tick);
-            SpawnAt(
-                VfxEffectKind.DestructionPersistentFire,
-                transform.Position,
-                context.Tick);
-            SpawnAt(
                 VfxEffectKind.DestructionSparkEmission,
                 transform.Position,
                 context.Tick);
@@ -1133,14 +1146,6 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 context.Tick);
             SpawnAt(
                 VfxEffectKind.DestructionDustCloud,
-                transform.Position,
-                context.Tick);
-            SpawnAt(
-                VfxEffectKind.DestructionSmokePlume,
-                transform.Position,
-                context.Tick);
-            SpawnAt(
-                VfxEffectKind.DestructionPersistentFire,
                 transform.Position,
                 context.Tick);
             SpawnAt(
@@ -1246,7 +1251,9 @@ public sealed class PresentationExtractor : ISimulationTickObserver
             VfxPooledEffect effect =
                 slots[index];
 
-            if (!effect.Active)
+            if (!effect.Active || !IsPositionVisible(effect.Transform.Position) ||
+                effect.VisibilityStart is { } start && !IsPositionVisible(start) ||
+                effect.VisibilityEnd is { } end && !IsPositionVisible(end))
             {
                 continue;
             }
@@ -1517,7 +1524,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 CreateDirectionRotation(
                     delta),
                 scale),
-            tick);
+            tick, start, end);
     }
 
     private Vector3 ResolveSocketWorldPosition(
@@ -1564,8 +1571,18 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 new Vector3(
                     socket.X,
                     socket.Y,
-                    socket.Z) *
-                transform.Scale;
+                    socket.Z);
+            if (socketName == "weapon_muzzle" && definition.HasArticulatedTurret)
+            {
+                Vector3 gunPivot = definition.TurretPivot;
+                foreach (var anchor in record.Sockets)
+                    if (anchor.Name == "gun_pivot") gunPivot = new(anchor.X, anchor.Y, anchor.Z);
+                local = Vector3.Transform(local - gunPivot,
+                    Quaternion.CreateFromAxisAngle(Vector3.UnitX, -ResolveAimElevation(entities, entity))) + gunPivot;
+                local = Vector3.Transform(local - definition.TurretPivot,
+                    Quaternion.CreateFromAxisAngle(Vector3.UnitY, ResolveAimYaw(entities, entity))) + definition.TurretPivot;
+            }
+            local *= transform.Scale;
 
             return
                 transform.Position +

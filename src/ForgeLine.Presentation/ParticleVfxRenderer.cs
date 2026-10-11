@@ -9,7 +9,12 @@ namespace ForgeLine.Presentation;
 
 public readonly record struct ParticleVfxDiagnostics(ParticleQuality Quality, int ActiveParticles, int PeakParticles,
     int ActiveEmitters, int Capacity, ulong EmittedParticles, ulong DroppedParticles, int FallbackEffects,
-    int DrawCalls, long BufferBytes, double PreparationCpuMilliseconds, float ScreenCoverage);
+    int DrawCalls, long BufferBytes, double PreparationCpuMilliseconds, float ScreenCoverage)
+{
+    public ParticleTypeCounts ByType { get; init; }
+}
+
+public readonly record struct ParticleTypeCounts(int Smoke, int Dust, int Sparks, int Blast, int Fire, int Muzzle);
 
 public sealed class ParticleVfxRenderer : IDisposable
 {
@@ -30,6 +35,7 @@ public sealed class ParticleVfxRenderer : IDisposable
     private readonly EffectKey[] _retire = new EffectKey[EmitterCapacity];
     private readonly ParticleDepthComparer _depthComparer = new();
     private SimulationSessionId _session;
+    private ulong _lastTick;
     private double _time;
     private int _count, _peak;
     private ulong _emitted, _dropped;
@@ -83,13 +89,16 @@ public sealed class ParticleVfxRenderer : IDisposable
         long started = Stopwatch.GetTimestamp();
         _count = 0; _replaced.Clear(); _authorized.Clear();
         var snapshot = world.CurrentSnapshot;
-        if (snapshot is not null && snapshot.SessionId != _session)
+        if (snapshot is not null && (snapshot.SessionId != _session || snapshot.Tick.Value < _lastTick))
         {
             _emitters.Clear(); Array.Clear(_occupied); _time = 0; _emitted = _dropped = 0; _peak = 0; _session = snapshot.SessionId;
         }
+        if (snapshot is not null) _lastTick = snapshot.Tick.Value;
         if (!paused) _time += Math.Min(deltaSeconds, .1);
         int candidateCount = 0, fallback = 0;
         float coverage = 0;
+        Span<int> byType = stackalloc int[6];
+        byType.Clear();
         var matrices = camera.GetMatrices(width,height);
         var frustum = ViewFrustum.FromViewProjection(matrices.ViewProjection);
         if (snapshot is not null)
@@ -149,17 +158,17 @@ public sealed class ParticleVfxRenderer : IDisposable
             float life = candidate.Descriptor.LifetimeSeconds;
             if (!candidate.Instance.VfxFeature.Continuous && elapsed >= life) continue;
             activeEmitters++;
+            byType[(int)candidate.Descriptor.Visual] += candidate.Count;
             coverage += candidate.Area;
             for (int particle = 0; particle < candidate.Count; particle++)
             {
                 uint seed = Seed(candidate.Key, particle);
                 float a = (seed & 65535) / 65535f * MathF.Tau;
                 float spread = .3f + ((seed >> 16) & 255) / 255f * .7f;
-                Vector3 velocity = new(MathF.Cos(a) * spread, .6f + spread, MathF.Sin(a) * spread);
-                velocity *= candidate.Descriptor.SpeedMetersPerSecond;
+                Vector3 velocity = candidate.Descriptor.InitialVelocity(a, spread, candidate.Instance.Transform.Rotation);
                 float age = candidate.Instance.VfxFeature.Continuous ? (elapsed + particle * life / candidate.Count) % life : elapsed;
                 Vector4 tint = VfxPresentationCatalog.Get(candidate.Descriptor.Effect).FallbackTint;
-                tint.W = candidate.Descriptor.Visual switch { ParticleVisualKind.Smoke => .18f, ParticleVisualKind.Dust => .22f, ParticleVisualKind.Spark => .9f, _ => .65f };
+                tint.W = candidate.Descriptor.Visual switch { ParticleVisualKind.Smoke => .24f, ParticleVisualKind.Dust => .18f, ParticleVisualKind.Spark => .65f, ParticleVisualKind.Fire => .48f, _ => .6f };
                 _particles[_count++] = new(new(candidate.Instance.Transform.Position, age), new(velocity, life), tint,
                     new(candidate.Radius, candidate.Descriptor.Gravity, (float)candidate.Descriptor.Visual, a));
             }
@@ -176,7 +185,8 @@ public sealed class ParticleVfxRenderer : IDisposable
         SortBounded(_particles.AsSpan(0,_count),_depthComparer);
         _peak = Math.Max(_peak,_count);
         Diagnostics = new(_settings.Quality,_count,_peak,activeEmitters,_settings.Capacity,_emitted,_dropped,fallback,
-            0,_renderer?.BufferBytes ?? 0,Stopwatch.GetElapsedTime(started).TotalMilliseconds,coverage);
+            0,_renderer?.BufferBytes ?? 0,Stopwatch.GetElapsedTime(started).TotalMilliseconds,coverage)
+        { ByType = new(byType[0], byType[1], byType[2], byType[3], byType[4], byType[5]) };
     }
 
     public void Render(IGraphicsCommandContext context, RtsCamera camera)
@@ -232,7 +242,9 @@ public sealed class ParticleVfxRenderer : IDisposable
             order=a.Distance.CompareTo(b.Distance);
             if(order != 0)return order;
             order=a.Key.Id.CompareTo(b.Key.Id);
-            return order != 0 ? order : a.Key.Generation.CompareTo(b.Key.Generation);
+            if (order != 0) return order;
+            order = a.Key.Generation.CompareTo(b.Key.Generation);
+            return order != 0 ? order : a.Key.Kind.CompareTo(b.Key.Kind);
         }
     }
     private sealed class ParticleDepthComparer : IComparer<GraphicsParticle>

@@ -1,4 +1,5 @@
 using ForgeLine.Simulation;
+using System.Numerics;
 
 namespace ForgeLine.Presentation;
 
@@ -33,6 +34,13 @@ public sealed class VfxEffectPool
 
     public ReadOnlySpan<VfxPooledEffect> Slots =>
         _slots;
+
+    public void Reset()
+    {
+        Array.Clear(_slots);
+        _activeCount = _searchStart = 0;
+        _totalSpawned = _totalReused = _totalDropped = 0;
+    }
 
     public VfxPresentationMetrics Metrics =>
         new(
@@ -78,7 +86,7 @@ public sealed class VfxEffectPool
     public bool TrySpawn(
         VfxEffectKind kind,
         in RenderTransform transform,
-        SimulationTick tick)
+        SimulationTick tick, Vector3? visibilityStart = null, Vector3? visibilityEnd = null)
     {
         VfxPresentationDefinition definition =
             VfxPresentationCatalog.Get(
@@ -112,7 +120,7 @@ public sealed class VfxEffectPool
                 transform,
                 tick,
                 new SimulationTick(
-                    expiresAt));
+                    expiresAt)) { VisibilityStart = visibilityStart, VisibilityEnd = visibilityEnd };
 
         _activeCount++;
         _totalSpawned++;
@@ -192,4 +200,6 @@ public readonly record struct VfxPooledEffect(
     SimulationTick ExpiresAtTick)
 {
     public int SlotIndex { get; init; } = -1;
+    public Vector3? VisibilityStart { get; init; }
+    public Vector3? VisibilityEnd { get; init; }
 }

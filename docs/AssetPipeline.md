@@ -503,3 +503,10 @@ passes and writes sibling `_motion.gltf` files. It verifies component bounds
 against the original source before reordering indices. Materials, vertex data,
 collision and stable asset IDs remain unchanged. Generated runtime assets are
 not source files. See [mechanical motion ownership](adr/BoundedMechanicalMotion.md).
+
+### Battlefield effect materials
+
+Explosion and spark emission multipliers are 0.35 and 0.45 respectively.
+Stable VFX IDs, atlas UVs/resolution and material bindings are unchanged;
+no new texture residency is introduced. Clean compilation still produces
+341 runtime assets. See [qualification limits](BattlefieldEffectCatalog.md).

@@ -17,5 +17,5 @@
     0.268
   ],
   "emissiveTexture": "texture.vfx.atlas_emissive",
-  "emissiveMultiplier": 1.2
+  "emissiveMultiplier": 0.35
 }
