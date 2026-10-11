@@ -89,10 +89,13 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
         if (kind == VisualReferenceSceneKind.DirectorateBuildingStates)
         {
             BuildingId[] buildings = [BuildingIds.CommandCore, BuildingIds.VehicleFactory, BuildingIds.PowerPlant];
+            var definitions = DirectorateContent.CreateBuildingCatalog();
             for (int row = 0; row < 3; row++)
             for (int column = 0; column < buildings.Length; column++)
             {
-                EntityId building = Add(new((column - 1) * 27, 0, (row - 1) * 27), new(16, 10, 16));
+                var footprint = definitions[buildings[column]].Footprint;
+                EntityId building = Add(new((column - 1) * 27, footprint.Height * .5f, (row - 1) * 27),
+                    new(footprint.Width, footprint.Height, footprint.Depth));
                 simulation.Entities.AddComponent(building, new CompletedBuilding(buildings[column], new(1), SimulationTick.Zero));
                 simulation.Entities.AddComponent(building, new ControllableEntity(new(1), ControllableEntityCategory.Building));
                 if (row == 1) simulation.Entities.AddComponent(building, new PowerConsumer(100));
