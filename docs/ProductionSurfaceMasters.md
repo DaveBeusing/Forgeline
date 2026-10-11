@@ -100,6 +100,9 @@ before raising them, especially for strategic views.
 
 ### Directorate material separation and fittings
 
+See [material qualification](DirectorateMaterialQualification.md) for per-family
+review, native camera evidence, measured cost and explicit acceptance limitations.
+
 `build/Author-DirectorateDetails.py` follows the bevel, running-gear and mechanical
 partition passes. Existing mechanical ranges and sockets are retained; appended
 fittings use bounded static ranges, while scout sensor glass shares radar motion.

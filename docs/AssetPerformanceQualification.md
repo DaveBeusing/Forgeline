@@ -417,6 +417,10 @@ Default client quality is Medium. The graphics-quality menu persists the next ma
 
 ## Mechanical motion qualification
 
+The subsequent [Directorate material qualification](DirectorateMaterialQualification.md)
+records bounded fittings, unchanged texture residency, native camera evidence and
+the remaining borderless/final visual acceptance limitations.
+
 The clean runtime compilation retains 341 assets, 158 meshes, 56 textures and
 127 materials; measured payload is 56,698,111 bytes. Six source mesh bindings
 add bounded rigid triangle ranges without changing their triangle populations
