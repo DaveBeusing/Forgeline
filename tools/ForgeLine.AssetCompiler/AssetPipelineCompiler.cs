@@ -452,6 +452,17 @@ public static class AssetPipelineCompiler
                 ToRelativePath(sourceRoot, sourcePath)));
         }
 
+        try
+        {
+            if (definition.MechanicalParts.Count > 0 && definition.Type != RuntimeAssetType.Mesh)
+                throw new InvalidDataException("Only mesh assets can declare mechanical parts.");
+            MechanicalMeshValidation.Validate(definition.MechanicalParts, definition.Sockets);
+        }
+        catch (Exception exception) when (exception is InvalidDataException or OverflowException)
+        {
+            diagnostics.Add(new AssetCompilerDiagnostic("ASSET050", AssetCompilerDiagnosticSeverity.Error,
+                exception.Message, id.Value, ToRelativePath(sourceRoot, sourcePath)));
+        }
         var socketNames = new HashSet<string>(StringComparer.Ordinal);
         foreach (var socket in definition.Sockets)
         {
@@ -879,11 +890,14 @@ public static class AssetPipelineCompiler
                 GetMeshMaterialRequirements(
                     node,
                     nodes);
-            return GltfImporter.Import(
+            ImportedAssetPayload imported = GltfImporter.Import(
                 node.SourcePath,
                 sourceRoot,
                 node.Definition.MaterialReferences,
                 requirements);
+            MechanicalMeshValidation.Validate(node.Definition.MechanicalParts, node.Definition.Sockets,
+                RuntimeMeshData.FromPayload(imported.Payload).Indices.Count);
+            return imported;
         }
 
         return node.Definition.Type switch
@@ -978,6 +992,7 @@ public static class AssetPipelineCompiler
                 .ToArray(),
             CollisionReference = node.Definition.CollisionReference,
             AnimationReferences = [],
+            MechanicalParts = node.Definition.MechanicalParts.ToArray(),
             Sockets = node.Definition.Sockets
                 .OrderBy(static socket => socket.Name, StringComparer.Ordinal)
                 .ToArray(),

@@ -56,6 +56,7 @@ public sealed class RuntimeAssetCatalog
         foreach (var record in manifest.Assets)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            MechanicalMeshValidation.Validate(record.MechanicalParts, record.Sockets);
             var id = AssetId.Parse(record.Id);
             if (!records.TryAdd(id, record))
             {

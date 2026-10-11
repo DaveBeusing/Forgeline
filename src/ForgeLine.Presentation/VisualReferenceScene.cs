@@ -11,7 +11,7 @@ using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
 
-public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat }
+public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat, MechanicalIdle, MechanicalMoving, MechanicalFiring, MechanicalLoading, MechanicalUnpowered, MechanicalBroken }
 
 // Authored presentation acceptance states, not economic/combat simulations or gameplay presets.
 public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3 Target,
@@ -20,7 +20,7 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
     private static readonly JsonSerializerOptions FingerprintOptions = new() { IncludeFields = true };
     public const ulong Seed = 2026;
     public const int FixedTick = 32;
-    public const int FixtureVersion = 1;
+    public const int FixtureVersion = 2;
 
     public static VisualReferenceScene Create(VisualReferenceSceneKind kind, TerrainWorld terrain, bool includeHiddenEnemy = true)
     {
@@ -96,7 +96,15 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
             simulation.Entities.AddComponent(building, new CompletedBuilding(BuildingIds.VehicleFactory, new(1), SimulationTick.Zero));
             simulation.Entities.AddComponent(building, new HealthState(20, 100));
         }
-        EntityId hidden = default;
+        bool mechanical = kind >= VisualReferenceSceneKind.MechanicalIdle;
+        if (mechanical)
+        {
+            UnitId[] units = [UnitIds.MainBattleTank, UnitIds.ScoutVehicle, UnitIds.CargoTruck, UnitIds.SupplyTruck];
+            for (int i = 0; i < units.Length; i++)
+                Unit(units[i], new((i - 1.5f) * 9, .75f, 8));
+            EntityId factory = Add(new(0, 3.9f, -12), new(16, 10, 16));
+            simulation.Entities.AddComponent(factory, new CompletedBuilding(BuildingIds.VehicleFactory, new(1), SimulationTick.Zero));
+        }        EntityId hidden = default;
         if (kind == VisualReferenceSceneKind.BattlefieldCombat)
         {
             EntityId contact = Unit(UnitIds.MainBattleTank, new(55, 0, 10), foreign: true);
@@ -130,7 +138,32 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
                     new(1), RenderMaterialHandle.Default, RenderVisibilityMask.Default, VfxFeature: new(effects[i])));
             }
         }
-        var snapshot = new PresentationSnapshot(extracted.Tick, extracted.TickDuration, extracted.SimulationEntityCount,
+        if (mechanical)
+        {
+            for (int i = 0; i < visible.Count; i++)
+            {
+                RenderInstance item = visible[i];
+                if (!item.UnitFeature.IsSpecified && !item.BuildingFeature.IsSpecified) continue;
+                bool broken = kind == VisualReferenceSceneKind.MechanicalBroken;
+                bool powered = kind != VisualReferenceSceneKind.MechanicalUnpowered && !broken;
+                visible[i] = item with
+                {
+                    MechanicalPose = new(true, kind == VisualReferenceSceneKind.MechanicalMoving ? 1.7 : 0,
+                        powered ? 2 : 0, 1.6, kind == VisualReferenceSceneKind.MechanicalFiring ? 1.55 : -1,
+                        kind == VisualReferenceSceneKind.MechanicalFiring ? .2f : 0,
+                        kind == VisualReferenceSceneKind.MechanicalLoading ? 1 : 0),
+                    UnitFeature = item.UnitFeature.IsSpecified ? item.UnitFeature with
+                    {
+                        AimYawRadians = kind == VisualReferenceSceneKind.MechanicalFiring ? .6f : 0,
+                        DamageState = broken ? UnitPresentationDamageState.Critical : UnitPresentationDamageState.Intact
+                    } : item.UnitFeature,
+                    BuildingFeature = item.BuildingFeature.IsSpecified ? item.BuildingFeature with
+                    {
+                        State = broken ? BuildingPresentationState.Critical : powered ? BuildingPresentationState.Operational : BuildingPresentationState.Unpowered
+                    } : item.BuildingFeature
+                };
+            }
+        }        var snapshot = new PresentationSnapshot(extracted.Tick, extracted.TickDuration, extracted.SimulationEntityCount,
             visible.ToArray(), extracted.Intelligence, new(1), experience with
             {
                 Selection = PlayerSelectionSummary.Empty with

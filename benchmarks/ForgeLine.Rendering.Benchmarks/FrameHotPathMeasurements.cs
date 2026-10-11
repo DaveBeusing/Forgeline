@@ -69,6 +69,8 @@ internal static class FrameHotPathMeasurements
 
         var results = new List<object>
         {
+            Measure("mechanical-static-1000", () => renderer.Submit1000MechanicalInstances(false), () => renderer.SubmissionMetrics),
+            Measure("mechanical-posed-1000", () => renderer.Submit1000MechanicalInstances(true), () => renderer.SubmissionMetrics),
             Measure("render-near-1000", () => renderer.Submit1000NearFieldInstances(), () => renderer.SubmissionMetrics),
             Measure("render-culled-5000", () => renderer.Submit5000InstancesWithCulling(), () => renderer.SubmissionMetrics),
             Measure("render-mixed-tactical", () => renderer.SubmitRepresentativeVerticalSliceTacticalView(), () => renderer.SubmissionMetrics),

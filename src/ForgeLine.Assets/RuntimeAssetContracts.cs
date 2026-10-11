@@ -70,6 +70,8 @@ public sealed record RuntimeAssetRecord
 
     public IReadOnlyList<AssetSocket> Sockets { get; init; } = [];
 
+    public IReadOnlyList<MechanicalMeshPart> MechanicalParts { get; init; } = [];
+
     public AssetBounds? Bounds { get; init; }
 }
 

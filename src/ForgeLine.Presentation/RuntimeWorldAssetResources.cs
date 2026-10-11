@@ -190,7 +190,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
                 id);
         mesh =
             CreateMeshBuffers(
-                content.Payload);
+                content.Payload, record);
         _meshes.Add(
             id,
             mesh);
@@ -566,11 +566,17 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
     }
 
     private RuntimeMeshBuffers CreateMeshBuffers(
-        byte[] payload)
+        byte[] payload, RuntimeAssetRecord record)
     {
         RuntimeMeshData data =
             RuntimeMeshData.FromPayload(
                 payload);
+        MechanicalMeshValidation.Validate(record.MechanicalParts, record.Sockets, data.Indices.Count);
+        MechanicalPartBinding[] parts = record.MechanicalParts.Select(part =>
+        {
+            AssetSocket socket = record.Sockets.FirstOrDefault(item => item.Name == part.Socket);
+            return new MechanicalPartBinding(part, new Vector3(socket.X, socket.Y, socket.Z));
+        }).ToArray();
         RuntimeMeshVertex[] vertices =
             data.Vertices.ToArray();
         uint[] indices =
@@ -642,7 +648,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
                 materialId,
                 hasMaterial,
                 usesDevelopmentFallback,
-                data.Sections.Count);
+                data.Sections.Count) { MechanicalParts = parts };
         }
         catch
         {
@@ -696,6 +702,9 @@ internal readonly record struct RuntimeMeshBuffers(
     bool UsesDevelopmentFallback,
     int SectionCount) : IDisposable
 {
+    public int FirstIndex { get; init; }
+    public MechanicalPartBinding[]? MechanicalParts { get; init; }
+
     public bool IsValid =>
         VertexBuffer is not null &&
         IndexBuffer is not null &&

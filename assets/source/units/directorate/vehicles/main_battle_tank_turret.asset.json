@@ -1,8 +1,35 @@
 {
   "id": "unit.directorate.main_battle_tank.turret",
   "type": "mesh",
-  "source": "../sources/main_battle_tank_turret_production.gltf",
+  "source": "../sources/main_battle_tank_turret_production_motion.gltf",
   "materialReferences": [
     "material.directorate.unit.main_battle_tank"
+  ],
+  "sockets": [
+    {
+      "name": "motion_cannon",
+      "x": 0.0,
+      "y": 0.16,
+      "z": 0.1
+    }
+  ],
+  "mechanicalParts": [
+    {
+      "name": "body",
+      "firstIndex": 0,
+      "indexCount": 264,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "cannon",
+      "parent": -1,
+      "motion": "cannon",
+      "socket": "motion_cannon",
+      "rate": 1,
+      "travel": 0.045,
+      "firstIndex": 264,
+      "indexCount": 384
+    }
   ]
 }

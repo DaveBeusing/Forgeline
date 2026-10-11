@@ -7,6 +7,12 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class VisualReferenceSceneTests
 {
     [Theory]
+    [InlineData(VisualReferenceSceneKind.MechanicalIdle)]
+    [InlineData(VisualReferenceSceneKind.MechanicalMoving)]
+    [InlineData(VisualReferenceSceneKind.MechanicalFiring)]
+    [InlineData(VisualReferenceSceneKind.MechanicalLoading)]
+    [InlineData(VisualReferenceSceneKind.MechanicalUnpowered)]
+    [InlineData(VisualReferenceSceneKind.MechanicalBroken)]
     [InlineData(VisualReferenceSceneKind.DaylightTerrain)]
     [InlineData(VisualReferenceSceneKind.IndustrialBase)]
     [InlineData(VisualReferenceSceneKind.FormationConvoy)]

@@ -414,3 +414,16 @@ Atmospheric depth composition reuses the surface depth with one optional R32 SRV
 Postprocessing uses the existing full-resolution frame-indexed FP16 targets and one composite draw. It adds no texture residency, intermediate/history targets or asset-compiler requirements. All world albedo decoding and linear normal/ORM treatment are retained; final exposure/grade/ACES/spatial AA/sRGB transfer is shared, with HUD/selection/command rendering after it at scale 1. Low/Medium/High budgets, the matched pre-change baseline, isolated AA cost, whole-profile production-terrain captures and resource payload distinctions are documented in [Postprocessing Qualification](PostProcessingQualification.md).
 
 Default client quality is Medium. The graphics-quality menu persists the next match profile, preserving camera and manual exposure. Low disables atmospheric fog after visual qualification showed reduced thin-silhouette contrast with distance fog. Software/capability/known-budget fallback is explicit in qualification diagnostics. Existing 64 MiB texture, descriptor, map, draw and acceptance gates remain unchanged; no native debug-layer-clean or full-match FPS claim is inferred from isolated captures.
+
+## Mechanical motion qualification
+
+The clean runtime compilation retains 341 assets, 158 meshes, 56 textures and
+127 materials; measured payload is 56,698,111 bytes. Six source mesh bindings
+add bounded rigid triangle ranges without changing their triangle populations
+or introducing texture allocations. Close-range parts increase instance and
+draw submission; previous static-scene performance figures are not evidence
+for their cost. The focused suite covers hierarchy pivots, event-time recoil,
+phase resets, invisible-entity history eviction, interpolation clamps and
+zero-allocation composition for 1,000 instances. Native and hosted validation
+results for this change are recorded during qualification; no final visual or
+performance acceptance is inferred from compilation.

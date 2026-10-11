@@ -70,6 +70,8 @@ public sealed record SourceAssetDefinition
     public IReadOnlyList<string> AnimationReferences { get; init; } = [];
 
     public IReadOnlyList<AssetSocket> Sockets { get; init; } = [];
+
+    public IReadOnlyList<MechanicalMeshPart> MechanicalParts { get; init; } = [];
 }
 
 public sealed record MaterialSourceDefinition

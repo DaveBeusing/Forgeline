@@ -14,4 +14,5 @@ public readonly record struct RenderInstance(
     UnitFeaturePresentationMetadata UnitFeature = default,
     BuildingFeaturePresentationMetadata BuildingFeature = default,
     InfrastructureFeaturePresentationMetadata InfrastructureFeature = default,
-    VfxFeaturePresentationMetadata VfxFeature = default);
+    VfxFeaturePresentationMetadata VfxFeature = default,
+    MechanicalPose MechanicalPose = default);
