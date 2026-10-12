@@ -120,6 +120,7 @@ def model(recipe, reduced):
         for y in (-.28,.32):m.box([-.5,y-.025,-.05],[.5,y+.025,.05],cells[0])
         for x in np.linspace(-.36,.36,5 if reduced else 11):m.box([x-.01,-.30,-.025],[x+.01,.39,.025],cells[0])
         if not reduced:m.box([-.11,.03,-.031],[.11,.25,-.026],cells[2])
+        m.fit([-.5,-.5,-.22],[.5,.5,.22])
     else: raise ValueError(shape)
     return m
 
