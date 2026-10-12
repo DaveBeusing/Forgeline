@@ -38,7 +38,6 @@
   },
   "intactModules": [
     "foundation",
-    "structural_frame",
     "clean_shell",
     "conditioned_power",
     "clean_air",

@@ -38,7 +38,6 @@
   },
   "intactModules": [
     "foundation",
-    "structural_frame",
     "extraction_head",
     "feed_and_conveyor",
     "head_gantry",

@@ -38,7 +38,6 @@
   },
   "intactModules": [
     "foundation",
-    "structural_frame",
     "process_towers",
     "storage_tanks",
     "manifold",

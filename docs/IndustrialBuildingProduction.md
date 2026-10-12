@@ -33,6 +33,10 @@ new dynamic terrain deformation, deposit-conforming geometry or animated mining.
 | Fuel Refinery | unequal process towers, horizontal/vertical tanks, swept pipe manifold, pump and inspection walkway | separated process equipment with deliberate inlet connections and service route |
 | Ammunition Plant | repeated reinforced bays, raised blast partitions, shielded loading area and small exhausts | concrete protective divisions and geometric warning/portal cues |
 
+Temporary corner scaffolds belong only to construction frame/shell stages.
+Completed families retain their functional gantries, housings, furnace supports
+and blast partitions without generic unattached corner posts.
+
 Role identity is retained in reduced meshes rather than depending on small
 fittings or tint. All five use the Command Core's manufactured bevel and atlas
 chart conventions. Open hoppers have separate inner walls and rims; hollow
@@ -70,11 +74,11 @@ and nonessential pipe routes. Existing projected-size thresholds (150/45 pixels,
 
 | Family | LOD0 triangles | LOD1 triangles | LOD2 triangles |
 | --- | ---: | ---: | ---: |
-| Extractor | 1,480 | 404 | 292 |
-| Smelter | 1,456 | 448 | 308 |
-| Electronics Plant | 1,344 | 320 | 244 |
-| Fuel Refinery | 2,008 | 584 | 336 |
-| Ammunition Plant | 1,284 | 324 | 276 |
+| Extractor | 1,260 | 332 | 220 |
+| Smelter | 1,236 | 376 | 236 |
+| Electronics Plant | 1,124 | 248 | 172 |
+| Fuel Refinery | 1,788 | 512 | 264 |
+| Ammunition Plant | 1,064 | 252 | 204 |
 
 The counts describe exported geometry, not arbitrary content limits or FPS
 guarantees. The shared independent `building.directorate.module.collision_box`

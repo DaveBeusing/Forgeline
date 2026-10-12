@@ -39,7 +39,7 @@ dimensions and flags masters below 2048 pixels for review. The flag is advisory:
 dimensions alone do not prove useful detail; tiny repeated textures can be
 deliberate. No source is enlarged to manufacture a numerical quality pass.
 
-Current inventory: 391 assets, 208 meshes, 56 textures and 127 materials.
+Current inventory: 413 assets, 230 meshes, 56 textures and 127 materials.
 Production texture budgets are documented in [Production surfaces](ProductionSurfaceMasters.md).
 Container sizes include metadata and studio splash assets; they are not GPU
 allocations or residency. The original 324-asset baseline occupied 4,985,866

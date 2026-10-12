@@ -1,7 +1,7 @@
 {
   "lod0": {
-    "vertices": 3704,
-    "triangles": 2008,
+    "vertices": 3224,
+    "triangles": 1788,
     "minimum": [
       -0.4300000071525574,
       -0.5,
@@ -12,11 +12,11 @@
       0.5199999809265137,
       0.44999998807907104
     ],
-    "sha256": "de175eecce0e9f70b338fe085a5d9160cde52cf18a621a51f963138acd5158cd"
+    "sha256": "367a19f73e4f198bc9013a91b83449a87d93b9c4d2b6063e20de474e948d5f2c"
   },
   "lod1": {
-    "vertices": 1072,
-    "triangles": 584,
+    "vertices": 952,
+    "triangles": 524,
     "minimum": [
       -0.4300000071525574,
       -0.5,
@@ -27,11 +27,11 @@
       0.5199999809265137,
       0.44999998807907104
     ],
-    "sha256": "b0be3989ce97b3b968013b49c7b6d3393bb158ac705b4c4a2cc6d16e38dfea97"
+    "sha256": "b5cee4187208f78ca9fb4545fe7bed93a13293e9db458a4cc787f40284d286b6"
   },
   "lod2": {
-    "vertices": 644,
-    "triangles": 336,
+    "vertices": 524,
+    "triangles": 276,
     "minimum": [
       -0.4300000071525574,
       -0.5,
@@ -42,7 +42,7 @@
       0.5199999809265137,
       0.44999998807907104
     ],
-    "sha256": "77f899703595536e3d6df2cba9da3ff265d672c46114e479d27db288555050d6"
+    "sha256": "205dbb59a19366a1e7a668a581928d46bed50864f61af9d9e76f2b66dd731a17"
   },
   "foundation": {
     "vertices": 24,
