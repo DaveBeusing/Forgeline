@@ -9,7 +9,7 @@ IDs, `.lod1`/`.lod2` IDs, gameplay building definitions, footprints, power,
 production, extraction, logistics, health and intelligence authority are retained.
 Command Core, units, other buildings and the infrastructure kit are not rebuilt.
 
-The baseline is master `fb08045edceeeefc0db1c89183d738c462453cec`. Its primary
+The integrated baseline is master `63569ac2031b4b89c57c55c02b2aa20244d34df9`. Its primary
 sources contain 120 Extractor vertices, 480 Smelter/Electronics vertices and
 576 Refinery/Ammunition vertices. Each industrial LOD2 previously referenced the
 same source as LOD1. Construction, status attachments and wrecks previously
