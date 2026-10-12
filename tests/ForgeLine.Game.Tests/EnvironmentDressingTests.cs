@@ -89,11 +89,11 @@ public sealed class EnvironmentDressingTests
         }
         var north = Assert.Single(kit, x => x.Key == "kit.bridge-apron.north");
         var south = Assert.Single(kit, x => x.Key == "kit.bridge-apron.south");
-        var crossing = Assert.Single(map.Crossings, x => x.Key == "crossing.north_bridge");
-        Assert.Equal(crossing.Position.Z - 21, north.Position.Z + north.Scale.Z * .5f);
-        Assert.Equal(crossing.Position.Z + 21, south.Position.Z - south.Scale.Z * .5f);
-        Assert.Equal(crossing.Position.X, north.Position.X);
-        Assert.Equal(crossing.Position.X, south.Position.X);
+        var northBridge = Assert.Single(map.Crossings, x => x.Key == "crossing.north_bridge");
+        Assert.Equal(northBridge.Position.Z - 21, north.Position.Z + north.Scale.Z * .5f);
+        Assert.Equal(northBridge.Position.Z + 21, south.Position.Z - south.Scale.Z * .5f);
+        Assert.Equal(northBridge.Position.X, north.Position.X);
+        Assert.Equal(northBridge.Position.X, south.Position.X);
         Assert.Equal(180, north.RotationDegrees);
         Assert.Equal(0, south.RotationDegrees);
         Assert.Equal(18, north.Scale.X);
