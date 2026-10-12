@@ -7,6 +7,12 @@ outputs through the normal compiler; see [environment composition](EnvironmentDr
 
 ## Purpose
 
+The five Directorate industrial building kits are editable JSON component
+assemblies exported by `python build/Author-IndustrialBuildings.py`. Their glTF
+LOD/state/module sources pass through this same compiler and verified manifest;
+no renderer-side authoring bypass is introduced. See
+[Industrial building production](IndustrialBuildingProduction.md).
+
 For live per-asset timing, memory, cache decisions and development-launch diagnostics, see [Asset Startup Diagnostics](AssetStartupDiagnostics.md).
 
 ForgeLine uses an explicit source-to-runtime asset boundary. Editable authoring files live under `assets/source/`; the Asset Compiler validates and compiles them into runtime-only artifacts under `assets/runtime/`. Runtime code consumes the compiled manifest and `.flasset` files through `ForgeLine.Assets` and never discovers authoring files directly.

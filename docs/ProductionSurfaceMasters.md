@@ -9,6 +9,11 @@ All randomness has fixed seeds. Historical sources remain editable references.
 
 ## Shared object surfaces
 
+The five [industrial building production kits](IndustrialBuildingProduction.md)
+reuse these exact masters, atlas cells and compiled mip chains. Their component
+exports add geometry and dedicated LOD/state representations without any new
+texture allocation, channel convention or material ID.
+
 The atlas preserves the existing four-by-four UV identities: painted armor,
 structural steel, rubber, canvas; glass, warnings, concrete, heat-treated steel;
 worn armor, vents, wood, mineral rock; conifer, scrub, grass, service panels.

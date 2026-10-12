@@ -11,6 +11,40 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class DirectorateBuildingPresentationTests
 {
+    [Theory]
+    [InlineData("extractor")]
+    [InlineData("smelter")]
+    [InlineData("electronics_plant")]
+    [InlineData("fuel_refinery")]
+    [InlineData("ammunition_plant")]
+    public void IndustrialStateBindingsRetainFamilyAndExistingStateMaterial(string family)
+    {
+        BuildingId building = family switch
+        {
+            "extractor" => BuildingIds.Extractor,
+            "smelter" => BuildingIds.Smelter,
+            "electronics_plant" => BuildingIds.ElectronicsPlant,
+            "fuel_refinery" => BuildingIds.Refinery,
+            _ => BuildingIds.AmmunitionPlant
+        };
+        string prefix = "building.directorate." + family;
+        foreach (var state in new[] { BuildingPresentationState.ConstructionFoundation, BuildingPresentationState.ConstructionFrame,
+            BuildingPresentationState.ConstructionShell, BuildingPresentationState.Destroyed })
+        {
+            var feature = new BuildingFeaturePresentationMetadata(building, state, 0);
+            Assert.StartsWith(prefix + ".", BuildingPresentationCatalog.ResolveMeshAssetId(feature, BuildingAssetLod.Lod2));
+        }
+        foreach (var state in new[] { BuildingPresentationState.Idle, BuildingPresentationState.Unpowered,
+            BuildingPresentationState.Damaged, BuildingPresentationState.Critical })
+        {
+            var feature = new BuildingFeaturePresentationMetadata(building, state, 0);
+            Assert.StartsWith(prefix + ".", BuildingPresentationCatalog.ResolveStateAttachmentAssetId(feature));
+            Assert.Equal(prefix + ".lod2", BuildingPresentationCatalog.ResolveMeshAssetId(feature, BuildingAssetLod.Lod2));
+            if (state != BuildingPresentationState.Idle)
+                Assert.StartsWith("material.directorate.building.", BuildingPresentationCatalog.ResolveMaterialAssetId(feature));
+        }
+    }
+
     [Fact]
     public void CatalogBindsRequiredFamiliesLodsCollisionAndStrategicSymbols()
     {
@@ -314,19 +348,35 @@ public sealed class DirectorateBuildingPresentationTests
                     InfrastructurePresentationState.Disabled)));
     }
 
-    [Fact]
-    public void RepeatedCommandCoreStateResolutionDoesNotAllocateAssetNamesPerFrame()
+    [Theory]
+    [InlineData("command_core")]
+    [InlineData("extractor")]
+    [InlineData("smelter")]
+    [InlineData("electronics_plant")]
+    [InlineData("fuel_refinery")]
+    [InlineData("ammunition_plant")]
+    public void RepeatedProductionStateResolutionDoesNotAllocateAssetNamesPerFrame(string family)
     {
+        BuildingId building = family switch
+        {
+            "command_core" => BuildingIds.CommandCore,
+            "extractor" => BuildingIds.Extractor,
+            "smelter" => BuildingIds.Smelter,
+            "electronics_plant" => BuildingIds.ElectronicsPlant,
+            "fuel_refinery" => BuildingIds.Refinery,
+            _ => BuildingIds.AmmunitionPlant
+        };
         BuildingFeaturePresentationMetadata[] states =
         [
-            new(BuildingIds.CommandCore, BuildingPresentationState.ConstructionFoundation),
-            new(BuildingIds.CommandCore, BuildingPresentationState.ConstructionFrame),
-            new(BuildingIds.CommandCore, BuildingPresentationState.ConstructionShell),
-            new(BuildingIds.CommandCore, BuildingPresentationState.Operational),
-            new(BuildingIds.CommandCore, BuildingPresentationState.Unpowered),
-            new(BuildingIds.CommandCore, BuildingPresentationState.Damaged),
-            new(BuildingIds.CommandCore, BuildingPresentationState.Critical),
-            new(BuildingIds.CommandCore, BuildingPresentationState.Destroyed)
+            new(building, BuildingPresentationState.ConstructionFoundation),
+            new(building, BuildingPresentationState.ConstructionFrame),
+            new(building, BuildingPresentationState.ConstructionShell),
+            new(building, BuildingPresentationState.Operational),
+            new(building, BuildingPresentationState.Idle),
+            new(building, BuildingPresentationState.Unpowered),
+            new(building, BuildingPresentationState.Damaged),
+            new(building, BuildingPresentationState.Critical),
+            new(building, BuildingPresentationState.Destroyed)
         ];
         _ = ResolveNames();
         long before = GC.GetAllocatedBytesForCurrentThread();
