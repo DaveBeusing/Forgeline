@@ -11,7 +11,7 @@ using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
 
-public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat, MechanicalIdle, MechanicalMoving, MechanicalFiring, MechanicalLoading, MechanicalUnpowered, MechanicalBroken, DirectorateUnits, DirectorateBuildingStates, CommandCoreProduction, MainBattleTankProduction, MainBattleTankFormation, EnvironmentKitYard, EnvironmentKitBridge, EnvironmentKitRepeated }
+public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat, MechanicalIdle, MechanicalMoving, MechanicalFiring, MechanicalLoading, MechanicalUnpowered, MechanicalBroken, DirectorateUnits, DirectorateBuildingStates, CommandCoreProduction, MainBattleTankProduction, MainBattleTankFormation, EnvironmentKitYard, EnvironmentKitBridge, EnvironmentKitRepeated, VehicleFactoryProduction, PowerPlantProduction, BarracksProduction, RadarProduction, OperationalBuildingsRepeated }
 
 // Authored presentation acceptance states, not economic/combat simulations or gameplay presets.
 public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3 Target,
@@ -28,6 +28,15 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
         ArgumentNullException.ThrowIfNull(terrain);
         if (kind is VisualReferenceSceneKind.EnvironmentKitYard or VisualReferenceSceneKind.EnvironmentKitBridge or VisualReferenceSceneKind.EnvironmentKitRepeated)
             return CreateKitReview(kind);
+        BuildingId operationalReview = kind switch
+        {
+            VisualReferenceSceneKind.VehicleFactoryProduction => BuildingIds.VehicleFactory,
+            VisualReferenceSceneKind.PowerPlantProduction => BuildingIds.PowerPlant,
+            VisualReferenceSceneKind.BarracksProduction => BuildingIds.Barracks,
+            VisualReferenceSceneKind.RadarProduction => BuildingIds.Radar,
+            _ => default
+        };
+        bool operationalGallery = operationalReview.IsSpecified || kind == VisualReferenceSceneKind.OperationalBuildingsRepeated;
         var battlefield = CentralDivideBattlefield.Create();
         Vector3 target = kind == VisualReferenceSceneKind.LogisticsCorridor
             ? battlefield.Crossings[0].Position : new(650, 0, 520);
@@ -43,7 +52,9 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
         simulation.Entities.AddComponent(sensor, new VisualSensorState(new(1), rangeMeters: 130));
         foreach (var item in battlefield.WorldObjects)
         {
-            // Keep the eight authored review plots clear of unrelated dressing.
+            // Keep authored review plots clear of unrelated dressing.
+            if (operationalGallery && MathF.Abs(item.Position.X - target.X) <= 64 + item.Scale.X * .5f &&
+                MathF.Abs(item.Position.Z - target.Z) <= 64 + item.Scale.Z * .5f) continue;
             Vector3 relative = item.Position - target;
             if (kind == VisualReferenceSceneKind.CommandCoreProduction &&
                 MathF.Abs(relative.X) <= 44 + item.Scale.X * .5f &&
@@ -66,13 +77,13 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
         }
         foreach (var item in battlefield.Resources)
         {
-            if (kind is VisualReferenceSceneKind.CommandCoreProduction or VisualReferenceSceneKind.MainBattleTankProduction or VisualReferenceSceneKind.MainBattleTankFormation) continue;
+            if (operationalGallery || kind is VisualReferenceSceneKind.CommandCoreProduction or VisualReferenceSceneKind.MainBattleTankProduction or VisualReferenceSceneKind.MainBattleTankFormation) continue;
             EntityId deposit = Add(new(item.Center.X - target.X, 0, item.Center.Z - target.Z), new(item.HalfExtents.X * 2, 8, item.HalfExtents.Z * 2));
             simulation.Entities.AddComponent(deposit, WorldPresentationIdentity.ForResource(item.ResourceId));
             simulation.Entities.AddComponent(deposit, new ResourceDeposit(item.ResourceId,
                 new(item.Center - item.HalfExtents, item.Center + item.HalfExtents), item.TotalQuantity, item.ExtractionRatePerSecond));
         }
-        if (kind is not (VisualReferenceSceneKind.DaylightTerrain or VisualReferenceSceneKind.MainBattleTankProduction or VisualReferenceSceneKind.MainBattleTankFormation))
+        if (!operationalGallery && kind is not (VisualReferenceSceneKind.DaylightTerrain or VisualReferenceSceneKind.MainBattleTankProduction or VisualReferenceSceneKind.MainBattleTankFormation))
         {
             for (int i = 0; i < 18; i++)
             {
@@ -151,6 +162,40 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
                 simulation.Entities.AddComponent(building, new ControllableEntity(new(1), ControllableEntityCategory.Building));
                 if (row == 1) simulation.Entities.AddComponent(building, new PowerConsumer(100));
                 if (row == 2) simulation.Entities.AddComponent(building, new HealthState(20, 100));
+            }
+        }
+        if (operationalGallery)
+        {
+            BuildingId[] families = [BuildingIds.VehicleFactory, BuildingIds.PowerPlant, BuildingIds.Barracks, BuildingIds.Radar];
+            var definitions = DirectorateContent.CreateBuildingCatalog();
+            bool repeated = kind == VisualReferenceSceneKind.OperationalBuildingsRepeated;
+            for (int i = 0; i < (repeated ? 1000 : 9); i++)
+            {
+                BuildingId id = repeated ? families[i % families.Length] : operationalReview;
+                bool producer = id == BuildingIds.VehicleFactory || id == BuildingIds.Barracks;
+                // Idle is meaningful only for the existing production-capable families.
+                if (!repeated && i == 4 && !producer) continue;
+                var footprint = definitions[id].Footprint;
+                Vector3 offset = repeated ? new((i % 40 - 19.5f) * 28, footprint.Height * .5f, (i / 40 - 12) * 28)
+                    : new((i % 3 - 1) * 32, footprint.Height * .5f, (i / 3 - 1) * 32);
+                EntityId building = Add(offset, new(footprint.Width, footprint.Height, footprint.Depth));
+                if (!repeated && i < 3)
+                    simulation.Entities.AddComponent(building, new ConstructionSite(id,
+                        new(1), new(1), SimulationTick.Zero, 100, (uint)(i * 40)));
+                else if (!repeated && i == 8)
+                    simulation.Entities.AddComponent(building, new BuildingWreckPresentationIdentity(id, new(1)));
+                else
+                {
+                    simulation.Entities.AddComponent(building, new CompletedBuilding(id, new(1), SimulationTick.Zero));
+                    if (!repeated && i == 4)
+                        simulation.Entities.AddComponent(building, new UnitProductionFacility(new(1),
+                            producer && id == BuildingIds.Barracks ? UnitProductionCapability.Infantry : UnitProductionCapability.Vehicle,
+                            new(1), definitions[id].UnitSpawnOffset, SimulationTick.Zero));
+                    if (!repeated && i == 5) simulation.Entities.AddComponent(building, new PowerConsumer(20));
+                    if (!repeated && i is 6 or 7) simulation.Entities.AddComponent(building, new HealthState(i == 6 ? 50 : 20, 100));
+                }
+                if (repeated || i != 8)
+                    simulation.Entities.AddComponent(building, new ControllableEntity(new(1), ControllableEntityCategory.Building));
             }
         }
         if (kind == VisualReferenceSceneKind.CommandCoreProduction)
@@ -288,7 +333,7 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
                 Selection = PlayerSelectionSummary.Empty with
                 {
                     Count = Math.Min(3, visible.Count(x => x.Selectable.Owner == new PlayerId(1))),
-                    Kind = kind is VisualReferenceSceneKind.IndustrialBase or VisualReferenceSceneKind.CommandCoreProduction
+                    Kind = operationalGallery || kind is VisualReferenceSceneKind.IndustrialBase or VisualReferenceSceneKind.CommandCoreProduction
                         ? PlayerSelectionKind.Building : PlayerSelectionKind.Unit,
                     DisplayName = kind.ToString()
                 }

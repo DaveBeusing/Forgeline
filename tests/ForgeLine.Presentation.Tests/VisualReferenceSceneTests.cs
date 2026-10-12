@@ -7,6 +7,11 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class VisualReferenceSceneTests
 {
     [Theory]
+    [InlineData(VisualReferenceSceneKind.VehicleFactoryProduction)]
+    [InlineData(VisualReferenceSceneKind.PowerPlantProduction)]
+    [InlineData(VisualReferenceSceneKind.BarracksProduction)]
+    [InlineData(VisualReferenceSceneKind.RadarProduction)]
+    [InlineData(VisualReferenceSceneKind.OperationalBuildingsRepeated)]
     [InlineData(VisualReferenceSceneKind.EnvironmentKitYard)]
     [InlineData(VisualReferenceSceneKind.EnvironmentKitBridge)]
     [InlineData(VisualReferenceSceneKind.EnvironmentKitRepeated)]
