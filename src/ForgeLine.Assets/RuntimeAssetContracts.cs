@@ -56,6 +56,10 @@ public sealed record RuntimeAssetRecord
 
     public required string CompilerVersion { get; init; }
 
+    public long RuntimeBytes { get; init; }
+
+    public string RuntimeHash { get; init; } = string.Empty;
+
     public IReadOnlyList<string> Dependencies { get; init; } = [];
 
     public IReadOnlyList<string> MaterialReferences { get; init; } = [];
@@ -82,6 +86,12 @@ public sealed record RuntimeAssetManifest
     public int FormatVersion { get; init; } = CurrentFormatVersion;
 
     public required string CompilerVersion { get; init; }
+
+    public const int CurrentIntegrityVersion = 1;
+
+    public int IntegrityVersion { get; init; }
+
+    public string ContentSignature { get; init; } = string.Empty;
 
     public IReadOnlyList<RuntimeAssetRecord> Assets { get; init; } = [];
 }

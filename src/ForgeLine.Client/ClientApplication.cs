@@ -2828,7 +2828,7 @@ internal sealed class ClientApplication
             resolution.RuntimeRoot!;
         RuntimeAssetCatalog catalog =
             RuntimeAssetCatalog.LoadCancellable(
-                runtimeRoot, cancellationToken);
+                runtimeRoot, cancellationToken, requireIntegrity: true);
 
         Console.WriteLine(
             $"[assets:runtime] manifest=loaded assets={catalog.AssetIds.Count} root=\"{runtimeRoot}\" manifest=validated gameplay=deferred");

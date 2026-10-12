@@ -20,6 +20,7 @@ internal static class Program
         string? qualificationOutput = null;
         string? progressLog = null;
         var clean = false;
+        string mode = "development";
 
         try
         {
@@ -28,6 +29,13 @@ internal static class Program
                 var argument = args[index];
                 switch (argument)
                 {
+                    case "--mode":
+                        mode = ReadValue(args, ref index, argument);
+                        if (mode is not ("development" or "build" or "validate"))
+                        {
+                            throw new ArgumentException("Mode must be development, build or validate.");
+                        }
+                        break;
                     case "--source":
                         sourceRoot = ReadValue(args, ref index, argument);
                         break;
@@ -57,9 +65,27 @@ internal static class Program
             return 2;
         }
 
+        if (mode == "validate" && clean)
+        {
+            Console.Error.WriteLine("Validation cannot clean or compile assets.");
+            return 2;
+        }
+
         using var log = new AssetCompilationLog(progressLog);
         using var reporter = new AssetCompilationReporter(log.Write);
-        var result = AssetPipelineCompiler.Compile(sourceRoot, runtimeRoot, clean, log.Write);
+        AssetCompilationResult result;
+        try
+        {
+            reporter.Report("mode", mode, detail: "player compilation is never allowed");
+            result = mode == "validate"
+                ? new AssetCompilationResult(true, 0, 0, [])
+                : AssetPipelineCompiler.Compile(sourceRoot, runtimeRoot, clean, log.Write);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            Console.Error.WriteLine($"ASSET101: {exception.Message}");
+            return 1;
+        }
 
         foreach (var diagnostic in result.Diagnostics)
         {
@@ -82,7 +108,7 @@ internal static class Program
         }
 
         RuntimeAssetQualificationReport qualification = reporter.Measure("qualification",
-            () => RuntimeAssetQualification.Run(runtimeRoot));
+            () => RuntimeAssetQualification.Run(runtimeRoot, requireIntegrity: true));
 
         foreach (RuntimeAssetQualificationIssue issue in
                  qualification.Issues)
@@ -175,6 +201,6 @@ internal static class Program
     {
         Console.WriteLine(
             "ForgeLine.AssetCompiler [--source <assets/source>] [--runtime <assets/runtime>] " +
-            "[--clean] [--qualification-output <report.json>] [--progress-log <progress.jsonl>]");
+            "[--mode <development|build|validate>] [--clean] [--qualification-output <report.json>] [--progress-log <progress.jsonl>]");
     }
 }

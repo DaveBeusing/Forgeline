@@ -58,7 +58,7 @@ public static class RuntimeAssetQualification
 {
     private const int LargestAssetCount = 12;
 
-    public static RuntimeAssetQualificationReport Run(string runtimeRoot)
+    public static RuntimeAssetQualificationReport Run(string runtimeRoot, bool requireIntegrity = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(runtimeRoot);
 
@@ -74,8 +74,8 @@ public static class RuntimeAssetQualification
         try
         {
             catalog =
-                RuntimeAssetCatalog.Load(
-                    normalizedRoot);
+                RuntimeAssetCatalog.LoadCancellable(
+                    normalizedRoot, CancellationToken.None, requireIntegrity);
         }
         catch (Exception exception) when (
             exception is IOException or
