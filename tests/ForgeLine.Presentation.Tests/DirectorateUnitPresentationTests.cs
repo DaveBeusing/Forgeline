@@ -11,6 +11,27 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class DirectorateUnitPresentationTests
 {
     [Fact]
+    public void TankDamageMeshesUseExistingStateAndResolveWithoutHotPathAllocations()
+    {
+        UnitFeaturePresentationMetadata[] states = Enum.GetValues<UnitPresentationDamageState>()
+            .Select(s => new UnitFeaturePresentationMetadata(UnitIds.MainBattleTank, s)).ToArray();
+        string?[] attachments = new string?[states.Length];
+        for (int i = 0; i < 1000; i++)
+            for (int j = 0; j < states.Length; j++)
+                attachments[j] = UnitPresentationCatalog.ResolveStateAttachmentAssetId(states[j]);
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        for (int i = 0; i < 1000; i++)
+            for (int j = 0; j < states.Length; j++)
+                attachments[j] = UnitPresentationCatalog.ResolveStateAttachmentAssetId(states[j]);
+        Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
+        Assert.Equal(new string?[] { null, "unit.directorate.main_battle_tank.damaged", "unit.directorate.main_battle_tank.critical", null }, attachments);
+        Assert.Equal("unit.directorate.main_battle_tank.wreck", UnitPresentationCatalog.ResolveWreckAssetId(states[3]));
+        var scout = new UnitFeaturePresentationMetadata(UnitIds.ScoutVehicle, UnitPresentationDamageState.Wreck);
+        Assert.Equal("unit.directorate.scout_vehicle.lod2", UnitPresentationCatalog.ResolveWreckAssetId(scout));
+        Assert.Null(UnitPresentationCatalog.ResolveStateAttachmentAssetId(scout));
+    }
+
+    [Fact]
     public void CatalogBindsStableAssetsLodsCollisionAndStrategicSymbols()
     {
         UnitId[] units =

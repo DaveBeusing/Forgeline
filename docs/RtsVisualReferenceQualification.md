@@ -39,7 +39,7 @@ dimensions and flags masters below 2048 pixels for review. The flag is advisory:
 dimensions alone do not prove useful detail; tiny repeated textures can be
 deliberate. No source is enlarged to manufacture a numerical quality pass.
 
-Current inventory: 348 assets, 165 meshes, 56 textures and 127 materials.
+Current inventory: 351 assets, 168 meshes, 56 textures and 127 materials.
 Production texture budgets are documented in [Production surfaces](ProductionSurfaceMasters.md).
 Container sizes include metadata and studio splash assets; they are not GPU
 allocations or residency. The original 324-asset baseline occupied 4,985,866
@@ -129,3 +129,7 @@ The opt-in `CommandCoreProduction` gallery adds all eight construction,
 operational, power, health and wreck states using the Command Core's real
 20 x 20 x 12m gameplay scale. Its dedicated modular/LOD sources and qualification
 are documented in [Command Core production](CommandCoreProduction.md).
+
+The dedicated [Main Battle Tank](MainBattleTankProduction.md) records its native
+state gallery, 1,000-tank formation, measured close-view performance blocker
+and pending live/art acceptance. Technical image equality does not clear those gates.

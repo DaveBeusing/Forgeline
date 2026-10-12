@@ -515,3 +515,8 @@ The Command Core family uses `python build/Author-CommandCore.py` and its editab
 component kit for deterministic modular and assembled glTF exports. It adds seven
 state meshes for a 348-asset catalog; see [Command Core production](CommandCoreProduction.md).
 Compile these sources normally; other families retain their existing exporters.
+
+The production tank replaces its four operational mesh sources and adds three
+state meshes for a 351-asset catalog (168 meshes, 56 textures, 127 materials).
+Its editable kit, deterministic exporter, rigid bindings and native acceptance
+limits are documented in [Main Battle Tank production](MainBattleTankProduction.md).

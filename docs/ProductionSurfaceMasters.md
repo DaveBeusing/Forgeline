@@ -148,11 +148,13 @@ industrial lamps, faceted mineral rocks and clustered rubble. It retains each
 original outer bound and UV/material cell convention. Their inexpensive
 reduced LOD meshes remain available for normal/strategic views.
 
-The source catalog contains 341 stable assets. Asset compilation and runtime
+The source catalog contains 351 stable assets. Asset compilation and runtime
 qualification must pass before client review. The production master test
 checks native dimensions, semantic color spaces, explicit caps and mip policy;
 existing material completeness tests verify all physical mesh dependencies
-and LOD material identities. Mesh authoring asserts unchanged outer bounds.
+and LOD material identities. General mesh authoring asserts unchanged outer bounds. The dedicated tank source
+extends its cosmetic track bottom to the unchanged normalized ground plane;
+[Main Battle Tank production](MainBattleTankProduction.md) records that decision.
 
 Use the reference qualification matrix in
 [RTS visual qualification](RtsVisualReferenceQualification.md). Data checks do
