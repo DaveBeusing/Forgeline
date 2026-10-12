@@ -24,7 +24,7 @@ BC7 formerly processed full mip images serially. Compression now operates on 128
 
 PNG decoding previously materialized full-image decompressed, filtered, scanline and RGBA copies. It now retains three row buffers and the RGBA image, reads exactly the declared scanlines, and rejects truncated or extra inflated data without materializing an unbounded decompression stream. RGB/RGBA and all five supported PNG filters are covered by regressions. The decoded source image still needs memory proportional to its authored dimensions; this is not a constant-memory importer.
 
-The compiler/runtime format versions remain unchanged because complete catalog and per-mip parity checks establish identical output. Existing caches remain valid; no unnecessary full rebuild is introduced by the scheduling/decoder fix.
+The earlier scheduling/decoder fix retained its compiler/runtime format versions because complete catalog and per-mip parity checks established identical output. That fix did not invalidate caches. The current integrity upgrade separately advances the compiler to 1.9.0 and rebuilds old unsealed caches once.
 
 ## Historical compiler qualification
 

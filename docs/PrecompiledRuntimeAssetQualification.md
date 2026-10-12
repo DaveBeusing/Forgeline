@@ -69,7 +69,7 @@ asset validation completed at 1,383.650 ms, after session-load request at
 gameplay frame and session readiness occurred at 8,110.675 ms. These phases
 include reconstruction/resource creation and are not isolated GPU-upload timers.
 The GPU smoke reported 179 texture uploads, 52,707,564 resident texture bytes,
-zero texture/material binding failures and zero debug-layer errors.
+zero texture/material binding failures and a reported debug-layer error count of\nzero. This Release device had the debug layer disabled; that counter does not\nprove debug-layer validation.
 
 Five installed-player negative runs covered missing manifest, unsupported
 manifest format, damaged manifest signature, damaged required command-core mesh
@@ -100,3 +100,11 @@ Git checkout started without bin/obj, runtime assets or prior restore to verify
 the default build-before-publish path. Complete solution/gate outcomes are
 recorded in the pull request; these timings do not claim optional hardware or
 manual cold-start acceptance checks that were not executed.
+Final local validation completed 1,756 solution tests: 1,747 passed, nine optional
+hardware/performance cases skipped, zero failed. Test modules were serialized
+with --max-parallel-test-modules 1. An earlier parallel run under concurrent
+clean-publish load timed out in the existing native session-handoff test; all
+three handoff cases passed in isolation and the complete serialized rerun passed.
+The final Release solution build had zero warnings/errors. Separate-process
+contracts and all 25 focused pipeline regression cases also passed, including
+qualification protected from a following clean writer.
