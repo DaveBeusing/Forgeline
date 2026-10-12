@@ -364,7 +364,14 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
         string fingerprint = Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new
         {
             version = FixtureVersion, kind, target, seed = Seed, tick = snapshot.Tick.Value,
-            instances = snapshot.Instances.ToArray(), snapshot.Intelligence, snapshot.PlayerExperience, snapshot.PlayerActions
+            instances = snapshot.Instances.ToArray(), snapshot.Intelligence, snapshot.PlayerExperience,
+            actions = snapshot.PlayerActions is null ? null : new
+            {
+                snapshot.PlayerActions.Tick, snapshot.PlayerActions.Construction,
+                snapshot.PlayerActions.PendingCommandCount, snapshot.PlayerActions.Production,
+                snapshot.PlayerActions.UnitProduction, snapshot.PlayerActions.Logistics,
+                snapshot.PlayerActions.Supply, snapshot.PlayerActions.Tactical, snapshot.PlayerActions.Technology
+            }
         }, FingerprintOptions)));
         return new(kind, target, snapshot, default, fingerprint);
     }
