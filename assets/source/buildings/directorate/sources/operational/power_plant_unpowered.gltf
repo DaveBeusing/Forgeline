@@ -1,0 +1,127 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine operational building component exporter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 912,
+      "uri": "data:application/octet-stream;base64,XI/CvlyPwr7D9eg+XI/CvuxROL7D9eg+XI/CvuxROL4K1+M+XI/CvlyPwr4K1+M+AACAvlyPwr4K1+M+AACAvuxROL4K1+M+AACAvuxROL7D9eg+AACAvlyPwr7D9eg+XI/CvlyPwr4K1+M+AACAvlyPwr4K1+M+AACAvlyPwr7D9eg+XI/CvlyPwr7D9eg+XI/CvuxROL7D9eg+AACAvuxROL7D9eg+AACAvuxROL4K1+M+XI/CvuxROL4K1+M+XI/CvuxROL4K1+M+AACAvuxROL4K1+M+AACAvlyPwr4K1+M+XI/CvlyPwr4K1+M+XI/CvlyPwr7D9eg+AACAvlyPwr7D9eg+AACAvuxROL7D9eg+XI/CvuxROL7D9eg+AACAvwAAAIAAAACAAACAvwAAAIAAAACAAACAvwAAAIAAAACAAACAvwAAAIAAAACAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/pptEP6abRD9aZHs/pptEP1pkez9aZHs/pptEP1pkez+mm0Q/pptEP1pkez+mm0Q/WmR7P1pkez+mm0Q/WmR7P6abRD+mm0Q/WmR7P6abRD9aZHs/WmR7P6abRD9aZHs/pptEP6abRD9aZHs/pptEP1pkez9aZHs/pptEP1pkez+mm0Q/pptEP1pkez+mm0Q/WmR7P1pkez+mm0Q/WmR7P6abRD+mm0Q/WmR7P6abRD9aZHs/WmR7P6abRD9aZHs/AAAAAAEAAAACAAAAAAAAAAIAAAADAAAABAAAAAUAAAAGAAAABAAAAAYAAAAHAAAACAAAAAkAAAAKAAAACAAAAAoAAAALAAAADAAAAA0AAAAOAAAADAAAAA4AAAAPAAAAEAAAABEAAAASAAAAEAAAABIAAAATAAAAFAAAABUAAAAWAAAAFAAAABYAAAAXAAAA"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 288,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 576,
+      "byteLength": 192,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 768,
+      "byteLength": 144,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3",
+      "min": [
+        -0.3799999952316284,
+        -0.3799999952316284,
+        0.4449999928474426
+      ],
+      "max": [
+        -0.25,
+        -0.18000000715255737,
+        0.45500001311302185
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3",
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5125,
+      "count": 36,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "power_plant_unpowered",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "extras": {
+    "componentHierarchy": [
+      {
+        "module": "service_shutdown",
+        "part": "isolated_service_cover",
+        "group": "static",
+        "firstIndex": 0,
+        "indexCount": 36
+      }
+    ],
+    "axes": "+Y up, +Z forward",
+    "state": "unpowered",
+    "lod": 1
+  }
+}

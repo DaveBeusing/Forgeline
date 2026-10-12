@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.radar",
   "type": "mesh",
-  "source": "sources/radar_lod0_production.gltf",
+  "source": "sources/operational/radar_lod0.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ],
@@ -18,5 +18,32 @@
     }
   ],
   "collisionRequired": true,
-  "collisionReference": "building.directorate.module.collision_box"
+  "collisionReference": "building.directorate.module.collision_box",
+  "sockets": [
+    {
+      "name": "motion_radar_array",
+      "x": 0,
+      "y": 0.285,
+      "z": 0
+    }
+  ],
+  "mechanicalParts": [
+    {
+      "name": "body",
+      "firstIndex": 0,
+      "indexCount": 1068,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "radar_array",
+      "firstIndex": 1068,
+      "indexCount": 1512,
+      "parent": -1,
+      "motion": "radar",
+      "socket": "motion_radar_array",
+      "rate": 0.6,
+      "travel": 0
+    }
+  ]
 }

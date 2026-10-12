@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.radar.partial_shell",
+  "type": "mesh",
+  "source": "sources/operational/radar_partial_shell.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

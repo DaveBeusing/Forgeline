@@ -1,0 +1,3591 @@
+{
+  "schemaVersion": 1,
+  "axes": "+Y up, +Z forward",
+  "importScale": 1,
+  "material": "material.directorate.building.structural",
+  "provenance": "Original Directorate hard-surface components; no third-party geometry or new textures.",
+  "families": {
+    "vehicle_factory": {
+      "bounds": [
+        -0.48,
+        0.48,
+        -0.39,
+        0.49,
+        0.42
+      ],
+      "modules": [
+        {
+          "name": "terrain_plinth",
+          "group": "body",
+          "parts": [
+            {
+              "name": "reinforced_foundation",
+              "kind": "box",
+              "min": [
+                -0.48,
+                -0.5,
+                -0.39
+              ],
+              "max": [
+                0.48,
+                -0.47,
+                0.49
+              ],
+              "cell": 6,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact",
+            "foundation",
+            "structural_frame",
+            "partial_shell",
+            "destroyed"
+          ]
+        },
+        {
+          "name": "structural_columns",
+          "group": "body",
+          "parts": [
+            {
+              "name": "column_0",
+              "kind": "box",
+              "min": [
+                -0.45499999999999996,
+                -0.47,
+                -0.365
+              ],
+              "max": [
+                -0.42999999999999994,
+                0.33999999999999997,
+                -0.33999999999999997
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "column_1",
+              "kind": "box",
+              "min": [
+                0.43,
+                -0.47,
+                -0.365
+              ],
+              "max": [
+                0.455,
+                0.33999999999999997,
+                -0.33999999999999997
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "column_2",
+              "kind": "box",
+              "min": [
+                -0.45499999999999996,
+                -0.47,
+                0.44
+              ],
+              "max": [
+                -0.42999999999999994,
+                0.33999999999999997,
+                0.465
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "column_3",
+              "kind": "box",
+              "min": [
+                0.43,
+                -0.47,
+                0.44
+              ],
+              "max": [
+                0.455,
+                0.33999999999999997,
+                0.465
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact",
+            "structural_frame",
+            "partial_shell"
+          ]
+        },
+        {
+          "name": "service_shutdown",
+          "group": "body",
+          "parts": [
+            {
+              "name": "isolated_service_cover",
+              "kind": "box",
+              "min": [
+                -0.43,
+                -0.38,
+                0.46499999999999997
+              ],
+              "max": [
+                -0.3,
+                -0.18,
+                0.475
+              ],
+              "cell": 15,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "unpowered"
+          ]
+        },
+        {
+          "name": "damaged_structure",
+          "group": "body",
+          "parts": [
+            {
+              "name": "broken_brace",
+              "kind": "box",
+              "min": [
+                -0.39999999999999997,
+                -0.45,
+                -0.31
+              ],
+              "max": [
+                -0.22999999999999998,
+                -0.38,
+                -0.23
+              ],
+              "cell": 8,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "broken_pipe",
+              "kind": "cylinder",
+              "start": [
+                -0.36,
+                -0.39,
+                -0.28
+              ],
+              "end": [
+                -0.27999999999999997,
+                -0.27,
+                -0.24000000000000002
+              ],
+              "radius": 0.014,
+              "inner": 0,
+              "cell": 7,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            }
+          ],
+          "states": [
+            "damaged"
+          ]
+        },
+        {
+          "name": "critical_structure",
+          "group": "body",
+          "parts": [
+            {
+              "name": "collapsed_roof_sheet",
+              "kind": "box",
+              "min": [
+                -0.42,
+                -0.44,
+                0.31
+              ],
+              "max": [
+                -0.20999999999999996,
+                -0.34,
+                0.42
+              ],
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "ruptured_service",
+              "kind": "cylinder",
+              "start": [
+                0.31999999999999995,
+                -0.45,
+                0.37
+              ],
+              "end": [
+                0.39,
+                -0.21,
+                0.42
+              ],
+              "radius": 0.018,
+              "inner": 0.009,
+              "cell": 7,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            }
+          ],
+          "states": [
+            "critical"
+          ]
+        },
+        {
+          "name": "collapsed_frame",
+          "group": "body",
+          "parts": [
+            {
+              "name": "fallen_wall",
+              "kind": "box",
+              "min": [
+                -0.45999999999999996,
+                -0.47,
+                -0.29000000000000004
+              ],
+              "max": [
+                -0.30999999999999994,
+                -0.27,
+                0.4
+              ],
+              "cell": 8,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "fallen_roof",
+              "kind": "box",
+              "min": [
+                -0.36,
+                -0.46,
+                -0.37
+              ],
+              "max": [
+                0.41,
+                -0.39,
+                -0.18000000000000002
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "fallen_support",
+              "kind": "cylinder",
+              "start": [
+                -0.38,
+                -0.4,
+                0.33999999999999997
+              ],
+              "end": [
+                0.39999999999999997,
+                -0.33,
+                0.37
+              ],
+              "radius": 0.025,
+              "inner": 0,
+              "cell": 8,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            }
+          ],
+          "states": [
+            "destroyed"
+          ]
+        },
+        {
+          "name": "assembly_hall",
+          "group": "body",
+          "parts": [
+            {
+              "name": "left_hall_wall",
+              "kind": "box",
+              "min": [
+                -0.45,
+                -0.47,
+                -0.36
+              ],
+              "max": [
+                -0.38,
+                0.29,
+                0.45
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.006
+            },
+            {
+              "name": "right_hall_wall",
+              "kind": "box",
+              "min": [
+                0.38,
+                -0.47,
+                -0.36
+              ],
+              "max": [
+                0.45,
+                0.29,
+                0.45
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.006
+            },
+            {
+              "name": "rear_hall_wall",
+              "kind": "box",
+              "min": [
+                -0.38,
+                -0.47,
+                -0.36
+              ],
+              "max": [
+                0.38,
+                0.29,
+                -0.3
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "left_portal_jamb",
+              "kind": "box",
+              "min": [
+                -0.38,
+                -0.47,
+                0.41
+              ],
+              "max": [
+                -0.25,
+                0.29,
+                0.46
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "right_portal_jamb",
+              "kind": "box",
+              "min": [
+                0.25,
+                -0.47,
+                0.41
+              ],
+              "max": [
+                0.38,
+                0.29,
+                0.46
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "door_lintel",
+              "kind": "box",
+              "min": [
+                -0.25,
+                -0.15,
+                0.41
+              ],
+              "max": [
+                0.25,
+                0.29,
+                0.46
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "roof",
+              "kind": "box",
+              "min": [
+                -0.45,
+                0.29,
+                -0.36
+              ],
+              "max": [
+                0.45,
+                0.34,
+                0.46
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.008
+            }
+          ],
+          "states": [
+            "intact",
+            "partial_shell"
+          ]
+        },
+        {
+          "name": "assembly_lanes",
+          "group": "body",
+          "parts": [
+            {
+              "name": "lane_0",
+              "kind": "box",
+              "min": [
+                -0.18,
+                -0.469,
+                -0.3
+              ],
+              "max": [
+                -0.16399999999999998,
+                -0.463,
+                0.49
+              ],
+              "cell": 5,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "lane_1",
+              "kind": "box",
+              "min": [
+                -0.08,
+                -0.469,
+                -0.3
+              ],
+              "max": [
+                -0.064,
+                -0.463,
+                0.49
+              ],
+              "cell": 5,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "lane_2",
+              "kind": "box",
+              "min": [
+                0.08,
+                -0.469,
+                -0.3
+              ],
+              "max": [
+                0.096,
+                -0.463,
+                0.49
+              ],
+              "cell": 5,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "lane_3",
+              "kind": "box",
+              "min": [
+                0.18,
+                -0.469,
+                -0.3
+              ],
+              "max": [
+                0.196,
+                -0.463,
+                0.49
+              ],
+              "cell": 5,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact"
+          ]
+        },
+        {
+          "name": "roof_ventilation",
+          "group": "body",
+          "parts": [
+            {
+              "name": "roof_monitor",
+              "kind": "box",
+              "min": [
+                -0.22,
+                0.34,
+                -0.2
+              ],
+              "max": [
+                0.22,
+                0.42,
+                0.1
+              ],
+              "cell": 9,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "vent_louver_0",
+              "kind": "box",
+              "min": [
+                -0.225,
+                0.345,
+                -0.2
+              ],
+              "max": [
+                -0.21,
+                0.35,
+                0.1
+              ],
+              "cell": 1,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "vent_louver_1",
+              "kind": "box",
+              "min": [
+                -0.225,
+                0.357,
+                -0.2
+              ],
+              "max": [
+                -0.21,
+                0.362,
+                0.1
+              ],
+              "cell": 1,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "vent_louver_2",
+              "kind": "box",
+              "min": [
+                -0.225,
+                0.369,
+                -0.2
+              ],
+              "max": [
+                -0.21,
+                0.374,
+                0.1
+              ],
+              "cell": 1,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "vent_louver_3",
+              "kind": "box",
+              "min": [
+                -0.225,
+                0.381,
+                -0.2
+              ],
+              "max": [
+                -0.21,
+                0.386,
+                0.1
+              ],
+              "cell": 1,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "vent_louver_4",
+              "kind": "box",
+              "min": [
+                -0.225,
+                0.39299999999999996,
+                -0.2
+              ],
+              "max": [
+                -0.21,
+                0.39799999999999996,
+                0.1
+              ],
+              "cell": 1,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact"
+          ]
+        },
+        {
+          "name": "static_gantry_rails",
+          "group": "body",
+          "parts": [
+            {
+              "name": "gantry_rail_0",
+              "kind": "box",
+              "min": [
+                -0.36,
+                0.22,
+                -0.25
+              ],
+              "max": [
+                -0.33499999999999996,
+                0.26,
+                0.32
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "gantry_rail_1",
+              "kind": "box",
+              "min": [
+                0.335,
+                0.22,
+                -0.25
+              ],
+              "max": [
+                0.36000000000000004,
+                0.26,
+                0.32
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact"
+          ]
+        },
+        {
+          "name": "loading_door",
+          "group": "loading_door",
+          "parts": [
+            {
+              "name": "armored_loading_leaf",
+              "kind": "box",
+              "min": [
+                -0.24,
+                -0.48,
+                0.472
+              ],
+              "max": [
+                0.24,
+                -0.18,
+                0.484
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "door_rib_0",
+              "kind": "box",
+              "min": [
+                -0.235,
+                -0.465,
+                0.484
+              ],
+              "max": [
+                0.235,
+                -0.458,
+                0.49
+              ],
+              "cell": 1,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "door_rib_1",
+              "kind": "box",
+              "min": [
+                -0.235,
+                -0.41300000000000003,
+                0.484
+              ],
+              "max": [
+                0.235,
+                -0.406,
+                0.49
+              ],
+              "cell": 1,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "door_rib_2",
+              "kind": "box",
+              "min": [
+                -0.235,
+                -0.36100000000000004,
+                0.484
+              ],
+              "max": [
+                0.235,
+                -0.35400000000000004,
+                0.49
+              ],
+              "cell": 1,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "door_rib_3",
+              "kind": "box",
+              "min": [
+                -0.235,
+                -0.30900000000000005,
+                0.484
+              ],
+              "max": [
+                0.235,
+                -0.30200000000000005,
+                0.49
+              ],
+              "cell": 1,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "door_rib_4",
+              "kind": "box",
+              "min": [
+                -0.235,
+                -0.257,
+                0.484
+              ],
+              "max": [
+                0.235,
+                -0.25,
+                0.49
+              ],
+              "cell": 1,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact"
+          ]
+        },
+        {
+          "name": "overhead_crane",
+          "group": "overhead_crane",
+          "parts": [
+            {
+              "name": "cross_beam",
+              "kind": "box",
+              "min": [
+                -0.34,
+                0.24,
+                -0.07
+              ],
+              "max": [
+                0.34,
+                0.27,
+                -0.03
+              ],
+              "cell": 5,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "trolley",
+              "kind": "box",
+              "min": [
+                -0.055,
+                0.18,
+                -0.08
+              ],
+              "max": [
+                0.055,
+                0.24,
+                -0.02
+              ],
+              "cell": 1,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "hoist",
+              "kind": "cylinder",
+              "start": [
+                0,
+                0.07,
+                -0.05
+              ],
+              "end": [
+                0,
+                0.18,
+                -0.05
+              ],
+              "radius": 0.009,
+              "inner": 0,
+              "cell": 1,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0
+              ]
+            }
+          ],
+          "states": [
+            "intact"
+          ]
+        },
+        {
+          "name": "wreck_portal",
+          "group": "body",
+          "parts": [
+            {
+              "name": "broken_portal_left",
+              "kind": "box",
+              "min": [
+                -0.38,
+                -0.47,
+                0.4
+              ],
+              "max": [
+                -0.27,
+                -0.17,
+                0.46
+              ],
+              "cell": 8,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "fallen_gantry",
+              "kind": "box",
+              "min": [
+                -0.25,
+                -0.44,
+                0.05
+              ],
+              "max": [
+                0.25,
+                -0.36,
+                0.11
+              ],
+              "cell": 5,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "destroyed"
+          ]
+        }
+      ],
+      "motion": {
+        "loading_door": {
+          "motion": "door",
+          "socket": "motion_loading_door",
+          "pivot": [
+            0,
+            -0.11999999731779099,
+            0.4000000059604645
+          ],
+          "rate": 1,
+          "travel": 0.35
+        },
+        "overhead_crane": {
+          "motion": "crane",
+          "socket": "motion_overhead_crane",
+          "pivot": [
+            0,
+            0.24,
+            -0.05
+          ],
+          "rate": 0.25,
+          "travel": 0.25
+        }
+      }
+    },
+    "power_plant": {
+      "bounds": [
+        -0.43,
+        0.42,
+        -0.34,
+        0.47,
+        0.55
+      ],
+      "modules": [
+        {
+          "name": "terrain_plinth",
+          "group": "body",
+          "parts": [
+            {
+              "name": "reinforced_foundation",
+              "kind": "box",
+              "min": [
+                -0.43,
+                -0.5,
+                -0.34
+              ],
+              "max": [
+                0.42,
+                -0.47,
+                0.47
+              ],
+              "cell": 6,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact",
+            "foundation",
+            "structural_frame",
+            "partial_shell",
+            "destroyed"
+          ]
+        },
+        {
+          "name": "structural_columns",
+          "group": "body",
+          "parts": [
+            {
+              "name": "column_0",
+              "kind": "box",
+              "min": [
+                -0.40499999999999997,
+                -0.47,
+                -0.315
+              ],
+              "max": [
+                -0.37999999999999995,
+                0.47000000000000003,
+                -0.29
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "column_1",
+              "kind": "box",
+              "min": [
+                0.37,
+                -0.47,
+                -0.315
+              ],
+              "max": [
+                0.395,
+                0.47000000000000003,
+                -0.29
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "column_2",
+              "kind": "box",
+              "min": [
+                -0.40499999999999997,
+                -0.47,
+                0.42
+              ],
+              "max": [
+                -0.37999999999999995,
+                0.47000000000000003,
+                0.445
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "column_3",
+              "kind": "box",
+              "min": [
+                0.37,
+                -0.47,
+                0.42
+              ],
+              "max": [
+                0.395,
+                0.47000000000000003,
+                0.445
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact",
+            "structural_frame",
+            "partial_shell"
+          ]
+        },
+        {
+          "name": "service_shutdown",
+          "group": "body",
+          "parts": [
+            {
+              "name": "isolated_service_cover",
+              "kind": "box",
+              "min": [
+                -0.38,
+                -0.38,
+                0.44499999999999995
+              ],
+              "max": [
+                -0.25,
+                -0.18,
+                0.45499999999999996
+              ],
+              "cell": 15,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "unpowered"
+          ]
+        },
+        {
+          "name": "damaged_structure",
+          "group": "body",
+          "parts": [
+            {
+              "name": "broken_brace",
+              "kind": "box",
+              "min": [
+                -0.35,
+                -0.45,
+                -0.26
+              ],
+              "max": [
+                -0.18,
+                -0.38,
+                -0.18000000000000002
+              ],
+              "cell": 8,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "broken_pipe",
+              "kind": "cylinder",
+              "start": [
+                -0.31,
+                -0.39,
+                -0.23000000000000004
+              ],
+              "end": [
+                -0.22999999999999998,
+                -0.27,
+                -0.19000000000000003
+              ],
+              "radius": 0.014,
+              "inner": 0,
+              "cell": 7,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            }
+          ],
+          "states": [
+            "damaged"
+          ]
+        },
+        {
+          "name": "critical_structure",
+          "group": "body",
+          "parts": [
+            {
+              "name": "collapsed_roof_sheet",
+              "kind": "box",
+              "min": [
+                -0.37,
+                -0.44,
+                0.29
+              ],
+              "max": [
+                -0.15999999999999998,
+                -0.34,
+                0.39999999999999997
+              ],
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "ruptured_service",
+              "kind": "cylinder",
+              "start": [
+                0.26,
+                -0.45,
+                0.35
+              ],
+              "end": [
+                0.32999999999999996,
+                -0.21,
+                0.39999999999999997
+              ],
+              "radius": 0.018,
+              "inner": 0.009,
+              "cell": 7,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            }
+          ],
+          "states": [
+            "critical"
+          ]
+        },
+        {
+          "name": "collapsed_frame",
+          "group": "body",
+          "parts": [
+            {
+              "name": "fallen_wall",
+              "kind": "box",
+              "min": [
+                -0.41,
+                -0.47,
+                -0.24000000000000002
+              ],
+              "max": [
+                -0.26,
+                -0.27,
+                0.38
+              ],
+              "cell": 8,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "fallen_roof",
+              "kind": "box",
+              "min": [
+                -0.31,
+                -0.46,
+                -0.32
+              ],
+              "max": [
+                0.35,
+                -0.39,
+                -0.13000000000000003
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "fallen_support",
+              "kind": "cylinder",
+              "start": [
+                -0.32999999999999996,
+                -0.4,
+                0.31999999999999995
+              ],
+              "end": [
+                0.33999999999999997,
+                -0.33,
+                0.35
+              ],
+              "radius": 0.025,
+              "inner": 0,
+              "cell": 8,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            }
+          ],
+          "states": [
+            "destroyed"
+          ]
+        },
+        {
+          "name": "generation_hall",
+          "group": "body",
+          "parts": [
+            {
+              "name": "generation_housing",
+              "kind": "box",
+              "min": [
+                -0.39,
+                -0.47,
+                -0.3
+              ],
+              "max": [
+                0.03,
+                0.17,
+                0.22
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.006
+            },
+            {
+              "name": "hall_roof",
+              "kind": "box",
+              "min": [
+                -0.4,
+                0.17,
+                -0.31
+              ],
+              "max": [
+                0.04,
+                0.21,
+                0.23
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact",
+            "partial_shell"
+          ]
+        },
+        {
+          "name": "exhaust_stacks",
+          "group": "body",
+          "parts": [
+            {
+              "name": "exhaust_0",
+              "kind": "cylinder",
+              "start": [
+                -0.28,
+                0.1,
+                -0.16
+              ],
+              "end": [
+                -0.28,
+                0.55,
+                -0.16
+              ],
+              "radius": 0.049,
+              "inner": 0.033,
+              "cell": 1,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            },
+            {
+              "name": "exhaust_1",
+              "kind": "cylinder",
+              "start": [
+                -0.12,
+                0.1,
+                -0.16
+              ],
+              "end": [
+                -0.12,
+                0.55,
+                -0.16
+              ],
+              "radius": 0.049,
+              "inner": 0.033,
+              "cell": 1,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            }
+          ],
+          "states": [
+            "intact"
+          ]
+        },
+        {
+          "name": "exhaust_flanges",
+          "group": "body",
+          "parts": [
+            {
+              "name": "flange_0",
+              "kind": "cylinder",
+              "start": [
+                -0.28,
+                0.45,
+                -0.16
+              ],
+              "end": [
+                -0.28,
+                0.48,
+                -0.16
+              ],
+              "radius": 0.063,
+              "inner": 0.033,
+              "cell": 8,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1
+              ]
+            },
+            {
+              "name": "flange_1",
+              "kind": "cylinder",
+              "start": [
+                -0.12,
+                0.45,
+                -0.16
+              ],
+              "end": [
+                -0.12,
+                0.48,
+                -0.16
+              ],
+              "radius": 0.063,
+              "inner": 0.033,
+              "cell": 8,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1
+              ]
+            }
+          ],
+          "states": [
+            "intact"
+          ]
+        },
+        {
+          "name": "distribution_yard",
+          "group": "body",
+          "parts": [
+            {
+              "name": "transformer_0",
+              "kind": "box",
+              "min": [
+                0.12,
+                -0.47,
+                -0.22
+              ],
+              "max": [
+                0.34,
+                -0.13,
+                -0.09
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.006
+            },
+            {
+              "name": "transformer_1",
+              "kind": "box",
+              "min": [
+                0.12,
+                -0.47,
+                0.07
+              ],
+              "max": [
+                0.34,
+                -0.13,
+                0.2
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.006
+            }
+          ],
+          "states": [
+            "intact",
+            "partial_shell"
+          ]
+        },
+        {
+          "name": "transformer_fittings",
+          "group": "body",
+          "parts": [
+            {
+              "name": "insulator_0",
+              "kind": "cylinder",
+              "start": [
+                0.23,
+                -0.13,
+                -0.15
+              ],
+              "end": [
+                0.23,
+                0.09,
+                -0.15
+              ],
+              "radius": 0.018,
+              "inner": 0,
+              "cell": 4,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1
+              ]
+            },
+            {
+              "name": "insulator_1",
+              "kind": "cylinder",
+              "start": [
+                0.23,
+                -0.13,
+                0.14
+              ],
+              "end": [
+                0.23,
+                0.09,
+                0.14
+              ],
+              "radius": 0.018,
+              "inner": 0,
+              "cell": 4,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1
+              ]
+            },
+            {
+              "name": "cooling_fin_0",
+              "kind": "box",
+              "min": [
+                0.342,
+                -0.42,
+                -0.22
+              ],
+              "max": [
+                0.362,
+                -0.405,
+                -0.09
+              ],
+              "cell": 9,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "cooling_fin_1",
+              "kind": "box",
+              "min": [
+                0.342,
+                -0.387,
+                -0.22
+              ],
+              "max": [
+                0.362,
+                -0.372,
+                -0.09
+              ],
+              "cell": 9,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "cooling_fin_2",
+              "kind": "box",
+              "min": [
+                0.342,
+                -0.354,
+                -0.22
+              ],
+              "max": [
+                0.362,
+                -0.339,
+                -0.09
+              ],
+              "cell": 9,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "cooling_fin_3",
+              "kind": "box",
+              "min": [
+                0.342,
+                -0.32099999999999995,
+                -0.22
+              ],
+              "max": [
+                0.362,
+                -0.30600000000000005,
+                -0.09
+              ],
+              "cell": 9,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "cooling_fin_4",
+              "kind": "box",
+              "min": [
+                0.342,
+                -0.288,
+                -0.22
+              ],
+              "max": [
+                0.362,
+                -0.273,
+                -0.09
+              ],
+              "cell": 9,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "cooling_fin_5",
+              "kind": "box",
+              "min": [
+                0.342,
+                -0.255,
+                -0.22
+              ],
+              "max": [
+                0.362,
+                -0.24000000000000002,
+                -0.09
+              ],
+              "cell": 9,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "cooling_fin_6",
+              "kind": "box",
+              "min": [
+                0.342,
+                -0.22199999999999998,
+                -0.22
+              ],
+              "max": [
+                0.362,
+                -0.20700000000000002,
+                -0.09
+              ],
+              "cell": 9,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact"
+          ]
+        },
+        {
+          "name": "service_enclosure",
+          "group": "body",
+          "parts": [
+            {
+              "name": "control_room",
+              "kind": "box",
+              "min": [
+                -0.29,
+                -0.47,
+                0.27
+              ],
+              "max": [
+                0.12,
+                -0.13,
+                0.42
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "service_door",
+              "kind": "box",
+              "min": [
+                -0.18,
+                -0.46,
+                0.421
+              ],
+              "max": [
+                -0.08,
+                -0.23,
+                0.432
+              ],
+              "cell": 15,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "cooling_shroud",
+              "kind": "box",
+              "min": [
+                -0.08,
+                0.21,
+                -0.11
+              ],
+              "max": [
+                0.02,
+                0.28,
+                -0.01
+              ],
+              "cell": 9,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact"
+          ]
+        },
+        {
+          "name": "cooling_rotor",
+          "group": "cooling_fan",
+          "parts": [
+            {
+              "name": "fan_hub",
+              "kind": "cylinder",
+              "start": [
+                -0.03,
+                0.284,
+                -0.06
+              ],
+              "end": [
+                -0.03,
+                0.3,
+                -0.06
+              ],
+              "radius": 0.018,
+              "inner": 0,
+              "cell": 1,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0
+              ]
+            },
+            {
+              "name": "fan_blade_0",
+              "kind": "radial_blade",
+              "centre": [
+                -0.03,
+                0.292,
+                -0.06
+              ],
+              "angle": 0,
+              "inner": 0.016,
+              "outer": 0.072,
+              "width": 0.019,
+              "thickness": 0.006,
+              "cell": 1,
+              "lods": [
+                0
+              ]
+            },
+            {
+              "name": "fan_blade_1",
+              "kind": "radial_blade",
+              "centre": [
+                -0.03,
+                0.292,
+                -0.06
+              ],
+              "angle": 90,
+              "inner": 0.016,
+              "outer": 0.072,
+              "width": 0.019,
+              "thickness": 0.006,
+              "cell": 1,
+              "lods": [
+                0
+              ]
+            },
+            {
+              "name": "fan_blade_2",
+              "kind": "radial_blade",
+              "centre": [
+                -0.03,
+                0.292,
+                -0.06
+              ],
+              "angle": 180,
+              "inner": 0.016,
+              "outer": 0.072,
+              "width": 0.019,
+              "thickness": 0.006,
+              "cell": 1,
+              "lods": [
+                0
+              ]
+            },
+            {
+              "name": "fan_blade_3",
+              "kind": "radial_blade",
+              "centre": [
+                -0.03,
+                0.292,
+                -0.06
+              ],
+              "angle": 270,
+              "inner": 0.016,
+              "outer": 0.072,
+              "width": 0.019,
+              "thickness": 0.006,
+              "cell": 1,
+              "lods": [
+                0
+              ]
+            }
+          ],
+          "states": [
+            "intact"
+          ]
+        },
+        {
+          "name": "wreck_generator",
+          "group": "body",
+          "parts": [
+            {
+              "name": "broken_stack",
+              "kind": "cylinder",
+              "start": [
+                -0.28,
+                -0.42,
+                -0.16
+              ],
+              "end": [
+                -0.02,
+                -0.29,
+                -0.15
+              ],
+              "radius": 0.049,
+              "inner": 0.033,
+              "cell": 8,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            },
+            {
+              "name": "crushed_transformer",
+              "kind": "box",
+              "min": [
+                0.12,
+                -0.47,
+                0.07
+              ],
+              "max": [
+                0.34,
+                -0.27,
+                0.2
+              ],
+              "cell": 8,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "destroyed"
+          ]
+        }
+      ],
+      "motion": {
+        "cooling_fan": {
+          "motion": "fan",
+          "socket": "motion_cooling_fan",
+          "pivot": [
+            -0.03,
+            0.292,
+            -0.06
+          ],
+          "rate": 2.2,
+          "travel": 0
+        }
+      }
+    },
+    "barracks": {
+      "bounds": [
+        -0.43,
+        0.43,
+        -0.41,
+        0.42,
+        0.16
+      ],
+      "modules": [
+        {
+          "name": "terrain_plinth",
+          "group": "body",
+          "parts": [
+            {
+              "name": "reinforced_foundation",
+              "kind": "box",
+              "min": [
+                -0.43,
+                -0.5,
+                -0.41
+              ],
+              "max": [
+                0.43,
+                -0.47,
+                0.42
+              ],
+              "cell": 6,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact",
+            "foundation",
+            "structural_frame",
+            "partial_shell",
+            "destroyed"
+          ]
+        },
+        {
+          "name": "structural_columns",
+          "group": "body",
+          "parts": [
+            {
+              "name": "column_0",
+              "kind": "box",
+              "min": [
+                -0.40499999999999997,
+                -0.47,
+                -0.38499999999999995
+              ],
+              "max": [
+                -0.37999999999999995,
+                0.08,
+                -0.35999999999999993
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "column_1",
+              "kind": "box",
+              "min": [
+                0.38,
+                -0.47,
+                -0.38499999999999995
+              ],
+              "max": [
+                0.405,
+                0.08,
+                -0.35999999999999993
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "column_2",
+              "kind": "box",
+              "min": [
+                -0.40499999999999997,
+                -0.47,
+                0.37
+              ],
+              "max": [
+                -0.37999999999999995,
+                0.08,
+                0.395
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "column_3",
+              "kind": "box",
+              "min": [
+                0.38,
+                -0.47,
+                0.37
+              ],
+              "max": [
+                0.405,
+                0.08,
+                0.395
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact",
+            "structural_frame",
+            "partial_shell"
+          ]
+        },
+        {
+          "name": "service_shutdown",
+          "group": "body",
+          "parts": [
+            {
+              "name": "isolated_service_cover",
+              "kind": "box",
+              "min": [
+                -0.38,
+                -0.38,
+                0.39499999999999996
+              ],
+              "max": [
+                -0.25,
+                -0.18,
+                0.40499999999999997
+              ],
+              "cell": 15,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "unpowered"
+          ]
+        },
+        {
+          "name": "damaged_structure",
+          "group": "body",
+          "parts": [
+            {
+              "name": "broken_brace",
+              "kind": "box",
+              "min": [
+                -0.35,
+                -0.45,
+                -0.32999999999999996
+              ],
+              "max": [
+                -0.18,
+                -0.38,
+                -0.24999999999999997
+              ],
+              "cell": 8,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "broken_pipe",
+              "kind": "cylinder",
+              "start": [
+                -0.31,
+                -0.39,
+                -0.3
+              ],
+              "end": [
+                -0.22999999999999998,
+                -0.27,
+                -0.26
+              ],
+              "radius": 0.014,
+              "inner": 0,
+              "cell": 7,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            }
+          ],
+          "states": [
+            "damaged"
+          ]
+        },
+        {
+          "name": "critical_structure",
+          "group": "body",
+          "parts": [
+            {
+              "name": "collapsed_roof_sheet",
+              "kind": "box",
+              "min": [
+                -0.37,
+                -0.44,
+                0.24
+              ],
+              "max": [
+                -0.15999999999999998,
+                -0.34,
+                0.35
+              ],
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "ruptured_service",
+              "kind": "cylinder",
+              "start": [
+                0.27,
+                -0.45,
+                0.3
+              ],
+              "end": [
+                0.33999999999999997,
+                -0.21,
+                0.35
+              ],
+              "radius": 0.018,
+              "inner": 0.009,
+              "cell": 7,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            }
+          ],
+          "states": [
+            "critical"
+          ]
+        },
+        {
+          "name": "collapsed_frame",
+          "group": "body",
+          "parts": [
+            {
+              "name": "fallen_wall",
+              "kind": "box",
+              "min": [
+                -0.41,
+                -0.47,
+                -0.30999999999999994
+              ],
+              "max": [
+                -0.26,
+                -0.27,
+                0.32999999999999996
+              ],
+              "cell": 8,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "fallen_roof",
+              "kind": "box",
+              "min": [
+                -0.31,
+                -0.46,
+                -0.38999999999999996
+              ],
+              "max": [
+                0.36,
+                -0.39,
+                -0.19999999999999998
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "fallen_support",
+              "kind": "cylinder",
+              "start": [
+                -0.32999999999999996,
+                -0.4,
+                0.27
+              ],
+              "end": [
+                0.35,
+                -0.33,
+                0.3
+              ],
+              "radius": 0.025,
+              "inner": 0,
+              "cell": 8,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            }
+          ],
+          "states": [
+            "destroyed"
+          ]
+        },
+        {
+          "name": "west_quarters",
+          "group": "body",
+          "parts": [
+            {
+              "name": "west_housing",
+              "kind": "box",
+              "min": [
+                -0.39,
+                -0.47,
+                -0.36
+              ],
+              "max": [
+                -0.1,
+                -0.06,
+                0.3
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.004
+            },
+            {
+              "name": "west_pitched_roof",
+              "kind": "gable",
+              "width": [
+                -0.405,
+                -0.085
+              ],
+              "depth": [
+                -0.38,
+                0.32
+              ],
+              "heights": [
+                -0.06,
+                0.01,
+                0.16
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            }
+          ],
+          "states": [
+            "intact",
+            "partial_shell"
+          ]
+        },
+        {
+          "name": "west_entrances",
+          "group": "body",
+          "parts": [
+            {
+              "name": "west_canopy",
+              "kind": "box",
+              "min": [
+                -0.39,
+                -0.17,
+                0.3
+              ],
+              "max": [
+                -0.1,
+                -0.14,
+                0.385
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "west_door",
+              "kind": "box",
+              "min": [
+                -0.28,
+                -0.46,
+                0.301
+              ],
+              "max": [
+                -0.21,
+                -0.23,
+                0.31
+              ],
+              "cell": 15,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact"
+          ]
+        },
+        {
+          "name": "west_windows",
+          "group": "body",
+          "parts": [
+            {
+              "name": "west_window_0",
+              "kind": "box",
+              "min": [
+                -0.34500000000000003,
+                -0.22,
+                -0.32
+              ],
+              "max": [
+                -0.14500000000000002,
+                -0.12,
+                -0.311
+              ],
+              "cell": 4,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "west_window_1",
+              "kind": "box",
+              "min": [
+                -0.34500000000000003,
+                -0.22,
+                -0.12
+              ],
+              "max": [
+                -0.14500000000000002,
+                -0.12,
+                -0.111
+              ],
+              "cell": 4,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "west_window_2",
+              "kind": "box",
+              "min": [
+                -0.34500000000000003,
+                -0.22,
+                0.08
+              ],
+              "max": [
+                -0.14500000000000002,
+                -0.12,
+                0.089
+              ],
+              "cell": 4,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact"
+          ]
+        },
+        {
+          "name": "east_quarters",
+          "group": "body",
+          "parts": [
+            {
+              "name": "east_housing",
+              "kind": "box",
+              "min": [
+                0.1,
+                -0.47,
+                -0.36
+              ],
+              "max": [
+                0.39,
+                -0.06,
+                0.3
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.004
+            },
+            {
+              "name": "east_pitched_roof",
+              "kind": "gable",
+              "width": [
+                0.085,
+                0.405
+              ],
+              "depth": [
+                -0.38,
+                0.32
+              ],
+              "heights": [
+                -0.06,
+                0.01,
+                0.16
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            }
+          ],
+          "states": [
+            "intact",
+            "partial_shell"
+          ]
+        },
+        {
+          "name": "east_entrances",
+          "group": "body",
+          "parts": [
+            {
+              "name": "east_canopy",
+              "kind": "box",
+              "min": [
+                0.1,
+                -0.17,
+                0.3
+              ],
+              "max": [
+                0.39,
+                -0.14,
+                0.385
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "east_door",
+              "kind": "box",
+              "min": [
+                0.21,
+                -0.46,
+                0.301
+              ],
+              "max": [
+                0.28,
+                -0.23,
+                0.31
+              ],
+              "cell": 15,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact"
+          ]
+        },
+        {
+          "name": "east_windows",
+          "group": "body",
+          "parts": [
+            {
+              "name": "east_window_0",
+              "kind": "box",
+              "min": [
+                0.14500000000000002,
+                -0.22,
+                -0.32
+              ],
+              "max": [
+                0.34500000000000003,
+                -0.12,
+                -0.311
+              ],
+              "cell": 4,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "east_window_1",
+              "kind": "box",
+              "min": [
+                0.14500000000000002,
+                -0.22,
+                -0.12
+              ],
+              "max": [
+                0.34500000000000003,
+                -0.12,
+                -0.111
+              ],
+              "cell": 4,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "east_window_2",
+              "kind": "box",
+              "min": [
+                0.14500000000000002,
+                -0.22,
+                0.08
+              ],
+              "max": [
+                0.34500000000000003,
+                -0.12,
+                0.089
+              ],
+              "cell": 4,
+              "lods": [
+                0
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact"
+          ]
+        },
+        {
+          "name": "infantry_circulation",
+          "group": "body",
+          "parts": [
+            {
+              "name": "central_path",
+              "kind": "box",
+              "min": [
+                -0.085,
+                -0.469,
+                -0.4
+              ],
+              "max": [
+                0.085,
+                -0.464,
+                0.42
+              ],
+              "cell": 6,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "deployment_step",
+              "kind": "box",
+              "min": [
+                -0.095,
+                -0.48,
+                0.35
+              ],
+              "max": [
+                0.095,
+                -0.455,
+                0.42
+              ],
+              "cell": 6,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact"
+          ]
+        },
+        {
+          "name": "quarters_wreck",
+          "group": "body",
+          "parts": [
+            {
+              "name": "fallen_quarters_roof",
+              "kind": "gable",
+              "width": [
+                -0.39,
+                -0.1
+              ],
+              "depth": [
+                -0.35,
+                0.2
+              ],
+              "heights": [
+                -0.46,
+                -0.35,
+                -0.22
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            },
+            {
+              "name": "broken_east_quarters",
+              "kind": "box",
+              "min": [
+                0.11,
+                -0.47,
+                -0.31
+              ],
+              "max": [
+                0.36,
+                -0.23,
+                0.24
+              ],
+              "cell": 8,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "destroyed"
+          ]
+        }
+      ],
+      "motion": {}
+    },
+    "radar": {
+      "bounds": [
+        -0.34,
+        0.34,
+        -0.3,
+        0.3,
+        0.5
+      ],
+      "modules": [
+        {
+          "name": "terrain_plinth",
+          "group": "body",
+          "parts": [
+            {
+              "name": "reinforced_foundation",
+              "kind": "box",
+              "min": [
+                -0.34,
+                -0.5,
+                -0.3
+              ],
+              "max": [
+                0.34,
+                -0.47,
+                0.3
+              ],
+              "cell": 6,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact",
+            "foundation",
+            "structural_frame",
+            "partial_shell",
+            "destroyed"
+          ]
+        },
+        {
+          "name": "structural_columns",
+          "group": "body",
+          "parts": [
+            {
+              "name": "column_0",
+              "kind": "box",
+              "min": [
+                -0.315,
+                -0.47,
+                -0.27499999999999997
+              ],
+              "max": [
+                -0.29,
+                0.42,
+                -0.24999999999999997
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "column_1",
+              "kind": "box",
+              "min": [
+                0.29000000000000004,
+                -0.47,
+                -0.27499999999999997
+              ],
+              "max": [
+                0.31500000000000006,
+                0.42,
+                -0.24999999999999997
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "column_2",
+              "kind": "box",
+              "min": [
+                -0.315,
+                -0.47,
+                0.25
+              ],
+              "max": [
+                -0.29,
+                0.42,
+                0.275
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "column_3",
+              "kind": "box",
+              "min": [
+                0.29000000000000004,
+                -0.47,
+                0.25
+              ],
+              "max": [
+                0.31500000000000006,
+                0.42,
+                0.275
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact",
+            "structural_frame",
+            "partial_shell"
+          ]
+        },
+        {
+          "name": "service_shutdown",
+          "group": "body",
+          "parts": [
+            {
+              "name": "isolated_service_cover",
+              "kind": "box",
+              "min": [
+                -0.29000000000000004,
+                -0.38,
+                0.27499999999999997
+              ],
+              "max": [
+                -0.16000000000000003,
+                -0.18,
+                0.285
+              ],
+              "cell": 15,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "unpowered"
+          ]
+        },
+        {
+          "name": "damaged_structure",
+          "group": "body",
+          "parts": [
+            {
+              "name": "broken_brace",
+              "kind": "box",
+              "min": [
+                -0.26,
+                -0.45,
+                -0.21999999999999997
+              ],
+              "max": [
+                -0.09000000000000002,
+                -0.38,
+                -0.13999999999999999
+              ],
+              "cell": 8,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "broken_pipe",
+              "kind": "cylinder",
+              "start": [
+                -0.22000000000000003,
+                -0.39,
+                -0.19
+              ],
+              "end": [
+                -0.14,
+                -0.27,
+                -0.15
+              ],
+              "radius": 0.014,
+              "inner": 0,
+              "cell": 7,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            }
+          ],
+          "states": [
+            "damaged"
+          ]
+        },
+        {
+          "name": "critical_structure",
+          "group": "body",
+          "parts": [
+            {
+              "name": "collapsed_roof_sheet",
+              "kind": "box",
+              "min": [
+                -0.28,
+                -0.44,
+                0.12
+              ],
+              "max": [
+                -0.07,
+                -0.34,
+                0.22999999999999998
+              ],
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "ruptured_service",
+              "kind": "cylinder",
+              "start": [
+                0.18000000000000002,
+                -0.45,
+                0.18
+              ],
+              "end": [
+                0.25,
+                -0.21,
+                0.22999999999999998
+              ],
+              "radius": 0.018,
+              "inner": 0.009,
+              "cell": 7,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            }
+          ],
+          "states": [
+            "critical"
+          ]
+        },
+        {
+          "name": "collapsed_frame",
+          "group": "body",
+          "parts": [
+            {
+              "name": "fallen_wall",
+              "kind": "box",
+              "min": [
+                -0.32,
+                -0.47,
+                -0.19999999999999998
+              ],
+              "max": [
+                -0.17,
+                -0.27,
+                0.21
+              ],
+              "cell": 8,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "fallen_roof",
+              "kind": "box",
+              "min": [
+                -0.22000000000000003,
+                -0.46,
+                -0.27999999999999997
+              ],
+              "max": [
+                0.27,
+                -0.39,
+                -0.09
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0
+            },
+            {
+              "name": "fallen_support",
+              "kind": "cylinder",
+              "start": [
+                -0.24000000000000002,
+                -0.4,
+                0.15
+              ],
+              "end": [
+                0.26,
+                -0.33,
+                0.18
+              ],
+              "radius": 0.025,
+              "inner": 0,
+              "cell": 8,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            }
+          ],
+          "states": [
+            "destroyed"
+          ]
+        },
+        {
+          "name": "electronics_enclosure",
+          "group": "body",
+          "parts": [
+            {
+              "name": "receiver_room",
+              "kind": "box",
+              "min": [
+                -0.29,
+                -0.47,
+                -0.25
+              ],
+              "max": [
+                0.29,
+                -0.22,
+                0.24
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.008
+            },
+            {
+              "name": "service_hatch",
+              "kind": "box",
+              "min": [
+                -0.06,
+                -0.46,
+                0.241
+              ],
+              "max": [
+                0.06,
+                -0.28,
+                0.25
+              ],
+              "cell": 15,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0
+            }
+          ],
+          "states": [
+            "intact",
+            "partial_shell"
+          ]
+        },
+        {
+          "name": "mast_support",
+          "group": "body",
+          "parts": [
+            {
+              "name": "bearing_mast",
+              "kind": "cylinder",
+              "start": [
+                0,
+                -0.22,
+                0
+              ],
+              "end": [
+                0,
+                0.285,
+                0
+              ],
+              "radius": 0.032,
+              "inner": 0,
+              "cell": 1,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            },
+            {
+              "name": "west_brace",
+              "kind": "cylinder",
+              "start": [
+                -0.22,
+                -0.21,
+                -0.12
+              ],
+              "end": [
+                0,
+                0.21,
+                0
+              ],
+              "radius": 0.014,
+              "inner": 0,
+              "cell": 1,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            },
+            {
+              "name": "east_brace",
+              "kind": "cylinder",
+              "start": [
+                0.22,
+                -0.21,
+                -0.12
+              ],
+              "end": [
+                0,
+                0.21,
+                0
+              ],
+              "radius": 0.014,
+              "inner": 0,
+              "cell": 1,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            },
+            {
+              "name": "forward_brace",
+              "kind": "cylinder",
+              "start": [
+                0,
+                -0.21,
+                0.17
+              ],
+              "end": [
+                0,
+                0.21,
+                0
+              ],
+              "radius": 0.014,
+              "inner": 0,
+              "cell": 1,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            }
+          ],
+          "states": [
+            "intact"
+          ]
+        },
+        {
+          "name": "receiver_array",
+          "group": "radar_array",
+          "parts": [
+            {
+              "name": "concave_reflector",
+              "kind": "dish",
+              "centre": [
+                0,
+                0.285,
+                0
+              ],
+              "radius": 0.22,
+              "cell": 0,
+              "sides": [
+                24,
+                12,
+                8
+              ],
+              "rings": [
+                4,
+                2,
+                1
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            },
+            {
+              "name": "receiver_feed",
+              "kind": "cylinder",
+              "start": [
+                0,
+                0.285,
+                0
+              ],
+              "end": [
+                0,
+                0.419,
+                0.1
+              ],
+              "radius": 0.01,
+              "inner": 0,
+              "cell": 1,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1
+              ]
+            },
+            {
+              "name": "array_bearing",
+              "kind": "cylinder",
+              "start": [
+                0,
+                0.25,
+                0
+              ],
+              "end": [
+                0,
+                0.285,
+                0
+              ],
+              "radius": 0.045,
+              "inner": 0,
+              "cell": 1,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            }
+          ],
+          "states": [
+            "intact"
+          ]
+        },
+        {
+          "name": "array_wreck",
+          "group": "body",
+          "parts": [
+            {
+              "name": "collapsed_reflector",
+              "kind": "dish",
+              "centre": [
+                0.04,
+                -0.39,
+                0.03
+              ],
+              "radius": 0.18,
+              "cell": 8,
+              "sides": [
+                16,
+                10,
+                8
+              ],
+              "rings": [
+                3,
+                2,
+                1
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            },
+            {
+              "name": "broken_mast",
+              "kind": "cylinder",
+              "start": [
+                -0.2,
+                -0.44,
+                -0.15
+              ],
+              "end": [
+                0.15,
+                -0.34,
+                0.12
+              ],
+              "radius": 0.025,
+              "inner": 0,
+              "cell": 8,
+              "sides": [
+                16,
+                10,
+                6
+              ],
+              "lods": [
+                0,
+                1,
+                2
+              ]
+            }
+          ],
+          "states": [
+            "destroyed"
+          ]
+        }
+      ],
+      "motion": {
+        "radar_array": {
+          "motion": "radar",
+          "socket": "motion_radar_array",
+          "pivot": [
+            0,
+            0.285,
+            0
+          ],
+          "rate": 0.6,
+          "travel": 0
+        }
+      }
+    }
+  }
+}

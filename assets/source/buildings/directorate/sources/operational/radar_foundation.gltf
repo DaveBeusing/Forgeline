@@ -1,0 +1,127 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine operational building component exporter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 912,
+      "uri": "data:application/octet-stream;base64,exSuvgAAAL+amZk+exSuvtej8L6amZk+exSuvtej8L6amZm+exSuvgAAAL+amZm+exSuPgAAAL+amZm+exSuPtej8L6amZm+exSuPtej8L6amZk+exSuPgAAAL+amZk+exSuvgAAAL+amZm+exSuPgAAAL+amZm+exSuPgAAAL+amZk+exSuvgAAAL+amZk+exSuvtej8L6amZk+exSuPtej8L6amZk+exSuPtej8L6amZm+exSuvtej8L6amZm+exSuvtej8L6amZm+exSuPtej8L6amZm+exSuPgAAAL+amZm+exSuvgAAAL+amZm+exSuvgAAAL+amZk+exSuPgAAAL+amZk+exSuPtej8L6amZk+exSuvtej8L6amZk+AACAvwAAAIAAAACAAACAvwAAAIAAAACAAACAvwAAAIAAAACAAACAvwAAAIAAAACAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/ppsEP0w3iT5aZDs/TDeJPlpkOz+0yPY+ppsEP7TI9j6mmwQ/TDeJPlpkOz9MN4k+WmQ7P7TI9j6mmwQ/tMj2PqabBD9MN4k+WmQ7P0w3iT5aZDs/tMj2PqabBD+0yPY+ppsEP0w3iT5aZDs/TDeJPlpkOz+0yPY+ppsEP7TI9j6mmwQ/TDeJPlpkOz9MN4k+WmQ7P7TI9j6mmwQ/tMj2PqabBD9MN4k+WmQ7P0w3iT5aZDs/tMj2PqabBD+0yPY+AAAAAAEAAAACAAAAAAAAAAIAAAADAAAABAAAAAUAAAAGAAAABAAAAAYAAAAHAAAACAAAAAkAAAAKAAAACAAAAAoAAAALAAAADAAAAA0AAAAOAAAADAAAAA4AAAAPAAAAEAAAABEAAAASAAAAEAAAABIAAAATAAAAFAAAABUAAAAWAAAAFAAAABYAAAAXAAAA"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 288,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 576,
+      "byteLength": 192,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 768,
+      "byteLength": 144,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3",
+      "min": [
+        -0.3400000035762787,
+        -0.5,
+        -0.30000001192092896
+      ],
+      "max": [
+        0.3400000035762787,
+        -0.4699999988079071,
+        0.30000001192092896
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3",
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5125,
+      "count": 36,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "radar_foundation",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "extras": {
+    "componentHierarchy": [
+      {
+        "module": "terrain_plinth",
+        "part": "reinforced_foundation",
+        "group": "static",
+        "firstIndex": 0,
+        "indexCount": 36
+      }
+    ],
+    "axes": "+Y up, +Z forward",
+    "state": "foundation",
+    "lod": 1
+  }
+}

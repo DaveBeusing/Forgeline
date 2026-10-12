@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.power_plant.damaged",
+  "type": "mesh",
+  "source": "sources/operational/power_plant_damaged.gltf",
+  "materialReferences": [
+    "material.directorate.building.damaged"
+  ]
+}

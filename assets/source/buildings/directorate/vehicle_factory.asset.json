@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.vehicle_factory",
   "type": "mesh",
-  "source": "sources/vehicle_factory_lod0_detailed.gltf",
+  "source": "sources/operational/vehicle_factory_lod0.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ],
@@ -22,13 +22,13 @@
   "sockets": [
     {
       "name": "motion_loading_door",
-      "x": 0.0,
+      "x": 0,
       "y": -0.11999999731779099,
       "z": 0.4000000059604645
     },
     {
       "name": "motion_overhead_crane",
-      "x": 0.0,
+      "x": 0,
       "y": 0.24,
       "z": -0.05
     }
@@ -37,36 +37,29 @@
     {
       "name": "body",
       "firstIndex": 0,
-      "indexCount": 528,
+      "indexCount": 1152,
       "parent": -1,
       "motion": "static"
     },
     {
       "name": "loading_door",
+      "firstIndex": 1152,
+      "indexCount": 216,
       "parent": -1,
       "motion": "door",
       "socket": "motion_loading_door",
       "rate": 1,
-      "travel": 0.27,
-      "firstIndex": 528,
-      "indexCount": 132
+      "travel": 0.35
     },
     {
       "name": "overhead_crane",
+      "firstIndex": 1368,
+      "indexCount": 252,
       "parent": -1,
       "motion": "crane",
       "socket": "motion_overhead_crane",
       "rate": 0.25,
-      "travel": 0.25,
-      "firstIndex": 660,
-      "indexCount": 132
-    },
-    {
-      "name": "fidelity_0",
-      "firstIndex": 792,
-      "indexCount": 180,
-      "parent": -1,
-      "motion": "static"
+      "travel": 0.25
     }
   ]
 }

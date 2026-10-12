@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.vehicle_factory.lod2",
   "type": "mesh",
-  "source": "sources/vehicle_factory_lod1_detailed.gltf",
+  "source": "sources/operational/vehicle_factory_lod2.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ]

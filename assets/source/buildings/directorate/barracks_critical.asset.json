@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.barracks.critical",
+  "type": "mesh",
+  "source": "sources/operational/barracks_critical.gltf",
+  "materialReferences": [
+    "material.directorate.building.critical"
+  ]
+}
