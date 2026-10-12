@@ -273,16 +273,16 @@
     "vertices": 1512,
     "triangles": 624,
     "minimum": [
-      -0.5,
+      -0.47959184646606445,
       0.0,
       -0.5
     ],
     "maximum": [
       0.5,
       1.0,
-      0.5
+      0.33673468232154846
     ],
-    "sha256": "d2af09d3f44ce0600fc2f1289d63115a8ba5d47384a151e716d877b4b927badb"
+    "sha256": "33f529844748ba2a429a000085050a06e12d08328daf7b4127fe24fb22da561c"
   },
   "broadleaf_reduced.gltf": {
     "vertices": 360,
@@ -293,11 +293,11 @@
       -0.5
     ],
     "maximum": [
-      0.5,
+      0.3164675235748291,
       1.0,
-      0.5
+      0.3732876777648926
     ],
-    "sha256": "4a23279cc6350fe2743d9efea8059f323f9718611ab1d991e513398477f9e0c2"
+    "sha256": "4a837184cde26a255978121951648fb57b3ebb646ac4d4f834771e4c0fffedcb"
   },
   "collision_centered.gltf": {
     "vertices": 24,

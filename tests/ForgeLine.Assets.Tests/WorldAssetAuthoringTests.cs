@@ -237,6 +237,14 @@ public sealed class WorldAssetAuthoringTests
                     });
                 }
             }
+            foreach (string suffix in new[] { "", "_lod1" })
+            {
+                var tree = RuntimeMeshData.FromPayload(catalog.Read(AssetId.Parse("mesh.world.vegetation.broadleaf" + suffix)).Payload);
+                var root = tree.Vertices.Where(v => v.Y == 0).ToArray();
+                Assert.NotEmpty(root);
+                Assert.Equal(0, root.Min(v => v.X) + root.Max(v => v.X), 5);
+                Assert.Equal(0, root.Min(v => v.Z) + root.Max(v => v.Z), 5);
+            }
             Assert.Equal("mesh.world.kit.collision_rooted", catalog.Get(AssetId.Parse("mesh.world.vegetation.broadleaf")).CollisionReference);
             var ore = RuntimeMeshData.FromPayload(catalog.Read(AssetId.Parse("mesh.world.resource.ferrous_ore")).Payload);
             Assert.Equal(-.4892709f, ore.Vertices.Min(v => v.X), 5);

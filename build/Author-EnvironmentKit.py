@@ -42,6 +42,13 @@ class Mesh(primitive.Mesh):
         n=np.array(self.normals)/scale
         self.normals=list(n/np.linalg.norm(n,axis=1)[:,None])
 
+    def root_fit(self):
+        p=np.array(self.positions)
+        scale=np.array([.5/np.max(np.abs(p[:,0])),1/p[:,1].max(),.5/np.max(np.abs(p[:,2]))])
+        self.positions=list(p*scale)
+        n=np.array(self.normals)/scale
+        self.normals=list(n/np.linalg.norm(n,axis=1)[:,None])
+
 
 def model(recipe, reduced):
     m=Mesh(); shape=recipe['shape']; cells=recipe['cells']
@@ -57,7 +64,7 @@ def model(recipe, reduced):
         for c,r in crowns:
             m.cylinder([0,.36,0],c,.014,cells[0],sides)
             m.blob(c,r,cells[1],sides,3 if reduced else 4)
-        m.fit([-.5,0,-.5],[.5,1,.5])
+        m.root_fit()
     elif shape == 'barrier':
         m.ramp(dict(width=[-.5,.5],depth=[-.5,.5],heights=[-.5,-.08,-.08],cell=cells[0]))
         m.ramp(dict(width=[-.5,.5],depth=[-.28,.28],heights=[-.1,.5,.15],cell=cells[0]))
