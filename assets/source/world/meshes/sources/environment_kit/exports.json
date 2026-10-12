@@ -1,0 +1,362 @@
+{
+  "rock_slab_high.gltf": {
+    "vertices": 576,
+    "triangles": 192,
+    "minimum": [
+      -0.5,
+      -0.5,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "sha256": "dc7575d90fd77e163da2d92385098f4cf22c4c0fa0944d3eeb51e6120d829011"
+  },
+  "rock_slab_reduced.gltf": {
+    "vertices": 144,
+    "triangles": 48,
+    "minimum": [
+      -0.5,
+      -0.5,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "sha256": "880703893ab74a2b246f0b16d99fb59be6779c3d0855783198f56a3a1f481939"
+  },
+  "rock_spire_high.gltf": {
+    "vertices": 576,
+    "triangles": 192,
+    "minimum": [
+      -0.5,
+      -0.5,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "sha256": "c04cf4cb440a74cfc7c305461fbd8c35835c660024ef671bb6472709e367b59c"
+  },
+  "rock_spire_reduced.gltf": {
+    "vertices": 144,
+    "triangles": 48,
+    "minimum": [
+      -0.5,
+      -0.5,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "sha256": "e3c0b435635024da676d936a25cd6267fcc8c18e9ab0ccfbd77c8f75c3db5a01"
+  },
+  "barrier_module_high.gltf": {
+    "vertices": 480,
+    "triangles": 232,
+    "minimum": [
+      -0.5,
+      -0.5,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "sha256": "1a8050c43f7e3093166d9416643149789fe2a28a69084e80fece0a3c22c0fea0"
+  },
+  "barrier_module_reduced.gltf": {
+    "vertices": 48,
+    "triangles": 24,
+    "minimum": [
+      -0.5,
+      -0.5,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "sha256": "ab953aea081ee97f8721d2348e6be65af23a438ab04d5535893d946b4517550b"
+  },
+  "pipe_elbow_high.gltf": {
+    "vertices": 1824,
+    "triangles": 912,
+    "minimum": [
+      -0.5,
+      -0.5,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "sha256": "03b2608bc5da2afa8e19ce05ad390cebf2ab359efcc26839311cc58c2044a3d5"
+  },
+  "pipe_elbow_reduced.gltf": {
+    "vertices": 480,
+    "triangles": 240,
+    "minimum": [
+      -0.5,
+      -0.5,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "sha256": "0cd9cb22537cb9b66ea3f7c26e9af454f065ce473f3bae2e8938033c8c825293"
+  },
+  "loading_gantry_high.gltf": {
+    "vertices": 1176,
+    "triangles": 584,
+    "minimum": [
+      -0.5,
+      -0.5,
+      -0.4000000059604645
+    ],
+    "maximum": [
+      0.5,
+      0.5,
+      0.4000000059604645
+    ],
+    "sha256": "fb7a6465e1cdecea0d57381a92a202b975c9e8a4ab04f38a6b5e5babcda14037"
+  },
+  "loading_gantry_reduced.gltf": {
+    "vertices": 300,
+    "triangles": 152,
+    "minimum": [
+      -0.5,
+      -0.5,
+      -0.4000000059604645
+    ],
+    "maximum": [
+      0.5,
+      0.5,
+      0.4000000059604645
+    ],
+    "sha256": "74798ea92705de40d4006eed11ed6fa7d35a3721594e08379853703520f8e601"
+  },
+  "road_edge_high.gltf": {
+    "vertices": 336,
+    "triangles": 164,
+    "minimum": [
+      -0.5,
+      -0.5,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "sha256": "da784a9c64c24c1db0b299b21e978d8c7ea89a2e3d15f67e10e13d10f18fb86d"
+  },
+  "road_edge_reduced.gltf": {
+    "vertices": 48,
+    "triangles": 24,
+    "minimum": [
+      -0.5,
+      -0.5,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "sha256": "300e74a2ff573232bcd2aa2e5fe3c52eed8dacad75ecc69ef8f501db7fdbfcbf"
+  },
+  "bridge_apron_high.gltf": {
+    "vertices": 288,
+    "triangles": 136,
+    "minimum": [
+      -0.5,
+      -0.5,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "sha256": "41175306c9ff1ce327609b2088aa4d6b9cc2b7232b0409cb42c8b8c979cf7f4a"
+  },
+  "bridge_apron_reduced.gltf": {
+    "vertices": 72,
+    "triangles": 36,
+    "minimum": [
+      -0.5,
+      -0.5,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "sha256": "9cefbb9a5f4603df32bb924d6dd795c57d055a2f9cd6d72a1b2896be09d85bc3"
+  },
+  "loading_apron_high.gltf": {
+    "vertices": 336,
+    "triangles": 160,
+    "minimum": [
+      -0.5,
+      -0.5,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "sha256": "6957599bab95b6bce393cf424d395684957d367bd7697ab89e770991e30c79d7"
+  },
+  "loading_apron_reduced.gltf": {
+    "vertices": 72,
+    "triangles": 36,
+    "minimum": [
+      -0.5,
+      -0.5,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "sha256": "99c9b53b30e13715aa17002a8c19bc24a7c0e650be1dd5654da775870a3e6459"
+  },
+  "service_fence_high.gltf": {
+    "vertices": 576,
+    "triangles": 280,
+    "minimum": [
+      -0.5199999809265137,
+      -0.5,
+      -0.2199999988079071
+    ],
+    "maximum": [
+      0.5199999809265137,
+      0.5,
+      0.2199999988079071
+    ],
+    "sha256": "dac658aba10f856f2022ca64a44b2053f596e0ebd4133960f277159848c4e18f"
+  },
+  "service_fence_reduced.gltf": {
+    "vertices": 264,
+    "triangles": 132,
+    "minimum": [
+      -0.5199999809265137,
+      -0.5,
+      -0.2199999988079071
+    ],
+    "maximum": [
+      0.5199999809265137,
+      0.5,
+      0.2199999988079071
+    ],
+    "sha256": "74fd6e4bd7e070792e6a72d3229a36c60b5370599c9c5fab2038a7fc15009594"
+  },
+  "broadleaf_high.gltf": {
+    "vertices": 1512,
+    "triangles": 624,
+    "minimum": [
+      -0.5,
+      0.0,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      1.0,
+      0.5
+    ],
+    "sha256": "d2af09d3f44ce0600fc2f1289d63115a8ba5d47384a151e716d877b4b927badb"
+  },
+  "broadleaf_reduced.gltf": {
+    "vertices": 360,
+    "triangles": 152,
+    "minimum": [
+      -0.5,
+      0.0,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      1.0,
+      0.5
+    ],
+    "sha256": "4a23279cc6350fe2743d9efea8059f323f9718611ab1d991e513398477f9e0c2"
+  },
+  "collision_centered.gltf": {
+    "vertices": 24,
+    "triangles": 12,
+    "minimum": [
+      -0.5,
+      -0.5,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "sha256": "fae8addaeac7fec641ca710b551c43ed15c7cdb30af85f963159532c5ce9f583"
+  },
+  "collision_rooted.gltf": {
+    "vertices": 24,
+    "triangles": 12,
+    "minimum": [
+      -0.5,
+      0.0,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      1.0,
+      0.5
+    ],
+    "sha256": "9577256dd8075cca437468abcfbdb436d5cfcfc43f7319e11e012f68e9217d74"
+  },
+  "ferrous_high.gltf": {
+    "vertices": 1200,
+    "triangles": 400,
+    "minimum": [
+      -0.4892708957195282,
+      -0.5,
+      -0.43247875571250916
+    ],
+    "maximum": [
+      0.490252286195755,
+      0.20999999344348907,
+      0.3992708921432495
+    ],
+    "sha256": "6e3cd57c8d5fc74485af015b405194ba97a7af7c93efcd93d60bb1f2dfca2e2b"
+  },
+  "ferrous_reduced.gltf": {
+    "vertices": 300,
+    "triangles": 100,
+    "minimum": [
+      -0.4892708957195282,
+      -0.5,
+      -0.43247875571250916
+    ],
+    "maximum": [
+      0.490252286195755,
+      0.20999999344348907,
+      0.3992708921432495
+    ],
+    "sha256": "c64f0b4b69ff7ff64b8d1a69eab03f2f6cf6217489d20b10de60f94b0fb1f1d9"
+  }
+}

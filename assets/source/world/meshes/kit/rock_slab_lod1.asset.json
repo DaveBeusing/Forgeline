@@ -1,0 +1,8 @@
+{
+  "id": "mesh.world.prop.rock_slab_lod1",
+  "type": "mesh",
+  "source": "../sources/environment_kit/rock_slab_reduced.gltf",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ]
+}

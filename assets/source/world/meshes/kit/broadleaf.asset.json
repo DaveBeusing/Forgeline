@@ -1,0 +1,17 @@
+{
+  "id": "mesh.world.vegetation.broadleaf",
+  "type": "mesh",
+  "source": "../sources/environment_kit/broadleaf_high.gltf",
+  "materialReferences": [
+    "material.world.vegetation"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "mesh.world.vegetation.broadleaf_lod1",
+      "maxDistance": 190
+    }
+  ],
+  "collisionReference": "mesh.world.kit.collision_rooted",
+  "collisionRequired": true
+}
