@@ -25,9 +25,13 @@ These meshes are also the current readability geometry baseline. Their intention
 
 The six unit families and articulated tank turret now have sibling production
 LOD0 sources with manufactured edge bevels. They preserve their original
-bounds, pivots, UV regions and sockets. All atlas materials bind native
+pivots, UV regions and sockets. Other family bounds remain; the tank
+retains gameplay bounds while its track bottom reaches the existing ground plane.
+All atlas materials bind native
 4096-pixel Base Color/Normal/ORM masters through explicit runtime caps.
-See [Production surfaces](ProductionSurfaceMasters.md). Existing reduced LODs,
+See [Production surfaces](ProductionSurfaceMasters.md). The tank now has a dedicated
+editable kit, replacement LODs and state meshes; see
+[Main Battle Tank production](MainBattleTankProduction.md). Other reduced LODs,
 collision assets and infantry animation boundaries remain in force.
 
 Editable unit assets live below:
@@ -53,7 +57,7 @@ Each six-family LOD0 mesh references explicit LOD1 and LOD2 assets in compiler m
 - LOD0 preserves the strongest silhouette and family-identifying details.
 - LOD1 removes small detail while retaining weapon, sensor, turret, cab, or cargo-module identity.
 - LOD2 preserves only strategic-scale silhouette features.
-- Wreck presentation uses the LOD2 geometry with the wreck damage-state treatment rather than introducing six unique wreck meshes without demonstrated visual value.
+- Most wreck families use LOD2 with their wreck treatment; the tank uses a dedicated collapsed wreck mesh.
 
 The renderer uses projected bounding-sphere size with 90/28 reference-pixel thresholds and 12% hysteresis. Legacy distance-selection helpers remain available in the catalog, but do not drive production rendering. See [Camera and Input](CameraAndInput.md). Selection is presentation-only and never changes simulation state.
 
@@ -90,14 +94,12 @@ The current runtime asset contract does not yet contain an animation asset type 
 
 The Main Battle Tank already uses the articulation contract for its LOD0 turret. LOD0 is authored as a hull mesh plus `unit.directorate.main_battle_tank.turret`. `PresentationExtractor` derives relative horizontal aim yaw from the authoritative `WeaponState` target and unit transforms, and the renderer rotates the turret mesh around `turret_pivot`. LOD1 and LOD2 remain combined silhouette meshes to avoid strategic-distance attachment overhead.
 
-The remaining anchors establish supported integration points without pretending that the engine owns systems it does not yet have:
-
-- gun elevation may later rotate around `gun_pivot`;
-- weapon recoil may later use `recoil_anchor`;
-- projectile/VFX origin resolves at `weapon_muzzle`;
-- sensor motion may later use `sensor_origin`.
-
-Gun elevation and recoil are not simulated presentation states in this package because the current gameplay/runtime contracts do not publish those values. Infantry remains a static authored silhouette until the engine owns a real animation/skeleton runtime contract. Gameplay simulation remains unaffected.
+The existing bounded mechanical read-model now supplies cannon elevation/recoil
+and wheel-hub motion in LOD0. Weapon/VFX origin resolves at `weapon_muzzle`.
+The production tank retains exact targeting anchors and rigid range names;
+its cosmetic wheel anchors move to the authored axle line. Neutral combined
+reduced LODs omit motion. There is no circulating tread or physical suspension
+solver; infantry still awaits a real skeleton/animation runtime.
 
 ## Materials and damage states
 
@@ -118,7 +120,7 @@ Legacy position-only source meshes are remediated deterministically by the Asset
 - Critical: 0–33%;
 - Wreck: destruction presentation proxy.
 
-Damage treatment is applied as presentation tinting over the compiled base material. This avoids unnecessary unique damaged meshes while preserving readable escalation.
+Damage treatment retains presentation tinting over the compiled base material. The tank additionally binds displaced armor/service attachments at LOD0/1 and a distinct collapsed wreck through existing state metadata; other families retain their established treatment.
 
 When a combat unit is destroyed, the normal gameplay entity is still removed at the authoritative lifecycle synchronization point. A non-commandable, non-combat wreck presentation entity preserves only transform, visual identity, unit presentation identity, and intelligence signature. It cannot move, fire, receive commands, or affect simulation combat.
 
