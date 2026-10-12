@@ -74,11 +74,11 @@ and nonessential pipe routes. Existing projected-size thresholds (150/45 pixels,
 
 | Family | LOD0 triangles | LOD1 triangles | LOD2 triangles |
 | --- | ---: | ---: | ---: |
-| Extractor | 1,260 | 332 | 220 |
-| Smelter | 1,236 | 376 | 236 |
-| Electronics Plant | 1,124 | 248 | 172 |
-| Fuel Refinery | 1,788 | 512 | 264 |
-| Ammunition Plant | 1,064 | 252 | 204 |
+| Extractor | 1,260 | 344 | 232 |
+| Smelter | 1,236 | 388 | 248 |
+| Electronics Plant | 1,124 | 260 | 184 |
+| Fuel Refinery | 1,788 | 524 | 276 |
+| Ammunition Plant | 1,064 | 264 | 216 |
 
 The counts describe exported geometry, not arbitrary content limits or FPS
 guarantees. The shared independent `building.directorate.module.collision_box`
