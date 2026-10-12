@@ -1,7 +1,7 @@
 {
   "id": "unit.directorate.main_battle_tank",
   "type": "mesh",
-  "source": "../sources/main_battle_tank_lod0_detailed.gltf",
+  "source": "../sources/main_battle_tank/chassis_lod0.gltf",
   "materialReferences": [
     "material.directorate.unit.main_battle_tank"
   ],
@@ -45,148 +45,147 @@
       "z": 0.16
     },
     {
+      "name": "sensor_origin",
+      "x": 0.16,
+      "y": 0.26,
+      "z": 0.05
+    },
+    {
       "name": "motion_road_wheel_1_0",
-      "x": -0.4300000071525574,
-      "y": -0.09999999403953552,
-      "z": -0.2624000012874603
+      "x": -0.43,
+      "y": -0.3,
+      "z": -0.2624
     },
     {
       "name": "motion_road_wheel_1_1",
-      "x": -0.4300000071525574,
-      "y": -0.09999999403953552,
-      "z": -0.08746666461229324
+      "x": -0.43,
+      "y": -0.3,
+      "z": -0.0874666667
     },
     {
       "name": "motion_road_wheel_1_2",
-      "x": -0.4300000071525574,
-      "y": -0.09999999403953552,
-      "z": 0.08746666461229324
+      "x": -0.43,
+      "y": -0.3,
+      "z": 0.0874666667
     },
     {
       "name": "motion_road_wheel_1_3",
-      "x": -0.4300000071525574,
-      "y": -0.09999999403953552,
-      "z": 0.2624000012874603
+      "x": -0.43,
+      "y": -0.3,
+      "z": 0.2624
     },
     {
       "name": "motion_road_wheel_2_0",
-      "x": 0.4300000071525574,
-      "y": -0.09999999403953552,
-      "z": -0.2624000012874603
+      "x": 0.43,
+      "y": -0.3,
+      "z": -0.2624
     },
     {
       "name": "motion_road_wheel_2_1",
-      "x": 0.4300000071525574,
-      "y": -0.09999999403953552,
-      "z": -0.08746666461229324
+      "x": 0.43,
+      "y": -0.3,
+      "z": -0.0874666667
     },
     {
       "name": "motion_road_wheel_2_2",
-      "x": 0.4300000071525574,
-      "y": -0.09999999403953552,
-      "z": 0.08746666461229324
+      "x": 0.43,
+      "y": -0.3,
+      "z": 0.0874666667
     },
     {
       "name": "motion_road_wheel_2_3",
-      "x": 0.4300000071525574,
-      "y": -0.09999999403953552,
-      "z": 0.2624000012874603
+      "x": 0.43,
+      "y": -0.3,
+      "z": 0.2624
     }
   ],
   "mechanicalParts": [
     {
       "name": "body",
       "firstIndex": 0,
-      "indexCount": 552,
+      "indexCount": 14100,
       "parent": -1,
       "motion": "static"
     },
     {
       "name": "road_wheel_1_0",
+      "firstIndex": 14100,
+      "indexCount": 372,
       "parent": -1,
       "motion": "wheel",
       "socket": "motion_road_wheel_1_0",
       "rate": 1.5,
-      "travel": 0,
-      "firstIndex": 552,
-      "indexCount": 192
+      "travel": 0
     },
     {
       "name": "road_wheel_1_1",
+      "firstIndex": 14472,
+      "indexCount": 372,
       "parent": -1,
       "motion": "wheel",
       "socket": "motion_road_wheel_1_1",
       "rate": 1.5,
-      "travel": 0,
-      "firstIndex": 744,
-      "indexCount": 192
+      "travel": 0
     },
     {
       "name": "road_wheel_1_2",
+      "firstIndex": 14844,
+      "indexCount": 372,
       "parent": -1,
       "motion": "wheel",
       "socket": "motion_road_wheel_1_2",
       "rate": 1.5,
-      "travel": 0,
-      "firstIndex": 936,
-      "indexCount": 192
+      "travel": 0
     },
     {
       "name": "road_wheel_1_3",
+      "firstIndex": 15216,
+      "indexCount": 372,
       "parent": -1,
       "motion": "wheel",
       "socket": "motion_road_wheel_1_3",
       "rate": 1.5,
-      "travel": 0,
-      "firstIndex": 1128,
-      "indexCount": 192
+      "travel": 0
     },
     {
       "name": "road_wheel_2_0",
+      "firstIndex": 15588,
+      "indexCount": 372,
       "parent": -1,
       "motion": "wheel",
       "socket": "motion_road_wheel_2_0",
       "rate": 1.5,
-      "travel": 0,
-      "firstIndex": 1320,
-      "indexCount": 192
+      "travel": 0
     },
     {
       "name": "road_wheel_2_1",
+      "firstIndex": 15960,
+      "indexCount": 372,
       "parent": -1,
       "motion": "wheel",
       "socket": "motion_road_wheel_2_1",
       "rate": 1.5,
-      "travel": 0,
-      "firstIndex": 1512,
-      "indexCount": 192
+      "travel": 0
     },
     {
       "name": "road_wheel_2_2",
+      "firstIndex": 16332,
+      "indexCount": 372,
       "parent": -1,
       "motion": "wheel",
       "socket": "motion_road_wheel_2_2",
       "rate": 1.5,
-      "travel": 0,
-      "firstIndex": 1704,
-      "indexCount": 192
+      "travel": 0
     },
     {
       "name": "road_wheel_2_3",
+      "firstIndex": 16704,
+      "indexCount": 372,
       "parent": -1,
       "motion": "wheel",
       "socket": "motion_road_wheel_2_3",
       "rate": 1.5,
-      "travel": 0,
-      "firstIndex": 1896,
-      "indexCount": 192
-    },
-    {
-      "name": "fidelity_0",
-      "firstIndex": 2088,
-      "indexCount": 144,
-      "parent": -1,
-      "motion": "static"
+      "travel": 0
     }
   ]
 }
