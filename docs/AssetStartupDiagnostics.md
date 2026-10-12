@@ -6,7 +6,7 @@ Asset compilation is an explicit authoring/build step. The client consumes compi
 
 The Asset Compiler now emits progress immediately, rather than buffering all messages until the catalog is finished. Each record identifies the stage, state, asset ID, source path, elapsed/stage time, managed heap bytes, working set, private bytes and peak working set. Process memory sampling is throttled to 250 ms; the record reports its sample age. Long stages emit a five-second heartbeat with refreshed memory values.
 
-Stages cover discovery, reference validation, dependency ordering, the previous manifest, source hashing, rebuild decisions, import, PNG/TGA decoding, resizing, mip generation, each BC7 mip and band, payload serialization, runtime/manifest writes and qualification. Rebuild reasons distinguish new/missing manifests, missing payloads, changed source, compiler, dependency and path. Failures include their stage, asset, exception and diagnostics. Unchanged assets are explicitly recorded and do not enter texture compression.
+Stages cover cache-lock acquisition, discovery, reference validation, dependency ordering, the previous manifest, source hashing, rebuild decisions, import, PNG/TGA decoding, resizing, mip generation, each BC7 mip and band, payload serialization, runtime/manifest writes and qualification. Rebuild reasons distinguish new/missing manifests, missing payloads, changed source, compiler, dependency and path. Failures include their stage, asset, exception and diagnostics. Unchanged assets are explicitly recorded and do not enter texture compression. Compiler 1.9.0 verifies full-container size/SHA-256 before cache reuse; damaged output has rebuild reason `invalid-payload-or-path`. See [build modes and integrity](AssetPipeline.md#build-modes-and-deployment-integrity).
 
 ```powershell
 dotnet run --project tools/ForgeLine.AssetCompiler --configuration Release -- --source assets/source --runtime assets/runtime --progress-log artifacts/asset-compilation.jsonl
@@ -24,7 +24,7 @@ BC7 formerly processed full mip images serially. Compression now operates on 128
 
 PNG decoding previously materialized full-image decompressed, filtered, scanline and RGBA copies. It now retains three row buffers and the RGBA image, reads exactly the declared scanlines, and rejects truncated or extra inflated data without materializing an unbounded decompression stream. RGB/RGBA and all five supported PNG filters are covered by regressions. The decoded source image still needs memory proportional to its authored dimensions; this is not a constant-memory importer.
 
-The compiler/runtime format versions remain unchanged because complete catalog and per-mip parity checks establish identical output. Existing caches remain valid; no unnecessary full rebuild is introduced by the scheduling/decoder fix.
+The earlier scheduling/decoder fix retained its compiler/runtime format versions because complete catalog and per-mip parity checks established identical output. That fix did not invalidate caches. The current integrity upgrade separately advances the compiler to 1.9.0 and rebuilds old unsealed caches once.
 
 ## Historical compiler qualification
 

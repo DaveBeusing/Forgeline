@@ -5,8 +5,8 @@ namespace ForgeLine.AssetCompiler;
 
 public static class AssetPipelineCompiler
 {
-    public const string CompilerVersion = "1.8.0";
-    public const int RuntimeVersion = 4;
+    public const string CompilerVersion = "1.9.0";
+    public const int RuntimeVersion = RuntimeAssetIntegrity.SupportedRuntimeVersion;
 
     private static readonly JsonSerializerOptions JsonOptions = RuntimeAssetCatalog.CreateJsonOptions();
 
@@ -14,7 +14,8 @@ public static class AssetPipelineCompiler
         string sourceRoot,
         string runtimeRoot,
         bool clean = false,
-        Action<AssetCompilationProgress>? progress = null)
+        Action<AssetCompilationProgress>? progress = null,
+        Action? qualifyOutput = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sourceRoot);
         ArgumentException.ThrowIfNullOrWhiteSpace(runtimeRoot);
@@ -46,6 +47,9 @@ public static class AssetPipelineCompiler
 
             return new AssetCompilationResult(false, 0, 0, diagnostics);
         }
+
+        using var cacheLock = reporter.Measure("cache-lock",
+            () => AssetCacheLock.Acquire(normalizedRuntimeRoot, TimeSpan.FromMinutes(5)));
 
         if (clean && Directory.Exists(normalizedRuntimeRoot))
         {
@@ -101,10 +105,12 @@ public static class AssetPipelineCompiler
 
                 var sourceRelativePath = ToRelativePath(normalizedSourceRoot, node.SourcePath);
                 if (previousById.TryGetValue(node.Id.Value, out var previous) &&
+                    previous.Type == node.Definition.Type &&
+                    previous.CompilerVersion == CompilerVersion && previous.RuntimeVersion == RuntimeVersion &&
                     string.Equals(previous.BuildHash, buildHash, StringComparison.Ordinal) &&
                     string.Equals(previous.RuntimePath, runtimePath, StringComparison.Ordinal) &&
                     string.Equals(previous.SourcePath, sourceRelativePath, StringComparison.Ordinal) &&
-                    File.Exists(runtimeFullPath))
+                    RuntimeAssetIntegrity.Matches(runtimeFullPath, previous))
                 {
                     recordsById[node.Id] = previous;
                     skippedCount++;
@@ -117,7 +123,7 @@ public static class AssetPipelineCompiler
                     : !string.Equals(previous.SourceHash, sourceHash, StringComparison.Ordinal) ? "source-changed"
                     : previousManifest!.CompilerVersion != CompilerVersion ? "compiler-changed"
                     : !string.Equals(previous.BuildHash, buildHash, StringComparison.Ordinal) ? "dependency-changed"
-                    : "source-or-runtime-path-changed";
+                    : "invalid-payload-or-path";
                 reporter.Report("asset", "rebuild", id: node.Id.Value, path: node.SourcePath,
                     detail: $"reason={rebuildReason} type={node.Definition.Type} format={node.Definition.TextureFormat} quality={node.Definition.TextureCompressionQuality}");
                 var imported = reporter.Measure("import", () => Import(node, normalizedSourceRoot, nodes, reporter), node.Id.Value, node.SourcePath);
@@ -137,7 +143,7 @@ public static class AssetPipelineCompiler
                 reporter.Measure("runtime-write", () => { WriteAtomically(runtimeFullPath, node.Definition.Type, metadata, imported.Payload); return true; },
                     node.Id.Value, runtimeFullPath, $"payloadBytes={imported.Payload.LongLength}");
 
-                recordsById[node.Id] = record;
+                recordsById[node.Id] = RuntimeAssetIntegrity.SealRecord(runtimeFullPath, record);
                 compiledCount++;
             }
             catch (Exception exception) when (
@@ -168,8 +174,11 @@ public static class AssetPipelineCompiler
                 .ToArray(),
         };
 
-        reporter.Measure("manifest-write", () => { WriteManifestAtomically(normalizedRuntimeRoot, manifest); return true; });
+        reporter.Measure("manifest-write", () => { WriteManifestAtomically(normalizedRuntimeRoot, RuntimeAssetIntegrity.SealManifest(manifest)); return true; });
         reporter.Report("compile", "completed", detail: $"compiled={compiledCount} unchanged={skippedCount}");
+        // Keep build qualification in the same lease: a following clean writer must not
+        // delete this generation while the caller is checking its deployment contract.
+        qualifyOutput?.Invoke();
         return new AssetCompilationResult(true, compiledCount, skippedCount, diagnostics);
     }
 
@@ -190,7 +199,7 @@ public static class AssetPipelineCompiler
                     File.ReadAllText(definitionPath),
                     JsonOptions);
             }
-            catch (Exception exception) when (exception is IOException or JsonException)
+            catch (Exception exception) when (exception is IOException or JsonException or ArgumentException or InvalidDataException or UnauthorizedAccessException)
             {
                 diagnostics.Add(new AssetCompilerDiagnostic(
                     "ASSET003",
@@ -1012,23 +1021,10 @@ public static class AssetPipelineCompiler
 
         try
         {
-            var manifest = JsonSerializer.Deserialize<RuntimeAssetManifest>(
-                File.ReadAllText(manifestPath),
-                JsonOptions);
-
-            if (manifest is null || manifest.FormatVersion != RuntimeAssetManifest.CurrentFormatVersion)
-            {
-                diagnostics.Add(new AssetCompilerDiagnostic(
-                    "ASSET023",
-                    AssetCompilerDiagnosticSeverity.Warning,
-                    "Existing runtime manifest is incompatible and will be replaced.",
-                    SourcePath: manifestPath));
-                return null;
-            }
-
-            return manifest;
+            return RuntimeAssetCatalog.LoadCancellable(runtimeRoot, CancellationToken.None,
+                requireIntegrity: true).Manifest;
         }
-        catch (Exception exception) when (exception is IOException or JsonException)
+        catch (Exception exception) when (exception is IOException or JsonException or ArgumentException or InvalidDataException or UnauthorizedAccessException)
         {
             diagnostics.Add(new AssetCompilerDiagnostic(
                 "ASSET024",
@@ -1062,7 +1058,7 @@ public static class AssetPipelineCompiler
             ?? throw new InvalidDataException($"Runtime path '{finalPath}' has no directory.");
         Directory.CreateDirectory(directory);
 
-        var temporaryPath = finalPath + ".tmp";
+        var temporaryPath = finalPath + "." + Guid.NewGuid().ToString("N") + ".tmp";
         try
         {
             RuntimeAssetFile.Write(temporaryPath, type, metadata, payload);
@@ -1080,7 +1076,7 @@ public static class AssetPipelineCompiler
     private static void WriteManifestAtomically(string runtimeRoot, RuntimeAssetManifest manifest)
     {
         var finalPath = Path.Combine(runtimeRoot, RuntimeAssetCatalog.ManifestFileName);
-        var temporaryPath = finalPath + ".tmp";
+        var temporaryPath = finalPath + "." + Guid.NewGuid().ToString("N") + ".tmp";
         try
         {
             File.WriteAllText(temporaryPath, JsonSerializer.Serialize(manifest, JsonOptions));

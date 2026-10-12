@@ -32,11 +32,16 @@ public static class RuntimeAssetFile
         writer.Write(payload);
     }
 
-    public static RuntimeAssetContent Read(string path, RuntimeAssetType? expectedType = null)
+    public static RuntimeAssetContent Read(
+        string path, RuntimeAssetType? expectedType = null, long? expectedBytes = null, string? expectedHash = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
 
         using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        if (expectedBytes is not null)
+        {
+            RuntimeAssetIntegrity.ValidateFile(stream, expectedBytes.Value, expectedHash ?? string.Empty, path);
+        }
         using var reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: false);
 
         if (reader.ReadUInt32() != Magic)

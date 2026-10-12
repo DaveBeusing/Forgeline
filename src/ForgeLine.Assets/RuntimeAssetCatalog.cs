@@ -29,7 +29,7 @@ public sealed class RuntimeAssetCatalog
     public static RuntimeAssetCatalog Load(string runtimeRoot) =>
         LoadCancellable(runtimeRoot, CancellationToken.None);
 
-    public static RuntimeAssetCatalog LoadCancellable(string runtimeRoot, CancellationToken cancellationToken)
+    public static RuntimeAssetCatalog LoadCancellable(string runtimeRoot, CancellationToken cancellationToken, bool requireIntegrity = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(runtimeRoot);
         cancellationToken.ThrowIfCancellationRequested();
@@ -50,6 +50,12 @@ public sealed class RuntimeAssetCatalog
         {
             throw new InvalidDataException(
                 $"Runtime asset manifest version {manifest.FormatVersion} is not supported.");
+        }
+
+        // Legacy manifests remain inspectable by tooling; players and build gates require integrity.
+        if (requireIntegrity || manifest.IntegrityVersion != 0 || !string.IsNullOrEmpty(manifest.ContentSignature))
+        {
+            RuntimeAssetIntegrity.ValidateManifest(manifest);
         }
 
         var records = new Dictionary<AssetId, RuntimeAssetRecord>();
@@ -88,7 +94,8 @@ public sealed class RuntimeAssetCatalog
             throw new FileNotFoundException($"Runtime asset '{id}' is missing.", path);
         }
 
-        return RuntimeAssetFile.Read(path, record.Type);
+        return RuntimeAssetFile.Read(path, record.Type,
+            Manifest.IntegrityVersion == 0 ? null : record.RuntimeBytes, record.RuntimeHash);
     }
 
     public static JsonSerializerOptions CreateJsonOptions()
