@@ -27,6 +27,11 @@ public sealed class VisualReferenceSceneTests
     [InlineData(VisualReferenceSceneKind.CommandCoreProduction)]
     [InlineData(VisualReferenceSceneKind.MainBattleTankProduction)]
     [InlineData(VisualReferenceSceneKind.MainBattleTankFormation)]
+    [InlineData(VisualReferenceSceneKind.ExtractorProduction)]
+    [InlineData(VisualReferenceSceneKind.SmelterProduction)]
+    [InlineData(VisualReferenceSceneKind.ElectronicsPlantProduction)]
+    [InlineData(VisualReferenceSceneKind.FuelRefineryProduction)]
+    [InlineData(VisualReferenceSceneKind.AmmunitionPlantProduction)]
     public void FreshFixturesRetainTheSameImmutableState(VisualReferenceSceneKind kind)
     {
         var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
@@ -39,6 +44,27 @@ public sealed class VisualReferenceSceneTests
         Assert.All(first.Snapshot.Instances.ToArray(), instance =>
             Assert.True(instance.UnitFeature.IsSpecified || instance.BuildingFeature.IsSpecified ||
                 instance.WorldFeature.IsSpecified || instance.InfrastructureFeature.IsSpecified || instance.VfxFeature.IsSpecified));
+    }
+
+    [Theory]
+    [InlineData(VisualReferenceSceneKind.ExtractorProduction)]
+    [InlineData(VisualReferenceSceneKind.SmelterProduction)]
+    [InlineData(VisualReferenceSceneKind.ElectronicsPlantProduction)]
+    [InlineData(VisualReferenceSceneKind.FuelRefineryProduction)]
+    [InlineData(VisualReferenceSceneKind.AmmunitionPlantProduction)]
+    public void IndustrialGalleryRetainsNineAuthoritativeStatesAndFootprints(VisualReferenceSceneKind kind)
+    {
+        var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+        var scene = VisualReferenceScene.Create(kind, terrain);
+        var buildings = scene.Snapshot.Instances.ToArray().Where(x => x.BuildingFeature.IsSpecified).ToArray();
+        Assert.Equal(9, buildings.Length);
+        Assert.Single(buildings.Select(x => x.BuildingFeature.Building).Distinct());
+        Assert.Equal(9, buildings.Select(x => x.BuildingFeature.State).Distinct().Count());
+        var footprint = DirectorateContent.CreateBuildingCatalog()[buildings[0].BuildingFeature.Building].Footprint;
+        Assert.All(buildings, x => Assert.Equal(new System.Numerics.Vector3(footprint.Width, footprint.Height, footprint.Depth), x.Transform.Scale));
+        Assert.Contains(buildings, x => x.BuildingFeature.IsDestroyed && !x.Selectable.IsSelectable);
+        Assert.Equal(3, buildings.Count(x => x.BuildingFeature.IsConstruction));
+        Assert.Equal(PlayerSelectionKind.Building, scene.Snapshot.PlayerExperience!.Value.Selection.Kind);
     }
 
     [Fact]
