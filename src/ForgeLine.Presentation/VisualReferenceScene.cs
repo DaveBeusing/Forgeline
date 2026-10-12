@@ -198,22 +198,6 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
             simulation.Entities.AddComponent(building, new HealthState(20, 100));
         }
         bool mechanical = kind is >= VisualReferenceSceneKind.MechanicalIdle and <= VisualReferenceSceneKind.MechanicalBroken;
-        if (tankReview.Count > 0)
-        {
-            for (int i = 0; i < visible.Count; i++)
-            {
-                RenderInstance item = visible[i];
-                int review = tankReview.IndexOf(item.Entity);
-                if (review < 0 || item.UnitFeature.IsWreck) continue;
-                bool formation = kind == VisualReferenceSceneKind.MainBattleTankFormation;
-                visible[i] = item with
-                {
-                    MechanicalPose = new(true, formation || review == 2 ? 1.7 : 0, 2, 1.6,
-                        review == 3 && !formation ? 1.55 : -1, review is 1 or 3 && !formation ? .2f : 0, 0),
-                    UnitFeature = item.UnitFeature with { AimYawRadians = !formation && review is 1 or 3 ? .6f : 0 }
-                };
-            }
-        }
         if (mechanical)
         {
             UnitId[] units = [UnitIds.MainBattleTank, UnitIds.ScoutVehicle, UnitIds.CargoTruck, UnitIds.SupplyTruck];
@@ -253,6 +237,22 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
                 position.Y = Height(position.X, position.Z) + 2;
                 visible.Add(new(new((uint)i + 1_000_000, 1), new(position, Quaternion.Identity, definition.BaseScale),
                     new(1), RenderMaterialHandle.Default, RenderVisibilityMask.Default, VfxFeature: new(effects[i])));
+            }
+        }
+        if (tankReview.Count > 0)
+        {
+            for (int i = 0; i < visible.Count; i++)
+            {
+                RenderInstance item = visible[i];
+                int review = tankReview.IndexOf(item.Entity);
+                if (review < 0 || item.UnitFeature.IsWreck) continue;
+                bool formation = kind == VisualReferenceSceneKind.MainBattleTankFormation;
+                visible[i] = item with
+                {
+                    MechanicalPose = new(true, formation || review == 2 ? 1.7 : 0, 2, 1.6,
+                        review == 3 && !formation ? 1.55 : -1, review is 1 or 3 && !formation ? .2f : 0, 0),
+                    UnitFeature = item.UnitFeature with { AimYawRadians = !formation && review is 1 or 3 ? .6f : 0 }
+                };
             }
         }
         if (mechanical)
