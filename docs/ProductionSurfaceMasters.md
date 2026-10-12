@@ -148,7 +148,7 @@ industrial lamps, faceted mineral rocks and clustered rubble. It retains each
 original outer bound and UV/material cell convention. Their inexpensive
 reduced LOD meshes remain available for normal/strategic views.
 
-The source catalog contains 351 stable assets. Asset compilation and runtime
+The source catalog contains 373 stable assets. Asset compilation and runtime
 qualification must pass before client review. The production master test
 checks native dimensions, semantic color spaces, explicit caps and mip policy;
 existing material completeness tests verify all physical mesh dependencies
@@ -163,3 +163,8 @@ LOD-transition review, exact 4K output and controlled performance/total-VRAM
 qualification remain separate acceptance work. No 60 FPS guarantee follows
 from the texture budget. Roads/bridges keep their current production geometry;
 this change does not add animation, skeletons, unique wreck models or LOD3.
+
+The [modular environment kit](ModularEnvironmentKit.md) reuses these surface
+masters and one material per LOD. Minerals use cell 11, timber 10, foliage 13,
+concrete 6, steel 1 and warnings 5. No texture/material or alpha-card family is
+added. New normals/UVs compile to tangents through the existing pipeline.

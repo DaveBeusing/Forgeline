@@ -579,3 +579,14 @@ The production tank replaces its four operational mesh sources and adds three
 state meshes for a 351-asset catalog (168 meshes, 56 textures, 127 materials).
 Its editable kit, deterministic exporter, rigid bindings and native acceptance
 limits are documented in [Main Battle Tank production](MainBattleTankProduction.md).
+
+## Modular environment authoring
+
+`build/Author-EnvironmentKit.py` requires Python with NumPy and reads the editable
+`assets/source/world/authoring/environment.kit.json`. `--output` exports in
+isolation; `--update-metadata` explicitly refreshes owned mesh definitions.
+Twenty High/Reduced visual meshes and two shared proxies add 22 catalog records.
+Two ferrous exports replace source paths under existing IDs. The current catalog
+is 373 assets (190 meshes, 56 textures, 127 materials). Compile with the existing
+build/validate integrity modes; generated runtime files remain compiler-owned.
+See [source conventions and reproduction](ModularEnvironmentKit.md).

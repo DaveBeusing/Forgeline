@@ -133,3 +133,11 @@ are documented in [Command Core production](CommandCoreProduction.md).
 The dedicated [Main Battle Tank](MainBattleTankProduction.md) records its native
 state gallery, 1,000-tank formation, measured close-view performance blocker
 and pending live/art acceptance. Technical image equality does not clear those gates.
+
+## Modular environment galleries
+
+Opt-in `EnvironmentKitYard` / `EnvironmentKitBridge` extract Central Divide at
+tick 32, seed 2026. `EnvironmentKitRepeated` adds 1,000 read-only copied kit
+instances. The [modular kit qualification](ModularEnvironmentKit.md) records
+72 profile/zoom/display rows, six repeated-kit rows, exact backbuffers, compiled
+source identity and the open 60-FPS/borderless-budget/human-art gates.
