@@ -138,9 +138,21 @@ public static class WorldPresentationCatalog
         AddProp(WorldVisualId.PropIndustrialLightSignage, "industrial_light_signage", new Vector4(0.44f, 0.48f, 0.42f, 1.0f), 320.0f);
         AddProp(WorldVisualId.PropRubble, "rubble", new Vector4(0.38f, 0.36f, 0.33f, 1.0f), 220.0f);
 
+        AddProp(WorldVisualId.PropRockSlab, "rock_slab", new Vector4(.48f, .49f, .45f, 1), 220.0f);
+        AddProp(WorldVisualId.PropRockSpire, "rock_spire", new Vector4(.48f, .49f, .45f, 1), 220.0f);
+        AddProp(WorldVisualId.PropBarrierModule, "barrier_module", new Vector4(.48f, .49f, .45f, 1), 260.0f);
+        AddProp(WorldVisualId.PropPipeElbow, "pipe_elbow", new Vector4(.48f, .49f, .45f, 1), 240.0f);
+        AddProp(WorldVisualId.PropLoadingGantry, "loading_gantry", new Vector4(.48f, .49f, .45f, 1), 300.0f);
+        AddProp(WorldVisualId.PropRoadEdge, "road_edge", new Vector4(.48f, .49f, .45f, 1), 240.0f);
+        AddProp(WorldVisualId.PropBridgeApron, "bridge_apron", new Vector4(.48f, .49f, .45f, 1), 260.0f);
+        AddProp(WorldVisualId.PropLoadingApron, "loading_apron", new Vector4(.48f, .49f, .45f, 1), 260.0f);
+        AddProp(WorldVisualId.PropServiceFence, "service_fence", new Vector4(.48f, .49f, .45f, 1), 300.0f);
+
         AddVegetation(WorldVisualId.VegetationConifer, "conifer", new Vector4(0.18f, 0.31f, 0.19f, 1.0f), 190.0f);
         AddVegetation(WorldVisualId.VegetationScrub, "scrub", new Vector4(0.30f, 0.40f, 0.22f, 1.0f), 160.0f);
         AddVegetation(WorldVisualId.VegetationGrassClump, "grass_clump", new Vector4(0.32f, 0.43f, 0.22f, 1.0f), 110.0f);
+
+        AddVegetation(WorldVisualId.VegetationBroadleaf, "broadleaf", new Vector4(.26f, .38f, .21f, 1), 190.0f);
 
         AddDecal(WorldVisualId.DecalTireTracks, "tire_tracks", new Vector4(0.18f, 0.17f, 0.15f, 1.0f));
         AddDecal(WorldVisualId.DecalTrackedVehicleMarks, "tracked_vehicle_marks", new Vector4(0.16f, 0.15f, 0.13f, 1.0f));

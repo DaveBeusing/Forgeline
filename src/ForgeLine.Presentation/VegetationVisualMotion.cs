@@ -10,7 +10,7 @@ internal static class VegetationVisualMotion
 
     internal static bool Applies(in RenderInstance instance) =>
         instance.WorldFeature.Kind == WorldPresentationKind.Vegetation &&
-        instance.WorldFeature.Visual is WorldVisualId.VegetationConifer or WorldVisualId.VegetationScrub or WorldVisualId.VegetationGrassClump;
+        instance.WorldFeature.Visual is WorldVisualId.VegetationConifer or WorldVisualId.VegetationScrub or WorldVisualId.VegetationGrassClump or WorldVisualId.VegetationBroadleaf;
 
     internal static AxisAlignedBounds CullingBounds(in RenderInstance instance)
     {
@@ -35,7 +35,7 @@ internal static class VegetationVisualMotion
         fade = fade * fade * (3 - 2 * fade);
         float amplitude = instance.WorldFeature.Visual switch
         {
-            WorldVisualId.VegetationConifer => .008f,
+            WorldVisualId.VegetationConifer or WorldVisualId.VegetationBroadleaf => .008f,
             WorldVisualId.VegetationScrub => .012f,
             _ => .02f
         };
