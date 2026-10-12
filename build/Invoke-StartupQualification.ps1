@@ -117,6 +117,10 @@ for ($sample = 0; $sample -le $Samples; $sample++) {
             nativeIconChecks = $iconChecks; phases = $phases; report = $reportPath }
     }
     finally {
+        if (-not $process.HasExited) {
+            $process.Kill($true)
+            $process.WaitForExit()
+        }
         if ($process.HasExited) {
             $stdout.GetAwaiter().GetResult() | Set-Content (Join-Path $destination "launch-$sample.stdout.log")
             $stderr.GetAwaiter().GetResult() | Set-Content (Join-Path $destination "launch-$sample.stderr.log")
