@@ -110,6 +110,20 @@ internal static partial class WindowsNative
 
     internal const uint WmClose = 0x0010;
     internal const uint WmPaint = 0x000F;
+    internal const uint WmSetIcon = 0x0080;
+
+    [LibraryImport("user32.dll", EntryPoint = "SendMessageW")]
+    internal static partial nint SendMessage(nint window, uint message, nuint wParam, nint lParam);
+
+    [LibraryImport("user32.dll")]
+    internal static partial int GetSystemMetricsForDpi(int index, uint dpi);
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    internal static partial nint CreateIconFromResourceEx(byte[] bytes, uint length, int icon, uint version,
+        int width, int height, uint flags);
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    internal static partial int DestroyIcon(nint icon);
     internal const uint WmEraseBackground = 0x0014;
 
     [LibraryImport("user32.dll")]

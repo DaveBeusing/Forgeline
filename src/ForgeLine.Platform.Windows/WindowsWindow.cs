@@ -33,6 +33,7 @@ internal sealed class WindowsWindow : IWindow
     private bool _isOpen;
     private string? _bootstrapStatus;
     private bool _bootstrapFailed;
+    private WindowsWindowIcons? _icons;
     internal bool BootstrapPainted { get; private set; }
     internal bool BootstrapActive => _bootstrapStatus is not null;
 
@@ -95,6 +96,7 @@ internal sealed class WindowsWindow : IWindow
 
             uint windowDpi = WindowsNative.GetDpiForWindow(_handle);
             _dpi = windowDpi == 0 ? initialDpi : windowDpi;
+            ApplyIcons();
             _lifecycle.InitializeClientSize(
                 ReadClientSizeOrThrow());
             RefreshCurrentMonitor();
@@ -119,6 +121,9 @@ internal sealed class WindowsWindow : IWindow
                 _ = WindowsNative.DestroyWindow(_handle);
                 _handle = 0;
             }
+
+            _icons?.Dispose();
+            _icons = null;
 
             if (_selfHandle.IsAllocated)
             {
@@ -291,6 +296,8 @@ internal sealed class WindowsWindow : IWindow
         }
 
         _isOpen = false;
+        _icons?.Dispose();
+        _icons = null;
         _inputEvents.Clear();
 
         if (_selfHandle.IsAllocated)
@@ -516,6 +523,8 @@ internal sealed class WindowsWindow : IWindow
 
             case WindowsNative.WmNcDestroy:
                 nint result = WindowsNative.DefWindowProc(windowHandle, message, wParam, lParam);
+                _icons?.Dispose();
+                _icons = null;
                 _ = WindowsNative.SetWindowLongPtr(windowHandle, WindowsNative.GwlpUserData, 0);
                 _handle = 0;
                 return result;
@@ -680,6 +689,7 @@ internal sealed class WindowsWindow : IWindow
         if (newDpi != 0)
         {
             _dpi = newDpi;
+            ApplyIcons();
         }
 
         if (lParam != 0)
@@ -698,6 +708,16 @@ internal sealed class WindowsWindow : IWindow
         TryRefreshClientSize();
         RefreshCurrentMonitor();
         EnqueueEvent(WindowEventKind.DpiChanged);
+    }
+
+    private void ApplyIcons()
+    {
+        if (_icons?.Dpi == _dpi) return;
+        var replacement = new WindowsWindowIcons(_dpi);
+        replacement.Assign(_handle);
+        WindowsWindowIcons? previous = _icons;
+        _icons = replacement;
+        previous?.Dispose();
     }
 
     private void EnterBorderlessFullscreen()
