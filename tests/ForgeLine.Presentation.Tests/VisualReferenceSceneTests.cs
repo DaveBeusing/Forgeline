@@ -22,6 +22,8 @@ public sealed class VisualReferenceSceneTests
     [InlineData(VisualReferenceSceneKind.DirectorateUnits)]
     [InlineData(VisualReferenceSceneKind.DirectorateBuildingStates)]
     [InlineData(VisualReferenceSceneKind.CommandCoreProduction)]
+    [InlineData(VisualReferenceSceneKind.MainBattleTankProduction)]
+    [InlineData(VisualReferenceSceneKind.MainBattleTankFormation)]
     public void FreshFixturesRetainTheSameImmutableState(VisualReferenceSceneKind kind)
     {
         var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
@@ -52,6 +54,36 @@ public sealed class VisualReferenceSceneTests
         Assert.DoesNotContain(scene.Snapshot.Instances.ToArray(), x => x.WorldFeature.IsSpecified &&
             MathF.Abs(x.Transform.Position.X - scene.Target.X) <= 44 + x.Transform.Scale.X * .5f &&
             MathF.Abs(x.Transform.Position.Z - scene.Target.Z) <= 22 + x.Transform.Scale.Z * .5f);
+    }
+
+    [Fact]
+    public void TankGalleryRetainsScaleStatesAimAndRoleComparators()
+    {
+        var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+        var scene = VisualReferenceScene.Create(VisualReferenceSceneKind.MainBattleTankProduction, terrain);
+        var tanks = scene.Snapshot.Instances.ToArray().Where(x => x.UnitFeature.Unit == UnitIds.MainBattleTank).ToArray();
+        Assert.Equal(8, tanks.Length);
+        Assert.All(tanks, x => Assert.Equal(new System.Numerics.Vector3(4, 3, 7.2f), x.Transform.Scale));
+        Assert.Equal(4, tanks.Select(x => x.UnitFeature.DamageState).Distinct().Count());
+        Assert.Contains(tanks, x => x.MechanicalPose.LastShotSeconds >= 0 && x.UnitFeature.AimYawRadians != 0);
+        Assert.Contains(tanks, x => x.MechanicalPose.TravelMeters > 0);
+        Assert.Contains(tanks, x => x.UnitFeature.IsWreck && !x.Selectable.IsSelectable);
+        Assert.Contains(scene.Snapshot.Instances.ToArray(), x => x.UnitFeature.Unit == UnitIds.MobileArtillery);
+        Assert.Contains(scene.Snapshot.Instances.ToArray(), x => x.UnitFeature.Unit == UnitIds.ScoutVehicle);
+    }
+
+    [Fact]
+    public void TankFormationContainsThousandRepeatedProductionIdentities()
+    {
+        var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+        var scene = VisualReferenceScene.Create(VisualReferenceSceneKind.MainBattleTankFormation, terrain);
+        var tanks = scene.Snapshot.Instances.ToArray().Where(x => x.UnitFeature.IsSpecified).ToArray();
+        Assert.Equal(1000, tanks.Length);
+        Assert.All(tanks, x =>
+        {
+            Assert.Equal(UnitIds.MainBattleTank, x.UnitFeature.Unit);
+            Assert.True(x.MechanicalPose.TravelMeters > 0);
+        });
     }
 
     [Fact]

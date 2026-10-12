@@ -11,7 +11,7 @@ using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
 
-public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat, MechanicalIdle, MechanicalMoving, MechanicalFiring, MechanicalLoading, MechanicalUnpowered, MechanicalBroken, DirectorateUnits, DirectorateBuildingStates, CommandCoreProduction }
+public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat, MechanicalIdle, MechanicalMoving, MechanicalFiring, MechanicalLoading, MechanicalUnpowered, MechanicalBroken, DirectorateUnits, DirectorateBuildingStates, CommandCoreProduction, MainBattleTankProduction, MainBattleTankFormation }
 
 // Authored presentation acceptance states, not economic/combat simulations or gameplay presets.
 public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3 Target,
@@ -33,6 +33,7 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
         var simulation = new SimulationCoordinator(seed: Seed);
         var store = new FactionIntelligenceStore(new() { CellSizeMeters = 32 });
         var snapshots = new PresentationSnapshotBuffer();
+        var tankReview = new List<EntityId>();
         simulation.RegisterSystem(new BattlefieldIntelligenceSystem(store));
         simulation.RegisterTickObserver(new PresentationExtractor(snapshots, store, new(1), terrain.WorldBounds));
         // A real sensor/intelligence/extraction boundary filters the authored foreign units.
@@ -46,6 +47,12 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
                 MathF.Abs(relative.X) <= 44 + item.Scale.X * .5f &&
                 MathF.Abs(relative.Z) <= 22 + item.Scale.Z * .5f)
                 continue;
+            float clearWidth = kind == VisualReferenceSceneKind.MainBattleTankFormation ? 164 : 24;
+            float clearDepth = kind == VisualReferenceSceneKind.MainBattleTankFormation ? 140 : 28;
+            if (kind is VisualReferenceSceneKind.MainBattleTankProduction or VisualReferenceSceneKind.MainBattleTankFormation &&
+                MathF.Abs(relative.X) <= clearWidth + item.Scale.X * .5f &&
+                MathF.Abs(relative.Z) <= clearDepth + item.Scale.Z * .5f)
+                continue;
             float groundOffset = item.Kind switch
             {
                 WorldPresentationKind.Decal => .04f,
@@ -57,13 +64,13 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
         }
         foreach (var item in battlefield.Resources)
         {
-            if (kind == VisualReferenceSceneKind.CommandCoreProduction) continue;
+            if (kind is VisualReferenceSceneKind.CommandCoreProduction or VisualReferenceSceneKind.MainBattleTankProduction or VisualReferenceSceneKind.MainBattleTankFormation) continue;
             EntityId deposit = Add(new(item.Center.X - target.X, 0, item.Center.Z - target.Z), new(item.HalfExtents.X * 2, 8, item.HalfExtents.Z * 2));
             simulation.Entities.AddComponent(deposit, WorldPresentationIdentity.ForResource(item.ResourceId));
             simulation.Entities.AddComponent(deposit, new ResourceDeposit(item.ResourceId,
                 new(item.Center - item.HalfExtents, item.Center + item.HalfExtents), item.TotalQuantity, item.ExtractionRatePerSecond));
         }
-        if (kind != VisualReferenceSceneKind.DaylightTerrain)
+        if (kind is not (VisualReferenceSceneKind.DaylightTerrain or VisualReferenceSceneKind.MainBattleTankProduction or VisualReferenceSceneKind.MainBattleTankFormation))
         {
             for (int i = 0; i < 18; i++)
             {
@@ -97,6 +104,35 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
                     (i / 4 - .5f) * 20), definition.VisualScale);
                 simulation.Entities.AddComponent(unit, new UnitIdentity(units[i], new(1)));
                 simulation.Entities.AddComponent(unit, new ControllableEntity(new(1), ControllableEntityCategory.Unit));
+            }
+        }
+        if (kind is VisualReferenceSceneKind.MainBattleTankProduction or VisualReferenceSceneKind.MainBattleTankFormation)
+        {
+            var definition = DirectorateContent.CreateUnitCatalog()[UnitIds.MainBattleTank];
+            int count = kind == VisualReferenceSceneKind.MainBattleTankFormation ? 1000 : 8;
+            int columns = count == 1000 ? 40 : 4;
+            for (int i = 0; i < count; i++)
+            {
+                EntityId tank = Add(new((i % columns - (columns - 1) * .5f) * 8,
+                    definition.Movement.HeightOffset, (i / columns - (count / columns - 1) * .5f) * 11), definition.VisualScale);
+                tankReview.Add(tank);
+                if (count == 8 && i == 7)
+                    simulation.Entities.AddComponent(tank, new UnitWreckPresentationIdentity(UnitIds.MainBattleTank, new(1)));
+                else
+                {
+                    simulation.Entities.AddComponent(tank, new UnitIdentity(UnitIds.MainBattleTank, new(1)));
+                    simulation.Entities.AddComponent(tank, new ControllableEntity(new(1), ControllableEntityCategory.Unit));
+                    if (count == 8 && i is 5 or 6) simulation.Entities.AddComponent(tank, new HealthState(i == 5 ? 50 : 20, 100));
+                }
+            }
+            if (count == 8)
+            {
+                foreach (var pair in new[] { (UnitIds.ScoutVehicle, -12f), (UnitIds.MobileArtillery, 12f) })
+                {
+                    var other = DirectorateContent.CreateUnitCatalog()[pair.Item1];
+                    EntityId unit = Add(new(pair.Item2, other.Movement.HeightOffset, 20), other.VisualScale);
+                    simulation.Entities.AddComponent(unit, new UnitIdentity(pair.Item1, new(1)));
+                }
             }
         }
         if (kind == VisualReferenceSceneKind.DirectorateBuildingStates)
@@ -162,6 +198,22 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
             simulation.Entities.AddComponent(building, new HealthState(20, 100));
         }
         bool mechanical = kind is >= VisualReferenceSceneKind.MechanicalIdle and <= VisualReferenceSceneKind.MechanicalBroken;
+        if (tankReview.Count > 0)
+        {
+            for (int i = 0; i < visible.Count; i++)
+            {
+                RenderInstance item = visible[i];
+                int review = tankReview.IndexOf(item.Entity);
+                if (review < 0 || item.UnitFeature.IsWreck) continue;
+                bool formation = kind == VisualReferenceSceneKind.MainBattleTankFormation;
+                visible[i] = item with
+                {
+                    MechanicalPose = new(true, formation || review == 2 ? 1.7 : 0, 2, 1.6,
+                        review == 3 && !formation ? 1.55 : -1, review is 1 or 3 && !formation ? .2f : 0, 0),
+                    UnitFeature = item.UnitFeature with { AimYawRadians = !formation && review is 1 or 3 ? .6f : 0 }
+                };
+            }
+        }
         if (mechanical)
         {
             UnitId[] units = [UnitIds.MainBattleTank, UnitIds.ScoutVehicle, UnitIds.CargoTruck, UnitIds.SupplyTruck];
