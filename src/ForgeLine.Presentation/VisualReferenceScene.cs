@@ -11,7 +11,7 @@ using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
 
-public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat, MechanicalIdle, MechanicalMoving, MechanicalFiring, MechanicalLoading, MechanicalUnpowered, MechanicalBroken, DirectorateUnits, DirectorateBuildingStates, CommandCoreProduction, MainBattleTankProduction, MainBattleTankFormation }
+public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat, MechanicalIdle, MechanicalMoving, MechanicalFiring, MechanicalLoading, MechanicalUnpowered, MechanicalBroken, DirectorateUnits, DirectorateBuildingStates, CommandCoreProduction, MainBattleTankProduction, MainBattleTankFormation, EnvironmentKitYard, EnvironmentKitBridge, EnvironmentKitRepeated }
 
 // Authored presentation acceptance states, not economic/combat simulations or gameplay presets.
 public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3 Target,
@@ -26,6 +26,8 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
     {
         if (!Enum.IsDefined(kind)) throw new ArgumentOutOfRangeException(nameof(kind));
         ArgumentNullException.ThrowIfNull(terrain);
+        if (kind is VisualReferenceSceneKind.EnvironmentKitYard or VisualReferenceSceneKind.EnvironmentKitBridge or VisualReferenceSceneKind.EnvironmentKitRepeated)
+            return CreateKitReview(kind);
         var battlefield = CentralDivideBattlefield.Create();
         Vector3 target = kind == VisualReferenceSceneKind.LogisticsCorridor
             ? battlefield.Crossings[0].Position : new(650, 0, 520);
@@ -319,4 +321,52 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
             return unit;
         }
     }
+    private static VisualReferenceScene CreateKitReview(VisualReferenceSceneKind kind)
+    {
+        using var scenario = CentralDivideScenario.Create(seed: Seed);
+        var snapshots = new PresentationSnapshotBuffer();
+        var gateway = new PlayerCommandGateway(scenario.Simulation, scenario.Services.BuildingCommands,
+            scenario.BattlefieldRuntime.MatchStateEntity);
+        scenario.Simulation.RegisterTickObserver(new PresentationExtractor(snapshots,
+            new PresentationExtractionContext(scenario, new(1), new PresentationInteractionState(), gateway)));
+        scenario.Simulation.RunTicks((int)FixedTick);
+        if (!snapshots.TryReadLatest(out var snapshot)) throw new InvalidOperationException("Kit snapshot was not published.");
+        Vector3 target = kind == VisualReferenceSceneKind.EnvironmentKitBridge ? new(1484, 0, 920) : new(855, 0, 303);
+        if (!scenario.Terrain.TrySampleHeight(target.X, target.Z, out float ground))
+            throw new InvalidOperationException("Kit review point lies outside terrain.");
+        target.Y = ground;
+        if (kind == VisualReferenceSceneKind.EnvironmentKitRepeated)
+        {
+            (WorldVisualId Visual, Vector3 Scale)[] families =
+            [
+                (WorldVisualId.PropRockSlab, new(9,3,6)), (WorldVisualId.PropRockSpire, new(4,7,4)),
+                (WorldVisualId.PropBarrierModule, new(4,1.2f,.9f)), (WorldVisualId.PropPipeElbow, new(3,1,3)),
+                (WorldVisualId.PropLoadingGantry, new(8,6,4)), (WorldVisualId.PropRoadEdge, new(8,.4f,1.4f)),
+                (WorldVisualId.PropBridgeApron, new(12,.3f,8)), (WorldVisualId.PropLoadingApron, new(8,.45f,8)),
+                (WorldVisualId.PropServiceFence, new(8,2.4f,.35f)), (WorldVisualId.VegetationBroadleaf, new(7,12,7))
+            ];
+            var instances = snapshot.Instances.ToArray().ToList();
+            for (int i = 0; i < 1000; i++)
+            {
+                var family = families[i % families.Length];
+                Vector3 position = target + new Vector3((i % 40 - 19.5f) * 14, 0, (i / 40 - 12) * 14);
+                if (!scenario.Terrain.TrySampleHeight(position.X, position.Z, out float height))
+                    throw new InvalidOperationException("Repeated kit point lies outside terrain.");
+                bool plant = family.Visual == WorldVisualId.VegetationBroadleaf;
+                position.Y = height + (plant ? 0 : family.Scale.Y * .5f);
+                instances.Add(new(new(0xD000_0000U + (uint)i, 1), new(position, Quaternion.Identity, family.Scale),
+                    new(1), RenderMaterialHandle.Default, RenderVisibilityMask.World,
+                    WorldFeature: new(family.Visual, plant ? WorldPresentationKind.Vegetation : WorldPresentationKind.Prop, default, false)));
+            }
+            snapshot = new(snapshot.Tick, snapshot.TickDuration, snapshot.SimulationEntityCount, instances.ToArray(),
+                snapshot.Intelligence, new(1), snapshot.PlayerExperience, playerActions: snapshot.PlayerActions, vfxMetrics: snapshot.VfxMetrics);
+        }
+        string fingerprint = Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new
+        {
+            version = FixtureVersion, kind, target, seed = Seed, tick = snapshot.Tick.Value,
+            instances = snapshot.Instances.ToArray(), snapshot.Intelligence, snapshot.PlayerExperience, snapshot.PlayerActions
+        }, FingerprintOptions)));
+        return new(kind, target, snapshot, default, fingerprint);
+    }
+
 }
