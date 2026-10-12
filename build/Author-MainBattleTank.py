@@ -97,6 +97,7 @@ def boxes(mesh, parts, lod):
 def chassis(kit,lod,modules=None):
     m=Mesh(); hull=kit['hull']; track=kit['tracks']
     m.loft(hull['profiles'],0,hull['edge'][lod]); boxes(m,hull['boxes'],lod)
+    if lod<2: m.loft(hull['armorProfiles'],8,.004 if lod==0 else 0)
     if lod==0:
         for z in (-.34,-.30,-.26):
             for x in (-.18,-.06,.06,.18):
@@ -120,6 +121,8 @@ def chassis(kit,lod,modules=None):
                 a,b=sorted(side*np.array(track['wheelX']))
                 m.wheel(a,b,track['wheelY'],z,*track['wheelRadius'],2,track['sides'][lod],inner=.70 if lod==0 else 0)
                 if lod==0:
+                    m.cylinder([side*.33,-.235,z-.03],[side*.405,track['wheelY'],z],.012,1,10)
+                    m.cylinder([side*.32,-.235,z-.03],[side*.37,-.235,z-.03],.026,15,12)
                     m.wheel(a+.005,b-.005,track['wheelY'],z,
                             track['wheelRadius'][0]*.70,track['wheelRadius'][1]*.70,1,track['sides'][lod])
                     pivot=[side*.43,track['wheelY'],z]
@@ -164,7 +167,7 @@ def turret(kit,lod,modules=None):
                 m.box([x-r*.6,y+.019,z-.005],[x+r*.6,y+.03,z+.005],1,.002)
         if lod==0:
             for side in (-1,1):
-                for z in (-.08,-.02,.04):
+                for z in (.085,.11,.135):
                     x=side*.245
                     m.cylinder([x,.13,z],[x,.21,z+.025],.012,7,8,inner=.007)
                 m.box([side*.245-.015,.17,-.08],[side*.245+.015,.185,-.025],1,.002)

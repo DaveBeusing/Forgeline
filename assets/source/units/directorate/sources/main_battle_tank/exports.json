@@ -1,8 +1,8 @@
 {
   "meshes": {
     "chassis_lod0": {
-      "vertices": 11152,
-      "triangles": 5692,
+      "vertices": 12080,
+      "triangles": 6272,
       "minimum": [
         -0.49000000953674316,
         -0.5,
@@ -13,7 +13,7 @@
         0.10000000149011612,
         0.4099999964237213
       ],
-      "sha256": "c25745eff724a161b2b976bb3cb661da26535ee3d67707cd46e10d893fe28f46"
+      "sha256": "886472bccaba9fe080758982cc3c6a95823b6aec85a2097b127cf703f6b7930c"
     },
     "turret_lod0": {
       "vertices": 3584,
@@ -28,10 +28,10 @@
         0.28999999165534973,
         0.6399999856948853
       ],
-      "sha256": "6349ff7e13e6c9453a4f924d5e37d4adb20dbdbdf04ef8c4f2e5a28d177f1e30"
+      "sha256": "37e83c7813e1a8d0c02652436719dc30de0e69a66ae0d2409fc2a3bd5cacf885"
     },
     "combined_lod1": {
-      "vertices": 1776,
+      "vertices": 1784,
       "triangles": 892,
       "minimum": [
         -0.49000000953674316,
@@ -43,7 +43,7 @@
         0.2809999883174896,
         0.6399999856948853
       ],
-      "sha256": "098d0a08b35c9a833ebabc370fc93ece5a708318bc779a8b22a13991663f1821"
+      "sha256": "b890d7d60b977b0ee45031661dc0f7f8958bce5fd5104cf620a8d08fcfe38234"
     },
     "combined_lod2": {
       "vertices": 532,
@@ -106,8 +106,8 @@
       "sha256": "05b3658284fa2b390c7cb7197be4493ec9a0dd5f581fd199a313ecb62b75ecb0"
     },
     "kit.hull": {
-      "vertices": 1024,
-      "triangles": 468,
+      "vertices": 896,
+      "triangles": 408,
       "minimum": [
         -0.3499999940395355,
         -0.2800000011920929,
@@ -118,28 +118,28 @@
         0.10000000149011612,
         0.4099999964237213
       ],
-      "sha256": "603a27c4efb76d8a8c1ab06bd4a5403878a49fcbbf7c91307c2795cb4318a6e1"
+      "sha256": "2d180c3ad73ef4cccb868bd64357a9983687bee9f2d89d28711147535f0bfbc6"
     },
     "kit.left_track": {
-      "vertices": 5064,
-      "triangles": 2612,
+      "vertices": 5592,
+      "triangles": 2932,
       "minimum": [
         -0.49000000953674316,
         -0.5,
         -0.4224405884742737
       ],
       "maximum": [
-        -0.36000001430511475,
+        -0.3199999928474426,
         0.02800000086426735,
         0.4014405906200409
       ],
-      "sha256": "456e4a5fd831f0c467f5693aa5f99167d1b2698e6659683c8a19747d9ea4198f"
+      "sha256": "0c5abeedbb4ca382b28884853a288c81e1f0ff5afd65f2e1f8a698e58366fde8"
     },
     "kit.right_track": {
-      "vertices": 5064,
-      "triangles": 2612,
+      "vertices": 5592,
+      "triangles": 2932,
       "minimum": [
-        0.36000001430511475,
+        0.3199999928474426,
         -0.5,
         -0.4224405884742737
       ],
@@ -148,7 +148,7 @@
         0.02800000086426735,
         0.4014405906200409
       ],
-      "sha256": "87e6977f9483d7287044b1394bd639a881ceacc13899d754619e65f016c94c0a"
+      "sha256": "d3ff6db373b7ed1f442d331b75ce2ea20d31f502c60d756663ffb0bd84a8ed91"
     },
     "kit.turret_body": {
       "vertices": 2080,
@@ -163,7 +163,7 @@
         0.28999999165534973,
         0.20999999344348907
       ],
-      "sha256": "ac5ff20565b450c777c178645793b5e681b829f79024ab3880994bf6db76df9a"
+      "sha256": "39f52cf57039102106d23a21f3dee904a5c31a35d89d96650208063dd5775db5"
     },
     "kit.cannon": {
       "vertices": 1504,
@@ -187,13 +187,13 @@
         {
           "name": "body",
           "firstIndex": 0,
-          "indexCount": 14100,
+          "indexCount": 15840,
           "parent": -1,
           "motion": "static"
         },
         {
           "name": "road_wheel_1_0",
-          "firstIndex": 14100,
+          "firstIndex": 15840,
           "indexCount": 372,
           "parent": -1,
           "motion": "wheel",
@@ -203,7 +203,7 @@
         },
         {
           "name": "road_wheel_1_1",
-          "firstIndex": 14472,
+          "firstIndex": 16212,
           "indexCount": 372,
           "parent": -1,
           "motion": "wheel",
@@ -213,7 +213,7 @@
         },
         {
           "name": "road_wheel_1_2",
-          "firstIndex": 14844,
+          "firstIndex": 16584,
           "indexCount": 372,
           "parent": -1,
           "motion": "wheel",
@@ -223,7 +223,7 @@
         },
         {
           "name": "road_wheel_1_3",
-          "firstIndex": 15216,
+          "firstIndex": 16956,
           "indexCount": 372,
           "parent": -1,
           "motion": "wheel",
@@ -233,7 +233,7 @@
         },
         {
           "name": "road_wheel_2_0",
-          "firstIndex": 15588,
+          "firstIndex": 17328,
           "indexCount": 372,
           "parent": -1,
           "motion": "wheel",
@@ -243,7 +243,7 @@
         },
         {
           "name": "road_wheel_2_1",
-          "firstIndex": 15960,
+          "firstIndex": 17700,
           "indexCount": 372,
           "parent": -1,
           "motion": "wheel",
@@ -253,7 +253,7 @@
         },
         {
           "name": "road_wheel_2_2",
-          "firstIndex": 16332,
+          "firstIndex": 18072,
           "indexCount": 372,
           "parent": -1,
           "motion": "wheel",
@@ -263,7 +263,7 @@
         },
         {
           "name": "road_wheel_2_3",
-          "firstIndex": 16704,
+          "firstIndex": 18444,
           "indexCount": 372,
           "parent": -1,
           "motion": "wheel",
