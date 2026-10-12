@@ -43,10 +43,14 @@ dotnet restore ForgeLine.sln
 pwsh ./build/Validate-ProjectReferences.ps1
 dotnet build ForgeLine.sln --configuration Release --no-restore
 dotnet run --project tools/ForgeLine.MapCompiler/ForgeLine.MapCompiler.csproj --configuration Release --no-build -- --output artifacts/maps/central-divide.flmap.json --qualification-output artifacts/map-qualification.json
+pwsh ./build/Build-RuntimeAssets.ps1 -Mode build -ForceRebuild -NoBuild
+pwsh ./build/Test-RuntimeAssetPipeline.ps1
+
 dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release --no-build -- --smoke-test --render-stress 1000
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 64 --seed 12345 --tick-rate 20 --entities 1000 --diagnostics-output artifacts/headless-smoke.json
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 16 --seed 67890 --tick-rate 20 --entities 10000 --diagnostics-output artifacts/headless-stress-10000.json
 dotnet test --solution ForgeLine.sln --configuration Release --no-build
+pwsh ./build/Publish-PreAlpha.ps1 -Configuration Release -VerifyReproducible -RuntimeAssetRoot assets/runtime
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario central-divide --profile validation --ticks 80000 --seed 2026 --require-terminal --diagnostics-output artifacts/match.json
 ```
 
@@ -99,7 +103,7 @@ Correctness tests remain separate from benchmark timing. Benchmark timing thresh
 
 ## Windows Client Host
 
-Compile runtime assets explicitly before launching a source checkout. The interactive client never starts source compilation. A native bootstrap window appears before settings and graphics initialization; changed startup events are checkpointed under the local user diagnostics directory. See [Startup timing](StartupDiagnostics.md) and [Early Native Bootstrap](adr/EarlyNativeBootstrap.md).
+Compile runtime assets explicitly with `pwsh ./build/Build-RuntimeAssets.ps1 -Mode development` before launching a source checkout. Publishing without `-RuntimeAssetRoot` builds its own runtime cache; the CI path validates and packages its already built/tested root. See [Asset Pipeline](AssetPipeline.md#build-modes-and-deployment-integrity) for force-rebuild, validation and migration. The interactive client never starts source compilation. A native bootstrap window appears before settings and graphics initialization; changed startup events are checkpointed under the local user diagnostics directory. See [Startup timing](StartupDiagnostics.md) and [Early Native Bootstrap](adr/EarlyNativeBootstrap.md).
 
 The interactive client owns the native Windows host, Direct3D 12 graphics backend, RTS input/camera stack, immutable presentation extraction, frame pacing, and development visualization. Canonical gameplay construction is delegated to `MatchRuntime` using the `Gameplay` profile. Player 1 is explicitly human-controlled and Player 2 computer-controlled; the local slot therefore does not receive a strategic opponent controller.
 

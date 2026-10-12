@@ -13,6 +13,62 @@ ForgeLine uses an explicit source-to-runtime asset boundary. Editable authoring 
 
 The initial production baseline covers static glTF/GLB meshes, PNG/TGA textures, PBR-oriented material definitions, stable asset IDs, dependency validation, LOD/collision/socket metadata, incremental compilation, deterministic runtime paths, actionable diagnostics, and runtime lookup/loading.
 
+## Build modes and deployment integrity
+
+Run from the repository root:
+
+```powershell
+# Incremental authoring: verify the cache and compile only changed/damaged outputs.
+pwsh ./build/Build-RuntimeAssets.ps1 -Mode development
+# Explicit rebuild; leaves no previous runtime generation.
+pwsh ./build/Build-RuntimeAssets.ps1 -Mode build -ForceRebuild
+# Validate deployment only; does not read sources, compile or repair output.
+pwsh ./build/Build-RuntimeAssets.ps1 -Mode validate -RuntimeRoot assets/runtime
+# Clean-cache publishing builds its own output before copying a player package.
+pwsh ./build/Publish-PreAlpha.ps1 -Configuration Release -OutputRoot artifacts/prealpha -VerifyReproducible
+# CI publishes the exact root already built, qualified and used by its test gates.
+pwsh ./build/Publish-PreAlpha.ps1 -Configuration Release -OutputRoot artifacts/prealpha-ci -RuntimeAssetRoot assets/runtime -VerifyReproducible
+# Separate compiler processes, terminated writer and source-less validation.
+pwsh ./build/Test-RuntimeAssetPipeline.ps1
+```
+
+The build helper builds the Release compiler unless `-NoBuild` is supplied after
+a successful solution build. Direct CLI equivalents use `--mode development`,
+`--mode build` or `--mode validate`; `--clean` is the explicit force-rebuild switch
+and is rejected in validate mode. Development/build always run full runtime
+qualification before success. Publishing restores/builds required projects and
+requires the pinned SDK and restored dependencies (or access to their package
+sources), but does not require an existing runtime cache. Its output must stay
+inside repository `artifacts`; an existing archive is never replaced.
+
+Compiler 1.9.0 emits integrity contract 1 alongside unchanged manifest format 1,
+FLAS header 1 and aggregate runtime version 4. Records contain `runtimeBytes` and
+full-container `runtimeHash` (lowercase SHA-256). `contentSignature` hashes the
+canonical serialized manifest with that field empty and includes all record
+metadata. Old unsealed caches are rebuilt once. The player requires this contract
+and never invokes the compiler, including when `FORGELINE_RUNTIME_ASSETS` points
+to invalid output. Legacy catalogs are inspectable through the library API but
+cannot pass player or CLI deployment validation.
+
+The player validates manifest integrity, supported versions, stable IDs, paths
+and dependency existence first. Payload size/hash is checked on the same open
+file before parsing when that asset is requested. Gameplay content/GPU uploads
+remain deferred; an interactive menu does not promise a ready match. Missing or
+corrupt required content displays/logs a startup or session failure. Rebuild in
+development, or reinstall the complete player package; do not copy a manifest
+alone and do not use source compilation as release recovery.
+
+The exclusive sibling `.compile.lock` prevents concurrent cache writers and is
+released by process termination. After a forced stop, retry the build; output
+checks repair inconsistent generations. Temporary files are ignored by cache
+lookup and excluded from distribution. Publish validates all assets and checks
+its copied manifest and each copied payload against the qualified snapshot,
+retaining only referenced containers and runtime notices. Asset signature/tool
+version are recorded in `build-provenance.json`.
+
+See [Precompiled runtime asset integrity](adr/PrecompiledRuntimeAssetIntegrity.md)
+for the compatibility and interruption contract.
+
 ## Canonical Directories
 
 ```text
@@ -289,7 +345,7 @@ Each source asset receives:
 - external `.gltf` buffer content in the source hash where applicable;
 - a build hash derived from the source hash, compiler/runtime version, and dependency build hashes.
 
-An unchanged asset with a matching build hash and existing runtime file is skipped. Texture import settings are part of the source `*.asset.json` bytes and therefore participate in the source hash; changing usage, color space, mip generation, or mip limits invalidates only the affected texture and its dependency chain. When a referenced dependency changes, dependent build hashes change and those dependents are rebuilt.
+An unchanged asset with a matching build hash, compatible record versions and verified runtime size/SHA-256 is skipped. Texture import settings are part of the source `*.asset.json` bytes and therefore participate in the source hash; changing usage, color space, mip generation, or mip limits invalidates only the affected texture and its dependency chain. When a referenced dependency changes, dependent build hashes change and those dependents are rebuilt.
 
 The compiler/runtime version also participates in the build hash, so changes to the compilation contract invalidate stale cached output deterministically. The runtime manifest is emitted in stable ID order and runtime paths are deterministic.
 
@@ -308,7 +364,7 @@ The manifest is written to:
 assets/runtime/manifest.json
 ```
 
-The manifest exposes source/content hash, build hash, runtime/compiler version, dependencies, material/texture references, LODs, collision, sockets, and mesh bounds. Texture payloads carry only runtime-required texture metadata/subresources; source/build provenance remains in this existing manifest/container metadata.
+The manifest exposes source/content hash, build hash, runtime/compiler version, full-container size/hash, manifest content signature, dependencies, material/texture references, LODs, collision, sockets, and mesh bounds. Texture payloads carry only runtime-required texture metadata/subresources; source/build provenance remains in this existing manifest/container metadata.
 
 ## Runtime Lookup
 
