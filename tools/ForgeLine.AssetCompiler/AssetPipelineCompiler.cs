@@ -14,7 +14,8 @@ public static class AssetPipelineCompiler
         string sourceRoot,
         string runtimeRoot,
         bool clean = false,
-        Action<AssetCompilationProgress>? progress = null)
+        Action<AssetCompilationProgress>? progress = null,
+        Action? qualifyOutput = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sourceRoot);
         ArgumentException.ThrowIfNullOrWhiteSpace(runtimeRoot);
@@ -104,6 +105,7 @@ public static class AssetPipelineCompiler
 
                 var sourceRelativePath = ToRelativePath(normalizedSourceRoot, node.SourcePath);
                 if (previousById.TryGetValue(node.Id.Value, out var previous) &&
+                    previous.Type == node.Definition.Type &&
                     previous.CompilerVersion == CompilerVersion && previous.RuntimeVersion == RuntimeVersion &&
                     string.Equals(previous.BuildHash, buildHash, StringComparison.Ordinal) &&
                     string.Equals(previous.RuntimePath, runtimePath, StringComparison.Ordinal) &&
@@ -174,6 +176,9 @@ public static class AssetPipelineCompiler
 
         reporter.Measure("manifest-write", () => { WriteManifestAtomically(normalizedRuntimeRoot, RuntimeAssetIntegrity.SealManifest(manifest)); return true; });
         reporter.Report("compile", "completed", detail: $"compiled={compiledCount} unchanged={skippedCount}");
+        // Keep build qualification in the same lease: a following clean writer must not
+        // delete this generation while the caller is checking its deployment contract.
+        qualifyOutput?.Invoke();
         return new AssetCompilationResult(true, compiledCount, skippedCount, diagnostics);
     }
 

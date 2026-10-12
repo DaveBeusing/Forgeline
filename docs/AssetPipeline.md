@@ -13,6 +13,8 @@ ForgeLine uses an explicit source-to-runtime asset boundary. Editable authoring 
 
 The initial production baseline covers static glTF/GLB meshes, PNG/TGA textures, PBR-oriented material definitions, stable asset IDs, dependency validation, LOD/collision/socket metadata, incremental compilation, deterministic runtime paths, actionable diagnostics, and runtime lookup/loading.
 
+Current build/startup timings, payload parity and installed-player failure evidence are recorded in [Precompiled runtime asset qualification](PrecompiledRuntimeAssetQualification.md).
+
 ## Build modes and deployment integrity
 
 Run from the repository root:
@@ -58,7 +60,8 @@ corrupt required content displays/logs a startup or session failure. Rebuild in
 development, or reinstall the complete player package; do not copy a manifest
 alone and do not use source compilation as release recovery.
 
-The exclusive sibling `.compile.lock` prevents concurrent cache writers and is
+The exclusive sibling `.compile.lock` prevents concurrent cache writers, remains
+held through build qualification, and is
 released by process termination. After a forced stop, retry the build; output
 checks repair inconsistent generations. Temporary files are ignored by cache
 lookup and excluded from distribution. Publish validates all assets and checks

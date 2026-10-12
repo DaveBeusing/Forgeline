@@ -431,6 +431,53 @@ public sealed class AssetPipelineTests
         Assert.Equal(0, workspace.Compile().CompiledCount);
     }
 
+    [Fact]
+    public async Task FollowingCleanWriterWaitsUntilBuildQualificationCompletes()
+    {
+        using var workspace = CreateIntegrityWorkspace();
+        using var entered = new ManualResetEventSlim();
+        using var finish = new ManualResetEventSlim();
+        Task<AssetCompilationResult> first = Task.Run(() => AssetPipelineCompiler.Compile(
+            workspace.SourceRoot, workspace.RuntimeRoot, clean: true, qualifyOutput: () =>
+            {
+                entered.Set();
+                if (!finish.Wait(TimeSpan.FromSeconds(10))) { throw new TimeoutException(); }
+                Assert.True(RuntimeAssetQualification.Run(workspace.RuntimeRoot, requireIntegrity: true).Success);
+            }));
+        Task<AssetCompilationResult>? second = null;
+        try
+        {
+            Assert.True(entered.Wait(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken));
+            second = Task.Run(() => workspace.Compile(clean: true));
+            await Task.Delay(100, TestContext.Current.CancellationToken);
+            Assert.False(second.IsCompleted);
+        }
+        finally { finish.Set(); }
+        Assert.True((await first).Success);
+        Assert.NotNull(second);
+        Assert.True((await second).Success);
+        Assert.True(RuntimeAssetQualification.Run(workspace.RuntimeRoot, requireIntegrity: true).Success);
+    }
+
+    [Fact]
+    public void MatchingKeyWithWrongCachedTypeRebuildsThatAsset()
+    {
+        using var workspace = CreateIntegrityWorkspace();
+        Assert.True(workspace.Compile().Success);
+        var manifest = RuntimeAssetCatalog.Load(workspace.RuntimeRoot).Manifest;
+        var changed = RuntimeAssetIntegrity.SealManifest(manifest with
+        {
+            Assets = [manifest.Assets[0] with { Type = RuntimeAssetType.Material }, manifest.Assets[1]],
+        });
+        File.WriteAllText(Path.Combine(workspace.RuntimeRoot, RuntimeAssetCatalog.ManifestFileName),
+            JsonSerializer.Serialize(changed, RuntimeAssetCatalog.CreateJsonOptions()));
+        var repaired = workspace.Compile();
+        Assert.True(repaired.Success);
+        Assert.Equal(1, repaired.CompiledCount);
+        Assert.Equal(1, repaired.SkippedCount);
+        Assert.True(RuntimeAssetQualification.Run(workspace.RuntimeRoot, requireIntegrity: true).Success);
+    }
+
     private static AssetWorkspace CreateIntegrityWorkspace()
     {
         var workspace = new AssetWorkspace();

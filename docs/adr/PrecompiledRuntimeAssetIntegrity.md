@@ -30,7 +30,7 @@ whole. Changes that retain identical dependency build hashes do not force
 unnecessary dependent reimports.
 
 A kernel-held exclusive sibling `<runtimeRoot>.compile.lock` serializes writers,
-including clean builds. It remains outside the directory that clean removes.
+including clean builds and the caller's complete build qualification. It remains outside the directory that clean removes.
 Waits are bounded to five minutes and reported as cache-lock progress. A crashed
 process automatically releases the handle. The empty lock file remains in place
 to avoid unlink/recreation races. Output and manifest writes use unique temporary

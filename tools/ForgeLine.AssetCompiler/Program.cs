@@ -74,12 +74,15 @@ internal static class Program
         using var log = new AssetCompilationLog(progressLog);
         using var reporter = new AssetCompilationReporter(log.Write);
         AssetCompilationResult result;
+        RuntimeAssetQualificationReport? qualification = null;
         try
         {
             reporter.Report("mode", mode, detail: "player compilation is never allowed");
             result = mode == "validate"
                 ? new AssetCompilationResult(true, 0, 0, [])
-                : AssetPipelineCompiler.Compile(sourceRoot, runtimeRoot, clean, log.Write);
+                : AssetPipelineCompiler.Compile(sourceRoot, runtimeRoot, clean, log.Write,
+                    qualifyOutput: () => qualification = reporter.Measure("qualification",
+                        () => RuntimeAssetQualification.Run(runtimeRoot, requireIntegrity: true)));
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
@@ -107,7 +110,7 @@ internal static class Program
             return 1;
         }
 
-        RuntimeAssetQualificationReport qualification = reporter.Measure("qualification",
+        qualification ??= reporter.Measure("qualification",
             () => RuntimeAssetQualification.Run(runtimeRoot, requireIntegrity: true));
 
         foreach (RuntimeAssetQualificationIssue issue in
