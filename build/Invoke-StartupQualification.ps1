@@ -20,12 +20,12 @@ public static class StartupWindowIconProbe
     [DllImport("user32.dll", EntryPoint = "SendMessageTimeoutW", SetLastError = true)]
     private static extern IntPtr SendMessageTimeout(IntPtr window, uint message, UIntPtr wParam,
         IntPtr lParam, uint flags, uint timeout, out UIntPtr result);
-    public static ulong Read(IntPtr window, uint size)
+    public static bool TryRead(IntPtr window, uint size, out ulong icon)
     {
-        UIntPtr icon;
-        if (SendMessageTimeout(window, 0x007F, (UIntPtr)size, IntPtr.Zero, 2, 500, out icon) == IntPtr.Zero)
-            throw new Win32Exception(Marshal.GetLastWin32Error(), "Window did not answer the icon probe.");
-        return icon.ToUInt64();
+        UIntPtr result;
+        bool answered = SendMessageTimeout(window, 0x007F, (UIntPtr)size, IntPtr.Zero, 2, 500, out result) != IntPtr.Zero;
+        icon = result.ToUInt64();
+        return answered;
     }
 }
 "@
@@ -55,6 +55,7 @@ for ($sample = 0; $sample -le $Samples; $sample++) {
     $windowObserved = $null
     $iconWindow = [IntPtr]::Zero
     $iconChecks = 0
+    $iconProbeMisses = 0
     try {
         while (-not $process.WaitForExit(10)) {
             $process.Refresh()
@@ -69,11 +70,16 @@ for ($sample = 0; $sample -le $Samples; $sample++) {
                 $iconWindow = $window
                 # A successful menu smoke may close between polling and SendMessageTimeout.
                 try {
-                    if ([StartupWindowIconProbe]::Read($window, 0) -eq 0 -or
-                        [StartupWindowIconProbe]::Read($window, 1) -eq 0) {
-                        throw "Startup sample $sample lacks native small/large application icons."
+                    [uint64]$smallIcon = 0
+                    [uint64]$largeIcon = 0
+                    if ([StartupWindowIconProbe]::TryRead($window, 0, [ref]$smallIcon) -and
+                        [StartupWindowIconProbe]::TryRead($window, 1, [ref]$largeIcon)) {
+                        if ($smallIcon -eq 0 -or $largeIcon -eq 0) {
+                            throw "Startup sample $sample lacks native small/large application icons."
+                        }
+                        $iconChecks++
                     }
-                    $iconChecks++
+                    else { $iconProbeMisses++ }
                 }
                 catch {
                     if (-not $process.WaitForExit(100)) { throw }
@@ -114,7 +120,7 @@ for ($sample = 0; $sample -le $Samples; $sample++) {
         if ($RequireApplicationIcons -and $iconChecks -eq 0) { throw "Startup sample $sample has no native icon observations." }
         $observations += [PSCustomObject]@{ sample = $sample; warmup = ($sample -eq 0);
             launchToWindowObservationMs = $windowObserved; launchToExitMs = $clock.Elapsed.TotalMilliseconds;
-            nativeIconChecks = $iconChecks; phases = $phases; report = $reportPath }
+            nativeIconChecks = $iconChecks; nativeIconProbeMisses = $iconProbeMisses; phases = $phases; report = $reportPath }
     }
     finally {
         if (-not $process.HasExited) {

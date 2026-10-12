@@ -55,7 +55,8 @@ closing exercises ownership without accumulating icons.
 The existing packaged startup qualification additionally queries both WM_GETICON
 values while the process runs. RequireApplicationIcons requires at least one valid
 observation per launch and rejects HWND replacement. Probes have bounded native
-message timeouts; ordinary process closure is tolerated without disguising a
+message timeouts; unanswered probes are counted separately and retried, rather
+than being interpreted as missing artwork. Ordinary process closure is tolerated without disguising a
 launch with no successful observation. Its interactive-menu and native-first-frame
 gates remain in force. This is also enabled in the existing CI menu step.
 
