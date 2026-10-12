@@ -69,7 +69,9 @@ asset validation completed at 1,383.650 ms, after session-load request at
 gameplay frame and session readiness occurred at 8,110.675 ms. These phases
 include reconstruction/resource creation and are not isolated GPU-upload timers.
 The GPU smoke reported 179 texture uploads, 52,707,564 resident texture bytes,
-zero texture/material binding failures and a reported debug-layer error count of\nzero. This Release device had the debug layer disabled; that counter does not\nprove debug-layer validation.
+zero texture/material binding failures and a reported debug-layer error count of
+zero. This Release device had the debug layer disabled; that counter does not
+prove debug-layer validation.
 
 Five installed-player negative runs covered missing manifest, unsupported
 manifest format, damaged manifest signature, damaged required command-core mesh
@@ -100,7 +102,7 @@ Git checkout started without bin/obj, runtime assets or prior restore to verify
 the default build-before-publish path. Complete solution/gate outcomes are
 recorded in the pull request; these timings do not claim optional hardware or
 manual cold-start acceptance checks that were not executed.
-Final local validation completed 1,756 solution tests: 1,747 passed, nine optional
+Validation before synchronization completed 1,756 solution tests: 1,747 passed, nine optional
 hardware/performance cases skipped, zero failed. Test modules were serialized
 with --max-parallel-test-modules 1. An earlier parallel run under concurrent
 clean-publish load timed out in the existing native session-handoff test; all
@@ -108,3 +110,20 @@ three handoff cases passed in isolation and the complete serialized rerun passed
 The final Release solution build had zero warnings/errors. Separate-process
 contracts and all 25 focused pipeline regression cases also passed, including
 qualification protected from a following clean writer.
+
+## Synchronization with updated production assets
+
+The final branch incorporates master `fad0f7a6` and uses product version
+`0.1.348`. The production tank update expands the catalog to 351 assets
+(168 meshes, 56 textures, 127 materials), occupying 58,408,475 container bytes.
+The incremental update rebuilt seven affected assets and reused 344; the next
+unchanged development run rebuilt zero and reused all 351. Full qualification,
+separate-process contracts and the Release solution build passed again.
+
+All 351 payload byte sequences, stable IDs, types, runtime paths and dependency
+lists match compiler 1.8.0 using these updated source inputs. The verified
+manifest signature is
+`d9c386116edef0b96fba4327c533af4393e1969bc034020ec804137ddd69ab1f`.
+The timing tables above retain the earlier, identical 348-asset cohorts; they
+must not be treated as measurements of the larger updated catalog. Complete
+synchronized regression and package outcomes are recorded in the pull request.

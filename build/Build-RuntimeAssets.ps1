@@ -11,6 +11,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
+$Mode = $Mode.ToLowerInvariant()
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $compiler = Join-Path $repoRoot "tools/ForgeLine.AssetCompiler/ForgeLine.AssetCompiler.csproj"
 if ($Mode -eq "validate" -and $ForceRebuild) { throw "Validation cannot rebuild assets." }
