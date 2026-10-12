@@ -7,6 +7,9 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class VisualReferenceSceneTests
 {
     [Theory]
+    [InlineData(VisualReferenceSceneKind.EnvironmentKitYard)]
+    [InlineData(VisualReferenceSceneKind.EnvironmentKitBridge)]
+    [InlineData(VisualReferenceSceneKind.EnvironmentKitRepeated)]
     [InlineData(VisualReferenceSceneKind.MechanicalIdle)]
     [InlineData(VisualReferenceSceneKind.MechanicalMoving)]
     [InlineData(VisualReferenceSceneKind.MechanicalFiring)]
@@ -36,6 +39,24 @@ public sealed class VisualReferenceSceneTests
         Assert.All(first.Snapshot.Instances.ToArray(), instance =>
             Assert.True(instance.UnitFeature.IsSpecified || instance.BuildingFeature.IsSpecified ||
                 instance.WorldFeature.IsSpecified || instance.InfrastructureFeature.IsSpecified || instance.VfxFeature.IsSpecified));
+    }
+
+    [Fact]
+    public void KitReviewContainsAuthenticStaticDressingAndBoundedRepeatedGeometry()
+    {
+        var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+        var yard = VisualReferenceScene.Create(VisualReferenceSceneKind.EnvironmentKitYard, terrain);
+        var bridge = VisualReferenceScene.Create(VisualReferenceSceneKind.EnvironmentKitBridge, terrain);
+        Assert.Equal(yard.Snapshot.Instances.ToArray(), bridge.Snapshot.Instances.ToArray());
+        Assert.Contains(yard.Snapshot.Instances.ToArray(), x => x.WorldFeature.Visual == WorldVisualId.PropLoadingGantry);
+        Assert.Contains(bridge.Snapshot.Instances.ToArray(), x => x.InfrastructureFeature.IsSpecified);
+        Assert.All(yard.Snapshot.Instances.ToArray().Where(x => x.Entity.Index >= 0xE000_0000U && x.Entity.Index < 0xF000_0000U),
+            x => Assert.False(x.Selectable.IsSelectable || x.WorldFeature.Inspectable));
+        var repeated = VisualReferenceScene.Create(VisualReferenceSceneKind.EnvironmentKitRepeated, terrain);
+        var added = repeated.Snapshot.Instances.ToArray().Where(x => x.Entity.Index >= 0xD000_0000U && x.Entity.Index < 0xE000_0000U).ToArray();
+        Assert.Equal(1000, added.Length);
+        Assert.Equal(10, added.Select(x => x.WorldFeature.Visual).Distinct().Count());
+        Assert.All(added, x => Assert.False(x.Selectable.IsSelectable || x.WorldFeature.Inspectable));
     }
 
     [Fact]
