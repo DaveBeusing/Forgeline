@@ -108,7 +108,7 @@ def chassis(kit,lod,modules=None):
         vertex,index=len(m.positions),len(m.indices)
         x0,x1=sorted(side*np.array(track['xRange']))
         profile=[list(p) for p in track['outerProfile']]
-        if lod==2:
+        if lod>0:
             for p in profile:
                 if p[1]==-.494: p[1]=-.5
         m.belt(profile,x0,x1,track['innerInset'])
