@@ -26,6 +26,7 @@ internal sealed record VisualReferenceCaptureRequest
     public int RepeatCaptures { get; init; } = 8;
     public bool ContinueAfterMismatch { get; init; }
     public uint RasterDpi { get; init; }
+    public float YawDegrees { get; init; } = 45;
     public VisualReferenceSceneKind[] Scenes { get; init; } =
     [
         VisualReferenceSceneKind.DaylightTerrain, VisualReferenceSceneKind.IndustrialBase,
@@ -43,6 +44,7 @@ internal sealed record VisualReferenceCaptureRequest
         if (Warmups is < 3 or > 4096 || Samples is < 8 or > 8192) throw new ArgumentOutOfRangeException(nameof(Samples));
         if (RepeatCaptures is < 2 or > 128) throw new ArgumentOutOfRangeException(nameof(RepeatCaptures));
         if (RasterDpi is not (0 or 96 or 120 or 144 or 192)) throw new ArgumentOutOfRangeException(nameof(RasterDpi));
+        if (!float.IsFinite(YawDegrees) || YawDegrees is < 0 or > 360) throw new ArgumentOutOfRangeException(nameof(YawDegrees));
         if (Scenes is null || Profiles is null || Displays is null || Zooms is null ||
             Scenes.Length is < 1 or > 14 || Profiles.Length is < 1 or > 3 || Displays.Length is < 1 or > 4 || Zooms.Length is < 1 or > 3 ||
             Scenes.Any(x => !Enum.IsDefined(x)) || Profiles.Any(x => !Enum.IsDefined(x)) || Zooms.Any(x => !Enum.IsDefined(x)) ||
@@ -116,8 +118,10 @@ internal static class VisualReferenceCapture
                     if (!platform.PumpEvents()) throw new OperationCanceledException("Reference window was closed.");
                     string key = $"{fixture.Kind}-{display.Width}x{display.Height}-{quality}-{zoom}";
                     if (request.RasterDpi != 0) key += $"-Dpi{request.RasterDpi}";
+                    if (request.YawDegrees != 45) key += $"-Yaw{request.YawDegrees.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
                     Console.WriteLine($"[reference:capture] {key}");
-                    var camera = new RtsCamera(RtsVisualReference.CreateCameraSettings(fixture.Target, zoom));
+                    var camera = new RtsCamera(RtsVisualReference.CreateCameraSettings(fixture.Target, zoom) with
+                        { InitialYawRadians = request.YawDegrees == 45 ? RtsVisualReference.YawRadians : request.YawDegrees * MathF.PI / 180 });
                     var buffer = new PresentationSnapshotBuffer(); buffer.Publish(fixture.Snapshot);
                     var world = new RenderWorld(); world.Update(buffer);
                     particles.Prepare(world, camera, display.Width, display.Height, 0);

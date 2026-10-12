@@ -31,13 +31,13 @@
     {
       "name": "body",
       "firstIndex": 0,
-      "indexCount": 2868,
+      "indexCount": 2724,
       "parent": -1,
       "motion": "static"
     },
     {
       "name": "cooling_fan",
-      "firstIndex": 2868,
+      "firstIndex": 2724,
       "indexCount": 324,
       "parent": -1,
       "motion": "fan",

@@ -31,13 +31,13 @@
     {
       "name": "body",
       "firstIndex": 0,
-      "indexCount": 1068,
+      "indexCount": 924,
       "parent": -1,
       "motion": "static"
     },
     {
       "name": "radar_array",
-      "firstIndex": 1068,
+      "firstIndex": 924,
       "indexCount": 1512,
       "parent": -1,
       "motion": "radar",
