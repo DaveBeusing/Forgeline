@@ -25,10 +25,11 @@ internal static class CentralDivideKitDressing
             Place($"slab-rock.{i}", WorldVisualId.PropRockSlab, 883 + i * 10, 304 + i % 2 * 10, new(9, 3, 6), i * 43);
             Place($"spire-rock.{i}", WorldVisualId.PropRockSpire, 892 + i * 9, 326 + i % 2 * 8, new(4, 7, 4), i * 29);
         }
-        // Physical mesh edges join the unchanged 12m road and existing crossing bounds.
+        // The existing crossing visual is 18m wide and 42m long along +Z.
+        // Approach geometry joins its actual mesh ends, not the navigation envelope.
         // Aprons are thin nonblocking decoration, never crossing health or restoration state.
-        Place("bridge-apron.west", WorldVisualId.PropBridgeApron, 1484, 920, new(12, .3f, 8), -90);
-        Place("bridge-apron.east", WorldVisualId.PropBridgeApron, 1588, 920, new(12, .3f, 8), 90);
+        Place("bridge-apron.north", WorldVisualId.PropBridgeApron, 1536, 895, new(18, 1, 8), 180);
+        Place("bridge-apron.south", WorldVisualId.PropBridgeApron, 1536, 945, new(18, 1, 8));
         for (int i = 0; i < 3; i++)
         {
             Place($"road-drain.west.{i}", WorldVisualId.PropRoadEdge, 1044 + i * 8, 1528.5f, new(8, .4f, 1.4f));

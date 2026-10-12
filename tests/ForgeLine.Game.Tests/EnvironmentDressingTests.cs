@@ -72,7 +72,7 @@ public sealed class EnvironmentDressingTests
             foreach (var resource in map.Resources)
                 Assert.True(Vector2.Distance(position, new(resource.Center.X, resource.Center.Z)) >= radius + new Vector2(resource.HalfExtents.X, resource.HalfExtents.Z).Length() + 24, item.Key);
             bool transition = item.Visual is WorldVisualId.PropRoadEdge or WorldVisualId.PropBridgeApron;
-            if (transition) Assert.InRange(item.Scale.Y, 0, .45f);
+            if (transition) Assert.InRange(item.Scale.Y, 0, item.Visual == WorldVisualId.PropBridgeApron ? 1 : .45f);
             else
             {
                 foreach (var crossing in map.Crossings)
@@ -87,11 +87,17 @@ public sealed class EnvironmentDressingTests
                 }
             }
         }
-        var west = Assert.Single(kit, x => x.Key == "kit.bridge-apron.west");
-        var east = Assert.Single(kit, x => x.Key == "kit.bridge-apron.east");
-        Assert.Equal(CentralDivideBattlefield.BarrierMinimumX, west.Position.X + west.Scale.Z * .5f);
-        Assert.Equal(CentralDivideBattlefield.BarrierMaximumX, east.Position.X - east.Scale.Z * .5f);
-        Assert.Equal(12, west.Scale.X);
+        var north = Assert.Single(kit, x => x.Key == "kit.bridge-apron.north");
+        var south = Assert.Single(kit, x => x.Key == "kit.bridge-apron.south");
+        var crossing = Assert.Single(map.Crossings, x => x.Key == "crossing.north_bridge");
+        Assert.Equal(crossing.Position.Z - 21, north.Position.Z + north.Scale.Z * .5f);
+        Assert.Equal(crossing.Position.Z + 21, south.Position.Z - south.Scale.Z * .5f);
+        Assert.Equal(crossing.Position.X, north.Position.X);
+        Assert.Equal(crossing.Position.X, south.Position.X);
+        Assert.Equal(180, north.RotationDegrees);
+        Assert.Equal(0, south.RotationDegrees);
+        Assert.Equal(18, north.Scale.X);
+        Assert.InRange(MathF.Abs(.73f * north.Scale.Y - (-.07f + .25f) * 4), 0, .011f);
         Assert.Equal(3, map.CreateNavigationObstacles().Count);
     }
 

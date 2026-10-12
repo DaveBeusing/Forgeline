@@ -331,7 +331,7 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
             new PresentationExtractionContext(scenario, new(1), new PresentationInteractionState(), gateway)));
         scenario.Simulation.RunTicks((int)FixedTick);
         if (!snapshots.TryReadLatest(out var snapshot)) throw new InvalidOperationException("Kit snapshot was not published.");
-        Vector3 target = kind == VisualReferenceSceneKind.EnvironmentKitBridge ? new(1484, 0, 920) : new(855, 0, 303);
+        Vector3 target = kind == VisualReferenceSceneKind.EnvironmentKitBridge ? new(1536, 0, 920) : new(855, 0, 303);
         if (!scenario.Terrain.TrySampleHeight(target.X, target.Z, out float ground))
             throw new InvalidOperationException("Kit review point lies outside terrain.");
         target.Y = ground;
