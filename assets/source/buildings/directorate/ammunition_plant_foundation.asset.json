@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.ammunition_plant.foundation",
+  "type": "mesh",
+  "source": "sources/industrial/ammunition_plant/foundation.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

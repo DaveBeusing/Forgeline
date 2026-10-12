@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.smelter.lod1",
   "type": "mesh",
-  "source": "sources/smelter_lod1.gltf",
+  "source": "sources/industrial/smelter/lod1.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ]

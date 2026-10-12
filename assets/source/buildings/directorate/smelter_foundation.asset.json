@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.smelter.foundation",
+  "type": "mesh",
+  "source": "sources/industrial/smelter/foundation.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

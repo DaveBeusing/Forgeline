@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.smelter.idle",
+  "type": "mesh",
+  "source": "sources/industrial/smelter/idle.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

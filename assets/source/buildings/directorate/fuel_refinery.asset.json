@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.fuel_refinery",
   "type": "mesh",
-  "source": "sources/fuel_refinery_lod0_production.gltf",
+  "source": "sources/industrial/fuel_refinery/lod0.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ],
@@ -18,5 +18,25 @@
     }
   ],
   "collisionRequired": true,
-  "collisionReference": "building.directorate.module.collision_box"
+  "collisionReference": "building.directorate.module.collision_box",
+  "sockets": [
+    {
+      "name": "fuel_manifold",
+      "x": 0.24,
+      "y": -0.18,
+      "z": 0.13
+    },
+    {
+      "name": "service_access",
+      "x": 0.33,
+      "y": -0.41,
+      "z": 0.45
+    },
+    {
+      "name": "process_tower",
+      "x": -0.22,
+      "y": 0.52,
+      "z": -0.17
+    }
+  ]
 }

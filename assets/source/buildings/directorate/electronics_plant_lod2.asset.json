@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.electronics_plant.lod2",
   "type": "mesh",
-  "source": "sources/electronics_plant_lod1.gltf",
+  "source": "sources/industrial/electronics_plant/lod2.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ]

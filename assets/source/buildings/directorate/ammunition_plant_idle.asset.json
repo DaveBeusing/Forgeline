@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.ammunition_plant.idle",
+  "type": "mesh",
+  "source": "sources/industrial/ammunition_plant/idle.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

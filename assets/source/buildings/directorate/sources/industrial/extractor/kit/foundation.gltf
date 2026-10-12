@@ -1,0 +1,141 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine industrial building component exporter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 3600,
+      "uri": "data:application/octet-stream;base64,oYkNv23n+75YObQ+oYkNv7Kd775YObQ+oYkNv7Kd775YObS+oYkNv23n+75YObS+hevRPm3n+75YObS+hevRPrKd775YObS+hevRPrKd775YObQ+hevRPm3n+75YObQ+V30LvwAAAL9YObS+8tLNPgAAAL9YObS+8tLNPgAAAL9YObQ+V30LvwAAAL9YObQ+V30Lvx+F675YObQ+8tLNPh+F675YObQ+8tLNPh+F675YObS+V30Lvx+F675YObS+V30Lv7Kd777sUbi+8tLNPrKd777sUbi+8tLNPm3n+77sUbi+V30Lv23n+77sUbi+V30Lv23n+77sUbg+8tLNPm3n+77sUbg+8tLNPrKd777sUbg+V30Lv7Kd777sUbg+V30LvwAAAL9YObS+V30LvwAAAL9YObQ+oYkNv23n+75YObQ+oYkNv23n+75YObS+oYkNv7Kd775YObS+oYkNv7Kd775YObQ+V30Lvx+F675YObQ+V30Lvx+F675YObS+hevRPm3n+75YObS+hevRPm3n+75YObQ+8tLNPgAAAL9YObQ+8tLNPgAAAL9YObS+8tLNPh+F675YObS+8tLNPh+F675YObQ+hevRPrKd775YObQ+hevRPrKd775YObS+oYkNv23n+75YObS+oYkNv7Kd775YObS+V30Lv7Kd777sUbi+V30Lv23n+77sUbi+V30Lv23n+77sUbg+V30Lv7Kd777sUbg+oYkNv7Kd775YObQ+oYkNv23n+75YObQ+8tLNPm3n+77sUbi+8tLNPrKd777sUbi+hevRPrKd775YObS+hevRPm3n+75YObS+hevRPm3n+75YObQ+hevRPrKd775YObQ+8tLNPrKd777sUbg+8tLNPm3n+77sUbg+V30Lv23n+77sUbi+8tLNPm3n+77sUbi+8tLNPgAAAL9YObS+V30LvwAAAL9YObS+V30LvwAAAL9YObQ+8tLNPgAAAL9YObQ+8tLNPm3n+77sUbg+V30Lv23n+77sUbg+V30Lvx+F675YObS+8tLNPh+F675YObS+8tLNPrKd777sUbi+V30Lv7Kd777sUbi+V30Lv7Kd777sUbg+8tLNPrKd777sUbg+8tLNPh+F675YObQ+V30Lvx+F675YObQ+V30Lv23n+77sUbi+V30LvwAAAL9YObS+oYkNv23n+75YObS+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"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 1152,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1152,
+      "byteLength": 1152,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 2304,
+      "byteLength": 768,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 3072,
+      "byteLength": 528,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 96,
+      "type": "VEC3",
+      "min": [
+        -0.5528813004493713,
+        -0.5,
+        -0.36000001430511475
+      ],
+      "max": [
+        0.4099999964237213,
+        -0.46000000834465027,
+        0.36000001430511475
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 96,
+      "type": "VEC3",
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 96,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5125,
+      "count": 132,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "foundation",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "extras": {
+    "coordinates": "Y up, +Z service access; centre pivot; normalized existing building visual scale",
+    "componentHierarchy": [
+      {
+        "name": "foundation",
+        "parent": null,
+        "firstIndex": 0,
+        "indexCount": 132
+      }
+    ],
+    "anchors": {
+      "material_outlet": [
+        0.4,
+        -0.15,
+        0.21
+      ],
+      "service_access": [
+        0.18,
+        -0.36,
+        -0.32
+      ],
+      "extraction_axis": [
+        -0.2,
+        -0.46,
+        -0.04
+      ]
+    }
+  }
+}

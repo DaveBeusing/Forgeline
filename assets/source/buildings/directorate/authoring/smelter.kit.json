@@ -1,0 +1,966 @@
+{
+  "schemaVersion": 1,
+  "family": "smelter",
+  "coordinates": "Y up, +Z service access; centre pivot; normalized existing building visual scale",
+  "bounds": {
+    "min": [
+      -0.48,
+      -0.5,
+      -0.36
+    ],
+    "max": [
+      0.42,
+      0.52,
+      0.47
+    ]
+  },
+  "atlas": "texture.directorate.surface.atlas_base",
+  "provenance": {
+    "author": "ForgeLine",
+    "license": "Original repository geometry; no third-party inputs or separate external license grant"
+  },
+  "anchors": {
+    "material_feed": [
+      0.2,
+      0.38,
+      -0.1
+    ],
+    "slag_outlet": [
+      -0.09,
+      -0.4,
+      0.47
+    ],
+    "service_access": [
+      0.28,
+      -0.36,
+      0.43
+    ]
+  },
+  "intactModules": [
+    "foundation",
+    "structural_frame",
+    "furnace",
+    "exhaust",
+    "feed",
+    "slag_access",
+    "service_fittings"
+  ],
+  "modules": [
+    {
+      "name": "foundation",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.48,
+            -0.5,
+            -0.36
+          ],
+          "max": [
+            0.42,
+            -0.46,
+            0.47
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        }
+      ]
+    },
+    {
+      "name": "structural_frame",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.433,
+            -0.46,
+            -0.323
+          ],
+          "max": [
+            -0.39699999999999996,
+            0.08,
+            -0.287
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.433,
+            -0.46,
+            0.352
+          ],
+          "max": [
+            -0.39699999999999996,
+            0.08,
+            0.388
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.33699999999999997,
+            -0.46,
+            -0.323
+          ],
+          "max": [
+            0.373,
+            0.08,
+            -0.287
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.33699999999999997,
+            -0.46,
+            0.352
+          ],
+          "max": [
+            0.373,
+            0.08,
+            0.388
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.435,
+            0.06,
+            -0.32499999999999996
+          ],
+          "max": [
+            0.375,
+            0.1,
+            -0.285
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        }
+      ]
+    },
+    {
+      "name": "furnace",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.12,
+            -0.39,
+            -0.03
+          ],
+          "end": [
+            -0.12,
+            0.27,
+            -0.03
+          ],
+          "radius": 0.22,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.12,
+            0.27,
+            -0.03
+          ],
+          "end": [
+            -0.12,
+            0.32,
+            -0.03
+          ],
+          "radius": 0.25,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.12,
+            -0.44,
+            -0.03
+          ],
+          "end": [
+            -0.12,
+            -0.39,
+            -0.03
+          ],
+          "radius": 0.25,
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        }
+      ]
+    },
+    {
+      "name": "exhaust",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.29,
+            0.22,
+            -0.19
+          ],
+          "end": [
+            -0.29,
+            0.49,
+            -0.19
+          ],
+          "radius": 0.065,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.29,
+            0.49,
+            -0.19
+          ],
+          "end": [
+            -0.29,
+            0.52,
+            -0.19
+          ],
+          "radius": 0.09,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0.063
+        },
+        {
+          "kind": "pipe",
+          "points": [
+            [
+              -0.02,
+              0.19,
+              -0.18
+            ],
+            [
+              0.14,
+              0.19,
+              -0.18
+            ],
+            [
+              0.18,
+              0.23,
+              -0.18
+            ],
+            [
+              0.18,
+              0.36,
+              -0.18
+            ]
+          ],
+          "radius": 0.045,
+          "cell": 7,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            12,
+            6,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "feed",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "hopper",
+          "min": [
+            0.08,
+            0.12,
+            -0.24
+          ],
+          "max": [
+            0.33,
+            0.38,
+            0.04
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "throatRatio": 0.42
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.28,
+            -0.4,
+            -0.23
+          ],
+          "max": [
+            0.33,
+            0.14,
+            -0.18
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.28,
+            -0.4,
+            -0.02
+          ],
+          "max": [
+            0.33,
+            0.14,
+            0.03
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        }
+      ]
+    },
+    {
+      "name": "slag_access",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.3,
+            -0.44,
+            0.26
+          ],
+          "max": [
+            -0.23,
+            -0.06,
+            0.45
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.05,
+            -0.44,
+            0.26
+          ],
+          "max": [
+            0.12,
+            -0.06,
+            0.45
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.3,
+            -0.07,
+            0.26
+          ],
+          "max": [
+            0.12,
+            -0.025,
+            0.45
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.23,
+            -0.44,
+            0.29
+          ],
+          "max": [
+            0.05,
+            -0.4,
+            0.47
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.2,
+            -0.43,
+            0.15
+          ],
+          "max": [
+            0.39,
+            -0.26,
+            0.43
+          ],
+          "cell": 15,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        }
+      ]
+    },
+    {
+      "name": "service_fittings",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.12,
+            -0.26,
+            -0.03
+          ],
+          "end": [
+            -0.12,
+            -0.247,
+            -0.03
+          ],
+          "radius": 0.227,
+          "cell": 1,
+          "lods": [
+            0
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.12,
+            -0.13,
+            -0.03
+          ],
+          "end": [
+            -0.12,
+            -0.117,
+            -0.03
+          ],
+          "radius": 0.227,
+          "cell": 1,
+          "lods": [
+            0
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.12,
+            0,
+            -0.03
+          ],
+          "end": [
+            -0.12,
+            0.013,
+            -0.03
+          ],
+          "radius": 0.227,
+          "cell": 1,
+          "lods": [
+            0
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.12,
+            0.13,
+            -0.03
+          ],
+          "end": [
+            -0.12,
+            0.14300000000000002,
+            -0.03
+          ],
+          "radius": 0.227,
+          "cell": 1,
+          "lods": [
+            0
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        }
+      ]
+    },
+    {
+      "name": "idle_gate",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.105,
+            -0.37,
+            0.41999999999999993
+          ],
+          "max": [
+            0.105,
+            -0.22,
+            0.44499999999999995
+          ],
+          "cell": 9,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.12,
+            -0.23,
+            0.42499999999999993
+          ],
+          "max": [
+            0.12,
+            -0.2,
+            0.45299999999999996
+          ],
+          "cell": 5,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        }
+      ]
+    },
+    {
+      "name": "power_isolation",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.45999999999999996,
+            -0.29,
+            -0.33999999999999997
+          ],
+          "max": [
+            -0.35,
+            -0.12,
+            -0.29
+          ],
+          "cell": 15,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.39999999999999997,
+            -0.18,
+            -0.288
+          ],
+          "end": [
+            -0.37,
+            -0.11,
+            -0.288
+          ],
+          "radius": 0.012,
+          "cell": 5,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        }
+      ]
+    },
+    {
+      "name": "damaged_panels",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.42,
+            -0.435,
+            0.30499999999999994
+          ],
+          "max": [
+            -0.26,
+            -0.415,
+            0.40499999999999997
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            0.27999999999999997,
+            -0.38,
+            0.345
+          ],
+          "end": [
+            0.37,
+            -0.16,
+            0.36499999999999994
+          ],
+          "radius": 0.022,
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        }
+      ]
+    },
+    {
+      "name": "critical_break",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.38,
+            -0.39,
+            -0.26
+          ],
+          "end": [
+            -0.3,
+            -0.12,
+            -0.16999999999999998
+          ],
+          "radius": 0.04,
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        },
+        {
+          "kind": "hopper",
+          "min": [
+            -0.42,
+            -0.43,
+            -0.27999999999999997
+          ],
+          "max": [
+            -0.22999999999999998,
+            -0.36,
+            -0.08999999999999997
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "throatRatio": 0.42
+        }
+      ]
+    },
+    {
+      "name": "wreck",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.41,
+            -0.45,
+            -0.27999999999999997
+          ],
+          "max": [
+            0.35,
+            -0.32,
+            0.37
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.32999999999999996,
+            -0.33,
+            -0.21
+          ],
+          "end": [
+            0.27,
+            -0.19,
+            -0.12999999999999998
+          ],
+          "radius": 0.065,
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.38,
+            -0.32,
+            -0.21999999999999997
+          ],
+          "max": [
+            -0.26,
+            -0.16,
+            -0.13999999999999999
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.12,
+            -0.4,
+            -0.03
+          ],
+          "end": [
+            -0.12,
+            -0.05,
+            -0.03
+          ],
+          "radius": 0.22,
+          "inner": 0.18,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ]
+        }
+      ]
+    }
+  ],
+  "states": {
+    "foundation": [
+      "foundation"
+    ],
+    "structural_frame": [
+      "foundation",
+      "structural_frame"
+    ],
+    "partial_shell": [
+      "foundation",
+      "structural_frame",
+      "furnace",
+      "feed",
+      "slag_access"
+    ],
+    "idle": [
+      "idle_gate"
+    ],
+    "unpowered": [
+      "power_isolation"
+    ],
+    "damaged": [
+      "damaged_panels"
+    ],
+    "critical": [
+      "critical_break"
+    ],
+    "destroyed": [
+      "foundation",
+      "wreck"
+    ]
+  }
+}

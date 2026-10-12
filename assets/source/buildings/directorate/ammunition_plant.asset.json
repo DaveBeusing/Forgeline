@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.ammunition_plant",
   "type": "mesh",
-  "source": "sources/ammunition_plant_lod0_production.gltf",
+  "source": "sources/industrial/ammunition_plant/lod0.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ],
@@ -18,5 +18,25 @@
     }
   ],
   "collisionRequired": true,
-  "collisionReference": "building.directorate.module.collision_box"
+  "collisionReference": "building.directorate.module.collision_box",
+  "sockets": [
+    {
+      "name": "loading_access",
+      "x": -0.25,
+      "y": -0.43,
+      "z": 0.39
+    },
+    {
+      "name": "service_access",
+      "x": 0.26,
+      "y": -0.43,
+      "z": 0.39
+    },
+    {
+      "name": "exhaust",
+      "x": 0.02,
+      "y": 0.24,
+      "z": -0.25
+    }
+  ]
 }

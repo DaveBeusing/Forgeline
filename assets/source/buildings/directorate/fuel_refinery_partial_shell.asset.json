@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.fuel_refinery.partial_shell",
+  "type": "mesh",
+  "source": "sources/industrial/fuel_refinery/partial_shell.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}
