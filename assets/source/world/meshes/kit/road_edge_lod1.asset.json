@@ -1,0 +1,8 @@
+{
+  "id": "mesh.world.prop.road_edge_lod1",
+  "type": "mesh",
+  "source": "../sources/environment_kit/road_edge_reduced.gltf",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ]
+}

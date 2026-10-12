@@ -1,0 +1,17 @@
+{
+  "id": "mesh.world.prop.barrier_module",
+  "type": "mesh",
+  "source": "../sources/environment_kit/barrier_module_high.gltf",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "mesh.world.prop.barrier_module_lod1",
+      "maxDistance": 260
+    }
+  ],
+  "collisionReference": "mesh.world.kit.collision_centered",
+  "collisionRequired": true
+}

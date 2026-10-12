@@ -184,3 +184,11 @@ Generated `assets/runtime` content remains ignored by Git and must never be edit
 ## Concept texture completion
 
 Every prop and vegetation mesh now has an authored surface-region UV layout; wood pallets, mineral rocks, concrete barriers, service crates, foliage and machinery retain shared material IDs while sampling the appropriate concept surface cell. Resource-family color and silhouette identity remain intact. The eight existing world decals use their RGBA atlas with bounded mip depth, placement-selected material regions and ordered alpha coverage. The terrain texture family remains complete through the existing GPU splatting path.
+
+## Modular environment sources
+
+The [modular environment kit](ModularEnvironmentKit.md) adds nine prop families
+and rooted broadleaf vegetation through the existing High/Reduced world catalog.
+Shared materials, normalized pivots, tooling-only collision proxies and stable
+world IDs retain existing presentation contracts. The selected ferrous source
+is refined under its existing IDs and bounds.

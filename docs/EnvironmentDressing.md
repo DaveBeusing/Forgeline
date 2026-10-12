@@ -140,3 +140,12 @@ remain visible. Continuous motion/LOD transitions and final art acceptance remai
 human review items; repeatable screenshots are structural evidence, not approved
 goldens. The PR remains a draft until required hosted gates and these acceptance
 items are resolved.
+
+## Bounded modular kit
+
+`CentralDivideKitDressing` appends 34 PresentationOnly `kit.*` records without
+changing legacy keys, navigation obstacles, construction sites or simulation
+allocation. Yard/natural modules keep the existing exclusions; thin road drains
+and bridge approaches use documented corridor exceptions. Aprons follow actual
+bridge mesh ends rather than its passage envelope. See the
+[kit catalog, reproducibility and measured acceptance limits](ModularEnvironmentKit.md).

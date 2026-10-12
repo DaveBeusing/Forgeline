@@ -1,0 +1,8 @@
+{
+  "id": "mesh.world.prop.barrier_module_lod1",
+  "type": "mesh",
+  "source": "../sources/environment_kit/barrier_module_reduced.gltf",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ]
+}

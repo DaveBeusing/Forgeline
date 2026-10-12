@@ -1,0 +1,17 @@
+{
+  "id": "mesh.world.prop.bridge_apron",
+  "type": "mesh",
+  "source": "../sources/environment_kit/bridge_apron_high.gltf",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "mesh.world.prop.bridge_apron_lod1",
+      "maxDistance": 260
+    }
+  ],
+  "collisionReference": "mesh.world.kit.collision_centered",
+  "collisionRequired": true
+}

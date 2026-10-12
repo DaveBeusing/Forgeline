@@ -1,0 +1,5 @@
+{
+  "id": "mesh.world.kit.collision_centered",
+  "type": "mesh",
+  "source": "../sources/environment_kit/collision_centered.gltf"
+}

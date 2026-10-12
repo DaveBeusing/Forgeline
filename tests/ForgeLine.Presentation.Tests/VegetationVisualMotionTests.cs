@@ -8,7 +8,7 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class VegetationVisualMotionTests
 {
     [Theory]
-    [InlineData(WorldVisualId.VegetationConifer)] [InlineData(WorldVisualId.VegetationScrub)] [InlineData(WorldVisualId.VegetationGrassClump)]
+    [InlineData(WorldVisualId.VegetationBroadleaf)] [InlineData(WorldVisualId.VegetationConifer)] [InlineData(WorldVisualId.VegetationScrub)] [InlineData(WorldVisualId.VegetationGrassClump)]
     public void GroundPivotBoundsAndPeriodicMotionPreserveCopiedState(WorldVisualId visual)
     {
         RenderInstance instance = new(new EntityId(1, 1), new(new Vector3(10, 5, 20), Quaternion.CreateFromAxisAngle(Vector3.UnitY, .7f), new Vector3(2, 10, 3)),

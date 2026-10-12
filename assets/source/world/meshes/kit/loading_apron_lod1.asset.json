@@ -1,0 +1,8 @@
+{
+  "id": "mesh.world.prop.loading_apron_lod1",
+  "type": "mesh",
+  "source": "../sources/environment_kit/loading_apron_reduced.gltf",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "id": "mesh.world.prop.service_fence_lod1",
+  "type": "mesh",
+  "source": "../sources/environment_kit/service_fence_reduced.gltf",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ]
+}

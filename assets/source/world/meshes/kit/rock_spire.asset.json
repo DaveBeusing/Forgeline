@@ -1,0 +1,17 @@
+{
+  "id": "mesh.world.prop.rock_spire",
+  "type": "mesh",
+  "source": "../sources/environment_kit/rock_spire_high.gltf",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "mesh.world.prop.rock_spire_lod1",
+      "maxDistance": 220
+    }
+  ],
+  "collisionReference": "mesh.world.kit.collision_centered",
+  "collisionRequired": true
+}
