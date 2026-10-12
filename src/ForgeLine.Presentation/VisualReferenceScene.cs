@@ -11,7 +11,7 @@ using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
 
-public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat, MechanicalIdle, MechanicalMoving, MechanicalFiring, MechanicalLoading, MechanicalUnpowered, MechanicalBroken, DirectorateUnits, DirectorateBuildingStates }
+public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat, MechanicalIdle, MechanicalMoving, MechanicalFiring, MechanicalLoading, MechanicalUnpowered, MechanicalBroken, DirectorateUnits, DirectorateBuildingStates, CommandCoreProduction }
 
 // Authored presentation acceptance states, not economic/combat simulations or gameplay presets.
 public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3 Target,
@@ -40,6 +40,12 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
         simulation.Entities.AddComponent(sensor, new VisualSensorState(new(1), rangeMeters: 130));
         foreach (var item in battlefield.WorldObjects)
         {
+            // Keep the eight authored review plots clear of unrelated dressing.
+            Vector3 relative = item.Position - target;
+            if (kind == VisualReferenceSceneKind.CommandCoreProduction &&
+                MathF.Abs(relative.X) <= 44 + item.Scale.X * .5f &&
+                MathF.Abs(relative.Z) <= 22 + item.Scale.Z * .5f)
+                continue;
             float groundOffset = item.Kind switch
             {
                 WorldPresentationKind.Decal => .04f,
@@ -51,6 +57,7 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
         }
         foreach (var item in battlefield.Resources)
         {
+            if (kind == VisualReferenceSceneKind.CommandCoreProduction) continue;
             EntityId deposit = Add(new(item.Center.X - target.X, 0, item.Center.Z - target.Z), new(item.HalfExtents.X * 2, 8, item.HalfExtents.Z * 2));
             simulation.Entities.AddComponent(deposit, WorldPresentationIdentity.ForResource(item.ResourceId));
             simulation.Entities.AddComponent(deposit, new ResourceDeposit(item.ResourceId,
@@ -106,6 +113,28 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
                 simulation.Entities.AddComponent(building, new ControllableEntity(new(1), ControllableEntityCategory.Building));
                 if (row == 1) simulation.Entities.AddComponent(building, new PowerConsumer(100));
                 if (row == 2) simulation.Entities.AddComponent(building, new HealthState(20, 100));
+            }
+        }
+        if (kind == VisualReferenceSceneKind.CommandCoreProduction)
+        {
+            var footprint = DirectorateContent.CreateBuildingCatalog()[BuildingIds.CommandCore].Footprint;
+            for (int i = 0; i < 8; i++)
+            {
+                EntityId building = Add(new((i % 4 - 1.5f) * 22, footprint.Height * .5f, (i / 4 - .5f) * 22),
+                    new(footprint.Width, footprint.Height, footprint.Depth));
+                if (i < 3)
+                    simulation.Entities.AddComponent(building, new ConstructionSite(BuildingIds.CommandCore,
+                        new(1), new(1), SimulationTick.Zero, 100, (uint)(i * 40)));
+                else if (i == 7)
+                    simulation.Entities.AddComponent(building, new BuildingWreckPresentationIdentity(BuildingIds.CommandCore, new(1)));
+                else
+                {
+                    simulation.Entities.AddComponent(building, new CompletedBuilding(BuildingIds.CommandCore, new(1), SimulationTick.Zero));
+                    if (i == 4) simulation.Entities.AddComponent(building, new PowerConsumer(20));
+                    if (i >= 5) simulation.Entities.AddComponent(building, new HealthState(i == 5 ? 50 : 20, 100));
+                }
+                if (i != 7)
+                    simulation.Entities.AddComponent(building, new ControllableEntity(new(1), ControllableEntityCategory.Building));
             }
         }
         if (kind is VisualReferenceSceneKind.FormationConvoy or VisualReferenceSceneKind.LogisticsCorridor)
@@ -205,7 +234,8 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
                 Selection = PlayerSelectionSummary.Empty with
                 {
                     Count = Math.Min(3, visible.Count(x => x.Selectable.Owner == new PlayerId(1))),
-                    Kind = kind == VisualReferenceSceneKind.IndustrialBase ? PlayerSelectionKind.Building : PlayerSelectionKind.Unit,
+                    Kind = kind is VisualReferenceSceneKind.IndustrialBase or VisualReferenceSceneKind.CommandCoreProduction
+                        ? PlayerSelectionKind.Building : PlayerSelectionKind.Unit,
                     DisplayName = kind.ToString()
                 }
             }, playerActions: new(new(1), extracted.Tick,

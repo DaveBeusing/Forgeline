@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.command_core.lod2",
   "type": "mesh",
-  "source": "sources/command_core_lod1_detailed.gltf",
+  "source": "sources/command_core/command_core_assembled_lod2.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ]

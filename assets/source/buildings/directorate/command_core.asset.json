@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.command_core",
   "type": "mesh",
-  "source": "sources/command_core_lod0_detailed.gltf",
+  "source": "sources/command_core/command_core_assembled_lod0.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ],
@@ -18,5 +18,25 @@
     }
   ],
   "collisionRequired": true,
-  "collisionReference": "building.directorate.module.collision_box"
+  "collisionReference": "building.directorate.module.collision_box",
+  "sockets": [
+    {
+      "name": "communications",
+      "x": 0,
+      "y": 0.395,
+      "z": 0.06
+    },
+    {
+      "name": "service_access",
+      "x": 0,
+      "y": -0.414,
+      "z": 0.25
+    },
+    {
+      "name": "roof_maintenance",
+      "x": 0.29,
+      "y": 0.19,
+      "z": 0.05
+    }
+  ]
 }

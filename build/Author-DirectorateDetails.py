@@ -73,6 +73,9 @@ def author():
         definition = json.loads(meta.read_text())
         if definition['id'] not in targets:
             continue
+        # This family has dedicated component/LOD sources, not retained box fittings.
+        if definition['id'].startswith('building.directorate.command_core'):
+            continue
         source = (meta.parent/definition['source']).resolve()
         reduced = '.lod' in definition['id']
         mechanical = definition.get('mechanicalParts', [])

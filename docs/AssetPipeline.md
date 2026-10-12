@@ -510,3 +510,8 @@ Explosion and spark emission multipliers are 0.35 and 0.45 respectively.
 Stable VFX IDs, atlas UVs/resolution and material bindings are unchanged;
 no new texture residency is introduced. Clean compilation still produces
 341 runtime assets. See [qualification limits](BattlefieldEffectCatalog.md).
+
+The Command Core family uses `python build/Author-CommandCore.py` and its editable
+component kit for deterministic modular and assembled glTF exports. It adds seven
+state meshes for a 348-asset catalog; see [Command Core production](CommandCoreProduction.md).
+Compile these sources normally; other families retain their existing exporters.
