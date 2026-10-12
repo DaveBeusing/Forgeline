@@ -2,7 +2,8 @@ param(
     [ValidateSet("Debug", "Release")]
     [string]$Configuration = "Release",
     [string]$OutputRoot = "artifacts/prealpha",
-    [switch]$VerifyReproducible
+    [switch]$VerifyReproducible,
+    [string]$RuntimeAssetRoot
 )
 
 $ErrorActionPreference = "Stop"
@@ -21,7 +22,9 @@ $buildTime = [DateTimeOffset]::UtcNow.ToString("O")
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $project = Join-Path $repoRoot "src/ForgeLine.Client/ForgeLine.Client.csproj"
-$runtimeAssets = Join-Path $repoRoot "assets/runtime"
+$runtimeAssets = $null
+$runtimeManifest = $null
+$runtimeManifestHash = $null
 $checklist = Join-Path $repoRoot "docs/PreAlphaVerificationChecklist.md"
 $readme = Join-Path $repoRoot "README.md"
 
@@ -43,7 +46,6 @@ function Publish-Client {
         "--configuration", $Configuration,
         "--runtime", "win-x64",
         "--self-contained", "false",
-        "--no-restore",
         "-p:ContinuousIntegrationBuild=true",
         "-p:Deterministic=true",
         "--output", $Destination
@@ -63,7 +65,30 @@ function Publish-Client {
 
     $assetDestination = Join-Path $Destination "assets/runtime"
     New-Item $assetDestination -ItemType Directory -Force | Out-Null
-    Copy-Item (Join-Path $runtimeAssets "*") $assetDestination -Recurse -Force
+    # Copy only qualified records; stale payloads, lock files and interrupted writes are never exported.
+    $inputManifest = Join-Path $runtimeAssets "manifest.json"
+    if ((Get-FileHash -LiteralPath $inputManifest -Algorithm SHA256).Hash -ne $runtimeManifestHash) {
+        throw "Qualified runtime manifest changed before packaging."
+    }
+    Copy-Item -LiteralPath $inputManifest -Destination (Join-Path $assetDestination "manifest.json")
+    if ((Get-FileHash -LiteralPath (Join-Path $assetDestination "manifest.json") -Algorithm SHA256).Hash -ne $runtimeManifestHash) {
+        throw "Qualified runtime manifest changed during copying."
+    }
+    foreach ($record in $runtimeManifest.assets) {
+        $assetPath = Join-Path $runtimeAssets $record.runtimePath
+        $targetPath = Join-Path $assetDestination $record.runtimePath
+        New-Item (Split-Path -Parent $targetPath) -ItemType Directory -Force | Out-Null
+        Copy-Item -LiteralPath $assetPath -Destination $targetPath
+        $copied = Get-Item -LiteralPath $targetPath
+        if ($copied.Length -ne $record.runtimeBytes -or
+            (Get-FileHash -LiteralPath $targetPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne $record.runtimeHash) {
+            throw "Qualified runtime asset changed during packaging: $($record.id)"
+        }
+    }
+    Copy-Item (Join-Path $repoRoot "assets/RuntimeNotices.md") (Join-Path $Destination "RuntimeNotices.md") -Force
+    foreach ($notice in @(Get-ChildItem -LiteralPath $repoRoot -File | Where-Object { $_.Name -match "^(LICENSE|NOTICE)(\.|$)" })) {
+        Copy-Item -LiteralPath $notice.FullName -Destination (Join-Path $Destination $notice.Name)
+    }
 
     Copy-Item $readme (Join-Path $Destination "README.md") -Force
     Copy-Item $checklist (Join-Path $Destination "PreAlphaVerificationChecklist.md") -Force
@@ -78,6 +103,7 @@ function Publish-Client {
         runUrl = if ($env:GITHUB_RUN_ID) { "https://github.com/DaveBeusing/Forgeline/actions/runs/$env:GITHUB_RUN_ID" } else { $null }
         targetFramework = "net10.0-windows"; runtimeIdentifier = "win-x64"
         configuration = $Configuration; sdk = $sdk; sourceTreeClean = ($dirty.Count -eq 0)
+        runtimeAssetSignature = $runtimeManifest.contentSignature; runtimeAssetCompiler = $runtimeManifest.compilerVersion
     } | ConvertTo-Json -Depth 10 | Set-Content (Join-Path $Destination "build-provenance.json") -Encoding utf8NoBOM
 
     $manifestPath = Join-Path $Destination "manifest.sha256"
@@ -121,6 +147,15 @@ $archivePath = Join-Path $outputRootAbsolute "FORGELINE-$buildVersion-win-x64.zi
 foreach ($path in @($archivePath, "$archivePath.sha256", "$archivePath.provenance.json")) {
     if (Test-Path -LiteralPath $path) { throw "Artifact already exists: $path. Refusing replacement." }
 }
+# Default publishing builds an owned cache, including on a clean checkout. CI may supply
+# the exact previously built/tested root; validate mode never touches sources or recompiles it.
+$assetMode = if ($RuntimeAssetRoot) { "validate" } else { "build" }
+$runtimeAssets = if ($RuntimeAssetRoot) { [IO.Path]::GetFullPath($RuntimeAssetRoot, $repoRoot) } else { Join-Path $outputRootAbsolute "compiled-assets" }
+& "$PSScriptRoot/Build-RuntimeAssets.ps1" -Mode $assetMode -SourceRoot (Join-Path $repoRoot "assets/source") `
+    -RuntimeRoot $runtimeAssets -QualificationOutput (Join-Path $outputRootAbsolute "asset-qualification.json") `
+    -ProgressLog (Join-Path $outputRootAbsolute "asset-compilation.jsonl")
+$runtimeManifest = Get-Content -LiteralPath (Join-Path $runtimeAssets "manifest.json") -Raw | ConvertFrom-Json
+$runtimeManifestHash = (Get-FileHash -LiteralPath (Join-Path $runtimeAssets "manifest.json") -Algorithm SHA256).Hash
 $publishDirectory = Join-Path $outputRootAbsolute "win-x64/publish"
 
 if ($VerifyReproducible) {
