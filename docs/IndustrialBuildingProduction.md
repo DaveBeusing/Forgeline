@@ -108,7 +108,8 @@ New mesh IDs extend each existing `building.directorate.<family>` prefix with
 families while other families retain their shared state bindings.
 
 Construction remains driven by real progress below 34%, below 67% and completion.
-Idle adds a closed service gate; unpowered adds a mechanical isolation treatment.
+Idle adds a closed gate aligned with the conveyor, slag mouth or loading access;
+unpowered adds a mechanical isolation cabinet at the visible service frontage.
 Damaged/critical overlays expose broken panels and process elements, reinforcing
 the existing state material and smoke/fire hooks. Wrecks retain the family's
 process remnant (drill head, furnace mouth, conditioning unit, towers or blast
