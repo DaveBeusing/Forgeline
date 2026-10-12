@@ -1,6 +1,8 @@
 # Startup presentation qualification
 
-## Implementation boundary
+The observations below describe the historical 2026-10-08 implementation. Current native bootstrap ownership and runtime-loading contracts are described in [Early Native Bootstrap](adr/EarlyNativeBootstrap.md).
+
+## Historical implementation boundary
 
 The startup surface uses built-in branded glyph geometry before runtime catalog completion. Exactly two CPU/I/O jobs prepare the validated runtime catalog and read-only save entries. Window/input pumping stays on the platform owner; graphics initialization, presentation, resize and disposal stay on the render owner. Gameplay scheduler construction remains deferred until session selection. Intro completion/skip and successful dependency completion jointly gate the frontend handoff. No elapsed-time percentage or new minimum delay is used.
 

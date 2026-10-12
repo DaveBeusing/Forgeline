@@ -42,7 +42,7 @@ The repository validates several of these invariants with `build/Validate-Projec
 
 ## Observability and Analysis Boundary
 
-Windows startup timing is owned by ForgeLine.Client and collected independently of simulation diagnostics. Platform/render owners record bounded monotonic events; actual successful presentation is distinct from internal preparation and from session reconstruction. Reports are serialized after execution. See [Startup Timing and Readiness](StartupDiagnostics.md).
+Windows startup timing is owned by ForgeLine.Client and collected independently of simulation diagnostics. Platform/render owners record bounded monotonic events; actual successful presentation is distinct from internal preparation and from session reconstruction. A native bootstrap is painted before settings and graphics initialization. One serialized writer checkpoints changed startup events during execution and flushes on failure/exit. See [Early Native Bootstrap](adr/EarlyNativeBootstrap.md). See [Startup Timing and Readiness](StartupDiagnostics.md).
 
 Gameplay telemetry is observational infrastructure, not a simulation authority.
 

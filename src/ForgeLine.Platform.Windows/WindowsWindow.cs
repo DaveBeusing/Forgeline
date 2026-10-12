@@ -31,9 +31,14 @@ internal sealed class WindowsWindow : IWindow
     private bool _hasWindowedRect;
     private bool _isFocused;
     private bool _isOpen;
+    private string? _bootstrapStatus;
+    private bool _bootstrapFailed;
+    internal bool BootstrapPainted { get; private set; }
+    internal bool BootstrapActive => _bootstrapStatus is not null;
 
-    internal WindowsWindow(WindowConfiguration configuration)
+    internal WindowsWindow(WindowConfiguration configuration, bool bootstrap = false)
     {
+        _bootstrapStatus = bootstrap ? "STARTING" : null;
         _configuration = configuration;
         _windowedStyle = GetWindowStyle(configuration.Resizable);
 
@@ -137,6 +142,37 @@ internal sealed class WindowsWindow : IWindow
     public bool IsOpen => _isOpen;
 
     public WindowMode Mode => _lifecycle.CurrentMode;
+
+    internal void UpdateBootstrap(string status, bool failed = false)
+    {
+        ThrowIfUnavailable();
+        ArgumentException.ThrowIfNullOrWhiteSpace(status);
+        if (_bootstrapStatus == status && _bootstrapFailed == failed) return;
+        _bootstrapStatus = status;
+        _bootstrapFailed = failed;
+        _ = WindowsNative.InvalidateRect(_handle, 0, 0);
+        _ = WindowsNative.UpdateWindow(_handle);
+    }
+
+    internal void CompleteBootstrap()
+    {
+        ThrowIfUnavailable();
+        _bootstrapStatus = null;
+    }
+
+    internal void ConfigureBootstrap(WindowConfiguration configuration)
+    {
+        ThrowIfUnavailable();
+        ArgumentNullException.ThrowIfNull(configuration);
+        if (!BootstrapActive) throw new InvalidOperationException("Window configuration must precede graphics handoff.");
+        if (Mode != WindowMode.Windowed) SetMode(WindowMode.Windowed);
+        var rect = new WindowsNative.NativeRect { Right = configuration.Width, Bottom = configuration.Height };
+        if (WindowsNative.AdjustWindowRectExForDpi(ref rect, _windowedStyle, 0, 0, _dpi) == 0 ||
+            WindowsNative.SetWindowPos(_handle, 0, 0, 0, rect.Width, rect.Height,
+                WindowsNative.SwpNoZOrder | WindowsNative.SwpNoActivate | 0x0002) == 0)
+            throw CreateLastErrorException("Unable to apply startup window dimensions.");
+        SetMode(configuration.Mode);
+    }
 
     public void RequestClose()
     {
@@ -361,6 +397,11 @@ internal sealed class WindowsWindow : IWindow
     {
         switch (message)
         {
+            case WindowsNative.WmPaint when _bootstrapStatus is not null:
+                BootstrapPainted |= WindowsBootstrapSurface.Paint(windowHandle, _dpi, _bootstrapStatus, _bootstrapFailed);
+                return 0;
+            case WindowsNative.WmEraseBackground when _bootstrapStatus is not null:
+                return 1;
             case WindowsNative.WmClose:
                 EnqueueEvent(WindowEventKind.CloseRequested);
                 _ = WindowsNative.DestroyWindow(windowHandle);

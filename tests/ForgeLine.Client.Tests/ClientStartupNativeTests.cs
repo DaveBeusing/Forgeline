@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using ForgeLine.Graphics;
 using ForgeLine.Platform;
 using ForgeLine.Platform.Windows;
@@ -10,11 +11,28 @@ namespace ForgeLine.Client.Tests;
 public sealed class ClientStartupNativeTests
 {
     [Fact]
+    public void EscapeCancelsNativeBootstrapAndPendingEventsAreDrained()
+    {
+        using var platform = new WindowsPlatform();
+        using IWindow window = platform.CreateBootstrapWindow(new WindowConfiguration("FORGELINE", 640, 360));
+        Assert.True(ClientBootstrap.PumpBootstrap(platform, window));
+        Assert.False(window.TryDequeueEvent(out _));
+        _ = SendMessage(window.NativeHandle.Value, 0x0100, 0x1B, 0);
+        Assert.False(ClientBootstrap.PumpBootstrap(platform, window));
+        Assert.False(window.IsOpen);
+    }
+
+    [DllImport("user32.dll", EntryPoint = "SendMessageW")]
+    private static extern nint SendMessage(nint window, uint message, nuint wParam, nint lParam);
+
+    [Fact]
     public void BrandedFramePresentsWhileAssetWorkerIsBlockedAndMenuWaitsForHandoff()
     {
         using var platform = new WindowsPlatform();
-        using IWindow window = platform.CreateWindow(new WindowConfiguration(
+        using IWindow window = platform.CreateBootstrapWindow(new WindowConfiguration(
             "FORGELINE Startup Presentation Test", 640, 360));
+        Assert.True(platform.BootstrapPainted(window));
+        nint bootstrapHandle = window.NativeHandle.Value;
         using var release = new ManualResetEventSlim();
         var diagnostics = new StartupDiagnostics(Stopwatch.GetTimestamp(), Guid.NewGuid(), 1);
         diagnostics.Begin(StartupPhase.BootRenderer);
@@ -39,6 +57,8 @@ public sealed class ClientStartupNativeTests
                 bool open = platform.PumpEvents() && window.IsOpen;
                 if (renderer.HasPresentedFrame && !release.IsSet && ++presentedPumps == 10)
                 {
+                    platform.CompleteBootstrap(window);
+                    Assert.Equal(bootstrapHandle, window.NativeHandle.Value);
                     Assert.False(coordinator.DependenciesReady);
                     Assert.True(diagnostics.Has(StartupPhase.SplashBootstrapFirstFrame));
                     release.Set();

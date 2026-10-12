@@ -209,7 +209,11 @@ internal sealed class ClientFrontendRenderHost : IDisposable
     {
         using var renderer =
             new FrontendOverlayRenderer(graphics);
-        if (_asynchronousStartup) _startup.End(StartupPhase.BootRenderer);
+        if (_asynchronousStartup)
+        {
+            _startup.End(StartupPhase.BootRenderer);
+            _startup.Mark(StartupPhase.GraphicsReady);
+        }
         _started.Set();
         int width = _target.Width, height = _target.Height;
         bool suspended = _target.Suspended;
@@ -293,6 +297,10 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                         else if (view.Value.Kind != FrontendSurfaceKind.StudioSplash)
                         {
                             renderer.Render(context, view.Value);
+                        }
+                        else
+                        {
+                            renderer.Render(context, FrontendSurfaceView.Loading("PREPARING STUDIO INTRO", false, 0));
                         }
                     });
                 if (ObservePresentation(_startup, _presentedFrames,

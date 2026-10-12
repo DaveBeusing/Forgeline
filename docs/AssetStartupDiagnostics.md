@@ -1,6 +1,6 @@
 # Asset Startup Diagnostics
 
-Source-checkout startup incrementally compiles authoring assets before loading the runtime catalog. A missing catalog or changed source/dependency/compiler hash can require costly texture compression. Packaged clients consume compiled assets; the development bootstrap is bypassed when a runtime override is supplied or CI is enabled.
+Asset compilation is an explicit authoring/build step. The client consumes compiled runtime assets and never starts the compiler. A missing or invalid manifest produces a visible startup failure. Compile assets using the command below before launching a source checkout; packaged clients require no source files or compiler.
 
 ## Live compiler records
 
@@ -16,13 +16,7 @@ The optional JSON-lines file is flushed after each record, so evidence survives 
 
 ## Development-launch evidence
 
-The client prints the compiler progress path before starting the child:
-
-`artifacts/asset-startup/compile-<client-process-id>.jsonl`
-
-The launcher prints its PID, wait duration, CPU time and memory every five seconds, then its exit code and total wait. These launcher measurements include SDK/build activity; use the compiler PID and JSON-lines records for actual asset-processing measurements. A delay before the progress file appears points to launching/building the compiler rather than an asset import. Cancellation still terminates and joins the complete compiler process tree.
-
-Use `--startup-diagnostics-output artifacts/startup.json` on the client to correlate dependency completion with window, application and session readiness. A compiler heartbeat proves the process is alive, not that it is making useful forward progress: compare completed band rows and stages over time. Retain both the client console log and compiler JSON-lines file when reporting a stall.
+Keep compiler and client measurements separate. Use `--progress-log artifacts/asset-compilation.jsonl` for the compiler and `--startup-diagnostics-output artifacts/startup.json` for the client. A compiler heartbeat identifies a live compiler process; completed rows and stage changes establish forward progress. Player-startup reports must use precompiled assets and must not include source compilation.
 
 ## Texture processing fix
 
@@ -32,7 +26,7 @@ PNG decoding previously materialized full-image decompressed, filtered, scanline
 
 The compiler/runtime format versions remain unchanged because complete catalog and per-mip parity checks establish identical output. Existing caches remain valid; no unnecessary full rebuild is introduced by the scheduling/decoder fix.
 
-## Observed qualification
+## Historical compiler qualification
 
 On the NVIDIA RTX PRO 5000 Blackwell Laptop development host, the instrumented serial cold compile of 341 assets took 681.78 seconds with 860.4 MiB peak working set. Banded compression with the old PNG decoder took 284.66 seconds and peaked at 1055.6 MiB, exposing the remaining decode memory cost. With streaming PNG decoding, the observed cold compile took 180.37 seconds and peaked at 548.8 MiB. All 341 payloads and the manifest matched byte-for-byte, and runtime qualification passed.
 

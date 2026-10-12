@@ -5,6 +5,26 @@ namespace ForgeLine.Client.Tests;
 
 public sealed class RuntimeAssetPathResolverTests
 {
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void BrokenExplicitOrPackagedInstallationCannotBorrowAnotherCatalog(bool explicitRoot)
+    {
+        string root = CreateTemporaryDirectory();
+        try
+        {
+            string app = Directory.CreateDirectory(Path.Combine(root, "app")).FullName;
+            string cwd = Directory.CreateDirectory(Path.Combine(root, "cwd")).FullName;
+            _ = CreateRuntimeRoot(cwd);
+            if (!explicitRoot) File.WriteAllText(Path.Combine(app, "build-provenance.json"), "{}");
+            RuntimeAssetPathResolution resolution = RuntimeAssetPathResolver.Resolve(app, cwd,
+                explicitRoot ? Path.Combine(root, "missing-installation") : null);
+            Assert.False(resolution.Found);
+            Assert.Single(resolution.CandidateRoots);
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
     [Fact]
     public void ExplicitRuntimeAssetRootTakesPriority()
     {

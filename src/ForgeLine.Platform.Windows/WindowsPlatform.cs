@@ -31,6 +31,27 @@ public sealed class WindowsPlatform : IPlatform
 
     public IClock Clock { get; }
 
+    public IWindow CreateBootstrapWindow(WindowConfiguration configuration)
+    {
+        ArgumentNullException.ThrowIfNull(configuration);
+        ThrowIfUnavailable();
+        PrepareForWindowCreation();
+        return new WindowsWindow(configuration, bootstrap: true);
+    }
+
+    public bool BootstrapPainted(IWindow window) => BootstrapWindow(window).BootstrapPainted;
+    public void UpdateBootstrap(IWindow window, string status, bool failed = false) =>
+        BootstrapWindow(window).UpdateBootstrap(status, failed);
+    public void CompleteBootstrap(IWindow window) => BootstrapWindow(window).CompleteBootstrap();
+    public void ConfigureBootstrap(IWindow window, WindowConfiguration configuration) =>
+        BootstrapWindow(window).ConfigureBootstrap(configuration);
+
+    private WindowsWindow BootstrapWindow(IWindow window)
+    {
+        ThrowIfUnavailable();
+        return window as WindowsWindow ?? throw new ArgumentException("A Windows window is required.", nameof(window));
+    }
+
     public IWindow CreateWindow(WindowConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);

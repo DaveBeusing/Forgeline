@@ -3,7 +3,7 @@
 Build and release identity follows [Release Versioning](docs/ReleaseVersioning.md).
 Each PR increments PATCH once; CI does not automatically create tags or releases.
 
-Source-checkout asset compilation emits live stage and memory progress and saves a flushed JSON-lines log under `artifacts/asset-startup/`. See [Asset startup diagnostics](docs/AssetStartupDiagnostics.md) to investigate slow launches and cold texture compilation.
+Explicit asset compilation emits live stage and memory progress and supports a flushed JSON-lines log. See [Asset startup diagnostics](docs/AssetStartupDiagnostics.md) to investigate slow launches and cold texture compilation.
 
 <div align="center">
 
@@ -84,10 +84,11 @@ The repository selects **Microsoft.Testing.Platform** through `global.json`.
 ### Launch the client
 
 ```powershell
-dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release
+dotnet run --project tools/ForgeLine.AssetCompiler --configuration Release -- --source assets/source --runtime assets/runtime --progress-log artifacts/asset-compilation.jsonl
+dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release --no-build
 ```
 
-The client starts the Central Divide / Directorate skirmish flow. Source checkouts refresh compiled assets before loading. Packaged builds locate assets beside the executable; `FORGELINE_RUNTIME_ASSETS` overrides asset discovery.
+The client starts the Central Divide / Directorate skirmish flow. Compile authoring assets explicitly before launching a source checkout; the client never starts the compiler. Packaged builds consume their adjacent runtime assets. `FORGELINE_RUNTIME_ASSETS` selects an authoritative override, including missing or broken installations. A native FORGELINE startup surface appears before settings and graphics initialization. Automatic startup checkpoints are stored under `%LOCALAPPDATA%/FORGELINE/diagnostics`; see [startup timing](docs/StartupDiagnostics.md).
 
 ### Essential controls
 
