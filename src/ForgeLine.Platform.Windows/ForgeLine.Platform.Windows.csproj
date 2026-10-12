@@ -8,5 +8,6 @@
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="ForgeLine.Platform.Windows.Tests" />
+    <EmbeddedResource Include="../../assets/source/branding/forgeline/application/forgeline.ico" LogicalName="ForgeLine.ApplicationIcon" />
   </ItemGroup>
 </Project>

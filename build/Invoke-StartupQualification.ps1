@@ -5,10 +5,31 @@ param(
     [ValidateRange(1, 100)][int]$Samples = 5,
     [ValidateRange(10, 300)][int]$TimeoutSeconds = 60,
     [switch]$IncludeStudioIntro,
-    [switch]$BaselineExitHook
+    [switch]$BaselineExitHook,
+    [switch]$RequireApplicationIcons
 )
 
 $ErrorActionPreference = "Stop"
+if ($RequireApplicationIcons -and -not ('StartupWindowIconProbe' -as [type])) {
+    Add-Type -TypeDefinition @"
+using System;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
+public static class StartupWindowIconProbe
+{
+    [DllImport("user32.dll", EntryPoint = "SendMessageTimeoutW", SetLastError = true)]
+    private static extern IntPtr SendMessageTimeout(IntPtr window, uint message, UIntPtr wParam,
+        IntPtr lParam, uint flags, uint timeout, out UIntPtr result);
+    public static bool TryRead(IntPtr window, uint size, out ulong icon)
+    {
+        UIntPtr result;
+        bool answered = SendMessageTimeout(window, 0x007F, (UIntPtr)size, IntPtr.Zero, 2, 500, out result) != IntPtr.Zero;
+        icon = result.ToUInt64();
+        return answered;
+    }
+}
+"@
+}
 $client = (Resolve-Path -LiteralPath $ClientPath).Path
 $destination = [IO.Path]::GetFullPath($OutputRoot)
 New-Item -ItemType Directory -Force -Path $destination | Out-Null
@@ -32,11 +53,37 @@ for ($sample = 0; $sample -le $Samples; $sample++) {
     $stdout = $process.StandardOutput.ReadToEndAsync()
     $stderr = $process.StandardError.ReadToEndAsync()
     $windowObserved = $null
+    $iconWindow = [IntPtr]::Zero
+    $iconChecks = 0
+    $iconProbeMisses = 0
     try {
         while (-not $process.WaitForExit(10)) {
             $process.Refresh()
             if ($null -eq $windowObserved -and $process.MainWindowHandle -ne 0) {
                 $windowObserved = $clock.Elapsed.TotalMilliseconds
+            }
+            if ($RequireApplicationIcons -and $process.MainWindowHandle -ne 0) {
+                $window = $process.MainWindowHandle
+                if ($iconWindow -ne [IntPtr]::Zero -and $iconWindow -ne $window) {
+                    throw "Startup sample $sample replaced its application window."
+                }
+                $iconWindow = $window
+                # A successful menu smoke may close between polling and SendMessageTimeout.
+                try {
+                    [uint64]$smallIcon = 0
+                    [uint64]$largeIcon = 0
+                    if ([StartupWindowIconProbe]::TryRead($window, 0, [ref]$smallIcon) -and
+                        [StartupWindowIconProbe]::TryRead($window, 1, [ref]$largeIcon)) {
+                        if ($smallIcon -eq 0 -or $largeIcon -eq 0) {
+                            throw "Startup sample $sample lacks native small/large application icons."
+                        }
+                        $iconChecks++
+                    }
+                    else { $iconProbeMisses++ }
+                }
+                catch {
+                    if (-not $process.WaitForExit(100)) { throw }
+                }
             }
             if ($clock.Elapsed.TotalSeconds -gt $TimeoutSeconds) {
                 $process.Kill($true)
@@ -70,11 +117,16 @@ for ($sample = 0; $sample -le $Samples; $sample++) {
         if ($IncludeStudioIntro -and $null -eq $phases['StudioSplashFirstFrame']) {
             throw "Startup sample $sample did not present the requested studio video; inspect its bypass/failure evidence."
         }
+        if ($RequireApplicationIcons -and $iconChecks -eq 0) { throw "Startup sample $sample has no native icon observations." }
         $observations += [PSCustomObject]@{ sample = $sample; warmup = ($sample -eq 0);
             launchToWindowObservationMs = $windowObserved; launchToExitMs = $clock.Elapsed.TotalMilliseconds;
-            phases = $phases; report = $reportPath }
+            nativeIconChecks = $iconChecks; nativeIconProbeMisses = $iconProbeMisses; phases = $phases; report = $reportPath }
     }
     finally {
+        if (-not $process.HasExited) {
+            $process.Kill($true)
+            $process.WaitForExit()
+        }
         if ($process.HasExited) {
             $stdout.GetAwaiter().GetResult() | Set-Content (Join-Path $destination "launch-$sample.stdout.log")
             $stderr.GetAwaiter().GetResult() | Set-Content (Join-Path $destination "launch-$sample.stderr.log")
@@ -86,6 +138,7 @@ $summary = [PSCustomObject]@{ client = $client; measuredAtUtc = [DateTimeOffset]
     cpu = @(Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores, NumberOfLogicalProcessors);
     graphics = @(Get-CimInstance Win32_VideoController | Select-Object Name, DriverVersion);
     cacheCondition = 'Warm repetitions after one excluded warmup; no cache eviction or reboot';
+    requiresApplicationIcons = [bool]$RequireApplicationIcons;
     includesStudioIntro = [bool]$IncludeStudioIntro; baselineExitHook = [bool]$BaselineExitHook;
     observations = $observations }
 $summary | ConvertTo-Json -Depth 12 | Set-Content (Join-Path $destination 'summary.json')

@@ -134,7 +134,7 @@ jobs:
       - name: Packaged startup menu lifecycle
         if: runner.os == 'Windows'
         shell: pwsh
-        run: ./build/Invoke-StartupQualification.ps1 -ClientPath artifacts/prealpha/win-x64/publish/ForgeLine.Client.exe -Samples 2
+        run: ./build/Invoke-StartupQualification.ps1 -ClientPath artifacts/prealpha/win-x64/publish/ForgeLine.Client.exe -Samples 2 -RequireApplicationIcons
 
       - name: Two-opponent full-match validation
         run: dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario central-divide --profile validation --ticks 80000 --seed 2026 --matches 1 --require-terminal --diagnostics-output artifacts/opponent-full-match.json --telemetry-output artifacts/opponent-balance-telemetry.json

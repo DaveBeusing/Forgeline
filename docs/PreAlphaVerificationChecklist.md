@@ -18,6 +18,17 @@ The packaged build is the qualification target. Do not substitute a repository-l
 - [ ] `FORGELINE-<build-version>-win-x64.zip` is produced.
 - [ ] The archive contains the client executable, runtime assets, README, this checklist, and `manifest.sha256`.
 
+## Windows Application Identity
+
+- [ ] Published EXE resource assertion matches every canonical icon frame.
+- [ ] Bootstrap/menu/gameplay show the same icon in title bar, taskbar and Alt+Tab.
+- [ ] Explorer and new/pinned shortcuts target the current installation.
+- [ ] Native icon assignment survives minimize/restore and mixed-DPI monitor movement.
+- [ ] Record manual shell results separately from resource tests; diagnose stale shortcut/icon caches before blaming embedding.
+- [ ] Higher-resolution artwork approval is recorded if new source frames are introduced.
+
+See [Windows application branding](WindowsApplicationBranding.md) for the source, tests and remaining artwork limits.
+
 ## Fresh-Install Launch
 
 - [ ] Extract or copy the publish output to a clean directory outside the repository.
