@@ -295,3 +295,17 @@ comparisons because an operational delivery build overlapped its measurements.
 The recorded isolated-before cohort was rebuilt and recaptured after explicit
 CPU/GPU clearance. Exploratory matrices remain local and are not acceptance
 evidence for this final geometry.
+
+### Reproducible package and installed smoke
+
+Two independent publish trees from `d48a920273915a6d942c1ec598fda22765ed6da5`
+are byte-identical under the established reproducibility check. Packaging
+validates and copies the exact previously qualified runtime. An installation
+outside the checkout starts without authoring sources or the asset compiler:
+all 413 compiled containers and their manifest are byte-identical to the
+qualified root. Existing studio-intro MP4/WAV media are included separately.
+The installed 1,000-instance Windowed smoke presents successfully with eleven
+instance batches and zero texture/material binding failures. This functional
+smoke does not grant Borderless, art or sustained-performance acceptance.
+[Portable package verification](qualification/industrial-building-package.json)
+records source identity, archive hash and checks; the archive remains local.
