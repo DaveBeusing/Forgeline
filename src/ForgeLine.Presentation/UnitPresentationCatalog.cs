@@ -166,6 +166,19 @@ public static class UnitPresentationCatalog
             feature,
             Get(feature.Unit).FallbackTint);
 
+    public static string ResolveWreckAssetId(in UnitFeaturePresentationMetadata feature) =>
+        feature.Unit == UnitIds.MainBattleTank
+            ? "unit.directorate.main_battle_tank.wreck"
+            : Get(feature.Unit).Lod2AssetId;
+
+    public static string? ResolveStateAttachmentAssetId(in UnitFeaturePresentationMetadata feature) =>
+        feature.Unit != UnitIds.MainBattleTank ? null : feature.DamageState switch
+        {
+            UnitPresentationDamageState.Damaged => "unit.directorate.main_battle_tank.damaged",
+            UnitPresentationDamageState.Critical => "unit.directorate.main_battle_tank.critical",
+            _ => null
+        };
+
     public static Vector4 ApplyDamageTint(
         in UnitFeaturePresentationMetadata feature,
         Vector4 baseTint) =>
