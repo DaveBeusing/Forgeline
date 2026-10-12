@@ -356,3 +356,14 @@ Reusable match ownership, injected composition, preset boundaries and schema mig
 ## Render scratch ownership
 
 Instance batching and contiguous CPU upload staging belong to the render owner and are reused within explicit retention limits. Extracted render arrays transfer to immutable GC-owned snapshots without a second copy; public snapshot inputs and client frame-publication arrays retain defensive copy semantics. GPU frame-index fences and retirement remain authoritative for upload-buffer replacement. See [Render frame scratch and snapshot ownership](adr/RenderFrameScratchAndSnapshotOwnership.md) for capacities, failure behavior and measurement limits.
+
+## Runtime asset build and deployment
+
+The offline compiler owns source discovery/import and serialized cache writes.
+`ForgeLine.Assets` owns portable manifest/container integrity and loading; the
+Windows player requires a sealed manifest but never references compiler tooling.
+Menu initialization reads manifest metadata first. Requested gameplay payloads
+are verified before parsing, and GPU work remains with the render owner.
+Publish builds or validates runtime content before copying the exact qualified
+records. Simulation and headless dependencies are unchanged. See
+[Precompiled runtime asset integrity](adr/PrecompiledRuntimeAssetIntegrity.md).

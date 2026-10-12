@@ -12,11 +12,14 @@ The packaged build is the qualification target. Do not substitute a repository-l
 - [ ] Project-reference validation passes.
 - [ ] Release build succeeds without repository-caused warnings or errors.
 - [ ] Canonical map compilation and qualification pass.
-- [ ] Runtime asset compilation and qualification pass.
+- [ ] Runtime asset compilation and strict size/hash/manifest qualification pass.
+- [ ] `build/Test-RuntimeAssetPipeline.ps1` passes separate-process locking, terminated-writer recovery and source-less validation.
 - [ ] `build/Publish-PreAlpha.ps1 -VerifyReproducible` succeeds.
 - [ ] Two independent publish passes produce identical SHA-256 manifests.
 - [ ] `FORGELINE-<build-version>-win-x64.zip` is produced.
-- [ ] The archive contains the client executable, runtime assets, README, this checklist, and `manifest.sha256`.
+- [ ] The archive contains the client executable, qualified manifest-listed runtime assets, runtime notices, README, this checklist, and `manifest.sha256`.
+- [ ] Package provenance records the qualified runtime content signature/compiler version, and copied asset size/hash matches the built/tested root.
+- [ ] No asset definitions, raw mesh/texture sources, compiler, encoder dependency, lock or temporary file is shipped.
 
 ## Windows Application Identity
 
@@ -37,7 +40,8 @@ See [Windows application branding](WindowsApplicationBranding.md) for the source
 - [ ] Missing settings do not block startup.
 - [ ] Malformed settings are quarantined and replaced by validated defaults.
 - [ ] The match setup screen is shown before normal gameplay begins.
-- [ ] No repository-relative source asset is required after runtime assets have been packaged.
+- [ ] No repository-relative source asset or AssetCompiler executable is required after runtime assets have been packaged.
+- [ ] Missing/corrupt deployment manifests and required payloads fail visibly and in diagnostics; player mode never compiles or repairs them.
 
 ## Match Setup and Lifecycle
 
