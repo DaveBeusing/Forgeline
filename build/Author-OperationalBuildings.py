@@ -84,7 +84,11 @@ def author(recipe,output,update):
             gltf=json.loads(path.read_text(encoding='utf-8'));gltf['asset']['generator']='ForgeLine operational building component exporter'
             gltf['extras']=dict(componentHierarchy=hierarchy,axes=kit['axes'],state=state,lod=lod)
             path.write_text(json.dumps(gltf,indent=2)+'\n',encoding='utf-8')
-            entry['sha256']=hashlib.sha256(path.read_bytes()).hexdigest();entry['groups']=groups
+            entry['sha256']=hashlib.sha256(path.read_bytes()).hexdigest()
+            for group in groups:
+                motion=family['motion'].get(group['name']) if state=='intact' and lod==0 else None
+                group.update({k:motion[k] for k in ('motion','socket','rate','travel')} if motion else dict(motion='static'))
+            entry['groups']=groups
             report[f'{name}.{suffix}']=entry
             if update:
                 meta=SOURCE/(name+(f'_lod{lod}' if state=='intact' and lod else '_'+state if state!='intact' else '')+'.asset.json')

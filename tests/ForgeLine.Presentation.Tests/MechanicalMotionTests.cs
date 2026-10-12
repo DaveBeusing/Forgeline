@@ -10,6 +10,38 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class MechanicalMotionTests
 {
+    [Theory]
+    [InlineData(MechanicalMotionKind.Radar, .285f, .6f)]
+    [InlineData(MechanicalMotionKind.Fan, .292f, 2.2f)]
+    public void OperationalRotorsKeepScaledPivotsFreezePhaseAndDisableForWrecks(MechanicalMotionKind motion, float height, float rate)
+    {
+        Vector3 pivot = new(0, height, 0);
+        MechanicalPartBinding[] parts = [new(new("rotor", 0, 3, -1, motion, "pivot", rate), pivot)];
+        Matrix4x4 world = Matrix4x4.CreateScale(14, 18, 14) * Matrix4x4.CreateTranslation(650, 15, 520);
+        Matrix4x4[] matrices = new Matrix4x4[1];
+        var instance = Instance() with
+        {
+            BuildingFeature = new(BuildingIds.Radar, BuildingPresentationState.Operational),
+            MechanicalPose = new(true, 0, 1.55, 1.6, -1, 0, 0)
+        };
+        MechanicalTransforms.Compose(parts, instance, world, matrices);
+        Matrix4x4 active = matrices[0];
+        Assert.True(Vector3.Distance(Vector3.Transform(pivot, world), Vector3.Transform(pivot, active)) < .0001f);
+        Assert.NotEqual(world, active);
+        instance = instance with
+        {
+            BuildingFeature = new(BuildingIds.Radar, BuildingPresentationState.Unpowered),
+            MechanicalPose = instance.MechanicalPose with { Seconds = 100 }
+        };
+        MechanicalTransforms.Compose(parts, instance, world, matrices);
+        Assert.Equal(active, matrices[0]);
+        MechanicalTransforms.Compose(parts, instance, world, matrices, weight: 0);
+        Assert.Equal(world, matrices[0]);
+        instance = instance with { BuildingFeature = new(BuildingIds.Radar, BuildingPresentationState.Destroyed) };
+        MechanicalTransforms.Compose(parts, instance, world, matrices);
+        Assert.Equal(world, matrices[0]);
+    }
+
     [Fact]
     public void DetailMotionIsNeutralAcrossBothLodHysteresisEdges()
     {

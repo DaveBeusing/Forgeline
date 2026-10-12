@@ -62,7 +62,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 720,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -85,7 +86,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 612,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -108,7 +110,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 36,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -131,7 +134,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 180,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -154,7 +158,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 432,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -177,7 +182,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 36,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -200,7 +206,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 144,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -223,7 +230,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 276,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -246,7 +254,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 288,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -303,7 +312,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 1608,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -326,7 +336,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 684,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -349,7 +360,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 36,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -372,7 +384,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 180,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -395,7 +408,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 324,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -418,7 +432,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 36,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -441,7 +456,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 144,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -464,7 +480,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 276,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -487,7 +504,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 492,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -504,13 +522,14 @@
       0.1599999964237213,
       0.41999998688697815
     ],
-    "sha256": "579af7222d3f67f93ffc0979dff49bbdf682cba10f833b3a051ba9dc4afdd6e7",
+    "sha256": "f5e4b6237e76104c2e7056ec54f1f24a68b767f11fc3b448728acb2c796aabdb",
     "groups": [
       {
         "name": "body",
         "firstIndex": 0,
         "indexCount": 972,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -533,7 +552,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 564,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -556,7 +576,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 420,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -579,7 +600,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 36,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -602,7 +624,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 180,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -625,7 +648,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 348,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -648,7 +672,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 36,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -671,7 +696,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 144,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -694,7 +720,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 276,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -717,7 +744,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 300,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -774,7 +802,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 1188,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -797,7 +826,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 612,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -820,7 +850,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 36,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -843,7 +874,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 180,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -866,7 +898,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 252,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -889,7 +922,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 36,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -912,7 +946,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 144,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -935,7 +970,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 276,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   },
@@ -958,7 +994,8 @@
         "name": "static",
         "firstIndex": 0,
         "indexCount": 564,
-        "parent": -1
+        "parent": -1,
+        "motion": "static"
       }
     ]
   }
