@@ -9,3 +9,4 @@ BenchmarkDotNet.Artifacts/
 artifacts/
 assets/runtime/
 __pycache__/
+*.compile.lock
