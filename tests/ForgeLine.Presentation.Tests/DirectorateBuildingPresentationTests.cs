@@ -315,7 +315,7 @@ public sealed class DirectorateBuildingPresentationTests
     }
 
     [Fact]
-    public void RepeatedCommandCoreStateResolutionDoesNotAllocateAssetNamesPerFrame()
+    public void RepeatedDedicatedStateResolutionDoesNotAllocateAssetNamesPerFrame()
     {
         BuildingFeaturePresentationMetadata[] states =
         [
@@ -328,6 +328,8 @@ public sealed class DirectorateBuildingPresentationTests
             new(BuildingIds.CommandCore, BuildingPresentationState.Critical),
             new(BuildingIds.CommandCore, BuildingPresentationState.Destroyed)
         ];
+        states = new[] { BuildingIds.CommandCore, BuildingIds.VehicleFactory, BuildingIds.PowerPlant, BuildingIds.Barracks, BuildingIds.Radar }
+            .SelectMany(building => states.Select(state => state with { Building = building })).ToArray();
         _ = ResolveNames();
         long before = GC.GetAllocatedBytesForCurrentThread();
         int resolvedCharacters = 0;
@@ -352,7 +354,7 @@ public sealed class DirectorateBuildingPresentationTests
     public void CriticalOperationalStatesUseGeometryAttachmentsNotOnlyTint()
     {
         Assert.Equal(
-            BuildingPresentationCatalog.UnpoweredStateAssetId,
+            "building.directorate.power_plant.unpowered",
             BuildingPresentationCatalog.ResolveStateAttachmentAssetId(
                 new BuildingFeaturePresentationMetadata(
                     BuildingIds.PowerPlant,

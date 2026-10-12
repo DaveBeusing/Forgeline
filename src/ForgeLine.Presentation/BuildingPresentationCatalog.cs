@@ -104,6 +104,28 @@ public static class BuildingPresentationCatalog
         BuildingPresentationDefinition> Definitions =
         CreateDefinitions();
 
+    private static readonly Dictionary<BuildingId, Dictionary<BuildingPresentationState, string>> DedicatedStates = CreateDedicatedStates();
+
+    private static Dictionary<BuildingId, Dictionary<BuildingPresentationState, string>> CreateDedicatedStates()
+    {
+        var result = new Dictionary<BuildingId, Dictionary<BuildingPresentationState, string>>();
+        foreach (BuildingId building in new[] { BuildingIds.CommandCore, BuildingIds.VehicleFactory, BuildingIds.PowerPlant, BuildingIds.Barracks, BuildingIds.Radar })
+        {
+            string id = Get(building).MeshAssetId;
+            result.Add(building, new Dictionary<BuildingPresentationState, string>
+            {
+                [BuildingPresentationState.ConstructionFoundation] = id + ".foundation",
+                [BuildingPresentationState.ConstructionFrame] = id + ".structural_frame",
+                [BuildingPresentationState.ConstructionShell] = id + ".partial_shell",
+                [BuildingPresentationState.Destroyed] = id + ".destroyed",
+                [BuildingPresentationState.Unpowered] = id + ".unpowered",
+                [BuildingPresentationState.Damaged] = id + ".damaged",
+                [BuildingPresentationState.Critical] = id + ".critical"
+            });
+        }
+        return result;
+    }
+
     public static BuildingPresentationDefinition Get(
         BuildingId building) =>
         Definitions.TryGetValue(
@@ -159,14 +181,14 @@ public static class BuildingPresentationCatalog
                 nameof(feature));
         }
 
-        if (feature.Building == BuildingIds.CommandCore)
+        if (DedicatedStates.TryGetValue(feature.Building, out var representations))
         {
             string? representation = feature.State switch
             {
-                BuildingPresentationState.ConstructionFoundation => "building.directorate.command_core.foundation",
-                BuildingPresentationState.ConstructionFrame => "building.directorate.command_core.structural_frame",
-                BuildingPresentationState.ConstructionShell => "building.directorate.command_core.partial_shell",
-                BuildingPresentationState.Destroyed => "building.directorate.command_core.destroyed",
+                BuildingPresentationState.ConstructionFoundation => representations[feature.State],
+                BuildingPresentationState.ConstructionFrame => representations[feature.State],
+                BuildingPresentationState.ConstructionShell => representations[feature.State],
+                BuildingPresentationState.Destroyed => representations[feature.State],
                 _ => null
             };
             if (representation is not null)
@@ -192,13 +214,13 @@ public static class BuildingPresentationCatalog
     public static string? ResolveStateAttachmentAssetId(
         in BuildingFeaturePresentationMetadata feature)
     {
-        if (feature.Building == BuildingIds.CommandCore)
+        if (DedicatedStates.TryGetValue(feature.Building, out var representations))
         {
             string? attachment = feature.State switch
             {
-                BuildingPresentationState.Unpowered => "building.directorate.command_core.unpowered",
-                BuildingPresentationState.Damaged => "building.directorate.command_core.damaged",
-                BuildingPresentationState.Critical => "building.directorate.command_core.critical",
+                BuildingPresentationState.Unpowered => representations[feature.State],
+                BuildingPresentationState.Damaged => representations[feature.State],
+                BuildingPresentationState.Critical => representations[feature.State],
                 _ => null
             };
             if (attachment is not null)

@@ -47,7 +47,7 @@ public sealed class DirectorateBuildingAssetAuthoringTests
                         static diagnostic =>
                             $"{diagnostic.Code}: {diagnostic.Message}")));
             Assert.Equal(
-                373,
+                401,
                 result.CompiledCount);
 
             RuntimeAssetCatalog catalog =
@@ -86,6 +86,50 @@ public sealed class DirectorateBuildingAssetAuthoringTests
 
             RuntimeMeshData ReadCommandMesh(string suffix) => RuntimeMeshData.FromPayload(
                 catalog.Read(AssetId.Parse("building.directorate.command_core" + suffix)).Payload);
+
+            foreach (string family in new[] { "vehicle_factory", "power_plant", "barracks", "radar" })
+            {
+                string id = "building.directorate." + family;
+                RuntimeMeshData Read(string suffix) => RuntimeMeshData.FromPayload(catalog.Read(AssetId.Parse(id + suffix)).Payload);
+                RuntimeMeshData[] lods = [Read(""), Read(".lod1"), Read(".lod2")];
+                Assert.True(lods[0].Indices.Count > lods[1].Indices.Count);
+                Assert.True(lods[1].Indices.Count > lods[2].Indices.Count);
+                Assert.All(lods, mesh =>
+                {
+                    Assert.True(mesh.HasNormals && mesh.HasUv0 && mesh.HasTangents);
+                    Assert.Single(mesh.Sections);
+                    Assert.Equal("material.directorate.building.structural", Assert.Single(mesh.MaterialIds));
+                    Assert.Equal(-.5f, mesh.Vertices.Min(v => v.Y), precision: 5);
+                    Assert.InRange(mesh.Vertices.Max(v => v.Y), .15f, .56f);
+                    Assert.All(mesh.Vertices, v => Assert.True(float.IsFinite(v.X) && float.IsFinite(v.Y) && float.IsFinite(v.Z)));
+                });
+                foreach (string state in new[] { "foundation", "structural_frame", "partial_shell", "unpowered", "damaged", "critical", "destroyed" })
+                {
+                    RuntimeMeshData mesh = Read("." + state);
+                    Assert.NotEmpty(mesh.Indices);
+                    Assert.True(mesh.HasNormals && mesh.HasUv0 && mesh.HasTangents);
+                    Assert.Single(mesh.Sections);
+                    Assert.True(mesh.Indices.Count < lods[0].Indices.Count);
+                }
+                RuntimeAssetRecord primary = catalog.Get(AssetId.Parse(id));
+                MechanicalMeshValidation.Validate(primary.MechanicalParts, primary.Sockets, lods[0].Indices.Count);
+                if (family == "vehicle_factory")
+                {
+                    Assert.Contains(primary.Sockets, s => s.Name == "motion_loading_door" && MathF.Abs(s.Y + .12f) < 1e-6f && MathF.Abs(s.Z - .4f) < 1e-6f);
+                    Assert.Contains(primary.Sockets, s => s.Name == "motion_overhead_crane" && s.Y == .24f && s.Z == -.05f);
+                    MechanicalMeshPart door = Assert.Single(primary.MechanicalParts.Where(p => p.Motion == MechanicalMotionKind.Door));
+                    // The operational leaf clears the 3m MBT; fixed jambs/lintel leave a real opening.
+                    Assert.True((-.48f + door.Travel + .5f) * 12 > 3);
+                    Assert.DoesNotContain(lods[2].Vertices, v => MathF.Abs(v.X) < .24f && v.Z > .40f && v.Y > -.47f && v.Y < -.15f);
+                    Assert.True(lods[0].Vertices.Max(v => v.Z) * 24 + 7.2f / 2 < 20);
+                }
+                if (family == "radar")
+                    Assert.Contains(primary.MechanicalParts, p => p.Motion == MechanicalMotionKind.Radar);
+                if (family == "power_plant")
+                    Assert.Contains(primary.MechanicalParts, p => p.Motion == MechanicalMotionKind.Fan);
+                Assert.Empty(catalog.Get(AssetId.Parse(id + ".lod1")).MechanicalParts);
+                Assert.Empty(catalog.Get(AssetId.Parse(id + ".lod2")).MechanicalParts);
+            }
 
             foreach (string family in
                      BuildingFamilies)
