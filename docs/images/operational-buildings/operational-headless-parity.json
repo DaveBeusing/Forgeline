@@ -1,0 +1,33 @@
+{
+  "equal": true,
+  "baseline": "kit-headless-final2.json",
+  "current": "operational-match-64.json",
+  "seed": 2026,
+  "ticks": 64,
+  "comparedMatchFields": [
+    "MatchIndex",
+    "Seed",
+    "ExecutedTicks",
+    "LogicalSeconds",
+    "MatchStatus",
+    "Winner",
+    "CompletedAtTick",
+    "Lifecycle",
+    "EntityCount",
+    "PendingCommands",
+    "OpponentWork",
+    "CompletedCargoOrders",
+    "FailedCargoOrders",
+    "RouteFailures",
+    "DeliveredCargoQuantity",
+    "PendingDistributionRequests",
+    "CompletedDistributionRequests",
+    "FailedDistributionRequests",
+    "TotalFuelTransferred",
+    "TotalAmmunitionTransferred",
+    "TotalArtilleryShots",
+    "TotalArtilleryImpacts",
+    "TotalArtilleryAmmunitionConsumed",
+    "Participants"
+  ]
+}

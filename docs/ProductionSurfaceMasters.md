@@ -168,3 +168,11 @@ The [modular environment kit](ModularEnvironmentKit.md) reuses these surface
 masters and one material per LOD. Minerals use cell 11, timber 10, foliage 13,
 concrete 6, steel 1 and warnings 5. No texture/material or alpha-card family is
 added. New normals/UVs compile to tangents through the existing pipeline.
+
+
+The four [operational building families](OperationalBuildingProduction.md)
+also reuse these masters, atlas-cell insets, sRGB Base Color and linear
+Normal/ORM channels. Source geometry adds external windows, manufactured
+roofs/vents, generators/transformers and concave receivers without new maps or
+material records. Compiler-generated tangents, BC7 caps and complete mip chains
+retain existing resource contracts.

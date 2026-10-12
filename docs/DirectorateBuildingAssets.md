@@ -1,10 +1,12 @@
 # Directorate Building and Infrastructure Assets
 
-Twelve building families have new manufactured-bevel LOD0 sources preserving
-their original outer bounds and sockets. The extractor's non-box topology is
-retained. The shared production atlas now has matched native 4096-pixel Base
-Color, Normal and ORM masters. See [Production surfaces](ProductionSurfaceMasters.md)
-for authoring tools, runtime caps and remaining visual acceptance work.
+The Command Core and the four operational families have dedicated editable
+component kits, distinct LODs and family construction/damage/wreck meshes.
+The remaining building sources retain their manufactured geometry and stable
+contracts. All families reuse the native 4096-pixel Directorate Base Color,
+Normal and ORM masters. See [Production surfaces](ProductionSurfaceMasters.md)
+and [operational building production](OperationalBuildingProduction.md) for
+source ownership, dimensional exceptions, native comparisons and open acceptance.
 
 ## Purpose
 
@@ -97,9 +99,9 @@ For completed supported buildings, state is derived from existing ECS components
 
 Brownout and offline power consumers use the unpowered treatment in this baseline because both represent insufficient power for normal operation.
 
-Critical states do not rely on tint alone. Idle, unpowered, damaged, and critical buildings add a shared state-geometry layer. Destroyed buildings use a dedicated collapsed module. Runtime material factors reinforce those shapes but are not the sole signal.
+Critical states do not rely on tint alone. Command Core, Vehicle Factory, Power Plant, Barracks and Radar use dedicated construction, power/damage and collapsed geometry. Other families retain the shared state-geometry layer; idle retains its shared production-capability attachment. Runtime material factors reinforce the shapes.
 
-The current asset runtime has no general skeletal/mechanical animation or effect asset contract. Machinery animation, sparks, smoke, fire, richer emissive behavior, and destruction VFX therefore remain later presentation layers rather than invented simulation state.
+Existing rigid triangle ranges and completed-tick mechanical poses animate the Factory door/gantry, Power cooling rotor and Radar array. Existing bounded VFX provide damage smoke/fire/sparks. Skeletons, physics destruction and new simulation state are not introduced; motion freezes or disables through current idle/unpowered/wreck history.
 
 ## Destruction boundary
 
@@ -237,7 +239,7 @@ Automated coverage verifies:
 
 ## Current boundary
 
-This baseline integrates the required Vertical Slice functions without expanding gameplay mechanics and now carries production Base Color/Normal/ORM material treatment through the existing runtime path. Roads are not player-constructible, rail content remains outside the current slice, and no new economic or power mechanic is introduced. Higher-detail unique hero art, mechanical building animation, emissive animation, audio, repair visuals, and editor-specific road placement can extend the stable contracts later.
+This baseline integrates the required Vertical Slice functions without expanding gameplay mechanics and now carries production Base Color/Normal/ORM material treatment through the existing runtime path. Roads are not player-constructible, rail content remains outside the current slice, and no new economic or power mechanic is introduced. Human art acceptance, sustained performance, emissive animation, audio, repair visuals and editor-specific road placement remain separate work over these stable contracts.
 
 
 ## VFX integration
@@ -261,6 +263,19 @@ State material selection takes precedence over the static primary mesh material,
 The Command Core now uses its dedicated editable modular kit, assembled glTF
 LOD0/1/2 and seven state meshes. Its stable primary identity, gameplay footprint,
 collision proxy, atlas maps and state authority are retained. Only its cosmetic
-foundation reaches the existing ground plane; other buildings keep the shared
+foundation reaches the existing ground plane. The four operational families now
+also have grounded dedicated geometry; other families keep the shared
 construction/state vocabulary. See [Command Core production](CommandCoreProduction.md)
 for dimensions, new anchors, source mapping, provenance and qualification limits.
+
+
+## Operational building production geometry
+
+Factory, Power, Barracks and Radar retain primary/LOD/strategic identities,
+gameplay dimensions, collision references and shared PBR. Their dedicated JSON
+component source exports three LODs and seven state meshes each. Cosmetic bases
+reach the existing normalized Y=-.5 ground plane; horizontal primary envelopes
+and gameplay footprints are retained. Door/crane sockets keep their original
+coordinates; rotor/array anchors use existing Fan/Radar motion contracts.
+See [source/state mapping, native evidence and limits](OperationalBuildingProduction.md).
+The catalog is 401 assets (218 meshes, 56 textures, 127 materials).

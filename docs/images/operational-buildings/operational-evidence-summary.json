@@ -1,0 +1,152 @@
+{
+  "baselineCommit": "eebfbb15006e723109fab269eaba51cda2842265",
+  "captureCommit": "db6a121fbb53804ad533719cec085e56d5d492a2",
+  "baselineRuntime": "73B77E4DB3F1F10A1E1877C8846E1BBE92F6941474AD5AAE5ED194050C59E310",
+  "finalRuntime": "E0DCBED3EFF2407AAD3D141276A85F9F9F0221CFCE67EF30370E220303883191",
+  "matchedCases": [
+    {
+      "key": "VehicleFactoryProduction-1920x1080-Medium-CloseTactical",
+      "beforeCpuMean": 17.590290624999998,
+      "afterCpuMean": 25.122556250000002,
+      "beforeGpuMean": 12.101553066666668,
+      "afterGpuMean": 10.532183999999997,
+      "afterGpuP95": 10.790144,
+      "beforeDraws": 24,
+      "afterDraws": 20,
+      "afterLod1": 0,
+      "afterLod2": 0
+    },
+    {
+      "key": "VehicleFactoryProduction-1920x1080-Medium-NormalGameplay",
+      "beforeCpuMean": 18.759284375,
+      "afterCpuMean": 10.686412499999998,
+      "beforeGpuMean": 17.781155,
+      "afterGpuMean": 11.049815000000004,
+      "afterGpuP95": 11.031744,
+      "beforeDraws": 34,
+      "afterDraws": 34,
+      "afterLod1": 68,
+      "afterLod2": 0
+    },
+    {
+      "key": "VehicleFactoryProduction-1920x1080-Medium-Strategic",
+      "beforeCpuMean": 16.87565,
+      "afterCpuMean": 11.434340624999997,
+      "beforeGpuMean": 14.994007,
+      "afterGpuMean": 11.682225999999996,
+      "afterGpuP95": 11.64544,
+      "beforeDraws": 36,
+      "afterDraws": 36,
+      "afterLod1": 227,
+      "afterLod2": 0
+    },
+    {
+      "key": "PowerPlantProduction-1920x1080-Medium-CloseTactical",
+      "beforeCpuMean": 15.199506249999999,
+      "afterCpuMean": 10.172312499999997,
+      "beforeGpuMean": 14.422616999999999,
+      "afterGpuMean": 10.447871999999997,
+      "afterGpuP95": 10.616832,
+      "beforeDraws": 11,
+      "afterDraws": 15,
+      "afterLod1": 0,
+      "afterLod2": 0
+    },
+    {
+      "key": "PowerPlantProduction-1920x1080-Medium-NormalGameplay",
+      "beforeCpuMean": 15.761406250000004,
+      "afterCpuMean": 10.640812499999997,
+      "beforeGpuMean": 14.691131,
+      "afterGpuMean": 10.908779000000001,
+      "afterGpuP95": 10.945344,
+      "beforeDraws": 33,
+      "afterDraws": 33,
+      "afterLod1": 72,
+      "afterLod2": 0
+    },
+    {
+      "key": "PowerPlantProduction-1920x1080-Medium-Strategic",
+      "beforeCpuMean": 16.965465625,
+      "afterCpuMean": 11.319684375,
+      "beforeGpuMean": 14.964609000000003,
+      "afterGpuMean": 11.560861000000001,
+      "afterGpuP95": 11.659104,
+      "beforeDraws": 35,
+      "afterDraws": 35,
+      "afterLod1": 226,
+      "afterLod2": 0
+    },
+    {
+      "key": "BarracksProduction-1920x1080-Medium-CloseTactical",
+      "beforeCpuMean": 21.236006250000003,
+      "afterCpuMean": 25.048387500000004,
+      "beforeGpuMean": 18.491728,
+      "afterGpuMean": 9.977282,
+      "afterGpuP95": 10.17456,
+      "beforeDraws": 12,
+      "afterDraws": 12,
+      "afterLod1": 0,
+      "afterLod2": 0
+    },
+    {
+      "key": "BarracksProduction-1920x1080-Medium-NormalGameplay",
+      "beforeCpuMean": 15.483328124999998,
+      "afterCpuMean": 10.420362499999998,
+      "beforeGpuMean": 14.477722999999997,
+      "afterGpuMean": 10.685983000000002,
+      "afterGpuP95": 10.877824,
+      "beforeDraws": 34,
+      "afterDraws": 34,
+      "afterLod1": 73,
+      "afterLod2": 0
+    },
+    {
+      "key": "BarracksProduction-1920x1080-Medium-Strategic",
+      "beforeCpuMean": 17.212196874999997,
+      "afterCpuMean": 11.419521875,
+      "beforeGpuMean": 15.208057999999998,
+      "afterGpuMean": 11.580783000000002,
+      "afterGpuP95": 11.637376,
+      "beforeDraws": 36,
+      "afterDraws": 36,
+      "afterLod1": 227,
+      "afterLod2": 0
+    },
+    {
+      "key": "RadarProduction-1920x1080-Medium-CloseTactical",
+      "beforeCpuMean": 14.947074999999998,
+      "afterCpuMean": 9.812981249999998,
+      "beforeGpuMean": 14.328053000000002,
+      "afterGpuMean": 10.147189999999998,
+      "afterGpuP95": 10.35776,
+      "beforeDraws": 11,
+      "afterDraws": 15,
+      "afterLod1": 0,
+      "afterLod2": 0
+    },
+    {
+      "key": "RadarProduction-1920x1080-Medium-NormalGameplay",
+      "beforeCpuMean": 15.866006250000002,
+      "afterCpuMean": 10.543578125,
+      "beforeGpuMean": 14.560594000000002,
+      "afterGpuMean": 10.830668,
+      "afterGpuP95": 10.898688,
+      "beforeDraws": 33,
+      "afterDraws": 33,
+      "afterLod1": 72,
+      "afterLod2": 0
+    },
+    {
+      "key": "RadarProduction-1920x1080-Medium-Strategic",
+      "beforeCpuMean": 23.309984375000006,
+      "afterCpuMean": 11.22666875,
+      "beforeGpuMean": 21.250725000000003,
+      "afterGpuMean": 11.495657999999997,
+      "afterGpuP95": 11.592608,
+      "beforeDraws": 35,
+      "afterDraws": 35,
+      "afterLod1": 226,
+      "afterLod2": 0
+    }
+  ]
+}

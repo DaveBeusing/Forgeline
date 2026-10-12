@@ -586,7 +586,22 @@ limits are documented in [Main Battle Tank production](MainBattleTankProduction.
 `assets/source/world/authoring/environment.kit.json`. `--output` exports in
 isolation; `--update-metadata` explicitly refreshes owned mesh definitions.
 Twenty High/Reduced visual meshes and two shared proxies add 22 catalog records.
-Two ferrous exports replace source paths under existing IDs. The current catalog
-is 373 assets (190 meshes, 56 textures, 127 materials). Compile with the existing
+Two ferrous exports replace source paths under existing IDs. At environment-kit integration the catalog
+was 373 assets (190 meshes, 56 textures, 127 materials). Compile with the existing
 build/validate integrity modes; generated runtime files remain compiler-owned.
 See [source conventions and reproduction](ModularEnvironmentKit.md).
+
+
+## Operational building authoring
+
+`build/Author-OperationalBuildings.py` reads the editable four-family
+`assets/source/buildings/directorate/authoring/operational_buildings.kit.json`.
+Python with NumPy is required. `--output` is isolated; `--update-metadata`
+explicitly refreshes owned bindings. Forty deterministic one-material glTF
+exports replace twelve stable operational LOD source paths and add 28 state
+records. Named component hierarchy, bounds/counts/SHA256 and contiguous rigid
+ranges remain inspectable in the source/export reports. Generic mesh tools
+skip this dedicated source owner. The catalog now has 401 assets (218 meshes,
+56 textures, 127 materials); no new texture/material family is added.
+Compiler build/validate integrity and runtime ownership remain unchanged.
+See [production and qualification](OperationalBuildingProduction.md).
