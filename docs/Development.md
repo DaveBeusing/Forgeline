@@ -31,6 +31,8 @@ do not consume versions. Concurrent PRs must rebase and refresh their version.
 See [PR Versioning](ReleaseVersioning.md) for metadata and artifact identity.
 CI does not create tags or publish releases.
 
+Windows icon resources and package assertions are documented in [Windows application branding](WindowsApplicationBranding.md).
+
 ## Canonical Validation Path
 
 From the repository root:

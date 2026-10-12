@@ -6,6 +6,8 @@ ForgeLine Engine is the custom RTS engine for FORGELINE. Its architecture is opt
 
 It is deliberately not a general-purpose game engine.
 
+Windows application icons remain owned by the Windows platform. The client apphost and native windows embed the same canonical mark; see [Windows application branding](WindowsApplicationBranding.md).
+
 ## Dependency Direction
 
 The intended high-level direction is:

@@ -2,6 +2,7 @@
 
 Build and release identity follows [Release Versioning](docs/ReleaseVersioning.md).
 Each PR increments PATCH once; CI does not automatically create tags or releases.
+Windows executable and native-window identity follow [Application branding](docs/WindowsApplicationBranding.md).
 
 Explicit asset compilation emits live stage and memory progress and supports a flushed JSON-lines log. See [Asset startup diagnostics](docs/AssetStartupDiagnostics.md) to investigate slow launches and cold texture compilation.
 

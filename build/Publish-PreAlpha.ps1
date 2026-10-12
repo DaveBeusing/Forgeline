@@ -55,6 +55,8 @@ function Publish-Client {
         throw "dotnet publish failed with exit code $LASTEXITCODE."
     }
 
+    & "$PSScriptRoot/Test-WindowsApplicationIcon.ps1" -ClientPath (Join-Path $Destination 'ForgeLine.Client.exe')
+
     if (-not (Test-Path $runtimeAssets)) {
         throw "Compiled runtime assets are missing: $runtimeAssets"
     }
