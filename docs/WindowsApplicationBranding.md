@@ -36,6 +36,7 @@ Headless composition and simulation do not acquire icon or window dependencies.
 pwsh ./build/Test-WindowsApplicationIcon.ps1 -ClientPath src/ForgeLine.Client/bin/Release/net10.0-windows/win-x64/ForgeLine.Client.exe
 pwsh ./build/Publish-PreAlpha.ps1 -Configuration Release -VerifyReproducible
 pwsh ./build/Test-WindowsApplicationIcon.ps1 -ClientPath artifacts/prealpha/win-x64/publish/ForgeLine.Client.exe
+pwsh ./build/Invoke-StartupQualification.ps1 -ClientPath artifacts/prealpha/win-x64/publish/ForgeLine.Client.exe -Samples 2 -RequireApplicationIcons
 ```
 
 Publish-PreAlpha runs the resource assertion for every generated publication tree,
@@ -50,6 +51,13 @@ Native integration tests query both actual HWND icons, verify their bitmap sizes
 at 96/144/192/288 DPI, retain handles through handoff and mode switches, and check
 that replaced and closed-window handles no longer resolve. Repeated creation and
 closing exercises ownership without accumulating icons.
+
+The existing packaged startup qualification additionally queries both WM_GETICON
+values while the process runs. RequireApplicationIcons requires at least one valid
+observation per launch and rejects HWND replacement. Probes have bounded native
+message timeouts; ordinary process closure is tolerated without disguising a
+launch with no successful observation. Its interactive-menu and native-first-frame
+gates remain in force. This is also enabled in the existing CI menu step.
 
 ## Artwork updates
 
