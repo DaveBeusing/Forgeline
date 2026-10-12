@@ -147,3 +147,12 @@ tick 32, seed 2026. `EnvironmentKitRepeated` adds 1,000 read-only copied kit
 instances. The [modular kit qualification](ModularEnvironmentKit.md) records
 72 profile/zoom/display rows, six repeated-kit rows, exact backbuffers, compiled
 source identity and the open 60-FPS/borderless-budget/human-art gates.
+
+
+[Industrial building production](IndustrialBuildingProduction.md) records five
+authoritative nine-state scenes, fifteen matched High/1080 baseline cases and
+180 final native cases across three profiles, three zooms and four backbuffer
+sizes. Fourteen original PNGs support visual review; complete portable timing,
+resource, camera and hash metadata are included. Structural equality, source
+identity and zero binding/fallback failures do not establish human art signoff,
+sustained FPS, moving LOD quality or physical-monitor DPI acceptance.

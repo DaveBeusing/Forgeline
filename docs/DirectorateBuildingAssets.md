@@ -101,7 +101,7 @@ For completed supported buildings, state is derived from existing ECS components
 
 Brownout and offline power consumers use the unpowered treatment in this baseline because both represent insufficient power for normal operation.
 
-Critical states do not rely on tint alone. Idle, unpowered, damaged, and critical buildings add a shared state-geometry layer. Destroyed buildings use a dedicated collapsed module. Runtime material factors reinforce those shapes but are not the sole signal.
+Critical states do not rely on tint alone. Command Core and the five industrial families use dedicated construction, damaged/critical and collapsed geometry; industrial idle and unpowered attachments are also family-specific. Other families retain shared status/wreck modules. Runtime material factors reinforce those shapes but are not the sole signal.
 
 Existing mechanical and VFX contracts remain presentation-owned. The five
 industrial production kits introduce static state geometry and inspection anchors,
@@ -267,8 +267,9 @@ State material selection takes precedence over the static primary mesh material,
 The Command Core now uses its dedicated editable modular kit, assembled glTF
 LOD0/1/2 and seven state meshes. Its stable primary identity, gameplay footprint,
 collision proxy, atlas maps and state authority are retained. Only its cosmetic
-foundation reaches the existing ground plane; other buildings keep the shared
-construction/state vocabulary. See [Command Core production](CommandCoreProduction.md)
+foundation reaches the existing ground plane; the five industrial foundations
+now also reach that plane. Remaining families keep the shared construction/state
+vocabulary. See [Command Core production](CommandCoreProduction.md)
 for dimensions, new anchors, source mapping, provenance and qualification limits.
 
 ## Industrial production geometry
