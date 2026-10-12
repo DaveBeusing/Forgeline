@@ -117,7 +117,7 @@ public sealed class DirectorateBuildingAssetAuthoringTests
                 {
                     Assert.Contains(primary.Sockets, s => s.Name == "motion_loading_door" && MathF.Abs(s.Y + .12f) < 1e-6f && MathF.Abs(s.Z - .4f) < 1e-6f);
                     Assert.Contains(primary.Sockets, s => s.Name == "motion_overhead_crane" && s.Y == .24f && s.Z == -.05f);
-                    MechanicalMeshPart door = Assert.Single(primary.MechanicalParts.Where(p => p.Motion == MechanicalMotionKind.Door));
+                    MechanicalMeshPart door = Assert.Single(primary.MechanicalParts, p => p.Motion == MechanicalMotionKind.Door);
                     // The operational leaf clears the 3m MBT; fixed jambs/lintel leave a real opening.
                     Assert.True((-.48f + door.Travel + .5f) * 12 > 3);
                     Assert.DoesNotContain(lods[2].Vertices, v => MathF.Abs(v.X) < .24f && v.Z > .40f && v.Y > -.47f && v.Y < -.15f);

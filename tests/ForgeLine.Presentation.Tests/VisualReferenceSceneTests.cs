@@ -46,6 +46,36 @@ public sealed class VisualReferenceSceneTests
                 instance.WorldFeature.IsSpecified || instance.InfrastructureFeature.IsSpecified || instance.VfxFeature.IsSpecified));
     }
 
+    [Theory]
+    [InlineData(VisualReferenceSceneKind.VehicleFactoryProduction, 9, 26, 12, 24)]
+    [InlineData(VisualReferenceSceneKind.PowerPlantProduction, 8, 16, 10, 16)]
+    [InlineData(VisualReferenceSceneKind.BarracksProduction, 9, 18, 8, 16)]
+    [InlineData(VisualReferenceSceneKind.RadarProduction, 8, 14, 18, 14)]
+    public void OperationalGalleriesRetainPhysicalScaleAndAuthorizedStates(VisualReferenceSceneKind kind, int count, int width, int height, int depth)
+    {
+        var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+        var scene = VisualReferenceScene.Create(kind, terrain);
+        var buildings = scene.Snapshot.Instances.ToArray().Where(x => x.BuildingFeature.IsSpecified).ToArray();
+        Assert.Equal(count, buildings.Length);
+        Assert.Equal(count, buildings.Select(x => x.BuildingFeature.State).Distinct().Count());
+        Assert.Equal(3, buildings.Count(x => x.BuildingFeature.IsConstruction));
+        Assert.All(buildings, x => Assert.Equal(new System.Numerics.Vector3(width, height, depth), x.Transform.Scale));
+        Assert.All(buildings.Where(x => x.BuildingFeature.IsDestroyed), x => Assert.False(x.Selectable.IsSelectable));
+        Assert.All(buildings.Where(x => x.BuildingFeature.State == BuildingPresentationState.Unpowered), x => Assert.Equal(0, x.MechanicalPose.ActiveSeconds));
+    }
+
+    [Fact]
+    public void RepeatedOperationalGalleryContainsEqualFamilyLoads()
+    {
+        var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+        var scene = VisualReferenceScene.Create(VisualReferenceSceneKind.OperationalBuildingsRepeated, terrain);
+        var buildings = scene.Snapshot.Instances.ToArray().Where(x => x.BuildingFeature.IsSpecified).ToArray();
+        Assert.Equal(1000, buildings.Length);
+        Assert.Equal(4, buildings.Select(x => x.BuildingFeature.Building).Distinct().Count());
+        Assert.All(buildings.GroupBy(x => x.BuildingFeature.Building), group => Assert.Equal(250, group.Count()));
+        Assert.All(buildings, x => Assert.Equal(BuildingPresentationState.Operational, x.BuildingFeature.State));
+    }
+
     [Fact]
     public void KitReviewContainsAuthenticStaticDressingAndBoundedRepeatedGeometry()
     {
