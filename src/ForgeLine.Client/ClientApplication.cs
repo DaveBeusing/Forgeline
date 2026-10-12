@@ -2831,7 +2831,7 @@ internal sealed class ClientApplication
                 runtimeRoot, cancellationToken, requireIntegrity: true);
 
         Console.WriteLine(
-            $"[assets:runtime] manifest=loaded assets={catalog.AssetIds.Count} root=\"{runtimeRoot}\" manifest=validated gameplay=deferred");
+            $"[assets:runtime] mode=player manifest=loaded assets={catalog.AssetIds.Count} root=\"{runtimeRoot}\" manifest=validated gameplay=deferred");
         cancellationToken.ThrowIfCancellationRequested();
         return catalog;
     }

@@ -298,6 +298,149 @@ public sealed class AssetPipelineTests
             record.RuntimePath);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void DamagedCachedPayloadIsDetectedAndOnlyThatOutputIsRebuilt(bool truncate)
+    {
+        using var workspace = CreateIntegrityWorkspace();
+        Assert.True(workspace.Compile().Success);
+        var catalog = RuntimeAssetCatalog.Load(workspace.RuntimeRoot);
+        var id = AssetId.Parse("texture.test.a");
+        string path = Path.Combine(workspace.RuntimeRoot, catalog.Get(id).RuntimePath);
+        byte[] bytes = File.ReadAllBytes(path);
+        if (truncate) { File.WriteAllBytes(path, bytes[..^1]); }
+        else { bytes[^1] ^= 1; File.WriteAllBytes(path, bytes); }
+        Assert.Throws<InvalidDataException>(() => catalog.Read(id));
+        var repaired = workspace.Compile();
+        Assert.True(repaired.Success);
+        Assert.Equal(1, repaired.CompiledCount);
+        Assert.Equal(1, repaired.SkippedCount);
+        Assert.True(RuntimeAssetQualification.Run(workspace.RuntimeRoot, requireIntegrity: true).Success);
+    }
+
+    [Theory]
+    [InlineData("signature")]
+    [InlineData("version")]
+    [InlineData("duplicate")]
+    [InlineData("dependency")]
+    [InlineData("runtime-version")]
+    [InlineData("compiler-version")]
+    [InlineData("missing-integrity")]
+    public void RejectsIncompatibleOrDamagedDeploymentManifestAndCompilerRecovers(string fault)
+    {
+        using var workspace = CreateIntegrityWorkspace();
+        Assert.True(workspace.Compile().Success);
+        var manifest = RuntimeAssetCatalog.Load(workspace.RuntimeRoot).Manifest;
+        manifest = fault switch
+        {
+            "signature" => manifest with { ContentSignature = new string('0', 64) },
+            "version" => RuntimeAssetIntegrity.SealManifest(manifest with { FormatVersion = 999 }),
+            "duplicate" => RuntimeAssetIntegrity.SealManifest(manifest with { Assets = [manifest.Assets[0], manifest.Assets[0]] }),
+            "dependency" => RuntimeAssetIntegrity.SealManifest(manifest with { Assets = [manifest.Assets[0] with { Dependencies = ["texture.test.missing"] }, manifest.Assets[1]] }),
+            "runtime-version" => RuntimeAssetIntegrity.SealManifest(manifest with { Assets = [manifest.Assets[0] with { RuntimeVersion = 999 }, manifest.Assets[1]] }),
+            "compiler-version" => RuntimeAssetIntegrity.SealManifest(manifest with { CompilerVersion = "other" }),
+            "missing-integrity" => manifest with { IntegrityVersion = 0, ContentSignature = string.Empty },
+            _ => throw new InvalidOperationException(),
+        };
+        File.WriteAllText(Path.Combine(workspace.RuntimeRoot, RuntimeAssetCatalog.ManifestFileName),
+            JsonSerializer.Serialize(manifest, RuntimeAssetCatalog.CreateJsonOptions()));
+        Assert.False(RuntimeAssetQualification.Run(workspace.RuntimeRoot, requireIntegrity: true).Success);
+        Assert.Throws<InvalidDataException>(() => RuntimeAssetCatalog.LoadCancellable(workspace.RuntimeRoot,
+            CancellationToken.None, requireIntegrity: true));
+        var recovered = workspace.Compile();
+        Assert.True(recovered.Success);
+        Assert.Equal(2, recovered.CompiledCount);
+    }
+
+    [Fact]
+    public void CompilerVersionAndImportSettingsInvalidateCache()
+    {
+        using var workspace = CreateIntegrityWorkspace();
+        Assert.True(workspace.Compile().Success);
+        var manifest = RuntimeAssetCatalog.Load(workspace.RuntimeRoot).Manifest;
+        var old = RuntimeAssetIntegrity.SealManifest(manifest with
+        {
+            CompilerVersion = "previous",
+            Assets = manifest.Assets.Select(static asset => asset with { CompilerVersion = "previous" }).ToArray(),
+        });
+        File.WriteAllText(Path.Combine(workspace.RuntimeRoot, RuntimeAssetCatalog.ManifestFileName),
+            JsonSerializer.Serialize(old, RuntimeAssetCatalog.CreateJsonOptions()));
+        Assert.Equal(2, workspace.Compile().CompiledCount);
+        workspace.WriteAsset("a.asset.json", """{"id":"texture.test.a","type":"texture","source":"a.tga","textureGenerateMipmaps":false}""");
+        var changed = workspace.Compile();
+        Assert.True(changed.Success);
+        Assert.Equal(1, changed.CompiledCount);
+        Assert.Equal(1, changed.SkippedCount);
+    }
+
+    [Fact]
+    public async Task ConcurrentCleanAndIncrementalWritersSerializeAndLeaveQualifiedCache()
+    {
+        using var workspace = CreateIntegrityWorkspace();
+        Task<AssetCompilationResult> first = Task.Run(() => workspace.Compile(clean: true));
+        Task<AssetCompilationResult> second = Task.Run(() => workspace.Compile());
+        Assert.All(await Task.WhenAll(first, second), static result => Assert.True(result.Success));
+        Assert.True(RuntimeAssetQualification.Run(workspace.RuntimeRoot, requireIntegrity: true).Success);
+        Assert.Equal(0, workspace.Compile().CompiledCount);
+    }
+
+    [Fact]
+    public void InterruptedGenerationIsRecoveredAndCleanBuildIsDeterministic()
+    {
+        using var workspace = CreateIntegrityWorkspace();
+        Assert.True(workspace.Compile().Success);
+        string manifestPath = Path.Combine(workspace.RuntimeRoot, RuntimeAssetCatalog.ManifestFileName);
+        byte[] originalManifest = File.ReadAllBytes(manifestPath);
+        var catalog = RuntimeAssetCatalog.Load(workspace.RuntimeRoot);
+        var record = catalog.Get(AssetId.Parse("texture.test.a"));
+        string path = Path.Combine(workspace.RuntimeRoot, record.RuntimePath);
+        byte[] originalAsset = File.ReadAllBytes(path);
+        File.WriteAllBytes(path + ".interrupted.tmp", [1, 2, 3]);
+        File.WriteAllBytes(path, originalAsset[..^1]);
+        var recovered = workspace.Compile();
+        Assert.True(recovered.Success);
+        Assert.Equal(1, recovered.CompiledCount);
+        Assert.Equal(originalAsset, File.ReadAllBytes(path));
+        Assert.Equal(originalManifest, File.ReadAllBytes(manifestPath));
+        Assert.True(workspace.Compile(clean: true).Success);
+        Assert.Equal(originalManifest, File.ReadAllBytes(manifestPath));
+        Assert.Equal(originalAsset, File.ReadAllBytes(path));
+        Assert.False(File.Exists(path + ".interrupted.tmp"));
+        Directory.Delete(workspace.SourceRoot, recursive: true);
+        Assert.True(RuntimeAssetQualification.Run(workspace.RuntimeRoot, requireIntegrity: true).Success);
+    }
+
+    [Fact]
+    public void SourceChangeRebuildsTransitiveDependenciesAndPreservesUnrelatedOutput()
+    {
+        using var workspace = CreateIntegrityWorkspace();
+        workspace.WriteAsset("b.asset.json", """{"id":"texture.test.b","type":"texture","source":"b.tga","dependencies":["texture.test.a"]}""");
+        workspace.WriteAsset("c.asset.json", """{"id":"texture.test.c","type":"texture","source":"b.tga","dependencies":["texture.test.b"]}""");
+        workspace.WriteAsset("d.asset.json", """{"id":"texture.test.d","type":"texture","source":"b.tga"}""");
+        Assert.Equal(4, workspace.Compile().CompiledCount);
+        var catalog = RuntimeAssetCatalog.Load(workspace.RuntimeRoot);
+        var unrelated = catalog.Get(AssetId.Parse("texture.test.d"));
+        workspace.WriteTga("a.tga", 20, 30, 40, 255);
+        var changed = workspace.Compile();
+        Assert.True(changed.Success);
+        Assert.Equal(3, changed.CompiledCount);
+        Assert.Equal(1, changed.SkippedCount);
+        Assert.Equal(unrelated.RuntimeHash, RuntimeAssetCatalog.Load(workspace.RuntimeRoot)
+            .Get(AssetId.Parse("texture.test.d")).RuntimeHash);
+        Assert.Equal(0, workspace.Compile().CompiledCount);
+    }
+
+    private static AssetWorkspace CreateIntegrityWorkspace()
+    {
+        var workspace = new AssetWorkspace();
+        workspace.WriteTga("a.tga", 1, 2, 3, 255);
+        workspace.WriteTga("b.tga", 4, 5, 6, 255);
+        workspace.WriteAsset("a.asset.json", """{"id":"texture.test.a","type":"texture","source":"a.tga"}""");
+        workspace.WriteAsset("b.asset.json", """{"id":"texture.test.b","type":"texture","source":"b.tga"}""");
+        return workspace;
+    }
+
     private sealed class AssetWorkspace : IDisposable
     {
         private readonly string root =
