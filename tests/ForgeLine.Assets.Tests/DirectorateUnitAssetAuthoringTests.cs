@@ -89,7 +89,7 @@ public sealed class DirectorateUnitAssetAuthoringTests
             Assert.Contains(tankRecord.Sockets, s => s.Name == "recoil_anchor" && s.Y == .16f && s.Z == .16f);
             foreach (var part in tankRecord.MechanicalParts.Where(p => p.Motion == MechanicalMotionKind.Wheel))
             {
-                AssetSocket pivot = Assert.Single(tankRecord.Sockets.Where(s => s.Name == part.Socket));
+                AssetSocket pivot = Assert.Single(tankRecord.Sockets, s => s.Name == part.Socket);
                 var vertices = tankLods[0].Indices.Skip(part.FirstIndex).Take(part.IndexCount)
                     .Select(i => tankLods[0].Vertices[(int)i]).ToArray();
                 Assert.InRange(pivot.X, vertices.Min(v => v.X), vertices.Max(v => v.X));
