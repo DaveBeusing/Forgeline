@@ -14,4 +14,11 @@ public readonly record struct TerrainRenderDiagnostics(
 {
     public bool SurfaceDetailEnabled { get; init; }
     public int RootSignatureDwords { get; init; }
+    public int ResidentChunks { get; init; }
+    public int RequiredChunks { get; init; }
+    public long ResidentGeometryBytes { get; init; }
+    public long ResidentControlBytes { get; init; }
+    public long ChunkUploads { get; init; }
+    public long ChunkEvictions { get; init; }
+    public double ResidencyCpuMilliseconds { get; init; }
 }

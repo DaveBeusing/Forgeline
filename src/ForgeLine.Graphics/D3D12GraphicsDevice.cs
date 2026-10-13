@@ -17,6 +17,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
     private readonly int _ownerThreadId = Environment.CurrentManagedThreadId;
     private readonly GraphicsResourceRetirement _resources = new();
     private bool _recording;
+    public bool IsRecording { get { ThrowIfDisposed(); return _recording; } }
     private GraphicsDeviceException? _failure;
     private long _fenceWaitCount;
     private long _submissionFaultCount;
