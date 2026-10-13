@@ -149,6 +149,18 @@ instances. The [modular kit qualification](ModularEnvironmentKit.md) records
 source identity and the open 60-FPS/borderless-budget/human-art gates.
 
 
+[Operational building production](OperationalBuildingProduction.md) records
+12 matched before cases, the final 144-case native four-family matrix, six
+1,000-building repeated cases and two access views. The opt-in scenes are
+VehicleFactoryProduction, PowerPlantProduction, BarracksProduction,
+RadarProduction and OperationalBuildingsRepeated. They use actual gameplay
+scales and existing authoritative extraction rather than alternate state logic.
+Capture-only `-YawDegrees 225` exposes the factory portal; the default 45-degree
+camera remains bit-identical and nondefault yaw is in the recorded camera/key.
+Use clean source identity, rebuilt binaries and fresh output roots. Identical
+repeat pixels and dimensions are structural evidence; art, live motion/LOD,
+sustained FPS and physical-window acceptance remain separate gates.
+
 [Industrial building production](IndustrialBuildingProduction.md) records five
 authoritative nine-state scenes, fifteen matched High/1080 baseline cases and
 180 final native cases across three profiles, three zooms and four backbuffer

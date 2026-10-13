@@ -598,6 +598,20 @@ build/validate integrity modes; generated runtime files remain compiler-owned.
 See [source conventions and reproduction](ModularEnvironmentKit.md).
 
 
+## Operational building authoring
+
+`build/Author-OperationalBuildings.py` reads the editable four-family
+`assets/source/buildings/directorate/authoring/operational_buildings.kit.json`.
+Python with NumPy is required. `--output` is isolated; `--update-metadata`
+explicitly refreshes owned bindings. Forty deterministic one-material glTF
+exports replace twelve stable operational LOD source paths and add 28 state
+records. Named component hierarchy, bounds/counts/SHA256 and contiguous rigid
+ranges remain inspectable in the source/export reports. Generic mesh tools
+skip this dedicated source owner. At operational qualification the catalog had 401 assets (218 meshes,
+56 textures, 127 materials); no new texture/material family is added.
+Compiler build/validate integrity and runtime ownership remain unchanged.
+See [production and qualification](OperationalBuildingProduction.md).
+
 ## Industrial building authoring
 
 `build/Author-IndustrialBuildings.py` requires Python with NumPy and reads the
@@ -623,8 +637,12 @@ and parent/shared-module inspection metadata. Existing primary IDs, collision
 references, material/texture masters and canonical asset compiler are retained.
 The general detail authoring pass skips this owned source subtree.
 
-Current catalog: 437 assets (254 meshes, 56 textures, 127 materials), 61,747,374
+Historical logistics qualification catalog: 437 assets (254 meshes, 56 textures, 127 materials), 61,747,374
 compiled payload bytes. Logistics adds 24 mesh state records and no new texture
 or material. Static anchors are baked into the source/compiled metadata and do
 not own vehicle movement or docking. See
 [source mapping, reproduction and qualification](LogisticsBuildingProduction.md).
+
+The integrated operational, industrial and logistics catalog contains 465 assets
+(282 meshes, 56 textures and 127 materials). All dedicated source owners and
+state mappings are retained. Qualification totals describe recorded revisions.

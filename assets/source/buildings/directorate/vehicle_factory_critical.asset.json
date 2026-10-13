@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.vehicle_factory.critical",
+  "type": "mesh",
+  "source": "sources/operational/vehicle_factory_critical.gltf",
+  "materialReferences": [
+    "material.directorate.building.critical"
+  ]
+}

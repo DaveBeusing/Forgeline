@@ -74,7 +74,7 @@ def author():
         if definition['id'] not in targets:
             continue
         # This family has dedicated component/LOD sources, not retained box fittings.
-        if definition['id'].startswith(('building.directorate.command_core', 'unit.directorate.main_battle_tank')) or '/logistics/' in definition.get('source', ''):
+        if definition['id'].startswith(('building.directorate.command_core', 'unit.directorate.main_battle_tank')) or definition['source'].replace('\\','/').startswith('sources/operational/') or '/logistics/' in definition.get('source', '').replace('\\', '/'):
             continue
         source = (meta.parent/definition['source']).resolve()
         reduced = '.lod' in definition['id']

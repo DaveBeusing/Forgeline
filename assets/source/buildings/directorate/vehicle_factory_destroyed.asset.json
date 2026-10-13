@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.vehicle_factory.destroyed",
+  "type": "mesh",
+  "source": "sources/operational/vehicle_factory_destroyed.gltf",
+  "materialReferences": [
+    "material.directorate.building.destroyed"
+  ]
+}

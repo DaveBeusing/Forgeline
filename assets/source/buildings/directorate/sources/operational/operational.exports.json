@@ -1,0 +1,1002 @@
+{
+  "vehicle_factory.lod0": {
+    "vertices": 1080,
+    "triangles": 540,
+    "minimum": [
+      -0.47999998927116394,
+      -0.5,
+      -0.38999998569488525
+    ],
+    "maximum": [
+      0.47999998927116394,
+      0.41999998688697815,
+      0.49000000953674316
+    ],
+    "sha256": "7ad961942521bd0990108ac335a08ed4a3be5f7586d775468b64f4f2aed57866",
+    "groups": [
+      {
+        "name": "body",
+        "firstIndex": 0,
+        "indexCount": 1152,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "loading_door",
+        "firstIndex": 1152,
+        "indexCount": 216,
+        "parent": -1,
+        "motion": "door",
+        "socket": "motion_loading_door",
+        "rate": 1,
+        "travel": 0.35
+      },
+      {
+        "name": "overhead_crane",
+        "firstIndex": 1368,
+        "indexCount": 252,
+        "parent": -1,
+        "motion": "crane",
+        "socket": "motion_overhead_crane",
+        "rate": 0.25,
+        "travel": 0.25
+      }
+    ]
+  },
+  "vehicle_factory.lod1": {
+    "vertices": 480,
+    "triangles": 240,
+    "minimum": [
+      -0.47999998927116394,
+      -0.5,
+      -0.38999998569488525
+    ],
+    "maximum": [
+      0.47999998927116394,
+      0.41999998688697815,
+      0.49000000953674316
+    ],
+    "sha256": "7e70454f8082e58c9b419159bb8e06096eac5cf81de1fe8af7a3d985afc09ba4",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 720,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "vehicle_factory.lod2": {
+    "vertices": 408,
+    "triangles": 204,
+    "minimum": [
+      -0.47999998927116394,
+      -0.5,
+      -0.38999998569488525
+    ],
+    "maximum": [
+      0.47999998927116394,
+      0.41999998688697815,
+      0.49000000953674316
+    ],
+    "sha256": "679208bd408f6f813a1165f4bfb8bd220648032b541e9b09260a721b1fbb282f",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 612,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "vehicle_factory.foundation": {
+    "vertices": 24,
+    "triangles": 12,
+    "minimum": [
+      -0.47999998927116394,
+      -0.5,
+      -0.38999998569488525
+    ],
+    "maximum": [
+      0.47999998927116394,
+      -0.4699999988079071,
+      0.49000000953674316
+    ],
+    "sha256": "adf055a5c0a7ae6ad21d51db4c798cb8a8364a9cf8fe3bd7e88d4d63dadaf574",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 36,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "vehicle_factory.structural_frame": {
+    "vertices": 216,
+    "triangles": 108,
+    "minimum": [
+      -0.47999998927116394,
+      -0.5,
+      -0.38999998569488525
+    ],
+    "maximum": [
+      0.47999998927116394,
+      0.35499998927116394,
+      0.49000000953674316
+    ],
+    "sha256": "20204c8a0463c996743468d4b0d6cbede8c81fdd22741bff6815effceb3882e6",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 324,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "vehicle_factory.partial_shell": {
+    "vertices": 384,
+    "triangles": 192,
+    "minimum": [
+      -0.47999998927116394,
+      -0.5,
+      -0.38999998569488525
+    ],
+    "maximum": [
+      0.47999998927116394,
+      0.35499998927116394,
+      0.49000000953674316
+    ],
+    "sha256": "d176aea98e3a7b867f56f4487025ceaa60301be6fd1d32188170af160d224cf1",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 576,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "vehicle_factory.unpowered": {
+    "vertices": 24,
+    "triangles": 12,
+    "minimum": [
+      -0.4300000071525574,
+      -0.3799999952316284,
+      0.4650000035762787
+    ],
+    "maximum": [
+      -0.30000001192092896,
+      -0.18000000715255737,
+      0.4749999940395355
+    ],
+    "sha256": "03864ca06dfe932f62e14c8284a1a5fa71ebb2e3ed3af7d8575c8b358a745c52",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 36,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "vehicle_factory.damaged": {
+    "vertices": 84,
+    "triangles": 48,
+    "minimum": [
+      -0.4000000059604645,
+      -0.44999998807907104,
+      -0.3100000023841858
+    ],
+    "maximum": [
+      -0.23000000417232513,
+      -0.2620428800582886,
+      -0.22691884636878967
+    ],
+    "sha256": "55010cff2baf36b13c7e8adcae07b90ccaa18417abb33e545627b208bdd78c23",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 144,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "vehicle_factory.critical": {
+    "vertices": 184,
+    "triangles": 92,
+    "minimum": [
+      -0.41999998688697815,
+      -0.4558138847351074,
+      0.3100000023841858
+    ],
+    "maximum": [
+      0.40646111965179443,
+      -0.2041861116886139,
+      0.4376216530799866
+    ],
+    "sha256": "a39e658c6ce44a4115b59b2242991497b21ca8394f3095927ace049d14ace809",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 276,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "vehicle_factory.destroyed": {
+    "vertices": 180,
+    "triangles": 96,
+    "minimum": [
+      -0.47999998927116394,
+      -0.5,
+      -0.38999998569488525
+    ],
+    "maximum": [
+      0.47999998927116394,
+      -0.17000000178813934,
+      0.49000000953674316
+    ],
+    "sha256": "23d97a74b39c2929c23e3cca25357345d57f506b2f8953e58c9bfeb6c5cc67c3",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 288,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "power_plant.lod0": {
+    "vertices": 1984,
+    "triangles": 1016,
+    "minimum": [
+      -0.4300000071525574,
+      -0.5,
+      -0.3400000035762787
+    ],
+    "maximum": [
+      0.41999998688697815,
+      0.550000011920929,
+      0.4699999988079071
+    ],
+    "sha256": "b0ed0635a956e98c8909f03fd39035f4d473a977bd471ddca56c16927dcff8a7",
+    "groups": [
+      {
+        "name": "body",
+        "firstIndex": 0,
+        "indexCount": 2724,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "cooling_fan",
+        "firstIndex": 2724,
+        "indexCount": 324,
+        "parent": -1,
+        "motion": "fan",
+        "socket": "motion_cooling_fan",
+        "rate": 2.2,
+        "travel": 0
+      }
+    ]
+  },
+  "power_plant.lod1": {
+    "vertices": 952,
+    "triangles": 488,
+    "minimum": [
+      -0.4300000071525574,
+      -0.5,
+      -0.3400000035762787
+    ],
+    "maximum": [
+      0.41999998688697815,
+      0.550000011920929,
+      0.4699999988079071
+    ],
+    "sha256": "4c35fd2a0922e88d4b7fe66b5000bbb48ec1692d99aaa81b76c14bd04a5a5686",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 1464,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "power_plant.lod2": {
+    "vertices": 360,
+    "triangles": 180,
+    "minimum": [
+      -0.4300000071525574,
+      -0.5,
+      -0.3400000035762787
+    ],
+    "maximum": [
+      0.41999998688697815,
+      0.550000011920929,
+      0.4699999988079071
+    ],
+    "sha256": "99e92d2b580225bc2b666184588975f1152efe3d49a298e8428c3cc58fd43208",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 540,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "power_plant.foundation": {
+    "vertices": 24,
+    "triangles": 12,
+    "minimum": [
+      -0.4300000071525574,
+      -0.5,
+      -0.3400000035762787
+    ],
+    "maximum": [
+      0.41999998688697815,
+      -0.4699999988079071,
+      0.4699999988079071
+    ],
+    "sha256": "df9de5e02020b66c69777d42edb1da78631b88cc02208244af9e81a064f1d16f",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 36,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "power_plant.structural_frame": {
+    "vertices": 216,
+    "triangles": 108,
+    "minimum": [
+      -0.4300000071525574,
+      -0.5,
+      -0.3400000035762787
+    ],
+    "maximum": [
+      0.41999998688697815,
+      0.48500001430511475,
+      0.4699999988079071
+    ],
+    "sha256": "a42a7ab69442529d05a77288f4abecbedd03d235390ffd086313798041b24586",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 324,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "power_plant.partial_shell": {
+    "vertices": 312,
+    "triangles": 156,
+    "minimum": [
+      -0.4300000071525574,
+      -0.5,
+      -0.3400000035762787
+    ],
+    "maximum": [
+      0.41999998688697815,
+      0.48500001430511475,
+      0.4699999988079071
+    ],
+    "sha256": "14e4c1f607dce8d47f0fe1a3a02afc33bb089e6ff5b569321e80c36c299d8231",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 468,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "power_plant.unpowered": {
+    "vertices": 24,
+    "triangles": 12,
+    "minimum": [
+      -0.3799999952316284,
+      -0.3799999952316284,
+      0.4449999928474426
+    ],
+    "maximum": [
+      -0.25,
+      -0.18000000715255737,
+      0.45500001311302185
+    ],
+    "sha256": "522b8489f445770bec22a4ecc658636436d28701e8d33c092af4a8f7a311e891",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 36,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "power_plant.damaged": {
+    "vertices": 84,
+    "triangles": 48,
+    "minimum": [
+      -0.3499999940395355,
+      -0.44999998807907104,
+      -0.25999999046325684
+    ],
+    "maximum": [
+      -0.18000000715255737,
+      -0.2620428800582886,
+      -0.1769188493490219
+    ],
+    "sha256": "1d324e3543456c03b416cc126f05d143c1b8685594f7d042ead52e6724ce39d0",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 144,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "power_plant.critical": {
+    "vertices": 184,
+    "triangles": 92,
+    "minimum": [
+      -0.3700000047683716,
+      -0.4558138847351074,
+      0.28999999165534973
+    ],
+    "maximum": [
+      0.34646111726760864,
+      -0.2041861116886139,
+      0.4176216423511505
+    ],
+    "sha256": "5e76d9f398d1537923acad65c52f0894513c9273c3afe8bfed6553bb933a8836",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 276,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "power_plant.destroyed": {
+    "vertices": 316,
+    "triangles": 164,
+    "minimum": [
+      -0.4300000071525574,
+      -0.5,
+      -0.3400000035762787
+    ],
+    "maximum": [
+      0.41999998688697815,
+      -0.24831195175647736,
+      0.4699999988079071
+    ],
+    "sha256": "9cfb5a5a1636817dd45f90ba85a27e0239740ec2690935a6e5497b4f9143cf92",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 492,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "barracks.lod0": {
+    "vertices": 564,
+    "triangles": 276,
+    "minimum": [
+      -0.4300000071525574,
+      -0.5,
+      -0.4099999964237213
+    ],
+    "maximum": [
+      0.4300000071525574,
+      0.1599999964237213,
+      0.41999998688697815
+    ],
+    "sha256": "95a6f7c0352268d9527e588ad041d20277917e6da2a033c79dd2d684d86033f2",
+    "groups": [
+      {
+        "name": "body",
+        "firstIndex": 0,
+        "indexCount": 828,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "barracks.lod1": {
+    "vertices": 276,
+    "triangles": 140,
+    "minimum": [
+      -0.4300000071525574,
+      -0.5,
+      -0.4099999964237213
+    ],
+    "maximum": [
+      0.4300000071525574,
+      0.1599999964237213,
+      0.41999998688697815
+    ],
+    "sha256": "a7f96daee901b323ba4467e58eb92006908026a916f9bb80de9c1a442e6b0f09",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 420,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "barracks.lod2": {
+    "vertices": 180,
+    "triangles": 92,
+    "minimum": [
+      -0.4300000071525574,
+      -0.5,
+      -0.4099999964237213
+    ],
+    "maximum": [
+      0.4300000071525574,
+      0.1599999964237213,
+      0.41999998688697815
+    ],
+    "sha256": "f5276ca3758cbcfc559a711e97879296347547933868f11d61c3e7a563f0abb5",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 276,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "barracks.foundation": {
+    "vertices": 24,
+    "triangles": 12,
+    "minimum": [
+      -0.4300000071525574,
+      -0.5,
+      -0.4099999964237213
+    ],
+    "maximum": [
+      0.4300000071525574,
+      -0.4699999988079071,
+      0.41999998688697815
+    ],
+    "sha256": "8410e875e2e727b573b83a9e16ca948a2c2a9e57b77de94ce9e476c9ecaa0fff",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 36,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "barracks.structural_frame": {
+    "vertices": 216,
+    "triangles": 108,
+    "minimum": [
+      -0.4300000071525574,
+      -0.5,
+      -0.4099999964237213
+    ],
+    "maximum": [
+      0.4300000071525574,
+      0.0949999988079071,
+      0.41999998688697815
+    ],
+    "sha256": "3cb9d1627e2f106c6dffa98e6161acf67e8e6d3f033c5a99bc246b74305f4f78",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 324,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "barracks.partial_shell": {
+    "vertices": 324,
+    "triangles": 164,
+    "minimum": [
+      -0.4300000071525574,
+      -0.5,
+      -0.4099999964237213
+    ],
+    "maximum": [
+      0.4300000071525574,
+      0.1599999964237213,
+      0.41999998688697815
+    ],
+    "sha256": "70b72ca49ddd210801f8b533dec219e00d5d12819dfb06ae8b8823557ad5009b",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 492,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "barracks.unpowered": {
+    "vertices": 24,
+    "triangles": 12,
+    "minimum": [
+      -0.3799999952316284,
+      -0.3799999952316284,
+      0.39500001072883606
+    ],
+    "maximum": [
+      -0.25,
+      -0.18000000715255737,
+      0.4050000011920929
+    ],
+    "sha256": "8f8fc482f6759599b7005ee5fc4c8b75952280a893416196c30049ad4ff7b1c3",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 36,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "barracks.damaged": {
+    "vertices": 84,
+    "triangles": 48,
+    "minimum": [
+      -0.3499999940395355,
+      -0.44999998807907104,
+      -0.33000001311302185
+    ],
+    "maximum": [
+      -0.18000000715255737,
+      -0.2620428800582886,
+      -0.24691884219646454
+    ],
+    "sha256": "3db886caf21be387d8107da6f48846fa17f24b21791d8a0b1c0ed9eb8ed98993",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 144,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "barracks.critical": {
+    "vertices": 184,
+    "triangles": 92,
+    "minimum": [
+      -0.3700000047683716,
+      -0.4558138847351074,
+      0.23999999463558197
+    ],
+    "maximum": [
+      0.3564611077308655,
+      -0.2041861116886139,
+      0.36762166023254395
+    ],
+    "sha256": "b4712cbfaab98018e3f16ab7de20d07960a79fda26a77c7c6fed8cbf9f8bae2d",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 276,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "barracks.destroyed": {
+    "vertices": 186,
+    "triangles": 100,
+    "minimum": [
+      -0.4300000071525574,
+      -0.5,
+      -0.4099999964237213
+    ],
+    "maximum": [
+      0.4300000071525574,
+      -0.2199999988079071,
+      0.41999998688697815
+    ],
+    "sha256": "af25d0fb06744c1e930c9ef73b43178be1ae2ffe8d221a2d1b016344ac98c492",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 300,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "radar.lod0": {
+    "vertices": 1536,
+    "triangles": 812,
+    "minimum": [
+      -0.3400000035762787,
+      -0.5,
+      -0.30000001192092896
+    ],
+    "maximum": [
+      0.3400000035762787,
+      0.49619999527931213,
+      0.30000001192092896
+    ],
+    "sha256": "d35dd12a891e38b1a4520cbb8e38bf3f10d9eeaab39e85d1f1fda4f0a1c3c256",
+    "groups": [
+      {
+        "name": "body",
+        "firstIndex": 0,
+        "indexCount": 924,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "radar_array",
+        "firstIndex": 924,
+        "indexCount": 1512,
+        "parent": -1,
+        "motion": "radar",
+        "socket": "motion_radar_array",
+        "rate": 0.6,
+        "travel": 0
+      }
+    ]
+  },
+  "radar.lod1": {
+    "vertices": 648,
+    "triangles": 348,
+    "minimum": [
+      -0.3400000035762787,
+      -0.5,
+      -0.30000001192092896
+    ],
+    "maximum": [
+      0.3400000035762787,
+      0.49619999527931213,
+      0.30000001192092896
+    ],
+    "sha256": "e8283dece2c1c45be8a32114f28dd4f6237f9bfb3614e2a2af46c78cea055477",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 1044,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "radar.lod2": {
+    "vertices": 308,
+    "triangles": 156,
+    "minimum": [
+      -0.3400000035762787,
+      -0.5,
+      -0.30000001192092896
+    ],
+    "maximum": [
+      0.3400000035762787,
+      0.49619999527931213,
+      0.30000001192092896
+    ],
+    "sha256": "ab8e8de4e2975ad2b27fdd6526a019cc567607e4ee1e6825ae2159a7ba4102c9",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 468,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "radar.foundation": {
+    "vertices": 24,
+    "triangles": 12,
+    "minimum": [
+      -0.3400000035762787,
+      -0.5,
+      -0.30000001192092896
+    ],
+    "maximum": [
+      0.3400000035762787,
+      -0.4699999988079071,
+      0.30000001192092896
+    ],
+    "sha256": "ff56922c9e36498d59c28b9f17983d6a03d2547b8fdf64f41a8f4c4f0558d95f",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 36,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "radar.structural_frame": {
+    "vertices": 216,
+    "triangles": 108,
+    "minimum": [
+      -0.3400000035762787,
+      -0.5,
+      -0.30000001192092896
+    ],
+    "maximum": [
+      0.3400000035762787,
+      0.4350000023841858,
+      0.30000001192092896
+    ],
+    "sha256": "7a18c7b37cf3bc5f15a341771daa080cfd21e794906a251a7fda3d727b94339b",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 324,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "radar.partial_shell": {
+    "vertices": 264,
+    "triangles": 132,
+    "minimum": [
+      -0.3400000035762787,
+      -0.5,
+      -0.30000001192092896
+    ],
+    "maximum": [
+      0.3400000035762787,
+      0.4350000023841858,
+      0.30000001192092896
+    ],
+    "sha256": "0e3bd3841376ce69267c1b3fbf78e492d298e57779c8ee821471d5f6d3214f53",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 396,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "radar.unpowered": {
+    "vertices": 24,
+    "triangles": 12,
+    "minimum": [
+      -0.28999999165534973,
+      -0.3799999952316284,
+      0.2750000059604645
+    ],
+    "maximum": [
+      -0.1599999964237213,
+      -0.18000000715255737,
+      0.2849999964237213
+    ],
+    "sha256": "0ee2a9263ddefa2a83c1db8d6c1d20145f0f18f1306380d7785bf3b030b272c4",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 36,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "radar.damaged": {
+    "vertices": 84,
+    "triangles": 48,
+    "minimum": [
+      -0.25999999046325684,
+      -0.44999998807907104,
+      -0.2199999988079071
+    ],
+    "maximum": [
+      -0.09000000357627869,
+      -0.2620428800582886,
+      -0.136918842792511
+    ],
+    "sha256": "ad6869db36aa4766e11d837fedb42b5a7b0cd6acf40110337279504950638518",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 144,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "radar.critical": {
+    "vertices": 184,
+    "triangles": 92,
+    "minimum": [
+      -0.2800000011920929,
+      -0.4558138847351074,
+      0.11999999731779099
+    ],
+    "maximum": [
+      0.2664611339569092,
+      -0.2041861116886139,
+      0.24762164056301117
+    ],
+    "sha256": "6cb0605523a3fe95769f546036d0593f880cc31d7b7c6fa06339b81bc904fada",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 276,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "radar.destroyed": {
+    "vertices": 372,
+    "triangles": 188,
+    "minimum": [
+      -0.3400000035762787,
+      -0.5,
+      -0.30000001192092896
+    ],
+    "maximum": [
+      0.3400000035762787,
+      -0.22248589992523193,
+      0.30000001192092896
+    ],
+    "sha256": "1941631f8b2638126de10cd8db30034a45c85c473c905032b1d5194f474e9be6",
+    "groups": [
+      {
+        "name": "static",
+        "firstIndex": 0,
+        "indexCount": 564,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  }
+}

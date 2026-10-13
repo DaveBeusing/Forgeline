@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.vehicle_factory.unpowered",
+  "type": "mesh",
+  "source": "sources/operational/vehicle_factory_unpowered.gltf",
+  "materialReferences": [
+    "material.directorate.building.unpowered"
+  ]
+}

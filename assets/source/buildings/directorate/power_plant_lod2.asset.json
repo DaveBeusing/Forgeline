@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.power_plant.lod2",
   "type": "mesh",
-  "source": "sources/power_plant_lod1_detailed.gltf",
+  "source": "sources/operational/power_plant_lod2.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ]

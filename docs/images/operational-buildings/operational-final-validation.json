@@ -1,0 +1,77 @@
+{
+  "assetCount": 401,
+  "meshCount": 218,
+  "textureCount": 56,
+  "materialCount": 127,
+  "totalRuntimeBytes": 59587033,
+  "meshRuntimeBytes": 4633935,
+  "textureRuntimeBytes": 54798223,
+  "studioSplashTextureRuntimeBytes": 1786411,
+  "materialRuntimeBytes": 154875,
+  "catalogLoadDuration": "00:00:00.1442774",
+  "assetReadDuration": "00:00:00.6236601",
+  "largestAssets": [
+    {
+      "assetId": "texture.world.terrain.crushed_gravel",
+      "type": "texture",
+      "runtimeBytes": 5593386
+    },
+    {
+      "assetId": "texture.world.terrain.concrete_base",
+      "type": "texture",
+      "runtimeBytes": 5593383
+    },
+    {
+      "assetId": "texture.world.terrain.cracked_earth",
+      "type": "texture",
+      "runtimeBytes": 5593383
+    },
+    {
+      "assetId": "texture.world.terrain.rocky_scrub",
+      "type": "texture",
+      "runtimeBytes": 5593377
+    },
+    {
+      "assetId": "texture.world.terrain.dark_ash",
+      "type": "texture",
+      "runtimeBytes": 5593368
+    },
+    {
+      "assetId": "texture.world.terrain.dry_dirt",
+      "type": "texture",
+      "runtimeBytes": 5593368
+    },
+    {
+      "assetId": "texture.world.terrain.bedrock",
+      "type": "texture",
+      "runtimeBytes": 5593365
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_base",
+      "type": "texture",
+      "runtimeBytes": 5587811
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_normal",
+      "type": "texture",
+      "runtimeBytes": 1393493
+    },
+    {
+      "assetId": "unit.directorate.main_battle_tank",
+      "type": "mesh",
+      "runtimeBytes": 660330
+    },
+    {
+      "assetId": "branding.undefined_behavior.splash.wordmark",
+      "type": "texture",
+      "runtimeBytes": 552058
+    },
+    {
+      "assetId": "texture.world.decal.atlas_base",
+      "type": "texture",
+      "runtimeBytes": 520450
+    }
+  ],
+  "issues": [],
+  "success": true
+}

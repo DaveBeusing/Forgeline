@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.barracks.partial_shell",
+  "type": "mesh",
+  "source": "sources/operational/barracks_partial_shell.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.vehicle_factory.foundation",
+  "type": "mesh",
+  "source": "sources/operational/vehicle_factory_foundation.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

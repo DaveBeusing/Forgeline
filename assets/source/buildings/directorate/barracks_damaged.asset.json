@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.barracks.damaged",
+  "type": "mesh",
+  "source": "sources/operational/barracks_damaged.gltf",
+  "materialReferences": [
+    "material.directorate.building.damaged"
+  ]
+}

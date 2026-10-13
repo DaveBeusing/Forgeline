@@ -1,0 +1,134 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine operational building component exporter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 3264,
+      "uri": "data:application/octet-stream;base64,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"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 1008,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1008,
+      "byteLength": 1008,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 2016,
+      "byteLength": 672,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 2688,
+      "byteLength": 576,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 84,
+      "type": "VEC3",
+      "min": [
+        -0.25999999046325684,
+        -0.44999998807907104,
+        -0.2199999988079071
+      ],
+      "max": [
+        -0.09000000357627869,
+        -0.2620428800582886,
+        -0.136918842792511
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 84,
+      "type": "VEC3",
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 84,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5125,
+      "count": 144,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "radar_damaged",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "extras": {
+    "componentHierarchy": [
+      {
+        "module": "damaged_structure",
+        "part": "broken_brace",
+        "group": "static",
+        "firstIndex": 0,
+        "indexCount": 36
+      },
+      {
+        "module": "damaged_structure",
+        "part": "broken_pipe",
+        "group": "static",
+        "firstIndex": 36,
+        "indexCount": 108
+      }
+    ],
+    "axes": "+Y up, +Z forward",
+    "state": "damaged",
+    "lod": 1
+  }
+}

@@ -28,6 +28,10 @@ public sealed class DirectorateBuildingPresentationTests
             "smelter" => BuildingIds.Smelter,
             "electronics_plant" => BuildingIds.ElectronicsPlant,
             "fuel_refinery" => BuildingIds.Refinery,
+            "vehicle_factory" => BuildingIds.VehicleFactory,
+            "power_plant" => BuildingIds.PowerPlant,
+            "barracks" => BuildingIds.Barracks,
+            "radar" => BuildingIds.Radar,
             "storage_depot" => BuildingIds.StorageDepot,
             "supply_depot" => BuildingIds.SupplyDepot,
             "logistics_hub" => BuildingIds.LogisticsHub,
@@ -361,6 +365,10 @@ public sealed class DirectorateBuildingPresentationTests
     [InlineData("electronics_plant")]
     [InlineData("fuel_refinery")]
     [InlineData("ammunition_plant")]
+    [InlineData("vehicle_factory")]
+    [InlineData("power_plant")]
+    [InlineData("barracks")]
+    [InlineData("radar")]
     [InlineData("storage_depot")]
     [InlineData("supply_depot")]
     [InlineData("logistics_hub")]
@@ -373,6 +381,10 @@ public sealed class DirectorateBuildingPresentationTests
             "smelter" => BuildingIds.Smelter,
             "electronics_plant" => BuildingIds.ElectronicsPlant,
             "fuel_refinery" => BuildingIds.Refinery,
+            "vehicle_factory" => BuildingIds.VehicleFactory,
+            "power_plant" => BuildingIds.PowerPlant,
+            "barracks" => BuildingIds.Barracks,
+            "radar" => BuildingIds.Radar,
             "storage_depot" => BuildingIds.StorageDepot,
             "supply_depot" => BuildingIds.SupplyDepot,
             "logistics_hub" => BuildingIds.LogisticsHub,
@@ -414,7 +426,7 @@ public sealed class DirectorateBuildingPresentationTests
     public void CriticalOperationalStatesUseGeometryAttachmentsNotOnlyTint()
     {
         Assert.Equal(
-            BuildingPresentationCatalog.UnpoweredStateAssetId,
+            "building.directorate.power_plant.unpowered",
             BuildingPresentationCatalog.ResolveStateAttachmentAssetId(
                 new BuildingFeaturePresentationMetadata(
                     BuildingIds.PowerPlant,

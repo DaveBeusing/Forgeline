@@ -45,6 +45,10 @@ public sealed class VisualReferenceCaptureTests
     {
         var request = new VisualReferenceCaptureRequest { OutputRoot = "unused", RuntimeRoot = "unused", Commit = new('a', 40) };
         request.Validate();
+        Assert.Equal(45, request.YawDegrees);
+        foreach (float yaw in new[] { 0f, 45f, 225f, 360f }) (request with { YawDegrees = yaw }).Validate();
+        foreach (float yaw in new[] { -1f, 361f, float.NaN, float.PositiveInfinity })
+            Assert.Throws<ArgumentOutOfRangeException>(() => (request with { YawDegrees = yaw }).Validate());
         foreach (uint dpi in new[] { 0u, 96u, 120u, 144u, 192u }) (request with { RasterDpi = dpi }).Validate();
         Assert.Throws<ArgumentOutOfRangeException>(() => (request with { RasterDpi = 193 }).Validate());
         Assert.Equal(6, request.Scenes.Length);

@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.power_plant.structural_frame",
+  "type": "mesh",
+  "source": "sources/operational/power_plant_structural_frame.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

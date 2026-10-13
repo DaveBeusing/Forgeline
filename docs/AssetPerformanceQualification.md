@@ -446,3 +446,14 @@ The bounded composite uses RGB edge contrast and reduced blending for
 isolated details without new samples, asset IDs or residency. Hardware
 before/after methods, complete scene/display/DPI evidence and unresolved
 performance/visual gates are in [Final Image Quality](FinalImageQuality.md).
+
+
+The [operational building qualification](OperationalBuildingProduction.md)
+uses the same GPU/driver/camera/profile for twelve matched before/after cases,
+plus the full 144-case four-display/profile matrix and six repeated-family
+loads. Runtime payload is 59,587,033 bytes for 401 assets; texture/material
+counts are unchanged. Native captures have no fallback meshes or binding
+failures and remain inside the existing texture-residency/descriptor bounds.
+Windowed canonical stress passes at 11 instance draws; Borderless retains the
+existing 13/11 failure. No budget, shader-sample, art or sustained-60-FPS gate
+is relaxed; per-case timing/resource details and limitations are linked above.

@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.power_plant",
   "type": "mesh",
-  "source": "sources/power_plant_lod0_detailed.gltf",
+  "source": "sources/operational/power_plant_lod0.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ],
@@ -18,5 +18,32 @@
     }
   ],
   "collisionRequired": true,
-  "collisionReference": "building.directorate.module.collision_box"
+  "collisionReference": "building.directorate.module.collision_box",
+  "sockets": [
+    {
+      "name": "motion_cooling_fan",
+      "x": -0.03,
+      "y": 0.292,
+      "z": -0.06
+    }
+  ],
+  "mechanicalParts": [
+    {
+      "name": "body",
+      "firstIndex": 0,
+      "indexCount": 2724,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "cooling_fan",
+      "firstIndex": 2724,
+      "indexCount": 324,
+      "parent": -1,
+      "motion": "fan",
+      "socket": "motion_cooling_fan",
+      "rate": 2.2,
+      "travel": 0
+    }
+  ]
 }
