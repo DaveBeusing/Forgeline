@@ -325,6 +325,8 @@ At runtime, material payloads are parsed into the stable material contract rathe
 
 Missing optional maps are deterministic: white Base Color, flat tangent-space normal, neutral ORM (`R=1 AO`, `G=1 roughness`, `B=0 metallic`), and black Emissive. A referenced missing/corrupt texture or material uses a visible magenta development fallback and records diagnostics instead of producing undefined rendering.
 
+Terrain and object presentation use these unchanged factors in the shared metallic-roughness GGX shader. Base Color is decoded to linear by its sRGB SRV; normal and ORM data remain linear. The shader correction introduces no source or compiled material schema migration; see [material lighting qualification](PbrFoundationQualification.md).
+
 The ORM convention remains:
 
 ```text
