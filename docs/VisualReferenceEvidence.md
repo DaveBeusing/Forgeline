@@ -31,6 +31,8 @@ Each scene/zoom/display/profile case constructs fresh production renderers befor
 
 For complete investigation evidence, add `-ContinueAfterMismatch`. All eight readbacks are still compared exactly; mismatches retain native images, hashes and channel/delta counts. Failed cases remain false in `repeatPixelsEqual`. The final manifest is `structural-failure`, failure.json lists failed keys, the process exits nonzero and baseline comparison rejects it. Dimensions, source/runtime attestation and unsafe resource failures still abort immediately. This mode collects a complete failing matrix; it never relaxes acceptance. A High shadow-edge repeatability defect observed on the recorded hardware remains a precise native qualification blocker rather than an accepted golden.
 
+`-Scenes MaterialFoundation` adds optional analytic steel, painted armor, rubber, concrete and rough-terrain controls with three roughness rows. It uses the production BRDF and camera bookmarks without changing the six default fixtures or replacing catalog assets. See [inputs and measured qualification](PbrFoundationQualification.md).
+
 ## Review rubric
 
 Use `-RasterDpi 96`, `120`, `144` or `192` with explicit `-Capture` to

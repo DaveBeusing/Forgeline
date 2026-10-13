@@ -12,7 +12,7 @@ using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
 
-public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat, MechanicalIdle, MechanicalMoving, MechanicalFiring, MechanicalLoading, MechanicalUnpowered, MechanicalBroken, DirectorateUnits, DirectorateBuildingStates, CommandCoreProduction, MainBattleTankProduction, MainBattleTankFormation, EnvironmentKitYard, EnvironmentKitBridge, EnvironmentKitRepeated, ExtractorProduction, SmelterProduction, ElectronicsPlantProduction, FuelRefineryProduction, AmmunitionPlantProduction, StorageDepotProduction, SupplyDepotProduction, LogisticsHubProduction, LogisticsLoadingProduction, LogisticsTransitProduction, LogisticsUnloadingProduction, LogisticsSustainedProduction, VehicleFactoryProduction, PowerPlantProduction, BarracksProduction, RadarProduction, OperationalBuildingsRepeated, InfantryRifleProduction, InfantryEngineerProduction, InfantryRepeated, InfantryBattleProduction, BattlefieldVariantProduction, ScoutVehicleProduction, ArtilleryProduction, CargoTruckProduction, SupplyTruckProduction, CombatSupportRepeated }
+public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat, MechanicalIdle, MechanicalMoving, MechanicalFiring, MechanicalLoading, MechanicalUnpowered, MechanicalBroken, DirectorateUnits, DirectorateBuildingStates, CommandCoreProduction, MainBattleTankProduction, MainBattleTankFormation, EnvironmentKitYard, EnvironmentKitBridge, EnvironmentKitRepeated, ExtractorProduction, SmelterProduction, ElectronicsPlantProduction, FuelRefineryProduction, AmmunitionPlantProduction, StorageDepotProduction, SupplyDepotProduction, LogisticsHubProduction, LogisticsLoadingProduction, LogisticsTransitProduction, LogisticsUnloadingProduction, LogisticsSustainedProduction, VehicleFactoryProduction, PowerPlantProduction, BarracksProduction, RadarProduction, OperationalBuildingsRepeated, InfantryRifleProduction, InfantryEngineerProduction, InfantryRepeated, InfantryBattleProduction, BattlefieldVariantProduction, ScoutVehicleProduction, ArtilleryProduction, CargoTruckProduction, SupplyTruckProduction, CombatSupportRepeated, MaterialFoundation }
 
 // Authored presentation acceptance states, not economic/combat simulations or gameplay presets.
 public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3 Target,
@@ -27,6 +27,14 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
     {
         if (!Enum.IsDefined(kind)) throw new ArgumentOutOfRangeException(nameof(kind));
         ArgumentNullException.ThrowIfNull(terrain);
+        if (kind == VisualReferenceSceneKind.MaterialFoundation)
+        {
+            var materialSnapshot = new PresentationSnapshot(new SimulationTick(FixedTick), TimeSpan.FromMilliseconds(50), 0, ReadOnlySpan<RenderInstance>.Empty);
+            var materialTarget = new Vector3(650, 0, 520);
+            string materialFingerprint = Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new
+            { kind, version = 1, Seed, target = materialTarget, materials = MaterialReferenceRenderer.Materials }, FingerprintOptions)));
+            return new(kind, materialTarget, materialSnapshot, default, materialFingerprint);
+        }
         if (kind is >= VisualReferenceSceneKind.ScoutVehicleProduction and <= VisualReferenceSceneKind.CombatSupportRepeated)
             return CombatSupportReferenceScene.Create(kind, terrain);
         if (kind is VisualReferenceSceneKind.EnvironmentKitYard or VisualReferenceSceneKind.EnvironmentKitBridge or VisualReferenceSceneKind.EnvironmentKitRepeated)

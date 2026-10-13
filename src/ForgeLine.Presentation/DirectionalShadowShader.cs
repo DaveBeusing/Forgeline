@@ -2,7 +2,7 @@ namespace ForgeLine.Presentation;
 
 internal static class DirectionalShadowShader
 {
-    internal const string Disabled = "float2 SampleDirectionalShadow(float3 position, float3 normal) { return float2(1, 1); }\n";
+    internal const string Disabled = "float2 SampleDirectionalShadow(float3 position, float3 normal, float3 lightDirection) { return float2(1, 1); }\n";
     internal const string Source = """
         Texture2D<float> DirectionalDepth : register(t15);
         cbuffer ShadowFrame : register(b1) {
@@ -10,7 +10,7 @@ internal static class DirectionalShadowShader
             float4 ShadowCenterRadius;
             float4 ShadowParameters;
         };
-        float2 SampleDirectionalShadow(float3 position, float3 normal) {
+        float2 SampleDirectionalShadow(float3 position, float3 normal, float3 lightDirection) {
             float4 projected = mul(float4(position, 1), ShadowProjection);
             float3 p = projected.xyz / projected.w;
             float2 uv = p.xy * float2(0.5, -0.5) + 0.5;
@@ -21,7 +21,7 @@ internal static class DirectionalShadowShader
             float edge = max(abs(p.x), abs(p.y));
             float fade = 1 - smoothstep(0.82, 0.98, edge);
             fade *= 1 - smoothstep(0.8, 1, length(position.xz - ShadowCenterRadius.xz) / ShadowCenterRadius.w);
-            float bias = (0.03 + 0.1 * (1 - saturate(normal.y))) / ShadowParameters.y;
+            float bias = (0.03 + 0.1 * (1 - saturate(dot(normal, lightDirection)))) / ShadowParameters.y;
             int size = (int)ShadowParameters.x;
             float2 texel = uv * size - 0.5;
             int2 pixel = int2(floor(texel));

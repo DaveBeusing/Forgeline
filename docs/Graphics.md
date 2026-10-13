@@ -2,7 +2,7 @@
 
 The explicit [graphics reference performance lane](GraphicsReferencePerformance.md) records renderer-cold/warm camera runs, allocations, resource observations and fence-qualified pass distributions. Graphics diagnostics expose the direct-queue timestamp frequency; the client collector owns benchmark evidence without changing simulation authority or normal frame recording.
 
-Terrain surface refinement retains the existing four-layer/thirteen-texture pipeline, thirteen-sample ceiling, 63-DWORD direct root signature and 18-DWORD buffered shadow receiver. Pixel-footprint-filtered color/normal detail and Rock-only slope-adaptive coordinates share existing textures and passes. Construction-time settings validate before native allocation; no new GPU target or descriptor class is introduced. Vegetation uses copied, viewer-authorized instance transforms with the same phase in World and SunShadowDepth. Authoring ranges, culling/LOD policy and qualified viewpoints are described in [World Asset Presentation](WorldAssetPresentation.md); the architectural choice is recorded in [Bounded Terrain Surface Refinement](adr/BoundedTerrainSurfaceRefinement.md).
+Terrain surface refinement retains the existing four-layer/thirteen-texture pipeline, thirteen-sample ceiling, 64-DWORD direct root signature and 18-DWORD buffered shadow receiver. Pixel-footprint-filtered color/normal detail and Rock-only slope-adaptive coordinates share existing textures and passes. Construction-time settings validate before native allocation; no new GPU target or descriptor class is introduced. Vegetation uses copied, viewer-authorized instance transforms with the same phase in World and SunShadowDepth. Authoring ranges, culling/LOD policy and qualified viewpoints are described in [World Asset Presentation](WorldAssetPresentation.md); the architectural choice is recorded in [Bounded Terrain Surface Refinement](adr/BoundedTerrainSurfaceRefinement.md).
 
 ## Purpose
 
@@ -159,7 +159,7 @@ TEXCOORD0 float2 @ 24
 TANGENT   float4 @ 32
 ```
 
-The vertex shader transforms the normal/tangent basis with the instance world basis. The pixel shader orthogonalizes the tangent, reconstructs the bitangent from `Tangent.w`, converts the sampled normal from [0,1] to tangent-space [-1,1], and transforms it through the TBN basis before the current lightweight material response. A deterministic orthogonal tangent is used only for materials that do not require a normal map and therefore receive the flat-normal fallback.
+The vertex shader transforms normals with the inverse transpose of the instance world basis and transforms tangents forward, preserving mirrored handedness. The pixel shader orthogonalizes the tangent, reconstructs the bitangent from `Tangent.w`, converts the sampled normal from [0,1] to tangent-space [-1,1], and transforms it through the TBN basis before the shared metallic-roughness GGX response. A deterministic orthogonal tangent is used only for materials that do not require a normal map and therefore receive the flat-normal fallback.
 
 Runtime mesh material IDs come from compiler-stable asset references. A one-material mesh can therefore preserve its source material identity through compiler output, GPU buffer creation, batching, and draw submission. Meshes explicitly marked as migration fallback do not enter the textured path; they remain visible through the existing untextured development path and are diagnosed by asset compilation.
 
@@ -229,6 +229,8 @@ The client quality profile defaults to Medium with linear scene composition. Wor
 SceneLightingSettings is presentation-owned and contains the canonical defaults. The client settings file exposes sceneExposure (validated from 0.25 through 4.0) and composes that value into the immutable scene-lighting state before the render host starts. This gives development and qualification runs an explicit persisted exposure control without making exposure simulation state. Scene lighting never enters simulation state and cannot influence deterministic gameplay.
 
 The terrain shader already uses thirteen SRV descriptor tables. D3D12 root signatures are limited to 64 DWORDs, so terrain per-layer Base Color factors are packed as RGB10 values and roughness/metallic factors as paired UNorm16 values before scene-lighting constants are appended. The resulting terrain root-signature cost remains within the existing hardware limit without adding descriptors or draw calls.
+
+Terrain, textured objects and fallback objects share GGX/Smith/Schlick direct lighting with a camera-relative view vector and bounded hemispheric ambient approximation. AO affects ambient only; emissive remains linear. Screen-space normal variance broadens small specular lobes, with a 0.045 perceptual roughness floor. Terrain uses 51 direct constants plus thirteen texture tables (64 DWORDs); instances use 35 constants. No production texture allocation or asset format changes are introduced. See [material lighting qualification](PbrFoundationQualification.md) and its ADR for model limits and evidence.
 
 The optional directional depth pass adds cast shadows and bounded local contact occlusion to this lighting path. Its coverage, quality budgets and qualification are described below.
 

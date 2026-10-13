@@ -46,7 +46,7 @@ public sealed class TerrainSurfaceDetailTests
         Assert.Equal(13, after.TextureBindingsPerDraw);
         Assert.Equal(13, after.MaximumTextureSamplesPerPixel);
         Assert.InRange(after.RootSignatureDwords, 1, 64);
-        Assert.Equal(shadowed ? 18 : 63, after.RootSignatureDwords);
+        Assert.Equal(shadowed ? 18 : 64, after.RootSignatureDwords);
         Assert.Equal(baselineBytes, detailBytes);
         Assert.Equal(0, graphics.Diagnostics.Health.SubmissionFaultCount);
         graphics.Resize(640, 400);

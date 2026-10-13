@@ -14,9 +14,29 @@ if ($Metrics.visibleTerrainChunks -le 0 -or
     throw 'Terrain draw count must equal the valid visible chunk count.'
 }
 
-# Retain the canonical roster's eleven mesh/material batches independently of terrain visibility.
-if ($Metrics.instanceDrawCalls -le 0 -or $Metrics.instanceDrawCalls -gt 11) {
-    throw 'Instance draw calls exceeded the canonical mesh/material batch budget of 11.'
+# Retain eleven canonical base batches; each additional LOD can split those same families.
+# A LOD with fewer instances cannot introduce more batches than it has instances.
+$instanceBatchBudget = 11
+$lodProperties = @('lod1Instances', 'lod2Instances')
+$presentLods = @($lodProperties | Where-Object { $null -ne $Metrics.PSObject.Properties[$_] })
+if ($presentLods.Count -ne 0 -and $presentLods.Count -ne 2) {
+    throw 'LOD draw qualification requires both instance counts.'
+}
+$additionalLodInstances = 0
+foreach ($name in $presentLods) {
+    $count = $Metrics.$name
+    if ($null -eq $count -or -not [double]::IsFinite([double]$count) -or
+        $count -lt 0 -or [Math]::Floor([double]$count) -ne $count) {
+        throw 'LOD instance counts must be finite nonnegative integers.'
+    }
+    $additionalLodInstances += $count
+    $instanceBatchBudget += [Math]::Min(11, $count)
+}
+if ($presentLods.Count -gt 0 -and $additionalLodInstances -gt $Metrics.visibleInstances) {
+    throw 'LOD instances exceeded the visible instance count.'
+}
+if ($Metrics.instanceDrawCalls -le 0 -or $Metrics.instanceDrawCalls -gt $instanceBatchBudget) {
+    throw "Instance draw calls exceeded the canonical LOD-aware batch budget of $instanceBatchBudget."
 }
 
 $compositeDrawCalls = 0
@@ -37,6 +57,6 @@ if ($null -ne $Metrics.PSObject.Properties['directionalShadows'] -and $null -ne 
 }
 
 if ($Metrics.totalMeasuredDrawCalls -ne ($Metrics.terrainDrawCalls + $Metrics.instanceDrawCalls + $compositeDrawCalls + $shadowDrawCalls) -or
-    $Metrics.totalMeasuredDrawCalls -gt ($Metrics.visibleTerrainChunks + 11 + $compositeDrawCalls + $shadowDrawCalls)) {
+    $Metrics.totalMeasuredDrawCalls -gt ($Metrics.visibleTerrainChunks + $instanceBatchBudget + $compositeDrawCalls + $shadowDrawCalls)) {
     throw 'Measured draw calls exceeded the visible-terrain plus instance-batch budget.'
 }
