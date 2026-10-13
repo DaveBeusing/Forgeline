@@ -608,7 +608,23 @@ three completed LODs and eight authorized state assemblies per family. Forty
 new state records and fifteen replacement source bindings retain primary/LOD IDs,
 shared collision proxies, PBR channels and gameplay footprints.
 
-Current catalog: 413 assets (230 meshes, 56 textures, 127 materials),
+Historical industrial qualification catalog: 413 assets (230 meshes, 56 textures, 127 materials),
 60,212,858 compiled payload bytes. No industrial texture/material is added.
 Compiler build/validate modes and runtime ownership remain unchanged.
 See [source mapping, reproduction and qualification](IndustrialBuildingProduction.md).
+
+## Logistics building authoring
+
+`python build/Author-LogisticsBuildings.py` reads three editable family recipes
+and `authoring/logistics.modules.json`, reusing the existing industrial and
+Command Core primitives. `--family` narrows ownership; `--output` supports an
+independent byte-identical export. Individual component glTFs carry named ranges
+and parent/shared-module inspection metadata. Existing primary IDs, collision
+references, material/texture masters and canonical asset compiler are retained.
+The general detail authoring pass skips this owned source subtree.
+
+Current catalog: 437 assets (254 meshes, 56 textures, 127 materials), 61,747,374
+compiled payload bytes. Logistics adds 24 mesh state records and no new texture
+or material. Static anchors are baked into the source/compiled metadata and do
+not own vehicle movement or docking. See
+[source mapping, reproduction and qualification](LogisticsBuildingProduction.md).

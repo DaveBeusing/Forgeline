@@ -153,7 +153,7 @@ industrial lamps, faceted mineral rocks and clustered rubble. It retains each
 original outer bound and UV/material cell convention. Their inexpensive
 reduced LOD meshes remain available for normal/strategic views.
 
-The source catalog contains 413 stable assets. Asset compilation and runtime
+The source catalog contains 437 stable assets. Asset compilation and runtime
 qualification must pass before client review. The production master test
 checks native dimensions, semantic color spaces, explicit caps and mip policy;
 existing material completeness tests verify all physical mesh dependencies
@@ -181,3 +181,10 @@ channels. Family geometry changes neither texture/material counts nor compiler
 mip policy. Exported UVs/normals compile to orthogonal tangent frames; each
 runtime assembly retains one material section. Native per-case residency and
 resource binding results are recorded in the linked production report.
+
+The [three logistics building families](LogisticsBuildingProduction.md) reuse
+the same structural material and Base Color/Normal/ORM masters across dedicated
+LOD and state geometry. No additional texture/material, sampler policy or atlas
+layout is introduced. Their catalog qualification has 437 assets: 254 meshes,
+56 textures and 127 materials. Native binding/residency and matched camera
+measurements are recorded with the logistics capture evidence.
