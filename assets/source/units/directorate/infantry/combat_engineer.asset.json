@@ -102,14 +102,14 @@
     {
       "name": "member_0_body",
       "firstIndex": 0,
-      "indexCount": 2496,
+      "indexCount": 3084,
       "parent": -1,
       "motion": "static"
     },
     {
       "name": "member_0_hip_left",
-      "firstIndex": 2496,
-      "indexCount": 480,
+      "firstIndex": 3084,
+      "indexCount": 612,
       "parent": -1,
       "motion": "infantryStride",
       "socket": "member_0_hip_left",
@@ -118,8 +118,8 @@
     },
     {
       "name": "member_0_hip_right",
-      "firstIndex": 2976,
-      "indexCount": 480,
+      "firstIndex": 3696,
+      "indexCount": 612,
       "parent": -1,
       "motion": "infantryStride",
       "socket": "member_0_hip_right",
@@ -128,7 +128,7 @@
     },
     {
       "name": "member_0_shoulder",
-      "firstIndex": 3456,
+      "firstIndex": 4308,
       "indexCount": 1440,
       "parent": -1,
       "motion": "cannon",
@@ -138,15 +138,15 @@
     },
     {
       "name": "member_1_body",
-      "firstIndex": 4896,
-      "indexCount": 2256,
+      "firstIndex": 5748,
+      "indexCount": 2844,
       "parent": -1,
       "motion": "static"
     },
     {
       "name": "member_1_hip_left",
-      "firstIndex": 7152,
-      "indexCount": 480,
+      "firstIndex": 8592,
+      "indexCount": 612,
       "parent": -1,
       "motion": "infantryStride",
       "socket": "member_1_hip_left",
@@ -155,8 +155,8 @@
     },
     {
       "name": "member_1_hip_right",
-      "firstIndex": 7632,
-      "indexCount": 480,
+      "firstIndex": 9204,
+      "indexCount": 612,
       "parent": -1,
       "motion": "infantryStride",
       "socket": "member_1_hip_right",
@@ -165,7 +165,7 @@
     },
     {
       "name": "member_1_shoulder",
-      "firstIndex": 8112,
+      "firstIndex": 9816,
       "indexCount": 1440,
       "parent": -1,
       "motion": "cannon",
@@ -175,15 +175,15 @@
     },
     {
       "name": "member_2_body",
-      "firstIndex": 9552,
-      "indexCount": 2256,
+      "firstIndex": 11256,
+      "indexCount": 2844,
       "parent": -1,
       "motion": "static"
     },
     {
       "name": "member_2_hip_left",
-      "firstIndex": 11808,
-      "indexCount": 480,
+      "firstIndex": 14100,
+      "indexCount": 612,
       "parent": -1,
       "motion": "infantryStride",
       "socket": "member_2_hip_left",
@@ -192,8 +192,8 @@
     },
     {
       "name": "member_2_hip_right",
-      "firstIndex": 12288,
-      "indexCount": 480,
+      "firstIndex": 14712,
+      "indexCount": 612,
       "parent": -1,
       "motion": "infantryStride",
       "socket": "member_2_hip_right",
@@ -202,7 +202,7 @@
     },
     {
       "name": "member_2_shoulder",
-      "firstIndex": 12768,
+      "firstIndex": 15324,
       "indexCount": 1440,
       "parent": -1,
       "motion": "cannon",
@@ -212,15 +212,15 @@
     },
     {
       "name": "member_3_body",
-      "firstIndex": 14208,
-      "indexCount": 2256,
+      "firstIndex": 16764,
+      "indexCount": 2844,
       "parent": -1,
       "motion": "static"
     },
     {
       "name": "member_3_hip_left",
-      "firstIndex": 16464,
-      "indexCount": 480,
+      "firstIndex": 19608,
+      "indexCount": 612,
       "parent": -1,
       "motion": "infantryStride",
       "socket": "member_3_hip_left",
@@ -229,8 +229,8 @@
     },
     {
       "name": "member_3_hip_right",
-      "firstIndex": 16944,
-      "indexCount": 480,
+      "firstIndex": 20220,
+      "indexCount": 612,
       "parent": -1,
       "motion": "infantryStride",
       "socket": "member_3_hip_right",
@@ -239,7 +239,7 @@
     },
     {
       "name": "member_3_shoulder",
-      "firstIndex": 17424,
+      "firstIndex": 20832,
       "indexCount": 1440,
       "parent": -1,
       "motion": "cannon",

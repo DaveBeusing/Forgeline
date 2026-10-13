@@ -12,7 +12,7 @@
       0.5099999904632568,
       0.41999998688697815
     ],
-    "sha256": "8c13ecfb6c92f751e87494c7597440ff8cbb730201a4ee66cbd3091e2c3a002a",
+    "sha256": "3a63c54cd79074d87b3379f37d73cfc88b4422f7e2c202bc046cae3b150c663f",
     "groups": [
       {
         "name": "member_0_body",
@@ -177,7 +177,7 @@
       0.5099999904632568,
       0.41999998688697815
     ],
-    "sha256": "27e0f98929cf2e7e4108f899182fe85e39d7be7fa5cfbf746a2103d7d2a0f009",
+    "sha256": "f5aa7d6deb8a2e8ff3124ed72584a8ac46beb7d893e1423a53e2876bc2d3de7b",
     "groups": [
       {
         "name": "member_0_body",
@@ -306,7 +306,7 @@
       0.49000000953674316,
       0.41999998688697815
     ],
-    "sha256": "ee8edbd4b9602d4dba657255cd7aab1b61690ebb75ff7d7bc65eae197df2aab3",
+    "sha256": "081c2b068e87114469787937d50698cd48b1781aed2d41e1eb885511907db718",
     "groups": [
       {
         "name": "member_0_body",
@@ -450,16 +450,16 @@
     "vertices": 312,
     "triangles": 160,
     "minimum": [
-      -0.02800000086426735,
+      -0.03484648838639259,
       -0.5,
-      0.18907517194747925
+      0.17610669136047363
     ],
     "maximum": [
-      0.041999999433755875,
-      0.017157545313239098,
+      0.04884648695588112,
+      0.018062323331832886,
       0.289000004529953
     ],
-    "sha256": "e867395b8cbc5a185400ba7fd622452eb3fed68e1ad6f52446f5d4eb988126ae",
+    "sha256": "ec73209ebed8f3f79d0ba86edae7ddce3defb5e270d3a6109192e3ae8c7da5cc",
     "groups": [
       {
         "name": "member_0_hip_left",
@@ -477,16 +477,16 @@
     "vertices": 312,
     "triangles": 160,
     "minimum": [
-      0.057999998331069946,
+      0.051153514534235,
       -0.5,
-      0.18907517194747925
+      0.17610669136047363
     ],
     "maximum": [
-      0.12800000607967377,
-      0.017157545313239098,
+      0.134846493601799,
+      0.018062323331832886,
       0.289000004529953
     ],
-    "sha256": "8827d4fa33a1dde8fc7371bade76a49842fa0790cac29d61159d8d22e13e63b0",
+    "sha256": "4a9d0b365c28ba7aeb12108b7b3c3e712b6ad445eca517b97eeb5f04d754a913",
     "groups": [
       {
         "name": "member_0_hip_right",
@@ -555,16 +555,16 @@
     "vertices": 312,
     "triangles": 160,
     "minimum": [
-      -0.3779999911785126,
+      -0.3848464787006378,
       -0.5,
-      0.18907517194747925
+      0.17610669136047363
     ],
     "maximum": [
-      -0.30799999833106995,
-      0.017157545313239098,
+      -0.3011535108089447,
+      0.018062323331832886,
       0.289000004529953
     ],
-    "sha256": "c2dc856e48e9685f062f34da119d3d744b7db6d8ac9b57f632616be409b8fede",
+    "sha256": "ae5e46d83e6d1e7172ad3e3a30ba75e9b3dc6403786adfd03d8ac1ffe6924061",
     "groups": [
       {
         "name": "member_1_hip_left",
@@ -582,16 +582,16 @@
     "vertices": 312,
     "triangles": 160,
     "minimum": [
-      -0.2919999957084656,
+      -0.2988464832305908,
       -0.5,
-      0.18907517194747925
+      0.17610669136047363
     ],
     "maximum": [
-      -0.22200000286102295,
-      0.017157545313239098,
+      -0.2151535153388977,
+      0.018062323331832886,
       0.289000004529953
     ],
-    "sha256": "da03e85da62f76812ed6acbcf838dd6d3b70b6ad04c9779cab5b61519c5f5003",
+    "sha256": "1f01de45d83811b17e8b758b6210fa8fbd3e621d9c02558151dd5f95a4a1fa8b",
     "groups": [
       {
         "name": "member_1_hip_right",
@@ -660,16 +660,16 @@
     "vertices": 312,
     "triangles": 160,
     "minimum": [
-      0.22200000286102295,
+      0.2151535153388977,
       -0.5,
-      -0.25092482566833496
+      -0.2638933062553406
     ],
     "maximum": [
-      0.2919999957084656,
-      0.017157545313239098,
+      0.2988464832305908,
+      0.018062323331832886,
       -0.1509999930858612
     ],
-    "sha256": "f7862b1f05b7a364e47b81fad56d67b692e175d93002f74bcb50a462b1a1e536",
+    "sha256": "ccc74742f944ca954b83b6f0876483e07e264418c14c667fbeef214ae7f85c08",
     "groups": [
       {
         "name": "member_2_hip_left",
@@ -687,16 +687,16 @@
     "vertices": 312,
     "triangles": 160,
     "minimum": [
-      0.30799999833106995,
+      0.3011535108089447,
       -0.5,
-      -0.25092482566833496
+      -0.2638933062553406
     ],
     "maximum": [
-      0.3779999911785126,
-      0.017157545313239098,
+      0.3848464787006378,
+      0.018062323331832886,
       -0.1509999930858612
     ],
-    "sha256": "75f99247eccd2bf647b204e92b498b13c680beb62983f0b0b4dfa983ab85d101",
+    "sha256": "5114898c6b511f75503640442712309c3589e4be9fa53998c86591114d7fd710",
     "groups": [
       {
         "name": "member_2_hip_right",
@@ -765,16 +765,16 @@
     "vertices": 312,
     "triangles": 160,
     "minimum": [
-      -0.3779999911785126,
+      -0.3848464787006378,
       -0.5,
-      -0.25092482566833496
+      -0.2638933062553406
     ],
     "maximum": [
-      -0.30799999833106995,
-      0.017157545313239098,
+      -0.3011535108089447,
+      0.018062323331832886,
       -0.1509999930858612
     ],
-    "sha256": "b6cb106c20cdf60d9d92397afc4a543cd5d8b05cb896a8e18fd9f0b918748247",
+    "sha256": "7f089a5b1425927f89fa55a0e928a8a22cdadc904965873600cc7e74de5ca9e1",
     "groups": [
       {
         "name": "member_3_hip_left",
@@ -792,16 +792,16 @@
     "vertices": 312,
     "triangles": 160,
     "minimum": [
-      -0.2919999957084656,
+      -0.2988464832305908,
       -0.5,
-      -0.25092482566833496
+      -0.2638933062553406
     ],
     "maximum": [
-      -0.22200000286102295,
-      0.017157545313239098,
+      -0.2151535153388977,
+      0.018062323331832886,
       -0.1509999930858612
     ],
-    "sha256": "3847e06f91910a42c6a1b876cc5b107747acbab9739a32e58d57a929b0c3f83c",
+    "sha256": "9cae250b3da1de344504c7f334546c27cefcd6d3682bce2adf6f57ce96efd20b",
     "groups": [
       {
         "name": "member_3_hip_right",
@@ -843,31 +843,31 @@
     ]
   },
   "combat_engineer.lod0": {
-    "vertices": 13260,
-    "triangles": 6288,
+    "vertices": 15516,
+    "triangles": 7424,
     "minimum": [
-      -0.4306178689002991,
+      -0.43402114510536194,
       -0.5,
-      -0.335999995470047
+      -0.3919999897480011
     ],
     "maximum": [
       0.43061643838882446,
       0.5099999904632568,
       0.41999998688697815
     ],
-    "sha256": "87910fbaf8f35459381fc0348f0837722414d01d01d18936fce3afa643a9ee91",
+    "sha256": "77f57633504be570ec0bc714658662a227f1b28677fa774086936f93e1d3ddfd",
     "groups": [
       {
         "name": "member_0_body",
         "firstIndex": 0,
-        "indexCount": 2496,
+        "indexCount": 3084,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_0_hip_left",
-        "firstIndex": 2496,
-        "indexCount": 480,
+        "firstIndex": 3084,
+        "indexCount": 612,
         "parent": -1,
         "motion": "infantryStride",
         "socket": "member_0_hip_left",
@@ -876,8 +876,8 @@
       },
       {
         "name": "member_0_hip_right",
-        "firstIndex": 2976,
-        "indexCount": 480,
+        "firstIndex": 3696,
+        "indexCount": 612,
         "parent": -1,
         "motion": "infantryStride",
         "socket": "member_0_hip_right",
@@ -886,7 +886,7 @@
       },
       {
         "name": "member_0_shoulder",
-        "firstIndex": 3456,
+        "firstIndex": 4308,
         "indexCount": 1440,
         "parent": -1,
         "motion": "cannon",
@@ -896,15 +896,15 @@
       },
       {
         "name": "member_1_body",
-        "firstIndex": 4896,
-        "indexCount": 2256,
+        "firstIndex": 5748,
+        "indexCount": 2844,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_1_hip_left",
-        "firstIndex": 7152,
-        "indexCount": 480,
+        "firstIndex": 8592,
+        "indexCount": 612,
         "parent": -1,
         "motion": "infantryStride",
         "socket": "member_1_hip_left",
@@ -913,8 +913,8 @@
       },
       {
         "name": "member_1_hip_right",
-        "firstIndex": 7632,
-        "indexCount": 480,
+        "firstIndex": 9204,
+        "indexCount": 612,
         "parent": -1,
         "motion": "infantryStride",
         "socket": "member_1_hip_right",
@@ -923,7 +923,7 @@
       },
       {
         "name": "member_1_shoulder",
-        "firstIndex": 8112,
+        "firstIndex": 9816,
         "indexCount": 1440,
         "parent": -1,
         "motion": "cannon",
@@ -933,15 +933,15 @@
       },
       {
         "name": "member_2_body",
-        "firstIndex": 9552,
-        "indexCount": 2256,
+        "firstIndex": 11256,
+        "indexCount": 2844,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_2_hip_left",
-        "firstIndex": 11808,
-        "indexCount": 480,
+        "firstIndex": 14100,
+        "indexCount": 612,
         "parent": -1,
         "motion": "infantryStride",
         "socket": "member_2_hip_left",
@@ -950,8 +950,8 @@
       },
       {
         "name": "member_2_hip_right",
-        "firstIndex": 12288,
-        "indexCount": 480,
+        "firstIndex": 14712,
+        "indexCount": 612,
         "parent": -1,
         "motion": "infantryStride",
         "socket": "member_2_hip_right",
@@ -960,7 +960,7 @@
       },
       {
         "name": "member_2_shoulder",
-        "firstIndex": 12768,
+        "firstIndex": 15324,
         "indexCount": 1440,
         "parent": -1,
         "motion": "cannon",
@@ -970,15 +970,15 @@
       },
       {
         "name": "member_3_body",
-        "firstIndex": 14208,
-        "indexCount": 2256,
+        "firstIndex": 16764,
+        "indexCount": 2844,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_3_hip_left",
-        "firstIndex": 16464,
-        "indexCount": 480,
+        "firstIndex": 19608,
+        "indexCount": 612,
         "parent": -1,
         "motion": "infantryStride",
         "socket": "member_3_hip_left",
@@ -987,8 +987,8 @@
       },
       {
         "name": "member_3_hip_right",
-        "firstIndex": 16944,
-        "indexCount": 480,
+        "firstIndex": 20220,
+        "indexCount": 612,
         "parent": -1,
         "motion": "infantryStride",
         "socket": "member_3_hip_right",
@@ -997,7 +997,7 @@
       },
       {
         "name": "member_3_shoulder",
-        "firstIndex": 17424,
+        "firstIndex": 20832,
         "indexCount": 1440,
         "parent": -1,
         "motion": "cannon",
@@ -1008,128 +1008,128 @@
     ]
   },
   "combat_engineer.lod1": {
-    "vertices": 3900,
-    "triangles": 1952,
+    "vertices": 4716,
+    "triangles": 2384,
     "minimum": [
-      -0.4283274710178375,
+      -0.4323205053806305,
       -0.5,
-      -0.335999995470047
+      -0.3919999897480011
     ],
     "maximum": [
       0.42832615971565247,
       0.5099999904632568,
       0.41999998688697815
     ],
-    "sha256": "bc684d6d8af9251ee556a31a3e0e5b65181ccdaad3629b5decab13db3332c861",
+    "sha256": "5e0cb6fd74c1629e6261bc6f61adb6c7f783b557d627b440c6349f04267cf7ec",
     "groups": [
       {
         "name": "member_0_body",
         "firstIndex": 0,
-        "indexCount": 708,
+        "indexCount": 960,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_0_hip_left",
-        "firstIndex": 708,
-        "indexCount": 192,
+        "firstIndex": 960,
+        "indexCount": 228,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_0_hip_right",
-        "firstIndex": 900,
-        "indexCount": 192,
+        "firstIndex": 1188,
+        "indexCount": 228,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_0_shoulder",
-        "firstIndex": 1092,
+        "firstIndex": 1416,
         "indexCount": 444,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_1_body",
-        "firstIndex": 1536,
-        "indexCount": 612,
+        "firstIndex": 1860,
+        "indexCount": 864,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_1_hip_left",
-        "firstIndex": 2148,
-        "indexCount": 192,
+        "firstIndex": 2724,
+        "indexCount": 228,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_1_hip_right",
-        "firstIndex": 2340,
-        "indexCount": 192,
+        "firstIndex": 2952,
+        "indexCount": 228,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_1_shoulder",
-        "firstIndex": 2532,
+        "firstIndex": 3180,
         "indexCount": 444,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_2_body",
-        "firstIndex": 2976,
-        "indexCount": 612,
+        "firstIndex": 3624,
+        "indexCount": 864,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_2_hip_left",
-        "firstIndex": 3588,
-        "indexCount": 192,
+        "firstIndex": 4488,
+        "indexCount": 228,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_2_hip_right",
-        "firstIndex": 3780,
-        "indexCount": 192,
+        "firstIndex": 4716,
+        "indexCount": 228,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_2_shoulder",
-        "firstIndex": 3972,
+        "firstIndex": 4944,
         "indexCount": 444,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_3_body",
-        "firstIndex": 4416,
-        "indexCount": 612,
+        "firstIndex": 5388,
+        "indexCount": 864,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_3_hip_left",
-        "firstIndex": 5028,
-        "indexCount": 192,
+        "firstIndex": 6252,
+        "indexCount": 228,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_3_hip_right",
-        "firstIndex": 5220,
-        "indexCount": 192,
+        "firstIndex": 6480,
+        "indexCount": 228,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_3_shoulder",
-        "firstIndex": 5412,
+        "firstIndex": 6708,
         "indexCount": 444,
         "parent": -1,
         "motion": "static"
@@ -1137,128 +1137,128 @@
     ]
   },
   "combat_engineer.lod2": {
-    "vertices": 2016,
-    "triangles": 1008,
+    "vertices": 2688,
+    "triangles": 1344,
     "minimum": [
-      -0.43193623423576355,
+      -0.4350000023841858,
       -0.5,
-      -0.335999995470047
+      -0.3919999897480011
     ],
     "maximum": [
       0.4319347143173218,
       0.49000000953674316,
       0.41999998688697815
     ],
-    "sha256": "e094ee230c260aba7bbbc1310fb99dd95726345fb68eea42ad522d268dd39adc",
+    "sha256": "c3a285a32438b111ea59b786736ec4c82802583db027f2d0ec3c42955e10b36c",
     "groups": [
       {
         "name": "member_0_body",
         "firstIndex": 0,
-        "indexCount": 288,
+        "indexCount": 468,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_0_hip_left",
-        "firstIndex": 288,
-        "indexCount": 108,
+        "firstIndex": 468,
+        "indexCount": 144,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_0_hip_right",
-        "firstIndex": 396,
-        "indexCount": 108,
+        "firstIndex": 612,
+        "indexCount": 144,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_0_shoulder",
-        "firstIndex": 504,
+        "firstIndex": 756,
         "indexCount": 252,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_1_body",
-        "firstIndex": 756,
-        "indexCount": 288,
+        "firstIndex": 1008,
+        "indexCount": 468,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_1_hip_left",
-        "firstIndex": 1044,
-        "indexCount": 108,
+        "firstIndex": 1476,
+        "indexCount": 144,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_1_hip_right",
-        "firstIndex": 1152,
-        "indexCount": 108,
+        "firstIndex": 1620,
+        "indexCount": 144,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_1_shoulder",
-        "firstIndex": 1260,
+        "firstIndex": 1764,
         "indexCount": 252,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_2_body",
-        "firstIndex": 1512,
-        "indexCount": 288,
+        "firstIndex": 2016,
+        "indexCount": 468,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_2_hip_left",
-        "firstIndex": 1800,
-        "indexCount": 108,
+        "firstIndex": 2484,
+        "indexCount": 144,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_2_hip_right",
-        "firstIndex": 1908,
-        "indexCount": 108,
+        "firstIndex": 2628,
+        "indexCount": 144,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_2_shoulder",
-        "firstIndex": 2016,
+        "firstIndex": 2772,
         "indexCount": 252,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_3_body",
-        "firstIndex": 2268,
-        "indexCount": 288,
+        "firstIndex": 3024,
+        "indexCount": 468,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_3_hip_left",
-        "firstIndex": 2556,
-        "indexCount": 108,
+        "firstIndex": 3492,
+        "indexCount": 144,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_3_hip_right",
-        "firstIndex": 2664,
-        "indexCount": 108,
+        "firstIndex": 3636,
+        "indexCount": 144,
         "parent": -1,
         "motion": "static"
       },
       {
         "name": "member_3_shoulder",
-        "firstIndex": 2772,
+        "firstIndex": 3780,
         "indexCount": 252,
         "parent": -1,
         "motion": "static"
@@ -1266,48 +1266,48 @@
     ]
   },
   "combat_engineer.kit.member_0_body": {
-    "vertices": 1872,
-    "triangles": 832,
+    "vertices": 2244,
+    "triangles": 1028,
     "minimum": [
-      -0.04500000178813934,
+      -0.08402112871408463,
       -0.0949999988079071,
-      0.10400000214576721
+      0.04800000041723251
     ],
     "maximum": [
       0.15523803234100342,
       0.5099999904632568,
-      0.29600000381469727
+      0.296999990940094
     ],
-    "sha256": "0cf47410bf91fc81586b54ffcbde7a4de0d8cc8a10d67ac6be0cd850ea30c44b",
+    "sha256": "38ab1a8aee96e885f7208ba199b027483ad7519a0c779ae749dced9f7d8a25ab",
     "groups": [
       {
         "name": "member_0_body",
         "firstIndex": 0,
-        "indexCount": 2496,
+        "indexCount": 3084,
         "parent": -1,
         "motion": "static"
       }
     ]
   },
   "combat_engineer.kit.member_0_hip_left": {
-    "vertices": 312,
-    "triangles": 160,
+    "vertices": 408,
+    "triangles": 204,
     "minimum": [
-      -0.02800000086426735,
+      -0.03484648838639259,
       -0.5,
-      0.18907517194747925
+      0.17610669136047363
     ],
     "maximum": [
-      0.041999999433755875,
-      0.017157545313239098,
+      0.04884648695588112,
+      0.018062323331832886,
       0.289000004529953
     ],
-    "sha256": "e867395b8cbc5a185400ba7fd622452eb3fed68e1ad6f52446f5d4eb988126ae",
+    "sha256": "950a8e88cca03f907dac80fc45dbc90f7a195935513855befcc755f20ed6f5d3",
     "groups": [
       {
         "name": "member_0_hip_left",
         "firstIndex": 0,
-        "indexCount": 480,
+        "indexCount": 612,
         "parent": -1,
         "motion": "infantryStride",
         "socket": "member_0_hip_left",
@@ -1317,24 +1317,24 @@
     ]
   },
   "combat_engineer.kit.member_0_hip_right": {
-    "vertices": 312,
-    "triangles": 160,
+    "vertices": 408,
+    "triangles": 204,
     "minimum": [
-      0.057999998331069946,
+      0.051153514534235,
       -0.5,
-      0.18907517194747925
+      0.17610669136047363
     ],
     "maximum": [
-      0.12800000607967377,
-      0.017157545313239098,
+      0.134846493601799,
+      0.018062323331832886,
       0.289000004529953
     ],
-    "sha256": "8827d4fa33a1dde8fc7371bade76a49842fa0790cac29d61159d8d22e13e63b0",
+    "sha256": "0785070e4f8801d52e0d5c01bf5fa7cdbf0fc1b175d1b8ed3d9df62040c5989f",
     "groups": [
       {
         "name": "member_0_hip_right",
         "firstIndex": 0,
-        "indexCount": 480,
+        "indexCount": 612,
         "parent": -1,
         "motion": "infantryStride",
         "socket": "member_0_hip_right",
@@ -1371,48 +1371,48 @@
     ]
   },
   "combat_engineer.kit.member_1_body": {
-    "vertices": 1716,
-    "triangles": 752,
+    "vertices": 2088,
+    "triangles": 948,
     "minimum": [
-      -0.39500001072883606,
+      -0.43402114510536194,
       -0.0949999988079071,
-      0.10400000214576721
+      0.04800000041723251
     ],
     "maximum": [
       -0.1947619616985321,
       0.4880000054836273,
-      0.29600000381469727
+      0.296999990940094
     ],
-    "sha256": "c8859346f84a5f98ff0e0da636cb238f808da32ff9021e5fef98f97e5b028a3f",
+    "sha256": "efbca0a268a204bfac0926ec08a386e13f892d71376284828d2d3e55934d0c73",
     "groups": [
       {
         "name": "member_1_body",
         "firstIndex": 0,
-        "indexCount": 2256,
+        "indexCount": 2844,
         "parent": -1,
         "motion": "static"
       }
     ]
   },
   "combat_engineer.kit.member_1_hip_left": {
-    "vertices": 312,
-    "triangles": 160,
+    "vertices": 408,
+    "triangles": 204,
     "minimum": [
-      -0.3779999911785126,
+      -0.3848464787006378,
       -0.5,
-      0.18907517194747925
+      0.17610669136047363
     ],
     "maximum": [
-      -0.30799999833106995,
-      0.017157545313239098,
+      -0.3011535108089447,
+      0.018062323331832886,
       0.289000004529953
     ],
-    "sha256": "c2dc856e48e9685f062f34da119d3d744b7db6d8ac9b57f632616be409b8fede",
+    "sha256": "297f46efb3368178caf54639c5eb4f13babc07d7bb5d8e483939bdfe795cb89a",
     "groups": [
       {
         "name": "member_1_hip_left",
         "firstIndex": 0,
-        "indexCount": 480,
+        "indexCount": 612,
         "parent": -1,
         "motion": "infantryStride",
         "socket": "member_1_hip_left",
@@ -1422,24 +1422,24 @@
     ]
   },
   "combat_engineer.kit.member_1_hip_right": {
-    "vertices": 312,
-    "triangles": 160,
+    "vertices": 408,
+    "triangles": 204,
     "minimum": [
-      -0.2919999957084656,
+      -0.2988464832305908,
       -0.5,
-      0.18907517194747925
+      0.17610669136047363
     ],
     "maximum": [
-      -0.22200000286102295,
-      0.017157545313239098,
+      -0.2151535153388977,
+      0.018062323331832886,
       0.289000004529953
     ],
-    "sha256": "da03e85da62f76812ed6acbcf838dd6d3b70b6ad04c9779cab5b61519c5f5003",
+    "sha256": "a148614ad7aa1dd054bb91319daf9a599f09476375cbdc291ab367fd3adfa859",
     "groups": [
       {
         "name": "member_1_hip_right",
         "firstIndex": 0,
-        "indexCount": 480,
+        "indexCount": 612,
         "parent": -1,
         "motion": "infantryStride",
         "socket": "member_1_hip_right",
@@ -1476,48 +1476,48 @@
     ]
   },
   "combat_engineer.kit.member_2_body": {
-    "vertices": 1716,
-    "triangles": 752,
+    "vertices": 2088,
+    "triangles": 948,
     "minimum": [
-      0.20499999821186066,
+      0.16597886383533478,
       -0.0949999988079071,
-      -0.335999995470047
+      -0.3919999897480011
     ],
     "maximum": [
       0.4052380323410034,
       0.4880000054836273,
-      -0.14399999380111694
+      -0.14300000667572021
     ],
-    "sha256": "e84c015cbafee32d3c403679a22140f07e07406907c11c10ea47b4bc65dd6eeb",
+    "sha256": "365b15368fe846d3fd921448dfc294cb132c940c4c1688bf2613ed2b3d283641",
     "groups": [
       {
         "name": "member_2_body",
         "firstIndex": 0,
-        "indexCount": 2256,
+        "indexCount": 2844,
         "parent": -1,
         "motion": "static"
       }
     ]
   },
   "combat_engineer.kit.member_2_hip_left": {
-    "vertices": 312,
-    "triangles": 160,
+    "vertices": 408,
+    "triangles": 204,
     "minimum": [
-      0.22200000286102295,
+      0.2151535153388977,
       -0.5,
-      -0.25092482566833496
+      -0.2638933062553406
     ],
     "maximum": [
-      0.2919999957084656,
-      0.017157545313239098,
+      0.2988464832305908,
+      0.018062323331832886,
       -0.1509999930858612
     ],
-    "sha256": "f7862b1f05b7a364e47b81fad56d67b692e175d93002f74bcb50a462b1a1e536",
+    "sha256": "ae973eec20444494316c7d4f222ef43b33dd789ceea4f18392104f66215e05b0",
     "groups": [
       {
         "name": "member_2_hip_left",
         "firstIndex": 0,
-        "indexCount": 480,
+        "indexCount": 612,
         "parent": -1,
         "motion": "infantryStride",
         "socket": "member_2_hip_left",
@@ -1527,24 +1527,24 @@
     ]
   },
   "combat_engineer.kit.member_2_hip_right": {
-    "vertices": 312,
-    "triangles": 160,
+    "vertices": 408,
+    "triangles": 204,
     "minimum": [
-      0.30799999833106995,
+      0.3011535108089447,
       -0.5,
-      -0.25092482566833496
+      -0.2638933062553406
     ],
     "maximum": [
-      0.3779999911785126,
-      0.017157545313239098,
+      0.3848464787006378,
+      0.018062323331832886,
       -0.1509999930858612
     ],
-    "sha256": "75f99247eccd2bf647b204e92b498b13c680beb62983f0b0b4dfa983ab85d101",
+    "sha256": "53d8dc5117e36865e0b17c9f1a9800568d1a4c6e3917706f0775249a4a4713e2",
     "groups": [
       {
         "name": "member_2_hip_right",
         "firstIndex": 0,
-        "indexCount": 480,
+        "indexCount": 612,
         "parent": -1,
         "motion": "infantryStride",
         "socket": "member_2_hip_right",
@@ -1581,48 +1581,48 @@
     ]
   },
   "combat_engineer.kit.member_3_body": {
-    "vertices": 1716,
-    "triangles": 752,
+    "vertices": 2088,
+    "triangles": 948,
     "minimum": [
-      -0.39500001072883606,
+      -0.43402114510536194,
       -0.0949999988079071,
-      -0.335999995470047
+      -0.3919999897480011
     ],
     "maximum": [
       -0.1947619616985321,
       0.4880000054836273,
-      -0.14399999380111694
+      -0.14300000667572021
     ],
-    "sha256": "364d1359ba4fb1376637729e33900cb899c69649c07bae879ad38114d0b81c39",
+    "sha256": "89cba43f346b9c7ca2fc324bcf0cb519c8d1e87eb05cee71ec54698708f6aeaa",
     "groups": [
       {
         "name": "member_3_body",
         "firstIndex": 0,
-        "indexCount": 2256,
+        "indexCount": 2844,
         "parent": -1,
         "motion": "static"
       }
     ]
   },
   "combat_engineer.kit.member_3_hip_left": {
-    "vertices": 312,
-    "triangles": 160,
+    "vertices": 408,
+    "triangles": 204,
     "minimum": [
-      -0.3779999911785126,
+      -0.3848464787006378,
       -0.5,
-      -0.25092482566833496
+      -0.2638933062553406
     ],
     "maximum": [
-      -0.30799999833106995,
-      0.017157545313239098,
+      -0.3011535108089447,
+      0.018062323331832886,
       -0.1509999930858612
     ],
-    "sha256": "b6cb106c20cdf60d9d92397afc4a543cd5d8b05cb896a8e18fd9f0b918748247",
+    "sha256": "70c6b0d2817a1b9778e93eec4bca41855a1af09eff30c869b3074f4ab7148862",
     "groups": [
       {
         "name": "member_3_hip_left",
         "firstIndex": 0,
-        "indexCount": 480,
+        "indexCount": 612,
         "parent": -1,
         "motion": "infantryStride",
         "socket": "member_3_hip_left",
@@ -1632,24 +1632,24 @@
     ]
   },
   "combat_engineer.kit.member_3_hip_right": {
-    "vertices": 312,
-    "triangles": 160,
+    "vertices": 408,
+    "triangles": 204,
     "minimum": [
-      -0.2919999957084656,
+      -0.2988464832305908,
       -0.5,
-      -0.25092482566833496
+      -0.2638933062553406
     ],
     "maximum": [
-      -0.22200000286102295,
-      0.017157545313239098,
+      -0.2151535153388977,
+      0.018062323331832886,
       -0.1509999930858612
     ],
-    "sha256": "3847e06f91910a42c6a1b876cc5b107747acbab9739a32e58d57a929b0c3f83c",
+    "sha256": "df01772f6edeb1f8ea07efefd3fe11d9ae74040b0b8faa2eea8b53e8618f0cf0",
     "groups": [
       {
         "name": "member_3_hip_right",
         "firstIndex": 0,
-        "indexCount": 480,
+        "indexCount": 612,
         "parent": -1,
         "motion": "infantryStride",
         "socket": "member_3_hip_right",
