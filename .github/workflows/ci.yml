@@ -77,6 +77,12 @@ jobs:
         shell: pwsh
         run: ./build/Test-VisualReferenceEvidence.ps1
 
+      - name: Reference performance and image contracts without GPU
+        shell: pwsh
+        run: |
+          ./build/Test-ReferencePerformance.ps1
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ReferencePerformanceSamplesTests
+
       - name: Native WARP reference capture
         if: runner.os == 'Windows'
         shell: pwsh
