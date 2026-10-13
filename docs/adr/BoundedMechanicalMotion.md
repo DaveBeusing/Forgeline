@@ -59,3 +59,22 @@ shoulder ranges supply elevation/recoil. Damage geometry remains bound in each
 infantry LOD, while reduced live meshes remain static. No skeleton, foot planting,
 retargeting, per-member simulation or animation-asset type is introduced. See
 [production and measured near-view limits](../InfantryBattlefieldProduction.md).
+
+
+## Vehicle metric rotation and mission-derived aim
+
+Normalized mesh coordinates can have different authoritative scales on each axis.
+Rigid motion therefore composes scale, rotation and inverse scale around the
+normalized pivot before world placement. Quaternion rotation and normalized
+recoil/door translation are faded separately. This preserves physical wheel radius
+and cannon length while retaining the 32-part cap, shared resources, identity
+fast path and warmed allocation contract. Articulated turret transforms and visual
+muzzle extraction use the same convention. Infantry stride remains supported.
+
+Owned active artillery FireMission coordinates provide cosmetic yaw and a bounded
+elevation derived from the existing parabolic arc. Ownership is checked before
+mission access; cancelled/completed and foreign missions supply no pose. Existing
+visible shot history supplies recoil. No authoritative component, trajectory,
+collision, skeleton or animation-resource contract changes. Clamped pitch may not
+align with steep close-range trajectories. See
+[vehicle geometry and measured limits](../CombatSupportUnitProduction.md).

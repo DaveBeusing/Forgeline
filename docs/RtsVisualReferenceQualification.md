@@ -39,7 +39,7 @@ dimensions and flags masters below 2048 pixels for review. The flag is advisory:
 dimensions alone do not prove useful detail; tiny repeated textures can be
 deliberate. No source is enlarged to manufacture a numerical quality pass.
 
-Current inventory: 437 assets, 254 meshes, 56 textures and 127 materials.
+Current inventory: 492 assets, 309 meshes, 56 textures and 127 materials. Historical family qualification counts retain their original source context.
 Production texture budgets are documented in [Production surfaces](ProductionSurfaceMasters.md).
 Container sizes include metadata and studio splash assets; they are not GPU
 allocations or residency. The original 324-asset baseline occupied 4,985,866
@@ -205,3 +205,18 @@ near inspections. All 134 final captures pass structural/repeat/binding checks;
 20m High foreground striping remains a visual gate. Capture-only
 `-InspectionDistanceMeters` accepts zero or20–120; zero retains exact default
 120/420/1000 cameras, with nondefault distance recorded in filenames/metadata.
+
+
+[Combat and support vehicle production](CombatSupportUnitProduction.md) adds four
+eight-unit role/state galleries and the 1,000-unit `CombatSupportRepeated` scene.
+The five values append to the 42 master scene indices. The fresh current-master
+baseline has 12 cases; final qualification has 144 matrix, four 70 m inspection,
+six repeated-unit and four real logistics cases. All 170 records pass structural
+and exact pixel-repeat checks. Twelve High/1080p before/after cases match fixture,
+camera, lighting and quality exactly. Twenty-three unchanged original PNGs and
+portable CPU/GPU/resource records are published with their source identities.
+
+Canonical Windowed/Borderless and installed-package smoke also pass; their explicit
+synthetic render-stress cubes are distinct from the zero-fallback vehicle fixtures.
+Frozen-state timing does not establish live combat or sustained gameplay FPS.
+Human art, live motion/LOD/interaction and debug-layer acceptance remain pending.

@@ -657,3 +657,20 @@ proxies and PBR masters remain independent; runtime files remain compiler-owned.
 New rigid InfantryStride reuses completed-tick travel, existing bounded ranges
 and neutral LOD fade, without a new animation asset type. See
 [source mapping and qualification](InfantryBattlefieldProduction.md).
+
+## Combat and support vehicle source ownership
+
+`build/Author-CombatSupportUnits.py` exports four editable family kits and shared
+modules from `assets/source/units/directorate/authoring/` to the dedicated
+`sources/combat_support/` subtree. Its 145 glTFs include 119 inspectable modules,
+12 LOD meshes, two weapon meshes and 12 state meshes; 26 stable runtime records
+resolve these sources. Generic detail/refinement/mechanical passes skip this owner.
+The infantry exporter retains vehicle metadata already owned by these kits.
+
+At combat/support qualification the integrated catalog contains 492 assets
+(309 meshes, 56 textures, 127 materials), 66,611,751 runtime payload bytes.
+Primary IDs, collision references and required gameplay sockets remain unchanged.
+The compiler owns runtime output, tangents, container integrity and packaging.
+Independent exports are byte-identical; the reproducible runtime-only package
+retains all 492 qualified payloads and the manifest byte-for-byte. See
+[the scoped source and runtime evidence](CombatSupportUnitProduction.md).

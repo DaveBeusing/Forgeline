@@ -1,0 +1,2871 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "4fc5305a0aa44df8b275786070d04f2f9a57dc36",
+  "catalog": {
+    "assetCount": 492,
+    "meshCount": 309,
+    "textureCount": 56,
+    "materialCount": 127,
+    "totalRuntimeBytes": 66611751,
+    "meshRuntimeBytes": 11658653,
+    "textureRuntimeBytes": 54798223,
+    "studioSplashTextureRuntimeBytes": 1786411,
+    "materialRuntimeBytes": 154875,
+    "catalogLoadDuration": "00:00:00.0159754",
+    "assetReadDuration": "00:00:00.4206919",
+    "largestAssets": [
+      {
+        "assetId": "texture.world.terrain.crushed_gravel",
+        "type": "texture",
+        "runtimeBytes": 5593386
+      },
+      {
+        "assetId": "texture.world.terrain.concrete_base",
+        "type": "texture",
+        "runtimeBytes": 5593383
+      },
+      {
+        "assetId": "texture.world.terrain.cracked_earth",
+        "type": "texture",
+        "runtimeBytes": 5593383
+      },
+      {
+        "assetId": "texture.world.terrain.rocky_scrub",
+        "type": "texture",
+        "runtimeBytes": 5593377
+      },
+      {
+        "assetId": "texture.world.terrain.dark_ash",
+        "type": "texture",
+        "runtimeBytes": 5593368
+      },
+      {
+        "assetId": "texture.world.terrain.dry_dirt",
+        "type": "texture",
+        "runtimeBytes": 5593368
+      },
+      {
+        "assetId": "texture.world.terrain.bedrock",
+        "type": "texture",
+        "runtimeBytes": 5593365
+      },
+      {
+        "assetId": "texture.directorate.surface.atlas_base",
+        "type": "texture",
+        "runtimeBytes": 5587811
+      },
+      {
+        "assetId": "texture.directorate.surface.atlas_normal",
+        "type": "texture",
+        "runtimeBytes": 1393493
+      },
+      {
+        "assetId": "unit.directorate.combat_engineer",
+        "type": "mesh",
+        "runtimeBytes": 840699
+      },
+      {
+        "assetId": "building.directorate.logistics_hub",
+        "type": "mesh",
+        "runtimeBytes": 680384
+      },
+      {
+        "assetId": "unit.directorate.main_battle_tank",
+        "type": "mesh",
+        "runtimeBytes": 660330
+      }
+    ],
+    "issues": [],
+    "success": true
+  },
+  "baselineCatalog": {
+    "assetCount": 482,
+    "meshCount": 299,
+    "textureCount": 56,
+    "materialCount": 127,
+    "totalRuntimeBytes": 64652118,
+    "meshRuntimeBytes": 9699020,
+    "textureRuntimeBytes": 54798223,
+    "studioSplashTextureRuntimeBytes": 1786411,
+    "materialRuntimeBytes": 154875,
+    "catalogLoadDuration": "00:00:00.0190740",
+    "assetReadDuration": "00:00:00.4090558",
+    "largestAssets": [
+      {
+        "assetId": "texture.world.terrain.crushed_gravel",
+        "type": "texture",
+        "runtimeBytes": 5593386
+      },
+      {
+        "assetId": "texture.world.terrain.concrete_base",
+        "type": "texture",
+        "runtimeBytes": 5593383
+      },
+      {
+        "assetId": "texture.world.terrain.cracked_earth",
+        "type": "texture",
+        "runtimeBytes": 5593383
+      },
+      {
+        "assetId": "texture.world.terrain.rocky_scrub",
+        "type": "texture",
+        "runtimeBytes": 5593377
+      },
+      {
+        "assetId": "texture.world.terrain.dark_ash",
+        "type": "texture",
+        "runtimeBytes": 5593368
+      },
+      {
+        "assetId": "texture.world.terrain.dry_dirt",
+        "type": "texture",
+        "runtimeBytes": 5593368
+      },
+      {
+        "assetId": "texture.world.terrain.bedrock",
+        "type": "texture",
+        "runtimeBytes": 5593365
+      },
+      {
+        "assetId": "texture.directorate.surface.atlas_base",
+        "type": "texture",
+        "runtimeBytes": 5587811
+      },
+      {
+        "assetId": "texture.directorate.surface.atlas_normal",
+        "type": "texture",
+        "runtimeBytes": 1393493
+      },
+      {
+        "assetId": "unit.directorate.combat_engineer",
+        "type": "mesh",
+        "runtimeBytes": 840699
+      },
+      {
+        "assetId": "building.directorate.logistics_hub",
+        "type": "mesh",
+        "runtimeBytes": 680384
+      },
+      {
+        "assetId": "unit.directorate.main_battle_tank",
+        "type": "mesh",
+        "runtimeBytes": 660330
+      }
+    ],
+    "issues": [],
+    "success": true
+  },
+  "inventory": [
+    {
+      "id": "unit.directorate.cargo_truck",
+      "definition": "assets/source/units/directorate/logistics/cargo_truck.asset.json",
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "unit.directorate.cargo_truck.lod1",
+          "maxDistance": 130
+        },
+        {
+          "level": 2,
+          "assetId": "unit.directorate.cargo_truck.lod2",
+          "maxDistance": 360
+        }
+      ],
+      "dependencies": [
+        "material.directorate.unit.cargo_truck",
+        "unit.directorate.cargo_truck.collision",
+        "unit.directorate.cargo_truck.lod1",
+        "unit.directorate.cargo_truck.lod2"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/cargo_truck/lod0.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/cargo_truck.flasset",
+      "materials": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "collision": "unit.directorate.cargo_truck.collision",
+      "sourceDimensions": null,
+      "sockets": [
+        {
+          "name": "cargo_load",
+          "x": 0,
+          "y": 0.12,
+          "z": -0.38,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_1_35",
+          "x": 0.4125,
+          "y": -0.27916667,
+          "z": 0.2109375,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_2_38",
+          "x": 0.4125,
+          "y": -0.27916667,
+          "z": 0.371875,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_n1_25",
+          "x": 0.4125,
+          "y": -0.27916667,
+          "z": -0.1953125,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_n2_4",
+          "x": 0.4125,
+          "y": -0.27916667,
+          "z": -0.375,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_1_35",
+          "x": -0.4125,
+          "y": -0.27916667,
+          "z": 0.2109375,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_2_38",
+          "x": -0.4125,
+          "y": -0.27916667,
+          "z": 0.371875,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_n1_25",
+          "x": -0.4125,
+          "y": -0.27916667,
+          "z": -0.1953125,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_n2_4",
+          "x": -0.4125,
+          "y": -0.27916667,
+          "z": -0.375,
+          "isValid": true
+        }
+      ]
+    },
+    {
+      "id": "unit.directorate.cargo_truck.critical",
+      "definition": "assets/source/units/directorate/logistics/cargo_truck_critical.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/cargo_truck/critical.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/cargo_truck/critical.flasset",
+      "materials": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    },
+    {
+      "id": "unit.directorate.cargo_truck.damaged",
+      "definition": "assets/source/units/directorate/logistics/cargo_truck_damaged.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/cargo_truck/damaged.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/cargo_truck/damaged.flasset",
+      "materials": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    },
+    {
+      "id": "unit.directorate.cargo_truck.lod1",
+      "definition": "assets/source/units/directorate/logistics/cargo_truck_lod1.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/cargo_truck/lod1.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/cargo_truck/lod1.flasset",
+      "materials": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    },
+    {
+      "id": "unit.directorate.cargo_truck.lod2",
+      "definition": "assets/source/units/directorate/logistics/cargo_truck_lod2.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/cargo_truck/lod2.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/cargo_truck/lod2.flasset",
+      "materials": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    },
+    {
+      "id": "unit.directorate.cargo_truck.wreck",
+      "definition": "assets/source/units/directorate/logistics/cargo_truck_wreck.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/cargo_truck/wreck.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/cargo_truck/wreck.flasset",
+      "materials": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    },
+    {
+      "id": "unit.directorate.scout_vehicle",
+      "definition": "assets/source/units/directorate/vehicles/scout_vehicle.asset.json",
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "unit.directorate.scout_vehicle.lod1",
+          "maxDistance": 120
+        },
+        {
+          "level": 2,
+          "assetId": "unit.directorate.scout_vehicle.lod2",
+          "maxDistance": 340
+        }
+      ],
+      "dependencies": [
+        "material.directorate.unit.scout_vehicle",
+        "unit.directorate.scout_vehicle.collision",
+        "unit.directorate.scout_vehicle.lod1",
+        "unit.directorate.scout_vehicle.lod2"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/scout_vehicle/lod0.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/scout_vehicle.flasset",
+      "materials": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "collision": "unit.directorate.scout_vehicle.collision",
+      "sourceDimensions": null,
+      "sockets": [
+        {
+          "name": "gun_pivot",
+          "x": 0,
+          "y": 0.2,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "motion_sensor",
+          "x": 0,
+          "y": 0.48,
+          "z": 0.02,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_0",
+          "x": 0.41,
+          "y": -0.325,
+          "z": 0,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_1_47",
+          "x": 0.41,
+          "y": -0.325,
+          "z": 0.2826923,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_n1_47",
+          "x": 0.41,
+          "y": -0.325,
+          "z": -0.2826923,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_0",
+          "x": -0.41,
+          "y": -0.325,
+          "z": 0,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_1_47",
+          "x": -0.41,
+          "y": -0.325,
+          "z": 0.2826923,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_n1_47",
+          "x": -0.41,
+          "y": -0.325,
+          "z": -0.2826923,
+          "isValid": true
+        },
+        {
+          "name": "sensor_origin",
+          "x": 0,
+          "y": 0.48,
+          "z": 0.02,
+          "isValid": true
+        },
+        {
+          "name": "turret_pivot",
+          "x": 0,
+          "y": 0.2,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "weapon_muzzle",
+          "x": 0,
+          "y": 0.2,
+          "z": 0.47,
+          "isValid": true
+        }
+      ]
+    },
+    {
+      "id": "unit.directorate.scout_vehicle.critical",
+      "definition": "assets/source/units/directorate/vehicles/scout_vehicle_critical.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/scout_vehicle/critical.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/scout_vehicle/critical.flasset",
+      "materials": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    },
+    {
+      "id": "unit.directorate.scout_vehicle.damaged",
+      "definition": "assets/source/units/directorate/vehicles/scout_vehicle_damaged.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/scout_vehicle/damaged.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/scout_vehicle/damaged.flasset",
+      "materials": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    },
+    {
+      "id": "unit.directorate.scout_vehicle.lod1",
+      "definition": "assets/source/units/directorate/vehicles/scout_vehicle_lod1.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/scout_vehicle/lod1.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/scout_vehicle/lod1.flasset",
+      "materials": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    },
+    {
+      "id": "unit.directorate.scout_vehicle.lod2",
+      "definition": "assets/source/units/directorate/vehicles/scout_vehicle_lod2.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/scout_vehicle/lod2.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/scout_vehicle/lod2.flasset",
+      "materials": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    },
+    {
+      "id": "unit.directorate.scout_vehicle.turret",
+      "definition": "assets/source/units/directorate/vehicles/scout_vehicle_turret.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/scout_vehicle/turret.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/scout_vehicle/turret.flasset",
+      "materials": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": [
+        {
+          "name": "gun_pivot",
+          "x": 0,
+          "y": 0.2,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "motion_weapon",
+          "x": 0,
+          "y": 0.2,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "sensor_origin",
+          "x": 0,
+          "y": 0.48,
+          "z": 0.02,
+          "isValid": true
+        },
+        {
+          "name": "turret_pivot",
+          "x": 0,
+          "y": 0.2,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "weapon_muzzle",
+          "x": 0,
+          "y": 0.2,
+          "z": 0.47,
+          "isValid": true
+        }
+      ]
+    },
+    {
+      "id": "unit.directorate.scout_vehicle.wreck",
+      "definition": "assets/source/units/directorate/vehicles/scout_vehicle_wreck.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/scout_vehicle/wreck.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/scout_vehicle/wreck.flasset",
+      "materials": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    },
+    {
+      "id": "unit.directorate.self_propelled_artillery",
+      "definition": "assets/source/units/directorate/artillery/self_propelled_artillery.asset.json",
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "unit.directorate.self_propelled_artillery.lod1",
+          "maxDistance": 140
+        },
+        {
+          "level": 2,
+          "assetId": "unit.directorate.self_propelled_artillery.lod2",
+          "maxDistance": 380
+        }
+      ],
+      "dependencies": [
+        "material.directorate.unit.self_propelled_artillery",
+        "unit.directorate.self_propelled_artillery.collision",
+        "unit.directorate.self_propelled_artillery.lod1",
+        "unit.directorate.self_propelled_artillery.lod2"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/self_propelled_artillery/lod0.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/self_propelled_artillery.flasset",
+      "materials": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "collision": "unit.directorate.self_propelled_artillery.collision",
+      "sourceDimensions": null,
+      "sockets": [
+        {
+          "name": "gun_pivot",
+          "x": 0,
+          "y": 0.24,
+          "z": -0.04,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_1_0",
+          "x": 0.39736843,
+          "y": -0.29375,
+          "z": 0,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_1_1_09",
+          "x": 0.39736843,
+          "y": -0.29375,
+          "z": 0.14533333,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_1_2_12",
+          "x": 0.39736843,
+          "y": -0.29375,
+          "z": 0.28266665,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_1_n1_09",
+          "x": 0.39736843,
+          "y": -0.29375,
+          "z": -0.14533333,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_1_n2_12",
+          "x": 0.39736843,
+          "y": -0.29375,
+          "z": -0.28266665,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_n1_0",
+          "x": -0.39736843,
+          "y": -0.29375,
+          "z": 0,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_n1_1_09",
+          "x": -0.39736843,
+          "y": -0.29375,
+          "z": 0.14533333,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_n1_2_12",
+          "x": -0.39736843,
+          "y": -0.29375,
+          "z": 0.28266665,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_n1_n1_09",
+          "x": -0.39736843,
+          "y": -0.29375,
+          "z": -0.14533333,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_n1_n2_12",
+          "x": -0.39736843,
+          "y": -0.29375,
+          "z": -0.28266665,
+          "isValid": true
+        },
+        {
+          "name": "recoil_anchor",
+          "x": 0,
+          "y": 0.24,
+          "z": 0.04,
+          "isValid": true
+        },
+        {
+          "name": "turret_pivot",
+          "x": 0,
+          "y": 0.24,
+          "z": -0.04,
+          "isValid": true
+        },
+        {
+          "name": "weapon_muzzle",
+          "x": 0,
+          "y": 0.24,
+          "z": 0.68,
+          "isValid": true
+        }
+      ]
+    },
+    {
+      "id": "unit.directorate.self_propelled_artillery.critical",
+      "definition": "assets/source/units/directorate/artillery/self_propelled_artillery_critical.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/self_propelled_artillery/critical.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/self_propelled_artillery/critical.flasset",
+      "materials": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    },
+    {
+      "id": "unit.directorate.self_propelled_artillery.damaged",
+      "definition": "assets/source/units/directorate/artillery/self_propelled_artillery_damaged.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/self_propelled_artillery/damaged.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/self_propelled_artillery/damaged.flasset",
+      "materials": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    },
+    {
+      "id": "unit.directorate.self_propelled_artillery.lod1",
+      "definition": "assets/source/units/directorate/artillery/self_propelled_artillery_lod1.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/self_propelled_artillery/lod1.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/self_propelled_artillery/lod1.flasset",
+      "materials": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    },
+    {
+      "id": "unit.directorate.self_propelled_artillery.lod2",
+      "definition": "assets/source/units/directorate/artillery/self_propelled_artillery_lod2.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/self_propelled_artillery/lod2.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/self_propelled_artillery/lod2.flasset",
+      "materials": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    },
+    {
+      "id": "unit.directorate.self_propelled_artillery.turret",
+      "definition": "assets/source/units/directorate/artillery/self_propelled_artillery_turret.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/self_propelled_artillery/turret.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/self_propelled_artillery/turret.flasset",
+      "materials": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": [
+        {
+          "name": "gun_pivot",
+          "x": 0,
+          "y": 0.24,
+          "z": -0.04,
+          "isValid": true
+        },
+        {
+          "name": "motion_cannon",
+          "x": 0,
+          "y": 0.24,
+          "z": -0.04,
+          "isValid": true
+        },
+        {
+          "name": "recoil_anchor",
+          "x": 0,
+          "y": 0.24,
+          "z": 0.04,
+          "isValid": true
+        },
+        {
+          "name": "turret_pivot",
+          "x": 0,
+          "y": 0.24,
+          "z": -0.04,
+          "isValid": true
+        },
+        {
+          "name": "weapon_muzzle",
+          "x": 0,
+          "y": 0.24,
+          "z": 0.68,
+          "isValid": true
+        }
+      ]
+    },
+    {
+      "id": "unit.directorate.self_propelled_artillery.wreck",
+      "definition": "assets/source/units/directorate/artillery/self_propelled_artillery_wreck.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/self_propelled_artillery/wreck.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/self_propelled_artillery/wreck.flasset",
+      "materials": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    },
+    {
+      "id": "unit.directorate.supply_truck",
+      "definition": "assets/source/units/directorate/logistics/supply_truck.asset.json",
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "unit.directorate.supply_truck.lod1",
+          "maxDistance": 130
+        },
+        {
+          "level": 2,
+          "assetId": "unit.directorate.supply_truck.lod2",
+          "maxDistance": 360
+        }
+      ],
+      "dependencies": [
+        "material.directorate.unit.supply_truck",
+        "unit.directorate.supply_truck.collision",
+        "unit.directorate.supply_truck.lod1",
+        "unit.directorate.supply_truck.lod2"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/supply_truck/lod0.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/supply_truck.flasset",
+      "materials": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "collision": "unit.directorate.supply_truck.collision",
+      "sourceDimensions": null,
+      "sockets": [
+        {
+          "name": "cargo_load",
+          "x": 0,
+          "y": 0.12,
+          "z": -0.38,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_1_35",
+          "x": 0.3882353,
+          "y": -0.268,
+          "z": 0.1985294,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_2_38",
+          "x": 0.3882353,
+          "y": -0.268,
+          "z": 0.35,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_n1_25",
+          "x": 0.3882353,
+          "y": -0.268,
+          "z": -0.18382353,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_n2_4",
+          "x": 0.3882353,
+          "y": -0.268,
+          "z": -0.3529412,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_1_35",
+          "x": -0.3882353,
+          "y": -0.268,
+          "z": 0.1985294,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_2_38",
+          "x": -0.3882353,
+          "y": -0.268,
+          "z": 0.35,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_n1_25",
+          "x": -0.3882353,
+          "y": -0.268,
+          "z": -0.18382353,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_n2_4",
+          "x": -0.3882353,
+          "y": -0.268,
+          "z": -0.3529412,
+          "isValid": true
+        },
+        {
+          "name": "supply_transfer",
+          "x": 0.34,
+          "y": 0.04,
+          "z": -0.18,
+          "isValid": true
+        }
+      ]
+    },
+    {
+      "id": "unit.directorate.supply_truck.critical",
+      "definition": "assets/source/units/directorate/logistics/supply_truck_critical.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/supply_truck/critical.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/supply_truck/critical.flasset",
+      "materials": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    },
+    {
+      "id": "unit.directorate.supply_truck.damaged",
+      "definition": "assets/source/units/directorate/logistics/supply_truck_damaged.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/supply_truck/damaged.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/supply_truck/damaged.flasset",
+      "materials": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    },
+    {
+      "id": "unit.directorate.supply_truck.lod1",
+      "definition": "assets/source/units/directorate/logistics/supply_truck_lod1.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/supply_truck/lod1.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/supply_truck/lod1.flasset",
+      "materials": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    },
+    {
+      "id": "unit.directorate.supply_truck.lod2",
+      "definition": "assets/source/units/directorate/logistics/supply_truck_lod2.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/supply_truck/lod2.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/supply_truck/lod2.flasset",
+      "materials": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    },
+    {
+      "id": "unit.directorate.supply_truck.wreck",
+      "definition": "assets/source/units/directorate/logistics/supply_truck_wreck.asset.json",
+      "lods": [],
+      "dependencies": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "source": "assets/source/units/directorate/sources/combat_support/supply_truck/wreck.gltf",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "runtimeTextureLimit": null,
+      "type": "mesh",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "runtime": "assets/runtime/meshes/unit/directorate/supply_truck/wreck.flasset",
+      "materials": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "collision": null,
+      "sourceDimensions": null,
+      "sockets": []
+    }
+  ],
+  "compiledRecords": [
+    {
+      "id": "unit.directorate.cargo_truck",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/cargo_truck/lod0.gltf",
+      "runtimePath": "meshes/unit/directorate/cargo_truck.flasset",
+      "sourceHash": "5232d538cc794bdbe7f092f345d997a938ac19c1dce386dac1ab32d9a16bc2e4",
+      "buildHash": "a29baec2a37048ac005c82622343f448cb897140e92e025adf5bd4124612ef0b",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 431774,
+      "runtimeHash": "3fca581347b72c8dfa54760365e41cdf786eea4d8bf1cdfa7dea0319642c5be4",
+      "dependencies": [
+        "material.directorate.unit.cargo_truck",
+        "unit.directorate.cargo_truck.collision",
+        "unit.directorate.cargo_truck.lod1",
+        "unit.directorate.cargo_truck.lod2"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "textureReferences": [],
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "unit.directorate.cargo_truck.lod1",
+          "maxDistance": 130
+        },
+        {
+          "level": 2,
+          "assetId": "unit.directorate.cargo_truck.lod2",
+          "maxDistance": 360
+        }
+      ],
+      "collisionReference": "unit.directorate.cargo_truck.collision",
+      "animationReferences": [],
+      "sockets": [
+        {
+          "name": "cargo_load",
+          "x": 0,
+          "y": 0.12,
+          "z": -0.38,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_1_35",
+          "x": 0.4125,
+          "y": -0.27916667,
+          "z": 0.2109375,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_2_38",
+          "x": 0.4125,
+          "y": -0.27916667,
+          "z": 0.371875,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_n1_25",
+          "x": 0.4125,
+          "y": -0.27916667,
+          "z": -0.1953125,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_n2_4",
+          "x": 0.4125,
+          "y": -0.27916667,
+          "z": -0.375,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_1_35",
+          "x": -0.4125,
+          "y": -0.27916667,
+          "z": 0.2109375,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_2_38",
+          "x": -0.4125,
+          "y": -0.27916667,
+          "z": 0.371875,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_n1_25",
+          "x": -0.4125,
+          "y": -0.27916667,
+          "z": -0.1953125,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_n2_4",
+          "x": -0.4125,
+          "y": -0.27916667,
+          "z": -0.375,
+          "isValid": true
+        }
+      ],
+      "mechanicalParts": [
+        {
+          "name": "body",
+          "firstIndex": 0,
+          "indexCount": 5322,
+          "parent": -1,
+          "motion": "static",
+          "socket": null,
+          "rate": 1,
+          "travel": 0
+        },
+        {
+          "name": "wheel_n1_n2_4",
+          "firstIndex": 5322,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_n1_n2_4",
+          "rate": 2.3255813,
+          "travel": 0
+        },
+        {
+          "name": "wheel_1_n2_4",
+          "firstIndex": 6162,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_1_n2_4",
+          "rate": 2.3255813,
+          "travel": 0
+        },
+        {
+          "name": "wheel_n1_n1_25",
+          "firstIndex": 7002,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_n1_n1_25",
+          "rate": 2.3255813,
+          "travel": 0
+        },
+        {
+          "name": "wheel_1_n1_25",
+          "firstIndex": 7842,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_1_n1_25",
+          "rate": 2.3255813,
+          "travel": 0
+        },
+        {
+          "name": "wheel_n1_1_35",
+          "firstIndex": 8682,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_n1_1_35",
+          "rate": 2.3255813,
+          "travel": 0
+        },
+        {
+          "name": "wheel_1_1_35",
+          "firstIndex": 9522,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_1_1_35",
+          "rate": 2.3255813,
+          "travel": 0
+        },
+        {
+          "name": "wheel_n1_2_38",
+          "firstIndex": 10362,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_n1_2_38",
+          "rate": 2.3255813,
+          "travel": 0
+        },
+        {
+          "name": "wheel_1_2_38",
+          "firstIndex": 11202,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_1_2_38",
+          "rate": 2.3255813,
+          "travel": 0
+        }
+      ],
+      "bounds": {
+        "minX": -0.4859375,
+        "minY": -0.45833334,
+        "minZ": -0.4734375,
+        "maxX": 0.4859375,
+        "maxY": 0.47916666,
+        "maxZ": 0.475,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.cargo_truck.critical",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/cargo_truck/critical.gltf",
+      "runtimePath": "meshes/unit/directorate/cargo_truck/critical.flasset",
+      "sourceHash": "87f2ba049e3db9918b806623d9fff78617e6581f12a120ee03cbba43691b908b",
+      "buildHash": "170cd83c7ee69f7781c57476b4ce664c151f84ee6a5a403a5b41ece652e37ee7",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 9913,
+      "runtimeHash": "fe07675168072e1bd0354f639ce3827da872f612c1d17c70db611f4bf3bac286",
+      "dependencies": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": -0.271875,
+        "minY": -0.45833334,
+        "minZ": -0.375,
+        "maxX": 0.478125,
+        "maxY": -0.045833334,
+        "maxZ": -0.1015625,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.cargo_truck.damaged",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/cargo_truck/damaged.gltf",
+      "runtimePath": "meshes/unit/directorate/cargo_truck/damaged.flasset",
+      "sourceHash": "144f572ccc1c13397b4d3eec85d5903778f26e0c468477163c5272bf25a04907",
+      "buildHash": "f5df1e31ee65e73ec47b581aed09c36d3087bca414e5a761c51fdd6f6e15e2ee",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 3670,
+      "runtimeHash": "c5ce0ec8b7689513f92cd1c9338a957cbdeda65b2b42d4e448fc00e0b19bbf03",
+      "dependencies": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": 0.3375,
+        "minY": -0.45833334,
+        "minZ": -0.3015625,
+        "maxX": 0.478125,
+        "maxY": -0.16666667,
+        "maxZ": -0.1828125,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.cargo_truck.lod1",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/cargo_truck/lod1.gltf",
+      "runtimePath": "meshes/unit/directorate/cargo_truck/lod1.flasset",
+      "sourceHash": "dc920c0f126473fa5da95eeba1f570f6657e96fbda43e3886c94a280230c278b",
+      "buildHash": "d9c7993bbaa888f70f4619ea87dc4f7f3edf008d1dc163a7c855aa8178ecdd95",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 100164,
+      "runtimeHash": "88f595d8f0b77bed85fc156d029f3646ca08e494d4bf5b274a1a0ff3fd49ca74",
+      "dependencies": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": -0.4859375,
+        "minY": -0.45833334,
+        "minZ": -0.4734375,
+        "maxX": 0.4859375,
+        "maxY": 0.47916666,
+        "maxZ": 0.475,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.cargo_truck.lod2",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/cargo_truck/lod2.gltf",
+      "runtimePath": "meshes/unit/directorate/cargo_truck/lod2.flasset",
+      "sourceHash": "4d9f48994c3557ccc3da2f63d7324819d1b68a164cad49468bdc343648c768dc",
+      "buildHash": "f89d632878ddd533945fdf99c3e525e93e5ef5cef632b81eb9dbfc729c34a09d",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 39370,
+      "runtimeHash": "51bd055de81d608fe636109c31d650a42cd11b1535100fe7501fd3d768d32ab2",
+      "dependencies": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": -0.478125,
+        "minY": -0.45833334,
+        "minZ": -0.4734375,
+        "maxX": 0.478125,
+        "maxY": 0.46666667,
+        "maxZ": 0.475,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.cargo_truck.wreck",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/cargo_truck/wreck.gltf",
+      "runtimePath": "meshes/unit/directorate/cargo_truck/wreck.flasset",
+      "sourceHash": "c90c67e43b6eaf4308c201419f06758a16f1be6c885f1fa7edb78bc2b1f570af",
+      "buildHash": "bf6ef635db2050c5005311bbf64664c8700b11c019647d387650fd87b338ad23",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 11195,
+      "runtimeHash": "e3152724649930b6c7c6f2df9b99a1e6cca64b6c216c522344dbb3eef9bfffd4",
+      "dependencies": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": -0.3966338,
+        "minY": -0.45833334,
+        "minZ": -0.40625,
+        "maxX": 0.34375,
+        "maxY": -0.025,
+        "maxZ": 0.2359375,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.scout_vehicle",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/scout_vehicle/lod0.gltf",
+      "runtimePath": "meshes/unit/directorate/scout_vehicle.flasset",
+      "sourceHash": "06ba6c3b9b7e1e2e0a944049787592edf9b8e3dcac79c6442d77298f3ba62247",
+      "buildHash": "f22d1af283866bc1932a0a6cfecb3fdfb378b99b6b70acaa868a356b2f972baa",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 265988,
+      "runtimeHash": "ab1daf1e0ca7fdaf7d2a0e62c3d5d25c04156517311c5a7f910082622276bb99",
+      "dependencies": [
+        "material.directorate.unit.scout_vehicle",
+        "unit.directorate.scout_vehicle.collision",
+        "unit.directorate.scout_vehicle.lod1",
+        "unit.directorate.scout_vehicle.lod2"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "textureReferences": [],
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "unit.directorate.scout_vehicle.lod1",
+          "maxDistance": 120
+        },
+        {
+          "level": 2,
+          "assetId": "unit.directorate.scout_vehicle.lod2",
+          "maxDistance": 340
+        }
+      ],
+      "collisionReference": "unit.directorate.scout_vehicle.collision",
+      "animationReferences": [],
+      "sockets": [
+        {
+          "name": "gun_pivot",
+          "x": 0,
+          "y": 0.2,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "motion_sensor",
+          "x": 0,
+          "y": 0.48,
+          "z": 0.02,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_0",
+          "x": 0.41,
+          "y": -0.325,
+          "z": 0,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_1_47",
+          "x": 0.41,
+          "y": -0.325,
+          "z": 0.2826923,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_n1_47",
+          "x": 0.41,
+          "y": -0.325,
+          "z": -0.2826923,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_0",
+          "x": -0.41,
+          "y": -0.325,
+          "z": 0,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_1_47",
+          "x": -0.41,
+          "y": -0.325,
+          "z": 0.2826923,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_n1_47",
+          "x": -0.41,
+          "y": -0.325,
+          "z": -0.2826923,
+          "isValid": true
+        },
+        {
+          "name": "sensor_origin",
+          "x": 0,
+          "y": 0.48,
+          "z": 0.02,
+          "isValid": true
+        },
+        {
+          "name": "turret_pivot",
+          "x": 0,
+          "y": 0.2,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "weapon_muzzle",
+          "x": 0,
+          "y": 0.2,
+          "z": 0.47,
+          "isValid": true
+        }
+      ],
+      "mechanicalParts": [
+        {
+          "name": "body",
+          "firstIndex": 0,
+          "indexCount": 2328,
+          "parent": -1,
+          "motion": "static",
+          "socket": null,
+          "rate": 1,
+          "travel": 0
+        },
+        {
+          "name": "wheel_n1_n1_47",
+          "firstIndex": 2328,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_n1_n1_47",
+          "rate": 2.3809524,
+          "travel": 0
+        },
+        {
+          "name": "wheel_1_n1_47",
+          "firstIndex": 3168,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_1_n1_47",
+          "rate": 2.3809524,
+          "travel": 0
+        },
+        {
+          "name": "wheel_n1_0",
+          "firstIndex": 4008,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_n1_0",
+          "rate": 2.3809524,
+          "travel": 0
+        },
+        {
+          "name": "wheel_1_0",
+          "firstIndex": 4848,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_1_0",
+          "rate": 2.3809524,
+          "travel": 0
+        },
+        {
+          "name": "wheel_n1_1_47",
+          "firstIndex": 5688,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_n1_1_47",
+          "rate": 2.3809524,
+          "travel": 0
+        },
+        {
+          "name": "wheel_1_1_47",
+          "firstIndex": 6528,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_1_1_47",
+          "rate": 2.3809524,
+          "travel": 0
+        },
+        {
+          "name": "sensor",
+          "firstIndex": 7368,
+          "indexCount": 168,
+          "parent": 0,
+          "motion": "radar",
+          "socket": "motion_sensor",
+          "rate": 0.6,
+          "travel": 0
+        }
+      ],
+      "bounds": {
+        "minX": -0.48833334,
+        "minY": -0.5,
+        "minZ": -0.43269232,
+        "maxX": 0.48833334,
+        "maxY": 0.5,
+        "maxZ": 0.43269232,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.scout_vehicle.critical",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/scout_vehicle/critical.gltf",
+      "runtimePath": "meshes/unit/directorate/scout_vehicle/critical.flasset",
+      "sourceHash": "5c0a8a873f5d9bedc404be1551fd05010946fc0a8a7b05a67aa14dbdaae72bd2",
+      "buildHash": "373e14f2eaf9c8d630668ff726999d69fc9fc39aac2327847991f4652d21229f",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 9906,
+      "runtimeHash": "1d2e548dbb832ae6b12edc484e6a8ea3b8ff690ff84cc2cc2316132a6f2404f5",
+      "dependencies": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": -0.29,
+        "minY": -0.5,
+        "minZ": -0.46153846,
+        "maxX": 0.51,
+        "maxY": -0.0875,
+        "maxZ": -0.125,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.scout_vehicle.damaged",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/scout_vehicle/damaged.gltf",
+      "runtimePath": "meshes/unit/directorate/scout_vehicle/damaged.flasset",
+      "sourceHash": "b2e8af4288cc1a51363352afa8b0f4a91fbfdee985b170ddd164c497911e2082",
+      "buildHash": "ebca6be3e6fb263da6dcc3caa7ffb17babf27900742c198c2df50126a01b0543",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 3666,
+      "runtimeHash": "18983ef32a50d41e925b3a0b209cf2acd1b669bba0152c7a5a3c9a6c90382543",
+      "dependencies": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": 0.36,
+        "minY": -0.5,
+        "minZ": -0.37115383,
+        "maxX": 0.51,
+        "maxY": -0.20833333,
+        "maxZ": -0.225,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.scout_vehicle.lod1",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/scout_vehicle/lod1.gltf",
+      "runtimePath": "meshes/unit/directorate/scout_vehicle/lod1.flasset",
+      "sourceHash": "719dc27f349038398fc840881947ab40d94690e1f86933d396138af1f5a638d4",
+      "buildHash": "6cd8f64d77c5e28bffe12bce3880b71831056e1bd6dff04077ae7f893abbf666",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 72876,
+      "runtimeHash": "5967cd397dc8ed13cd2ff7018ab4ee9101d4de502900240e983a06121dea2ee3",
+      "dependencies": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": -0.48833334,
+        "minY": -0.5,
+        "minZ": -0.43269232,
+        "maxX": 0.48833334,
+        "maxY": 0.5,
+        "maxZ": 0.47,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.scout_vehicle.lod2",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/scout_vehicle/lod2.gltf",
+      "runtimePath": "meshes/unit/directorate/scout_vehicle/lod2.flasset",
+      "sourceHash": "36fa01a861491db9d11e9f9deeca21066c593dfc7d6ad4de8b7834d3dd05f319",
+      "buildHash": "30135f49e21dcf7495bee32ae507777449dc87fee7bc41811841431e4cf6b086",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 30576,
+      "runtimeHash": "384e3d87df47afe11cca7bdf954f94ad35b92ab90a537a2020c89bc730aaa899",
+      "dependencies": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": -0.48,
+        "minY": -0.5,
+        "minZ": -0.43269232,
+        "maxX": 0.48,
+        "maxY": 0.5,
+        "maxZ": 0.47,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.scout_vehicle.turret",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/scout_vehicle/turret.gltf",
+      "runtimePath": "meshes/unit/directorate/scout_vehicle/turret.flasset",
+      "sourceHash": "8eb14d38c0f23210077df7f946e94648af529714ffddbe90448834204feb1505",
+      "buildHash": "35b9b722a260f89faa393529e60365ccb818187e79e31f868a9fef6fa26335d0",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 22784,
+      "runtimeHash": "b67a0ade208fd3c0f6c80c90db00c7f88f33f5e461e9655263b7592164e77992",
+      "dependencies": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [
+        {
+          "name": "gun_pivot",
+          "x": 0,
+          "y": 0.2,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "motion_weapon",
+          "x": 0,
+          "y": 0.2,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "sensor_origin",
+          "x": 0,
+          "y": 0.48,
+          "z": 0.02,
+          "isValid": true
+        },
+        {
+          "name": "turret_pivot",
+          "x": 0,
+          "y": 0.2,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "weapon_muzzle",
+          "x": 0,
+          "y": 0.2,
+          "z": 0.47,
+          "isValid": true
+        }
+      ],
+      "mechanicalParts": [
+        {
+          "name": "turret_body",
+          "firstIndex": 0,
+          "indexCount": 84,
+          "parent": -1,
+          "motion": "static",
+          "socket": null,
+          "rate": 1,
+          "travel": 0
+        },
+        {
+          "name": "weapon",
+          "firstIndex": 84,
+          "indexCount": 480,
+          "parent": 0,
+          "motion": "cannon",
+          "socket": "motion_weapon",
+          "rate": 1,
+          "travel": 0.009
+        }
+      ],
+      "bounds": {
+        "minX": -0.11333334,
+        "minY": 0.1,
+        "minZ": 0.15961538,
+        "maxX": 0.11333334,
+        "maxY": 0.24166666,
+        "maxZ": 0.47,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.scout_vehicle.wreck",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/scout_vehicle/wreck.gltf",
+      "runtimePath": "meshes/unit/directorate/scout_vehicle/wreck.flasset",
+      "sourceHash": "e91838f90805aaa4997c46738dc5834aa0bce94b1713261617201633a1d9e22c",
+      "buildHash": "b2dcf87163b1ee06b4c6b13de9aad54ca52c4256651bda7262cca32ef5f92a7c",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 13225,
+      "runtimeHash": "072ba3d5e5b1bb231a63de03acaeac41b566abe79c0a297bd7e4449b31ec8478",
+      "dependencies": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": -0.42307603,
+        "minY": -0.5,
+        "minZ": -0.45192307,
+        "maxX": 0.36640936,
+        "maxY": -0.1125,
+        "maxZ": 0.29038462,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.self_propelled_artillery",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/self_propelled_artillery/lod0.gltf",
+      "runtimePath": "meshes/unit/directorate/self_propelled_artillery.flasset",
+      "sourceHash": "36b3f1ffaf9e327b6fa8e166cba289e1f0a625c054576b7d999022e4f94ac0b6",
+      "buildHash": "2f97e5ca8526ba1798e658aa70c7cea4de7f263af16d2a91329ccf87a77815f9",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 495870,
+      "runtimeHash": "0e4f01a7bedbe47aab4d79980c6e3ac6e9d0b7c05c9cca2ba3e8a83279a764bf",
+      "dependencies": [
+        "material.directorate.unit.self_propelled_artillery",
+        "unit.directorate.self_propelled_artillery.collision",
+        "unit.directorate.self_propelled_artillery.lod1",
+        "unit.directorate.self_propelled_artillery.lod2"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "textureReferences": [],
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "unit.directorate.self_propelled_artillery.lod1",
+          "maxDistance": 140
+        },
+        {
+          "level": 2,
+          "assetId": "unit.directorate.self_propelled_artillery.lod2",
+          "maxDistance": 380
+        }
+      ],
+      "collisionReference": "unit.directorate.self_propelled_artillery.collision",
+      "animationReferences": [],
+      "sockets": [
+        {
+          "name": "gun_pivot",
+          "x": 0,
+          "y": 0.24,
+          "z": -0.04,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_1_0",
+          "x": 0.39736843,
+          "y": -0.29375,
+          "z": 0,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_1_1_09",
+          "x": 0.39736843,
+          "y": -0.29375,
+          "z": 0.14533333,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_1_2_12",
+          "x": 0.39736843,
+          "y": -0.29375,
+          "z": 0.28266665,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_1_n1_09",
+          "x": 0.39736843,
+          "y": -0.29375,
+          "z": -0.14533333,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_1_n2_12",
+          "x": 0.39736843,
+          "y": -0.29375,
+          "z": -0.28266665,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_n1_0",
+          "x": -0.39736843,
+          "y": -0.29375,
+          "z": 0,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_n1_1_09",
+          "x": -0.39736843,
+          "y": -0.29375,
+          "z": 0.14533333,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_n1_2_12",
+          "x": -0.39736843,
+          "y": -0.29375,
+          "z": 0.28266665,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_n1_n1_09",
+          "x": -0.39736843,
+          "y": -0.29375,
+          "z": -0.14533333,
+          "isValid": true
+        },
+        {
+          "name": "motion_roadwheel_n1_n2_12",
+          "x": -0.39736843,
+          "y": -0.29375,
+          "z": -0.28266665,
+          "isValid": true
+        },
+        {
+          "name": "recoil_anchor",
+          "x": 0,
+          "y": 0.24,
+          "z": 0.04,
+          "isValid": true
+        },
+        {
+          "name": "turret_pivot",
+          "x": 0,
+          "y": 0.24,
+          "z": -0.04,
+          "isValid": true
+        },
+        {
+          "name": "weapon_muzzle",
+          "x": 0,
+          "y": 0.24,
+          "z": 0.68,
+          "isValid": true
+        }
+      ],
+      "mechanicalParts": [
+        {
+          "name": "body",
+          "firstIndex": 0,
+          "indexCount": 5904,
+          "parent": -1,
+          "motion": "static",
+          "socket": null,
+          "rate": 1,
+          "travel": 0
+        },
+        {
+          "name": "roadwheel_n1_n2_12",
+          "firstIndex": 5904,
+          "indexCount": 804,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_roadwheel_n1_n2_12",
+          "rate": 2.857143,
+          "travel": 0
+        },
+        {
+          "name": "roadwheel_n1_n1_09",
+          "firstIndex": 6708,
+          "indexCount": 804,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_roadwheel_n1_n1_09",
+          "rate": 2.857143,
+          "travel": 0
+        },
+        {
+          "name": "roadwheel_n1_0",
+          "firstIndex": 7512,
+          "indexCount": 804,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_roadwheel_n1_0",
+          "rate": 2.857143,
+          "travel": 0
+        },
+        {
+          "name": "roadwheel_n1_1_09",
+          "firstIndex": 8316,
+          "indexCount": 804,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_roadwheel_n1_1_09",
+          "rate": 2.857143,
+          "travel": 0
+        },
+        {
+          "name": "roadwheel_n1_2_12",
+          "firstIndex": 9120,
+          "indexCount": 804,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_roadwheel_n1_2_12",
+          "rate": 2.857143,
+          "travel": 0
+        },
+        {
+          "name": "roadwheel_1_n2_12",
+          "firstIndex": 9924,
+          "indexCount": 804,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_roadwheel_1_n2_12",
+          "rate": 2.857143,
+          "travel": 0
+        },
+        {
+          "name": "roadwheel_1_n1_09",
+          "firstIndex": 10728,
+          "indexCount": 804,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_roadwheel_1_n1_09",
+          "rate": 2.857143,
+          "travel": 0
+        },
+        {
+          "name": "roadwheel_1_0",
+          "firstIndex": 11532,
+          "indexCount": 804,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_roadwheel_1_0",
+          "rate": 2.857143,
+          "travel": 0
+        },
+        {
+          "name": "roadwheel_1_1_09",
+          "firstIndex": 12336,
+          "indexCount": 804,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_roadwheel_1_1_09",
+          "rate": 2.857143,
+          "travel": 0
+        },
+        {
+          "name": "roadwheel_1_2_12",
+          "firstIndex": 13140,
+          "indexCount": 804,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_roadwheel_1_2_12",
+          "rate": 2.857143,
+          "travel": 0
+        }
+      ],
+      "bounds": {
+        "minX": -0.47894737,
+        "minY": -0.4375,
+        "minZ": -0.41155803,
+        "maxX": 0.47894737,
+        "maxY": 0.059375,
+        "maxZ": 0.39906183,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.self_propelled_artillery.critical",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/self_propelled_artillery/critical.gltf",
+      "runtimePath": "meshes/unit/directorate/self_propelled_artillery/critical.flasset",
+      "sourceHash": "98ccace8177d8cc62cd47b3f50a7f18518f31c8ae4c1393c40f62ff9795d3238",
+      "buildHash": "d1aa86088a56a1e02ead10fd5c26c855f4a611888ca5b2950eeb600f9cc3a123",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 9989,
+      "runtimeHash": "0bd95ecbaedee24ff1dd297ac86fede211f7a706a51bfed4a31271149d64a8a9",
+      "dependencies": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": -0.22894737,
+        "minY": -0.4375,
+        "minZ": -0.32,
+        "maxX": 0.40263158,
+        "maxY": -0.128125,
+        "maxZ": -0.086666666,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.self_propelled_artillery.damaged",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/self_propelled_artillery/damaged.gltf",
+      "runtimePath": "meshes/unit/directorate/self_propelled_artillery/damaged.flasset",
+      "sourceHash": "d5a11ca7c2e726678d43f513f4646f5dc5586ca84c663cd0ab41999452f9573c",
+      "buildHash": "0fd27af404dc32f6780696901268e4b86b24bd4639a3ebcf1b7a43764d74b821",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 3744,
+      "runtimeHash": "b27cd57e2f784bd2a57c60e5f761467062684eef80eae949c5408061407945f5",
+      "dependencies": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": 0.28421053,
+        "minY": -0.4375,
+        "minZ": -0.25733334,
+        "maxX": 0.40263158,
+        "maxY": -0.21875,
+        "maxZ": -0.156,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.self_propelled_artillery.lod1",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/self_propelled_artillery/lod1.gltf",
+      "runtimePath": "meshes/unit/directorate/self_propelled_artillery/lod1.flasset",
+      "sourceHash": "01b9c6100f67e6c96264b85751e5038590bc051d5deead95ae0d799b1f7c62dc",
+      "buildHash": "68bebea37c7583324a36faf2364a5ebb809be6b1379a0ff8c5ce37425539c34f",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 115905,
+      "runtimeHash": "ef1a75d24365b177855180b328d47c136123d7a2883103c742883772a6e63633",
+      "dependencies": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": -0.47894737,
+        "minY": -0.4375,
+        "minZ": -0.408,
+        "maxX": 0.47894737,
+        "maxY": 0.353125,
+        "maxZ": 0.68,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.self_propelled_artillery.lod2",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/self_propelled_artillery/lod2.gltf",
+      "runtimePath": "meshes/unit/directorate/self_propelled_artillery/lod2.flasset",
+      "sourceHash": "8f475df7ee78f8f9c75911f6d1649b3d9ea39422644cef88299712aa5fda46d5",
+      "buildHash": "fdf38297ff8947d538dac449f0a6b52282a1451beee7a28d53dfb743dfcdf3af",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 53505,
+      "runtimeHash": "dcd3310e7781cf7bc6b9fa2538019cdcf75b9cbb77fa293b34151a2e7132cdb3",
+      "dependencies": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": -0.47894737,
+        "minY": -0.4375,
+        "minZ": -0.408,
+        "maxX": 0.47894737,
+        "maxY": 0.328125,
+        "maxZ": 0.68,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.self_propelled_artillery.turret",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/self_propelled_artillery/turret.gltf",
+      "runtimePath": "meshes/unit/directorate/self_propelled_artillery/turret.flasset",
+      "sourceHash": "f16b9c93ad9399c58cfe182daa5ddb2e1bf78860594aaaf67f018a231fbd2845",
+      "buildHash": "9b2a424dcc9f0041ead133d0340182760ac606de8a4de5b2158024d870a44b2f",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 67456,
+      "runtimeHash": "2c530ac0e3e66cf03890e52552333fa3ae78f8cffa8503ba3c0da11d651171b1",
+      "dependencies": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [
+        {
+          "name": "gun_pivot",
+          "x": 0,
+          "y": 0.24,
+          "z": -0.04,
+          "isValid": true
+        },
+        {
+          "name": "motion_cannon",
+          "x": 0,
+          "y": 0.24,
+          "z": -0.04,
+          "isValid": true
+        },
+        {
+          "name": "recoil_anchor",
+          "x": 0,
+          "y": 0.24,
+          "z": 0.04,
+          "isValid": true
+        },
+        {
+          "name": "turret_pivot",
+          "x": 0,
+          "y": 0.24,
+          "z": -0.04,
+          "isValid": true
+        },
+        {
+          "name": "weapon_muzzle",
+          "x": 0,
+          "y": 0.24,
+          "z": 0.68,
+          "isValid": true
+        }
+      ],
+      "mechanicalParts": [
+        {
+          "name": "turret_body",
+          "firstIndex": 0,
+          "indexCount": 528,
+          "parent": -1,
+          "motion": "static",
+          "socket": null,
+          "rate": 1,
+          "travel": 0
+        },
+        {
+          "name": "cannon",
+          "firstIndex": 528,
+          "indexCount": 1392,
+          "parent": 0,
+          "motion": "cannon",
+          "socket": "motion_cannon",
+          "rate": 1,
+          "travel": 0.022
+        }
+      ],
+      "bounds": {
+        "minX": -0.23157895,
+        "minY": 0.009375,
+        "minZ": -0.28533334,
+        "maxX": 0.23157895,
+        "maxY": 0.353125,
+        "maxZ": 0.68,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.self_propelled_artillery.wreck",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/self_propelled_artillery/wreck.gltf",
+      "runtimePath": "meshes/unit/directorate/self_propelled_artillery/wreck.flasset",
+      "sourceHash": "52dd15373e111db503702b39902800b27ff66b2e119daabdfd23d399373e5f79",
+      "buildHash": "ba50264aed94e83f5a02129f56c739db276693501d926a3a3bb7aa3907682b2b",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 13295,
+      "runtimeHash": "263de6601832c653a0500f7baf2724f8d909f01fc923a2a478b6739db488b5b9",
+      "dependencies": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": -0.3340074,
+        "minY": -0.4375,
+        "minZ": -0.33333334,
+        "maxX": 0.31578946,
+        "maxY": -0.146875,
+        "maxZ": 0.48955625,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.supply_truck",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/supply_truck/lod0.gltf",
+      "runtimePath": "meshes/unit/directorate/supply_truck.flasset",
+      "sourceHash": "3f9c4d288e7c144ecb0bba1f005742c9049ff76a0a63c5aeaff87a9a4353b138",
+      "buildHash": "11ce0e60567e31e333039ddc91a14e30ef6ba6dc0d251e047408c855170483cd",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 445960,
+      "runtimeHash": "efacda86f2ef547bb35ee932874cca8476bb87ab6892df0e3f911683d2b264c2",
+      "dependencies": [
+        "material.directorate.unit.supply_truck",
+        "unit.directorate.supply_truck.collision",
+        "unit.directorate.supply_truck.lod1",
+        "unit.directorate.supply_truck.lod2"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "textureReferences": [],
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "unit.directorate.supply_truck.lod1",
+          "maxDistance": 130
+        },
+        {
+          "level": 2,
+          "assetId": "unit.directorate.supply_truck.lod2",
+          "maxDistance": 360
+        }
+      ],
+      "collisionReference": "unit.directorate.supply_truck.collision",
+      "animationReferences": [],
+      "sockets": [
+        {
+          "name": "cargo_load",
+          "x": 0,
+          "y": 0.12,
+          "z": -0.38,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_1_35",
+          "x": 0.3882353,
+          "y": -0.268,
+          "z": 0.1985294,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_2_38",
+          "x": 0.3882353,
+          "y": -0.268,
+          "z": 0.35,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_n1_25",
+          "x": 0.3882353,
+          "y": -0.268,
+          "z": -0.18382353,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_1_n2_4",
+          "x": 0.3882353,
+          "y": -0.268,
+          "z": -0.3529412,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_1_35",
+          "x": -0.3882353,
+          "y": -0.268,
+          "z": 0.1985294,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_2_38",
+          "x": -0.3882353,
+          "y": -0.268,
+          "z": 0.35,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_n1_25",
+          "x": -0.3882353,
+          "y": -0.268,
+          "z": -0.18382353,
+          "isValid": true
+        },
+        {
+          "name": "motion_wheel_n1_n2_4",
+          "x": -0.3882353,
+          "y": -0.268,
+          "z": -0.3529412,
+          "isValid": true
+        },
+        {
+          "name": "supply_transfer",
+          "x": 0.34,
+          "y": 0.04,
+          "z": -0.18,
+          "isValid": true
+        }
+      ],
+      "mechanicalParts": [
+        {
+          "name": "body",
+          "firstIndex": 0,
+          "indexCount": 5958,
+          "parent": -1,
+          "motion": "static",
+          "socket": null,
+          "rate": 1,
+          "travel": 0
+        },
+        {
+          "name": "wheel_n1_n2_4",
+          "firstIndex": 5958,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_n1_n2_4",
+          "rate": 2.3255813,
+          "travel": 0
+        },
+        {
+          "name": "wheel_1_n2_4",
+          "firstIndex": 6798,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_1_n2_4",
+          "rate": 2.3255813,
+          "travel": 0
+        },
+        {
+          "name": "wheel_n1_n1_25",
+          "firstIndex": 7638,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_n1_n1_25",
+          "rate": 2.3255813,
+          "travel": 0
+        },
+        {
+          "name": "wheel_1_n1_25",
+          "firstIndex": 8478,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_1_n1_25",
+          "rate": 2.3255813,
+          "travel": 0
+        },
+        {
+          "name": "wheel_n1_1_35",
+          "firstIndex": 9318,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_n1_1_35",
+          "rate": 2.3255813,
+          "travel": 0
+        },
+        {
+          "name": "wheel_1_1_35",
+          "firstIndex": 10158,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_1_1_35",
+          "rate": 2.3255813,
+          "travel": 0
+        },
+        {
+          "name": "wheel_n1_2_38",
+          "firstIndex": 10998,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_n1_2_38",
+          "rate": 2.3255813,
+          "travel": 0
+        },
+        {
+          "name": "wheel_1_2_38",
+          "firstIndex": 11838,
+          "indexCount": 840,
+          "parent": 0,
+          "motion": "wheel",
+          "socket": "motion_wheel_1_2_38",
+          "rate": 2.3255813,
+          "travel": 0
+        }
+      ],
+      "bounds": {
+        "minX": -0.45735294,
+        "minY": -0.44,
+        "minZ": -0.44558823,
+        "maxX": 0.45735294,
+        "maxY": 0.46,
+        "maxZ": 0.44705883,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.supply_truck.critical",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/supply_truck/critical.gltf",
+      "runtimePath": "meshes/unit/directorate/supply_truck/critical.flasset",
+      "sourceHash": "9cfe04bfe9b6bd604f6a76ed24f832bb0c49b98b3a88fc1f913344131231fce7",
+      "buildHash": "5ed0c51f2e6c45cca8d9914899220cb95986ac9ad890a53a34f62abd5dc43dca",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 9910,
+      "runtimeHash": "f55b2bdf0d545f57f42e5d19f8e257c804d57ae2051398dc7d098ac66feda3b9",
+      "dependencies": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": -0.25588235,
+        "minY": -0.44,
+        "minZ": -0.3529412,
+        "maxX": 0.45,
+        "maxY": -0.044,
+        "maxZ": -0.09558824,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.supply_truck.damaged",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/supply_truck/damaged.gltf",
+      "runtimePath": "meshes/unit/directorate/supply_truck/damaged.flasset",
+      "sourceHash": "cc221bc91f9e0973674ea7c45c86275d6f395ae99442e499275e540a28f3b6b9",
+      "buildHash": "3eeeb81575bf05bff1d399ae4bc1d94ef6308d4b7cfac1a003238cde0867390a",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 3666,
+      "runtimeHash": "f3cef8dd85ab9a7dfcff51b8d9c24deceeb017bceed6d5ebed7051aaec4c0b17",
+      "dependencies": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": 0.31764707,
+        "minY": -0.44,
+        "minZ": -0.28382352,
+        "maxX": 0.45,
+        "maxY": -0.16,
+        "maxZ": -0.17205882,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.supply_truck.lod1",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/supply_truck/lod1.gltf",
+      "runtimePath": "meshes/unit/directorate/supply_truck/lod1.flasset",
+      "sourceHash": "09b17871d9526d23284a70cae29490e0cfb42ab4ba537f8830059cc67611a2f8",
+      "buildHash": "d98136987159f5066073bf3d0f9e0e70a1a3dddccb91d7ed7c95cc374e71f6e6",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 115430,
+      "runtimeHash": "1bc39549813719fe40a74a062cad48302a09c4357a2d175afff8a534e2ab1f14",
+      "dependencies": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": -0.45735294,
+        "minY": -0.44,
+        "minZ": -0.44558823,
+        "maxX": 0.45735294,
+        "maxY": 0.46,
+        "maxZ": 0.44705883,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.supply_truck.lod2",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/supply_truck/lod2.gltf",
+      "runtimePath": "meshes/unit/directorate/supply_truck/lod2.flasset",
+      "sourceHash": "e785bd235304f2be97e8c02b50d98c32496a336875407f159019056262021c20",
+      "buildHash": "dd11a3a11756d72d274da086eeb75f152a1dbeb1884a018f9f1feeea33c02e6a",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 40707,
+      "runtimeHash": "27b067f32411c2007119ca389d806c0c6916b66296cdb9ca0e48351cbfb7bb67",
+      "dependencies": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": -0.45,
+        "minY": -0.44,
+        "minZ": -0.44558823,
+        "maxX": 0.45,
+        "maxY": 0.448,
+        "maxZ": 0.44705883,
+        "isValid": true
+      }
+    },
+    {
+      "id": "unit.directorate.supply_truck.wreck",
+      "type": "mesh",
+      "sourcePath": "units/directorate/sources/combat_support/supply_truck/wreck.gltf",
+      "runtimePath": "meshes/unit/directorate/supply_truck/wreck.flasset",
+      "sourceHash": "e2856f0729dc21a71dd6ea53257885cf35fc20c1f23cd9555049e6621a30b9b0",
+      "buildHash": "2dc886a86b9e007b9e9ff648ed35d9f0134984f142b186e50590b6e0c759fb8d",
+      "runtimeVersion": 4,
+      "compilerVersion": "1.9.0",
+      "runtimeBytes": 13217,
+      "runtimeHash": "97baf92d887687a2c9c043a52da91ddcb5cb575e0bb22c11d69ace74f9b0bb03",
+      "dependencies": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "materialReferences": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "textureReferences": [],
+      "lods": [],
+      "collisionReference": null,
+      "animationReferences": [],
+      "sockets": [],
+      "mechanicalParts": [],
+      "bounds": {
+        "minX": -0.3733024,
+        "minY": -0.44,
+        "minZ": -0.3614958,
+        "maxX": 0.32352942,
+        "maxY": -0.068,
+        "maxZ": 0.22205882,
+        "isValid": true
+      }
+    }
+  ],
+  "sourceValidation": {
+    "gltfCount": 145,
+    "independentExportByteIdentical": true,
+    "finiteAttributes": true,
+    "validIndices": true,
+    "nondegenerateTriangles": true,
+    "unitNormals": true,
+    "validUvs": true
+  }
+}
