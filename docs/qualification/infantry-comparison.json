@@ -1,0 +1,425 @@
+[
+  {
+    "key": "InfantryRifleProduction-1920x1080-Medium-CloseTactical",
+    "beforeGpu": {
+      "samples": 30,
+      "mean": 2.832604800000001,
+      "p50": 2.259424,
+      "p95": 3.947072,
+      "p99": 3.947072
+    },
+    "afterGpu": {
+      "samples": 32,
+      "mean": 4.6058769999999996,
+      "p50": 4.47152,
+      "p95": 4.591456,
+      "p99": 6.107872
+    },
+    "beforeCpu": {
+      "samples": 32,
+      "mean": 7.724640625000001,
+      "p50": 7.3764,
+      "p95": 13.2485,
+      "p99": 14.5939
+    },
+    "afterCpu": {
+      "samples": 32,
+      "mean": 4.317243750000001,
+      "p50": 4.1347,
+      "p95": 5.0861,
+      "p99": 5.3735
+    },
+    "beforeDraws": 2,
+    "afterDraws": 4,
+    "matchedInputFields": [
+      "kind",
+      "fingerprint",
+      "seed",
+      "tick",
+      "captureVisualSeconds",
+      "camera",
+      "requestedDisplay",
+      "rasterDpi",
+      "uiScale",
+      "requestedQuality",
+      "profile",
+      "lighting"
+    ]
+  },
+  {
+    "key": "InfantryRifleProduction-1920x1080-Medium-NormalGameplay",
+    "beforeGpu": {
+      "samples": 32,
+      "mean": 4.138238,
+      "p50": 4.13888,
+      "p95": 4.18016,
+      "p99": 4.182752
+    },
+    "afterGpu": {
+      "samples": 31,
+      "mean": 3.5562745806451623,
+      "p50": 4.351456,
+      "p95": 4.389216,
+      "p99": 4.391808
+    },
+    "beforeCpu": {
+      "samples": 32,
+      "mean": 3.8935249999999995,
+      "p50": 3.888,
+      "p95": 5.0409,
+      "p99": 5.3716
+    },
+    "afterCpu": {
+      "samples": 32,
+      "mean": 3.2532499999999995,
+      "p50": 3.8859,
+      "p95": 5.0037,
+      "p99": 5.5122
+    },
+    "beforeDraws": 23,
+    "afterDraws": 26,
+    "matchedInputFields": [
+      "kind",
+      "fingerprint",
+      "seed",
+      "tick",
+      "captureVisualSeconds",
+      "camera",
+      "requestedDisplay",
+      "rasterDpi",
+      "uiScale",
+      "requestedQuality",
+      "profile",
+      "lighting"
+    ]
+  },
+  {
+    "key": "InfantryRifleProduction-1920x1080-Medium-Strategic",
+    "beforeGpu": {
+      "samples": 32,
+      "mean": 4.959745,
+      "p50": 4.943968,
+      "p95": 5.009664,
+      "p99": 5.057216
+    },
+    "afterGpu": {
+      "samples": 31,
+      "mean": 3.465313032258064,
+      "p50": 4.997408,
+      "p95": 5.220288,
+      "p99": 5.23088
+    },
+    "beforeCpu": {
+      "samples": 32,
+      "mean": 4.760075,
+      "p50": 4.7205,
+      "p95": 5.6543,
+      "p99": 5.7778
+    },
+    "afterCpu": {
+      "samples": 32,
+      "mean": 3.20476875,
+      "p50": 3.1116,
+      "p95": 5.2277,
+      "p99": 5.6266
+    },
+    "beforeDraws": 25,
+    "afterDraws": 28,
+    "matchedInputFields": [
+      "kind",
+      "fingerprint",
+      "seed",
+      "tick",
+      "captureVisualSeconds",
+      "camera",
+      "requestedDisplay",
+      "rasterDpi",
+      "uiScale",
+      "requestedQuality",
+      "profile",
+      "lighting"
+    ]
+  },
+  {
+    "key": "InfantryEngineerProduction-1920x1080-Medium-CloseTactical",
+    "beforeGpu": {
+      "samples": 32,
+      "mean": 3.9523879999999996,
+      "p50": 3.951904,
+      "p95": 3.984832,
+      "p99": 3.99296
+    },
+    "afterGpu": {
+      "samples": 32,
+      "mean": 4.919008,
+      "p50": 4.929984,
+      "p95": 4.975584,
+      "p99": 4.97856
+    },
+    "beforeCpu": {
+      "samples": 32,
+      "mean": 3.7398125000000007,
+      "p50": 3.7749,
+      "p95": 4.5113,
+      "p99": 4.5762
+    },
+    "afterCpu": {
+      "samples": 32,
+      "mean": 4.624143749999999,
+      "p50": 4.6511,
+      "p95": 5.426,
+      "p99": 5.5591
+    },
+    "beforeDraws": 2,
+    "afterDraws": 4,
+    "matchedInputFields": [
+      "kind",
+      "fingerprint",
+      "seed",
+      "tick",
+      "captureVisualSeconds",
+      "camera",
+      "requestedDisplay",
+      "rasterDpi",
+      "uiScale",
+      "requestedQuality",
+      "profile",
+      "lighting"
+    ]
+  },
+  {
+    "key": "InfantryEngineerProduction-1920x1080-Medium-NormalGameplay",
+    "beforeGpu": {
+      "samples": 32,
+      "mean": 4.1503060000000005,
+      "p50": 4.155072,
+      "p95": 4.194848,
+      "p99": 4.195872
+    },
+    "afterGpu": {
+      "samples": 32,
+      "mean": 4.546583999999999,
+      "p50": 4.543776,
+      "p95": 4.593568,
+      "p99": 4.593856
+    },
+    "beforeCpu": {
+      "samples": 32,
+      "mean": 3.93710625,
+      "p50": 3.963,
+      "p95": 4.5158,
+      "p99": 4.7132
+    },
+    "afterCpu": {
+      "samples": 32,
+      "mean": 4.305875,
+      "p50": 4.2464,
+      "p95": 5.189,
+      "p99": 5.1981
+    },
+    "beforeDraws": 23,
+    "afterDraws": 26,
+    "matchedInputFields": [
+      "kind",
+      "fingerprint",
+      "seed",
+      "tick",
+      "captureVisualSeconds",
+      "camera",
+      "requestedDisplay",
+      "rasterDpi",
+      "uiScale",
+      "requestedQuality",
+      "profile",
+      "lighting"
+    ]
+  },
+  {
+    "key": "InfantryEngineerProduction-1920x1080-Medium-Strategic",
+    "beforeGpu": {
+      "samples": 32,
+      "mean": 4.932,
+      "p50": 4.933088,
+      "p95": 4.964928,
+      "p99": 4.967744
+    },
+    "afterGpu": {
+      "samples": 32,
+      "mean": 5.408359,
+      "p50": 5.423072,
+      "p95": 5.496768,
+      "p99": 5.510784
+    },
+    "beforeCpu": {
+      "samples": 32,
+      "mean": 4.698275000000001,
+      "p50": 4.7876,
+      "p95": 5.5152,
+      "p99": 5.6559
+    },
+    "afterCpu": {
+      "samples": 32,
+      "mean": 5.130331250000001,
+      "p50": 5.103,
+      "p95": 6.3064,
+      "p99": 6.4284
+    },
+    "beforeDraws": 25,
+    "afterDraws": 28,
+    "matchedInputFields": [
+      "kind",
+      "fingerprint",
+      "seed",
+      "tick",
+      "captureVisualSeconds",
+      "camera",
+      "requestedDisplay",
+      "rasterDpi",
+      "uiScale",
+      "requestedQuality",
+      "profile",
+      "lighting"
+    ]
+  },
+  {
+    "key": "BattlefieldVariantProduction-1920x1080-Medium-CloseTactical",
+    "beforeGpu": {
+      "samples": 32,
+      "mean": 3.926328,
+      "p50": 3.924896,
+      "p95": 3.947008,
+      "p99": 3.95008
+    },
+    "afterGpu": {
+      "samples": 31,
+      "mean": 3.054110967741935,
+      "p50": 3.988448,
+      "p95": 4.023584,
+      "p99": 4.033632
+    },
+    "beforeCpu": {
+      "samples": 32,
+      "mean": 3.6828499999999997,
+      "p50": 3.7176,
+      "p95": 4.2193,
+      "p99": 4.5628
+    },
+    "afterCpu": {
+      "samples": 32,
+      "mean": 2.79039375,
+      "p50": 3.3467,
+      "p95": 4.4635,
+      "p99": 4.5213
+    },
+    "beforeDraws": 12,
+    "afterDraws": 13,
+    "matchedInputFields": [
+      "kind",
+      "fingerprint",
+      "seed",
+      "tick",
+      "captureVisualSeconds",
+      "camera",
+      "requestedDisplay",
+      "rasterDpi",
+      "uiScale",
+      "requestedQuality",
+      "profile",
+      "lighting"
+    ]
+  },
+  {
+    "key": "BattlefieldVariantProduction-1920x1080-Medium-NormalGameplay",
+    "beforeGpu": {
+      "samples": 32,
+      "mean": 4.114251000000001,
+      "p50": 4.116064,
+      "p95": 4.143904,
+      "p99": 4.148512
+    },
+    "afterGpu": {
+      "samples": 32,
+      "mean": 3.0760150000000004,
+      "p50": 4.190112,
+      "p95": 4.24112,
+      "p99": 4.242528
+    },
+    "beforeCpu": {
+      "samples": 32,
+      "mean": 3.8994187499999997,
+      "p50": 3.9377,
+      "p95": 4.675,
+      "p99": 4.8367
+    },
+    "afterCpu": {
+      "samples": 32,
+      "mean": 2.9062562500000007,
+      "p50": 3.4427,
+      "p95": 4.5712,
+      "p99": 4.6675
+    },
+    "beforeDraws": 31,
+    "afterDraws": 34,
+    "matchedInputFields": [
+      "kind",
+      "fingerprint",
+      "seed",
+      "tick",
+      "captureVisualSeconds",
+      "camera",
+      "requestedDisplay",
+      "rasterDpi",
+      "uiScale",
+      "requestedQuality",
+      "profile",
+      "lighting"
+    ]
+  },
+  {
+    "key": "BattlefieldVariantProduction-1920x1080-Medium-Strategic",
+    "beforeGpu": {
+      "samples": 32,
+      "mean": 4.908621,
+      "p50": 4.90624,
+      "p95": 4.96784,
+      "p99": 4.991008
+    },
+    "afterGpu": {
+      "samples": 32,
+      "mean": 7.2162,
+      "p50": 9.934976,
+      "p95": 10.032672,
+      "p99": 10.072512
+    },
+    "beforeCpu": {
+      "samples": 32,
+      "mean": 4.613228124999999,
+      "p50": 4.6189,
+      "p95": 5.4137,
+      "p99": 5.7097
+    },
+    "afterCpu": {
+      "samples": 32,
+      "mean": 6.97033125,
+      "p50": 9.0395,
+      "p95": 10.2782,
+      "p99": 10.4454
+    },
+    "beforeDraws": 33,
+    "afterDraws": 36,
+    "matchedInputFields": [
+      "kind",
+      "fingerprint",
+      "seed",
+      "tick",
+      "captureVisualSeconds",
+      "camera",
+      "requestedDisplay",
+      "rasterDpi",
+      "uiScale",
+      "requestedQuality",
+      "profile",
+      "lighting"
+    ]
+  }
+]

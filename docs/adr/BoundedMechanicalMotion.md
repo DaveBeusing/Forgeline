@@ -49,3 +49,13 @@ Revisit the range approach when measured close-range batching cost becomes
 material, or when reduced LODs need continuously articulated silhouettes.
 Persistent cosmetic replay phases, tread-link circulation, independent wheel
 steering and physically simulated suspension are separate future contracts.
+
+## Infantry range extension
+
+InfantryStride adds bounded hip rotation from copied travel, using the same
+32-range validation, stack transform storage, resource sharing and LOD fade.
+Sixteen groups per four-member family remain within that cap; existing Cannon
+shoulder ranges supply elevation/recoil. Damage geometry remains bound in each
+infantry LOD, while reduced live meshes remain static. No skeleton, foot planting,
+retargeting, per-member simulation or animation-asset type is introduced. See
+[production and measured near-view limits](../InfantryBattlefieldProduction.md).
