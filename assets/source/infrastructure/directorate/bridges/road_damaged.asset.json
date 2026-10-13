@@ -1,7 +1,7 @@
 {
   "id": "infrastructure.directorate.bridge.road.damaged",
   "type": "mesh",
-  "source": "../sources/bridge_damaged.gltf",
+  "source": "../sources/battlefield/bridge_damaged.gltf",
   "materialReferences": [
     "material.directorate.infrastructure.bridge"
   ]

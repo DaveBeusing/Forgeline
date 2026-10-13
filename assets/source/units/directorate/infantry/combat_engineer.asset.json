@@ -1,0 +1,252 @@
+{
+  "id": "unit.directorate.combat_engineer",
+  "type": "mesh",
+  "materialReferences": [
+    "material.directorate.unit.rifle_squad"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "unit.directorate.combat_engineer.lod1",
+      "maxDistance": 80
+    },
+    {
+      "level": 2,
+      "assetId": "unit.directorate.combat_engineer.lod2",
+      "maxDistance": 220
+    }
+  ],
+  "collisionRequired": true,
+  "collisionReference": "unit.directorate.rifle_squad.collision",
+  "sockets": [
+    {
+      "name": "weapon_muzzle",
+      "x": 0.05,
+      "y": 0.05,
+      "z": 0.42
+    },
+    {
+      "name": "member_0_hip_left",
+      "x": 0.007000000000000006,
+      "y": 0.015,
+      "z": 0.22
+    },
+    {
+      "name": "member_0_hip_right",
+      "x": 0.093,
+      "y": 0.015,
+      "z": 0.22
+    },
+    {
+      "name": "member_0_shoulder",
+      "x": 0.05,
+      "y": 0.24,
+      "z": 0.22
+    },
+    {
+      "name": "member_1_hip_left",
+      "x": -0.34299999999999997,
+      "y": 0.015,
+      "z": 0.22
+    },
+    {
+      "name": "member_1_hip_right",
+      "x": -0.257,
+      "y": 0.015,
+      "z": 0.22
+    },
+    {
+      "name": "member_1_shoulder",
+      "x": -0.3,
+      "y": 0.24,
+      "z": 0.22
+    },
+    {
+      "name": "member_2_hip_left",
+      "x": 0.257,
+      "y": 0.015,
+      "z": -0.22
+    },
+    {
+      "name": "member_2_hip_right",
+      "x": 0.34299999999999997,
+      "y": 0.015,
+      "z": -0.22
+    },
+    {
+      "name": "member_2_shoulder",
+      "x": 0.3,
+      "y": 0.24,
+      "z": -0.22
+    },
+    {
+      "name": "member_3_hip_left",
+      "x": -0.34299999999999997,
+      "y": 0.015,
+      "z": -0.22
+    },
+    {
+      "name": "member_3_hip_right",
+      "x": -0.257,
+      "y": 0.015,
+      "z": -0.22
+    },
+    {
+      "name": "member_3_shoulder",
+      "x": -0.3,
+      "y": 0.24,
+      "z": -0.22
+    }
+  ],
+  "mechanicalParts": [
+    {
+      "name": "member_0_body",
+      "firstIndex": 0,
+      "indexCount": 2496,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "member_0_hip_left",
+      "firstIndex": 2496,
+      "indexCount": 480,
+      "parent": -1,
+      "motion": "infantryStride",
+      "socket": "member_0_hip_left",
+      "rate": -4.0,
+      "travel": 0.42
+    },
+    {
+      "name": "member_0_hip_right",
+      "firstIndex": 2976,
+      "indexCount": 480,
+      "parent": -1,
+      "motion": "infantryStride",
+      "socket": "member_0_hip_right",
+      "rate": 4.0,
+      "travel": 0.42
+    },
+    {
+      "name": "member_0_shoulder",
+      "firstIndex": 3456,
+      "indexCount": 1440,
+      "parent": -1,
+      "motion": "cannon",
+      "socket": "member_0_shoulder",
+      "rate": 1,
+      "travel": 0.004
+    },
+    {
+      "name": "member_1_body",
+      "firstIndex": 4896,
+      "indexCount": 2256,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "member_1_hip_left",
+      "firstIndex": 7152,
+      "indexCount": 480,
+      "parent": -1,
+      "motion": "infantryStride",
+      "socket": "member_1_hip_left",
+      "rate": -4.0,
+      "travel": 0.42
+    },
+    {
+      "name": "member_1_hip_right",
+      "firstIndex": 7632,
+      "indexCount": 480,
+      "parent": -1,
+      "motion": "infantryStride",
+      "socket": "member_1_hip_right",
+      "rate": 4.0,
+      "travel": 0.42
+    },
+    {
+      "name": "member_1_shoulder",
+      "firstIndex": 8112,
+      "indexCount": 1440,
+      "parent": -1,
+      "motion": "cannon",
+      "socket": "member_1_shoulder",
+      "rate": 1,
+      "travel": 0.004
+    },
+    {
+      "name": "member_2_body",
+      "firstIndex": 9552,
+      "indexCount": 2256,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "member_2_hip_left",
+      "firstIndex": 11808,
+      "indexCount": 480,
+      "parent": -1,
+      "motion": "infantryStride",
+      "socket": "member_2_hip_left",
+      "rate": -4.0,
+      "travel": 0.42
+    },
+    {
+      "name": "member_2_hip_right",
+      "firstIndex": 12288,
+      "indexCount": 480,
+      "parent": -1,
+      "motion": "infantryStride",
+      "socket": "member_2_hip_right",
+      "rate": 4.0,
+      "travel": 0.42
+    },
+    {
+      "name": "member_2_shoulder",
+      "firstIndex": 12768,
+      "indexCount": 1440,
+      "parent": -1,
+      "motion": "cannon",
+      "socket": "member_2_shoulder",
+      "rate": 1,
+      "travel": 0.004
+    },
+    {
+      "name": "member_3_body",
+      "firstIndex": 14208,
+      "indexCount": 2256,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "member_3_hip_left",
+      "firstIndex": 16464,
+      "indexCount": 480,
+      "parent": -1,
+      "motion": "infantryStride",
+      "socket": "member_3_hip_left",
+      "rate": -4.0,
+      "travel": 0.42
+    },
+    {
+      "name": "member_3_hip_right",
+      "firstIndex": 16944,
+      "indexCount": 480,
+      "parent": -1,
+      "motion": "infantryStride",
+      "socket": "member_3_hip_right",
+      "rate": 4.0,
+      "travel": 0.42
+    },
+    {
+      "name": "member_3_shoulder",
+      "firstIndex": 17424,
+      "indexCount": 1440,
+      "parent": -1,
+      "motion": "cannon",
+      "socket": "member_3_shoulder",
+      "rate": 1,
+      "travel": 0.004
+    }
+  ],
+  "source": "../sources/infantry/combat_engineer_lod0.gltf"
+}

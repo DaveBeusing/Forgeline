@@ -1,0 +1,3841 @@
+{
+  "axes": "Existing normalized mesh coordinates; +Y up +Z forward",
+  "provenance": "Repository-authored geometry; reused Directorate atlas and hard-surface primitives; no external model dependencies",
+  "families": [
+    {
+      "name": "rifle_squad_damaged",
+      "id": "unit.directorate.rifle_squad.damaged",
+      "metadata": "units/directorate/infantry/rifle_squad_damaged.asset.json",
+      "parts": [
+        {
+          "name": "torn_plate",
+          "kind": "box",
+          "min": [
+            -0.03,
+            0.1,
+            0.278
+          ],
+          "max": [
+            0.064,
+            0.25,
+            0.301
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "torn_plate",
+          "kind": "box",
+          "min": [
+            -0.38,
+            0.1,
+            0.278
+          ],
+          "max": [
+            -0.286,
+            0.25,
+            0.301
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "torn_plate",
+          "kind": "box",
+          "min": [
+            0.21999999999999997,
+            0.1,
+            -0.162
+          ],
+          "max": [
+            0.314,
+            0.25,
+            -0.139
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "torn_plate",
+          "kind": "box",
+          "min": [
+            -0.38,
+            0.1,
+            -0.162
+          ],
+          "max": [
+            -0.286,
+            0.25,
+            -0.139
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        }
+      ],
+      "material": "material.directorate.unit.rifle_squad"
+    },
+    {
+      "name": "rifle_squad_critical",
+      "id": "unit.directorate.rifle_squad.critical",
+      "metadata": "units/directorate/infantry/rifle_squad_critical.asset.json",
+      "parts": [
+        {
+          "name": "torn_plate",
+          "kind": "box",
+          "min": [
+            -0.03,
+            0.1,
+            0.278
+          ],
+          "max": [
+            0.064,
+            0.25,
+            0.301
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "broken_pack",
+          "kind": "box",
+          "min": [
+            -0.03,
+            0.08,
+            0.086
+          ],
+          "max": [
+            0.076,
+            0.245,
+            0.11
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "exposed_brace",
+          "kind": "cylinder",
+          "start": [
+            -0.024999999999999994,
+            0.1,
+            0.09
+          ],
+          "end": [
+            0.085,
+            0.28,
+            0.07999999999999999
+          ],
+          "radius": 0.01,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "torn_plate",
+          "kind": "box",
+          "min": [
+            -0.38,
+            0.1,
+            0.278
+          ],
+          "max": [
+            -0.286,
+            0.25,
+            0.301
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "broken_pack",
+          "kind": "box",
+          "min": [
+            -0.38,
+            0.08,
+            0.086
+          ],
+          "max": [
+            -0.27399999999999997,
+            0.245,
+            0.11
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "exposed_brace",
+          "kind": "cylinder",
+          "start": [
+            -0.375,
+            0.1,
+            0.09
+          ],
+          "end": [
+            -0.265,
+            0.28,
+            0.07999999999999999
+          ],
+          "radius": 0.01,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "torn_plate",
+          "kind": "box",
+          "min": [
+            0.21999999999999997,
+            0.1,
+            -0.162
+          ],
+          "max": [
+            0.314,
+            0.25,
+            -0.139
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "broken_pack",
+          "kind": "box",
+          "min": [
+            0.21999999999999997,
+            0.08,
+            -0.354
+          ],
+          "max": [
+            0.326,
+            0.245,
+            -0.33
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "exposed_brace",
+          "kind": "cylinder",
+          "start": [
+            0.22499999999999998,
+            0.1,
+            -0.35
+          ],
+          "end": [
+            0.33499999999999996,
+            0.28,
+            -0.36
+          ],
+          "radius": 0.01,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "torn_plate",
+          "kind": "box",
+          "min": [
+            -0.38,
+            0.1,
+            -0.162
+          ],
+          "max": [
+            -0.286,
+            0.25,
+            -0.139
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "broken_pack",
+          "kind": "box",
+          "min": [
+            -0.38,
+            0.08,
+            -0.354
+          ],
+          "max": [
+            -0.27399999999999997,
+            0.245,
+            -0.33
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "exposed_brace",
+          "kind": "cylinder",
+          "start": [
+            -0.375,
+            0.1,
+            -0.35
+          ],
+          "end": [
+            -0.265,
+            0.28,
+            -0.36
+          ],
+          "radius": 0.01,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        }
+      ],
+      "material": "material.directorate.unit.rifle_squad"
+    },
+    {
+      "name": "rifle_squad_wreck",
+      "id": "unit.directorate.rifle_squad.wreck",
+      "metadata": "units/directorate/infantry/rifle_squad_wreck.asset.json",
+      "parts": [
+        {
+          "name": "discarded_helmet",
+          "kind": "blob",
+          "centre": [
+            0.05,
+            -0.455,
+            0.22
+          ],
+          "radius": [
+            0.07,
+            0.045,
+            0.07
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "rings": [
+            5,
+            3,
+            2
+          ]
+        },
+        {
+          "name": "collapsed_pack",
+          "kind": "box",
+          "min": [
+            -0.024999999999999994,
+            -0.49,
+            0.32
+          ],
+          "max": [
+            0.125,
+            -0.4,
+            0.42000000000000004
+          ],
+          "cell": 3,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "abandoned_rifle",
+          "kind": "cylinder",
+          "start": [
+            -0.03,
+            -0.474,
+            0.1
+          ],
+          "end": [
+            0.15000000000000002,
+            -0.465,
+            0.32
+          ],
+          "radius": 0.012,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "discarded_helmet",
+          "kind": "blob",
+          "centre": [
+            -0.3,
+            -0.455,
+            0.22
+          ],
+          "radius": [
+            0.07,
+            0.045,
+            0.07
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "rings": [
+            5,
+            3,
+            2
+          ]
+        },
+        {
+          "name": "collapsed_pack",
+          "kind": "box",
+          "min": [
+            -0.375,
+            -0.49,
+            0.32
+          ],
+          "max": [
+            -0.22499999999999998,
+            -0.4,
+            0.42000000000000004
+          ],
+          "cell": 3,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "abandoned_rifle",
+          "kind": "cylinder",
+          "start": [
+            -0.38,
+            -0.474,
+            0.1
+          ],
+          "end": [
+            -0.19999999999999998,
+            -0.465,
+            0.32
+          ],
+          "radius": 0.012,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "discarded_helmet",
+          "kind": "blob",
+          "centre": [
+            0.3,
+            -0.455,
+            -0.22
+          ],
+          "radius": [
+            0.07,
+            0.045,
+            0.07
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "rings": [
+            5,
+            3,
+            2
+          ]
+        },
+        {
+          "name": "collapsed_pack",
+          "kind": "box",
+          "min": [
+            0.22499999999999998,
+            -0.49,
+            -0.12
+          ],
+          "max": [
+            0.375,
+            -0.4,
+            -0.01999999999999999
+          ],
+          "cell": 3,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "abandoned_rifle",
+          "kind": "cylinder",
+          "start": [
+            0.21999999999999997,
+            -0.474,
+            -0.33999999999999997
+          ],
+          "end": [
+            0.4,
+            -0.465,
+            -0.12
+          ],
+          "radius": 0.012,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "discarded_helmet",
+          "kind": "blob",
+          "centre": [
+            -0.3,
+            -0.455,
+            -0.22
+          ],
+          "radius": [
+            0.07,
+            0.045,
+            0.07
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "rings": [
+            5,
+            3,
+            2
+          ]
+        },
+        {
+          "name": "collapsed_pack",
+          "kind": "box",
+          "min": [
+            -0.375,
+            -0.49,
+            -0.12
+          ],
+          "max": [
+            -0.22499999999999998,
+            -0.4,
+            -0.01999999999999999
+          ],
+          "cell": 3,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "abandoned_rifle",
+          "kind": "cylinder",
+          "start": [
+            -0.38,
+            -0.474,
+            -0.33999999999999997
+          ],
+          "end": [
+            -0.19999999999999998,
+            -0.465,
+            -0.12
+          ],
+          "radius": 0.012,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        }
+      ],
+      "material": "material.directorate.unit.rifle_squad"
+    },
+    {
+      "name": "combat_engineer_damaged",
+      "id": "unit.directorate.combat_engineer.damaged",
+      "metadata": "units/directorate/infantry/combat_engineer_damaged.asset.json",
+      "parts": [
+        {
+          "name": "torn_plate",
+          "kind": "box",
+          "min": [
+            -0.03,
+            0.1,
+            0.278
+          ],
+          "max": [
+            0.064,
+            0.25,
+            0.301
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "torn_plate",
+          "kind": "box",
+          "min": [
+            -0.38,
+            0.1,
+            0.278
+          ],
+          "max": [
+            -0.286,
+            0.25,
+            0.301
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "torn_plate",
+          "kind": "box",
+          "min": [
+            0.21999999999999997,
+            0.1,
+            -0.162
+          ],
+          "max": [
+            0.314,
+            0.25,
+            -0.139
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "torn_plate",
+          "kind": "box",
+          "min": [
+            -0.38,
+            0.1,
+            -0.162
+          ],
+          "max": [
+            -0.286,
+            0.25,
+            -0.139
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        }
+      ],
+      "material": "material.directorate.unit.rifle_squad"
+    },
+    {
+      "name": "combat_engineer_critical",
+      "id": "unit.directorate.combat_engineer.critical",
+      "metadata": "units/directorate/infantry/combat_engineer_critical.asset.json",
+      "parts": [
+        {
+          "name": "torn_plate",
+          "kind": "box",
+          "min": [
+            -0.03,
+            0.1,
+            0.278
+          ],
+          "max": [
+            0.064,
+            0.25,
+            0.301
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "broken_pack",
+          "kind": "box",
+          "min": [
+            -0.03,
+            0.08,
+            0.086
+          ],
+          "max": [
+            0.076,
+            0.245,
+            0.11
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "exposed_brace",
+          "kind": "cylinder",
+          "start": [
+            -0.024999999999999994,
+            0.1,
+            0.09
+          ],
+          "end": [
+            0.085,
+            0.28,
+            0.07999999999999999
+          ],
+          "radius": 0.01,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "torn_plate",
+          "kind": "box",
+          "min": [
+            -0.38,
+            0.1,
+            0.278
+          ],
+          "max": [
+            -0.286,
+            0.25,
+            0.301
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "broken_pack",
+          "kind": "box",
+          "min": [
+            -0.38,
+            0.08,
+            0.086
+          ],
+          "max": [
+            -0.27399999999999997,
+            0.245,
+            0.11
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "exposed_brace",
+          "kind": "cylinder",
+          "start": [
+            -0.375,
+            0.1,
+            0.09
+          ],
+          "end": [
+            -0.265,
+            0.28,
+            0.07999999999999999
+          ],
+          "radius": 0.01,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "torn_plate",
+          "kind": "box",
+          "min": [
+            0.21999999999999997,
+            0.1,
+            -0.162
+          ],
+          "max": [
+            0.314,
+            0.25,
+            -0.139
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "broken_pack",
+          "kind": "box",
+          "min": [
+            0.21999999999999997,
+            0.08,
+            -0.354
+          ],
+          "max": [
+            0.326,
+            0.245,
+            -0.33
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "exposed_brace",
+          "kind": "cylinder",
+          "start": [
+            0.22499999999999998,
+            0.1,
+            -0.35
+          ],
+          "end": [
+            0.33499999999999996,
+            0.28,
+            -0.36
+          ],
+          "radius": 0.01,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "torn_plate",
+          "kind": "box",
+          "min": [
+            -0.38,
+            0.1,
+            -0.162
+          ],
+          "max": [
+            -0.286,
+            0.25,
+            -0.139
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "broken_pack",
+          "kind": "box",
+          "min": [
+            -0.38,
+            0.08,
+            -0.354
+          ],
+          "max": [
+            -0.27399999999999997,
+            0.245,
+            -0.33
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0
+        },
+        {
+          "name": "exposed_brace",
+          "kind": "cylinder",
+          "start": [
+            -0.375,
+            0.1,
+            -0.35
+          ],
+          "end": [
+            -0.265,
+            0.28,
+            -0.36
+          ],
+          "radius": 0.01,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        }
+      ],
+      "material": "material.directorate.unit.rifle_squad"
+    },
+    {
+      "name": "combat_engineer_wreck",
+      "id": "unit.directorate.combat_engineer.wreck",
+      "metadata": "units/directorate/infantry/combat_engineer_wreck.asset.json",
+      "parts": [
+        {
+          "name": "discarded_helmet",
+          "kind": "blob",
+          "centre": [
+            0.05,
+            -0.455,
+            0.22
+          ],
+          "radius": [
+            0.07,
+            0.045,
+            0.07
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "rings": [
+            5,
+            3,
+            2
+          ]
+        },
+        {
+          "name": "collapsed_pack",
+          "kind": "box",
+          "min": [
+            -0.024999999999999994,
+            -0.49,
+            0.32
+          ],
+          "max": [
+            0.125,
+            -0.4,
+            0.42000000000000004
+          ],
+          "cell": 3,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "abandoned_rifle",
+          "kind": "cylinder",
+          "start": [
+            -0.03,
+            -0.474,
+            0.1
+          ],
+          "end": [
+            0.15000000000000002,
+            -0.465,
+            0.32
+          ],
+          "radius": 0.012,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "scattered_tool_cylinder",
+          "kind": "cylinder",
+          "start": [
+            -0.05,
+            -0.466,
+            0.23
+          ],
+          "end": [
+            0.12000000000000001,
+            -0.466,
+            0.24
+          ],
+          "radius": 0.024,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "discarded_helmet",
+          "kind": "blob",
+          "centre": [
+            -0.3,
+            -0.455,
+            0.22
+          ],
+          "radius": [
+            0.07,
+            0.045,
+            0.07
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "rings": [
+            5,
+            3,
+            2
+          ]
+        },
+        {
+          "name": "collapsed_pack",
+          "kind": "box",
+          "min": [
+            -0.375,
+            -0.49,
+            0.32
+          ],
+          "max": [
+            -0.22499999999999998,
+            -0.4,
+            0.42000000000000004
+          ],
+          "cell": 3,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "abandoned_rifle",
+          "kind": "cylinder",
+          "start": [
+            -0.38,
+            -0.474,
+            0.1
+          ],
+          "end": [
+            -0.19999999999999998,
+            -0.465,
+            0.32
+          ],
+          "radius": 0.012,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "scattered_tool_cylinder",
+          "kind": "cylinder",
+          "start": [
+            -0.4,
+            -0.466,
+            0.23
+          ],
+          "end": [
+            -0.22999999999999998,
+            -0.466,
+            0.24
+          ],
+          "radius": 0.024,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "discarded_helmet",
+          "kind": "blob",
+          "centre": [
+            0.3,
+            -0.455,
+            -0.22
+          ],
+          "radius": [
+            0.07,
+            0.045,
+            0.07
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "rings": [
+            5,
+            3,
+            2
+          ]
+        },
+        {
+          "name": "collapsed_pack",
+          "kind": "box",
+          "min": [
+            0.22499999999999998,
+            -0.49,
+            -0.12
+          ],
+          "max": [
+            0.375,
+            -0.4,
+            -0.01999999999999999
+          ],
+          "cell": 3,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "abandoned_rifle",
+          "kind": "cylinder",
+          "start": [
+            0.21999999999999997,
+            -0.474,
+            -0.33999999999999997
+          ],
+          "end": [
+            0.4,
+            -0.465,
+            -0.12
+          ],
+          "radius": 0.012,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "scattered_tool_cylinder",
+          "kind": "cylinder",
+          "start": [
+            0.19999999999999998,
+            -0.466,
+            -0.21
+          ],
+          "end": [
+            0.37,
+            -0.466,
+            -0.2
+          ],
+          "radius": 0.024,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "discarded_helmet",
+          "kind": "blob",
+          "centre": [
+            -0.3,
+            -0.455,
+            -0.22
+          ],
+          "radius": [
+            0.07,
+            0.045,
+            0.07
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "rings": [
+            5,
+            3,
+            2
+          ]
+        },
+        {
+          "name": "collapsed_pack",
+          "kind": "box",
+          "min": [
+            -0.375,
+            -0.49,
+            -0.12
+          ],
+          "max": [
+            -0.22499999999999998,
+            -0.4,
+            -0.01999999999999999
+          ],
+          "cell": 3,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "abandoned_rifle",
+          "kind": "cylinder",
+          "start": [
+            -0.38,
+            -0.474,
+            -0.33999999999999997
+          ],
+          "end": [
+            -0.19999999999999998,
+            -0.465,
+            -0.12
+          ],
+          "radius": 0.012,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "scattered_tool_cylinder",
+          "kind": "cylinder",
+          "start": [
+            -0.4,
+            -0.466,
+            -0.21
+          ],
+          "end": [
+            -0.22999999999999998,
+            -0.466,
+            -0.2
+          ],
+          "radius": 0.024,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        }
+      ],
+      "material": "material.directorate.unit.rifle_squad"
+    },
+    {
+      "name": "scout_vehicle_wreck",
+      "id": "unit.directorate.scout_vehicle.wreck",
+      "metadata": "units/directorate/vehicles/scout_vehicle_wreck.asset.json",
+      "parts": [
+        {
+          "name": "twisted_chassis",
+          "kind": "box",
+          "min": [
+            -0.39,
+            -0.5,
+            -0.43
+          ],
+          "max": [
+            0.41,
+            -0.37,
+            0.42
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "broken_cab",
+          "kind": "box",
+          "min": [
+            -0.26,
+            -0.4,
+            -0.36
+          ],
+          "max": [
+            0.24,
+            -0.12,
+            -0.16
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "fallen_axle",
+          "kind": "cylinder",
+          "start": [
+            -0.49,
+            -0.435,
+            0.26
+          ],
+          "end": [
+            0.48,
+            -0.38,
+            0.29
+          ],
+          "radius": 0.035,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "detached_panel",
+          "kind": "box",
+          "min": [
+            -0.48,
+            -0.492,
+            0.1
+          ],
+          "max": [
+            -0.18,
+            -0.445,
+            0.39
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "collapsed_wheel",
+          "kind": "cylinder",
+          "start": [
+            -0.3,
+            -0.405,
+            -0.29
+          ],
+          "end": [
+            -0.46,
+            -0.405,
+            -0.24999999999999997
+          ],
+          "radius": 0.083,
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "collapsed_wheel",
+          "kind": "cylinder",
+          "start": [
+            -0.3,
+            -0.405,
+            0.27
+          ],
+          "end": [
+            -0.46,
+            -0.405,
+            0.31
+          ],
+          "radius": 0.083,
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "collapsed_wheel",
+          "kind": "cylinder",
+          "start": [
+            0.3,
+            -0.405,
+            -0.29
+          ],
+          "end": [
+            0.46,
+            -0.405,
+            -0.24999999999999997
+          ],
+          "radius": 0.083,
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "collapsed_wheel",
+          "kind": "cylinder",
+          "start": [
+            0.3,
+            -0.405,
+            0.27
+          ],
+          "end": [
+            0.46,
+            -0.405,
+            0.31
+          ],
+          "radius": 0.083,
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "collapsed_sensor",
+          "kind": "box",
+          "min": [
+            -0.06,
+            -0.19,
+            -0.31
+          ],
+          "max": [
+            0.12,
+            -0.09999999999999998,
+            -0.08
+          ],
+          "cell": 4,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        }
+      ],
+      "material": "material.directorate.unit.scout_vehicle"
+    },
+    {
+      "name": "self_propelled_artillery_wreck",
+      "id": "unit.directorate.self_propelled_artillery.wreck",
+      "metadata": "units/directorate/vehicles/self_propelled_artillery_wreck.asset.json",
+      "parts": [
+        {
+          "name": "twisted_chassis",
+          "kind": "box",
+          "min": [
+            -0.39,
+            -0.43749999999999994,
+            -0.43
+          ],
+          "max": [
+            0.41,
+            -0.30749999999999994,
+            0.42
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "broken_cab",
+          "kind": "box",
+          "min": [
+            -0.26,
+            -0.3374999999999999,
+            -0.36
+          ],
+          "max": [
+            0.24,
+            -0.05749999999999994,
+            -0.16
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "fallen_axle",
+          "kind": "cylinder",
+          "start": [
+            -0.49,
+            -0.37249999999999994,
+            0.26
+          ],
+          "end": [
+            0.48,
+            -0.31749999999999995,
+            0.29
+          ],
+          "radius": 0.035,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "detached_panel",
+          "kind": "box",
+          "min": [
+            -0.48,
+            -0.42949999999999994,
+            0.1
+          ],
+          "max": [
+            -0.18,
+            -0.38249999999999995,
+            0.39
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "collapsed_wheel",
+          "kind": "cylinder",
+          "start": [
+            -0.3,
+            -0.3424999999999999,
+            -0.29
+          ],
+          "end": [
+            -0.46,
+            -0.3424999999999999,
+            -0.24999999999999997
+          ],
+          "radius": 0.083,
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "collapsed_wheel",
+          "kind": "cylinder",
+          "start": [
+            -0.3,
+            -0.3424999999999999,
+            0.27
+          ],
+          "end": [
+            -0.46,
+            -0.3424999999999999,
+            0.31
+          ],
+          "radius": 0.083,
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "collapsed_wheel",
+          "kind": "cylinder",
+          "start": [
+            0.3,
+            -0.3424999999999999,
+            -0.29
+          ],
+          "end": [
+            0.46,
+            -0.3424999999999999,
+            -0.24999999999999997
+          ],
+          "radius": 0.083,
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "collapsed_wheel",
+          "kind": "cylinder",
+          "start": [
+            0.3,
+            -0.3424999999999999,
+            0.27
+          ],
+          "end": [
+            0.46,
+            -0.3424999999999999,
+            0.31
+          ],
+          "radius": 0.083,
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "bent_gun",
+          "kind": "cylinder",
+          "start": [
+            0,
+            -0.18749999999999994,
+            -0.04
+          ],
+          "end": [
+            0.24,
+            -0.30749999999999994,
+            0.46
+          ],
+          "radius": 0.039,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        }
+      ],
+      "material": "material.directorate.unit.self_propelled_artillery"
+    },
+    {
+      "name": "cargo_truck_wreck",
+      "id": "unit.directorate.cargo_truck.wreck",
+      "metadata": "units/directorate/vehicles/cargo_truck_wreck.asset.json",
+      "parts": [
+        {
+          "name": "twisted_chassis",
+          "kind": "box",
+          "min": [
+            -0.39,
+            -0.45833333333333337,
+            -0.43
+          ],
+          "max": [
+            0.41,
+            -0.32833333333333337,
+            0.42
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "broken_cab",
+          "kind": "box",
+          "min": [
+            -0.26,
+            -0.3583333333333334,
+            -0.36
+          ],
+          "max": [
+            0.24,
+            -0.07833333333333337,
+            -0.16
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "fallen_axle",
+          "kind": "cylinder",
+          "start": [
+            -0.49,
+            -0.39333333333333337,
+            0.26
+          ],
+          "end": [
+            0.48,
+            -0.3383333333333334,
+            0.29
+          ],
+          "radius": 0.035,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "detached_panel",
+          "kind": "box",
+          "min": [
+            -0.48,
+            -0.45033333333333336,
+            0.1
+          ],
+          "max": [
+            -0.18,
+            -0.4033333333333334,
+            0.39
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "collapsed_wheel",
+          "kind": "cylinder",
+          "start": [
+            -0.3,
+            -0.3633333333333334,
+            -0.29
+          ],
+          "end": [
+            -0.46,
+            -0.3633333333333334,
+            -0.24999999999999997
+          ],
+          "radius": 0.083,
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "collapsed_wheel",
+          "kind": "cylinder",
+          "start": [
+            -0.3,
+            -0.3633333333333334,
+            0.27
+          ],
+          "end": [
+            -0.46,
+            -0.3633333333333334,
+            0.31
+          ],
+          "radius": 0.083,
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "collapsed_wheel",
+          "kind": "cylinder",
+          "start": [
+            0.3,
+            -0.3633333333333334,
+            -0.29
+          ],
+          "end": [
+            0.46,
+            -0.3633333333333334,
+            -0.24999999999999997
+          ],
+          "radius": 0.083,
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "collapsed_wheel",
+          "kind": "cylinder",
+          "start": [
+            0.3,
+            -0.3633333333333334,
+            0.27
+          ],
+          "end": [
+            0.46,
+            -0.3633333333333334,
+            0.31
+          ],
+          "radius": 0.083,
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "ruptured_flatbed",
+          "kind": "box",
+          "min": [
+            -0.29,
+            -0.30833333333333335,
+            0.03
+          ],
+          "max": [
+            0.28,
+            -0.22833333333333336,
+            0.41
+          ],
+          "cell": 10,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "spilled_crate",
+          "kind": "box",
+          "min": [
+            -0.46,
+            -0.43833333333333335,
+            -0.02
+          ],
+          "max": [
+            -0.22,
+            -0.30833333333333335,
+            0.14
+          ],
+          "cell": 10,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        }
+      ],
+      "material": "material.directorate.unit.cargo_truck"
+    },
+    {
+      "name": "supply_truck_wreck",
+      "id": "unit.directorate.supply_truck.wreck",
+      "metadata": "units/directorate/vehicles/supply_truck_wreck.asset.json",
+      "parts": [
+        {
+          "name": "twisted_chassis",
+          "kind": "box",
+          "min": [
+            -0.39,
+            -0.44000000000000006,
+            -0.43
+          ],
+          "max": [
+            0.41,
+            -0.31000000000000005,
+            0.42
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "broken_cab",
+          "kind": "box",
+          "min": [
+            -0.26,
+            -0.3400000000000001,
+            -0.36
+          ],
+          "max": [
+            0.24,
+            -0.06000000000000005,
+            -0.16
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "fallen_axle",
+          "kind": "cylinder",
+          "start": [
+            -0.49,
+            -0.37500000000000006,
+            0.26
+          ],
+          "end": [
+            0.48,
+            -0.32000000000000006,
+            0.29
+          ],
+          "radius": 0.035,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "detached_panel",
+          "kind": "box",
+          "min": [
+            -0.48,
+            -0.43200000000000005,
+            0.1
+          ],
+          "max": [
+            -0.18,
+            -0.38500000000000006,
+            0.39
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "collapsed_wheel",
+          "kind": "cylinder",
+          "start": [
+            -0.3,
+            -0.3450000000000001,
+            -0.29
+          ],
+          "end": [
+            -0.46,
+            -0.3450000000000001,
+            -0.24999999999999997
+          ],
+          "radius": 0.083,
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "collapsed_wheel",
+          "kind": "cylinder",
+          "start": [
+            -0.3,
+            -0.3450000000000001,
+            0.27
+          ],
+          "end": [
+            -0.46,
+            -0.3450000000000001,
+            0.31
+          ],
+          "radius": 0.083,
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "collapsed_wheel",
+          "kind": "cylinder",
+          "start": [
+            0.3,
+            -0.3450000000000001,
+            -0.29
+          ],
+          "end": [
+            0.46,
+            -0.3450000000000001,
+            -0.24999999999999997
+          ],
+          "radius": 0.083,
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "collapsed_wheel",
+          "kind": "cylinder",
+          "start": [
+            0.3,
+            -0.3450000000000001,
+            0.27
+          ],
+          "end": [
+            0.46,
+            -0.3450000000000001,
+            0.31
+          ],
+          "radius": 0.083,
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "ruptured_tank",
+          "kind": "cylinder",
+          "start": [
+            -0.2,
+            -0.20000000000000007,
+            0.13
+          ],
+          "end": [
+            0.27,
+            -0.16000000000000003,
+            0.23
+          ],
+          "radius": 0.11,
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0.078
+        },
+        {
+          "name": "service_panel",
+          "kind": "box",
+          "min": [
+            0.27,
+            -0.42000000000000004,
+            -0.1
+          ],
+          "max": [
+            0.46,
+            -0.31000000000000005,
+            0.08
+          ],
+          "cell": 15,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        }
+      ],
+      "material": "material.directorate.unit.supply_truck"
+    },
+    {
+      "name": "rubble",
+      "id": "mesh.world.prop.rubble",
+      "metadata": "world/meshes/props/rubble.asset.json",
+      "parts": [
+        {
+          "name": "fractured_concrete",
+          "kind": "box",
+          "min": [
+            -0.38,
+            -0.5,
+            -0.275
+          ],
+          "max": [
+            -0.22999999999999998,
+            -0.28,
+            -0.11000000000000001
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.009
+        },
+        {
+          "name": "exposed_rebar",
+          "kind": "cylinder",
+          "start": [
+            -0.3,
+            -0.34,
+            -0.2
+          ],
+          "end": [
+            -0.16999999999999998,
+            -0.23,
+            -0.12000000000000001
+          ],
+          "radius": 0.009,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "fractured_concrete",
+          "kind": "box",
+          "min": [
+            0.14,
+            -0.5,
+            -0.245
+          ],
+          "max": [
+            0.29000000000000004,
+            -0.24400000000000002,
+            -0.08000000000000002
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.009
+        },
+        {
+          "name": "exposed_rebar",
+          "kind": "cylinder",
+          "start": [
+            0.22,
+            -0.34,
+            -0.17
+          ],
+          "end": [
+            0.35,
+            -0.23,
+            -0.09000000000000001
+          ],
+          "radius": 0.009,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "fractured_concrete",
+          "kind": "box",
+          "min": [
+            -0.16,
+            -0.5,
+            0.20500000000000002
+          ],
+          "max": [
+            -0.009999999999999995,
+            -0.20800000000000002,
+            0.37
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.009
+        },
+        {
+          "name": "exposed_rebar",
+          "kind": "cylinder",
+          "start": [
+            -0.08,
+            -0.34,
+            0.28
+          ],
+          "end": [
+            0.05,
+            -0.23,
+            0.36000000000000004
+          ],
+          "radius": 0.009,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "fractured_concrete",
+          "kind": "box",
+          "min": [
+            0.22999999999999998,
+            -0.5,
+            0.21499999999999997
+          ],
+          "max": [
+            0.38,
+            -0.17200000000000004,
+            0.38
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.009
+        },
+        {
+          "name": "exposed_rebar",
+          "kind": "cylinder",
+          "start": [
+            0.31,
+            -0.34,
+            0.29
+          ],
+          "end": [
+            0.44,
+            -0.23,
+            0.37
+          ],
+          "radius": 0.009,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "fractured_concrete",
+          "kind": "box",
+          "min": [
+            -0.45,
+            -0.5,
+            0.245
+          ],
+          "max": [
+            -0.3,
+            -0.13600000000000004,
+            0.41000000000000003
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.009
+        },
+        {
+          "name": "exposed_rebar",
+          "kind": "cylinder",
+          "start": [
+            -0.37,
+            -0.34,
+            0.32
+          ],
+          "end": [
+            -0.24,
+            -0.23,
+            0.4
+          ],
+          "radius": 0.009,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        }
+      ],
+      "material": "material.world.prop.industrial"
+    },
+    {
+      "name": "scorched_barrier",
+      "id": "mesh.world.prop.scorched_barrier",
+      "metadata": "world/meshes/props/scorched_barrier.asset.json",
+      "parts": [
+        {
+          "name": "charred_base",
+          "kind": "box",
+          "min": [
+            -0.49,
+            -0.5,
+            -0.35
+          ],
+          "max": [
+            0.49,
+            -0.31,
+            0.35
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "broken_left_jamb",
+          "kind": "box",
+          "min": [
+            -0.47,
+            -0.31,
+            -0.12
+          ],
+          "max": [
+            -0.3,
+            0.31,
+            0.13
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "fallen_right_jamb",
+          "kind": "box",
+          "min": [
+            0.03,
+            -0.31,
+            -0.18
+          ],
+          "max": [
+            0.47,
+            -0.19,
+            0.28
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "exposed_left_rebar",
+          "kind": "cylinder",
+          "start": [
+            -0.33,
+            0.21,
+            -0.04
+          ],
+          "end": [
+            -0.25,
+            0.44,
+            0.08
+          ],
+          "radius": 0.015,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        }
+      ],
+      "material": "material.world.prop.industrial"
+    },
+    {
+      "name": "burst_pipe",
+      "id": "mesh.world.prop.burst_pipe",
+      "metadata": "world/meshes/props/burst_pipe.asset.json",
+      "parts": [
+        {
+          "name": "broken_pipe_left",
+          "kind": "cylinder",
+          "start": [
+            -0.49,
+            -0.29,
+            -0.1
+          ],
+          "end": [
+            -0.13,
+            -0.18,
+            0.015
+          ],
+          "radius": 0.145,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0.108
+        },
+        {
+          "name": "broken_pipe_right",
+          "kind": "cylinder",
+          "start": [
+            0.08,
+            -0.26,
+            -0.03
+          ],
+          "end": [
+            0.48,
+            -0.18,
+            0.19
+          ],
+          "radius": 0.145,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0.108
+        },
+        {
+          "name": "fractured_pipe_saddle",
+          "kind": "box",
+          "min": [
+            -0.36,
+            -0.5,
+            -0.25
+          ],
+          "max": [
+            0.3,
+            -0.38,
+            0.23
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "torn_flange",
+          "kind": "cylinder",
+          "start": [
+            -0.16,
+            -0.19,
+            0.006
+          ],
+          "end": [
+            -0.12,
+            -0.18,
+            0.016
+          ],
+          "radius": 0.19,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0.107
+        }
+      ],
+      "material": "material.world.prop.industrial"
+    },
+    {
+      "name": "road_damaged",
+      "id": "infrastructure.directorate.road.damaged",
+      "metadata": "infrastructure/directorate/roads/damaged.asset.json",
+      "parts": [
+        {
+          "name": "left_broken_lane",
+          "kind": "box",
+          "min": [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          "max": [
+            -0.13,
+            0.35,
+            0.5
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "right_broken_lane",
+          "kind": "box",
+          "min": [
+            0.17,
+            -0.5,
+            -0.5
+          ],
+          "max": [
+            0.5,
+            0.35,
+            0.5
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "exposed_subgrade",
+          "kind": "box",
+          "min": [
+            -0.13,
+            -0.5,
+            -0.5
+          ],
+          "max": [
+            0.17,
+            -0.37,
+            0.5
+          ],
+          "cell": 11,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "retained_asphalt",
+          "kind": "box",
+          "min": [
+            -0.16,
+            -0.37,
+            -0.5
+          ],
+          "max": [
+            0.2,
+            0.35,
+            -0.03
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "spalled_slab",
+          "kind": "box",
+          "min": [
+            -0.1,
+            -0.36,
+            -0.38
+          ],
+          "max": [
+            0.02,
+            -0.07,
+            -0.28
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "spalled_slab",
+          "kind": "box",
+          "min": [
+            -0.060000000000000005,
+            -0.36,
+            -0.18
+          ],
+          "max": [
+            0.06,
+            -0.07,
+            -0.08000000000000002
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "spalled_slab",
+          "kind": "box",
+          "min": [
+            -0.020000000000000004,
+            -0.36,
+            0.020000000000000018
+          ],
+          "max": [
+            0.1,
+            -0.07,
+            0.12
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "spalled_slab",
+          "kind": "box",
+          "min": [
+            0.01999999999999999,
+            -0.36,
+            0.22000000000000008
+          ],
+          "max": [
+            0.13999999999999999,
+            -0.07,
+            0.32000000000000006
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        }
+      ],
+      "material": "material.directorate.infrastructure.road_damaged"
+    },
+    {
+      "name": "road_destroyed",
+      "id": "infrastructure.directorate.road.destroyed",
+      "metadata": "infrastructure/directorate/roads/destroyed.asset.json",
+      "parts": [
+        {
+          "name": "left_broken_lane",
+          "kind": "box",
+          "min": [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          "max": [
+            -0.13,
+            0.35,
+            0.5
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "right_broken_lane",
+          "kind": "box",
+          "min": [
+            0.17,
+            -0.5,
+            -0.5
+          ],
+          "max": [
+            0.5,
+            0.35,
+            0.5
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "exposed_subgrade",
+          "kind": "box",
+          "min": [
+            -0.13,
+            -0.5,
+            -0.5
+          ],
+          "max": [
+            0.17,
+            -0.37,
+            0.5
+          ],
+          "cell": 11,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "spalled_slab",
+          "kind": "box",
+          "min": [
+            -0.1,
+            -0.36,
+            -0.38
+          ],
+          "max": [
+            0.02,
+            -0.07,
+            -0.28
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "spalled_slab",
+          "kind": "box",
+          "min": [
+            -0.060000000000000005,
+            -0.36,
+            -0.18
+          ],
+          "max": [
+            0.06,
+            -0.07,
+            -0.08000000000000002
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "spalled_slab",
+          "kind": "box",
+          "min": [
+            -0.020000000000000004,
+            -0.36,
+            0.020000000000000018
+          ],
+          "max": [
+            0.1,
+            -0.07,
+            0.12
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "spalled_slab",
+          "kind": "box",
+          "min": [
+            0.01999999999999999,
+            -0.36,
+            0.22000000000000008
+          ],
+          "max": [
+            0.13999999999999999,
+            -0.07,
+            0.32000000000000006
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        }
+      ],
+      "material": "material.directorate.infrastructure.road_damaged"
+    },
+    {
+      "name": "bridge_damaged",
+      "id": "infrastructure.directorate.bridge.road.damaged",
+      "metadata": "infrastructure/directorate/bridges/road_damaged.asset.json",
+      "parts": [
+        {
+          "name": "remaining_deck",
+          "kind": "box",
+          "min": [
+            -0.45,
+            -0.1,
+            -0.5
+          ],
+          "max": [
+            0.45,
+            -0.01,
+            -0.12
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "broken_edge_girder",
+          "kind": "box",
+          "min": [
+            -0.46,
+            -0.3,
+            -0.5
+          ],
+          "max": [
+            -0.38,
+            -0.1,
+            -0.12
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "broken_edge_girder",
+          "kind": "box",
+          "min": [
+            0.38,
+            -0.3,
+            -0.5
+          ],
+          "max": [
+            0.46,
+            -0.1,
+            -0.12
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "pier",
+          "kind": "box",
+          "min": [
+            -0.34,
+            -0.5,
+            -0.39999999999999997
+          ],
+          "max": [
+            0.34,
+            -0.11,
+            -0.32
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "remaining_deck",
+          "kind": "box",
+          "min": [
+            -0.45,
+            -0.1,
+            0.18
+          ],
+          "max": [
+            0.45,
+            -0.01,
+            0.5
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "broken_edge_girder",
+          "kind": "box",
+          "min": [
+            -0.46,
+            -0.3,
+            0.18
+          ],
+          "max": [
+            -0.38,
+            -0.1,
+            0.5
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "broken_edge_girder",
+          "kind": "box",
+          "min": [
+            0.38,
+            -0.3,
+            0.18
+          ],
+          "max": [
+            0.46,
+            -0.1,
+            0.5
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "pier",
+          "kind": "box",
+          "min": [
+            -0.34,
+            -0.5,
+            0.32
+          ],
+          "max": [
+            0.34,
+            -0.11,
+            0.39999999999999997
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "remaining_lane",
+          "kind": "box",
+          "min": [
+            -0.22,
+            -0.1,
+            -0.15
+          ],
+          "max": [
+            0.1,
+            -0.01,
+            0.2
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "fractured_rebar",
+          "kind": "cylinder",
+          "start": [
+            -0.3,
+            -0.06,
+            -0.12
+          ],
+          "end": [
+            -0.26,
+            -0.23,
+            0.13
+          ],
+          "radius": 0.007,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "fractured_rebar",
+          "kind": "cylinder",
+          "start": [
+            -0.09999999999999998,
+            -0.06,
+            -0.12
+          ],
+          "end": [
+            -0.06,
+            -0.23,
+            0.13
+          ],
+          "radius": 0.007,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "fractured_rebar",
+          "kind": "cylinder",
+          "start": [
+            0.10000000000000003,
+            -0.06,
+            -0.12
+          ],
+          "end": [
+            0.14,
+            -0.23,
+            0.13
+          ],
+          "radius": 0.007,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "fractured_rebar",
+          "kind": "cylinder",
+          "start": [
+            0.3000000000000001,
+            -0.06,
+            -0.12
+          ],
+          "end": [
+            0.3400000000000001,
+            -0.23,
+            0.13
+          ],
+          "radius": 0.007,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "fallen_deck",
+          "kind": "box",
+          "min": [
+            -0.22,
+            -0.48,
+            -0.09
+          ],
+          "max": [
+            0.21,
+            -0.39,
+            0.17
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        }
+      ],
+      "material": "material.directorate.infrastructure.bridge"
+    },
+    {
+      "name": "bridge_destroyed",
+      "id": "infrastructure.directorate.bridge.road.destroyed",
+      "metadata": "infrastructure/directorate/bridges/road_destroyed.asset.json",
+      "parts": [
+        {
+          "name": "remaining_deck",
+          "kind": "box",
+          "min": [
+            -0.45,
+            -0.1,
+            -0.5
+          ],
+          "max": [
+            0.45,
+            -0.01,
+            -0.12
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "broken_edge_girder",
+          "kind": "box",
+          "min": [
+            -0.46,
+            -0.3,
+            -0.5
+          ],
+          "max": [
+            -0.38,
+            -0.1,
+            -0.12
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "broken_edge_girder",
+          "kind": "box",
+          "min": [
+            0.38,
+            -0.3,
+            -0.5
+          ],
+          "max": [
+            0.46,
+            -0.1,
+            -0.12
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "pier",
+          "kind": "box",
+          "min": [
+            -0.34,
+            -0.5,
+            -0.39999999999999997
+          ],
+          "max": [
+            0.34,
+            -0.11,
+            -0.32
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "remaining_deck",
+          "kind": "box",
+          "min": [
+            -0.45,
+            -0.1,
+            0.18
+          ],
+          "max": [
+            0.45,
+            -0.01,
+            0.5
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "broken_edge_girder",
+          "kind": "box",
+          "min": [
+            -0.46,
+            -0.3,
+            0.18
+          ],
+          "max": [
+            -0.38,
+            -0.1,
+            0.5
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "broken_edge_girder",
+          "kind": "box",
+          "min": [
+            0.38,
+            -0.3,
+            0.18
+          ],
+          "max": [
+            0.46,
+            -0.1,
+            0.5
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "pier",
+          "kind": "box",
+          "min": [
+            -0.34,
+            -0.5,
+            0.32
+          ],
+          "max": [
+            0.34,
+            -0.11,
+            0.39999999999999997
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "name": "fractured_rebar",
+          "kind": "cylinder",
+          "start": [
+            -0.3,
+            -0.06,
+            -0.12
+          ],
+          "end": [
+            -0.26,
+            -0.23,
+            0.13
+          ],
+          "radius": 0.007,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "fractured_rebar",
+          "kind": "cylinder",
+          "start": [
+            -0.09999999999999998,
+            -0.06,
+            -0.12
+          ],
+          "end": [
+            -0.06,
+            -0.23,
+            0.13
+          ],
+          "radius": 0.007,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "fractured_rebar",
+          "kind": "cylinder",
+          "start": [
+            0.10000000000000003,
+            -0.06,
+            -0.12
+          ],
+          "end": [
+            0.14,
+            -0.23,
+            0.13
+          ],
+          "radius": 0.007,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "fractured_rebar",
+          "kind": "cylinder",
+          "start": [
+            0.3000000000000001,
+            -0.06,
+            -0.12
+          ],
+          "end": [
+            0.3400000000000001,
+            -0.23,
+            0.13
+          ],
+          "radius": 0.007,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            10,
+            6,
+            4
+          ],
+          "inner": 0
+        },
+        {
+          "name": "fallen_deck",
+          "kind": "box",
+          "min": [
+            -0.22,
+            -0.48,
+            -0.09
+          ],
+          "max": [
+            0.21,
+            -0.39,
+            0.17
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        }
+      ],
+      "material": "material.directorate.infrastructure.bridge"
+    }
+  ]
+}

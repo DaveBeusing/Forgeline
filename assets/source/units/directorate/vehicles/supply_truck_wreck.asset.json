@@ -1,0 +1,8 @@
+{
+  "id": "unit.directorate.supply_truck.wreck",
+  "type": "mesh",
+  "materialReferences": [
+    "material.directorate.unit.supply_truck"
+  ],
+  "source": "../sources/infantry/supply_truck_wreck.gltf"
+}

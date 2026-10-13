@@ -1,0 +1,8 @@
+{
+  "id": "unit.directorate.rifle_squad.critical",
+  "type": "mesh",
+  "materialReferences": [
+    "material.directorate.unit.rifle_squad"
+  ],
+  "source": "../sources/infantry/rifle_squad_critical.gltf"
+}

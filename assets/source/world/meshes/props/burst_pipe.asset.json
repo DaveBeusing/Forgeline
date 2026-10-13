@@ -1,0 +1,15 @@
+{
+  "id": "mesh.world.prop.burst_pipe",
+  "type": "mesh",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "lods": [
+    {
+      "level": 1,
+      "assetId": "mesh.world.prop.burst_pipe_lod1",
+      "maxDistance": 220
+    }
+  ],
+  "source": "../sources/battlefield/burst_pipe_lod0.gltf"
+}

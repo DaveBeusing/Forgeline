@@ -53,6 +53,8 @@ internal static class MechanicalTransforms
                     MechanicalMotionKind.Cannon => Matrix4x4.CreateTranslation(0, 0, -Recoil(pose) * part.Travel) *
                         Matrix4x4.CreateRotationX(-Math.Clamp(pose.Elevation, -0.15f, 0.55f)),
                     MechanicalMotionKind.Wheel => Matrix4x4.CreateRotationX((float)Math.IEEERemainder(pose.TravelMeters * part.Rate, Math.Tau)),
+                    MechanicalMotionKind.InfantryStride => Matrix4x4.CreateRotationX(
+                        MathF.Sin((float)Math.IEEERemainder(pose.TravelMeters * part.Rate, Math.Tau)) * part.Travel),
                     MechanicalMotionKind.Fan or MechanicalMotionKind.Radar => Matrix4x4.CreateRotationY(phase),
                     MechanicalMotionKind.Door => Matrix4x4.CreateTranslation(0, pose.Door * part.Travel, 0),
                     MechanicalMotionKind.Crane => Matrix4x4.CreateRotationY(MathF.Sin(phase) * part.Travel),

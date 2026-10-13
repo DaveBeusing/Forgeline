@@ -1,0 +1,8 @@
+{
+  "id": "unit.directorate.scout_vehicle.wreck",
+  "type": "mesh",
+  "materialReferences": [
+    "material.directorate.unit.scout_vehicle"
+  ],
+  "source": "../sources/infantry/scout_vehicle_wreck.gltf"
+}

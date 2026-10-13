@@ -1,7 +1,7 @@
 {
   "id": "unit.directorate.rifle_squad",
   "type": "mesh",
-  "source": "../sources/rifle_squad_lod0_production.gltf",
+  "source": "../sources/infantry/rifle_squad_lod0.gltf",
   "materialReferences": [
     "material.directorate.unit.rifle_squad"
   ],
@@ -25,6 +25,228 @@
       "x": 0.05,
       "y": 0.05,
       "z": 0.42
+    },
+    {
+      "name": "member_0_hip_left",
+      "x": 0.007000000000000006,
+      "y": 0.015,
+      "z": 0.22
+    },
+    {
+      "name": "member_0_hip_right",
+      "x": 0.093,
+      "y": 0.015,
+      "z": 0.22
+    },
+    {
+      "name": "member_0_shoulder",
+      "x": 0.05,
+      "y": 0.24,
+      "z": 0.22
+    },
+    {
+      "name": "member_1_hip_left",
+      "x": -0.34299999999999997,
+      "y": 0.015,
+      "z": 0.22
+    },
+    {
+      "name": "member_1_hip_right",
+      "x": -0.257,
+      "y": 0.015,
+      "z": 0.22
+    },
+    {
+      "name": "member_1_shoulder",
+      "x": -0.3,
+      "y": 0.24,
+      "z": 0.22
+    },
+    {
+      "name": "member_2_hip_left",
+      "x": 0.257,
+      "y": 0.015,
+      "z": -0.22
+    },
+    {
+      "name": "member_2_hip_right",
+      "x": 0.34299999999999997,
+      "y": 0.015,
+      "z": -0.22
+    },
+    {
+      "name": "member_2_shoulder",
+      "x": 0.3,
+      "y": 0.24,
+      "z": -0.22
+    },
+    {
+      "name": "member_3_hip_left",
+      "x": -0.34299999999999997,
+      "y": 0.015,
+      "z": -0.22
+    },
+    {
+      "name": "member_3_hip_right",
+      "x": -0.257,
+      "y": 0.015,
+      "z": -0.22
+    },
+    {
+      "name": "member_3_shoulder",
+      "x": -0.3,
+      "y": 0.24,
+      "z": -0.22
+    }
+  ],
+  "mechanicalParts": [
+    {
+      "name": "member_0_body",
+      "firstIndex": 0,
+      "indexCount": 1752,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "member_0_hip_left",
+      "firstIndex": 1752,
+      "indexCount": 480,
+      "parent": -1,
+      "motion": "infantryStride",
+      "socket": "member_0_hip_left",
+      "rate": -4.0,
+      "travel": 0.42
+    },
+    {
+      "name": "member_0_hip_right",
+      "firstIndex": 2232,
+      "indexCount": 480,
+      "parent": -1,
+      "motion": "infantryStride",
+      "socket": "member_0_hip_right",
+      "rate": 4.0,
+      "travel": 0.42
+    },
+    {
+      "name": "member_0_shoulder",
+      "firstIndex": 2712,
+      "indexCount": 1308,
+      "parent": -1,
+      "motion": "cannon",
+      "socket": "member_0_shoulder",
+      "rate": 1,
+      "travel": 0.004
+    },
+    {
+      "name": "member_1_body",
+      "firstIndex": 4020,
+      "indexCount": 1512,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "member_1_hip_left",
+      "firstIndex": 5532,
+      "indexCount": 480,
+      "parent": -1,
+      "motion": "infantryStride",
+      "socket": "member_1_hip_left",
+      "rate": -4.0,
+      "travel": 0.42
+    },
+    {
+      "name": "member_1_hip_right",
+      "firstIndex": 6012,
+      "indexCount": 480,
+      "parent": -1,
+      "motion": "infantryStride",
+      "socket": "member_1_hip_right",
+      "rate": 4.0,
+      "travel": 0.42
+    },
+    {
+      "name": "member_1_shoulder",
+      "firstIndex": 6492,
+      "indexCount": 1308,
+      "parent": -1,
+      "motion": "cannon",
+      "socket": "member_1_shoulder",
+      "rate": 1,
+      "travel": 0.004
+    },
+    {
+      "name": "member_2_body",
+      "firstIndex": 7800,
+      "indexCount": 1512,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "member_2_hip_left",
+      "firstIndex": 9312,
+      "indexCount": 480,
+      "parent": -1,
+      "motion": "infantryStride",
+      "socket": "member_2_hip_left",
+      "rate": -4.0,
+      "travel": 0.42
+    },
+    {
+      "name": "member_2_hip_right",
+      "firstIndex": 9792,
+      "indexCount": 480,
+      "parent": -1,
+      "motion": "infantryStride",
+      "socket": "member_2_hip_right",
+      "rate": 4.0,
+      "travel": 0.42
+    },
+    {
+      "name": "member_2_shoulder",
+      "firstIndex": 10272,
+      "indexCount": 1308,
+      "parent": -1,
+      "motion": "cannon",
+      "socket": "member_2_shoulder",
+      "rate": 1,
+      "travel": 0.004
+    },
+    {
+      "name": "member_3_body",
+      "firstIndex": 11580,
+      "indexCount": 1512,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "member_3_hip_left",
+      "firstIndex": 13092,
+      "indexCount": 480,
+      "parent": -1,
+      "motion": "infantryStride",
+      "socket": "member_3_hip_left",
+      "rate": -4.0,
+      "travel": 0.42
+    },
+    {
+      "name": "member_3_hip_right",
+      "firstIndex": 13572,
+      "indexCount": 480,
+      "parent": -1,
+      "motion": "infantryStride",
+      "socket": "member_3_hip_right",
+      "rate": 4.0,
+      "travel": 0.42
+    },
+    {
+      "name": "member_3_shoulder",
+      "firstIndex": 14052,
+      "indexCount": 1308,
+      "parent": -1,
+      "motion": "cannon",
+      "socket": "member_3_shoulder",
+      "rate": 1,
+      "travel": 0.004
     }
   ]
 }

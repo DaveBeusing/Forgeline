@@ -1,0 +1,8 @@
+{
+  "id": "unit.directorate.cargo_truck.wreck",
+  "type": "mesh",
+  "materialReferences": [
+    "material.directorate.unit.cargo_truck"
+  ],
+  "source": "../sources/infantry/cargo_truck_wreck.gltf"
+}
