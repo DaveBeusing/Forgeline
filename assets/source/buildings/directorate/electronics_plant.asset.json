@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.electronics_plant",
   "type": "mesh",
-  "source": "sources/electronics_plant_lod0_production.gltf",
+  "source": "sources/industrial/electronics_plant/lod0.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ],
@@ -18,5 +18,25 @@
     }
   ],
   "collisionRequired": true,
-  "collisionReference": "building.directorate.module.collision_box"
+  "collisionReference": "building.directorate.module.collision_box",
+  "sockets": [
+    {
+      "name": "conditioned_power",
+      "x": -0.28,
+      "y": -0.2,
+      "z": 0.44
+    },
+    {
+      "name": "service_access",
+      "x": 0.23,
+      "y": -0.43,
+      "z": 0.49
+    },
+    {
+      "name": "clean_air",
+      "x": -0.17,
+      "y": 0.28,
+      "z": -0.14
+    }
+  ]
 }

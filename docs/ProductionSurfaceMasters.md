@@ -9,6 +9,11 @@ All randomness has fixed seeds. Historical sources remain editable references.
 
 ## Shared object surfaces
 
+The five [industrial building production kits](IndustrialBuildingProduction.md)
+reuse these exact masters, atlas cells and compiled mip chains. Their component
+exports add geometry and dedicated LOD/state representations without any new
+texture allocation, channel convention or material ID.
+
 The atlas preserves the existing four-by-four UV identities: painted armor,
 structural steel, rubber, canvas; glass, warnings, concrete, heat-treated steel;
 worn armor, vents, wood, mineral rock; conifer, scrub, grass, service panels.
@@ -148,7 +153,7 @@ industrial lamps, faceted mineral rocks and clustered rubble. It retains each
 original outer bound and UV/material cell convention. Their inexpensive
 reduced LOD meshes remain available for normal/strategic views.
 
-The source catalog contains 373 stable assets. Asset compilation and runtime
+The source catalog contains 413 stable assets. Asset compilation and runtime
 qualification must pass before client review. The production master test
 checks native dimensions, semantic color spaces, explicit caps and mip policy;
 existing material completeness tests verify all physical mesh dependencies
@@ -168,3 +173,11 @@ The [modular environment kit](ModularEnvironmentKit.md) reuses these surface
 masters and one material per LOD. Minerals use cell 11, timber 10, foliage 13,
 concrete 6, steel 1 and warnings 5. No texture/material or alpha-card family is
 added. New normals/UVs compile to tangents through the existing pipeline.
+
+
+The [five industrial building families](IndustrialBuildingProduction.md) reuse
+these same surface masters, atlas insets, sRGB Base Color and linear Normal/ORM
+channels. Family geometry changes neither texture/material counts nor compiler
+mip policy. Exported UVs/normals compile to orthogonal tangent frames; each
+runtime assembly retains one material section. Native per-case residency and
+resource binding results are recorded in the linked production report.

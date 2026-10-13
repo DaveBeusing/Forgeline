@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.smelter",
   "type": "mesh",
-  "source": "sources/smelter_lod0_production.gltf",
+  "source": "sources/industrial/smelter/lod0.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ],
@@ -18,5 +18,25 @@
     }
   ],
   "collisionRequired": true,
-  "collisionReference": "building.directorate.module.collision_box"
+  "collisionReference": "building.directorate.module.collision_box",
+  "sockets": [
+    {
+      "name": "material_feed",
+      "x": 0.2,
+      "y": 0.38,
+      "z": -0.1
+    },
+    {
+      "name": "slag_outlet",
+      "x": -0.09,
+      "y": -0.4,
+      "z": 0.47
+    },
+    {
+      "name": "service_access",
+      "x": 0.28,
+      "y": -0.36,
+      "z": 0.43
+    }
+  ]
 }

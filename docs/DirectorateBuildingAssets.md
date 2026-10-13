@@ -1,10 +1,12 @@
 # Directorate Building and Infrastructure Assets
 
-Twelve building families have new manufactured-bevel LOD0 sources preserving
-their original outer bounds and sockets. The extractor's non-box topology is
-retained. The shared production atlas now has matched native 4096-pixel Base
-Color, Normal and ORM masters. See [Production surfaces](ProductionSurfaceMasters.md)
-for authoring tools, runtime caps and remaining visual acceptance work.
+Extractor, Smelter, Electronics Plant, Fuel Refinery and Ammunition Plant now use
+dedicated editable industrial component kits, separate LOD0/1/2 and family-specific
+construction/status/wreck geometry. Their existing gameplay footprints and public
+identities remain stable. See [Industrial building production](IndustrialBuildingProduction.md)
+for dimensions, modules, anchors and visual qualification. Other families retain
+their existing geometry. The shared production atlas has matched native 4096-pixel
+Base Color, Normal and ORM masters; see [Production surfaces](ProductionSurfaceMasters.md).
 
 ## Purpose
 
@@ -71,7 +73,9 @@ building.directorate.module.destroyed
 building.directorate.module.collision_box
 ```
 
-The construction and state modules are intentionally shared by all thirteen families. This keeps the initial art vocabulary consistent and makes repeated geometry eligible for the existing indexed-instancing path.
+The construction and state modules remain the common fallback vocabulary for
+families without dedicated production kits. Command Core and the five industrial
+families resolve their own purpose-specific meshes through the same indexed-instancing path.
 
 ## Construction presentation
 
@@ -97,9 +101,11 @@ For completed supported buildings, state is derived from existing ECS components
 
 Brownout and offline power consumers use the unpowered treatment in this baseline because both represent insufficient power for normal operation.
 
-Critical states do not rely on tint alone. Idle, unpowered, damaged, and critical buildings add a shared state-geometry layer. Destroyed buildings use a dedicated collapsed module. Runtime material factors reinforce those shapes but are not the sole signal.
+Critical states do not rely on tint alone. Command Core and the five industrial families use dedicated construction, damaged/critical and collapsed geometry; industrial idle and unpowered attachments are also family-specific. Other families retain shared status/wreck modules. Runtime material factors reinforce those shapes but are not the sole signal.
 
-The current asset runtime has no general skeletal/mechanical animation or effect asset contract. Machinery animation, sparks, smoke, fire, richer emissive behavior, and destruction VFX therefore remain later presentation layers rather than invented simulation state.
+Existing mechanical and VFX contracts remain presentation-owned. The five
+industrial production kits introduce static state geometry and inspection anchors,
+not new motion or gameplay state. Existing damage smoke/fire effects are retained.
 
 ## Destruction boundary
 
@@ -261,6 +267,16 @@ State material selection takes precedence over the static primary mesh material,
 The Command Core now uses its dedicated editable modular kit, assembled glTF
 LOD0/1/2 and seven state meshes. Its stable primary identity, gameplay footprint,
 collision proxy, atlas maps and state authority are retained. Only its cosmetic
-foundation reaches the existing ground plane; other buildings keep the shared
-construction/state vocabulary. See [Command Core production](CommandCoreProduction.md)
+foundation reaches the existing ground plane; the five industrial foundations
+now also reach that plane. Remaining families keep the shared construction/state
+vocabulary. See [Command Core production](CommandCoreProduction.md)
 for dimensions, new anchors, source mapping, provenance and qualification limits.
+
+## Industrial production geometry
+
+Five industrial families now have individually inspectable module glTFs and
+editable JSON assembly recipes. The 40 additional state assets replace shared
+representations only for these families. All primary IDs, simplified collision
+references, state-material priority, projected LOD thresholds and authoritative
+placement/power/production/damage rules remain intact. See
+[Industrial building production](IndustrialBuildingProduction.md).

@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.fuel_refinery.lod2",
   "type": "mesh",
-  "source": "sources/fuel_refinery_lod1.gltf",
+  "source": "sources/industrial/fuel_refinery/lod2.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ]

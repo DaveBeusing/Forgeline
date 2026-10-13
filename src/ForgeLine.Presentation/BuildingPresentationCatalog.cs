@@ -159,14 +159,14 @@ public static class BuildingPresentationCatalog
                 nameof(feature));
         }
 
-        if (feature.Building == BuildingIds.CommandCore)
+        if (ProductionStates.TryGetValue(feature.Building, out ProductionStateAssets? states))
         {
             string? representation = feature.State switch
             {
-                BuildingPresentationState.ConstructionFoundation => "building.directorate.command_core.foundation",
-                BuildingPresentationState.ConstructionFrame => "building.directorate.command_core.structural_frame",
-                BuildingPresentationState.ConstructionShell => "building.directorate.command_core.partial_shell",
-                BuildingPresentationState.Destroyed => "building.directorate.command_core.destroyed",
+                BuildingPresentationState.ConstructionFoundation => states.Foundation,
+                BuildingPresentationState.ConstructionFrame => states.StructuralFrame,
+                BuildingPresentationState.ConstructionShell => states.PartialShell,
+                BuildingPresentationState.Destroyed => states.Destroyed,
                 _ => null
             };
             if (representation is not null)
@@ -192,13 +192,14 @@ public static class BuildingPresentationCatalog
     public static string? ResolveStateAttachmentAssetId(
         in BuildingFeaturePresentationMetadata feature)
     {
-        if (feature.Building == BuildingIds.CommandCore)
+        if (ProductionStates.TryGetValue(feature.Building, out ProductionStateAssets? states))
         {
             string? attachment = feature.State switch
             {
-                BuildingPresentationState.Unpowered => "building.directorate.command_core.unpowered",
-                BuildingPresentationState.Damaged => "building.directorate.command_core.damaged",
-                BuildingPresentationState.Critical => "building.directorate.command_core.critical",
+                BuildingPresentationState.Idle when feature.Building != BuildingIds.CommandCore => states.Idle,
+                BuildingPresentationState.Unpowered => states.Unpowered,
+                BuildingPresentationState.Damaged => states.Damaged,
+                BuildingPresentationState.Critical => states.Critical,
                 _ => null
             };
             if (attachment is not null)
@@ -219,6 +220,20 @@ public static class BuildingPresentationCatalog
                 null
         };
     }
+
+    private sealed record ProductionStateAssets(string Foundation, string StructuralFrame,
+        string PartialShell, string Idle, string Unpowered, string Damaged, string Critical, string Destroyed);
+
+    private static readonly Dictionary<BuildingId, ProductionStateAssets> ProductionStates =
+        new[] { BuildingIds.CommandCore, BuildingIds.Extractor, BuildingIds.Smelter,
+            BuildingIds.ElectronicsPlant, BuildingIds.Refinery, BuildingIds.AmmunitionPlant }
+        .ToDictionary(building => building, building =>
+        {
+            string prefix = Get(building).MeshAssetId;
+            return new ProductionStateAssets(prefix + ".foundation", prefix + ".structural_frame",
+                prefix + ".partial_shell", prefix + ".idle", prefix + ".unpowered",
+                prefix + ".damaged", prefix + ".critical", prefix + ".destroyed");
+        });
 
     public static string ResolveMaterialAssetId(
         in BuildingFeaturePresentationMetadata feature) =>

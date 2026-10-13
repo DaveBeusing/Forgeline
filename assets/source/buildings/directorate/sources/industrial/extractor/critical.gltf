@@ -1,0 +1,141 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine industrial building component exporter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 4176,
+      "uri": "data:application/octet-stream;base64,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"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 1296,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1296,
+      "byteLength": 1296,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 2592,
+      "byteLength": 864,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 3456,
+      "byteLength": 720,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 108,
+      "type": "VEC3",
+      "min": [
+        -0.49288129806518555,
+        -0.4300000071525574,
+        -0.29794731736183167
+      ],
+      "max": [
+        -0.30288130044937134,
+        -0.10373086482286453,
+        -0.09000000357627869
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 108,
+      "type": "VEC3",
+      "min": [
+        -0.9626907110214233,
+        -0.9132886528968811,
+        -0.9286947846412659
+      ],
+      "max": [
+        0.9626907110214233,
+        0.9132886528968811,
+        0.9286947846412659
+      ]
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 108,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5125,
+      "count": 180,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "critical",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "extras": {
+    "coordinates": "Y up, +Z service access; centre pivot; normalized existing building visual scale",
+    "componentHierarchy": [
+      {
+        "name": "critical_break",
+        "parent": "foundation",
+        "firstIndex": 0,
+        "indexCount": 180
+      }
+    ],
+    "anchors": {
+      "material_outlet": [
+        0.4,
+        -0.15,
+        0.21
+      ],
+      "service_access": [
+        0.18,
+        -0.36,
+        -0.32
+      ],
+      "extraction_axis": [
+        -0.2,
+        -0.46,
+        -0.04
+      ]
+    }
+  }
+}

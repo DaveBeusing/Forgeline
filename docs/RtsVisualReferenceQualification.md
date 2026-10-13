@@ -39,7 +39,7 @@ dimensions and flags masters below 2048 pixels for review. The flag is advisory:
 dimensions alone do not prove useful detail; tiny repeated textures can be
 deliberate. No source is enlarged to manufacture a numerical quality pass.
 
-Current inventory: 351 assets, 168 meshes, 56 textures and 127 materials.
+Current inventory: 413 assets, 230 meshes, 56 textures and 127 materials.
 Production texture budgets are documented in [Production surfaces](ProductionSurfaceMasters.md).
 Container sizes include metadata and studio splash assets; they are not GPU
 allocations or residency. The original 324-asset baseline occupied 4,985,866
@@ -55,6 +55,12 @@ does not provide a fixed-tick art-review scene, screenshots or a performance
 guarantee.
 
 ## Fixed-state native evidence
+
+The five industrial production galleries retain nine real presentation states
+and unchanged gameplay footprint scale per family. Their before/after captures
+use fixed 120/420/1000m reference distances. See
+[Industrial building production](IndustrialBuildingProduction.md) for model scope,
+reproduction and qualification limits; compilation alone is not visual acceptance.
 
 The optional `Invoke-RtsReferenceQualification.ps1 -Capture` lane extends the original loading smoke with six immutable reference states, all four native resolutions, three zooms and Low/Medium/High profiles. PNGs, source/runtime hashes, actual backbuffer dimensions, repeated pixels, CPU/GPU distributions and resource diagnostics form a metadata manifest. A comparison report protects baselines and distinguishes structural qualification from pending human art review. See [Native visual reference evidence](VisualReferenceEvidence.md) for fixtures, methodology, review rubric, failure handling and WARP/hardware separation.
 
@@ -141,3 +147,12 @@ tick 32, seed 2026. `EnvironmentKitRepeated` adds 1,000 read-only copied kit
 instances. The [modular kit qualification](ModularEnvironmentKit.md) records
 72 profile/zoom/display rows, six repeated-kit rows, exact backbuffers, compiled
 source identity and the open 60-FPS/borderless-budget/human-art gates.
+
+
+[Industrial building production](IndustrialBuildingProduction.md) records five
+authoritative nine-state scenes, fifteen matched High/1080 baseline cases and
+180 final native cases across three profiles, three zooms and four backbuffer
+sizes. Fourteen original PNGs support visual review; complete portable timing,
+resource, camera and hash metadata are included. Structural equality, source
+identity and zero binding/fallback failures do not establish human art signoff,
+sustained FPS, moving LOD quality or physical-monitor DPI acceptance.

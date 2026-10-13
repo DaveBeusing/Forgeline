@@ -7,6 +7,12 @@ outputs through the normal compiler; see [environment composition](EnvironmentDr
 
 ## Purpose
 
+The five Directorate industrial building kits are editable JSON component
+assemblies exported by `python build/Author-IndustrialBuildings.py`. Their glTF
+LOD/state/module sources pass through this same compiler and verified manifest;
+no renderer-side authoring bypass is introduced. See
+[Industrial building production](IndustrialBuildingProduction.md).
+
 For live per-asset timing, memory, cache decisions and development-launch diagnostics, see [Asset Startup Diagnostics](AssetStartupDiagnostics.md).
 
 ForgeLine uses an explicit source-to-runtime asset boundary. Editable authoring files live under `assets/source/`; the Asset Compiler validates and compiles them into runtime-only artifacts under `assets/runtime/`. Runtime code consumes the compiled manifest and `.flasset` files through `ForgeLine.Assets` and never discovers authoring files directly.
@@ -542,7 +548,7 @@ CI writes the structured result to `artifacts/asset-qualification.json`. See [As
 
 ## Concept surface and effect completion
 
-The current catalog contains 324 assets: 158 meshes, 39 textures and 127 materials. Shared concept atlases add component-specific armor, steel, rubber, canvas, sensor glass, warning, wood and foliage colors, plus matching numeric surface ORM. Authored UV seams preserve one material per physical mesh and its LOD identity. World decal and VFX families now have real RGBA texture bindings rather than factor-only colors; the shared materialless decal carrier accepts the externally selected placement material.
+At concept-surface integration the catalog contained 324 assets: 158 meshes, 39 textures and 127 materials. Shared concept atlases add component-specific armor, steel, rubber, canvas, sensor glass, warning, wood and foliage colors, plus matching numeric surface ORM. Authored UV seams preserve one material per physical mesh and its LOD identity. World decal and VFX families now have real RGBA texture bindings rather than factor-only colors; the shared materialless decal carrier accepts the externally selected placement material.
 
 `textureMaxDimension` optionally bounds the largest offline runtime dimension from 1 to 16384. The compiler repeatedly applies its existing semantic downsampling until the limit is satisfied, then generates the requested mip chain. Aspect ratio follows the existing integer mip reduction. Source images remain editable at their authoring resolution. The setting participates in the source/build hash and invalidates dependent cached output. Compiler version is 1.6.0.
 
@@ -567,7 +573,7 @@ not source files. See [mechanical motion ownership](adr/BoundedMechanicalMotion.
 
 Explosion and spark emission multipliers are 0.35 and 0.45 respectively.
 Stable VFX IDs, atlas UVs/resolution and material bindings are unchanged;
-no new texture residency is introduced. Clean compilation still produces
+no new texture residency is introduced. At battlefield-effect integration clean compilation produced
 341 runtime assets. See [qualification limits](BattlefieldEffectCatalog.md).
 
 The Command Core family uses `python build/Author-CommandCore.py` and its editable
@@ -586,7 +592,23 @@ limits are documented in [Main Battle Tank production](MainBattleTankProduction.
 `assets/source/world/authoring/environment.kit.json`. `--output` exports in
 isolation; `--update-metadata` explicitly refreshes owned mesh definitions.
 Twenty High/Reduced visual meshes and two shared proxies add 22 catalog records.
-Two ferrous exports replace source paths under existing IDs. The current catalog
-is 373 assets (190 meshes, 56 textures, 127 materials). Compile with the existing
+Two ferrous exports replace source paths under existing IDs. At environment-kit
+integration the catalog contained 373 assets (190 meshes, 56 textures, 127 materials). Compile with the existing
 build/validate integrity modes; generated runtime files remain compiler-owned.
 See [source conventions and reproduction](ModularEnvironmentKit.md).
+
+
+## Industrial building authoring
+
+`build/Author-IndustrialBuildings.py` requires Python with NumPy and reads the
+five editable `assets/source/buildings/directorate/authoring/*.kit.json` family
+recipes. `--output` exports in isolation; repeated `--family` filters ownership.
+The 115 validated one-material glTF exports include inspectable component kits,
+three completed LODs and eight authorized state assemblies per family. Forty
+new state records and fifteen replacement source bindings retain primary/LOD IDs,
+shared collision proxies, PBR channels and gameplay footprints.
+
+Current catalog: 413 assets (230 meshes, 56 textures, 127 materials),
+60,212,858 compiled payload bytes. No industrial texture/material is added.
+Compiler build/validate modes and runtime ownership remain unchanged.
+See [source mapping, reproduction and qualification](IndustrialBuildingProduction.md).

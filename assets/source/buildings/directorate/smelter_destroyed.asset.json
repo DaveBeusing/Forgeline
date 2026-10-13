@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.smelter.destroyed",
+  "type": "mesh",
+  "source": "sources/industrial/smelter/destroyed.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

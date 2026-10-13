@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.smelter.critical",
+  "type": "mesh",
+  "source": "sources/industrial/smelter/critical.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.ammunition_plant.lod2",
   "type": "mesh",
-  "source": "sources/ammunition_plant_lod1.gltf",
+  "source": "sources/industrial/ammunition_plant/lod2.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ]

@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "d48a920273915a6d942c1ec598fda22765ed6da5",
+  "reproduciblePublish": true,
+  "installedOutsideCheckout": true,
+  "authoringSourcesAbsent": true,
+  "assetCompilerAbsent": true,
+  "runtimeFilesByteIdentical": true,
+  "runtimeFileCount": 414,
+  "archiveSha256": "bfbaf71ff5c2b8d511748888e5042cf1df1feda021b26c1aee947568ba80e2fa",
+  "windowMode": "Windowed",
+  "instanceDrawCalls": 11,
+  "textureBindingFailureCount": 0,
+  "materialBindingFailureCount": 0
+}

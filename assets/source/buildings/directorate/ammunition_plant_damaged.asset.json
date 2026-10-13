@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.ammunition_plant.damaged",
+  "type": "mesh",
+  "source": "sources/industrial/ammunition_plant/damaged.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}
