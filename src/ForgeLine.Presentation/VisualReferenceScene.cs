@@ -323,6 +323,8 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
                     i < 2 ? new(12, .2f, 20) : new(18, 4, 20));
                 simulation.Entities.AddComponent(road, new InfrastructurePresentationIdentity(
                     i < 2 ? InfrastructurePresentationKind.RoadSegment : InfrastructurePresentationKind.RoadBridge, $"reference-damage-{i}"));
+                simulation.Entities.AddComponent(road, new StrategicInfrastructureState(
+                    i % 2 == 0 ? StrategicInfrastructureOperationalState.Restoring : StrategicInfrastructureOperationalState.Disabled, 0));
             }
             foreach (var visual in new[] { WorldVisualId.PropRubble, WorldVisualId.PropScorchedBarrier, WorldVisualId.PropBurstPipe })
             {
@@ -341,7 +343,7 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
         }        EntityId hidden = default;
         if (kind is VisualReferenceSceneKind.BattlefieldCombat or VisualReferenceSceneKind.InfantryBattleProduction)
         {
-            EntityId contact = Unit(UnitIds.MainBattleTank, new(55, 0, 10), foreign: true);
+            EntityId contact = Unit(kind == VisualReferenceSceneKind.InfantryBattleProduction ? UnitIds.RifleSquad : UnitIds.MainBattleTank, new(55, 0, 10), foreign: true);
             simulation.Entities.AddComponent(contact, new IntelligenceSignature(new(2), identityKey: 42));
             if (includeHiddenEnemy)
             {
@@ -396,9 +398,6 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
                 if (infantryReview && item.UnitFeature.IsSpecified && !item.UnitFeature.IsWreck)
                     visible[i] = item with { MechanicalPose = new(true, i % 3 == 1 ? .35 : 0, 1.6, 1.6,
                         i % 3 == 2 ? 1.55 : -1, 0, 0) };
-                if (battlefieldReview && item.InfrastructureFeature.IsSpecified)
-                    visible[i] = item with { InfrastructureFeature = item.InfrastructureFeature with
-                        { State = i % 2 == 0 ? InfrastructurePresentationState.Restoring : InfrastructurePresentationState.Disabled } };
             }
         }
         if (mechanical)
