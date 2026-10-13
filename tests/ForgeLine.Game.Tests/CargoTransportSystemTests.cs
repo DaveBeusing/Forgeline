@@ -13,8 +13,11 @@ public sealed class CargoTransportSystemTests
 {
     private static readonly PlayerId LocalPlayer = new(1);
 
-    [Fact]
-    public void LoadsNearStaticApproachWhileAnActiveMovementOrderRemains()
+    [Theory]
+    [InlineData(14.0f)]
+    [InlineData(16.0f)]
+    [InlineData(18.0f)]
+    public void LoadsNearStaticApproachWhileAnActiveMovementOrderRemains(float buildingWidth)
     {
         TransportFixture fixture = CreateFixture(
             sourceQuantity: 80.0,
@@ -26,12 +29,12 @@ public sealed class CargoTransportSystemTests
         fixture.Simulation.Entities.AddComponent(
             source.Entity,
             new SpatialPresence(
-                new Vector3(4.0f),
+                new Vector3(buildingWidth * .5f),
                 new SpatialEntryMetadata(1, 0, SpatialMobility.Static)));
         EntityId truck = fixture.CreateTruckAtSource();
         GroundMovement movement = fixture.Simulation.Entities.GetComponent<GroundMovement>(truck);
         Vector3 approach = fixture.SourcePosition - new Vector3(
-            4.0f + movement.ObstacleLookAhead + movement.Radius + 32.0f, 0.0f, 0.0f);
+            buildingWidth * .5f + movement.ObstacleLookAhead + movement.Radius + 32.0f, 0.0f, 0.0f);
         WorldTransform transform = fixture.Simulation.Entities.GetComponent<WorldTransform>(truck);
         fixture.Simulation.Entities.SetComponent(
             truck,

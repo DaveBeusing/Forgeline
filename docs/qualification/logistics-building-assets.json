@@ -1,0 +1,886 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "3e03aec7e1d0ae9f5a151f008e87b7e658902b78",
+  "catalogCount": 437,
+  "catalogQualification": {
+    "assetCount": 437,
+    "meshCount": 254,
+    "textureCount": 56,
+    "materialCount": 127,
+    "totalRuntimeBytes": 61747374,
+    "meshRuntimeBytes": 6794276,
+    "textureRuntimeBytes": 54798223,
+    "studioSplashTextureRuntimeBytes": 1786411,
+    "materialRuntimeBytes": 154875,
+    "catalogLoadDuration": "00:00:00.0264823",
+    "assetReadDuration": "00:00:00.5430633",
+    "largestAssets": [
+      {
+        "assetId": "texture.world.terrain.crushed_gravel",
+        "type": "texture",
+        "runtimeBytes": 5593386
+      },
+      {
+        "assetId": "texture.world.terrain.concrete_base",
+        "type": "texture",
+        "runtimeBytes": 5593383
+      },
+      {
+        "assetId": "texture.world.terrain.cracked_earth",
+        "type": "texture",
+        "runtimeBytes": 5593383
+      },
+      {
+        "assetId": "texture.world.terrain.rocky_scrub",
+        "type": "texture",
+        "runtimeBytes": 5593377
+      },
+      {
+        "assetId": "texture.world.terrain.dark_ash",
+        "type": "texture",
+        "runtimeBytes": 5593368
+      },
+      {
+        "assetId": "texture.world.terrain.dry_dirt",
+        "type": "texture",
+        "runtimeBytes": 5593368
+      },
+      {
+        "assetId": "texture.world.terrain.bedrock",
+        "type": "texture",
+        "runtimeBytes": 5593365
+      },
+      {
+        "assetId": "texture.directorate.surface.atlas_base",
+        "type": "texture",
+        "runtimeBytes": 5587811
+      },
+      {
+        "assetId": "texture.directorate.surface.atlas_normal",
+        "type": "texture",
+        "runtimeBytes": 1393493
+      },
+      {
+        "assetId": "building.directorate.logistics_hub",
+        "type": "mesh",
+        "runtimeBytes": 680384
+      },
+      {
+        "assetId": "unit.directorate.main_battle_tank",
+        "type": "mesh",
+        "runtimeBytes": 660330
+      },
+      {
+        "assetId": "branding.undefined_behavior.splash.wordmark",
+        "type": "texture",
+        "runtimeBytes": 552058
+      }
+    ],
+    "issues": [],
+    "success": true
+  },
+  "scopedAssetCount": 33,
+  "assets": [
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/logistics_hub.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/lod0.gltf",
+      "collision": "building.directorate.module.collision_box",
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/logistics_hub.asset.json",
+      "sockets": [
+        {
+          "name": "cargo_load",
+          "x": 0,
+          "y": -0.34577778,
+          "z": 0.45,
+          "isValid": true
+        },
+        {
+          "name": "gantry_pivot",
+          "x": 0,
+          "y": 0.245,
+          "z": -0.25,
+          "isValid": true
+        },
+        {
+          "name": "service_access",
+          "x": 0.2,
+          "y": -0.4,
+          "z": 0.45,
+          "isValid": true
+        }
+      ],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.logistics_hub",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "building.directorate.logistics_hub.lod1",
+        "building.directorate.logistics_hub.lod2",
+        "building.directorate.module.collision_box",
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "building.directorate.logistics_hub.lod1",
+          "maxDistance": 220
+        },
+        {
+          "level": 2,
+          "assetId": "building.directorate.logistics_hub.lod2",
+          "maxDistance": 620
+        }
+      ]
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/logistics_hub/critical.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/critical.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/logistics_hub_critical.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.logistics_hub.critical",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/logistics_hub/damaged.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/damaged.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/logistics_hub_damaged.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.logistics_hub.damaged",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/logistics_hub/destroyed.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/destroyed.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/logistics_hub_destroyed.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.logistics_hub.destroyed",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/logistics_hub/foundation.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/foundation.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/logistics_hub_foundation.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.logistics_hub.foundation",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/logistics_hub/idle.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/idle.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/logistics_hub_idle.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.logistics_hub.idle",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/logistics_hub/lod1.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/lod1.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/logistics_hub_lod1.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.logistics_hub.lod1",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/logistics_hub/lod2.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/lod2.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/logistics_hub_lod2.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.logistics_hub.lod2",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/logistics_hub/partial_shell.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/partial_shell.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/logistics_hub_partial_shell.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.logistics_hub.partial_shell",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/logistics_hub/structural_frame.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/structural_frame.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/logistics_hub_structural_frame.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.logistics_hub.structural_frame",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/logistics_hub/unpowered.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/logistics_hub/unpowered.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/logistics_hub_unpowered.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.logistics_hub.unpowered",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/storage_depot.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/lod0.gltf",
+      "collision": "building.directorate.module.collision_box",
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/storage_depot.asset.json",
+      "sockets": [
+        {
+          "name": "cargo_load",
+          "x": 0,
+          "y": -0.3265,
+          "z": 0.42,
+          "isValid": true
+        },
+        {
+          "name": "gantry_pivot",
+          "x": 0,
+          "y": 0.0885,
+          "z": -0.1,
+          "isValid": true
+        },
+        {
+          "name": "service_access",
+          "x": 0.15,
+          "y": -0.4,
+          "z": 0.42,
+          "isValid": true
+        }
+      ],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.storage_depot",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "building.directorate.module.collision_box",
+        "building.directorate.storage_depot.lod1",
+        "building.directorate.storage_depot.lod2",
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "building.directorate.storage_depot.lod1",
+          "maxDistance": 220
+        },
+        {
+          "level": 2,
+          "assetId": "building.directorate.storage_depot.lod2",
+          "maxDistance": 620
+        }
+      ]
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/storage_depot/critical.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/critical.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/storage_depot_critical.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.storage_depot.critical",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/storage_depot/damaged.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/damaged.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/storage_depot_damaged.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.storage_depot.damaged",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/storage_depot/destroyed.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/destroyed.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/storage_depot_destroyed.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.storage_depot.destroyed",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/storage_depot/foundation.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/foundation.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/storage_depot_foundation.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.storage_depot.foundation",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/storage_depot/idle.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/idle.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/storage_depot_idle.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.storage_depot.idle",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/storage_depot/lod1.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/lod1.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/storage_depot_lod1.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.storage_depot.lod1",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/storage_depot/lod2.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/lod2.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/storage_depot_lod2.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.storage_depot.lod2",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/storage_depot/partial_shell.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/partial_shell.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/storage_depot_partial_shell.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.storage_depot.partial_shell",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/storage_depot/structural_frame.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/structural_frame.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/storage_depot_structural_frame.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.storage_depot.structural_frame",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/storage_depot/unpowered.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/storage_depot/unpowered.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/storage_depot_unpowered.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.storage_depot.unpowered",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/supply_depot.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/lod0.gltf",
+      "collision": "building.directorate.module.collision_box",
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/supply_depot.asset.json",
+      "sockets": [
+        {
+          "name": "cargo_load",
+          "x": 0.26,
+          "y": -0.3265,
+          "z": 0.44,
+          "isValid": true
+        },
+        {
+          "name": "gantry_pivot",
+          "x": -0.14,
+          "y": -0.055,
+          "z": 0.31,
+          "isValid": true
+        },
+        {
+          "name": "supply_transfer",
+          "x": -0.14,
+          "y": -0.35,
+          "z": 0.44,
+          "isValid": true
+        }
+      ],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.supply_depot",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "building.directorate.module.collision_box",
+        "building.directorate.supply_depot.lod1",
+        "building.directorate.supply_depot.lod2",
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "building.directorate.supply_depot.lod1",
+          "maxDistance": 220
+        },
+        {
+          "level": 2,
+          "assetId": "building.directorate.supply_depot.lod2",
+          "maxDistance": 620
+        }
+      ]
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/supply_depot/critical.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/critical.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/supply_depot_critical.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.supply_depot.critical",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/supply_depot/damaged.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/damaged.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/supply_depot_damaged.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.supply_depot.damaged",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/supply_depot/destroyed.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/destroyed.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/supply_depot_destroyed.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.supply_depot.destroyed",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/supply_depot/foundation.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/foundation.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/supply_depot_foundation.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.supply_depot.foundation",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/supply_depot/idle.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/idle.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/supply_depot_idle.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.supply_depot.idle",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/supply_depot/lod1.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/lod1.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/supply_depot_lod1.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.supply_depot.lod1",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/supply_depot/lod2.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/lod2.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/supply_depot_lod2.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.supply_depot.lod2",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/supply_depot/partial_shell.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/partial_shell.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/supply_depot_partial_shell.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.supply_depot.partial_shell",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/supply_depot/structural_frame.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/structural_frame.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/supply_depot_structural_frame.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.supply_depot.structural_frame",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    },
+    {
+      "runtime": "assets/runtime/meshes/building/directorate/supply_depot/unpowered.flasset",
+      "source": "assets/source/buildings/directorate/sources/logistics/supply_depot/unpowered.gltf",
+      "collision": null,
+      "sourceDimensions": null,
+      "runtimeTextureLimit": null,
+      "definition": "assets/source/buildings/directorate/supply_depot_unpowered.asset.json",
+      "sockets": [],
+      "textures": [],
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "building.directorate.supply_depot.unpowered",
+      "runtimeTextureFormat": "rgba8Unorm",
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "type": "mesh",
+      "lods": []
+    }
+  ]
+}

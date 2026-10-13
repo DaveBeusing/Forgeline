@@ -227,7 +227,8 @@ public static class BuildingPresentationCatalog
     private static readonly Dictionary<BuildingId, ProductionStateAssets> ProductionStates =
         new[] { BuildingIds.CommandCore, BuildingIds.Extractor, BuildingIds.Smelter,
             BuildingIds.ElectronicsPlant, BuildingIds.Refinery, BuildingIds.AmmunitionPlant,
-            BuildingIds.VehicleFactory, BuildingIds.PowerPlant, BuildingIds.Barracks, BuildingIds.Radar }
+            BuildingIds.VehicleFactory, BuildingIds.PowerPlant, BuildingIds.Barracks, BuildingIds.Radar,
+            BuildingIds.StorageDepot, BuildingIds.SupplyDepot, BuildingIds.LogisticsHub }
         .ToDictionary(building => building, building =>
         {
             string prefix = Get(building).MeshAssetId;
@@ -235,7 +236,8 @@ public static class BuildingPresentationCatalog
                 prefix + ".partial_shell",
                 building == BuildingIds.Extractor || building == BuildingIds.Smelter ||
                 building == BuildingIds.ElectronicsPlant || building == BuildingIds.Refinery ||
-                building == BuildingIds.AmmunitionPlant ? prefix + ".idle" : null, prefix + ".unpowered",
+                building == BuildingIds.AmmunitionPlant || building == BuildingIds.StorageDepot ||
+                building == BuildingIds.SupplyDepot || building == BuildingIds.LogisticsHub ? prefix + ".idle" : null, prefix + ".unpowered",
                 prefix + ".damaged", prefix + ".critical", prefix + ".destroyed");
         });
 

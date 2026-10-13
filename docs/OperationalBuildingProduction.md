@@ -309,3 +309,20 @@ pass, with seven optional presentation qualification tests skipped. Both test
 projects ran with `--parallel none`. The state-resolution allocation theory
 covers Command Core and all nine production families. Existing art/live,
 sustained-performance and borderless acceptance limits remain open.
+
+## Integration with logistics building production
+
+Master `2df6a9d` includes logistics production from PR #184. The integration
+retains all thirteen family state bindings, operational and logistics galleries,
+real logistics traffic fixtures, completed-tick capture time and optional
+operational review yaw. Existing master enum values remain stable; operational
+scenes follow the logistics entries. Industrial/logistics idle asset bindings are
+retained without adding gameplay production state.
+
+Combined catalog: 465 assets (282 meshes, 56 textures, 127 materials). PR version
+advances once from current master 0.1.351 to 0.1.352. Validation: Release solution
+build with zero warnings/errors; 42-project graph; 97 asset tests, 787 presentation
+tests and three capture tests passed, with seven optional presentation skips.
+The first presentation run caught missing logistics idle bindings; restoring
+the existing bindings passes the unchanged complete project suite. Historical
+capture fingerprints and performance results are not requalified by this merge.

@@ -1,11 +1,12 @@
 # Directorate Building and Infrastructure Assets
 
-The Command Core, four operational families and five industrial families use
+The Command Core, four operational families and five industrial and three logistics families use
 editable component kits, distinct LODs and dedicated construction/damage/wreck
 geometry. All retain their public identities, gameplay footprints and shared
 4096-pixel Base Color, Normal and ORM masters. See
 [Operational building production](OperationalBuildingProduction.md),
-[Industrial building production](IndustrialBuildingProduction.md) and
+[Industrial building production](IndustrialBuildingProduction.md),
+[Logistics building production](LogisticsBuildingProduction.md) and
 [Production surfaces](ProductionSurfaceMasters.md) for source ownership,
 dimensions, qualification evidence and open acceptance.
 
@@ -76,7 +77,7 @@ building.directorate.module.collision_box
 
 The construction and state modules remain the common fallback vocabulary for
 families without dedicated production kits. Command Core and the five industrial
-families resolve their own purpose-specific meshes through the same indexed-instancing path.
+families and the three logistics families resolve their own purpose-specific meshes through the same indexed-instancing path.
 
 ## Construction presentation
 
@@ -103,13 +104,13 @@ For completed supported buildings, state is derived from existing ECS components
 Brownout and offline power consumers use the unpowered treatment in this baseline because both represent insufficient power for normal operation.
 
 Critical states do not rely on tint alone. Command Core, all four operational
-families and all five industrial families use dedicated construction, unpowered,
-damaged/critical and collapsed geometry. Industrial idle attachments are also
+families and all five industrial and three logistics families use dedicated construction, unpowered,
+damaged/critical and collapsed geometry. Industrial and logistics idle asset bindings are also
 family-specific; operational production-capable families retain the shared idle
-attachment. Remaining families retain shared state modules.
+attachment. Logistics has no fabricated production idle state.
 
 Existing rigid triangle ranges and completed-tick mechanical poses animate the
-Factory door/gantry, Power cooling rotor and Radar array. Industrial kits introduce
+Factory door/gantry, Power cooling rotor and Radar array. Industrial and logistics kits introduce
 static state geometry and inspection anchors. Existing bounded damage VFX remain;
 no skeletons, physics destruction or new simulation state are introduced.
 
@@ -273,7 +274,7 @@ State material selection takes precedence over the static primary mesh material,
 The Command Core now uses its dedicated editable modular kit, assembled glTF
 LOD0/1/2 and seven state meshes. Its stable primary identity, gameplay footprint,
 collision proxy, atlas maps and state authority are retained. Only its cosmetic
-foundation reaches the existing ground plane, as do the operational and industrial
+foundation reaches the existing ground plane, as do the operational, industrial and logistics
 foundations. See [Command Core production](CommandCoreProduction.md) for dimensions,
 anchors, source mapping and qualification limits.
 
@@ -297,7 +298,22 @@ references, state-material priority, projected LOD thresholds and authoritative
 placement/power/production/damage rules remain intact. See
 [Industrial building production](IndustrialBuildingProduction.md).
 
-After integrating both production kits, the catalog contains 441 assets
-(258 meshes, 56 textures and 127 materials). Command Core, all four operational
-and all five industrial families use dedicated construction and damage/wreck
-geometry. Only the industrial families add a dedicated idle attachment.
+## Logistics production geometry
+
+Storage Depot, Supply Depot and Logistics Hub use editable component assemblies,
+90 inspectable glTFs, three dedicated LODs per family and 24 additional state
+meshes. Warehouses, separate fuel/ammunition/service zones and gantry transfer
+lanes distinguish their roles. Containers, tanks, portals, pumps and bollards
+are reused as explicit modules. Cargo/service anchors match existing vehicle
+deck heights; loading pivots are static inspection contracts. Inventory
+capacities 5000/2500/3000, node topology, routes, external truck approach and
+gameplay footprints remain unchanged. Their nine-plot galleries have eight
+distinct reachable states, with two Operational plots; no fabricated production
+Idle component is added. Real loading/transit/unloading/repeated-traffic fixtures
+exercise existing simulation and compiled vehicle sockets at 420 m. See
+[source mapping, measurements and qualification limits](LogisticsBuildingProduction.md).
+
+The integrated catalog contains 465 assets (282 meshes, 56 textures and 127
+materials). All thirteen building families retain dedicated construction and
+damage/wreck geometry. Industrial and logistics families retain dedicated idle asset bindings;
+logistics fixtures expose only reachable gameplay states.

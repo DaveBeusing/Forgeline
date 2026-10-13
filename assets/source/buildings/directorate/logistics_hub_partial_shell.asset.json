@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.logistics_hub.partial_shell",
+  "type": "mesh",
+  "source": "sources/logistics/logistics_hub/partial_shell.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

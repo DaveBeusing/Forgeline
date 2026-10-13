@@ -17,7 +17,10 @@ public sealed class DirectorateBuildingPresentationTests
     [InlineData("electronics_plant")]
     [InlineData("fuel_refinery")]
     [InlineData("ammunition_plant")]
-    public void IndustrialStateBindingsRetainFamilyAndExistingStateMaterial(string family)
+    [InlineData("storage_depot")]
+    [InlineData("supply_depot")]
+    [InlineData("logistics_hub")]
+    public void ProductionStateBindingsRetainFamilyAndExistingStateMaterial(string family)
     {
         BuildingId building = family switch
         {
@@ -29,6 +32,9 @@ public sealed class DirectorateBuildingPresentationTests
             "power_plant" => BuildingIds.PowerPlant,
             "barracks" => BuildingIds.Barracks,
             "radar" => BuildingIds.Radar,
+            "storage_depot" => BuildingIds.StorageDepot,
+            "supply_depot" => BuildingIds.SupplyDepot,
+            "logistics_hub" => BuildingIds.LogisticsHub,
             _ => BuildingIds.AmmunitionPlant
         };
         string prefix = "building.directorate." + family;
@@ -363,6 +369,9 @@ public sealed class DirectorateBuildingPresentationTests
     [InlineData("power_plant")]
     [InlineData("barracks")]
     [InlineData("radar")]
+    [InlineData("storage_depot")]
+    [InlineData("supply_depot")]
+    [InlineData("logistics_hub")]
     public void RepeatedProductionStateResolutionDoesNotAllocateAssetNamesPerFrame(string family)
     {
         BuildingId building = family switch
@@ -376,6 +385,9 @@ public sealed class DirectorateBuildingPresentationTests
             "power_plant" => BuildingIds.PowerPlant,
             "barracks" => BuildingIds.Barracks,
             "radar" => BuildingIds.Radar,
+            "storage_depot" => BuildingIds.StorageDepot,
+            "supply_depot" => BuildingIds.SupplyDepot,
+            "logistics_hub" => BuildingIds.LogisticsHub,
             _ => BuildingIds.AmmunitionPlant
         };
         BuildingFeaturePresentationMetadata[] states =

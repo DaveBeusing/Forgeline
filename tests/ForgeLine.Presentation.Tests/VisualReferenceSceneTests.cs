@@ -37,6 +37,9 @@ public sealed class VisualReferenceSceneTests
     [InlineData(VisualReferenceSceneKind.ElectronicsPlantProduction)]
     [InlineData(VisualReferenceSceneKind.FuelRefineryProduction)]
     [InlineData(VisualReferenceSceneKind.AmmunitionPlantProduction)]
+    [InlineData(VisualReferenceSceneKind.StorageDepotProduction)]
+    [InlineData(VisualReferenceSceneKind.SupplyDepotProduction)]
+    [InlineData(VisualReferenceSceneKind.LogisticsHubProduction)]
     public void FreshFixturesRetainTheSameImmutableState(VisualReferenceSceneKind kind)
     {
         var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
@@ -102,6 +105,24 @@ public sealed class VisualReferenceSceneTests
         Assert.Equal(PlayerSelectionKind.Building, scene.Snapshot.PlayerExperience!.Value.Selection.Kind);
     }
 
+    [Theory]
+    [InlineData(VisualReferenceSceneKind.StorageDepotProduction)]
+    [InlineData(VisualReferenceSceneKind.SupplyDepotProduction)]
+    [InlineData(VisualReferenceSceneKind.LogisticsHubProduction)]
+    public void LogisticsGalleryUsesExistingStatesWithoutInventingProductionFacilities(VisualReferenceSceneKind kind)
+    {
+        var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+        var scene = VisualReferenceScene.Create(kind, terrain);
+        var buildings = scene.Snapshot.Instances.ToArray().Where(x => x.BuildingFeature.IsSpecified).ToArray();
+        Assert.Equal(9, buildings.Length);
+        Assert.Single(buildings.Select(x => x.BuildingFeature.Building).Distinct());
+        Assert.Equal(8, buildings.Select(x => x.BuildingFeature.State).Distinct().Count());
+        Assert.DoesNotContain(buildings, x => x.BuildingFeature.State == BuildingPresentationState.Idle);
+        var footprint = DirectorateContent.CreateBuildingCatalog()[buildings[0].BuildingFeature.Building].Footprint;
+        Assert.All(buildings, x => Assert.Equal(new System.Numerics.Vector3(footprint.Width, footprint.Height, footprint.Depth), x.Transform.Scale));
+        Assert.Equal(2, buildings.Count(x => x.BuildingFeature.State == BuildingPresentationState.Operational));
+    }
+
     [Fact]
     public void KitReviewContainsAuthenticStaticDressingAndBoundedRepeatedGeometry()
     {
@@ -118,6 +139,35 @@ public sealed class VisualReferenceSceneTests
         Assert.Equal(1000, added.Length);
         Assert.Equal(10, added.Select(x => x.WorldFeature.Visual).Distinct().Count());
         Assert.All(added, x => Assert.False(x.Selectable.IsSelectable || x.WorldFeature.Inspectable));
+    }
+
+    [Theory]
+    [InlineData(VisualReferenceSceneKind.LogisticsLoadingProduction)]
+    [InlineData(VisualReferenceSceneKind.LogisticsTransitProduction)]
+    [InlineData(VisualReferenceSceneKind.LogisticsUnloadingProduction)]
+    [InlineData(VisualReferenceSceneKind.LogisticsSustainedProduction)]
+    public void PhysicalLogisticsFixturesReachTheirRealLifecycleWithoutVisualOverlap(VisualReferenceSceneKind kind)
+    {
+        var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+        var first = VisualReferenceScene.Create(kind, terrain);
+        var second = VisualReferenceScene.Create(kind, terrain);
+        Assert.Equal(first.Fingerprint, second.Fingerprint);
+        var instances = first.Snapshot.Instances.ToArray();
+        var buildings = instances.Where(x => x.BuildingFeature.IsSpecified).ToArray();
+        var vehicles = instances.Where(x => x.UnitFeature.IsSpecified).ToArray();
+        Assert.Equal(3, buildings.Length);
+        Assert.Equal(2, vehicles.Length);
+        Assert.Contains(vehicles, x => x.UnitFeature.Unit == UnitIds.CargoTruck);
+        Assert.Contains(vehicles, x => x.UnitFeature.Unit == UnitIds.SupplyTruck);
+        foreach (var vehicle in vehicles)
+        foreach (var building in buildings)
+        {
+            var delta = vehicle.Transform.Position - building.Transform.Position;
+            var combined = (vehicle.Transform.Scale + building.Transform.Scale) * .5f;
+            Assert.True(MathF.Abs(delta.X) > combined.X || MathF.Abs(delta.Z) > combined.Z);
+        }
+        if (kind == VisualReferenceSceneKind.LogisticsSustainedProduction)
+            Assert.Equal(1024UL, first.Snapshot.Tick.Value);
     }
 
     [Fact]

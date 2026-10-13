@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.supply_depot.destroyed",
+  "type": "mesh",
+  "source": "sources/logistics/supply_depot/destroyed.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

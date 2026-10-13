@@ -1,0 +1,142 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine logistics building component exporter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 3216,
+      "uri": "data:application/octet-stream;base64,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"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 1008,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1008,
+      "byteLength": 1008,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 2016,
+      "byteLength": 672,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 2688,
+      "byteLength": 528,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 84,
+      "type": "VEC3",
+      "min": [
+        0.1850000023841858,
+        -0.4650909900665283,
+        0.3528582751750946
+      ],
+      "max": [
+        0.3499999940395355,
+        -0.3189089894294739,
+        0.4449999928474426
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 84,
+      "type": "VEC3",
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 84,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5125,
+      "count": 132,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "damaged",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "extras": {
+    "coordinates": "Normalized building-local right-handed Y-up; +Z loading front",
+    "componentHierarchy": [
+      {
+        "name": "damaged_dock",
+        "parent": null,
+        "sharedModule": null,
+        "firstIndex": 0,
+        "indexCount": 132
+      }
+    ],
+    "anchors": {
+      "supply_transfer": [
+        -0.14,
+        -0.35,
+        0.44
+      ],
+      "gantry_pivot": [
+        -0.14,
+        -0.055,
+        0.31
+      ],
+      "cargo_load": [
+        0.26,
+        -0.3265,
+        0.44
+      ]
+    }
+  }
+}

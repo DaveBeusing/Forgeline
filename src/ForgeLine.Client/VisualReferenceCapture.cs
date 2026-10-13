@@ -83,7 +83,7 @@ internal static class VisualReferenceCapture
             string runtimeFingerprint = RuntimeFingerprint(request.RuntimeRoot);
             var catalog = RuntimeAssetCatalog.Load(request.RuntimeRoot);
             var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
-            var fixtures = request.Scenes.Select(x => VisualReferenceScene.Create(x, terrain)).ToArray();
+            var fixtures = request.Scenes.Select(x => VisualReferenceScene.Create(x, terrain, runtimeAssets: catalog)).ToArray();
             using var platform = new WindowsPlatform();
             using IWindow window = platform.CreateWindow(new("FORGELINE Reference Capture", 1280, 720));
             using var graphics = GraphicsDeviceFactory.CreateForWindow(window, new()
@@ -122,6 +122,7 @@ internal static class VisualReferenceCapture
                     Console.WriteLine($"[reference:capture] {key}");
                     var camera = new RtsCamera(RtsVisualReference.CreateCameraSettings(fixture.Target, zoom) with
                         { InitialYawRadians = request.YawDegrees == 45 ? RtsVisualReference.YawRadians : request.YawDegrees * MathF.PI / 180 });
+                    double captureVisualSeconds = fixture.Snapshot.Tick.Value * fixture.Snapshot.TickDuration.TotalSeconds;
                     var buffer = new PresentationSnapshotBuffer(); buffer.Publish(fixture.Snapshot);
                     var world = new RenderWorld(); world.Update(buffer);
                     particles.Prepare(world, camera, display.Width, display.Height, 0);
@@ -150,12 +151,12 @@ internal static class VisualReferenceCapture
                             var shadow = DirectionalShadowProjection.Create(camera.CaptureState(), lighting, profile.Shadows);
                             context.BeginDirectionalShadowPass(shadow);
                             int draws = ground.RenderShadow(context, shadow, 128);
-                            meshes.RenderShadow(context, camera, world, 1, shadow, profile.Shadows.MaximumCasters - draws, profile.Shadows.MaximumDraws - draws, 1.6);
+                            meshes.RenderShadow(context, camera, world, 1, shadow, profile.Shadows.MaximumCasters - draws, profile.Shadows.MaximumDraws - draws, captureVisualSeconds);
                             context.EndDirectionalShadowPass();
                         }
                         ground.Render(context, camera);
                         particles.Prepare(world, camera, context.Width, context.Height, 0, true);
-                        meshes.Render(context, camera, world, 1, 1.6, particles);
+                        meshes.Render(context, camera, world, 1, captureVisualSeconds, particles);
                         particles.Render(context, camera);
                         context.BeginPass(GraphicsFramePass.Overlay);
                         selection.Render(context, camera, indicators);
@@ -234,7 +235,7 @@ internal static class VisualReferenceCapture
                     }
                     captures.Add(new { submission = meshes.SubmissionMetrics, key, image, imageSha256 = FileHash(Path.Combine(request.OutputRoot, image)),
                         pixelSha256 = Convert.ToHexString(SHA256.HashData(rgba)), fixture.Kind, fixture.Fingerprint,
-                        seed = VisualReferenceScene.Seed, tick = fixture.Snapshot.Tick.Value, camera = camera.CaptureState(),
+                        seed = VisualReferenceScene.Seed, tick = fixture.Snapshot.Tick.Value, captureVisualSeconds, camera = camera.CaptureState(),
                         requestedDisplay = display, actualSurface = measured.Surface, hostWindow = window.ClientSize,
                         rasterDpi, uiScale = 1, requestedQuality = quality, profile, lighting,
                         cpu = Distribution(cpu), gpu = Distribution(gpu.ToArray()), fps = Distribution(cpu.Select(x => 1000 / x).ToArray()),
@@ -259,7 +260,7 @@ internal static class VisualReferenceCapture
                     runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
                     runtimeFingerprint, request.Driver, software = request.Software, fixtureVersion = VisualReferenceScene.FixtureVersion,
                     capturePath = "D3D12 swap-chain backbuffer readback before Present; full-resolution native output, independent of host-window clamp",
-                    method = "Authored immutable presentation states; fixed 32 completed extraction ticks, VSync off, frozen visual age1.6s and particle age.2s. CPU includes frame reuse/Present. Distinct completed GPU fences. Readbacks/PNG export excluded. No live gameplay or sustained-motion FPS claim.",
+                    method = "Immutable presentation states; completed extraction tick and frozen visual seconds recorded per case, VSync off, particle age.2s. CPU includes frame reuse/Present. Distinct completed GPU fences. Readbacks/PNG export excluded. No live gameplay or sustained-motion FPS claim.",
                     request.Warmups, request.Samples, request.ContinueAfterMismatch, failedCaptures, captures, humanVisualAcceptance = "pending" }, JsonOptions));
         }
         catch (Exception error)

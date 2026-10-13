@@ -1,0 +1,1139 @@
+{
+  "family": "storage_depot",
+  "coordinates": "Normalized building-local right-handed Y-up; +Z loading front",
+  "gameScaleMeters": [
+    14,
+    8,
+    14
+  ],
+  "bounds": {
+    "min": [
+      -0.46,
+      -0.5,
+      -0.4
+    ],
+    "max": [
+      0.46,
+      0.16,
+      0.45
+    ]
+  },
+  "atlas": "texture.directorate.surface.atlas_base",
+  "provenance": {
+    "author": "ForgeLine",
+    "license": "Original repository geometry; no third-party inputs"
+  },
+  "anchors": {
+    "service_access": [
+      0.15,
+      -0.4,
+      0.42
+    ],
+    "gantry_pivot": [
+      0,
+      0.0885,
+      -0.1
+    ],
+    "cargo_load": [
+      0,
+      -0.3265,
+      0.42
+    ]
+  },
+  "intactModules": [
+    "foundation",
+    "warehouse_left",
+    "warehouse_right",
+    "container_stack_0",
+    "container_upper_0",
+    "container_stack_1",
+    "container_upper_1",
+    "loading_portal",
+    "dock_bollard_0",
+    "dock_bollard_1"
+  ],
+  "modules": [
+    {
+      "name": "foundation",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.46,
+            -0.5,
+            -0.4
+          ],
+          "max": [
+            0.46,
+            -0.465,
+            0.45
+          ],
+          "cell": 0,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        }
+      ]
+    },
+    {
+      "name": "warehouse_left",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.41000000000000003,
+            -0.465,
+            -0.36
+          ],
+          "max": [
+            -0.15000000000000002,
+            0.065,
+            0.16
+          ],
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "roof",
+          "min": [
+            -0.42000000000000004,
+            0.065,
+            -0.37
+          ],
+          "max": [
+            -0.14,
+            0.16,
+            0.17
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.36500000000000005,
+            -0.425,
+            0.161
+          ],
+          "max": [
+            -0.195,
+            -0.08,
+            0.168
+          ],
+          "cell": 3,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.377,
+            -0.43,
+            0.169
+          ],
+          "max": [
+            -0.36500000000000005,
+            -0.06,
+            0.183
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.195,
+            -0.43,
+            0.169
+          ],
+          "max": [
+            -0.18300000000000002,
+            -0.06,
+            0.183
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.377,
+            -0.08,
+            0.169
+          ],
+          "max": [
+            -0.18300000000000002,
+            -0.06,
+            0.183
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.41500000000000004,
+            -0.46,
+            -0.3
+          ],
+          "max": [
+            -0.41000000000000003,
+            0.055,
+            -0.288
+          ],
+          "cell": 1,
+          "lods": [
+            0
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.15000000000000002,
+            -0.46,
+            -0.3
+          ],
+          "max": [
+            -0.14500000000000002,
+            0.055,
+            -0.288
+          ],
+          "cell": 1,
+          "lods": [
+            0
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.41500000000000004,
+            -0.46,
+            -0.15
+          ],
+          "max": [
+            -0.41000000000000003,
+            0.055,
+            -0.13799999999999998
+          ],
+          "cell": 1,
+          "lods": [
+            0
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.15000000000000002,
+            -0.46,
+            -0.15
+          ],
+          "max": [
+            -0.14500000000000002,
+            0.055,
+            -0.13799999999999998
+          ],
+          "cell": 1,
+          "lods": [
+            0
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.41500000000000004,
+            -0.46,
+            0
+          ],
+          "max": [
+            -0.41000000000000003,
+            0.055,
+            0.012
+          ],
+          "cell": 1,
+          "lods": [
+            0
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.15000000000000002,
+            -0.46,
+            0
+          ],
+          "max": [
+            -0.14500000000000002,
+            0.055,
+            0.012
+          ],
+          "cell": 1,
+          "lods": [
+            0
+          ],
+          "bevel": 0.004
+        }
+      ]
+    },
+    {
+      "name": "warehouse_right",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            0.15000000000000002,
+            -0.465,
+            -0.36
+          ],
+          "max": [
+            0.41000000000000003,
+            0.065,
+            0.16
+          ],
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "roof",
+          "min": [
+            0.14,
+            0.065,
+            -0.37
+          ],
+          "max": [
+            0.42000000000000004,
+            0.16,
+            0.17
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.195,
+            -0.425,
+            0.161
+          ],
+          "max": [
+            0.36500000000000005,
+            -0.08,
+            0.168
+          ],
+          "cell": 3,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.18300000000000002,
+            -0.43,
+            0.169
+          ],
+          "max": [
+            0.195,
+            -0.06,
+            0.183
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.36500000000000005,
+            -0.43,
+            0.169
+          ],
+          "max": [
+            0.377,
+            -0.06,
+            0.183
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.18300000000000002,
+            -0.08,
+            0.169
+          ],
+          "max": [
+            0.377,
+            -0.06,
+            0.183
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.14500000000000002,
+            -0.46,
+            -0.3
+          ],
+          "max": [
+            0.15000000000000002,
+            0.055,
+            -0.288
+          ],
+          "cell": 1,
+          "lods": [
+            0
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.41000000000000003,
+            -0.46,
+            -0.3
+          ],
+          "max": [
+            0.41500000000000004,
+            0.055,
+            -0.288
+          ],
+          "cell": 1,
+          "lods": [
+            0
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.14500000000000002,
+            -0.46,
+            -0.15
+          ],
+          "max": [
+            0.15000000000000002,
+            0.055,
+            -0.13799999999999998
+          ],
+          "cell": 1,
+          "lods": [
+            0
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.41000000000000003,
+            -0.46,
+            -0.15
+          ],
+          "max": [
+            0.41500000000000004,
+            0.055,
+            -0.13799999999999998
+          ],
+          "cell": 1,
+          "lods": [
+            0
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.14500000000000002,
+            -0.46,
+            0
+          ],
+          "max": [
+            0.15000000000000002,
+            0.055,
+            0.012
+          ],
+          "cell": 1,
+          "lods": [
+            0
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.41000000000000003,
+            -0.46,
+            0
+          ],
+          "max": [
+            0.41500000000000004,
+            0.055,
+            0.012
+          ],
+          "cell": 1,
+          "lods": [
+            0
+          ],
+          "bevel": 0.004
+        }
+      ]
+    },
+    {
+      "name": "container_stack_0",
+      "parent": null,
+      "source": "container",
+      "translation": [
+        -0.285,
+        -0.465,
+        0.295
+      ],
+      "scale": [
+        0.95,
+        1,
+        0.85
+      ]
+    },
+    {
+      "name": "container_upper_0",
+      "parent": null,
+      "source": "container",
+      "translation": [
+        -0.285,
+        -0.325,
+        0.295
+      ],
+      "scale": [
+        0.95,
+        1,
+        0.85
+      ]
+    },
+    {
+      "name": "container_stack_1",
+      "parent": null,
+      "source": "container",
+      "translation": [
+        0.285,
+        -0.465,
+        0.295
+      ],
+      "scale": [
+        0.95,
+        1,
+        0.85
+      ]
+    },
+    {
+      "name": "container_upper_1",
+      "parent": null,
+      "source": "container",
+      "translation": [
+        0.285,
+        -0.325,
+        0.295
+      ],
+      "scale": [
+        0.95,
+        1,
+        0.85
+      ]
+    },
+    {
+      "name": "loading_portal",
+      "parent": null,
+      "source": "loading_portal",
+      "translation": [
+        0,
+        -0.465,
+        -0.1
+      ],
+      "scale": [
+        1.1,
+        1.35,
+        1
+      ]
+    },
+    {
+      "name": "dock_bollard_0",
+      "parent": null,
+      "source": "dock_bollard",
+      "translation": [
+        -0.1,
+        -0.465,
+        0.42
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "dock_bollard_1",
+      "parent": null,
+      "source": "dock_bollard",
+      "translation": [
+        0.1,
+        -0.465,
+        0.42
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "construction_frame",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.443,
+            -0.465,
+            -0.383
+          ],
+          "max": [
+            -0.427,
+            0.15,
+            -0.367
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.443,
+            -0.465,
+            0.417
+          ],
+          "max": [
+            -0.427,
+            0.15,
+            0.433
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.427,
+            -0.465,
+            -0.383
+          ],
+          "max": [
+            0.443,
+            0.15,
+            -0.367
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.427,
+            -0.465,
+            0.417
+          ],
+          "max": [
+            0.443,
+            0.15,
+            0.433
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.44,
+            0.14,
+            -0.38
+          ],
+          "max": [
+            0.44,
+            0.16,
+            -0.36000000000000004
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        }
+      ]
+    },
+    {
+      "name": "closed_loading_gate",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.105,
+            -0.43,
+            0.39499999999999996
+          ],
+          "max": [
+            0.105,
+            -0.28,
+            0.41
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        }
+      ]
+    },
+    {
+      "name": "isolated_service",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.105,
+            -0.43,
+            0.39499999999999996
+          ],
+          "max": [
+            0.105,
+            -0.28,
+            0.41
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.035,
+            -0.29,
+            0.39
+          ],
+          "max": [
+            0.035,
+            -0.245,
+            0.415
+          ],
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        }
+      ]
+    },
+    {
+      "name": "damaged_dock",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.075,
+            -0.465,
+            0.37
+          ],
+          "max": [
+            0.03,
+            -0.36,
+            0.39999999999999997
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.02,
+            -0.4,
+            0.38
+          ],
+          "max": [
+            0.09,
+            -0.38,
+            0.425
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "pipe",
+          "points": [
+            [
+              -0.07,
+              -0.36,
+              0.38
+            ],
+            [
+              0.07,
+              -0.459,
+              0.41
+            ]
+          ],
+          "radius": 0.012,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            12,
+            6,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "critical_dock",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.09,
+            -0.465,
+            0.35
+          ],
+          "max": [
+            0.1,
+            -0.39,
+            0.415
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.03,
+            -0.43,
+            0.38
+          ],
+          "max": [
+            0.06,
+            -0.25,
+            0.41
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.12,
+            -0.455,
+            0.365
+          ],
+          "max": [
+            -0.05,
+            -0.36,
+            0.39499999999999996
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "pipe",
+          "points": [
+            [
+              -0.15,
+              0.075,
+              0.17
+            ],
+            [
+              -0.05,
+              -0.08,
+              0.27
+            ],
+            [
+              0.05,
+              -0.43,
+              0.37
+            ]
+          ],
+          "radius": 0.016,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            12,
+            6,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "collapsed_cargo",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.32,
+            -0.465,
+            -0.24
+          ],
+          "max": [
+            0.06,
+            -0.31,
+            -0.04
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.12,
+            -0.465,
+            0.06
+          ],
+          "max": [
+            0.28,
+            -0.35,
+            0.25
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.3,
+            -0.4,
+            0.25
+          ],
+          "end": [
+            0.25,
+            -0.36,
+            -0.16
+          ],
+          "radius": 0.022,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            16,
+            8,
+            6
+          ]
+        },
+        {
+          "kind": "roof",
+          "min": [
+            -0.39,
+            -0.44,
+            -0.24
+          ],
+          "max": [
+            -0.06,
+            -0.27,
+            0.09
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "kind": "roof",
+          "min": [
+            0.05,
+            -0.44,
+            -0.19
+          ],
+          "max": [
+            0.39,
+            -0.31,
+            0.16
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ]
+        }
+      ]
+    }
+  ],
+  "states": {
+    "foundation": [
+      "foundation"
+    ],
+    "structural_frame": [
+      "foundation",
+      "construction_frame"
+    ],
+    "partial_shell": [
+      "foundation",
+      "construction_frame",
+      "warehouse_left"
+    ],
+    "idle": [
+      "closed_loading_gate"
+    ],
+    "unpowered": [
+      "isolated_service"
+    ],
+    "damaged": [
+      "damaged_dock"
+    ],
+    "critical": [
+      "critical_dock"
+    ],
+    "destroyed": [
+      "foundation",
+      "collapsed_cargo"
+    ]
+  },
+  "vehicleInterface": {
+    "cargoDeckHeightMeters": 1.388,
+    "supplyTransferHeightMeters": 1.2,
+    "source": "Existing Directorate vehicle scale, GroundMovement.HeightOffset and compiled transfer sockets; no docking/navigation rule"
+  }
+}

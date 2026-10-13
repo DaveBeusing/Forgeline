@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.supply_depot.lod2",
   "type": "mesh",
-  "source": "sources/supply_depot_lod1.gltf",
+  "source": "sources/logistics/supply_depot/lod2.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ]
