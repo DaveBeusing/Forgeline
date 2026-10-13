@@ -182,6 +182,10 @@ public static class UnitPresentationCatalog
             ? "unit.directorate.main_battle_tank.wreck"
             : Get(feature.Unit).Lod2AssetId;
 
+    public static string? ResolveStateAttachmentAssetId(in UnitFeaturePresentationMetadata feature, UnitAssetLod lod) =>
+        lod == UnitAssetLod.Lod2 && feature.Unit != UnitIds.RifleSquad && feature.Unit != UnitIds.CombatEngineer
+            ? null : ResolveStateAttachmentAssetId(feature);
+
     public static string? ResolveStateAttachmentAssetId(in UnitFeaturePresentationMetadata feature) =>
         InfantryStates.TryGetValue(feature.Unit, out var states) ? feature.DamageState switch
         {
