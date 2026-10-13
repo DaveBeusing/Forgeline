@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.storage_depot.partial_shell",
+  "type": "mesh",
+  "source": "sources/logistics/storage_depot/partial_shell.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

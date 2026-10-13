@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.storage_depot",
   "type": "mesh",
-  "source": "sources/storage_depot_lod0_production.gltf",
+  "source": "sources/logistics/storage_depot/lod0.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ],
@@ -18,5 +18,25 @@
     }
   ],
   "collisionRequired": true,
-  "collisionReference": "building.directorate.module.collision_box"
+  "collisionReference": "building.directorate.module.collision_box",
+  "sockets": [
+    {
+      "name": "service_access",
+      "x": 0.15,
+      "y": -0.4,
+      "z": 0.42
+    },
+    {
+      "name": "gantry_pivot",
+      "x": 0,
+      "y": 0.0885,
+      "z": -0.1
+    },
+    {
+      "name": "cargo_load",
+      "x": 0,
+      "y": -0.3265,
+      "z": 0.42
+    }
+  ]
 }

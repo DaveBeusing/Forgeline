@@ -226,7 +226,8 @@ public static class BuildingPresentationCatalog
 
     private static readonly Dictionary<BuildingId, ProductionStateAssets> ProductionStates =
         new[] { BuildingIds.CommandCore, BuildingIds.Extractor, BuildingIds.Smelter,
-            BuildingIds.ElectronicsPlant, BuildingIds.Refinery, BuildingIds.AmmunitionPlant }
+            BuildingIds.ElectronicsPlant, BuildingIds.Refinery, BuildingIds.AmmunitionPlant,
+            BuildingIds.StorageDepot, BuildingIds.SupplyDepot, BuildingIds.LogisticsHub }
         .ToDictionary(building => building, building =>
         {
             string prefix = Get(building).MeshAssetId;

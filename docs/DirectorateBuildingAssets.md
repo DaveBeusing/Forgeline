@@ -4,8 +4,11 @@ Extractor, Smelter, Electronics Plant, Fuel Refinery and Ammunition Plant now us
 dedicated editable industrial component kits, separate LOD0/1/2 and family-specific
 construction/status/wreck geometry. Their existing gameplay footprints and public
 identities remain stable. See [Industrial building production](IndustrialBuildingProduction.md)
-for dimensions, modules, anchors and visual qualification. Other families retain
-their existing geometry. The shared production atlas has matched native 4096-pixel
+for dimensions, modules, anchors and visual qualification. Storage Depot, Supply
+Depot and Logistics Hub now have dedicated editable kits, three separate LODs
+and family-specific construction/status/wreck geometry; see
+[Logistics building production](LogisticsBuildingProduction.md). Other families
+retain their existing geometry. The shared production atlas has matched native 4096-pixel
 Base Color, Normal and ORM masters; see [Production surfaces](ProductionSurfaceMasters.md).
 
 ## Purpose
@@ -75,7 +78,7 @@ building.directorate.module.collision_box
 
 The construction and state modules remain the common fallback vocabulary for
 families without dedicated production kits. Command Core and the five industrial
-families resolve their own purpose-specific meshes through the same indexed-instancing path.
+families and the three logistics families resolve their own purpose-specific meshes through the same indexed-instancing path.
 
 ## Construction presentation
 
@@ -101,10 +104,9 @@ For completed supported buildings, state is derived from existing ECS components
 
 Brownout and offline power consumers use the unpowered treatment in this baseline because both represent insufficient power for normal operation.
 
-Critical states do not rely on tint alone. Command Core and the five industrial families use dedicated construction, damaged/critical and collapsed geometry; industrial idle and unpowered attachments are also family-specific. Other families retain shared status/wreck modules. Runtime material factors reinforce those shapes but are not the sole signal.
+Critical states do not rely on tint alone. Command Core, the five industrial families and the three logistics families use dedicated construction, damaged/critical and collapsed geometry; industrial idle and unpowered attachments are also family-specific. Other families retain shared status/wreck modules. Runtime material factors reinforce those shapes but are not the sole signal.
 
-Existing mechanical and VFX contracts remain presentation-owned. The five
-industrial production kits introduce static state geometry and inspection anchors,
+Existing mechanical and VFX contracts remain presentation-owned. The industrial and logistics production kits introduce static state geometry and inspection anchors,
 not new motion or gameplay state. Existing damage smoke/fire effects are retained.
 
 ## Destruction boundary
@@ -268,7 +270,7 @@ The Command Core now uses its dedicated editable modular kit, assembled glTF
 LOD0/1/2 and seven state meshes. Its stable primary identity, gameplay footprint,
 collision proxy, atlas maps and state authority are retained. Only its cosmetic
 foundation reaches the existing ground plane; the five industrial foundations
-now also reach that plane. Remaining families keep the shared construction/state
+and the three logistics foundations also reach that plane. Remaining families keep the shared construction/state
 vocabulary. See [Command Core production](CommandCoreProduction.md)
 for dimensions, new anchors, source mapping, provenance and qualification limits.
 
@@ -280,3 +282,18 @@ representations only for these families. All primary IDs, simplified collision
 references, state-material priority, projected LOD thresholds and authoritative
 placement/power/production/damage rules remain intact. See
 [Industrial building production](IndustrialBuildingProduction.md).
+
+## Logistics production geometry
+
+Storage Depot, Supply Depot and Logistics Hub use editable component assemblies,
+90 inspectable glTFs, three dedicated LODs per family and 24 additional state
+meshes. Warehouses, separate fuel/ammunition/service zones and gantry transfer
+lanes distinguish their roles. Containers, tanks, portals, pumps and bollards
+are reused as explicit modules. Cargo/service anchors match existing vehicle
+deck heights; loading pivots are static inspection contracts. Inventory
+capacities 5000/2500/3000, node topology, routes, external truck approach and
+gameplay footprints remain unchanged. Their nine-plot galleries have eight
+distinct reachable states, with two Operational plots; no fabricated production
+Idle component is added. Real loading/transit/unloading/repeated-traffic fixtures
+exercise existing simulation and compiled vehicle sockets at 420 m. See
+[source mapping, measurements and qualification limits](LogisticsBuildingProduction.md).

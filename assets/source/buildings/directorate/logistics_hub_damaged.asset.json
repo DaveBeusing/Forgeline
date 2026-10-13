@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.logistics_hub.damaged",
+  "type": "mesh",
+  "source": "sources/logistics/logistics_hub/damaged.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

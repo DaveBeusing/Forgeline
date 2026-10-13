@@ -39,7 +39,7 @@ dimensions and flags masters below 2048 pixels for review. The flag is advisory:
 dimensions alone do not prove useful detail; tiny repeated textures can be
 deliberate. No source is enlarged to manufacture a numerical quality pass.
 
-Current inventory: 413 assets, 230 meshes, 56 textures and 127 materials.
+Current inventory: 437 assets, 254 meshes, 56 textures and 127 materials.
 Production texture budgets are documented in [Production surfaces](ProductionSurfaceMasters.md).
 Container sizes include metadata and studio splash assets; they are not GPU
 allocations or residency. The original 324-asset baseline occupied 4,985,866
@@ -156,3 +156,32 @@ sizes. Fourteen original PNGs support visual review; complete portable timing,
 resource, camera and hash metadata are included. Structural equality, source
 identity and zero binding/fallback failures do not establish human art signoff,
 sustained FPS, moving LOD quality or physical-monitor DPI acceptance.
+
+## Logistics production references
+
+`StorageDepotProduction`, `SupplyDepotProduction` and `LogisticsHubProduction`
+retain seed 2026, tick 32 and fixed 120/420/1000 m cameras. Their galleries show
+eight distinct existing states across nine real-scale plots; two Operational
+plots replace any invented logistics production-Idle state. Dedicated LODs and
+construction/status/wreck meshes resolve through the established presentation
+catalog, material priorities and projected-size hysteresis.
+
+`LogisticsLoadingProduction`, `LogisticsTransitProduction`,
+`LogisticsUnloadingProduction` and `LogisticsSustainedProduction` exercise real
+cargo/navigation/movement/inventory/supply systems before snapshot extraction.
+They render at 420 m with all three buildings and two real-scale vehicles.
+Transfer VFX resolve compiled vehicle sockets; visual mechanical time freezes
+at each fixture's completed tick, preserving 1.6 s for existing 32-tick scenes.
+The repeated scene covers 1024 ticks/51.2 s logical simulation, not wall-clock
+native gameplay FPS. Live interaction, camera/LOD transitions and sustained
+native performance still require separate acceptance.
+
+The logistics report publishes 108 building and 48 traffic cases across all
+three quality profiles and four native backbuffer sizes, plus 9 matched baseline
+cases. 107 of 108 building cases and all 48 traffic cases pass pixel repetition;
+one building case remains pending after two control attempts. Every case has zero mesh/profile
+fallback and zero texture/material binding failures. Fourteen original PNGs
+and sanitized performance/resource records are linked from
+[Logistics building production](LogisticsBuildingProduction.md). An earlier
+one-channel one-LSB terrain-repeat discrepancy remains recorded with unknown
+cause; later passes are not a root-cause fix and no threshold is changed.

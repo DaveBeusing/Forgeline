@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "3e03aec7e1d0ae9f5a151f008e87b7e658902b78",
+  "reproduciblePublish": true,
+  "installedOutsideCheckout": true,
+  "authoringSourcesAbsent": true,
+  "assetCompilerAbsent": true,
+  "runtimeFilesByteIdentical": true,
+  "runtimeFileCount": 438,
+  "deployedRuntimeFileCount": 440,
+  "knownExtraMedia": [
+    "branding/studio-intro.mp4",
+    "branding/studio-intro.wav"
+  ],
+  "archiveSha256": "c548b174ce7bc4e4df57cab1f411af163b16968264a0c420dc80e768239edf38",
+  "windowMode": "Windowed",
+  "renderStressInstances": 1000,
+  "instanceDrawCalls": 11,
+  "textureBindingFailureCount": 0,
+  "materialBindingFailureCount": 0
+}

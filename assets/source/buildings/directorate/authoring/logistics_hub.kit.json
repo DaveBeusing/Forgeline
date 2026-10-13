@@ -1,0 +1,908 @@
+{
+  "family": "logistics_hub",
+  "coordinates": "Normalized building-local right-handed Y-up; +Z loading front",
+  "gameScaleMeters": [
+    18,
+    9,
+    18
+  ],
+  "bounds": {
+    "min": [
+      -0.42,
+      -0.5,
+      -0.355
+    ],
+    "max": [
+      0.42,
+      0.35,
+      0.48
+    ]
+  },
+  "atlas": "texture.directorate.surface.atlas_base",
+  "provenance": {
+    "author": "ForgeLine",
+    "license": "Original repository geometry; no third-party inputs"
+  },
+  "anchors": {
+    "service_access": [
+      0.2,
+      -0.4,
+      0.45
+    ],
+    "gantry_pivot": [
+      0,
+      0.245,
+      -0.25
+    ],
+    "cargo_load": [
+      0,
+      -0.3457777777777778,
+      0.45
+    ]
+  },
+  "intactModules": [
+    "foundation",
+    "cargo_row_-1_0",
+    "cargo_upper_-1_0",
+    "cargo_row_-1_1",
+    "cargo_upper_-1_1",
+    "cargo_row_-1_2",
+    "cargo_row_1_0",
+    "cargo_upper_1_0",
+    "cargo_row_1_1",
+    "cargo_upper_1_1",
+    "cargo_row_1_2",
+    "transfer_beam",
+    "gantry_rear",
+    "loading_portal",
+    "dock_bollard_0",
+    "dock_bollard_1"
+  ],
+  "modules": [
+    {
+      "name": "foundation",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.42,
+            -0.5,
+            -0.355
+          ],
+          "max": [
+            0.42,
+            -0.465,
+            0.48
+          ],
+          "cell": 0,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        }
+      ]
+    },
+    {
+      "name": "cargo_row_-1_0",
+      "parent": null,
+      "source": "container",
+      "translation": [
+        -0.3,
+        -0.465,
+        -0.2
+      ],
+      "scale": [
+        1.5,
+        1.4,
+        0.86
+      ]
+    },
+    {
+      "name": "cargo_upper_-1_0",
+      "parent": null,
+      "source": "container",
+      "translation": [
+        -0.3,
+        -0.269,
+        -0.2
+      ],
+      "scale": [
+        1.5,
+        1.4,
+        0.86
+      ]
+    },
+    {
+      "name": "cargo_row_-1_1",
+      "parent": null,
+      "source": "container",
+      "translation": [
+        -0.3,
+        -0.465,
+        0.09
+      ],
+      "scale": [
+        1.5,
+        1.4,
+        0.86
+      ]
+    },
+    {
+      "name": "cargo_upper_-1_1",
+      "parent": null,
+      "source": "container",
+      "translation": [
+        -0.3,
+        -0.269,
+        0.09
+      ],
+      "scale": [
+        1.5,
+        1.4,
+        0.86
+      ]
+    },
+    {
+      "name": "cargo_row_-1_2",
+      "parent": null,
+      "source": "container",
+      "translation": [
+        -0.3,
+        -0.465,
+        0.34
+      ],
+      "scale": [
+        1.5,
+        1.4,
+        0.86
+      ]
+    },
+    {
+      "name": "cargo_row_1_0",
+      "parent": null,
+      "source": "container",
+      "translation": [
+        0.3,
+        -0.465,
+        -0.2
+      ],
+      "scale": [
+        1.5,
+        1.4,
+        0.86
+      ]
+    },
+    {
+      "name": "cargo_upper_1_0",
+      "parent": null,
+      "source": "container",
+      "translation": [
+        0.3,
+        -0.269,
+        -0.2
+      ],
+      "scale": [
+        1.5,
+        1.4,
+        0.86
+      ]
+    },
+    {
+      "name": "cargo_row_1_1",
+      "parent": null,
+      "source": "container",
+      "translation": [
+        0.3,
+        -0.465,
+        0.09
+      ],
+      "scale": [
+        1.5,
+        1.4,
+        0.86
+      ]
+    },
+    {
+      "name": "cargo_upper_1_1",
+      "parent": null,
+      "source": "container",
+      "translation": [
+        0.3,
+        -0.269,
+        0.09
+      ],
+      "scale": [
+        1.5,
+        1.4,
+        0.86
+      ]
+    },
+    {
+      "name": "cargo_row_1_2",
+      "parent": null,
+      "source": "container",
+      "translation": [
+        0.3,
+        -0.465,
+        0.34
+      ],
+      "scale": [
+        1.5,
+        1.4,
+        0.86
+      ]
+    },
+    {
+      "name": "transfer_beam",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.4,
+            0.29,
+            -0.29
+          ],
+          "max": [
+            0.4,
+            0.35,
+            -0.22
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.1,
+            0.2,
+            -0.285
+          ],
+          "max": [
+            0.1,
+            0.29,
+            -0.225
+          ],
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            0,
+            0.1,
+            -0.25
+          ],
+          "end": [
+            0,
+            0.2,
+            -0.25
+          ],
+          "radius": 0.018,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            16,
+            8,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gantry_rear",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.4,
+            -0.465,
+            -0.3
+          ],
+          "max": [
+            -0.36,
+            0.29,
+            -0.22
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.36,
+            -0.465,
+            -0.3
+          ],
+          "max": [
+            0.4,
+            0.29,
+            -0.22
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        }
+      ]
+    },
+    {
+      "name": "loading_portal",
+      "parent": null,
+      "source": "loading_portal",
+      "translation": [
+        0,
+        -0.465,
+        0.24
+      ],
+      "scale": [
+        1.25,
+        1.75,
+        1
+      ]
+    },
+    {
+      "name": "dock_bollard_0",
+      "parent": null,
+      "source": "dock_bollard",
+      "translation": [
+        -0.1,
+        -0.465,
+        0.42
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "dock_bollard_1",
+      "parent": null,
+      "source": "dock_bollard",
+      "translation": [
+        0.1,
+        -0.465,
+        0.42
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "construction_frame",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.40299999999999997,
+            -0.465,
+            -0.33799999999999997
+          ],
+          "max": [
+            -0.38699999999999996,
+            0.33999999999999997,
+            -0.32199999999999995
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.40299999999999997,
+            -0.465,
+            0.44699999999999995
+          ],
+          "max": [
+            -0.38699999999999996,
+            0.33999999999999997,
+            0.46299999999999997
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.38699999999999996,
+            -0.465,
+            -0.33799999999999997
+          ],
+          "max": [
+            0.40299999999999997,
+            0.33999999999999997,
+            -0.32199999999999995
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.38699999999999996,
+            -0.465,
+            0.44699999999999995
+          ],
+          "max": [
+            0.40299999999999997,
+            0.33999999999999997,
+            0.46299999999999997
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.39999999999999997,
+            0.32999999999999996,
+            -0.33499999999999996
+          ],
+          "max": [
+            0.39999999999999997,
+            0.35,
+            -0.315
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        }
+      ]
+    },
+    {
+      "name": "closed_loading_gate",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.105,
+            -0.43,
+            0.425
+          ],
+          "max": [
+            0.105,
+            -0.28,
+            0.44
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        }
+      ]
+    },
+    {
+      "name": "isolated_service",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.105,
+            -0.43,
+            0.425
+          ],
+          "max": [
+            0.105,
+            -0.28,
+            0.44
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.035,
+            -0.29,
+            0.42000000000000004
+          ],
+          "max": [
+            0.035,
+            -0.245,
+            0.445
+          ],
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        }
+      ]
+    },
+    {
+      "name": "damaged_dock",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.075,
+            -0.465,
+            0.4
+          ],
+          "max": [
+            0.03,
+            -0.36,
+            0.43
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.02,
+            -0.4,
+            0.41000000000000003
+          ],
+          "max": [
+            0.09,
+            -0.38,
+            0.455
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "pipe",
+          "points": [
+            [
+              0.02,
+              -0.39,
+              0.41
+            ],
+            [
+              0.09,
+              -0.459,
+              0.44
+            ]
+          ],
+          "radius": 0.012,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            12,
+            6,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "critical_dock",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.09,
+            -0.465,
+            0.38
+          ],
+          "max": [
+            0.1,
+            -0.39,
+            0.445
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.03,
+            -0.43,
+            0.41000000000000003
+          ],
+          "max": [
+            0.06,
+            -0.25,
+            0.44
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.12,
+            -0.455,
+            0.395
+          ],
+          "max": [
+            -0.05,
+            -0.36,
+            0.425
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "pipe",
+          "points": [
+            [
+              -0.15,
+              0.245,
+              0.265
+            ],
+            [
+              -0.07,
+              -0.09,
+              0.34
+            ],
+            [
+              0.06,
+              -0.43,
+              0.4
+            ]
+          ],
+          "radius": 0.016,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            12,
+            6,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "collapsed_cargo",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.32,
+            -0.465,
+            -0.24
+          ],
+          "max": [
+            0.06,
+            -0.31,
+            -0.04
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.12,
+            -0.465,
+            0.06
+          ],
+          "max": [
+            0.28,
+            -0.35,
+            0.25
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.3,
+            -0.4,
+            0.25
+          ],
+          "end": [
+            0.25,
+            -0.36,
+            -0.16
+          ],
+          "radius": 0.022,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            16,
+            8,
+            6
+          ]
+        },
+        {
+          "kind": "pipe",
+          "points": [
+            [
+              -0.33,
+              -0.447,
+              -0.27
+            ],
+            [
+              0.05,
+              -0.18,
+              0.01
+            ],
+            [
+              0.31,
+              -0.447,
+              0.27
+            ]
+          ],
+          "radius": 0.026,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            12,
+            6,
+            4
+          ]
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.34,
+            -0.465,
+            -0.1
+          ],
+          "max": [
+            -0.16,
+            -0.22,
+            0.18
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        }
+      ]
+    }
+  ],
+  "states": {
+    "foundation": [
+      "foundation"
+    ],
+    "structural_frame": [
+      "foundation",
+      "construction_frame"
+    ],
+    "partial_shell": [
+      "foundation",
+      "construction_frame",
+      "cargo_row_-1_0"
+    ],
+    "idle": [
+      "closed_loading_gate"
+    ],
+    "unpowered": [
+      "isolated_service"
+    ],
+    "damaged": [
+      "damaged_dock"
+    ],
+    "critical": [
+      "critical_dock"
+    ],
+    "destroyed": [
+      "foundation",
+      "collapsed_cargo"
+    ]
+  },
+  "vehicleInterface": {
+    "cargoDeckHeightMeters": 1.388,
+    "supplyTransferHeightMeters": 1.2,
+    "source": "Existing Directorate vehicle scale, GroundMovement.HeightOffset and compiled transfer sockets; no docking/navigation rule"
+  }
+}
