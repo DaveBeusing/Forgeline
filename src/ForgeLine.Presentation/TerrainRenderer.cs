@@ -44,7 +44,7 @@ public sealed class TerrainRenderer : IDisposable
         TerrainPresentationProfile? presentationProfile = null,
         RuntimeAssetCatalog? runtimeAssets = null,
         SceneLightingSettings? lighting = null,
-        TerrainSurfaceDetailSettings? surfaceDetail = null)
+        TerrainSurfaceDetailSettings? surfaceDetail = null, TextureDetailQuality textureDetail = TextureDetailQuality.Full)
     {
         ArgumentNullException.ThrowIfNull(graphics);
         ArgumentNullException.ThrowIfNull(world);
@@ -77,7 +77,7 @@ public sealed class TerrainRenderer : IDisposable
                     ? null
                     : new RuntimeWorldAssetResources(
                         graphics,
-                        runtimeAssets);
+                        runtimeAssets, textureDetail);
 
             if (_runtimeAssets is null)
             {

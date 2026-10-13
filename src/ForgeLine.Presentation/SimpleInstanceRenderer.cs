@@ -28,6 +28,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
     private readonly RuntimeWorldAssetResources? _runtimeAssets;
     private readonly SceneLightingSettings _lighting;
     private readonly float _lodDiameterScale;
+    private readonly bool _vegetationMotion;
     private readonly Dictionary<int, FrameInstanceBuffer> _frameInstanceBuffers = [];
     private readonly Dictionary<int, FrameInstanceBuffer> _shadowFrameInstanceBuffers = [];
     private readonly Dictionary<InstanceBatchKey, InstanceBatch> _batchLookup = [];
@@ -41,7 +42,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
     public SimpleInstanceRenderer(
         IGraphicsDevice graphics,
         RuntimeAssetCatalog? runtimeAssets = null,
-        SceneLightingSettings? lighting = null, float lodDiameterScale = 1)
+        SceneLightingSettings? lighting = null, float lodDiameterScale = 1, TextureDetailQuality textureDetail = TextureDetailQuality.Full, bool vegetationMotion = true)
     {
         ArgumentNullException.ThrowIfNull(graphics);
 
@@ -49,9 +50,10 @@ public sealed class SimpleInstanceRenderer : IDisposable
             lighting ??
             SceneLightingSettings.Default;
         _lighting.Validate();
-        if (!float.IsFinite(lodDiameterScale) || lodDiameterScale is < .8f or > 1.1f)
+        if (!float.IsFinite(lodDiameterScale) || lodDiameterScale is < .8f or > 1.25f)
             throw new ArgumentOutOfRangeException(nameof(lodDiameterScale));
         _lodDiameterScale = lodDiameterScale;
+        _vegetationMotion = vegetationMotion;
 
         _graphics = graphics;
         try
@@ -63,7 +65,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     ? null
                     : new RuntimeWorldAssetResources(
                         graphics,
-                        runtimeAssets);
+                        runtimeAssets, textureDetail);
             _texturedPipeline =
                 _runtimeAssets is null
                     ? null
@@ -197,6 +199,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
         ArgumentNullException.ThrowIfNull(world);
         if (presentationSeconds is { } seconds && (!double.IsFinite(seconds) || seconds < 0))
             throw new ArgumentOutOfRangeException(nameof(presentationSeconds));
+
+        if (!_vegetationMotion) presentationSeconds = null;
 
         CameraMatrices matrices =
             camera.GetMatrices(

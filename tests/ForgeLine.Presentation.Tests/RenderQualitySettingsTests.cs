@@ -15,7 +15,7 @@ public sealed class RenderQualitySettingsTests
         Assert.Equal(1,high.Shadows.CascadeCount);
         Assert.Equal(4096,high.Particles.Capacity);
         Assert.Equal(SpatialAntialiasing.High,high.PostProcessing.Antialiasing);
-        var reduced=requested.Resolve(true,false,1280,720,3,100_000_000);
+        var reduced=requested.Resolve(true,false,1280,720,3,170_000_000);
         Assert.Equal(RenderQuality.Medium,reduced.Active);
         Assert.NotNull(reduced.FallbackReason);
         var exhausted=requested.Resolve(true,false,1280,720,3,1);
