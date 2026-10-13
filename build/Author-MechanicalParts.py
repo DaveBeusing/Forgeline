@@ -23,7 +23,7 @@ def load(path):
 def author(meta):
     d = json.loads(meta.read_text())
     if '/combat_support/' in d['source'].replace('\\', '/'): return
-    if d['id'].startswith('unit.directorate.main_battle_tank') or d['source'].replace('\\','/').startswith('sources/operational/'):
+    if d['id'].startswith('unit.directorate.main_battle_tank') or d['source'].replace('\\','/').startswith('sources/operational/') or '/infantry/' in d['source'].replace('\\','/') or '/battlefield/' in d['source'].replace('\\','/'):
         return  # Dedicated editable tank authoring owns its rigid ranges.
     path = (meta.parent / d['source']).resolve()
     if path.stem.endswith('_detailed'):

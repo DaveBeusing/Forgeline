@@ -7,6 +7,7 @@ namespace ForgeLine.Assets.Tests;
 
 public sealed class DirectorateUnitAssetAuthoringTests
 {
+    private static readonly string[] InfantryLodSuffixes = ["", ".lod1", ".lod2"];
     private static readonly UnitAssetExpectation[] Units =
     [
         new(
@@ -53,7 +54,7 @@ public sealed class DirectorateUnitAssetAuthoringTests
                         static diagnostic =>
                             $"{diagnostic.Code}: {diagnostic.Message}")));
             Assert.Equal(
-                479,
+                492,
                 result.CompiledCount);
 
             RuntimeAssetCatalog catalog =
@@ -107,6 +108,40 @@ public sealed class DirectorateUnitAssetAuthoringTests
                 Assert.True(mesh.HasUv0 && mesh.HasTangents);
                 Assert.Single(mesh.Sections);
                 if (state == ".wreck") Assert.True(mesh.Vertices.Max(v => v.Y) < tankLods[1].Vertices.Max(v => v.Y));
+            }
+
+            foreach (string family in new[] { "rifle_squad", "combat_engineer" })
+            {
+                string id = "unit.directorate." + family;
+                var primary = catalog.Get(AssetId.Parse(id));
+                Assert.Equal("unit.directorate.rifle_squad.collision", primary.CollisionReference);
+                Assert.Equal(16, primary.MechanicalParts.Count);
+                Assert.Equal(8, primary.MechanicalParts.Count(part => part.Motion == MechanicalMotionKind.InfantryStride));
+                Assert.Equal(4, primary.MechanicalParts.Count(part => part.Motion == MechanicalMotionKind.Cannon));
+                Assert.Contains(primary.Sockets, socket => socket.Name == "weapon_muzzle" && socket.X == .05f && socket.Y == .05f && socket.Z == .42f);
+                RuntimeMeshData[] lods = InfantryLodSuffixes.Select(suffix => RuntimeMeshData.FromPayload(catalog.Read(AssetId.Parse(id + suffix)).Payload)).ToArray();
+                Assert.True(lods[0].Indices.Count > lods[1].Indices.Count && lods[1].Indices.Count > lods[2].Indices.Count);
+                MechanicalMeshValidation.Validate(primary.MechanicalParts, primary.Sockets, lods[0].Indices.Count);
+                Assert.All(lods, mesh =>
+                {
+                    Assert.True(mesh.HasNormals && mesh.HasUv0 && mesh.HasTangents);
+                    Assert.Single(mesh.Sections);
+                    Assert.Equal("material.directorate.unit.rifle_squad", Assert.Single(mesh.MaterialIds));
+                    Assert.Equal(-.5f, mesh.Vertices.Min(vertex => vertex.Y), precision: 5);
+                });
+                foreach (string state in new[] { ".damaged", ".critical", ".wreck" })
+                {
+                    var mesh = RuntimeMeshData.FromPayload(catalog.Read(AssetId.Parse(id + state)).Payload);
+                    Assert.True(mesh.HasNormals && mesh.HasUv0 && mesh.HasTangents);
+                    if (state == ".wreck") Assert.True(mesh.Vertices.Max(vertex => vertex.Y) < -.35f);
+                }
+            }
+            foreach (string family in new[] { "scout_vehicle", "self_propelled_artillery", "cargo_truck", "supply_truck" })
+            {
+                var wreck = RuntimeMeshData.FromPayload(catalog.Read(AssetId.Parse("unit.directorate." + family + ".wreck")).Payload);
+                Assert.True(wreck.HasNormals && wreck.HasUv0 && wreck.HasTangents);
+                Assert.Single(wreck.Sections);
+                Assert.True(wreck.Vertices.Max(vertex => vertex.Y) < 0);
             }
 
             RuntimeMeshData ReadTank(string suffix) => RuntimeMeshData.FromPayload(

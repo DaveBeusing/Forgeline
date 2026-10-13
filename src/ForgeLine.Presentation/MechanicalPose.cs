@@ -67,6 +67,8 @@ internal static class MechanicalTransforms
                 {
                     MechanicalMotionKind.TurretYaw => Quaternion.CreateFromAxisAngle(Vector3.UnitY, instance.UnitFeature.AimYawRadians),
                     MechanicalMotionKind.Cannon => Quaternion.CreateFromAxisAngle(Vector3.UnitX, -Math.Clamp(pose.Elevation, -0.15f, 0.55f)),
+                    MechanicalMotionKind.InfantryStride => Quaternion.CreateFromAxisAngle(Vector3.UnitX,
+                        MathF.Sin((float)Math.IEEERemainder(pose.TravelMeters * part.Rate, Math.Tau)) * part.Travel),
                     MechanicalMotionKind.Wheel => Quaternion.CreateFromAxisAngle(Vector3.UnitX, (float)Math.IEEERemainder(pose.TravelMeters * part.Rate, Math.Tau)),
                     MechanicalMotionKind.Fan or MechanicalMotionKind.Radar => Quaternion.CreateFromAxisAngle(Vector3.UnitY, phase),
                     MechanicalMotionKind.Crane => Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.Sin(phase) * part.Travel),

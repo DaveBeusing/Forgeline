@@ -1,7 +1,7 @@
 {
   "id": "infrastructure.directorate.road.destroyed",
   "type": "mesh",
-  "source": "../sources/road_destroyed.gltf",
+  "source": "../sources/battlefield/road_destroyed.gltf",
   "materialReferences": [
     "material.directorate.infrastructure.road_damaged"
   ]

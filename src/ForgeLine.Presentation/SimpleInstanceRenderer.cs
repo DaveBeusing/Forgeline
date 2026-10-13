@@ -510,8 +510,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     CreateArticulatedTransform(worldMatrix, unitDefinition.TurretPivot, instance.UnitFeature.AimYawRadians * motionWeight),
                     color, true, turretMesh, turretMeshId, usesRuntimeMaterial, runtimeMaterial, motionWeight);
             }
-            string? unitStateAssetId = hasUnitDefinition && unitLod != UnitAssetLod.Lod2
-                ? UnitPresentationCatalog.ResolveStateAttachmentAssetId(instance.UnitFeature) : null;
+            string? unitStateAssetId = hasUnitDefinition
+                ? UnitPresentationCatalog.ResolveStateAttachmentAssetId(instance.UnitFeature, unitLod) : null;
             if (unitStateAssetId is not null && _runtimeAssets is not null &&
                 _runtimeAssets.TryGetMesh(unitStateAssetId, out RuntimeMeshBuffers unitStateMesh, out AssetId unitStateMeshId) &&
                 unitStateMesh.IsValid)

@@ -169,7 +169,7 @@ public static class UnitPresentationCatalog
     private sealed record StateAssets(string Damaged, string Critical, string Wreck);
 
     private static readonly Dictionary<UnitId, StateAssets> ProductionStates =
-        new[] { UnitIds.MainBattleTank, UnitIds.ScoutVehicle, UnitIds.MobileArtillery, UnitIds.CargoTruck, UnitIds.SupplyTruck }
+        new[] { UnitIds.RifleSquad, UnitIds.CombatEngineer, UnitIds.MainBattleTank, UnitIds.ScoutVehicle, UnitIds.MobileArtillery, UnitIds.CargoTruck, UnitIds.SupplyTruck }
         .ToDictionary(unit => unit, unit =>
         {
             string prefix = Get(unit).MeshAssetId;
@@ -179,6 +179,10 @@ public static class UnitPresentationCatalog
     public static string ResolveWreckAssetId(in UnitFeaturePresentationMetadata feature) =>
         ProductionStates.TryGetValue(feature.Unit, out StateAssets? states)
             ? states.Wreck : Get(feature.Unit).Lod2AssetId;
+
+    public static string? ResolveStateAttachmentAssetId(in UnitFeaturePresentationMetadata feature, UnitAssetLod lod) =>
+        lod == UnitAssetLod.Lod2 && feature.Unit != UnitIds.RifleSquad && feature.Unit != UnitIds.CombatEngineer
+            ? null : ResolveStateAttachmentAssetId(feature);
 
     public static string? ResolveStateAttachmentAssetId(in UnitFeaturePresentationMetadata feature) =>
         ProductionStates.TryGetValue(feature.Unit, out StateAssets? states) ? feature.DamageState switch
@@ -223,12 +227,14 @@ public static class UnitPresentationCatalog
             80.0f,
             220.0f,
             ["weapon_muzzle"]);
-        result.Add(
-            UnitIds.CombatEngineer,
-            result[UnitIds.RifleSquad] with
-            {
-                Unit = UnitIds.CombatEngineer
-            });
+        Add(UnitIds.CombatEngineer, "combat_engineer", new Vector4(0.31f, 0.34f, 0.29f, 1.0f),
+            80, 220, ["weapon_muzzle"]);
+        result[UnitIds.CombatEngineer] = result[UnitIds.CombatEngineer] with
+        {
+            MaterialAssetId = result[UnitIds.RifleSquad].MaterialAssetId,
+            CollisionAssetId = result[UnitIds.RifleSquad].CollisionAssetId,
+            StrategicSymbolAssetId = result[UnitIds.RifleSquad].StrategicSymbolAssetId
+        };
 
         Add(
             UnitIds.ScoutVehicle,

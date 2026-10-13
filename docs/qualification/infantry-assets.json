@@ -1,0 +1,821 @@
+{
+  "catalogCount": 482,
+  "ownedAssemblies": 26,
+  "assets": [
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "infrastructure.directorate.bridge.road.damaged",
+      "materials": [
+        "material.directorate.infrastructure.bridge"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/infrastructure/directorate/sources/battlefield/bridge_damaged.gltf",
+      "runtime": "assets/runtime/meshes/infrastructure/directorate/bridge/road/damaged.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.infrastructure.bridge"
+      ],
+      "definition": "assets/source/infrastructure/directorate/bridges/road_damaged.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "infrastructure.directorate.bridge.road.destroyed",
+      "materials": [
+        "material.directorate.infrastructure.bridge"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/infrastructure/directorate/sources/battlefield/bridge_destroyed.gltf",
+      "runtime": "assets/runtime/meshes/infrastructure/directorate/bridge/road/destroyed.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.infrastructure.bridge"
+      ],
+      "definition": "assets/source/infrastructure/directorate/bridges/road_destroyed.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "infrastructure.directorate.road.damaged",
+      "materials": [
+        "material.directorate.infrastructure.road_damaged"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/infrastructure/directorate/sources/battlefield/road_damaged.gltf",
+      "runtime": "assets/runtime/meshes/infrastructure/directorate/road/damaged.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.infrastructure.road_damaged"
+      ],
+      "definition": "assets/source/infrastructure/directorate/roads/damaged.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "infrastructure.directorate.road.destroyed",
+      "materials": [
+        "material.directorate.infrastructure.road_damaged"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/infrastructure/directorate/sources/battlefield/road_destroyed.gltf",
+      "runtime": "assets/runtime/meshes/infrastructure/directorate/road/destroyed.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.infrastructure.road_damaged"
+      ],
+      "definition": "assets/source/infrastructure/directorate/roads/destroyed.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "mesh.world.kit.collision_centered",
+      "materials": [],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/world/meshes/sources/environment_kit/collision_centered.gltf",
+      "runtime": "assets/runtime/meshes/mesh/world/kit/collision_centered.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [],
+      "definition": "assets/source/world/meshes/kit/collision_centered.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": "mesh.world.kit.collision_centered",
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "mesh.world.prop.burst_pipe",
+      "materials": [
+        "material.world.prop.industrial"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "mesh.world.prop.burst_pipe_lod1",
+          "maxDistance": 240
+        }
+      ],
+      "source": "assets/source/world/meshes/sources/battlefield/burst_pipe_lod0.gltf",
+      "runtime": "assets/runtime/meshes/mesh/world/prop/burst_pipe.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.world.prop.industrial",
+        "mesh.world.kit.collision_centered",
+        "mesh.world.prop.burst_pipe_lod1"
+      ],
+      "definition": "assets/source/world/meshes/props/burst_pipe.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "mesh.world.prop.burst_pipe_lod1",
+      "materials": [
+        "material.world.prop.industrial"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/world/meshes/sources/battlefield/burst_pipe_lod1.gltf",
+      "runtime": "assets/runtime/meshes/mesh/world/prop/burst_pipe_lod1.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.world.prop.industrial"
+      ],
+      "definition": "assets/source/world/meshes/props/burst_pipe_lod1.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "mesh.world.prop.rubble",
+      "materials": [
+        "material.world.prop.industrial"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "mesh.world.prop.rubble_lod1",
+          "maxDistance": 220
+        }
+      ],
+      "source": "assets/source/world/meshes/sources/battlefield/rubble_lod0.gltf",
+      "runtime": "assets/runtime/meshes/mesh/world/prop/rubble.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.world.prop.industrial",
+        "mesh.world.prop.rubble_lod1"
+      ],
+      "definition": "assets/source/world/meshes/props/rubble.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "mesh.world.prop.rubble_lod1",
+      "materials": [
+        "material.world.prop.industrial"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/world/meshes/sources/battlefield/rubble_lod1.gltf",
+      "runtime": "assets/runtime/meshes/mesh/world/prop/rubble_lod1.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.world.prop.industrial"
+      ],
+      "definition": "assets/source/world/meshes/props/rubble_lod1.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": "mesh.world.kit.collision_centered",
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "mesh.world.prop.scorched_barrier",
+      "materials": [
+        "material.world.prop.industrial"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "mesh.world.prop.scorched_barrier_lod1",
+          "maxDistance": 260
+        }
+      ],
+      "source": "assets/source/world/meshes/sources/battlefield/scorched_barrier_lod0.gltf",
+      "runtime": "assets/runtime/meshes/mesh/world/prop/scorched_barrier.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.world.prop.industrial",
+        "mesh.world.kit.collision_centered",
+        "mesh.world.prop.scorched_barrier_lod1"
+      ],
+      "definition": "assets/source/world/meshes/props/scorched_barrier.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "mesh.world.prop.scorched_barrier_lod1",
+      "materials": [
+        "material.world.prop.industrial"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/world/meshes/sources/battlefield/scorched_barrier_lod1.gltf",
+      "runtime": "assets/runtime/meshes/mesh/world/prop/scorched_barrier_lod1.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.world.prop.industrial"
+      ],
+      "definition": "assets/source/world/meshes/props/scorched_barrier_lod1.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "unit.directorate.cargo_truck.wreck",
+      "materials": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/units/directorate/sources/infantry/cargo_truck_wreck.gltf",
+      "runtime": "assets/runtime/meshes/unit/directorate/cargo_truck/wreck.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.unit.cargo_truck"
+      ],
+      "definition": "assets/source/units/directorate/vehicles/cargo_truck_wreck.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [
+        {
+          "name": "member_0_hip_left",
+          "x": 0.007,
+          "y": 0.015,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_0_hip_right",
+          "x": 0.093,
+          "y": 0.015,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_0_shoulder",
+          "x": 0.05,
+          "y": 0.24,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_1_hip_left",
+          "x": -0.343,
+          "y": 0.015,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_1_hip_right",
+          "x": -0.257,
+          "y": 0.015,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_1_shoulder",
+          "x": -0.3,
+          "y": 0.24,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_2_hip_left",
+          "x": 0.257,
+          "y": 0.015,
+          "z": -0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_2_hip_right",
+          "x": 0.343,
+          "y": 0.015,
+          "z": -0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_2_shoulder",
+          "x": 0.3,
+          "y": 0.24,
+          "z": -0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_3_hip_left",
+          "x": -0.343,
+          "y": 0.015,
+          "z": -0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_3_hip_right",
+          "x": -0.257,
+          "y": 0.015,
+          "z": -0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_3_shoulder",
+          "x": -0.3,
+          "y": 0.24,
+          "z": -0.22,
+          "isValid": true
+        },
+        {
+          "name": "weapon_muzzle",
+          "x": 0.05,
+          "y": 0.05,
+          "z": 0.42,
+          "isValid": true
+        }
+      ],
+      "collision": "unit.directorate.rifle_squad.collision",
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "unit.directorate.combat_engineer",
+      "materials": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "unit.directorate.combat_engineer.lod1",
+          "maxDistance": 80
+        },
+        {
+          "level": 2,
+          "assetId": "unit.directorate.combat_engineer.lod2",
+          "maxDistance": 220
+        }
+      ],
+      "source": "assets/source/units/directorate/sources/infantry/combat_engineer_lod0.gltf",
+      "runtime": "assets/runtime/meshes/unit/directorate/combat_engineer.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.unit.rifle_squad",
+        "unit.directorate.combat_engineer.lod1",
+        "unit.directorate.combat_engineer.lod2",
+        "unit.directorate.rifle_squad.collision"
+      ],
+      "definition": "assets/source/units/directorate/infantry/combat_engineer.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "unit.directorate.combat_engineer.critical",
+      "materials": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/units/directorate/sources/infantry/combat_engineer_critical.gltf",
+      "runtime": "assets/runtime/meshes/unit/directorate/combat_engineer/critical.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "definition": "assets/source/units/directorate/infantry/combat_engineer_critical.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "unit.directorate.combat_engineer.damaged",
+      "materials": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/units/directorate/sources/infantry/combat_engineer_damaged.gltf",
+      "runtime": "assets/runtime/meshes/unit/directorate/combat_engineer/damaged.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "definition": "assets/source/units/directorate/infantry/combat_engineer_damaged.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "unit.directorate.combat_engineer.lod1",
+      "materials": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/units/directorate/sources/infantry/combat_engineer_lod1.gltf",
+      "runtime": "assets/runtime/meshes/unit/directorate/combat_engineer/lod1.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "definition": "assets/source/units/directorate/infantry/combat_engineer_lod1.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "unit.directorate.combat_engineer.lod2",
+      "materials": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/units/directorate/sources/infantry/combat_engineer_lod2.gltf",
+      "runtime": "assets/runtime/meshes/unit/directorate/combat_engineer/lod2.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "definition": "assets/source/units/directorate/infantry/combat_engineer_lod2.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "unit.directorate.combat_engineer.wreck",
+      "materials": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/units/directorate/sources/infantry/combat_engineer_wreck.gltf",
+      "runtime": "assets/runtime/meshes/unit/directorate/combat_engineer/wreck.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "definition": "assets/source/units/directorate/infantry/combat_engineer_wreck.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [
+        {
+          "name": "member_0_hip_left",
+          "x": 0.007,
+          "y": 0.015,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_0_hip_right",
+          "x": 0.093,
+          "y": 0.015,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_0_shoulder",
+          "x": 0.05,
+          "y": 0.24,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_1_hip_left",
+          "x": -0.343,
+          "y": 0.015,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_1_hip_right",
+          "x": -0.257,
+          "y": 0.015,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_1_shoulder",
+          "x": -0.3,
+          "y": 0.24,
+          "z": 0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_2_hip_left",
+          "x": 0.257,
+          "y": 0.015,
+          "z": -0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_2_hip_right",
+          "x": 0.343,
+          "y": 0.015,
+          "z": -0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_2_shoulder",
+          "x": 0.3,
+          "y": 0.24,
+          "z": -0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_3_hip_left",
+          "x": -0.343,
+          "y": 0.015,
+          "z": -0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_3_hip_right",
+          "x": -0.257,
+          "y": 0.015,
+          "z": -0.22,
+          "isValid": true
+        },
+        {
+          "name": "member_3_shoulder",
+          "x": -0.3,
+          "y": 0.24,
+          "z": -0.22,
+          "isValid": true
+        },
+        {
+          "name": "weapon_muzzle",
+          "x": 0.05,
+          "y": 0.05,
+          "z": 0.42,
+          "isValid": true
+        }
+      ],
+      "collision": "unit.directorate.rifle_squad.collision",
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "unit.directorate.rifle_squad",
+      "materials": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "unit.directorate.rifle_squad.lod1",
+          "maxDistance": 80
+        },
+        {
+          "level": 2,
+          "assetId": "unit.directorate.rifle_squad.lod2",
+          "maxDistance": 220
+        }
+      ],
+      "source": "assets/source/units/directorate/sources/infantry/rifle_squad_lod0.gltf",
+      "runtime": "assets/runtime/meshes/unit/directorate/rifle_squad.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.unit.rifle_squad",
+        "unit.directorate.rifle_squad.collision",
+        "unit.directorate.rifle_squad.lod1",
+        "unit.directorate.rifle_squad.lod2"
+      ],
+      "definition": "assets/source/units/directorate/infantry/rifle_squad.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "unit.directorate.rifle_squad.collision",
+      "materials": [],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/units/directorate/sources/collision_box.gltf",
+      "runtime": "assets/runtime/meshes/unit/directorate/rifle_squad/collision.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [],
+      "definition": "assets/source/units/directorate/collision/rifle_squad_collision.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "unit.directorate.rifle_squad.critical",
+      "materials": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/units/directorate/sources/infantry/rifle_squad_critical.gltf",
+      "runtime": "assets/runtime/meshes/unit/directorate/rifle_squad/critical.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "definition": "assets/source/units/directorate/infantry/rifle_squad_critical.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "unit.directorate.rifle_squad.damaged",
+      "materials": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/units/directorate/sources/infantry/rifle_squad_damaged.gltf",
+      "runtime": "assets/runtime/meshes/unit/directorate/rifle_squad/damaged.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "definition": "assets/source/units/directorate/infantry/rifle_squad_damaged.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "unit.directorate.rifle_squad.lod1",
+      "materials": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/units/directorate/sources/infantry/rifle_squad_lod1.gltf",
+      "runtime": "assets/runtime/meshes/unit/directorate/rifle_squad/lod1.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "definition": "assets/source/units/directorate/infantry/rifle_squad_lod1.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "unit.directorate.rifle_squad.lod2",
+      "materials": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/units/directorate/sources/infantry/rifle_squad_lod2.gltf",
+      "runtime": "assets/runtime/meshes/unit/directorate/rifle_squad/lod2.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "definition": "assets/source/units/directorate/infantry/rifle_squad_lod2.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "unit.directorate.rifle_squad.wreck",
+      "materials": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/units/directorate/sources/infantry/rifle_squad_wreck.gltf",
+      "runtime": "assets/runtime/meshes/unit/directorate/rifle_squad/wreck.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.unit.rifle_squad"
+      ],
+      "definition": "assets/source/units/directorate/infantry/rifle_squad_wreck.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "unit.directorate.scout_vehicle.wreck",
+      "materials": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/units/directorate/sources/infantry/scout_vehicle_wreck.gltf",
+      "runtime": "assets/runtime/meshes/unit/directorate/scout_vehicle/wreck.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.unit.scout_vehicle"
+      ],
+      "definition": "assets/source/units/directorate/vehicles/scout_vehicle_wreck.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "unit.directorate.self_propelled_artillery.wreck",
+      "materials": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/units/directorate/sources/infantry/self_propelled_artillery_wreck.gltf",
+      "runtime": "assets/runtime/meshes/unit/directorate/self_propelled_artillery/wreck.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.unit.self_propelled_artillery"
+      ],
+      "definition": "assets/source/units/directorate/vehicles/self_propelled_artillery_wreck.asset.json"
+    },
+    {
+      "runtimeTextureFormat": "rgba8Unorm",
+      "sockets": [],
+      "collision": null,
+      "sourceMasterStatus": "requires-camera-review",
+      "id": "unit.directorate.supply_truck.wreck",
+      "materials": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "textures": [],
+      "type": "mesh",
+      "lods": [],
+      "source": "assets/source/units/directorate/sources/infantry/supply_truck_wreck.gltf",
+      "runtime": "assets/runtime/meshes/unit/directorate/supply_truck/wreck.flasset",
+      "runtimeTextureLimit": null,
+      "sourceDimensions": null,
+      "dependencies": [
+        "material.directorate.unit.supply_truck"
+      ],
+      "definition": "assets/source/units/directorate/vehicles/supply_truck_wreck.asset.json"
+    }
+  ]
+}

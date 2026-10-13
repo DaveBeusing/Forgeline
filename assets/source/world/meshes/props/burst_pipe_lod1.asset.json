@@ -1,0 +1,8 @@
+{
+  "id": "mesh.world.prop.burst_pipe_lod1",
+  "type": "mesh",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "source": "../sources/battlefield/burst_pipe_lod1.gltf"
+}

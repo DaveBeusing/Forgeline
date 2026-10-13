@@ -1,0 +1,7522 @@
+{
+  "axes": "right-handed +Y up, +Z forward; normalized by unchanged 1.8m game scale",
+  "provenance": "Repository-authored geometry; reused Directorate atlas and hard-surface primitives; no external model dependencies",
+  "families": {
+    "rifle_squad": {
+      "memberCount": 4,
+      "leader": 0,
+      "role": "rifle infantry",
+      "sockets": [
+        {
+          "name": "weapon_muzzle",
+          "x": 0.05,
+          "y": 0.05,
+          "z": 0.42
+        },
+        {
+          "name": "member_0_hip_left",
+          "x": 0.007000000000000006,
+          "y": 0.015,
+          "z": 0.22
+        },
+        {
+          "name": "member_0_hip_right",
+          "x": 0.093,
+          "y": 0.015,
+          "z": 0.22
+        },
+        {
+          "name": "member_0_shoulder",
+          "x": 0.05,
+          "y": 0.24,
+          "z": 0.22
+        },
+        {
+          "name": "member_1_hip_left",
+          "x": -0.34299999999999997,
+          "y": 0.015,
+          "z": 0.22
+        },
+        {
+          "name": "member_1_hip_right",
+          "x": -0.257,
+          "y": 0.015,
+          "z": 0.22
+        },
+        {
+          "name": "member_1_shoulder",
+          "x": -0.3,
+          "y": 0.24,
+          "z": 0.22
+        },
+        {
+          "name": "member_2_hip_left",
+          "x": 0.257,
+          "y": 0.015,
+          "z": -0.22
+        },
+        {
+          "name": "member_2_hip_right",
+          "x": 0.34299999999999997,
+          "y": 0.015,
+          "z": -0.22
+        },
+        {
+          "name": "member_2_shoulder",
+          "x": 0.3,
+          "y": 0.24,
+          "z": -0.22
+        },
+        {
+          "name": "member_3_hip_left",
+          "x": -0.34299999999999997,
+          "y": 0.015,
+          "z": -0.22
+        },
+        {
+          "name": "member_3_hip_right",
+          "x": -0.257,
+          "y": 0.015,
+          "z": -0.22
+        },
+        {
+          "name": "member_3_shoulder",
+          "x": -0.3,
+          "y": 0.24,
+          "z": -0.22
+        }
+      ],
+      "modules": [
+        {
+          "name": "member_0_body",
+          "group": "member_0_body",
+          "motion": "static",
+          "parts": [
+            {
+              "name": "hip",
+              "kind": "box",
+              "min": [
+                -0.023999999999999994,
+                -0.04,
+                0.177
+              ],
+              "max": [
+                0.124,
+                0.08,
+                0.263
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "armored_vest",
+              "kind": "box",
+              "min": [
+                -0.032,
+                0.08,
+                0.173
+              ],
+              "max": [
+                0.132,
+                0.29,
+                0.274
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "neck",
+              "kind": "cylinder",
+              "start": [
+                0.05,
+                0.285,
+                0.22
+              ],
+              "end": [
+                0.05,
+                0.335,
+                0.22
+              ],
+              "radius": 0.026,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "head",
+              "kind": "blob",
+              "centre": [
+                0.05,
+                0.381,
+                0.22
+              ],
+              "radius": [
+                0.047,
+                0.062,
+                0.045
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "rings": [
+                5,
+                3,
+                2
+              ]
+            },
+            {
+              "name": "helmet",
+              "kind": "blob",
+              "centre": [
+                0.05,
+                0.442,
+                0.22
+              ],
+              "radius": [
+                0.063,
+                0.046,
+                0.059
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "rings": [
+                5,
+                3,
+                2
+              ]
+            },
+            {
+              "name": "helmet_strategic",
+              "kind": "box",
+              "min": [
+                -0.006999999999999999,
+                0.405,
+                0.168
+              ],
+              "max": [
+                0.10700000000000001,
+                0.49,
+                0.272
+              ],
+              "cell": 0,
+              "lods": [
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "field_pack",
+              "kind": "box",
+              "min": [
+                -0.009999999999999995,
+                0.07,
+                0.112
+              ],
+              "max": [
+                0.11,
+                0.27,
+                0.172
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "visor",
+              "kind": "box",
+              "min": [
+                0.0040000000000000036,
+                0.383,
+                0.259
+              ],
+              "max": [
+                0.096,
+                0.408,
+                0.271
+              ],
+              "cell": 4,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                -0.019999999999999993,
+                0.1,
+                0.276
+              ],
+              "max": [
+                0.016000000000000004,
+                0.17,
+                0.296
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                0.032,
+                0.1,
+                0.276
+              ],
+              "max": [
+                0.068,
+                0.17,
+                0.296
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                0.084,
+                0.1,
+                0.276
+              ],
+              "max": [
+                0.12000000000000001,
+                0.17,
+                0.296
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "leader_antenna",
+              "kind": "cylinder",
+              "start": [
+                -0.001999999999999995,
+                0.26,
+                0.14300000000000002
+              ],
+              "end": [
+                -0.001999999999999995,
+                0.51,
+                0.14300000000000002
+              ],
+              "radius": 0.004,
+              "cell": 1,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "leader_radio",
+              "kind": "box",
+              "min": [
+                -0.019000000000000003,
+                0.18,
+                0.105
+              ],
+              "max": [
+                0.020000000000000004,
+                0.26,
+                0.15
+              ],
+              "cell": 15,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            }
+          ]
+        },
+        {
+          "name": "member_0_hip_left",
+          "group": "member_0_hip_left",
+          "motion": "infantryStride",
+          "socket": "member_0_hip_left",
+          "pivot": [
+            0.007000000000000006,
+            0.015,
+            0.22
+          ],
+          "rate": -4.0,
+          "travel": 0.42,
+          "parts": [
+            {
+              "name": "thigh",
+              "kind": "cylinder",
+              "start": [
+                0.007000000000000006,
+                0.015,
+                0.22
+              ],
+              "end": [
+                0.007000000000000006,
+                -0.2,
+                0.235
+              ],
+              "radius": 0.044,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shin",
+              "kind": "cylinder",
+              "start": [
+                0.007000000000000006,
+                -0.2,
+                0.235
+              ],
+              "end": [
+                0.007000000000000006,
+                -0.415,
+                0.23
+              ],
+              "radius": 0.033,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "boot",
+              "kind": "box",
+              "min": [
+                -0.027999999999999997,
+                -0.5,
+                0.191
+              ],
+              "max": [
+                0.04200000000000001,
+                -0.411,
+                0.28900000000000003
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "knee_guard",
+              "kind": "box",
+              "min": [
+                -0.021999999999999995,
+                -0.235,
+                0.258
+              ],
+              "max": [
+                0.036000000000000004,
+                -0.17,
+                0.273
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            }
+          ]
+        },
+        {
+          "name": "member_0_hip_right",
+          "group": "member_0_hip_right",
+          "motion": "infantryStride",
+          "socket": "member_0_hip_right",
+          "pivot": [
+            0.093,
+            0.015,
+            0.22
+          ],
+          "rate": 4.0,
+          "travel": 0.42,
+          "parts": [
+            {
+              "name": "thigh",
+              "kind": "cylinder",
+              "start": [
+                0.093,
+                0.015,
+                0.22
+              ],
+              "end": [
+                0.093,
+                -0.2,
+                0.235
+              ],
+              "radius": 0.044,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shin",
+              "kind": "cylinder",
+              "start": [
+                0.093,
+                -0.2,
+                0.235
+              ],
+              "end": [
+                0.093,
+                -0.415,
+                0.23
+              ],
+              "radius": 0.033,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "boot",
+              "kind": "box",
+              "min": [
+                0.057999999999999996,
+                -0.5,
+                0.191
+              ],
+              "max": [
+                0.128,
+                -0.411,
+                0.28900000000000003
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "knee_guard",
+              "kind": "box",
+              "min": [
+                0.064,
+                -0.235,
+                0.258
+              ],
+              "max": [
+                0.122,
+                -0.17,
+                0.273
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            }
+          ]
+        },
+        {
+          "name": "member_0_shoulder",
+          "group": "member_0_shoulder",
+          "motion": "cannon",
+          "socket": "member_0_shoulder",
+          "pivot": [
+            0.05,
+            0.24,
+            0.22
+          ],
+          "rate": 1,
+          "travel": 0.004,
+          "parts": [
+            {
+              "name": "upper_arm_left",
+              "kind": "cylinder",
+              "start": [
+                -0.044,
+                0.24,
+                0.22
+              ],
+              "end": [
+                -0.05499999999999999,
+                0.087,
+                0.266
+              ],
+              "radius": 0.027,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "forearm_left",
+              "kind": "cylinder",
+              "start": [
+                -0.05499999999999999,
+                0.087,
+                0.266
+              ],
+              "end": [
+                0.055,
+                0.056,
+                0.325
+              ],
+              "radius": 0.023,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "upper_arm_right",
+              "kind": "cylinder",
+              "start": [
+                0.14400000000000002,
+                0.24,
+                0.22
+              ],
+              "end": [
+                0.155,
+                0.087,
+                0.259
+              ],
+              "radius": 0.027,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "forearm_right",
+              "kind": "cylinder",
+              "start": [
+                0.155,
+                0.087,
+                0.259
+              ],
+              "end": [
+                0.07300000000000001,
+                0.052,
+                0.36
+              ],
+              "radius": 0.023,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "receiver",
+              "kind": "box",
+              "min": [
+                0.035,
+                0.028,
+                0.2
+              ],
+              "max": [
+                0.07300000000000001,
+                0.083,
+                0.335
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "stock",
+              "kind": "box",
+              "min": [
+                0.029,
+                0.04,
+                0.010000000000000009
+              ],
+              "max": [
+                0.07100000000000001,
+                0.072,
+                0.20500000000000002
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "barrel",
+              "kind": "cylinder",
+              "start": [
+                0.05,
+                0.05,
+                0.335
+              ],
+              "end": [
+                0.05,
+                0.05,
+                0.42000000000000004
+              ],
+              "radius": 0.009,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "magazine",
+              "kind": "box",
+              "min": [
+                0.04,
+                -0.025,
+                0.32
+              ],
+              "max": [
+                0.068,
+                0.035,
+                0.353
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "hand_left",
+              "kind": "box",
+              "min": [
+                0.032,
+                0.044,
+                0.33
+              ],
+              "max": [
+                0.061,
+                0.068,
+                0.359
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "hand_right",
+              "kind": "box",
+              "min": [
+                0.063,
+                0.033,
+                0.312
+              ],
+              "max": [
+                0.085,
+                0.061,
+                0.335
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "optic",
+              "kind": "cylinder",
+              "start": [
+                0.05,
+                0.088,
+                0.296
+              ],
+              "end": [
+                0.05,
+                0.088,
+                0.34099999999999997
+              ],
+              "radius": 0.012,
+              "cell": 4,
+              "lods": [
+                0
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            }
+          ]
+        },
+        {
+          "name": "member_1_body",
+          "group": "member_1_body",
+          "motion": "static",
+          "parts": [
+            {
+              "name": "hip",
+              "kind": "box",
+              "min": [
+                -0.374,
+                -0.04,
+                0.177
+              ],
+              "max": [
+                -0.22599999999999998,
+                0.08,
+                0.263
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "armored_vest",
+              "kind": "box",
+              "min": [
+                -0.382,
+                0.08,
+                0.173
+              ],
+              "max": [
+                -0.21799999999999997,
+                0.29,
+                0.274
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "neck",
+              "kind": "cylinder",
+              "start": [
+                -0.3,
+                0.285,
+                0.22
+              ],
+              "end": [
+                -0.3,
+                0.335,
+                0.22
+              ],
+              "radius": 0.026,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "head",
+              "kind": "blob",
+              "centre": [
+                -0.3,
+                0.381,
+                0.22
+              ],
+              "radius": [
+                0.047,
+                0.062,
+                0.045
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "rings": [
+                5,
+                3,
+                2
+              ]
+            },
+            {
+              "name": "helmet",
+              "kind": "blob",
+              "centre": [
+                -0.3,
+                0.442,
+                0.22
+              ],
+              "radius": [
+                0.063,
+                0.046,
+                0.059
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "rings": [
+                5,
+                3,
+                2
+              ]
+            },
+            {
+              "name": "helmet_strategic",
+              "kind": "box",
+              "min": [
+                -0.357,
+                0.405,
+                0.168
+              ],
+              "max": [
+                -0.243,
+                0.49,
+                0.272
+              ],
+              "cell": 0,
+              "lods": [
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "field_pack",
+              "kind": "box",
+              "min": [
+                -0.36,
+                0.07,
+                0.112
+              ],
+              "max": [
+                -0.24,
+                0.27,
+                0.172
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "visor",
+              "kind": "box",
+              "min": [
+                -0.346,
+                0.383,
+                0.259
+              ],
+              "max": [
+                -0.254,
+                0.408,
+                0.271
+              ],
+              "cell": 4,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                -0.37,
+                0.1,
+                0.276
+              ],
+              "max": [
+                -0.33399999999999996,
+                0.17,
+                0.296
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                -0.318,
+                0.1,
+                0.276
+              ],
+              "max": [
+                -0.282,
+                0.17,
+                0.296
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                -0.266,
+                0.1,
+                0.276
+              ],
+              "max": [
+                -0.23,
+                0.17,
+                0.296
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            }
+          ]
+        },
+        {
+          "name": "member_1_hip_left",
+          "group": "member_1_hip_left",
+          "motion": "infantryStride",
+          "socket": "member_1_hip_left",
+          "pivot": [
+            -0.34299999999999997,
+            0.015,
+            0.22
+          ],
+          "rate": -4.0,
+          "travel": 0.42,
+          "parts": [
+            {
+              "name": "thigh",
+              "kind": "cylinder",
+              "start": [
+                -0.34299999999999997,
+                0.015,
+                0.22
+              ],
+              "end": [
+                -0.34299999999999997,
+                -0.2,
+                0.235
+              ],
+              "radius": 0.044,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shin",
+              "kind": "cylinder",
+              "start": [
+                -0.34299999999999997,
+                -0.2,
+                0.235
+              ],
+              "end": [
+                -0.34299999999999997,
+                -0.415,
+                0.23
+              ],
+              "radius": 0.033,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "boot",
+              "kind": "box",
+              "min": [
+                -0.378,
+                -0.5,
+                0.191
+              ],
+              "max": [
+                -0.30799999999999994,
+                -0.411,
+                0.28900000000000003
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "knee_guard",
+              "kind": "box",
+              "min": [
+                -0.372,
+                -0.235,
+                0.258
+              ],
+              "max": [
+                -0.31399999999999995,
+                -0.17,
+                0.273
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            }
+          ]
+        },
+        {
+          "name": "member_1_hip_right",
+          "group": "member_1_hip_right",
+          "motion": "infantryStride",
+          "socket": "member_1_hip_right",
+          "pivot": [
+            -0.257,
+            0.015,
+            0.22
+          ],
+          "rate": 4.0,
+          "travel": 0.42,
+          "parts": [
+            {
+              "name": "thigh",
+              "kind": "cylinder",
+              "start": [
+                -0.257,
+                0.015,
+                0.22
+              ],
+              "end": [
+                -0.257,
+                -0.2,
+                0.235
+              ],
+              "radius": 0.044,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shin",
+              "kind": "cylinder",
+              "start": [
+                -0.257,
+                -0.2,
+                0.235
+              ],
+              "end": [
+                -0.257,
+                -0.415,
+                0.23
+              ],
+              "radius": 0.033,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "boot",
+              "kind": "box",
+              "min": [
+                -0.29200000000000004,
+                -0.5,
+                0.191
+              ],
+              "max": [
+                -0.222,
+                -0.411,
+                0.28900000000000003
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "knee_guard",
+              "kind": "box",
+              "min": [
+                -0.28600000000000003,
+                -0.235,
+                0.258
+              ],
+              "max": [
+                -0.228,
+                -0.17,
+                0.273
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            }
+          ]
+        },
+        {
+          "name": "member_1_shoulder",
+          "group": "member_1_shoulder",
+          "motion": "cannon",
+          "socket": "member_1_shoulder",
+          "pivot": [
+            -0.3,
+            0.24,
+            0.22
+          ],
+          "rate": 1,
+          "travel": 0.004,
+          "parts": [
+            {
+              "name": "upper_arm_left",
+              "kind": "cylinder",
+              "start": [
+                -0.394,
+                0.24,
+                0.22
+              ],
+              "end": [
+                -0.40499999999999997,
+                0.087,
+                0.266
+              ],
+              "radius": 0.027,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "forearm_left",
+              "kind": "cylinder",
+              "start": [
+                -0.40499999999999997,
+                0.087,
+                0.266
+              ],
+              "end": [
+                -0.295,
+                0.056,
+                0.325
+              ],
+              "radius": 0.023,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "upper_arm_right",
+              "kind": "cylinder",
+              "start": [
+                -0.206,
+                0.24,
+                0.22
+              ],
+              "end": [
+                -0.195,
+                0.087,
+                0.259
+              ],
+              "radius": 0.027,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "forearm_right",
+              "kind": "cylinder",
+              "start": [
+                -0.195,
+                0.087,
+                0.259
+              ],
+              "end": [
+                -0.27699999999999997,
+                0.052,
+                0.36
+              ],
+              "radius": 0.023,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "receiver",
+              "kind": "box",
+              "min": [
+                -0.315,
+                0.028,
+                0.2
+              ],
+              "max": [
+                -0.27699999999999997,
+                0.083,
+                0.335
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "stock",
+              "kind": "box",
+              "min": [
+                -0.321,
+                0.04,
+                0.010000000000000009
+              ],
+              "max": [
+                -0.27899999999999997,
+                0.072,
+                0.20500000000000002
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "barrel",
+              "kind": "cylinder",
+              "start": [
+                -0.3,
+                0.05,
+                0.335
+              ],
+              "end": [
+                -0.3,
+                0.05,
+                0.42000000000000004
+              ],
+              "radius": 0.009,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "magazine",
+              "kind": "box",
+              "min": [
+                -0.31,
+                -0.025,
+                0.32
+              ],
+              "max": [
+                -0.282,
+                0.035,
+                0.353
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "hand_left",
+              "kind": "box",
+              "min": [
+                -0.318,
+                0.044,
+                0.33
+              ],
+              "max": [
+                -0.289,
+                0.068,
+                0.359
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "hand_right",
+              "kind": "box",
+              "min": [
+                -0.287,
+                0.033,
+                0.312
+              ],
+              "max": [
+                -0.265,
+                0.061,
+                0.335
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "optic",
+              "kind": "cylinder",
+              "start": [
+                -0.3,
+                0.088,
+                0.296
+              ],
+              "end": [
+                -0.3,
+                0.088,
+                0.34099999999999997
+              ],
+              "radius": 0.012,
+              "cell": 4,
+              "lods": [
+                0
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            }
+          ]
+        },
+        {
+          "name": "member_2_body",
+          "group": "member_2_body",
+          "motion": "static",
+          "parts": [
+            {
+              "name": "hip",
+              "kind": "box",
+              "min": [
+                0.22599999999999998,
+                -0.04,
+                -0.263
+              ],
+              "max": [
+                0.374,
+                0.08,
+                -0.177
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "armored_vest",
+              "kind": "box",
+              "min": [
+                0.21799999999999997,
+                0.08,
+                -0.267
+              ],
+              "max": [
+                0.382,
+                0.29,
+                -0.166
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "neck",
+              "kind": "cylinder",
+              "start": [
+                0.3,
+                0.285,
+                -0.22
+              ],
+              "end": [
+                0.3,
+                0.335,
+                -0.22
+              ],
+              "radius": 0.026,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "head",
+              "kind": "blob",
+              "centre": [
+                0.3,
+                0.381,
+                -0.22
+              ],
+              "radius": [
+                0.047,
+                0.062,
+                0.045
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "rings": [
+                5,
+                3,
+                2
+              ]
+            },
+            {
+              "name": "helmet",
+              "kind": "blob",
+              "centre": [
+                0.3,
+                0.442,
+                -0.22
+              ],
+              "radius": [
+                0.063,
+                0.046,
+                0.059
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "rings": [
+                5,
+                3,
+                2
+              ]
+            },
+            {
+              "name": "helmet_strategic",
+              "kind": "box",
+              "min": [
+                0.243,
+                0.405,
+                -0.272
+              ],
+              "max": [
+                0.357,
+                0.49,
+                -0.168
+              ],
+              "cell": 0,
+              "lods": [
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "field_pack",
+              "kind": "box",
+              "min": [
+                0.24,
+                0.07,
+                -0.328
+              ],
+              "max": [
+                0.36,
+                0.27,
+                -0.268
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "visor",
+              "kind": "box",
+              "min": [
+                0.254,
+                0.383,
+                -0.181
+              ],
+              "max": [
+                0.346,
+                0.408,
+                -0.169
+              ],
+              "cell": 4,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                0.23,
+                0.1,
+                -0.164
+              ],
+              "max": [
+                0.266,
+                0.17,
+                -0.14400000000000002
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                0.282,
+                0.1,
+                -0.164
+              ],
+              "max": [
+                0.318,
+                0.17,
+                -0.14400000000000002
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                0.33399999999999996,
+                0.1,
+                -0.164
+              ],
+              "max": [
+                0.37,
+                0.17,
+                -0.14400000000000002
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            }
+          ]
+        },
+        {
+          "name": "member_2_hip_left",
+          "group": "member_2_hip_left",
+          "motion": "infantryStride",
+          "socket": "member_2_hip_left",
+          "pivot": [
+            0.257,
+            0.015,
+            -0.22
+          ],
+          "rate": -4.0,
+          "travel": 0.42,
+          "parts": [
+            {
+              "name": "thigh",
+              "kind": "cylinder",
+              "start": [
+                0.257,
+                0.015,
+                -0.22
+              ],
+              "end": [
+                0.257,
+                -0.2,
+                -0.20500000000000002
+              ],
+              "radius": 0.044,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shin",
+              "kind": "cylinder",
+              "start": [
+                0.257,
+                -0.2,
+                -0.20500000000000002
+              ],
+              "end": [
+                0.257,
+                -0.415,
+                -0.21
+              ],
+              "radius": 0.033,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "boot",
+              "kind": "box",
+              "min": [
+                0.222,
+                -0.5,
+                -0.249
+              ],
+              "max": [
+                0.29200000000000004,
+                -0.411,
+                -0.151
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "knee_guard",
+              "kind": "box",
+              "min": [
+                0.228,
+                -0.235,
+                -0.182
+              ],
+              "max": [
+                0.28600000000000003,
+                -0.17,
+                -0.167
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            }
+          ]
+        },
+        {
+          "name": "member_2_hip_right",
+          "group": "member_2_hip_right",
+          "motion": "infantryStride",
+          "socket": "member_2_hip_right",
+          "pivot": [
+            0.34299999999999997,
+            0.015,
+            -0.22
+          ],
+          "rate": 4.0,
+          "travel": 0.42,
+          "parts": [
+            {
+              "name": "thigh",
+              "kind": "cylinder",
+              "start": [
+                0.34299999999999997,
+                0.015,
+                -0.22
+              ],
+              "end": [
+                0.34299999999999997,
+                -0.2,
+                -0.20500000000000002
+              ],
+              "radius": 0.044,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shin",
+              "kind": "cylinder",
+              "start": [
+                0.34299999999999997,
+                -0.2,
+                -0.20500000000000002
+              ],
+              "end": [
+                0.34299999999999997,
+                -0.415,
+                -0.21
+              ],
+              "radius": 0.033,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "boot",
+              "kind": "box",
+              "min": [
+                0.30799999999999994,
+                -0.5,
+                -0.249
+              ],
+              "max": [
+                0.378,
+                -0.411,
+                -0.151
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "knee_guard",
+              "kind": "box",
+              "min": [
+                0.31399999999999995,
+                -0.235,
+                -0.182
+              ],
+              "max": [
+                0.372,
+                -0.17,
+                -0.167
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            }
+          ]
+        },
+        {
+          "name": "member_2_shoulder",
+          "group": "member_2_shoulder",
+          "motion": "cannon",
+          "socket": "member_2_shoulder",
+          "pivot": [
+            0.3,
+            0.24,
+            -0.22
+          ],
+          "rate": 1,
+          "travel": 0.004,
+          "parts": [
+            {
+              "name": "upper_arm_left",
+              "kind": "cylinder",
+              "start": [
+                0.206,
+                0.24,
+                -0.22
+              ],
+              "end": [
+                0.195,
+                0.087,
+                -0.174
+              ],
+              "radius": 0.027,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "forearm_left",
+              "kind": "cylinder",
+              "start": [
+                0.195,
+                0.087,
+                -0.174
+              ],
+              "end": [
+                0.305,
+                0.056,
+                -0.115
+              ],
+              "radius": 0.023,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "upper_arm_right",
+              "kind": "cylinder",
+              "start": [
+                0.394,
+                0.24,
+                -0.22
+              ],
+              "end": [
+                0.40499999999999997,
+                0.087,
+                -0.181
+              ],
+              "radius": 0.027,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "forearm_right",
+              "kind": "cylinder",
+              "start": [
+                0.40499999999999997,
+                0.087,
+                -0.181
+              ],
+              "end": [
+                0.323,
+                0.052,
+                -0.07999999999999999
+              ],
+              "radius": 0.023,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "receiver",
+              "kind": "box",
+              "min": [
+                0.285,
+                0.028,
+                -0.24
+              ],
+              "max": [
+                0.323,
+                0.083,
+                -0.105
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "stock",
+              "kind": "box",
+              "min": [
+                0.27899999999999997,
+                0.04,
+                -0.43
+              ],
+              "max": [
+                0.321,
+                0.072,
+                -0.235
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "barrel",
+              "kind": "cylinder",
+              "start": [
+                0.3,
+                0.05,
+                -0.105
+              ],
+              "end": [
+                0.3,
+                0.05,
+                -0.01999999999999999
+              ],
+              "radius": 0.009,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "magazine",
+              "kind": "box",
+              "min": [
+                0.29,
+                -0.025,
+                -0.12
+              ],
+              "max": [
+                0.318,
+                0.035,
+                -0.087
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "hand_left",
+              "kind": "box",
+              "min": [
+                0.282,
+                0.044,
+                -0.11
+              ],
+              "max": [
+                0.311,
+                0.068,
+                -0.08099999999999999
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "hand_right",
+              "kind": "box",
+              "min": [
+                0.313,
+                0.033,
+                -0.128
+              ],
+              "max": [
+                0.33499999999999996,
+                0.061,
+                -0.105
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "optic",
+              "kind": "cylinder",
+              "start": [
+                0.3,
+                0.088,
+                -0.14400000000000002
+              ],
+              "end": [
+                0.3,
+                0.088,
+                -0.099
+              ],
+              "radius": 0.012,
+              "cell": 4,
+              "lods": [
+                0
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            }
+          ]
+        },
+        {
+          "name": "member_3_body",
+          "group": "member_3_body",
+          "motion": "static",
+          "parts": [
+            {
+              "name": "hip",
+              "kind": "box",
+              "min": [
+                -0.374,
+                -0.04,
+                -0.263
+              ],
+              "max": [
+                -0.22599999999999998,
+                0.08,
+                -0.177
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "armored_vest",
+              "kind": "box",
+              "min": [
+                -0.382,
+                0.08,
+                -0.267
+              ],
+              "max": [
+                -0.21799999999999997,
+                0.29,
+                -0.166
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "neck",
+              "kind": "cylinder",
+              "start": [
+                -0.3,
+                0.285,
+                -0.22
+              ],
+              "end": [
+                -0.3,
+                0.335,
+                -0.22
+              ],
+              "radius": 0.026,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "head",
+              "kind": "blob",
+              "centre": [
+                -0.3,
+                0.381,
+                -0.22
+              ],
+              "radius": [
+                0.047,
+                0.062,
+                0.045
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "rings": [
+                5,
+                3,
+                2
+              ]
+            },
+            {
+              "name": "helmet",
+              "kind": "blob",
+              "centre": [
+                -0.3,
+                0.442,
+                -0.22
+              ],
+              "radius": [
+                0.063,
+                0.046,
+                0.059
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "rings": [
+                5,
+                3,
+                2
+              ]
+            },
+            {
+              "name": "helmet_strategic",
+              "kind": "box",
+              "min": [
+                -0.357,
+                0.405,
+                -0.272
+              ],
+              "max": [
+                -0.243,
+                0.49,
+                -0.168
+              ],
+              "cell": 0,
+              "lods": [
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "field_pack",
+              "kind": "box",
+              "min": [
+                -0.36,
+                0.07,
+                -0.328
+              ],
+              "max": [
+                -0.24,
+                0.27,
+                -0.268
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "visor",
+              "kind": "box",
+              "min": [
+                -0.346,
+                0.383,
+                -0.181
+              ],
+              "max": [
+                -0.254,
+                0.408,
+                -0.169
+              ],
+              "cell": 4,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                -0.37,
+                0.1,
+                -0.164
+              ],
+              "max": [
+                -0.33399999999999996,
+                0.17,
+                -0.14400000000000002
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                -0.318,
+                0.1,
+                -0.164
+              ],
+              "max": [
+                -0.282,
+                0.17,
+                -0.14400000000000002
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                -0.266,
+                0.1,
+                -0.164
+              ],
+              "max": [
+                -0.23,
+                0.17,
+                -0.14400000000000002
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            }
+          ]
+        },
+        {
+          "name": "member_3_hip_left",
+          "group": "member_3_hip_left",
+          "motion": "infantryStride",
+          "socket": "member_3_hip_left",
+          "pivot": [
+            -0.34299999999999997,
+            0.015,
+            -0.22
+          ],
+          "rate": -4.0,
+          "travel": 0.42,
+          "parts": [
+            {
+              "name": "thigh",
+              "kind": "cylinder",
+              "start": [
+                -0.34299999999999997,
+                0.015,
+                -0.22
+              ],
+              "end": [
+                -0.34299999999999997,
+                -0.2,
+                -0.20500000000000002
+              ],
+              "radius": 0.044,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shin",
+              "kind": "cylinder",
+              "start": [
+                -0.34299999999999997,
+                -0.2,
+                -0.20500000000000002
+              ],
+              "end": [
+                -0.34299999999999997,
+                -0.415,
+                -0.21
+              ],
+              "radius": 0.033,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "boot",
+              "kind": "box",
+              "min": [
+                -0.378,
+                -0.5,
+                -0.249
+              ],
+              "max": [
+                -0.30799999999999994,
+                -0.411,
+                -0.151
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "knee_guard",
+              "kind": "box",
+              "min": [
+                -0.372,
+                -0.235,
+                -0.182
+              ],
+              "max": [
+                -0.31399999999999995,
+                -0.17,
+                -0.167
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            }
+          ]
+        },
+        {
+          "name": "member_3_hip_right",
+          "group": "member_3_hip_right",
+          "motion": "infantryStride",
+          "socket": "member_3_hip_right",
+          "pivot": [
+            -0.257,
+            0.015,
+            -0.22
+          ],
+          "rate": 4.0,
+          "travel": 0.42,
+          "parts": [
+            {
+              "name": "thigh",
+              "kind": "cylinder",
+              "start": [
+                -0.257,
+                0.015,
+                -0.22
+              ],
+              "end": [
+                -0.257,
+                -0.2,
+                -0.20500000000000002
+              ],
+              "radius": 0.044,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shin",
+              "kind": "cylinder",
+              "start": [
+                -0.257,
+                -0.2,
+                -0.20500000000000002
+              ],
+              "end": [
+                -0.257,
+                -0.415,
+                -0.21
+              ],
+              "radius": 0.033,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "boot",
+              "kind": "box",
+              "min": [
+                -0.29200000000000004,
+                -0.5,
+                -0.249
+              ],
+              "max": [
+                -0.222,
+                -0.411,
+                -0.151
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "knee_guard",
+              "kind": "box",
+              "min": [
+                -0.28600000000000003,
+                -0.235,
+                -0.182
+              ],
+              "max": [
+                -0.228,
+                -0.17,
+                -0.167
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            }
+          ]
+        },
+        {
+          "name": "member_3_shoulder",
+          "group": "member_3_shoulder",
+          "motion": "cannon",
+          "socket": "member_3_shoulder",
+          "pivot": [
+            -0.3,
+            0.24,
+            -0.22
+          ],
+          "rate": 1,
+          "travel": 0.004,
+          "parts": [
+            {
+              "name": "upper_arm_left",
+              "kind": "cylinder",
+              "start": [
+                -0.394,
+                0.24,
+                -0.22
+              ],
+              "end": [
+                -0.40499999999999997,
+                0.087,
+                -0.174
+              ],
+              "radius": 0.027,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "forearm_left",
+              "kind": "cylinder",
+              "start": [
+                -0.40499999999999997,
+                0.087,
+                -0.174
+              ],
+              "end": [
+                -0.295,
+                0.056,
+                -0.115
+              ],
+              "radius": 0.023,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "upper_arm_right",
+              "kind": "cylinder",
+              "start": [
+                -0.206,
+                0.24,
+                -0.22
+              ],
+              "end": [
+                -0.195,
+                0.087,
+                -0.181
+              ],
+              "radius": 0.027,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "forearm_right",
+              "kind": "cylinder",
+              "start": [
+                -0.195,
+                0.087,
+                -0.181
+              ],
+              "end": [
+                -0.27699999999999997,
+                0.052,
+                -0.07999999999999999
+              ],
+              "radius": 0.023,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "receiver",
+              "kind": "box",
+              "min": [
+                -0.315,
+                0.028,
+                -0.24
+              ],
+              "max": [
+                -0.27699999999999997,
+                0.083,
+                -0.105
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "stock",
+              "kind": "box",
+              "min": [
+                -0.321,
+                0.04,
+                -0.43
+              ],
+              "max": [
+                -0.27899999999999997,
+                0.072,
+                -0.235
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "barrel",
+              "kind": "cylinder",
+              "start": [
+                -0.3,
+                0.05,
+                -0.105
+              ],
+              "end": [
+                -0.3,
+                0.05,
+                -0.01999999999999999
+              ],
+              "radius": 0.009,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "magazine",
+              "kind": "box",
+              "min": [
+                -0.31,
+                -0.025,
+                -0.12
+              ],
+              "max": [
+                -0.282,
+                0.035,
+                -0.087
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "hand_left",
+              "kind": "box",
+              "min": [
+                -0.318,
+                0.044,
+                -0.11
+              ],
+              "max": [
+                -0.289,
+                0.068,
+                -0.08099999999999999
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "hand_right",
+              "kind": "box",
+              "min": [
+                -0.287,
+                0.033,
+                -0.128
+              ],
+              "max": [
+                -0.265,
+                0.061,
+                -0.105
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "optic",
+              "kind": "cylinder",
+              "start": [
+                -0.3,
+                0.088,
+                -0.14400000000000002
+              ],
+              "end": [
+                -0.3,
+                0.088,
+                -0.099
+              ],
+              "radius": 0.012,
+              "cell": 4,
+              "lods": [
+                0
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            }
+          ]
+        }
+      ],
+      "weaponLengthMeters": 0.738
+    },
+    "combat_engineer": {
+      "memberCount": 4,
+      "leader": 0,
+      "role": "field engineering",
+      "sockets": [
+        {
+          "name": "weapon_muzzle",
+          "x": 0.05,
+          "y": 0.05,
+          "z": 0.42
+        },
+        {
+          "name": "member_0_hip_left",
+          "x": 0.007000000000000006,
+          "y": 0.015,
+          "z": 0.22
+        },
+        {
+          "name": "member_0_hip_right",
+          "x": 0.093,
+          "y": 0.015,
+          "z": 0.22
+        },
+        {
+          "name": "member_0_shoulder",
+          "x": 0.05,
+          "y": 0.24,
+          "z": 0.22
+        },
+        {
+          "name": "member_1_hip_left",
+          "x": -0.34299999999999997,
+          "y": 0.015,
+          "z": 0.22
+        },
+        {
+          "name": "member_1_hip_right",
+          "x": -0.257,
+          "y": 0.015,
+          "z": 0.22
+        },
+        {
+          "name": "member_1_shoulder",
+          "x": -0.3,
+          "y": 0.24,
+          "z": 0.22
+        },
+        {
+          "name": "member_2_hip_left",
+          "x": 0.257,
+          "y": 0.015,
+          "z": -0.22
+        },
+        {
+          "name": "member_2_hip_right",
+          "x": 0.34299999999999997,
+          "y": 0.015,
+          "z": -0.22
+        },
+        {
+          "name": "member_2_shoulder",
+          "x": 0.3,
+          "y": 0.24,
+          "z": -0.22
+        },
+        {
+          "name": "member_3_hip_left",
+          "x": -0.34299999999999997,
+          "y": 0.015,
+          "z": -0.22
+        },
+        {
+          "name": "member_3_hip_right",
+          "x": -0.257,
+          "y": 0.015,
+          "z": -0.22
+        },
+        {
+          "name": "member_3_shoulder",
+          "x": -0.3,
+          "y": 0.24,
+          "z": -0.22
+        }
+      ],
+      "modules": [
+        {
+          "name": "member_0_body",
+          "group": "member_0_body",
+          "motion": "static",
+          "parts": [
+            {
+              "name": "hip",
+              "kind": "box",
+              "min": [
+                -0.023999999999999994,
+                -0.04,
+                0.177
+              ],
+              "max": [
+                0.124,
+                0.08,
+                0.263
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "armored_vest",
+              "kind": "box",
+              "min": [
+                -0.032,
+                0.08,
+                0.173
+              ],
+              "max": [
+                0.132,
+                0.29,
+                0.274
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "neck",
+              "kind": "cylinder",
+              "start": [
+                0.05,
+                0.285,
+                0.22
+              ],
+              "end": [
+                0.05,
+                0.335,
+                0.22
+              ],
+              "radius": 0.026,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "head",
+              "kind": "blob",
+              "centre": [
+                0.05,
+                0.381,
+                0.22
+              ],
+              "radius": [
+                0.047,
+                0.062,
+                0.045
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "rings": [
+                5,
+                3,
+                2
+              ]
+            },
+            {
+              "name": "helmet",
+              "kind": "blob",
+              "centre": [
+                0.05,
+                0.442,
+                0.22
+              ],
+              "radius": [
+                0.063,
+                0.046,
+                0.059
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "rings": [
+                5,
+                3,
+                2
+              ]
+            },
+            {
+              "name": "helmet_strategic",
+              "kind": "box",
+              "min": [
+                -0.006999999999999999,
+                0.405,
+                0.168
+              ],
+              "max": [
+                0.10700000000000001,
+                0.49,
+                0.272
+              ],
+              "cell": 0,
+              "lods": [
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "field_pack",
+              "kind": "box",
+              "min": [
+                -0.009999999999999995,
+                0.07,
+                0.112
+              ],
+              "max": [
+                0.11,
+                0.27,
+                0.172
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "visor",
+              "kind": "box",
+              "min": [
+                0.0040000000000000036,
+                0.383,
+                0.259
+              ],
+              "max": [
+                0.096,
+                0.408,
+                0.271
+              ],
+              "cell": 4,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                -0.019999999999999993,
+                0.1,
+                0.276
+              ],
+              "max": [
+                0.016000000000000004,
+                0.17,
+                0.296
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                0.032,
+                0.1,
+                0.276
+              ],
+              "max": [
+                0.068,
+                0.17,
+                0.296
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                0.084,
+                0.1,
+                0.276
+              ],
+              "max": [
+                0.12000000000000001,
+                0.17,
+                0.296
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "leader_antenna",
+              "kind": "cylinder",
+              "start": [
+                -0.001999999999999995,
+                0.26,
+                0.14300000000000002
+              ],
+              "end": [
+                -0.001999999999999995,
+                0.51,
+                0.14300000000000002
+              ],
+              "radius": 0.004,
+              "cell": 1,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "leader_radio",
+              "kind": "box",
+              "min": [
+                -0.019000000000000003,
+                0.18,
+                0.105
+              ],
+              "max": [
+                0.020000000000000004,
+                0.26,
+                0.15
+              ],
+              "cell": 15,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "equipment_canister",
+              "kind": "cylinder",
+              "start": [
+                0.121,
+                0.065,
+                0.14
+              ],
+              "end": [
+                0.121,
+                0.272,
+                0.14
+              ],
+              "radius": 0.036,
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "tool_case",
+              "kind": "box",
+              "min": [
+                -0.045,
+                -0.015,
+                0.16
+              ],
+              "max": [
+                -0.0029999999999999957,
+                0.155,
+                0.21
+              ],
+              "cell": 15,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "engineer_apron",
+              "kind": "box",
+              "min": [
+                -0.03,
+                -0.095,
+                0.265
+              ],
+              "max": [
+                0.13,
+                0.13,
+                0.28400000000000003
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "cutter_handle",
+              "kind": "cylinder",
+              "start": [
+                -0.025999999999999995,
+                0.06,
+                0.136
+              ],
+              "end": [
+                -0.025999999999999995,
+                0.295,
+                0.136
+              ],
+              "radius": 0.012,
+              "cell": 7,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shoulder_mark",
+              "kind": "box",
+              "min": [
+                0.133,
+                0.195,
+                0.193
+              ],
+              "max": [
+                0.14400000000000002,
+                0.24,
+                0.248
+              ],
+              "cell": 5,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "paired_service_canister",
+              "kind": "cylinder",
+              "start": [
+                -0.001999999999999995,
+                0.065,
+                0.09199999999999997
+              ],
+              "end": [
+                -0.001999999999999995,
+                0.346,
+                0.09199999999999997
+              ],
+              "radius": 0.039,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "paired_service_canister",
+              "kind": "cylinder",
+              "start": [
+                0.10200000000000001,
+                0.065,
+                0.09199999999999997
+              ],
+              "end": [
+                0.10200000000000001,
+                0.346,
+                0.09199999999999997
+              ],
+              "radius": 0.039,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "tool_backframe",
+              "kind": "box",
+              "min": [
+                -0.048,
+                0.09,
+                0.04799999999999999
+              ],
+              "max": [
+                0.14800000000000002,
+                0.19,
+                0.06999999999999998
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.004
+            },
+            {
+              "name": "protective_faceplate",
+              "kind": "box",
+              "min": [
+                -0.021999999999999992,
+                0.356,
+                0.25799999999999995
+              ],
+              "max": [
+                0.122,
+                0.43,
+                0.286
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.006
+            },
+            {
+              "name": "faceplate_glass_slot",
+              "kind": "box",
+              "min": [
+                -0.000999999999999994,
+                0.397,
+                0.287
+              ],
+              "max": [
+                0.101,
+                0.419,
+                0.297
+              ],
+              "cell": 4,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.002
+            },
+            {
+              "name": "suspended_tool",
+              "kind": "cylinder",
+              "start": [
+                -0.065,
+                -0.025,
+                0.17999999999999997
+              ],
+              "end": [
+                -0.065,
+                0.3,
+                0.17999999999999997
+              ],
+              "radius": 0.02,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            }
+          ]
+        },
+        {
+          "name": "member_0_hip_left",
+          "group": "member_0_hip_left",
+          "motion": "infantryStride",
+          "socket": "member_0_hip_left",
+          "pivot": [
+            0.007000000000000006,
+            0.015,
+            0.22
+          ],
+          "rate": -4.0,
+          "travel": 0.42,
+          "parts": [
+            {
+              "name": "thigh",
+              "kind": "cylinder",
+              "start": [
+                0.007000000000000006,
+                0.015,
+                0.22
+              ],
+              "end": [
+                0.007000000000000006,
+                -0.2,
+                0.235
+              ],
+              "radius": 0.044,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shin",
+              "kind": "cylinder",
+              "start": [
+                0.007000000000000006,
+                -0.2,
+                0.235
+              ],
+              "end": [
+                0.007000000000000006,
+                -0.415,
+                0.23
+              ],
+              "radius": 0.033,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "boot",
+              "kind": "box",
+              "min": [
+                -0.027999999999999997,
+                -0.5,
+                0.191
+              ],
+              "max": [
+                0.04200000000000001,
+                -0.411,
+                0.28900000000000003
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "knee_guard",
+              "kind": "box",
+              "min": [
+                -0.021999999999999995,
+                -0.235,
+                0.258
+              ],
+              "max": [
+                0.036000000000000004,
+                -0.17,
+                0.273
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "engineer_shin_plate",
+              "kind": "box",
+              "min": [
+                -0.031999999999999994,
+                -0.393,
+                0.263
+              ],
+              "max": [
+                0.046000000000000006,
+                -0.241,
+                0.281
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.004
+            }
+          ]
+        },
+        {
+          "name": "member_0_hip_right",
+          "group": "member_0_hip_right",
+          "motion": "infantryStride",
+          "socket": "member_0_hip_right",
+          "pivot": [
+            0.093,
+            0.015,
+            0.22
+          ],
+          "rate": 4.0,
+          "travel": 0.42,
+          "parts": [
+            {
+              "name": "thigh",
+              "kind": "cylinder",
+              "start": [
+                0.093,
+                0.015,
+                0.22
+              ],
+              "end": [
+                0.093,
+                -0.2,
+                0.235
+              ],
+              "radius": 0.044,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shin",
+              "kind": "cylinder",
+              "start": [
+                0.093,
+                -0.2,
+                0.235
+              ],
+              "end": [
+                0.093,
+                -0.415,
+                0.23
+              ],
+              "radius": 0.033,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "boot",
+              "kind": "box",
+              "min": [
+                0.057999999999999996,
+                -0.5,
+                0.191
+              ],
+              "max": [
+                0.128,
+                -0.411,
+                0.28900000000000003
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "knee_guard",
+              "kind": "box",
+              "min": [
+                0.064,
+                -0.235,
+                0.258
+              ],
+              "max": [
+                0.122,
+                -0.17,
+                0.273
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "engineer_shin_plate",
+              "kind": "box",
+              "min": [
+                0.054,
+                -0.393,
+                0.263
+              ],
+              "max": [
+                0.132,
+                -0.241,
+                0.281
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.004
+            }
+          ]
+        },
+        {
+          "name": "member_0_shoulder",
+          "group": "member_0_shoulder",
+          "motion": "cannon",
+          "socket": "member_0_shoulder",
+          "pivot": [
+            0.05,
+            0.24,
+            0.22
+          ],
+          "rate": 1,
+          "travel": 0.004,
+          "parts": [
+            {
+              "name": "upper_arm_left",
+              "kind": "cylinder",
+              "start": [
+                -0.044,
+                0.24,
+                0.22
+              ],
+              "end": [
+                -0.05499999999999999,
+                0.087,
+                0.266
+              ],
+              "radius": 0.027,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "forearm_left",
+              "kind": "cylinder",
+              "start": [
+                -0.05499999999999999,
+                0.087,
+                0.266
+              ],
+              "end": [
+                0.055,
+                0.056,
+                0.325
+              ],
+              "radius": 0.023,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "upper_arm_right",
+              "kind": "cylinder",
+              "start": [
+                0.14400000000000002,
+                0.24,
+                0.22
+              ],
+              "end": [
+                0.155,
+                0.087,
+                0.259
+              ],
+              "radius": 0.027,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "forearm_right",
+              "kind": "cylinder",
+              "start": [
+                0.155,
+                0.087,
+                0.259
+              ],
+              "end": [
+                0.07300000000000001,
+                0.052,
+                0.36
+              ],
+              "radius": 0.023,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "receiver",
+              "kind": "box",
+              "min": [
+                0.035,
+                0.028,
+                0.2
+              ],
+              "max": [
+                0.07300000000000001,
+                0.083,
+                0.335
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "stock",
+              "kind": "box",
+              "min": [
+                0.029,
+                0.04,
+                0.07
+              ],
+              "max": [
+                0.07100000000000001,
+                0.072,
+                0.20500000000000002
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "barrel",
+              "kind": "cylinder",
+              "start": [
+                0.05,
+                0.05,
+                0.335
+              ],
+              "end": [
+                0.05,
+                0.05,
+                0.42000000000000004
+              ],
+              "radius": 0.009,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "magazine",
+              "kind": "box",
+              "min": [
+                0.04,
+                -0.025,
+                0.32
+              ],
+              "max": [
+                0.068,
+                0.035,
+                0.353
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "hand_left",
+              "kind": "box",
+              "min": [
+                0.032,
+                0.044,
+                0.33
+              ],
+              "max": [
+                0.061,
+                0.068,
+                0.359
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "hand_right",
+              "kind": "box",
+              "min": [
+                0.063,
+                0.033,
+                0.312
+              ],
+              "max": [
+                0.085,
+                0.061,
+                0.335
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "optic",
+              "kind": "cylinder",
+              "start": [
+                0.05,
+                0.088,
+                0.296
+              ],
+              "end": [
+                0.05,
+                0.088,
+                0.34099999999999997
+              ],
+              "radius": 0.012,
+              "cell": 4,
+              "lods": [
+                0
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "carbine_shroud",
+              "kind": "box",
+              "min": [
+                0.026000000000000002,
+                0.046,
+                0.354
+              ],
+              "max": [
+                0.07400000000000001,
+                0.077,
+                0.404
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            }
+          ]
+        },
+        {
+          "name": "member_1_body",
+          "group": "member_1_body",
+          "motion": "static",
+          "parts": [
+            {
+              "name": "hip",
+              "kind": "box",
+              "min": [
+                -0.374,
+                -0.04,
+                0.177
+              ],
+              "max": [
+                -0.22599999999999998,
+                0.08,
+                0.263
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "armored_vest",
+              "kind": "box",
+              "min": [
+                -0.382,
+                0.08,
+                0.173
+              ],
+              "max": [
+                -0.21799999999999997,
+                0.29,
+                0.274
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "neck",
+              "kind": "cylinder",
+              "start": [
+                -0.3,
+                0.285,
+                0.22
+              ],
+              "end": [
+                -0.3,
+                0.335,
+                0.22
+              ],
+              "radius": 0.026,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "head",
+              "kind": "blob",
+              "centre": [
+                -0.3,
+                0.381,
+                0.22
+              ],
+              "radius": [
+                0.047,
+                0.062,
+                0.045
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "rings": [
+                5,
+                3,
+                2
+              ]
+            },
+            {
+              "name": "helmet",
+              "kind": "blob",
+              "centre": [
+                -0.3,
+                0.442,
+                0.22
+              ],
+              "radius": [
+                0.063,
+                0.046,
+                0.059
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "rings": [
+                5,
+                3,
+                2
+              ]
+            },
+            {
+              "name": "helmet_strategic",
+              "kind": "box",
+              "min": [
+                -0.357,
+                0.405,
+                0.168
+              ],
+              "max": [
+                -0.243,
+                0.49,
+                0.272
+              ],
+              "cell": 0,
+              "lods": [
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "field_pack",
+              "kind": "box",
+              "min": [
+                -0.36,
+                0.07,
+                0.112
+              ],
+              "max": [
+                -0.24,
+                0.27,
+                0.172
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "visor",
+              "kind": "box",
+              "min": [
+                -0.346,
+                0.383,
+                0.259
+              ],
+              "max": [
+                -0.254,
+                0.408,
+                0.271
+              ],
+              "cell": 4,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                -0.37,
+                0.1,
+                0.276
+              ],
+              "max": [
+                -0.33399999999999996,
+                0.17,
+                0.296
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                -0.318,
+                0.1,
+                0.276
+              ],
+              "max": [
+                -0.282,
+                0.17,
+                0.296
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                -0.266,
+                0.1,
+                0.276
+              ],
+              "max": [
+                -0.23,
+                0.17,
+                0.296
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "equipment_canister",
+              "kind": "cylinder",
+              "start": [
+                -0.22899999999999998,
+                0.065,
+                0.14
+              ],
+              "end": [
+                -0.22899999999999998,
+                0.272,
+                0.14
+              ],
+              "radius": 0.036,
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "tool_case",
+              "kind": "box",
+              "min": [
+                -0.395,
+                -0.015,
+                0.16
+              ],
+              "max": [
+                -0.353,
+                0.155,
+                0.21
+              ],
+              "cell": 15,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "engineer_apron",
+              "kind": "box",
+              "min": [
+                -0.38,
+                -0.095,
+                0.265
+              ],
+              "max": [
+                -0.21999999999999997,
+                0.13,
+                0.28400000000000003
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "cutter_handle",
+              "kind": "cylinder",
+              "start": [
+                -0.376,
+                0.06,
+                0.136
+              ],
+              "end": [
+                -0.376,
+                0.295,
+                0.136
+              ],
+              "radius": 0.012,
+              "cell": 7,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shoulder_mark",
+              "kind": "box",
+              "min": [
+                -0.21699999999999997,
+                0.195,
+                0.193
+              ],
+              "max": [
+                -0.206,
+                0.24,
+                0.248
+              ],
+              "cell": 5,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "paired_service_canister",
+              "kind": "cylinder",
+              "start": [
+                -0.352,
+                0.065,
+                0.09199999999999997
+              ],
+              "end": [
+                -0.352,
+                0.346,
+                0.09199999999999997
+              ],
+              "radius": 0.039,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "paired_service_canister",
+              "kind": "cylinder",
+              "start": [
+                -0.248,
+                0.065,
+                0.09199999999999997
+              ],
+              "end": [
+                -0.248,
+                0.346,
+                0.09199999999999997
+              ],
+              "radius": 0.039,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "tool_backframe",
+              "kind": "box",
+              "min": [
+                -0.398,
+                0.09,
+                0.04799999999999999
+              ],
+              "max": [
+                -0.20199999999999999,
+                0.19,
+                0.06999999999999998
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.004
+            },
+            {
+              "name": "protective_faceplate",
+              "kind": "box",
+              "min": [
+                -0.372,
+                0.356,
+                0.25799999999999995
+              ],
+              "max": [
+                -0.22799999999999998,
+                0.43,
+                0.286
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.006
+            },
+            {
+              "name": "faceplate_glass_slot",
+              "kind": "box",
+              "min": [
+                -0.351,
+                0.397,
+                0.287
+              ],
+              "max": [
+                -0.249,
+                0.419,
+                0.297
+              ],
+              "cell": 4,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.002
+            },
+            {
+              "name": "suspended_tool",
+              "kind": "cylinder",
+              "start": [
+                -0.415,
+                -0.025,
+                0.17999999999999997
+              ],
+              "end": [
+                -0.415,
+                0.3,
+                0.17999999999999997
+              ],
+              "radius": 0.02,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            }
+          ]
+        },
+        {
+          "name": "member_1_hip_left",
+          "group": "member_1_hip_left",
+          "motion": "infantryStride",
+          "socket": "member_1_hip_left",
+          "pivot": [
+            -0.34299999999999997,
+            0.015,
+            0.22
+          ],
+          "rate": -4.0,
+          "travel": 0.42,
+          "parts": [
+            {
+              "name": "thigh",
+              "kind": "cylinder",
+              "start": [
+                -0.34299999999999997,
+                0.015,
+                0.22
+              ],
+              "end": [
+                -0.34299999999999997,
+                -0.2,
+                0.235
+              ],
+              "radius": 0.044,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shin",
+              "kind": "cylinder",
+              "start": [
+                -0.34299999999999997,
+                -0.2,
+                0.235
+              ],
+              "end": [
+                -0.34299999999999997,
+                -0.415,
+                0.23
+              ],
+              "radius": 0.033,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "boot",
+              "kind": "box",
+              "min": [
+                -0.378,
+                -0.5,
+                0.191
+              ],
+              "max": [
+                -0.30799999999999994,
+                -0.411,
+                0.28900000000000003
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "knee_guard",
+              "kind": "box",
+              "min": [
+                -0.372,
+                -0.235,
+                0.258
+              ],
+              "max": [
+                -0.31399999999999995,
+                -0.17,
+                0.273
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "engineer_shin_plate",
+              "kind": "box",
+              "min": [
+                -0.38199999999999995,
+                -0.393,
+                0.263
+              ],
+              "max": [
+                -0.304,
+                -0.241,
+                0.281
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.004
+            }
+          ]
+        },
+        {
+          "name": "member_1_hip_right",
+          "group": "member_1_hip_right",
+          "motion": "infantryStride",
+          "socket": "member_1_hip_right",
+          "pivot": [
+            -0.257,
+            0.015,
+            0.22
+          ],
+          "rate": 4.0,
+          "travel": 0.42,
+          "parts": [
+            {
+              "name": "thigh",
+              "kind": "cylinder",
+              "start": [
+                -0.257,
+                0.015,
+                0.22
+              ],
+              "end": [
+                -0.257,
+                -0.2,
+                0.235
+              ],
+              "radius": 0.044,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shin",
+              "kind": "cylinder",
+              "start": [
+                -0.257,
+                -0.2,
+                0.235
+              ],
+              "end": [
+                -0.257,
+                -0.415,
+                0.23
+              ],
+              "radius": 0.033,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "boot",
+              "kind": "box",
+              "min": [
+                -0.29200000000000004,
+                -0.5,
+                0.191
+              ],
+              "max": [
+                -0.222,
+                -0.411,
+                0.28900000000000003
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "knee_guard",
+              "kind": "box",
+              "min": [
+                -0.28600000000000003,
+                -0.235,
+                0.258
+              ],
+              "max": [
+                -0.228,
+                -0.17,
+                0.273
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "engineer_shin_plate",
+              "kind": "box",
+              "min": [
+                -0.296,
+                -0.393,
+                0.263
+              ],
+              "max": [
+                -0.218,
+                -0.241,
+                0.281
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.004
+            }
+          ]
+        },
+        {
+          "name": "member_1_shoulder",
+          "group": "member_1_shoulder",
+          "motion": "cannon",
+          "socket": "member_1_shoulder",
+          "pivot": [
+            -0.3,
+            0.24,
+            0.22
+          ],
+          "rate": 1,
+          "travel": 0.004,
+          "parts": [
+            {
+              "name": "upper_arm_left",
+              "kind": "cylinder",
+              "start": [
+                -0.394,
+                0.24,
+                0.22
+              ],
+              "end": [
+                -0.40499999999999997,
+                0.087,
+                0.266
+              ],
+              "radius": 0.027,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "forearm_left",
+              "kind": "cylinder",
+              "start": [
+                -0.40499999999999997,
+                0.087,
+                0.266
+              ],
+              "end": [
+                -0.295,
+                0.056,
+                0.325
+              ],
+              "radius": 0.023,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "upper_arm_right",
+              "kind": "cylinder",
+              "start": [
+                -0.206,
+                0.24,
+                0.22
+              ],
+              "end": [
+                -0.195,
+                0.087,
+                0.259
+              ],
+              "radius": 0.027,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "forearm_right",
+              "kind": "cylinder",
+              "start": [
+                -0.195,
+                0.087,
+                0.259
+              ],
+              "end": [
+                -0.27699999999999997,
+                0.052,
+                0.36
+              ],
+              "radius": 0.023,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "receiver",
+              "kind": "box",
+              "min": [
+                -0.315,
+                0.028,
+                0.2
+              ],
+              "max": [
+                -0.27699999999999997,
+                0.083,
+                0.335
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "stock",
+              "kind": "box",
+              "min": [
+                -0.321,
+                0.04,
+                0.07
+              ],
+              "max": [
+                -0.27899999999999997,
+                0.072,
+                0.20500000000000002
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "barrel",
+              "kind": "cylinder",
+              "start": [
+                -0.3,
+                0.05,
+                0.335
+              ],
+              "end": [
+                -0.3,
+                0.05,
+                0.42000000000000004
+              ],
+              "radius": 0.009,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "magazine",
+              "kind": "box",
+              "min": [
+                -0.31,
+                -0.025,
+                0.32
+              ],
+              "max": [
+                -0.282,
+                0.035,
+                0.353
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "hand_left",
+              "kind": "box",
+              "min": [
+                -0.318,
+                0.044,
+                0.33
+              ],
+              "max": [
+                -0.289,
+                0.068,
+                0.359
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "hand_right",
+              "kind": "box",
+              "min": [
+                -0.287,
+                0.033,
+                0.312
+              ],
+              "max": [
+                -0.265,
+                0.061,
+                0.335
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "optic",
+              "kind": "cylinder",
+              "start": [
+                -0.3,
+                0.088,
+                0.296
+              ],
+              "end": [
+                -0.3,
+                0.088,
+                0.34099999999999997
+              ],
+              "radius": 0.012,
+              "cell": 4,
+              "lods": [
+                0
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "carbine_shroud",
+              "kind": "box",
+              "min": [
+                -0.324,
+                0.046,
+                0.354
+              ],
+              "max": [
+                -0.27599999999999997,
+                0.077,
+                0.404
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            }
+          ]
+        },
+        {
+          "name": "member_2_body",
+          "group": "member_2_body",
+          "motion": "static",
+          "parts": [
+            {
+              "name": "hip",
+              "kind": "box",
+              "min": [
+                0.22599999999999998,
+                -0.04,
+                -0.263
+              ],
+              "max": [
+                0.374,
+                0.08,
+                -0.177
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "armored_vest",
+              "kind": "box",
+              "min": [
+                0.21799999999999997,
+                0.08,
+                -0.267
+              ],
+              "max": [
+                0.382,
+                0.29,
+                -0.166
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "neck",
+              "kind": "cylinder",
+              "start": [
+                0.3,
+                0.285,
+                -0.22
+              ],
+              "end": [
+                0.3,
+                0.335,
+                -0.22
+              ],
+              "radius": 0.026,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "head",
+              "kind": "blob",
+              "centre": [
+                0.3,
+                0.381,
+                -0.22
+              ],
+              "radius": [
+                0.047,
+                0.062,
+                0.045
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "rings": [
+                5,
+                3,
+                2
+              ]
+            },
+            {
+              "name": "helmet",
+              "kind": "blob",
+              "centre": [
+                0.3,
+                0.442,
+                -0.22
+              ],
+              "radius": [
+                0.063,
+                0.046,
+                0.059
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "rings": [
+                5,
+                3,
+                2
+              ]
+            },
+            {
+              "name": "helmet_strategic",
+              "kind": "box",
+              "min": [
+                0.243,
+                0.405,
+                -0.272
+              ],
+              "max": [
+                0.357,
+                0.49,
+                -0.168
+              ],
+              "cell": 0,
+              "lods": [
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "field_pack",
+              "kind": "box",
+              "min": [
+                0.24,
+                0.07,
+                -0.328
+              ],
+              "max": [
+                0.36,
+                0.27,
+                -0.268
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "visor",
+              "kind": "box",
+              "min": [
+                0.254,
+                0.383,
+                -0.181
+              ],
+              "max": [
+                0.346,
+                0.408,
+                -0.169
+              ],
+              "cell": 4,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                0.23,
+                0.1,
+                -0.164
+              ],
+              "max": [
+                0.266,
+                0.17,
+                -0.14400000000000002
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                0.282,
+                0.1,
+                -0.164
+              ],
+              "max": [
+                0.318,
+                0.17,
+                -0.14400000000000002
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                0.33399999999999996,
+                0.1,
+                -0.164
+              ],
+              "max": [
+                0.37,
+                0.17,
+                -0.14400000000000002
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "equipment_canister",
+              "kind": "cylinder",
+              "start": [
+                0.371,
+                0.065,
+                -0.3
+              ],
+              "end": [
+                0.371,
+                0.272,
+                -0.3
+              ],
+              "radius": 0.036,
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "tool_case",
+              "kind": "box",
+              "min": [
+                0.205,
+                -0.015,
+                -0.28
+              ],
+              "max": [
+                0.247,
+                0.155,
+                -0.23
+              ],
+              "cell": 15,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "engineer_apron",
+              "kind": "box",
+              "min": [
+                0.21999999999999997,
+                -0.095,
+                -0.175
+              ],
+              "max": [
+                0.38,
+                0.13,
+                -0.156
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "cutter_handle",
+              "kind": "cylinder",
+              "start": [
+                0.22399999999999998,
+                0.06,
+                -0.304
+              ],
+              "end": [
+                0.22399999999999998,
+                0.295,
+                -0.304
+              ],
+              "radius": 0.012,
+              "cell": 7,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shoulder_mark",
+              "kind": "box",
+              "min": [
+                0.383,
+                0.195,
+                -0.247
+              ],
+              "max": [
+                0.394,
+                0.24,
+                -0.192
+              ],
+              "cell": 5,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "paired_service_canister",
+              "kind": "cylinder",
+              "start": [
+                0.248,
+                0.065,
+                -0.34800000000000003
+              ],
+              "end": [
+                0.248,
+                0.346,
+                -0.34800000000000003
+              ],
+              "radius": 0.039,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "paired_service_canister",
+              "kind": "cylinder",
+              "start": [
+                0.352,
+                0.065,
+                -0.34800000000000003
+              ],
+              "end": [
+                0.352,
+                0.346,
+                -0.34800000000000003
+              ],
+              "radius": 0.039,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "tool_backframe",
+              "kind": "box",
+              "min": [
+                0.20199999999999999,
+                0.09,
+                -0.392
+              ],
+              "max": [
+                0.398,
+                0.19,
+                -0.37
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.004
+            },
+            {
+              "name": "protective_faceplate",
+              "kind": "box",
+              "min": [
+                0.22799999999999998,
+                0.356,
+                -0.18200000000000002
+              ],
+              "max": [
+                0.372,
+                0.43,
+                -0.15400000000000003
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.006
+            },
+            {
+              "name": "faceplate_glass_slot",
+              "kind": "box",
+              "min": [
+                0.249,
+                0.397,
+                -0.15300000000000002
+              ],
+              "max": [
+                0.351,
+                0.419,
+                -0.14300000000000002
+              ],
+              "cell": 4,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.002
+            },
+            {
+              "name": "suspended_tool",
+              "kind": "cylinder",
+              "start": [
+                0.185,
+                -0.025,
+                -0.26
+              ],
+              "end": [
+                0.185,
+                0.3,
+                -0.26
+              ],
+              "radius": 0.02,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            }
+          ]
+        },
+        {
+          "name": "member_2_hip_left",
+          "group": "member_2_hip_left",
+          "motion": "infantryStride",
+          "socket": "member_2_hip_left",
+          "pivot": [
+            0.257,
+            0.015,
+            -0.22
+          ],
+          "rate": -4.0,
+          "travel": 0.42,
+          "parts": [
+            {
+              "name": "thigh",
+              "kind": "cylinder",
+              "start": [
+                0.257,
+                0.015,
+                -0.22
+              ],
+              "end": [
+                0.257,
+                -0.2,
+                -0.20500000000000002
+              ],
+              "radius": 0.044,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shin",
+              "kind": "cylinder",
+              "start": [
+                0.257,
+                -0.2,
+                -0.20500000000000002
+              ],
+              "end": [
+                0.257,
+                -0.415,
+                -0.21
+              ],
+              "radius": 0.033,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "boot",
+              "kind": "box",
+              "min": [
+                0.222,
+                -0.5,
+                -0.249
+              ],
+              "max": [
+                0.29200000000000004,
+                -0.411,
+                -0.151
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "knee_guard",
+              "kind": "box",
+              "min": [
+                0.228,
+                -0.235,
+                -0.182
+              ],
+              "max": [
+                0.28600000000000003,
+                -0.17,
+                -0.167
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "engineer_shin_plate",
+              "kind": "box",
+              "min": [
+                0.218,
+                -0.393,
+                -0.177
+              ],
+              "max": [
+                0.296,
+                -0.241,
+                -0.159
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.004
+            }
+          ]
+        },
+        {
+          "name": "member_2_hip_right",
+          "group": "member_2_hip_right",
+          "motion": "infantryStride",
+          "socket": "member_2_hip_right",
+          "pivot": [
+            0.34299999999999997,
+            0.015,
+            -0.22
+          ],
+          "rate": 4.0,
+          "travel": 0.42,
+          "parts": [
+            {
+              "name": "thigh",
+              "kind": "cylinder",
+              "start": [
+                0.34299999999999997,
+                0.015,
+                -0.22
+              ],
+              "end": [
+                0.34299999999999997,
+                -0.2,
+                -0.20500000000000002
+              ],
+              "radius": 0.044,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shin",
+              "kind": "cylinder",
+              "start": [
+                0.34299999999999997,
+                -0.2,
+                -0.20500000000000002
+              ],
+              "end": [
+                0.34299999999999997,
+                -0.415,
+                -0.21
+              ],
+              "radius": 0.033,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "boot",
+              "kind": "box",
+              "min": [
+                0.30799999999999994,
+                -0.5,
+                -0.249
+              ],
+              "max": [
+                0.378,
+                -0.411,
+                -0.151
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "knee_guard",
+              "kind": "box",
+              "min": [
+                0.31399999999999995,
+                -0.235,
+                -0.182
+              ],
+              "max": [
+                0.372,
+                -0.17,
+                -0.167
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "engineer_shin_plate",
+              "kind": "box",
+              "min": [
+                0.304,
+                -0.393,
+                -0.177
+              ],
+              "max": [
+                0.38199999999999995,
+                -0.241,
+                -0.159
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.004
+            }
+          ]
+        },
+        {
+          "name": "member_2_shoulder",
+          "group": "member_2_shoulder",
+          "motion": "cannon",
+          "socket": "member_2_shoulder",
+          "pivot": [
+            0.3,
+            0.24,
+            -0.22
+          ],
+          "rate": 1,
+          "travel": 0.004,
+          "parts": [
+            {
+              "name": "upper_arm_left",
+              "kind": "cylinder",
+              "start": [
+                0.206,
+                0.24,
+                -0.22
+              ],
+              "end": [
+                0.195,
+                0.087,
+                -0.174
+              ],
+              "radius": 0.027,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "forearm_left",
+              "kind": "cylinder",
+              "start": [
+                0.195,
+                0.087,
+                -0.174
+              ],
+              "end": [
+                0.305,
+                0.056,
+                -0.115
+              ],
+              "radius": 0.023,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "upper_arm_right",
+              "kind": "cylinder",
+              "start": [
+                0.394,
+                0.24,
+                -0.22
+              ],
+              "end": [
+                0.40499999999999997,
+                0.087,
+                -0.181
+              ],
+              "radius": 0.027,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "forearm_right",
+              "kind": "cylinder",
+              "start": [
+                0.40499999999999997,
+                0.087,
+                -0.181
+              ],
+              "end": [
+                0.323,
+                0.052,
+                -0.07999999999999999
+              ],
+              "radius": 0.023,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "receiver",
+              "kind": "box",
+              "min": [
+                0.285,
+                0.028,
+                -0.24
+              ],
+              "max": [
+                0.323,
+                0.083,
+                -0.105
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "stock",
+              "kind": "box",
+              "min": [
+                0.27899999999999997,
+                0.04,
+                -0.37
+              ],
+              "max": [
+                0.321,
+                0.072,
+                -0.235
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "barrel",
+              "kind": "cylinder",
+              "start": [
+                0.3,
+                0.05,
+                -0.105
+              ],
+              "end": [
+                0.3,
+                0.05,
+                -0.01999999999999999
+              ],
+              "radius": 0.009,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "magazine",
+              "kind": "box",
+              "min": [
+                0.29,
+                -0.025,
+                -0.12
+              ],
+              "max": [
+                0.318,
+                0.035,
+                -0.087
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "hand_left",
+              "kind": "box",
+              "min": [
+                0.282,
+                0.044,
+                -0.11
+              ],
+              "max": [
+                0.311,
+                0.068,
+                -0.08099999999999999
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "hand_right",
+              "kind": "box",
+              "min": [
+                0.313,
+                0.033,
+                -0.128
+              ],
+              "max": [
+                0.33499999999999996,
+                0.061,
+                -0.105
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "optic",
+              "kind": "cylinder",
+              "start": [
+                0.3,
+                0.088,
+                -0.14400000000000002
+              ],
+              "end": [
+                0.3,
+                0.088,
+                -0.099
+              ],
+              "radius": 0.012,
+              "cell": 4,
+              "lods": [
+                0
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "carbine_shroud",
+              "kind": "box",
+              "min": [
+                0.27599999999999997,
+                0.046,
+                -0.086
+              ],
+              "max": [
+                0.324,
+                0.077,
+                -0.036000000000000004
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            }
+          ]
+        },
+        {
+          "name": "member_3_body",
+          "group": "member_3_body",
+          "motion": "static",
+          "parts": [
+            {
+              "name": "hip",
+              "kind": "box",
+              "min": [
+                -0.374,
+                -0.04,
+                -0.263
+              ],
+              "max": [
+                -0.22599999999999998,
+                0.08,
+                -0.177
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "armored_vest",
+              "kind": "box",
+              "min": [
+                -0.382,
+                0.08,
+                -0.267
+              ],
+              "max": [
+                -0.21799999999999997,
+                0.29,
+                -0.166
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "neck",
+              "kind": "cylinder",
+              "start": [
+                -0.3,
+                0.285,
+                -0.22
+              ],
+              "end": [
+                -0.3,
+                0.335,
+                -0.22
+              ],
+              "radius": 0.026,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "head",
+              "kind": "blob",
+              "centre": [
+                -0.3,
+                0.381,
+                -0.22
+              ],
+              "radius": [
+                0.047,
+                0.062,
+                0.045
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "rings": [
+                5,
+                3,
+                2
+              ]
+            },
+            {
+              "name": "helmet",
+              "kind": "blob",
+              "centre": [
+                -0.3,
+                0.442,
+                -0.22
+              ],
+              "radius": [
+                0.063,
+                0.046,
+                0.059
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "rings": [
+                5,
+                3,
+                2
+              ]
+            },
+            {
+              "name": "helmet_strategic",
+              "kind": "box",
+              "min": [
+                -0.357,
+                0.405,
+                -0.272
+              ],
+              "max": [
+                -0.243,
+                0.49,
+                -0.168
+              ],
+              "cell": 0,
+              "lods": [
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "field_pack",
+              "kind": "box",
+              "min": [
+                -0.36,
+                0.07,
+                -0.328
+              ],
+              "max": [
+                -0.24,
+                0.27,
+                -0.268
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "visor",
+              "kind": "box",
+              "min": [
+                -0.346,
+                0.383,
+                -0.181
+              ],
+              "max": [
+                -0.254,
+                0.408,
+                -0.169
+              ],
+              "cell": 4,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                -0.37,
+                0.1,
+                -0.164
+              ],
+              "max": [
+                -0.33399999999999996,
+                0.17,
+                -0.14400000000000002
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                -0.318,
+                0.1,
+                -0.164
+              ],
+              "max": [
+                -0.282,
+                0.17,
+                -0.14400000000000002
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "magazine_pouch",
+              "kind": "box",
+              "min": [
+                -0.266,
+                0.1,
+                -0.164
+              ],
+              "max": [
+                -0.23,
+                0.17,
+                -0.14400000000000002
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "equipment_canister",
+              "kind": "cylinder",
+              "start": [
+                -0.22899999999999998,
+                0.065,
+                -0.3
+              ],
+              "end": [
+                -0.22899999999999998,
+                0.272,
+                -0.3
+              ],
+              "radius": 0.036,
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "tool_case",
+              "kind": "box",
+              "min": [
+                -0.395,
+                -0.015,
+                -0.28
+              ],
+              "max": [
+                -0.353,
+                0.155,
+                -0.23
+              ],
+              "cell": 15,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "engineer_apron",
+              "kind": "box",
+              "min": [
+                -0.38,
+                -0.095,
+                -0.175
+              ],
+              "max": [
+                -0.21999999999999997,
+                0.13,
+                -0.156
+              ],
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "cutter_handle",
+              "kind": "cylinder",
+              "start": [
+                -0.376,
+                0.06,
+                -0.304
+              ],
+              "end": [
+                -0.376,
+                0.295,
+                -0.304
+              ],
+              "radius": 0.012,
+              "cell": 7,
+              "lods": [
+                0,
+                1
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shoulder_mark",
+              "kind": "box",
+              "min": [
+                -0.21699999999999997,
+                0.195,
+                -0.247
+              ],
+              "max": [
+                -0.206,
+                0.24,
+                -0.192
+              ],
+              "cell": 5,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "paired_service_canister",
+              "kind": "cylinder",
+              "start": [
+                -0.352,
+                0.065,
+                -0.34800000000000003
+              ],
+              "end": [
+                -0.352,
+                0.346,
+                -0.34800000000000003
+              ],
+              "radius": 0.039,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "paired_service_canister",
+              "kind": "cylinder",
+              "start": [
+                -0.248,
+                0.065,
+                -0.34800000000000003
+              ],
+              "end": [
+                -0.248,
+                0.346,
+                -0.34800000000000003
+              ],
+              "radius": 0.039,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "tool_backframe",
+              "kind": "box",
+              "min": [
+                -0.398,
+                0.09,
+                -0.392
+              ],
+              "max": [
+                -0.20199999999999999,
+                0.19,
+                -0.37
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.004
+            },
+            {
+              "name": "protective_faceplate",
+              "kind": "box",
+              "min": [
+                -0.372,
+                0.356,
+                -0.18200000000000002
+              ],
+              "max": [
+                -0.22799999999999998,
+                0.43,
+                -0.15400000000000003
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.006
+            },
+            {
+              "name": "faceplate_glass_slot",
+              "kind": "box",
+              "min": [
+                -0.351,
+                0.397,
+                -0.15300000000000002
+              ],
+              "max": [
+                -0.249,
+                0.419,
+                -0.14300000000000002
+              ],
+              "cell": 4,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.002
+            },
+            {
+              "name": "suspended_tool",
+              "kind": "cylinder",
+              "start": [
+                -0.415,
+                -0.025,
+                -0.26
+              ],
+              "end": [
+                -0.415,
+                0.3,
+                -0.26
+              ],
+              "radius": 0.02,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            }
+          ]
+        },
+        {
+          "name": "member_3_hip_left",
+          "group": "member_3_hip_left",
+          "motion": "infantryStride",
+          "socket": "member_3_hip_left",
+          "pivot": [
+            -0.34299999999999997,
+            0.015,
+            -0.22
+          ],
+          "rate": -4.0,
+          "travel": 0.42,
+          "parts": [
+            {
+              "name": "thigh",
+              "kind": "cylinder",
+              "start": [
+                -0.34299999999999997,
+                0.015,
+                -0.22
+              ],
+              "end": [
+                -0.34299999999999997,
+                -0.2,
+                -0.20500000000000002
+              ],
+              "radius": 0.044,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shin",
+              "kind": "cylinder",
+              "start": [
+                -0.34299999999999997,
+                -0.2,
+                -0.20500000000000002
+              ],
+              "end": [
+                -0.34299999999999997,
+                -0.415,
+                -0.21
+              ],
+              "radius": 0.033,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "boot",
+              "kind": "box",
+              "min": [
+                -0.378,
+                -0.5,
+                -0.249
+              ],
+              "max": [
+                -0.30799999999999994,
+                -0.411,
+                -0.151
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "knee_guard",
+              "kind": "box",
+              "min": [
+                -0.372,
+                -0.235,
+                -0.182
+              ],
+              "max": [
+                -0.31399999999999995,
+                -0.17,
+                -0.167
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "engineer_shin_plate",
+              "kind": "box",
+              "min": [
+                -0.38199999999999995,
+                -0.393,
+                -0.177
+              ],
+              "max": [
+                -0.304,
+                -0.241,
+                -0.159
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.004
+            }
+          ]
+        },
+        {
+          "name": "member_3_hip_right",
+          "group": "member_3_hip_right",
+          "motion": "infantryStride",
+          "socket": "member_3_hip_right",
+          "pivot": [
+            -0.257,
+            0.015,
+            -0.22
+          ],
+          "rate": 4.0,
+          "travel": 0.42,
+          "parts": [
+            {
+              "name": "thigh",
+              "kind": "cylinder",
+              "start": [
+                -0.257,
+                0.015,
+                -0.22
+              ],
+              "end": [
+                -0.257,
+                -0.2,
+                -0.20500000000000002
+              ],
+              "radius": 0.044,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "shin",
+              "kind": "cylinder",
+              "start": [
+                -0.257,
+                -0.2,
+                -0.20500000000000002
+              ],
+              "end": [
+                -0.257,
+                -0.415,
+                -0.21
+              ],
+              "radius": 0.033,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "boot",
+              "kind": "box",
+              "min": [
+                -0.29200000000000004,
+                -0.5,
+                -0.249
+              ],
+              "max": [
+                -0.222,
+                -0.411,
+                -0.151
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "knee_guard",
+              "kind": "box",
+              "min": [
+                -0.28600000000000003,
+                -0.235,
+                -0.182
+              ],
+              "max": [
+                -0.228,
+                -0.17,
+                -0.167
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "engineer_shin_plate",
+              "kind": "box",
+              "min": [
+                -0.296,
+                -0.393,
+                -0.177
+              ],
+              "max": [
+                -0.218,
+                -0.241,
+                -0.159
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.004
+            }
+          ]
+        },
+        {
+          "name": "member_3_shoulder",
+          "group": "member_3_shoulder",
+          "motion": "cannon",
+          "socket": "member_3_shoulder",
+          "pivot": [
+            -0.3,
+            0.24,
+            -0.22
+          ],
+          "rate": 1,
+          "travel": 0.004,
+          "parts": [
+            {
+              "name": "upper_arm_left",
+              "kind": "cylinder",
+              "start": [
+                -0.394,
+                0.24,
+                -0.22
+              ],
+              "end": [
+                -0.40499999999999997,
+                0.087,
+                -0.174
+              ],
+              "radius": 0.027,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "forearm_left",
+              "kind": "cylinder",
+              "start": [
+                -0.40499999999999997,
+                0.087,
+                -0.174
+              ],
+              "end": [
+                -0.295,
+                0.056,
+                -0.115
+              ],
+              "radius": 0.023,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "upper_arm_right",
+              "kind": "cylinder",
+              "start": [
+                -0.206,
+                0.24,
+                -0.22
+              ],
+              "end": [
+                -0.195,
+                0.087,
+                -0.181
+              ],
+              "radius": 0.027,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "forearm_right",
+              "kind": "cylinder",
+              "start": [
+                -0.195,
+                0.087,
+                -0.181
+              ],
+              "end": [
+                -0.27699999999999997,
+                0.052,
+                -0.07999999999999999
+              ],
+              "radius": 0.023,
+              "cell": 3,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "receiver",
+              "kind": "box",
+              "min": [
+                -0.315,
+                0.028,
+                -0.24
+              ],
+              "max": [
+                -0.27699999999999997,
+                0.083,
+                -0.105
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "stock",
+              "kind": "box",
+              "min": [
+                -0.321,
+                0.04,
+                -0.37
+              ],
+              "max": [
+                -0.27899999999999997,
+                0.072,
+                -0.235
+              ],
+              "cell": 2,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "barrel",
+              "kind": "cylinder",
+              "start": [
+                -0.3,
+                0.05,
+                -0.105
+              ],
+              "end": [
+                -0.3,
+                0.05,
+                -0.01999999999999999
+              ],
+              "radius": 0.009,
+              "cell": 7,
+              "lods": [
+                0,
+                1,
+                2
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "magazine",
+              "kind": "box",
+              "min": [
+                -0.31,
+                -0.025,
+                -0.12
+              ],
+              "max": [
+                -0.282,
+                0.035,
+                -0.087
+              ],
+              "cell": 1,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "hand_left",
+              "kind": "box",
+              "min": [
+                -0.318,
+                0.044,
+                -0.11
+              ],
+              "max": [
+                -0.289,
+                0.068,
+                -0.08099999999999999
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "hand_right",
+              "kind": "box",
+              "min": [
+                -0.287,
+                0.033,
+                -0.128
+              ],
+              "max": [
+                -0.265,
+                0.061,
+                -0.105
+              ],
+              "cell": 3,
+              "lods": [
+                0
+              ],
+              "bevel": 0.005
+            },
+            {
+              "name": "optic",
+              "kind": "cylinder",
+              "start": [
+                -0.3,
+                0.088,
+                -0.14400000000000002
+              ],
+              "end": [
+                -0.3,
+                0.088,
+                -0.099
+              ],
+              "radius": 0.012,
+              "cell": 4,
+              "lods": [
+                0
+              ],
+              "sides": [
+                10,
+                6,
+                4
+              ],
+              "inner": 0
+            },
+            {
+              "name": "carbine_shroud",
+              "kind": "box",
+              "min": [
+                -0.324,
+                0.046,
+                -0.086
+              ],
+              "max": [
+                -0.27599999999999997,
+                0.077,
+                -0.036000000000000004
+              ],
+              "cell": 0,
+              "lods": [
+                0,
+                1
+              ],
+              "bevel": 0.005
+            }
+          ]
+        }
+      ],
+      "weaponLengthMeters": 0.63
+    }
+  }
+}

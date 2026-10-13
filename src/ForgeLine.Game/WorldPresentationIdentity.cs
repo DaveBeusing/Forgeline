@@ -39,6 +39,8 @@ public enum WorldVisualId : ushort
     PropBridgeApron = 117,
     PropLoadingApron = 118,
     PropServiceFence = 119,
+    PropScorchedBarrier = 120,
+    PropBurstPipe = 121,
 
     VegetationConifer = 200,
     VegetationScrub = 201,

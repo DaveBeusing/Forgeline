@@ -17,7 +17,10 @@ Simulation remains authoritative for movement, combat, health, supply, ownership
 | Cargo Truck | `unit.directorate.cargo_truck` | heavy logistics chassis with general cargo module |
 | Supply Truck | `unit.directorate.supply_truck` | shared heavy logistics chassis with visible supply containers |
 
-The existing Combat Engineer intentionally reuses the Rifle Squad presentation family until a dedicated infantry-art package is justified. No gameplay definition or stable `UnitId` is duplicated.
+Combat Engineer now resolves its dedicated editable infantry family and three
+LODs. Material, independent collision proxy and strategic-symbol contracts reuse
+the established rifle resources; no gameplay definition or UnitId is duplicated.
+See [infantry and battlefield production](InfantryBattlefieldProduction.md).
 
 These meshes are also the current readability geometry baseline. Their intentionally exaggerated role features are retained rather than replaced by a parallel placeholder set: the tank is wide and gun-dominant, the scout is sensor-dominant and lighter, artillery is defined by its long weapon mass, and logistics vehicles expose rear cargo or supply modules. Recognition must remain possible from silhouette at the normal RTS camera before material color is considered.
 
@@ -99,7 +102,9 @@ and wheel-hub motion in LOD0. Weapon/VFX origin resolves at `weapon_muzzle`.
 The production tank retains exact targeting anchors and rigid range names;
 its cosmetic wheel anchors move to the authored axle line. Neutral combined
 reduced LODs omit motion. There is no circulating tread or physical suspension
-solver; infantry still awaits a real skeleton/animation runtime.
+solver. Infantry uses bounded travel-driven hip and existing shoulder-recoil
+ranges in LOD0; reduced LODs remain static. A real skeleton/foot-IK/retargeting
+runtime is still absent and is not promised by these rigid sources.
 
 ## Materials and damage states
 
@@ -182,3 +187,13 @@ Directorate weapon and damage visuals use the shared presentation VFX contracts 
 The compiled unit sockets are now active presentation anchors: `weapon_muzzle` supplies muzzle origin, while logistics-family sockets can anchor cargo/supply effects. Missing socket/runtime data falls back to the unit transform without changing weapon or supply simulation.
 
 Damage-state smoke/fire/sparks and destruction bursts are derived from authoritative health/wreck state. They do not replace the existing unit material/geometry damage treatment or create additional combat authority.
+
+## Dedicated infantry and wreck production
+
+Both infantry roles now have four separately inspectable figure groups, leader
+equipment, geometric damage/critical attachments through every LOD, and discarded
+gear wrecks. Scout/Artillery/Cargo/Supply use dedicated collapsed wreck meshes.
+Stable simulation IDs, muzzle origin and gameplay movement/selection remain
+unchanged. Source mappings, resource measurements, native imagery and open
+near-view/animation/art gates are in
+[Infantry and battlefield production](InfantryBattlefieldProduction.md).

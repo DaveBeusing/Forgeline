@@ -195,3 +195,8 @@ LOD and state geometry. No additional texture/material, sampler policy or atlas
 layout is introduced. Their catalog qualification has 437 assets: 254 meshes,
 56 textures and 127 materials. Native binding/residency and matched camera
 measurements are recorded with the logistics capture evidence.
+
+The [infantry and battlefield families](InfantryBattlefieldProduction.md) reuse
+these masters and channel/mip conventions. Armor, canvas, glass, rubber, tools,
+weapons, worn wreck panels and exposed concrete/rebar use the existing inset
+atlas cells. No texture/material record is added.

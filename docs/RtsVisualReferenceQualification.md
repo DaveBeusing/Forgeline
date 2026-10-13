@@ -197,3 +197,11 @@ and sanitized performance/resource records are linked from
 [Logistics building production](LogisticsBuildingProduction.md). An earlier
 one-channel one-LSB terrain-repeat discrepancy remains recorded with unknown
 cause; later passes are not a root-cause fix and no threshold is changed.
+
+[Infantry and battlefield production](InfantryBattlefieldProduction.md) records
+nine exactly matched original-geometry before cases, 108 final role/state
+cases, twelve 1000-unit cases, twelve visible/hidden battle cases and two native
+near inspections. All 134 final captures pass structural/repeat/binding checks;
+20m High foreground striping remains a visual gate. Capture-only
+`-InspectionDistanceMeters` accepts zero or20–120; zero retains exact default
+120/420/1000 cameras, with nondefault distance recorded in filenames/metadata.

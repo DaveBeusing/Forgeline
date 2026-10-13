@@ -99,7 +99,7 @@ if __name__=='__main__':
         if d['type']!='mesh' or not (name.startswith('unit.directorate.') or name.startswith('building.directorate.') or name.startswith('mesh.world.prop.')): continue
         if any(s in name for s in ('.collision','.lod1','.lod2','_lod1','_lod2','.module.','.symbol.','.state.')): continue
         if not d.get('lods') and name!='unit.directorate.main_battle_tank.turret': continue
-        if d['source'].replace('\\','/').startswith('sources/operational/'): continue
+        if d['source'].replace('\\','/').startswith('sources/operational/') or '/infantry/' in d['source'].replace('\\','/') or '/battlefield/' in d['source'].replace('\\','/'): continue
         source=(meta.parent/d['source']).resolve()
         if source.stem.endswith('_motion'):
             source=source.with_name(source.stem.removesuffix('_motion')+'.gltf')

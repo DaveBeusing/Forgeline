@@ -1,0 +1,8 @@
+{
+  "id": "unit.directorate.combat_engineer.critical",
+  "type": "mesh",
+  "materialReferences": [
+    "material.directorate.unit.rifle_squad"
+  ],
+  "source": "../sources/infantry/combat_engineer_critical.gltf"
+}
