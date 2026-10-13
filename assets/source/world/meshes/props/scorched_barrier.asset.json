@@ -8,8 +8,10 @@
     {
       "level": 1,
       "assetId": "mesh.world.prop.scorched_barrier_lod1",
-      "maxDistance": 220
+      "maxDistance": 260
     }
   ],
-  "source": "../sources/battlefield/scorched_barrier_lod0.gltf"
+  "source": "../sources/battlefield/scorched_barrier_lod0.gltf",
+  "collisionRequired": true,
+  "collisionReference": "mesh.world.kit.collision_centered"
 }

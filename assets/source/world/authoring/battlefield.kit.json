@@ -2763,7 +2763,9 @@
           "inner": 0
         }
       ],
-      "material": "material.world.prop.industrial"
+      "material": "material.world.prop.industrial",
+      "reducedDistance": 260,
+      "collisionReference": "mesh.world.kit.collision_centered"
     },
     {
       "name": "burst_pipe",
@@ -2873,7 +2875,9 @@
           "inner": 0.107
         }
       ],
-      "material": "material.world.prop.industrial"
+      "material": "material.world.prop.industrial",
+      "reducedDistance": 240,
+      "collisionReference": "mesh.world.kit.collision_centered"
     },
     {
       "name": "road_damaged",

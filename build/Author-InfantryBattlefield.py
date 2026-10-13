@@ -98,7 +98,9 @@ def author(output, update):
                 if lod:metadata = metadata.with_name(metadata.stem.replace('.asset','_lod1.asset')+'.json')
                 definition = json.loads(metadata.read_text(encoding='utf-8-sig')) if metadata.exists() else dict(id=recipe['id']+('_lod1' if lod else ''),type='mesh')
                 definition['materialReferences'] = [recipe['material']]
-                if world and not lod:definition['lods']=[dict(level=1,assetId=recipe['id']+'_lod1',maxDistance=220)]
+                if world and not lod:definition['lods']=[dict(level=1,assetId=recipe['id']+'_lod1',maxDistance=recipe.get('reducedDistance',220))]
+                if world and not lod and 'collisionReference' in recipe:
+                    definition.update(collisionRequired=True,collisionReference=recipe['collisionReference'])
                 write_metadata(metadata,definition,path)
     for family in kit['families']:
         counts=[report[family+f'.lod{i}']['triangles'] for i in range(3)]

@@ -8,8 +8,10 @@
     {
       "level": 1,
       "assetId": "mesh.world.prop.burst_pipe_lod1",
-      "maxDistance": 220
+      "maxDistance": 240
     }
   ],
-  "source": "../sources/battlefield/burst_pipe_lod0.gltf"
+  "source": "../sources/battlefield/burst_pipe_lod0.gltf",
+  "collisionRequired": true,
+  "collisionReference": "mesh.world.kit.collision_centered"
 }
