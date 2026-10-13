@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Security.Cryptography;
 using System.Text.Json;
+using ForgeLine.Assets;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Game;
@@ -15,7 +16,7 @@ namespace ForgeLine.Presentation;
 internal static class LogisticsTrafficReferenceScene
 {
     private static readonly JsonSerializerOptions FingerprintOptions = new() { IncludeFields = true };
-    public static VisualReferenceScene Create(VisualReferenceSceneKind kind, TerrainWorld terrain)
+    public static VisualReferenceScene Create(VisualReferenceSceneKind kind, TerrainWorld terrain, RuntimeAssetCatalog? runtimeAssets = null)
     {
         bool sustained = kind == VisualReferenceSceneKind.LogisticsSustainedProduction;
         CargoTransportLifecycleState requested = kind switch
@@ -54,7 +55,7 @@ internal static class LogisticsTrafficReferenceScene
         var intelligence = new FactionIntelligenceStore(new() { CellSizeMeters = 32 });
         simulation.RegisterSystem(new BattlefieldIntelligenceSystem(intelligence));
         var snapshots = new PresentationSnapshotBuffer();
-        simulation.RegisterTickObserver(new PresentationExtractor(snapshots, intelligence, new(1), terrain.WorldBounds));
+        simulation.RegisterTickObserver(new PresentationExtractor(snapshots, intelligence, new(1), terrain.WorldBounds, runtimeAssets));
         var definition = DirectorateContent.CreateUnitCatalog()[UnitIds.CargoTruck];
         Vector3 start = Ground(new(545,0,520));
         start.Y += definition.Movement.HeightOffset;

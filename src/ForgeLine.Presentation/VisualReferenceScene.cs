@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Security.Cryptography;
 using System.Text.Json;
+using ForgeLine.Assets;
 using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
@@ -22,14 +23,14 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
     public const int FixedTick = 32;
     public const int FixtureVersion = 3;
 
-    public static VisualReferenceScene Create(VisualReferenceSceneKind kind, TerrainWorld terrain, bool includeHiddenEnemy = true)
+    public static VisualReferenceScene Create(VisualReferenceSceneKind kind, TerrainWorld terrain, bool includeHiddenEnemy = true, RuntimeAssetCatalog? runtimeAssets = null)
     {
         if (!Enum.IsDefined(kind)) throw new ArgumentOutOfRangeException(nameof(kind));
         ArgumentNullException.ThrowIfNull(terrain);
         if (kind is VisualReferenceSceneKind.EnvironmentKitYard or VisualReferenceSceneKind.EnvironmentKitBridge or VisualReferenceSceneKind.EnvironmentKitRepeated)
             return CreateKitReview(kind);
         if (kind is VisualReferenceSceneKind.LogisticsLoadingProduction or VisualReferenceSceneKind.LogisticsTransitProduction or VisualReferenceSceneKind.LogisticsUnloadingProduction or VisualReferenceSceneKind.LogisticsSustainedProduction)
-            return LogisticsTrafficReferenceScene.Create(kind, terrain);
+            return LogisticsTrafficReferenceScene.Create(kind, terrain, runtimeAssets);
         BuildingId industrialBuilding = kind switch
         {
             VisualReferenceSceneKind.ExtractorProduction => BuildingIds.Extractor,

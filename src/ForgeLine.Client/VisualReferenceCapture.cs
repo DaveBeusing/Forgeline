@@ -81,7 +81,7 @@ internal static class VisualReferenceCapture
             string runtimeFingerprint = RuntimeFingerprint(request.RuntimeRoot);
             var catalog = RuntimeAssetCatalog.Load(request.RuntimeRoot);
             var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
-            var fixtures = request.Scenes.Select(x => VisualReferenceScene.Create(x, terrain)).ToArray();
+            var fixtures = request.Scenes.Select(x => VisualReferenceScene.Create(x, terrain, runtimeAssets: catalog)).ToArray();
             using var platform = new WindowsPlatform();
             using IWindow window = platform.CreateWindow(new("FORGELINE Reference Capture", 1280, 720));
             using var graphics = GraphicsDeviceFactory.CreateForWindow(window, new()
