@@ -27,6 +27,7 @@ internal sealed record VisualReferenceCaptureRequest
     public bool ContinueAfterMismatch { get; init; }
     public uint RasterDpi { get; init; }
     public float YawDegrees { get; init; } = 45;
+    public float? DistanceMeters { get; init; }
     public VisualReferenceSceneKind[] Scenes { get; init; } =
     [
         VisualReferenceSceneKind.DaylightTerrain, VisualReferenceSceneKind.IndustrialBase,
@@ -44,6 +45,7 @@ internal sealed record VisualReferenceCaptureRequest
         if (Warmups is < 3 or > 4096 || Samples is < 8 or > 8192) throw new ArgumentOutOfRangeException(nameof(Samples));
         if (RepeatCaptures is < 2 or > 128) throw new ArgumentOutOfRangeException(nameof(RepeatCaptures));
         if (RasterDpi is not (0 or 96 or 120 or 144 or 192)) throw new ArgumentOutOfRangeException(nameof(RasterDpi));
+        if (DistanceMeters is float distance && (!float.IsFinite(distance) || distance is < 20 or > 1200)) throw new ArgumentOutOfRangeException(nameof(DistanceMeters));
         if (!float.IsFinite(YawDegrees) || YawDegrees is < 0 or > 360) throw new ArgumentOutOfRangeException(nameof(YawDegrees));
         if (Scenes is null || Profiles is null || Displays is null || Zooms is null ||
             Scenes.Length is < 1 or > 14 || Profiles.Length is < 1 or > 3 || Displays.Length is < 1 or > 4 || Zooms.Length is < 1 or > 3 ||
@@ -119,9 +121,11 @@ internal static class VisualReferenceCapture
                     string key = $"{fixture.Kind}-{display.Width}x{display.Height}-{quality}-{zoom}";
                     if (request.RasterDpi != 0) key += $"-Dpi{request.RasterDpi}";
                     if (request.YawDegrees != 45) key += $"-Yaw{request.YawDegrees.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+                    if (request.DistanceMeters is float detailDistance) key += $"-Distance{detailDistance.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
                     Console.WriteLine($"[reference:capture] {key}");
                     var camera = new RtsCamera(RtsVisualReference.CreateCameraSettings(fixture.Target, zoom) with
-                        { InitialYawRadians = request.YawDegrees == 45 ? RtsVisualReference.YawRadians : request.YawDegrees * MathF.PI / 180 });
+                        { InitialYawRadians = request.YawDegrees == 45 ? RtsVisualReference.YawRadians : request.YawDegrees * MathF.PI / 180,
+                          InitialDistance = request.DistanceMeters ?? RtsVisualReference.GetDistance(zoom) });
                     double captureVisualSeconds = fixture.Snapshot.Tick.Value * fixture.Snapshot.TickDuration.TotalSeconds;
                     var buffer = new PresentationSnapshotBuffer(); buffer.Publish(fixture.Snapshot);
                     var world = new RenderWorld(); world.Update(buffer);
