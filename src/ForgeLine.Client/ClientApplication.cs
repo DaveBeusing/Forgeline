@@ -470,7 +470,7 @@ internal sealed class ClientApplication
                 _settings.CreateSceneLightingSettings(),
                 _startup, asynchronousStartup: true, expectedSession: simulationHost.SessionId,
                 transitionHost: sessionTransitionRenderer, simulationTelemetry: simulationHost.CaptureTelemetry,
-                sceneAtmosphere: _settings.SceneAtmosphere, particles: _settings.Particles, renderQuality: _settings.RenderQuality);
+                sceneAtmosphere: _settings.SceneAtmosphere, particles: _settings.Particles, renderQuality: _settings.CreateRenderQualitySettings());
         bool playable = ClientSessionLoadingLoop.WaitForPresentation(
             pumpEvents: () =>
             {
@@ -3004,17 +3004,10 @@ internal sealed class ClientApplication
             new LoadGameModel(startupSaves);
         var settingsInteraction =
             new SettingsInteractionModel();
-        var settings =
-            new SettingsModel(
-                new FrontendSettingsSnapshot(
-                    _settings.WindowWidth,
-                    _settings.WindowHeight,
-                    _settings.BorderlessFullscreen,
-                    _settings.UiScale,
-                    _settings.ShowOnboarding,
-                    _settings.EdgeScrollEnabled,
-                    _settings.CameraPanSpeedMultiplier,
-                    _settings.CameraBindings, _settings.GameplayBindings));
+        var settings = new SettingsModel(ClientSettingsFrontendAdapter.ToSnapshot(_settings));
+        using var displayPreview = new ClientDisplayPreview(window);
+        string? displayFeedback = null;
+        void RestoreDisplay() => settings.SetDisplay(_settings.WindowWidth, _settings.WindowHeight, _settings.BorderlessFullscreen, _settings.UiScale);
         var mainMenu =
             new MainMenuModel(
                 loadGame.CanContinue);
@@ -3075,6 +3068,20 @@ internal sealed class ClientApplication
                 !primaryPointerHeld;
             primaryPointerHeld =
                 primaryPointerDown;
+            if (displayPreview.Expire())
+            {
+                RestoreDisplay();
+                displayFeedback = null;
+            }
+            if (displayPreview.Active && escape)
+            {
+                displayPreview.Cancel();
+                RestoreDisplay();
+                displayFeedback = null;
+                escape = false;
+            }
+            if (displayPreview.Active)
+                displayFeedback = GraphicsSettingsText.Get("DisplayPreview") + $" / {displayPreview.RemainingSeconds}s";
             if (shell.Screen != transitionScreen)
             {
                 transitionScreen = shell.Screen;
@@ -3276,56 +3283,59 @@ internal sealed class ClientApplication
                         settingsInteraction.VisibleRowCount) is int settingsRow &&
                     settingsRow + settingsInteraction.VisibleStart > 0)
                 {
+                    if (!displayPreview.Active)
+                {
                     if (primaryPointerPressed) settingsInteraction.FocusVisible(settingsRow);
 
-                    if (primaryPointerPressed &&
-                        FrontendHitTesting.DetailAdjust(
-                            input.PointerPosition.X,
-                            input.PointerPosition.Y,
-                            frontendLayout,
-                            settingsInteraction.VisibleRowCount) is int settingsDirection)
+                        if (primaryPointerPressed &&
+                            FrontendHitTesting.DetailAdjust(
+                                input.PointerPosition.X,
+                                input.PointerPosition.Y,
+                                frontendLayout,
+                                settingsInteraction.VisibleRowCount) is int settingsDirection)
+                        {
+                            settingsInteraction.Adjust(
+                                settings,
+                                settingsDirection);
+                        }
+                    }
+                    if (ConsumeKeyPress(
+                            input,
+                            PlatformKey.Up,
+                            ref upHeld))
+                    {
+                        settingsInteraction.MovePrevious();
+                    }
+
+                    if (ConsumeKeyPress(
+                            input,
+                            PlatformKey.Down,
+                            ref downHeld))
+                    {
+                        settingsInteraction.MoveNext();
+                    }
+
+                    if (ConsumeKeyPress(
+                            input,
+                            PlatformKey.Left,
+                            ref leftHeld))
                     {
                         settingsInteraction.Adjust(
                             settings,
-                            settingsDirection);
+                            -1);
                     }
-                }
-                if (ConsumeKeyPress(
-                        input,
-                        PlatformKey.Up,
-                        ref upHeld))
-                {
-                    settingsInteraction.MovePrevious();
-                }
 
-                if (ConsumeKeyPress(
-                        input,
-                        PlatformKey.Down,
-                        ref downHeld))
-                {
-                    settingsInteraction.MoveNext();
-                }
+                    if (ConsumeKeyPress(
+                            input,
+                            PlatformKey.Right,
+                            ref rightHeld))
+                    {
+                        settingsInteraction.Adjust(
+                            settings,
+                            1);
+                    }
 
-                if (ConsumeKeyPress(
-                        input,
-                        PlatformKey.Left,
-                        ref leftHeld))
-                {
-                    settingsInteraction.Adjust(
-                        settings,
-                        -1);
                 }
-
-                if (ConsumeKeyPress(
-                        input,
-                        PlatformKey.Right,
-                        ref rightHeld))
-                {
-                    settingsInteraction.Adjust(
-                        settings,
-                        1);
-                }
-
                 bool applyClicked =
                     primaryPointerPressed &&
                     input.HasPointerPosition &&
@@ -3347,18 +3357,30 @@ internal sealed class ClientApplication
                         new ClientSettingsFrontendAdapter(
                             new ClientSettingsStore(
                                 settingsRoot));
-                    ClientUserSettings applied =
-                        adapter.Apply(settings);
-                    shell.Dispatch(
-                        SettingsModel.Back());
-
-                    if (applied.GameplayBindings != _settings.GameplayBindings ||
-                        applied.WindowWidth != _settings.WindowWidth ||
-                        applied.WindowHeight != _settings.WindowHeight ||
-                        applied.BorderlessFullscreen !=
-                            _settings.BorderlessFullscreen)
+                    try
                     {
-                        return FrontendSessionSelectionResult.Restart();
+                        ClientUserSettings candidate = adapter.CreateCandidate(settings);
+                        bool displayChanged = candidate.WindowWidth != _settings.WindowWidth || candidate.WindowHeight != _settings.WindowHeight ||
+                            candidate.BorderlessFullscreen != _settings.BorderlessFullscreen;
+                        if (displayChanged && !displayPreview.Active)
+                        {
+                            displayPreview.Begin(_settings.CreateWindowConfiguration(), candidate.CreateWindowConfiguration());
+                            displayFeedback = GraphicsSettingsText.Get("DisplayPreview") + " / 15s";
+                        }
+                        else if (!displayPreview.Active || (!window.IsMinimized && renderer.IsSurfacePresented(window.ClientSize.Width, window.ClientSize.Height)))
+                        {
+                            ClientUserSettings applied = adapter.Apply(settings);
+                            displayPreview.Keep();
+                            shell.Dispatch(SettingsModel.Back());
+                            if (applied != _settings) return FrontendSessionSelectionResult.Restart();
+                        }
+                    }
+                    catch (Exception error) when (error is IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException or NotSupportedException)
+                    {
+                        displayPreview.Cancel();
+                        RestoreDisplay();
+                        displayFeedback = GraphicsSettingsText.Get("ApplyFailure");
+                        Console.Error.WriteLine($"[settings:apply-failed] {error.Message}");
                     }
                 }
             }
@@ -3376,6 +3398,12 @@ internal sealed class ClientApplication
                         frontendLayout)))) &&
                 shell.Screen != GameFrontendScreen.MainMenu)
             {
+                if (displayPreview.Active)
+                {
+                    displayPreview.Cancel();
+                    RestoreDisplay();
+                    displayFeedback = null;
+                }
                 shell.Dispatch(
                     GameFrontendAction.Back);
             }
@@ -3389,7 +3417,7 @@ internal sealed class ClientApplication
                     settings,
                     settingsInteraction,
                     _settings.CameraBindings,
-                    _settings.EdgeScrollEnabled, gameplay: _gameplayBindings);
+                    _settings.EdgeScrollEnabled, gameplay: _gameplayBindings, settingsFeedback: displayFeedback, displayPreviewActive: displayPreview.Active);
             if (input.HasPointerPosition &&
                 shell.Screen != GameFrontendScreen.MainMenu)
             {
@@ -3426,6 +3454,7 @@ internal sealed class ClientApplication
                         false);
             }
 
+            renderer.UpdateSurface(window.ClientSize.Width, window.ClientSize.Height, window.IsMinimized || window.ClientSize.IsEmpty);
             renderer.Publish(surface);
             renderer.ThrowIfFaulted();
             _platform.WaitForEvents(
@@ -3458,7 +3487,7 @@ internal sealed class ClientApplication
         SettingsModel settings,
         SettingsInteractionModel settingsInteraction,
         RtsCameraBindings cameraBindings,
-        bool edgeScrollEnabled, GameplayBindingRegistry? gameplay = null) =>
+        bool edgeScrollEnabled, GameplayBindingRegistry? gameplay = null, string? settingsFeedback = null, bool displayPreviewActive = false) =>
         screen switch
         {
             GameFrontendScreen.MainMenu =>
@@ -3473,7 +3502,7 @@ internal sealed class ClientApplication
             GameFrontendScreen.Settings =>
                 FrontendPresentationAdapter.Settings(
                     settings,
-                    settingsInteraction),
+                    settingsInteraction, settingsFeedback, displayPreviewActive),
             GameFrontendScreen.Controls =>
                 FrontendPresentationAdapter.Controls(
                     cameraBindings, edgeScrollEnabled: edgeScrollEnabled, gameplay: gameplay),

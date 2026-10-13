@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>2.0</value></resheader>
+<data name="OutputResolution" xml:space="preserve"><value>DISPLAY</value></data>
+<data name="BorderlessFullscreen" xml:space="preserve"><value>BORDERLESS</value></data>
+<data name="UiScale" xml:space="preserve"><value>UI SCALE</value></data>
+<data name="EdgeScroll" xml:space="preserve"><value>EDGE SCROLL</value></data>
+<data name="CameraSpeed" xml:space="preserve"><value>CAMERA SPEED</value></data>
+<data name="Onboarding" xml:space="preserve"><value>ONBOARDING</value></data>
+<data name="BindingAction" xml:space="preserve"><value>GAMEPLAY ACTION</value></data>
+<data name="BindingKey" xml:space="preserve"><value>GAMEPLAY KEY</value></data>
+<data name="RenderQuality" xml:space="preserve"><value>GRAPHICS QUALITY</value></data>
+<data name="ResolutionScale" xml:space="preserve"><value>WORLD RESOLUTION</value></data>
+<data name="Antialiasing" xml:space="preserve"><value>ANTI-ALIASING</value></data>
+<data name="Shadows" xml:space="preserve"><value>SHADOWS</value></data>
+<data name="Textures" xml:space="preserve"><value>WORLD TEXTURES</value></data>
+<data name="ObjectDetail" xml:space="preserve"><value>OBJECT DETAIL</value></data>
+<data name="SurfaceDetail" xml:space="preserve"><value>SURFACE DETAIL</value></data>
+<data name="VegetationMotion" xml:space="preserve"><value>VEGETATION MOTION</value></data>
+<data name="Atmosphere" xml:space="preserve"><value>ATMOSPHERE</value></data>
+<data name="Particles" xml:space="preserve"><value>PARTICLES</value></data>
+<data name="Profile" xml:space="preserve"><value>PROFILE</value></data>
+<data name="On" xml:space="preserve"><value>ON</value></data>
+<data name="Off" xml:space="preserve"><value>OFF</value></data>
+<data name="Controls" xml:space="preserve"><value>UP/DOWN SELECT   LEFT/RIGHT CHANGE   ENTER APPLY   ESC BACK</value></data>
+<data name="NextMatch" xml:space="preserve"><value>GRAPHICS APPLY TO THE NEXT MATCH</value></data>
+<data name="DisplayPreview" xml:space="preserve"><value>ENTER KEEP DISPLAY   ESC REVERT</value></data>
+<data name="OutputResolutionHelp" xml:space="preserve"><value>WINDOW SIZE; BORDERLESS USES THE MONITOR. DISPLAY CHANGES ARE PREVIEWED.</value></data>
+<data name="ResolutionScaleHelp" xml:space="preserve"><value>WORLD RESOLUTION; HUD AND TACTICAL MARKERS STAY SHARP. NEXT MATCH.</value></data>
+<data name="AntialiasingHelp" xml:space="preserve"><value>SPATIAL EDGE SMOOTHING; NO TEMPORAL HISTORY. NEXT MATCH.</value></data>
+<data name="ShadowsHelp" xml:space="preserve"><value>BOUNDED DIRECTIONAL SHADOW DETAIL. NEXT MATCH.</value></data>
+<data name="TexturesHelp" xml:space="preserve"><value>WORLD TEXTURE MIP DETAIL; UI TEXTURES KEEP FULL DETAIL. NEXT MATCH.</value></data>
+<data name="ObjectDetailHelp" xml:space="preserve"><value>MODEL DETAIL RETENTION AT A DISTANCE. NEXT MATCH.</value></data>
+<data name="SurfaceDetailHelp" xml:space="preserve"><value>FINE TERRAIN COLOR AND NORMAL DETAIL. NEXT MATCH.</value></data>
+<data name="VegetationMotionHelp" xml:space="preserve"><value>WIND MOTION; VEGETATION AND GAMEPLAY BOUNDS ARE PRESERVED. NEXT MATCH.</value></data>
+<data name="AtmosphereHelp" xml:space="preserve"><value>DISTANCE OR HEIGHT FOG. NEXT MATCH.</value></data>
+<data name="ParticlesHelp" xml:space="preserve"><value>BOUNDED SMOKE, DUST AND SPARK POPULATION. NEXT MATCH.</value></data>
+<data name="RenderQualityHelp" xml:space="preserve"><value>SELECTING A PRESET RESETS FEATURE OVERRIDES. NEXT MATCH.</value></data>
+<data name="KeepDisplay" xml:space="preserve"><value>KEEP DISPLAY</value></data>
+<data name="ApplyFailure" xml:space="preserve"><value>SETTINGS COULD NOT BE APPLIED; PREVIOUS DISPLAY RESTORED</value></data>
+</root>

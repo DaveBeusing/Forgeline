@@ -19,6 +19,8 @@ public interface IWindow : IDisposable
     void RequestClose();
 
     void SetMode(WindowMode mode);
+    void ConfigureDisplay(WindowConfiguration configuration) =>
+        throw new NotSupportedException("Display preview is unsupported by this window.");
 
     bool TryDequeueEvent(out WindowEvent windowEvent);
 

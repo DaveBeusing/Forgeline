@@ -6,7 +6,7 @@ param(
     [switch]$Capture,
     [switch]$Software,
     [string[]]$Scenes = @('DaylightTerrain','IndustrialBase','FormationConvoy','LogisticsCorridor','DamageDestruction','BattlefieldCombat'),
-    [string[]]$Profiles = @('Low','Medium','High'),
+    [string[]]$Profiles = @('Low','Medium','High','Ultra'),
     [string[]]$Zooms = @('CloseTactical','NormalGameplay','Strategic'),
     [ValidateSet('640x360','1920x1080','2560x1440','3840x2160','3440x1440')][string[]]$Displays = @('1920x1080','2560x1440','3840x2160','3440x1440'),
     [ValidateRange(3,4096)][int]$Warmups = 32,
@@ -18,6 +18,12 @@ param(
     [ValidateRange(0,120)][float]$InspectionDistanceMeters = 0,
     [ValidateSet('Warm','RendererCold')][string]$RunProfile = 'Warm',
     [ValidateSet('Fixed','Sweep')][string]$CameraPath = 'Fixed',
+    [ValidateRange(.5,1)][float]$ResolutionScale = 1,
+    [ValidateSet('','Full','Half','Quarter')][string]$TextureQuality = '',
+    [ValidateSet('','Disabled','Low','High')][string]$Antialiasing = '',
+    [ValidateSet('','Disabled','Low','Medium','High')][string]$ShadowQuality = '',
+    [ValidateSet('','Disabled','Distance','Height')][string]$AtmosphereQuality = '',
+    [ValidateSet('','Disabled','Low','Medium','High')][string]$ParticleQuality = '',
     [string]$RuntimeAssetRoot,
     [string]$ClientPath,
     [string]$BaselineRoot
@@ -34,7 +40,13 @@ if ($Capture) {
     if ((& git -C $repositoryRoot status --porcelain)) { throw 'Commit capture changes and rebuild before exporting acceptance evidence.' }
     if (Test-Path -LiteralPath $referenceRoot) { throw 'Use a new evidence directory; existing references are never overwritten.' }
     $drivers = @(Get-CimInstance Win32_VideoController | ForEach-Object { "$($_.Name): $($_.DriverVersion)" }) -join '; '
+    $graphicsSettings = @{ resolutionScale = $ResolutionScale }
+    foreach ($choice in @(@('textures',$TextureQuality),@('antialiasing',$Antialiasing),@('shadows',$ShadowQuality),
+        @('atmosphere',$AtmosphereQuality),@('particles',$ParticleQuality))) {
+        if ($choice[1]) { $graphicsSettings[$choice[0]] = $choice[1] }
+    }
     $request = @{
+        graphicsSettings = $graphicsSettings
         outputRoot = $referenceRoot; commit = $commit
         runtimeRoot = $(if ($RuntimeAssetRoot) { [IO.Path]::GetFullPath($RuntimeAssetRoot) } else { Join-Path $repositoryRoot 'assets/runtime' })
         runProfile = $RunProfile; cameraPath = $CameraPath

@@ -70,11 +70,12 @@ public sealed class FrontendInteractionTests
         var interaction =
             new SettingsInteractionModel();
 
+        interaction.Focus(FrontendSettingsField.OutputResolution);
         interaction.MovePrevious();
 
         Assert.Equal(
-            FrontendSettingsField.RenderQuality,
+            FrontendSettingsField.Particles,
             interaction.FocusedField);
-        Assert.Equal(FrontendSettingsField.BorderlessFullscreen, interaction.MoveNext());
+        Assert.Equal(FrontendSettingsField.OutputResolution, interaction.MoveNext());
     }
 }

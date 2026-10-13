@@ -138,13 +138,17 @@ internal static class FrontendPresentationAdapter
 
     internal static FrontendSurfaceView Settings(
         SettingsModel model,
-        SettingsInteractionModel? interaction = null)
+        SettingsInteractionModel? interaction = null, string? displayFeedback = null, bool displayPreviewActive = false)
     {
         ArgumentNullException.ThrowIfNull(model);
         FrontendSettingsSnapshot settings =
             model.Settings;
 
         FrontendSettingsField? focused = interaction?.FocusedField;
+        var graphics = model.GraphicsSettings;
+        var effective = graphics.Resolve(true, false, settings.WindowWidth, settings.WindowHeight, 3);
+        string Choice<T>(T? requested, T active) where T : struct => requested?.ToString()?.ToUpperInvariant() ?? GraphicsSettingsText.Get("Profile") + " / " + active.ToString()?.ToUpperInvariant();
+        string Toggle(bool? requested, bool active) => requested.HasValue ? GraphicsSettingsText.Get(requested.Value ? "On" : "Off") : GraphicsSettingsText.Get("Profile") + " / " + GraphicsSettingsText.Get(active ? "On" : "Off");
         GameplayAction action = interaction?.BindingAction ?? GameplayAction.Build;
         var registry = model.Bindings;
 
@@ -153,16 +157,17 @@ internal static class FrontendPresentationAdapter
             new FrontendDetailLineView[]
             {
                 new FrontendDetailLineView(
-                    "DISPLAY",
-                    $"{settings.WindowWidth} X {settings.WindowHeight}"),
+                    GraphicsSettingsText.Get("OutputResolution"),
+                    $"{settings.WindowWidth} X {settings.WindowHeight}",
+                    IsFocused: focused == FrontendSettingsField.OutputResolution, CanDecrease: true, CanIncrease: true),
                 new FrontendDetailLineView(
-                    "BORDERLESS",
+                    GraphicsSettingsText.Get("BorderlessFullscreen"),
                     settings.BorderlessFullscreen ? "ON" : "OFF",
                     IsFocused: focused == FrontendSettingsField.BorderlessFullscreen,
                     CanDecrease: true,
                     CanIncrease: true),
                 new FrontendDetailLineView(
-                    "UI SCALE",
+                    GraphicsSettingsText.Get("UiScale"),
                     settings.UiScale.ToString(
                         "0.00",
                         System.Globalization.CultureInfo.InvariantCulture),
@@ -170,35 +175,45 @@ internal static class FrontendPresentationAdapter
                     CanDecrease: settings.UiScale > FrontendDesign.MinimumScale,
                     CanIncrease: settings.UiScale < FrontendDesign.MaximumScale),
                 new FrontendDetailLineView(
-                    "EDGE SCROLL",
+                    GraphicsSettingsText.Get("EdgeScroll"),
                     settings.EdgeScrollEnabled ? "ON" : "OFF",
                     IsFocused: focused == FrontendSettingsField.EdgeScroll,
                     CanDecrease: true,
                     CanIncrease: true),
                 new FrontendDetailLineView(
-                    "CAMERA SPEED",
+                    GraphicsSettingsText.Get("CameraSpeed"),
                     settings.CameraPanSpeedMultiplier.ToString(
                         "0.00",
                         System.Globalization.CultureInfo.InvariantCulture),
                     IsFocused: focused == FrontendSettingsField.CameraSpeed,
-                    CanDecrease: settings.CameraPanSpeedMultiplier > 0.25f,
-                    CanIncrease: settings.CameraPanSpeedMultiplier < 3.0f),
+                    CanDecrease: settings.CameraPanSpeedMultiplier > .5f,
+                    CanIncrease: settings.CameraPanSpeedMultiplier < 2.5f),
                 new FrontendDetailLineView(
-                    "ONBOARDING",
+                    GraphicsSettingsText.Get("Onboarding"),
                     settings.ShowOnboarding ? "ON" : "OFF",
                     IsFocused: focused == FrontendSettingsField.Onboarding,
                     CanDecrease: true,
                     CanIncrease: true)
-                , new FrontendDetailLineView("GAMEPLAY ACTION", GameplayBindingRegistry.Definitions[(int)action].Label,
+                , new FrontendDetailLineView(GraphicsSettingsText.Get("BindingAction"), GameplayBindingRegistry.Definitions[(int)action].Label,
                     IsFocused: focused == FrontendSettingsField.BindingAction, CanDecrease: true, CanIncrease: true),
-                new FrontendDetailLineView("GAMEPLAY KEY", interaction?.BindingCandidate is { } candidate ?
+                new FrontendDetailLineView(GraphicsSettingsText.Get("BindingKey"), interaction?.BindingCandidate is { } candidate ?
                     GameplayBindingRegistry.KeyLabel(candidate) : registry.Prompt(action),
                     IsFocused: focused == FrontendSettingsField.BindingKey, CanDecrease: true, CanIncrease: true),
-                new FrontendDetailLineView("GRAPHICS QUALITY", settings.RenderQuality.ToString().ToUpperInvariant(),
-                    IsFocused: focused == FrontendSettingsField.RenderQuality, CanDecrease: true, CanIncrease: true)
+                new FrontendDetailLineView(GraphicsSettingsText.Get("RenderQuality"), settings.RenderQuality.ToString().ToUpperInvariant(),
+                    IsFocused: focused == FrontendSettingsField.RenderQuality, CanDecrease: true, CanIncrease: true),
+                new(GraphicsSettingsText.Get("ResolutionScale"), graphics.ResolutionScale.HasValue ? $"{graphics.ResolutionScale.Value * 100:0}%" : GraphicsSettingsText.Get("Profile") + " / 100%", IsFocused: focused == FrontendSettingsField.ResolutionScale, CanDecrease: true, CanIncrease: true),
+                new(GraphicsSettingsText.Get("Antialiasing"), Choice(graphics.Antialiasing, effective.PostProcessing.Antialiasing), IsFocused: focused == FrontendSettingsField.Antialiasing, CanDecrease: true, CanIncrease: true),
+                new(GraphicsSettingsText.Get("Shadows"), Choice(graphics.Shadows, effective.Shadows.Quality), IsFocused: focused == FrontendSettingsField.Shadows, CanDecrease: true, CanIncrease: true),
+                new(GraphicsSettingsText.Get("Textures"), Choice(graphics.Textures, effective.Textures), IsFocused: focused == FrontendSettingsField.Textures, CanDecrease: true, CanIncrease: true),
+                new(GraphicsSettingsText.Get("ObjectDetail"), Choice(graphics.ObjectDetail, graphics.Quality), IsFocused: focused == FrontendSettingsField.ObjectDetail, CanDecrease: true, CanIncrease: true),
+                new(GraphicsSettingsText.Get("SurfaceDetail"), Toggle(graphics.SurfaceDetail, effective.TerrainDetail.Enabled), IsFocused: focused == FrontendSettingsField.SurfaceDetail, CanDecrease: true, CanIncrease: true),
+                new(GraphicsSettingsText.Get("VegetationMotion"), Toggle(graphics.VegetationMotion, effective.VegetationMotion), IsFocused: focused == FrontendSettingsField.VegetationMotion, CanDecrease: true, CanIncrease: true),
+                new(GraphicsSettingsText.Get("Atmosphere"), Choice(graphics.Atmosphere, effective.Atmosphere), IsFocused: focused == FrontendSettingsField.Atmosphere, CanDecrease: true, CanIncrease: true),
+                new(GraphicsSettingsText.Get("Particles"), Choice(graphics.Particles, effective.Particles.Quality), IsFocused: focused == FrontendSettingsField.Particles, CanDecrease: true, CanIncrease: true)
             }.Skip(interaction?.VisibleStart ?? 0).Take(7).ToArray(),
-            string.IsNullOrEmpty(interaction?.BindingFeedback) ? "UP/DOWN  SELECT     LEFT/RIGHT  CHANGE     ENTER  APPLY     ESC  BACK" : interaction.BindingFeedback,
-            interaction?.CanApply == false ? string.Empty : "APPLY");
+            displayFeedback ?? (string.IsNullOrEmpty(interaction?.BindingFeedback) ?
+                focused is { } field && (field == FrontendSettingsField.OutputResolution || field >= FrontendSettingsField.RenderQuality) ? GraphicsSettingsText.Get(field + "Help") : GraphicsSettingsText.Get("Controls") : interaction.BindingFeedback),
+            interaction?.CanApply == false ? string.Empty : displayPreviewActive ? GraphicsSettingsText.Get("KeepDisplay") : "APPLY");
     }
 
     internal static FrontendSurfaceView Controls(

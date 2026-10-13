@@ -6,8 +6,10 @@ param(
     [ValidateSet('Representative','Vehicles1000')][string]$Preset = 'Representative',
     [ValidateRange(3,4096)][int]$Warmups = 64,
     [ValidateRange(8,8192)][int]$Samples = 512,
-    [ValidateSet('Low','Medium','High')][string[]]$Profiles = @('Medium'),
+    [ValidateSet('Low','Medium','High','Ultra')][string[]]$Profiles = @('Medium'),
     [ValidateSet('640x360','1920x1080','2560x1440','3840x2160','3440x1440')][string[]]$Displays = @('1920x1080'),
+    [ValidateRange(.5,1)][float]$ResolutionScale = 1,
+    [ValidateSet('','Full','Half','Quarter')][string]$TextureQuality = '',
     [switch]$Software,
     [string]$ClientPath,
     [string]$RuntimeAssetRoot
@@ -19,7 +21,7 @@ $root = [IO.Path]::GetFullPath($OutputRoot, $repositoryRoot)
 if (Test-Path -LiteralPath $root) { throw 'Use a fresh paired-run output directory.' }
 $scenes = if ($Preset -eq 'Vehicles1000') { @('CombatSupportRepeated') } else { @('IndustrialBase','BattlefieldCombat') }
 $arguments = @{Capture=$true;Software=$Software;Scenes=$scenes;Profiles=$Profiles;Zooms=@('CloseTactical','Strategic');Displays=$Displays;
-    RunProfile=$RunProfile;CameraPath=$CameraPath;Warmups=$Warmups;Samples=$Samples;RepeatCaptures=2;ClientPath=$ClientPath;RuntimeAssetRoot=$RuntimeAssetRoot}
+    ResolutionScale=$ResolutionScale;TextureQuality=$TextureQuality;RunProfile=$RunProfile;CameraPath=$CameraPath;Warmups=$Warmups;Samples=$Samples;RepeatCaptures=2;ClientPath=$ClientPath;RuntimeAssetRoot=$RuntimeAssetRoot}
 # Independent processes; compilation/builds must have finished before starting this lane.
 & "$PSScriptRoot/Invoke-RtsReferenceQualification.ps1" @arguments -OutputRoot (Join-Path $root 'run-1')
 & "$PSScriptRoot/Invoke-RtsReferenceQualification.ps1" @arguments -OutputRoot (Join-Path $root 'run-2')

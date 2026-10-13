@@ -418,72 +418,35 @@ internal sealed class ClientRenderHost : IDisposable
             using IGraphicsDevice? ownedGraphics = existingDevice is null
                 ? GraphicsDeviceFactory.CreateForWindowTarget(initialTarget) : null;
             IGraphicsDevice graphics = existingDevice ?? ownedGraphics!;
-            var qualitySettings = _renderQuality;
-            string? qualityOverride = Environment.GetEnvironmentVariable("FORGELINE_RENDER_QUALITY");
-            if (!string.IsNullOrEmpty(qualityOverride))
+            var qualitySettings = ClientGraphicsOverrides.Read(_renderQuality with
             {
-                if (!Enum.TryParse(qualityOverride, true, out RenderQuality quality) || !Enum.IsDefined(quality))
-                    throw new ArgumentException("FORGELINE_RENDER_QUALITY must be Low, Medium or High.");
-                qualitySettings = qualitySettings with { Quality = quality };
-            }
+                Atmosphere = _renderQuality.Atmosphere ?? (_sceneAtmosphere.Quality != AtmosphereQuality.Disabled ? _sceneAtmosphere.Quality : null),
+                Particles = _renderQuality.Particles ?? (_particleSettings != ParticleSettings.Default ? _particleSettings.Quality : null)
+            });
             RenderQualityProfile qualityProfile = qualitySettings.Resolve(graphics.SupportsPostProcessing,
                 graphics.Diagnostics.Device.IsSoftwareAdapter, Math.Max(1, initialTarget.Width), Math.Max(1, initialTarget.Height),
-                graphics.Diagnostics.Surface.BufferCount, graphics.AvailableMemoryBudgetBytes);
-            GraphicsAtmosphereSettings atmosphere = _sceneAtmosphere.Graphics with
-            {
-                Quality = _sceneAtmosphere.Quality != AtmosphereQuality.Disabled && qualityProfile.LinearScene ?
-                    _sceneAtmosphere.Quality : qualityProfile.Atmosphere
-            };
-            string? atmosphereProfile = Environment.GetEnvironmentVariable("FORGELINE_ATMOSPHERE_QUALITY");
-            if (!string.IsNullOrEmpty(atmosphereProfile))
-            {
-                if (!Enum.TryParse(atmosphereProfile, true, out AtmosphereQuality quality) || !Enum.IsDefined(quality))
-                    throw new ArgumentException("FORGELINE_ATMOSPHERE_QUALITY must be Disabled, Distance or Height.");
-                atmosphere = atmosphere with { Quality = quality };
-            }
+                graphics.Diagnostics.Surface.BufferCount, graphics.AvailableMemoryBudgetBytes, graphics.SupportsParticleRendering);
+            GraphicsAtmosphereSettings atmosphere = _sceneAtmosphere.Graphics with { Quality = qualityProfile.Atmosphere };
             atmosphere.Validate();
             graphics.ConfigurePostProcessing(GraphicsPostProcessingSettings.Neutral);
             if (!qualityProfile.LinearScene && graphics.Atmosphere.Enabled)
                 graphics.ConfigureAtmosphere(GraphicsAtmosphereSettings.Default);
-            graphics.ConfigureSceneOutput(new GraphicsSceneOutputSettings(
-                qualityProfile.LinearScene || atmosphere.Enabled || Environment.GetEnvironmentVariable("FORGELINE_LINEAR_SCENE_OUTPUT") == "1",
-                _sceneLighting.Exposure, _sceneLighting.ToneMapping == SceneToneMappingMode.AcesFitted));
+            graphics.ConfigureSceneOutput(new GraphicsSceneOutputSettings(qualityProfile.LinearScene,
+                _sceneLighting.Exposure, _sceneLighting.ToneMapping == SceneToneMappingMode.AcesFitted, qualityProfile.ResolutionScale));
             graphics.ConfigureAtmosphere(atmosphere);
-            graphics.ConfigurePostProcessing(qualityProfile.LinearScene ? qualityProfile.PostProcessing : GraphicsPostProcessingSettings.Neutral);
-            string? shadowProfile = Environment.GetEnvironmentVariable("FORGELINE_SHADOW_QUALITY");
-            if (!string.IsNullOrEmpty(shadowProfile) && !Enum.TryParse(shadowProfile, true, out DirectionalShadowQuality _))
-                throw new ArgumentException("FORGELINE_SHADOW_QUALITY must be Disabled, Low, Medium or High.");
-            var shadowSettings = new GraphicsDirectionalShadowSettings(string.IsNullOrEmpty(shadowProfile) ? qualityProfile.Shadows.Quality :
-                Enum.Parse<DirectionalShadowQuality>(shadowProfile, true));
+            graphics.ConfigurePostProcessing(qualityProfile.PostProcessing);
+            var shadowSettings = qualityProfile.Shadows;
             graphics.ConfigureDirectionalShadows(shadowSettings);
             if (existingDevice is not null)
             {
                 graphics.WaitForIdle();
-                graphics.Resize(initialTarget.Suspended ? 0 : initialTarget.Width,
-                    initialTarget.Suspended ? 0 : initialTarget.Height);
+                graphics.Resize(initialTarget.Suspended ? 0 : initialTarget.Width, initialTarget.Suspended ? 0 : initialTarget.Height);
             }
-            using var terrainRenderer =
-                new TerrainRenderer(
-                    graphics,
-                    terrain,
-                    runtimeAssets: _runtimeAssets,
-                    lighting: _sceneLighting, surfaceDetail: qualityProfile.TerrainDetail);
-            using var instanceRenderer =
-                new SimpleInstanceRenderer(
-                    graphics,
-                    _runtimeAssets,
-                    _sceneLighting, lodDiameterScale: qualityProfile.LodDiameterScale);
-            string? particleProfile = Environment.GetEnvironmentVariable("FORGELINE_PARTICLE_QUALITY");
-            var particleSettings = qualityProfile.LinearScene && _particleSettings != ParticleSettings.Default ? _particleSettings : qualityProfile.Particles;
-            if (!string.IsNullOrEmpty(particleProfile))
-            {
-                if (!Enum.TryParse(particleProfile,true,out ParticleQuality quality) || !Enum.IsDefined(quality))
-                    throw new ArgumentException("FORGELINE_PARTICLE_QUALITY must be Disabled, Low, Medium or High.");
-                particleSettings = new(quality);
-            }
-            qualityProfile = qualityProfile with { Shadows = shadowSettings, Atmosphere = atmosphere.Quality,
-                Particles = particleSettings, PostProcessing = graphics.PostProcessing };
-            using var particleRenderer = new ParticleVfxRenderer(graphics,_runtimeAssets,particleSettings,_sceneLighting);
+            using var terrainRenderer = new TerrainRenderer(graphics, terrain, runtimeAssets: _runtimeAssets,
+                lighting: _sceneLighting, surfaceDetail: qualityProfile.TerrainDetail, textureDetail: qualityProfile.Textures);
+            using var instanceRenderer = new SimpleInstanceRenderer(graphics, _runtimeAssets, _sceneLighting,
+                lodDiameterScale: qualityProfile.LodDiameterScale, textureDetail: qualityProfile.Textures, vegetationMotion: qualityProfile.VegetationMotion);
+            using var particleRenderer = new ParticleVfxRenderer(graphics, _runtimeAssets, qualityProfile.Particles, _sceneLighting);
             long lastParticleFrame = Stopwatch.GetTimestamp();
             using var gameplayOverlayRenderer =
                 new DebugDrawRenderer(

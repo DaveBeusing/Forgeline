@@ -23,6 +23,18 @@ function Read-Evidence([string]$Root) {
     return $manifest
 }
 function Same($Left, $Right) { return ($Left | ConvertTo-Json -Depth 20 -Compress) -ceq ($Right | ConvertTo-Json -Depth 20 -Compress) }
+function Effective-Profile($Profile) {
+    $values = @{}
+    foreach ($property in $Profile.PSObject.Properties) {
+        if ($property.Name -ne 'requestedSettings') { $values[$property.Name] = $property.Value }
+    }
+    foreach ($default in @(@('resolutionScale',1),@('textures','Full'),@('vegetationMotion',$true))) {
+        if (-not $values.ContainsKey($default[0])) { $values[$default[0]] = $default[1] }
+    }
+    $ordered = [ordered]@{}
+    foreach ($key in @($values.Keys | Sort-Object)) { $ordered[$key] = $values[$key] }
+    return [pscustomobject]$ordered
+}
 function Confirm-Distribution($Distribution) {
     if ($Distribution.samples -lt 1) { return $false }
     foreach ($name in @('mean','p50','p95','p99')) {
@@ -50,7 +62,7 @@ foreach ($case in $current.captures) {
         elseif (-not (Same $current.environment $baseline.environment) -or $current.driver -ne $baseline.driver -or
             -not (Same $case.graphics.device $previous.graphics.device)) { $reason = 'hardware-environment-changed' }
         elseif ($case.fingerprint -ne $previous.fingerprint -or -not (Same $case.camera $previous.camera) -or
-            -not (Same $case.profile $previous.profile) -or -not (Same $case.lighting $previous.lighting) -or
+            -not (Same (Effective-Profile $case.profile) (Effective-Profile $previous.profile)) -or -not (Same $case.lighting $previous.lighting) -or
             $case.rasterDpi -ne $previous.rasterDpi -or $case.uiScale -ne $previous.uiScale -or
             -not (Same $case.requestedDisplay $previous.requestedDisplay) -or
             $case.run.runProfile -ne $previous.run.runProfile -or $case.run.cameraPath -ne $previous.run.cameraPath -or

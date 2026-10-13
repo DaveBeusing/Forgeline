@@ -1,10 +1,13 @@
 using ForgeLine.Input;
 using ForgeLine.Platform;
+using ForgeLine.Presentation;
+using ForgeLine.Graphics;
 
 namespace ForgeLine.UI;
 
 public enum FrontendSettingsField : byte
 {
+    OutputResolution = 0,
     BorderlessFullscreen = 1,
     UiScale = 2,
     EdgeScroll = 3,
@@ -12,14 +15,16 @@ public enum FrontendSettingsField : byte
     Onboarding = 5,
     BindingAction = 6,
     BindingKey = 7,
-    RenderQuality = 8
+    RenderQuality = 8,
+    ResolutionScale = 9, Antialiasing = 10, Shadows = 11, Textures = 12, ObjectDetail = 13,
+    SurfaceDetail = 14, VegetationMotion = 15, Atmosphere = 16, Particles = 17
 }
 
 public sealed class SettingsInteractionModel
 {
     private static readonly FrontendSettingsField[] s_fields =
         Enum.GetValues<FrontendSettingsField>();
-    private int _index;
+    private int _index = 1;
     private static readonly PlatformKey[] Keys = Enum.GetValues<PlatformKey>();
     public bool CanApply { get; private set; } = true;
     private PlatformKey? _candidate;
@@ -71,8 +76,15 @@ public sealed class SettingsInteractionModel
         FrontendSettingsSnapshot settings =
             model.Settings;
 
+        RenderQualitySettings graphics = model.GraphicsSettings;
         switch (FocusedField)
         {
+            case FrontendSettingsField.OutputResolution:
+                (int Width, int Height)[] sizes = [(1280, 720), (1600, 900), (1920, 1080), (2560, 1440), (3840, 2160)];
+                int sizeIndex = Array.FindIndex(sizes, size => size.Width == settings.WindowWidth && size.Height == settings.WindowHeight);
+                sizeIndex = (sizeIndex + Math.Sign(direction) + sizes.Length) % sizes.Length;
+                model.SetDisplay(sizes[sizeIndex].Width, sizes[sizeIndex].Height, settings.BorderlessFullscreen, settings.UiScale);
+                break;
             case FrontendSettingsField.BorderlessFullscreen:
                 model.SetDisplay(
                     settings.WindowWidth,
@@ -102,8 +114,8 @@ public sealed class SettingsInteractionModel
                     Math.Clamp(
                         settings.CameraPanSpeedMultiplier +
                         Math.Sign(direction) * 0.1f,
-                        0.25f,
-                        3.0f));
+                        .5f,
+                        2.5f));
                 break;
             case FrontendSettingsField.BindingAction:
                 BindingAction = (GameplayAction)(((int)BindingAction + Math.Sign(direction) + GameplayBindingRegistry.Definitions.Count) % GameplayBindingRegistry.Definitions.Count);
@@ -130,8 +142,29 @@ public sealed class SettingsInteractionModel
                 catch (InvalidDataException exception) { CanApply = false; BindingFeedback = exception.Message.ToUpperInvariant(); }
                 break;
             case FrontendSettingsField.RenderQuality:
-                model.SetRenderQuality((FrontendRenderQuality)(((int)settings.RenderQuality + Math.Sign(direction) + 3) % 3));
+                model.SetRenderQuality((FrontendRenderQuality)(((int)settings.RenderQuality + Math.Sign(direction) + 4) % 4));
                 break;
+            case FrontendSettingsField.ResolutionScale:
+                float?[] scales = [null, .5f, .75f, 1f];
+                int scaleIndex = Array.IndexOf(scales, graphics.ResolutionScale);
+                model.SetGraphicsSettings(graphics with { ResolutionScale = scales[(scaleIndex + Math.Sign(direction) + scales.Length) % scales.Length] });
+                break;
+            case FrontendSettingsField.Antialiasing:
+                model.SetGraphicsSettings(graphics with { Antialiasing = Cycle(graphics.Antialiasing, direction) }); break;
+            case FrontendSettingsField.Shadows:
+                model.SetGraphicsSettings(graphics with { Shadows = Cycle(graphics.Shadows, direction) }); break;
+            case FrontendSettingsField.Textures:
+                model.SetGraphicsSettings(graphics with { Textures = Cycle(graphics.Textures, direction) }); break;
+            case FrontendSettingsField.ObjectDetail:
+                model.SetGraphicsSettings(graphics with { ObjectDetail = Cycle(graphics.ObjectDetail, direction) }); break;
+            case FrontendSettingsField.Atmosphere:
+                model.SetGraphicsSettings(graphics with { Atmosphere = Cycle(graphics.Atmosphere, direction) }); break;
+            case FrontendSettingsField.Particles:
+                model.SetGraphicsSettings(graphics with { Particles = Cycle(graphics.Particles, direction) }); break;
+            case FrontendSettingsField.SurfaceDetail:
+                model.SetGraphicsSettings(graphics with { SurfaceDetail = Cycle(graphics.SurfaceDetail, direction) }); break;
+            case FrontendSettingsField.VegetationMotion:
+                model.SetGraphicsSettings(graphics with { VegetationMotion = Cycle(graphics.VegetationMotion, direction) }); break;
             case FrontendSettingsField.Onboarding:
                 model.SetOnboarding(
                     !settings.ShowOnboarding);
@@ -140,6 +173,18 @@ public sealed class SettingsInteractionModel
                 throw new InvalidOperationException(
                     $"Unsupported settings field {FocusedField}.");
         }
+    }
+    private static T? Cycle<T>(T? current, int direction) where T : struct, Enum
+    {
+        T[] values = Enum.GetValues<T>();
+        int index = current.HasValue ? Array.IndexOf(values, current.Value) + 1 : 0;
+        index = (index + Math.Sign(direction) + values.Length + 1) % (values.Length + 1);
+        return index == 0 ? null : values[index - 1];
+    }
+    private static bool? Cycle(bool? current, int direction)
+    {
+        bool?[] values = [null, false, true];
+        return values[(Array.IndexOf(values, current) + Math.Sign(direction) + 3) % 3];
     }
 }
 

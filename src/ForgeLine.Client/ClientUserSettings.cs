@@ -5,12 +5,13 @@ using System.Text.Json.Nodes;
 using ForgeLine.Input;
 using ForgeLine.Platform;
 using ForgeLine.Presentation;
+using ForgeLine.Graphics;
 
 namespace ForgeLine.Client;
 
 internal sealed record ClientUserSettings
 {
-    internal const int CurrentSchemaVersion = 2;
+    internal const int CurrentSchemaVersion = 3;
     private const int MinimumWindowWidth = 1_024;
     private const int MinimumWindowHeight = 720;
     private const int MaximumWindowWidth = 7_680;
@@ -99,6 +100,11 @@ internal sealed record ClientUserSettings
         _ = new GameplayBindingRegistry(GameplayBindings, CameraBindings);
     }
 
+    public RenderQualitySettings CreateRenderQualitySettings() => RenderQuality with
+    {
+        Atmosphere = RenderQuality.Atmosphere ?? (SceneAtmosphere.Quality != AtmosphereQuality.Disabled ? SceneAtmosphere.Quality : null),
+        Particles = RenderQuality.Particles ?? (Particles != ParticleSettings.Default ? Particles.Quality : null)
+    };
     public WindowConfiguration CreateWindowConfiguration() =>
         new(
             "FORGELINE",
@@ -255,6 +261,9 @@ internal sealed class ClientSettingsStore
             string? gameplayProperty = document.Select(x => x.Key).FirstOrDefault(x => string.Equals(x, "gameplayBindings", StringComparison.OrdinalIgnoreCase));
             JsonNode? gameplay = gameplayProperty is null ? null : document[gameplayProperty];
             if (gameplayProperty is not null) document.Remove(gameplayProperty);
+            string? graphicsProperty = document.Select(x => x.Key).FirstOrDefault(x => string.Equals(x, "renderQuality", StringComparison.OrdinalIgnoreCase));
+            JsonNode? graphics = graphicsProperty is null ? null : document[graphicsProperty];
+            if (graphicsProperty is not null) document.Remove(graphicsProperty);
             ClientUserSettings settings =
                 JsonSerializer.Deserialize<ClientUserSettings>(
                     document.ToJsonString(),
@@ -262,9 +271,35 @@ internal sealed class ClientSettingsStore
                 throw new InvalidDataException(
                     "Settings file did not contain a settings object.");
 
-            bool migrated = settings.SchemaVersion == 1;
+            bool migrated = settings.SchemaVersion is 1 or 2;
             if (migrated) settings = settings with { SchemaVersion = ClientUserSettings.CurrentSchemaVersion };
             settings.Validate();
+            string? graphicsRecovery = null;
+            if (graphicsProperty is not null)
+            {
+                try
+                {
+                    RenderQualitySettings parsed = graphics?.Deserialize<RenderQualitySettings>(JsonOptions) ?? throw new InvalidDataException("Graphics settings are missing.");
+                    parsed.Validate();
+                    settings = settings with { RenderQuality = parsed };
+                }
+                catch (Exception exception) when (exception is JsonException or InvalidDataException or ArgumentException)
+                {
+                    graphicsRecovery = $"Graphics settings reset: {exception.Message} Display and input settings were preserved.";
+                    _ = TryQuarantineInvalidSettings();
+                    settings = settings with { SceneAtmosphere = SceneAtmosphereSettings.Default, Particles = ParticleSettings.Default };
+                }
+            }
+            if (migrated && graphicsRecovery is null)
+            {
+                var converted = settings.CreateRenderQualitySettings();
+                settings = settings with
+                {
+                    RenderQuality = converted with { Textures = converted.Textures ?? TextureDetailQuality.Full, VegetationMotion = converted.VegetationMotion ?? true },
+                    SceneAtmosphere = settings.SceneAtmosphere with { Quality = AtmosphereQuality.Disabled },
+                    Particles = ParticleSettings.Default
+                };
+            }
             string? bindingRecovery = null;
             if (gameplayProperty is not null)
             {
@@ -281,14 +316,14 @@ internal sealed class ClientSettingsStore
                 }
             }
             cancellationToken.ThrowIfCancellationRequested();
-            if (migrated || bindingRecovery is not null) Save(settings);
+            if (migrated || bindingRecovery is not null || graphicsRecovery is not null) Save(settings);
 
             return new ClientSettingsLoadResult(
                 settings,
                 _path,
                 CreatedDefaults: false,
-                RecoveredInvalidSettings: bindingRecovery is not null,
-                RecoveryMessage: bindingRecovery);
+                RecoveredInvalidSettings: bindingRecovery is not null || graphicsRecovery is not null,
+                RecoveryMessage: graphicsRecovery is null ? bindingRecovery : bindingRecovery is null ? graphicsRecovery : graphicsRecovery + " " + bindingRecovery);
         }
         catch (Exception exception)
             when (exception is JsonException or

@@ -23,6 +23,8 @@ public sealed class ClientSettingsFrontendAdapterTests
             var interaction = new SettingsInteractionModel();
             interaction.Focus(FrontendSettingsField.RenderQuality);
             interaction.Adjust(model,1);
+            Assert.Equal(FrontendRenderQuality.Ultra,model.Settings.RenderQuality);
+            interaction.Adjust(model,1);
             Assert.Equal(FrontendRenderQuality.Low,model.Settings.RenderQuality);
             Assert.Equal(2,interaction.VisibleStart);
             Assert.Contains(FrontendPresentationAdapter.Settings(model,interaction).DetailLines!,line=>line.Label=="GRAPHICS QUALITY");

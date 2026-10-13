@@ -26,6 +26,13 @@ internal sealed class ClientSettingsFrontendAdapter
     internal ClientUserSettings Apply(
         SettingsModel model)
     {
+        ClientUserSettings settings = CreateCandidate(model);
+        _store.Save(settings);
+        return settings;
+    }
+
+    internal ClientUserSettings CreateCandidate(SettingsModel model)
+    {
         ArgumentNullException.ThrowIfNull(model);
 
         FrontendSettingsSnapshot snapshot =
@@ -39,7 +46,9 @@ internal sealed class ClientSettingsFrontendAdapter
                 BorderlessFullscreen =
                     snapshot.BorderlessFullscreen,
                 UiScale = snapshot.UiScale,
-                RenderQuality = saved.RenderQuality with { Quality = (ForgeLine.Presentation.RenderQuality)snapshot.RenderQuality },
+                RenderQuality = snapshot.GraphicsSettings ?? saved.RenderQuality with { Quality = (ForgeLine.Presentation.RenderQuality)snapshot.RenderQuality },
+                SceneAtmosphere = saved.SceneAtmosphere with { Quality = ForgeLine.Graphics.AtmosphereQuality.Disabled },
+                Particles = ForgeLine.Presentation.ParticleSettings.Default,
                 ShowOnboarding =
                     snapshot.ShowOnboarding,
                 EdgeScrollEnabled =
@@ -52,11 +61,10 @@ internal sealed class ClientSettingsFrontendAdapter
             };
 
         settings.Validate();
-        _store.Save(settings);
         return settings;
     }
 
-    private static FrontendSettingsSnapshot ToSnapshot(
+    internal static FrontendSettingsSnapshot ToSnapshot(
         ClientUserSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
@@ -69,6 +77,6 @@ internal sealed class ClientSettingsFrontendAdapter
             settings.ShowOnboarding,
             settings.EdgeScrollEnabled,
             settings.CameraPanSpeedMultiplier,
-            settings.CameraBindings, settings.GameplayBindings, (FrontendRenderQuality)settings.RenderQuality.Quality);
+            settings.CameraBindings, settings.GameplayBindings, (FrontendRenderQuality)settings.RenderQuality.Quality, settings.CreateRenderQualitySettings());
     }
 }
