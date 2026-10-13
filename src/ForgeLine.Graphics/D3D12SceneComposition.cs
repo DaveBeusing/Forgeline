@@ -176,7 +176,8 @@ internal sealed partial class D3D12GraphicsDevice
     {
         var compiler = new DxcShaderCompiler();
         var vertex = compiler.Compile(SceneCompositeShader.Vertex, GraphicsShaderStage.Vertex, "VSMain", "SceneCompositeVertex.hlsl");
-        var pixel = compiler.Compile((ScaledScene ? "#define UPSAMPLE 1\n" : "#define UPSAMPLE 0\n") +
+        var pixel = compiler.Compile((_atmosphere.Enabled ? _atmosphere.LocalHaze?.ShaderConstants() ?? "" : "") +
+            (ScaledScene ? "#define UPSAMPLE 1\n" : "#define UPSAMPLE 0\n") +
             (_atmosphere.Enabled ? "#define ATMOSPHERE 1\n" : "#define ATMOSPHERE 0\n") +
             SceneCompositeShader.Pixel, GraphicsShaderStage.Pixel, "PSMain", "SceneCompositePixel.hlsl");
         return (D3D12GraphicsPipeline)CreateGraphicsPipeline(new(vertex, pixel)

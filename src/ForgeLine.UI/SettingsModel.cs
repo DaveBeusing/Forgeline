@@ -54,7 +54,12 @@ public sealed class SettingsModel
     public void SetRenderQuality(FrontendRenderQuality quality)
     {
         if (!Enum.IsDefined(quality)) throw new ArgumentOutOfRangeException(nameof(quality));
-        SetGraphicsSettings(new RenderQualitySettings { Quality = (RenderQuality)quality, ColorGrade = GraphicsSettings.ColorGrade });
+        SetGraphicsSettings(new RenderQualitySettings
+        {
+            Quality = (RenderQuality)quality, ColorGrade = GraphicsSettings.ColorGrade,
+            Environment = GraphicsSettings.Environment, Vegetation = GraphicsSettings.Vegetation,
+            TerrainResidency = GraphicsSettings.TerrainResidency
+        });
     }
 
     public void SetCamera(

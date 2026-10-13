@@ -28,8 +28,31 @@ internal static class ClientGraphicsOverrides
                 throw new ArgumentException("FORGELINE_RENDER_SCALE requires a finite value from 0.5 through 1.");
             settings = settings with { ResolutionScale = value };
         }
+        settings = settings with
+        {
+            Environment = saved.Environment with
+            {
+                Daylight = FloatValue("FORGELINE_WORLD_DAYLIGHT") ?? saved.Environment.Daylight,
+                CloudCover = FloatValue("FORGELINE_CLOUD_COVER") ?? saved.Environment.CloudCover,
+                Wetness = FloatValue("FORGELINE_WORLD_WETNESS") ?? saved.Environment.Wetness
+            },
+            Vegetation = saved.Vegetation with
+            {
+                Density = FloatValue("FORGELINE_VEGETATION_DENSITY") ?? saved.Vegetation.Density,
+                MaximumDistanceMeters = FloatValue("FORGELINE_VEGETATION_DISTANCE") ?? saved.Vegetation.MaximumDistanceMeters
+            }
+        };
         settings.Validate();
         return settings;
+
+        float? FloatValue(string name)
+        {
+            string? text = read(name);
+            if (string.IsNullOrEmpty(text)) return null;
+            if (!float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out float value))
+                throw new ArgumentException($"{name} requires an invariant decimal value.");
+            return value;
+        }
 
         T? EnumValue<T>(string name) where T : struct, Enum
         {

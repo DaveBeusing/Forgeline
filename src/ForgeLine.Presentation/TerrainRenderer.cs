@@ -55,7 +55,8 @@ public sealed class TerrainRenderer : IDisposable
         TerrainPresentationProfile? presentationProfile = null,
         RuntimeAssetCatalog? runtimeAssets = null,
         SceneLightingSettings? lighting = null,
-        TerrainSurfaceDetailSettings? surfaceDetail = null, TextureDetailQuality textureDetail = TextureDetailQuality.Full, TerrainResidencySettings? residency = null)
+        TerrainSurfaceDetailSettings? surfaceDetail = null, TextureDetailQuality textureDetail = TextureDetailQuality.Full,
+        TerrainResidencySettings? residency = null, WorldEnvironmentSettings? environment = null)
     {
         ArgumentNullException.ThrowIfNull(graphics);
         ArgumentNullException.ThrowIfNull(world);
@@ -65,6 +66,8 @@ public sealed class TerrainRenderer : IDisposable
         _required = new bool[_chunks.Count];
         _residency = residency ?? TerrainResidencySettings.Eager;
         _residency.Validate();
+        WorldEnvironmentSettings appearance = environment ?? new();
+        appearance.Validate();
 
         _lighting =
             lighting ??
@@ -89,7 +92,7 @@ public sealed class TerrainRenderer : IDisposable
         {
             _pipeline =
                 CreateTerrainPipeline(
-                    graphics, _surfaceDetail);
+                    graphics, _surfaceDetail, appearance);
             if (graphics.DirectionalShadows.Enabled) _shadowPipeline = DirectionalShadowCasterPipeline.Create(graphics, false);
             _runtimeAssets =
                 runtimeAssets is null
@@ -555,7 +558,7 @@ public sealed class TerrainRenderer : IDisposable
     }
 
     private static IGraphicsPipeline CreateTerrainPipeline(
-        IGraphicsDevice graphics, TerrainSurfaceDetailSettings surfaceDetail)
+        IGraphicsDevice graphics, TerrainSurfaceDetailSettings surfaceDetail, WorldEnvironmentSettings environment)
     {
         const string vertexShaderSource = """
             cbuffer TerrainFrame : register(b0)
@@ -951,7 +954,7 @@ public sealed class TerrainRenderer : IDisposable
                 "TerrainVertex.hlsl");
         GraphicsShaderBytecode pixelShader =
             compiler.Compile(
-                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n#define DEBUG_ALPHA -2.0f\n" : "#define LINEAR_SCENE 0\n#define DEBUG_ALPHA 1.0f\n") + (graphics.DirectionalShadows.Enabled ? DirectionalShadowShader.Source : DirectionalShadowShader.Disabled) + TerrainSurfaceShader.Constants(surfaceDetail) + PbrMaterialShader.Lighting + pixelShaderSource,
+                environment.ShaderConstants() + (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n#define DEBUG_ALPHA -2.0f\n" : "#define LINEAR_SCENE 0\n#define DEBUG_ALPHA 1.0f\n") + (graphics.DirectionalShadows.Enabled ? DirectionalShadowShader.Source : DirectionalShadowShader.Disabled) + TerrainSurfaceShader.Constants(surfaceDetail) + PbrMaterialShader.Lighting + pixelShaderSource,
                 GraphicsShaderStage.Pixel,
                 "PSMain",
                 "TerrainPixel.hlsl");

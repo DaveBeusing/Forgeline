@@ -29,6 +29,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
     private readonly SceneLightingSettings _lighting;
     private readonly float _lodDiameterScale;
     private readonly bool _vegetationMotion;
+    private readonly VegetationRenderSettings _vegetation;
     private readonly Dictionary<int, FrameInstanceBuffer> _frameInstanceBuffers = [];
     private readonly Dictionary<int, FrameInstanceBuffer> _shadowFrameInstanceBuffers = [];
     private readonly Dictionary<InstanceBatchKey, InstanceBatch> _batchLookup = [];
@@ -42,7 +43,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
     public SimpleInstanceRenderer(
         IGraphicsDevice graphics,
         RuntimeAssetCatalog? runtimeAssets = null,
-        SceneLightingSettings? lighting = null, float lodDiameterScale = 1, TextureDetailQuality textureDetail = TextureDetailQuality.Full, bool vegetationMotion = true)
+        SceneLightingSettings? lighting = null, float lodDiameterScale = 1, TextureDetailQuality textureDetail = TextureDetailQuality.Full,
+        bool vegetationMotion = true, WorldEnvironmentSettings? environment = null, VegetationRenderSettings? vegetation = null)
     {
         ArgumentNullException.ThrowIfNull(graphics);
 
@@ -54,11 +56,15 @@ public sealed class SimpleInstanceRenderer : IDisposable
             throw new ArgumentOutOfRangeException(nameof(lodDiameterScale));
         _lodDiameterScale = lodDiameterScale;
         _vegetationMotion = vegetationMotion;
+        WorldEnvironmentSettings appearance = environment ?? new();
+        appearance.Validate();
+        _vegetation = vegetation ?? new();
+        _vegetation.Validate();
 
         _graphics = graphics;
         try
         {
-            _pipeline = CreatePipeline(graphics);
+            _pipeline = CreatePipeline(graphics, appearance);
             if (graphics.DirectionalShadows.Enabled) _shadowPipeline = DirectionalShadowCasterPipeline.Create(graphics, true);
             _runtimeAssets =
                 runtimeAssets is null
@@ -70,7 +76,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 _runtimeAssets is null
                     ? null
                     : CreateTexturedPipeline(
-                        graphics);
+                        graphics, appearance);
 
             SimpleVertex[] vertices =
             [
@@ -232,6 +238,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             if (!shadowProjection.HasValue && particles?.Replaces(instance) == true) continue;
 
             if ((instance.Visibility & RenderVisibilityMask.World) == 0 ||
+                !_vegetation.Includes(instance, camera.Position) ||
                 !instance.Mesh.IsValid ||
                 !instance.Material.IsValid)
             {
@@ -885,7 +892,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
     }
 
     private static IGraphicsPipeline CreatePipeline(
-        IGraphicsDevice graphics)
+        IGraphicsDevice graphics, WorldEnvironmentSettings environment)
     {
         const string vertexShaderSource = """
             cbuffer InstanceFrame : register(b0)
@@ -1009,7 +1016,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 "InstanceVertex.hlsl");
         GraphicsShaderBytecode pixelShader =
             compiler.Compile(
-                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n" : "#define LINEAR_SCENE 0\n") + (graphics.DirectionalShadows.Enabled ? DirectionalShadowShader.Source : DirectionalShadowShader.Disabled) + PbrMaterialShader.Lighting + pixelShaderSource,
+                environment.ShaderConstants() + (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n" : "#define LINEAR_SCENE 0\n") + (graphics.DirectionalShadows.Enabled ? DirectionalShadowShader.Source : DirectionalShadowShader.Disabled) + PbrMaterialShader.Lighting + pixelShaderSource,
                 GraphicsShaderStage.Pixel,
                 "PSMain",
                 "InstancePixel.hlsl");
@@ -1083,7 +1090,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
     }
 
     private static IGraphicsPipeline CreateTexturedPipeline(
-        IGraphicsDevice graphics)
+        IGraphicsDevice graphics, WorldEnvironmentSettings environment)
     {
         const string vertexShaderSource = """
             cbuffer InstanceFrame : register(b0)
@@ -1332,7 +1339,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 "InstanceMaterialVertex.hlsl");
         GraphicsShaderBytecode pixelShader =
             compiler.Compile(
-                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n" : "#define LINEAR_SCENE 0\n") + (graphics.DirectionalShadows.Enabled ? DirectionalShadowShader.Source : DirectionalShadowShader.Disabled) + PbrMaterialShader.Lighting + pixelShaderSource,
+                environment.ShaderConstants() + (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n" : "#define LINEAR_SCENE 0\n") + (graphics.DirectionalShadows.Enabled ? DirectionalShadowShader.Source : DirectionalShadowShader.Disabled) + PbrMaterialShader.Lighting + pixelShaderSource,
                 GraphicsShaderStage.Pixel,
                 "PSMain",
                 "InstanceMaterialPixel.hlsl");

@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Text.Json;
 using ForgeLine.Assets;
 using ForgeLine.Game;
+using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
 
@@ -44,6 +45,7 @@ public sealed class TerrainPresentationProfile
 
     private readonly Dictionary<TerrainMaterialSlot, TerrainMaterialDefinition> _materials;
     private readonly TerrainBlendRegion[] _regions;
+    private readonly TerrainBlendRegion[] _surfaceMarks = [];
 
     public TerrainPresentationProfile(
         IEnumerable<TerrainMaterialDefinition> materials,
@@ -90,6 +92,42 @@ public sealed class TerrainPresentationProfile
     }
 
     public TerrainMaterialDefinition FallbackMaterial { get; }
+
+    private TerrainPresentationProfile(IEnumerable<TerrainMaterialDefinition> materials,
+        IEnumerable<TerrainBlendRegion> regions, TerrainBlendRegion[] surfaceMarks) : this(materials, regions) =>
+        _surfaceMarks = surfaceMarks;
+
+    public int SurfaceMarkCount => _surfaceMarks.Length;
+
+    internal uint SurfaceMarkPriority(AxisAlignedBounds bounds)
+    {
+        uint mask = 0;
+        foreach (var region in _surfaceMarks)
+        {
+            if (region.Strength == 0) continue;
+            float cosine = MathF.Abs(MathF.Cos(region.RotationRadians)), sine = MathF.Abs(MathF.Sin(region.RotationRadians));
+            Vector2 extent = new(cosine * region.HalfExtents.X + sine * region.HalfExtents.Y + region.FeatherMeters,
+                sine * region.HalfExtents.X + cosine * region.HalfExtents.Y + region.FeatherMeters);
+            if (region.Center.X + extent.X >= bounds.Minimum.X && region.Center.X - extent.X <= bounds.Maximum.X &&
+                region.Center.Y + extent.Y >= bounds.Minimum.Z && region.Center.Y - extent.Y <= bounds.Maximum.Z)
+                mask |= 1u << (int)region.Slot;
+        }
+        return mask;
+    }
+
+    public TerrainPresentationProfile WithSurfaceMarks(ITerrainSurfaceMarkSource source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ReadOnlySpan<TerrainSurfaceMark> marks = source.Marks.Span;
+        if (_surfaceMarks.Length + marks.Length > TerrainSurfaceMarks.MaximumMarks) throw new ArgumentOutOfRangeException(nameof(source));
+        var regions = new TerrainBlendRegion[_regions.Length + marks.Length];
+        var priority = new TerrainBlendRegion[_surfaceMarks.Length + marks.Length];
+        _regions.CopyTo(regions, 0);
+        _surfaceMarks.CopyTo(priority, 0);
+        for (int index = 0; index < marks.Length; index++)
+            regions[_regions.Length + index] = priority[_surfaceMarks.Length + index] = marks[index].ToBlendRegion();
+        return new(_materials.Values, regions, priority);
+    }
 
     public TerrainMaterialDefinition GetMaterial(
         TerrainMaterialSlot slot) =>

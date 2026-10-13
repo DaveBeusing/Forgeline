@@ -82,13 +82,14 @@ public static class TerrainSplatMapBuilder
             totals,
             peaks);
 
+        uint surfacePriority = profile.SurfaceMarkPriority(chunk.Bounds);
         TerrainMaterialSlot[] palette =
             Enumerable
                 .Range(
                     0,
                     TerrainPresentationProfile.MaterialSlotCount)
                 .OrderByDescending(
-                    index => index >= (int)TerrainMaterialSlot.Gravel && peaks[index] >= .5f)
+                    index => (surfacePriority & (1u << index)) != 0 || index >= (int)TerrainMaterialSlot.Gravel && peaks[index] >= .5f)
                 .ThenByDescending(
                     index =>
                         totals[index])

@@ -10,6 +10,7 @@ public readonly record struct GraphicsAtmosphereSettings(
     AtmosphereQuality Quality, Vector3 Color, float Density, float StartDistance,
     float BaseHeight, float HeightFalloff, float MaximumOpacity, float ZoomCompensation)
 {
+    public GraphicsLocalHazeSettings? LocalHaze { get; init; }
     public bool Enabled => Quality != AtmosphereQuality.Disabled;
     public static GraphicsAtmosphereSettings Default => new(AtmosphereQuality.Disabled,
         new(0.58f, 0.66f, 0.76f), 0.0012f, 100, 0, 0.02f, 0.5f, 0.75f);
@@ -21,6 +22,7 @@ public readonly record struct GraphicsAtmosphereSettings(
         Range(Density, 0, 0.01f, nameof(Density)); Range(StartDistance, 0, 2000, nameof(StartDistance));
         Range(BaseHeight, -1000, 10000, nameof(BaseHeight)); Range(HeightFalloff, 0, 0.1f, nameof(HeightFalloff));
         Range(MaximumOpacity, 0, 0.65f, nameof(MaximumOpacity)); Range(ZoomCompensation, 0, 1, nameof(ZoomCompensation));
+        LocalHaze?.Validate();
     }
 
     private static void Range(float value, float min, float max, string name)
@@ -48,4 +50,6 @@ public readonly record struct GraphicsAtmosphereDiagnostics(AtmosphereQuality Qu
     ulong GpuSubmissionFence, double? CompositionGpuMilliseconds, string? UnavailableReason)
 {
     public long RequiredScenePayloadBytes { get; init; }
+    public GraphicsLocalHazeSettings? LocalHaze { get; init; }
+    public int MaximumLocalDensityEvaluations { get; init; }
 }
