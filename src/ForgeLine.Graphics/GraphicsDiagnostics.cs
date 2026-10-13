@@ -46,6 +46,8 @@ public sealed record GraphicsDiagnostics(
 
     public bool GpuTimingAvailable { get; init; }
 
+    public ulong TimestampFrequencyHz { get; init; }
+
     public double? GpuFrameMilliseconds { get; init; }
 
     public GraphicsDebugDiagnostics Debug { get; init; } =

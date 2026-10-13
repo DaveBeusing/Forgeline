@@ -28,6 +28,8 @@ internal sealed record VisualReferenceCaptureRequest
     public uint RasterDpi { get; init; }
     public float YawDegrees { get; init; } = 45;
     public float InspectionDistanceMeters { get; init; }
+    public ReferenceRunProfile RunProfile { get; init; }
+    public ReferenceCameraPath CameraPath { get; init; }
     public VisualReferenceSceneKind[] Scenes { get; init; } =
     [
         VisualReferenceSceneKind.DaylightTerrain, VisualReferenceSceneKind.IndustrialBase,
@@ -41,6 +43,7 @@ internal sealed record VisualReferenceCaptureRequest
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(OutputRoot);
         ArgumentException.ThrowIfNullOrWhiteSpace(RuntimeRoot);
+        if (!Enum.IsDefined(RunProfile) || !Enum.IsDefined(CameraPath)) throw new ArgumentException("Unsupported performance profile or camera path.");
         if (Commit is null || Commit.Length != 40 || Commit.Any(c => !Uri.IsHexDigit(c))) throw new ArgumentException("Capture requires a complete source commit.");
         if (Warmups is < 3 or > 4096 || Samples is < 8 or > 8192) throw new ArgumentOutOfRangeException(nameof(Samples));
         if (RepeatCaptures is < 2 or > 128) throw new ArgumentOutOfRangeException(nameof(RepeatCaptures));
@@ -71,6 +74,8 @@ internal static class VisualReferenceCapture
         var captures = new List<object>();
         var captureInputs = new List<object>();
         var failedCaptures = new List<string>();
+        long startupStart = Stopwatch.GetTimestamp();
+        long startupAllocationStart = GC.GetAllocatedBytesForCurrentThread();
         try
         {
             request = JsonSerializer.Deserialize<VisualReferenceCaptureRequest>(File.ReadAllText(requestPath), JsonOptions)
@@ -94,6 +99,8 @@ internal static class VisualReferenceCapture
                 AllowSoftwareAdapterFallback = request.Software });
             if (graphics.Diagnostics.Device.IsSoftwareAdapter != request.Software)
                 throw new InvalidOperationException("Capture adapter does not match the requested lane.");
+            double startupMilliseconds = Stopwatch.GetElapsedTime(startupStart).TotalMilliseconds;
+            long startupAllocatedBytes = GC.GetAllocatedBytesForCurrentThread() - startupAllocationStart;
             var lighting = SceneLightingSettings.Default;
             foreach (var display in request.Displays)
             foreach (var quality in request.Profiles)
@@ -113,6 +120,10 @@ internal static class VisualReferenceCapture
                 foreach (var fixture in fixtures)
                 foreach (var zoom in request.Zooms)
                 {
+                    graphics.WaitForIdle();
+                    long setupStart = Stopwatch.GetTimestamp();
+                    long setupAllocationStart = GC.GetAllocatedBytesForCurrentThread();
+                    var beforeSetup = graphics.Diagnostics;
                     using var ground = new TerrainRenderer(graphics, terrain, runtimeAssets: catalog, surfaceDetail: profile.TerrainDetail) { DebugChunksEnabled = false };
                     using var meshes = new SimpleInstanceRenderer(graphics, catalog, lodDiameterScale: profile.LodDiameterScale);
                     using var particles = new ParticleVfxRenderer(graphics, catalog, profile.Particles);
@@ -123,6 +134,8 @@ internal static class VisualReferenceCapture
                     if (request.RasterDpi != 0) key += $"-Dpi{request.RasterDpi}";
                     if (request.YawDegrees != 45) key += $"-Yaw{request.YawDegrees.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
                     if (request.InspectionDistanceMeters != 0) key += $"-Inspection{request.InspectionDistanceMeters.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+                    if (request.RunProfile != ReferenceRunProfile.Warm) key += $"-{request.RunProfile}";
+                    if (request.CameraPath != ReferenceCameraPath.Fixed) key += $"-{request.CameraPath}";
                     Console.WriteLine($"[reference:capture] {key}");
                     var camera = new RtsCamera(RtsVisualReference.CreateCameraSettings(fixture.Target, zoom) with
                         { InitialYawRadians = request.YawDegrees == 45 ? RtsVisualReference.YawRadians : request.YawDegrees * MathF.PI / 180,
@@ -168,24 +181,46 @@ internal static class VisualReferenceCapture
                         hud.Render(context, camera, fixture.Snapshot, terrain.WorldBounds, information, default, default,
                             FormationTemplate.Compact, CombatGroupOverviewView.Empty, default, rasterDpi, 1);
                     };
-                    for (int i = 0; i < request.Warmups; i++) graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
+                    double setupMilliseconds = Stopwatch.GetElapsedTime(setupStart).TotalMilliseconds;
+                    long setupAllocatedBytes = GC.GetAllocatedBytesForCurrentThread() - setupAllocationStart;
+                    int warmupFrames = request.RunProfile == ReferenceRunProfile.RendererCold ? 0 : request.Warmups;
+                    for (int i = 0; i < warmupFrames; i++) graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
+                    graphics.WaitForIdle();
+                    var beforeSamples = graphics.Diagnostics;
+                    var performance = new ReferencePerformanceSamples(request.Samples, beforeSamples.Frame?.GpuSubmissionFence ?? 0);
+                    var initialCamera = camera.CaptureState();
                     var cpu = new double[request.Samples]; var gpu = new List<double>(); ulong lastFence = 0;
+                    lastFence = beforeSamples.Frame?.GpuSubmissionFence ?? 0;
                     for (int i = 0; i < cpu.Length; i++)
                     {
+                        camera.ApplyState(ReferencePerformanceSamples.CameraPose(initialCamera, request.CameraPath, i, request.Samples));
+                        long allocationStart = GC.GetAllocatedBytesForCurrentThread();
                         long start = Stopwatch.GetTimestamp(); graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
                         cpu[i] = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
-                        if (graphics.Diagnostics.Frame is { } frame && frame.GpuSubmissionFence > lastFence)
+                        long allocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocationStart;
+                        var sampleDiagnostics = graphics.Diagnostics;
+                        performance.AddCpu(i, cpu[i], allocatedBytes, sampleDiagnostics,
+                            new { objects = meshes.SubmissionMetrics, terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, particles = particles.Diagnostics });
+                        if (sampleDiagnostics.Frame is { } frame && frame.GpuSubmissionFence > lastFence)
                         {
                             lastFence = frame.GpuSubmissionFence;
-                            if (graphics.Diagnostics.GpuFrameMilliseconds is { } milliseconds) gpu.Add(milliseconds);
+                            if (sampleDiagnostics.GpuFrameMilliseconds is { } milliseconds) gpu.Add(milliseconds);
                         }
                     }
                     graphics.WaitForIdle();
                     var measured = graphics.Diagnostics;
+                    performance.AddGpu(measured);
+                    if (measured.Frame is { } finalFrame && finalFrame.GpuSubmissionFence > lastFence && measured.GpuFrameMilliseconds is { } finalGpu)
+                        gpu.Add(finalGpu);
+                    camera.ApplyState(initialCamera);
+                    // Restore fixed pose and settle history only after the timed window.
+                    if (request.CameraPath != ReferenceCameraPath.Fixed)
+                        for (int i = 0; i < 3; i++) graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
                     if (measured.Surface.Width != display.Width || measured.Surface.Height != display.Height)
                         throw new InvalidOperationException("Actual native surface dimensions differ from the capture request.");
                     if (measured.Resources.TextureBindingFailureCount != 0 || meshes.MaterialDiagnostics.BindingFailureCount != 0 ||
                         meshes.LastDiagnostics.FallbackMeshInstances != 0 || measured.Health.PendingRetirementCount != 0 ||
+                        measured.Health.SubmissionFaultCount != 0 || measured.Health.FailureReasonCode is not null ||
                         (measured.Debug.Enabled && measured.Debug.ErrorCount != 0))
                         throw new InvalidOperationException("Capture contains failed bindings or fallback meshes.");
                     byte[] rgba = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
@@ -244,6 +279,11 @@ internal static class VisualReferenceCapture
                         requestedDisplay = display, actualSurface = measured.Surface, hostWindow = window.ClientSize,
                         rasterDpi, uiScale = 1, requestedQuality = quality, profile, lighting,
                         cpu = Distribution(cpu), gpu = Distribution(gpu.ToArray()), fps = Distribution(cpu.Select(x => 1000 / x).ToArray()),
+                        performance = performance.Report(measured),
+                        run = new { request.RunProfile, request.CameraPath, warmupFrames, setupMilliseconds, setupAllocatedBytes,
+                            resourcesBeforeSetup = beforeSetup.Resources, resourcesBeforeSamples = beforeSamples.Resources,
+                            cameraPathVersion = 1, cameraSamples = request.Samples,
+                            coldScope = "Fresh per-case renderers; process/device/runtime catalog and OS caches can already be warm. No OS/driver cache flush." },
                         terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, materials = meshes.MaterialDiagnostics, particles = particles.Diagnostics,
                         hudVertices = hud.LastRenderedVertexCount, graphics = measured, repeatPixelsEqual, request.RepeatCaptures, repeatFailures,
                         captureInputs = captureInputs.ToArray(),
@@ -263,7 +303,12 @@ internal static class VisualReferenceCapture
             void WriteManifest(string status, string? error) => File.WriteAllText(Path.Combine(request.OutputRoot, "manifest.json"),
                 JsonSerializer.Serialize(new { schemaVersion = 1, status, error, request.Commit, buildIdentity = identity,
                     runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
+                    environment = new { os = System.Runtime.InteropServices.RuntimeInformation.OSDescription,
+                        architecture = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString(),
+                        logicalProcessors = Environment.ProcessorCount, cpu = Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER"),
+                        configuration = typeof(Program).Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>()?.Configuration },
                     runtimeFingerprint, request.Driver, software = request.Software, fixtureVersion = VisualReferenceScene.FixtureVersion,
+                    startupMilliseconds, startupAllocatedBytes,
                     capturePath = "D3D12 swap-chain backbuffer readback before Present; full-resolution native output, independent of host-window clamp",
                     method = "Immutable presentation states; completed extraction tick and frozen visual seconds recorded per case, VSync off, particle age.2s. CPU includes frame reuse/Present. Distinct completed GPU fences. Readbacks/PNG export excluded. No live gameplay or sustained-motion FPS claim.",
                     request.Warmups, request.Samples, request.ContinueAfterMismatch, failedCaptures, captures, humanVisualAcceptance = "pending" }, JsonOptions));
@@ -283,7 +328,7 @@ internal static class VisualReferenceCapture
         Array.Sort(values);
         return values.Length == 0 ? new { samples = 0, mean = (double?)null, p50 = (double?)null, p95 = (double?)null, p99 = (double?)null }
             : new { samples = values.Length, mean = (double?)values.Average(), p50 = (double?)values[(int)((values.Length - 1) * .5)],
-                p95 = (double?)values[(int)((values.Length - 1) * .95)], p99 = (double?)values[(int)((values.Length - 1) * .99)] };
+                p95 = (double?)values[(int)Math.Ceiling(values.Length * .95) - 1], p99 = (double?)values[(int)Math.Ceiling(values.Length * .99) - 1] };
     }
     internal static string FileHash(string path) => Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path)));
     internal static string RuntimeFingerprint(string root)

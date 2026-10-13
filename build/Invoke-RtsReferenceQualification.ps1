@@ -16,6 +16,10 @@ param(
     [ValidateSet(0,96,120,144,192)][uint]$RasterDpi = 0,
     [ValidateRange(0,360)][float]$YawDegrees = 45,
     [ValidateRange(0,120)][float]$InspectionDistanceMeters = 0,
+    [ValidateSet('Warm','RendererCold')][string]$RunProfile = 'Warm',
+    [ValidateSet('Fixed','Sweep')][string]$CameraPath = 'Fixed',
+    [string]$RuntimeAssetRoot,
+    [string]$ClientPath,
     [string]$BaselineRoot
 )
 
@@ -31,7 +35,9 @@ if ($Capture) {
     if (Test-Path -LiteralPath $referenceRoot) { throw 'Use a new evidence directory; existing references are never overwritten.' }
     $drivers = @(Get-CimInstance Win32_VideoController | ForEach-Object { "$($_.Name): $($_.DriverVersion)" }) -join '; '
     $request = @{
-        outputRoot = $referenceRoot; commit = $commit; runtimeRoot = Join-Path $repositoryRoot 'assets/runtime'
+        outputRoot = $referenceRoot; commit = $commit
+        runtimeRoot = $(if ($RuntimeAssetRoot) { [IO.Path]::GetFullPath($RuntimeAssetRoot) } else { Join-Path $repositoryRoot 'assets/runtime' })
+        runProfile = $RunProfile; cameraPath = $CameraPath
         driver = $drivers; software = [bool]$Software; warmups = $Warmups; samples = $Samples; repeatCaptures = $RepeatCaptures; continueAfterMismatch = [bool]$ContinueAfterMismatch; rasterDpi = $RasterDpi; yawDegrees = $YawDegrees; inspectionDistanceMeters = $InspectionDistanceMeters
         scenes = $Scenes; profiles = $Profiles; zooms = $Zooms
         displays = @($Displays | ForEach-Object { $parts = $_.Split('x'); @{ width = [int]$parts[0]; height = [int]$parts[1] } })
@@ -41,13 +47,17 @@ if ($Capture) {
     $stream = [IO.File]::Open($requestPath, [IO.FileMode]::CreateNew)
     try { $bytes = [Text.Encoding]::UTF8.GetBytes(($request | ConvertTo-Json -Depth 8)); $stream.Write($bytes) }
     finally { $stream.Dispose() }
-    & dotnet run --project (Join-Path $repositoryRoot 'src/ForgeLine.Client/ForgeLine.Client.csproj') `
-        --configuration $Configuration --no-build -- --reference-capture-request $requestPath
+    if ($ClientPath) {
+        & ([IO.Path]::GetFullPath($ClientPath)) --reference-capture-request $requestPath
+    } else {
+        & dotnet run --project (Join-Path $repositoryRoot 'src/ForgeLine.Client/ForgeLine.Client.csproj') `
+            --configuration $Configuration --no-build -- --reference-capture-request $requestPath
+    }
     if ($LASTEXITCODE -ne 0) { throw "Native reference capture failed; inspect $referenceRoot/failure.json and client output." }
     & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $referenceRoot -BaselineRoot $BaselineRoot
     return
 }
-if ($Software -or $BaselineRoot -or $RasterDpi -or $YawDegrees -ne 45 -or $InspectionDistanceMeters -ne 0) { throw 'Software, raster DPI, yaw and baseline comparison require explicit -Capture mode.' }
+if ($Software -or $BaselineRoot -or $RasterDpi -or $YawDegrees -ne 45 -or $InspectionDistanceMeters -ne 0 -or $RunProfile -ne 'Warm' -or $CameraPath -ne 'Fixed' -or $RuntimeAssetRoot -or $ClientPath) { throw 'Capture options require explicit -Capture mode.' }
 $displays = @(@(1920, 1080), @(2560, 1440), @(3840, 2160), @(3440, 1440))
 foreach ($display in $displays) {
     foreach ($zoom in @('CloseTactical', 'NormalGameplay', 'Strategic')) {
