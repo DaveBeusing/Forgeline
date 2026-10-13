@@ -12,7 +12,7 @@ using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
 
-public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat, MechanicalIdle, MechanicalMoving, MechanicalFiring, MechanicalLoading, MechanicalUnpowered, MechanicalBroken, DirectorateUnits, DirectorateBuildingStates, CommandCoreProduction, MainBattleTankProduction, MainBattleTankFormation, EnvironmentKitYard, EnvironmentKitBridge, EnvironmentKitRepeated, ExtractorProduction, SmelterProduction, ElectronicsPlantProduction, FuelRefineryProduction, AmmunitionPlantProduction, StorageDepotProduction, SupplyDepotProduction, LogisticsHubProduction, LogisticsLoadingProduction, LogisticsTransitProduction, LogisticsUnloadingProduction, LogisticsSustainedProduction, VehicleFactoryProduction, PowerPlantProduction, BarracksProduction, RadarProduction, OperationalBuildingsRepeated }
+public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat, MechanicalIdle, MechanicalMoving, MechanicalFiring, MechanicalLoading, MechanicalUnpowered, MechanicalBroken, DirectorateUnits, DirectorateBuildingStates, CommandCoreProduction, MainBattleTankProduction, MainBattleTankFormation, EnvironmentKitYard, EnvironmentKitBridge, EnvironmentKitRepeated, ExtractorProduction, SmelterProduction, ElectronicsPlantProduction, FuelRefineryProduction, AmmunitionPlantProduction, StorageDepotProduction, SupplyDepotProduction, LogisticsHubProduction, LogisticsLoadingProduction, LogisticsTransitProduction, LogisticsUnloadingProduction, LogisticsSustainedProduction, VehicleFactoryProduction, PowerPlantProduction, BarracksProduction, RadarProduction, OperationalBuildingsRepeated, ScoutVehicleProduction, ArtilleryProduction, CargoTruckProduction, SupplyTruckProduction, CombatSupportRepeated }
 
 // Authored presentation acceptance states, not economic/combat simulations or gameplay presets.
 public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3 Target,
@@ -27,6 +27,8 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
     {
         if (!Enum.IsDefined(kind)) throw new ArgumentOutOfRangeException(nameof(kind));
         ArgumentNullException.ThrowIfNull(terrain);
+        if (kind is >= VisualReferenceSceneKind.ScoutVehicleProduction and <= VisualReferenceSceneKind.CombatSupportRepeated)
+            return CombatSupportReferenceScene.Create(kind, terrain);
         if (kind is VisualReferenceSceneKind.EnvironmentKitYard or VisualReferenceSceneKind.EnvironmentKitBridge or VisualReferenceSceneKind.EnvironmentKitRepeated)
             return CreateKitReview(kind);
         if (kind is VisualReferenceSceneKind.LogisticsLoadingProduction or VisualReferenceSceneKind.LogisticsTransitProduction or VisualReferenceSceneKind.LogisticsUnloadingProduction or VisualReferenceSceneKind.LogisticsSustainedProduction)

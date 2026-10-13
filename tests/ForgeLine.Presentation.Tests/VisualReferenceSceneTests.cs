@@ -7,6 +7,11 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class VisualReferenceSceneTests
 {
     [Theory]
+    [InlineData(VisualReferenceSceneKind.ScoutVehicleProduction)]
+    [InlineData(VisualReferenceSceneKind.ArtilleryProduction)]
+    [InlineData(VisualReferenceSceneKind.CargoTruckProduction)]
+    [InlineData(VisualReferenceSceneKind.SupplyTruckProduction)]
+    [InlineData(VisualReferenceSceneKind.CombatSupportRepeated)]
     [InlineData(VisualReferenceSceneKind.VehicleFactoryProduction)]
     [InlineData(VisualReferenceSceneKind.PowerPlantProduction)]
     [InlineData(VisualReferenceSceneKind.BarracksProduction)]
@@ -70,6 +75,29 @@ public sealed class VisualReferenceSceneTests
         Assert.All(buildings, x => Assert.Equal(new System.Numerics.Vector3(width, height, depth), x.Transform.Scale));
         Assert.All(buildings.Where(x => x.BuildingFeature.IsDestroyed), x => Assert.False(x.Selectable.IsSelectable));
         Assert.All(buildings.Where(x => x.BuildingFeature.State == BuildingPresentationState.Unpowered), x => Assert.Equal(0, x.MechanicalPose.ActiveSeconds));
+    }
+
+    [Theory]
+    [InlineData(VisualReferenceSceneKind.ScoutVehicleProduction, 8)]
+    [InlineData(VisualReferenceSceneKind.ArtilleryProduction, 8)]
+    [InlineData(VisualReferenceSceneKind.CargoTruckProduction, 8)]
+    [InlineData(VisualReferenceSceneKind.SupplyTruckProduction, 8)]
+    [InlineData(VisualReferenceSceneKind.CombatSupportRepeated, 1000)]
+    public void CombatSupportReviewRetainsGameScaleAndExtractedDamage(VisualReferenceSceneKind kind, int count)
+    {
+        var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+        var scene = VisualReferenceScene.Create(kind, terrain);
+        var instances = scene.Snapshot.Instances.ToArray().Where(x => x.UnitFeature.IsSpecified).ToArray();
+        Assert.Equal(count, instances.Length);
+        var definitions = DirectorateContent.CreateUnitCatalog();
+        Assert.All(instances, item => Assert.Equal(definitions[item.UnitFeature.Unit].VisualScale, item.Transform.Scale));
+        if (count == 8)
+        {
+            Assert.Equal(4, instances.Select(x => x.UnitFeature.DamageState).Distinct().Count());
+            Assert.Single(instances, x => x.UnitFeature.IsWreck && !x.Selectable.IsSelectable);
+            Assert.Contains(instances, x => x.MechanicalPose.TravelMeters > 0);
+        }
+        else Assert.Equal(4, instances.Select(x => x.UnitFeature.Unit).Distinct().Count());
     }
 
     [Fact]
