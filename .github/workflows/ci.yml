@@ -78,7 +78,9 @@ jobs:
 
       - name: Reference evidence report contracts
         shell: pwsh
-        run: ./build/Test-VisualReferenceEvidence.ps1
+        run: |
+          ./build/Test-VisualReferenceEvidence.ps1
+          ./build/Test-VisualDrawBudgets.ps1
 
       - name: Reference performance and image contracts without GPU
         shell: pwsh

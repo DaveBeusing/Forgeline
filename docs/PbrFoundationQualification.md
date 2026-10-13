@@ -52,6 +52,8 @@ Eight changed performance cases, nine material/profile/bookmark controls and eig
 
 ## Review limits
 
+Window qualification preserves eleven canonical base mesh/material batch families. Additional LODs can split those families: the ceiling adds `min(11,lod1Instances)` and `min(11,lod2Instances)`, bounded at33 total instance draws. Negative, fractional, partial or over-visible LOD counts are rejected; legacy reports keep the eleven-batch ceiling. Terrain, composite and shadow draw accounting retains its separate bounds. Contract tests cover the boundaries in CI. The earlier fixed eleven-batch gate rejected the5120x2160 borderless view with13 instance draws on both unchanged master and the new material shader; their identical counts establish that this qualification repair is independent of shading cost.
+
 The material controls show the expected metallic versus dielectric and roughness response. Production terrain is darker under normalized diffuse lighting; tactical overlays stay in their existing sharp output-space pass. Native repeatability and numerical BRDF contracts do not grant human art acceptance. Inspect actual units/buildings at every bookmark for readable scale, lighting, normal detail, shadow acne/peter-panning and clipping before accepting goldens.
 
 The existing spatial AA plus normal-variance roughness broadening has no temporal history. Camera sweeps inspect spatial shimmer, but readback interrupts pacing and cannot certify live judder, sustained FPS or monitor DPI transitions. There is no new bloom, temporal upscale, environment map or physical HDR display path. Additional display sizes, physical monitor transitions and device/debug-layer investigations remain separate qualifications.
