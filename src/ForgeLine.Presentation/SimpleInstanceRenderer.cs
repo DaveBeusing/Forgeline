@@ -1745,11 +1745,11 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 ? yawRadians
                 : 0.0f;
 
+        if (!Matrix4x4.Decompose(world, out Vector3 scale, out _, out _)) scale = Vector3.One;
         return
             Matrix4x4.CreateTranslation(
                 -pivot) *
-            Matrix4x4.CreateRotationY(
-                yaw) *
+            MechanicalMotionSpace.Rotation(scale, Quaternion.CreateFromAxisAngle(Vector3.UnitY, yaw)) *
             Matrix4x4.CreateTranslation(
                 pivot) *
             world;

@@ -1577,9 +1577,9 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 Vector3 gunPivot = definition.TurretPivot;
                 foreach (var anchor in record.Sockets)
                     if (anchor.Name == "gun_pivot") gunPivot = new(anchor.X, anchor.Y, anchor.Z);
-                local = Vector3.Transform(local - gunPivot,
+                local = MechanicalMotionSpace.RotateOffset(local - gunPivot, transform.Scale,
                     Quaternion.CreateFromAxisAngle(Vector3.UnitX, -ResolveAimElevation(entities, entity))) + gunPivot;
-                local = Vector3.Transform(local - definition.TurretPivot,
+                local = MechanicalMotionSpace.RotateOffset(local - definition.TurretPivot, transform.Scale,
                     Quaternion.CreateFromAxisAngle(Vector3.UnitY, ResolveAimYaw(entities, entity))) + definition.TurretPivot;
             }
             local *= transform.Scale;

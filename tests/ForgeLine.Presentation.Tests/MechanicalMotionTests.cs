@@ -11,6 +11,24 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class MechanicalMotionTests
 {
     [Theory]
+    [InlineData(MechanicalMotionKind.Wheel)]
+    [InlineData(MechanicalMotionKind.Cannon)]
+    public void PhysicalRotationKeepsRadiusUnderNonuniformVehicleScale(MechanicalMotionKind kind)
+    {
+        Vector3 scale = new(3.2f, 2.4f, 6.4f);
+        Vector3 pivot = new(.2f, -.1f, .15f);
+        Vector3 point = pivot + new Vector3(0, .43f / scale.Y, 0);
+        MechanicalPartBinding[] parts = [new(new("rotating", 0, 3, -1, kind, "pivot", 1, 0), pivot)];
+        Matrix4x4 world = Matrix4x4.CreateScale(scale) * Matrix4x4.CreateRotationY(.3f) * Matrix4x4.CreateTranslation(10, 2, 20);
+        var instance = Instance() with { MechanicalPose = new(true, Math.PI * .5, 0, 1.6, -1, .5f, 0) };
+        Matrix4x4[] transforms = new Matrix4x4[1];
+        MechanicalTransforms.Compose(parts, instance, world, transforms);
+        Vector3 anchor = Vector3.Transform(pivot, world);
+        Assert.True(Vector3.Distance(anchor, Vector3.Transform(pivot, transforms[0])) < .0001f);
+        Assert.InRange(Vector3.Distance(anchor, Vector3.Transform(point, transforms[0])), .4299f, .4301f);
+    }
+
+    [Theory]
     [InlineData(MechanicalMotionKind.Radar, .285f, .6f)]
     [InlineData(MechanicalMotionKind.Fan, .292f, 2.2f)]
     public void OperationalRotorsKeepScaledPivotsFreezePhaseAndDisableForWrecks(MechanicalMotionKind motion, float height, float rate)
