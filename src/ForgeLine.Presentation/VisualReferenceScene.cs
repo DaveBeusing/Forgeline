@@ -12,7 +12,7 @@ using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
 
-public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat, MechanicalIdle, MechanicalMoving, MechanicalFiring, MechanicalLoading, MechanicalUnpowered, MechanicalBroken, DirectorateUnits, DirectorateBuildingStates, CommandCoreProduction, MainBattleTankProduction, MainBattleTankFormation, EnvironmentKitYard, EnvironmentKitBridge, EnvironmentKitRepeated, ExtractorProduction, SmelterProduction, ElectronicsPlantProduction, FuelRefineryProduction, AmmunitionPlantProduction, StorageDepotProduction, SupplyDepotProduction, LogisticsHubProduction, LogisticsLoadingProduction, LogisticsTransitProduction, LogisticsUnloadingProduction, LogisticsSustainedProduction, VehicleFactoryProduction, PowerPlantProduction, BarracksProduction, RadarProduction, OperationalBuildingsRepeated }
+public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, FormationConvoy, LogisticsCorridor, DamageDestruction, BattlefieldCombat, MechanicalIdle, MechanicalMoving, MechanicalFiring, MechanicalLoading, MechanicalUnpowered, MechanicalBroken, DirectorateUnits, DirectorateBuildingStates, CommandCoreProduction, MainBattleTankProduction, MainBattleTankFormation, EnvironmentKitYard, EnvironmentKitBridge, EnvironmentKitRepeated, ExtractorProduction, SmelterProduction, ElectronicsPlantProduction, FuelRefineryProduction, AmmunitionPlantProduction, StorageDepotProduction, SupplyDepotProduction, LogisticsHubProduction, LogisticsLoadingProduction, LogisticsTransitProduction, LogisticsUnloadingProduction, LogisticsSustainedProduction, VehicleFactoryProduction, PowerPlantProduction, BarracksProduction, RadarProduction, OperationalBuildingsRepeated, InfantryRifleProduction, InfantryEngineerProduction, InfantryRepeated, InfantryBattleProduction, BattlefieldVariantProduction }
 
 // Authored presentation acceptance states, not economic/combat simulations or gameplay presets.
 public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3 Target,
@@ -53,6 +53,8 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
             _ => default
         };
         bool logisticsReview = kind is VisualReferenceSceneKind.StorageDepotProduction or VisualReferenceSceneKind.SupplyDepotProduction or VisualReferenceSceneKind.LogisticsHubProduction;
+        bool infantryReview = kind is VisualReferenceSceneKind.InfantryRifleProduction or VisualReferenceSceneKind.InfantryEngineerProduction or VisualReferenceSceneKind.InfantryRepeated or VisualReferenceSceneKind.InfantryBattleProduction;
+        bool battlefieldReview = kind == VisualReferenceSceneKind.BattlefieldVariantProduction;
         var battlefield = CentralDivideBattlefield.Create();
         Vector3 target = kind == VisualReferenceSceneKind.LogisticsCorridor
             ? battlefield.Crossings[0].Position : new(650, 0, 520);
@@ -69,7 +71,7 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
         foreach (var item in battlefield.WorldObjects)
         {
             // Keep authored review plots clear of unrelated dressing.
-            if (operationalGallery && MathF.Abs(item.Position.X - target.X) <= 64 + item.Scale.X * .5f &&
+            if ((operationalGallery || infantryReview || battlefieldReview) && MathF.Abs(item.Position.X - target.X) <= 64 + item.Scale.X * .5f &&
                 MathF.Abs(item.Position.Z - target.Z) <= 64 + item.Scale.Z * .5f) continue;
             Vector3 relative = item.Position - target;
             if (industrialBuilding.IsSpecified &&
@@ -97,14 +99,14 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
         }
         foreach (var item in battlefield.Resources)
         {
-            if (industrialBuilding.IsSpecified || operationalGallery) continue;
+            if (industrialBuilding.IsSpecified || operationalGallery || infantryReview || battlefieldReview) continue;
             if (kind is VisualReferenceSceneKind.CommandCoreProduction or VisualReferenceSceneKind.MainBattleTankProduction or VisualReferenceSceneKind.MainBattleTankFormation) continue;
             EntityId deposit = Add(new(item.Center.X - target.X, 0, item.Center.Z - target.Z), new(item.HalfExtents.X * 2, 8, item.HalfExtents.Z * 2));
             simulation.Entities.AddComponent(deposit, WorldPresentationIdentity.ForResource(item.ResourceId));
             simulation.Entities.AddComponent(deposit, new ResourceDeposit(item.ResourceId,
                 new(item.Center - item.HalfExtents, item.Center + item.HalfExtents), item.TotalQuantity, item.ExtractionRatePerSecond));
         }
-        if (!operationalGallery && kind is not (VisualReferenceSceneKind.DaylightTerrain or VisualReferenceSceneKind.MainBattleTankProduction or VisualReferenceSceneKind.MainBattleTankFormation))
+        if (!operationalGallery && !infantryReview && !battlefieldReview && kind is not (VisualReferenceSceneKind.DaylightTerrain or VisualReferenceSceneKind.MainBattleTankProduction or VisualReferenceSceneKind.MainBattleTankFormation))
         {
             for (int i = 0; i < 18; i++)
             {
@@ -289,6 +291,45 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
             simulation.Entities.AddComponent(building, new CompletedBuilding(BuildingIds.VehicleFactory, new(1), SimulationTick.Zero));
             simulation.Entities.AddComponent(building, new HealthState(20, 100));
         }
+        if (infantryReview)
+        {
+            bool repeated = kind == VisualReferenceSceneKind.InfantryRepeated;
+            for (int i = 0; i < (repeated ? 1000 : 12); i++)
+            {
+                UnitId family = kind == VisualReferenceSceneKind.InfantryEngineerProduction ||
+                    kind is VisualReferenceSceneKind.InfantryRepeated or VisualReferenceSceneKind.InfantryBattleProduction && i % 2 != 0
+                    ? UnitIds.CombatEngineer : UnitIds.RifleSquad;
+                Vector3 offset = repeated ? new((i % 40 - 19.5f) * 3.2f, 0, (i / 40 - 12) * 3.2f)
+                    : new((i % 4 - 1.5f) * 5, 0, (i / 4 - 1) * 8);
+                EntityId soldier = Unit(family, offset);
+                if (!repeated && i % 4 is 1 or 2)
+                    simulation.Entities.AddComponent(soldier, new HealthState(i % 4 == 1 ? 50 : 20, 100));
+                if (!repeated && i % 4 == 3)
+                    simulation.Entities.AddComponent(soldier, new UnitWreckPresentationIdentity(family, new(1)));
+            }
+        }
+        if (battlefieldReview)
+        {
+            UnitId[] wreckFamilies = [UnitIds.RifleSquad, UnitIds.CombatEngineer, UnitIds.ScoutVehicle,
+                UnitIds.MobileArtillery, UnitIds.CargoTruck, UnitIds.SupplyTruck];
+            for (int i = 0; i < wreckFamilies.Length; i++)
+            {
+                EntityId wreck = Unit(wreckFamilies[i], new((i % 3 - 1) * 14, 0, (i / 3 - .5f) * 16));
+                simulation.Entities.AddComponent(wreck, new UnitWreckPresentationIdentity(wreckFamilies[i], new(1)));
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                EntityId road = Add(new((i % 2 - .5f) * 28, i < 2 ? .08f : 2, 28 + i / 2 * 22),
+                    i < 2 ? new(12, .2f, 20) : new(18, 4, 20));
+                simulation.Entities.AddComponent(road, new InfrastructurePresentationIdentity(
+                    i < 2 ? InfrastructurePresentationKind.RoadSegment : InfrastructurePresentationKind.RoadBridge, $"reference-damage-{i}"));
+            }
+            foreach (var visual in new[] { WorldVisualId.PropRubble, WorldVisualId.PropScorchedBarrier, WorldVisualId.PropBurstPipe })
+            {
+                EntityId prop = Add(new(((int)visual % 3 - 1) * 12, 1, -24), new(8, 2, 6));
+                simulation.Entities.AddComponent(prop, new WorldPresentationIdentity(visual, WorldPresentationKind.Prop));
+            }
+        }
         bool mechanical = kind is >= VisualReferenceSceneKind.MechanicalIdle and <= VisualReferenceSceneKind.MechanicalBroken;
         if (mechanical)
         {
@@ -298,13 +339,13 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
             EntityId factory = Add(new(0, 3.9f, -12), new(16, 10, 16));
             simulation.Entities.AddComponent(factory, new CompletedBuilding(BuildingIds.VehicleFactory, new(1), SimulationTick.Zero));
         }        EntityId hidden = default;
-        if (kind == VisualReferenceSceneKind.BattlefieldCombat)
+        if (kind is VisualReferenceSceneKind.BattlefieldCombat or VisualReferenceSceneKind.InfantryBattleProduction)
         {
             EntityId contact = Unit(UnitIds.MainBattleTank, new(55, 0, 10), foreign: true);
             simulation.Entities.AddComponent(contact, new IntelligenceSignature(new(2), identityKey: 42));
             if (includeHiddenEnemy)
             {
-                hidden = Unit(UnitIds.MobileArtillery, new(300, 0, 0), foreign: true);
+                hidden = Unit(kind == VisualReferenceSceneKind.InfantryBattleProduction ? UnitIds.CombatEngineer : UnitIds.MobileArtillery, new(300, 0, 0), foreign: true);
                 simulation.Entities.AddComponent(hidden, new IntelligenceSignature(new(2), identityKey: 43));
             }
         }
@@ -345,6 +386,19 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
                         review == 3 && !formation ? 1.55 : -1, review is 1 or 3 && !formation ? .2f : 0, 0),
                     UnitFeature = item.UnitFeature with { AimYawRadians = !formation && review is 1 or 3 ? .6f : 0 }
                 };
+            }
+        }
+        if (infantryReview || battlefieldReview)
+        {
+            for (int i = 0; i < visible.Count; i++)
+            {
+                RenderInstance item = visible[i];
+                if (infantryReview && item.UnitFeature.IsSpecified && !item.UnitFeature.IsWreck)
+                    visible[i] = item with { MechanicalPose = new(true, i % 3 == 1 ? .35 : 0, 1.6, 1.6,
+                        i % 3 == 2 ? 1.55 : -1, 0, 0) };
+                if (battlefieldReview && item.InfrastructureFeature.IsSpecified)
+                    visible[i] = item with { InfrastructureFeature = item.InfrastructureFeature with
+                        { State = i % 2 == 0 ? InfrastructurePresentationState.Restoring : InfrastructurePresentationState.Disabled } };
             }
         }
         if (mechanical)
@@ -405,7 +459,10 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
         }
         EntityId Unit(UnitId id, Vector3 offset, bool foreign = false)
         {
-            EntityId unit = Add(offset, id == UnitIds.RifleSquad ? new(2, 2, 2) : new(4, 3, 7));
+            var definition = DirectorateContent.CreateUnitCatalog()[id];
+            bool physicalReview = infantryReview || battlefieldReview;
+            if (physicalReview) offset.Y += definition.Movement.HeightOffset;
+            EntityId unit = Add(offset, physicalReview ? definition.VisualScale : id == UnitIds.RifleSquad ? new(2, 2, 2) : new(4, 3, 7));
             simulation.Entities.AddComponent(unit, new UnitIdentity(id, new(foreign ? 2u : 1u)));
             simulation.Entities.AddComponent(unit, new ControllableEntity(new(foreign ? 2UL : 1UL), ControllableEntityCategory.Unit));
             return unit;
