@@ -1,6 +1,7 @@
 using Vortice.Direct3D;
 using Vortice.Direct3D12;
 using Vortice.DXGI;
+using Feature = Vortice.Direct3D12.Feature;
 
 namespace ForgeLine.Graphics;
 
@@ -17,7 +18,24 @@ internal sealed partial class D3D12GraphicsDevice
                 budget.LocalBudgetBytes > budget.LocalUsageBytes ? budget.LocalBudgetBytes - budget.LocalUsageBytes : 0 : null;
         }
     }
-    public bool SupportsPostProcessing => true;
+    private bool? _supportsPostProcessing;
+    public bool SupportsPostProcessing
+    {
+        get
+        {
+            ThrowIfDisposed();
+            if (_supportsPostProcessing is { } supported) return supported;
+            var color = new FeatureDataFormatSupport { Format = Format.R16G16B16A16_Float };
+            var depth = new FeatureDataFormatSupport { Format = Format.R32_Float };
+            const FormatSupport1 colorFlags = FormatSupport1.Texture2D | FormatSupport1.RenderTarget | FormatSupport1.ShaderLoad | FormatSupport1.Blendable;
+            const FormatSupport1 depthFlags = FormatSupport1.Texture2D | FormatSupport1.ShaderLoad;
+            bool available = _device.CheckFeatureSupport(Feature.FormatSupport, ref color) &&
+                _device.CheckFeatureSupport(Feature.FormatSupport, ref depth) &&
+                (color.Support1 & colorFlags) == colorFlags && (depth.Support1 & depthFlags) == depthFlags;
+            _supportsPostProcessing = available;
+            return available;
+        }
+    }
     public GraphicsPostProcessingSettings PostProcessing { get { ThrowIfDisposed(); return _postProcessing; } }
     public void ConfigurePostProcessing(GraphicsPostProcessingSettings settings)
     {
@@ -29,6 +47,13 @@ internal sealed partial class D3D12GraphicsDevice
     }
     private GraphicsSceneOutputSettings _sceneOutput = new(false, 1, true);
     private ID3D12Resource[]? _sceneTargets;
+    private ID3D12Resource? _overlayDepthTarget;
+    private bool ScaledScene => _sceneOutput.Enabled && _sceneOutput.ResolutionScale < 1;
+    internal bool IsWorldPass => _passState.Current == GraphicsFramePass.World;
+    internal int WorldWidth => GraphicsFramePlan.ScaledDimension(_surfaceLifecycle.Width, _sceneOutput.ResolutionScale);
+    internal int WorldHeight => GraphicsFramePlan.ScaledDimension(_surfaceLifecycle.Height, _sceneOutput.ResolutionScale);
+    private CpuDescriptorHandle OverlayDsv => ScaledScene ? new(_dsvHeap.GetCPUDescriptorHandleForHeapStart(), 1,
+        _device.GetDescriptorHandleIncrementSize(DescriptorHeapType.DepthStencilView)) : _dsvHeap.GetCPUDescriptorHandleForHeapStart();
     private int[]? _sceneDescriptors;
     private D3D12GraphicsPipeline? _sceneComposite;
     private double? _compositeCpuMilliseconds;
@@ -44,12 +69,20 @@ internal sealed partial class D3D12GraphicsDevice
         ThrowIfDisposed();
         ThrowIfRecording();
         settings.Validate();
+        if (settings.Enabled && !SupportsPostProcessing) throw new NotSupportedException("Linear scene formats are unsupported.");
         if ((_atmosphere.Enabled || _postProcessing != GraphicsPostProcessingSettings.Neutral) && !settings.Enabled)
             throw new InvalidOperationException("Disable atmosphere and postprocessing before disabling linear scene composition.");
         if (settings == _sceneOutput)
             return;
+        if (settings.Enabled == _sceneOutput.Enabled && settings.ResolutionScale == _sceneOutput.ResolutionScale)
+        {
+            _sceneOutput = settings;
+            ResetFrameMeasurements();
+            return;
+        }
         WaitForIdle();
-        ReleaseSceneTargets();
+        GraphicsSceneOutputSettings previous = _sceneOutput;
+        ReleaseRenderTargets();
         _sceneComposite?.Dispose();
         _sceneComposite = null;
         _sceneOutput = settings;
@@ -58,14 +91,26 @@ internal sealed partial class D3D12GraphicsDevice
         {
             if (settings.Enabled)
             {
-                CreateSceneTargets(_surfaceLifecycle.Width, _surfaceLifecycle.Height);
+                CreateRenderTargets(_surfaceLifecycle.Width, _surfaceLifecycle.Height);
                 _sceneComposite = CreateSceneComposite();
             }
+            else CreateRenderTargets(_surfaceLifecycle.Width, _surfaceLifecycle.Height);
         }
         catch
         {
-            ReleaseSceneTargets();
-            _sceneOutput = new(false, 1, true);
+            ReleaseRenderTargets();
+            _sceneOutput = previous;
+            try
+            {
+                CreateRenderTargets(_surfaceLifecycle.Width, _surfaceLifecycle.Height);
+                if (previous.Enabled) _sceneComposite = CreateSceneComposite();
+            }
+            catch (Exception recovery)
+            {
+                ReleaseRenderTargets();
+                _failure = new GraphicsDeviceException("Scene target rollback failed.", recovery);
+                throw _failure;
+            }
             throw;
         }
     }
@@ -77,6 +122,8 @@ internal sealed partial class D3D12GraphicsDevice
     {
         if (!_sceneOutput.Enabled)
             return;
+        width = GraphicsFramePlan.ScaledDimension(width, _sceneOutput.ResolutionScale);
+        height = GraphicsFramePlan.ScaledDimension(height, _sceneOutput.ResolutionScale);
         _sceneTargets = new ID3D12Resource[_configuration.BufferCount];
         _sceneDescriptors = new int[_configuration.BufferCount];
         Array.Fill(_sceneDescriptors, -1);
@@ -129,11 +176,13 @@ internal sealed partial class D3D12GraphicsDevice
     {
         var compiler = new DxcShaderCompiler();
         var vertex = compiler.Compile(SceneCompositeShader.Vertex, GraphicsShaderStage.Vertex, "VSMain", "SceneCompositeVertex.hlsl");
-        var pixel = compiler.Compile((_atmosphere.Enabled ? "#define ATMOSPHERE 1\n" : "#define ATMOSPHERE 0\n") +
+        var pixel = compiler.Compile((ScaledScene ? "#define UPSAMPLE 1\n" : "#define UPSAMPLE 0\n") +
+            (_atmosphere.Enabled ? "#define ATMOSPHERE 1\n" : "#define ATMOSPHERE 0\n") +
             SceneCompositeShader.Pixel, GraphicsShaderStage.Pixel, "PSMain", "SceneCompositePixel.hlsl");
         return (D3D12GraphicsPipeline)CreateGraphicsPipeline(new(vertex, pixel)
         {
-            CullMode = GraphicsCullMode.None, PixelTextureCount = _atmosphere.Enabled ? 2 : 1,
+            CullMode = GraphicsCullMode.None, PixelTextureCount = _atmosphere.Enabled || ScaledScene ? 2 : 1,
+            DepthEnabled = ScaledScene, DepthAlwaysPass = ScaledScene,
             VertexRootConstantCount = SceneCompositeShader.ConstantCount
         });
     }
@@ -146,14 +195,14 @@ internal sealed partial class D3D12GraphicsDevice
         long started = System.Diagnostics.Stopwatch.GetTimestamp();
         _commandList.ResourceBarrierTransition(_sceneTargets![_frameIndex],
             ResourceStates.RenderTarget, ResourceStates.PixelShaderResource);
-        if (_atmosphere.Enabled)
+        if (_atmosphere.Enabled || ScaledScene)
         {
             _commandList.OMSetRenderTargets(new CpuDescriptorHandle(_rtvHeap.GetCPUDescriptorHandleForHeapStart(),
                 _frameIndex, _rtvDescriptorSize));
             _commandList.ResourceBarrierTransition(_depthTarget!, ResourceStates.DepthWrite, ResourceStates.PixelShaderResource);
         }
         _commandList.OMSetRenderTargets(new CpuDescriptorHandle(_rtvHeap.GetCPUDescriptorHandleForHeapStart(),
-            _frameIndex, _rtvDescriptorSize), _atmosphere.Enabled ? null : _dsvHeap.GetCPUDescriptorHandleForHeapStart());
+            _frameIndex, _rtvDescriptorSize), ScaledScene ? OverlayDsv : _atmosphere.Enabled ? null : _dsvHeap.GetCPUDescriptorHandleForHeapStart());
         _commandList.RSSetViewport(0, 0, _surfaceLifecycle.Width, _surfaceLifecycle.Height);
         _commandList.RSSetScissorRect(Vortice.Mathematics.RectI.FromLTRB(0, 0, _surfaceLifecycle.Width, _surfaceLifecycle.Height));
         UseResource(_sceneComposite!.Lifetime);
@@ -163,7 +212,7 @@ internal sealed partial class D3D12GraphicsDevice
         _commandList.SetDescriptorHeaps(_shaderResourceHeap);
         _commandList.SetGraphicsRootDescriptorTable(1, new GpuDescriptorHandle(
             _shaderResourceHeap.GetGPUDescriptorHandleForHeapStart(), _sceneDescriptors![_frameIndex], _shaderResourceDescriptorSize));
-        if (_atmosphere.Enabled)
+        if (_atmosphere.Enabled || ScaledScene)
         {
             _commandList.SetGraphicsRootDescriptorTable(2, new GpuDescriptorHandle(
                 _shaderResourceHeap.GetGPUDescriptorHandleForHeapStart(), _atmosphereDepthDescriptor, _shaderResourceDescriptorSize));
@@ -173,14 +222,15 @@ internal sealed partial class D3D12GraphicsDevice
         constants[32] = _postProcessing.WhiteBalance; constants[33] = _postProcessing.Tint;
         constants[34] = _postProcessing.Contrast; constants[35] = _postProcessing.Saturation;
         constants[36] = _postProcessing.EdgeBlend;
+        constants[37] = _surfaceLifecycle.Width; constants[38] = _surfaceLifecycle.Height;
         RecordCaptureInput(System.Runtime.InteropServices.MemoryMarshal.AsBytes(constants));
         _commandList.SetGraphicsRoot32BitConstants(0, constants);
         _commandList.DrawInstanced(3, 1, 0, 0);
-        if (_atmosphere.Enabled)
+        if (_atmosphere.Enabled || ScaledScene)
         {
             _commandList.ResourceBarrierTransition(_depthTarget!, ResourceStates.PixelShaderResource, ResourceStates.DepthWrite);
             _commandList.OMSetRenderTargets(new CpuDescriptorHandle(_rtvHeap.GetCPUDescriptorHandleForHeapStart(),
-                _frameIndex, _rtvDescriptorSize), _dsvHeap.GetCPUDescriptorHandleForHeapStart());
+                _frameIndex, _rtvDescriptorSize), OverlayDsv);
         }
         _recordedCompositeCpuMilliseconds = System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
     }

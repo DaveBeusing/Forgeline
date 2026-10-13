@@ -156,7 +156,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             _dsvHeap = _device.CreateDescriptorHeap(
                 new DescriptorHeapDescription(
                     DescriptorHeapType.DepthStencilView,
-                    1));
+                    2));
             _shaderResourceHeap =
                 _device.CreateDescriptorHeap(
                     new DescriptorHeapDescription(
@@ -252,11 +252,11 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 DirectionalShadows = ShadowDiagnostics,
                 Atmosphere = AtmosphereDiagnostics,
                 PostProcessing = new(true, _sceneOutput.Enabled ? _postProcessing.Antialiasing : SpatialAntialiasing.Disabled,
-                    1, _sceneTargets?.Length ?? 0, _sceneTargets is null ? 0 : checked((long)_surfaceLifecycle.Width * _surfaceLifecycle.Height * 8 * _configuration.BufferCount),
-                    0, 0, _sceneOutput.Enabled ? (_postProcessing.EdgeBlend > 0 ? 5 : 1) : 0, _gpuTimingFence, _compositeGpuMilliseconds),
+                    _sceneOutput.ResolutionScale, _sceneTargets?.Length ?? 0, _sceneTargets is null ? 0 : checked((long)WorldWidth * WorldHeight * 8 * _configuration.BufferCount),
+                    0, 0, _sceneOutput.Enabled ? (_postProcessing.EdgeBlend > 0 ? 5 : 1) * (ScaledScene ? 4 : 1) : 0, _gpuTimingFence, _compositeGpuMilliseconds),
                 Particles = new(_particleDepth, _particleGpuFence, _particleGpu, _particleDepth ? 1 : 0),
                 Frame = new GraphicsFrameDiagnostics(
-                    new GraphicsFramePlan(_surfaceLifecycle.Width, _surfaceLifecycle.Height, _configuration.BufferCount, _sceneOutput.Enabled, _directionalShadows.Resolution, _atmosphere.Enabled || _particleDepth),
+                    new GraphicsFramePlan(_surfaceLifecycle.Width, _surfaceLifecycle.Height, _configuration.BufferCount, _sceneOutput.Enabled, _directionalShadows.Resolution, _atmosphere.Enabled || _particleDepth, _sceneOutput.ResolutionScale),
                     _cpuTimingSubmission, _worldCpuMilliseconds, _overlayCpuMilliseconds,
                     _gpuTimingFence, _worldGpuMilliseconds, _overlayGpuMilliseconds)
                 {
@@ -488,6 +488,12 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 SampleDescription = SampleDescription.Default
             };
 
+            if (description.DepthAlwaysPass)
+            {
+                var depth = DepthStencilDescription.Default;
+                depth.DepthFunc = ComparisonFunction.Always;
+                pipelineStateDescription.DepthStencilState = depth;
+            }
             if (description.SceneDepthReceiver)
             {
                 // A blended scene pixel must not retain the negative clear/debug
@@ -777,6 +783,9 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             1.0f,
             0);
 
+        if (_overlayDepthTarget is not null)
+            _commandList.ClearDepthStencilView(OverlayDsv, ClearFlags.Depth, 1, 0);
+
         int width =
             _surfaceLifecycle.Width;
         int height =
@@ -791,13 +800,13 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         context.SetViewport(
             0,
             0,
-            width,
-            height);
+            context.Width,
+            context.Height);
         context.SetScissor(
             0,
             0,
-            width,
-            height);
+            context.Width,
+            context.Height);
         try
         {
             recordCommands?.Invoke(context);
@@ -1463,9 +1472,9 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         }
 
         ResourceDescription depthDescription = ResourceDescription.Texture2D(
-            (_atmosphere.Enabled || _particleDepth) ? Format.R32_Typeless : DepthBufferFormat,
-            checked((uint)width),
-            checked((uint)height),
+            (_atmosphere.Enabled || _particleDepth || ScaledScene) ? Format.R32_Typeless : DepthBufferFormat,
+            checked((uint)GraphicsFramePlan.ScaledDimension(width, _sceneOutput.ResolutionScale)),
+            checked((uint)GraphicsFramePlan.ScaledDimension(height, _sceneOutput.ResolutionScale)),
             flags: ResourceFlags.AllowDepthStencil);
         var clearValue = new ClearValue(DepthBufferFormat, 1.0f, 0);
 
@@ -1486,6 +1495,14 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             _depthTarget,
             depthViewDescription,
             _dsvHeap.GetCPUDescriptorHandleForHeapStart());
+        if (ScaledScene)
+        {
+            _overlayDepthTarget = _device.CreateCommittedResource(HeapType.Default,
+                ResourceDescription.Texture2D(DepthBufferFormat, checked((uint)width), checked((uint)height),
+                    flags: ResourceFlags.AllowDepthStencil), ResourceStates.DepthWrite, clearValue);
+            _overlayDepthTarget.Name = "ForgeLine Overlay Depth";
+            _device.CreateDepthStencilView(_overlayDepthTarget, depthViewDescription, OverlayDsv);
+        }
         CreateAtmosphereDepthView();
         CreateSceneTargets(width, height);
     }
@@ -1496,6 +1513,8 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         ReleaseAtmosphereDepthView();
         _depthTarget?.Dispose();
         _depthTarget = null;
+        _overlayDepthTarget?.Dispose();
+        _overlayDepthTarget = null;
 
         for (int index = 0; index < _renderTargets.Length; index++)
         {

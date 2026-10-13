@@ -36,7 +36,7 @@ public readonly record struct GraphicsFrameTargetDescriptor(
 /// <summary>The direct-output frame contract. Contains no transient copies or allocations.</summary>
 public readonly record struct GraphicsFramePlan
 {
-    public GraphicsFramePlan(int width, int height, int bufferCount, bool linearScene = false, int shadowResolution = 0, bool sampledDepth = false)
+    public GraphicsFramePlan(int width, int height, int bufferCount, bool linearScene = false, int shadowResolution = 0, bool sampledDepth = false, float resolutionScale = 1)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(width);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(height);
@@ -45,10 +45,14 @@ public readonly record struct GraphicsFramePlan
 
         Output = new(width, height, GraphicsFrameTargetFormat.Rgba8Unorm,
             GraphicsFrameTargetLifetime.BackBuffer, bufferCount);
-        Depth = new(width, height, GraphicsFrameTargetFormat.Depth32Float,
+        new GraphicsSceneOutputSettings(linearScene, 1, true, resolutionScale).Validate();
+        int worldWidth = ScaledDimension(width, resolutionScale), worldHeight = ScaledDimension(height, resolutionScale);
+        Depth = new(worldWidth, worldHeight, GraphicsFrameTargetFormat.Depth32Float,
             GraphicsFrameTargetLifetime.Surface, 1);
-        DepthShaderReadable = sampledDepth;
-        Scene = linearScene ? new(width, height, GraphicsFrameTargetFormat.Rgba16Float,
+        DepthShaderReadable = sampledDepth || resolutionScale < 1;
+        OverlayDepth = resolutionScale < 1 ? new(width, height, GraphicsFrameTargetFormat.Depth32Float,
+            GraphicsFrameTargetLifetime.Surface, 1) : null;
+        Scene = linearScene ? new(worldWidth, worldHeight, GraphicsFrameTargetFormat.Rgba16Float,
             GraphicsFrameTargetLifetime.BackBuffer, bufferCount) : null;
         ArgumentOutOfRangeException.ThrowIfNegative(shadowResolution);
         Shadow = shadowResolution > 0 ? new(shadowResolution, shadowResolution, GraphicsFrameTargetFormat.Depth32Float,
@@ -57,10 +61,12 @@ public readonly record struct GraphicsFramePlan
 
     public GraphicsFrameTargetDescriptor Output { get; }
     public GraphicsFrameTargetDescriptor Depth { get; }
+    public GraphicsFrameTargetDescriptor? OverlayDepth { get; }
     public bool DepthShaderReadable { get; }
     public GraphicsFrameTargetDescriptor? Scene { get; }
     public GraphicsFrameTargetDescriptor? Shadow { get; }
     public long TransientPayloadBytes => checked((Scene?.PayloadBytes ?? 0) + (Shadow?.PayloadBytes ?? 0));
+    internal static int ScaledDimension(int value, float scale) => Math.Max(1, checked((int)Math.Ceiling(value * (double)scale)));
 }
 
 internal struct GraphicsFramePassState
