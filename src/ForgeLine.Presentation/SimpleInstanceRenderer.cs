@@ -12,7 +12,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
     private const int MatrixRootConstantCount = 16;
     private const int RootConstantCount =
         MatrixRootConstantCount +
-        SceneLightingSettings.ShaderConstantCount;
+        SceneLightingSettings.ShaderConstantCount + 5;
     private const int FallbackVertexStride = 48;
     private const int InstanceStride = 112;
     private const int MinimumInstanceCapacity = 64;
@@ -664,6 +664,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
             constants[
                 MatrixRootConstantCount..]);
 
+        constants[30] = 0; constants[31] = 0;
+        constants[32] = camera.Position.X; constants[33] = camera.Position.Y; constants[34] = camera.Position.Z;
+
         int draws = 0;
         int shadowSubmitted = 0;
 
@@ -888,6 +891,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 float4 SceneDirectionalColorAmbientIntensity;
                 float4 SceneAmbientColorExposure;
                 float2 SceneGroundAmbientToneMapping;
+                float2 FramePadding;
+                float3 CameraPosition;
             };
 
             struct VertexInput
@@ -906,6 +911,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 float4 Position : SV_Position;
                 float4 Color : COLOR0;
                 float3 WorldPosition : TEXCOORD14;
+                float3 WorldView : TEXCOORD15;
                 float3 WorldNormal : TEXCOORD0;
                 nointerpolation float4 SceneLight : TEXCOORD1;
                 nointerpolation float4 SceneDirectionalAmbient : TEXCOORD2;
@@ -932,17 +938,15 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     (float3x3)world;
 
                 output.WorldPosition = worldPosition.xyz;
+                output.WorldView = CameraPosition - worldPosition.xyz;
                 output.Position =
                     mul(
                         worldPosition,
                         ViewProjection);
                 output.Color =
                     input.Color;
-                output.WorldNormal =
-                    normalize(
-                        mul(
-                            input.Normal,
-                            worldBasis));
+                float orientation;
+                output.WorldNormal = PbrTransformNormal(input.Normal, worldBasis, orientation);
                 output.SceneLight =
                     SceneLightDirectionIntensity;
                 output.SceneDirectionalAmbient =
@@ -961,150 +965,13 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 float4 Position : SV_Position;
                 float4 Color : COLOR0;
                 float3 WorldPosition : TEXCOORD14;
+                float3 WorldView : TEXCOORD15;
                 float3 WorldNormal : TEXCOORD0;
                 nointerpolation float4 SceneLight : TEXCOORD1;
                 nointerpolation float4 SceneDirectionalAmbient : TEXCOORD2;
                 nointerpolation float4 SceneAmbientExposure : TEXCOORD3;
                 nointerpolation float2 SceneGroundTone : TEXCOORD4;
             };
-
-            float3 ToneMapAces(float3 value)
-            {
-                const float a = 2.51f;
-                const float b = 0.03f;
-                const float c = 2.43f;
-                const float d = 0.59f;
-                const float e = 0.14f;
-
-                return saturate(
-                    (value *
-                        (a * value + b)) /
-                    (value *
-                        (c * value + d) +
-                     e));
-            }
-
-            float3 LinearToSrgb(float3 value)
-            {
-                value =
-                    max(
-                        value,
-                        0.0f);
-                float3 low =
-                    value *
-                    12.92f;
-                float3 high =
-                    1.055f *
-                    pow(
-                        max(
-                            value,
-                            0.0031308f),
-                        1.0f / 2.4f) -
-                    0.055f;
-
-                return lerp(
-                    low,
-                    high,
-                    step(
-                        float3(
-                            0.0031308f,
-                            0.0031308f,
-                            0.0031308f),
-                        value));
-            }
-
-            float3 ApplySceneLighting(
-                float3 albedo,
-                float3 worldNormal,
-                float ambientOcclusion,
-                float roughness,
-                float metallic,
-                float3 emissive,
-                float4 sceneLight,
-                float4 sceneDirectionalAmbient,
-                float4 sceneAmbientExposure,
-                float2 sceneGroundTone,
-                float3 worldPosition)
-            {
-                float3 normal =
-                    normalize(
-                        worldNormal);
-                float lightFacing =
-                    saturate(
-                        dot(
-                            normal,
-                            normalize(
-                                sceneLight.xyz)));
-                float hemisphere =
-                    saturate(
-                        normal.y *
-                            0.5f +
-                        0.5f);
-                float ambientShape =
-                    lerp(
-                        sceneGroundTone.x,
-                        1.0f,
-                        hemisphere);
-                float aoResponse =
-                    lerp(
-                        0.55f,
-                        1.0f,
-                        saturate(
-                            ambientOcclusion));
-                float3 ambient =
-                    sceneAmbientExposure.rgb *
-                    sceneDirectionalAmbient.w *
-                    ambientShape *
-                    aoResponse;
-                float3 direct =
-                    sceneDirectionalAmbient.rgb *
-                    sceneLight.w *
-                    lightFacing;
-                float diffuseEnergy =
-                    lerp(
-                        1.0f,
-                        0.72f,
-                        saturate(
-                            metallic));
-                float roughnessResponse =
-                    lerp(
-                        1.02f,
-                        0.94f,
-                        saturate(
-                            roughness));
-                float2 shadow = SampleDirectionalShadow(worldPosition, normal);
-                ambient *= shadow.y;
-                direct *= shadow.x;
-                float3 linearColor =
-                    albedo *
-                    (ambient + direct) *
-                    diffuseEnergy *
-                    roughnessResponse +
-                    emissive;
-
-            #if LINEAR_SCENE
-                return linearColor;
-            #endif
-                linearColor *=
-                    sceneAmbientExposure.w;
-
-                if (sceneGroundTone.y >= 0.5f)
-                {
-                    linearColor =
-                        ToneMapAces(
-                            linearColor);
-                }
-                else
-                {
-                    linearColor =
-                        saturate(
-                            linearColor);
-                }
-
-                return LinearToSrgb(
-                    saturate(
-                        linearColor));
-            }
 
             float4 PSMain(PixelInput input) : SV_Target0
             {
@@ -1120,7 +987,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         input.SceneDirectionalAmbient,
                         input.SceneAmbientExposure,
                         input.SceneGroundTone,
-                        input.WorldPosition);
+                        input.WorldPosition, input.WorldView);
 
                 return float4(
                     color,
@@ -1132,13 +999,13 @@ public sealed class SimpleInstanceRenderer : IDisposable
             new DxcShaderCompiler();
         GraphicsShaderBytecode vertexShader =
             compiler.Compile(
-                vertexShaderSource,
+                PbrMaterialShader.Transforms + vertexShaderSource,
                 GraphicsShaderStage.Vertex,
                 "VSMain",
                 "InstanceVertex.hlsl");
         GraphicsShaderBytecode pixelShader =
             compiler.Compile(
-                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n" : "#define LINEAR_SCENE 0\n") + (graphics.DirectionalShadows.Enabled ? DirectionalShadowShader.Source : DirectionalShadowShader.Disabled) + pixelShaderSource,
+                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n" : "#define LINEAR_SCENE 0\n") + (graphics.DirectionalShadows.Enabled ? DirectionalShadowShader.Source : DirectionalShadowShader.Disabled) + PbrMaterialShader.Lighting + pixelShaderSource,
                 GraphicsShaderStage.Pixel,
                 "PSMain",
                 "InstancePixel.hlsl");
@@ -1222,6 +1089,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 float4 SceneDirectionalColorAmbientIntensity;
                 float4 SceneAmbientColorExposure;
                 float2 SceneGroundAmbientToneMapping;
+                float2 FramePadding;
+                float3 CameraPosition;
             };
 
             struct VertexInput
@@ -1244,6 +1113,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 float4 Position : SV_Position;
                 float4 Color : COLOR0;
                 float3 WorldPosition : TEXCOORD14;
+                float3 WorldView : TEXCOORD15;
                 float2 Uv : TEXCOORD0;
                 float3 WorldNormal : TEXCOORD1;
                 float4 WorldTangent : TEXCOORD2;
@@ -1274,6 +1144,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     (float3x3)world;
 
                 output.WorldPosition = worldPosition.xyz;
+                output.WorldView = CameraPosition - worldPosition.xyz;
                 output.Position =
                     mul(
                         worldPosition,
@@ -1282,17 +1153,14 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     input.Color;
                 output.Uv =
                     input.Uv;
-                output.WorldNormal =
-                    normalize(
-                        mul(
-                            input.Normal,
-                            worldBasis));
+                float orientation;
+                output.WorldNormal = PbrTransformNormal(input.Normal, worldBasis, orientation);
                 output.WorldTangent =
                     float4(
                         mul(
                             input.Tangent.xyz,
                             worldBasis),
-                        input.Tangent.w);
+                        input.Tangent.w * orientation);
                 output.Material0 =
                     input.Material0;
                 output.Material1 =
@@ -1321,6 +1189,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 float4 Position : SV_Position;
                 float4 Color : COLOR0;
                 float3 WorldPosition : TEXCOORD14;
+                float3 WorldView : TEXCOORD15;
                 float2 Uv : TEXCOORD0;
                 float3 WorldNormal : TEXCOORD1;
                 float4 WorldTangent : TEXCOORD2;
@@ -1342,144 +1211,6 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     cross(
                         axis,
                         normal));
-            }
-
-            float3 ToneMapAces(float3 value)
-            {
-                const float a = 2.51f;
-                const float b = 0.03f;
-                const float c = 2.43f;
-                const float d = 0.59f;
-                const float e = 0.14f;
-
-                return saturate(
-                    (value *
-                        (a * value + b)) /
-                    (value *
-                        (c * value + d) +
-                     e));
-            }
-
-            float3 LinearToSrgb(float3 value)
-            {
-                value =
-                    max(
-                        value,
-                        0.0f);
-                float3 low =
-                    value *
-                    12.92f;
-                float3 high =
-                    1.055f *
-                    pow(
-                        max(
-                            value,
-                            0.0031308f),
-                        1.0f / 2.4f) -
-                    0.055f;
-
-                return lerp(
-                    low,
-                    high,
-                    step(
-                        float3(
-                            0.0031308f,
-                            0.0031308f,
-                            0.0031308f),
-                        value));
-            }
-
-            float3 ApplySceneLighting(
-                float3 albedo,
-                float3 worldNormal,
-                float ambientOcclusion,
-                float roughness,
-                float metallic,
-                float3 emissive,
-                float4 sceneLight,
-                float4 sceneDirectionalAmbient,
-                float4 sceneAmbientExposure,
-                float2 sceneGroundTone,
-                float3 worldPosition)
-            {
-                float3 normal =
-                    normalize(
-                        worldNormal);
-                float lightFacing =
-                    saturate(
-                        dot(
-                            normal,
-                            normalize(
-                                sceneLight.xyz)));
-                float hemisphere =
-                    saturate(
-                        normal.y *
-                            0.5f +
-                        0.5f);
-                float ambientShape =
-                    lerp(
-                        sceneGroundTone.x,
-                        1.0f,
-                        hemisphere);
-                float aoResponse =
-                    lerp(
-                        0.55f,
-                        1.0f,
-                        saturate(
-                            ambientOcclusion));
-                float3 ambient =
-                    sceneAmbientExposure.rgb *
-                    sceneDirectionalAmbient.w *
-                    ambientShape *
-                    aoResponse;
-                float3 direct =
-                    sceneDirectionalAmbient.rgb *
-                    sceneLight.w *
-                    lightFacing;
-                float diffuseEnergy =
-                    lerp(
-                        1.0f,
-                        0.72f,
-                        saturate(
-                            metallic));
-                float roughnessResponse =
-                    lerp(
-                        1.02f,
-                        0.94f,
-                        saturate(
-                            roughness));
-                float2 shadow = SampleDirectionalShadow(worldPosition, normal);
-                ambient *= shadow.y;
-                direct *= shadow.x;
-                float3 linearColor =
-                    albedo *
-                    (ambient + direct) *
-                    diffuseEnergy *
-                    roughnessResponse +
-                    emissive;
-
-            #if LINEAR_SCENE
-                return linearColor;
-            #endif
-                linearColor *=
-                    sceneAmbientExposure.w;
-
-                if (sceneGroundTone.y >= 0.5f)
-                {
-                    linearColor =
-                        ToneMapAces(
-                            linearColor);
-                }
-                else
-                {
-                    linearColor =
-                        saturate(
-                            linearColor);
-                }
-
-                return LinearToSrgb(
-                    saturate(
-                        linearColor));
             }
 
             float4 PSMain(PixelInput input) : SV_Target0
@@ -1578,7 +1309,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                         input.SceneDirectionalAmbient,
                         input.SceneAmbientExposure,
                         input.SceneGroundTone,
-                        input.WorldPosition);
+                        input.WorldPosition, input.WorldView);
 
                 return float4(
                     color,
@@ -1591,13 +1322,13 @@ public sealed class SimpleInstanceRenderer : IDisposable
             new DxcShaderCompiler();
         GraphicsShaderBytecode vertexShader =
             compiler.Compile(
-                vertexShaderSource,
+                PbrMaterialShader.Transforms + vertexShaderSource,
                 GraphicsShaderStage.Vertex,
                 "VSMain",
                 "InstanceMaterialVertex.hlsl");
         GraphicsShaderBytecode pixelShader =
             compiler.Compile(
-                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n" : "#define LINEAR_SCENE 0\n") + (graphics.DirectionalShadows.Enabled ? DirectionalShadowShader.Source : DirectionalShadowShader.Disabled) + pixelShaderSource,
+                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n" : "#define LINEAR_SCENE 0\n") + (graphics.DirectionalShadows.Enabled ? DirectionalShadowShader.Source : DirectionalShadowShader.Disabled) + PbrMaterialShader.Lighting + pixelShaderSource,
                 GraphicsShaderStage.Pixel,
                 "PSMain",
                 "InstanceMaterialPixel.hlsl");

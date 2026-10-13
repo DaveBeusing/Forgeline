@@ -21,7 +21,7 @@ public sealed class TerrainRenderer : IDisposable
     private const int TerrainBaseRootConstantCount = 36;
     private const int TerrainRootConstantCount =
         TerrainBaseRootConstantCount +
-        SceneLightingSettings.ShaderConstantCount;
+        SceneLightingSettings.ShaderConstantCount + 1;
     private const int TerrainTextureCount = 13;
     private const int LayerCount = TerrainChunkSplatData.LayerCount;
 
@@ -272,16 +272,11 @@ public sealed class TerrainRenderer : IDisposable
             submittedTriangles +=
                 resource.TriangleCount;
 
-            constants[16] =
-                DebugChunksEnabled
-                    ? 1.0f
-                    : 0.0f;
-            constants[17] =
-                (float)DebugVisualizationMode;
-            constants[18] =
-                0.0f;
-            constants[19] =
-                0.0f;
+            constants[16] = BitConverter.Int32BitsToSingle(((int)DebugVisualizationMode << 1) | (DebugChunksEnabled ? 1 : 0));
+            constants[17] = camera.Position.X;
+            constants[18] = 0;
+            constants[19] = camera.Position.Y;
+            constants[50] = camera.Position.Z;
             WriteLayerConstants(
                 resource.Layers,
                 constants);
@@ -475,10 +470,10 @@ public sealed class TerrainRenderer : IDisposable
             cbuffer TerrainFrame : register(b0)
             {
                 row_major float4x4 ViewProjection;
-                float DebugChunks;
-                float DebugMode;
+                uint DebugFlags;
+                float CameraX;
                 uint PackedPaletteSlots;
-                float TerrainPadding;
+                float CameraY;
                 float4 LayerUvScale01;
                 float4 LayerUvScale23;
                 uint4 LayerBaseColorPacked;
@@ -487,6 +482,7 @@ public sealed class TerrainRenderer : IDisposable
                 float4 SceneDirectionalColorAmbientIntensity;
                 float4 SceneAmbientColorExposure;
                 float2 SceneGroundAmbientToneMapping;
+                float CameraZ;
             };
 
             struct VertexInput
@@ -501,6 +497,7 @@ public sealed class TerrainRenderer : IDisposable
             {
                 float4 Position : SV_Position;
                 float3 WorldPosition : TEXCOORD0;
+                float3 WorldView : TEXCOORD14;
                 float3 Normal : TEXCOORD1;
                 float2 LocalUv : TEXCOORD2;
                 float DebugChunks : TEXCOORD3;
@@ -528,16 +525,17 @@ public sealed class TerrainRenderer : IDisposable
                         ViewProjection);
                 output.WorldPosition =
                     input.Position;
+                output.WorldView = float3(CameraX, CameraY, CameraZ) - input.Position;
                 output.Normal =
                     input.Normal;
                 output.LocalUv =
                     input.LocalUv;
                 output.DebugChunks =
-                    DebugChunks;
+                    (DebugFlags & 1) != 0 ? 1.0f : 0.0f;
                 output.MacroTint =
                     input.MacroTint;
                 output.DebugMode =
-                    DebugMode;
+                    float(DebugFlags >> 1);
                 output.LayerUvScale01 =
                     LayerUvScale01;
                 output.LayerUvScale23 =
@@ -582,6 +580,7 @@ public sealed class TerrainRenderer : IDisposable
             {
                 float4 Position : SV_Position;
                 float3 WorldPosition : TEXCOORD0;
+                float3 WorldView : TEXCOORD14;
                 float3 Normal : TEXCOORD1;
                 float2 LocalUv : TEXCOORD2;
                 float DebugChunks : TEXCOORD3;
@@ -658,144 +657,6 @@ public sealed class TerrainRenderer : IDisposable
                     packed & 0xffffu,
                     (packed >> 16) & 0xffffu) /
                     65535.0f;
-            }
-
-            float3 ToneMapAces(float3 value)
-            {
-                const float a = 2.51f;
-                const float b = 0.03f;
-                const float c = 2.43f;
-                const float d = 0.59f;
-                const float e = 0.14f;
-
-                return saturate(
-                    (value *
-                        (a * value + b)) /
-                    (value *
-                        (c * value + d) +
-                     e));
-            }
-
-            float3 LinearToSrgb(float3 value)
-            {
-                value =
-                    max(
-                        value,
-                        0.0f);
-                float3 low =
-                    value *
-                    12.92f;
-                float3 high =
-                    1.055f *
-                    pow(
-                        max(
-                            value,
-                            0.0031308f),
-                        1.0f / 2.4f) -
-                    0.055f;
-
-                return lerp(
-                    low,
-                    high,
-                    step(
-                        float3(
-                            0.0031308f,
-                            0.0031308f,
-                            0.0031308f),
-                        value));
-            }
-
-            float3 ApplySceneLighting(
-                float3 albedo,
-                float3 worldNormal,
-                float ambientOcclusion,
-                float roughness,
-                float metallic,
-                float3 emissive,
-                float4 sceneLight,
-                float4 sceneDirectionalAmbient,
-                float4 sceneAmbientExposure,
-                float2 sceneGroundTone,
-                float3 worldPosition)
-            {
-                float3 normal =
-                    normalize(
-                        worldNormal);
-                float lightFacing =
-                    saturate(
-                        dot(
-                            normal,
-                            normalize(
-                                sceneLight.xyz)));
-                float hemisphere =
-                    saturate(
-                        normal.y *
-                            0.5f +
-                        0.5f);
-                float ambientShape =
-                    lerp(
-                        sceneGroundTone.x,
-                        1.0f,
-                        hemisphere);
-                float aoResponse =
-                    lerp(
-                        0.55f,
-                        1.0f,
-                        saturate(
-                            ambientOcclusion));
-                float3 ambient =
-                    sceneAmbientExposure.rgb *
-                    sceneDirectionalAmbient.w *
-                    ambientShape *
-                    aoResponse;
-                float3 direct =
-                    sceneDirectionalAmbient.rgb *
-                    sceneLight.w *
-                    lightFacing;
-                float diffuseEnergy =
-                    lerp(
-                        1.0f,
-                        0.72f,
-                        saturate(
-                            metallic));
-                float roughnessResponse =
-                    lerp(
-                        1.02f,
-                        0.94f,
-                        saturate(
-                            roughness));
-                float2 shadow = SampleDirectionalShadow(worldPosition, normal);
-                ambient *= shadow.y;
-                direct *= shadow.x;
-                float3 linearColor =
-                    albedo *
-                    (ambient + direct) *
-                    diffuseEnergy *
-                    roughnessResponse +
-                    emissive;
-
-            #if LINEAR_SCENE
-                return linearColor;
-            #endif
-                linearColor *=
-                    sceneAmbientExposure.w;
-
-                if (sceneGroundTone.y >= 0.5f)
-                {
-                    linearColor =
-                        ToneMapAces(
-                            linearColor);
-                }
-                else
-                {
-                    linearColor =
-                        saturate(
-                            linearColor);
-                }
-
-                return LinearToSrgb(
-                    saturate(
-                        linearColor));
             }
 
             float4 PSMain(PixelInput input) : SV_Target0
@@ -955,7 +816,7 @@ public sealed class TerrainRenderer : IDisposable
                         input.SceneDirectionalAmbient,
                         input.SceneAmbientExposure,
                         input.SceneGroundTone,
-                        input.WorldPosition);
+                        input.WorldPosition, input.WorldView);
 
                 if (input.DebugChunks > 0.5f)
                 {
@@ -993,13 +854,13 @@ public sealed class TerrainRenderer : IDisposable
             new DxcShaderCompiler();
         GraphicsShaderBytecode vertexShader =
             compiler.Compile(
-                vertexShaderSource,
+                PbrMaterialShader.Transforms + vertexShaderSource,
                 GraphicsShaderStage.Vertex,
                 "VSMain",
                 "TerrainVertex.hlsl");
         GraphicsShaderBytecode pixelShader =
             compiler.Compile(
-                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n#define DEBUG_ALPHA -2.0f\n" : "#define LINEAR_SCENE 0\n#define DEBUG_ALPHA 1.0f\n") + (graphics.DirectionalShadows.Enabled ? DirectionalShadowShader.Source : DirectionalShadowShader.Disabled) + TerrainSurfaceShader.Constants(surfaceDetail) + pixelShaderSource,
+                (graphics.SceneOutput.Enabled ? "#define LINEAR_SCENE 1\n#define DEBUG_ALPHA -2.0f\n" : "#define LINEAR_SCENE 0\n#define DEBUG_ALPHA 1.0f\n") + (graphics.DirectionalShadows.Enabled ? DirectionalShadowShader.Source : DirectionalShadowShader.Disabled) + TerrainSurfaceShader.Constants(surfaceDetail) + PbrMaterialShader.Lighting + pixelShaderSource,
                 GraphicsShaderStage.Pixel,
                 "PSMain",
                 "TerrainPixel.hlsl");
