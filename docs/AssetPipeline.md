@@ -646,3 +646,14 @@ not own vehicle movement or docking. See
 The integrated operational, industrial and logistics catalog contains 465 assets
 (282 meshes, 56 textures and 127 materials). All dedicated source owners and
 state mappings are retained. Qualification totals describe recorded revisions.
+
+## Infantry and battlefield source owner
+
+`build/Author-InfantryBattlefield.py` reads editable infantry and battlefield JSON
+recipes, exporting 58 actual glTFs with inspectable groups. `--output` isolates
+byte-identical re-export; `--update-metadata` refreshes owned bindings. Current
+integrated catalog: 482 assets (299 meshes, 56 textures, 127 materials). Collision
+proxies and PBR masters remain independent; runtime files remain compiler-owned.
+New rigid InfantryStride reuses completed-tick travel, existing bounded ranges
+and neutral LOD fade, without a new animation asset type. See
+[source mapping and qualification](InfantryBattlefieldProduction.md).

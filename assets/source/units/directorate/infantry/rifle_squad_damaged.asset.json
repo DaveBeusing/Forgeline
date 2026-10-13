@@ -1,0 +1,8 @@
+{
+  "id": "unit.directorate.rifle_squad.damaged",
+  "type": "mesh",
+  "materialReferences": [
+    "material.directorate.unit.rifle_squad"
+  ],
+  "source": "../sources/infantry/rifle_squad_damaged.gltf"
+}

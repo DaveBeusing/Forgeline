@@ -148,6 +148,9 @@ public static class WorldPresentationCatalog
         AddProp(WorldVisualId.PropLoadingApron, "loading_apron", new Vector4(.48f, .49f, .45f, 1), 260.0f);
         AddProp(WorldVisualId.PropServiceFence, "service_fence", new Vector4(.48f, .49f, .45f, 1), 300.0f);
 
+        Add(WorldVisualId.PropScorchedBarrier, "mesh.world.prop.scorched_barrier", "mesh.world.prop.scorched_barrier_lod1", "material.world.prop.industrial", null, new Vector4(.3f, .28f, .24f, 1), 260);
+        Add(WorldVisualId.PropBurstPipe, "mesh.world.prop.burst_pipe", "mesh.world.prop.burst_pipe_lod1", "material.world.prop.industrial", null, new Vector4(.3f, .28f, .24f, 1), 240);
+
         AddVegetation(WorldVisualId.VegetationConifer, "conifer", new Vector4(0.18f, 0.31f, 0.19f, 1.0f), 190.0f);
         AddVegetation(WorldVisualId.VegetationScrub, "scrub", new Vector4(0.30f, 0.40f, 0.22f, 1.0f), 160.0f);
         AddVegetation(WorldVisualId.VegetationGrassClump, "grass_clump", new Vector4(0.32f, 0.43f, 0.22f, 1.0f), 110.0f);

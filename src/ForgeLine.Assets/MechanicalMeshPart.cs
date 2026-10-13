@@ -9,7 +9,8 @@ public enum MechanicalMotionKind
     Fan,
     Radar,
     Door,
-    Crane
+    Crane,
+    InfantryStride
 }
 
 /// <summary>A triangle range in the existing mesh, in mesh-local coordinates.</summary>

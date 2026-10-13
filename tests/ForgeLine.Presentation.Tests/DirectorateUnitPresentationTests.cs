@@ -27,7 +27,7 @@ public sealed class DirectorateUnitPresentationTests
         Assert.Equal(new string?[] { null, "unit.directorate.main_battle_tank.damaged", "unit.directorate.main_battle_tank.critical", null }, attachments);
         Assert.Equal("unit.directorate.main_battle_tank.wreck", UnitPresentationCatalog.ResolveWreckAssetId(states[3]));
         var scout = new UnitFeaturePresentationMetadata(UnitIds.ScoutVehicle, UnitPresentationDamageState.Wreck);
-        Assert.Equal("unit.directorate.scout_vehicle.lod2", UnitPresentationCatalog.ResolveWreckAssetId(scout));
+        Assert.Equal("unit.directorate.scout_vehicle.wreck", UnitPresentationCatalog.ResolveWreckAssetId(scout));
         Assert.Null(UnitPresentationCatalog.ResolveStateAttachmentAssetId(scout));
     }
 
@@ -91,12 +91,29 @@ public sealed class DirectorateUnitPresentationTests
             UnitPresentationCatalog.Get(
                 UnitIds.CombatEngineer);
 
-        Assert.Equal(
+        Assert.NotEqual(
             rifle.MeshAssetId,
             engineer.MeshAssetId);
         Assert.Equal(
             rifle.MaterialAssetId,
             engineer.MaterialAssetId);
+    }
+
+    [Theory]
+    [InlineData(UnitAssetLod.Lod0)]
+    [InlineData(UnitAssetLod.Lod1)]
+    [InlineData(UnitAssetLod.Lod2)]
+    public void InfantryDamageGeometryRemainsBoundAcrossAllLods(UnitAssetLod lod)
+    {
+        foreach (UnitId unit in new[] { UnitIds.RifleSquad, UnitIds.CombatEngineer })
+        {
+            string prefix = UnitPresentationCatalog.Get(unit).MeshAssetId;
+            Assert.Equal(prefix + ".damaged", UnitPresentationCatalog.ResolveStateAttachmentAssetId(new(unit, UnitPresentationDamageState.Damaged), lod));
+            Assert.Equal(prefix + ".critical", UnitPresentationCatalog.ResolveStateAttachmentAssetId(new(unit, UnitPresentationDamageState.Critical), lod));
+            Assert.Null(UnitPresentationCatalog.ResolveStateAttachmentAssetId(new(unit, UnitPresentationDamageState.Wreck), lod));
+        }
+        if (lod == UnitAssetLod.Lod2)
+            Assert.Null(UnitPresentationCatalog.ResolveStateAttachmentAssetId(new(UnitIds.MainBattleTank, UnitPresentationDamageState.Critical), lod));
     }
 
     [Fact]

@@ -192,3 +192,12 @@ and rooted broadleaf vegetation through the existing High/Reduced world catalog.
 Shared materials, normalized pivots, tooling-only collision proxies and stable
 world IDs retain existing presentation contracts. The selected ferrous source
 is refined under its existing IDs and bounds.
+
+## Battlefield destruction variants
+
+Dedicated fractured rubble, scorched barrier and burst pipe sources extend the
+modular kit's atlas/centered-proxy conventions. Existing damaged/destroyed
+road/bridge IDs now bind fractured slabs, exposed rebar and broken deck/girder
+geometry using authorized infrastructure states. No navigation/physics side
+effects or resource changes are added. See
+[Infantry and battlefield production](InfantryBattlefieldProduction.md).

@@ -1,0 +1,2168 @@
+{
+  "rifle_squad.lod0": {
+    "vertices": 10860,
+    "triangles": 5120,
+    "minimum": [
+      -0.4306178689002991,
+      -0.5,
+      -0.4300000071525574
+    ],
+    "maximum": [
+      0.43061643838882446,
+      0.5099999904632568,
+      0.41999998688697815
+    ],
+    "sha256": "c2615f3d966da734c6d05889d87d623d50fa4842656b4c6b3245f9e4dffdbf92",
+    "groups": [
+      {
+        "name": "member_0_body",
+        "firstIndex": 0,
+        "indexCount": 1752,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_0_hip_left",
+        "firstIndex": 1752,
+        "indexCount": 480,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_0_hip_left",
+        "rate": -4.0,
+        "travel": 0.42
+      },
+      {
+        "name": "member_0_hip_right",
+        "firstIndex": 2232,
+        "indexCount": 480,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_0_hip_right",
+        "rate": 4.0,
+        "travel": 0.42
+      },
+      {
+        "name": "member_0_shoulder",
+        "firstIndex": 2712,
+        "indexCount": 1308,
+        "parent": -1,
+        "motion": "cannon",
+        "socket": "member_0_shoulder",
+        "rate": 1,
+        "travel": 0.004
+      },
+      {
+        "name": "member_1_body",
+        "firstIndex": 4020,
+        "indexCount": 1512,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_1_hip_left",
+        "firstIndex": 5532,
+        "indexCount": 480,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_1_hip_left",
+        "rate": -4.0,
+        "travel": 0.42
+      },
+      {
+        "name": "member_1_hip_right",
+        "firstIndex": 6012,
+        "indexCount": 480,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_1_hip_right",
+        "rate": 4.0,
+        "travel": 0.42
+      },
+      {
+        "name": "member_1_shoulder",
+        "firstIndex": 6492,
+        "indexCount": 1308,
+        "parent": -1,
+        "motion": "cannon",
+        "socket": "member_1_shoulder",
+        "rate": 1,
+        "travel": 0.004
+      },
+      {
+        "name": "member_2_body",
+        "firstIndex": 7800,
+        "indexCount": 1512,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_2_hip_left",
+        "firstIndex": 9312,
+        "indexCount": 480,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_2_hip_left",
+        "rate": -4.0,
+        "travel": 0.42
+      },
+      {
+        "name": "member_2_hip_right",
+        "firstIndex": 9792,
+        "indexCount": 480,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_2_hip_right",
+        "rate": 4.0,
+        "travel": 0.42
+      },
+      {
+        "name": "member_2_shoulder",
+        "firstIndex": 10272,
+        "indexCount": 1308,
+        "parent": -1,
+        "motion": "cannon",
+        "socket": "member_2_shoulder",
+        "rate": 1,
+        "travel": 0.004
+      },
+      {
+        "name": "member_3_body",
+        "firstIndex": 11580,
+        "indexCount": 1512,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_3_hip_left",
+        "firstIndex": 13092,
+        "indexCount": 480,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_3_hip_left",
+        "rate": -4.0,
+        "travel": 0.42
+      },
+      {
+        "name": "member_3_hip_right",
+        "firstIndex": 13572,
+        "indexCount": 480,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_3_hip_right",
+        "rate": 4.0,
+        "travel": 0.42
+      },
+      {
+        "name": "member_3_shoulder",
+        "firstIndex": 14052,
+        "indexCount": 1308,
+        "parent": -1,
+        "motion": "cannon",
+        "socket": "member_3_shoulder",
+        "rate": 1,
+        "travel": 0.004
+      }
+    ]
+  },
+  "rifle_squad.lod1": {
+    "vertices": 3132,
+    "triangles": 1552,
+    "minimum": [
+      -0.4283274710178375,
+      -0.5,
+      -0.4300000071525574
+    ],
+    "maximum": [
+      0.42832615971565247,
+      0.5099999904632568,
+      0.41999998688697815
+    ],
+    "sha256": "0cf11ebdc74db44bb35a4f631df48c83c318bed9920ba28ded1b89ebc606bd7b",
+    "groups": [
+      {
+        "name": "member_0_body",
+        "firstIndex": 0,
+        "indexCount": 444,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_0_hip_left",
+        "firstIndex": 444,
+        "indexCount": 192,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_0_hip_right",
+        "firstIndex": 636,
+        "indexCount": 192,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_0_shoulder",
+        "firstIndex": 828,
+        "indexCount": 408,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_1_body",
+        "firstIndex": 1236,
+        "indexCount": 348,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_1_hip_left",
+        "firstIndex": 1584,
+        "indexCount": 192,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_1_hip_right",
+        "firstIndex": 1776,
+        "indexCount": 192,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_1_shoulder",
+        "firstIndex": 1968,
+        "indexCount": 408,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_2_body",
+        "firstIndex": 2376,
+        "indexCount": 348,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_2_hip_left",
+        "firstIndex": 2724,
+        "indexCount": 192,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_2_hip_right",
+        "firstIndex": 2916,
+        "indexCount": 192,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_2_shoulder",
+        "firstIndex": 3108,
+        "indexCount": 408,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_3_body",
+        "firstIndex": 3516,
+        "indexCount": 348,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_3_hip_left",
+        "firstIndex": 3864,
+        "indexCount": 192,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_3_hip_right",
+        "firstIndex": 4056,
+        "indexCount": 192,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_3_shoulder",
+        "firstIndex": 4248,
+        "indexCount": 408,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "rifle_squad.lod2": {
+    "vertices": 1728,
+    "triangles": 864,
+    "minimum": [
+      -0.43193623423576355,
+      -0.5,
+      -0.4300000071525574
+    ],
+    "maximum": [
+      0.4319347143173218,
+      0.49000000953674316,
+      0.41999998688697815
+    ],
+    "sha256": "f36a95110edbd1f943bdebbd964d9acdfdacfca3176687700d325a115a73f911",
+    "groups": [
+      {
+        "name": "member_0_body",
+        "firstIndex": 0,
+        "indexCount": 180,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_0_hip_left",
+        "firstIndex": 180,
+        "indexCount": 108,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_0_hip_right",
+        "firstIndex": 288,
+        "indexCount": 108,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_0_shoulder",
+        "firstIndex": 396,
+        "indexCount": 252,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_1_body",
+        "firstIndex": 648,
+        "indexCount": 180,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_1_hip_left",
+        "firstIndex": 828,
+        "indexCount": 108,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_1_hip_right",
+        "firstIndex": 936,
+        "indexCount": 108,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_1_shoulder",
+        "firstIndex": 1044,
+        "indexCount": 252,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_2_body",
+        "firstIndex": 1296,
+        "indexCount": 180,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_2_hip_left",
+        "firstIndex": 1476,
+        "indexCount": 108,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_2_hip_right",
+        "firstIndex": 1584,
+        "indexCount": 108,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_2_shoulder",
+        "firstIndex": 1692,
+        "indexCount": 252,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_3_body",
+        "firstIndex": 1944,
+        "indexCount": 180,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_3_hip_left",
+        "firstIndex": 2124,
+        "indexCount": 108,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_3_hip_right",
+        "firstIndex": 2232,
+        "indexCount": 108,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_3_shoulder",
+        "firstIndex": 2340,
+        "indexCount": 252,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "rifle_squad.kit.member_0_body": {
+    "vertices": 1368,
+    "triangles": 584,
+    "minimum": [
+      -0.03200000151991844,
+      -0.03999999910593033,
+      0.10499999672174454
+    ],
+    "maximum": [
+      0.13199999928474426,
+      0.5099999904632568,
+      0.29600000381469727
+    ],
+    "sha256": "40fb85fa985903c21e3232e2a5be2327a575da468893d41b68a7666c96e69d82",
+    "groups": [
+      {
+        "name": "member_0_body",
+        "firstIndex": 0,
+        "indexCount": 1752,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "rifle_squad.kit.member_0_hip_left": {
+    "vertices": 312,
+    "triangles": 160,
+    "minimum": [
+      -0.03484648838639259,
+      -0.5,
+      0.17610669136047363
+    ],
+    "maximum": [
+      0.04884648695588112,
+      0.018062323331832886,
+      0.289000004529953
+    ],
+    "sha256": "ec73209ebed8f3f79d0ba86edae7ddce3defb5e270d3a6109192e3ae8c7da5cc",
+    "groups": [
+      {
+        "name": "member_0_hip_left",
+        "firstIndex": 0,
+        "indexCount": 480,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_0_hip_left",
+        "rate": -4.0,
+        "travel": 0.42
+      }
+    ]
+  },
+  "rifle_squad.kit.member_0_hip_right": {
+    "vertices": 312,
+    "triangles": 160,
+    "minimum": [
+      0.051153514534235,
+      -0.5,
+      0.17610669136047363
+    ],
+    "maximum": [
+      0.134846493601799,
+      0.018062323331832886,
+      0.289000004529953
+    ],
+    "sha256": "4a9d0b365c28ba7aeb12108b7b3c3e712b6ad445eca517b97eeb5f04d754a913",
+    "groups": [
+      {
+        "name": "member_0_hip_right",
+        "firstIndex": 0,
+        "indexCount": 480,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_0_hip_right",
+        "rate": 4.0,
+        "travel": 0.42
+      }
+    ]
+  },
+  "rifle_squad.kit.member_0_shoulder": {
+    "vertices": 840,
+    "triangles": 436,
+    "minimum": [
+      -0.08061787486076355,
+      -0.02500000037252903,
+      0.009999999776482582
+    ],
+    "maximum": [
+      0.18061643838882446,
+      0.2477739006280899,
+      0.41999998688697815
+    ],
+    "sha256": "244ba5a3bc1c326c36480022b6271416e4415df3fe9de415730f75e5a6ebb679",
+    "groups": [
+      {
+        "name": "member_0_shoulder",
+        "firstIndex": 0,
+        "indexCount": 1308,
+        "parent": -1,
+        "motion": "cannon",
+        "socket": "member_0_shoulder",
+        "rate": 1,
+        "travel": 0.004
+      }
+    ]
+  },
+  "rifle_squad.kit.member_1_body": {
+    "vertices": 1212,
+    "triangles": 504,
+    "minimum": [
+      -0.38199999928474426,
+      -0.03999999910593033,
+      0.1120000034570694
+    ],
+    "maximum": [
+      -0.21799999475479126,
+      0.4880000054836273,
+      0.29600000381469727
+    ],
+    "sha256": "075e73682ad5179a58ab902aca5c41c38aa71282a575f4803f5187ccdd029beb",
+    "groups": [
+      {
+        "name": "member_1_body",
+        "firstIndex": 0,
+        "indexCount": 1512,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "rifle_squad.kit.member_1_hip_left": {
+    "vertices": 312,
+    "triangles": 160,
+    "minimum": [
+      -0.3848464787006378,
+      -0.5,
+      0.17610669136047363
+    ],
+    "maximum": [
+      -0.3011535108089447,
+      0.018062323331832886,
+      0.289000004529953
+    ],
+    "sha256": "ae5e46d83e6d1e7172ad3e3a30ba75e9b3dc6403786adfd03d8ac1ffe6924061",
+    "groups": [
+      {
+        "name": "member_1_hip_left",
+        "firstIndex": 0,
+        "indexCount": 480,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_1_hip_left",
+        "rate": -4.0,
+        "travel": 0.42
+      }
+    ]
+  },
+  "rifle_squad.kit.member_1_hip_right": {
+    "vertices": 312,
+    "triangles": 160,
+    "minimum": [
+      -0.2988464832305908,
+      -0.5,
+      0.17610669136047363
+    ],
+    "maximum": [
+      -0.2151535153388977,
+      0.018062323331832886,
+      0.289000004529953
+    ],
+    "sha256": "1f01de45d83811b17e8b758b6210fa8fbd3e621d9c02558151dd5f95a4a1fa8b",
+    "groups": [
+      {
+        "name": "member_1_hip_right",
+        "firstIndex": 0,
+        "indexCount": 480,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_1_hip_right",
+        "rate": 4.0,
+        "travel": 0.42
+      }
+    ]
+  },
+  "rifle_squad.kit.member_1_shoulder": {
+    "vertices": 840,
+    "triangles": 436,
+    "minimum": [
+      -0.4306178689002991,
+      -0.02500000037252903,
+      0.009999999776482582
+    ],
+    "maximum": [
+      -0.16938357055187225,
+      0.2477739006280899,
+      0.41999998688697815
+    ],
+    "sha256": "10a379b9221329844571485465d0fe7e5d1bac5caf055a789898291aca594b92",
+    "groups": [
+      {
+        "name": "member_1_shoulder",
+        "firstIndex": 0,
+        "indexCount": 1308,
+        "parent": -1,
+        "motion": "cannon",
+        "socket": "member_1_shoulder",
+        "rate": 1,
+        "travel": 0.004
+      }
+    ]
+  },
+  "rifle_squad.kit.member_2_body": {
+    "vertices": 1212,
+    "triangles": 504,
+    "minimum": [
+      0.21799999475479126,
+      -0.03999999910593033,
+      -0.328000009059906
+    ],
+    "maximum": [
+      0.38199999928474426,
+      0.4880000054836273,
+      -0.14399999380111694
+    ],
+    "sha256": "308fe2dcefe8e3148f6c5a294a2519e665575a23e5267fa9c4d6abc8e79f4960",
+    "groups": [
+      {
+        "name": "member_2_body",
+        "firstIndex": 0,
+        "indexCount": 1512,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "rifle_squad.kit.member_2_hip_left": {
+    "vertices": 312,
+    "triangles": 160,
+    "minimum": [
+      0.2151535153388977,
+      -0.5,
+      -0.2638933062553406
+    ],
+    "maximum": [
+      0.2988464832305908,
+      0.018062323331832886,
+      -0.1509999930858612
+    ],
+    "sha256": "ccc74742f944ca954b83b6f0876483e07e264418c14c667fbeef214ae7f85c08",
+    "groups": [
+      {
+        "name": "member_2_hip_left",
+        "firstIndex": 0,
+        "indexCount": 480,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_2_hip_left",
+        "rate": -4.0,
+        "travel": 0.42
+      }
+    ]
+  },
+  "rifle_squad.kit.member_2_hip_right": {
+    "vertices": 312,
+    "triangles": 160,
+    "minimum": [
+      0.3011535108089447,
+      -0.5,
+      -0.2638933062553406
+    ],
+    "maximum": [
+      0.3848464787006378,
+      0.018062323331832886,
+      -0.1509999930858612
+    ],
+    "sha256": "5114898c6b511f75503640442712309c3589e4be9fa53998c86591114d7fd710",
+    "groups": [
+      {
+        "name": "member_2_hip_right",
+        "firstIndex": 0,
+        "indexCount": 480,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_2_hip_right",
+        "rate": 4.0,
+        "travel": 0.42
+      }
+    ]
+  },
+  "rifle_squad.kit.member_2_shoulder": {
+    "vertices": 840,
+    "triangles": 436,
+    "minimum": [
+      0.16938212513923645,
+      -0.02500000037252903,
+      -0.4300000071525574
+    ],
+    "maximum": [
+      0.43061643838882446,
+      0.2477739006280899,
+      -0.019999999552965164
+    ],
+    "sha256": "f54590afe4726464856c029b76962be539391ba4149bc3d2f3b6a0e9d7df3f99",
+    "groups": [
+      {
+        "name": "member_2_shoulder",
+        "firstIndex": 0,
+        "indexCount": 1308,
+        "parent": -1,
+        "motion": "cannon",
+        "socket": "member_2_shoulder",
+        "rate": 1,
+        "travel": 0.004
+      }
+    ]
+  },
+  "rifle_squad.kit.member_3_body": {
+    "vertices": 1212,
+    "triangles": 504,
+    "minimum": [
+      -0.38199999928474426,
+      -0.03999999910593033,
+      -0.328000009059906
+    ],
+    "maximum": [
+      -0.21799999475479126,
+      0.4880000054836273,
+      -0.14399999380111694
+    ],
+    "sha256": "48fad8fdacdbdef2a4723627786e1a899dd888607e536f6c312a8fbfcfbdcb8b",
+    "groups": [
+      {
+        "name": "member_3_body",
+        "firstIndex": 0,
+        "indexCount": 1512,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "rifle_squad.kit.member_3_hip_left": {
+    "vertices": 312,
+    "triangles": 160,
+    "minimum": [
+      -0.3848464787006378,
+      -0.5,
+      -0.2638933062553406
+    ],
+    "maximum": [
+      -0.3011535108089447,
+      0.018062323331832886,
+      -0.1509999930858612
+    ],
+    "sha256": "7f089a5b1425927f89fa55a0e928a8a22cdadc904965873600cc7e74de5ca9e1",
+    "groups": [
+      {
+        "name": "member_3_hip_left",
+        "firstIndex": 0,
+        "indexCount": 480,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_3_hip_left",
+        "rate": -4.0,
+        "travel": 0.42
+      }
+    ]
+  },
+  "rifle_squad.kit.member_3_hip_right": {
+    "vertices": 312,
+    "triangles": 160,
+    "minimum": [
+      -0.2988464832305908,
+      -0.5,
+      -0.2638933062553406
+    ],
+    "maximum": [
+      -0.2151535153388977,
+      0.018062323331832886,
+      -0.1509999930858612
+    ],
+    "sha256": "9cae250b3da1de344504c7f334546c27cefcd6d3682bce2adf6f57ce96efd20b",
+    "groups": [
+      {
+        "name": "member_3_hip_right",
+        "firstIndex": 0,
+        "indexCount": 480,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_3_hip_right",
+        "rate": 4.0,
+        "travel": 0.42
+      }
+    ]
+  },
+  "rifle_squad.kit.member_3_shoulder": {
+    "vertices": 840,
+    "triangles": 436,
+    "minimum": [
+      -0.4306178689002991,
+      -0.02500000037252903,
+      -0.4300000071525574
+    ],
+    "maximum": [
+      -0.16938357055187225,
+      0.2477739006280899,
+      -0.019999999552965164
+    ],
+    "sha256": "0a2592d7f05979ff62b4a47109decbacafb9a9a3a22826c0495181d3b19b57ad",
+    "groups": [
+      {
+        "name": "member_3_shoulder",
+        "firstIndex": 0,
+        "indexCount": 1308,
+        "parent": -1,
+        "motion": "cannon",
+        "socket": "member_3_shoulder",
+        "rate": 1,
+        "travel": 0.004
+      }
+    ]
+  },
+  "combat_engineer.lod0": {
+    "vertices": 15516,
+    "triangles": 7424,
+    "minimum": [
+      -0.43402114510536194,
+      -0.5,
+      -0.3919999897480011
+    ],
+    "maximum": [
+      0.43061643838882446,
+      0.5099999904632568,
+      0.41999998688697815
+    ],
+    "sha256": "b4ab810d801ddbb6997849c52e839bd71b02db8b2de720fa3c941b05b43bb9c1",
+    "groups": [
+      {
+        "name": "member_0_body",
+        "firstIndex": 0,
+        "indexCount": 3084,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_0_hip_left",
+        "firstIndex": 3084,
+        "indexCount": 612,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_0_hip_left",
+        "rate": -4.0,
+        "travel": 0.42
+      },
+      {
+        "name": "member_0_hip_right",
+        "firstIndex": 3696,
+        "indexCount": 612,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_0_hip_right",
+        "rate": 4.0,
+        "travel": 0.42
+      },
+      {
+        "name": "member_0_shoulder",
+        "firstIndex": 4308,
+        "indexCount": 1440,
+        "parent": -1,
+        "motion": "cannon",
+        "socket": "member_0_shoulder",
+        "rate": 1,
+        "travel": 0.004
+      },
+      {
+        "name": "member_1_body",
+        "firstIndex": 5748,
+        "indexCount": 2844,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_1_hip_left",
+        "firstIndex": 8592,
+        "indexCount": 612,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_1_hip_left",
+        "rate": -4.0,
+        "travel": 0.42
+      },
+      {
+        "name": "member_1_hip_right",
+        "firstIndex": 9204,
+        "indexCount": 612,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_1_hip_right",
+        "rate": 4.0,
+        "travel": 0.42
+      },
+      {
+        "name": "member_1_shoulder",
+        "firstIndex": 9816,
+        "indexCount": 1440,
+        "parent": -1,
+        "motion": "cannon",
+        "socket": "member_1_shoulder",
+        "rate": 1,
+        "travel": 0.004
+      },
+      {
+        "name": "member_2_body",
+        "firstIndex": 11256,
+        "indexCount": 2844,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_2_hip_left",
+        "firstIndex": 14100,
+        "indexCount": 612,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_2_hip_left",
+        "rate": -4.0,
+        "travel": 0.42
+      },
+      {
+        "name": "member_2_hip_right",
+        "firstIndex": 14712,
+        "indexCount": 612,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_2_hip_right",
+        "rate": 4.0,
+        "travel": 0.42
+      },
+      {
+        "name": "member_2_shoulder",
+        "firstIndex": 15324,
+        "indexCount": 1440,
+        "parent": -1,
+        "motion": "cannon",
+        "socket": "member_2_shoulder",
+        "rate": 1,
+        "travel": 0.004
+      },
+      {
+        "name": "member_3_body",
+        "firstIndex": 16764,
+        "indexCount": 2844,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_3_hip_left",
+        "firstIndex": 19608,
+        "indexCount": 612,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_3_hip_left",
+        "rate": -4.0,
+        "travel": 0.42
+      },
+      {
+        "name": "member_3_hip_right",
+        "firstIndex": 20220,
+        "indexCount": 612,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_3_hip_right",
+        "rate": 4.0,
+        "travel": 0.42
+      },
+      {
+        "name": "member_3_shoulder",
+        "firstIndex": 20832,
+        "indexCount": 1440,
+        "parent": -1,
+        "motion": "cannon",
+        "socket": "member_3_shoulder",
+        "rate": 1,
+        "travel": 0.004
+      }
+    ]
+  },
+  "combat_engineer.lod1": {
+    "vertices": 4716,
+    "triangles": 2384,
+    "minimum": [
+      -0.4323205053806305,
+      -0.5,
+      -0.3919999897480011
+    ],
+    "maximum": [
+      0.42832615971565247,
+      0.5099999904632568,
+      0.41999998688697815
+    ],
+    "sha256": "8c399dcbb012c17085f7fcb484e7d915c7223c5e92f7ad9340ee046841b2ecb4",
+    "groups": [
+      {
+        "name": "member_0_body",
+        "firstIndex": 0,
+        "indexCount": 960,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_0_hip_left",
+        "firstIndex": 960,
+        "indexCount": 228,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_0_hip_right",
+        "firstIndex": 1188,
+        "indexCount": 228,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_0_shoulder",
+        "firstIndex": 1416,
+        "indexCount": 444,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_1_body",
+        "firstIndex": 1860,
+        "indexCount": 864,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_1_hip_left",
+        "firstIndex": 2724,
+        "indexCount": 228,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_1_hip_right",
+        "firstIndex": 2952,
+        "indexCount": 228,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_1_shoulder",
+        "firstIndex": 3180,
+        "indexCount": 444,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_2_body",
+        "firstIndex": 3624,
+        "indexCount": 864,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_2_hip_left",
+        "firstIndex": 4488,
+        "indexCount": 228,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_2_hip_right",
+        "firstIndex": 4716,
+        "indexCount": 228,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_2_shoulder",
+        "firstIndex": 4944,
+        "indexCount": 444,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_3_body",
+        "firstIndex": 5388,
+        "indexCount": 864,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_3_hip_left",
+        "firstIndex": 6252,
+        "indexCount": 228,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_3_hip_right",
+        "firstIndex": 6480,
+        "indexCount": 228,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_3_shoulder",
+        "firstIndex": 6708,
+        "indexCount": 444,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "combat_engineer.lod2": {
+    "vertices": 2688,
+    "triangles": 1344,
+    "minimum": [
+      -0.4350000023841858,
+      -0.5,
+      -0.3919999897480011
+    ],
+    "maximum": [
+      0.4319347143173218,
+      0.49000000953674316,
+      0.41999998688697815
+    ],
+    "sha256": "57d09b4c862e9dba02e00a0b159c27cb36c8c45b7609c5293acb47bb51cda449",
+    "groups": [
+      {
+        "name": "member_0_body",
+        "firstIndex": 0,
+        "indexCount": 468,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_0_hip_left",
+        "firstIndex": 468,
+        "indexCount": 144,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_0_hip_right",
+        "firstIndex": 612,
+        "indexCount": 144,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_0_shoulder",
+        "firstIndex": 756,
+        "indexCount": 252,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_1_body",
+        "firstIndex": 1008,
+        "indexCount": 468,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_1_hip_left",
+        "firstIndex": 1476,
+        "indexCount": 144,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_1_hip_right",
+        "firstIndex": 1620,
+        "indexCount": 144,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_1_shoulder",
+        "firstIndex": 1764,
+        "indexCount": 252,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_2_body",
+        "firstIndex": 2016,
+        "indexCount": 468,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_2_hip_left",
+        "firstIndex": 2484,
+        "indexCount": 144,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_2_hip_right",
+        "firstIndex": 2628,
+        "indexCount": 144,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_2_shoulder",
+        "firstIndex": 2772,
+        "indexCount": 252,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_3_body",
+        "firstIndex": 3024,
+        "indexCount": 468,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_3_hip_left",
+        "firstIndex": 3492,
+        "indexCount": 144,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_3_hip_right",
+        "firstIndex": 3636,
+        "indexCount": 144,
+        "parent": -1,
+        "motion": "static"
+      },
+      {
+        "name": "member_3_shoulder",
+        "firstIndex": 3780,
+        "indexCount": 252,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "combat_engineer.kit.member_0_body": {
+    "vertices": 2244,
+    "triangles": 1028,
+    "minimum": [
+      -0.08402112871408463,
+      -0.0949999988079071,
+      0.04800000041723251
+    ],
+    "maximum": [
+      0.15523803234100342,
+      0.5099999904632568,
+      0.296999990940094
+    ],
+    "sha256": "38ab1a8aee96e885f7208ba199b027483ad7519a0c779ae749dced9f7d8a25ab",
+    "groups": [
+      {
+        "name": "member_0_body",
+        "firstIndex": 0,
+        "indexCount": 3084,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "combat_engineer.kit.member_0_hip_left": {
+    "vertices": 408,
+    "triangles": 204,
+    "minimum": [
+      -0.03484648838639259,
+      -0.5,
+      0.17610669136047363
+    ],
+    "maximum": [
+      0.04884648695588112,
+      0.018062323331832886,
+      0.289000004529953
+    ],
+    "sha256": "950a8e88cca03f907dac80fc45dbc90f7a195935513855befcc755f20ed6f5d3",
+    "groups": [
+      {
+        "name": "member_0_hip_left",
+        "firstIndex": 0,
+        "indexCount": 612,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_0_hip_left",
+        "rate": -4.0,
+        "travel": 0.42
+      }
+    ]
+  },
+  "combat_engineer.kit.member_0_hip_right": {
+    "vertices": 408,
+    "triangles": 204,
+    "minimum": [
+      0.051153514534235,
+      -0.5,
+      0.17610669136047363
+    ],
+    "maximum": [
+      0.134846493601799,
+      0.018062323331832886,
+      0.289000004529953
+    ],
+    "sha256": "0785070e4f8801d52e0d5c01bf5fa7cdbf0fc1b175d1b8ed3d9df62040c5989f",
+    "groups": [
+      {
+        "name": "member_0_hip_right",
+        "firstIndex": 0,
+        "indexCount": 612,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_0_hip_right",
+        "rate": 4.0,
+        "travel": 0.42
+      }
+    ]
+  },
+  "combat_engineer.kit.member_0_shoulder": {
+    "vertices": 936,
+    "triangles": 480,
+    "minimum": [
+      -0.08061787486076355,
+      -0.02500000037252903,
+      0.07000000029802322
+    ],
+    "maximum": [
+      0.18061643838882446,
+      0.2477739006280899,
+      0.41999998688697815
+    ],
+    "sha256": "df82f601310df911a09577f35c74cdf85cbdc92b348f8d7bcc2a9c1ebf9ddc6a",
+    "groups": [
+      {
+        "name": "member_0_shoulder",
+        "firstIndex": 0,
+        "indexCount": 1440,
+        "parent": -1,
+        "motion": "cannon",
+        "socket": "member_0_shoulder",
+        "rate": 1,
+        "travel": 0.004
+      }
+    ]
+  },
+  "combat_engineer.kit.member_1_body": {
+    "vertices": 2088,
+    "triangles": 948,
+    "minimum": [
+      -0.43402114510536194,
+      -0.0949999988079071,
+      0.04800000041723251
+    ],
+    "maximum": [
+      -0.1947619616985321,
+      0.4880000054836273,
+      0.296999990940094
+    ],
+    "sha256": "efbca0a268a204bfac0926ec08a386e13f892d71376284828d2d3e55934d0c73",
+    "groups": [
+      {
+        "name": "member_1_body",
+        "firstIndex": 0,
+        "indexCount": 2844,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "combat_engineer.kit.member_1_hip_left": {
+    "vertices": 408,
+    "triangles": 204,
+    "minimum": [
+      -0.3848464787006378,
+      -0.5,
+      0.17610669136047363
+    ],
+    "maximum": [
+      -0.3011535108089447,
+      0.018062323331832886,
+      0.289000004529953
+    ],
+    "sha256": "297f46efb3368178caf54639c5eb4f13babc07d7bb5d8e483939bdfe795cb89a",
+    "groups": [
+      {
+        "name": "member_1_hip_left",
+        "firstIndex": 0,
+        "indexCount": 612,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_1_hip_left",
+        "rate": -4.0,
+        "travel": 0.42
+      }
+    ]
+  },
+  "combat_engineer.kit.member_1_hip_right": {
+    "vertices": 408,
+    "triangles": 204,
+    "minimum": [
+      -0.2988464832305908,
+      -0.5,
+      0.17610669136047363
+    ],
+    "maximum": [
+      -0.2151535153388977,
+      0.018062323331832886,
+      0.289000004529953
+    ],
+    "sha256": "a148614ad7aa1dd054bb91319daf9a599f09476375cbdc291ab367fd3adfa859",
+    "groups": [
+      {
+        "name": "member_1_hip_right",
+        "firstIndex": 0,
+        "indexCount": 612,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_1_hip_right",
+        "rate": 4.0,
+        "travel": 0.42
+      }
+    ]
+  },
+  "combat_engineer.kit.member_1_shoulder": {
+    "vertices": 936,
+    "triangles": 480,
+    "minimum": [
+      -0.4306178689002991,
+      -0.02500000037252903,
+      0.07000000029802322
+    ],
+    "maximum": [
+      -0.16938357055187225,
+      0.2477739006280899,
+      0.41999998688697815
+    ],
+    "sha256": "c9d62d347428e337735392beff6e49f34d90cbdeb76d0c9624bdc813581adf2b",
+    "groups": [
+      {
+        "name": "member_1_shoulder",
+        "firstIndex": 0,
+        "indexCount": 1440,
+        "parent": -1,
+        "motion": "cannon",
+        "socket": "member_1_shoulder",
+        "rate": 1,
+        "travel": 0.004
+      }
+    ]
+  },
+  "combat_engineer.kit.member_2_body": {
+    "vertices": 2088,
+    "triangles": 948,
+    "minimum": [
+      0.16597886383533478,
+      -0.0949999988079071,
+      -0.3919999897480011
+    ],
+    "maximum": [
+      0.4052380323410034,
+      0.4880000054836273,
+      -0.14300000667572021
+    ],
+    "sha256": "365b15368fe846d3fd921448dfc294cb132c940c4c1688bf2613ed2b3d283641",
+    "groups": [
+      {
+        "name": "member_2_body",
+        "firstIndex": 0,
+        "indexCount": 2844,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "combat_engineer.kit.member_2_hip_left": {
+    "vertices": 408,
+    "triangles": 204,
+    "minimum": [
+      0.2151535153388977,
+      -0.5,
+      -0.2638933062553406
+    ],
+    "maximum": [
+      0.2988464832305908,
+      0.018062323331832886,
+      -0.1509999930858612
+    ],
+    "sha256": "ae973eec20444494316c7d4f222ef43b33dd789ceea4f18392104f66215e05b0",
+    "groups": [
+      {
+        "name": "member_2_hip_left",
+        "firstIndex": 0,
+        "indexCount": 612,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_2_hip_left",
+        "rate": -4.0,
+        "travel": 0.42
+      }
+    ]
+  },
+  "combat_engineer.kit.member_2_hip_right": {
+    "vertices": 408,
+    "triangles": 204,
+    "minimum": [
+      0.3011535108089447,
+      -0.5,
+      -0.2638933062553406
+    ],
+    "maximum": [
+      0.3848464787006378,
+      0.018062323331832886,
+      -0.1509999930858612
+    ],
+    "sha256": "53d8dc5117e36865e0b17c9f1a9800568d1a4c6e3917706f0775249a4a4713e2",
+    "groups": [
+      {
+        "name": "member_2_hip_right",
+        "firstIndex": 0,
+        "indexCount": 612,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_2_hip_right",
+        "rate": 4.0,
+        "travel": 0.42
+      }
+    ]
+  },
+  "combat_engineer.kit.member_2_shoulder": {
+    "vertices": 936,
+    "triangles": 480,
+    "minimum": [
+      0.16938212513923645,
+      -0.02500000037252903,
+      -0.3700000047683716
+    ],
+    "maximum": [
+      0.43061643838882446,
+      0.2477739006280899,
+      -0.019999999552965164
+    ],
+    "sha256": "b577d009eb928c2cbb891286ec570dc663b7dbfa22b11479c473ab0d59e53285",
+    "groups": [
+      {
+        "name": "member_2_shoulder",
+        "firstIndex": 0,
+        "indexCount": 1440,
+        "parent": -1,
+        "motion": "cannon",
+        "socket": "member_2_shoulder",
+        "rate": 1,
+        "travel": 0.004
+      }
+    ]
+  },
+  "combat_engineer.kit.member_3_body": {
+    "vertices": 2088,
+    "triangles": 948,
+    "minimum": [
+      -0.43402114510536194,
+      -0.0949999988079071,
+      -0.3919999897480011
+    ],
+    "maximum": [
+      -0.1947619616985321,
+      0.4880000054836273,
+      -0.14300000667572021
+    ],
+    "sha256": "89cba43f346b9c7ca2fc324bcf0cb519c8d1e87eb05cee71ec54698708f6aeaa",
+    "groups": [
+      {
+        "name": "member_3_body",
+        "firstIndex": 0,
+        "indexCount": 2844,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "combat_engineer.kit.member_3_hip_left": {
+    "vertices": 408,
+    "triangles": 204,
+    "minimum": [
+      -0.3848464787006378,
+      -0.5,
+      -0.2638933062553406
+    ],
+    "maximum": [
+      -0.3011535108089447,
+      0.018062323331832886,
+      -0.1509999930858612
+    ],
+    "sha256": "70c6b0d2817a1b9778e93eec4bca41855a1af09eff30c869b3074f4ab7148862",
+    "groups": [
+      {
+        "name": "member_3_hip_left",
+        "firstIndex": 0,
+        "indexCount": 612,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_3_hip_left",
+        "rate": -4.0,
+        "travel": 0.42
+      }
+    ]
+  },
+  "combat_engineer.kit.member_3_hip_right": {
+    "vertices": 408,
+    "triangles": 204,
+    "minimum": [
+      -0.2988464832305908,
+      -0.5,
+      -0.2638933062553406
+    ],
+    "maximum": [
+      -0.2151535153388977,
+      0.018062323331832886,
+      -0.1509999930858612
+    ],
+    "sha256": "df01772f6edeb1f8ea07efefd3fe11d9ae74040b0b8faa2eea8b53e8618f0cf0",
+    "groups": [
+      {
+        "name": "member_3_hip_right",
+        "firstIndex": 0,
+        "indexCount": 612,
+        "parent": -1,
+        "motion": "infantryStride",
+        "socket": "member_3_hip_right",
+        "rate": 4.0,
+        "travel": 0.42
+      }
+    ]
+  },
+  "combat_engineer.kit.member_3_shoulder": {
+    "vertices": 936,
+    "triangles": 480,
+    "minimum": [
+      -0.4306178689002991,
+      -0.02500000037252903,
+      -0.3700000047683716
+    ],
+    "maximum": [
+      -0.16938357055187225,
+      0.2477739006280899,
+      -0.019999999552965164
+    ],
+    "sha256": "34ee9fcea5102468b14b3fe92f0d09a5edbceec2a900c845e8e5b7fbf6579b4b",
+    "groups": [
+      {
+        "name": "member_3_shoulder",
+        "firstIndex": 0,
+        "indexCount": 1440,
+        "parent": -1,
+        "motion": "cannon",
+        "socket": "member_3_shoulder",
+        "rate": 1,
+        "travel": 0.004
+      }
+    ]
+  },
+  "rifle_squad_damaged": {
+    "vertices": 96,
+    "triangles": 48,
+    "minimum": [
+      -0.3799999952316284,
+      0.10000000149011612,
+      -0.16200000047683716
+    ],
+    "maximum": [
+      0.3140000104904175,
+      0.25,
+      0.3009999990463257
+    ],
+    "sha256": "5b95c2eee22aae064c4d4657a3b01828740fc4e535231c81737f97a328758611",
+    "groups": [
+      {
+        "name": "rifle_squad_damaged",
+        "firstIndex": 0,
+        "indexCount": 144,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "rifle_squad_critical": {
+    "vertices": 336,
+    "triangles": 176,
+    "minimum": [
+      -0.38280370831489563,
+      0.07999999821186066,
+      -0.36995893716812134
+    ],
+    "maximum": [
+      0.3428037166595459,
+      0.2845294177532196,
+      0.3009999990463257
+    ],
+    "sha256": "0e9b3596250edfeffd5429944dad1b0c2001f86bf1b57a0b2b1a41299ec5f077",
+    "groups": [
+      {
+        "name": "rifle_squad_critical",
+        "firstIndex": 0,
+        "indexCount": 528,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "rifle_squad_wreck": {
+    "vertices": 528,
+    "triangles": 224,
+    "minimum": [
+      -0.3892875015735626,
+      -0.5,
+      -0.3475988507270813
+    ],
+    "maximum": [
+      0.4092874825000763,
+      -0.4000000059604645,
+      0.41999998688697815
+    ],
+    "sha256": "8908f54002341c5984bd92ce93d446658628ad45cd0da4fedfb9874b8212dc4d",
+    "groups": [
+      {
+        "name": "rifle_squad_wreck",
+        "firstIndex": 0,
+        "indexCount": 672,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "combat_engineer_damaged": {
+    "vertices": 96,
+    "triangles": 48,
+    "minimum": [
+      -0.3799999952316284,
+      0.10000000149011612,
+      -0.16200000047683716
+    ],
+    "maximum": [
+      0.3140000104904175,
+      0.25,
+      0.3009999990463257
+    ],
+    "sha256": "d8ec06798438eb7dff5fb55b05b1fb886900aa1616201fdd684cfc0ea8b7b417",
+    "groups": [
+      {
+        "name": "combat_engineer_damaged",
+        "firstIndex": 0,
+        "indexCount": 144,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "combat_engineer_critical": {
+    "vertices": 336,
+    "triangles": 176,
+    "minimum": [
+      -0.38280370831489563,
+      0.07999999821186066,
+      -0.36995893716812134
+    ],
+    "maximum": [
+      0.3428037166595459,
+      0.2845294177532196,
+      0.3009999990463257
+    ],
+    "sha256": "65d691d56e0524094434b4b250fd8986e819c98cd6caa63709944fda6c2a9cd8",
+    "groups": [
+      {
+        "name": "combat_engineer_critical",
+        "firstIndex": 0,
+        "indexCount": 528,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "combat_engineer_wreck": {
+    "vertices": 672,
+    "triangles": 304,
+    "minimum": [
+      -0.4014093279838562,
+      -0.5,
+      -0.3475988507270813
+    ],
+    "maximum": [
+      0.4092874825000763,
+      -0.4000000059604645,
+      0.41999998688697815
+    ],
+    "sha256": "42d9cb97b201e9cb89cf8896c100ecfe810eb694edc4a522d1442d27d53cf276",
+    "groups": [
+      {
+        "name": "combat_engineer_wreck",
+        "firstIndex": 0,
+        "indexCount": 912,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "scout_vehicle_wreck": {
+    "vertices": 276,
+    "triangles": 148,
+    "minimum": [
+      -0.49225524067878723,
+      -0.5,
+      -0.4300000071525574
+    ],
+    "maximum": [
+      0.4822552502155304,
+      -0.10000000149011612,
+      0.41999998688697815
+    ],
+    "sha256": "9e451da881fc68608c8c219dd546e3c46dd794c6ea026cd2ed0db9ec20c4cec5",
+    "groups": [
+      {
+        "name": "scout_vehicle_wreck",
+        "firstIndex": 0,
+        "indexCount": 444,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "self_propelled_artillery_wreck": {
+    "vertices": 288,
+    "triangles": 156,
+    "minimum": [
+      -0.49225524067878723,
+      -0.4375,
+      -0.4300000071525574
+    ],
+    "maximum": [
+      0.4822552502155304,
+      -0.057500001043081284,
+      0.47687649726867676
+    ],
+    "sha256": "0beb2cd85a64ea172a5f77732804b51f6759d1c8aba0268ca791a45015f36771",
+    "groups": [
+      {
+        "name": "self_propelled_artillery_wreck",
+        "firstIndex": 0,
+        "indexCount": 468,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "cargo_truck_wreck": {
+    "vertices": 300,
+    "triangles": 160,
+    "minimum": [
+      -0.49225524067878723,
+      -0.4583333432674408,
+      -0.4300000071525574
+    ],
+    "maximum": [
+      0.4822552502155304,
+      -0.07833333313465118,
+      0.41999998688697815
+    ],
+    "sha256": "f3ef647a9d0e812b9fbbeb8cd52c240a4e7a59e8e269242ca48ecc2bad51694a",
+    "groups": [
+      {
+        "name": "cargo_truck_wreck",
+        "firstIndex": 0,
+        "indexCount": 480,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "supply_truck_wreck": {
+    "vertices": 372,
+    "triangles": 196,
+    "minimum": [
+      -0.49225524067878723,
+      -0.4399999976158142,
+      -0.4300000071525574
+    ],
+    "maximum": [
+      0.4822552502155304,
+      -0.05999999865889549,
+      0.41999998688697815
+    ],
+    "sha256": "bf965939574713bba8ca72dcaca0647b05f6f713b2df24cecd46bfab888de26b",
+    "groups": [
+      {
+        "name": "supply_truck_wreck",
+        "firstIndex": 0,
+        "indexCount": 588,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "rubble.lod0": {
+    "vertices": 780,
+    "triangles": 400,
+    "minimum": [
+      -0.44999998807907104,
+      -0.5,
+      -0.2750000059604645
+    ],
+    "maximum": [
+      0.44645005464553833,
+      -0.13600000739097595,
+      0.4099999964237213
+    ],
+    "sha256": "711fca44761e4712fbc4faef1ecc56ef7bbc3ac117991c9b1cca37dc56b56032",
+    "groups": [
+      {
+        "name": "rubble",
+        "firstIndex": 0,
+        "indexCount": 1200,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "rubble.lod1": {
+    "vertices": 300,
+    "triangles": 160,
+    "minimum": [
+      -0.44999998807907104,
+      -0.5,
+      -0.2750000059604645
+    ],
+    "maximum": [
+      0.44623932242393494,
+      -0.13600000739097595,
+      0.4099999964237213
+    ],
+    "sha256": "9ce48e3c5a53e8e6c7dc10eeeeb953e95a7d58e702b4a71514dc067343f086ef",
+    "groups": [
+      {
+        "name": "rubble",
+        "firstIndex": 0,
+        "indexCount": 480,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "scorched_barrier.lod0": {
+    "vertices": 348,
+    "triangles": 168,
+    "minimum": [
+      -0.49000000953674316,
+      -0.5,
+      -0.3499999940395355
+    ],
+    "maximum": [
+      0.49000000953674316,
+      0.4475787281990051,
+      0.3499999940395355
+    ],
+    "sha256": "aa05846b11faebc28b9cbbce788b0ba90856b0e09ffdf21cd21f7730b8260121",
+    "groups": [
+      {
+        "name": "scorched_barrier",
+        "firstIndex": 0,
+        "indexCount": 504,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "scorched_barrier.lod1": {
+    "vertices": 108,
+    "triangles": 56,
+    "minimum": [
+      -0.49000000953674316,
+      -0.5,
+      -0.3499999940395355
+    ],
+    "maximum": [
+      0.49000000953674316,
+      0.4469011127948761,
+      0.3499999940395355
+    ],
+    "sha256": "60522924b5757f2f51a90e06354fa8ff22fc0041df47c76cb2f98b3fbac01bc8",
+    "groups": [
+      {
+        "name": "scorched_barrier",
+        "firstIndex": 0,
+        "indexCount": 168,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "burst_pipe.lod0": {
+    "vertices": 576,
+    "triangles": 284,
+    "minimum": [
+      -0.5483853220939636,
+      -0.5,
+      -0.25
+    ],
+    "maximum": [
+      0.5498782396316528,
+      -0.004390448331832886,
+      0.31705132126808167
+    ],
+    "sha256": "a9bb71581889ead77e978c706b6db21bc70ef7b16752b261bb76138a5840a427",
+    "groups": [
+      {
+        "name": "burst_pipe",
+        "firstIndex": 0,
+        "indexCount": 852,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "burst_pipe.lod1": {
+    "vertices": 312,
+    "triangles": 156,
+    "minimum": [
+      -0.5454910397529602,
+      -0.5,
+      -0.25
+    ],
+    "maximum": [
+      0.5498782396316528,
+      -0.02009117230772972,
+      0.31705132126808167
+    ],
+    "sha256": "412299c851d19c912dbfdbb5b8f22e9a649bd13e49ae1b63cf4572a0dbad47de",
+    "groups": [
+      {
+        "name": "burst_pipe",
+        "firstIndex": 0,
+        "indexCount": 468,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "road_damaged": {
+    "vertices": 192,
+    "triangles": 96,
+    "minimum": [
+      -0.5,
+      -0.5,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      0.3499999940395355,
+      0.5
+    ],
+    "sha256": "edae47611b1d1ab9041bf1fa6b4f05e0a78f2f9170669270fe6e75485978803f",
+    "groups": [
+      {
+        "name": "road_damaged",
+        "firstIndex": 0,
+        "indexCount": 288,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "road_destroyed": {
+    "vertices": 168,
+    "triangles": 84,
+    "minimum": [
+      -0.5,
+      -0.5,
+      -0.5
+    ],
+    "maximum": [
+      0.5,
+      0.3499999940395355,
+      0.5
+    ],
+    "sha256": "a36b9958b9ce434c166a33cb6a5ec0a803bcaadbe694413e1b5180b08e4f3bd7",
+    "groups": [
+      {
+        "name": "road_destroyed",
+        "firstIndex": 0,
+        "indexCount": 252,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "bridge_damaged": {
+    "vertices": 384,
+    "triangles": 200,
+    "minimum": [
+      -0.46000000834465027,
+      -0.5,
+      -0.5
+    ],
+    "maximum": [
+      0.46000000834465027,
+      -0.009999999776482582,
+      0.5
+    ],
+    "sha256": "db4ba96444b6baeef27a451fe5b996233c73d9727db85532a8134799aa60bb92",
+    "groups": [
+      {
+        "name": "bridge_damaged",
+        "firstIndex": 0,
+        "indexCount": 600,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  },
+  "bridge_destroyed": {
+    "vertices": 360,
+    "triangles": 188,
+    "minimum": [
+      -0.46000000834465027,
+      -0.5,
+      -0.5
+    ],
+    "maximum": [
+      0.46000000834465027,
+      -0.009999999776482582,
+      0.5
+    ],
+    "sha256": "0212ca705975694af10f915155aa511f4e87d0b3bb7c4ef062958c6f6af4a849",
+    "groups": [
+      {
+        "name": "bridge_destroyed",
+        "firstIndex": 0,
+        "indexCount": 564,
+        "parent": -1,
+        "motion": "static"
+      }
+    ]
+  }
+}

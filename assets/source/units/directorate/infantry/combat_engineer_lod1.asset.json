@@ -1,0 +1,8 @@
+{
+  "id": "unit.directorate.combat_engineer.lod1",
+  "type": "mesh",
+  "materialReferences": [
+    "material.directorate.unit.rifle_squad"
+  ],
+  "source": "../sources/infantry/combat_engineer_lod1.gltf"
+}

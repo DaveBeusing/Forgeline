@@ -147,6 +147,30 @@ public sealed class MechanicalMotionTests
         Assert.Equal(expected, matrices[0]);
     }
 
+    [Fact]
+    public void InfantryStrideUsesTravelKeepsHipFixedAndDisablesForWrecksAndReducedDetail()
+    {
+        Vector3 hip = new(.04f, .015f, .22f);
+        MechanicalPartBinding[] parts = [new(new("leg", 0, 3, -1,
+            MechanicalMotionKind.InfantryStride, "hip", Rate: 4, Travel: .42f), hip)];
+        var instance = Instance() with { UnitFeature = new(UnitIds.RifleSquad, UnitPresentationDamageState.Intact),
+            MechanicalPose = new(true, .35, 100, 100, -1, 0, 0) };
+        var world = Matrix4x4.CreateScale(1.8f) * Matrix4x4.CreateTranslation(3, .9f, 5);
+        Matrix4x4[] output = new Matrix4x4[1];
+        MechanicalTransforms.Compose(parts, instance, world, output);
+        Assert.NotEqual(world, output[0]);
+        Assert.True(Vector3.Distance(Vector3.Transform(hip, world), Vector3.Transform(hip, output[0])) < .0001f);
+        Matrix4x4 walking = output[0];
+        instance = instance with { MechanicalPose = instance.MechanicalPose with { ActiveSeconds = 200, Seconds = 200 } };
+        MechanicalTransforms.Compose(parts, instance, world, output);
+        Assert.Equal(walking, output[0]);
+        MechanicalTransforms.Compose(parts, instance, world, output, weight: 0);
+        Assert.Equal(world, output[0]);
+        instance = instance with { UnitFeature = instance.UnitFeature with { DamageState = UnitPresentationDamageState.Wreck } };
+        MechanicalTransforms.Compose(parts, instance, world, output);
+        Assert.Equal(world, output[0]);
+    }
+
     private static RenderInstance Instance() => new(new EntityId(1, 1),
         new RenderTransform(Vector3.Zero, Quaternion.Identity, Vector3.One),
         new RenderMeshHandle(1), RenderMaterialHandle.Default, RenderVisibilityMask.World);
