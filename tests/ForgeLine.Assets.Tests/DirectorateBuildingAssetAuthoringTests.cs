@@ -136,6 +136,17 @@ public sealed class DirectorateBuildingAssetAuthoringTests
                     Assert.True(lods[1].Indices.Count > lods[2].Indices.Count);
                     Assert.Equal(3, primary.Sockets.Count);
                     Assert.Contains(primary.Sockets, x => x.Name is "service_access" or "loading_access" or "supply_transfer");
+                    if (family is "storage_depot" or "supply_depot" or "logistics_hub")
+                    {
+                        float height = kit.RootElement.GetProperty("gameScaleMeters")[1].GetSingle();
+                        var cargo = Assert.Single(primary.Sockets, x => x.Name == "cargo_load");
+                        Assert.Equal(1.388f, height * (.5f + cargo.Y), precision: 5);
+                        if (family == "supply_depot")
+                        {
+                            var transfer = Assert.Single(primary.Sockets, x => x.Name == "supply_transfer");
+                            Assert.Equal(1.2f, height * (.5f + transfer.Y), precision: 5);
+                        }
+                    }
                     foreach (var mesh in lods)
                     {
                         Assert.True(mesh.HasNormals && mesh.HasUv0 && mesh.HasTangents);

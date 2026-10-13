@@ -26,17 +26,17 @@
   "anchors": {
     "supply_transfer": [
       -0.14,
-      -0.38,
+      -0.35,
       0.44
     ],
     "gantry_pivot": [
       -0.14,
-      -0.035,
+      -0.055,
       0.31
     ],
     "cargo_load": [
       0.26,
-      -0.4,
+      -0.3265,
       0.44
     ]
   },
@@ -885,5 +885,10 @@
       "foundation",
       "collapsed_cargo"
     ]
+  },
+  "vehicleInterface": {
+    "cargoDeckHeightMeters": 1.388,
+    "supplyTransferHeightMeters": 1.2,
+    "source": "Existing Directorate vehicle scale, GroundMovement.HeightOffset and compiled transfer sockets; no docking/navigation rule"
   }
 }
