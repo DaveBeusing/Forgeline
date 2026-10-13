@@ -1,0 +1,142 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine logistics building component exporter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 912,
+      "uri": "data:application/octet-stream;base64,UrgePvYo3L72KNw+UrgePilcj772KNw+UrgePilcj77hetQ+UrgePvYo3L7hetQ+SOG6PvYo3L7hetQ+SOG6Pilcj77hetQ+SOG6Pilcj772KNw+SOG6PvYo3L72KNw+UrgePvYo3L7hetQ+SOG6PvYo3L7hetQ+SOG6PvYo3L72KNw+UrgePvYo3L72KNw+UrgePilcj772KNw+SOG6Pilcj772KNw+SOG6Pilcj77hetQ+UrgePilcj77hetQ+UrgePilcj77hetQ+SOG6Pilcj77hetQ+SOG6PvYo3L7hetQ+UrgePvYo3L7hetQ+UrgePvYo3L72KNw+SOG6PvYo3L72KNw+SOG6Pilcj772KNw+UrgePilcj772KNw+AACAvwAAAIAAAACAAACAvwAAAIAAAACAAACAvwAAAIAAAACAAACAvwAAAIAAAACAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/ppsEP0w3iT5aZDs/TDeJPlpkOz+0yPY+ppsEP7TI9j6mmwQ/TDeJPlpkOz9MN4k+WmQ7P7TI9j6mmwQ/tMj2PqabBD9MN4k+WmQ7P0w3iT5aZDs/tMj2PqabBD+0yPY+ppsEP0w3iT5aZDs/TDeJPlpkOz+0yPY+ppsEP7TI9j6mmwQ/TDeJPlpkOz9MN4k+WmQ7P7TI9j6mmwQ/tMj2PqabBD9MN4k+WmQ7P0w3iT5aZDs/tMj2PqabBD+0yPY+AAAAAAEAAAACAAAAAAAAAAIAAAADAAAABAAAAAUAAAAGAAAABAAAAAYAAAAHAAAACAAAAAkAAAAKAAAACAAAAAoAAAALAAAADAAAAA0AAAAOAAAADAAAAA4AAAAPAAAAEAAAABEAAAASAAAAEAAAABIAAAATAAAAFAAAABUAAAAWAAAAFAAAABYAAAAXAAAA"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 288,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 576,
+      "byteLength": 192,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 768,
+      "byteLength": 144,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3",
+      "min": [
+        0.1550000011920929,
+        -0.4300000071525574,
+        0.41499999165534973
+      ],
+      "max": [
+        0.36500000953674316,
+        -0.2800000011920929,
+        0.4300000071525574
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3",
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5125,
+      "count": 36,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "idle",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "extras": {
+    "coordinates": "Normalized building-local right-handed Y-up; +Z loading front",
+    "componentHierarchy": [
+      {
+        "name": "closed_loading_gate",
+        "parent": null,
+        "sharedModule": null,
+        "firstIndex": 0,
+        "indexCount": 36
+      }
+    ],
+    "anchors": {
+      "supply_transfer": [
+        -0.14,
+        -0.38,
+        0.44
+      ],
+      "gantry_pivot": [
+        -0.14,
+        -0.035,
+        0.31
+      ],
+      "cargo_load": [
+        0.26,
+        -0.4,
+        0.44
+      ]
+    }
+  }
+}

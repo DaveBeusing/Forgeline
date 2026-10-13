@@ -1,0 +1,785 @@
+{
+  "family": "supply_depot",
+  "coordinates": "Normalized building-local right-handed Y-up; +Z loading front",
+  "gameScaleMeters": [
+    16,
+    8,
+    16
+  ],
+  "bounds": {
+    "min": [
+      -0.4,
+      -0.5,
+      -0.34
+    ],
+    "max": [
+      0.44,
+      0.21,
+      0.47
+    ]
+  },
+  "atlas": "texture.directorate.surface.atlas_base",
+  "provenance": {
+    "author": "ForgeLine",
+    "license": "Original repository geometry; no third-party inputs"
+  },
+  "anchors": {
+    "supply_transfer": [
+      -0.14,
+      -0.38,
+      0.44
+    ],
+    "gantry_pivot": [
+      -0.14,
+      -0.035,
+      0.31
+    ],
+    "cargo_load": [
+      0.26,
+      -0.4,
+      0.44
+    ]
+  },
+  "intactModules": [
+    "foundation",
+    "fuel_reservoir_0",
+    "fuel_reservoir_1",
+    "fuel_manifold",
+    "protected_ammunition",
+    "service_station_0",
+    "service_station_1",
+    "service_station_2",
+    "ammunition_container",
+    "service_awning",
+    "loading_portal",
+    "dock_bollard_0",
+    "dock_bollard_1"
+  ],
+  "modules": [
+    {
+      "name": "foundation",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.4,
+            -0.5,
+            -0.34
+          ],
+          "max": [
+            0.44,
+            -0.465,
+            0.47
+          ],
+          "cell": 0,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        }
+      ]
+    },
+    {
+      "name": "fuel_reservoir_0",
+      "parent": null,
+      "source": "fuel_tank",
+      "translation": [
+        -0.28,
+        -0.465,
+        -0.12
+      ],
+      "scale": [
+        1,
+        2.75,
+        1
+      ]
+    },
+    {
+      "name": "fuel_reservoir_1",
+      "parent": null,
+      "source": "fuel_tank",
+      "translation": [
+        -0.12,
+        -0.465,
+        -0.12
+      ],
+      "scale": [
+        1,
+        2.75,
+        1
+      ]
+    },
+    {
+      "name": "fuel_manifold",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "pipe",
+          "points": [
+            [
+              -0.28,
+              -0.38,
+              0.0
+            ],
+            [
+              -0.28,
+              -0.3,
+              0.06
+            ],
+            [
+              -0.12,
+              -0.3,
+              0.06
+            ],
+            [
+              0.02,
+              -0.3,
+              0.06
+            ]
+          ],
+          "radius": 0.009,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            12,
+            6,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "protected_ammunition",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            0.1,
+            -0.465,
+            -0.29
+          ],
+          "max": [
+            0.41,
+            -0.05,
+            0.04
+          ],
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.08,
+            -0.05,
+            -0.31
+          ],
+          "max": [
+            0.43,
+            0.01,
+            0.06
+          ],
+          "cell": 0,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.17,
+            -0.43,
+            0.041
+          ],
+          "max": [
+            0.34,
+            -0.16,
+            0.047
+          ],
+          "cell": 3,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0.004
+        }
+      ]
+    },
+    {
+      "name": "service_station_0",
+      "parent": null,
+      "source": "service_pump",
+      "translation": [
+        -0.27,
+        -0.465,
+        0.27
+      ],
+      "scale": [
+        1,
+        1.5,
+        1
+      ]
+    },
+    {
+      "name": "service_station_1",
+      "parent": null,
+      "source": "service_pump",
+      "translation": [
+        -0.11,
+        -0.465,
+        0.27
+      ],
+      "scale": [
+        1,
+        1.5,
+        1
+      ]
+    },
+    {
+      "name": "service_station_2",
+      "parent": null,
+      "source": "service_pump",
+      "translation": [
+        0.24,
+        -0.465,
+        0.27
+      ],
+      "scale": [
+        1,
+        1.5,
+        1
+      ]
+    },
+    {
+      "name": "ammunition_container",
+      "parent": null,
+      "source": "container",
+      "translation": [
+        0.26,
+        -0.465,
+        0.26
+      ],
+      "scale": [
+        0.9,
+        1,
+        0.8
+      ]
+    },
+    {
+      "name": "service_awning",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.38,
+            -0.02,
+            0.08
+          ],
+          "max": [
+            0.09,
+            0.015,
+            0.45
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.37,
+            -0.465,
+            0.12
+          ],
+          "max": [
+            -0.35,
+            -0.02,
+            0.14
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.06,
+            -0.465,
+            0.12
+          ],
+          "max": [
+            0.08,
+            -0.02,
+            0.14
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        }
+      ]
+    },
+    {
+      "name": "loading_portal",
+      "parent": null,
+      "source": "loading_portal",
+      "translation": [
+        -0.14,
+        -0.465,
+        0.31
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "dock_bollard_0",
+      "parent": null,
+      "source": "dock_bollard",
+      "translation": [
+        -0.1,
+        -0.465,
+        0.42
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "dock_bollard_1",
+      "parent": null,
+      "source": "dock_bollard",
+      "translation": [
+        0.1,
+        -0.465,
+        0.42
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "construction_frame",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.383,
+            -0.465,
+            -0.323
+          ],
+          "max": [
+            -0.367,
+            0.19999999999999998,
+            -0.307
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.383,
+            -0.465,
+            0.43699999999999994
+          ],
+          "max": [
+            -0.367,
+            0.19999999999999998,
+            0.45299999999999996
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.407,
+            -0.465,
+            -0.323
+          ],
+          "max": [
+            0.423,
+            0.19999999999999998,
+            -0.307
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.407,
+            -0.465,
+            0.43699999999999994
+          ],
+          "max": [
+            0.423,
+            0.19999999999999998,
+            0.45299999999999996
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.38,
+            0.19,
+            -0.32
+          ],
+          "max": [
+            0.42,
+            0.21,
+            -0.30000000000000004
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        }
+      ]
+    },
+    {
+      "name": "closed_loading_gate",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            0.15500000000000003,
+            -0.43,
+            0.415
+          ],
+          "max": [
+            0.365,
+            -0.28,
+            0.43
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        }
+      ]
+    },
+    {
+      "name": "isolated_service",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            0.15500000000000003,
+            -0.43,
+            0.415
+          ],
+          "max": [
+            0.365,
+            -0.28,
+            0.43
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.225,
+            -0.29,
+            0.41000000000000003
+          ],
+          "max": [
+            0.29500000000000004,
+            -0.245,
+            0.435
+          ],
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        }
+      ]
+    },
+    {
+      "name": "damaged_dock",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            0.185,
+            -0.465,
+            0.39
+          ],
+          "max": [
+            0.29000000000000004,
+            -0.36,
+            0.42
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.24000000000000002,
+            -0.4,
+            0.4
+          ],
+          "max": [
+            0.35,
+            -0.38,
+            0.445
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        }
+      ]
+    },
+    {
+      "name": "critical_dock",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            0.17,
+            -0.465,
+            0.37
+          ],
+          "max": [
+            0.36,
+            -0.39,
+            0.435
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.23,
+            -0.43,
+            0.4
+          ],
+          "max": [
+            0.32,
+            -0.25,
+            0.43
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.14,
+            -0.455,
+            0.385
+          ],
+          "max": [
+            0.21000000000000002,
+            -0.36,
+            0.415
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        }
+      ]
+    },
+    {
+      "name": "collapsed_cargo",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.32,
+            -0.465,
+            -0.24
+          ],
+          "max": [
+            0.06,
+            -0.31,
+            -0.04
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.12,
+            -0.465,
+            0.06
+          ],
+          "max": [
+            0.28,
+            -0.35,
+            0.25
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.004
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.3,
+            -0.4,
+            0.25
+          ],
+          "end": [
+            0.25,
+            -0.36,
+            -0.16
+          ],
+          "radius": 0.022,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            16,
+            8,
+            6
+          ]
+        }
+      ]
+    }
+  ],
+  "states": {
+    "foundation": [
+      "foundation"
+    ],
+    "structural_frame": [
+      "foundation",
+      "construction_frame"
+    ],
+    "partial_shell": [
+      "foundation",
+      "construction_frame",
+      "fuel_reservoir_0"
+    ],
+    "idle": [
+      "closed_loading_gate"
+    ],
+    "unpowered": [
+      "isolated_service"
+    ],
+    "damaged": [
+      "damaged_dock"
+    ],
+    "critical": [
+      "critical_dock"
+    ],
+    "destroyed": [
+      "foundation",
+      "collapsed_cargo"
+    ]
+  }
+}

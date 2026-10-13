@@ -1,0 +1,142 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine logistics building component exporter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 1824,
+      "uri": "data:application/octet-stream;base64,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"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 576,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 576,
+      "byteLength": 576,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1152,
+      "byteLength": 384,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1536,
+      "byteLength": 288,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC3",
+      "min": [
+        -0.07500000298023224,
+        -0.4650000035762787,
+        0.4000000059604645
+      ],
+      "max": [
+        0.09000000357627869,
+        -0.36000001430511475,
+        0.45500001311302185
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC3",
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5125,
+      "count": 72,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "damaged",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "extras": {
+    "coordinates": "Normalized building-local right-handed Y-up; +Z loading front",
+    "componentHierarchy": [
+      {
+        "name": "damaged_dock",
+        "parent": null,
+        "sharedModule": null,
+        "firstIndex": 0,
+        "indexCount": 72
+      }
+    ],
+    "anchors": {
+      "service_access": [
+        0.2,
+        -0.4,
+        0.45
+      ],
+      "gantry_pivot": [
+        0,
+        0.24,
+        -0.25
+      ],
+      "cargo_load": [
+        0,
+        -0.4,
+        0.45
+      ]
+    }
+  }
+}

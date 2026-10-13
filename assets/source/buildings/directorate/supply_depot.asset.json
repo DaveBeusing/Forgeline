@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.supply_depot",
   "type": "mesh",
-  "source": "sources/supply_depot_lod0_production.gltf",
+  "source": "sources/logistics/supply_depot/lod0.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ],
@@ -18,5 +18,25 @@
     }
   ],
   "collisionRequired": true,
-  "collisionReference": "building.directorate.module.collision_box"
+  "collisionReference": "building.directorate.module.collision_box",
+  "sockets": [
+    {
+      "name": "supply_transfer",
+      "x": -0.14,
+      "y": -0.38,
+      "z": 0.44
+    },
+    {
+      "name": "gantry_pivot",
+      "x": -0.14,
+      "y": -0.035,
+      "z": 0.31
+    },
+    {
+      "name": "cargo_load",
+      "x": 0.26,
+      "y": -0.4,
+      "z": 0.44
+    }
+  ]
 }

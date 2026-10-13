@@ -48,7 +48,7 @@ public sealed class DirectorateBuildingAssetAuthoringTests
                         static diagnostic =>
                             $"{diagnostic.Code}: {diagnostic.Message}")));
             Assert.Equal(
-                413,
+                437,
                 result.CompiledCount);
 
             RuntimeAssetCatalog catalog =
@@ -125,7 +125,7 @@ public sealed class DirectorateBuildingAssetAuthoringTests
                         AssetId.Parse(
                             $"{primaryId}.lod2")));
 
-                if (family is "extractor" or "smelter" or "electronics_plant" or "fuel_refinery" or "ammunition_plant")
+                if (family is "extractor" or "smelter" or "electronics_plant" or "fuel_refinery" or "ammunition_plant" or "storage_depot" or "supply_depot" or "logistics_hub")
                 {
                     using var kit = JsonDocument.Parse(File.ReadAllText(Path.Combine(repositoryRoot,
                         "assets/source/buildings/directorate/authoring", family + ".kit.json")));
@@ -135,7 +135,7 @@ public sealed class DirectorateBuildingAssetAuthoringTests
                     Assert.True(lods[0].Indices.Count > lods[1].Indices.Count);
                     Assert.True(lods[1].Indices.Count > lods[2].Indices.Count);
                     Assert.Equal(3, primary.Sockets.Count);
-                    Assert.Contains(primary.Sockets, x => x.Name is "service_access" or "loading_access");
+                    Assert.Contains(primary.Sockets, x => x.Name is "service_access" or "loading_access" or "supply_transfer");
                     foreach (var mesh in lods)
                     {
                         Assert.True(mesh.HasNormals && mesh.HasUv0 && mesh.HasTangents);

@@ -1,0 +1,142 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine logistics building component exporter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 3792,
+      "uri": "data:application/octet-stream;base64,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TDeJPlpkOz+0yPY+ppsEP7TI9j6mmwQ/TDeJPlpkOz9MN4k+WmQ7P7TI9j6mmwQ/tMj2PqabBD9MN4k+WmQ7P0w3iT5aZDs/tMj2PqabBD+0yPY+ppsEP0w3iT5aZDs/TDeJPlpkOz+0yPY+ppsEP7TI9j4ojRo/TDeJPthyJT9MN4k+LoQvP26OkT7JODc/pfegPlpkOz9QGrU+WmQ7P7Dlyj7JODc/WwjfPi6ELz+Sce4+2HIlP7TI9j4ojRo/tMj2PtJ7ED+Sce4+N8cIP1sI3z6mmwQ/sOXKPqabBD9QGrU+N8cIP6X3oD7SexA/bo6RPiiNGj9MN4k+2HIlP0w3iT4uhC8/bo6RPsk4Nz+l96A+WmQ7P1AatT5aZDs/sOXKPsk4Nz9bCN8+LoQvP5Jx7j7YciU/tMj2PiiNGj+0yPY+0nsQP5Jx7j43xwg/WwjfPqabBD+w5co+ppsEP1AatT43xwg/pfegPtJ7ED9ujpE+AAAAAAEAAAACAAAAAAAAAAIAAAADAAAABAAAAAUAAAAGAAAABAAAAAYAAAAHAAAACAAAAAkAAAAKAAAACAAAAAoAAAALAAAADAAAAA0AAAAOAAAADAAAAA4AAAAPAAAAEAAAABEAAAASAAAAEAAAABIAAAATAAAAFAAAABUAAAAWAAAAFAAAABYAAAAXAAAAGAAAABkAAAAaAAAAGAAAABoAAAAbAAAAHAAAAB0AAAAeAAAAHAAAAB4AAAAfAAAAIAAAACEAAAAiAAAAIAAAACIAAAAjAAAAJAAAACUAAAAmAAAAJAAAACYAAAAnAAAAKAAAACkAAAAqAAAAKAAAACoAAAArAAAALAAAAC0AAAAuAAAALAAAAC4AAAAvAAAAMAAAADEAAAAyAAAAMAAAADIAAAAzAAAANAAAADUAAAA2AAAANAAAADYAAAA3AAAAOAAAADkAAAA6AAAAOAAAADoAAAA7AAAAPAAAAD0AAAA+AAAAPAAAAD4AAAA/AAAAQAAAAEEAAABCAAAAQAAAAEIAAABDAAAAQAAAAEMAAABEAAAAQAAAAEQAAABFAAAAQAAAAEUAAABGAAAAQAAAAEYAAABHAAAAQAAAAEcAAABIAAAAQAAAAEgAAABJAAAAQAAAAEkAAABKAAAAQAAAAEoAAABLAAAAQAAAAEsAAABMAAAAQAAAAEwAAABNAAAAQAAAAE0AAABOAAAAQAAAAE4AAABPAAAAUAAAAFEAAABSAAAAUAAAAFIAAABTAAAAUAAAAFMAAABUAAAAUAAAAFQAAABVAAAAUAAAAFUAAABWAAAAUAAAAFYAAABXAAAAUAAAAFcAAABYAAAAUAAAAFgAAABZAAAAUAAAAFkAAABaAAAAUAAAAFoAAABbAAAAUAAAAFsAAABcAAAAUAAAAFwAAABdAAAAUAAAAF0AAABeAAAAUAAAAF4AAABfAAAA"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 1152,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1152,
+      "byteLength": 1152,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 2304,
+      "byteLength": 768,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 3072,
+      "byteLength": 720,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 96,
+      "type": "VEC3",
+      "min": [
+        -0.1120000034570694,
+        -0.4650000035762787,
+        0.40799999237060547
+      ],
+      "max": [
+        -0.08799999952316284,
+        -0.38999998569488525,
+        0.4320000112056732
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 96,
+      "type": "VEC3",
+      "min": [
+        -0.9807852506637573,
+        -1.0,
+        -0.9807852506637573
+      ],
+      "max": [
+        0.9807852506637573,
+        1.0,
+        0.9807852506637573
+      ]
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 96,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5125,
+      "count": 180,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "dock_bollard_0",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "extras": {
+    "coordinates": "Normalized building-local right-handed Y-up; +Z loading front",
+    "componentHierarchy": [
+      {
+        "name": "dock_bollard_0",
+        "parent": null,
+        "sharedModule": "dock_bollard",
+        "firstIndex": 0,
+        "indexCount": 180
+      }
+    ],
+    "anchors": {
+      "service_access": [
+        0.15,
+        -0.4,
+        0.42
+      ],
+      "gantry_pivot": [
+        0,
+        0.115,
+        -0.1
+      ],
+      "cargo_load": [
+        0,
+        -0.4,
+        0.42
+      ]
+    }
+  }
+}
