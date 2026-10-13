@@ -111,6 +111,8 @@ Settings → GRAPHICS QUALITY selects Low, Medium or High for the next match. Th
 
 The opt-in [native visual reference lane](docs/VisualReferenceEvidence.md) exports fixed-state Central Divide images with build/asset identity, actual resolution and resource/timing metadata. Structural qualification and human art review remain separate.
 
+The [graphics reference performance workflow](docs/GraphicsReferencePerformance.md) adds paired warm/renderer-cold measurements, deterministic camera sweeps, a production 1,000-vehicle preset and explicit performance/native-pixel comparison gates.
+
 Gameplay shortcuts can be changed in Settings through GAMEPLAY ACTION and GAMEPLAY KEY. Conflicts show a reason and block APPLY; saved camera mappings retain priority. Cards, onboarding and help show the saved mapping after the settings restart. Mouse selection, control-group digits, help and Escape remain fixed. See [binding rules and qualification](docs/GameplayInputAccessibilityAndQualification.md).
 
 Additional behavior is covered by [Windows Client](docs/WindowsClient.md) and [Camera and Input](docs/CameraAndInput.md).
