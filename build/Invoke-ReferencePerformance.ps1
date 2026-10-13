@@ -15,7 +15,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$root = [IO.Path]::GetFullPath((Join-Path $repositoryRoot $OutputRoot))
+$root = [IO.Path]::GetFullPath($OutputRoot, $repositoryRoot)
 if (Test-Path -LiteralPath $root) { throw 'Use a fresh paired-run output directory.' }
 $scenes = if ($Preset -eq 'Vehicles1000') { @('CombatSupportRepeated') } else { @('IndustrialBase','BattlefieldCombat') }
 $arguments = @{Capture=$true;Software=$Software;Scenes=$scenes;Profiles=$Profiles;Zooms=@('CloseTactical','Strategic');Displays=$Displays;

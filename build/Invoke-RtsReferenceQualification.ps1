@@ -26,7 +26,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$referenceRoot = [IO.Path]::GetFullPath((Join-Path $repositoryRoot $OutputRoot))
+$referenceRoot = [IO.Path]::GetFullPath($OutputRoot, $repositoryRoot)
 if ($Capture) {
     # Source identity and runtime payloads must represent the binaries being reviewed.
     $commit = (& git -C $repositoryRoot rev-parse HEAD).Trim()
