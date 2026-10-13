@@ -41,7 +41,7 @@ public readonly record struct RenderQualitySettings
         if (width <= 0 || height <= 0 || buffers is < 2 or > 4) throw new ArgumentOutOfRangeException(nameof(width));
         RenderQualitySettings input = this;
         RenderQuality active = software ? RenderQuality.Low : Quality;
-        string? reason = software && active != Quality ? "Software adapter uses Low quality." : null;
+        string? reason = software ? "Software adapter uses Low quality." : null;
         if (!supported) return Profile(RenderQuality.Low, false, "Linear scene formats or postprocessing are unsupported.");
         while (true)
         {

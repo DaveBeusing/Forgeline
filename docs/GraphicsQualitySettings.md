@@ -38,6 +38,8 @@ Win32 display changes run on the window owner. The frontend render owner queues 
 
 Adapter selection remains D3D12 feature level 11_0 or newer, with maximum supported feature level in diagnostics. Composition additionally probes FP16 texture/render-target/blend/shader-load and R32 depth shader-load support. Software adapters cap optional features to Low, including Quarter textures, no fog/AA/wind and Low shadow/particle budgets. The requested settings remain visible in diagnostics.
 
+Software-cap diagnostics also report the reason when Low was already requested: explicit Full/High overrides may still be capped even though the profile name does not change.
+
 Construction checks available local budget, when available, against scaled scene/depth, optional native overlay depth, shadow textures and constants, particles and a conservative 64 MiB Full texture allowance (16 MiB Half, 4 MiB Quarter). Pressure degrades Ultra → High → Medium → Low; explicit overrides cannot bypass degraded caps. Unsupported composition or insufficient Low budget selects direct native output with neutral grading and optional AA/shadows/fog/particles disabled. The allowance is a policy estimate, not a guarantee of physical VRAM residency. Runtime allocations and device removal still use controlled fault handling. Quality is stable during a session; there is no continuous adaptive budget polling.
 
 At reduced world resolution, world color and depth use ceil(output × scale), while HUD, selection and command indicators retain native output dimensions. The existing composition draw interpolates four display-linear samples and transfers nearest world depth to a native overlay depth target. Spatial AA can require up to 20 scene loads, versus five at native resolution. Thus reduced resolution saves target memory but is not guaranteed to improve frame time. See the [decision and ownership contract](adr/ValidatedGraphicsQualityAndDisplayPreview.md).
@@ -45,6 +47,8 @@ At reduced world resolution, world color and depth use ceil(output × scale), wh
 ## Reproduction and measured evidence
 
 Build the exact clean source and qualify canonical assets before capturing. Run hardware workloads sequentially; do not overlap builds or GPU tests. Existing development environment overrides remain available, including `FORGELINE_RENDER_QUALITY`. Prefer typed fixture settings for reproducible per-feature comparisons; manifests record requested settings, effective profile, fallback and actual resource dimensions.
+
+Development overrides use `FORGELINE_RENDER_SCALE` (invariant decimal 0.5–1), `FORGELINE_ANTIALIASING`, `FORGELINE_SHADOW_QUALITY`, `FORGELINE_TEXTURE_QUALITY`, `FORGELINE_OBJECT_DETAIL`, `FORGELINE_ATMOSPHERE_QUALITY`, `FORGELINE_PARTICLE_QUALITY`, `FORGELINE_SURFACE_DETAIL` and `FORGELINE_VEGETATION_MOTION`. Enum values match the typed controls above; boolean values are `true`/`false`. Invalid values fail validation before renderer construction, and environment choices do not overwrite saved preferences.
 
 ```powershell
 dotnet build ForgeLine.sln --configuration Release

@@ -52,12 +52,14 @@ public sealed class GraphicsQualityPolicyTests
         Assert.Equal(settings, exhausted.RequestedSettings);
     }
 
-    [Fact]
-    public void PressureCapsExplicitHighOverridesAndUnsupportedParticles()
+    [Theory]
+    [InlineData(RenderQuality.Low)]
+    [InlineData(RenderQuality.Ultra)]
+    public void PressureCapsExplicitHighOverridesAndUnsupportedParticles(RenderQuality requested)
     {
         var settings = new RenderQualitySettings
         {
-            Quality = RenderQuality.Ultra, Shadows = DirectionalShadowQuality.High,
+            Quality = requested, Shadows = DirectionalShadowQuality.High,
             Particles = ParticleQuality.High, Antialiasing = SpatialAntialiasing.High, Textures = TextureDetailQuality.Full
         };
         var software = settings.Resolve(true, true, 320, 240, 3);
@@ -66,6 +68,8 @@ public sealed class GraphicsQualityPolicyTests
         Assert.Equal(512, software.Particles.Capacity);
         Assert.Equal(TextureDetailQuality.Quarter, software.Textures);
         Assert.Equal(SpatialAntialiasing.Disabled, software.PostProcessing.Antialiasing);
+        Assert.Contains("Software", software.FallbackReason);
+        Assert.Equal(settings, software.RequestedSettings);
         var unsupported = settings.Resolve(true, false, 320, 240, 3, particlesSupported: false);
         Assert.Equal(0, unsupported.Particles.Capacity);
         Assert.Contains("unsupported", unsupported.FallbackReason);
