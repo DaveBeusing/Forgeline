@@ -227,3 +227,14 @@ dotnet test --solution ForgeLine.sln -c Release --no-build --max-parallel-test-m
 InspectionDistanceMeters is capture-only, finite and zero or20â€“120. Zero retains
 bit-identical120/420/1000 reference settings; nondefault distance is recorded in
 both camera metadata and filename. It changes no default gameplay camera.
+
+## Package delivery check
+
+A reproducible local 0.1.353-dev/win-x64 package passes file-hash comparison and
+runtime integrity with the existing asset root. The produced archive is
+33,761,159 bytes. Its source/evidence revision is eb3ffc2. An installed-package
+Windowed1600×900 smoke exits successfully, with 11 instance draws, 938/1551 visible
+instances and zero texture/material binding failures. Repository and installed
+startup both use the canonical existing smoke path; generated package files stay
+under artifacts, outside source ownership. The package is local and is not a
+GitHub release. Subsequent updates below record evidence only.
