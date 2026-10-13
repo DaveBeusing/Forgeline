@@ -1,0 +1,1340 @@
+{
+  "count": 55,
+  "assets": [
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [
+        {
+          "name": "exhaust",
+          "x": 0.02,
+          "y": 0.24,
+          "z": -0.25,
+          "isValid": true
+        },
+        {
+          "name": "loading_access",
+          "x": -0.25,
+          "y": -0.43,
+          "z": 0.39,
+          "isValid": true
+        },
+        {
+          "name": "service_access",
+          "x": 0.26,
+          "y": -0.43,
+          "z": 0.39,
+          "isValid": true
+        }
+      ],
+      "dependencies": [
+        "building.directorate.ammunition_plant.lod1",
+        "building.directorate.ammunition_plant.lod2",
+        "building.directorate.module.collision_box",
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/ammunition_plant.flasset",
+      "definition": "assets/source/buildings/directorate/ammunition_plant.asset.json",
+      "collision": "building.directorate.module.collision_box",
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.ammunition_plant",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/ammunition_plant/lod0.gltf",
+      "sourceDimensions": null,
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "building.directorate.ammunition_plant.lod1",
+          "maxDistance": 220
+        },
+        {
+          "level": 2,
+          "assetId": "building.directorate.ammunition_plant.lod2",
+          "maxDistance": 620
+        }
+      ],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/ammunition_plant/critical.flasset",
+      "definition": "assets/source/buildings/directorate/ammunition_plant_critical.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.ammunition_plant.critical",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/ammunition_plant/critical.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/ammunition_plant/damaged.flasset",
+      "definition": "assets/source/buildings/directorate/ammunition_plant_damaged.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.ammunition_plant.damaged",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/ammunition_plant/damaged.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/ammunition_plant/destroyed.flasset",
+      "definition": "assets/source/buildings/directorate/ammunition_plant_destroyed.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.ammunition_plant.destroyed",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/ammunition_plant/destroyed.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/ammunition_plant/foundation.flasset",
+      "definition": "assets/source/buildings/directorate/ammunition_plant_foundation.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.ammunition_plant.foundation",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/ammunition_plant/foundation.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/ammunition_plant/idle.flasset",
+      "definition": "assets/source/buildings/directorate/ammunition_plant_idle.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.ammunition_plant.idle",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/ammunition_plant/idle.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/ammunition_plant/lod1.flasset",
+      "definition": "assets/source/buildings/directorate/ammunition_plant_lod1.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.ammunition_plant.lod1",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/ammunition_plant/lod1.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/ammunition_plant/lod2.flasset",
+      "definition": "assets/source/buildings/directorate/ammunition_plant_lod2.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.ammunition_plant.lod2",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/ammunition_plant/lod2.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/ammunition_plant/partial_shell.flasset",
+      "definition": "assets/source/buildings/directorate/ammunition_plant_partial_shell.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.ammunition_plant.partial_shell",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/ammunition_plant/partial_shell.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/ammunition_plant/structural_frame.flasset",
+      "definition": "assets/source/buildings/directorate/ammunition_plant_structural_frame.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.ammunition_plant.structural_frame",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/ammunition_plant/structural_frame.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/ammunition_plant/unpowered.flasset",
+      "definition": "assets/source/buildings/directorate/ammunition_plant_unpowered.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.ammunition_plant.unpowered",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/ammunition_plant/unpowered.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [
+        {
+          "name": "clean_air",
+          "x": -0.17,
+          "y": 0.28,
+          "z": -0.14,
+          "isValid": true
+        },
+        {
+          "name": "conditioned_power",
+          "x": -0.28,
+          "y": -0.2,
+          "z": 0.44,
+          "isValid": true
+        },
+        {
+          "name": "service_access",
+          "x": 0.23,
+          "y": -0.43,
+          "z": 0.49,
+          "isValid": true
+        }
+      ],
+      "dependencies": [
+        "building.directorate.electronics_plant.lod1",
+        "building.directorate.electronics_plant.lod2",
+        "building.directorate.module.collision_box",
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/electronics_plant.flasset",
+      "definition": "assets/source/buildings/directorate/electronics_plant.asset.json",
+      "collision": "building.directorate.module.collision_box",
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.electronics_plant",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/electronics_plant/lod0.gltf",
+      "sourceDimensions": null,
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "building.directorate.electronics_plant.lod1",
+          "maxDistance": 220
+        },
+        {
+          "level": 2,
+          "assetId": "building.directorate.electronics_plant.lod2",
+          "maxDistance": 620
+        }
+      ],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/electronics_plant/critical.flasset",
+      "definition": "assets/source/buildings/directorate/electronics_plant_critical.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.electronics_plant.critical",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/electronics_plant/critical.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/electronics_plant/damaged.flasset",
+      "definition": "assets/source/buildings/directorate/electronics_plant_damaged.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.electronics_plant.damaged",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/electronics_plant/damaged.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/electronics_plant/destroyed.flasset",
+      "definition": "assets/source/buildings/directorate/electronics_plant_destroyed.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.electronics_plant.destroyed",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/electronics_plant/destroyed.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/electronics_plant/foundation.flasset",
+      "definition": "assets/source/buildings/directorate/electronics_plant_foundation.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.electronics_plant.foundation",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/electronics_plant/foundation.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/electronics_plant/idle.flasset",
+      "definition": "assets/source/buildings/directorate/electronics_plant_idle.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.electronics_plant.idle",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/electronics_plant/idle.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/electronics_plant/lod1.flasset",
+      "definition": "assets/source/buildings/directorate/electronics_plant_lod1.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.electronics_plant.lod1",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/electronics_plant/lod1.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/electronics_plant/lod2.flasset",
+      "definition": "assets/source/buildings/directorate/electronics_plant_lod2.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.electronics_plant.lod2",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/electronics_plant/lod2.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/electronics_plant/partial_shell.flasset",
+      "definition": "assets/source/buildings/directorate/electronics_plant_partial_shell.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.electronics_plant.partial_shell",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/electronics_plant/partial_shell.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/electronics_plant/structural_frame.flasset",
+      "definition": "assets/source/buildings/directorate/electronics_plant_structural_frame.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.electronics_plant.structural_frame",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/electronics_plant/structural_frame.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/electronics_plant/unpowered.flasset",
+      "definition": "assets/source/buildings/directorate/electronics_plant_unpowered.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.electronics_plant.unpowered",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/electronics_plant/unpowered.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [
+        {
+          "name": "extraction_axis",
+          "x": -0.2,
+          "y": -0.46,
+          "z": -0.04,
+          "isValid": true
+        },
+        {
+          "name": "material_outlet",
+          "x": 0.4,
+          "y": -0.15,
+          "z": 0.21,
+          "isValid": true
+        },
+        {
+          "name": "service_access",
+          "x": 0.18,
+          "y": -0.36,
+          "z": -0.32,
+          "isValid": true
+        }
+      ],
+      "dependencies": [
+        "building.directorate.extractor.lod1",
+        "building.directorate.extractor.lod2",
+        "building.directorate.module.collision_box",
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/extractor.flasset",
+      "definition": "assets/source/buildings/directorate/extractor.asset.json",
+      "collision": "building.directorate.module.collision_box",
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.extractor",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/extractor/lod0.gltf",
+      "sourceDimensions": null,
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "building.directorate.extractor.lod1",
+          "maxDistance": 220
+        },
+        {
+          "level": 2,
+          "assetId": "building.directorate.extractor.lod2",
+          "maxDistance": 620
+        }
+      ],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/extractor/critical.flasset",
+      "definition": "assets/source/buildings/directorate/extractor_critical.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.extractor.critical",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/extractor/critical.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/extractor/damaged.flasset",
+      "definition": "assets/source/buildings/directorate/extractor_damaged.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.extractor.damaged",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/extractor/damaged.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/extractor/destroyed.flasset",
+      "definition": "assets/source/buildings/directorate/extractor_destroyed.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.extractor.destroyed",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/extractor/destroyed.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/extractor/foundation.flasset",
+      "definition": "assets/source/buildings/directorate/extractor_foundation.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.extractor.foundation",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/extractor/foundation.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/extractor/idle.flasset",
+      "definition": "assets/source/buildings/directorate/extractor_idle.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.extractor.idle",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/extractor/idle.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/extractor/lod1.flasset",
+      "definition": "assets/source/buildings/directorate/extractor_lod1.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.extractor.lod1",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/extractor/lod1.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/extractor/lod2.flasset",
+      "definition": "assets/source/buildings/directorate/extractor_lod2.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.extractor.lod2",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/extractor/lod2.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/extractor/partial_shell.flasset",
+      "definition": "assets/source/buildings/directorate/extractor_partial_shell.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.extractor.partial_shell",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/extractor/partial_shell.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/extractor/structural_frame.flasset",
+      "definition": "assets/source/buildings/directorate/extractor_structural_frame.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.extractor.structural_frame",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/extractor/structural_frame.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/extractor/unpowered.flasset",
+      "definition": "assets/source/buildings/directorate/extractor_unpowered.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.extractor.unpowered",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/extractor/unpowered.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [
+        {
+          "name": "fuel_manifold",
+          "x": 0.24,
+          "y": -0.18,
+          "z": 0.13,
+          "isValid": true
+        },
+        {
+          "name": "process_tower",
+          "x": -0.22,
+          "y": 0.52,
+          "z": -0.17,
+          "isValid": true
+        },
+        {
+          "name": "service_access",
+          "x": 0.33,
+          "y": -0.41,
+          "z": 0.45,
+          "isValid": true
+        }
+      ],
+      "dependencies": [
+        "building.directorate.fuel_refinery.lod1",
+        "building.directorate.fuel_refinery.lod2",
+        "building.directorate.module.collision_box",
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/fuel_refinery.flasset",
+      "definition": "assets/source/buildings/directorate/fuel_refinery.asset.json",
+      "collision": "building.directorate.module.collision_box",
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.fuel_refinery",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/fuel_refinery/lod0.gltf",
+      "sourceDimensions": null,
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "building.directorate.fuel_refinery.lod1",
+          "maxDistance": 220
+        },
+        {
+          "level": 2,
+          "assetId": "building.directorate.fuel_refinery.lod2",
+          "maxDistance": 620
+        }
+      ],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/fuel_refinery/critical.flasset",
+      "definition": "assets/source/buildings/directorate/fuel_refinery_critical.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.fuel_refinery.critical",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/fuel_refinery/critical.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/fuel_refinery/damaged.flasset",
+      "definition": "assets/source/buildings/directorate/fuel_refinery_damaged.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.fuel_refinery.damaged",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/fuel_refinery/damaged.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/fuel_refinery/destroyed.flasset",
+      "definition": "assets/source/buildings/directorate/fuel_refinery_destroyed.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.fuel_refinery.destroyed",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/fuel_refinery/destroyed.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/fuel_refinery/foundation.flasset",
+      "definition": "assets/source/buildings/directorate/fuel_refinery_foundation.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.fuel_refinery.foundation",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/fuel_refinery/foundation.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/fuel_refinery/idle.flasset",
+      "definition": "assets/source/buildings/directorate/fuel_refinery_idle.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.fuel_refinery.idle",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/fuel_refinery/idle.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/fuel_refinery/lod1.flasset",
+      "definition": "assets/source/buildings/directorate/fuel_refinery_lod1.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.fuel_refinery.lod1",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/fuel_refinery/lod1.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/fuel_refinery/lod2.flasset",
+      "definition": "assets/source/buildings/directorate/fuel_refinery_lod2.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.fuel_refinery.lod2",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/fuel_refinery/lod2.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/fuel_refinery/partial_shell.flasset",
+      "definition": "assets/source/buildings/directorate/fuel_refinery_partial_shell.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.fuel_refinery.partial_shell",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/fuel_refinery/partial_shell.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/fuel_refinery/structural_frame.flasset",
+      "definition": "assets/source/buildings/directorate/fuel_refinery_structural_frame.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.fuel_refinery.structural_frame",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/fuel_refinery/structural_frame.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/fuel_refinery/unpowered.flasset",
+      "definition": "assets/source/buildings/directorate/fuel_refinery_unpowered.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.fuel_refinery.unpowered",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/fuel_refinery/unpowered.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [
+        {
+          "name": "material_feed",
+          "x": 0.2,
+          "y": 0.38,
+          "z": -0.1,
+          "isValid": true
+        },
+        {
+          "name": "service_access",
+          "x": 0.28,
+          "y": -0.36,
+          "z": 0.43,
+          "isValid": true
+        },
+        {
+          "name": "slag_outlet",
+          "x": -0.09,
+          "y": -0.4,
+          "z": 0.47,
+          "isValid": true
+        }
+      ],
+      "dependencies": [
+        "building.directorate.module.collision_box",
+        "building.directorate.smelter.lod1",
+        "building.directorate.smelter.lod2",
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/smelter.flasset",
+      "definition": "assets/source/buildings/directorate/smelter.asset.json",
+      "collision": "building.directorate.module.collision_box",
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.smelter",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/smelter/lod0.gltf",
+      "sourceDimensions": null,
+      "lods": [
+        {
+          "level": 1,
+          "assetId": "building.directorate.smelter.lod1",
+          "maxDistance": 220
+        },
+        {
+          "level": 2,
+          "assetId": "building.directorate.smelter.lod2",
+          "maxDistance": 620
+        }
+      ],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/smelter/critical.flasset",
+      "definition": "assets/source/buildings/directorate/smelter_critical.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.smelter.critical",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/smelter/critical.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/smelter/damaged.flasset",
+      "definition": "assets/source/buildings/directorate/smelter_damaged.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.smelter.damaged",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/smelter/damaged.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/smelter/destroyed.flasset",
+      "definition": "assets/source/buildings/directorate/smelter_destroyed.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.smelter.destroyed",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/smelter/destroyed.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/smelter/foundation.flasset",
+      "definition": "assets/source/buildings/directorate/smelter_foundation.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.smelter.foundation",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/smelter/foundation.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/smelter/idle.flasset",
+      "definition": "assets/source/buildings/directorate/smelter_idle.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.smelter.idle",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/smelter/idle.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/smelter/lod1.flasset",
+      "definition": "assets/source/buildings/directorate/smelter_lod1.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.smelter.lod1",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/smelter/lod1.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/smelter/lod2.flasset",
+      "definition": "assets/source/buildings/directorate/smelter_lod2.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.smelter.lod2",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/smelter/lod2.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/smelter/partial_shell.flasset",
+      "definition": "assets/source/buildings/directorate/smelter_partial_shell.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.smelter.partial_shell",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/smelter/partial_shell.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/smelter/structural_frame.flasset",
+      "definition": "assets/source/buildings/directorate/smelter_structural_frame.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.smelter.structural_frame",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/smelter/structural_frame.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    },
+    {
+      "runtimeTextureLimit": null,
+      "sockets": [],
+      "dependencies": [
+        "material.directorate.building.structural"
+      ],
+      "runtime": "assets/runtime/meshes/building/directorate/smelter/unpowered.flasset",
+      "definition": "assets/source/buildings/directorate/smelter_unpowered.asset.json",
+      "collision": null,
+      "materials": [
+        "material.directorate.building.structural"
+      ],
+      "id": "building.directorate.smelter.unpowered",
+      "textures": [],
+      "sourceMasterStatus": "requires-camera-review",
+      "source": "assets/source/buildings/directorate/sources/industrial/smelter/unpowered.gltf",
+      "sourceDimensions": null,
+      "lods": [],
+      "runtimeTextureFormat": "rgba8Unorm",
+      "type": "mesh"
+    }
+  ]
+}

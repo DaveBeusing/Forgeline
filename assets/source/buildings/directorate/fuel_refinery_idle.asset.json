@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.fuel_refinery.idle",
+  "type": "mesh",
+  "source": "sources/industrial/fuel_refinery/idle.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

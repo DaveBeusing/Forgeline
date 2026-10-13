@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.extractor.damaged",
+  "type": "mesh",
+  "source": "sources/industrial/extractor/damaged.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

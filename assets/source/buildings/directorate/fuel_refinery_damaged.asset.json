@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.fuel_refinery.damaged",
+  "type": "mesh",
+  "source": "sources/industrial/fuel_refinery/damaged.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

@@ -289,3 +289,23 @@ load. The complete serialized run passes those same unchanged assertions.
 Parallel failures are retained in local logs; this execution strategy does not
 weaken thresholds or establish remote CI success. GitHub build-test still gates
 integration after publication.
+
+## Integration with industrial building production
+
+The branch integrates master `8ff5f9d` (industrial building production). Both
+source owners, state mappings and all operational/industrial review galleries
+are retained. Existing industrial enum values remain stable; operational scenes
+are appended. Dedicated industrial idle attachments remain family-specific;
+operational idle retains its shared attachment.
+
+The combined catalog contains 441 assets (258 meshes, 56 textures, 127 materials).
+The PR version advances once from current master 0.1.350 to 0.1.351. Earlier
+capture hashes, image comparisons and timing results above describe their
+recorded revisions and have not been recaptured for this integration.
+
+Integration validation: Release solution build with zero warnings/errors;
+42-project reference validation; all 97 asset tests and 771 presentation tests
+pass, with seven optional presentation qualification tests skipped. Both test
+projects ran with `--parallel none`. The state-resolution allocation theory
+covers Command Core and all nine production families. Existing art/live,
+sustained-performance and borderless acceptance limits remain open.

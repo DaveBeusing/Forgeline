@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.extractor.idle",
+  "type": "mesh",
+  "source": "sources/industrial/extractor/idle.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

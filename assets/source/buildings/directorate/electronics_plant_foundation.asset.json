@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.electronics_plant.foundation",
+  "type": "mesh",
+  "source": "sources/industrial/electronics_plant/foundation.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

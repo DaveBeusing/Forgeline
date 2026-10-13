@@ -1,5 +1,6 @@
 using ForgeLine.AssetCompiler;
 using ForgeLine.Assets;
+using System.Text.Json;
 using Xunit;
 
 namespace ForgeLine.Assets.Tests;
@@ -47,7 +48,7 @@ public sealed class DirectorateBuildingAssetAuthoringTests
                         static diagnostic =>
                             $"{diagnostic.Code}: {diagnostic.Message}")));
             Assert.Equal(
-                401,
+                441,
                 result.CompiledCount);
 
             RuntimeAssetCatalog catalog =
@@ -167,6 +168,51 @@ public sealed class DirectorateBuildingAssetAuthoringTests
                     catalog.Contains(
                         AssetId.Parse(
                             $"{primaryId}.lod2")));
+
+                if (family is "extractor" or "smelter" or "electronics_plant" or "fuel_refinery" or "ammunition_plant")
+                {
+                    using var kit = JsonDocument.Parse(File.ReadAllText(Path.Combine(repositoryRoot,
+                        "assets/source/buildings/directorate/authoring", family + ".kit.json")));
+                    float[] minimum = kit.RootElement.GetProperty("bounds").GetProperty("min").EnumerateArray().Select(x => x.GetSingle()).ToArray();
+                    float[] maximum = kit.RootElement.GetProperty("bounds").GetProperty("max").EnumerateArray().Select(x => x.GetSingle()).ToArray();
+                    RuntimeMeshData[] lods = [ReadMesh(""), ReadMesh(".lod1"), ReadMesh(".lod2")];
+                    Assert.True(lods[0].Indices.Count > lods[1].Indices.Count);
+                    Assert.True(lods[1].Indices.Count > lods[2].Indices.Count);
+                    Assert.Equal(3, primary.Sockets.Count);
+                    Assert.Contains(primary.Sockets, x => x.Name is "service_access" or "loading_access");
+                    foreach (var mesh in lods)
+                    {
+                        Assert.True(mesh.HasNormals && mesh.HasUv0 && mesh.HasTangents);
+                        Assert.Single(mesh.Sections);
+                        Assert.Equal("material.directorate.building.structural", Assert.Single(mesh.MaterialIds));
+                        Assert.Equal(-.5f, mesh.Vertices.Min(x => x.Y), precision: 5);
+                        Assert.All(mesh.Vertices, x =>
+                        {
+                            Assert.InRange(x.X, minimum[0] - .00001f, maximum[0] + .00001f);
+                            Assert.InRange(x.Y, minimum[1] - .00001f, maximum[1] + .00001f);
+                            Assert.InRange(x.Z, minimum[2] - .00001f, maximum[2] + .00001f);
+                            Assert.InRange(x.U, .017f, .983f);
+                            Assert.InRange(x.V, .017f, .983f);
+                            var normal = new System.Numerics.Vector3(x.NormalX, x.NormalY, x.NormalZ);
+                            var tangent = new System.Numerics.Vector3(x.TangentX, x.TangentY, x.TangentZ);
+                            Assert.InRange(normal.Length(), .999f, 1.001f);
+                            Assert.InRange(tangent.Length(), .999f, 1.001f);
+                            Assert.InRange(MathF.Abs(System.Numerics.Vector3.Dot(normal, tangent)), 0, .001f);
+                        });
+                    }
+                    foreach (string state in new[] { "foundation", "structural_frame", "partial_shell", "idle", "unpowered", "damaged", "critical", "destroyed" })
+                    {
+                        var mesh = ReadMesh("." + state);
+                        Assert.NotEmpty(mesh.Indices);
+                        Assert.True(mesh.HasNormals && mesh.HasUv0 && mesh.HasTangents);
+                        Assert.Single(mesh.Sections);
+                    }
+                    Assert.True(ReadMesh(".structural_frame").Indices.Count > ReadMesh(".foundation").Indices.Count);
+                    Assert.True(ReadMesh(".partial_shell").Indices.Count < lods[1].Indices.Count);
+
+                    RuntimeMeshData ReadMesh(string suffix) => RuntimeMeshData.FromPayload(
+                        catalog.Read(AssetId.Parse(primaryId + suffix)).Payload);
+                }
             }
 
             string[] sharedIds =

@@ -1,7 +1,7 @@
 {
   "id": "building.directorate.extractor.lod1",
   "type": "mesh",
-  "source": "sources/extractor_lod1.gltf",
+  "source": "sources/industrial/extractor/lod1.gltf",
   "materialReferences": [
     "material.directorate.building.structural"
   ]

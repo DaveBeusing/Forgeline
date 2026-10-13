@@ -1,0 +1,8 @@
+{
+  "id": "building.directorate.electronics_plant.damaged",
+  "type": "mesh",
+  "source": "sources/industrial/electronics_plant/damaged.gltf",
+  "materialReferences": [
+    "material.directorate.building.structural"
+  ]
+}

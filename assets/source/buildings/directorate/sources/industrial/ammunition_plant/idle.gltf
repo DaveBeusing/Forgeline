@@ -1,0 +1,141 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine industrial building component exporter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 1824,
+      "uri": "data:application/octet-stream;base64,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"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 576,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 576,
+      "byteLength": 576,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1152,
+      "byteLength": 384,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1536,
+      "byteLength": 288,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC3",
+      "min": [
+        -0.3449999988079071,
+        -0.3700000047683716,
+        0.39800000190734863
+      ],
+      "max": [
+        -0.19499999284744263,
+        -0.20000000298023224,
+        0.40799999237060547
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC3",
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5125,
+      "count": 72,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "idle",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "extras": {
+    "coordinates": "Y up, +Z service access; centre pivot; normalized existing building visual scale",
+    "componentHierarchy": [
+      {
+        "name": "idle_gate",
+        "parent": "foundation",
+        "firstIndex": 0,
+        "indexCount": 72
+      }
+    ],
+    "anchors": {
+      "loading_access": [
+        -0.25,
+        -0.43,
+        0.39
+      ],
+      "service_access": [
+        0.26,
+        -0.43,
+        0.39
+      ],
+      "exhaust": [
+        0.02,
+        0.24,
+        -0.25
+      ]
+    }
+  }
+}

@@ -1,0 +1,983 @@
+{
+  "schemaVersion": 1,
+  "family": "ammunition_plant",
+  "coordinates": "Y up, +Z service access; centre pivot; normalized existing building visual scale",
+  "bounds": {
+    "min": [
+      -0.45,
+      -0.5,
+      -0.42
+    ],
+    "max": [
+      0.41,
+      0.27,
+      0.41
+    ]
+  },
+  "atlas": "texture.directorate.surface.atlas_base",
+  "provenance": {
+    "author": "ForgeLine",
+    "license": "Original repository geometry; no third-party inputs or separate external license grant"
+  },
+  "anchors": {
+    "loading_access": [
+      -0.25,
+      -0.43,
+      0.39
+    ],
+    "service_access": [
+      0.26,
+      -0.43,
+      0.39
+    ],
+    "exhaust": [
+      0.02,
+      0.24,
+      -0.25
+    ]
+  },
+  "intactModules": [
+    "foundation",
+    "reinforced_bays",
+    "blast_partitions",
+    "protected_loading",
+    "ventilation",
+    "service_fittings"
+  ],
+  "modules": [
+    {
+      "name": "foundation",
+      "parent": null,
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.45,
+            -0.5,
+            -0.42
+          ],
+          "max": [
+            0.41,
+            -0.46,
+            0.41
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        }
+      ]
+    },
+    {
+      "name": "structural_frame",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.403,
+            -0.46,
+            -0.383
+          ],
+          "max": [
+            -0.367,
+            0.08,
+            -0.347
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.403,
+            -0.46,
+            0.2919999999999999
+          ],
+          "max": [
+            -0.367,
+            0.08,
+            0.32799999999999996
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.32699999999999996,
+            -0.46,
+            -0.383
+          ],
+          "max": [
+            0.363,
+            0.08,
+            -0.347
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.32699999999999996,
+            -0.46,
+            0.2919999999999999
+          ],
+          "max": [
+            0.363,
+            0.08,
+            0.32799999999999996
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.405,
+            0.06,
+            -0.385
+          ],
+          "max": [
+            0.365,
+            0.1,
+            -0.345
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        }
+      ]
+    },
+    {
+      "name": "reinforced_bays",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.4,
+            -0.43,
+            -0.36
+          ],
+          "max": [
+            -0.18,
+            0.16,
+            0.13
+          ],
+          "cell": 15,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.1,
+            -0.43,
+            -0.36
+          ],
+          "max": [
+            0.12,
+            0.16,
+            0.13
+          ],
+          "cell": 15,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.2,
+            -0.43,
+            -0.36
+          ],
+          "max": [
+            0.38,
+            0.16,
+            0.13
+          ],
+          "cell": 15,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.42,
+            0.16,
+            -0.38
+          ],
+          "max": [
+            0.4,
+            0.19,
+            0.15
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        }
+      ]
+    },
+    {
+      "name": "blast_partitions",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.17,
+            -0.46,
+            -0.4
+          ],
+          "max": [
+            -0.11,
+            0.27,
+            0.25
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.13,
+            -0.46,
+            -0.4
+          ],
+          "max": [
+            0.19,
+            0.27,
+            0.25
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.43,
+            -0.46,
+            -0.4
+          ],
+          "max": [
+            -0.4,
+            0.23,
+            0.25
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        }
+      ]
+    },
+    {
+      "name": "protected_loading",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.39,
+            -0.46,
+            0.16
+          ],
+          "max": [
+            0.39,
+            -0.43,
+            0.39
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.4,
+            -0.43,
+            0.18
+          ],
+          "max": [
+            -0.34,
+            -0.02,
+            0.25
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.33,
+            -0.43,
+            0.18
+          ],
+          "max": [
+            0.39,
+            -0.02,
+            0.25
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.4,
+            -0.025,
+            0.18
+          ],
+          "max": [
+            0.39,
+            0.02,
+            0.25
+          ],
+          "cell": 5,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.2,
+            -0.43,
+            0.36
+          ],
+          "max": [
+            0.09,
+            -0.14,
+            0.41
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        }
+      ]
+    },
+    {
+      "name": "ventilation",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.28,
+            0.19,
+            -0.25
+          ],
+          "end": [
+            -0.28,
+            0.24,
+            -0.25
+          ],
+          "radius": 0.06,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            0.02,
+            0.19,
+            -0.25
+          ],
+          "end": [
+            0.02,
+            0.24,
+            -0.25
+          ],
+          "radius": 0.06,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            0.28,
+            0.19,
+            -0.25
+          ],
+          "end": [
+            0.28,
+            0.24,
+            -0.25
+          ],
+          "radius": 0.05,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        }
+      ]
+    },
+    {
+      "name": "service_fittings",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.33499999999999996,
+            -0.16,
+            0.131
+          ],
+          "max": [
+            -0.245,
+            -0.05,
+            0.136
+          ],
+          "cell": 5,
+          "lods": [
+            0
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.345,
+            -0.35,
+            0.133
+          ],
+          "max": [
+            -0.235,
+            -0.18,
+            0.139
+          ],
+          "cell": 9,
+          "lods": [
+            0
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.034999999999999996,
+            -0.16,
+            0.131
+          ],
+          "max": [
+            0.055,
+            -0.05,
+            0.136
+          ],
+          "cell": 5,
+          "lods": [
+            0
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.045,
+            -0.35,
+            0.133
+          ],
+          "max": [
+            0.065,
+            -0.18,
+            0.139
+          ],
+          "cell": 9,
+          "lods": [
+            0
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.23500000000000004,
+            -0.16,
+            0.131
+          ],
+          "max": [
+            0.325,
+            -0.05,
+            0.136
+          ],
+          "cell": 5,
+          "lods": [
+            0
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.22500000000000003,
+            -0.35,
+            0.133
+          ],
+          "max": [
+            0.335,
+            -0.18,
+            0.139
+          ],
+          "cell": 9,
+          "lods": [
+            0
+          ],
+          "bevel": 0.008
+        }
+      ]
+    },
+    {
+      "name": "idle_gate",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.34,
+            -0.37,
+            0.398
+          ],
+          "max": [
+            -0.2,
+            -0.22,
+            0.405
+          ],
+          "cell": 9,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.345,
+            -0.23,
+            0.4
+          ],
+          "max": [
+            -0.195,
+            -0.2,
+            0.408
+          ],
+          "cell": 5,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        }
+      ]
+    },
+    {
+      "name": "power_isolation",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.425,
+            -0.42,
+            0.33999999999999997
+          ],
+          "max": [
+            -0.315,
+            -0.2,
+            0.38499999999999995
+          ],
+          "cell": 15,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.37,
+            -0.25,
+            0.38999999999999996
+          ],
+          "end": [
+            -0.33999999999999997,
+            -0.18,
+            0.38999999999999996
+          ],
+          "radius": 0.012,
+          "cell": 5,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        }
+      ]
+    },
+    {
+      "name": "damaged_panels",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.39,
+            -0.435,
+            0.24499999999999994
+          ],
+          "max": [
+            -0.23,
+            -0.415,
+            0.345
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            0.26999999999999996,
+            -0.38,
+            0.2849999999999999
+          ],
+          "end": [
+            0.36,
+            -0.16,
+            0.30499999999999994
+          ],
+          "radius": 0.022,
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        }
+      ]
+    },
+    {
+      "name": "critical_break",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.35,
+            -0.39,
+            -0.31999999999999995
+          ],
+          "end": [
+            -0.27,
+            -0.12,
+            -0.22999999999999998
+          ],
+          "radius": 0.04,
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        },
+        {
+          "kind": "hopper",
+          "min": [
+            -0.39,
+            -0.43,
+            -0.33999999999999997
+          ],
+          "max": [
+            -0.2,
+            -0.36,
+            -0.14999999999999997
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "throatRatio": 0.42
+        }
+      ]
+    },
+    {
+      "name": "wreck",
+      "parent": "foundation",
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.38,
+            -0.45,
+            -0.33999999999999997
+          ],
+          "max": [
+            0.33999999999999997,
+            -0.32,
+            0.30999999999999994
+          ],
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.30000000000000004,
+            -0.33,
+            -0.27
+          ],
+          "end": [
+            0.26,
+            -0.19,
+            -0.18999999999999997
+          ],
+          "radius": 0.065,
+          "cell": 8,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.35,
+            -0.32,
+            -0.27999999999999997
+          ],
+          "max": [
+            -0.23,
+            -0.16,
+            -0.19999999999999998
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.008
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.16,
+            -0.44,
+            -0.33
+          ],
+          "max": [
+            -0.11,
+            -0.08,
+            0.16
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.14,
+            -0.44,
+            -0.33
+          ],
+          "max": [
+            0.19,
+            -0.08,
+            0.16
+          ],
+          "cell": 6,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.005
+        }
+      ]
+    }
+  ],
+  "states": {
+    "foundation": [
+      "foundation"
+    ],
+    "structural_frame": [
+      "foundation",
+      "structural_frame"
+    ],
+    "partial_shell": [
+      "foundation",
+      "structural_frame",
+      "reinforced_bays",
+      "blast_partitions",
+      "protected_loading"
+    ],
+    "idle": [
+      "idle_gate"
+    ],
+    "unpowered": [
+      "power_isolation"
+    ],
+    "damaged": [
+      "damaged_panels"
+    ],
+    "critical": [
+      "critical_break"
+    ],
+    "destroyed": [
+      "foundation",
+      "wreck"
+    ]
+  }
+}
