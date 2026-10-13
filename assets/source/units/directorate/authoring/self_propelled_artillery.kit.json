@@ -222,7 +222,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -269,7 +269,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -316,7 +316,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -363,7 +363,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -410,7 +410,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -525,7 +525,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -572,7 +572,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -619,7 +619,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -666,7 +666,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -713,7 +713,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -848,7 +848,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         },
         {
           "kind": "cylinder",
@@ -874,7 +874,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         },
         {
           "kind": "cylinder",
@@ -900,7 +900,7 @@
             10,
             6
           ],
-          "inner": 0.58
+          "innerRatio": 0.58
         }
       ]
     },
@@ -932,7 +932,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         },
         {
           "kind": "cylinder",
@@ -957,7 +957,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -1066,7 +1066,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -1148,7 +1148,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         },
         {
           "kind": "cylinder",
@@ -1174,7 +1174,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         },
         {
           "kind": "box",

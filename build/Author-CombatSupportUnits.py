@@ -29,7 +29,9 @@ def component(part, lod):
     elif kind == 'loft':
         mesh.loft(part['profiles'], cell, part.get('edge', [0, 0, 0])[lod])
     elif kind == 'cylinder':
-        mesh.cylinder(part['start'], part['end'], part['radius'], cell, part['sides'][lod], part.get('inner', 0) if lod == 0 else 0)
+        ratio = part.get('innerRatio', 0) if lod == 0 else 0
+        if not 0 <= ratio < 1: raise ValueError('Bore ratio must be below the outer radius')
+        mesh.cylinder(part['start'], part['end'], part['radius'], cell, part['sides'][lod], part['radius'] * ratio)
     elif kind == 'wheel':
         mesh.wheel(part['x0'], part['x1'], part['y'], part['z'], part['radius'], part['radius'], cell, part['sides'][lod], part.get('inner', 0) if lod == 0 else 0)
     elif kind == 'belt':

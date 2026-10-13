@@ -93,7 +93,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         },
         {
           "kind": "box",
@@ -168,7 +168,7 @@
             6,
             4
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -215,7 +215,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         },
         {
           "kind": "box",
@@ -290,7 +290,7 @@
             6,
             4
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -337,7 +337,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         },
         {
           "kind": "box",
@@ -412,7 +412,7 @@
             6,
             4
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -459,7 +459,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         },
         {
           "kind": "box",
@@ -534,7 +534,7 @@
             6,
             4
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -581,7 +581,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         },
         {
           "kind": "box",
@@ -656,7 +656,7 @@
             6,
             4
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -703,7 +703,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         },
         {
           "kind": "box",
@@ -778,7 +778,7 @@
             6,
             4
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -825,7 +825,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         },
         {
           "kind": "box",
@@ -900,7 +900,7 @@
             6,
             4
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -947,7 +947,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         },
         {
           "kind": "box",
@@ -1022,7 +1022,7 @@
             6,
             4
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -1082,7 +1082,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         },
         {
           "kind": "cylinder",
@@ -1107,7 +1107,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         },
         {
           "kind": "box",
@@ -1252,7 +1252,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         },
         {
           "kind": "box",
@@ -1303,7 +1303,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         },
         {
           "kind": "cylinder",
@@ -1328,7 +1328,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -1437,7 +1437,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         }
       ]
     },
@@ -1519,7 +1519,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         },
         {
           "kind": "cylinder",
@@ -1545,7 +1545,7 @@
             10,
             6
           ],
-          "inner": 0
+          "innerRatio": 0
         },
         {
           "kind": "box",

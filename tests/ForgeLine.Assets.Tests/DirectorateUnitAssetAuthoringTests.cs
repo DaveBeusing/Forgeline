@@ -123,6 +123,14 @@ public sealed class DirectorateUnitAssetAuthoringTests
                 {
                     RuntimeMeshData turret = Read(".turret");
                     highIndices += turret.Indices.Count;
+                    var muzzle = Assert.Single(catalog.Get(AssetId.Parse(id)).Sockets, x => x.Name == "weapon_muzzle");
+                    float sx = family == "scout_vehicle" ? 3 : 3.8f;
+                    float sy = family == "scout_vehicle" ? 2.4f : 3.2f;
+                    float outer = family == "scout_vehicle" ? .048f : .16f;
+                    var front = turret.Vertices.Where(v => v.Z > muzzle.Z - .0001f).ToArray();
+                    Assert.NotEmpty(front);
+                    Assert.All(front, v => Assert.InRange(MathF.Sqrt(v.X * sx * v.X * sx +
+                        (v.Y - muzzle.Y) * sy * (v.Y - muzzle.Y) * sy), outer * .45f, outer + .0001f));
                     Assert.Contains(catalog.Get(AssetId.Parse(id + ".turret")).MechanicalParts, p => p.Motion == MechanicalMotionKind.Cannon);
                 }
                 Assert.True(highIndices > lods[0].Indices.Count && lods[0].Indices.Count > lods[1].Indices.Count);
