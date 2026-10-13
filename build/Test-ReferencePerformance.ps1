@@ -39,6 +39,16 @@ try {
     Write-Current
     Copy-Item -LiteralPath (Join-Path $current 'manifest.json') -Destination (Join-Path $baseline 'manifest.json')
     $baselineHash = (Get-FileHash -LiteralPath (Join-Path $baseline 'manifest.json')).Hash
+    $capture.profile = @{quality='Medium';resolutionScale=1;textures='Full';vegetationMotion=$true;requestedSettings=@{antialiasing='Low'}}
+    Write-Current
+    & "$PSScriptRoot/Compare-ReferencePerformance.ps1" -CurrentRoot $current -BaselineRoot $baseline -GatePerformance -ReportPath (Join-Path $current 'profile-compatible.json')
+    $compatible = Get-Content (Join-Path $current 'profile-compatible.json') -Raw | ConvertFrom-Json
+    if ($compatible.cases[0].status -ne 'comparable') { throw 'Equivalent legacy effective settings were not comparable.' }
+    $capture.profile.resolutionScale = .75
+    Write-Current
+    Reject { & "$PSScriptRoot/Compare-ReferencePerformance.ps1" -CurrentRoot $current -BaselineRoot $baseline -GatePerformance -ReportPath (Join-Path $current 'profile-changed.json') }
+    $capture.profile = @{quality='Medium'}
+    Write-Current
     & "$PSScriptRoot/Compare-ReferencePerformance.ps1" -CurrentRoot $current -BaselineRoot $baseline -GatePerformance
     & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -BaselineRoot $baseline -GateImages
     $capture.cpu.p99=10; Write-Current

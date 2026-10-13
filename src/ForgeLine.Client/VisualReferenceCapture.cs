@@ -36,11 +36,13 @@ internal sealed record VisualReferenceCaptureRequest
         VisualReferenceSceneKind.FormationConvoy, VisualReferenceSceneKind.LogisticsCorridor,
         VisualReferenceSceneKind.DamageDestruction, VisualReferenceSceneKind.BattlefieldCombat
     ];
+    public RenderQualitySettings? GraphicsSettings { get; init; }
     public RenderQuality[] Profiles { get; init; } = Enum.GetValues<RenderQuality>();
     public RtsReferenceDisplay[] Displays { get; init; } = RtsVisualReference.Displays.ToArray();
     public RtsReferenceZoom[] Zooms { get; init; } = Enum.GetValues<RtsReferenceZoom>();
     public void Validate()
     {
+        GraphicsSettings?.Validate();
         ArgumentException.ThrowIfNullOrWhiteSpace(OutputRoot);
         ArgumentException.ThrowIfNullOrWhiteSpace(RuntimeRoot);
         if (!Enum.IsDefined(RunProfile) || !Enum.IsDefined(CameraPath)) throw new ArgumentException("Unsupported performance profile or camera path.");
@@ -52,7 +54,7 @@ internal sealed record VisualReferenceCaptureRequest
             throw new ArgumentOutOfRangeException(nameof(InspectionDistanceMeters));
         if (!float.IsFinite(YawDegrees) || YawDegrees is < 0 or > 360) throw new ArgumentOutOfRangeException(nameof(YawDegrees));
         if (Scenes is null || Profiles is null || Displays is null || Zooms is null ||
-            Scenes.Length is < 1 or > 14 || Profiles.Length is < 1 or > 3 || Displays.Length is < 1 or > 4 || Zooms.Length is < 1 or > 3 ||
+            Scenes.Length is < 1 or > 14 || Profiles.Length is < 1 or > 4 || Displays.Length is < 1 or > 4 || Zooms.Length is < 1 or > 3 ||
             Scenes.Any(x => !Enum.IsDefined(x)) || Profiles.Any(x => !Enum.IsDefined(x)) || Zooms.Any(x => !Enum.IsDefined(x)) ||
             Displays.Any(x => !RtsVisualReference.Displays.Contains(x) && !(Software && x == new RtsReferenceDisplay(640, 360))) ||
             Scenes.Distinct().Count() != Scenes.Length || Profiles.Distinct().Count() != Profiles.Length ||
@@ -111,9 +113,10 @@ internal static class VisualReferenceCapture
                 graphics.ConfigureSceneOutput(new(false, lighting.Exposure, true));
                 graphics.Resize(display.Width, display.Height);
                 graphics.RenderFrame(GraphicsColor.ForgeLineClear);
-                var profile = new RenderQualitySettings { Quality = quality }.Resolve(graphics.SupportsPostProcessing,
-                    graphics.Diagnostics.Device.IsSoftwareAdapter, display.Width, display.Height, 3, graphics.AvailableMemoryBudgetBytes);
-                graphics.ConfigureSceneOutput(new(profile.LinearScene, lighting.Exposure, true));
+                var settings = (request.GraphicsSettings ?? new RenderQualitySettings()) with { Quality = quality };
+                var profile = settings.Resolve(graphics.SupportsPostProcessing,
+                    graphics.Diagnostics.Device.IsSoftwareAdapter, display.Width, display.Height, 3, graphics.AvailableMemoryBudgetBytes, graphics.SupportsParticleRendering);
+                graphics.ConfigureSceneOutput(new(profile.LinearScene, lighting.Exposure, true, profile.ResolutionScale));
                 graphics.ConfigureAtmosphere(GraphicsAtmosphereSettings.Default with { Quality = profile.Atmosphere });
                 graphics.ConfigureDirectionalShadows(profile.Shadows);
                 graphics.ConfigurePostProcessing(profile.PostProcessing);
@@ -124,8 +127,8 @@ internal static class VisualReferenceCapture
                     long setupStart = Stopwatch.GetTimestamp();
                     long setupAllocationStart = GC.GetAllocatedBytesForCurrentThread();
                     var beforeSetup = graphics.Diagnostics;
-                    using var ground = new TerrainRenderer(graphics, terrain, runtimeAssets: catalog, surfaceDetail: profile.TerrainDetail) { DebugChunksEnabled = false };
-                    using var meshes = new SimpleInstanceRenderer(graphics, catalog, lodDiameterScale: profile.LodDiameterScale);
+                    using var ground = new TerrainRenderer(graphics, terrain, runtimeAssets: catalog, surfaceDetail: profile.TerrainDetail, textureDetail: profile.Textures) { DebugChunksEnabled = false };
+                    using var meshes = new SimpleInstanceRenderer(graphics, catalog, lodDiameterScale: profile.LodDiameterScale, textureDetail: profile.Textures, vegetationMotion: profile.VegetationMotion);
                     using var particles = new ParticleVfxRenderer(graphics, catalog, profile.Particles);
                     using var hud = new GameplayHudRenderer(graphics, catalog);
                     using var selection = new DebugDrawRenderer(graphics, depthEnabled: false, lineWidthPixels: 3);

@@ -20,6 +20,7 @@ internal sealed class ClientFrontendRenderHost : IDisposable
     private Action<IGraphicsDevice>? _nextStage;
     private long _publishedSequence;
     private long _presentedSequence;
+    private long _presentedDimensions;
     private int _surfaceWidth;
     private int _surfaceHeight;
     private bool _surfaceSuspended;
@@ -103,6 +104,8 @@ internal sealed class ClientFrontendRenderHost : IDisposable
         }
         _signal.Set();
     }
+    internal bool IsSurfacePresented(int width, int height) =>
+        Volatile.Read(ref _presentedDimensions) == ((long)(uint)width << 32 | (uint)height);
 
     internal bool WaitForLatestFrame(TimeSpan timeout)
     {
@@ -311,6 +314,7 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                     if (view.Value.Kind == FrontendSurfaceKind.StudioSplash && videoRenderer?.HasFrame == true)
                         Volatile.Write(ref _splashPresented, 1);
                     _presentedFrames = graphics.PresentedFrameCount;
+                    Volatile.Write(ref _presentedDimensions, (long)(uint)width << 32 | (uint)height);
                     Volatile.Write(ref _presentedSequence, sequence);
                     _frameRendered.Set();
                 }

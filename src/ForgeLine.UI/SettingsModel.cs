@@ -1,9 +1,10 @@
 using ForgeLine.Input;
 using ForgeLine.Platform;
+using ForgeLine.Presentation;
 
 namespace ForgeLine.UI;
 
-public enum FrontendRenderQuality { Low, Medium, High }
+public enum FrontendRenderQuality { Low, Medium, High, Ultra }
 
 public readonly record struct FrontendSettingsSnapshot(
     int WindowWidth,
@@ -14,7 +15,7 @@ public readonly record struct FrontendSettingsSnapshot(
     bool EdgeScrollEnabled,
     float CameraPanSpeedMultiplier,
     RtsCameraBindings CameraBindings, GameplayBindings? GameplayBindings = null,
-    FrontendRenderQuality RenderQuality = FrontendRenderQuality.Medium);
+    FrontendRenderQuality RenderQuality = FrontendRenderQuality.Medium, RenderQualitySettings? GraphicsSettings = null);
 
 public sealed class SettingsModel
 {
@@ -27,6 +28,13 @@ public sealed class SettingsModel
 
     public FrontendSettingsSnapshot Settings { get; private set; }
     public GameplayBindingRegistry Bindings { get; private set; }
+    public RenderQualitySettings GraphicsSettings => Settings.GraphicsSettings ?? new RenderQualitySettings { Quality = (RenderQuality)Settings.RenderQuality };
+
+    public void SetGraphicsSettings(RenderQualitySettings settings)
+    {
+        settings.Validate();
+        Settings = Settings with { RenderQuality = (FrontendRenderQuality)settings.Quality, GraphicsSettings = settings };
+    }
 
     public void SetDisplay(
         int width,
@@ -46,7 +54,7 @@ public sealed class SettingsModel
     public void SetRenderQuality(FrontendRenderQuality quality)
     {
         if (!Enum.IsDefined(quality)) throw new ArgumentOutOfRangeException(nameof(quality));
-        Settings = Settings with { RenderQuality = quality };
+        SetGraphicsSettings(new RenderQualitySettings { Quality = (RenderQuality)quality, ColorGrade = GraphicsSettings.ColorGrade });
     }
 
     public void SetCamera(

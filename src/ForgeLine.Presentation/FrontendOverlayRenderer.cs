@@ -7,6 +7,7 @@ namespace ForgeLine.Presentation;
 public sealed class FrontendOverlayRenderer : IDisposable
 {
     private const int MaxVertices = 16_384;
+    private const int MaxDetailVertices = 65_536;
     private const int MaxControlsVertices = 131_072;
     private const int VertexStride = 24;
     private const float GlyphPixelSize = 3.0f;
@@ -47,7 +48,12 @@ public sealed class FrontendOverlayRenderer : IDisposable
         }
 
         _vertexCount = 0;
-        _vertexLimit = view.Kind == FrontendSurfaceKind.Controls ? MaxControlsVertices : MaxVertices;
+        _vertexLimit = view.Kind switch
+        {
+            FrontendSurfaceKind.Controls => MaxControlsVertices,
+            FrontendSurfaceKind.Detail => MaxDetailVertices,
+            _ => MaxVertices
+        };
         _offsetX = 0f;
         _offsetY = 0f;
         float viewportScale = MathF.Min(

@@ -25,7 +25,7 @@ public sealed class GameplayBindingSettingsTests
             Assert.Equal(PlatformKey.Home, loaded.Settings.CameraBindings.PanForward);
             Assert.Equal(1.5f, loaded.Settings.UiScale);
             Assert.Empty(loaded.Settings.GameplayBindings.Overrides);
-            Assert.Equal(2, loaded.Settings.SchemaVersion);
+            Assert.Equal(ClientUserSettings.CurrentSchemaVersion, loaded.Settings.SchemaVersion);
             Assert.False(store.Load().RecoveredInvalidSettings);
         }
         finally { if (Directory.Exists(root)) Directory.Delete(root, true); }

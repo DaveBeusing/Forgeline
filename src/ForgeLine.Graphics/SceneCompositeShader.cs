@@ -32,7 +32,7 @@ internal static class SceneCompositeShader
         """;
     internal const string Pixel = Shared + """
         Texture2D<float4> Scene : register(t0);
-        #if ATMOSPHERE
+        #if ATMOSPHERE || UPSAMPLE
         Texture2D<float> Depth : register(t1);
         #endif
         float3 Decode(float3 value) {
@@ -80,11 +80,9 @@ internal static class SceneCompositeShader
             pixel=clamp(pixel,int2(0,0),int2(dimensions)-1);
             return DisplayLinear(Scene.Load(int3(pixel,0)),pixel,input,dimensions);
         }
-        float4 PSMain(Output input) : SV_Target0 {
-            int2 pixel=int2(input.Position.xy);
+        float4 ShadePixel(int2 pixel, Output input, uint2 dimensions) {
             float4 scene=Scene.Load(int3(pixel,0));
             if(scene.a<0) return float4(scene.rgb,-scene.a-1);
-            uint width,height; Scene.GetDimensions(width,height); uint2 dimensions=uint2(width,height);
             float3 value=DisplayLinear(scene,pixel,input,dimensions);
             if(input.Post.x>0) {
                 float3 north=SampleDisplayLinear(pixel+int2(0,-1),input,dimensions);
@@ -106,5 +104,30 @@ internal static class SceneCompositeShader
             }
             return float4(Encode(value),scene.a);
         }
+        #if UPSAMPLE
+        struct CompositeOutput { float4 Color:SV_Target0; float DepthValue:SV_Depth; };
+        CompositeOutput PSMain(Output input) {
+            uint width,height; Scene.GetDimensions(width,height); uint2 dimensions=uint2(width,height);
+            float2 position=input.Position.xy*float2(dimensions)/input.Post.yz-0.5;
+            int2 origin=int2(floor(position)); float2 weight=frac(position);
+            int2 maximum=int2(dimensions)-1;
+            float4 a=ShadePixel(clamp(origin,int2(0,0),maximum),input,dimensions);
+            float4 b=ShadePixel(clamp(origin+int2(1,0),int2(0,0),maximum),input,dimensions);
+            float4 c=ShadePixel(clamp(origin+int2(0,1),int2(0,0),maximum),input,dimensions);
+            float4 d=ShadePixel(clamp(origin+int2(1,1),int2(0,0),maximum),input,dimensions);
+            CompositeOutput output;
+            // Interpolate display-linear colors after each sample's fog/tone/AA, including authored clear colors.
+            output.Color=float4(Encode(lerp(lerp(Decode(a.rgb),Decode(b.rgb),weight.x),
+                lerp(Decode(c.rgb),Decode(d.rgb),weight.x),weight.y)),lerp(lerp(a.a,b.a,weight.x),lerp(c.a,d.a,weight.x),weight.y));
+            int2 nearest=clamp(int2(floor(position+0.5)),int2(0,0),maximum);
+            output.DepthValue=Depth.Load(int3(nearest,0));
+            return output;
+        }
+        #else
+        float4 PSMain(Output input):SV_Target0 {
+            uint width,height; Scene.GetDimensions(width,height);
+            return ShadePixel(int2(input.Position.xy),input,uint2(width,height));
+        }
+        #endif
         """;
 }

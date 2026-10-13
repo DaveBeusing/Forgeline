@@ -8,6 +8,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
 {
     private readonly IGraphicsDevice _graphics;
     private readonly RuntimeAssetCatalog _catalog;
+    private readonly TextureDetailQuality _textureDetail;
     private readonly Dictionary<AssetId, RuntimeMeshBuffers> _meshes = [];
     private readonly Dictionary<AssetId, RuntimeMaterialResources> _materials = [];
     private readonly Dictionary<AssetId, RuntimeTextureResource> _textures = [];
@@ -21,7 +22,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
 
     public RuntimeWorldAssetResources(
         IGraphicsDevice graphics,
-        RuntimeAssetCatalog catalog)
+        RuntimeAssetCatalog catalog, TextureDetailQuality textureDetail = TextureDetailQuality.Full)
     {
         _graphics =
             graphics ??
@@ -29,6 +30,9 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
         _catalog =
             catalog ??
             throw new ArgumentNullException(nameof(catalog));
+
+        if (!Enum.IsDefined(textureDetail)) throw new ArgumentOutOfRangeException(nameof(textureDetail));
+        _textureDetail = textureDetail;
 
         IGraphicsTexture? whiteBaseColor = null;
         IGraphicsTexture? flatNormal = null;
@@ -507,27 +511,20 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
         }
     }
 
-    private IGraphicsTexture CreateGraphicsTexture(
-        RuntimeTextureData data) =>
-        _graphics.CreateTexture(
-            new GraphicsTextureData(
-                new GraphicsTextureDescription(
-                    data.Width,
-                    data.Height,
-                    data.Format == RuntimeTextureFormat.Bc7Unorm ? GraphicsTextureFormat.Bc7Unorm : GraphicsTextureFormat.Rgba8Unorm,
-                    data.ColorSpace ==
-                    RuntimeTextureColorSpace.Srgb
-                        ? GraphicsTextureColorSpace.Srgb
-                        : GraphicsTextureColorSpace.Linear,
-                    data.Mips.Count),
-                data.Mips.Select(
-                    static mip =>
-                        new GraphicsTextureMipData(
-                            mip.Width,
-                            mip.Height,
-                            mip.RowPitch,
-                            mip.Pixels))));
-
+    private IGraphicsTexture CreateGraphicsTexture(RuntimeTextureData data)
+    {
+        int skip = Math.Min((int)_textureDetail, data.Mips.Count - 1);
+        // BC7 top levels retain block-aligned dimensions; tiny/odd chains keep the nearest usable level.
+        while (skip > 0 && data.Format == RuntimeTextureFormat.Bc7Unorm &&
+            (data.Mips[skip].Width % 4 != 0 || data.Mips[skip].Height % 4 != 0)) skip--;
+        var first = data.Mips[skip];
+        return _graphics.CreateTexture(new GraphicsTextureData(
+            new GraphicsTextureDescription(first.Width, first.Height,
+                data.Format == RuntimeTextureFormat.Bc7Unorm ? GraphicsTextureFormat.Bc7Unorm : GraphicsTextureFormat.Rgba8Unorm,
+                data.ColorSpace == RuntimeTextureColorSpace.Srgb ? GraphicsTextureColorSpace.Srgb : GraphicsTextureColorSpace.Linear,
+                data.Mips.Count - skip),
+            data.Mips.Skip(skip).Select(static mip => new GraphicsTextureMipData(mip.Width, mip.Height, mip.RowPitch, mip.Pixels))));
+    }
     private IGraphicsTexture CreateSolidTexture(
         byte red,
         byte green,

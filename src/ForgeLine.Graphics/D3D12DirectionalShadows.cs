@@ -161,8 +161,8 @@ internal sealed partial class D3D12GraphicsDevice
         }
         _commandList.OMSetRenderTargets(_sceneOutput.Enabled ? SceneRtv(_frameIndex) :
             new CpuDescriptorHandle(_rtvHeap.GetCPUDescriptorHandleForHeapStart(), _frameIndex, _rtvDescriptorSize), _dsvHeap.GetCPUDescriptorHandleForHeapStart());
-        _commandList.RSSetViewport(0, 0, _surfaceLifecycle.Width, _surfaceLifecycle.Height);
-        _commandList.RSSetScissorRect(Vortice.Mathematics.RectI.FromLTRB(0, 0, _surfaceLifecycle.Width, _surfaceLifecycle.Height));
+        _commandList.RSSetViewport(0, 0, WorldWidth, WorldHeight);
+        _commandList.RSSetScissorRect(Vortice.Mathematics.RectI.FromLTRB(0, 0, WorldWidth, WorldHeight));
         _shadowRecording = false;
         _shadowCpu = System.Diagnostics.Stopwatch.GetElapsedTime(_shadowStarted).TotalMilliseconds;
     }

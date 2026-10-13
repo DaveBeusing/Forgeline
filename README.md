@@ -107,7 +107,7 @@ The client starts the Central Divide / Directorate skirmish flow. Compile author
 | Development metrics | Shift + F1 |
 | Restart finished match / exit session | R / Escape |
 
-Settings → GRAPHICS QUALITY selects Low, Medium or High for the next match. The profile controls shadows, atmosphere, particle budgets, terrain detail, object LOD and spatial anti-aliasing while preserving full-resolution HUD and selection indicators. See [quality profiles and qualification](docs/PostProcessingQualification.md).
+Settings → GRAPHICS QUALITY selects Low, Medium, High or Ultra for the next match. Independent controls cover world resolution, spatial anti-aliasing, shadows, textures, object/surface detail, vegetation motion, atmosphere and particles while preserving full-resolution HUD and selection indicators. Display changes use a 15-second confirmation with automatic rollback. Medium is the default; effective hardware fallbacks are reported. See [settings and measured qualification](docs/GraphicsQualitySettings.md).
 
 The opt-in [native visual reference lane](docs/VisualReferenceEvidence.md) exports fixed-state Central Divide images with build/asset identity, actual resolution and resource/timing metadata. Structural qualification and human art review remain separate.
 

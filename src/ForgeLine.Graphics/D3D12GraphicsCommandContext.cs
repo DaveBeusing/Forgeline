@@ -12,6 +12,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
 
     private D3D12GraphicsPipeline? _pipeline;
     private bool _closed;
+    private readonly int _outputWidth, _outputHeight;
     internal void Close() => _closed = true;
     private void ValidateRecording()
     {
@@ -28,14 +29,14 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
     {
         _owner = owner;
         _commandList = commandList;
-        Width = width;
-        Height = height;
+        _outputWidth = width;
+        _outputHeight = height;
         FrameIndex = frameIndex;
     }
 
-    public int Width { get; }
+    public int Width => _owner.IsWorldPass ? _owner.WorldWidth : _outputWidth;
 
-    public int Height { get; }
+    public int Height => _owner.IsWorldPass ? _owner.WorldHeight : _outputHeight;
 
     public int FrameIndex { get; }
 

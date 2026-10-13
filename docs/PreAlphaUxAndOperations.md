@@ -94,6 +94,7 @@ The current schema contains:
 - camera key bindings;
 - drag-pan mouse binding;
 - gameplay shortcut overrides with camera/modal/group conflict validation.
+- graphics preset and independent world resolution, AA, shadows, textures, object/surface detail, vegetation motion, atmosphere and particles.
 
 Settings are typed and validated before window or camera creation.
 
@@ -108,7 +109,9 @@ Primary camera actions require unique non-unknown keys. Invalid drag-pan binding
 
 If the settings file is missing, validated defaults are created. If it is malformed, uses an unsupported schema, or contains invalid values, the invalid file is moved to a timestamped settings.json.invalid-* file and a fresh validated default file is written.
 
-GAMEPLAY ACTION selects one of twenty-five supported actions; GAMEPLAY KEY selects a candidate. Invalid candidates retain the valid draft, display the conflict and disable APPLY. Changing the mapping restarts the frontend window before a match begins. Camera settings remain independent and preserved. Schema 1 migrates to schema 2; invalid gameplay data alone recovers without discarding valid camera/display values. Mouse selection, group digits, help and Escape stay fixed. Onboarding, placement and controls prompts share the cached registry. See [binding rules and qualification](GameplayInputAccessibilityAndQualification.md).
+GAMEPLAY ACTION selects one of twenty-five supported actions; GAMEPLAY KEY selects a candidate. Invalid candidates retain the valid draft, display the conflict and disable APPLY. Changing the mapping reloads the frontend session before a match begins. Camera settings remain independent and preserved. Schema 1/2 migrate to schema 3; invalid gameplay or graphics groups recover independently without discarding valid camera/display values. Mouse selection, group digits, help and Escape stay fixed. Onboarding, placement and controls prompts share the cached registry. See [binding rules and qualification](GameplayInputAccessibilityAndQualification.md).
+
+Graphics defaults to Medium. Low/Medium/High/Ultra and independent implemented controls apply at the next session or match; preset selection clears feature overrides while preserving other preferences. Display changes first start an unsaved 15-second trial. Keep requires successful presentation of the new dimensions; Escape or expiry restores the previous mode and live size. See [graphics settings](GraphicsQualitySettings.md) for supported ranges, hardware fallback and evidence.
 
 ## UI Scale and DPI
 

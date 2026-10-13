@@ -170,12 +170,19 @@ internal sealed class WindowsWindow : IWindow
         ThrowIfUnavailable();
         ArgumentNullException.ThrowIfNull(configuration);
         if (!BootstrapActive) throw new InvalidOperationException("Window configuration must precede graphics handoff.");
+        ConfigureDisplay(configuration);
+    }
+
+    public void ConfigureDisplay(WindowConfiguration configuration)
+    {
+        ThrowIfUnavailable();
+        ArgumentNullException.ThrowIfNull(configuration);
         if (Mode != WindowMode.Windowed) SetMode(WindowMode.Windowed);
         var rect = new WindowsNative.NativeRect { Right = configuration.Width, Bottom = configuration.Height };
         if (WindowsNative.AdjustWindowRectExForDpi(ref rect, _windowedStyle, 0, 0, _dpi) == 0 ||
             WindowsNative.SetWindowPos(_handle, 0, 0, 0, rect.Width, rect.Height,
                 WindowsNative.SwpNoZOrder | WindowsNative.SwpNoActivate | 0x0002) == 0)
-            throw CreateLastErrorException("Unable to apply startup window dimensions.");
+            throw CreateLastErrorException("Unable to apply window dimensions.");
         SetMode(configuration.Mode);
     }
 

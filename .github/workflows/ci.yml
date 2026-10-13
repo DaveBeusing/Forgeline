@@ -69,6 +69,16 @@ jobs:
       - name: Native material BRDF and HDR contracts
         run: dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.PbrMaterialShaderTests ForgeLine.Presentation.Tests.SceneOutputIntegrationTests
 
+      - name: Graphics quality and display contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Graphics.Tests/ForgeLine.Graphics.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Graphics.Tests.ResolutionScaleTests ForgeLine.Graphics.Tests.PostProcessingTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.GraphicsQualityPolicyTests ForgeLine.Presentation.Tests.RenderQualitySettingsTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.GraphicsSettingsTests ForgeLine.Client.Tests.ClientUserSettingsTests ForgeLine.Client.Tests.ClientSettingsFrontendAdapterTests ForgeLine.Client.Tests.FrontendInteractionTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Compile and qualify runtime assets
         run: dotnet run --project tools/ForgeLine.AssetCompiler/ForgeLine.AssetCompiler.csproj --configuration Release --no-build -- --mode build --source assets/source --runtime assets/runtime --clean --qualification-output artifacts/asset-qualification.json
 
