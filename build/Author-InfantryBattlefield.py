@@ -71,6 +71,11 @@ def author(output, update):
     unit_output = output/'units' if output else unit_source/'sources/infantry'
     world_output = output/'world' if output else SOURCE/'world/meshes/sources/battlefield'
     infrastructure_output = output/'infrastructure' if output else SOURCE/'infrastructure/directorate/sources/battlefield'
+    dedicated_units = set()
+    for definition_path in unit_source.rglob('*.asset.json'):
+        definition = json.loads(definition_path.read_text(encoding='utf-8-sig'))
+        if '/combat_support/' in definition.get('source', '').replace('\\', '/'):
+            dedicated_units.add(definition['id'])
     rifle_primary = json.loads((unit_source/'infantry/rifle_squad.asset.json').read_text(encoding='utf-8-sig'))
     for family, recipe in kit['families'].items():
         for lod in range(3):
@@ -94,6 +99,7 @@ def author(output, update):
             path = (world_output if world else infrastructure_output if recipe['id'].startswith('infrastructure.') else unit_output)/(name+(f'_lod{lod}' if world else '')+'.gltf')
             entry = export([dict(name=name,parts=recipe['parts'])],lod if world else 1,path,battlefield['axes']);report[name+(f'.lod{lod}' if world else '')]=entry
             if update:
+                if recipe['id'].removesuffix('.wreck') in dedicated_units: continue
                 metadata = SOURCE/recipe['metadata']
                 if lod:metadata = metadata.with_name(metadata.stem.replace('.asset','_lod1.asset')+'.json')
                 definition = json.loads(metadata.read_text(encoding='utf-8-sig')) if metadata.exists() else dict(id=recipe['id']+('_lod1' if lod else ''),type='mesh')

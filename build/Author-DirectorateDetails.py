@@ -76,6 +76,7 @@ def author():
         # This family has dedicated component/LOD sources, not retained box fittings.
         if definition['id'].startswith(('building.directorate.command_core', 'unit.directorate.main_battle_tank')) or definition['source'].replace('\\','/').startswith('sources/operational/') or '/infantry/' in definition['source'].replace('\\','/') or '/battlefield/' in definition['source'].replace('\\','/') or '/logistics/' in definition.get('source', '').replace('\\', '/'):
             continue
+        if '/combat_support/' in definition['source'].replace('\\', '/'): continue
         source = (meta.parent/definition['source']).resolve()
         reduced = '.lod' in definition['id']
         mechanical = definition.get('mechanicalParts', [])

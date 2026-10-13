@@ -166,38 +166,31 @@ public static class UnitPresentationCatalog
             feature,
             Get(feature.Unit).FallbackTint);
 
-    private static readonly Dictionary<UnitId, string> DedicatedWrecks = new[]
-    {
-        UnitIds.RifleSquad, UnitIds.CombatEngineer, UnitIds.ScoutVehicle,
-        UnitIds.MobileArtillery, UnitIds.CargoTruck, UnitIds.SupplyTruck
-    }.ToDictionary(unit => unit, unit => Get(unit).MeshAssetId + ".wreck");
+    private sealed record StateAssets(string Damaged, string Critical, string Wreck);
 
-    private static readonly Dictionary<UnitId, (string Damaged, string Critical)> InfantryStates =
-        new[] { UnitIds.RifleSquad, UnitIds.CombatEngineer }
-        .ToDictionary(unit => unit, unit => (Get(unit).MeshAssetId + ".damaged", Get(unit).MeshAssetId + ".critical"));
+    private static readonly Dictionary<UnitId, StateAssets> ProductionStates =
+        new[] { UnitIds.RifleSquad, UnitIds.CombatEngineer, UnitIds.MainBattleTank, UnitIds.ScoutVehicle, UnitIds.MobileArtillery, UnitIds.CargoTruck, UnitIds.SupplyTruck }
+        .ToDictionary(unit => unit, unit =>
+        {
+            string prefix = Get(unit).MeshAssetId;
+            return new StateAssets(prefix + ".damaged", prefix + ".critical", prefix + ".wreck");
+        });
 
     public static string ResolveWreckAssetId(in UnitFeaturePresentationMetadata feature) =>
-        DedicatedWrecks.TryGetValue(feature.Unit, out string? wreck) ? wreck :
-        feature.Unit == UnitIds.MainBattleTank
-            ? "unit.directorate.main_battle_tank.wreck"
-            : Get(feature.Unit).Lod2AssetId;
+        ProductionStates.TryGetValue(feature.Unit, out StateAssets? states)
+            ? states.Wreck : Get(feature.Unit).Lod2AssetId;
 
     public static string? ResolveStateAttachmentAssetId(in UnitFeaturePresentationMetadata feature, UnitAssetLod lod) =>
         lod == UnitAssetLod.Lod2 && feature.Unit != UnitIds.RifleSquad && feature.Unit != UnitIds.CombatEngineer
             ? null : ResolveStateAttachmentAssetId(feature);
 
     public static string? ResolveStateAttachmentAssetId(in UnitFeaturePresentationMetadata feature) =>
-        InfantryStates.TryGetValue(feature.Unit, out var states) ? feature.DamageState switch
+        ProductionStates.TryGetValue(feature.Unit, out StateAssets? states) ? feature.DamageState switch
         {
             UnitPresentationDamageState.Damaged => states.Damaged,
             UnitPresentationDamageState.Critical => states.Critical,
             _ => null
-        } : feature.Unit != UnitIds.MainBattleTank ? null : feature.DamageState switch
-        {
-            UnitPresentationDamageState.Damaged => "unit.directorate.main_battle_tank.damaged",
-            UnitPresentationDamageState.Critical => "unit.directorate.main_battle_tank.critical",
-            _ => null
-        };
+        } : null;
 
     public static Vector4 ApplyDamageTint(
         in UnitFeaturePresentationMetadata feature,
@@ -250,6 +243,11 @@ public static class UnitPresentationCatalog
             120.0f,
             340.0f,
             ["weapon_muzzle", "sensor_origin"]);
+        result[UnitIds.ScoutVehicle] = result[UnitIds.ScoutVehicle] with
+        {
+            TurretMeshAssetId = "unit.directorate.scout_vehicle.turret",
+            TurretPivot = new Vector3(0.0f, 0.2f, 0.22f)
+        };
         Add(
             UnitIds.MainBattleTank,
             "main_battle_tank",
@@ -275,6 +273,11 @@ public static class UnitPresentationCatalog
             140.0f,
             380.0f,
             ["gun_pivot", "weapon_muzzle", "recoil_anchor"]);
+        result[UnitIds.MobileArtillery] = result[UnitIds.MobileArtillery] with
+        {
+            TurretMeshAssetId = "unit.directorate.self_propelled_artillery.turret",
+            TurretPivot = new Vector3(0.0f, 0.24f, -0.04f)
+        };
         Add(
             UnitIds.CargoTruck,
             "cargo_truck",

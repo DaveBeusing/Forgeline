@@ -14,6 +14,7 @@ namespace ForgeLine.Presentation;
 
 public sealed class PresentationExtractor : ISimulationTickObserver
 {
+    private static readonly ArtilleryWeaponCatalog DefaultArtilleryWeapons = DirectorateContent.CreateArtilleryWeaponCatalog();
     private readonly MechanicalPoseHistory _mechanicalHistory = new();
     private readonly HashSet<EntityId> _mechanicalShots = [];
     private readonly PresentationSnapshotBuffer _buffer;
@@ -493,7 +494,8 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 weapon.Target,
                 out WorldTransform target))
         {
-            return 0.0f;
+            return TryReadArtilleryAim(entities, entity, out Vector3 missionDirection, out _)
+                ? MathF.Atan2(missionDirection.X, missionDirection.Z) : 0.0f;
         }
 
         Vector3 direction =
@@ -536,10 +538,36 @@ public sealed class PresentationExtractor : ISimulationTickObserver
         if (!entities.TryGetComponent(entity, out WeaponState weapon) || !weapon.Target.IsValid ||
             !entities.IsAlive(weapon.Target) || !IsVisibleToViewer(entities, weapon.Target) ||
             !entities.TryGetComponent(entity, out WorldTransform source) ||
-            !entities.TryGetComponent(weapon.Target, out WorldTransform target)) return 0;
+            !entities.TryGetComponent(weapon.Target, out WorldTransform target))
+        {
+            if (!TryReadArtilleryAim(entities, entity, out Vector3 missionDirection, out float launchRise)) return 0;
+            return Math.Clamp(MathF.Atan2(missionDirection.Y + launchRise,
+                MathF.Sqrt(missionDirection.X * missionDirection.X + missionDirection.Z * missionDirection.Z)), -0.15f, 0.55f);
+        }
         Vector3 direction = Vector3.Transform(target.Position - source.Position, Quaternion.Inverse(source.Rotation));
         return Math.Clamp(MathF.Atan2(direction.Y, MathF.Sqrt(direction.X * direction.X + direction.Z * direction.Z)), -0.15f, 0.55f);
     }
+    private bool TryReadArtilleryAim(EntityRegistry entities, EntityId entity, out Vector3 direction, out float launchRise)
+    {
+        direction = Vector3.Zero;
+        launchRise = 0;
+        if (!entities.TryGetComponent(entity, out UnitIdentity unit) || unit.UnitId != UnitIds.MobileArtillery ||
+            (_viewingFaction.IsSpecified && (!entities.TryGetComponent(entity, out IntelligenceSignature signature) ||
+                signature.Faction != _viewingFaction)) ||
+            !entities.TryGetComponent(entity, out FireMissionState mission) ||
+            mission.Status is not (FireMissionStatus.Acquiring or FireMissionStatus.Firing or FireMissionStatus.WaitingReload) ||
+            !entities.TryGetComponent(entity, out ArtilleryCapability capability) ||
+            !entities.TryGetComponent(entity, out WorldTransform source)) return false;
+        var weapons = _extraction?.Scenario.Services.ArtilleryWeapons ?? DefaultArtilleryWeapons;
+        if (!weapons.TryGet(capability.WeaponId, out ArtilleryWeaponDefinition? definition) || definition is null) return false;
+        direction = Vector3.Transform(mission.TargetPosition - source.Position, Quaternion.Inverse(source.Rotation));
+        if (!float.IsFinite(direction.X) || !float.IsFinite(direction.Y) || !float.IsFinite(direction.Z) ||
+            direction.X * direction.X + direction.Z * direction.Z < .0001f) return false;
+        // Tangent of the existing parabolic trajectory; retain bounded cosmetic elevation.
+        launchRise = 4 * definition.ApexHeightMeters;
+        return true;
+    }
+
     private static BuildingFeaturePresentationMetadata ResolveBuildingPresentationState(
         EntityRegistry entities,
         EntityId entity)
@@ -1577,9 +1605,9 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 Vector3 gunPivot = definition.TurretPivot;
                 foreach (var anchor in record.Sockets)
                     if (anchor.Name == "gun_pivot") gunPivot = new(anchor.X, anchor.Y, anchor.Z);
-                local = Vector3.Transform(local - gunPivot,
+                local = MechanicalMotionSpace.RotateOffset(local - gunPivot, transform.Scale,
                     Quaternion.CreateFromAxisAngle(Vector3.UnitX, -ResolveAimElevation(entities, entity))) + gunPivot;
-                local = Vector3.Transform(local - definition.TurretPivot,
+                local = MechanicalMotionSpace.RotateOffset(local - definition.TurretPivot, transform.Scale,
                     Quaternion.CreateFromAxisAngle(Vector3.UnitY, ResolveAimYaw(entities, entity))) + definition.TurretPivot;
             }
             local *= transform.Scale;

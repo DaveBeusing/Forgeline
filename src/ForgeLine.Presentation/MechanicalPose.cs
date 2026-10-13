@@ -30,6 +30,20 @@ public readonly record struct MechanicalPose(
 
 internal readonly record struct MechanicalPartBinding(MechanicalMeshPart Part, Vector3 Pivot);
 
+internal static class MechanicalMotionSpace
+{
+    public static Matrix4x4 Rotation(Vector3 scale, Quaternion rotation)
+    {
+        if (rotation == Quaternion.Identity) return Matrix4x4.Identity;
+        if (!Matrix4x4.Invert(Matrix4x4.CreateScale(scale), out Matrix4x4 inverse))
+            return Matrix4x4.CreateFromQuaternion(rotation);
+        return Matrix4x4.CreateScale(scale) * Matrix4x4.CreateFromQuaternion(rotation) * inverse;
+    }
+
+    public static Vector3 RotateOffset(Vector3 offset, Vector3 scale, Quaternion rotation) =>
+        Vector3.Transform(offset, Rotation(scale, rotation));
+}
+
 internal static class MechanicalTransforms
 {
     public static void Compose(ReadOnlySpan<MechanicalPartBinding> parts, in RenderInstance instance,
@@ -39,32 +53,37 @@ internal static class MechanicalTransforms
             throw new ArgumentException("Insufficient bounded mechanical transform storage.");
         MechanicalPose pose = instance.MechanicalPose;
         bool enabled = pose.IsSpecified && !instance.UnitFeature.IsWreck && !instance.BuildingFeature.IsDestroyed;
+        if (!Matrix4x4.Decompose(world, out Vector3 scale, out _, out _)) scale = instance.Transform.Scale;
         for (int i = 0; i < parts.Length; i++)
         {
             MechanicalPartBinding binding = parts[i];
             MechanicalMeshPart part = binding.Part;
-            Matrix4x4 motion = Matrix4x4.Identity;
+            Quaternion rotation = Quaternion.Identity;
+            Vector3 translation = Vector3.Zero;
             if (enabled)
             {
                 float phase = (float)Math.IEEERemainder(pose.ActiveSeconds * part.Rate, Math.Tau);
-                motion = part.Motion switch
+                rotation = part.Motion switch
                 {
-                    MechanicalMotionKind.TurretYaw => Matrix4x4.CreateRotationY(instance.UnitFeature.AimYawRadians),
-                    MechanicalMotionKind.Cannon => Matrix4x4.CreateTranslation(0, 0, -Recoil(pose) * part.Travel) *
-                        Matrix4x4.CreateRotationX(-Math.Clamp(pose.Elevation, -0.15f, 0.55f)),
-                    MechanicalMotionKind.Wheel => Matrix4x4.CreateRotationX((float)Math.IEEERemainder(pose.TravelMeters * part.Rate, Math.Tau)),
-                    MechanicalMotionKind.InfantryStride => Matrix4x4.CreateRotationX(
+                    MechanicalMotionKind.TurretYaw => Quaternion.CreateFromAxisAngle(Vector3.UnitY, instance.UnitFeature.AimYawRadians),
+                    MechanicalMotionKind.Cannon => Quaternion.CreateFromAxisAngle(Vector3.UnitX, -Math.Clamp(pose.Elevation, -0.15f, 0.55f)),
+                    MechanicalMotionKind.InfantryStride => Quaternion.CreateFromAxisAngle(Vector3.UnitX,
                         MathF.Sin((float)Math.IEEERemainder(pose.TravelMeters * part.Rate, Math.Tau)) * part.Travel),
-                    MechanicalMotionKind.Fan or MechanicalMotionKind.Radar => Matrix4x4.CreateRotationY(phase),
-                    MechanicalMotionKind.Door => Matrix4x4.CreateTranslation(0, pose.Door * part.Travel, 0),
-                    MechanicalMotionKind.Crane => Matrix4x4.CreateRotationY(MathF.Sin(phase) * part.Travel),
-                    _ => Matrix4x4.Identity
+                    MechanicalMotionKind.Wheel => Quaternion.CreateFromAxisAngle(Vector3.UnitX, (float)Math.IEEERemainder(pose.TravelMeters * part.Rate, Math.Tau)),
+                    MechanicalMotionKind.Fan or MechanicalMotionKind.Radar => Quaternion.CreateFromAxisAngle(Vector3.UnitY, phase),
+                    MechanicalMotionKind.Crane => Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.Sin(phase) * part.Travel),
+                    _ => Quaternion.Identity
+                };
+                translation = part.Motion switch
+                {
+                    MechanicalMotionKind.Cannon => new Vector3(0, 0, -Recoil(pose) * part.Travel),
+                    MechanicalMotionKind.Door => new Vector3(0, pose.Door * part.Travel, 0),
+                    _ => Vector3.Zero
                 };
             }
-            if (weight <= 0) motion = Matrix4x4.Identity;
-            else if (weight < 1 && Matrix4x4.Decompose(motion, out _, out Quaternion rotation, out Vector3 translation))
-                motion = Matrix4x4.CreateFromQuaternion(Quaternion.Slerp(Quaternion.Identity, rotation, weight)) *
-                    Matrix4x4.CreateTranslation(translation * weight);
+            if (weight <= 0) { rotation = Quaternion.Identity; translation = Vector3.Zero; }
+            else if (weight < 1) { rotation = Quaternion.Slerp(Quaternion.Identity, rotation, weight); translation *= weight; }
+            Matrix4x4 motion = Matrix4x4.CreateTranslation(translation) * MechanicalMotionSpace.Rotation(scale, rotation);
             Matrix4x4 local = Matrix4x4.CreateTranslation(-binding.Pivot) * motion * Matrix4x4.CreateTranslation(binding.Pivot);
             transforms[i] = local * (part.Parent < 0 ? world : transforms[part.Parent]);
         }

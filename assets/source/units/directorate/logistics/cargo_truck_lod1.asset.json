@@ -1,7 +1,7 @@
 {
   "id": "unit.directorate.cargo_truck.lod1",
   "type": "mesh",
-  "source": "../sources/cargo_truck_lod1.gltf",
+  "source": "../sources/combat_support/cargo_truck/lod1.gltf",
   "materialReferences": [
     "material.directorate.unit.cargo_truck"
   ]

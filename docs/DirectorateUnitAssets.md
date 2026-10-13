@@ -197,3 +197,18 @@ Stable simulation IDs, muzzle origin and gameplay movement/selection remain
 unchanged. Source mappings, resource measurements, native imagery and open
 near-view/animation/art gates are in
 [Infantry and battlefield production](InfantryBattlefieldProduction.md).
+
+## Dedicated combat and support vehicle production
+
+Scout Vehicle, Self-Propelled Artillery, Cargo Truck and Supply Truck now own
+editable metre-space component kits, three distinct LODs and dedicated damage,
+critical and wreck geometry. Cargo/Supply share chassis and cab templates while
+retaining distinct payload silhouettes. Scout and Artillery use separate weapons
+through the existing articulated turret path. Stable primary/LOD/material/collision
+IDs, authoritative dimensions and existing muzzle/cargo/transfer sockets remain.
+
+Cached state bindings retain all seven infantry/vehicle families and warmed
+allocation behavior. Metric rigid rotations preserve wheel radius and cannon
+length under nonuniform unit scale. Owned active artillery missions supply only
+bounded visual aim; gameplay missions and trajectories remain authoritative.
+See [source, native comparisons and remaining acceptance](CombatSupportUnitProduction.md).

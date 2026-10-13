@@ -1,0 +1,131 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine combat and support unit component exporter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 3600,
+      "uri": "data:application/octet-stream;base64,KiqqvmiRbT1ISAg+Kiqqvq5H4T1ISAg+Kiqqvq5H4T39/Ny+KiqqvmiRbT39/Ny+KiqqPmiRbT39/Ny+KiqqPq5H4T39/Ny+KiqqPq5H4T1ISAg+KiqqPmiRbT1ISAg+ZmamvqabRD39/Ny+ZmamPqabRD39/Ny+ZmamPqabRD1ISAg+ZmamvqabRD1ISAg+Zmamvo/C9T1ISAg+ZmamPo/C9T1ISAg+ZmamPo/C9T39/Ny+Zmamvo/C9T39/Ny+Zmamvq5H4T3f3t6+ZmamPq5H4T3f3t6+ZmamPmiRbT3f3t6+ZmamvmiRbT3f3t6+ZmamvmiRbT0MDAw+ZmamPmiRbT0MDAw+ZmamPq5H4T0MDAw+Zmamvq5H4T0MDAw+ZmamvqabRD39/Ny+ZmamvqabRD1ISAg+KiqqvmiRbT1ISAg+KiqqvmiRbT39/Ny+Kiqqvq5H4T39/Ny+Kiqqvq5H4T1ISAg+Zmamvo/C9T1ISAg+Zmamvo/C9T39/Ny+KiqqPmiRbT39/Ny+KiqqPmiRbT1ISAg+ZmamPqabRD1ISAg+ZmamPqabRD39/Ny+ZmamPo/C9T39/Ny+ZmamPo/C9T1ISAg+KiqqPq5H4T1ISAg+KiqqPq5H4T39/Ny+KiqqvmiRbT39/Ny+Kiqqvq5H4T39/Ny+Zmamvq5H4T3f3t6+ZmamvmiRbT3f3t6+ZmamvmiRbT0MDAw+Zmamvq5H4T0MDAw+Kiqqvq5H4T1ISAg+KiqqvmiRbT1ISAg+ZmamPmiRbT3f3t6+ZmamPq5H4T3f3t6+KiqqPq5H4T39/Ny+KiqqPmiRbT39/Ny+KiqqPmiRbT1ISAg+KiqqPq5H4T1ISAg+ZmamPq5H4T0MDAw+ZmamPmiRbT0MDAw+ZmamvmiRbT3f3t6+ZmamPmiRbT3f3t6+ZmamPqabRD39/Ny+ZmamvqabRD39/Ny+ZmamvqabRD1ISAg+ZmamPqabRD1ISAg+ZmamPmiRbT0MDAw+ZmamvmiRbT0MDAw+Zmamvo/C9T39/Ny+ZmamPo/C9T39/Ny+ZmamPq5H4T3f3t6+Zmamvq5H4T3f3t6+Zmamvq5H4T0MDAw+ZmamPq5H4T0MDAw+ZmamPo/C9T1ISAg+Zmamvo/C9T1ISAg+ZmamvmiRbT3f3t6+ZmamvqabRD39/Ny+KiqqvmiRbT39/Ny+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"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 1152,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1152,
+      "byteLength": 1152,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 2304,
+      "byteLength": 768,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 3072,
+      "byteLength": 528,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 96,
+      "type": "VEC3",
+      "min": [
+        -0.3323529362678528,
+        0.04800000041723251,
+        -0.43529412150382996
+      ],
+      "max": [
+        0.3323529362678528,
+        0.11999999731779099,
+        0.13676470518112183
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 96,
+      "type": "VEC3",
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 96,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5125,
+      "count": 132,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "rear_loading_platform",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "extras": {
+    "coordinates": "Vehicle-local metres; Y above sampled ground, +Z forward; normalized runtime root retains existing movement height offset",
+    "componentHierarchy": [
+      {
+        "name": "rear_loading_platform",
+        "parent": null,
+        "sharedModule": null,
+        "firstIndex": 0,
+        "indexCount": 132
+      }
+    ],
+    "gameScaleMeters": [
+      3.4,
+      2.5,
+      6.8
+    ],
+    "heightOffsetMeters": 1.1
+  }
+}

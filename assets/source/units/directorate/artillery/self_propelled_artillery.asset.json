@@ -1,7 +1,7 @@
 {
   "id": "unit.directorate.self_propelled_artillery",
   "type": "mesh",
-  "source": "../sources/self_propelled_artillery_lod0_production.gltf",
+  "source": "../sources/combat_support/self_propelled_artillery/lod0.gltf",
   "materialReferences": [
     "material.directorate.unit.self_propelled_artillery"
   ],
@@ -37,6 +37,181 @@
       "x": 0,
       "y": 0.24,
       "z": 0.04
+    },
+    {
+      "name": "turret_pivot",
+      "x": 0,
+      "y": 0.24,
+      "z": -0.04
+    },
+    {
+      "name": "motion_roadwheel_n1_n2_12",
+      "x": -0.3973684210526316,
+      "y": -0.29374999999999996,
+      "z": -0.2826666666666667
+    },
+    {
+      "name": "motion_roadwheel_n1_n1_09",
+      "x": -0.3973684210526316,
+      "y": -0.29374999999999996,
+      "z": -0.14533333333333334
+    },
+    {
+      "name": "motion_roadwheel_n1_0",
+      "x": -0.3973684210526316,
+      "y": -0.29374999999999996,
+      "z": 0.0
+    },
+    {
+      "name": "motion_roadwheel_n1_1_09",
+      "x": -0.3973684210526316,
+      "y": -0.29374999999999996,
+      "z": 0.14533333333333334
+    },
+    {
+      "name": "motion_roadwheel_n1_2_12",
+      "x": -0.3973684210526316,
+      "y": -0.29374999999999996,
+      "z": 0.2826666666666667
+    },
+    {
+      "name": "motion_roadwheel_1_n2_12",
+      "x": 0.3973684210526316,
+      "y": -0.29374999999999996,
+      "z": -0.2826666666666667
+    },
+    {
+      "name": "motion_roadwheel_1_n1_09",
+      "x": 0.3973684210526316,
+      "y": -0.29374999999999996,
+      "z": -0.14533333333333334
+    },
+    {
+      "name": "motion_roadwheel_1_0",
+      "x": 0.3973684210526316,
+      "y": -0.29374999999999996,
+      "z": 0.0
+    },
+    {
+      "name": "motion_roadwheel_1_1_09",
+      "x": 0.3973684210526316,
+      "y": -0.29374999999999996,
+      "z": 0.14533333333333334
+    },
+    {
+      "name": "motion_roadwheel_1_2_12",
+      "x": 0.3973684210526316,
+      "y": -0.29374999999999996,
+      "z": 0.2826666666666667
+    }
+  ],
+  "mechanicalParts": [
+    {
+      "name": "body",
+      "firstIndex": 0,
+      "indexCount": 5904,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "roadwheel_n1_n2_12",
+      "firstIndex": 5904,
+      "indexCount": 804,
+      "parent": 0,
+      "motion": "wheel",
+      "socket": "motion_roadwheel_n1_n2_12",
+      "rate": 2.857142857142857,
+      "travel": 0
+    },
+    {
+      "name": "roadwheel_n1_n1_09",
+      "firstIndex": 6708,
+      "indexCount": 804,
+      "parent": 0,
+      "motion": "wheel",
+      "socket": "motion_roadwheel_n1_n1_09",
+      "rate": 2.857142857142857,
+      "travel": 0
+    },
+    {
+      "name": "roadwheel_n1_0",
+      "firstIndex": 7512,
+      "indexCount": 804,
+      "parent": 0,
+      "motion": "wheel",
+      "socket": "motion_roadwheel_n1_0",
+      "rate": 2.857142857142857,
+      "travel": 0
+    },
+    {
+      "name": "roadwheel_n1_1_09",
+      "firstIndex": 8316,
+      "indexCount": 804,
+      "parent": 0,
+      "motion": "wheel",
+      "socket": "motion_roadwheel_n1_1_09",
+      "rate": 2.857142857142857,
+      "travel": 0
+    },
+    {
+      "name": "roadwheel_n1_2_12",
+      "firstIndex": 9120,
+      "indexCount": 804,
+      "parent": 0,
+      "motion": "wheel",
+      "socket": "motion_roadwheel_n1_2_12",
+      "rate": 2.857142857142857,
+      "travel": 0
+    },
+    {
+      "name": "roadwheel_1_n2_12",
+      "firstIndex": 9924,
+      "indexCount": 804,
+      "parent": 0,
+      "motion": "wheel",
+      "socket": "motion_roadwheel_1_n2_12",
+      "rate": 2.857142857142857,
+      "travel": 0
+    },
+    {
+      "name": "roadwheel_1_n1_09",
+      "firstIndex": 10728,
+      "indexCount": 804,
+      "parent": 0,
+      "motion": "wheel",
+      "socket": "motion_roadwheel_1_n1_09",
+      "rate": 2.857142857142857,
+      "travel": 0
+    },
+    {
+      "name": "roadwheel_1_0",
+      "firstIndex": 11532,
+      "indexCount": 804,
+      "parent": 0,
+      "motion": "wheel",
+      "socket": "motion_roadwheel_1_0",
+      "rate": 2.857142857142857,
+      "travel": 0
+    },
+    {
+      "name": "roadwheel_1_1_09",
+      "firstIndex": 12336,
+      "indexCount": 804,
+      "parent": 0,
+      "motion": "wheel",
+      "socket": "motion_roadwheel_1_1_09",
+      "rate": 2.857142857142857,
+      "travel": 0
+    },
+    {
+      "name": "roadwheel_1_2_12",
+      "firstIndex": 13140,
+      "indexCount": 804,
+      "parent": 0,
+      "motion": "wheel",
+      "socket": "motion_roadwheel_1_2_12",
+      "rate": 2.857142857142857,
+      "travel": 0
     }
   ]
 }

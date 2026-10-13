@@ -95,6 +95,7 @@ if __name__=='__main__':
     refined={}
     for meta in (ROOT/'assets/source').rglob('*.asset.json'):
         d=json.loads(meta.read_text()); name=d['id']
+        if '/combat_support/' in d['source'].replace('\\', '/'): continue
         if d['type']!='mesh' or not (name.startswith('unit.directorate.') or name.startswith('building.directorate.') or name.startswith('mesh.world.prop.')): continue
         if any(s in name for s in ('.collision','.lod1','.lod2','_lod1','_lod2','.module.','.symbol.','.state.')): continue
         if not d.get('lods') and name!='unit.directorate.main_battle_tank.turret': continue

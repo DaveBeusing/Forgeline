@@ -10,11 +10,24 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class DirectorateUnitPresentationTests
 {
-    [Fact]
-    public void TankDamageMeshesUseExistingStateAndResolveWithoutHotPathAllocations()
+    [Theory]
+    [InlineData("main_battle_tank")]
+    [InlineData("scout_vehicle")]
+    [InlineData("self_propelled_artillery")]
+    [InlineData("cargo_truck")]
+    [InlineData("supply_truck")]
+    public void ProductionDamageMeshesUseExistingStateAndResolveWithoutHotPathAllocations(string family)
     {
+        UnitId unit = family switch
+        {
+            "scout_vehicle" => UnitIds.ScoutVehicle,
+            "self_propelled_artillery" => UnitIds.MobileArtillery,
+            "cargo_truck" => UnitIds.CargoTruck,
+            "supply_truck" => UnitIds.SupplyTruck,
+            _ => UnitIds.MainBattleTank
+        };
         UnitFeaturePresentationMetadata[] states = Enum.GetValues<UnitPresentationDamageState>()
-            .Select(s => new UnitFeaturePresentationMetadata(UnitIds.MainBattleTank, s)).ToArray();
+            .Select(s => new UnitFeaturePresentationMetadata(unit, s)).ToArray();
         string?[] attachments = new string?[states.Length];
         for (int i = 0; i < 1000; i++)
             for (int j = 0; j < states.Length; j++)
@@ -24,10 +37,10 @@ public sealed class DirectorateUnitPresentationTests
             for (int j = 0; j < states.Length; j++)
                 attachments[j] = UnitPresentationCatalog.ResolveStateAttachmentAssetId(states[j]);
         Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
-        Assert.Equal(new string?[] { null, "unit.directorate.main_battle_tank.damaged", "unit.directorate.main_battle_tank.critical", null }, attachments);
-        Assert.Equal("unit.directorate.main_battle_tank.wreck", UnitPresentationCatalog.ResolveWreckAssetId(states[3]));
-        var scout = new UnitFeaturePresentationMetadata(UnitIds.ScoutVehicle, UnitPresentationDamageState.Wreck);
-        Assert.Equal("unit.directorate.scout_vehicle.wreck", UnitPresentationCatalog.ResolveWreckAssetId(scout));
+        Assert.Equal(new string?[] { null, "unit.directorate." + family + ".damaged", "unit.directorate." + family + ".critical", null }, attachments);
+        Assert.Equal("unit.directorate." + family + ".wreck", UnitPresentationCatalog.ResolveWreckAssetId(states[3]));
+        var scout = new UnitFeaturePresentationMetadata(UnitIds.RifleSquad, UnitPresentationDamageState.Wreck);
+        Assert.Equal("unit.directorate.rifle_squad.wreck", UnitPresentationCatalog.ResolveWreckAssetId(scout));
         Assert.Null(UnitPresentationCatalog.ResolveStateAttachmentAssetId(scout));
     }
 

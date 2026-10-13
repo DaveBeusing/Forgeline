@@ -200,3 +200,11 @@ The [infantry and battlefield families](InfantryBattlefieldProduction.md) reuse
 these masters and channel/mip conventions. Armor, canvas, glass, rubber, tools,
 weapons, worn wreck panels and exposed concrete/rebar use the existing inset
 atlas cells. No texture/material record is added.
+
+The [four combat/support vehicles](CombatSupportUnitProduction.md) reuse these
+masters without new texture/material records. Beveled armor, chassis steel,
+rubber wheels/tracks, cab/sensor glass, cargo canvas, supply hardware and cannon
+surfaces use the existing inset atlas cells, sRGB Base Color and linear Normal/ORM.
+The integrated qualification contains 492 assets (309 meshes, 56 textures and
+127 materials). Dedicated unit and logistics traffic captures report zero mesh
+fallbacks and texture-binding failures; human surface/art acceptance remains open.

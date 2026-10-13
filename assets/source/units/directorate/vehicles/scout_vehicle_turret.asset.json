@@ -1,0 +1,59 @@
+{
+  "id": "unit.directorate.scout_vehicle.turret",
+  "type": "mesh",
+  "source": "../sources/combat_support/scout_vehicle/turret.gltf",
+  "materialReferences": [
+    "material.directorate.unit.scout_vehicle"
+  ],
+  "mechanicalParts": [
+    {
+      "name": "turret_body",
+      "firstIndex": 0,
+      "indexCount": 84,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "weapon",
+      "firstIndex": 84,
+      "indexCount": 480,
+      "parent": 0,
+      "motion": "cannon",
+      "socket": "motion_weapon",
+      "rate": 1,
+      "travel": 0.009
+    }
+  ],
+  "sockets": [
+    {
+      "name": "weapon_muzzle",
+      "x": 0,
+      "y": 0.2,
+      "z": 0.47
+    },
+    {
+      "name": "sensor_origin",
+      "x": 0,
+      "y": 0.48,
+      "z": 0.02
+    },
+    {
+      "name": "gun_pivot",
+      "x": 0,
+      "y": 0.2,
+      "z": 0.22
+    },
+    {
+      "name": "turret_pivot",
+      "x": 0,
+      "y": 0.2,
+      "z": 0.22
+    },
+    {
+      "name": "motion_weapon",
+      "x": 0.0,
+      "y": 0.2,
+      "z": 0.21999999999999997
+    }
+  ]
+}

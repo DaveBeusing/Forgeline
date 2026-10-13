@@ -1,3 +1,4 @@
+using System.Text.Json;
 using ForgeLine.AssetCompiler;
 using ForgeLine.Assets;
 using Xunit;
@@ -53,7 +54,7 @@ public sealed class DirectorateUnitAssetAuthoringTests
                         static diagnostic =>
                             $"{diagnostic.Code}: {diagnostic.Message}")));
             Assert.Equal(
-                482,
+                492,
                 result.CompiledCount);
 
             RuntimeAssetCatalog catalog =
@@ -145,6 +146,54 @@ public sealed class DirectorateUnitAssetAuthoringTests
 
             RuntimeMeshData ReadTank(string suffix) => RuntimeMeshData.FromPayload(
                 catalog.Read(AssetId.Parse("unit.directorate.main_battle_tank" + suffix)).Payload);
+
+            foreach (var (family, wheels) in new[] { ("scout_vehicle", 6), ("self_propelled_artillery", 10), ("cargo_truck", 8), ("supply_truck", 8) })
+            {
+                string id = "unit.directorate." + family;
+                RuntimeMeshData Read(string suffix) => RuntimeMeshData.FromPayload(catalog.Read(AssetId.Parse(id + suffix)).Payload);
+                RuntimeMeshData hull = Read("");
+                RuntimeMeshData[] lods = [Read(".lod1"), Read(".lod2")];
+                int highIndices = hull.Indices.Count;
+                if (family is "scout_vehicle" or "self_propelled_artillery")
+                {
+                    RuntimeMeshData turret = Read(".turret");
+                    highIndices += turret.Indices.Count;
+                    var muzzle = Assert.Single(catalog.Get(AssetId.Parse(id)).Sockets, x => x.Name == "weapon_muzzle");
+                    float sx = family == "scout_vehicle" ? 3 : 3.8f;
+                    float sy = family == "scout_vehicle" ? 2.4f : 3.2f;
+                    float outer = family == "scout_vehicle" ? .048f : .16f;
+                    var front = turret.Vertices.Where(v => v.Z > muzzle.Z - .0001f).ToArray();
+                    Assert.NotEmpty(front);
+                    Assert.All(front, v => Assert.InRange(MathF.Sqrt(v.X * sx * v.X * sx +
+                        (v.Y - muzzle.Y) * sy * (v.Y - muzzle.Y) * sy), outer * .45f, outer + .0001f));
+                    Assert.Contains(catalog.Get(AssetId.Parse(id + ".turret")).MechanicalParts, p => p.Motion == MechanicalMotionKind.Cannon);
+                }
+                Assert.True(highIndices > lods[0].Indices.Count && lods[0].Indices.Count > lods[1].Indices.Count);
+                var record = catalog.Get(AssetId.Parse(id));
+                Assert.Equal(wheels, record.MechanicalParts.Count(p => p.Motion == MechanicalMotionKind.Wheel));
+                using var kit = JsonDocument.Parse(File.ReadAllText(Path.Combine(repositoryRoot,
+                    "assets/source/units/directorate/authoring", family + ".kit.json")));
+                float ground = -kit.RootElement.GetProperty("heightOffsetMeters").GetSingle() /
+                    kit.RootElement.GetProperty("gameScaleMeters")[1].GetSingle();
+                Assert.Equal(ground, hull.Vertices.Min(v => v.Y), precision: 5);
+                foreach (var part in record.MechanicalParts.Where(p => p.Motion == MechanicalMotionKind.Wheel))
+                {
+                    var pivot = Assert.Single(record.Sockets, s => s.Name == part.Socket);
+                    var vertices = hull.Indices.Skip(part.FirstIndex).Take(part.IndexCount).Select(i => hull.Vertices[(int)i]).ToArray();
+                    Assert.InRange(pivot.X, vertices.Min(v => v.X), vertices.Max(v => v.X));
+                    Assert.InRange(pivot.Y, vertices.Min(v => v.Y), vertices.Max(v => v.Y));
+                    Assert.InRange(pivot.Z, vertices.Min(v => v.Z), vertices.Max(v => v.Z));
+                }
+                foreach (var mesh in new[] { hull, lods[0], lods[1], Read(".damaged"), Read(".critical"), Read(".wreck") })
+                {
+                    Assert.True(mesh.HasNormals && mesh.HasUv0 && mesh.HasTangents);
+                    Assert.Single(mesh.Sections);
+                    Assert.Equal("material.directorate.unit." + family, Assert.Single(mesh.MaterialIds));
+                }
+                Assert.True(Read(".wreck").Vertices.Max(v => v.Y) < hull.Vertices.Max(v => v.Y));
+                Assert.Empty(catalog.Get(AssetId.Parse(id + ".lod1")).MechanicalParts);
+                Assert.Empty(catalog.Get(AssetId.Parse(id + ".lod2")).MechanicalParts);
+            }
 
             foreach (UnitAssetExpectation unit in Units)
             {
