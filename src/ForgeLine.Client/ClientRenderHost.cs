@@ -426,13 +426,14 @@ internal sealed class ClientRenderHost : IDisposable
             RenderQualityProfile qualityProfile = qualitySettings.Resolve(graphics.SupportsPostProcessing,
                 graphics.Diagnostics.Device.IsSoftwareAdapter, Math.Max(1, initialTarget.Width), Math.Max(1, initialTarget.Height),
                 graphics.Diagnostics.Surface.BufferCount, graphics.AvailableMemoryBudgetBytes, graphics.SupportsParticleRendering);
+            SceneLightingSettings lighting = qualityProfile.Environment.ResolveLighting(_sceneLighting);
             GraphicsAtmosphereSettings atmosphere = _sceneAtmosphere.Graphics with { Quality = qualityProfile.Atmosphere };
             atmosphere.Validate();
             graphics.ConfigurePostProcessing(GraphicsPostProcessingSettings.Neutral);
             if (!qualityProfile.LinearScene && graphics.Atmosphere.Enabled)
                 graphics.ConfigureAtmosphere(GraphicsAtmosphereSettings.Default);
             graphics.ConfigureSceneOutput(new GraphicsSceneOutputSettings(qualityProfile.LinearScene,
-                _sceneLighting.Exposure, _sceneLighting.ToneMapping == SceneToneMappingMode.AcesFitted, qualityProfile.ResolutionScale));
+                lighting.Exposure, lighting.ToneMapping == SceneToneMappingMode.AcesFitted, qualityProfile.ResolutionScale));
             graphics.ConfigureAtmosphere(atmosphere);
             graphics.ConfigurePostProcessing(qualityProfile.PostProcessing);
             var shadowSettings = qualityProfile.Shadows;
@@ -443,10 +444,12 @@ internal sealed class ClientRenderHost : IDisposable
                 graphics.Resize(initialTarget.Suspended ? 0 : initialTarget.Width, initialTarget.Suspended ? 0 : initialTarget.Height);
             }
             using var terrainRenderer = new TerrainRenderer(graphics, terrain, runtimeAssets: _runtimeAssets,
-                lighting: _sceneLighting, surfaceDetail: qualityProfile.TerrainDetail, textureDetail: qualityProfile.Textures);
-            using var instanceRenderer = new SimpleInstanceRenderer(graphics, _runtimeAssets, _sceneLighting,
-                lodDiameterScale: qualityProfile.LodDiameterScale, textureDetail: qualityProfile.Textures, vegetationMotion: qualityProfile.VegetationMotion);
-            using var particleRenderer = new ParticleVfxRenderer(graphics, _runtimeAssets, qualityProfile.Particles, _sceneLighting);
+                lighting: lighting, surfaceDetail: qualityProfile.TerrainDetail, textureDetail: qualityProfile.Textures,
+                residency: qualityProfile.TerrainResidency, environment: qualityProfile.Environment);
+            using var instanceRenderer = new SimpleInstanceRenderer(graphics, _runtimeAssets, lighting,
+                lodDiameterScale: qualityProfile.LodDiameterScale, textureDetail: qualityProfile.Textures, vegetationMotion: qualityProfile.VegetationMotion,
+                environment: qualityProfile.Environment, vegetation: qualityProfile.Vegetation);
+            using var particleRenderer = new ParticleVfxRenderer(graphics, _runtimeAssets, qualityProfile.Particles, lighting);
             long lastParticleFrame = Stopwatch.GetTimestamp();
             using var gameplayOverlayRenderer =
                 new DebugDrawRenderer(
@@ -649,6 +652,9 @@ internal sealed class ClientRenderHost : IDisposable
                     lastMeasuredRunningRates = runtimeMetrics;
 
                 ulong presentedBefore = !_startupPresented ? graphics.PresentedFrameCount : 0;
+                terrainRenderer.Prepare(renderCamera, Math.Max(1, (int)Math.Ceiling(width * (double)qualityProfile.ResolutionScale)),
+                    Math.Max(1, (int)Math.Ceiling(height * (double)qualityProfile.ResolutionScale)),
+                    shadowSettings.Enabled ? DirectionalShadowProjection.Create(current.Camera, lighting, shadowSettings) : null);
                 graphics.RenderFrame(
                     GraphicsColor.ForgeLineClear,
                     context =>
@@ -658,7 +664,7 @@ internal sealed class ClientRenderHost : IDisposable
                             context.SetAtmosphereView(SceneAtmosphereSettings.CreateView(renderCamera, context.Width, context.Height));
                         if (shadowSettings.Enabled)
                         {
-                            GraphicsDirectionalShadowFrame shadowFrame = DirectionalShadowProjection.Create(current.Camera, _sceneLighting, shadowSettings);
+                            GraphicsDirectionalShadowFrame shadowFrame = DirectionalShadowProjection.Create(current.Camera, lighting, shadowSettings);
                             context.BeginDirectionalShadowPass(shadowFrame);
                             int terrainShadows = terrainRenderer.RenderShadow(context, shadowFrame, Math.Min(128, shadowSettings.MaximumDraws));
                             instanceRenderer.RenderShadow(context, renderCamera, renderWorld, renderAlpha, shadowFrame,
@@ -772,7 +778,7 @@ internal sealed class ClientRenderHost : IDisposable
                     debugDrawRenderer.LastDiagnostics,
                     snapshot.VfxMetrics,
                     renderWorld.InstanceCount,
-                    _sceneLighting, gameplayHudRenderer.State, gameplayHudRenderer.LastRenderedVertexCount,
+                    lighting, gameplayHudRenderer.State, gameplayHudRenderer.LastRenderedVertexCount,
                     runtimeMetrics, lastMeasuredRunningRates,particleRenderer.Diagnostics, qualityProfile);
 
                 if (StopwatchElapsed(

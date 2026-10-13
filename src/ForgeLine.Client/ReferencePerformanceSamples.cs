@@ -5,7 +5,7 @@ using ForgeLine.Presentation;
 namespace ForgeLine.Client;
 
 internal enum ReferenceRunProfile { Warm, RendererCold }
-internal enum ReferenceCameraPath { Fixed, Sweep }
+internal enum ReferenceCameraPath { Fixed, Sweep, Traverse }
 
 // Only the explicit reference runner constructs this collector. It never submits simulation commands.
 internal sealed class ReferencePerformanceSamples(int capacity, ulong minimumFence)
@@ -74,6 +74,10 @@ internal sealed class ReferencePerformanceSamples(int capacity, ulong minimumFen
         if (!Enum.IsDefined(path)) throw new ArgumentOutOfRangeException(nameof(path));
         if (path == ReferenceCameraPath.Fixed) return start;
         float phase = (frame % samples) / (float)samples * MathF.Tau;
+        if (path == ReferenceCameraPath.Traverse)
+            return start with { Target = start.Target + new Vector3(700 * MathF.Sin(phase), 0, 500 * (1 - MathF.Cos(phase))),
+                YawRadians = start.YawRadians + .6f * MathF.Sin(phase),
+                Distance = Math.Max(120, start.Distance * (1 + .3f * MathF.Sin(2 * phase))) };
         return start with { Target = start.Target + new Vector3(20 * MathF.Sin(phase), 0, 10 * (1 - MathF.Cos(phase))),
             YawRadians = start.YawRadians + .15f * MathF.Sin(phase) };
     }
