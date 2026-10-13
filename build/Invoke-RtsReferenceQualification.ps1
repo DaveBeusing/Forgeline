@@ -48,7 +48,8 @@ if ($Capture) {
     try { $bytes = [Text.Encoding]::UTF8.GetBytes(($request | ConvertTo-Json -Depth 8)); $stream.Write($bytes) }
     finally { $stream.Dispose() }
     if ($ClientPath) {
-        & ([IO.Path]::GetFullPath($ClientPath)) --reference-capture-request $requestPath
+        # A GUI apphost invoked outside a pipeline can return before its process exits.
+        & ([IO.Path]::GetFullPath($ClientPath)) --reference-capture-request $requestPath | Out-Host
     } else {
         & dotnet run --project (Join-Path $repositoryRoot 'src/ForgeLine.Client/ForgeLine.Client.csproj') `
             --configuration $Configuration --no-build -- --reference-capture-request $requestPath
