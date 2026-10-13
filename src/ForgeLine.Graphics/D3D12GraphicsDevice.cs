@@ -289,6 +289,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                     _timestampQueryHeap is not null &&
                     _timestampReadback is not null &&
                     _timestampFrequency > 0,
+                TimestampFrequencyHz = _timestampFrequency,
                 GpuFrameMilliseconds =
                     _lastGpuFrameMilliseconds,
                 Health = new GraphicsHealthDiagnostics(

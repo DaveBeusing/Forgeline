@@ -62,6 +62,15 @@ jobs:
         env:
           FORGELINE_D3D12_DEBUG_LAYER: '1'
         run: ./build/Invoke-ScalabilityQualification.ps1 -NoBuild -Gpu -Samples 4096
+      - name: Paired moving-camera graphics reference
+        shell: pwsh
+        run: ./build/Invoke-ReferencePerformance.ps1 -Samples 512 -OutputRoot artifacts/reference-performance
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: graphics-reference-performance
+          path: artifacts/reference-performance
+          if-no-files-found: warn
       - uses: actions/upload-artifact@v4
         if: always()
         with:

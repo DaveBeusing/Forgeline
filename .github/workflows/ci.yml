@@ -77,10 +77,21 @@ jobs:
         shell: pwsh
         run: ./build/Test-VisualReferenceEvidence.ps1
 
+      - name: Reference performance and image contracts without GPU
+        shell: pwsh
+        run: |
+          ./build/Test-ReferencePerformance.ps1
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ReferencePerformanceSamplesTests
+
       - name: Native WARP reference capture
         if: runner.os == 'Windows'
         shell: pwsh
         run: ./build/Invoke-RtsReferenceQualification.ps1 -Capture -Software -Scenes BattlefieldCombat -Profiles Low -Zooms NormalGameplay -Displays 640x360 -Warmups 3 -Samples 8 -OutputRoot artifacts/visual-reference-warp
+
+      - name: Windows apphost reference completion contract
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./build/Invoke-RtsReferenceQualification.ps1 -Capture -ClientPath src/ForgeLine.Client/bin/Release/net10.0-windows/win-x64/ForgeLine.Client.exe -RuntimeAssetRoot assets/runtime -Software -Scenes BattlefieldCombat -Profiles Low -Zooms NormalGameplay -Displays 640x360 -Warmups 3 -Samples 8 -RepeatCaptures 2 -OutputRoot artifacts/visual-reference-apphost
 
       - name: Windows window mode and visual qualification smoke
         if: runner.os == 'Windows'
