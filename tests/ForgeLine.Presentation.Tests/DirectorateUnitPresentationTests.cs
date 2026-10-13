@@ -27,7 +27,7 @@ public sealed class DirectorateUnitPresentationTests
         Assert.Equal(new string?[] { null, "unit.directorate.main_battle_tank.damaged", "unit.directorate.main_battle_tank.critical", null }, attachments);
         Assert.Equal("unit.directorate.main_battle_tank.wreck", UnitPresentationCatalog.ResolveWreckAssetId(states[3]));
         var scout = new UnitFeaturePresentationMetadata(UnitIds.ScoutVehicle, UnitPresentationDamageState.Wreck);
-        Assert.Equal("unit.directorate.scout_vehicle.lod2", UnitPresentationCatalog.ResolveWreckAssetId(scout));
+        Assert.Equal("unit.directorate.scout_vehicle.wreck", UnitPresentationCatalog.ResolveWreckAssetId(scout));
         Assert.Null(UnitPresentationCatalog.ResolveStateAttachmentAssetId(scout));
     }
 
@@ -91,7 +91,7 @@ public sealed class DirectorateUnitPresentationTests
             UnitPresentationCatalog.Get(
                 UnitIds.CombatEngineer);
 
-        Assert.Equal(
+        Assert.NotEqual(
             rifle.MeshAssetId,
             engineer.MeshAssetId);
         Assert.Equal(
