@@ -18,6 +18,7 @@ public sealed class InfantryReferenceTests
         var second = VisualReferenceScene.Create(kind, terrain);
         Assert.Equal(first.Fingerprint, second.Fingerprint);
         var units = first.Snapshot.Instances.ToArray().Where(x => x.UnitFeature.IsSpecified).ToArray();
+        Assert.All(units.Where(unit => unit.UnitFeature.IsWreck), unit => Assert.False(unit.Selectable.IsSelectable));
         Assert.All(units, unit => Assert.Equal(DirectorateContent.CreateUnitCatalog()[unit.UnitFeature.Unit].VisualScale, unit.Transform.Scale));
         if (first.HiddenEnemy.IsValid) Assert.DoesNotContain(units, unit => unit.Entity == first.HiddenEnemy);
         if (kind == VisualReferenceSceneKind.InfantryRepeated)

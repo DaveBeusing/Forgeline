@@ -137,7 +137,7 @@ internal static class VisualReferenceCapture
                     var indicators = new DebugDraw { Enabled = true };
                     foreach (var instance in fixture.Snapshot.Instances.ToArray().Where(x => selected.Contains(x.Entity)))
                     {
-                        if (fixture.Kind == VisualReferenceSceneKind.CommandCoreProduction)
+                        if (fixture.Kind is VisualReferenceSceneKind.CommandCoreProduction or VisualReferenceSceneKind.InfantryRifleProduction or VisualReferenceSceneKind.InfantryEngineerProduction or VisualReferenceSceneKind.InfantryRepeated or VisualReferenceSceneKind.InfantryBattleProduction)
                             RtsWorldMarkerVisualization.DrawSelected(indicators, instance, new(0, .8f, .2f, 1), terrain);
                         else
                             indicators.Circle(instance.Transform.Position + Vector3.UnitY, 5, new(0, .8f, .2f, 1));

@@ -305,7 +305,10 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
                 if (!repeated && i % 4 is 1 or 2)
                     simulation.Entities.AddComponent(soldier, new HealthState(i % 4 == 1 ? 50 : 20, 100));
                 if (!repeated && i % 4 == 3)
+                    {
                     simulation.Entities.AddComponent(soldier, new UnitWreckPresentationIdentity(family, new(1)));
+                    simulation.Entities.RemoveComponent<ControllableEntity>(soldier);
+                }
             }
         }
         if (battlefieldReview)
@@ -316,6 +319,7 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
             {
                 EntityId wreck = Unit(wreckFamilies[i], new((i % 3 - 1) * 14, 0, (i / 3 - .5f) * 16));
                 simulation.Entities.AddComponent(wreck, new UnitWreckPresentationIdentity(wreckFamilies[i], new(1)));
+                simulation.Entities.RemoveComponent<ControllableEntity>(wreck);
             }
             for (int i = 0; i < 4; i++)
             {
@@ -360,10 +364,10 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
             new(extracted.Intelligence!.Cells.Count, extracted.Intelligence.Cells.Count(x => x.State == IntelligenceState.Visible), extracted.Intelligence.Contacts.Count),
             default, PlayerAlertState.None, 0, 0, PlayerCommandFeedback.None, default);
         var visible = extracted.Instances.ToArray().ToList();
-        if (kind == VisualReferenceSceneKind.BattlefieldCombat)
+        if (kind is VisualReferenceSceneKind.BattlefieldCombat or VisualReferenceSceneKind.InfantryBattleProduction)
         {
             // Authored effects at known visible positions; no events or positions from hidden units.
-            VfxEffectKind[] effects = [VfxEffectKind.MuzzleTankCannon, VfxEffectKind.ImpactMetal,
+            VfxEffectKind[] effects = [kind == VisualReferenceSceneKind.InfantryBattleProduction ? VfxEffectKind.MuzzleInfantry : VfxEffectKind.MuzzleTankCannon, VfxEffectKind.ImpactMetal,
                 VfxEffectKind.ImpactDirt, VfxEffectKind.ExplosionBuilding, VfxEffectKind.DestructionSparkEmission];
             for (int i = 0; i < effects.Length; i++)
             {
@@ -463,6 +467,7 @@ public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3
             if (physicalReview) offset.Y += definition.Movement.HeightOffset;
             EntityId unit = Add(offset, physicalReview ? definition.VisualScale : id == UnitIds.RifleSquad ? new(2, 2, 2) : new(4, 3, 7));
             simulation.Entities.AddComponent(unit, new UnitIdentity(id, new(foreign ? 2u : 1u)));
+            if (physicalReview) simulation.Entities.AddComponent(unit, definition.Movement);
             simulation.Entities.AddComponent(unit, new ControllableEntity(new(foreign ? 2UL : 1UL), ControllableEntityCategory.Unit));
             return unit;
         }
