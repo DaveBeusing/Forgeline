@@ -3275,66 +3275,20 @@ internal sealed class ClientApplication
             }
             else if (shell.Screen == GameFrontendScreen.Settings)
             {
-                if (input.HasPointerPosition &&
-                    FrontendHitTesting.DetailRow(
-                        input.PointerPosition.X,
-                        input.PointerPosition.Y,
-                            frontendLayout,
-                        settingsInteraction.VisibleRowCount) is int settingsRow &&
-                    settingsRow + settingsInteraction.VisibleStart > 0)
+                if (!displayPreview.Active)
                 {
-                    if (!displayPreview.Active)
-                {
-                    if (primaryPointerPressed) settingsInteraction.FocusVisible(settingsRow);
-
-                        if (primaryPointerPressed &&
-                            FrontendHitTesting.DetailAdjust(
-                                input.PointerPosition.X,
-                                input.PointerPosition.Y,
-                                frontendLayout,
-                                settingsInteraction.VisibleRowCount) is int settingsDirection)
-                        {
-                            settingsInteraction.Adjust(
-                                settings,
-                                settingsDirection);
-                        }
-                    }
-                    if (ConsumeKeyPress(
-                            input,
-                            PlatformKey.Up,
-                            ref upHeld))
+                    if (input.HasPointerPosition && FrontendHitTesting.DetailRow(input.PointerPosition.X,
+                        input.PointerPosition.Y, frontendLayout, settingsInteraction.VisibleRowCount) is int settingsRow)
                     {
-                        settingsInteraction.MovePrevious();
+                        if (primaryPointerPressed) settingsInteraction.FocusVisible(settingsRow);
+                        if (primaryPointerPressed && FrontendHitTesting.DetailAdjust(input.PointerPosition.X,
+                            input.PointerPosition.Y, frontendLayout, settingsInteraction.VisibleRowCount) is int settingsDirection)
+                            settingsInteraction.Adjust(settings, settingsDirection);
                     }
-
-                    if (ConsumeKeyPress(
-                            input,
-                            PlatformKey.Down,
-                            ref downHeld))
-                    {
-                        settingsInteraction.MoveNext();
-                    }
-
-                    if (ConsumeKeyPress(
-                            input,
-                            PlatformKey.Left,
-                            ref leftHeld))
-                    {
-                        settingsInteraction.Adjust(
-                            settings,
-                            -1);
-                    }
-
-                    if (ConsumeKeyPress(
-                            input,
-                            PlatformKey.Right,
-                            ref rightHeld))
-                    {
-                        settingsInteraction.Adjust(
-                            settings,
-                            1);
-                    }
-
+                    if (ConsumeKeyPress(input, PlatformKey.Up, ref upHeld)) settingsInteraction.MovePrevious();
+                    if (ConsumeKeyPress(input, PlatformKey.Down, ref downHeld)) settingsInteraction.MoveNext();
+                    if (ConsumeKeyPress(input, PlatformKey.Left, ref leftHeld)) settingsInteraction.Adjust(settings, -1);
+                    if (ConsumeKeyPress(input, PlatformKey.Right, ref rightHeld)) settingsInteraction.Adjust(settings, 1);
                 }
                 bool applyClicked =
                     primaryPointerPressed &&
