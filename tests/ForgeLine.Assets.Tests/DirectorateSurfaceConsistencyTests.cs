@@ -55,10 +55,13 @@ public sealed class DirectorateSurfaceConsistencyTests
                 if (id == "unit.directorate.scout_vehicle")
                 {
                     var sensor = Assert.Single(record.MechanicalParts, x => x.Name == "sensor");
-                    var glass = Assert.Single(record.MechanicalParts, x => x.Name == "fidelity_1");
-                    Assert.Equal(sensor.Motion, glass.Motion);
-                    Assert.Equal(sensor.Socket, glass.Socket);
-                    Assert.Equal(sensor.Rate, glass.Rate);
+                    Assert.Equal(MechanicalMotionKind.Radar, sensor.Motion);
+                    Assert.Equal("motion_sensor", sensor.Socket);
+                    Assert.Equal(.6f, sensor.Rate);
+                    var sensorMesh = RuntimeMeshData.FromPayload(catalog.Read(AssetId.Parse(id)).Payload);
+                    var sensorVertices = sensorMesh.Indices.Skip(sensor.FirstIndex).Take(sensor.IndexCount)
+                        .Select(i => sensorMesh.Vertices[(int)i]);
+                    Assert.Contains(sensorVertices, v => Cell(v) == (0, 1));
                 }
                 foreach (string meshId in new[] { id }.Concat(record.Lods.Select(x => x.AssetId)))
                 {

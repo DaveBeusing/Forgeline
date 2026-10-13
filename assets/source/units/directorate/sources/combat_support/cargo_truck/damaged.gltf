@@ -1,0 +1,131 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine combat and support unit component exporter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 1824,
+      "uri": "data:application/octet-stream;base64,zcysPquq6r4zMzu+zcysPquqyr4zMzu+zcysPquqyr5mZpq+zcysPquq6r5mZpq+zcz0Pquq6r5mZpq+zcz0Pquqyr5mZpq+zcz0Pquqyr4zMzu+zcz0Pquq6r4zMzu+zcysPquq6r5mZpq+zcz0Pquq6r5mZpq+zcz0Pquq6r4zMzu+zcysPquq6r4zMzu+zcysPquqyr4zMzu+zcz0Pquqyr4zMzu+zcz0Pquqyr5mZpq+zcysPquqyr5mZpq+zcysPquqyr5mZpq+zcz0Pquqyr5mZpq+zcz0Pquq6r5mZpq+zcysPquq6r5mZpq+zcysPquq6r4zMzu+zcz0Pquq6r4zMzu+zcz0Pquqyr4zMzu+zcysPquqyr4zMzu+mpnJPpqZ2b5mZla+mpnJPquqKr5mZla+mpnJPquqKr5mZo6+mpnJPpqZ2b5mZo6+ZmbmPpqZ2b5mZo6+ZmbmPquqKr5mZo6+ZmbmPquqKr5mZla+ZmbmPpqZ2b5mZla+mpnJPpqZ2b5mZo6+ZmbmPpqZ2b5mZo6+ZmbmPpqZ2b5mZla+mpnJPpqZ2b5mZla+mpnJPquqKr5mZla+ZmbmPquqKr5mZla+ZmbmPquqKr5mZo6+mpnJPquqKr5mZo6+mpnJPquqKr5mZo6+ZmbmPquqKr5mZo6+ZmbmPpqZ2b5mZo6+mpnJPpqZ2b5mZo6+mpnJPpqZ2b5mZla+ZmbmPpqZ2b5mZla+ZmbmPquqKr5mZla+mpnJPquqKr5mZla+AACAvwAAAIAAAACAAACAvwAAAIAAAACAAACAvwAAAIAAAACAAACAvwAAAIAAAACAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AACAvwAAAIAAAACAAACAvwAAAIAAAACAAACAvwAAAIAAAACAAACAvwAAAIAAAACAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAgD8AAACAAAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/pptEP0w3iT5aZHs/TDeJPlpkez+0yPY+pptEP7TI9j6mm0Q/TDeJPlpkez9MN4k+WmR7P7TI9j6mm0Q/tMj2PqabRD9MN4k+WmR7P0w3iT5aZHs/tMj2PqabRD+0yPY+pptEP0w3iT5aZHs/TDeJPlpkez+0yPY+pptEP7TI9j6mm0Q/TDeJPlpkez9MN4k+WmR7P7TI9j6mm0Q/tMj2PqabRD9MN4k+WmR7P0w3iT5aZHs/tMj2PqabRD+0yPY+TDeJPrx0kzy0yPY+vHSTPLTI9j5okW0+TDeJPmiRbT5MN4k+vHSTPLTI9j68dJM8tMj2PmiRbT5MN4k+aJFtPkw3iT68dJM8tMj2Prx0kzy0yPY+aJFtPkw3iT5okW0+TDeJPrx0kzy0yPY+vHSTPLTI9j5okW0+TDeJPmiRbT5MN4k+vHSTPLTI9j68dJM8tMj2PmiRbT5MN4k+aJFtPkw3iT68dJM8tMj2Prx0kzy0yPY+aJFtPkw3iT5okW0+AAAAAAEAAAACAAAAAAAAAAIAAAADAAAABAAAAAUAAAAGAAAABAAAAAYAAAAHAAAACAAAAAkAAAAKAAAACAAAAAoAAAALAAAADAAAAA0AAAAOAAAADAAAAA4AAAAPAAAAEAAAABEAAAASAAAAEAAAABIAAAATAAAAFAAAABUAAAAWAAAAFAAAABYAAAAXAAAAGAAAABkAAAAaAAAAGAAAABoAAAAbAAAAHAAAAB0AAAAeAAAAHAAAAB4AAAAfAAAAIAAAACEAAAAiAAAAIAAAACIAAAAjAAAAJAAAACUAAAAmAAAAJAAAACYAAAAnAAAAKAAAACkAAAAqAAAAKAAAACoAAAArAAAALAAAAC0AAAAuAAAALAAAAC4AAAAvAAAA"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 576,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 576,
+      "byteLength": 576,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1152,
+      "byteLength": 384,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1536,
+      "byteLength": 288,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC3",
+      "min": [
+        0.3375000059604645,
+        -0.4583333432674408,
+        -0.30156248807907104
+      ],
+      "max": [
+        0.4781250059604645,
+        -0.1666666716337204,
+        -0.18281249701976776
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC3",
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5125,
+      "count": 72,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "damaged",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "extras": {
+    "coordinates": "Vehicle-local metres; Y above sampled ground, +Z forward; normalized runtime root retains existing movement height offset",
+    "componentHierarchy": [
+      {
+        "name": "damaged_panels",
+        "parent": null,
+        "sharedModule": null,
+        "firstIndex": 0,
+        "indexCount": 72
+      }
+    ],
+    "gameScaleMeters": [
+      3.2,
+      2.4,
+      6.4
+    ],
+    "heightOffsetMeters": 1.1
+  }
+}

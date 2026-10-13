@@ -1,0 +1,59 @@
+{
+  "id": "unit.directorate.self_propelled_artillery.turret",
+  "type": "mesh",
+  "source": "../sources/combat_support/self_propelled_artillery/turret.gltf",
+  "materialReferences": [
+    "material.directorate.unit.self_propelled_artillery"
+  ],
+  "mechanicalParts": [
+    {
+      "name": "turret_body",
+      "firstIndex": 0,
+      "indexCount": 528,
+      "parent": -1,
+      "motion": "static"
+    },
+    {
+      "name": "cannon",
+      "firstIndex": 528,
+      "indexCount": 1392,
+      "parent": 0,
+      "motion": "cannon",
+      "socket": "motion_cannon",
+      "rate": 1,
+      "travel": 0.022
+    }
+  ],
+  "sockets": [
+    {
+      "name": "gun_pivot",
+      "x": 0,
+      "y": 0.24,
+      "z": -0.04
+    },
+    {
+      "name": "weapon_muzzle",
+      "x": 0,
+      "y": 0.24,
+      "z": 0.68
+    },
+    {
+      "name": "recoil_anchor",
+      "x": 0,
+      "y": 0.24,
+      "z": 0.04
+    },
+    {
+      "name": "turret_pivot",
+      "x": 0,
+      "y": 0.24,
+      "z": -0.04
+    },
+    {
+      "name": "motion_cannon",
+      "x": 0.0,
+      "y": 0.24000000000000007,
+      "z": -0.04
+    }
+  ]
+}

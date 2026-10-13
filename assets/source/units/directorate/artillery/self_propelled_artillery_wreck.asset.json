@@ -1,0 +1,8 @@
+{
+  "id": "unit.directorate.self_propelled_artillery.wreck",
+  "type": "mesh",
+  "source": "../sources/combat_support/self_propelled_artillery/wreck.gltf",
+  "materialReferences": [
+    "material.directorate.unit.self_propelled_artillery"
+  ]
+}

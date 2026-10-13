@@ -1,0 +1,1355 @@
+{
+  "family": "self_propelled_artillery",
+  "coordinates": "Vehicle-local metres; Y above sampled ground, +Z forward; normalized runtime root retains existing movement height offset",
+  "gameScaleMeters": [
+    3.8,
+    3.2,
+    7.5
+  ],
+  "heightOffsetMeters": 1.4,
+  "bounds": {
+    "min": [
+      -0.55,
+      -0.43849999999999995,
+      -0.55
+    ],
+    "max": [
+      0.55,
+      1.0,
+      0.8
+    ]
+  },
+  "provenance": {
+    "author": "ForgeLine",
+    "license": "Original repository geometry; no third-party inputs"
+  },
+  "sockets": [
+    {
+      "name": "gun_pivot",
+      "x": 0,
+      "y": 0.24,
+      "z": -0.04
+    },
+    {
+      "name": "weapon_muzzle",
+      "x": 0,
+      "y": 0.24,
+      "z": 0.68
+    },
+    {
+      "name": "recoil_anchor",
+      "x": 0,
+      "y": 0.24,
+      "z": 0.04
+    },
+    {
+      "name": "turret_pivot",
+      "x": 0,
+      "y": 0.24,
+      "z": -0.04
+    }
+  ],
+  "modules": [
+    {
+      "name": "artillery_hull",
+      "parent": null,
+      "group": "body",
+      "parts": [
+        {
+          "kind": "loft",
+          "profiles": [
+            [
+              -3.03,
+              1.18,
+              0.45,
+              1.35
+            ],
+            [
+              -2.3,
+              1.48,
+              0.45,
+              1.45
+            ],
+            [
+              2.25,
+              1.46,
+              0.45,
+              1.24
+            ],
+            [
+              2.88,
+              1.15,
+              0.45,
+              0.96
+            ]
+          ],
+          "cell": 0,
+          "edge": [
+            0.04,
+            0,
+            0
+          ]
+        },
+        {
+          "kind": "box",
+          "min": [
+            -1.03,
+            1.43,
+            -2.65
+          ],
+          "max": [
+            1.03,
+            1.59,
+            -1.33
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0.025
+        }
+      ]
+    },
+    {
+      "name": "track_-1",
+      "parent": null,
+      "group": "body",
+      "parts": [
+        {
+          "kind": "belt",
+          "profile": [
+            [
+              -2.9,
+              0.035
+            ],
+            [
+              2.58,
+              0.035
+            ],
+            [
+              2.98,
+              0.43
+            ],
+            [
+              2.61,
+              0.86
+            ],
+            [
+              -2.63,
+              0.86
+            ],
+            [
+              -3.06,
+              0.44
+            ]
+          ],
+          "x0": -1.82,
+          "x1": -1.27,
+          "inset": [
+            0.075,
+            0.075
+          ],
+          "step": [
+            0.19,
+            0,
+            0
+          ],
+          "thickness": 0.035,
+          "cell": 2
+        },
+        {
+          "kind": "box",
+          "min": [
+            -1.82,
+            0.96,
+            -2.8
+          ],
+          "max": [
+            -1.27,
+            1.07,
+            2.73
+          ],
+          "cell": 0,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0.025
+        }
+      ]
+    },
+    {
+      "name": "roadwheel_n1_n2_12",
+      "parent": null,
+      "group": "roadwheel_n1_n2_12",
+      "parts": [
+        {
+          "kind": "wheel",
+          "x0": -1.72,
+          "x1": -1.3,
+          "y": 0.46,
+          "z": -2.12,
+          "radius": 0.35,
+          "cell": 2,
+          "sides": [
+            24,
+            12,
+            8
+          ],
+          "inner": 0.58
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -1.695,
+            0.46,
+            -2.12
+          ],
+          "end": [
+            -1.325,
+            0.46,
+            -2.12
+          ],
+          "radius": 0.2,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        }
+      ]
+    },
+    {
+      "name": "roadwheel_n1_n1_09",
+      "parent": null,
+      "group": "roadwheel_n1_n1_09",
+      "parts": [
+        {
+          "kind": "wheel",
+          "x0": -1.72,
+          "x1": -1.3,
+          "y": 0.46,
+          "z": -1.09,
+          "radius": 0.35,
+          "cell": 2,
+          "sides": [
+            24,
+            12,
+            8
+          ],
+          "inner": 0.58
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -1.695,
+            0.46,
+            -1.09
+          ],
+          "end": [
+            -1.325,
+            0.46,
+            -1.09
+          ],
+          "radius": 0.2,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        }
+      ]
+    },
+    {
+      "name": "roadwheel_n1_0",
+      "parent": null,
+      "group": "roadwheel_n1_0",
+      "parts": [
+        {
+          "kind": "wheel",
+          "x0": -1.72,
+          "x1": -1.3,
+          "y": 0.46,
+          "z": 0,
+          "radius": 0.35,
+          "cell": 2,
+          "sides": [
+            24,
+            12,
+            8
+          ],
+          "inner": 0.58
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -1.695,
+            0.46,
+            0
+          ],
+          "end": [
+            -1.325,
+            0.46,
+            0
+          ],
+          "radius": 0.2,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        }
+      ]
+    },
+    {
+      "name": "roadwheel_n1_1_09",
+      "parent": null,
+      "group": "roadwheel_n1_1_09",
+      "parts": [
+        {
+          "kind": "wheel",
+          "x0": -1.72,
+          "x1": -1.3,
+          "y": 0.46,
+          "z": 1.09,
+          "radius": 0.35,
+          "cell": 2,
+          "sides": [
+            24,
+            12,
+            8
+          ],
+          "inner": 0.58
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -1.695,
+            0.46,
+            1.09
+          ],
+          "end": [
+            -1.325,
+            0.46,
+            1.09
+          ],
+          "radius": 0.2,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        }
+      ]
+    },
+    {
+      "name": "roadwheel_n1_2_12",
+      "parent": null,
+      "group": "roadwheel_n1_2_12",
+      "parts": [
+        {
+          "kind": "wheel",
+          "x0": -1.72,
+          "x1": -1.3,
+          "y": 0.46,
+          "z": 2.12,
+          "radius": 0.35,
+          "cell": 2,
+          "sides": [
+            24,
+            12,
+            8
+          ],
+          "inner": 0.58
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -1.695,
+            0.46,
+            2.12
+          ],
+          "end": [
+            -1.325,
+            0.46,
+            2.12
+          ],
+          "radius": 0.2,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        }
+      ]
+    },
+    {
+      "name": "track_1",
+      "parent": null,
+      "group": "body",
+      "parts": [
+        {
+          "kind": "belt",
+          "profile": [
+            [
+              -2.9,
+              0.035
+            ],
+            [
+              2.58,
+              0.035
+            ],
+            [
+              2.98,
+              0.43
+            ],
+            [
+              2.61,
+              0.86
+            ],
+            [
+              -2.63,
+              0.86
+            ],
+            [
+              -3.06,
+              0.44
+            ]
+          ],
+          "x0": 1.27,
+          "x1": 1.82,
+          "inset": [
+            0.075,
+            0.075
+          ],
+          "step": [
+            0.19,
+            0,
+            0
+          ],
+          "thickness": 0.035,
+          "cell": 2
+        },
+        {
+          "kind": "box",
+          "min": [
+            1.27,
+            0.96,
+            -2.8
+          ],
+          "max": [
+            1.82,
+            1.07,
+            2.73
+          ],
+          "cell": 0,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0.025
+        }
+      ]
+    },
+    {
+      "name": "roadwheel_1_n2_12",
+      "parent": null,
+      "group": "roadwheel_1_n2_12",
+      "parts": [
+        {
+          "kind": "wheel",
+          "x0": 1.3,
+          "x1": 1.72,
+          "y": 0.46,
+          "z": -2.12,
+          "radius": 0.35,
+          "cell": 2,
+          "sides": [
+            24,
+            12,
+            8
+          ],
+          "inner": 0.58
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            1.325,
+            0.46,
+            -2.12
+          ],
+          "end": [
+            1.695,
+            0.46,
+            -2.12
+          ],
+          "radius": 0.2,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        }
+      ]
+    },
+    {
+      "name": "roadwheel_1_n1_09",
+      "parent": null,
+      "group": "roadwheel_1_n1_09",
+      "parts": [
+        {
+          "kind": "wheel",
+          "x0": 1.3,
+          "x1": 1.72,
+          "y": 0.46,
+          "z": -1.09,
+          "radius": 0.35,
+          "cell": 2,
+          "sides": [
+            24,
+            12,
+            8
+          ],
+          "inner": 0.58
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            1.325,
+            0.46,
+            -1.09
+          ],
+          "end": [
+            1.695,
+            0.46,
+            -1.09
+          ],
+          "radius": 0.2,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        }
+      ]
+    },
+    {
+      "name": "roadwheel_1_0",
+      "parent": null,
+      "group": "roadwheel_1_0",
+      "parts": [
+        {
+          "kind": "wheel",
+          "x0": 1.3,
+          "x1": 1.72,
+          "y": 0.46,
+          "z": 0,
+          "radius": 0.35,
+          "cell": 2,
+          "sides": [
+            24,
+            12,
+            8
+          ],
+          "inner": 0.58
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            1.325,
+            0.46,
+            0
+          ],
+          "end": [
+            1.695,
+            0.46,
+            0
+          ],
+          "radius": 0.2,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        }
+      ]
+    },
+    {
+      "name": "roadwheel_1_1_09",
+      "parent": null,
+      "group": "roadwheel_1_1_09",
+      "parts": [
+        {
+          "kind": "wheel",
+          "x0": 1.3,
+          "x1": 1.72,
+          "y": 0.46,
+          "z": 1.09,
+          "radius": 0.35,
+          "cell": 2,
+          "sides": [
+            24,
+            12,
+            8
+          ],
+          "inner": 0.58
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            1.325,
+            0.46,
+            1.09
+          ],
+          "end": [
+            1.695,
+            0.46,
+            1.09
+          ],
+          "radius": 0.2,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        }
+      ]
+    },
+    {
+      "name": "roadwheel_1_2_12",
+      "parent": null,
+      "group": "roadwheel_1_2_12",
+      "parts": [
+        {
+          "kind": "wheel",
+          "x0": 1.3,
+          "x1": 1.72,
+          "y": 0.46,
+          "z": 2.12,
+          "radius": 0.35,
+          "cell": 2,
+          "sides": [
+            24,
+            12,
+            8
+          ],
+          "inner": 0.58
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            1.325,
+            0.46,
+            2.12
+          ],
+          "end": [
+            1.695,
+            0.46,
+            2.12
+          ],
+          "radius": 0.2,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        }
+      ]
+    },
+    {
+      "name": "rear_weapon_mass",
+      "parent": null,
+      "group": "turret_body",
+      "parts": [
+        {
+          "kind": "loft",
+          "profiles": [
+            [
+              -2.14,
+              0.88,
+              1.43,
+              2.25
+            ],
+            [
+              -0.18,
+              0.81,
+              1.43,
+              2.45
+            ],
+            [
+              0.55,
+              0.57,
+              1.43,
+              2.14
+            ]
+          ],
+          "cell": 0,
+          "edge": [
+            0.04,
+            0,
+            0
+          ]
+        },
+        {
+          "kind": "box",
+          "min": [
+            -0.39,
+            2.42,
+            -1.55
+          ],
+          "max": [
+            0.39,
+            2.53,
+            -0.44
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "bevel": 0.025
+        }
+      ]
+    },
+    {
+      "name": "trunnion_support",
+      "parent": null,
+      "group": "turret_body",
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -0.54,
+            1.79,
+            -0.54
+          ],
+          "max": [
+            -0.31,
+            2.44,
+            -0.05
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.025
+        },
+        {
+          "kind": "box",
+          "min": [
+            0.31,
+            1.79,
+            -0.54
+          ],
+          "max": [
+            0.54,
+            2.44,
+            -0.05
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.025
+        }
+      ]
+    },
+    {
+      "name": "heavy_cannon",
+      "parent": null,
+      "group": "cannon",
+      "parts": [
+        {
+          "kind": "cylinder",
+          "start": [
+            0,
+            2.168,
+            -1.2
+          ],
+          "end": [
+            0,
+            2.168,
+            0.95
+          ],
+          "radius": 0.19,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            0,
+            2.168,
+            0.7
+          ],
+          "end": [
+            0,
+            2.168,
+            4.83
+          ],
+          "radius": 0.105,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            0,
+            2.168,
+            4.68
+          ],
+          "end": [
+            0,
+            2.168,
+            5.1
+          ],
+          "radius": 0.16,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0.58
+        }
+      ]
+    },
+    {
+      "name": "recoil_cylinders",
+      "parent": null,
+      "group": "cannon",
+      "parts": [
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.23,
+            2.3,
+            -0.76
+          ],
+          "end": [
+            -0.23,
+            2.3,
+            1.28
+          ],
+          "radius": 0.055,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            0.23,
+            2.3,
+            -0.76
+          ],
+          "end": [
+            0.23,
+            2.3,
+            1.28
+          ],
+          "radius": 0.055,
+          "cell": 1,
+          "lods": [
+            0,
+            1
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        }
+      ]
+    },
+    {
+      "name": "damaged_panels",
+      "parent": null,
+      "group": "body",
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            1.08,
+            0,
+            -1.93
+          ],
+          "max": [
+            1.53,
+            0.15,
+            -1.17
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.025
+        },
+        {
+          "kind": "box",
+          "min": [
+            1.26,
+            0.08,
+            -1.78
+          ],
+          "max": [
+            1.44,
+            0.7,
+            -1.34
+          ],
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.025
+        }
+      ]
+    },
+    {
+      "name": "critical_structure",
+      "parent": null,
+      "group": "body",
+      "parts": [
+        {
+          "kind": "loft",
+          "profiles": [
+            [
+              -2.4,
+              0.87,
+              0.18,
+              0.38
+            ],
+            [
+              -1.4,
+              0.64,
+              0.18,
+              0.99
+            ],
+            [
+              -0.65,
+              0.45,
+              0.18,
+              0.47
+            ]
+          ],
+          "cell": 7,
+          "edge": [
+            0.04,
+            0,
+            0
+          ]
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.6,
+            0.35,
+            -2.12
+          ],
+          "end": [
+            0.5,
+            0.65,
+            -0.95
+          ],
+          "radius": 0.095,
+          "cell": 1,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        }
+      ]
+    },
+    {
+      "name": "collapsed_chassis",
+      "parent": null,
+      "group": "body",
+      "parts": [
+        {
+          "kind": "box",
+          "min": [
+            -1.06,
+            0,
+            -2.35
+          ],
+          "max": [
+            1.06,
+            0.49,
+            1.51
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.025
+        },
+        {
+          "kind": "loft",
+          "profiles": [
+            [
+              -1.75,
+              0.8,
+              0.38,
+              0.93
+            ],
+            [
+              -0.2,
+              0.7,
+              0.38,
+              0.73
+            ],
+            [
+              1.32,
+              0.54,
+              0.38,
+              0.55
+            ]
+          ],
+          "cell": 7,
+          "edge": [
+            0.04,
+            0,
+            0
+          ]
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -1.18,
+            0.28,
+            -2.07
+          ],
+          "end": [
+            1.01,
+            0.34,
+            -0.82
+          ],
+          "radius": 0.18,
+          "cell": 2,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        },
+        {
+          "kind": "cylinder",
+          "start": [
+            -0.25,
+            0.63,
+            -1.2
+          ],
+          "end": [
+            0.57,
+            0.5,
+            3.65
+          ],
+          "radius": 0.13,
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "sides": [
+            20,
+            10,
+            6
+          ],
+          "inner": 0
+        },
+        {
+          "kind": "box",
+          "min": [
+            -1.2,
+            0.13,
+            -2.5
+          ],
+          "max": [
+            1.2,
+            0.75,
+            -1.55
+          ],
+          "cell": 7,
+          "lods": [
+            0,
+            1,
+            2
+          ],
+          "bevel": 0.025
+        }
+      ]
+    }
+  ],
+  "motions": {
+    "roadwheel_n1_n2_12": {
+      "kind": "wheel",
+      "pivot": [
+        -1.51,
+        0.46,
+        -2.12
+      ],
+      "rate": 2.857142857142857
+    },
+    "roadwheel_n1_n1_09": {
+      "kind": "wheel",
+      "pivot": [
+        -1.51,
+        0.46,
+        -1.09
+      ],
+      "rate": 2.857142857142857
+    },
+    "roadwheel_n1_0": {
+      "kind": "wheel",
+      "pivot": [
+        -1.51,
+        0.46,
+        0
+      ],
+      "rate": 2.857142857142857
+    },
+    "roadwheel_n1_1_09": {
+      "kind": "wheel",
+      "pivot": [
+        -1.51,
+        0.46,
+        1.09
+      ],
+      "rate": 2.857142857142857
+    },
+    "roadwheel_n1_2_12": {
+      "kind": "wheel",
+      "pivot": [
+        -1.51,
+        0.46,
+        2.12
+      ],
+      "rate": 2.857142857142857
+    },
+    "roadwheel_1_n2_12": {
+      "kind": "wheel",
+      "pivot": [
+        1.51,
+        0.46,
+        -2.12
+      ],
+      "rate": 2.857142857142857
+    },
+    "roadwheel_1_n1_09": {
+      "kind": "wheel",
+      "pivot": [
+        1.51,
+        0.46,
+        -1.09
+      ],
+      "rate": 2.857142857142857
+    },
+    "roadwheel_1_0": {
+      "kind": "wheel",
+      "pivot": [
+        1.51,
+        0.46,
+        0
+      ],
+      "rate": 2.857142857142857
+    },
+    "roadwheel_1_1_09": {
+      "kind": "wheel",
+      "pivot": [
+        1.51,
+        0.46,
+        1.09
+      ],
+      "rate": 2.857142857142857
+    },
+    "roadwheel_1_2_12": {
+      "kind": "wheel",
+      "pivot": [
+        1.51,
+        0.46,
+        2.12
+      ],
+      "rate": 2.857142857142857
+    },
+    "cannon": {
+      "kind": "cannon",
+      "pivot": [
+        0,
+        2.168,
+        -0.3
+      ],
+      "travel": 0.022
+    }
+  },
+  "chassisModules": [
+    "artillery_hull",
+    "track_-1",
+    "roadwheel_n1_n2_12",
+    "roadwheel_n1_n1_09",
+    "roadwheel_n1_0",
+    "roadwheel_n1_1_09",
+    "roadwheel_n1_2_12",
+    "track_1",
+    "roadwheel_1_n2_12",
+    "roadwheel_1_n1_09",
+    "roadwheel_1_0",
+    "roadwheel_1_1_09",
+    "roadwheel_1_2_12"
+  ],
+  "turretModules": [
+    "rear_weapon_mass",
+    "trunnion_support",
+    "heavy_cannon",
+    "recoil_cylinders"
+  ],
+  "intactModules": [
+    "artillery_hull",
+    "track_-1",
+    "roadwheel_n1_n2_12",
+    "roadwheel_n1_n1_09",
+    "roadwheel_n1_0",
+    "roadwheel_n1_1_09",
+    "roadwheel_n1_2_12",
+    "track_1",
+    "roadwheel_1_n2_12",
+    "roadwheel_1_n1_09",
+    "roadwheel_1_0",
+    "roadwheel_1_1_09",
+    "roadwheel_1_2_12",
+    "rear_weapon_mass",
+    "trunnion_support",
+    "heavy_cannon",
+    "recoil_cylinders"
+  ],
+  "states": {
+    "damaged": [
+      "damaged_panels"
+    ],
+    "critical": [
+      "damaged_panels",
+      "critical_structure"
+    ],
+    "wreck": [
+      "collapsed_chassis"
+    ]
+  }
+}

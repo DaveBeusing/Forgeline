@@ -1,0 +1,131 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine combat and support unit component exporter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 2384,
+      "uri": "data:application/octet-stream;base64,zczMvc3MzD03ciM+zczMPc3MzD03ciM+zczMPc3MzD2e2Ik+zczMvc3MzD03ciM+zczMPc3MzD2e2Ik+zczMvc3MzD2e2Ik+zczMPc3MzD03ciM+TxvoPe/u7j03ciM+TxvoPe/u7j2e2Ik+zczMPc3MzD03ciM+TxvoPe/u7j2e2Ik+zczMPc3MzD2e2Ik+TxvoPe/u7j03ciM+TxvoPWZmZj43ciM+TxvoPWZmZj6e2Ik+TxvoPe/u7j03ciM+TxvoPWZmZj6e2Ik+TxvoPe/u7j2e2Ik+TxvoPWZmZj43ciM+zczMPXd3dz43ciM+zczMPXd3dz6e2Ik+TxvoPWZmZj43ciM+zczMPXd3dz6e2Ik+TxvoPWZmZj6e2Ik+zczMPXd3dz43ciM+zczMvXd3dz43ciM+zczMvXd3dz6e2Ik+zczMPXd3dz43ciM+zczMvXd3dz6e2Ik+zczMPXd3dz6e2Ik+zczMvXd3dz43ciM+TxvovWZmZj43ciM+TxvovWZmZj6e2Ik+zczMvXd3dz43ciM+TxvovWZmZj6e2Ik+zczMvXd3dz6e2Ik+TxvovWZmZj43ciM+Txvove/u7j03ciM+Txvove/u7j2e2Ik+TxvovWZmZj43ciM+Txvove/u7j2e2Ik+TxvovWZmZj6e2Ik+Txvove/u7j03ciM+zczMvc3MzD03ciM+zczMvc3MzD2e2Ik+Txvove/u7j03ciM+zczMvc3MzD2e2Ik+Txvove/u7j2e2Ik+Txvove/u7j03ciM+TxvovWZmZj43ciM+zczMvXd3dz43ciM+zczMPXd3dz43ciM+TxvoPWZmZj43ciM+TxvoPe/u7j03ciM+zczMPc3MzD03ciM+zczMvc3MzD03ciM+zczMvc3MzD2e2Ik+zczMPc3MzD2e2Ik+TxvoPe/u7j2e2Ik+TxvoPWZmZj6e2Ik+zczMPXd3dz6e2Ik+zczMvXd3dz6e2Ik+TxvovWZmZj6e2Ik+Txvove/u7j2e2Ik+AAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAABedHPwTsH78AAAAABedHPwTsH78AAAAABedHPwTsH78AAAAABedHPwTsH78AAAAABedHPwTsH78AAAAABedHPwTsH78AAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAABedHPwTsHz8AAAAABedHPwTsHz8AAAAABedHPwTsHz8AAAAABedHPwTsHz8AAACABedHPwTsHz8AAACABedHPwTsHz8AAACAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAACAAAAAAAAAgD8AAACAAAAAAAAAgD8AAACABedHvwTsHz8AAAAABedHvwTsHz8AAAAABedHvwTsHz8AAAAABedHvwTsHz8AAAAABedHvwTsHz8AAAAABedHvwTsHz8AAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAABedHvwTsH78AAAAABedHvwTsH78AAAAABedHvwTsH78AAAAABedHvwTsH78AAAAABedHvwTsH78AAAAABedHvwTsH78AAAAAAAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAgAAAAIAAAIC/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/vHSTPLx0kzxokW0+vHSTPGiRbT5okW0+vHSTPLx0kzxokW0+vHSTPAfF9D1okW0+vHSTPLx0kzxokW0+vHSTPGiRbT5okW0+vHSTPLx0kzxokW0+vHSTPEVuaz5okW0+vHSTPLx0kzxokW0+vHSTPGiRbT5okW0+vHSTPLx0kzxokW0+vHSTPIzTRz5okW0+vHSTPLx0kzxokW0+vHSTPGiRbT5okW0+vHSTPLx0kzxokW0+vHSTPEVuaz5okW0+vHSTPLx0kzxokW0+vHSTPGiRbT5okW0+vHSTPLx0kzxokW0+vHSTPAfF9D1okW0+vHSTPLx0kzxokW0+vHSTPGiRbT5okW0+vHSTPLx0kzxokW0+vHSTPEVuaz5okW0+vHSTPLx0kzxokW0+vHSTPGiRbT5okW0+vHSTPLx0kzxokW0+vHSTPIzTRz5okW0+vHSTPLx0kzxokW0+vHSTPGiRbT5okW0+vHSTPLx0kzxokW0+vHSTPEVuaz5okW0+0NkwPbx0kzyMyVM+vHSTPGiRbT4ulPo8aJFtPnqtYD6MyVM+aJFtPtDZMD1okW0+vHSTPHqtYD68dJM8LpT6PC6U+jy8dJM8eq1gPrx0kzxokW0+0NkwPWiRbT6MyVM+eq1gPmiRbT4ulPo8aJFtPrx0kzyMyVM+vHSTPNDZMD0AAAAAAQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAJQAAACYAAAAnAAAAKAAAACkAAAAqAAAAKwAAACwAAAAtAAAALgAAAC8AAAAwAAAAMQAAADIAAAAwAAAAMgAAADMAAAAwAAAAMwAAADQAAAAwAAAANAAAADUAAAAwAAAANQAAADYAAAAwAAAANgAAADcAAAA4AAAAOQAAADoAAAA4AAAAOgAAADsAAAA4AAAAOwAAADwAAAA4AAAAPAAAAD0AAAA4AAAAPQAAAD4AAAA4AAAAPgAAAD8AAAA="
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 768,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 768,
+      "byteLength": 768,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1536,
+      "byteLength": 512,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 2048,
+      "byteLength": 336,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 64,
+      "type": "VEC3",
+      "min": [
+        -0.1133333370089531,
+        0.10000000149011612,
+        0.1596153825521469
+      ],
+      "max": [
+        0.1133333370089531,
+        0.24166665971279144,
+        0.26923078298568726
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 64,
+      "type": "VEC3",
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 64,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5125,
+      "count": 84,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "weapon_mount",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "extras": {
+    "coordinates": "Vehicle-local metres; Y above sampled ground, +Z forward; normalized runtime root retains existing movement height offset",
+    "componentHierarchy": [
+      {
+        "name": "weapon_mount",
+        "parent": null,
+        "sharedModule": null,
+        "firstIndex": 0,
+        "indexCount": 84
+      }
+    ],
+    "gameScaleMeters": [
+      3,
+      2.4,
+      5.2
+    ],
+    "heightOffsetMeters": 1.2
+  }
+}

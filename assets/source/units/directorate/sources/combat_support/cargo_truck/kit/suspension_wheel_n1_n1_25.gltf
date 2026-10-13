@@ -1,0 +1,131 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "ForgeLine combat and support unit component exporter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 2832,
+      "uri": "data:application/octet-stream;base64,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"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 864,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 864,
+      "byteLength": 864,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1728,
+      "byteLength": 576,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 2304,
+      "byteLength": 528,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 72,
+      "type": "VEC3",
+      "min": [
+        -0.3472612798213959,
+        -0.2926637530326843,
+        -0.20234374701976776
+      ],
+      "max": [
+        -0.2402387112379074,
+        -0.15316958725452423,
+        -0.18828125298023224
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 72,
+      "type": "VEC3",
+      "min": [
+        -0.8102974891662598,
+        -0.5860187411308289,
+        -0.9931313991546631
+      ],
+      "max": [
+        0.8102974891662598,
+        0.5860187411308289,
+        0.9931313991546631
+      ]
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 72,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5125,
+      "count": 132,
+      "type": "SCALAR"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "suspension_wheel_n1_n1_25",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "extras": {
+    "coordinates": "Vehicle-local metres; Y above sampled ground, +Z forward; normalized runtime root retains existing movement height offset",
+    "componentHierarchy": [
+      {
+        "name": "suspension_wheel_n1_n1_25",
+        "parent": null,
+        "sharedModule": null,
+        "firstIndex": 0,
+        "indexCount": 132
+      }
+    ],
+    "gameScaleMeters": [
+      3.2,
+      2.4,
+      6.4
+    ],
+    "heightOffsetMeters": 1.1
+  }
+}

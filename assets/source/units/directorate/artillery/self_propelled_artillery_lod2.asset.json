@@ -1,7 +1,7 @@
 {
   "id": "unit.directorate.self_propelled_artillery.lod2",
   "type": "mesh",
-  "source": "../sources/self_propelled_artillery_lod2.gltf",
+  "source": "../sources/combat_support/self_propelled_artillery/lod2.gltf",
   "materialReferences": [
     "material.directorate.unit.self_propelled_artillery"
   ]
