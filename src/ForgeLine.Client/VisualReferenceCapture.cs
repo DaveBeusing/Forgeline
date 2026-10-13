@@ -129,6 +129,7 @@ internal static class VisualReferenceCapture
                     using var particles = new ParticleVfxRenderer(graphics, catalog, profile.Particles);
                     using var hud = new GameplayHudRenderer(graphics, catalog);
                     using var selection = new DebugDrawRenderer(graphics, depthEnabled: false, lineWidthPixels: 3);
+                    using var materialReference = fixture.Kind == VisualReferenceSceneKind.MaterialFoundation ? new MaterialReferenceRenderer(graphics, lighting) : null;
                     if (!platform.PumpEvents()) throw new OperationCanceledException("Reference window was closed.");
                     string key = $"{fixture.Kind}-{display.Width}x{display.Height}-{quality}-{zoom}";
                     if (request.RasterDpi != 0) key += $"-Dpi{request.RasterDpi}";
@@ -163,6 +164,11 @@ internal static class VisualReferenceCapture
                     Action<IGraphicsCommandContext> record = context =>
                     {
                         recordFrameIndex = context.FrameIndex;
+                        if (materialReference is not null)
+                        {
+                            materialReference.Render(context, camera);
+                            return;
+                        }
                         if (graphics.Atmosphere.Enabled) context.SetAtmosphereView(SceneAtmosphereSettings.CreateView(camera, context.Width, context.Height));
                         if (profile.Shadows.Enabled)
                         {
@@ -285,6 +291,7 @@ internal static class VisualReferenceCapture
                             cameraPathVersion = 1, cameraSamples = request.Samples,
                             coldScope = "Fresh per-case renderers; process/device/runtime catalog and OS caches can already be warm. No OS/driver cache flush." },
                         terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, materials = meshes.MaterialDiagnostics, particles = particles.Diagnostics,
+                        materialReference = materialReference is null ? null : MaterialReferenceRenderer.Materials,
                         hudVertices = hud.LastRenderedVertexCount, graphics = measured, repeatPixelsEqual, request.RepeatCaptures, repeatFailures,
                         captureInputs = captureInputs.ToArray(),
                         motionImages, motionMethod = "Eight adjacent camera poses, no timing claim; readback stalls prevent judder acceptance.", visualReview = "pending" });

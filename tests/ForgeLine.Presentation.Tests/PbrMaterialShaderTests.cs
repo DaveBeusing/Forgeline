@@ -75,6 +75,35 @@ public sealed class PbrMaterialShaderTests
 
     private static string F(float value) => value.ToString("R",CultureInfo.InvariantCulture);
 
+    [Fact]
+    public void MaterialControlsKeepDirectHdrParityAndResizeWithoutTextures()
+    {
+        using var platform = new WindowsPlatform();
+        using IWindow window = platform.CreateWindow(new("FORGELINE Material Gallery",512,320));
+        using var graphics = GraphicsDeviceFactory.CreateForWindow(window,new() {ForceSoftwareAdapter=true,EnableVSync=false,EnableDebugLayer=false});
+        var camera = new RtsCamera(RtsVisualReference.CreateCameraSettings(Vector3.Zero,RtsReferenceZoom.CloseTactical));
+        byte[] direct = Gallery(false), linear = Gallery(true);
+        for(int i=0;i<direct.Length;i++) Assert.InRange(Math.Abs(direct[i]-linear[i]),0,1);
+        graphics.Resize(640,360);
+        graphics.RenderFrame(GraphicsColor.ForgeLineClear);
+        linear=Gallery(true);
+        Assert.Equal(640*360*4,linear.Length);
+        graphics.WaitForIdle();
+        Assert.Equal(0,graphics.Diagnostics.Resources.LoadedTextureCount);
+        Assert.Equal(0,graphics.Diagnostics.Health.PendingRetirementCount);
+        Assert.Equal(5,MaterialReferenceRenderer.Materials.Count);
+
+        byte[] Gallery(bool enabled)
+        {
+            graphics.ConfigureSceneOutput(new(enabled,SceneLightingSettings.Default.Exposure,true));
+            using var gallery=new MaterialReferenceRenderer(graphics);
+            byte[] first=graphics.CaptureFrame(GraphicsColor.ForgeLineClear,c=>gallery.Render(c,camera));
+            Assert.Equal(first,graphics.CaptureFrame(GraphicsColor.ForgeLineClear,c=>gallery.Render(c,camera)));
+            Assert.Contains(Enumerable.Range(0,first.Length/4),i=>first[i*4]>64 || first[i*4+1]>64 || first[i*4+2]>64);
+            return first;
+        }
+    }
+
     private static byte[] Capture(string pixel)
     {
         using var platform = new WindowsPlatform();
