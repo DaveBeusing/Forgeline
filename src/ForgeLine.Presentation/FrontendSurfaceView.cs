@@ -24,7 +24,8 @@ public readonly record struct FrontendDetailLineView(
     bool CanDecrease = false,
     bool CanIncrease = false,
     bool IsHovered = false,
-    bool IsPressed = false);
+    bool IsPressed = false,
+    bool IsSelectable = false);
 
 public readonly record struct FrontendSurfaceView(
     FrontendSurfaceKind Kind,
@@ -48,6 +49,9 @@ public readonly record struct FrontendSurfaceView(
     float SplashMasterOpacity = 1f,
     bool SplashBootstrap = false)
 {
+    public FrontendGeometry? Layout { get; init; }
+    public int DetailScroll { get; init; }
+
     public static FrontendSurfaceView StudioSplash(float elapsedSeconds, float masterOpacity = 1f) =>
         new(FrontendSurfaceKind.StudioSplash, string.Empty, string.Empty,
             false, 0f, [], [], string.Empty,

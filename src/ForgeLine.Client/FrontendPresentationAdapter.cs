@@ -85,7 +85,7 @@ internal static class FrontendPresentationAdapter
             "START");
 
     internal static FrontendSurfaceView LoadGame(
-        LoadGameModel model)
+        LoadGameModel model, int visibleRows = FrontendDesign.MaximumVisibleDetailRows)
     {
         ArgumentNullException.ThrowIfNull(model);
 
@@ -102,21 +102,21 @@ internal static class FrontendPresentationAdapter
         }
 
         LoadGameEntry[] visibleEntries =
-            ResolveVisibleSaves(model);
+            ResolveVisibleSaves(model, visibleRows);
 
         FrontendDetailLineView[] lines =
             visibleEntries
                 .Select(
                     entry =>
                         new FrontendDetailLineView(
-                            FrontendDesign.FitText(entry.DisplayName, 320f, UiTypography.Style(UiTextRole.MenuItem).Size),
+                            entry.DisplayName,
                             entry.CanLoad
                                 ? $"TICK {entry.SavedTick}"
                                 : entry.State.ToString().ToUpperInvariant(),
                             !entry.CanLoad,
                             IsFocused:
                                 model.FocusedEntry is LoadGameEntry selected &&
-                                string.Equals(entry.Id, selected.Id, StringComparison.Ordinal)))
+                                string.Equals(entry.Id, selected.Id, StringComparison.Ordinal), IsSelectable: true))
                 .ToArray();
 
         return FrontendSurfaceView.Detail(
@@ -127,13 +127,13 @@ internal static class FrontendPresentationAdapter
     }
 
     private static LoadGameEntry[] ResolveVisibleSaves(
-        LoadGameModel model) =>
+        LoadGameModel model, int visibleRows) =>
         model.Entries
             .Skip(
                 model.VisibleStartIndex(
-                    FrontendDesign.MaximumVisibleDetailRows))
+                    visibleRows))
             .Take(
-                FrontendDesign.MaximumVisibleDetailRows)
+                visibleRows)
             .ToArray();
 
     internal static FrontendSurfaceView Settings(
@@ -210,7 +210,7 @@ internal static class FrontendPresentationAdapter
                 new(GraphicsSettingsText.Get("VegetationMotion"), Toggle(graphics.VegetationMotion, effective.VegetationMotion), IsFocused: focused == FrontendSettingsField.VegetationMotion, CanDecrease: true, CanIncrease: true),
                 new(GraphicsSettingsText.Get("Atmosphere"), Choice(graphics.Atmosphere, effective.Atmosphere), IsFocused: focused == FrontendSettingsField.Atmosphere, CanDecrease: true, CanIncrease: true),
                 new(GraphicsSettingsText.Get("Particles"), Choice(graphics.Particles, effective.Particles.Quality), IsFocused: focused == FrontendSettingsField.Particles, CanDecrease: true, CanIncrease: true)
-            }.Skip(interaction?.VisibleStart ?? 0).Take(7).ToArray(),
+            }.Skip(interaction?.VisibleStart ?? 0).Take(interaction?.VisibleRowCount ?? 7).ToArray(),
             displayFeedback ?? (string.IsNullOrEmpty(interaction?.BindingFeedback) ?
                 focused is { } field && (field == FrontendSettingsField.OutputResolution || field >= FrontendSettingsField.RenderQuality) ? GraphicsSettingsText.Get(field + "Help") : GraphicsSettingsText.Get("Controls") : interaction.BindingFeedback),
             interaction?.CanApply == false ? string.Empty : displayPreviewActive ? GraphicsSettingsText.Get("KeepDisplay") : "APPLY");

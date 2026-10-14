@@ -16,13 +16,12 @@ public sealed class FrontendOverlayRenderer : IDisposable
 
     private readonly IGraphicsDevice _graphics;
     private readonly UiTextBatch _text;
+    private readonly Dictionary<(string Text, float Width, float Size), string[]> _wrappedText = new();
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers = new(4);
     private OverlayVertex[] _vertices = new OverlayVertex[MaxVertices];
     private int _vertexLimit = MaxVertices;
     private int _vertexCount;
-    private float _offsetX;
-    private float _offsetY;
     private bool _disposed;
 
     public FrontendOverlayRenderer(IGraphicsDevice graphics)
@@ -33,6 +32,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
         _text = new UiTextBatch(graphics);
     }
 
+    public FrontendGeometry LastLayout { get; private set; }
     public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
     public int LastRenderedVertexCount { get; private set; }
 
@@ -59,236 +59,115 @@ public sealed class FrontendOverlayRenderer : IDisposable
             FrontendSurfaceKind.Detail => MaxDetailVertices,
             _ => MaxVertices
         };
-        _offsetX = 0f;
-        _offsetY = 0f;
-        float viewportScale = MathF.Min(
-            context.Width / 1920f,
-            context.Height / 1080f);
-        float scale = Math.Min(
-            viewportScale * Math.Min(userScale, 1f),
-            2.0f);
-        float offsetX =
-            MathF.Max(
-                0f,
-                (context.Width - 1920f * scale) * 0.5f);
-        float offsetY =
-            MathF.Max(
-                0f,
-                (context.Height - 1080f * scale) * 0.5f);
-
-        _offsetX = offsetX;
-        _offsetY = offsetY;
-
-        float transition = Math.Clamp(view.Transition, 0f, 1f);
-        float contentOffset = (1f - transition) * 18f * scale;
-
-        RenderBackdrop(context.Width, context.Height, scale, view.Kind);
-        RenderHeader(context.Width, context.Height, scale, view.Kind);
-
-        if (_graphics.SupportsUiText && !_text.Ready)
-            EmitText("UI FONT ERROR - REINSTALL FORGELINE", 94 * scale, 1034 * scale,
-                ForgeLineUiPalette.Warning, context.Width, context.Height, .8f * scale);
-
-        if (view.Kind == FrontendSurfaceKind.Loading)
+        FrontendGeometry layout = view.Layout ?? FrontendGeometry.Resolve(context.Width, context.Height, userScale,
+            controls: view.Kind == FrontendSurfaceKind.Controls);
+        if (layout.IsEmpty || layout.Width != context.Width || layout.Height != context.Height)
         {
-            EmitText("INITIALIZING COMMAND SYSTEMS", 94 * scale, 850 * scale, ForgeLineUiPalette.TextSecondary, context.Width, context.Height, scale);
-            EmitText(view.Status, 94 * scale, 890 * scale, ForgeLineUiPalette.Accent, context.Width, context.Height, scale);
-            if (!string.IsNullOrEmpty(view.Feedback))
-                EmitText(view.Feedback, 94 * scale, 982 * scale, ForgeLineUiPalette.TextMuted, context.Width, context.Height, scale);
-            if (view.HasProgress)
-            {
-                int percent =
-                    Math.Clamp(
-                        (int)MathF.Round(
-                            view.Progress * 100f),
-                        0,
-                        100);
-                EmitText(
-                    $"{percent}%",
-                    828 * scale,
-                    926 * scale,
-                    ForgeLineUiPalette.TextPrimary,
-                    context.Width,
-                    context.Height,
-                    scale);
-                EmitProgress(
-                    94 * scale,
-                    936 * scale,
-                    720 * scale,
-                    8 * scale,
-                    view.Progress,
-                    context.Width,
-                    context.Height);
-            }
+            LastRenderedVertexCount = 0;
+            return; // A resize has not yet published matching input geometry.
         }
-        else if (view.Kind is
-                     FrontendSurfaceKind.MainMenu or
-                     FrontendSurfaceKind.PauseMenu)
+        LastLayout = layout;
+        float scale = layout.Scale;
+        int width = context.Width, height = context.Height;
+        if (view.Kind != FrontendSurfaceKind.PauseMenu)
         {
-            if (view.Kind == FrontendSurfaceKind.PauseMenu)
+            for (int band = 0; band < 24; band++)
+                EmitPanel(new SurfaceRect(0, band * height / 24f, width, height / 24f + 1),
+                    Vector4.Lerp(ForgeLineUiPalette.BackgroundDeep, ForgeLineUiPalette.Background, band / 24f), width, height);
+        }
+        Panel(layout.SafeArea, ForgeLineUiPalette.Surface);
+        Text("FORGELINE", layout.Header, ForgeLineUiPalette.TextPrimary, 1.46f);
+        var tagline = layout.Header with { Y = layout.Header.Y + 54 * scale };
+        Text("BUILD. SUPPLY. CONQUER.", tagline, ForgeLineUiPalette.TextSecondary, .75f);
+        Text(view.Title, layout.Title, ForgeLineUiPalette.Accent);
+        // Decorations have their own visual-only rectangle and cannot enter a control slot.
+        if (layout.Decorative.Width > 180 * scale && view.Kind != FrontendSurfaceKind.Controls)
+        {
+            var art = layout.Decorative;
+            Panel(art, ForgeLineUiPalette.BackgroundRaised);
+            for (int i = 1; i < 8; i++)
+                Panel(art with { X = art.X + art.Width * i / 8, Width = 1 }, ForgeLineUiPalette.BorderSubtle);
+            // Retain the industrial schematic inside the reserved art viewport.
+            for (int i = 0; i < 4; i++)
             {
-                EmitText(
-                    view.Title,
-                    94 * scale + contentOffset,
-                    286 * scale,
-                    ForgeLineUiPalette.Accent,
-                    context.Width,
-                    context.Height,
-                    scale);
-                EmitPanel(
-                    new SurfaceRect(
-                        92 * scale,
-                        330 * scale,
-                        980 * scale,
-                        2 * scale),
-                    ForgeLineUiPalette.BorderSubtle,
-                    context.Width,
-                    context.Height);
+                float buildingWidth = art.Width * .15f;
+                float buildingHeight = art.Height * (.2f + (i % 3) * .08f);
+                Panel(new FrontendRegion(art.X + art.Width * (.12f + i * .2f), art.Y + art.Height * .8f - buildingHeight,
+                    buildingWidth, buildingHeight), ForgeLineUiPalette.BackgroundDeep);
             }
-
-            float y = 350 * scale;
-            int itemIndex = 0;
-            for (int menuIndex = 0; menuIndex < view.MenuEntries.Count; menuIndex++)
+            Text("TACTICAL COMMAND", art with { X = art.X + 20 * scale, Y = art.Y + 20 * scale, Width = art.Width - 40 * scale },
+                ForgeLineUiPalette.TextSecondary, .8f);
+        }
+        if (view.Kind is FrontendSurfaceKind.MainMenu or FrontendSurfaceKind.PauseMenu)
+        {
+            for (int i = 0; i < Math.Min(7, view.MenuEntries.Count); i++)
             {
-                FrontendMenuEntryView item = view.MenuEntries[menuIndex];
+                var item = view.MenuEntries[i]; var row = layout.MenuRow(i);
                 bool focused = item.IsEnabled && item.IsFocused;
-                var row = new SurfaceRect(82 * scale, y - 12 * scale, 560 * scale, 52 * scale);
-                EmitPanel(
-                    row,
-                    focused ? ForgeLineUiPalette.SurfaceActive :
-                    item.IsEnabled ? ForgeLineUiPalette.SurfaceRaised : ForgeLineUiPalette.SurfaceDisabled,
-                    context.Width, context.Height);
-                EmitPanel(
-                    new SurfaceRect(row.X, row.Y, row.Width, 1 * scale),
-                    focused ? ForgeLineUiPalette.AccentDim : ForgeLineUiPalette.BorderSubtle,
-                    context.Width, context.Height);
-                EmitPanel(
-                    new SurfaceRect(row.X, row.Y + row.Height - 1 * scale, row.Width, 1 * scale),
-                    focused ? ForgeLineUiPalette.AccentDim : ForgeLineUiPalette.BorderSubtle,
-                    context.Width, context.Height);
-                EmitPanel(
-                    new SurfaceRect(row.X, row.Y, (focused ? 5f : 2f) * scale, row.Height),
-                    focused ? ForgeLineUiPalette.Accent : ForgeLineUiPalette.BorderSubtle,
-                    context.Width, context.Height);
-
-                string number = s_menuNumbers[Math.Min(itemIndex, s_menuNumbers.Length - 1)];
-                EmitText(number, 104 * scale, y + 3 * scale,
-                    focused ? ForgeLineUiPalette.Accent : ForgeLineUiPalette.TextMuted,
-                    context.Width, context.Height, 0.76f * scale);
-                EmitText(item.Label, 158 * scale, y,
-                    focused ? ForgeLineUiPalette.TextPrimary :
-                    item.IsEnabled ? ForgeLineUiPalette.TextSecondary : ForgeLineUiPalette.TextDisabled,
-                    context.Width, context.Height, scale);
-                if (focused)
-                {
-                    EmitText("SELECT", 514 * scale, y + 3 * scale,
-                        ForgeLineUiPalette.Accent, context.Width, context.Height, 0.68f * scale);
-                    EmitPanel(
-                        new SurfaceRect(625 * scale, (y + 1 * scale), 3 * scale, 17 * scale),
-                        ForgeLineUiPalette.Accent, context.Width, context.Height);
-                }
-                else if (!item.IsEnabled)
-                {
-                    EmitText("N/A", 554 * scale, y + 3 * scale,
-                        ForgeLineUiPalette.TextDisabled, context.Width, context.Height, 0.68f * scale);
-                }
-
-                y += 72 * scale;
-                itemIndex++;
-            }
-            if (!string.IsNullOrEmpty(view.Feedback))
-            {
-                EmitText(view.Feedback, 94 * scale, 873 * scale, ForgeLineUiPalette.Warning, context.Width, context.Height, 0.82f * scale);
-            }
-
-            EmitText(view.Footer, 94 * scale, 930 * scale, ForgeLineUiPalette.TextMuted, context.Width, context.Height, 0.78f * scale);
-
-            if (view.Kind == FrontendSurfaceKind.MainMenu &&
-                !string.IsNullOrWhiteSpace(view.ProductVersion))
-            {
-                string versionLabel =
-                    $"VERSION {view.ProductVersion}";
-                float versionX =
-                    (1920f - 48f -
-                     (_text.Ready ? UiFontMetrics.Default.Measure(versionLabel, UiTypography.Style(UiTextRole.MenuItem).Size) : versionLabel.Length * GlyphAdvance)) * scale;
-
-                EmitText(
-                    versionLabel,
-                    versionX,
-                    1024f * scale,
-                    ForgeLineUiPalette.TextMuted,
-                    context.Width,
-                    context.Height,
-                    0.78f * scale);
+                Panel(row, focused ? ForgeLineUiPalette.SurfaceActive : item.IsEnabled ? ForgeLineUiPalette.SurfaceRaised : ForgeLineUiPalette.SurfaceDisabled);
+                Panel(row with { Width = (focused ? 5 : 2) * scale }, focused ? ForgeLineUiPalette.Accent : ForgeLineUiPalette.BorderSubtle);
+                Text(s_menuNumbers[i], row with { X = row.X + 22 * scale, Y = row.Y + 15 * scale, Width = 40 * scale }, ForgeLineUiPalette.TextMuted, .76f);
+                Text(item.Label, row with { X = row.X + 76 * scale, Y = row.Y + 12 * scale, Width = row.Width - 220 * scale },
+                    focused ? ForgeLineUiPalette.TextPrimary : item.IsEnabled ? ForgeLineUiPalette.TextSecondary : ForgeLineUiPalette.TextDisabled);
+                if (focused || !item.IsEnabled)
+                    Text(focused ? "SELECT" : "N/A", row with { X = row.Right - 128 * scale, Y = row.Y + 15 * scale, Width = 110 * scale },
+                        focused ? ForgeLineUiPalette.Accent : ForgeLineUiPalette.TextDisabled, .68f);
             }
         }
         else if (view.Kind is FrontendSurfaceKind.Detail or FrontendSurfaceKind.Controls)
         {
-            bool controls = view.Kind == FrontendSurfaceKind.Controls;
-            EmitText(view.Title, 94 * scale + contentOffset, 286 * scale, ForgeLineUiPalette.Accent, context.Width, context.Height, scale);
-            EmitPanel(new SurfaceRect(92 * scale, 330 * scale, (controls ? 1740 : 980) * scale, 2 * scale), ForgeLineUiPalette.BorderSubtle, context.Width, context.Height);
-
-            float y = 390 * scale;
-            foreach (FrontendDetailLineView line in view.DetailLines)
+            int start = Math.Clamp(view.DetailScroll, 0, Math.Max(0, view.DetailLines.Count - layout.VisibleDetailRows));
+            int count = Math.Min(layout.VisibleDetailRows, view.DetailLines.Count - start);
+            for (int i = 0; i < count; i++)
             {
-                var detailRow = new SurfaceRect(92 * scale, y - 13 * scale, 980 * scale, (controls ? 43f : 48f) * scale);
-                Vector4 rowPanel = line.IsPressed
-                    ? ForgeLineUiPalette.SurfacePressed
-                    : line.IsFocused
-                        ? ForgeLineUiPalette.SurfaceActive
-                        : line.IsHovered
-                            ? ForgeLineUiPalette.SurfaceHover
-                            : ForgeLineUiPalette.SurfaceRaised;
-                EmitPanel(detailRow, rowPanel, context.Width, context.Height);
-                EmitPanel(
-                    new SurfaceRect(detailRow.X, detailRow.Y + detailRow.Height - scale, detailRow.Width, scale),
-                    ForgeLineUiPalette.BorderSubtle, context.Width, context.Height);
-                if (line.IsFocused || line.IsHovered)
+                var line = view.DetailLines[start + i]; var row = layout.DetailRow(i);
+                Panel(row, line.IsPressed ? ForgeLineUiPalette.SurfacePressed : line.IsFocused ? ForgeLineUiPalette.SurfaceActive :
+                    line.IsHovered ? ForgeLineUiPalette.SurfaceHover : ForgeLineUiPalette.SurfaceRaised);
+                if (line.IsFocused || line.IsHovered) Panel(row with { Width = 4 * scale }, ForgeLineUiPalette.Accent);
+                Text(line.Label, layout.DetailLabel(i), ForgeLineUiPalette.TextSecondary);
+                var valueSlot = layout.DetailValue(i, line.CanDecrease || line.CanIncrease);
+                Vector4 color = line.IsWarning ? ForgeLineUiPalette.Warning : line.IsFocused ? ForgeLineUiPalette.Accent : ForgeLineUiPalette.TextPrimary;
+                if (layout.Controls)
                 {
-                    EmitPanel(
-                        new SurfaceRect(detailRow.X, detailRow.Y, 4 * scale, detailRow.Height),
-                        ForgeLineUiPalette.Accent, context.Width, context.Height);
+                    var wrapped = Wrap(line.Value, valueSlot.Width / scale, 22);
+                    for (int lineIndex = 0; lineIndex < Math.Min(3, wrapped.Length); lineIndex++)
+                        Text(wrapped[lineIndex], valueSlot with { Y = valueSlot.Y + lineIndex * 27 * scale }, color);
                 }
-
-                Vector4 valueColor = line.IsWarning
-                    ? ForgeLineUiPalette.Warning
-                    : line.IsFocused
-                        ? ForgeLineUiPalette.Accent
-                        : ForgeLineUiPalette.TextPrimary;
-                float valueScale = controls
-                    ? MathF.Min(scale, 1370f * scale / MathF.Max(1f, (_text.Ready ? UiFontMetrics.Default.Measure(line.Value, UiTypography.Style(UiTextRole.MenuItem).Size) : line.Value.Length * GlyphAdvance)))
-                    : scale;
-                EmitText(line.Label, 112 * scale, y, controls
-                    ? ForgeLineUiPalette.TextSecondary
-                    : ForgeLineUiPalette.TextMuted, context.Width, context.Height, scale, maximumWidth: 320);
-                EmitText(line.Value, 460 * scale, y, valueColor, context.Width, context.Height, valueScale,
-                    maximumWidth: controls ? 1370f * scale / valueScale : line.CanDecrease || line.CanIncrease ? 340 : 1370);
-
-                if (line.CanDecrease)
-                {
-                    EmitControlButton("-", 830 * scale, (y - 13 * scale), 72 * scale, 42 * scale, context.Width, context.Height, scale);
-                }
-
-                if (line.CanIncrease)
-                {
-                    EmitControlButton("+", 916 * scale, (y - 13 * scale), 72 * scale, 42 * scale, context.Width, context.Height, scale);
-                }
-
-                y += (controls ? 44 : 58) * scale;
+                else Text(line.Value, valueSlot, color);
+                if (line.CanDecrease) Button("-", layout.Decrease(i));
+                if (line.CanIncrease) Button("+", layout.Increase(i));
             }
-
-            if (!string.IsNullOrEmpty(view.PrimaryAction))
-            {
-                EmitActionButton(view.PrimaryAction, 782 * scale, 838 * scale, 290 * scale, 58 * scale, true, view.PrimaryHovered, view.PrimaryPressed, context.Width, context.Height, scale);
-            }
-
-            if (!string.IsNullOrEmpty(view.SecondaryAction))
-            {
-                EmitActionButton(view.SecondaryAction, 92 * scale, 838 * scale, 220 * scale, 58 * scale, false, view.SecondaryHovered, view.SecondaryPressed, context.Width, context.Height, scale);
-            }
-
-            EmitText(view.Footer, 94 * scale, 930 * scale, ForgeLineUiPalette.TextMuted, context.Width, context.Height, scale);
+            if (view.DetailLines.Count > count)
+                Text($"{start + 1}-{start + count} / {view.DetailLines.Count}  UP/DOWN / WHEEL", layout.Title with { X = layout.Title.X + layout.Title.Width * .42f, Width = layout.Title.Width * .58f }, ForgeLineUiPalette.TextMuted, .65f);
+            if (!string.IsNullOrEmpty(view.PrimaryAction)) Action(view.PrimaryAction, layout.PrimaryAction, true, view.PrimaryHovered, view.PrimaryPressed);
+            if (!string.IsNullOrEmpty(view.SecondaryAction)) Action(view.SecondaryAction, layout.SecondaryAction, false, view.SecondaryHovered, view.SecondaryPressed);
         }
+        else if (view.Kind == FrontendSurfaceKind.Loading)
+        {
+            Text("INITIALIZING COMMAND SYSTEMS", layout.Title, ForgeLineUiPalette.TextSecondary);
+            Text(view.Status, layout.Details, ForgeLineUiPalette.Accent);
+            if (view.HasProgress)
+            {
+                var r = layout.PrimaryAction;
+                EmitProgress(layout.Details.X, r.Y, layout.Details.Width, 8 * scale, view.Progress, width, height);
+                Text($"{Math.Clamp((int)(view.Progress * 100), 0, 100)}%", layout.Feedback, ForgeLineUiPalette.TextPrimary);
+            }
+        }
+        var footerLines = Wrap(view.Footer, layout.Footer.Width / scale, 22 * .78f);
+        for (int i = 0; i < Math.Min(2, footerLines.Length); i++)
+            Text(footerLines[i], layout.Footer with { Y = layout.Footer.Y + i * 24 * scale }, ForgeLineUiPalette.TextMuted, .78f);
+        if (!string.IsNullOrEmpty(view.Feedback)) Text(view.Feedback, layout.Feedback, ForgeLineUiPalette.Warning, .8f);
+        if (!string.IsNullOrEmpty(view.ProductVersion))
+            Text($"VERSION {view.ProductVersion}", layout.Footer with { Y = height - 40 * scale }, ForgeLineUiPalette.TextMuted, .65f);
+        if (_graphics.SupportsUiText && !_text.Ready)
+            Text("UI FONT ERROR - REINSTALL FORGELINE", layout.Feedback, ForgeLineUiPalette.Warning, .8f);
+
+        void Panel(FrontendRegion r, Vector4 color) => EmitPanel(new SurfaceRect(r.X, r.Y, r.Width, r.Height), color, width, height);
+        void Text(string text, FrontendRegion r, Vector4 color, float factor = 1) =>
+            EmitText(text, r.X, r.Y, color, width, height, scale * factor, r.Width / (scale * factor));
+        void Button(string label, FrontendRegion r) => EmitControlButton(label, r.X, r.Y, r.Width, r.Height, width, height, scale);
+        void Action(string label, FrontendRegion r, bool primary, bool hovered, bool pressed) =>
+            EmitActionButton(label, r.X, r.Y, r.Width, r.Height, primary, hovered, pressed, width, height, scale);
 
         if (_vertexCount == 0)
         {
@@ -315,136 +194,14 @@ public sealed class FrontendOverlayRenderer : IDisposable
         _disposed = true;
     }
 
-    private void RenderBackdrop(int width, int height, float scale, FrontendSurfaceKind kind)
+    private string[] Wrap(string text, float width, float size)
     {
-        if (kind == FrontendSurfaceKind.PauseMenu)
-        {
-            EmitPanel(new SurfaceRect(64 * scale, 54 * scale, 1040 * scale, 972 * scale),
-                ForgeLineUiPalette.Surface, width, height);
-            EmitPanel(new SurfaceRect(64 * scale, 54 * scale, 1040 * scale, 2 * scale),
-                ForgeLineUiPalette.AccentDim, width, height);
-            EmitPanel(new SurfaceRect(64 * scale, 54 * scale, 2 * scale, 972 * scale),
-                ForgeLineUiPalette.Border, width, height);
-            return;
-        }
-
-        // A bounded set of wide color bands gives the menu an intentional
-        // dark-to-light hierarchy without textures or runtime asset dependencies.
-        const int bandCount = 24;
-        for (int band = 0; band < bandCount; band++)
-        {
-            float t = band / (float)(bandCount - 1);
-            Vector4 color = Vector4.Lerp(
-                ForgeLineUiPalette.BackgroundDeep,
-                ForgeLineUiPalette.Background,
-                t * 0.95f);
-            EmitPanel(new SurfaceRect(0, band * 45 * scale, 1920 * scale, 45 * scale),
-                color, width, height);
-        }
-
-        EmitPanel(new SurfaceRect(0, 0, 10 * scale, 1080 * scale),
-            ForgeLineUiPalette.AccentDim, width, height);
-        EmitPanel(new SurfaceRect(80 * scale, 168 * scale, 1760 * scale, scale),
-            ForgeLineUiPalette.BorderSubtle, width, height);
-        EmitPanel(new SurfaceRect(80 * scale, 1007 * scale, 1760 * scale, scale),
-            ForgeLineUiPalette.BorderSubtle, width, height);
-
-        if (kind == FrontendSurfaceKind.MainMenu)
-        {
-            RenderMenuComposition(width, height, scale);
-        }
-        else if (kind is FrontendSurfaceKind.Detail or FrontendSurfaceKind.Controls)
-        {
-            bool controls = kind == FrontendSurfaceKind.Controls;
-            EmitPanel(new SurfaceRect(68 * scale, 251 * scale, (controls ? 1770 : 1032) * scale, 700 * scale),
-                ForgeLineUiPalette.Surface, width, height);
-            EmitPanel(new SurfaceRect(68 * scale, 251 * scale, 5 * scale, 700 * scale),
-                ForgeLineUiPalette.Border, width, height);
-            if (!controls)
-            {
-                RenderTechnicalGrid(1200f, 255f, 625f, 605f, width, height, scale);
-                EmitText("TACTICAL COMMAND", 1244 * scale, 310 * scale,
-                    ForgeLineUiPalette.TextSecondary, width, height, 0.94f * scale);
-                EmitText("BUILD / SUPPLY / CONQUER", 1244 * scale, 365 * scale,
-                    ForgeLineUiPalette.AccentDim, width, height, 0.76f * scale);
-            }
-        }
-    }
-
-    private void RenderHeader(int width, int height, float scale, FrontendSurfaceKind kind)
-    {
-        EmitPanel(new SurfaceRect(91 * scale, 77 * scale, 6 * scale, 74 * scale),
-            ForgeLineUiPalette.Accent, width, height);
-        EmitText("FORGELINE", 119 * scale, 80 * scale,
-            ForgeLineUiPalette.TextPrimary, width, height, 1.46f * scale);
-        EmitText("BUILD. SUPPLY. CONQUER.", 121 * scale, 134 * scale,
-            ForgeLineUiPalette.TextSecondary, width, height, 0.75f * scale);
-        if (kind is FrontendSurfaceKind.MainMenu or FrontendSurfaceKind.Loading)
-        {
-            EmitText("STRATEGIC OPERATIONS", 1518 * scale, 110 * scale,
-                ForgeLineUiPalette.TextMuted, width, height, 0.8f * scale);
-        }
-    }
-
-    private void RenderMenuComposition(int width, int height, float scale)
-    {
-        EmitPanel(new SurfaceRect(66 * scale, 263 * scale, 610 * scale, 593 * scale),
-            ForgeLineUiPalette.Surface, width, height);
-        EmitPanel(new SurfaceRect(66 * scale, 263 * scale, 4 * scale, 593 * scale),
-            ForgeLineUiPalette.AccentDim, width, height);
-        EmitText("OPERATIONS", 91 * scale, 291 * scale,
-            ForgeLineUiPalette.Accent, width, height, 0.9f * scale);
-        EmitText("SELECT AN ACTION", 91 * scale, 321 * scale,
-            ForgeLineUiPalette.TextMuted, width, height, 0.65f * scale);
-        RenderTechnicalGrid(750f, 241f, 1090f, 640f, width, height, scale);
-
-        // Industrial skyline rendered as an understated diagram, not a false
-        // gameplay preview. Geometry remains behind the functional menu.
-        EmitPanel(new SurfaceRect(885 * scale, 682 * scale, 820 * scale, 165 * scale),
-            ForgeLineUiPalette.BackgroundRaised, width, height);
-        EmitPanel(new SurfaceRect(1010 * scale, 553 * scale, 168 * scale, 129 * scale),
-            ForgeLineUiPalette.BackgroundRaised, width, height);
-        EmitPanel(new SurfaceRect(1248 * scale, 601 * scale, 206 * scale, 81 * scale),
-            ForgeLineUiPalette.BackgroundRaised, width, height);
-        EmitPanel(new SurfaceRect(1510 * scale, 536 * scale, 128 * scale, 146 * scale),
-            ForgeLineUiPalette.BackgroundRaised, width, height);
-        EmitPanel(new SurfaceRect(1045 * scale, 457 * scale, 8 * scale, 96 * scale),
-            ForgeLineUiPalette.BorderSubtle, width, height);
-        EmitPanel(new SurfaceRect(1548 * scale, 407 * scale, 7 * scale, 129 * scale),
-            ForgeLineUiPalette.BorderSubtle, width, height);
-        EmitPanel(new SurfaceRect(903 * scale, 680 * scale, 791 * scale, 2 * scale),
-            ForgeLineUiPalette.AccentDim, width, height);
-        EmitPanel(new SurfaceRect(885 * scale, 846 * scale, 820 * scale, 3 * scale),
-            ForgeLineUiPalette.Border, width, height);
-        EmitText("INDUSTRIAL WARFARE", 882 * scale, 296 * scale,
-            ForgeLineUiPalette.TextPrimary, width, height, 1.10f * scale);
-        EmitText("COMMAND / PRODUCTION / LOGISTICS", 884 * scale, 350 * scale,
-            ForgeLineUiPalette.TextSecondary, width, height, 0.78f * scale);
-        EmitText("EXTRACT. MANUFACTURE. ADVANCE.", 892 * scale, 901 * scale,
-            ForgeLineUiPalette.Accent, width, height, 0.75f * scale);
-    }
-
-    private void RenderTechnicalGrid(
-        float x, float y, float widthPx, float heightPx,
-        int viewportWidth, int viewportHeight, float scale)
-    {
-        EmitPanel(new SurfaceRect(x * scale, y * scale, widthPx * scale, heightPx * scale),
-            ForgeLineUiPalette.Background, viewportWidth, viewportHeight);
-        const float spacing = 80f;
-        for (float column = spacing; column < widthPx; column += spacing)
-        {
-            EmitPanel(new SurfaceRect((x + column) * scale, y * scale, scale, heightPx * scale),
-                ForgeLineUiPalette.BorderSubtle, viewportWidth, viewportHeight);
-        }
-        for (float row = spacing; row < heightPx; row += spacing)
-        {
-            EmitPanel(new SurfaceRect(x * scale, (y + row) * scale, widthPx * scale, scale),
-                ForgeLineUiPalette.BorderSubtle, viewportWidth, viewportHeight);
-        }
-        EmitPanel(new SurfaceRect(x * scale, y * scale, widthPx * scale, 2 * scale),
-            ForgeLineUiPalette.Border, viewportWidth, viewportHeight);
-        EmitPanel(new SurfaceRect(x * scale, (y + heightPx - 2f) * scale, widthPx * scale, 2 * scale),
-            ForgeLineUiPalette.Border, viewportWidth, viewportHeight);
+        var key = (text, width, size);
+        if (_wrappedText.TryGetValue(key, out var lines)) return lines;
+        if (_wrappedText.Count >= 64) _wrappedText.Clear();
+        lines = UiFontMetrics.Default.Wrap(text, width, size);
+        _wrappedText.Add(key, lines);
+        return lines;
     }
 
     private void EmitControlButton(string label, float x, float y, float width, float height, int viewportWidth, int viewportHeight, float scale)
@@ -482,8 +239,8 @@ public sealed class FrontendOverlayRenderer : IDisposable
 
     private void EmitPanel(SurfaceRect rect, Vector4 color, int width, int height)
     {
-        float x = MathF.Round(rect.X + _offsetX);
-        float y = MathF.Round(rect.Y + _offsetY);
+        float x = MathF.Round(rect.X);
+        float y = MathF.Round(rect.Y);
         float rectWidth = MathF.Max(1f, MathF.Round(rect.Width));
         float rectHeight = MathF.Max(1f, MathF.Round(rect.Height));
         float left = x / width * 2 - 1;
@@ -496,10 +253,13 @@ public sealed class FrontendOverlayRenderer : IDisposable
 
     private void EmitText(string text, float x, float y, Vector4 color, int width, int height, float scale, float maximumWidth = float.MaxValue)
     {
-        if (_text.Add(text, x + _offsetX, y + _offsetY, UiTypography.Style(text == "FORGELINE" ? UiTextRole.CommandTitle : UiTextRole.MenuItem).Size * scale, color, width, height,
+        if (_text.Add(text, x, y, UiTypography.Style(text == "FORGELINE" ? UiTextRole.CommandTitle : UiTextRole.MenuItem).Size * scale, color, width, height,
             maximumWidth: maximumWidth == float.MaxValue ? maximumWidth : maximumWidth * scale,
             bold: text == "FORGELINE" || color == ForgeLineUiPalette.Warning)) return;
 
+        // Bootstrap bitmap fallback obeys the same bounded text slot.
+        int maximumCharacters = maximumWidth == float.MaxValue ? text.Length : Math.Max(0, (int)(maximumWidth / GlyphAdvance));
+        if (text.Length > maximumCharacters) text = text[..maximumCharacters];
         float cursor = x;
         foreach (char character in text.ToUpperInvariant())
         {

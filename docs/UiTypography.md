@@ -26,7 +26,7 @@ Use `UiTypography.Style` for shared role defaults and the existing semantic pale
 
 ASCII, Latin-1/Extended-A, selected Greek/Cyrillic, German diacritics, punctuation, arrows, percentages, digits and a visible replacement glyph are bundled. Common decomposed Latin accents compose during scalar traversal. Unsupported characters, including emoji, display U+FFFD and increment rendering diagnostics. This is left-to-right layout with kerning and common accent composition; Arabic/Indic shaping, bidi and full global-script coverage require a later explicit shaping contract.
 
-Frontend reference geometry and pointer mapping use the same viewport-fit scale. User scale is capped at the scale that fits the reference canvas; it no longer expands controls beyond the viewport. Gameplay retains its existing DPI-aware region layout. Detail labels and values use measured width budgets, and the renderer clips glyph quads to the viewport and supplied right edge. Full descriptions remain available through their existing detail/tooltip models. No gameplay or input authority moved into rendering.
+Frontend rendering and pointer mapping consume the same published adaptive physical-pixel geometry, including actual window DPI and user scale. Density fit limits preserve menu/actions and scroll long lists; see [frontend layout](FrontendLayout.md). Gameplay retains its separate DPI-aware region layout. Detail labels and values use measured width budgets, and the renderer clips glyph quads to the viewport and supplied right edge. Full descriptions remain available through their existing detail/tooltip models. No gameplay or input authority moved into rendering.
 
 ## Ownership, performance and failures
 
@@ -48,4 +48,4 @@ dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks -c Release -- --g
 ./ForgeLine.Client.exe --ui-typography-capture <empty-output-directory> <runtime-root>
 ```
 
-The native capture command renders menu/HUD over the complete resolution × DPI-layout × UI-scale matrix, checks repeated pixels and missing/dropped glyphs, and exports representative PNGs plus settings/loading/controls/pause. DPI values are requested HUD sampling values; the report separately records actual window DPI. This is not physical-monitor DPI certification. Capture/readback duration includes waits and is not isolated text GPU timing.
+The native capture command renders menu/HUD over the complete resolution × DPI-layout × UI-scale matrix, checks repeated pixels and missing/dropped glyphs, and exports representative PNGs plus settings/loading/controls/pause. DPI values are requested frontend/HUD layout sampling values; the report separately records actual window DPI. This is not physical-monitor DPI certification. Capture/readback duration includes waits and is not isolated text GPU timing.

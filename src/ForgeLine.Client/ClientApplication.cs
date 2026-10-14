@@ -524,6 +524,8 @@ internal sealed class ClientApplication
         ulong pendingPlacementHostSequence = 0;
         var hoverTooltip = new HoverTooltipController();
         bool helpPointerHeld = false;
+        var modalLifetime = new FrontendInputLifetime();
+        int controlsScroll = 0;
         bool pauseMenuUpHeld = false;
         bool pauseMenuDownHeld = false;
         bool pauseMenuEnterHeld = false;
@@ -616,6 +618,19 @@ internal sealed class ClientApplication
             guidanceInteraction.Update(inputState, renderWorld.CurrentSnapshot?.SessionId ?? SimulationSessionId.None,
                 _settings.ShowOnboarding && !smokeTest && !wasShellBlocking && window.IsFocused &&
                 renderWorld.CurrentSnapshot?.PlayerExperience is { IsMatchComplete: false });
+            FrontendLayout modalLayout = FrontendDesign.ResolveLayout(window.ClientSize.Width, window.ClientSize.Height,
+                _settings.UiScale, window.Dpi, helpController.Visible || pauseControlsVisible);
+            if (modalLifetime.Update(inputState, modalLayout.Geometry, pauseMenuActive ? (pauseControlsVisible ? 2 : 1) : helpController.Visible ? 3 : 0,
+                window.IsFocused && !window.IsMinimized && !window.ClientSize.IsEmpty))
+            {
+                helpPointerHeld = pauseMenuPrimaryPointerHeld = false;
+                controlsScroll = 0;
+            }
+            if (helpController.Visible || pauseControlsVisible)
+            {
+                if (inputState.WasKeyPressed(PlatformKey.Down) || inputState.WheelDelta < 0) controlsScroll++;
+                if (inputState.WasKeyPressed(PlatformKey.Up) || inputState.WheelDelta > 0) controlsScroll = Math.Max(0, controlsScroll - 1);
+            }
             bool helpPointerDown = inputState.IsMouseButtonDown(PlatformMouseButton.Left);
             bool helpPointerPressed = helpPointerDown && !helpPointerHeld;
             helpPointerHeld = helpPointerDown;
@@ -623,8 +638,7 @@ internal sealed class ClientApplication
             if (helpController.Visible && helpPointerPressed && inputState.HasPointerPosition &&
                 !window.ClientSize.IsEmpty)
             {
-                FrontendLayout helpLayout = FrontendDesign.ResolveLayout(
-                    window.ClientSize.Width, window.ClientSize.Height, Math.Min(_settings.UiScale, 1f));
+                FrontendLayout helpLayout = modalLayout;
                 if (FrontendHitTesting.SecondaryAction(inputState.PointerPosition.X, inputState.PointerPosition.Y, helpLayout) ||
                     FrontendHitTesting.Footer(inputState.PointerPosition.X, inputState.PointerPosition.Y, helpLayout))
                 {
@@ -736,11 +750,7 @@ internal sealed class ClientApplication
             if (pauseMenuActive &&
                 !inputMatchTerminal)
             {
-                FrontendLayout pauseLayout =
-                    FrontendDesign.ResolveLayout(
-                        window.ClientSize.Width,
-                        window.ClientSize.Height,
-                        pauseControlsVisible ? Math.Min(_settings.UiScale, 1f) : _settings.UiScale);
+                FrontendLayout pauseLayout = modalLayout;
                 bool pointerDown =
                     inputState.IsMouseButtonDown(
                         PlatformMouseButton.Left);
@@ -781,7 +791,7 @@ internal sealed class ClientApplication
                 }
                 else
                 {
-                    if (inputState.HasPointerPosition)
+                    if (inputState.HasPointerPosition && (inputState.PointerDelta != Vector2.Zero || pointerPressed))
                     {
                         string? hoveredId =
                             FrontendHitTesting.PauseMenu(
@@ -1042,11 +1052,7 @@ internal sealed class ClientApplication
                             FrontendPresentationAdapter.Controls(
                                 _settings.CameraBindings,
                                 "ESC  BACK TO PAUSE", _settings.EdgeScrollEnabled, gameplay: _gameplayBindings);
-                        FrontendLayout pauseLayout =
-                            FrontendDesign.ResolveLayout(
-                                window.ClientSize.Width,
-                                window.ClientSize.Height,
-                                Math.Min(_settings.UiScale, 1f));
+                        FrontendLayout pauseLayout = modalLayout;
                         bool secondaryHovered =
                             inputState.HasPointerPosition &&
                             FrontendHitTesting.SecondaryAction(
@@ -1086,6 +1092,15 @@ internal sealed class ClientApplication
                         _settings.CameraBindings, "F1 / F12 / ESC  CLOSE", _settings.EdgeScrollEnabled, gameplay: _gameplayBindings);
                 }
 
+                if (frontendSurface is FrontendSurfaceView modalSurface)
+                {
+                    var geometry = modalLayout.Geometry;
+                    if (geometry.Controls != (modalSurface.Kind == FrontendSurfaceKind.Controls))
+                        geometry = FrontendGeometry.Resolve(window.ClientSize.Width, window.ClientSize.Height, _settings.UiScale,
+                            window.Dpi, modalSurface.Kind == FrontendSurfaceKind.Controls);
+                    controlsScroll = Math.Clamp(controlsScroll, 0, Math.Max(0, modalSurface.DetailLines.Count - geometry.VisibleDetailRows));
+                    frontendSurface = modalSurface with { Layout = geometry, DetailScroll = controlsScroll };
+                }
                 _ = renderHost.Publish(
                     new ClientRenderFrame(
                         camera.CaptureState(),
@@ -3012,6 +3027,8 @@ internal sealed class ClientApplication
             new MainMenuModel(
                 loadGame.CanContinue);
         var input = new InputState();
+        var frontendLifetime = new FrontendInputLifetime();
+        int detailScroll = 0;
         bool enterHeld = false;
         bool escapeHeld = false;
         bool upHeld = false;
@@ -3050,6 +3067,20 @@ internal sealed class ClientApplication
             if (menuSmoke && _startup.ApplicationReadiness == StartupReadiness.Ready)
                 return FrontendSessionSelectionResult.Exit();
 
+            FrontendLayout frontendLayout = FrontendDesign.ResolveLayout(window.ClientSize.Width,
+                window.ClientSize.Height, settings.Settings.UiScale, window.Dpi, shell.Screen == GameFrontendScreen.Controls);
+            if (frontendLifetime.Update(input, frontendLayout.Geometry, (int)shell.Screen,
+                window.IsFocused && !window.IsMinimized && !window.ClientSize.IsEmpty))
+            {
+                primaryPointerHeld = enterHeld = escapeHeld = upHeld = downHeld = leftHeld = rightHeld = false;
+            }
+            if (frontendLayout.Geometry.IsEmpty || window.IsMinimized)
+            {
+                renderer.UpdateSurface(window.ClientSize.Width, window.ClientSize.Height, true);
+                _platform.WaitForEvents(IdleWait);
+                continue;
+            }
+            settingsInteraction.VisibleCapacity = frontendLayout.Geometry.VisibleDetailRows;
             bool enter =
                 ConsumeKeyPress(
                     input,
@@ -3087,6 +3118,7 @@ internal sealed class ClientApplication
                 transitionScreen = shell.Screen;
                 transitionStarted = Stopwatch.GetTimestamp();
                 frontendFeedback = string.Empty;
+                detailScroll = 0;
             }
 
             float transition =
@@ -3095,15 +3127,10 @@ internal sealed class ClientApplication
                         transitionStarted).TotalMilliseconds / 140f,
                     0f,
                     1f);
-            FrontendLayout frontendLayout =
-                FrontendDesign.ResolveLayout(
-                    window.ClientSize.Width,
-                    window.ClientSize.Height,
-                    shell.Screen == GameFrontendScreen.Controls ? Math.Min(_settings.UiScale, 1f) : _settings.UiScale);
 
             if (shell.Screen == GameFrontendScreen.MainMenu)
             {
-                if (input.HasPointerPosition)
+                if (input.HasPointerPosition && (input.PointerDelta != Vector2.Zero || primaryPointerPressed))
                 {
                     string? hoveredId =
                         FrontendHitTesting.MainMenu(
@@ -3197,7 +3224,7 @@ internal sealed class ClientApplication
                         input.PointerPosition.X,
                         input.PointerPosition.Y,
                             frontendLayout,
-                        3) is int seedDirection)
+                        FrontendPresentationAdapter.NewGame(newGame)) is int seedDirection)
                 {
                     newGame.SetSeed(
                         seedDirection < 0
@@ -3224,16 +3251,16 @@ internal sealed class ClientApplication
             }
             else if (shell.Screen == GameFrontendScreen.LoadGame)
             {
-                if (input.HasPointerPosition &&
+                if (input.HasPointerPosition && (primaryPointerPressed || input.PointerDelta != Vector2.Zero) &&
                     FrontendHitTesting.DetailRow(
                         input.PointerPosition.X,
                         input.PointerPosition.Y,
                             frontendLayout,
-                        loadGame.Entries.Count) is int saveRow)
+                        Math.Min(loadGame.Entries.Count, frontendLayout.Geometry.VisibleDetailRows)) is int saveRow)
                 {
                     loadGame.FocusVisible(
                         saveRow,
-                        FrontendDesign.MaximumVisibleDetailRows);
+                        frontendLayout.Geometry.VisibleDetailRows);
                 }
                 if (ConsumeKeyPress(
                         input,
@@ -3252,7 +3279,7 @@ internal sealed class ClientApplication
                 }
 
                 bool loadActionClicked =
-                    primaryPointerPressed &&
+                    loadGame.TryGetFocusedLoadTarget(out _) && primaryPointerPressed &&
                     input.HasPointerPosition &&
                     FrontendHitTesting.PrimaryAction(
                         input.PointerPosition.X,
@@ -3280,9 +3307,11 @@ internal sealed class ClientApplication
                     if (input.HasPointerPosition && FrontendHitTesting.DetailRow(input.PointerPosition.X,
                         input.PointerPosition.Y, frontendLayout, settingsInteraction.VisibleRowCount) is int settingsRow)
                     {
+                        var settingsLine = FrontendPresentationAdapter.Settings(settings, settingsInteraction).DetailLines[settingsRow];
                         if (primaryPointerPressed) settingsInteraction.FocusVisible(settingsRow);
                         if (primaryPointerPressed && FrontendHitTesting.DetailAdjust(input.PointerPosition.X,
-                            input.PointerPosition.Y, frontendLayout, settingsInteraction.VisibleRowCount) is int settingsDirection)
+                            input.PointerPosition.Y, frontendLayout, settingsInteraction.VisibleRowCount) is int settingsDirection &&
+                            (settingsDirection < 0 ? settingsLine.CanDecrease : settingsLine.CanIncrease))
                             settingsInteraction.Adjust(settings, settingsDirection);
                     }
                     if (ConsumeKeyPress(input, PlatformKey.Up, ref upHeld)) settingsInteraction.MovePrevious();
@@ -3339,6 +3368,18 @@ internal sealed class ClientApplication
                 }
             }
 
+            if (input.WheelDelta != 0)
+            {
+                if (shell.Screen == GameFrontendScreen.Settings)
+                { if (input.WheelDelta < 0) settingsInteraction.MoveNext(); else settingsInteraction.MovePrevious(); }
+                if (shell.Screen == GameFrontendScreen.LoadGame)
+                { if (input.WheelDelta < 0) loadGame.MoveNext(); else loadGame.MovePrevious(); }
+            }
+            if (shell.Screen is GameFrontendScreen.Controls or GameFrontendScreen.Credits)
+            {
+                if (ConsumeKeyPress(input, PlatformKey.Up, ref upHeld) || input.WheelDelta > 0) detailScroll = Math.Max(0, detailScroll - 1);
+                if (ConsumeKeyPress(input, PlatformKey.Down, ref downHeld) || input.WheelDelta < 0) detailScroll++;
+            }
             if ((escape ||
                  (primaryPointerPressed &&
                   input.HasPointerPosition &&
@@ -3371,10 +3412,21 @@ internal sealed class ClientApplication
                     settings,
                     settingsInteraction,
                     _settings.CameraBindings,
-                    _settings.EdgeScrollEnabled, gameplay: _gameplayBindings, settingsFeedback: displayFeedback, displayPreviewActive: displayPreview.Active);
+                    _settings.EdgeScrollEnabled, gameplay: _gameplayBindings, settingsFeedback: displayFeedback, displayPreviewActive: displayPreview.Active, visibleRows: frontendLayout.Geometry.VisibleDetailRows);
+            var publishedLayout = FrontendDesign.ResolveLayout(window.ClientSize.Width, window.ClientSize.Height,
+                settings.Settings.UiScale, window.Dpi, surface.Kind == FrontendSurfaceKind.Controls);
+            if (publishedLayout != frontendLayout || shell.Screen != transitionScreen)
+            {
+                input.SuppressHeldInput();
+                frontendLayout = publishedLayout;
+            }
+            detailScroll = Math.Clamp(detailScroll, 0, Math.Max(0, surface.DetailLines.Count - frontendLayout.Geometry.VisibleDetailRows));
+            surface = surface with { Layout = frontendLayout.Geometry, DetailScroll = detailScroll };
             if (input.HasPointerPosition &&
                 shell.Screen != GameFrontendScreen.MainMenu)
             {
+                surface = FrontendHitTesting.WithDetailPointer(surface, frontendLayout,
+                    input.PointerPosition.X, input.PointerPosition.Y, primaryPointerDown);
                 bool primaryHovered =
                     FrontendHitTesting.PrimaryAction(
                         input.PointerPosition.X,
@@ -3441,7 +3493,7 @@ internal sealed class ClientApplication
         SettingsModel settings,
         SettingsInteractionModel settingsInteraction,
         RtsCameraBindings cameraBindings,
-        bool edgeScrollEnabled, GameplayBindingRegistry? gameplay = null, string? settingsFeedback = null, bool displayPreviewActive = false) =>
+        bool edgeScrollEnabled, GameplayBindingRegistry? gameplay = null, string? settingsFeedback = null, bool displayPreviewActive = false, int visibleRows = FrontendDesign.MaximumVisibleDetailRows) =>
         screen switch
         {
             GameFrontendScreen.MainMenu =>
@@ -3452,7 +3504,7 @@ internal sealed class ClientApplication
                     newGame),
             GameFrontendScreen.LoadGame =>
                 FrontendPresentationAdapter.LoadGame(
-                    loadGame),
+                    loadGame, visibleRows),
             GameFrontendScreen.Settings =>
                 FrontendPresentationAdapter.Settings(
                     settings,

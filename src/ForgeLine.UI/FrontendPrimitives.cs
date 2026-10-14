@@ -18,24 +18,10 @@ public static class FrontendDesign
     public static FrontendLayout ResolveLayout(
         float viewportWidth,
         float viewportHeight,
-        float userScale = 1f)
+        float userScale = 1f, float dpi = 96f, bool controls = false)
     {
-        float scale =
-            ResolveScale(
-                viewportWidth,
-                viewportHeight,
-                userScale);
-        float contentWidth =
-            ReferenceWidth * scale;
-        float contentHeight =
-            ReferenceHeight * scale;
-
-        return new FrontendLayout(
-            scale,
-            MathF.Max(0f, (viewportWidth - contentWidth) * 0.5f),
-            MathF.Max(0f, (viewportHeight - contentHeight) * 0.5f),
-            contentWidth,
-            contentHeight);
+        var geometry = FrontendGeometry.Resolve(viewportWidth, viewportHeight, userScale, dpi, controls);
+        return new FrontendLayout(geometry.Scale, 0, 0, viewportWidth, viewportHeight) { Geometry = geometry };
     }
 
     public static string FitText(
@@ -53,12 +39,7 @@ public static class FrontendDesign
 
     public static float ResolveScale(float viewportWidth, float viewportHeight, float userScale = 1f)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(viewportWidth, 0f);
-        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(viewportHeight, 0f);
-        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(userScale, 0f);
-
-        var viewportScale = MathF.Min(viewportWidth / ReferenceWidth, viewportHeight / ReferenceHeight);
-        return Math.Min(Math.Min(viewportScale * userScale, viewportScale), MaximumScale);
+        return FrontendGeometry.Resolve(viewportWidth, viewportHeight, userScale).Scale;
     }
 }
 
@@ -67,7 +48,10 @@ public readonly record struct FrontendLayout(
     float OffsetX,
     float OffsetY,
     float ContentWidth,
-    float ContentHeight);
+    float ContentHeight)
+{
+    public FrontendGeometry Geometry { get; init; }
+}
 
 public readonly record struct FrontendRect(float X, float Y, float Width, float Height)
 {

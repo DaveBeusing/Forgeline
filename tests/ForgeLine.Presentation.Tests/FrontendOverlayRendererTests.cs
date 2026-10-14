@@ -170,6 +170,24 @@ public sealed class FrontendOverlayRendererTests : IDisposable
         Assert.InRange(_graphics.LastBuffer!.MaximumAbsoluteX, 0, 1.001f);
     }
 
+    [Fact]
+    public void PublishedGeometryControlsRenderingAndStaleResizeFramesDoNotDraw()
+    {
+        using var renderer = new FrontendOverlayRenderer(_graphics);
+        var context = new FakeGraphicsCommandContext { Width = 1280, Height = 720 };
+        var geometry = FrontendGeometry.Resolve(1280, 720, 2, 192);
+        var view = FrontendSurfaceView.MainMenu([new("new-game", "NEW GAME", true, true)]) with { Layout = geometry };
+        renderer.Render(context, view, .75f);
+        Assert.Equal(geometry, renderer.LastLayout); // Published DPI/scale wins over legacy optional renderer scale.
+        Assert.True(renderer.LastRenderedVertexCount > 0);
+        renderer.Render(new FakeGraphicsCommandContext { Width = 1920, Height = 1080 }, view);
+        Assert.Equal(0, renderer.LastRenderedVertexCount);
+        renderer.Render(new FakeGraphicsCommandContext { Width = 0, Height = 0 }, view with { Layout = default(FrontendGeometry) });
+        Assert.Equal(0, renderer.LastRenderedVertexCount);
+        renderer.Render(context, view);
+        Assert.True(renderer.LastRenderedVertexCount > 0);
+    }
+
     private sealed class FakeGraphicsDevice : IGraphicsDevice
     {
         internal FakeGraphicsBuffer? LastBuffer { get; private set; }

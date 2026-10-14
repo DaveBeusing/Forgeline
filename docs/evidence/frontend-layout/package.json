@@ -1,0 +1,72 @@
+{
+  "CodeRevision": "424d5a4879ddeeab0d638f0d53971ab8ae2f4690",
+  "Version": "0.1.364-dev",
+  "SourceTreeClean": true,
+  "ReproduciblePublish": true,
+  "ArchiveSha256": "a29aff89369c089445c296608aca524e73bcd4de709a8387dbed1c660cae23aa",
+  "Modes": [
+    {
+      "Window": {
+        "mode": "Windowed",
+        "clientWidth": 1600,
+        "clientHeight": 900,
+        "isMinimized": false,
+        "dpi": 144
+      },
+      "Surface": {
+        "width": 1600,
+        "height": 900,
+        "bufferCount": 3,
+        "frameIndex": 1,
+        "isSuspended": false,
+        "presentMode": "VSync",
+        "isOccluded": false,
+        "resizePending": false,
+        "resizeGeneration": 0,
+        "appliedResizeGeneration": 0,
+        "submittedFrameCount": 112,
+        "presentedFrameCount": 112
+      },
+      "TextureBindingFailures": 0,
+      "MaterialBindingFailures": 0,
+      "PeakResidentTextureBytes": 54106824,
+      "RuntimeMeshInstances": 15,
+      "TexturedRuntimeMeshInstances": 15,
+      "VisibleTerrainChunks": 15
+    },
+    {
+      "Window": {
+        "mode": "BorderlessFullscreen",
+        "clientWidth": 5120,
+        "clientHeight": 2160,
+        "isMinimized": false,
+        "dpi": 144
+      },
+      "Surface": {
+        "width": 5120,
+        "height": 2160,
+        "bufferCount": 3,
+        "frameIndex": 0,
+        "isSuspended": false,
+        "presentMode": "VSync",
+        "isOccluded": false,
+        "resizePending": false,
+        "resizeGeneration": 0,
+        "appliedResizeGeneration": 0,
+        "submittedFrameCount": 48,
+        "presentedFrameCount": 48
+      },
+      "TextureBindingFailures": 0,
+      "MaterialBindingFailures": 0,
+      "PeakResidentTextureBytes": 54112544,
+      "RuntimeMeshInstances": 17,
+      "TexturedRuntimeMeshInstances": 17,
+      "VisibleTerrainChunks": 18
+    }
+  ],
+  "StartupSmoke": {
+    "ApplicationReadiness": "Ready",
+    "DroppedEvents": 0,
+    "SessionReadiness": "NotRequested"
+  }
+}

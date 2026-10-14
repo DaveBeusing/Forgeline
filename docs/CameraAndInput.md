@@ -247,3 +247,21 @@ Camera tests verify view-projected left/right and forward/backward movement afte
 Camera target navigation remains unbounded as before; zoom and pitch retain their configured bounds. No new map clamp or projection was introduced.
 
 The integrated controller journey covers keyboard/drag pan, zoom bounds, unit/building selection, commands, first-press help, focus recovery and display changes. See [Interaction qualification](InteractionQualification.md) for the state matrix, automated limits and manual display checklist.
+
+## Adaptive frontend geometry
+
+Frontend menus, setup/load/settings, loading, controls and pause use the same immutable
+`FrontendGeometry` value for drawing and hit testing. The platform owner resolves physical
+client-pixel bounds using actual window DPI and current UI scale, then publishes that value
+with the surface. The render thread never reads mutable window state. A stale surface after
+resize waits for matching geometry; zero-size/minimized surfaces suspend rendering.
+
+Up/Down and the mouse wheel scroll long controls/credits pages, and navigate the existing
+settings/save lists. Focus remains visible as row capacity changes. Enter, Escape, Back and
+existing actions retain their meanings. Stationary mouse position does not override keyboard
+navigation. Disabled/absent commands and static setup labels never activate adjustments.
+Resize, DPI/scale changes, focus loss and modal ownership changes suppress held input until
+release, clear hover/pressed state and preserve model focus. Closing help/pause still consumes
+the gesture before gameplay resumes. `GameplayHudLayout` retains separate ownership.
+
+See [named regions and migration](FrontendLayout.md) and [qualification](FrontendLayoutQualification.md).

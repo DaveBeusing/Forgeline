@@ -1,0 +1,78 @@
+# Frontend layout contract
+
+`ForgeLine.UI` owns focus, list windows and hit testing. `ForgeLine.Presentation` exposes the
+passive `FrontendGeometry`/`FrontendRegion` value contract and renders it. This uses the
+existing UI → Presentation reference without adding a reverse reference. The Client platform
+owner resolves one physical-pixel layout and passes its exact value through
+`FrontendSurfaceView.Layout` to the render owner. A renderer-only caller may resolve a default
+96-DPI layout; normal window frontend and modal input always publish their actual layout.
+`GameplayHudLayout` and its command/action dock are independent.
+
+## Regions and state
+
+| Region | Meaning | Input |
+| --- | --- | --- |
+| SafeArea, Header, Title | Bounded composition and heading slots | Visual only |
+| Navigation / MenuRow(i) | Up to seven existing menu cards | Enabled menu command only |
+| Details / DetailRow(i) | Visible list window, separated by real gaps | Selectable save/settings rows |
+| DetailLabel / DetailValue | Measured label and value slots | Visual only |
+| Decrease / Increase | Separate bounded edit buttons | Only corresponding visible affordance enabled |
+| PrimaryAction / SecondaryAction | Existing Start, Load, Apply, Keep, Back | Present/enabled actions only |
+| Footer | Existing Back/close hint and shortcut text | Preserved secondary-screen Back shortcut |
+| Feedback | Warnings and font failure recovery | Visual only |
+| Decorative | Clipped industrial schematic, sacrificed before controls | Visual only |
+
+Coordinates are physical client pixels; pointer positions use the same space. Hit rectangles
+are rounded once and half open: left/top included, right/bottom excluded. Gaps, ultrawide
+margins, unused rows and decorative space cannot identify a command. Geometry describes
+potential slots; model enablement and actual view affordances gate activation.
+
+## Responsive rules
+
+The viewport fit factor uses 1920×1080 as a density reference, not a virtual monitor.
+Requested density multiplies viewport fit, user scale and DPI / 96. At supported sizes the
+minimum is the smaller of 0.75 and viewport fit. Density is capped by height / 850,
+width / 1100 and 3 to keep every menu command and both modal actions visible. Thus a
+requested scale can reach a deliberate fit limit; it is never silently allowed to clip actions.
+
+The safe horizontal extent is centered and bounded on ultrawide displays. Header spacing
+compresses and menu stride changes from 72 to 64 density units when the logical height falls
+below 1000. Ordinary detail rows use 58-unit stride; controls use 150 and full available width
+for measured, wrapped descriptions. One to seven rows fit above the fixed action band.
+Details/settings/saves retain keyboard focus inside the resulting list window. Controls and
+credits use Up/Down or wheel to scroll. Settings retain the same 18 fields; no new action or
+persistent setting is added. Long save labels and values use measured ellipsis. Footer
+feedback wraps to two bounded lines. Wrapped text is cached with a 64-entry bound.
+
+## Old-to-new mapping
+
+| Superseded literal | Shared replacement |
+| --- | --- |
+| 82, 338, 560×52, 72 stride | Navigation / MenuRow |
+| Input Y390 vs drawn Y377, 58-row bucket | DetailRow; gaps are excluded |
+| Label X112 / value X460 / 320/1370 width | DetailLabel / DetailValue |
+| X830 and X916, 72×42 edits | Decrease / Increase |
+| X782/Y838, 290×58 | PrimaryAction |
+| X92/Y838, 220×58 | SecondaryAction |
+| X82/Y900..970 shortcut strip | Footer |
+| Independently centered renderer canvas | Published physical-pixel geometry |
+
+At 1920×1080, 96 DPI, scale 1, menu/action/edit rectangles retain their familiar positions.
+The intentional change to detail hit bounds removes the old 13-pixel vertical mismatch and
+10-pixel gap capture. At other densities/aspect ratios, consumers must use named regions.
+Legacy `FrontendLayout` scale/content fields remain compatibility metadata; offsets are zero
+and are no longer a coordinate transform. The old duplicate literal hit path is removed.
+
+## Lifecycle
+
+`FrontendInputLifetime` compares layout, focus availability and screen/modal owner. Changes
+suppress held keys/buttons through the existing `InputState` mechanism and clear pointer
+position/hover; release is required before another gesture. Navigation model focus survives.
+A mouse must move or click to change menu/save focus, so a stationary cursor cannot undo
+keyboard navigation. Minimize suspends the render surface; restore publishes fresh geometry.
+No transition animation translates functional controls away from their hit rectangles.
+
+Use `ForgeLine.Client.exe --frontend-layout-capture <empty-output-directory>` for repeated
+native captures of all seven screens across the complete matrix, real windowed/borderless
+DPI/size sampling and zero-size GPU-surface restore. Capture warms resized surfaces before
+readback. It uses shipped resources only and does not compile/import assets.

@@ -4,7 +4,7 @@
 
 The Windows frontend is rendered by `FrontendOverlayRenderer` over the existing Direct3D 12 graphics device. The UI is intentionally independent of game authority, and `ForgeLine.UI` owns navigation/focus and pointer hit testing. The gameplay HUD uses distinct, modular surfaces composed by `GameplayHudRenderer`.
 
-The frontend uses the bundled antialiased DejaVu font atlas and a 1920×1080 reference layout, scaled and centered into the viewport. See [UI typography](UiTypography.md) for font resources, metrics, fallback and ownership. Main-menu interaction rectangles, settings adjustment hit targets, and primary/secondary buttons are intentionally fixed in reference coordinates. The battlefield HUD has a separate DPI-aware layout with named regions. These constraints are relevant to every visual change: presentation must not drift away from actual input geometry.
+The frontend uses the bundled antialiased DejaVu font atlas and adaptive physical-client-pixel regions. See [UI typography](UiTypography.md) for font resources, metrics, fallback and ownership. `FrontendGeometry` supplies named regions to both drawing and input; see [layout contract](FrontendLayout.md). The battlefield HUD has a separate DPI-aware layout with named regions. These constraints are relevant to every visual change: presentation must not drift away from actual input geometry.
 
 ### Verified design weaknesses
 
@@ -17,7 +17,7 @@ The frontend uses the bundled antialiased DejaVu font atlas and a 1920×1080 ref
 ### Existing strengths to retain
 
 - Focus and hover affordances, keyboard navigation, disabled command states, explicit feedback and error states.
-- The input contract and 1920×1080 frontend reference geometry; mouse hit testing must remain synchronized with the drawn controls.
+- The input action contract; mouse hit testing consumes the same published geometry as drawn controls.
 - DPI-aware gameplay HUD with noncolor selection patterns and separate resource, selection, action, minimap and operational surfaces.
 - Read-only presentation snapshots and no simulation mutations originating from visual controls.
 - A compact, industrial military presentation appropriate to the Directorate.
@@ -45,13 +45,13 @@ Alpha is meaningful only when the graphics pipeline supports blending. Functiona
 - Use subtle vertical tonal variation rather than a flat color fill.
 - Keep a consistent logo/header, tagline, separator and low-contrast version/footer placement.
 - Make every menu row's visual boundary discoverable; focus adds a thick warm rail and explicit SELECT text while disabled actions receive a visibly different treatment.
-- Keep the exact current menu interaction boxes: X 82–642; rows start at Y 338, advance by 72 and are 52 high, in reference pixels.
+- Use `Navigation` / `MenuRow` for both visible bounds and input. The 96-DPI 1080p default retains X 82–642 and Y 338 + 72×row; compact layouts change these through the shared resolver.
 - Use a right-side **abstract industrial schematic**, not a false gameplay render or fictional runtime health indicator. It must not intercept pointer input or imply functional options.
 - Do not obscure the primary commands, loading errors, or menu feedback with ornament.
-- Detail pages can carry a quiet second-plane technical grid, but must preserve the settings controls and their hit rectangles.
+- Detail pages reserve a separate decorative region; rows, values and adjustment controls use the shared geometry.
 - Pause screens preserve the battlefield context rather than replacing it with the full frontend backdrop.
 
-The current geometry remains reference-space based. If the UI eventually adopts a responsive constraint layout, migrate hit testing and rendering **together** and qualify ultrawide, 16:9, low resolution and multiple DPI/UI scale combinations.
+Geometry now adapts to actual viewport, per-monitor DPI and user scale. Details and controls scroll deliberately; action buttons and feedback remain outside the list. [Qualification](FrontendLayoutQualification.md) records the display matrix and native evidence.
 
 ## Performance and Validation
 

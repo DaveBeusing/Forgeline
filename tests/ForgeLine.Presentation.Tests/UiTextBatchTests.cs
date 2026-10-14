@@ -74,8 +74,12 @@ public sealed class UiTextBatchTests
         using var frontend=new FrontendOverlayRenderer(device);
         frontend.Render(new RecordingContext(),FrontendSurfaceView.MainMenu([]));
         Assert.False(frontend.TextDiagnostics.AtlasReady);
+        var region = frontend.LastLayout.Feedback;
+        var context = new RecordingContext();
         Assert.Contains(MemoryMarshal.Cast<byte,SelectionOverlayRenderingTests.Vertex>(device.Buffers[^1].Bytes).ToArray(),
-            v=>v.Color==ForgeLineUiPalette.Warning && v.Position.Y<-.9f);
+            v => v.Color == ForgeLineUiPalette.Warning &&
+                v.Position.Y <= 1 - 2 * region.Y / context.Height &&
+                v.Position.Y >= 1 - 2 * region.Bottom / context.Height);
     }
     [StructLayout(LayoutKind.Sequential)] private readonly record struct Vertex(Vector2 Position, Vector4 Color, Vector2 Uv);
     private sealed class Device : IGraphicsDevice
