@@ -208,3 +208,6 @@ Authored public wear uses ITerrainSurfaceMarkSource and immutable WithSurfaceMar
 
 
 Live impact marks and short owned-vehicle tracks reuse the authored decal quad/material IDs through DecalPool. Receiver marks use copied full entity identity and normalized local anchors; invalid or hidden receivers retire their marks. Missing decal meshes/materials skip the mark. See [shared decal decision](adr/BoundedPresentationDecals.md).
+
+
+RuntimeMaterialDiagnostics now reports unique LoadedMeshCount and logical ResidentMeshBytes. LOD buffers remain loaded on first admitted use and cached for the compiled-catalog session; this is not asynchronous eviction or a physical-residency guarantee. Conservative copied-snapshot groups can skip offscreen instance/asset work before normal individual admission. See [scalable rendering](ScalableRendering.md).

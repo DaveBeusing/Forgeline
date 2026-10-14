@@ -42,7 +42,7 @@ Software-cap diagnostics also report the reason when Low was already requested: 
 
 Construction checks available local budget, when available, against scaled scene/depth, optional native overlay depth, shadow textures and constants, particles and a conservative 64 MiB Full texture allowance (16 MiB Half, 4 MiB Quarter). Pressure degrades Ultra → High → Medium → Low; explicit overrides cannot bypass degraded caps. Unsupported composition or insufficient Low budget selects direct native output with neutral grading and optional AA/shadows/fog/particles disabled. The allowance is a policy estimate, not a guarantee of physical VRAM residency. Runtime allocations and device removal still use controlled fault handling. Quality is stable during a session; there is no continuous adaptive budget polling.
 
-At reduced world resolution, world color and depth use ceil(output × scale), while HUD, selection and command indicators retain native output dimensions. The existing composition draw interpolates four display-linear samples and transfers nearest world depth to a native overlay depth target. Spatial AA can require up to 20 scene loads, versus five at native resolution. Thus reduced resolution saves target memory but is not guaranteed to improve frame time. See the [decision and ownership contract](adr/ValidatedGraphicsQualityAndDisplayPreview.md).
+At reduced world resolution, world color and depth use ceil(output × scale), while HUD, selection and command indicators retain native output dimensions. The existing composition draw reconstructs four display-linear samples with depth-guided weights and transfers nearest world depth to a native overlay depth target. Spatial AA can require up to 20 scene loads, versus five at native resolution. Thus reduced resolution saves target memory but is not guaranteed to improve frame time. See the [decision and ownership contract](adr/ValidatedGraphicsQualityAndDisplayPreview.md).
 
 ## Reproduction and measured evidence
 
@@ -83,3 +83,6 @@ Release builds, architecture/version checks, policy, migration, native scaling/d
 ## World environment integration
 
 Additive schema 3 fields environment, vegetation and terrainResidency preserve neutral defaults and survive preset changes. Invalid values use existing graphics quarantine. Weather controls are development/configuration inputs with the normal next-session lifecycle; no new UI rows are introduced. See [World environment rendering](WorldEnvironmentRendering.md) for bounds and fallback.
+
+
+Depth-guided spatial reconstruction uses existing scene/depth, retains native overlays and adds no history target. ExecuteIndirect and temporal reconstruction remain evaluated deferrals. See [scalable rendering](ScalableRendering.md) for evidence and limitations.
