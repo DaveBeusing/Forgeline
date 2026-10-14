@@ -21,6 +21,20 @@ try {
     $manifest = @{schemaVersion=1;status='structural-pass';commit=('a'*40);buildIdentity=('0.1.1-dev+'+('a'*40));runtimeFingerprint=('b'*64);driver='contract';software=$true;captures=@($capture)}
     function Write-Manifests { foreach ($directory in @($baseline,$current)) { $manifest | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath (Join-Path $directory 'manifest.json') } }
     function Reject([scriptblock]$Action) { $rejected=$false; try { & $Action } catch { $rejected=$true }; if (-not $rejected) { throw 'Malformed evidence was accepted.' } }
+    # Exercise the real runner's parameter block without entering native capture or writing requests.
+    $parseTokens=$null;$parseErrors=$null
+    $runner=[Management.Automation.Language.Parser]::ParseFile("$PSScriptRoot/Invoke-RtsReferenceQualification.ps1",[ref]$parseTokens,[ref]$parseErrors)
+    if ($parseErrors.Count) { throw 'Reference runner contains invalid PowerShell.' }
+    $bindScales=[scriptblock]::Create($runner.ParamBlock.Extent.Text + '; return $UiScales')
+    $previousCulture=[Threading.Thread]::CurrentThread.CurrentCulture
+    try {
+        foreach ($culture in @('de-DE','en-US')) {
+            [Threading.Thread]::CurrentThread.CurrentCulture=[Globalization.CultureInfo]::GetCultureInfo($culture)
+            $scales=@(& $bindScales -UiScales .75,1,2)
+            if ($scales.Count -ne 3 -or $scales[0] -ne .75 -or $scales[2] -ne 2) { throw 'UI scale binding depends on locale.' }
+            Reject { & $bindScales -UiScales .5 }
+        }
+    } finally { [Threading.Thread]::CurrentThread.CurrentCulture=$previousCulture }
     Write-Manifests
     $baselineManifestHash = (Get-FileHash -LiteralPath (Join-Path $baseline 'manifest.json')).Hash
     & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -BaselineRoot $baseline

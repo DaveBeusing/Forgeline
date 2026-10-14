@@ -10,7 +10,7 @@ param(
     [string[]]$Zooms = @('CloseTactical','NormalGameplay','Strategic'),
     [ValidateSet('640x360','1280x720','1920x1080','2560x1440','3840x2160','3440x1440')][string[]]$Displays = @('1920x1080','2560x1440','3840x2160','3440x1440'),
     [string[]]$UiScenarios = @('World'),
-    [ValidateSet(.75,1,2)][float[]]$UiScales = @(1),
+    [ValidateScript({ $_ -in @(.75,1,2) })][float[]]$UiScales = @(1),
     [switch]$CinematicFrontend,
     [ValidateRange(3,4096)][int]$Warmups = 32,
     [ValidateRange(8,8192)][int]$Samples = 128,
