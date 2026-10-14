@@ -1126,6 +1126,7 @@ internal sealed class ClientApplication
                         _settings.UiScale,
                         preAlphaUx,
                         frontendSurface,
+                        FeedbackSettings: _settings.CreateUiFeedbackSettings(),
                         MetricsActive: (smokeTest || window.IsFocused) && !window.IsMinimized));
 
                 if (shouldPauseForWindow)
@@ -1628,7 +1629,7 @@ internal sealed class ClientApplication
                         combatGroupOverview,
                     MetricsActive: (smokeTest || window.IsFocused) && !window.IsMinimized,
                     HoverTooltip: tooltipView,
-                    Operations: operationsController.View));
+                    Operations: operationsController.View, FeedbackSettings: _settings.CreateUiFeedbackSettings()));
 
             if (_platform.Clock.GetElapsedTime(nextDiagnosticAt, now) >= DiagnosticInterval)
             {
@@ -3038,7 +3039,6 @@ internal sealed class ClientApplication
         bool primaryPointerHeld = false;
         string frontendFeedback = initialFeedback;
         GameFrontendScreen transitionScreen = shell.Screen;
-        long transitionStarted = Stopwatch.GetTimestamp();
 
         var target =
             new GraphicsWindowTarget(
@@ -3117,17 +3117,11 @@ internal sealed class ClientApplication
             if (shell.Screen != transitionScreen)
             {
                 transitionScreen = shell.Screen;
-                transitionStarted = Stopwatch.GetTimestamp();
                 frontendFeedback = string.Empty;
                 detailScroll = 0;
             }
 
-            float transition =
-                Math.Clamp(
-                    (float)Stopwatch.GetElapsedTime(
-                        transitionStarted).TotalMilliseconds / 140f,
-                    0f,
-                    1f);
+            const float transition = 1f; // Render owner supplies decorative motion; input never waits.
 
             if (shell.Screen == GameFrontendScreen.MainMenu)
             {
@@ -3423,7 +3417,7 @@ internal sealed class ClientApplication
             }
             detailScroll = Math.Clamp(detailScroll, 0, Math.Max(0, surface.DetailLines.Count - frontendLayout.Geometry.VisibleDetailRows));
             surface = surface with { Layout = frontendLayout.Geometry, DetailScroll = detailScroll,
-                BackgroundQuality = (RenderQuality)settings.Settings.RenderQuality };
+                BackgroundQuality = (RenderQuality)settings.Settings.RenderQuality, FeedbackSettings = settings.Settings.FeedbackSettings, FeedbackActive = window.IsFocused && !window.IsMinimized };
             if (input.HasPointerPosition &&
                 shell.Screen != GameFrontendScreen.MainMenu)
             {

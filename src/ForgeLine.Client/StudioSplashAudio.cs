@@ -7,6 +7,8 @@ internal sealed class StudioSplashAudio : IDisposable
 {
     private IntPtr _device, _data, _header;
     private bool _attempted, _prepared, _disposed;
+    private uint _initialVolume;
+    private bool _restoreVolume;
 
     internal void Update(float elapsed, float opacity)
     {
@@ -57,6 +59,7 @@ internal sealed class StudioSplashAudio : IDisposable
         offset -= offset % format.BlockAlign;
         if (offset == pcm.Length) return;
         Check(waveOutOpen(out _device, uint.MaxValue, ref format, IntPtr.Zero, IntPtr.Zero, 0));
+        _restoreVolume = waveOutGetVolume(_device, out _initialVolume) == 0;
         _data = Marshal.AllocHGlobal(pcm.Length - offset);
         Marshal.Copy(pcm, offset, _data, pcm.Length - offset);
         _header = Marshal.AllocHGlobal(Marshal.SizeOf<WaveHeader>());
@@ -78,6 +81,8 @@ internal sealed class StudioSplashAudio : IDisposable
         {
             _ = waveOutReset(_device);
             if (_prepared) _ = waveOutUnprepareHeader(_device, _header, (uint)Marshal.SizeOf<WaveHeader>());
+            // Legacy streams can share a process volume. Do not leave later UI cues muted by the intro fade.
+            if (_restoreVolume) _ = waveOutSetVolume(_device, _initialVolume);
             _ = waveOutClose(_device);
         }
         if (_header != IntPtr.Zero) Marshal.FreeHGlobal(_header);
@@ -94,6 +99,7 @@ internal sealed class StudioSplashAudio : IDisposable
     [DllImport("winmm.dll", ExactSpelling = true)] private static extern uint waveOutPrepareHeader(IntPtr device, IntPtr header, uint size);
     [DllImport("winmm.dll", ExactSpelling = true)] private static extern uint waveOutWrite(IntPtr device, IntPtr header, uint size);
     [DllImport("winmm.dll", ExactSpelling = true)] private static extern uint waveOutSetVolume(IntPtr device, uint volume);
+    [DllImport("winmm.dll", ExactSpelling = true)] private static extern uint waveOutGetVolume(IntPtr device, out uint volume);
     [DllImport("winmm.dll", ExactSpelling = true)] private static extern uint waveOutReset(IntPtr device);
     [DllImport("winmm.dll", ExactSpelling = true)] private static extern uint waveOutUnprepareHeader(IntPtr device, IntPtr header, uint size);
     [DllImport("winmm.dll", ExactSpelling = true)] private static extern uint waveOutClose(IntPtr device);

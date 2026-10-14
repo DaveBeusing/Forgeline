@@ -95,8 +95,15 @@ The current schema contains:
 - drag-pan mouse binding;
 - gameplay shortcut overrides with camera/modal/group conflict validation.
 - graphics preset and independent world resolution, AA, shadows, textures, object/surface detail, vegetation motion, atmosphere and particles.
+- reduced UI motion, optional interface sound (default off), and validated interface volume.
 
 Settings are typed and validated before window or camera creation.
+
+UI feedback settings are additive schema-3 fields. Existing files retain defaults and
+their display/camera/binding preferences. Low quality and reduced motion settle
+decoration immediately; muted/zero-volume output opens no UI audio device. Accepted
+and rejected cues come only from coherent copied command results, separately from a
+neutral pending intent. See [timing, cancellation and audio ownership](UiMotionAndAudio.md).
 
 Current supported ranges:
 

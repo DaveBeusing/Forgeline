@@ -37,6 +37,11 @@ internal sealed record ClientUserSettings
 
     public bool ShowStudioSplash { get; init; } = true;
 
+    public bool ReducedUiMotion { get; init; }
+    public bool UiSoundEnabled { get; init; }
+    public float UiSoundVolume { get; init; } = .35f;
+    public UiFeedbackSettings CreateUiFeedbackSettings() => new(ReducedUiMotion, UiSoundEnabled, UiSoundVolume);
+
     public bool EdgeScrollEnabled { get; init; } = true;
 
     public float CameraPanSpeedMultiplier { get; init; } = 1.0f;
@@ -92,6 +97,7 @@ internal sealed record ClientUserSettings
             MaximumSceneExposure,
             nameof(SceneExposure));
 
+        CreateUiFeedbackSettings().Validate();
         ArgumentNullException.ThrowIfNull(CameraBindings);
         SceneAtmosphere.Validate();
         Particles.Validate();

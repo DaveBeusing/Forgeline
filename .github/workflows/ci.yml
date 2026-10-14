@@ -64,6 +64,10 @@ jobs:
         shell: pwsh
         run: ./build/Validate-UiFonts.ps1
 
+      - name: UI motion, optional sound and preference contracts
+        shell: pwsh
+        run: ./build/Validate-UiAudio.ps1
+
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
@@ -84,6 +88,14 @@ jobs:
           dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.HudInformationLayoutTests ForgeLine.Presentation.Tests.GameplayHudVisualQualificationTests ForgeLine.Presentation.Tests.GameplayHudLayoutIntegrationTests ForgeLine.Presentation.Tests.GameplayHudRuntimeTests ForgeLine.Presentation.Tests.ResourcePowerAlertHudTests ForgeLine.Presentation.Tests.SelectionInspectorHudTests ForgeLine.Presentation.Tests.ActionableAlertTests ForgeLine.Presentation.Tests.GameplayUiFixtureTests ForgeLine.Presentation.Tests.RtsMinimapInteractionTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.GameplayInteractionJourneyTests ForgeLine.Client.Tests.GameplayGuidanceInteractionTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: UI motion and feedback interaction contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.UiInteractionFeedbackTests ForgeLine.Client.Tests.FrontendLifecycleTests ForgeLine.Client.Tests.FrontendUxFeedbackTests ForgeLine.Client.Tests.FrontendInteractionTests ForgeLine.Client.Tests.ClientUserSettingsTests ForgeLine.Client.Tests.ClientSettingsFrontendAdapterTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.UiMotionTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Native UI typography contracts

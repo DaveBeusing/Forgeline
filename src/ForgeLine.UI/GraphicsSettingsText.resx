@@ -38,4 +38,10 @@
 <data name="RenderQualityHelp" xml:space="preserve"><value>SELECTING A PRESET RESETS FEATURE OVERRIDES. NEXT MATCH.</value></data>
 <data name="KeepDisplay" xml:space="preserve"><value>KEEP DISPLAY</value></data>
 <data name="ApplyFailure" xml:space="preserve"><value>SETTINGS COULD NOT BE APPLIED; PREVIOUS DISPLAY RESTORED</value></data>
+  <data name="ReducedUiMotion" xml:space="preserve"><value>REDUCE UI MOTION</value></data>
+  <data name="ReducedUiMotionHelp" xml:space="preserve"><value>Show UI transitions immediately. Text and controls remain available in either mode.</value></data>
+  <data name="UiSoundEnabled" xml:space="preserve"><value>INTERFACE SOUND</value></data>
+  <data name="UiSoundEnabledHelp" xml:space="preserve"><value>Optional navigation and request/result cues. Studio intro sound is separate.</value></data>
+  <data name="UiSoundVolume" xml:space="preserve"><value>INTERFACE VOLUME</value></data>
+  <data name="UiSoundVolumeHelp" xml:space="preserve"><value>Volume for interface cues only. Zero silences them.</value></data>
 </root>

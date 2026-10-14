@@ -77,6 +77,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
         }
         LastLayout = layout;
         float scale = layout.Scale;
+        var motion = view.Motion ?? UiMotionView.Settled;
         int width = context.Width, height = context.Height;
         if (view.Kind != FrontendSurfaceKind.PauseMenu)
         {
@@ -124,7 +125,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
                 var item = view.MenuEntries[i]; var row = layout.MenuRow(i);
                 bool focused = item.IsEnabled && item.IsFocused;
                 Panel(row, focused ? ForgeLineUiPalette.SurfaceActive : item.IsEnabled ? ForgeLineUiPalette.SurfaceRaised : ForgeLineUiPalette.SurfaceDisabled);
-                Panel(row with { Width = (focused ? 5 : 2) * scale }, focused ? ForgeLineUiPalette.Accent : ForgeLineUiPalette.BorderSubtle);
+                Panel(row with { Width = (focused ? 5 : 2) * scale, Height = focused ? row.Height * (.6f + .4f * Math.Clamp(motion.Focus, 0, 1)) : row.Height }, focused ? ForgeLineUiPalette.Accent : ForgeLineUiPalette.BorderSubtle);
                 Text(s_menuNumbers[i], row with { X = row.X + 22 * scale, Y = row.Y + 15 * scale, Width = 40 * scale }, ForgeLineUiPalette.TextMuted, .76f);
                 Text(item.Label, row with { X = row.X + 76 * scale, Y = row.Y + 12 * scale, Width = row.Width - 220 * scale },
                     focused ? ForgeLineUiPalette.TextPrimary : item.IsEnabled ? ForgeLineUiPalette.TextSecondary : ForgeLineUiPalette.TextDisabled);
@@ -142,7 +143,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
                 var line = view.DetailLines[start + i]; var row = layout.DetailRow(i);
                 Panel(row, line.IsPressed ? ForgeLineUiPalette.SurfacePressed : line.IsFocused ? ForgeLineUiPalette.SurfaceActive :
                     line.IsHovered ? ForgeLineUiPalette.SurfaceHover : ForgeLineUiPalette.SurfaceRaised);
-                if (line.IsFocused || line.IsHovered) Panel(row with { Width = 4 * scale }, ForgeLineUiPalette.Accent);
+                if (line.IsFocused || line.IsHovered) Panel(row with { Width = 4 * scale, Height = row.Height * (.6f + .4f * Math.Clamp(motion.Focus, 0, 1)) }, ForgeLineUiPalette.Accent);
                 Text(line.Label, layout.DetailLabel(i), ForgeLineUiPalette.TextSecondary);
                 var valueSlot = layout.DetailValue(i, line.CanDecrease || line.CanIncrease);
                 Vector4 color = line.IsWarning ? ForgeLineUiPalette.Warning : line.IsFocused ? ForgeLineUiPalette.Accent : ForgeLineUiPalette.TextPrimary;
@@ -172,6 +173,10 @@ public sealed class FrontendOverlayRenderer : IDisposable
                 Text($"{Math.Clamp((int)(view.Progress * 100), 0, 100)}%", layout.Feedback, ForgeLineUiPalette.TextPrimary);
             }
         }
+        if (motion.Reveal < 1)
+            Panel(layout.Title with { Width = layout.Title.Width * Math.Clamp(motion.Reveal, 0, 1), Y = layout.Title.Bottom - scale, Height = scale }, ForgeLineUiPalette.Accent);
+        if (motion.Result > 0 && !string.IsNullOrEmpty(view.Feedback))
+            Panel(layout.Feedback with { Width = 3 * scale, Height = layout.Feedback.Height * Math.Clamp(motion.Result, 0, 1) }, ForgeLineUiPalette.Warning);
         var footerLines = Wrap(view.Footer, layout.Footer.Width / scale, 22 * .78f);
         for (int i = 0; i < Math.Min(2, footerLines.Length); i++)
             Text(footerLines[i], layout.Footer with { Y = layout.Footer.Y + i * 24 * scale }, ForgeLineUiPalette.TextMuted, .78f);
