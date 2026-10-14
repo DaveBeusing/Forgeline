@@ -28,6 +28,7 @@ internal sealed class PlayerActionDockHudSurface : IGameplayHudSurface
     public GameplayHudRegion Regions =>
         GameplayHudRegion.ActionDock | GameplayHudRegion.PrimaryCommands;
 
+    public UiTextDiagnostics TextDiagnostics => _renderer.TextDiagnostics;
     public int LastRenderedVertexCount => _renderer.LastRenderedVertexCount;
 
     public void Render(
@@ -63,6 +64,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         GameplayHudVisualStyle.TextSecondary;
 
     private readonly IGraphicsDevice _graphics;
+    private readonly UiTextBatch _text;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers =
         new(4);
@@ -89,8 +91,10 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                 ? null
                 : new RuntimeUiIconPalette(
                     runtimeAssets);
+        _text = new UiTextBatch(graphics);
     }
 
+    public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
     public int LastRenderedVertexCount { get; private set; }
 
     public void Render(
@@ -102,6 +106,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         in GameplayHudLayout layout)
     {
         ThrowIfDisposed();
+        _text.Begin();
         ArgumentNullException.ThrowIfNull(graphics);
         ArgumentNullException.ThrowIfNull(snapshot);
 
@@ -176,8 +181,8 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         graphics.Draw(
             _vertexCount);
 
-        LastRenderedVertexCount =
-            _vertexCount;
+        _text.Render(graphics);
+        LastRenderedVertexCount = _vertexCount + _text.VertexCount;
     }
 
     public void Dispose()
@@ -194,6 +199,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         }
 
         _vertexBuffers.Clear();
+        _text.Dispose();
         _pipeline.Dispose();
         _disposed = true;
     }
@@ -1779,10 +1785,8 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         int width,
         int height)
     {
-        float textWidth =
-            text.Length *
-            GlyphAdvance *
-            _scale;
+        float textWidth = _text.Ready ? UiFontMetrics.Default.Measure(text, UiTypography.Style(UiTextRole.Telemetry).Size * _scale)
+            : text.Length * GlyphAdvance * _scale;
         float x =
             MathF.Max(
                 rect.X +
@@ -1841,6 +1845,8 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         int width,
         int height)
     {
+        if (_text.Add(text, x, y, UiTypography.Style(UiTextRole.Telemetry).Size * _scale, color, width, height, right - x)) return;
+
         float available =
             MathF.Max(
                 0.0f,

@@ -14,6 +14,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     private const int VertexStride = 24;
 
     private readonly IGraphicsDevice _graphics;
+    private readonly UiTextBatch _text;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers =
         new(4);
@@ -42,8 +43,10 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 ? null
                 : new RuntimeUiIconPalette(
                     runtimeAssets);
+        _text = new UiTextBatch(graphics);
     }
 
+    public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
     public int LastRenderedVertexCount { get; private set; }
     internal HudRect LastGuidanceBounds { get; private set; }
     public int LastGuidanceVertexCount { get; private set; }
@@ -60,6 +63,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         PreAlphaUxView preAlphaUx = default)
     {
         ThrowIfDisposed();
+        _text.Begin();
         _bindings = preAlphaUx.Bindings ?? GameplayBindingRegistry.Default;
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(camera);
@@ -174,8 +178,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         context.Draw(
             _vertexCount);
 
-        LastRenderedVertexCount =
-            _vertexCount;
+        _text.Render(context);
+        LastRenderedVertexCount = _vertexCount + _text.VertexCount;
     }
 
     public void Dispose()
@@ -192,6 +196,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         }
 
         _vertexBuffers.Clear();
+        _text.Dispose();
         _pipeline.Dispose();
         _disposed = true;
     }
@@ -1659,6 +1664,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         int width,
         int height)
     {
+        if (_text.Add(value, x, y, UiTypography.Style(UiTextRole.Telemetry).Size * glyphScale, color, width, height, right - x)) return;
+
         const float Advance = 6.0f;
         float step =
             Advance *

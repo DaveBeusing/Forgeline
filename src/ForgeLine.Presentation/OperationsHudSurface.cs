@@ -10,6 +10,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
     internal const int MaxVertices = 262_144;
     private const int MaxLines = 24;
     private readonly IGraphicsDevice _graphics;
+    private readonly UiTextBatch _text;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _buffers = new(4);
     private readonly OperationsVertex[] _vertices = new OperationsVertex[MaxVertices];
@@ -18,13 +19,13 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
     private float _scale;
     private bool _disposed;
     public OperationsHudSurface(IGraphicsDevice graphics)
-    { _graphics = graphics; _pipeline = SelectionInspectorHudRenderer.CreatePipeline(graphics, alphaBlendEnabled: true); }
+    { _graphics = graphics; _text = new(graphics); _pipeline = SelectionInspectorHudRenderer.CreatePipeline(graphics, alphaBlendEnabled: true); }
     public GameplayHudRegion Regions => GameplayHudRegion.SecondaryView | GameplayHudRegion.AlertStack;
     public int LastRenderedVertexCount { get; private set; }
     public void Render(in GameplayHudRenderContext context)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        LastRenderedVertexCount = 0;
+        LastRenderedVertexCount = 0; _text.Begin();
         _width = context.Graphics.Width; _height = context.Graphics.Height;
         if (_width <= 0 || _height <= 0) return;
         _count = 0; _line = 0;
@@ -116,7 +117,8 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
         { buffer = _graphics.CreateBuffer(new GraphicsBufferDescription(MaxVertices * 24UL, GraphicsBufferMemory.Upload)); _buffers.Add(context.Graphics.FrameIndex, buffer); }
         buffer.SetData<OperationsVertex>(_vertices.AsSpan(0, _count));
         context.Graphics.SetPipeline(_pipeline); context.Graphics.SetVertexBuffer(buffer, 24); context.Graphics.Draw(_count);
-        LastRenderedVertexCount = _count;
+        _text.Render(context.Graphics);
+        LastRenderedVertexCount = _count + _text.VertexCount;
     }
     private static void Number(ref OperationsTextBuilder builder, double? value, string format = "0")
     { if (value.HasValue) builder.Number(value.Value, format); else builder.Append("N/A"); }
@@ -135,6 +137,8 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
         if (y + 7 * _scale > _bounds.Bottom - 2 * _scale) return;
         int characters = Math.Min(68, Math.Max(0, (int)((_bounds.Width - 16 * _scale) / (6.4f * _scale))));
         var color = primary ? GameplayHudVisualStyle.TextPrimary : GameplayHudVisualStyle.TextSecondary;
+        if (_text.Add(text, x, y, 12f * _scale, color, _width, _height,
+            MathF.Max(0, _bounds.Right - 8f * _scale - x), bold: primary)) return;
         for (int i = 0; i < Math.Min(text.Length, characters); i++)
         {
             string pattern = SelectionInspectorHudRenderer.TextGlyphPattern(char.ToUpperInvariant(text[i]));
@@ -164,6 +168,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
         if (_disposed) return;
         foreach (var buffer in _buffers.Values) buffer.Dispose();
         _buffers.Clear();
+        _text.Dispose();
         _pipeline.Dispose();
         _disposed = true;
     }
