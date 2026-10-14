@@ -64,7 +64,7 @@ public sealed class ContextFeedbackTests
             ProductionStatus.Idle, reason, 0,
             [new PlayerProductionRecipeActionReadModel(RecipeIds.Steel, "Steel",
                 [new PlayerActionResourceAmount(ResourceIds.FerrousOre, "Ferrous Ore", 10, 20)], [])], []);
-        var snapshot = Snapshot(new PlayerActionSnapshot(new SimulationSessionId(1), new SimulationTick(1), [], 1, facility, null));
+        var snapshot = Snapshot(new PlayerActionSnapshot(new SimulationSessionId(1), new SimulationTick(1), [], 0, facility, null));
         var panel = default(PlayerActionPanelView) with { Mode = PlayerActionPanelMode.Production };
         var hover = new HoverTooltipView(snapshot.SessionId, EntityId.Invalid, default, default, true, 1600, 900, 1,
             panel.Mode, (int)PlayerActionDockControlKind.Item, 0);

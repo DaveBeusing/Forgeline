@@ -278,16 +278,26 @@ public sealed class PlayerActionPanelController
             }
         }
 
+        if (Mode != PlayerActionPanelMode.Closed && input.HasPointerPosition &&
+            layout.ActionDock.Contains(input.PointerPosition) && input.WheelDelta != 0 && itemCount > 0)
+        {
+            int capacity = PlayerActionDockInteractionLayout.MaximumVisibleItems(layout);
+            SelectedIndex = Math.Clamp(SelectedIndex + (input.WheelDelta > 0 ? -capacity : capacity), 0, itemCount - 1);
+            _desiredStockQuantity = 0.0;
+            _stockResourceId = ResourceId.None;
+        }
         SynchronizeStockEditor(actions);
         SynchronizeSupplyEditor(actions);
+        bool requestPending = actions?.PendingCommandCount > 0 ||
+            ContextualCommandModel.HasPending(CreateView(viewportWidth, viewportHeight, actions, dpi, uiScale), snapshot);
 
-        if (Pressed(input, _bindings.Key(GameplayAction.PrimarySetting)))
+        if (Pressed(input, _bindings.Key(GameplayAction.PrimarySetting)) && !requestPending)
         {
             CyclePrimarySetting(
                 actions);
         }
 
-        if (Pressed(input, _bindings.Key(GameplayAction.SecondarySetting)))
+        if (Pressed(input, _bindings.Key(GameplayAction.SecondarySetting)) && !requestPending)
         {
             CycleSecondarySetting(
                 actions);
@@ -304,7 +314,7 @@ public sealed class PlayerActionPanelController
             adjustment++;
         }
 
-        if (adjustment != 0)
+        if (adjustment != 0 && !requestPending)
         {
             AdjustCurrentSetting(
                 actions,
@@ -338,7 +348,7 @@ public sealed class PlayerActionPanelController
 
         bool hasPress = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var pressOrigin);
         var clickPosition = hasPress ? pressOrigin : input.PointerPosition;
-        bool clicked = !displayChanged && !sessionChanged && freshPress && hasPress && input.HasPointerPosition;
+        bool clicked = input.WheelDelta == 0 && !displayChanged && !sessionChanged && freshPress && hasPress && input.HasPointerPosition;
         if (clicked && ContextualCommandModel.TryHit(clickPosition, snapshot, layout, out var command,
                 localPending: ContextualCommandModel.HasPending(view, snapshot), selectionPending: view.SelectionPending))
         {
@@ -370,7 +380,7 @@ public sealed class PlayerActionPanelController
                 layout,
                 view.IsOpen,
                 itemCount,
-                out hit);
+                out hit, SelectedIndex);
         _hoveredIndex =
             hasHit &&
             hit.Kind ==
@@ -382,7 +392,7 @@ public sealed class PlayerActionPanelController
             leftDown;
 
         if (clicked && PlayerActionDockInteractionLayout.TryHit(clickPosition, layout,
-                view.IsOpen, itemCount, out var clickHit))
+                view.IsOpen, itemCount, out var clickHit, SelectedIndex))
         {
             HandlePointerHit(
                 clickHit,
@@ -396,10 +406,8 @@ public sealed class PlayerActionPanelController
             Pressed(input, _bindings.Key(GameplayAction.Activate));
 
         if (activate &&
-            PlayerActionDockHudModel.ResolveItemState(
-                Mode,
-                SelectedIndex,
-                actions).CanActivate)
+            PlayerActionDockHudModel.CanUseControl(PlayerActionDockControlKind.Activate,
+                Mode, SelectedIndex, view, actions))
         {
             ActivateSelected(actions);
         }
@@ -412,7 +420,7 @@ public sealed class PlayerActionPanelController
                  PlayerActionPanelMode.Technology) &&
             Pressed(input, _bindings.Key(GameplayAction.CancelJob));
 
-        if (cancel)
+        if (cancel && !requestPending)
         {
             CancelSelected(actions);
         }
@@ -1011,6 +1019,7 @@ public sealed class PlayerActionPanelController
                     hit.Mode);
                 break;
 
+            case PlayerActionDockControlKind.Page:
             case PlayerActionDockControlKind.Item:
                 SelectedIndex =
                     hit.ItemIndex;

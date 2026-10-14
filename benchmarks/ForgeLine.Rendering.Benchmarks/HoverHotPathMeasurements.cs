@@ -142,7 +142,8 @@ internal static class HoverHotPathMeasurements
                     guidance: new PlayerGuidanceSummary(session, tick, new PlayerId(1), PlayerGuidanceMilestone.CommandCore | PlayerGuidanceMilestone.Supply));
             }
             _ux = default(PreAlphaUxView) with { ShowOnboarding = true, Guidance = new EarlyGameGuidanceController().Update(_snapshots[0], true) };
-            var card = new Vector2(_layout.ActionDock.X + 20 * _layout.Scale, _layout.ActionDock.Y + 100 * _layout.Scale);
+            var cardRect = PlayerActionDockInteractionLayout.GetCardRect(_layout, 0);
+            var card = new Vector2(cardRect.X + cardRect.Width / 2, cardRect.Y + cardRect.Height / 2);
             var position = dock ? card : detected ? _camera.WorldToScreen(Vector3.Zero, width, height).Position : new Vector2(width / 2, height / 2);
             _input.Apply(PlatformInputEvent.PointerMoved((int)position.X, (int)position.Y));
         }

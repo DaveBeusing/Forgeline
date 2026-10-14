@@ -332,7 +332,8 @@ internal static class PlayerActionDockHudModel
     public static PlayerActionDockItemState ResolveItemState(
         PlayerActionPanelMode mode,
         int index,
-        PlayerActionSnapshot? actions)
+        PlayerActionSnapshot? actions,
+        bool requestPending = false)
     {
         if (actions is null ||
             index < 0)
@@ -340,6 +341,9 @@ internal static class PlayerActionDockHudModel
             return PlayerActionDockItemState.Disabled(
                 "NO DATA");
         }
+
+        if (requestPending || actions.PendingCommandCount > 0)
+            return PlayerActionDockItemState.Disabled("REQUEST PENDING");
 
         switch (mode)
         {
@@ -472,6 +476,9 @@ internal static class PlayerActionDockHudModel
         int index,
         in PlayerActionPanelView panel,
         PlayerActionSnapshot? actions) =>
+        actions is not null && actions.PendingCommandCount == 0 &&
+        !(panel.ContextualPending && panel.ContextualActivationTick == actions.Tick &&
+          panel.ContextualSessionId == actions.SessionId) &&
         control switch
         {
             PlayerActionDockControlKind.Activate =>
@@ -501,6 +508,21 @@ internal static class PlayerActionDockHudModel
                     actions),
             _ =>
                 false
+        };
+
+    public static string ResolvePrimaryActionLabel(PlayerActionPanelMode mode, int index, PlayerActionSnapshot? actions) =>
+        mode switch
+        {
+            PlayerActionPanelMode.Construction => "PLACE",
+            PlayerActionPanelMode.Production when actions?.Production is { } production && index >= production.Recipes.Count &&
+                index - production.Recipes.Count < production.Requests.Count =>
+                production.Requests[index - production.Recipes.Count].Paused ? "RESUME" : "PAUSE",
+            PlayerActionPanelMode.Production or PlayerActionPanelMode.UnitProduction => "QUEUE",
+            PlayerActionPanelMode.Logistics => "APPLY POLICY",
+            PlayerActionPanelMode.Supply => index < 2 ? "APPLY AUTO" : "REQUEST SUPPLY",
+            PlayerActionPanelMode.Technology => "START RESEARCH",
+            PlayerActionPanelMode.Tactical => ResolveItemTitle(mode, index, actions),
+            _ => "ACT"
         };
 
     public static bool CanCancel(

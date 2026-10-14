@@ -95,7 +95,7 @@ public sealed class GameplayUiFixtureTests
         }
         else
         {
-            string baseline = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", "gameplay-ui-geometry.json"));
+            string baseline = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", "command-dock-geometry.json"));
             var expected = JsonSerializer.Deserialize<SortedDictionary<string, Fixture>>(baseline, JsonOptions)!;
             Assert.Equal(expected.Count, fixtures.Count);
             foreach (var fixture in fixtures) Assert.Equal(expected[fixture.Key], fixture.Value);
