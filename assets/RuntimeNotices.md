@@ -22,3 +22,8 @@ Bitstream Vera and Arev redistribution notices are shipped in
 recorded in `assets/source/ui/fonts/README.md` and `metrics.json`. Only the
 precompiled atlas/metrics are needed by the player; source TTF files and
 font-authoring libraries are excluded from the package.
+
+The optional Directorate menu still is a repository-authored native render of the existing
+Directorate/Central Divide models and materials. No external imagery was introduced.
+Composition/export details and the source hash are recorded in
+`assets/source/branding/forgeline/menu/README.md`; this notice grants no additional rights.

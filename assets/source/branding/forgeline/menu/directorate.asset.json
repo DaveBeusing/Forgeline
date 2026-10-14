@@ -1,0 +1,10 @@
+{
+  "id": "branding.forgeline.menu.directorate",
+  "type": "texture",
+  "source": "directorate.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": true,
+  "textureFormat": "bc7Unorm",
+  "textureCompressionQuality": "balanced"
+}

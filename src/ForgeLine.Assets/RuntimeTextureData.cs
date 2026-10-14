@@ -21,6 +21,7 @@ public enum RuntimeTextureUsage
     Emissive = 4,
     GenericData = 5,
     TerrainControl = 6,
+    DisplayImage = 7,
 }
 
 public readonly record struct RuntimeTextureMipLevel(
@@ -519,7 +520,8 @@ public sealed class RuntimeTextureData
         if (Usage is RuntimeTextureUsage.Normal or
             RuntimeTextureUsage.Orm or
             RuntimeTextureUsage.GenericData or
-            RuntimeTextureUsage.TerrainControl &&
+            RuntimeTextureUsage.TerrainControl or
+            RuntimeTextureUsage.DisplayImage &&
             ColorSpace != RuntimeTextureColorSpace.Linear)
         {
             throw new InvalidDataException(
