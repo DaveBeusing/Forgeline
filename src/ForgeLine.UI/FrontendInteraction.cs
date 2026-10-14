@@ -203,6 +203,25 @@ public static class FrontendHitTesting
         return layout.Geometry.Decrease(row).Contains(pointerX, pointerY) ? -1 :
             layout.Geometry.Increase(row).Contains(pointerX, pointerY) ? 1 : null;
     }
+    public static FrontendSurfaceView WithDetailPointer(in FrontendSurfaceView view, FrontendLayout layout, float x, float y, bool pressed)
+    {
+        if (view.Kind != FrontendSurfaceKind.Detail) return view;
+        int? row = DetailRow(x, y, layout, view.DetailLines.Count);
+        if (row is null) return view;
+        var line = view.DetailLines[row.Value];
+        if (!line.IsSelectable && !line.CanDecrease && !line.CanIncrease) return view;
+        var lines = view.DetailLines.ToArray();
+        lines[row.Value] = line with { IsHovered = true, IsPressed = pressed };
+        return view with { DetailLines = lines };
+    }
+    public static int? DetailAdjust(float x, float y, FrontendLayout layout, in FrontendSurfaceView view)
+    {
+        int? row = DetailRow(x, y, layout, view.DetailLines.Count);
+        if (row is not int index) return null;
+        int? direction = DetailAdjust(x, y, layout, view.DetailLines.Count);
+        var line = view.DetailLines[index];
+        return direction == -1 && line.CanDecrease ? -1 : direction == 1 && line.CanIncrease ? 1 : null;
+    }
     public static bool PrimaryAction(float x, float y, FrontendLayout layout) => layout.Geometry.PrimaryAction.Contains(x, y);
     public static bool SecondaryAction(float x, float y, FrontendLayout layout) => layout.Geometry.SecondaryAction.Contains(x, y);
     public static bool Footer(float x, float y, FrontendLayout layout) => layout.Geometry.Footer.Contains(x, y);

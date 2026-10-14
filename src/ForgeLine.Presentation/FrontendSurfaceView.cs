@@ -24,7 +24,8 @@ public readonly record struct FrontendDetailLineView(
     bool CanDecrease = false,
     bool CanIncrease = false,
     bool IsHovered = false,
-    bool IsPressed = false);
+    bool IsPressed = false,
+    bool IsSelectable = false);
 
 public readonly record struct FrontendSurfaceView(
     FrontendSurfaceKind Kind,

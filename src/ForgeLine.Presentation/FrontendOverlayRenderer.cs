@@ -16,6 +16,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
 
     private readonly IGraphicsDevice _graphics;
     private readonly UiTextBatch _text;
+    private readonly Dictionary<(string Text, float Width, float Size), string[]> _wrappedText = new();
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers = new(4);
     private OverlayVertex[] _vertices = new OverlayVertex[MaxVertices];
@@ -128,7 +129,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
                 Vector4 color = line.IsWarning ? ForgeLineUiPalette.Warning : line.IsFocused ? ForgeLineUiPalette.Accent : ForgeLineUiPalette.TextPrimary;
                 if (layout.Controls)
                 {
-                    var wrapped = UiFontMetrics.Default.Wrap(line.Value, valueSlot.Width / scale, 22);
+                    var wrapped = Wrap(line.Value, valueSlot.Width / scale, 22);
                     for (int lineIndex = 0; lineIndex < Math.Min(3, wrapped.Length); lineIndex++)
                         Text(wrapped[lineIndex], valueSlot with { Y = valueSlot.Y + lineIndex * 27 * scale }, color);
                 }
@@ -152,7 +153,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
                 Text($"{Math.Clamp((int)(view.Progress * 100), 0, 100)}%", layout.Feedback, ForgeLineUiPalette.TextPrimary);
             }
         }
-        var footerLines = UiFontMetrics.Default.Wrap(view.Footer, layout.Footer.Width / scale, 22 * .78f);
+        var footerLines = Wrap(view.Footer, layout.Footer.Width / scale, 22 * .78f);
         for (int i = 0; i < Math.Min(2, footerLines.Length); i++)
             Text(footerLines[i], layout.Footer with { Y = layout.Footer.Y + i * 24 * scale }, ForgeLineUiPalette.TextMuted, .78f);
         if (!string.IsNullOrEmpty(view.Feedback)) Text(view.Feedback, layout.Feedback, ForgeLineUiPalette.Warning, .8f);
@@ -191,6 +192,16 @@ public sealed class FrontendOverlayRenderer : IDisposable
         _text.Dispose();
         _pipeline.Dispose();
         _disposed = true;
+    }
+
+    private string[] Wrap(string text, float width, float size)
+    {
+        var key = (text, width, size);
+        if (_wrappedText.TryGetValue(key, out var lines)) return lines;
+        if (_wrappedText.Count >= 64) _wrappedText.Clear();
+        lines = UiFontMetrics.Default.Wrap(text, width, size);
+        _wrappedText.Add(key, lines);
+        return lines;
     }
 
     private void EmitControlButton(string label, float x, float y, float width, float height, int viewportWidth, int viewportHeight, float scale)
