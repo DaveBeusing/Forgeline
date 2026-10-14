@@ -102,7 +102,7 @@ ForgeLine.Graphics
     D3D12 buffers, pipeline, depth target, commands
 ```
 
-`TerrainRenderer` creates each chunk's vertex and index buffers once during renderer construction. Static terrain buffers are reused across frames and are not regenerated during normal rendering.
+The production `TerrainRenderer` prepares bounded GPU residency for the current camera/shadow union before recording. Chunk buffers and control textures are created on admission and reused while resident; eviction uses native fence retirement. Standalone construction without residency settings retains eager loading. See [World environment rendering](WorldEnvironmentRendering.md) for preparation, capacity failure and diagnostics.
 
 The graphics layer owns native D3D12 resources and command submission. The world layer has no graphics reference.
 
@@ -208,4 +208,4 @@ The canonical definition can be captured as a versioned `BattlefieldMapArtifact`
 
 Central Divide now has a presentation layer above the simulation-owned chunked heightfield. Eight stable terrain material slots, nine reusable terrain texture sources, map-specific blend regions, reusable world objects, decals, and vegetation are defined without adding render material state to `TerrainWorld` or `TerrainChunk`.
 
-Terrain GPU resources are resolved from compiled runtime materials while the terrain renderer creates persistent per-chunk geometry and control textures. A visible chunk submits one indexed draw with a fixed 13-texture binding budget. The canonical 12 x 12 Central Divide therefore owns 144 persistent control textures at 33 x 33 plus mips, while material textures are shared through the runtime asset cache. World props and vegetation remain ordinary presentation entities using compiled runtime assets, shared cached mesh buffers, distance-selected LODs, and batched indexed instanced draws. See [World Asset Presentation](WorldAssetPresentation.md) for the stable IDs, LOD policy, map authoring examples, and current renderer boundary.
+Terrain GPU resources use compiled runtime materials and resident per-chunk geometry/control textures. A visible chunk submits one indexed draw with a fixed 13-texture binding budget. Central Divide retains all 144 CPU chunks; production GPU residency covers required chunks within its configured bound. Eager mode retains all 144 control textures at 33×33 plus mips. Material textures remain shared through the runtime cache. Props and vegetation use compiled assets, shared mesh buffers, distance-selected LODs and batched indexed instances. See [World Asset Presentation](WorldAssetPresentation.md) for authoring and [World environment rendering](WorldEnvironmentRendering.md) for residency and vegetation admission.
