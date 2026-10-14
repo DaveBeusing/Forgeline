@@ -27,6 +27,7 @@ public readonly record struct FrontendGeometry
     public FrontendRegion Footer { get; init; }
     public FrontendRegion Feedback { get; init; }
     public FrontendRegion Decorative { get; init; }
+    public FrontendRegion MenuArtwork { get; init; }
     public float MenuStride { get; init; }
     public float DetailStride { get; init; }
     public bool Controls { get; init; }
@@ -82,6 +83,8 @@ public readonly record struct FrontendGeometry
             Footer = Rect(left + 12 * scale, height - 150 * scale, right - left - 24 * scale, 70 * scale, true),
             Feedback = Rect(left + 12 * scale, height - 175 * scale, right - left - 24 * scale, 28 * scale),
             Decorative = Rect(left + detailWidth + 50 * scale, detailY, MathF.Max(0, right - left - detailWidth - 50 * scale), actionY - detailY),
+            MenuArtwork = Rect(left + MathF.Min(560 * scale, right - left) + 40 * scale, MathF.Max(190 * scale, menuY - 90 * scale),
+                MathF.Max(0, right - left - MathF.Min(560 * scale, right - left) - 40 * scale), height - 210 * scale - MathF.Max(190 * scale, menuY - 90 * scale)),
             MenuStride = menuStride, DetailStride = stride, Controls = controls, VisibleDetailRows = rows
         };
     }
