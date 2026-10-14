@@ -45,3 +45,5 @@ Repeat with -Profiles Medium -ParticleQuality Disabled for the fallback path; us
 ```
 
 Extract the development archive into a fresh directory, run its client with --smoke-test --render-stress 1000, then capture with -ClientPath and -RuntimeAssetRoot pointing exclusively to the extracted package. Structural checks, exact fixed-state pixels, human art acceptance and performance gates remain separate results.
+
+Final paired Sweep captures at 56ff7fed43530b9fceff06297ff5433e0f85a5aa (same rendering code as 949659b0c7629a95023f80d003a25868497ff5eb) use 128 warmups, 512 samples and eight exact readbacks per case: two scenes and tactical/strategic zooms in each of two runs. All eight captures are structurally valid; all four paired comparisons are comparable, with zero trends beyond 15% and zero unqualified cases. This establishes repeatability for the final moving stress workload, while the earlier master comparison remains historical and does not prove a final-source before/after improvement.
