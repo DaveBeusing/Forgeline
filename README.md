@@ -1,14 +1,5 @@
 # FORGELINE
 
-Build and release identity follows [Release Versioning](docs/ReleaseVersioning.md).
-Each PR increments PATCH once; CI does not automatically create tags or releases.
-Windows executable and native-window identity follow [Application branding](docs/WindowsApplicationBranding.md).
-Frontend and HUD colors, composition, interaction-state visuals, and the next typography milestone are documented in [Command Interface Visual Language](docs/CommandInterfaceVisualLanguage.md).
-
-Runtime assets are built explicitly with `pwsh ./build/Build-RuntimeAssets.ps1`; publish builds a complete runtime cache automatically, and installed players need neither source assets nor the compiler. See [asset build modes and integrity](docs/AssetPipeline.md#build-modes-and-deployment-integrity).
-
-Explicit asset compilation emits live stage and memory progress and supports a flushed JSON-lines log. See [Asset startup diagnostics](docs/AssetStartupDiagnostics.md) to investigate slow launches and cold texture compilation.
-
 <div align="center">
 
 ### BUILD. SUPPLY. CONQUER.
@@ -34,7 +25,7 @@ Explicit asset compilation emits live stage and memory progress and supports a f
 | Pillar | What you do |
 | :--- | :--- |
 | **Build** | Extract finite resources, refine materials, power factories, manufacture units, and automate production. |
-| **Supply** | Establish roads, transport routes, depots, fuel and ammunition distribution, and maintenance capacity. |
+| **Supply** | Establish transport routes, depots, fuel and ammunition distribution, and maintenance capacity. |
 | **Conquer** | Reconnoiter, position combined-arms forces, exploit terrain, disrupt supply lines, and advance the frontline. |
 
 **Core gameplay loop**
@@ -43,7 +34,7 @@ Explicit asset compilation emits live stage and memory progress and supports a f
 Extract → Process → Manufacture → Supply → Fight → Expand → Automate → Scale
 ```
 
-Unlike a conventional RTS economy, **industry is part of the battlefield**. Destroying a bridge, cutting off fuel, or disabling production can decide the outcome of a battle.
+Industry is part of the battlefield. Destroying a bridge, cutting off fuel, or disabling production can decide the outcome of a battle.
 
 ## Playable Pre-Alpha
 
@@ -58,11 +49,11 @@ The current development slice centers on **Central Divide**, a **3.072 × 3.072 
 | **Intelligence** | Fog of war, radar and visual sensors, detection/identification, information-limited targeting |
 | **Skirmish** | Computer-controlled opponent operating under the same core economy, supply, and combat rules |
 | **Match flow** | Setup, pause, victory/surrender, results, and restart |
-| **Presentation** | Native Direct3D 12, terrain, Directorate assets, HUD, minimap, strategic overlays, and effects |
+| **Presentation** | Native Direct3D 12, terrain, Directorate assets, contextual HUD, minimap, strategic overlays, and effects |
 
-The Windows client provides resource and power information, selection-derived contextual commands, and opt-in FPS/simulation-rate readings through Shift + F1. Directorate unit and building families use compiled assets with LOD and gameplay-relevant visual states. The Combat Engineer currently shares the Rifle Squad visual family.
+Directorate buildings and units use compiled assets with physical LODs and damage-state geometry. Rifle Squad and Combat Engineer now have distinct four-member visual kits; their figures are presentation detail, while each squad remains one simulation entity. Scout Vehicle, artillery, cargo and supply trucks have dedicated component kits and damaged/critical/wreck meshes. Human art review and sustained native performance acceptance for those vehicle kits remain pending. See [infantry and battlefield production](docs/InfantryBattlefieldProduction.md) and [combat/support unit production](docs/CombatSupportUnitProduction.md).
 
-**Development status:** This is a **pre-alpha vertical slice**, not a finished game. Rail gameplay, more advanced tactics, interactive map editing, other factions, and multiplayer remain future work.
+**Development status:** This is a **pre-alpha vertical slice**. Rail gameplay, interactive map editing, other factions, multiplayer, and audio playback remain future work. Measured qualification covers specific workloads and hardware; frame-rate and entity-scale targets remain engineering goals.
 
 See [Central Divide](docs/CentralDivideScenario.md) and the [Windows client guide](docs/WindowsClient.md).
 
@@ -70,29 +61,30 @@ See [Central Divide](docs/CentralDivideScenario.md) and the [Windows client guid
 
 ### Prerequisites
 
-- **Windows x64**
-- **.NET SDK 10.0.401**, pinned in [`global.json`](global.json)
-- A **Direct3D 12-capable** graphics environment; WARP fallback supports designated development/smoke scenarios
-- **PowerShell** for validation scripts
+- **Windows x64** for the interactive client.
+- **.NET SDK 10.0.401**, pinned in [global.json](global.json), with C# 14.
+- A **Direct3D 12-capable** graphics environment; designated development/smoke scenarios support WARP fallback.
+- **PowerShell 7** (`pwsh`) for build and validation scripts.
 
 From the repository root:
 
 ```powershell
 dotnet restore ForgeLine.sln
-dotnet build ForgeLine.sln --configuration Release
-dotnet test --solution ForgeLine.sln --configuration Release
+dotnet build ForgeLine.sln --configuration Release --no-restore
 ```
 
-The repository selects **Microsoft.Testing.Platform** through `global.json`.
-
-### Launch the client
+### Build runtime assets and launch
 
 ```powershell
-dotnet run --project tools/ForgeLine.AssetCompiler --configuration Release -- --source assets/source --runtime assets/runtime --progress-log artifacts/asset-compilation.jsonl
+pwsh ./build/Build-RuntimeAssets.ps1 -Mode development -NoBuild
 dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release --no-build
 ```
 
-The client starts the Central Divide / Directorate skirmish flow. Compile authoring assets explicitly before launching a source checkout; the client never starts the compiler. Packaged builds consume their adjacent runtime assets. `FORGELINE_RUNTIME_ASSETS` selects an authoritative override, including missing or broken installations. A native FORGELINE startup surface appears before settings and graphics initialization. Automatic startup checkpoints are stored under `%LOCALAPPDATA%/FORGELINE/diagnostics`; see [startup timing](docs/StartupDiagnostics.md).
+Build authoring assets explicitly before launching a source checkout. The helper invokes the asset compiler, checks its result, and records qualification and progress under `artifacts/`. Development mode supports incremental rebuilds; build mode prepares a complete runtime cache, and validate mode checks an existing cache without rebuilding. See [asset build modes and deployment integrity](docs/AssetPipeline.md#build-modes-and-deployment-integrity).
+
+The client opens the Central Divide / Directorate skirmish flow and consumes compiled runtime assets; it never starts the compiler. Packaged builds consume adjacent runtime assets and require neither authoring sources nor the compiler. `FORGELINE_RUNTIME_ASSETS` selects an authoritative asset root; an invalid override is reported rather than silently replaced.
+
+A branded native startup surface appears before settings and graphics initialization. Startup checkpoints are saved under `%LOCALAPPDATA%/FORGELINE/diagnostics`. See [startup timing](docs/StartupDiagnostics.md) and [asset compilation diagnostics](docs/AssetStartupDiagnostics.md).
 
 ### Essential controls
 
@@ -108,33 +100,35 @@ The client starts the Central Divide / Directorate skirmish flow. Compile author
 | Development metrics | Shift + F1 |
 | Restart finished match / exit session | R / Escape |
 
-Settings → GRAPHICS QUALITY selects Low, Medium, High or Ultra for the next match. Independent controls cover world resolution, spatial anti-aliasing, shadows, textures, object/surface detail, vegetation motion, atmosphere and particles while preserving full-resolution HUD and selection indicators. Display changes use a 15-second confirmation with automatic rollback. Medium is the default; effective hardware fallbacks are reported. See [settings and measured qualification](docs/GraphicsQualitySettings.md).
+Gameplay shortcuts can be changed in Settings through GAMEPLAY ACTION and GAMEPLAY KEY. Conflicts block APPLY with an explanation; saved camera mappings retain priority. Mouse selection, control-group digits, help and Escape remain fixed. See [input binding rules](docs/GameplayInputAccessibilityAndQualification.md).
 
-The opt-in [native visual reference lane](docs/VisualReferenceEvidence.md) exports fixed-state Central Divide images with build/asset identity, actual resolution and resource/timing metadata. Structural qualification and human art review remain separate.
+Multi-selection supports owned-unit type filters, operational averages, and damaged/critical-supply member focus. Saved control groups remain available; F3/NEXT on the group card cycles the formation. See [group-card controls](docs/FormationMovementAndGroupOrders.md#current-selection-group-card).
 
-The [graphics reference performance workflow](docs/GraphicsReferencePerformance.md) adds paired warm/renderer-cold measurements, deterministic camera sweeps, a production 1,000-vehicle preset and explicit performance/native-pixel comparison gates.
+The optional **OPERATIONS** tab inspects local production, stock, power and logistics bottlenecks. Resource/power-strip, alert and facility-inspector clicks open relevant views. Alerts marked **FOCUS** select and center an authorized target; **OPS** and **MORE** open operations filters. Strategic-map layers have full names and shape legends. See [operations](docs/ProductionAndLogisticsOperations.md) and [actionable alerts and strategic map](docs/ActionableAlertsAndStrategicMap.md).
 
-The shared [metallic-roughness lighting foundation](docs/PbrFoundationQualification.md) includes explicit material controls and measured native comparisons alongside existing HDR, shadow and spatial-AA profiles.
+Frontend and HUD use the shared [Command Interface Visual Language](docs/CommandInterfaceVisualLanguage.md). Further interaction details are in [Windows Client](docs/WindowsClient.md) and [Camera and Input](docs/CameraAndInput.md).
 
-Gameplay shortcuts can be changed in Settings through GAMEPLAY ACTION and GAMEPLAY KEY. Conflicts show a reason and block APPLY; saved camera mappings retain priority. Cards, onboarding and help show the saved mapping after the settings restart. Mouse selection, control-group digits, help and Escape remain fixed. See [binding rules and qualification](docs/GameplayInputAccessibilityAndQualification.md).
+### Graphics settings
 
-Additional behavior is covered by [Windows Client](docs/WindowsClient.md) and [Camera and Input](docs/CameraAndInput.md).
+Settings → GRAPHICS QUALITY selects **Low, Medium, High or Ultra** for the next match; Medium is the default. Independent controls cover world resolution, spatial anti-aliasing, shadows, textures, object/surface detail, vegetation motion, atmosphere and particles while keeping HUD and selection indicators at full resolution. Display changes use a 15-second confirmation with automatic rollback, and effective hardware fallbacks are reported. See [graphics quality settings](docs/GraphicsQualitySettings.md).
+
+The renderer includes a shared metallic-roughness lighting foundation. Optional fixed-state visual references and paired warm/renderer-cold performance runs record build/asset identity, resolution and timing. See [PBR qualification](docs/PbrFoundationQualification.md), [native visual evidence](docs/VisualReferenceEvidence.md) and [graphics reference performance](docs/GraphicsReferencePerformance.md). Structural checks and human art review remain separate gates.
 
 ## ForgeLine Engine
 
-FORGELINE is built on **ForgeLine Engine**, a purpose-built C#/.NET RTS engine—not Unity, Unreal, or a general-purpose engine.
+FORGELINE uses **ForgeLine Engine**, a purpose-built C#/.NET RTS engine.
 
 | Area | Baseline |
 | :--- | :--- |
-| Language / runtime | **C# 14 · .NET 10 LTS** |
-| Target | **Windows x64** |
+| Language / runtime | **C# 14 · .NET 10** |
+| Interactive target | **Windows x64** |
 | Renderer | Custom **Direct3D 12** |
 | Simulation | Fixed-tick, command-driven, headless-capable; **20 Hz target** |
 | Entity architecture | Data-oriented custom ECS |
 | Multithreading | Persistent-worker job scheduler |
 | World / navigation | Chunk-based world, hierarchical paths, local steering, formation corridors |
 | Logistics | Graph-based transport and capacity simulation |
-| Content | Stable data identifiers, compiled source-to-runtime assets |
+| Content | Stable identifiers, editable source kits, compiled runtime assets |
 | Recovery | Versioned save/load and command replay |
 | Design | Strict simulation/presentation separation; future networking considered |
 
@@ -156,36 +150,55 @@ See [Architecture](docs/Architecture.md) and [Project Context](docs/ProjectConte
 
 ## Development and Validation
 
-### Headless simulation
+### Versions and pull requests
+
+`master` is the integration branch. Each PR commits exactly one PATCH increment relative to current master in [Directory.Build.props](Directory.Build.props). Additional commits and CI reruns do not increment it again. Prepare the PR version with:
 
 ```powershell
-dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --ticks 1000 --seed 1 --tick-rate 20
+pwsh ./build/Increment-PrVersion.ps1 -BaseRef origin/master
 ```
 
-A repeatable, bounded terminal-match scenario:
+CI validates the increment and runs with read-only repository permissions. It creates **no automatic tags or releases**. PR/run/attempt and full Git SHA identify validation builds; packages retain checksums and provenance. See [PR Versioning](docs/ReleaseVersioning.md).
 
-```powershell
-dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario central-divide --profile validation --ticks 80000 --seed 2026 --require-terminal
-```
+### Tests and architecture
 
-The `validation` profile supports automated qualification; `gameplay` retains player-facing defaults.
-
-### Architecture and renderer checks
+After the Release build and runtime asset preparation:
 
 ```powershell
 pwsh ./build/Validate-ProjectReferences.ps1
-dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release -- --smoke-test --render-stress 1000
+dotnet test --solution ForgeLine.sln --configuration Release --no-build
+dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release --no-build -- --smoke-test --render-stress 1000
 ```
 
-### Save and replay
+The repository selects **Microsoft.Testing.Platform** through `global.json`. The complete CI `build-test` job also covers map/runtime asset qualification, native checks, packaging and a bounded terminal match. Follow [Development](docs/Development.md) for the canonical sequence and opt-in hardware checks; a local subset does not represent the full CI gate.
+
+### Headless simulation and recovery
 
 ```powershell
-dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --scenario central-divide --profile validation --ticks 5000 --seed 2026 --save-output artifacts/match.save.json --replay-output artifacts/match.replay.json
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 1000 --seed 1 --tick-rate 20
 ```
 
-See [Save, Load, Replay, and Recovery](docs/SaveLoadReplayAndRecovery.md).
+A repeatable terminal-match scenario:
 
-**Note:** Frame-rate, simulation, and entity-scale targets are engineering goals, not performance guarantees.
+```powershell
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario central-divide --profile validation --ticks 80000 --seed 2026 --require-terminal
+```
+
+Save and replay output:
+
+```powershell
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario central-divide --profile validation --ticks 5000 --seed 2026 --save-output artifacts/match.save.json --replay-output artifacts/match.replay.json
+```
+
+The `validation` profile supports automated qualification; `gameplay` retains player-facing defaults. See [Save, Load, Replay, and Recovery](docs/SaveLoadReplayAndRecovery.md).
+
+### Package a Windows build
+
+```powershell
+pwsh ./build/Publish-PreAlpha.ps1 -Configuration Release -VerifyReproducible
+```
+
+Publishing prepares a complete runtime cache by default and produces a versioned Windows ZIP under `artifacts/prealpha`, with SHA-256 and provenance sidecars. An explicitly supplied `-RuntimeAssetRoot` must pass validation. The package is framework-dependent and requires the .NET 10 x64 runtime. The installed client consumes compiled assets without the source tree or compiler. Application icon and native-window identity follow [Windows application branding](docs/WindowsApplicationBranding.md).
 
 ## Repository Structure
 
@@ -195,8 +208,8 @@ assets/       Editable source and compiled runtime assets
 tools/        Editors, asset and map compilation
 tests/        Unit, integration and headless tests
 benchmarks/   Performance benchmarks
-build/        Validation scripts
-docs/         Technical and operational documentation
+build/        Build, packaging and validation scripts
+docs/         Technical documentation and qualification evidence
 .github/      CI workflows
 ```
 
@@ -204,12 +217,15 @@ docs/         Technical and operational documentation
 
 | Topic | References |
 | :--- | :--- |
-| **Development** | [Development workflow](docs/Development.md) · [Architecture](docs/Architecture.md) |
+| **Development and governance** | [Development](docs/Development.md) · [Project Context](docs/ProjectContext.md) · [PR Versioning](docs/ReleaseVersioning.md) · [Architecture](docs/Architecture.md) |
 | **Client and controls** | [Windows Client](docs/WindowsClient.md) · [Camera and Input](docs/CameraAndInput.md) · [Interaction Qualification](docs/InteractionQualification.md) |
+| **Interface and operations** | [Command Interface Visual Language](docs/CommandInterfaceVisualLanguage.md) · [Group Orders](docs/FormationMovementAndGroupOrders.md) · [Operations](docs/ProductionAndLogisticsOperations.md) · [Alerts and Strategic Map](docs/ActionableAlertsAndStrategicMap.md) |
 | **World and runtime** | [Central Divide Battlefield](docs/CentralDivideBattlefield.md) · [Simulation Runtime](docs/SimulationRuntime.md) · [Navigation](docs/HierarchicalNavigation.md) |
 | **Economy and supply** | [Industrial Production](docs/IndustrialProduction.md) · [Logistics Routing](docs/LogisticsNetworkAndRouting.md) · [Battlefield Supply](docs/BattlefieldSupply.md) |
 | **Warfare** | [Combat Execution](docs/CombatExecution.md) · [Battlefield Intelligence](docs/BattlefieldIntelligence.md) · [Skirmish Opponent](docs/SkirmishOpponent.md) |
-| **Production and quality** | [Asset Pipeline](docs/AssetPipeline.md) · [Scalability Qualification](docs/ScalabilityQualification.md) · [Pre-Alpha Operations](docs/PreAlphaUxAndOperations.md) |
+| **Source assets** | [Asset Pipeline](docs/AssetPipeline.md) · [Directorate Buildings](docs/DirectorateBuildingAssets.md) · [Directorate Units](docs/DirectorateUnitAssets.md) · [Infantry and Battlefield Production](docs/InfantryBattlefieldProduction.md) · [Combat/Support Units](docs/CombatSupportUnitProduction.md) |
+| **Graphics and qualification** | [Graphics Settings](docs/GraphicsQualitySettings.md) · [PBR Foundation](docs/PbrFoundationQualification.md) · [Visual Evidence](docs/VisualReferenceEvidence.md) · [Reference Performance](docs/GraphicsReferencePerformance.md) · [Scalability](docs/ScalabilityQualification.md) |
+| **Packaging and diagnostics** | [Pre-Alpha Operations](docs/PreAlphaUxAndOperations.md) · [Application Branding](docs/WindowsApplicationBranding.md) · [Startup Timing](docs/StartupDiagnostics.md) · [Asset Diagnostics](docs/AssetStartupDiagnostics.md) |
 | **Architecture decisions** | [Match Runtime Composition](docs/adr/MatchRuntimeAndScenarioComposition.md) · [Render Snapshot Ownership](docs/adr/RenderFrameScratchAndSnapshotOwnership.md) · [GPU Resource Safety](docs/adr/GpuResourceRetirementAndFaultShutdown.md) |
 
 ---
@@ -219,9 +235,3 @@ docs/         Technical and operational documentation
 **FORGELINE — Build. Supply. Conquer.**
 
 </div>
-
-Multi-selection provides owned unit type filters, component-covered operational averages and damaged/critical-supply member focus controls. Saved control groups remain available; the card F3/NEXT control uses the existing formation cycle. See [group-card controls](docs/FormationMovementAndGroupOrders.md#current-selection-group-card).
-
-The optional OPERATIONS tab provides local production, stock, power and logistics bottleneck inspection. Resource/power-strip, alert and facility-inspector clicks open relevant views; existing facility controls remain available. See [operations controls and limits](docs/ProductionAndLogisticsOperations.md).
-
-Alert rows marked FOCUS select and center an authorized affected target; OPS and MORE open existing operations filters with unavailable-target explanations. The existing minimap selector has full layer names and shape legends; F10/F11 controls remain available. See [alert and strategic-map semantics](docs/ActionableAlertsAndStrategicMap.md).
