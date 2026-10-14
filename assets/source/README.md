@@ -12,6 +12,7 @@ The Vertical Slice source sets are organized by presentation domain:
 - `infrastructure/directorate/` — Directorate road/bridge presentation and strategic symbols;
 - `vfx/` — combat, destruction, persistent damage, projectile, and logistics VFX meshes/materials;
 - `ui/` — semantic RTS resource, role, command, cursor, supply, minimap, and status material assets.
+- `branding/forgeline/menu/` — authored Directorate title still, provenance and compiled display-image declaration.
 - `branding/undefined_behavior/splash/` — studio startup atmosphere, separator, monogram, wordmark, and subtitle textures.
 
 These baselines intentionally use compact replacement-ready geometry and stable IDs so presentation exercises the production compiler/runtime path before final high-detail content replacement.

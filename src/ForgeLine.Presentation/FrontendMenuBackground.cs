@@ -23,10 +23,11 @@ public sealed class FrontendMenuBackground : IDisposable
     private IGraphicsPipeline? _pipeline;
     private bool _failed, _disposed;
     private int _mip = -1, _uploads;
+    private long _residentBytes;
     private string? _failure;
     public bool Ready => _texture is not null;
     public FrontendBackgroundDiagnostics Diagnostics => new(_disposed ? "Disposed" : Ready ? "Ready" : _failed ? "Fallback" : _worker is null ? "Deferred" : "Loading",
-        _texture is null ? 0 : _data!.Mips.Skip(_mip).Sum(m => (long)m.RowPitch * ((m.Height + 3) / 4)), _uploads, _failure);
+        _residentBytes, _uploads, _failure);
 
     public FrontendMenuBackground(IGraphicsDevice graphics, RuntimeAssetCatalog catalog) : this(graphics, () => Read(catalog)) { }
     internal FrontendMenuBackground(IGraphicsDevice graphics, Func<RuntimeTextureData?> load)
@@ -83,9 +84,10 @@ public sealed class FrontendMenuBackground : IDisposable
                 GraphicsTextureColorSpace.Linear, _data.Mips.Count - mip) { DeferUploadWait = true },
                 _data.Mips.Skip(mip).Select(m => new GraphicsTextureMipData(m.Width, m.Height, m.RowPitch, m.Pixels))));
             _texture?.Dispose(); _texture = texture; _mip = mip; _uploads++;
+            _residentBytes = _data.Mips.Skip(mip).Sum(m => (long)m.RowPitch * ((m.Height + 3) / 4));
         }
         catch (Exception error) when (error is IOException or InvalidOperationException or NotSupportedException or ArgumentException)
-        { _texture?.Dispose(); _texture = null; _pipeline?.Dispose(); _pipeline = null; Fail(error.Message); }
+        { _texture?.Dispose(); _texture = null; _residentBytes = 0; _pipeline?.Dispose(); _pipeline = null; Fail(error.Message); }
     }
     private void Fail(string reason) { _failed = true; _failure = reason; Console.Error.WriteLine($"[frontend:image:fallback] {reason}"); }
 
@@ -123,7 +125,7 @@ public sealed class FrontendMenuBackground : IDisposable
     {
         if (_disposed) return;
         _disposed = true; _cancellation.Cancel(); _cancellation.Dispose();
-        _texture?.Dispose(); _texture = null; _pipeline?.Dispose(); _data = null; _worker = null;
+        _texture?.Dispose(); _texture = null; _residentBytes = 0; _pipeline?.Dispose(); _data = null; _worker = null;
         foreach (var buffer in _buffers.Values) buffer.Dispose();
         // The bounded CPU read may finish after cancellation; it owns no device/window resources.
     }

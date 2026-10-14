@@ -197,10 +197,12 @@ public sealed class FrontendOverlayRenderer : IDisposable
         context.SetPipeline(_pipeline);
         context.SetVertexBuffer(buffer, VertexStride);
         context.Draw(_vertexCount);
-        if (_background?.Ready == true && view.Kind is not (FrontendSurfaceKind.Controls or FrontendSurfaceKind.PauseMenu))
-            _background.Render(context, view.Kind == FrontendSurfaceKind.MainMenu ? layout.MenuArtwork : layout.Decorative);
+        var imageRegion = view.Kind == FrontendSurfaceKind.MainMenu ? layout.MenuArtwork : layout.Decorative;
+        bool imageDrawn = _background?.Ready == true && imageRegion.Width > 0 && imageRegion.Height > 0 &&
+            view.Kind is not (FrontendSurfaceKind.Controls or FrontendSurfaceKind.PauseMenu);
+        if (imageDrawn) _background!.Render(context, imageRegion);
         _text.Render(context);
-        LastRenderedVertexCount = _vertexCount + _text.VertexCount;
+        LastRenderedVertexCount = _vertexCount + _text.VertexCount + (imageDrawn ? 6 : 0);
     }
 
     public void Dispose()
