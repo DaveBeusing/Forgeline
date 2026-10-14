@@ -72,7 +72,7 @@ jobs:
       - name: Graphics quality and display contracts
         shell: pwsh
         run: |
-          dotnet test --project tests/ForgeLine.Graphics.Tests/ForgeLine.Graphics.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Graphics.Tests.ResolutionScaleTests ForgeLine.Graphics.Tests.PostProcessingTests
+          dotnet test --project tests/ForgeLine.Graphics.Tests/ForgeLine.Graphics.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Graphics.Tests.ResolutionScaleTests ForgeLine.Graphics.Tests.PostProcessingTests ForgeLine.Graphics.Tests.DepthReconstructionTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.GraphicsQualityPolicyTests ForgeLine.Presentation.Tests.RenderQualitySettingsTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
