@@ -255,8 +255,9 @@ public sealed class FrontendOverlayRenderer : IDisposable
                     : scale;
                 EmitText(line.Label, 112 * scale, y, controls
                     ? ForgeLineUiPalette.TextSecondary
-                    : ForgeLineUiPalette.TextMuted, context.Width, context.Height, scale);
-                EmitText(line.Value, 460 * scale, y, valueColor, context.Width, context.Height, valueScale);
+                    : ForgeLineUiPalette.TextMuted, context.Width, context.Height, scale, maximumWidth: 320);
+                EmitText(line.Value, 460 * scale, y, valueColor, context.Width, context.Height, valueScale,
+                    maximumWidth: controls ? 1370f * scale / valueScale : line.CanDecrease || line.CanIncrease ? 340 : 1370);
 
                 if (line.CanDecrease)
                 {
@@ -488,10 +489,11 @@ public sealed class FrontendOverlayRenderer : IDisposable
         EmitTriangle(left, top, right, bottom, left, bottom, color);
     }
 
-    private void EmitText(string text, float x, float y, Vector4 color, int width, int height, float scale)
+    private void EmitText(string text, float x, float y, Vector4 color, int width, int height, float scale, float maximumWidth = float.MaxValue)
     {
         if (_text.Add(text, x + _offsetX, y + _offsetY, UiTypography.Style(text == "FORGELINE" ? UiTextRole.CommandTitle : UiTextRole.MenuItem).Size * scale, color, width, height,
-            bold: text == "FORGELINE")) return;
+            maximumWidth: maximumWidth == float.MaxValue ? maximumWidth : maximumWidth * scale,
+            bold: text == "FORGELINE" || color == ForgeLineUiPalette.Warning)) return;
 
         float cursor = x;
         foreach (char character in text.ToUpperInvariant())

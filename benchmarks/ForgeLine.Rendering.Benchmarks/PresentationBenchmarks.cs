@@ -545,7 +545,7 @@ public class PresentationBenchmarks : IDisposable
 
     internal sealed class NullGraphicsDevice : IGraphicsDevice
     {
-        public bool SupportsUiText => true;
+        public bool SupportsUiText { get; init; } = true;
         public long UploadedBytes { get; private set; }
         public long UploadCalls { get; private set; }
         internal void RecordUpload(int bytes) { UploadedBytes += bytes; UploadCalls++; }

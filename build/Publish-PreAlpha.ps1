@@ -57,6 +57,7 @@ function Publish-Client {
         throw "dotnet publish failed with exit code $LASTEXITCODE."
     }
 
+    & "$PSScriptRoot/Validate-UiFonts.ps1" -PublishRoot $Destination
     & "$PSScriptRoot/Test-WindowsApplicationIcon.ps1" -ClientPath (Join-Path $Destination 'ForgeLine.Client.exe')
 
     if (-not (Test-Path $runtimeAssets)) {

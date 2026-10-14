@@ -53,8 +53,13 @@ internal sealed class UiTextBatch : IDisposable
             _atlas.Users++;
             _pipeline = pipeline;
         }
-        catch (Exception error) when (error is InvalidDataException or NotSupportedException)
-        { pipeline?.Dispose(); FailureReason = "Bundled UI font unavailable. Reinstall the application. " + error.Message; }
+        catch (Exception error)
+        {
+            pipeline?.Dispose();
+            if (error is not (IOException or NotSupportedException or System.Text.Json.JsonException)) throw;
+            FailureReason = "Bundled UI font unavailable. Reinstall the application. " + error.Message;
+            Console.Error.WriteLine("[ui:font] " + FailureReason);
+        }
     }
     public void Begin() { ObjectDisposedException.ThrowIf(_disposed,this); _count=0; _missing=0; _dropped=0; }
     public bool Add(ReadOnlySpan<char> text, float x, float y, float size, Vector4 color, int width, int height,

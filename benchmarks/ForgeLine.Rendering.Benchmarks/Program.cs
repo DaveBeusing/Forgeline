@@ -6,6 +6,11 @@ internal static class Program
 {
     public static void Main(string[] args)
     {
+        if (args is ["--typography-hotpaths", string typographyOutput])
+        {
+            UiTypographyMeasurements.Run(typographyOutput);
+            return;
+        }
         if (args is ["--gameplay-ui-hotpaths", string gameplayUiOutput])
         {
             GameplayUiMeasurements.Run(gameplayUiOutput);

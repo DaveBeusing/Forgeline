@@ -60,11 +60,18 @@ jobs:
         shell: pwsh
         run: ./build/Validate-ProjectReferences.ps1
 
+      - name: Validate bundled UI font resources
+        shell: pwsh
+        run: ./build/Validate-UiFonts.ps1
+
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
       - name: Compile and qualify canonical map
         run: dotnet run --project tools/ForgeLine.MapCompiler/ForgeLine.MapCompiler.csproj --configuration Release --no-build -- --output artifacts/maps/central-divide.flmap.json --qualification-output artifacts/map-qualification.json
+
+      - name: Native UI typography contracts
+        run: dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.UiFontMetricsTests ForgeLine.Presentation.Tests.UiTypographyNativeTests
 
       - name: Native material BRDF and HDR contracts
         run: dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.PbrMaterialShaderTests ForgeLine.Presentation.Tests.SceneOutputIntegrationTests

@@ -5,6 +5,16 @@ namespace ForgeLine.Graphics.Tests;
 public sealed class GraphicsTextureDataTests
 {
     [Fact]
+    public void CoverageTextureUsesOneLinearBytePerTexel()
+    {
+        var d = new GraphicsTextureDescription(3, 2, GraphicsTextureFormat.R8Unorm, GraphicsTextureColorSpace.Linear, 1);
+        var texture = new GraphicsTextureData(d, [new(3, 2, 3, new byte[6])]);
+        Assert.Equal(6, texture.ResidentByteCount);
+        Assert.Throws<ArgumentException>(() => new GraphicsTextureData(d, [new(3, 2, 2, new byte[4])]));
+        Assert.Throws<ArgumentException>(() => (d with { ColorSpace = GraphicsTextureColorSpace.Srgb }).Validate());
+    }
+
+    [Fact]
     public void Bc7UsesBlockRowsIncludingSmallMips()
     {
         var description = new GraphicsTextureDescription(8, 4, GraphicsTextureFormat.Bc7Unorm, GraphicsTextureColorSpace.Srgb, 4);
