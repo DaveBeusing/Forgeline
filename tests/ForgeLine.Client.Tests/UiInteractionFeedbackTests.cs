@@ -66,6 +66,23 @@ public sealed class UiInteractionFeedbackTests
     }
 
     [Fact]
+    public void LoadingToMenuAndFirstModalRevealWithoutDelayingContent()
+    {
+        var feedback = new UiInteractionFeedback();
+        feedback.Frontend(FrontendSurfaceView.Loading("LOADING", false, 0), TimeSpan.Zero, true);
+        var menu = FrontendSurfaceView.MainMenu([new("new", "NEW GAME", true, true)])
+            with { Layout = FrontendGeometry.Resolve(1920, 1080) };
+        var first = feedback.Frontend(menu, TimeSpan.FromMilliseconds(16), true);
+        Assert.Equal(0, first.Motion!.Value.Reveal);
+        Assert.Equal(menu.MenuEntries, first.MenuEntries);
+        Assert.Equal(menu.Layout, first.Layout);
+        var modal = new UiInteractionFeedback().Frontend(FrontendSurfaceView.Detail("SETTINGS", [], "ESC BACK", "APPLY"), TimeSpan.Zero, true);
+        Assert.Equal(0, modal.Motion!.Value.Reveal); Assert.Equal("APPLY", modal.PrimaryAction);
+        var software = feedback.Frontend(menu with { Title = "SOFTWARE" }, TimeSpan.FromMilliseconds(32), true, software: true);
+        Assert.Equal(UiMotionView.Settled, software.Motion);
+    }
+
+    [Fact]
     public void FutureAndStaleFeedbackCannotProduceAResultCue()
     {
         var feedback = new UiInteractionFeedback(); var panel = default(PlayerActionPanelView);

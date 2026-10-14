@@ -35,10 +35,13 @@ internal sealed class UiInteractionFeedback
         }
         bool error = !string.IsNullOrEmpty(view.Feedback) && _error != view.Feedback;
         bool eligible = active && view.Kind is not (FrontendSurfaceKind.Loading or FrontendSurfaceKind.StudioSplash);
-        bool resized = _width != (view.Layout?.Width ?? 0) || _height != (view.Layout?.Height ?? 0);
+        bool resized = _width > 0 && _height > 0 && view.Layout is { } layout &&
+            (_width != layout.Width || _height != layout.Height);
         Cue = !_seen || _cancelled || !eligible || resized ? UiAudioCue.None : error ? UiAudioCue.Rejected :
             pressed && !_pressed ? UiAudioCue.Intent : reveal || focused ? UiAudioCue.Navigation : UiAudioCue.None;
         if (!eligible || resized) _motion.Cancel();
+        // First interactive content is usable immediately; initialize only its decoration clock.
+        if (!_seen && eligible) _motion.Update(now, false, false, false, false);
         var motion = _motion.Update(now, reveal, focused, error, eligible && !software && view.FeedbackSettings.Animate(view.BackgroundQuality));
         _kind = view.Kind; _title = view.Title; _focus = focus; _pressed = pressed; _error = view.Feedback;
         _cancelled = false;
