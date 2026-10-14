@@ -131,8 +131,11 @@ internal static class UiFeedbackCapture
             {
                 bool played = audio.TryPlay(cue, .06f);
                 bool busyDropped = played && !audio.TryPlay(cue, .06f);
+                audio.StopPlayback();
+                bool restarted = played && audio.TryPlay(cue, .06f);
+                if (played && !restarted) throw new InvalidOperationException("UI voice did not restart after reset.");
                 Thread.Sleep(140); audio.StopPlayback();
-                sound.Add(new { Cue = cue.ToString(), Played = played, BusyDropped = busyDropped });
+                sound.Add(new { Cue = cue.ToString(), Played = played, BusyDropped = busyDropped, RestartedAfterStop = restarted });
             }
             bool audioAvailable = audio.Available;
             audio.Dispose();
