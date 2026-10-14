@@ -15,4 +15,5 @@ public readonly record struct InstanceRenderDiagnostics(
     public int Lod2Instances { get; init; }
     public int AnimatedVegetationInstances { get; init; }
     public int VisibleVegetationInstances { get; init; }
+    public int SkippedDecalResources { get; init; }
 }
