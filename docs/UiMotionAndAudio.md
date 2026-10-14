@@ -93,3 +93,5 @@ audio probe records actual device availability and busy-drop behavior separately
 from subjective listening approval. See the accompanying qualification record for
 executed checks and unresolved acceptance; stable captures do not grant pixel-golden
 approval or physical-monitor certification.
+
+See [executed package/native qualification and remaining acceptance](UiFeedbackQualification.md).

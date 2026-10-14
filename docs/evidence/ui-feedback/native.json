@@ -1,0 +1,1854 @@
+{
+  "Source": "0.1.368-dev\u002B4642b5fe71677b33a01d76d31a82ec72a396d704",
+  "Device": {
+    "AdapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+    "DedicatedVideoMemoryBytes": 25309478912,
+    "IsSoftwareAdapter": false,
+    "FeatureLevel": "Level_12_1",
+    "DebugLayerEnabled": false,
+    "Advanced": {
+      "MeshShaderQuerySucceeded": true,
+      "MeshShadersSupported": true,
+      "RaytracingQuerySucceeded": true,
+      "RaytracingSupported": true
+    }
+  },
+  "WindowDpi": 144,
+  "Fixture": "5EB51829C2002B94B0CBAECA14DF3110AF566E01CF19688BFDD398AF6B08E723",
+  "Contract": "Injected presentation clock, authored copied dock state and frozen battlefield; no requests dispatched. Native rates are sampling inputs, not sustained client FPS. Submit includes waits/Present. Short sequential cohorts are observational. Physical-monitor and human motion/sound acceptance remain separate.",
+  "Cases": [
+    {
+      "Surface": "Menu",
+      "ReducedMotion": false,
+      "InjectedRate": 30,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 0.7354,
+      "SubmitP95Milliseconds": 5.3441,
+      "GpuSamples": 4,
+      "GpuP50Milliseconds": 0.140672,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "534D443C091AC81EB631DDFFFB9F1C4F4758000BDFF1E22CD17E39D5796B5CD5"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "9DBF08E5D693244175327D306042D4B3F875F8CCB8CEF5FEC9889F620F7981D4"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "E9B5ECF76522E4B67FB66C7B23408981D5F6391A94F457CD9BD04B17E2BB48B2"
+        }
+      ]
+    },
+    {
+      "Surface": "Menu",
+      "ReducedMotion": false,
+      "InjectedRate": 60,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 3.358,
+      "SubmitP95Milliseconds": 6.4404,
+      "GpuSamples": 16,
+      "GpuP50Milliseconds": 0.451584,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "1A8E5648261A6FA1A8556A92EA1B106B00EE168DA483A7813C374B0E56896B10"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "C6B65D28ECC66552CFEFEEB2A329CB9C3F7188DB60CEE4FAF55915B7C3A6EF42"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "E9B5ECF76522E4B67FB66C7B23408981D5F6391A94F457CD9BD04B17E2BB48B2"
+        }
+      ]
+    },
+    {
+      "Surface": "Menu",
+      "ReducedMotion": false,
+      "InjectedRate": 144,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 3.8527,
+      "SubmitP95Milliseconds": 17.775,
+      "GpuSamples": 42,
+      "GpuP50Milliseconds": 0.194208,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "231577EE07D01C72EFB102239732503E87FB7A21752AAC50EB4F34E6CE1985D2"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "AFD918293E1EBE6EA675590D140565E86B35FBA7F47FF5AC9014D388E0696BCE"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "E9B5ECF76522E4B67FB66C7B23408981D5F6391A94F457CD9BD04B17E2BB48B2"
+        }
+      ]
+    },
+    {
+      "Surface": "Menu",
+      "ReducedMotion": true,
+      "InjectedRate": 30,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 3.0311,
+      "SubmitP95Milliseconds": 12.0223,
+      "GpuSamples": 6,
+      "GpuP50Milliseconds": 0.412608,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "E9B5ECF76522E4B67FB66C7B23408981D5F6391A94F457CD9BD04B17E2BB48B2"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "E9B5ECF76522E4B67FB66C7B23408981D5F6391A94F457CD9BD04B17E2BB48B2"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "E9B5ECF76522E4B67FB66C7B23408981D5F6391A94F457CD9BD04B17E2BB48B2"
+        }
+      ]
+    },
+    {
+      "Surface": "Menu",
+      "ReducedMotion": true,
+      "InjectedRate": 60,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 4.8369,
+      "SubmitP95Milliseconds": 14.5135,
+      "GpuSamples": 16,
+      "GpuP50Milliseconds": 0.389952,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "E9B5ECF76522E4B67FB66C7B23408981D5F6391A94F457CD9BD04B17E2BB48B2"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "E9B5ECF76522E4B67FB66C7B23408981D5F6391A94F457CD9BD04B17E2BB48B2"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "E9B5ECF76522E4B67FB66C7B23408981D5F6391A94F457CD9BD04B17E2BB48B2"
+        }
+      ]
+    },
+    {
+      "Surface": "Menu",
+      "ReducedMotion": true,
+      "InjectedRate": 144,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 5.4675,
+      "SubmitP95Milliseconds": 19.7345,
+      "GpuSamples": 43,
+      "GpuP50Milliseconds": 0.209056,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "E9B5ECF76522E4B67FB66C7B23408981D5F6391A94F457CD9BD04B17E2BB48B2"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "E9B5ECF76522E4B67FB66C7B23408981D5F6391A94F457CD9BD04B17E2BB48B2"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "E9B5ECF76522E4B67FB66C7B23408981D5F6391A94F457CD9BD04B17E2BB48B2"
+        }
+      ]
+    },
+    {
+      "Surface": "Panel",
+      "ReducedMotion": false,
+      "InjectedRate": 30,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 2.2066,
+      "SubmitP95Milliseconds": 13.3694,
+      "GpuSamples": 6,
+      "GpuP50Milliseconds": 0.32416,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "4E2183FECC5E4363B7246A2E6812EB1BD864CA3CC7B94E86FBB239425EA5CAEC"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "AC8F7138E4C870803684FB5CABD1E98C02697CF3205F90C4D9006784584DD04E"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "8F813580CC3EDBDB7CB1CC27EFD5FBBA8E76F820B38BDAAC85D9F9815262C9B6"
+        }
+      ]
+    },
+    {
+      "Surface": "Panel",
+      "ReducedMotion": false,
+      "InjectedRate": 60,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 2.6584,
+      "SubmitP95Milliseconds": 17.3748,
+      "GpuSamples": 16,
+      "GpuP50Milliseconds": 0.152448,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "753B7295D60BE7CCD441B1C2FA0FF7A0686E9E104DD1BB6D21F676DEBFAE2CEE"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "AC8F7138E4C870803684FB5CABD1E98C02697CF3205F90C4D9006784584DD04E"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "8F813580CC3EDBDB7CB1CC27EFD5FBBA8E76F820B38BDAAC85D9F9815262C9B6"
+        }
+      ]
+    },
+    {
+      "Surface": "Panel",
+      "ReducedMotion": false,
+      "InjectedRate": 144,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 5.0072,
+      "SubmitP95Milliseconds": 16.9516,
+      "GpuSamples": 41,
+      "GpuP50Milliseconds": 0.1488,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "915760BA0D2267DF130141B235F9868A2D831ADE24A58048F24CC145B8D23250"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "12BB9C8FD28365420FE3BF75E1425B20230451280C7616C4E4131AC4DA750A95"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "8F813580CC3EDBDB7CB1CC27EFD5FBBA8E76F820B38BDAAC85D9F9815262C9B6"
+        }
+      ]
+    },
+    {
+      "Surface": "Panel",
+      "ReducedMotion": true,
+      "InjectedRate": 30,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 3.1122,
+      "SubmitP95Milliseconds": 8.833,
+      "GpuSamples": 6,
+      "GpuP50Milliseconds": 0.244384,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "8F813580CC3EDBDB7CB1CC27EFD5FBBA8E76F820B38BDAAC85D9F9815262C9B6"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "8F813580CC3EDBDB7CB1CC27EFD5FBBA8E76F820B38BDAAC85D9F9815262C9B6"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "8F813580CC3EDBDB7CB1CC27EFD5FBBA8E76F820B38BDAAC85D9F9815262C9B6"
+        }
+      ]
+    },
+    {
+      "Surface": "Panel",
+      "ReducedMotion": true,
+      "InjectedRate": 60,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 2.7701,
+      "SubmitP95Milliseconds": 16.0246,
+      "GpuSamples": 16,
+      "GpuP50Milliseconds": 0.164704,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "8F813580CC3EDBDB7CB1CC27EFD5FBBA8E76F820B38BDAAC85D9F9815262C9B6"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "8F813580CC3EDBDB7CB1CC27EFD5FBBA8E76F820B38BDAAC85D9F9815262C9B6"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "8F813580CC3EDBDB7CB1CC27EFD5FBBA8E76F820B38BDAAC85D9F9815262C9B6"
+        }
+      ]
+    },
+    {
+      "Surface": "Panel",
+      "ReducedMotion": true,
+      "InjectedRate": 144,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 7.3906,
+      "SubmitP95Milliseconds": 13.2717,
+      "GpuSamples": 44,
+      "GpuP50Milliseconds": 0.33632,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "8F813580CC3EDBDB7CB1CC27EFD5FBBA8E76F820B38BDAAC85D9F9815262C9B6"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "8F813580CC3EDBDB7CB1CC27EFD5FBBA8E76F820B38BDAAC85D9F9815262C9B6"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "8F813580CC3EDBDB7CB1CC27EFD5FBBA8E76F820B38BDAAC85D9F9815262C9B6"
+        }
+      ]
+    },
+    {
+      "Surface": "Dock",
+      "ReducedMotion": false,
+      "InjectedRate": 30,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 9.67,
+      "SubmitP95Milliseconds": 13.9804,
+      "GpuSamples": 6,
+      "GpuP50Milliseconds": 10.177248,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "6EB621C610A5E916302CB9E9EBD9CFD2730CCE6CA9B741384AE21BC8EAEC5884"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "6CE60BB1F38C4718D43049CBEE917BA749E939D81B7216FEE5110B8AA6F36986"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "59434D7E6F346D8A97A2F2C17BA77F601A7828E4B55F325EA031398FC3D62CC8"
+        }
+      ]
+    },
+    {
+      "Surface": "Dock",
+      "ReducedMotion": false,
+      "InjectedRate": 60,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 9.7721,
+      "SubmitP95Milliseconds": 13.4992,
+      "GpuSamples": 15,
+      "GpuP50Milliseconds": 8.044288,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "6EB621C610A5E916302CB9E9EBD9CFD2730CCE6CA9B741384AE21BC8EAEC5884"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "6CE60BB1F38C4718D43049CBEE917BA749E939D81B7216FEE5110B8AA6F36986"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "59434D7E6F346D8A97A2F2C17BA77F601A7828E4B55F325EA031398FC3D62CC8"
+        }
+      ]
+    },
+    {
+      "Surface": "Dock",
+      "ReducedMotion": false,
+      "InjectedRate": 144,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 14.0593,
+      "SubmitP95Milliseconds": 16.8547,
+      "GpuSamples": 44,
+      "GpuP50Milliseconds": 11.710848,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "6EB621C610A5E916302CB9E9EBD9CFD2730CCE6CA9B741384AE21BC8EAEC5884"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "AF18FEE6EAE9977039E5459E8D80C6CADC775DC3169E51E5624B96CC02DEB2EE"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "59434D7E6F346D8A97A2F2C17BA77F601A7828E4B55F325EA031398FC3D62CC8"
+        }
+      ]
+    },
+    {
+      "Surface": "Dock",
+      "ReducedMotion": true,
+      "InjectedRate": 30,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 10.9016,
+      "SubmitP95Milliseconds": 14.8222,
+      "GpuSamples": 6,
+      "GpuP50Milliseconds": 10.5856,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "59434D7E6F346D8A97A2F2C17BA77F601A7828E4B55F325EA031398FC3D62CC8"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "59434D7E6F346D8A97A2F2C17BA77F601A7828E4B55F325EA031398FC3D62CC8"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "59434D7E6F346D8A97A2F2C17BA77F601A7828E4B55F325EA031398FC3D62CC8"
+        }
+      ]
+    },
+    {
+      "Surface": "Dock",
+      "ReducedMotion": true,
+      "InjectedRate": 60,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 9.0946,
+      "SubmitP95Milliseconds": 15.4327,
+      "GpuSamples": 16,
+      "GpuP50Milliseconds": 10.240544,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "59434D7E6F346D8A97A2F2C17BA77F601A7828E4B55F325EA031398FC3D62CC8"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "59434D7E6F346D8A97A2F2C17BA77F601A7828E4B55F325EA031398FC3D62CC8"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "59434D7E6F346D8A97A2F2C17BA77F601A7828E4B55F325EA031398FC3D62CC8"
+        }
+      ]
+    },
+    {
+      "Surface": "Dock",
+      "ReducedMotion": true,
+      "InjectedRate": 144,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 11.5214,
+      "SubmitP95Milliseconds": 15.612,
+      "GpuSamples": 44,
+      "GpuP50Milliseconds": 9.91104,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "59434D7E6F346D8A97A2F2C17BA77F601A7828E4B55F325EA031398FC3D62CC8"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "59434D7E6F346D8A97A2F2C17BA77F601A7828E4B55F325EA031398FC3D62CC8"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "59434D7E6F346D8A97A2F2C17BA77F601A7828E4B55F325EA031398FC3D62CC8"
+        }
+      ]
+    },
+    {
+      "Surface": "Accepted",
+      "ReducedMotion": false,
+      "InjectedRate": 30,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 11.927,
+      "SubmitP95Milliseconds": 14.8656,
+      "GpuSamples": 6,
+      "GpuP50Milliseconds": 11.632864,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "40658B9D6D92DC008E5FF2D0CA17F67F86773D2236EA3E739D484ACBA6F8D6E0"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "B2AB70E51B5C06926524F3219C2B96F2A1E6E2835630C3741453D8A3B6E60561"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "C1021E8C611D4E48B262A7EC06AA3CB3376E44AD0AE66EE99589F5CE1E7B4EFE"
+        }
+      ]
+    },
+    {
+      "Surface": "Accepted",
+      "ReducedMotion": false,
+      "InjectedRate": 60,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 9.7876,
+      "SubmitP95Milliseconds": 14.2647,
+      "GpuSamples": 16,
+      "GpuP50Milliseconds": 9.813728,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "40658B9D6D92DC008E5FF2D0CA17F67F86773D2236EA3E739D484ACBA6F8D6E0"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "B2AB70E51B5C06926524F3219C2B96F2A1E6E2835630C3741453D8A3B6E60561"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "C1021E8C611D4E48B262A7EC06AA3CB3376E44AD0AE66EE99589F5CE1E7B4EFE"
+        }
+      ]
+    },
+    {
+      "Surface": "Accepted",
+      "ReducedMotion": false,
+      "InjectedRate": 144,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 10.9456,
+      "SubmitP95Milliseconds": 15.5622,
+      "GpuSamples": 44,
+      "GpuP50Milliseconds": 10.064096,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "40658B9D6D92DC008E5FF2D0CA17F67F86773D2236EA3E739D484ACBA6F8D6E0"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "E7FAAE1B35F22B108949D65F566A7F09447E8C4C878B52F0BFB35CC3473101BB"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "C1021E8C611D4E48B262A7EC06AA3CB3376E44AD0AE66EE99589F5CE1E7B4EFE"
+        }
+      ]
+    },
+    {
+      "Surface": "Accepted",
+      "ReducedMotion": true,
+      "InjectedRate": 30,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 7.6308,
+      "SubmitP95Milliseconds": 11.8787,
+      "GpuSamples": 6,
+      "GpuP50Milliseconds": 7.185472,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "C1021E8C611D4E48B262A7EC06AA3CB3376E44AD0AE66EE99589F5CE1E7B4EFE"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "C1021E8C611D4E48B262A7EC06AA3CB3376E44AD0AE66EE99589F5CE1E7B4EFE"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "C1021E8C611D4E48B262A7EC06AA3CB3376E44AD0AE66EE99589F5CE1E7B4EFE"
+        }
+      ]
+    },
+    {
+      "Surface": "Accepted",
+      "ReducedMotion": true,
+      "InjectedRate": 60,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 10.2856,
+      "SubmitP95Milliseconds": 13.3201,
+      "GpuSamples": 16,
+      "GpuP50Milliseconds": 9.676544,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "C1021E8C611D4E48B262A7EC06AA3CB3376E44AD0AE66EE99589F5CE1E7B4EFE"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "C1021E8C611D4E48B262A7EC06AA3CB3376E44AD0AE66EE99589F5CE1E7B4EFE"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "C1021E8C611D4E48B262A7EC06AA3CB3376E44AD0AE66EE99589F5CE1E7B4EFE"
+        }
+      ]
+    },
+    {
+      "Surface": "Accepted",
+      "ReducedMotion": true,
+      "InjectedRate": 144,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 11.9357,
+      "SubmitP95Milliseconds": 15.8914,
+      "GpuSamples": 44,
+      "GpuP50Milliseconds": 10.411392,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "C1021E8C611D4E48B262A7EC06AA3CB3376E44AD0AE66EE99589F5CE1E7B4EFE"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "C1021E8C611D4E48B262A7EC06AA3CB3376E44AD0AE66EE99589F5CE1E7B4EFE"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "C1021E8C611D4E48B262A7EC06AA3CB3376E44AD0AE66EE99589F5CE1E7B4EFE"
+        }
+      ]
+    },
+    {
+      "Surface": "Rejected",
+      "ReducedMotion": false,
+      "InjectedRate": 30,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 6.9095,
+      "SubmitP95Milliseconds": 15.0465,
+      "GpuSamples": 6,
+      "GpuP50Milliseconds": 9.88032,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "4452ACD8786749196DFEA762F36B147F1AEB5F469ED2A477FC31F3F6EF8EE8E4"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "21C949C972367F1B302E2208216AAB4F561483F9B77B7707E8A21BE870C94565"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "D99560D28941717162575C93EAF5FC11C74FD4D341BFEAE39E4C8D37B904514C"
+        }
+      ]
+    },
+    {
+      "Surface": "Rejected",
+      "ReducedMotion": false,
+      "InjectedRate": 60,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 9.6529,
+      "SubmitP95Milliseconds": 14.4215,
+      "GpuSamples": 16,
+      "GpuP50Milliseconds": 8.765184,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "4452ACD8786749196DFEA762F36B147F1AEB5F469ED2A477FC31F3F6EF8EE8E4"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "21C949C972367F1B302E2208216AAB4F561483F9B77B7707E8A21BE870C94565"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "D99560D28941717162575C93EAF5FC11C74FD4D341BFEAE39E4C8D37B904514C"
+        }
+      ]
+    },
+    {
+      "Surface": "Rejected",
+      "ReducedMotion": false,
+      "InjectedRate": 144,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 13.9279,
+      "SubmitP95Milliseconds": 17.392,
+      "GpuSamples": 44,
+      "GpuP50Milliseconds": 11.48224,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "4452ACD8786749196DFEA762F36B147F1AEB5F469ED2A477FC31F3F6EF8EE8E4"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "1603C5A254BC583D36A6631805696F0E9B322073DC5468E31C65F3472B0101B4"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "D99560D28941717162575C93EAF5FC11C74FD4D341BFEAE39E4C8D37B904514C"
+        }
+      ]
+    },
+    {
+      "Surface": "Rejected",
+      "ReducedMotion": true,
+      "InjectedRate": 30,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 14.1484,
+      "SubmitP95Milliseconds": 16.1302,
+      "GpuSamples": 6,
+      "GpuP50Milliseconds": 11.108256,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "D99560D28941717162575C93EAF5FC11C74FD4D341BFEAE39E4C8D37B904514C"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "D99560D28941717162575C93EAF5FC11C74FD4D341BFEAE39E4C8D37B904514C"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "D99560D28941717162575C93EAF5FC11C74FD4D341BFEAE39E4C8D37B904514C"
+        }
+      ]
+    },
+    {
+      "Surface": "Rejected",
+      "ReducedMotion": true,
+      "InjectedRate": 60,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 11.1459,
+      "SubmitP95Milliseconds": 16.712,
+      "GpuSamples": 16,
+      "GpuP50Milliseconds": 10.498592,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "D99560D28941717162575C93EAF5FC11C74FD4D341BFEAE39E4C8D37B904514C"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "D99560D28941717162575C93EAF5FC11C74FD4D341BFEAE39E4C8D37B904514C"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "D99560D28941717162575C93EAF5FC11C74FD4D341BFEAE39E4C8D37B904514C"
+        }
+      ]
+    },
+    {
+      "Surface": "Rejected",
+      "ReducedMotion": true,
+      "InjectedRate": 144,
+      "Width": 1280,
+      "Height": 720,
+      "LayoutDpi": 192,
+      "UiScale": 2,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 10.856,
+      "SubmitP95Milliseconds": 15.9386,
+      "GpuSamples": 44,
+      "GpuP50Milliseconds": 10.273088,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "D99560D28941717162575C93EAF5FC11C74FD4D341BFEAE39E4C8D37B904514C"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "D99560D28941717162575C93EAF5FC11C74FD4D341BFEAE39E4C8D37B904514C"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "D99560D28941717162575C93EAF5FC11C74FD4D341BFEAE39E4C8D37B904514C"
+        }
+      ]
+    },
+    {
+      "Surface": "Menu",
+      "ReducedMotion": false,
+      "InjectedRate": 30,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 2.3517,
+      "SubmitP95Milliseconds": 4.1096,
+      "GpuSamples": 6,
+      "GpuP50Milliseconds": 0.513984,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "24E4BC77CBA37002B931CA733631114966C5CD639598B75DAAC919244BE167FC"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "6DD2808EE04459A3DB2358B616D0649247B9390D9BB8C0EF8A011A431A29578B"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "E68EBF1C2120A6E2E9A1290A5BA6258C26ECAEAF43626E3E9538A567D9977827"
+        }
+      ]
+    },
+    {
+      "Surface": "Menu",
+      "ReducedMotion": false,
+      "InjectedRate": 60,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 4.6608,
+      "SubmitP95Milliseconds": 7.1703,
+      "GpuSamples": 16,
+      "GpuP50Milliseconds": 1.82272,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "211B55959C8A73D096B04D2D761487AF2962A57E11107996BBB48C99C5679945"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "291B741B677B73ABA760621C84511E83C10ED78E8C456D638C85FF662D3B4A5E"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "E68EBF1C2120A6E2E9A1290A5BA6258C26ECAEAF43626E3E9538A567D9977827"
+        }
+      ]
+    },
+    {
+      "Surface": "Menu",
+      "ReducedMotion": false,
+      "InjectedRate": 144,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 4.7003,
+      "SubmitP95Milliseconds": 7.3535,
+      "GpuSamples": 44,
+      "GpuP50Milliseconds": 0.518528,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "E3A167C236E2764D2E35EF318DBB368DB83BEAD3F2F867426479F19284551B7E"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "4782580783ECB861D329B024C7DF2B2ABDC5F476129DECE02A62A15FC0F4DA6E"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "E68EBF1C2120A6E2E9A1290A5BA6258C26ECAEAF43626E3E9538A567D9977827"
+        }
+      ]
+    },
+    {
+      "Surface": "Menu",
+      "ReducedMotion": true,
+      "InjectedRate": 30,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 4.73,
+      "SubmitP95Milliseconds": 5.8471,
+      "GpuSamples": 6,
+      "GpuP50Milliseconds": 1.974624,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "E68EBF1C2120A6E2E9A1290A5BA6258C26ECAEAF43626E3E9538A567D9977827"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "E68EBF1C2120A6E2E9A1290A5BA6258C26ECAEAF43626E3E9538A567D9977827"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "E68EBF1C2120A6E2E9A1290A5BA6258C26ECAEAF43626E3E9538A567D9977827"
+        }
+      ]
+    },
+    {
+      "Surface": "Menu",
+      "ReducedMotion": true,
+      "InjectedRate": 60,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 4.0587,
+      "SubmitP95Milliseconds": 10.8218,
+      "GpuSamples": 16,
+      "GpuP50Milliseconds": 0.509184,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "E68EBF1C2120A6E2E9A1290A5BA6258C26ECAEAF43626E3E9538A567D9977827"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "E68EBF1C2120A6E2E9A1290A5BA6258C26ECAEAF43626E3E9538A567D9977827"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "E68EBF1C2120A6E2E9A1290A5BA6258C26ECAEAF43626E3E9538A567D9977827"
+        }
+      ]
+    },
+    {
+      "Surface": "Menu",
+      "ReducedMotion": true,
+      "InjectedRate": 144,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 4.9228,
+      "SubmitP95Milliseconds": 10.5397,
+      "GpuSamples": 44,
+      "GpuP50Milliseconds": 0.516608,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "E68EBF1C2120A6E2E9A1290A5BA6258C26ECAEAF43626E3E9538A567D9977827"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "E68EBF1C2120A6E2E9A1290A5BA6258C26ECAEAF43626E3E9538A567D9977827"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "E68EBF1C2120A6E2E9A1290A5BA6258C26ECAEAF43626E3E9538A567D9977827"
+        }
+      ]
+    },
+    {
+      "Surface": "Panel",
+      "ReducedMotion": false,
+      "InjectedRate": 30,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 4.8634,
+      "SubmitP95Milliseconds": 8.2908,
+      "GpuSamples": 6,
+      "GpuP50Milliseconds": 3.466208,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "3BBD5B18CCB35EDF8FBE765C6C3D7A3691268454F16E3A34FF3C518DE804AAB6"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "CB8093E16B1146CF8AA6BA6A0789A85299E6D6A14A70769D7FE4EF6452A05BBB"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "3F0F52F5918C4938BC771020FBA052145BA6909EA9AD6DED5B98F21A78AEC39E"
+        }
+      ]
+    },
+    {
+      "Surface": "Panel",
+      "ReducedMotion": false,
+      "InjectedRate": 60,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 4.3684,
+      "SubmitP95Milliseconds": 10.5428,
+      "GpuSamples": 16,
+      "GpuP50Milliseconds": 0.520608,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "71851EBE84E104F69C4DC5B94030789BCD88C12BE8035D0326D1E364A20E9D36"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "CB8093E16B1146CF8AA6BA6A0789A85299E6D6A14A70769D7FE4EF6452A05BBB"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "3F0F52F5918C4938BC771020FBA052145BA6909EA9AD6DED5B98F21A78AEC39E"
+        }
+      ]
+    },
+    {
+      "Surface": "Panel",
+      "ReducedMotion": false,
+      "InjectedRate": 144,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 4.6667,
+      "SubmitP95Milliseconds": 7.6586,
+      "GpuSamples": 44,
+      "GpuP50Milliseconds": 0.522432,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "B38897E8C5D9CB3B7295CAFC1D0124AE1763BFB559031E7E54DC4C3B82F58171"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "5BFD0BE35B34CF666BDAC24121E4B446B76DE95CCB3DEEBC8D1A4A370859C56F"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "3F0F52F5918C4938BC771020FBA052145BA6909EA9AD6DED5B98F21A78AEC39E"
+        }
+      ]
+    },
+    {
+      "Surface": "Panel",
+      "ReducedMotion": true,
+      "InjectedRate": 30,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 7.6038,
+      "SubmitP95Milliseconds": 8.0847,
+      "GpuSamples": 6,
+      "GpuP50Milliseconds": 2.816768,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "3F0F52F5918C4938BC771020FBA052145BA6909EA9AD6DED5B98F21A78AEC39E"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "3F0F52F5918C4938BC771020FBA052145BA6909EA9AD6DED5B98F21A78AEC39E"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "3F0F52F5918C4938BC771020FBA052145BA6909EA9AD6DED5B98F21A78AEC39E"
+        }
+      ]
+    },
+    {
+      "Surface": "Panel",
+      "ReducedMotion": true,
+      "InjectedRate": 60,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 2.8772,
+      "SubmitP95Milliseconds": 9.6972,
+      "GpuSamples": 16,
+      "GpuP50Milliseconds": 0.513568,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "3F0F52F5918C4938BC771020FBA052145BA6909EA9AD6DED5B98F21A78AEC39E"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "3F0F52F5918C4938BC771020FBA052145BA6909EA9AD6DED5B98F21A78AEC39E"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "3F0F52F5918C4938BC771020FBA052145BA6909EA9AD6DED5B98F21A78AEC39E"
+        }
+      ]
+    },
+    {
+      "Surface": "Panel",
+      "ReducedMotion": true,
+      "InjectedRate": 144,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 4.5156,
+      "SubmitP95Milliseconds": 6.9583,
+      "GpuSamples": 44,
+      "GpuP50Milliseconds": 0.516992,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "3F0F52F5918C4938BC771020FBA052145BA6909EA9AD6DED5B98F21A78AEC39E"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "3F0F52F5918C4938BC771020FBA052145BA6909EA9AD6DED5B98F21A78AEC39E"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "3F0F52F5918C4938BC771020FBA052145BA6909EA9AD6DED5B98F21A78AEC39E"
+        }
+      ]
+    },
+    {
+      "Surface": "Dock",
+      "ReducedMotion": false,
+      "InjectedRate": 30,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 9.3239,
+      "SubmitP95Milliseconds": 16.1989,
+      "GpuSamples": 6,
+      "GpuP50Milliseconds": 11.69216,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "99EEDD140D1A59CA8FEA7E0E393CF5FEE651D4DE6905601B545DFF629049FA09"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "DB3D727D07827C9E310501207B640FC9BE95BF857BBAA93762F49FD32FE3FC8A"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "861F8C6100AC84323CB99FCD715EF671B40E2FEAEFBA5D020162CF61F2325A44"
+        }
+      ]
+    },
+    {
+      "Surface": "Dock",
+      "ReducedMotion": false,
+      "InjectedRate": 60,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 16.3074,
+      "SubmitP95Milliseconds": 20.9349,
+      "GpuSamples": 16,
+      "GpuP50Milliseconds": 14.460032,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "99EEDD140D1A59CA8FEA7E0E393CF5FEE651D4DE6905601B545DFF629049FA09"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "DB3D727D07827C9E310501207B640FC9BE95BF857BBAA93762F49FD32FE3FC8A"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "861F8C6100AC84323CB99FCD715EF671B40E2FEAEFBA5D020162CF61F2325A44"
+        }
+      ]
+    },
+    {
+      "Surface": "Dock",
+      "ReducedMotion": false,
+      "InjectedRate": 144,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 15.1204,
+      "SubmitP95Milliseconds": 17.9135,
+      "GpuSamples": 44,
+      "GpuP50Milliseconds": 12.396032,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "99EEDD140D1A59CA8FEA7E0E393CF5FEE651D4DE6905601B545DFF629049FA09"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "E27B8C8F905273BA2EA39921E7D210FCD3F810E86580865291635BB3D91D7727"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "861F8C6100AC84323CB99FCD715EF671B40E2FEAEFBA5D020162CF61F2325A44"
+        }
+      ]
+    },
+    {
+      "Surface": "Dock",
+      "ReducedMotion": true,
+      "InjectedRate": 30,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 11.7018,
+      "SubmitP95Milliseconds": 13.3944,
+      "GpuSamples": 6,
+      "GpuP50Milliseconds": 11.88144,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "861F8C6100AC84323CB99FCD715EF671B40E2FEAEFBA5D020162CF61F2325A44"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "861F8C6100AC84323CB99FCD715EF671B40E2FEAEFBA5D020162CF61F2325A44"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "861F8C6100AC84323CB99FCD715EF671B40E2FEAEFBA5D020162CF61F2325A44"
+        }
+      ]
+    },
+    {
+      "Surface": "Dock",
+      "ReducedMotion": true,
+      "InjectedRate": 60,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 12.6097,
+      "SubmitP95Milliseconds": 17.7551,
+      "GpuSamples": 16,
+      "GpuP50Milliseconds": 12.45792,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "861F8C6100AC84323CB99FCD715EF671B40E2FEAEFBA5D020162CF61F2325A44"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "861F8C6100AC84323CB99FCD715EF671B40E2FEAEFBA5D020162CF61F2325A44"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "861F8C6100AC84323CB99FCD715EF671B40E2FEAEFBA5D020162CF61F2325A44"
+        }
+      ]
+    },
+    {
+      "Surface": "Dock",
+      "ReducedMotion": true,
+      "InjectedRate": 144,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 14.7548,
+      "SubmitP95Milliseconds": 18.373,
+      "GpuSamples": 44,
+      "GpuP50Milliseconds": 12.333568,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "861F8C6100AC84323CB99FCD715EF671B40E2FEAEFBA5D020162CF61F2325A44"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "861F8C6100AC84323CB99FCD715EF671B40E2FEAEFBA5D020162CF61F2325A44"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "861F8C6100AC84323CB99FCD715EF671B40E2FEAEFBA5D020162CF61F2325A44"
+        }
+      ]
+    },
+    {
+      "Surface": "Accepted",
+      "ReducedMotion": false,
+      "InjectedRate": 30,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 11.2022,
+      "SubmitP95Milliseconds": 15.5477,
+      "GpuSamples": 6,
+      "GpuP50Milliseconds": 12.033024,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "ABCCFE627431FEE12F4B5E8FE478FBAAEEDE055A06D4DAA1E9974711F4FE8A39"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "F777EFBBB99D9C642BD45B22CB9C49AA2661F6DEE905B108A91C0F7A47A75E50"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "408FA635457DFE0C781BDAB4C420E2079ED96EB2AE05F08EFC6DF2E33A2156A2"
+        }
+      ]
+    },
+    {
+      "Surface": "Accepted",
+      "ReducedMotion": false,
+      "InjectedRate": 60,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 12.5528,
+      "SubmitP95Milliseconds": 19.4012,
+      "GpuSamples": 16,
+      "GpuP50Milliseconds": 12.232832,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "ABCCFE627431FEE12F4B5E8FE478FBAAEEDE055A06D4DAA1E9974711F4FE8A39"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "F777EFBBB99D9C642BD45B22CB9C49AA2661F6DEE905B108A91C0F7A47A75E50"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "408FA635457DFE0C781BDAB4C420E2079ED96EB2AE05F08EFC6DF2E33A2156A2"
+        }
+      ]
+    },
+    {
+      "Surface": "Accepted",
+      "ReducedMotion": false,
+      "InjectedRate": 144,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 14.3263,
+      "SubmitP95Milliseconds": 17.9395,
+      "GpuSamples": 44,
+      "GpuP50Milliseconds": 12.303168,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "ABCCFE627431FEE12F4B5E8FE478FBAAEEDE055A06D4DAA1E9974711F4FE8A39"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "F1D68854B8C7B4A1B21C502964512CC43B69D022959930197C5D8E4BDC6A424D"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "408FA635457DFE0C781BDAB4C420E2079ED96EB2AE05F08EFC6DF2E33A2156A2"
+        }
+      ]
+    },
+    {
+      "Surface": "Accepted",
+      "ReducedMotion": true,
+      "InjectedRate": 30,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 13.4114,
+      "SubmitP95Milliseconds": 16.2501,
+      "GpuSamples": 6,
+      "GpuP50Milliseconds": 11.763136,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "408FA635457DFE0C781BDAB4C420E2079ED96EB2AE05F08EFC6DF2E33A2156A2"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "408FA635457DFE0C781BDAB4C420E2079ED96EB2AE05F08EFC6DF2E33A2156A2"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "408FA635457DFE0C781BDAB4C420E2079ED96EB2AE05F08EFC6DF2E33A2156A2"
+        }
+      ]
+    },
+    {
+      "Surface": "Accepted",
+      "ReducedMotion": true,
+      "InjectedRate": 60,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 17.7944,
+      "SubmitP95Milliseconds": 22.5405,
+      "GpuSamples": 16,
+      "GpuP50Milliseconds": 15.517056,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "408FA635457DFE0C781BDAB4C420E2079ED96EB2AE05F08EFC6DF2E33A2156A2"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "408FA635457DFE0C781BDAB4C420E2079ED96EB2AE05F08EFC6DF2E33A2156A2"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "408FA635457DFE0C781BDAB4C420E2079ED96EB2AE05F08EFC6DF2E33A2156A2"
+        }
+      ]
+    },
+    {
+      "Surface": "Accepted",
+      "ReducedMotion": true,
+      "InjectedRate": 144,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 12.9277,
+      "SubmitP95Milliseconds": 18.5719,
+      "GpuSamples": 44,
+      "GpuP50Milliseconds": 12.14864,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "408FA635457DFE0C781BDAB4C420E2079ED96EB2AE05F08EFC6DF2E33A2156A2"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "408FA635457DFE0C781BDAB4C420E2079ED96EB2AE05F08EFC6DF2E33A2156A2"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "408FA635457DFE0C781BDAB4C420E2079ED96EB2AE05F08EFC6DF2E33A2156A2"
+        }
+      ]
+    },
+    {
+      "Surface": "Rejected",
+      "ReducedMotion": false,
+      "InjectedRate": 30,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 11.6998,
+      "SubmitP95Milliseconds": 15.5807,
+      "GpuSamples": 6,
+      "GpuP50Milliseconds": 13.182368,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "5445756FD5F353D7381671FDC6CD36B8CABA817F313EF2EE87FE2C4D6901050E"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "9099ED09A7A5A8F154DAAA4BAC503A18C614F4F38D17D3C8E9593AE7F9CE0A65"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "21B665E2D322CE9A4C38FE01E5F746D64A5DDCA79982911CEAB7D785E5CDB27B"
+        }
+      ]
+    },
+    {
+      "Surface": "Rejected",
+      "ReducedMotion": false,
+      "InjectedRate": 60,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 15.2035,
+      "SubmitP95Milliseconds": 19.4428,
+      "GpuSamples": 16,
+      "GpuP50Milliseconds": 12.341984,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "5445756FD5F353D7381671FDC6CD36B8CABA817F313EF2EE87FE2C4D6901050E"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "9099ED09A7A5A8F154DAAA4BAC503A18C614F4F38D17D3C8E9593AE7F9CE0A65"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "21B665E2D322CE9A4C38FE01E5F746D64A5DDCA79982911CEAB7D785E5CDB27B"
+        }
+      ]
+    },
+    {
+      "Surface": "Rejected",
+      "ReducedMotion": false,
+      "InjectedRate": 144,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 14.5587,
+      "SubmitP95Milliseconds": 19.1085,
+      "GpuSamples": 44,
+      "GpuP50Milliseconds": 12.963872,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "5445756FD5F353D7381671FDC6CD36B8CABA817F313EF2EE87FE2C4D6901050E"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "203923FB49A67E74978C92BA0760F3EC2ABBA2E9F282284BC6A633D9663DFF19"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "21B665E2D322CE9A4C38FE01E5F746D64A5DDCA79982911CEAB7D785E5CDB27B"
+        }
+      ]
+    },
+    {
+      "Surface": "Rejected",
+      "ReducedMotion": true,
+      "InjectedRate": 30,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 11,
+      "Repeats": 2,
+      "Samples": 8,
+      "SubmitP50Milliseconds": 14.7511,
+      "SubmitP95Milliseconds": 16.6905,
+      "GpuSamples": 6,
+      "GpuP50Milliseconds": 13.390144,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "21B665E2D322CE9A4C38FE01E5F746D64A5DDCA79982911CEAB7D785E5CDB27B"
+        },
+        {
+          "Frame": 2,
+          "PixelSha256": "21B665E2D322CE9A4C38FE01E5F746D64A5DDCA79982911CEAB7D785E5CDB27B"
+        },
+        {
+          "Frame": 10,
+          "PixelSha256": "21B665E2D322CE9A4C38FE01E5F746D64A5DDCA79982911CEAB7D785E5CDB27B"
+        }
+      ]
+    },
+    {
+      "Surface": "Rejected",
+      "ReducedMotion": true,
+      "InjectedRate": 60,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 21,
+      "Repeats": 2,
+      "Samples": 18,
+      "SubmitP50Milliseconds": 15.2826,
+      "SubmitP95Milliseconds": 20.4614,
+      "GpuSamples": 16,
+      "GpuP50Milliseconds": 14.009824,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "21B665E2D322CE9A4C38FE01E5F746D64A5DDCA79982911CEAB7D785E5CDB27B"
+        },
+        {
+          "Frame": 4,
+          "PixelSha256": "21B665E2D322CE9A4C38FE01E5F746D64A5DDCA79982911CEAB7D785E5CDB27B"
+        },
+        {
+          "Frame": 20,
+          "PixelSha256": "21B665E2D322CE9A4C38FE01E5F746D64A5DDCA79982911CEAB7D785E5CDB27B"
+        }
+      ]
+    },
+    {
+      "Surface": "Rejected",
+      "ReducedMotion": true,
+      "InjectedRate": 144,
+      "Width": 1920,
+      "Height": 1080,
+      "LayoutDpi": 144,
+      "UiScale": 1,
+      "Frames": 49,
+      "Repeats": 2,
+      "Samples": 46,
+      "SubmitP50Milliseconds": 14.5237,
+      "SubmitP95Milliseconds": 19.6188,
+      "GpuSamples": 44,
+      "GpuP50Milliseconds": 12.548128,
+      "Images": [
+        {
+          "Frame": 0,
+          "PixelSha256": "21B665E2D322CE9A4C38FE01E5F746D64A5DDCA79982911CEAB7D785E5CDB27B"
+        },
+        {
+          "Frame": 9,
+          "PixelSha256": "21B665E2D322CE9A4C38FE01E5F746D64A5DDCA79982911CEAB7D785E5CDB27B"
+        },
+        {
+          "Frame": 48,
+          "PixelSha256": "21B665E2D322CE9A4C38FE01E5F746D64A5DDCA79982911CEAB7D785E5CDB27B"
+        }
+      ]
+    }
+  ],
+  "Sound": [
+    {
+      "Cue": "Navigation",
+      "Played": true,
+      "BusyDropped": true,
+      "RestartedAfterStop": true
+    },
+    {
+      "Cue": "Intent",
+      "Played": true,
+      "BusyDropped": true,
+      "RestartedAfterStop": true
+    },
+    {
+      "Cue": "Accepted",
+      "Played": true,
+      "BusyDropped": true,
+      "RestartedAfterStop": true
+    },
+    {
+      "Cue": "Rejected",
+      "Played": true,
+      "BusyDropped": true,
+      "RestartedAfterStop": true
+    }
+  ],
+  "AudioAvailable": true,
+  "AudioReleased": true,
+  "StudioVolumeBefore": 4294967295,
+  "StudioVolumeDuringMute": 0,
+  "StudioVolumeAfter": 4294967295,
+  "StudioMuteObserved": true,
+  "StudioVolumeRestored": true
+}
