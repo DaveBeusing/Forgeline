@@ -44,6 +44,14 @@ try {
     & "$PSScriptRoot/Compare-ReferencePerformance.ps1" -CurrentRoot $current -BaselineRoot $baseline -GatePerformance -ReportPath (Join-Path $current 'profile-compatible.json')
     $compatible = Get-Content (Join-Path $current 'profile-compatible.json') -Raw | ConvertFrom-Json
     if ($compatible.cases[0].status -ne 'comparable') { throw 'Equivalent legacy effective settings were not comparable.' }
+    $capture.graphics.device.advanced = @{meshShaderQuerySucceeded=$true;meshShadersSupported=$true;raytracingQuerySucceeded=$true;raytracingSupported=$true}
+    Write-Current
+    & "$PSScriptRoot/Compare-ReferencePerformance.ps1" -CurrentRoot $current -BaselineRoot $baseline -GatePerformance -ReportPath (Join-Path $current 'capability-compatible.json')
+    $capture.graphics.device.adapterName = 'other-adapter'
+    Write-Current
+    Reject { & "$PSScriptRoot/Compare-ReferencePerformance.ps1" -CurrentRoot $current -BaselineRoot $baseline -GatePerformance -ReportPath (Join-Path $current 'adapter-changed.json') }
+    $capture.graphics.device.adapterName = 'contract'
+    $capture.graphics.device.Remove('advanced')
     $capture.profile.resolutionScale = .75
     Write-Current
     Reject { & "$PSScriptRoot/Compare-ReferencePerformance.ps1" -CurrentRoot $current -BaselineRoot $baseline -GatePerformance -ReportPath (Join-Path $current 'profile-changed.json') }

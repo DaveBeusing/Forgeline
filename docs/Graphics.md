@@ -476,3 +476,8 @@ World rendering combines bounded terrain residency, vegetation admission and opt
 ## Combat and industrial effect integration
 
 Particle admission overflow is suppressed; mesh fallback has an independent tier cap. Production perspective soft depth uses -Projection.M33. Shared ground/receiver marks reuse textured instancing, fade through ordered coverage and never cast shadows or receive selection identity. See [combat and industrial rendering](CombatIndustrialRendering.md) for contracts, diagnostics and qualification limits.
+
+
+## Scalable object submission and reconstruction
+
+RenderWorld prepares previous-identity indices and conservative swept groups once per copied snapshot. Group rejection preserves individual frustum tests, current visibility and native overlays. Optional mesh-shader/raytracing support is reported without enabling a path. Scaled composition uses existing depth to weight four display-linear samples; native scale is unchanged. See [scalable rendering](ScalableRendering.md) for budgets, diagnostics, decisions and retained performance limitations.

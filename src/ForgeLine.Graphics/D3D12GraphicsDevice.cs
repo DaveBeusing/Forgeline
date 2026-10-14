@@ -97,6 +97,12 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 configuration.AllowSoftwareAdapterFallback,
                 debugLayerEnabled,
                 configuration.ForceSoftwareAdapter);
+            var meshOptions = new FeatureDataD3D12Options7();
+            var rayOptions = new FeatureDataD3D12Options5();
+            bool meshQuery = _device.CheckFeatureSupport(Vortice.Direct3D12.Feature.Options7, ref meshOptions);
+            bool rayQuery = _device.CheckFeatureSupport(Vortice.Direct3D12.Feature.Options5, ref rayOptions);
+            _deviceInfo = _deviceInfo with { Advanced = new(meshQuery, meshQuery && meshOptions.MeshShaderTier != MeshShaderTier.NotSupported,
+                rayQuery, rayQuery && rayOptions.RaytracingTier != RaytracingTier.NotSupported) };
             _debugInfoQueue =
                 debugLayerEnabled
                     ? _device.QueryInterfaceOrNull<ID3D12InfoQueue>()

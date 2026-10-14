@@ -184,3 +184,6 @@ World appearance overrides and multi-chunk Traverse qualification are described 
 
 
 Combat/industrial validation adds bounded extraction, industrial production parity, decal lifecycle/visibility, allocation churn, fallback saturation and production perspective-depth regressions to existing mechanical and particle tests. EffectsBarrage and IndustrialEffects are additional native reference scenes. Reproduction and portable measurements: [combat and industrial rendering](CombatIndustrialRendering.md).
+
+
+Scalable rendering adds RenderSnapshotIndexTests, reference/optimized upload parity and native DepthReconstructionTests to CI. Frame hot-path reports now measure snapshot-index rebuild separately. Full reproduction, capability probes and CPU/GPU qualification limits: [scalable rendering](ScalableRendering.md).

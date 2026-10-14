@@ -6,6 +6,9 @@ public sealed class RenderWorld
 {
     private PresentationSnapshot? _previous;
     private PresentationSnapshot? _current;
+    private readonly RenderSnapshotIndex _index = new();
+    internal bool ClusterVisible(int firstIndex, in ViewFrustum frustum) => _index.IsVisible(firstIndex, frustum);
+    internal long IndexRetainedBytes => _index.RetainedBytes;
 
     public PresentationSnapshot? CurrentSnapshot => _current;
 
@@ -39,11 +42,13 @@ public sealed class RenderWorld
         {
             _previous = null;
             _current = latest;
+            _index.Rebuild(latest, _previous);
             return true;
         }
 
         _previous = _current;
         _current = latest;
+        _index.Rebuild(latest, _previous);
         return true;
     }
 
@@ -67,15 +72,13 @@ public sealed class RenderWorld
             return currentInstance;
         }
 
-        if (_previous is null ||
-            !TryFindByEntity(
-                _previous,
-                currentInstance.Entity,
-                out RenderInstance previousInstance))
+        int previousIndex = _index.PreviousIndex(index);
+        if (_previous is null || previousIndex < 0)
         {
             return currentInstance;
         }
 
+        RenderInstance previousInstance = _previous.GetInstance(previousIndex);
         return currentInstance with
         {
             Transform = RenderTransform.Interpolate(

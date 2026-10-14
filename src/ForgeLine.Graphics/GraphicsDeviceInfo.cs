@@ -5,4 +5,11 @@ public sealed record GraphicsDeviceInfo(
     ulong DedicatedVideoMemoryBytes,
     bool IsSoftwareAdapter,
     string FeatureLevel,
-    bool DebugLayerEnabled);
+    bool DebugLayerEnabled)
+{
+    public GraphicsAdvancedCapabilities Advanced { get; init; } = new(false, false, false, false);
+}
+
+// Capability reports never enable an optional rendering path.
+public readonly record struct GraphicsAdvancedCapabilities(bool MeshShaderQuerySucceeded, bool MeshShadersSupported,
+    bool RaytracingQuerySucceeded, bool RaytracingSupported);

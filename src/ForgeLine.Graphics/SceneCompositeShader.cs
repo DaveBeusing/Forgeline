@@ -135,9 +135,21 @@ internal static class SceneCompositeShader
             float4 d=ShadePixel(clamp(origin+int2(1,1),int2(0,0),maximum),input,dimensions);
             CompositeOutput output;
             // Interpolate display-linear colors after each sample's fog/tone/AA, including authored clear colors.
-            output.Color=float4(Encode(lerp(lerp(Decode(a.rgb),Decode(b.rgb),weight.x),
-                lerp(Decode(c.rgb),Decode(d.rgb),weight.x),weight.y)),lerp(lerp(a.a,b.a,weight.x),lerp(c.a,d.a,weight.x),weight.y));
             int2 nearest=clamp(int2(floor(position+0.5)),int2(0,0),maximum);
+            float referenceDepth=Depth.Load(int3(nearest,0));
+            float4 depths=float4(Depth.Load(int3(clamp(origin,int2(0,0),maximum),0)),
+                Depth.Load(int3(clamp(origin+int2(1,0),int2(0,0),maximum),0)),
+                Depth.Load(int3(clamp(origin+int2(0,1),int2(0,0),maximum),0)),
+                Depth.Load(int3(clamp(origin+int2(1,1),int2(0,0),maximum),0)));
+            float4 weights=float4((1-weight.x)*(1-weight.y),weight.x*(1-weight.y),
+                (1-weight.x)*weight.y,weight.x*weight.y);
+            // Reject cross-surface color bleeding in perspective depth. The tolerance
+            // scales with remaining depth range and keeps sloping surfaces continuous.
+            float tolerance=max(0.00001,(1-referenceDepth)*0.05);
+            weights*=saturate(1-abs(depths-referenceDepth)/tolerance);
+            weights/=max(dot(weights,1),0.00001);
+            output.Color=float4(Encode(Decode(a.rgb)*weights.x+Decode(b.rgb)*weights.y+
+                Decode(c.rgb)*weights.z+Decode(d.rgb)*weights.w),dot(float4(a.a,b.a,c.a,d.a),weights));
             output.DepthValue=Depth.Load(int3(nearest,0));
             return output;
         }

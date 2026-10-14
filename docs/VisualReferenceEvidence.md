@@ -84,3 +84,6 @@ Traverse uses path version 2 with changing target, yaw and distance. Optional ha
 ## Effect stress fixtures
 
 EffectsBarrage adds 1,024 copied effects to IndustrialBase; IndustrialEffects uses frozen working-factory presets resolved through real compiled sockets. Both request 64 ground marks; default cell admission retains 32. The fixtures preserve base intelligence and selection/HUD data. They establish repeatability and bounded submission, not natural combat placement or long-match art acceptance. Their fingerprint includes injected visual state; existing neutral fixture fingerprints remain unchanged. See [combat and industrial qualification](CombatIndustrialRendering.md).
+
+
+The scalable object path retains exact native-scale pixels; reduced-scale depth reconstruction intentionally changes world pixels while keeping native overlays. CombatSupportRepeated is immutable 1,000-object render stress, not 1,000 active simulated units. Snapshot/cluster, submission and mesh payload counters are retained alongside completed-fence timing. New informational Advanced capability probes do not change a workload; adapter/driver/effective-profile changes still invalidate a hardware gate. See [scalable rendering](ScalableRendering.md).
