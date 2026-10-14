@@ -1,5 +1,12 @@
 # Pre-Alpha Verification Checklist
 
+## Native UI acceptance
+
+- [ ] Run named frontend/HUD captures from the packaged exact source/runtime, following [UI review](UiVisualReview.md).
+- [ ] Retain before/after manifests, original native PNGs, region changes and reviewer decisions; no automatic golden update.
+- [ ] Complete physical 1080p/1440p/4K, DPI/scale, keyboard/pointer, localization and color-vision review.
+- [ ] Record structural, GPU budget and human visual/live-motion outcomes separately. Software CI does not qualify physical monitors.
+
 ## Purpose
 
 Use this checklist to qualify a FORGELINE Windows x64 pre-alpha package before it is shared outside the development environment.

@@ -33,12 +33,19 @@ try {
         cpu=@{samples=8;mean=2;p50=2;p95=2;p99=2};gpu=@{samples=8;mean=1;p50=1;p95=1;p99=1};
         camera=@{distance=420};profile=@{quality='Medium'};lighting=@{exposure=1};rasterDpi=96;uiScale=1;
         run=@{runProfile='Warm';cameraPath='Fixed';cameraPathVersion=1;warmupFrames=64}}
-    $manifest = @{schemaVersion=1;status='structural-pass';commit=('a'*40);driver='contract';software=$false;samples=8;
-        environment=@{cpu='contract'};runtimeFingerprint='contract';captures=@($capture)}
+    $manifest = @{schemaVersion=1;status='structural-pass';commit=('a'*40);buildIdentity=('0.1.1-dev+'+('a'*40));driver='contract';software=$false;samples=8;
+        environment=@{cpu='contract'};runtimeFingerprint=('b'*64);captures=@($capture)}
     function Write-Current { $manifest | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $current 'manifest.json') }
     Write-Current
     Copy-Item -LiteralPath (Join-Path $current 'manifest.json') -Destination (Join-Path $baseline 'manifest.json')
     $baselineHash = (Get-FileHash -LiteralPath (Join-Path $baseline 'manifest.json')).Hash
+    # Synthetic review exercises validation only; it is not renderer evidence or human approval.
+    $approvalPath = Join-Path $root 'synthetic-review.json'
+    & "$PSScriptRoot/Export-VisualReferenceReview.ps1" -EvidenceRoot $baseline -OutputPath $approvalPath
+    $review = Get-Content -LiteralPath $approvalPath -Raw | ConvertFrom-Json
+    $review.reviewer='Synthetic contract';$review.reviewedAtUtc='2026-10-15T00:00:00Z';$review.rationale='Synthetic contract only'
+    foreach ($row in $review.captures) { $row.decision='accepted';foreach ($property in $row.rubric.PSObject.Properties) {$property.Value='accepted'} }
+    $review | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $approvalPath
     $capture.profile = @{quality='Medium';resolutionScale=1;textures='Full';vegetationMotion=$true;requestedSettings=@{antialiasing='Low'}}
     Write-Current
     & "$PSScriptRoot/Compare-ReferencePerformance.ps1" -CurrentRoot $current -BaselineRoot $baseline -GatePerformance -ReportPath (Join-Path $current 'profile-compatible.json')
@@ -67,19 +74,26 @@ try {
     $capture.profile = @{quality='Medium'}
     Write-Current
     & "$PSScriptRoot/Compare-ReferencePerformance.ps1" -CurrentRoot $current -BaselineRoot $baseline -GatePerformance
-    & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -BaselineRoot $baseline -GateImages
+    & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -BaselineRoot $baseline -GateImages -ApprovalPath $approvalPath
     $capture.cpu.p99=10; Write-Current
     Reject { & "$PSScriptRoot/Compare-ReferencePerformance.ps1" -CurrentRoot $current -BaselineRoot $baseline -GatePerformance -ReportPath (Join-Path $current 'regression.json') }
     $capture.cpu.p99=2; $manifest.driver='other'; Write-Current
     Reject { & "$PSScriptRoot/Compare-ReferencePerformance.ps1" -CurrentRoot $current -BaselineRoot $baseline -GatePerformance -ReportPath (Join-Path $current 'hardware.json') }
-    Reject { & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -BaselineRoot $baseline -GateImages -ReportPath (Join-Path $current 'hardware-image.json') }
+    Reject { & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -BaselineRoot $baseline -GateImages -ApprovalPath $approvalPath -ReportPath (Join-Path $current 'hardware-image.json') }
     $manifest.driver='contract'; $manifest.software=$true; Write-Current
     Reject { & "$PSScriptRoot/Compare-ReferencePerformance.ps1" -CurrentRoot $current -BaselineRoot $baseline -GatePerformance -ReportPath (Join-Path $current 'software.json') }
     $manifest.software=$false; $capture.gpu=@{samples=0;mean=$null;p50=$null;p95=$null;p99=$null}; Write-Current
     Reject { & "$PSScriptRoot/Compare-ReferencePerformance.ps1" -CurrentRoot $current -BaselineRoot $baseline -GatePerformance -ReportPath (Join-Path $current 'missing-gpu.json') }
     $capture.image='one-pixel.png'; $capture.imageSha256=(Get-FileHash -LiteralPath (Join-Path $current 'one-pixel.png')).Hash; Write-Current
-    Reject { & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -BaselineRoot $baseline -GateImages -ReportPath (Join-Path $current 'image-failed.json') }
-    & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -BaselineRoot $baseline -GateImages -MaximumChangedPixelFraction .01 -ReportPath (Join-Path $current 'image-tolerance.json')
+    Reject { & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -BaselineRoot $baseline -GateImages -ApprovalPath $approvalPath -ReportPath (Join-Path $current 'image-failed.json') }
+    & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -BaselineRoot $baseline -GateImages -ApprovalPath $approvalPath -MaximumChangedPixelFraction .01 -ReportPath (Join-Path $current 'image-tolerance.json')
+    $manifest.runtimeFingerprint='c'*64;Write-Current
+    Reject { & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -BaselineRoot $baseline -GateImages -ApprovalPath $approvalPath -ReportPath (Join-Path $current 'changed-runtime.json') }
+    $manifest.runtimeFingerprint='b'*64;$manifest.commit='c'*40;$manifest.buildIdentity='0.1.1-dev+'+('c'*40);Write-Current
+    Reject { & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -BaselineRoot $baseline -GateImages -ApprovalPath $approvalPath -ReportPath (Join-Path $current 'changed-source.json') }
+    $manifest.commit='a'*40;$manifest.buildIdentity='0.1.1-dev+'+('a'*40);Write-Current
+    $review.captures[0].rubric.focus='pending';$review | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $approvalPath
+    Reject { & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -BaselineRoot $baseline -GateImages -ApprovalPath $approvalPath -ReportPath (Join-Path $current 'incomplete-rubric.json') }
     Reject { & "$PSScriptRoot/Compare-ReferencePerformance.ps1" -CurrentRoot $current -BaselineRoot $baseline -ReportPath (Join-Path $baseline 'forbidden.json') }
     if ((Get-FileHash -LiteralPath (Join-Path $baseline 'manifest.json')).Hash -ne $baselineHash -or (Test-Path (Join-Path $baseline 'forbidden.json'))) { throw 'Baseline modified.' }
     Write-Output 'Performance comparability, missing GPU, percentile trend, native pixel tolerance and immutable baseline contracts passed.'

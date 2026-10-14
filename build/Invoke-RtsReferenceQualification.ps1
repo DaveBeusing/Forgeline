@@ -8,7 +8,10 @@ param(
     [string[]]$Scenes = @('DaylightTerrain','IndustrialBase','FormationConvoy','LogisticsCorridor','DamageDestruction','BattlefieldCombat'),
     [string[]]$Profiles = @('Low','Medium','High','Ultra'),
     [string[]]$Zooms = @('CloseTactical','NormalGameplay','Strategic'),
-    [ValidateSet('640x360','1920x1080','2560x1440','3840x2160','3440x1440')][string[]]$Displays = @('1920x1080','2560x1440','3840x2160','3440x1440'),
+    [ValidateSet('640x360','1280x720','1920x1080','2560x1440','3840x2160','3440x1440')][string[]]$Displays = @('1920x1080','2560x1440','3840x2160','3440x1440'),
+    [string[]]$UiScenarios = @('World'),
+    [ValidateSet(.75,1,2)][float[]]$UiScales = @(1),
+    [switch]$CinematicFrontend,
     [ValidateRange(3,4096)][int]$Warmups = 32,
     [ValidateRange(8,8192)][int]$Samples = 128,
     [ValidateRange(2,128)][int]$RepeatCaptures = 8,
@@ -69,6 +72,7 @@ if ($Capture) {
         runProfile = $RunProfile; cameraPath = $CameraPath
         driver = $drivers; software = [bool]$Software; warmups = $Warmups; samples = $Samples; repeatCaptures = $RepeatCaptures; continueAfterMismatch = [bool]$ContinueAfterMismatch; rasterDpi = $RasterDpi; yawDegrees = $YawDegrees; inspectionDistanceMeters = $InspectionDistanceMeters
         scenes = $Scenes; profiles = $Profiles; zooms = $Zooms
+        uiScenarios = $UiScenarios; uiScales = $UiScales; cinematicFrontend = [bool]$CinematicFrontend
         displays = @($Displays | ForEach-Object { $parts = $_.Split('x'); @{ width = [int]$parts[0]; height = [int]$parts[1] } })
     }
     $requestPath = "$referenceRoot.request.json"
@@ -87,7 +91,7 @@ if ($Capture) {
     & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $referenceRoot -BaselineRoot $BaselineRoot
     return
 }
-if ($Software -or $BaselineRoot -or $RasterDpi -or $YawDegrees -ne 45 -or $InspectionDistanceMeters -ne 0 -or $RunProfile -ne 'Warm' -or $CameraPath -ne 'Fixed' -or $RuntimeAssetRoot -or $ClientPath) { throw 'Capture options require explicit -Capture mode.' }
+if ($Software -or $BaselineRoot -or $RasterDpi -or $YawDegrees -ne 45 -or $InspectionDistanceMeters -ne 0 -or $RunProfile -ne 'Warm' -or $CameraPath -ne 'Fixed' -or $RuntimeAssetRoot -or $ClientPath -or $CinematicFrontend -or ($UiScenarios -join ',') -ne 'World' -or ($UiScales -join ',') -ne '1') { throw 'Capture options require explicit -Capture mode.' }
 $displays = @(@(1920, 1080), @(2560, 1440), @(3840, 2160), @(3440, 1440))
 foreach ($display in $displays) {
     foreach ($zoom in @('CloseTactical', 'NormalGameplay', 'Strategic')) {

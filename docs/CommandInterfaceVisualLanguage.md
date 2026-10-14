@@ -55,6 +55,10 @@ Geometry now adapts to actual viewport, per-monitor DPI and user scale. Details 
 
 ## Performance and Validation
 
+Use the [native UI review handbook](UiVisualReview.md) for named frontend/HUD
+captures, attributable comparisons and explicit human baseline review. Structural
+checks, GPU performance and subjective readability remain separate.
+
 Frontend composition uses bounded static geometric detail and the existing overlay buffer/pipeline; it must not load source assets, initialize a second graphics device, or allocate new graphic resources per frame. Normal text batches generate six vertices per glyph, share one atlas, and reuse bounded frame buffers. Qualification records the extra text draws and measured CPU/upload trade-off.
 
 Targeted validation:

@@ -159,6 +159,14 @@ jobs:
           ./build/Test-ReferencePerformance.ps1
           dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ReferencePerformanceSamplesTests
 
+      - name: UI reference geometry and input contracts
+        run: dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.UiReferenceScenarioTests ForgeLine.Client.Tests.VisualReferenceCaptureTests ForgeLine.Client.Tests.FrontendLayoutHardeningTests ForgeLine.Client.Tests.FrontendPointerInteractionTests
+
+      - name: Software UI reference smoke (no physical visual acceptance)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./build/Invoke-RtsReferenceQualification.ps1 -Capture -Software -Scenes BattlefieldCombat -Profiles Low -Zooms NormalGameplay -Displays 1280x720 -UiScenarios MenuDisabled,LoadingError -RasterDpi 96 -Warmups 3 -Samples 8 -RepeatCaptures 2 -OutputRoot artifacts/ui-reference-warp
+
       - name: Native WARP reference capture
         if: runner.os == 'Windows'
         shell: pwsh
@@ -248,6 +256,7 @@ jobs:
             artifacts/*.json
             artifacts/maps/*.json
             artifacts/visual-reference-warp/**
+            artifacts/ui-reference-warp/**
             artifacts/rendering-benchmarks/**
             artifacts/startup-qualification/**
           if-no-files-found: warn
