@@ -17,7 +17,7 @@ namespace ForgeLine.Client;
 internal static class BattlefieldHudCapture
 {
     private static readonly JsonSerializerOptions s_json = new() { WriteIndented = true };
-    internal static int Run(string output, string runtimeRoot)
+    internal static int Run(string output, string runtimeRoot, bool timingOnly = false)
     {
         try
         {
@@ -37,9 +37,11 @@ internal static class BattlefieldHudCapture
             var results = new List<object>();
             foreach (var zoom in new[] { RtsReferenceZoom.NormalGameplay, RtsReferenceZoom.Strategic })
             {
+                if (timingOnly && zoom != RtsReferenceZoom.NormalGameplay) continue;
                 var camera = new RtsCamera(RtsVisualReference.CreateCameraSettings(fixture.Target, zoom));
                 foreach (var display in new[] { (1280, 720), (1920, 1080), (2560, 1440), (3440, 1440), (3840, 2160) })
                 {
+                    if (timingOnly && display != (1920, 1080)) continue;
                     // The complete display/DPI/scale matrix uses normal zoom; strategic adds the same
                     // three state inspections at the reference display without duplicating layout work.
                     if (zoom == RtsReferenceZoom.Strategic && display != (1920, 1080)) continue;
@@ -48,6 +50,7 @@ internal static class BattlefieldHudCapture
                     foreach (uint dpi in new uint[] { 96, 144, 192 })
                     foreach (float scale in new[] { .75f, 1f, 2f })
                     {
+                        if (timingOnly && (dpi != 96 || scale != 1)) continue;
                         if (zoom == RtsReferenceZoom.Strategic && (dpi != 96 || scale != 1)) continue;
                         foreach (string state in new[] { "Mixed", "Supply", "Production" })
                         {
@@ -114,9 +117,11 @@ internal static class BattlefieldHudCapture
 
     private static object Measure(IGraphicsDevice graphics, Action<IGraphicsCommandContext> record)
     {
-        for (int i = 0; i < 16; i++) graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
-        var cpu = new List<double>(64); var gpu = new List<double>(64); ulong fence = 0;
-        for (int i = 0; i < 64; i++)
+        for (int i = 0; i < 64; i++) graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
+        graphics.WaitForIdle();
+        var cpu = new List<double>(128); var gpu = new List<double>(128);
+        ulong fence = graphics.Diagnostics.Frame?.GpuSubmissionFence ?? 0;
+        for (int i = 0; i < 128; i++)
         {
             long started = Stopwatch.GetTimestamp(); graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
             cpu.Add(Stopwatch.GetElapsedTime(started).TotalMicroseconds); AddGpu();
@@ -128,7 +133,7 @@ internal static class BattlefieldHudCapture
             if (d.Frame is { } frame && frame.GpuSubmissionFence > fence && d.GpuFrameMilliseconds is { } ms)
             { fence = frame.GpuSubmissionFence; gpu.Add(ms); }
         }
-        return new { Warmups = 16, Samples = 64, SubmitP50Microseconds = cpu[32],
+        return new { Warmups = 64, Samples = 128, SubmitP50Microseconds = cpu[cpu.Count / 2],
             GpuSamples = gpu.Count, GpuP50Milliseconds = gpu.Count > 0 ? (double?)gpu[gpu.Count / 2] : null };
     }
 

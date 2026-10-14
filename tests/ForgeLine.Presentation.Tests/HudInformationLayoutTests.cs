@@ -30,6 +30,7 @@ public sealed class HudInformationLayoutTests
             Inside(layout.SafeArea, operations);
             Assert.False(operations.Intersects(layout.SelectionInspector));
             Assert.False(operations.Intersects(layout.ActionDock));
+            Assert.False(operations.Intersects(layout.PrimaryCommands));
             for (int control = 0; control < 12; control++) Inside(operations, OperationsLayout.Control(layout, control));
         }
     }

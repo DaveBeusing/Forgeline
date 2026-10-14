@@ -35,6 +35,8 @@ public static class OperationsLayout
         float height = MathF.Max(0, layout.SelectionInspector.Y - y - gap);
         float width = MathF.Min(450 * layout.Scale,
             MathF.Min(MathF.Max(0, layout.ActionDock.X - layout.SafeArea.X - gap), height * 450 / 346));
+        if (y + MathF.Min(height, width * 346 / 450) > layout.PrimaryCommands.Y)
+            width = MathF.Min(width, MathF.Max(0, layout.PrimaryCommands.X - layout.SafeArea.X - gap));
         return new(layout.SafeArea.X, y, width, MathF.Min(height, width * 346 / 450));
     }
     public static float Scale(in GameplayHudLayout layout) { var p = Panel(layout); return MathF.Min(layout.Scale, MathF.Min(p.Width / 450, p.Height / 346)); }
@@ -98,7 +100,7 @@ public sealed class OperationsController
             return new(input.HasPointerPosition && tab.Contains(input.PointerPosition));
         }
         interaction.SetOperationsOpen(View.Open);
-        var entry = OperationsLayout.Entry(layout);
+        var entry = View.Open ? default : OperationsLayout.Entry(layout);
         var panel = OperationsLayout.Panel(layout);
         bool captured = input.HasPointerPosition && (entry.Contains(input.PointerPosition) || View.Open && panel.Contains(input.PointerPosition));
         bool originValid = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin);

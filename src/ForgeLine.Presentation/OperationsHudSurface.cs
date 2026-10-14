@@ -32,7 +32,8 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
         _count = 0; _line = 0;
         _scale = MathF.Min(context.Layout.Scale, OperationsLayout.Entry(context.Layout).Width / 126);
         _bounds = OperationsLayout.Entry(context.Layout);
-        if (!_bounds.IsEmpty)
+        bool panelVisible = context.Operations.Open && !context.Operations.Suppressed && context.Operations.Session == context.Snapshot.SessionId;
+        if (!_bounds.IsEmpty && !panelVisible)
         {
             Quad(_bounds, GameplayHudVisualStyle.PanelBackground);
             Line("OPERATIONS", true);
