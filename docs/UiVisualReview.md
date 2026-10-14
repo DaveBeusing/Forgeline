@@ -32,12 +32,13 @@ combine warnings to inspect priority/density without changing simulation rules.
 ## Compare and review
 
 ```powershell
-./build/Compare-VisualReferenceEvidence.ps1 -CurrentRoot artifacts/after -BaselineRoot artifacts/before -ReportPath artifacts/before-after.json
+./build/Compare-VisualReferenceEvidence.ps1 -CurrentRoot artifacts/after -BaselineRoot artifacts/before -ComparePixels -ReportPath artifacts/before-after.json
 ./build/Export-VisualReferenceReview.ps1 -EvidenceRoot artifacts/after -OutputPath artifacts/review.pending.json
 ```
 
 The report records source/runtime/device comparability, per-region changed hashes,
-CPU/GPU observations and exact pixel deltas when gated. No native image is resized,
+CPU/GPU observations and exact pixel deltas with `-ComparePixels` or the gate. Cross-source
+pixel deltas are diagnostic and never inherit baseline acceptance. No native image is resized,
 normalized or recolored. Nonuniform region pixels do not establish legibility.
 
 The exporter creates an entirely **pending** review. A human inspects every exact

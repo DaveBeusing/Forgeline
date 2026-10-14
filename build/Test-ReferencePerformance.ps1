@@ -90,6 +90,9 @@ try {
     $manifest.runtimeFingerprint='c'*64;Write-Current
     Reject { & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -BaselineRoot $baseline -GateImages -ApprovalPath $approvalPath -ReportPath (Join-Path $current 'changed-runtime.json') }
     $manifest.runtimeFingerprint='b'*64;$manifest.commit='c'*40;$manifest.buildIdentity='0.1.1-dev+'+('c'*40);Write-Current
+    & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -BaselineRoot $baseline -ComparePixels -ReportPath (Join-Path $current 'cross-source-diagnostic.json')
+    $diagnostic = Get-Content -LiteralPath (Join-Path $current 'cross-source-diagnostic.json') -Raw | ConvertFrom-Json
+    if ($diagnostic.captures[0].sameSource -or $diagnostic.captures[0].pixelComparison.ChangedPixels -ne 1 -or $diagnostic.visualAcceptance -ne 'pending') { throw 'Diagnostic pixel delta fabricated acceptance.' }
     Reject { & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -BaselineRoot $baseline -GateImages -ApprovalPath $approvalPath -ReportPath (Join-Path $current 'changed-source.json') }
     $manifest.commit='a'*40;$manifest.buildIdentity='0.1.1-dev+'+('a'*40);Write-Current
     $review.captures[0].rubric.focus='pending';$review | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $approvalPath

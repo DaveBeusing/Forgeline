@@ -207,7 +207,7 @@ internal static class VisualReferenceCapture
                     Action<IGraphicsCommandContext> record = context =>
                     {
                         recordFrameIndex = context.FrameIndex;
-                        if (frontend is not null && frontendView is { } view)
+                        if (frontend is not null && frontendView is { Kind: not FrontendSurfaceKind.PauseMenu } view)
                         {
                             context.BeginPass(GraphicsFramePass.Overlay); frontend.Render(context, view); return;
                         }
@@ -233,10 +233,12 @@ internal static class VisualReferenceCapture
                         selection.Render(context, camera, indicators);
                         hud.Render(context, camera, snapshot, terrain.WorldBounds, information, panel, default,
                             FormationTemplate.Compact, CombatGroupOverviewView.Empty, default, rasterDpi, uiScale);
+                        if (frontend is not null && frontendView is { Kind: FrontendSurfaceKind.PauseMenu } pause)
+                            frontend.Render(context, pause);
                     };
                     void PrepareTerrain()
                     {
-                        if (frontend is not null) return;
+                        if (frontend is not null && frontendView?.Kind != FrontendSurfaceKind.PauseMenu) return;
                         ground.Prepare(camera,
                             Math.Max(1, (int)Math.Ceiling(display.Width * (double)profile.ResolutionScale)),
                             Math.Max(1, (int)Math.Ceiling(display.Height * (double)profile.ResolutionScale)),

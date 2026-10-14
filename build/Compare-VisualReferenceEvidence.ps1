@@ -2,6 +2,7 @@
 param([Parameter(Mandatory)][string]$CurrentRoot, [string]$BaselineRoot,
     [string]$ReportPath,
     [switch]$GateImages,
+    [switch]$ComparePixels,
     [string]$ApprovalPath,
     [ValidateRange(0,8)][int]$ChannelTolerance = 0,
     [ValidateRange(0,0.05)][double]$MaximumChangedPixelFraction = 0)
@@ -18,7 +19,8 @@ function Confirm-Identity($Manifest) {
 Confirm-Identity $current
 $baseline = $null
 if ($GateImages -and -not $BaselineRoot) { throw 'Image gate requires a baseline.' }
-if ($GateImages -and -not ('ReferenceImageComparison' -as [type])) { Add-Type -Path "$PSScriptRoot/ReferenceImageComparison.cs" }
+if ($ComparePixels -and -not $BaselineRoot) { throw 'Pixel comparison requires a baseline.' }
+if (($GateImages -or $ComparePixels) -and -not ('ReferenceImageComparison' -as [type])) { Add-Type -Path "$PSScriptRoot/ReferenceImageComparison.cs" }
 if ($BaselineRoot) {
     if ([IO.Path]::GetFullPath($CurrentRoot) -eq [IO.Path]::GetFullPath($BaselineRoot)) { throw 'Baseline and current evidence must be distinct.' }
     $baseline = Get-Content -LiteralPath (Join-Path $BaselineRoot 'manifest.json') -Raw | ConvertFrom-Json
@@ -94,6 +96,10 @@ $rows = foreach ($capture in $current.captures) {
     if ($null -ne $previous) { Confirm-Image $BaselineRoot $previous.image $previous.imageSha256 $previous.actualSurface.width $previous.actualSurface.height }
     $pixelComparison = $null
     $equivalentHardware = ($null -ne $previous -and -not [string]::IsNullOrWhiteSpace($current.driver) -and $baseline.driver -eq $current.driver -and $previous.graphics.device.adapterName -eq $capture.graphics.device.adapterName -and $baseline.software -eq $current.software)
+    if ($ComparePixels -and $equivalentHardware -and $previous.actualSurface.width -eq $capture.actualSurface.width -and $previous.actualSurface.height -eq $capture.actualSurface.height) {
+        $pixelComparison = [ReferenceImageComparison]::Compare((Join-Path $CurrentRoot $capture.image), (Join-Path $BaselineRoot $previous.image),
+            $capture.actualSurface.width, $capture.actualSurface.height, 0, 0)
+    }
     if ($GateImages) {
         $sameInputs = $null -ne $previous -and $previous.fingerprint -eq $capture.fingerprint -and $equivalentHardware -and
             $baseline.commit -eq $current.commit -and $baseline.buildIdentity -eq $current.buildIdentity -and $baseline.runtimeFingerprint -eq $current.runtimeFingerprint
@@ -136,7 +142,7 @@ if (-not $ReportPath) { $ReportPath = Join-Path $CurrentRoot 'comparison.json' }
 if ($BaselineRoot -and [IO.Path]::GetFullPath($ReportPath).StartsWith([IO.Path]::GetFullPath($BaselineRoot).TrimEnd('\','/') + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw 'Comparison report may not write into baseline evidence.' }
 if (Test-Path -LiteralPath $ReportPath) { throw 'Comparison report already exists; select a new report path.' }
 @{schemaVersion=1; commit=$current.commit; structural='pass'; visualAcceptance='pending'; baselineCommit=$(if ($baseline) {$baseline.commit} else {$null}); captures=@($rows);
-    imageGateRequested=[bool]$GateImages;channelTolerance=$ChannelTolerance;maximumChangedPixelFraction=$MaximumChangedPixelFraction;imageFailures=@($imageFailures);
+    imageGateRequested=[bool]$GateImages;pixelComparisonRequested=[bool]$ComparePixels;channelTolerance=$ChannelTolerance;maximumChangedPixelFraction=$MaximumChangedPixelFraction;imageFailures=@($imageFailures);
     policy='Checksums and native dimensions are structural checks. No accepted goldens, similarity threshold, art-quality acceptance or portable timing gate is inferred.'} |
     ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $ReportPath -Encoding utf8
 if ($GateImages -and $imageFailures.Count) { throw "Image gate failed for $($imageFailures.Count) cases; inspect $ReportPath. Human visual acceptance remains pending." }
