@@ -8,6 +8,16 @@ namespace ForgeLine.Client.Tests;
 public sealed class UiReferenceScenarioTests
 {
     [Fact]
+    public void NativeInteractionPairsMustChangePixelsWithinTheSameDisplayScope()
+    {
+        var hashes = new Dictionary<string,string>(StringComparer.Ordinal);
+        UiReferenceStates.ConfirmDistinct(hashes,"compact-",UiReferenceScenario.DockHover,[1,2,3,255]);
+        Assert.Throws<InvalidDataException>(() => UiReferenceStates.ConfirmDistinct(hashes,"compact-",UiReferenceScenario.DockPressed,[1,2,3,255]));
+        UiReferenceStates.ConfirmDistinct(hashes,"wide-",UiReferenceScenario.DockPressed,[1,2,3,255]);
+        UiReferenceStates.ConfirmDistinct(hashes,"wide-",UiReferenceScenario.DockHover,[2,2,3,255]);
+    }
+
+    [Fact]
     public void NamedMatrixRejectsUnsupportedOrAmbiguousInputsBeforeNativeStartup()
     {
         var request = new VisualReferenceCaptureRequest { OutputRoot = "unused", RuntimeRoot = "unused", Commit = new('a', 40),

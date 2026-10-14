@@ -92,6 +92,7 @@ internal static class VisualReferenceCapture
         var captures = new List<object>();
         var captureInputs = new List<object>();
         var failedCaptures = new List<string>();
+        var uiPixelHashes = new Dictionary<string, string>(StringComparer.Ordinal);
         long startupStart = Stopwatch.GetTimestamp();
         long startupAllocationStart = GC.GetAllocatedBytesForCurrentThread();
         try
@@ -331,6 +332,8 @@ internal static class VisualReferenceCapture
                     if (!repeatPixelsEqual) failedCaptures.Add(key);
                     string image = key + ".png";
                     ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, image), display.Width, display.Height, rgba);
+                    if (uiScenario != UiReferenceScenario.World)
+                        UiReferenceStates.ConfirmDistinct(uiPixelHashes, FormattableString.Invariant($"{display.Width}x{display.Height}-{quality}-{rasterDpi}-{uiScale:0.00}-"), uiScenario, rgba);
                     var motionImages = new List<object>();
                     if (uiScenario == UiReferenceScenario.World && display.Width == RtsVisualReference.Width && quality == RenderQuality.Medium && zoom == RtsReferenceZoom.NormalGameplay)
                     {

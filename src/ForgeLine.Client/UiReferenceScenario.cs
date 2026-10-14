@@ -19,6 +19,30 @@ internal enum UiReferenceScenario
 /// <summary>Named authored read models for the existing reference capture lane; never dispatches input.</summary>
 internal static class UiReferenceStates
 {
+    private static readonly (UiReferenceScenario Left, UiReferenceScenario Right)[] s_distinct =
+    [
+        (UiReferenceScenario.Menu, UiReferenceScenario.MenuFocus),
+        (UiReferenceScenario.Menu, UiReferenceScenario.MenuDisabled),
+        (UiReferenceScenario.Menu, UiReferenceScenario.MenuReveal),
+        (UiReferenceScenario.Contacts, UiReferenceScenario.DockHover),
+        (UiReferenceScenario.DockHover, UiReferenceScenario.DockPressed),
+        (UiReferenceScenario.DockPending, UiReferenceScenario.DockAccepted),
+        (UiReferenceScenario.DockAccepted, UiReferenceScenario.DockRejected)
+    ];
+
+    internal static void ConfirmDistinct(Dictionary<string, string> hashes, string scope, UiReferenceScenario state, byte[] rgba)
+    {
+        string hash = Convert.ToHexString(SHA256.HashData(rgba));
+        hashes.Add(scope + state, hash);
+        foreach (var (left, right) in s_distinct)
+        {
+            if (state != left && state != right) continue;
+            var other = state == left ? right : left;
+            if (hashes.TryGetValue(scope + other, out string? previous) && previous == hash)
+                throw new InvalidDataException($"UI states {state} and {other} have identical native pixels in {scope}.");
+        }
+    }
+
     internal static bool IsFrontend(UiReferenceScenario state) => state is >= UiReferenceScenario.Menu and <= UiReferenceScenario.Credits;
 
     internal static FrontendSurfaceView Frontend(UiReferenceScenario state, int width, int height, uint dpi, float scale)
