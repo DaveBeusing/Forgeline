@@ -29,6 +29,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
     private readonly SceneLightingSettings _lighting;
     private readonly float _lodDiameterScale;
     private readonly bool _vegetationMotion;
+    private readonly bool _clusterCulling;
     private readonly VegetationRenderSettings _vegetation;
     private readonly Dictionary<int, FrameInstanceBuffer> _frameInstanceBuffers = [];
     private readonly Dictionary<int, FrameInstanceBuffer> _shadowFrameInstanceBuffers = [];
@@ -38,13 +39,14 @@ public sealed class SimpleInstanceRenderer : IDisposable
     private Dictionary<(EntityId Entity, uint Identity), int> _currentLods = [];
     private InstanceRenderData[] _instanceStaging = [];
     private int _activeBatchCount;
+    private long _snapshotIndexBytes;
     private bool _disposed;
 
     public SimpleInstanceRenderer(
         IGraphicsDevice graphics,
         RuntimeAssetCatalog? runtimeAssets = null,
         SceneLightingSettings? lighting = null, float lodDiameterScale = 1, TextureDetailQuality textureDetail = TextureDetailQuality.Full,
-        bool vegetationMotion = true, WorldEnvironmentSettings? environment = null, VegetationRenderSettings? vegetation = null)
+        bool vegetationMotion = true, WorldEnvironmentSettings? environment = null, VegetationRenderSettings? vegetation = null, bool clusterCulling = true)
     {
         ArgumentNullException.ThrowIfNull(graphics);
 
@@ -56,6 +58,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             throw new ArgumentOutOfRangeException(nameof(lodDiameterScale));
         _lodDiameterScale = lodDiameterScale;
         _vegetationMotion = vegetationMotion;
+        _clusterCulling = clusterCulling;
         WorldEnvironmentSettings appearance = environment ?? new();
         appearance.Validate();
         _vegetation = vegetation ?? new();
@@ -164,7 +167,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             int submitted = LastDiagnostics.RuntimeMeshInstances + LastDiagnostics.FallbackMeshInstances;
             return new InstanceSubmissionMetrics(_instanceStaging.Length, retained, _batches.Count,
                 submitted, (long)submitted * InstanceStride, LastDiagnostics.DrawCalls, textured * 4)
-            { MechanicalPartInstances = mechanical, MechanicalTransformScratchBytes = MechanicalMeshValidation.MaximumParts * 64 };
+            { SnapshotIndexBytes = _snapshotIndexBytes, MechanicalPartInstances = mechanical, MechanicalTransformScratchBytes = MechanicalMeshValidation.MaximumParts * 64 };
         }
     }
 
@@ -206,6 +209,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
         if (presentationSeconds is { } seconds && (!double.IsFinite(seconds) || seconds < 0))
             throw new ArgumentOutOfRangeException(nameof(presentationSeconds));
 
+        _snapshotIndexBytes = world.IndexRetainedBytes;
         if (!_vegetationMotion) presentationSeconds = null;
 
         CameraMatrices matrices =
@@ -220,6 +224,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
         var batchLookup = _batchLookup;
         var batches = _batches;
 
+        int clusterTests = 0, rejectedClusters = 0, clusterCulled = 0, instanceTests = 0;
         int visible = 0;
         int animatedVegetation = 0;
         int visibleVegetation = 0;
@@ -233,6 +238,16 @@ public sealed class SimpleInstanceRenderer : IDisposable
         for (int index = 0; index < world.InstanceCount; index++)
         {
             if (visible >= maximumCasters) break;
+            if (_clusterCulling && world.InstanceCount >= RenderSnapshotIndex.ClusterSize && index % RenderSnapshotIndex.ClusterSize == 0)
+            {
+                clusterTests++;
+                if (!world.ClusterVisible(index, frustum))
+                {
+                    int skipped = Math.Min(RenderSnapshotIndex.ClusterSize, world.InstanceCount - index);
+                    rejectedClusters++; clusterCulled += skipped; index += skipped - 1;
+                    continue;
+                }
+            }
             RenderInstance instance =
                 world.GetInterpolatedInstance(
                     index,
@@ -255,6 +270,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 presentationSeconds.HasValue ? VegetationVisualMotion.CullingBounds(instance) :
                     PresentationBounds.ResolveAxisAlignedBounds(instance);
 
+            instanceTests++;
             if (!frustum.Intersects(
                     bounds))
             {
@@ -594,7 +610,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     world.InstanceCount,
                     0,
                     highLod,
-                    reducedLod) { Lod1Instances = lod1Instances, Lod2Instances = lod2Instances, SkippedDecalResources = skippedDecalResources };
+                    reducedLod) { Lod1Instances = lod1Instances, Lod2Instances = lod2Instances, SkippedDecalResources = skippedDecalResources, ClusterTests = clusterTests, RejectedClusters = rejectedClusters, ClusterCulledInstances = clusterCulled, InstanceBoundsTests = instanceTests };
             return;
         }
 
@@ -774,7 +790,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 runtimeMeshInstances,
                 texturedRuntimeMeshInstances,
                 fallbackMeshInstances) { Lod1Instances = lod1Instances, Lod2Instances = lod2Instances,
-                    AnimatedVegetationInstances = animatedVegetation, VisibleVegetationInstances = visibleVegetation, SkippedDecalResources = skippedDecalResources };
+                    AnimatedVegetationInstances = animatedVegetation, VisibleVegetationInstances = visibleVegetation, SkippedDecalResources = skippedDecalResources, ClusterTests = clusterTests, RejectedClusters = rejectedClusters, ClusterCulledInstances = clusterCulled, InstanceBoundsTests = instanceTests };
     }
 
     public void Dispose()

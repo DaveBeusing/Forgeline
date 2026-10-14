@@ -10,6 +10,7 @@ public readonly record struct InstanceSubmissionMetrics(
     int PipelineBindings,
     int TextureBindings)
 {
+    public long SnapshotIndexBytes { get; init; }
     public int MechanicalPartInstances { get; init; }
     public int MechanicalTransformScratchBytes { get; init; }
 }

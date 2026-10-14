@@ -523,6 +523,35 @@ public sealed class SimpleInstanceRendererTests : IDisposable
         Assert.Equal(128, context.LastInstanceCount);
     }
 
+    [Fact]
+    public void ClusterCullingMatchesReferenceUploadsAndSkipsOffscreenWork()
+    {
+        using var referenceGraphics = new FakeGraphicsDevice { CaptureUploads = true };
+        _graphics.CaptureUploads = true;
+        using var optimized = new SimpleInstanceRenderer(_graphics);
+        using var reference = new SimpleInstanceRenderer(referenceGraphics, clusterCulling: false);
+        var camera = new RtsCamera();
+        var buffer = new PresentationSnapshotBuffer();
+        var world = new RenderWorld();
+        var instances = Enumerable.Range(1, 1024).Select(i => Instance(new EntityId((uint)i, 1),
+            i < 257 ? camera.Target + new Vector3(i % 16 - 8, 0, i / 16 - 8) : new Vector3(1_000_000 + i), Vector3.One)).ToArray();
+        // Current and previous snapshots exercise the cached identity lookup too.
+        buffer.Publish(new(new SimulationTick(1), TimeSpan.FromMilliseconds(50), instances.Length, instances));
+        world.Update(buffer);
+        buffer.Publish(new(new SimulationTick(2), TimeSpan.FromMilliseconds(50), instances.Length, instances));
+        world.Update(buffer);
+        foreach (float distance in new[] { 120, 420, 900 })
+        {
+            camera.ApplyState(camera.CaptureState() with { Distance = distance });
+            optimized.Render(new FakeGraphicsCommandContext(), camera, world, .5f);
+            reference.Render(new FakeGraphicsCommandContext(), camera, world, .5f);
+            Assert.Equal(reference.LastDiagnostics.VisibleInstances, optimized.LastDiagnostics.VisibleInstances);
+            Assert.Equal(reference.LastDiagnostics.DrawCalls, optimized.LastDiagnostics.DrawCalls);
+            Assert.Equal(referenceGraphics.Buffers[^1].LastUpload, _graphics.Buffers[^1].LastUpload);
+            Assert.True(optimized.LastDiagnostics.ClusterCulledInstances >= 736);
+            Assert.True(optimized.LastDiagnostics.InstanceBoundsTests < reference.LastDiagnostics.InstanceBoundsTests);
+        }
+    }
     private static RenderInstance Instance(
         EntityId entity,
         Vector3 position,
