@@ -209,10 +209,13 @@ internal static class FrontendPresentationAdapter
                 new(GraphicsSettingsText.Get("SurfaceDetail"), Toggle(graphics.SurfaceDetail, effective.TerrainDetail.Enabled), IsFocused: focused == FrontendSettingsField.SurfaceDetail, CanDecrease: true, CanIncrease: true),
                 new(GraphicsSettingsText.Get("VegetationMotion"), Toggle(graphics.VegetationMotion, effective.VegetationMotion), IsFocused: focused == FrontendSettingsField.VegetationMotion, CanDecrease: true, CanIncrease: true),
                 new(GraphicsSettingsText.Get("Atmosphere"), Choice(graphics.Atmosphere, effective.Atmosphere), IsFocused: focused == FrontendSettingsField.Atmosphere, CanDecrease: true, CanIncrease: true),
-                new(GraphicsSettingsText.Get("Particles"), Choice(graphics.Particles, effective.Particles.Quality), IsFocused: focused == FrontendSettingsField.Particles, CanDecrease: true, CanIncrease: true)
+                new(GraphicsSettingsText.Get("Particles"), Choice(graphics.Particles, effective.Particles.Quality), IsFocused: focused == FrontendSettingsField.Particles, CanDecrease: true, CanIncrease: true),
+                new("REDUCE UI MOTION", settings.FeedbackSettings.ReducedMotion ? "ON" : "OFF", IsFocused: focused == FrontendSettingsField.ReducedUiMotion, CanDecrease: true, CanIncrease: true),
+                new("INTERFACE SOUND", settings.FeedbackSettings.SoundEnabled ? "ON" : "OFF", IsFocused: focused == FrontendSettingsField.UiSoundEnabled, CanDecrease: true, CanIncrease: true),
+                new("INTERFACE VOLUME", $"{settings.FeedbackSettings.SoundVolume * 100:0}%", IsFocused: focused == FrontendSettingsField.UiSoundVolume, CanDecrease: settings.FeedbackSettings.SoundVolume > 0, CanIncrease: settings.FeedbackSettings.SoundVolume < 1)
             }.Skip(interaction?.VisibleStart ?? 0).Take(interaction?.VisibleRowCount ?? 7).ToArray(),
             displayFeedback ?? (string.IsNullOrEmpty(interaction?.BindingFeedback) ?
-                focused is { } field && (field == FrontendSettingsField.OutputResolution || field >= FrontendSettingsField.RenderQuality) ? GraphicsSettingsText.Get(field + "Help") : GraphicsSettingsText.Get("Controls") : interaction.BindingFeedback),
+                focused is { } field && (field == FrontendSettingsField.OutputResolution || field >= FrontendSettingsField.RenderQuality && field <= FrontendSettingsField.Particles) ? GraphicsSettingsText.Get(field + "Help") : GraphicsSettingsText.Get("Controls") : interaction.BindingFeedback),
             interaction?.CanApply == false ? string.Empty : displayPreviewActive ? GraphicsSettingsText.Get("KeepDisplay") : "APPLY");
     }
 

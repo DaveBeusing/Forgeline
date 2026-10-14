@@ -52,6 +52,9 @@ public readonly record struct FrontendSurfaceView(
     public RenderQuality BackgroundQuality { get; init; } = RenderQuality.Medium;
     public FrontendGeometry? Layout { get; init; }
     public int DetailScroll { get; init; }
+    public UiFeedbackSettings FeedbackSettings { get; init; }
+    public bool FeedbackActive { get; init; } = true;
+    public UiMotionView? Motion { get; init; }
 
     public static FrontendSurfaceView StudioSplash(float elapsedSeconds, float masterOpacity = 1f) =>
         new(FrontendSurfaceKind.StudioSplash, string.Empty, string.Empty,

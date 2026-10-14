@@ -234,6 +234,8 @@ internal sealed class ClientFrontendRenderHost : IDisposable
         StudioSplashVideoRenderer? videoRenderer = null;
         bool videoAttempted = false;
         bool menuPresented = false;
+        var feedback = new UiInteractionFeedback();
+        using var uiAudio = new WaveOutUiAudio();
         try
         {
             while (Volatile.Read(ref _stopping) == 0)
@@ -262,12 +264,14 @@ internal sealed class ClientFrontendRenderHost : IDisposable
 
                 if (requestedSuspended)
                 {
+                    feedback.Cancel(); uiAudio.StopPlayback();
                     if (!suspended) graphics.Resize(0, 0);
                     suspended = true;
                     continue;
                 }
                 if (suspended || width != requestedWidth || height != requestedHeight)
                 {
+                    feedback.Cancel(); uiAudio.StopPlayback();
                     graphics.Resize(requestedWidth, requestedHeight);
                     width = requestedWidth;
                     height = requestedHeight;
@@ -306,6 +310,8 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                     renderer.PrepareBackground(menuAssets, view.Value.BackgroundQuality, graphics.Diagnostics.Device.IsSoftwareAdapter);
                     lock (_gate) _menuImageDiagnostics = renderer.BackgroundDiagnostics;
                 }
+                TimeSpan uiNow = TimeSpan.FromSeconds((double)Stopwatch.GetTimestamp() / Stopwatch.Frequency);
+                view = feedback.Frontend(view.Value, uiNow, view.Value.FeedbackActive, graphics.Diagnostics.Device.IsSoftwareAdapter);
                 graphics.RenderFrame(
                     view.Value.Kind == FrontendSurfaceKind.StudioSplash
                         ? new GraphicsColor(0, 0, 0, 1) : GraphicsColor.ForgeLineClear,
@@ -325,6 +331,7 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                             renderer.Render(context, FrontendSurfaceView.Loading("PREPARING STUDIO INTRO", false, 0));
                         }
                     });
+                uiAudio.Update(feedback.Cue, view.Value.FeedbackSettings, uiNow, view.Value.FeedbackActive);
                 if (ObservePresentation(_startup, _presentedFrames,
                     graphics.PresentedFrameCount, view.Value.Kind,
                     videoRenderer?.HasFrame == true,

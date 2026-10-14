@@ -303,6 +303,17 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             width,
             height);
 
+        var motion = panel.Motion ?? UiMotionView.Settled;
+        if (motion.Reveal < 1)
+            EmitQuad(layout.ActionDock.X, bar.Bottom, layout.ActionDock.Width * Math.Clamp(motion.Reveal, 0, 1),
+                _scale, GameplayHudVisualStyle.Focus, width, height);
+        if (motion.Result > 0 && snapshot.PlayerExperience is { } experience && experience.Tick == snapshot.Tick)
+        {
+            var resultColor = experience.Feedback.State == PlayerCommandFeedbackState.Accepted ? GameplayHudVisualStyle.Focus : GameplayHudVisualStyle.Warning;
+            EmitQuad(layout.ActionDock.X, bar.Bottom, 3 * _scale,
+                PlayerActionDockInteractionLayout.HeaderHeight(layout) * Math.Clamp(motion.Result, 0, 1), resultColor, width, height);
+        }
+
         EmitCards(
             actions,
             panel,
@@ -852,7 +863,8 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             bool selected = index == panel.SelectedIndex; bool hovered = index == panel.HoveredIndex;
             var visual = GameplayHudVisualStyle.ResolveItemState(selected, hovered, hovered && panel.PointerPressed, state.CanActivate);
             EmitQuad(rect.X, rect.Y, rect.Width, rect.Height, visual.Fill, width, height);
-            EmitItemStateCue(rect, visual, width, height);
+            var cueRect = selected ? rect with { Height = rect.Height * (.6f + .4f * Math.Clamp((panel.Motion ?? UiMotionView.Settled).Focus, 0, 1)) } : rect;
+            EmitItemStateCue(cueRect, visual, width, height);
             EmitIcon(PlayerActionDockHudModel.ResolveItemIcon(panel.Mode, index, actions), rect.X + 6 * _scale,
                 rect.Y + 5 * _scale, 14 * _scale, width, height);
             DockText(PlayerActionDockHudModel.ResolveItemTitle(panel.Mode, index, actions),

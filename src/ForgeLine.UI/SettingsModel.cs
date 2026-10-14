@@ -15,7 +15,7 @@ public readonly record struct FrontendSettingsSnapshot(
     bool EdgeScrollEnabled,
     float CameraPanSpeedMultiplier,
     RtsCameraBindings CameraBindings, GameplayBindings? GameplayBindings = null,
-    FrontendRenderQuality RenderQuality = FrontendRenderQuality.Medium, RenderQualitySettings? GraphicsSettings = null);
+    FrontendRenderQuality RenderQuality = FrontendRenderQuality.Medium, RenderQualitySettings? GraphicsSettings = null, UiFeedbackSettings FeedbackSettings = default);
 
 public sealed class SettingsModel
 {
@@ -29,6 +29,12 @@ public sealed class SettingsModel
     public FrontendSettingsSnapshot Settings { get; private set; }
     public GameplayBindingRegistry Bindings { get; private set; }
     public RenderQualitySettings GraphicsSettings => Settings.GraphicsSettings ?? new RenderQualitySettings { Quality = (RenderQuality)Settings.RenderQuality };
+
+    public void SetUiFeedback(UiFeedbackSettings settings)
+    {
+        settings.Validate();
+        Settings = Settings with { FeedbackSettings = settings };
+    }
 
     public void SetGraphicsSettings(RenderQualitySettings settings)
     {

@@ -17,7 +17,7 @@ public enum FrontendSettingsField : byte
     BindingKey = 7,
     RenderQuality = 8,
     ResolutionScale = 9, Antialiasing = 10, Shadows = 11, Textures = 12, ObjectDetail = 13,
-    SurfaceDetail = 14, VegetationMotion = 15, Atmosphere = 16, Particles = 17
+    SurfaceDetail = 14, VegetationMotion = 15, Atmosphere = 16, Particles = 17, ReducedUiMotion = 18, UiSoundEnabled = 19, UiSoundVolume = 20
 }
 
 public sealed class SettingsInteractionModel
@@ -166,6 +166,12 @@ public sealed class SettingsInteractionModel
                 model.SetGraphicsSettings(graphics with { SurfaceDetail = Cycle(graphics.SurfaceDetail, direction) }); break;
             case FrontendSettingsField.VegetationMotion:
                 model.SetGraphicsSettings(graphics with { VegetationMotion = Cycle(graphics.VegetationMotion, direction) }); break;
+            case FrontendSettingsField.ReducedUiMotion:
+                model.SetUiFeedback(settings.FeedbackSettings with { ReducedMotion = !settings.FeedbackSettings.ReducedMotion }); break;
+            case FrontendSettingsField.UiSoundEnabled:
+                model.SetUiFeedback(settings.FeedbackSettings with { SoundEnabled = !settings.FeedbackSettings.SoundEnabled }); break;
+            case FrontendSettingsField.UiSoundVolume:
+                model.SetUiFeedback(settings.FeedbackSettings with { SoundVolume = Math.Clamp(settings.FeedbackSettings.SoundVolume + Math.Sign(direction) * .05f, 0, 1) }); break;
             case FrontendSettingsField.Onboarding:
                 model.SetOnboarding(
                     !settings.ShowOnboarding);

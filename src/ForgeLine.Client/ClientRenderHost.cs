@@ -125,7 +125,7 @@ internal readonly record struct ClientRenderFrame(
     CombatGroupOverviewView? CombatGroups = null,
     bool MetricsActive = true,
     HoverTooltipView HoverTooltip = default,
-    OperationsView Operations = default);
+    OperationsView Operations = default, UiFeedbackSettings FeedbackSettings = default);
 
 internal sealed class ClientRenderHost : IDisposable
 {
@@ -451,6 +451,9 @@ internal sealed class ClientRenderHost : IDisposable
                 environment: qualityProfile.Environment, vegetation: qualityProfile.Vegetation);
             using var particleRenderer = new ParticleVfxRenderer(graphics, _runtimeAssets, qualityProfile.Particles, lighting);
             long lastParticleFrame = Stopwatch.GetTimestamp();
+            var dockFeedback = new UiInteractionFeedback();
+            var frontendFeedback = new UiInteractionFeedback();
+            using var uiAudio = new WaveOutUiAudio();
             using var gameplayOverlayRenderer =
                 new DebugDrawRenderer(
                     graphics,
@@ -531,6 +534,7 @@ internal sealed class ClientRenderHost : IDisposable
 
                 if (current.SurfaceSuspended)
                 {
+                    dockFeedback.Cancel(); frontendFeedback.Cancel(); uiAudio.StopPlayback();
                     runtimeMetricsSampler.Reset();
                     if (!surfaceSuspended)
                     {
@@ -544,6 +548,7 @@ internal sealed class ClientRenderHost : IDisposable
                     continue;
                 }
 
+                if (!current.MetricsActive) { dockFeedback.Cancel(); frontendFeedback.Cancel(); uiAudio.StopPlayback(); }
                 if (current.ViewportWidth <= 0 ||
                     current.ViewportHeight <= 0)
                 {
@@ -555,6 +560,7 @@ internal sealed class ClientRenderHost : IDisposable
                     current.ViewportWidth != width ||
                     current.ViewportHeight != height)
                 {
+                    dockFeedback.Cancel(); frontendFeedback.Cancel(); uiAudio.StopPlayback();
                     graphics.Resize(
                         current.ViewportWidth,
                         current.ViewportHeight);
@@ -597,6 +603,14 @@ internal sealed class ClientRenderHost : IDisposable
 
                 long now =
                     Stopwatch.GetTimestamp();
+                TimeSpan uiNow = TimeSpan.FromSeconds((double)now / Stopwatch.Frequency);
+                var animatedPanel = dockFeedback.Gameplay(current.ActionPanel, snapshot, uiNow,
+                    current.MetricsActive && current.Frontend is null && current.PreAlphaUx.Mode == PreAlphaUxMode.None, current.FeedbackSettings, qualityProfile.Active);
+                FrontendSurfaceView? animatedFrontend = current.Frontend.HasValue ? frontendFeedback.Frontend(
+                    current.Frontend.Value with { FeedbackSettings = current.FeedbackSettings, BackgroundQuality = qualityProfile.Active },
+                    uiNow, current.MetricsActive, graphics.Diagnostics.Device.IsSoftwareAdapter) : null;
+                uiAudio.Update(animatedFrontend.HasValue ? frontendFeedback.Cue : dockFeedback.Cue,
+                    current.FeedbackSettings, uiNow, current.MetricsActive && (current.Frontend.HasValue || current.PreAlphaUx.Mode == PreAlphaUxMode.None));
                 TimeSpan sinceSnapshot =
                     StopwatchElapsed(
                         snapshotObservedAt,
@@ -709,7 +723,7 @@ internal sealed class ClientRenderHost : IDisposable
                             snapshot,
                             terrain.WorldBounds,
                             current.InformationLayer,
-                            current.ActionPanel,
+                            animatedPanel,
                             current.TacticalTargeting,
                             current.ActiveFormation,
                             current.CombatGroups ??
@@ -731,7 +745,7 @@ internal sealed class ClientRenderHost : IDisposable
                                 current.OverlayEnabled,
                             uiScale:
                                 current.UiScale);
-                        if (current.Frontend is FrontendSurfaceView frontend)
+                        if (animatedFrontend is FrontendSurfaceView frontend)
                         {
                             frontendRenderer.Render(
                                 context,

@@ -1,0 +1,11 @@
+FORGELINE interface cues
+
+navigation.wav, intent.wav, accepted.wav and rejected.wav are original mathematical
+tone synthesis, with no recordings, samples or third-party sound libraries.
+Reproducible source: build/Generate-UiAudio.py (Python standard library, build-time only).
+Stereo 48 kHz PCM16, 35/55/95/110 ms; peak synthesis gain 0.16.
+
+Copyright 2026 FORGELINE contributors. These four sound files are dedicated to the
+public domain under CC0 1.0 Universal: https://creativecommons.org/publicdomain/zero/1.0/
+Redistribution and modification are permitted. The studio introduction is separate
+and is not licensed or repurposed by this notice.

@@ -52,6 +52,7 @@ public readonly record struct PlayerActionPanelView(
     SimulationSessionId ContextualSessionId = default,
     bool SelectionPending = false, GameplayBindingRegistry? Bindings = null, int ContextualHoveredIndex = -1, bool ContextualPressed = false)
 {
+    public UiMotionView? Motion { get; init; }
     public bool IsOpen =>
         Mode != PlayerActionPanelMode.Closed;
 }
