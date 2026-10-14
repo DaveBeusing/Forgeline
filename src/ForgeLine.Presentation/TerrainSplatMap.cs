@@ -59,7 +59,7 @@ public sealed class TerrainChunkSplatData
                 _mips[0].Height,
                 GraphicsTextureFormat.Rgba8Unorm,
                 GraphicsTextureColorSpace.Linear,
-                _mips.Length),
+                _mips.Length) { DeferUploadWait = true },
             _mips);
 }
 

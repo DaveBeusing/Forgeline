@@ -1439,7 +1439,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 item.LastUseFence = fenceValue;
                 item.Recording = false;
             }
-            WaitForFence(fenceValue);
+            if (!texture.Description.DeferUploadWait) WaitForFence(fenceValue);
         }
         catch (Exception exception)
         {

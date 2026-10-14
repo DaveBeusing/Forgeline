@@ -222,6 +222,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
 
         int visible = 0;
         int animatedVegetation = 0;
+        int visibleVegetation = 0;
         int highLod = 0;
         int reducedLod = 0;
         int lod1Instances = 0;
@@ -256,6 +257,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             }
 
             visible++;
+            if (instance.WorldFeature.Kind == ForgeLine.Game.WorldPresentationKind.Vegetation) visibleVegetation++;
 
             RuntimeMeshBuffers runtimeMesh =
                 default;
@@ -763,7 +765,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 reducedLod,
                 runtimeMeshInstances,
                 texturedRuntimeMeshInstances,
-                fallbackMeshInstances) { Lod1Instances = lod1Instances, Lod2Instances = lod2Instances, AnimatedVegetationInstances = animatedVegetation };
+                fallbackMeshInstances) { Lod1Instances = lod1Instances, Lod2Instances = lod2Instances,
+                    AnimatedVegetationInstances = animatedVegetation, VisibleVegetationInstances = visibleVegetation };
     }
 
     public void Dispose()

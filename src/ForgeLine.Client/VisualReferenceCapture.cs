@@ -210,7 +210,11 @@ internal static class VisualReferenceCapture
                     double setupMilliseconds = Stopwatch.GetElapsedTime(setupStart).TotalMilliseconds;
                     long setupAllocatedBytes = GC.GetAllocatedBytesForCurrentThread() - setupAllocationStart;
                     int warmupFrames = request.RunProfile == ReferenceRunProfile.RendererCold ? 0 : request.Warmups;
-                    for (int i = 0; i < warmupFrames; i++) graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
+                    for (int i = 0; i < warmupFrames; i++)
+                    {
+                        if (!platform.PumpEvents()) throw new OperationCanceledException("Reference window was closed.");
+                        graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
+                    }
                     graphics.WaitForIdle();
                     var beforeSamples = graphics.Diagnostics;
                     var performance = new ReferencePerformanceSamples(request.Samples, beforeSamples.Frame?.GpuSubmissionFence ?? 0);
@@ -219,6 +223,7 @@ internal static class VisualReferenceCapture
                     lastFence = beforeSamples.Frame?.GpuSubmissionFence ?? 0;
                     for (int i = 0; i < cpu.Length; i++)
                     {
+                        if (!platform.PumpEvents()) throw new OperationCanceledException("Reference window was closed.");
                         camera.ApplyState(ReferencePerformanceSamples.CameraPose(initialCamera, request.CameraPath, i, request.Samples));
                         long allocationStart = GC.GetAllocatedBytesForCurrentThread();
                         long start = Stopwatch.GetTimestamp(); PrepareTerrain(); graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
