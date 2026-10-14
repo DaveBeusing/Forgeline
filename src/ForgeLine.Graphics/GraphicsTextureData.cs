@@ -25,6 +25,8 @@ public sealed record GraphicsTextureDescription(
     GraphicsTextureColorSpace ColorSpace,
     int MipCount)
 {
+    /// <summary>Return after queuing the copy; staging storage retires at its direct-queue fence.</summary>
+    public bool DeferUploadWait { get; init; }
     internal void Validate()
     {
         if (Width <= 0 || Height <= 0)

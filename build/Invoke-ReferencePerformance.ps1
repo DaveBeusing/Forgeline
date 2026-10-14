@@ -2,7 +2,7 @@
 param(
     [string]$OutputRoot = 'artifacts/reference-performance',
     [ValidateSet('Warm','RendererCold')][string]$RunProfile = 'Warm',
-    [ValidateSet('Fixed','Sweep')][string]$CameraPath = 'Sweep',
+    [ValidateSet('Fixed','Sweep','Traverse')][string]$CameraPath = 'Sweep',
     [ValidateSet('Representative','Vehicles1000')][string]$Preset = 'Representative',
     [ValidateRange(3,4096)][int]$Warmups = 64,
     [ValidateRange(8,8192)][int]$Samples = 512,

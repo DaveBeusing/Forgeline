@@ -51,7 +51,11 @@ internal sealed partial class D3D12GraphicsDevice
         _submittedAtmosphereApplied, _atmosphereDepthDescriptor >= 0 ? 1 : 0, 0, _submittedAtmosphereDensity,
         _cpuTimingSubmission, _gpuTimingFence, _atmosphere.Enabled ? _compositeGpuMilliseconds : null,
         !_atmosphere.Enabled ? "Atmospheric fog is disabled." : !_submittedAtmosphereApplied ? "No atmospheric camera was submitted." : null)
-        { RequiredScenePayloadBytes = _atmosphere.Enabled ? checked((long)WorldWidth * WorldHeight * 8 * _configuration.BufferCount) : 0 };
+        {
+            RequiredScenePayloadBytes = _atmosphere.Enabled ? checked((long)WorldWidth * WorldHeight * 8 * _configuration.BufferCount) : 0,
+            LocalHaze = _atmosphere.Enabled ? _atmosphere.LocalHaze : null,
+            MaximumLocalDensityEvaluations = _atmosphere.Enabled && _atmosphere.LocalHaze is { Density: > 0 } ? 3 : 0
+        };
 
     private void CreateAtmosphereDepthView()
     {

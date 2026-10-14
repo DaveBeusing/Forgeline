@@ -201,3 +201,7 @@ road/bridge IDs now bind fractured slabs, exposed rebar and broken deck/girder
 geometry using authorized infrastructure states. No navigation/physics side
 effects or resource changes are added. See
 [Infantry and battlefield production](InfantryBattlefieldProduction.md).
+
+## World environment integration
+
+Authored public wear uses ITerrainSurfaceMarkSource and immutable WithSurfaceMarks profiles. Existing detailed decal quads remain the fine-track path. Stable vegetation density and distance admission preserve simulation and intelligence ownership. See [World environment rendering](WorldEnvironmentRendering.md).

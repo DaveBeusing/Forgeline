@@ -467,3 +467,7 @@ Smoke, dust, sparks, blast, fire and heavy muzzle visuals share the existing
 64-byte analytic particle stream and depth-fade path. Type-specific velocity,
 growth, heat decay and admission diagnostics add no render targets, textures,
 UAV simulation or scheduler. See [effect contracts and qualification](BattlefieldEffectCatalog.md).
+
+## World environment integration
+
+World rendering combines bounded terrain residency, vegetation admission and optional session atmosphere inputs. See [World environment rendering](WorldEnvironmentRendering.md) for preparation/upload contracts, shader bounds and diagnostic interpretation.

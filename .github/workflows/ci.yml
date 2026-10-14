@@ -86,6 +86,16 @@ jobs:
         shell: pwsh
         run: ./build/Test-RuntimeAssetPipeline.ps1
 
+      - name: World environment and terrain residency contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Graphics.Tests/ForgeLine.Graphics.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Graphics.Tests.LocalAtmosphereTests ForgeLine.Graphics.Tests.D3D12AtmosphereTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.TerrainResidencyTests ForgeLine.Presentation.Tests.WorldEnvironmentSettingsTests ForgeLine.Presentation.Tests.WorldEnvironmentNativeTests ForgeLine.Presentation.Tests.VegetationVisualMotionTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.WorldEnvironmentPersistenceTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Reference evidence report contracts
         shell: pwsh
         run: |

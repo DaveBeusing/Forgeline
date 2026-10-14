@@ -429,7 +429,8 @@ internal sealed class ClientSettingsStore
                 PropertyNameCaseInsensitive = true,
                 PropertyNamingPolicy =
                     JsonNamingPolicy.CamelCase,
-                WriteIndented = true
+                WriteIndented = true,
+                IncludeFields = true
             };
         options.Converters.Add(
             new JsonStringEnumConverter());

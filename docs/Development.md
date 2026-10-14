@@ -177,3 +177,7 @@ Documentation changes with implementation. When project responsibilities, depend
 The skirmish opponent is a game-composition layer, not an alternate simulation authority. New behavior must preserve the command boundary, faction-scoped intelligence, real resource costs, physical Fuel/Ammunition, and normal logistics/movement/combat execution. Difficulty/configuration changes may adjust decision cadence and thresholds but must not alter simulation advantages.
 
 Use `MatchRuntime` as the canonical reusable game composition and `SkirmishScenarioHarness` as its test-facing wrapper. Keep focused deterministic scenarios in the normal test suite; CI also executes one accelerated terminal validation match, while repeated multi-match soak remains on demand. See [Skirmish Opponent](SkirmishOpponent.md) for behavior, allowed knowledge, configuration, diagnostics, and current limitations.
+
+## World environment integration
+
+World appearance overrides and multi-chunk Traverse qualification are described in [World environment rendering](WorldEnvironmentRendering.md). Capture clean committed binaries sequentially; timed traversal includes terrain admissions.

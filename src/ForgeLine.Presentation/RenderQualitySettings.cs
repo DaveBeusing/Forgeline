@@ -19,11 +19,15 @@ public readonly record struct RenderQualitySettings
     public bool? VegetationMotion { get; init; }
     public AtmosphereQuality? Atmosphere { get; init; }
     public ParticleQuality? Particles { get; init; }
+    public WorldEnvironmentSettings Environment { get; init; } = new();
+    public VegetationRenderSettings Vegetation { get; init; } = new();
+    public TerrainResidencySettings TerrainResidency { get; init; } = TerrainResidencySettings.Default;
 
     public void Validate()
     {
         Require(Quality, nameof(Quality));
         ColorGrade.Validate();
+        Environment.Validate(); Vegetation.Validate(); TerrainResidency.Validate();
         if (ResolutionScale is { } scale && (!float.IsFinite(scale) || scale is < .5f or > 1))
             throw new ArgumentOutOfRangeException(nameof(ResolutionScale));
         if (Antialiasing is { } aa) Require(aa, nameof(Antialiasing));
@@ -100,7 +104,9 @@ public readonly record struct RenderQualitySettings
                 ResolutionScale = linear ? input.ResolutionScale ?? 1 : 1,
                 Textures = linear ? textures : TextureDetailQuality.Quarter,
                 VegetationMotion = !limited || selected != RenderQuality.Low ? input.VegetationMotion ?? selected != RenderQuality.Low : false,
-                RequestedSettings = input
+                RequestedSettings = input,
+                Environment = limited && selected == RenderQuality.Low ? input.Environment with { CloudCover = 0, Wetness = 0 } : input.Environment,
+                Vegetation = input.Vegetation, TerrainResidency = input.TerrainResidency
             };
         }
     }
@@ -119,4 +125,7 @@ public readonly record struct RenderQualityProfile(RenderQuality Requested, Rend
     public TextureDetailQuality Textures { get; init; } = TextureDetailQuality.Full;
     public bool VegetationMotion { get; init; } = true;
     public RenderQualitySettings RequestedSettings { get; init; }
+    public WorldEnvironmentSettings Environment { get; init; } = new();
+    public VegetationRenderSettings Vegetation { get; init; } = new();
+    public TerrainResidencySettings TerrainResidency { get; init; } = TerrainResidencySettings.Default;
 }

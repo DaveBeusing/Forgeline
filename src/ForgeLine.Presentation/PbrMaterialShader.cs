@@ -43,10 +43,20 @@ internal static class PbrMaterialShader
             float3 n=PbrNormalize(worldNormal,float3(0,1,0));
             float3 v=PbrNormalize(viewVector,n), l=normalize(light.xyz);
             albedo=saturate(albedo); metallic=saturate(metallic); roughness=saturate(roughness);
+        #if WORLD_ENVIRONMENT
+            float wet=WorldWetness*saturate(n.y)*(1-metallic);
+            albedo*=1-.15*wet;
+            roughness=lerp(roughness,max(.28,roughness*.65),wet);
+        #endif
             // Screen-space normal variance broadens subpixel specular lobes without history or extra samples.
             float3 dx=ddx(n), dy=ddy(n);
             roughness=sqrt(saturate(roughness*roughness+0.25*max(dot(dx,dx),dot(dy,dy))));
             float2 shadow=SampleDirectionalShadow(worldPosition,n,l);
+        #if WORLD_ENVIRONMENT
+            // A fixed world-space cloud field avoids camera-relative shimmer and adds no texture reads.
+            float cloud=.5+.5*sin(worldPosition.x*.0041+worldPosition.z*.0027)*sin(worldPosition.z*.0033-worldPosition.x*.0019);
+            shadow.x*=1-.18*WorldCloudCover*cloud;
+        #endif
             float3 direct=PbrDirect(albedo,metallic,roughness,n,v,l)*directionalAmbient.rgb*light.w*shadow.x;
             float3 f0=lerp(0.04.xxx,albedo,metallic);
             float3 ambientF=f0+(max((1-roughness).xxx,f0)-f0)*PbrPow5(1-saturate(dot(n,v)));

@@ -17,7 +17,16 @@ param(
     [ValidateRange(0,360)][float]$YawDegrees = 45,
     [ValidateRange(0,120)][float]$InspectionDistanceMeters = 0,
     [ValidateSet('Warm','RendererCold')][string]$RunProfile = 'Warm',
-    [ValidateSet('Fixed','Sweep')][string]$CameraPath = 'Fixed',
+    [ValidateSet('Fixed','Sweep','Traverse')][string]$CameraPath = 'Fixed',
+    [ValidateRange(0,1)][float]$WorldDaylight = 1,
+    [ValidateRange(0,1)][float]$CloudCover = 0,
+    [ValidateRange(0,1)][float]$Wetness = 0,
+    [ValidateRange(0,1)][float]$VegetationDensity = 1,
+    [ValidateRange(100,4000)][float]$VegetationDistance = 4000,
+    [ValidateRange(1,4096)][int]$TerrainResidentChunks = 128,
+    [switch]$EagerTerrain,
+    [switch]$LocalizedHaze,
+    [switch]$SurfaceTracks,
     [ValidateRange(.5,1)][float]$ResolutionScale = 1,
     [ValidateSet('','Full','Half','Quarter')][string]$TextureQuality = '',
     [ValidateSet('','Disabled','Low','High')][string]$Antialiasing = '',
@@ -40,13 +49,21 @@ if ($Capture) {
     if ((& git -C $repositoryRoot status --porcelain)) { throw 'Commit capture changes and rebuild before exporting acceptance evidence.' }
     if (Test-Path -LiteralPath $referenceRoot) { throw 'Use a new evidence directory; existing references are never overwritten.' }
     $drivers = @(Get-CimInstance Win32_VideoController | ForEach-Object { "$($_.Name): $($_.DriverVersion)" }) -join '; '
-    $graphicsSettings = @{ resolutionScale = $ResolutionScale }
+    $graphicsSettings = @{ resolutionScale = $ResolutionScale;
+        environment = @{daylight=$WorldDaylight;cloudCover=$CloudCover;wetness=$Wetness};
+        vegetation = @{density=$VegetationDensity;maximumDistanceMeters=$VegetationDistance};
+        terrainResidency = @{enabled= !$EagerTerrain;maximumResidentChunks=$TerrainResidentChunks} }
     foreach ($choice in @(@('textures',$TextureQuality),@('antialiasing',$Antialiasing),@('shadows',$ShadowQuality),
         @('atmosphere',$AtmosphereQuality),@('particles',$ParticleQuality))) {
         if ($choice[1]) { $graphicsSettings[$choice[0]] = $choice[1] }
     }
     $request = @{
         graphicsSettings = $graphicsSettings
+        localHaze = $(if($LocalizedHaze){@{center=@{x=900;y=15;z=750};radiusMeters=450;density=.001}}else{$null})
+        surfaceMarks = @($(if($SurfaceTracks){@(
+            @{kind='TireTrack';start=@{x=630;y=505};end=@{x=690;y=535};widthMeters=3;strength=.35},
+            @{kind='TrackedVehicle';start=@{x=810;y=690};end=@{x=980;y=840};widthMeters=5;strength=.45},
+            @{kind='RoadWear';start=@{x=880;y=510};end=@{x=1030;y=600};widthMeters=8;strength=.35})}))
         outputRoot = $referenceRoot; commit = $commit
         runtimeRoot = $(if ($RuntimeAssetRoot) { [IO.Path]::GetFullPath($RuntimeAssetRoot) } else { Join-Path $repositoryRoot 'assets/runtime' })
         runProfile = $RunProfile; cameraPath = $CameraPath

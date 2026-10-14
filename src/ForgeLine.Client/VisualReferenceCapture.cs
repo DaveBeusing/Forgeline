@@ -37,12 +37,17 @@ internal sealed record VisualReferenceCaptureRequest
         VisualReferenceSceneKind.DamageDestruction, VisualReferenceSceneKind.BattlefieldCombat
     ];
     public RenderQualitySettings? GraphicsSettings { get; init; }
+    public GraphicsLocalHazeSettings? LocalHaze { get; init; }
+    public TerrainSurfaceMark[] SurfaceMarks { get; init; } = [];
     public RenderQuality[] Profiles { get; init; } = Enum.GetValues<RenderQuality>();
     public RtsReferenceDisplay[] Displays { get; init; } = RtsVisualReference.Displays.ToArray();
     public RtsReferenceZoom[] Zooms { get; init; } = Enum.GetValues<RtsReferenceZoom>();
     public void Validate()
     {
         GraphicsSettings?.Validate();
+        LocalHaze?.Validate();
+        ArgumentNullException.ThrowIfNull(SurfaceMarks);
+        _ = new TerrainSurfaceMarks(SurfaceMarks);
         ArgumentException.ThrowIfNullOrWhiteSpace(OutputRoot);
         ArgumentException.ThrowIfNullOrWhiteSpace(RuntimeRoot);
         if (!Enum.IsDefined(RunProfile) || !Enum.IsDefined(CameraPath)) throw new ArgumentException("Unsupported performance profile or camera path.");
@@ -116,8 +121,9 @@ internal static class VisualReferenceCapture
                 var settings = (request.GraphicsSettings ?? new RenderQualitySettings()) with { Quality = quality };
                 var profile = settings.Resolve(graphics.SupportsPostProcessing,
                     graphics.Diagnostics.Device.IsSoftwareAdapter, display.Width, display.Height, 3, graphics.AvailableMemoryBudgetBytes, graphics.SupportsParticleRendering);
+                lighting = profile.Environment.ResolveLighting(SceneLightingSettings.Default);
                 graphics.ConfigureSceneOutput(new(profile.LinearScene, lighting.Exposure, true, profile.ResolutionScale));
-                graphics.ConfigureAtmosphere(GraphicsAtmosphereSettings.Default with { Quality = profile.Atmosphere });
+                graphics.ConfigureAtmosphere(GraphicsAtmosphereSettings.Default with { Quality = profile.Atmosphere, LocalHaze = request.LocalHaze });
                 graphics.ConfigureDirectionalShadows(profile.Shadows);
                 graphics.ConfigurePostProcessing(profile.PostProcessing);
                 foreach (var fixture in fixtures)
@@ -127,9 +133,15 @@ internal static class VisualReferenceCapture
                     long setupStart = Stopwatch.GetTimestamp();
                     long setupAllocationStart = GC.GetAllocatedBytesForCurrentThread();
                     var beforeSetup = graphics.Diagnostics;
-                    using var ground = new TerrainRenderer(graphics, terrain, runtimeAssets: catalog, surfaceDetail: profile.TerrainDetail, textureDetail: profile.Textures) { DebugChunksEnabled = false };
-                    using var meshes = new SimpleInstanceRenderer(graphics, catalog, lodDiameterScale: profile.LodDiameterScale, textureDetail: profile.Textures, vegetationMotion: profile.VegetationMotion);
-                    using var particles = new ParticleVfxRenderer(graphics, catalog, profile.Particles);
+                    var terrainProfile = TerrainPresentationProfile.CreateCentralDivide(catalog);
+                    if (request.SurfaceMarks.Length > 0) terrainProfile = terrainProfile.WithSurfaceMarks(new TerrainSurfaceMarks(request.SurfaceMarks));
+                    using var ground = new TerrainRenderer(graphics, terrain, runtimeAssets: catalog, lighting: lighting,
+                        surfaceDetail: profile.TerrainDetail, textureDetail: profile.Textures, residency: profile.TerrainResidency,
+                        environment: profile.Environment, presentationProfile: terrainProfile) { DebugChunksEnabled = false };
+                    using var meshes = new SimpleInstanceRenderer(graphics, catalog, lighting: lighting,
+                        lodDiameterScale: profile.LodDiameterScale, textureDetail: profile.Textures, vegetationMotion: profile.VegetationMotion,
+                        environment: profile.Environment, vegetation: profile.Vegetation);
+                    using var particles = new ParticleVfxRenderer(graphics, catalog, profile.Particles, lighting);
                     using var hud = new GameplayHudRenderer(graphics, catalog);
                     using var selection = new DebugDrawRenderer(graphics, depthEnabled: false, lineWidthPixels: 3);
                     using var materialReference = fixture.Kind == VisualReferenceSceneKind.MaterialFoundation ? new MaterialReferenceRenderer(graphics, lighting) : null;
@@ -190,10 +202,19 @@ internal static class VisualReferenceCapture
                         hud.Render(context, camera, fixture.Snapshot, terrain.WorldBounds, information, default, default,
                             FormationTemplate.Compact, CombatGroupOverviewView.Empty, default, rasterDpi, 1);
                     };
+                    void PrepareTerrain() => ground.Prepare(camera,
+                        Math.Max(1, (int)Math.Ceiling(display.Width * (double)profile.ResolutionScale)),
+                        Math.Max(1, (int)Math.Ceiling(display.Height * (double)profile.ResolutionScale)),
+                        profile.Shadows.Enabled ? DirectionalShadowProjection.Create(camera.CaptureState(), lighting, profile.Shadows) : null);
+                    PrepareTerrain();
                     double setupMilliseconds = Stopwatch.GetElapsedTime(setupStart).TotalMilliseconds;
                     long setupAllocatedBytes = GC.GetAllocatedBytesForCurrentThread() - setupAllocationStart;
                     int warmupFrames = request.RunProfile == ReferenceRunProfile.RendererCold ? 0 : request.Warmups;
-                    for (int i = 0; i < warmupFrames; i++) graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
+                    for (int i = 0; i < warmupFrames; i++)
+                    {
+                        if (!platform.PumpEvents()) throw new OperationCanceledException("Reference window was closed.");
+                        graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
+                    }
                     graphics.WaitForIdle();
                     var beforeSamples = graphics.Diagnostics;
                     var performance = new ReferencePerformanceSamples(request.Samples, beforeSamples.Frame?.GpuSubmissionFence ?? 0);
@@ -202,9 +223,10 @@ internal static class VisualReferenceCapture
                     lastFence = beforeSamples.Frame?.GpuSubmissionFence ?? 0;
                     for (int i = 0; i < cpu.Length; i++)
                     {
+                        if (!platform.PumpEvents()) throw new OperationCanceledException("Reference window was closed.");
                         camera.ApplyState(ReferencePerformanceSamples.CameraPose(initialCamera, request.CameraPath, i, request.Samples));
                         long allocationStart = GC.GetAllocatedBytesForCurrentThread();
-                        long start = Stopwatch.GetTimestamp(); graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
+                        long start = Stopwatch.GetTimestamp(); PrepareTerrain(); graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
                         cpu[i] = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
                         long allocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocationStart;
                         var sampleDiagnostics = graphics.Diagnostics;
@@ -222,6 +244,7 @@ internal static class VisualReferenceCapture
                     if (measured.Frame is { } finalFrame && finalFrame.GpuSubmissionFence > lastFence && measured.GpuFrameMilliseconds is { } finalGpu)
                         gpu.Add(finalGpu);
                     camera.ApplyState(initialCamera);
+                    PrepareTerrain();
                     // Restore fixed pose and settle history only after the timed window.
                     if (request.CameraPath != ReferenceCameraPath.Fixed)
                         for (int i = 0; i < 3; i++) graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
@@ -275,23 +298,26 @@ internal static class VisualReferenceCapture
                         for (int step = 0; step < 8; step++)
                         {
                             camera.ApplyState(original with { Target = original.Target + new Vector3(step * .5f, 0, step * .5f), YawRadians = original.YawRadians + step * .005f });
+                            PrepareTerrain();
                             string motionImage = $"{key}-motion-{step:D2}.png";
                             byte[] motion = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
                             ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, motionImage), display.Width, display.Height, motion);
                             motionImages.Add(new { image = motionImage, imageSha256 = FileHash(Path.Combine(request.OutputRoot, motionImage)), camera = camera.CaptureState() });
                         }
                         camera.ApplyState(original);
+                        PrepareTerrain();
                     }
                     captures.Add(new { submission = meshes.SubmissionMetrics, key, image, imageSha256 = FileHash(Path.Combine(request.OutputRoot, image)),
                         pixelSha256 = Convert.ToHexString(SHA256.HashData(rgba)), fixture.Kind, fixture.Fingerprint,
                         seed = VisualReferenceScene.Seed, tick = fixture.Snapshot.Tick.Value, captureVisualSeconds, camera = camera.CaptureState(),
                         requestedDisplay = display, actualSurface = measured.Surface, hostWindow = window.ClientSize,
                         rasterDpi, uiScale = 1, requestedQuality = quality, profile, lighting,
+                        localHaze = graphics.Atmosphere.Enabled ? graphics.Atmosphere.LocalHaze : null, surfaceMarks = request.SurfaceMarks,
                         cpu = Distribution(cpu), gpu = Distribution(gpu.ToArray()), fps = Distribution(cpu.Select(x => 1000 / x).ToArray()),
                         performance = performance.Report(measured),
                         run = new { request.RunProfile, request.CameraPath, warmupFrames, setupMilliseconds, setupAllocatedBytes,
                             resourcesBeforeSetup = beforeSetup.Resources, resourcesBeforeSamples = beforeSamples.Resources,
-                            cameraPathVersion = 1, cameraSamples = request.Samples,
+                            cameraPathVersion = request.CameraPath == ReferenceCameraPath.Traverse ? 2 : 1, cameraSamples = request.Samples,
                             coldScope = "Fresh per-case renderers; process/device/runtime catalog and OS caches can already be warm. No OS/driver cache flush." },
                         terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, materials = meshes.MaterialDiagnostics, particles = particles.Diagnostics,
                         materialReference = materialReference is null ? null : MaterialReferenceRenderer.Materials,

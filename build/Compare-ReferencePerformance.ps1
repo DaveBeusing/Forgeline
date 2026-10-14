@@ -26,14 +26,21 @@ function Same($Left, $Right) { return ($Left | ConvertTo-Json -Depth 20 -Compres
 function Effective-Profile($Profile) {
     $values = @{}
     foreach ($property in $Profile.PSObject.Properties) {
-        if ($property.Name -ne 'requestedSettings') { $values[$property.Name] = $property.Value }
+        if ($property.Name -notin @('requestedSettings','terrainResidency')) { $values[$property.Name] = $property.Value }
     }
+    if (-not $values.ContainsKey('environment')) { $values['environment'] = [pscustomobject][ordered]@{daylight=1;cloudCover=0;wetness=0} }
+    if (-not $values.ContainsKey('vegetation')) { $values['vegetation'] = [pscustomobject][ordered]@{density=1;maximumDistanceMeters=4000} }
     foreach ($default in @(@('resolutionScale',1),@('textures','Full'),@('vegetationMotion',$true))) {
         if (-not $values.ContainsKey($default[0])) { $values[$default[0]] = $default[1] }
     }
     $ordered = [ordered]@{}
     foreach ($key in @($values.Keys | Sort-Object)) { $ordered[$key] = $values[$key] }
     return [pscustomobject]$ordered
+}
+function Surface-Inputs($Case) {
+    $haze = $Case.PSObject.Properties['localHaze']
+    $marks = $Case.PSObject.Properties['surfaceMarks']
+    return [pscustomobject][ordered]@{localHaze=$(if($haze){$haze.Value}else{$null});surfaceMarks=$(if($marks -and $marks.Value.Count){@($marks.Value)}else{@()})}
 }
 function Confirm-Distribution($Distribution) {
     if ($Distribution.samples -lt 1) { return $false }
@@ -63,6 +70,7 @@ foreach ($case in $current.captures) {
             -not (Same $case.graphics.device $previous.graphics.device)) { $reason = 'hardware-environment-changed' }
         elseif ($case.fingerprint -ne $previous.fingerprint -or -not (Same $case.camera $previous.camera) -or
             -not (Same (Effective-Profile $case.profile) (Effective-Profile $previous.profile)) -or -not (Same $case.lighting $previous.lighting) -or
+            -not (Same (Surface-Inputs $case) (Surface-Inputs $previous)) -or
             $case.rasterDpi -ne $previous.rasterDpi -or $case.uiScale -ne $previous.uiScale -or
             -not (Same $case.requestedDisplay $previous.requestedDisplay) -or
             $case.run.runProfile -ne $previous.run.runProfile -or $case.run.cameraPath -ne $previous.run.cameraPath -or

@@ -47,6 +47,15 @@ try {
     $capture.profile.resolutionScale = .75
     Write-Current
     Reject { & "$PSScriptRoot/Compare-ReferencePerformance.ps1" -CurrentRoot $current -BaselineRoot $baseline -GatePerformance -ReportPath (Join-Path $current 'profile-changed.json') }
+    $capture.profile.resolutionScale = 1
+    $capture.profile.environment = [ordered]@{daylight=1;cloudCover=0;wetness=.5}
+    Write-Current
+    Reject { & "$PSScriptRoot/Compare-ReferencePerformance.ps1" -CurrentRoot $current -BaselineRoot $baseline -GatePerformance -ReportPath (Join-Path $current 'wetness-changed.json') }
+    $capture.profile.Remove('environment')
+    $capture.surfaceMarks = @(@{kind='TireTrack';widthMeters=3})
+    Write-Current
+    Reject { & "$PSScriptRoot/Compare-ReferencePerformance.ps1" -CurrentRoot $current -BaselineRoot $baseline -GatePerformance -ReportPath (Join-Path $current 'marks-changed.json') }
+    $capture.Remove('surfaceMarks')
     $capture.profile = @{quality='Medium'}
     Write-Current
     & "$PSScriptRoot/Compare-ReferencePerformance.ps1" -CurrentRoot $current -BaselineRoot $baseline -GatePerformance

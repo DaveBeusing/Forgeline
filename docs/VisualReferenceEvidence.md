@@ -75,3 +75,7 @@ Record pass/fail/pending per scene/profile/zoom/display, with image filename, re
 Structural-pass never means visual acceptance. Review all six scenes before accepting any golden; keep reviewer observations and acceptance decisions separate from immutable renderer metadata. No baseline update is automatic. Known missing or ambiguous visual capabilities should become prioritized follow-up work rather than hidden by a numerical score.
 
 Long animated combat, natural unit/production/logistics workloads, continuous LOD transitions, physical monitor/DPI, HDR monitor output and actual device removal/recovery are unqualified by these static fixtures. Existing native lifecycle tests and production windowed/borderless smoke remain separate gates. Optional local debug-layer unavailability must be disclosed in the manifest; zero reported debug messages without an enabled layer is not a debug-clean claim.
+
+## World environment integration
+
+Traverse uses path version 2 with changing target, yaw and distance. Optional haze, authored surface marks and environment/vegetation inputs are recorded and participate in workload comparison. Residency settings are excluded only as the measured resource implementation; review pixel, draw and memory equality independently. See [World environment rendering](WorldEnvironmentRendering.md).

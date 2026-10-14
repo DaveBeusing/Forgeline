@@ -263,8 +263,10 @@ public sealed class D3D12TextureSamplingIntegrationTests
         }
     }
 
-    [Fact]
-    public void TerrainStylePipelineSupportsThirteenPixelTextureBindings()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void TerrainStylePipelineSupportsThirteenPixelTextureBindings(bool deferUploadWait)
     {
         using var platform =
             new WindowsPlatform();
@@ -285,14 +287,14 @@ public sealed class D3D12TextureSamplingIntegrationTests
                     EnableDebugLayer = false,
                     EnableVSync = false
                 });
-        using IGraphicsTexture texture =
-            graphics.CreateTexture(
-                CreateSinglePixelTexture(
+        GraphicsTextureData textureData = CreateSinglePixelTexture(
                     GraphicsTextureColorSpace.Linear,
                     255,
                     255,
                     255,
-                    255));
+                    255);
+        using IGraphicsTexture texture = graphics.CreateTexture(new GraphicsTextureData(
+            textureData.Description with { DeferUploadWait = deferUploadWait }, textureData.Mips));
 
         var compiler =
             new DxcShaderCompiler();
@@ -356,7 +358,8 @@ public sealed class D3D12TextureSamplingIntegrationTests
                             GraphicsVertexElementFormat.Float3,
                             0)
                     ],
-                    PixelTextureCount = 13
+                    PixelTextureCount = 13,
+                    CullMode = GraphicsCullMode.None
                 });
 
         TexturePositionVertex[] vertices =
@@ -375,7 +378,7 @@ public sealed class D3D12TextureSamplingIntegrationTests
         vertexBuffer.SetData<TexturePositionVertex>(
             vertices);
 
-        graphics.RenderFrame(
+        byte[] pixels = graphics.CaptureFrame(
             GraphicsColor.ForgeLineClear,
             context =>
             {
@@ -398,9 +401,12 @@ public sealed class D3D12TextureSamplingIntegrationTests
                     vertices.Length);
             });
 
-        Assert.Equal(
-            1,
-            graphics.Diagnostics.Resources.LoadedTextureCount);
+        GraphicsSurfaceInfo surface = graphics.Diagnostics.Surface;
+        int center = (surface.Height / 2 * surface.Width + surface.Width / 2) * 4;
+        Assert.Equal(new byte[] { 255, 255, 255, 255 }, pixels[center..(center + 4)]);
+        texture.Dispose();
+        graphics.RenderFrame(GraphicsColor.ForgeLineClear);
+        Assert.Equal(0, graphics.Diagnostics.Resources.LoadedTextureCount);
         Assert.Equal(
             0,
             graphics.Diagnostics.Resources.TextureBindingFailureCount);

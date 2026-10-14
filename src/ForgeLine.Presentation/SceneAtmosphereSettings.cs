@@ -17,9 +17,10 @@ public readonly record struct SceneAtmosphereSettings
     public float HeightFalloff { get; init; } = 0.02f;
     public float MaximumOpacity { get; init; } = 0.5f;
     public float ZoomCompensation { get; init; } = 0.75f;
+    public GraphicsLocalHazeSettings? LocalHaze { get; init; }
     [JsonIgnore]
     public GraphicsAtmosphereSettings Graphics => new(Quality, new(ColorRed, ColorGreen, ColorBlue),
-        Density, StartDistance, BaseHeight, HeightFalloff, MaximumOpacity, ZoomCompensation);
+        Density, StartDistance, BaseHeight, HeightFalloff, MaximumOpacity, ZoomCompensation) { LocalHaze = LocalHaze };
     public static SceneAtmosphereSettings Default => new();
     public void Validate() => Graphics.Validate();
 

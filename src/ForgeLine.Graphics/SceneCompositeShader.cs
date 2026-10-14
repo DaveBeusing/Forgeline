@@ -45,6 +45,20 @@ internal static class SceneCompositeShader
         float ColorDistance(float3 a, float3 b) {
             float3 delta=abs(a-b); return max(delta.r,max(delta.g,delta.b));
         }
+        #if LOCAL_HAZE
+        float HazeField(float3 p) {
+            float3 delta=(p-HazeCenter)/HazeRadius;
+            float density=saturate(1-dot(delta,delta));
+            return density*density;
+        }
+        float HazeOpticalDepth(float3 camera,float3 position,float startDistance) {
+            float3 ray=position-camera; float rayLength=length(ray);
+            if(rayLength<=startDistance || rayLength<.0001) return 0;
+            float3 start=camera+ray*(startDistance/rayLength);
+            float integral=(HazeField(start)+4*HazeField((start+position)*.5)+HazeField(position))/6;
+            return HazeDensity*(rayLength-startDistance)*integral;
+        }
+        #endif
         float3 DisplayLinear(float4 scene, int2 pixel, Output input, uint2 dimensions) {
             // Authored output-space clear/debug pixels bypass fog, grade and tone mapping.
             if(scene.a<0) return Decode(scene.rgb);
@@ -64,7 +78,11 @@ internal static class SceneCompositeShader
                         float integral=heightSpan<0.001 ? 1-heightSpan*0.5 : (1-exp(-heightSpan))/heightSpan;
                         heightDensity=exp(clamp(-(min(position.y,input.Camera.y)-input.Fog.y)*input.Fog.z,-40,5))*integral;
                     }
-                    float opacity=min(input.Fog.w,1-exp(-min(80,length*input.ColorDensity.w*heightDensity)));
+                    float opticalDepth=length*input.ColorDensity.w*heightDensity;
+                #if LOCAL_HAZE
+                    opticalDepth+=HazeOpticalDepth(input.Camera.xyz,position,input.Fog.x);
+                #endif
+                    float opacity=min(input.Fog.w,1-exp(-min(80,opticalDepth)));
                     value=lerp(value,input.ColorDensity.rgb,opacity);
                 }
             }
