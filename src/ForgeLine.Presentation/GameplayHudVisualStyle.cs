@@ -37,6 +37,13 @@ internal static class GameplayHudVisualStyle
     public const float BorderThickness = 1.0f;
     public const float ProgressBarThickness = 5.0f;
 
+    // Content hierarchy is local to each named HUD region; command-dock metrics stay independent.
+    public const float CaptionTextSize = 9.0f;
+    public const float ValueTextSize = 14.0f;
+    public const float BodyTextSize = 12.0f;
+    public static readonly Vector4 PanelHeader = ForgeLineUiPalette.BackgroundRaised;
+    public static readonly Vector4 QuietBorder = ForgeLineUiPalette.BorderSubtle;
+
     public static readonly Vector4 PanelBackground =
         ForgeLineUiPalette.Surface;
 
