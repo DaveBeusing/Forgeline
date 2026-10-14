@@ -6,7 +6,8 @@ namespace ForgeLine.Presentation;
 
 public sealed class FrontendOverlayRenderer : IDisposable
 {
-    private const int MaxVertices = 16_384;
+    private const int MaxVertices = 32_768;
+    private static readonly string[] s_menuNumbers = ["01", "02", "03", "04", "05", "06", "07", "08", "09"];
     private const int MaxDetailVertices = 65_536;
     private const int MaxControlsVertices = 131_072;
     private const int VertexStride = 24;
@@ -77,27 +78,8 @@ public sealed class FrontendOverlayRenderer : IDisposable
         float transition = Math.Clamp(view.Transition, 0f, 1f);
         float contentOffset = (1f - transition) * 18f * scale;
 
-        SurfaceRect backdrop =
-            view.Kind == FrontendSurfaceKind.PauseMenu
-                ? new SurfaceRect(
-                    64f,
-                    54f,
-                    1040f,
-                    972f)
-                : new SurfaceRect(
-                    0f,
-                    0f,
-                    1920f,
-                    1080f);
-
-        EmitPanel(
-            backdrop.Scale(scale),
-            new Vector4(0.035f, 0.045f, 0.045f, 0.98f),
-            context.Width,
-            context.Height);
-
-        EmitText("FORGELINE", 92 * scale, 82 * scale, new Vector4(0.82f, 0.84f, 0.78f, 1), context.Width, context.Height, scale);
-        EmitText("BUILD. SUPPLY. CONQUER.", 94 * scale, 128 * scale, new Vector4(0.52f, 0.58f, 0.50f, 1), context.Width, context.Height, scale);
+        RenderBackdrop(context.Width, context.Height, scale, view.Kind);
+        RenderHeader(context.Width, context.Height, scale, view.Kind);
 
         if (view.Kind == FrontendSurfaceKind.Loading)
         {
@@ -141,7 +123,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
                     view.Title,
                     94 * scale + contentOffset,
                     286 * scale,
-                    new Vector4(0.95f, 0.72f, 0.22f, 1),
+                    ForgeLineUiPalette.Accent,
                     context.Width,
                     context.Height,
                     scale);
@@ -151,32 +133,66 @@ public sealed class FrontendOverlayRenderer : IDisposable
                         330 * scale,
                         980 * scale,
                         2 * scale),
-                    new Vector4(0.28f, 0.32f, 0.29f, 1),
+                    ForgeLineUiPalette.BorderSubtle,
                     context.Width,
                     context.Height);
             }
 
             float y = 350 * scale;
+            int itemIndex = 0;
             foreach (FrontendMenuEntryView item in view.MenuEntries)
             {
-                bool focused = item.IsFocused;
-                Vector4 textColor = item.IsEnabled
-                    ? focused ? new Vector4(0.95f, 0.72f, 0.22f, 1) : new Vector4(0.76f, 0.78f, 0.72f, 1)
-                    : new Vector4(0.32f, 0.34f, 0.32f, 1);
+                bool focused = item.IsEnabled && item.IsFocused;
+                var row = new SurfaceRect(82 * scale, y - 12 * scale, 560 * scale, 52 * scale);
+                EmitPanel(
+                    row,
+                    focused ? ForgeLineUiPalette.SurfaceActive :
+                    item.IsEnabled ? ForgeLineUiPalette.SurfaceRaised : ForgeLineUiPalette.SurfaceDisabled,
+                    context.Width, context.Height);
+                EmitPanel(
+                    new SurfaceRect(row.X, row.Y, row.Width, 1 * scale),
+                    focused ? ForgeLineUiPalette.AccentDim : ForgeLineUiPalette.BorderSubtle,
+                    context.Width, context.Height);
+                EmitPanel(
+                    new SurfaceRect(row.X, row.Y + row.Height - 1 * scale, row.Width, 1 * scale),
+                    focused ? ForgeLineUiPalette.AccentDim : ForgeLineUiPalette.BorderSubtle,
+                    context.Width, context.Height);
+                EmitPanel(
+                    new SurfaceRect(row.X, row.Y, (focused ? 5f : 2f) * scale, row.Height),
+                    focused ? ForgeLineUiPalette.Accent : ForgeLineUiPalette.BorderSubtle,
+                    context.Width, context.Height);
+
+                string number = s_menuNumbers[Math.Min(itemIndex, s_menuNumbers.Length - 1)];
+                EmitText(number, 104 * scale, y + 3 * scale,
+                    focused ? ForgeLineUiPalette.Accent : ForgeLineUiPalette.TextMuted,
+                    context.Width, context.Height, 0.76f * scale);
+                EmitText(item.Label, 158 * scale, y,
+                    focused ? ForgeLineUiPalette.TextPrimary :
+                    item.IsEnabled ? ForgeLineUiPalette.TextSecondary : ForgeLineUiPalette.TextDisabled,
+                    context.Width, context.Height, scale);
                 if (focused)
                 {
-                    EmitPanel(new SurfaceRect(82 * scale, (y - 12 * scale), 560 * scale, 52 * scale), new Vector4(0.12f, 0.14f, 0.13f, 0.95f), context.Width, context.Height);
-                    EmitPanel(new SurfaceRect(82 * scale, (y - 12 * scale), 5 * scale, 52 * scale), new Vector4(0.86f, 0.61f, 0.16f, 1), context.Width, context.Height);
+                    EmitText("SELECT", 514 * scale, y + 3 * scale,
+                        ForgeLineUiPalette.Accent, context.Width, context.Height, 0.68f * scale);
+                    EmitPanel(
+                        new SurfaceRect(625 * scale, (y + 1 * scale), 3 * scale, 17 * scale),
+                        ForgeLineUiPalette.Accent, context.Width, context.Height);
                 }
-                EmitText(item.Label, 104 * scale, y, textColor, context.Width, context.Height, scale);
+                else if (!item.IsEnabled)
+                {
+                    EmitText("N/A", 554 * scale, y + 3 * scale,
+                        ForgeLineUiPalette.TextDisabled, context.Width, context.Height, 0.68f * scale);
+                }
+
                 y += 72 * scale;
+                itemIndex++;
             }
             if (!string.IsNullOrEmpty(view.Feedback))
             {
-                EmitText(view.Feedback, 94 * scale, 790 * scale, new Vector4(0.82f, 0.42f, 0.20f, 1), context.Width, context.Height, scale);
+                EmitText(view.Feedback, 94 * scale, 873 * scale, ForgeLineUiPalette.Warning, context.Width, context.Height, 0.82f * scale);
             }
 
-            EmitText(view.Footer, 94 * scale, 930 * scale, new Vector4(0.40f, 0.44f, 0.40f, 1), context.Width, context.Height, scale);
+            EmitText(view.Footer, 94 * scale, 930 * scale, ForgeLineUiPalette.TextMuted, context.Width, context.Height, 0.78f * scale);
 
             if (view.Kind == FrontendSurfaceKind.MainMenu &&
                 !string.IsNullOrWhiteSpace(view.ProductVersion))
@@ -191,43 +207,51 @@ public sealed class FrontendOverlayRenderer : IDisposable
                     versionLabel,
                     versionX,
                     1024f * scale,
-                    new Vector4(0.40f, 0.44f, 0.40f, 1),
+                    ForgeLineUiPalette.TextMuted,
                     context.Width,
                     context.Height,
-                    scale);
+                    0.78f * scale);
             }
         }
         else if (view.Kind is FrontendSurfaceKind.Detail or FrontendSurfaceKind.Controls)
         {
             bool controls = view.Kind == FrontendSurfaceKind.Controls;
-            EmitText(view.Title, 94 * scale + contentOffset, 286 * scale, new Vector4(0.95f, 0.72f, 0.22f, 1), context.Width, context.Height, scale);
-            EmitPanel(new SurfaceRect(92 * scale, 330 * scale, (controls ? 1740 : 980) * scale, 2 * scale), new Vector4(0.28f, 0.32f, 0.29f, 1), context.Width, context.Height);
+            EmitText(view.Title, 94 * scale + contentOffset, 286 * scale, ForgeLineUiPalette.Accent, context.Width, context.Height, scale);
+            EmitPanel(new SurfaceRect(92 * scale, 330 * scale, (controls ? 1740 : 980) * scale, 2 * scale), ForgeLineUiPalette.BorderSubtle, context.Width, context.Height);
 
             float y = 390 * scale;
             foreach (FrontendDetailLineView line in view.DetailLines)
             {
+                var detailRow = new SurfaceRect(92 * scale, y - 13 * scale, 980 * scale, (controls ? 43f : 48f) * scale);
+                Vector4 rowPanel = line.IsPressed
+                    ? ForgeLineUiPalette.SurfacePressed
+                    : line.IsFocused
+                        ? ForgeLineUiPalette.SurfaceActive
+                        : line.IsHovered
+                            ? ForgeLineUiPalette.SurfaceHover
+                            : ForgeLineUiPalette.SurfaceRaised;
+                EmitPanel(detailRow, rowPanel, context.Width, context.Height);
+                EmitPanel(
+                    new SurfaceRect(detailRow.X, detailRow.Y + detailRow.Height - scale, detailRow.Width, scale),
+                    ForgeLineUiPalette.BorderSubtle, context.Width, context.Height);
                 if (line.IsFocused || line.IsHovered)
                 {
-                    Vector4 rowPanel = line.IsPressed
-                        ? new Vector4(0.20f, 0.17f, 0.10f, 0.98f)
-                        : line.IsHovered
-                            ? new Vector4(0.14f, 0.16f, 0.14f, 0.97f)
-                            : new Vector4(0.10f, 0.12f, 0.11f, 0.96f);
-                    EmitPanel(new SurfaceRect(92 * scale, (y - 13 * scale), 980 * scale, 48 * scale), rowPanel, context.Width, context.Height);
-                    EmitPanel(new SurfaceRect(92 * scale, (y - 13 * scale), 4 * scale, 48 * scale), new Vector4(0.86f, 0.61f, 0.16f, 1), context.Width, context.Height);
+                    EmitPanel(
+                        new SurfaceRect(detailRow.X, detailRow.Y, 4 * scale, detailRow.Height),
+                        ForgeLineUiPalette.Accent, context.Width, context.Height);
                 }
 
                 Vector4 valueColor = line.IsWarning
-                    ? new Vector4(0.82f, 0.42f, 0.20f, 1)
+                    ? ForgeLineUiPalette.Warning
                     : line.IsFocused
-                        ? new Vector4(0.95f, 0.72f, 0.22f, 1)
-                        : new Vector4(0.78f, 0.80f, 0.74f, 1);
+                        ? ForgeLineUiPalette.Accent
+                        : ForgeLineUiPalette.TextPrimary;
                 float valueScale = controls
                     ? MathF.Min(scale, 1370f * scale / MathF.Max(1f, line.Value.Length * GlyphAdvance))
                     : scale;
                 EmitText(line.Label, 112 * scale, y, controls
-                    ? new Vector4(0.60f, 0.65f, 0.60f, 1)
-                    : new Vector4(0.45f, 0.50f, 0.45f, 1), context.Width, context.Height, scale);
+                    ? ForgeLineUiPalette.TextSecondary
+                    : ForgeLineUiPalette.TextMuted, context.Width, context.Height, scale);
                 EmitText(line.Value, 460 * scale, y, valueColor, context.Width, context.Height, valueScale);
 
                 if (line.CanDecrease)
@@ -279,34 +303,169 @@ public sealed class FrontendOverlayRenderer : IDisposable
         _disposed = true;
     }
 
+    private void RenderBackdrop(int width, int height, float scale, FrontendSurfaceKind kind)
+    {
+        if (kind == FrontendSurfaceKind.PauseMenu)
+        {
+            EmitPanel(new SurfaceRect(64 * scale, 54 * scale, 1040 * scale, 972 * scale),
+                ForgeLineUiPalette.Surface, width, height);
+            EmitPanel(new SurfaceRect(64 * scale, 54 * scale, 1040 * scale, 2 * scale),
+                ForgeLineUiPalette.AccentDim, width, height);
+            EmitPanel(new SurfaceRect(64 * scale, 54 * scale, 2 * scale, 972 * scale),
+                ForgeLineUiPalette.Border, width, height);
+            return;
+        }
+
+        // A bounded set of wide color bands gives the menu an intentional
+        // dark-to-light hierarchy without textures or runtime asset dependencies.
+        const int bandCount = 24;
+        for (int band = 0; band < bandCount; band++)
+        {
+            float t = band / (float)(bandCount - 1);
+            Vector4 color = Vector4.Lerp(
+                ForgeLineUiPalette.BackgroundDeep,
+                ForgeLineUiPalette.Background,
+                t * 0.95f);
+            EmitPanel(new SurfaceRect(0, band * 45 * scale, 1920 * scale, 45 * scale),
+                color, width, height);
+        }
+
+        EmitPanel(new SurfaceRect(0, 0, 10 * scale, 1080 * scale),
+            ForgeLineUiPalette.AccentDim, width, height);
+        EmitPanel(new SurfaceRect(80 * scale, 168 * scale, 1760 * scale, scale),
+            ForgeLineUiPalette.BorderSubtle, width, height);
+        EmitPanel(new SurfaceRect(80 * scale, 1007 * scale, 1760 * scale, scale),
+            ForgeLineUiPalette.BorderSubtle, width, height);
+
+        if (kind == FrontendSurfaceKind.MainMenu)
+        {
+            RenderMenuComposition(width, height, scale);
+        }
+        else if (kind is FrontendSurfaceKind.Detail or FrontendSurfaceKind.Controls)
+        {
+            bool controls = kind == FrontendSurfaceKind.Controls;
+            EmitPanel(new SurfaceRect(68 * scale, 251 * scale, (controls ? 1770 : 1032) * scale, 700 * scale),
+                ForgeLineUiPalette.Surface, width, height);
+            EmitPanel(new SurfaceRect(68 * scale, 251 * scale, 5 * scale, 700 * scale),
+                ForgeLineUiPalette.Border, width, height);
+            if (!controls)
+            {
+                RenderTechnicalGrid(1200f, 255f, 625f, 605f, width, height, scale);
+                EmitText("TACTICAL COMMAND", 1244 * scale, 310 * scale,
+                    ForgeLineUiPalette.TextSecondary, width, height, 0.94f * scale);
+                EmitText("BUILD / SUPPLY / CONQUER", 1244 * scale, 365 * scale,
+                    ForgeLineUiPalette.AccentDim, width, height, 0.76f * scale);
+            }
+        }
+    }
+
+    private void RenderHeader(int width, int height, float scale, FrontendSurfaceKind kind)
+    {
+        EmitPanel(new SurfaceRect(91 * scale, 77 * scale, 6 * scale, 74 * scale),
+            ForgeLineUiPalette.Accent, width, height);
+        EmitText("FORGELINE", 119 * scale, 80 * scale,
+            ForgeLineUiPalette.TextPrimary, width, height, 1.46f * scale);
+        EmitText("BUILD. SUPPLY. CONQUER.", 121 * scale, 134 * scale,
+            ForgeLineUiPalette.TextSecondary, width, height, 0.75f * scale);
+        if (kind is FrontendSurfaceKind.MainMenu or FrontendSurfaceKind.Loading)
+        {
+            EmitText("STRATEGIC OPERATIONS", 1518 * scale, 110 * scale,
+                ForgeLineUiPalette.TextMuted, width, height, 0.8f * scale);
+        }
+    }
+
+    private void RenderMenuComposition(int width, int height, float scale)
+    {
+        EmitPanel(new SurfaceRect(66 * scale, 263 * scale, 610 * scale, 593 * scale),
+            ForgeLineUiPalette.Surface, width, height);
+        EmitPanel(new SurfaceRect(66 * scale, 263 * scale, 4 * scale, 593 * scale),
+            ForgeLineUiPalette.AccentDim, width, height);
+        EmitText("OPERATIONS", 91 * scale, 291 * scale,
+            ForgeLineUiPalette.Accent, width, height, 0.9f * scale);
+        EmitText("SELECT AN ACTION", 91 * scale, 321 * scale,
+            ForgeLineUiPalette.TextMuted, width, height, 0.65f * scale);
+        RenderTechnicalGrid(750f, 241f, 1090f, 640f, width, height, scale);
+
+        // Industrial skyline rendered as an understated diagram, not a false
+        // gameplay preview. Geometry remains behind the functional menu.
+        EmitPanel(new SurfaceRect(885 * scale, 682 * scale, 820 * scale, 165 * scale),
+            ForgeLineUiPalette.BackgroundRaised, width, height);
+        EmitPanel(new SurfaceRect(1010 * scale, 553 * scale, 168 * scale, 129 * scale),
+            ForgeLineUiPalette.BackgroundRaised, width, height);
+        EmitPanel(new SurfaceRect(1248 * scale, 601 * scale, 206 * scale, 81 * scale),
+            ForgeLineUiPalette.BackgroundRaised, width, height);
+        EmitPanel(new SurfaceRect(1510 * scale, 536 * scale, 128 * scale, 146 * scale),
+            ForgeLineUiPalette.BackgroundRaised, width, height);
+        EmitPanel(new SurfaceRect(1045 * scale, 457 * scale, 8 * scale, 96 * scale),
+            ForgeLineUiPalette.BorderSubtle, width, height);
+        EmitPanel(new SurfaceRect(1548 * scale, 407 * scale, 7 * scale, 129 * scale),
+            ForgeLineUiPalette.BorderSubtle, width, height);
+        EmitPanel(new SurfaceRect(903 * scale, 680 * scale, 791 * scale, 2 * scale),
+            ForgeLineUiPalette.AccentDim, width, height);
+        EmitPanel(new SurfaceRect(885 * scale, 846 * scale, 820 * scale, 3 * scale),
+            ForgeLineUiPalette.Border, width, height);
+        EmitText("INDUSTRIAL WARFARE", 882 * scale, 296 * scale,
+            ForgeLineUiPalette.TextPrimary, width, height, 1.10f * scale);
+        EmitText("COMMAND / PRODUCTION / LOGISTICS", 884 * scale, 350 * scale,
+            ForgeLineUiPalette.TextSecondary, width, height, 0.78f * scale);
+        EmitText("EXTRACT. MANUFACTURE. ADVANCE.", 892 * scale, 901 * scale,
+            ForgeLineUiPalette.Accent, width, height, 0.75f * scale);
+    }
+
+    private void RenderTechnicalGrid(
+        float x, float y, float widthPx, float heightPx,
+        int viewportWidth, int viewportHeight, float scale)
+    {
+        EmitPanel(new SurfaceRect(x * scale, y * scale, widthPx * scale, heightPx * scale),
+            ForgeLineUiPalette.Background, viewportWidth, viewportHeight);
+        const float spacing = 80f;
+        for (float column = spacing; column < widthPx; column += spacing)
+        {
+            EmitPanel(new SurfaceRect((x + column) * scale, y * scale, scale, heightPx * scale),
+                ForgeLineUiPalette.BorderSubtle, viewportWidth, viewportHeight);
+        }
+        for (float row = spacing; row < heightPx; row += spacing)
+        {
+            EmitPanel(new SurfaceRect(x * scale, (y + row) * scale, widthPx * scale, scale),
+                ForgeLineUiPalette.BorderSubtle, viewportWidth, viewportHeight);
+        }
+        EmitPanel(new SurfaceRect(x * scale, y * scale, widthPx * scale, 2 * scale),
+            ForgeLineUiPalette.Border, viewportWidth, viewportHeight);
+        EmitPanel(new SurfaceRect(x * scale, (y + heightPx - 2f) * scale, widthPx * scale, 2 * scale),
+            ForgeLineUiPalette.Border, viewportWidth, viewportHeight);
+    }
+
     private void EmitControlButton(string label, float x, float y, float width, float height, int viewportWidth, int viewportHeight, float scale)
     {
-        EmitPanel(new SurfaceRect(x, y, width, height), new Vector4(0.15f, 0.17f, 0.16f, 1), viewportWidth, viewportHeight);
-        EmitPanel(new SurfaceRect(x, y, width, 2 * scale), new Vector4(0.36f, 0.40f, 0.36f, 1), viewportWidth, viewportHeight);
-        EmitText(label, x + 27 * scale, y + 10 * scale, new Vector4(0.82f, 0.84f, 0.78f, 1), viewportWidth, viewportHeight, scale);
+        EmitPanel(new SurfaceRect(x, y, width, height), ForgeLineUiPalette.SurfaceHover, viewportWidth, viewportHeight);
+        EmitPanel(new SurfaceRect(x, y, width, scale), ForgeLineUiPalette.Border, viewportWidth, viewportHeight);
+        EmitPanel(new SurfaceRect(x, y + height - scale, width, scale), ForgeLineUiPalette.BorderSubtle, viewportWidth, viewportHeight);
+        EmitText(label, x + 27 * scale, y + 10 * scale, ForgeLineUiPalette.TextPrimary, viewportWidth, viewportHeight, scale);
     }
 
     private void EmitActionButton(string label, float x, float y, float width, float height, bool primary, bool hovered, bool pressed, int viewportWidth, int viewportHeight, float scale)
     {
-        Vector4 panel = pressed
-            ? new Vector4(0.30f, 0.24f, 0.10f, 1)
+        Vector4 fill = pressed
+            ? ForgeLineUiPalette.SurfacePressed
             : hovered
-                ? new Vector4(0.20f, 0.19f, 0.13f, 1)
+                ? ForgeLineUiPalette.SurfaceHover
                 : primary
-                    ? new Vector4(0.24f, 0.20f, 0.10f, 1)
-                    : new Vector4(0.12f, 0.14f, 0.13f, 1);
-        Vector4 accent = primary
-            ? new Vector4(0.86f, 0.61f, 0.16f, 1)
-            : new Vector4(0.34f, 0.38f, 0.34f, 1);
-        EmitPanel(new SurfaceRect(x, y, width, height), panel, viewportWidth, viewportHeight);
-        EmitPanel(new SurfaceRect(x, y, 5 * scale, height), accent, viewportWidth, viewportHeight);
-        EmitText(label, x + 24 * scale, y + 18 * scale, new Vector4(0.90f, 0.88f, 0.76f, 1), viewportWidth, viewportHeight, scale);
+                    ? ForgeLineUiPalette.SurfaceActive
+                    : ForgeLineUiPalette.SurfaceRaised;
+        Vector4 border = primary ? ForgeLineUiPalette.Accent : ForgeLineUiPalette.Border;
+        EmitPanel(new SurfaceRect(x, y, width, height), fill, viewportWidth, viewportHeight);
+        EmitPanel(new SurfaceRect(x, y, 5 * scale, height), border, viewportWidth, viewportHeight);
+        EmitPanel(new SurfaceRect(x, y, width, 1 * scale), border, viewportWidth, viewportHeight);
+        EmitPanel(new SurfaceRect(x, y + height - 1 * scale, width, 1 * scale), border, viewportWidth, viewportHeight);
+        EmitText(label, x + 24 * scale, y + 18 * scale,
+            primary ? ForgeLineUiPalette.TextPrimary : ForgeLineUiPalette.TextSecondary,
+            viewportWidth, viewportHeight, scale);
     }
 
     private void EmitProgress(float x, float y, float width, float height, float progress, int viewportWidth, int viewportHeight)
     {
-        EmitPanel(new SurfaceRect(x, y, width, height), new Vector4(0.12f, 0.14f, 0.13f, 1), viewportWidth, viewportHeight);
-        EmitPanel(new SurfaceRect(x, y, width * Math.Clamp(progress, 0, 1), height), new Vector4(0.82f, 0.58f, 0.14f, 1), viewportWidth, viewportHeight);
+        EmitPanel(new SurfaceRect(x, y, width, height), ForgeLineUiPalette.SurfaceRaised, viewportWidth, viewportHeight);
+        EmitPanel(new SurfaceRect(x, y, width * Math.Clamp(progress, 0, 1), height), ForgeLineUiPalette.Accent, viewportWidth, viewportHeight);
     }
 
     private void EmitPanel(SurfaceRect rect, Vector4 color, int width, int height)
@@ -390,7 +549,8 @@ public sealed class FrontendOverlayRenderer : IDisposable
         {
             VertexElements=[new GraphicsVertexElement("POSITION",0,GraphicsVertexElementFormat.Float2,0),new GraphicsVertexElement("COLOR",0,GraphicsVertexElementFormat.Float4,8)],
             PrimitiveTopology=GraphicsPrimitiveTopology.TriangleList,
-            DepthEnabled=false
+            DepthEnabled=false,
+            AlphaBlendEnabled=true
         });
     }
 
