@@ -471,3 +471,8 @@ UAV simulation or scheduler. See [effect contracts and qualification](Battlefiel
 ## World environment integration
 
 World rendering combines bounded terrain residency, vegetation admission and optional session atmosphere inputs. See [World environment rendering](WorldEnvironmentRendering.md) for preparation/upload contracts, shader bounds and diagnostic interpretation.
+
+
+## Combat and industrial effect integration
+
+Particle admission overflow is suppressed; mesh fallback has an independent tier cap. Production perspective soft depth uses -Projection.M33. Shared ground/receiver marks reuse textured instancing, fade through ordered coverage and never cast shadows or receive selection identity. See [combat and industrial rendering](CombatIndustrialRendering.md) for contracts, diagnostics and qualification limits.

@@ -205,3 +205,6 @@ effects or resource changes are added. See
 ## World environment integration
 
 Authored public wear uses ITerrainSurfaceMarkSource and immutable WithSurfaceMarks profiles. Existing detailed decal quads remain the fine-track path. Stable vegetation density and distance admission preserve simulation and intelligence ownership. See [World environment rendering](WorldEnvironmentRendering.md).
+
+
+Live impact marks and short owned-vehicle tracks reuse the authored decal quad/material IDs through DecalPool. Receiver marks use copied full entity identity and normalized local anchors; invalid or hidden receivers retire their marks. Missing decal meshes/materials skip the mark. See [shared decal decision](adr/BoundedPresentationDecals.md).
