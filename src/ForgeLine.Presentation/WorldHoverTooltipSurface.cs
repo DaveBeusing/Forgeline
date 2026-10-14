@@ -11,6 +11,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
     internal const int MaxVertices = 131_072;
     private const int MaxLines = 12;
     private readonly IGraphicsDevice _graphics;
+    private readonly UiTextBatch _text;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _buffers = new(4);
     private readonly TooltipVertex[] _vertices = new TooltipVertex[MaxVertices];
@@ -25,8 +26,10 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
     {
         _graphics = graphics;
         _pipeline = SelectionInspectorHudRenderer.CreatePipeline(graphics, alphaBlendEnabled: true);
+        _text = new UiTextBatch(graphics);
     }
 
+    public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
     public GameplayHudRegion Regions => GameplayHudRegion.GlobalOverlay;
     public int LastRenderedVertexCount { get; private set; }
     internal HudRect LastBounds { get; private set; }
@@ -34,6 +37,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
     public void Render(in GameplayHudRenderContext context)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
+        _text.Begin();
         LastRenderedVertexCount = 0;
         LastBounds = default;
         var view = context.HoverTooltip;
@@ -92,7 +96,8 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         context.Graphics.SetPipeline(_pipeline);
         context.Graphics.SetVertexBuffer(buffer, 24);
         context.Graphics.Draw(_count);
-        LastRenderedVertexCount = _count;
+        _text.Render(context.Graphics);
+        LastRenderedVertexCount = _count + _text.VertexCount;
         LastBounds = _bounds;
     }
 
@@ -181,6 +186,8 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         if (y + 7 * _scale > _bounds.Bottom - 4 * _scale) return;
         int characters = Math.Min(48, Math.Max(0, (int)((_bounds.Width - 16 * _scale) / (6.4f * _scale))));
         var color = primary ? GameplayHudVisualStyle.TextPrimary : GameplayHudVisualStyle.TextSecondary;
+        if (_text.Add(text, x, y, UiTypography.Style(UiTextRole.Tooltip).Size * _scale, color, _width, _height,
+            _bounds.Right - 8 * _scale - x, primary)) return;
         for (int i = 0; i < Math.Min(text.Length, characters); i++)
         {
             string pattern = SelectionInspectorHudRenderer.TextGlyphPattern(char.ToUpperInvariant(text[i]));
@@ -210,6 +217,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         if (_disposed) return;
         foreach (var buffer in _buffers.Values) buffer.Dispose();
         _buffers.Clear();
+        _text.Dispose();
         _pipeline.Dispose();
         _disposed = true;
     }

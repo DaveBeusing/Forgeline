@@ -188,6 +188,7 @@ internal sealed class ResourcePowerHudSurface : IGameplayHudSurface
         GameplayHudRegion.TopStatusBar |
         GameplayHudRegion.AlertStack;
 
+    public UiTextDiagnostics TextDiagnostics => _renderer.TextDiagnostics;
     public int LastRenderedVertexCount => _renderer.LastRenderedVertexCount;
 
     public void Render(
@@ -224,6 +225,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         GameplayHudVisualStyle.TextSecondary;
 
     private readonly IGraphicsDevice _graphics;
+    private readonly UiTextBatch _text;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers =
         new(4);
@@ -251,8 +253,10 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 ? null
                 : new RuntimeUiIconPalette(
                     runtimeAssets);
+        _text = new UiTextBatch(graphics);
     }
 
+    public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
     public int LastRenderedVertexCount { get; private set; }
 
     public void Render(
@@ -263,6 +267,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         bool showRuntimeMetrics = true)
     {
         ThrowIfDisposed();
+        _text.Begin();
         ArgumentNullException.ThrowIfNull(graphics);
 
         if (graphics.Width <= 0 ||
@@ -319,8 +324,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         graphics.Draw(
             _vertexCount);
 
-        LastRenderedVertexCount =
-            _vertexCount;
+        _text.Render(graphics);
+        LastRenderedVertexCount = _vertexCount + _text.VertexCount;
     }
 
     public void Dispose()
@@ -337,6 +342,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         }
 
         _vertexBuffers.Clear();
+        _text.Dispose();
         _pipeline.Dispose();
         _disposed = true;
     }
@@ -597,6 +603,9 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 0.0f,
                 availableWidth -
                 20.0f * _scale);
+        if (_text.Add(text.Written, textX, centerY - 5f * _scale, 12f * _scale,
+            power.IsConstrained ? ResolveColor(RtsUiIcon.StatusAlert) : TextColor,
+            width, height, maximumTextWidth, bold: true)) return;
         int maximumCharacters =
             (int)MathF.Floor(
                 maximumTextWidth /
@@ -1011,6 +1020,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 region.Right -
                 textX -
                 4.0f * _scale);
+        if (_text.Add(text, textX, y + 4f * _scale, 12f * _scale, severityColor,
+            width, height, maximumTextWidth)) return;
         int maximumCharacters =
             Math.Max(
                 0,
@@ -1273,6 +1284,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         int width,
         int height)
     {
+        if (_text.Add(text, x, y, UiTypography.Style(UiTextRole.Telemetry).Size * _scale, color, width, height)) return;
+
         for (int index = 0;
              index < text.Length;
              index++)
