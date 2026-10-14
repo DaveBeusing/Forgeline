@@ -17,4 +17,9 @@
     <ProjectReference Include="../ForgeLine.Audio/ForgeLine.Audio.csproj" />
     <ProjectReference Include="../ForgeLine.Input/ForgeLine.Input.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="../../assets/source/ui/fonts/metrics.json" LogicalName="ForgeLine.UiFont.Metrics" />
+    <EmbeddedResource Include="../../assets/source/ui/fonts/atlas.alpha.gz" LogicalName="ForgeLine.UiFont.Alpha" />
+    <None Include="../../assets/source/ui/fonts/LICENSE.txt" TargetPath="ThirdPartyNotices/DejaVuFonts.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

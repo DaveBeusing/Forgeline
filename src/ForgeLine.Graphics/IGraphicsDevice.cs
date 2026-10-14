@@ -3,6 +3,7 @@ namespace ForgeLine.Graphics;
 public interface IGraphicsDevice : IDisposable
 {
     bool IsRecording => false;
+    bool SupportsUiText => false;
     ulong? AvailableMemoryBudgetBytes => null;
     bool SupportsPostProcessing => false;
     GraphicsPostProcessingSettings PostProcessing => GraphicsPostProcessingSettings.Neutral;

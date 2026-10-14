@@ -4,6 +4,7 @@ public enum GraphicsTextureFormat
 {
     Rgba8Unorm = 1,
     Bc7Unorm = 2,
+    R8Unorm = 3,
 }
 
 public enum GraphicsTextureColorSpace
@@ -45,6 +46,9 @@ public sealed record GraphicsTextureDescription(
         {
             throw new ArgumentOutOfRangeException(nameof(ColorSpace));
         }
+
+        if (Format == GraphicsTextureFormat.R8Unorm && ColorSpace != GraphicsTextureColorSpace.Linear)
+            throw new ArgumentException("Coverage textures require linear data.");
 
         if (Format == GraphicsTextureFormat.Bc7Unorm && (Width % 4 != 0 || Height % 4 != 0))
         {
@@ -99,7 +103,7 @@ public sealed class GraphicsTextureData
                 nameof(_mips));
         }
 
-        if (Description.Format is not (GraphicsTextureFormat.Rgba8Unorm or GraphicsTextureFormat.Bc7Unorm))
+        if (Description.Format is not (GraphicsTextureFormat.Rgba8Unorm or GraphicsTextureFormat.Bc7Unorm or GraphicsTextureFormat.R8Unorm))
         {
             throw new NotSupportedException(
                 $"Texture format {Description.Format} is not supported.");
@@ -119,7 +123,7 @@ public sealed class GraphicsTextureData
                     nameof(_mips));
             }
 
-            int minimumRowPitch = Description.Format == GraphicsTextureFormat.Bc7Unorm ? checked(((mip.Width + 3) / 4) * 16) : checked(mip.Width * RgbaChannelCount);
+            int minimumRowPitch = Description.Format == GraphicsTextureFormat.Bc7Unorm ? checked(((mip.Width + 3) / 4) * 16) : checked(mip.Width * (Description.Format == GraphicsTextureFormat.R8Unorm ? 1 : RgbaChannelCount));
             if (mip.RowPitch < minimumRowPitch)
             {
                 throw new ArgumentException(
