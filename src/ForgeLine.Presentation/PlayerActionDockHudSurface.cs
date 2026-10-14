@@ -863,8 +863,8 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             bool selected = index == panel.SelectedIndex; bool hovered = index == panel.HoveredIndex;
             var visual = GameplayHudVisualStyle.ResolveItemState(selected, hovered, hovered && panel.PointerPressed, state.CanActivate);
             EmitQuad(rect.X, rect.Y, rect.Width, rect.Height, visual.Fill, width, height);
-            var cueRect = selected ? rect with { Height = rect.Height * (.6f + .4f * Math.Clamp((panel.Motion ?? UiMotionView.Settled).Focus, 0, 1)) } : rect;
-            EmitItemStateCue(cueRect, visual, width, height);
+            float focus = selected ? .6f + .4f * Math.Clamp((panel.Motion ?? UiMotionView.Settled).Focus, 0, 1) : 1;
+            EmitItemStateCue(rect, visual, width, height, focus);
             EmitIcon(PlayerActionDockHudModel.ResolveItemIcon(panel.Mode, index, actions), rect.X + 6 * _scale,
                 rect.Y + 5 * _scale, 14 * _scale, width, height);
             DockText(PlayerActionDockHudModel.ResolveItemTitle(panel.Mode, index, actions),
@@ -948,7 +948,8 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         in HudRect rect,
         in HudStateVisual visual,
         int width,
-        int height)
+        int height,
+        float focus = 1f)
     {
         float rail =
             GameplayHudVisualStyle.StateRailThickness *
@@ -978,7 +979,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                     rect.X,
                     rect.Y,
                     rail,
-                    rect.Height,
+                    rect.Height * Math.Clamp(focus, 0, 1),
                     visual.Border,
                     width,
                     height);
