@@ -38,40 +38,40 @@ internal static class GameplayHudVisualStyle
     public const float ProgressBarThickness = 5.0f;
 
     public static readonly Vector4 PanelBackground =
-        new(0.05f, 0.06f, 0.06f, 0.97f);
+        ForgeLineUiPalette.Surface;
 
     public static readonly Vector4 PanelRaised =
-        new(0.075f, 0.09f, 0.09f, 0.98f);
+        ForgeLineUiPalette.SurfaceRaised;
 
     public static readonly Vector4 PanelSelected =
-        new(0.12f, 0.18f, 0.19f, 0.98f);
+        ForgeLineUiPalette.SurfaceActive;
 
     public static readonly Vector4 PanelHovered =
-        new(0.09f, 0.12f, 0.12f, 0.98f);
+        ForgeLineUiPalette.SurfaceHover;
 
     public static readonly Vector4 PanelPressed =
-        new(0.10f, 0.15f, 0.16f, 0.98f);
+        ForgeLineUiPalette.SurfacePressed;
 
     public static readonly Vector4 PanelDisabled =
-        new(0.055f, 0.06f, 0.06f, 0.88f);
+        ForgeLineUiPalette.SurfaceDisabled;
 
     public static readonly Vector4 Border =
-        new(0.32f, 0.35f, 0.34f, 0.90f);
+        ForgeLineUiPalette.Border;
 
     public static readonly Vector4 TextPrimary =
-        new(0.93f, 0.96f, 0.95f, 1.0f);
+        ForgeLineUiPalette.TextPrimary;
 
     public static readonly Vector4 TextSecondary =
-        new(0.65f, 0.70f, 0.69f, 1.0f);
+        ForgeLineUiPalette.TextSecondary;
 
     public static readonly Vector4 Focus =
-        new(0.88f, 0.80f, 0.42f, 1.0f);
+        ForgeLineUiPalette.Accent;
 
     public static readonly Vector4 Warning =
-        new(0.94f, 0.66f, 0.24f, 1.0f);
+        ForgeLineUiPalette.Warning;
 
     public static readonly Vector4 Critical =
-        new(0.96f, 0.34f, 0.20f, 1.0f);
+        ForgeLineUiPalette.Critical;
 
     public static float ResolveSafeMargin(float scale) =>
         MathF.Max(
