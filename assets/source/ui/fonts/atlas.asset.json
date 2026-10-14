@@ -1,8 +1,0 @@
-{
-  "id": "texture.ui.typography.dejavu_sans",
-  "type": "texture",
-  "source": "atlas.png",
-  "textureUsage": "genericData",
-  "textureColorSpace": "linear",
-  "textureGenerateMipmaps": false
-}

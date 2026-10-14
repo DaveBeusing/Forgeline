@@ -1,0 +1,6 @@
+
+# Generated metrics are hashed and verified byte-for-byte on every platform.
+assets/source/ui/fonts/metrics.json text eol=lf
+assets/source/ui/fonts/*.ttf binary
+assets/source/ui/fonts/*.gz binary
+assets/source/ui/fonts/*.png binary

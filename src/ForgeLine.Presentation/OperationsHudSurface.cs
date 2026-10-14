@@ -21,6 +21,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
     public OperationsHudSurface(IGraphicsDevice graphics)
     { _graphics = graphics; _text = new(graphics); _pipeline = SelectionInspectorHudRenderer.CreatePipeline(graphics, alphaBlendEnabled: true); }
     public GameplayHudRegion Regions => GameplayHudRegion.SecondaryView | GameplayHudRegion.AlertStack;
+    public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
     public int LastRenderedVertexCount { get; private set; }
     public void Render(in GameplayHudRenderContext context)
     {

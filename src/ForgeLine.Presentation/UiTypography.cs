@@ -10,9 +10,13 @@ public static class UiTypography
 {
     public static UiTextStyle Style(UiTextRole role) => role switch
     {
-        UiTextRole.CommandTitle => new(32, true), UiTextRole.MenuItem => new(22, false),
-        UiTextRole.SectionHeading => new(16, true), UiTextRole.Numeric => new(12, true),
-        UiTextRole.Warning => new(14, true), UiTextRole.Tooltip => new(12, false), _ => new(12, false)
+        UiTextRole.CommandTitle => new(32, true),
+        UiTextRole.MenuItem => new(22, false),
+        UiTextRole.SectionHeading => new(16, true),
+        UiTextRole.Numeric => new(12, true),
+        UiTextRole.Warning => new(14, true),
+        UiTextRole.Tooltip => new(12, false),
+        _ => new(12, false)
     };
 }
 
@@ -112,13 +116,18 @@ public sealed class UiFontMetrics
         var lines = new List<string>();
         foreach (string paragraph in text.Replace("\r", "", StringComparison.Ordinal).Split('\n'))
         {
+            if (lines.Count >= 256) break;
             int offset = 0;
             if (paragraph.Length == 0) { lines.Add(string.Empty); continue; }
             while (offset < paragraph.Length && lines.Count < 256)
             {
                 ReadOnlySpan<char> remaining = paragraph.AsSpan(offset);
                 int count = FitPrefix(remaining, width, size, bold);
-                if (count == 0) { int next = 0; _ = Next(remaining, ref next); count = next; }
+                if (count == 0)
+                {
+                    int next = 0; _ = Next(remaining, ref next);
+                    lines.Add(string.Empty); offset += next; continue;
+                }
                 if (count < remaining.Length) { int space = remaining[..count].LastIndexOf(' '); if (space > 0) count = space; }
                 lines.Add(remaining[..count].ToString()); offset += count;
                 while (offset < paragraph.Length && paragraph[offset] == ' ') offset++;

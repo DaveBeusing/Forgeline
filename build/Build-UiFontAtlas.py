@@ -1,4 +1,5 @@
 """Build the bundled UI distance-field atlas; never invoked by a player."""
+import io
 import argparse, gzip, hashlib, json, unicodedata
 from pathlib import Path
 import numpy as np
@@ -59,14 +60,16 @@ def build():
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--verify',action='store_true');args=parser.parse_args()
     alpha, metadata, image=build()
+    png=io.BytesIO(); image.save(png,format='PNG',optimize=False,compress_level=9)
+    metadata['pngSha256']=hashlib.sha256(png.getvalue()).hexdigest()
     encoded=(json.dumps(metadata,ensure_ascii=False,sort_keys=True,separators=(',',':'))+'\n').encode('utf-8')
     compressed=gzip.compress(alpha,compresslevel=9,mtime=0)
     if args.verify:
         assert (FONTS/'atlas.alpha.gz').read_bytes()==compressed,'Atlas differs'
         assert (FONTS/'metrics.json').read_bytes()==encoded,'Metrics differ'
-        assert Image.open(FONTS/'atlas.png').convert('RGBA').tobytes()==image.tobytes(),'PNG differs'
+        assert (FONTS/'atlas.png').read_bytes()==png.getvalue(),'PNG differs'
     else:
         (FONTS/'atlas.alpha.gz').write_bytes(compressed);(FONTS/'metrics.json').write_bytes(encoded)
-        image.save(FONTS/'atlas.png',optimize=False,compress_level=9)
+        (FONTS/'atlas.png').write_bytes(png.getvalue())
     print(f'{len(metadata["glyphs"])} glyphs, {len(metadata["kerning"])} kerning pairs; {len(compressed)} compressed bytes')
 if __name__=='__main__': main()

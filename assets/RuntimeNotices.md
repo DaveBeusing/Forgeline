@@ -15,3 +15,10 @@ being packaged.
 BCnEncoder.Net 2.3.0 (MIT/Unlicense) is used only by the offline asset compiler.
 Neither that compiler nor its authoring dependency is part of the player package.
 The player package retains its required application runtime dependencies.
+
+Bundled UI text uses unmodified DejaVu Sans Regular/Bold (font version 2.35).
+Bitstream Vera and Arev redistribution notices are shipped in
+`ThirdPartyNotices/DejaVuFonts.txt`. Source revisions and SHA-256 hashes are
+recorded in `assets/source/ui/fonts/README.md` and `metrics.json`. Only the
+precompiled atlas/metrics are needed by the player; source TTF files and
+font-authoring libraries are excluded from the package.

@@ -22,6 +22,7 @@ internal sealed class RtsInformationHudSurface : IGameplayHudSurface
         GameplayHudRegion.SecondaryView |
         GameplayHudRegion.GlobalOverlay;
 
+    public UiTextDiagnostics TextDiagnostics => _renderer.TextDiagnostics;
     public int LastRenderedVertexCount => _renderer.LastRenderedVertexCount;
     public int LastGuidanceVertexCount => _renderer.LastGuidanceVertexCount;
 

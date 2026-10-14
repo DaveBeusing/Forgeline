@@ -20,7 +20,7 @@ public sealed class GameplayUiFixtureTests
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
     [Fact]
-    public void ReboundLongLabelAndFeedbackGeometryMatchesReviewedFixtures()
+    public void BootstrapReboundLongLabelAndFeedbackGeometryMatchesReviewedFixtures()
     {
         var fixtures = new SortedDictionary<string, Fixture>(StringComparer.Ordinal);
         var bindings = new GameplayBindingRegistry(new GameplayBindings().With(GameplayAction.Build, ForgeLine.Platform.PlatformKey.G));
@@ -104,7 +104,7 @@ public sealed class GameplayUiFixtureTests
     private static void WriteSvg(string path, Vertex[] vertices, int width, int height)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
-        var svg = new StringBuilder(FormattableString.Invariant($"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{width}\" height=\"{height}\" viewBox=\"0 0 {width} {height}\"><title>Command geometry fixture; excludes native terrain and textures</title><rect width=\"100%\" height=\"100%\" fill=\"#171b1b\"/>"));
+        var svg = new StringBuilder(FormattableString.Invariant($"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{width}\" height=\"{height}\" viewBox=\"0 0 {width} {height}\"><title>Bootstrap bitmap command geometry; excludes normal atlas text, native terrain and textures</title><rect width=\"100%\" height=\"100%\" fill=\"#171b1b\"/>"));
         for (int i = 0; i < vertices.Length; i += 3)
         {
             var color = vertices[i].Color;

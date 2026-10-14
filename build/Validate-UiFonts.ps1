@@ -19,8 +19,7 @@ try {
     } finally { $gzip.Dispose() }
 } finally { $stream.Dispose() }
 if ($metadata.glyphs.Count -ne 1448 -or $metadata.kerning.Count -ne 3524) { throw 'Unexpected bundled font coverage.' }
-$asset = Get-Content (Join-Path $fonts 'atlas.asset.json') -Raw | ConvertFrom-Json
-if ($asset.id -ne 'texture.ui.typography.dejavu_sans' -or -not (Test-Path (Join-Path $fonts $asset.source))) { throw 'Compiled atlas source missing.' }
+if ((Get-FileHash (Join-Path $fonts 'atlas.png') -Algorithm SHA256).Hash.ToLowerInvariant() -ne $metadata.pngSha256) { throw 'UI atlas PNG hash mismatch.' }
 if ($PublishRoot) {
     $notice = Join-Path $PublishRoot 'ThirdPartyNotices/DejaVuFonts.txt'
     if (-not (Test-Path $notice) -or (Get-FileHash $notice).Hash -ne (Get-FileHash (Join-Path $fonts 'LICENSE.txt')).Hash) { throw 'Published font license missing or changed.' }

@@ -144,8 +144,9 @@ public sealed class FrontendOverlayRenderer : IDisposable
 
             float y = 350 * scale;
             int itemIndex = 0;
-            foreach (FrontendMenuEntryView item in view.MenuEntries)
+            for (int menuIndex = 0; menuIndex < view.MenuEntries.Count; menuIndex++)
             {
+                FrontendMenuEntryView item = view.MenuEntries[menuIndex];
                 bool focused = item.IsEnabled && item.IsFocused;
                 var row = new SurfaceRect(82 * scale, y - 12 * scale, 560 * scale, 52 * scale);
                 EmitPanel(
