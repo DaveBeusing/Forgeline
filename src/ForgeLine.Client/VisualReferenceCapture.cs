@@ -202,6 +202,8 @@ internal static class VisualReferenceCapture
                     var information = RtsInformationLayerView.Empty with { SelectedEntities = selected,
                         Cursor = uiScenario == UiReferenceScenario.Targeting ? RtsCursorKind.Attack : RtsCursorKind.Default,
                         HasPointer = uiScenario == UiReferenceScenario.Targeting, PointerPosition = new(display.Width * .5f, display.Height * .5f) };
+                    var targeting = uiScenario == UiReferenceScenario.Targeting ? new TacticalTargetingView(TacticalTargetingMode.Attack, 2, 1, 1, 0)
+                    { HasPointerTarget = true, PointerTargetValid = true, PointerWorldTarget = fixture.Target } : default;
                     int recordFrameIndex = -1;
                     captureInputs.Clear();
                     Action<IGraphicsCommandContext> record = context =>
@@ -231,7 +233,7 @@ internal static class VisualReferenceCapture
                         particles.Render(context, camera);
                         context.BeginPass(GraphicsFramePass.Overlay);
                         selection.Render(context, camera, indicators);
-                        hud.Render(context, camera, snapshot, terrain.WorldBounds, information, panel, default,
+                        hud.Render(context, camera, snapshot, terrain.WorldBounds, information, panel, targeting,
                             FormationTemplate.Compact, CombatGroupOverviewView.Empty, default, rasterDpi, uiScale);
                         if (frontend is not null && frontendView is { Kind: FrontendSurfaceKind.PauseMenu } pause)
                             frontend.Render(context, pause);
