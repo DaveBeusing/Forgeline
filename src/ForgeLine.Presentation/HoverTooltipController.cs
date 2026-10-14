@@ -55,7 +55,7 @@ public sealed class HoverTooltipController
                 DockControl = (int)(command.OpensMode ? PlayerActionDockControlKind.Mode : PlayerActionDockControlKind.Item),
                 DockIndex = command.ItemIndex, Contextual = true };
         }
-        else if (PlayerActionDockInteractionLayout.TryHit(pointer, layout, panel.IsOpen, count, out var hit))
+        else if (PlayerActionDockInteractionLayout.TryHit(pointer, layout, panel.IsOpen, count, out var hit, panel.SelectedIndex))
         {
             next = next with
             {

@@ -72,11 +72,13 @@ internal static class HoverTooltipResolver
                 PlayerActionDockHudModel.ResolveModeShortcut(mode, panel.Bindings), "CLICK TO OPEN / CLOSE");
         if (panel.SelectionPending || !panel.IsOpen || panel.Mode != mode || snapshot.PlayerActions is not { } actions ||
             actions.SessionId != snapshot.SessionId || actions.Tick != snapshot.Tick) return null;
+        if (control == PlayerActionDockControlKind.Page)
+            return new("PAGE CARDS", "DOCK NAVIGATION", "CHANGES SELECTION", "CLICK / WHEEL / TAB");
         int index = view.DockIndex;
         if (control != PlayerActionDockControlKind.Item && index != panel.SelectedIndex) return null;
         if (control == PlayerActionDockControlKind.Item &&
             (index < 0 || index >= PlayerActionDockInteractionLayout.GetItemCount(mode, actions))) return null;
-        var state = PlayerActionDockHudModel.ResolveItemState(mode, index, actions);
+        var state = PlayerActionDockHudModel.ResolveItemState(mode, index, actions, ContextualCommandModel.HasPending(panel, snapshot));
         bool item = control == PlayerActionDockControlKind.Item;
         bool enabled = item ? state.CanActivate : PlayerActionDockHudModel.CanUseControl(control, mode, index, panel, actions);
         string title = item ? PlayerActionDockHudModel.ResolveItemTitle(mode, index, actions) :

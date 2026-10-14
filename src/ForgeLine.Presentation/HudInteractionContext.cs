@@ -53,8 +53,7 @@ public sealed class HudInteractionContext
         layout.PrimaryCommands.Contains(position) ||
         (actionDockExpanded
             ? layout.ActionDock.Contains(position)
-            : new HudRect(layout.ActionDock.X, layout.ActionDock.Y, layout.ActionDock.Width,
-                MathF.Min(layout.ActionDock.Height, 59.0f * layout.Scale)).Contains(position)) ||
+            : PlayerActionDockInteractionLayout.GetCollapsedRect(layout).Contains(position)) ||
         (minimapEnabled && layout.Minimap.Contains(position)) ||
         (guidanceVisible && GameplayGuidanceLayout.Resolve(layout).Contains(position));
 
