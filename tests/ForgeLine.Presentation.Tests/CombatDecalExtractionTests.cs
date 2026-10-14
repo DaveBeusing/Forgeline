@@ -10,6 +10,33 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class CombatDecalExtractionTests
 {
     [Fact]
+    public void SampledVehicleTracksRequireContiguousMotionAndRemainBounded()
+    {
+        var simulation = new SimulationCoordinator();
+        var buffer = new PresentationSnapshotBuffer();
+        simulation.RegisterTickObserver(new PresentationExtractor(buffer));
+        EntityId vehicle = Add(simulation, Vector3.Zero);
+        simulation.Entities.AddComponent(vehicle, new UnitIdentity(UnitIds.MainBattleTank, DirectorateContent.FactionId));
+        for (int tick = 0; tick < 32; tick++)
+        {
+            simulation.Entities.SetComponent(vehicle, new WorldTransform(new(0, 0, tick), Quaternion.Identity, new(8, 4, 12)));
+            simulation.AdvanceOneTick();
+        }
+        Assert.True(buffer.TryReadLatest(out var moving));
+        Assert.Contains(moving.Instances.ToArray(), x => x.DecalFeature.Kind == DecalKind.TrackedVehicle);
+        ulong spawned = moving.DecalMetrics.Spawned;
+        simulation.RunTicks(16, TestContext.Current.CancellationToken);
+        Assert.True(buffer.TryReadLatest(out var idle));
+        Assert.Equal(spawned, idle.DecalMetrics.Spawned);
+        simulation.Entities.SetComponent(vehicle, new WorldTransform(new(0, 0, 1000), Quaternion.Identity, new(8, 4, 12)));
+        simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var teleported));
+        Assert.Equal(spawned, teleported.DecalMetrics.Spawned);
+        Assert.InRange(teleported.DecalMetrics.Active, 1, 16);
+        Assert.Equal(1, simulation.Entities.EntityCount);
+    }
+
+    [Fact]
     public void CopiedImpactCreatesTerrainMarkWithoutChangingAuthoritativeState()
     {
         var simulation = new SimulationCoordinator();

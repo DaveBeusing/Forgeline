@@ -1,5 +1,7 @@
 using System.Numerics;
 using ForgeLine.Game;
+using ForgeLine.Core;
+using ForgeLine.Economy;
 using ForgeLine.Simulation;
 using Xunit;
 
@@ -7,6 +9,55 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class IndustrialEffectPresetTests
 {
+    [Fact]
+    public void RealProductionEmitsSteamStopsWithoutPowerAndLeavesSimulationIdentical()
+    {
+        var first = CreateFactory();
+        var second = CreateFactory();
+        var buffer = new PresentationSnapshotBuffer();
+        first.Simulation.RegisterTickObserver(new PresentationExtractor(buffer));
+        for (int i = 0; i < 16; i++)
+        {
+            first.Simulation.AdvanceOneTick(); second.Simulation.AdvanceOneTick();
+            Assert.Equal(first.Simulation.Entities.GetComponent<ProductionFacility>(first.Facility),
+                second.Simulation.Entities.GetComponent<ProductionFacility>(second.Facility));
+            Assert.Equal(first.Inventories.GetQuantity(first.Output, ResourceIds.Steel), second.Inventories.GetQuantity(second.Output, ResourceIds.Steel));
+            Assert.Equal(first.Simulation.Entities.EntityCount, second.Simulation.Entities.EntityCount);
+        }
+        Assert.True(buffer.TryReadLatest(out var running));
+        var steam = Assert.Single(running.Instances.ToArray(), x => x.VfxFeature.Kind == VfxEffectKind.IndustrialSteam);
+        Assert.True(steam.VfxFeature.Continuous);
+        first.Simulation.Entities.RemoveComponent<PowerGenerator>(first.Generator);
+        first.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var stopped));
+        Assert.DoesNotContain(stopped.Instances.ToArray(), x => x.VfxFeature.Kind == VfxEffectKind.IndustrialSteam);
+    }
+
+    private static (SimulationCoordinator Simulation, InventoryStore Inventories, InventoryId Output, EntityId Facility, EntityId Generator) CreateFactory()
+    {
+        var simulation = new SimulationCoordinator(seed: 12345);
+        var inventories = new InventoryStore();
+        simulation.RegisterSystem(new PowerNetworkSystem());
+        simulation.RegisterSystem(new ProductionSystem(InitialProductionRecipes.CreateCatalog(), inventories));
+        var network = new PowerNetworkId(1);
+        var generator = simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(generator, new PowerNetworkMembership(network));
+        simulation.Entities.AddComponent(generator, new PowerGenerator(1000));
+        var input = inventories.CreateInventory(new InventorySpecification(10000));
+        var output = inventories.CreateInventory(new InventorySpecification(10000));
+        Assert.True(inventories.Add(input, ResourceIds.FerrousOre, 1000).Succeeded);
+        var facility = simulation.Entities.CreateEntity();
+        simulation.Entities.AddComponent(facility, new WorldTransform(Vector3.Zero, Quaternion.Identity, new(24, 16, 24)));
+        simulation.Entities.AddComponent(facility, new VisualIdentity(1));
+        simulation.Entities.AddComponent(facility, new CompletedBuilding(BuildingIds.Smelter, new PlayerId(1), SimulationTick.Zero));
+        simulation.Entities.AddComponent(facility, new PowerNetworkMembership(network));
+        simulation.Entities.AddComponent(facility, new PowerConsumer(10, PowerPriority.Industrial));
+        simulation.Entities.AddComponent(facility, new ProductionFacility(input, output, ProductionCapability.SteelProcessing, SimulationTick.Zero));
+        simulation.SubmitCommand(new QueueProductionCommand(facility, RecipeIds.Steel, simulation.CurrentTick,
+            ProductionPriority.Normal, ProductionRequestMode.Repeat), simulation.CurrentTick.Next());
+        return (simulation, inventories, output, facility, generator);
+    }
+
     [Fact]
     public void PresetsRequireWorkingOperationalStateAndReuseValidatedAssets()
     {

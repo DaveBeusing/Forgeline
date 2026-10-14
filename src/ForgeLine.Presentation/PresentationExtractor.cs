@@ -355,6 +355,15 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                 if (_extraction is not null && _extraction.Scenario.Terrain.TrySampleHeight(dust.X, dust.Z, out float dustGround))
                     dust.Y = dustGround + .15f;
                 QueueAt(VfxEffectKind.PersistentDust, dust, entity);
+                if (context.Tick.Value % 8 == entity.Index % 8 && (!_viewingFaction.IsSpecified ||
+                    entities.TryGetComponent(entity, out IntelligenceSignature signature) && signature.Faction == _viewingFaction))
+                {
+                    Vector3 trackPosition = dust with { Y = dust.Y - .09f };
+                    bool tracked = movingUnit.UnitId == UnitIds.MainBattleTank || movingUnit.UnitId == UnitIds.MobileArtillery;
+                    _decals.TrySpawn(new(tracked ? DecalKind.TrackedVehicle : DecalKind.TireTrack, DecalSurface.Ground,
+                        new(trackPosition, transform.Rotation, new(Math.Clamp(MathF.Abs(transform.Scale.X) * .8f, .5f, 12), 1, 4)),
+                        LifetimeTicks: 200, Strength: .28f), context.Tick, out _);
+                }
             }
             QueueIndustrialVfx(entities, entity, transform, buildingFeature);
             QueueLogisticsVfx(
@@ -1548,17 +1557,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
         bool working = entities.TryGetComponent(entity, out ProductionFacility production) && production.Status == ProductionStatus.Running ||
             entities.TryGetComponent(entity, out UnitProductionFacility unitProduction) && unitProduction.Status == UnitProductionStatus.Running;
         if (!IndustrialEffectPreset.TryResolve(building, working, out var preset)) return;
-        Vector3 position = transform.Position + Vector3.Transform(new Vector3(0, MathF.Abs(transform.Scale.Y) * .8f, 0), transform.Rotation);
-        if (_runtimeAssets is not null && BuildingPresentationCatalog.TryGet(building.Building, out var definition) &&
-            _runtimeAssets.TryGet(AssetId.Parse(definition.MeshAssetId), out RuntimeAssetRecord? record) && record is not null)
-        {
-            foreach (var socket in record.Sockets)
-                if (socket.Name == preset.Socket)
-                {
-                    position = transform.Position + Vector3.Transform(new Vector3(socket.X, socket.Y, socket.Z) * transform.Scale, transform.Rotation);
-                    break;
-                }
-        }
+        Vector3 position = preset.ResolveAnchor(building, new RenderTransform(transform.Position, transform.Rotation, transform.Scale), _runtimeAssets);
         QueueAt(preset.Effect, position, entity);
     }
 

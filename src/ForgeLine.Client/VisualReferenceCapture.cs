@@ -231,7 +231,7 @@ internal static class VisualReferenceCapture
                         long allocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocationStart;
                         var sampleDiagnostics = graphics.Diagnostics;
                         performance.AddCpu(i, cpu[i], allocatedBytes, sampleDiagnostics,
-                            new { objects = meshes.SubmissionMetrics, terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, particles = particles.Diagnostics });
+                            new { objects = meshes.SubmissionMetrics, decals = fixture.Snapshot.DecalMetrics, terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, particles = particles.Diagnostics });
                         if (sampleDiagnostics.Frame is { } frame && frame.GpuSubmissionFence > lastFence)
                         {
                             lastFence = frame.GpuSubmissionFence;
@@ -319,7 +319,7 @@ internal static class VisualReferenceCapture
                             resourcesBeforeSetup = beforeSetup.Resources, resourcesBeforeSamples = beforeSamples.Resources,
                             cameraPathVersion = request.CameraPath == ReferenceCameraPath.Traverse ? 2 : 1, cameraSamples = request.Samples,
                             coldScope = "Fresh per-case renderers; process/device/runtime catalog and OS caches can already be warm. No OS/driver cache flush." },
-                        terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, materials = meshes.MaterialDiagnostics, particles = particles.Diagnostics,
+                        decals = fixture.Snapshot.DecalMetrics, terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, materials = meshes.MaterialDiagnostics, particles = particles.Diagnostics,
                         materialReference = materialReference is null ? null : MaterialReferenceRenderer.Materials,
                         hudVertices = hud.LastRenderedVertexCount, graphics = measured, repeatPixelsEqual, request.RepeatCaptures, repeatFailures,
                         captureInputs = captureInputs.ToArray(),
