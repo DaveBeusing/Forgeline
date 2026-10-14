@@ -145,6 +145,31 @@ public sealed class FrontendOverlayRendererTests : IDisposable
             withoutVersion);
     }
 
+    [Fact]
+    public void MainMenuSelectionUsesAdditionalGeometricCues()
+    {
+        using var renderer = new FrontendOverlayRenderer(_graphics);
+        var context = new FakeGraphicsCommandContext { Width = 2560, Height = 1440 };
+        FrontendSurfaceView unfocused = FrontendSurfaceView.MainMenu(
+        [
+            new FrontendMenuEntryView("new-game", "NEW GAME", true, false)
+        ]);
+
+        renderer.Render(context, unfocused);
+        int neutralVertexCount = renderer.LastRenderedVertexCount;
+
+        renderer.Render(context, unfocused with
+        {
+            MenuEntries =
+            [
+                new FrontendMenuEntryView("new-game", "NEW GAME", true, true)
+            ]
+        });
+
+        Assert.True(renderer.LastRenderedVertexCount > neutralVertexCount);
+        Assert.InRange(_graphics.LastBuffer!.MaximumAbsoluteX, 0, 1.001f);
+    }
+
     private sealed class FakeGraphicsDevice : IGraphicsDevice
     {
         internal FakeGraphicsBuffer? LastBuffer { get; private set; }
