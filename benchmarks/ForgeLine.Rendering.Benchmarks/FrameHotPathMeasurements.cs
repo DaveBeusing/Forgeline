@@ -67,8 +67,16 @@ internal static class FrameHotPathMeasurements
             simulation.Entities.AddComponent(entity, new VisualIdentity(1));
         }
 
+        var indexedInstances = Enumerable.Range(1, 1000).Select(i => new RenderInstance(new ForgeLine.Core.EntityId((uint)i, 1),
+            new(new Vector3(i % 32, 0, i / 32), Quaternion.Identity, Vector3.One), new(1), RenderMaterialHandle.Default, RenderVisibilityMask.World)).ToArray();
+        var indexBuffer = new PresentationSnapshotBuffer();
+        var indexedWorld = new RenderWorld();
+        var indexFirst = new PresentationSnapshot(new SimulationTick(1), TimeSpan.FromMilliseconds(50), 1000, indexedInstances);
+        var indexSecond = new PresentationSnapshot(new SimulationTick(1), TimeSpan.FromMilliseconds(50), 1000, indexedInstances);
+        bool alternate = false;
         var results = new List<object>
         {
+            Measure("snapshot-index-rebuild-1000", () => { alternate = !alternate; indexBuffer.Publish(alternate ? indexFirst : indexSecond); return indexedWorld.Update(indexBuffer); }),
             Measure("mechanical-static-1000", () => renderer.Submit1000MechanicalInstances(false), () => renderer.SubmissionMetrics),
             Measure("mechanical-posed-1000", () => renderer.Submit1000MechanicalInstances(true), () => renderer.SubmissionMetrics),
             Measure("render-near-1000", () => renderer.Submit1000NearFieldInstances(), () => renderer.SubmissionMetrics),

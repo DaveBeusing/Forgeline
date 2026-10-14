@@ -18,6 +18,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
     private readonly IGraphicsTexture _blackEmissive;
     private readonly IGraphicsTexture _missingBaseColor;
     private long _materialBindingFailures;
+    private long _residentMeshBytes;
     private bool _disposed;
 
     public RuntimeWorldAssetResources(
@@ -109,7 +110,7 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
             return new RuntimeMaterialDiagnostics(
                 _materials.Count,
                 _textures.Count,
-                _materialBindingFailures);
+                _materialBindingFailures) { LoadedMeshCount = _meshes.Count, ResidentMeshBytes = _residentMeshBytes };
         }
     }
 
@@ -195,9 +196,8 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
         mesh =
             CreateMeshBuffers(
                 content.Payload, record);
-        _meshes.Add(
-            id,
-            mesh);
+        _meshes.Add(id, mesh);
+        _residentMeshBytes += checked((long)(mesh.VertexBuffer.Description.SizeInBytes + mesh.IndexBuffer.Description.SizeInBytes));
         resolvedAssetId =
             id;
         return true;
@@ -666,7 +666,11 @@ internal sealed class RuntimeWorldAssetResources : IDisposable
 public readonly record struct RuntimeMaterialDiagnostics(
     int LoadedMaterialCount,
     int LoadedAssetTextureCount,
-    long BindingFailureCount);
+    long BindingFailureCount)
+{
+    public int LoadedMeshCount { get; init; }
+    public long ResidentMeshBytes { get; init; }
+}
 
 internal readonly record struct RuntimeMaterialResources(
     AssetId MaterialId,

@@ -23,6 +23,15 @@ function Read-Evidence([string]$Root) {
     return $manifest
 }
 function Same($Left, $Right) { return ($Left | ConvertTo-Json -Depth 20 -Compress) -ceq ($Right | ConvertTo-Json -Depth 20 -Compress) }
+function Device-Identity($Device) {
+    # Optional support probes are informational; no advanced render path is active.
+    # Active features remain part of Effective-Profile and must match independently.
+    $identity = [ordered]@{}
+    foreach ($property in $Device.PSObject.Properties | Sort-Object Name) {
+        if ($property.Name -ne 'advanced') { $identity[$property.Name] = $property.Value }
+    }
+    return [pscustomobject]$identity
+}
 function Effective-Profile($Profile) {
     $values = @{}
     foreach ($property in $Profile.PSObject.Properties) {
@@ -67,7 +76,7 @@ foreach ($case in $current.captures) {
         $previous = $previous[0]
         if ($current.software -or $baseline.software) { $reason = 'software-functional-only' }
         elseif (-not (Same $current.environment $baseline.environment) -or $current.driver -ne $baseline.driver -or
-            -not (Same $case.graphics.device $previous.graphics.device)) { $reason = 'hardware-environment-changed' }
+            -not (Same (Device-Identity $case.graphics.device) (Device-Identity $previous.graphics.device))) { $reason = 'hardware-environment-changed' }
         elseif ($case.fingerprint -ne $previous.fingerprint -or -not (Same $case.camera $previous.camera) -or
             -not (Same (Effective-Profile $case.profile) (Effective-Profile $previous.profile)) -or -not (Same $case.lighting $previous.lighting) -or
             -not (Same (Surface-Inputs $case) (Surface-Inputs $previous)) -or
