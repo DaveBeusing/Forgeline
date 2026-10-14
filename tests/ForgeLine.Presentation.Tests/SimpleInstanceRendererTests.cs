@@ -447,7 +447,7 @@ public sealed class SimpleInstanceRendererTests : IDisposable
     }
 
     [Fact]
-    public void RepeatedVfxWithoutRuntimeCatalogUsesSharedFallbackBatch()
+    public void RepeatedVfxWithoutRuntimeCatalogUsesBoundedSharedFallbackBatch()
     {
         const int Count = 512;
 
@@ -513,18 +513,14 @@ public sealed class SimpleInstanceRendererTests : IDisposable
             world,
             1.0f);
 
-        Assert.Equal(
-            Count,
-            renderer.LastDiagnostics.VisibleInstances);
+        Assert.Equal(128, renderer.LastDiagnostics.VisibleInstances);
         Assert.Equal(
             1,
             renderer.LastDiagnostics.DrawCalls);
         Assert.Equal(
             1,
             context.IndexedDrawCalls);
-        Assert.Equal(
-            Count,
-            context.LastInstanceCount);
+        Assert.Equal(128, context.LastInstanceCount);
     }
 
     private static RenderInstance Instance(
