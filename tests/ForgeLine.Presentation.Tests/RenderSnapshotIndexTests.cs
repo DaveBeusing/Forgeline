@@ -1,6 +1,7 @@
 using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Simulation;
+using ForgeLine.Game;
 using Xunit;
 
 namespace ForgeLine.Presentation.Tests;
@@ -65,6 +66,25 @@ public sealed class RenderSnapshotIndexTests
         Assert.True(index.IsVisible(0, frustum));
     }
 
+    [Fact]
+    public void CurrentReadabilityMetadataBoundsPreviousScaleAndRotations()
+    {
+        var camera = new RtsCamera();
+        var frustum = ViewFrustum.FromViewProjection(camera.GetMatrices(1600, 900).ViewProjection);
+        var index = new RenderSnapshotIndex();
+        for (int x = 0; x < 1600; x += 20)
+        {
+            var prior = Enumerable.Range(1, 32).Select(i => Instance((uint)i, new Vector3(x, 0, 0), new Vector3(1, 1, 400)) with
+                { Transform = new(new Vector3(x, 0, 0), Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.PI / 2), new Vector3(1, 1, 400)) }).ToArray();
+            var current = prior.Select(i => i with { Transform = i.Transform with { Scale = Vector3.One },
+                UnitFeature = new(UnitIds.MobileArtillery, UnitPresentationDamageState.Intact) }).ToArray();
+            var before = new PresentationSnapshot(new SimulationTick(1), TimeSpan.Zero, 32, prior);
+            var after = new PresentationSnapshot(new SimulationTick(2), TimeSpan.Zero, 32, current);
+            index.Rebuild(after, before);
+            var interpolated = current[0] with { Transform = prior[0].Transform };
+            if (frustum.Intersects(PresentationBounds.ResolveAxisAlignedBounds(interpolated))) Assert.True(index.IsVisible(0, frustum));
+        }
+    }
     private static RenderInstance Instance(uint id, Vector3 position, Vector3 scale) =>
         new(new EntityId(id, 1), new(position, Quaternion.Identity, scale), new(1), RenderMaterialHandle.Default, RenderVisibilityMask.World);
 }

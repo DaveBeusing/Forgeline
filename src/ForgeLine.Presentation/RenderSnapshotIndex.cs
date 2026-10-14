@@ -54,11 +54,11 @@ internal sealed class RenderSnapshotIndex
     {
         Vector3 start = previous?.Transform.Position ?? current.Transform.Position;
         float radius = PresentationBounds.ResolveLocalHalfExtents(current).Length();
-        if (previous is { } prior) radius = MathF.Max(radius, PresentationBounds.ResolveLocalHalfExtents(prior).Length());
+        if (previous is { } prior) radius = MathF.Max(radius, PresentationBounds.ResolveLocalHalfExtents(current with { Transform = prior.Transform }).Length());
         // A sphere bounds every intermediate quaternion rotation. Vegetation pivots
         // at its root, so include the full authored height and wind sweep.
         if (VegetationVisualMotion.Applies(current))
-            radius = MathF.Max(radius, Vector3.Abs(current.Transform.Scale).Length() * (1 + VegetationVisualMotion.MaximumAngle));
+            radius = MathF.Max(radius, MathF.Max(Vector3.Abs(current.Transform.Scale).Length(), Vector3.Abs(previous?.Transform.Scale ?? current.Transform.Scale).Length()) * (1 + VegetationVisualMotion.MaximumAngle));
         if (previous is { } old && VegetationVisualMotion.Applies(old))
             radius = MathF.Max(radius, Vector3.Abs(old.Transform.Scale).Length() * (1 + VegetationVisualMotion.MaximumAngle));
         Vector3 minimum = Vector3.Min(start, current.Transform.Position) - new Vector3(radius);

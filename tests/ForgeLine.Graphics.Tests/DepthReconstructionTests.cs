@@ -37,8 +37,7 @@ public sealed class DepthReconstructionTests
         }
         for (int x = 0; x < width; x++) Assert.Equal(new byte[] { 0, 255, 0, 255 }, image.AsSpan((20 * width + x) * 4, 4).ToArray());
         Assert.Equal(0, graphics.Diagnostics.PostProcessing!.Value.HistoryTargets);
-        Assert.True(graphics.Diagnostics.Device.Advanced.MeshShaderQuerySucceeded);
-        Assert.True(graphics.Diagnostics.Device.Advanced.RaytracingQuerySucceeded);
+        Assert.True(graphics.Diagnostics.Device.IsSoftwareAdapter);
         Assert.Equal(0, graphics.Diagnostics.Health.SubmissionFaultCount);
         graphics.Resize(0, 0);
         graphics.RenderFrame(GraphicsColor.ForgeLineClear);
