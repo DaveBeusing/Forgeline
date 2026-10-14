@@ -52,6 +52,10 @@ public readonly record struct ParticleEmitterDescriptor(int Version, VfxEffectKi
         descriptor = new(1, effect, source.MeshAssetId, source.MaterialAssetId, visual,
             visual == ParticleVisualKind.Explosion ? 16 : 8, life, radius, speed, gravity,
             visual is ParticleVisualKind.Explosion or ParticleVisualKind.Muzzle ? 0 : visual == ParticleVisualKind.Spark ? 2 : 1);
+        if (effect == VfxEffectKind.IndustrialSteam)
+            descriptor = descriptor with { Count = 6, LifetimeSeconds = 1.8f, RadiusMeters = .35f, SpeedMetersPerSecond = .8f };
+        else if (effect == VfxEffectKind.IndustrialWelding)
+            descriptor = descriptor with { Count = 6, LifetimeSeconds = .3f, RadiusMeters = .12f, SpeedMetersPerSecond = 4 };
         return true;
     }
 

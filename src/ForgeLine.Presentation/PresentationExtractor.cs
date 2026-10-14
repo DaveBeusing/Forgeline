@@ -28,7 +28,9 @@ public sealed class PresentationExtractor : ISimulationTickObserver
     private ulong? _vfxTick;
     private SimulationSessionId _vfxSession;
     private readonly AlertLifecycleTracker _alerts = new();
+    public const int MaximumSnapshotEffects = 4096;
     private readonly List<QueuedVfxInstance> _queuedVfx = new(256);
+    private int _droppedQueuedVfx;
     private readonly HashSet<EntityId> _seenWrecks = [];
     private readonly Dictionary<EntityId, UnitSupplyState> _previousSupplyStates = [];
 
@@ -213,7 +215,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 _extraction?.Scenario.Simulation.Diagnostics.Capture(
                     _extraction.Scenario.Simulation),
                 playerActions,
-                _vfxPool.Metrics,
+                _vfxPool.Metrics with { PublishedEffects = _queuedVfx.Count, DiscardedSnapshotEffects = _droppedQueuedVfx },
                 strategicOverlay,
                 combatGroups,
                 _extraction is null || interaction.HoverSessionId != _extraction.Scenario.Simulation.SessionId
@@ -236,7 +238,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 transformCount,
                 entities.GetComponentCount<VisualIdentity>());
 
-        _queuedVfx.Clear();
+        _queuedVfx.Clear(); _droppedQueuedVfx = 0;
 
         var baseInstances =
             visualCount + _staticDressing.Length == 0
@@ -350,6 +352,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                     dust.Y = dustGround + .15f;
                 QueueAt(VfxEffectKind.PersistentDust, dust, entity);
             }
+            QueueIndustrialVfx(entities, entity, transform, buildingFeature);
             QueueLogisticsVfx(
                 entities,
                 entity,
@@ -1218,7 +1221,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 CreateDirectionRotation(
                     projectile.Velocity);
 
-            _queuedVfx.Add(
+            QueueVfx(
                 new QueuedVfxInstance(
                     kind,
                     new RenderTransform(
@@ -1256,7 +1259,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 projectile.TargetPosition -
                 transform.Position;
 
-            _queuedVfx.Add(
+            QueueVfx(
                 new QueuedVfxInstance(
                     kind,
                     new RenderTransform(
@@ -1286,7 +1289,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 continue;
             }
 
-            _queuedVfx.Add(
+            QueueVfx(
                 new QueuedVfxInstance(
                     effect.Kind,
                     effect.Transform, 0x8000_0000_0000_0000UL | (uint)(index + 1), effect.Generation, false, effect.SpawnedAtTick.Value));
@@ -1479,6 +1482,32 @@ public sealed class PresentationExtractor : ISimulationTickObserver
             supply;
     }
 
+    private void QueueVfx(in QueuedVfxInstance effect)
+    {
+        if (_queuedVfx.Count < MaximumSnapshotEffects) _queuedVfx.Add(effect);
+        else _droppedQueuedVfx++;
+    }
+
+    private void QueueIndustrialVfx(EntityRegistry entities, EntityId entity, in WorldTransform transform,
+        in BuildingFeaturePresentationMetadata building)
+    {
+        bool working = entities.TryGetComponent(entity, out ProductionFacility production) && production.Status == ProductionStatus.Running ||
+            entities.TryGetComponent(entity, out UnitProductionFacility unitProduction) && unitProduction.Status == UnitProductionStatus.Running;
+        if (!IndustrialEffectPreset.TryResolve(building, working, out var preset)) return;
+        Vector3 position = transform.Position + Vector3.Transform(new Vector3(0, MathF.Abs(transform.Scale.Y) * .8f, 0), transform.Rotation);
+        if (_runtimeAssets is not null && BuildingPresentationCatalog.TryGet(building.Building, out var definition) &&
+            _runtimeAssets.TryGet(AssetId.Parse(definition.MeshAssetId), out RuntimeAssetRecord? record) && record is not null)
+        {
+            foreach (var socket in record.Sockets)
+                if (socket.Name == preset.Socket)
+                {
+                    position = transform.Position + Vector3.Transform(new Vector3(socket.X, socket.Y, socket.Z) * transform.Scale, transform.Rotation);
+                    break;
+                }
+        }
+        QueueAt(preset.Effect, position, entity);
+    }
+
     private void QueueAt(
         VfxEffectKind kind,
         Vector3 position,
@@ -1488,7 +1517,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
             VfxPresentationCatalog.Get(
                 kind);
 
-        _queuedVfx.Add(
+        QueueVfx(
             new QueuedVfxInstance(
                 kind,
                 new RenderTransform(

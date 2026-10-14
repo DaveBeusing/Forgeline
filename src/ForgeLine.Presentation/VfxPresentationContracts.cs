@@ -44,7 +44,9 @@ public enum VfxEffectKind : byte
     LogisticsResourceTransfer = 33,
     LogisticsSupplyTransfer = 34,
     LogisticsRefuel = 35,
-    LogisticsRearm = 36
+    LogisticsRearm = 36,
+    IndustrialSteam = 37,
+    IndustrialWelding = 38
 }
 
 public readonly record struct VfxPresentationDefinition(
@@ -59,7 +61,7 @@ public readonly record struct VfxPresentationDefinition(
 {
     public void Validate()
     {
-        if (Kind == VfxEffectKind.None)
+        if (Kind == VfxEffectKind.None || !Enum.IsDefined(Kind))
         {
             throw new InvalidOperationException(
                 "VFX definitions require a concrete effect kind.");
@@ -125,7 +127,11 @@ public readonly record struct VfxPresentationMetrics(
     int PoolCapacity,
     ulong TotalSpawned,
     ulong TotalReused,
-    ulong TotalDropped);
+    ulong TotalDropped)
+{
+    public int PublishedEffects { get; init; }
+    public int DiscardedSnapshotEffects { get; init; }
+}
 
 public static class VfxPresentationCatalog
 {
@@ -620,6 +626,11 @@ public static class VfxPresentationCatalog
         AddLogistics(
             VfxEffectKind.LogisticsRearm,
             "vfx.logistics.rearm");
+
+        Add(VfxEffectKind.IndustrialSteam, "vfx.combat.persistent.light_smoke", "material.vfx.smoke",
+            new Vector3(1.2f), 12, 700, new Vector4(.78f, .82f, .84f, .2f));
+        Add(VfxEffectKind.IndustrialWelding, "vfx.combat.persistent.sparks", "material.vfx.spark",
+            new Vector3(.6f), 4, 320, new Vector4(.7f, .85f, 1, .6f), true);
 
         foreach (VfxPresentationDefinition definition in
                  result.Values)

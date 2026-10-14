@@ -23,7 +23,7 @@ public sealed class ParticleVfxRenderer : IDisposable
     private readonly SceneLightingSettings _lighting;
     private readonly GpuParticleRenderer? _renderer;
     private readonly bool _linearOutput;
-    private readonly bool[] _available = new bool[37];
+    private readonly bool[] _available = new bool[Enum.GetValues<VfxEffectKind>().Max(static kind => (int)kind) + 1];
     private readonly GraphicsParticle[] _particles;
     private readonly Candidate[] _candidates = new Candidate[EmitterCapacity];
     private readonly Dictionary<EffectKey, int> _emitters = new(EmitterCapacity);
