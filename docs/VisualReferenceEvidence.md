@@ -102,3 +102,7 @@ Selected full-resolution PNGs retain their original pixels. Timing measures a co
 HUD-only clear/overlay/text GPU frame without a world; CPU duration includes waits/Present.
 Existing reference captures retain their original snapshots and fingerprints for direct
 before/after comparisons. See [HUD qualification](BattlefieldHudQualification.md).
+
+## Adaptive command dock
+
+Version 0.1.367 introduces --command-dock-reference and --command-dock-capture. Authored copied-state inspection cases do not represent naturally played matches. The new command-dock-geometry.json is an implementation-reviewed geometry candidate; the old gameplay-ui-geometry.json is retained. Neither is an accepted native pixel golden. See [CommandDockQualification](CommandDockQualification.md).

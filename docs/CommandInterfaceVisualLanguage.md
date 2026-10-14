@@ -101,3 +101,7 @@ and semantic marker sources are preserved. Tooltips fit available width and heig
 
 No reviewed command fixture or accepted pixel golden is regenerated. New captures are
 review evidence, not automatic golden approval. See [HUD qualification](BattlefieldHudQualification.md).
+
+## Adaptive command dock
+
+Dock hierarchy: mode tabs, selected context, card title, availability/work status, captured quantities and progress, six rebound-key controls. Explicit operation labels replace ACT. LAST accepted/rejected feedback never promises production/delivery/research completion. Compact dock content fits its existing region without changing other HUD panels.

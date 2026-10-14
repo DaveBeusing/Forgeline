@@ -116,3 +116,7 @@ Primary/advanced action controls wait until copied tactical selection identities
 ## Configurable keyboard controls
 
 The keys described above are defaults. Settings can rebind mode, next-item, primary/secondary setting, decrease/increase, activation and cancel-job actions. Cards and controls help use the same session registry. Dock navigation intentionally takes precedence over camera movement while the panel owns keyboard focus; global shortcuts cannot be explicitly rebound onto camera keys. Escape remains fixed. See [complete conflict and migration rules](GameplayInputAccessibilityAndQualification.md).
+
+## Adaptive command dock
+
+All seven modes now use two-column status cards and a two-row footer. Build shows costs/deposit requirements; Process inputs/outputs/queue state; Units costs/technology/queue progress; Logistics stock thresholds/transport context; Supply automatic policy and explicit supply requests; Combat eligibility/target intent; Technology facility/prerequisites/costs/research progress. Captured active work alone has progress. Primary controls name the existing operation. Pending copied commands and matching local contextual requests disable dispatch controls; navigation remains available. Authoritative validation still decides acceptance.

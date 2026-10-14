@@ -287,3 +287,7 @@ Only populated cards capture pointer origins/current positions; gaps, empty rows
 area right of a card do not open Operations or block world selection. A held card press
 retains ownership until release, with existing identity/session/layout revalidation.
 Informational command result cards remain non-actionable.
+
+## Adaptive command dock
+
+The selected card determines the visible dock page. Rebound NextItem, wheel and header arrows navigate without simulation requests. Rendering, pointer hits and hover share the visible window; hidden cards cannot be clicked. Wheel suppresses simultaneous clicks. Collapsed ownership follows the visible strip. Existing session/tick/selection/terminal guards remain in force.
