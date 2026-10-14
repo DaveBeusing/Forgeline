@@ -46,10 +46,8 @@ public sealed class FrontendLayoutHardeningTests
             FrontendDesign.FitText(
                 "CENTRAL-DIVIDE-SAVE-WITH-A-VERY-LONG-NAME");
 
-        Assert.Equal(
-            FrontendDesign.MaximumDetailTextLength,
-            value.Length);
-        Assert.EndsWith("...", value, StringComparison.Ordinal);
+        Assert.True(ForgeLine.Presentation.UiFontMetrics.Default.Measure(value, 22) <= FrontendDesign.MaximumDetailTextLength * 13f);
+        Assert.EndsWith("…", value, StringComparison.Ordinal);
     }
 
     [Fact]

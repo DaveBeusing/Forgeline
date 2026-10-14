@@ -15,6 +15,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
     private const float GlyphAdvance = 18.0f;
 
     private readonly IGraphicsDevice _graphics;
+    private readonly UiTextBatch _text;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers = new(4);
     private OverlayVertex[] _vertices = new OverlayVertex[MaxVertices];
@@ -29,8 +30,10 @@ public sealed class FrontendOverlayRenderer : IDisposable
         ArgumentNullException.ThrowIfNull(graphics);
         _graphics = graphics;
         _pipeline = CreatePipeline(graphics);
+        _text = new UiTextBatch(graphics);
     }
 
+    public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
     public int LastRenderedVertexCount { get; private set; }
 
     public void Render(
@@ -39,6 +42,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
         float userScale = 1.0f)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
+        _text.Begin();
         ArgumentNullException.ThrowIfNull(context);
 
         // Studio playback has its own compositor; the overlay must never add old branding.
@@ -61,7 +65,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
             context.Width / 1920f,
             context.Height / 1080f);
         float scale = Math.Min(
-            viewportScale * (view.Kind == FrontendSurfaceKind.Controls ? Math.Min(userScale, 1f) : userScale),
+            viewportScale * Math.Min(userScale, 1f),
             2.0f);
         float offsetX =
             MathF.Max(
@@ -201,7 +205,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
                     $"VERSION {view.ProductVersion}";
                 float versionX =
                     (1920f - 48f -
-                     versionLabel.Length * GlyphAdvance) * scale;
+                     (_text.Ready ? UiFontMetrics.Default.Measure(versionLabel, UiTypography.Style(UiTextRole.MenuItem).Size) : versionLabel.Length * GlyphAdvance)) * scale;
 
                 EmitText(
                     versionLabel,
@@ -247,7 +251,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
                         ? ForgeLineUiPalette.Accent
                         : ForgeLineUiPalette.TextPrimary;
                 float valueScale = controls
-                    ? MathF.Min(scale, 1370f * scale / MathF.Max(1f, line.Value.Length * GlyphAdvance))
+                    ? MathF.Min(scale, 1370f * scale / MathF.Max(1f, (_text.Ready ? UiFontMetrics.Default.Measure(line.Value, UiTypography.Style(UiTextRole.MenuItem).Size) : line.Value.Length * GlyphAdvance)))
                     : scale;
                 EmitText(line.Label, 112 * scale, y, controls
                     ? ForgeLineUiPalette.TextSecondary
@@ -291,7 +295,8 @@ public sealed class FrontendOverlayRenderer : IDisposable
         context.SetPipeline(_pipeline);
         context.SetVertexBuffer(buffer, VertexStride);
         context.Draw(_vertexCount);
-        LastRenderedVertexCount = _vertexCount;
+        _text.Render(context);
+        LastRenderedVertexCount = _vertexCount + _text.VertexCount;
     }
 
     public void Dispose()
@@ -299,6 +304,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
         if (_disposed) return;
         foreach (IGraphicsBuffer buffer in _vertexBuffers.Values) buffer.Dispose();
         _vertexBuffers.Clear();
+        _text.Dispose();
         _pipeline.Dispose();
         _disposed = true;
     }
@@ -484,6 +490,9 @@ public sealed class FrontendOverlayRenderer : IDisposable
 
     private void EmitText(string text, float x, float y, Vector4 color, int width, int height, float scale)
     {
+        if (_text.Add(text, x + _offsetX, y + _offsetY, UiTypography.Style(text == "FORGELINE" ? UiTextRole.CommandTitle : UiTextRole.MenuItem).Size * scale, color, width, height,
+            bold: text == "FORGELINE")) return;
+
         float cursor = x;
         foreach (char character in text.ToUpperInvariant())
         {

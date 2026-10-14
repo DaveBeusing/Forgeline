@@ -1,3 +1,5 @@
+using ForgeLine.Presentation;
+
 namespace ForgeLine.UI;
 
 public static class FrontendDesign
@@ -43,12 +45,11 @@ public static class FrontendDesign
         ArgumentNullException.ThrowIfNull(value);
         ArgumentOutOfRangeException.ThrowIfLessThan(maximumLength, 4);
 
-        return value.Length <= maximumLength
-            ? value
-            : string.Concat(
-                value.AsSpan(0, maximumLength - 3),
-                "...");
+        return FitText(value, maximumLength * 13f, UiTypography.Style(UiTextRole.MenuItem).Size);
     }
+
+    public static string FitText(string value, float maximumWidth, float fontSize, bool bold = false)
+        => UiFontMetrics.Default.Fit(value, maximumWidth, fontSize, bold);
 
     public static float ResolveScale(float viewportWidth, float viewportHeight, float userScale = 1f)
     {
@@ -57,7 +58,7 @@ public static class FrontendDesign
         ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(userScale, 0f);
 
         var viewportScale = MathF.Min(viewportWidth / ReferenceWidth, viewportHeight / ReferenceHeight);
-        return Math.Min(viewportScale * userScale, MaximumScale);
+        return Math.Min(Math.Min(viewportScale * userScale, viewportScale), MaximumScale);
     }
 }
 
