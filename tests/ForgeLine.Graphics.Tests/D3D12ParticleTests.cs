@@ -7,6 +7,49 @@ namespace ForgeLine.Graphics.Tests;
 
 public sealed class D3D12ParticleTests
 {
+    [Fact]
+    public void PerspectiveDepthUsesPositiveAsymptoteAndRetainsVisibleForegroundParticles()
+    {
+        using var platform = new WindowsPlatform();
+        using IWindow window = platform.CreateWindow(new WindowConfiguration("FORGELINE Perspective Particle Depth", 320, 240));
+        using var graphics = (D3D12GraphicsDevice)GraphicsDeviceFactory.CreateForWindow(window,
+            new() { ForceSoftwareAdapter = true, EnableDebugLayer = false, EnableVSync = false });
+        using var renderer = new GpuParticleRenderer(graphics, 512);
+        Matrix4x4 projection = Matrix4x4.CreatePerspectiveFieldOfView(MathF.PI / 3, 320f / 240, .25f, 1000);
+        Matrix4x4 view = Matrix4x4.CreateLookAt(new(0, 0, 10), Vector3.Zero, Vector3.UnitY);
+        Vector4 plane = Vector4.Transform(new Vector4(0, 0, -20, 1), projection);
+        float depth = plane.Z / plane.W;
+        var compiler = new DxcShaderCompiler();
+        var vertex = compiler.Compile("""
+            float4 VSMain(uint id : SV_VertexID) : SV_Position {
+                float2 uv = float2((id<<1)&2,id&2);
+                return float4(uv*float2(2,-2)+float2(-1,1),PLANE_DEPTH,1);
+            }
+            """.Replace("PLANE_DEPTH", depth.ToString("R", System.Globalization.CultureInfo.InvariantCulture)),
+            GraphicsShaderStage.Vertex, "VSMain", "PerspectiveParticlePlane.hlsl");
+        var pixel = compiler.Compile("float4 PSMain() : SV_Target0 { return float4(.1,.2,.3,1); }",
+            GraphicsShaderStage.Pixel, "PSMain", "PerspectiveParticlePlanePixel.hlsl");
+        using var opaque = graphics.CreateGraphicsPipeline(new(vertex, pixel) { DepthEnabled = true, CullMode = GraphicsCullMode.None });
+        byte[] Capture(float projectionA)
+        {
+            GraphicsParticle[] particles = [new(new(0, 0, 0, .25f), new(0, 0, 0, 1), new(0, 1, 0, 1), new(1, 0, 2, 0))];
+            return graphics.CaptureFrame(GraphicsColor.ForgeLineClear, context =>
+            {
+                context.SetPipeline(opaque); context.Draw(3);
+                renderer.Render(context, particles, view * projection, Vector3.UnitX, Vector3.UnitY,
+                    projectionA, projection.M43, 1, false, false);
+                context.BeginPass(GraphicsFramePass.Overlay);
+            });
+        }
+        byte[] incorrect = Capture(projection.M33);
+        byte[] correct = Capture(-projection.M33);
+        var surface = graphics.Diagnostics.Surface;
+        int center = (surface.Height / 2 * surface.Width + surface.Width / 2) * 4;
+        Assert.True(correct[center + 1] > incorrect[center + 1] + 50);
+        Assert.Equal(correct, Capture(-projection.M33));
+        Assert.Equal(0, graphics.Diagnostics.Resources.TextureBindingFailureCount);
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]

@@ -202,7 +202,7 @@ public sealed class ParticleVfxRenderer : IDisposable
         CameraMatrices matrices = camera.GetMatrices(context.Width,context.Height);
         Matrix4x4.Invert(matrices.View,out var inverse);
         _renderer.Render(context,Particles,matrices.ViewProjection,new(inverse.M11,inverse.M12,inverse.M13),
-            new(inverse.M21,inverse.M22,inverse.M23),matrices.Projection.M33,matrices.Projection.M43,
+            new(inverse.M21,inverse.M22,inverse.M23),-matrices.Projection.M33,matrices.Projection.M43,
             _lighting.Exposure,_lighting.ToneMapping == SceneToneMappingMode.AcesFitted,_linearOutput);
         Diagnostics = Diagnostics with { DrawCalls = 1 };
     }

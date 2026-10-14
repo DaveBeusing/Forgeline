@@ -13,6 +13,19 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class ParticleVfxRendererTests : IDisposable
 {
+    [Fact]
+    public void ProductionPerspectiveCallerPublishesPositiveDepthAsymptote()
+    {
+        using var device = new Device();
+        using var renderer = new ParticleVfxRenderer(device, _catalog);
+        var camera = new RtsCamera(new() { InitialTarget = Vector3.Zero, InitialDistance = 120 });
+        renderer.Prepare(World([Effect(1, VfxEffectKind.ExplosionBuilding)]), camera, 1280, 720, .1);
+        var context = new Context();
+        renderer.Render(context, camera);
+        Assert.Equal(-camera.GetMatrices(1280, 720).Projection.M33, context.DepthAsymptote);
+        Assert.True(context.DepthAsymptote > 1);
+    }
+
     private readonly string _root = Path.Combine(Path.GetTempPath(),"forgeline-particle-contract-"+Guid.NewGuid().ToString("N"));
     private readonly RuntimeAssetCatalog _catalog;
     public ParticleVfxRendererTests()
@@ -251,11 +264,11 @@ public sealed class ParticleVfxRendererTests : IDisposable
     }
     private sealed class Context : IGraphicsCommandContext
     {
-        public int Width=>1280;public int Height=>720;public int FrameIndex=>0;public int Draws { get; private set; } public bool ParticlePassEnded { get; private set; }
+        public int Width=>1280;public int Height=>720;public int FrameIndex=>0;public int Draws { get; private set; } public bool ParticlePassEnded { get; private set; } public float DepthAsymptote { get; private set; }
         public void BeginParticlePass() { } public void EndParticlePass()=>ParticlePassEnded=true;
         public void SetViewport(float x,float y,float width,float height) { } public void SetScissor(int left,int top,int right,int bottom) { }
         public void SetPipeline(IGraphicsPipeline pipeline) { } public void SetVertexBuffer(IGraphicsBuffer buffer,int strideInBytes,int offsetInBytes=0,int inputSlot=0) { }
-        public void SetIndexBuffer(IGraphicsBuffer buffer,GraphicsIndexFormat format,int offsetInBytes=0) { }public void SetVertexConstants(ReadOnlySpan<float> values) { }
+        public void SetIndexBuffer(IGraphicsBuffer buffer,GraphicsIndexFormat format,int offsetInBytes=0) { }public void SetVertexConstants(ReadOnlySpan<float> values) { DepthAsymptote = values[24]; }
         public void Draw(int count,int startVertex=0) { }public void DrawIndexed(int count,int startIndex=0,int baseVertex=0) { }
         public void DrawIndexedInstanced(int count,int instances,int startIndex=0,int baseVertex=0,int startInstance=0)=>Draws++;
     }
