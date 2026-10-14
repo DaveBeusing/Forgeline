@@ -49,3 +49,8 @@ remain unchanged. See [title resource lifecycle](CinematicFrontend.md).
 Optional interface cues have a separate one-voice owner, separate packaged PCM files
 and software gain. Interface mute/volume and reduced UI motion do not alter the studio
 stream or its existing skip policy. See [UI motion/audio lifecycle](UiMotionAndAudio.md).
+
+When the studio audio device closes, it restores the gain captured at opening.
+This prevents its final fade from muting later legacy UI streams on devices with
+shared process gain. The existing content, fade curve, minimum skip interval and
+video timing remain unchanged.

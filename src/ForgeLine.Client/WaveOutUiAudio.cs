@@ -17,6 +17,7 @@ internal sealed class WaveOutUiAudio : IUiAudioOutput
 
     internal bool Available => _device != IntPtr.Zero && !_failed && !_disposed;
     internal bool OwnsNativeResources => _device != IntPtr.Zero || _data != IntPtr.Zero || _header != IntPtr.Zero;
+    internal uint? DeviceVolume => _device != IntPtr.Zero && waveOutGetVolume(_device, out uint volume) == 0 ? volume : null;
     internal WaveOutUiAudio(string? assetRoot = null) => _assetRoot = assetRoot;
 
     internal void Update(UiAudioCue cue, in UiFeedbackSettings settings, TimeSpan now, bool active)
@@ -127,4 +128,5 @@ internal sealed class WaveOutUiAudio : IUiAudioOutput
     [DllImport("winmm.dll", ExactSpelling = true)] private static extern uint waveOutWrite(IntPtr device, IntPtr header, uint size);
     [DllImport("winmm.dll", ExactSpelling = true)] private static extern uint waveOutReset(IntPtr device);
     [DllImport("winmm.dll", ExactSpelling = true)] private static extern uint waveOutClose(IntPtr device);
+    [DllImport("winmm.dll", ExactSpelling = true)] private static extern uint waveOutGetVolume(IntPtr device, out uint volume);
 }

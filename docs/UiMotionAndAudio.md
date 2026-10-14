@@ -67,6 +67,12 @@ unprepares and closes the output before releasing native buffers, following the
 [Windows reset](https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutreset)
 and [buffer lifetime](https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-waveoutunprepareheader) contracts.
 
+The existing studio stream retains its playback/fade/skip behavior and now restores
+the gain observed when it opened before closing. On the qualified Windows device,
+changing one legacy stream's volume also changed a second stream's reported gain.
+Restoration prevents the studio fade from leaving later interface cues muted. The
+native probe verifies this interoperation without repurposing the studio clip.
+
 The four stereo 48 kHz PCM16 cues are original mathematical synthesis with no sampled
 or third-party recordings: navigation 35 ms, intent 55 ms, accepted 95 ms, rejected
 110 ms. Total PCM payload is 56,640 bytes. Their CC0 notice is in

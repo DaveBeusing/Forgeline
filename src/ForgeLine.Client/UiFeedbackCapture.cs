@@ -138,6 +138,19 @@ internal static class UiFeedbackCapture
                 sound.Add(new { Cue = cue.ToString(), Played = played, BusyDropped = busyDropped, RestartedAfterStop = restarted });
             }
             bool audioAvailable = audio.Available;
+            uint? beforeIntro = audio.DeviceVolume;
+            uint? duringIntro = null;
+            uint? afterIntro = null;
+            if (beforeIntro.HasValue)
+            {
+                using (var intro = new StudioSplashAudio())
+                {
+                    intro.Update(0, 0);
+                    duringIntro = audio.DeviceVolume;
+                }
+                afterIntro = audio.DeviceVolume;
+                if (afterIntro != beforeIntro) throw new InvalidOperationException("Studio fade left the shared audio gain changed.");
+            }
             audio.Dispose();
             if (audio.OwnsNativeResources) throw new InvalidOperationException("Audio driver did not release its buffers.");
             graphics.WaitForIdle();
@@ -147,7 +160,10 @@ internal static class UiFeedbackCapture
                 Source = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
                 Device = graphics.Diagnostics.Device, WindowDpi = window.Dpi, Fixture = scene.Fingerprint,
                 Contract = "Injected presentation clock, authored copied dock state and frozen battlefield; no requests dispatched. Native rates are sampling inputs, not sustained client FPS. Submit includes waits/Present. Short sequential cohorts are observational. Physical-monitor and human motion/sound acceptance remain separate.",
-                Cases = results, Sound = sound, AudioAvailable = audioAvailable, AudioReleased = !audio.OwnsNativeResources
+                Cases = results, Sound = sound, AudioAvailable = audioAvailable, AudioReleased = !audio.OwnsNativeResources,
+                StudioVolumeBefore = beforeIntro, StudioVolumeDuringMute = duringIntro,
+                StudioVolumeAfter = afterIntro, StudioMuteObserved = duringIntro == 0,
+                StudioVolumeRestored = beforeIntro.HasValue && afterIntro == beforeIntro
             }, s_json));
             return 0;
         }
