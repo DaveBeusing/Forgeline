@@ -1,0 +1,73 @@
+using ForgeLine.Game;
+using ForgeLine.Presentation;
+using ForgeLine.UI;
+using Xunit;
+
+namespace ForgeLine.Client.Tests;
+
+public sealed class UiReferenceScenarioTests
+{
+    [Fact]
+    public void NamedMatrixRejectsUnsupportedOrAmbiguousInputsBeforeNativeStartup()
+    {
+        var request = new VisualReferenceCaptureRequest { OutputRoot = "unused", RuntimeRoot = "unused", Commit = new('a', 40),
+            UiScenarios = [UiReferenceScenario.Menu], Scenes = [VisualReferenceSceneKind.BattlefieldCombat],
+            Zooms = [RtsReferenceZoom.NormalGameplay], Displays = [new(1280, 720)], UiScales = [.75f, 1, 2] };
+        request.Validate();
+        Assert.Throws<ArgumentException>(() => (request with { UiScenarios = [UiReferenceScenario.Menu, UiReferenceScenario.Menu] }).Validate());
+        Assert.Throws<ArgumentException>(() => (request with { UiScenarios = [(UiReferenceScenario)255] }).Validate());
+        Assert.Throws<ArgumentException>(() => (request with { UiScales = [float.NaN] }).Validate());
+        Assert.Throws<ArgumentException>(() => (request with { UiScales = [1, 1] }).Validate());
+        Assert.Throws<ArgumentException>(() => (request with { CameraPath = ReferenceCameraPath.Traverse }).Validate());
+        Assert.Throws<ArgumentException>(() => (request with { Scenes = [VisualReferenceSceneKind.IndustrialBase] }).Validate());
+        Assert.Throws<ArgumentException>(() => (request with { UiScenarios = [UiReferenceScenario.World] }).Validate());
+    }
+
+    [Fact]
+    public void FrontendStatesUseSharedBoundedInputRegionsAcrossAcceptanceMatrix()
+    {
+        foreach (var d in new[] { (1280,720), (1920,1080), (2560,1440), (3440,1440), (3840,2160) })
+        foreach (uint dpi in new uint[] {96,144,192})
+        foreach (float scale in new[] {.75f,1,2})
+        foreach (var state in Enum.GetValues<UiReferenceScenario>().Where(UiReferenceStates.IsFrontend))
+        {
+            var view = UiReferenceStates.Frontend(state, d.Item1, d.Item2, dpi, scale);
+            var g = view.Layout!.Value;
+            var layout = FrontendDesign.ResolveLayout(d.Item1, d.Item2, scale, dpi, view.Kind == FrontendSurfaceKind.Controls);
+            for (int i = 0; i < view.MenuEntries.Count; i++)
+            {
+                var r = g.MenuRow(i);
+                Assert.True(r.X >= 0 && r.Right <= d.Item1 && r.Y >= 0 && r.Bottom <= d.Item2);
+                Assert.True(r.Contains(r.X + 1, r.Y + 1));
+                Assert.False(r.Contains(r.Right, r.Y + 1));
+            }
+            for (int i = 0; i < Math.Min(view.DetailLines.Count, g.VisibleDetailRows); i++)
+            {
+                var r = g.DetailRow(i);
+                Assert.Equal(i, FrontendHitTesting.DetailRow(r.X + 1, r.Y + 1, layout, view.DetailLines.Count));
+                Assert.True(r.Bottom < g.PrimaryAction.Y);
+            }
+            Assert.True(g.PrimaryAction.Right <= d.Item1 && g.Feedback.Bottom <= d.Item2);
+        }
+        Assert.Empty(UiReferenceStates.Frontend(UiReferenceScenario.LoadBroken,1920,1080,96,1).PrimaryAction);
+        Assert.Contains(UiReferenceStates.Frontend(UiReferenceScenario.MenuDisabled,1920,1080,96,1).MenuEntries,x=>!x.IsEnabled);
+    }
+
+    [Fact]
+    public void HudStatesRetainOriginalIntelligenceAndWorldWithoutIssuingCommands()
+    {
+        var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+        var original = VisualReferenceScene.Create(VisualReferenceSceneKind.BattlefieldCombat, terrain).Snapshot;
+        foreach (var state in Enum.GetValues<UiReferenceScenario>().Where(x => !UiReferenceStates.IsFrontend(x)))
+        {
+            var (snapshot, panel) = UiReferenceStates.Hud(original,state,1920,1080,96,1);
+            Assert.Same(original.Intelligence,snapshot.Intelligence);
+            Assert.True(original.Instances.SequenceEqual(snapshot.Instances));
+            Assert.Equal(original.SessionId,snapshot.SessionId);
+            Assert.Equal(original.Tick,snapshot.Tick);
+            if (state == UiReferenceScenario.DockPending) Assert.True(panel.ContextualPending);
+            if (state == UiReferenceScenario.DockRejected) Assert.Equal(PlayerCommandFeedbackState.Rejected,snapshot.PlayerExperience!.Value.Feedback.State);
+            if (state == UiReferenceScenario.DockAccepted) Assert.Equal(PlayerCommandFeedbackState.Accepted,snapshot.PlayerExperience!.Value.Feedback.State);
+        }
+    }
+}

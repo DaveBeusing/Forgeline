@@ -137,7 +137,7 @@ internal static class BattlefieldHudCapture
             GpuSamples = gpu.Count, GpuP50Milliseconds = gpu.Count > 0 ? (double?)gpu[gpu.Count / 2] : null };
     }
 
-    private static PresentationSnapshot State(PresentationSnapshot source, string state)
+    internal static PresentationSnapshot State(PresentationSnapshot source, string state)
     {
         // These are explicit inspection inputs from permitted read-model fields, not newly inferred
         // gameplay facts. World intelligence and instances remain the canonical fixture's copies.

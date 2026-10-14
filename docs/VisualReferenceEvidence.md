@@ -1,5 +1,15 @@
 # Native visual reference evidence
 
+Named UI requests extend this same capture lane with `uiScenarios`, `uiScales` and
+`cinematicFrontend`. The default remains `World`; existing world fixture files and
+fingerprints are retained. UI requests use the fixed BattlefieldCombat normal-zoom
+fixture (MinimapStrategic selects the strategic camera explicitly). They support
+1280x720 in addition to the four original output sizes. Each UI row records the
+named state, layout owner, text completion, bounded region pixel hashes and vertex
+count. These are authored permitted read models; no input or command is dispatched.
+The manifest includes client/presentation assembly hashes. Region pixel equality
+detects change; nonuniform pixels alone do not establish semantic visibility.
+
 The optional capture lane extends Invoke-RtsReferenceQualification.ps1 and the production client's explicit D3D12 readback. Normal gameplay frames never allocate a capture target, copy pixels or serialize evidence. Immutable reference snapshots are produced after 32 completed extraction ticks with seed2026. These are authored presentation acceptance fixtures, not a balance preset or a running full-match performance benchmark.
 
 Six states share the canonical Central Divide terrain and committed world objects: untouched daylight, an operational industrial asset layout, mixed formation/convoy, the authored first crossing and logistics corridor, damaged/wreck units and a critical factory, and a combat-effects layout with identified and hidden foreign units. Existing intelligence/sensor/extraction contracts filter foreign units; persistent damage/wreck effects use the existing presentation extractor. Combat bursts at known visible positions are explicitly authored effects. Resource/power HUD values are fixed fixture data. No gameplay content, inventories, production rates or combat rules change.
