@@ -113,6 +113,32 @@ internal static class UiTypographyCapture
                     }
             }
             graphics.WaitForIdle();
+            graphics.Resize(1920,1080);
+            using var bitmap = new FrontendOverlayRenderer(new BitmapComparisonDevice(graphics));
+            var nativeComparison = new[] { Measure(bitmap,false),Measure(frontend,true) };
+            object Measure(FrontendOverlayRenderer renderer,bool atlas)
+            {
+                void Record(IGraphicsCommandContext c) { c.BeginPass(GraphicsFramePass.Overlay);renderer.Render(c,menu); }
+                for(int i=0;i<32;i++) graphics.RenderFrame(GraphicsColor.ForgeLineClear,Record);
+                var cpu=new List<double>(64);var gpu=new List<double>(64);ulong fence=0;
+                for(int i=0;i<64;i++)
+                {
+                    long started=Stopwatch.GetTimestamp();graphics.RenderFrame(GraphicsColor.ForgeLineClear,Record);
+                    cpu.Add(Stopwatch.GetElapsedTime(started).TotalMicroseconds);
+                    AddGpu();
+                }
+                graphics.WaitForIdle();AddGpu();cpu.Sort();gpu.Sort();
+                void AddGpu()
+                {
+                    var diagnostics=graphics.Diagnostics;
+                    if(diagnostics.Frame is {} frame && frame.GpuSubmissionFence>fence && diagnostics.GpuFrameMilliseconds is {} ms)
+                    { fence=frame.GpuSubmissionFence;gpu.Add(ms); }
+                }
+                return new { Atlas=atlas,Width=1920,Height=1080,Warmups=32,Samples=64,
+                    Vertices=renderer.LastRenderedVertexCount,SubmitP50Microseconds=cpu[32],SubmitP95Microseconds=cpu[60],
+                    GpuSamples=gpu.Count,GpuP50Milliseconds=gpu.Count>0?(double?)gpu[gpu.Count/2]:null,
+                    GpuP95Milliseconds=gpu.Count>0?(double?)gpu[(int)((gpu.Count-1)*.95)]:null };
+            }
             if (graphics.Diagnostics.Health.SubmissionFaultCount != 0) throw new InvalidDataException("Native graphics submission failed.");
             File.WriteAllText(Path.Combine(output, "qualification.json"), JsonSerializer.Serialize(new
             {
@@ -122,10 +148,25 @@ internal static class UiTypographyCapture
                 AtlasResidentBytes = 2048 * 4096,
                 DpiContract = "Requested HUD layout DPI sampling; this is not a physical monitor DPI certification.",
                 TimingContract = "Capture readback timing includes GPU waits; it is not an isolated text GPU benchmark.",
+                NativeComparison = nativeComparison,
+                NativeComparisonContract = "Controlled 1080p menu: complete clear/overlay GPU frame; submit duration includes waits/Present; no world. Same device and view, bitmap debug backend versus atlas.",
                 Cases = results
             }, s_json));
             return 0;
         }
         catch (Exception error) { Console.Error.WriteLine($"[typography:failure] {error.GetType().Name}: {error.Message}"); return 1; }
     }
+    private sealed class BitmapComparisonDevice(IGraphicsDevice graphics) : IGraphicsDevice
+    {
+        public bool SupportsUiText => false;
+        public GraphicsDiagnostics Diagnostics => graphics.Diagnostics;
+        public IGraphicsPipeline CreateGraphicsPipeline(GraphicsPipelineDescription description) => graphics.CreateGraphicsPipeline(description);
+        public IGraphicsBuffer CreateBuffer(GraphicsBufferDescription description) => graphics.CreateBuffer(description);
+        public IGraphicsTexture CreateTexture(GraphicsTextureData data) => graphics.CreateTexture(data);
+        public void RenderFrame(GraphicsColor color,Action<IGraphicsCommandContext>? record=null) => graphics.RenderFrame(color,record);
+        public void Resize(int width,int height) => graphics.Resize(width,height);
+        public void WaitForIdle() => graphics.WaitForIdle();
+        public void Dispose() { }
+    }
+
 }

@@ -25,6 +25,19 @@ public sealed class UiTypographyNativeTests
         Assert.Equal(0, frontend.TextDiagnostics.MissingGlyphs); Assert.Equal(0, frontend.TextDiagnostics.DroppedGlyphs);
         Assert.Equal(6 * frontend.TextDiagnostics.Glyphs, frontend.TextDiagnostics.Vertices);
         Assert.Contains(first, x => x > 200);
+        Assert.Equal(1, text.Diagnostics.MissingGlyphs);
+        byte[] isolated = graphics.CaptureFrame(new GraphicsColor(0,0,0,1), c =>
+        {
+            text.Begin(); text.Add("AV ÄÖÜ äöü ß 0123456789",50,50,24,Vector4.One,c.Width,c.Height);
+            text.Render(c);
+        });
+        int antialiased = 0, solid = 0;
+        for (int i=0;i<isolated.Length;i+=4)
+        {
+            if (isolated[i] is >0 and <255) antialiased++;
+            if (isolated[i]==255) solid++;
+        }
+        Assert.True(antialiased>100); Assert.True(solid>100);
         Assert.Equal(0, graphics.Diagnostics.Health.SubmissionFaultCount);
         byte[] Capture() => graphics.CaptureFrame(GraphicsColor.ForgeLineClear, c =>
         {

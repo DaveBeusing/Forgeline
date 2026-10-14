@@ -67,6 +67,16 @@ public sealed class UiTextBatchTests
         Assert.All(device.Pipelines, p => Assert.True(p.Disposed));
         Assert.False(batch.Add("Error", 0, 0, 12, Vector4.One, 1280, 720));
     }
+    [Fact]
+    public void FontFailureShowsAnActionableBitmapMessageWithoutReplacingInputGeometry()
+    {
+        using var device=new Device { FailTexture=true };
+        using var frontend=new FrontendOverlayRenderer(device);
+        frontend.Render(new RecordingContext(),FrontendSurfaceView.MainMenu([]));
+        Assert.False(frontend.TextDiagnostics.AtlasReady);
+        Assert.Contains(MemoryMarshal.Cast<byte,SelectionOverlayRenderingTests.Vertex>(device.Buffers[^1].Bytes).ToArray(),
+            v=>v.Color==ForgeLineUiPalette.Warning && v.Position.Y<-.9f);
+    }
     [StructLayout(LayoutKind.Sequential)] private readonly record struct Vertex(Vector2 Position, Vector4 Color, Vector2 Uv);
     private sealed class Device : IGraphicsDevice
     {

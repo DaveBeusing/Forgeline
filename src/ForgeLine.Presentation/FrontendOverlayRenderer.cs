@@ -85,6 +85,10 @@ public sealed class FrontendOverlayRenderer : IDisposable
         RenderBackdrop(context.Width, context.Height, scale, view.Kind);
         RenderHeader(context.Width, context.Height, scale, view.Kind);
 
+        if (_graphics.SupportsUiText && !_text.Ready)
+            EmitText("UI FONT ERROR - REINSTALL FORGELINE", 94 * scale, 1034 * scale,
+                ForgeLineUiPalette.Warning, context.Width, context.Height, .8f * scale);
+
         if (view.Kind == FrontendSurfaceKind.Loading)
         {
             EmitText("INITIALIZING COMMAND SYSTEMS", 94 * scale, 850 * scale, ForgeLineUiPalette.TextSecondary, context.Width, context.Height, scale);
