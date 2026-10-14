@@ -12,7 +12,7 @@ namespace ForgeLine.Client;
 internal static class FrontendLayoutCapture
 {
     private static readonly JsonSerializerOptions s_json = new() { WriteIndented = true };
-    internal static int Run(string output)
+    internal static int Run(string output, string? runtimeRoot = null)
     {
         try
         {
@@ -23,6 +23,14 @@ internal static class FrontendLayoutCapture
             using IWindow window = platform.CreateWindow(new("FORGELINE Frontend Layout Qualification", 1280, 720));
             using var graphics = GraphicsDeviceFactory.CreateForWindow(window, new() { EnableVSync = false });
             using var renderer = new FrontendOverlayRenderer(graphics);
+            if (runtimeRoot is not null)
+            {
+                var catalog = ForgeLine.Assets.RuntimeAssetCatalog.Load(runtimeRoot);
+                var wait = System.Diagnostics.Stopwatch.StartNew();
+                do { renderer.PrepareBackground(catalog, RenderQuality.High); Thread.Sleep(1); }
+                while (renderer.BackgroundDiagnostics.State == "Loading" && wait.Elapsed < TimeSpan.FromSeconds(15));
+                if (renderer.BackgroundDiagnostics.State != "Ready") throw new InvalidDataException("Cinematic art did not become ready.");
+            }
             var results = new List<object>();
             var menu = new MainMenuModel(false);
             var saves = new LoadGameModel(Enumerable.Range(0, 50).Select(i => new LoadGameEntry($"s{i}",
@@ -100,6 +108,7 @@ internal static class FrontendLayoutCapture
             {
                 Version = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
                 Device = graphics.Diagnostics.Device, MatrixDpiContract = "Requested physical-pixel layout DPI; actual window DPI recorded separately. No physical multi-monitor certification.",
+                Background = renderer.BackgroundDiagnostics,
                 Cases = results, WindowModes = modes, ZeroSizeRestore = true, SubmissionFaults = graphics.Diagnostics.Health.SubmissionFaultCount
             }, s_json));
             return 0;

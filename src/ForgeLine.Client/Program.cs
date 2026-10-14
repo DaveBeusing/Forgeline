@@ -12,6 +12,8 @@ internal static class Program
     public static int Main(string[] args)
     {
         long processEntryTimestamp = Stopwatch.GetTimestamp();
+        if (args.Length == 3 && args[0] == "--cinematic-menu-capture")
+            return RunCinematicCapture(args[1], args[2]);
         if (args.Length == 3 && args[0] == "--author-menu-background")
             return RunMenuAuthoring(args[1], args[2]);
         if (args.Length == 2 && args[0] == "--frontend-layout-capture")
@@ -22,6 +24,9 @@ internal static class Program
             return RunReferenceCapture(args[1]);
         return ClientBootstrap.Run(args, processEntryTimestamp);
     }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static int RunCinematicCapture(string output, string runtimeRoot) => FrontendLayoutCapture.Run(output, runtimeRoot);
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static int RunMenuAuthoring(string output, string runtimeRoot) => MenuSceneAuthoring.Run(output, runtimeRoot);
