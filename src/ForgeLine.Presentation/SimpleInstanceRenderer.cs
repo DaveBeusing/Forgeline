@@ -224,6 +224,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
         int animatedVegetation = 0;
         int visibleVegetation = 0;
         int skippedDecalResources = 0;
+        int effectRequests = 0, meshFallbackEffects = 0;
         int highLod = 0;
         int reducedLod = 0;
         int lod1Instances = 0;
@@ -237,7 +238,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     index,
                     alpha);
             if (shadowProjection.HasValue && (instance.VfxFeature.IsSpecified || instance.DecalFeature.IsSpecified)) continue;
-            if (!shadowProjection.HasValue && particles?.Replaces(instance) == true) continue;
+
 
             if ((instance.Visibility & RenderVisibilityMask.World) == 0 ||
                 !_vegetation.Includes(instance, camera.Position) ||
@@ -247,6 +248,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 continue;
             }
 
+            if (instance.VfxFeature.IsSpecified && ++effectRequests > PresentationExtractor.MaximumSnapshotEffects) continue;
+            if (!shadowProjection.HasValue && particles?.Replaces(instance) == true) continue;
+            if (instance.VfxFeature.IsSpecified && ++meshFallbackEffects > (particles?.MaximumMeshFallbackEffects ?? 128)) continue;
             AxisAlignedBounds bounds =
                 presentationSeconds.HasValue ? VegetationVisualMotion.CullingBounds(instance) :
                     PresentationBounds.ResolveAxisAlignedBounds(instance);

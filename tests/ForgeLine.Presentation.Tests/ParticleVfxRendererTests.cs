@@ -142,7 +142,7 @@ public sealed class ParticleVfxRendererTests : IDisposable
     [InlineData(ParticleQuality.Low)]
     [InlineData(ParticleQuality.Medium)]
     [InlineData(ParticleQuality.High)]
-    public void RepeatedDestructionAndQualityCapsRetainBoundedBuffersAndMeshFallback(ParticleQuality quality)
+    public void RepeatedDestructionAndQualityCapsSuppressOverflowWithoutMeshFlood(ParticleQuality quality)
     {
         var settings = new ParticleSettings(quality);
         using var device=new Device();using var renderer=new ParticleVfxRenderer(device,_catalog,settings);
@@ -155,7 +155,9 @@ public sealed class ParticleVfxRendererTests : IDisposable
             renderer.Prepare(World(current),camera,1280,720,.05);
             Assert.InRange(renderer.Diagnostics.ActiveParticles,1,settings.Capacity);
             Assert.InRange(renderer.Diagnostics.ScreenCoverage,0,settings.MaximumScreenCoverage);
-            Assert.True(renderer.Diagnostics.FallbackEffects>0);
+            Assert.True(renderer.Diagnostics.SuppressedEffects>0);
+            Assert.Equal(0, renderer.Diagnostics.FallbackEffects);
+            Assert.True(renderer.Replaces(current[^1]));
             if(frame==0) bytes=renderer.Diagnostics.BufferBytes;
             Assert.Equal(bytes,renderer.Diagnostics.BufferBytes);
             Assert.Equal(4,device.Buffers);
@@ -191,6 +193,21 @@ public sealed class ParticleVfxRendererTests : IDisposable
         renderer.Prepare(World([effect]),new RtsCamera(),1280,720,.1);
         Assert.False(renderer.Replaces(effect));Assert.Equal(0,device.Buffers);
         Assert.Equal(1,renderer.Diagnostics.FallbackEffects);
+    }
+
+    [Theory]
+    [InlineData(ParticleQuality.Disabled, true)]
+    [InlineData(ParticleQuality.Medium, false)]
+    public void MissingBackendFallbackCannotFloodTheSceneAndHiddenCopiesConsumeNoBudget(ParticleQuality quality, bool supported)
+    {
+        using var device = new Device(supported);
+        using var renderer = new ParticleVfxRenderer(device, _catalog, new(quality));
+        var visible = Enumerable.Range(1, 600).Select(i => Effect((uint)i, VfxEffectKind.ExplosionBuilding)).ToArray();
+        var hidden = visible.Select(x => x with { Visibility = RenderVisibilityMask.Debug }).ToArray();
+        renderer.Prepare(World(hidden.Concat(visible).ToArray()), new RtsCamera(), 1280, 720, .1);
+        Assert.Equal(renderer.MaximumMeshFallbackEffects, renderer.Diagnostics.FallbackEffects);
+        Assert.Equal(600 - renderer.MaximumMeshFallbackEffects, renderer.Diagnostics.SuppressedEffects);
+        Assert.Equal(renderer.MaximumMeshFallbackEffects, visible.Count(x => !renderer.Replaces(x)));
     }
 
     [Fact]

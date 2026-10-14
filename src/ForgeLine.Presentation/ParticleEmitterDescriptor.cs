@@ -77,6 +77,7 @@ public readonly record struct ParticleSettings(ParticleQuality Quality)
 {
     public static ParticleSettings Default => new(ParticleQuality.Medium);
     public int Capacity => Quality switch { ParticleQuality.Low => 512, ParticleQuality.Medium => 2048, ParticleQuality.High => 4096, _ => 0 };
+    public int MaximumFallbackEffects => Quality switch { ParticleQuality.Low => 32, ParticleQuality.Medium => 64, ParticleQuality.High => 128, _ => 128 };
     public float MaximumScreenCoverage => Quality switch { ParticleQuality.Low => .5f, ParticleQuality.Medium => 1, ParticleQuality.High => 2, _ => 0 };
     public void Validate() { if (!Enum.IsDefined(Quality)) throw new ArgumentOutOfRangeException(nameof(Quality)); }
 }
