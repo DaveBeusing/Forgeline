@@ -212,7 +212,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
             layout.SelectionInspector.IsEmpty ||
             snapshot.PlayerExperience is not
                 PlayerExperienceSnapshot experience ||
-            experience.Selection.Count <= 0)
+            experience.Selection.Count <= 0 || experience.Tick != snapshot.Tick)
         {
             LastRenderedVertexCount = 0;
             return;
@@ -220,7 +220,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
 
         _vertexCount = 0;
         _scale =
-            layout.Scale;
+            HudInformationLayout.InspectorScale(layout);
 
         if (experience.Selection.Count > 1 && group is not null && group.Tick == snapshot.Tick &&
             group.TotalCount == experience.Selection.Count && SelectedCombatGroup.Resolve(snapshot) is not null)
@@ -282,6 +282,8 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         _scale = CombatGroupCardLayout.Scale(layout);
         HudRect region = layout.SelectionInspector;
         EmitQuad(region.X, region.Y, region.Width, region.Height, PanelColor, width, height);
+        EmitQuad(region.X, region.Y, region.Width, 18 * _scale, GameplayHudVisualStyle.PanelHeader, width, height);
+        EmitQuad(region.X, region.Y, 3 * _scale, region.Height, GameplayHudVisualStyle.Focus, width, height);
         Span<char> buffer = stackalloc char[128];
         var text = new HudTextBuilder(buffer);
         text.Append("GROUP "); text.Append(group.TotalCount); text.Append(" UNITS "); text.Append(group.LiveCount);
@@ -364,6 +366,13 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
             width,
             height);
 
+        EmitQuad(region.X, region.Y, region.Width, 32 * _scale,
+            GameplayHudVisualStyle.PanelHeader, width, height);
+        EmitQuad(region.X, region.Y, 3 * _scale, region.Height,
+            GameplayHudVisualStyle.Focus, width, height);
+        EmitQuad(region.X, region.Bottom - _scale, region.Width, _scale,
+            GameplayHudVisualStyle.QuietBorder, width, height);
+
         RtsUiIcon roleIcon =
             SelectionInspectorHudModel.ResolveRoleIcon(
                 selection);
@@ -391,6 +400,9 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         header.Append(
             selection.DisplayName);
 
+        if (!_text.Add(header.Written, x + 26 * _scale, y, 13 * _scale, TextColor,
+            width, height, region.Right - x - 32 * _scale, bold: true))
+        {
         EmitClippedText(
             header.Written,
             x +
@@ -405,6 +417,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
             TextColor,
             width,
             height);
+        }
 
         EmitClippedText(
             SelectionInspectorHudModel.ResolveKindLabel(
@@ -413,7 +426,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
                 26.0f *
                 _scale,
             y +
-                12.0f *
+                15.0f *
                 _scale,
             region.Right -
                 6.0f *
@@ -588,7 +601,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
             new HudTextBuilder(
                 buffer);
         text.Append(label);
-        text.Append(" ");
+        text.Append(fraction <= .25 ? " ! " : " ");
         text.Append(
             Math.Clamp(
                 fraction,
@@ -642,8 +655,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
             GameplayHudVisualStyle.ProgressBarThickness *
                 _scale,
             fraction,
-            ResolveColor(
-                icon),
+            fraction <= .25 ? GameplayHudVisualStyle.Critical : ResolveColor(icon),
             width,
             height);
     }
@@ -679,7 +691,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         text.Append(
             SelectionInspectorHudModel.ResolveSupplyLabel(
                 selection.SupplyStatus));
-        text.Append("  F ");
+        text.Append(" FUEL ");
         text.Append(
             Math.Clamp(
                 selection.FuelFraction,
@@ -687,7 +699,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
                 1.0) *
                 100.0,
             "F0");
-        text.Append("% A ");
+        text.Append("% AMMO ");
         text.Append(
             Math.Clamp(
                 selection.AmmunitionFraction,

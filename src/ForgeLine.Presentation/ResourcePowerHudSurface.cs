@@ -288,7 +288,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 EmitTopStatusBar(experience, layout.TopStatusBar, graphics.Width, graphics.Height);
                 if (ActionableAlertSnapshot.Resolve(snapshot) is { } alerts)
                     EmitActionableNotifications(experience, alerts, layout, graphics.Width, graphics.Height);
-                else EmitNotificationStack(experience, layout.AlertStack, graphics.Width, graphics.Height);
+                else { _scale = HudInformationLayout.AlertScale(layout); EmitNotificationStack(experience, HudInformationLayout.Alerts(layout), graphics.Width, graphics.Height); _scale = layout.Scale; }
             }
             else
             {
@@ -300,6 +300,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                     MutedTextColor, graphics.Width, graphics.Height);
             }
         }
+        _scale = layout.Scale;
         if (showRuntimeMetrics) EmitRuntimeMetrics(metrics, layout.RuntimeMetrics, graphics.Width, graphics.Height);
 
         if (_vertexCount == 0)
@@ -379,256 +380,64 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
     }
 
     private void EmitTopStatusBar(
-        in PlayerExperienceSnapshot experience,
-        in HudRect bar,
-        int width,
-        int height)
+        in PlayerExperienceSnapshot experience, in HudRect bar, int width, int height)
     {
-        float padding =
-            6.0f * _scale;
-        float gap =
-            6.0f * _scale;
-        float powerWidth =
-            MathF.Min(
-                196.0f * _scale,
-                MathF.Max(
-                    0.0f,
-                    bar.Width * 0.34f));
-        float resourceWidth =
-            MathF.Max(
-                0.0f,
-                bar.Width -
-                powerWidth -
-                gap -
-                padding * 2.0f);
-        float cellWidth =
-            94.0f * _scale;
-        int visibleResources =
-            ResourcePowerHudModel.ResolveVisibleResourceCount(
-                resourceWidth,
-                cellWidth);
-
-        EmitQuad(
-            bar.X,
-            bar.Y,
-            bar.Width,
-            bar.Height,
-            PanelColor,
-            width,
-            height);
-
-        float x =
-            bar.X +
-            padding;
-        float centerY =
-            bar.Y +
-            bar.Height * 0.5f;
-
-        for (int index = 0;
-             index < visibleResources;
-             index++)
+        var density = ResourceStripLayout.Create(GameplayHudLayout.Create(width, height, 96) with
+        { Scale = _scale, TopStatusBar = bar });
+        float previousScale = _scale;
+        _scale = density.Scale;
+        if (_scale <= 0) return;
+        EmitQuad(bar.X, bar.Y, bar.Width, bar.Height, PanelColor, width, height);
+        EmitQuad(bar.X, bar.Bottom - _scale, bar.Width, _scale,
+            GameplayHudVisualStyle.QuietBorder, width, height);
+        Span<char> buffer = stackalloc char[32];
+        for (int index = 0; index < ResourcePowerHudModel.AuthoritativeResourceCount; index++)
         {
-            EmitResource(
-                experience.Resources,
-                index,
-                x,
-                centerY,
-                width,
-                height);
-            x +=
-                cellWidth;
+            var cell = density.Resource(index);
+            var icon = ResourcePowerHudModel.GetResourceIcon(index);
+            var definition = RtsUiIconCatalog.Get(icon);
+            float top = cell.Y + (cell.Height - 30 * _scale) * .5f;
+            EmitIcon(icon, cell.X + 2 * _scale, top + 9 * _scale, 12 * _scale, width, height);
+            EmitQuad(cell.Right - _scale, cell.Y + 5 * _scale, _scale,
+                cell.Height - 10 * _scale, GameplayHudVisualStyle.QuietBorder, width, height);
+            float textX = cell.X + 19 * _scale;
+            float textWidth = MathF.Max(0, cell.Right - textX - 5 * _scale);
+            var value = new HudTextBuilder(buffer);
+            AppendQuantity(ref value, ResourcePowerHudModel.GetResourceQuantity(experience.Resources, index));
+            if (_text.Ready)
+            {
+                _text.Add(definition.ShortLabel, textX, top, GameplayHudVisualStyle.CaptionTextSize * _scale,
+                    MutedTextColor, width, height, textWidth);
+                _text.Add(value.Written, textX, top + 13 * _scale, GameplayHudVisualStyle.ValueTextSize * _scale,
+                    TextColor, width, height, textWidth, bold: true, alignment: UiTextAlignment.Right);
+            }
+            else
+            {
+                EmitText(definition.ShortLabel, textX, top, MutedTextColor, width, height);
+                EmitText(value.Written, textX, top + 13 * _scale, TextColor, width, height);
+            }
         }
-
-        int hiddenResources =
-            ResourcePowerHudModel.AuthoritativeResourceCount -
-            visibleResources;
-
-        if (hiddenResources > 0 &&
-            resourceWidth >=
-                34.0f * _scale)
-        {
-            float overflowX =
-                MathF.Min(
-                    x,
-                    bar.X +
-                    padding +
-                    resourceWidth -
-                    30.0f * _scale);
-            Span<char> overflowBuffer =
-                stackalloc char[16];
-            var overflow =
-                new HudTextBuilder(
-                    overflowBuffer);
-            overflow.Append("+");
-            overflow.Append(
-                hiddenResources);
-
-            EmitText(
-                overflow.Written,
-                overflowX,
-                centerY -
-                    5.0f * _scale,
-                MutedTextColor,
-                width,
-                height);
-        }
-
-        float powerX =
-            bar.Right -
-            powerWidth -
-            padding;
-
-        if (powerWidth >
-            26.0f * _scale)
-        {
-            EmitQuad(
-                powerX - gap * 0.5f,
-                bar.Y +
-                    5.0f * _scale,
-                MathF.Max(
-                    1.0f,
-                    _scale),
-                MathF.Max(
-                    0.0f,
-                    bar.Height -
-                    10.0f * _scale),
-                DividerColor,
-                width,
-                height);
-
-            EmitPower(
-                experience.Power,
-                powerX,
-                centerY,
-                powerWidth,
-                width,
-                height);
-        }
-    }
-
-    private void EmitResource(
-        in PlayerResourceSummary resources,
-        int index,
-        float x,
-        float centerY,
-        int width,
-        int height)
-    {
-        RtsUiIcon icon =
-            ResourcePowerHudModel.GetResourceIcon(
-                index);
-        RtsUiIconDefinition definition =
-            RtsUiIconCatalog.Get(
-                icon);
-        float iconSize =
-            13.0f * _scale;
-
-        EmitIcon(
-            icon,
-            x,
-            centerY -
-                iconSize * 0.5f,
-            iconSize,
-            width,
-            height);
-
-        Span<char> buffer =
-            stackalloc char[32];
-        var text =
-            new HudTextBuilder(
-                buffer);
-        text.Append(
-            definition.ShortLabel);
-        text.Append(" ");
-        AppendQuantity(
-            ref text,
-            ResourcePowerHudModel.GetResourceQuantity(
-                resources,
-                index));
-
-        EmitText(
-            text.Written,
-            x +
-                18.0f * _scale,
-            centerY -
-                5.0f * _scale,
-            TextColor,
-            width,
-            height);
-    }
-
-    private void EmitPower(
-        in PlayerPowerSummary power,
-        float x,
-        float centerY,
-        float availableWidth,
-        int width,
-        int height)
-    {
-        float iconSize =
-            14.0f * _scale;
-
-        EmitIcon(
-            RtsUiIcon.StatusPower,
-            x,
-            centerY -
-                iconSize * 0.5f,
-            iconSize,
-            width,
-            height);
-
-        Span<char> buffer =
-            stackalloc char[80];
-        var text =
-            new HudTextBuilder(
-                buffer);
-        text.Append("PWR ");
-        AppendQuantity(
-            ref text,
-            power.Generation);
-        text.Append("/");
-        AppendQuantity(
-            ref text,
-            power.Demand);
-        text.Append(" ");
-        text.Append(
-            ResourcePowerHudModel.ResolvePowerStateLabel(
-                power));
-
-        float textX =
-            x +
-            20.0f * _scale;
-        float maximumTextWidth =
-            MathF.Max(
-                0.0f,
-                availableWidth -
-                20.0f * _scale);
-        if (_text.Add(text.Written, textX, centerY - 5f * _scale, 12f * _scale,
-            power.IsConstrained ? ResolveColor(RtsUiIcon.StatusAlert) : TextColor,
-            width, height, maximumTextWidth, bold: true)) return;
-        int maximumCharacters =
-            (int)MathF.Floor(
-                maximumTextWidth /
-                (GlyphAdvance * _scale));
-        ReadOnlySpan<char> visibleText =
-            text.Written[
-                ..Math.Min(
-                    text.Written.Length,
-                    Math.Max(
-                        0,
-                        maximumCharacters))];
-
-        EmitText(
-            visibleText,
-            textX,
-            centerY -
-                5.0f * _scale,
-            power.IsConstrained
-                ? ResolveColor(
-                    RtsUiIcon.StatusAlert)
-                : TextColor,
-            width,
-            height);
+        var power = density.Power;
+        Vector4 state = experience.Power.IsConstrained ? GameplayHudVisualStyle.Warning : TextColor;
+        EmitQuad(power.X, power.Y + 3 * _scale, power.Width, power.Height - 6 * _scale,
+            GameplayHudVisualStyle.PanelHeader, width, height);
+        EmitQuad(power.X, power.Y + 3 * _scale, 3 * _scale, power.Height - 6 * _scale,
+            state, width, height);
+        float y = power.Y + (power.Height - 28 * _scale) * .5f;
+        Span<char> powerBuffer = stackalloc char[80];
+        var text = new HudTextBuilder(powerBuffer);
+        text.Append("POWER / ");
+        text.Append(ResourcePowerHudModel.ResolvePowerStateLabel(experience.Power));
+        if (!_text.Add(text.Written, power.X + 10 * _scale, y, 10 * _scale,
+            state, width, height, power.Width - 18 * _scale, bold: true))
+            EmitText(text.Written, power.X + 10 * _scale, y, state, width, height);
+        text = new HudTextBuilder(powerBuffer);
+        AppendQuantity(ref text, experience.Power.Generation); text.Append(" / ");
+        AppendQuantity(ref text, experience.Power.Demand);
+        if (!_text.Add(text.Written, power.X + 10 * _scale, y + 12 * _scale, 13 * _scale,
+            TextColor, width, height, power.Width - 18 * _scale, bold: true))
+            EmitText(text.Written, power.X + 10 * _scale, y + 13 * _scale, TextColor, width, height);
+        _scale = previousScale;
     }
 
     private void EmitNotificationStack(
@@ -711,19 +520,6 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             y += rowHeight;
         }
 
-        if (feedbackVisible &&
-            emitted < contentRows)
-        {
-            EmitCommandFeedbackCard(
-                experience.Feedback,
-                region,
-                y,
-                width,
-                height);
-            emitted++;
-            y += rowHeight;
-        }
-
         if (ResourcePowerHudModel.HasAlert(
                 experience.Alerts,
                 PlayerAlertState.SupplyCritical) &&
@@ -733,6 +529,19 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 PlayerAlertState.SupplyCritical,
                 "SUPPLY CRITICAL",
                 experience.CriticalSupplyUnits,
+                region,
+                y,
+                width,
+                height);
+            emitted++;
+            y += rowHeight;
+        }
+
+        if (feedbackVisible &&
+            emitted < contentRows)
+        {
+            EmitCommandFeedbackCard(
+                experience.Feedback,
                 region,
                 y,
                 width,
@@ -803,13 +612,15 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
 
     private void EmitActionableNotifications(in PlayerExperienceSnapshot experience, ActionableAlertSnapshot alerts, in GameplayHudLayout layout, int width, int height)
     {
-        int maximum = (int)(layout.AlertStack.Height / (21 * layout.Scale));
+        _scale = HudInformationLayout.AlertScale(layout);
+        int maximum = (int)(layout.AlertStack.Height / (21 * _scale));
+        var region = HudInformationLayout.Alerts(layout);
         for (int row = 0; row < maximum; row++)
         {
             var item = ActionableAlertLayout.Item(experience, layout, row);
             var rect = ActionableAlertLayout.Row(layout, row);
-            if (item.Feedback) EmitCommandFeedbackCard(experience.Feedback, layout.AlertStack, rect.Y, width, height);
-            else if (item.Hidden > 0) EmitAlertCard(PlayerAlertState.None, "MORE - OPEN OPS", item.Hidden, layout.AlertStack, rect.Y, width, height);
+            if (item.Feedback) EmitCommandFeedbackCard(experience.Feedback, region, rect.Y, width, height);
+            else if (item.Hidden > 0) EmitAlertCard(PlayerAlertState.None, "MORE - OPEN OPS", item.Hidden, region, rect.Y, width, height);
             else if (item.Kind != PlayerAlertState.None)
                 for (int i = 0; i < alerts.Alerts.Count; i++)
                 {
@@ -817,7 +628,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                     if (alert.Identity.Kind != item.Kind) continue;
                     int count = item.Kind == PlayerAlertState.SupplyCritical ? experience.CriticalSupplyUnits :
                         item.Kind == PlayerAlertState.ProductionBlocked ? experience.BlockedProductionFacilities : 0;
-                    EmitAlertCard(item.Kind, alert.Label, count, layout.AlertStack, rect.Y, width, height, alert.Target.IsValid ? " FOCUS" : " OPS");
+                    EmitAlertCard(item.Kind, alert.Label, count, region, rect.Y, width, height, alert.Target.IsValid ? " FOCUS" : " OPS");
                     break;
                 }
         }
@@ -1020,7 +831,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 region.Right -
                 textX -
                 4.0f * _scale);
-        if (_text.Add(text, textX, y + 4f * _scale, 12f * _scale, severityColor,
+        if (_text.Add(text, textX, y + 4f * _scale, 12f * _scale, TextColor,
             width, height, maximumTextWidth)) return;
         int maximumCharacters =
             Math.Max(

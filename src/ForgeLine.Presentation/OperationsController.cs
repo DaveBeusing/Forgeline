@@ -28,9 +28,17 @@ public static class OperationsLayout
         float band = MathF.Min(20 * scale, MathF.Max(0, layout.SecondaryView.Height - 38 * scale));
         return band >= 14 * scale ? band : 0;
     }
-    public static HudRect Panel(in GameplayHudLayout layout) => new(layout.SafeArea.X, layout.TopStatusBar.Bottom + 8 * layout.Scale,
-        MathF.Min(450 * layout.Scale, MathF.Max(0, layout.ActionDock.X - layout.SafeArea.X - 8 * layout.Scale)),
-        MathF.Max(0, layout.SelectionInspector.Y - layout.TopStatusBar.Bottom - 36 * layout.Scale));
+    public static HudRect Panel(in GameplayHudLayout layout)
+    {
+        float gap = 8 * MathF.Min(layout.Scale, 1.25f);
+        float y = layout.TopStatusBar.Bottom + gap;
+        float height = MathF.Max(0, layout.SelectionInspector.Y - y - gap);
+        float width = MathF.Min(450 * layout.Scale,
+            MathF.Min(MathF.Max(0, layout.ActionDock.X - layout.SafeArea.X - gap), height * 450 / 346));
+        if (y + MathF.Min(height, width * 346 / 450) > layout.PrimaryCommands.Y)
+            width = MathF.Min(width, MathF.Max(0, layout.PrimaryCommands.X - layout.SafeArea.X - gap));
+        return new(layout.SafeArea.X, y, width, MathF.Min(height, width * 346 / 450));
+    }
     public static float Scale(in GameplayHudLayout layout) { var p = Panel(layout); return MathF.Min(layout.Scale, MathF.Min(p.Width / 450, p.Height / 346)); }
     public static HudRect Control(in GameplayHudLayout layout, int index)
     {
@@ -92,7 +100,7 @@ public sealed class OperationsController
             return new(input.HasPointerPosition && tab.Contains(input.PointerPosition));
         }
         interaction.SetOperationsOpen(View.Open);
-        var entry = OperationsLayout.Entry(layout);
+        var entry = View.Open ? default : OperationsLayout.Entry(layout);
         var panel = OperationsLayout.Panel(layout);
         bool captured = input.HasPointerPosition && (entry.Contains(input.PointerPosition) || View.Open && panel.Contains(input.PointerPosition));
         bool originValid = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin);
@@ -104,11 +112,11 @@ public sealed class OperationsController
             View = new(!View.Open, Session: _session); interaction.SetOperationsOpen(View.Open); return new(true);
         }
         if (!View.Open && snapshot?.PlayerExperience is { } experience && !experience.IsMatchComplete &&
-            (layout.TopStatusBar.Contains(origin) || layout.AlertStack.Contains(origin) ||
+            (layout.TopStatusBar.Contains(origin) || ActionableAlertLayout.Contains(experience, layout, origin) ||
                 layout.SelectionInspector.Contains(origin) && experience.Selection.HasSingleEntityDetails &&
                 (experience.Selection.HasInventory || experience.Selection.HasSupply || experience.Selection.Work.Kind != PlayerWorkKind.None)))
         {
-            var filter = layout.AlertStack.Contains(origin) ? OperationsCategory.Blocked :
+            var filter = ActionableAlertLayout.Contains(experience, layout, origin) ? OperationsCategory.Blocked :
                 layout.SelectionInspector.Contains(origin) ? experience.Selection.HasSupply ? OperationsCategory.Supply :
                     experience.Selection.Work.Kind != PlayerWorkKind.None ? OperationsCategory.Production : OperationsCategory.Logistics : OperationsCategory.All;
             View = new(true, filter, Session: _session); interaction.SetOperationsOpen(true); return new(true);

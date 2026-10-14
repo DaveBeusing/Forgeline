@@ -274,3 +274,16 @@ Alert clicks reuse owned full-generation camera focus and selection inspection. 
 ## Gameplay shortcuts and interaction feedback
 
 Dock mode, navigation, activation and cancellation shortcuts are configurable through the shared registry. Contextual cards and help display that mapping. Focus rails, hover outlines, pressed underlines and disabled double rails accompany text; command results retain authoritative accepted/partial/rejected counts. Escape closing a dock reports CANCELLED - PANEL CLOSED for three seconds without submitting an order. Resize, focus loss, modal transitions and session replacement consume key edges and held inputs. See [binding and feedback rules](GameplayInputAccessibilityAndQualification.md).
+
+## HUD content density and alert capture
+
+Inspector content fits its available width and rejects a player summary from a different
+completed tick. Mixed selections retain aggregate-only facts; current group aggregates
+retain their existing owned-member/session checks. Compact inspector height releases
+unused vertical space without moving the separate established command-dock band.
+
+Alert drawing and navigation share bounded row rectangles and fitted scale.
+Only populated cards capture pointer origins/current positions; gaps, empty rows and the
+area right of a card do not open Operations or block world selection. A held card press
+retains ownership until release, with existing identity/session/layout revalidation.
+Informational command result cards remain non-actionable.

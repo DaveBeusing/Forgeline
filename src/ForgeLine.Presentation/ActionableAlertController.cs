@@ -9,11 +9,26 @@ namespace ForgeLine.Presentation;
 public readonly record struct AlertNotification(PlayerAlertState Kind, bool Feedback = false, int Hidden = 0);
 public static class ActionableAlertLayout
 {
-    public static HudRect Row(in GameplayHudLayout layout, int row) => new(layout.AlertStack.X,
-        layout.AlertStack.Y + row * 21 * layout.Scale, layout.AlertStack.Width, 18 * layout.Scale);
+    public static float Scale(in GameplayHudLayout layout) => HudInformationLayout.AlertScale(layout);
+    public static HudRect Row(in GameplayHudLayout layout, int row)
+    {
+        var region = HudInformationLayout.Alerts(layout);
+        float scale = Scale(layout);
+        return new(region.X, region.Y + row * 21 * scale, region.Width, 18 * scale);
+    }
+    public static bool Contains(in PlayerExperienceSnapshot experience, in GameplayHudLayout layout, System.Numerics.Vector2 point)
+    {
+        int maximum = Scale(layout) > 0 ? (int)(layout.AlertStack.Height / (21 * Scale(layout))) : 0;
+        for (int row = 0; row < maximum; row++)
+        {
+            var item = Item(experience, layout, row);
+            if ((item.Kind != PlayerAlertState.None || item.Feedback || item.Hidden > 0) && Row(layout, row).Contains(point)) return true;
+        }
+        return false;
+    }
     public static AlertNotification Item(in PlayerExperienceSnapshot experience, in GameplayHudLayout layout, int row)
     {
-        int maximum = (int)(layout.AlertStack.Height / (21 * layout.Scale));
+        int maximum = Scale(layout) > 0 ? (int)(layout.AlertStack.Height / (21 * Scale(layout))) : 0;
         int total = ResourcePowerHudModel.ResolveNotificationCount(experience);
         if (row < 0 || row >= maximum || row >= total) return default;
         int visible = total > maximum && maximum > 1 ? maximum - 1 : maximum;
@@ -21,8 +36,8 @@ public static class ActionableAlertLayout
         int index = 0;
         for (int slot = 0; slot < 6; slot++)
         {
-            bool feedback = slot == 2;
-            var kind = feedback ? default : AlertLifecycleTracker.Kind(slot < 2 ? slot : slot - 1);
+            bool feedback = slot == 3;
+            var kind = feedback ? default : AlertLifecycleTracker.Kind(slot < 3 ? slot : slot - 1);
             if (feedback ? !ResourcePowerHudModel.IsCommandFeedbackVisible(experience) : (experience.Alerts & kind) == 0) continue;
             if (index++ == row) return new(kind, feedback);
         }
@@ -59,14 +74,14 @@ public sealed class ActionableAlertController
         if (blocked || input.FocusLostThisFrame || snapshot?.PlayerExperience is not { IsMatchComplete: false } experience)
         { _pending = false; return default; }
         bool originValid = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin);
-        bool captured = _pending || input.HasPointerPosition && layout.AlertStack.Contains(input.PointerPosition) || fresh && originValid && layout.AlertStack.Contains(origin);
+        bool captured = _pending || input.HasPointerPosition && ActionableAlertLayout.Contains(experience, layout, input.PointerPosition) || fresh && originValid && ActionableAlertLayout.Contains(experience, layout, origin);
         if (changed) { _pending = false; return new(captured); }
         var alerts = ActionableAlertSnapshot.Resolve(snapshot);
         if (fresh)
         {
             _pending = false; _identity = default;
-            if (!originValid || !layout.AlertStack.Contains(origin)) return new(captured);
-            _row = (int)((origin.Y - layout.AlertStack.Y) / (21 * layout.Scale));
+            if (!originValid || !ActionableAlertLayout.Contains(experience, layout, origin)) return new(captured);
+            _row = (int)((origin.Y - layout.AlertStack.Y) / (21 * ActionableAlertLayout.Scale(layout)));
             if (!ActionableAlertLayout.Row(layout, _row).Contains(origin)) return new(true);
             _item = ActionableAlertLayout.Item(experience, layout, _row);
             _pending = _item.Kind != PlayerAlertState.None || _item.Hidden > 0;

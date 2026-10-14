@@ -77,3 +77,27 @@ This pass is **visual-foundation work**, not a claim of final AAA visual quality
 5. Screenshot/golden-image qualification on reference machines to assess visual hierarchy, not just geometry and input tests.
 
 Implement those as independently reviewable changes while preserving the game's RTS-first readability and simulation separation.
+
+## Battlefield HUD hierarchy
+
+The status strip keeps all seven authoritative resources visible. Each cell has a quiet
+caption and a bold, right-aligned quantity; power has a separate labelled state and
+generation/demand block. Narrow, tall strips use two resource rows instead of hiding
+currencies behind an overflow count. This is presentation of captured totals, not net flow.
+
+Selection identity uses a raised header, while health, explicit supply/fuel/ammunition,
+readiness and copied work remain in the inspector. Local scale and compact height fit
+the available width. The established command-dock band and its frozen geometry fixtures
+remain independent. Unavailable private facts are omitted; aggregate selection does not
+synthesize individual component values.
+
+Alert cards use bounded width, severity labels and rails (double marks for critical
+conditions). Core and supply-critical conditions precede transient command feedback.
+Only populated rows capture input; gaps, empty rows and space to their right remain
+world space. Operations retains existing navigation/causes and gives selected or
+blocked facility rows structural emphasis. The minimap selector and two-line legend
+use its fitted size, with the frame inside its interaction bounds. Fog/knowledge colors
+and semantic marker sources are preserved. Tooltips fit available width and height.
+
+No reviewed command fixture or accepted pixel golden is regenerated. New captures are
+review evidence, not automatic golden approval. See [HUD qualification](BattlefieldHudQualification.md).

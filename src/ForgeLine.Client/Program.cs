@@ -12,6 +12,10 @@ internal static class Program
     public static int Main(string[] args)
     {
         long processEntryTimestamp = Stopwatch.GetTimestamp();
+        if (args.Length == 3 && args[0] == "--battlefield-hud-timing")
+            return RunHudTiming(args[1], args[2]);
+        if (args.Length == 3 && args[0] == "--battlefield-hud-capture")
+            return RunHudCapture(args[1], args[2]);
         if (args.Length == 3 && args[0] == "--cinematic-menu-capture")
             return RunCinematicCapture(args[1], args[2]);
         if (args.Length == 3 && args[0] == "--author-menu-background")
@@ -24,6 +28,12 @@ internal static class Program
             return RunReferenceCapture(args[1]);
         return ClientBootstrap.Run(args, processEntryTimestamp);
     }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static int RunHudTiming(string output, string runtimeRoot) => BattlefieldHudCapture.Run(output, runtimeRoot, timingOnly: true);
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static int RunHudCapture(string output, string runtimeRoot) => BattlefieldHudCapture.Run(output, runtimeRoot);
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static int RunCinematicCapture(string output, string runtimeRoot) => FrontendLayoutCapture.Run(output, runtimeRoot);

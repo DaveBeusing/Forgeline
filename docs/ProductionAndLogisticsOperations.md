@@ -35,3 +35,5 @@ While open, extraction runs at the existing fixed-tick cadence (20 Hz in the can
 `--operations-hotpaths artifacts/operations-hotpaths.json` measures 128 warmups and 256 samples for 1/10/100/1000 facilities. Full HUD/idle input must allocate zero warm bytes; copied snapshot storage has a fixed bound. The frame-hotpaths workflow runs these gates. Timings use null graphics and exclude ECS extraction, GPU uploads, waits and Present; they are not a frame-rate guarantee.
 
 Native startup smoke qualifies HUD composition and window modes. It does not establish active operations interaction, terrain contrast, text readability on every monitor, live DPI transitions, mixed-route focus journeys or steady-state GPU acceptance. Those remain manual acceptance items until exercised.
+
+The HUD information update fits the opaque Operations panel inside its available space and clear of selection commands. The separate entry is hidden while the panel is open; CLOSE remains available. Selected and blocked rows have distinct rails plus text. See [HUD evidence](BattlefieldHudQualification.md).

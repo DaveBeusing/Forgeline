@@ -32,7 +32,8 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
         _count = 0; _line = 0;
         _scale = MathF.Min(context.Layout.Scale, OperationsLayout.Entry(context.Layout).Width / 126);
         _bounds = OperationsLayout.Entry(context.Layout);
-        if (!_bounds.IsEmpty)
+        bool panelVisible = context.Operations.Open && !context.Operations.Suppressed && context.Operations.Session == context.Snapshot.SessionId;
+        if (!_bounds.IsEmpty && !panelVisible)
         {
             Quad(_bounds, GameplayHudVisualStyle.PanelBackground);
             Line("OPERATIONS", true);
@@ -44,7 +45,9 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
             _bounds = OperationsLayout.Panel(context.Layout); _line = 0;
             if (_scale > 0)
             {
-                Quad(_bounds, GameplayHudVisualStyle.PanelBackground);
+                Quad(_bounds, GameplayHudVisualStyle.PanelBackground with { W = 1 });
+                Quad(new HudRect(_bounds.X, _bounds.Y, _bounds.Width, 24 * _scale), GameplayHudVisualStyle.PanelHeader);
+                Quad(new HudRect(_bounds.X, _bounds.Y, 3 * _scale, _bounds.Height), GameplayHudVisualStyle.Focus);
                 Line("OPERATIONS", true);
                 Control(context.Layout, 0, "CLOSE");
                 var data = OperationsSnapshot.Resolve(context.Snapshot);
@@ -82,7 +85,10 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                         if (OperationsLayout.Row(data, view, i) is { } row)
                         { b.Append(row.Entity == view.Selected ? "> " : "  "); b.Append(row.Name); b.Append(" / "); b.Append(row.Cause.Length > 0 ? row.Cause : row.Status); b.Append(" / Q "); b.Number(row.QueueCount, "0"); }
                         else b.Append(i == 0 ? "NO MATCHING FACILITIES" : "");
-                        Control(context.Layout, i + 3, b.Written);
+                        var facility = OperationsLayout.Row(data, view, i);
+                        Control(context.Layout, i + 3, b.Written,
+                            facility is { } active && active.Entity == view.Selected,
+                            facility is { } blocked && blocked.Cause.Length > 0);
                     }
                     var panel = _bounds; _line = 0;
                     _bounds = new(panel.X, panel.Y + 264 * _scale, panel.Width, 52 * _scale);
@@ -123,11 +129,18 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
     }
     private static void Number(ref OperationsTextBuilder builder, double? value, string format = "0")
     { if (value.HasValue) builder.Number(value.Value, format); else builder.Append("N/A"); }
-    private void Control(in GameplayHudLayout layout, int index, ReadOnlySpan<char> label)
+    private void Control(in GameplayHudLayout layout, int index, ReadOnlySpan<char> label, bool selected = false, bool blocked = false)
     {
         var previous = _bounds; int line = _line;
         _bounds = OperationsLayout.Control(layout, index); _line = 0;
-        Quad(_bounds, GameplayHudVisualStyle.PanelBackground); Line(label, true);
+        Quad(_bounds, selected ? GameplayHudVisualStyle.PanelSelected : GameplayHudVisualStyle.PanelRaised);
+        if (selected || blocked)
+        {
+            var rail = new HudRect(_bounds.X, _bounds.Y, 2 * _scale, _bounds.Height);
+            Quad(rail, blocked ? GameplayHudVisualStyle.Warning : GameplayHudVisualStyle.Focus);
+            if (blocked) Quad(rail with { X = rail.X + 3 * _scale }, GameplayHudVisualStyle.Warning);
+        }
+        Line(label, true);
         _bounds = previous; _line = line;
     }
     private void Line(ReadOnlySpan<char> text, bool primary = false)

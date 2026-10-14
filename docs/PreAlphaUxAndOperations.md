@@ -219,3 +219,18 @@ release, clear hover/pressed state and preserve model focus. Closing help/pause 
 the gesture before gameplay resumes. `GameplayHudLayout` retains separate ownership.
 
 See [named regions and migration](FrontendLayout.md) and [qualification](FrontendLayoutQualification.md).
+
+## Battlefield information hierarchy
+
+All seven resource totals remain visible, with a separate power condition block. Narrow
+high-scale status strips use two rows. Resource labels and numbers have separate
+typographic levels; compact selection and minimap text fit their own named regions.
+Operations highlights selected facilities with a rail and blocked rows with double
+warning marks plus the captured textual cause. No inferred net flow or foreign facts
+are added.
+
+Native HUD inspection uses --battlefield-hud-capture with an empty output directory and
+a runtime asset root. It renders authored copied states over the battlefield fixture
+for mixed selection, critical supply and blocked production. This is a renderer
+qualification tool, not a game mode or natural match. Physical monitor transitions and
+human visual golden approval remain separate from deterministic output checks.

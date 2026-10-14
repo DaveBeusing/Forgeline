@@ -78,6 +78,14 @@ jobs:
           dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.FrontendOverlayRendererTests ForgeLine.Presentation.Tests.FrontendLayoutNativeTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+      - name: Battlefield HUD hierarchy and interaction contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.HudInformationLayoutTests ForgeLine.Presentation.Tests.GameplayHudVisualQualificationTests ForgeLine.Presentation.Tests.GameplayHudLayoutIntegrationTests ForgeLine.Presentation.Tests.GameplayHudRuntimeTests ForgeLine.Presentation.Tests.ResourcePowerAlertHudTests ForgeLine.Presentation.Tests.SelectionInspectorHudTests ForgeLine.Presentation.Tests.ActionableAlertTests ForgeLine.Presentation.Tests.GameplayUiFixtureTests ForgeLine.Presentation.Tests.RtsMinimapInteractionTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.GameplayInteractionJourneyTests ForgeLine.Client.Tests.GameplayGuidanceInteractionTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Native UI typography contracts
         run: dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.UiFontMetricsTests ForgeLine.Presentation.Tests.UiTypographyNativeTests
 

@@ -129,7 +129,7 @@ public sealed class ActionableAlertTests
     {
         var layout = GameplayHudLayout.Create(width, height, dpi, scale);
         var experience = Experience(4, (PlayerAlertState)31);
-        int count = (int)(layout.AlertStack.Height / (21 * layout.Scale));
+        int count = (int)(layout.AlertStack.Height / (21 * ActionableAlertLayout.Scale(layout)));
         if (count == 0)
         {
             Assert.Equal(default, ActionableAlertLayout.Item(experience, layout, 0));
@@ -137,8 +137,9 @@ public sealed class ActionableAlertTests
             return;
         }
         Assert.Equal(PlayerAlertState.CommandCoreDestroyed, ActionableAlertLayout.Item(experience, layout, 0).Kind);
-        if (count > 1) Assert.True(ActionableAlertLayout.Item(experience, layout, count - 1).Hidden > 0);
+        if (count > 1 && ResourcePowerHudModel.ResolveNotificationCount(experience) > count) Assert.True(ActionableAlertLayout.Item(experience, layout, count - 1).Hidden > 0);
         else Assert.Equal(PlayerAlertState.CommandCoreDestroyed, ActionableAlertLayout.Item(experience, layout, 0).Kind);
+        count = Math.Min(count, ResourcePowerHudModel.ResolveNotificationCount(experience));
         for (int i = 0; i < count; i++) Assert.True(layout.AlertStack.Contains(new Vector2(ActionableAlertLayout.Row(layout, i).Right, ActionableAlertLayout.Row(layout, i).Bottom)));
     }
     [Fact]
@@ -152,7 +153,7 @@ public sealed class ActionableAlertTests
         Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
     }
     [Fact]
-    public void RowGapsCapturePointerWithoutActivatingInvisibleControls()
+    public void RowGapsLeaveWorldInputAvailable()
     {
         var controller = new ActionableAlertController(); var input = new InputState(); var layout = GameplayHudLayout.Create(1600, 900, 96);
         var snapshot = Snapshot(new AlertLifecycleTracker().Capture(new(1), Experience(4, PlayerAlertState.LowPower), []));
@@ -160,7 +161,7 @@ public sealed class ActionableAlertTests
         var gap = new HudRect(layout.AlertStack.X, layout.AlertStack.Y + 19 * layout.Scale, layout.AlertStack.Width, layout.Scale);
         Click(input, gap);
         var result = controller.Update(input, snapshot, layout);
-        Assert.True(result.Captured); Assert.False(result.OpenOperations); Assert.False(result.Target.IsValid);
+        Assert.False(result.Captured); Assert.False(result.OpenOperations); Assert.False(result.Target.IsValid);
     }
     [Theory]
     [InlineData(false)]
@@ -183,6 +184,26 @@ public sealed class ActionableAlertTests
         Assert.Equal(!resolved, controller.Update(input, snapshot, layout).OpenOperations);
         Assert.False(controller.Update(input, snapshot, layout).OpenOperations);
     }
+    [Fact]
+    public void EmptyRowsAndRightOfCardsNeverCaptureWorldInput()
+    {
+        var layout = GameplayHudLayout.Create(1920, 1080, 96);
+        var experience = Experience(4, PlayerAlertState.LowPower);
+        var rect = ActionableAlertLayout.Row(layout, 0);
+        Assert.True(ActionableAlertLayout.Contains(experience, layout, new(rect.X + 10, rect.Y + 5)));
+        Assert.False(ActionableAlertLayout.Contains(experience, layout, new(rect.Right + 1, rect.Y + 5)));
+        Assert.False(ActionableAlertLayout.Contains(experience, layout, new(rect.X + 10, rect.Bottom + 5)));
+        Assert.False(ActionableAlertLayout.Contains(Experience(), layout, new(rect.X + 10, rect.Y + 5)));
+        var controller = new ActionableAlertController(); var operations = new OperationsController();
+        var state = new PresentationInteractionState(); var input = new InputState();
+        var snapshot = Snapshot(new AlertLifecycleTracker().Capture(new(1), experience, []));
+        controller.Update(input, snapshot, layout); operations.Update(input, snapshot, layout, state);
+        Click(input, new(rect.Right + 10, rect.Y, 10, 10));
+        Assert.False(controller.Update(input, snapshot, layout).Captured);
+        Assert.False(operations.Update(input, snapshot, layout, state).Captured);
+        Assert.False(operations.View.Open);
+    }
+
     private static PlayerExperienceSnapshot Experience(ulong tick = 4, PlayerAlertState flags = default) =>
         default(PlayerExperienceSnapshot) with { Tick = new(tick), Player = new(1), Alerts = flags, MatchStatus = PlayerMatchStatus.Active };
     private static PresentationSnapshot Snapshot(ActionableAlertSnapshot alerts, ulong tick = 4, ulong session = 1, uint player = 1, bool terminal = false) =>
