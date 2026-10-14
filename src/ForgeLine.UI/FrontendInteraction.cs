@@ -31,8 +31,9 @@ public sealed class SettingsInteractionModel
     public PlatformKey? BindingCandidate => _candidate;
     public GameplayAction BindingAction { get; private set; }
     public string BindingFeedback { get; private set; } = string.Empty;
-    public int VisibleStart => Math.Max(0, (int)FocusedField - 6);
-    public int VisibleRowCount => Math.Min(7, s_fields.Length + 1 - VisibleStart);
+    public int VisibleCapacity { get; set; } = 7;
+    public int VisibleStart => Math.Max(0, (int)FocusedField - Math.Clamp(VisibleCapacity, 1, 7) + 1);
+    public int VisibleRowCount => Math.Min(Math.Clamp(VisibleCapacity, 1, 7), s_fields.Length - VisibleStart);
     public void FocusVisible(int row) => Focus((FrontendSettingsField)(row + VisibleStart));
 
     public FrontendSettingsField FocusedField =>
@@ -190,143 +191,33 @@ public sealed class SettingsInteractionModel
 
 public static class FrontendHitTesting
 {
-    private static (float X, float Y) Local(float pointerX, float pointerY, FrontendLayout layout) =>
-        ((pointerX - layout.OffsetX) / layout.Scale, (pointerY - layout.OffsetY) / layout.Scale);
-    private const float DetailStartY = 390f;
-    private const float DetailRowHeight = 58f;
     public static int? DetailRow(float pointerX, float pointerY, FrontendLayout layout, int rowCount)
     {
-        (float x, float y) = Local(pointerX, pointerY, layout);
-        if (rowCount <= 0 ||
-            x < 92f ||
-            x > 1072f)
-        {
-            return null;
-        }
-
-        float localY = y - DetailStartY;
-        if (localY < 0)
-        {
-            return null;
-        }
-
-        int row = (int)(localY / DetailRowHeight);
-        return row < rowCount ? row : null;
+        for (int i = 0; i < Math.Min(rowCount, layout.Geometry.VisibleDetailRows); i++)
+            if (layout.Geometry.DetailRow(i).Contains(pointerX, pointerY)) return i;
+        return null;
     }
-
     public static int? DetailAdjust(float pointerX, float pointerY, FrontendLayout layout, int rowCount)
     {
-        int? row = DetailRow(pointerX, pointerY, layout, rowCount);
-        if (row is null)
-        {
-            return null;
-        }
-
-        (float x, _) = Local(pointerX, pointerY, layout);
-        if (x >= 830f && x <= 902f)
-        {
-            return -1;
-        }
-
-        if (x >= 916f && x <= 988f)
-        {
-            return 1;
-        }
-
-        return null;
+        if (DetailRow(pointerX, pointerY, layout, rowCount) is not int row) return null;
+        return layout.Geometry.Decrease(row).Contains(pointerX, pointerY) ? -1 :
+            layout.Geometry.Increase(row).Contains(pointerX, pointerY) ? 1 : null;
     }
-
-    public static bool PrimaryAction(float pointerX, float pointerY, FrontendLayout layout)
-    {
-        (float x, float y) = Local(pointerX, pointerY, layout);
-        return x >= 782f &&
-            x <= 1072f &&
-            y >= 838f &&
-            y <= 896f;
-    }
-
-    public static bool SecondaryAction(float pointerX, float pointerY, FrontendLayout layout)
-    {
-        (float x, float y) = Local(pointerX, pointerY, layout);
-        return x >= 92f &&
-            x <= 312f &&
-            y >= 838f &&
-            y <= 896f;
-    }
-
-    public static bool Footer(float pointerX, float pointerY, FrontendLayout layout)
-    {
-        (float x, float y) = Local(pointerX, pointerY, layout);
-        return x >= 82f &&
-            x <= 1072f &&
-            y >= 900f &&
-            y <= 970f;
-    }
-
-    public static string? MainMenu(
-        float pointerX,
-        float pointerY,
-        FrontendLayout layout,
-        IReadOnlyList<MainMenuItem> items)
+    public static bool PrimaryAction(float x, float y, FrontendLayout layout) => layout.Geometry.PrimaryAction.Contains(x, y);
+    public static bool SecondaryAction(float x, float y, FrontendLayout layout) => layout.Geometry.SecondaryAction.Contains(x, y);
+    public static bool Footer(float x, float y, FrontendLayout layout) => layout.Geometry.Footer.Contains(x, y);
+    public static string? MainMenu(float x, float y, FrontendLayout layout, IReadOnlyList<MainMenuItem> items)
     {
         ArgumentNullException.ThrowIfNull(items);
-        (float x, float pointerLocalY) = Local(pointerX, pointerY, layout);
-        float y = 338f;
-
-        foreach (MainMenuItem item in items)
-        {
-            if (item.IsEnabled &&
-                IsMenuRowHit(
-                    x,
-                    pointerLocalY,
-                    y))
-            {
-                return item.Id;
-            }
-
-            y += 72f;
-        }
-
+        for (int i = 0; i < items.Count; i++)
+            if (items[i].IsEnabled && layout.Geometry.MenuRow(i).Contains(x, y)) return items[i].Id;
         return null;
     }
-
-    public static string? PauseMenu(
-        float pointerX,
-        float pointerY,
-        FrontendLayout layout,
-        IReadOnlyList<PauseMenuItem> items)
+    public static string? PauseMenu(float x, float y, FrontendLayout layout, IReadOnlyList<PauseMenuItem> items)
     {
         ArgumentNullException.ThrowIfNull(items);
-        (float x, float pointerLocalY) =
-            Local(
-                pointerX,
-                pointerY,
-                layout);
-        float y = 338f;
-
-        foreach (PauseMenuItem item in items)
-        {
-            if (item.IsEnabled &&
-                IsMenuRowHit(
-                    x,
-                    pointerLocalY,
-                    y))
-            {
-                return item.Id;
-            }
-
-            y += 72f;
-        }
-
+        for (int i = 0; i < items.Count; i++)
+            if (items[i].IsEnabled && layout.Geometry.MenuRow(i).Contains(x, y)) return items[i].Id;
         return null;
     }
-
-    private static bool IsMenuRowHit(
-        float x,
-        float y,
-        float rowY) =>
-        x >= 82f &&
-        x <= 642f &&
-        y >= rowY &&
-        y <= rowY + 52f;
 }

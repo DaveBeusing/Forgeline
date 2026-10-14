@@ -48,6 +48,9 @@ public readonly record struct FrontendSurfaceView(
     float SplashMasterOpacity = 1f,
     bool SplashBootstrap = false)
 {
+    public FrontendGeometry? Layout { get; init; }
+    public int DetailScroll { get; init; }
+
     public static FrontendSurfaceView StudioSplash(float elapsedSeconds, float masterOpacity = 1f) =>
         new(FrontendSurfaceKind.StudioSplash, string.Empty, string.Empty,
             false, 0f, [], [], string.Empty,
