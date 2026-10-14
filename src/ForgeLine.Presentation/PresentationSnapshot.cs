@@ -105,6 +105,8 @@ public sealed class PresentationSnapshot
 
     public VfxPresentationMetrics VfxMetrics { get; }
 
+    public DecalPresentationMetrics DecalMetrics { get; init; }
+
     public StrategicOverlaySnapshot? StrategicOverlay { get; }
 
     public CombatGroupOperationalSnapshot? CombatGroups { get; }

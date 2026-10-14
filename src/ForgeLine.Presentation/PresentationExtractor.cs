@@ -12,7 +12,7 @@ using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
 
-public sealed class PresentationExtractor : ISimulationTickObserver
+public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisibility
 {
     private static readonly ArtilleryWeaponCatalog DefaultArtilleryWeapons = DirectorateContent.CreateArtilleryWeaponCatalog();
     private readonly MechanicalPoseHistory _mechanicalHistory = new();
@@ -25,6 +25,9 @@ public sealed class PresentationExtractor : ISimulationTickObserver
     private readonly RuntimeAssetCatalog? _runtimeAssets;
     private readonly RenderInstance[] _staticDressing = [];
     private readonly VfxEffectPool _vfxPool = new();
+    private readonly DecalPool _decals = new();
+    private readonly RenderInstance[] _decalScratch = new RenderInstance[128];
+    private EntityRegistry? _decalEntities;
     private ulong? _vfxTick;
     private SimulationSessionId _vfxSession;
     private readonly AlertLifecycleTracker _alerts = new();
@@ -128,8 +131,9 @@ public sealed class PresentationExtractor : ISimulationTickObserver
         SimulationSessionId vfxSession = _extraction?.Scenario.Simulation.SessionId ?? SimulationSessionId.None;
         if (_vfxTick.HasValue && (vfxSession != _vfxSession || context.Tick.Value < _vfxTick.Value))
         {
-            _vfxPool.Reset(); _seenWrecks.Clear(); _previousSupplyStates.Clear(); _vfxTick = null;
+            _vfxPool.Reset(); _decals.Reset(); _seenWrecks.Clear(); _previousSupplyStates.Clear(); _vfxTick = null;
         }
+        _decalEntities = context.Entities; _decals.BeginTick(context.Tick);
         if (_vfxTick != context.Tick.Value) CaptureCombatVfx(context);
         _vfxTick = context.Tick.Value; _vfxSession = vfxSession;
         CaptureNewWreckVfx(
@@ -223,7 +227,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                     context, _extraction, interaction.HoveredEntity),
                 _extraction is null ? null : PlayerGuidanceSummaryFactory.Capture(context, _extraction, intelligenceSnapshot),
                 _extraction is not null && interaction.OperationsOpen ? OperationsSnapshotFactory.Capture(context, _extraction) : null,
-                _extraction is not null && playerExperience is { } experience ? _alerts.Capture(context, _extraction, experience) : null));
+                _extraction is not null && playerExperience is { } experience ? _alerts.Capture(context, _extraction, experience) : null) { DecalMetrics = _decals.Metrics });
     }
 
     private RenderInstance[] CaptureRenderInstances(
@@ -365,13 +369,14 @@ public sealed class PresentationExtractor : ISimulationTickObserver
         QueueProjectileVfx(
             context);
         QueuePooledVfx();
+        int decalCount = _decals.CopyVisibleTo(_decalScratch, context.Tick, this);
 
         // This fresh array is transferred to the snapshot and never reused.
-        if (_queuedVfx.Count == 0 && baseIndex == baseInstances.Length)
+        if (_queuedVfx.Count == 0 && baseIndex == baseInstances.Length && decalCount == 0)
             return baseInstances;
 
         if (baseIndex == 0 &&
-            _queuedVfx.Count == 0)
+            _queuedVfx.Count == 0 && decalCount == 0)
         {
             return [];
         }
@@ -380,7 +385,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
             new RenderInstance[
                 checked(
                     baseIndex +
-                    _queuedVfx.Count)];
+                    _queuedVfx.Count + decalCount)];
 
         if (baseIndex > 0)
         {
@@ -424,6 +429,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                             queued.Kind, queued.EmitterId, queued.Generation, queued.Continuous, queued.SpawnedAtTick));
         }
 
+        _decalScratch.AsSpan(0, decalCount).CopyTo(instances.AsSpan(baseIndex + _queuedVfx.Count));
         return instances;
     }
 
@@ -1057,6 +1063,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver
                 combatEvent,
                 targetClass);
 
+        QueueImpactDecal(entities, combatEvent, targetClass);
         SpawnAt(
             impact,
             combatEvent.Position,
@@ -1480,6 +1487,53 @@ public sealed class PresentationExtractor : ISimulationTickObserver
 
         _previousSupplyStates[entity] =
             supply;
+    }
+
+    bool IDecalVisibility.IsGroundVisible(Vector3 position) => IsPositionVisible(position);
+
+    bool IDecalVisibility.TryGetReceiver(EntityId receiver, out RenderTransform transform)
+    {
+        transform = default;
+        if (_decalEntities is null || !_decalEntities.IsAlive(receiver) || !IsVisibleToViewer(_decalEntities, receiver) ||
+            !_decalEntities.TryGetComponent(receiver, out VisualIdentity visual) || ((uint)visual.Visibility & (uint)RenderVisibilityMask.World) == 0 ||
+            !_decalEntities.TryGetComponent(receiver, out WorldTransform pose) ||
+            _decalEntities.TryGetComponent(receiver, out HealthState health) && health.Fraction <= 0) return false;
+        transform = new(pose.Position, pose.Rotation, pose.Scale);
+        return true;
+    }
+
+    internal void QueueImpactDecal(EntityRegistry entities, in CombatEvent impact, TargetClass? targetClass)
+    {
+        if (!IsPositionVisible(impact.Position)) return;
+        if (impact.Weapon == DirectorateContent.WeaponIds.MobileArtillery || impact.Weapon == DirectorateContent.WeaponIds.MainBattleCannon)
+        {
+            Vector3 position = impact.Position;
+            if (_extraction is not null && _extraction.Scenario.Terrain.TrySampleHeight(position.X, position.Z, out float height)) position.Y = height;
+            Quaternion groundRotation = Quaternion.Identity;
+            if (_extraction is not null && _extraction.Scenario.Terrain.TrySampleNormal(position.X, position.Z, out Vector3 groundNormal))
+            {
+                Vector3 axis = Vector3.Cross(Vector3.UnitY, groundNormal);
+                if (axis.LengthSquared() > .000001f) groundRotation = Quaternion.CreateFromAxisAngle(Vector3.Normalize(axis), MathF.Acos(Math.Clamp(groundNormal.Y, -1, 1)));
+            }
+            position.Y += .06f;
+            bool artillery = impact.Weapon == DirectorateContent.WeaponIds.MobileArtillery;
+            _decals.TrySpawn(new(artillery ? DecalKind.Crater : DecalKind.Scorch, DecalSurface.Ground,
+                new(position, groundRotation, new(artillery ? 8 : 4, 1, artillery ? 8 : 4))), impact.Tick, out _);
+            return;
+        }
+        if (targetClass is not (TargetClass.ArmoredVehicle or TargetClass.Structure) || !IsVisibleToViewer(entities, impact.Target) ||
+            !entities.TryGetComponent(impact.Target, out WorldTransform receiver)) return;
+        Vector3 incoming = Vector3.UnitZ;
+        if (IsVisibleToViewer(entities, impact.Source) && entities.TryGetComponent(impact.Source, out WorldTransform source))
+            incoming = Vector3.Transform(source.Position - receiver.Position, Quaternion.Inverse(receiver.Rotation));
+        Vector3 normal = MathF.Abs(incoming.X) > MathF.Abs(incoming.Z) ? Vector3.UnitX * (incoming.X >= 0 ? 1 : -1)
+            : Vector3.UnitZ * (incoming.Z >= 0 ? 1 : -1);
+        Vector3 anchor = normal * .51f;
+        Quaternion rotation = normal.X != 0 ? Quaternion.CreateFromAxisAngle(Vector3.UnitZ, -normal.X * MathF.PI / 2)
+            : Quaternion.CreateFromAxisAngle(Vector3.UnitX, normal.Z * MathF.PI / 2);
+        Vector3 world = receiver.Position + Vector3.Transform(anchor * receiver.Scale, receiver.Rotation);
+        _decals.TrySpawn(new(DecalKind.Hit, DecalSurface.Receiver, new(world, rotation, new(1.2f, 1, 1.2f)),
+            LifetimeTicks: 400, Strength: .35f, Receiver: impact.Target, ReceiverLocalAnchor: anchor), impact.Tick, out _);
     }
 
     private void QueueVfx(in QueuedVfxInstance effect)

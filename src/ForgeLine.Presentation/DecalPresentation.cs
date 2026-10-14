@@ -141,7 +141,7 @@ public sealed class DecalPool
                     Decrement(slot.Cell); _cells[cell] = Count(cell) + 1; slot.Cell = cell; _migrated++;
                 }
             }
-            if (request.Surface == DecalSurface.Ground && !visibility.IsGroundVisible(transform.Position) || _published == MaximumPublished) continue;
+            if (request.Surface == DecalSurface.Ground && !FootprintVisible(transform, visibility) || _published == MaximumPublished) continue;
             float remaining = (float)(slot.Expires - tick.Value);
             float fade = Math.Clamp(remaining / Math.Max(1, request.LifetimeTicks * .2f), 0, 1);
             WorldVisualId visual = request.Kind switch
@@ -163,6 +163,15 @@ public sealed class DecalPool
 
     private Cell CellAt(Vector3 position) => new(checked((int)MathF.Floor(position.X / _settings.ChunkSizeMeters)),
         checked((int)MathF.Floor(position.Z / _settings.ChunkSizeMeters)));
+    private static bool FootprintVisible(in RenderTransform transform, IDecalVisibility visibility)
+    {
+        if (!visibility.IsGroundVisible(transform.Position)) return false;
+        for (int x = -1; x <= 1; x += 2)
+            for (int z = -1; z <= 1; z += 2)
+                if (!visibility.IsGroundVisible(transform.Position + Vector3.Transform(
+                    new Vector3(x * transform.Scale.X * .5f, 0, z * transform.Scale.Z * .5f), transform.Rotation))) return false;
+        return true;
+    }
     private static bool Finite(in RenderTransform transform) =>
         float.IsFinite(transform.Position.X) && float.IsFinite(transform.Position.Y) && float.IsFinite(transform.Position.Z) &&
         MathF.Abs(transform.Position.X) <= 16_777_216 && MathF.Abs(transform.Position.Y) <= 16_777_216 && MathF.Abs(transform.Position.Z) <= 16_777_216 &&

@@ -487,7 +487,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 hasRuntimeMaterial &&
                 (!usesRuntimeMesh ||
                  runtimeMesh.SupportsTexturedMaterial);
-            if (instance.DecalFeature.IsSpecified && (!usesRuntimeMesh || !usesRuntimeMaterial || !float.IsFinite(instance.DecalFeature.Opacity)))
+            if (instance.DecalFeature.IsSpecified && (!usesRuntimeMesh || !usesRuntimeMaterial || runtimeMaterial.UsesDevelopmentFallback || !float.IsFinite(instance.DecalFeature.Opacity)))
             { skippedDecalResources++; continue; }
             Vector4 color =
                 ResolveColor(
