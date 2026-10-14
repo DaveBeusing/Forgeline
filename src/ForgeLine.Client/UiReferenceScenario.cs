@@ -83,10 +83,12 @@ internal static class UiReferenceStates
             UiReferenceScenario.Technology => "Queue", _ => "Ready"
         };
         var mode = state == UiReferenceScenario.Technology ? PlayerActionPanelMode.Technology :
-            state == UiReferenceScenario.Targeting ? PlayerActionPanelMode.Tactical : PlayerActionPanelMode.UnitProduction;
+            state == UiReferenceScenario.Targeting ? PlayerActionPanelMode.Tactical :
+            state is UiReferenceScenario.Contacts or UiReferenceScenario.DockFocus or UiReferenceScenario.DockHover or UiReferenceScenario.DockPressed
+                ? PlayerActionPanelMode.Construction : PlayerActionPanelMode.UnitProduction;
         var (snapshot, panel) = CommandDockCapture.Fixture(source, mode, dockState, width, height, dpi, scale);
         panel = panel with { SelectedIndex = state == UiReferenceScenario.DockFocus ? 1 : 0,
-            HoveredIndex = state is UiReferenceScenario.DockHover or UiReferenceScenario.DockPressed ? 0 : -1,
+            HoveredIndex = state is UiReferenceScenario.DockHover or UiReferenceScenario.DockPressed ? 1 : -1,
             PointerPressed = state == UiReferenceScenario.DockPressed };
         if (state is UiReferenceScenario.ResourcePressure or UiReferenceScenario.LowPower or UiReferenceScenario.SupplyCritical or UiReferenceScenario.MixedSelection)
         {

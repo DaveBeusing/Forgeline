@@ -358,6 +358,8 @@ internal static class VisualReferenceCapture
                     captures.Add(new { submission = meshes.SubmissionMetrics, key, image, imageSha256 = FileHash(Path.Combine(request.OutputRoot, image)),
                         pixelSha256 = Convert.ToHexString(SHA256.HashData(rgba)), fixture.Kind, fingerprint = fixture.Fingerprint,
                         ui = new { scenario = uiScenario, fixtureVersion = 1, layoutId = frontend is null ? "GameplayHudLayout" : "FrontendGeometry",
+                            interaction = new { panel.Mode, panel.SelectedIndex, panel.HoveredIndex, panel.PointerPressed,
+                                panel.ContextualHoveredIndex, panel.ContextualPressed, panel.ContextualPending, targetingMode = targeting.Mode },
                             captureOffset = uiScenario == UiReferenceScenario.MenuReveal ? "Authored half-reveal; live motion reviewed separately" : "Settled fixed state",
                             regions, text, vertices = frontend?.LastRenderedVertexCount ?? hud.LastRenderedVertexCount,
                             background = frontend?.BackgroundDiagnostics },

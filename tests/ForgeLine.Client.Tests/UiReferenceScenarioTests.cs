@@ -88,7 +88,10 @@ public sealed class UiReferenceScenarioTests
             if (state == UiReferenceScenario.DockPending) Assert.True(panel.ContextualPending);
             if (state is UiReferenceScenario.DockHover or UiReferenceScenario.DockPressed)
             {
-                Assert.Equal(0, panel.HoveredIndex); // Visible even when the compact dock admits only one card.
+                Assert.Equal(1, panel.HoveredIndex);
+                Assert.Equal(0, panel.SelectedIndex); // Hover a separate enabled card instead of the focused or technology-locked unit.
+                Assert.Equal(PlayerActionPanelMode.Construction,panel.Mode);
+                Assert.True(snapshot.PlayerActions!.Construction[1].HasRequiredResources);
                 Assert.Equal(state == UiReferenceScenario.DockPressed, panel.PointerPressed);
             }
             if (state == UiReferenceScenario.Targeting) Assert.Equal(PlayerActionPanelMode.Tactical, panel.Mode);
