@@ -49,7 +49,7 @@ internal static class UiTypographyCapture
                     foreach (float scale in new[] { .75f, 1f, 2f })
                     {
                         string key = FormattableString.Invariant($"{display.Item1}x{display.Item2}-{dpi}dpi-{scale:0.00}");
-                        var layout = FrontendDesign.ResolveLayout(display.Item1, display.Item2, scale);
+                        var layout = FrontendDesign.ResolveLayout(display.Item1, display.Item2, scale, dpi);
                         if (layout.ContentWidth > display.Item1 + .01 || layout.ContentHeight > display.Item2 + .01)
                             throw new InvalidDataException("Frontend exceeds native surface.");
                         foreach (bool gameplay in new[] { false, true })
@@ -63,7 +63,7 @@ internal static class UiTypographyCapture
                                     hud.Render(c, camera, fixture.Snapshot, terrain.WorldBounds, RtsInformationLayerView.Empty,
                                         default, default, FormationTemplate.Compact, CombatGroupOverviewView.Empty, default, dpi, scale);
                                 }
-                                else { c.BeginPass(GraphicsFramePass.Overlay); frontend.Render(c, menu, scale); }
+                                else { c.BeginPass(GraphicsFramePass.Overlay); frontend.Render(c, menu with { Layout = layout.Geometry }, scale); }
                             }
                             for (int i = 0; i < 4; i++) graphics.RenderFrame(GraphicsColor.ForgeLineClear, Record);
                             var watch = Stopwatch.StartNew(); byte[] rgba = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, Record); watch.Stop();

@@ -70,6 +70,14 @@ jobs:
       - name: Compile and qualify canonical map
         run: dotnet run --project tools/ForgeLine.MapCompiler/ForgeLine.MapCompiler.csproj --configuration Release --no-build -- --output artifacts/maps/central-divide.flmap.json --qualification-output artifacts/map-qualification.json
 
+      - name: Adaptive frontend geometry and interaction contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.FrontendLayoutHardeningTests ForgeLine.Client.Tests.FrontendPointerInteractionTests ForgeLine.Client.Tests.FrontendControlAffordanceTests ForgeLine.Client.Tests.FrontendInteractionTests ForgeLine.Client.Tests.FrontendInputLifetimeTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.FrontendOverlayRendererTests ForgeLine.Presentation.Tests.FrontendLayoutNativeTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Native UI typography contracts
         run: dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.UiFontMetricsTests ForgeLine.Presentation.Tests.UiTypographyNativeTests
 

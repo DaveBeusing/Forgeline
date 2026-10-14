@@ -68,7 +68,7 @@ public readonly record struct FrontendGeometry
         float actionY = height - 242 * scale;
         float detailWidth = controls ? right - left - 10 * scale : MathF.Min(right - left - 10 * scale, MathF.Max(980 * viewport, 950 * scale));
         float stride = controls ? 150 : 58;
-        int rows = Math.Clamp((int)((actionY - detailY - 16 * scale) / (stride * scale)), 1, 7);
+        int rows = Math.Clamp((int)((actionY - detailY - 6 * scale) / (stride * scale)), 1, 7);
         var result = new FrontendGeometry { Width = width, Height = height, Scale = scale, Dpi = dpi, UserScale = userScale };
         return result with
         {
