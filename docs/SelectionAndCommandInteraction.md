@@ -291,3 +291,5 @@ Informational command result cards remain non-actionable.
 ## Adaptive command dock
 
 The selected card determines the visible dock page. Rebound NextItem, wheel and header arrows navigate without simulation requests. Rendering, pointer hits and hover share the visible window; hidden cards cannot be clicked. Wheel suppresses simultaneous clicks. Collapsed ownership follows the visible strip. Existing session/tick/selection/terminal guards remain in force.
+
+See [dock qualification](CommandDockQualification.md) for the interaction checks, native reference coverage and remaining live acceptance.
