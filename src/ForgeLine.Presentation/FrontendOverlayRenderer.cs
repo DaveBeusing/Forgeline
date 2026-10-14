@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
 using ForgeLine.Graphics;
+using ForgeLine.Assets;
 
 namespace ForgeLine.Presentation;
 
@@ -23,6 +24,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
     private int _vertexLimit = MaxVertices;
     private int _vertexCount;
     private bool _disposed;
+    private FrontendMenuBackground? _background;
 
     public FrontendOverlayRenderer(IGraphicsDevice graphics)
     {
@@ -32,6 +34,13 @@ public sealed class FrontendOverlayRenderer : IDisposable
         _text = new UiTextBatch(graphics);
     }
 
+    public FrontendBackgroundDiagnostics BackgroundDiagnostics => _background?.Diagnostics ?? new("Deferred", 0, 0, null);
+    public void PrepareBackground(RuntimeAssetCatalog catalog, RenderQuality quality, bool software = false)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        _background ??= new FrontendMenuBackground(_graphics, catalog);
+        _background.Prepare(quality, software);
+    }
     public FrontendGeometry LastLayout { get; private set; }
     public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
     public int LastRenderedVertexCount { get; private set; }
@@ -75,13 +84,20 @@ public sealed class FrontendOverlayRenderer : IDisposable
                 EmitPanel(new SurfaceRect(0, band * height / 24f, width, height / 24f + 1),
                     Vector4.Lerp(ForgeLineUiPalette.BackgroundDeep, ForgeLineUiPalette.Background, band / 24f), width, height);
         }
-        Panel(layout.SafeArea, ForgeLineUiPalette.Surface);
-        Text("FORGELINE", layout.Header, ForgeLineUiPalette.TextPrimary, 1.46f);
-        var tagline = layout.Header with { Y = layout.Header.Y + 54 * scale };
+        if (view.Kind == FrontendSurfaceKind.PauseMenu)
+        {
+            Panel(layout.Header with { Width = layout.Navigation.Width }, ForgeLineUiPalette.Surface);
+            Panel(layout.Title with { Width = layout.Navigation.Width }, ForgeLineUiPalette.Surface);
+            Panel(layout.Footer, ForgeLineUiPalette.Surface);
+            if (!string.IsNullOrEmpty(view.Feedback)) Panel(layout.Feedback, ForgeLineUiPalette.Surface);
+        }
+        else Panel(layout.SafeArea, ForgeLineUiPalette.Surface);
+        Text("FORGELINE", layout.Header, ForgeLineUiPalette.TextPrimary, view.Kind == FrontendSurfaceKind.PauseMenu ? 1.46f : 1.8f);
+        var tagline = layout.Header with { Y = layout.Header.Y + (view.Kind == FrontendSurfaceKind.PauseMenu ? 54 : 70) * scale };
         Text("BUILD. SUPPLY. CONQUER.", tagline, ForgeLineUiPalette.TextSecondary, .75f);
         Text(view.Title, layout.Title, ForgeLineUiPalette.Accent);
         // Decorations have their own visual-only rectangle and cannot enter a control slot.
-        if (layout.Decorative.Width > 180 * scale && view.Kind != FrontendSurfaceKind.Controls)
+        if (layout.Decorative.Width > 180 * scale && view.Kind is not (FrontendSurfaceKind.Controls or FrontendSurfaceKind.PauseMenu) && _background?.Ready != true)
         {
             var art = layout.Decorative;
             Panel(art, ForgeLineUiPalette.BackgroundRaised);
@@ -98,6 +114,9 @@ public sealed class FrontendOverlayRenderer : IDisposable
             Text("TACTICAL COMMAND", art with { X = art.X + 20 * scale, Y = art.Y + 20 * scale, Width = art.Width - 40 * scale },
                 ForgeLineUiPalette.TextSecondary, .8f);
         }
+        if (_background?.Ready == true && view.Kind == FrontendSurfaceKind.MainMenu)
+            Text("DIRECTORATE / CENTRAL DIVIDE", layout.MenuArtwork with { X = layout.MenuArtwork.X + 20 * scale,
+                Y = layout.MenuArtwork.Y + 18 * scale, Width = layout.MenuArtwork.Width - 40 * scale }, ForgeLineUiPalette.TextSecondary, .72f);
         if (view.Kind is FrontendSurfaceKind.MainMenu or FrontendSurfaceKind.PauseMenu)
         {
             for (int i = 0; i < Math.Min(7, view.MenuEntries.Count); i++)
@@ -180,8 +199,12 @@ public sealed class FrontendOverlayRenderer : IDisposable
         context.SetPipeline(_pipeline);
         context.SetVertexBuffer(buffer, VertexStride);
         context.Draw(_vertexCount);
+        var imageRegion = view.Kind == FrontendSurfaceKind.MainMenu ? layout.MenuArtwork : layout.Decorative;
+        bool imageDrawn = _background?.Ready == true && imageRegion.Width > 0 && imageRegion.Height > 0 &&
+            view.Kind is not (FrontendSurfaceKind.Controls or FrontendSurfaceKind.PauseMenu);
+        if (imageDrawn) _background!.Render(context, imageRegion);
         _text.Render(context);
-        LastRenderedVertexCount = _vertexCount + _text.VertexCount;
+        LastRenderedVertexCount = _vertexCount + _text.VertexCount + (imageDrawn ? 6 : 0);
     }
 
     public void Dispose()
@@ -189,6 +212,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
         if (_disposed) return;
         foreach (IGraphicsBuffer buffer in _vertexBuffers.Values) buffer.Dispose();
         _vertexBuffers.Clear();
+        _background?.Dispose();
         _text.Dispose();
         _pipeline.Dispose();
         _disposed = true;

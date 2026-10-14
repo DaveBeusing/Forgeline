@@ -50,6 +50,10 @@ public sealed class FrontendLayoutHardeningTests
             Assert.True(g.SecondaryAction.Right < g.PrimaryAction.X);
             Assert.True(g.PrimaryAction.Bottom < g.Feedback.Y);
             Assert.True(g.MenuRow(6).Bottom < g.Feedback.Y);
+            Assert.True(g.MenuArtwork.X > g.Navigation.Right);
+            Assert.True(g.MenuArtwork.Right <= display.Item1);
+            Assert.True(g.MenuArtwork.Bottom < g.Footer.Y);
+            Assert.False(g.MenuArtwork.Interactive);
             Assert.False(g.Decorative.Contains(g.Decorative.X + 1, g.Decorative.Y + 1));
             Assert.Null(FrontendHitTesting.MainMenu(1, display.Item2 / 2f, layout, menu.Items));
         }

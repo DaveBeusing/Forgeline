@@ -181,7 +181,7 @@ internal sealed class ClientApplication
             else
             {
                 FrontendSessionSelectionResult selection = RunFrontendSessionSelection(window,
-                    new GameFrontendShell(), newGame, startupSaves, sessionFeedback, menuSmoke, bootRendererAvailable ? bootRenderer : null);
+                    new GameFrontendShell(), newGame, startupSaves, sessionFeedback, menuSmoke, bootRendererAvailable ? bootRenderer : null, runtimeAssets);
                 if (selection.RestartRequested) return RestartRequestedExitCode;
                 if (selection.Session is not ClientSessionRequest selected) return 0;
                 sessionRequest = selected;
@@ -3009,7 +3009,7 @@ internal sealed class ClientApplication
         GameFrontendShell shell,
         NewGameModel newGame,
         IReadOnlyList<LoadGameEntry> startupSaves,
-        string initialFeedback = "", bool menuSmoke = false, ClientFrontendRenderHost? initialRenderer = null)
+        string initialFeedback = "", bool menuSmoke = false, ClientFrontendRenderHost? initialRenderer = null, RuntimeAssetCatalog? menuAssets = null)
     {
         _startup.Begin(StartupPhase.Frontend);
         shell.Dispatch(
@@ -3050,6 +3050,7 @@ internal sealed class ClientApplication
         using ClientFrontendRenderHost? ownedRenderer = initialRenderer is null
             ? new ClientFrontendRenderHost(target, _startup, asynchronousStartup: true) : null;
         ClientFrontendRenderHost renderer = initialRenderer ?? ownedRenderer!;
+        renderer.SetMenuAssets(menuAssets);
         _startup.End(StartupPhase.Frontend);
         _startup.Mark(StartupPhase.FrontendReady);
 
@@ -3421,7 +3422,8 @@ internal sealed class ClientApplication
                 frontendLayout = publishedLayout;
             }
             detailScroll = Math.Clamp(detailScroll, 0, Math.Max(0, surface.DetailLines.Count - frontendLayout.Geometry.VisibleDetailRows));
-            surface = surface with { Layout = frontendLayout.Geometry, DetailScroll = detailScroll };
+            surface = surface with { Layout = frontendLayout.Geometry, DetailScroll = detailScroll,
+                BackgroundQuality = (RenderQuality)settings.Settings.RenderQuality };
             if (input.HasPointerPosition &&
                 shell.Screen != GameFrontendScreen.MainMenu)
             {

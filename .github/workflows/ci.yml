@@ -101,6 +101,14 @@ jobs:
         shell: pwsh
         run: ./build/Test-RuntimeAssetPipeline.ps1
 
+      - name: Cinematic menu image and native lifecycle contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.FrontendMenuBackgroundTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.CinematicMenuNativeTests ForgeLine.Client.Tests.FrontendLifecycleTests ForgeLine.Client.Tests.FrontendLoadingControllerTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: World environment and terrain residency contracts
         shell: pwsh
         run: |

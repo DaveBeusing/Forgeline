@@ -7,6 +7,19 @@ namespace ForgeLine.Assets.Tests;
 public sealed class RuntimeTextureDataTests
 {
     [Fact]
+    public void DisplayImagesRoundTripBc7WithoutApplyingSrgbAgain()
+    {
+        var mips = new[] { new RuntimeTextureMipLevel(4, 4, 16, new byte[16]) };
+        var image = new RuntimeTextureData(4, 4, RuntimeTextureFormat.Bc7Unorm, RuntimeTextureColorSpace.Linear,
+            RuntimeTextureUsage.DisplayImage, mips);
+        var decoded = RuntimeTextureData.FromPayload(image.ToPayload());
+        Assert.Equal(RuntimeTextureUsage.DisplayImage, decoded.Usage);
+        Assert.Equal(RuntimeTextureColorSpace.Linear, decoded.ColorSpace);
+        Assert.Throws<InvalidDataException>(() => new RuntimeTextureData(4, 4, RuntimeTextureFormat.Bc7Unorm,
+            RuntimeTextureColorSpace.Srgb, RuntimeTextureUsage.DisplayImage, mips));
+    }
+
+    [Fact]
     public void MultiMipPayloadRoundTripsMetadataAndSubresources()
     {
         var texture =

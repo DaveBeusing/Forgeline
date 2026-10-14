@@ -1,0 +1,144 @@
+{
+  "CodeRevision": "5e7d4f7f625ca7ea330dfd0ea86c6e23b59b5295",
+  "ProductVersion": "0.1.365",
+  "ArchiveSha256": "87c7c385b784bb921bb53ed2761bdd04d4b51ba0644e1e11cf503d9dee0ad565",
+  "SourceTreeClean": true,
+  "Reproducible": true,
+  "Startup": [
+    {
+      "Baseline": true,
+      "Readiness": "Ready",
+      "DroppedEvents": 0,
+      "MilestonesMilliseconds": {
+        "ProcessEntered": 0,
+        "WindowVisible": 137.5487,
+        "RuntimeAssetsReady": 948.36,
+        "FrontendDependenciesReady": 1417.7894,
+        "GraphicsReady": 2534.1478,
+        "FirstPresentedFrame": 2627.9922,
+        "SplashBootstrapFirstFrame": 2627.9943,
+        "StudioSplashFirstFrame": 4242.9539,
+        "FrontendReady": 14304.7094,
+        "MainMenuFirstFrame": 14570.6045,
+        "MainMenuInteractive": 14582.7065,
+        "ApplicationReady": 14583.0215
+      }
+    },
+    {
+      "Baseline": false,
+      "Readiness": "Ready",
+      "DroppedEvents": 0,
+      "MilestonesMilliseconds": {
+        "ProcessEntered": 0,
+        "WindowVisible": 346.0315,
+        "RuntimeAssetsReady": 2166.7425,
+        "FrontendDependenciesReady": 3939.0702,
+        "GraphicsReady": 5117.4186,
+        "FirstPresentedFrame": 5194.575,
+        "SplashBootstrapFirstFrame": 5194.5769,
+        "StudioSplashFirstFrame": 6920.3436,
+        "FrontendReady": 16976.2058,
+        "MainMenuFirstFrame": 17081.1023,
+        "MainMenuInteractive": 17081.5315,
+        "ApplicationReady": 17081.7254
+      }
+    },
+    {
+      "Baseline": false,
+      "Readiness": "Ready",
+      "DroppedEvents": 0,
+      "MilestonesMilliseconds": {
+        "ProcessEntered": 0,
+        "WindowVisible": 209.2074,
+        "RuntimeAssetsReady": 1102.5421,
+        "FrontendDependenciesReady": 1589.7452,
+        "GraphicsReady": 3170.8114,
+        "FirstPresentedFrame": 3287.8646,
+        "SplashBootstrapFirstFrame": 3287.8677,
+        "StudioSplashFirstFrame": 5277.5123,
+        "FrontendReady": 15381.0177,
+        "MainMenuFirstFrame": 15738.3685,
+        "MainMenuInteractive": 15747.3816,
+        "ApplicationReady": 15748.0635
+      }
+    },
+    {
+      "Baseline": false,
+      "Readiness": "Ready",
+      "DroppedEvents": 0,
+      "MilestonesMilliseconds": {
+        "ProcessEntered": 0,
+        "WindowVisible": 220.3208,
+        "RuntimeAssetsReady": 1210.7836,
+        "FrontendDependenciesReady": 1723.5791,
+        "GraphicsReady": 3135.1691,
+        "FirstPresentedFrame": 3208.0466,
+        "SplashBootstrapFirstFrame": 3208.0493,
+        "StudioSplashFirstFrame": 4662.4277,
+        "FrontendReady": 14725.5957,
+        "MainMenuFirstFrame": 14841.374,
+        "MainMenuInteractive": 14856.5812,
+        "ApplicationReady": 14856.9824
+      }
+    }
+  ],
+  "StartupContract": "Normal studio-to-menu launches; baseline is one earlier 0.1.364 packaged launch. These sequential samples are not a controlled startup benchmark. Optional art is scheduled after menu presentation.",
+  "PlayableModes": [
+    {
+      "Window": {
+        "mode": "Windowed",
+        "clientWidth": 1600,
+        "clientHeight": 900,
+        "isMinimized": false,
+        "dpi": 144
+      },
+      "Surface": {
+        "width": 1600,
+        "height": 900,
+        "bufferCount": 3,
+        "frameIndex": 1,
+        "isSuspended": false,
+        "presentMode": "VSync",
+        "isOccluded": false,
+        "resizePending": false,
+        "resizeGeneration": 0,
+        "appliedResizeGeneration": 0,
+        "submittedFrameCount": 112,
+        "presentedFrameCount": 112
+      },
+      "TextureBindingFailures": 0,
+      "MaterialBindingFailures": 0,
+      "PeakResidentTextureBytes": 54106824,
+      "RuntimeMeshInstances": 15,
+      "TerrainChunks": 15
+    },
+    {
+      "Window": {
+        "mode": "BorderlessFullscreen",
+        "clientWidth": 5120,
+        "clientHeight": 2160,
+        "isMinimized": false,
+        "dpi": 144
+      },
+      "Surface": {
+        "width": 5120,
+        "height": 2160,
+        "bufferCount": 3,
+        "frameIndex": 2,
+        "isSuspended": false,
+        "presentMode": "VSync",
+        "isOccluded": false,
+        "resizePending": false,
+        "resizeGeneration": 0,
+        "appliedResizeGeneration": 0,
+        "submittedFrameCount": 44,
+        "presentedFrameCount": 44
+      },
+      "TextureBindingFailures": 0,
+      "MaterialBindingFailures": 0,
+      "PeakResidentTextureBytes": 54112544,
+      "RuntimeMeshInstances": 17,
+      "TerrainChunks": 18
+    }
+  ]
+}

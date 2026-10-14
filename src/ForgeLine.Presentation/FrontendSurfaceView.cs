@@ -49,6 +49,7 @@ public readonly record struct FrontendSurfaceView(
     float SplashMasterOpacity = 1f,
     bool SplashBootstrap = false)
 {
+    public RenderQuality BackgroundQuality { get; init; } = RenderQuality.Medium;
     public FrontendGeometry? Layout { get; init; }
     public int DetailScroll { get; init; }
 

@@ -12,7 +12,7 @@ namespace ForgeLine.Client;
 internal static class FrontendLayoutCapture
 {
     private static readonly JsonSerializerOptions s_json = new() { WriteIndented = true };
-    internal static int Run(string output)
+    internal static int Run(string output, string? runtimeRoot = null)
     {
         try
         {
@@ -23,6 +23,16 @@ internal static class FrontendLayoutCapture
             using IWindow window = platform.CreateWindow(new("FORGELINE Frontend Layout Qualification", 1280, 720));
             using var graphics = GraphicsDeviceFactory.CreateForWindow(window, new() { EnableVSync = false });
             using var renderer = new FrontendOverlayRenderer(graphics);
+            double? backgroundLoadMilliseconds = null;
+            if (runtimeRoot is not null)
+            {
+                var catalog = ForgeLine.Assets.RuntimeAssetCatalog.Load(runtimeRoot);
+                var wait = System.Diagnostics.Stopwatch.StartNew();
+                do { renderer.PrepareBackground(catalog, RenderQuality.High); Thread.Sleep(1); }
+                while (renderer.BackgroundDiagnostics.State == "Loading" && wait.Elapsed < TimeSpan.FromSeconds(15));
+                if (renderer.BackgroundDiagnostics.State != "Ready") throw new InvalidDataException("Cinematic art did not become ready.");
+                backgroundLoadMilliseconds = wait.Elapsed.TotalMilliseconds;
+            }
             var results = new List<object>();
             var menu = new MainMenuModel(false);
             var saves = new LoadGameModel(Enumerable.Range(0, 50).Select(i => new LoadGameEntry($"s{i}",
@@ -58,8 +68,9 @@ internal static class FrontendLayoutCapture
                         var view = source with { Layout = geometry, DetailScroll = scroll };
                         void Record(IGraphicsCommandContext c) { c.BeginPass(GraphicsFramePass.Overlay); renderer.Render(c, view); }
                         for (int warmup = 0; warmup < 3; warmup++) graphics.RenderFrame(GraphicsColor.ForgeLineClear, Record);
-                        byte[] pixels = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, Record);
-                        byte[] repeated = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, Record);
+                        var clear = name == "pause" ? new GraphicsColor(.7f, .75f, .8f, 1) : GraphicsColor.ForgeLineClear;
+                        byte[] pixels = graphics.CaptureFrame(clear, Record);
+                        byte[] repeated = graphics.CaptureFrame(clear, Record);
                         if (!pixels.AsSpan().SequenceEqual(repeated) || renderer.LastLayout != geometry)
                             throw new InvalidDataException("Layout capture or shared geometry is not repeatable.");
                         if (!renderer.TextDiagnostics.AtlasReady || renderer.TextDiagnostics.DroppedGlyphs != 0 || renderer.TextDiagnostics.MissingGlyphs != 0)
@@ -72,7 +83,7 @@ internal static class FrontendLayoutCapture
                             ReferenceCaptureImage.WritePng(Path.Combine(output, image), display.Item1, display.Item2, pixels);
                         }
                         results.Add(new { Screen = name, Width = display.Item1, Height = display.Item2, Dpi = dpi, UiScale = scale,
-                            VisibleRows = geometry.VisibleDetailRows, Scroll = scroll, GeometryScale = geometry.Scale,
+                            VisibleRows = geometry.VisibleDetailRows, Scroll = scroll, GeometryScale = geometry.Scale, BrightPauseBackdrop = name == "pause",
                             Repeatable = true, SharedGeometry = true, Vertices = renderer.LastRenderedVertexCount,
                             Font = renderer.TextDiagnostics, PixelSha256 = Convert.ToHexString(SHA256.HashData(pixels)), Image = image });
                     }
@@ -96,10 +107,36 @@ internal static class FrontendLayoutCapture
             for (int warmup = 0; warmup < 3; warmup++) graphics.RenderFrame(GraphicsColor.ForgeLineClear, c => renderer.Render(c, restored));
             graphics.CaptureFrame(GraphicsColor.ForgeLineClear, c => renderer.Render(c, restored));
             if (graphics.Diagnostics.Health.SubmissionFaultCount != 0) throw new InvalidDataException("Native submission failed.");
+            object? comparison = null;
+            if (runtimeRoot is not null)
+            {
+                graphics.WaitForIdle(); graphics.Resize(1920, 1080);
+                using var fallback = new FrontendOverlayRenderer(graphics);
+                var sample = FrontendPresentationAdapter.MainMenu(menu) with { Layout = FrontendGeometry.Resolve(1920, 1080) };
+                object Measure(FrontendOverlayRenderer target)
+                {
+                    void Draw(IGraphicsCommandContext c) { c.BeginPass(GraphicsFramePass.Overlay); target.Render(c, sample); }
+                    for (int i = 0; i < 16; i++) graphics.RenderFrame(GraphicsColor.ForgeLineClear, Draw);
+                    var cpu = new List<double>(); var gpu = new List<double>(); ulong fence = 0;
+                    for (int i = 0; i < 64; i++)
+                    {
+                        long start = System.Diagnostics.Stopwatch.GetTimestamp(); graphics.RenderFrame(GraphicsColor.ForgeLineClear, Draw);
+                        cpu.Add(System.Diagnostics.Stopwatch.GetElapsedTime(start).TotalMicroseconds);
+                        if (graphics.Diagnostics.Frame is { } frame && frame.GpuSubmissionFence > fence && graphics.Diagnostics.GpuFrameMilliseconds is { } time)
+                        { fence = frame.GpuSubmissionFence; gpu.Add(time); }
+                    }
+                    cpu.Sort(); gpu.Sort();
+                    return new { Vertices = target.LastRenderedVertexCount, CpuSubmitP50Microseconds = cpu[cpu.Count/2], GpuSamples = gpu.Count,
+                        GpuFrameP50Milliseconds = gpu.Count == 0 ? (double?)null : gpu[gpu.Count/2] };
+                }
+                comparison = new { Fallback = Measure(fallback), Cinematic = Measure(renderer),
+                    Contract = "Same-device 1080p complete clear/menu/image/text GPU frame; no world. CPU submit includes waits/present. Not an isolated image shader benchmark." };
+            }
             File.WriteAllText(Path.Combine(output, "qualification.json"), JsonSerializer.Serialize(new
             {
                 Version = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
                 Device = graphics.Diagnostics.Device, MatrixDpiContract = "Requested physical-pixel layout DPI; actual window DPI recorded separately. No physical multi-monitor certification.",
+                Background = renderer.BackgroundDiagnostics, BackgroundLoadMilliseconds = backgroundLoadMilliseconds, NativeComparison = comparison,
                 Cases = results, WindowModes = modes, ZeroSizeRestore = true, SubmissionFaults = graphics.Diagnostics.Health.SubmissionFaultCount
             }, s_json));
             return 0;

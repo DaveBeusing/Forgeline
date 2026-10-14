@@ -680,3 +680,12 @@ retains all 492 qualified payloads and the manifest byte-for-byte. See
 ## UI font resources
 
 Bundled UI typography has a reproducible offline atlas, a PNG authoring inspection asset, and embedded precompiled coverage/metrics for early frontend use. Font authoring is never a startup or publish dependency. See [UI typography](UiTypography.md) for provenance, exact resource IDs, the narrow ownership decision and validation commands. Publishing validates the font payload and redistribution notice, and rejects source TTF files in the package.
+
+## Display-referred title images
+
+`textureUsage: displayImage` (runtime usage value 7) identifies a rendered/tone-mapped image
+that is displayed directly, rather than sampled as a PBR BaseColor. It requires linear GPU
+storage to avoid a second sRGB decode; BC7 with mipmaps is supported. Normal/ORM/control
+and BaseColor contracts stay unchanged. The enum addition uses the existing texture payload
+layout and manifest integrity contract. The Directorate menu image is an ordinary compiled
+asset with source provenance; it is loaded only after the interactive menu has presented.

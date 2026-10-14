@@ -368,7 +368,8 @@ public static class AssetPipelineCompiler
                     RuntimeTextureUsage.Normal or
                     RuntimeTextureUsage.Orm or
                     RuntimeTextureUsage.GenericData or
-                    RuntimeTextureUsage.TerrainControl &&
+                    RuntimeTextureUsage.TerrainControl or
+                    RuntimeTextureUsage.DisplayImage &&
                 definition.TextureColorSpace != RuntimeTextureColorSpace.Linear)
             {
                 diagnostics.Add(new AssetCompilerDiagnostic(

@@ -127,3 +127,11 @@ manifest signature is
 The timing tables above retain the earlier, identical 348-asset cohorts; they
 must not be treated as measurements of the larger updated catalog. Complete
 synchronized regression and package outcomes are recorded in the pull request.
+
+## Optional menu image deployment
+
+The title still adds one compiled `branding.forgeline.menu.directorate` texture (493 canonical
+assets total). It passes the same manifest/hash/deployment verification and is copied by the
+normal reproducible publisher with the runtime notices. Its complete BC7 mip chain is about
+3 MiB, with a strict 4 MiB loader bound; the existing 56 MiB gameplay-catalog and 64 MiB scene
+budgets are not raised. Runtime fallback does not compile, download or repair artwork.

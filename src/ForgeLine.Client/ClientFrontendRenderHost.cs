@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.ExceptionServices;
 using ForgeLine.Graphics;
+using ForgeLine.Assets;
 using ForgeLine.Presentation;
 
 namespace ForgeLine.Client;
@@ -17,6 +18,8 @@ internal sealed class ClientFrontendRenderHost : IDisposable
     private readonly ManualResetEventSlim _frameRendered = new(false);
     private readonly Thread _thread;
     private FrontendSurfaceView? _latest;
+    private RuntimeAssetCatalog? _menuAssets;
+    private FrontendBackgroundDiagnostics _menuImageDiagnostics = new("Deferred", 0, 0, null);
     private Action<IGraphicsDevice>? _nextStage;
     private long _publishedSequence;
     private long _presentedSequence;
@@ -72,6 +75,14 @@ internal sealed class ClientFrontendRenderHost : IDisposable
             _frameRendered.Reset();
         }
 
+        _signal.Set();
+    }
+
+    internal FrontendBackgroundDiagnostics MenuImageDiagnostics { get { lock (_gate) return _menuImageDiagnostics; } }
+
+    internal void SetMenuAssets(RuntimeAssetCatalog? catalog)
+    {
+        lock (_gate) _menuAssets = catalog;
         _signal.Set();
     }
 
@@ -222,6 +233,7 @@ internal sealed class ClientFrontendRenderHost : IDisposable
         bool suspended = _target.Suspended;
         StudioSplashVideoRenderer? videoRenderer = null;
         bool videoAttempted = false;
+        bool menuPresented = false;
         try
         {
             while (Volatile.Read(ref _stopping) == 0)
@@ -229,12 +241,14 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                 _signal.WaitOne(TimeSpan.FromMilliseconds(16));
                 FrontendSurfaceView? view;
                 long sequence;
+                RuntimeAssetCatalog? menuAssets;
                 int requestedWidth, requestedHeight;
                 bool requestedSuspended;
                 lock (_gate)
                 {
                     if (_nextStage is not null) return _nextStage;
                     view = _latest;
+                    menuAssets = _menuAssets;
                     sequence = _publishedSequence;
                     requestedWidth = _surfaceWidth;
                     requestedHeight = _surfaceHeight;
@@ -287,6 +301,11 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                     }
                 }
 
+                if (menuPresented && menuAssets is not null && view.Value.Kind == FrontendSurfaceKind.MainMenu)
+                {
+                    renderer.PrepareBackground(menuAssets, view.Value.BackgroundQuality, graphics.Diagnostics.Device.IsSoftwareAdapter);
+                    lock (_gate) _menuImageDiagnostics = renderer.BackgroundDiagnostics;
+                }
                 graphics.RenderFrame(
                     view.Value.Kind == FrontendSurfaceKind.StudioSplash
                         ? new GraphicsColor(0, 0, 0, 1) : GraphicsColor.ForgeLineClear,
@@ -313,6 +332,7 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                 {
                     if (view.Value.Kind == FrontendSurfaceKind.StudioSplash && videoRenderer?.HasFrame == true)
                         Volatile.Write(ref _splashPresented, 1);
+                    if (view.Value.Kind == FrontendSurfaceKind.MainMenu) menuPresented = true;
                     _presentedFrames = graphics.PresentedFrameCount;
                     Volatile.Write(ref _presentedDimensions, (long)(uint)width << 32 | (uint)height);
                     Volatile.Write(ref _presentedSequence, sequence);

@@ -12,7 +12,7 @@ The frontend uses the bundled antialiased DejaVu font atlas and adaptive physica
 - Flat background and only-selected-row panels made the frontend resemble a technical prototype rather than a deliberately composed game menu.
 - Frontend amber accents and battlefield HUD cool-tinted panels were defined independently instead of using shared semantic colors.
 - Main-menu feedback previously occupied the vertical area of the final menu entry. The revised feedback position prevents that overlap.
-- Major screens are implemented and tested, but a finished scene-backed title treatment, rich content transitions are not yet provided by this visual pass. The bundled typography layer is now implemented separately.
+- The authored static Directorate title treatment now supplements this foundation; rich motion/audio transitions and higher-detail content remain separate work. See [cinematic menu](CinematicFrontend.md).
 
 ### Existing strengths to retain
 
@@ -46,7 +46,7 @@ Alpha is meaningful only when the graphics pipeline supports blending. Functiona
 - Keep a consistent logo/header, tagline, separator and low-contrast version/footer placement.
 - Make every menu row's visual boundary discoverable; focus adds a thick warm rail and explicit SELECT text while disabled actions receive a visibly different treatment.
 - Use `Navigation` / `MenuRow` for both visible bounds and input. The 96-DPI 1080p default retains X 82–642 and Y 338 + 72×row; compact layouts change these through the shared resolver.
-- Use a right-side **abstract industrial schematic**, not a false gameplay render or fictional runtime health indicator. It must not intercept pointer input or imply functional options.
+- Use the authored Directorate still in the visual-only `MenuArtwork` region. The industrial schematic remains the missing/unsupported-art fallback. Neither presentation is a live match preview or runtime health indicator, and neither captures input.
 - Do not obscure the primary commands, loading errors, or menu feedback with ornament.
 - Detail pages reserve a separate decorative region; rows, values and adjustment controls use the shared geometry.
 - Pause screens preserve the battlefield context rather than replacing it with the full frontend backdrop.
@@ -71,7 +71,7 @@ Visually qualify main menu, loading, settings, controls, pause, and the battlefi
 This pass is **visual-foundation work**, not a claim of final AAA visual quality. A complete title-quality interface additionally needs:
 
 1. Extend the bundled typography contract when additional locales require complex-script shaping or bidi; current language coverage, kerning, metrics and visible replacement are documented in [UI typography](UiTypography.md).
-2. Professionally authored title/menu environment imagery or animated real-time background scenes; integrate with the compiled runtime asset pipeline and quality presets.
+2. Further high-detail title content and optional motion review; the compiled static title composition uses existing Directorate production meshes and does not claim new film-quality models.
 3. Motion language: short deliberate transitions, input feedback, panel reveals and audio cues, with reduced-motion/skip behavior and no artificial loading delays.
 4. A coherent HUD iconography and information-density pass for selection, build/production, logistics, alerts and minimap with semantic states at multiple zoom levels.
 5. Screenshot/golden-image qualification on reference machines to assess visual hierarchy, not just geometry and input tests.

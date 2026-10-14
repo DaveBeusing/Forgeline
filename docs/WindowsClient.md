@@ -304,3 +304,13 @@ release, clear hover/pressed state and preserve model focus. Closing help/pause 
 the gesture before gameplay resumes. `GameplayHudLayout` retains separate ownership.
 
 See [named regions and migration](FrontendLayout.md) and [qualification](FrontendLayoutQualification.md).
+
+## Static cinematic menu presentation
+
+After the first interactive menu frame, the render owner starts one bounded CPU read of
+`branding.forgeline.menu.directorate` from the already validated runtime catalog. GPU texture
+creation runs outside command recording on that same render owner, with deferred upload
+waits. The image is clipped to named visual-only regions; enabled commands and hit targets
+are unchanged. Low/software quality uses a smaller mip chain. Gameplay pause never replaces
+the current battlefield with title art. Entering a match disposes the frontend image; return
+creates a fresh frontend owner. See [policy and qualification](CinematicFrontend.md).

@@ -35,3 +35,13 @@ Legacy source textures and reusable layer contracts remain available to other as
 ## Verification
 
 Unit tests cover interpolation, duplicate keyframes, duration, fade, missing asset paths, and CLI bypass. Full qualification additionally requires normal launch, explicit splash bypass, missing-video bypass, four target resolutions (1920x1080, 2560x1440, 3840x2160, 3440x1440), no resource leaks, and Windows Release build/test and CI checks. These manual visual and lifetime checks are not covered by unit tests and must be performed before release.
+
+## Optional title artwork after startup
+
+The cinematic menu still is a separate Presentation resource, not a studio-intro layer.
+The first interactive menu frame is presented before its CPU load is scheduled. Missing,
+corrupt or unsupported optional art retains the responsive schematic/command interface;
+required manifest/gameplay failures retain the existing startup error behavior. No terrain,
+map simulation, decoder, source compiler or new graphics device is loaded for the still.
+Studio timing, minimum skip interval, audio, process/restart bypass and native bootstrap
+remain unchanged. See [title resource lifecycle](CinematicFrontend.md).
