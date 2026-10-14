@@ -300,6 +300,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                     MutedTextColor, graphics.Width, graphics.Height);
             }
         }
+        _scale = layout.Scale;
         if (showRuntimeMetrics) EmitRuntimeMetrics(metrics, layout.RuntimeMetrics, graphics.Width, graphics.Height);
 
         if (_vertexCount == 0)

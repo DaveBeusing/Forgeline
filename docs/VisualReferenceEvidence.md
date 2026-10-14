@@ -87,3 +87,18 @@ EffectsBarrage adds 1,024 copied effects to IndustrialBase; IndustrialEffects us
 
 
 The scalable object path retains exact native-scale pixels; reduced-scale depth reconstruction intentionally changes world pixels while keeping native overlays. CombatSupportRepeated is immutable 1,000-object render stress, not 1,000 active simulated units. Snapshot/cluster, submission and mesh payload counters are retained alongside completed-fence timing. New informational Advanced capability probes do not change a workload; adapter/driver/effective-profile changes still invalidate a hardware gate. See [scalable rendering](ScalableRendering.md).
+
+## Battlefield HUD inspection
+
+ForgeLine.Client.exe --battlefield-hud-capture <empty-output> <runtime-root> exercises
+the production HUD and compiled assets over the native BattlefieldCombat terrain/mesh
+fixture. Authored permitted read-model observations cover mixed selection, supply shortage
+and blocked factory work; original world intelligence/instances remain unchanged.
+Normal zoom covers five output sizes, three layout DPI values and three user scales.
+Strategic zoom adds the three states at 1080p / 96 DPI / scale 1.
+
+Repeated native pixels, text completion, submission faults and HUD vertices are recorded.
+Selected full-resolution PNGs retain their original pixels. Timing measures a complete
+HUD-only clear/overlay/text GPU frame without a world; CPU duration includes waits/Present.
+Existing reference captures retain their original snapshots and fingerprints for direct
+before/after comparisons. See [HUD qualification](BattlefieldHudQualification.md).
