@@ -1,0 +1,9 @@
+# Bundled UI typeface
+
+DejaVu Sans Regular and Bold are redistributed unmodified with the complete Bitstream Vera/Arev notices in LICENSE.txt. The original font names are retained. Their binary source is matplotlib commit 8d64f03a1f501ba0019279bf2f8db3930d1fe33f (v3.10.0), lib/matplotlib/mpl-data/fonts/ttf; font versions and SHA-256 hashes are recorded in metrics.json. License text is from dejavu-fonts/dejavu-fonts commit 9b5d1b2ffeec20c7b46aa89c0223d783c02762cf.
+
+Build-UiFontAtlas.py produces a version-1 signed-distance coverage atlas from those bundled files with pinned authoring libraries. No font importer or system font is used by a player. The atlas uses 48px source glyphs and a six-pixel distance spread, with regular/bold glyphs, kerning, Latin compositions and visible replacement glyphs. Compressed alpha and measured layout data are embedded as precompiled, bootstrap-safe UI resources under font.ui.dejavu_sans; the source PNG remains an authoring inspection asset. The current mesh/texture/material catalog has no font-metrics payload type, so publishing validates this narrow embedded resource contract without exporting a duplicate RGBA texture. Runtime texture quality settings never reduce UI text resolution.
+
+Reproduction: install build/ui-font-requirements.txt into an isolated authoring environment, then run python build/Build-UiFontAtlas.py --verify. Do not regenerate fonts during startup or ordinary publishing. Generated files are committed; CI validates source hashes, glyph bounds/coverage and compiled-resource availability. The publisher includes LICENSE.txt as ThirdPartyNotices/DejaVuFonts.txt.
+
+Coverage comprises ASCII, Latin-1/Extended-A, selected Greek/Cyrillic, arrows, punctuation and replacement. This is an LTR UI contract with kerning and canonical composition, not a complete Arabic/Indic shaping or bidi implementation. Unsupported scalars use a visible replacement glyph rather than blank space.

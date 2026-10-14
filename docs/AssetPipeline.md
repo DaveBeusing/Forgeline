@@ -676,3 +676,7 @@ The compiler owns runtime output, tangents, container integrity and packaging.
 Independent exports are byte-identical; the reproducible runtime-only package
 retains all 492 qualified payloads and the manifest byte-for-byte. See
 [the scoped source and runtime evidence](CombatSupportUnitProduction.md).
+
+## UI font resources
+
+Bundled UI typography has a reproducible offline atlas, a PNG authoring inspection asset, and embedded precompiled coverage/metrics for early frontend use. Font authoring is never a startup or publish dependency. See [UI typography](UiTypography.md) for provenance, exact resource IDs, the narrow ownership decision and validation commands. Publishing validates the font payload and redistribution notice, and rejects source TTF files in the package.

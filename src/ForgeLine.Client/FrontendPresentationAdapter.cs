@@ -109,7 +109,7 @@ internal static class FrontendPresentationAdapter
                 .Select(
                     entry =>
                         new FrontendDetailLineView(
-                            FrontendDesign.FitText(entry.DisplayName),
+                            FrontendDesign.FitText(entry.DisplayName, 320f, UiTypography.Style(UiTextRole.MenuItem).Size),
                             entry.CanLoad
                                 ? $"TICK {entry.SavedTick}"
                                 : entry.State.ToString().ToUpperInvariant(),

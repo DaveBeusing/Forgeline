@@ -46,6 +46,21 @@ public sealed class GameplayHudRenderer : IDisposable
 
     public int LastRenderedVertexCount { get; private set; }
 
+    public UiTextDiagnostics TextDiagnostics
+    {
+        get
+        {
+            int glyphs = 0, vertices = 0, missing = 0, dropped = 0; long upload = 0; bool ready = true; string? failure = null;
+            foreach (var surface in _surfaces)
+            {
+                var text = surface.TextDiagnostics; glyphs += text.Glyphs; vertices += text.Vertices;
+                missing += text.MissingGlyphs; dropped += text.DroppedGlyphs; upload += text.UploadBytes;
+                ready &= text.AtlasReady; failure ??= text.FailureReason;
+            }
+            return new(glyphs, vertices, missing, dropped, upload, ready, failure);
+        }
+    }
+
     public int LastHoverTooltipVertexCount { get; private set; }
     public int LastGuidanceVertexCount { get; private set; }
 

@@ -29,7 +29,10 @@ public sealed class GraphicsSettingsPresentationTests
         var surface = FrontendPresentationAdapter.Settings(model, interaction);
         byte[] image = Capture();
         Assert.Equal(image, Capture());
-        Assert.InRange(renderer.LastRenderedVertexCount, 16_385, 65_535);
+        Assert.True(renderer.TextDiagnostics.AtlasReady);
+        Assert.Equal(0, renderer.TextDiagnostics.MissingGlyphs);
+        Assert.Equal(6 * renderer.TextDiagnostics.Glyphs, renderer.TextDiagnostics.Vertices);
+        Assert.InRange(renderer.LastRenderedVertexCount, 1_000, 8_000);
         string? root = Environment.GetEnvironmentVariable("FORGELINE_SETTINGS_CAPTURE_OUTPUT");
         if (!string.IsNullOrWhiteSpace(root))
         {

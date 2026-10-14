@@ -4,15 +4,15 @@
 
 The Windows frontend is rendered by `FrontendOverlayRenderer` over the existing Direct3D 12 graphics device. The UI is intentionally independent of game authority, and `ForgeLine.UI` owns navigation/focus and pointer hit testing. The gameplay HUD uses distinct, modular surfaces composed by `GameplayHudRenderer`.
 
-The existing frontend uses a custom five-by-seven bitmap glyph renderer and a 1920×1080 reference layout, scaled and centered into the viewport. Main-menu interaction rectangles, settings adjustment hit targets, and primary/secondary buttons are intentionally fixed in reference coordinates. The battlefield HUD has a separate DPI-aware layout with named regions. These constraints are relevant to every visual change: presentation must not drift away from actual input geometry.
+The frontend uses the bundled antialiased DejaVu font atlas and a 1920×1080 reference layout, scaled and centered into the viewport. See [UI typography](UiTypography.md) for font resources, metrics, fallback and ownership. Main-menu interaction rectangles, settings adjustment hit targets, and primary/secondary buttons are intentionally fixed in reference coordinates. The battlefield HUD has a separate DPI-aware layout with named regions. These constraints are relevant to every visual change: presentation must not drift away from actual input geometry.
 
 ### Verified design weaknesses
 
-- Low-fidelity five-by-seven glyphs remain the strongest typography limitation. The approach is functional for diagnostics, but it does not meet finished-game typography, internationalization, or accessibility goals.
+- Five-by-seven glyphs are retained only for bootstrap/failure and explicit debug backends. Normal frontend/HUD text uses measured glyph quads; full bidi and complex-script shaping remain future work.
 - Flat background and only-selected-row panels made the frontend resemble a technical prototype rather than a deliberately composed game menu.
 - Frontend amber accents and battlefield HUD cool-tinted panels were defined independently instead of using shared semantic colors.
 - Main-menu feedback previously occupied the vertical area of the final menu entry. The revised feedback position prevents that overlap.
-- Major screens are implemented and tested, but a finished scene-backed title treatment, rich content transitions, and game-quality UI font/atlas pipeline are not yet provided by this visual pass.
+- Major screens are implemented and tested, but a finished scene-backed title treatment, rich content transitions are not yet provided by this visual pass. The bundled typography layer is now implemented separately.
 
 ### Existing strengths to retain
 
@@ -55,7 +55,7 @@ The current geometry remains reference-space based. If the UI eventually adopts 
 
 ## Performance and Validation
 
-Frontend composition uses bounded static geometric detail and the existing overlay buffer/pipeline; it must not load source assets, initialize a second graphics device, or allocate new graphic resources per frame. Large collections of text will still generate many vertices until a glyph-atlas solution replaces the prototype renderer.
+Frontend composition uses bounded static geometric detail and the existing overlay buffer/pipeline; it must not load source assets, initialize a second graphics device, or allocate new graphic resources per frame. Normal text batches generate six vertices per glyph, share one atlas, and reuse bounded frame buffers. Qualification records the extra text draws and measured CPU/upload trade-off.
 
 Targeted validation:
 
@@ -70,7 +70,7 @@ Visually qualify main menu, loading, settings, controls, pause, and the battlefi
 
 This pass is **visual-foundation work**, not a claim of final AAA visual quality. A complete title-quality interface additionally needs:
 
-1. A licensed, bundled high-quality UI typography pipeline (e.g., multi-channel signed-distance-field glyph atlas), kerning, tracking, Unicode coverage, locale fallback, and text measurement. Replace the bitmap font in a separate, measured implementation, including gameplay HUD usage.
+1. Extend the bundled typography contract when additional locales require complex-script shaping or bidi; current language coverage, kerning, metrics and visible replacement are documented in [UI typography](UiTypography.md).
 2. Professionally authored title/menu environment imagery or animated real-time background scenes; integrate with the compiled runtime asset pipeline and quality presets.
 3. Motion language: short deliberate transitions, input feedback, panel reveals and audio cues, with reduced-motion/skip behavior and no artificial loading delays.
 4. A coherent HUD iconography and information-density pass for selection, build/production, logistics, alerts and minimap with semantic states at multiple zoom levels.

@@ -131,6 +131,7 @@ internal sealed class SelectionInspectorHudSurface : IGameplayHudSurface
     public GameplayHudRegion Regions =>
         GameplayHudRegion.SelectionInspector;
 
+    public UiTextDiagnostics TextDiagnostics => _renderer.TextDiagnostics;
     public int LastRenderedVertexCount => _renderer.LastRenderedVertexCount;
 
     public void Render(
@@ -161,6 +162,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         GameplayHudVisualStyle.TextSecondary;
 
     private readonly IGraphicsDevice _graphics;
+    private readonly UiTextBatch _text;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers =
         new(4);
@@ -187,8 +189,10 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
                 ? null
                 : new RuntimeUiIconPalette(
                     runtimeAssets);
+        _text = new UiTextBatch(graphics);
     }
 
+    public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
     public int LastRenderedVertexCount { get; private set; }
 
     public void Render(
@@ -199,6 +203,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         FormationTemplate formation = default, GameplayBindingRegistry? bindings = null)
     {
         ThrowIfDisposed();
+        _text.Begin();
         ArgumentNullException.ThrowIfNull(graphics);
         ArgumentNullException.ThrowIfNull(snapshot);
 
@@ -248,8 +253,8 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         graphics.Draw(
             _vertexCount);
 
-        LastRenderedVertexCount =
-            _vertexCount;
+        _text.Render(graphics);
+        LastRenderedVertexCount = _vertexCount + _text.VertexCount;
     }
 
     public void Dispose()
@@ -266,6 +271,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         }
 
         _vertexBuffers.Clear();
+        _text.Dispose();
         _pipeline.Dispose();
         _disposed = true;
     }
@@ -904,6 +910,8 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         int width,
         int height)
     {
+        if (_text.Add(text, x, y, UiTypography.Style(UiTextRole.Telemetry).Size * _scale, color, width, height, right - x)) return;
+
         float available =
             MathF.Max(
                 0.0f,

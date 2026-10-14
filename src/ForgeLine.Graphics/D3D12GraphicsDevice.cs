@@ -8,6 +8,7 @@ namespace ForgeLine.Graphics;
 
 internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
 {
+    public bool SupportsUiText => true;
     private const Format BackBufferFormat = Format.R8G8B8A8_UNorm;
     private const Format DepthBufferFormat = Format.D32_Float;
     private const int DxgiStatusOccluded = 0x087A0001;
@@ -575,6 +576,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         long residentByteCount = texture.ResidentByteCount;
 
         Format nativeFormat =
+            description.Format == GraphicsTextureFormat.R8Unorm ? Format.R8_UNorm :
             description.Format == GraphicsTextureFormat.Bc7Unorm
                 ? (description.ColorSpace == GraphicsTextureColorSpace.Srgb ? Format.BC7_UNorm_SRgb : Format.BC7_UNorm)
                 : description.ColorSpace == GraphicsTextureColorSpace.Srgb
@@ -1347,7 +1349,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             int rowBytes =
                 texture.Description.Format == GraphicsTextureFormat.Bc7Unorm
                     ? checked(((mip.Width + 3) / 4) * 16)
-                    : checked(mip.Width * 4);
+                    : checked(mip.Width * (texture.Description.Format == GraphicsTextureFormat.R8Unorm ? 1 : 4));
 
             if (rowSizes[mipIndex] < checked((ulong)rowBytes))
             {

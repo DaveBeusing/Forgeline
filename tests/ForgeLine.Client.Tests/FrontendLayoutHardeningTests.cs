@@ -27,6 +27,23 @@ public sealed class FrontendLayoutHardeningTests
     }
 
     [Fact]
+    public void DeclaredScaleExtremesKeepDrawnControlsAndPointerTargetsInsideViewport()
+    {
+        foreach (var display in new[] { (1280, 720), (1920, 1080), (2560, 1440), (3840, 2160), (3440, 1440) })
+            foreach (float scale in new[] { .75f, 1f, 2f })
+            {
+                var layout = FrontendDesign.ResolveLayout(display.Item1, display.Item2, scale);
+                Assert.True(layout.ContentWidth <= display.Item1 + .01f);
+                Assert.True(layout.ContentHeight <= display.Item2 + .01f);
+                var menu = new MainMenuModel(false);
+                Assert.Equal("new-game", FrontendHitTesting.MainMenu(layout.OffsetX + 120 * layout.Scale,
+                    layout.OffsetY + 422 * layout.Scale, layout, menu.Items));
+                Assert.Null(FrontendHitTesting.MainMenu(layout.OffsetX + 120 * layout.Scale,
+                    layout.OffsetY + 350 * layout.Scale, layout, menu.Items));
+            }
+    }
+
+    [Fact]
     public void SmallViewportFitsInsteadOfClippingAtMinimumScale()
     {
         FrontendLayout layout =
@@ -46,10 +63,8 @@ public sealed class FrontendLayoutHardeningTests
             FrontendDesign.FitText(
                 "CENTRAL-DIVIDE-SAVE-WITH-A-VERY-LONG-NAME");
 
-        Assert.Equal(
-            FrontendDesign.MaximumDetailTextLength,
-            value.Length);
-        Assert.EndsWith("...", value, StringComparison.Ordinal);
+        Assert.True(ForgeLine.Presentation.UiFontMetrics.Default.Measure(value, 22) <= FrontendDesign.MaximumDetailTextLength * 13f);
+        Assert.EndsWith("…", value, StringComparison.Ordinal);
     }
 
     [Fact]

@@ -54,7 +54,7 @@ public sealed class FrontendOverlayRendererTests : IDisposable
     }
 
     [Fact]
-    public void BitmapFontRendersEveryUppercaseAsciiLetter()
+    public void BootstrapBitmapFontRendersEveryUppercaseAsciiLetter()
     {
         using var renderer =
             new FrontendOverlayRenderer(_graphics);
@@ -88,7 +88,7 @@ public sealed class FrontendOverlayRendererTests : IDisposable
     }
 
     [Fact]
-    public void BitmapFontRendersPercentageSymbol()
+    public void BootstrapBitmapFontRendersPercentageSymbol()
     {
         using var renderer =
             new FrontendOverlayRenderer(_graphics);

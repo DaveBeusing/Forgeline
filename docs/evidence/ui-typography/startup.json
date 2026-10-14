@@ -1,0 +1,94 @@
+{
+  "measuredAtUtc": "2026-10-14T13:41:49.9274091+00:00",
+  "cpu": [
+    {
+      "Name": "Intel(R) Core(TM) Ultra 9 285HX",
+      "NumberOfCores": 24,
+      "NumberOfLogicalProcessors": 24
+    }
+  ],
+  "graphics": [
+    {
+      "Name": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+      "DriverVersion": "32.0.15.9653"
+    },
+    {
+      "Name": "Intel(R) Graphics",
+      "DriverVersion": "32.0.101.8724"
+    }
+  ],
+  "cacheCondition": "Warm repetitions after one excluded warmup; no cache eviction or reboot",
+  "requiresApplicationIcons": true,
+  "includesStudioIntro": false,
+  "baselineExitHook": false,
+  "observations": [
+    {
+      "sample": 0,
+      "warmup": true,
+      "launchToWindowObservationMs": 401.3858,
+      "launchToExitMs": 3134.0721,
+      "nativeIconChecks": 129,
+      "nativeIconProbeMisses": 0,
+      "phases": {
+        "StudioSplashFirstFrame": null,
+        "GraphicsReady": 2702.7772,
+        "NativeBootstrapFirstFrame": 301.4902,
+        "FirstPresentedFrame": 2742.7392,
+        "MainMenuInteractive": 2777.4832,
+        "WindowVisible": 301.4318,
+        "RuntimeAssetsReady": 1192.5426
+      }
+    },
+    {
+      "sample": 1,
+      "warmup": false,
+      "launchToWindowObservationMs": 259.5265,
+      "launchToExitMs": 1928.9476,
+      "nativeIconChecks": 95,
+      "nativeIconProbeMisses": 0,
+      "phases": {
+        "StudioSplashFirstFrame": null,
+        "GraphicsReady": 1595.696,
+        "NativeBootstrapFirstFrame": 124.419,
+        "FirstPresentedFrame": 1620.3282,
+        "MainMenuInteractive": 1657.605,
+        "WindowVisible": 124.3092,
+        "RuntimeAssetsReady": 679.4733
+      }
+    },
+    {
+      "sample": 2,
+      "warmup": false,
+      "launchToWindowObservationMs": 199.467,
+      "launchToExitMs": 1386.3095,
+      "nativeIconChecks": 66,
+      "nativeIconProbeMisses": 0,
+      "phases": {
+        "StudioSplashFirstFrame": null,
+        "GraphicsReady": 1059.5351,
+        "NativeBootstrapFirstFrame": 86.2239,
+        "FirstPresentedFrame": 1093.2414,
+        "MainMenuInteractive": 1143.7884,
+        "WindowVisible": 86.1685,
+        "RuntimeAssetsReady": 395.1841
+      }
+    },
+    {
+      "sample": 3,
+      "warmup": false,
+      "launchToWindowObservationMs": 180.3943,
+      "launchToExitMs": 1468.9724,
+      "nativeIconChecks": 75,
+      "nativeIconProbeMisses": 0,
+      "phases": {
+        "StudioSplashFirstFrame": null,
+        "GraphicsReady": 1186.1941,
+        "NativeBootstrapFirstFrame": 79.4473,
+        "FirstPresentedFrame": 1214.462,
+        "MainMenuInteractive": 1245.0236,
+        "WindowVisible": 79.3833,
+        "RuntimeAssetsReady": 410.2411
+      }
+    }
+  ]
+}
