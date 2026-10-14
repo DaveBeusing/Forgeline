@@ -83,10 +83,10 @@ public sealed class FrontendOverlayRenderer : IDisposable
 
         if (view.Kind == FrontendSurfaceKind.Loading)
         {
-            EmitText("INITIALIZING COMMAND SYSTEMS", 94 * scale, 850 * scale, new Vector4(0.72f, 0.74f, 0.68f, 1), context.Width, context.Height, scale);
-            EmitText(view.Status, 94 * scale, 890 * scale, new Vector4(0.82f, 0.62f, 0.20f, 1), context.Width, context.Height, scale);
+            EmitText("INITIALIZING COMMAND SYSTEMS", 94 * scale, 850 * scale, ForgeLineUiPalette.TextSecondary, context.Width, context.Height, scale);
+            EmitText(view.Status, 94 * scale, 890 * scale, ForgeLineUiPalette.Accent, context.Width, context.Height, scale);
             if (!string.IsNullOrEmpty(view.Feedback))
-                EmitText(view.Feedback, 94 * scale, 982 * scale, new Vector4(0.52f, 0.58f, 0.50f, 1), context.Width, context.Height, scale);
+                EmitText(view.Feedback, 94 * scale, 982 * scale, ForgeLineUiPalette.TextMuted, context.Width, context.Height, scale);
             if (view.HasProgress)
             {
                 int percent =
@@ -99,7 +99,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
                     $"{percent}%",
                     828 * scale,
                     926 * scale,
-                    new Vector4(0.82f, 0.84f, 0.78f, 1),
+                    ForgeLineUiPalette.TextPrimary,
                     context.Width,
                     context.Height,
                     scale);
@@ -277,7 +277,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
                 EmitActionButton(view.SecondaryAction, 92 * scale, 838 * scale, 220 * scale, 58 * scale, false, view.SecondaryHovered, view.SecondaryPressed, context.Width, context.Height, scale);
             }
 
-            EmitText(view.Footer, 94 * scale, 930 * scale, new Vector4(0.40f, 0.44f, 0.40f, 1), context.Width, context.Height, scale);
+            EmitText(view.Footer, 94 * scale, 930 * scale, ForgeLineUiPalette.TextMuted, context.Width, context.Height, scale);
         }
 
         if (_vertexCount == 0)
