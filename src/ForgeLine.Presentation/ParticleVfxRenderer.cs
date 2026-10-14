@@ -12,6 +12,7 @@ public readonly record struct ParticleVfxDiagnostics(ParticleQuality Quality, in
     int DrawCalls, long BufferBytes, double PreparationCpuMilliseconds, float ScreenCoverage)
 {
     public ParticleTypeCounts ByType { get; init; }
+    public int SuppressedEffects { get; init; }
 }
 
 public readonly record struct ParticleTypeCounts(int Smoke, int Dust, int Sparks, int Blast, int Fire, int Muzzle);
@@ -23,14 +24,16 @@ public sealed class ParticleVfxRenderer : IDisposable
     private readonly SceneLightingSettings _lighting;
     private readonly GpuParticleRenderer? _renderer;
     private readonly bool _linearOutput;
-    private readonly bool[] _available = new bool[37];
+    private readonly bool[] _available = new bool[Enum.GetValues<VfxEffectKind>().Max(static kind => (int)kind) + 1];
     private readonly GraphicsParticle[] _particles;
     private readonly Candidate[] _candidates = new Candidate[EmitterCapacity];
     private readonly Dictionary<EffectKey, int> _emitters = new(EmitterCapacity);
     private readonly double[] _starts = new double[EmitterCapacity];
     private readonly ulong[] _cycles = new ulong[EmitterCapacity];
     private readonly bool[] _occupied = new bool[EmitterCapacity];
-    private readonly HashSet<EffectKey> _replaced = new(EmitterCapacity);
+    private readonly HashSet<EffectKey> _meshFallback = new(128);
+    private readonly HashSet<EffectKey> _currentEffects = new(PresentationExtractor.MaximumSnapshotEffects);
+    private bool _prepared;
     private readonly HashSet<EffectKey> _authorized = new(EmitterCapacity);
     private readonly EffectKey[] _retire = new EffectKey[EmitterCapacity];
     private readonly ParticleDepthComparer _depthComparer = new();
@@ -78,7 +81,9 @@ public sealed class ParticleVfxRenderer : IDisposable
 
     internal ReadOnlySpan<GraphicsParticle> Particles => _particles.AsSpan(0, _count);
     public ParticleVfxDiagnostics Diagnostics { get; private set; }
-    public bool Replaces(in RenderInstance instance) => _replaced.Contains(Key(instance));
+    public int MaximumMeshFallbackEffects => _settings.MaximumFallbackEffects;
+    public bool Replaces(in RenderInstance instance) => _prepared && instance.VfxFeature.IsSpecified &&
+        (instance.Visibility & RenderVisibilityMask.World) != 0 && _currentEffects.Contains(Key(instance)) && !_meshFallback.Contains(Key(instance));
 
     public void Prepare(RenderWorld world, RtsCamera camera, int width, int height, double deltaSeconds, bool paused = false)
     {
@@ -87,7 +92,7 @@ public sealed class ParticleVfxRenderer : IDisposable
         if (!double.IsFinite(deltaSeconds) || deltaSeconds < 0) throw new ArgumentOutOfRangeException(nameof(deltaSeconds));
         if (width <= 0 || height <= 0) throw new ArgumentOutOfRangeException(nameof(width));
         long started = Stopwatch.GetTimestamp();
-        _count = 0; _replaced.Clear(); _authorized.Clear();
+        _count = 0; _meshFallback.Clear(); _currentEffects.Clear(); _authorized.Clear(); _prepared = true;
         var snapshot = world.CurrentSnapshot;
         if (snapshot is not null && (snapshot.SessionId != _session || snapshot.Tick.Value < _lastTick))
         {
@@ -95,7 +100,7 @@ public sealed class ParticleVfxRenderer : IDisposable
         }
         if (snapshot is not null) _lastTick = snapshot.Tick.Value;
         if (!paused) _time += Math.Min(deltaSeconds, .1);
-        int candidateCount = 0, fallback = 0;
+        int candidateCount = 0, fallback = 0, suppressed = 0;
         float coverage = 0;
         Span<int> byType = stackalloc int[6];
         byType.Clear();
@@ -109,11 +114,13 @@ public sealed class ParticleVfxRenderer : IDisposable
             Vector3 position = instance.Transform.Position;
             if (!float.IsFinite(position.X) || !float.IsFinite(position.Y) || !float.IsFinite(position.Z) || !instance.Mesh.IsValid || !instance.Material.IsValid)
                 continue;
+            EffectKey currentKey = Key(instance);
+            if (_currentEffects.Count < PresentationExtractor.MaximumSnapshotEffects) _currentEffects.Add(currentKey);
             if (_renderer is null || (uint)instance.VfxFeature.Kind >= _available.Length || !_available[(int)instance.VfxFeature.Kind])
-            { fallback++; continue; }
+            { if (fallback < _settings.MaximumFallbackEffects) { _meshFallback.Add(Key(instance)); fallback++; } else suppressed++; continue; }
             EffectKey key = Key(instance);
             if (_authorized.Count < EmitterCapacity) _authorized.Add(key);
-            if (!_authorized.Contains(key)) { fallback++; continue; }
+            if (!_authorized.Contains(key)) { suppressed++; continue; }
             ParticleEmitterDescriptor.TryResolve(instance.VfxFeature.Kind, out var descriptor);
             float distance = Vector3.Distance(camera.Position, instance.Transform.Position);
             if (!float.IsFinite(distance) || !VfxPresentationCatalog.ShouldRender(descriptor.Effect, distance)) continue;
@@ -129,7 +136,7 @@ public sealed class ParticleVfxRenderer : IDisposable
             radius = MathF.Min(radius, 24 / MathF.Max(.001f, pixelsPerMeter)); // growth <=2 => maximum 96-pixel diameter
             int count = _settings.Quality == ParticleQuality.Low ? Math.Max(2, descriptor.Count / 2) : descriptor.Count;
             float area = count * MathF.Pow(radius * 4 * pixelsPerMeter, 2) / (width * (float)height);
-            if (candidateCount == _candidates.Length) { _dropped += (uint)count; fallback++; continue; }
+            if (candidateCount == _candidates.Length) { _dropped += (uint)count; suppressed++; continue; }
             _candidates[candidateCount++] = new(key, instance, descriptor, distance, radius, count, area);
         }
         int retireCount = 0;
@@ -141,10 +148,10 @@ public sealed class ParticleVfxRenderer : IDisposable
         {
             var candidate = _candidates[i];
             if (candidate.Count > _particles.Length - _count || coverage + candidate.Area > _settings.MaximumScreenCoverage)
-            { _dropped += (uint)candidate.Count; fallback++; continue; }
+            { _dropped += (uint)candidate.Count; suppressed++; continue; }
             if (!_emitters.TryGetValue(candidate.Key, out var state))
             {
-                if (_emitters.Count == EmitterCapacity) { _dropped += (uint)candidate.Count; fallback++; continue; }
+                if (_emitters.Count == EmitterCapacity) { _dropped += (uint)candidate.Count; suppressed++; continue; }
                 double sourceAge = candidate.Instance.VfxFeature.SpawnedAtTick > 0 && snapshot is not null && snapshot.Tick.Value >= candidate.Instance.VfxFeature.SpawnedAtTick
                     ? (snapshot.Tick.Value - candidate.Instance.VfxFeature.SpawnedAtTick) * snapshot.TickDuration.TotalSeconds : 0;
                 state = Array.IndexOf(_occupied,false);
@@ -153,7 +160,6 @@ public sealed class ParticleVfxRenderer : IDisposable
                 if(candidate.Instance.VfxFeature.Continuous || sourceAge < candidate.Descriptor.LifetimeSeconds)
                     _emitted += (uint)candidate.Count;
             }
-            _replaced.Add(candidate.Key);
             float elapsed = (float)Math.Max(0, _time - _starts[state]);
             float life = candidate.Descriptor.LifetimeSeconds;
             if (!candidate.Instance.VfxFeature.Continuous && elapsed >= life) continue;
@@ -186,7 +192,7 @@ public sealed class ParticleVfxRenderer : IDisposable
         _peak = Math.Max(_peak,_count);
         Diagnostics = new(_settings.Quality,_count,_peak,activeEmitters,_settings.Capacity,_emitted,_dropped,fallback,
             0,_renderer?.BufferBytes ?? 0,Stopwatch.GetElapsedTime(started).TotalMilliseconds,coverage)
-        { ByType = new(byType[0], byType[1], byType[2], byType[3], byType[4], byType[5]) };
+        { ByType = new(byType[0], byType[1], byType[2], byType[3], byType[4], byType[5]), SuppressedEffects = suppressed };
     }
 
     public void Render(IGraphicsCommandContext context, RtsCamera camera)
@@ -196,7 +202,7 @@ public sealed class ParticleVfxRenderer : IDisposable
         CameraMatrices matrices = camera.GetMatrices(context.Width,context.Height);
         Matrix4x4.Invert(matrices.View,out var inverse);
         _renderer.Render(context,Particles,matrices.ViewProjection,new(inverse.M11,inverse.M12,inverse.M13),
-            new(inverse.M21,inverse.M22,inverse.M23),matrices.Projection.M33,matrices.Projection.M43,
+            new(inverse.M21,inverse.M22,inverse.M23),-matrices.Projection.M33,matrices.Projection.M43,
             _lighting.Exposure,_lighting.ToneMapping == SceneToneMappingMode.AcesFitted,_linearOutput);
         Diagnostics = Diagnostics with { DrawCalls = 1 };
     }
@@ -208,7 +214,7 @@ public sealed class ParticleVfxRenderer : IDisposable
         uint value = unchecked((uint)key.Id ^ (uint)(key.Id >> 32) ^ key.Generation * 747796405U ^ (uint)key.Kind * 2891336453U ^ (uint)index * 277803737U);
         value ^= value >> 16; value = unchecked(value * 2246822519U); return value ^ (value >> 13);
     }
-    public void Dispose() { if (_disposed) return; _renderer?.Dispose(); _emitters.Clear(); _replaced.Clear(); _disposed = true; }
+    public void Dispose() { if (_disposed) return; _renderer?.Dispose(); _emitters.Clear(); _meshFallback.Clear(); _currentEffects.Clear(); _prepared = false; _disposed = true; }
     // The framework comparer overload creates comparison delegates on each call.
     // Iterative heap sorting keeps both fixed-size render streams allocation-free.
     private static void SortBounded<T>(Span<T> values,IComparer<T> comparer)

@@ -223,6 +223,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
         int visible = 0;
         int animatedVegetation = 0;
         int visibleVegetation = 0;
+        int skippedDecalResources = 0;
+        int effectRequests = 0, meshFallbackEffects = 0;
         int highLod = 0;
         int reducedLod = 0;
         int lod1Instances = 0;
@@ -235,8 +237,8 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 world.GetInterpolatedInstance(
                     index,
                     alpha);
-            if (shadowProjection.HasValue && instance.VfxFeature.IsSpecified) continue;
-            if (!shadowProjection.HasValue && particles?.Replaces(instance) == true) continue;
+            if (shadowProjection.HasValue && (instance.VfxFeature.IsSpecified || instance.DecalFeature.IsSpecified)) continue;
+
 
             if ((instance.Visibility & RenderVisibilityMask.World) == 0 ||
                 !_vegetation.Includes(instance, camera.Position) ||
@@ -246,6 +248,9 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 continue;
             }
 
+            if (instance.VfxFeature.IsSpecified && ++effectRequests > PresentationExtractor.MaximumSnapshotEffects) continue;
+            if (!shadowProjection.HasValue && particles?.Replaces(instance) == true) continue;
+            if (instance.VfxFeature.IsSpecified && ++meshFallbackEffects > (particles?.MaximumMeshFallbackEffects ?? 128)) continue;
             AxisAlignedBounds bounds =
                 presentationSeconds.HasValue ? VegetationVisualMotion.CullingBounds(instance) :
                     PresentationBounds.ResolveAxisAlignedBounds(instance);
@@ -486,12 +491,15 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 hasRuntimeMaterial &&
                 (!usesRuntimeMesh ||
                  runtimeMesh.SupportsTexturedMaterial);
+            if (instance.DecalFeature.IsSpecified && (!usesRuntimeMesh || !usesRuntimeMaterial || runtimeMaterial.UsesDevelopmentFallback || !float.IsFinite(instance.DecalFeature.Opacity)))
+            { skippedDecalResources++; continue; }
             Vector4 color =
                 ResolveColor(
                     instance,
                     hasRuntimeMaterial
                         ? runtimeMaterial.BaseColorFactor
                         : null);
+            if (instance.DecalFeature.IsSpecified) color.W *= Math.Clamp(instance.DecalFeature.Opacity, 0, .65f);
             Matrix4x4 worldMatrix =
                 presentationSeconds.HasValue ? VegetationVisualMotion.Transform(instance, projectedDiameter, presentationSeconds.Value) :
                     instance.Transform.ToMatrix();
@@ -577,7 +585,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
             }
         }
 
-        if (visible == 0)
+        if (visible == 0 || _activeBatchCount == 0)
         {
             LastDiagnostics =
                 new InstanceRenderDiagnostics(
@@ -586,7 +594,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                     world.InstanceCount,
                     0,
                     highLod,
-                    reducedLod) { Lod1Instances = lod1Instances, Lod2Instances = lod2Instances };
+                    reducedLod) { Lod1Instances = lod1Instances, Lod2Instances = lod2Instances, SkippedDecalResources = skippedDecalResources };
             return;
         }
 
@@ -766,7 +774,7 @@ public sealed class SimpleInstanceRenderer : IDisposable
                 runtimeMeshInstances,
                 texturedRuntimeMeshInstances,
                 fallbackMeshInstances) { Lod1Instances = lod1Instances, Lod2Instances = lod2Instances,
-                    AnimatedVegetationInstances = animatedVegetation, VisibleVegetationInstances = visibleVegetation };
+                    AnimatedVegetationInstances = animatedVegetation, VisibleVegetationInstances = visibleVegetation, SkippedDecalResources = skippedDecalResources };
     }
 
     public void Dispose()

@@ -52,6 +52,10 @@ public readonly record struct ParticleEmitterDescriptor(int Version, VfxEffectKi
         descriptor = new(1, effect, source.MeshAssetId, source.MaterialAssetId, visual,
             visual == ParticleVisualKind.Explosion ? 16 : 8, life, radius, speed, gravity,
             visual is ParticleVisualKind.Explosion or ParticleVisualKind.Muzzle ? 0 : visual == ParticleVisualKind.Spark ? 2 : 1);
+        if (effect == VfxEffectKind.IndustrialSteam)
+            descriptor = descriptor with { Count = 6, LifetimeSeconds = 1.8f, RadiusMeters = .35f, SpeedMetersPerSecond = .8f };
+        else if (effect == VfxEffectKind.IndustrialWelding)
+            descriptor = descriptor with { Count = 6, LifetimeSeconds = .3f, RadiusMeters = .12f, SpeedMetersPerSecond = 4 };
         return true;
     }
 
@@ -73,6 +77,7 @@ public readonly record struct ParticleSettings(ParticleQuality Quality)
 {
     public static ParticleSettings Default => new(ParticleQuality.Medium);
     public int Capacity => Quality switch { ParticleQuality.Low => 512, ParticleQuality.Medium => 2048, ParticleQuality.High => 4096, _ => 0 };
+    public int MaximumFallbackEffects => Quality switch { ParticleQuality.Low => 32, ParticleQuality.Medium => 64, ParticleQuality.High => 128, _ => 128 };
     public float MaximumScreenCoverage => Quality switch { ParticleQuality.Low => .5f, ParticleQuality.Medium => 1, ParticleQuality.High => 2, _ => 0 };
     public void Validate() { if (!Enum.IsDefined(Quality)) throw new ArgumentOutOfRangeException(nameof(Quality)); }
 }

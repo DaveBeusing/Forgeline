@@ -79,3 +79,8 @@ Long animated combat, natural unit/production/logistics workloads, continuous LO
 ## World environment integration
 
 Traverse uses path version 2 with changing target, yaw and distance. Optional haze, authored surface marks and environment/vegetation inputs are recorded and participate in workload comparison. Residency settings are excluded only as the measured resource implementation; review pixel, draw and memory equality independently. See [World environment rendering](WorldEnvironmentRendering.md).
+
+
+## Effect stress fixtures
+
+EffectsBarrage adds 1,024 copied effects to IndustrialBase; IndustrialEffects uses frozen working-factory presets resolved through real compiled sockets. Both request 64 ground marks; default cell admission retains 32. The fixtures preserve base intelligence and selection/HUD data. They establish repeatability and bounded submission, not natural combat placement or long-match art acceptance. Their fingerprint includes injected visual state; existing neutral fixture fingerprints remain unchanged. See [combat and industrial qualification](CombatIndustrialRendering.md).

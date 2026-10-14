@@ -7,6 +7,23 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class VisualReferenceSceneTests
 {
     [Theory]
+    [InlineData(VisualReferenceSceneKind.EffectsBarrage)]
+    [InlineData(VisualReferenceSceneKind.IndustrialEffects)]
+    public void EffectReviewsRetainAuthorizedBaseAndBoundedFootprintPublication(VisualReferenceSceneKind kind)
+    {
+        var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
+        var first = VisualReferenceScene.Create(kind, terrain);
+        var second = VisualReferenceScene.Create(kind, terrain);
+        Assert.Equal(first.Fingerprint, second.Fingerprint);
+        Assert.DoesNotContain(first.Snapshot.Instances.ToArray(), x => x.Entity == first.HiddenEnemy);
+        Assert.InRange(first.Snapshot.DecalMetrics.Published, 1, 128);
+        Assert.InRange(first.Snapshot.DecalMetrics.Active, 1, 512);
+        var effects = first.Snapshot.Instances.ToArray().Where(x => x.VfxFeature.IsSpecified).ToArray();
+        if (kind == VisualReferenceSceneKind.EffectsBarrage) Assert.True(effects.Length >= 1024);
+        else Assert.Contains(effects, x => x.VfxFeature.Kind == VfxEffectKind.IndustrialSteam || x.VfxFeature.Kind == VfxEffectKind.IndustrialWelding);
+    }
+
+    [Theory]
     [InlineData(VisualReferenceSceneKind.ScoutVehicleProduction)]
     [InlineData(VisualReferenceSceneKind.ArtilleryProduction)]
     [InlineData(VisualReferenceSceneKind.CargoTruckProduction)]

@@ -15,4 +15,6 @@ public readonly record struct RenderInstance(
     BuildingFeaturePresentationMetadata BuildingFeature = default,
     InfrastructureFeaturePresentationMetadata InfrastructureFeature = default,
     VfxFeaturePresentationMetadata VfxFeature = default,
-    MechanicalPose MechanicalPose = default);
+    MechanicalPose MechanicalPose = default,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    DecalFeaturePresentationMetadata DecalFeature = default);

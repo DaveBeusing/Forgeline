@@ -13,6 +13,19 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class ParticleVfxRendererTests : IDisposable
 {
+    [Fact]
+    public void ProductionPerspectiveCallerPublishesPositiveDepthAsymptote()
+    {
+        using var device = new Device();
+        using var renderer = new ParticleVfxRenderer(device, _catalog);
+        var camera = new RtsCamera(new() { InitialTarget = Vector3.Zero, InitialDistance = 120 });
+        renderer.Prepare(World([Effect(1, VfxEffectKind.ExplosionBuilding)]), camera, 1280, 720, .1);
+        var context = new Context();
+        renderer.Render(context, camera);
+        Assert.Equal(-camera.GetMatrices(1280, 720).Projection.M33, context.DepthAsymptote);
+        Assert.True(context.DepthAsymptote > 1);
+    }
+
     private readonly string _root = Path.Combine(Path.GetTempPath(),"forgeline-particle-contract-"+Guid.NewGuid().ToString("N"));
     private readonly RuntimeAssetCatalog _catalog;
     public ParticleVfxRendererTests()
@@ -142,7 +155,7 @@ public sealed class ParticleVfxRendererTests : IDisposable
     [InlineData(ParticleQuality.Low)]
     [InlineData(ParticleQuality.Medium)]
     [InlineData(ParticleQuality.High)]
-    public void RepeatedDestructionAndQualityCapsRetainBoundedBuffersAndMeshFallback(ParticleQuality quality)
+    public void RepeatedDestructionAndQualityCapsSuppressOverflowWithoutMeshFlood(ParticleQuality quality)
     {
         var settings = new ParticleSettings(quality);
         using var device=new Device();using var renderer=new ParticleVfxRenderer(device,_catalog,settings);
@@ -155,7 +168,9 @@ public sealed class ParticleVfxRendererTests : IDisposable
             renderer.Prepare(World(current),camera,1280,720,.05);
             Assert.InRange(renderer.Diagnostics.ActiveParticles,1,settings.Capacity);
             Assert.InRange(renderer.Diagnostics.ScreenCoverage,0,settings.MaximumScreenCoverage);
-            Assert.True(renderer.Diagnostics.FallbackEffects>0);
+            Assert.True(renderer.Diagnostics.SuppressedEffects>0);
+            Assert.Equal(0, renderer.Diagnostics.FallbackEffects);
+            Assert.True(renderer.Replaces(current[^1]));
             if(frame==0) bytes=renderer.Diagnostics.BufferBytes;
             Assert.Equal(bytes,renderer.Diagnostics.BufferBytes);
             Assert.Equal(4,device.Buffers);
@@ -191,6 +206,21 @@ public sealed class ParticleVfxRendererTests : IDisposable
         renderer.Prepare(World([effect]),new RtsCamera(),1280,720,.1);
         Assert.False(renderer.Replaces(effect));Assert.Equal(0,device.Buffers);
         Assert.Equal(1,renderer.Diagnostics.FallbackEffects);
+    }
+
+    [Theory]
+    [InlineData(ParticleQuality.Disabled, true)]
+    [InlineData(ParticleQuality.Medium, false)]
+    public void MissingBackendFallbackCannotFloodTheSceneAndHiddenCopiesConsumeNoBudget(ParticleQuality quality, bool supported)
+    {
+        using var device = new Device(supported);
+        using var renderer = new ParticleVfxRenderer(device, _catalog, new(quality));
+        var visible = Enumerable.Range(1, 600).Select(i => Effect((uint)i, VfxEffectKind.ExplosionBuilding)).ToArray();
+        var hidden = visible.Select(x => x with { Visibility = RenderVisibilityMask.Debug }).ToArray();
+        renderer.Prepare(World(hidden.Concat(visible).ToArray()), new RtsCamera(), 1280, 720, .1);
+        Assert.Equal(renderer.MaximumMeshFallbackEffects, renderer.Diagnostics.FallbackEffects);
+        Assert.Equal(600 - renderer.MaximumMeshFallbackEffects, renderer.Diagnostics.SuppressedEffects);
+        Assert.Equal(renderer.MaximumMeshFallbackEffects, visible.Count(x => !renderer.Replaces(x)));
     }
 
     [Fact]
@@ -234,11 +264,11 @@ public sealed class ParticleVfxRendererTests : IDisposable
     }
     private sealed class Context : IGraphicsCommandContext
     {
-        public int Width=>1280;public int Height=>720;public int FrameIndex=>0;public int Draws { get; private set; } public bool ParticlePassEnded { get; private set; }
+        public int Width=>1280;public int Height=>720;public int FrameIndex=>0;public int Draws { get; private set; } public bool ParticlePassEnded { get; private set; } public float DepthAsymptote { get; private set; }
         public void BeginParticlePass() { } public void EndParticlePass()=>ParticlePassEnded=true;
         public void SetViewport(float x,float y,float width,float height) { } public void SetScissor(int left,int top,int right,int bottom) { }
         public void SetPipeline(IGraphicsPipeline pipeline) { } public void SetVertexBuffer(IGraphicsBuffer buffer,int strideInBytes,int offsetInBytes=0,int inputSlot=0) { }
-        public void SetIndexBuffer(IGraphicsBuffer buffer,GraphicsIndexFormat format,int offsetInBytes=0) { }public void SetVertexConstants(ReadOnlySpan<float> values) { }
+        public void SetIndexBuffer(IGraphicsBuffer buffer,GraphicsIndexFormat format,int offsetInBytes=0) { }public void SetVertexConstants(ReadOnlySpan<float> values) { DepthAsymptote = values[24]; }
         public void Draw(int count,int startVertex=0) { }public void DrawIndexed(int count,int startIndex=0,int baseVertex=0) { }
         public void DrawIndexedInstanced(int count,int instances,int startIndex=0,int baseVertex=0,int startInstance=0)=>Draws++;
     }

@@ -545,7 +545,7 @@ public sealed class VfxPresentationTests
     public void CatalogContainsAllRequiredProductionFamilies()
     {
         Assert.Equal(
-            36,
+            38,
             VfxPresentationCatalog.All.Count);
 
         foreach (VfxPresentationDefinition definition in

@@ -62,7 +62,7 @@ public sealed class RenderWorld
 
         RenderInstance currentInstance = current.GetInstance(index);
 
-        if (currentInstance.VfxFeature.IsSpecified)
+        if (currentInstance.VfxFeature.IsSpecified || currentInstance.DecalFeature.IsSpecified && currentInstance.DecalFeature.Surface == DecalSurface.Ground)
         {
             return currentInstance;
         }
@@ -99,7 +99,7 @@ public sealed class RenderWorld
             return false;
         }
 
-        if (current.VfxFeature.IsSpecified ||
+        if (current.VfxFeature.IsSpecified || current.DecalFeature.IsSpecified && current.DecalFeature.Surface == DecalSurface.Ground ||
             _previous is null ||
             !TryFindByEntity(
                 _previous,

@@ -13,6 +13,24 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class RuntimeDecalMaterialTests
 {
     [Fact]
+    public void MissingDecalAssetsSkipTheMarkWithoutOpaquePrimitiveFallback()
+    {
+        var instance = new RenderInstance(new EntityId(1, 1), RenderTransform.Identity,
+            new RenderMeshHandle(1), RenderMaterialHandle.Default, RenderVisibilityMask.World,
+            WorldFeature: new(WorldVisualId.DecalShellImpact, WorldPresentationKind.Decal, default, false),
+            DecalFeature: new(DecalKind.Crater, .5f));
+        var snapshots = new PresentationSnapshotBuffer();
+        snapshots.Publish(new PresentationSnapshot(new SimulationTick(1), TimeSpan.FromMilliseconds(50), 0, [instance]));
+        var world = new RenderWorld();
+        Assert.True(world.Update(snapshots));
+        using var renderer = new SimpleInstanceRenderer(new FakeDevice());
+        renderer.Render(new FakeContext(), new RtsCamera(), world, 1);
+        Assert.Equal(0, renderer.LastDiagnostics.DrawCalls);
+        Assert.Equal(0, renderer.LastDiagnostics.FallbackMeshInstances);
+        Assert.Equal(1, renderer.LastDiagnostics.SkippedDecalResources);
+    }
+
+    [Fact]
     public void CriticalBuildingUploadsItsStateMaterialInsteadOfTheStaticMeshMaterial()
     {
         string root = Path.Combine(Path.GetTempPath(), "forgeline-building-state-material-" + Guid.NewGuid().ToString("N"));

@@ -96,6 +96,14 @@ jobs:
           dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.WorldEnvironmentPersistenceTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+      - name: Combat industrial effects and decal contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.IndustrialEffectPresetTests ForgeLine.Presentation.Tests.CombatDecalExtractionTests ForgeLine.Presentation.Tests.DecalPoolTests ForgeLine.Presentation.Tests.RuntimeDecalMaterialTests ForgeLine.Presentation.Tests.ParticleVfxRendererTests ForgeLine.Presentation.Tests.MechanicalMotionTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Graphics.Tests/ForgeLine.Graphics.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Graphics.Tests.D3D12ParticleTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Reference evidence report contracts
         shell: pwsh
         run: |

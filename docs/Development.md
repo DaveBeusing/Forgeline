@@ -181,3 +181,6 @@ Use `MatchRuntime` as the canonical reusable game composition and `SkirmishScena
 ## World environment integration
 
 World appearance overrides and multi-chunk Traverse qualification are described in [World environment rendering](WorldEnvironmentRendering.md). Capture clean committed binaries sequentially; timed traversal includes terrain admissions.
+
+
+Combat/industrial validation adds bounded extraction, industrial production parity, decal lifecycle/visibility, allocation churn, fallback saturation and production perspective-depth regressions to existing mechanical and particle tests. EffectsBarrage and IndustrialEffects are additional native reference scenes. Reproduction and portable measurements: [combat and industrial rendering](CombatIndustrialRendering.md).
