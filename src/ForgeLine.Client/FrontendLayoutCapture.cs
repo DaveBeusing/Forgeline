@@ -68,8 +68,9 @@ internal static class FrontendLayoutCapture
                         var view = source with { Layout = geometry, DetailScroll = scroll };
                         void Record(IGraphicsCommandContext c) { c.BeginPass(GraphicsFramePass.Overlay); renderer.Render(c, view); }
                         for (int warmup = 0; warmup < 3; warmup++) graphics.RenderFrame(GraphicsColor.ForgeLineClear, Record);
-                        byte[] pixels = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, Record);
-                        byte[] repeated = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, Record);
+                        var clear = name == "pause" ? new GraphicsColor(.7f, .75f, .8f, 1) : GraphicsColor.ForgeLineClear;
+                        byte[] pixels = graphics.CaptureFrame(clear, Record);
+                        byte[] repeated = graphics.CaptureFrame(clear, Record);
                         if (!pixels.AsSpan().SequenceEqual(repeated) || renderer.LastLayout != geometry)
                             throw new InvalidDataException("Layout capture or shared geometry is not repeatable.");
                         if (!renderer.TextDiagnostics.AtlasReady || renderer.TextDiagnostics.DroppedGlyphs != 0 || renderer.TextDiagnostics.MissingGlyphs != 0)
@@ -82,7 +83,7 @@ internal static class FrontendLayoutCapture
                             ReferenceCaptureImage.WritePng(Path.Combine(output, image), display.Item1, display.Item2, pixels);
                         }
                         results.Add(new { Screen = name, Width = display.Item1, Height = display.Item2, Dpi = dpi, UiScale = scale,
-                            VisibleRows = geometry.VisibleDetailRows, Scroll = scroll, GeometryScale = geometry.Scale,
+                            VisibleRows = geometry.VisibleDetailRows, Scroll = scroll, GeometryScale = geometry.Scale, BrightPauseBackdrop = name == "pause",
                             Repeatable = true, SharedGeometry = true, Vertices = renderer.LastRenderedVertexCount,
                             Font = renderer.TextDiagnostics, PixelSha256 = Convert.ToHexString(SHA256.HashData(pixels)), Image = image });
                     }

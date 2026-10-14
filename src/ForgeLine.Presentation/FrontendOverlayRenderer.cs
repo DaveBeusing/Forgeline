@@ -88,6 +88,8 @@ public sealed class FrontendOverlayRenderer : IDisposable
         {
             Panel(layout.Header with { Width = layout.Navigation.Width }, ForgeLineUiPalette.Surface);
             Panel(layout.Title with { Width = layout.Navigation.Width }, ForgeLineUiPalette.Surface);
+            Panel(layout.Footer, ForgeLineUiPalette.Surface);
+            if (!string.IsNullOrEmpty(view.Feedback)) Panel(layout.Feedback, ForgeLineUiPalette.Surface);
         }
         else Panel(layout.SafeArea, ForgeLineUiPalette.Surface);
         Text("FORGELINE", layout.Header, ForgeLineUiPalette.TextPrimary, view.Kind == FrontendSurfaceKind.PauseMenu ? 1.46f : 1.8f);
