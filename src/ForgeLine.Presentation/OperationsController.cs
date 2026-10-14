@@ -104,11 +104,11 @@ public sealed class OperationsController
             View = new(!View.Open, Session: _session); interaction.SetOperationsOpen(View.Open); return new(true);
         }
         if (!View.Open && snapshot?.PlayerExperience is { } experience && !experience.IsMatchComplete &&
-            (layout.TopStatusBar.Contains(origin) || layout.AlertStack.Contains(origin) ||
+            (layout.TopStatusBar.Contains(origin) || ActionableAlertLayout.Contains(experience, layout, origin) ||
                 layout.SelectionInspector.Contains(origin) && experience.Selection.HasSingleEntityDetails &&
                 (experience.Selection.HasInventory || experience.Selection.HasSupply || experience.Selection.Work.Kind != PlayerWorkKind.None)))
         {
-            var filter = layout.AlertStack.Contains(origin) ? OperationsCategory.Blocked :
+            var filter = ActionableAlertLayout.Contains(experience, layout, origin) ? OperationsCategory.Blocked :
                 layout.SelectionInspector.Contains(origin) ? experience.Selection.HasSupply ? OperationsCategory.Supply :
                     experience.Selection.Work.Kind != PlayerWorkKind.None ? OperationsCategory.Production : OperationsCategory.Logistics : OperationsCategory.All;
             View = new(true, filter, Session: _session); interaction.SetOperationsOpen(true); return new(true);

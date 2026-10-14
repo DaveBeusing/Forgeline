@@ -16,14 +16,14 @@ internal static class RtsMinimapInteractionLayout
         MathF.Min(
             layout.Minimap.Height,
             24.0f *
-            layout.Scale);
+            HudInformationLayout.MinimapScale(layout));
 
     public static float LegendHeight(
         in GameplayHudLayout layout) =>
         MathF.Min(
             layout.Minimap.Height,
-            18.0f *
-            layout.Scale);
+            30.0f *
+            HudInformationLayout.MinimapScale(layout));
 
     public static HudRect GetSelectorRect(
         in GameplayHudLayout layout) =>
@@ -50,7 +50,7 @@ internal static class RtsMinimapInteractionLayout
                 layout);
         float gap =
             2.0f *
-            layout.Scale;
+            HudInformationLayout.MinimapScale(layout);
         float totalGap =
             gap *
             (RtsStrategicOverlayHudModel.SelectorButtonCount -
@@ -120,7 +120,7 @@ internal static class RtsMinimapInteractionLayout
     {
         float gap =
             3.0f *
-            layout.Scale;
+            HudInformationLayout.MinimapScale(layout);
         HudRect selector =
             GetSelectorRect(
                 layout);

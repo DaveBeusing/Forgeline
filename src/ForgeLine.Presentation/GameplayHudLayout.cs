@@ -51,7 +51,11 @@ public readonly record struct GameplayHudLayout(
             float gap = GameplayHudVisualStyle.ResolveSafeMargin(Scale);
             float x = SelectionInspector.Right + gap;
             float width = MathF.Min(608 * Scale, MathF.Max(0, Minimap.X - gap - x));
-            float y = MathF.Max(SelectionInspector.Y, Minimap.Y);
+            // The command dock retains its established requested-scale band independently
+            // of the inspector's compact content height.
+            float legacyInspectorHeight = MathF.Min(GameplayHudVisualStyle.SelectionInspectorHeight * Scale,
+                MathF.Max(0, SafeArea.Height - TopStatusBar.Height - gap));
+            float y = MathF.Max(SafeArea.Bottom - legacyInspectorHeight, Minimap.Y);
             return new HudRect(x, y, width, MathF.Max(0, SafeArea.Bottom - y));
         }
     }
@@ -163,7 +167,8 @@ public readonly record struct GameplayHudLayout(
                     margin)));
         float selectionHeight =
             MathF.Min(
-                GameplayHudVisualStyle.SelectionInspectorHeight * scale,
+                GameplayHudVisualStyle.SelectionInspectorHeight * MathF.Min(scale,
+                    selectionWidth / GameplayHudVisualStyle.SelectionInspectorWidth),
                 MathF.Max(
                     0.0f,
                     safeArea.Height -

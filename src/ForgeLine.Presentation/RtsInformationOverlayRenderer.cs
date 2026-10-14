@@ -211,7 +211,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         int height)
     {
         float scale =
-            layout.Scale;
+            HudInformationLayout.MinimapScale(layout);
         HudRect map =
             RtsMinimapInteractionLayout.GetMapRect(
                 layout);
@@ -229,14 +229,10 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 layout);
 
         EmitQuad(
-            layout.Minimap.X -
-                3.0f,
-            layout.Minimap.Y -
-                3.0f,
-            layout.Minimap.Width +
-                6.0f,
-            layout.Minimap.Height +
-                6.0f,
+            layout.Minimap.X,
+            layout.Minimap.Y,
+            layout.Minimap.Width,
+            layout.Minimap.Height,
             GameplayHudVisualStyle.Border,
             width,
             height);
@@ -762,10 +758,10 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 text.Append(" LOCAL "); text.Append(count);
             }
         }
-        float fittedScale = MathF.Min(scale * .58f, legend.Height / 18);
+        float fittedScale = MathF.Min(scale * .8f, legend.Height / 30);
         EmitText(text.Written, legend.X + 3 * scale, legend.Y + 2 * scale, legend.Right - 3 * scale,
             GameplayHudVisualStyle.TextPrimary, fittedScale, width, height);
-        EmitText(_bindings.Text(RtsStrategicOverlayHudModel.Legend(mode)), legend.X + 3 * scale, legend.Y + 10 * scale, legend.Right - 3 * scale,
+        EmitText(_bindings.Text(RtsStrategicOverlayHudModel.Legend(mode)), legend.X + 3 * scale, legend.Y + 15 * scale, legend.Right - 3 * scale,
             GameplayHudVisualStyle.TextSecondary, fittedScale, width, height);
     }
 

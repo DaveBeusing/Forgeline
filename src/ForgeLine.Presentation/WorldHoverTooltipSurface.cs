@@ -54,10 +54,14 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         _line = 0;
         // Reserve a bounded twelve-line panel; use the measured line count for its tight final bounds.
         int lines = CountLines(resolved);
+        _scale = MathF.Min(_scale, MathF.Min(context.Layout.SafeArea.Width / 350,
+            context.Layout.SafeArea.Height / (16 + lines * 14)));
         _bounds = HoverTooltipPlacement.Resolve(view.PointerPosition, context.Layout,
             330 * _scale, (16 + lines * 14) * _scale);
         if (_bounds.IsEmpty) return;
         Quad(_bounds, GameplayHudVisualStyle.PanelBackground);
+        Quad(new HudRect(_bounds.X, _bounds.Y, _bounds.Width, 25 * _scale), GameplayHudVisualStyle.PanelHeader);
+        Quad(new HudRect(_bounds.X, _bounds.Bottom - _scale, _bounds.Width, _scale), GameplayHudVisualStyle.QuietBorder);
         Quad(new HudRect(_bounds.X, _bounds.Y, MathF.Min(2 * _scale, _bounds.Width), _bounds.Height), GameplayHudVisualStyle.TextPrimary);
         Line(resolved.Title, true);
         Line(resolved.Role);
