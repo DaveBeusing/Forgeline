@@ -28,9 +28,15 @@ public static class OperationsLayout
         float band = MathF.Min(20 * scale, MathF.Max(0, layout.SecondaryView.Height - 38 * scale));
         return band >= 14 * scale ? band : 0;
     }
-    public static HudRect Panel(in GameplayHudLayout layout) => new(layout.SafeArea.X, layout.TopStatusBar.Bottom + 8 * layout.Scale,
-        MathF.Min(450 * layout.Scale, MathF.Max(0, layout.ActionDock.X - layout.SafeArea.X - 8 * layout.Scale)),
-        MathF.Max(0, layout.SelectionInspector.Y - layout.TopStatusBar.Bottom - 36 * layout.Scale));
+    public static HudRect Panel(in GameplayHudLayout layout)
+    {
+        float gap = 8 * MathF.Min(layout.Scale, 1.25f);
+        float y = layout.TopStatusBar.Bottom + gap;
+        float height = MathF.Max(0, layout.SelectionInspector.Y - y - gap);
+        float width = MathF.Min(450 * layout.Scale,
+            MathF.Min(MathF.Max(0, layout.ActionDock.X - layout.SafeArea.X - gap), height * 450 / 346));
+        return new(layout.SafeArea.X, y, width, MathF.Min(height, width * 346 / 450));
+    }
     public static float Scale(in GameplayHudLayout layout) { var p = Panel(layout); return MathF.Min(layout.Scale, MathF.Min(p.Width / 450, p.Height / 346)); }
     public static HudRect Control(in GameplayHudLayout layout, int index)
     {

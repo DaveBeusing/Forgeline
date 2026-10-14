@@ -44,7 +44,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
             _bounds = OperationsLayout.Panel(context.Layout); _line = 0;
             if (_scale > 0)
             {
-                Quad(_bounds, GameplayHudVisualStyle.PanelBackground);
+                Quad(_bounds, GameplayHudVisualStyle.PanelBackground with { W = 1 });
                 Quad(new HudRect(_bounds.X, _bounds.Y, _bounds.Width, 24 * _scale), GameplayHudVisualStyle.PanelHeader);
                 Quad(new HudRect(_bounds.X, _bounds.Y, 3 * _scale, _bounds.Height), GameplayHudVisualStyle.Focus);
                 Line("OPERATIONS", true);

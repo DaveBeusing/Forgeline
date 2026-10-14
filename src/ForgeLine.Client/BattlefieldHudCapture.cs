@@ -100,6 +100,8 @@ internal static class BattlefieldHudCapture
             File.WriteAllText(Path.Combine(output, "qualification.json"), JsonSerializer.Serialize(new
             {
                 Version = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
+                PresentationVersion = typeof(GameplayHudRenderer).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
+                PresentationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(typeof(GameplayHudRenderer).Assembly.Location))),
                 Fixture = fixture.Fingerprint, Device = graphics.Diagnostics.Device, WindowDpi = window.Dpi,
                 Contract = "Authored owned snapshot states over the existing native battlefield fixture; not a natural match or approved golden. Layout DPI is not physical monitor certification.",
                 TimingContract = "HUD-only complete clear/overlay/text GPU frame; no world. CPU submit includes waits/Present. Fixed paused snapshots; same device required for comparison.",

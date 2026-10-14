@@ -26,6 +26,11 @@ public sealed class HudInformationLayoutTests
             Assert.True(112 * HudInformationLayout.InspectorScale(layout) <= layout.SelectionInspector.Height + .01f);
             Assert.True(360 * HudInformationLayout.InspectorScale(layout) <= layout.SelectionInspector.Width + .01f);
             Inside(layout.AlertStack, HudInformationLayout.Alerts(layout));
+            var operations = OperationsLayout.Panel(layout);
+            Inside(layout.SafeArea, operations);
+            Assert.False(operations.Intersects(layout.SelectionInspector));
+            Assert.False(operations.Intersects(layout.ActionDock));
+            for (int control = 0; control < 12; control++) Inside(operations, OperationsLayout.Control(layout, control));
         }
     }
 

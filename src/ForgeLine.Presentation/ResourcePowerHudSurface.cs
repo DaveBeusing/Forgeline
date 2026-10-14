@@ -408,7 +408,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             {
                 _text.Add(definition.ShortLabel, textX, top, GameplayHudVisualStyle.CaptionTextSize * _scale,
                     MutedTextColor, width, height, textWidth);
-                _text.Add(value.Written, textX, top + 11 * _scale, GameplayHudVisualStyle.ValueTextSize * _scale,
+                _text.Add(value.Written, textX, top + 13 * _scale, GameplayHudVisualStyle.ValueTextSize * _scale,
                     TextColor, width, height, textWidth, bold: true, alignment: UiTextAlignment.Right);
             }
             else
