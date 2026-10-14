@@ -32,3 +32,21 @@ An intermediate implementation exported an unused 32 MiB RGBA catalog copy of th
 The full-solution verification completed with 1,931 passed, zero failed and nine existing opt-in hardware/performance skips (1,940 total). Targeted font coverage, scalar-safe fitting/wrapping, kerning, alignment/baseline/ellipsis, batch bounds, allocation, texture sharing, failed buffer replacement and font-fallback ownership tests pass. Client coverage includes viewport-fit geometry with pointer targets at all declared frontend sizes/scales and existing focus/session/interaction contracts. Graphics R8 row/payload validation and native sampling pass. Asset authoring/recovery and project/version-boundary checks pass.
 
 Packaged-player reproducibility/startup evidence is recorded alongside the native evidence after publishing the qualified source revision. CI results must be read at the current PR head; historical failed or superseded runs are not passing evidence.
+
+## Published Windows player
+
+Source revision `922d0c6efb8defdbc8fee1be531da84760d3eca5` was published from a clean tree as `0.1.363-dev` with `Publish-PreAlpha.ps1 -VerifyReproducible`. The two independent publish trees matched; source/provenance and the archive SHA-256 are retained with this evidence. This is a local development qualification package, not a release. Its 492 compiled assets validate, the complete font notice is present, and no source TTF files are shipped. The same 90 native capture cases pass when run from that published player, with zero missing/dropped glyphs.
+
+Three fresh menu launches after one excluded warmup passed with both application icons present. Native bootstrap first-frame events occurred at 79–124 ms after managed entry; menu interactivity at 1.14–1.66 s. No studio intro was requested for this startup series. These are warm-cache observations, not cold-boot performance claims.
+
+The packaged player also measured a controlled 1920×1080 menu comparison (32 warmups, 64 submitted samples per path). Available unique completed GPU-frame timestamps numbered 52 for bitmap and 50 for atlas. Median full clear/overlay GPU time was 0.16656 ms for the bitmap debug path and 0.04304 ms for atlas; P95 was 0.177984 and 0.049664 ms. These include the same menu backdrop and no world; CPU submission durations include waits/Present. They are not isolated glyph-kernel timings or a general-game FPS guarantee.
+
+### Representative untouched native images
+
+![720p main menu](evidence/ui-typography/menu-1280x720-96dpi-1.00.png)
+
+![720p HUD over terrain](evidence/ui-typography/hud-1280x720-96dpi-1.00.png)
+
+![Settings and focus](evidence/ui-typography/settings.png)
+
+[1080p menu](evidence/ui-typography/menu-1920x1080-96dpi-1.00.png), [1440p menu](evidence/ui-typography/menu-2560x1440-96dpi-1.00.png), [4K menu](evidence/ui-typography/menu-3840x2160-96dpi-1.00.png), [ultrawide menu](evidence/ui-typography/menu-3440x1440-96dpi-1.00.png), [controls](evidence/ui-typography/controls.png), [loading](evidence/ui-typography/loading.png), [pause](evidence/ui-typography/pause.png). The machine-readable report retains all native matrix hashes and font counts.
