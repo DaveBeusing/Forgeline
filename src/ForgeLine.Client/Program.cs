@@ -12,6 +12,8 @@ internal static class Program
     public static int Main(string[] args)
     {
         long processEntryTimestamp = Stopwatch.GetTimestamp();
+        if (args.Length == 3 && args[0] == "--ui-feedback-capture")
+            return UiFeedbackCapture.Run(args[1], args[2]);
         if (args.Length == 3 && args[0] is "--command-dock-capture" or "--command-dock-reference")
             return RunDockCapture(args[1], args[2], args[0] == "--command-dock-reference");
         if (args.Length == 3 && args[0] == "--battlefield-hud-timing")

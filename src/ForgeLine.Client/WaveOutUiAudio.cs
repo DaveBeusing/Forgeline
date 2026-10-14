@@ -9,12 +9,15 @@ internal sealed class WaveOutUiAudio : IUiAudioOutput
 {
     private readonly UiPcmClip?[] _clips = new UiPcmClip?[5];
     private readonly byte[] _scaled = new byte[UiPcmClip.MaximumBytes];
+    private readonly string? _assetRoot;
     private IntPtr _device, _data, _header;
     private bool _attempted, _prepared, _disposed, _failed;
     private TimeSpan _lastCue;
     private bool _hasCue;
 
     internal bool Available => _device != IntPtr.Zero && !_failed && !_disposed;
+    internal bool OwnsNativeResources => _device != IntPtr.Zero || _data != IntPtr.Zero || _header != IntPtr.Zero;
+    internal WaveOutUiAudio(string? assetRoot = null) => _assetRoot = assetRoot;
 
     internal void Update(UiAudioCue cue, in UiFeedbackSettings settings, TimeSpan now, bool active)
     {
@@ -71,7 +74,8 @@ internal sealed class WaveOutUiAudio : IUiAudioOutput
         string[] names = ["navigation", "intent", "accepted", "rejected"];
         for (int i = 0; i < names.Length; i++)
         {
-            using var stream = File.OpenRead(Path.Combine(AppContext.BaseDirectory, "assets", "runtime", "audio", "ui", names[i] + ".wav"));
+            string root = _assetRoot ?? Path.Combine(AppContext.BaseDirectory, "assets", "runtime", "audio", "ui");
+            using var stream = File.OpenRead(Path.Combine(root, names[i] + ".wav"));
             _clips[i + 1] = UiPcmClip.Read(stream);
         }
         var format = new WaveFormat { Tag = 1, Channels = 2, Rate = 48_000, BytesPerSecond = 192_000, BlockAlign = 4, Bits = 16 };
@@ -94,14 +98,24 @@ internal sealed class WaveOutUiAudio : IUiAudioOutput
     private void Release()
     {
         StopPlayback();
-        if (_device != IntPtr.Zero) _ = waveOutClose(_device);
+        // A failing driver must not retain a pointer to memory that we free.
+        // The finalizer can retry teardown; an unreturned native buffer remains owned.
+        if (_prepared) { _failed = true; return; }
+        if (_device != IntPtr.Zero && waveOutClose(_device) != 0) { _failed = true; return; }
         if (_header != IntPtr.Zero) Marshal.FreeHGlobal(_header);
         if (_data != IntPtr.Zero) Marshal.FreeHGlobal(_data);
         _device = _header = _data = IntPtr.Zero;
         _prepared = false;
     }
 
-    public void Dispose() { if (_disposed) return; Release(); _disposed = true; }
+    public void Dispose()
+    {
+        if (_disposed) return;
+        Release(); _disposed = true;
+        if (_device == IntPtr.Zero) GC.SuppressFinalize(this);
+    }
+
+    ~WaveOutUiAudio() => Release();
 
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     private struct WaveFormat { public ushort Tag, Channels; public uint Rate, BytesPerSecond; public ushort BlockAlign, Bits, Extra; }

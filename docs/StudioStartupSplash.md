@@ -45,3 +45,7 @@ required manifest/gameplay failures retain the existing startup error behavior. 
 map simulation, decoder, source compiler or new graphics device is loaded for the still.
 Studio timing, minimum skip interval, audio, process/restart bypass and native bootstrap
 remain unchanged. See [title resource lifecycle](CinematicFrontend.md).
+
+Optional interface cues have a separate one-voice owner, separate packaged PCM files
+and software gain. Interface mute/volume and reduced UI motion do not alter the studio
+stream or its existing skip policy. See [UI motion/audio lifecycle](UiMotionAndAudio.md).

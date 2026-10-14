@@ -12,7 +12,7 @@ The frontend uses the bundled antialiased DejaVu font atlas and adaptive physica
 - Flat background and only-selected-row panels made the frontend resemble a technical prototype rather than a deliberately composed game menu.
 - Frontend amber accents and battlefield HUD cool-tinted panels were defined independently instead of using shared semantic colors.
 - Main-menu feedback previously occupied the vertical area of the final menu entry. The revised feedback position prevents that overlap.
-- The authored static Directorate title treatment now supplements this foundation; rich motion/audio transitions and higher-detail content remain separate work. See [cinematic menu](CinematicFrontend.md).
+- The authored static Directorate title treatment supplements this foundation. Bounded decorative motion and optional interface cues follow the [UI motion/audio contract](UiMotionAndAudio.md); higher-detail content and human motion acceptance remain separate. See [cinematic menu](CinematicFrontend.md).
 
 ### Existing strengths to retain
 
@@ -72,7 +72,7 @@ This pass is **visual-foundation work**, not a claim of final AAA visual quality
 
 1. Extend the bundled typography contract when additional locales require complex-script shaping or bidi; current language coverage, kerning, metrics and visible replacement are documented in [UI typography](UiTypography.md).
 2. Further high-detail title content and optional motion review; the compiled static title composition uses existing Directorate production meshes and does not claim new film-quality models.
-3. Motion language: short deliberate transitions, input feedback, panel reveals and audio cues, with reduced-motion/skip behavior and no artificial loading delays.
+3. Human acceptance and refinement of the bounded motion/cue language, including subjective listening, physical-monitor transitions and sustained live-match pacing. Current reduced-motion/input rules are documented in [UI motion/audio](UiMotionAndAudio.md).
 4. A coherent HUD iconography and information-density pass for selection, build/production, logistics, alerts and minimap with semantic states at multiple zoom levels.
 5. Screenshot/golden-image qualification on reference machines to assess visual hierarchy, not just geometry and input tests.
 

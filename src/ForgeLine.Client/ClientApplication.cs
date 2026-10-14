@@ -3039,7 +3039,6 @@ internal sealed class ClientApplication
         bool primaryPointerHeld = false;
         string frontendFeedback = initialFeedback;
         GameFrontendScreen transitionScreen = shell.Screen;
-        long transitionStarted = Stopwatch.GetTimestamp();
 
         var target =
             new GraphicsWindowTarget(
@@ -3118,17 +3117,11 @@ internal sealed class ClientApplication
             if (shell.Screen != transitionScreen)
             {
                 transitionScreen = shell.Screen;
-                transitionStarted = Stopwatch.GetTimestamp();
                 frontendFeedback = string.Empty;
                 detailScroll = 0;
             }
 
-            float transition =
-                Math.Clamp(
-                    (float)Stopwatch.GetElapsedTime(
-                        transitionStarted).TotalMilliseconds / 140f,
-                    0f,
-                    1f);
+            const float transition = 1f; // Render owner supplies decorative motion; input never waits.
 
             if (shell.Screen == GameFrontendScreen.MainMenu)
             {

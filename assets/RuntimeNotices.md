@@ -27,3 +27,9 @@ The optional Directorate menu still is a repository-authored native render of th
 Directorate/Central Divide models and materials. No external imagery was introduced.
 Composition/export details and the source hash are recorded in
 `assets/source/branding/forgeline/menu/README.md`; this notice grants no additional rights.
+
+The four original mathematical interface tone files in `assets/source/audio/ui`
+have a separate CC0 1.0 dedication. Their synthesis source uses no third-party sound
+recordings or sample libraries. The exact notice ships as `ThirdPartyNotices/UiAudio.txt`.
+This dedication applies only to those four cues, not the studio introduction or other
+repository content. See `docs/UiMotionAndAudio.md` for their packaged resource contract.
