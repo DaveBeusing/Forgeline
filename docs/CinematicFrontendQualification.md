@@ -84,9 +84,8 @@ or asset compilation.
   window modes passed on the final implementation revision.
 
 GitHub Actions build, version/font/geometry/native typography/material/display,
-canonical asset compilation and runtime process checks passed for the qualified code
-revision when this report was written. The cinematic lifecycle step and subsequent
-jobs were still running. Frame allocation contracts passed; longer frame and scalability
+canonical asset compilation, runtime process, cinematic lifecycle, world/effects and
+native WARP reference checks passed for the qualified code revision. Its general
+Windows window-mode smoke was still running when this report was written. Frame allocation contracts passed; longer frame and scalability
 measurements remained running. Check the pull request for final current-head results;
 this document does not assert completion of pending CI or a whole-solution test run.
-
