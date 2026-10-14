@@ -50,6 +50,7 @@ Alpha is meaningful only when the graphics pipeline supports blending. Functiona
 - Do not obscure the primary commands, loading errors, or menu feedback with ornament.
 - Detail pages reserve a separate decorative region; rows, values and adjustment controls use the shared geometry.
 - Pause screens preserve the battlefield context rather than replacing it with the full frontend backdrop.
+- The pause navigation column has one continuous quiet backplate from header through footer, preventing underlying HUD text from entering gaps between menu surfaces. The world remains visible beside it.
 
 Geometry now adapts to actual viewport, per-monitor DPI and user scale. Details and controls scroll deliberately; action buttons and feedback remain outside the list. [Qualification](FrontendLayoutQualification.md) records the display matrix and native evidence.
 

@@ -33,6 +33,14 @@ public readonly record struct FrontendGeometry
     public bool Controls { get; init; }
     public int VisibleDetailRows { get; init; }
     public bool IsEmpty => Scale <= 0;
+    public FrontendRegion PauseBackdrop
+    {
+        get
+        {
+            float top = MathF.Min(Header.Y, Title.Y);
+            return new(Navigation.X, top, Navigation.Width, MathF.Max(0, Footer.Bottom - top));
+        }
+    }
 
     private static FrontendRegion Rect(float x, float y, float width, float height, bool interactive = false) =>
         new(MathF.Round(x), MathF.Round(y), MathF.Max(0, MathF.Round(width)), MathF.Max(0, MathF.Round(height)), interactive);

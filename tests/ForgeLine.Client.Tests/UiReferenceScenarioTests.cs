@@ -48,6 +48,16 @@ public sealed class UiReferenceScenarioTests
                 Assert.True(r.Bottom < g.PrimaryAction.Y);
             }
             Assert.True(g.PrimaryAction.Right <= d.Item1 && g.Feedback.Bottom <= d.Item2);
+            if (state == UiReferenceScenario.Pause)
+            {
+                var backdrop = g.PauseBackdrop;
+                Assert.True(backdrop.Y <= g.Header.Y && backdrop.Bottom >= g.Footer.Bottom);
+                Assert.True(backdrop.Y <= g.Title.Y && backdrop.Bottom >= g.MenuRow(view.MenuEntries.Count - 1).Bottom);
+                Assert.Equal(g.Navigation.X, backdrop.X);
+                Assert.Equal(g.Navigation.Right, backdrop.Right);
+                Assert.True(backdrop.Right < d.Item1); // Battlefield context remains visible.
+                Assert.False(backdrop.Interactive);
+            }
         }
         Assert.Empty(UiReferenceStates.Frontend(UiReferenceScenario.LoadBroken,1920,1080,96,1).PrimaryAction);
         Assert.Contains(UiReferenceStates.Frontend(UiReferenceScenario.MenuDisabled,1920,1080,96,1).MenuEntries,x=>!x.IsEnabled);
