@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "purpose": "source-artwork-inspection",
+  "artworkCommit": "d65742c3f8abdb461076dfa0358776b2de19ea37",
+  "compilerAndTestCommit": "649e7d68b6968bed99490e2d94b06df08ca5d9ad",
+  "runtimeContentSignature": "c7fe53eb349cb4b93e36e4c2bec1f324bc39f3a59bcf96aa617984357eb10df9",
+  "humanReview": "pending",
+  "nativeGpuSkinIntegration": "not_in_scope",
+  "files": [
+    {
+      "file": "components.png",
+      "bytes": 34609,
+      "sha256": "00ad9eaf4c3e90819451ef3e439a29c350fe827678a4333937294779d0ab511d"
+    },
+    {
+      "file": "reference-verification.json",
+      "bytes": 1610,
+      "sha256": "39aa2bde7775f92a807740c19eefd9c6b496ee3b2e8f124c42e6ae14d57c4b82"
+    },
+    {
+      "file": "states.png",
+      "bytes": 48483,
+      "sha256": "07bc2404c320fa02acda4170eee0e292f463ba98bbde5c4015aa0cf31c2f3f86"
+    }
+  ]
+}

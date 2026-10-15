@@ -66,6 +66,13 @@ outside source regions and prevent neighboring sampling; source margin is not
 an alternative to atlas bleeding qualification. Keep normal HUD at native output
 resolution regardless of world render scale.
 
+State overlays target the interactive wrapper (minimum 24 x 24), not a narrow
+decorative track or 20-pixel thumb. Keep those pieces inside the shared hit
+region; do not shrink focus brackets below their minimum or enlarge hit geometry
+independently of the owning layout. Minimum sizes describe frame integrity,
+not sufficient space for arbitrary live labels; text metrics/padding may require
+a larger region.
+
 ## State composition
 
 Normal is the base sprite without an overlay. Add hover **or** pressed, selected,

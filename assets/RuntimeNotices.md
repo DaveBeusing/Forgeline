@@ -1,5 +1,12 @@
 # Runtime content notices
 
+The Directorate UI skin primitives are repository-authored geometric redraws.
+Their editable SVGs and PNGs copy no reference-board pixels, marks or labels.
+Reference boards remain outside player assets; their recorded rights evidence
+is not supplied by this notice. Source relationships and existing rights status
+are recorded in `assets/source/ui/directorate/skin.catalog.json` and
+`docs/UiSkinArtwork.md`. This notice grants no additional rights.
+
 The Directorate material sources are repository-authored procedural patterns;
 their authoring README reports no external imagery, texture data, fonts or
 licensed source material. The decal and VFX atlases are documented as original

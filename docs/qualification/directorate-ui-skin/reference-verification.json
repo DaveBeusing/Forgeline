@@ -1,0 +1,57 @@
+{
+  "remoteMaster": "27d80f8b04d77404b5287e66d533dcfea3788250",
+  "references": [
+    {
+      "file": "ui_visual_language.png",
+      "sha256": "57d51455045aca0c222fa836ae10d10829556f2acc5c2480db3215a1ec0f2a04",
+      "gitBlobSha": "87d8be1907487ff1178ad11e4ec69247fc437172",
+      "bytes": 2220368,
+      "mode": "RGB",
+      "alpha": null
+    },
+    {
+      "file": "hud_panel_reference.png",
+      "sha256": "187f22dda7fe420a85cbc51c8e0b823160ee2249b157ebe0c8b049a252edce21",
+      "gitBlobSha": "95f82080ca5ea537dac8bc5616a2d283a4937b24",
+      "bytes": 2144766,
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "resource_status_reference.png",
+      "sha256": "2a02bc2897c84a29d6dbd9918ea0771e1ca665368af3f18075edba5ebcdc3458",
+      "gitBlobSha": "c9a76a3136828af65de94e7a8a6423d815814abb",
+      "bytes": 1341685,
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "command_cursor_reference.png",
+      "sha256": "f1c87d16ad06fc91eba53c8742f0b28353d906a802ebaa270942d86d2a4398d1",
+      "gitBlobSha": "bd75162cfbdebd4f8c51b7292e222a8e6e792f0a",
+      "bytes": 1813832,
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "strategic_marker_reference.png",
+      "sha256": "1e5845f4a5b0df70fab834efca2cf5a6d8067ab11ea88f66f3c6639c0dbeba5e",
+      "gitBlobSha": "a1e2f7266426d2d3b613d78b122d51ac019c7cfa",
+      "bytes": 1451740,
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ]
+    }
+  ]
+}

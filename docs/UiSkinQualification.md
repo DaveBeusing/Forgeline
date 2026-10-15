@@ -16,18 +16,19 @@ The inventory's pending migration states are intentional scope boundaries.
 
 | Check | Status |
 | --- | --- |
-| Original import in current remote master | Existing completed import reused; local revalidation in progress |
+| Original import in current remote master | Passed: all five fetched master blobs equal the original files and recorded identities |
 | Authoring | 37 PNG/SVG/texture-definition sets and state catalog generated |
-| PNG decoding, alpha, dimensions, SHA-256 and Git blob identity | Pending source tests |
-| Slice bounds, minimum sizes, unique IDs and state resolution | Pending source tests |
-| Native-size contact sheets over dark/light backgrounds | Initial source inspection performed; final composite inspection pending |
+| PNG decoding, alpha, dimensions, SHA-256 and Git blob identity | Passed: four source tests |
+| Slice bounds, minimum sizes, unique IDs and state resolution | Passed: four source tests |
+| Native-size contact sheets over dark/light backgrounds | Source pixel inspection performed, including combined states and 28 x 28 slices; human review pending |
 | Release restore | Passed |
-| Release build | In progress |
-| Targeted source and integration tests | Not run yet |
-| Project-reference boundary validation | Not run yet |
-| Canonical runtime compilation | Not run yet |
-| Source-less reproducible package | Not run yet |
-| Full solution tests | Not run yet |
+| Release build | Passed: zero warnings/errors after narrowly documented Git SHA-1 analyzer compatibility exception |
+| Targeted source tests | Passed: 4/4; compiler decodes all 37 skin sources and five originals |
+| Package guard contracts | Passed: 7/7, including corrupt/missing/duplicate payloads, source leakage and escaping paths |
+| Project-reference boundary validation | Passed: 42 projects; no cycles or boundary violations |
+| Canonical runtime compilation | Passed: 530 assets, including all 37 skin textures; no references |
+| Source-less reproducible package | In progress |
+| Full solution tests | Passed: 2,004 passed, 9 existing opt-in skipped, 0 failed; 2,013 total, 6m23s |
 | Required current-head build-test CI | Pending |
 | Human art/accessibility/physical-monitor acceptance | Review pending; no reviewer decision recorded |
 
@@ -48,3 +49,29 @@ No test assertions or required workflow gates are disabled. The prior planning
 snapshot's fence/shutdown failure is historical context, not a result for this
 candidate. Current checks must establish their own outcomes. Full pipeline and
 human acceptance are separate from successful source decoding.
+
+## Retained source inspection evidence
+
+[Components](qualification/directorate-ui-skin/components.png),
+[combined states](qualification/directorate-ui-skin/states.png),
+[original revalidation](qualification/directorate-ui-skin/reference-verification.json)
+and their [hash ledger](qualification/directorate-ui-skin/evidence.json) are retained
+in the repository. These are authoring contact sheets, not native game captures
+or approved goldens. Labels appear only in inspection output, never in skin PNGs.
+
+PNG bytes total 11,234. Decoded single-level RGBA totals 944,384 bytes. Compiled
+skin containers total 972,486 bytes. This is storage accounting, not a GPU residency
+or frame-time measurement. No live draw paths change; integrated GPU costs and
+physical-display/motion acceptance belong to the subsequent renderer/integration
+qualification. There is no sustained FPS or final AAA acceptance claim.
+
+The runtime content signature is
+`c7fe53eb349cb4b93e36e4c2bec1f324bc39f3a59bcf96aa617984357eb10df9`.
+The source-art compiler and full-test build is `649e7d68b6968bed99490e2d94b06df08ca5d9ad`.
+The later changes add inspection tooling, package guards, provenance and evidence;
+production PNGs and C# source/test contracts remain byte-identical.
+
+Nine existing opt-in skips cover two GPU-lifetime cases and seven isolated
+Presentation hardware/performance cases. They are not new tests skipped to clear
+this change. The current local complete suite passed; the historical allocation
+and shutdown findings are not reported as failures of this run.

@@ -173,6 +173,64 @@ def contact_sheet(entries, path):
     sheet.save(path)
 
 
+def state_preview(entries, path):
+    """Inspection-only nine-slice composites; never imported by the player."""
+    catalog = {entry["id"]: entry for entry in entries}
+
+    def sliced(identifier, size):
+        entry = catalog["ui.skin.directorate." + identifier]
+        source = Image.open(OUT / entry["file"]).convert("RGBA")
+        left, top, right, bottom = entry["insets"]
+        if entry["scaling"] == "fixed":
+            assert size == source.size
+            return source
+        assert size[0] >= entry["minimumSize"][0] and size[1] >= entry["minimumSize"][1]
+        result = Image.new("RGBA", size)
+        sx, sy = [0, left, source.width - right, source.width], [0, top, source.height - bottom, source.height]
+        dx, dy = [0, left, size[0] - right, size[0]], [0, top, size[1] - bottom, size[1]]
+        for row in range(3):
+            for column in range(3):
+                region = source.crop((sx[column], sy[row], sx[column + 1], sy[row + 1]))
+                target = (dx[column + 1] - dx[column], dy[row + 1] - dy[row])
+                result.paste(region.resize(target, Image.Resampling.NEAREST), (dx[column], dy[row]))
+        return result
+
+    sheet = Image.new("RGBA", (1000, 790), "#252c2e")
+    draw = ImageDraw.Draw(sheet)
+    font = ImageFont.load_default(size=14)
+    examples = [("NORMAL", []), ("HOVER", ["hover"]), ("PRESSED", ["pressed"]),
+                ("SELECTED + FOCUS", ["selected", "focus"]),
+                ("WARNING + FOCUS", ["warning", "focus"]),
+                ("REJECTED", ["error"]), ("PENDING", ["pending"]),
+                ("ACCEPTED", ["accepted"]), ("DISABLED", ["disabled"])]
+    for index, (label, states) in enumerate(examples):
+        y = 18 + index * 57
+        draw.text((12, y + 10), label, font=font, fill="white")
+        for x, background in [(205, "#10181a"), (465, "#dedbd2")]:
+            draw.rectangle((x, y, x + 240, y + 44), fill=background)
+            button = sliced("control.button", (232, 40))
+            for state in states:
+                button.alpha_composite(sliced("overlay." + state, (232, 40)))
+            sheet.alpha_composite(button, (x + 4, y + 2))
+            ImageDraw.Draw(sheet).text((x + 21, y + 13), "LIVE ACTION", font=font,
+                                       fill="#687375" if states == ["disabled"] else "#edf4f2")
+        # Small geometry-only checks expose crossed corners without pretending a label fits.
+        small = sliced("control.button", (28, 28))
+        for state in states:
+            small.alpha_composite(sliced("overlay." + state, (28, 28)))
+        sheet.alpha_composite(small, (745, y + 7))
+    draw.text((12, 555), "NATIVE SMALL PARTS / MINIMUM SLICES / TRANSPARENT FRAME CENTERS", font=font, fill="white")
+    x = 12
+    for identifier in ("control.checkbox", "control.toggle_track", "control.slider_track", "control.scrollbar_thumb", "panel.portrait", "panel.minimap"):
+        entry = catalog["ui.skin.directorate." + identifier]
+        image = Image.open(OUT / entry["file"]).convert("RGBA")
+        draw.rectangle((x, 590, x + image.width, 590 + image.height), fill="#dedbd2")
+        sheet.alpha_composite(image, (x, 590))
+        x += image.width + 22
+    draw.text((12, 740), "Inspection labels are not source artwork. Bright/dark compositing uses the same straight-alpha sources.", font=font, fill="white")
+    sheet.convert("RGB").save(path)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--preview", type=Path, help="Optional authoring-only contact sheet")
@@ -220,6 +278,7 @@ def main():
     (OUT / "skin.catalog.json").write_text(json.dumps(catalog, indent=2) + "\n", encoding="utf-8")
     if args.preview:
         contact_sheet(entries, args.preview)
+        state_preview(entries, args.preview.with_name(args.preview.stem + "-states.png"))
     print(f"Authored {len(entries)} text-free RGBA PNGs, editable SVGs and texture definitions.")
 
 
