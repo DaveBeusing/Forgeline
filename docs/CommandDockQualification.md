@@ -67,3 +67,11 @@ dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks --configuration R
 ```
 
 For the paired CPU measurement, run the existing `--gameplay-ui-hotpaths <report.json>` benchmark with `DOTNET_TieredCompilation=0` in that benchmark process only. Restore the previous environment value afterward. Preserve renderer hashes and use sequential workloads on the same adapter/driver for comparison. Captures and geometry candidates do not grant visual golden approval.
+
+## Shared shell integration
+
+The [graphical battlefield HUD](GraphicalBattlefieldHud.md) migrates the shared
+dock backplates, mode tabs, primary/page/footer controls and command-result layers.
+Domain-card content contracts remain with this owner for production integration.
+Normal text is fitted inside shared controls; the independent bitmap path keeps
+its reviewed geometry hashes. See [qualification](GraphicalBattlefieldHudQualification.md).

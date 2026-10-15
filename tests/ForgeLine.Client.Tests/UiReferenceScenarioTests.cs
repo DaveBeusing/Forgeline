@@ -85,6 +85,16 @@ public sealed class UiReferenceScenarioTests
             Assert.True(original.Instances.SequenceEqual(snapshot.Instances));
             Assert.Equal(original.SessionId,snapshot.SessionId);
             Assert.Equal(original.Tick,snapshot.Tick);
+            if (state == UiReferenceScenario.SelectedGroup)
+            {
+                var members = Assert.IsType<CombatGroupOperationalSnapshot>(SelectedCombatGroup.Resolve(snapshot));
+                Assert.Equal(snapshot.PlayerExperience!.Value.Selection.Count, members.Members.Count);
+                Assert.All(members.Members, m => Assert.Contains(original.Instances.ToArray(), i => i.Entity == m.Entity && i.Selectable.Owner == original.PlayerExperience!.Value.Player));
+            }
+            if (state == UiReferenceScenario.SelectionUnit) Assert.Equal(ForgeLine.Game.UnitIds.MainBattleTank, snapshot.PlayerExperience!.Value.Selection.CommonUnitId);
+            if (state == UiReferenceScenario.SelectionBuilding) Assert.Equal(ForgeLine.Game.BuildingIds.VehicleFactory, snapshot.PlayerExperience!.Value.Selection.CommonBuildingId);
+            if (state == UiReferenceScenario.SelectionEmpty) Assert.Equal(0, snapshot.PlayerExperience!.Value.Selection.Count);
+            if (state == UiReferenceScenario.MissingPlayerData) Assert.Null(snapshot.PlayerExperience);
             if (state == UiReferenceScenario.DockPending) Assert.True(panel.ContextualPending);
             if (state is UiReferenceScenario.DockHover or UiReferenceScenario.DockPressed)
             {

@@ -29,6 +29,7 @@ internal sealed class PlayerActionDockHudSurface : IGameplayHudSurface
         GameplayHudRegion.ActionDock | GameplayHudRegion.PrimaryCommands;
 
     public UiTextDiagnostics TextDiagnostics => _renderer.TextDiagnostics;
+    public GameplayHudSkinDiagnostics SkinDiagnostics => _renderer.SkinDiagnostics;
     public int LastRenderedVertexCount => _renderer.LastRenderedVertexCount;
 
     public void Render(
@@ -65,6 +66,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
 
     private readonly IGraphicsDevice _graphics;
     private readonly UiTextBatch _text;
+    private readonly GameplayHudSkin _skin;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers =
         new(4);
@@ -92,9 +94,12 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                 : new RuntimeUiIconPalette(
                     runtimeAssets);
         _text = new UiTextBatch(graphics);
+        try { _skin = new(graphics, runtimeAssets, icons: false, portraits: false); }
+        catch { _text.Dispose(); _pipeline.Dispose(); throw; }
     }
 
     public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
+    public GameplayHudSkinDiagnostics SkinDiagnostics => _skin.Diagnostics;
     public int LastRenderedVertexCount { get; private set; }
 
     public void Render(
@@ -108,6 +113,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         ThrowIfDisposed();
         _text.Begin();
         ArgumentNullException.ThrowIfNull(graphics);
+        if (graphics.Width > 0 && graphics.Height > 0) _skin.Begin(graphics);
         ArgumentNullException.ThrowIfNull(snapshot);
 
         if (graphics.Width <= 0 ||
@@ -160,30 +166,35 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                 graphics.Height);
         }
 
-        if (_vertexCount == 0)
+        if (_vertexCount == 0 && _skin.Vertices == 0 && _text.VertexCount == 0)
         {
             LastRenderedVertexCount = 0;
             return;
         }
 
-        IGraphicsBuffer vertexBuffer =
-            GetFrameVertexBuffer(
-                graphics.FrameIndex);
-        vertexBuffer.SetData<OverlayVertex>(
-            _vertices.AsSpan(
-                0,
-                _vertexCount));
+        _skin.Flush(graphics);
+        if (_vertexCount > 0)
+        {
+            IGraphicsBuffer vertexBuffer =
+                GetFrameVertexBuffer(
+                    graphics.FrameIndex);
+            vertexBuffer.SetData<OverlayVertex>(
+                _vertices.AsSpan(
+                    0,
+                    _vertexCount));
 
-        graphics.SetPipeline(
-            _pipeline);
-        graphics.SetVertexBuffer(
-            vertexBuffer,
-            VertexStride);
-        graphics.Draw(
-            _vertexCount);
+            graphics.SetPipeline(
+                _pipeline);
+            graphics.SetVertexBuffer(
+                vertexBuffer,
+                VertexStride);
+            graphics.Draw(
+                _vertexCount);
+
+        }
 
         _text.Render(graphics);
-        LastRenderedVertexCount = _vertexCount + _text.VertexCount;
+        LastRenderedVertexCount = _vertexCount + _text.VertexCount + _skin.Vertices;
     }
 
     public void Dispose()
@@ -200,6 +211,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         }
 
         _vertexBuffers.Clear();
+        _skin.Dispose();
         _text.Dispose();
         _pipeline.Dispose();
         _disposed = true;
@@ -212,9 +224,9 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         if (region.IsEmpty) return;
         float previousScale = _scale;
         _scale = ContextualCommandModel.TextScale(layout);
-        EmitQuad(region.X, region.Y, region.Width, region.Height, PanelColor, width, height);
-        EmitClippedText(ContextualCommandModel.Status(snapshot), region.X + 5 * _scale,
-            region.Y + 5 * _scale, region.Right - 5 * _scale, TextColor, width, height);
+        if (!_skin.Panel(region, "panel.compact")) EmitQuad(region.X, region.Y, region.Width, region.Height, PanelColor, width, height);
+        PrimaryCommandText(ContextualCommandModel.Status(snapshot), region.X + 5 * _scale,
+            region.Y + 5 * _scale, region.Right - 5 * _scale, TextColor, 12, true, width, height);
         Span<char> promptBuffer = stackalloc char[128];
         bool localPending = ContextualCommandModel.HasPending(panel, snapshot);
         for (int i = 0; ContextualCommandModel.TryGet(snapshot, i, out var command, localPending, panel.SelectionPending, panel.Bindings); i++)
@@ -223,10 +235,10 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             bool focused = panel.IsOpen && panel.Mode == command.Mode && (command.OpensMode || panel.SelectedIndex == command.ItemIndex);
             bool hovered = panel.ContextualHoveredIndex == i;
             var visual = GameplayHudVisualStyle.ResolveItemState(focused, hovered, hovered && panel.ContextualPressed, command.Availability.CanActivate);
-            EmitQuad(button.X, button.Y, button.Width, button.Height, visual.Fill, width, height);
+            if (!_skin.Control(button, command.Availability.CanActivate, focused, hovered, hovered && panel.ContextualPressed)) EmitQuad(button.X, button.Y, button.Width, button.Height, visual.Fill, width, height);
             EmitItemStateCue(button, visual, width, height);
-            EmitClippedText(command.Label, button.X + 5 * _scale, button.Y + 4 * _scale,
-                button.Right - 4 * _scale, TextColor, width, height);
+            PrimaryCommandText(command.Label, button.X + 5 * _scale, button.Y + (_text.Ready ? 3 : 4) * _scale,
+                button.Right - 4 * _scale, TextColor, 12, true, width, height);
             var prompt = new HudTextBuilder(promptBuffer);
             if (command.Availability.CanActivate)
             {
@@ -234,28 +246,35 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                 prompt.Append(command.Shortcut);
             }
             else prompt.Append(command.Availability.DisabledReason);
-            EmitClippedText(prompt.Written, button.X + 5 * _scale, button.Y + 18 * _scale, button.Right - 4 * _scale,
-                MutedTextColor, width, height);
+            PrimaryCommandText(prompt.Written, button.X + 5 * _scale, button.Y + (_text.Ready ? 17 : 18) * _scale, button.Right - 4 * _scale,
+                MutedTextColor, 10, false, width, height);
         }
         string footer = targeting.IsActive ? "TARGETING - ESC CANCELS" :
             localPending || snapshot.PlayerActions?.PendingCommandCount > 0 ? "REQUEST PENDING - WAIT FOR RESULT" : (panel.Bindings ?? GameplayBindingRegistry.Default).DockModesPrompt;
-        EmitClippedText(footer, region.X + 5 * _scale, region.Bottom - 14 * _scale,
-            region.Right - 5 * _scale, MutedTextColor, width, height);
+        PrimaryCommandText(footer, region.X + 5 * _scale, region.Bottom - 14 * _scale,
+            region.Right - 5 * _scale, MutedTextColor, 10, false, width, height);
         _scale = previousScale;
+    }
+
+    private void PrimaryCommandText(ReadOnlySpan<char> text, float x, float y, float right, Vector4 color,
+        float size, bool bold, int width, int height)
+    {
+        if (_text.Ready) DockText(text, x, y, right, color, size, bold, width, height);
+        else EmitClippedText(text, x, y, right, color, width, height);
     }
 
     private void EmitModeBar(PlayerActionPanelMode activeMode, GameplayBindingRegistry? bindings,
         in GameplayHudLayout layout, int width, int height)
     {
         var bar = PlayerActionDockInteractionLayout.GetModeBarRect(layout);
-        EmitQuad(bar.X, bar.Y, bar.Width, bar.Height, GameplayHudVisualStyle.PanelHeader, width, height);
+        if (!_skin.Panel(bar, "panel.compact")) EmitQuad(bar.X, bar.Y, bar.Width, bar.Height, GameplayHudVisualStyle.PanelHeader, width, height);
         Span<char> buffer = stackalloc char[40];
         for (int i = 0; i < 7; i++)
         {
             var mode = PlayerActionDockInteractionLayout.ModeForButton(i);
             var rect = PlayerActionDockInteractionLayout.GetModeButtonRect(layout, i);
             bool selected = mode == activeMode;
-            EmitQuad(rect.X, rect.Y, rect.Width, rect.Height,
+            if (!_skin.Control(rect, selected: selected, role: "control.tab")) EmitQuad(rect.X, rect.Y, rect.Width, rect.Height,
                 selected ? GameplayHudVisualStyle.PanelSelected : CardColor, width, height);
             if (selected) EmitQuad(rect.X, rect.Bottom - 3 * _scale, rect.Width, 3 * _scale,
                 GameplayHudVisualStyle.Focus, width, height);
@@ -281,7 +300,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             PlayerActionDockInteractionLayout.GetModeBarRect(
                 layout);
 
-        EmitQuad(
+        if (!_skin.Panel(new HudRect(layout.ActionDock.X, bar.Bottom, layout.ActionDock.Width, MathF.Max(0, layout.ActionDock.Bottom - bar.Bottom)))) EmitQuad(
             layout.ActionDock.X,
             bar.Bottom,
             layout.ActionDock.Width,
@@ -335,7 +354,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
     {
         var header = PlayerActionDockInteractionLayout.GetHeaderRect(layout);
         bool compact = PlayerActionDockInteractionLayout.Compact(layout);
-        EmitQuad(header.X, header.Y, header.Width, header.Height, GameplayHudVisualStyle.PanelHeader, width, height);
+        if (!_skin.Panel(header, "panel.raised")) EmitQuad(header.X, header.Y, header.Width, header.Height, GameplayHudVisualStyle.PanelHeader, width, height);
         Span<char> buffer = stackalloc char[320]; var text = new HudTextBuilder(buffer);
         text.Append(PlayerActionDockHudModel.ResolveModeLabel(panel.Mode));
         if (snapshot.PlayerExperience is { } experience && experience.Tick == snapshot.Tick &&
@@ -345,6 +364,15 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             header.Right - 58 * _scale, TextColor, 13, true, width, height);
 
         bool pending = actions?.PendingCommandCount > 0 || ContextualCommandModel.HasPending(panel, snapshot);
+        if (pending || panel.SelectionPending) _skin.State(header, UiSkinState.Pending);
+        else if (snapshot.PlayerExperience is { } feedbackExperience && ResourcePowerHudModel.IsCommandFeedbackVisible(feedbackExperience))
+            _skin.State(header, feedbackExperience.Feedback.State switch
+            {
+                PlayerCommandFeedbackState.Accepted => UiSkinState.Accepted,
+                PlayerCommandFeedbackState.Rejected => UiSkinState.Error,
+                PlayerCommandFeedbackState.Partial => UiSkinState.Warning,
+                _ => UiSkinState.Normal
+            });
         text = new(buffer);
         if (panel.SelectionPending) text.Append("UPDATING SELECTION");
         else if (pending) text.Append("REQUEST PENDING / AWAIT RESULT");
@@ -378,7 +406,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         {
             var rect = PlayerActionDockInteractionLayout.GetPageButtonRect(layout, i);
             bool enabled = i == 0 ? start > 0 : start + capacity < items;
-            EmitQuad(rect.X, rect.Y, rect.Width, rect.Height, enabled ? CardColor : PanelColor, width, height);
+            if (!_skin.Control(rect, enabled)) EmitQuad(rect.X, rect.Y, rect.Width, rect.Height, enabled ? CardColor : PanelColor, width, height);
             DockText(i == 0 ? "<" : ">", rect.X + 6 * _scale, rect.Y + 3 * _scale, rect.Right - _scale,
                 enabled ? TextColor : MutedTextColor, 12, true, width, height);
         }
@@ -1297,7 +1325,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                 : PlayerActionDockHudModel.ResolveFooterLabel(control, panel.Mode);
             if (label.Length == 0) continue;
             bool enabled = PlayerActionDockHudModel.CanUseControl(control, panel.Mode, panel.SelectedIndex, panel, actions);
-            EmitQuad(rect.X, rect.Y, rect.Width, rect.Height, enabled ? CardColor : GameplayHudVisualStyle.PanelDisabled, width, height);
+            if (!_skin.Control(rect, enabled)) EmitQuad(rect.X, rect.Y, rect.Width, rect.Height, enabled ? CardColor : GameplayHudVisualStyle.PanelDisabled, width, height);
             var text = new HudTextBuilder(buffer);
             text.Append((panel.Bindings ?? GameplayBindingRegistry.Default).Prompt(index switch
             { 0 => GameplayAction.Activate, 1 => GameplayAction.CancelJob, 2 => GameplayAction.PrimarySetting,
@@ -1409,7 +1437,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             return;
         }
 
-        EmitQuad(
+        if (!_skin.Panel(strip, "panel.compact")) EmitQuad(
             strip.X,
             strip.Y,
             strip.Width,

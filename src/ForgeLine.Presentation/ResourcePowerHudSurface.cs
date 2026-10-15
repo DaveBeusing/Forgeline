@@ -38,6 +38,7 @@ internal static class ResourcePowerHudModel
 
     public static string ResolvePowerStateLabel(
         in PlayerPowerSummary power) =>
+        !double.IsFinite(power.Generation) || !double.IsFinite(power.Demand) ? "UNAVAILABLE" :
         power.IsConstrained
             ? "CONSTRAINED"
             : "STABLE";
@@ -189,6 +190,7 @@ internal sealed class ResourcePowerHudSurface : IGameplayHudSurface
         GameplayHudRegion.AlertStack;
 
     public UiTextDiagnostics TextDiagnostics => _renderer.TextDiagnostics;
+    public GameplayHudSkinDiagnostics SkinDiagnostics => _renderer.SkinDiagnostics;
     public int LastRenderedVertexCount => _renderer.LastRenderedVertexCount;
 
     public void Render(
@@ -226,6 +228,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
 
     private readonly IGraphicsDevice _graphics;
     private readonly UiTextBatch _text;
+    private readonly GameplayHudSkin _skin;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers =
         new(4);
@@ -254,9 +257,12 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 : new RuntimeUiIconPalette(
                     runtimeAssets);
         _text = new UiTextBatch(graphics);
+        try { _skin = new(graphics, runtimeAssets, icons: true, portraits: false); }
+        catch { _text.Dispose(); _pipeline.Dispose(); throw; }
     }
 
     public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
+    public GameplayHudSkinDiagnostics SkinDiagnostics => _skin.Diagnostics;
     public int LastRenderedVertexCount { get; private set; }
 
     public void Render(
@@ -269,6 +275,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         ThrowIfDisposed();
         _text.Begin();
         ArgumentNullException.ThrowIfNull(graphics);
+        if (graphics.Width > 0 && graphics.Height > 0) _skin.Begin(graphics);
 
         if (graphics.Width <= 0 ||
             graphics.Height <= 0 ||
@@ -293,7 +300,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             else
             {
                 HudRect bar = layout.TopStatusBar;
-                EmitQuad(bar.X, bar.Y, bar.Width, bar.Height, PanelColor, graphics.Width, graphics.Height);
+                if (!_skin.Panel(bar, "panel.resource")) EmitQuad(bar.X, bar.Y, bar.Width, bar.Height, PanelColor, graphics.Width, graphics.Height);
                 ReadOnlySpan<char> label = snapshot is null ? "WAITING FOR MATCH" : "WAITING FOR PLAYER DATA";
                 int count = Math.Min(label.Length, Math.Max(0, (int)((bar.Width - 16 * _scale) / (GlyphAdvance * _scale))));
                 EmitText(label[..count], bar.X + 8 * _scale, bar.Y + 12 * _scale,
@@ -303,30 +310,35 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         _scale = layout.Scale;
         if (showRuntimeMetrics) EmitRuntimeMetrics(metrics, layout.RuntimeMetrics, graphics.Width, graphics.Height);
 
-        if (_vertexCount == 0)
+        if (_vertexCount == 0 && _skin.Vertices == 0 && _text.VertexCount == 0)
         {
             LastRenderedVertexCount = 0;
             return;
         }
 
-        IGraphicsBuffer vertexBuffer =
-            GetFrameVertexBuffer(
-                graphics.FrameIndex);
-        vertexBuffer.SetData<OverlayVertex>(
-            _vertices.AsSpan(
-                0,
-                _vertexCount));
+        _skin.Flush(graphics);
+        if (_vertexCount > 0)
+        {
+            IGraphicsBuffer vertexBuffer =
+                GetFrameVertexBuffer(
+                    graphics.FrameIndex);
+            vertexBuffer.SetData<OverlayVertex>(
+                _vertices.AsSpan(
+                    0,
+                    _vertexCount));
 
-        graphics.SetPipeline(
-            _pipeline);
-        graphics.SetVertexBuffer(
-            vertexBuffer,
-            VertexStride);
-        graphics.Draw(
-            _vertexCount);
+            graphics.SetPipeline(
+                _pipeline);
+            graphics.SetVertexBuffer(
+                vertexBuffer,
+                VertexStride);
+            graphics.Draw(
+                _vertexCount);
+
+        }
 
         _text.Render(graphics);
-        LastRenderedVertexCount = _vertexCount + _text.VertexCount;
+        LastRenderedVertexCount = _vertexCount + _text.VertexCount + _skin.Vertices;
     }
 
     public void Dispose()
@@ -343,6 +355,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         }
 
         _vertexBuffers.Clear();
+        _skin.Dispose();
         _text.Dispose();
         _pipeline.Dispose();
         _disposed = true;
@@ -387,7 +400,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         float previousScale = _scale;
         _scale = density.Scale;
         if (_scale <= 0) return;
-        EmitQuad(bar.X, bar.Y, bar.Width, bar.Height, PanelColor, width, height);
+        if (!_skin.Panel(bar, "panel.resource")) EmitQuad(bar.X, bar.Y, bar.Width, bar.Height, PanelColor, width, height);
         EmitQuad(bar.X, bar.Bottom - _scale, bar.Width, _scale,
             GameplayHudVisualStyle.QuietBorder, width, height);
         Span<char> buffer = stackalloc char[32];
@@ -397,7 +410,9 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             var icon = ResourcePowerHudModel.GetResourceIcon(index);
             var definition = RtsUiIconCatalog.Get(icon);
             float top = cell.Y + (cell.Height - 30 * _scale) * .5f;
-            EmitIcon(icon, cell.X + 2 * _scale, top + 9 * _scale, 12 * _scale, width, height);
+            _skin.Panel(cell, "panel.resource");
+            if (!_skin.Icon(icon, cell.X + 2 * _scale, top + 9 * _scale, 12 * _scale))
+                EmitIcon(icon, cell.X + 2 * _scale, top + 9 * _scale, 12 * _scale, width, height);
             EmitQuad(cell.Right - _scale, cell.Y + 5 * _scale, _scale,
                 cell.Height - 10 * _scale, GameplayHudVisualStyle.QuietBorder, width, height);
             float textX = cell.X + 19 * _scale;
@@ -419,10 +434,11 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         }
         var power = density.Power;
         Vector4 state = experience.Power.IsConstrained ? GameplayHudVisualStyle.Warning : TextColor;
-        EmitQuad(power.X, power.Y + 3 * _scale, power.Width, power.Height - 6 * _scale,
+        if (!_skin.Panel(power, "panel.resource")) EmitQuad(power.X, power.Y + 3 * _scale, power.Width, power.Height - 6 * _scale,
             GameplayHudVisualStyle.PanelHeader, width, height);
         EmitQuad(power.X, power.Y + 3 * _scale, 3 * _scale, power.Height - 6 * _scale,
             state, width, height);
+        if (experience.Power.IsConstrained) _skin.State(power, UiSkinState.Warning);
         float y = power.Y + (power.Height - 28 * _scale) * .5f;
         Span<char> powerBuffer = stackalloc char[80];
         var text = new HudTextBuilder(powerBuffer);
@@ -1049,16 +1065,12 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         return "";
     }
 
-    private static void AppendQuantity(
+    internal static void AppendQuantity(
         ref HudTextBuilder builder,
         double value)
     {
-        double normalized =
-            double.IsFinite(value)
-                ? Math.Max(
-                    0.0,
-                    value)
-                : 0.0;
+        if (!double.IsFinite(value)) { builder.Append("N/A"); return; }
+        double normalized = Math.Max(0.0, value);
 
         if (normalized >=
             1_000_000.0)
@@ -1507,7 +1519,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         Vector2 Position,
         Vector4 Color);
 
-    private ref struct HudTextBuilder
+    internal ref struct HudTextBuilder
     {
         private Span<char> _buffer;
         private int _length;
@@ -1565,3 +1577,4 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
 
 
 }
+

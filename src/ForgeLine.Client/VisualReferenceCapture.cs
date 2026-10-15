@@ -217,6 +217,20 @@ internal static class VisualReferenceCapture
                         ShowOnboarding = true,
                         Guidance = new EarlyGameGuidanceController().Update(snapshot, true)
                     } : default;
+                    var hover = uiScenario == UiReferenceScenario.GameplayTooltip ? new HoverTooltipView(snapshot.SessionId, default, default,
+                        new(display.Width * .65f, display.Height * .6f), true, display.Width, display.Height,
+                        GameplayHudLayout.Create(display.Width, display.Height, rasterDpi, uiScale).Scale,
+                        panel.Mode, DockControl: 2, DockIndex: 0) : default;
+                    var groups = uiScenario == UiReferenceScenario.GroupSummary ? new CombatGroupOverviewView(
+                        [default(CombatGroupSummaryReadModel) with { Slot = 1, Label = "Armoured support", MemberCount = 3,
+                            IsActive = true, IsSelected = true, HasHealth = true, Health = .4, HasSupply = true,
+                            SupplyStatus = BattlefieldSupplyStatus.Critical, Fuel = .12, Ammunition = .08,
+                            HasReadiness = true, Readiness = .31, HasFormation = true, Formation = FormationTemplate.Wedge }], []) : CombatGroupOverviewView.Empty;
+                    if (uiScenario == UiReferenceScenario.SelectedGroup && SelectedCombatGroup.Resolve(snapshot) is { } groupMembers)
+                    {
+                        var selectedUnits = new SelectionSet(); selectedUnits.Replace(groupMembers.EligibleEntities.ToArray());
+                        groups = new CombatGroupOverviewView([], [], SelectedCombatGroup.Create(groupMembers, selectedUnits));
+                    }
                     int recordFrameIndex = -1;
                     captureInputs.Clear();
                     Action<IGraphicsCommandContext> record = context =>
@@ -247,7 +261,8 @@ internal static class VisualReferenceCapture
                         context.BeginPass(GraphicsFramePass.Overlay);
                         selection.Render(context, camera, indicators);
                         hud.Render(context, camera, snapshot, terrain.WorldBounds, information, panel, targeting,
-                            FormationTemplate.Compact, CombatGroupOverviewView.Empty, captureUx, rasterDpi, uiScale,
+                            FormationTemplate.Compact, groups, captureUx, rasterDpi, uiScale,
+                            hoverTooltip: hover,
                             runtimeMetrics: new RuntimeMetricsView(60, 20, RuntimeSimulationState.Running),
                             showRuntimeMetrics: uiScenario != UiReferenceScenario.World);
                         if (frontend is not null && frontendView is { } pause)
@@ -375,7 +390,7 @@ internal static class VisualReferenceCapture
                     captures.Add(new { submission = meshes.SubmissionMetrics, key, image, imageSha256 = FileHash(Path.Combine(request.OutputRoot, image)),
                         pixelSha256 = Convert.ToHexString(SHA256.HashData(rgba)), fixture.Kind, fingerprint = fixture.Fingerprint,
                         ui = new { scenario = uiScenario, fixtureVersion = 1,
-                            skin = frontend?.SkinDiagnostics, skinState = frontend?.SkinState, skinnedControls = frontend?.LastSkinnedControlCount, layoutId = frontend is null ? "GameplayHudLayout" : "FrontendGeometry",
+                            skin = frontend?.SkinDiagnostics, battlefieldSkin = frontend is null ? hud.SkinDiagnostics : (GameplayHudSkinDiagnostics?)null, skinState = frontend?.SkinState, skinnedControls = frontend?.LastSkinnedControlCount, layoutId = frontend is null ? "GameplayHudLayout" : "FrontendGeometry",
                             interaction = new { panel.Mode, panel.SelectedIndex, panel.HoveredIndex, panel.PointerPressed,
                                 panel.ContextualHoveredIndex, panel.ContextualPressed, panel.ContextualPending, targetingMode = targeting.Mode },
                             captureOffset = uiScenario == UiReferenceScenario.MenuReveal ? "Authored half-reveal; live motion reviewed separately" : "Settled fixed state",
@@ -453,3 +468,4 @@ internal static class VisualReferenceCapture
         return Convert.ToHexString(hash.GetHashAndReset());
     }
 }
+

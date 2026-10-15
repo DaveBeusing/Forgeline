@@ -132,6 +132,7 @@ internal sealed class SelectionInspectorHudSurface : IGameplayHudSurface
         GameplayHudRegion.SelectionInspector;
 
     public UiTextDiagnostics TextDiagnostics => _renderer.TextDiagnostics;
+    public GameplayHudSkinDiagnostics SkinDiagnostics => _renderer.SkinDiagnostics;
     public int LastRenderedVertexCount => _renderer.LastRenderedVertexCount;
 
     public void Render(
@@ -163,6 +164,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
 
     private readonly IGraphicsDevice _graphics;
     private readonly UiTextBatch _text;
+    private readonly GameplayHudSkin _skin;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers =
         new(4);
@@ -190,9 +192,12 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
                 : new RuntimeUiIconPalette(
                     runtimeAssets);
         _text = new UiTextBatch(graphics);
+        try { _skin = new(graphics, runtimeAssets, icons: true, portraits: true); }
+        catch { _text.Dispose(); _pipeline.Dispose(); throw; }
     }
 
     public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
+    public GameplayHudSkinDiagnostics SkinDiagnostics => _skin.Diagnostics;
     public int LastRenderedVertexCount { get; private set; }
 
     public void Render(
@@ -205,6 +210,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         ThrowIfDisposed();
         _text.Begin();
         ArgumentNullException.ThrowIfNull(graphics);
+        if (graphics.Width > 0 && graphics.Height > 0) _skin.Begin(graphics);
         ArgumentNullException.ThrowIfNull(snapshot);
 
         if (graphics.Width <= 0 ||
@@ -231,30 +237,35 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
             graphics.Width,
             graphics.Height);
 
-        if (_vertexCount == 0)
+        if (_vertexCount == 0 && _skin.Vertices == 0 && _text.VertexCount == 0)
         {
             LastRenderedVertexCount = 0;
             return;
         }
 
-        IGraphicsBuffer vertexBuffer =
-            GetFrameVertexBuffer(
-                graphics.FrameIndex);
-        vertexBuffer.SetData<OverlayVertex>(
-            _vertices.AsSpan(
-                0,
-                _vertexCount));
+        _skin.Flush(graphics);
+        if (_vertexCount > 0)
+        {
+            IGraphicsBuffer vertexBuffer =
+                GetFrameVertexBuffer(
+                    graphics.FrameIndex);
+            vertexBuffer.SetData<OverlayVertex>(
+                _vertices.AsSpan(
+                    0,
+                    _vertexCount));
 
-        graphics.SetPipeline(
-            _pipeline);
-        graphics.SetVertexBuffer(
-            vertexBuffer,
-            VertexStride);
-        graphics.Draw(
-            _vertexCount);
+            graphics.SetPipeline(
+                _pipeline);
+            graphics.SetVertexBuffer(
+                vertexBuffer,
+                VertexStride);
+            graphics.Draw(
+                _vertexCount);
+
+        }
 
         _text.Render(graphics);
-        LastRenderedVertexCount = _vertexCount + _text.VertexCount;
+        LastRenderedVertexCount = _vertexCount + _text.VertexCount + _skin.Vertices;
     }
 
     public void Dispose()
@@ -271,6 +282,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         }
 
         _vertexBuffers.Clear();
+        _skin.Dispose();
         _text.Dispose();
         _pipeline.Dispose();
         _disposed = true;
@@ -281,8 +293,8 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
     {
         _scale = CombatGroupCardLayout.Scale(layout);
         HudRect region = layout.SelectionInspector;
-        EmitQuad(region.X, region.Y, region.Width, region.Height, PanelColor, width, height);
-        EmitQuad(region.X, region.Y, region.Width, 18 * _scale, GameplayHudVisualStyle.PanelHeader, width, height);
+        if (!_skin.Panel(region)) EmitQuad(region.X, region.Y, region.Width, region.Height, PanelColor, width, height);
+        if (!_skin.Ready) EmitQuad(region.X, region.Y, region.Width, 18 * _scale, GameplayHudVisualStyle.PanelHeader, width, height);
         EmitQuad(region.X, region.Y, 3 * _scale, region.Height, GameplayHudVisualStyle.Focus, width, height);
         Span<char> buffer = stackalloc char[128];
         var text = new HudTextBuilder(buffer);
@@ -315,9 +327,11 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
             else if (index == 10)
             { text.Append(bindings.Prompt(GameplayAction.Formation)); text.Append(" "); text.Append(formation switch { FormationTemplate.Line => "LINE", FormationTemplate.Column => "COLUMN", FormationTemplate.Wedge => "WEDGE", _ => "COMPACT" }); text.Append(" NEXT"); enabled = group.CombatCount > 0; }
             else { text.Append("FOCUS GROUP"); enabled = group.LiveCount > 0; }
-            EmitQuad(rect.X, rect.Y, rect.Width, rect.Height, enabled ? GameplayHudVisualStyle.PanelRaised : PanelColor, width, height);
-            EmitClippedText(text.Written, rect.X + _scale, rect.Y + _scale, rect.Right - _scale,
-                enabled ? TextColor : MutedTextColor, width, height);
+            if (!_skin.Control(rect, enabled)) EmitQuad(rect.X, rect.Y, rect.Width, rect.Height, enabled ? GameplayHudVisualStyle.PanelRaised : PanelColor, width, height);
+            if (!_text.Add(text.Written, rect.X + _scale, rect.Y + _scale, 9 * _scale,
+                enabled ? TextColor : MutedTextColor, width, height, rect.Width - 2 * _scale))
+                EmitClippedText(text.Written, rect.X + _scale, rect.Y + _scale, rect.Right - _scale,
+                    enabled ? TextColor : MutedTextColor, width, height);
         }
         text = new HudTextBuilder(buffer);
         text.Append("LAST CMD ");
@@ -334,9 +348,13 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         text.Append(value * 100, "F0"); text.Append("%("); text.Append(count); text.Append(")");
     }
 
-    private void GroupText(ReadOnlySpan<char> text, float offset, in HudRect region, Vector4 color, int width, int height) =>
-        EmitClippedText(text, region.X + 6 * _scale, region.Y + offset * _scale,
-            region.Right - 6 * _scale, color, width, height);
+    private void GroupText(ReadOnlySpan<char> text, float offset, in HudRect region, Vector4 color, int width, int height)
+    {
+        if (!_text.Add(text, region.X + 6 * _scale, region.Y + offset * _scale, 10 * _scale,
+            color, width, height, region.Width - 12 * _scale))
+            EmitClippedText(text, region.X + 6 * _scale, region.Y + offset * _scale,
+                region.Right - 6 * _scale, color, width, height);
+    }
 
     private void EmitInspector(
         in PlayerSelectionSummary selection,
@@ -357,7 +375,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
             region.Y +
             padding;
 
-        EmitQuad(
+        if (!_skin.Panel(region)) EmitQuad(
             region.X,
             region.Y,
             region.Width,
@@ -366,7 +384,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
             width,
             height);
 
-        EmitQuad(region.X, region.Y, region.Width, 32 * _scale,
+        if (!_skin.Ready) EmitQuad(region.X, region.Y, region.Width, 32 * _scale,
             GameplayHudVisualStyle.PanelHeader, width, height);
         EmitQuad(region.X, region.Y, 3 * _scale, region.Height,
             GameplayHudVisualStyle.Focus, width, height);
@@ -376,7 +394,8 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         RtsUiIcon roleIcon =
             SelectionInspectorHudModel.ResolveRoleIcon(
                 selection);
-        EmitIcon(
+        bool portrait = _skin.Portrait(selection, new HudRect(x, y - 2 * _scale, 32 * _scale, 32 * _scale));
+        if (!portrait) EmitIcon(
             roleIcon,
             x,
             y,
@@ -397,16 +416,16 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
             header.Append(" ");
         }
 
-        header.Append(
+        header.AppendClipped(
             selection.DisplayName);
 
-        if (!_text.Add(header.Written, x + 26 * _scale, y, 13 * _scale, TextColor,
-            width, height, region.Right - x - 32 * _scale, bold: true))
+        if (!_text.Add(header.Written, x + (portrait ? 38 : 26) * _scale, y, 13 * _scale, TextColor,
+            width, height, region.Right - x - (portrait ? 44 : 32) * _scale, bold: true))
         {
         EmitClippedText(
             header.Written,
             x +
-                26.0f *
+                (portrait ? 38.0f : 26.0f) *
                 _scale,
             y +
                 1.0f *
@@ -423,7 +442,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
             SelectionInspectorHudModel.ResolveKindLabel(
                 selection.Kind),
             x +
-                26.0f *
+                (portrait ? 38.0f : 26.0f) *
                 _scale,
             y +
                 15.0f *
@@ -724,6 +743,12 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
                 supplyIcon),
             width,
             height);
+        float available = MathF.Max(0, region.Right - x - 22 * _scale);
+        float half = available * .5f;
+        _skin.Bar(new HudRect(x + 15 * _scale, y + 12 * _scale, half - 2 * _scale, 2 * _scale),
+            selection.FuelFraction, selection.FuelFraction <= .25 ? GameplayHudVisualStyle.Critical : ResolveColor(RtsUiIcon.StatusFuel));
+        _skin.Bar(new HudRect(x + 15 * _scale + half, y + 12 * _scale, half - 2 * _scale, 2 * _scale),
+            selection.AmmunitionFraction, selection.AmmunitionFraction <= .25 ? GameplayHudVisualStyle.Critical : ResolveColor(RtsUiIcon.StatusAmmunition));
     }
 
     private void EmitStatusRow(
@@ -854,6 +879,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         int width,
         int height)
     {
+        if (_skin.Bar(new HudRect(x, y, barWidth, barHeight), fraction, color)) return;
         const int SegmentCount = 5;
         float gap =
             1.5f *
@@ -1021,6 +1047,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         int width,
         int height)
     {
+        if (_skin.Icon(icon, x, y, size)) return;
         RtsUiIconDefinition definition =
             RtsUiIconCatalog.Get(
                 icon);
@@ -1405,6 +1432,14 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
 
         public readonly ReadOnlySpan<char> Written =>
             _buffer[.._length];
+
+        public void AppendClipped(string value)
+        {
+            ReadOnlySpan<char> text = value.AsSpan();
+            ReadOnlySpan<char> prefix = text[..Math.Min(text.Length, _buffer.Length - _length)];
+            prefix.CopyTo(_buffer[_length..]);
+            _length += prefix.Length;
+        }
 
         public void Append(
             string value)

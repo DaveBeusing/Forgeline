@@ -17,6 +17,7 @@ public sealed class GameplayHudRenderer : IDisposable
     private readonly IGameplayHudSurface[] _surfaces;
     private readonly ResourcePowerHudSurface? _statusSurface;
     private bool _disposed;
+    private GameplayHudSkinDiagnostics _frameSkin;
 
     public GameplayHudRenderer(
         IGraphicsDevice graphics,
@@ -24,27 +25,39 @@ public sealed class GameplayHudRenderer : IDisposable
     {
         ArgumentNullException.ThrowIfNull(graphics);
 
-        _statusSurface = new ResourcePowerHudSurface(graphics, runtimeAssets);
-        _surfaces =
-        [
-            _statusSurface,
-            new SelectionInspectorHudSurface(
-                graphics,
-                runtimeAssets),
-            new PlayerActionDockHudSurface(
-                graphics,
-                runtimeAssets),
-            new RtsInformationHudSurface(
-                graphics,
-                runtimeAssets),
-            new WorldHoverTooltipSurface(graphics),
-            new OperationsHudSurface(graphics)
-        ];
+        var prepared = new List<IGameplayHudSurface>();
+        try
+        {
+            _statusSurface = new ResourcePowerHudSurface(graphics, runtimeAssets);
+            prepared.Add(_statusSurface);
+            prepared.Add(new SelectionInspectorHudSurface(graphics, runtimeAssets));
+            prepared.Add(new PlayerActionDockHudSurface(graphics, runtimeAssets));
+            prepared.Add(new RtsInformationHudSurface(graphics, runtimeAssets));
+            prepared.Add(new WorldHoverTooltipSurface(graphics, runtimeAssets));
+            prepared.Add(new OperationsHudSurface(graphics));
+            _surfaces = prepared.ToArray();
+        }
+        catch
+        {
+            for (int i = prepared.Count - 1; i >= 0; i--) prepared[i].Dispose();
+            throw;
+        }
     }
 
     public GameplayHudState State { get; private set; }
 
     public int LastRenderedVertexCount { get; private set; }
+
+    public GameplayHudSkinDiagnostics SkinDiagnostics
+    {
+        get
+        {
+            GameplayHudSkinDiagnostics result = default;
+            foreach (var surface in _surfaces) result = result.Combine(surface.SkinDiagnostics);
+            return result with { Draws = _frameSkin.Draws, Vertices = _frameSkin.Vertices,
+                VertexUploadBytes = _frameSkin.VertexUploadBytes, MissingAssets = _frameSkin.MissingAssets, DroppedQuads = _frameSkin.DroppedQuads };
+        }
+    }
 
     public UiTextDiagnostics TextDiagnostics
     {
@@ -116,6 +129,7 @@ public sealed class GameplayHudRenderer : IDisposable
                 context.Height,
                 dpi,
                 uiScale);
+        _frameSkin = default;
         State = ResolveState(snapshot);
         LastRenderedVertexCount = 0;
         LastHoverTooltipVertexCount = 0;
@@ -123,6 +137,7 @@ public sealed class GameplayHudRenderer : IDisposable
         if (snapshot is null)
         {
             _statusSurface?.RenderWaiting(context, layout, runtimeMetrics, showRuntimeMetrics);
+            _frameSkin = _statusSurface?.SkinDiagnostics ?? default;
             LastRenderedVertexCount = _statusSurface?.LastRenderedVertexCount ?? 0;
             return;
         }
@@ -151,6 +166,7 @@ public sealed class GameplayHudRenderer : IDisposable
         {
             surface.Render(
                 renderContext);
+            _frameSkin = _frameSkin.Combine(surface.SkinDiagnostics);
             LastRenderedVertexCount += surface.LastRenderedVertexCount;
             if (surface is RtsInformationHudSurface information)
                 LastGuidanceVertexCount = information.LastGuidanceVertexCount;

@@ -14,7 +14,8 @@ internal enum UiReferenceScenario
     ResourcePressure, LowPower, SupplyCritical, MixedSelection, Targeting, QueueBlocked,
     Technology, Contacts, DockFocus, DockHover, DockPressed, DockPending, DockAccepted,
     DockRejected, MinimapStrategic, Onboarding, SettingsAudio, SettingsGraphics, Controls,
-    SettingsGeneral, SettingsBindings, BindingConflict, DisplayTrial, PauseSettings, MenuHover, MenuPressed
+    SettingsGeneral, SettingsBindings, BindingConflict, DisplayTrial, PauseSettings, MenuHover, MenuPressed,
+    SelectionUnit, SelectionBuilding, SelectionEmpty, SelectionLongName, MissingPlayerData, GameplayTooltip, GroupSummary, ResourceUnknown, SelectedGroup
 }
 
 /// <summary>Named authored read models for the existing reference capture lane; never dispatches input.</summary>
@@ -134,10 +135,44 @@ internal static class UiReferenceStates
                 snapshot = CopyExperience(snapshot, snapshot.PlayerExperience!.Value with
                 { Selection = PlayerSelectionSummary.Empty with { Count = 3, Kind = PlayerSelectionKind.Mixed, DisplayName = "Mixed selection" } });
         }
+        if (state is UiReferenceScenario.SelectionUnit or UiReferenceScenario.SelectionBuilding or UiReferenceScenario.SelectionLongName)
+        {
+            snapshot = BattlefieldHudCapture.State(snapshot, state == UiReferenceScenario.SelectionBuilding ? "Production" : "Supply");
+            if (state == UiReferenceScenario.SelectionLongName)
+                snapshot = CopyExperience(snapshot, snapshot.PlayerExperience!.Value with
+                { Selection = snapshot.PlayerExperience.Value.Selection with { DisplayName = "Armoured reconnaissance and mobile support detachment " + new string('W', 240) } });
+        }
+        if (state == UiReferenceScenario.SelectionEmpty)
+            snapshot = CopyExperience(snapshot, snapshot.PlayerExperience!.Value with { Selection = PlayerSelectionSummary.Empty });
+        if (state == UiReferenceScenario.MissingPlayerData)
+            snapshot = new(snapshot.Tick, snapshot.TickDuration, snapshot.SimulationEntityCount, snapshot.Instances, snapshot.Intelligence, snapshot.SessionId);
+        if (state == UiReferenceScenario.ResourceUnknown)
+            snapshot = CopyExperience(snapshot, snapshot.PlayerExperience!.Value with
+            { Resources = new(double.NaN,double.NaN,double.NaN,double.NaN,double.NaN,double.NaN,double.NaN),
+                Power = snapshot.PlayerExperience.Value.Power with { Generation = double.NaN, Demand = double.NaN } });
         if (state == UiReferenceScenario.Onboarding)
             snapshot = new(snapshot.Tick, snapshot.TickDuration, snapshot.SimulationEntityCount, snapshot.Instances,
                 snapshot.Intelligence, snapshot.SessionId, snapshot.PlayerExperience, playerActions: snapshot.PlayerActions,
                 guidance: new PlayerGuidanceSummary(snapshot.SessionId, snapshot.Tick, snapshot.PlayerExperience!.Value.Player, default));
+        if (state == UiReferenceScenario.SelectedGroup)
+        {
+            var experience = snapshot.PlayerExperience!.Value;
+            var owned = snapshot.Instances.ToArray().Where(i => i.Selectable.Owner == experience.Player &&
+                i.Selectable.Category == ControllableEntityCategory.Unit).Take(3).ToArray();
+            if (owned.Length < 2) throw new InvalidDataException("Group fixture requires existing owned unit identities.");
+            var members = owned.Select((instance, index) => default(CombatGroupMemberReadModel) with
+            {
+                Entity = instance.Entity, Category = ControllableEntityCategory.Unit, Unit = instance.UnitFeature.Unit,
+                CombatEligible = true, HasHealth = true, HealthFraction = index == 0 ? .2 : .8,
+                HasSupply = true, SupplyStatus = index == 0 ? BattlefieldSupplyStatus.Critical : BattlefieldSupplyStatus.Supplied,
+                FuelFraction = .3, AmmunitionFraction = .4, HasReadiness = true, Readiness = .6
+            }).ToArray();
+            snapshot = new(snapshot.Tick, snapshot.TickDuration, snapshot.SimulationEntityCount, snapshot.Instances,
+                snapshot.Intelligence, snapshot.SessionId, experience with { Selection = PlayerSelectionSummary.Empty with
+                { Count = members.Length, Kind = PlayerSelectionKind.Unit, DisplayName = "Selected combat group" } },
+                playerActions: snapshot.PlayerActions, vfxMetrics: snapshot.VfxMetrics,
+                combatGroups: new CombatGroupOperationalSnapshot(snapshot.Tick, members, snapshot.SessionId));
+        }
         return (snapshot, panel);
     }
 

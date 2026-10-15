@@ -125,3 +125,10 @@ dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks --configuration R
 Use the same adapter/driver and sequential workloads for timing comparison. Native
 captures do not grant visual golden approval, physical-monitor certification, sustained
 combat/motion acceptance or additional intelligence access.
+
+## Production skin integration
+
+The subsequent [graphical HUD qualification](GraphicalBattlefieldHudQualification.md)
+records the current resource, selection/portrait, group, dock-shell and tooltip
+consumers. The earlier geometry/interaction evidence above remains historical;
+reviewed bitmap fixture hashes are retained unchanged.

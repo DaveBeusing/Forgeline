@@ -51,28 +51,28 @@ text atlas. Shared geometry is `FrontendGeometry` in Presentation; interaction i
 
 ## Battlefield HUD
 
-The six surfaces below compose in `GameplayHudRenderer`. Existing semantic icons
-are `ui.icon.*` material-backed glyphs through `RtsUiRuntimeAssets`; they are not
-new skin textures or final semantic portrait art. Existing health/progress fills
-and all text remain copied live data. HUD integration owns shell/selection/groups;
-production integration owns domain cards/operations/alerts; tactical integration
-owns map/cursor/world indicators. These are migration responsibilities, not new
-runtime classes.
+The six surfaces below compose in `GameplayHudRenderer`. The normal resource,
+selection, group, command-shell, tooltip and guidance paths now use prepared
+production atlas layers and the existing live text atlas; see
+[graphical battlefield HUD](GraphicalBattlefieldHud.md). Their legacy bitmap
+geometry remains an independent bootstrap/debug path. Domain-card contents,
+operations/alerts and tactical map/cursor/world geometry keep the migration
+owners shown below. No new simulation/read-model authority is introduced.
 
 | Surface / actual states | Owner / existing graphics | Layout and hit geometry | Required production family / migration |
 | --- | --- | --- | --- |
-| WaitingForSnapshot, WaitingForPlayerData | `ResourcePowerHudSurface.RenderWaiting`; geometric status/text | `GameplayHudLayout.TopStatusBar` | panel.resource if available; retain independent failure/wait fallback; HUD |
-| Seven resource quantities, compact two-row/unavailable/zero | `ResourcePowerHudSurface`; semantic resource glyphs/quads | `ResourceStripLayout.Create`, `Resource(index)` | panel.resource; semantic icons separate; HUD |
-| Power generation/demand, low power | `ResourcePowerHudSurface`; power icon/quads | `ResourceStripLayout.Power` | panel.resource, overlay.warning/error; HUD |
+| WaitingForSnapshot, WaitingForPlayerData | `ResourcePowerHudSurface.RenderWaiting`; compiled resource panel and live waiting text | `GameplayHudLayout.TopStatusBar` | panel.resource; explicit required-asset failure and independent bootstrap; implemented |
+| Seven resource quantities, compact two-row/unavailable/zero | `ResourcePowerHudSurface`; compiled resource cells/icons and live totals | `ResourceStripLayout.Create`, `Resource(index)` | panel.resource; seven mapped semantic icons; implemented |
+| Power generation/demand, low power | `ResourcePowerHudSurface`; compiled power cell and state overlay | `ResourceStripLayout.Power` | panel.resource, overlay.warning/error; HUD |
 | Command result feedback pending/accepted/rejected | `ResourcePowerHudSurface`; labels/rails | `HudInformationLayout.Alerts` | panel.banner, status overlays; production |
 | Alerts standard/warning/critical; facility/core/supply focus | `ResourcePowerHudSurface`; live severity and semantic icons | `ActionableAlertLayout`, `GameplayHudLayout.AlertStack` | panel.banner, overlays.warning/error; production |
 | FPS/TPS and expanded runtime diagnostics | `ResourcePowerHudSurface`; independent text/quads | `GameplayHudLayout.RuntimeMetrics` | retain independent diagnostic path |
-| Empty selection, single owned unit/building, permitted enemy/contact | `SelectionInspectorHudSurface`; semantic glyph and geometric header | `GameplayHudLayout.SelectionInspector`, `HudInformationLayout.InspectorScale` | panel.primary, panel.portrait; real identity portraits separate; HUD |
-| Health, ammunition, fuel, supply/readiness, copied work | `SelectionInspectorHudSurface`; live quads/text | inspector internal fitted bounds | progress.*, panel.inset; live quantities and permitted facts; HUD |
-| Multi-selection filters/summaries, damaged/critical focus, cycling | `SelectionInspectorHudSurface`; geometric controls | `CombatGroupCardLayout.Control` | control.row, control.button_compact, shared overlays; HUD |
-| Formation controls | `SelectionInspectorHudSurface`; geometric actions | `CombatGroupCardLayout.Control` | control.button_compact, selected/focus layers; HUD |
-| Primary RTS commands/targeting availability | `PlayerActionDockHudSurface`; existing command glyphs/quads | `GameplayHudLayout.PrimaryCommands`, `PlayerActionDockInteractionLayout` | control.button, shared overlays; HUD shell / tactical content |
-| Dock closed/collapsed/open; compact/scroll | `PlayerActionDockHudSurface`; geometric shell | `ActionDock`, `GetCollapsedRect`, `GetCardsRect`, `FirstVisibleItem` | panel.primary/compact, control.row_compact; HUD shell |
+| Empty selection, single owned unit/building, permitted enemy/contact | `SelectionInspectorHudSurface`; compiled shell and permitted roster portrait | `GameplayHudLayout.SelectionInspector`, `HudInformationLayout.InspectorScale` | panel.primary/portrait; mapped roster portraits for permitted single identities; implemented |
+| Health, ammunition, fuel, supply/readiness, copied work | `SelectionInspectorHudSurface`; clipped atlas fills/tracks and live text | inspector internal fitted bounds | progress.*, panel.inset; live quantities and permitted facts; HUD |
+| Multi-selection filters/summaries, damaged/critical focus, cycling | `SelectionInspectorHudSurface`; compiled controls | `CombatGroupCardLayout.Control` | control.row, control.button_compact, shared overlays; HUD |
+| Formation controls | `SelectionInspectorHudSurface`; compiled formation controls | `CombatGroupCardLayout.Control` | control.button_compact, selected/focus layers; HUD |
+| Primary RTS commands/targeting availability | `PlayerActionDockHudSurface`; compiled shell controls with shared hit targets | `GameplayHudLayout.PrimaryCommands`, `PlayerActionDockInteractionLayout` | control.button, shared overlays; HUD shell / tactical content |
+| Dock closed/collapsed/open; compact/scroll | `PlayerActionDockHudSurface`; compiled shell | `ActionDock`, `GetCollapsedRect`, `GetCardsRect`, `FirstVisibleItem` | panel.primary/compact, control.row_compact; HUD shell |
 | Mode tabs: Construction, Production, UnitProduction, Logistics, Supply, Tactical, Technology | `PlayerActionDockHudSurface`; compiled tabs | `GetModeBarRect`, `GetModeButtonRect` | control.tab, selected/focus layers; HUD shell |
 | Construction cards, costs, placement availability | `PlayerActionDockHudSurface`; live card data and icons | `GetCardRect`, `GetHeaderRect` | control.row, panel.portrait, status overlays; production |
 | Production recipes, stock/blocked/current work | same dock owner; live recipe data | same card/header geometry | control.row, progress.*, status overlays; production |
@@ -81,16 +81,16 @@ runtime classes.
 | Supply service/refuel/rearm/repair, unavailable facts | same dock owner; live supply data | card/header/footer geometry | control.row, progress.*, warning/error; production |
 | Tactical targeting and current order | same dock owner; live targeting facts | card/header/footer geometry | control.row, selected/focus/error; tactical |
 | Technology current/research/blocked | same dock owner; live technology data | card/header/footer geometry | control.row, progress.*, disabled/pending; production |
-| Dock pagination, six rebound-key footer actions | same dock owner; live hotkeys | `GetPageButtonRect`, `GetFooterButtonRect` | control.button_compact, shared overlays; production |
-| Dock focus/hover/press/pending/accepted/rejected | same dock owner; geometric state patterns | shared dock hit regions and controller state | nine shared overlays; preserve command lifecycle; HUD/production |
+| Dock pagination, six rebound-key footer actions | same dock owner; live hotkeys | `GetPageButtonRect`, `GetFooterButtonRect` | control.button_compact, shared overlays; implemented shell controls |
+| Dock focus/hover/press/pending/accepted/rejected | same dock owner; compiled shell/control state layers; retained domain-card cues | shared dock hit regions and controller state | nine shared overlays; preserve command lifecycle; HUD/production |
 | Minimap frame and selectors/legend | `RtsInformationHudSurface` / `RtsInformationOverlayRenderer`; quads/glyphs | `GameplayHudLayout.Minimap`, `RtsMinimapInteractionLayout` | panel.minimap, control.tab/row_compact; tactical |
 | Minimap terrain, fog, permitted contacts, objectives, camera footprint | same information owner; dynamic colored geometry | `RtsMinimapInteractionLayout.MapWorldToPointer` / minimap layout | retain live geometry; semantic markers separate; tactical |
 | Strategic information-layer tabs/legend | same information owner; live layer view | `GameplayHudLayout.SecondaryView`, information controls | control.tab, panel.compact; tactical |
-| Combat-group overview assigned/selected/mixed, empty omitted, keyboard shortcuts | same information owner; live group glyphs/text | `SecondaryView`, `GameplayGuidanceLayout.Remaining`; group keyboard controller | control.button_compact, selected/focus; HUD |
+| Combat-group overview assigned/selected/mixed, empty omitted, keyboard shortcuts | same information owner; compiled group controls and live summaries | `SecondaryView`, `GameplayGuidanceLayout.Remaining`; group keyboard controller | control.button_compact, selected/focus; HUD |
 | Match setup/pause/terminal result/restart | same information owner; live `PreAlphaUxView` and match result | `EmitSystemPanel` fitted viewport bounds | panel.dialog, control.button; HUD |
 | Legacy help renderer (currently unreachable from F1) | same information owner; procedural help text | `EmitHelpPanel` fitted bounds | retain dormant compatibility path; no new help page |
-| Onboarding objective/context/hint/dismiss | same information owner; `EarlyGameGuidance` | `GameplayGuidanceLayout.Resolve`, secondary bounds | panel.tooltip, control.button_compact; HUD |
-| World hover tooltip owned/visible/unknown, delay/clamp | `WorldHoverTooltipSurface`; fitted quads/text | pointer-derived bounds clamped to viewport; no new hit region | panel.tooltip; omit unauthorized facts; HUD |
+| Onboarding objective/context/hint/dismiss | same information owner; `EarlyGameGuidance`; compiled backplate | `GameplayGuidanceLayout.Resolve`, secondary bounds | panel.tooltip, control.button_compact; HUD |
+| World hover tooltip owned/visible/unknown, delay/clamp | `WorldHoverTooltipSurface`; compiled fitted backplate/live text | pointer-derived bounds clamped to viewport; no new hit region | panel.tooltip; omit unauthorized facts; HUD |
 | Operations entry/open/closed/suppressed/waiting | `OperationsHudSurface`; geometric shell | `OperationsLayout.Entry`, `Panel` | panel.primary/compact, control.button_compact; production |
 | Operations resource totals, facilities/routes, no-flow-data | same operations owner; live text | `OperationsLayout.Panel` fitted internal bounds | panel.inset, control.separator; production |
 | Operations filter/page/facility selection/blocked/details | same operations owner; geometric controls | `OperationsLayout.Control`, `Row`, `PageSize` | control.row, button_compact, selected/warning/error; production |
