@@ -5,7 +5,7 @@ using ForgeLine.Assets;
 
 namespace ForgeLine.Presentation;
 
-public sealed class FrontendOverlayRenderer : IDisposable
+public sealed partial class FrontendOverlayRenderer : IDisposable
 {
     private const int MaxVertices = 32_768;
     private static readonly string[] s_menuNumbers = ["01", "02", "03", "04", "05", "06", "07", "08", "09"];
@@ -41,12 +41,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
     public void PrepareBackground(RuntimeAssetCatalog catalog, RenderQuality quality, bool software = false)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        if (_graphics.SupportsUiText && _skin is null)
-        {
-            var resources = new UiSkinResources(_graphics, catalog);
-            try { _skin = new UiSkinBatch(_graphics, resources); _skinResources = resources; }
-            catch { resources.Dispose(); throw; }
-        }
+        PrepareSkin(catalog);
         _background ??= new FrontendMenuBackground(_graphics, catalog);
         _background.Prepare(quality, software);
     }
@@ -61,6 +56,7 @@ public sealed class FrontendOverlayRenderer : IDisposable
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         _text.Begin();
+        LastSkinnedControlCount = 0;
         ArgumentNullException.ThrowIfNull(context);
 
         // Studio playback has its own compositor; the overlay must never add old branding.
@@ -85,6 +81,11 @@ public sealed class FrontendOverlayRenderer : IDisposable
             return; // A resize has not yet published matching input geometry.
         }
         LastLayout = layout;
+        if (SkinReady)
+        {
+            RenderSkinned(context, view, layout);
+            return;
+        }
         float scale = layout.Scale;
         var motion = view.Motion ?? UiMotionView.Settled;
         int width = context.Width, height = context.Height;
@@ -206,6 +207,8 @@ public sealed class FrontendOverlayRenderer : IDisposable
         if (!string.IsNullOrEmpty(view.Feedback)) Text(view.Feedback, layout.Feedback, ForgeLineUiPalette.Warning, .8f);
         if (!string.IsNullOrEmpty(view.ProductVersion))
             Text($"VERSION {view.ProductVersion}", layout.Footer with { Y = height - 40 * scale }, ForgeLineUiPalette.TextMuted, .65f);
+        if (_skinFailure is not null)
+            Text("UI SKIN ERROR - REINSTALL FORGELINE", layout.Feedback, ForgeLineUiPalette.Warning, .72f);
         if (_graphics.SupportsUiText && !_text.Ready)
             Text("UI FONT ERROR - REINSTALL FORGELINE", layout.Feedback, ForgeLineUiPalette.Warning, .8f);
 
@@ -231,20 +234,6 @@ public sealed class FrontendOverlayRenderer : IDisposable
         bool imageDrawn = !fullImage && _background?.Ready == true && imageRegion.Width > 0 && imageRegion.Height > 0 &&
             view.Kind is not (FrontendSurfaceKind.Controls or FrontendSurfaceKind.Credits or FrontendSurfaceKind.PauseMenu);
         if (imageDrawn) _background!.Render(context, imageRegion);
-        // Representative real control: uses the identical MenuRow rectangle as pointer hit testing.
-        // Submit after backplates and before the existing live text, preserving painter order.
-        if (_skin is not null)
-        {
-            _skin.Begin(context.Width, context.Height, context.FrameIndex);
-            if (view.Kind == FrontendSurfaceKind.MainMenu && view.MenuEntries.Count > 0)
-            {
-                var row = layout.MenuRow(0); var entry = view.MenuEntries[0];
-                var bounds = new UiSkinRect(row.X, row.Y, row.Width, row.Height);
-                _skin.Draw("ui.skin.directorate.control.button", bounds, Vector4.One, true);
-                _skin.Overlay(!entry.IsEnabled ? UiSkinState.Disabled : entry.IsFocused ? UiSkinState.Focus : UiSkinState.Normal, bounds, Vector4.One);
-            }
-            _skin.Flush(context);
-        }
         _text.Render(context);
         LastRenderedVertexCount = _vertexCount + _text.VertexCount + (_skin?.Diagnostics.Vertices ?? 0) + (imageDrawn || fullImage ? 6 : 0);
     }

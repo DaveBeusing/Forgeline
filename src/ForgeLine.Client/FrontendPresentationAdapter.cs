@@ -14,7 +14,7 @@ internal static class FrontendPresentationAdapter
         FrontendSurfaceView.Loading(
             state.Status,
             state.HasDeterminateProgress,
-            state.Progress);
+            state.Progress) with { IsError = state.HasFailed };
 
     internal static FrontendSurfaceView MainMenu(
         MainMenuModel menu)
@@ -98,7 +98,7 @@ internal static class FrontendPresentationAdapter
                         "STATUS",
                         "NO SAVED MATCHES")
                 ],
-                "ESC  BACK");
+                "ESC  BACK") with { DisabledPrimaryAction = "LOAD" };
         }
 
         LoadGameEntry[] visibleEntries =
@@ -123,7 +123,7 @@ internal static class FrontendPresentationAdapter
             "LOAD GAME",
             lines,
             "UP/DOWN  SELECT SAVE     ENTER  LOAD     ESC  BACK",
-            model.TryGetFocusedLoadTarget(out _) ? "LOAD" : string.Empty);
+            model.TryGetFocusedLoadTarget(out _) ? "LOAD" : string.Empty) with { DisabledPrimaryAction = model.TryGetFocusedLoadTarget(out _) ? "" : "LOAD", TotalDetailRows = model.Entries.Count, DetailRowOffset = model.VisibleStartIndex(visibleRows) };
     }
 
     private static LoadGameEntry[] ResolveVisibleSaves(
@@ -214,12 +214,48 @@ internal static class FrontendPresentationAdapter
                 new(GraphicsSettingsText.Get("UiSoundVolume"), $"{settings.FeedbackSettings.SoundVolume * 100:0}%", IsFocused: focused == FrontendSettingsField.UiSoundVolume, CanDecrease: settings.FeedbackSettings.SoundVolume > 0, CanIncrease: settings.FeedbackSettings.SoundVolume < 1)
             };
         interaction ??= new SettingsInteractionModel();
+        foreach (var settingField in Enum.GetValues<FrontendSettingsField>())
+        {
+            var kind = settingField switch
+            {
+                FrontendSettingsField.BorderlessFullscreen or FrontendSettingsField.EdgeScroll or FrontendSettingsField.Onboarding or
+                FrontendSettingsField.ReducedUiMotion or FrontendSettingsField.UiSoundEnabled or FrontendSettingsField.SurfaceDetail or
+                FrontendSettingsField.VegetationMotion => FrontendValueKind.Toggle,
+                FrontendSettingsField.UiScale or FrontendSettingsField.CameraSpeed or FrontendSettingsField.UiSoundVolume or
+                FrontendSettingsField.ResolutionScale => FrontendValueKind.Slider,
+                FrontendSettingsField.BindingKey => FrontendValueKind.Binding,
+                _ => FrontendValueKind.Choice
+            };
+            bool on = settingField switch
+            {
+                FrontendSettingsField.BorderlessFullscreen => settings.BorderlessFullscreen,
+                FrontendSettingsField.EdgeScroll => settings.EdgeScrollEnabled,
+                FrontendSettingsField.Onboarding => settings.ShowOnboarding,
+                FrontendSettingsField.ReducedUiMotion => settings.FeedbackSettings.ReducedMotion,
+                FrontendSettingsField.UiSoundEnabled => settings.FeedbackSettings.SoundEnabled,
+                FrontendSettingsField.SurfaceDetail => graphics.SurfaceDetail ?? effective.TerrainDetail.Enabled,
+                FrontendSettingsField.VegetationMotion => graphics.VegetationMotion ?? effective.VegetationMotion,
+                _ => false
+            };
+            float normalized = settingField switch
+            {
+                FrontendSettingsField.UiScale => (settings.UiScale - FrontendDesign.MinimumScale) / (FrontendDesign.MaximumScale - FrontendDesign.MinimumScale),
+                FrontendSettingsField.CameraSpeed => (settings.CameraPanSpeedMultiplier - .5f) / 2,
+                FrontendSettingsField.UiSoundVolume => settings.FeedbackSettings.SoundVolume,
+                FrontendSettingsField.ResolutionScale => ((graphics.ResolutionScale ?? 1) - .5f) * 2,
+                _ => 0
+            };
+            lines[(int)settingField] = lines[(int)settingField] with { ValueKind = kind, IsOn = on, NormalizedValue = Math.Clamp(normalized, 0, 1) };
+        }
         var visible = interaction.VisibleFields.Select(field => lines[(int)field]).ToArray();
         return FrontendSurfaceView.Detail("SETTINGS", visible,
             displayFeedback ?? (string.IsNullOrEmpty(interaction.BindingFeedback) ?
                 focused is { } field && (field == FrontendSettingsField.OutputResolution || field >= FrontendSettingsField.RenderQuality) ? GraphicsSettingsText.Get(field + "Help") : GraphicsSettingsText.Get("Controls") : interaction.BindingFeedback),
             interaction.CanApply == false ? string.Empty : displayPreviewActive ? GraphicsSettingsText.Get("KeepDisplay") : "APPLY") with
         {
+            TotalDetailRows = interaction.SectionFieldCount, DetailRowOffset = interaction.VisibleStart,
+            IsError = !interaction.CanApply,
+            DisabledPrimaryAction = interaction.CanApply ? "" : "APPLY",
             SettingsTabs = Enum.GetValues<FrontendSettingsSection>().Select(section => new FrontendMenuEntryView(
                 section.ToString(), section.ToString().ToUpperInvariant(), true, section == interaction.Section)).ToArray()
         };

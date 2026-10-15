@@ -1,0 +1,327 @@
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.World.Tests\bin\Release\net10.0\ForgeLine.World.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.World.Tests\bin\Release\net10.0\ForgeLine.World.Tests.dll (net10.0|x64) erfolgreich (1s 173ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Simulation.Tests\bin\Release\net10.0\ForgeLine.Simulation.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Simulation.Tests\bin\Release\net10.0\ForgeLine.Simulation.Tests.dll (net10.0|x64) erfolgreich (1s 268ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Ecs.Tests\bin\Release\net10.0\ForgeLine.Ecs.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Ecs.Tests\bin\Release\net10.0\ForgeLine.Ecs.Tests.dll (net10.0|x64) erfolgreich (1s 007ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Input.Tests\bin\Release\net10.0-windows\ForgeLine.Input.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Input.Tests\bin\Release\net10.0-windows\ForgeLine.Input.Tests.dll (net10.0|x64) erfolgreich (1s 041ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Core.Tests\bin\Release\net10.0\ForgeLine.Core.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Core.Tests\bin\Release\net10.0\ForgeLine.Core.Tests.dll (net10.0|x64) erfolgreich (881ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Assets.Tests\bin\Release\net10.0\ForgeLine.Assets.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Assets.Tests\bin\Release\net10.0\ForgeLine.Assets.Tests.dll (net10.0|x64) erfolgreich (5m 09s 711ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Jobs.Tests\bin\Release\net10.0\ForgeLine.Jobs.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Jobs.Tests\bin\Release\net10.0\ForgeLine.Jobs.Tests.dll (net10.0|x64) erfolgreich (1s 240ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Logistics.Tests\bin\Release\net10.0\ForgeLine.Logistics.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Logistics.Tests\bin\Release\net10.0\ForgeLine.Logistics.Tests.dll (net10.0|x64) erfolgreich (1s 357ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Platform.Windows.Tests\bin\Release\net10.0-windows\ForgeLine.Platform.Windows.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Platform.Windows.Tests\bin\Release\net10.0-windows\ForgeLine.Platform.Windows.Tests.dll (net10.0|x64) erfolgreich (4s 804ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Graphics.Tests.D3D12ResourceLifetimeIntegrationTests.RecordedResourcesSurviveDisposalAndFrameGrowth(requireDebugLayer: False)
+  Set FORGELINE_GPU_LIFETIME_TESTS=1 for native lifetime qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Graphics.Tests.D3D12ResourceLifetimeIntegrationTests.RecordedResourcesSurviveDisposalAndFrameGrowth(requireDebugLayer: True)
+  Set FORGELINE_GPU_LIFETIME_TESTS=1 for native lifetime qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64) erfolgreich (10s 365ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Navigation.Tests\bin\Release\net10.0\ForgeLine.Navigation.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Navigation.Tests\bin\Release\net10.0\ForgeLine.Navigation.Tests.dll (net10.0|x64) erfolgreich (981ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Client.Tests\bin\Release\net10.0-windows\ForgeLine.Client.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Client.Tests\bin\Release\net10.0-windows\ForgeLine.Client.Tests.dll (net10.0|x64) erfolgreich (13s 256ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Game.Tests\bin\Release\net10.0\ForgeLine.Game.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Game.Tests\bin\Release\net10.0\ForgeLine.Game.Tests.dll (net10.0|x64) erfolgreich (1m 32s 043ms)
+Ausführen von Tests von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.ParticlePerformanceQualificationTests.MeasureBoundedProductionEffectsAtRtsViewpoints
+  Set FORGELINE_PARTICLE_QUALIFICATION_OUTPUT for isolated hardware qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+fehlerhaft ForgeLine.Presentation.Tests.DirectorateBuildingPresentationTests.RepeatedProductionStateResolutionDoesNotAllocateAssetNamesPerFrame(family: "command_core") (38ms)
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+  Assert.Equal() Failure: Values differ
+  Expected: 0
+  Actual:   1136
+    um ForgeLine.Presentation.Tests.DirectorateBuildingPresentationTests.RepeatedProductionStateResolutionDoesNotAllocateAssetNamesPerFrame(String family) in C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\DirectorateBuildingPresentationTests.cs:411
+    um InvokeStub_DirectorateBuildingPresentationTests.RepeatedProductionStateResolutionDoesNotAllocateAssetNamesPerFrame(Object, Span`1)
+    um System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+übersprungen ForgeLine.Presentation.Tests.AtmospherePerformanceQualificationTests.CompareEquivalentTerrainAcrossAtmosphericModesAndZooms
+  Set FORGELINE_ATMOSPHERE_BENCHMARK_OUTPUT for isolated hardware measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.RenderQualityQualificationTests.CaptureProductionQualityProfilesWithTerrainEffectsAndSelectionOverlays
+  Set FORGELINE_QUALITY_QUALIFICATION_OUTPUT for isolated hardware qualification.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.ScenePassPerformanceQualificationTests.CompareDirectAndLinearSceneOnEquivalentNativeWorkloads
+  Set FORGELINE_PASS_BENCHMARK_OUTPUT for isolated hardware measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.DirectionalShadowPerformanceTests.CompareEquivalentDenseWorkloadsAcrossQualityAndRtsZoom
+  Set FORGELINE_SHADOW_BENCHMARK_OUTPUT for isolated hardware shadow measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.TerrainFidelityQualificationTests.MeasureProductionMaterialsAtFixedCentralDivideViewpoints
+  Set FORGELINE_TERRAIN_QUALIFICATION_OUTPUT for isolated production terrain measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+übersprungen ForgeLine.Presentation.Tests.TerrainFidelityQualificationTests.MeasureVegetationMotionWithIdenticalProductionBatches
+  Set FORGELINE_TERRAIN_QUALIFICATION_OUTPUT for isolated vegetation measurement.
+  von C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64)
+C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64) fehlerhaft mit 1 Fehler(n) (58s 743ms)
+Exitcode: 2
+  Standardausgabe: [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=320x240 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=1280x720 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=1028x720 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=1280x720 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=1280x720 buffers=3 present=Immediate
+  [graphics:resize-request] requested=1600x900 generation=1 action=queued
+  [graphics:resize-apply] requested=1600x900 generation=1 phase=synchronize
+  [graphics:resize-synchronized] generation=1 completedFence=11
+  [graphics:resize-applied] size=1600x900 generation=1 frameIndex=0 buffers=3
+  [graphics:resize-request] requested=1280x720 generation=2 action=queued
+  [graphics:resize-apply] requested=1280x720 generation=2 phase=synchronize
+  [graphics:resize-synchronized] generation=2 completedFence=20
+  [graphics:resize-applied] size=1280x720 generation=2 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=512x320 buffers=3 present=Immediate
+  [graphics:resize-request] requested=640x400 generation=1 action=queued
+  [graphics:resize-apply] requested=640x400 generation=1 phase=synchronize
+  [graphics:resize-synchronized] generation=1 completedFence=57
+  [graphics:resize-applied] size=640x400 generation=1 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=512x320 buffers=3 present=Immediate
+  [graphics:resize-request] requested=640x400 generation=1 action=queued
+  [graphics:resize-apply] requested=640x400 generation=1 phase=synchronize
+  [graphics:resize-synchronized] generation=1 completedFence=60
+  [graphics:resize-applied] size=640x400 generation=1 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=512x320 buffers=3 present=Immediate
+  [graphics:resize-request] requested=640x400 generation=1 action=queued
+  [graphics:resize-apply] requested=640x400 generation=1 phase=synchronize
+  [graphics:resize-synchronized] generation=1 completedFence=57
+  [graphics:resize-applied] size=640x400 generation=1 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=320x240 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=256x160 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=768x480 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=1024x640 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=768x480 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=512x320 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=512x320 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=512x320 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=1024x640 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=1024x640 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=768x480 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=512x320 buffers=3 present=Immediate
+  [graphics:resize-request] requested=640x360 generation=1 action=queued
+  [graphics:resize-apply] requested=640x360 generation=1 phase=synchronize
+  [graphics:resize-synchronized] generation=1 completedFence=10
+  [graphics:resize-applied] size=640x360 generation=1 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=256x256 buffers=3 present=Immediate
+  [graphics:resize-request] requested=16x16 generation=1 action=queued
+  [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+  [graphics:resize-synchronized] generation=1 completedFence=1
+  [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=256x256 buffers=3 present=Immediate
+  [graphics:resize-request] requested=16x16 generation=1 action=queued
+  [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+  [graphics:resize-synchronized] generation=1 completedFence=1
+  [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=256x256 buffers=3 present=Immediate
+  [graphics:resize-request] requested=16x16 generation=1 action=queued
+  [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+  [graphics:resize-synchronized] generation=1 completedFence=1
+  [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=256x256 buffers=3 present=Immediate
+  [graphics:resize-request] requested=16x16 generation=1 action=queued
+  [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+  [graphics:resize-synchronized] generation=1 completedFence=1
+  [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=256x256 buffers=3 present=Immediate
+  [graphics:resize-request] requested=16x16 generation=1 action=queued
+  [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+  [graphics:resize-synchronized] generation=1 completedFence=1
+  [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=256x256 buffers=3 present=Immediate
+  [graphics:resize-request] requested=16x16 generation=1 action=queued
+  [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+  [graphics:resize-synchronized] generation=1 completedFence=1
+  [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=256x256 buffers=3 present=Immediate
+  [graphics:resize-request] requested=16x16 generation=1 action=queued
+  [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+  [graphics:resize-synchronized] generation=1 completedFence=1
+  [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=256x256 buffers=3 present=Immediate
+  [graphics:resize-request] requested=16x16 generation=1 action=queued
+  [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+  [graphics:resize-synchronized] generation=1 completedFence=1
+  [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=256x256 buffers=3 present=Immediate
+  [graphics:resize-request] requested=16x16 generation=1 action=queued
+  [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+  [graphics:resize-synchronized] generation=1 completedFence=1
+  [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=256x256 buffers=3 present=Immediate
+  [graphics:resize-request] requested=16x16 generation=1 action=queued
+  [graphics:resize-apply] requested=16x16 generation=1 phase=synchronize
+  [graphics:resize-synchronized] generation=1 completedFence=1
+  [graphics:resize-applied] size=16x16 generation=1 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=1280x720 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=1280x720 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=1280x720 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=1280x720 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=1024x640 buffers=3 present=Immediate
+  [graphics:resize-request] requested=0x0 action=suspend
+  [graphics:resize-request] requested=400x300 generation=2 action=queued
+  [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+  [graphics:resize-synchronized] generation=2 completedFence=58
+  [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=512x320 buffers=3 present=Immediate
+  [graphics:resize-request] requested=0x0 action=suspend
+  [graphics:resize-request] requested=400x300 generation=2 action=queued
+  [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+  [graphics:resize-synchronized] generation=2 completedFence=86
+  [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=768x480 buffers=3 present=Immediate
+  [graphics:resize-request] requested=0x0 action=suspend
+  [graphics:resize-request] requested=400x300 generation=2 action=queued
+  [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+  [graphics:resize-synchronized] generation=2 completedFence=58
+  [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=1024x640 buffers=3 present=Immediate
+  [graphics:resize-request] requested=0x0 action=suspend
+  [graphics:resize-request] requested=400x300 generation=2 action=queued
+  [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+  [graphics:resize-synchronized] generation=2 completedFence=58
+  [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=768x480 buffers=3 present=Immediate
+  [graphics:resize-request] requested=0x0 action=suspend
+  [graphics:resize-request] requested=400x300 generation=2 action=queued
+  [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+  [graphics:resize-synchronized] generation=2 completedFence=58
+  [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=512x320 buffers=3 present=Immediate
+  [graphics:resize-request] requested=0x0 action=suspend
+  [graphics:resize-request] requested=400x300 generation=2 action=queued
+  [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+  [graphics:resize-synchronized] generation=2 completedFence=87
+  [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=512x320 buffers=3 present=Immediate
+  [graphics:resize-request] requested=0x0 action=suspend
+  [graphics:resize-request] requested=400x300 generation=2 action=queued
+  [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+  [graphics:resize-synchronized] generation=2 completedFence=58
+  [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=1024x640 buffers=3 present=Immediate
+  [graphics:resize-request] requested=0x0 action=suspend
+  [graphics:resize-request] requested=400x300 generation=2 action=queued
+  [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+  [graphics:resize-synchronized] generation=2 completedFence=58
+  [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=768x480 buffers=3 present=Immediate
+  [graphics:resize-request] requested=0x0 action=suspend
+  [graphics:resize-request] requested=400x300 generation=2 action=queued
+  [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+  [graphics:resize-synchronized] generation=2 completedFence=58
+  [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=512x320 buffers=3 present=Immediate
+  [graphics:resize-request] requested=0x0 action=suspend
+  [graphics:resize-request] requested=400x300 generation=2 action=queued
+  [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+  [graphics:resize-synchronized] generation=2 completedFence=58
+  [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=512x320 buffers=3 present=Immediate
+  [graphics:resize-request] requested=0x0 action=suspend
+  [graphics:resize-request] requested=400x300 generation=2 action=queued
+  [graphics:resize-apply] requested=400x300 generation=2 phase=synchronize
+  [graphics:resize-synchronized] generation=2 completedFence=58
+  [graphics:resize-applied] size=400x300 generation=2 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=320x240 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=320x200 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=320x200 buffers=3 present=Immediate
+  [graphics:resize-request] requested=400x300 generation=1 action=queued
+  [graphics:resize-apply] requested=400x300 generation=1 phase=synchronize
+  [graphics:resize-synchronized] generation=1 completedFence=45
+  [graphics:resize-applied] size=400x300 generation=1 frameIndex=0 buffers=3
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=320x200 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=512x320 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=512x320 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=512x320 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=512x320 buffers=3 present=Immediate
+  [graphics:device] adapter="Microsoft Basic Render Driver" featureLevel=Level_12_1 vramBytes=0 software=True debugLayer=False
+  [graphics:surface] size=512x320 buffers=3 present=Immediate
+  Fehlerausgabe: [frontend:image:fallback] Reinstall optional menu image.
+  [frontend:image:fallback] Optional menu image is absent; using command interface fallback.
+  [ui:font] Bundled UI font unavailable. Reinstall the application. Font texture unavailable.
+  [ui:font] Bundled UI font unavailable. Reinstall the application. Font texture unavailable.
+  [frontend:image:fallback] Texture unavailable.
+  [graphics:debug] Direct3D 12 debug layer requested but unavailable.
+  [graphics:debug] Direct3D 12 debug layer requested but unavailable.
+  [graphics:debug] Direct3D 12 debug layer requested but unavailable.
+  [ui:skin:failed] Required UI skin unavailable. Reinstall the complete player. Runtime asset 'ui.skin.directorate.compiled' was not found.
+
+Testlaufzusammenfassung: Fehler!
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Jobs.Tests\bin\Release\net10.0\ForgeLine.Jobs.Tests.dll (net10.0|x64) erfolgreich (1s 240ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Game.Tests\bin\Release\net10.0\ForgeLine.Game.Tests.dll (net10.0|x64) erfolgreich (1m 32s 043ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Navigation.Tests\bin\Release\net10.0\ForgeLine.Navigation.Tests.dll (net10.0|x64) erfolgreich (981ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Input.Tests\bin\Release\net10.0-windows\ForgeLine.Input.Tests.dll (net10.0|x64) erfolgreich (1s 041ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Core.Tests\bin\Release\net10.0\ForgeLine.Core.Tests.dll (net10.0|x64) erfolgreich (881ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Platform.Windows.Tests\bin\Release\net10.0-windows\ForgeLine.Platform.Windows.Tests.dll (net10.0|x64) erfolgreich (4s 804ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Graphics.Tests\bin\Release\net10.0-windows\ForgeLine.Graphics.Tests.dll (net10.0|x64) erfolgreich (10s 365ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.World.Tests\bin\Release\net10.0\ForgeLine.World.Tests.dll (net10.0|x64) erfolgreich (1s 173ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Presentation.Tests\bin\Release\net10.0-windows\ForgeLine.Presentation.Tests.dll (net10.0|x64) fehlerhaft mit 1 Fehler(n) (58s 743ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Assets.Tests\bin\Release\net10.0\ForgeLine.Assets.Tests.dll (net10.0|x64) erfolgreich (5m 09s 711ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Client.Tests\bin\Release\net10.0-windows\ForgeLine.Client.Tests.dll (net10.0|x64) erfolgreich (13s 256ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Ecs.Tests\bin\Release\net10.0\ForgeLine.Ecs.Tests.dll (net10.0|x64) erfolgreich (1s 007ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Simulation.Tests\bin\Release\net10.0\ForgeLine.Simulation.Tests.dll (net10.0|x64) erfolgreich (1s 268ms)
+  C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tests\ForgeLine.Logistics.Tests\bin\Release\net10.0\ForgeLine.Logistics.Tests.dll (net10.0|x64) erfolgreich (1s 357ms)
+
+  gesamt: 2048
+  fehlgeschlagen: 1
+  erfolgreich: 2038
+  übersprungen: 9
+  Dauer: 8m 25s 607ms
+Der Testlauf wurde mit einem nicht erfolgreichen Exitcode abgeschlossen: 2 (siehe: https://aka.ms/testingplatform/exitcodes)

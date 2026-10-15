@@ -305,9 +305,11 @@ internal sealed class ClientFrontendRenderHost : IDisposable
                     }
                 }
 
-                if (menuPresented && menuAssets is not null && view.Value.Kind == FrontendSurfaceKind.MainMenu)
+                if (menuPresented && menuAssets is not null && view.Value.Kind != FrontendSurfaceKind.StudioSplash)
                 {
-                    renderer.PrepareBackground(menuAssets, view.Value.BackgroundQuality, graphics.Diagnostics.Device.IsSoftwareAdapter);
+                    renderer.PrepareSkin(menuAssets);
+                    if(view.Value.Kind == FrontendSurfaceKind.MainMenu)
+                        renderer.PrepareBackground(menuAssets, view.Value.BackgroundQuality, graphics.Diagnostics.Device.IsSoftwareAdapter);
                     lock (_gate) _menuImageDiagnostics = renderer.BackgroundDiagnostics;
                 }
                 TimeSpan uiNow = TimeSpan.FromSeconds((double)Stopwatch.GetTimestamp() / Stopwatch.Frequency);

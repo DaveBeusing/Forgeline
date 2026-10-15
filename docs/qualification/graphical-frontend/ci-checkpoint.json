@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "source": "6257abea3ec3b7260d6efd0b5688b1090f0b6d3d",
+  "runId": 38798845220,
+  "jobId": 116642274641,
+  "url": "https://github.com/DaveBeusing/Forgeline/actions/runs/38798845220",
+  "conclusion": "failure",
+  "successfulScopes": [
+    "Compiled UI atlas and ordered skin contracts",
+    "Directorate skin package integrity and source exclusion",
+    "Graphical frontend skin and pointer contracts",
+    "Cinematic menu image and native lifecycle contracts",
+    "UI reference geometry and input contracts",
+    "Software UI reference smoke",
+    "Native WARP reference capture",
+    "Windows apphost reference completion"
+  ],
+  "failure": {
+    "step": "Windows window mode and visual qualification smoke",
+    "observedGameplayCatalogBytes": 99608050,
+    "limitBytes": 58720256,
+    "limitMiB": 56,
+    "message": "Compiled gameplay texture footprint 99608050 bytes exceeded the 56 MiB production catalog budget."
+  },
+  "baselineComparison": {
+    "base": "fd1a4c0d5869136a43ff5ae7306c9254a60881cf",
+    "assetsUnchanged": true,
+    "compilerUnchanged": true,
+    "gateUnchanged": true,
+    "contentSignatureUnchanged": true,
+    "nativeRuntimeFingerprintUnchanged": true
+  },
+  "localCompleteJobLog": {
+    "path": "artifacts/graphical-frontend-ci-38798845220.log",
+    "sha256": "e68369337523f8386b6de0ca3fbcf8f711efab414320d37239bfc422a37d418d"
+  },
+  "review": "Required gate remains failed; no threshold or counted asset was changed."
+}

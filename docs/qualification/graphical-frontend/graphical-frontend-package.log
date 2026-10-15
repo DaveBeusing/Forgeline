@@ -1,0 +1,36 @@
+  Wiederherzustellende Projekte werden ermittelt...
+  Alle Projekte sind für die Wiederherstellung auf dem neuesten Stand.
+  ForgeLine.Core -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\src\ForgeLine.Core\bin\Release\net10.0\ForgeLine.Core.dll
+  ForgeLine.Assets -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\src\ForgeLine.Assets\bin\Release\net10.0\ForgeLine.Assets.dll
+  ForgeLine.AssetCompiler -> C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\tools\ForgeLine.AssetCompiler\bin\Release\net10.0\ForgeLine.AssetCompiler.dll
+
+Der Buildvorgang wurde erfolgreich ausgeführt.
+    0 Warnung(en)
+    0 Fehler
+
+Verstrichene Zeit 00:00:02.56
+[asset:progress] log="C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\artifacts\graphical-frontend-package\asset-compilation.jsonl" pid=54516
+[asset:progress] stage=mode state=validate id=- elapsedMs=66,5 stageMs=0,0 managedBytes=691944 workingSetBytes=27324416 privateBytes=8429568 peakWorkingSetBytes=27324416 memorySampleAgeMs=0,0 source="" player compilation is never allowed
+Asset compilation succeeded: 0 compiled, 0 unchanged.
+[asset:progress] stage=qualification state=started id=- elapsedMs=183,6 stageMs=0,0 managedBytes=951016 workingSetBytes=27324416 privateBytes=8429568 peakWorkingSetBytes=27324416 memorySampleAgeMs=147,9 source="" 
+[asset:progress] stage=qualification state=completed id=- elapsedMs=1486,1 stageMs=1294,3 managedBytes=27825288 workingSetBytes=121892864 privateBytes=98381824 peakWorkingSetBytes=168230912 memorySampleAgeMs=0,0 source="" 
+Runtime asset qualification succeeded: assets=1337 meshes=309 textures=900 materials=127 bytes=113308083 catalogLoadMs=146,365 assetReadMs=1142,333.
+[asset:footprint] id=texture.world.terrain.crushed_gravel type=Texture bytes=5593387
+[asset:footprint] id=texture.world.terrain.concrete_base type=Texture bytes=5593384
+[asset:footprint] id=texture.world.terrain.cracked_earth type=Texture bytes=5593384
+[asset:footprint] id=texture.world.terrain.rocky_scrub type=Texture bytes=5593378
+[asset:footprint] id=texture.world.terrain.dark_ash type=Texture bytes=5593369
+[asset:footprint] id=texture.world.terrain.dry_dirt type=Texture bytes=5593369
+[asset:footprint] id=texture.world.terrain.bedrock type=Texture bytes=5593366
+[asset:footprint] id=texture.directorate.surface.atlas_base type=Texture bytes=5587812
+[asset:footprint] id=ui.atlas.directorate.portraits.p1 type=Texture bytes=4195060
+[asset:footprint] id=ui.atlas.directorate.portraits.p2 type=Texture bytes=4195060
+[asset:footprint] id=ui.atlas.directorate.portraits.p3 type=Texture bytes=4195060
+[asset:footprint] id=ui.atlas.directorate.portraits.p4 type=Texture bytes=4195060
+Runtime asset qualification report written to 'C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\artifacts\graphical-frontend-package\asset-qualification.json'.
+UI atlas integrity, coverage, provenance and packaging contracts passed.
+UI atlas integrity, coverage, provenance and packaging contracts passed.
+844 packaged UI payloads verified; reference boards, unavailable roles and authoring tools/files excluded.
+Four bounded original PCM cues, provenance and package identity passed.
+Pre-alpha publish: C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\artifacts\graphical-frontend-package\win-x64\publish
+Pre-alpha archive: C:\Users\david.beusing\.codex\.chatgpt-projects\g-p-6ab4537c5fcc81918005c0c8bcd4e7d7\work\Forgeline\artifacts\graphical-frontend-package\FORGELINE-0.1.376-dev-win-x64.zip

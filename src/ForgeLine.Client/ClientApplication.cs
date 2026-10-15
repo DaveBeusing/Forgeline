@@ -1098,7 +1098,15 @@ internal sealed class ClientApplication
                         geometry = FrontendGeometry.Resolve(window.ClientSize.Width, window.ClientSize.Height, _settings.UiScale,
                             window.Dpi, modalSurface.Kind == FrontendSurfaceKind.Controls);
                     controlsScroll = Math.Clamp(controlsScroll, 0, Math.Max(0, modalSurface.DetailLines.Count - geometry.VisibleDetailRows));
-                    frontendSurface = modalSurface with { Layout = geometry, DetailScroll = controlsScroll };
+                    frontendSurface = modalSurface with { Layout = geometry, DetailScroll = controlsScroll, PauseContext = true };
+                    if(inputState.HasPointerPosition)
+                    {
+                        var pointerLayout = modalLayout with { Geometry = geometry };
+                        var positioned = FrontendHitTesting.WithDetailPointer(frontendSurface.Value, pointerLayout,
+                            inputState.PointerPosition.X, inputState.PointerPosition.Y, inputState.IsMouseButtonDown(PlatformMouseButton.Left));
+                        frontendSurface = FrontendHitTesting.WithMenuPointer(positioned, pointerLayout,
+                            inputState.PointerPosition.X, inputState.PointerPosition.Y, inputState.IsMouseButtonDown(PlatformMouseButton.Left));
+                    }
                 }
                 _ = renderHost.Publish(
                     new ClientRenderFrame(
@@ -3425,6 +3433,8 @@ internal sealed class ClientApplication
             detailScroll = Math.Clamp(detailScroll, 0, Math.Max(0, surface.DetailLines.Count - frontendLayout.Geometry.VisibleDetailRows));
             surface = surface with { Layout = frontendLayout.Geometry, DetailScroll = detailScroll,
                 BackgroundQuality = (RenderQuality)settings.Settings.RenderQuality, FeedbackSettings = settings.Settings.FeedbackSettings, FeedbackActive = window.IsFocused && !window.IsMinimized };
+            if(input.HasPointerPosition) surface = FrontendHitTesting.WithMenuPointer(surface, frontendLayout,
+                input.PointerPosition.X, input.PointerPosition.Y, primaryPointerDown);
             if (input.HasPointerPosition &&
                 shell.Screen != GameFrontendScreen.MainMenu)
             {

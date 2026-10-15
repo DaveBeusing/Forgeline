@@ -46,6 +46,7 @@ public sealed class SettingsInteractionModel
     public GameplayAction BindingAction { get; private set; }
     public string BindingFeedback { get; private set; } = string.Empty;
     public int VisibleCapacity { get; set; } = 7;
+    public int SectionFieldCount => Fields.Length;
     public int VisibleStart => Math.Max(0, _index - Math.Clamp(VisibleCapacity, 1, 7) + 1);
     public int VisibleRowCount => Math.Min(Math.Clamp(VisibleCapacity, 1, 7), Fields.Length - VisibleStart);
     public void FocusVisible(int row) => Focus(Fields[Math.Clamp(row, 0, VisibleRowCount - 1) + VisibleStart]);
@@ -261,8 +262,36 @@ public static class FrontendHitTesting
         var line = view.DetailLines[row.Value];
         if (!line.IsSelectable && !line.CanDecrease && !line.CanIncrease) return view;
         var lines = view.DetailLines.ToArray();
-        lines[row.Value] = line with { IsHovered = true, IsPressed = pressed };
+        int direction = DetailAdjust(x,y,layout,view.DetailLines.Count) ?? 0;
+        bool enabled = direction < 0 ? line.CanDecrease : direction > 0 && line.CanIncrease;
+        lines[row.Value] = line with { IsHovered = true, IsPressed = pressed,
+            AdjustHover = enabled ? direction : 0, AdjustPress = enabled && pressed ? direction : 0 };
         return view with { DetailLines = lines };
+    }
+    public static FrontendSurfaceView WithMenuPointer(in FrontendSurfaceView view, FrontendLayout layout, float x, float y, bool pressed)
+    {
+        var result = view;
+        if (view.Kind is FrontendSurfaceKind.MainMenu or FrontendSurfaceKind.PauseMenu)
+        {
+            var entries = view.MenuEntries.ToArray();
+            for(int i=0;i<entries.Length;i++)
+            {
+                bool hover = entries[i].IsEnabled && layout.Geometry.MenuRow(i).Contains(x,y);
+                entries[i] = entries[i] with { IsHovered = hover, IsPressed = hover && pressed };
+            }
+            result = result with { MenuEntries = entries };
+        }
+        if (view.SettingsTabs is { } tabs)
+        {
+            var entries = tabs.ToArray();
+            for(int i=0;i<entries.Length;i++)
+            {
+                bool hover = entries[i].IsEnabled && layout.Geometry.SettingsTab(i).Contains(x,y);
+                entries[i] = entries[i] with { IsHovered = hover, IsPressed = hover && pressed };
+            }
+            result = result with { SettingsTabs = entries };
+        }
+        return result;
     }
     public static int? DetailAdjust(float x, float y, FrontendLayout layout, in FrontendSurfaceView view)
     {

@@ -474,6 +474,8 @@ internal sealed class ClientRenderHost : IDisposable
                 new FrontendOverlayRenderer(
                     graphics);
 
+            if (_runtimeAssets is not null) frontendRenderer.PrepareSkin(_runtimeAssets);
+
             var renderWorld =
                 new RenderWorld();
             var renderCamera =

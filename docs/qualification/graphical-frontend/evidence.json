@@ -1,0 +1,843 @@
+{
+  "schemaVersion": 1,
+  "source": "ac0c9c50f98fab897d5b6b4b610a23612871ccd3",
+  "base": "fd1a4c0d5869136a43ff5ae7306c9254a60881cf",
+  "version": "0.1.376-dev",
+  "testValidationSource": "6257abea3ec3b7260d6efd0b5688b1090f0b6d3d",
+  "completeTests": {
+    "total": 2048,
+    "passed": 2038,
+    "failed": 1,
+    "failure": "DirectorateBuildingPresentationTests.RepeatedProductionStateResolutionDoesNotAllocateAssetNamesPerFrame(command_core): 1136 bytes observed, expected 0",
+    "skipped": 9,
+    "command": "dotnet test --solution ForgeLine.sln --configuration Release --no-build --max-parallel-test-modules 1"
+  },
+  "ci": {
+    "runId": 38798845220,
+    "status": "failure",
+    "step": "Windows window mode and visual qualification smoke",
+    "observedCatalogBytes": 99608050,
+    "limitBytes": 58720256,
+    "baselineCatalogUnchanged": true
+  },
+  "runtimeContentSignature": "b6cbe90cbbd4dfc780abb28f5d42f7bc3b469ae0cf4e663f594975a2bfd219d9",
+  "nativeRuntimeFingerprint": "7E9E2DF8E7569BD0F8992ED30488040A2CBC4ED7DE071F54A7853D2EC9AD4E3C",
+  "nativeCases": 1080,
+  "repeatCaptures": 2,
+  "scenarios": [
+    "BindingConflict",
+    "Controls",
+    "ControlsLong",
+    "Credits",
+    "DisplayTrial",
+    "LoadBroken",
+    "LoadEmpty",
+    "LoadGame",
+    "Loading",
+    "LoadingError",
+    "Menu",
+    "MenuDisabled",
+    "MenuFocus",
+    "MenuHover",
+    "MenuPressed",
+    "MenuReveal",
+    "NewGame",
+    "Pause",
+    "PauseSettings",
+    "SettingsAudio",
+    "SettingsBindings",
+    "SettingsGeneral",
+    "SettingsGraphics",
+    "SettingsLong"
+  ],
+  "displays": [
+    [
+      1280,
+      720
+    ],
+    [
+      1920,
+      1080
+    ],
+    [
+      2560,
+      1440
+    ],
+    [
+      3440,
+      1440
+    ],
+    [
+      3840,
+      2160
+    ]
+  ],
+  "rasterDpi": [
+    96,
+    144,
+    192
+  ],
+  "uiScales": [
+    0.75,
+    1,
+    2
+  ],
+  "hardware": {
+    "adapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+    "dedicatedVideoMemoryBytes": 25309478912,
+    "isSoftwareAdapter": false,
+    "featureLevel": "Level_12_1",
+    "debugLayerEnabled": false,
+    "advanced": {
+      "meshShaderQuerySucceeded": true,
+      "meshShadersSupported": true,
+      "raytracingQuerySucceeded": true,
+      "raytracingSupported": true
+    }
+  },
+  "hostWindowDpi": [
+    144
+  ],
+  "skin": {
+    "pageBytes": [
+      4194304
+    ],
+    "textures": 1,
+    "uploadsPerPreparation": 1,
+    "missingAssets": 0,
+    "droppedQuads": 0,
+    "glyphDrops": 0,
+    "missingGlyphs": 0,
+    "verticesRange": [
+      216,
+      2322
+    ],
+    "vertexUploadBytesRange": [
+      6912,
+      74304
+    ]
+  },
+  "manifests": [
+    {
+      "root": "artifacts/graphical-frontend-qualified-1280x720-dpi144",
+      "status": "structural-pass",
+      "captures": 72,
+      "source": "ac0c9c50f98fab897d5b6b4b610a23612871ccd3",
+      "runtimeFingerprint": "7E9E2DF8E7569BD0F8992ED30488040A2CBC4ED7DE071F54A7853D2EC9AD4E3C",
+      "originalManifestSha256": "dd09a749190cc6379615809fba25f6305d496b724441a2bf9342ae1b6bfe81d7",
+      "retainedManifest": "native-manifests.zip#1280x720-dpi144-native-manifest.json"
+    },
+    {
+      "root": "artifacts/graphical-frontend-qualified-1280x720-dpi192",
+      "status": "structural-pass",
+      "captures": 72,
+      "source": "ac0c9c50f98fab897d5b6b4b610a23612871ccd3",
+      "runtimeFingerprint": "7E9E2DF8E7569BD0F8992ED30488040A2CBC4ED7DE071F54A7853D2EC9AD4E3C",
+      "originalManifestSha256": "d4dfea73c756d1a7da629cc1689ffe46b005cf1db5c09a1420004d050097227e",
+      "retainedManifest": "native-manifests.zip#1280x720-dpi192-native-manifest.json"
+    },
+    {
+      "root": "artifacts/graphical-frontend-qualified-1280x720-dpi96",
+      "status": "structural-pass",
+      "captures": 72,
+      "source": "ac0c9c50f98fab897d5b6b4b610a23612871ccd3",
+      "runtimeFingerprint": "7E9E2DF8E7569BD0F8992ED30488040A2CBC4ED7DE071F54A7853D2EC9AD4E3C",
+      "originalManifestSha256": "18f792cbcc39813c692a0b46d3b59478351658402c35611571d44d123a69f33e",
+      "retainedManifest": "native-manifests.zip#1280x720-dpi96-native-manifest.json"
+    },
+    {
+      "root": "artifacts/graphical-frontend-qualified-1920x1080-dpi144",
+      "status": "structural-pass",
+      "captures": 72,
+      "source": "ac0c9c50f98fab897d5b6b4b610a23612871ccd3",
+      "runtimeFingerprint": "7E9E2DF8E7569BD0F8992ED30488040A2CBC4ED7DE071F54A7853D2EC9AD4E3C",
+      "originalManifestSha256": "dcbd5994fe260b68071b15e7e7e3277a857bd8a375c04977f994e0c1d7ec4872",
+      "retainedManifest": "native-manifests.zip#1920x1080-dpi144-native-manifest.json"
+    },
+    {
+      "root": "artifacts/graphical-frontend-qualified-1920x1080-dpi192",
+      "status": "structural-pass",
+      "captures": 72,
+      "source": "ac0c9c50f98fab897d5b6b4b610a23612871ccd3",
+      "runtimeFingerprint": "7E9E2DF8E7569BD0F8992ED30488040A2CBC4ED7DE071F54A7853D2EC9AD4E3C",
+      "originalManifestSha256": "8652ada680fd0b0f9b8c1ea86a204080719c78106d0d04b963b55648f5fb7b84",
+      "retainedManifest": "native-manifests.zip#1920x1080-dpi192-native-manifest.json"
+    },
+    {
+      "root": "artifacts/graphical-frontend-qualified-1920x1080-dpi96",
+      "status": "structural-pass",
+      "captures": 72,
+      "source": "ac0c9c50f98fab897d5b6b4b610a23612871ccd3",
+      "runtimeFingerprint": "7E9E2DF8E7569BD0F8992ED30488040A2CBC4ED7DE071F54A7853D2EC9AD4E3C",
+      "originalManifestSha256": "8c63d05bdc83fb374296aee95ed59e3876043ceceaa4454c612ce3cfd04f1c8b",
+      "retainedManifest": "native-manifests.zip#1920x1080-dpi96-native-manifest.json"
+    },
+    {
+      "root": "artifacts/graphical-frontend-qualified-2560x1440-dpi144",
+      "status": "structural-pass",
+      "captures": 72,
+      "source": "ac0c9c50f98fab897d5b6b4b610a23612871ccd3",
+      "runtimeFingerprint": "7E9E2DF8E7569BD0F8992ED30488040A2CBC4ED7DE071F54A7853D2EC9AD4E3C",
+      "originalManifestSha256": "5fc4941f75718b6c0424a8be49e6393a935f93f93b801f98f2c009315059f24b",
+      "retainedManifest": "native-manifests.zip#2560x1440-dpi144-native-manifest.json"
+    },
+    {
+      "root": "artifacts/graphical-frontend-qualified-2560x1440-dpi192",
+      "status": "structural-pass",
+      "captures": 72,
+      "source": "ac0c9c50f98fab897d5b6b4b610a23612871ccd3",
+      "runtimeFingerprint": "7E9E2DF8E7569BD0F8992ED30488040A2CBC4ED7DE071F54A7853D2EC9AD4E3C",
+      "originalManifestSha256": "33b4ffeb7a214359aeb2f75dab29de933ae5aabd783eadf7d417febc7795695c",
+      "retainedManifest": "native-manifests.zip#2560x1440-dpi192-native-manifest.json"
+    },
+    {
+      "root": "artifacts/graphical-frontend-qualified-2560x1440-dpi96",
+      "status": "structural-pass",
+      "captures": 72,
+      "source": "ac0c9c50f98fab897d5b6b4b610a23612871ccd3",
+      "runtimeFingerprint": "7E9E2DF8E7569BD0F8992ED30488040A2CBC4ED7DE071F54A7853D2EC9AD4E3C",
+      "originalManifestSha256": "e4179a8de8285048ebe82a3f8b7b9e31ae8466809fc08966409499cc2155d07e",
+      "retainedManifest": "native-manifests.zip#2560x1440-dpi96-native-manifest.json"
+    },
+    {
+      "root": "artifacts/graphical-frontend-qualified-3440x1440-dpi144",
+      "status": "structural-pass",
+      "captures": 72,
+      "source": "ac0c9c50f98fab897d5b6b4b610a23612871ccd3",
+      "runtimeFingerprint": "7E9E2DF8E7569BD0F8992ED30488040A2CBC4ED7DE071F54A7853D2EC9AD4E3C",
+      "originalManifestSha256": "16cac079602f790874dc1dd75bf61f9333eff1f402be3ff4b9f08b2b6be03cc1",
+      "retainedManifest": "native-manifests.zip#3440x1440-dpi144-native-manifest.json"
+    },
+    {
+      "root": "artifacts/graphical-frontend-qualified-3440x1440-dpi192",
+      "status": "structural-pass",
+      "captures": 72,
+      "source": "ac0c9c50f98fab897d5b6b4b610a23612871ccd3",
+      "runtimeFingerprint": "7E9E2DF8E7569BD0F8992ED30488040A2CBC4ED7DE071F54A7853D2EC9AD4E3C",
+      "originalManifestSha256": "5afd948f82587d70df6f7f7f8c537e36687c938bec778109d752e62ef6ba44ca",
+      "retainedManifest": "native-manifests.zip#3440x1440-dpi192-native-manifest.json"
+    },
+    {
+      "root": "artifacts/graphical-frontend-qualified-3440x1440-dpi96",
+      "status": "structural-pass",
+      "captures": 72,
+      "source": "ac0c9c50f98fab897d5b6b4b610a23612871ccd3",
+      "runtimeFingerprint": "7E9E2DF8E7569BD0F8992ED30488040A2CBC4ED7DE071F54A7853D2EC9AD4E3C",
+      "originalManifestSha256": "4d42b77b7f8e0973cf89a9853c545965738dbe207ad916890c00e0dd12b39172",
+      "retainedManifest": "native-manifests.zip#3440x1440-dpi96-native-manifest.json"
+    },
+    {
+      "root": "artifacts/graphical-frontend-qualified-3840x2160-dpi144",
+      "status": "structural-pass",
+      "captures": 72,
+      "source": "ac0c9c50f98fab897d5b6b4b610a23612871ccd3",
+      "runtimeFingerprint": "7E9E2DF8E7569BD0F8992ED30488040A2CBC4ED7DE071F54A7853D2EC9AD4E3C",
+      "originalManifestSha256": "0908eb8690626a09ee4934cab64fe53da29b8ee9e02bb3966ee3ae1875cff4e9",
+      "retainedManifest": "native-manifests.zip#3840x2160-dpi144-native-manifest.json"
+    },
+    {
+      "root": "artifacts/graphical-frontend-qualified-3840x2160-dpi192",
+      "status": "structural-pass",
+      "captures": 72,
+      "source": "ac0c9c50f98fab897d5b6b4b610a23612871ccd3",
+      "runtimeFingerprint": "7E9E2DF8E7569BD0F8992ED30488040A2CBC4ED7DE071F54A7853D2EC9AD4E3C",
+      "originalManifestSha256": "a3e5bc700f83505e089d9a387dc5a4fcf9d7ca9f00c09784f0d029a87889e961",
+      "retainedManifest": "native-manifests.zip#3840x2160-dpi192-native-manifest.json"
+    },
+    {
+      "root": "artifacts/graphical-frontend-qualified-3840x2160-dpi96",
+      "status": "structural-pass",
+      "captures": 72,
+      "source": "ac0c9c50f98fab897d5b6b4b610a23612871ccd3",
+      "runtimeFingerprint": "7E9E2DF8E7569BD0F8992ED30488040A2CBC4ED7DE071F54A7853D2EC9AD4E3C",
+      "originalManifestSha256": "30d9224dafb13b7d18749939a341162349e1ed6c181cb599c8f9377d6b92f8b2",
+      "retainedManifest": "native-manifests.zip#3840x2160-dpi96-native-manifest.json"
+    }
+  ],
+  "package": {
+    "archive": "artifacts/graphical-frontend-package/FORGELINE-0.1.376-dev-win-x64.zip",
+    "sha256": "41bf99e7d9e49f42a3848d9a38856f8a1a1139856d91bbda2ef6a540f9337dfa",
+    "bytes": 39971508,
+    "manifestEntriesVerified": 1403,
+    "runtimePayloadsVerified": 1337,
+    "sourceTreeClean": true,
+    "reproducible": true,
+    "nativeCases": 24,
+    "nativePixelsEqualToDevelopment": 24
+  },
+  "retainedFiles": [
+    {
+      "path": "docs/qualification/graphical-frontend/native-manifests.zip",
+      "original": "artifacts/graphical-frontend-qualified-1280x720-dpi144/manifest.json",
+      "sha256": "dd09a749190cc6379615809fba25f6305d496b724441a2bf9342ae1b6bfe81d7",
+      "bytes": 4456859,
+      "entry": "1280x720-dpi144-native-manifest.json"
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiSettingsGraphics-Scale2.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1280x720-dpi192/BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiSettingsGraphics-Scale2.00.png",
+      "sha256": "12e3daba5d438f1c3fbf9981985b2f9c9770b8ab0f58245b257c0de7c9e1871b",
+      "bytes": 113495
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiControls-Scale2.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1280x720-dpi192/BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiControls-Scale2.00.png",
+      "sha256": "4060b40c2c57a847e96453ca21c8338658a341719ef89285f28ddadf5a9be668",
+      "bytes": 83033
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiPauseSettings-Scale2.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1280x720-dpi192/BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi192-UiPauseSettings-Scale2.00.png",
+      "sha256": "d81af5c5638a697ed2a108e680fd69a6ff498dbfd3726ba1e67db44c951fa5a5",
+      "bytes": 709677
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/native-manifests.zip",
+      "original": "artifacts/graphical-frontend-qualified-1280x720-dpi192/manifest.json",
+      "sha256": "d4dfea73c756d1a7da629cc1689ffe46b005cf1db5c09a1420004d050097227e",
+      "bytes": 4458515,
+      "entry": "1280x720-dpi192-native-manifest.json"
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/native-manifests.zip",
+      "original": "artifacts/graphical-frontend-qualified-1280x720-dpi96/manifest.json",
+      "sha256": "18f792cbcc39813c692a0b46d3b59478351658402c35611571d44d123a69f33e",
+      "bytes": 4458714,
+      "entry": "1280x720-dpi96-native-manifest.json"
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/native-manifests.zip",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi144/manifest.json",
+      "sha256": "dcbd5994fe260b68071b15e7e7e3277a857bd8a375c04977f994e0c1d7ec4872",
+      "bytes": 4459087,
+      "entry": "1920x1080-dpi144-native-manifest.json"
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi192-UiSettingsGraphics-Scale2.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi192/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi192-UiSettingsGraphics-Scale2.00.png",
+      "sha256": "552d22f977de2a39e959434f7caf0117b6f43c7d7df27dbe5073f29f7da1742e",
+      "bytes": 210931
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi192-UiControls-Scale2.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi192/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi192-UiControls-Scale2.00.png",
+      "sha256": "6c9b4e9601e98fec00a87fc5c5fa30f6ee9f17b0474510c0d657d22707b429a5",
+      "bytes": 167728
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi192-UiPauseSettings-Scale2.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi192/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi192-UiPauseSettings-Scale2.00.png",
+      "sha256": "a2d16c355ccae06c764969cf5b84ede3387d2431719e792c2ae32fee459e282c",
+      "bytes": 1545586
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/native-manifests.zip",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi192/manifest.json",
+      "sha256": "8652ada680fd0b0f9b8c1ea86a204080719c78106d0d04b963b55648f5fb7b84",
+      "bytes": 4462024,
+      "entry": "1920x1080-dpi192-native-manifest.json"
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenu-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenu-Scale1.00.png",
+      "sha256": "5e9c98d377c330fc6077cf72abd9000145230eb254a3fd17712d36c74930ba06",
+      "bytes": 1817667
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenuFocus-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenuFocus-Scale1.00.png",
+      "sha256": "ed61f7a53102c945875c84b52e38993e5c4e87125367b7af9f1bb1e1c35f24b1",
+      "bytes": 1816463
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenuDisabled-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenuDisabled-Scale1.00.png",
+      "sha256": "a9228c0e2042a2bed501b50822dba464e836ba4c2ff34c7b277c966a205e1d97",
+      "bytes": 1818245
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenuReveal-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenuReveal-Scale1.00.png",
+      "sha256": "4e9dfc2ee0690e0830c3198817e1a17ed386aaab725b6d557f64ae8b1d37c589",
+      "bytes": 1817866
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenuHover-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenuHover-Scale1.00.png",
+      "sha256": "fdd35048920a1c02b00387cc7dfc53d0de92eaf869ab4346f88e1cfde933429e",
+      "bytes": 1817642
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenuPressed-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenuPressed-Scale1.00.png",
+      "sha256": "7cd082b382a0dc31980a700c5a8b118c1741670fd0e6d76a0906f06d1126096a",
+      "bytes": 1817566
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoading-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoading-Scale1.00.png",
+      "sha256": "255a9a259415c46c84352ba022095bfc6bb14ea71c70337bfb41533828d5a36d",
+      "bytes": 139489
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoadingError-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoadingError-Scale1.00.png",
+      "sha256": "1a926b7e7a4395af96e1c8450a8e23fa77e6d0e275d05524d76254d6e2b9ef09",
+      "bytes": 144080
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiNewGame-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiNewGame-Scale1.00.png",
+      "sha256": "0f37325845033264da123c97e84051a7cfa28d13bd12dd9c43fef19c70c38cef",
+      "bytes": 145669
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoadGame-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoadGame-Scale1.00.png",
+      "sha256": "436f49b4de45bcc30b9a5c81368e36fc274ba1c09bcb986629adc1c6e200ee4c",
+      "bytes": 138413
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoadEmpty-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoadEmpty-Scale1.00.png",
+      "sha256": "a2881fb8e2e4774f35e43d68d74d37145a86eca6e2fa571ddebf01d7501e3178",
+      "bytes": 132292
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoadBroken-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoadBroken-Scale1.00.png",
+      "sha256": "012c2af198d1727cd22338fd587de0ffc00ac795cc8348a1bcee72b705f5f854",
+      "bytes": 138822
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiSettingsLong-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiSettingsLong-Scale1.00.png",
+      "sha256": "2ce04ecc74eeea287f47313287ce6954332fe7a13f4e82c0d5831d682219b598",
+      "bytes": 160045
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiControlsLong-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiControlsLong-Scale1.00.png",
+      "sha256": "f18f96ee47ad5f74b1228a0edd9c63eb7894971badda8d16cfd2b508e66a3b6b",
+      "bytes": 160492
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiPause-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiPause-Scale1.00.png",
+      "sha256": "017202636066996cfd1119381a51f83b562937fcd7f0916b19b7186c38b8e4da",
+      "bytes": 3169290
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiCredits-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiCredits-Scale1.00.png",
+      "sha256": "746d486e15183de7e997bc799fcaee606d1136f6bf46a77d14acfeabb15209cd",
+      "bytes": 146831
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiSettingsAudio-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiSettingsAudio-Scale1.00.png",
+      "sha256": "670aa516d83565a7722b638fde62abce18afe674bc8ab10cf8f4003c9aed8e08",
+      "bytes": 156465
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiSettingsGraphics-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiSettingsGraphics-Scale1.00.png",
+      "sha256": "6e9a404361e1aa9b93f7ce763e264b1226558c376f2e50bbaff396d0f33932d0",
+      "bytes": 207177
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiControls-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiControls-Scale1.00.png",
+      "sha256": "101259ccff679c99748c7c6a83842dc725b9e86d03592a2ee658beaea45873b1",
+      "bytes": 159880
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiSettingsGeneral-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiSettingsGeneral-Scale1.00.png",
+      "sha256": "f5df1cdb8232ca1e269191f9b1f236c747a736c35da487e7f59d75095a2c1d41",
+      "bytes": 188179
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiSettingsBindings-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiSettingsBindings-Scale1.00.png",
+      "sha256": "b9ed08b0fce95152d79371a169cd3bb6d10db8e3420867c4a2285ff651653595",
+      "bytes": 154503
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiBindingConflict-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiBindingConflict-Scale1.00.png",
+      "sha256": "bc490585257bc8b103eacca26be55765e90bd1c95f3c199973468f4a9d368d8b",
+      "bytes": 151521
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiDisplayTrial-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiDisplayTrial-Scale1.00.png",
+      "sha256": "5170191eeea1dc5f2d0d4e7c5032b31239870ea2e8183e37b841d68e35385f0f",
+      "bytes": 181135
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiPauseSettings-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiPauseSettings-Scale1.00.png",
+      "sha256": "4a7b0a510857e34d0dd679f3049affed263ecb7da8775588dd6865521522a210",
+      "bytes": 2323705
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/native-manifests.zip",
+      "original": "artifacts/graphical-frontend-qualified-1920x1080-dpi96/manifest.json",
+      "sha256": "8c63d05bdc83fb374296aee95ed59e3876043ceceaa4454c612ce3cfd04f1c8b",
+      "bytes": 4459225,
+      "entry": "1920x1080-dpi96-native-manifest.json"
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/native-manifests.zip",
+      "original": "artifacts/graphical-frontend-qualified-2560x1440-dpi144/manifest.json",
+      "sha256": "5fc4941f75718b6c0424a8be49e6393a935f93f93b801f98f2c009315059f24b",
+      "bytes": 4463689,
+      "entry": "2560x1440-dpi144-native-manifest.json"
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-2560x1440-Medium-NormalGameplay-Dpi192-UiSettingsGraphics-Scale2.00.png",
+      "original": "artifacts/graphical-frontend-qualified-2560x1440-dpi192/BattlefieldCombat-2560x1440-Medium-NormalGameplay-Dpi192-UiSettingsGraphics-Scale2.00.png",
+      "sha256": "027f7a67fce041716e2e800cfb617a804aeb41fd4ff81fc32cdd5290df68acd5",
+      "bytes": 325052
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-2560x1440-Medium-NormalGameplay-Dpi192-UiControls-Scale2.00.png",
+      "original": "artifacts/graphical-frontend-qualified-2560x1440-dpi192/BattlefieldCombat-2560x1440-Medium-NormalGameplay-Dpi192-UiControls-Scale2.00.png",
+      "sha256": "b80f2a41ed4ac2b7e365cb9103868057a488de16e2650c5a828315b0bd48f156",
+      "bytes": 259503
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-2560x1440-Medium-NormalGameplay-Dpi192-UiPauseSettings-Scale2.00.png",
+      "original": "artifacts/graphical-frontend-qualified-2560x1440-dpi192/BattlefieldCombat-2560x1440-Medium-NormalGameplay-Dpi192-UiPauseSettings-Scale2.00.png",
+      "sha256": "a9c7ee107a3acd17d97349d2716bb58a2f4c58f78b245b1b9db87fd76333fa55",
+      "bytes": 2739613
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/native-manifests.zip",
+      "original": "artifacts/graphical-frontend-qualified-2560x1440-dpi192/manifest.json",
+      "sha256": "33b4ffeb7a214359aeb2f75dab29de933ae5aabd783eadf7d417febc7795695c",
+      "bytes": 4463587,
+      "entry": "2560x1440-dpi192-native-manifest.json"
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/native-manifests.zip",
+      "original": "artifacts/graphical-frontend-qualified-2560x1440-dpi96/manifest.json",
+      "sha256": "e4179a8de8285048ebe82a3f8b7b9e31ae8466809fc08966409499cc2155d07e",
+      "bytes": 4463525,
+      "entry": "2560x1440-dpi96-native-manifest.json"
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/native-manifests.zip",
+      "original": "artifacts/graphical-frontend-qualified-3440x1440-dpi144/manifest.json",
+      "sha256": "16cac079602f790874dc1dd75bf61f9333eff1f402be3ff4b9f08b2b6be03cc1",
+      "bytes": 4465301,
+      "entry": "3440x1440-dpi144-native-manifest.json"
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-3440x1440-Medium-NormalGameplay-Dpi192-UiSettingsGraphics-Scale2.00.png",
+      "original": "artifacts/graphical-frontend-qualified-3440x1440-dpi192/BattlefieldCombat-3440x1440-Medium-NormalGameplay-Dpi192-UiSettingsGraphics-Scale2.00.png",
+      "sha256": "6271cbd799d488ab4735b0acdfcaf90d16698e19d12dda72807b359c9f827537",
+      "bytes": 373291
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-3440x1440-Medium-NormalGameplay-Dpi192-UiControls-Scale2.00.png",
+      "original": "artifacts/graphical-frontend-qualified-3440x1440-dpi192/BattlefieldCombat-3440x1440-Medium-NormalGameplay-Dpi192-UiControls-Scale2.00.png",
+      "sha256": "2638666d66aaed56bd203812e240af9687d6f4e23f012405f0312be4a35c50d6",
+      "bytes": 312020
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-3440x1440-Medium-NormalGameplay-Dpi192-UiPauseSettings-Scale2.00.png",
+      "original": "artifacts/graphical-frontend-qualified-3440x1440-dpi192/BattlefieldCombat-3440x1440-Medium-NormalGameplay-Dpi192-UiPauseSettings-Scale2.00.png",
+      "sha256": "e8d5bc31652b65341c57b30d5b747ee805e4d16d6c55f78b14aa6ba7a6be7899",
+      "bytes": 4433362
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/native-manifests.zip",
+      "original": "artifacts/graphical-frontend-qualified-3440x1440-dpi192/manifest.json",
+      "sha256": "5afd948f82587d70df6f7f7f8c537e36687c938bec778109d752e62ef6ba44ca",
+      "bytes": 4465087,
+      "entry": "3440x1440-dpi192-native-manifest.json"
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/native-manifests.zip",
+      "original": "artifacts/graphical-frontend-qualified-3440x1440-dpi96/manifest.json",
+      "sha256": "4d42b77b7f8e0973cf89a9853c545965738dbe207ad916890c00e0dd12b39172",
+      "bytes": 4465275,
+      "entry": "3440x1440-dpi96-native-manifest.json"
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/native-manifests.zip",
+      "original": "artifacts/graphical-frontend-qualified-3840x2160-dpi144/manifest.json",
+      "sha256": "0908eb8690626a09ee4934cab64fe53da29b8ee9e02bb3966ee3ae1875cff4e9",
+      "bytes": 4465338,
+      "entry": "3840x2160-dpi144-native-manifest.json"
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiSettingsGraphics-Scale2.00.png",
+      "original": "artifacts/graphical-frontend-qualified-3840x2160-dpi192/BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiSettingsGraphics-Scale2.00.png",
+      "sha256": "85529cd3423b02dc60944d3c2e45c5e52a2c556a38ab990bb95745ce3ac93599",
+      "bytes": 600550
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiControls-Scale2.00.png",
+      "original": "artifacts/graphical-frontend-qualified-3840x2160-dpi192/BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiControls-Scale2.00.png",
+      "sha256": "a42c5cda638652e7051fc083f9f21e586688447aa52edd6f14e92c5850de36b9",
+      "bytes": 502983
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiPauseSettings-Scale2.00.png",
+      "original": "artifacts/graphical-frontend-qualified-3840x2160-dpi192/BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiPauseSettings-Scale2.00.png",
+      "sha256": "5ae1688cd0fd745a5f7b4cdc1391920dcb120f8d54c8a1ce321229a4800243dd",
+      "bytes": 6087934
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/native-manifests.zip",
+      "original": "artifacts/graphical-frontend-qualified-3840x2160-dpi192/manifest.json",
+      "sha256": "a3e5bc700f83505e089d9a387dc5a4fcf9d7ca9f00c09784f0d029a87889e961",
+      "bytes": 4464955,
+      "entry": "3840x2160-dpi192-native-manifest.json"
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/native-manifests.zip",
+      "original": "artifacts/graphical-frontend-qualified-3840x2160-dpi96/manifest.json",
+      "sha256": "30d9224dafb13b7d18749939a341162349e1ed6c181cb599c8f9377d6b92f8b2",
+      "bytes": 4464817,
+      "entry": "3840x2160-dpi96-native-manifest.json"
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/native-manifests.zip",
+      "original": "artifacts/graphical-frontend-before-all/manifest.json",
+      "sha256": "4b01b68a53a00d1d617ef1c90f8ff8cd833131d1df4c8648497bdf83da32a37e",
+      "bytes": 801168,
+      "entry": "before-native-manifest.json"
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/before-BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenu-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-before-all/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenu-Scale1.00.png",
+      "sha256": "034cbc1a2c6912bf9f0a95e88adc625d4f117df57568be151bb1805c43c553ef",
+      "bytes": 1672307
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/before-BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenuFocus-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-before-all/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenuFocus-Scale1.00.png",
+      "sha256": "25c40adea37a35ad0c377731d90009e47ae2d2ff7105a1fb2a3c31f52516d018",
+      "bytes": 1672303
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/before-BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenuDisabled-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-before-all/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMenuDisabled-Scale1.00.png",
+      "sha256": "73b74a269d12c132732807d8568761373814fc136c995a9c2283269bac9e558e",
+      "bytes": 1673703
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/before-BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoading-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-before-all/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoading-Scale1.00.png",
+      "sha256": "c8ba1a42a7252c75d2a335f436913234ca78f3e2b6e4130583ded8ccba5403a1",
+      "bytes": 597949
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/before-BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoadingError-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-before-all/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoadingError-Scale1.00.png",
+      "sha256": "a8a5025ac1060c8f1437098a9805ea1126fa94a77f4b34848f5aa35bae358890",
+      "bytes": 600961
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/before-BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiNewGame-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-before-all/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiNewGame-Scale1.00.png",
+      "sha256": "f213a7d198419832beab3932f3376bfb26b5a4ded23e8df8490042e849e08f61",
+      "bytes": 608818
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/before-BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoadGame-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-before-all/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoadGame-Scale1.00.png",
+      "sha256": "efee82841d749a649684dfbc459668142d6ae73ba8629a4892856b3c352dcf2f",
+      "bytes": 603999
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/before-BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoadEmpty-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-before-all/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoadEmpty-Scale1.00.png",
+      "sha256": "6d8808f24f3c33fcddf92bb2ca9b1bd8573c037a2fbcd4a9284e374bea8a35ac",
+      "bytes": 596176
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/before-BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoadBroken-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-before-all/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiLoadBroken-Scale1.00.png",
+      "sha256": "9c4323ea1a1b19bdebd18975885997b40334ba6b839778d0962c4f41f2d7b2eb",
+      "bytes": 602395
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/before-BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiSettingsLong-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-before-all/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiSettingsLong-Scale1.00.png",
+      "sha256": "b094db8f585d25afcb09dbe728409537dc303c047594c5fc4123008ee01e767b",
+      "bytes": 617644
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/before-BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiControlsLong-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-before-all/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiControlsLong-Scale1.00.png",
+      "sha256": "09bb93516c205b3c85ff15fa3c63f9217acea4178982cbe62438474e942fbc57",
+      "bytes": 142617
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/before-BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiPause-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-before-all/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiPause-Scale1.00.png",
+      "sha256": "13e9229b47d88d90ea6f9cc81168be4913ff1684235fb7a970c6fa7513ffd9d7",
+      "bytes": 3300149
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/before-BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiCredits-Scale1.00.png",
+      "original": "artifacts/graphical-frontend-before-all/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiCredits-Scale1.00.png",
+      "sha256": "a43fda7bda600a5f5715e2ed383a22c99a8aa666467129ecf313f52a23ff0497",
+      "bytes": 125471
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/before-after-comparison.json",
+      "original": "artifacts/graphical-frontend-comparison.json",
+      "sha256": "f09b011609b324bba86eb0bbca820799eb85922cc53c8860267a9b2592d622db",
+      "bytes": 46875
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/ci-checkpoint.json",
+      "original": "artifacts/graphical-frontend-ci-checkpoint.json",
+      "sha256": "e5639baa6e50dbed3072803387e8970bec8975534849a68538ece9ac9e195abd",
+      "bytes": 1511
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/runtime-asset-qualification.json",
+      "original": "artifacts/asset-qualification.json",
+      "sha256": "a27153280661a0a742291b7f981c4caf39f50ebcf3d8491a0b13d200b93d08e4",
+      "bytes": 2016
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/packaged-comparison.json",
+      "original": "artifacts/graphical-frontend-packaged-comparison.json",
+      "sha256": "a2ff722b310e42e170a4505484fd186d7c1c9fe2ca1f1831b5074544c07d658a",
+      "bytes": 33388
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/native-manifests.zip",
+      "original": "artifacts/graphical-frontend-packaged-native/manifest.json",
+      "sha256": "15b9623aa95f3536b70af6700b43e11d6ae40177a06208af78da519a27362ec7",
+      "bytes": 1487751,
+      "entry": "packaged-native-manifest.json"
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/packaged-build-provenance.json",
+      "original": "artifacts/graphical-frontend-package/win-x64/publish/build-provenance.json",
+      "sha256": "5f9ff59996f826ea18e85a5fc5cf4daef06eff8cb55abbc72082c13bd277bffd",
+      "bytes": 729
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/packaged-startup.json",
+      "original": "artifacts/graphical-frontend-packaged-startup.json",
+      "sha256": "1f0f62fc915e7817177aa1735a5445a58d36bd67cb25f2da213b81967eba8fe5",
+      "bytes": 10650
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/reveal-failure.json",
+      "original": "artifacts/graphical-frontend-final-1920x1080-dpi96/failure.json",
+      "sha256": "9d55a176abbbb2e6ef7c5ca598813ad4cb6706ab1d5d129042e0c93df00e6eb8",
+      "bytes": 1681
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/graphical-frontend-building-allocation-investigation.log",
+      "original": "artifacts/graphical-frontend-building-allocation-investigation.log",
+      "sha256": "2b4a7166ea7a0af827726f83becdfcf7ee3936b0f8903a8003bf774da7bea04f",
+      "bytes": 602
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/graphical-frontend-qualification-build.log",
+      "original": "artifacts/graphical-frontend-qualification-build.log",
+      "sha256": "6972ce7e13c768ca75d041c96cf02206247f030f19d005ddeb40e765bfd4afbb",
+      "bytes": 8809
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/graphical-frontend-surface-stride-tests.log",
+      "original": "artifacts/graphical-frontend-surface-stride-tests.log",
+      "sha256": "5df02f1c5208ccb846d5e786d8b932ae3e13c91ff68d5b73e90674f2d8f62099",
+      "bytes": 600
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/graphical-frontend-surface-frontend-tests.log",
+      "original": "artifacts/graphical-frontend-surface-frontend-tests.log",
+      "sha256": "9b338053e923cb81ef02724716b265b478da8434841d08d849c43314756d4352",
+      "bytes": 600
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/graphical-frontend-solution-final.log",
+      "original": "artifacts/graphical-frontend-solution-final.log",
+      "sha256": "e3744355a352863628ba56453a9d7f72380fbed7e7b13bfd751b6a9f9ae12c25",
+      "bytes": 34492
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/graphical-frontend-unit-allocation-investigation.log",
+      "original": "artifacts/graphical-frontend-unit-allocation-investigation.log",
+      "sha256": "3f110f222b5e8b125315ec24f18f886700e4169e4faf7d4609de1c2ea0eac82b",
+      "bytes": 602
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/graphical-frontend-final-build.log",
+      "original": "artifacts/graphical-frontend-final-build.log",
+      "sha256": "9e674f0d5860e6a55f32e1f6a29cf868b765614a164741ecbed09be1c27ea117",
+      "bytes": 8809
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/graphical-frontend-boundaries.log",
+      "original": "artifacts/graphical-frontend-boundaries.log",
+      "sha256": "2834442048167a3e16fb8d8bbd76b13cba766a16c33cb9fba23983ca5ce9f040",
+      "bytes": 95
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/graphical-frontend-runtime.log",
+      "original": "artifacts/graphical-frontend-runtime.log",
+      "sha256": "d91f91bf726a08374da00167f6e4aaa103d9bf497cc695d396eba2cc72326f53",
+      "bytes": 1726074
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/graphical-frontend-client-final.log",
+      "original": "artifacts/graphical-frontend-client-final.log",
+      "sha256": "3d50b1964ae9cd872df00a20d7860061881b31d9411e58bbf340a2933618ba0c",
+      "bytes": 582
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/graphical-frontend-reveal-tests.log",
+      "original": "artifacts/graphical-frontend-reveal-tests.log",
+      "sha256": "6caca9f6c6d1d7024367918414dd3a51f3f9ff1ffc49e366bcf49d75a84e953e",
+      "bytes": 600
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/graphical-frontend-solution-tests.log",
+      "original": "artifacts/graphical-frontend-solution-tests.log",
+      "sha256": "1652e9524127e18059ef711d2dbd761b4f764e9983c90f75b0f77598bc3f132f",
+      "bytes": 29409
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/graphical-frontend-solution-isolated.log",
+      "original": "artifacts/graphical-frontend-solution-isolated.log",
+      "sha256": "e7104690bdb6f0563402d372699ce3b053a40a8fcb1e344f5b76b2d84ebb9055",
+      "bytes": 34434
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/graphical-frontend-package.log",
+      "original": "artifacts/graphical-frontend-package.log",
+      "sha256": "9c51667581f7ad0b882ca6913065a1ed50a91ad71592bcf3bc43bd28afae3d6e",
+      "bytes": 3796
+    },
+    {
+      "path": "docs/qualification/graphical-frontend/native-manifests.zip",
+      "sha256": "4faa46e57b6ad915430e46246e9af014335f7b846ff1a1f114034df0ce08f029",
+      "bytes": 5840280,
+      "original": "Lossless container of the individually hashed original native manifests."
+    }
+  ],
+  "review": {
+    "nativeStructural": "pass",
+    "completeRegression": "failed",
+    "requiredCI": "failed",
+    "visualAcceptance": "pending",
+    "physicalMonitor": "pending",
+    "liveMotion": "pending",
+    "gpuPerformance": "pending",
+    "note": "Native raster-DPI captures with 1280x720 host are not physical-monitor or calibrated accessibility approval; concurrent captures are not isolated timing measurements."
+  }
+}

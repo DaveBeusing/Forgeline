@@ -1,0 +1,20 @@
+{
+  "runId": null,
+  "targetFramework": "net10.0-windows",
+  "channel": "dev",
+  "runUrl": null,
+  "productVersion": "0.1.376",
+  "runtimeIdentifier": "win-x64",
+  "buildTimeUtc": "2026-10-15T19:58:09.8396430+00:00",
+  "runtimeAssetSignature": "b6cbe90cbbd4dfc780abb28f5d42f7bc3b469ae0cf4e663f594975a2bfd219d9",
+  "sourceRevision": "ac0c9c50f98fab897d5b6b4b610a23612871ccd3",
+  "runAttempt": null,
+  "informationalVersion": "0.1.376-dev+ac0c9c50f98fab897d5b6b4b610a23612871ccd3",
+  "version": "0.1.376-dev",
+  "sdk": "10.0.401",
+  "repository": "https://github.com/DaveBeusing/Forgeline",
+  "sourceTreeClean": true,
+  "configuration": "Release",
+  "product": "FORGELINE",
+  "runtimeAssetCompiler": "1.10.0"
+}

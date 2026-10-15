@@ -13,7 +13,8 @@ internal enum UiReferenceScenario
     NewGame, LoadGame, LoadEmpty, LoadBroken, SettingsLong, ControlsLong, Pause, Credits,
     ResourcePressure, LowPower, SupplyCritical, MixedSelection, Targeting, QueueBlocked,
     Technology, Contacts, DockFocus, DockHover, DockPressed, DockPending, DockAccepted,
-    DockRejected, MinimapStrategic, Onboarding, SettingsAudio, SettingsGraphics, Controls
+    DockRejected, MinimapStrategic, Onboarding, SettingsAudio, SettingsGraphics, Controls,
+    SettingsGeneral, SettingsBindings, BindingConflict, DisplayTrial, PauseSettings, MenuHover, MenuPressed
 }
 
 /// <summary>Named authored read models for the existing reference capture lane; never dispatches input.</summary>
@@ -24,6 +25,8 @@ internal static class UiReferenceStates
         (UiReferenceScenario.Menu, UiReferenceScenario.MenuFocus),
         (UiReferenceScenario.Menu, UiReferenceScenario.MenuDisabled),
         (UiReferenceScenario.Menu, UiReferenceScenario.MenuReveal),
+        (UiReferenceScenario.Menu, UiReferenceScenario.MenuHover),
+        (UiReferenceScenario.MenuHover, UiReferenceScenario.MenuPressed),
         (UiReferenceScenario.Contacts, UiReferenceScenario.DockHover),
         (UiReferenceScenario.DockHover, UiReferenceScenario.DockPressed),
         (UiReferenceScenario.DockPending, UiReferenceScenario.DockAccepted),
@@ -44,7 +47,9 @@ internal static class UiReferenceStates
     }
 
     internal static bool IsFrontend(UiReferenceScenario state) => state is >= UiReferenceScenario.Menu and <= UiReferenceScenario.Credits or
-        UiReferenceScenario.SettingsAudio or UiReferenceScenario.SettingsGraphics or UiReferenceScenario.Controls;
+        UiReferenceScenario.SettingsAudio or UiReferenceScenario.SettingsGraphics or UiReferenceScenario.Controls or
+        UiReferenceScenario.SettingsGeneral or UiReferenceScenario.SettingsBindings or UiReferenceScenario.BindingConflict or
+        UiReferenceScenario.DisplayTrial or UiReferenceScenario.PauseSettings or UiReferenceScenario.MenuHover or UiReferenceScenario.MenuPressed;
 
     internal static FrontendSurfaceView Frontend(UiReferenceScenario state, int width, int height, uint dpi, float scale)
     {
@@ -53,9 +58,17 @@ internal static class UiReferenceStates
         {
             UiReferenceScenario.Menu or UiReferenceScenario.MenuDisabled => menu,
             UiReferenceScenario.MenuFocus => menu with { MenuEntries = menu.MenuEntries.Select((x, i) => x with { IsFocused = i == 2 }).ToArray() },
+            UiReferenceScenario.MenuHover => menu with { MenuEntries = menu.MenuEntries.Select((entry,i)=>entry with { IsHovered = i==1 }).ToArray() },
+            UiReferenceScenario.MenuPressed => menu with { MenuEntries = menu.MenuEntries.Select((entry,i)=>entry with { IsHovered = i==1, IsPressed = i==1 }).ToArray() },
+            UiReferenceScenario.SettingsGeneral => Settings(FrontendSettingsSection.General),
+            UiReferenceScenario.SettingsBindings => Settings(FrontendSettingsSection.Bindings),
+            UiReferenceScenario.BindingConflict => BindingConflict(),
+            UiReferenceScenario.DisplayTrial => FrontendPresentationAdapter.Settings(new SettingsModel(ClientSettingsFrontendAdapter.ToSnapshot(new ClientUserSettings())),
+                displayFeedback:"KEEP DISPLAY / 14s",displayPreviewActive:true),
+            UiReferenceScenario.PauseSettings => Settings(FrontendSettingsSection.General) with { PauseContext = true, SecondaryAction = "BACK TO PAUSE" },
             UiReferenceScenario.MenuReveal => menu with { Motion = new UiMotionView(.5f, .5f, 0) },
             UiReferenceScenario.Loading => FrontendSurfaceView.Loading("LOADING SAVED MATCH / 75%", true, .75f),
-            UiReferenceScenario.LoadingError => FrontendSurfaceView.Loading("ERROR / SAVED MATCH COULD NOT BE READ / ESC BACK", false, 0),
+            UiReferenceScenario.LoadingError => FrontendSurfaceView.Loading("ERROR / SAVED MATCH COULD NOT BE READ / ESC BACK", false, 0) with { IsError = true },
             UiReferenceScenario.NewGame => FrontendPresentationAdapter.NewGame(new NewGameModel()),
             UiReferenceScenario.LoadEmpty => FrontendPresentationAdapter.LoadGame(new LoadGameModel([])),
             UiReferenceScenario.LoadGame or UiReferenceScenario.LoadBroken => FrontendPresentationAdapter.LoadGame(new LoadGameModel(
@@ -75,6 +88,15 @@ internal static class UiReferenceStates
         return view with { Layout = FrontendGeometry.Resolve(width, height, scale, dpi, view.Kind == FrontendSurfaceKind.Controls) };
     }
 
+    private static FrontendSurfaceView BindingConflict()
+    {
+        var model = new SettingsModel(ClientSettingsFrontendAdapter.ToSnapshot(new ClientUserSettings()));
+        var interaction = new SettingsInteractionModel();
+        interaction.Focus(FrontendSettingsField.BindingKey);
+        for(int i=0;i<512 && interaction.CanApply;i++) interaction.Adjust(model,1);
+        if(interaction.CanApply) throw new InvalidDataException("Binding conflict fixture could not use an actual validation conflict.");
+        return FrontendPresentationAdapter.Settings(model,interaction);
+    }
     private static FrontendSurfaceView Settings(FrontendSettingsSection section)
     {
         var interaction = new SettingsInteractionModel();
