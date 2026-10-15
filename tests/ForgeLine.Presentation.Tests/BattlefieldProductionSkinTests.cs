@@ -128,6 +128,9 @@ public sealed class BattlefieldProductionSkinTests
         var after = Capture(hidden with { HealthFraction = .99, FuelFraction = .99, AmmunitionFraction = .99,
             Readiness = .99, InventoryQuantity = 100000, PowerState = PowerOperationalState.Brownout });
         Assert.True(before.AsSpan().SequenceEqual(after));
+        var longName = Capture(hidden with { DisplayName = new string('W', 300) });
+        var emptyName = Capture(hidden with { DisplayName = string.Empty });
+        Assert.False(longName.AsSpan().SequenceEqual(emptyName));
         Capture(PlayerSelectionSummary.Empty);
         Assert.Equal(0, inspector.LastRenderedVertexCount);
         Assert.Equal(0, inspector.SkinDiagnostics.Vertices);

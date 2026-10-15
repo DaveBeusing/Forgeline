@@ -140,7 +140,7 @@ internal static class UiReferenceStates
             snapshot = BattlefieldHudCapture.State(snapshot, state == UiReferenceScenario.SelectionBuilding ? "Production" : "Supply");
             if (state == UiReferenceScenario.SelectionLongName)
                 snapshot = CopyExperience(snapshot, snapshot.PlayerExperience!.Value with
-                { Selection = snapshot.PlayerExperience.Value.Selection with { DisplayName = "Armoured reconnaissance and mobile support detachment — long identified name" } });
+                { Selection = snapshot.PlayerExperience.Value.Selection with { DisplayName = "Armoured reconnaissance and mobile support detachment " + new string('W', 240) } });
         }
         if (state == UiReferenceScenario.SelectionEmpty)
             snapshot = CopyExperience(snapshot, snapshot.PlayerExperience!.Value with { Selection = PlayerSelectionSummary.Empty });

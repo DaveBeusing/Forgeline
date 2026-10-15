@@ -416,7 +416,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
             header.Append(" ");
         }
 
-        header.Append(
+        header.AppendClipped(
             selection.DisplayName);
 
         if (!_text.Add(header.Written, x + (portrait ? 38 : 26) * _scale, y, 13 * _scale, TextColor,
@@ -1432,6 +1432,13 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
 
         public readonly ReadOnlySpan<char> Written =>
             _buffer[.._length];
+
+        public void AppendClipped(string value)
+        {
+            ReadOnlySpan<char> prefix = value.AsSpan(0, Math.Min(value.Length, _buffer.Length - _length));
+            prefix.CopyTo(_buffer[_length..]);
+            _length += prefix.Length;
+        }
 
         public void Append(
             string value)
