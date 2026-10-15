@@ -11,3 +11,7 @@ docs/qualification/directorate-ui-artwork/*.csv text eol=lf
 docs/qualification/directorate-ui-artwork/**/*.json text eol=lf
 docs/qualification/directorate-ui-artwork/terrain/native-manifest.json -text
 assets/source/ui/directorate/atlas/*.json text eol=lf
+
+docs/qualification/directorate-ui-atlas/*.json text eol=lf
+docs/qualification/directorate-ui-atlas/native-manifest.json -text
+docs/qualification/directorate-ui-atlas/packaged-*.json -text
