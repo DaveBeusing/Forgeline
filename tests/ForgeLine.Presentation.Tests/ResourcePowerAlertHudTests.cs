@@ -11,7 +11,8 @@ public sealed class ResourcePowerAlertHudTests
     [InlineData(double.PositiveInfinity, "N/A")]
     [InlineData(double.NegativeInfinity, "N/A")]
     [InlineData(0, "0")]
-    [InlineData(1200, "1.2K")]
+    [InlineData(1200, "1200")]
+    [InlineData(12000, "12.0K")]
     public void UnknownQuantityCannotBePresentedAsARealZero(double value, string expected)
     {
         Span<char> buffer = stackalloc char[40];
@@ -257,3 +258,4 @@ public sealed class ResourcePowerAlertHudTests
             feedback,
             default);
 }
+
