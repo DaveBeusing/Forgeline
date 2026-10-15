@@ -225,7 +225,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         float previousScale = _scale;
         _scale = ContextualCommandModel.TextScale(layout);
         if (!_skin.Panel(region, "panel.compact")) EmitQuad(region.X, region.Y, region.Width, region.Height, PanelColor, width, height);
-        DockText(ContextualCommandModel.Status(snapshot), region.X + 5 * _scale,
+        PrimaryCommandText(ContextualCommandModel.Status(snapshot), region.X + 5 * _scale,
             region.Y + 5 * _scale, region.Right - 5 * _scale, TextColor, 12, true, width, height);
         Span<char> promptBuffer = stackalloc char[128];
         bool localPending = ContextualCommandModel.HasPending(panel, snapshot);
@@ -237,7 +237,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             var visual = GameplayHudVisualStyle.ResolveItemState(focused, hovered, hovered && panel.ContextualPressed, command.Availability.CanActivate);
             if (!_skin.Control(button, command.Availability.CanActivate, focused, hovered, hovered && panel.ContextualPressed)) EmitQuad(button.X, button.Y, button.Width, button.Height, visual.Fill, width, height);
             EmitItemStateCue(button, visual, width, height);
-            DockText(command.Label, button.X + 5 * _scale, button.Y + 3 * _scale,
+            PrimaryCommandText(command.Label, button.X + 5 * _scale, button.Y + (_text.Ready ? 3 : 4) * _scale,
                 button.Right - 4 * _scale, TextColor, 12, true, width, height);
             var prompt = new HudTextBuilder(promptBuffer);
             if (command.Availability.CanActivate)
@@ -246,14 +246,21 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                 prompt.Append(command.Shortcut);
             }
             else prompt.Append(command.Availability.DisabledReason);
-            DockText(prompt.Written, button.X + 5 * _scale, button.Y + 17 * _scale, button.Right - 4 * _scale,
+            PrimaryCommandText(prompt.Written, button.X + 5 * _scale, button.Y + (_text.Ready ? 17 : 18) * _scale, button.Right - 4 * _scale,
                 MutedTextColor, 10, false, width, height);
         }
         string footer = targeting.IsActive ? "TARGETING - ESC CANCELS" :
             localPending || snapshot.PlayerActions?.PendingCommandCount > 0 ? "REQUEST PENDING - WAIT FOR RESULT" : (panel.Bindings ?? GameplayBindingRegistry.Default).DockModesPrompt;
-        DockText(footer, region.X + 5 * _scale, region.Bottom - 14 * _scale,
+        PrimaryCommandText(footer, region.X + 5 * _scale, region.Bottom - 14 * _scale,
             region.Right - 5 * _scale, MutedTextColor, 10, false, width, height);
         _scale = previousScale;
+    }
+
+    private void PrimaryCommandText(ReadOnlySpan<char> text, float x, float y, float right, Vector4 color,
+        float size, bool bold, int width, int height)
+    {
+        if (_text.Ready) DockText(text, x, y, right, color, size, bold, width, height);
+        else EmitClippedText(text, x, y, right, color, width, height);
     }
 
     private void EmitModeBar(PlayerActionPanelMode activeMode, GameplayBindingRegistry? bindings,
