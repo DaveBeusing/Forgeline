@@ -109,6 +109,11 @@ runtime classes.
 
 ## Evidence and maintenance
 
+The [semantic artwork catalog](UiIconArtwork.md) now supplies icon/portrait/cursor
+source mappings for these owners. Source availability does not change any row's
+pending live-migration or human-acceptance status. Existing legacy material icons
+remain active until the shared atlas renderer and consumer integration are qualified.
+
 [Skin contract](UiSkinArtwork.md) and `assets/source/ui/directorate/skin.catalog.json`
 define the available source families/states. [Qualification](UiSkinQualification.md)
 records exact validation status. Live migrations must update their rows with the

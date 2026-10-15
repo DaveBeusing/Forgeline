@@ -11,6 +11,8 @@ The text-free Directorate UI skin sources and editable vector masters use this
 same compiler boundary. See [skin artwork](UiSkinArtwork.md),
 [surface coverage](UiSurfaceCatalog.md) and [source qualification](UiSkinQualification.md).
 Reference boards stay outside source discovery and player packaging.
+The [semantic artwork and native roster portraits](UiIconArtwork.md) extend this
+same source contract. Their separate authoring executable is excluded from the player.
 
 The five Directorate industrial building kits are editable JSON component
 assemblies exported by `python build/Author-IndustrialBuildings.py`. Their glTF
