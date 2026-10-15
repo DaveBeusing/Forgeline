@@ -94,18 +94,21 @@ public sealed class UiSkinBatchTests
         Assert.Throws<InvalidOperationException>(()=>batch.Flush(context));
         Assert.Equal(4,device.Buffers.Count);
     }
-    [Fact]
-    public void NativeStraightAlphaIsAppliedOnceOverDarkAndBrightOutput()
+    [Theory]
+    [InlineData(1280)]
+    [InlineData(1028)]
+    public void NativeStraightAlphaIsAppliedOnceOverDarkAndBrightOutput(int requestedWidth)
     {
         using var fixture=new Fixture();using var platform=new WindowsPlatform();
-        using IWindow window=platform.CreateWindow(new("FORGELINE skin alpha",1280,720));
+        using IWindow window=platform.CreateWindow(new("FORGELINE skin alpha",requestedWidth,720));
         using var device=GraphicsDeviceFactory.CreateForWindow(window,new(){ForceSoftwareAdapter=true,EnableVSync=false,EnableDebugLayer=true});
         using(var resources=new UiSkinResources(device,fixture.Catalog,cancellationToken:TestContext.Current.CancellationToken))
         using(var batch=new UiSkinBatch(device,resources,maximumFlushes:2))
         {
+            int capturedWidth=0;
             byte[] Capture(float clear)=>device.CaptureFrame(new(clear,clear,clear,1),c=>
-            {c.BeginPass(GraphicsFramePass.Overlay);batch.Begin(c.Width,c.Height,c.FrameIndex);batch.Draw("ui.sprite.a",new(8,8,64,64),Vector4.One);batch.Flush(c);batch.Draw("ui.sprite.b",new(80,8,64,64),Vector4.One);batch.Flush(c);});
-            var dark=Capture(0);var bright=Capture(1);int pixel=(32*1280+32)*4;
+            {capturedWidth=c.Width;c.BeginPass(GraphicsFramePass.Overlay);batch.Begin(c.Width,c.Height,c.FrameIndex);batch.Draw("ui.sprite.a",new(8,8,64,64),Vector4.One);batch.Flush(c);batch.Draw("ui.sprite.b",new(80,8,64,64),Vector4.One);batch.Flush(c);});
+            var dark=Capture(0);var bright=Capture(1);int pixel=(32*capturedWidth+32)*4;
             Assert.InRange(dark[pixel],118,122);Assert.InRange(dark[pixel+1],58,62);Assert.InRange(dark[pixel+2],28,32);
             Assert.InRange(bright[pixel],245,249);Assert.InRange(bright[pixel+1],185,189);Assert.InRange(bright[pixel+2],155,159);
             Assert.Equal(dark,Capture(0));

@@ -47,13 +47,15 @@ public sealed class FrontendProductionSkinTests
         using var device=GraphicsDeviceFactory.CreateForWindow(window,new(){ForceSoftwareAdapter=true,EnableVSync=false});
         using var renderer=new FrontendOverlayRenderer(device);renderer.PrepareSkin(RuntimeAssetCatalog.Load(RuntimeRoot()));
         var view=View(FrontendSurfaceKind.PauseMenu);
-        byte[] Capture(float clear)=>device.CaptureFrame(new(clear,clear,clear,1),c=>renderer.Render(c,view));
+        int capturedWidth=0;
+        byte[] Capture(float clear)=>device.CaptureFrame(new(clear,clear,clear,1),c=>{capturedWidth=c.Width;renderer.Render(c,view);});
         var dark=Capture(0);var bright=Capture(1);var layout=renderer.LastLayout;
         int x=(int)(layout.PauseBackdrop.X+layout.PauseBackdrop.Width/2);
         int y=(int)(layout.MenuRow(0).Bottom+2);
-        int offset=(y*1280+x)*4;
+        int offset=(y*capturedWidth+x)*4;
         Assert.Equal(dark.AsSpan(offset,4).ToArray(),bright.AsSpan(offset,4).ToArray());
-        Assert.NotEqual(dark.AsSpan((y*1280+1200)*4,4).ToArray(),bright.AsSpan((y*1280+1200)*4,4).ToArray());
+        int outside=(y*capturedWidth+capturedWidth-4)*4;
+        Assert.NotEqual(dark.AsSpan(outside,4).ToArray(),bright.AsSpan(outside,4).ToArray());
     }
     [Fact]
     public void MenuRevealRemainsVisibleAtSupportedScales()
@@ -63,10 +65,11 @@ public sealed class FrontendProductionSkinTests
         using var renderer=new FrontendOverlayRenderer(device);renderer.PrepareSkin(RuntimeAssetCatalog.Load(RuntimeRoot()));
         foreach(float scale in new[]{.75f,1f,2f})
         {
-            var view=View(FrontendSurfaceKind.MainMenu) with { Layout=FrontendGeometry.Resolve(1280,720,scale,96) };
-            var settled=device.CaptureFrame(GraphicsColor.ForgeLineClear,c=>renderer.Render(c,view));
-            var revealing=view with { Motion=new UiMotionView(.5f,.5f,0) };
-            var animated=device.CaptureFrame(GraphicsColor.ForgeLineClear,c=>renderer.Render(c,revealing));
+            var view=View(FrontendSurfaceKind.MainMenu);
+            byte[] Capture(bool revealing)=>device.CaptureFrame(GraphicsColor.ForgeLineClear,c=>renderer.Render(c,
+                view with { Layout=FrontendGeometry.Resolve(c.Width,c.Height,scale,96),
+                    Motion=revealing ? new UiMotionView(.5f,.5f,0) : UiMotionView.Settled }));
+            var settled=Capture(false);var animated=Capture(true);
             Assert.False(settled.AsSpan().SequenceEqual(animated));
         }
     }
