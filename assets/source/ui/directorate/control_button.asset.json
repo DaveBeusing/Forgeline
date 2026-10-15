@@ -1,0 +1,9 @@
+{
+  "id": "ui.skin.directorate.control.button",
+  "type": "texture",
+  "source": "control_button.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

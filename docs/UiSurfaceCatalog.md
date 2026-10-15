@@ -29,7 +29,7 @@ text atlas. Shared geometry is `FrontendGeometry` in Presentation; interaction i
 | --- | --- | --- | --- |
 | Studio splash, regular/bootstrap/fade | `StudioSplashRenderer`; canonical embedded mark | Frontend splash composition; noninteractive | retain canonical mark; bootstrap remains independent |
 | Main menu backdrop, ready/loading/missing | `FrontendOverlayRenderer`, `FrontendMenuBackground`; compiled `branding.forgeline.menu.directorate`, procedural schematic fallback | `Background`, `MenuArtwork` | retain image; panel.primary for navigation shell |
-| Product mark, tagline, version/footer | `FrontendOverlayRenderer`, `ForgelineWordmark`; embedded canonical wordmark | `Header`, `Footer` | retain marks/live text; control.separator |
+| Product mark, tagline, version/footer | `FrontendOverlayRenderer`, `FrontendBrandMark`; embedded canonical wordmark | `Header`, `Footer` | retain marks/live text; control.separator |
 | Main menu entries, focus/disabled/hover/press | `FrontendOverlayRenderer`; geometric rows | `Navigation`, `MenuRow`, `MainMenuModel` | control.button, shared overlays |
 | Loading progress, preparation, cancellation/error | `FrontendOverlayRenderer`; geometric track/fill | `Details`, `PrimaryAction`, `SecondaryAction`, `FrontendLoadingController` | panel.dialog, progress.*, control.button, overlay.error |
 | New game scenario/seed/options, start/back | `FrontendOverlayRenderer`; detail rows | `DetailRow`, `DetailValue`, `NewGameModel` | panel.primary, control.row, control.button |

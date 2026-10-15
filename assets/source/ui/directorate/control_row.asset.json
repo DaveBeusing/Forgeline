@@ -1,0 +1,9 @@
+{
+  "id": "ui.skin.directorate.control.row",
+  "type": "texture",
+  "source": "control_row.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

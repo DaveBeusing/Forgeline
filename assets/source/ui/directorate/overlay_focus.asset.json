@@ -1,0 +1,9 @@
+{
+  "id": "ui.skin.directorate.overlay.focus",
+  "type": "texture",
+  "source": "overlay_focus.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "ui.skin.directorate.panel.inset",
+  "type": "texture",
+  "source": "panel_inset.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

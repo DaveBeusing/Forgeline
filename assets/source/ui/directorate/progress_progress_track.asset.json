@@ -1,0 +1,9 @@
+{
+  "id": "ui.skin.directorate.progress.progress_track",
+  "type": "texture",
+  "source": "progress_progress_track.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

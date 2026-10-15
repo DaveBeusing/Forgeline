@@ -1,0 +1,9 @@
+{
+  "id": "ui.skin.directorate.control.slider_thumb",
+  "type": "texture",
+  "source": "control_slider_thumb.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

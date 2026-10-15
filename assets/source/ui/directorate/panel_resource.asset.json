@@ -1,0 +1,9 @@
+{
+  "id": "ui.skin.directorate.panel.resource",
+  "type": "texture",
+  "source": "panel_resource.png",
+  "textureUsage": "displayImage",
+  "textureColorSpace": "linear",
+  "textureGenerateMipmaps": false,
+  "textureFormat": "rgba8Unorm"
+}

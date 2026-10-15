@@ -1,0 +1,1148 @@
+{
+  "schemaVersion": 1,
+  "purpose": "ui-skin-authoring-contract",
+  "runtimeLoader": "none; compile textures through the existing Asset Compiler",
+  "referenceCatalog": "assets/reference/ui/directorate/catalog.json",
+  "provenance": "Independent vector redraw informed by the reference styling; no reference pixels copied.",
+  "rightsEvidence": "Reference catalog records not_recorded; no additional license or redistribution permission asserted.",
+  "reviewStatus": "pending_human_review",
+  "paletteSource": "src/ForgeLine.Presentation/ForgeLineUiPalette.cs",
+  "sprites": [
+    {
+      "id": "ui.skin.directorate.panel.primary",
+      "file": "panel_primary.png",
+      "editableSource": "panel_primary.svg",
+      "width": 256,
+      "height": 128,
+      "insets": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "contentPadding": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "minimumSize": [
+        36,
+        36
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "2af0cad8d56353329cf9623d720692b1c352111a29a3e7b80d8dfaf423aa5fcb",
+      "editableSha256": "7d1253dc3ec6c535e82f15a5223b8f382e2b563a70d31509b84642a2eb77142f"
+    },
+    {
+      "id": "ui.skin.directorate.panel.compact",
+      "file": "panel_compact.png",
+      "editableSource": "panel_compact.svg",
+      "width": 128,
+      "height": 64,
+      "insets": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "contentPadding": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "minimumSize": [
+        24,
+        24
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "bfbe2473dec7e813cd2395c3eb604dd65978c55a018f9b0ea12f21e6bbb80f30",
+      "editableSha256": "229bf0ae4310a05ca072548c390a937f827f4fdea78a7acee66c3143749a39f9"
+    },
+    {
+      "id": "ui.skin.directorate.panel.raised",
+      "file": "panel_raised.png",
+      "editableSource": "panel_raised.svg",
+      "width": 128,
+      "height": 64,
+      "insets": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "contentPadding": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "minimumSize": [
+        24,
+        24
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "0d7a121538a665a0b4e70f30233da745f3a6b52400cb6533411ee369e0db7f6f",
+      "editableSha256": "c6dc563c2426271422da69fc8ea03d2a8b329ed453eab0b9ef0a53d59d4f2771"
+    },
+    {
+      "id": "ui.skin.directorate.panel.inset",
+      "file": "panel_inset.png",
+      "editableSource": "panel_inset.svg",
+      "width": 64,
+      "height": 64,
+      "insets": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "contentPadding": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "minimumSize": [
+        20,
+        20
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "4f4674fc51ed2010b93ad926633dfdc43b1c959790683d058b7e22d4fe221615",
+      "editableSha256": "2f688e6d933fad5bc3969674c1b0c93069d36e657f0afb1d7849ad9e981ee848"
+    },
+    {
+      "id": "ui.skin.directorate.panel.dialog",
+      "file": "panel_dialog.png",
+      "editableSource": "panel_dialog.svg",
+      "width": 256,
+      "height": 160,
+      "insets": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "contentPadding": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "minimumSize": [
+        40,
+        40
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "92a36ab23565dc04544d7ad797fccaae3d0e23fabaf029734bb275965e0fa3e2",
+      "editableSha256": "4b4f1c1db0f4819fcaa91a3c0e257a9ed4af2817d919214fbf6eda5bec2d0039"
+    },
+    {
+      "id": "ui.skin.directorate.panel.tooltip",
+      "file": "panel_tooltip.png",
+      "editableSource": "panel_tooltip.svg",
+      "width": 128,
+      "height": 64,
+      "insets": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "contentPadding": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "minimumSize": [
+        24,
+        24
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "53f68fd47e0ebf0fe82309041727e7f6ca803b83d6dced76b9c0c7c220f64d75",
+      "editableSha256": "409a323f6e491dfd69bfadf343aa364aa7a7175bcaa1df489626c818398f0bab"
+    },
+    {
+      "id": "ui.skin.directorate.panel.portrait",
+      "file": "panel_portrait.png",
+      "editableSource": "panel_portrait.svg",
+      "width": 96,
+      "height": 96,
+      "insets": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "contentPadding": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "minimumSize": [
+        40,
+        40
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "6da1fd1133f6df1dc81ee3edae0656f677937e0600bbc286fdc27c71f8b2d2f3",
+      "editableSha256": "b21928a0e827dd43f93759a86c911b866096315dc4d488aaa1e7c569fe2dc636"
+    },
+    {
+      "id": "ui.skin.directorate.panel.minimap",
+      "file": "panel_minimap.png",
+      "editableSource": "panel_minimap.svg",
+      "width": 128,
+      "height": 128,
+      "insets": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "contentPadding": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "minimumSize": [
+        40,
+        40
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "dcb559fe2c31cd05593c65a961f4ad7f35d26b9d794c1260ab8fc42116dc0fff",
+      "editableSha256": "86eb9ff531faa6c7815e098cdc1fd2fd64cdbab86105e526a92501426030a6f3"
+    },
+    {
+      "id": "ui.skin.directorate.panel.resource",
+      "file": "panel_resource.png",
+      "editableSource": "panel_resource.svg",
+      "width": 128,
+      "height": 40,
+      "insets": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "contentPadding": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "minimumSize": [
+        24,
+        24
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "606d129d65fa85c4c22bdfa8832a5a1401e97d62de59173e73c5d0660e5de796",
+      "editableSha256": "a7e5947ef8eb598205f751dae7d2e1ddac19f657f9c5e126d9b72043dbf242cc"
+    },
+    {
+      "id": "ui.skin.directorate.panel.banner",
+      "file": "panel_banner.png",
+      "editableSource": "panel_banner.svg",
+      "width": 256,
+      "height": 48,
+      "insets": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "contentPadding": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "minimumSize": [
+        28,
+        28
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "aaf0d8b04a41a7b1f668b6fc1160bde4a61259ff269a163e7d662a8fe8377c90",
+      "editableSha256": "bd3f8a79fef2c99c742f6ae7009522f9422aca84e853d661887f3074f1228a13"
+    },
+    {
+      "id": "ui.skin.directorate.control.button",
+      "file": "control_button.png",
+      "editableSource": "control_button.svg",
+      "width": 128,
+      "height": 40,
+      "insets": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "contentPadding": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "minimumSize": [
+        28,
+        28
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "383339452f04053f1e3b017e97e069fbf806473108f2ffb1271817b966699d19",
+      "editableSha256": "5d062c4ad0c92bb9048772ee64ae0114671096eeab6564461481350df8b71e06"
+    },
+    {
+      "id": "ui.skin.directorate.control.button_compact",
+      "file": "control_button_compact.png",
+      "editableSource": "control_button_compact.svg",
+      "width": 96,
+      "height": 28,
+      "insets": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "contentPadding": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "minimumSize": [
+        24,
+        24
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "f0e90d3b70f87368d8e32bb54991548d15759111be49aebdc3d788a05e591c10",
+      "editableSha256": "7175a6f8494bbea80d20801db31b1c08a1cd66f013c15e16b6e65d8f6c97af1c"
+    },
+    {
+      "id": "ui.skin.directorate.control.tab",
+      "file": "control_tab.png",
+      "editableSource": "control_tab.svg",
+      "width": 112,
+      "height": 32,
+      "insets": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "contentPadding": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "minimumSize": [
+        24,
+        24
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "825c938b7800ed199a06e4d3253374029ec9f339b644c8cbde144c875adf7da5",
+      "editableSha256": "0006a40dddd3cc76eb43e32d494b4b1d8e58eda5c131489ddf6fa0bb3945cb1e"
+    },
+    {
+      "id": "ui.skin.directorate.control.row",
+      "file": "control_row.png",
+      "editableSource": "control_row.svg",
+      "width": 192,
+      "height": 32,
+      "insets": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "contentPadding": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "minimumSize": [
+        24,
+        24
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "c9725c4d381d6cbc7143311d5944710913e23b6bde82eec770af1fb4f0137c49",
+      "editableSha256": "223dc93059a1a16d058471be76c0bcf1bdb08084a7bab553a0b4e21417f852b4"
+    },
+    {
+      "id": "ui.skin.directorate.control.row_compact",
+      "file": "control_row_compact.png",
+      "editableSource": "control_row_compact.svg",
+      "width": 128,
+      "height": 24,
+      "insets": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "contentPadding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "minimumSize": [
+        20,
+        20
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "f1cb3a9bcd3149c452d04774d52c4c405aa115b28e67debd7685958c1213e237",
+      "editableSha256": "f986e592ff9fd33a61cf61f2fdfe137fc515e05295f571d9f9d09d82d1a95099"
+    },
+    {
+      "id": "ui.skin.directorate.control.input",
+      "file": "control_input.png",
+      "editableSource": "control_input.svg",
+      "width": 192,
+      "height": 40,
+      "insets": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "contentPadding": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "minimumSize": [
+        28,
+        28
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "298a216fa8cb421afe5362f28b58b1d7afc11c8f2168cab6ab8be1a3640a3e29",
+      "editableSha256": "67e02900261bf1a612d70326fb59371014696e153998685bbed05de624087e74"
+    },
+    {
+      "id": "ui.skin.directorate.control.dropdown",
+      "file": "control_dropdown.png",
+      "editableSource": "control_dropdown.svg",
+      "width": 192,
+      "height": 40,
+      "insets": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "contentPadding": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "minimumSize": [
+        28,
+        28
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "298a216fa8cb421afe5362f28b58b1d7afc11c8f2168cab6ab8be1a3640a3e29",
+      "editableSha256": "67e02900261bf1a612d70326fb59371014696e153998685bbed05de624087e74"
+    },
+    {
+      "id": "ui.skin.directorate.control.checkbox",
+      "file": "control_checkbox.png",
+      "editableSource": "control_checkbox.svg",
+      "width": 24,
+      "height": 24,
+      "insets": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "contentPadding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "minimumSize": [
+        24,
+        24
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "7e47b043ad21ac6e8d4c743c3edd9beae68e004cb96644bf64d0ba6a3a9a0298",
+      "editableSha256": "c68d8429c06f98f2282d5b1b5a8cbf1bae3ab103699f4747c7c8ff15261c8615"
+    },
+    {
+      "id": "ui.skin.directorate.control.checkmark",
+      "file": "control_checkmark.png",
+      "editableSource": "control_checkmark.svg",
+      "width": 24,
+      "height": 24,
+      "insets": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "contentPadding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "minimumSize": [
+        24,
+        24
+      ],
+      "scaling": "fixed",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "615532d87c496aa4915703b65b7537ff92b49fdae59dae6f6d7d4841babdf1a0",
+      "editableSha256": "30844154dce7e41256131a8a165d85e0a542eae40e1c1a25fa4e8caed4f0b68f"
+    },
+    {
+      "id": "ui.skin.directorate.control.toggle_track",
+      "file": "control_toggle_track.png",
+      "editableSource": "control_toggle_track.svg",
+      "width": 48,
+      "height": 24,
+      "insets": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "contentPadding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "minimumSize": [
+        36,
+        24
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "e396d472c78855d5063aaadbc1bafed2754505555abbf63a79ddb5e9e7f7e03b",
+      "editableSha256": "eb021e821d90257bfbfe8345059fd96d525b635c02fb2dc39cbad5febb0f7700"
+    },
+    {
+      "id": "ui.skin.directorate.control.toggle_thumb",
+      "file": "control_toggle_thumb.png",
+      "editableSource": "control_toggle_thumb.svg",
+      "width": 20,
+      "height": 20,
+      "insets": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "contentPadding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "minimumSize": [
+        20,
+        20
+      ],
+      "scaling": "fixed",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "1bf8364f5e86b37e17c75d04d9ed781e98b468c91cd29eb4ea49ae5359000c46",
+      "editableSha256": "a9891d6799b096f0f0226ac91f64f49836f2a925fcbd043eb718f67105a1cb4b"
+    },
+    {
+      "id": "ui.skin.directorate.control.slider_track",
+      "file": "control_slider_track.png",
+      "editableSource": "control_slider_track.svg",
+      "width": 128,
+      "height": 12,
+      "insets": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "contentPadding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "minimumSize": [
+        12,
+        12
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "2f62de7d4424be240396975c38de331116459f7552ee1825bf45a03edcfae571",
+      "editableSha256": "36aca8d602503f997f1915c3d4dd5506422c965c7010b49081f25e89c89a13e9"
+    },
+    {
+      "id": "ui.skin.directorate.control.slider_thumb",
+      "file": "control_slider_thumb.png",
+      "editableSource": "control_slider_thumb.svg",
+      "width": 20,
+      "height": 28,
+      "insets": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "contentPadding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "minimumSize": [
+        20,
+        28
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "b1ef1b153f08476f5d08bf6969a2826efe7fca75a305cf0b35d1fa4d4116e819",
+      "editableSha256": "60dc959a118b8c16767ea8a8d21338c325abffa69aa1f5d396dd381e1f9311a6"
+    },
+    {
+      "id": "ui.skin.directorate.control.scrollbar_track",
+      "file": "control_scrollbar_track.png",
+      "editableSource": "control_scrollbar_track.svg",
+      "width": 12,
+      "height": 96,
+      "insets": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "contentPadding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "minimumSize": [
+        12,
+        12
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "d29b8c4d6cb5de19320973909572a24cfb6289a5b23a4b1e45ebe9215c96370f",
+      "editableSha256": "21cb4cc260c0696309cb76d2a9d17b136f4c945332f3c2d110fcdb59d6d02a7d"
+    },
+    {
+      "id": "ui.skin.directorate.control.scrollbar_thumb",
+      "file": "control_scrollbar_thumb.png",
+      "editableSource": "control_scrollbar_thumb.svg",
+      "width": 12,
+      "height": 32,
+      "insets": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "contentPadding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "minimumSize": [
+        12,
+        16
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "576d72ce457115151d00073e84bae9a4e89bae9041ca8c9752f5c2d2ed76a2c1",
+      "editableSha256": "4c30de25a8391b1a177231a21a30bb53016dc25e158bd8e701549e421f2a87d0"
+    },
+    {
+      "id": "ui.skin.directorate.control.separator",
+      "file": "control_separator.png",
+      "editableSource": "control_separator.svg",
+      "width": 64,
+      "height": 4,
+      "insets": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "contentPadding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "minimumSize": [
+        4,
+        4
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "32b183234c1e646c0f443875ed7afc013e0d8727ce3f4f021576fa08af59447b",
+      "editableSha256": "b7c2f314fda8dc97343a5a91fabc8580281420468b9acd918a35dd85bb625bb0"
+    },
+    {
+      "id": "ui.skin.directorate.progress.progress_track",
+      "file": "progress_progress_track.png",
+      "editableSource": "progress_progress_track.svg",
+      "width": 128,
+      "height": 12,
+      "insets": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "contentPadding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "minimumSize": [
+        12,
+        12
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "2f62de7d4424be240396975c38de331116459f7552ee1825bf45a03edcfae571",
+      "editableSha256": "36aca8d602503f997f1915c3d4dd5506422c965c7010b49081f25e89c89a13e9"
+    },
+    {
+      "id": "ui.skin.directorate.progress.progress_fill",
+      "file": "progress_progress_fill.png",
+      "editableSource": "progress_progress_fill.svg",
+      "width": 64,
+      "height": 8,
+      "insets": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "contentPadding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "minimumSize": [
+        6,
+        6
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "653b82413d4ab301ada6d5e9b57624ccb062817627541f3a34eec91cbe0bebfb",
+      "editableSha256": "1c245c07850e74c2bead9041894beca62bfc12d74fb7d194ae6fb14d5298cbc9"
+    },
+    {
+      "id": "ui.skin.directorate.overlay.hover",
+      "file": "overlay_hover.png",
+      "editableSource": "overlay_hover.svg",
+      "width": 128,
+      "height": 40,
+      "insets": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "contentPadding": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "minimumSize": [
+        24,
+        24
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "b5d37ff4fd378c3b408a1d1124c5b3bc66d1e4d21ad0803867b56e9ea660a77e",
+      "editableSha256": "14bc21d22c6ac53546fba7f65466824e1f7d6068a6ca4802e6f69c0b670ab0e4"
+    },
+    {
+      "id": "ui.skin.directorate.overlay.pressed",
+      "file": "overlay_pressed.png",
+      "editableSource": "overlay_pressed.svg",
+      "width": 128,
+      "height": 40,
+      "insets": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "contentPadding": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "minimumSize": [
+        24,
+        24
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "691c8fd189f4b9ce8bb635e0bff39a8634deaff180560087a4620fb960b71713",
+      "editableSha256": "2029c16c81604d99b28020dd2ca75890ef8090a363e4a477fc2bec404d5df8dd"
+    },
+    {
+      "id": "ui.skin.directorate.overlay.focus",
+      "file": "overlay_focus.png",
+      "editableSource": "overlay_focus.svg",
+      "width": 128,
+      "height": 40,
+      "insets": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "contentPadding": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "minimumSize": [
+        24,
+        24
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "390008585c936569618dab3551eeba06a324733f426da2a5d4643a98b19c0c95",
+      "editableSha256": "9320141823ed6e60444ac7f13e1b6a8de3bfe1768947fcdb9005a06d4e19a08a"
+    },
+    {
+      "id": "ui.skin.directorate.overlay.selected",
+      "file": "overlay_selected.png",
+      "editableSource": "overlay_selected.svg",
+      "width": 128,
+      "height": 40,
+      "insets": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "contentPadding": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "minimumSize": [
+        24,
+        24
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "704660a2676268b50c188954d5586978e3d987aa111f83fc6c37e5541c5c8ff4",
+      "editableSha256": "5aa4033e17344511f0d595f8d634b9ab714a1db4aa35d76dc0d41791abc41ff1"
+    },
+    {
+      "id": "ui.skin.directorate.overlay.disabled",
+      "file": "overlay_disabled.png",
+      "editableSource": "overlay_disabled.svg",
+      "width": 128,
+      "height": 40,
+      "insets": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "contentPadding": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "minimumSize": [
+        24,
+        24
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "3be9c08b4823955b849defc731e21b21c35c743b849c70e66f769ab9babdbddd",
+      "editableSha256": "f398c3884e6f77a72e327053f5b881599289f35865355fbcc14b5ebf63ebf0e0"
+    },
+    {
+      "id": "ui.skin.directorate.overlay.warning",
+      "file": "overlay_warning.png",
+      "editableSource": "overlay_warning.svg",
+      "width": 128,
+      "height": 40,
+      "insets": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "contentPadding": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "minimumSize": [
+        24,
+        24
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "d0b5787097905cd0266d254aef8147554e98a872ce403cf447873a6875fac6a2",
+      "editableSha256": "66eb43d9f62ebbb0d35530430de8fda8fbc39692d8549e19ab37554f5c9f578a"
+    },
+    {
+      "id": "ui.skin.directorate.overlay.error",
+      "file": "overlay_error.png",
+      "editableSource": "overlay_error.svg",
+      "width": 128,
+      "height": 40,
+      "insets": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "contentPadding": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "minimumSize": [
+        24,
+        24
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "454f4dc1df068fc6925a72bd94296a81f05efd23a76b4a5b5e6d70fb8546abbe",
+      "editableSha256": "c60048c9a7cdea0e529edc0234fda452b9221dfaaf05981e87ea7211fca994a1"
+    },
+    {
+      "id": "ui.skin.directorate.overlay.pending",
+      "file": "overlay_pending.png",
+      "editableSource": "overlay_pending.svg",
+      "width": 128,
+      "height": 40,
+      "insets": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "contentPadding": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "minimumSize": [
+        24,
+        24
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "b7755702262d38b387c5494b422dfec93975e03fc4cfa78b94d8dfa144485515",
+      "editableSha256": "7b0e4e16f29ce46ebe608d5f1c7f5375cadab55364791338da73621c4e08b6cd"
+    },
+    {
+      "id": "ui.skin.directorate.overlay.accepted",
+      "file": "overlay_accepted.png",
+      "editableSource": "overlay_accepted.svg",
+      "width": 128,
+      "height": 40,
+      "insets": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "contentPadding": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "minimumSize": [
+        24,
+        24
+      ],
+      "scaling": "nine_slice",
+      "edgePolicy": "stretch",
+      "centerPolicy": "stretch",
+      "alphaMode": "straight",
+      "sha256": "a672d067a7e6ab63e035d1289c9849a066097f941c10cc553e6cfe9f540e9ad2",
+      "editableSha256": "3474baa14bf256a551b1935a7ab15974e0faea0ea40790d5183c9ce0327d7b5e"
+    }
+  ],
+  "states": {
+    "normal": [],
+    "hover": [
+      "ui.skin.directorate.overlay.hover"
+    ],
+    "pressed": [
+      "ui.skin.directorate.overlay.pressed"
+    ],
+    "focus": [
+      "ui.skin.directorate.overlay.focus"
+    ],
+    "selected": [
+      "ui.skin.directorate.overlay.selected"
+    ],
+    "disabled": [
+      "ui.skin.directorate.overlay.disabled"
+    ],
+    "warning": [
+      "ui.skin.directorate.overlay.warning"
+    ],
+    "error": [
+      "ui.skin.directorate.overlay.error"
+    ],
+    "pending": [
+      "ui.skin.directorate.overlay.pending"
+    ],
+    "accepted": [
+      "ui.skin.directorate.overlay.accepted"
+    ],
+    "rejected": [
+      "ui.skin.directorate.overlay.error"
+    ]
+  },
+  "compositionOrder": [
+    "base",
+    "hover_or_pressed",
+    "selected",
+    "semantic_status",
+    "focus",
+    "disabled",
+    "live_text"
+  ],
+  "disabledSuppresses": [
+    "hover",
+    "pressed",
+    "pending",
+    "accepted"
+  ],
+  "futureControls": [
+    "input",
+    "dropdown",
+    "checkbox",
+    "toggle",
+    "slider",
+    "scrollbar"
+  ],
+  "notes": [
+    "Control glyphs and live labels are separate; dropdown needs a semantic chevron.",
+    "Normal means the base sprite with no overlay; focus and selected may coexist.",
+    "Do not scale below minimumSize; choose compact variants or relayout.",
+    "Bounds are the full PNG; the outermost pixel perimeter is transparent.",
+    "Atlas extrusion, renderer mapping and consumer integration are subsequent work."
+  ]
+}
