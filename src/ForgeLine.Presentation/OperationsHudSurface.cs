@@ -16,7 +16,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
     private readonly GameplayHudSkin _skin;
     private readonly Dictionary<int, IGraphicsBuffer> _buffers = new(4);
     private readonly OperationsVertex[] _vertices = new OperationsVertex[MaxVertices];
-    private int _count, _line, _width, _height;
+    private int _count, _line, _width, _height, _underlay;
     private HudRect _bounds;
     private float _scale;
     private bool _disposed;
@@ -37,7 +37,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
         _width = context.Graphics.Width; _height = context.Graphics.Height;
         if (_width <= 0 || _height <= 0) return;
         _skin.Begin(context.Graphics);
-        _count = 0; _line = 0;
+        _count = 0; _line = 0; _underlay = 0;
         _scale = MathF.Min(context.Layout.Scale, OperationsLayout.Entry(context.Layout).Width / 126);
         _bounds = OperationsLayout.Entry(context.Layout);
         bool panelVisible = context.Operations.Open && !context.Operations.Suppressed && context.Operations.Session == context.Snapshot.SessionId;
@@ -53,6 +53,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
             _bounds = OperationsLayout.Panel(context.Layout); _line = 0;
             if (_scale > 0)
             {
+                if (_skin.Ready) { Quad(_bounds, GameplayHudVisualStyle.PanelBackground with { W = 1 }); _underlay = _count; }
                 if (!_skin.Panel(_bounds)) Quad(_bounds, GameplayHudVisualStyle.PanelBackground with { W = 1 });
                 var header = new HudRect(_bounds.X, _bounds.Y, _bounds.Width, 24 * _scale);
                 if (!_skin.Panel(header, "panel.raised")) Quad(header, GameplayHudVisualStyle.PanelHeader);
@@ -132,14 +133,19 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
             }
         }
         if (_count == 0 && _skin.Vertices == 0 && _text.VertexCount == 0) return;
-        _skin.Flush(context.Graphics);
+        IGraphicsBuffer? frameBuffer = null;
         if (_count > 0)
         {
             if (!_buffers.TryGetValue(context.Graphics.FrameIndex, out var buffer))
             { buffer = _graphics.CreateBuffer(new GraphicsBufferDescription(MaxVertices * 24UL, GraphicsBufferMemory.Upload)); _buffers.Add(context.Graphics.FrameIndex, buffer); }
             buffer.SetData<OperationsVertex>(_vertices.AsSpan(0, _count));
-            context.Graphics.SetPipeline(_pipeline); context.Graphics.SetVertexBuffer(buffer, 24); context.Graphics.Draw(_count);
+            frameBuffer = buffer;
+            if (_underlay > 0)
+            { context.Graphics.SetPipeline(_pipeline); context.Graphics.SetVertexBuffer(buffer, 24); context.Graphics.Draw(_underlay); }
         }
+        _skin.Flush(context.Graphics);
+        if (frameBuffer is not null && _count > _underlay)
+        { context.Graphics.SetPipeline(_pipeline); context.Graphics.SetVertexBuffer(frameBuffer, 24); context.Graphics.Draw(_count - _underlay, _underlay); }
         _text.Render(context.Graphics);
         LastRenderedVertexCount = _count + _text.VertexCount + _skin.Vertices;
     }

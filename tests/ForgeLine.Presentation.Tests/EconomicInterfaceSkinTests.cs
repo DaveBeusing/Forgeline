@@ -118,6 +118,26 @@ public sealed class EconomicInterfaceSkinTests
         }
     }
     [Fact]
+    public void NativeThinMetersRetainVisibleClippedFillAndUnknownNeverLooksCompleted()
+    {
+        using var platform = new WindowsPlatform(); using IWindow window = platform.CreateWindow(new("FORGELINE queue meters",1280,720));
+        using var device = GraphicsDeviceFactory.CreateForWindow(window,new() { ForceSoftwareAdapter = true,EnableVSync = false });
+        using var skin = new GameplayHudSkin(device,RuntimeAssetCatalog.Load(Path.Combine(Root(),"assets/runtime")));
+        foreach (float height in new[] { 2f,4f,6f })
+        {
+            byte[] Capture(double fraction) => device.CaptureFrame(GraphicsColor.ForgeLineClear,c =>
+            { skin.Begin(c); skin.Bar(new(20,20,200,height),fraction,Vector4.One); skin.Flush(c); });
+            var empty = Capture(0); var half = Capture(.5); var full = Capture(1); var unknown = Capture(double.NaN);
+            Assert.True(empty.AsSpan().SequenceEqual(unknown));
+            int halfChanges = Differences(empty,half), fullChanges = Differences(empty,full);
+            Assert.True(halfChanges > 0,$"{height}px meter lost its fill");
+            Assert.True(fullChanges > halfChanges,$"{height}px meter did not clip progress");
+            Assert.Equal(0,skin.Diagnostics.DroppedQuads);
+        }
+        static int Differences(byte[] left, byte[] right)
+        { int count = 0; for (int i = 0; i < left.Length; i++) if (left[i] != right[i]) count++; return count; }
+    }
+    [Fact]
     public void NativeOperationsRejectsStaleFactsAndSelectionNeverCachesRetiredFacilityData()
     {
         using var platform = new WindowsPlatform(); using IWindow window = platform.CreateWindow(new("FORGELINE operations skin", 1280,720));
@@ -130,8 +150,10 @@ public sealed class EconomicInterfaceSkinTests
                 2, null, null, 100, 20, null, null, PlayerActionPanelMode.UnitProduction);
             var data = new OperationsSnapshot(new(1), new(1), new(1), [row], [], [], 1,0);
             var view = new OperationsView(true, Session: new(1), Selected: entity);
-            byte[] Capture(PresentationSnapshot snapshot, OperationsView state) => device.CaptureFrame(GraphicsColor.ForgeLineClear, c =>
+            int width = 0,height = 0;
+            byte[] Capture(PresentationSnapshot snapshot, OperationsView state, GraphicsColor? background = null) => device.CaptureFrame(background ?? GraphicsColor.ForgeLineClear, c =>
             {
+                width = c.Width; height = c.Height;
                 var layout = GameplayHudLayout.Create(c.Width,c.Height,96,1);
                 surface.Render(new(c,new RtsCamera(),snapshot,new AxisAlignedBounds(new(-100),new(100)),default,default,default,
                     FormationTemplate.Compact,CombatGroupOverviewView.Empty,default,layout,96,1,null,Operations: state));
@@ -142,6 +164,12 @@ public sealed class EconomicInterfaceSkinTests
             var waiting = Capture(Snapshot(), view);
             var stale = Capture(Snapshot(operations: new(new(2),new(1),new(1),[row],[],[],1,0)), view);
             Assert.True(waiting.AsSpan().SequenceEqual(stale));
+            var blue = Capture(Snapshot(operations:data),view,new(0,0,1,1));
+            var red = Capture(Snapshot(operations:data),view,new(1,0,0,1));
+            Assert.False(blue.AsSpan().SequenceEqual(red));
+            var panel = OperationsLayout.Panel(GameplayHudLayout.Create(width,height,96,1));
+            int pixel = ((int)(panel.Y + panel.Height * .7f) * width + (int)(panel.X + panel.Width * .5f)) * 4;
+            Assert.True(blue.AsSpan(pixel,4).SequenceEqual(red.AsSpan(pixel,4))); // Existing opaque ownership, underneath transparent artwork.
             long uploads = device.Diagnostics.Resources.TextureUploadCount;
             Capture(Snapshot(operations: data), view);
             Assert.Equal(uploads, device.Diagnostics.Resources.TextureUploadCount);

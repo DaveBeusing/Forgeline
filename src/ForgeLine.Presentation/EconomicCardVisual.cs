@@ -76,6 +76,7 @@ internal readonly record struct EconomicCardVisual(UiSkinState State, string Lab
     internal static RtsUiIcon Icon(PlayerActionPanelMode mode, int index, PlayerActionSnapshot? actions)
     {
         if (actions is null || index < 0) return RtsUiIcon.StatusAlert;
+        if (mode == PlayerActionPanelMode.Production) return RtsUiIcon.BuildingProcessing;
         // Explicit TechnologyId bindings from artwork.catalog.json. Unknown future identities stay neutral.
         if (mode == PlayerActionPanelMode.Technology && index < actions.Technology.Count)
             return actions.Technology[index].TechnologyId.Value switch

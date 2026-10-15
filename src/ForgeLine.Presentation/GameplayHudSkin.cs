@@ -122,9 +122,11 @@ internal sealed class GameplayHudSkin : IDisposable
     internal bool Bar(HudRect r, double fraction, Vector4 tint)
     {
         if (_panels is null) return false;
-        _panels.Draw("ui.skin.directorate.progress.progress_track", Rect(r), Vector4.One, true);
+        // Resample the complete sprite below its authored height: compressed borders would remove the centre.
+        bool sliced = r.Height >= 12;
+        _panels.Draw("ui.skin.directorate.progress.progress_track", Rect(r), Vector4.One, sliced);
         if (double.IsFinite(fraction))
-            _panels.Draw("ui.skin.directorate.progress.progress_fill", Rect(r), tint, true, (float)Math.Clamp(fraction,0,1));
+            _panels.Draw("ui.skin.directorate.progress.progress_fill", Rect(r), tint, sliced, (float)Math.Clamp(fraction,0,1));
         return true;
     }
     internal void Flush(IGraphicsCommandContext context) { _panels?.Flush(context); _symbols?.Flush(context); _images?.Flush(context); }
