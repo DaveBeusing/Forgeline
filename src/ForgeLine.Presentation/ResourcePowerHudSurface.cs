@@ -786,7 +786,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             SeverityColor(
                 severity);
 
-        EmitQuad(
+        var card = new HudRect(region.X, y, region.Width, cardHeight);
+        if (!_skin.Panel(card, "panel.raised")) EmitQuad(
             region.X,
             y,
             region.Width,
@@ -794,6 +795,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             GameplayHudVisualStyle.PanelRaised,
             width,
             height);
+        _skin.State(card, severity == HudAlertSeverity.Critical ? UiSkinState.Error :
+            severity == HudAlertSeverity.Warning ? UiSkinState.Warning : UiSkinState.Normal);
         EmitQuad(
             region.X,
             y,
@@ -1188,6 +1191,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         int width,
         int height)
     {
+        if (_skin.Icon(icon, x, y, size)) return;
         RtsUiIconDefinition definition =
             RtsUiIconCatalog.Get(
                 icon);
