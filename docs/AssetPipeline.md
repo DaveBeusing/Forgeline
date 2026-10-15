@@ -7,6 +7,11 @@ outputs through the normal compiler; see [environment composition](EnvironmentDr
 
 ## Purpose
 
+[Compiled UI atlases and skin rendering](UiAtlasRendering.md) add compiler 1.10.0
+and the bounded UiSkin binary payload. Authored atlas regions reference ordinary
+compiled page textures and share existing manifest/container integrity.
+
+
 The text-free Directorate UI skin sources and editable vector masters use this
 same compiler boundary. See [skin artwork](UiSkinArtwork.md),
 [surface coverage](UiSurfaceCatalog.md) and [source qualification](UiSkinQualification.md).
@@ -56,7 +61,7 @@ requires the pinned SDK and restored dependencies (or access to their package
 sources), but does not require an existing runtime cache. Its output must stay
 inside repository `artifacts`; an existing archive is never replaced.
 
-Compiler 1.9.0 emits integrity contract 1 alongside unchanged manifest format 1,
+Compiler 1.10.0 emits integrity contract 1 alongside unchanged manifest format 1,
 FLAS header 1 and aggregate runtime version 4. Records contain `runtimeBytes` and
 full-container `runtimeHash` (lowercase SHA-256). `contentSignature` hashes the
 canonical serialized manifest with that field empty and includes all record

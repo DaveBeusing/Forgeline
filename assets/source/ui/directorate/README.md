@@ -22,3 +22,8 @@ boards remain unchanged and are not compiled or packaged with the player.
 
 See `docs/UiSkinArtwork.md`, `docs/UiSurfaceCatalog.md` and
 `docs/UiSkinQualification.md` for the complete integration boundary and results.
+
+The `atlas/` derivatives pack all runtime-required skin/artwork sources. Run
+`python build/Author-UiAtlas.py`, then compile through the existing compiler.
+The player consumes binary `ui.skin.directorate.compiled` plus compiled pages;
+source catalogs and atlas JSON never ship. See `docs/UiAtlasRendering.md`.

@@ -20,8 +20,8 @@ under the same persistent ID. The new sources use the skin contract's common
 `id/file/width/height/insets/contentPadding/minimumSize/scaling/alphaMode` fields.
 Pictograms/portraits are fixed-size sprites with zero slice insets. Extensions
 record semantic availability, visible bounds, cursor hotspot and portrait identity.
-There is no second atlas loader or player-side JSON/SVG parser. The next atlas
-compiler consumes these authoring contracts and ordinary compiled textures.
+There is no second atlas loader or player-side JSON/SVG parser. The [compiled atlas path](UiAtlasRendering.md) consumes these authoring contracts
+and ordinary compiled textures.
 
 ## Semantic coverage and consumers
 
@@ -146,7 +146,7 @@ Channel-loss aids are diagnostic proxies, not calibrated color-vision simulation
 or human accessibility acceptance. Pixel/source validity, native repeatability,
 gameplay identity, integrated usability and human art decisions remain separate.
 
-Atlas packing/rendering, role-based live binding, actual cursor installation,
+Atlas packing/rendering is implemented. Role-based live binding, actual cursor installation,
 live contact privacy and final physical-display acceptance belong to their
-subsequent integration scopes. Every surface in the existing inventory remains
+subsequent integration scopes. The representative first menu control is migrated; the other surfaces remain
 pending migration. No source-validity result grants final AAA acceptance.
