@@ -228,7 +228,7 @@ internal static class VisualReferenceCapture
                             HasReadiness = true, Readiness = .31, HasFormation = true, Formation = FormationTemplate.Wedge }], []) : CombatGroupOverviewView.Empty;
                     if (uiScenario == UiReferenceScenario.SelectedGroup && SelectedCombatGroup.Resolve(snapshot) is { } groupMembers)
                     {
-                        var selectedUnits = new SelectionSet(); selectedUnits.Replace(groupMembers.EligibleEntities);
+                        var selectedUnits = new SelectionSet(); selectedUnits.Replace(groupMembers.EligibleEntities.ToArray());
                         groups = new CombatGroupOverviewView([], [], SelectedCombatGroup.Create(groupMembers, selectedUnits));
                     }
                     int recordFrameIndex = -1;
@@ -468,3 +468,4 @@ internal static class VisualReferenceCapture
         return Convert.ToHexString(hash.GetHashAndReset());
     }
 }
+
