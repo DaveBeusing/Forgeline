@@ -34,7 +34,7 @@ public sealed class GameplayHudRenderer : IDisposable
             prepared.Add(new PlayerActionDockHudSurface(graphics, runtimeAssets));
             prepared.Add(new RtsInformationHudSurface(graphics, runtimeAssets));
             prepared.Add(new WorldHoverTooltipSurface(graphics, runtimeAssets));
-            prepared.Add(new OperationsHudSurface(graphics));
+            prepared.Add(new OperationsHudSurface(graphics, runtimeAssets));
             _surfaces = prepared.ToArray();
         }
         catch
