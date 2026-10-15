@@ -106,7 +106,7 @@ internal static class ClientBootstrap
             if (!string.IsNullOrWhiteSpace(loaded.RecoveryMessage))
                 Console.WriteLine($"[settings:recovery] {loaded.RecoveryMessage}");
             RtsReferenceZoom zoom = ArgumentValue(args, "--reference-zoom") is string raw
-                ? Enum.Parse<RtsReferenceZoom>(raw, true) : RtsReferenceZoom.NormalGameplay;
+                ? Enum.Parse<RtsReferenceZoom>(raw, true) : loaded.Settings.ReferenceZoom;
             platform.ConfigureBootstrap(window, loaded.Settings.CreateWindowConfiguration());
             platform.UpdateBootstrap(window, "PREPARING GRAPHICS");
             var application = new ClientApplication(platform, loaded.Settings with { ReferenceZoom = zoom },

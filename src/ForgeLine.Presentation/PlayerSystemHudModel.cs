@@ -7,7 +7,7 @@ internal static class PlayerSystemHudModel
     public const int HelpLineCount = 10;
 
     public const string OnboardingHint =
-        "HOME BASE  F1 HELP  SPACE PAUSE  SHIFT+F12 GUIDE";
+        "HOME BASE  ESC CONTROLS  SPACE PAUSE  SHIFT+F12 GUIDE";
 
     public static string ResolveMatchResultLabel(
         PlayerMatchStatus status) =>
@@ -36,7 +36,7 @@ internal static class PlayerSystemHudModel
             3 =>
                 "B BUILD  P PROCESS  U UNITS  L LOGISTICS  Y SUPPLY",
             4 =>
-                "F10 STRATEGIC OVERLAY  F11 MINIMAP  F1/F12/ESC CLOSE HELP",
+                "F10 STRATEGIC OVERLAY  F11 MINIMAP  ESC PAUSE / CONTROLS",
             5 =>
                 "ESC OR SPACE PAUSE  SHIFT+F1 METRICS  F2 WORLD DEBUG",
             6 => "SHIFT+F12 SHOW / HIDE OPTIONAL MATCH GUIDE",

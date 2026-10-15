@@ -21,7 +21,7 @@ public sealed class GameplayInteractionJourneyTests
     [InlineData(3440, 1440, 120, ControllableEntityCategory.Unit)]
     [InlineData(3840, 2160, 144, ControllableEntityCategory.Building)]
     [InlineData(5120, 2160, 192, ControllableEntityCategory.Unit)]
-    public void LoadedWorldSupportsOrdersHelpFocusResizeAndSessionReplacement(
+    public void LoadedWorldSupportsOrdersUnboundF1FocusResizeAndSessionReplacement(
         int width, int height, uint dpi, ControllableEntityCategory category)
     {
         var journey = new Journey(width, height, dpi, category);
@@ -76,30 +76,16 @@ public sealed class GameplayInteractionJourneyTests
         Assert.True(journey.Selection.CommandFeedback.IsVisible);
         Assert.False(journey.Selection.TryTakeMovementRequest(out _));
 
+        // F1 is unbound during gameplay: no modal and no swallowed camera input.
         journey.Input.BeginFrame();
         Key(journey.Input, PlatformKey.D, true);
-        Button(journey.Input, PlatformMouseButton.Right, true, width / 2, height / 2);
         Key(journey.Input, PlatformKey.F1, true);
         target = journey.Camera.Target;
         journey.Frame();
-        Assert.True(journey.Help.Visible);
-        Assert.Equal(target, journey.Camera.Target);
-        Assert.False(journey.Selection.CommandFeedback.IsVisible);
-        Assert.False(journey.Selection.TryTakeMovementRequest(out _));
-        journey.Input.BeginFrame();
-        Key(journey.Input, PlatformKey.Escape, true);
-        journey.Frame();
-        Assert.False(journey.Help.Visible);
-        Assert.True(journey.Help.BlocksGameplayThisFrame);
-        journey.Input.BeginFrame();
-        journey.Frame();
-        Assert.Equal(target, journey.Camera.Target);
+        Assert.NotEqual(target, journey.Camera.Target);
         Assert.True(journey.Selection.Selection.Contains(journey.Entity));
-        // Physical release is necessary before fresh input may resume after the modal.
         Key(journey.Input, PlatformKey.D, false);
         Key(journey.Input, PlatformKey.F1, false);
-        Key(journey.Input, PlatformKey.Escape, false);
-        Button(journey.Input, PlatformMouseButton.Right, false, width / 2, height / 2);
 
         journey.StartDrag();
         journey.Input.BeginFrame();
@@ -208,7 +194,6 @@ public sealed class GameplayInteractionJourneyTests
         public RenderWorld World { get; } = new();
         public RtsSelectionController Selection { get; } = new(new SelectionFilter(new PlayerId(1),
             ControllableEntityCategory.Unit | ControllableEntityCategory.Building));
-        public GameplayHelpController Help { get; } = new();
         public HudInteractionContext Hud { get; } = new();
         public RtsMinimapInteractionController Minimap { get; } = new();
         public GameplayHudLayout Layout => GameplayHudLayout.Create(Width, Height, dpi);
@@ -225,11 +210,8 @@ public sealed class GameplayInteractionJourneyTests
 
         public void Frame()
         {
-            bool helpChanged = Help.Update(Input, true);
-            if (helpChanged || Input.FocusLostThisFrame) Selection.CancelPointerInteraction();
+            if (Input.FocusLostThisFrame) Selection.CancelPointerInteraction();
             Hud.BeginFrame(World.CurrentSnapshot?.SessionId ?? default);
-            Hud.CapturePointer(Help.BlocksGameplayThisFrame);
-            Hud.CaptureKeyboard(Help.BlocksGameplayThisFrame);
             Minimap.Update(Input, Camera, _terrain, World.CurrentSnapshot, Layout, Selection.Selection.Entities,
                 TacticalTargetingMode.None, FormationTemplate.Compact, inputBlocked: Hud.PointerCaptured);
             Hud.CapturePointer(Minimap.PointerCaptured);

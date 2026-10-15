@@ -53,7 +53,7 @@ internal sealed class ClientApplication
         };
 
     private readonly IPlatform _platform;
-    private readonly ClientUserSettings _settings;
+    private ClientUserSettings _settings;
     private readonly GameplayBindingRegistry _gameplayBindings;
     private readonly string _settingsPath;
     private readonly StartupDiagnostics _startup;
@@ -517,13 +517,11 @@ internal sealed class ClientApplication
         bool restartHeld = false;
         bool returnHeld = false;
         bool pauseHeld = false;
-        var helpController = new GameplayHelpController();
         var guidanceInteraction = new GameplayGuidanceInteraction();
         var guidance = new EarlyGameGuidanceController();
         var cameraFocus = new RtsCameraFocusController(LocalPlayer);
         ulong pendingPlacementHostSequence = 0;
         var hoverTooltip = new HoverTooltipController();
-        bool helpPointerHeld = false;
         var modalLifetime = new FrontendInputLifetime();
         int controlsScroll = 0;
         bool pauseMenuUpHeld = false;
@@ -532,7 +530,7 @@ internal sealed class ClientApplication
         bool pauseMenuPrimaryPointerHeld = false;
         bool pauseMenuActive = false;
         bool pauseControlsVisible = false;
-        bool helpVisible = false;
+        using var pauseSettings = new PausedSettingsController(window, _settings, CreateSettingsAdapter());
         string pauseMenuFeedback = string.Empty;
         FormationTemplate activeFormation =
             FormationTemplate.Compact;
@@ -614,42 +612,27 @@ internal sealed class ClientApplication
                 frameElapsed.TotalSeconds,
                 MaximumCameraDeltaSeconds);
 
-            bool wasShellBlocking = pauseMenuActive || helpVisible;
+            bool wasShellBlocking = pauseMenuActive;
             guidanceInteraction.Update(inputState, renderWorld.CurrentSnapshot?.SessionId ?? SimulationSessionId.None,
                 _settings.ShowOnboarding && !smokeTest && !wasShellBlocking && window.IsFocused &&
                 renderWorld.CurrentSnapshot?.PlayerExperience is { IsMatchComplete: false });
             FrontendLayout modalLayout = FrontendDesign.ResolveLayout(window.ClientSize.Width, window.ClientSize.Height,
-                _settings.UiScale, window.Dpi, helpController.Visible || pauseControlsVisible);
-            if (modalLifetime.Update(inputState, modalLayout.Geometry, pauseMenuActive ? (pauseControlsVisible ? 2 : 1) : helpController.Visible ? 3 : 0,
+                _settings.UiScale, window.Dpi, pauseControlsVisible);
+            if (modalLifetime.Update(inputState, modalLayout.Geometry, pauseMenuActive ? (pauseSettings.Visible ? 4 : pauseControlsVisible ? 2 : 1) : 0,
                 window.IsFocused && !window.IsMinimized && !window.ClientSize.IsEmpty))
             {
-                helpPointerHeld = pauseMenuPrimaryPointerHeld = false;
+                pauseMenuPrimaryPointerHeld = false;
                 controlsScroll = 0;
             }
-            if (helpController.Visible || pauseControlsVisible)
+            if (pauseControlsVisible)
             {
                 if (inputState.WasKeyPressed(PlatformKey.Down) || inputState.WheelDelta < 0) controlsScroll++;
                 if (inputState.WasKeyPressed(PlatformKey.Up) || inputState.WheelDelta > 0) controlsScroll = Math.Max(0, controlsScroll - 1);
             }
-            bool helpPointerDown = inputState.IsMouseButtonDown(PlatformMouseButton.Left);
-            bool helpPointerPressed = helpPointerDown && !helpPointerHeld;
-            helpPointerHeld = helpPointerDown;
-            bool helpChanged = helpController.Update(inputState, !pauseMenuActive);
-            if (helpController.Visible && helpPointerPressed && inputState.HasPointerPosition &&
-                !window.ClientSize.IsEmpty)
-            {
-                FrontendLayout helpLayout = modalLayout;
-                if (FrontendHitTesting.SecondaryAction(inputState.PointerPosition.X, inputState.PointerPosition.Y, helpLayout) ||
-                    FrontendHitTesting.Footer(inputState.PointerPosition.X, inputState.PointerPosition.Y, helpLayout))
-                {
-                    helpController.Dismiss(inputState);
-                    helpChanged = true;
-                }
-            }
-            helpVisible = helpController.Visible;
-            bool modalFrame = wasShellBlocking || helpController.BlocksGameplayThisFrame || guidanceInteraction.BlocksGameplayThisFrame;
-            bool metricsDown = inputState.IsKeyDown(PlatformKey.F1) &&
-                (inputState.IsKeyDown(PlatformKey.LeftShift) || inputState.IsKeyDown(PlatformKey.RightShift));
+            bool modalFrame = wasShellBlocking || guidanceInteraction.BlocksGameplayThisFrame;
+            bool metricsDown = inputState.WasKeyPressedWithShift(PlatformKey.F1) ||
+                (inputState.IsKeyDown(PlatformKey.F1) &&
+                 (inputState.IsKeyDown(PlatformKey.LeftShift) || inputState.IsKeyDown(PlatformKey.RightShift)));
             if (!modalFrame && metricsDown && !overlayToggleHeld)
                 overlayEnabled = !overlayEnabled;
             overlayToggleHeld = metricsDown;
@@ -687,8 +670,20 @@ internal sealed class ClientApplication
                 }
             }
 
+            bool settingsOwnedFrame = pauseSettings.Visible;
+            if (pauseSettings.Visible)
+            {
+                ClientUserSettings? applied = pauseSettings.Update(inputState, modalLayout,
+                    renderHost.LatestQualification?.Surface ?? default);
+                if (applied is not null)
+                {
+                    _settings = PausedSettingsController.LiveSettings(_settings, applied);
+                    camera.ConfigureControls(_settings.EdgeScrollEnabled, _settings.CameraPanSpeedMultiplier);
+                }
+            }
+
             bool pausePressed =
-                !helpController.BlocksGameplayThisFrame && ConsumeKeyPress(
+                ConsumeKeyPress(
                     inputState,
                     _gameplayBindings.Key(GameplayAction.Pause),
                     ref pauseHeld);
@@ -705,7 +700,7 @@ internal sealed class ClientApplication
                     PlatformKey.R,
                     ref restartHeld);
             bool returnPressed =
-                !helpController.BlocksGameplayThisFrame && ConsumeKeyPress(
+                ConsumeKeyPress(
                     inputState,
                     PlatformKey.Escape,
                     ref returnHeld);
@@ -734,6 +729,7 @@ internal sealed class ClientApplication
                     string.Empty;
             }
             else if (!inputMatchTerminal &&
+                     !settingsOwnedFrame &&
                      (pausePressed ||
                       returnPressed))
             {
@@ -743,11 +739,10 @@ internal sealed class ClientApplication
                     false;
                 pauseMenuFeedback =
                     string.Empty;
-                helpVisible =
-                    false;
             }
 
             if (pauseMenuActive &&
+                !settingsOwnedFrame &&
                 !inputMatchTerminal)
             {
                 FrontendLayout pauseLayout = modalLayout;
@@ -858,6 +853,12 @@ internal sealed class ClientApplication
                             pauseMenuFeedback =
                                 string.Empty;
                         }
+                        else if (pauseMenuCommand == PauseMenuCommand.Settings)
+                        {
+                            pauseSettings.Open(_settings);
+                            pauseMenuCommand = null;
+                            inputState.SuppressHeldInput();
+                        }
                         else if (pauseMenuCommand ==
                                  PauseMenuCommand.Controls)
                         {
@@ -889,8 +890,8 @@ internal sealed class ClientApplication
                         PlatformMouseButton.Left);
             }
 
-            bool shellChanged = wasShellBlocking != (pauseMenuActive || helpVisible);
-            if (helpChanged || shellChanged || inputState.FocusLostThisFrame || guidanceInteraction.BlocksGameplayThisFrame)
+            bool shellChanged = wasShellBlocking != (pauseMenuActive);
+            if (shellChanged || inputState.FocusLostThisFrame || guidanceInteraction.BlocksGameplayThisFrame)
             {
                 inputState.SuppressHeldInput();
                 pauseHeld = false;
@@ -962,8 +963,7 @@ internal sealed class ClientApplication
                 window.IsMinimized ||
                 window.ClientSize.IsEmpty;
             bool shellBlocksGameplay =
-                pauseMenuActive ||
-                helpVisible;
+                pauseMenuActive;
             bool shouldPauseSimulation =
                 !inputMatchTerminal &&
                 (shouldPauseForWindow ||
@@ -1046,7 +1046,11 @@ internal sealed class ClientApplication
 
                 if (pauseMenuActive)
                 {
-                    if (pauseControlsVisible)
+                    if (pauseSettings.Visible)
+                    {
+                        frontendSurface = pauseSettings.Surface;
+                    }
+                    else if (pauseControlsVisible)
                     {
                         FrontendSurfaceView controlsSurface =
                             FrontendPresentationAdapter.Controls(
@@ -1085,11 +1089,6 @@ internal sealed class ClientApplication
                                 false,
                                 false);
                     }
-                }
-                else if (helpVisible)
-                {
-                    frontendSurface = FrontendPresentationAdapter.Controls(
-                        _settings.CameraBindings, "F1 / F12 / ESC  CLOSE", _settings.EdgeScrollEnabled, gameplay: _gameplayBindings);
                 }
 
                 if (frontendSurface is FrontendSurfaceView modalSurface)
@@ -3003,6 +3002,13 @@ internal sealed class ClientApplication
             $"building={buildingPlacementController.ActiveBuilding} " +
             $"orientation={buildingPlacementController.Orientation} " +
             $"previewFreshness={buildingPlacementController.PreviewFreshness}");
+    }
+
+    private ClientSettingsFrontendAdapter CreateSettingsAdapter()
+    {
+        string? directory = Path.GetDirectoryName(_settingsPath);
+        if (string.IsNullOrWhiteSpace(directory)) return new(new ClientSettingsStore());
+        return new(new ClientSettingsStore(Directory.GetParent(directory)?.FullName ?? directory));
     }
 
     private FrontendSessionSelectionResult RunFrontendSessionSelection(

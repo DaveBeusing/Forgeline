@@ -310,7 +310,7 @@ public sealed class PlayerActionPanelTests
     }
 
     [Fact]
-    public void PointerSelectionAndActivationAreCapturedAndFocusLossDoesNotRepeatModeToggle()
+    public void PointerCardStartsPlacementImmediatelyAndFocusLossDoesNotRepeatModeToggle()
     {
         PresentationSnapshot snapshot =
             CreateSnapshot(
@@ -357,32 +357,14 @@ public sealed class PlayerActionPanelTests
             PlayerActionDockInteractionLayout.GetCardRect(
                 layout,
                 0);
-        HudRect activate =
-            PlayerActionDockInteractionLayout.GetFooterButtonRect(
-                layout,
-                0);
-
-        Click(
-            controller,
-            input,
-            snapshot,
-            Center(card));
-
-        Assert.True(
-            controller.PointerCaptured);
+        var point = Center(card);
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown,
+            PlatformMouseButton.Left, (int)point.X, (int)point.Y));
+        controller.Update(input, snapshot, 1600, 900);
+        Assert.True(controller.PointerCaptured);
         Assert.Equal(
             0,
             controller.SelectedIndex);
-        Assert.False(
-            controller.TryTakeRequest(
-                out _));
-
-        Click(
-            controller,
-            input,
-            snapshot,
-            Center(activate));
-
         Assert.True(
             controller.TryTakeRequest(
                 out PlayerActionRequest request));
@@ -395,6 +377,10 @@ public sealed class PlayerActionPanelTests
         Assert.Equal(
             PlayerActionPanelMode.Closed,
             controller.Mode);
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp,
+            PlatformMouseButton.Left, (int)point.X, (int)point.Y));
+        controller.Update(input, snapshot, 1600, 900);
+        Assert.False(controller.TryTakeRequest(out _));
     }
 
     [Fact]

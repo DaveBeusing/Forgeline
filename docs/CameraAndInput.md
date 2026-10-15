@@ -48,7 +48,7 @@ The gameplay client uses the perspective reference from `RtsVisualReference`:
 45 degrees yaw from +Z toward +X, -55 degrees engine pitch (55 degrees downward
 from the horizontal), 45 degrees vertical field of view, and zero roll.
 Camera-to-target distances are 120 m for close tactical, 420 m for normal gameplay,
-and 1,000 m for strategic review. Interactive zoom remains clamped to 20–1,200 m.
+and 1,000 m for strategic review. New matches start at the 120 m close tactical bookmark. Interactive zoom remains clamped to 20–1,200 m.
 `--reference-zoom CloseTactical|NormalGameplay|Strategic` selects a launch bookmark
 without persisting a user preference. Authoring uses 2560 x 1440 at 100% render/UI
 scale; compatibility review includes 1920 x 1080, 3840 x 2160, and 3440 x 1440.
@@ -265,3 +265,24 @@ release, clear hover/pressed state and preserve model focus. Closing help/pause 
 the gesture before gameplay resumes. `GameplayHudLayout` retains separate ownership.
 
 See [named regions and migration](FrontendLayout.md) and [qualification](FrontendLayoutQualification.md).
+
+## Gameplay usability
+
+F1 and unmodified F12 do not open a gameplay help page. Escape opens Pause,
+where Controls and Settings remain available. Shift+F1 toggles the detailed
+performance overlay. The compact FPS and measured simulation TPS strip stays
+visible independently; paused/stopped simulation states retain explicit labels.
+Windows generic Shift/Control messages are decoded by scan code/extended bit,
+and brief Shift+F1 presses survive release before the next platform frame.
+
+Enabled action cards activate on the first click. Clicking a building card
+starts its placement preview; the next world click places it through the
+existing validated command boundary. Enter/Place remains a keyboard alternative,
+not a required second confirmation. Disabled/pending cards and page changes
+never dispatch commands. The operating-system pointer is the only mouse cursor;
+world targeting feedback and minimap markers remain contextual indicators.
+
+HUD text uses a larger 14 px base at unit scale. Onboarding uses 18 px headings,
+16 px body text, word wrapping and 23 px line spacing. DPI and UI scale are
+respected without the old 1.25 guide cap; only available viewport height can
+reduce the guide scale. The guide remains inside its existing reserved region.

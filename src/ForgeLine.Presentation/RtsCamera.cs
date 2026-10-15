@@ -15,7 +15,7 @@ public sealed class RtsCamera
 {
     private const float RadiansToDegrees = 180.0f / MathF.PI;
 
-    private readonly RtsCameraSettings _settings;
+    private RtsCameraSettings _settings;
 
     private bool _hasPointerPosition;
     private Vector2 _pointerPosition;
@@ -38,6 +38,14 @@ public sealed class RtsCamera
     }
 
     public RtsCameraSettings Settings => _settings;
+
+    public void ConfigureControls(bool edgeScrollEnabled, float panSpeedMultiplier)
+    {
+        var settings = _settings with { EdgeScrollEnabled = edgeScrollEnabled,
+            BasePanSpeedUnitsPerSecond = 42 * panSpeedMultiplier };
+        settings.Validate();
+        _settings = settings;
+    }
 
     public Vector3 Target { get; private set; }
 

@@ -24,7 +24,7 @@ public sealed class GameplayBindingRegistry
     public const PlatformKey CancelKey = PlatformKey.Escape;
     public static IReadOnlyList<string> FixedBindings { get; } = Array.AsReadOnly(new[]
     {
-        "F1 / F12 HELP", "ESC CANCEL / PAUSE", "LEFT SELECT / DOUBLE LEFT VISIBLE SAME TYPE",
+        "ESC PAUSE / CONTROLS", "ESC CANCEL / PAUSE", "LEFT SELECT / DOUBLE LEFT VISIBLE SAME TYPE",
         "SHIFT + LEFT EXTEND SELECTION", "RIGHT MOVE / TARGET", "CTRL + DIGIT ASSIGN / DIGIT RECALL / DOUBLE DIGIT FOCUS",
         "CTRL + SHIFT + DIGIT CLEAR", "SHIFT + CLICK REPEAT ACCEPTED BUILD", "SHIFT + F1 METRICS",
         "SHIFT + F12 GUIDE", "F2 WORLD DEBUG / SHIFT + F4-F9 DEBUG CATEGORIES", "R RESTART TERMINAL MATCH"

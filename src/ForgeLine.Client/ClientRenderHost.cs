@@ -734,7 +734,7 @@ internal sealed class ClientRenderHost : IDisposable
                             gameplayDraw,
                             runtimeMetrics,
                             current.HoverTooltip,
-                            showRuntimeMetrics: current.OverlayEnabled,
+                            showRuntimeMetrics: true,
                             operations: current.Operations);
                         developmentOverlayRenderer.Render(
                             context,
@@ -744,7 +744,7 @@ internal sealed class ClientRenderHost : IDisposable
                             showDevelopmentMetrics:
                                 current.OverlayEnabled,
                             uiScale:
-                                current.UiScale);
+                                RtsUiLayout.ScaleForDpi(current.Dpi) * current.UiScale);
                         if (animatedFrontend is FrontendSurfaceView frontend)
                         {
                             frontendRenderer.Render(

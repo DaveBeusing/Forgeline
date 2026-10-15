@@ -142,20 +142,6 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 context.Height);
         }
 
-        if (view.HasPointer)
-        {
-            EmitIcon(
-                RtsUiIconCatalog.ResolveCursor(
-                    view.Cursor),
-                view.PointerPosition.X +
-                    10.0f * scale,
-                view.PointerPosition.Y +
-                    10.0f * scale,
-                14.0f * scale,
-                context.Width,
-                context.Height);
-        }
-
         if (_vertexCount == 0)
         {
             LastRenderedVertexCount = 0;
@@ -789,7 +775,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 EmitSystemPanel(
                     "MATCH SETUP",
                     "ENTER START  ESC EXIT",
-                    "F1 CONTROLS",
+                    "ESC CONTROLS",
                     layout,
                     width,
                     height);
@@ -799,7 +785,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 EmitSystemPanel(
                     "PAUSED",
                     _bindings.Text("ESC OR SPACE RESUME"),
-                    "F1 CONTROLS",
+                    "ESC CONTROLS",
                     layout,
                     width,
                     height);
@@ -1001,48 +987,56 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     {
         var region = GameplayGuidanceLayout.Resolve(layout);
         if (region.IsEmpty) return;
-        float scale = MathF.Min(layout.Scale, 1.25f);
-        float padding = 5 * scale;
-        float lineHeight = 14 * scale;
-        int lines = Math.Min(6, (int)((region.Height - padding * 2) / lineHeight));
-        if (lines < 2) return;
+        float scale = MathF.Min(layout.Scale, region.Height / 62);
         int start = _vertexCount;
         LastGuidanceBounds = region;
         EmitQuad(region.X, region.Y, region.Width, region.Height, GameplayHudVisualStyle.PanelBackground, width, height);
-        EmitQuad(region.X, region.Y, 2 * scale, region.Height, GameplayHudVisualStyle.Focus, width, height);
-        ContextLine(placement ? view.Placement.Title : view.Guidance.Objective, 0, region, scale, width, height);
-        ContextLine(placement ? view.Placement.Reason : view.Guidance.Binding, 1, region, scale, width, height);
-        if (lines > 2) ContextLine(placement ? view.Placement.Hint : view.Guidance.Context, 2, region, scale, width, height);
-        if (!placement)
-        {
-            if (lines > 3 && view.Guidance.Next.Length > 0)
-            {
-                Span<char> buffer = stackalloc char[96];
-                var text = new HudTextBuilder(buffer);
-                text.Append("NEXT: "); text.Append(view.Guidance.Next);
-                ContextLine(text.Written, 3, region, scale, width, height);
-            }
-            if (lines > 4) ContextLine("OPTIONAL GUIDE / SHIFT+F12 HIDE / F1 HELP", 4, region, scale, width, height);
-        }
-        else if (view.Placement.Costs is { } costs)
+        EmitQuad(region.X, region.Y, 3 * scale, region.Height, GameplayHudVisualStyle.Focus, width, height);
+        float y = region.Y + 8 * scale;
+        ContextBlock(placement ? view.Placement.Title : view.Guidance.Objective, ref y, region, scale, true, 2, width, height);
+        ContextBlock(placement ? view.Placement.Reason : view.Guidance.Binding, ref y, region, scale, false, 2, width, height);
+        ContextBlock(placement ? view.Placement.Hint : view.Guidance.Context, ref y, region, scale, false, 2, width, height);
+        if (!placement && view.Guidance.Next.Length > 0)
+            ContextBlock(view.Guidance.Next, ref y, region, scale, false, 1, width, height);
+        if (placement && view.Placement.Costs is { } costs)
         {
             Span<char> buffer = stackalloc char[128];
-            for (int i = 0; i < Math.Min(costs.Count, lines - 3); i++)
+            for (int i = 0; i < costs.Count; i++)
             {
                 var text = new HudTextBuilder(buffer);
                 text.Append(costs[i].DisplayName); text.Append(" CORE ");
                 text.Append(costs[i].AvailableQuantity); text.Append(" / NEED ");
                 text.Append(costs[i].RequiredQuantity);
-                ContextLine(text.Written, i + 3, region, scale, width, height);
+                ContextBlock(text.Written, ref y, region, scale, false, 1, width, height);
             }
         }
         LastGuidanceVertexCount = _vertexCount - start;
     }
 
-    private void ContextLine(ReadOnlySpan<char> text, int line, in HudRect region, float scale, int width, int height) =>
-        EmitText(text, region.X + 6 * scale, region.Y + (5 + line * 14) * scale, region.Right - 5 * scale,
-            line == 0 ? GameplayHudVisualStyle.TextPrimary : GameplayHudVisualStyle.TextSecondary,
-            scale * (line == 0 ? .8f : .68f), width, height);
+    private void ContextBlock(ReadOnlySpan<char> text, ref float y, in HudRect region,
+        float scale, bool heading, int maximumLines, int width, int height)
+    {
+        float size = (heading ? 18 : 16) * scale;
+        float lineHeight = 23 * scale;
+        float availableWidth = MathF.Max(0, region.Width - 20 * scale);
+        for (int line = 0; line < maximumLines && !text.IsEmpty && y + lineHeight <= region.Bottom - 6 * scale; line++)
+        {
+            int count = UiFontMetrics.Default.FitPrefix(text, availableWidth, size, heading);
+            if (count <= 0) return;
+            if (count < text.Length && line + 1 < maximumLines)
+            {
+                int space = text[..count].LastIndexOf(' ');
+                if (space > 0) count = space;
+            }
+            ReadOnlySpan<char> value = line + 1 == maximumLines ? text : text[..count];
+            if (!_text.Add(value, region.X + 10 * scale, y, size, GameplayHudVisualStyle.TextPrimary,
+                    width, height, availableWidth, heading))
+                EmitText(value, region.X + 10 * scale, y, region.Right - 10 * scale,
+                    GameplayHudVisualStyle.TextPrimary, size / UiTypography.Style(UiTextRole.Telemetry).Size, width, height);
+            y += lineHeight;
+            text = text[count..].TrimStart();
+        }
+    }
 
     private void EmitOnboardingHint(
         string? interactionHint,
@@ -1082,7 +1076,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             y,
             right,
             GameplayHudVisualStyle.TextSecondary,
-            scale * 0.68f,
+            scale,
             width,
             height);
     }

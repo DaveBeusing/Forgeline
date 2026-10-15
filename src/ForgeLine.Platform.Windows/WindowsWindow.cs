@@ -443,7 +443,7 @@ internal sealed class WindowsWindow : IWindow
                 return 0;
 
             case WindowsNative.WmKeyDown:
-                if (TryMapKey(wParam, out PlatformKey keyDown))
+                if (TryMapKey(wParam, lParam, out PlatformKey keyDown))
                 {
                     _inputEvents.Enqueue(
                         PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, keyDown));
@@ -453,7 +453,7 @@ internal sealed class WindowsWindow : IWindow
                 break;
 
             case WindowsNative.WmKeyUp:
-                if (TryMapKey(wParam, out PlatformKey keyUp))
+                if (TryMapKey(wParam, lParam, out PlatformKey keyUp))
                 {
                     _inputEvents.Enqueue(
                         PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, keyUp));
@@ -578,8 +578,11 @@ internal sealed class WindowsWindow : IWindow
         return (x, y);
     }
 
-    private static bool TryMapKey(nuint virtualKey, out PlatformKey key)
+    internal static bool TryMapKey(nuint virtualKey, nint keyData, out PlatformKey key)
     {
+        // WM_KEYDOWN/UP report generic modifier VKs; side is carried by scan/extended bits.
+        if (virtualKey == 0x10) virtualKey = ((keyData >> 16) & 0xff) == 0x36 ? (nuint)0xA1 : 0xA0;
+        if (virtualKey == 0x11) virtualKey = (keyData & (1 << 24)) != 0 ? (nuint)0xA3 : 0xA2;
         key = (int)virtualKey switch
         {
             WindowsNative.Vk0 => PlatformKey.D0,

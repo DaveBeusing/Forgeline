@@ -93,10 +93,10 @@ public sealed class MainMenuModelTests
             "UP/LEFT/DOWN/RIGHT",
             view.DetailLines[0].Value);
         Assert.Equal(
-            "HELP / WORLD / FORMATION",
+            "CONTROLS / WORLD / FORMATION",
             view.DetailLines[4].Label);
         Assert.Contains(
-            "HELP",
+            "CONTROLS",
             view.DetailLines[4].Value);
         Assert.Contains(
             "WORLD DEBUG",
@@ -129,7 +129,7 @@ public sealed class MainMenuModelTests
             "MINIMAP",
             view.DetailLines[^1].Value);
         Assert.Contains(
-            "HELP",
+            "CONTROLS",
             view.DetailLines[^1].Value);
         Assert.Contains(
             "ESC/SPACE PAUSE",

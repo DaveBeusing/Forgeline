@@ -31,6 +31,7 @@ public sealed class PauseMenuTests
                     "CONTROLS",
                     item.Label);
             },
+            item => Assert.Equal(PauseMenuCommand.Settings, item.Command),
             item =>
                 Assert.Equal(
                     PauseMenuCommand.SaveGame,
@@ -104,7 +105,7 @@ public sealed class PauseMenuTests
             "controls",
             second);
         Assert.Equal(
-            "save-game",
+            "settings",
             third);
     }
 }

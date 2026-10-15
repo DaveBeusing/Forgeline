@@ -375,7 +375,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             builder.Append(" TPS");
         }
         else builder.Append("— TPS");
-        EmitText(builder.Written, region.X + 8 * _scale, region.Y + 21 * _scale, MutedTextColor, width, height);
+        EmitText(builder.Written, region.X + 8 * _scale, region.Y + 20 * _scale, MutedTextColor, width, height);
         _scale = originalScale;
     }
 

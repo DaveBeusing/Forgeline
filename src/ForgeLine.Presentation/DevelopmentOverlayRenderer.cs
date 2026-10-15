@@ -57,7 +57,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         _vertexCount = 0;
         _uiScale =
             float.IsFinite(uiScale)
-                ? Math.Clamp(uiScale, 0.75f, 2.0f)
+                ? Math.Clamp(uiScale, 0.75f, 4.0f)
                 : 1.0f;
 
         if (showDevelopmentMetrics)
@@ -127,7 +127,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         EmitReadableText(
             builder.Written,
             12.0f,
-            12.0f,
+            64.0f * _uiScale,
             new Vector4(0.98f, 0.78f, 0.18f, 1.0f),
             context.Width,
             context.Height);
@@ -363,7 +363,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             builder.NewLine();
             builder.Append("ESC EXIT");
             builder.NewLine();
-            builder.Append("F1 CONTROLS AND ONBOARDING");
+            builder.Append("ESC CONTROLS AND ONBOARDING");
             builder.NewLine();
             builder.NewLine();
             builder.Append("SETTINGS ");
@@ -389,7 +389,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             builder.NewLine();
             builder.Append(_bindings.Text("ESC OR SPACE RESUME"));
             builder.NewLine();
-            builder.Append("F1 CONTROLS");
+            builder.Append("ESC CONTROLS");
 
             EmitReadableText(
                 builder.Written,
@@ -443,7 +443,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             builder.NewLine();
             builder.Append(_bindings.Text("F7 STORAGE DEPOT  F8 SMELTER  F9 ROTATE BUILDING"));
             builder.NewLine();
-            builder.Append(_bindings.Text("F10 STRATEGIC OVERLAY  F11 MINIMAP  F1/F12/ESC CLOSE HELP"));
+            builder.Append(_bindings.Text("F10 STRATEGIC OVERLAY  F11 MINIMAP  ESC PAUSE / CONTROLS"));
             builder.NewLine();
             builder.Append(_bindings.Text("ESC OR SPACE PAUSE MENU"));
             builder.NewLine();
@@ -481,7 +481,7 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
 
         if (view.ShowOnboarding)
         {
-            builder.Append("F1 HELP  ESC PAUSE MENU  GOAL DESTROY ENEMY COMMAND CORE");
+            builder.Append("ESC CONTROLS  ESC PAUSE MENU  GOAL DESTROY ENEMY COMMAND CORE");
 
             EmitReadableText(
                 builder.Written,

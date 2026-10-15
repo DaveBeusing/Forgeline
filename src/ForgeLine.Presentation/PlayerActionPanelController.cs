@@ -1030,6 +1030,10 @@ public sealed class PlayerActionPanelController
                     actions);
                 SynchronizeSupplyEditor(
                     actions);
+                if (hit.Kind == PlayerActionDockControlKind.Item &&
+                    PlayerActionDockHudModel.CanUseControl(PlayerActionDockControlKind.Activate,
+                        Mode, SelectedIndex, panel, actions))
+                    ActivateSelected(actions);
                 break;
 
             case PlayerActionDockControlKind.Activate:

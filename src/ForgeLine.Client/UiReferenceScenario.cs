@@ -13,7 +13,7 @@ internal enum UiReferenceScenario
     NewGame, LoadGame, LoadEmpty, LoadBroken, SettingsLong, ControlsLong, Pause, Credits,
     ResourcePressure, LowPower, SupplyCritical, MixedSelection, Targeting, QueueBlocked,
     Technology, Contacts, DockFocus, DockHover, DockPressed, DockPending, DockAccepted,
-    DockRejected, MinimapStrategic
+    DockRejected, MinimapStrategic, Onboarding
 }
 
 /// <summary>Named authored read models for the existing reference capture lane; never dispatches input.</summary>
@@ -100,6 +100,10 @@ internal static class UiReferenceStates
                 snapshot = CopyExperience(snapshot, snapshot.PlayerExperience!.Value with
                 { Selection = PlayerSelectionSummary.Empty with { Count = 3, Kind = PlayerSelectionKind.Mixed, DisplayName = "Mixed selection" } });
         }
+        if (state == UiReferenceScenario.Onboarding)
+            snapshot = new(snapshot.Tick, snapshot.TickDuration, snapshot.SimulationEntityCount, snapshot.Instances,
+                snapshot.Intelligence, snapshot.SessionId, snapshot.PlayerExperience, playerActions: snapshot.PlayerActions,
+                guidance: new PlayerGuidanceSummary(snapshot.SessionId, snapshot.Tick, snapshot.PlayerExperience!.Value.Player, default));
         return (snapshot, panel);
     }
 

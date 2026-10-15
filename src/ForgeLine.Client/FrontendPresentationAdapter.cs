@@ -261,8 +261,8 @@ internal static class FrontendPresentationAdapter
                     "COMMAND PANELS",
                     gameplay.PanelsHelpPrompt + "; " + gameplay.DockNavigationPrompt),
                 new FrontendDetailLineView(
-                    "HELP / WORLD / FORMATION",
-                    "F1 HELP  F2 WORLD DEBUG  " + gameplay.Prompt(GameplayAction.Formation) + " FORMATION"),
+                    "CONTROLS / WORLD / FORMATION",
+                    "ESC CONTROLS  F2 WORLD DEBUG  " + gameplay.Prompt(GameplayAction.Formation) + " FORMATION"),
                 new FrontendDetailLineView(
                     "PLACEMENT",
                     gameplay.Prompt(GameplayAction.CorePlacement) + " COMMAND CORE  " + gameplay.Prompt(GameplayAction.PowerPlacement) + " POWER PLANT  " + gameplay.Prompt(GameplayAction.ExtractorPlacement) + " EXTRACTOR"),
@@ -283,7 +283,7 @@ internal static class FrontendPresentationAdapter
                     "SHIFT+F12 SHOW / HIDE  ONBOARDING SETTING CONTROLS DEFAULT"),
                 new FrontendDetailLineView(
                     "MAP / HELP / PAUSE",
-                    gameplay.Prompt(GameplayAction.Overlay) + " STRATEGIC OVERLAY  " + gameplay.Prompt(GameplayAction.Minimap) + " MINIMAP  F12 HELP  ESC/" + gameplay.Prompt(GameplayAction.Pause) + " PAUSE")
+                    gameplay.Prompt(GameplayAction.Overlay) + " STRATEGIC OVERLAY  " + gameplay.Prompt(GameplayAction.Minimap) + " MINIMAP  ESC CONTROLS  ESC/" + gameplay.Prompt(GameplayAction.Pause) + " PAUSE")
             ],
             footer) with { Kind = FrontendSurfaceKind.Controls };
     }
