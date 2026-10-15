@@ -55,7 +55,7 @@ internal static class UiReferenceStates
             UiReferenceScenario.MenuFocus => menu with { MenuEntries = menu.MenuEntries.Select((x, i) => x with { IsFocused = i == 2 }).ToArray() },
             UiReferenceScenario.MenuReveal => menu with { Motion = new UiMotionView(.5f, .5f, 0) },
             UiReferenceScenario.Loading => FrontendSurfaceView.Loading("LOADING SAVED MATCH / 75%", true, .75f),
-            UiReferenceScenario.LoadingError => FrontendSurfaceView.Loading("ERROR / SAVED MATCH COULD NOT BE READ / ESC BACK", false, 0),
+            UiReferenceScenario.LoadingError => FrontendSurfaceView.Loading("ERROR / SAVED MATCH COULD NOT BE READ / ESC BACK", false, 0) with { IsError = true },
             UiReferenceScenario.NewGame => FrontendPresentationAdapter.NewGame(new NewGameModel()),
             UiReferenceScenario.LoadEmpty => FrontendPresentationAdapter.LoadGame(new LoadGameModel([])),
             UiReferenceScenario.LoadGame or UiReferenceScenario.LoadBroken => FrontendPresentationAdapter.LoadGame(new LoadGameModel(

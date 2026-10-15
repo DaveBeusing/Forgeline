@@ -160,6 +160,11 @@ internal static class VisualReferenceCapture
                     using var particles = new ParticleVfxRenderer(graphics, catalog, profile.Particles, lighting);
                     using var hud = new GameplayHudRenderer(graphics, catalog);
                     using var frontend = UiReferenceStates.IsFrontend(uiScenario) ? new FrontendOverlayRenderer(graphics) : null;
+                    if (frontend is not null)
+                    {
+                        frontend.PrepareSkin(catalog);
+                        if (!frontend.SkinReady) throw new InvalidDataException("Required production frontend skin is unavailable: " + frontend.SkinFailure);
+                    }
                     if (frontend is not null && request.CinematicFrontend)
                     {
                         var deadline = Stopwatch.StartNew();
@@ -369,7 +374,8 @@ internal static class VisualReferenceCapture
                         frontendView?.Layout, GameplayHudLayout.Create(display.Width, display.Height, rasterDpi, uiScale));
                     captures.Add(new { submission = meshes.SubmissionMetrics, key, image, imageSha256 = FileHash(Path.Combine(request.OutputRoot, image)),
                         pixelSha256 = Convert.ToHexString(SHA256.HashData(rgba)), fixture.Kind, fingerprint = fixture.Fingerprint,
-                        ui = new { scenario = uiScenario, fixtureVersion = 1, layoutId = frontend is null ? "GameplayHudLayout" : "FrontendGeometry",
+                        ui = new { scenario = uiScenario, fixtureVersion = 1,
+                            skin = frontend?.SkinDiagnostics, skinState = frontend?.SkinState, skinnedControls = frontend?.LastSkinnedControlCount, layoutId = frontend is null ? "GameplayHudLayout" : "FrontendGeometry",
                             interaction = new { panel.Mode, panel.SelectedIndex, panel.HoveredIndex, panel.PointerPressed,
                                 panel.ContextualHoveredIndex, panel.ContextualPressed, panel.ContextualPending, targetingMode = targeting.Mode },
                             captureOffset = uiScenario == UiReferenceScenario.MenuReveal ? "Authored half-reveal; live motion reviewed separately" : "Settled fixed state",
