@@ -73,7 +73,9 @@ internal sealed class GameplayHudSkin : IDisposable
     internal bool Icon(RtsUiIcon icon, float x, float y, float size)
     {
         if (_symbols is null) return false;
-        _symbols.Draw(GameplayHudArtwork.Icon(icon, size), new(x,y,size,size), Vector4.One);
+        string? id = GameplayHudArtwork.Icon(icon, size);
+        if (id is null) return false;
+        _symbols.Draw(id, new(x,y,size,size), Vector4.One);
         return true;
     }
     internal bool Portrait(in PlayerSelectionSummary selection, HudRect r)

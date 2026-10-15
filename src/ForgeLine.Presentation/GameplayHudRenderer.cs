@@ -37,7 +37,7 @@ public sealed class GameplayHudRenderer : IDisposable
             new RtsInformationHudSurface(
                 graphics,
                 runtimeAssets),
-            new WorldHoverTooltipSurface(graphics),
+            new WorldHoverTooltipSurface(graphics, runtimeAssets),
             new OperationsHudSurface(graphics)
         ];
     }

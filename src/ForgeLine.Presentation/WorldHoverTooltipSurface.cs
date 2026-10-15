@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using ForgeLine.Game;
+using ForgeLine.Assets;
 using ForgeLine.Graphics;
 
 namespace ForgeLine.Presentation;
@@ -12,6 +13,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
     private const int MaxLines = 12;
     private readonly IGraphicsDevice _graphics;
     private readonly UiTextBatch _text;
+    private readonly GameplayHudSkin _skin;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _buffers = new(4);
     private readonly TooltipVertex[] _vertices = new TooltipVertex[MaxVertices];
@@ -22,11 +24,12 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
     private int _width, _height;
     private bool _disposed;
 
-    public WorldHoverTooltipSurface(IGraphicsDevice graphics)
+    public WorldHoverTooltipSurface(IGraphicsDevice graphics, RuntimeAssetCatalog? runtimeAssets = null)
     {
         _graphics = graphics;
         _pipeline = SelectionInspectorHudRenderer.CreatePipeline(graphics, alphaBlendEnabled: true);
         _text = new UiTextBatch(graphics);
+        _skin = new(graphics, runtimeAssets);
     }
 
     public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
@@ -59,8 +62,9 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         _bounds = HoverTooltipPlacement.Resolve(view.PointerPosition, context.Layout,
             330 * _scale, (16 + lines * 14) * _scale);
         if (_bounds.IsEmpty) return;
-        Quad(_bounds, GameplayHudVisualStyle.PanelBackground);
-        Quad(new HudRect(_bounds.X, _bounds.Y, _bounds.Width, 25 * _scale), GameplayHudVisualStyle.PanelHeader);
+        _skin.Begin(context.Graphics);
+        if (!_skin.Panel(_bounds, "panel.tooltip")) Quad(_bounds, GameplayHudVisualStyle.PanelBackground);
+        if (!_skin.Ready) Quad(new HudRect(_bounds.X, _bounds.Y, _bounds.Width, 25 * _scale), GameplayHudVisualStyle.PanelHeader);
         Quad(new HudRect(_bounds.X, _bounds.Bottom - _scale, _bounds.Width, _scale), GameplayHudVisualStyle.QuietBorder);
         Quad(new HudRect(_bounds.X, _bounds.Y, MathF.Min(2 * _scale, _bounds.Width), _bounds.Height), GameplayHudVisualStyle.TextPrimary);
         Line(resolved.Title, true);
@@ -96,12 +100,13 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
             buffer = _graphics.CreateBuffer(new GraphicsBufferDescription(MaxVertices * 24UL, GraphicsBufferMemory.Upload));
             _buffers.Add(context.Graphics.FrameIndex, buffer);
         }
+        _skin.Flush(context.Graphics);
         buffer.SetData<TooltipVertex>(_vertices.AsSpan(0, _count));
         context.Graphics.SetPipeline(_pipeline);
         context.Graphics.SetVertexBuffer(buffer, 24);
         context.Graphics.Draw(_count);
         _text.Render(context.Graphics);
-        LastRenderedVertexCount = _count + _text.VertexCount;
+        LastRenderedVertexCount = _count + _text.VertexCount + _skin.Vertices;
         LastBounds = _bounds;
     }
 
@@ -221,6 +226,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         if (_disposed) return;
         foreach (var buffer in _buffers.Values) buffer.Dispose();
         _buffers.Clear();
+        _skin.Dispose();
         _text.Dispose();
         _pipeline.Dispose();
         _disposed = true;

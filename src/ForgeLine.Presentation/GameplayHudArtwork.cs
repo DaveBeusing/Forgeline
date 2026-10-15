@@ -34,22 +34,10 @@ internal static class GameplayHudArtwork
         [RtsUiIcon.CommandAttackMove] = ["ui.artwork.directorate.command.attack_move.p16", "ui.artwork.directorate.command.attack_move.p24", "ui.artwork.directorate.command.attack_move.p32", "ui.artwork.directorate.command.attack_move.p48", "ui.artwork.directorate.command.attack_move.p64"],
         [RtsUiIcon.CommandStop] = ["ui.artwork.directorate.command.stop.p16", "ui.artwork.directorate.command.stop.p24", "ui.artwork.directorate.command.stop.p32", "ui.artwork.directorate.command.stop.p48", "ui.artwork.directorate.command.stop.p64"],
         [RtsUiIcon.CommandHold] = ["ui.artwork.directorate.command.hold.p16", "ui.artwork.directorate.command.hold.p24", "ui.artwork.directorate.command.hold.p32", "ui.artwork.directorate.command.hold.p48", "ui.artwork.directorate.command.hold.p64"],
-        [RtsUiIcon.CommandPatrol] = ["ui.artwork.directorate.command.patrol.p16", "ui.artwork.directorate.command.patrol.p24", "ui.artwork.directorate.command.patrol.p32", "ui.artwork.directorate.command.patrol.p48", "ui.artwork.directorate.command.patrol.p64"],
         [RtsUiIcon.CommandBuild] = ["ui.artwork.directorate.command.build.p16", "ui.artwork.directorate.command.build.p24", "ui.artwork.directorate.command.build.p32", "ui.artwork.directorate.command.build.p48", "ui.artwork.directorate.command.build.p64"],
         [RtsUiIcon.CommandRepair] = ["ui.artwork.directorate.command.repair.p16", "ui.artwork.directorate.command.repair.p24", "ui.artwork.directorate.command.repair.p32", "ui.artwork.directorate.command.repair.p48", "ui.artwork.directorate.command.repair.p64"],
         [RtsUiIcon.CommandSupply] = ["ui.artwork.directorate.command.supply.p16", "ui.artwork.directorate.command.supply.p24", "ui.artwork.directorate.command.supply.p32", "ui.artwork.directorate.command.supply.p48", "ui.artwork.directorate.command.supply.p64"],
         [RtsUiIcon.CommandCancel] = ["ui.artwork.directorate.command.cancel.p16", "ui.artwork.directorate.command.cancel.p24", "ui.artwork.directorate.command.cancel.p32", "ui.artwork.directorate.command.cancel.p48", "ui.artwork.directorate.command.cancel.p64"],
-        [RtsUiIcon.CursorDefault] = ["ui.artwork.directorate.cursor.default.p16", "ui.artwork.directorate.cursor.default.p24", "ui.artwork.directorate.cursor.default.p32", "ui.artwork.directorate.cursor.default.p48", "ui.artwork.directorate.cursor.default.p64"],
-        [RtsUiIcon.CursorSelect] = ["ui.artwork.directorate.cursor.select.p16", "ui.artwork.directorate.cursor.select.p24", "ui.artwork.directorate.cursor.select.p32", "ui.artwork.directorate.cursor.select.p48", "ui.artwork.directorate.cursor.select.p64"],
-        [RtsUiIcon.CursorMove] = ["ui.artwork.directorate.cursor.move.p16", "ui.artwork.directorate.cursor.move.p24", "ui.artwork.directorate.cursor.move.p32", "ui.artwork.directorate.cursor.move.p48", "ui.artwork.directorate.cursor.move.p64"],
-        [RtsUiIcon.CursorAttack] = ["ui.artwork.directorate.cursor.attack.p16", "ui.artwork.directorate.cursor.attack.p24", "ui.artwork.directorate.cursor.attack.p32", "ui.artwork.directorate.cursor.attack.p48", "ui.artwork.directorate.cursor.attack.p64"],
-        [RtsUiIcon.CursorAttackMove] = ["ui.artwork.directorate.cursor.attack_move.p16", "ui.artwork.directorate.cursor.attack_move.p24", "ui.artwork.directorate.cursor.attack_move.p32", "ui.artwork.directorate.cursor.attack_move.p48", "ui.artwork.directorate.cursor.attack_move.p64"],
-        [RtsUiIcon.CursorBuild] = ["ui.artwork.directorate.cursor.build.p16", "ui.artwork.directorate.cursor.build.p24", "ui.artwork.directorate.cursor.build.p32", "ui.artwork.directorate.cursor.build.p48", "ui.artwork.directorate.cursor.build.p64"],
-        [RtsUiIcon.CursorRepair] = ["ui.artwork.directorate.cursor.repair.p16", "ui.artwork.directorate.cursor.repair.p24", "ui.artwork.directorate.cursor.repair.p32", "ui.artwork.directorate.cursor.repair.p48", "ui.artwork.directorate.cursor.repair.p64"],
-        [RtsUiIcon.CursorSupply] = ["ui.artwork.directorate.cursor.supply.p16", "ui.artwork.directorate.cursor.supply.p24", "ui.artwork.directorate.cursor.supply.p32", "ui.artwork.directorate.cursor.supply.p48", "ui.artwork.directorate.cursor.supply.p64"],
-        [RtsUiIcon.CursorInvalid] = ["ui.artwork.directorate.cursor.invalid.p16", "ui.artwork.directorate.cursor.invalid.p24", "ui.artwork.directorate.cursor.invalid.p32", "ui.artwork.directorate.cursor.invalid.p48", "ui.artwork.directorate.cursor.invalid.p64"],
-        [RtsUiIcon.CursorPan] = ["ui.artwork.directorate.cursor.pan.p16", "ui.artwork.directorate.cursor.pan.p24", "ui.artwork.directorate.cursor.pan.p32", "ui.artwork.directorate.cursor.pan.p48", "ui.artwork.directorate.cursor.pan.p64"],
-        [RtsUiIcon.CursorDragSelect] = ["ui.artwork.directorate.cursor.drag_select.p16", "ui.artwork.directorate.cursor.drag_select.p24", "ui.artwork.directorate.cursor.drag_select.p32", "ui.artwork.directorate.cursor.drag_select.p48", "ui.artwork.directorate.cursor.drag_select.p64"],
         [RtsUiIcon.SupplySupplied] = ["ui.artwork.directorate.supply.supplied.p16", "ui.artwork.directorate.supply.supplied.p24", "ui.artwork.directorate.supply.supplied.p32", "ui.artwork.directorate.supply.supplied.p48", "ui.artwork.directorate.supply.supplied.p64"],
         [RtsUiIcon.SupplyLow] = ["ui.artwork.directorate.supply.low.p16", "ui.artwork.directorate.supply.low.p24", "ui.artwork.directorate.supply.low.p32", "ui.artwork.directorate.supply.low.p48", "ui.artwork.directorate.supply.low.p64"],
         [RtsUiIcon.SupplyCritical] = ["ui.artwork.directorate.supply.critical.p16", "ui.artwork.directorate.supply.critical.p24", "ui.artwork.directorate.supply.critical.p32", "ui.artwork.directorate.supply.critical.p48", "ui.artwork.directorate.supply.critical.p64"],
@@ -95,9 +83,9 @@ internal static class GameplayHudArtwork
     };
     internal static IEnumerable<string> RequiredIcons => Icons.Values.SelectMany(static ids => ids);
     internal static IEnumerable<string> RequiredPortraits => Portraits.Values.SelectMany(static ids => ids);
-    internal static string Icon(RtsUiIcon icon, float pixels)
+    internal static string? Icon(RtsUiIcon icon, float pixels)
     {
-        var ids = Icons[icon];
+        if (!Icons.TryGetValue(icon, out var ids)) return null;
         return ids[pixels <= 16 ? 0 : pixels <= 24 ? 1 : pixels <= 32 ? 2 : pixels <= 48 ? 3 : 4];
     }
     internal static string? Portrait(in PlayerSelectionSummary selection, float pixels)

@@ -15,6 +15,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
 
     private readonly IGraphicsDevice _graphics;
     private readonly UiTextBatch _text;
+    private readonly GameplayHudSkin _skin;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers =
         new(4);
@@ -44,6 +45,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 : new RuntimeUiIconPalette(
                     runtimeAssets);
         _text = new UiTextBatch(graphics);
+        _skin = new(graphics, runtimeAssets, icons: false, portraits: false);
     }
 
     public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
@@ -79,6 +81,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             return;
         }
 
+        _skin.Begin(context);
         _vertexCount = 0;
         _vertexLimit = MaxVertices - 2048;
         GameplayHudLayout layout =
@@ -142,12 +145,13 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 context.Height);
         }
 
-        if (_vertexCount == 0)
+        if (_vertexCount == 0 && _skin.Vertices == 0 && _text.VertexCount == 0)
         {
             LastRenderedVertexCount = 0;
             return;
         }
 
+        _skin.Flush(context);
         IGraphicsBuffer vertexBuffer =
             GetFrameVertexBuffer(
                 context.FrameIndex);
@@ -165,7 +169,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             _vertexCount);
 
         _text.Render(context);
-        LastRenderedVertexCount = _vertexCount + _text.VertexCount;
+        LastRenderedVertexCount = _vertexCount + _text.VertexCount + _skin.Vertices;
     }
 
     public void Dispose()
@@ -182,6 +186,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         }
 
         _vertexBuffers.Clear();
+        _skin.Dispose();
         _text.Dispose();
         _pipeline.Dispose();
         _disposed = true;
@@ -990,7 +995,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         float scale = MathF.Min(layout.Scale, region.Height / 62);
         int start = _vertexCount;
         LastGuidanceBounds = region;
-        EmitQuad(region.X, region.Y, region.Width, region.Height, GameplayHudVisualStyle.PanelBackground, width, height);
+        if (!_skin.Panel(region, "panel.compact")) EmitQuad(region.X, region.Y, region.Width, region.Height, GameplayHudVisualStyle.PanelBackground, width, height);
         EmitQuad(region.X, region.Y, 3 * scale, region.Height, GameplayHudVisualStyle.Focus, width, height);
         float y = region.Y + 8 * scale;
         ContextBlock(placement ? view.Placement.Title : view.Guidance.Objective, ref y, region, scale, true, 2, width, height);
@@ -1144,7 +1149,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 rowHeight +
             padding * 2.0f;
 
-        EmitQuad(
+        if (!_skin.Panel(new HudRect(region.X, region.Y, region.Width, MathF.Min(region.Height, panelHeight)), "panel.compact")) EmitQuad(
             region.X,
             region.Y,
             region.Width,
@@ -1225,7 +1230,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                             0.58f,
                             1.0f);
 
-            EmitQuad(
+            var card = new HudRect(region.X + padding, y, region.Width - padding * 2, rowHeight - 2 * scale);
+            if (!_skin.Control(card, selected: group.IsActive || group.IsSelected)) EmitQuad(
                 region.X +
                     padding,
                 y,
