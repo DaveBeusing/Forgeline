@@ -135,10 +135,10 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
         _skin.Flush(context.Graphics);
         if (_count > 0)
         {
-        if (!_buffers.TryGetValue(context.Graphics.FrameIndex, out var buffer))
-        { buffer = _graphics.CreateBuffer(new GraphicsBufferDescription(MaxVertices * 24UL, GraphicsBufferMemory.Upload)); _buffers.Add(context.Graphics.FrameIndex, buffer); }
-        buffer.SetData<OperationsVertex>(_vertices.AsSpan(0, _count));
-        context.Graphics.SetPipeline(_pipeline); context.Graphics.SetVertexBuffer(buffer, 24); context.Graphics.Draw(_count);
+            if (!_buffers.TryGetValue(context.Graphics.FrameIndex, out var buffer))
+            { buffer = _graphics.CreateBuffer(new GraphicsBufferDescription(MaxVertices * 24UL, GraphicsBufferMemory.Upload)); _buffers.Add(context.Graphics.FrameIndex, buffer); }
+            buffer.SetData<OperationsVertex>(_vertices.AsSpan(0, _count));
+            context.Graphics.SetPipeline(_pipeline); context.Graphics.SetVertexBuffer(buffer, 24); context.Graphics.Draw(_count);
         }
         _text.Render(context.Graphics);
         LastRenderedVertexCount = _count + _text.VertexCount + _skin.Vertices;
@@ -233,6 +233,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
         }
         public void Number(double value, string format)
         {
+            if (!double.IsFinite(value)) { Append("N/A"); return; }
             if (value.TryFormat(_buffer[_length..], out int written, format, CultureInfo.InvariantCulture)) _length += written;
         }
     }

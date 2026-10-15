@@ -1,6 +1,7 @@
 using ForgeLine.Assets;
 using ForgeLine.Economy;
 using ForgeLine.Game;
+using ForgeLine.Logistics;
 
 namespace ForgeLine.Presentation;
 
@@ -41,6 +42,21 @@ internal readonly record struct EconomicCardVisual(UiSkinState State, string Lab
                 _ => new(UiSkinState.Normal, "AVAILABLE")
             };
         }
+        if (mode == PlayerActionPanelMode.Logistics && actions.Logistics is { } logistics && index < logistics.Policies.Count)
+        {
+            var stock = logistics.Policies[index];
+            if (stock.FailureReason != LogisticsTransportRequestFailureReason.None)
+                return new(UiSkinState.Warning, PlayerActionDockHudModel.ResolveTransportFailureLabel(stock.FailureReason));
+            if (stock.BottleneckReason != LogisticsBottleneckReason.None)
+                return new(UiSkinState.Warning, PlayerActionDockHudModel.ResolveBottleneckLabel(stock.BottleneckReason));
+        }
+        if (mode == PlayerActionPanelMode.Supply && actions.Supply is { } supply)
+        {
+            if (index == 2 && supply.ProviderState is PlayerSupplyProviderState.Empty or PlayerSupplyProviderState.Blocked)
+                return new(UiSkinState.Warning, PlayerActionDockHudModel.ResolveSupplyProviderStateLabel(supply.ProviderState));
+            if (index == 0 && supply.FuelFraction <= 0) return new(UiSkinState.Warning, "FUEL EMPTY");
+            if (index == 1 && supply.AmmunitionFraction <= 0) return new(UiSkinState.Warning, "AMMUNITION EMPTY");
+        }
         var availability = PlayerActionDockHudModel.ResolveItemState(mode, index, actions);
         return availability.CanActivate ? new(UiSkinState.Normal, "") : new(UiSkinState.Disabled, availability.DisabledReason);
     }
@@ -56,5 +72,17 @@ internal readonly record struct EconomicCardVisual(UiSkinState State, string Lab
             if (index < u.Units.Count + u.Requests.Count) return (PlayerSelectionKind.Unit, u.Requests[index - u.Units.Count].UnitId.Value);
         }
         return default;
+    }
+    internal static RtsUiIcon Icon(PlayerActionPanelMode mode, int index, PlayerActionSnapshot? actions)
+    {
+        if (actions is null || index < 0) return RtsUiIcon.StatusAlert;
+        // Explicit TechnologyId bindings from artwork.catalog.json. Unknown future identities stay neutral.
+        if (mode == PlayerActionPanelMode.Technology && index < actions.Technology.Count)
+            return actions.Technology[index].TechnologyId.Value switch
+            {
+                1 => RtsUiIcon.BuildingProcessing, 2 => RtsUiIcon.UnitLogistics,
+                3 => RtsUiIcon.UnitArmor, 4 => RtsUiIcon.UnitReconnaissance, _ => RtsUiIcon.StatusAlert
+            };
+        return PlayerActionDockHudModel.ResolveItemIcon(mode, index, actions);
     }
 }

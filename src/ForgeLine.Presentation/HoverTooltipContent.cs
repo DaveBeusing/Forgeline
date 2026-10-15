@@ -1,6 +1,7 @@
 using ForgeLine.Game;
 using ForgeLine.Input;
 using ForgeLine.Intelligence;
+using ForgeLine.Assets;
 
 namespace ForgeLine.Presentation;
 
@@ -12,7 +13,7 @@ internal readonly record struct HoverTooltipContent(
     uint? ProductionTicks = null,
     string Requirement = "",
     IReadOnlyList<PlayerTechnologyPrerequisiteReadModel>? Prerequisites = null,
-    string WorkStatus = "", string Explanation = "");
+    string WorkStatus = "", string Explanation = "", UiSkinState VisualState = UiSkinState.Normal);
 
 internal static class HoverTooltipResolver
 {
@@ -126,7 +127,8 @@ internal static class HoverTooltipResolver
         return new(title, PlayerActionDockHudModel.ResolveModeLabel(mode), status, hint,
             Costs: costs, Outputs: outputs, ProductionTicks: ticks, Requirement: requirement, Prerequisites: prerequisites,
             WorkStatus: ProductionContextFeedback.WorkLabel(workReason),
-            Explanation: (panel.Bindings ?? GameplayBindingRegistry.Default).Text(ProductionContextFeedback.Explain(enabled ? workReason : state.DisabledReason)));
+            Explanation: (panel.Bindings ?? GameplayBindingRegistry.Default).Text(ProductionContextFeedback.Explain(enabled ? workReason : state.DisabledReason)),
+            VisualState: EconomicCardVisual.Resolve(mode, index, actions, ContextualCommandModel.HasPending(panel, snapshot)).State);
     }
 
     private static string ResolveControlTitle(PlayerActionDockControlKind control, PlayerActionPanelMode mode)

@@ -900,7 +900,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             var identity = EconomicCardVisual.Portrait(panel.Mode, index, actions);
             bool portrait = _skin.Portrait(identity.Kind, identity.Id, new(rect.X + 5 * _scale, rect.Y + 4 * _scale,
                 (compact ? 24 : 30) * _scale, (compact ? 24 : 30) * _scale));
-            if (!portrait) EmitIcon(PlayerActionDockHudModel.ResolveItemIcon(panel.Mode, index, actions), rect.X + 6 * _scale,
+            if (!portrait) EmitIcon(_skin.Ready ? EconomicCardVisual.Icon(panel.Mode, index, actions) : PlayerActionDockHudModel.ResolveItemIcon(panel.Mode, index, actions), rect.X + 6 * _scale,
                 rect.Y + 5 * _scale, 14 * _scale, width, height);
             float textX = rect.X + (portrait ? compact ? 34 : 40 : 25) * _scale;
             DockText(PlayerActionDockHudModel.ResolveItemTitle(panel.Mode, index, actions),
@@ -914,7 +914,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             DockText(text.Written, textX, rect.Y + (compact ? 18 : 22) * _scale,
                 rect.Right - 5 * _scale, state.CanActivate ? MutedTextColor : GameplayHudVisualStyle.Warning,
                 compact ? 10 : 11, false, width, height);
-            text = new(buffer); AppendCardDetail(ref text, panel.Mode, index, actions);
+            text = new(buffer); AppendCardDetail(ref text, panel.Mode, index, actions, _skin.Ready);
             DockText(text.Written, rect.X + 6 * _scale, rect.Y + (compact ? 30 : 39) * _scale,
                 rect.Right - 5 * _scale, MutedTextColor, 10, false, width, height);
             double? progress = _skin.Ready ? work.Progress : CardProgress(panel.Mode, index, actions);
@@ -941,7 +941,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         _ => null
     };
 
-    private static void AppendCardDetail(ref HudTextBuilder text, PlayerActionPanelMode mode, int index, PlayerActionSnapshot? actions)
+    private static void AppendCardDetail(ref HudTextBuilder text, PlayerActionPanelMode mode, int index, PlayerActionSnapshot? actions, bool productionSkin = false)
     {
         if (actions is null) return;
         switch (mode)
@@ -959,10 +959,18 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             case PlayerActionPanelMode.UnitProduction:
                 var u = actions.UnitProduction!;
                 if (index < u.Units.Count) { text.Append("COST "); AppendAmounts(ref text, u.Units[index].Costs); }
-                else { text.Append("PROGRESS "); text.Append(u.Progress * 100, "F0"); text.Append("% / CANCEL QUEUED JOB"); }
+                else
+                {
+                    var job = u.Requests[index - u.Units.Count];
+                    if (productionSkin && !job.IsActive) text.Append("QUEUED / ");
+                    else { text.Append("PROGRESS "); text.Append(u.Progress * 100, "F0"); text.Append("% / "); }
+                    if (productionSkin) { text.Append(PlayerActionDockHudModel.ResolvePriorityLabel(job.Priority)); text.Append(" / "); }
+                    text.Append("CANCEL QUEUED JOB");
+                }
                 break;
             case PlayerActionPanelMode.Logistics:
                 var stock = actions.Logistics!.Policies[index];
+                if (productionSkin) { text.Append("STOCK "); text.Append(stock.CurrentQuantity, "F0"); text.Append(" / "); }
                 text.Append("MIN "); text.Append(stock.DesiredMinimum, "F0"); text.Append(" MAX "); text.Append(stock.DesiredMaximum, "F0");
                 text.Append(stock.Enabled ? " / ENABLED" : " / DISABLED");
                 break;

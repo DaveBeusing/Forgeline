@@ -66,6 +66,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
             330 * _scale, (16 + lines * 14) * _scale);
         if (_bounds.IsEmpty) return;
         if (!_skin.Panel(_bounds, "panel.tooltip")) Quad(_bounds, GameplayHudVisualStyle.PanelBackground);
+        _skin.State(_bounds, resolved.VisualState);
         if (!_skin.Ready) Quad(new HudRect(_bounds.X, _bounds.Y, _bounds.Width, 25 * _scale), GameplayHudVisualStyle.PanelHeader);
         Quad(new HudRect(_bounds.X, _bounds.Bottom - _scale, _bounds.Width, _scale), GameplayHudVisualStyle.QuietBorder);
         Quad(new HudRect(_bounds.X, _bounds.Y, MathF.Min(2 * _scale, _bounds.Width), _bounds.Height), GameplayHudVisualStyle.TextPrimary);
