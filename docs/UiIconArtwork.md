@@ -150,3 +150,12 @@ Atlas packing/rendering is implemented. Role-based live binding, actual cursor i
 live contact privacy and final physical-display acceptance belong to their
 subsequent integration scopes. The representative first menu control is migrated; the other surfaces remain
 pending migration. No source-validity result grants final AAA acceptance.
+
+## Battlefield consumer integration
+
+The [graphical battlefield HUD](GraphicalBattlefieldHud.md) now consumes compiled
+resource/selection artwork and actual roster portraits through `GameplayHudArtwork`
+and `GameplayHudSkin`. Exact mappings are validated against this source catalog
+and the packed sprites. Existing `ui.icon.*` IDs remain valid for independent
+bitmap paths and the production/tactical consumers that have not migrated.
+No artwork, definitions or catalog content changes in this consumer integration.

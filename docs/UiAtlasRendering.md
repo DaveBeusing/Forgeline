@@ -152,3 +152,10 @@ fixture to all normal frontend screens. The core group, binary contracts, device
 ownership, text metrics and page budgets remain unchanged. The first-control-only
 scope above records the original renderer integration; current frontend coverage
 is listed in the surface catalog. Battlefield HUD migration remains separate.
+
+## Battlefield consumer update
+
+The [battlefield HUD](GraphicalBattlefieldHud.md) now shares the existing core,
+icon and portrait page leases. `UiSkinBatch` accepts a bounded per-consumer quad
+capacity; its default limit, ordering, overflow and alpha contracts are unchanged.
+See [native and package qualification](GraphicalBattlefieldHudQualification.md).

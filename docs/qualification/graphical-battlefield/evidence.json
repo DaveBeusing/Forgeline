@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "productionSource": "7e271dbdd9ad2c59810118a6d774398655ff7505",
+  "baseSource": "476f3646e16dd47eb40fbf7319f3f56349bf1eca",
+  "runtimeContentSignature": "b6cbe90cbbd4dfc780abb28f5d42f7bc3b469ae0cf4e663f594975a2bfd219d9",
+  "humanReview": "pending",
+  "captures": [
+    {
+      "root": "artifacts/battlefield-hud-before",
+      "source": "476f3646e16dd47eb40fbf7319f3f56349bf1eca",
+      "cases": 5,
+      "status": "structural-pass"
+    },
+    {
+      "root": "artifacts/battlefield-hud-current",
+      "source": "7e271dbdd9ad2c59810118a6d774398655ff7505",
+      "cases": 21,
+      "status": "structural-pass"
+    },
+    {
+      "root": "artifacts/battlefield-hud-current-compact",
+      "source": "7e271dbdd9ad2c59810118a6d774398655ff7505",
+      "cases": 21,
+      "status": "structural-pass"
+    },
+    {
+      "root": "artifacts/battlefield-hud-current-4k",
+      "source": "7e271dbdd9ad2c59810118a6d774398655ff7505",
+      "cases": 7,
+      "status": "structural-pass"
+    },
+    {
+      "root": "artifacts/battlefield-hud-current-matrix",
+      "source": "7e271dbdd9ad2c59810118a6d774398655ff7505",
+      "cases": 138,
+      "status": "structural-pass"
+    },
+    {
+      "root": "artifacts/battlefield-hud-current-packaged",
+      "source": "7e271dbdd9ad2c59810118a6d774398655ff7505",
+      "cases": 6,
+      "status": "structural-pass"
+    }
+  ],
+  "archive": {
+    "path": "artifacts/graphical-battlefield-current-package/FORGELINE-0.1.377-dev-win-x64.zip",
+    "bytes": 39981298,
+    "sha256": "2bf265986da748e939d54fafbbefaea55491ce2e7f7297dfffb6e6c2d936ddd9"
+  },
+  "retainedOriginals": [
+    {
+      "file": "native-manifests.zip",
+      "bytes": 475658,
+      "sha256": "70b360fac00af7e0a65d004381ed07fd295fa81e7d439df6166232bcca179b12",
+      "original": "Unmodified native records and execution logs; grouped by original root."
+    },
+    {
+      "file": "images/before-ResourcePressure.png",
+      "bytes": 3945577,
+      "sha256": "0ca451aab7b7745deaecadcb32b25e0090e5c3a2aee555a78f778471bacfa12b",
+      "original": "artifacts/battlefield-hud-before/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiResourcePressure-Scale1.00.png"
+    },
+    {
+      "file": "images/current-ResourcePressure.png",
+      "bytes": 4070794,
+      "sha256": "990a80aca81449c9788fc7d1fa5f164712b0ac0ca6d5255d4a8b116063318b7f",
+      "original": "artifacts/battlefield-hud-current/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiResourcePressure-Scale1.00.png"
+    },
+    {
+      "file": "images/before-SupplyCritical.png",
+      "bytes": 3945613,
+      "sha256": "29437f45efe849170a64c0ddc3ceeb6bf2025a5160b0a6f07b13841442f1aaad",
+      "original": "artifacts/battlefield-hud-before/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiSupplyCritical-Scale1.00.png"
+    },
+    {
+      "file": "images/current-SupplyCritical.png",
+      "bytes": 4070117,
+      "sha256": "cbe878c8101b2c581281fb1268590ae4a9ac31b1f3fe9cf9f89462a5053b2af9",
+      "original": "artifacts/battlefield-hud-current/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiSupplyCritical-Scale1.00.png"
+    },
+    {
+      "file": "images/before-MixedSelection.png",
+      "bytes": 3941603,
+      "sha256": "68857a9b225e638e690eeac4f530a3ddac7ee5da54974d2d62b3ec9a9c8949fd",
+      "original": "artifacts/battlefield-hud-before/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMixedSelection-Scale1.00.png"
+    },
+    {
+      "file": "images/current-MixedSelection.png",
+      "bytes": 4066500,
+      "sha256": "71265c441be52718f4b6d9d99263be94ef9d032d204a412ec50884afe4d04b6d",
+      "original": "artifacts/battlefield-hud-current/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiMixedSelection-Scale1.00.png"
+    },
+    {
+      "file": "images/before-DockPending.png",
+      "bytes": 4012275,
+      "sha256": "779dd6f7a7997ee662649202763adb0ebca1495f7deb7da2ff2893a949a9884f",
+      "original": "artifacts/battlefield-hud-before/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiDockPending-Scale1.00.png"
+    },
+    {
+      "file": "images/current-DockPending.png",
+      "bytes": 4137462,
+      "sha256": "34c5fa3f919147b652ca2bb10253cfe706e001a72a02414f4f79d185cbaba079",
+      "original": "artifacts/battlefield-hud-current/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiDockPending-Scale1.00.png"
+    },
+    {
+      "file": "images/before-DockRejected.png",
+      "bytes": 3981072,
+      "sha256": "f8bd68ef066f8e83401c7518e71b8f5131f8ac8a049db8f66bedd6cf59870daa",
+      "original": "artifacts/battlefield-hud-before/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiDockRejected-Scale1.00.png"
+    },
+    {
+      "file": "images/current-DockRejected.png",
+      "bytes": 4108576,
+      "sha256": "8127283296d7afc3f9fa81699e3a8995474666549208d15b829a8d020ac94186",
+      "original": "artifacts/battlefield-hud-current/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiDockRejected-Scale1.00.png"
+    },
+    {
+      "file": "images/current-DockAccepted.png",
+      "bytes": 4107511,
+      "sha256": "48a7f85d9fe1f689f93c0b627ae7495bc6d5d8be37e3b8780029f5291c7381a0",
+      "original": "artifacts/battlefield-hud-current/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiDockAccepted-Scale1.00.png"
+    },
+    {
+      "file": "images/current-SelectionUnit.png",
+      "bytes": 4070117,
+      "sha256": "cbe878c8101b2c581281fb1268590ae4a9ac31b1f3fe9cf9f89462a5053b2af9",
+      "original": "artifacts/battlefield-hud-current/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiSelectionUnit-Scale1.00.png"
+    },
+    {
+      "file": "images/current-SelectionBuilding.png",
+      "bytes": 4072987,
+      "sha256": "272d97b9a6b6004fe7a78dd6f99c32eafb848a26a7236dce4ba8cb77aec1c381",
+      "original": "artifacts/battlefield-hud-current/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiSelectionBuilding-Scale1.00.png"
+    },
+    {
+      "file": "images/current-ResourceUnknown.png",
+      "bytes": 4137389,
+      "sha256": "ca072f52a6a35cab9fd32c66bc21c7e4fddab56ab1c228f0c638086543a29ceb",
+      "original": "artifacts/battlefield-hud-current/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiResourceUnknown-Scale1.00.png"
+    },
+    {
+      "file": "images/current-GameplayTooltip.png",
+      "bytes": 4093482,
+      "sha256": "43497f2661eb079186d59bc4a97fb3d3c3a58220ceb19d015c8b2f8ecf1c455a",
+      "original": "artifacts/battlefield-hud-current/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiGameplayTooltip-Scale1.00.png"
+    },
+    {
+      "file": "images/current-GroupSummary.png",
+      "bytes": 3948285,
+      "sha256": "cebde3c8e76c1e55f029a02b4481e4dd3ad09fc25db5bf06476a75c08ed2c9e5",
+      "original": "artifacts/battlefield-hud-current/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiGroupSummary-Scale1.00.png"
+    },
+    {
+      "file": "images/current-SelectedGroup.png",
+      "bytes": 4144217,
+      "sha256": "c1a90c90362f363bc8f1d97acaaa295d30070ca9a727b4b7d8e41044b14429af",
+      "original": "artifacts/battlefield-hud-current/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiSelectedGroup-Scale1.00.png"
+    },
+    {
+      "file": "images/current-Onboarding.png",
+      "bytes": 3749072,
+      "sha256": "720bbdb630cda37e37d846bec82a4644ab3e6f33fcf5e3059b26ef39526ba867",
+      "original": "artifacts/battlefield-hud-current/BattlefieldCombat-1920x1080-Medium-NormalGameplay-Dpi96-UiOnboarding-Scale1.00.png"
+    },
+    {
+      "file": "images/compact-long-name.png",
+      "bytes": 1079044,
+      "sha256": "1f0eda0648ed391a94d39b4a8a31d0d57c99bcdfff78e7e5a6415aafb875e3cb",
+      "original": "artifacts/battlefield-hud-current-compact/BattlefieldCombat-1280x720-Medium-NormalGameplay-Dpi144-UiSelectionLongName-Scale2.00.png"
+    },
+    {
+      "file": "images/4k-selected-group.png",
+      "bytes": 9279317,
+      "sha256": "fd0bcd8d930f7103763d970aa84885d86fcedbadc376a7c600eb93f9916ddd3e",
+      "original": "artifacts/battlefield-hud-current-4k/BattlefieldCombat-3840x2160-Medium-NormalGameplay-Dpi192-UiSelectedGroup-Scale2.00.png"
+    }
+  ],
+  "remainingImages": "Original immutable artifacts roots remain local; full original manifests retain every image and pixel hash. Retained PNGs are unmodified byte-for-byte samples, not approved goldens."
+}

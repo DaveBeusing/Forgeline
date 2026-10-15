@@ -20,3 +20,7 @@ docs/qualification/directorate-ui-atlas/packaged-*.json -text whitespace=blank-a
 docs/qualification/graphical-frontend/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 docs/qualification/graphical-frontend/*.log -text -whitespace
 docs/qualification/graphical-frontend/evidence.json text eol=lf
+
+# Immutable battlefield qualification records preserve original bytes.
+docs/qualification/graphical-battlefield/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/qualification/graphical-battlefield/evidence.json text eol=lf
