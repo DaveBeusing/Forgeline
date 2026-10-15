@@ -4,6 +4,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 if ([IO.Path]::GetFullPath($OutputPath).StartsWith([IO.Path]::GetFullPath($EvidenceRoot).TrimEnd('\','/') + [IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw 'Review must be separate from immutable evidence.' }
 $manifestPath = Join-Path $EvidenceRoot 'manifest.json'
+if (Test-Path -LiteralPath (Join-Path $EvidenceRoot 'failure.json')) { throw 'Failed evidence cannot enter baseline review.' }
 $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
 if ($manifest.status -ne 'structural-pass') { throw 'Only completed structural evidence can enter review.' }
 $review = [ordered]@{

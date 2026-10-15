@@ -93,6 +93,7 @@ internal static class VisualReferenceCapture
         var captureInputs = new List<object>();
         var failedCaptures = new List<string>();
         var uiPixelHashes = new Dictionary<string, string>(StringComparer.Ordinal);
+        object? captureState = null;
         long startupStart = Stopwatch.GetTimestamp();
         long startupAllocationStart = GC.GetAllocatedBytesForCurrentThread();
         try
@@ -111,6 +112,7 @@ internal static class VisualReferenceCapture
             var catalog = RuntimeAssetCatalog.Load(request.RuntimeRoot);
             var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
             var fixtures = request.Scenes.Select(x => VisualReferenceScene.Create(x, terrain, runtimeAssets: catalog)).ToArray();
+            using var capturePower = new ReferenceCapturePowerLease();
             using var platform = new WindowsPlatform();
             using IWindow window = platform.CreateWindow(new("FORGELINE Reference Capture", 1280, 720));
             using var graphics = GraphicsDeviceFactory.CreateForWindow(window, new()
@@ -296,6 +298,7 @@ internal static class VisualReferenceCapture
                         measured.Health.SubmissionFaultCount != 0 || measured.Health.FailureReasonCode is not null ||
                         (measured.Debug.Enabled && measured.Debug.ErrorCount != 0))
                         throw new InvalidOperationException("Capture contains failed bindings or fallback meshes.");
+                    captureState = new { key, stage = "first-readback", surface = graphics.Diagnostics.Surface, hostWindowDpi = window.Dpi };
                     byte[] rgba = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
                     bool repeatPixelsEqual = true;
                     var repeatFailures = new List<object>();
@@ -304,6 +307,7 @@ internal static class VisualReferenceCapture
                         shadowFingerprint = shadowDepth.IsEmpty ? null : Convert.ToHexString(SHA256.HashData(shadowDepth.Span)) });
                     for (int repetition = 1; repetition < request.RepeatCaptures; repetition++)
                     {
+                        captureState = new { key, stage = "repeat-readback", repetition, surface = graphics.Diagnostics.Surface, hostWindowDpi = window.Dpi };
                         byte[] repeated = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
                         captureInputs.Add(new { frameIndex = recordFrameIndex, fingerprint = graphics.CaptureInputFingerprint,
                             shadowFingerprint = graphics.CaptureShadowDepth.IsEmpty ? null : Convert.ToHexString(SHA256.HashData(graphics.CaptureShadowDepth.Span)) });
@@ -343,6 +347,7 @@ internal static class VisualReferenceCapture
                             camera.ApplyState(original with { Target = original.Target + new Vector3(step * .5f, 0, step * .5f), YawRadians = original.YawRadians + step * .005f });
                             PrepareTerrain();
                             string motionImage = $"{key}-motion-{step:D2}.png";
+                            captureState = new { key, stage = "camera-pose-readback", step, surface = graphics.Diagnostics.Surface, hostWindowDpi = window.Dpi };
                             byte[] motion = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
                             ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, motionImage), display.Width, display.Height, motion);
                             motionImages.Add(new { image = motionImage, imageSha256 = FileHash(Path.Combine(request.OutputRoot, motionImage)), camera = camera.CaptureState() });
@@ -364,7 +369,7 @@ internal static class VisualReferenceCapture
                             regions, text, vertices = frontend?.LastRenderedVertexCount ?? hud.LastRenderedVertexCount,
                             background = frontend?.BackgroundDiagnostics },
                         seed = VisualReferenceScene.Seed, tick = fixture.Snapshot.Tick.Value, captureVisualSeconds, camera = camera.CaptureState(),
-                        requestedDisplay = display, actualSurface = measured.Surface, hostWindow = window.ClientSize,
+                        requestedDisplay = display, actualSurface = measured.Surface, hostWindow = window.ClientSize, hostWindowDpi = window.Dpi,
                         rasterDpi, uiScale, requestedQuality = quality, profile, lighting,
                         localHaze = graphics.Atmosphere.Enabled ? graphics.Atmosphere.LocalHaze : null, surfaceMarks = request.SurfaceMarks,
                         cpu = Distribution(cpu), gpu = Distribution(gpu.ToArray()), fps = Distribution(cpu.Select(x => 1000 / x).ToArray()),
@@ -386,11 +391,11 @@ internal static class VisualReferenceCapture
             string? aggregateFailure = failedCaptures.Count == 0 ? null : $"{failedCaptures.Count} fixed-state cases contain unequal native pixels.";
             WriteManifest(aggregateFailure is null ? "structural-pass" : "structural-failure", aggregateFailure);
             if (aggregateFailure is not null)
-                File.WriteAllText(Path.Combine(request.OutputRoot, "failure.json"), JsonSerializer.Serialize(new
+                ReferenceCaptureManifest.Write(Path.Combine(request.OutputRoot, "failure.json"), JsonSerializer.Serialize(new
                 { status = "structural-failure", error = aggregateFailure, completedCaptures = captures.Count, failedCaptures }, JsonOptions));
             return aggregateFailure is null ? 0 : 1;
 
-            void WriteManifest(string status, string? error) => File.WriteAllText(Path.Combine(request.OutputRoot, "manifest.json"),
+            void WriteManifest(string status, string? error) => ReferenceCaptureManifest.Write(Path.Combine(request.OutputRoot, "manifest.json"),
                 JsonSerializer.Serialize(new { schemaVersion = 1, status, error, request.Commit, buildIdentity = identity,
                     runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
                     environment = new { os = System.Runtime.InteropServices.RuntimeInformation.OSDescription,
@@ -398,6 +403,7 @@ internal static class VisualReferenceCapture
                         logicalProcessors = Environment.ProcessorCount, cpu = Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER"),
                         configuration = typeof(Program).Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>()?.Configuration },
                     runtimeFingerprint, request.Driver, software = request.Software, fixtureVersion = VisualReferenceScene.FixtureVersion,
+                    hostWindowDpi = window.Dpi, executionRequirement = "Thread-scoped display/system requirement during explicit capture; user sleep/lock and occlusion checks remain authoritative.",
                     clientAssemblySha256 = FileHash(typeof(Program).Assembly.Location),
                     presentationAssemblySha256 = FileHash(typeof(GameplayHudRenderer).Assembly.Location),
                     startupMilliseconds, startupAllocatedBytes,
@@ -410,7 +416,7 @@ internal static class VisualReferenceCapture
             Console.Error.WriteLine($"[reference:failure] {error.GetType().Name}: {error.Message}");
             // Never overwrite an existing evidence directory after a rejected request.
             if (request is not null && outputCreated)
-                File.WriteAllText(Path.Combine(request.OutputRoot, "failure.json"), JsonSerializer.Serialize(new { status = "structural-failure", error = error.ToString(), completedCaptures = captures.Count, captureInputs }, JsonOptions));
+                ReferenceCaptureManifest.Write(Path.Combine(request.OutputRoot, "failure.json"), JsonSerializer.Serialize(new { status = "structural-failure", error = error.ToString(), completedCaptures = captures.Count, captureState, captureInputs }, JsonOptions));
             return 1;
         }
     }

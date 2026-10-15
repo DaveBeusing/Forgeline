@@ -8,6 +8,7 @@ param([Parameter(Mandatory)][string]$CurrentRoot, [string]$BaselineRoot,
     [ValidateRange(0,0.05)][double]$MaximumChangedPixelFraction = 0)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+if (Test-Path -LiteralPath (Join-Path $CurrentRoot 'failure.json')) { throw 'Evidence has a recorded failure.' }
 $current = Get-Content -LiteralPath (Join-Path $CurrentRoot 'manifest.json') -Raw | ConvertFrom-Json
 if ($current.schemaVersion -ne 1) { throw 'Unsupported evidence schema.' }
 if ($current.status -ne 'structural-pass') { throw "Incomplete native capture: $($current.status)." }
@@ -22,6 +23,7 @@ if ($GateImages -and -not $BaselineRoot) { throw 'Image gate requires a baseline
 if ($ComparePixels -and -not $BaselineRoot) { throw 'Pixel comparison requires a baseline.' }
 if (($GateImages -or $ComparePixels) -and -not ('ReferenceImageComparison' -as [type])) { Add-Type -Path "$PSScriptRoot/ReferenceImageComparison.cs" }
 if ($BaselineRoot) {
+    if (Test-Path -LiteralPath (Join-Path $BaselineRoot 'failure.json')) { throw 'Baseline has a recorded failure.' }
     if ([IO.Path]::GetFullPath($CurrentRoot) -eq [IO.Path]::GetFullPath($BaselineRoot)) { throw 'Baseline and current evidence must be distinct.' }
     $baseline = Get-Content -LiteralPath (Join-Path $BaselineRoot 'manifest.json') -Raw | ConvertFrom-Json
     if ($baseline.schemaVersion -ne 1) { throw 'Unsupported baseline schema.' }
@@ -114,8 +116,8 @@ $rows = foreach ($capture in $current.captures) {
         }
         if ($sameInputs -and $capture.PSObject.Properties.Name -contains 'ui') {
             $sameInputs = $previous.PSObject.Properties.Name -contains 'ui' -and
-                (($capture.ui | Select-Object scenario,fixtureVersion,layoutId,captureOffset | ConvertTo-Json -Compress) -ceq
-                 ($previous.ui | Select-Object scenario,fixtureVersion,layoutId,captureOffset | ConvertTo-Json -Compress))
+                (($capture.ui | Select-Object scenario,fixtureVersion,layoutId,captureOffset,interaction | ConvertTo-Json -Depth 5 -Compress) -ceq
+                 ($previous.ui | Select-Object scenario,fixtureVersion,layoutId,captureOffset,interaction | ConvertTo-Json -Depth 5 -Compress))
         }
         if (-not $sameInputs) { $imageFailures.Add("$($capture.key): changed or missing fixture/device/settings require human review") }
         else {

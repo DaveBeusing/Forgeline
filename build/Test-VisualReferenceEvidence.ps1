@@ -61,6 +61,13 @@ try {
     & "$PSScriptRoot/Export-VisualReferenceReview.ps1" -EvidenceRoot $baseline -OutputPath (Join-Path $root 'pending-review.json')
     Reject { & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -BaselineRoot $baseline -GateImages -ApprovalPath (Join-Path $root 'pending-review.json') -ReportPath (Join-Path $root 'unapproved.json') }
     Reject { & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -BaselineRoot $baseline -GateImages -ReportPath (Join-Path $root 'missing-approval.json') }
+    foreach ($failedRoot in @($current,$baseline)) {
+        $failurePath=Join-Path $failedRoot 'failure.json'
+        '{}' | Set-Content -LiteralPath $failurePath
+        Reject { & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $current -BaselineRoot $baseline -ReportPath (Join-Path $root 'recorded-failure.json') }
+        Reject { & "$PSScriptRoot/Export-VisualReferenceReview.ps1" -EvidenceRoot $failedRoot -OutputPath (Join-Path $root 'failed-review.json') }
+        Remove-Item -LiteralPath $failurePath
+    }
     Write-Output 'Reference dimensions/checksums, incomplete-state rejection and read-only baseline contracts passed.'
 } finally {
     $resolved = [IO.Path]::GetFullPath($root)

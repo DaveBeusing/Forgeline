@@ -7,6 +7,11 @@ fixture (MinimapStrategic selects the strategic camera explicitly). They support
 1280x720 in addition to the four original output sizes. Each UI row records the
 named state, layout owner, text completion, bounded region pixel hashes and vertex
 count. These are authored permitted read models; no input or command is dispatched.
+
+See the [UI review handbook](UiVisualReview.md) for review-bound baseline gating,
+small hardware cohorts, failure preservation and the distinction between requested
+raster DPI and the actual host-window DPI. A `failure.json` marker always rejects
+qualification and review export, irrespective of a stale progress status.
 The manifest includes client/presentation assembly hashes. Region pixel equality
 detects change; nonuniform pixels alone do not establish semantic visibility.
 

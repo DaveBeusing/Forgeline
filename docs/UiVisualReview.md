@@ -23,6 +23,21 @@ Low/software and lifecycle tests remain required. Without `-CinematicFrontend`,
 the production schematic fallback is intentional. Requested cinematic art must
 become Ready or capture fails; missing required runtime assets reject capture.
 
+Long hardware matrices may be split into independently complete requests, for
+example one `-Displays` value per output root. Inventory the exact union of case
+keys, source/build/runtime identities and original manifest hashes; never promote
+an interrupted manifest or overwrite its root to complete a matrix. A failed root
+remains failed even if its last progress manifest happens to say structural-pass.
+
+Explicit capture holds a thread-owned Windows display/system execution requirement
+and restores the preceding requirements on exit. This is a temporary capture
+resource, not a power-plan change. User sleep/lock, screensavers and occlusion
+remain authoritative. See [Windows execution requirements](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate).
+Progress manifests are published atomically. Concurrent observers should open with
+`FileShare.ReadWrite | FileShare.Delete`; they retain the complete old snapshot
+while the next one is published. Failures include the pending capture stage,
+surface lifecycle and actual host-window DPI. Requested raster DPI remains separate.
+
 The default World request and original fixture files remain unchanged. Named
 states are authored copied facts, not natural matches. Contacts retains the existing
 identified/hidden enemy fixture and extractor boundary. MinimapStrategic changes
