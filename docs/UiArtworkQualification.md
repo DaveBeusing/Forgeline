@@ -28,7 +28,7 @@ The original native camera/lighting/identity record is included verbatim in
 | Project boundaries / canonical runtime compile | Passed: 43 projects; 1,329 assets, 799 new textures |
 | Complete solution tests | Passed: 2,009 passed, 0 failed, 9 existing opt-in skips; 2,018 total, 7m 27.959s |
 | Package boundary and reproducible source-less player | Passed: 9 guard contracts; identical publish trees, clean source provenance, packaged application/session Ready |
-| Current-head required build-test CI | Pending |
+| Required build-test CI | Previous qualified source c8bdb: failed at Windows window mode and visual qualification smoke; final evidence head pending |
 | Human art, physical display and calibrated color-vision review | Review pending |
 | Live UI integration / installed cursor behavior / integrated GPU cost | Not in this source-art scope |
 
@@ -118,3 +118,12 @@ python build/Inspect-UiArtworkContrast.py --native-root artifacts/ui-artwork-ter
 
 Use an empty output directory when reproducing; retained evidence is never
 replaced by the inspection helper.
+
+CI run `38780940839` on the qualified source completed the build, runtime
+compile, package guards and native WARP capture, then failed at Windows window
+mode and visual qualification smoke (step 31). Later solution-test/package and
+terminal-match CI steps were skipped. The local complete solution and package
+results above are independent evidence, not a CI pass. Detailed job-log retrieval
+was unavailable (connector transport closed twice), so the underlying CI failure
+is unresolved and no cause is asserted. Scalability and frame hot-path workflows
+on that source passed. Required CI and human acceptance remain merge blockers.
