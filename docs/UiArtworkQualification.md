@@ -26,8 +26,8 @@ The original native camera/lighting/identity record is included verbatim in
 | Pixel/hash/hotspot/size source tests | Passed: 6/6 artwork plus skin tests after canonical-LF and source-isolation repair |
 | Actual enum/resource/technology/roster mapping tests | Passed: 3/3, all current domains and identities |
 | Project boundaries / canonical runtime compile | Passed: 43 projects; 1,329 assets, 799 new textures |
-| Complete solution tests | Initial run: 2,006 passed, 3 failed, 9 skipped; source-boundary fixes prepared, final rerun pending |
-| Package boundary and reproducible source-less player | 9 package guard contracts passed; reproducible player packaging pending |
+| Complete solution tests | Passed: 2,009 passed, 0 failed, 9 existing opt-in skips; 2,018 total, 7m 27.959s |
+| Package boundary and reproducible source-less player | Passed: 9 guard contracts; identical publish trees, clean source provenance, packaged application/session Ready |
 | Current-head required build-test CI | Pending |
 | Human art, physical display and calibrated color-vision review | Review pending |
 | Live UI integration / installed cursor behavior / integrated GPU cost | Not in this source-art scope |
@@ -41,7 +41,7 @@ pwsh ./build/Validate-ProjectReferences.ps1
 pwsh ./build/Build-RuntimeAssets.ps1 -Mode development -NoBuild
 pwsh ./build/Test-UiSkinPackage.ps1
 dotnet test --solution ForgeLine.sln --configuration Release --no-build
-pwsh ./build/Publish-PreAlpha.ps1 -Configuration Release -VerifyReproducible -RuntimeAssetRoot assets/runtime -OutputRoot artifacts/ui-artwork-package
+pwsh ./build/Publish-PreAlpha.ps1 -Configuration Release -VerifyReproducible -RuntimeAssetRoot assets/runtime -OutputRoot artifacts/ui-artwork-package-clean
 ```
 
 No existing assertions, approved goldens, native lifetime or terminal-match gates
@@ -88,3 +88,33 @@ Canonical runtime content signature:
 Native model capture used the preceding sealed production runtime signature
 `c7fe53eb349cb4b93e36e4c2bec1f324bc39f3a59bcf96aa617984357eb10df9`;
 adding UI textures does not change the captured model/material identities.
+## Final technical qualification identity
+
+Build, complete solution tests, reproducible package and native terrain capture
+use `c8bdbebfd56b109d34fdb92dc41c715fd463b189`. Subsequent changes only retain
+inspection evidence, its authoring helper and this qualification record; they do
+not change compiled code or production asset pixels. Final-head required CI is
+still a separate merge gate.
+
+[Package verification](qualification/directorate-ui-artwork/package-verification.json)
+records the clean source revision, archive hash, runtime signature and startup
+report identity. The archive is `FORGELINE-0.1.374-dev-win-x64.zip`, 38,379,103
+bytes, SHA-256 `af6f7f371014425ffe0b10ec853c9ab0b3f2892e08b83a28defd9e2d73f466ee`.
+The packaged player reached application and session Ready with zero dropped
+diagnostic events, using isolated settings.
+
+[Terrain evidence](qualification/directorate-ui-artwork/terrain/evidence.json)
+retains an unchanged hardware-rendered BattlefieldCombat capture at 1920x1080,
+Medium, CloseTactical, 96 DPI; repeat captures have identical pixels. Every one
+of the 715 vector size variants is composited at its actual pixel size over
+unscaled bright and shadow terrain crops. These are source contrast inspection
+sheets, not evidence of live UI integration or integrated GPU performance.
+Human readability, physical display and calibrated color-vision acceptance
+remain pending, including the documented unavailable/inspection-only variants.
+
+```powershell
+python build/Inspect-UiArtworkContrast.py --native-root artifacts/ui-artwork-terrain-native --output docs/qualification/directorate-ui-artwork/terrain
+```
+
+Use an empty output directory when reproducing; retained evidence is never
+replaced by the inspection helper.

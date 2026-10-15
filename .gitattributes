@@ -8,4 +8,4 @@ assets/source/ui/fonts/*.png binary
 # Editable vector identities must match the Git blobs on every checkout.
 assets/source/ui/directorate/**/*.svg text eol=lf
 docs/qualification/directorate-ui-artwork/*.csv text eol=lf
-docs/qualification/directorate-ui-artwork/*.json text eol=lf
+docs/qualification/directorate-ui-artwork/**/*.json text eol=lf
