@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "purpose": "visual-reference-inventory",
+  "importStatus": "pending_binary_import",
+  "runtimeEligible": false,
+  "baselineCommit": "563f8c79641cb6f227ae009cc3213e012c4e7fed",
+  "rightsEvidence": "not_recorded",
+  "references": [
+    { "id": "reference.ui.directorate.visual_language", "file": "ui_visual_language.png", "status": "pending_binary_import", "bytes": null, "width": null, "height": null, "sha256": null, "gitBlobSha": null },
+    { "id": "reference.ui.directorate.hud_panels", "file": "hud_panel_reference.png", "status": "pending_binary_import", "bytes": null, "width": null, "height": null, "sha256": null, "gitBlobSha": null },
+    { "id": "reference.ui.directorate.resource_status", "file": "resource_status_reference.png", "status": "pending_binary_import", "bytes": null, "width": null, "height": null, "sha256": null, "gitBlobSha": null },
+    { "id": "reference.ui.directorate.command_cursor", "file": "command_cursor_reference.png", "status": "pending_binary_import", "bytes": null, "width": null, "height": null, "sha256": null, "gitBlobSha": null },
+    { "id": "reference.ui.directorate.strategic_markers", "file": "strategic_marker_reference.png", "status": "pending_binary_import", "bytes": null, "width": null, "height": null, "sha256": null, "gitBlobSha": null }
+  ]
+}
