@@ -118,6 +118,30 @@ public sealed class EconomicInterfaceSkinTests
         }
     }
     [Fact]
+    public void SelectedQueueProgressRemainsVisibleAboveTheFocusBorder()
+    {
+        using var platform = new WindowsPlatform(); using IWindow window = platform.CreateWindow(new("FORGELINE selected queue",1280,720));
+        using var device = GraphicsDeviceFactory.CreateForWindow(window,new() { ForceSoftwareAdapter = true,EnableVSync = false });
+        using var renderer = new PlayerActionDockHudRenderer(device,RuntimeAssetCatalog.Load(Path.Combine(Root(),"assets/runtime")));
+        HudRect card = default; int width = 0; float scale = 1;
+        byte[] Capture(double progress) => device.CaptureFrame(GraphicsColor.ForgeLineClear,c =>
+        {
+            var layout = GameplayHudLayout.Create(c.Width,c.Height,96,1); width = c.Width;
+            scale = PlayerActionDockInteractionLayout.Scale(layout);
+            Assert.False(PlayerActionDockInteractionLayout.Compact(layout));
+            card = PlayerActionDockInteractionLayout.GetCardRect(layout,0);
+            renderer.Render(c,Snapshot(actions:Processing(ProductionBlockReason.None,progress:progress)),
+                default(PlayerActionPanelView) with { Mode = PlayerActionPanelMode.Production,SelectedIndex = 0 },default,FormationTemplate.Compact,layout);
+        });
+        var empty = Capture(0); var full = Capture(1);
+        int changes = 0;
+        // The progress lane sits above the full-width selected border and below card details.
+        for (int y = (int)(card.Bottom - 10 * scale); y < (int)(card.Bottom - 4 * scale); y++)
+        for (int x = (int)(card.X + 8 * scale); x < (int)(card.Right - 8 * scale); x++)
+        { int pixel = (y * width + x) * 4; if (!empty.AsSpan(pixel,4).SequenceEqual(full.AsSpan(pixel,4))) changes++; }
+        Assert.True(changes > 0,"Selected border obscured the production progress fill.");
+    }
+    [Fact]
     public void NativeThinMetersRetainVisibleClippedFillAndUnknownNeverLooksCompleted()
     {
         using var platform = new WindowsPlatform(); using IWindow window = platform.CreateWindow(new("FORGELINE queue meters",1280,720));
@@ -179,8 +203,8 @@ public sealed class EconomicInterfaceSkinTests
         device.WaitForIdle(); Assert.Equal(0, device.Diagnostics.Resources.LoadedTextureCount);
         Assert.Equal(0, device.Diagnostics.Health.SubmissionFaultCount);
     }
-    private static PlayerActionSnapshot Processing(ProductionBlockReason reason, bool paused = false, bool active = true) => new(new(1),new(1),[],0,
-        new(new(10,1),new(20,1),RecipeIds.Steel,ProductionStatus.Running,reason,.42,[],
+    private static PlayerActionSnapshot Processing(ProductionBlockReason reason, bool paused = false, bool active = true, double progress = .42) => new(new(1),new(1),[],0,
+        new(new(10,1),new(20,1),RecipeIds.Steel,ProductionStatus.Running,reason,progress,[],
             [new(new(20,1),RecipeIds.Steel,"Steel",ProductionPriority.Normal,ProductionRequestMode.Repeat,paused,active)]),null);
     private static PlayerActionSnapshot Units(UnitProductionBlockReason reason) => new(new(1),new(1),[],0,null,
         new(new(10,1),new(20,1),UnitIds.MainBattleTank,UnitProductionStatus.Running,reason,.63,

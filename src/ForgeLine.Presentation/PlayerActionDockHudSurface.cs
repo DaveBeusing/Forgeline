@@ -918,9 +918,9 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             DockText(text.Written, rect.X + 6 * _scale, rect.Y + (compact ? 30 : 39) * _scale,
                 rect.Right - 5 * _scale, MutedTextColor, 10, false, width, height);
             double? progress = _skin.Ready ? work.Progress : CardProgress(panel.Mode, index, actions);
-            if (progress.HasValue && (_skin.Ready || !compact))
+            if (!compact && progress.HasValue)
             {
-                if (_skin.Bar(new(rect.X + 6 * _scale, rect.Bottom - 4 * _scale, rect.Width - 12 * _scale, 2 * _scale),
+                if (_skin.Bar(new(rect.X + 6 * _scale, rect.Bottom - 8 * _scale, rect.Width - 12 * _scale, 2 * _scale),
                     progress.Value, work.State == UiSkinState.Warning ? GameplayHudVisualStyle.Warning : GameplayHudVisualStyle.Focus)) continue;
                 EmitQuad(rect.X + 6 * _scale, rect.Bottom - 4 * _scale, rect.Width - 12 * _scale,
                     2 * _scale, GameplayHudVisualStyle.QuietBorder, width, height);
