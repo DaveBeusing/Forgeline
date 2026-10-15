@@ -184,7 +184,10 @@ public sealed partial class FrontendOverlayRenderer
             Action(view.SecondaryAction, layout.SecondaryAction, false, view.SecondaryHovered, view.SecondaryPressed);
         }
         var motion = view.Motion ?? UiMotionView.Settled;
-        if (motion.Reveal < 1) Panel(layout.Title with { Y = layout.Title.Bottom - scale, Height = scale, Width = layout.Title.Width * Math.Clamp(motion.Reveal, 0, 1) }, "control.separator");
+        if (motion.Reveal < 1)
+            skin.Draw(SkinIds["progress.progress_fill"], Rect(layout.Title with
+            { Y = layout.Title.Bottom - 4 * scale, Height = 4 * scale }), ForgeLineUiPalette.Accent,
+                fill: Math.Clamp(motion.Reveal, 0, 1));
         var footer = Wrap(view.Footer, layout.Footer.Width / scale, 22 * .78f);
         for (int i = 0; i < Math.Min(2, footer.Length); i++) Text(footer[i], layout.Footer with { Y = layout.Footer.Y + i * 24 * scale }, ForgeLineUiPalette.TextMuted, .78f);
         if (!string.IsNullOrEmpty(view.Feedback))

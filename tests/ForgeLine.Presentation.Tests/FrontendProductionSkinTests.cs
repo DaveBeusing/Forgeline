@@ -56,6 +56,21 @@ public sealed class FrontendProductionSkinTests
         Assert.NotEqual(dark.AsSpan((y*1280+1200)*4,4).ToArray(),bright.AsSpan((y*1280+1200)*4,4).ToArray());
     }
     [Fact]
+    public void MenuRevealRemainsVisibleAtSupportedScales()
+    {
+        using var platform=new WindowsPlatform();using IWindow window=platform.CreateWindow(new("FORGELINE reveal skin",1280,720));
+        using var device=GraphicsDeviceFactory.CreateForWindow(window,new(){ForceSoftwareAdapter=true,EnableVSync=false});
+        using var renderer=new FrontendOverlayRenderer(device);renderer.PrepareSkin(RuntimeAssetCatalog.Load(RuntimeRoot()));
+        foreach(float scale in new[]{.75f,1f,2f})
+        {
+            var view=View(FrontendSurfaceKind.MainMenu) with { Layout=FrontendGeometry.Resolve(1280,720,scale,96) };
+            var settled=device.CaptureFrame(GraphicsColor.ForgeLineClear,c=>renderer.Render(c,view));
+            var revealing=view with { Motion=new UiMotionView(.5f,.5f,0) };
+            var animated=device.CaptureFrame(GraphicsColor.ForgeLineClear,c=>renderer.Render(c,revealing));
+            Assert.False(settled.AsSpan().SequenceEqual(animated));
+        }
+    }
+    [Fact]
     public void MissingRequiredSkinHasExplicitFailedStateAndUsableEmergencyRendering()
     {
         string root=Path.Combine(Path.GetTempPath(),"forgeline-missing-frontend-"+Guid.NewGuid().ToString("N"));
