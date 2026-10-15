@@ -243,7 +243,7 @@ def main():
         stem = f"{family}_{name}"
         png, svg = OUT / f"{stem}.png", OUT / f"{stem}.svg"
         drawing.image.save(png, optimize=False)
-        svg.write_text("\n".join(drawing.svg + ["</svg>", ""]), encoding="utf-8")
+        svg.write_text("\n".join(drawing.svg + ["</svg>", ""]), encoding="utf-8", newline="\n")
         asset_id = f"ui.skin.directorate.{family}.{name}"
         metadata = {"id": asset_id, "type": "texture", "source": png.name,
                     "textureUsage": "displayImage", "textureColorSpace": "linear",

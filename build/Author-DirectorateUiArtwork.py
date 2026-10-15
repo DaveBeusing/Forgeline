@@ -284,7 +284,7 @@ def main():
         folder=OUT/family;folder.mkdir(exist_ok=True)
         master=folder/(name+'.svg')
         g=Glyph(64);draw(g,role)
-        master.write_text('\n'.join(g.drawing.svg+['</svg>','']))
+        master.write_text('\n'.join(g.drawing.svg+['</svg>','']), encoding='utf-8', newline='\n')
         unavailable=role=='command.patrol'
         for size in SIZES:
             # Independent vector rasterization per target size; no upscaled bitmap.

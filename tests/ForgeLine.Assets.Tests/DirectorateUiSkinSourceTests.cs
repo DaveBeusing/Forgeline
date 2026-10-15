@@ -33,6 +33,7 @@ public sealed class DirectorateUiSkinSourceTests
             Assert.Equal(Hash(Path.Combine(Source, file)), sprite.GetProperty("sha256").GetString());
             Assert.Equal(Hash(Path.Combine(Source, editable)), sprite.GetProperty("editableSha256").GetString());
             XDocument svg = XDocument.Load(Path.Combine(Source, editable));
+            Assert.DoesNotContain("\r", File.ReadAllText(Path.Combine(Source, editable)), StringComparison.Ordinal);
             Assert.DoesNotContain(svg.Descendants(), e => e.Name.LocalName is "text" or "image" or "script");
             Assert.Equal(sprite.GetProperty("width").GetInt32().ToString(System.Globalization.CultureInfo.InvariantCulture), svg.Root!.Attribute("width")!.Value);
             int[] insets = sprite.GetProperty("insets").EnumerateArray().Select(static x => x.GetInt32()).ToArray();
@@ -62,10 +63,18 @@ public sealed class DirectorateUiSkinSourceTests
         string runtime = Path.Combine(Path.GetTempPath(), "forgeline-ui-skin-" + Guid.NewGuid().ToString("N"));
         try
         {
-            AssetCompilationResult result = AssetPipelineCompiler.Compile(Source, runtime, clean: true);
+            // Keep this round trip scoped to the skin family. Artwork now lives
+            // in a child directory and has its own complete decoding contracts.
+            string skinSource = Path.Combine(runtime, "skin-sources");
+            string output = Path.Combine(runtime, "compiled");
+            Directory.CreateDirectory(skinSource);
+            foreach (string file in Directory.EnumerateFiles(Source, "*.png")
+                .Concat(Directory.EnumerateFiles(Source, "*.asset.json")))
+                File.Copy(file, Path.Combine(skinSource, Path.GetFileName(file)));
+            AssetCompilationResult result = AssetPipelineCompiler.Compile(skinSource, output, clean: true);
             Assert.True(result.Success, string.Join(Environment.NewLine, result.Diagnostics));
             Assert.Equal(37, result.CompiledCount);
-            RuntimeAssetCatalog catalog = RuntimeAssetCatalog.Load(runtime);
+            RuntimeAssetCatalog catalog = RuntimeAssetCatalog.Load(output);
             using JsonDocument sourceCatalog = JsonDocument.Parse(File.ReadAllText(Path.Combine(Source, "skin.catalog.json")));
             foreach (JsonElement source in sourceCatalog.RootElement.GetProperty("sprites").EnumerateArray())
             {

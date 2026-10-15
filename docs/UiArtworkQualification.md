@@ -22,12 +22,12 @@ The original native camera/lighting/identity record is included verbatim in
 | Source production | 143 vector roles, 20 roster identities, 815 PNGs, 799 texture definitions |
 | Exclusions | Patrol (5 PNGs) intentionally unavailable; 16-pixel cursor inspection (11 PNGs) not registered; railway/aviation reference-only |
 | Restore | Passed |
-| Release solution build | In progress; constant-array analyzer findings in new tests corrected |
-| Pixel/hash/hotspot/size source tests | Pending |
-| Actual enum/resource/technology/roster mapping tests | Pending |
-| Project boundaries / canonical runtime compile | Pending |
-| Complete solution tests | Pending |
-| Package boundary and reproducible source-less player | Pending |
+| Release solution build | Passed; zero warnings/errors |
+| Pixel/hash/hotspot/size source tests | Passed: 6/6 artwork plus skin tests after canonical-LF and source-isolation repair |
+| Actual enum/resource/technology/roster mapping tests | Passed: 3/3, all current domains and identities |
+| Project boundaries / canonical runtime compile | Passed: 43 projects; 1,329 assets, 799 new textures |
+| Complete solution tests | Initial run: 2,006 passed, 3 failed, 9 skipped; source-boundary fixes prepared, final rerun pending |
+| Package boundary and reproducible source-less player | 9 package guard contracts passed; reproducible player packaging pending |
 | Current-head required build-test CI | Pending |
 | Human art, physical display and calibrated color-vision review | Review pending |
 | Live UI integration / installed cursor behavior / integrated GPU cost | Not in this source-art scope |
@@ -48,3 +48,43 @@ No existing assertions, approved goldens, native lifetime or terminal-match gate
 are weakened. The previous shutdown finding is historical context; current-head
 results must establish their own outcomes. Keep the PR draft while required CI
 or human acceptance is pending. No merge, automatic tag or release is performed.
+
+## Source boundary corrections
+
+The initial full run found three concrete source-test regressions. The skin
+round trip recursively included the new artwork child directory; it now stages
+only its 37 own PNG/definition pairs, preserving the exact 37-texture assertion.
+Physical material checks selected UI action filenames containing production;
+they now exclude DisplayImage usage while retaining all 24 native 4096-pixel
+masters, runtime cap requirements and the 51,364,204-byte physical texture budget.
+No assertion or approved golden is relaxed.
+
+A separate Git-byte audit found editable SVG hashes depended on Windows CRLF
+conversion, including the preceding skin family. Both authoring scripts now emit
+canonical LF and scoped .gitattributes preserve it. Editable hashes are corrected
+for the same vector content; all production PNG bytes remain unchanged. Source
+checks explicitly reject CRLF masters. This repairs reproducible source identity,
+not the visual content or runtime texture format.
+
+## Retained inspection evidence
+
+[Evidence ledger](qualification/directorate-ui-artwork/evidence.json),
+[semantic coverage](qualification/directorate-ui-artwork/semantic-coverage.csv),
+[resources](qualification/directorate-ui-artwork/resource.png),
+[commands](qualification/directorate-ui-artwork/command.png),
+[markers](qualification/directorate-ui-artwork/marker.png),
+[cursors](qualification/directorate-ui-artwork/cursor.png) and four portrait pages
+retain actual-size source inspection output. Original source PNGs and vector
+relationships are in the catalog. Labels belong to contact sheets only.
+The ledger remains human-review-pending; these are not accepted native UI goldens.
+
+Registered artwork storage: 12,481,024 decoded RGBA bytes and 13,110,630 compiled
+container bytes. All 815 source PNGs total 2,010,426 bytes, including excluded
+inspection/unavailable variants. This is storage accounting, not integrated GPU
+residency or sustained frame-time performance. No live draw path changes.
+
+Canonical runtime content signature:
+`e62d83a106f8a2e88c3a2a1f5acb7794ed8bc7fb683e40adc91c5cd404753aa5`.
+Native model capture used the preceding sealed production runtime signature
+`c7fe53eb349cb4b93e36e4c2bec1f324bc39f3a59bcf96aa617984357eb10df9`;
+adding UI textures does not change the captured model/material identities.

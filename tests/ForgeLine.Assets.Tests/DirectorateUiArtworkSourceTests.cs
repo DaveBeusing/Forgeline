@@ -54,6 +54,7 @@ public sealed class DirectorateUiArtworkSourceTests
             if (sprite.TryGetProperty("editableSource", out JsonElement editable))
             {
                 string master = Path.Combine(Source, editable.GetString()!);
+                Assert.DoesNotContain("\r", File.ReadAllText(master), StringComparison.Ordinal);
                 Assert.Equal(sprite.GetProperty("editableSha256").GetString(), Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(master))));
                 Assert.DoesNotContain(XDocument.Load(master).Descendants(), static e => e.Name.LocalName is "text" or "image" or "script");
             }

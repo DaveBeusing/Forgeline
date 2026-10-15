@@ -119,6 +119,8 @@ antialiasing, then given a transparent outer pixel perimeter. No reference bitma
 is enlarged, no black-pixel deletion is used, and there are no embedded text or
 label plates. PNGs compile as lossless linear DisplayImage RGBA8 with one mip.
 The SVG masters remain editable authoring data, excluded from the player.
+Both generators and scoped Git attributes enforce LF before calculating editable
+SHA-256, so the catalog matches actual Git blob bytes on fresh checkouts.
 
 Cursor art has an arrow plus a separate action badge, dark/light contrast outline,
 measured `visibleBounds` and an actual pixel `hotspot`. The hotspot is the arrow

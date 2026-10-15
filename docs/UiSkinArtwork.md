@@ -33,6 +33,8 @@ python build/Author-DirectorateUiSkin.py --preview artifacts/directorate-ui-skin
 ```
 
 The PNG/SVG pairs are emitted from the same integer-coordinate primitives.
+Editable SVGs use canonical LF with scoped Git attributes; editable SHA-256
+values match the actual Git blob bytes independently of Windows text conversion.
 Rasterization is directly at declared dimensions, with no image enlargement or
 claim of new reference detail. The generator updates source hashes in the catalog.
 Do not use it to overwrite later approved edits without reviewing the resulting diff.
