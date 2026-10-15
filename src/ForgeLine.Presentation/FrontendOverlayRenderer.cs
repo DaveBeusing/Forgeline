@@ -25,6 +25,9 @@ public sealed class FrontendOverlayRenderer : IDisposable
     private int _vertexCount;
     private bool _disposed;
     private FrontendMenuBackground? _background;
+    private UiSkinResources? _skinResources;
+    private UiSkinBatch? _skin;
+    public UiSkinDiagnostics SkinDiagnostics => _skin?.Diagnostics ?? default;
 
     public FrontendOverlayRenderer(IGraphicsDevice graphics)
     {
@@ -38,6 +41,12 @@ public sealed class FrontendOverlayRenderer : IDisposable
     public void PrepareBackground(RuntimeAssetCatalog catalog, RenderQuality quality, bool software = false)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
+        if (_graphics.SupportsUiText && _skin is null)
+        {
+            var resources = new UiSkinResources(_graphics, catalog);
+            try { _skin = new UiSkinBatch(_graphics, resources); _skinResources = resources; }
+            catch { resources.Dispose(); throw; }
+        }
         _background ??= new FrontendMenuBackground(_graphics, catalog);
         _background.Prepare(quality, software);
     }
@@ -222,6 +231,20 @@ public sealed class FrontendOverlayRenderer : IDisposable
         bool imageDrawn = !fullImage && _background?.Ready == true && imageRegion.Width > 0 && imageRegion.Height > 0 &&
             view.Kind is not (FrontendSurfaceKind.Controls or FrontendSurfaceKind.Credits or FrontendSurfaceKind.PauseMenu);
         if (imageDrawn) _background!.Render(context, imageRegion);
+        // Representative real control: uses the identical MenuRow rectangle as pointer hit testing.
+        // Submit after backplates and before the existing live text, preserving painter order.
+        if (_skin is not null)
+        {
+            _skin.Begin(context.Width, context.Height, context.FrameIndex);
+            if (view.Kind == FrontendSurfaceKind.MainMenu && view.MenuEntries.Count > 0)
+            {
+                var row = layout.MenuRow(0); var entry = view.MenuEntries[0];
+                var bounds = new UiSkinRect(row.X, row.Y, row.Width, row.Height);
+                _skin.Draw("ui.skin.directorate.control.button", bounds, Vector4.One, true);
+                _skin.Overlay(!entry.IsEnabled ? UiSkinState.Disabled : entry.IsFocused ? UiSkinState.Focus : UiSkinState.Normal, bounds, Vector4.One);
+            }
+            _skin.Flush(context);
+        }
         _text.Render(context);
         LastRenderedVertexCount = _vertexCount + _text.VertexCount + (imageDrawn || fullImage ? 6 : 0);
     }
@@ -231,6 +254,8 @@ public sealed class FrontendOverlayRenderer : IDisposable
         if (_disposed) return;
         foreach (IGraphicsBuffer buffer in _vertexBuffers.Values) buffer.Dispose();
         _vertexBuffers.Clear();
+        _skin?.Dispose();
+        _skinResources?.Dispose();
         _background?.Dispose();
         _text.Dispose();
         _pipeline.Dispose();
