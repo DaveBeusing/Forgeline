@@ -110,6 +110,15 @@ internal sealed class GameplayHudSkin : IDisposable
         _images.Draw(id, Rect(r with { X = r.X + 2, Y = r.Y + 2, Width = r.Width - 4, Height = r.Height - 4 }), Vector4.One);
         return true;
     }
+    internal bool Portrait(PlayerSelectionKind kind, uint identity, HudRect r)
+    {
+        if (_images is null) return false;
+        string? id = GameplayHudArtwork.Portrait(kind, identity, r.Width);
+        if (id is null) return false;
+        Panel(r, "panel.portrait");
+        _images.Draw(id, Rect(r with { X = r.X + 1, Y = r.Y + 1, Width = r.Width - 2, Height = r.Height - 2 }), Vector4.One);
+        return true;
+    }
     internal bool Bar(HudRect r, double fraction, Vector4 tint)
     {
         if (_panels is null) return false;

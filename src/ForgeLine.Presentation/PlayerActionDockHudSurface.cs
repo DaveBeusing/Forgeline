@@ -94,7 +94,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
                 : new RuntimeUiIconPalette(
                     runtimeAssets);
         _text = new UiTextBatch(graphics);
-        try { _skin = new(graphics, runtimeAssets, icons: false, portraits: false); }
+        try { _skin = new(graphics, runtimeAssets, icons: true, portraits: true); }
         catch { _text.Dispose(); _pipeline.Dispose(); throw; }
     }
 
@@ -875,6 +875,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         if (end <= first)
         {
             var rect = PlayerActionDockInteractionLayout.GetCardsRect(layout);
+            _skin.Panel(rect, "panel.inset");
             DockText(panel.SelectionPending ? "UPDATING SELECTION" : "SELECT OWNED CONTEXT / NO AVAILABLE CARDS",
                 rect.X + 6 * _scale, rect.Y + 6 * _scale, rect.Right - 6 * _scale,
                 MutedTextColor, 11, false, width, height);
@@ -890,27 +891,37 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
             var state = PlayerActionDockHudModel.ResolveItemState(panel.Mode, index, actions, pending);
             bool selected = index == panel.SelectedIndex; bool hovered = index == panel.HoveredIndex;
             var visual = GameplayHudVisualStyle.ResolveItemState(selected, hovered, hovered && panel.PointerPressed, state.CanActivate);
-            EmitQuad(rect.X, rect.Y, rect.Width, rect.Height, visual.Fill, width, height);
+            if (!_skin.Control(rect, state.CanActivate, selected, hovered, hovered && panel.PointerPressed))
+                EmitQuad(rect.X, rect.Y, rect.Width, rect.Height, visual.Fill, width, height);
+            var work = EconomicCardVisual.Resolve(panel.Mode, index, actions, pending);
+            _skin.State(rect, work.State);
             float focus = selected ? .6f + .4f * Math.Clamp((panel.Motion ?? UiMotionView.Settled).Focus, 0, 1) : 1;
             EmitItemStateCue(rect, visual, width, height, focus);
-            EmitIcon(PlayerActionDockHudModel.ResolveItemIcon(panel.Mode, index, actions), rect.X + 6 * _scale,
+            var identity = EconomicCardVisual.Portrait(panel.Mode, index, actions);
+            bool portrait = _skin.Portrait(identity.Kind, identity.Id, new(rect.X + 5 * _scale, rect.Y + 4 * _scale,
+                (compact ? 24 : 30) * _scale, (compact ? 24 : 30) * _scale));
+            if (!portrait) EmitIcon(PlayerActionDockHudModel.ResolveItemIcon(panel.Mode, index, actions), rect.X + 6 * _scale,
                 rect.Y + 5 * _scale, 14 * _scale, width, height);
+            float textX = rect.X + (portrait ? compact ? 34 : 40 : 25) * _scale;
             DockText(PlayerActionDockHudModel.ResolveItemTitle(panel.Mode, index, actions),
-                rect.X + 25 * _scale, rect.Y + 4 * _scale, rect.Right - 5 * _scale,
+                textX, rect.Y + 4 * _scale, rect.Right - 5 * _scale,
                 TextColor, compact ? 11 : 13, true, width, height);
             var text = new HudTextBuilder(buffer);
-            if (pending) text.Append("REQUEST PENDING");
+            if (_skin.Ready && work.Label.Length > 0) text.Append(work.Label);
+            else if (pending) text.Append("REQUEST PENDING");
             else if (!state.CanActivate) text.Append(state.DisabledReason);
             else AppendItemStatus(ref text, panel.Mode, index, actions, panel);
-            DockText(text.Written, rect.X + 25 * _scale, rect.Y + (compact ? 18 : 22) * _scale,
+            DockText(text.Written, textX, rect.Y + (compact ? 18 : 22) * _scale,
                 rect.Right - 5 * _scale, state.CanActivate ? MutedTextColor : GameplayHudVisualStyle.Warning,
                 compact ? 10 : 11, false, width, height);
             text = new(buffer); AppendCardDetail(ref text, panel.Mode, index, actions);
             DockText(text.Written, rect.X + 6 * _scale, rect.Y + (compact ? 30 : 39) * _scale,
                 rect.Right - 5 * _scale, MutedTextColor, 10, false, width, height);
-            double? progress = CardProgress(panel.Mode, index, actions);
-            if (!compact && progress.HasValue)
+            double? progress = _skin.Ready ? work.Progress : CardProgress(panel.Mode, index, actions);
+            if (progress.HasValue && (_skin.Ready || !compact))
             {
+                if (_skin.Bar(new(rect.X + 6 * _scale, rect.Bottom - 4 * _scale, rect.Width - 12 * _scale, 2 * _scale),
+                    progress.Value, work.State == UiSkinState.Warning ? GameplayHudVisualStyle.Warning : GameplayHudVisualStyle.Focus)) continue;
                 EmitQuad(rect.X + 6 * _scale, rect.Bottom - 4 * _scale, rect.Width - 12 * _scale,
                     2 * _scale, GameplayHudVisualStyle.QuietBorder, width, height);
                 EmitQuad(rect.X + 6 * _scale, rect.Bottom - 4 * _scale,
@@ -1702,6 +1713,7 @@ internal sealed class PlayerActionDockHudRenderer : IDisposable
         int width,
         int height)
     {
+        if (_skin.Icon(icon, x, y, size)) return;
         RtsUiIconDefinition definition =
             RtsUiIconCatalog.Get(
                 icon);
