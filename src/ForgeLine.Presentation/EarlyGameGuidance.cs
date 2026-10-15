@@ -20,7 +20,7 @@ internal static class EarlyGameGuidanceCatalog
         new(PlayerGuidanceMilestone.Scout, "FIELD A SCOUT VEHICLE", "Deliver factory materials; queue a Scout.", "L LOGISTICS / SELECT FACTORY / U UNITS"),
         new(PlayerGuidanceMilestone.Supply, "MAKE SUPPLY AVAILABLE", "Stock a core or Supply Depot with Fuel and Ammo.", "L LOGISTICS / Y SUPPLY"),
         new(PlayerGuidanceMilestone.OpponentContact, "SCOUT THE OPPONENT", "Move scouts to gain permitted contact information.", "RIGHT CLICK MOVE / F11 MINIMAP"),
-        new(PlayerGuidanceMilestone.None, "DEFEAT THE ENEMY COMMAND CORE", "Keep forces supplied; the match decides victory.", "K COMBAT / F1 HELP")
+        new(PlayerGuidanceMilestone.None, "DEFEAT THE ENEMY COMMAND CORE", "Keep forces supplied; the match decides victory.", "K COMBAT / ESC CONTROLS")
     ];
 }
 

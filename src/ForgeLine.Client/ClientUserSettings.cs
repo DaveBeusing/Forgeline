@@ -57,7 +57,7 @@ internal sealed record ClientUserSettings
     public GameplayBindings GameplayBindings { get; init; } = new();
 
     [JsonIgnore]
-    public RtsReferenceZoom ReferenceZoom { get; init; } = RtsReferenceZoom.NormalGameplay;
+    public RtsReferenceZoom ReferenceZoom { get; init; } = RtsReferenceZoom.CloseTactical;
 
     public void Validate()
     {

@@ -51,6 +51,24 @@ public sealed class GuidancePresentationTests
         });
     }
 
+    [Fact]
+    public void PointerDoesNotDrawAnAdditionalMouseCursor()
+    {
+        using var device = new RecordingDevice();
+        using var renderer = new RtsInformationOverlayRenderer(device);
+        var snapshot = EarlyGameGuidanceTests.Snapshot(0);
+        var context = new RecordingContext();
+        var camera = new RtsCamera();
+        renderer.Render(context, camera, snapshot, default, RtsInformationLayerView.Empty,
+            CombatGroupOverviewView.Empty, 96);
+        int withoutPointer = renderer.LastRenderedVertexCount;
+        renderer.Render(context, camera, snapshot, default, RtsInformationLayerView.Empty with
+        { HasPointer = true, PointerPosition = new(300,300), Cursor = RtsCursorKind.Attack },
+            CombatGroupOverviewView.Empty, 96);
+        Assert.Equal(withoutPointer, renderer.LastRenderedVertexCount);
+        Assert.True(UiTypography.Style(UiTextRole.Telemetry).Size >= 14);
+    }
+
     [Theory]
     [InlineData(PreAlphaUxMode.Help)]
     [InlineData(PreAlphaUxMode.Paused)]

@@ -12,7 +12,6 @@ public sealed class GameplayGuidanceInteractionTests
     {
         var input = new InputState();
         var guide = new GameplayGuidanceInteraction();
-        var help = new GameplayHelpController();
         input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.LeftShift));
         input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.F12));
         input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.B));
@@ -22,8 +21,6 @@ public sealed class GameplayGuidanceInteractionTests
         Assert.True(guide.BlocksGameplayThisFrame);
         Assert.False(input.IsKeyDown(PlatformKey.B));
         Assert.False(input.IsMouseButtonDown(PlatformMouseButton.Left));
-        Assert.False(help.Update(input, true));
-        Assert.False(help.Visible);
         guide.Update(input, new SimulationSessionId(1), true);
         Assert.False(guide.BlocksGameplayThisFrame);
         Assert.True(guide.Hidden);
@@ -33,7 +30,7 @@ public sealed class GameplayGuidanceInteractionTests
     }
 
     [Fact]
-    public void DisabledOnboardingAndModalFramesIgnoreToggleAndUnshiftedF12RemainsHelp()
+    public void DisabledOnboardingAndModalFramesIgnoreToggleAndUnshiftedF12DoesNothing()
     {
         var input = new InputState();
         var guide = new GameplayGuidanceInteraction();
@@ -47,8 +44,7 @@ public sealed class GameplayGuidanceInteractionTests
         input.Reset();
         input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.F12));
         guide.Update(input, new SimulationSessionId(1), true);
-        var help = new GameplayHelpController();
-        Assert.True(help.Update(input, true));
-        Assert.True(help.Visible);
+        Assert.False(guide.Hidden);
+        Assert.False(guide.BlocksGameplayThisFrame);
     }
 }

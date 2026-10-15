@@ -25,10 +25,13 @@ Labels and descriptions live in `ForgeLine.UI/GraphicsSettingsText.resx`; the ne
 
 | Change | Application |
 | --- | --- |
-| UI scale | Immediate frontend preview; saved on Apply |
+| UI scale | Frontend preview; Pause Settings applies to the current match on Apply |
 | Window size / windowed or borderless | Immediate unsaved trial, then explicit Keep |
 | Graphics features / preset | Next session or match, after retiring the previous renderer resources |
-| Camera and binding preferences | Existing validated frontend/session application |
+| Camera pan speed / edge scroll, guide, UI feedback | Immediate on Apply, including during a paused match |
+| Key bindings | Saved for the next match |
+
+Pause → Settings keeps the current match paused while editing. Back returns to Pause; Resume continues the same match. Graphics and binding rows explicitly apply next match.
 
 No exposed graphics option requires an executable restart. There is no quality mutation of an active match. Apply validates a complete candidate before writing it. Display trials last 15 seconds; Keep is available only after the requested surface has successfully presented and the window is not minimized. During a trial, other settings edits are frozen. Escape, cancellation, expiry and disposal restore the previous live dimensions/mode. A failed restore attempts a safe windowed configuration. Failed trials never save the candidate. Borderless uses the current monitor; windowed choices are 1280×720, 1600×900, 1920×1080, 2560×1440 and 3840×2160.
 

@@ -207,6 +207,11 @@ internal static class VisualReferenceCapture
                         HasPointer = uiScenario == UiReferenceScenario.Targeting, PointerPosition = new(display.Width * .5f, display.Height * .5f) };
                     var targeting = uiScenario == UiReferenceScenario.Targeting ? new TacticalTargetingView(TacticalTargetingMode.Attack, 2, 1, 1, 0)
                     { HasPointerTarget = true, PointerTargetValid = true, PointerWorldTarget = fixture.Target } : default;
+                    var captureUx = uiScenario == UiReferenceScenario.Onboarding ? default(PreAlphaUxView) with
+                    {
+                        ShowOnboarding = true,
+                        Guidance = new EarlyGameGuidanceController().Update(snapshot, true)
+                    } : default;
                     int recordFrameIndex = -1;
                     captureInputs.Clear();
                     Action<IGraphicsCommandContext> record = context =>
@@ -237,7 +242,9 @@ internal static class VisualReferenceCapture
                         context.BeginPass(GraphicsFramePass.Overlay);
                         selection.Render(context, camera, indicators);
                         hud.Render(context, camera, snapshot, terrain.WorldBounds, information, panel, targeting,
-                            FormationTemplate.Compact, CombatGroupOverviewView.Empty, default, rasterDpi, uiScale);
+                            FormationTemplate.Compact, CombatGroupOverviewView.Empty, captureUx, rasterDpi, uiScale,
+                            runtimeMetrics: new RuntimeMetricsView(60, 20, RuntimeSimulationState.Running),
+                            showRuntimeMetrics: uiScenario != UiReferenceScenario.World);
                         if (frontend is not null && frontendView is { Kind: FrontendSurfaceKind.PauseMenu } pause)
                             frontend.Render(context, pause);
                     };

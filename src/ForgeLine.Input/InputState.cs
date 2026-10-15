@@ -8,6 +8,7 @@ public sealed class InputState
     private readonly HashSet<PlatformKey> _keysDown = [];
     private readonly ulong[] _keyPressSequences = new ulong[Enum.GetValues<PlatformKey>().Length];
     private readonly bool[] _keyPressed = new bool[Enum.GetValues<PlatformKey>().Length];
+    private readonly bool[] _shiftKeyPressed = new bool[Enum.GetValues<PlatformKey>().Length];
     private readonly HashSet<PlatformMouseButton> _mouseButtonsDown = [];
     private readonly ulong[] _mousePressSequences = new ulong[Enum.GetValues<PlatformMouseButton>().Length];
     private readonly HashSet<PlatformKey> _suppressedKeys = [];
@@ -35,6 +36,7 @@ public sealed class InputState
     public void BeginFrame()
     {
         Array.Clear(_keyPressed);
+        Array.Clear(_shiftKeyPressed);
         _mousePressPositions.Clear();
         _mouseButtonsReleased.Clear();
         _pointerDelta = Vector2.Zero;
@@ -53,6 +55,8 @@ public sealed class InputState
                     {
                         _keyPressSequences[(int)inputEvent.Key]++;
                         _keyPressed[(int)inputEvent.Key] = true;
+                        _shiftKeyPressed[(int)inputEvent.Key] =
+                            IsKeyDown(PlatformKey.LeftShift) || IsKeyDown(PlatformKey.RightShift);
                     }
                 }
 
@@ -118,6 +122,7 @@ public sealed class InputState
     // Survives a release between frames; repeats and suppressed keys do not advance it.
     public ulong KeyPressSequence(PlatformKey key) => _keyPressSequences[(int)key];
     public bool WasKeyPressed(PlatformKey key) => _keyPressed[(int)key];
+    public bool WasKeyPressedWithShift(PlatformKey key) => _shiftKeyPressed[(int)key];
 
     public ulong MousePressSequence(PlatformMouseButton button) => _mousePressSequences[(int)button];
 
@@ -133,6 +138,7 @@ public sealed class InputState
     public void Reset()
     {
         Array.Clear(_keyPressed);
+        Array.Clear(_shiftKeyPressed);
         _mousePressPositions.Clear();
         _mouseButtonsReleased.Clear();
         _suppressedKeys.Clear();
@@ -148,6 +154,7 @@ public sealed class InputState
     public void SuppressHeldInput()
     {
         Array.Clear(_keyPressed);
+        Array.Clear(_shiftKeyPressed);
         _mousePressPositions.Clear();
         _mouseButtonsReleased.Clear();
         _suppressedKeys.UnionWith(_keysDown);

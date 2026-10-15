@@ -59,16 +59,5 @@ public sealed class GameplayBindingEditorTests
         Assert.Contains("CAMERA", editor.BindingFeedback);
         Assert.Equal(PlatformKey.Z, model.Bindings.Key(GameplayAction.Build));
     }
-    [Fact]
-    public void HelpSuppressesReboundHeldInputUntilPhysicalRelease()
-    {
-        var input = new InputState(); var help = new GameplayHelpController();
-        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.G));
-        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.F1));
-        help.Update(input, true);
-        Assert.True(help.Visible); Assert.False(input.IsKeyDown(PlatformKey.G));
-        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.G));
-        Assert.False(input.IsKeyDown(PlatformKey.G));
-    }
     private static SettingsModel Model() => new(new(1600, 900, false, 1, true, true, 1, new(), new()));
 }

@@ -13,10 +13,10 @@ public static class UiTypography
         UiTextRole.CommandTitle => new(32, true),
         UiTextRole.MenuItem => new(22, false),
         UiTextRole.SectionHeading => new(16, true),
-        UiTextRole.Numeric => new(12, true),
+        UiTextRole.Numeric => new(14, true),
         UiTextRole.Warning => new(14, true),
-        UiTextRole.Tooltip => new(12, false),
-        _ => new(12, false)
+        UiTextRole.Tooltip => new(14, false),
+        _ => new(14, false)
     };
 }
 
