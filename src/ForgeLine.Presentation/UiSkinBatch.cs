@@ -20,8 +20,8 @@ public sealed class UiSkinBatch : IDisposable
     private readonly IGraphicsBuffer[] _buffers;
     private readonly int _maximumFlushes;
     private int _flushes;
-    private readonly Vertex[] _vertices = new Vertex[MaximumQuads * 6];
-    private readonly Command[] _commands = new Command[MaximumQuads];
+    private readonly Vertex[] _vertices;
+    private readonly Command[] _commands;
     private int _count, _uploaded, _commandCount, _draws, _dropped, _missing, _width, _height, _frame;
     private bool _disposed;
     private readonly int _thread = Environment.CurrentManagedThreadId;
@@ -29,11 +29,15 @@ public sealed class UiSkinBatch : IDisposable
     public UiSkinDiagnostics Diagnostics => new(_resources.PageBytes, _resources.TextureCount, _resources.LeaseCount, _resources.Uploads,
         _draws, _count, _uploaded * (long)Stride, _dropped, _missing, _buffers.Length);
 
-    public UiSkinBatch(IGraphicsDevice graphics, UiSkinResources resources, int maximumFlushes = 1)
+    public UiSkinBatch(IGraphicsDevice graphics, UiSkinResources resources, int maximumFlushes = 1, int maximumQuads = MaximumQuads)
     {
         ArgumentNullException.ThrowIfNull(graphics); ArgumentNullException.ThrowIfNull(resources);
         ArgumentOutOfRangeException.ThrowIfLessThan(maximumFlushes, 1);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(maximumFlushes, 8);
+        ArgumentOutOfRangeException.ThrowIfLessThan(maximumQuads, 1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(maximumQuads, MaximumQuads);
+        _vertices = new Vertex[maximumQuads * 6];
+        _commands = new Command[maximumQuads];
         _maximumFlushes = maximumFlushes;
         _buffers = new IGraphicsBuffer[4 * maximumFlushes];
         resources.ValidateDevice(graphics);

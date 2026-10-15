@@ -29,10 +29,12 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         _graphics = graphics;
         _pipeline = SelectionInspectorHudRenderer.CreatePipeline(graphics, alphaBlendEnabled: true);
         _text = new UiTextBatch(graphics);
-        _skin = new(graphics, runtimeAssets);
+        try { _skin = new(graphics, runtimeAssets); }
+        catch { _text.Dispose(); _pipeline.Dispose(); throw; }
     }
 
     public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
+    public GameplayHudSkinDiagnostics SkinDiagnostics => _skin.Diagnostics;
     public GameplayHudRegion Regions => GameplayHudRegion.GlobalOverlay;
     public int LastRenderedVertexCount { get; private set; }
     internal HudRect LastBounds { get; private set; }
@@ -41,6 +43,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         _text.Begin();
+        if (context.Graphics.Width > 0 && context.Graphics.Height > 0) _skin.Begin(context.Graphics);
         LastRenderedVertexCount = 0;
         LastBounds = default;
         var view = context.HoverTooltip;
@@ -62,7 +65,6 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         _bounds = HoverTooltipPlacement.Resolve(view.PointerPosition, context.Layout,
             330 * _scale, (16 + lines * 14) * _scale);
         if (_bounds.IsEmpty) return;
-        _skin.Begin(context.Graphics);
         if (!_skin.Panel(_bounds, "panel.tooltip")) Quad(_bounds, GameplayHudVisualStyle.PanelBackground);
         if (!_skin.Ready) Quad(new HudRect(_bounds.X, _bounds.Y, _bounds.Width, 25 * _scale), GameplayHudVisualStyle.PanelHeader);
         Quad(new HudRect(_bounds.X, _bounds.Bottom - _scale, _bounds.Width, _scale), GameplayHudVisualStyle.QuietBorder);

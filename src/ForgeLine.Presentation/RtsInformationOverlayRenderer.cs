@@ -45,10 +45,12 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                 : new RuntimeUiIconPalette(
                     runtimeAssets);
         _text = new UiTextBatch(graphics);
-        _skin = new(graphics, runtimeAssets, icons: false, portraits: false);
+        try { _skin = new(graphics, runtimeAssets, icons: false, portraits: false); }
+        catch { _text.Dispose(); _pipeline.Dispose(); throw; }
     }
 
     public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
+    public GameplayHudSkinDiagnostics SkinDiagnostics => _skin.Diagnostics;
     public int LastRenderedVertexCount { get; private set; }
     internal HudRect LastGuidanceBounds { get; private set; }
     public int LastGuidanceVertexCount { get; private set; }
@@ -66,6 +68,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     {
         ThrowIfDisposed();
         _text.Begin();
+        if (context.Width > 0 && context.Height > 0) _skin.Begin(context);
         _bindings = preAlphaUx.Bindings ?? GameplayBindingRegistry.Default;
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(camera);
@@ -81,7 +84,6 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             return;
         }
 
-        _skin.Begin(context);
         _vertexCount = 0;
         _vertexLimit = MaxVertices - 2048;
         GameplayHudLayout layout =
@@ -152,21 +154,25 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         }
 
         _skin.Flush(context);
-        IGraphicsBuffer vertexBuffer =
-            GetFrameVertexBuffer(
-                context.FrameIndex);
-        vertexBuffer.SetData<OverlayVertex>(
-            _vertices.AsSpan(
-                0,
-                _vertexCount));
+        if (_vertexCount > 0)
+        {
+            IGraphicsBuffer vertexBuffer =
+                GetFrameVertexBuffer(
+                    context.FrameIndex);
+            vertexBuffer.SetData<OverlayVertex>(
+                _vertices.AsSpan(
+                    0,
+                    _vertexCount));
 
-        context.SetPipeline(
-            _pipeline);
-        context.SetVertexBuffer(
-            vertexBuffer,
-            VertexStride);
-        context.Draw(
-            _vertexCount);
+            context.SetPipeline(
+                _pipeline);
+            context.SetVertexBuffer(
+                vertexBuffer,
+                VertexStride);
+            context.Draw(
+                _vertexCount);
+
+        }
 
         _text.Render(context);
         LastRenderedVertexCount = _vertexCount + _text.VertexCount + _skin.Vertices;

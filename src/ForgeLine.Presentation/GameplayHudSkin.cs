@@ -5,6 +5,18 @@ using ForgeLine.Graphics;
 
 namespace ForgeLine.Presentation;
 
+/// <summary>Shared atlas residency (deduplicated by group) and bounded per-owner recording costs.</summary>
+public readonly record struct GameplayHudSkinDiagnostics(long CoreBytes, long IconBytes, long PortraitBytes,
+    int Batches, int Buffers, int Draws, int Vertices, long VertexUploadBytes, int MissingAssets, int DroppedQuads)
+{
+    public long ResidentPageBytes => CoreBytes + IconBytes + PortraitBytes;
+    public bool Prepared => CoreBytes > 0;
+    internal GameplayHudSkinDiagnostics Combine(GameplayHudSkinDiagnostics other) => new(
+        Math.Max(CoreBytes, other.CoreBytes), Math.Max(IconBytes, other.IconBytes), Math.Max(PortraitBytes, other.PortraitBytes),
+        Batches + other.Batches, Buffers + other.Buffers, Draws + other.Draws, Vertices + other.Vertices,
+        VertexUploadBytes + other.VertexUploadBytes, MissingAssets + other.MissingAssets, DroppedQuads + other.DroppedQuads);
+}
+
 /// <summary>Prepared render-thread resources. Skin precedes the owner's dynamic geometry and live text.
 /// Bootstrap/test devices remain independent of assets; a required production asset failure is explicit.</summary>
 internal sealed class GameplayHudSkin : IDisposable
@@ -13,6 +25,17 @@ internal sealed class GameplayHudSkin : IDisposable
         .ToDictionary(static role => role, static role => "ui.skin.directorate." + role, StringComparer.Ordinal);
     private readonly UiSkinResources? _core, _icons, _portraits;
     private readonly UiSkinBatch? _panels, _symbols, _images;
+    internal GameplayHudSkinDiagnostics Diagnostics
+    {
+        get
+        {
+            var core = _panels?.Diagnostics ?? default; var icons = _symbols?.Diagnostics ?? default; var portraits = _images?.Diagnostics ?? default;
+            return new(core.PageBytes, icons.PageBytes, portraits.PageBytes, (Ready ? 1 : 0) + (_symbols is null ? 0 : 1) + (_images is null ? 0 : 1),
+                core.BufferCount + icons.BufferCount + portraits.BufferCount, core.Draws + icons.Draws + portraits.Draws,
+                core.Vertices + icons.Vertices + portraits.Vertices, core.VertexUploadBytes + icons.VertexUploadBytes + portraits.VertexUploadBytes,
+                core.MissingAssets + icons.MissingAssets + portraits.MissingAssets, core.DroppedQuads + icons.DroppedQuads + portraits.DroppedQuads);
+        }
+    }
     internal bool Ready => _panels is not null;
     internal int Vertices => (_panels?.Diagnostics.Vertices ?? 0) + (_symbols?.Diagnostics.Vertices ?? 0) + (_images?.Diagnostics.Vertices ?? 0);
     internal GameplayHudSkin(IGraphicsDevice graphics, RuntimeAssetCatalog? catalog, bool icons = false, bool portraits = false)
@@ -25,18 +48,18 @@ internal sealed class GameplayHudSkin : IDisposable
                 "control.button_compact", "control.tab", "progress.progress_track", "progress.progress_fill",
                 "overlay.hover", "overlay.pressed", "overlay.focus", "overlay.selected", "overlay.disabled", "overlay.warning", "overlay.error", "overlay.pending", "overlay.accepted" })
                 _ = _core.Sprite("ui.skin.directorate." + role);
-            _panels = new(graphics, _core);
+            _panels = new(graphics, _core, maximumQuads: 1024);
             if (icons)
             {
                 _icons = new(graphics, catalog, UiSkinGroup.Icons);
                 foreach (string id in GameplayHudArtwork.RequiredIcons) _ = _icons.Sprite(id);
-                _symbols = new(graphics, _icons);
+                _symbols = new(graphics, _icons, maximumQuads: 256);
             }
             if (portraits)
             {
                 _portraits = new(graphics, catalog, UiSkinGroup.Portraits);
                 foreach (string id in GameplayHudArtwork.RequiredPortraits) _ = _portraits.Sprite(id);
-                _images = new(graphics, _portraits);
+                _images = new(graphics, _portraits, maximumQuads: 64);
             }
         }
         catch
@@ -63,7 +86,7 @@ internal sealed class GameplayHudSkin : IDisposable
         if (!enabled) State(r, UiSkinState.Disabled);
         else
         {
-            if (selected) State(r, UiSkinState.Focus);
+            if (selected) { State(r, UiSkinState.Selected); State(r, UiSkinState.Focus); }
             if (hover) State(r, UiSkinState.Hover);
             if (pressed) State(r, UiSkinState.Pressed);
         }

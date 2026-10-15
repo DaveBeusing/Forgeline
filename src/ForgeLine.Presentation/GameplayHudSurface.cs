@@ -45,6 +45,7 @@ public interface IGameplayHudSurface : IDisposable
     int LastRenderedVertexCount => 0;
 
     UiTextDiagnostics TextDiagnostics => default;
+    GameplayHudSkinDiagnostics SkinDiagnostics => default;
 
     void Render(
         in GameplayHudRenderContext context);

@@ -189,6 +189,7 @@ internal sealed class ResourcePowerHudSurface : IGameplayHudSurface
         GameplayHudRegion.AlertStack;
 
     public UiTextDiagnostics TextDiagnostics => _renderer.TextDiagnostics;
+    public GameplayHudSkinDiagnostics SkinDiagnostics => _renderer.SkinDiagnostics;
     public int LastRenderedVertexCount => _renderer.LastRenderedVertexCount;
 
     public void Render(
@@ -255,10 +256,12 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
                 : new RuntimeUiIconPalette(
                     runtimeAssets);
         _text = new UiTextBatch(graphics);
-        _skin = new(graphics, runtimeAssets, icons: true, portraits: false);
+        try { _skin = new(graphics, runtimeAssets, icons: true, portraits: false); }
+        catch { _text.Dispose(); _pipeline.Dispose(); throw; }
     }
 
     public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
+    public GameplayHudSkinDiagnostics SkinDiagnostics => _skin.Diagnostics;
     public int LastRenderedVertexCount { get; private set; }
 
     public void Render(
@@ -270,6 +273,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
     {
         ThrowIfDisposed();
         _text.Begin();
+        if (graphics.Width > 0 && graphics.Height > 0) _skin.Begin(graphics);
         ArgumentNullException.ThrowIfNull(graphics);
 
         if (graphics.Width <= 0 ||
@@ -280,7 +284,6 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
             return;
         }
 
-        _skin.Begin(graphics);
         _vertexCount = 0;
         _scale = layout.Scale;
 
@@ -313,21 +316,25 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         }
 
         _skin.Flush(graphics);
-        IGraphicsBuffer vertexBuffer =
-            GetFrameVertexBuffer(
-                graphics.FrameIndex);
-        vertexBuffer.SetData<OverlayVertex>(
-            _vertices.AsSpan(
-                0,
-                _vertexCount));
+        if (_vertexCount > 0)
+        {
+            IGraphicsBuffer vertexBuffer =
+                GetFrameVertexBuffer(
+                    graphics.FrameIndex);
+            vertexBuffer.SetData<OverlayVertex>(
+                _vertices.AsSpan(
+                    0,
+                    _vertexCount));
 
-        graphics.SetPipeline(
-            _pipeline);
-        graphics.SetVertexBuffer(
-            vertexBuffer,
-            VertexStride);
-        graphics.Draw(
-            _vertexCount);
+            graphics.SetPipeline(
+                _pipeline);
+            graphics.SetVertexBuffer(
+                vertexBuffer,
+                VertexStride);
+            graphics.Draw(
+                _vertexCount);
+
+        }
 
         _text.Render(graphics);
         LastRenderedVertexCount = _vertexCount + _text.VertexCount + _skin.Vertices;

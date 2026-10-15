@@ -14,7 +14,8 @@ internal enum UiReferenceScenario
     ResourcePressure, LowPower, SupplyCritical, MixedSelection, Targeting, QueueBlocked,
     Technology, Contacts, DockFocus, DockHover, DockPressed, DockPending, DockAccepted,
     DockRejected, MinimapStrategic, Onboarding, SettingsAudio, SettingsGraphics, Controls,
-    SettingsGeneral, SettingsBindings, BindingConflict, DisplayTrial, PauseSettings, MenuHover, MenuPressed
+    SettingsGeneral, SettingsBindings, BindingConflict, DisplayTrial, PauseSettings, MenuHover, MenuPressed,
+    SelectionUnit, SelectionBuilding, SelectionEmpty, SelectionLongName, MissingPlayerData, GameplayTooltip, GroupSummary
 }
 
 /// <summary>Named authored read models for the existing reference capture lane; never dispatches input.</summary>
@@ -134,6 +135,17 @@ internal static class UiReferenceStates
                 snapshot = CopyExperience(snapshot, snapshot.PlayerExperience!.Value with
                 { Selection = PlayerSelectionSummary.Empty with { Count = 3, Kind = PlayerSelectionKind.Mixed, DisplayName = "Mixed selection" } });
         }
+        if (state is UiReferenceScenario.SelectionUnit or UiReferenceScenario.SelectionBuilding or UiReferenceScenario.SelectionLongName)
+        {
+            snapshot = BattlefieldHudCapture.State(snapshot, state == UiReferenceScenario.SelectionBuilding ? "Production" : "Supply");
+            if (state == UiReferenceScenario.SelectionLongName)
+                snapshot = CopyExperience(snapshot, snapshot.PlayerExperience!.Value with
+                { Selection = snapshot.PlayerExperience.Value.Selection with { DisplayName = "Armoured reconnaissance and mobile support detachment — long identified name" } });
+        }
+        if (state == UiReferenceScenario.SelectionEmpty)
+            snapshot = CopyExperience(snapshot, snapshot.PlayerExperience!.Value with { Selection = PlayerSelectionSummary.Empty });
+        if (state == UiReferenceScenario.MissingPlayerData)
+            snapshot = new(snapshot.Tick, snapshot.TickDuration, snapshot.SimulationEntityCount, snapshot.Instances, snapshot.Intelligence, snapshot.SessionId);
         if (state == UiReferenceScenario.Onboarding)
             snapshot = new(snapshot.Tick, snapshot.TickDuration, snapshot.SimulationEntityCount, snapshot.Instances,
                 snapshot.Intelligence, snapshot.SessionId, snapshot.PlayerExperience, playerActions: snapshot.PlayerActions,

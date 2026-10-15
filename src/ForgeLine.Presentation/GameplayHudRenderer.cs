@@ -24,27 +24,38 @@ public sealed class GameplayHudRenderer : IDisposable
     {
         ArgumentNullException.ThrowIfNull(graphics);
 
-        _statusSurface = new ResourcePowerHudSurface(graphics, runtimeAssets);
-        _surfaces =
-        [
-            _statusSurface,
-            new SelectionInspectorHudSurface(
-                graphics,
-                runtimeAssets),
-            new PlayerActionDockHudSurface(
-                graphics,
-                runtimeAssets),
-            new RtsInformationHudSurface(
-                graphics,
-                runtimeAssets),
-            new WorldHoverTooltipSurface(graphics, runtimeAssets),
-            new OperationsHudSurface(graphics)
-        ];
+        var prepared = new List<IGameplayHudSurface>();
+        try
+        {
+            _statusSurface = new ResourcePowerHudSurface(graphics, runtimeAssets);
+            prepared.Add(_statusSurface);
+            prepared.Add(new SelectionInspectorHudSurface(graphics, runtimeAssets));
+            prepared.Add(new PlayerActionDockHudSurface(graphics, runtimeAssets));
+            prepared.Add(new RtsInformationHudSurface(graphics, runtimeAssets));
+            prepared.Add(new WorldHoverTooltipSurface(graphics, runtimeAssets));
+            prepared.Add(new OperationsHudSurface(graphics));
+            _surfaces = prepared.ToArray();
+        }
+        catch
+        {
+            for (int i = prepared.Count - 1; i >= 0; i--) prepared[i].Dispose();
+            throw;
+        }
     }
 
     public GameplayHudState State { get; private set; }
 
     public int LastRenderedVertexCount { get; private set; }
+
+    public GameplayHudSkinDiagnostics SkinDiagnostics
+    {
+        get
+        {
+            GameplayHudSkinDiagnostics result = default;
+            foreach (var surface in _surfaces) result = result.Combine(surface.SkinDiagnostics);
+            return result;
+        }
+    }
 
     public UiTextDiagnostics TextDiagnostics
     {

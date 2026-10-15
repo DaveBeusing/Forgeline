@@ -132,6 +132,7 @@ internal sealed class SelectionInspectorHudSurface : IGameplayHudSurface
         GameplayHudRegion.SelectionInspector;
 
     public UiTextDiagnostics TextDiagnostics => _renderer.TextDiagnostics;
+    public GameplayHudSkinDiagnostics SkinDiagnostics => _renderer.SkinDiagnostics;
     public int LastRenderedVertexCount => _renderer.LastRenderedVertexCount;
 
     public void Render(
@@ -191,10 +192,12 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
                 : new RuntimeUiIconPalette(
                     runtimeAssets);
         _text = new UiTextBatch(graphics);
-        _skin = new(graphics, runtimeAssets, icons: true, portraits: true);
+        try { _skin = new(graphics, runtimeAssets, icons: true, portraits: true); }
+        catch { _text.Dispose(); _pipeline.Dispose(); throw; }
     }
 
     public UiTextDiagnostics TextDiagnostics => _text.Diagnostics;
+    public GameplayHudSkinDiagnostics SkinDiagnostics => _skin.Diagnostics;
     public int LastRenderedVertexCount { get; private set; }
 
     public void Render(
@@ -206,6 +209,7 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
     {
         ThrowIfDisposed();
         _text.Begin();
+        if (graphics.Width > 0 && graphics.Height > 0) _skin.Begin(graphics);
         ArgumentNullException.ThrowIfNull(graphics);
         ArgumentNullException.ThrowIfNull(snapshot);
 
@@ -220,7 +224,6 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
             return;
         }
 
-        _skin.Begin(graphics);
         _vertexCount = 0;
         _scale =
             HudInformationLayout.InspectorScale(layout);
@@ -241,21 +244,25 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
         }
 
         _skin.Flush(graphics);
-        IGraphicsBuffer vertexBuffer =
-            GetFrameVertexBuffer(
-                graphics.FrameIndex);
-        vertexBuffer.SetData<OverlayVertex>(
-            _vertices.AsSpan(
-                0,
-                _vertexCount));
+        if (_vertexCount > 0)
+        {
+            IGraphicsBuffer vertexBuffer =
+                GetFrameVertexBuffer(
+                    graphics.FrameIndex);
+            vertexBuffer.SetData<OverlayVertex>(
+                _vertices.AsSpan(
+                    0,
+                    _vertexCount));
 
-        graphics.SetPipeline(
-            _pipeline);
-        graphics.SetVertexBuffer(
-            vertexBuffer,
-            VertexStride);
-        graphics.Draw(
-            _vertexCount);
+            graphics.SetPipeline(
+                _pipeline);
+            graphics.SetVertexBuffer(
+                vertexBuffer,
+                VertexStride);
+            graphics.Draw(
+                _vertexCount);
+
+        }
 
         _text.Render(graphics);
         LastRenderedVertexCount = _vertexCount + _text.VertexCount + _skin.Vertices;
@@ -730,6 +737,12 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
                 supplyIcon),
             width,
             height);
+        float available = MathF.Max(0, region.Right - x - 22 * _scale);
+        float half = available * .5f;
+        _skin.Bar(new HudRect(x + 15 * _scale, y + 12 * _scale, half - 2 * _scale, 2 * _scale),
+            selection.FuelFraction, selection.FuelFraction <= .25 ? GameplayHudVisualStyle.Critical : ResolveColor(RtsUiIcon.StatusFuel));
+        _skin.Bar(new HudRect(x + 15 * _scale + half, y + 12 * _scale, half - 2 * _scale, 2 * _scale),
+            selection.AmmunitionFraction, selection.AmmunitionFraction <= .25 ? GameplayHudVisualStyle.Critical : ResolveColor(RtsUiIcon.StatusAmmunition));
     }
 
     private void EmitStatusRow(

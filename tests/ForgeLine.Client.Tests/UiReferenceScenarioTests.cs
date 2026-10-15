@@ -85,6 +85,10 @@ public sealed class UiReferenceScenarioTests
             Assert.True(original.Instances.SequenceEqual(snapshot.Instances));
             Assert.Equal(original.SessionId,snapshot.SessionId);
             Assert.Equal(original.Tick,snapshot.Tick);
+            if (state == UiReferenceScenario.SelectionUnit) Assert.Equal(ForgeLine.Game.UnitIds.MainBattleTank, snapshot.PlayerExperience!.Value.Selection.CommonUnitId);
+            if (state == UiReferenceScenario.SelectionBuilding) Assert.Equal(ForgeLine.Game.BuildingIds.VehicleFactory, snapshot.PlayerExperience!.Value.Selection.CommonBuildingId);
+            if (state == UiReferenceScenario.SelectionEmpty) Assert.Equal(0, snapshot.PlayerExperience!.Value.Selection.Count);
+            if (state == UiReferenceScenario.MissingPlayerData) Assert.Null(snapshot.PlayerExperience);
             if (state == UiReferenceScenario.DockPending) Assert.True(panel.ContextualPending);
             if (state is UiReferenceScenario.DockHover or UiReferenceScenario.DockPressed)
             {
