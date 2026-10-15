@@ -123,7 +123,7 @@ internal static class FrontendPresentationAdapter
             "LOAD GAME",
             lines,
             "UP/DOWN  SELECT SAVE     ENTER  LOAD     ESC  BACK",
-            model.TryGetFocusedLoadTarget(out _) ? "LOAD" : string.Empty) with { DisabledPrimaryAction = model.TryGetFocusedLoadTarget(out _) ? "" : "LOAD" };
+            model.TryGetFocusedLoadTarget(out _) ? "LOAD" : string.Empty) with { DisabledPrimaryAction = model.TryGetFocusedLoadTarget(out _) ? "" : "LOAD", TotalDetailRows = model.Entries.Count, DetailRowOffset = model.VisibleStartIndex(visibleRows) };
     }
 
     private static LoadGameEntry[] ResolveVisibleSaves(
@@ -253,6 +253,7 @@ internal static class FrontendPresentationAdapter
                 focused is { } field && (field == FrontendSettingsField.OutputResolution || field >= FrontendSettingsField.RenderQuality) ? GraphicsSettingsText.Get(field + "Help") : GraphicsSettingsText.Get("Controls") : interaction.BindingFeedback),
             interaction.CanApply == false ? string.Empty : displayPreviewActive ? GraphicsSettingsText.Get("KeepDisplay") : "APPLY") with
         {
+            TotalDetailRows = interaction.SectionFieldCount, DetailRowOffset = interaction.VisibleStart,
             IsError = !interaction.CanApply,
             DisabledPrimaryAction = interaction.CanApply ? "" : "APPLY",
             SettingsTabs = Enum.GetValues<FrontendSettingsSection>().Select(section => new FrontendMenuEntryView(

@@ -56,6 +56,7 @@ public sealed partial class FrontendOverlayRenderer : IDisposable
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         _text.Begin();
+        LastSkinnedControlCount = 0;
         ArgumentNullException.ThrowIfNull(context);
 
         // Studio playback has its own compositor; the overlay must never add old branding.

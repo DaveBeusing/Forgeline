@@ -46,6 +46,7 @@ public sealed class SettingsInteractionModel
     public GameplayAction BindingAction { get; private set; }
     public string BindingFeedback { get; private set; } = string.Empty;
     public int VisibleCapacity { get; set; } = 7;
+    public int SectionFieldCount => Fields.Length;
     public int VisibleStart => Math.Max(0, _index - Math.Clamp(VisibleCapacity, 1, 7) + 1);
     public int VisibleRowCount => Math.Min(Math.Clamp(VisibleCapacity, 1, 7), Fields.Length - VisibleStart);
     public void FocusVisible(int row) => Focus(Fields[Math.Clamp(row, 0, VisibleRowCount - 1) + VisibleStart]);

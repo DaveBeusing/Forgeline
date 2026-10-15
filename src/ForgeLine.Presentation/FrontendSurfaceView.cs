@@ -63,6 +63,8 @@ public readonly record struct FrontendSurfaceView(
     public RenderQuality BackgroundQuality { get; init; } = RenderQuality.Medium;
     public FrontendGeometry? Layout { get; init; }
     public int DetailScroll { get; init; }
+    public int TotalDetailRows { get; init; }
+    public int DetailRowOffset { get; init; }
     public bool PauseContext { get; init; }
     public bool IsError { get; init; }
     public string DisabledPrimaryAction { get; init; } = string.Empty;

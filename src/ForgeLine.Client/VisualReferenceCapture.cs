@@ -222,7 +222,7 @@ internal static class VisualReferenceCapture
                     Action<IGraphicsCommandContext> record = context =>
                     {
                         recordFrameIndex = context.FrameIndex;
-                        if (frontend is not null && frontendView is { Kind: not FrontendSurfaceKind.PauseMenu } view)
+                        if (frontend is not null && frontendView is { Kind: not FrontendSurfaceKind.PauseMenu, PauseContext: false } view)
                         {
                             context.BeginPass(GraphicsFramePass.Overlay); frontend.Render(context, view); return;
                         }
@@ -250,12 +250,12 @@ internal static class VisualReferenceCapture
                             FormationTemplate.Compact, CombatGroupOverviewView.Empty, captureUx, rasterDpi, uiScale,
                             runtimeMetrics: new RuntimeMetricsView(60, 20, RuntimeSimulationState.Running),
                             showRuntimeMetrics: uiScenario != UiReferenceScenario.World);
-                        if (frontend is not null && frontendView is { Kind: FrontendSurfaceKind.PauseMenu } pause)
+                        if (frontend is not null && frontendView is { } pause)
                             frontend.Render(context, pause);
                     };
                     void PrepareTerrain()
                     {
-                        if (frontend is not null && frontendView?.Kind != FrontendSurfaceKind.PauseMenu) return;
+                        if (frontend is not null && frontendView?.Kind != FrontendSurfaceKind.PauseMenu && frontendView?.PauseContext != true) return;
                         ground.Prepare(camera,
                             Math.Max(1, (int)Math.Ceiling(display.Width * (double)profile.ResolutionScale)),
                             Math.Max(1, (int)Math.Ceiling(display.Height * (double)profile.ResolutionScale)),

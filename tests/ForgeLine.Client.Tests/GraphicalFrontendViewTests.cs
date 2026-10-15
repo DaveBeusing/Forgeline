@@ -64,6 +64,25 @@ public sealed class GraphicalFrontendViewTests
         Assert.True(view.IsError); Assert.Equal(.25f,view.Progress); Assert.Equal("Cannot read save",view.Status);
     }
     [Fact]
+    public void WindowedSettingsExposeTheRealListExtentWithoutCreatingAnotherScrollOwner()
+    {
+        var model = new SettingsModel(ClientSettingsFrontendAdapter.ToSnapshot(new ClientUserSettings()));
+        var interaction = new SettingsInteractionModel { VisibleCapacity = 3 };
+        interaction.Focus(FrontendSettingsField.Particles);
+        var view = FrontendPresentationAdapter.Settings(model,interaction);
+        Assert.Equal(10,view.TotalDetailRows);Assert.Equal(7,view.DetailRowOffset);
+        Assert.Equal(3,view.DetailLines.Count);Assert.True(view.DetailLines[^1].IsFocused);
+    }
+    [Fact]
+    public void NativeConflictAndDisplayFixturesUseRealPresentationContracts()
+    {
+        var conflict=UiReferenceStates.Frontend(UiReferenceScenario.BindingConflict,1920,1080,96,1);
+        Assert.True(conflict.IsError);Assert.Empty(conflict.PrimaryAction);Assert.Equal("APPLY",conflict.DisabledPrimaryAction);
+        var trial=UiReferenceStates.Frontend(UiReferenceScenario.DisplayTrial,1920,1080,96,1);
+        Assert.Contains("14s",trial.Footer,StringComparison.Ordinal);Assert.NotEqual("APPLY",trial.PrimaryAction);
+        Assert.True(UiReferenceStates.Frontend(UiReferenceScenario.PauseSettings,1920,1080,96,1).PauseContext);
+    }
+    [Fact]
     public void StepperHoverDoesNotMakeTheDisabledDirectionActionable()
     {
         var layout = FrontendDesign.ResolveLayout(1920,1080);

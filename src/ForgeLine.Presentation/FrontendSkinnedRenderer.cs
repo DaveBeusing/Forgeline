@@ -151,11 +151,10 @@ public sealed partial class FrontendOverlayRenderer
                 }
                 else if (line.ValueKind == FrontendValueKind.Slider && value.Width >= 140 * scale)
                 {
-                    var track = new FrontendRegion(value.X + 90 * scale, value.Y + 9 * scale, value.Width - 100 * scale, 8 * scale);
+                    var track = new FrontendRegion(value.X, row.Bottom - 8 * scale, MathF.Max(1, value.Width - 10 * scale), 4 * scale);
                     Panel(track, "control.slider_track");
                     skin.Draw("ui.skin.directorate.progress.progress_fill", Rect(track), ForgeLineUiPalette.Accent, fill: line.NormalizedValue);
-                    Panel(new(track.X + Math.Clamp(line.NormalizedValue, 0, 1) * MathF.Max(0, track.Width - 12 * scale), track.Y - 5 * scale, 12 * scale, 18 * scale), "control.slider_thumb");
-                    valueText = value with { Width = 80 * scale };
+                    Panel(new(track.X + Math.Clamp(line.NormalizedValue, 0, 1) * MathF.Max(0, track.Width - 12 * scale), track.Y - 3 * scale, 12 * scale, 10 * scale), "control.slider_thumb");
                 }
                 Text(line.Value, valueText, line.IsWarning ? ForgeLineUiPalette.Warning : line.IsFocused ? ForgeLineUiPalette.Accent : ForgeLineUiPalette.TextPrimary, layout.Controls ? .9f : 1);
                 if (layout.Controls) Panel(row with { X = row.X + row.Width * .35f, Width = scale }, "control.separator");
@@ -166,13 +165,15 @@ public sealed partial class FrontendOverlayRenderer
                 }
             }
             skin.SetClip(new(0, 0, width, height));
-            if (view.DetailLines.Count > count)
+            int totalRows = Math.Max(view.DetailLines.Count, view.TotalDetailRows);
+            int displayedStart = Math.Clamp(view.DetailRowOffset + start, 0, Math.Max(0,totalRows - count));
+            if (totalRows > count)
             {
                 var track = layout.Details with { X = layout.Details.Right + 4 * scale, Width = 8 * scale };
                 Panel(track, "control.scrollbar_track");
-                float thumb = MathF.Max(20 * scale, track.Height * count / view.DetailLines.Count);
-                Panel(track with { Y = track.Y + (track.Height - thumb) * start / Math.Max(1, view.DetailLines.Count - count), Height = thumb }, "control.scrollbar_thumb");
-                Text($"{start + 1}-{start + count} / {view.DetailLines.Count}  UP/DOWN / WHEEL", layout.Title with { X = layout.Title.X + layout.Title.Width * .42f, Width = layout.Title.Width * .58f }, ForgeLineUiPalette.TextMuted, .65f);
+                float thumb = MathF.Max(20 * scale, track.Height * count / totalRows);
+                Panel(track with { Y = track.Y + (track.Height - thumb) * displayedStart / Math.Max(1, totalRows - count), Height = thumb }, "control.scrollbar_thumb");
+                Text($"{displayedStart + 1}-{displayedStart + count} / {totalRows}  UP/DOWN / WHEEL", layout.Title with { X = layout.Title.X + layout.Title.Width * .42f, Width = layout.Title.Width * .58f }, ForgeLineUiPalette.TextMuted, .65f);
             }
             if (!string.IsNullOrEmpty(view.DisabledPrimaryAction))
             {
