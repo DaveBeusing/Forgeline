@@ -159,3 +159,7 @@ The [battlefield HUD](GraphicalBattlefieldHud.md) now shares the existing core,
 icon and portrait page leases. `UiSkinBatch` accepts a bounded per-consumer quad
 capacity; its default limit, ordering, overflow and alpha contracts are unchanged.
 See [native and package qualification](GraphicalBattlefieldHudQualification.md).
+
+## Economic HUD consumers
+
+[Production and operations](GraphicalProductionAndOperations.md) share the same seven atlas pages. Current composed HUD preparation is twelve bounded batches / 48 buffers / 5,603,328 upload-buffer bytes. Thin progress tracks resample complete sprites below the authored height and still clip the fill fraction. Operations records its opaque underlay before skin and remaining text. [Qualification](GraphicalProductionAndOperationsQualification.md) preserves source and package identities.

@@ -75,3 +75,7 @@ dock backplates, mode tabs, primary/page/footer controls and command-result laye
 Domain-card content contracts remain with this owner for production integration.
 Normal text is fitted inside shared controls; the independent bitmap path keeps
 its reviewed geometry hashes. See [qualification](GraphicalBattlefieldHudQualification.md).
+
+## Subsequent graphical domain-card qualification
+
+[Current production/operations qualification](GraphicalProductionAndOperationsQualification.md) migrates domain cards/queues after the shared dock shell. It retains the reviewed bitmap fixtures and current input controls, and records exact final native/payload identities separately from the historical measurements above.

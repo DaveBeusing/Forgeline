@@ -157,5 +157,9 @@ The [graphical battlefield HUD](GraphicalBattlefieldHud.md) now consumes compile
 resource/selection artwork and actual roster portraits through `GameplayHudArtwork`
 and `GameplayHudSkin`. Exact mappings are validated against this source catalog
 and the packed sprites. Existing `ui.icon.*` IDs remain valid for independent
-bitmap paths and the production/tactical consumers that have not migrated.
+bitmap paths and the tactical map/cursor consumers outside this integration.
 No artwork, definitions or catalog content changes in this consumer integration.
+
+## Production and operations consumers
+
+[Domain cards and operations](GraphicalProductionAndOperations.md) now consume actual offered/queued roster portraits, existing resource/command/status roles, explicit TechnologyId 1-4 role bindings and Operations category artwork. Unknown future technologies remain neutral. The source catalog and packed payloads are unchanged; bindings and native lifetime/privacy are qualified separately from pending human art acceptance.
