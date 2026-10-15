@@ -1435,7 +1435,8 @@ internal sealed class SelectionInspectorHudRenderer : IDisposable
 
         public void AppendClipped(string value)
         {
-            ReadOnlySpan<char> prefix = value.AsSpan(0, Math.Min(value.Length, _buffer.Length - _length));
+            ReadOnlySpan<char> text = value.AsSpan();
+            ReadOnlySpan<char> prefix = text[..Math.Min(text.Length, _buffer.Length - _length)];
             prefix.CopyTo(_buffer[_length..]);
             _length += prefix.Length;
         }
