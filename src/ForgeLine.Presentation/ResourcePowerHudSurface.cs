@@ -1519,7 +1519,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         Vector2 Position,
         Vector4 Color);
 
-    private ref struct HudTextBuilder
+    internal ref struct HudTextBuilder
     {
         private Span<char> _buffer;
         private int _length;
@@ -1577,3 +1577,4 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
 
 
 }
+

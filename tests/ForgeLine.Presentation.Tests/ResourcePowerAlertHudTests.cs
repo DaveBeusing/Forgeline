@@ -16,7 +16,7 @@ public sealed class ResourcePowerAlertHudTests
     public void UnknownQuantityCannotBePresentedAsARealZero(double value, string expected)
     {
         Span<char> buffer = stackalloc char[40];
-        var text = new HudTextBuilder(buffer);
+        var text = new ResourcePowerHudRenderer.HudTextBuilder(buffer);
         ResourcePowerHudRenderer.AppendQuantity(ref text, value);
         Assert.Equal(expected, text.Written.ToString());
     }
@@ -258,4 +258,5 @@ public sealed class ResourcePowerAlertHudTests
             feedback,
             default);
 }
+
 
