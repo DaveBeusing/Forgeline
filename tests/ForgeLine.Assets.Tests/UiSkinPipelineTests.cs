@@ -56,7 +56,7 @@ public sealed class UiSkinPipelineTests
         string root = Path.Combine(Path.GetTempPath(),"forgeline-atlas-"+Guid.NewGuid().ToString("N"));
         try
         {
-            
+
             Assert.True(AssetPipelineCompiler.Compile(source,Path.Combine(root,"a")).Success);
             Assert.True(AssetPipelineCompiler.Compile(source,Path.Combine(root,"b")).Success);
             var a = RuntimeAssetCatalog.LoadCancellable(Path.Combine(root,"a"),TestContext.Current.CancellationToken,true);
